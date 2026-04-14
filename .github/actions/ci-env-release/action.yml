@@ -1,0 +1,58 @@
+name: Release CI Test Environment
+description: >
+  Signal the ci-env-controller to tear down a test environment by patching
+  the trigger ConfigMap to desired-state=absent, then wait for cleanup to
+  complete and delete the ConfigMap.
+
+inputs:
+  configmap-name:
+    description: Name of the trigger ConfigMap
+    required: true
+  ci-env-namespace:
+    description: Namespace where ci-env-controller runs
+    default: ci-env
+  timeout:
+    description: Max seconds to wait for cleanup to complete
+    default: '300'
+
+runs:
+  using: composite
+  steps:
+    - name: Release environment
+      shell: bash
+      env:
+        CM_NAME: ${{ inputs.configmap-name }}
+        CM_NS: ${{ inputs.ci-env-namespace }}
+        TIMEOUT: ${{ inputs.timeout }}
+      run: |
+        if ! oc get configmap "${CM_NAME}" -n "${CM_NS}" &>/dev/null; then
+          echo "ConfigMap ${CM_NS}/${CM_NAME} not found, nothing to clean up."
+          exit 0
+        fi
+
+        oc patch configmap "${CM_NAME}" -n "${CM_NS}" \
+          --type merge -p '{"data":{"desired-state":"absent"}}'
+
+        echo "Waiting for controller to clean up..."
+        INTERVAL=5
+        ELAPSED=0
+
+        while true; do
+          STATUS="$(oc get configmap "${CM_NAME}" -n "${CM_NS}" \
+            -o jsonpath='{.data.status}' 2>/dev/null || echo "")"
+
+          if [[ "${STATUS}" == "cleaned" ]]; then
+            echo "Cleanup complete."
+            break
+          fi
+
+          if (( ELAPSED >= TIMEOUT )); then
+            echo "::warning::Timed out waiting for controller cleanup (status=${STATUS})"
+            break
+          fi
+
+          sleep "${INTERVAL}"
+          ELAPSED=$(( ELAPSED + INTERVAL ))
+        done
+
+        oc delete configmap "${CM_NAME}" -n "${CM_NS}" 2>/dev/null || true

@@ -1,0 +1,81 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "ci-test-stack.consoleName" . }}
+  labels:
+    {{- include "ci-test-stack.labels" . | nindent 4 }}
+    app.kubernetes.io/component: console
+spec:
+  replicas: {{ .Values.console.replicas }}
+  selector:
+    matchLabels:
+      app: {{ include "ci-test-stack.consoleName" . }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "ci-test-stack.consoleName" . }}
+        {{- include "ci-test-stack.labels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ include "ci-test-stack.consoleName" . }}
+      containers:
+        - name: console
+          image: {{ required "console.image is required" .Values.console.image | quote }}
+          ports:
+            - containerPort: {{ .Values.console.port }}
+              protocol: TCP
+          env:
+            - name: BRIDGE_USER_AUTH
+              value: "disabled"
+            - name: BRIDGE_K8S_MODE
+              value: "off-cluster"
+            - name: BRIDGE_K8S_AUTH
+              value: "bearer-token"
+            - name: BRIDGE_K8S_MODE_OFF_CLUSTER_SKIP_VERIFY_TLS
+              value: "true"
+            - name: BRIDGE_K8S_MODE_OFF_CLUSTER_ENDPOINT
+              value: {{ required "console.apiServer is required" .Values.console.apiServer | quote }}
+            - name: BRIDGE_K8S_AUTH_BEARER_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "ci-test-stack.consoleName" . }}-token
+                  key: token
+            - name: BRIDGE_USER_SETTINGS_LOCATION
+              value: "localstorage"
+            - name: BRIDGE_I18N_NAMESPACES
+              value: "plugin__kubevirt-plugin"
+            - name: BRIDGE_PLUGINS
+              value: "kubevirt-plugin={{ include "ci-test-stack.pluginUrl" . }}"
+            {{- if .Values.console.pluginProxy.endpoint }}
+            - name: BRIDGE_PLUGIN_PROXY
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "ci-test-stack.consoleName" . }}-config
+                  key: pluginProxy
+            {{- end }}
+            {{- if .Values.console.monitoring.thanosUrl }}
+            - name: BRIDGE_K8S_MODE_OFF_CLUSTER_THANOS
+              value: {{ .Values.console.monitoring.thanosUrl | quote }}
+            {{- end }}
+            {{- if .Values.console.monitoring.alertmanagerUrl }}
+            - name: BRIDGE_K8S_MODE_OFF_CLUSTER_ALERTMANAGER
+              value: {{ .Values.console.monitoring.alertmanagerUrl | quote }}
+            {{- end }}
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
+          readinessProbe:
+            httpGet:
+              path: /
+              port: {{ .Values.console.port }}
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: {{ .Values.console.port }}
+            initialDelaySeconds: 15
+            periodSeconds: 30

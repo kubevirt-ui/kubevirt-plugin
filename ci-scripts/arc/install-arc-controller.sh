@@ -22,8 +22,8 @@ ARC_VERSION="${ARC_VERSION:-0.14.0}"
 echo "=== ARC controller installation (OpenShift) ==="
 echo "  ARC_CONTROLLER_NS:           ${ARC_CONTROLLER_NS}"
 echo "  ARC_CONTROLLER_INSTALL_NAME: ${ARC_CONTROLLER_INSTALL_NAME}"
-echo "  ARC_VERSION:                 ${ARC_VERSION}"
 echo "  ARC_HELM_REPO:               ${ARC_HELM_REPO}"
+echo "  ARC_VERSION:                 ${ARC_VERSION}"
 echo ""
 
 if ! oc get clusterversion version &>/dev/null; then
@@ -38,11 +38,15 @@ oc create namespace "${ARC_CONTROLLER_NS}" --dry-run=client -o yaml | oc apply -
 echo "Applying ARC SCC and ClusterRole (github-arc)..."
 oc apply -f "${ARC_DIR}/arc-openshift-scc.yaml"
 
-CONTROLLER_SA_NAME="${ARC_CONTROLLER_INSTALL_NAME}-gha-rs-controller"
+echo "Applying CI console ClusterRole (ci-console)..."
+oc apply -f "${ARC_DIR}/ci-console-clusterrole.yaml"
+
 CONTROLLER_ARGS=(--namespace "${ARC_CONTROLLER_NS}")
 if [[ -n "${ARC_VERSION}" && "${ARC_VERSION}" != "latest" ]]; then
   CONTROLLER_ARGS+=(--version "${ARC_VERSION}")
 fi
+
+CONTROLLER_SA_NAME="${ARC_CONTROLLER_INSTALL_NAME}-gha-rs-controller"
 CONTROLLER_ARGS+=(--set "serviceAccount.name=${CONTROLLER_SA_NAME}")
 
 echo "Installing ARC controller (Helm release: ${ARC_CONTROLLER_INSTALL_NAME})..."

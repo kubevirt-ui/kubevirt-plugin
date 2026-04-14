@@ -1,0 +1,28 @@
+# Plugin (kubevirt-plugin nginx image built from the PR)
+plugin:
+  image: ''
+  port: 9080
+  replicas: 1
+
+# Console (origin-console in off-cluster mode)
+console:
+  image: 'quay.io/openshift/origin-console:latest'
+  port: 9000
+  replicas: 1
+  apiServer: ''
+
+  route:
+    enabled: true
+    host: ''
+
+  # kubevirt-apiserver-proxy endpoint (Route or internal Service URL)
+  pluginProxy:
+    endpoint: ''
+
+  monitoring:
+    thanosUrl: ''
+    alertmanagerUrl: ''
+
+# ClusterRole pre-created at ARC install time (ci-console-clusterrole.yaml)
+rbac:
+  consoleClusterRole: ci-console

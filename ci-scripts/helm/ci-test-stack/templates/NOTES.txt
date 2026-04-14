@@ -1,0 +1,12 @@
+CI Test Stack deployed.
+
+Plugin:  http://{{ include "ci-test-stack.pluginName" . }}.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.plugin.port }}
+Console: http://{{ include "ci-test-stack.consoleName" . }}.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.console.port }}
+{{- if .Values.console.route.enabled }}
+
+Route:
+  oc get route {{ include "ci-test-stack.consoleName" . }} -n {{ .Release.Namespace }} -o jsonpath='{.spec.host}'
+{{- end }}
+
+For Cypress, set:
+  BRIDGE_BASE_ADDRESS=http://{{ include "ci-test-stack.consoleName" . }}.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.console.port }}

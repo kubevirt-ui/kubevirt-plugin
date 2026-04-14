@@ -21,12 +21,15 @@ ARG NODE_VERSION=22
 ARG OC_VERSION=4.20
 # KubeVirt CLI version to match HCO install (e.g. v1.4.0)
 ARG VIRTCTL_VERSION=v1.4.0
+# Helm version (e.g. 3.19.0)
+ARG HELM_VERSION=3.19.0
 
 # Direct binary download URLs resolved from ConsoleCLIDownload by setup-runner-image.sh.
 # When set, these take precedence over the static mirror/GitHub URLs above and guarantee
 # the binaries match the live cluster. Left empty to use the static fallback URLs.
 ARG OC_URL=""
 ARG VIRTCTL_URL=""
+ARG HELM_URL=""
 
 # curl and wget2 are both installed:
 #   curl  — kept for CI workflow scripts at runtime
@@ -100,6 +103,18 @@ RUN if [ -n "${VIRTCTL_URL}" ]; then \
            "https://github.com/kubevirt/kubevirt/releases/download/${VIRTCTL_VERSION}/virtctl-${VIRTCTL_VERSION}-linux-amd64"; \
     fi \
     && chmod +x /usr/local/bin/virtctl
+
+# Helm — use console download URL if resolved, else get.helm.sh.
+# Console route serves a .tar.gz; fallback uses wget2 (GnuTLS) for the external HTTPS download.
+RUN if [ -n "${HELM_URL}" ]; then \
+      wget2 -qO /tmp/helm-archive "${HELM_URL}" \
+      && tar -xf /tmp/helm-archive -C /usr/local/bin --strip-components=1 linux-amd64/helm \
+      && rm /tmp/helm-archive; \
+    else \
+      wget2 -qO- "https://get.helm.sh/helm-v${HELM_VERSION}-linux-amd64.tar.gz" \
+           | tar -xzf - -C /usr/local/bin --strip-components=1 linux-amd64/helm; \
+    fi \
+    && chmod +x /usr/local/bin/helm
 
 USER runner
 

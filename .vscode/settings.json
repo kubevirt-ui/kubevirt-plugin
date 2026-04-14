@@ -7,5 +7,9 @@
     "source.fixAll.eslint": "always"
   },
   "eslint.validate": ["javascript", "typescript"],
-  "cSpell.words": ["hyperconverged", "kubevirt"]
+  "cSpell.words": ["hyperconverged", "kubevirt"],
+  "yaml.validate": true,
+  "files.associations": {
+    "ci-scripts/helm/**/templates/*.yaml": "helm"
+  }
 }

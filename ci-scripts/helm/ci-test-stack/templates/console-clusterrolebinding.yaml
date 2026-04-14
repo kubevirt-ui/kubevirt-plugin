@@ -1,0 +1,18 @@
+# Binds the console SA to the ci-console ClusterRole that was pre-created at
+# ARC install time. The ClusterRoleBinding is cluster-scoped so it must be
+# explicitly deleted on cleanup (helm uninstall handles this).
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ include "ci-test-stack.consoleName" . }}
+  labels:
+    {{- include "ci-test-stack.labels" . | nindent 4 }}
+    app.kubernetes.io/component: console
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ .Values.rbac.consoleClusterRole }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "ci-test-stack.consoleName" . }}
+    namespace: {{ .Release.Namespace }}
