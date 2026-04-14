@@ -10,7 +10,7 @@ import {
   PROJECT_SELECTOR_PREFIX,
 } from '@virtualmachines/tree/utils/constants';
 
-import RightClickActionMenu from './RightClickActionMenu';
+import GroupedRightClickActionMenu from './GroupedRightClickActionMenu';
 import { getCreateVMAction, getElementComponentsFromID, getVMsTrigger } from './utils';
 
 type DefaultRightClickActionMenuProps = {
@@ -28,14 +28,14 @@ const DefaultRightClickActionMenu: FC<DefaultRightClickActionMenuProps> = ({
   const vms = getVMsTrigger(triggerElement);
   const [vmims] = useVirtualMachineInstanceMigrations(cluster, namespace);
   const vmimMapper = useVirtualMachineInstanceMigrationMapper(vmims);
-  const baseActions = useMultipleVirtualMachineActions(vms, vmimMapper);
+  const baseActions = useMultipleVirtualMachineActions(vms, vmimMapper, true);
 
   const navigate = useNavigate();
 
-  const actions =
+  const createVMAction =
     prefix === PROJECT_SELECTOR_PREFIX
-      ? [getCreateVMAction(t, navigate, namespace, cluster), ...baseActions]
-      : baseActions;
+      ? getCreateVMAction(t, navigate, namespace, cluster)
+      : undefined;
 
   const getNestedLevel = () => {
     if (prefix === FOLDER_SELECTOR_PREFIX) {
@@ -47,8 +47,9 @@ const DefaultRightClickActionMenu: FC<DefaultRightClickActionMenuProps> = ({
   const nestedLevel = getNestedLevel();
 
   return (
-    <RightClickActionMenu
-      actions={actions}
+    <GroupedRightClickActionMenu
+      actions={baseActions}
+      createVMAction={createVMAction}
       hideMenu={hideMenu}
       nestedLevel={nestedLevel}
       triggerRef={() => triggerElement.children.item(0) as HTMLElement}

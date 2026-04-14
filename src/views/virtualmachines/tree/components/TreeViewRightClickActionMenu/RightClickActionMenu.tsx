@@ -2,14 +2,11 @@ import React, { FC } from 'react';
 
 import ActionDropdownItem from '@kubevirt-utils/components/ActionDropdownItem/ActionDropdownItem';
 import { ActionDropdownItemType } from '@kubevirt-utils/components/ActionsDropdown/constants';
-import { Menu, MenuContent, MenuList, Popper } from '@patternfly/react-core';
+import { MenuList } from '@patternfly/react-core';
 
-import { BASE_MENU_MARGIN, MENU_DISTANCE, NESTED_LEVEL_MENU_MARGIN } from './constants';
+import RightClickMenuWrapper from './RightClickMenuWrapper';
 
-const JOYRIDE_OVERLAY_Z_INDEX = 10000;
-const RIGHT_CLICK_MENU_Z_INDEX = JOYRIDE_OVERLAY_Z_INDEX + 1;
-
-type RightClickActionMenuProps = {
+export type RightClickActionMenuProps = {
   actions: ActionDropdownItemType[];
   hideMenu: () => void;
   nestedLevel: number;
@@ -21,30 +18,14 @@ const RightClickActionMenu: FC<RightClickActionMenuProps> = ({
   hideMenu,
   nestedLevel,
   triggerRef,
-}) => {
-  return (
-    <Popper
-      popper={
-        <Menu
-          className="right-click-action-menu"
-          containsFlyout
-          style={{ marginLeft: `${BASE_MENU_MARGIN + nestedLevel * NESTED_LEVEL_MENU_MARGIN}px` }}
-        >
-          <MenuContent>
-            <MenuList>
-              {actions?.map((action) => (
-                <ActionDropdownItem action={action} key={action?.id} setIsOpen={hideMenu} />
-              ))}
-            </MenuList>
-          </MenuContent>
-        </Menu>
-      }
-      distance={MENU_DISTANCE}
-      isVisible
-      triggerRef={triggerRef}
-      zIndex={RIGHT_CLICK_MENU_Z_INDEX}
-    />
-  );
-};
+}) => (
+  <RightClickMenuWrapper nestedLevel={nestedLevel} triggerRef={triggerRef}>
+    <MenuList>
+      {actions?.map((action) => (
+        <ActionDropdownItem action={action} key={action.id} setIsOpen={hideMenu} />
+      ))}
+    </MenuList>
+  </RightClickMenuWrapper>
+);
 
 export default RightClickActionMenu;

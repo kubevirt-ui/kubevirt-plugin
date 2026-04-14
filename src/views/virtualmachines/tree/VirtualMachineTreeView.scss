@@ -70,6 +70,10 @@
 
 .right-click-action-menu {
   min-width: 0 !important;
+
+  .pf-v6-c-menu__group-title {
+    font-size: var(--pf-t--global--font--size--xs);
+  }
 }
 
 .vms-drawer-content-body {

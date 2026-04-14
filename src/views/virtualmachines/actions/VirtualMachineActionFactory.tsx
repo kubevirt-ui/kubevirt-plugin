@@ -94,7 +94,7 @@ export const createVirtualMachineActionFactory = (t: TFunction) => ({
       cta: () => cancelMigration(vmim),
       description: !!vmim?.metadata?.deletionTimestamp && t('Canceling ongoing migration'),
       disabled: !vmim || !!vmim?.metadata?.deletionTimestamp,
-      id: 'vm-action-cancel-migrate',
+      id: ACTIONS_ID.CANCEL_COMPUTE_MIGRATION,
       label: t('Cancel compute migration'),
     };
   },
@@ -114,13 +114,13 @@ export const createVirtualMachineActionFactory = (t: TFunction) => ({
       description: noMigratableDisks && t('No migratable disks found'),
       disabled: noMigratableDisks,
       disabledTooltip: !noMigratableDisks && getNoPermissionTooltipContent(t),
-      id: 'vm-action-clone',
+      id: ACTIONS_ID.CLONE,
       label: t('Clone'),
     };
   },
   controlActions: (controlActions: ActionDropdownItemType[]): ActionDropdownItemType => ({
     cta: () => null, // follow migrationActions
-    id: 'control-menu',
+    id: ACTIONS_ID.CONTROL_MENU,
     label: t('Control'),
     options: controlActions,
   }),
@@ -131,7 +131,7 @@ export const createVirtualMachineActionFactory = (t: TFunction) => ({
       description: t('SSH using virtctl'),
       disabled: isEmpty(getVMSSHSecretName(vm)),
       icon: <CopyIcon />,
-      id: 'vm-action-copy-ssh',
+      id: ACTIONS_ID.COPY_SSH_COMMAND,
       label: t('Copy SSH command'),
     };
   },
@@ -153,7 +153,7 @@ export const createVirtualMachineActionFactory = (t: TFunction) => ({
               'VirtualMachine is delete protected and cannot be deleted. To enable deletion, go to VirtualMachine details and disable deletion protection.',
             )
           : undefined,
-      id: 'vm-action-delete',
+      id: ACTIONS_ID.DELETE,
       label: t('Delete'),
     };
   },
@@ -183,7 +183,7 @@ export const createVirtualMachineActionFactory = (t: TFunction) => ({
           onClose={onClose}
         />
       )),
-    id: 'vm-action-edit-labels',
+    id: ACTIONS_ID.EDIT_LABELS,
     label: t('Edit labels'),
   }),
   editRunStrategy: (
@@ -212,7 +212,7 @@ export const createVirtualMachineActionFactory = (t: TFunction) => ({
           gracePeriod: 0,
         }),
       disabled: [Migrating, Provisioning, Stopped, Unknown].includes(vm?.status?.printableStatus),
-      id: 'vm-action-force-stop',
+      id: ACTIONS_ID.FORCE_STOP,
       label: t('Force stop'),
     };
   },
@@ -244,7 +244,7 @@ export const createVirtualMachineActionFactory = (t: TFunction) => ({
       description: t('Migrate VirtualMachine to a different Node'),
       disabled: !liveMigratable,
       disabledTooltip: getDisabledTooltip(),
-      id: 'vm-action-migrate-compute',
+      id: ACTIONS_ID.MIGRATE_COMPUTE,
       label: t('Compute'),
     };
   },
@@ -263,13 +263,13 @@ export const createVirtualMachineActionFactory = (t: TFunction) => ({
       cta: () => createModal((props) => <VirtualMachineMigrateModal vms={[vm]} {...props} />),
       description: t('Migrate VirtualMachine storage to a different StorageClass'),
       disabledTooltip: getNoPermissionTooltipContent(t),
-      id: 'vm-action-migrate-storage',
+      id: ACTIONS_ID.MIGRATE_STORAGE,
       label: t('Storage'),
     };
   },
   migrationActions: (migrationActions): ActionDropdownItemType => ({
     cta: () => null, // Required to avoid breaking actions in the topology view
-    id: 'migration-menu',
+    id: ACTIONS_ID.MIGRATION_MENU,
     label: t('Migration'),
     options: migrationActions,
   }),
@@ -301,7 +301,7 @@ export const createVirtualMachineActionFactory = (t: TFunction) => ({
             {...props}
           />
         )),
-      id: 'vm-action-move-to-folder',
+      id: ACTIONS_ID.MOVE_TO_FOLDER,
       label: t('Move to folder'),
     };
   },
@@ -316,7 +316,7 @@ export const createVirtualMachineActionFactory = (t: TFunction) => ({
         ? t('Open console in new tab')
         : t('The VirtualMachine is not running'),
       disabled: !isRunning(vm),
-      id: 'vm-action-open-console',
+      id: ACTIONS_ID.OPEN_CONSOLE,
       label: t('Open Console'),
     };
   },
@@ -340,7 +340,7 @@ export const createVirtualMachineActionFactory = (t: TFunction) => ({
             ))
           : pauseVM(vm),
       disabled: !isRunning(vm) || isSnapshotting(vm) || isRestoring(vm),
-      id: 'vm-action-pause',
+      id: ACTIONS_ID.PAUSE,
       label: t('Pause'),
     };
   },
@@ -369,7 +369,7 @@ export const createVirtualMachineActionFactory = (t: TFunction) => ({
           : resetVM(vm),
       description: t('Hard power cycle on the VM'),
       disabled: !isRunning(vm) || isSnapshotting(vm) || isRestoring(vm),
-      id: 'vm-action-reset',
+      id: ACTIONS_ID.RESET,
       label: t('Reset'),
     };
   },
@@ -399,7 +399,7 @@ export const createVirtualMachineActionFactory = (t: TFunction) => ({
         ) ||
         isSnapshotting(vm) ||
         isRestoring(vm),
-      id: 'vm-action-restart',
+      id: ACTIONS_ID.RESTART,
       label: t('Restart'),
     };
   },
@@ -413,7 +413,7 @@ export const createVirtualMachineActionFactory = (t: TFunction) => ({
         <SaveAsTemplateModal isOpen={isOpen} onClose={onClose} vm={vm} />
       )),
     disabledTooltip: getNoPermissionTooltipContent(t),
-    id: 'vm-action-save-as-template',
+    id: ACTIONS_ID.SAVE_AS_TEMPLATE,
     label: t('Save as template'),
   }),
   snapshot: (
@@ -423,7 +423,7 @@ export const createVirtualMachineActionFactory = (t: TFunction) => ({
     return {
       accessReview: asAccessReview(VirtualMachineSnapshotModel, vm, 'create'),
       cta: () => createModal((props) => <SnapshotModal vm={vm} {...props} />),
-      id: 'vm-action-snapshot',
+      id: ACTIONS_ID.SNAPSHOT,
       label: t('Take snapshot'),
     };
   },
@@ -444,7 +444,7 @@ export const createVirtualMachineActionFactory = (t: TFunction) => ({
         ].includes(vm?.status?.printableStatus) ||
         isSnapshotting(vm) ||
         isRestoring(vm),
-      id: 'vm-action-start',
+      id: ACTIONS_ID.START,
       label: t('Start'),
     };
   },
@@ -473,7 +473,7 @@ export const createVirtualMachineActionFactory = (t: TFunction) => ({
         ) ||
         isSnapshotting(vm) ||
         isRestoring(vm),
-      id: 'vm-action-stop',
+      id: ACTIONS_ID.STOP,
       label: t('Stop'),
     };
   },
@@ -487,7 +487,7 @@ export const createVirtualMachineActionFactory = (t: TFunction) => ({
       ),
       cta: () => unpauseVM(vm),
       disabled: vm?.status?.printableStatus !== Paused,
-      id: 'vm-action-unpause',
+      id: ACTIONS_ID.UNPAUSE,
       label: t('Unpause'),
     };
   },
