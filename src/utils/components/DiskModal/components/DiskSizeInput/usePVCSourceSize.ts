@@ -16,8 +16,10 @@ const usePVCSourceSize = (
   dataSourceRef: V1beta1DataVolumeSourceRef,
   pvcClaimName: string,
   pvcClaimNamespace: string,
+  clusterFromResource?: string,
 ): [pvcSize: string, loaded: boolean, error: any] => {
-  const cluster = useClusterParam();
+  const clusterFromUrl = useClusterParam();
+  const cluster = clusterFromResource ?? clusterFromUrl;
   const [dataSource, dsLoaded, dsError] = useK8sWatchData<V1beta1DataSource>(
     dataSourceRef
       ? {

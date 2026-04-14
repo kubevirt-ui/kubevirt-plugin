@@ -3,8 +3,9 @@ import { modelToGroupVersionKind, PersistentVolumeClaimModel } from '@kubevirt-u
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 
-const usePVCDiskSource = (pvcName: string, pvcNamespace: string) => {
-  const cluster = useClusterParam();
+const usePVCDiskSource = (pvcName: string, pvcNamespace: string, clusterFromResource?: string) => {
+  const clusterFromUrl = useClusterParam();
+  const cluster = clusterFromResource ?? clusterFromUrl;
 
   return useK8sWatchData<IoK8sApiCoreV1PersistentVolumeClaim>(
     pvcName

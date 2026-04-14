@@ -3,6 +3,7 @@ import React, { FC } from 'react';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getDataVolumeTemplates, getVolumes } from '@kubevirt-utils/resources/vm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { getCluster } from '@multicluster/helpers/selectors';
 
 import usePVCDiskSource from './hooks/usePVCDiskSource';
 import { getDiskModalBySource } from './utils/getDiskModalBySource';
@@ -27,7 +28,7 @@ const DiskModal: FC<V1DiskModalProps> = ({
   );
 
   const namespace = getNamespace(vm);
-  const [pvc] = usePVCDiskSource(createdPVCName, namespace);
+  const [pvc] = usePVCDiskSource(createdPVCName, namespace, getCluster(vm));
 
   const editDiskSource = getSourceFromVolume(diskVolume, dataVolumeTemplate);
 
