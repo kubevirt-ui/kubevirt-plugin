@@ -1,0 +1,40 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "ci-test-stack.pluginName" . }}-nginx
+  labels:
+    {{- include "ci-test-stack.labels" . | nindent 4 }}
+    app.kubernetes.io/component: plugin
+data:
+  nginx.conf: |
+    pid /tmp/nginx.pid;
+    error_log /dev/stdout info;
+
+    events {
+      worker_connections 1024;
+    }
+
+    http {
+      access_log         /dev/stdout;
+      include            /etc/nginx/mime.types;
+      default_type       application/octet-stream;
+      keepalive_timeout  65;
+
+      add_header X-Content-Type-Options nosniff;
+
+      server {
+        listen       {{ .Values.plugin.port }} default_server;
+        root         /usr/share/nginx/html;
+
+        location = /plugin-manifest.json {
+          add_header Cache-Control 'no-cache, no-store, must-revalidate, proxy-revalidate, max-age=0';
+          add_header Pragma 'no-cache';
+          add_header Expires '0';
+        }
+        location = /plugin-entry.js {
+          add_header Cache-Control 'no-cache, no-store, must-revalidate, proxy-revalidate, max-age=0';
+          add_header Pragma 'no-cache';
+          add_header Expires '0';
+        }
+      }
+    }

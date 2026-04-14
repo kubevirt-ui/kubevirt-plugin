@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ include "ci-test-stack.consoleName" . }}
+  labels:
+    {{- include "ci-test-stack.labels" . | nindent 4 }}
+    app.kubernetes.io/component: console
+---
+# Legacy-style SA token Secret. The token controller auto-populates it so the
+# console Deployment can reference the token without an out-of-band TokenRequest.
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ include "ci-test-stack.consoleName" . }}-token
+  labels:
+    {{- include "ci-test-stack.labels" . | nindent 4 }}
+    app.kubernetes.io/component: console
+  annotations:
+    kubernetes.io/service-account.name: {{ include "ci-test-stack.consoleName" . }}
+type: kubernetes.io/service-account-token

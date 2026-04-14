@@ -4,21 +4,22 @@
 # custom ARC runner image (ci-scripts/arc/runner-image/Dockerfile).
 #
 # Output: prints IMAGE_REF= to stdout (and to ARC_RUNNER_IMAGE_FILE if set).
-# Run setup-dind-mirror.sh first if you need an internal docker:dind mirror (optional).
 #
 # Optional environment variables:
 #   ARC_RUNNERS_NS   (default: arc-runners)
 #   OC_VERSION       OpenShift client version build-arg (default: detect or 4.20)
+#   HELM_VERSION     Helm version build-arg (default: 3.19.0)
 #   VIRTCTL_VERSION  (default: v1.4.0)
 #
 # Requires: oc logged into OpenShift; jq optional for version detection and URL resolution.
 #
 # Binary URL resolution:
-#   When jq is available, this script queries ConsoleCLIDownload resources to find the
-#   exact binary download URLs for oc, kubectl, and virtctl that match the live cluster.
-#   These are passed to the Docker build as OC_URL and VIRTCTL_URL build-args.
+#   Uses ci-scripts/_cluster-helpers.sh to query ConsoleCLIDownload resources for
+#   exact binary download URLs (oc, virtctl, helm) matching the live cluster.
+#   These are passed to the Docker build as OC_URL, VIRTCTL_URL, and HELM_URL build-args.
 #   If resolution fails (CRD not found, jq absent, etc.), the Dockerfile falls back to
-#   mirror.openshift.com / GitHub releases using OC_VERSION / VIRTCTL_VERSION.
+#   mirror.openshift.com / GitHub releases / get.helm.sh using OC_VERSION / VIRTCTL_VERSION /
+#   HELM_VERSION.
 
 set -euo pipefail
 ARC_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -32,62 +33,23 @@ if ! oc get clusterversion version &>/dev/null; then
   exit 1
 fi
 
-if [[ -z "${OC_VERSION:-}" ]]; then
-  OC_VERSION=$(oc version --output json 2>/dev/null | jq -r '.openshiftVersion | split(".") | .[0:2] | join(".") // empty') || true
-  OC_VERSION="${OC_VERSION:-4.20}"
-fi
+source "${CI_SCRIPTS_DIR}/_cluster-helpers.sh"
+
+resolve_oc_version
+HELM_VERSION="${HELM_VERSION:-3.19.0}"
 VIRTCTL_VERSION="${VIRTCTL_VERSION:-v1.4.0}"
 
-# Resolve binary download URLs from ConsoleCLIDownload resources so the image binaries
-# match the live cluster exactly. Requires jq; silently skipped if unavailable.
-OC_URL=""
-VIRTCTL_URL=""
-if command -v jq &>/dev/null; then
-  CLI_DOWNLOAD_JSON=$(oc get consoleclidownload -o json 2>/dev/null || true)
-  if [[ -n "${CLI_DOWNLOAD_JSON}" ]]; then
-    OC_URL=$(echo "${CLI_DOWNLOAD_JSON}" \
-      | jq -r '.items[].spec.links[] | select(.text | test("oc.*linux.*x86_64|oc.*linux.*amd64"; "i")) | .href' \
-      | head -1)
-    VIRTCTL_URL=$(echo "${CLI_DOWNLOAD_JSON}" \
-      | jq -r '.items[].spec.links[] | select(.text | test("virtctl.*linux.*amd64|virtctl.*linux.*x86_64"; "i")) | .href' \
-      | head -1 || true)
-
-    # Rewrite public console download route URLs to their backing internal HTTP services so
-    # that build pods don't need to trust the cluster's self-signed ingress CA.
-    # Each route's host maps to a service that listens on plain HTTP internally; TLS is only
-    # terminated at the ingress router. We resolve service+namespace from the route spec so
-    # this works for any URL regardless of hostname naming conventions.
-    _ALL_ROUTES_JSON=$(oc get route --all-namespaces -o json 2>/dev/null || true)
-    _url_to_internal() {
-      local url="${1}"
-      local host path route_info ns svc svc_port
-      host=$(echo "${url}" | sed -E 's|https://([^/]+).*|\1|')
-      path=$(echo "${url}" | sed -E 's|https://[^/]+(/.*)?|\1|' || echo '/')
-      route_info=$(echo "${_ALL_ROUTES_JSON}" \
-        | jq -r --arg h "${host}" \
-            '.items[] | select(.spec.host == $h) | "\(.metadata.namespace) \(.spec.to.name)"' \
-        | head -1)
-      if [[ -n "${route_info}" ]]; then
-        read -r ns svc <<< "${route_info}"
-        svc_port=$(oc get service "${svc}" -n "${ns}" \
-          -o jsonpath='{.spec.ports[0].port}' 2>/dev/null || echo "8080")
-        echo "http://${svc}.${ns}.svc.cluster.local:${svc_port}${path}"
-      else
-        echo "${url}"
-      fi
-    }
-    [[ -n "${OC_URL}" ]]      && OC_URL=$(_url_to_internal "${OC_URL}")
-    [[ -n "${VIRTCTL_URL}" ]] && VIRTCTL_URL=$(_url_to_internal "${VIRTCTL_URL}")
-  fi
-fi
+resolve_cli_downloads
 
 echo "=== Build ARC runner image (in-cluster, OpenShift) ==="
 echo "  ARC_RUNNERS_NS:   ${ARC_RUNNERS_NS}"
 echo "  OC_VERSION:       ${OC_VERSION}"
 echo "  VIRTCTL_VERSION:  ${VIRTCTL_VERSION}"
+echo "  HELM_VERSION:     ${HELM_VERSION}"
 echo "  RUNNER_IMAGE_DIR: ${RUNNER_IMAGE_DIR}"
 echo "  OC_URL:           ${OC_URL:-(fallback to mirror.openshift.com)}"
 echo "  VIRTCTL_URL:      ${VIRTCTL_URL:-(fallback to GitHub releases)}"
+echo "  HELM_URL:         ${HELM_URL:-(fallback to get.helm.sh)}"
 echo ""
 
 if [[ ! -f "${RUNNER_IMAGE_DIR}/Dockerfile" ]]; then
@@ -126,10 +88,14 @@ spec:
           value: "${OC_VERSION}"
         - name: VIRTCTL_VERSION
           value: "${VIRTCTL_VERSION}"
+        - name: HELM_VERSION
+          value: "${HELM_VERSION}"
         - name: OC_URL
           value: "${OC_URL}"
         - name: VIRTCTL_URL
           value: "${VIRTCTL_URL}"
+        - name: HELM_URL
+          value: "${HELM_URL}"
   output:
     to:
       kind: ImageStreamTag
