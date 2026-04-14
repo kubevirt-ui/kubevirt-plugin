@@ -21,6 +21,7 @@ import { useK8sModel } from '@openshift-console/dynamic-plugin-sdk';
 import { printableVMStatus } from '../../utils';
 import { createVirtualMachineActionFactory } from '../VirtualMachineActionFactory';
 
+import useActiveVMStorageMigrationPlan from './useActiveVMStorageMigrationPlan';
 import useIsMTVInstalled from './useIsMTVInstalled';
 
 type UseVirtualMachineActionsProvider = (
@@ -36,6 +37,8 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (vm, 
   const virtctlCommand = getConsoleVirtctlCommand(vm);
 
   const [mtvInstalled] = useIsMTVInstalled();
+
+  const activeStorageMigrationPlan = useActiveVMStorageMigrationPlan(vm);
 
   const acmActions = useACMExtensionActions(vm);
 
@@ -63,7 +66,9 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (vm, 
     const currentMigrationExist =
       vmim && ![vmimStatuses.Failed, vmimStatuses.Succeeded].includes(vmim?.status?.phase);
 
-    const isComputeMigration = printableStatus === Migrating || currentMigrationExist;
+    const isStorageMigration = !!activeStorageMigrationPlan;
+    const isComputeMigration =
+      !isStorageMigration && (printableStatus === Migrating || !!currentMigrationExist);
 
     const startOrStop = ((printableStatusMachine) => {
       const map = {
@@ -85,9 +90,14 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (vm, 
       startMigrationActions.unshift(crossClusterMigration);
     }
 
-    const migrationActions = isComputeMigration
-      ? [VirtualMachineActionFactory.cancelComputeMigration(vm, vmim)]
-      : startMigrationActions;
+    let migrationActions = startMigrationActions;
+    if (isComputeMigration) {
+      migrationActions = [VirtualMachineActionFactory.cancelComputeMigration(vm, vmim)];
+    } else if (isStorageMigration) {
+      migrationActions = [
+        VirtualMachineActionFactory.cancelStorageMigration(vm, activeStorageMigrationPlan),
+      ];
+    }
 
     const pauseOrUnpause =
       printableStatus === Paused
@@ -118,6 +128,7 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (vm, 
   }, [
     vm,
     vmim,
+    activeStorageMigrationPlan,
     createModal,
     confirmVMActionsEnabled,
     virtctlCommand,
