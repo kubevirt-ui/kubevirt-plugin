@@ -10,13 +10,14 @@ import {
 } from '@stolostron/multicluster-sdk';
 
 const useK8sWatchData = <T>(resource: FleetWatchK8sResource | null): WatchK8sResult<T> => {
-  const [hubClusterName, hubClusterNameLoaded] = useHubClusterName();
+  const [hubClusterName, hubClusterNameLoaded, hubClusterError] = useHubClusterName();
   const isACMPage = useIsACMPage();
 
   // multicluster sdk doesn't support limit as console sdk does
   const requestWithNoLimit = resource ? { ...resource, limit: undefined } : null;
 
-  const waitingForHubName = isACMPage && !!resource?.cluster && !hubClusterNameLoaded;
+  const waitingForHubName =
+    isACMPage && !!resource?.cluster && !hubClusterNameLoaded && !hubClusterError;
   const useFleet = resource?.cluster && resource?.cluster !== hubClusterName;
 
   const [fleetData, fleetLoaded, fleetError] = useFleetK8sWatchResource<T>(

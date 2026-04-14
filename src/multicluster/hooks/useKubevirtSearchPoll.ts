@@ -1,5 +1,5 @@
 import useIsACMPage from '@multicluster/useIsACMPage';
-import { WatchK8sResource } from '@openshift-console/dynamic-plugin-sdk';
+import { K8sResourceCommon, WatchK8sResource } from '@openshift-console/dynamic-plugin-sdk';
 import {
   AdvancedSearchFilter,
   SearchResult,
@@ -13,8 +13,8 @@ const useKubevirtSearchPoll = <T extends K8sResourceCommon | K8sResourceCommon[]
   pollInterval?: false | number,
 ): [SearchResult<T>, boolean, Error, () => void] => {
   const isACMPage = useIsACMPage();
-  const [_, hubClusterNameLoaded] = useHubClusterName();
-  const isHubClusterLoaded = isACMPage && hubClusterNameLoaded;
+  const [_, hubClusterNameLoaded, hubClusterError] = useHubClusterName();
+  const isHubClusterLoaded = isACMPage && (hubClusterNameLoaded || !!hubClusterError);
 
   const requestWithNoLimit =
     watchOptions && isHubClusterLoaded
