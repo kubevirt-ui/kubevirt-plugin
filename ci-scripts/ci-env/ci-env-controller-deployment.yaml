@@ -1,0 +1,66 @@
+# ci-env-controller Deployment.
+# The controller script is mounted from a ConfigMap so it can be updated
+# without rebuilding the container image.
+#
+# The image is a UBI9-based image with oc, helm, jq, yq, curl.
+# Set CI_ENV_CONTROLLER_IMAGE before applying, or substitute with sed/envsubst.
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ci-env-controller
+  namespace: ci-env
+  labels:
+    app: ci-env-controller
+    app.kubernetes.io/component: ci-env-controller
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ci-env-controller
+  template:
+    metadata:
+      labels:
+        app: ci-env-controller
+    spec:
+      serviceAccountName: ci-env-controller
+      containers:
+        - name: controller
+          image: CI_ENV_CONTROLLER_IMAGE_PLACEHOLDER
+          command: ['/bin/bash', '/opt/ci-env/controller/ci-env-controller.sh']
+          env:
+            - name: CI_ENV_NS
+              value: ci-env
+            - name: CI_ENV_TTL_SECONDS
+              value: '7200'
+            - name: CI_ENV_LABEL
+              value: ci.kubevirt-plugin/type=test-environment
+            - name: HELM_CHART_PATH
+              value: /opt/ci-env/helm/ci-test-stack
+            - name: RUNNER_SA_NAME
+              value: RUNNER_SA_NAME_PLACEHOLDER
+            - name: RUNNER_SA_NS
+              value: RUNNER_SA_NS_PLACEHOLDER
+          volumeMounts:
+            - name: controller-script
+              mountPath: /opt/ci-env/controller
+              readOnly: true
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
+            capabilities:
+              drop: ['ALL']
+      volumes:
+        - name: controller-script
+          configMap:
+            name: ci-env-controller-script
+            defaultMode: 0555

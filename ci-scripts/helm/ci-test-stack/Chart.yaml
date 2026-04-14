@@ -1,0 +1,9 @@
+apiVersion: v2
+name: ci-test-stack
+description: >-
+  Deploys the kubevirt-plugin and OpenShift console as Kubernetes workloads
+  for E2E CI testing. Designed to run in a per-test-run namespace alongside
+  ARC self-hosted runners.
+version: 0.1.0
+appVersion: '1.0.0'
+type: application

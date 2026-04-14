@@ -4,23 +4,23 @@
 #
 export TEST_NS=${CYPRESS_TEST_NS:-'auto-test-ns'}
 
-oc delete vm --all -n ${TEST_NS} --wait=false
-oc delete template --all -n ${TEST_NS} --wait=false
-#oc delete template -l app.kubernetes.io/name=custom-templates -n openshift --wait=false
-oc delete VirtualMachineSnapshot --all -n ${TEST_NS} --ignore-not-found
-oc delete datavolume --all -n ${TEST_NS} --wait=false
-oc delete datasource --all -n ${TEST_NS} --wait=false
-#oc delete datasource  -n openshift-virtualization-os-images -l app.kubernetes.io/part-of!=hyperconverged-cluster
-#oc delete datavolume  -n openshift-virtualization-os-images -l app.kubernetes.io/part-of!=hyperconverged-cluster
-oc delete pvc --all -n ${TEST_NS} --wait=false
-#oc delete pvc -n openshift-cnv -l k8s-app!=hostpath-provisioner --wait=false
-#oc delete pvc --all -n openshift --wait=false
-#oc delete pvc --all -n openshift-virtualization-os-images --wait=false
-oc delete secret --all -n ${TEST_NS} --ignore-not-found --wait=false
-oc delete net-attach-def --all -n ${TEST_NS} --ignore-not-found --wait=false
-#oc delete VirtualMachineClusterInstancetype example --ignore-not-found --wait=false
-oc delete VirtualMachineInstancetype example -n ${TEST_NS} --ignore-not-found --wait=false
-#oc delete VirtualMachineClusterPreference example --ignore-not-found --wait=false
-oc delete VirtualMachinePreference example -n ${TEST_NS} --ignore-not-found --wait=false
-#oc delete MigrationPolicy example --ignore-not-found --wait=false
-oc delete migplan --all -n ${TEST_NS} --ignore-not-found --wait=false
+oc -n ${TEST_NS} delete vm --all --wait=false || true
+oc -n ${TEST_NS} delete template --all --wait=false || true
+oc -n ${TEST_NS} delete VirtualMachineSnapshot --all --ignore-not-found || true
+oc -n ${TEST_NS} delete datavolume --all --wait=false || true
+oc -n ${TEST_NS} delete datasource --all --wait=false || true
+oc -n ${TEST_NS} delete pvc --all --wait=false || true
+oc -n ${TEST_NS} delete secret --all --ignore-not-found --wait=false || true
+oc -n ${TEST_NS} delete net-attach-def --all --ignore-not-found --wait=false || true
+oc -n ${TEST_NS} delete VirtualMachineInstancetype example --ignore-not-found --wait=false || true
+oc -n ${TEST_NS} delete VirtualMachinePreference example --ignore-not-found --wait=false || true
+
+#oc -n openshift-virtualization-os-images delete datasource  -l app.kubernetes.io/part-of!=hyperconverged-cluster
+#oc -n openshift-virtualization-os-images delete datavolume  -l app.kubernetes.io/part-of!=hyperconverged-cluster
+#oc -n openshift-virtualization-os-images delete pvc --all --wait=false
+#oc -n openshift-cnv delete pvc -l k8s-app!=hostpath-provisioner --wait=false
+#oc -n openshift delete template -l app.kubernetes.io/name=custom-templates --wait=false
+#oc -n openshift delete pvc --all --wait=false
+#oc -n openshift delete VirtualMachineClusterInstancetype example --ignore-not-found --wait=false
+#oc -n openshift delete VirtualMachineClusterPreference example --ignore-not-found --wait=false
+#oc -n openshift delete MigrationPolicy example --ignore-not-found --wait=false

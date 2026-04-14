@@ -64,27 +64,3 @@ arc_helm_append_scale_set_labels() {
   echo "Scale set labels (multilabel): ${ARC_SCALE_SET_LABELS}"
   _helm_arr+=(--set-json "scaleSetLabels=${json}")
 }
-
-#
-# Post-renders gha-runner-scale-set dind manifests: optional docker:dind → mirror
-# (ci-scripts/generated/arc-dind-replace.env), and always injects --storage-driver=vfs
-# so dockerd works on OpenShift (nested overlay otherwise fails with EINVAL).
-#
-# Usage: arc_helm_append_dind_post_renderer RUNNER_SET_ARGS "${ARC_DIR}" "${CI_SCRIPTS_DIR}"
-# Env: ARC_USE_DIND_POST_RENDER=0 to disable.
-#
-arc_helm_append_dind_post_renderer() {
-  local -n _helm_arr="${1:?helm args array name required}"
-  local arc_dir="${2:?arc directory required}"
-  local ci_scripts_dir="${3:?ci-scripts directory required}"
-  local env_file="${ci_scripts_dir}/generated/arc-dind-replace.env"
-  local pr_script="${arc_dir}/arc-dind-post-render.sh"
-  [[ "${ARC_USE_DIND_POST_RENDER:-1}" == "0" ]] && return 0
-  [[ ! -f "${pr_script}" ]] && return 0
-  if [[ -f "${env_file}" ]]; then
-    echo "Helm post-renderer: docker:dind mirror (${env_file}) + dind vfs (OpenShift)"
-  else
-    echo "Helm post-renderer: dind --storage-driver=vfs (OpenShift / nested overlay)"
-  fi
-  _helm_arr+=(--post-renderer "${pr_script}")
-}
