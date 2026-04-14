@@ -74,9 +74,6 @@ export const extensions: EncodedExtension[] = [
     type: 'console.dashboards/overview/health/prometheus',
   } as EncodedExtension<DashboardsOverviewHealthPrometheusSubsystem>,
   {
-    flags: {
-      required: ['KUBEVIRT_DYNAMIC'],
-    },
     properties: {
       component: { $codeRef: 'ConsoleStandAlone' },
       exact: false,
