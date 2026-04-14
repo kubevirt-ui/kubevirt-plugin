@@ -12,6 +12,8 @@ import {
 } from '@openshift-console/dynamic-plugin-sdk';
 import { OBJECTS_FETCHING_LIMIT } from '@virtualmachines/utils/constants';
 
+import useClustersRowFilters from './useClustersRowFilters';
+
 type FilterOptions = { [key: string]: string };
 
 export type UseAccessibleResourcesOptions = {
@@ -21,10 +23,6 @@ export type UseAccessibleResourcesOptions = {
    */
   cluster?: string;
   filterOptions?: FilterOptions;
-  /**
-   * When non-empty, fleet search uses these cluster names and the watch `cluster` field stays unset.
-   */
-  fleetClusterNames?: string[];
 };
 
 type UseAccessibleResources = <T extends K8sResourceCommon>(
@@ -40,7 +38,7 @@ export const useAccessibleResources: UseAccessibleResources = <T extends K8sReso
   groupVersionKind: K8sGroupVersionKind,
   options?: UseAccessibleResourcesOptions,
 ) => {
-  const { cluster: clusterScope, filterOptions, fleetClusterNames } = options ?? {};
+  const { cluster: clusterScope, filterOptions } = options ?? {};
 
   const isAdmin = useIsAdmin();
   const isACMPage = useIsACMPage();
@@ -48,8 +46,9 @@ export const useAccessibleResources: UseAccessibleResources = <T extends K8sReso
 
   const loadPerNamespace = !isACMPage && projectNamesLoaded && !isAdmin;
 
+  const fleetClusterNames = useClustersRowFilters();
   const shouldFetchClusterWide = isAdmin || isACMPage;
-  const hasFleetFilter = Boolean(fleetClusterNames?.length);
+  const hasFleetFilter = Boolean(fleetClusterNames.length);
   const watchCluster = hasFleetFilter ? undefined : clusterScope;
 
   const [allResources, allResourcesLoaded] = useKubevirtWatchResource<T[]>(
