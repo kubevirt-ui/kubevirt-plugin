@@ -1008,6 +1008,7 @@
   "Increment": "Incremento",
   "Indicates the current completion percentage of the ongoing live migration operation.": "Indica el porcentaje de finalización actual de la operación de migración en vivo en curso.",
   "Indications": "Indicaciones",
+  "Inferred from volume {{volumeName}}": "Inferred from volume {{volumeName}}",
   "Info": "Información",
   "Ingresses": "Ingresos",
   "Initial run": "Ejecución inicial",

@@ -991,6 +991,7 @@
   "Increment": "증가",
   "Indicates the current completion percentage of the ongoing live migration operation.": "진행 중인 실시간 마이그레이션 작업의 현재 완료 비율을 표시합니다.",
   "Indications": "표시",
+  "Inferred from volume {{volumeName}}": "Inferred from volume {{volumeName}}",
   "Info": "정보",
   "Ingresses": "Ingress",
   "Initial run": "초기 실행",

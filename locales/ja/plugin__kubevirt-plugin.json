@@ -991,6 +991,7 @@
   "Increment": "インクリメント",
   "Indicates the current completion percentage of the ongoing live migration operation.": "進行中のライブマイグレーション操作の現在の完了率を示します。",
   "Indications": "表示",
+  "Inferred from volume {{volumeName}}": "Inferred from volume {{volumeName}}",
   "Info": "情報",
   "Ingresses": "Ingresses",
   "Initial run": "初回実行",

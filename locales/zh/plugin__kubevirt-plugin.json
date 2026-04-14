@@ -991,6 +991,7 @@
   "Increment": "增量",
   "Indicates the current completion percentage of the ongoing live migration operation.": "代表正在进行实时迁移操作的当前完成百分比。",
   "Indications": "表示",
+  "Inferred from volume {{volumeName}}": "Inferred from volume {{volumeName}}",
   "Info": "信息",
   "Ingresses": "Ingresses",
   "Initial run": "初始运行",
