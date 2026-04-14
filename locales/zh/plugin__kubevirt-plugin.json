@@ -1170,6 +1170,7 @@
   "Max. migrations per node": "每个节点的最大迁移",
   "Max. running migrations per cluster": "每个集群的最大运行迁移",
   "Max. running migrations per node": "每个节点的最大运行迁移",
+  "Maximize console": "Maximize console",
   "Maximum": "最大",
   "Maximum name length is {{ maxNameLength }} characters": "名称最长为 {{ maxNameLength }} 个字符",
   "Maximum number of migrations running in parallel in the cluster. The format is a number": "Maximum number of migrations running in parallel in the cluster. The format is a number",

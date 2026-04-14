@@ -1170,6 +1170,7 @@
   "Max. migrations per node": "노드당 최대 마이그레이션",
   "Max. running migrations per cluster": "클러스터당 최대 실행 중인 마이그레이션",
   "Max. running migrations per node": "노드당 최대 실행 중인 마이그레이션",
+  "Maximize console": "Maximize console",
   "Maximum": "최대 크기",
   "Maximum name length is {{ maxNameLength }} characters": "최대 이름 길이는 {{ maxNameLength }} 자입니다.",
   "Maximum number of migrations running in parallel in the cluster. The format is a number": "Maximum number of migrations running in parallel in the cluster. The format is a number",
