@@ -1,5 +1,6 @@
 import React, { FC, useState } from 'react';
 
+import { getMCONotInstalledTooltip } from '@kubevirt-utils/hooks/useAlerts/utils/useMCOInstalled';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Alert, AlertActionCloseButton, AlertVariant } from '@patternfly/react-core';
 
@@ -13,11 +14,9 @@ const MCONotInstalledAlert: FC = () => {
 
   return (
     <Alert
-      title={t(
-        'Multicluster observability is not available. Install it on the hub cluster to enable monitoring across clusters.',
-      )}
       actionClose={<AlertActionCloseButton onClose={() => setDismissed(true)} />}
       isInline
+      title={getMCONotInstalledTooltip(t)}
       variant={AlertVariant.warning}
     />
   );

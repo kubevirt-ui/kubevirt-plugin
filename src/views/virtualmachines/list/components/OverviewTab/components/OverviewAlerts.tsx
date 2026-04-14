@@ -1,15 +1,12 @@
 import React, { FC } from 'react';
 
 import useIsACMPage from '@multicluster/useIsACMPage';
-import { StackItem } from '@patternfly/react-core';
 import { useHubClusterName } from '@stolostron/multicluster-sdk';
 
 import MCONotInstalledAlert from './MCONotInstalledAlert';
 import NoVMsAlert from './NoVMsAlert';
 import ObservabilityDisabledAlert from './ObservabilityDisabledAlert';
 import { getIsSpokeCluster, getShowMCOWarning, getShowObservabilityWarning } from './utils';
-
-import './OverviewAlerts.scss';
 
 type OverviewAlertsProps = {
   cluster?: string;
@@ -70,21 +67,11 @@ const OverviewAlerts: FC<OverviewAlertsProps> = ({
 
   return (
     <>
-      {showMCOWarning && (
-        <StackItem className="overview-alerts__item">
-          <MCONotInstalledAlert />
-        </StackItem>
-      )}
+      {showMCOWarning && <MCONotInstalledAlert />}
       {!showMCOWarning && showObservabilityWarning && (
-        <StackItem className="overview-alerts__item">
-          <ObservabilityDisabledAlert disabledClusters={alertClusters} />
-        </StackItem>
+        <ObservabilityDisabledAlert disabledClusters={alertClusters} />
       )}
-      {hasNoVMs && (
-        <StackItem className="overview-alerts__item">
-          <NoVMsAlert namespace={namespace} />
-        </StackItem>
-      )}
+      {hasNoVMs && <NoVMsAlert namespace={namespace} />}
     </>
   );
 };
