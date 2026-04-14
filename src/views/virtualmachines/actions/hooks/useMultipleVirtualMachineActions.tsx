@@ -11,12 +11,12 @@ import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useProviderByClusterName from '@multicluster/components/CrossClusterMigration/hooks/useProviderByClusterName';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { useHubClusterName } from '@stolostron/multicluster-sdk';
-import { isDeletionProtectionEnabled } from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/utils/utils';
 import { isPaused, isRunning, isStopped } from '@virtualmachines/utils';
 import { getVMIMFromMapper, VMIMMapper } from '@virtualmachines/utils/mappers';
 
 import { createBulkVirtualMachineActionFactory } from '../BulkVirtualMachineActionFactory';
 
+import { ACTIONS_ID } from './constants';
 import useIsMTVInstalled from './useIsMTVInstalled';
 import useVirtualMachineActionsProvider from './useVirtualMachineActionsProvider';
 import { someVMIsMigrating } from './utils';
@@ -24,9 +24,14 @@ import { someVMIsMigrating } from './utils';
 type UseMultipleVirtualMachineActions = (
   vms: V1VirtualMachine[],
   vmimMapper: VMIMMapper,
+  isTreeViewMenu?: boolean,
 ) => ActionDropdownItemType[];
 
-const useMultipleVirtualMachineActions: UseMultipleVirtualMachineActions = (vms, vmimMapper) => {
+const useMultipleVirtualMachineActions: UseMultipleVirtualMachineActions = (
+  vms,
+  vmimMapper,
+  isTreeViewMenu = false,
+) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const { featureEnabled: confirmVMActionsEnabled } = useFeatures(CONFIRM_VM_ACTIONS);
@@ -74,9 +79,6 @@ const useMultipleVirtualMachineActions: UseMultipleVirtualMachineActions = (vms,
     }
 
     const hasMigratingVM = someVMIsMigrating(vms, vmimMapper);
-    const hasRunningVM = vms?.some(isRunning);
-    const hasProtectedVM = vms?.some(isDeletionProtectionEnabled);
-    const isDeleteDisabled = hasRunningVM || hasProtectedVM;
 
     const actions: ActionDropdownItemType[] = [
       BulkVirtualMachineActionFactory.controlActions(
@@ -97,7 +99,7 @@ const useMultipleVirtualMachineActions: UseMultipleVirtualMachineActions = (vms,
             {
               cta: null,
               disabled: hasMigratingVM,
-              id: 'migration-menu',
+              id: ACTIONS_ID.MIGRATION_MENU,
               label: t('Migration'),
               options: migrationActions,
             },
@@ -106,8 +108,8 @@ const useMultipleVirtualMachineActions: UseMultipleVirtualMachineActions = (vms,
       ...(treeViewFoldersEnabled
         ? [BulkVirtualMachineActionFactory.moveToFolder(vms, createModal)]
         : []),
-      BulkVirtualMachineActionFactory.editLabels(vms, createModal),
-      BulkVirtualMachineActionFactory.delete(vms, createModal, isDeleteDisabled),
+      BulkVirtualMachineActionFactory.editLabels(vms, createModal, isTreeViewMenu),
+      BulkVirtualMachineActionFactory.delete(vms, createModal, isTreeViewMenu),
     ];
 
     return actions;

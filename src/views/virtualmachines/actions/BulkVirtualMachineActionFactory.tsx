@@ -47,7 +47,12 @@ import {
   unpauseVM,
 } from './actions';
 import { BulkVirtualMachineActionFactory } from './types';
-import { getCommonLabels, getLabelsDiffPatch } from './utils';
+import {
+  getBulkDeleteActionDescription,
+  getCommonLabels,
+  getLabelsDiffPatch,
+  isBulkDeleteActionDisabled,
+} from './utils';
 
 const { Paused, Stopped } = printableVMStatus;
 
@@ -56,7 +61,7 @@ export const createBulkVirtualMachineActionFactory = (
 ): BulkVirtualMachineActionFactory => ({
   controlActions: (controlActions: ActionDropdownItemType[]): ActionDropdownItemType => ({
     cta: null,
-    id: 'control-menu',
+    id: ACTIONS_ID.CONTROL_MENU,
     label: t('Control'),
     options: controlActions,
   }),
@@ -84,7 +89,7 @@ export const createBulkVirtualMachineActionFactory = (
   delete: (
     vms: V1VirtualMachine[],
     createModal: (modal: ModalComponent) => void,
-    isDisabled: boolean,
+    isTreeViewAction: boolean,
   ): ActionDropdownItemType => ({
     cta: () =>
       createModal(({ isOpen, onClose }) => (
@@ -97,13 +102,15 @@ export const createBulkVirtualMachineActionFactory = (
           vms={vms}
         />
       )),
-    disabled: isEmpty(vms) || isDisabled,
+    description: getBulkDeleteActionDescription(vms, t),
+    disabled: isBulkDeleteActionDisabled(vms),
     id: ACTIONS_ID.DELETE,
-    label: t('Delete'),
+    label: isTreeViewAction ? t('Delete all VMs') : t('Delete'),
   }),
   editLabels: (
     vms: V1VirtualMachine[],
     createModal: (modal: ModalComponent) => void,
+    isTreeViewAction: boolean,
   ): ActionDropdownItemType => ({
     cta: () => {
       const commonLabels = getCommonLabels(vms);
@@ -130,7 +137,7 @@ export const createBulkVirtualMachineActionFactory = (
     },
     disabled: isEmpty(vms),
     id: ACTIONS_ID.EDIT_LABELS,
-    label: t('Edit labels'),
+    label: isTreeViewAction ? t('Edit VM labels') : t('Edit labels'),
   }),
   editRunStrategy: (
     vms: V1VirtualMachine[],
@@ -216,7 +223,7 @@ export const createBulkVirtualMachineActionFactory = (
       disabledTooltip: hasNoMigratableVMs
         ? t('None of the selected VirtualMachines are eligible for live migration')
         : getNoPermissionTooltipContent(t),
-      id: ACTIONS_ID.BULK_MIGRATE_COMPUTE,
+      id: ACTIONS_ID.MIGRATE_COMPUTE,
       label: t('Compute'),
     };
   },
@@ -235,7 +242,7 @@ export const createBulkVirtualMachineActionFactory = (
     cta: () => createModal((props) => <VirtualMachineMigrateModal vms={vms} {...props} />),
     description: t('Migrate VirtualMachine storage to a different StorageClass'),
     disabledTooltip: getNoPermissionTooltipContent(t),
-    id: ACTIONS_ID.BULK_MIGRATE_STORAGE,
+    id: ACTIONS_ID.MIGRATE_STORAGE,
     label: t('Storage'),
   }),
   moveToFolder: (

@@ -1,3 +1,5 @@
+import { TFunction } from 'react-i18next';
+
 import { DataVolumeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -5,7 +7,9 @@ import { getAnnotation, getLabels, getName } from '@kubevirt-utils/resources/sha
 import { getDataVolumeTemplates, getVolumes } from '@kubevirt-utils/resources/vm';
 import { escapeJsonPointerToken, isEmpty } from '@kubevirt-utils/utils/utils';
 import { k8sDelete, Patch } from '@openshift-console/dynamic-plugin-sdk';
+import { isDeletionProtectionEnabled } from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/utils/utils';
 import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
+import { isRunning } from '@virtualmachines/utils';
 
 import { ANNOTATION_PREFIX_MIGRATION_ORIGIN_CLAIMNAME } from './constants';
 
@@ -166,4 +170,22 @@ export const getLabelsDiffPatch = (
   patchArray.push(...labelsPatchDelete);
 
   return patchArray;
+};
+
+export const isBulkDeleteActionDisabled = (vms: V1VirtualMachine[]): boolean =>
+  isEmpty(vms) || vms?.some(isRunning) || vms?.some(isDeletionProtectionEnabled);
+
+export const getBulkDeleteActionDescription = (
+  vms: V1VirtualMachine[],
+  t: TFunction,
+): string | undefined => {
+  if (vms?.some(isRunning)) {
+    return t('Some VirtualMachines are running');
+  }
+
+  if (vms?.some(isDeletionProtectionEnabled)) {
+    return t('Some VirtualMachines are protected');
+  }
+
+  return undefined;
 };

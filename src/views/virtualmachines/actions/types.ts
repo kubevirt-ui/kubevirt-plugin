@@ -12,11 +12,12 @@ export type BulkVirtualMachineActionFactory = {
   delete: (
     vms: V1VirtualMachine[],
     createModal: (modal: ModalComponent) => void,
-    isDisabled: boolean,
+    isTreeViewAction: boolean,
   ) => ActionDropdownItemType;
   editLabels: (
     vms: V1VirtualMachine[],
     createModal: (modal: ModalComponent) => void,
+    isTreeViewAction: boolean,
   ) => ActionDropdownItemType;
   editRunStrategy: (
     vms: V1VirtualMachine[],
