@@ -1,7 +1,9 @@
 import React, { FC, memo, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Flex, FlexItem, Stack, StackItem } from '@patternfly/react-core';
+import { getConsoleStandaloneURL } from '@multicluster/urls';
+import { Button, ButtonVariant, Flex, FlexItem, Stack, StackItem } from '@patternfly/react-core';
+import { ExternalLinkAltIcon } from '@patternfly/react-icons';
 
 import { AccessConsoles } from './components/AccessConsoles/AccessConsoles';
 import CloudInitCredentials from './components/CloudInitCredentials/CloudInitCredentials';
@@ -40,6 +42,7 @@ type ConsolesProps = {
 const Consoles: FC<ConsolesProps> = ({
   consoleContainerClass,
   isHeadlessMode,
+  isStandAlone = false,
   isWindowsVM,
   path,
   vmCluster,
@@ -75,15 +78,38 @@ const Consoles: FC<ConsolesProps> = ({
             )}
           </FlexItem>
           <FlexItem>
-            <AccessConsoles
-              setType={(newType: ConsoleType) =>
-                setState({ actions: {}, state: ConsoleState.disconnected, type: newType })
-              }
-              actions={actions}
-              isWindowsVM={isWindowsVM}
-              state={state}
-              type={type}
-            />
+            <Flex
+              alignItems={{ default: 'alignItemsCenter' }}
+              flexWrap={{ default: 'wrap' }}
+              spaceItems={{ default: 'spaceItemsMd' }}
+            >
+              {!isStandAlone && (
+                <FlexItem>
+                  <Button
+                    onClick={() => {
+                      actions?.disconnect?.();
+                      window.open(getConsoleStandaloneURL(vmNamespace, vmName, vmCluster));
+                    }}
+                    icon={<ExternalLinkAltIcon />}
+                    iconPosition="end"
+                    variant={ButtonVariant.secondary}
+                  >
+                    {t('Open web console')}
+                  </Button>
+                </FlexItem>
+              )}
+              <FlexItem>
+                <AccessConsoles
+                  setType={(newType: ConsoleType) =>
+                    setState({ actions: {}, state: ConsoleState.disconnected, type: newType })
+                  }
+                  actions={actions}
+                  isWindowsVM={isWindowsVM}
+                  state={state}
+                  type={type}
+                />
+              </FlexItem>
+            </Flex>
           </FlexItem>
         </Flex>
       </StackItem>
