@@ -16,6 +16,7 @@ import {
 } from '@patternfly/react-core';
 import SlidersHIcon from '@patternfly/react-icons/dist/esm/icons/sliders-h-icon';
 import { SearchSuggestResult } from '@search/utils/types';
+import { useVirtualMachineSearchSuggestionResources } from '@virtualmachines/search/hooks/useVirtualMachineSearchSuggestionResources';
 import { useVirtualMachineSearchSuggestions } from '@virtualmachines/search/hooks/useVirtualMachineSearchSuggestions';
 
 import { useNavigateToSearchResults } from '../hooks/useNavigateToSearchResults';
@@ -43,7 +44,15 @@ const SearchBar: FC<SearchBarProps> = ({ onFilterChange }) => {
   const searchInputRef = useRef<HTMLInputElement>();
   const searchSuggestBoxRef = useRef<HTMLDivElement>();
 
-  const [vmSuggestions, vmSuggestionsLoaded] = useVirtualMachineSearchSuggestions(searchQuery);
+  const { vmis, vmisLoaded, vms, vmsLoaded } = useVirtualMachineSearchSuggestionResources();
+
+  const [vmSuggestions, vmSuggestionsLoaded] = useVirtualMachineSearchSuggestions({
+    searchQuery,
+    vmis,
+    vmisLoaded,
+    vms,
+    vmsLoaded,
+  });
   const navigateToSearchResults = useNavigateToSearchResults(onFilterChange);
   const { saveSearch, urlSearchQuery } = useSavedSearchData();
 

@@ -5,6 +5,7 @@ import { ExposedFilterFunctions } from '@kubevirt-utils/components/ListPageFilte
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { VirtualMachineModelRef } from '@kubevirt-utils/models';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
 import {
   ListPageHeader,
   OnFilterChange,
@@ -24,7 +25,9 @@ const VirtualMachineSearchResults: FC = () => {
 
   const vmSearchQueries = useVMSearchQueries();
 
-  const { cluster } = useParams<{ cluster?: string }>();
+  const { cluster: clusterParam } = useParams<{ cluster?: string }>();
+  const clusterFromHook = useClusterParam();
+  const cluster = clusterParam ?? clusterFromHook;
   const namespace = activeNamespace === ALL_NAMESPACES_SESSION_KEY ? null : activeNamespace;
 
   useHideNamespaceBar();

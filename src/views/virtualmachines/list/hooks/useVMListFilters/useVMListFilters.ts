@@ -31,13 +31,15 @@ import { useStorageClassFilter } from './useStorageClassFilter';
 export const useVMListFilters = (
   vmims: V1VirtualMachineInstanceMigration[],
   pvcMapper: PVCMapper,
+  cluster?: string,
 ): {
   filtersWithSelect: RowFilter<V1VirtualMachine>[];
   hiddenFilters: RowFilter<V1VirtualMachine>[];
   vmiMapper: VMIMapper;
   vmimMapper: VMIMMapper;
+  vmisLoaded: boolean;
 } => {
-  const vmiMapper = useVirtualMachineInstanceMapper();
+  const { vmiMapper, vmisLoaded } = useVirtualMachineInstanceMapper(cluster);
 
   const vmimMapper: VMIMMapper = useMemo(() => getLatestMigrationForEachVM(vmims), [vmims]);
 
@@ -86,5 +88,6 @@ export const useVMListFilters = (
     ],
     vmiMapper,
     vmimMapper,
+    vmisLoaded,
   };
 };

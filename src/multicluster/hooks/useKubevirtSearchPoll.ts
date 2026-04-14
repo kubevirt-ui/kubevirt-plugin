@@ -1,4 +1,4 @@
-import { WatchK8sResource } from '@openshift-console/dynamic-plugin-sdk';
+import { K8sResourceCommon, WatchK8sResource } from '@openshift-console/dynamic-plugin-sdk';
 import {
   AdvancedSearchFilter,
   SearchResult,
@@ -6,7 +6,7 @@ import {
 } from '@stolostron/multicluster-sdk';
 
 const useKubevirtSearchPoll = <T extends K8sResourceCommon | K8sResourceCommon[]>(
-  watchOptions: WatchK8sResource,
+  watchOptions: null | WatchK8sResource,
   advancedSearchFilters?: AdvancedSearchFilter,
   pollInterval?: false | number,
 ): [SearchResult<T>, boolean, Error, () => void] => {
