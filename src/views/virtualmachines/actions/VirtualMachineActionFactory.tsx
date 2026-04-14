@@ -25,6 +25,7 @@ import {
   VirtualMachineInstanceSubresourcesModel,
   VirtualMachineSubresourcesModel,
 } from '@kubevirt-utils/models';
+import { MultiNamespaceVirtualMachineStorageMigrationPlan } from '@kubevirt-utils/resources/migrations/constants';
 import { asAccessReview, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getVMSSHSecretName } from '@kubevirt-utils/resources/vm';
 import {
@@ -58,6 +59,7 @@ import DeleteVMModal from './components/DeleteVMModal/DeleteVMModal';
 import { ACTIONS_ID } from './hooks/constants';
 import {
   cancelMigration,
+  cancelStorageMigrationPlan,
   pauseVM,
   resetVM,
   restartVM,
@@ -96,6 +98,26 @@ export const createVirtualMachineActionFactory = (t: TFunction) => ({
       disabled: !vmim || !!vmim?.metadata?.deletionTimestamp,
       id: 'vm-action-cancel-migrate',
       label: t('Cancel compute migration'),
+    };
+  },
+  cancelStorageMigration: (
+    vm: V1VirtualMachine,
+    storageMigrationPlan: MultiNamespaceVirtualMachineStorageMigrationPlan,
+  ): ActionDropdownItemType => {
+    return {
+      accessReview: {
+        cluster: getCluster(vm),
+        group: MultiNamespaceVirtualMachineStorageMigrationPlanModel.apiGroup,
+        namespace: getNamespace(vm),
+        resource: MultiNamespaceVirtualMachineStorageMigrationPlanModel.plural,
+        verb: 'delete',
+      },
+      cta: () => cancelStorageMigrationPlan(vm, storageMigrationPlan),
+      description:
+        !!storageMigrationPlan?.metadata?.deletionTimestamp && t('Canceling ongoing migration'),
+      disabled: !storageMigrationPlan || !!storageMigrationPlan?.metadata?.deletionTimestamp,
+      id: 'vm-action-cancel-storage-migrate',
+      label: t('Cancel storage migration'),
     };
   },
   clone: (

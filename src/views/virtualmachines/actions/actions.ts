@@ -8,6 +8,8 @@ import {
   V1VirtualMachine,
   V1VirtualMachineInstanceMigration,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { MultiNamespaceVirtualMachineStorageMigrationPlanModel } from '@kubevirt-utils/models';
+import { MultiNamespaceVirtualMachineStorageMigrationPlan } from '@kubevirt-utils/resources/migrations/constants';
 import { getRandomChars, kubevirtConsole, truncateToK8sName } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import {
@@ -110,6 +112,17 @@ export const cancelMigration = async (vmim: V1VirtualMachineInstanceMigration) =
     cluster: vmim?.cluster,
     model: VirtualMachineInstanceMigrationModel,
     resource: vmim,
+  });
+};
+
+export const cancelStorageMigrationPlan = async (
+  vm: V1VirtualMachine,
+  plan: MultiNamespaceVirtualMachineStorageMigrationPlan,
+) => {
+  await kubevirtK8sDelete({
+    cluster: getCluster(vm),
+    model: MultiNamespaceVirtualMachineStorageMigrationPlanModel,
+    resource: plan,
   });
 };
 
