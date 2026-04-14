@@ -3,7 +3,7 @@ import React, { FC, memo, useState } from 'react';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getConsoleStandaloneURL } from '@multicluster/urls';
 import { Button, ButtonVariant, Flex, FlexItem, Stack, StackItem } from '@patternfly/react-core';
-import { ArrowsAltIcon } from '@patternfly/react-icons';
+import { ExternalLinkAltIcon } from '@patternfly/react-icons';
 
 import { AccessConsoles } from './components/AccessConsoles/AccessConsoles';
 import CloudInitCredentials from './components/CloudInitCredentials/CloudInitCredentials';
@@ -90,11 +90,11 @@ const Consoles: FC<ConsolesProps> = ({
                       actions?.disconnect?.();
                       window.open(getConsoleStandaloneURL(vmNamespace, vmName, vmCluster));
                     }}
-                    icon={<ArrowsAltIcon />}
-                    iconPosition="start"
+                    icon={<ExternalLinkAltIcon />}
+                    iconPosition="end"
                     variant={ButtonVariant.secondary}
                   >
-                    {t('Maximize console')}
+                    {t('Open web console')}
                   </Button>
                 </FlexItem>
               )}

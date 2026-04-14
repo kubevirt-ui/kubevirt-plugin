@@ -1187,7 +1187,6 @@
   "Max. migrations per node": "Migrations max. par nœud",
   "Max. running migrations per cluster": "Nombre maximal de migrations en cours d'exécution par cluster",
   "Max. running migrations per node": "Nombre maximal de migrations en cours d'exécution par nœud",
-  "Maximize console": "Maximize console",
   "Maximum": "Maximum",
   "Maximum name length is {{ maxNameLength }} characters": "La longueur maximale du nom est de {{ maxNameLength }} caractères",
   "Maximum number of migrations running in parallel in the cluster. The format is a number": "Maximum number of migrations running in parallel in the cluster. The format is a number",

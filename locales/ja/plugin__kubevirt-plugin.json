@@ -1170,7 +1170,6 @@
   "Max. migrations per node": "ノードあたりの最大移行数",
   "Max. running migrations per cluster": "クラスターあたりの実行中の最大移行数",
   "Max. running migrations per node": "ノードあたりの実行中の最大移行数",
-  "Maximize console": "Maximize console",
   "Maximum": "最大",
   "Maximum name length is {{ maxNameLength }} characters": "名前の最大長は {{ maxNameLength }} 文字です",
   "Maximum number of migrations running in parallel in the cluster. The format is a number": "Maximum number of migrations running in parallel in the cluster. The format is a number",
