@@ -43,6 +43,9 @@ const VirtualizationFeaturesSection: FC = () => {
       <Stack hasGutter>
         <StackItem isFilled>
           <FeaturedOperatorItem
+            helpBody={t(
+              'Delivers real-time, in-depth metrics and a fully functional Cluster Health Dashboard.',
+            )}
             isNew
             operatorName={CLUSTER_OBSERVABILITY_OPERATOR_NAME}
             title={t('Cluster observability (COO)')}
@@ -50,12 +53,16 @@ const VirtualizationFeaturesSection: FC = () => {
         </StackItem>
         <StackItem isFilled>
           <FeaturedOperatorItem
+            helpBody={t('Network flows collector and monitoring solution.')}
             operatorName={NETOBSERV_OPERATOR_NAME}
             title={t('Network observability')}
           />
         </StackItem>
         <StackItem isFilled>
           <FeaturedOperatorItem
+            helpBody={t(
+              'OpenShift Container Platform uses nmstate to report on and configure the state of the node network.',
+            )}
             operatorName={NMSTATE_OPERATOR_NAME}
             title={t('Host network management (NMState)')}
           />
