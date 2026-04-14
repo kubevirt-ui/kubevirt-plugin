@@ -39,7 +39,7 @@ export const documentationURL = {
     'https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata',
   MIGRATION_CONFIGURATION: `${KV_UG_URL}/api-reference/main/definitions.html#_v1_migrationconfiguration`,
   MIGRATION_POLICIES: `${REDHAT_DOC_URL}/html/virtualization/live-migration#live-migration-policies`,
-  MTV_OPERATOR: `${RH_DOC_URL}/migration_toolkit_for_virtualization/latest/html/installing_and_using_the_migration_toolkit_for_virtualization/index`,
+  MTV_OPERATOR: `${RH_DOC_URL}/migration_toolkit_for_virtualization`,
   NAME: `${K8_DOC_OBJ_URL}/names`,
   NAMESPACE_DOC: `${K8_DOC_OBJ_URL}/namespaces/`,
   NETWORKING: `${REDHAT_DOC_URL}/html/virtualization/networking`,
