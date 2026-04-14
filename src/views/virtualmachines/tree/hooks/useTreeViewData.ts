@@ -9,6 +9,7 @@ import {
   V1VirtualMachine,
   V1VirtualMachineInstanceMigration,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { runningTourSignal } from '@kubevirt-utils/components/GuidedTour/utils/guidedTourSignals';
 import { ALL_CLUSTERS } from '@kubevirt-utils/hooks/constants';
 import { TREE_VIEW_FOLDERS } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
@@ -42,6 +43,8 @@ export const useTreeViewData = (): UseTreeViewData => {
   const [clusterNames] = useFleetClusterNames();
 
   const isACMTreeView = useIsACMPage();
+
+  const isTourRunning = runningTourSignal.value;
 
   const { featureEnabled: treeViewFoldersEnabled } = useFeatures(TREE_VIEW_FOLDERS);
   const [projectNames, projectNamesLoaded, projectNamesError] = useProjects();
@@ -148,10 +151,12 @@ export const useTreeViewData = (): UseTreeViewData => {
       location.pathname,
       treeViewFoldersEnabled,
       location.search,
+      isTourRunning,
     );
   }, [
     loaded,
     isACMTreeView,
+    isTourRunning,
     projectNames,
     sortedMemoizedVMs,
     location.pathname,

@@ -1,6 +1,7 @@
-import { MouseEvent, useCallback, useLayoutEffect, useMemo, useState } from 'react';
+import { MouseEvent, useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom-v5-compat';
 
+import { tourContextMenuTriggerSignal } from '@kubevirt-utils/components/GuidedTour/utils/guidedTourSignals';
 import useRemoveFolderQuery from '@kubevirt-utils/components/MoveVMToFolderModal/hooks/useRemoveFolderQuery';
 import { TreeViewDataItem, TreeViewProps } from '@patternfly/react-core';
 
@@ -97,6 +98,8 @@ const useTreeViewItemActions: UseTreeViewItemActions = (treeData) => {
     },
     [addRightClickEvent, navigate, removeFolderQuery],
   );
+
+  useEffect(() => tourContextMenuTriggerSignal.subscribe(setTriggerElement), []);
 
   const hideMenu = useCallback(() => setTriggerElement(null), []);
 

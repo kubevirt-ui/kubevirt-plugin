@@ -1,90 +1,84 @@
 import React from 'react';
+import { TFunction } from 'react-i18next';
 import { Step } from 'react-joyride';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
+import { SINGLE_CLUSTER_KEY } from '@kubevirt-utils/resources/constants';
 import { RUNSTRATEGY_ALWAYS } from '@kubevirt-utils/resources/vm/utils/constants';
-import { TREE_VIEW_PANEL_ID } from '@virtualmachines/tree/utils/constants';
 
-import AddVolumeContent from '../components/AddVolumeContent/AddVolumeContent';
 import EndTourContent from '../components/EndTourContent/EndTourContent';
-import NewStepTitle from '../components/NewStepTitle/NewStepTitle';
+import PowerfulShortcutsContent from '../components/PowerfulShortcutsContent/PowerfulShortcutsContent';
 
-export const tourSteps: Step[] = [
+const TOUR_GUIDE_VM_NAMESPACE = 'default';
+const TOUR_GUIDE_VM_NAME = 'rhel9-tour-guide';
+export const TOUR_GUIDE_VM_TREE_ID = `${SINGLE_CLUSTER_KEY}/${TOUR_GUIDE_VM_NAMESPACE}/${TOUR_GUIDE_VM_NAME}`;
+
+const VM_LIST_ROUTE = '/k8s/all-namespaces/kubevirt.io~v1~VirtualMachine';
+
+export const getTourSteps = (t: TFunction): Step[] => [
   {
-    content: t(
-      'To create VirtualMachines in a project, you must first create a new project and become the administrator.',
-    ),
-    data: { route: '/k8s/all-namespaces/kubevirt.io~v1~VirtualMachine' },
+    content: t('Right-click a cluster in the sidebar to start organizing your workspace.'),
+    data: { route: VM_LIST_ROUTE },
     disableBeacon: true,
     placement: 'right',
-    target: '.co-namespace-dropdown',
-    title: t('Project selector'),
+    spotlightPadding: 4,
+    target: `[id="${ALL_NAMESPACES_SESSION_KEY}"] > div`,
+    title: t('Create a new project'),
   },
   {
-    content: t('You can set the cluster and your individual preferences on the Settings page.'),
-    data: { route: '/k8s/all-namespaces/virtualization-settings' },
-    disableBeacon: true,
-    placement: 'bottom',
-    target: '[data-test-id="virtualization-settings-nav-item"]',
-    title: t('Settings configurations'),
-  },
-  {
-    content: t(
-      'Visualize all your VirtualMachines and easily navigate between them using the tree view. You can also see their details with a status summary.',
-    ),
-    data: { route: '/k8s/all-namespaces/kubevirt.io~v1~VirtualMachine' },
+    content: <PowerfulShortcutsContent />,
+    data: { route: VM_LIST_ROUTE },
     disableBeacon: true,
     placement: 'right',
-    target: `#${TREE_VIEW_PANEL_ID}`,
-    title: <NewStepTitle title={t('Tree view')} />,
+    target: `[id="${TOUR_GUIDE_VM_TREE_ID}"]`,
+    title: t('Powerful VM shortcuts'),
   },
   {
-    content: <AddVolumeContent />,
-    data: { route: '/k8s/all-namespaces/catalog' },
-    disableBeacon: false,
+    content: t('Get a high-level summary of your current view, including VM health and alerts.'),
+    data: { route: VM_LIST_ROUTE },
+    disableBeacon: true,
     placement: 'bottom',
-    target: '#tour-step-add-volume',
-    title: t('Add volume'),
+    target: '[data-test="overview-tab"]',
+    title: t('Overview tab'),
+  },
+  {
+    content: t('Monitor and manage all of your VMs right here.'),
+    data: { route: VM_LIST_ROUTE },
+    disableBeacon: true,
+    placement: 'bottom',
+    target: '[data-test="vm-list-tab"]',
+    title: t('Virtual machines tab'),
   },
   {
     content: t(
-      'Before creating a virtual machine, we recommend that you configure the public SSH key. It will be saved in the project as a secret. You can configure the public SSH key at a later time, but this is the easiest way.',
+      'Choose to create a VM from a guided flow or from the YAML. You can also create a VM directly from the side navigation by right-clicking in any project.',
     ),
-    data: { route: '/k8s/all-namespaces/catalog' },
-    disableBeacon: true,
-    placement: 'left-start',
-    target: '#tour-step-ssh',
-    title: t('Public SSH key'),
-  },
-  {
-    content: t(
-      'On the Configuration tab on the VirtualMachine page, you can search for and edit any configurable item using the search box.',
-    ),
-    data: {
-      route: '/k8s/ns/default/kubevirt.io~v1~VirtualMachine/rhel9-tour-guide/configuration',
-    },
+    data: { route: VM_LIST_ROUTE },
     disableBeacon: true,
     placement: 'bottom',
-    target: '#ConfigurationSearch-autocomplete-search',
-    title: t('Search for configurable items'),
+    spotlightPadding: 12,
+    target: '#tour-step-create-button',
+    title: t('Create a VM'),
   },
   {
     content: <EndTourContent />,
-    data: { route: '/k8s/all-namespaces/catalog' },
+    data: { route: VM_LIST_ROUTE },
     disableBeacon: true,
     placement: 'center',
     target: 'body',
-    title: t('You are ready to go!'),
+    title: t("You're all set!"),
   },
 ];
+
+export const TOUR_STEPS_COUNT = getTourSteps((key: string) => key).length;
 
 export const tourGuideVM: V1VirtualMachine = {
   apiVersion: 'kubevirt.io/v1',
   kind: 'VirtualMachine',
   metadata: {
-    name: 'rhel9-tour-guide',
-    namespace: 'default',
+    name: TOUR_GUIDE_VM_NAME,
+    namespace: TOUR_GUIDE_VM_NAMESPACE,
   },
   spec: {
     dataVolumeTemplates: [

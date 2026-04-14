@@ -82,35 +82,37 @@ const VirtualMachinesCreateButton: FC<VirtualMachinesCreateButtonProps> = ({
   }
 
   return (
-    <Dropdown
-      toggle={(toggleRef: Ref<MenuToggleElement>) => (
-        <MenuToggle
-          splitButtonItems={[
-            <MenuToggleAction
-              aria-label={t('Create VirtualMachine')}
-              key="create-vm"
-              onClick={() => navigate(vmWizardURL)}
-            >
-              {t('Create')}
-            </MenuToggleAction>,
-          ]}
-          data-test="item-create"
-          isExpanded={isOpen}
-          onClick={() => setIsOpen((prev) => !prev)}
-          ref={toggleRef}
-          variant="primary"
-        />
-      )}
-      isOpen={isOpen}
-      onOpenChange={setIsOpen}
-      onSelect={onSelect}
-    >
-      <DropdownList>
-        <DropdownItem key={YAML} value={YAML}>
-          {t('With YAML')}
-        </DropdownItem>
-      </DropdownList>
-    </Dropdown>
+    <span id="tour-step-create-button">
+      <Dropdown
+        toggle={(toggleRef: Ref<MenuToggleElement>) => (
+          <MenuToggle
+            splitButtonItems={[
+              <MenuToggleAction
+                aria-label={t('Create VirtualMachine')}
+                key="create-vm"
+                onClick={() => navigate(vmWizardURL)}
+              >
+                {t('Create')}
+              </MenuToggleAction>,
+            ]}
+            data-test="item-create"
+            isExpanded={isOpen}
+            onClick={() => setIsOpen((prev) => !prev)}
+            ref={toggleRef}
+            variant="primary"
+          />
+        )}
+        isOpen={isOpen}
+        onOpenChange={setIsOpen}
+        onSelect={onSelect}
+      >
+        <DropdownList>
+          <DropdownItem key={YAML} value={YAML}>
+            {t('With YAML')}
+          </DropdownItem>
+        </DropdownList>
+      </Dropdown>
+    </span>
   );
 };
 

@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom-v5-compat';
 import { ALL_NAMESPACES } from '@kubevirt-utils/hooks/constants';
 import useNamespaceParam from '@kubevirt-utils/hooks/useNamespaceParam';
 
-import { tourSteps } from '../utils/constants';
+import { TOUR_STEPS_COUNT } from '../utils/constants';
 import { namespaceSignal, runningTourSignal, stepIndexSignal } from '../utils/guidedTourSignals';
 
 const useTour = () => {
@@ -19,7 +19,7 @@ const useTour = () => {
   };
 
   const startTour = () => {
-    if (stepIndexSignal.value >= tourSteps.length) stepIndexSignal.value = 0;
+    if (stepIndexSignal.value >= TOUR_STEPS_COUNT) stepIndexSignal.value = 0;
     runningTourSignal.value = true;
     namespaceSignal.value = namespace;
   };
@@ -29,7 +29,12 @@ const useTour = () => {
     resetNamespace();
   };
 
-  return { startTour, stopTour };
+  const resetTour = () => {
+    stopTour();
+    stepIndexSignal.value = 0;
+  };
+
+  return { resetTour, startTour, stopTour };
 };
 
 export default useTour;

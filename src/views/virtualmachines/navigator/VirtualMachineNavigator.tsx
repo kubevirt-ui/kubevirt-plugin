@@ -20,6 +20,7 @@ import { useTreeViewData } from '@virtualmachines/tree/hooks/useTreeViewData';
 import VirtualMachineTreeView from '@virtualmachines/tree/VirtualMachineTreeView';
 
 import { defaultVMYamlTemplate } from '../../../templates';
+import WelcomeModal from '../../welcome/WelcomeModal';
 import OverviewTab from '../list/components/OverviewTab/OverviewTab';
 
 import { OVERVIEW_TAB_INDEX, VM_LIST_TAB_INDEX } from './constants';
@@ -73,6 +74,7 @@ const VirtualMachineNavigator: FC = () => {
         <VirtualizationFeaturesContextProvider>
           <VirtualMachineTreeView onFilterChange={onFilterChange} {...treeProps}>
             <GuidedTour />
+            <WelcomeModal />
             <CatalogOnboardingPopover />
             {isVirtualMachineListPage ? (
               <Tabs

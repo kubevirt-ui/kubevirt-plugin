@@ -83,22 +83,6 @@
 // t('Show VirtualMachine per InstanceTypes')
 // t('Show uncategorized VirtualMachines')
 
-// Guided tour strings - used in GuidedTour/utils/constants.tsx as tour step titles and content
-// t('Getting started resources')
-// t('Learn more about key areas to complete workflows, increase productivity, and familiarize yourself with Virtualization using our resources.')
-// t('Project selector')
-// t('To create VirtualMachines in a project, you must first create a new project and become the administrator.')
-// t('Settings configurations')
-// t('You can set the cluster and your individual preferences in the Settings tab on the Overview page.')
-// t('Tree view')
-// t('Visualize all your VirtualMachines and easily navigate between them using the tree view. You can also see their details with a status summary.')
-// t('Add volume')
-// t('Public SSH key')
-// t('Before creating a virtual machine, we recommend that you configure the public SSH key. It will be saved in the project as a secret. You can configure the public SSH key at a later time, but this is the easiest way.')
-// t('Search for configurable items')
-// t('On the Configuration tab on the VirtualMachine page, you can search for and edit any configurable item using the search box.')
-// t('You are ready to go!')
-
 // URL source helper text - used in DiskSourceUrlInput/URLSourceHelperText.tsx via t(osEntry.field)
 // TODO: Replace three-part concatenation with single interpolated translation key
 // t('Example: For CentOS, visit the ')
