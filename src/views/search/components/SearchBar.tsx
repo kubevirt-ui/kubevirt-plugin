@@ -16,6 +16,7 @@ import {
 } from '@patternfly/react-core';
 import SlidersHIcon from '@patternfly/react-icons/dist/esm/icons/sliders-h-icon';
 import { SearchSuggestResult } from '@search/utils/types';
+import { useVirtualMachineSearchSuggestionResources } from '@virtualmachines/search/hooks/useVirtualMachineSearchSuggestionResources';
 import { useVirtualMachineSearchSuggestions } from '@virtualmachines/search/hooks/useVirtualMachineSearchSuggestions';
 
 import { useNavigateToSearchResults } from '../hooks/useNavigateToSearchResults';
@@ -30,10 +31,12 @@ import SaveSearchModal from './SaveSearchModal';
 import './search-bar.scss';
 
 type SearchBarProps = {
+  cluster?: string;
+  namespace?: null | string;
   onFilterChange: OnFilterChange;
 };
 
-const SearchBar: FC<SearchBarProps> = ({ onFilterChange }) => {
+const SearchBar: FC<SearchBarProps> = ({ cluster, namespace = null, onFilterChange }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
 
@@ -43,7 +46,18 @@ const SearchBar: FC<SearchBarProps> = ({ onFilterChange }) => {
   const searchInputRef = useRef<HTMLInputElement>();
   const searchSuggestBoxRef = useRef<HTMLDivElement>();
 
-  const [vmSuggestions, vmSuggestionsLoaded] = useVirtualMachineSearchSuggestions(searchQuery);
+  const { vmis, vmisLoaded, vms, vmsLoaded } = useVirtualMachineSearchSuggestionResources({
+    cluster,
+    namespace: namespace ?? null,
+  });
+
+  const [vmSuggestions, vmSuggestionsLoaded] = useVirtualMachineSearchSuggestions({
+    searchQuery,
+    vmis,
+    vmisLoaded,
+    vms,
+    vmsLoaded,
+  });
   const navigateToSearchResults = useNavigateToSearchResults(onFilterChange);
   const { saveSearch, urlSearchQuery } = useSavedSearchData();
 

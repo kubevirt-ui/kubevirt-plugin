@@ -48,7 +48,11 @@ const VirtualMachineNavigator: FC = () => {
       ) : (
         <>
           <ListPageHeader title={t('VirtualMachines')}>
-            <SearchBar onFilterChange={onFilterChange} />
+            <SearchBar
+              cluster={cluster}
+              namespace={namespace ?? null}
+              onFilterChange={onFilterChange}
+            />
             <div>
               <VirtualMachinesCreateButton namespace={namespace} />
             </div>
