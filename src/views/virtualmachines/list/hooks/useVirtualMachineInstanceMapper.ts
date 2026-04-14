@@ -7,9 +7,10 @@ import { getCluster } from '@multicluster/helpers/selectors';
 import { useAccessibleResources } from '@virtualmachines/search/hooks/useAccessibleResources';
 import { VMIMapper } from '@virtualmachines/utils/mappers';
 
-export const useVirtualMachineInstanceMapper = () => {
+export const useVirtualMachineInstanceMapper = (clusterScope?: string) => {
   const { loaded: vmisLoaded, resources: vmis } = useAccessibleResources<V1VirtualMachineInstance>(
     VirtualMachineInstanceModelGroupVersionKind,
+    { cluster: clusterScope },
   );
 
   const vmiMapper: VMIMapper = useMemo(() => {
@@ -17,14 +18,14 @@ export const useVirtualMachineInstanceMapper = () => {
       (acc, vmi) => {
         const name = vmi?.metadata?.name;
         const namespace = vmi?.metadata?.namespace;
-        const cluster = getCluster(vmi) || SINGLE_CLUSTER_KEY;
-        if (!acc.mapper[cluster]) {
-          acc.mapper[cluster] = {};
+        const vmiCluster = getCluster(vmi) || SINGLE_CLUSTER_KEY;
+        if (!acc.mapper[vmiCluster]) {
+          acc.mapper[vmiCluster] = {};
         }
-        if (!acc.mapper[cluster][namespace]) {
-          acc.mapper[cluster][namespace] = {};
+        if (!acc.mapper[vmiCluster][namespace]) {
+          acc.mapper[vmiCluster][namespace] = {};
         }
-        acc.mapper[cluster][namespace][name] = vmi;
+        acc.mapper[vmiCluster][namespace][name] = vmi;
         const nodeName = vmi?.status?.nodeName;
         if (nodeName && !acc?.nodeNames?.[nodeName]) {
           acc.nodeNames[nodeName] = {

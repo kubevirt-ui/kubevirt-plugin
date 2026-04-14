@@ -31,12 +31,10 @@ import SaveSearchModal from './SaveSearchModal';
 import './search-bar.scss';
 
 type SearchBarProps = {
-  cluster?: string;
-  namespace?: null | string;
   onFilterChange: OnFilterChange;
 };
 
-const SearchBar: FC<SearchBarProps> = ({ cluster, namespace = null, onFilterChange }) => {
+const SearchBar: FC<SearchBarProps> = ({ onFilterChange }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
 
@@ -46,10 +44,7 @@ const SearchBar: FC<SearchBarProps> = ({ cluster, namespace = null, onFilterChan
   const searchInputRef = useRef<HTMLInputElement>();
   const searchSuggestBoxRef = useRef<HTMLDivElement>();
 
-  const { vmis, vmisLoaded, vms, vmsLoaded } = useVirtualMachineSearchSuggestionResources({
-    cluster,
-    namespace: namespace ?? null,
-  });
+  const { vmis, vmisLoaded, vms, vmsLoaded } = useVirtualMachineSearchSuggestionResources();
 
   const [vmSuggestions, vmSuggestionsLoaded] = useVirtualMachineSearchSuggestions({
     searchQuery,

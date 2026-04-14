@@ -42,7 +42,7 @@ const VirtualMachineSearchResults: FC = () => {
     () => (
       <>
         <ListPageHeader title={t('VirtualMachines')}>
-          <SearchBar cluster={cluster} namespace={namespace} onFilterChange={onFilterChange} />
+          <SearchBar onFilterChange={onFilterChange} />
           <div>
             <VirtualMachinesCreateButton namespace={namespace} />
           </div>

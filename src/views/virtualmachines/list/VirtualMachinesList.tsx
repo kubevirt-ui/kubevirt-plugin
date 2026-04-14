@@ -115,10 +115,10 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref
     loaded: accessibleVMsLoaded,
     loadError: accessibleVMsLoadError,
     resources: accessibleVMs,
-  } = useAccessibleResources<V1VirtualMachine>(
-    VirtualMachineModelGroupVersionKind,
-    VM_FILTER_OPTIONS,
-  );
+  } = useAccessibleResources<V1VirtualMachine>(VirtualMachineModelGroupVersionKind, {
+    cluster,
+    filterOptions: VM_FILTER_OPTIONS,
+  });
 
   const vms = namespace ? namespacedVMs : accessibleVMs;
   const vmsLoaded = namespace ? namespacedVMsLoaded : accessibleVMsLoaded;
@@ -133,6 +133,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref
   const { filtersWithSelect, hiddenFilters, vmiMapper, vmimMapper, vmisLoaded } = useVMListFilters(
     vmims,
     pvcMapper,
+    cluster,
   );
 
   const vmisForSummary = useMemo(
