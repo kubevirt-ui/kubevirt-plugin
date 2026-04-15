@@ -3,6 +3,7 @@ import React, { FC, memo } from 'react';
 import CPUDescription from '@kubevirt-utils/components/CPUDescription/CPUDescription';
 import CPUMemory from '@kubevirt-utils/components/CPUMemory/CPUMemory';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
+import useIsIPv6SingleStackCluster from '@kubevirt-utils/hooks/useIPStackType/useIsIPv6SingleStackCluster';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { WORKLOADS_LABELS } from '@kubevirt-utils/resources/template/utils/constants';
 import {
@@ -14,17 +15,21 @@ import {
   isDefaultVariantTemplate,
 } from '@kubevirt-utils/resources/template/utils/selectors';
 import { getCPU } from '@kubevirt-utils/resources/vm';
+import { networksHavePodNetwork } from '@kubevirt-utils/resources/vm/utils/network/utils';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
-import { DescriptionList } from '@patternfly/react-core';
+import { Alert, DescriptionList } from '@patternfly/react-core';
 import DisksReviewTable from '@virtualmachines/creation-wizard/components/DisksReviewTable/DisksReviewTable';
 import useWizardDisksTableData from '@virtualmachines/creation-wizard/components/DisksReviewTable/hooks/useWizardDisksTableData/useWizardDisksTableData';
 import NetworksReviewTable from '@virtualmachines/creation-wizard/components/NetworksReviewTable';
+import useVMWizardStore from '@virtualmachines/creation-wizard/state/vm-wizard-store/useVMWizardStore';
 import { useDrawerContext } from '@virtualmachines/creation-wizard/steps/TemplateStep/components/TemplatesCatalogDrawer/hooks/useDrawerContext';
 
 import TemplateExpandableDescription from './TemplateExpandableDescription';
 
 const TemplateInfoSection: FC = memo(() => {
   const { t } = useKubevirtTranslation();
+  const { cluster } = useVMWizardStore();
+  const isIPv6SingleStack = useIsIPv6SingleStackCluster(cluster);
   const { template, vm } = useDrawerContext();
 
   const notAvailable = t('N/A');
@@ -35,6 +40,7 @@ const TemplateInfoSection: FC = memo(() => {
   const interfaces = getTemplateInterfaces(template);
   const [disks] = useWizardDisksTableData(vm);
   const isDefaultTemplate = isDefaultVariantTemplate(template);
+  const hasPodNetwork = networksHavePodNetwork(networks);
 
   return (
     <DescriptionList className="pf-v6-u-mt-lg">
@@ -62,6 +68,16 @@ const TemplateInfoSection: FC = memo(() => {
         descriptionData={<NetworksReviewTable interfaces={interfaces} networks={networks} />}
         descriptionHeader={t('Network interfaces ({{networks}})', { networks: networks?.length })}
       />
+      {isIPv6SingleStack && hasPodNetwork && (
+        <Alert
+          isInline
+          title={t("Can't use Pod networking in IPv6 single-stack cluster")}
+          variant="warning"
+        >
+          {networks.length === 1 &&
+            t('You can add a different network interface in the Customization step')}
+        </Alert>
+      )}
       <DescriptionItem
         descriptionData={<DisksReviewTable disks={disks} />}
         descriptionHeader={t('Disks ({{disks}})', { disks: disks?.length })}

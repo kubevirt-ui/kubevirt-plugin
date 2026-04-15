@@ -105,11 +105,13 @@ type GenerateVMArgs = {
   cluster?: string;
   enableMultiArchBootImageImport?: boolean;
   instanceTypeState: InstanceTypeVMState;
+  isIPv6SingleStack?: boolean;
   isUDNManagedNamespace: boolean;
   runStrategy: RunStrategy;
   subscriptionData: RHELAutomaticSubscriptionData;
   targetNamespace: string;
 };
+
 type GenerateVMCallback = (props: GenerateVMArgs) => V1VirtualMachine;
 
 export const generateVM: GenerateVMCallback = ({
@@ -117,6 +119,7 @@ export const generateVM: GenerateVMCallback = ({
   cluster,
   enableMultiArchBootImageImport,
   instanceTypeState,
+  isIPv6SingleStack,
   isUDNManagedNamespace,
   runStrategy,
   subscriptionData,
@@ -219,10 +222,10 @@ export const generateVM: GenerateVMCallback = ({
             devices: {
               autoattachPodInterface: false,
               disks: [],
-              interfaces: [defaultInterface],
+              interfaces: isIPv6SingleStack ? [] : [defaultInterface],
             },
           },
-          networks: [DEFAULT_NETWORK],
+          networks: isIPv6SingleStack ? [] : [DEFAULT_NETWORK],
           subdomain: HEADLESS_SERVICE_NAME,
           volumes: [
             {

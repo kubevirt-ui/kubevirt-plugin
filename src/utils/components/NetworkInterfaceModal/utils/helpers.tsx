@@ -36,7 +36,7 @@ import { isRunning, isStopped } from '@virtualmachines/utils';
 import { NetworkAttachmentDefinition } from '../components/hooks/types';
 
 export const hasExplicitlyDefinedPodNetwork = (vm: V1VirtualMachine): boolean =>
-  !!getNetworks(vm)?.find(isPodNetwork);
+  getNetworks(vm)?.some(isPodNetwork);
 
 export const podNetworkExists = (vm: V1VirtualMachine): boolean =>
   hasExplicitlyDefinedPodNetwork(vm) || (hasAutoAttachedPodNetwork(vm) && isRunning(vm));

@@ -13,6 +13,7 @@ import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/Descript
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
+import useIsIPv6SingleStackCluster from '@kubevirt-utils/hooks/useIPStackType/useIsIPv6SingleStackCluster';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { WORKLOADS_LABELS } from '@kubevirt-utils/resources/template/utils/constants';
 import {
@@ -25,14 +26,18 @@ import {
   isDefaultVariantTemplate,
 } from '@kubevirt-utils/resources/template/utils/selectors';
 import { getCPU, getDisks } from '@kubevirt-utils/resources/vm';
+import { networksHavePodNetwork } from '@kubevirt-utils/resources/vm/utils/network/utils';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
-import { DescriptionList, ExpandableSection } from '@patternfly/react-core';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
+import { Alert, DescriptionList, ExpandableSection } from '@patternfly/react-core';
 
 import { useDrawerContext } from './hooks/useDrawerContext';
 import TemplateExpandableDescription from './TemplateExpandableDescription';
 
 export const TemplateInfoSection: FC = memo(() => {
   const { t } = useKubevirtTranslation();
+  const cluster = useClusterParam();
+  const isIPv6SingleStack = useIsIPv6SingleStackCluster(cluster);
   const { createModal } = useModal();
   const { setVM, template, vm } = useDrawerContext();
   const { ns } = useParams<{ ns: string }>();
@@ -48,6 +53,7 @@ export const TemplateInfoSection: FC = memo(() => {
   const disks = getDisks(vm);
   const isDefaultTemplate = isDefaultVariantTemplate(template);
   const [isTemplateInfoExpanded, setIsTemplateInfoExpanded] = useState(true);
+  const hasPodNetwork = networksHavePodNetwork(networks);
 
   return (
     <ExpandableSection
@@ -111,6 +117,16 @@ export const TemplateInfoSection: FC = memo(() => {
           }
           descriptionHeader={t('Network interfaces ({{networks}})', { networks: networks?.length })}
         />
+        {isIPv6SingleStack && hasPodNetwork && (
+          <Alert
+            isInline
+            title={t("Can't use Pod networking in IPv6 single-stack cluster")}
+            variant="warning"
+          >
+            {networks.length === 1 &&
+              t('Click Customize VirtualMachine to add a different network interface')}
+          </Alert>
+        )}
         <DescriptionItem
           descriptionData={<WizardOverviewDisksTable vm={vm} />}
           descriptionHeader={t('Disks ({{disks}})', { disks: disks?.length })}

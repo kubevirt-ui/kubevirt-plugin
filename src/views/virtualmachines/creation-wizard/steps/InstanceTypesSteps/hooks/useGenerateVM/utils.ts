@@ -231,6 +231,7 @@ export const generateVM: GenerateVMCallback = ({
   enableMultiArchBootImageImport,
   folder,
   generatedVMName,
+  isIPv6SingleStack,
   isUDNManagedNamespace,
   populatedCloudInitYAML,
   pvcSource,
@@ -329,10 +330,10 @@ export const generateVM: GenerateVMCallback = ({
             devices: {
               autoattachPodInterface: false,
               disks: [],
-              interfaces: [defaultInterface],
+              interfaces: isIPv6SingleStack ? [] : [defaultInterface],
             },
           },
-          networks: [DEFAULT_NETWORK],
+          networks: isIPv6SingleStack ? [] : [DEFAULT_NETWORK],
           subdomain: HEADLESS_SERVICE_NAME,
           volumes: [
             {

@@ -17,6 +17,7 @@ import {
   DEFAULT_NETWORK_INTERFACE,
   UDN_BINDING_NAME,
 } from '@kubevirt-utils/resources/vm/utils/constants';
+import { removePodNetworkFromVM } from '@kubevirt-utils/resources/vm/utils/network/utils';
 import { getArchitecture } from '@kubevirt-utils/utils/architecture';
 import { createHeadlessService } from '@kubevirt-utils/utils/headless-service';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -32,6 +33,7 @@ type QuickCreateVMType = (inputs: {
     cluster?: string;
     enableMultiArchBootImageImport?: boolean;
     isDisabledGuestSystemLogs: boolean;
+    isIPv6SingleStack?: boolean;
     isUDNManagedNamespace?: boolean;
     name: string;
     namespace: string;
@@ -48,6 +50,7 @@ export const quickCreateVM: QuickCreateVMType = async ({
     cluster,
     enableMultiArchBootImageImport,
     isDisabledGuestSystemLogs,
+    isIPv6SingleStack,
     isUDNManagedNamespace,
     name,
     namespace = DEFAULT_NAMESPACE,
@@ -93,6 +96,10 @@ export const quickCreateVM: QuickCreateVMType = async ({
     if (isUDNManagedNamespace && defaultInterface) {
       delete defaultInterface.masquerade;
       defaultInterface.binding = { name: UDN_BINDING_NAME };
+    }
+
+    if (isIPv6SingleStack) {
+      removePodNetworkFromVM(draftVM);
     }
 
     const templateArchitecture = getArchitecture(processedTemplate);
