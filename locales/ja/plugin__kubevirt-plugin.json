@@ -2157,6 +2157,7 @@
   "Type to create folder": "入力してフォルダーを作成",
   "UEFI": "UEFI",
   "UEFI (secure)": "UEFI (セキュア)",
+  "Unable to verify multicluster observability status. Metrics may not be available.": "Unable to verify multicluster observability status. Metrics may not be available.",
   "Unattend.xml answer file": "Unattend.xml アンサーファイル",
   "Unavailable": "利用不可",
   "Unique name of the MigrationPolicy": "MigrationPolicy の一意の名前",

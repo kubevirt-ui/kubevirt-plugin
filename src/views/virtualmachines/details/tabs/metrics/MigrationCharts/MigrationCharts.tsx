@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import MigrationThresholdChart from '@kubevirt-utils/components/Charts/MigrationUtil/MigrationThresholdChart';
@@ -18,13 +18,16 @@ import {
   StackItem,
 } from '@patternfly/react-core';
 
+import NoDataMetricsCard from '../components/NoDataMetricsCard';
+
 import MigrationProgressStatus from './MigrationProgressStatus';
 
 type MigrationChartsProps = {
+  prometheusUnavailable?: boolean;
   vmi: V1VirtualMachineInstance;
 };
 
-const MigrationCharts: React.FC<MigrationChartsProps> = ({ vmi }) => {
+const MigrationCharts: FC<MigrationChartsProps> = ({ prometheusUnavailable, vmi }) => {
   const { t } = useKubevirtTranslation();
 
   return (
@@ -32,56 +35,64 @@ const MigrationCharts: React.FC<MigrationChartsProps> = ({ vmi }) => {
       <StackItem>
         <Grid>
           <GridItem span={6}>
-            <Card>
-              <CardTitle>
-                {t('Migration chart')}
-                <HelpTextIcon
-                  bodyContent={(hide) => (
-                    <PopoverContentWithLightspeedButton
-                      content={t(
-                        'Displays real-time metrics of the live migration process, such as memory transfer and downtime.',
-                      )}
-                      hide={hide}
-                      obj={vmi}
-                      promptType={OLSPromptType.MIGRATION_METRICS}
-                    />
-                  )}
-                  helpIconClassName="pf-v6-u-ml-xs"
-                  position={PopoverPosition.right}
-                />
-              </CardTitle>
-              <CardBody>
-                <MigrationThresholdChart vmi={vmi} />
-              </CardBody>
-            </Card>
+            {prometheusUnavailable ? (
+              <NoDataMetricsCard title={t('Migration chart')} />
+            ) : (
+              <Card>
+                <CardTitle>
+                  {t('Migration chart')}
+                  <HelpTextIcon
+                    bodyContent={(hide) => (
+                      <PopoverContentWithLightspeedButton
+                        content={t(
+                          'Displays real-time metrics of the live migration process, such as memory transfer and downtime.',
+                        )}
+                        hide={hide}
+                        obj={vmi}
+                        promptType={OLSPromptType.MIGRATION_METRICS}
+                      />
+                    )}
+                    helpIconClassName="pf-v6-u-ml-xs"
+                    position={PopoverPosition.right}
+                  />
+                </CardTitle>
+                <CardBody>
+                  <MigrationThresholdChart vmi={vmi} />
+                </CardBody>
+              </Card>
+            )}
           </GridItem>
           <GridItem span={6}>
-            <Card>
-              <CardTitle>
-                {t('KV data transfer rate')}
-                <HelpTextIcon
-                  bodyContent={(hide) => (
-                    <PopoverContentWithLightspeedButton
-                      content={t(
-                        'Shows the data throughput (MB/s) during the live migration between source and destination nodes.',
-                      )}
-                      hide={hide}
-                      obj={vmi}
-                      promptType={OLSPromptType.LIVE_MIGRATION_DATA_TRANSFER_RATE}
-                    />
-                  )}
-                  helpIconClassName="pf-v6-u-ml-xs"
-                  position={PopoverPosition.right}
-                />
-              </CardTitle>
-              <CardBody>
-                <MigrationThresholdChartDiskRate vmi={vmi} />
-              </CardBody>
-            </Card>
+            {prometheusUnavailable ? (
+              <NoDataMetricsCard title={t('KV data transfer rate')} />
+            ) : (
+              <Card>
+                <CardTitle>
+                  {t('KV data transfer rate')}
+                  <HelpTextIcon
+                    bodyContent={(hide) => (
+                      <PopoverContentWithLightspeedButton
+                        content={t(
+                          'Shows the data throughput (MB/s) during the live migration between source and destination nodes.',
+                        )}
+                        hide={hide}
+                        obj={vmi}
+                        promptType={OLSPromptType.LIVE_MIGRATION_DATA_TRANSFER_RATE}
+                      />
+                    )}
+                    helpIconClassName="pf-v6-u-ml-xs"
+                    position={PopoverPosition.right}
+                  />
+                </CardTitle>
+                <CardBody>
+                  <MigrationThresholdChartDiskRate vmi={vmi} />
+                </CardBody>
+              </Card>
+            )}
           </GridItem>
         </Grid>
       </StackItem>
-      <MigrationProgressStatus vmi={vmi} />
+      <MigrationProgressStatus prometheusUnavailable={prometheusUnavailable} vmi={vmi} />
     </Stack>
   );
 };

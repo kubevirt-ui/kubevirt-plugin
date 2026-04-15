@@ -1,13 +1,18 @@
 import React, { FC, useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom-v5-compat';
 
+import {
+  getMCOCheckErrorTooltip,
+  getMCONotInstalledTooltip,
+} from '@kubevirt-utils/hooks/useAlerts/utils/useMCOInstalled';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { usePrometheusAvailability } from '@kubevirt-utils/hooks/usePrometheusAvailability';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import useVMI from '@kubevirt-utils/resources/vm/hooks/useVMI';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { Overview } from '@openshift-console/dynamic-plugin-sdk';
-import { ExpandableSection, Title } from '@patternfly/react-core';
+import { Alert, AlertVariant, ExpandableSection, Title } from '@patternfly/react-core';
 import { NavPageComponentProps } from '@virtualmachines/details/utils/types';
 
 import MigrationCharts from './MigrationCharts/MigrationCharts';
@@ -23,6 +28,7 @@ const VirtualMachineMetricsTab: FC<NavPageComponentProps> = ({ obj: vm }) => {
   const { t } = useKubevirtTranslation();
   const location = useLocation();
   const { vmi, vmiLoaded } = useVMI(getName(vm), getNamespace(vm), getCluster(vm));
+  const { mcoError, prometheusUnavailable } = usePrometheusAvailability(vm);
 
   const [expended, setExpended] = useState<{ [key in MetricsTabExpendedSections]: boolean }>({
     [MetricsTabExpendedSections.migration]: true,
@@ -31,7 +37,7 @@ const VirtualMachineMetricsTab: FC<NavPageComponentProps> = ({ obj: vm }) => {
     [MetricsTabExpendedSections.utilization]: true,
   });
 
-  const onToggle = (value) => () =>
+  const onToggle = (value: MetricsTabExpendedSections) => () =>
     setExpended((currentOpen) => ({ ...currentOpen, [value]: !currentOpen?.[value] }));
 
   useEffect(() => {
@@ -39,8 +45,7 @@ const VirtualMachineMetricsTab: FC<NavPageComponentProps> = ({ obj: vm }) => {
       const focusedSectionId = Object.values(MetricsTabExpendedSections).find((focusedSection) =>
         location?.search?.includes(focusedSection),
       );
-      const focusedExpandableSection = document.getElementById(focusedSectionId);
-      focusedExpandableSection.scrollIntoView();
+      document.getElementById(focusedSectionId)?.scrollIntoView();
     }
   }, [location?.search, vmiLoaded]);
 
@@ -49,7 +54,15 @@ const VirtualMachineMetricsTab: FC<NavPageComponentProps> = ({ obj: vm }) => {
       <Title className="title" headingLevel="h2">
         {t('Metrics')}
       </Title>
-      <TimeRange />
+      {prometheusUnavailable && (
+        <Alert
+          className="pf-v6-u-mb-md pf-v6-u-mx-md"
+          isInline
+          title={mcoError ? getMCOCheckErrorTooltip(t) : getMCONotInstalledTooltip(t)}
+          variant={AlertVariant.warning}
+        />
+      )}
+      {!prometheusUnavailable && <TimeRange />}
       <Overview className="virtual-machine-metrics-tab__charts">
         <ExpandableSection
           id={MetricsTabExpendedSections.utilization}
@@ -57,7 +70,7 @@ const VirtualMachineMetricsTab: FC<NavPageComponentProps> = ({ obj: vm }) => {
           onToggle={onToggle(MetricsTabExpendedSections.utilization)}
           toggleText={t('Utilization')}
         >
-          <UtilizationCharts vmi={vmi} />
+          <UtilizationCharts prometheusUnavailable={prometheusUnavailable} vmi={vmi} />
         </ExpandableSection>
 
         <ExpandableSection
@@ -66,7 +79,7 @@ const VirtualMachineMetricsTab: FC<NavPageComponentProps> = ({ obj: vm }) => {
           onToggle={onToggle(MetricsTabExpendedSections.storage)}
           toggleText={t('Storage')}
         >
-          <StorageCharts vmi={vmi} />
+          <StorageCharts prometheusUnavailable={prometheusUnavailable} vmi={vmi} />
         </ExpandableSection>
         <ExpandableSection
           id={MetricsTabExpendedSections.network}
@@ -74,7 +87,7 @@ const VirtualMachineMetricsTab: FC<NavPageComponentProps> = ({ obj: vm }) => {
           onToggle={onToggle(MetricsTabExpendedSections.network)}
           toggleText={t('Network')}
         >
-          <NetworkCharts vmi={vmi} />
+          <NetworkCharts prometheusUnavailable={prometheusUnavailable} vmi={vmi} />
         </ExpandableSection>
         <ExpandableSection
           id={MetricsTabExpendedSections.migration}
@@ -82,7 +95,7 @@ const VirtualMachineMetricsTab: FC<NavPageComponentProps> = ({ obj: vm }) => {
           onToggle={onToggle(MetricsTabExpendedSections.migration)}
           toggleText={t('Migration')}
         >
-          <MigrationCharts vmi={vmi} />
+          <MigrationCharts prometheusUnavailable={prometheusUnavailable} vmi={vmi} />
         </ExpandableSection>
       </Overview>
     </div>

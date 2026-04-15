@@ -12,6 +12,9 @@ export const getMCONotInstalledTooltip = (t: TFunction): string =>
     'Multicluster observability is not available. Install it on the hub cluster to enable monitoring across clusters.',
   );
 
+export const getMCOCheckErrorTooltip = (t: TFunction): string =>
+  t('Unable to verify multicluster observability status. Metrics may not be available.');
+
 type UseMCOInstalledResult = {
   error: Error | unknown;
   loaded: boolean;

@@ -34,12 +34,14 @@ const CPUUtil: FC<CPUUtilProps> = ({ vmi }) => {
     namespace: getNamespace(vmi),
   };
 
-  const [dataCPUUsage] = useFleetPrometheusPoll({
+  const [dataCPUUsage, loaded, error] = useFleetPrometheusPoll({
     ...prometheusProps,
     query: queries?.CPU_USAGE,
   });
 
+  const isLoading = !loaded;
   const vmCPU = getCPU(vmi);
+  const hasData = dataCPUUsage?.data?.result?.length > 0;
 
   const cpuUsage = +(dataCPUUsage?.data?.result?.[0]?.value?.[1] || 0);
   const cpuUsageHumanized = humanizeCpuCores(cpuUsage);
@@ -50,18 +52,22 @@ const CPUUtil: FC<CPUUtilProps> = ({ vmi }) => {
   const averageCPUUsageStr = ((cpuUsage / cpuRequested) * 100).toFixed(2) || 0;
   const averageCPUUsage = Number(averageCPUUsageStr);
 
-  const isReady = !Number.isNaN(cpuUsage) && !Number.isNaN(cpuRequested);
+  const isReady = loaded && hasData && !Number.isNaN(cpuRequested);
 
   return (
     <UtilizationBlock
-      usedOfTotalText={t('Requested of {{cpuRequested}}', {
-        cpuRequested: isReady ? cpuRequestedHumanized?.string : 0,
-      })}
+      usedOfTotalText={
+        isReady
+          ? t('Requested of {{cpuRequested}}', {
+              cpuRequested: cpuRequestedHumanized?.string,
+            })
+          : ''
+      }
       dataTestId="util-summary-cpu"
       title={t('CPU')}
-      usageValue={`${isReady ? cpuUsageHumanized?.string : 0}`}
+      usageValue={isReady ? cpuUsageHumanized?.string : ''}
     >
-      <ComponentReady isReady={isReady}>
+      <ComponentReady error={error} isLoading={isLoading} isReady={isReady}>
         <ChartDonutUtilization
           data={{
             x: t('CPU used'),

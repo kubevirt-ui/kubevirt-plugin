@@ -2161,6 +2161,7 @@
   "Type to create folder": "Type to create folder",
   "UEFI": "UEFI",
   "UEFI (secure)": "UEFI (secure)",
+  "Unable to verify multicluster observability status. Metrics may not be available.": "Unable to verify multicluster observability status. Metrics may not be available.",
   "Unattend.xml answer file": "Unattend.xml answer file",
   "Unavailable": "Unavailable",
   "Unique name of the MigrationPolicy": "Unique name of the MigrationPolicy",
