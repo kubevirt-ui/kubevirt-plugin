@@ -22,6 +22,7 @@ import {
   FLEET_NS_INSTANCETYPES_PATH,
   FLEET_TEMPLATES_PATH,
   FLEET_VIRTUAL_MACHINES_PATH,
+  FLEET_WIZARD_PATH,
 } from './constants';
 
 export const exposedModules: ConsolePluginBuildMetadata['exposedModules'] = {
@@ -262,9 +263,9 @@ export const extensions: EncodedExtension[] = [
         $codeRef: 'VMWizard',
       },
       path: [
-        '/k8s/all-clusters/all-namespaces/vmwizard',
-        '/k8s/cluster/:cluster/ns/:ns/vmwizard',
-        '/k8s/cluster/:cluster/all-namespaces/vmwizard',
+        `${FLEET_WIZARD_PATH}/all-clusters/all-namespaces`,
+        `${FLEET_WIZARD_PATH}/cluster/:cluster/ns/:ns`,
+        `${FLEET_WIZARD_PATH}/cluster/:cluster/all-namespaces`,
       ],
     },
     type: 'console.page/route',
