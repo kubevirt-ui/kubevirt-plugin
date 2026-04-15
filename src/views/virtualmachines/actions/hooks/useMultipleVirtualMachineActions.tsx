@@ -55,7 +55,7 @@ const useMultipleVirtualMachineActions: UseMultipleVirtualMachineActions = (
   );
 
   return useMemo(() => {
-    if (vms.length === 1) {
+    if (vms.length === 1 && !isTreeViewMenu) {
       return singleVMActions;
     }
 
@@ -116,6 +116,7 @@ const useMultipleVirtualMachineActions: UseMultipleVirtualMachineActions = (
   }, [
     confirmVMActionsEnabled,
     createModal,
+    isTreeViewMenu,
     mtvInstalled,
     provider,
     providerLoaded,
