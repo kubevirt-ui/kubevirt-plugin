@@ -18,11 +18,13 @@ import useDuration from '@virtualmachines/details/tabs/metrics/hooks/useDuration
 import { tickLabels } from '../ChartLabels/styleOverrides';
 import ComponentReady from '../ComponentReady/ComponentReady';
 import useResponsiveCharts from '../hooks/useResponsiveCharts';
+import useStableYMax from '../hooks/useStableYMax';
 import {
   addTimestampToTooltip,
   findNetworkMaxYValue,
   formatNetworkThresholdSingleSourceTooltipData,
   formatNetworkYTick,
+  getChartYRange,
   MILLISECONDS_MULTIPLIER,
   tickFormat,
   TICKS_COUNT,
@@ -52,7 +54,8 @@ const NetworkThresholdSingleSourceChart: FC<NetworkThresholdSingleSourceChartPro
       });
     });
   const isReady = !isEmpty(chartData);
-  const Ymax = findNetworkMaxYValue(chartData);
+  const Ymax = useStableYMax(findNetworkMaxYValue(chartData), duration);
+  const yRange = getChartYRange(Ymax);
 
   const CursorVoronoiContainer = createContainer('voronoi', 'cursor');
   const legendData =
@@ -84,7 +87,7 @@ const NetworkThresholdSingleSourceChart: FC<NetworkThresholdSingleSourceChartPro
             }
             domain={{
               x: [currentTime - timespan, currentTime],
-              y: [0, Ymax + 1],
+              ...(yRange && { y: yRange }),
             }}
             height={height}
             padding={{ bottom: 60, left: 70, right: 60, top: 30 }}
@@ -101,7 +104,7 @@ const NetworkThresholdSingleSourceChart: FC<NetworkThresholdSingleSourceChartPro
               }}
               dependentAxis
               tickFormat={formatNetworkYTick}
-              tickValues={[0, Ymax]}
+              {...(yRange && { tickValues: yRange })}
             />
             <ChartAxis
               style={{

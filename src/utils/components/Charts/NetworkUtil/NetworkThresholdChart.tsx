@@ -22,9 +22,12 @@ import useDuration from '@virtualmachines/details/tabs/metrics/hooks/useDuration
 import { tickLabels } from '../ChartLabels/styleOverrides';
 import ComponentReady from '../ComponentReady/ComponentReady';
 import useResponsiveCharts from '../hooks/useResponsiveCharts';
+import useStableYMax from '../hooks/useStableYMax';
 import {
   addTimestampToTooltip,
+  findMaxYValue,
   formatNetworkThresholdTooltipData,
+  getChartYRange,
   MILLISECONDS_MULTIPLIER,
   queriesToLink,
   tickFormat,
@@ -74,6 +77,11 @@ const NetworkThresholdChart: React.FC<NetworkThresholdChartProps> = ({ vmi }) =>
   });
 
   const isReady = !isEmpty(chartDataOut) || !isEmpty(chartDataIn);
+  const yMax = useStableYMax(
+    findMaxYValue([...(chartDataIn || []), ...(chartDataOut || [])]),
+    `${vmi?.metadata?.uid}_${duration}`,
+  );
+  const yRange = getChartYRange(yMax);
 
   return (
     <ComponentReady error={error} isLoading={isLoading} isReady={isReady}>
@@ -88,6 +96,7 @@ const NetworkThresholdChart: React.FC<NetworkThresholdChartProps> = ({ vmi }) =>
             }
             domain={{
               x: [currentTime - timespan, currentTime],
+              ...(yRange && { y: yRange }),
             }}
             height={height}
             padding={35}

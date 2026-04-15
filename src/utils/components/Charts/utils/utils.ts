@@ -7,7 +7,6 @@ import {
   timestampFor,
 } from '@kubevirt-utils/components/Timestamp/utils/datetime';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   PrometheusResponse,
   PrometheusResult,
@@ -83,21 +82,25 @@ export const getPrometheusDataAllNics = (response: PrometheusResponse): Promethe
   ];
 };
 
+/**
+ * Finds the maximum Y value across nested per-NIC chart data arrays. Ceils non-integer results.
+ * @param chartData
+ */
 export const findNetworkMaxYValue = (
   chartData: { name: string; x: Date; y: number }[][],
-): number => {
-  const yValues =
-    !isEmpty(chartData) &&
-    chartData?.map((dataArray) => {
-      return Math.max(...dataArray?.map((data) => data?.y));
-    });
-  const maxY = Math.max(...(yValues || []));
+): null | number => {
+  if (!chartData?.length) return null;
 
-  if (Number.isInteger(maxY)) return maxY;
+  let max = -Infinity;
+  for (const dataArray of chartData) {
+    if (!dataArray?.length) continue;
+    for (const point of dataArray) {
+      if (point?.y > max) max = point.y;
+    }
+  }
 
-  const roundedMax = Math.round(maxY);
-
-  return isNaN(roundedMax) ? 0 : roundedMax;
+  if (!Number.isFinite(max)) return null;
+  return Number.isInteger(max) ? max : Math.ceil(max);
 };
 
 export const formatNetworkYTick = (tick: any, index: number, ticks: any[]) => {
@@ -116,18 +119,47 @@ export const formatMemoryYTick = (yMax: number, fixedDigits: number) => (tick: n
   return humanizedValue || '';
 };
 
+/**
+ * Finds the maximum Y value in a flat chart data array. Returns null when data is empty or all NaN.
+ * @param chartData
+ */
 export const findMaxYValue = (
   chartData: { name?: string; x: Date; y: number }[],
 ): null | number => {
-  const yValues = chartData?.map((point) => point?.y);
-  return yValues ? Math.max(...yValues) : 0;
+  if (!chartData?.length) return null;
+
+  let max = -Infinity;
+  for (const point of chartData) {
+    if (point?.y > max) max = point.y;
+  }
+
+  return Number.isFinite(max) ? max : null;
 };
 
-export const findMigrationMaxYValue = (processedData, remainingData, dirtyRateData) => {
-  const max = [processedData, remainingData, dirtyRateData]?.map((chartData) =>
-    findMaxYValue(chartData),
-  );
-  return Math.max(...max);
+/**
+ * Returns a [0, max] range suitable for Y-axis domain and tickValues.
+ * Returns undefined when max is null (no data), letting the chart library auto-scale.
+ * Ensures a minimum positive range to avoid degenerate [0, 0] domains.
+ * @param yMax - the maximum Y value, or null when no data is available
+ */
+export const getChartYRange = (yMax: null | number): [number, number] | undefined =>
+  yMax != null ? [0, yMax || 1] : undefined;
+
+/**
+ * Finds the overall maximum Y across the three migration metric series. Returns null when all are empty.
+ * @param processedData
+ * @param remainingData
+ * @param dirtyRateData
+ */
+export const findMigrationMaxYValue = (
+  processedData,
+  remainingData,
+  dirtyRateData,
+): null | number => {
+  const values = [processedData, remainingData, dirtyRateData]
+    .map((chartData) => findMaxYValue(chartData))
+    .filter((v): v is number => v !== null);
+  return values.length ? Math.max(...values) : null;
 };
 
 /**
