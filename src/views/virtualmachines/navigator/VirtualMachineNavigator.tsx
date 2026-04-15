@@ -8,6 +8,7 @@ import VMsTabOnboardingPopover from '@kubevirt-utils/components/OnboardingPopove
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { VirtualMachineModelRef } from '@kubevirt-utils/models';
 import { FLEET_VIRTUAL_MACHINES_PATH } from '@multicluster/constants';
+import { isACMPath } from '@multicluster/urls';
 import { OnFilterChange } from '@openshift-console/dynamic-plugin-sdk';
 import { Divider, Tab, Tabs, TabTitleText } from '@patternfly/react-core';
 import { useSignals } from '@preact/signals-react/runtime';
@@ -36,6 +37,8 @@ const VirtualMachineNavigator: FC = () => {
   const { activeTabKey, handleTabSelect } = useNavigatorTabs();
 
   const { cluster, ns: namespace } = useParams<{ cluster?: string; ns: string }>();
+
+  const isFleetPage = isACMPath(location.pathname);
 
   const isACMVMListPage =
     matchPath(`${FLEET_VIRTUAL_MACHINES_PATH}/all-clusters/all-namespaces`, location.pathname) ||
@@ -73,8 +76,8 @@ const VirtualMachineNavigator: FC = () => {
       <SettingsClusterProvider cluster={cluster}>
         <VirtualizationFeaturesContextProvider>
           <VirtualMachineTreeView onFilterChange={onFilterChange} {...treeProps}>
-            <GuidedTour />
-            <WelcomeModal />
+            {!isFleetPage && <GuidedTour />}
+            {!isFleetPage && <WelcomeModal />}
             <CatalogOnboardingPopover />
             {isVirtualMachineListPage ? (
               <Tabs
