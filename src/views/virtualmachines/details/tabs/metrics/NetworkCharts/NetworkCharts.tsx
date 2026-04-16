@@ -1,11 +1,9 @@
 import React, { FC, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom-v5-compat';
+import { useLocation, useNavigate } from 'react-router-dom-v5-compat';
 
-import { VirtualMachineModelRef } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { Grid, GridItem, SelectOption, Title } from '@patternfly/react-core';
 
 import useQuery from '../../../../../../utils/hooks/useQuery';
@@ -23,6 +21,7 @@ type NetworkChartsProps = {
 
 const NetworkCharts: FC<NetworkChartsProps> = ({ prometheusUnavailable, vmi }) => {
   const { t } = useKubevirtTranslation();
+  const { pathname } = useLocation();
   const navigate = useNavigate();
 
   const interfacesNames = useMemo(() => {
@@ -65,11 +64,7 @@ const NetworkCharts: FC<NetworkChartsProps> = ({ prometheusUnavailable, vmi }) =
         {interfacesNames?.map((nic) => (
           <SelectOption
             onClick={() => {
-              navigate(
-                `/k8s/ns/${getNamespace(vmi)}/${VirtualMachineModelRef}/${getName(
-                  vmi,
-                )}/metrics?network=${nic}`,
-              );
+              navigate({ pathname, search: `?network=${nic}` }, { replace: true });
             }}
             key={nic}
             value={nic}

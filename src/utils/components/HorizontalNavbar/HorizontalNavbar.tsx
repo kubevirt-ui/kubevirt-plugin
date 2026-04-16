@@ -109,7 +109,10 @@ const HorizontalNavbar: FC<HorizontalNavbarProps> = ({
           })}
         </ul>
       </nav>
-      <div className={classNames('horizontal-navbar__routes', routesClassName)}>
+      <div
+        className={classNames('horizontal-navbar__routes', routesClassName)}
+        id="horizontal-navbar-routes"
+      >
         <Routes>{RoutesComponents}</Routes>
       </div>
     </>
