@@ -81,6 +81,9 @@ const extensions: EncodedExtension[] = [
 
   // Hardware Devices (compute section, not virtualization)
   {
+    flags: {
+      required: ['KUBEVIRT_VIRTUALIZATION_NAV'],
+    },
     properties: {
       href: '/hardwaredevices',
       id: 'hardwaredevices',

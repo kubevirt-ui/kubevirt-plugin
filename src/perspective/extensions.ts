@@ -19,6 +19,7 @@ export const extensions: EncodedExtension[] = [
   {
     flags: {
       disallowed: ['KUBEVIRT_DYNAMIC_ACM'],
+      required: ['KUBEVIRT_VIRTUALIZATION_NAV'],
     },
     properties: {
       icon: { $codeRef: 'perspective.icon' },

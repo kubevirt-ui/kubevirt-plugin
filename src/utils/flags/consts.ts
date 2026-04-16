@@ -10,5 +10,8 @@ export const FLAG_SHOW_MIGRATION_SECTION = 'SHOW_MIGRATION_SECTION';
 export const FLAG_NMSTATE_DYNAMIC = 'NMSTATE_DYNAMIC';
 export const FLAG_LIGHTSPEED_PLUGIN = 'LIGHTSPEED_PLUGIN';
 
+/** When true, show Virtualization nav, perspective switcher entry, and related ACM nav (CNV-81682). */
+export const FLAG_KUBEVIRT_VIRTUALIZATION_NAV = 'KUBEVIRT_VIRTUALIZATION_NAV';
+
 export const MIGRATION_SECTION_ID = 'migration';
 export const KUBEVIRT_PLUGIN_NAME = 'kubevirt-plugin';

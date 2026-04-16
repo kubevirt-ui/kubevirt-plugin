@@ -37,7 +37,10 @@ export const extensions: EncodedExtension[] = [
     properties: { handler: { $codeRef: 'kubevirtFlags.useEnableKubevirtMenuFlags' } },
     type: 'console.flag/hookProvider',
   } as EncodedExtension<FeatureFlagHookProvider>,
-
+  {
+    properties: { handler: { $codeRef: 'kubevirtFlags.useVirtualizationNavVisibilityFlag' } },
+    type: 'console.flag/hookProvider',
+  } as EncodedExtension<FeatureFlagHookProvider>,
   {
     properties: {
       description: '%plugin__kubevirt-plugin~Create a Virtual Machine from a template%',
