@@ -21,6 +21,7 @@ import {
   FLEET_MIGRATION_POLICIES_PATH,
   FLEET_TEMPLATES_PATH,
   FLEET_VIRTUAL_MACHINES_PATH,
+  FLEET_WIZARD_PATH,
 } from './constants';
 
 /**
@@ -84,8 +85,8 @@ export const getVMWizardURL = (cluster: string, namespace: string): string => {
   if (!cluster) return `/k8s/${namespacePath}/vmwizard`;
 
   return cluster === ALL_CLUSTERS_KEY
-    ? `/k8s/${ALL_CLUSTERS_KEY}/${namespacePath}/vmwizard`
-    : `/k8s/cluster/${cluster}/${namespacePath}/vmwizard`;
+    ? `${FLEET_WIZARD_PATH}/${ALL_CLUSTERS_KEY}/${namespacePath}`
+    : `${FLEET_WIZARD_PATH}/cluster/${cluster}/${namespacePath}`;
 };
 
 export const getConsoleStandaloneURL = (
