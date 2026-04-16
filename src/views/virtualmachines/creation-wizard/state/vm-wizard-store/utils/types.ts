@@ -1,4 +1,4 @@
-import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { Template } from '@kubevirt-utils/resources/template';
 import { VMCreationMethod } from '@virtualmachines/creation-wizard/utils/constants';
 
 export type VMWizardState = {
@@ -8,7 +8,7 @@ export type VMWizardState = {
   creationMethod: VMCreationMethod;
   folder: string;
   project: string;
-  selectedTemplate: V1Template;
+  selectedTemplate: Template;
   startVM: boolean;
   templatesDrawerIsOpen: boolean;
 };
@@ -21,7 +21,7 @@ export type VMWizardActions = {
   setCreationMethod: (creationMethod: VMCreationMethod) => void;
   setFolder: (folder: string) => void;
   setProject: (project: string) => void;
-  setSelectedTemplate: (template: V1Template) => void;
+  setSelectedTemplate: (template: Template) => void;
   setStartVM: (startVM: boolean) => void;
   setTemplatesDrawerIsOpen: (templatesDrawerIsOpen: boolean) => void;
 };

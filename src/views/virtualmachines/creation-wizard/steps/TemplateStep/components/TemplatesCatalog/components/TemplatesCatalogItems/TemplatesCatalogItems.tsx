@@ -3,7 +3,7 @@ import React, { useMemo, VFC } from 'react';
 import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import { getUID } from '@kubevirt-utils/resources/shared';
-import { getTemplateName } from '@kubevirt-utils/resources/template';
+import { getTemplateName, Template } from '@kubevirt-utils/resources/template';
 import { Gallery, StackItem } from '@patternfly/react-core';
 
 import { TemplateFilters } from '../../utils/types';
@@ -17,10 +17,10 @@ type TemplatesCatalogItemsProps = {
   bootSourcesLoaded: boolean;
   filters: TemplateFilters;
   loaded: boolean;
-  onTemplateClick: (template: V1Template) => void;
-  selectedTemplate?: V1Template;
-  templates: V1Template[];
-  unfilteredTemplates: V1Template[];
+  onTemplateClick: (template: Template) => void;
+  selectedTemplate?: Template;
+  templates: Template[];
+  unfilteredTemplates: Template[];
 };
 
 const TemplatesCatalogItems: VFC<TemplatesCatalogItemsProps> = ({

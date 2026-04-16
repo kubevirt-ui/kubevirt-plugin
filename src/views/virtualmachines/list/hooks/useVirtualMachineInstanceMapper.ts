@@ -8,9 +8,9 @@ import { useAccessibleResources } from '@virtualmachines/search/hooks/useAccessi
 import { VMIMapper } from '@virtualmachines/utils/mappers';
 
 export const useVirtualMachineInstanceMapper = () => {
-  const { loaded: vmisLoaded, resources: vmis } = useAccessibleResources<V1VirtualMachineInstance>(
-    VirtualMachineInstanceModelGroupVersionKind,
-  );
+  const { loaded: vmisLoaded, resources: vmis } = useAccessibleResources<V1VirtualMachineInstance>({
+    groupVersionKind: VirtualMachineInstanceModelGroupVersionKind,
+  });
 
   const vmiMapper: VMIMapper = useMemo(() => {
     return (Array.isArray(vmis) ? vmis : [])?.reduce(

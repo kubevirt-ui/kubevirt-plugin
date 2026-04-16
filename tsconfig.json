@@ -25,6 +25,7 @@
       "@overview/*": ["src/views/clusteroverview/*"],
       "@search/*": ["src/views/search/*"],
       "@settings/*": ["src/views/settings/*"],
+      "@templates/*": ["src/views/templates/*"],
       "@topology/*": ["src/views/topology/*"],
       "@virtualmachines/*": ["src/views/virtualmachines/*"]
     },

@@ -132,7 +132,7 @@ const useDrawer = (template: V1Template) => {
       draftVM.spec.runStrategy = getStartingRunStrategy(draftVM.spec.runStrategy as RunStrategy);
     });
 
-    setCustomizedTemplate(templateWithRunning);
+    setCustomizedTemplate(templateWithRunning as V1Template);
   }, [setCustomizedTemplate, templateWithGeneratedParams, updateDefaultDiskSource]);
 
   return {

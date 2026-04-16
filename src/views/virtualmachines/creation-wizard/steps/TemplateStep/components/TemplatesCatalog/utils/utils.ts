@@ -1,10 +1,10 @@
-import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { getName } from '@kubevirt-utils/resources/shared';
 import {
   isCommonTemplate,
   isDefaultVariantTemplate,
   isDeprecatedTemplate,
   OS_NAME_TYPES,
+  Template,
 } from '@kubevirt-utils/resources/template';
 import {
   getTemplateName,
@@ -15,13 +15,10 @@ import { getArchitecture } from '@kubevirt-utils/utils/architecture';
 
 import { TemplateFilters } from './types';
 
-const isUserTemplate = (template: V1Template): boolean =>
+const isUserTemplate = (template: Template): boolean =>
   !isDefaultVariantTemplate(template) && !isCommonTemplate(template);
 
-export const filterTemplates = (
-  templates: V1Template[],
-  filters: TemplateFilters,
-): V1Template[] => {
+export const filterTemplates = (templates: Template[], filters: TemplateFilters): Template[] => {
   return (
     templates
       .filter((tmp) => {

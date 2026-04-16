@@ -9,13 +9,13 @@ import { WORKLOADS_LABELS } from '@kubevirt-utils/resources/template/utils/const
 import {
   getTemplateDescription,
   getTemplateInterfaces,
-  getTemplateName,
   getTemplateNetworks,
   getTemplateWorkload,
   isDefaultVariantTemplate,
 } from '@kubevirt-utils/resources/template/utils/selectors';
 import { getCPU } from '@kubevirt-utils/resources/vm';
 import { networksHavePodNetwork } from '@kubevirt-utils/resources/vm/utils/network/utils';
+import { getOperatingSystemName } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { Alert, DescriptionList } from '@patternfly/react-core';
 import DisksReviewTable from '@virtualmachines/creation-wizard/components/DisksReviewTable/DisksReviewTable';
@@ -31,23 +31,28 @@ const TemplateInfoSection: FC = memo(() => {
   const { cluster } = useVMWizardStore();
   const isIPv6SingleStack = useIsIPv6SingleStackCluster(cluster);
   const { template, vm } = useDrawerContext();
+  const [disks] = useWizardDisksTableData(vm);
 
   const notAvailable = t('N/A');
-  const displayName = getTemplateName(template);
   const description = getTemplateDescription(template) || notAvailable;
   const workload = getTemplateWorkload(template);
   const networks = getTemplateNetworks(template);
   const interfaces = getTemplateInterfaces(template);
-  const [disks] = useWizardDisksTableData(vm);
   const isDefaultTemplate = isDefaultVariantTemplate(template);
+
   const hasPodNetwork = networksHavePodNetwork(networks);
+
+  const operatingSystem = getOperatingSystemName(template) || notAvailable;
 
   return (
     <DescriptionList className="pf-v6-u-mt-lg">
-      <DescriptionItem descriptionData={displayName} descriptionHeader={t('Operating system')} />
+      <DescriptionItem
+        descriptionData={operatingSystem}
+        descriptionHeader={t('Operating system')}
+      />
       <DescriptionItem
         descriptionData={`${WORKLOADS_LABELS[workload] ?? t('Other')} ${
-          isDefaultTemplate && t('(default)')
+          isDefaultTemplate ? t('(default)') : ''
         }`}
         descriptionHeader={t('Workload type')}
       />

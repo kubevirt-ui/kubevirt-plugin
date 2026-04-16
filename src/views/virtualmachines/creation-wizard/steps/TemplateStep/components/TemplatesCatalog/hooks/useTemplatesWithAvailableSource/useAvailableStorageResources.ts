@@ -31,10 +31,7 @@ type UniqueSourceType = {
  * @param templatesLoaded - whether the templates are loaded
  * @returns availablePVCs and availableDatasources, both Sets of strings representing the available sources. `{namespace-name}`
  */
-export const useSingleClusterAvailableSources = (
-  templates: Template[],
-  templatesLoaded: boolean,
-) => {
+export const useAvailableStorageResources = (templates: Template[], templatesLoaded: boolean) => {
   const { uniqueDataSources, uniquePVCs } = useMemo(() => {
     if (!templatesLoaded)
       return {
@@ -51,7 +48,7 @@ export const useSingleClusterAvailableSources = (
 
         if (bootSource.type === BOOT_SOURCE.DATA_SOURCE) {
           const ds = bootSource?.source?.sourceRef;
-          acc.uniqueDataSources[`${ds?.namespace}-${ds?.name}`] = {
+          acc.uniqueDataSources[`${ds?.namespace}/${ds?.name}`] = {
             groupVersionKind: getGroupVersionKindForModel(DataSourceModel),
             isList: false,
             name: ds?.name,
@@ -61,7 +58,7 @@ export const useSingleClusterAvailableSources = (
 
         if (bootSource.type === BOOT_SOURCE.PVC) {
           const pvc = bootSource?.source?.pvc;
-          acc.uniquePVCs[`${pvc?.namespace}-${pvc?.name}`] = {
+          acc.uniquePVCs[`${pvc?.namespace}/${pvc?.name}`] = {
             groupVersionKind: getGroupVersionKindForModel(PersistentVolumeClaimModel),
             isList: false,
             name: pvc?.name,
@@ -92,13 +89,13 @@ export const useSingleClusterAvailableSources = (
       Object.values(watchDataSources).reduce(
         (acc, { data: dataSource }) => {
           if (isDataSourceReady(dataSource as V1beta1DataSource)) {
-            acc.availableDataSources[`${getNamespace(dataSource)}-${getName(dataSource)}`] =
+            acc.availableDataSources[`${getNamespace(dataSource)}/${getName(dataSource)}`] =
               dataSource;
             return acc;
           }
 
           if (isDataSourceCloning(dataSource)) {
-            acc.cloneInProgressDataSources[`${getNamespace(dataSource)}-${getName(dataSource)}`] =
+            acc.cloneInProgressDataSources[`${getNamespace(dataSource)}/${getName(dataSource)}`] =
               dataSource;
             return acc;
           }

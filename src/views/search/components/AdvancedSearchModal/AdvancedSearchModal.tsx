@@ -64,11 +64,10 @@ const AdvancedSearchModal: FC<AdvancedSearchModalProps> = ({
 
   const { value: selectedClusters } = useAdvancedSearchField(VirtualMachineRowFilterType.Cluster);
 
-  const { resources: vms } = useAccessibleResources<V1VirtualMachine>(
-    VirtualMachineModelGroupVersionKind,
-    undefined,
-    selectedClusters,
-  );
+  const { resources: vms } = useAccessibleResources<V1VirtualMachine>({
+    clusters: selectedClusters,
+    groupVersionKind: VirtualMachineModelGroupVersionKind,
+  });
   const namespace = useNamespaceParam();
   const cluster = useClusterParam();
 

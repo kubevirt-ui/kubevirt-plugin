@@ -1,5 +1,6 @@
 import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1CPU, V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { Template } from '@kubevirt-utils/resources/template';
 import { getCPU, getMemory } from '@kubevirt-utils/resources/vm';
 
 import {
@@ -81,7 +82,7 @@ export const getVmCPUMemory = (
  * @param {V1Template} template - template to parse
  */
 export const getTemplateFlavorData = (
-  template: V1Template,
+  template: Template,
 ): {
   cpuCount: number;
   flavor: string;

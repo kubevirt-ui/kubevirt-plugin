@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 
-import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { Template } from '@kubevirt-utils/resources/template';
 import { getTemplateName } from '@kubevirt-utils/resources/template/utils/selectors';
 import { CatalogItemHeader } from '@patternfly/react-catalog-view-extension';
 import {
@@ -19,7 +19,7 @@ import './TemplateCatalogDrawer.scss';
 
 type TemplatesCatalogDrawerProps = {
   onClose: () => void;
-  template: undefined | V1Template;
+  template: Template | undefined;
 };
 
 export const TemplatesCatalogDrawer: FC<TemplatesCatalogDrawerProps> = ({ onClose, template }) => {

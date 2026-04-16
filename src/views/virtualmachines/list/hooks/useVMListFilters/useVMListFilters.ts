@@ -34,9 +34,9 @@ export const useVMListFilters = (
   const { t } = useKubevirtTranslation();
   const isACMPage = useIsACMPage();
 
-  const { resources: vms } = useAccessibleResources<V1VirtualMachine>(
-    VirtualMachineModelGroupVersionKind,
-  );
+  const { resources: vms } = useAccessibleResources<V1VirtualMachine>({
+    groupVersionKind: VirtualMachineModelGroupVersionKind,
+  });
 
   const clusterFilter = useClusterFilter();
   const projectFilter = useProjectFilter<V1VirtualMachine>();

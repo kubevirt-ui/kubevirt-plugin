@@ -1,12 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 
-import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
   V1beta1DataVolumeSourcePVC,
   V1beta1DataVolumeSourceRef,
   V1beta1PersistentVolumeClaim,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { isEqualObject } from '@kubevirt-utils/components/NodeSelectorModal/utils/helpers';
+import { Template } from '@kubevirt-utils/resources/template';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 
 import { BOOT_SOURCE } from '../../utils/constants';
@@ -15,10 +15,10 @@ import { getDataSource, getPVC, getTemplateBootSourceType, TemplateBootSource } 
 
 /**
  * A Hook that returns the boot source status of a given template
- * @param {V1Template} template - template to check
+ * @param {Template} template - template to check
  * @returns the boot source and its status
  */
-export const useVMTemplateSource = (template: V1Template): UseVMTemplateSourceValue => {
+export const useVMTemplateSource = (template: Template): UseVMTemplateSourceValue => {
   const [templateBootSource, setTemplateBootSource] = useState<TemplateBootSource>(undefined);
   const [isBootSourceAvailable, setIsBootSourceAvailable] = useState<boolean>(false);
   const [loaded, setLoaded] = useState<boolean>(false);

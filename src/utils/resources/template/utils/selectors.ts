@@ -5,7 +5,7 @@ import {
   V1Network,
   V1VirtualMachine,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { getAnnotation, getLabel } from '@kubevirt-utils/resources/shared';
+import { getAnnotation, getLabel, getLabels, getName } from '@kubevirt-utils/resources/shared';
 import { getCPU } from '@kubevirt-utils/resources/vm';
 import { getCluster } from '@multicluster/helpers/selectors';
 
@@ -20,7 +20,7 @@ import {
   TEMPLATE_WORKLOAD_LABEL,
   WORKLOADS,
 } from './constants';
-import { isVirtualMachineTemplate, Template } from './types';
+import { isOpenShiftTemplate, isVirtualMachineTemplate, Template } from './types';
 
 /**
  * A selector that returns the VirtualMachine object of a given template
@@ -39,7 +39,7 @@ export const getTemplateVirtualMachineObject = (template: Template): V1VirtualMa
  * @param {Template} template - template
  */
 export const isDefaultVariantTemplate = (template: Template): boolean =>
-  template?.metadata?.labels?.[TEMPLATE_DEFAULT_VARIANT_LABEL] === 'true';
+  getLabels(template)?.[TEMPLATE_DEFAULT_VARIANT_LABEL] === 'true';
 
 /**
  * A selector that returns the os label name of a given template
@@ -92,9 +92,9 @@ export const getTemplateImportURLs = (template: V1Template): string[] | undefine
 
 /**
  * A selector that returns the flavor of a given template
- * @param {V1Template} template - template
+ * @param {Template} template - template
  */
-export const getTemplateFlavor = (template: V1Template): string => {
+export const getTemplateFlavor = (template: Template): string => {
   // eslint-disable-next-line require-jsdoc
   const isFlavorExist = (flavor: string) =>
     getLabel(template, `${TEMPLATE_FLAVOR_LABEL}/${flavor}`) === 'true';
@@ -104,9 +104,9 @@ export const getTemplateFlavor = (template: V1Template): string => {
 
 /**
  * A selector that returns the workload of a given template
- * @param {V1Template} template - template
+ * @param {Template} template - template
  */
-export const getTemplateWorkload = (template: V1Template): string => {
+export const getTemplateWorkload = (template: Template): string => {
   // eslint-disable-next-line require-jsdoc
   const isWorkloadExist = (workload: string) =>
     getLabel(template, `${TEMPLATE_WORKLOAD_LABEL}/${workload}`) === 'true';
@@ -116,17 +116,17 @@ export const getTemplateWorkload = (template: V1Template): string => {
 
 /**
  * A selector that returns the networks of a given template
- * @param {V1Template} template - template
+ * @param {Template} template - template
  */
-export const getTemplateNetworks = (template: V1Template): V1Network[] => {
+export const getTemplateNetworks = (template: Template): V1Network[] => {
   return getTemplateVirtualMachineObject(template)?.spec?.template?.spec?.networks ?? [];
 };
 
 /**
  * A selector that returns the interfaces of a given template
- * @param {V1Template} template - template
+ * @param {Template} template - template
  */
-export const getTemplateInterfaces = (template: V1Template): V1Interface[] => {
+export const getTemplateInterfaces = (template: Template): V1Interface[] => {
   return (
     getTemplateVirtualMachineObject(template)?.spec?.template?.spec?.domain?.devices?.interfaces ??
     []
@@ -144,12 +144,19 @@ export const getTemplateDisks = (template: V1Template): V1Disk[] => {
 };
 
 /**
+ * A selector that returns the parameters of a given template
+ * @param {Template} template - template
+ */
+export const getParameters = (template: Template) =>
+  isOpenShiftTemplate(template) ? template?.parameters : template?.spec?.parameters;
+
+/**
  * A selector that returns the value of a given template's parameter
- * @param {V1Template} template - template
+ * @param {Template} template - template
  * @param {string} parameter - parameter name
  */
-export const getTemplateParameterValue = (template: V1Template, parameter: string): string => {
-  return template?.parameters?.find((param) => param.name === parameter)?.value ?? '';
+export const getTemplateParameterValue = (template: Template, parameter: string): string => {
+  return getParameters(template)?.find((param) => param.name === parameter)?.value ?? '';
 };
 
 /**
@@ -161,24 +168,24 @@ export const getTemplateDocumentationURL = (template: V1Template): string =>
 
 /**
  * A selector that returns the name of a given template
- * @param {V1Template} template - template
+ * @param {Template} template - template
  */
-export const getTemplateName = (template: V1Template): string =>
-  getAnnotation(template, ANNOTATIONS.displayName, template?.metadata?.name);
+export const getTemplateName = (template: Template): string =>
+  getAnnotation(template, ANNOTATIONS.displayName, getName(template));
 
 /**
  * A selector that returns the PVC name of a given template's base image
- * @param {V1Template} template - template
+ * @param {Template} template - template
  */
-export const getTemplatePVCName = (template: V1Template): string =>
+export const getTemplatePVCName = (template: Template): string =>
   getTemplateParameterValue(template, TEMPLATE_BASE_IMAGE_NAME_PARAMETER) ||
   getTemplateParameterValue(template, TEMPLATE_DATA_SOURCE_NAME_PARAMETER);
 
 /**
  * A selector that returns the description of a given template
- * @param {V1Template} template - template
+ * @param {Template} template - template
  */
-export const getTemplateDescription = (template: V1Template): string =>
+export const getTemplateDescription = (template: Template): string =>
   getAnnotation(template, ANNOTATIONS.description);
 
 /**

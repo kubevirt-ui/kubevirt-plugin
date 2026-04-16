@@ -1,6 +1,5 @@
 import React, { FC } from 'react';
 
-import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import ArchitectureLabel from '@kubevirt-utils/components/ArchitectureLabel/ArchitectureLabel';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -10,6 +9,7 @@ import {
   getTemplateFlavorData,
   getTemplateName,
   getTemplateWorkload,
+  Template,
   WORKLOADS_LABELS,
 } from '@kubevirt-utils/resources/template';
 import { getTemplateBootSourceType } from '@kubevirt-utils/resources/template/hooks/useVmTemplateSource/utils';
@@ -30,9 +30,9 @@ type TemplatesTableRowProps = {
   activeColumnIDs: string[];
   availableDatasources: Record<string, V1beta1DataSource>;
   availableTemplatesUID: Set<string>;
-  onSelectTemplate: (template: V1Template) => void;
-  selectedTemplate?: V1Template;
-  template: V1Template;
+  onSelectTemplate: (template: Template) => void;
+  selectedTemplate?: Template;
+  template: Template;
 };
 
 const TemplatesTableRow: FC<TemplatesTableRowProps> = ({

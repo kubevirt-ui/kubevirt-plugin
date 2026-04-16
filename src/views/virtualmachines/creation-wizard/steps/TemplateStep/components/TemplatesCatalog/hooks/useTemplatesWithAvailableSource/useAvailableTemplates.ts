@@ -1,21 +1,20 @@
 import { useMemo } from 'react';
 
-import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import {
   ClusterNamespacedResourceMap,
   getResourceFromClusterMap,
 } from '@kubevirt-utils/resources/shared';
-import { BOOT_SOURCE } from '@kubevirt-utils/resources/template';
+import { BOOT_SOURCE, Template } from '@kubevirt-utils/resources/template';
 import { getTemplateBootSourceType } from '@kubevirt-utils/resources/template/hooks/useVmTemplateSource/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 
 type UseAvailableTemplates = (
   availableDataSources: object,
   availablePVCs: ClusterNamespacedResourceMap<IoK8sApiCoreV1PersistentVolumeClaim>,
-  templates: V1Template[],
+  templates: Template[],
   templatesLoaded: boolean,
-) => V1Template[];
+) => Template[];
 
 const useAvailableTemplates: UseAvailableTemplates = (
   availableDataSources,
@@ -56,7 +55,7 @@ const useAvailableTemplates: UseAvailableTemplates = (
           acc.push(template);
         }
         return acc;
-      }, [] as V1Template[]);
+      }, [] as Template[]);
 
     return temps || [];
   }, [availableDataSources, availablePVCs, templatesLoaded, templates]);

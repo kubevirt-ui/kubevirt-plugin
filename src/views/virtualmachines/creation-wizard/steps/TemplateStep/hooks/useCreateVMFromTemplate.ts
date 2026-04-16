@@ -7,7 +7,7 @@ import {
 } from '@kubevirt-utils/extensions/telemetry/utils/constants';
 import { ProcessedTemplatesModel } from '@kubevirt-utils/models';
 import { getLabels } from '@kubevirt-utils/resources/shared';
-import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
+import { getTemplateVirtualMachineObject, Template } from '@kubevirt-utils/resources/template';
 import { getDefaultRunningStrategy, getRunStrategy } from '@kubevirt-utils/resources/vm';
 import { vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
 import { kubevirtK8sCreate } from '@multicluster/k8sRequests';
@@ -29,7 +29,7 @@ const useCreateVMFromTemplate: UseCreateVMFromTemplate = () => {
     logTemplateFlowEvent(CUSTOMIZE_VM_BUTTON_CLICKED, selectedTemplate);
 
     try {
-      const processedTemplate = await kubevirtK8sCreate<V1Template>({
+      const processedTemplate = await kubevirtK8sCreate<Template>({
         cluster,
         data: { ...selectedTemplate, metadata: { ...selectedTemplate?.metadata, namespace } },
         model: ProcessedTemplatesModel,

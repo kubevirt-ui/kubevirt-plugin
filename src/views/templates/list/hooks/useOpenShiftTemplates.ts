@@ -1,7 +1,6 @@
 import { useMemo } from 'react';
 
-import { TemplateModel, V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
-import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
+import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import useListClusters from '@kubevirt-utils/hooks/useListClusters';
 import useListMulticlusterFilters from '@kubevirt-utils/hooks/useListMulticlusterFilters';
 import {
@@ -9,11 +8,9 @@ import {
   TEMPLATE_TYPE_LABEL,
   TEMPLATE_TYPE_VM,
 } from '@kubevirt-utils/resources/template';
-import {
-  getGroupVersionKindForModel,
-  Operator,
-  Selector,
-} from '@openshift-console/dynamic-plugin-sdk';
+import { TemplateModelGroupVersionKind } from '@kubevirt-utils/resources/template/hooks/constants';
+import { Operator, Selector } from '@openshift-console/dynamic-plugin-sdk';
+import { useAccessibleResources } from '@virtualmachines/search/hooks/useAccessibleResources';
 
 type UseOpenShiftTemplates = (props: {
   fieldSelector?: string;
@@ -48,29 +45,28 @@ export const useOpenShiftTemplates: UseOpenShiftTemplates = ({
     [multiclusterFilters],
   );
 
-  const [templates, loaded, loadError] = useKubevirtWatchResource<V1Template[]>(
-    {
-      cluster,
-      fieldSelector,
-      groupVersionKind: getGroupVersionKindForModel(TemplateModel),
-      isList: true,
-      namespace,
-      namespaced: true,
-      selector: {
-        ...(selector || {}),
-        matchExpressions: [
-          ...(selector?.matchExpressions || []),
-          {
-            key: TEMPLATE_TYPE_LABEL,
-            operator: Operator.In,
-            values: [TEMPLATE_TYPE_BASE, TEMPLATE_TYPE_VM],
-          },
-        ],
-      },
+  const {
+    loaded,
+    loadError,
+    resources: templates,
+  } = useAccessibleResources<V1Template>({
+    clusters: cluster ? [cluster] : undefined,
+    fieldSelector,
+    groupVersionKind: TemplateModelGroupVersionKind,
+    namespace,
+    searchQueries: templateMulticlusterFilters,
+    selector: {
+      ...(selector || {}),
+      matchExpressions: [
+        ...(selector?.matchExpressions || []),
+        {
+          key: TEMPLATE_TYPE_LABEL,
+          operator: Operator.In,
+          values: [TEMPLATE_TYPE_BASE, TEMPLATE_TYPE_VM],
+        },
+      ],
     },
-    null,
-    templateMulticlusterFilters,
-  );
+  });
 
   return {
     error: loadError,

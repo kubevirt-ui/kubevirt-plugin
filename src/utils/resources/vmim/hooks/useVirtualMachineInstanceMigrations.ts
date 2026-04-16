@@ -23,9 +23,9 @@ const useVirtualMachineInstanceMigrations = (cluster?: string, namespace?: strin
     loaded: accessibleVMIMsLoaded,
     loadError: accessibleVMIMsError,
     resources: accessibleVMIMs,
-  } = useAccessibleResources<V1VirtualMachineInstanceMigration>(
-    VirtualMachineInstanceMigrationModelGroupVersionKind,
-  );
+  } = useAccessibleResources<V1VirtualMachineInstanceMigration>({
+    groupVersionKind: VirtualMachineInstanceMigrationModelGroupVersionKind,
+  });
 
   const vmims = namespace ? namespacedVMIMs : accessibleVMIMs;
   const loaded = namespace ? namespacedVMIMsLoaded : accessibleVMIMsLoaded;

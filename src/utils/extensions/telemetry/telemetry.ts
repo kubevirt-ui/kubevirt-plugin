@@ -1,7 +1,7 @@
-import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { createVMFlowTypes } from '@kubevirt-utils/extensions/telemetry/utils/constants';
 import { getName } from '@kubevirt-utils/resources/shared';
+import { Template } from '@kubevirt-utils/resources/template';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { getSegmentAnalytics } from '@openshift-console/dynamic-plugin-sdk-internal';
 
@@ -39,7 +39,7 @@ export const logITFlowEvent = (
 
 export const logTemplateFlowEvent = (
   key: string,
-  template: V1Template,
+  template: Template,
   properties?: Record<string, any>,
 ) =>
   eventMonitor(key, {

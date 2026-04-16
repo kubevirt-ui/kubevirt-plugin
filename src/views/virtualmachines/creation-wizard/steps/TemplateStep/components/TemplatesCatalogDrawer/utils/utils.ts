@@ -4,6 +4,13 @@ import {
   V1ContainerDiskSource,
   V1VirtualMachine,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { V1alpha1VirtualMachineTemplateSpecParameters } from '@kubevirt-ui-ext/kubevirt-api/virt-template';
+import {
+  getParameters,
+  isOpenShiftTemplate,
+  isVirtualMachineTemplate,
+  Template,
+} from '@kubevirt-utils/resources/template';
 import { getDisks, getVolumes } from '@kubevirt-utils/resources/vm';
 import { NAME_INPUT_FIELD } from '@virtualmachines/creation-wizard/steps/TemplateStep/components/TemplatesCatalog/utils/consts';
 
@@ -45,15 +52,19 @@ export const getDiskSource = (
 };
 
 export const changeTemplateParameterValue = (
-  template: V1Template,
+  template: Template,
   parameterName: string,
   value: string,
-): V1Template => {
-  template.parameters = template.parameters.map((parameter) => {
+): Template => {
+  const parameters = getParameters(template)?.map((parameter) => {
     if (parameter.name === parameterName) parameter.value = value;
 
     return parameter;
   });
+
+  if (isOpenShiftTemplate(template)) template.parameters = parameters;
+  if (isVirtualMachineTemplate(template))
+    template.spec.parameters = parameters as V1alpha1VirtualMachineTemplateSpecParameters[];
 
   return template;
 };
