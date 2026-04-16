@@ -1,3 +1,5 @@
+import { TFunction } from 'react-i18next';
+
 type SpokeClusterParams = {
   cluster?: string;
   hubClusterName: string;
@@ -69,3 +71,8 @@ export const getShowObservabilityWarning = ({
   !observabilityError &&
   ((isAllClustersPage && disabledClusters.length > 0) ||
     (isSpokeCluster && disabledClusters.includes(cluster)));
+
+export const getAlertMessage = (canCreate: boolean, t: TFunction) =>
+  canCreate
+    ? t('Create your first virtual machine to begin monitoring health and performance metrics.')
+    : t('Health and performance metrics will appear after virtual machines are available.');
