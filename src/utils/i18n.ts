@@ -55,6 +55,7 @@
 // t('plugin__kubevirt-plugin~Storage migrations')
 // t('plugin__kubevirt-plugin~Storage MigrationPlans')
 // t('plugin__kubevirt-plugin~Cross cluster migration')
+// t('plugin__kubevirt-plugin~Fleet virtualization')
 
 // SSH service type titles - used in SSHAccess/constants.ts via t(serviceTypeTitles[type])
 // t('SSH over LoadBalancer')
