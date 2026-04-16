@@ -45,7 +45,15 @@ const VirtualMachineMetricsTab: FC<NavPageComponentProps> = ({ obj: vm }) => {
       const focusedSectionId = Object.values(MetricsTabExpendedSections).find((focusedSection) =>
         location?.search?.includes(focusedSection),
       );
-      document.getElementById(focusedSectionId)?.scrollIntoView();
+      const element = focusedSectionId ? document.getElementById(focusedSectionId) : null;
+      const scrollContainer = document.getElementById('horizontal-navbar-routes');
+
+      if (element && scrollContainer) {
+        scrollContainer.scrollTo({
+          behavior: 'smooth',
+          top: element.offsetTop - scrollContainer.offsetTop,
+        });
+      }
     }
   }, [location?.search, vmiLoaded]);
 
