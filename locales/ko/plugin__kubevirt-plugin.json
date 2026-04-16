@@ -2157,6 +2157,7 @@
   "Type to create folder": "폴더를 생성하려면 입력하세요",
   "UEFI": "UEFI",
   "UEFI (secure)": "UEFI (보안)",
+  "Unable to verify multicluster observability status. Metrics may not be available.": "Unable to verify multicluster observability status. Metrics may not be available.",
   "Unattend.xml answer file": "Unattend.xml 응답 파일",
   "Unavailable": "사용할 수 없음",
   "Unique name of the MigrationPolicy": "MigrationPolicy의 고유 이름",

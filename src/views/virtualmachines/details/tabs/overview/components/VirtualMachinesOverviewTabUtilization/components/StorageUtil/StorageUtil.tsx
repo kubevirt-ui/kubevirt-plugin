@@ -31,20 +31,25 @@ const StorageUtil: FC<StorageUtilProps> = ({ vmi }) => {
       { totalBytes: 0, usedBytes: 0 },
     ) || {};
 
-  const usedPercentage = (usedBytes / totalBytes) * 100 || 0;
+  const hasDiskData = totalBytes > 0;
+  const usedPercentage = hasDiskData ? (usedBytes / totalBytes) * 100 : 0;
 
-  const isReady = !Number.isNaN(usedPercentage) && loaded;
+  const isReady = loaded && hasDiskData;
 
   return (
     <UtilizationBlock
-      usedOfTotalText={t('Used of {{ total }}', {
-        total: xbytes(totalBytes || 0, { fixed: 2, iec: true }),
-      })}
+      usedOfTotalText={
+        isReady
+          ? t('Used of {{ total }}', {
+              total: xbytes(totalBytes || 0, { fixed: 2, iec: true }),
+            })
+          : ''
+      }
       dataTestId="util-summary-storage"
       title={t('Storage')}
-      usageValue={xbytes(usedBytes || 0, { fixed: 2, iec: true })}
+      usageValue={isReady ? xbytes(usedBytes || 0, { fixed: 2, iec: true }) : ''}
     >
-      <ComponentReady isReady={isReady}>
+      <ComponentReady isLoading={!loaded} isReady={isReady}>
         <ChartDonutUtilization
           data={{
             x: t('Storage used'),

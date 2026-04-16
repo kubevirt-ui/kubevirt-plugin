@@ -172,5 +172,17 @@
 // t('Less than')
 // t('Error')
 
+// MCO status tooltips - used in useMCOInstalled.ts via getMCONotInstalledTooltip(t) and getMCOCheckErrorTooltip(t)
+// t('Multicluster observability is not available. Install it on the hub cluster to enable monitoring across clusters.')
+// t('Unable to verify multicluster observability status. Metrics may not be available.')
+
+// Storage chart titles - used in StorageCharts.tsx via STORAGE_CHART_COMPONENTS t(titleKey)
+// t('Storage total read / write')
+// t('Storage IOPS total read / write')
+// t('Storage Read Avg/Max Latency (all drives)')
+// t('Storage Write Avg/Max Latency (all drives)')
+// t('Storage Read Latency per Drive')
+// t('Storage Write Latency per Drive')
+
 //Disk size input
 // t('Dynamic')

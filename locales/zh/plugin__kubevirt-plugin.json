@@ -2157,6 +2157,7 @@
   "Type to create folder": "输入来创建文件夹",
   "UEFI": "UEFI",
   "UEFI (secure)": "UEFI （安全）",
+  "Unable to verify multicluster observability status. Metrics may not be available.": "Unable to verify multicluster observability status. Metrics may not be available.",
   "Unattend.xml answer file": "Unattend.xml 应答文件",
   "Unavailable": "不可用",
   "Unique name of the MigrationPolicy": "MigrationPolicy 的唯一名称",

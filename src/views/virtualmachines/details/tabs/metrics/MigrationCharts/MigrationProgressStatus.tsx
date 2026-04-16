@@ -1,13 +1,15 @@
-import React from 'react';
+import React, { FC } from 'react';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
+import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useMigrationPercentage from '@kubevirt-utils/resources/vm/hooks/useMigrationPercentage';
 import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverContentWithLightspeedButton/PopoverContentWithLightspeedButton';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { Timestamp } from '@openshift-console/dynamic-plugin-sdk';
 import {
+  Bullseye,
   Card,
   CardBody,
   CardTitle,
@@ -21,10 +23,14 @@ import {
 import { getMigrationProgressVariant } from '../utils/utils';
 
 type MigrationProgressStatusProps = {
+  prometheusUnavailable?: boolean;
   vmi: V1VirtualMachineInstance;
 };
 
-const MigrationProgressStatus: React.FC<MigrationProgressStatusProps> = ({ vmi }) => {
+const MigrationProgressStatus: FC<MigrationProgressStatusProps> = ({
+  prometheusUnavailable,
+  vmi,
+}) => {
   const { t } = useKubevirtTranslation();
 
   const { endTimestamp, isFailed, percentage } = useMigrationPercentage(vmi);
@@ -52,27 +58,33 @@ const MigrationProgressStatus: React.FC<MigrationProgressStatusProps> = ({ vmi }
           />
         </CardTitle>
         <CardBody>
-          <Stack hasGutter>
-            <StackItem>
-              {endTimestamp && (
-                <>
-                  {t('Complete time:')}
-                  <Timestamp
-                    className="virtual-machine-metrics-tab__migration-completed-timestamp"
-                    simple
-                    timestamp={endTimestamp}
-                  />
-                </>
-              )}
-            </StackItem>
-            <StackItem>
-              <Progress
-                measureLocation={ProgressMeasureLocation.top}
-                value={percentage}
-                variant={progressStatus}
-              />
-            </StackItem>
-          </Stack>
+          {prometheusUnavailable ? (
+            <Bullseye>
+              <MutedTextSpan text={t('Not available')} />
+            </Bullseye>
+          ) : (
+            <Stack hasGutter>
+              <StackItem>
+                {endTimestamp && (
+                  <>
+                    {t('Complete time:')}
+                    <Timestamp
+                      className="virtual-machine-metrics-tab__migration-completed-timestamp"
+                      simple
+                      timestamp={endTimestamp}
+                    />
+                  </>
+                )}
+              </StackItem>
+              <StackItem>
+                <Progress
+                  measureLocation={ProgressMeasureLocation.top}
+                  value={percentage}
+                  variant={progressStatus}
+                />
+              </StackItem>
+            </Stack>
+          )}
         </CardBody>
       </Card>
     </StackItem>

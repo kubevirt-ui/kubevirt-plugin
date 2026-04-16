@@ -30,7 +30,7 @@ const MemoryUtil: FC<MemoryUtilProps> = ({ vmi }) => {
   const queries = useVMQueries(vmi);
   const memory = getMemorySize(getMemory(vmi));
 
-  const [data] = useFleetPrometheusPoll({
+  const [data, loaded, error] = useFleetPrometheusPoll({
     cluster: getCluster(vmi),
     endpoint: PrometheusEndpoint?.QUERY,
     endTime: currentTime,
@@ -38,19 +38,22 @@ const MemoryUtil: FC<MemoryUtilProps> = ({ vmi }) => {
     query: queries?.MEMORY_USAGE,
   });
 
+  const isLoading = !loaded;
   const memoryUsed = +data?.data?.result?.[0]?.value?.[1];
   const memoryAvailableBytes = xbytes.parseSize(`${memory?.size} ${memory?.unit}B`);
   const percentageMemoryUsed = (memoryUsed / memoryAvailableBytes) * 100;
-  const isReady = !isEmpty(memory) && !Number.isNaN(percentageMemoryUsed);
+  const isReady = loaded && !isEmpty(memory) && !Number.isNaN(percentageMemoryUsed);
 
   return (
     <UtilizationBlock
+      usedOfTotalText={
+        isReady ? t('Used of {{ total }}', { total: `${memory?.size} ${memory?.unit}B` }) : ''
+      }
       dataTestId="util-summary-memory"
       title={t('Memory')}
-      usageValue={xbytes(memoryUsed || 0, { fixed: 0, iec: true })}
-      usedOfTotalText={t('Used of {{ total }}', { total: `${memory?.size} ${memory?.unit}B` })}
+      usageValue={isReady ? xbytes(memoryUsed || 0, { fixed: 0, iec: true }) : ''}
     >
-      <ComponentReady isReady={isReady}>
+      <ComponentReady error={error} isLoading={isLoading} isReady={isReady}>
         <ChartDonutUtilization
           data={{
             x: t('Memory used'),

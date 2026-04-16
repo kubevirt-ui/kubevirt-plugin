@@ -35,7 +35,7 @@ const NetworkUtil: React.FC<NetworkUtilProps> = ({ vmi }) => {
     namespace: getNamespace(vmi),
   };
 
-  const [networkIn] = useFleetPrometheusPoll({
+  const [networkIn, networkInLoaded, networkInError] = useFleetPrometheusPoll({
     ...prometheusProps,
     query: queries?.NETWORK_IN_USAGE,
   });
@@ -45,29 +45,35 @@ const NetworkUtil: React.FC<NetworkUtilProps> = ({ vmi }) => {
     query: queries?.NETWORK_TOTAL_BY_INTERFACE_USAGE,
   });
 
-  const [networkOut] = useFleetPrometheusPoll({
+  const [networkOut, networkOutLoaded, networkOutError] = useFleetPrometheusPoll({
     ...prometheusProps,
     query: queries?.NETWORK_OUT_USAGE,
   });
 
-  const networkInData = +networkIn?.data?.result?.[0]?.value?.[1];
-  const networkOutData = +networkOut?.data?.result?.[0]?.value?.[1];
-  const totalTransferred = xbytes(networkInData + networkOutData || 0, {
+  const loaded = networkInLoaded && networkOutLoaded;
+  const isLoading = !loaded;
+  const error = networkInError || networkOutError;
+
+  const hasNetworkInData = !isEmpty(networkIn?.data?.result);
+  const hasNetworkOutData = !isEmpty(networkOut?.data?.result);
+  const networkInData = +(networkIn?.data?.result?.[0]?.value?.[1] ?? 0);
+  const networkOutData = +(networkOut?.data?.result?.[0]?.value?.[1] ?? 0);
+  const totalTransferred = xbytes(networkInData + networkOutData, {
     fixed: 0,
     iec: true,
   });
-  const isReady = !isEmpty(networkInData) || !isEmpty(networkOutData);
+  const isReady = loaded && (hasNetworkInData || hasNetworkOutData);
 
   return (
     <UtilizationBlock
       dataTestId="util-summary-network-transfer"
       isNetworkUtil
       title={t('Network transfer')}
-      usageValue={`${totalTransferred}ps`}
-      usedOfTotalText={t('Total')}
+      usageValue={isReady ? `${totalTransferred}ps` : ''}
+      usedOfTotalText={isReady ? t('Total') : ''}
     >
       <Stack className="pf-v6-u-pl-lg pf-v6-u-mt-xl" hasGutter>
-        <ComponentReady isReady={isReady}>
+        <ComponentReady error={error} isLoading={isLoading} isReady={isReady}>
           <div>
             <NetworkMetricsRow label={t('In')} value={networkInData} />
             <NetworkMetricsRow label={t('Out')} value={networkOutData} />
