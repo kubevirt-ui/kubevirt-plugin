@@ -44,7 +44,7 @@ export const extensions: EncodedExtension[] = [
       id: PERSPECTIVES.FLEET_VIRTUALIZATION,
       importRedirectURL: { $codeRef: 'perspective.getACMLandingPageURL' },
       landingPageURL: { $codeRef: 'perspective.getACMLandingPageURL' },
-      name: '%plugin__console-virt-perspective-plugin~Fleet Virtualization%',
+      name: '%plugin__kubevirt-plugin~Fleet virtualization%',
     },
     type: 'console.perspective',
   },
