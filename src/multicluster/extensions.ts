@@ -39,7 +39,7 @@ export const extensions: EncodedExtension[] = [
   {
     flags: {
       disallowed: ['KUBEVIRT_DISALLOW_DYNAMIC_ACM'],
-      required: ['KUBEVIRT_DYNAMIC_ACM', FLAG_KUBEVIRT_VIRTUALIZATION_NAV],
+      required: [FLAG_KUBEVIRT_VIRTUALIZATION_NAV],
     },
     properties: {
       icon: { $codeRef: 'perspective.icon' },
@@ -60,9 +60,6 @@ export const extensions: EncodedExtension[] = [
   // MigrationPolicies
   // Checkups
   {
-    flags: {
-      required: ['KUBEVIRT_DYNAMIC_ACM', FLAG_KUBEVIRT_VIRTUALIZATION_NAV],
-    },
     properties: {
       dataAttributes: {
         'data-quickstart-id': 'qs-nav-virtualmachines',
@@ -77,9 +74,6 @@ export const extensions: EncodedExtension[] = [
     type: 'console.navigation/href',
   } as EncodedExtension<HrefNavItem>,
   {
-    flags: {
-      required: ['KUBEVIRT_DYNAMIC_ACM', FLAG_KUBEVIRT_VIRTUALIZATION_NAV],
-    },
     properties: {
       dataAttributes: {
         'data-quickstart-id': 'qs-nav-templates',
@@ -95,9 +89,6 @@ export const extensions: EncodedExtension[] = [
     type: 'console.navigation/href',
   } as EncodedExtension<HrefNavItem>,
   {
-    flags: {
-      required: ['KUBEVIRT_DYNAMIC_ACM', FLAG_KUBEVIRT_VIRTUALIZATION_NAV],
-    },
     properties: {
       dataAttributes: {
         'data-quickstart-id': 'qs-nav-bootablevolumes',
@@ -113,9 +104,6 @@ export const extensions: EncodedExtension[] = [
     type: 'console.navigation/href',
   } as EncodedExtension<HrefNavItem>,
   {
-    flags: {
-      required: ['KUBEVIRT_DYNAMIC_ACM', FLAG_KUBEVIRT_VIRTUALIZATION_NAV],
-    },
     properties: {
       id: 'acm-separator-1',
       insertAfter: 'bootablevolumes-virt-perspective',
@@ -126,9 +114,6 @@ export const extensions: EncodedExtension[] = [
     type: 'console.navigation/separator',
   } as EncodedExtension<Separator>,
   {
-    flags: {
-      required: ['KUBEVIRT_DYNAMIC_ACM', FLAG_KUBEVIRT_VIRTUALIZATION_NAV],
-    },
     properties: {
       dataAttributes: {
         'data-quickstart-id': 'qs-nav-instancetype',
@@ -144,9 +129,6 @@ export const extensions: EncodedExtension[] = [
     type: 'console.navigation/href',
   } as EncodedExtension<HrefNavItem>,
   {
-    flags: {
-      required: ['KUBEVIRT_DYNAMIC_ACM', FLAG_KUBEVIRT_VIRTUALIZATION_NAV],
-    },
     properties: {
       id: 'acm-separator-2',
       insertAfter: 'instancetype-virt-perspective',
@@ -157,9 +139,6 @@ export const extensions: EncodedExtension[] = [
     type: 'console.navigation/separator',
   } as EncodedExtension<Separator>,
   {
-    flags: {
-      required: ['KUBEVIRT_DYNAMIC_ACM', FLAG_KUBEVIRT_VIRTUALIZATION_NAV],
-    },
     properties: {
       dataAttributes: {
         'data-quickstart-id': 'qs-nav-migrationpolicies',
@@ -175,9 +154,6 @@ export const extensions: EncodedExtension[] = [
     type: 'console.navigation/href',
   } as EncodedExtension<HrefNavItem>,
   {
-    flags: {
-      required: ['KUBEVIRT_DYNAMIC_ACM', FLAG_KUBEVIRT_VIRTUALIZATION_NAV],
-    },
     properties: {
       dataAttributes: {
         'data-quickstart-id': 'qs-nav-checkups',
@@ -193,9 +169,6 @@ export const extensions: EncodedExtension[] = [
     type: 'console.navigation/href',
   } as EncodedExtension<HrefNavItem>,
   {
-    flags: {
-      required: ['KUBEVIRT_DYNAMIC_ACM', FLAG_KUBEVIRT_VIRTUALIZATION_NAV],
-    },
     properties: {
       component: { $codeRef: 'ConsoleStandAlone' },
       exact: false,
@@ -204,9 +177,6 @@ export const extensions: EncodedExtension[] = [
     type: 'console.page/route/standalone',
   } as EncodedExtension<StandaloneRoutePage>,
   {
-    flags: {
-      required: ['KUBEVIRT_DYNAMIC_ACM', FLAG_KUBEVIRT_VIRTUALIZATION_NAV],
-    },
     properties: {
       component: {
         $codeRef: 'Navigator',
@@ -222,9 +192,6 @@ export const extensions: EncodedExtension[] = [
     type: 'console.page/route',
   } as EncodedExtension<RoutePage>,
   {
-    flags: {
-      required: ['KUBEVIRT_DYNAMIC_ACM', FLAG_KUBEVIRT_VIRTUALIZATION_NAV],
-    },
     properties: {
       component: {
         $codeRef: 'InstanceTypePage',
@@ -307,7 +274,7 @@ export const extensions: EncodedExtension[] = [
   } as EncodedExtension<RoutePage>,
   {
     flags: {
-      required: ['KUBEVIRT_DYNAMIC_ACM', FLAG_KUBEVIRT_VIRTUALIZATION_NAV],
+      required: ['KUBEVIRT_DYNAMIC_ACM'],
     },
     properties: {
       component: {
