@@ -7,6 +7,7 @@ import {
 } from '@kubevirt-utils/constants/instancetypes-and-preferences';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import useHyperConvergeConfiguration from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
+import useIsIPv6SingleStackCluster from '@kubevirt-utils/hooks/useIPStackType/useIsIPv6SingleStackCluster';
 import useRHELAutomaticSubscription from '@kubevirt-utils/hooks/useRHELAutomaticSubscription/useRHELAutomaticSubscription';
 import { getLabel } from '@kubevirt-utils/resources/shared';
 import useNamespaceUDN from '@kubevirt-utils/resources/udn/hooks/useNamespaceUDN';
@@ -34,6 +35,7 @@ const useGenerateVM: UseGenerateVM = () => {
     store;
 
   const [isUDNManagedNamespace] = useNamespaceUDN(getValidNamespace(namespace));
+  const isIPv6SingleStack = useIsIPv6SingleStackCluster(cluster);
   const [hyperConverge] = useHyperConvergeConfiguration();
   const enableMultiArchBootImageImport =
     hyperConverge?.spec?.featureGates?.enableMultiArchBootImageImport;
@@ -61,6 +63,7 @@ const useGenerateVM: UseGenerateVM = () => {
         enableMultiArchBootImageImport,
         folder,
         generatedVMName,
+        isIPv6SingleStack,
         isUDNManagedNamespace,
         populatedCloudInitYAML,
         pvcSource,
@@ -69,18 +72,19 @@ const useGenerateVM: UseGenerateVM = () => {
         targetNamespace: namespace,
       }),
     [
-      autoUpdateEnabled,
       cluster,
       customDiskSize,
       dvSource,
       enableMultiArchBootImageImport,
       folder,
+      generatedVMName,
+      isIPv6SingleStack,
       isUDNManagedNamespace,
       namespace,
+      populatedCloudInitYAML,
       pvcSource,
       selectedBootableVolume,
       selectedInstanceType,
-      subscriptionData,
     ],
   );
 

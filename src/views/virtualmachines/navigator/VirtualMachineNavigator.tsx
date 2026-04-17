@@ -5,6 +5,7 @@ import CreateResourceDefaultPage from '@kubevirt-utils/components/CreateResource
 import GuidedTour from '@kubevirt-utils/components/GuidedTour/GuidedTour';
 import CatalogOnboardingPopover from '@kubevirt-utils/components/OnboardingPopover/components/CatalogOnboardingPopover';
 import VMsTabOnboardingPopover from '@kubevirt-utils/components/OnboardingPopover/components/VMsTabOnboardingPopover';
+import useIsIPv6SingleStackCluster from '@kubevirt-utils/hooks/useIPStackType/useIsIPv6SingleStackCluster';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { VirtualMachineModelRef } from '@kubevirt-utils/models';
 import { FLEET_VIRTUAL_MACHINES_PATH } from '@multicluster/constants';
@@ -37,6 +38,7 @@ const VirtualMachineNavigator: FC = () => {
   const { activeTabKey, handleTabSelect } = useNavigatorTabs();
 
   const { cluster, ns: namespace } = useParams<{ cluster?: string; ns: string }>();
+  const isIPv6SingleStack = useIsIPv6SingleStackCluster(cluster);
 
   const isFleetPage = isACMPath(location.pathname);
 
@@ -64,7 +66,7 @@ const VirtualMachineNavigator: FC = () => {
     return (
       <CreateResourceDefaultPage
         header={t('Create VirtualMachine')}
-        initialResource={defaultVMYamlTemplate()}
+        initialResource={defaultVMYamlTemplate(isIPv6SingleStack)}
       />
     );
   }

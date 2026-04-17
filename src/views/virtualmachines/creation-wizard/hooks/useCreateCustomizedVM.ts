@@ -7,9 +7,11 @@ import {
   CUSTOMIZE_VM_FAILED,
   CUSTOMIZE_VM_SUCCEEDED,
 } from '@kubevirt-utils/extensions/telemetry/utils/constants';
+import useIsIPv6SingleStackCluster from '@kubevirt-utils/hooks/useIPStackType/useIsIPv6SingleStackCluster';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName } from '@kubevirt-utils/resources/shared';
 import useNamespaceUDN from '@kubevirt-utils/resources/udn/hooks/useNamespaceUDN';
+import { removePodNetworkFromVM } from '@kubevirt-utils/resources/vm/utils/network/utils';
 import { clearCustomizeInstanceType, vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
 import { createHeadlessService } from '@kubevirt-utils/utils/headless-service';
 import { getErrorMessage, kubevirtConsole } from '@kubevirt-utils/utils/utils';
@@ -30,6 +32,7 @@ const useCreateCustomizedVM: UseCreateCustomizedVM = () => {
   const navigate = useNavigate();
   const cluster = useClusterParam();
   const { project: vmNamespaceTarget } = useVMWizardStore();
+  const isIPv6SingleStack = useIsIPv6SingleStackCluster(cluster);
   const [isUDNManagedNamespace] = useNamespaceUDN(vmNamespaceTarget);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -47,6 +50,8 @@ const useCreateCustomizedVM: UseCreateCustomizedVM = () => {
     }
 
     try {
+      if (isIPv6SingleStack) removePodNetworkFromVM(storeVM);
+
       const createdVM = await kubevirtK8sCreate({
         cluster,
         data: storeVM,

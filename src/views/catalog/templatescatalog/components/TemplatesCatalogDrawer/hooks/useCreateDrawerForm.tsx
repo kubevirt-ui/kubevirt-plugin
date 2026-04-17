@@ -35,6 +35,7 @@ import {
 import { DISABLED_GUEST_SYSTEM_LOGS_ACCESS } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import useHyperConvergeConfiguration from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
+import useIsIPv6SingleStackCluster from '@kubevirt-utils/hooks/useIPStackType/useIsIPv6SingleStackCluster';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
 import { RHELAutomaticSubscriptionData } from '@kubevirt-utils/hooks/useRHELAutomaticSubscription/utils/types';
 import {
@@ -57,6 +58,7 @@ import {
   DEFAULT_NETWORK_INTERFACE,
   UDN_BINDING_NAME,
 } from '@kubevirt-utils/resources/vm/utils/constants';
+import { removePodNetworkFromVM } from '@kubevirt-utils/resources/vm/utils/network/utils';
 import { getArchitecture } from '@kubevirt-utils/utils/architecture';
 import {
   HEADLESS_SERVICE_LABEL,
@@ -96,6 +98,7 @@ const useCreateDrawerForm = (
   const { featureEnabled: isDisabledGuestSystemLogs } = useFeatures(
     DISABLED_GUEST_SYSTEM_LOGS_ACCESS,
   );
+  const isIPv6SingleStack = useIsIPv6SingleStackCluster(cluster);
 
   const navigate = useNavigate();
   const {
@@ -212,6 +215,7 @@ const useCreateDrawerForm = (
           cluster,
           enableMultiArchBootImageImport,
           isDisabledGuestSystemLogs,
+          isIPv6SingleStack,
           isUDNManagedNamespace,
           name: nameField,
           namespace,
@@ -309,6 +313,10 @@ const useCreateDrawerForm = (
         if (isUDNManagedNamespace && defaultInterface) {
           delete defaultInterface.masquerade;
           defaultInterface.binding = { name: UDN_BINDING_NAME };
+        }
+
+        if (isIPv6SingleStack) {
+          removePodNetworkFromVM(vmDraft);
         }
 
         const templateArchitecture = getArchitecture(processedTemplate);

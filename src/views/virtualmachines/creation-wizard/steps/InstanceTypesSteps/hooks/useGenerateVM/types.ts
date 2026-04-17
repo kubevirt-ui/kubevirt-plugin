@@ -10,6 +10,7 @@ type GenerateVMArgs = {
   enableMultiArchBootImageImport?: boolean;
   folder: string;
   generatedVMName: string;
+  isIPv6SingleStack?: boolean;
   isUDNManagedNamespace: boolean;
   populatedCloudInitYAML: string;
   pvcSource: IoK8sApiCoreV1PersistentVolumeClaim;
