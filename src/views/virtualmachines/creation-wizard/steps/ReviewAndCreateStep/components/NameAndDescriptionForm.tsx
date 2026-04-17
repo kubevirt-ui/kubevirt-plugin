@@ -1,5 +1,7 @@
 import React, { FC, useState } from 'react';
+import { Trans } from 'react-i18next';
 
+import TabToConfirmTextInput from '@kubevirt-utils/components/TabToConfirmTextInput/TabToConfirmTextInput';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getDescription, getName } from '@kubevirt-utils/resources/shared';
 import { updateCustomizeInstanceType, vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
@@ -12,8 +14,14 @@ import './NameAndDescriptionForm.scss';
 
 const NameAndDescriptionForm: FC = () => {
   const { t } = useKubevirtTranslation();
-  const { cloneVMDescription, cloneVMName, creationMethod, setCloneVMDescription, setCloneVMName } =
-    useVMWizardStore();
+  const {
+    cloneVMDescription,
+    cloneVMName,
+    creationMethod,
+    setCloneVMDescription,
+    setCloneVMName,
+    setVMNameConfirmed,
+  } = useVMWizardStore();
   const isCloneMethod = isCloneCreationMethod(creationMethod);
 
   const [nameValidated, setNameValidated] = useState<ValidatedOptions>(ValidatedOptions.default);
@@ -43,15 +51,21 @@ const NameAndDescriptionForm: FC = () => {
   return (
     <Stack hasGutter>
       <StackItem>
-        <FormGroup className="name-and-description-form__input" label={t('Name')}>
-          <TextInput
-            autoFocus
-            onChange={(_event, value: string) => onNameChange(value)}
-            type="text"
-            validated={nameValidated}
-            value={isCloneMethod ? cloneVMName : getName(vm)}
-          />
-        </FormGroup>
+        <TabToConfirmTextInput
+          helperText={
+            <Trans t={t}>
+              Press the <strong>Tab</strong> key to accept the suggestion or enter a custom name.
+            </Trans>
+          }
+          autoFocus
+          className="name-and-description-form__input"
+          fieldId="vm name"
+          label={t('Name')}
+          onChange={onNameChange}
+          onConfirm={() => setVMNameConfirmed(true)}
+          validated={nameValidated}
+          value={isCloneMethod ? cloneVMName : getName(vm)}
+        />
       </StackItem>
       <StackItem>
         <FormGroup className="name-and-description-form__input" label={t('Description')}>

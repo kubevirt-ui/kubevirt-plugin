@@ -11,6 +11,7 @@ export type VMWizardState = {
   selectedTemplate: Template;
   startVM: boolean;
   templatesDrawerIsOpen: boolean;
+  vmNameConfirmed: boolean;
 };
 
 export type VMWizardActions = {
@@ -24,6 +25,7 @@ export type VMWizardActions = {
   setSelectedTemplate: (template: Template) => void;
   setStartVM: (startVM: boolean) => void;
   setTemplatesDrawerIsOpen: (templatesDrawerIsOpen: boolean) => void;
+  setVMNameConfirmed: (vmNameConfirmed: boolean) => void;
 };
 
 export type VMWizardStore = VMWizardState & VMWizardActions;

@@ -11,4 +11,5 @@ export const initialVMWizardState: VMWizardState = {
   selectedTemplate: null,
   startVM: false,
   templatesDrawerIsOpen: false,
+  vmNameConfirmed: false,
 };

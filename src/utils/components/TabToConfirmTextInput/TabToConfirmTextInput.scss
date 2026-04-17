@@ -1,0 +1,15 @@
+.tab-to-confirm-text-input {
+  position: relative;
+
+  &__input {
+    padding-right: calc(var(--pf-t--global--spacer--lg) + var(--pf-t--global--spacer--md));
+  }
+
+  &__badge {
+    position: absolute;
+    right: var(--pf-t--global--spacer--sm);
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+}

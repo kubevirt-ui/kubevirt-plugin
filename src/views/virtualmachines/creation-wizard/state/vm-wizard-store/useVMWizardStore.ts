@@ -19,6 +19,7 @@ const useVMWizardStore = create<VMWizardStore>()((set) => {
     setStartVM: (startVM: boolean) => set({ startVM }),
     setTemplatesDrawerIsOpen: (templatesDrawerIsOpen: boolean) =>
       set(() => ({ templatesDrawerIsOpen })),
+    setVMNameConfirmed: (vmNameConfirmed: boolean) => set({ vmNameConfirmed }),
   };
 });
 
