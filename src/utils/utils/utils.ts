@@ -189,8 +189,8 @@ export const columnSortingCompare = <T>(
   return data?.sort(predicate)?.slice(startIndex, endIndex);
 };
 
-export const removeDuplicatesByName = (array: any[], nameProperty = 'name') =>
-  array?.reduce((acc, curr) => {
+export const removeDuplicatesByName = <T>(array: T[], nameProperty = 'name'): T[] =>
+  array?.reduce<T[]>((acc, curr) => {
     if (!acc.find((item) => item?.[nameProperty] === curr?.[nameProperty])) acc.push(curr);
     return acc;
   }, []);
