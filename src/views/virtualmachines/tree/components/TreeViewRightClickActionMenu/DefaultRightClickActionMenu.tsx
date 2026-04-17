@@ -1,10 +1,12 @@
-import React, { FC } from 'react';
+import React, { FC, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom-v5-compat';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useVirtualMachineInstanceMigrationMapper from '@kubevirt-utils/resources/vmim/hooks/useVirtualMachineInstanceMigrationMapper';
 import useVirtualMachineInstanceMigrations from '@kubevirt-utils/resources/vmim/hooks/useVirtualMachineInstanceMigrations';
+import useIsACMPage from '@multicluster/useIsACMPage';
 import useMultipleVirtualMachineActions from '@virtualmachines/actions/hooks/useMultipleVirtualMachineActions';
+import useVMWizardStore from '@virtualmachines/creation-wizard/state/vm-wizard-store/useVMWizardStore';
 import {
   FOLDER_SELECTOR_PREFIX,
   PROJECT_SELECTOR_PREFIX,
@@ -23,19 +25,22 @@ const DefaultRightClickActionMenu: FC<DefaultRightClickActionMenuProps> = ({
   triggerElement,
 }) => {
   const { t } = useKubevirtTranslation();
+  const isACMPage = useIsACMPage();
   const { cluster, namespace, prefix } = getElementComponentsFromID(triggerElement);
 
   const vms = getVMsTrigger(triggerElement);
   const [vmims] = useVirtualMachineInstanceMigrations(cluster, namespace);
   const vmimMapper = useVirtualMachineInstanceMigrationMapper(vmims);
   const baseActions = useMultipleVirtualMachineActions(vms, vmimMapper, true);
+  const { setProject } = useVMWizardStore();
 
   const navigate = useNavigate();
 
-  const createVMAction =
-    prefix === PROJECT_SELECTOR_PREFIX
-      ? getCreateVMAction(t, navigate, namespace, cluster)
+  const createVMAction = useMemo(() => {
+    return prefix === PROJECT_SELECTOR_PREFIX
+      ? getCreateVMAction(t, navigate, namespace, setProject, isACMPage ? cluster : '')
       : undefined;
+  }, [cluster, isACMPage, namespace, navigate, prefix, setProject, t]);
 
   const getNestedLevel = () => {
     if (prefix === FOLDER_SELECTOR_PREFIX) {

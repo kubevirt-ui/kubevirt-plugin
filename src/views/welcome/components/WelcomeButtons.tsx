@@ -4,8 +4,6 @@ import { useNavigate } from 'react-router-dom-v5-compat';
 import CreateProjectModal from '@kubevirt-utils/components/CreateProjectModal/CreateProjectModal';
 import useTour from '@kubevirt-utils/components/GuidedTour/hooks/useTour';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
-import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
-import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useProjects from '@kubevirt-utils/hooks/useProjects';
 import { getName } from '@kubevirt-utils/resources/shared';
@@ -19,7 +17,7 @@ type WelcomeButtonsProps = {
 
 const WelcomeButtons: FC<WelcomeButtonsProps> = ({ onClose }) => {
   const { t } = useKubevirtTranslation();
-  const [activeNamespace, setActiveNamespace] = useActiveNamespace();
+  const [, setActiveNamespace] = useActiveNamespace();
   const navigate = useNavigate();
   const { createModal } = useModal();
 
@@ -28,9 +26,7 @@ const WelcomeButtons: FC<WelcomeButtonsProps> = ({ onClose }) => {
   const hasNoProjects = projectsLoaded && !projectsError && (!projects || projects.length === 0);
 
   const onCreateVM = () => {
-    const wizardNamespace =
-      activeNamespace === ALL_NAMESPACES_SESSION_KEY ? DEFAULT_NAMESPACE : activeNamespace;
-    navigate(getVMWizardURL('', wizardNamespace));
+    navigate(getVMWizardURL(''));
     onClose();
   };
 

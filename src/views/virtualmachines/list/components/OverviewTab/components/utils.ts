@@ -27,10 +27,6 @@ type ObservabilityWarningParams = {
   observabilityLoaded: boolean;
 };
 
-export type NoVMsAlertProps = {
-  namespace?: string;
-};
-
 export const CLUSTER_SEPARATOR = ',';
 
 export type ObservabilityDisabledAlertProps = {

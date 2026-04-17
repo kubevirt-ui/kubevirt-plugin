@@ -10,7 +10,9 @@ import useIsACMPage from '@multicluster/useIsACMPage';
 import { useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
 import { Alert, AlertActionCloseButton, AlertVariant, Skeleton } from '@patternfly/react-core';
 
-import { getAlertMessage, NoVMsAlertProps } from './utils';
+import { getAlertMessage } from './utils';
+
+type NoVMsAlertProps = { namespace?: string };
 
 const NoVMsAlert: FC<NoVMsAlertProps> = ({ namespace }) => {
   const { t } = useKubevirtTranslation();
@@ -27,8 +29,8 @@ const NoVMsAlert: FC<NoVMsAlertProps> = ({ namespace }) => {
   });
 
   const vmWizardURL = useMemo(
-    () => getVMWizardURL(isACMPage ? cluster || '' : '', selectedNamespace),
-    [isACMPage, cluster, selectedNamespace],
+    () => getVMWizardURL(isACMPage ? cluster || '' : ''),
+    [isACMPage, cluster],
   );
 
   const alertMessage = getAlertMessage(canCreateVM, t);

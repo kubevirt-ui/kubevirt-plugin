@@ -1,8 +1,9 @@
 import React, { FC, useEffect, useRef } from 'react';
-import { useParams } from 'react-router-dom-v5-compat';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getValidNamespace } from '@kubevirt-utils/utils/utils';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
+import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
 import { Wizard, WizardHeader, WizardStep } from '@patternfly/react-core';
 import { useSignals } from '@preact/signals-react/runtime';
 import DefaultWizardFooter from '@virtualmachines/creation-wizard/components/DefaultWizardFooter';
@@ -31,20 +32,22 @@ import DeploymentDetailsStep from './steps/DeploymentDetailsStep/DeploymentDetai
 const VMCreationWizard: FC = () => {
   const { t } = useKubevirtTranslation();
   useSignals();
-  const { creationMethod, setCluster, setProject, setTemplatesDrawerIsOpen } = useVMWizardStore();
+  const { creationMethod, project, setCluster, setProject, setTemplatesDrawerIsOpen } =
+    useVMWizardStore();
   const clusterParam = useClusterParam();
-  const { ns } = useParams<{ ns: string }>();
   const hasInitialized = useRef(false);
   const createVM = useCreateVM();
   const closeWizard = useCloseWizard();
+  const [activeNamespace] = useActiveNamespace();
+  const namespace = getValidNamespace(activeNamespace);
 
   useEffect(() => {
     if (!hasInitialized.current) {
       setCluster(clusterParam);
-      setProject(ns);
+      setProject(project ?? namespace);
       hasInitialized.current = true;
     }
-  }, [clusterParam, ns, setCluster, setProject]);
+  }, [clusterParam, namespace, project, setCluster, setProject]);
 
   const isInstanceTypeMethod = isInstanceTypeCreationMethod(creationMethod);
   const isCloneMethod = isCloneCreationMethod(creationMethod);

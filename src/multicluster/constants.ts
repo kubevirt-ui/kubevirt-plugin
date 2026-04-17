@@ -18,7 +18,7 @@ export const FLEET_NS_INSTANCETYPES_PATH = `${FLEET_BASE_PATH}/${VirtualMachineI
 export const FLEET_MIGRATION_POLICIES_PATH = `${FLEET_BASE_PATH}/${MigrationPolicyModelRef}`;
 export const FLEET_CHECKUPS_PATH = `${FLEET_BASE_PATH}/checkups`;
 export const FLEET_CATALOG_PATH = `${FLEET_BASE_PATH}/catalog`;
-export const FLEET_WIZARD_PATH = `${FLEET_BASE_PATH}/vmwizard`;
+export const FLEET_WIZARD_PATH = `${FLEET_BASE_PATH}/vm-wizard`;
 
 export const FLAG_KUBEVIRT_DYNAMIC_ACM = 'KUBEVIRT_DYNAMIC_ACM';
 export const FLAG_DISALLOWED_KUBEVIRT_DYNAMIC_ACM = 'DISALLOWED_KUBEVIRT_DYNAMIC_ACM';
