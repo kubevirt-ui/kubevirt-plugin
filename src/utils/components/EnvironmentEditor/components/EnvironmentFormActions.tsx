@@ -72,6 +72,7 @@ const EnvironmentFormActions: React.FC<EnvironmentFormActionsProps> = ({
         {success && (
           <Alert
             actionClose={<AlertActionCloseButton onClose={() => setSuccess(false)} />}
+            className="pf-v6-u-mb-md"
             isInline
             title={t('Success')}
             variant={AlertVariant.success}

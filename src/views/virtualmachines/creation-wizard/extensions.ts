@@ -7,6 +7,7 @@ export const exposedModules: ConsolePluginBuildMetadata['exposedModules'] = {
 
 export const extensions: EncodedExtension[] = [
   {
+    prefixNamespaced: true,
     properties: {
       component: {
         $codeRef: 'VMWizard',

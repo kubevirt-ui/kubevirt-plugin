@@ -1,15 +1,14 @@
 import { TFunction } from 'react-i18next';
 
 import { VirtualMachineDetailsTab } from '@kubevirt-utils/constants/tabs-constants';
+import CustomizeInstanceTypeDetailsTab from '@virtualmachines/creation-wizard/steps/CustomizationStep/components/CustomizeVirtualMachine/components/CustomizeVMTabs/tabs/CustomizeInstanceTypeDetailsTab';
+import CustomizeInstanceTypeInitialRunTab from '@virtualmachines/creation-wizard/steps/CustomizationStep/components/CustomizeVirtualMachine/components/CustomizeVMTabs/tabs/CustomizeInstanceTypeInitialRunTab';
+import CustomizeInstanceTypeMetadataTab from '@virtualmachines/creation-wizard/steps/CustomizationStep/components/CustomizeVirtualMachine/components/CustomizeVMTabs/tabs/CustomizeInstanceTypeMetadataTab';
+import CustomizeInstanceTypeNetworkTab from '@virtualmachines/creation-wizard/steps/CustomizationStep/components/CustomizeVirtualMachine/components/CustomizeVMTabs/tabs/CustomizeInstanceTypeNetworkTab';
+import CustomizeInstanceTypeSchedulingTab from '@virtualmachines/creation-wizard/steps/CustomizationStep/components/CustomizeVirtualMachine/components/CustomizeVMTabs/tabs/CustomizeInstanceTypeSchedulingTab';
+import CustomizeInstanceTypeSSHTab from '@virtualmachines/creation-wizard/steps/CustomizationStep/components/CustomizeVirtualMachine/components/CustomizeVMTabs/tabs/CustomizeInstanceTypeSSHTab';
+import CustomizeInstanceTypeStorageTab from '@virtualmachines/creation-wizard/steps/CustomizationStep/components/CustomizeVirtualMachine/components/CustomizeVMTabs/tabs/CustomizeInstanceTypeStorageTab';
 import { getTabNameAndTitle } from '@virtualmachines/details/utils/utils';
-
-import CustomizeInstanceTypeDetailsTab from './tabs/CustomizeInstanceTypeDetailsTab';
-import CustomizeInstanceTypeInitialRunTab from './tabs/CustomizeInstanceTypeInitialRunTab';
-import CustomizeInstanceTypeMetadataTab from './tabs/CustomizeInstanceTypeMetadataTab';
-import CustomizeInstanceTypeNetworkTab from './tabs/CustomizeInstanceTypeNetworkTab';
-import CustomizeInstanceTypeSchedulingTab from './tabs/CustomizeInstanceTypeSchedulingTab';
-import CustomizeInstanceTypeSSHTab from './tabs/CustomizeInstanceTypeSSHTab';
-import CustomizeInstanceTypeStorageTab from './tabs/CustomizeInstanceTypeStorageTab';
 
 export const getTabs = (t: TFunction) => [
   {
