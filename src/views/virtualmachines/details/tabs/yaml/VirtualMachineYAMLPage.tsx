@@ -1,6 +1,7 @@
 import React, { FC } from 'react';
 
 import Loading from '@kubevirt-utils/components/Loading/Loading';
+import { getUID } from '@kubevirt-utils/resources/shared';
 import { ResourceYAMLEditor } from '@openshift-console/dynamic-plugin-sdk';
 import { Bullseye } from '@patternfly/react-core';
 import { NavPageComponentProps } from '@virtualmachines/details/utils/types';
@@ -20,7 +21,7 @@ const VirtualMachineYAMLPage: FC<NavPageComponentProps> = (props) => {
   ) : (
     <React.Suspense fallback={loading}>
       <div className="VirtualMachineYAML--main">
-        <ResourceYAMLEditor initialResource={vm} />
+        <ResourceYAMLEditor initialResource={vm} key={getUID(vm)} />
       </div>
     </React.Suspense>
   );
