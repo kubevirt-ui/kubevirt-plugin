@@ -123,6 +123,33 @@ describe('getUtilizationQueries', () => {
         `avg by (name, namespace)(rate(kubevirt_vmi_storage_read_times_seconds_total{name='${TEST_VM_NAME}',namespace='${TEST_NAMESPACE_SHORT}'}[${DEFAULT_DURATION}]) / rate(kubevirt_vmi_storage_iops_read_total{name='${TEST_VM_NAME}',namespace='${TEST_NAMESPACE_SHORT}'}[${DEFAULT_DURATION}]) > 0)`,
       );
     });
+
+    it('should use gauge-safe rollups for live migration metrics (CNV-35287)', () => {
+      const vm = createMockVMObj({ name: TEST_VM_NAME, namespace: TEST_NAMESPACE });
+
+      const queries = getUtilizationQueries({
+        duration: DEFAULT_DURATION,
+        hubClusterName: HUB_CLUSTER_NAME,
+        obj: vm,
+      });
+
+      expect(queries[VMQueries.MIGRATION_DATA_PROCESSED]).toBe(
+        `sum(max_over_time(kubevirt_vmi_migration_data_processed_bytes{name='${TEST_VM_NAME}',namespace='${TEST_NAMESPACE}'}[${DEFAULT_DURATION}])) ${BY_CLAUSE_HUB}`,
+      );
+      expect(queries[VMQueries.MIGRATION_DATA_REMAINING]).toBe(
+        `sum(min_over_time(kubevirt_vmi_migration_data_remaining_bytes{name='${TEST_VM_NAME}',namespace='${TEST_NAMESPACE}'}[${DEFAULT_DURATION}])) ${BY_CLAUSE_HUB}`,
+      );
+      expect(queries[VMQueries.MIGRATION_DISK_TRANSFER_RATE]).toBe(
+        `sum(avg_over_time(kubevirt_vmi_migration_memory_transfer_rate_bytes{name='${TEST_VM_NAME}',namespace='${TEST_NAMESPACE}'}[${DEFAULT_DURATION}])) ${BY_CLAUSE_HUB}`,
+      );
+      expect(queries[VMQueries.MIGRATION_MEMORY_DIRTY_RATE]).toBe(
+        `sum(avg_over_time(kubevirt_vmi_migration_dirty_memory_rate_bytes{name='${TEST_VM_NAME}',namespace='${TEST_NAMESPACE}'}[${DEFAULT_DURATION}])) ${BY_CLAUSE_HUB}`,
+      );
+      expect(queries[VMQueries.MIGRATION_DATA_PROCESSED]).not.toContain('sum_over_time');
+      expect(queries[VMQueries.MIGRATION_DISK_TRANSFER_RATE]).not.toContain(
+        'kubevirt_vmi_migration_disk_transfer_rate_bytes',
+      );
+    });
   });
 
   describe('query completeness', () => {
