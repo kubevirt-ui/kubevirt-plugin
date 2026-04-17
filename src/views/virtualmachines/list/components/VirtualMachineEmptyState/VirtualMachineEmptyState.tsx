@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 import { Trans } from 'react-i18next';
 
-import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { ProjectRequestModel, VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ListPageBody, useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
@@ -27,12 +27,20 @@ const VirtualMachineEmptyState: FC<VirtualMachineEmptyStateProps> = ({ namespace
   const { t } = useKubevirtTranslation();
   const selectedNamespace = namespace || DEFAULT_NAMESPACE;
 
-  const [canCreateVM, loading] = useAccessReview({
+  const [canCreateVM, loadingVM] = useAccessReview({
     group: VirtualMachineModel.apiGroup,
     namespace: selectedNamespace,
     resource: VirtualMachineModel.plural,
     verb: 'create',
   });
+
+  const [canCreateProject, loadingProject] = useAccessReview({
+    group: ProjectRequestModel.apiGroup,
+    resource: ProjectRequestModel.plural,
+    verb: 'create',
+  });
+
+  const loading = loadingVM || loadingProject;
 
   return (
     <ListPageBody>
@@ -58,7 +66,7 @@ const VirtualMachineEmptyState: FC<VirtualMachineEmptyStateProps> = ({ namespace
               ) : (
                 <div>{t('To create a virtual machine, contact an administrator.')}</div>
               )}
-              {canCreateVM && (
+              {canCreateProject && (
                 <div className="pf-v6-u-mt-md">
                   <Trans ns="plugin__kubevirt-plugin" t={t}>
                     <b>Don&apos;t have a project yet?</b> Right-click a cluster in the navigation
