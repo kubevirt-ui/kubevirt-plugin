@@ -21,11 +21,13 @@ import useDuration from '@virtualmachines/details/tabs/metrics/hooks/useDuration
 
 import ComponentReady from '../ComponentReady/ComponentReady';
 import useResponsiveCharts from '../hooks/useResponsiveCharts';
+import useStableYMax from '../hooks/useStableYMax';
 import { VMQueries } from '../utils/queries';
 import {
   addTimestampToTooltip,
   findMaxYValue,
   formatStorageIOPSTotalThresholdTooltipData,
+  getChartYRange,
   MILLISECONDS_MULTIPLIER,
   tickFormat,
   TICKS_COUNT,
@@ -56,7 +58,8 @@ const StorageIOPSTotalThresholdChart: React.FC<StorageIOPSTotalThresholdChartPro
   const chartData = storageWriteData?.map(([x, y]) => {
     return { x: new Date(x * MILLISECONDS_MULTIPLIER), y: Number(y) };
   });
-  const yMax = findMaxYValue(chartData);
+  const yMax = useStableYMax(findMaxYValue(chartData), `${vmi?.metadata?.uid}_${duration}`);
+  const yRange = getChartYRange(yMax);
 
   return (
     <ComponentReady
@@ -76,7 +79,7 @@ const StorageIOPSTotalThresholdChart: React.FC<StorageIOPSTotalThresholdChartPro
             }
             domain={{
               x: [currentTime - timespan, currentTime],
-              y: [0, yMax],
+              ...(yRange && { y: yRange }),
             }}
             height={height}
             padding={{ bottom: 35, left: 80, right: 35, top: 35 }}
@@ -91,7 +94,7 @@ const StorageIOPSTotalThresholdChart: React.FC<StorageIOPSTotalThresholdChartPro
               }}
               dependentAxis
               tickFormat={(tick: number) => `${tick === 0 ? tick : tick?.toFixed(2)} IOPS`}
-              tickValues={[0, yMax]}
+              {...(yRange && { tickValues: yRange })}
             />
             <ChartAxis
               style={{

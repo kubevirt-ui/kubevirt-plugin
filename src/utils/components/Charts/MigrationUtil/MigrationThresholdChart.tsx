@@ -26,11 +26,13 @@ import useDuration from '@virtualmachines/details/tabs/metrics/hooks/useDuration
 import { tickLabels } from '../ChartLabels/styleOverrides';
 import ComponentReady from '../ComponentReady/ComponentReady';
 import useResponsiveCharts from '../hooks/useResponsiveCharts';
+import useStableYMax from '../hooks/useStableYMax';
 import {
   addTimestampToTooltip,
   findMigrationMaxYValue,
   formatMemoryYTick,
   formatMigrationThresholdTooltipData,
+  getChartYRange,
   getPrometheusData,
   MILLISECONDS_MULTIPLIER,
   queriesToLink,
@@ -105,7 +107,11 @@ const MigrationThresholdChart: React.FC<MigrationThresholdChartProps> = ({ vmi }
 
   const isReady =
     !isEmpty(chartDataProcessed) || !isEmpty(chartDataRemaining) || !isEmpty(chartDataDirtyRate);
-  const yMax = findMigrationMaxYValue(chartDataProcessed, chartDataRemaining, chartDataDirtyRate);
+  const yMax = useStableYMax(
+    findMigrationMaxYValue(chartDataProcessed, chartDataRemaining, chartDataDirtyRate),
+    `${vmi?.metadata?.uid}_${duration}`,
+  );
+  const yRange = getChartYRange(yMax);
   const linkToMetrics =
     !isACMPage &&
     queriesToLink([
@@ -131,7 +137,7 @@ const MigrationThresholdChart: React.FC<MigrationThresholdChartProps> = ({ vmi }
             }
             domain={{
               x: [currentTime - timespan, currentTime],
-              y: [0, yMax],
+              ...(yRange && { y: yRange }),
             }}
             legendData={[
               { name: t('Data Processed') },
@@ -153,8 +159,10 @@ const MigrationThresholdChart: React.FC<MigrationThresholdChartProps> = ({ vmi }
                 tickLabels,
               }}
               dependentAxis
-              tickFormat={formatMemoryYTick(yMax, 2)}
-              tickValues={[0, yMax]}
+              {...(yMax != null && {
+                tickFormat: formatMemoryYTick(yMax, 2),
+                tickValues: yRange,
+              })}
             />
             <ChartAxis
               style={{

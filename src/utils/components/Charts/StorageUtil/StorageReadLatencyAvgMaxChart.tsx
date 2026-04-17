@@ -23,12 +23,14 @@ import useDuration from '@virtualmachines/details/tabs/metrics/hooks/useDuration
 
 import ComponentReady from '../ComponentReady/ComponentReady';
 import useResponsiveCharts from '../hooks/useResponsiveCharts';
+import useStableYMax from '../hooks/useStableYMax';
 import { VMQueries } from '../utils/queries';
 import {
   addTimestampToTooltip,
   AVG_LABEL,
   findMaxYValue,
   formatStorageReadLatencyAvgMaxTooltipData,
+  getChartYRange,
   MAX_LABEL,
   MILLISECONDS_MULTIPLIER,
   tickFormat,
@@ -79,7 +81,8 @@ const StorageReadLatencyAvgMaxChart: React.FC<StorageReadLatencyAvgMaxChartProps
   });
 
   const allData = [...(avgChartData || []), ...(maxChartData || [])];
-  const yMax = findMaxYValue(allData);
+  const yMax = useStableYMax(findMaxYValue(allData), `${vmi?.metadata?.uid}_${duration}`);
+  const yRange = getChartYRange(yMax);
 
   const legendData = [
     {
@@ -110,7 +113,7 @@ const StorageReadLatencyAvgMaxChart: React.FC<StorageReadLatencyAvgMaxChartProps
             }
             domain={{
               x: [currentTime - timespan, currentTime],
-              y: [0, yMax],
+              ...(yRange && { y: yRange }),
             }}
             height={height}
             legendData={legendData}
@@ -127,7 +130,7 @@ const StorageReadLatencyAvgMaxChart: React.FC<StorageReadLatencyAvgMaxChartProps
               }}
               dependentAxis
               tickFormat={(tick: number) => `${tick === 0 ? tick : (tick * 1000)?.toFixed(2)} ms`}
-              tickValues={[0, yMax]}
+              {...(yRange && { tickValues: yRange })}
             />
             <ChartAxis
               style={{

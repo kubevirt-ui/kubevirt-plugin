@@ -25,11 +25,13 @@ import useDuration from '@virtualmachines/details/tabs/metrics/hooks/useDuration
 
 import ComponentReady from '../ComponentReady/ComponentReady';
 import useResponsiveCharts from '../hooks/useResponsiveCharts';
+import useStableYMax from '../hooks/useStableYMax';
 import { VMQueries } from '../utils/queries';
 import {
   addTimestampToTooltip,
   findMaxYValue,
   formatStorageTotalReadWriteThresholdTooltipData,
+  getChartYRange,
   getNumberOfDigitsAfterDecimalPoint,
   MILLISECONDS_MULTIPLIER,
   tickFormat,
@@ -63,11 +65,16 @@ const StorageTotalReadWriteThresholdChart: React.FC<StorageTotalReadWriteThresho
   const chartData = storageWriteData?.map(([x, y]) => {
     return { x: new Date(x * MILLISECONDS_MULTIPLIER), y: Number(y) };
   });
-  const yMax = findMaxYValue(chartData);
+  const yMax = useStableYMax(findMaxYValue(chartData), `${vmi?.metadata?.uid}_${duration}`);
+  const yRange = getChartYRange(yMax);
 
-  const thresholdData = storageWriteData?.map(([x]) => {
-    return { x: new Date(x * MILLISECONDS_MULTIPLIER), y: yMax };
-  });
+  const thresholdData =
+    yMax != null
+      ? storageWriteData?.map(([x]) => ({
+          x: new Date(x * MILLISECONDS_MULTIPLIER),
+          y: yMax,
+        }))
+      : undefined;
   return (
     <ComponentReady
       error={error}
@@ -86,7 +93,7 @@ const StorageTotalReadWriteThresholdChart: React.FC<StorageTotalReadWriteThresho
             }
             domain={{
               x: [currentTime - timespan, currentTime],
-              y: [0, yMax],
+              ...(yRange && { y: yRange }),
             }}
             height={height}
             padding={{ bottom: 35, left: 70, right: 35, top: 35 }}
@@ -101,10 +108,10 @@ const StorageTotalReadWriteThresholdChart: React.FC<StorageTotalReadWriteThresho
                 tickLabels,
               }}
               tickFormat={(tick: number) =>
-                xbytes(tick, { fixed: getNumberOfDigitsAfterDecimalPoint(yMax), iec: true })
+                xbytes(tick, { fixed: getNumberOfDigitsAfterDecimalPoint(yMax ?? 0), iec: true })
               }
               dependentAxis
-              tickValues={[0, yMax]}
+              {...(yRange && { tickValues: yRange })}
             />
             <ChartAxis
               style={{
@@ -125,15 +132,17 @@ const StorageTotalReadWriteThresholdChart: React.FC<StorageTotalReadWriteThresho
                 data={chartData}
               />
             </ChartGroup>
-            <ChartThreshold
-              style={{
-                data: {
-                  stroke: chart_color_orange_300.value,
-                  strokeDasharray: 10,
-                },
-              }}
-              data={thresholdData}
-            />
+            {thresholdData && (
+              <ChartThreshold
+                style={{
+                  data: {
+                    stroke: chart_color_orange_300.value,
+                    strokeDasharray: 10,
+                  },
+                }}
+                data={thresholdData}
+              />
+            )}
           </Chart>
         </Link>
       </div>

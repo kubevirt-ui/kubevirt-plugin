@@ -23,12 +23,14 @@ import useDuration from '@virtualmachines/details/tabs/metrics/hooks/useDuration
 import { tickLabels } from '../ChartLabels/styleOverrides';
 import ComponentReady from '../ComponentReady/ComponentReady';
 import useResponsiveCharts from '../hooks/useResponsiveCharts';
+import useStableYMax from '../hooks/useStableYMax';
 import { VMQueries } from '../utils/queries';
 import {
   addTimestampToTooltip,
   findMaxYValue,
   formatMemoryYTick,
   formatMigrationThresholdDiskRateTooltipData,
+  getChartYRange,
   getPrometheusData,
   MILLISECONDS_MULTIPLIER,
   tickFormat,
@@ -64,7 +66,11 @@ const MigrationThresholdChartDiskRate: React.FC<MigrationThresholdChartDiskRateP
   });
 
   const isReady = !isEmpty(chartDataProcessed);
-  const yMax = findMaxYValue(chartDataProcessed);
+  const yMax = useStableYMax(
+    findMaxYValue(chartDataProcessed),
+    `${vmi?.metadata?.uid}_${duration}`,
+  );
+  const yRange = getChartYRange(yMax);
 
   return (
     <ComponentReady isReady={isReady} linkToMetrics={queryLink}>
@@ -79,7 +85,7 @@ const MigrationThresholdChartDiskRate: React.FC<MigrationThresholdChartDiskRateP
             }
             domain={{
               x: [currentTime - timespan, currentTime],
-              y: [0, yMax],
+              ...(yRange && { y: yRange }),
             }}
             height={height}
             padding={35}
@@ -94,8 +100,10 @@ const MigrationThresholdChartDiskRate: React.FC<MigrationThresholdChartDiskRateP
                 tickLabels,
               }}
               dependentAxis
-              tickFormat={formatMemoryYTick(yMax, 2)}
-              tickValues={[0, yMax]}
+              {...(yMax != null && {
+                tickFormat: formatMemoryYTick(yMax, 2),
+                tickValues: yRange,
+              })}
             />
             <ChartAxis
               style={{

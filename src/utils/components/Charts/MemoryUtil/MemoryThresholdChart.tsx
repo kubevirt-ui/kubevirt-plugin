@@ -74,7 +74,7 @@ const MemoryThresholdChart: FC<MemoryThresholdChartProps> = ({ vmi }) => {
   }));
 
   const isReady = !isEmpty(chartData) || !isEmpty(thresholdLine);
-  const yMax = findMaxYValue(thresholdLine);
+  const yMax = findMaxYValue(thresholdLine) ?? 0;
 
   return (
     <ComponentReady error={error} isLoading={isLoading} isReady={isReady} linkToMetrics={queryLink}>
