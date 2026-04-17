@@ -34,7 +34,7 @@ import DetailsSectionBoot from '@virtualmachines/details/tabs/configuration/deta
 import DetailsSectionHardware from '@virtualmachines/details/tabs/configuration/details/components/DetailsSectionHardware';
 import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
 
-import usePreference from '../../hooks/usePreference';
+import usePreference from '../hooks/usePreference';
 
 const CustomizeInstanceTypeDetailsTab = () => {
   const { t } = useKubevirtTranslation();

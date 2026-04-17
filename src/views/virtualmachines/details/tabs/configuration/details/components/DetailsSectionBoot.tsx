@@ -81,7 +81,7 @@ const DetailsSectionBoot: FC<DetailsSectionBootProps> = ({
             />
           ))
         }
-        className="DetailsSection-margin__bottom"
+        className="pf-v6-u-mb-lg"
         data-test-id={`${vmName}-boot-method`}
         descriptionHeader={<SearchItem id="boot-mode">{t('Boot mode')}</SearchItem>}
         isEdit={canUpdateVM}
@@ -113,7 +113,7 @@ const DetailsSectionBoot: FC<DetailsSectionBootProps> = ({
             />
           ))
         }
-        className="DetailsSection-margin__bottom"
+        className="pf-v6-u-mb-lg"
         data-test-id={`${vmName}-boot-order`}
         descriptionData={<BootOrderSummary instanceTypeVM={instanceTypeVM} vm={vm} />}
         descriptionHeader={<SearchItem id="boot-order">{t('Boot order')}</SearchItem>}
@@ -145,7 +145,7 @@ const DetailsSectionBoot: FC<DetailsSectionBootProps> = ({
         descriptionHeader={
           <SearchItem id="start-pause-mode">{t('Start in pause mode')}</SearchItem>
         }
-        className="DetailsSection-margin__bottom"
+        className="pf-v6-u-mb-lg"
         data-test-id="start-pause-mode"
         isPopover
         olsObj={vm}

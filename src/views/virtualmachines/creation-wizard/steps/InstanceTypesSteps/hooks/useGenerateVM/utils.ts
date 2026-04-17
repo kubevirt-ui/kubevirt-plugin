@@ -5,8 +5,6 @@ import {
   VirtualMachineInstancetypeModel,
   VirtualMachineModel,
 } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
-import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { V1Interface, V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import {
   addDNFUpdateToRunCMD,
@@ -16,7 +14,6 @@ import {
 } from '@kubevirt-utils/components/CloudinitModal/utils/cloudinit-utils';
 import { DEFAULT_DISK_SIZE } from '@kubevirt-utils/components/DiskModal/utils/constants';
 import { InterfaceTypes } from '@kubevirt-utils/components/DiskModal/utils/types';
-import { VolumeSnapshotKind } from '@kubevirt-utils/components/SelectSnapshot/types';
 import { sysprepDisk, sysprepVolume } from '@kubevirt-utils/components/SysprepModal/sysprep-utils';
 import { CLOUDINITDISK, ROOTDISK } from '@kubevirt-utils/constants/constants';
 import {
@@ -33,7 +30,6 @@ import {
   getDataVolumeSize,
   getPVCSize,
   getPVCStorageClassName,
-  getVolumeSnapshotSize,
 } from '@kubevirt-utils/resources/bootableresources/selectors';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { getLabel, getLabels, getName, getNamespace } from '@kubevirt-utils/resources/shared';
@@ -218,12 +214,6 @@ export const useIsWindowsBootableVolume = (): boolean => {
   return defaultPreferenceName?.startsWith(OS_WINDOWS_PREFIX);
 };
 
-export const getDiskSize = (
-  dataVolume: V1beta1DataVolume,
-  pvc: IoK8sApiCoreV1PersistentVolumeClaim,
-  volumeSnapshot: VolumeSnapshotKind,
-) => getDataVolumeSize(dataVolume) || getPVCSize(pvc) || getVolumeSnapshotSize(volumeSnapshot);
-
 export const generateVM: GenerateVMCallback = ({
   cluster,
   customDiskSize,
@@ -239,25 +229,15 @@ export const generateVM: GenerateVMCallback = ({
   selectedInstanceType,
   targetNamespace,
 }) => {
-  // const {
-  //   sshSecretCredentials,
-  //   sysprepConfigMapData,
-  //   vmName,
-  // } = instanceTypeState;
-  // const { sshSecretName } = sshSecretCredentials;
-
   const selectedPreference = getLabel(selectedBootableVolume, DEFAULT_PREFERENCE_LABEL);
   const selectPreferenceKind = getLabel(
     selectedBootableVolume,
     DEFAULT_PREFERENCE_KIND_LABEL,
     null,
   );
-  // const isDynamic = instanceTypeState?.isDynamicSSHInjection;
-  // const isSysprep = !isEmpty(sysprepConfigMapData?.name);
+
   const isIso = isBootableVolumeISO(selectedBootableVolume);
   const isWindowsVM = selectedPreference?.startsWith(OS_WINDOWS_PREFIX);
-  // const storageClassName =
-  //   instanceTypeState.selectedStorageClass || pvcSource?.spec?.storageClassName;
   const storageClassName = getPVCStorageClassName(pvcSource);
 
   const defaultInterface = isUDNManagedNamespace
@@ -370,17 +350,9 @@ export const generateVM: GenerateVMCallback = ({
     emptyVM = addISOFlowToVM(emptyVM, storageClassName);
   }
 
-  // if (isSysprep) {
-  //   emptyVM = addSysprepOrCloudInitToVM(emptyVM, sysprepConfigMapData.name);
-  // }
-
   if (customDiskSize) {
     emptyVM = addSizeToROOTDISKVM(emptyVM, customDiskSize, isIso);
   }
-
-  // if (sshSecretName) {
-  //   emptyVM = addSecretToVM(emptyVM, sshSecretName, isDynamic);
-  // }
 
   emptyVM = addRootDiskToVM(emptyVM);
 

@@ -1,9 +1,12 @@
 import React, { FC, useEffect, useRef } from 'react';
+import classnames from 'classnames';
 
+import { FLAG_LIGHTSPEED_PLUGIN } from '@kubevirt-utils/flags/consts';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getValidNamespace } from '@kubevirt-utils/utils/utils';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
+import { useFlag } from '@openshift-console/dynamic-plugin-sdk';
 import { Wizard, WizardHeader, WizardStep } from '@patternfly/react-core';
 import { useSignals } from '@preact/signals-react/runtime';
 import DefaultWizardFooter from '@virtualmachines/creation-wizard/components/DefaultWizardFooter';
@@ -31,6 +34,7 @@ import DeploymentDetailsStep from './steps/DeploymentDetailsStep/DeploymentDetai
 
 const VMCreationWizard: FC = () => {
   const { t } = useKubevirtTranslation();
+  const hasOLSConsole = useFlag(FLAG_LIGHTSPEED_PLUGIN);
   useSignals();
   const { creationMethod, project, setCluster, setProject, setTemplatesDrawerIsOpen } =
     useVMWizardStore();
@@ -44,7 +48,7 @@ const VMCreationWizard: FC = () => {
   useEffect(() => {
     if (!hasInitialized.current) {
       setCluster(clusterParam);
-      setProject(project ?? namespace);
+      setProject(Boolean(project) ? project : namespace);
       hasInitialized.current = true;
     }
   }, [clusterParam, namespace, project, setCluster, setProject]);
@@ -122,6 +126,7 @@ const VMCreationWizard: FC = () => {
         </WizardStep>
         <WizardStep
           footer={{
+            cancelButtonProps: { className: classnames({ 'pf-v6-u-mr-4xl': hasOLSConsole }) },
             nextButtonText: isCloneMethod ? t('Clone VirtualMachine') : t('Create VirtualMachine'),
             onNext: createVM,
           }}
