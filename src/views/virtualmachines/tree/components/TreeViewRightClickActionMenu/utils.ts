@@ -6,7 +6,7 @@ import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { SINGLE_CLUSTER_KEY } from '@kubevirt-utils/resources/constants';
 import { getLabel, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getCluster } from '@multicluster/helpers/selectors';
-import { getCatalogURL } from '@multicluster/urls';
+import { getVMWizardURL } from '@multicluster/urls';
 import {
   CLUSTER_SELECTOR_PREFIX,
   FOLDER_SELECTOR_PREFIX,
@@ -23,12 +23,18 @@ export const getCreateVMAction = (
   t: TFunction,
   navigate: NavigateFunction,
   namespace: string,
+  setProject: (project: string) => void,
   cluster?: string,
-): ActionDropdownItemType => ({
-  cta: () => navigate(`${getCatalogURL(cluster, namespace)}`),
-  id: 'create-vm',
-  label: t('Create VirtualMachine'),
-});
+): ActionDropdownItemType => {
+  return {
+    cta: () => {
+      setProject(namespace);
+      navigate(`${getVMWizardURL(cluster)}`);
+    },
+    id: 'create-vm',
+    label: t('Create VirtualMachine'),
+  };
+};
 
 export const getElementComponentsFromID = (
   triggerElement: HTMLElement | null,

@@ -11,7 +11,7 @@ export const extensions: EncodedExtension[] = [
       component: {
         $codeRef: 'VMWizard',
       },
-      path: ['/k8s/ns/:ns/vmwizard', '/k8s/all-namespaces/vmwizard'],
+      path: ['/vm-wizard'],
     },
     type: 'console.page/route',
   } as EncodedExtension,
