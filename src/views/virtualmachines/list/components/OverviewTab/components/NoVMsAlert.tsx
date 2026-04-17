@@ -1,25 +1,37 @@
 import React, { FC, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom-v5-compat';
 
+import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useCluster from '@multicluster/hooks/useCluster';
 import { getVMWizardURL } from '@multicluster/urls';
 import useIsACMPage from '@multicluster/useIsACMPage';
-import { Alert, AlertActionCloseButton, AlertVariant } from '@patternfly/react-core';
+import { useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
+import { Alert, AlertActionCloseButton, AlertVariant, Skeleton } from '@patternfly/react-core';
 
-import { NoVMsAlertProps } from './utils';
+import { getAlertMessage, NoVMsAlertProps } from './utils';
 
 const NoVMsAlert: FC<NoVMsAlertProps> = ({ namespace }) => {
   const { t } = useKubevirtTranslation();
   const [dismissed, setDismissed] = useState(false);
   const isACMPage = useIsACMPage();
   const cluster = useCluster();
+  const selectedNamespace = namespace || DEFAULT_NAMESPACE;
+
+  const [canCreateVM, loading] = useAccessReview({
+    group: VirtualMachineModel.apiGroup,
+    namespace: selectedNamespace,
+    resource: VirtualMachineModel.plural,
+    verb: 'create',
+  });
 
   const vmWizardURL = useMemo(
-    () => getVMWizardURL(isACMPage ? cluster || '' : '', namespace || DEFAULT_NAMESPACE),
-    [isACMPage, cluster, namespace],
+    () => getVMWizardURL(isACMPage ? cluster || '' : '', selectedNamespace),
+    [isACMPage, cluster, selectedNamespace],
   );
+
+  const alertMessage = getAlertMessage(canCreateVM, t);
 
   if (dismissed) {
     return null;
@@ -32,9 +44,18 @@ const NoVMsAlert: FC<NoVMsAlertProps> = ({ namespace }) => {
       title={t('No data to display yet.')}
       variant={AlertVariant.info}
     >
-      {t('Create your first virtual machine to begin monitoring health and performance metrics.')}
-      <br />
-      <Link to={vmWizardURL}>{t('Create VM')}</Link>
+      {loading ? (
+        <Skeleton screenreaderText={t('Loading')} width="75%" />
+      ) : (
+        <>
+          {alertMessage}
+          {canCreateVM && (
+            <div className="pf-v6-u-mt-sm">
+              <Link to={vmWizardURL}>{t('Create VM')}</Link>
+            </div>
+          )}
+        </>
+      )}
     </Alert>
   );
 };
