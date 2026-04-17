@@ -8,7 +8,6 @@ import { getVMListPath } from '@kubevirt-utils/resources/vm';
 import useCluster from '@multicluster/hooks/useCluster';
 import { getACMVMListURL, getVMWizardURL } from '@multicluster/urls';
 import useIsACMPage from '@multicluster/useIsACMPage';
-import { useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Button,
   Dropdown,
@@ -18,6 +17,7 @@ import {
   MenuToggleAction,
   MenuToggleElement,
 } from '@patternfly/react-core';
+import { useFleetAccessReview } from '@stolostron/multicluster-sdk';
 
 type VirtualMachinesCreateButtonProps = {
   buttonText?: string;
@@ -38,7 +38,8 @@ const VirtualMachinesCreateButton: FC<VirtualMachinesCreateButtonProps> = ({
   const cluster = useCluster();
   const selectedNamespace = namespace || DEFAULT_NAMESPACE;
 
-  const [canCreateVM] = useAccessReview({
+  const [canCreateVM] = useFleetAccessReview({
+    cluster,
     group: VirtualMachineModel.apiGroup,
     namespace: selectedNamespace,
     resource: VirtualMachineModel.plural,
