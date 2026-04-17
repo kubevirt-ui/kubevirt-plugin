@@ -1,6 +1,5 @@
 import React, { FC, memo, useMemo } from 'react';
 
-import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import ArchitectureLabel from '@kubevirt-utils/components/ArchitectureLabel/ArchitectureLabel';
 import DeprecatedBadge from '@kubevirt-utils/components/badges/DeprecatedBadge/DeprecatedBadge';
@@ -9,6 +8,7 @@ import { getAnnotations, getName, getNamespace, getUID } from '@kubevirt-utils/r
 import {
   getTemplateFlavorData,
   isDeprecatedTemplate,
+  Template,
   WORKLOADS_LABELS,
 } from '@kubevirt-utils/resources/template';
 import { getTemplateBootSourceType } from '@kubevirt-utils/resources/template/hooks/useVmTemplateSource/utils';
@@ -39,8 +39,8 @@ export type TemplatesCatalogTileProps = {
   availableTemplatesUID: Set<string>;
   bootSourcesLoaded: boolean;
   isSelected?: boolean;
-  onClick: (template: V1Template) => void;
-  template: V1Template;
+  onClick: (template: Template) => void;
+  template: Template;
 };
 
 const TemplatesCatalogTile: FC<TemplatesCatalogTileProps> = memo(
@@ -143,14 +143,10 @@ const TemplatesCatalogTile: FC<TemplatesCatalogTileProps> = memo(
                   <b>{t('Workload')}</b> {WORKLOADS_LABELS?.[workload] ?? t('Other')}
                 </StackItem>
                 <StackItem>
-                  <Stack hasGutter>
-                    <StackItem>
-                      <b>{t('CPU')}</b> {cpuCount}
-                    </StackItem>
-                    <StackItem>
-                      <b>{t('Memory')}</b> {readableSizeUnit(memory)}
-                    </StackItem>
-                  </Stack>
+                  <b>{t('CPU')}</b> {cpuCount}
+                </StackItem>
+                <StackItem>
+                  <b>{t('Memory')}</b> {readableSizeUnit(memory)}
                 </StackItem>
               </Stack>
             </StackItem>

@@ -13,7 +13,7 @@ import TemplatesCatalogItems from '@virtualmachines/creation-wizard/steps/Templa
 import CatalogSkeleton from '@virtualmachines/creation-wizard/steps/TemplateStep/components/TemplatesCatalog/components/TemplatesCatalogSkeleton';
 import TemplatesToolbar from '@virtualmachines/creation-wizard/steps/TemplateStep/components/TemplatesCatalog/components/TemplatesToolbar/TemplatesToolbar';
 import useHideDeprecatedTemplateTiles from '@virtualmachines/creation-wizard/steps/TemplateStep/components/TemplatesCatalog/hooks/useHideDeprecatedTemplateTiles';
-import { useTemplatesWithAvailableSource } from '@virtualmachines/creation-wizard/steps/TemplateStep/components/TemplatesCatalog/hooks/useTemplatesWithAvailableSource/useTemplatesWithAvailableSource';
+import useTemplatesWithAvailableSource from '@virtualmachines/creation-wizard/steps/TemplateStep/components/TemplatesCatalog/hooks/useTemplatesWithAvailableSource/useTemplatesWithAvailableSource';
 import { useTemplatesFilters } from '@virtualmachines/creation-wizard/steps/TemplateStep/components/TemplatesCatalog/hooks/useVMTemplatesFilters';
 import { filterTemplates } from '@virtualmachines/creation-wizard/steps/TemplateStep/components/TemplatesCatalog/utils/utils';
 

@@ -21,7 +21,7 @@ import { getBootDisk, getVolumes } from '@kubevirt-utils/resources/vm';
 import { getVMBootSourceType } from '@kubevirt-utils/resources/vm/utils/source';
 import { kubevirtK8sGet } from '@multicluster/k8sRequests';
 
-import { poorManProcess } from '../../utils';
+import { isOpenShiftTemplate, poorManProcess, Template } from '../../utils';
 import { BOOT_SOURCE } from '../../utils/constants';
 import { getTemplateVirtualMachineObject } from '../../utils/selectors';
 
@@ -51,8 +51,12 @@ export type TemplateBootSource = {
  * @param {V1Template} template - the template to get the boot source from
  * @returns the template's boot source and its status
  */
-export const getTemplateBootSourceType = (template: V1Template): TemplateBootSource =>
-  getVMBootSourceType(getTemplateVirtualMachineObject(poorManProcess(template)));
+export const getTemplateBootSourceType = (template: Template): TemplateBootSource =>
+  getVMBootSourceType(
+    getTemplateVirtualMachineObject(
+      isOpenShiftTemplate(template) ? poorManProcess(template) : template,
+    ),
+  );
 
 /**
  * a function to k8sGet a PVC

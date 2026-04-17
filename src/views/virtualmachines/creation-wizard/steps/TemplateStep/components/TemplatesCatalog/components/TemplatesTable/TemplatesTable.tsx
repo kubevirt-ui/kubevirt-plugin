@@ -1,10 +1,9 @@
 import React, { FC, useMemo } from 'react';
 
-import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getUID } from '@kubevirt-utils/resources/shared';
-import { getTemplateName } from '@kubevirt-utils/resources/template';
+import { getTemplateName, Template } from '@kubevirt-utils/resources/template';
 import { ARCHITECTURE_ID, ARCHITECTURE_TITLE } from '@kubevirt-utils/utils/architecture';
 import { Table, TableVariant, Tbody, Th, Thead, Tr } from '@patternfly/react-table';
 import useVMWizardStore from '@virtualmachines/creation-wizard/state/vm-wizard-store/useVMWizardStore';
@@ -16,8 +15,8 @@ type TemplatesTableProps = {
   availableTemplatesUID: Set<string>;
   bootSourcesLoaded: boolean;
   loaded: boolean;
-  onTemplateClick: (template: V1Template) => void;
-  templates: V1Template[];
+  onTemplateClick: (template: Template) => void;
+  templates: Template[];
 };
 
 const TemplatesTable: FC<TemplatesTableProps> = ({
@@ -38,13 +37,13 @@ const TemplatesTable: FC<TemplatesTableProps> = ({
 
   const sortedTemplates = useMemo(
     () =>
-      [...templates].sort((a: V1Template, b: V1Template) =>
+      [...templates].sort((a: Template, b: Template) =>
         (getTemplateName(a) ?? '').localeCompare(getTemplateName(b) ?? ''),
       ),
     [templates],
   );
 
-  const handleSelectTemplate = (template: V1Template) => {
+  const handleSelectTemplate = (template: Template) => {
     onTemplateClick(template);
   };
 

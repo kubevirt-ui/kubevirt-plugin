@@ -1,6 +1,7 @@
 import React, { FC, memo, useCallback, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getParameters } from '@kubevirt-utils/resources/template';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Alert, AlertVariant, Spinner, Tab, Tabs, TabTitleText } from '@patternfly/react-core';
 import { TemplatesDrawerTabKey } from '@virtualmachines/creation-wizard/steps/TemplateStep/components/TemplatesCatalogDrawer/components/TemplatesCatalogDrawerPanel/utils/types';
@@ -17,7 +18,7 @@ const TemplatesCatalogDrawerPanel: FC = memo(() => {
   );
   const { template, templateDataLoaded, templateLoadingError } = useDrawerContext();
 
-  const [requiredParameters] = getTemplateParametersSplit(template?.parameters ?? []);
+  const [requiredParameters] = getTemplateParametersSplit(getParameters(template) ?? []);
 
   const handleTabKey = useCallback((_: unknown, tabKey: TemplatesDrawerTabKey): void => {
     setActiveTabKey(tabKey);

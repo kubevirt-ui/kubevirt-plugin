@@ -1,21 +1,20 @@
 import React, { createContext, FC, useContext, useEffect, useMemo } from 'react';
 import { Updater, useImmer } from 'use-immer';
 
-import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
+import { getTemplateVirtualMachineObject, Template } from '@kubevirt-utils/resources/template';
 import { useVMTemplateSource } from '@kubevirt-utils/resources/template';
 import useVMTemplateGeneratedParams from '@kubevirt-utils/resources/template/hooks/useVMTemplateGeneratedParams';
 
 export type DrawerContext = {
-  setTemplate: Updater<V1Template>;
-  template: V1Template;
+  setTemplate: Updater<Template>;
+  template: Template;
   templateDataLoaded: boolean;
   templateLoadingError: Error;
   vm: V1VirtualMachine;
 };
 
-const useDrawer = (initialTemplate: V1Template) => {
+const useDrawer = (initialTemplate: Template) => {
   const [template, setTemplate] = useImmer(initialTemplate);
   const [templateWithGeneratedParams, loading, error] =
     useVMTemplateGeneratedParams(initialTemplate);
@@ -53,7 +52,7 @@ const initialValue: DrawerContext = {
 
 export const DrawerContext = createContext<DrawerContext>(initialValue);
 
-export const DrawerContextProvider: FC<{ template: V1Template }> = ({ children, template }) => {
+export const DrawerContextProvider: FC<{ template: Template }> = ({ children, template }) => {
   const context = useDrawer(template);
   return <DrawerContext.Provider value={context}>{children}</DrawerContext.Provider>;
 };

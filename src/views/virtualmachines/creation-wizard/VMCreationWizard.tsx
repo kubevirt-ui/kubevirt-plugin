@@ -1,6 +1,7 @@
 import React, { FC, useEffect, useRef } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { clearCustomizeInstanceType } from '@kubevirt-utils/store/customizeInstanceType';
 import { getValidNamespace } from '@kubevirt-utils/utils/utils';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
@@ -32,8 +33,14 @@ import DeploymentDetailsStep from './steps/DeploymentDetailsStep/DeploymentDetai
 const VMCreationWizard: FC = () => {
   const { t } = useKubevirtTranslation();
   useSignals();
-  const { creationMethod, project, setCluster, setProject, setTemplatesDrawerIsOpen } =
-    useVMWizardStore();
+  const {
+    creationMethod,
+    project,
+    resetWizardState,
+    setCluster,
+    setProject,
+    setTemplatesDrawerIsOpen,
+  } = useVMWizardStore();
   const clusterParam = useClusterParam();
   const hasInitialized = useRef(false);
   const createVM = useCreateVM();
@@ -43,11 +50,24 @@ const VMCreationWizard: FC = () => {
 
   useEffect(() => {
     if (!hasInitialized.current) {
+      // clear any previous state
+      clearCustomizeInstanceType();
+      resetWizardState();
+      setTemplatesDrawerIsOpen(false);
+
       setCluster(clusterParam);
-      setProject(project ?? namespace);
+      setProject(Boolean(project) ? project : namespace);
       hasInitialized.current = true;
     }
-  }, [clusterParam, namespace, project, setCluster, setProject]);
+  }, [
+    clusterParam,
+    project,
+    namespace,
+    resetWizardState,
+    setCluster,
+    setProject,
+    setTemplatesDrawerIsOpen,
+  ]);
 
   const isInstanceTypeMethod = isInstanceTypeCreationMethod(creationMethod);
   const isCloneMethod = isCloneCreationMethod(creationMethod);

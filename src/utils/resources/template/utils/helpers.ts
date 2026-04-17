@@ -1,17 +1,27 @@
+import { SetStateAction } from 'react';
 import produce from 'immer';
 
 import {
+  ProcessedTemplatesModel,
   TemplateModel,
   TemplateParameter,
   V1Template,
+  VirtualMachineTemplateRequestModel,
 } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { getAnnotation, getName, getNamespace } from '@kubevirt-utils/resources/shared';
+import { V1alpha1VirtualMachineTemplateSpecParameters } from '@kubevirt-ui-ext/kubevirt-api/virt-template';
+import { getAnnotation, getLabels, getName, getNamespace } from '@kubevirt-utils/resources/shared';
+import {
+  getParameters,
+  isOpenShiftTemplate,
+  isVirtualMachineTemplate,
+  Template,
+} from '@kubevirt-utils/resources/template';
 import { vmBootDiskSourceIsRegistry } from '@kubevirt-utils/resources/vm/utils/source';
 import { generatePrettyName } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
-import { kubevirtK8sUpdate } from '@multicluster/k8sRequests';
+import { kubevirtK8sCreate, kubevirtK8sUpdate } from '@multicluster/k8sRequests';
 
 import { ANNOTATIONS } from './annotations';
 import {
@@ -37,8 +47,8 @@ export const poorManProcess = (template: V1Template): V1Template => {
   return JSON.parse(templateString);
 };
 
-export const isCommonTemplate = (template: V1Template): boolean =>
-  template?.metadata?.labels?.[TEMPLATE_TYPE_LABEL] === TEMPLATE_TYPE_BASE;
+export const isCommonTemplate = (template: Template): boolean =>
+  getLabels(template)?.[TEMPLATE_TYPE_LABEL] === TEMPLATE_TYPE_BASE;
 
 export const isDeprecatedTemplate = (template: K8sResourceCommon): boolean =>
   getAnnotation(template, ANNOTATIONS.deprecated) === 'true';
@@ -53,22 +63,23 @@ export const replaceTemplateVM = (template: V1Template, vm: V1VirtualMachine) =>
 
 /**
  * A function for generating a unique vm name
- * @param {V1Template} template - template
+ * @param {Template} template - template
  * @returns a unique vm name
  */
-export const generateVMName = (template: V1Template): string => {
+export const generateVMName = (template: Template): string => {
   return generatePrettyName(getTemplatePVCName(template) || template?.metadata?.name);
 };
 
-export const generateVMNamePrettyParam = (template: V1Template): TemplateParameter => {
+export const generateVMNamePrettyParam = (template: Template): TemplateParameter => {
   if (getAnnotation(template, GENERATE_VM_PRETTY_NAME_ANNOTATION)) {
     return { description: 'VM name', name: 'NAME', value: generateVMName(template) };
   }
 };
 
-export const generateParamsWithPrettyName = (template: V1Template) => {
-  if (template?.parameters) {
-    const [nameParam, ...restParams] = template?.parameters?.reduce(
+export const generateParamsWithPrettyName = (template: Template) => {
+  const parameters = getParameters(template);
+  if (parameters) {
+    const [nameParam, ...restParams] = parameters?.reduce(
       (acc: TemplateParameter[], param) =>
         (param?.name === 'NAME' ? acc.unshift(param) : acc.push(param)) && acc,
       [],
@@ -77,6 +88,29 @@ export const generateParamsWithPrettyName = (template: V1Template) => {
   }
   return [];
 };
+
+export const replaceTemplateParameters = (
+  template: Template,
+  parameters: TemplateParameter[] | V1alpha1VirtualMachineTemplateSpecParameters[],
+) =>
+  produce(template, (draftTemplate) => {
+    if (isOpenShiftTemplate(draftTemplate)) draftTemplate.parameters = parameters;
+    if (isVirtualMachineTemplate(draftTemplate))
+      draftTemplate.spec.parameters = parameters as V1alpha1VirtualMachineTemplateSpecParameters[];
+  });
+
+export const createTemplateDraft = (
+  template: Template,
+  namespace: string,
+  parameters: TemplateParameter[] | V1alpha1VirtualMachineTemplateSpecParameters[],
+) =>
+  produce(template, (draftTemplate) => {
+    if (isOpenShiftTemplate(draftTemplate)) draftTemplate.parameters = parameters;
+    if (isVirtualMachineTemplate(draftTemplate))
+      draftTemplate.spec.parameters = parameters as V1alpha1VirtualMachineTemplateSpecParameters[];
+
+    draftTemplate.metadata = { ...draftTemplate.metadata, namespace };
+  });
 
 export const bootDiskSourceIsRegistry = (template: V1Template) => {
   const vmObject: V1VirtualMachine = getTemplateVirtualMachineObject(template);
@@ -125,4 +159,38 @@ export const updateTemplate = (template: V1Template) => {
     name: getName(template),
     ns: getNamespace(template),
   });
+};
+
+export const createProcessedTemplate = <T extends Template>(
+  template: T,
+  cluster: string,
+  namespace: string,
+  excludedParameters: TemplateParameter[],
+  setTemplateWithGeneratedValues: (value: SetStateAction<Template>) => void,
+  setError: (value: SetStateAction<Error>) => void,
+  setLoading: (value: SetStateAction<boolean>) => void,
+) => {
+  kubevirtK8sCreate<T>({
+    cluster,
+    data: template,
+    model: isOpenShiftTemplate(template)
+      ? ProcessedTemplatesModel
+      : VirtualMachineTemplateRequestModel,
+    ns: namespace,
+    queryParams: {
+      dryRun: 'All',
+    },
+  })
+    .then((processedTemplate) => {
+      const mergedParameters = [...(getParameters(processedTemplate) ?? []), ...excludedParameters];
+
+      setTemplateWithGeneratedValues(replaceTemplateParameters(template, mergedParameters));
+      setError(null);
+      setLoading(false);
+    })
+    .catch((apiError) => {
+      setTemplateWithGeneratedValues(template);
+      setError(apiError);
+      setLoading(false);
+    });
 };
