@@ -2,6 +2,7 @@ import React, { FC } from 'react';
 import classnames from 'classnames';
 
 import { FLAG_LIGHTSPEED_PLUGIN } from '@kubevirt-utils/flags/consts';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { useFlag } from '@openshift-console/dynamic-plugin-sdk';
 import { useWizardContext, WizardFooter } from '@patternfly/react-core';
 import useCloseWizard from '@virtualmachines/creation-wizard/hooks/useCloseWizard';
@@ -13,7 +14,7 @@ const TemplateStepFooter: FC = ({}) => {
   const { activeStep, goToNextStep, goToPrevStep } = useWizardContext();
   const { createVMFromTemplate } = useCreateVMFromTemplate();
   const closeWizard = useCloseWizard();
-  const { setTemplatesDrawerIsOpen } = useVMWizardStore();
+  const { selectedTemplate, setTemplatesDrawerIsOpen } = useVMWizardStore();
 
   const handleGoToNextStep = async () => {
     await createVMFromTemplate();
@@ -26,6 +27,7 @@ const TemplateStepFooter: FC = ({}) => {
       activeStep={activeStep}
       cancelButtonProps={{ className: classnames({ 'pf-v6-u-mr-4xl': hasOLSConsole }) }}
       isBackDisabled={activeStep.index === 1}
+      isNextDisabled={isEmpty(selectedTemplate)}
       onBack={goToPrevStep}
       onClose={closeWizard}
       onNext={handleGoToNextStep}

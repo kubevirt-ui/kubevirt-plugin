@@ -79,6 +79,7 @@ const useInstanceTypeVMStore = create<InstanceTypeVMStore>()((set) => {
         },
         selectedSize: selectedSize,
       })),
+    setUseBootSource: (useBootSource: boolean) => set({ useBootSource }),
     setVolumeListNamespace: (volumeListNamespace: string) => set({ volumeListNamespace }),
     setVolumeSnapshotSource: (volumeSnapshotSource: VolumeSnapshotKind) =>
       set({ volumeSnapshotSource }),

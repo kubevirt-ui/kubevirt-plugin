@@ -11,7 +11,7 @@ export const initialInstanceTypeVMState: InstanceTypeVMState = {
   selectedInstanceType: null,
   selectedSeries: '',
   selectedSize: '',
+  useBootSource: true,
   volumeListNamespace: '',
-
   volumeSnapshotSource: null,
 };
