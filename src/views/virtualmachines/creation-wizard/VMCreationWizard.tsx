@@ -1,18 +1,14 @@
 import React, { FC, useEffect, useRef } from 'react';
-import classnames from 'classnames';
 
-import { FLAG_LIGHTSPEED_PLUGIN } from '@kubevirt-utils/flags/consts';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { clearCustomizeInstanceType } from '@kubevirt-utils/store/customizeInstanceType';
 import { getValidNamespace } from '@kubevirt-utils/utils/utils';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
-import { useFlag } from '@openshift-console/dynamic-plugin-sdk';
 import { Wizard, WizardHeader, WizardStep } from '@patternfly/react-core';
 import { useSignals } from '@preact/signals-react/runtime';
 import DefaultWizardFooter from '@virtualmachines/creation-wizard/components/DefaultWizardFooter';
 import useCloseWizard from '@virtualmachines/creation-wizard/hooks/useCloseWizard';
-import useCreateVM from '@virtualmachines/creation-wizard/hooks/useCreateVM';
 import useVMWizardStore from '@virtualmachines/creation-wizard/state/vm-wizard-store/useVMWizardStore';
 import CloneSourceStep from '@virtualmachines/creation-wizard/steps/CloneSourceStep/CloneSourceStep';
 import CustomizationStep from '@virtualmachines/creation-wizard/steps/CustomizationStep/CustomizationStep';
@@ -20,6 +16,7 @@ import BootSourceStep from '@virtualmachines/creation-wizard/steps/InstanceTypes
 import ComputeResourcesStepFooter from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/ComputeResourcesStep/components/ComputeResourcesStepFooter';
 import ComputeResourcesStep from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/ComputeResourcesStep/ComputeResourcesStep';
 import GuestOSStep from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/GuestOSStep/GuestOSStep';
+import ReviewAndCreateStepFooter from '@virtualmachines/creation-wizard/steps/ReviewAndCreateStep/components/ReviewAndCreateStepFooter';
 import ReviewAndCreateStep from '@virtualmachines/creation-wizard/steps/ReviewAndCreateStep/ReviewAndCreateStep';
 import TemplateStepFooter from '@virtualmachines/creation-wizard/steps/TemplateStep/components/TemplateStepFooter';
 import TemplateStep from '@virtualmachines/creation-wizard/steps/TemplateStep/TemplateStep';
@@ -35,7 +32,6 @@ import DeploymentDetailsStep from './steps/DeploymentDetailsStep/DeploymentDetai
 
 const VMCreationWizard: FC = () => {
   const { t } = useKubevirtTranslation();
-  const hasOLSConsole = useFlag(FLAG_LIGHTSPEED_PLUGIN);
   useSignals();
   const {
     creationMethod,
@@ -47,7 +43,6 @@ const VMCreationWizard: FC = () => {
   } = useVMWizardStore();
   const clusterParam = useClusterParam();
   const hasInitialized = useRef(false);
-  const createVM = useCreateVM();
   const closeWizard = useCloseWizard();
   const [activeNamespace] = useActiveNamespace();
   const namespace = getValidNamespace(activeNamespace);
@@ -145,11 +140,7 @@ const VMCreationWizard: FC = () => {
           <CloneSourceStep />
         </WizardStep>
         <WizardStep
-          footer={{
-            cancelButtonProps: { className: classnames({ 'pf-v6-u-mr-4xl': hasOLSConsole }) },
-            nextButtonText: isCloneMethod ? t('Clone VirtualMachine') : t('Create VirtualMachine'),
-            onNext: createVM,
-          }}
+          footer={<ReviewAndCreateStepFooter />}
           id={VMWizardStep.REVIEW_AND_CREATE}
           name={t('Review and create')}
         >
