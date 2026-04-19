@@ -26,9 +26,7 @@ const DeploymentDetailsStep: FC = () => {
         </Title>
       </StackItem>
       <StackItem>
-        {t(
-          'Your VirtualMachine will be created in the location below based on your current view. Edit to change.',
-        )}
+        {t('Your VirtualMachine will be created in the following location unless you edit it:')}
       </StackItem>
       <StackItem>
         <VMCreationLocationDisplay setEditCreationLocation={setEditCreationLocation} />

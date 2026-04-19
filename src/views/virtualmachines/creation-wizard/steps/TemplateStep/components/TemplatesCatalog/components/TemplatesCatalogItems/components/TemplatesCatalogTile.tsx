@@ -1,7 +1,5 @@
 import React, { FC, memo, useMemo } from 'react';
 
-import { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
-import ArchitectureLabel from '@kubevirt-utils/components/ArchitectureLabel/ArchitectureLabel';
 import DeprecatedBadge from '@kubevirt-utils/components/badges/DeprecatedBadge/DeprecatedBadge';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getAnnotations, getName, getNamespace, getUID } from '@kubevirt-utils/resources/shared';
@@ -9,22 +7,15 @@ import {
   getTemplateFlavorData,
   isDeprecatedTemplate,
   Template,
-  WORKLOADS_LABELS,
 } from '@kubevirt-utils/resources/template';
-import { getTemplateBootSourceType } from '@kubevirt-utils/resources/template/hooks/useVmTemplateSource/utils';
-import {
-  getTemplateName,
-  getTemplateWorkload,
-} from '@kubevirt-utils/resources/template/utils/selectors';
-import { getVMBootSourceLabel } from '@kubevirt-utils/resources/vm/utils/source';
-import { ARCHITECTURE_TITLE, getArchitecture } from '@kubevirt-utils/utils/architecture';
+import { getTemplateName } from '@kubevirt-utils/resources/template/utils/selectors';
+import { getArchitecture } from '@kubevirt-utils/utils/architecture';
 import { readableSizeUnit } from '@kubevirt-utils/utils/units';
 import {
   Badge,
   Card,
   CardBody,
   CardHeader,
-  Skeleton,
   Split,
   SplitItem,
   Stack,
@@ -35,37 +26,21 @@ import { getTemplateOSIcon } from '@virtualmachines/creation-wizard/utils/os-ico
 import './TemplatesCatalogTile.scss';
 
 export type TemplatesCatalogTileProps = {
-  availableDatasources: Record<string, V1beta1DataSource>;
-  availableTemplatesUID: Set<string>;
-  bootSourcesLoaded: boolean;
   isSelected?: boolean;
   onClick: (template: Template) => void;
   template: Template;
 };
 
 const TemplatesCatalogTile: FC<TemplatesCatalogTileProps> = memo(
-  ({
-    availableDatasources,
-    availableTemplatesUID,
-    bootSourcesLoaded,
-    isSelected,
-    onClick,
-    template,
-  }) => {
+  ({ isSelected, onClick, template }) => {
     const { t } = useKubevirtTranslation();
 
     const isDeprecated = isDeprecatedTemplate(template);
-    const workload = getTemplateWorkload(template);
     const templateID = getUID(template);
     const templateName = getName(template);
     const displayName = getTemplateName(template);
-    const bootSource = getTemplateBootSourceType(template);
-    const isBootSourceAvailable = availableTemplatesUID.has(template.metadata.uid);
-    const dataSource =
-      availableDatasources[
-        `${bootSource?.source?.sourceRef?.namespace}-${bootSource?.source?.sourceRef?.name}`
-      ];
     const { cpuCount, memory } = getTemplateFlavorData(template);
+    const architecture = getArchitecture(template);
 
     const icon = useMemo(() => {
       return getTemplateOSIcon(template);
@@ -96,33 +71,25 @@ const TemplatesCatalogTile: FC<TemplatesCatalogTileProps> = memo(
               <Split>
                 {icon && (
                   <SplitItem>
-                    <img alt={`${templateName} icon`} className="catalog-tile-pf-icon" src={icon} />
+                    <img
+                      alt={`${templateName} icon`}
+                      className="templates-catalog-tile__icon pf-v6-u-mr-sm"
+                      src={icon}
+                    />
                   </SplitItem>
                 )}
+                <SplitItem>
+                  <div className="pf-v6-u-font-weight-bold">{displayName}</div>
+                </SplitItem>
                 <SplitItem isFilled />
                 <SplitItem>
-                  <Stack className="badge-stack" key="badge-stack">
-                    {bootSourcesLoaded
-                      ? isBootSourceAvailable && [
-                          <Badge key="available-boot">{t('Source available')}</Badge>,
-                        ]
-                      : [
-                          <Skeleton
-                            className="badgeload"
-                            height="1.125rem" // 18px
-                            key="loading-sources"
-                            width="6.563rem" // 105px
-                          />,
-                        ]}
+                  <Stack className="badge-stack pf-v6-u-ml-xs" key="badge-stack">
+                    {architecture && <Badge key="architecture">{getArchitecture(template)}</Badge>}
                     {isDeprecated ? <DeprecatedBadge className="deprecated-template" /> : null}
                   </Stack>
                 </SplitItem>
               </Split>
             </StackItem>
-            <StackItem>
-              <b>{displayName}</b>
-            </StackItem>
-            <StackItem className="pf-v6-u-text-color-subtle">{templateName}</StackItem>
           </Stack>
         </CardHeader>
         <CardBody>
@@ -130,23 +97,13 @@ const TemplatesCatalogTile: FC<TemplatesCatalogTileProps> = memo(
             <StackItem>
               <Stack>
                 <StackItem>
-                  <b>{ARCHITECTURE_TITLE}</b>{' '}
-                  <ArchitectureLabel architecture={getArchitecture(template)} />
-                </StackItem>
-                <StackItem>
                   <b>{t('Project')}</b> {getNamespace(template)}
                 </StackItem>
                 <StackItem>
-                  <b>{t('Boot source')}</b> {getVMBootSourceLabel(bootSource?.type, dataSource)}
+                  <b>{t('OS')}</b> {displayName}
                 </StackItem>
                 <StackItem>
-                  <b>{t('Workload')}</b> {WORKLOADS_LABELS?.[workload] ?? t('Other')}
-                </StackItem>
-                <StackItem>
-                  <b>{t('CPU')}</b> {cpuCount}
-                </StackItem>
-                <StackItem>
-                  <b>{t('Memory')}</b> {readableSizeUnit(memory)}
+                  <b>{t('vCPU | Memory')}</b> {cpuCount} | {readableSizeUnit(memory)}
                 </StackItem>
               </Stack>
             </StackItem>

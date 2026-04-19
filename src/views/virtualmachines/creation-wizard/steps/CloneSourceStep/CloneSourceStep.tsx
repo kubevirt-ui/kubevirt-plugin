@@ -14,7 +14,7 @@ const CloneSourceStep: FC = () => {
           {t('Source')}
         </Title>
       </StackItem>
-      <StackItem>{t('Select a VirtualMachine to clone.')}</StackItem>
+      <StackItem>{t('Select a VM to clone.')}</StackItem>
       <StackItem>
         <VirtualMachinesList />
       </StackItem>

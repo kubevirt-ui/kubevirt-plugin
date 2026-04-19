@@ -29,7 +29,7 @@ export const getVMCreationMethodsDetails = (t: TFunction) => {
     },
     [VMCreationMethod.INSTANCE_TYPE]: {
       description: t(
-        'Create a VirtualMachine by selecting an operating system and the right performance for your workload.',
+        'Create a new VM by selecting an operating system and the right performance for your workload.',
       ),
       IconComponent: InstanceTypeIcon,
       label: t('Custom configuration (default)'),

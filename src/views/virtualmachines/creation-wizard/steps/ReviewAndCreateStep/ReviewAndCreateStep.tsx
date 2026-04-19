@@ -1,29 +1,21 @@
 import React, { FC } from 'react';
-import { Trans } from 'react-i18next';
 
 import { getStartAfterCreationLabel } from '@kubevirt-utils/components/RunStrategyModal/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getName } from '@kubevirt-utils/resources/shared';
 import {
   getDefaultRunningStrategy,
   RUNSTRATEGY_HALTED,
 } from '@kubevirt-utils/resources/vm/utils/constants';
-import { updateCustomizeInstanceType, vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
+import { updateCustomizeInstanceType } from '@kubevirt-utils/store/customizeInstanceType';
 import { Checkbox, Stack, StackItem, Title, TitleSizes } from '@patternfly/react-core';
 import useVMWizardStore from '@virtualmachines/creation-wizard/state/vm-wizard-store/useVMWizardStore';
 import ReviewGrid from '@virtualmachines/creation-wizard/steps/ReviewAndCreateStep/components/ReviewGrid/ReviewGrid';
-import { isCloneCreationMethod } from '@virtualmachines/creation-wizard/utils/utils';
 
 import NameAndDescriptionForm from './components/NameAndDescriptionForm';
 
 const ReviewAndCreateStep: FC = () => {
   const { t } = useKubevirtTranslation();
-  const { creationMethod, setStartVM, startVM } = useVMWizardStore();
-  const vm = vmSignal.value;
-  const vmName = getName(vm);
-  const isCloneMethod = isCloneCreationMethod(creationMethod);
-  const cloneMethodLabel = isCloneMethod ? 'Clone' : 'Create';
-
+  const { setStartVM, startVM } = useVMWizardStore();
   return (
     <Stack hasGutter>
       <StackItem>
@@ -32,10 +24,9 @@ const ReviewAndCreateStep: FC = () => {
         </Title>
       </StackItem>
       <StackItem>
-        <Trans ns="plugin__kubevirt-plugin" t={t}>
-          Review and click <strong>{{ cloneMethodLabel }} VirtualMachine</strong> to start creating{' '}
-          {{ vmName }}.
-        </Trans>
+        {t(
+          "Review your VirtualMachine configuration. After the name is set, you're ready to create your VirtualMachine.",
+        )}
       </StackItem>
       <StackItem>
         <ReviewGrid />

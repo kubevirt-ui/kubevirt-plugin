@@ -3,7 +3,6 @@ import produce from 'immer';
 
 import useIsIPv6SingleStackCluster from '@kubevirt-utils/hooks/useIPStackType/useIsIPv6SingleStackCluster';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getName } from '@kubevirt-utils/resources/shared';
 import { getNetworks } from '@kubevirt-utils/resources/vm';
 import { isPodNetwork } from '@kubevirt-utils/resources/vm/utils/network/selectors';
 import { removePodNetworkFromVM } from '@kubevirt-utils/resources/vm/utils/network/utils';
@@ -34,10 +33,7 @@ const CustomizationStep: FC = () => {
         </Title>
       </StackItem>
       <StackItem>
-        {t(
-          'You can customize {{ virtualMachineName }} before creating it by editing it via the tabs.',
-          { virtualMachineName: getName(vm) || '' },
-        )}
+        {t('Optionally, explore the tabs to further edit your VirtualMachine.')}
       </StackItem>
       <StackItem>
         <CustomizeVirtualMachine />

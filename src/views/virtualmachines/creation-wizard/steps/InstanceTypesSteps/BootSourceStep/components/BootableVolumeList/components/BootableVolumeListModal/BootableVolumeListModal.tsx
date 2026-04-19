@@ -4,6 +4,7 @@ import { V1beta1VirtualMachinePreference } from '@kubevirt-ui-ext/kubevirt-api/k
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { UserSettingFavorites } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/types';
+import useBootableVolumes from '@kubevirt-utils/resources/bootableresources/hooks/useBootableVolumes';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { ModalVariant } from '@patternfly/react-core';
 import useInstanceTypeVMStore from '@virtualmachines/creation-wizard/state/instance-type-vm-store/useInstanceTypeVMStore';
@@ -31,8 +32,8 @@ const BootableVolumeListModal: FC<BootableVolumeListModalProps> = ({
   preferencesData,
 }) => {
   const { t } = useKubevirtTranslation();
-
-  const { selectedBootableVolume } = useInstanceTypeVMStore();
+  const { selectedBootableVolume, volumeListNamespace } = useInstanceTypeVMStore();
+  const bootableVolumesData = useBootableVolumes(volumeListNamespace);
 
   const onSave = () => {
     if (!selectedBootableVolume) {
@@ -53,7 +54,10 @@ const BootableVolumeListModal: FC<BootableVolumeListModalProps> = ({
       onSubmit={onSave}
       submitBtnText={t('Select')}
     >
-      <BootableVolumeList instanceTypesAndPreferencesData={preferencesData} />
+      <BootableVolumeList
+        bootableVolumesData={bootableVolumesData}
+        instanceTypesAndPreferencesData={preferencesData}
+      />
     </TabModal>
   );
 };

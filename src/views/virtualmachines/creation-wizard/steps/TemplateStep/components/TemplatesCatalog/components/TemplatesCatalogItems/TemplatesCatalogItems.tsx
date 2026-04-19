@@ -57,9 +57,6 @@ const TemplatesCatalogItems: VFC<TemplatesCatalogItemsProps> = ({
       <Gallery className="vm-catalog-grid" hasGutter id="vm-catalog-grid">
         {sortedTemplates.map((template) => (
           <TemplatesCatalogTile
-            availableDatasources={availableDatasources}
-            availableTemplatesUID={availableTemplatesUID}
-            bootSourcesLoaded={bootSourcesLoaded}
             isSelected={getUID(selectedTemplate) === getUID(template)}
             key={getUID(template) ?? getTemplateName(template)}
             onClick={onTemplateClick}
