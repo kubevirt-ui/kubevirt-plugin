@@ -15,7 +15,7 @@ import { getNetworkInterfaceType } from '@kubevirt-utils/resources/vm/utils/netw
 import { NetworkInterfaceState } from '@kubevirt-utils/resources/vm/utils/network/types';
 import { generatePrettyName } from '@kubevirt-utils/utils/utils';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
-import { ExpandableSection } from '@patternfly/react-core';
+import { Checkbox, ExpandableSection, FormGroup } from '@patternfly/react-core';
 import {
   getConfigInterfaceStateFromVM,
   isLinkStateEditable,
@@ -36,6 +36,7 @@ export type NetworkInterfaceModalOnSubmit = {
   interfaceMACAddress: string;
   interfaceModel: string;
   interfaceType: string;
+  isBootSource?: boolean;
   isLegacyPasst: boolean;
   networkName: string;
   nicName: string;
@@ -85,6 +86,7 @@ const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
     !network ? NetworkInterfaceState.UP : getConfigInterfaceStateFromVM(vm, nicName),
   );
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isBootSource, setIsBootSource] = useState<boolean>(Boolean(iface?.bootOrder));
 
   useEffect(() => {
     if (interfaceType === interfaceTypesProxy.sriov)
@@ -103,6 +105,7 @@ const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
         interfaceMACAddress,
         interfaceModel,
         interfaceType,
+        isBootSource,
         isLegacyPasst,
         networkName,
         nicName,
@@ -115,6 +118,7 @@ const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
     interfaceMACAddress,
     interfaceLinkState,
     interfaceType,
+    isBootSource,
     onSubmit,
     isLegacyPasst,
   ]);
@@ -143,6 +147,15 @@ const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
         setSubmitDisabled={setNetworkSelectError}
         vm={vm}
       />
+      <FormGroup fieldId="nic-boot-source">
+        <Checkbox
+          data-test-id="nic-use-as-boot-source"
+          id="nic-boot-source"
+          isChecked={isBootSource}
+          label={t('Use as boot source')}
+          onChange={(_, checked) => setIsBootSource(checked)}
+        />
+      </FormGroup>
       <ExpandableSection
         className="NetworkInterfaceModal__advanced"
         isExpanded={isExpanded}

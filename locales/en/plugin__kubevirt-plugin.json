@@ -2212,6 +2212,7 @@
   "Usage": "Usage",
   "Use \"{{inputValue}}\"": "Use \"{{inputValue}}\"",
   "Use an alternative": "Use an alternative",
+  "Use as boot source": "Use as boot source",
   "Use BIOS when bootloading the guest OS": "Use BIOS when bootloading the guest OS",
   "Use cron formatting to set when and how often to look for new imports.": "Use cron formatting to set when and how often to look for new imports.",
   "Use custom registration server url": "Use custom registration server url",

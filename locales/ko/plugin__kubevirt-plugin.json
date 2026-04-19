@@ -2208,6 +2208,7 @@
   "Usage": "사용량",
   "Use \"{{inputValue}}\"": "\"{{inputValue}}\" 사용",
   "Use an alternative": "대안 사용",
+  "Use as boot source": "Use as boot source",
   "Use BIOS when bootloading the guest OS": "게스트 OS를 부트로딩할 때 BIOS 사용",
   "Use cron formatting to set when and how often to look for new imports.": "cron 포맷을 사용하여 새 가져오기를 찾는 빈도와 시기를 설정합니다.",
   "Use custom registration server url": "사용자 정의 등록 서버 URL 사용",

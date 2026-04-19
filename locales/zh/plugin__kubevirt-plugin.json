@@ -2208,6 +2208,7 @@
   "Usage": "使用",
   "Use \"{{inputValue}}\"": "使用 \"{{inputValue}}\"",
   "Use an alternative": "使用替代方案",
+  "Use as boot source": "Use as boot source",
   "Use BIOS when bootloading the guest OS": "在载入客户端操作系统时使用 BIOS",
   "Use cron formatting to set when and how often to look for new imports.": "使用 cron 格式设置查找新导入的时间和频率。",
   "Use custom registration server url": "使用自定义注册服务器 url",

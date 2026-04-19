@@ -1,11 +1,16 @@
 import React from 'react';
 import { TFunction } from 'react-i18next';
 
-import { V1Interface, V1Network, V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import {
+  V1Disk,
+  V1Interface,
+  V1Network,
+  V1VirtualMachine,
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import TechPreviewBadge from '@kubevirt-utils/components/TechPreviewBadge/TechPreviewBadge';
 import { NetworkAttachmentDefinitionConfig } from '@kubevirt-utils/resources/nad/types';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
-import { getInterface, getInterfaces, getNetworks } from '@kubevirt-utils/resources/vm';
+import { getDisks, getInterface, getInterfaces, getNetworks } from '@kubevirt-utils/resources/vm';
 import {
   NAD_TYPE_OVN_K8S_CNI_OVERLAY,
   PASST_BINDING_NAME,
@@ -109,6 +114,52 @@ export const createInterface = ({
   }
 
   return createdInterface;
+};
+
+/**
+ * Returns the next available bootOrder integer, looking across ALL disks and interfaces.
+ * @param vm
+ */
+export const getNextBootOrder = (vm: V1VirtualMachine): number => {
+  const diskOrders = (getDisks(vm) || []).map((d) => d.bootOrder ?? 0);
+  const ifaceOrders = (getInterfaces(vm) || []).map((i) => i.bootOrder ?? 0);
+  return Math.max(0, ...diskOrders, ...ifaceOrders) + 1;
+};
+
+export type NICBootOrderPreparation = {
+  disksWithOrder: V1Disk[];
+  needsDiskUpdate: boolean;
+  nicBootOrder: number;
+};
+
+/**
+ * Prepares the bootOrder for a NIC being marked as a boot source.
+ * If no disks currently have a bootOrder, assigns sequential bootOrders to all disks
+ * so they retain priority over the incoming NIC in the firmware boot sequence.
+ * Disk numbering starts above any existing interface bootOrders to avoid collisions.
+ * Returns the bootOrder to assign to the NIC and whether the disks array also needs saving.
+ * @param vm
+ */
+export const prepareNICBootOrder = (vm: V1VirtualMachine): NICBootOrderPreparation => {
+  const disks = getDisks(vm) || [];
+  const anyDiskHasBootOrder = disks.some((d) => d.bootOrder != null);
+
+  if (!anyDiskHasBootOrder && disks.length > 0) {
+    // Start disk numbering above any existing interface bootOrders to avoid collisions.
+    const ifaceOrders = (getInterfaces(vm) || []).map((i) => i.bootOrder ?? 0);
+    const diskStart = Math.max(0, ...ifaceOrders) + 1;
+    return {
+      disksWithOrder: disks.map((d, index) => ({ ...d, bootOrder: diskStart + index })),
+      needsDiskUpdate: true,
+      nicBootOrder: diskStart + disks.length,
+    };
+  }
+
+  return {
+    disksWithOrder: disks,
+    needsDiskUpdate: false,
+    nicBootOrder: getNextBootOrder(vm),
+  };
 };
 
 type NADTypes = NetworkAttachmentDefinition | NetworkAttachmentDefinitionKind;

@@ -1,6 +1,9 @@
 import React, { FC, useCallback } from 'react';
+import produce from 'immer';
+import { VirtualMachineModel } from 'src/views/dashboard-extensions/utils';
 
 import {
+  V1Disk,
   V1Interface,
   V1Network,
   V1VirtualMachine,
@@ -10,6 +13,7 @@ import NetworkInterfaceModal from '@kubevirt-utils/components/NetworkInterfaceMo
 import {
   createInterface,
   createNetwork,
+  prepareNICBootOrder,
 } from '@kubevirt-utils/components/NetworkInterfaceModal/utils/helpers';
 import { getInterface, getInterfaces, getNetworks } from '@kubevirt-utils/resources/vm';
 import {
@@ -17,13 +21,16 @@ import {
   addNetwork,
   patchVM,
 } from '@kubevirt-utils/resources/vm/utils/network/patch';
+import { getCluster } from '@multicluster/helpers/selectors';
+import { kubevirtK8sUpdate } from '@multicluster/k8sRequests';
 
 type VirtualMachinesNetworkInterfaceModalProps = {
   headerText: string;
   isOpen: boolean;
-  onAddNetworkInterface: (
+  onAddNetworkInterface?: (
     updatedNetworks: V1Network[],
     updatedInterfaces: V1Interface[],
+    updatedDisks?: V1Disk[],
   ) => Promise<V1VirtualMachine>;
   onClose: () => void;
   vm: V1VirtualMachine;
@@ -43,6 +50,7 @@ const VirtualMachinesNetworkInterfaceModal: FC<VirtualMachinesNetworkInterfaceMo
         interfaceMACAddress,
         interfaceModel,
         interfaceType,
+        isBootSource = false,
         isLegacyPasst,
         networkName,
         nicName,
@@ -64,10 +72,32 @@ const VirtualMachinesNetworkInterfaceModal: FC<VirtualMachinesNetworkInterfaceMo
           nicName,
         });
 
+        const { disksWithOrder, needsDiskUpdate, nicBootOrder } = prepareNICBootOrder(vm);
+        if (isBootSource) resultInterface.bootOrder = nicBootOrder;
+
         if (onAddNetworkInterface) {
           const updatedNetworks: V1Network[] = [...(getNetworks(vm) || []), resultNetwork];
           const updatedInterfaces: V1Interface[] = [...(getInterfaces(vm) || []), resultInterface];
-          return onAddNetworkInterface(updatedNetworks, updatedInterfaces);
+          return onAddNetworkInterface(
+            updatedNetworks,
+            updatedInterfaces,
+            isBootSource && needsDiskUpdate ? disksWithOrder : undefined,
+          );
+        }
+
+        if (isBootSource && needsDiskUpdate) {
+          const newVM = produce(vm, (draftVM) => {
+            draftVM.spec!.template!.spec!.domain!.devices!.disks = disksWithOrder;
+            getNetworks(draftVM)!.push(resultNetwork);
+            getInterfaces(draftVM)!.push(resultInterface);
+          });
+          return kubevirtK8sUpdate({
+            cluster: getCluster(vm),
+            data: newVM,
+            model: VirtualMachineModel,
+            name: newVM.metadata?.name,
+            ns: newVM.metadata?.namespace,
+          });
         }
 
         return patchVM(vm, [
