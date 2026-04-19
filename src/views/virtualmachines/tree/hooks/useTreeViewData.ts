@@ -18,9 +18,10 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
 import useProjects from '@kubevirt-utils/hooks/useProjects';
 import { getName } from '@kubevirt-utils/resources/shared';
-import { universalComparator } from '@kubevirt-utils/utils/utils';
+import { isEmpty, universalComparator } from '@kubevirt-utils/utils/utils';
 import useMulticlusterNamespaces from '@multicluster/hooks/useMulticlusterNamespaces';
 import useIsACMPage from '@multicluster/useIsACMPage';
+import { WatchK8sResource } from '@openshift-console/dynamic-plugin-sdk';
 import { useK8sWatchResources } from '@openshift-console/dynamic-plugin-sdk';
 import { TreeViewDataItem } from '@patternfly/react-core';
 import { useFleetClusterNames } from '@stolostron/multicluster-sdk';
@@ -56,11 +57,15 @@ export const useTreeViewData = (): UseTreeViewData => {
 
   const loadVMsPerNamespace = !isACMTreeView && projectNamesLoaded && !isAdmin;
 
-  const [allVMs, allVMsLoaded] = useKubevirtWatchResource<V1VirtualMachine[]>({
-    groupVersionKind: VirtualMachineModelGroupVersionKind,
-    isList: true,
-    limit: OBJECTS_FETCHING_LIMIT,
-  });
+  const [allVMs, allVMsLoaded] = useKubevirtWatchResource<V1VirtualMachine[]>(
+    (isAdmin || isACMTreeView
+      ? {
+          groupVersionKind: VirtualMachineModelGroupVersionKind,
+          isList: true,
+          limit: OBJECTS_FETCHING_LIMIT,
+        }
+      : null) as WatchK8sResource,
+  );
 
   // user has limited access, so we can only get vms from allowed namespaces
   const allowedResources = useK8sWatchResources<{ [key: string]: V1VirtualMachine[] }>(
@@ -78,11 +83,15 @@ export const useTreeViewData = (): UseTreeViewData => {
     ),
   );
 
-  const [allVMIM] = useKubevirtWatchResource<V1VirtualMachineInstanceMigration[]>({
-    groupVersionKind: VirtualMachineInstanceMigrationModelGroupVersionKind,
-    isList: true,
-    limit: OBJECTS_FETCHING_LIMIT,
-  });
+  const [allVMIM] = useKubevirtWatchResource<V1VirtualMachineInstanceMigration[]>(
+    (isAdmin || isACMTreeView
+      ? {
+          groupVersionKind: VirtualMachineInstanceMigrationModelGroupVersionKind,
+          isList: true,
+          limit: OBJECTS_FETCHING_LIMIT,
+        }
+      : null) as WatchK8sResource,
+  );
 
   const allowedVMIMResources = useK8sWatchResources<{
     [key: string]: V1VirtualMachineInstanceMigration[];
@@ -127,7 +136,8 @@ export const useTreeViewData = (): UseTreeViewData => {
   const loaded =
     projectsLoaded &&
     (loadVMsPerNamespace
-      ? Object.values(allowedResources).some((resource) => resource.loaded)
+      ? isEmpty(allowedResources) ||
+        Object.values(allowedResources).every((resource) => resource.loaded || resource.loadError)
       : allVMsLoaded);
 
   const treeData = useMemo(() => {

@@ -6,8 +6,10 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import OnboardingPopover from '../OnboardingPopover';
 import { OnboardingPopoverKey } from '../types';
 
-const VMsTabOnboardingPopover: FC = ({ children }) => {
+const VMsTabOnboardingPopover: FC = () => {
   const { t } = useKubevirtTranslation();
+
+  const triggerElement = document.querySelector<HTMLElement>('[data-test="vm-list-tab"]');
 
   return (
     <OnboardingPopover
@@ -19,12 +21,12 @@ const VMsTabOnboardingPopover: FC = ({ children }) => {
           high-level summary of your current view, including health and alerts.
         </Trans>
       }
+      coveredByTourSteps={[2, 3]}
       headerContent={t('Looking for your VMs?')}
       hideOnTriggerClick
       popoverKey={OnboardingPopoverKey.VMsTab}
-    >
-      {children}
-    </OnboardingPopover>
+      triggerElement={triggerElement}
+    />
   );
 };
 

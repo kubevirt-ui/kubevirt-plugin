@@ -1,7 +1,10 @@
-import React, { FC, useCallback, useState } from 'react';
+import React, { FC, useCallback, useEffect, useState } from 'react';
 import openCulture from 'images/openCulture.svg';
 
-import { runningTourSignal } from '@kubevirt-utils/components/GuidedTour/utils/guidedTourSignals';
+import {
+  runningTourSignal,
+  welcomeModalDismissedSignal,
+} from '@kubevirt-utils/components/GuidedTour/utils/guidedTourSignals';
 import useIsWindowsSupportedArchitecture from '@kubevirt-utils/hooks/useIsWindowsSupportedArchitecture';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
@@ -17,18 +20,27 @@ import {
   Stack,
   Title,
 } from '@patternfly/react-core';
+import { useSignals } from '@preact/signals-react/runtime';
 
 import WelcomeButtons from './components/WelcomeButtons';
 
 import './WelcomeModal.scss';
 
 const WelcomeModal: FC = () => {
+  useSignals();
   const { t } = useKubevirtTranslation();
   const [isOpen, setIsOpen] = useState<boolean>(true);
   const [quickStarts, setQuickStarts, loaded] = useKubevirtUserSettings('quickStart');
   const isWindowsSupported = useIsWindowsSupportedArchitecture();
 
-  const onClose = useCallback(() => setIsOpen(false), []);
+  useEffect(() => {
+    welcomeModalDismissedSignal.value = false;
+  }, []);
+
+  const onClose = useCallback(() => {
+    setIsOpen(false);
+    welcomeModalDismissedSignal.value = true;
+  }, []);
 
   if (runningTourSignal.value || !loaded || quickStarts?.dontShowWelcomeModal) return null;
 

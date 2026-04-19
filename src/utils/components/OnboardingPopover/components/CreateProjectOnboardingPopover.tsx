@@ -19,6 +19,7 @@ const CreateProjectOnboardingPopover: FC<CreateProjectOnboardingPopoverProps> = 
       bodyContent={t(
         'Right-click a cluster in the navigation tree to create a new project and start organizing your workspace.',
       )}
+      coveredByTourSteps={[0]}
       headerContent={t('Create a new project')}
       popoverKey={OnboardingPopoverKey.CreateProject}
       triggerElement={triggerElement}
