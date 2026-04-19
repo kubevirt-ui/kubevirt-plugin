@@ -10,7 +10,6 @@ import {
 import { ALL_PROJECTS } from '@kubevirt-utils/hooks/constants';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import useBootableVolumes from '@kubevirt-utils/resources/bootableresources/hooks/useBootableVolumes';
 import useHideDeprecatedBootableVolumes from '@kubevirt-utils/resources/bootableresources/hooks/useHideDeprecatedBootableVolumes';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { getName } from '@kubevirt-utils/resources/shared';
@@ -19,7 +18,10 @@ import { isEmpty, OS_IMAGES_NS } from '@kubevirt-utils/utils/utils';
 import { Card, FormGroup, Skeleton, Split, SplitItem } from '@patternfly/react-core';
 import useInstanceTypeVMStore from '@virtualmachines/creation-wizard/state/instance-type-vm-store/useInstanceTypeVMStore';
 import usePreferencesData from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/BootSourceStep/components/BootableVolumeList/hooks/usePreferencesData';
-import { UseInstanceTypeAndPreferencesValues } from '@virtualmachines/creation-wizard/utils/types';
+import {
+  UseBootableVolumesValues,
+  UseInstanceTypeAndPreferencesValues,
+} from '@virtualmachines/creation-wizard/utils/types';
 
 import BootableVolumeEmptyState from './components/BootableVolumeEmptyState/BootableVolumeEmptyState';
 import BootableVolumeListPagination from './components/BootableVolumeListPagination/BootableVolumeListPagination';
@@ -31,10 +33,14 @@ import { getPaginationFromVolumeIndex } from './utils/utils';
 import './BootableVolumeList.scss';
 
 type BootableVolumeListProps = {
+  bootableVolumesData: UseBootableVolumesValues;
   instanceTypesAndPreferencesData: UseInstanceTypeAndPreferencesValues;
 };
 
-const BootableVolumeList: FC<BootableVolumeListProps> = ({ instanceTypesAndPreferencesData }) => {
+const BootableVolumeList: FC<BootableVolumeListProps> = ({
+  bootableVolumesData,
+  instanceTypesAndPreferencesData,
+}) => {
   const { t } = useKubevirtTranslation();
   const isAdmin = useIsAdmin();
   const operatorNamespace = operatorNamespaceSignal.value;
@@ -51,7 +57,6 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({ instanceTypesAndPrefe
   const { preferencesMap, userPreferencesData, userPreferencesLoaded, userPreferencesMap } =
     usePreferencesData(volumeListNamespace, preferencesData);
 
-  const bootableVolumesData = useBootableVolumes(volumeListNamespace);
   const { bootableVolumes, loaded } = bootableVolumesData;
 
   const displayShowAllButton = true;

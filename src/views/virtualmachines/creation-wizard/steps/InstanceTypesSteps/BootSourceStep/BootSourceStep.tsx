@@ -2,6 +2,7 @@ import React, { FC, useState } from 'react';
 
 import useInstanceTypesAndPreferences from '@kubevirt-utils/hooks/useInstanceTypesAndPreferences';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useBootableVolumes from '@kubevirt-utils/resources/bootableresources/hooks/useBootableVolumes';
 import { getValidNamespace } from '@kubevirt-utils/utils/utils';
 import {
   Radio,
@@ -12,8 +13,10 @@ import {
   Title,
   TitleSizes,
 } from '@patternfly/react-core';
+import useInstanceTypeVMStore from '@virtualmachines/creation-wizard/state/instance-type-vm-store/useInstanceTypeVMStore';
 import useVMWizardStore from '@virtualmachines/creation-wizard/state/vm-wizard-store/useVMWizardStore';
 import BootableVolumeList from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/BootSourceStep/components/BootableVolumeList/BootableVolumeList';
+import BootableVolumesPipelinesHint from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/BootSourceStep/components/BootableVolumeList/components/BootableVolumesPipelinesHint/BootableVolumesPipelinesHint';
 
 import AddBootableVolumeButton from './components/AddBootableVolumeButton';
 
@@ -24,6 +27,8 @@ const BootSourceStep: FC = () => {
   const instanceTypesAndPreferencesData = useInstanceTypesAndPreferences(
     getValidNamespace(project),
   );
+  const { volumeListNamespace } = useInstanceTypeVMStore();
+  const bootableVolumesData = useBootableVolumes(volumeListNamespace);
 
   return (
     <Stack hasGutter>
@@ -32,18 +37,12 @@ const BootSourceStep: FC = () => {
           {t('Boot source')}
         </Title>
       </StackItem>
-      <StackItem>
-        {t(
-          'Choose how the VirtualMachine will start. You can select a bootable disk now or configure storage after creation.',
-        )}
-      </StackItem>
+      <StackItem>{t('Select a boot source (volume or ISO) now or configure it later.')}</StackItem>
       <StackItem>
         <Split>
           <SplitItem>
             <Radio
-              description={t(
-                'Start your VM with an existing disk image or volume from your project.',
-              )}
+              description={t('Create your VM from an existing boot source or add a new one.')}
               id="boot-volume-option"
               isChecked={useBootSource}
               label={t('Boot volume')}
@@ -58,19 +57,24 @@ const BootSourceStep: FC = () => {
         </Split>
       </StackItem>
       {useBootSource && (
-        <BootableVolumeList instanceTypesAndPreferencesData={instanceTypesAndPreferencesData} />
+        <BootableVolumeList
+          bootableVolumesData={bootableVolumesData}
+          instanceTypesAndPreferencesData={instanceTypesAndPreferencesData}
+        />
       )}
       <StackItem>
         <Radio
-          description={t(
-            'Create an empty VirtualMachine. You can mount an ISO or attach storage during the customization step.',
-          )}
+          description={t('Assign a boot source for your VM during the customization step.')}
           id="no-boot-volume-option"
           isChecked={!useBootSource}
           label={t('No boot source')}
           name="boot-volume"
           onChange={() => setUseBootSource(false)}
         />
+      </StackItem>
+      <StackItem isFilled />
+      <StackItem>
+        <BootableVolumesPipelinesHint bootableVolumes={bootableVolumesData?.bootableVolumes} />
       </StackItem>
     </Stack>
   );
