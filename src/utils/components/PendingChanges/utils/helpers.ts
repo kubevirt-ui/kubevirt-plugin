@@ -206,7 +206,9 @@ export const getChangedNICs = (vm: V1VirtualMachine, vmi: V1VirtualMachineInstan
         // model change (virtio <-> e1000e)
         (state.config.iface?.model &&
           state.config.iface?.model !==
-            (state.runtime.iface?.model ?? getDefaultInterfaceModel(vmi))),
+            (state.runtime.iface?.model ?? getDefaultInterfaceModel(vmi))) ||
+        // boot order changed
+        state.config.iface?.bootOrder !== state.runtime.iface?.bootOrder,
     )
     .map((state) => state.runtime?.network?.name);
 

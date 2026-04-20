@@ -9,7 +9,7 @@ import { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { getNetworkNameLabel } from '@kubevirt-utils/resources/vm/utils/network/network-columns';
-import { Label } from '@patternfly/react-core';
+import { Label, Stack, StackItem } from '@patternfly/react-core';
 
 import { SimpleNICPresentation } from '../../utils/types';
 import { getConfigInterfaceState, getRuntimeInterfaceState } from '../../utils/utils';
@@ -26,15 +26,26 @@ type NameCellProps = {
 };
 
 const NameCell: FC<NameCellProps> = ({ row }) => {
+  const { t } = useKubevirtTranslation();
   const { interfaceName, isInterfaceEphemeral, isPending, network } = row;
   const nicName = network?.name;
+  const isBootable = Boolean(row.config?.iface?.bootOrder);
 
   return (
-    <span data-test-id={`nic-${nicName}`}>
-      {!nicName && interfaceName ? <Label>{interfaceName}</Label> : nicName ?? NO_DATA_DASH}
-      {isPending && !isInterfaceEphemeral && <PendingBadge />}
-      {isInterfaceEphemeral && <EphemeralBadge />}
-    </span>
+    <Stack data-test-id={`nic-${nicName}`}>
+      <StackItem>
+        {!nicName && interfaceName ? <Label>{interfaceName}</Label> : nicName ?? NO_DATA_DASH}
+        {isPending && !isInterfaceEphemeral && <PendingBadge />}
+        {isInterfaceEphemeral && <EphemeralBadge />}
+      </StackItem>
+      {isBootable && (
+        <StackItem>
+          <Label color="blue" data-test-id={`nic-bootable-${nicName}`} variant="filled">
+            {t('bootable')}
+          </Label>
+        </StackItem>
+      )}
+    </Stack>
   );
 };
 

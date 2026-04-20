@@ -2232,6 +2232,7 @@
   "Usage": "Utilisation",
   "Use \"{{inputValue}}\"": "Utiliser \"{{inputValue}} \"",
   "Use an alternative": "Utiliser une alternative",
+  "Use as boot source": "Use as boot source",
   "Use BIOS when bootloading the guest OS": "Utiliser le BIOS lors du démarrage du système d'exploitation invité",
   "Use cron formatting to set when and how often to look for new imports.": "Utilisez le formatage cron pour définir quand et à quelle fréquence rechercher de nouvelles importations.",
   "Use custom registration server url": "Utiliser l'URL du serveur d'enregistrement personnalisé",

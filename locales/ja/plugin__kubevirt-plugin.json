@@ -2208,6 +2208,7 @@
   "Usage": "使用",
   "Use \"{{inputValue}}\"": "\"{{inputValue}}\" の使用",
   "Use an alternative": "別のものを使用する",
+  "Use as boot source": "Use as boot source",
   "Use BIOS when bootloading the guest OS": "ゲスト OS のブートロード時に BIOS を使用する",
   "Use cron formatting to set when and how often to look for new imports.": "cron 形式を使用して、新しいインポートを検索する時刻と頻度を設定します。",
   "Use custom registration server url": "カスタム登録サーバー url の使用",

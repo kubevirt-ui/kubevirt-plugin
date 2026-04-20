@@ -2,6 +2,7 @@ import React, { FC } from 'react';
 import classNames from 'classnames';
 
 import {
+  V1Disk,
   V1Interface,
   V1Network,
   V1VirtualMachine,
@@ -17,6 +18,7 @@ type AddNetworkInterfaceButtonProps = {
   onAddNetworkInterface?: (
     updatedNetworks: V1Network[],
     updatedInterfaces: V1Interface[],
+    updatedDisks?: V1Disk[],
   ) => Promise<V1VirtualMachine>;
   vm: V1VirtualMachine;
   vmi?: V1VirtualMachineInstance;
