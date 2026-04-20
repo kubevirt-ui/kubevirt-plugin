@@ -1,0 +1,287 @@
+name: Auto-retest infrastructure failures
+
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  issues: write
+  pull-requests: write
+
+concurrency:
+  group: ci-retest-${{ github.event.issue.number }}
+  cancel-in-progress: false
+
+jobs:
+  triage-and-retest:
+    if: |
+      github.event.issue.pull_request &&
+      github.event.comment.user.login == 'openshift-ci[bot]' &&
+      contains(github.event.comment.body, 'failed') &&
+      contains(github.event.comment.body, 'prow.ci.openshift.org')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check for hold label
+        id: hold-check
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
+        with:
+          script: |
+            const { data: labels } = await github.rest.issues.listLabelsOnIssue({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            const held = labels.some(l => l.name === 'do-not-merge/hold');
+            core.setOutput('held', held.toString());
+
+      - name: Extract build URLs from comment
+        if: steps.hold-check.outputs.held == 'false'
+        id: extract
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
+        with:
+          script: |
+            const body = context.payload.comment.body;
+            const pr = context.issue.number;
+            const orgRepo = `${context.repo.owner}_${context.repo.repo}`;
+
+            const urlPattern = new RegExp(
+              `https://prow\\.ci\\.openshift\\.org/view/gs/test-platform-results/pr-logs/pull/${orgRepo}/(\\d+)/([^/]+)/(\\d+)`,
+              'g'
+            );
+            const matches = [...body.matchAll(urlPattern)];
+
+            if (matches.length === 0) {
+              core.info('No Prow build URLs found in comment');
+              core.setOutput('found', 'false');
+              return;
+            }
+
+            const jobNamePattern = /^[A-Za-z0-9._-]+$/;
+            const jobs = matches
+              .filter(m => jobNamePattern.test(m[2]))
+              .map(m => ({
+                job_name: m[2],
+                build_id: m[3],
+                log_url: `https://storage.googleapis.com/test-platform-results/pr-logs/pull/${orgRepo}/${m[1]}/${m[2]}/${m[3]}/build-log.txt`
+              }));
+
+            if (jobs.length === 0) {
+              core.info('No valid job names extracted');
+              core.setOutput('found', 'false');
+              return;
+            }
+
+            core.setOutput('found', 'true');
+            core.setOutput('jobs', JSON.stringify(jobs));
+
+      - name: Fetch and classify build logs
+        if: steps.extract.outputs.found == 'true'
+        id: classify
+        shell: bash
+        env:
+          JOBS_JSON: ${{ steps.extract.outputs.jobs }}
+        run: |
+          if ! echo "$JOBS_JSON" | jq empty 2>/dev/null; then
+            echo "::error::Failed to parse jobs JSON"
+            echo "is_infra=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          INFRA_PATTERNS=(
+            "received unexpected HTTP status: 50[0-9]"
+            "504 Gateway Timeout"
+            "503 Service Unavailable"
+            "registry\.access\.redhat\.com.*error"
+            "quay\.io.*error"
+            "ErrImagePull"
+            "ImagePullBackOff"
+            "manifest unknown"
+            "failed to resolve reference"
+            "creating build container: initializing source"
+            "could not acquire lease"
+            "cluster creation timed out"
+            "failed to create cluster"
+            "waiting for cluster to initialize.*timed out"
+            "infrastructure setup failed"
+            "NodeNotReady"
+            "insufficient resources"
+            "Insufficient cpu"
+            "Insufficient memory"
+            "connection refused.*(setup|provision|install)"
+            "i/o timeout.*(setup|provision|install)"
+            "dial tcp.*connection refused"
+            "TLS handshake timeout"
+            "storage\.googleapis\.com.*error"
+            "failed to upload.*artifact"
+            "DockerBuildFailed.*initializing source"
+            "error building.*creating build container"
+          )
+
+          while read -r job; do
+            JOB_NAME=$(echo "$job" | jq -r '.job_name')
+            LOG_URL=$(echo "$job" | jq -r '.log_url')
+
+            echo "::group::Analyzing $JOB_NAME"
+
+            if ! HTTP_CODE=$(curl -s -o /tmp/build-log.txt -w "%{http_code}" "$LOG_URL" --max-time 30); then
+              echo "curl failed for $JOB_NAME, skipping"
+              echo "::endgroup::"
+              continue
+            fi
+
+            if [ "$HTTP_CODE" != "200" ]; then
+              echo "Failed to fetch log (HTTP $HTTP_CODE), skipping"
+              echo "::endgroup::"
+              continue
+            fi
+
+            for pattern in "${INFRA_PATTERNS[@]}"; do
+              MATCH=$(grep -Ei "$pattern" /tmp/build-log.txt | tail -3 || true)
+              if [ -n "$MATCH" ]; then
+                echo "INFRA match: $pattern"
+                echo "$JOB_NAME" >> /tmp/infra_jobs.txt
+                echo "$MATCH" >> /tmp/infra_reasons.txt
+                echo "---" >> /tmp/infra_reasons.txt
+                break
+              fi
+            done
+            echo "::endgroup::"
+          done < <(echo "$JOBS_JSON" | jq -c '.[]')
+
+          if [ -f /tmp/infra_jobs.txt ]; then
+            echo "is_infra=true" >> "$GITHUB_OUTPUT"
+            JOBS_LIST=$(sort -u /tmp/infra_jobs.txt | paste -sd ',' -)
+            echo "infra_jobs=$JOBS_LIST" >> "$GITHUB_OUTPUT"
+
+            REASONS_RAW=$(cat /tmp/infra_reasons.txt)
+            REASONS_SIZE=${#REASONS_RAW}
+            REASONS=$(head -c 1000 /tmp/infra_reasons.txt)
+            TRUNCATED="false"
+            if [ "$REASONS_SIZE" -gt 1000 ]; then
+              TRUNCATED="true"
+            fi
+            echo "truncated=$TRUNCATED" >> "$GITHUB_OUTPUT"
+
+            EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
+            echo "infra_reasons<<$EOF" >> "$GITHUB_OUTPUT"
+            echo "$REASONS" >> "$GITHUB_OUTPUT"
+            echo "$EOF" >> "$GITHUB_OUTPUT"
+          else
+            echo "is_infra=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Count previous retests for this SHA
+        if: steps.classify.outputs.is_infra == 'true'
+        id: count
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
+        with:
+          script: |
+            const { data: pr } = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+            });
+            const headSha = pr.head.sha.substring(0, 7);
+
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              per_page: 100,
+            });
+
+            const retestCount = comments.filter(c =>
+              c.body.includes('<!-- ci-triage: INFRASTRUCTURE -->') &&
+              c.body.includes(headSha)
+            ).length;
+
+            core.info(`Found ${retestCount} previous auto-retests for SHA ${headSha}`);
+            core.setOutput('count', retestCount.toString());
+            core.setOutput('sha_short', headSha);
+
+      - name: Post retest comment
+        if: steps.classify.outputs.is_infra == 'true' && fromJSON(steps.count.outputs.count) < 5
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
+        env:
+          SHA_SHORT: ${{ steps.count.outputs.sha_short }}
+          INFRA_JOBS: ${{ steps.classify.outputs.infra_jobs }}
+          INFRA_REASONS: ${{ steps.classify.outputs.infra_reasons }}
+          RETEST_COUNT: ${{ steps.count.outputs.count }}
+          TRUNCATED: ${{ steps.classify.outputs.truncated }}
+        with:
+          script: |
+            const sha = process.env.SHA_SHORT;
+            const jobs = process.env.INFRA_JOBS;
+            const reasons = process.env.INFRA_REASONS;
+            const attempt = parseInt(process.env.RETEST_COUNT, 10) + 1;
+            const truncated = process.env.TRUNCATED === 'true';
+            const truncNote = truncated ? '\n\n_(log truncated)_' : '';
+
+            const body = [
+              '<!-- ci-triage: INFRASTRUCTURE -->',
+              `**CI Triage** (auto-retest ${attempt}/5 for \`${sha}\`)`,
+              '',
+              '**Classification**: Infrastructure failure',
+              `**Failed job(s)**: ${jobs}`,
+              '',
+              '<details><summary>Log excerpt (infrastructure pattern matched)</summary>',
+              '',
+              '```',
+              reasons.trim(),
+              '```',
+              truncNote,
+              '</details>',
+              '',
+              '/retest',
+            ].join('\n');
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: body,
+            });
+
+      - name: Post exhaustion notice
+        if: steps.classify.outputs.is_infra == 'true' && fromJSON(steps.count.outputs.count) >= 5
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
+        env:
+          SHA_SHORT: ${{ steps.count.outputs.sha_short }}
+          INFRA_JOBS: ${{ steps.classify.outputs.infra_jobs }}
+          INFRA_REASONS: ${{ steps.classify.outputs.infra_reasons }}
+          TRUNCATED: ${{ steps.classify.outputs.truncated }}
+        with:
+          script: |
+            const sha = process.env.SHA_SHORT;
+            const jobs = process.env.INFRA_JOBS;
+            const reasons = process.env.INFRA_REASONS;
+            const truncated = process.env.TRUNCATED === 'true';
+            const truncNote = truncated ? '\n\n_(log truncated)_' : '';
+
+            const body = [
+              '<!-- ci-triage: INFRASTRUCTURE_EXHAUSTED -->',
+              `**CI Triage**: Max retries exhausted for \`${sha}\``,
+              '',
+              'Infrastructure failures persisted after 5 automatic retests.',
+              `**Failed job(s)**: ${jobs}`,
+              '',
+              '<details><summary>Log excerpt (infrastructure pattern matched)</summary>',
+              '',
+              '```',
+              reasons.trim(),
+              '```',
+              truncNote,
+              '</details>',
+              '',
+              '**Next steps**:',
+              '- Check the [OpenShift CI status page](https://status.ci.openshift.org/) for ongoing outages',
+              '- Wait for infrastructure to recover and manually run `/retest`',
+              '- If the issue persists, investigate the failing job logs directly',
+            ].join('\n');
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: body,
+            });
