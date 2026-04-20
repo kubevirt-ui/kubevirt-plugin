@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FC } from 'react';
 
 import useInstanceTypesAndPreferences from '@kubevirt-utils/hooks/useInstanceTypesAndPreferences';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -22,7 +22,7 @@ import AddBootableVolumeButton from './components/AddBootableVolumeButton';
 
 const BootSourceStep: FC = () => {
   const { t } = useKubevirtTranslation();
-  const [useBootSource, setUseBootSource] = useState<boolean>(true);
+  const { setUseBootSource, useBootSource } = useInstanceTypeVMStore();
   const { project } = useVMWizardStore();
   const instanceTypesAndPreferencesData = useInstanceTypesAndPreferences(
     getValidNamespace(project),

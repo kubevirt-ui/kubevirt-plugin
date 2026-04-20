@@ -1,14 +1,17 @@
 import React, { FC, useEffect, useRef } from 'react';
+import classnames from 'classnames';
 
+import { FLAG_LIGHTSPEED_PLUGIN } from '@kubevirt-utils/flags/consts';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { clearCustomizeInstanceType } from '@kubevirt-utils/store/customizeInstanceType';
-import { getValidNamespace } from '@kubevirt-utils/utils/utils';
+import { clearCustomizeInstanceType, vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
+import { getValidNamespace, isEmpty } from '@kubevirt-utils/utils/utils';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
-import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
+import { useActiveNamespace, useFlag } from '@openshift-console/dynamic-plugin-sdk';
 import { Wizard, WizardHeader, WizardStep } from '@patternfly/react-core';
 import { useSignals } from '@preact/signals-react/runtime';
 import DefaultWizardFooter from '@virtualmachines/creation-wizard/components/DefaultWizardFooter';
 import useCloseWizard from '@virtualmachines/creation-wizard/hooks/useCloseWizard';
+import useInstanceTypeVMStore from '@virtualmachines/creation-wizard/state/instance-type-vm-store/useInstanceTypeVMStore';
 import useVMWizardStore from '@virtualmachines/creation-wizard/state/vm-wizard-store/useVMWizardStore';
 import CloneSourceStep from '@virtualmachines/creation-wizard/steps/CloneSourceStep/CloneSourceStep';
 import CustomizationStep from '@virtualmachines/creation-wizard/steps/CustomizationStep/CustomizationStep';
@@ -33,6 +36,7 @@ import DeploymentDetailsStep from './steps/DeploymentDetailsStep/DeploymentDetai
 const VMCreationWizard: FC = () => {
   const { t } = useKubevirtTranslation();
   useSignals();
+  const hasOLSConsole = useFlag(FLAG_LIGHTSPEED_PLUGIN);
   const {
     creationMethod,
     project,
@@ -41,6 +45,8 @@ const VMCreationWizard: FC = () => {
     setProject,
     setTemplatesDrawerIsOpen,
   } = useVMWizardStore();
+  const { operatingSystemType, preference, selectedBootableVolume, useBootSource } =
+    useInstanceTypeVMStore();
   const clusterParam = useClusterParam();
   const hasInitialized = useRef(false);
   const closeWizard = useCloseWizard();
@@ -72,6 +78,8 @@ const VMCreationWizard: FC = () => {
   const isCloneMethod = isCloneCreationMethod(creationMethod);
   const isTemplateMethod = isTemplateCreationMethod(creationMethod);
 
+  const cancelButtonProps = { className: classnames({ 'pf-v6-u-mr-4xl': hasOLSConsole }) };
+
   return (
     <TemplatesDrawerWrapper>
       <Wizard
@@ -80,6 +88,7 @@ const VMCreationWizard: FC = () => {
         }}
         className="vm-creation-wizard"
         header={<WizardHeader isCloseHidden title={t('Create VirtualMachine')} />}
+        isVisitRequired
         onClose={closeWizard}
         title={t('Create VirtualMachine')}
       >
@@ -91,7 +100,10 @@ const VMCreationWizard: FC = () => {
           <DeploymentDetailsStep />
         </WizardStep>
         <WizardStep
-          footer={<DefaultWizardFooter />}
+          footer={{
+            cancelButtonProps,
+            isNextDisabled: !operatingSystemType || !preference,
+          }}
           id={VMWizardStep.GUEST_OS}
           isHidden={!isInstanceTypeMethod}
           name={t('Guest OS')}
@@ -99,7 +111,10 @@ const VMCreationWizard: FC = () => {
           <GuestOSStep />
         </WizardStep>
         <WizardStep
-          footer={<DefaultWizardFooter />}
+          footer={{
+            cancelButtonProps,
+            isNextDisabled: useBootSource && isEmpty(selectedBootableVolume),
+          }}
           id={VMWizardStep.BOOT_SOURCE}
           isHidden={!isInstanceTypeMethod}
           name={t('Boot source')}
@@ -132,7 +147,10 @@ const VMCreationWizard: FC = () => {
           <CustomizationStep />
         </WizardStep>
         <WizardStep
-          footer={<DefaultWizardFooter />}
+          footer={{
+            cancelButtonProps,
+            isNextDisabled: isEmpty(vmSignal.value),
+          }}
           id={VMWizardStep.CLONE}
           isHidden={!isCloneMethod}
           name={t('Source')}

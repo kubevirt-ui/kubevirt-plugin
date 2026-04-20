@@ -14,6 +14,7 @@ export type InstanceTypeVMState = {
   selectedInstanceType: { name: string; namespace: null | string };
   selectedSeries: string;
   selectedSize: string;
+  useBootSource: boolean;
   volumeListNamespace: string;
   volumeSnapshotSource?: VolumeSnapshotKind;
 };
@@ -33,6 +34,7 @@ export type InstanceTypeVMActions = {
   setSelectedInstanceType: (instanceType: { name: string; namespace: null | string }) => void;
   setSelectedSeries: (series: string) => void;
   setSelectedSize: (size: string) => void;
+  setUseBootSource: (useBootSource: boolean) => void;
   setVolumeListNamespace: (volumeListNamespace: string) => void;
   setVolumeSnapshotSource: (volumeSnapShotSource: VolumeSnapshotKind) => void;
 };
