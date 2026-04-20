@@ -19,7 +19,7 @@ import { isRunning } from '@virtualmachines/utils';
 
 import { getDataVolumeTemplateSize } from '../components/utils/selectors';
 
-import { DEFAULT_DISK_SIZE, UPLOAD_SUFFIX } from './constants';
+import { DEFAULT_CDROM_DISK_SIZE, DEFAULT_DISK_SIZE, UPLOAD_SUFFIX } from './constants';
 import {
   createDataVolumeName,
   createMutableUploadData,
@@ -69,16 +69,6 @@ export const reorderBootDisk = (
   return isBootDisk ? applyDiskAsBootable(vm, diskName) : removeDiskAsBootable(vm, diskName);
 };
 
-const UPLOAD_SIZE_BUFFER_FACTOR = 1.1; // 10% buffer for filesystem overhead
-const BYTES_PER_GIB = 1024 * 1024 * 1024;
-
-const getUploadFileSizeWithBuffer = (data: V1DiskFormState): null | string => {
-  const fileSize = data?.uploadFile?.file?.size;
-  if (!fileSize) return null;
-  const sizeInGi = Math.ceil((fileSize * UPLOAD_SIZE_BUFFER_FACTOR) / BYTES_PER_GIB);
-  return `${Math.max(sizeInGi, 1)}Gi`;
-};
-
 export const uploadDataVolume = async (
   vm: V1VirtualMachine,
   uploadData: ({ dataVolume, file }: UploadDataProps) => Promise<void>,
@@ -90,8 +80,10 @@ export const uploadDataVolume = async (
 
   dataVolume.metadata.name = dvName || generateUploadDiskName(data.disk.name, UPLOAD_SUFFIX);
   dataVolume.spec.source = { upload: {} };
+  const isCDROM = Boolean(data.disk?.cdrom);
+  const defaultSize = isCDROM ? DEFAULT_CDROM_DISK_SIZE : DEFAULT_DISK_SIZE;
   dataVolume.spec.storage.resources.requests.storage =
-    getUploadFileSizeWithBuffer(data) || getDataVolumeTemplateSize(data) || DEFAULT_DISK_SIZE;
+    getDataVolumeTemplateSize(data) || defaultSize;
 
   await uploadData({ dataVolume, file });
 
