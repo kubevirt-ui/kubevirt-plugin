@@ -11,6 +11,7 @@ import type { ConsolePluginBuildMetadata } from '@openshift-console/dynamic-plug
 import { ResourceRoute } from '@stolostron/multicluster-sdk';
 
 import { PERSPECTIVES } from '../utils/constants/constants';
+import { FLAG_KUBEVIRT_VIRTUALIZATION_NAV } from '../utils/flags/consts';
 
 import {
   CROSS_CLUSTER_MIGRATION_ACTION_ID,
@@ -38,6 +39,7 @@ export const extensions: EncodedExtension[] = [
   {
     flags: {
       disallowed: ['KUBEVIRT_DISALLOW_DYNAMIC_ACM'],
+      required: [FLAG_KUBEVIRT_VIRTUALIZATION_NAV],
     },
     properties: {
       icon: { $codeRef: 'perspective.icon' },

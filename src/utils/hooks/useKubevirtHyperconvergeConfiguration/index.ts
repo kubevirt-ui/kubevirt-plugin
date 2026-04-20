@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 
 import { V1KubeVirtConfiguration } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { getHyperconvergedConfiguration } from '@kubevirt-utils/resources/hyperconverged/selectors';
 import { operatorNamespaceSignal } from '@kubevirt-utils/store/operatorNamespace';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
@@ -36,7 +37,7 @@ const useKubevirtHyperconvergeConfiguration = (
   const hcLoaded = _hcLoaded && !isEmpty(operatorNamespace);
 
   const featureGates = useMemo(() => {
-    return hcConfig?.spec?.configuration?.developerConfiguration?.featureGates;
+    return getHyperconvergedConfiguration(hcConfig)?.developerConfiguration?.featureGates;
   }, [hcConfig]);
 
   return { featureGates, hcConfig, hcError, hcLoaded };

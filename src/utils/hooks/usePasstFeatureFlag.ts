@@ -4,6 +4,7 @@ import { HyperConvergedModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import useHyperConvergeConfiguration from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import useKubevirtHyperconvergeConfiguration from '@kubevirt-utils/hooks/useKubevirtHyperconvergeConfiguration';
+import { getHyperconvergedConfiguration } from '@kubevirt-utils/resources/hyperconverged/selectors';
 import { getAnnotations } from '@kubevirt-utils/resources/shared';
 import {
   PASS_IP_STACK_MIGRATION_GATE,
@@ -23,7 +24,7 @@ const usePasstFeatureFlag = (clusterOverride?: string) => {
   const isAdmin = useIsAdmin();
 
   const featureEnabled = useMemo(
-    () => Boolean(hcConfig?.spec?.configuration?.network?.binding?.[PASST_BINDING_NAME]),
+    () => Boolean(getHyperconvergedConfiguration(hcConfig)?.network?.binding?.[PASST_BINDING_NAME]),
     [hcConfig],
   );
 
