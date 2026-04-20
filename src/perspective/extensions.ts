@@ -3,6 +3,7 @@ import { Perspective } from '@openshift-console/dynamic-plugin-sdk';
 import type { ConsolePluginBuildMetadata } from '@openshift-console/dynamic-plugin-sdk-webpack';
 
 import { PERSPECTIVES } from '../utils/constants/constants';
+import { FLAG_KUBEVIRT_VIRTUALIZATION_NAV } from '../utils/flags/consts';
 
 import { clusterSection } from './navigation/clusterSection';
 import { computeSection } from './navigation/computeSection';
@@ -19,7 +20,7 @@ export const extensions: EncodedExtension[] = [
   {
     flags: {
       disallowed: ['KUBEVIRT_DYNAMIC_ACM'],
-      required: ['KUBEVIRT_VIRTUALIZATION_NAV'],
+      required: [FLAG_KUBEVIRT_VIRTUALIZATION_NAV],
     },
     properties: {
       icon: { $codeRef: 'perspective.icon' },

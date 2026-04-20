@@ -7,7 +7,7 @@ import {
   VirtualMachineModel,
 } from '@kubevirt-ui-ext/kubevirt-api/console';
 import useKubevirtHyperconvergeConfiguration, {
-  KubevirtHyperconverged,
+  selectHyperconvergedConfiguration,
 } from '@kubevirt-utils/hooks/useKubevirtHyperconvergeConfiguration';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -18,12 +18,7 @@ import {
   useK8sWatchResource,
 } from '@openshift-console/dynamic-plugin-sdk';
 
-import { FLAG_KUBEVIRT_VIRTUALIZATION_NAV } from './consts';
-
-const MANUAL_ROLE_AGGREGATION = 'Manual';
-
-const getRoleAggregationStrategy = (hcConfig: KubevirtHyperconverged): string | undefined =>
-  hcConfig?.spec?.configuration?.roleAggregationStrategy;
+import { FLAG_KUBEVIRT_VIRTUALIZATION_NAV, HCO_MANUAL_ROLE_AGGREGATION_STRATEGY } from './consts';
 
 const useVirtualizationNavVisibilityFlag = (setFeatureFlag: SetFeatureFlag) => {
   const { hcConfig, hcError, hcLoaded } = useKubevirtHyperconvergeConfiguration();
@@ -34,9 +29,12 @@ const useVirtualizationNavVisibilityFlag = (setFeatureFlag: SetFeatureFlag) => {
     namespaced: false,
   });
 
-  const strategy = getRoleAggregationStrategy(hcConfig);
+  const strategy = selectHyperconvergedConfiguration(hcConfig)?.roleAggregationStrategy;
 
-  const isManualRoleAggregation = useMemo(() => strategy === MANUAL_ROLE_AGGREGATION, [strategy]);
+  const isManualRoleAggregation = useMemo(
+    () => strategy === HCO_MANUAL_ROLE_AGGREGATION_STRATEGY,
+    [strategy],
+  );
 
   const fetchAccessReview = hcLoaded && projectsLoaded && isManualRoleAggregation;
 
@@ -49,16 +47,20 @@ const useVirtualizationNavVisibilityFlag = (setFeatureFlag: SetFeatureFlag) => {
     [projects],
   );
 
-  const [allowed, accessReviewsLoading] = useMultipleAccessReviews(
-    fetchAccessReview
-      ? projectNames.map((name) => ({
-          group: VirtualMachineModel.apiGroup,
-          namespace: name,
-          resource: VirtualMachineModel.plural,
-          verb: 'list' as K8sVerb,
-        }))
-      : [],
+  const accessReviewAttributes = useMemo(
+    () =>
+      fetchAccessReview
+        ? projectNames.map((name) => ({
+            group: VirtualMachineModel.apiGroup,
+            namespace: name,
+            resource: VirtualMachineModel.plural,
+            verb: 'list' as K8sVerb,
+          }))
+        : [],
+    [fetchAccessReview, projectNames],
   );
+
+  const [allowed, accessReviewsLoading] = useMultipleAccessReviews(accessReviewAttributes);
 
   const isAllowed = useMemo(() => allowed.some((accessReview) => accessReview.allowed), [allowed]);
 

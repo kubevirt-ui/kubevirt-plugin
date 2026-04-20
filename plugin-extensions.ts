@@ -5,6 +5,7 @@ import { extensions as MulticlusterExtensions } from './src/multicluster/extensi
 import { extensions as VirtualizationPerspectiveExtensions } from './src/perspective/extensions';
 import { extensions as YamlTemplatesExtensions } from './src/templates/extensions';
 import { extensions as utilsExtensions } from './src/utils/extension';
+import { FLAG_KUBEVIRT_VIRTUALIZATION_NAV } from './src/utils/flags/consts';
 import { extensions as BootableVolumesExtensions } from './src/views/bootablevolumes/extensions';
 import { extensions as CatalogExtensions } from './src/views/catalog/extensions';
 import { extensions as CDIUploadProviderExtensions } from './src/views/cdi-upload-provider/extensions';
@@ -82,7 +83,7 @@ const extensions: EncodedExtension[] = [
   // Hardware Devices (compute section, not virtualization)
   {
     flags: {
-      required: ['KUBEVIRT_VIRTUALIZATION_NAV'],
+      required: [FLAG_KUBEVIRT_VIRTUALIZATION_NAV],
     },
     properties: {
       href: '/hardwaredevices',

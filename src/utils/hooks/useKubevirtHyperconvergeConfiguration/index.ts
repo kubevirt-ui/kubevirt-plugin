@@ -14,6 +14,10 @@ export type KubevirtHyperconverged = K8sResourceCommon & {
   };
 };
 
+export const selectHyperconvergedConfiguration = (
+  hc: KubevirtHyperconverged | undefined,
+): undefined | V1KubeVirtConfiguration => hc?.spec?.configuration;
+
 const useKubevirtHyperconvergeConfiguration = (
   cluster?: string,
 ): {
@@ -36,7 +40,7 @@ const useKubevirtHyperconvergeConfiguration = (
   const hcLoaded = _hcLoaded && !isEmpty(operatorNamespace);
 
   const featureGates = useMemo(() => {
-    return hcConfig?.spec?.configuration?.developerConfiguration?.featureGates;
+    return selectHyperconvergedConfiguration(hcConfig)?.developerConfiguration?.featureGates;
   }, [hcConfig]);
 
   return { featureGates, hcConfig, hcError, hcLoaded };
