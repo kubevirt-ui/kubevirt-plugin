@@ -7,9 +7,11 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
 import useIsAllClustersPage from '@multicluster/hooks/useIsAllClustersPage';
 import useIsACMPage from '@multicluster/useIsACMPage';
+import { WatchK8sResource } from '@openshift-console/dynamic-plugin-sdk';
 import { Alert, Bullseye, PageSection, Spinner, Stack } from '@patternfly/react-core';
 import { useSignals } from '@preact/signals-react/runtime';
 import { AdvancedSearchFilter, useHubClusterName } from '@stolostron/multicluster-sdk';
+import { useAccessibleResources } from '@virtualmachines/search/hooks/useAccessibleResources';
 import { OBJECTS_FETCHING_LIMIT } from '@virtualmachines/utils';
 
 import OverviewAlerts from './components/OverviewAlerts';
@@ -42,20 +44,34 @@ const OverviewTab: FC<OverviewTabProps> = ({ cluster, namespace }) => {
 
   const watchEnabled = !isACMPage || !cluster || hubClusterLoaded;
 
-  const [vms, vmsLoaded, vmsError] = useKubevirtWatchResource<V1VirtualMachine[]>(
-    watchEnabled
+  const [watchedVms, watchedVmsLoaded, watchedVmsError] = useKubevirtWatchResource<
+    V1VirtualMachine[]
+  >(
+    (watchEnabled && !!namespace
       ? {
           cluster: isManagedClusterFetch ? undefined : cluster,
           groupVersionKind: VirtualMachineModelGroupVersionKind,
           isList: true,
           limit: OBJECTS_FETCHING_LIMIT,
           namespace,
-          namespaced: !!namespace,
+          namespaced: true,
         }
-      : null,
+      : null) as WatchK8sResource,
     undefined,
     searchQueries,
   );
+  const {
+    loaded: accessibleVmsLoaded,
+    loadError: accessibleVmsError,
+    resources: accessibleVms,
+  } = useAccessibleResources<V1VirtualMachine>({
+    groupVersionKind: VirtualMachineModelGroupVersionKind,
+    namespace: namespace || undefined,
+  });
+
+  const vms = namespace ? watchedVms : accessibleVms;
+  const vmsLoaded = namespace ? watchedVmsLoaded : accessibleVmsLoaded;
+  const vmsError = namespace ? watchedVmsError : accessibleVmsError;
 
   const { filteredVMs, vmNames } = useFolderFilter(vms);
 

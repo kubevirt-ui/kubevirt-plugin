@@ -81,6 +81,7 @@ const VirtualMachineNavigator: FC = () => {
             {!isFleetPage && <GuidedTour />}
             {!isFleetPage && <WelcomeModal />}
             <CatalogOnboardingPopover />
+            <VMsTabOnboardingPopover />
             {isVirtualMachineListPage ? (
               <Tabs
                 activeKey={activeTabKey}
@@ -97,9 +98,7 @@ const VirtualMachineNavigator: FC = () => {
                 </Tab>
                 <Tab
                   title={
-                    <VMsTabOnboardingPopover>
-                      <TabTitleText data-test="vm-list-tab">{t('Virtual machines')}</TabTitleText>
-                    </VMsTabOnboardingPopover>
+                    <TabTitleText data-test="vm-list-tab">{t('Virtual machines')}</TabTitleText>
                   }
                   eventKey={VM_LIST_TAB_INDEX}
                 >

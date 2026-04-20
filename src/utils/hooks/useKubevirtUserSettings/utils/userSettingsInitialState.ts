@@ -21,7 +21,8 @@ type ColumnsUserSettings = {
 };
 
 type QuickStartUserSettings = {
-  [guideName: string]: boolean;
+  dontShowWelcomeModal?: boolean;
+  tourStepsSeen?: number[];
 };
 
 type CardsUserSettings = {
