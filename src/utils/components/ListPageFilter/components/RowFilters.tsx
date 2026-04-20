@@ -2,7 +2,6 @@ import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Badge,
   Icon,
@@ -15,13 +14,14 @@ import {
 import { FilterIcon } from '@patternfly/react-icons';
 
 import FormPFSelect from '../../FormPFSelect/FormPFSelect';
+import { ExtendedRowFilter } from '../types';
 import { Filter, FilterKeys, generateRowFilters, intersection } from '../utils';
 
 type RowFiltersProps = {
   filters: Filter;
   filtersNameMap: FilterKeys;
   generatedRowFilters: ReturnType<typeof generateRowFilters>;
-  rowFilters: RowFilter[];
+  rowFilters: ExtendedRowFilter[];
   selectedRowFilters: string[];
   updateRowFilterSelected: (id: string[]) => void;
 };
@@ -95,7 +95,9 @@ const RowFilters: FC<RowFiltersProps> = ({
                       key={item.id}
                       value={item.id}
                     >
-                      <span className="co-filter-dropdown-item__name">{item.title}</span>
+                      <span className="co-filter-dropdown-item__name">
+                        {item.content ?? item.title}
+                      </span>
                       <Badge isRead key={item.id}>
                         {item.count}
                       </Badge>

@@ -1,4 +1,6 @@
-import { OnFilterChange } from '@openshift-console/dynamic-plugin-sdk';
+import { ReactNode } from 'react';
+
+import { OnFilterChange, RowFilter, RowFilterItem } from '@openshift-console/dynamic-plugin-sdk';
 
 export type ApplyTextFilters = (type: string, value?: string | string[]) => void;
 
@@ -21,4 +23,12 @@ export type ExposedFilterFunctions = {
 export type FilterInfo = {
   filterGroupName: string;
   query: null | string;
+};
+
+export type ExtendedRowFilterItem = RowFilterItem & {
+  content?: ReactNode;
+};
+
+export type ExtendedRowFilter<R = any> = Omit<RowFilter<R>, 'items'> & {
+  items: ExtendedRowFilterItem[];
 };

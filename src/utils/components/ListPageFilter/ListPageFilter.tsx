@@ -21,6 +21,7 @@ import useListPageFiltersMethods from './hooks/useListPageFiltersMethods';
 import { useRowFiltersParameters } from './hooks/useRowFiltersParameters';
 import { useSearchFiltersParameters } from './hooks/useSearchFiltersParameters';
 import useTextFilterState from './hooks/useTextFilterState';
+import { ExtendedRowFilter } from './types';
 import { Filter, FilterKeys, generateRowFilters, getFiltersData } from './utils';
 
 type ListPageFilterProps = {
@@ -34,7 +35,7 @@ type ListPageFilterProps = {
   loaded?: boolean;
   nameFilterPlaceholder?: string;
   onFilterChange?: OnFilterChange;
-  rowFilters?: RowFilter[];
+  rowFilters?: ExtendedRowFilter[];
   searchFilters?: RowFilter[];
 };
 

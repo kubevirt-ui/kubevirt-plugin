@@ -564,7 +564,7 @@
   "Created": "创建",
   "Created at": "创建于",
   "Creates a DataImportCron, which defines a cron job to poll and import the disk image.": "创建 DataImportCron，它定义了一个 cron 作业来轮询和导入磁盘镜像。",
-  "Creating a template from a running VirtualMachine may result in inconsistent data because the system is still actively writing changes. For best results, consider stopping the VM before creating the template.": "Creating a template from a running VirtualMachine may result in inconsistent data because the system is still actively writing changes. For best results, consider stopping the VM before creating the template.",
+  "Creating a template from a running virtual machine might result in inconsistent data because the system is still writing changes. For best results, stop the VM before creating the template.": "Creating a template from a running virtual machine might result in inconsistent data because the system is still writing changes. For best results, stop the VM before creating the template.",
   "CreationTimestamp is a timestamp representing the server time when this object was created. It is not guaranteed to be set in happens-before order across separate operations. Clients may not set this value. It is represented in RFC3339 form and is in UTC.": "CreationTimestamp 是一个代表创建此对象时服务器时间的时间戳。无法保证在跨独立的操作间以 happens-before 顺序设置设置。客户端可能无法设置这个值。它以 RFC3339 格式表示，且采用 UTC。",
   "Critical": "关键",
   "Cron expression": "Cron 表达式",
