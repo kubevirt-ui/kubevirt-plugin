@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 import { Trans } from 'react-i18next';
 
 import QuickStartLauncherLink from '@catalog/CreateFromInstanceTypes/components/BootableVolumeList/components/BootableVolumesPipelinesHint/QuickStartLauncherLink/QuickStartLauncherLink';
@@ -17,7 +17,7 @@ type CreateFromInstanceTypeTitleProps = {
   instanceTypesAndPreferencesData: UseInstanceTypeAndPreferencesValues;
 };
 
-const CreateFromInstanceTypeTitle: FC<CreateFromInstanceTypeTitleProps> = ({
+const CreateFromInstanceTypeTitle: FCC<CreateFromInstanceTypeTitleProps> = ({
   instanceTypesAndPreferencesData,
 }) => {
   const { t } = useKubevirtTranslation();

@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { debounce } from 'lodash';
 
@@ -11,7 +11,7 @@ import { FormGroup, TextInput, ValidatedOptions } from '@patternfly/react-core';
 import { V1DiskFormState } from '../../utils/types';
 import { DISK_NAME_FIELD, VOLUME_NAME_FIELD } from '../utils/constants';
 
-const DiskNameInput: FC<{ isDisabled?: boolean }> = ({ isDisabled }) => {
+const DiskNameInput: FCC<{ isDisabled?: boolean }> = ({ isDisabled }) => {
   const { t } = useKubevirtTranslation();
   const {
     formState: { errors },

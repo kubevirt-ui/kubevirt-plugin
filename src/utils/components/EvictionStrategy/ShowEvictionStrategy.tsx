@@ -1,4 +1,4 @@
-import React, { FC, memo } from 'react';
+import React, { FCC, memo } from 'react';
 
 import useHCOEvictionStrategy from './useHCOEvictionStrategy';
 
@@ -7,7 +7,7 @@ type ShowEvictionStrategyProps = {
   evictionStrategy: string;
 };
 
-const ShowEvictionStrategy: FC<ShowEvictionStrategyProps> = ({ cluster, evictionStrategy }) => {
+const ShowEvictionStrategy: FCC<ShowEvictionStrategyProps> = ({ cluster, evictionStrategy }) => {
   const HCOEvictionStrategy = useHCOEvictionStrategy(cluster);
 
   if (evictionStrategy) return <>{evictionStrategy}</>;

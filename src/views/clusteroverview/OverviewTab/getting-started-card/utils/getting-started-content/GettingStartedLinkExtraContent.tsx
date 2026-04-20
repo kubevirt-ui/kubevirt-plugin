@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Link } from 'react-router-dom-v5-compat';
+import { Link } from 'react-router';
 
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 
@@ -11,7 +11,7 @@ export type GettingStartedLinkExtraContentProps = {
   link: GettingStartedLink;
 };
 
-const GettingStartedLinkExtraContent: React.FC<GettingStartedLinkExtraContentProps> = ({
+const GettingStartedLinkExtraContent: React.FCC<GettingStartedLinkExtraContentProps> = ({
   link,
 }) => {
   let ExtraLink = null;

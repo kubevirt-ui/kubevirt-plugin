@@ -1,5 +1,5 @@
-import React, { FC, ReactNode } from 'react';
-import { TFunction } from 'react-i18next';
+import React, { FCC, ReactNode } from 'react';
+import { TFunction } from 'i18next';
 
 import { JobModel, modelToGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { IoK8sApiBatchV1Job } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
@@ -20,7 +20,7 @@ export type CheckupsHistoryCallbacks = {
   customActions?: (job: IoK8sApiBatchV1Job) => ReactNode;
 };
 
-const JobCell: FC<{ row: IoK8sApiBatchV1Job }> = ({ row }) => {
+const JobCell: FCC<{ row: IoK8sApiBatchV1Job }> = ({ row }) => {
   const [hubClusterName] = useHubClusterName();
   const isACMPage = useIsACMPage();
   const cluster = getCluster(row) || hubClusterName;
@@ -35,19 +35,19 @@ const JobCell: FC<{ row: IoK8sApiBatchV1Job }> = ({ row }) => {
   );
 };
 
-const StatusCell: FC<{ row: IoK8sApiBatchV1Job }> = ({ row }) => (
+const StatusCell: FCC<{ row: IoK8sApiBatchV1Job }> = ({ row }) => (
   <CheckupsStatusIcon job={row} onlyJob={true} />
 );
 
-const StartTimeCell: FC<{ row: IoK8sApiBatchV1Job }> = ({ row }) => (
+const StartTimeCell: FCC<{ row: IoK8sApiBatchV1Job }> = ({ row }) => (
   <Timestamp timestamp={row?.status?.startTime} />
 );
 
-const CompleteTimeCell: FC<{ row: IoK8sApiBatchV1Job }> = ({ row }) => (
+const CompleteTimeCell: FCC<{ row: IoK8sApiBatchV1Job }> = ({ row }) => (
   <Timestamp timestamp={row?.status?.completionTime} />
 );
 
-const ActionsCell: FC<{ callbacks: CheckupsHistoryCallbacks; row: IoK8sApiBatchV1Job }> = ({
+const ActionsCell: FCC<{ callbacks: CheckupsHistoryCallbacks; row: IoK8sApiBatchV1Job }> = ({
   callbacks,
   row,
 }) => <>{callbacks?.customActions?.(row) || null}</>;

@@ -11,7 +11,7 @@ type StatusCardStoragePopoverProps = {
   odfState: any;
 };
 
-const StatusCardStoragePopover: React.FC<StatusCardStoragePopoverProps> = ({
+const StatusCardStoragePopover: React.FCC<StatusCardStoragePopoverProps> = ({
   lsoState,
   odfState,
 }) => {

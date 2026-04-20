@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { Alert, AlertVariant, StackItem } from '@patternfly/react-core';
 
@@ -8,7 +8,7 @@ type RunStrategyWarningAlertProps = {
   warningMessage: null | WarningMessage;
 };
 
-const RunStrategyWarningAlert: FC<RunStrategyWarningAlertProps> = ({ warningMessage }) => {
+const RunStrategyWarningAlert: FCC<RunStrategyWarningAlertProps> = ({ warningMessage }) => {
   if (!warningMessage || !warningMessage.body) return null;
   return (
     <StackItem>

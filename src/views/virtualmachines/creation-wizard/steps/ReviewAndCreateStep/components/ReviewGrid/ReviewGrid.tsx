@@ -1,11 +1,11 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { Grid, GridItem, Stack } from '@patternfly/react-core';
 import ReviewGridLeftColumn from '@virtualmachines/creation-wizard/steps/ReviewAndCreateStep/components/ReviewGrid/components/ReviewGridLeftColumn';
 
 import ReviewGridRightColumn from './components/ReviewGridRightColumn/ReviewGridRightColumn';
 
-const ReviewGrid: FC = () => {
+const ReviewGrid: FCC = () => {
   return (
     <Stack hasGutter>
       <Grid hasGutter>

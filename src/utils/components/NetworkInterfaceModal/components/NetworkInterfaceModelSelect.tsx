@@ -1,4 +1,4 @@
-import React, { Dispatch, FC, MouseEvent, SetStateAction } from 'react';
+import React, { Dispatch, FCC, MouseEvent, SetStateAction } from 'react';
 
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -11,7 +11,7 @@ type NetworkInterfaceModelSelectProps = {
   setInterfaceModel: Dispatch<SetStateAction<string>>;
 };
 
-const NetworkInterfaceModelSelect: FC<NetworkInterfaceModelSelectProps> = ({
+const NetworkInterfaceModelSelect: FCC<NetworkInterfaceModelSelectProps> = ({
   interfaceModel,
   setInterfaceModel,
 }) => {

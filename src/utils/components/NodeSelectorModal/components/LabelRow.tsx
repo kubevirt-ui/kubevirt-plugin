@@ -1,4 +1,4 @@
-import React, { ClipboardEvent, FC } from 'react';
+import React, { ClipboardEvent, FCC } from 'react';
 
 import PlainIconButton from '@kubevirt-utils/components/HardwareDevices/form/PlainIconButton';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -14,7 +14,7 @@ type LabelRowProps = {
   withKeyValueTitle?: boolean;
 };
 
-const LabelRow: FC<LabelRowProps> = ({ label, onChange, onDelete, withKeyValueTitle = true }) => {
+const LabelRow: FCC<LabelRowProps> = ({ label, onChange, onDelete, withKeyValueTitle = true }) => {
   const { t } = useKubevirtTranslation();
   const { id, key, value } = label;
 

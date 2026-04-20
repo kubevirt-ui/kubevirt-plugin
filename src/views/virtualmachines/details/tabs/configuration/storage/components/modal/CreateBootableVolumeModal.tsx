@@ -1,5 +1,5 @@
-import React, { FC, useCallback, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom-v5-compat';
+import React, { FCC, useCallback, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router';
 
 import {
   DEFAULT_INSTANCETYPE_LABEL,
@@ -41,7 +41,7 @@ type CreateBootableVolumeModalProps = {
   vm: V1VirtualMachine;
 };
 
-const CreateBootableVolumeModal: FC<CreateBootableVolumeModalProps> = ({
+const CreateBootableVolumeModal: FCC<CreateBootableVolumeModalProps> = ({
   diskObj,
   isOpen,
   onClose,

@@ -1,4 +1,4 @@
-import { TFunction } from 'react-i18next';
+import { TFunction } from 'i18next';
 
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import {

@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -15,7 +15,7 @@ type InlineFilterSelectOptionsProps = {
   focusedItemIndex: number;
   groupedOptions: Record<string, EnhancedSelectOptionProps[]>;
 };
-const InlineFilterSelectOptions: FC<InlineFilterSelectOptionsProps> = ({
+const InlineFilterSelectOptions: FCC<InlineFilterSelectOptionsProps> = ({
   filterOptions,
   filterValue,
   focusedItemIndex,

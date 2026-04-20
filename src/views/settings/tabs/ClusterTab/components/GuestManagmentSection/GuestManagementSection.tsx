@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -15,7 +15,7 @@ type GuestManagementSectionProps = {
   newBadge?: boolean;
 };
 
-const GuestManagementSection: FC<GuestManagementSectionProps> = ({
+const GuestManagementSection: FCC<GuestManagementSectionProps> = ({
   hyperConvergeConfiguration,
   newBadge,
 }) => {

@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -16,7 +16,7 @@ type CPUMemoryProps = {
   vmi?: V1VirtualMachineInstance;
 };
 
-const CPUMemory: FC<CPUMemoryProps> = ({ vm, vmi }) => {
+const CPUMemory: FCC<CPUMemoryProps> = ({ vm, vmi }) => {
   const { t } = useKubevirtTranslation();
   const isVMRunning = isRunning(vm);
 

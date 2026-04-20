@@ -1,5 +1,5 @@
-import React, { FC } from 'react';
-import { useNavigate } from 'react-router-dom-v5-compat';
+import React, { FCC } from 'react';
+import { useNavigate } from 'react-router';
 import { getMigrationPolicyURL } from 'src/views/migrationpolicies/utils/utils';
 
 import { MigrationPolicyModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -10,7 +10,7 @@ import { K8sVerb, ListPageCreateDropdown } from '@openshift-console/dynamic-plug
 import { Button, Tooltip } from '@patternfly/react-core';
 import { useFleetAccessReview } from '@stolostron/multicluster-sdk';
 
-const MigrationPoliciesCreateButton: FC = () => {
+const MigrationPoliciesCreateButton: FCC = () => {
   const { t } = useKubevirtTranslation();
   const selectedCluster = useSelectedCluster();
   const navigate = useNavigate();

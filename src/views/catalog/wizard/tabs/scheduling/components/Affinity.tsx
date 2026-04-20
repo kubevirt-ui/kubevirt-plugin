@@ -8,7 +8,7 @@ type AffinityProps = {
   vm: V1VirtualMachine;
 };
 
-const Affinity: React.FC<AffinityProps> = ({ vm }) => {
+const Affinity: React.FCC<AffinityProps> = ({ vm }) => {
   const { t } = useKubevirtTranslation();
   const affinity = vm?.spec?.template?.spec?.affinity;
 

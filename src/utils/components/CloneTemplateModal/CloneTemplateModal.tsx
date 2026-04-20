@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FCC, useState } from 'react';
 import produce from 'immer';
 import { LABELS } from 'src/views/templates/utils/constants';
 
@@ -37,7 +37,7 @@ type CloneTemplateModalProps = {
   onTemplateCloned?: (clonedTemplate: V1Template) => void;
 };
 
-const CloneTemplateModal: FC<CloneTemplateModalProps> = ({
+const CloneTemplateModal: FCC<CloneTemplateModalProps> = ({
   isOpen,
   obj,
   onClose,

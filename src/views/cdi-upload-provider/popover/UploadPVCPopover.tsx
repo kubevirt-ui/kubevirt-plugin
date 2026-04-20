@@ -14,7 +14,7 @@ type PVCUploadStatusProps = {
   title?: string;
 };
 
-const UploadPVCPopover: React.FC<PVCUploadStatusProps> = ({ pvc, title }) => {
+const UploadPVCPopover: React.FCC<PVCUploadStatusProps> = ({ pvc, title }) => {
   const { t } = useKubevirtTranslation();
   const { uploads } = useContext(CDIUploadContext);
   const upload = uploads?.find(

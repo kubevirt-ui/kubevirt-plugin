@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { modelToGroupVersionKind, NamespaceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
@@ -13,7 +13,7 @@ type BootableVolumeNamespaceCellProps = {
   row: BootableResource;
 };
 
-const BootableVolumeNamespaceCell: FC<BootableVolumeNamespaceCellProps> = ({ callbacks, row }) => {
+const BootableVolumeNamespaceCell: FCC<BootableVolumeNamespaceCellProps> = ({ callbacks, row }) => {
   const cluster = getEffectiveCluster(row, callbacks);
 
   return (

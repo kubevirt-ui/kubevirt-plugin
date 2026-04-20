@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FCC, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { isDataImportCronAutoUpdated } from 'src/views/datasources/utils';
 
@@ -40,7 +40,7 @@ type DataImportCronManageModalProps = {
   onClose: () => void;
 };
 
-export const DataImportCronManageModal: FC<DataImportCronManageModalProps> = ({
+export const DataImportCronManageModal: FCC<DataImportCronManageModalProps> = ({
   dataImportCron,
   dataSource,
   isOpen,

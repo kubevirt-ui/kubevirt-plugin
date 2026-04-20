@@ -1,4 +1,4 @@
-import React, { FC, useMemo } from 'react';
+import React, { FCC, useMemo } from 'react';
 
 import { V1GPU, V1HostDevice } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
@@ -18,7 +18,7 @@ type HardwareDevicesListProps = {
   showActions?: boolean;
 };
 
-const HardwareDevicesList: FC<HardwareDevicesListProps> = ({
+const HardwareDevicesList: FCC<HardwareDevicesListProps> = ({
   className,
   devices,
   handleRemoveDevice,

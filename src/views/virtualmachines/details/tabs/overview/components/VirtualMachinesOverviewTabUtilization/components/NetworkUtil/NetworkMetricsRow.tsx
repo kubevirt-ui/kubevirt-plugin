@@ -8,7 +8,7 @@ type NetworkMetricsRowProps = {
   value: number;
 };
 
-const NetworkMetricsRow: React.FC<NetworkMetricsRowProps> = ({ label, value }) => {
+const NetworkMetricsRow: React.FCC<NetworkMetricsRowProps> = ({ label, value }) => {
   return (
     <Grid className="pf-v6-u-text-color-subtle">
       <GridItem span={6}>

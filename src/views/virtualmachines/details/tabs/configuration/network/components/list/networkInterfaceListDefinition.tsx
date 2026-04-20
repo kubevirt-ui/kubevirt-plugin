@@ -1,5 +1,5 @@
-import React, { FC, ReactNode } from 'react';
-import { TFunction } from 'react-i18next';
+import React, { FCC, ReactNode } from 'react';
+import { TFunction } from 'i18next';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import EphemeralBadge from '@kubevirt-utils/components/badges/EphemeralBadge/EphemeralBadge';
@@ -25,7 +25,7 @@ type NameCellProps = {
   row: SimpleNICPresentation;
 };
 
-const NameCell: FC<NameCellProps> = ({ row }) => {
+const NameCell: FCC<NameCellProps> = ({ row }) => {
   const { t } = useKubevirtTranslation();
   const { interfaceName, isInterfaceEphemeral, isPending, network } = row;
   const nicName = network?.name;
@@ -53,7 +53,7 @@ type StateCellProps = {
   row: SimpleNICPresentation;
 };
 
-const StateCell: FC<StateCellProps> = ({ row }) => {
+const StateCell: FCC<StateCellProps> = ({ row }) => {
   const { config, configLinkState, isSRIOV, runtimeLinkState } = row;
 
   return (
@@ -68,7 +68,7 @@ type NetworkCellProps = {
   row: SimpleNICPresentation;
 };
 
-const NetworkCell: FC<NetworkCellProps> = ({ row }) => {
+const NetworkCell: FCC<NetworkCellProps> = ({ row }) => {
   const { t } = useKubevirtTranslation();
   return (
     <span data-test-id={`nic-network-${row.network?.name}`}>

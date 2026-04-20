@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useMemo, useState } from 'react';
+import React, { FCC, useEffect, useMemo, useState } from 'react';
 
 import RedHatProvidedInstanceTypesSection from '@catalog/CreateFromInstanceTypes/components/SelectInstanceTypeSection/components/RedHatProvidedInstanceTypesSection/RedHatProvidedInstanceTypesSection';
 import UserProvidedInstanceTypesList from '@catalog/CreateFromInstanceTypes/components/SelectInstanceTypeSection/components/UserProvidedInstanceTypeList/UserProvidedInstanceTypeList';
@@ -15,7 +15,7 @@ type SelectInstanceTypeSectionProps = {
   instanceTypesAndPreferencesData: UseInstanceTypeAndPreferencesValues;
 };
 
-const SelectInstanceTypeSection: FC<SelectInstanceTypeSectionProps> = ({
+const SelectInstanceTypeSection: FCC<SelectInstanceTypeSectionProps> = ({
   instanceTypesAndPreferencesData,
 }) => {
   const [activeTabKey, setActiveTabKey] = useState<TabKey>(TabKey.RedHat);

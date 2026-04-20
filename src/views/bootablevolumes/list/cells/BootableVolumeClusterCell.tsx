@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { modelToGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import MulticlusterResourceLink from '@multicluster/components/MulticlusterResourceLink/MulticlusterResourceLink';
@@ -11,7 +11,7 @@ type BootableVolumeClusterCellProps = {
   row: BootableResource;
 };
 
-const BootableVolumeClusterCell: FC<BootableVolumeClusterCellProps> = ({ row }) => (
+const BootableVolumeClusterCell: FCC<BootableVolumeClusterCellProps> = ({ row }) => (
   <MulticlusterResourceLink
     groupVersionKind={modelToGroupVersionKind(ManagedClusterModel)}
     name={getCluster(row)}

@@ -1,4 +1,4 @@
-import React, { Dispatch, FC, SetStateAction } from 'react';
+import React, { Dispatch, FCC, SetStateAction } from 'react';
 
 import { IoK8sApiCoreV1Node } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { useIDEntities } from '@kubevirt-utils/components/NodeSelectorModal/hooks/useIDEntities';
@@ -31,7 +31,7 @@ type AffinityEditModalProps = {
   title: string;
 };
 
-const AffinityEditModal: FC<AffinityEditModalProps> = ({
+const AffinityEditModal: FCC<AffinityEditModalProps> = ({
   focusedAffinity,
   isOpen,
   nodes,

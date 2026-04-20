@@ -1,5 +1,5 @@
-import React, { FC } from 'react';
-import { Link } from 'react-router-dom-v5-compat';
+import React, { FCC } from 'react';
+import { Link } from 'react-router';
 
 import DurationDropdown from '@kubevirt-utils/components/DurationOption/DurationDropdown';
 import DurationOption from '@kubevirt-utils/components/DurationOption/DurationOption';
@@ -22,7 +22,7 @@ import MigrationsTab from './MigrationsTab';
 
 import './MigrationsPage.scss';
 
-const MigrationsPage: FC = () => {
+const MigrationsPage: FCC = () => {
   const { t } = useKubevirtTranslation();
   const [activeNamespace] = useActiveNamespace();
 

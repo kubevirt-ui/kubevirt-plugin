@@ -1,6 +1,8 @@
-import { EncodedExtension } from '@openshift/dynamic-plugin-sdk-webpack';
-import { ResourceActionProvider } from '@openshift-console/dynamic-plugin-sdk';
-import type { ConsolePluginBuildMetadata } from '@openshift-console/dynamic-plugin-sdk-webpack';
+import type { ResourceActionProvider } from '@openshift-console/dynamic-plugin-sdk';
+import type {
+  EncodedExtension,
+  ConsolePluginBuildMetadata,
+} from '@openshift-console/dynamic-plugin-sdk-webpack';
 
 export const exposedModules: ConsolePluginBuildMetadata['exposedModules'] = {
   useStorageClassActionsProvider:

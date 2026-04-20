@@ -1,4 +1,4 @@
-import React, { FC, memo } from 'react';
+import React, { FCC, memo } from 'react';
 
 import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
@@ -15,7 +15,7 @@ type TemplateSchedulingTabProps = {
   obj?: V1Template;
 };
 
-const TemplateSchedulingTab: FC<TemplateSchedulingTabProps> = ({ obj: template }) => {
+const TemplateSchedulingTab: FCC<TemplateSchedulingTabProps> = ({ obj: template }) => {
   const { isTemplateEditable } = useEditTemplateAccessReview(template);
   const { t } = useKubevirtTranslation();
 

@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { V1VirtualMachineInstanceMigration } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import ActionsDropdown from '@kubevirt-utils/components/ActionsDropdown/ActionsDropdown';
@@ -10,7 +10,7 @@ type MigrationActionsDropdownProps = {
   vmim: V1VirtualMachineInstanceMigration;
 };
 
-const MigrationActionsDropdown: FC<MigrationActionsDropdownProps> = ({ isKebabToggle, vmim }) => {
+const MigrationActionsDropdown: FCC<MigrationActionsDropdownProps> = ({ isKebabToggle, vmim }) => {
   const [actions] = useVirtualMachineInstanceMigrationActionsProvider(vmim);
 
   return (

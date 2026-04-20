@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { Switch, Tooltip } from '@patternfly/react-core';
 
@@ -10,7 +10,7 @@ type SwitchWithTooltipProps = {
   switchState: boolean;
 };
 
-const SwitchWithTooltip: FC<SwitchWithTooltipProps> = ({
+const SwitchWithTooltip: FCC<SwitchWithTooltipProps> = ({
   dataTestID,
   disabledTooltipContent,
   onSwitchChange,

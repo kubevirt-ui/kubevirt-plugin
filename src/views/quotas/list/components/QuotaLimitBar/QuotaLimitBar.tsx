@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 import { getQuotaNumbers, getResourceKeyKind } from 'src/views/quotas/utils/utils';
 
 import { ResourceInfo } from '@kubevirt-utils/resources/quotas/types';
@@ -16,7 +16,7 @@ type QuotaLimitBarProps = {
   used: ResourceInfo;
 };
 
-const QuotaLimitBar: FC<QuotaLimitBarProps> = ({ hard, resourceKey, unit, used: usedValue }) => {
+const QuotaLimitBar: FCC<QuotaLimitBarProps> = ({ hard, resourceKey, unit, used: usedValue }) => {
   if (!hard?.[resourceKey]) {
     return <span className="pf-v6-u-text-color-subtle">{NO_DATA_DASH}</span>;
   }

@@ -11,7 +11,7 @@ type TemplateRowAvailableSourceProps = {
 };
 
 // Component for VM Template's Boot source availability column
-const TemplateRowAvailableSource: React.FC<TemplateRowAvailableSourceProps> = ({
+const TemplateRowAvailableSource: React.FCC<TemplateRowAvailableSourceProps> = ({
   isBootSourceAvailable,
   source,
 }) => {

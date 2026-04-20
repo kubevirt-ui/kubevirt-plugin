@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FCC, useState } from 'react';
 import { Controller, FieldPath, useFormContext } from 'react-hook-form';
 
 import { V1DiskFormState } from '@kubevirt-utils/components/DiskModal/utils/types';
@@ -23,7 +23,7 @@ type DiskSourceUploadPVCProps = {
   relevantUpload: DataUpload;
 };
 
-const DiskSourceUploadPVC: FC<DiskSourceUploadPVCProps> = ({
+const DiskSourceUploadPVC: FCC<DiskSourceUploadPVCProps> = ({
   acceptedFileTypes,
   children,
   handleClearUpload,

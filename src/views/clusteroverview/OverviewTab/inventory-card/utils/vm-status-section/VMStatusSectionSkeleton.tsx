@@ -4,7 +4,7 @@ import { Flex, Grid, GridItem, Skeleton } from '@patternfly/react-core';
 
 import './VMStatusSectionSkeleton.scss';
 
-const VMStatusSectionSkeleton: React.FC = () => (
+const VMStatusSectionSkeleton: React.FCC = () => (
   <Grid
     className="kv-inventory-card__statuses-grid kv-inventory-card__statuses-grid--skeleton-box"
     hasGutter

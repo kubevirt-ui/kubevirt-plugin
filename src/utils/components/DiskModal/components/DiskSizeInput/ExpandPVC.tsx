@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 import { useFormContext } from 'react-hook-form';
 
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
@@ -14,7 +14,7 @@ import { getMinSizes } from './utils';
 
 type ExpandPVCProps = { pvc: IoK8sApiCoreV1PersistentVolumeClaim };
 
-const ExpandPVC: FC<ExpandPVCProps> = ({ pvc }) => {
+const ExpandPVC: FCC<ExpandPVCProps> = ({ pvc }) => {
   const { t } = useKubevirtTranslation();
   const { setValue, watch } = useFormContext<V1DiskFormState>();
   const diskState = watch();

@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useMemo } from 'react';
+import React, { FCC, useCallback, useMemo } from 'react';
 
 import useProjects from '@kubevirt-utils/hooks/useProjects';
 import usePVCs from '@kubevirt-utils/hooks/usePVCs';
@@ -17,7 +17,7 @@ type DiskSourcePVCSelectProps = {
   setDiskSize?: (value: string) => void;
 };
 
-const DiskSourcePVCSelect: FC<DiskSourcePVCSelectProps> = ({
+const DiskSourcePVCSelect: FCC<DiskSourcePVCSelectProps> = ({
   cluster,
   pvcNameSelected,
   pvcNamespaceSelected,

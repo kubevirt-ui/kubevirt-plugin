@@ -1,4 +1,4 @@
-import React, { FC, useMemo } from 'react';
+import React, { FCC, useMemo } from 'react';
 
 import { NodeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -23,7 +23,7 @@ type NodeLoadDistributionCardProps = {
 
 const NODES_PATH = `${getResourceUrl({ model: NodeModel })}?roles=worker`;
 
-const NodeLoadDistributionCard: FC<NodeLoadDistributionCardProps> = ({
+const NodeLoadDistributionCard: FCC<NodeLoadDistributionCardProps> = ({
   cluster,
   metricsUnavailable,
 }) => {

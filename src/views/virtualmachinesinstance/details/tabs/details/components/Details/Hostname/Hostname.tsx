@@ -7,7 +7,7 @@ type HostnameProps = {
   guestAgentData: V1VirtualMachineInstanceGuestAgentInfo;
 };
 
-const Hostname: React.FC<HostnameProps> = ({ guestAgentData }) => {
+const Hostname: React.FCC<HostnameProps> = ({ guestAgentData }) => {
   const { t } = useKubevirtTranslation();
 
   return (

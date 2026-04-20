@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { groupVersionKindFromCommonResource } from '@catalog/CreateFromInstanceTypes/utils/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -15,7 +15,7 @@ import useEditInstanceType from './hooks/useEditInstanceType';
 import { InstanceTypeModalProps } from './utils/types';
 import { getInstanceTypeSizes } from './utils/util';
 
-const InstanceTypeModal: FC<InstanceTypeModalProps> = ({
+const InstanceTypeModal: FCC<InstanceTypeModalProps> = ({
   allInstanceTypes,
   instanceType,
   isOpen,

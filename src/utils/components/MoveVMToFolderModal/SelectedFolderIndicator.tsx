@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { StackItem } from '@patternfly/react-core';
@@ -8,7 +8,7 @@ type SelectedFolderIndicatorProps = {
   folderName: string;
 };
 
-const SelectedFolderIndicator: FC<SelectedFolderIndicatorProps> = ({ folderName }) => {
+const SelectedFolderIndicator: FCC<SelectedFolderIndicatorProps> = ({ folderName }) => {
   const { t } = useKubevirtTranslation();
   return (
     <StackItem>

@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import RedHatSeriesMenuCard from '@catalog/CreateFromInstanceTypes/components/SelectInstanceTypeSection/components/RedHatProvidedInstanceTypesSection/components/RedHatSeriesMenuCard/RedHatSeriesMenuCard';
 import useInstanceTypeCardMenuSection from '@catalog/CreateFromInstanceTypes/components/SelectInstanceTypeSection/hooks/useInstanceTypeCardMenuSection';
@@ -11,7 +11,7 @@ type RedHatProvidedInstanceTypesSectionProps = {
   redHatMenuItems: RedHatInstanceTypeMetadata;
 };
 
-const RedHatProvidedInstanceTypesSection: FC<RedHatProvidedInstanceTypesSectionProps> = ({
+const RedHatProvidedInstanceTypesSection: FCC<RedHatProvidedInstanceTypesSectionProps> = ({
   redHatMenuItems,
 }) => {
   const menuProps = useInstanceTypeCardMenuSection();

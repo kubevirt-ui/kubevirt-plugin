@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import {
@@ -34,7 +34,7 @@ type BootableVolumeTableProps = {
   userPreferencesMap: NamespacedResourceMap<V1beta1VirtualMachinePreference>;
 };
 
-const BootableVolumeTable: FC<BootableVolumeTableProps> = ({
+const BootableVolumeTable: FCC<BootableVolumeTableProps> = ({
   activeColumns,
   bootableVolumesData,
   favorites,

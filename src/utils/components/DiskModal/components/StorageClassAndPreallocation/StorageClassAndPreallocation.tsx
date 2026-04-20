@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FCC, useState } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 
@@ -12,7 +12,7 @@ type StorageClassAndPreallocationProps = {
   vm: V1VirtualMachine;
 };
 
-const StorageClassAndPreallocation: FC<StorageClassAndPreallocationProps> = ({ vm }) => {
+const StorageClassAndPreallocation: FCC<StorageClassAndPreallocationProps> = ({ vm }) => {
   const [showSCAlert, setShowSCAlert] = useState(false);
 
   return (

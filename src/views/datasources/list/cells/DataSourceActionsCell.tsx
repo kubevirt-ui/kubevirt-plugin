@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 
@@ -8,7 +8,7 @@ type DataSourceActionsCellProps = {
   row: V1beta1DataSource;
 };
 
-const DataSourceActionsCell: FC<DataSourceActionsCellProps> = ({ row }) => (
+const DataSourceActionsCell: FCC<DataSourceActionsCellProps> = ({ row }) => (
   <DataSourceActions dataSource={row} isKebabToggle />
 );
 

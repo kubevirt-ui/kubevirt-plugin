@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
@@ -16,7 +16,7 @@ type TemplateNetworkProps = {
   obj: V1Template;
 };
 
-const TemplateNetwork: FC<TemplateNetworkProps> = ({ obj: template }) => {
+const TemplateNetwork: FCC<TemplateNetworkProps> = ({ obj: template }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const { isTemplateEditable } = useEditTemplateAccessReview(template);

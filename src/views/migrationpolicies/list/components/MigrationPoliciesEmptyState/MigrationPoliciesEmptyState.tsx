@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 import { Trans } from 'react-i18next';
 
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
@@ -16,7 +16,7 @@ import { MigrationIcon } from '@patternfly/react-icons';
 
 import MigrationPoliciesCreateButton from '../MigrationPoliciesCreateButton/MigrationPoliciesCreateButton';
 
-const MigrationPoliciesEmptyState: FC = () => {
+const MigrationPoliciesEmptyState: FCC = () => {
   const { t } = useKubevirtTranslation();
 
   return (

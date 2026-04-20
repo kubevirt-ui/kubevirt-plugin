@@ -1,10 +1,10 @@
-import React, { FC, useState } from 'react';
+import React, { FCC, useState } from 'react';
 
 import { getMCONotInstalledTooltip } from '@kubevirt-utils/hooks/useAlerts/utils/useMCOInstalled';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Alert, AlertActionCloseButton, AlertVariant } from '@patternfly/react-core';
 
-const MCONotInstalledAlert: FC = () => {
+const MCONotInstalledAlert: FCC = () => {
   const { t } = useKubevirtTranslation();
   const [dismissed, setDismissed] = useState(false);
 

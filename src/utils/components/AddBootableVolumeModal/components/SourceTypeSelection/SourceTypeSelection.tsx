@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useEffect, useState } from 'react';
+import React, { FCC, useCallback, useEffect, useState } from 'react';
 
 import SelectToggle from '@kubevirt-utils/components/toggles/SelectToggle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -17,7 +17,7 @@ type SourceTypeSelectionProps = {
   setFormSelection: (value: DROPDOWN_FORM_SELECTION) => void;
 };
 
-const SourceTypeSelection: FC<SourceTypeSelectionProps> = ({
+const SourceTypeSelection: FCC<SourceTypeSelectionProps> = ({
   formSelection,
   namespace,
   resetDiskSize,

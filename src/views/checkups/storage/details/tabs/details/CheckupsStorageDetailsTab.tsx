@@ -1,5 +1,5 @@
-import React, { FC, JSX } from 'react';
-import { useParams } from 'react-router-dom-v5-compat';
+import React, { FCC, JSX } from 'react';
+import { useParams } from 'react-router';
 
 import { Divider, PageSection } from '@patternfly/react-core';
 
@@ -8,7 +8,7 @@ import { getJobByName } from '../../../../utils/utils';
 import useCheckupsStorageData from '../../../components/hooks/useCheckupsStorageData';
 import CheckupsStorageDetailsPageSection from '../../CheckupsStorageDetailsPageSection';
 
-const CheckupsStorageDetailsTab: FC = (): JSX.Element | null => {
+const CheckupsStorageDetailsTab: FCC = (): JSX.Element | null => {
   const { checkupName } = useParams<{ checkupName: string }>();
   const { configMaps, error, jobs, loaded } = useCheckupsStorageData();
 

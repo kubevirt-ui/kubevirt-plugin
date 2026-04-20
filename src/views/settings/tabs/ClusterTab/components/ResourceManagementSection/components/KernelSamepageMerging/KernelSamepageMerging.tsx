@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from 'react';
+import React, { FCC, useEffect, useState } from 'react';
 
 import { HyperConvergedModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import SectionWithSwitch from '@kubevirt-utils/components/SectionWithSwitch/SectionWithSwitch';
@@ -16,7 +16,7 @@ type KernelSamepageMergingProps = {
   hyperConvergeConfiguration: [hyperConvergeConfig: HyperConverged, loaded: boolean, error: Error];
   newBadge?: boolean;
 };
-const KernelSamepageMerging: FC<KernelSamepageMergingProps> = ({
+const KernelSamepageMerging: FCC<KernelSamepageMergingProps> = ({
   hyperConvergeConfiguration,
   newBadge = false,
 }) => {

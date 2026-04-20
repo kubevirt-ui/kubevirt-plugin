@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 import { useFormContext } from 'react-hook-form';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -19,7 +19,7 @@ import {
 import { getVMNetworkProjects } from '../../utils';
 import { VMNetworkForm } from '../constants';
 
-const SelectedProjects: FC = () => {
+const SelectedProjects: FCC = () => {
   const { t } = useKubevirtTranslation();
 
   const { watch } = useFormContext<VMNetworkForm>();

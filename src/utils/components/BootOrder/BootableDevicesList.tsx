@@ -9,7 +9,7 @@ type BootableDevicesListProps = {
   devices: BootableDeviceType[];
 };
 
-const BootableDevicesList: React.FC<BootableDevicesListProps> = ({ devices }) => (
+const BootableDevicesList: React.FCC<BootableDevicesListProps> = ({ devices }) => (
   <List component={ListComponent.ol} type={OrderType.number}>
     {devices?.map((device) => (
       <ListItem key={`${device?.value?.name}-${device?.value?.bootOrder}`}>

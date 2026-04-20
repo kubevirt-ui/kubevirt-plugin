@@ -1,4 +1,4 @@
-import React, { FC, useMemo, useState } from 'react';
+import React, { FCC, useMemo, useState } from 'react';
 
 import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
 import {
@@ -30,7 +30,7 @@ type UserProvidedInstanceTypesListProps = {
   userProvidedInstanceTypes: InstanceTypes;
 };
 
-const UserProvidedInstanceTypesList: FC<UserProvidedInstanceTypesListProps> = ({
+const UserProvidedInstanceTypesList: FCC<UserProvidedInstanceTypesListProps> = ({
   userProvidedInstanceTypes,
 }) => {
   const { t } = useKubevirtTranslation();

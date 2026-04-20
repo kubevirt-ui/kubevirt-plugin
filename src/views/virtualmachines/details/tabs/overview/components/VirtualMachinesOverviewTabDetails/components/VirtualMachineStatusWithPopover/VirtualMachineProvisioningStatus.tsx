@@ -1,5 +1,5 @@
-import React, { FC } from 'react';
-import { Link } from 'react-router-dom-v5-compat';
+import React, { FCC } from 'react';
+import { Link } from 'react-router';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -16,7 +16,7 @@ type VirtualMachineProvisioningStatusProps = {
   vm: V1VirtualMachine;
 };
 
-const VirtualMachineProvisioningStatus: FC<VirtualMachineProvisioningStatusProps> = ({
+const VirtualMachineProvisioningStatus: FCC<VirtualMachineProvisioningStatusProps> = ({
   children,
   vm,
 }) => {

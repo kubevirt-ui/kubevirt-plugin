@@ -1,5 +1,5 @@
-import React, { FC } from 'react';
-import { Link } from 'react-router-dom-v5-compat';
+import React, { FCC } from 'react';
+import { Link } from 'react-router';
 
 import { OnFilterChange } from '@openshift-console/dynamic-plugin-sdk';
 import { Flex, FlexItem } from '@patternfly/react-core';
@@ -12,7 +12,7 @@ type MigrationChartLegendProps = {
   onFilterChange: OnFilterChange;
 };
 
-const MigrationChartLegend: FC<MigrationChartLegendProps> = ({ legendItems, onFilterChange }) => {
+const MigrationChartLegend: FCC<MigrationChartLegendProps> = ({ legendItems, onFilterChange }) => {
   return (
     <Flex gap={{ default: 'gapMd' }}>
       {legendItems?.map((item, index) => {

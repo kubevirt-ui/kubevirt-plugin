@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import CPUDescription from '@kubevirt-utils/components/CPUDescription/CPUDescription';
@@ -14,7 +14,7 @@ type TolerationsProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const CPUMemory: FC<TolerationsProps> = ({ vmi }) => {
+const CPUMemory: FCC<TolerationsProps> = ({ vmi }) => {
   const { t } = useKubevirtTranslation();
   const cpu = vCPUCount(getCPU(vmi));
 

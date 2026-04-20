@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 import classNames from 'classnames';
 
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
@@ -19,7 +19,7 @@ type DiskSourceSelectProps = {
   onSelect: (value: SourceTypes) => void;
 };
 
-const DiskSourceSelect: FC<DiskSourceSelectProps> = ({
+const DiskSourceSelect: FCC<DiskSourceSelectProps> = ({
   canCreateDataVolume,
   canUpdate = true,
   className,

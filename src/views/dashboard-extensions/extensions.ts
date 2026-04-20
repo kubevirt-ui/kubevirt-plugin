@@ -1,11 +1,13 @@
-import { EncodedExtension } from '@openshift/dynamic-plugin-sdk-webpack';
-import {
+import type {
   DashboardsInventoryItemGroup,
   DashboardsOverviewInventoryItem,
   DashboardsOverviewResourceActivity,
   DashboardsProjectOverviewInventoryItem,
 } from '@openshift-console/dynamic-plugin-sdk';
-import type { ConsolePluginBuildMetadata } from '@openshift-console/dynamic-plugin-sdk-webpack';
+import type {
+  EncodedExtension,
+  ConsolePluginBuildMetadata,
+} from '@openshift-console/dynamic-plugin-sdk-webpack';
 
 export const exposedModules: ConsolePluginBuildMetadata['exposedModules'] = {
   dashboardActivity: 'src/views/dashboard-extensions/Activity.tsx',

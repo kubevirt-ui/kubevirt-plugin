@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import {
   AddBootableVolumeState,
@@ -11,7 +11,7 @@ type SnapshotSourceProps = {
   setBootableVolumeField: SetBootableVolumeFieldType;
 };
 
-const SnapshotSource: FC<SnapshotSourceProps> = ({ bootableVolume, setBootableVolumeField }) => {
+const SnapshotSource: FCC<SnapshotSourceProps> = ({ bootableVolume, setBootableVolumeField }) => {
   const { bootableVolumeCluster, snapshotName, snapshotNamespace } = bootableVolume || {};
   return (
     <SelectSnapshot

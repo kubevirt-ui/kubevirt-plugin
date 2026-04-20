@@ -1,4 +1,4 @@
-import React, { FC, useMemo, useRef } from 'react';
+import React, { FCC, useMemo, useRef } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { KUBE_DESCHEDULER_URL } from '@kubevirt-utils/resources/descheduler/constants';
@@ -24,7 +24,7 @@ type DeschedulerSectionProps = {
   isOperatorInstalled: boolean;
 };
 
-const DeschedulerSection: FC<DeschedulerSectionProps> = ({ isOperatorInstalled }) => {
+const DeschedulerSection: FCC<DeschedulerSectionProps> = ({ isOperatorInstalled }) => {
   const { t } = useKubevirtTranslation();
   const cluster = useSettingsCluster();
   const { descheduler, deschedulerLoaded } = useKubeDescheduler({

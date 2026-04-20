@@ -1,4 +1,4 @@
-import React, { Dispatch, FC, SetStateAction } from 'react';
+import React, { Dispatch, FCC, SetStateAction } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
@@ -18,7 +18,7 @@ type HighAvailabilitySectionProps = {
   setAlternativeCheckedMap: Dispatch<SetStateAction<HAAlternativeCheckedMap>>;
 };
 
-const HighAvailabilityContent: FC<HighAvailabilitySectionProps> = ({
+const HighAvailabilityContent: FCC<HighAvailabilitySectionProps> = ({
   alternativeCheckedMap,
   setAlternativeCheckedMap,
 }) => {

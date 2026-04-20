@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import SelectProject from '@kubevirt-utils/components/CloneTemplateModal/SelectProject';
@@ -24,7 +24,7 @@ type SaveAsTemplateModalProps = {
   vm: V1VirtualMachine;
 };
 
-const SaveAsTemplateModal: FC<SaveAsTemplateModalProps> = ({ isOpen, onClose, vm }) => {
+const SaveAsTemplateModal: FCC<SaveAsTemplateModalProps> = ({ isOpen, onClose, vm }) => {
   const { t } = useKubevirtTranslation();
 
   const { onSubmit, selectedProject, setSelectedProject, setTemplateName, templateName } =

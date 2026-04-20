@@ -1,4 +1,4 @@
-import React, { FC, Suspense, useState } from 'react';
+import React, { FCC, Suspense, useState } from 'react';
 import { dump } from 'js-yaml';
 
 import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
@@ -20,7 +20,7 @@ type YamlAndCLIViewerModalProps = {
   vm: V1VirtualMachine;
 };
 
-const YamlAndCLIViewerModal: FC<YamlAndCLIViewerModalProps> = ({ isOpen, onClose, vm }) => {
+const YamlAndCLIViewerModal: FCC<YamlAndCLIViewerModalProps> = ({ isOpen, onClose, vm }) => {
   const { t } = useKubevirtTranslation();
 
   const [activeTabKey, setActiveTabKey] = useState<TAB>(TAB.YAML);

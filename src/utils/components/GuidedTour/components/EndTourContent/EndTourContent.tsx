@@ -1,10 +1,10 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 import { Trans } from 'react-i18next';
 
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
-const EndTourContent: FC = () => {
+const EndTourContent: FCC = () => {
   const { t } = useKubevirtTranslation();
 
   return (

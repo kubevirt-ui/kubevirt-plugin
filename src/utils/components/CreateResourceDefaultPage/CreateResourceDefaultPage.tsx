@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { ResourceYAMLEditor } from '@openshift-console/dynamic-plugin-sdk';
 
@@ -7,7 +7,7 @@ type CreateResourceDefaultPageProps = {
   initialResource: K8sResourceCommon;
 };
 
-const CreateResourceDefaultPage: FC<CreateResourceDefaultPageProps> = ({
+const CreateResourceDefaultPage: FCC<CreateResourceDefaultPageProps> = ({
   header,
   initialResource,
 }) => {

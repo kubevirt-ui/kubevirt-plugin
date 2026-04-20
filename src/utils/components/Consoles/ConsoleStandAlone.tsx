@@ -1,5 +1,5 @@
-import React, { FC } from 'react';
-import { useParams } from 'react-router-dom-v5-compat';
+import React, { FCC } from 'react';
+import { useParams } from 'react-router';
 
 import { V1VirtualMachine } from '@kubev2v/types';
 import { VirtualMachineModelGroupVersionKind } from '@kubevirt-utils/models';
@@ -19,7 +19,7 @@ import { isVncLogLevel } from './components/vnc-console/utils/util';
 import { getConsoleBasePath } from './utils/utils';
 import Consoles from './Consoles';
 
-const ConsoleStandAlone: FC = () => {
+const ConsoleStandAlone: FCC = () => {
   const { cluster, name, ns } = useParams<{ cluster?: string; name: string; ns: string }>();
   const [apiPath, apiPathLoaded] = useK8sBaseAPIPath(cluster);
   const [vm, vmLoaded, vmLoadError] = useK8sWatchData<V1VirtualMachine>({

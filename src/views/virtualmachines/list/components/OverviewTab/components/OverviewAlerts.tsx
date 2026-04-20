@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import useIsACMPage from '@multicluster/useIsACMPage';
 import { useHubClusterName } from '@stolostron/multicluster-sdk';
@@ -19,7 +19,7 @@ type OverviewAlertsProps = {
   observabilityLoaded: boolean;
 };
 
-const OverviewAlerts: FC<OverviewAlertsProps> = ({
+const OverviewAlerts: FCC<OverviewAlertsProps> = ({
   cluster,
   disabledClusters,
   hasNoVMs,

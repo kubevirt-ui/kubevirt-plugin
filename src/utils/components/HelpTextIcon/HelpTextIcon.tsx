@@ -1,4 +1,4 @@
-import React, { FC, MouseEventHandler, ReactNode } from 'react';
+import React, { FCC, MouseEventHandler, ReactNode } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Button, Icon, IconSize, Popover, PopoverPosition } from '@patternfly/react-core';
@@ -19,7 +19,7 @@ type HelpTextIconProps = {
   size?: IconSize;
 };
 
-const HelpTextIcon: FC<HelpTextIconProps> = ({
+const HelpTextIcon: FCC<HelpTextIconProps> = ({
   bodyContent,
   buttonAriaLabel,
   className,

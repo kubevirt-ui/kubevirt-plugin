@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -16,7 +16,7 @@ import IconSkeleton from '../icons/IconSkeleton/IconSkeleton';
 
 import '../FeaturedOperatorItem.scss';
 
-const HighAvailabilitySection: FC = () => {
+const HighAvailabilitySection: FCC = () => {
   const { t } = useKubevirtTranslation();
   const { operatorDetailsMap, operatorResourcesLoaded } = useVirtualizationFeaturesContext();
 

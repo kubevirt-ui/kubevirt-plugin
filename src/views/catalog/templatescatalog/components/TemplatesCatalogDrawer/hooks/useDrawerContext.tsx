@@ -1,6 +1,6 @@
 import React, {
   createContext,
-  FC,
+  FCC,
   useCallback,
   useContext,
   useEffect,
@@ -170,7 +170,7 @@ const useDrawer = (template: V1Template) => {
 
 export const DrawerContext = createContext<DrawerContext>(initialValue);
 
-export const DrawerContextProvider: FC<{ template: V1Template }> = ({ children, template }) => {
+export const DrawerContextProvider: FCC<{ template: V1Template }> = ({ children, template }) => {
   const context = useDrawer(template);
   return <DrawerContext.Provider value={context}>{children}</DrawerContext.Provider>;
 };

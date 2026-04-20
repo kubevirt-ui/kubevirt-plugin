@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { produceVMSysprep, useWizardVMContext } from '@catalog/utils/WizardVMContext';
 import { WizardDescriptionItem } from '@catalog/wizard/components/WizardDescriptionItem';
@@ -25,7 +25,7 @@ import {
   removeSysprepObject,
 } from './sysprep-utils';
 
-const Sysprep: FC = () => {
+const Sysprep: FCC = () => {
   const { t } = useKubevirtTranslation();
 
   const { createModal } = useModal();

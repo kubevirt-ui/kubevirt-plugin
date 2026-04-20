@@ -1,5 +1,5 @@
-import React, { FC } from 'react';
-import { Link } from 'react-router-dom-v5-compat';
+import React, { FCC } from 'react';
+import { Link } from 'react-router';
 
 import { TemplateModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -15,7 +15,7 @@ import { ActivityItem } from '@openshift-console/dynamic-plugin-sdk-internal';
 import ActivityProgress from './ActivityProgress';
 import { diskImportKindMapping, VIRTUALMACHINES_TEMPLATES_BASE_URL } from './utils';
 
-export const DiskImportActivity: FC<
+export const DiskImportActivity: FCC<
   K8sActivityProps<
     K8sResourceCommon & {
       data?: { [key: string]: any };

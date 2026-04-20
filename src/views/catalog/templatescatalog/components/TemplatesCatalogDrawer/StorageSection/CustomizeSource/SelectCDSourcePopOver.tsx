@@ -1,9 +1,9 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
-const SelectCDSourcePopOver: FC = () => {
+const SelectCDSourcePopOver: FCC = () => {
   const { t } = useKubevirtTranslation();
 
   return (

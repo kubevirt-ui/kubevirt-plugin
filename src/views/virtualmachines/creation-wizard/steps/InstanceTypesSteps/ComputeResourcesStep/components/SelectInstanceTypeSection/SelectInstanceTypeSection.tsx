@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useMemo, useState } from 'react';
+import React, { FCC, useEffect, useMemo, useState } from 'react';
 
 import { getInstanceTypeMenuItems } from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/utils/utils';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
@@ -12,7 +12,7 @@ import { getUserProvidedInstanceTypes } from '@virtualmachines/creation-wizard/s
 
 import { TabKey } from './utils/constants';
 
-const SelectInstanceTypeSection: FC = ({}) => {
+const SelectInstanceTypeSection: FCC = ({}) => {
   const [activeTabKey, setActiveTabKey] = useState<TabKey>(TabKey.RedHat);
 
   const { cluster, project } = useVMWizardStore();

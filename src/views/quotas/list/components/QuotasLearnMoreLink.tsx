@@ -1,10 +1,10 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
-const QuotasLearnMoreLink: FC = () => {
+const QuotasLearnMoreLink: FCC = () => {
   const { t } = useKubevirtTranslation();
 
   return (

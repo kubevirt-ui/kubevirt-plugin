@@ -5,7 +5,7 @@ import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Content, ContentVariants } from '@patternfly/react-core';
 
-const TolerationModalDescriptionText: React.FC = () => {
+const TolerationModalDescriptionText: React.FCC = () => {
   const { t } = useKubevirtTranslation();
   return (
     <>

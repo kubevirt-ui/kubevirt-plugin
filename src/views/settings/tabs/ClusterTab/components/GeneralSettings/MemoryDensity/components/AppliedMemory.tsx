@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Content, ContentVariants, Skeleton, StackItem } from '@patternfly/react-core';
@@ -9,7 +9,7 @@ type AppliedMemoryProps = {
   isLoadingRatio: boolean;
 };
 
-const AppliedMemory: FC<AppliedMemoryProps> = ({
+const AppliedMemory: FCC<AppliedMemoryProps> = ({
   appliedRatio,
   currentOvercommit,
   isLoadingRatio,

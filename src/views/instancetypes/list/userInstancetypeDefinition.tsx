@@ -1,5 +1,5 @@
 import React from 'react';
-import { TFunction } from 'react-i18next';
+import { TFunction } from 'i18next';
 import { parseSize } from 'xbytes';
 
 import { VirtualMachineInstancetypeModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';

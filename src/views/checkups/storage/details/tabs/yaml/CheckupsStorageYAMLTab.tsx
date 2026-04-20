@@ -1,11 +1,11 @@
-import React, { FC } from 'react';
-import { useParams } from 'react-router-dom-v5-compat';
+import React, { FCC } from 'react';
+import { useParams } from 'react-router';
 
 import { ResourceYAMLEditor } from '@openshift-console/dynamic-plugin-sdk';
 
 import useCheckupsStorageData from '../../../components/hooks/useCheckupsStorageData';
 
-const CheckupsStorageYAMLTab: FC = () => {
+const CheckupsStorageYAMLTab: FCC = () => {
   const { checkupName } = useParams<{ checkupName: string }>();
   const { configMaps } = useCheckupsStorageData();
 

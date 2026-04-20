@@ -30,7 +30,7 @@ type GettingStartedSectionContentsProps = {
   titleColor?: string;
 };
 
-const GettingStartedSectionContents: React.FC<GettingStartedSectionContentsProps> = ({
+const GettingStartedSectionContents: React.FCC<GettingStartedSectionContentsProps> = ({
   description,
   icon,
   id,

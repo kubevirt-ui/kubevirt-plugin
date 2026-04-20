@@ -1,4 +1,4 @@
-import React, { FC, MouseEvent } from 'react';
+import React, { FCC, MouseEvent } from 'react';
 
 import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
 import { InstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/utils/types';
@@ -57,7 +57,7 @@ type BootableVolumeRowProps = {
   };
 };
 
-const BootableVolumeRow: FC<BootableVolumeRowProps> = ({
+const BootableVolumeRow: FCC<BootableVolumeRowProps> = ({
   activeColumnIDs,
   bootableVolume,
   rowData: {

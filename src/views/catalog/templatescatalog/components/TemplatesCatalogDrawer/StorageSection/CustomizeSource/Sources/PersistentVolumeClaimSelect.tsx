@@ -1,4 +1,4 @@
-import React, { FC, useCallback } from 'react';
+import React, { FCC, useCallback } from 'react';
 
 import {
   modelToGroupVersionKind,
@@ -24,7 +24,7 @@ type PersistentVolumeClaimSelectProps = {
   pvcNameSelected: string;
 };
 
-export const PersistentVolumeClaimSelect: FC<PersistentVolumeClaimSelectProps> = ({
+export const PersistentVolumeClaimSelect: FCC<PersistentVolumeClaimSelectProps> = ({
   currentSize,
   'data-test-id': testId,
   onSourceChange,

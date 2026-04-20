@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import {
   Alert,
@@ -13,7 +13,7 @@ import {
 } from '@patternfly/react-core';
 
 // Display and empty with a Call to add new source if no sources are defined.
-export const BootOrderEmptyState: FC<BootOrderEmptyProps> = ({
+export const BootOrderEmptyState: FCC<BootOrderEmptyProps> = ({
   addItemDisabledMessage,
   addItemIsDisabled,
   addItemMessage,

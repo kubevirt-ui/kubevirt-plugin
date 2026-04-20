@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FCC, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -24,7 +24,7 @@ type ConfirmVMActionBaseModalProps = {
   title: string;
 };
 
-const ConfirmVMActionBaseModal: FC<ConfirmVMActionBaseModalProps> = ({
+const ConfirmVMActionBaseModal: FCC<ConfirmVMActionBaseModalProps> = ({
   action,
   actionLabel,
   actionType,

@@ -19,7 +19,7 @@ import { formatPopoverLabel, getLabelUnit } from '../utils/utils';
 
 import './MetricChart.scss';
 
-const MetricChart: React.FC<MetricChartProps> = ({ metric, metricChartData }) => {
+const MetricChart: React.FCC<MetricChartProps> = ({ metric, metricChartData }) => {
   const { chartData, domain, unit } = metricChartData;
   const { height, ref, width } = useResponsiveCharts();
   const displayUnit = getLabelUnit(metric, unit);

@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Checkbox, FormGroup } from '@patternfly/react-core';
@@ -6,7 +6,7 @@ import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
 import { useAdvancedSearchField } from '../store/useAdvancedSearchStore';
 
-const SchedulingField: FC = () => {
+const SchedulingField: FCC = () => {
   const { t } = useKubevirtTranslation();
   const { setValue, value } = useAdvancedSearchField(VirtualMachineRowFilterType.Scheduling);
 

@@ -1,4 +1,4 @@
-import React, { FC, useLayoutEffect, useRef, useState } from 'react';
+import React, { FCC, useLayoutEffect, useRef, useState } from 'react';
 
 import { V1Volume } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -16,7 +16,7 @@ type CloudInitEditorProps = {
 
 const EDITOR_TOOLS_SPACES = 75;
 
-export const _CloudInitEditor: FC<CloudInitEditorProps> = ({ cloudInitVolume, onSave }) => {
+export const _CloudInitEditor: FCC<CloudInitEditorProps> = ({ cloudInitVolume, onSave }) => {
   const { t } = useKubevirtTranslation();
   const cloudInitData = getCloudInitData(cloudInitVolume);
 

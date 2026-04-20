@@ -1,4 +1,4 @@
-import React, { Dispatch, FC, SetStateAction, useState } from 'react';
+import React, { Dispatch, FCC, SetStateAction, useState } from 'react';
 
 import { IoK8sApiCoreV1Secret } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
@@ -26,7 +26,7 @@ type SSHKeyUploadProps = {
   sshDetails: SSHSecretDetails;
 };
 
-const SSHKeyUpload: FC<SSHKeyUploadProps> = ({ secrets, setSSHDetails, sshDetails }) => {
+const SSHKeyUpload: FCC<SSHKeyUploadProps> = ({ secrets, setSSHDetails, sshDetails }) => {
   const { t } = useKubevirtTranslation();
   const activeNamespace = useActiveNamespace();
   const [nameErrorMessage, setNameErrorMessage] = useState<string>(null);

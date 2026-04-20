@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { PageSection } from '@patternfly/react-core';
@@ -12,7 +12,7 @@ type VirtualMachinesInstancePageDisksTabProps = {
   obj: V1VirtualMachineInstance;
 };
 
-const VirtualMachinesInstancePageDisksTab: FC<VirtualMachinesInstancePageDisksTabProps> = ({
+const VirtualMachinesInstancePageDisksTab: FCC<VirtualMachinesInstancePageDisksTabProps> = ({
   obj: vmi,
 }) => (
   <PageSection>

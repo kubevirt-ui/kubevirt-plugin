@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { IoK8sApiCoreV1Pod } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -15,7 +15,7 @@ type VMIPAddressesItemProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const VMIPAddressesDetailsItem: FC<VMIPAddressesItemProps> = ({ launcherPod, vmi }) => {
+const VMIPAddressesDetailsItem: FCC<VMIPAddressesItemProps> = ({ launcherPod, vmi }) => {
   const { t } = useKubevirtTranslation();
 
   const ipAddresses = getVMIIPAddresses(vmi);

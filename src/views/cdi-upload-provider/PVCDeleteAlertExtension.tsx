@@ -28,7 +28,7 @@ const templatesResource: WatchK8sResource = {
   },
 };
 
-const PVCDeleteAlertExtension: React.FC<{ pvc: V1beta1PersistentVolumeClaim }> = ({ pvc }) => {
+const PVCDeleteAlertExtension: React.FCC<{ pvc: V1beta1PersistentVolumeClaim }> = ({ pvc }) => {
   const [commonTemplates, loadedTemplates, errorTemplates] =
     useK8sWatchResource<V1Template[]>(templatesResource);
   const { t } = useKubevirtTranslation();

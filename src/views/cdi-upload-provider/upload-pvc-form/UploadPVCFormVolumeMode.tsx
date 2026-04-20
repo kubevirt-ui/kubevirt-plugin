@@ -1,4 +1,4 @@
-import React, { FC, useMemo } from 'react';
+import React, { FCC, useMemo } from 'react';
 import { Trans } from 'react-i18next';
 
 import { V1beta1StorageSpecAccessModesEnum } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -16,7 +16,7 @@ type UploadPVCFormModeVolumeModeVolumeModeProps = {
   volumeMode: string;
 };
 
-const UploadPVCFormModeVolumeMode: FC<UploadPVCFormModeVolumeModeVolumeModeProps> = ({
+const UploadPVCFormModeVolumeMode: FCC<UploadPVCFormModeVolumeModeVolumeModeProps> = ({
   accessMode,
   loaded,
   onChange,

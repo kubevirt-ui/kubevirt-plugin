@@ -1,4 +1,4 @@
-import React, { Dispatch, FC, SetStateAction } from 'react';
+import React, { Dispatch, FCC, SetStateAction } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from '@patternfly/react-core';
@@ -11,7 +11,7 @@ export type SessionAlreadyInUseModalProps = {
   setConsoleState: Dispatch<SetStateAction<ConsoleState>>;
 };
 
-const SessionAlreadyInUseModal: FC<SessionAlreadyInUseModalProps> = ({
+const SessionAlreadyInUseModal: FCC<SessionAlreadyInUseModalProps> = ({
   connect,
   isOpen,
   setConsoleState,

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom-v5-compat';
+import { useParams } from 'react-router';
 
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import {

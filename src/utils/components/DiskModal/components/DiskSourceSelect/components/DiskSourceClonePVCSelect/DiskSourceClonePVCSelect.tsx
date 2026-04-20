@@ -1,9 +1,9 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import DiskSourceClonePVCSelectName from './DiskSourceClonePVCSelectName';
 import DiskSourceClonePVCSelectNamespace from './DiskSourceClonePVCSelectNamespace';
 
-const DiskSourceClonePVCSelect: FC = () => {
+const DiskSourceClonePVCSelect: FCC = () => {
   return (
     <>
       <DiskSourceClonePVCSelectNamespace />

@@ -1,5 +1,5 @@
-import React, { FC } from 'react';
-import { Link } from 'react-router-dom-v5-compat';
+import React, { FCC } from 'react';
+import { Link } from 'react-router';
 import xbytes from 'xbytes';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -42,7 +42,7 @@ type MemoryThresholdChartProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const MemoryThresholdChart: FC<MemoryThresholdChartProps> = ({ vmi }) => {
+const MemoryThresholdChart: FCC<MemoryThresholdChartProps> = ({ vmi }) => {
   const { currentTime, duration, timespan } = useDuration();
 
   const { query, queryLink } = useVMQuery(vmi, VMQueries.MEMORY_USAGE);

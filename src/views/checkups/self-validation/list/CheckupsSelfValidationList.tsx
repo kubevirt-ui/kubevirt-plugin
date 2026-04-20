@@ -1,4 +1,4 @@
-import React, { FC, useMemo } from 'react';
+import React, { FCC, useMemo } from 'react';
 
 import { IoK8sApiBatchV1Job } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
@@ -32,7 +32,7 @@ import CheckupsSelfValidationListEmptyState from './CheckupsSelfValidationListEm
 
 import '@kubevirt-utils/styles/list-managment-group.scss';
 
-const CheckupsSelfValidationList: FC = () => {
+const CheckupsSelfValidationList: FCC = () => {
   const { t } = useKubevirtTranslation();
   const isACMPage = useIsACMPage();
   const [hubClusterName] = useHubClusterName();

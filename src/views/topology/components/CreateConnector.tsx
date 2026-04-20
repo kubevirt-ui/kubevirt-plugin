@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { DefaultCreateConnector, Point } from '@patternfly/react-topology';
@@ -11,7 +11,7 @@ type CreateConnectorProps = {
   startPoint: Point;
 };
 
-const CreateConnector: FC<CreateConnectorProps> = ({
+const CreateConnector: FCC<CreateConnectorProps> = ({
   dragging,
   endPoint,
   hints,

@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FCC, useState } from 'react';
 
 import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
 import { UseBootableVolumesValues } from '@catalog/CreateFromInstanceTypes/state/utils/types';
@@ -24,7 +24,7 @@ type BootableVolumeListModalProps = {
   userPreferencesData: V1beta1VirtualMachinePreference[];
 };
 
-const BootableVolumeListModal: FC<BootableVolumeListModalProps> = ({
+const BootableVolumeListModal: FCC<BootableVolumeListModalProps> = ({
   favorites,
   isOpen,
   onClose,

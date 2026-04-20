@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { modelToGroupVersionKind, PersistentVolumeClaimModel } from '@kubevirt-utils/models';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
@@ -10,7 +10,7 @@ type DiskSourceCellProps = {
   row: DiskRowDataLayout;
 };
 
-const DiskSourceCell: FC<DiskSourceCellProps> = ({ row }) => {
+const DiskSourceCell: FCC<DiskSourceCellProps> = ({ row }) => {
   const cluster = useClusterParam();
   const isPVCSource = row?.namespace != null;
 

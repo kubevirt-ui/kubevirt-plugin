@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 import classnames from 'classnames';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -14,7 +14,7 @@ type OperatingSystemTileProps = {
   operatingSystem: OperatingSystemType;
 };
 
-const OperatingSystemTile: FC<OperatingSystemTileProps> = ({
+const OperatingSystemTile: FCC<OperatingSystemTileProps> = ({
   isSelected,
   onClick,
   operatingSystem,

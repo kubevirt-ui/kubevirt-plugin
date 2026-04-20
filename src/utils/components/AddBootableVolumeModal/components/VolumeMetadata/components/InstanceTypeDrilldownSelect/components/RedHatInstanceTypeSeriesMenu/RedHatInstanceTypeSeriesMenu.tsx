@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { RedHatInstanceTypeSeries } from '../../utils/types';
 import DrilldownMenuItemWrapper from '../DrilldownMenuItem/DrilldownMenuItemWrapper';
@@ -10,7 +10,7 @@ type RedHatInstanceTypeSeriesMenuProps = {
   seriesList: RedHatInstanceTypeSeries[];
 };
 
-const RedHatInstanceTypeSeriesMenu: FC<RedHatInstanceTypeSeriesMenuProps> = ({
+const RedHatInstanceTypeSeriesMenu: FCC<RedHatInstanceTypeSeriesMenuProps> = ({
   seriesList,
   ...restProps
 }) => (

@@ -1,5 +1,5 @@
-import React, { FC } from 'react';
-import { useParams } from 'react-router-dom-v5-compat';
+import React, { FCC } from 'react';
+import { useParams } from 'react-router';
 
 import {
   ConfigMapModel,
@@ -37,7 +37,7 @@ type SysPrepItemProps = {
   template: V1Template;
 };
 
-const SysPrepItem: FC<SysPrepItemProps> = ({ template }) => {
+const SysPrepItem: FCC<SysPrepItemProps> = ({ template }) => {
   const { ns: namespace } = useParams<{ ns: string }>();
   const { isTemplateEditable } = useEditTemplateAccessReview(template);
   const vm = getTemplateVirtualMachineObject(template);

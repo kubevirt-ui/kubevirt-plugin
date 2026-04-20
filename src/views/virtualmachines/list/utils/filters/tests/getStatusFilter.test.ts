@@ -1,3 +1,4 @@
+import { TFunction } from 'i18next';
 import {
   errorPrintableVMStatus,
   printableVMStatus,
@@ -15,7 +16,7 @@ jest.mock('@kubevirt-utils/hooks/useKubevirtTranslation', () => ({
 }));
 
 describe('VM Status Filter', () => {
-  const statusFilter = getStatusFilter(t);
+  const statusFilter = getStatusFilter(t as TFunction);
 
   describe('filter function', () => {
     it('should return true when no statuses are selected', () => {

@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 import xbytes from 'xbytes';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -18,7 +18,7 @@ type StorageUtilProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const StorageUtil: FC<StorageUtilProps> = ({ vmi }) => {
+const StorageUtil: FCC<StorageUtilProps> = ({ vmi }) => {
   const { t } = useKubevirtTranslation();
 
   const [filesystems, loaded] = useVMIFilesystems(vmi);

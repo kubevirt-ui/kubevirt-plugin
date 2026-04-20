@@ -1,5 +1,5 @@
 /* Copyright Contributors to the Open Cluster Management project */
-import React, { FC, useMemo } from 'react';
+import React, { FCC, useMemo } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { Modal, ModalBody } from '@patternfly/react-core';
@@ -8,7 +8,7 @@ import CrossClusterMigrationWizard from './CrossClusterMigrationWizard';
 
 import './CrossClusterMigration.scss';
 
-const CrossClusterMigration: FC<{
+const CrossClusterMigration: FCC<{
   close: () => void;
   isOpen?: boolean;
   resource?: V1VirtualMachine;

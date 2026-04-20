@@ -16,7 +16,7 @@ type AlertStatusItemACMProps = {
   alertType: AlertType;
 };
 
-const AlertStatusItemACM: React.FC<AlertStatusItemACMProps> = ({ alertDetails, alertType }) => {
+const AlertStatusItemACM: React.FCC<AlertStatusItemACMProps> = ({ alertDetails, alertType }) => {
   const { t } = useKubevirtTranslation();
   const { alertName, externalLink, isVMAlert, link, namespace, vmName } = alertDetails;
   const Icon = alertIcon[alertType];

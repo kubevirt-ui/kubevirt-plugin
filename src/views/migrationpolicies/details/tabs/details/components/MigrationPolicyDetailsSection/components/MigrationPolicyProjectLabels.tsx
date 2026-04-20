@@ -22,7 +22,7 @@ import { ensureMigrationPolicyMatchLabels } from '../utils/utils';
 type MigrationPolicyVirtualMachineLabelsProps = {
   mp: V1alpha1MigrationPolicy;
 };
-const MigrationPolicyVirtualMachineLabels: React.FC<MigrationPolicyVirtualMachineLabelsProps> = ({
+const MigrationPolicyVirtualMachineLabels: React.FCC<MigrationPolicyVirtualMachineLabelsProps> = ({
   mp,
 }) => {
   const { t } = useKubevirtTranslation();

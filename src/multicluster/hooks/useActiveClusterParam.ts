@@ -1,4 +1,4 @@
-import { useMatch } from 'react-router-dom-v5-compat';
+import { useMatch } from 'react-router';
 
 import { ALL_CLUSTERS_KEY } from '@kubevirt-utils/hooks/constants';
 import { FLEET_BASE_PATH } from '@multicluster/constants';

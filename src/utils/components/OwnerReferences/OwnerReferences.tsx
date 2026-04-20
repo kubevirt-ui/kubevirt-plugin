@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -14,7 +14,7 @@ type OwnerReferencesProps = {
   obj: K8sResourceCommon;
 };
 
-const OwnerReferences: FC<OwnerReferencesProps> = ({ obj }) => {
+const OwnerReferences: FCC<OwnerReferencesProps> = ({ obj }) => {
   const { t } = useKubevirtTranslation();
   const ownerReferences = (obj?.metadata?.ownerReferences || [])?.map(
     (ownerRef: OwnerReference) => (

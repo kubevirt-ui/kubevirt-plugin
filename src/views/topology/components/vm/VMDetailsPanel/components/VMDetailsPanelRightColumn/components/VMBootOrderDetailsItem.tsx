@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import BootOrderSummary from '@kubevirt-utils/components/BootOrder/BootOrderSummary';
@@ -17,7 +17,7 @@ type VMBootOrderDetailsItemProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const VMBootOrderDetailsItem: FC<VMBootOrderDetailsItemProps> = ({ instanceTypeVM, vm, vmi }) => {
+const VMBootOrderDetailsItem: FCC<VMBootOrderDetailsItemProps> = ({ instanceTypeVM, vm, vmi }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
 

@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { Menu, MenuContent, Popper } from '@patternfly/react-core';
 
@@ -14,7 +14,7 @@ type RightClickMenuWrapperProps = {
   triggerRef: () => HTMLElement | null;
 };
 
-const RightClickMenuWrapper: FC<RightClickMenuWrapperProps> = ({
+const RightClickMenuWrapper: FCC<RightClickMenuWrapperProps> = ({
   children,
   nestedLevel,
   triggerRef,

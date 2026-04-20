@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { IoK8sApiCoreV1Pod } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -19,7 +19,7 @@ type ShowProgressProps = {
   uploadPod: IoK8sApiCoreV1Pod;
 };
 
-const ShowProgress: FC<ShowProgressProps> = ({ uploadPod }) => {
+const ShowProgress: FCC<ShowProgressProps> = ({ uploadPod }) => {
   const { t } = useKubevirtTranslation();
 
   const phase = uploadPod?.status?.phase;

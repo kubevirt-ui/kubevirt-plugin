@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import {
   V1VirtualMachine,
@@ -24,7 +24,7 @@ type MakePersistentModalProps = {
   volume: V1Volume;
 };
 
-const MakePersistentModal: FC<MakePersistentModalProps> = ({
+const MakePersistentModal: FCC<MakePersistentModalProps> = ({
   isOpen,
   onClose,
   vm,

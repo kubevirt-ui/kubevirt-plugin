@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 import { Trans } from 'react-i18next';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -19,7 +19,7 @@ type DownloadResultsErrorModalProps = {
   url?: string;
 };
 
-const DownloadResultsErrorModal: FC<DownloadResultsErrorModalProps> = ({
+const DownloadResultsErrorModal: FCC<DownloadResultsErrorModalProps> = ({
   errorMessage,
   isOpen,
   onClose,

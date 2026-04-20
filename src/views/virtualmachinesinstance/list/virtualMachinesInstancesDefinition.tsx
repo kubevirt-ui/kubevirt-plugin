@@ -1,5 +1,5 @@
 import React from 'react';
-import { TFunction } from 'react-i18next';
+import { TFunction } from 'i18next';
 import format from 'date-fns/format';
 import { VMStatusConditionLabelList } from 'src/views/virtualmachines/list/components/VMStatusConditionLabel';
 

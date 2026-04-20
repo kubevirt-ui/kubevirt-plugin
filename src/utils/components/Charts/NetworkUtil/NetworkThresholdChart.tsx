@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom-v5-compat';
+import { Link } from 'react-router';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import useVMQueries from '@kubevirt-utils/hooks/useVMQueries';
@@ -38,7 +38,7 @@ type NetworkThresholdChartProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const NetworkThresholdChart: React.FC<NetworkThresholdChartProps> = ({ vmi }) => {
+const NetworkThresholdChart: React.FCC<NetworkThresholdChartProps> = ({ vmi }) => {
   const { currentTime, duration, timespan } = useDuration();
 
   const queries = useVMQueries(vmi);

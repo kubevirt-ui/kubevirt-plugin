@@ -1,4 +1,4 @@
-import { TFunction } from 'react-i18next';
+import { TFunction } from 'i18next';
 
 import { InProgressIcon, UnknownIcon } from '@patternfly/react-icons';
 import { InstallState } from '@settings/tabs/ClusterTab/components/VirtualizationFeaturesSection/utils/types';

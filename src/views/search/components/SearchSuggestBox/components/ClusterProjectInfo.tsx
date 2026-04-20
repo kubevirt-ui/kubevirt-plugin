@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { SearchSuggestResource } from '@search/utils/types';
@@ -9,7 +9,7 @@ type ClusterProjectInfoProps = {
   resource: SearchSuggestResource;
 };
 
-const ClusterProjectInfo: FC<ClusterProjectInfoProps> = ({
+const ClusterProjectInfo: FCC<ClusterProjectInfoProps> = ({
   isAllClusters,
   isAllNamespaces,
   resource,

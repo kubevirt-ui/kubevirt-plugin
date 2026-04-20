@@ -1,4 +1,4 @@
-import React, { Dispatch, FC, SetStateAction } from 'react';
+import React, { Dispatch, FCC, SetStateAction } from 'react';
 
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -11,7 +11,7 @@ type YesNoDropdownProps = {
   state: boolean;
 };
 
-const YesNoDropdown: FC<YesNoDropdownProps> = ({ setState, state }) => {
+const YesNoDropdown: FCC<YesNoDropdownProps> = ({ setState, state }) => {
   const { t } = useKubevirtTranslation();
 
   return (

@@ -1,5 +1,5 @@
-import React, { FC } from 'react';
-import { useNavigate } from 'react-router-dom-v5-compat';
+import React, { FCC } from 'react';
+import { useNavigate } from 'react-router';
 
 import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import CloneTemplateModal from '@kubevirt-utils/components/CloneTemplateModal/CloneTemplateModal';
@@ -17,7 +17,7 @@ type CommonTemplateAlertProps = {
   template: V1Template;
 };
 
-const CommonTemplateAlert: FC<CommonTemplateAlertProps> = ({ template }) => {
+const CommonTemplateAlert: FCC<CommonTemplateAlertProps> = ({ template }) => {
   const { t } = useKubevirtTranslation();
   const osName = getOperatingSystemName(template);
   const providerName = getTemplateProviderName(template);

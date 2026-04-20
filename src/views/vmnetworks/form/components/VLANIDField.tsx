@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
@@ -11,7 +11,7 @@ import { FormGroup, TextInput } from '@patternfly/react-core';
 import { MAX_VLAN_ID, MIN_VLAN_ID, VMNetworkForm } from '../constants';
 import { getVLANIDValidatedOption } from '../utils/utils';
 
-const VLANIDField: FC = () => {
+const VLANIDField: FCC = () => {
   const { t } = useKubevirtTranslation();
   const { control } = useFormContext<VMNetworkForm>();
 

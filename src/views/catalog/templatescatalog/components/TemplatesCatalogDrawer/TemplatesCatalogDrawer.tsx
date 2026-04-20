@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { logTemplateFlowEvent } from '@kubevirt-utils/extensions/telemetry/telemetry';
@@ -22,7 +22,7 @@ type TemplatesCatalogDrawerProps = {
   template: undefined | V1Template;
 };
 
-export const TemplatesCatalogDrawer: FC<TemplatesCatalogDrawerProps> = ({
+export const TemplatesCatalogDrawer: FCC<TemplatesCatalogDrawerProps> = ({
   isOpen,
   namespace,
   onClose,

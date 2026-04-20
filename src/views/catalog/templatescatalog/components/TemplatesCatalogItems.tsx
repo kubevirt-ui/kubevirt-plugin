@@ -1,4 +1,4 @@
-import React, { FC, useMemo } from 'react';
+import React, { FCC, useMemo } from 'react';
 
 import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
@@ -27,7 +27,7 @@ type TemplatesCatalogItemsProps = {
   unfilteredTemplates: V1Template[];
 };
 
-export const TemplatesCatalogItems: FC<TemplatesCatalogItemsProps> = ({
+export const TemplatesCatalogItems: FCC<TemplatesCatalogItemsProps> = ({
   availableDatasources,
   availableTemplatesUID,
   bootSourcesLoaded,

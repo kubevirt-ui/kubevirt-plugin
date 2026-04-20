@@ -1,4 +1,4 @@
-import React, { ChangeEvent, FC, useEffect, useState } from 'react';
+import React, { ChangeEvent, FCC, useEffect, useState } from 'react';
 import { XMLValidator } from 'fast-xml-parser';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -23,7 +23,7 @@ type SysprepFileFieldProps = {
   value?: string;
 };
 
-const SysprepFileField: FC<SysprepFileFieldProps> = ({ id, onChange, value }) => {
+const SysprepFileField: FCC<SysprepFileFieldProps> = ({ id, onChange, value }) => {
   const { t } = useKubevirtTranslation();
   const [data, setData] = useState<SysprepFile>({
     fileName: '',

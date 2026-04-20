@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-utils/models';
 import { ResourceLink, RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
@@ -7,7 +7,7 @@ import { ProjectWithVMCount } from '../../types';
 
 type ConnectedProjectsRowProps = RowProps<ProjectWithVMCount>;
 
-const ConnectedProjectsRow: FC<ConnectedProjectsRowProps> = ({ activeColumnIDs, obj }) => {
+const ConnectedProjectsRow: FCC<ConnectedProjectsRowProps> = ({ activeColumnIDs, obj }) => {
   const { projectName, vmCount } = obj;
 
   return (

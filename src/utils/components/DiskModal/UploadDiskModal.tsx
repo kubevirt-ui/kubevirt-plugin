@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
 import { useCDIUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
@@ -24,7 +24,7 @@ import { diskModalTitle, hotplugPromise } from './utils/helpers';
 import { addDisk, reorderBootDisk, uploadDataVolume } from './utils/submit';
 import { SourceTypes, V1DiskFormState, V1SubDiskModalProps } from './utils/types';
 
-const UploadDiskModal: FC<V1SubDiskModalProps> = ({
+const UploadDiskModal: FCC<V1SubDiskModalProps> = ({
   isOpen,
   onClose,
   onSubmit,

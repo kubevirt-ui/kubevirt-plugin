@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -20,7 +20,7 @@ type QuotaFormResourceLimitFieldsProps = {
   updateHardValue: (key: string, value: number, unit?: string) => void;
 };
 
-const QuotaFormResourceLimitFields: FC<QuotaFormResourceLimitFieldsProps> = ({
+const QuotaFormResourceLimitFields: FCC<QuotaFormResourceLimitFieldsProps> = ({
   formData,
   updateHardValue,
 }) => {

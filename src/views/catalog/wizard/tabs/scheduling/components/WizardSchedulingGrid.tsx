@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { UpdateValidatedVM } from '@catalog/utils/WizardVMContext';
 import { modelToGroupVersionKind, NodeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -39,7 +39,7 @@ type WizardSchedulingGridProps = {
   vm: V1VirtualMachine;
 };
 
-const WizardSchedulingGrid: FC<WizardSchedulingGridProps> = ({ updateVM, vm }) => {
+const WizardSchedulingGrid: FCC<WizardSchedulingGridProps> = ({ updateVM, vm }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
 

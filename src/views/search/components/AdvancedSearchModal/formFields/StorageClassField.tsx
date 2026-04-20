@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import MultiSelectTypeahead from '@kubevirt-utils/components/MultiSelectTypeahead/MultiSelectTypeahead';
@@ -14,7 +14,7 @@ type StorageClassFieldProps = {
   vms: V1VirtualMachine[];
 };
 
-const StorageClassField: FC<StorageClassFieldProps> = ({ vms }) => {
+const StorageClassField: FCC<StorageClassFieldProps> = ({ vms }) => {
   const { t } = useKubevirtTranslation();
   const { setValue, value } = useAdvancedSearchField(VirtualMachineRowFilterType.StorageClass);
 

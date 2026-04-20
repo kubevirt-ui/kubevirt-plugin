@@ -9,7 +9,7 @@ type UploadPVCPopoverProgressStatusProps = {
   title: string;
 };
 
-const UploadPVCPopoverProgressStatus: React.FC<UploadPVCPopoverProgressStatusProps> = ({
+const UploadPVCPopoverProgressStatus: React.FCC<UploadPVCPopoverProgressStatusProps> = ({
   onCancelClick,
   title,
 }) => {

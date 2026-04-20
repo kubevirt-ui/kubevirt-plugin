@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
@@ -6,7 +6,7 @@ import ConnectToConsole from '../ConnectToConsole';
 
 import { CustomConnectComponentProps } from './utils/VncConsoleTypes';
 
-const VncConnect: FC<CustomConnectComponentProps> = ({ connect, isConnecting }) => {
+const VncConnect: FCC<CustomConnectComponentProps> = ({ connect, isConnecting }) => {
   const { t } = useKubevirtTranslation();
   return (
     <ConnectToConsole

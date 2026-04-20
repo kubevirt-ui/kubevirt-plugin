@@ -8,7 +8,7 @@ import SysprepFileField from '../SysprepFileField';
 
 import SysprepUnattendHelperPopup from './SysprepUnattendHelperPopup';
 
-const SysprepUnattend: React.FC<{
+const SysprepUnattend: React.FCC<{
   onChange: (value: string) => void;
   value: string;
 }> = ({ onChange, value }) => {

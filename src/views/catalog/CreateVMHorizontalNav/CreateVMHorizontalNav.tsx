@@ -1,5 +1,5 @@
-import React, { FC, MouseEvent, useMemo, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom-v5-compat';
+import React, { FCC, MouseEvent, useMemo, useState } from 'react';
+import { useNavigate, useParams } from 'react-router';
 
 import CreateFromInstanceType from '@catalog/CreateFromInstanceTypes/CreateFromInstanceType';
 import TemplatesCatalog from '@catalog/templatescatalog/TemplatesCatalog';
@@ -13,7 +13,7 @@ import { CREATE_VM_TAB } from './constants';
 
 import './CreateVMHorizontalNav.scss';
 
-const CreateVMHorizontalNav: FC = () => {
+const CreateVMHorizontalNav: FCC = () => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
   const params = useParams();

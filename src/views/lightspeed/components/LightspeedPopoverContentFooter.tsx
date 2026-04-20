@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import Breadcrumbs from '@kubevirt-utils/components/Breadcrumbs/Breadcrumbs';
 import { FLAG_LIGHTSPEED_PLUGIN } from '@kubevirt-utils/flags/consts';
@@ -14,7 +14,7 @@ type LightspeedPopoverContentFooterProps = {
   promptType: OLSPromptType;
 };
 
-const LightspeedPopoverContentFooter: FC<LightspeedPopoverContentFooterProps> = ({
+const LightspeedPopoverContentFooter: FCC<LightspeedPopoverContentFooterProps> = ({
   breadcrumb,
   hide,
   obj,

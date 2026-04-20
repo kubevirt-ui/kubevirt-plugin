@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -17,7 +17,7 @@ type RelatedSuggestions = Pick<
   'searchQuery' | 'searchSuggestResult' | 'showSearchModal'
 >;
 
-const RelatedSuggestions: FC<RelatedSuggestions> = ({
+const RelatedSuggestions: FCC<RelatedSuggestions> = ({
   searchQuery,
   searchSuggestResult,
   showSearchModal,

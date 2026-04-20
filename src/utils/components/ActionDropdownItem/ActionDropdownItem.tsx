@@ -1,4 +1,4 @@
-import React, { Dispatch, FC, SetStateAction } from 'react';
+import React, { Dispatch, FCC, SetStateAction } from 'react';
 
 import { Menu, MenuContent, MenuItem, MenuList, TooltipPosition } from '@patternfly/react-core';
 import { useFleetAccessReview } from '@stolostron/multicluster-sdk';
@@ -12,7 +12,7 @@ type ActionDropdownItemProps = {
   setIsOpen: Dispatch<SetStateAction<boolean>>;
 };
 
-const ActionDropdownItem: FC<ActionDropdownItemProps> = ({ action, setIsOpen }) => {
+const ActionDropdownItem: FCC<ActionDropdownItemProps> = ({ action, setIsOpen }) => {
   const [accessReview] = useFleetAccessReview(action?.accessReview || {});
 
   const actionAllowed = accessReview || action?.accessReview === undefined;

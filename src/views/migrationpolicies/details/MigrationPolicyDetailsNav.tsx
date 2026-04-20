@@ -1,5 +1,5 @@
-import React, { FC, useMemo } from 'react';
-import { useParams } from 'react-router-dom-v5-compat';
+import React, { FCC, useMemo } from 'react';
+import { useParams } from 'react-router';
 
 import { MigrationPolicyModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1alpha1MigrationPolicy } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -12,7 +12,7 @@ import { HorizontalNav } from '@openshift-console/dynamic-plugin-sdk';
 import MigrationPolicyDetailsNavTitle from './components/MigrationPolicyDetailsNavTitle/MigrationPolicyDetailsNavTitle';
 import { useMigrationPolicyTabs } from './hooks/useMigrationPolicyTabs';
 
-const MigrationPolicyDetailsNav: FC = () => {
+const MigrationPolicyDetailsNav: FCC = () => {
   const cluster = useClusterParam();
   const namespace = useNamespaceParam();
   const { name } = useParams();

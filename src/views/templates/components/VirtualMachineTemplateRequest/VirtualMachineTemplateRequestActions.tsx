@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { VirtualMachineTemplateRequestModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1alpha1VirtualMachineTemplateRequest } from '@kubevirt-ui-ext/kubevirt-api/virt-template';
@@ -15,7 +15,7 @@ type VirtualMachineTemplateRequestActionsProps = {
   request: V1alpha1VirtualMachineTemplateRequest;
 };
 
-const VirtualMachineTemplateRequestActions: FC<VirtualMachineTemplateRequestActionsProps> = ({
+const VirtualMachineTemplateRequestActions: FCC<VirtualMachineTemplateRequestActionsProps> = ({
   isKebabToggle,
   request,
 }) => {

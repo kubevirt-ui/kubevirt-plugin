@@ -36,7 +36,7 @@ type TolerationsModalProps = {
   template: V1Template;
 };
 
-const TolerationsModal: React.FC<TolerationsModalProps> = ({
+const TolerationsModal: React.FCC<TolerationsModalProps> = ({
   isOpen,
   onClose,
   onSubmit,

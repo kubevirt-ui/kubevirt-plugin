@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-shadow */
-import React, { FC, useRef, useState } from 'react';
-import { TFunction } from 'react-i18next';
+import React, { FCC, useRef, useState } from 'react';
+import { TFunction } from 'i18next';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getRandomChars } from '@kubevirt-utils/utils/utils';
@@ -55,7 +55,7 @@ type SelectTypeaheadProps = {
 const getDisplayValue = (option: SelectTypeaheadOptionProps) =>
   option?.label ?? option?.value ?? '';
 
-const SelectTypeahead: FC<SelectTypeaheadProps> = ({
+const SelectTypeahead: FCC<SelectTypeaheadProps> = ({
   addOption,
   canCreate = false,
   dataTestId,

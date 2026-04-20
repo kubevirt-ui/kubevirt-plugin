@@ -1,4 +1,4 @@
-import React, { FC, useCallback } from 'react';
+import React, { FCC, useCallback } from 'react';
 
 import { IoK8sApiBatchV1Job } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
@@ -15,7 +15,7 @@ import useWatchCheckupData from '../../hooks/useWatchCheckupData';
 
 import CheckupsSelfValidationDetailsPageSection from './CheckupsSelfValidationDetailsPageSection';
 
-const CheckupsSelfValidationDetailsTab: FC = () => {
+const CheckupsSelfValidationDetailsTab: FCC = () => {
   const { configMap, error, jobMatches, loaded } = useWatchCheckupData();
   const currentJob = jobMatches?.[0];
 

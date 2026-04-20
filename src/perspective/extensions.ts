@@ -1,6 +1,8 @@
-import { EncodedExtension } from '@openshift/dynamic-plugin-sdk-webpack';
-import { Perspective } from '@openshift-console/dynamic-plugin-sdk';
-import type { ConsolePluginBuildMetadata } from '@openshift-console/dynamic-plugin-sdk-webpack';
+import type { Perspective } from '@openshift-console/dynamic-plugin-sdk';
+import type {
+  EncodedExtension,
+  ConsolePluginBuildMetadata,
+} from '@openshift-console/dynamic-plugin-sdk-webpack';
 
 import { PERSPECTIVES } from '../utils/constants/constants';
 import { FLAG_KUBEVIRT_VIRTUALIZATION_NAV } from '../utils/flags/consts';

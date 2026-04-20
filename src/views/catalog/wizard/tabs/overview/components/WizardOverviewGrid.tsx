@@ -1,5 +1,5 @@
-import React, { FC, useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom-v5-compat';
+import React, { FCC, useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router';
 
 import { UpdateValidatedVM } from '@catalog/utils/WizardVMContext';
 import { TabsData } from '@catalog/utils/WizardVMContext/utils/tabs-data';
@@ -55,7 +55,7 @@ type WizardOverviewGridProps = {
   vm: V1VirtualMachine;
 };
 
-const WizardOverviewGrid: FC<WizardOverviewGridProps> = ({ tabsData, updateVM, vm }) => {
+const WizardOverviewGrid: FCC<WizardOverviewGridProps> = ({ tabsData, updateVM, vm }) => {
   const navigate = useNavigate();
   const { ns } = useParams<{ ns: string }>();
   const { t } = useKubevirtTranslation();

@@ -1,5 +1,5 @@
-import React, { FC } from 'react';
-import { Link } from 'react-router-dom-v5-compat';
+import React, { FCC } from 'react';
+import { Link } from 'react-router';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -9,7 +9,7 @@ type ErrorAlertProps = {
   error: any | Error;
 };
 
-const ErrorAlert: FC<ErrorAlertProps> = ({ error }) => {
+const ErrorAlert: FCC<ErrorAlertProps> = ({ error }) => {
   const { t } = useKubevirtTranslation();
   if (isEmpty(error)) return null;
 

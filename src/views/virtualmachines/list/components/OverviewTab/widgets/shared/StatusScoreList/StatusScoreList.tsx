@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import StatusScoreItem from './StatusScoreItem';
 import { StatusScoreItem as StatusScoreItemType } from './types';
@@ -13,7 +13,7 @@ type StatusScoreListProps = {
   scoreHeader: string;
 };
 
-const StatusScoreList: FC<StatusScoreListProps> = ({ items, nameHeader, scoreHeader }) => {
+const StatusScoreList: FCC<StatusScoreListProps> = ({ items, nameHeader, scoreHeader }) => {
   return (
     <div className="status-score-list">
       <div className="status-score-list__header">

@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { IoK8sApiCoreV1Service } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
@@ -19,7 +19,7 @@ type SSHServiceSelectProps = {
   sshServiceLoaded: boolean;
 };
 
-const SSHServiceSelect: FC<SSHServiceSelectProps> = ({
+const SSHServiceSelect: FCC<SSHServiceSelectProps> = ({
   onSSHChange,
   sshService,
   sshServiceLoaded,

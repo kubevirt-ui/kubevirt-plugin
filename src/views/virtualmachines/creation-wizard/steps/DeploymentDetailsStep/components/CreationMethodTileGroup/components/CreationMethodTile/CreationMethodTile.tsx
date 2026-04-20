@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Card, CardBody, CardHeader, Stack, StackItem, Title } from '@patternfly/react-core';
@@ -13,7 +13,7 @@ type CreationMethodTileProps = {
   setSelectedCreationMethod: (creationMethod: VMCreationMethod) => void;
 };
 
-const CreationMethodTile: FC<CreationMethodTileProps> = ({
+const CreationMethodTile: FCC<CreationMethodTileProps> = ({
   creationMethod,
   isChecked,
   setSelectedCreationMethod,

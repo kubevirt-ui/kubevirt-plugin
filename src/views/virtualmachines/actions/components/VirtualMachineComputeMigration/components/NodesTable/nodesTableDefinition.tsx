@@ -1,5 +1,5 @@
-import React, { FC, ReactNode } from 'react';
-import { TFunction } from 'react-i18next';
+import React, { FCC, ReactNode } from 'react';
+import { TFunction } from 'i18next';
 
 import { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -19,7 +19,7 @@ type SelectionCellProps = {
   row: NodeData;
 };
 
-const SelectionCell: FC<SelectionCellProps> = ({ callbacks, row }) => {
+const SelectionCell: FCC<SelectionCellProps> = ({ callbacks, row }) => {
   const { t } = useKubevirtTranslation();
   const { handleNodeSelection, selectedNode } = callbacks;
   return (
@@ -36,7 +36,7 @@ type CPUCellProps = {
   row: NodeData;
 };
 
-const CPUCell: FC<CPUCellProps> = ({ row }) => {
+const CPUCell: FCC<CPUCellProps> = ({ row }) => {
   const { t } = useKubevirtTranslation();
   const { totalCPU, usedCPU } = row;
   const parsedUsedCPU = parseFloat(usedCPU);
@@ -56,7 +56,7 @@ type MemoryCellProps = {
   row: NodeData;
 };
 
-const MemoryCell: FC<MemoryCellProps> = ({ row }) => {
+const MemoryCell: FCC<MemoryCellProps> = ({ row }) => {
   const { t } = useKubevirtTranslation();
   const { totalMemory, usedMemory } = row;
 

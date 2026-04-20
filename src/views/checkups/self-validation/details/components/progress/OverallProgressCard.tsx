@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useMemo, useState } from 'react';
+import React, { FCC, useEffect, useMemo, useState } from 'react';
 
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -30,7 +30,7 @@ type OverallProgressCardProps = {
   progress: OverallProgress;
 };
 
-const OverallProgressCard: FC<OverallProgressCardProps> = ({ progress: overallProgress }) => {
+const OverallProgressCard: FCC<OverallProgressCardProps> = ({ progress: overallProgress }) => {
   const { t } = useKubevirtTranslation();
 
   const initialElapsedSeconds = useMemo(() => {

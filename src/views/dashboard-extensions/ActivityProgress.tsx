@@ -7,7 +7,7 @@ type ActivityProgressProps = {
   title: string;
 };
 
-const ActivityProgress: React.FC<ActivityProgressProps> = ({ children, progress, title }) => (
+const ActivityProgress: React.FCC<ActivityProgressProps> = ({ children, progress, title }) => (
   <>
     <Progress
       className="co-activity-item__progress"

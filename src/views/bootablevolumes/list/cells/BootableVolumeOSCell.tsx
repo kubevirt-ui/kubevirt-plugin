@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { BootableResource } from '../../utils/types';
 import { getPreferenceReadableOS } from '../../utils/utils';
@@ -10,7 +10,7 @@ type BootableVolumeOSCellProps = {
   row: BootableResource;
 };
 
-const BootableVolumeOSCell: FC<BootableVolumeOSCellProps> = ({ callbacks, row }) => {
+const BootableVolumeOSCell: FCC<BootableVolumeOSCellProps> = ({ callbacks, row }) => {
   const cluster = getEffectiveCluster(row, callbacks);
   const clusterPreferences = getClusterPreferences(cluster, callbacks.preferences);
 

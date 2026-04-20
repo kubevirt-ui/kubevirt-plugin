@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { StatusGroupMapper } from '@openshift-console/dynamic-plugin-sdk';
@@ -68,6 +68,6 @@ export const getVMStatusGroups: StatusGroupMapper = (vms) => {
   return groups;
 };
 
-export const VMOffGroupIcon: FC = () => (
+export const VMOffGroupIcon: FCC = () => (
   <OffIcon className="kubevirt-inventory-card__status-icon--off" />
 );

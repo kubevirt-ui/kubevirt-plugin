@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Popover, PopoverPosition } from '@patternfly/react-core';
@@ -10,7 +10,7 @@ type VMsCountByNamespacePopoverLinkProps = {
   vmsByNamespace: Record<string, string[]>;
 };
 
-const VMsCountByNamespacePopoverLink: FC<VMsCountByNamespacePopoverLinkProps> = ({
+const VMsCountByNamespacePopoverLink: FCC<VMsCountByNamespacePopoverLinkProps> = ({
   suffix,
   vmsByNamespace,
 }) => {

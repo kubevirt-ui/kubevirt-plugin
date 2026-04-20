@@ -12,7 +12,7 @@ type SubscriptionStatusType = {
   subscription: SubscriptionKind;
 };
 
-const SubscriptionStatus: React.FC<SubscriptionStatusType> = ({ operatorLink, subscription }) => {
+const SubscriptionStatus: React.FCC<SubscriptionStatusType> = ({ operatorLink, subscription }) => {
   const Component = {
     default: <SubscriptionStateDefault subscription={subscription} />,
     [SubscriptionState.SubscriptionStateAtLatest]: <SubscriptionStateAtLatest />,

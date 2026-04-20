@@ -1,5 +1,5 @@
-import React, { FC } from 'react';
-import { useParams } from 'react-router-dom-v5-compat';
+import React, { FCC } from 'react';
+import { useParams } from 'react-router';
 
 import HorizontalNavbar from '@kubevirt-utils/components/HorizontalNavbar/HorizontalNavbar';
 import { SidebarEditorProvider } from '@kubevirt-utils/components/SidebarEditor/SidebarEditorContext';
@@ -14,7 +14,7 @@ import { wizardNavPages } from './tabs';
 
 import './Wizard.scss';
 
-const Wizard: FC = () => {
+const Wizard: FCC = () => {
   const { ns } = useParams<{ ns: string }>();
   const { vm } = useWizardVMContext();
 

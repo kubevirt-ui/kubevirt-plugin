@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 import { getSortedResourceKeys, getStatus } from 'src/views/quotas/utils/utils';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -12,7 +12,7 @@ type QuotaConsumptionTableProps = {
   quota: ApplicationAwareResourceQuota;
 };
 
-const QuotaConsumptionTable: FC<QuotaConsumptionTableProps> = ({ quota }) => {
+const QuotaConsumptionTable: FCC<QuotaConsumptionTableProps> = ({ quota }) => {
   const { t } = useKubevirtTranslation();
 
   const status = getStatus(quota);

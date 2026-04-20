@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { V1VirtualMachineInstanceSpec } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -10,7 +10,7 @@ type NodeSelectorProps = {
   nodeSelector: V1VirtualMachineInstanceSpec['nodeSelector'];
 };
 
-const NodeSelectorDetailItem: FC<NodeSelectorProps> = ({ nodeSelector }) => {
+const NodeSelectorDetailItem: FCC<NodeSelectorProps> = ({ nodeSelector }) => {
   const { t } = useKubevirtTranslation();
   const nodeSelectorLabel = getNodeSelectorLabel(nodeSelector);
 

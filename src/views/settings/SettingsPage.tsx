@@ -1,5 +1,5 @@
-import React, { FC, useCallback, useState } from 'react';
-import { Link } from 'react-router-dom-v5-compat';
+import React, { FCC, useCallback, useState } from 'react';
+import { Link } from 'react-router';
 
 import ClusterDropdown from '@kubevirt-utils/components/ClusterProjectDropdown/ClusterDropdown';
 import ConfigurationSearch from '@kubevirt-utils/components/ConfigurationSearch/ConfigurationSearch';
@@ -28,7 +28,7 @@ import SettingsTab from './SettingsTab';
 
 import './SettingsPage.scss';
 
-const SettingsPage: FC = () => {
+const SettingsPage: FCC = () => {
   useSignals();
 
   const { t } = useKubevirtTranslation();

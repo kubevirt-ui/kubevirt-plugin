@@ -1,4 +1,4 @@
-import { ComponentClass, FC } from 'react';
+import { ComponentClass, FCC } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { ErrorIcon } from '@kubevirt-utils/components/ErrorIcon/ErrorIcon';
@@ -48,7 +48,7 @@ export const errorPrintableVMStatus = {
 export const isErrorPrintableStatus = (printableStatus: string) =>
   Object.values(VM_ERROR_STATUSES).includes(printableStatus as VM_STATUS);
 
-export const getVMStatusIcon = (status: string): ComponentClass | FC => {
+export const getVMStatusIcon = (status: string): ComponentClass | FCC => {
   switch (status) {
     case printableVMStatus.Stopped:
       return OffIcon;

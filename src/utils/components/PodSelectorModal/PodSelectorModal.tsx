@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FCC, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { get, isEmpty } from '@kubevirt-utils/utils/utils';
@@ -32,7 +32,7 @@ export type PodSelectorModalProps = {
   resource: K8sResourceCommon;
 };
 
-const PodSelectorModal: FC<PodSelectorModalProps> = ({
+const PodSelectorModal: FCC<PodSelectorModalProps> = ({
   closeModal,
   model,
   path = 'spec.selector',

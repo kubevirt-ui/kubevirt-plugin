@@ -26,7 +26,7 @@ type DataSourceDetailsGridProps = {
   dataSource: V1beta1DataSource;
 };
 
-export const DataSourceDetailsGrid: React.FC<DataSourceDetailsGridProps> = ({ dataSource }) => {
+export const DataSourceDetailsGrid: React.FCC<DataSourceDetailsGridProps> = ({ dataSource }) => {
   const { t } = useKubevirtTranslation();
   const dataImportCron = getDataSourceCronJob(dataSource);
   const { name: pvcSourceName, namespace: pvcSourceNamespace } =

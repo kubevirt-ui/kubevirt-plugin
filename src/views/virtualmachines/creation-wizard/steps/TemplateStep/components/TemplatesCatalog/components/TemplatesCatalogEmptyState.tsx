@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { FC, memo } from 'react';
+import { FCC, memo } from 'react';
 
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -18,7 +18,7 @@ export type TemplatesCatalogEmptyStateProps = {
   onClearFilters: () => void;
 };
 
-const TemplatesCatalogEmptyState: FC<TemplatesCatalogEmptyStateProps> = memo(
+const TemplatesCatalogEmptyState: FCC<TemplatesCatalogEmptyStateProps> = memo(
   ({ bootSourcesLoaded, onClearFilters }) => {
     const { t } = useKubevirtTranslation();
 

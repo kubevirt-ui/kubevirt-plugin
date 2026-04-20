@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { MigrationPolicyModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1alpha1MigrationPolicy } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -22,7 +22,7 @@ import { ensureMigrationPolicyMatchLabels } from '../utils/utils';
 type MigrationPolicyVirtualMachineLabelsProps = {
   mp: V1alpha1MigrationPolicy;
 };
-const MigrationPolicyVirtualMachineLabels: FC<MigrationPolicyVirtualMachineLabelsProps> = ({
+const MigrationPolicyVirtualMachineLabels: FCC<MigrationPolicyVirtualMachineLabelsProps> = ({
   mp,
 }) => {
   const { t } = useKubevirtTranslation();

@@ -1,4 +1,4 @@
-import React, { FC, useMemo, useState } from 'react';
+import React, { FCC, useMemo, useState } from 'react';
 
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -20,7 +20,7 @@ import ResourceAllocationSubHeader from '../ResourceAllocationSubHeader/Resource
 
 import { getWidgetConfigs, WidgetDataMap } from './resourceAllocationSectionConfig';
 
-const ResourceAllocationSection: FC<OverviewSectionData> = ({
+const ResourceAllocationSection: FCC<OverviewSectionData> = ({
   metricsUnavailable,
   namespace,
   title,

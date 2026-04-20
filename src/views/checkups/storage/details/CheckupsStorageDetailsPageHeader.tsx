@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import {
   IoK8sApiBatchV1Job,
@@ -18,7 +18,7 @@ type CheckupsStorageDetailsPageHeaderProps = {
   jobs: IoK8sApiBatchV1Job[];
 };
 
-const CheckupsStorageDetailsPageHeader: FC<CheckupsStorageDetailsPageHeaderProps> = ({
+const CheckupsStorageDetailsPageHeader: FCC<CheckupsStorageDetailsPageHeaderProps> = ({
   configMap,
   jobs,
 }) => {

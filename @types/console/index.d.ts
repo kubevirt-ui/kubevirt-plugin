@@ -19,3 +19,20 @@ declare interface Window {
     };
   };
 }
+
+// TODO: React 18 FC type no longer supports optional children, so we use custom FCC type
+// (FC with Children) as a temporary workaround. Long term, all React components that use
+// children should have their Props types updated, e.g. use explicit children?: ReactNode
+import 'react';
+declare module 'react' {
+  /** @deprecated Replace with `FC<P>` where `P` reflects the expected `children` usage. */
+  type FCC<P = {}> = FC<PropsWithChildren<P>>;
+}
+
+import 'i18next';
+declare module 'i18next' {
+  /** @see https://www.i18next.com/overview/typescript#custom-type-options */
+  interface CustomTypeOptions {
+    allowObjectInHTMLChildren: true;
+  }
+}

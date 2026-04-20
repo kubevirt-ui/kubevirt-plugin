@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FCC, useState } from 'react';
 
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import LoadingEmptyState from '@kubevirt-utils/components/LoadingEmptyState/LoadingEmptyState';
@@ -28,7 +28,7 @@ type MigrationsTabProps = {
   duration: string;
 };
 
-const MigrationsTab: FC<MigrationsTabProps> = ({ duration }) => {
+const MigrationsTab: FCC<MigrationsTabProps> = ({ duration }) => {
   const { t } = useKubevirtTranslation();
   const [isExpanded, setIsExpanded] = useState(true);
 

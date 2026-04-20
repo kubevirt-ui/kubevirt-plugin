@@ -11,7 +11,7 @@ type BaseTemplateProps = {
   template: V1Template;
 };
 
-const BaseTemplate: React.FC<BaseTemplateProps> = ({ template }) => {
+const BaseTemplate: React.FCC<BaseTemplateProps> = ({ template }) => {
   const { t } = useKubevirtTranslation();
   const baseTemplate = getVMTemplateBaseName(template);
 

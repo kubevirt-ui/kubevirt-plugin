@@ -1,4 +1,4 @@
-import { TFunction } from 'react-i18next';
+import { TFunction } from 'i18next';
 
 import { timestampFor } from '@kubevirt-utils/components/Timestamp/utils/datetime';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';

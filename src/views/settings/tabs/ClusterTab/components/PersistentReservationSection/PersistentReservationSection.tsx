@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FCC, useState } from 'react';
 
 import { HyperConvergedModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import SectionWithSwitch from '@kubevirt-utils/components/SectionWithSwitch/SectionWithSwitch';
@@ -20,7 +20,7 @@ type PersistentReservationSectionProps = {
   hyperConvergeConfiguration: [hyperConvergeConfig: HyperConverged, loaded: boolean, error: Error];
 };
 
-const PersistentReservationSection: FC<PersistentReservationSectionProps> = ({
+const PersistentReservationSection: FCC<PersistentReservationSectionProps> = ({
   hyperConvergeConfiguration,
 }) => {
   const { t } = useKubevirtTranslation();

@@ -1,4 +1,4 @@
-import { TFunction } from 'react-i18next';
+import { TFunction } from 'i18next';
 
 import { InstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/utils/types';
 import { getNotSupportedVMError } from '@catalog/utils/constants';

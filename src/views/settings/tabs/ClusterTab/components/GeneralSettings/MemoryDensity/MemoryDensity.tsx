@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from 'react';
+import React, { FCC, useEffect, useState } from 'react';
 
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import SectionWithSwitch from '@kubevirt-utils/components/SectionWithSwitch/SectionWithSwitch';
@@ -36,7 +36,7 @@ type MemoryDensityProps = {
   newBadge: boolean;
 };
 
-const MemoryDensity: FC<MemoryDensityProps> = ({ hyperConvergeConfiguration, newBadge }) => {
+const MemoryDensity: FCC<MemoryDensityProps> = ({ hyperConvergeConfiguration, newBadge }) => {
   const { t } = useKubevirtTranslation();
   const cluster = useSettingsCluster();
   const isAdmin = useIsAdmin();

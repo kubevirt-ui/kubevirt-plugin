@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup } from '@patternfly/react-core';
@@ -8,7 +8,7 @@ import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 import MultiSelectTypeahead from '../../../../../utils/components/MultiSelectTypeahead/MultiSelectTypeahead';
 import { useAdvancedSearchField } from '../store/useAdvancedSearchStore';
 
-const StatusField: FC = () => {
+const StatusField: FCC = () => {
   const { t } = useKubevirtTranslation();
   const { setValue, value } = useAdvancedSearchField(VirtualMachineRowFilterType.Status);
 

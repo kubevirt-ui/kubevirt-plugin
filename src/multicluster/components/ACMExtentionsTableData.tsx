@@ -1,4 +1,4 @@
-import { ComponentType, FC } from 'react';
+import { ComponentType, FCC } from 'react';
 import React from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -10,7 +10,7 @@ type ACMExtentionsTableDataProps = {
   vm: V1VirtualMachine;
 };
 
-const ACMExtentionsTableData: FC<ACMExtentionsTableDataProps> = ({ activeColumnIDs, vm }) => {
+const ACMExtentionsTableData: FCC<ACMExtentionsTableDataProps> = ({ activeColumnIDs, vm }) => {
   const columnProperties = useACMExtensionColumns();
 
   return (

@@ -1,5 +1,5 @@
-import React, { FC } from 'react';
-import { useNavigate } from 'react-router-dom-v5-compat';
+import React, { FCC } from 'react';
+import { useNavigate } from 'react-router';
 import classNames from 'classnames';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -17,7 +17,7 @@ export type LabelProps = {
   value: string;
 };
 
-export const Label: FC<LabelProps> = ({ cluster, expand, groupVersionKind, name, value }) => {
+export const Label: FCC<LabelProps> = ({ cluster, expand, groupVersionKind, name, value }) => {
   const navigate = useNavigate();
 
   const href = getSearchLabelHREF(groupVersionKind.kind, name, value, cluster);
@@ -43,7 +43,7 @@ type LabelListProps = {
   labels: { [key: string]: string };
 };
 
-export const LabelList: FC<LabelListProps> = ({
+export const LabelList: FCC<LabelListProps> = ({
   cluster,
   expand = true,
   groupVersionKind,

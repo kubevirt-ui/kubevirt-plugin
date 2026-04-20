@@ -32,7 +32,7 @@ export type TemplateTileProps = {
   template: V1Template;
 };
 
-export const TemplateTile: React.FC<TemplateTileProps> = React.memo(
+export const TemplateTile: React.FCC<TemplateTileProps> = React.memo(
   ({ availableDatasources, availableTemplatesUID, bootSourcesLoaded, onClick, template }) => {
     const { t } = useKubevirtTranslation();
 

@@ -1,11 +1,11 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Stack, StackItem, Title, TitleSizes } from '@patternfly/react-core';
 import OperatingSystemTileGroup from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/GuestOSStep/components/OperatingSystemTileGroup/OperatingSystemTileGroup';
 import PreferenceSelectMenu from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/GuestOSStep/components/PreferenceSelectMenu/PreferenceSelectMenu';
 
-const GuestOSStep: FC = () => {
+const GuestOSStep: FCC = () => {
   const { t } = useKubevirtTranslation();
 
   return (

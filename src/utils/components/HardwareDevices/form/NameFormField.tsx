@@ -1,4 +1,4 @@
-import React, { Dispatch, FC, SetStateAction } from 'react';
+import React, { Dispatch, FCC, SetStateAction } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup, GridItem, TextInput } from '@patternfly/react-core';
@@ -9,7 +9,7 @@ type NameFormFieldProps = {
   setName: Dispatch<SetStateAction<string>>;
 };
 
-const NameFormField: FC<NameFormFieldProps> = ({ index, name, setName }) => {
+const NameFormField: FCC<NameFormFieldProps> = ({ index, name, setName }) => {
   const { t } = useKubevirtTranslation();
 
   return (

@@ -1,6 +1,14 @@
-import React, { FC, FormEvent, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { Helmet } from 'react-helmet';
-import { useNavigate } from 'react-router-dom-v5-compat';
+import React, {
+  FCC,
+  FormEvent,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
+import { DocumentTitle } from '@openshift-console/dynamic-plugin-sdk';
+import { useNavigate } from 'react-router';
 import axios from 'axios';
 import classNames from 'classnames';
 
@@ -61,7 +69,7 @@ const templatesResource: WatchK8sResource = {
     matchLabels: { [TEMPLATE_TYPE_LABEL]: TEMPLATE_TYPE_BASE },
   },
 };
-const UploadPVCPage: FC = () => {
+const UploadPVCPage: FCC = () => {
   const { t } = useKubevirtTranslation();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isCheckingCertificate, setCheckingCertificate] = useState(false);
@@ -178,9 +186,7 @@ const UploadPVCPage: FC = () => {
 
   return (
     <>
-      <Helmet>
-        <title>{title}</title>
-      </Helmet>
+      <DocumentTitle>{title}</DocumentTitle>
       <PageSection
         className={classNames('kv-m-pane__form', {
           'kv--create-upload__hide': isSubmitting,

@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useMemo, useState } from 'react';
+import React, { FCC, useEffect, useMemo, useState } from 'react';
 import produce from 'immer';
 import { getEvictionStrategy } from 'src/views/templates/utils/selectors';
 
@@ -21,7 +21,7 @@ type EvictionStrategyModalProps = {
   template: V1Template;
 };
 
-const EvictionStrategyModal: FC<EvictionStrategyModalProps> = ({
+const EvictionStrategyModal: FCC<EvictionStrategyModalProps> = ({
   isOpen,
   onClose,
   onSubmit,

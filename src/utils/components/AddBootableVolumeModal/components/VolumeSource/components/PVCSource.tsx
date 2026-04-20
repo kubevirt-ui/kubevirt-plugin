@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import {
   AddBootableVolumeState,
@@ -17,7 +17,7 @@ type PVCSourceProps = {
   setBootableVolumeField: SetBootableVolumeFieldType;
 };
 
-const PVCSource: FC<PVCSourceProps> = ({ bootableVolume, setBootableVolumeField }) => {
+const PVCSource: FCC<PVCSourceProps> = ({ bootableVolume, setBootableVolumeField }) => {
   const { t } = useKubevirtTranslation();
   const { bootableVolumeCluster, pvcName, pvcNamespace } = bootableVolume || {};
 

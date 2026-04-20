@@ -1,4 +1,4 @@
-import React, { ChangeEvent, FC, InputHTMLAttributes, useEffect, useRef, useState } from 'react';
+import React, { ChangeEvent, FCC, InputHTMLAttributes, useEffect, useRef, useState } from 'react';
 import TagsInput from 'react-tagsinput';
 import classNames from 'classnames';
 
@@ -17,7 +17,7 @@ type SelectorInputProps = {
   tags: string[];
 };
 
-const SelectorInput: FC<SelectorInputProps> = ({
+const SelectorInput: FCC<SelectorInputProps> = ({
   autoFocus,
   inputProps,
   labelClassName,

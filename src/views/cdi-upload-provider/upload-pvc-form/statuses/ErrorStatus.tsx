@@ -9,7 +9,7 @@ type ErrorStatusProps = {
   onErrorClick: () => void;
 };
 
-const ErrorStatus: React.FC<ErrorStatusProps> = ({ error, onErrorClick }) => {
+const ErrorStatus: React.FCC<ErrorStatusProps> = ({ error, onErrorClick }) => {
   const { t } = useKubevirtTranslation();
   return (
     <EmptyState

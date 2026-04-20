@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
@@ -8,7 +8,7 @@ type DataSourceNamespaceCellProps = {
   row: V1beta1DataSource;
 };
 
-const DataSourceNamespaceCell: FC<DataSourceNamespaceCellProps> = ({ row }) => (
+const DataSourceNamespaceCell: FCC<DataSourceNamespaceCellProps> = ({ row }) => (
   <ResourceLink kind="Namespace" name={getNamespace(row)} />
 );
 

@@ -1,4 +1,4 @@
-import React, { FC, useMemo, useState } from 'react';
+import React, { FCC, useMemo, useState } from 'react';
 
 import { InstanceTypes } from '@catalog/CreateFromInstanceTypes/state/utils/types';
 import { VirtualMachineInstancetypeModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -18,7 +18,7 @@ type UserInstanceTypeMenuProps = {
   selectedKind: string;
 };
 
-const UserInstanceTypeMenu: FC<UserInstanceTypeMenuProps> = ({
+const UserInstanceTypeMenu: FCC<UserInstanceTypeMenuProps> = ({
   allInstanceTypes,
   onSelect,
   selected,

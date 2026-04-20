@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { DataVolumeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -18,7 +18,7 @@ type DiskSourceCellProps = {
   vm: V1VirtualMachine;
 };
 
-const DiskSourceCell: FC<DiskSourceCellProps> = ({ row, sourcesLoaded, vm }) => {
+const DiskSourceCell: FCC<DiskSourceCellProps> = ({ row, sourcesLoaded, vm }) => {
   const { hasDataVolume, namespace, source } = row;
   const dataTestId = `disk-source-${row.name}`;
 

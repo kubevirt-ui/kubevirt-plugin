@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 import { abbreviateNumber } from 'js-abbreviation-number';
 
 import { tickLabels } from '@kubevirt-utils/components/Charts/ChartLabels/styleOverrides';
@@ -52,7 +52,7 @@ type ResourceAllocationChartProps = {
   requestedValue?: number;
 };
 
-const ResourceAllocationChart: FC<ResourceAllocationChartProps> = ({
+const ResourceAllocationChart: FCC<ResourceAllocationChartProps> = ({
   chartSeries,
   effectiveData,
   isMultiCluster,

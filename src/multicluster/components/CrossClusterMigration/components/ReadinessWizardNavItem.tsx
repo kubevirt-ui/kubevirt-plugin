@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import {
   GreenCheckCircleIcon,
@@ -12,7 +12,7 @@ type ReadinessWizardNavItemProps = {
   title: string;
 };
 
-const ReadinessWizardNavItem: FC<ReadinessWizardNavItemProps> = ({ checked, loaded, title }) => {
+const ReadinessWizardNavItem: FCC<ReadinessWizardNavItemProps> = ({ checked, loaded, title }) => {
   let icon = <InProgressIcon />;
 
   if (loaded && checked) icon = <GreenCheckCircleIcon />;

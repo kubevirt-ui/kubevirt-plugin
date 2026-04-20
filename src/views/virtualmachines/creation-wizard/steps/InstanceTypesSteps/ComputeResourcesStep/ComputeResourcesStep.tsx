@@ -1,10 +1,10 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Stack, StackItem, Title, TitleSizes } from '@patternfly/react-core';
 import SelectInstanceTypeSection from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/ComputeResourcesStep/components/SelectInstanceTypeSection/SelectInstanceTypeSection';
 
-const ComputeResourcesStep: FC = ({}) => {
+const ComputeResourcesStep: FCC = ({}) => {
   const { t } = useKubevirtTranslation();
 
   return (

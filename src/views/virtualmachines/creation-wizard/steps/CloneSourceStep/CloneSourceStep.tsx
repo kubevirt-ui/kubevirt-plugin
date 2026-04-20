@@ -1,10 +1,10 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Stack, StackItem, Title, TitleSizes } from '@patternfly/react-core';
 import VirtualMachinesList from '@virtualmachines/creation-wizard/steps/CloneSourceStep/components/VirtualMachinesList/VirtualMachinesList';
 
-const CloneSourceStep: FC = () => {
+const CloneSourceStep: FCC = () => {
   const { t } = useKubevirtTranslation();
 
   return (

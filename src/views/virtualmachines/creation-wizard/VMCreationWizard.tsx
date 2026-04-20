@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useRef } from 'react';
+import React, { FCC, useEffect, useRef } from 'react';
 import classnames from 'classnames';
 
 import { FLAG_LIGHTSPEED_PLUGIN } from '@kubevirt-utils/flags/consts';
@@ -33,7 +33,7 @@ import {
 import TemplatesDrawerWrapper from './components/TemplatesDrawerWrapper';
 import DeploymentDetailsStep from './steps/DeploymentDetailsStep/DeploymentDetailsStep';
 
-const VMCreationWizard: FC = () => {
+const VMCreationWizard: FCC = () => {
   const { t } = useKubevirtTranslation();
   useSignals();
   const hasOLSConsole = useFlag(FLAG_LIGHTSPEED_PLUGIN);

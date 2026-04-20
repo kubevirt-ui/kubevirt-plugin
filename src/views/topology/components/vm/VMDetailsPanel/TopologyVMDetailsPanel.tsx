@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import useInstanceTypeExpandSpec from '@kubevirt-utils/resources/vm/hooks/useInstanceTypeExpandSpec';
@@ -13,7 +13,7 @@ type TopologyVMDetailsPanelProps = {
   vmNode: VMNode;
 };
 
-const TopologyVMDetailsPanel: FC<TopologyVMDetailsPanelProps> = observer(({ vmNode }) => {
+const TopologyVMDetailsPanel: FCC<TopologyVMDetailsPanelProps> = observer(({ vmNode }) => {
   const vmData = vmNode.getData();
   const vm = vmData.resource as V1VirtualMachine;
   const { vmi } = vmData?.data;

@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -7,7 +7,7 @@ import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { PopoverPosition, Title, TitleSizes } from '@patternfly/react-core';
 import HelpTextTooltipContent from '@settings/tabs/ClusterTab/components/VirtualizationFeaturesSection/VirtualizationFeaturesWizard/components/HelpTextTooltipContent/HelpTextTooltipContent';
 
-const ConfigurationStepHeader: FC = ({}) => {
+const ConfigurationStepHeader: FCC = ({}) => {
   const { t } = useKubevirtTranslation();
 
   return (

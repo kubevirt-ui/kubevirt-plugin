@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FCC, useState } from 'react';
 
 import ExpandSectionWithCustomToggle from '@kubevirt-utils/components/ExpandSectionWithCustomToggle/ExpandSectionWithCustomToggle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -16,7 +16,7 @@ import UseAlternativeOptionCheckbox from '../UseAlternativeOptionCheckbox/UseAlt
 
 import './LoadBalanceConfigurationSection.scss';
 
-const LoadBalanceConfigurationSection: FC = () => {
+const LoadBalanceConfigurationSection: FCC = () => {
   const { t } = useKubevirtTranslation();
   const [alternativeChecked, setAlternativeChecked] = useState<boolean>(false);
 

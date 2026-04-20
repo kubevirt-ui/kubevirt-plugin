@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { CloudInitDescription } from '@kubevirt-utils/components/CloudinitDescription/CloudInitDescription';
@@ -17,7 +17,7 @@ type InitialRunTabCloudInitProps = {
   vmi?: V1VirtualMachineInstance;
 };
 
-const InitialRunTabCloudinit: FC<InitialRunTabCloudInitProps> = ({
+const InitialRunTabCloudinit: FCC<InitialRunTabCloudInitProps> = ({
   canUpdateVM,
   onSubmit,
   vm,

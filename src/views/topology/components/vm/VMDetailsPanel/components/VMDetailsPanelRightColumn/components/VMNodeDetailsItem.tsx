@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { modelToGroupVersionKind, NodeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { IoK8sApiCoreV1Pod } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
@@ -19,7 +19,7 @@ type VMNodeDetailsItemProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const VMNodeDetailsItem: FC<VMNodeDetailsItemProps> = ({ launcherPod, vm, vmi }) => {
+const VMNodeDetailsItem: FCC<VMNodeDetailsItemProps> = ({ launcherPod, vm, vmi }) => {
   const { t } = useKubevirtTranslation();
 
   const [canGetNode] = useAccessReview({

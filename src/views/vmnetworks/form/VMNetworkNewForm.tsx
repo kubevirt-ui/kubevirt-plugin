@@ -1,6 +1,6 @@
-import React, { FC, useEffect, useRef, useState } from 'react';
+import React, { FCC, useEffect, useRef, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom-v5-compat';
+import { useNavigate } from 'react-router';
 
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import { MAX_MTU } from '@kubevirt-utils/constants/constants';
@@ -30,7 +30,7 @@ import VMNetworkWizardHeader from './components/VMNetworkWizardHeader';
 import { getVLANIDValidatedOption } from './utils/utils';
 import { getDefaultFormValue, NODE_NETWORK_MAPPING_PARAM_KEY, VMNetworkForm } from './constants';
 
-const VMNetworkNewForm: FC = () => {
+const VMNetworkNewForm: FCC = () => {
   const navigate = useNavigate();
   const { t } = useKubevirtTranslation();
   const [apiError, setError] = useState<Error>(null);

@@ -25,7 +25,7 @@ type DataImportCronManageDetailsProps = {
   onEditClick: () => void;
 };
 
-export const DataImportCronManageDetails: React.FC<DataImportCronManageDetailsProps> = ({
+export const DataImportCronManageDetails: React.FCC<DataImportCronManageDetailsProps> = ({
   dataImportCron,
   dataSource,
   onEditClick,

@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FCC, useState } from 'react';
 
 import { modelToGroupVersionKind, NamespaceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -15,7 +15,7 @@ type ExpandableProjectListProps = {
   projectNames: string[];
 };
 
-const ExpandableProjectList: FC<ExpandableProjectListProps> = ({
+const ExpandableProjectList: FCC<ExpandableProjectListProps> = ({
   emptyMessage,
   loaded = true,
   maxItems = SHOW_MAX_ITEMS,

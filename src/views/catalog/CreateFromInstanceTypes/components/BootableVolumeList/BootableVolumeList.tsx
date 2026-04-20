@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useMemo, useState } from 'react';
+import React, { FCC, useEffect, useMemo, useState } from 'react';
 
 import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
 import { UseBootableVolumesValues } from '@catalog/CreateFromInstanceTypes/state/utils/types';
@@ -51,7 +51,7 @@ type BootableVolumeListProps = {
   userPreferencesLoaded?: boolean;
 };
 
-const BootableVolumeList: FC<BootableVolumeListProps> = ({
+const BootableVolumeList: FCC<BootableVolumeListProps> = ({
   bootableVolumesData,
   currentTab,
   displayShowAllButton = false,

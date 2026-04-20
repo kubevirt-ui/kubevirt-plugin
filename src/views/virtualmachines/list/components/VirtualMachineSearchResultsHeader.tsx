@@ -1,12 +1,12 @@
-import React, { FC } from 'react';
-import { useNavigate } from 'react-router-dom-v5-compat';
+import React, { FCC } from 'react';
+import { useNavigate } from 'react-router';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useVMListURL from '@multicluster/hooks/useVMListURL';
 import { Button, Flex, Title } from '@patternfly/react-core';
 import { AngleLeftIcon } from '@patternfly/react-icons';
 
-const VirtualMachineSearchResultsHeader: FC = () => {
+const VirtualMachineSearchResultsHeader: FCC = () => {
   const navigate = useNavigate();
   const { t } = useKubevirtTranslation();
   const vmlistURL = useVMListURL();

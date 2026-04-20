@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { documentationURL, PLUGIN_VERSION } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -10,7 +10,7 @@ import FeatureHighlightsTitle from './FeatureHighlightsTitle';
 
 import './FeatureHighlightsSection.scss';
 
-const FeatureHighlightsSection: FC = () => {
+const FeatureHighlightsSection: FCC = () => {
   const { FREE_PAGE_REPORTING, HIGHLIGHTS, VIRTUALIZATION_BLOG } = documentationURL;
   const { t } = useKubevirtTranslation();
   const moreLink: GettingStartedLink = {

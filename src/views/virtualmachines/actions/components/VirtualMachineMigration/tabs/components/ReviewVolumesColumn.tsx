@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -12,7 +12,7 @@ type ReviewVolumesColumnProps = {
   vms: V1VirtualMachine[];
 };
 
-const ReviewVolumesColumn: FC<ReviewVolumesColumnProps> = ({ pvcsToMigrate, vms }) => {
+const ReviewVolumesColumn: FCC<ReviewVolumesColumnProps> = ({ pvcsToMigrate, vms }) => {
   const rows = vms
     .map((vm) => {
       const volumesToMigrate = getVolumeFromPVC(getVolumes(vm), pvcsToMigrate);

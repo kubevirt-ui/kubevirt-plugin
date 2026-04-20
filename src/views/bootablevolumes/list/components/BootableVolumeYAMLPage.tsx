@@ -1,5 +1,5 @@
-import React, { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom-v5-compat';
+import React, { FCC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useNavigate, useParams } from 'react-router';
 import { load } from 'js-yaml';
 
 import { DataSourceModel, DataVolumeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -40,7 +40,7 @@ const buildDataSourceForDataVolume = (
 
 const YAML_EDITOR_CANCEL_BUTTON_ID = 'cancel';
 
-const BootableVolumeYAMLPage: FC = () => {
+const BootableVolumeYAMLPage: FCC = () => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
   const { ns: namespace } = useParams<{ ns: string }>();

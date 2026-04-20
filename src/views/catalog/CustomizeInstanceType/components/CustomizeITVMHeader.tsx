@@ -1,11 +1,11 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { Content, ContentVariants, PageSection, Title } from '@patternfly/react-core';
 
-const CutomizeITVMHeader: FC = () => {
+const CutomizeITVMHeader: FCC = () => {
   const { t } = useKubevirtTranslation();
   const {
     instanceTypeVMState: { selectedBootableVolume },

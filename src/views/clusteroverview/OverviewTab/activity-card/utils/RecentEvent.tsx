@@ -8,7 +8,7 @@ import { RecentEventsBody } from '@openshift-console/dynamic-plugin-sdk-internal
 import { VIEW_EVENTS_PATH } from './constants';
 import { eventTypes } from './utils';
 
-const RecentEvent: React.FC = () => {
+const RecentEvent: React.FCC = () => {
   const [events, loaded, loadError] = useK8sWatchResource<EventKind[]>({
     isList: true,
     kind: EventModel.kind,

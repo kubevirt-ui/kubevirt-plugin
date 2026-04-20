@@ -1,4 +1,4 @@
-import React, { FC, useMemo } from 'react';
+import React, { FCC, useMemo } from 'react';
 
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
 import { buildColumnLayout } from '@kubevirt-utils/components/KubevirtTable/utils';
@@ -21,7 +21,7 @@ import {
 
 import '@kubevirt-utils/styles/list-managment-group.scss';
 
-const ClusterPreferenceList: FC<ListPageProps> = ({
+const ClusterPreferenceList: FCC<ListPageProps> = ({
   fieldSelector,
   hideColumnManagement,
   hideNameLabelFilters,

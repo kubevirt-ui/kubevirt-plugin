@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { PendingChangesAlert } from '@kubevirt-utils/components/PendingChanges/PendingChangesAlert/PendingChangesAlert';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -7,7 +7,7 @@ type PendingChangesProps = {
   isVMRunning?: boolean;
 };
 
-const PendingChanges: FC<PendingChangesProps> = ({ isVMRunning }) => {
+const PendingChanges: FCC<PendingChangesProps> = ({ isVMRunning }) => {
   const { t } = useKubevirtTranslation();
 
   if (!isVMRunning) return null;

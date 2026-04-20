@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FCC, useState } from 'react';
 import { Trans } from 'react-i18next';
 import { Updater } from 'use-immer';
 
@@ -47,7 +47,7 @@ type VirtualMachineMigrationDetailsProps = {
   vms: V1VirtualMachine[];
 };
 
-const VirtualMachineMigrationDetails: FC<VirtualMachineMigrationDetailsProps> = ({
+const VirtualMachineMigrationDetails: FCC<VirtualMachineMigrationDetailsProps> = ({
   migrationPlanName,
   pvcs,
   selectedPVCs,
@@ -87,10 +87,10 @@ const VirtualMachineMigrationDetails: FC<VirtualMachineMigrationDetailsProps> = 
                 />
               </Content>
             ) : (
-              <Trans t={t}>
+              <Trans t={t} values={{ vmsCount: vmCount }}>
                 Enter storage migration details for{' '}
                 <SelectedStorageTooltip vms={vms}>
-                  {{ vmsCount: vmCount }} VirtualMachines
+                  {'{{vmsCount}}'} VirtualMachines
                 </SelectedStorageTooltip>
               </Trans>
             )}

@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import EditButton from '@kubevirt-utils/components/EditButton/EditButton';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
@@ -15,7 +15,7 @@ type EditCalculationMethodButtonProps = {
   selectedCalculationMethod: CalculationMethod;
 };
 
-const EditCalculationMethodButton: FC<EditCalculationMethodButtonProps> = ({
+const EditCalculationMethodButton: FCC<EditCalculationMethodButtonProps> = ({
   calculationMethodContentMapper,
   hyperConverge,
   selectedCalculationMethod,

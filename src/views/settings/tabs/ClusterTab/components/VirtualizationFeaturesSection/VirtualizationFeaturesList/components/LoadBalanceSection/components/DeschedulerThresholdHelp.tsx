@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -6,7 +6,7 @@ import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverCo
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { Content } from '@patternfly/react-core';
 
-const DeschedulerThresholdHelp: FC = () => {
+const DeschedulerThresholdHelp: FCC = () => {
   const { t } = useKubevirtTranslation();
 
   return (

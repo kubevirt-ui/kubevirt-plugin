@@ -1,6 +1,6 @@
-import React, { FC, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom-v5-compat';
-import { useLocation } from 'react-router-dom-v5-compat';
+import React, { FCC, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router';
+import { useLocation } from 'react-router';
 
 import { VirtualMachineDetailsTab } from '@kubevirt-utils/constants/tabs-constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -16,7 +16,7 @@ import VirtualMachineLogViewer from './VirtualMachineLogViewer/VirtualMachineLog
 
 import './virtual-machine-diagnostic-tab.scss';
 
-const VirtualMachineDiagnosticTab: FC<NavPageComponentProps> = ({ obj: vm }) => {
+const VirtualMachineDiagnosticTab: FCC<NavPageComponentProps> = ({ obj: vm }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useKubevirtTranslation();

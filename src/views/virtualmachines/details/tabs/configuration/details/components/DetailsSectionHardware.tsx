@@ -1,5 +1,5 @@
-import React, { FC, useEffect } from 'react';
-import { useLocation } from 'react-router-dom-v5-compat';
+import React, { FCC, useEffect } from 'react';
+import { useLocation } from 'react-router';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import HardwareDevicesTable from '@kubevirt-utils/components/HardwareDevices/HardwareDevicesTable';
@@ -24,7 +24,7 @@ type DetailsSectionHardwareProps = {
   vmi?: V1VirtualMachineInstance;
 };
 
-const DetailsSectionHardware: FC<DetailsSectionHardwareProps> = ({
+const DetailsSectionHardware: FCC<DetailsSectionHardwareProps> = ({
   onSubmit: onSubmitProp,
   vm,
   vmi,

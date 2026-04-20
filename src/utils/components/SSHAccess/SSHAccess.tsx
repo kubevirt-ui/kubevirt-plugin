@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { IoK8sApiCoreV1Service } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -14,7 +14,7 @@ type SSHAccessProps = {
   vm: V1VirtualMachine;
 };
 
-const SSHAccess: FC<SSHAccessProps> = ({
+const SSHAccess: FCC<SSHAccessProps> = ({
   isCustomizeInstanceType,
   sshService,
   sshServiceLoaded,

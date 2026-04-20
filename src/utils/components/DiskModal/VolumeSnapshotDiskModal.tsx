@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
 import { getNamespace } from '@kubevirt-utils/resources/shared';
@@ -21,7 +21,7 @@ import { diskModalTitle } from './utils/helpers';
 import { submit } from './utils/submit';
 import { SourceTypes, V1DiskFormState, V1SubDiskModalProps } from './utils/types';
 
-const VolumeSnapshotDiskModal: FC<V1SubDiskModalProps> = ({
+const VolumeSnapshotDiskModal: FCC<V1SubDiskModalProps> = ({
   editDiskName,
   isCreated,
   isOpen,

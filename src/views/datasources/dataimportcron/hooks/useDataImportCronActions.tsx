@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom-v5-compat';
+import { useNavigate } from 'react-router';
 
 import { DataImportCronModel, DataImportCronModelRef } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { DataSourceModel } from '@kubevirt-ui-ext/kubevirt-api/console';

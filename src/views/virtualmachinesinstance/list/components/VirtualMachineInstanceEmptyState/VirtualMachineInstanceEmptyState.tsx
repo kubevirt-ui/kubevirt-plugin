@@ -1,6 +1,6 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 import { Trans } from 'react-i18next';
-import { useNavigate } from 'react-router-dom-v5-compat';
+import { useNavigate } from 'react-router';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -17,7 +17,7 @@ import { RocketIcon, VirtualMachineIcon } from '@patternfly/react-icons';
 type VirtualMachineInstanceEmptyStateProps = {
   catalogURL: string;
 };
-const VirtualMachineInstanceEmptyState: FC<VirtualMachineInstanceEmptyStateProps> = ({
+const VirtualMachineInstanceEmptyState: FCC<VirtualMachineInstanceEmptyStateProps> = ({
   catalogURL,
 }) => {
   const { t } = useKubevirtTranslation();

@@ -14,7 +14,7 @@ type VirtualMachinesInstancePageHeaderProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const VirtualMachinesInstancePageHeader: React.FC<VirtualMachinesInstancePageHeaderProps> = ({
+const VirtualMachinesInstancePageHeader: React.FCC<VirtualMachinesInstancePageHeaderProps> = ({
   vmi,
 }) => {
   const { t } = useKubevirtTranslation();

@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FCC, useState } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import FolderSelect from '@kubevirt-utils/components/FolderSelect/FolderSelect';
@@ -19,7 +19,7 @@ type MoveBulkVMToFolderModalProps = {
   vms: V1VirtualMachine[];
 };
 
-const MoveBulkVMToFolderModal: FC<MoveBulkVMToFolderModalProps> = ({
+const MoveBulkVMToFolderModal: FCC<MoveBulkVMToFolderModalProps> = ({
   isOpen,
   onClose,
   onSubmit,

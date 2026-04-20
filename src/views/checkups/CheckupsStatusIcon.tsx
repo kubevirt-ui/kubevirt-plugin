@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import {
   IoK8sApiBatchV1Job,
@@ -20,7 +20,7 @@ type CheckupsStatusIconProps = {
   onlyJob?: boolean;
 };
 
-const CheckupsStatusIcon: FC<CheckupsStatusIconProps> = ({ configMap, job, onlyJob = false }) => {
+const CheckupsStatusIcon: FCC<CheckupsStatusIconProps> = ({ configMap, job, onlyJob = false }) => {
   const { t } = useKubevirtTranslation();
   const jobStatus = getJobStatus(job);
   const configMapStatus = getConfigMapStatus(configMap, jobStatus);

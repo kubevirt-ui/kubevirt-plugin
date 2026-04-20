@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import NetworkIcon from '@kubevirt-utils/components/NetworkIcons/NetworkIcon';
@@ -11,7 +11,7 @@ type TemplateStateCellProps = {
   template: V1Template;
 };
 
-const TemplateStateCell: FC<TemplateStateCellProps> = ({ row, template }) => {
+const TemplateStateCell: FCC<TemplateStateCellProps> = ({ row, template }) => {
   const templateVM = getTemplateVirtualMachineObject(template);
   return (
     <NetworkIcon configuredState={getConfigInterfaceStateFromVM(templateVM, row.network?.name)} />

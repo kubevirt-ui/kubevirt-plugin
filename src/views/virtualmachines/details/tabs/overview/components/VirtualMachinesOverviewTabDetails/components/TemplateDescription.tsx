@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { modelToGroupVersionKind, TemplateModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -15,7 +15,7 @@ type TemplateDescriptionProps = {
   vm: V1VirtualMachine;
 };
 
-const TemplateDescription: FC<TemplateDescriptionProps> = ({ vm }) => {
+const TemplateDescription: FCC<TemplateDescriptionProps> = ({ vm }) => {
   const { t } = useKubevirtTranslation();
   const templateName = getLabel(vm, VM_TEMPLATE_ANNOTATION);
   const templateNamespace = getLabel(vm, LABEL_USED_TEMPLATE_NAMESPACE);

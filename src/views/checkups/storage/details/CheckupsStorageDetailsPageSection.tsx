@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import {
   JobModel,
@@ -54,7 +54,7 @@ type CheckupsStorageDetailsPageSectionProps = {
   job: IoK8sApiBatchV1Job;
 };
 
-const CheckupsStorageDetailsPageSection: FC<CheckupsStorageDetailsPageSectionProps> = ({
+const CheckupsStorageDetailsPageSection: FCC<CheckupsStorageDetailsPageSectionProps> = ({
   configMap,
   job,
 }) => {

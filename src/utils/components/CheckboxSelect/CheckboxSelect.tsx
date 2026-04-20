@@ -1,4 +1,4 @@
-import React, { FC, ReactNode, Ref, useState } from 'react';
+import React, { FCC, ReactNode, Ref, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -25,7 +25,7 @@ type CheckboxSelectProps = {
   tooltipContent?: ReactNode;
 };
 
-const CheckboxSelect: FC<CheckboxSelectProps> = ({
+const CheckboxSelect: FCC<CheckboxSelectProps> = ({
   badgeNumber,
   isToggleDisabled = false,
   onSelect,

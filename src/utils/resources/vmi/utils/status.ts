@@ -1,4 +1,4 @@
-import { ComponentClass, FC } from 'react';
+import { ComponentClass, FCC } from 'react';
 
 import { GreenRunningIcon } from '@kubevirt-utils/icons/GreenRunningIcon';
 import {

@@ -1,4 +1,4 @@
-import React, { Dispatch, FC, FormEvent, SetStateAction, useState } from 'react';
+import React, { Dispatch, FCC, FormEvent, SetStateAction, useState } from 'react';
 
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -23,7 +23,7 @@ type SnapshotDeadlineFormFieldProps = {
   setIsError: Dispatch<SetStateAction<boolean>>;
 };
 
-const SnapshotDeadlineFormField: FC<SnapshotDeadlineFormFieldProps> = ({
+const SnapshotDeadlineFormField: FCC<SnapshotDeadlineFormFieldProps> = ({
   deadline,
   deadlineUnit,
   setDeadline,

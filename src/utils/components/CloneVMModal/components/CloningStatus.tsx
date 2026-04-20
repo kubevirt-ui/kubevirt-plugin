@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { V1beta1VirtualMachineClone } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -17,7 +17,7 @@ type CloningStatusProps = {
   vmCloneRequest: V1beta1VirtualMachineClone;
 };
 
-const CloningStatus: FC<CloningStatusProps> = ({ vmCloneRequest }) => {
+const CloningStatus: FCC<CloningStatusProps> = ({ vmCloneRequest }) => {
   const { t } = useKubevirtTranslation();
 
   const phase = vmCloneRequest?.status?.phase;

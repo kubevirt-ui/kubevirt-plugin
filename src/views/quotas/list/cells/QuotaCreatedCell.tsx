@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import Timestamp from '@kubevirt-utils/components/Timestamp/Timestamp';
 import { ApplicationAwareQuota } from '@kubevirt-utils/resources/quotas/types';
@@ -8,7 +8,7 @@ type QuotaCreatedCellProps = {
   row: ApplicationAwareQuota;
 };
 
-const QuotaCreatedCell: FC<QuotaCreatedCellProps> = ({ row }) => (
+const QuotaCreatedCell: FCC<QuotaCreatedCellProps> = ({ row }) => (
   <Timestamp timestamp={getCreationTimestamp(row)} />
 );
 

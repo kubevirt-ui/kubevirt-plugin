@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import {
   IoK8sApiBatchV1Job,
@@ -41,7 +41,7 @@ type CheckupsSelfValidationDetailsPageSectionProps = {
   results: JobResults | null;
 };
 
-const CheckupsSelfValidationDetailsPageSection: FC<
+const CheckupsSelfValidationDetailsPageSection: FCC<
   CheckupsSelfValidationDetailsPageSectionProps
 > = ({ configMap, error, isJobCompleted, job, loading, results }) => {
   const { t } = useKubevirtTranslation();

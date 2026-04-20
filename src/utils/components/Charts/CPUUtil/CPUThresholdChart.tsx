@@ -1,5 +1,5 @@
-import React, { FC } from 'react';
-import { Link } from 'react-router-dom-v5-compat';
+import React, { FCC } from 'react';
+import { Link } from 'react-router';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import useVMQuery from '@kubevirt-utils/hooks/useVMQuery';
@@ -38,7 +38,7 @@ type CPUThresholdChartProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const CPUThresholdChart: FC<CPUThresholdChartProps> = ({ vmi }) => {
+const CPUThresholdChart: FCC<CPUThresholdChartProps> = ({ vmi }) => {
   const { currentTime, duration, timespan } = useDuration();
   const { height, ref, width } = useResponsiveCharts();
 

@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
@@ -9,7 +9,7 @@ import { GettingStartedGrid } from './utils/getting-started-grid/GettingStartedG
 
 import './GettingStartedCard.scss';
 
-const GettingStartedCard: FC = () => {
+const GettingStartedCard: FCC = () => {
   const { t } = useKubevirtTranslation();
 
   return (

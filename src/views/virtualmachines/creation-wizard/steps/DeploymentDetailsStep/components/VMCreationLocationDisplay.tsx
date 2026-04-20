@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import EditButton from '@kubevirt-utils/components/EditButton/EditButton';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -11,7 +11,7 @@ type VMCreationLocationDisplayProps = {
   setEditCreationLocation: (value: boolean) => void;
 };
 
-const VMCreationLocationDisplay: FC<VMCreationLocationDisplayProps> = ({
+const VMCreationLocationDisplay: FCC<VMCreationLocationDisplayProps> = ({
   setEditCreationLocation,
 }) => {
   const { t } = useKubevirtTranslation();

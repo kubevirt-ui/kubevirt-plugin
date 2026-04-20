@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { V1VirtualMachineInstanceMigration } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import SubTitleChartLabel from '@kubevirt-utils/components/Charts/ChartLabels/SubTitleChartLabel';
@@ -23,7 +23,7 @@ export type ChartDataItem = {
   y: number; // count of each status
 };
 
-const MigrationsChartDonut: FC<MigrationsChartDonutProps> = ({ onFilterChange, vmims }) => {
+const MigrationsChartDonut: FCC<MigrationsChartDonutProps> = ({ onFilterChange, vmims }) => {
   const { t } = useKubevirtTranslation();
 
   if (!vmims?.length) return null;

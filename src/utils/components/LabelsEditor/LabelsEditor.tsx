@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FCC, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -23,7 +23,7 @@ export type LabelsEditorProps = {
   values: string[];
 };
 
-export const LabelsEditor: FC<LabelsEditorProps> = ({
+export const LabelsEditor: FCC<LabelsEditorProps> = ({
   addButtonText,
   isHidden,
   numLabelsToShow,

@@ -1,4 +1,4 @@
-import React, { ChangeEvent, Dispatch, FC, SetStateAction } from 'react';
+import React, { ChangeEvent, Dispatch, FCC, SetStateAction } from 'react';
 
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverContentWithLightspeedButton/PopoverContentWithLightspeedButton';
@@ -16,7 +16,7 @@ type MigrationNumberInputProps = {
   value: number;
 };
 
-const MigrationNumberInput: FC<MigrationNumberInputProps> = ({
+const MigrationNumberInput: FCC<MigrationNumberInputProps> = ({
   inputName,
   labelHelp,
   minValue,

@@ -13,7 +13,7 @@ type DescriptionItemCreatedAtProps = {
   resource: K8sResourceCommon;
 };
 
-const DescriptionItemCreatedAt: React.FC<DescriptionItemCreatedAtProps> = ({
+const DescriptionItemCreatedAt: React.FCC<DescriptionItemCreatedAtProps> = ({
   label,
   model,
   resource,

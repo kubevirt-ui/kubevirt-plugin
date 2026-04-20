@@ -1,6 +1,6 @@
-import React, { FC, ReactNode } from 'react';
-import { TFunction } from 'react-i18next';
-import { Link } from 'react-router-dom-v5-compat';
+import React, { FCC, ReactNode } from 'react';
+import { TFunction } from 'i18next';
+import { Link } from 'react-router';
 
 import { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -18,7 +18,7 @@ type MTUCellProps = {
   obj: ClusterUserDefinedNetworkKind;
 };
 
-const MTUCell: FC<MTUCellProps> = ({ obj }) => {
+const MTUCell: FCC<MTUCellProps> = ({ obj }) => {
   const { t } = useKubevirtTranslation();
   const mtu = getMTU(obj);
 

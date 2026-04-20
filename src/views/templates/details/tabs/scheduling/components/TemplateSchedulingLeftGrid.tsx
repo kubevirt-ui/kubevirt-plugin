@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 import AffinityRules from 'src/views/templates/details/tabs/scheduling/components/AffinityRules';
 import Descheduler from 'src/views/templates/details/tabs/scheduling/components/Descheduler';
 import NodeSelector from 'src/views/templates/details/tabs/scheduling/components/NodeSelector';
@@ -14,7 +14,7 @@ export type TemplateSchedulingGridProps = {
   template: V1Template;
 };
 
-const TemplateSchedulingLeftGrid: FC<TemplateSchedulingGridProps> = ({ editable, template }) => {
+const TemplateSchedulingLeftGrid: FCC<TemplateSchedulingGridProps> = ({ editable, template }) => {
   return (
     <DescriptionList>
       <NodeSelector editable={editable} onSubmit={updateTemplate} template={template} />

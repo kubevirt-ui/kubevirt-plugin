@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FCC, useState } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
@@ -32,7 +32,7 @@ type ComputeMigrationModalProps = {
   vm: V1VirtualMachine;
 };
 
-const ComputeMigrationModal: FC<ComputeMigrationModalProps> = ({ isOpen, onClose, vm }) => {
+const ComputeMigrationModal: FCC<ComputeMigrationModalProps> = ({ isOpen, onClose, vm }) => {
   const { t } = useKubevirtTranslation();
 
   const [migrationOption, setMigrationOption] = useState<MigrationOptions>(

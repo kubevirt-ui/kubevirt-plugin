@@ -8,7 +8,7 @@ type EvictionStrategyProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const EvictionStrategy: React.FC<EvictionStrategyProps> = ({ vmi }) => {
+const EvictionStrategy: React.FCC<EvictionStrategyProps> = ({ vmi }) => {
   const { t } = useKubevirtTranslation();
   const evictionStrategy = getEvictionStrategy(vmi);
 

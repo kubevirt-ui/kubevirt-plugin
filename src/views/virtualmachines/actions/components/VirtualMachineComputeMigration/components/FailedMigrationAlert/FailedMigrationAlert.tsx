@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import {
   V1VirtualMachine,
@@ -27,7 +27,7 @@ type FailedMigrationAlertProps = {
   vmim: V1VirtualMachineInstanceMigration;
 };
 
-const FailedMigrationAlert: FC<FailedMigrationAlertProps> = ({ vm, vmim }) => {
+const FailedMigrationAlert: FCC<FailedMigrationAlertProps> = ({ vm, vmim }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
 

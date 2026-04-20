@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { YellowExclamationTriangleIcon } from '@openshift-console/dynamic-plugin-sdk';
 import {
@@ -13,7 +13,7 @@ type QuotaCapacityIconProps = {
   percent: number;
 };
 
-export const QuotaCapacityIcon: FC<QuotaCapacityIconProps> = ({ percent }) => {
+export const QuotaCapacityIcon: FCC<QuotaCapacityIconProps> = ({ percent }) => {
   if (percent === 0) {
     return <OutlinedCircleIcon className="co-resource-quota-empty" />;
   }

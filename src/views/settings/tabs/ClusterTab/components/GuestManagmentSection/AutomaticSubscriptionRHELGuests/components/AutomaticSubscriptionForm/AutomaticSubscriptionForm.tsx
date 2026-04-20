@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useMemo, useState } from 'react';
+import React, { FCC, useEffect, useMemo, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { RHELAutomaticSubscriptionFormProps } from '@kubevirt-utils/hooks/useRHELAutomaticSubscription/utils/types';
@@ -18,7 +18,7 @@ import { ACTIVATION_KEYS_URL } from '../../utils/constants';
 import ActivationKeyHelpIcon from '../ActivationKeyHelpIcon/ActivationKeyHelpIcon';
 import OrganizationIDHelpIcon from '../OrganizationIDHelpIcon/OrganizationIDHelpIcon';
 
-const AutomaticSubscriptionForm: FC<RHELAutomaticSubscriptionFormProps> = ({
+const AutomaticSubscriptionForm: FCC<RHELAutomaticSubscriptionFormProps> = ({
   canEdit,
   loaded,
   subscriptionData,

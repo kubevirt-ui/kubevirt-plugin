@@ -43,7 +43,7 @@ type DetailsProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const Details: React.FC<DetailsProps> = ({ pathname, vmi }) => {
+const Details: React.FCC<DetailsProps> = ({ pathname, vmi }) => {
   const { t } = useKubevirtTranslation();
   const [guestAgentData, loadedGuestAgent] = useGuestOS(vmi);
   const [vm] = useK8sWatchData<V1VirtualMachine>({

@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
@@ -10,7 +10,7 @@ type NoDataUtilizationBlockProps = {
   title: string;
 };
 
-const NoDataUtilizationBlock: FC<NoDataUtilizationBlockProps> = ({
+const NoDataUtilizationBlock: FCC<NoDataUtilizationBlockProps> = ({
   dataTestId,
   isNetworkUtil = false,
   title,

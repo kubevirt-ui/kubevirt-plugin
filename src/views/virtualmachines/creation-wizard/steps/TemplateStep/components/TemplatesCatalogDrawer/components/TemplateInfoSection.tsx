@@ -1,4 +1,4 @@
-import React, { FC, memo } from 'react';
+import React, { FCC, memo } from 'react';
 
 import CPUDescription from '@kubevirt-utils/components/CPUDescription/CPUDescription';
 import CPUMemory from '@kubevirt-utils/components/CPUMemory/CPUMemory';
@@ -26,7 +26,7 @@ import { useDrawerContext } from '@virtualmachines/creation-wizard/steps/Templat
 
 import TemplateExpandableDescription from './TemplateExpandableDescription';
 
-const TemplateInfoSection: FC = memo(() => {
+const TemplateInfoSection: FCC = memo(() => {
   const { t } = useKubevirtTranslation();
   const { cluster } = useVMWizardStore();
   const isIPv6SingleStack = useIsIPv6SingleStackCluster(cluster);

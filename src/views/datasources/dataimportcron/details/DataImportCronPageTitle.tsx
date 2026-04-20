@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Link } from 'react-router-dom-v5-compat';
+import { Link } from 'react-router';
 
 import { DataImportCronModelRef } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1beta1DataImportCron } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
@@ -17,7 +17,7 @@ type DataImportCronPageTitleProps = {
   namespace: string;
 };
 
-const DataImportCronPageTitle: React.FC<DataImportCronPageTitleProps> = ({
+const DataImportCronPageTitle: React.FCC<DataImportCronPageTitleProps> = ({
   dataImportCron,
   name,
   namespace,

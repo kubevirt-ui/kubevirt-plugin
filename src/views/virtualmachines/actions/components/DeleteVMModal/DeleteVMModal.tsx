@@ -1,5 +1,5 @@
-import React, { FC, useMemo, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom-v5-compat';
+import React, { FCC, useMemo, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import ConfirmActionMessage from '@kubevirt-utils/components/ConfirmActionMessage/ConfirmActionMessage';
@@ -26,7 +26,7 @@ type DeleteVMModalProps = {
   vm: V1VirtualMachine;
 };
 
-const DeleteVMModal: FC<DeleteVMModalProps> = ({ isOpen, onClose, vm }) => {
+const DeleteVMModal: FCC<DeleteVMModalProps> = ({ isOpen, onClose, vm }) => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
   const location = useLocation();

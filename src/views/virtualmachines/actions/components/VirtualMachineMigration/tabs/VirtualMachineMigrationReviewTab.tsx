@@ -1,4 +1,4 @@
-import React, { FC, useMemo } from 'react';
+import React, { FCC, useMemo } from 'react';
 
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -41,7 +41,7 @@ type VirtualMachineMigrationReviewTabProps = {
 
 const StorageClassModelGroupVersionKind = modelToGroupVersionKind(StorageClassModel);
 
-const VirtualMachineMigrationReviewTab: FC<VirtualMachineMigrationReviewTabProps> = ({
+const VirtualMachineMigrationReviewTab: FCC<VirtualMachineMigrationReviewTabProps> = ({
   defaultStorageClassName,
   destinationStorageClass,
   keepOriginalVolumes,

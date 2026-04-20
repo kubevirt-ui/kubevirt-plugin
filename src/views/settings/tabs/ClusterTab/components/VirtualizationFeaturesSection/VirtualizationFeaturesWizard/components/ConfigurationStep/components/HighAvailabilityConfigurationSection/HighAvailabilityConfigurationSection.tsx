@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FCC, useState } from 'react';
 
 import ExpandSectionWithCustomToggle from '@kubevirt-utils/components/ExpandSectionWithCustomToggle/ExpandSectionWithCustomToggle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -16,7 +16,7 @@ import HighAvailabilityContent from './components/HighAvailabilityContent/HighAv
 
 import './HighAvailabilityConfigurationSection.scss';
 
-const HighAvailabilityConfigurationSection: FC = () => {
+const HighAvailabilityConfigurationSection: FCC = () => {
   const { t } = useKubevirtTranslation();
 
   const [alternativeCheckedMap, setAlternativeCheckedMap] = useState<HAAlternativeCheckedMap>({

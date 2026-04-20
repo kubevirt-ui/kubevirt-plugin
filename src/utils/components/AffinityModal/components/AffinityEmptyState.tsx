@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -16,7 +16,7 @@ type AffinityEmptyStateProps = {
   onAffinityClickAdd: () => void;
 };
 
-const AffinityEmptyState: FC<AffinityEmptyStateProps> = ({ onAffinityClickAdd }) => {
+const AffinityEmptyState: FCC<AffinityEmptyStateProps> = ({ onAffinityClickAdd }) => {
   const { t } = useKubevirtTranslation();
   return (
     <EmptyState

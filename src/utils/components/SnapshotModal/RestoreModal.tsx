@@ -1,4 +1,4 @@
-import React, { FC, useMemo } from 'react';
+import React, { FCC, useMemo } from 'react';
 import { Trans } from 'react-i18next';
 
 import { VirtualMachineRestoreModel } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -20,7 +20,7 @@ type RestoreModalProps = {
   snapshot: V1beta1VirtualMachineSnapshot;
 };
 
-const RestoreModal: FC<RestoreModalProps> = ({ isOpen, onClose, snapshot }) => {
+const RestoreModal: FCC<RestoreModalProps> = ({ isOpen, onClose, snapshot }) => {
   const { t } = useKubevirtTranslation();
 
   const resultRestore = useMemo(() => {

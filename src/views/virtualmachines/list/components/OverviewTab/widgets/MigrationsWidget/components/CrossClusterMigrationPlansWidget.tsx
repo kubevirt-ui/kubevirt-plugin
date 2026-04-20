@@ -1,4 +1,4 @@
-import React, { FC, useMemo } from 'react';
+import React, { FCC, useMemo } from 'react';
 
 import { V1beta1Plan } from '@kubev2v/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -23,7 +23,7 @@ type CrossClusterMigrationPlansWidgetProps = {
   plansListPath: string;
 };
 
-const CrossClusterMigrationPlansWidget: FC<CrossClusterMigrationPlansWidgetProps> = ({
+const CrossClusterMigrationPlansWidget: FCC<CrossClusterMigrationPlansWidgetProps> = ({
   isLoading,
   plans,
   plansListPath,

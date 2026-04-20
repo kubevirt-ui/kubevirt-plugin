@@ -1,4 +1,4 @@
-import React, { FC, useMemo } from 'react';
+import React, { FCC, useMemo } from 'react';
 import { ReactNode } from 'react';
 
 import SubTitleChartLabel from '@kubevirt-utils/components/Charts/ChartLabels/SubTitleChartLabel';
@@ -23,7 +23,7 @@ import './VMsPerResourceCard.scss';
 type VMsPerResourceChartProps = {
   type: string;
 };
-const VMsPerResourceChart: FC<VMsPerResourceChartProps> = ({ type }) => {
+const VMsPerResourceChart: FCC<VMsPerResourceChartProps> = ({ type }) => {
   const { t } = useKubevirtTranslation();
   const { loaded, vms } = useVMsPerResource();
 

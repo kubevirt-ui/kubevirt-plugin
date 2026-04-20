@@ -1,5 +1,5 @@
-import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom-v5-compat';
+import React, { FCC, useCallback, useEffect, useMemo, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router';
 
 import ConfigurationSearch from '@kubevirt-utils/components/ConfigurationSearch/ConfigurationSearch';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
@@ -18,7 +18,7 @@ import { getTabs } from './utils/constants';
 
 import './CustomizeInstanceTypeConfigurationTab.scss';
 
-const CustomizeInstanceTypeConfigurationTab: FC = () => {
+const CustomizeInstanceTypeConfigurationTab: FCC = () => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
   const location = useLocation();

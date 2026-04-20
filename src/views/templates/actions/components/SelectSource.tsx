@@ -1,4 +1,4 @@
-import React, { FC, ReactNode } from 'react';
+import React, { FCC, ReactNode } from 'react';
 
 import { V1beta1DataVolumeSpec } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import CapacityInput from '@kubevirt-utils/components/CapacityInput/CapacityInput';
@@ -27,7 +27,7 @@ type SelectSourceProps = {
   withSize?: boolean;
 };
 
-export const SelectSource: FC<SelectSourceProps> = ({
+export const SelectSource: FCC<SelectSourceProps> = ({
   httpSourceHelperText,
   initialVolumeQuantity = DEFAULT_DISK_SIZE,
   onSourceChange,

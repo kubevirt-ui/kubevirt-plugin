@@ -1,5 +1,7 @@
-import { EncodedExtension } from '@openshift/dynamic-plugin-sdk-webpack';
-import type { ConsolePluginBuildMetadata } from '@openshift-console/dynamic-plugin-sdk-webpack';
+import type {
+  EncodedExtension,
+  ConsolePluginBuildMetadata,
+} from '@openshift-console/dynamic-plugin-sdk-webpack';
 
 export const exposedModules: ConsolePluginBuildMetadata['exposedModules'] = {
   topology: 'src/views/topology/topology.ts',

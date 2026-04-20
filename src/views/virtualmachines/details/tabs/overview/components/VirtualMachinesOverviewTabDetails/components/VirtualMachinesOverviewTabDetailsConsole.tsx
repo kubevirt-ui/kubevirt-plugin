@@ -1,4 +1,4 @@
-import React, { FC, memo, useState } from 'react';
+import React, { FCC, memo, useState } from 'react';
 
 import {
   ConsoleState,
@@ -28,7 +28,7 @@ type VirtualMachinesOverviewTabDetailsConsoleProps = {
   vncLogLevel?: VncLogLevel;
 };
 
-const VirtualMachinesOverviewTabDetailsConsole: FC<
+const VirtualMachinesOverviewTabDetailsConsole: FCC<
   VirtualMachinesOverviewTabDetailsConsoleProps
 > = ({
   canConnectConsole,

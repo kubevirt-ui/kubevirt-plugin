@@ -6,7 +6,7 @@ type VirtualMachinesInstancesStatusProps = {
   status: string;
 };
 
-const VirtualMachinesInstancesStatus: React.FC<VirtualMachinesInstancesStatusProps> = ({
+const VirtualMachinesInstancesStatus: React.FCC<VirtualMachinesInstancesStatusProps> = ({
   status,
 }) => {
   const IconComponent = icon?.[status];

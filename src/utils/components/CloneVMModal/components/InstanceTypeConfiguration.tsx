@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { modelToGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -16,7 +16,7 @@ type InstanceTypeConfigurationProps = {
   vm: V1VirtualMachine;
 };
 
-const InstanceTypeConfiguration: FC<InstanceTypeConfigurationProps> = ({ vm }) => {
+const InstanceTypeConfiguration: FCC<InstanceTypeConfigurationProps> = ({ vm }) => {
   const { t } = useKubevirtTranslation();
   const itMatcher = getInstanceTypeMatcher(vm);
   const { instanceType, instanceTypeLoaded } = useInstanceType(itMatcher, getCluster(vm));

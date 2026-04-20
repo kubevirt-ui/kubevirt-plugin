@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useMemo, useState } from 'react';
+import React, { FCC, useCallback, useMemo, useState } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import ActionsDropdown from '@kubevirt-utils/components/ActionsDropdown/ActionsDropdown';
@@ -38,7 +38,7 @@ type ConnectedVirtualMachinesProps = {
   obj: ClusterUserDefinedNetworkKind;
 };
 
-const ConnectedVirtualMachines: FC<ConnectedVirtualMachinesProps> = ({ obj: vmNetwork }) => {
+const ConnectedVirtualMachines: FCC<ConnectedVirtualMachinesProps> = ({ obj: vmNetwork }) => {
   const { t } = useKubevirtTranslation();
   const createModal = useModal();
   const [vms, loadedVMs, error] = useConnectedVMs(vmNetwork);

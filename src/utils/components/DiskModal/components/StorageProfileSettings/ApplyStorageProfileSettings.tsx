@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 import { useFormContext } from 'react-hook-form';
 
 import ApplyStorageProfileSettings from '@kubevirt-utils/components/ApplyStorageProfileSettings/ApplyStorageProfileSettings';
@@ -11,7 +11,7 @@ import {
   VOLUME_MODE_FIELD,
 } from '../utils/constants';
 
-const ApplyStorageProfileSettingsToDisk: FC = () => {
+const ApplyStorageProfileSettingsToDisk: FCC = () => {
   const { setValue, watch } = useFormContext<V1DiskFormState>();
 
   const [storage, accessModes, volumeMode, vmCluster] = watch([

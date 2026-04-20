@@ -1,4 +1,4 @@
-import React, { FC, useMemo } from 'react';
+import React, { FCC, useMemo } from 'react';
 
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -15,7 +15,7 @@ type HardwareDevicesPageTableProps = {
   loaded: boolean;
 };
 
-const HardwareDevicesPageTable: FC<HardwareDevicesPageTableProps> = ({
+const HardwareDevicesPageTable: FCC<HardwareDevicesPageTableProps> = ({
   devices,
   error,
   loaded,

@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import ActionsDropdown from '@kubevirt-utils/components/ActionsDropdown/ActionsDropdown';
 import { ClusterUserDefinedNetworkKind } from '@kubevirt-utils/resources/udn/types';
@@ -10,7 +10,7 @@ type VMNetworkActionProps = {
   obj: ClusterUserDefinedNetworkKind;
 };
 
-const VMNetworkActions: FC<VMNetworkActionProps> = ({ isKebabToggle = true, obj }) => {
+const VMNetworkActions: FCC<VMNetworkActionProps> = ({ isKebabToggle = true, obj }) => {
   const actions = useVMNetworkActions(obj);
 
   return (

@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 import classNames from 'classnames';
 
 import { TemplateParameter } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -14,7 +14,7 @@ type FieldGroupProps = {
   showError?: boolean;
 };
 
-const FieldGroup: FC<FieldGroupProps> = ({
+const FieldGroup: FCC<FieldGroupProps> = ({
   className,
   field,
   isDisabled = false,

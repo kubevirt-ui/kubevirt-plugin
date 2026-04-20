@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { ApplicationAwareQuota } from '@kubevirt-utils/resources/quotas/types';
 
@@ -11,7 +11,7 @@ type QuotaVMICountCellProps = {
   row: ApplicationAwareQuota;
 };
 
-const QuotaVMICountCell: FC<QuotaVMICountCellProps> = ({ callbacks, row }) => {
+const QuotaVMICountCell: FCC<QuotaVMICountCellProps> = ({ callbacks, row }) => {
   const { vmiCount } = getResourceKeysFromCallbacks(callbacks);
   const { hard, used } = getQuotaStatusData(row);
 

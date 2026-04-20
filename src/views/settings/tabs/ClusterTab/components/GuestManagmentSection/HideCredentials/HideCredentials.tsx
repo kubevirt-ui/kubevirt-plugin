@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import SectionWithSwitch from '@kubevirt-utils/components/SectionWithSwitch/SectionWithSwitch';
 import { HIDE_CREDENTIALS_NON_PRIVILEGED } from '@kubevirt-utils/hooks/useFeatures/constants';
@@ -12,7 +12,7 @@ type HideCredentialsProps = {
   newBadge?: boolean;
 };
 
-const HideCredentials: FC<HideCredentialsProps> = ({ newBadge = false }) => {
+const HideCredentials: FCC<HideCredentialsProps> = ({ newBadge = false }) => {
   const { t } = useKubevirtTranslation();
   const cluster = useSettingsCluster();
   const { canEdit, error, featureEnabled, loading, toggleFeature } = useFeatures(

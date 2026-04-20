@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { SelectOption } from '@patternfly/react-core';
 
@@ -10,7 +10,7 @@ type InlineFilterSelectOptionProps = {
   isFocused: boolean;
   option: EnhancedSelectOptionProps;
 };
-const InlineFilterSelectOption: FC<InlineFilterSelectOptionProps> = ({ isFocused, option }) => {
+const InlineFilterSelectOption: FCC<InlineFilterSelectOptionProps> = ({ isFocused, option }) => {
   return (
     <SelectOption
       data-test-id={`select-option-${option.value}`}

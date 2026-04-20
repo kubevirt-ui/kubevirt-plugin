@@ -1,4 +1,4 @@
-import React, { FC, MouseEvent, useState } from 'react';
+import React, { FCC, MouseEvent, useState } from 'react';
 
 import { V1PermittedHostDevices } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import SelectToggle from '@kubevirt-utils/components/toggles/SelectToggle';
@@ -14,7 +14,7 @@ type DeviceNameSelectProps = {
   setDeviceName: (resourceName: string) => void;
 };
 
-const DeviceNameSelect: FC<DeviceNameSelectProps> = ({
+const DeviceNameSelect: FCC<DeviceNameSelectProps> = ({
   deviceName,
   index,
   permittedHostDevices,

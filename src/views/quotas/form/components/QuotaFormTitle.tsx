@@ -1,5 +1,5 @@
-import React, { FC } from 'react';
-import { useNavigate } from 'react-router-dom-v5-compat';
+import React, { FCC } from 'react';
+import { useNavigate } from 'react-router';
 
 import DetailsPageTitle from '@kubevirt-utils/components/DetailsPageTitle/DetailsPageTitle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -13,7 +13,7 @@ type QuotaFormTitleProps = {
   isEdit?: boolean;
 };
 
-const QuotaFormTitle: FC<QuotaFormTitleProps> = ({ isEdit = false }) => {
+const QuotaFormTitle: FCC<QuotaFormTitleProps> = ({ isEdit = false }) => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
   const namespace = useNamespaceParam();

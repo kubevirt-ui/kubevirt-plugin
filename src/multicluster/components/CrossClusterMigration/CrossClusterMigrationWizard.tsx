@@ -1,6 +1,6 @@
 /* Copyright Contributors to the Open Cluster Management project */
-import React, { FC } from 'react';
-import { useNavigate } from 'react-router-dom-v5-compat';
+import React, { FCC } from 'react';
+import { useNavigate } from 'react-router';
 import { useImmer } from 'use-immer';
 
 import { PlanModel, V1beta1NetworkMap, V1beta1Plan, V1beta1StorageMap } from '@kubev2v/types';
@@ -29,7 +29,7 @@ import { getInitialMigrationPlan } from './utils';
 
 import './CrossClusterMigration.scss';
 
-const CrossClusterMigrationWizard: FC<{
+const CrossClusterMigrationWizard: FCC<{
   close: () => void;
   vms: V1VirtualMachine[];
 }> = ({ close, vms }) => {

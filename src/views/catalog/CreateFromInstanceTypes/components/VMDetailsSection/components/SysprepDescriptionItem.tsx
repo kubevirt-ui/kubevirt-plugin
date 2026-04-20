@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FCC, useState } from 'react';
 
 import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
 import { instanceTypeVMInitialState } from '@catalog/CreateFromInstanceTypes/state/utils/state';
@@ -22,7 +22,7 @@ import MulticlusterResourceLink from '@multicluster/components/MulticlusterResou
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { Loading } from '@patternfly/quickstarts';
 
-const SysprepDescriptionItem: FC = () => {
+const SysprepDescriptionItem: FCC = () => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const cluster = useClusterParam();

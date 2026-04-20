@@ -1,5 +1,5 @@
-import React, { FC, memo } from 'react';
-import { Link } from 'react-router-dom-v5-compat';
+import React, { FCC, memo } from 'react';
+import { Link } from 'react-router';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ActivityBody } from '@openshift-console/dynamic-plugin-sdk-internal';
@@ -9,7 +9,7 @@ import { VIEW_EVENTS_PATH } from './utils/constants';
 import OngoingActivity from './utils/OngoingActivity';
 import RecentEvent from './utils/RecentEvent';
 
-const ActivityCard: FC = memo(() => {
+const ActivityCard: FCC = memo(() => {
   const { t } = useKubevirtTranslation();
   return (
     <Card className="co-overview-card--gradient" data-test-id="kv-activity-card">

@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import {
   IoK8sApiBatchV1Job,
@@ -23,7 +23,7 @@ type CheckupsSelfValidationDetailsPageHeaderProps = {
   jobs: IoK8sApiBatchV1Job[];
 };
 
-const CheckupsSelfValidationDetailsPageHeader: FC<CheckupsSelfValidationDetailsPageHeaderProps> = ({
+const CheckupsSelfValidationDetailsPageHeader: FCC<CheckupsSelfValidationDetailsPageHeaderProps> = ({
   configMap,
   jobs,
 }) => {

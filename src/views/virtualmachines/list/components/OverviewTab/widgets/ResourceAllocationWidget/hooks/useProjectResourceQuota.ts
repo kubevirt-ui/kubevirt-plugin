@@ -1,5 +1,5 @@
 import { ReactNode, useMemo } from 'react';
-import { TFunction } from 'react-i18next';
+import { TFunction } from 'i18next';
 import { RESOURCE_KEYS } from 'src/views/quotas/utils/constants';
 
 import {

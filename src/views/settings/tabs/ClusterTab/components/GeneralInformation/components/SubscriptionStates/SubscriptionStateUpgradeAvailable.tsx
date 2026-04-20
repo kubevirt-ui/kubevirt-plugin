@@ -8,7 +8,7 @@ type SubscriptionStateUpgradeAvailableProps = {
   operatorLink: string;
 };
 
-const SubscriptionStateUpgradeAvailable: React.FC<SubscriptionStateUpgradeAvailableProps> = ({
+const SubscriptionStateUpgradeAvailable: React.FCC<SubscriptionStateUpgradeAvailableProps> = ({
   operatorLink,
 }) => {
   const { t } = useKubevirtTranslation();

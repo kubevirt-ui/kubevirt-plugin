@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
@@ -27,7 +27,7 @@ type MigrationProgressStatusProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const MigrationProgressStatus: FC<MigrationProgressStatusProps> = ({
+const MigrationProgressStatus: FCC<MigrationProgressStatusProps> = ({
   prometheusUnavailable,
   vmi,
 }) => {

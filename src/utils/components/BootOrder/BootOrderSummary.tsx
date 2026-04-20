@@ -1,4 +1,4 @@
-import React, { FC, useMemo } from 'react';
+import React, { FCC, useMemo } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import BootableDevicesList from '@kubevirt-utils/components/BootOrder/BootableDevicesList';
@@ -9,7 +9,7 @@ type BootOrderSummaryProps = {
   vm: V1VirtualMachine;
 };
 
-const BootOrderSummary: FC<BootOrderSummaryProps> = ({ instanceTypeVM, vm }) => {
+const BootOrderSummary: FCC<BootOrderSummaryProps> = ({ instanceTypeVM, vm }) => {
   const transformedDevices = useMemo(
     () => getSortedBootableDevices({ instanceTypeVM, vm }),
     [vm, instanceTypeVM],

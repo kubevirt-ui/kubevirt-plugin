@@ -1,4 +1,4 @@
-import React, { Dispatch, FC, SetStateAction, useCallback, useEffect } from 'react';
+import React, { Dispatch, FCC, SetStateAction, useCallback, useEffect } from 'react';
 
 import { getSCSelectOptions } from '@kubevirt-utils/components/DiskModal/components/StorageClassAndPreallocation/utils/helpers';
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
@@ -20,7 +20,7 @@ type StorageClassSelectProps = {
   storageClass: string;
 };
 
-const StorageClassSelect: FC<StorageClassSelectProps> = ({
+const StorageClassSelect: FCC<StorageClassSelectProps> = ({
   checkSC,
   cluster,
   setShowSCAlert,

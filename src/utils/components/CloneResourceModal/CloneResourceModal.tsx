@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FCC, useState } from 'react';
 import produce from 'immer';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -19,7 +19,7 @@ type CloneResourceModalProps<T extends K8sResourceCommon = K8sResourceCommon> = 
   onClose: () => void;
 };
 
-const CloneResourceModal: FC<CloneResourceModalProps> = ({
+const CloneResourceModal: FCC<CloneResourceModalProps> = ({
   headerText,
   model,
   namespace,

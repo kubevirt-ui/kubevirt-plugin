@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import {
   FormHelperText,
@@ -13,7 +13,7 @@ type FormGroupHelperTextProps = {
   validated?: ValidatedOptions;
 };
 
-const FormGroupHelperText: FC<FormGroupHelperTextProps> = ({
+const FormGroupHelperText: FCC<FormGroupHelperTextProps> = ({
   children,
   validated = ValidatedOptions.default,
 }) => (

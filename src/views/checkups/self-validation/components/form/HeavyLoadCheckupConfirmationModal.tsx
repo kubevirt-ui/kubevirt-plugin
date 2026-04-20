@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FCC, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -19,7 +19,7 @@ type HeavyLoadCheckupConfirmationModalProps = {
   onConfirm: () => void;
 };
 
-const HeavyLoadCheckupConfirmationModal: FC<HeavyLoadCheckupConfirmationModalProps> = ({
+const HeavyLoadCheckupConfirmationModal: FCC<HeavyLoadCheckupConfirmationModalProps> = ({
   isOpen,
   onClose,
   onConfirm,

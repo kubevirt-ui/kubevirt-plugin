@@ -1,10 +1,10 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { ExclamationCircleIcon } from '@patternfly/react-icons';
 
 import './virt-wizard-icons.scss';
 
-const FailedInstallIcon: FC = () => {
+const FailedInstallIcon: FCC = () => {
   return <ExclamationCircleIcon className="failed-install-icon" />;
 };
 

@@ -1,4 +1,4 @@
-import React, { FC, useMemo } from 'react';
+import React, { FCC, useMemo } from 'react';
 
 import SubTitleChartLabel from '@kubevirt-utils/components/Charts/ChartLabels/SubTitleChartLabel';
 import TitleChartLabel from '@kubevirt-utils/components/Charts/ChartLabels/TitleChartLabel';
@@ -16,7 +16,7 @@ type HealthPopupChartProps = {
   numberOfAlerts?: number;
 };
 
-const HealthPopupChart: FC<HealthPopupChartProps> = ({ alerts, numberOfAlerts }) => {
+const HealthPopupChart: FCC<HealthPopupChartProps> = ({ alerts, numberOfAlerts }) => {
   const { t } = useKubevirtTranslation();
   const totalNumberAlerts = useMemo(
     () => Object.values(alerts)?.reduce((acc, alertType) => acc + (alertType?.length || 0), 0),

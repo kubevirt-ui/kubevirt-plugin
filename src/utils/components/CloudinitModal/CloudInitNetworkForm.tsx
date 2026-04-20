@@ -20,7 +20,7 @@ type CloudinitNetworkFormProps = {
   updateNetworkField: (key: keyof CloudInitNetworkData, value: string | string[]) => void;
 };
 
-export const CloudinitNetworkForm: React.FC<CloudinitNetworkFormProps> = ({
+export const CloudinitNetworkForm: React.FCC<CloudinitNetworkFormProps> = ({
   enableNetworkData,
   networkData,
   setEnableNetworkData,

@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FCC, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
@@ -28,7 +28,7 @@ export type EditProjectMappingModalProps = {
   obj: ClusterUserDefinedNetworkKind;
 };
 
-const EditProjectMappingModal: FC<EditProjectMappingModalProps> = ({ closeModal, obj }) => {
+const EditProjectMappingModal: FCC<EditProjectMappingModalProps> = ({ closeModal, obj }) => {
   const { t } = useKubevirtTranslation();
   const [apiError, setError] = useState<Error>(null);
 

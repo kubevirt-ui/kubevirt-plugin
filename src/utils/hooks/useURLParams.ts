@@ -1,4 +1,4 @@
-import { useLocation, useNavigate } from 'react-router-dom-v5-compat';
+import { useLocation, useNavigate } from 'react-router';
 
 /**
  * A Hook for manipulating URL Parameters and History.

@@ -1,5 +1,5 @@
-import React, { FC } from 'react';
-import { useNavigate } from 'react-router-dom-v5-compat';
+import React, { FCC } from 'react';
+import { useNavigate } from 'react-router';
 
 import AddBootableVolumeModal from '@kubevirt-utils/components/AddBootableVolumeModal/AddBootableVolumeModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
@@ -16,7 +16,7 @@ type BootableVolumeAddButtonProps = {
   namespace: string;
 };
 
-const BootableVolumeAddButton: FC<BootableVolumeAddButtonProps> = ({ buttonText, namespace }) => {
+const BootableVolumeAddButton: FCC<BootableVolumeAddButtonProps> = ({ buttonText, namespace }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const navigate = useNavigate();

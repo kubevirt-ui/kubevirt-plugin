@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { Split, SplitItem } from '@patternfly/react-core';
 import useInstanceTypeVMStore from '@virtualmachines/creation-wizard/state/instance-type-vm-store/useInstanceTypeVMStore';
@@ -6,7 +6,7 @@ import { OperatingSystemType } from '@virtualmachines/creation-wizard/steps/Inst
 
 import OperatingSystemTile from './components/OperatingSystemTile/OperatingSystemTile';
 
-const OperatingSystemTileGroup: FC = () => {
+const OperatingSystemTileGroup: FCC = () => {
   const { operatingSystemType, setOperatingSystemType } = useInstanceTypeVMStore();
 
   return (

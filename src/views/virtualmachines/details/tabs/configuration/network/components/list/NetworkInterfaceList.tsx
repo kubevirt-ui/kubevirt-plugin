@@ -1,4 +1,4 @@
-import React, { FC, useMemo } from 'react';
+import React, { FCC, useMemo } from 'react';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
@@ -33,7 +33,7 @@ type NetworkInterfaceTableProps = {
   vmi?: V1VirtualMachineInstance;
 };
 
-const NetworkInterfaceList: FC<NetworkInterfaceTableProps> = ({ vm, vmi }) => {
+const NetworkInterfaceList: FCC<NetworkInterfaceTableProps> = ({ vm, vmi }) => {
   const { t } = useKubevirtTranslation();
   const filters = useNetworkRowFilters();
   const columns = useMemo(() => getNetworkInterfaceListColumns(t), [t]);

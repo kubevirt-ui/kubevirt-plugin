@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FCC, useState } from 'react';
 import produce from 'immer';
 
 import { V1CPU, V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -38,7 +38,7 @@ type CPUMemoryModalProps = {
   vm: V1VirtualMachine;
 };
 
-const CPUMemoryModal: FC<CPUMemoryModalProps> = ({
+const CPUMemoryModal: FCC<CPUMemoryModalProps> = ({
   isOpen,
   onClose,
   onSubmit,

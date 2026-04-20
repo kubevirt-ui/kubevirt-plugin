@@ -1,4 +1,4 @@
-import { TFunction } from 'react-i18next';
+import { TFunction } from 'i18next';
 
 import { NetworkInterfaceState } from '@kubevirt-utils/resources/vm/utils/network/types';
 

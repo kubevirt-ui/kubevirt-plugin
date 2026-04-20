@@ -3,7 +3,7 @@ import React from 'react';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Content, ContentVariants } from '@patternfly/react-core';
 
-const MigrationPolicyFormDescription: React.FC = () => {
+const MigrationPolicyFormDescription: React.FCC = () => {
   const { t } = useKubevirtTranslation();
 
   return (

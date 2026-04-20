@@ -1,4 +1,4 @@
-import React, { FC, useMemo, useState } from 'react';
+import React, { FCC, useMemo, useState } from 'react';
 
 import { DataVolumeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1VirtualMachine, V1Volume } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -30,7 +30,7 @@ type DeleteDiskModalProps = {
   volume: V1Volume;
 };
 
-const DeleteDiskModal: FC<DeleteDiskModalProps> = ({
+const DeleteDiskModal: FCC<DeleteDiskModalProps> = ({
   isHotPluginVolume,
   isOpen,
   onClose,

@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import OwnerDetailsItem from '@kubevirt-utils/components/OwnerDetailsItem/OwnerDetailsItem';
@@ -20,7 +20,7 @@ type VMResourceSummaryProps = {
   vmi?: V1VirtualMachineInstance;
 };
 
-const VMDetailsPanelLeftColumn: FC<VMResourceSummaryProps> = ({ vm, vmi }) => (
+const VMDetailsPanelLeftColumn: FCC<VMResourceSummaryProps> = ({ vm, vmi }) => (
   <DescriptionList
     className="pf-v6-c-description-list__group"
     data-test-id="details-panel-left-column"

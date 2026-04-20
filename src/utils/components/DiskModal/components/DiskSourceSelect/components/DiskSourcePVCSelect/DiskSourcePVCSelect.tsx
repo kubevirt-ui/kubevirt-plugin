@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import DiskSourcePVCSelectName from './DiskSourcePVCSelectName';
 import DiskSourcePVCSelectNamespace from './DiskSourcePVCSelectNamespace';
@@ -7,7 +7,7 @@ type DiskSourcePVCSelectProps = {
   vmNamepace: string;
 };
 
-const DiskSourcePVCSelect: FC<DiskSourcePVCSelectProps> = ({ vmNamepace }) => {
+const DiskSourcePVCSelect: FCC<DiskSourcePVCSelectProps> = ({ vmNamepace }) => {
   return (
     <>
       <DiskSourcePVCSelectNamespace vmNamespace={vmNamepace} />

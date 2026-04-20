@@ -1,4 +1,4 @@
-import React, { FC, ReactNode } from 'react';
+import React, { FCC, ReactNode } from 'react';
 
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
@@ -25,7 +25,7 @@ type OpenShiftVirtualizationWidgetBodyProps = {
   statusMessage: string;
 };
 
-const OpenShiftVirtualizationWidgetBody: FC<OpenShiftVirtualizationWidgetBodyProps> = ({
+const OpenShiftVirtualizationWidgetBody: FCC<OpenShiftVirtualizationWidgetBodyProps> = ({
   criticalClusters,
   criticalCount,
   csvError,

@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FCC, useState } from 'react';
 
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
@@ -20,7 +20,7 @@ type EditCalculationMethodModalProps = {
   onClose: () => void;
 };
 
-const EditCalculationMethodModal: FC<EditCalculationMethodModalProps> = ({
+const EditCalculationMethodModal: FCC<EditCalculationMethodModalProps> = ({
   calculationMethodContentMapper,
   hyperConverge,
   initiallySelectedMethod,

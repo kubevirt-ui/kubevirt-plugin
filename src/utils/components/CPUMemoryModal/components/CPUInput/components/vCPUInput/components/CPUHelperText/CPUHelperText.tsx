@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { V1CPU } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { formatVCPUsAsSockets } from '@kubevirt-utils/components/CPUMemoryModal/components/CPUInput/utils/utils';
@@ -12,7 +12,7 @@ type CPUHelperTextProps = {
   hide: boolean;
 };
 
-const CPUHelperText: FC<CPUHelperTextProps> = ({ cpu, hide }) => {
+const CPUHelperText: FCC<CPUHelperTextProps> = ({ cpu, hide }) => {
   const { t } = useKubevirtTranslation();
 
   if (hide) return null;

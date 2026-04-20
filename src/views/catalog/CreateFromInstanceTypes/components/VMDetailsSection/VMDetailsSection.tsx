@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { Grid, GridItem } from '@patternfly/react-core';
 
@@ -7,7 +7,7 @@ import DetailsRightGrid from './components/DetailsRightGrid';
 
 import './VMDetailsSection.scss';
 
-const VMDetailsSection: FC<DetailsLeftGridProps> = (props) => {
+const VMDetailsSection: FCC<DetailsLeftGridProps> = (props) => {
   return (
     <div className="instancetypes-vm-details-section instancetypes-vm-details-body">
       <Grid hasGutter>

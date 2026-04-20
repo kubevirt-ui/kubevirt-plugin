@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useMemo, useState } from 'react';
+import React, { FCC, useEffect, useMemo, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import usePagination from '@kubevirt-utils/hooks/usePagination/usePagination';
@@ -19,7 +19,7 @@ type VirtualMachineDiagnosticTabVolumeStatusProps = {
   volumeSnapshotStatuses: VirtualizationVolumeSnapshotStatus[];
 };
 
-const VirtualMachineDiagnosticTabVolumeStatus: FC<VirtualMachineDiagnosticTabVolumeStatusProps> = ({
+const VirtualMachineDiagnosticTabVolumeStatus: FCC<VirtualMachineDiagnosticTabVolumeStatusProps> = ({
   volumeSnapshotStatuses,
 }) => {
   const { t } = useKubevirtTranslation();

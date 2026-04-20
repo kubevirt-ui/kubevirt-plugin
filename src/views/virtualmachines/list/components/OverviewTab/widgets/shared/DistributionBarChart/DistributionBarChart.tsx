@@ -1,4 +1,4 @@
-import React, { FC, ReactNode } from 'react';
+import React, { FCC, ReactNode } from 'react';
 
 import useResponsiveCharts from '@kubevirt-utils/components/Charts/hooks/useResponsiveCharts';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
@@ -23,7 +23,7 @@ type DistributionBarChartProps = {
   title: string;
 };
 
-const DistributionBarChart: FC<DistributionBarChartProps> = ({
+const DistributionBarChart: FCC<DistributionBarChartProps> = ({
   buckets,
   helpContent,
   isLoading,

@@ -1,4 +1,4 @@
-import { FC, ReactNode } from 'react';
+import { FCC, ReactNode } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 
@@ -33,7 +33,7 @@ export type OverviewSectionData = {
 };
 
 export type OverviewSectionConfig = {
-  Component: FC<OverviewSectionData>;
+  Component: FCC<OverviewSectionData>;
   id: string;
   subHeader?: ReactNode;
   title: string;

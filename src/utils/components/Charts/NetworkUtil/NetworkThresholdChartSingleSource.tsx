@@ -1,5 +1,5 @@
-import React, { FC } from 'react';
-import { Link } from 'react-router-dom-v5-compat';
+import React, { FCC } from 'react';
+import { Link } from 'react-router';
 
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { PrometheusResult } from '@openshift-console/dynamic-plugin-sdk';
@@ -35,7 +35,7 @@ type NetworkThresholdSingleSourceChartProps = {
   link: string;
 };
 
-const NetworkThresholdSingleSourceChart: FC<NetworkThresholdSingleSourceChartProps> = ({
+const NetworkThresholdSingleSourceChart: FCC<NetworkThresholdSingleSourceChartProps> = ({
   data,
   link,
 }) => {

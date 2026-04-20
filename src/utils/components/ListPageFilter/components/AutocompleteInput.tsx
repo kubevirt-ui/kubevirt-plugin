@@ -1,4 +1,4 @@
-import React, { Dispatch, FC, SetStateAction, useMemo, useState } from 'react';
+import React, { Dispatch, FCC, SetStateAction, useMemo, useState } from 'react';
 import classNames from 'classnames';
 
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
@@ -19,7 +19,7 @@ type AutocompleteInputProps = {
   textValue: string;
 };
 
-const AutocompleteInput: FC<AutocompleteInputProps> = ({
+const AutocompleteInput: FCC<AutocompleteInputProps> = ({
   data,
   onSuggestionSelect,
   placeholder,

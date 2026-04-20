@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { TemplateModel, V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import NetworkInterfaceModal from '@kubevirt-utils/components/NetworkInterfaceModal/NetworkInterfaceModal';
@@ -23,7 +23,7 @@ type TemplatesEditNetworkInterfaceModalProps = {
   template: V1Template;
 };
 
-const TemplatesEditNetworkInterfaceModal: FC<TemplatesEditNetworkInterfaceModalProps> = ({
+const TemplatesEditNetworkInterfaceModal: FCC<TemplatesEditNetworkInterfaceModalProps> = ({
   isOpen,
   nicPresentation,
   onClose,

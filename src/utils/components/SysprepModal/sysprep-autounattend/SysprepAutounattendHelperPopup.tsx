@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 import { Trans } from 'react-i18next';
 
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
@@ -7,7 +7,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { Button, ButtonVariant, Content, ContentVariants, Popover } from '@patternfly/react-core';
 import { OutlinedQuestionCircleIcon } from '@patternfly/react-icons';
 
-const SysprepUnattendHelperPopup: FC = () => {
+const SysprepUnattendHelperPopup: FCC = () => {
   const { t } = useKubevirtTranslation();
   return (
     <Popover

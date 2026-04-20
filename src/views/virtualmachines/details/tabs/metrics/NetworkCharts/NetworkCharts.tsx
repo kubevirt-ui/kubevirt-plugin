@@ -1,5 +1,5 @@
-import React, { FC, useMemo, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom-v5-compat';
+import React, { FCC, useMemo, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
@@ -19,7 +19,7 @@ type NetworkChartsProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const NetworkCharts: FC<NetworkChartsProps> = ({ prometheusUnavailable, vmi }) => {
+const NetworkCharts: FCC<NetworkChartsProps> = ({ prometheusUnavailable, vmi }) => {
   const { t } = useKubevirtTranslation();
   const { pathname } = useLocation();
   const navigate = useNavigate();

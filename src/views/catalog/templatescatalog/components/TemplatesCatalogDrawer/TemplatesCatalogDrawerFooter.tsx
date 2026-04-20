@@ -1,4 +1,4 @@
-import React, { FC, useEffect } from 'react';
+import React, { FCC, useEffect } from 'react';
 
 import { SecretModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { IoK8sApiCoreV1Secret } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
@@ -19,7 +19,7 @@ type TemplateCatalogDrawerFooterProps = {
   onCancel: () => void;
 };
 
-export const TemplatesCatalogDrawerFooter: FC<TemplateCatalogDrawerFooterProps> = ({
+export const TemplatesCatalogDrawerFooter: FCC<TemplateCatalogDrawerFooterProps> = ({
   namespace,
   onCancel,
 }) => {

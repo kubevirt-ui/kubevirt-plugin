@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useMemo, useState } from 'react';
+import React, { FCC, useEffect, useMemo, useState } from 'react';
 import { useImmer } from 'use-immer';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -32,7 +32,7 @@ export type VirtualMachineMigrateModalProps = {
   vms: V1VirtualMachine[];
 };
 
-const VirtualMachineMigrateModal: FC<VirtualMachineMigrateModalProps> = ({
+const VirtualMachineMigrateModal: FCC<VirtualMachineMigrateModalProps> = ({
   isOpen,
   onClose,
   vms,

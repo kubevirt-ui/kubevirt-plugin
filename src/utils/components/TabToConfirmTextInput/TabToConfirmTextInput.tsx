@@ -1,4 +1,4 @@
-import React, { FC, FormEvent, KeyboardEvent, ReactNode, useEffect, useRef, useState } from 'react';
+import React, { FCC, FormEvent, KeyboardEvent, ReactNode, useEffect, useRef, useState } from 'react';
 
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import { TAB } from '@kubevirt-utils/hooks/useClickOutside/constants';
@@ -21,7 +21,7 @@ type TabToConfirmTextInputProps = {
   value?: string;
 };
 
-const TabToConfirmTextInput: FC<TabToConfirmTextInputProps> = ({
+const TabToConfirmTextInput: FCC<TabToConfirmTextInputProps> = ({
   autoFocus = false,
   className,
   fieldId,

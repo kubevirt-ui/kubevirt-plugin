@@ -1,4 +1,4 @@
-import React, { FC, Suspense } from 'react';
+import React, { FCC, Suspense } from 'react';
 
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { ApplicationAwareQuota } from '@kubevirt-utils/resources/quotas/types';
@@ -9,7 +9,7 @@ type QuotaYAMLTabProps = {
   obj?: ApplicationAwareQuota;
 };
 
-const QuotaYAMLTab: FC<QuotaYAMLTabProps> = ({ obj: quota }) => {
+const QuotaYAMLTab: FCC<QuotaYAMLTabProps> = ({ obj: quota }) => {
   const loading = (
     <Bullseye>
       <Loading />

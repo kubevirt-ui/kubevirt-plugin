@@ -1,6 +1,6 @@
 import React, { ReactElement } from 'react';
-import { TFunction } from 'react-i18next';
-import { Link } from 'react-router-dom-v5-compat';
+import { TFunction } from 'i18next';
+import { Link } from 'react-router';
 import { extractConfigMapName } from 'src/views/checkups/utils/utils';
 
 import { IoK8sApiBatchV1Job } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';

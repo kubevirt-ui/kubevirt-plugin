@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useMemo, useState } from 'react';
+import React, { FCC, useEffect, useMemo, useState } from 'react';
 import { Trans } from 'react-i18next';
 import classNames from 'classnames';
 
@@ -17,7 +17,7 @@ import { CLUSTER_SEPARATOR, ObservabilityDisabledAlertProps } from './utils';
 
 import './ObservabilityDisabledAlert.scss';
 
-const ObservabilityDisabledAlert: FC<ObservabilityDisabledAlertProps> = ({ disabledClusters }) => {
+const ObservabilityDisabledAlert: FCC<ObservabilityDisabledAlertProps> = ({ disabledClusters }) => {
   const { t } = useKubevirtTranslation();
   const [alertDismissed, setAlertDismissed] = useState(false);
   const disabledClustersKey = useMemo(

@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { modelToGroupVersionKind, ServiceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { IoK8sApiCoreV1Service } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
@@ -14,7 +14,7 @@ import { Card, CardBody, CardTitle, Divider } from '@patternfly/react-core';
 
 type VirtualMachinesOverviewTabServiceProps = { vm: V1VirtualMachine };
 
-const VirtualMachinesOverviewTabService: FC<VirtualMachinesOverviewTabServiceProps> = ({ vm }) => {
+const VirtualMachinesOverviewTabService: FCC<VirtualMachinesOverviewTabServiceProps> = ({ vm }) => {
   const { t } = useKubevirtTranslation();
 
   const [services, loaded, loadError] = useK8sWatchData<IoK8sApiCoreV1Service[]>({

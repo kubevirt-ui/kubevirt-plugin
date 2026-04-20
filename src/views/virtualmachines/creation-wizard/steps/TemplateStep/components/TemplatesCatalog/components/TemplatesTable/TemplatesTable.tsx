@@ -1,4 +1,4 @@
-import React, { FC, useMemo } from 'react';
+import React, { FCC, useMemo } from 'react';
 
 import { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -19,7 +19,7 @@ type TemplatesTableProps = {
   templates: Template[];
 };
 
-const TemplatesTable: FC<TemplatesTableProps> = ({
+const TemplatesTable: FCC<TemplatesTableProps> = ({
   availableDatasources,
   availableTemplatesUID,
   bootSourcesLoaded,

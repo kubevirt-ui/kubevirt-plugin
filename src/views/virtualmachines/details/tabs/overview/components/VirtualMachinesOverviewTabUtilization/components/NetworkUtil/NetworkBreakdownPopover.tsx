@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Link } from 'react-router-dom-v5-compat';
+import { Link } from 'react-router';
 
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -15,7 +15,7 @@ type NetworkBreakdownPopoverProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const NetworkBreakdownPopover: React.FC<NetworkBreakdownPopoverProps> = ({ networkTotal, vmi }) => {
+const NetworkBreakdownPopover: React.FCC<NetworkBreakdownPopoverProps> = ({ networkTotal, vmi }) => {
   const { t } = useKubevirtTranslation();
 
   const interfacesNames = useMemo(() => vmi?.spec?.domain?.devices?.interfaces, [vmi]);

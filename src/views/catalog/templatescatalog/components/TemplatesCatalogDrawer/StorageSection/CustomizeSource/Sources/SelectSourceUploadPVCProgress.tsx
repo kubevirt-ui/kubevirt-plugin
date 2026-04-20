@@ -17,7 +17,7 @@ import {
   StackItem,
 } from '@patternfly/react-core';
 
-export const SelectSourceUploadPVCProgress: React.FC<{ upload: DataUpload }> = ({ upload }) => {
+export const SelectSourceUploadPVCProgress: React.FCC<{ upload: DataUpload }> = ({ upload }) => {
   const { t } = useKubevirtTranslation();
   return (
     <FormGroup fieldId="upload-progress">

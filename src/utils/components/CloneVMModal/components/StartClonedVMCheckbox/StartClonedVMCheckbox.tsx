@@ -1,4 +1,4 @@
-import React, { Dispatch, FC, SetStateAction } from 'react';
+import React, { Dispatch, FCC, SetStateAction } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Checkbox, FormGroup } from '@patternfly/react-core';
@@ -10,7 +10,7 @@ type StartClonedVMCheckboxProps = {
   startCloneVM: boolean;
 };
 
-const StartClonedVMCheckbox: FC<StartClonedVMCheckboxProps> = ({
+const StartClonedVMCheckbox: FCC<StartClonedVMCheckboxProps> = ({
   setStartCloneVM,
   startCloneVM,
 }) => {

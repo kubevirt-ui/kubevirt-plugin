@@ -1,4 +1,4 @@
-import React, { FC, useMemo, useState } from 'react';
+import React, { FCC, useMemo, useState } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
@@ -18,7 +18,7 @@ type NodesTableProps = {
   vm: V1VirtualMachine;
 };
 
-const NodesTable: FC<NodesTableProps> = ({ handleNodeSelection, selectedNode, vm }) => {
+const NodesTable: FCC<NodesTableProps> = ({ handleNodeSelection, selectedNode, vm }) => {
   const { t } = useKubevirtTranslation();
   const columns = useMemo(() => getNodesTableColumns(t), [t]);
   const { nodesData, nodesDataLoaded } = useNodesData(vm);

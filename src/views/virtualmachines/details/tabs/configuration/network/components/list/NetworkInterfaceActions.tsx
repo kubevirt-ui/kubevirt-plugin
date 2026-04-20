@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FCC, useState } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import ConfirmActionMessage from '@kubevirt-utils/components/ConfirmActionMessage/ConfirmActionMessage';
@@ -38,7 +38,7 @@ type NetworkInterfaceActionsProps = {
   vm: V1VirtualMachine;
 };
 
-const NetworkInterfaceActions: FC<NetworkInterfaceActionsProps> = ({
+const NetworkInterfaceActions: FCC<NetworkInterfaceActionsProps> = ({
   isAutoAttached,
   nicName,
   nicPresentation,

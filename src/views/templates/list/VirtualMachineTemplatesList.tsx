@@ -1,4 +1,4 @@
-import React, { FC, useMemo } from 'react';
+import React, { FCC, useMemo } from 'react';
 
 import { modelToRef, TemplateModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
@@ -27,7 +27,7 @@ import { getTemplateColumns, getTemplateRowId } from './virtualMachineTemplatesD
 
 import '@kubevirt-utils/styles/list-managment-group.scss';
 
-const VirtualMachineTemplatesList: FC<ListPageProps> = ({
+const VirtualMachineTemplatesList: FCC<ListPageProps> = ({
   fieldSelector,
   hideColumnManagement,
   hideNameLabelFilters,

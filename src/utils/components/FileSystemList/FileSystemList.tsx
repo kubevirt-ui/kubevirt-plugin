@@ -1,4 +1,4 @@
-import React, { FC, useMemo } from 'react';
+import React, { FCC, useMemo } from 'react';
 
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -15,7 +15,7 @@ type FileSystemListProps = {
   loadError?: Error;
 };
 
-const FileSystemList: FC<FileSystemListProps> = ({ data, loaded, loadError }) => {
+const FileSystemList: FCC<FileSystemListProps> = ({ data, loaded, loadError }) => {
   const { t } = useKubevirtTranslation();
 
   const columns = useMemo(() => getFileSystemColumns(t), [t]);

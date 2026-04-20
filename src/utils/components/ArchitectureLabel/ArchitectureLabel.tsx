@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -10,7 +10,7 @@ type ArchitectureLabelProps = {
   architecture?: string;
 } & Omit<LabelProps, 'color' | 'isCompact'>;
 
-const ArchitectureLabel: FC<ArchitectureLabelProps> = ({ architecture, ...rest }) => {
+const ArchitectureLabel: FCC<ArchitectureLabelProps> = ({ architecture, ...rest }) => {
   if (isEmpty(architecture)) return <>{NO_DATA_DASH}</>;
 
   return (

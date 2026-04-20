@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 import { Trans } from 'react-i18next';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -18,7 +18,7 @@ type BootableVolumesEmptyStateProps = {
   namespace: string;
 };
 
-const BootableVolumesEmptyState: FC<BootableVolumesEmptyStateProps> = ({ namespace }) => {
+const BootableVolumesEmptyState: FCC<BootableVolumesEmptyStateProps> = ({ namespace }) => {
   const { t } = useKubevirtTranslation();
 
   return (

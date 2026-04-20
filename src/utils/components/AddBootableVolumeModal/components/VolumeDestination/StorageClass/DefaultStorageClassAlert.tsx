@@ -1,9 +1,9 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Alert, AlertVariant } from '@patternfly/react-core';
 
-const DefaultStorageClassAlert: FC = () => {
+const DefaultStorageClassAlert: FCC = () => {
   const { t } = useKubevirtTranslation();
   return (
     <Alert

@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { getLabel, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getCluster } from '@multicluster/helpers/selectors';
@@ -16,7 +16,7 @@ type VMRightClickActionMenuProps = {
   triggerElement: HTMLElement | null;
 };
 
-const VMRightClickActionMenu: FC<VMRightClickActionMenuProps> = ({ hideMenu, triggerElement }) => {
+const VMRightClickActionMenu: FCC<VMRightClickActionMenuProps> = ({ hideMenu, triggerElement }) => {
   const { vmCluster, vmName, vmNamespace } = getVMComponentsFromID(triggerElement);
 
   const vmim = getVMIMFromMapper(vmimMapperSignal.value, vmName, vmNamespace, vmCluster);

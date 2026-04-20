@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import ActionsDropdown from '@kubevirt-utils/components/ActionsDropdown/ActionsDropdown';
@@ -8,7 +8,7 @@ import { EDIT_TEMPLATE_ID } from './constants';
 
 type VirtualMachineTemplatesActionsProps = { isKebabToggle?: boolean; template: V1Template };
 
-const VirtualMachineTemplatesActions: FC<VirtualMachineTemplatesActionsProps> = ({
+const VirtualMachineTemplatesActions: FCC<VirtualMachineTemplatesActionsProps> = ({
   isKebabToggle,
   template,
 }) => {

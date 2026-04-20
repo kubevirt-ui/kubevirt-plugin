@@ -1,5 +1,5 @@
-import React, { FC, FormEvent, useState } from 'react';
-import { useNavigate } from 'react-router-dom-v5-compat';
+import React, { FCC, FormEvent, useState } from 'react';
+import { useNavigate } from 'react-router';
 
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
@@ -34,7 +34,7 @@ type QuotaFormEditorProps = {
   onChange?: (data: ApplicationAwareResourceQuota) => void;
 };
 
-const QuotaFormEditor: FC<QuotaFormEditorProps> = ({ formData, isEdit = false, onChange }) => {
+const QuotaFormEditor: FCC<QuotaFormEditorProps> = ({ formData, isEdit = false, onChange }) => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
   const namespace = useNamespaceParam();

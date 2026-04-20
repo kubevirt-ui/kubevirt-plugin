@@ -1,4 +1,4 @@
-import React, { FC, memo, useMemo } from 'react';
+import React, { FCC, memo, useMemo } from 'react';
 
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import useHcoWorkloadArchitectures from '@kubevirt-utils/hooks/useHcoWorkloadArchitectures';
@@ -20,7 +20,7 @@ import { TemplateFilters } from '@virtualmachines/creation-wizard/steps/Template
 
 import './TemplatesCatalogFilters.scss';
 
-export const TemplatesCatalogFilters: FC<{
+export const TemplatesCatalogFilters: FCC<{
   filters: TemplateFilters;
   onFilterChange: (type: CATALOG_FILTERS, value: boolean | string) => void;
 }> = memo(({ filters, onFilterChange }) => {

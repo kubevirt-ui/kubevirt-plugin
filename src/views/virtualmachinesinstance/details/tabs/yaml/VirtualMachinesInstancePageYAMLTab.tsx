@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
@@ -9,7 +9,7 @@ type VirtualMachinesInstancePageYAMLTabProps = {
   obj: V1VirtualMachineInstance;
 };
 
-const VirtualMachinesInstancePageYAMLTab: FC<VirtualMachinesInstancePageYAMLTabProps> = ({
+const VirtualMachinesInstancePageYAMLTab: FCC<VirtualMachinesInstancePageYAMLTabProps> = ({
   obj,
 }) => {
   return (

@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { V1beta1VirtualMachineClusterInstancetype } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import ActionsDropdown from '@kubevirt-utils/components/ActionsDropdown/ActionsDropdown';
@@ -10,7 +10,7 @@ type ClusterInstancetypeActionsProps = {
   isKebabToggle?: boolean;
 };
 
-const ClusterInstancetypeActions: FC<ClusterInstancetypeActionsProps> = ({
+const ClusterInstancetypeActions: FCC<ClusterInstancetypeActionsProps> = ({
   instanceType,
   isKebabToggle,
 }) => {

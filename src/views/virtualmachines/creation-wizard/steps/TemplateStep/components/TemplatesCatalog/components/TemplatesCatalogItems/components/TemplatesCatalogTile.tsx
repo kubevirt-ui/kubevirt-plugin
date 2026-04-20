@@ -1,4 +1,4 @@
-import React, { FC, memo, useMemo } from 'react';
+import React, { FCC, memo, useMemo } from 'react';
 
 import DeprecatedBadge from '@kubevirt-utils/components/badges/DeprecatedBadge/DeprecatedBadge';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -31,7 +31,7 @@ export type TemplatesCatalogTileProps = {
   template: Template;
 };
 
-const TemplatesCatalogTile: FC<TemplatesCatalogTileProps> = memo(
+const TemplatesCatalogTile: FCC<TemplatesCatalogTileProps> = memo(
   ({ isSelected, onClick, template }) => {
     const { t } = useKubevirtTranslation();
 

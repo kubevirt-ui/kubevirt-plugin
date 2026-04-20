@@ -1,5 +1,5 @@
-import React, { FC, useState } from 'react';
-import { useNavigate } from 'react-router-dom-v5-compat';
+import React, { FCC, useState } from 'react';
+import { useNavigate } from 'react-router';
 import { load } from 'js-yaml';
 
 import ClusterProjectDropdown from '@kubevirt-utils/components/ClusterProjectDropdown/ClusterProjectDropdown';
@@ -17,7 +17,7 @@ import { ResourceYAMLEditor } from '@openshift-console/dynamic-plugin-sdk';
 import useModelFromParam from './hooks/useModelFromParam';
 import useYAMLTemplateExtension from './hooks/useYAMLTemplateExtension';
 
-const MulticlusterYAMLCreation: FC = () => {
+const MulticlusterYAMLCreation: FCC = () => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
   const isACMPage = useIsACMPage();

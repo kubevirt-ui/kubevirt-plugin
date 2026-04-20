@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import {
   AddBootableVolumeState,
@@ -19,7 +19,7 @@ type ArchitectureSelectProps = {
   setBootableVolumeField: SetBootableVolumeFieldType;
 };
 
-const ArchitectureSelect: FC<ArchitectureSelectProps> = ({
+const ArchitectureSelect: FCC<ArchitectureSelectProps> = ({
   bootableVolumeState,
   setBootableVolumeField,
 }) => {

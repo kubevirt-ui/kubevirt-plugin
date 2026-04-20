@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
@@ -14,7 +14,7 @@ type NoDataAvailableMessageProps = {
   isVCPU: boolean;
 };
 
-const NoDataAvailableMessage: FC<NoDataAvailableMessageProps> = ({ isVCPU = false }) => {
+const NoDataAvailableMessage: FCC<NoDataAvailableMessageProps> = ({ isVCPU = false }) => {
   const { t } = useKubevirtTranslation();
 
   const nonVCPUMessage = t('Metrics are collected by the OpenShift Monitoring Operator.');

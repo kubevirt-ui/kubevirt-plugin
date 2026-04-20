@@ -1,5 +1,5 @@
-import React, { FC, useMemo, useState } from 'react';
-import { useParams } from 'react-router-dom-v5-compat';
+import React, { FCC, useMemo, useState } from 'react';
+import { useParams } from 'react-router';
 
 import { CREATE_VM_TAB } from '@catalog/CreateVMHorizontalNav/constants';
 import useHideDeprecatedTemplateTiles from '@catalog/templatescatalog/hooks/useHideDeprecatedTemplateTiles';
@@ -24,7 +24,7 @@ import './TemplatesCatalog.scss';
 
 type TemplatesCatalogProps = { currentTab: CREATE_VM_TAB };
 
-const TemplatesCatalog: FC<TemplatesCatalogProps> = ({ currentTab }) => {
+const TemplatesCatalog: FCC<TemplatesCatalogProps> = ({ currentTab }) => {
   const { ns: namespace } = useParams<{ ns: string }>();
   const [selectedTemplate, setSelectedTemplate] = useState<undefined | V1Template>(undefined);
 

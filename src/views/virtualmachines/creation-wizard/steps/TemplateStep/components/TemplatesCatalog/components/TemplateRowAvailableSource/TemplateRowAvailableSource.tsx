@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Badge, Split, SplitItem } from '@patternfly/react-core';
@@ -10,7 +10,7 @@ type TemplateRowAvailableSourceProps = {
   source: string;
 };
 
-const TemplateRowAvailableSource: FC<TemplateRowAvailableSourceProps> = ({
+const TemplateRowAvailableSource: FCC<TemplateRowAvailableSourceProps> = ({
   isBootSourceAvailable,
   source,
 }) => {

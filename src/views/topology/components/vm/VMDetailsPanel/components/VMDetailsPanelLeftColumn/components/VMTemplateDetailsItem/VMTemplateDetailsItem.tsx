@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { TemplateModel, V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -24,7 +24,7 @@ export type VMDetailsItemTemplateProps = {
   vm: V1VirtualMachine;
 };
 
-const VMTemplateDetailsItem: FC<VMDetailsItemTemplateProps> = ({ vm }) => {
+const VMTemplateDetailsItem: FCC<VMDetailsItemTemplateProps> = ({ vm }) => {
   const { t } = useKubevirtTranslation();
 
   const templateName = getLabel(vm, LABEL_USED_TEMPLATE_NAME);

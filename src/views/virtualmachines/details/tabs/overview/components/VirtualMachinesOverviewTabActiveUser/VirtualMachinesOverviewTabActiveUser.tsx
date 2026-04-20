@@ -1,4 +1,4 @@
-import React, { FC, ReactNode } from 'react';
+import React, { FCC, ReactNode } from 'react';
 
 import {
   V1VirtualMachine,
@@ -20,7 +20,7 @@ type VirtualMachinesOverviewTabActiveUserProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const VirtualMachinesOverviewTabActiveUser: FC<VirtualMachinesOverviewTabActiveUserProps> = ({
+const VirtualMachinesOverviewTabActiveUser: FCC<VirtualMachinesOverviewTabActiveUserProps> = ({
   guestAgentData,
   guestAgentDataLoaded,
   guestAgentDataLoadError,

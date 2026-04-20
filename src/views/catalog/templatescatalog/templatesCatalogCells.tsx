@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -23,7 +23,7 @@ type NameCellProps = {
   template: V1Template;
 };
 
-export const NameCell: FC<NameCellProps> = ({ callbacks, template }) => {
+export const NameCell: FCC<NameCellProps> = ({ callbacks, template }) => {
   const { onTemplateClick } = callbacks;
   const displayName = getAnnotation(template, ANNOTATIONS.displayName);
 
@@ -47,7 +47,7 @@ type SourceCellProps = {
   template: V1Template;
 };
 
-export const SourceCell: FC<SourceCellProps> = ({ callbacks, template }) => {
+export const SourceCell: FCC<SourceCellProps> = ({ callbacks, template }) => {
   const { availableDatasources, availableTemplatesUID } = callbacks;
   const bootSource = getTemplateBootSourceType(template);
   const sourceRef = bootSource?.source?.sourceRef;
@@ -68,7 +68,7 @@ type CPUMemoryCellProps = {
   template: V1Template;
 };
 
-export const CPUMemoryCell: FC<CPUMemoryCellProps> = ({ template }) => {
+export const CPUMemoryCell: FCC<CPUMemoryCellProps> = ({ template }) => {
   const { t } = useKubevirtTranslation();
   const { cpuCount, memory } = getTemplateFlavorData(template);
 

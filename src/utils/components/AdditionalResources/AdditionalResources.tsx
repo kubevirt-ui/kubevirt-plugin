@@ -12,7 +12,7 @@ type AdditionalResourcesProps = {
   template: V1Template;
 };
 
-const AdditionalResources: React.FC<AdditionalResourcesProps> = ({ template }) => {
+const AdditionalResources: React.FCC<AdditionalResourcesProps> = ({ template }) => {
   const { t } = useKubevirtTranslation();
 
   const additionalResources: K8sResourceCommon[] = template?.objects?.filter(

@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
@@ -16,7 +16,7 @@ type UseAlternativeOptionCheckboxProps = {
   onChange: (isChecked: boolean) => void;
 };
 
-const UseAlternativeOptionCheckbox: FC<UseAlternativeOptionCheckboxProps> = ({
+const UseAlternativeOptionCheckbox: FCC<UseAlternativeOptionCheckboxProps> = ({
   className,
   id,
   isChecked,

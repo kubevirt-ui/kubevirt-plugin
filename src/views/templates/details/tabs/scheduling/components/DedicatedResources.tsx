@@ -8,7 +8,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 
 import DedicatedResourcesModal from './DedicatedResourcesModal';
 
-const DedicatedResources: React.FC<TemplateSchedulingGridProps> = ({
+const DedicatedResources: React.FCC<TemplateSchedulingGridProps> = ({
   editable,
   onSubmit,
   template,

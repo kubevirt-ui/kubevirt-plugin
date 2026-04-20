@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FCC, useState } from 'react';
 import produce from 'immer';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -14,7 +14,7 @@ type HardwareDevicesHeadlessModeProps = {
   onSubmit: (vm: V1VirtualMachine) => Promise<V1VirtualMachine | void>;
   vm: V1VirtualMachine;
 };
-const HardwareDevicesHeadlessMode: FC<HardwareDevicesHeadlessModeProps> = ({ onSubmit, vm }) => {
+const HardwareDevicesHeadlessMode: FCC<HardwareDevicesHeadlessModeProps> = ({ onSubmit, vm }) => {
   const { t } = useKubevirtTranslation();
 
   const [isChecked, setIsChecked] = useState<boolean>(isHeadlessMode(vm));

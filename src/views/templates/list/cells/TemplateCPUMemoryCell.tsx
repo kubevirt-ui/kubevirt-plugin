@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -13,7 +13,7 @@ type TemplateCPUMemoryCellProps = {
   row: TemplateOrRequest;
 };
 
-const TemplateCPUMemoryCell: FC<TemplateCPUMemoryCellProps> = ({ row }) => {
+const TemplateCPUMemoryCell: FCC<TemplateCPUMemoryCellProps> = ({ row }) => {
   const { t } = useKubevirtTranslation();
 
   if (isVirtualMachineTemplateRequest(row)) {

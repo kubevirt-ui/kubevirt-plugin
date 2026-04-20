@@ -1,4 +1,4 @@
-import React, { FC, useMemo, useState } from 'react';
+import React, { FCC, useMemo, useState } from 'react';
 
 import useDeepCompareMemoize from '@kubevirt-utils/hooks/useDeepCompareMemoize/useDeepCompareMemoize';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -38,7 +38,7 @@ type ListPageFilterProps = {
   searchFilters?: RowFilter[];
 };
 
-const ListPageFilter: FC<ListPageFilterProps> = ({
+const ListPageFilter: FCC<ListPageFilterProps> = ({
   className,
   columnLayout,
   data,

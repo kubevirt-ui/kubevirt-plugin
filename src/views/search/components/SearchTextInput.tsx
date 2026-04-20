@@ -1,4 +1,4 @@
-import React, { FC, RefObject, useMemo, useState } from 'react';
+import React, { FCC, RefObject, useMemo, useState } from 'react';
 import debounce from 'lodash/debounce';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -22,7 +22,7 @@ type SearchTextInputProps = {
   setSearchQuery: (query: string) => void;
 };
 
-const SearchTextInput: FC<SearchTextInputProps> = ({
+const SearchTextInput: FCC<SearchTextInputProps> = ({
   inputRef,
   onEnterKeyDown,
   onOpenAdvancedSearch,

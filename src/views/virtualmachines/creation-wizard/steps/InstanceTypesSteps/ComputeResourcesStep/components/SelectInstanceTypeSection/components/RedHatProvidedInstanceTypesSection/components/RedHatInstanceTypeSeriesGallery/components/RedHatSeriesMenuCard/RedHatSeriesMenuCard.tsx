@@ -1,4 +1,4 @@
-import React, { FC, useMemo } from 'react';
+import React, { FCC, useMemo } from 'react';
 import classNames from 'classnames';
 
 import { instanceTypeSeriesNameMapper } from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/utils/constants';
@@ -18,7 +18,7 @@ type RedHatSeriesMenuCardProps = {
   rhSeriesItem: RedHatInstanceTypeSeries;
 };
 
-const RedHatSeriesMenuCard: FC<RedHatSeriesMenuCardProps> = ({ rhSeriesItem }) => {
+const RedHatSeriesMenuCard: FCC<RedHatSeriesMenuCardProps> = ({ rhSeriesItem }) => {
   const { t } = useKubevirtTranslation();
 
   const { selectedSeries, setSelectedSeries } = useInstanceTypeVMStore();

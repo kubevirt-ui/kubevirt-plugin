@@ -1,4 +1,4 @@
-import React, { FC, useMemo, useState } from 'react';
+import React, { FCC, useMemo, useState } from 'react';
 import produce from 'immer';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -19,7 +19,7 @@ type HostnameModalProps = {
   vmi?: V1VirtualMachineInstance;
 };
 
-const HostnameModal: FC<HostnameModalProps> = ({ isOpen, onClose, onSubmit, vm, vmi }) => {
+const HostnameModal: FCC<HostnameModalProps> = ({ isOpen, onClose, onSubmit, vm, vmi }) => {
   const { t } = useKubevirtTranslation();
   const [newHostname, setNewHostname] = useState<string>(getHostname(vm));
 

@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup, TextInput } from '@patternfly/react-core';
@@ -6,7 +6,7 @@ import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
 import { useAdvancedSearchField } from '../store/useAdvancedSearchStore';
 
-const DescriptionField: FC = () => {
+const DescriptionField: FCC = () => {
   const { t } = useKubevirtTranslation();
   const { setValue, value } = useAdvancedSearchField(VirtualMachineRowFilterType.Description);
 

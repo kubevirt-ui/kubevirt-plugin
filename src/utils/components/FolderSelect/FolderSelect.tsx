@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
@@ -15,7 +15,7 @@ type FoldersSelectProps = {
   selectedFolder: string;
   setSelectedFolder: (newFolder: string) => void;
 };
-const FolderSelect: FC<FoldersSelectProps> = ({
+const FolderSelect: FCC<FoldersSelectProps> = ({
   cluster,
   isFullWidth = false,
   namespace,

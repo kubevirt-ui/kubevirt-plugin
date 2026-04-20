@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FCC, useState } from 'react';
 
 import DurationOption from '@kubevirt-utils/components/DurationOption/DurationOption';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -11,7 +11,7 @@ export type DurationDropdownProps = {
   selectHandler: (value: string) => void;
 };
 
-const DurationDropdown: FC<DurationDropdownProps> = ({ selectedDuration, selectHandler }) => {
+const DurationDropdown: FCC<DurationDropdownProps> = ({ selectedDuration, selectHandler }) => {
   const { t } = useKubevirtTranslation();
 
   const [isOpen, setIsOpen] = useState(false);

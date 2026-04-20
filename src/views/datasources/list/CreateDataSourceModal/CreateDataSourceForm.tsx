@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 import { FieldError, UseFormRegister, UseFormSetValue } from 'react-hook-form';
 
 import CapacityInput from '@kubevirt-utils/components/CapacityInput/CapacityInput';
@@ -30,7 +30,7 @@ type CreateDataSourceFormProps = {
   size: string;
 };
 
-export const CreateDataSourceForm: FC<CreateDataSourceFormProps> = ({
+export const CreateDataSourceForm: FCC<CreateDataSourceFormProps> = ({
   errors,
   importsToKeep,
   register,

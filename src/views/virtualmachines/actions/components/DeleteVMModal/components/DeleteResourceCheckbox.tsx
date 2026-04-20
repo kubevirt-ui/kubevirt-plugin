@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName } from '@kubevirt-utils/resources/shared';
@@ -14,7 +14,7 @@ type DeleteResourceCheckboxProps = {
   willDelete: boolean;
 };
 
-const DeleteResourceCheckbox: FC<DeleteResourceCheckboxProps> = ({
+const DeleteResourceCheckbox: FCC<DeleteResourceCheckboxProps> = ({
   isShareable,
   onToggle,
   resource,

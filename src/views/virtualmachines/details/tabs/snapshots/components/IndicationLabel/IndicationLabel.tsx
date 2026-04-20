@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { Label, Tooltip } from '@patternfly/react-core';
 
@@ -10,7 +10,7 @@ type IndicationLabelProps = {
   indicationObject: { indication: string; message: string };
 };
 
-const IndicationLabel: FC<IndicationLabelProps> = ({ indicationObject }) => (
+const IndicationLabel: FCC<IndicationLabelProps> = ({ indicationObject }) => (
   <Tooltip content={indicationObject.message}>
     <Label status={INDICATOR_STATUSES[indicationObject.indication] || 'info'}>
       {indicationObject.indication}

@@ -1,4 +1,4 @@
-import React, { ChangeEvent, FC } from 'react';
+import React, { ChangeEvent, FCC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useLocalStorage from '@kubevirt-utils/hooks/useLocalStorage';
@@ -22,7 +22,7 @@ type TreeViewToolbarProps = {
   onSearch: (event: ChangeEvent<HTMLInputElement>) => void;
 };
 
-const TreeViewToolbar: FC<TreeViewToolbarProps> = ({ onSearch }) => {
+const TreeViewToolbar: FCC<TreeViewToolbarProps> = ({ onSearch }) => {
   const { t } = useKubevirtTranslation();
   const isACMPage = useIsACMPage();
   const [showEmptyProjects, setShowEmptyProjects] = useLocalStorage(SHOW_EMPTY_PROJECTS_KEY, HIDE);

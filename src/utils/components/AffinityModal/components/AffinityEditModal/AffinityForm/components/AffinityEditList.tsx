@@ -17,7 +17,7 @@ type AffinityExpressionListProps = {
   rowID: string;
 };
 
-const AffinityEditList: React.FC<AffinityExpressionListProps> = ({
+const AffinityEditList: React.FCC<AffinityExpressionListProps> = ({
   addRowText,
   expressions,
   onAdd,

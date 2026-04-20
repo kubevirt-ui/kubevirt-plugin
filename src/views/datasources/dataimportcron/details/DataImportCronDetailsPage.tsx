@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { V1beta1DataImportCron } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import {
@@ -14,7 +14,7 @@ type DataImportCronDetailsPageProps = {
   obj?: V1beta1DataImportCron;
 };
 
-const DataImportCronDetailsPage: FC<DataImportCronDetailsPageProps> = ({ obj: dataImportCron }) => {
+const DataImportCronDetailsPage: FCC<DataImportCronDetailsPageProps> = ({ obj: dataImportCron }) => {
   const { t } = useKubevirtTranslation();
 
   return (

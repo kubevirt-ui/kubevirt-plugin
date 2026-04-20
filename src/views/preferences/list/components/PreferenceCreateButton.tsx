@@ -1,5 +1,5 @@
-import React, { FC } from 'react';
-import { useLocation } from 'react-router-dom-v5-compat';
+import React, { FCC } from 'react';
+import { useLocation } from 'react-router';
 
 import {
   VirtualMachineClusterPreferenceModelGroupVersionKind,
@@ -13,7 +13,7 @@ type PreferenceCreateButtonProps = {
   namespace: string;
 };
 
-const PreferenceCreateButton: FC<PreferenceCreateButtonProps> = ({ buttonText, namespace }) => {
+const PreferenceCreateButton: FCC<PreferenceCreateButtonProps> = ({ buttonText, namespace }) => {
   const { t } = useKubevirtTranslation();
   const location = useLocation();
   const activeTabKey = location?.pathname.includes(

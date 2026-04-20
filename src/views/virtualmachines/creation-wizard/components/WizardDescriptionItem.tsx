@@ -1,4 +1,4 @@
-import React, { FC, ReactNode } from 'react';
+import React, { FCC, ReactNode } from 'react';
 import classNames from 'classnames';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -49,7 +49,7 @@ type WizardDescriptionItemProps = {
   title: string;
 };
 
-export const WizardDescriptionItem: FC<WizardDescriptionItemProps> = React.memo(
+export const WizardDescriptionItem: FCC<WizardDescriptionItemProps> = React.memo(
   ({
     className,
     count,

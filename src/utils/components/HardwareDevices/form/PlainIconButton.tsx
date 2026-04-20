@@ -1,4 +1,4 @@
-import React, { FC, ReactNode } from 'react';
+import React, { FCC, ReactNode } from 'react';
 
 import { Button, ButtonVariant, FormGroup, GridItem } from '@patternfly/react-core';
 
@@ -9,7 +9,7 @@ type PlainIconButtonProps = {
   withKeyValueTitle?: boolean;
 };
 
-const PlainIconButton: FC<PlainIconButtonProps> = ({
+const PlainIconButton: FCC<PlainIconButtonProps> = ({
   fieldId,
   icon,
   onClick,

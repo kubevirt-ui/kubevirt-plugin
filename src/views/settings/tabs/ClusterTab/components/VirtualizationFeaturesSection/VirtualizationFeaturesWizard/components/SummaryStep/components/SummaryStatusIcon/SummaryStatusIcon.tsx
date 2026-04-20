@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Split, SplitItem } from '@patternfly/react-core';
@@ -17,7 +17,7 @@ type SummaryStatusIconProps = {
   operatorHubURL?: string;
 };
 
-const SummaryStatusIcon: FC<SummaryStatusIconProps> = ({ installState, operatorHubURL }) => {
+const SummaryStatusIcon: FCC<SummaryStatusIconProps> = ({ installState, operatorHubURL }) => {
   const { t } = useKubevirtTranslation();
 
   const Icon = getInstallStateIcon(installState);

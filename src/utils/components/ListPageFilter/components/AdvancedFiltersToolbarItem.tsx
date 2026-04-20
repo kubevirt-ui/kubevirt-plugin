@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 import { ToolbarFilter, ToolbarItem } from '@patternfly/react-core';
@@ -14,7 +14,7 @@ type AdvancedFiltersToolbarItemProps = {
   applyFilters: ApplyTextFilters;
 };
 
-const AdvancedFiltersToolbarItem: FC<AdvancedFiltersToolbarItemProps> = ({
+const AdvancedFiltersToolbarItem: FCC<AdvancedFiltersToolbarItemProps> = ({
   advancedFilters,
   applyFilters,
 }) => {

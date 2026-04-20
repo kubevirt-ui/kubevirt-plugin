@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup, TextInput } from '@patternfly/react-core';
@@ -6,7 +6,7 @@ import { FormGroup, TextInput } from '@patternfly/react-core';
 import { ephemeralDiskSizeFieldID } from '../DiskSourceSelect/utils/constants';
 import { DYNAMIC } from '../utils/constants';
 
-const DynamicSize: FC = () => {
+const DynamicSize: FCC = () => {
   const { t } = useKubevirtTranslation();
   return (
     <FormGroup fieldId={ephemeralDiskSizeFieldID} label="Size">

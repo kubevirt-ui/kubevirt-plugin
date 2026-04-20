@@ -8,7 +8,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 
 import TolerationsModal from './TolerationsModal';
 
-const Tolerations: React.FC<TemplateSchedulingGridProps> = ({ editable, onSubmit, template }) => {
+const Tolerations: React.FCC<TemplateSchedulingGridProps> = ({ editable, onSubmit, template }) => {
   const { createModal } = useModal();
   const { t } = useKubevirtTranslation();
   const tolerationsCount = t('{{tolerations}} Toleration rules', {

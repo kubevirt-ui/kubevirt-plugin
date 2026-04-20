@@ -1,4 +1,4 @@
-import React, { FC, Suspense } from 'react';
+import React, { FCC, Suspense } from 'react';
 
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { ClusterUserDefinedNetworkKind } from '@kubevirt-utils/resources/udn/types';
@@ -8,7 +8,7 @@ type NetworkYAMLPageProps = {
   obj: ClusterUserDefinedNetworkKind;
 };
 
-const NetworkYAMLPage: FC<NetworkYAMLPageProps> = ({ obj }) => {
+const NetworkYAMLPage: FCC<NetworkYAMLPageProps> = ({ obj }) => {
   return !obj ? (
     <Loading />
   ) : (

@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -23,7 +23,7 @@ interface GracePeriodInputProps {
   setGracePeriodSeconds: (newGracePeriod: null | number) => void;
 }
 
-export const GracePeriodInput: FC<GracePeriodInputProps> = ({
+export const GracePeriodInput: FCC<GracePeriodInputProps> = ({
   gracePeriodSeconds,
   isChecked,
   onCheckboxChange,

@@ -1,4 +1,4 @@
-import React, { Dispatch, FC, SetStateAction } from 'react';
+import React, { Dispatch, FCC, SetStateAction } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Button, Content, ContentVariants, Slider, StackItem } from '@patternfly/react-core';
@@ -18,7 +18,7 @@ type MemoryDensitySliderProps = {
   onSliderChange: (value: number) => void;
 };
 
-const MemoryDensitySlider: FC<MemoryDensitySliderProps> = ({
+const MemoryDensitySlider: FCC<MemoryDensitySliderProps> = ({
   hasChanged,
   inputValue,
   isLoading,

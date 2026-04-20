@@ -1,5 +1,5 @@
-import React, { FC, useMemo } from 'react';
-import { useParams } from 'react-router-dom-v5-compat';
+import React, { FCC, useMemo } from 'react';
+import { useParams } from 'react-router';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { tourGuideVM } from '@kubevirt-utils/components/GuidedTour/utils/constants';
@@ -21,7 +21,7 @@ import VirtualMachineNavPageTitle from './VirtualMachineNavPageTitle';
 
 import './virtual-machine-page.scss';
 
-const VirtualMachineNavPage: FC = () => {
+const VirtualMachineNavPage: FCC = () => {
   useSignals();
   const {
     cluster,

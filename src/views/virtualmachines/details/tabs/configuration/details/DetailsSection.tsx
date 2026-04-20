@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useMemo, useState } from 'react';
+import React, { FCC, useEffect, useMemo, useState } from 'react';
 
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -65,7 +65,7 @@ type DetailsSectionProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const DetailsSection: FC<DetailsSectionProps> = ({ allInstanceTypes, instanceTypeVM, vm, vmi }) => {
+const DetailsSection: FCC<DetailsSectionProps> = ({ allInstanceTypes, instanceTypeVM, vm, vmi }) => {
   const { createModal } = useModal();
   const { t } = useKubevirtTranslation();
   const accessReview = asAccessReview(VirtualMachineModel, vm, 'update' as K8sVerb);

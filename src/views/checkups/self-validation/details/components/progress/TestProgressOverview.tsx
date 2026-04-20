@@ -1,4 +1,4 @@
-import React, { FC, useMemo } from 'react';
+import React, { FCC, useMemo } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Alert, AlertVariant, Card, CardBody, Spinner, Title } from '@patternfly/react-core';
@@ -22,7 +22,7 @@ type TestProgressOverviewProps = {
   progress: null | OverallProgress;
 };
 
-const TestProgressOverview: FC<TestProgressOverviewProps> = ({ error, loading, progress }) => {
+const TestProgressOverview: FCC<TestProgressOverviewProps> = ({ error, loading, progress }) => {
   const { t } = useKubevirtTranslation();
 
   const sortedSuites = useMemo(() => {

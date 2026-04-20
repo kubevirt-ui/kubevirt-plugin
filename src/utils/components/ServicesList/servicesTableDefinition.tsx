@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react';
-import { TFunction } from 'react-i18next';
+import { TFunction } from 'i18next';
 import classNames from 'classnames';
 
 import { IoK8sApiCoreV1Service } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';

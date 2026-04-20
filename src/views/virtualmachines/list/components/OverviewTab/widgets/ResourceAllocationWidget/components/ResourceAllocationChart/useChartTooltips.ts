@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from 'react';
-import { TFunction } from 'react-i18next';
+import { TFunction } from 'i18next';
 
 import {
   CHART_NAME_QUOTA,

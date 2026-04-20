@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import useHyperConvergeConfiguration from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
@@ -14,7 +14,7 @@ import PersistentReservationSection from './components/PersistentReservationSect
 import ResourceManagementSection from './components/ResourceManagementSection/ResourceManagementSection';
 import VirtualizationFeaturesList from './components/VirtualizationFeaturesSection/VirtualizationFeaturesList/VirtualizationFeaturesList';
 
-const ClusterTab: FC = () => {
+const ClusterTab: FCC = () => {
   const cluster = useSettingsCluster();
   const hyperConvergeConfiguration = useHyperConvergeConfiguration(cluster);
   const error = hyperConvergeConfiguration?.[2];

@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Split, SplitItem } from '@patternfly/react-core';
@@ -18,7 +18,7 @@ type ConfigurationToggleContentProps = {
   switchState: boolean;
 };
 
-const ConfigurationToggleContent: FC<ConfigurationToggleContentProps> = ({
+const ConfigurationToggleContent: FCC<ConfigurationToggleContentProps> = ({
   disabledTooltipContent = '',
   isInstalled,
   onSwitchChange,

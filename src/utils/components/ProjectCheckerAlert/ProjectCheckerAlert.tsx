@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
@@ -23,7 +23,7 @@ type ProjectCheckerAlertProps = {
   qualifiedProjects: K8sResourceKind[];
 };
 
-const ProjectCheckerAlert: FC<ProjectCheckerAlertProps> = ({
+const ProjectCheckerAlert: FCC<ProjectCheckerAlertProps> = ({
   projectsLoaded,
   qualifiedProjects = [],
 }) => {

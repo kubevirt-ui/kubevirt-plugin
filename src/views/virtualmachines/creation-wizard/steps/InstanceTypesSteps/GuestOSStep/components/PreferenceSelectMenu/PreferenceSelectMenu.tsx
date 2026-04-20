@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -9,7 +9,7 @@ import usePreferenceSelectOptions from '@virtualmachines/creation-wizard/steps/I
 
 import './PreferenceSelectMenu.scss';
 
-const PreferenceSelectMenu: FC = () => {
+const PreferenceSelectMenu: FCC = () => {
   const { t } = useKubevirtTranslation();
   const { cluster, project } = useVMWizardStore();
   const { operatingSystemType, preference, setPreference } = useInstanceTypeVMStore();

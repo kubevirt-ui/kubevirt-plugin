@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import NumberTextInput from '@kubevirt-utils/components/NumberTextInput/NumberTextInput';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -8,7 +8,7 @@ import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 import NumberOperatorSelect from '../../../../../utils/components/NumberOperatorSelect/NumberOperatorSelect';
 import { useAdvancedSearchField } from '../store/useAdvancedSearchStore';
 
-const CPUField: FC = () => {
+const CPUField: FCC = () => {
   const { t } = useKubevirtTranslation();
   const { setValue: setVCPU, value: vCPU } = useAdvancedSearchField(
     VirtualMachineRowFilterType.CPU,

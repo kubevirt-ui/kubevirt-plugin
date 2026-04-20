@@ -1,4 +1,4 @@
-import React, { Dispatch, FC, SetStateAction, useEffect, useState } from 'react';
+import React, { Dispatch, FCC, SetStateAction, useEffect, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { DatePicker, DatePickerProps, Split, SplitItem } from '@patternfly/react-core';
@@ -13,7 +13,7 @@ type DateFromToPickerProps = {
   setDateToString: Dispatch<SetStateAction<string>>;
 };
 
-const DateFromToPicker: FC<DateFromToPickerProps> = ({
+const DateFromToPicker: FCC<DateFromToPickerProps> = ({
   'data-test': dataTest,
   dateFromString,
   dateToString,

@@ -1,5 +1,5 @@
-import React, { FC, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom-v5-compat';
+import React, { FCC, useCallback } from 'react';
+import { useNavigate } from 'react-router';
 
 import { EditorType } from '@kubevirt-utils/components/SyncedEditor/utils/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -15,7 +15,7 @@ type QuotasCreateButtonProps = {
   namespace?: string;
 };
 
-const QuotasCreateButton: FC<QuotasCreateButtonProps> = ({ namespace }) => {
+const QuotasCreateButton: FCC<QuotasCreateButtonProps> = ({ namespace }) => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
 

@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 import classNames from 'classnames';
 
 import { Split, SplitItem } from '@patternfly/react-core';
@@ -14,7 +14,7 @@ type FeatureSummaryItemProps = {
   operatorName: VirtualizationFeatureOperators;
 };
 
-const FeatureSummaryItem: FC<FeatureSummaryItemProps> = ({
+const FeatureSummaryItem: FCC<FeatureSummaryItemProps> = ({
   isIndented,
   operatorLabel,
   operatorName,

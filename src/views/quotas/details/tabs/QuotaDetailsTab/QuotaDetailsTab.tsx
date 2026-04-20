@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 import StandardResourceQuotaAlert from 'src/views/quotas/components/StandardResourceQuotaAlert';
 
 import { ApplicationAwareResourceQuota } from '@kubevirt-utils/resources/quotas/types';
@@ -16,7 +16,7 @@ type QuotaDetailsTabProps = {
   obj?: ApplicationAwareResourceQuota;
 };
 
-const QuotaDetailsTab: FC<QuotaDetailsTabProps> = ({ obj: quota }) => {
+const QuotaDetailsTab: FCC<QuotaDetailsTabProps> = ({ obj: quota }) => {
   if (!quota) {
     return (
       <PageSection>

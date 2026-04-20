@@ -1,4 +1,4 @@
-import React, { Dispatch, FC, SetStateAction } from 'react';
+import React, { Dispatch, FCC, SetStateAction } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Button, ButtonVariant, Tooltip } from '@patternfly/react-core';
@@ -9,7 +9,7 @@ type TreeViewCollapseExpandProps = {
   showAll: boolean;
 };
 
-const TreeViewCollapseExpand: FC<TreeViewCollapseExpandProps> = ({ setShowAll, showAll }) => {
+const TreeViewCollapseExpand: FCC<TreeViewCollapseExpandProps> = ({ setShowAll, showAll }) => {
   const { t } = useKubevirtTranslation();
 
   const Icon = showAll ? AngleDoubleUpIcon : AngleDoubleDownIcon;

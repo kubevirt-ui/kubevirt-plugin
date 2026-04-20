@@ -1,9 +1,9 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 import { Trans } from 'react-i18next';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
-const PowerfulShortcutsContent: FC = () => {
+const PowerfulShortcutsContent: FCC = () => {
   const { t } = useKubevirtTranslation();
 
   return (

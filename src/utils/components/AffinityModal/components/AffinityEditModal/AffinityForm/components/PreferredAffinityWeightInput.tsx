@@ -1,4 +1,4 @@
-import React, { Dispatch, FC, SetStateAction, useEffect, useState } from 'react';
+import React, { Dispatch, FCC, SetStateAction, useEffect, useState } from 'react';
 
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -12,7 +12,7 @@ type PreferredAffinityWeightInputProps = {
   setSubmitDisabled: Dispatch<SetStateAction<boolean>>;
 };
 
-const PreferredAffinityWeightInput: FC<PreferredAffinityWeightInputProps> = ({
+const PreferredAffinityWeightInput: FCC<PreferredAffinityWeightInputProps> = ({
   focusedAffinity,
   setFocusedAffinity,
   setSubmitDisabled,

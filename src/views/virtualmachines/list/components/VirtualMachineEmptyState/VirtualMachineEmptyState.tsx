@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 import { Trans } from 'react-i18next';
 
 import { ProjectRequestModel, VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -23,7 +23,7 @@ type VirtualMachineEmptyStateProps = {
   namespace: string;
 };
 
-const VirtualMachineEmptyState: FC<VirtualMachineEmptyStateProps> = ({ namespace }) => {
+const VirtualMachineEmptyState: FCC<VirtualMachineEmptyStateProps> = ({ namespace }) => {
   const { t } = useKubevirtTranslation();
   const selectedNamespace = namespace || DEFAULT_NAMESPACE;
 

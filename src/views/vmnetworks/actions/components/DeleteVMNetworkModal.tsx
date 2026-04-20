@@ -1,6 +1,6 @@
-import React, { FC, useState } from 'react';
+import React, { FCC, useState } from 'react';
 import { Trans } from 'react-i18next';
-import { useNavigate } from 'react-router-dom-v5-compat';
+import { useNavigate } from 'react-router';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ClusterUserDefinedNetworkModel } from '@kubevirt-utils/models';
@@ -29,7 +29,7 @@ export type DeleteVMNetworkModalProps = {
   obj: ClusterUserDefinedNetworkKind;
 };
 
-const DeleteVMNetworkModal: FC<DeleteVMNetworkModalProps> = ({ closeModal, obj }) => {
+const DeleteVMNetworkModal: FCC<DeleteVMNetworkModalProps> = ({ closeModal, obj }) => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);

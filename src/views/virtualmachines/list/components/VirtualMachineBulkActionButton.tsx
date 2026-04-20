@@ -1,4 +1,4 @@
-import React, { FC, useMemo } from 'react';
+import React, { FCC, useMemo } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import LazyActionMenu from '@kubevirt-utils/components/LazyActionMenu/LazyActionMenu';
@@ -22,7 +22,7 @@ type VirtualMachineBulkActionButtonProps = {
 
 const VirtualMachineModelRefArray = `${VirtualMachineModelRef}[]`;
 
-const VirtualMachineBulkActionButton: FC<VirtualMachineBulkActionButtonProps> = ({
+const VirtualMachineBulkActionButton: FCC<VirtualMachineBulkActionButtonProps> = ({
   vmimMapper,
   vms,
 }) => {

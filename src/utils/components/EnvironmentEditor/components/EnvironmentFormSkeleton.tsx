@@ -1,10 +1,10 @@
-import React, { FC, memo } from 'react';
+import React, { FCC, memo } from 'react';
 
 import { Skeleton, Stack, StackItem } from '@patternfly/react-core';
 
 import EnvironmentFormTitle from './EnvironmentFormTitle';
 
-const EnvironmentFormSkeleton: FC = memo(() => (
+const EnvironmentFormSkeleton: FCC = memo(() => (
   <Stack hasGutter>
     <EnvironmentFormTitle />
     <StackItem />

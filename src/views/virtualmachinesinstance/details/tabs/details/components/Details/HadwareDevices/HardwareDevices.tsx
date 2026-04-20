@@ -16,7 +16,7 @@ type HardwareDevicesProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const HardwareDevices: React.FC<HardwareDevicesProps> = ({ vmi }) => {
+const HardwareDevices: React.FCC<HardwareDevicesProps> = ({ vmi }) => {
   const { t } = useKubevirtTranslation();
 
   const devices = getVMIDevices(vmi);

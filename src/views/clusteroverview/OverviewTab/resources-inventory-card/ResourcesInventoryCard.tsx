@@ -14,7 +14,7 @@ import ResourceInventoryItem from './ResourceInventoryItem';
 
 import './ResourcesInventoryCard.scss';
 
-const ResourcesInventoryCard: React.FC = () => {
+const ResourcesInventoryCard: React.FCC = () => {
   const { t } = useKubevirtTranslation();
   const isAdmin = useIsAdmin();
   const { nads, nodes, vms, vmTemplates } = useResourcesQuantities();

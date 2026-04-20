@@ -15,7 +15,7 @@ import MetricChart from './MetricChart';
 
 import './ChartCard.scss';
 
-const ChartCard: React.FC<ChartCardProps> = ({ metric }) => {
+const ChartCard: React.FCC<ChartCardProps> = ({ metric }) => {
   const { t } = useKubevirtTranslation();
   const metricChartData = useMetricChartData(metric);
   const { chartData, error, isReady, loaded, numberOfTicks, unit } = metricChartData;

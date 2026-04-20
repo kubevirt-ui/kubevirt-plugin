@@ -1,4 +1,4 @@
-import React, { FC, memo, useState } from 'react';
+import React, { FCC, memo, useState } from 'react';
 import { ANNOTATIONS } from 'src/views/templates/utils/constants';
 
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
@@ -13,7 +13,7 @@ type DisplayNameModalProps = {
   onSubmit: (displayName: string) => Promise<K8sResourceCommon | void>;
 };
 
-const DisplayNameModal: FC<DisplayNameModalProps> = memo(({ isOpen, obj, onClose, onSubmit }) => {
+const DisplayNameModal: FCC<DisplayNameModalProps> = memo(({ isOpen, obj, onClose, onSubmit }) => {
   const { t } = useKubevirtTranslation();
   const [displayName, setDisplayName] = useState(
     obj?.metadata?.annotations?.[ANNOTATIONS.displayName],

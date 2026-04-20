@@ -31,7 +31,7 @@ type AffinityModalProps = {
   vm: V1VirtualMachine;
 };
 
-const AffinityModal: React.FC<AffinityModalProps> = ({
+const AffinityModal: React.FCC<AffinityModalProps> = ({
   isOpen,
   nodes,
   nodesLoaded,

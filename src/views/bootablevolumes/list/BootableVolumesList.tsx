@@ -1,5 +1,5 @@
-import React, { FC, useMemo } from 'react';
-import { useParams } from 'react-router-dom-v5-compat';
+import React, { FCC, useMemo } from 'react';
+import { useParams } from 'react-router';
 
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
 import { buildColumnLayout } from '@kubevirt-utils/components/KubevirtTable/utils';
@@ -40,7 +40,7 @@ import {
 
 import '@kubevirt-utils/styles/list-managment-group.scss';
 
-const BootableVolumesList: FC = () => {
+const BootableVolumesList: FCC = () => {
   const { ns: namespace } = useParams<{ cluster: string; ns: string }>();
   const { t } = useKubevirtTranslation();
   const [activeNamespace] = useActiveNamespace();

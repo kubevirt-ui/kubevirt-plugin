@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Split, SplitItem, Title } from '@patternfly/react-core';
@@ -8,7 +8,7 @@ type ComputeCompatibilityProps = {
   vmArchs: string[];
 };
 
-const ComputeCompatibility: FC<ComputeCompatibilityProps> = ({ nodesArchs, vmArchs }) => {
+const ComputeCompatibility: FCC<ComputeCompatibilityProps> = ({ nodesArchs, vmArchs }) => {
   const { t } = useKubevirtTranslation();
 
   return (

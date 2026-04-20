@@ -1,5 +1,5 @@
 import React, {
-  FC,
+  FCC,
   FormEventHandler,
   JSXElementConstructor,
   ReactElement,
@@ -60,7 +60,7 @@ export type SelectSourceProps = {
   sourcePopOver?: ReactElement<any, JSXElementConstructor<any> | string>;
 };
 
-export const SelectSource: FC<SelectSourceProps> = ({
+export const SelectSource: FCC<SelectSourceProps> = ({
   'data-test-id': testId,
   diskSource = false,
   httpSourceHelperURL,

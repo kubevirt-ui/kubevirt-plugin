@@ -20,7 +20,7 @@ type MigrationPolicyTooltipProps = {
   obj: MigrationTableDataLayout;
 };
 
-const MigrationPolicyTooltip: React.FC<MigrationPolicyTooltipProps> = ({ obj }) => {
+const MigrationPolicyTooltip: React.FCC<MigrationPolicyTooltipProps> = ({ obj }) => {
   const { t } = useKubevirtTranslation();
 
   const { defaultConfig, mpConfig } = useMemo<TooltipObject>(() => {

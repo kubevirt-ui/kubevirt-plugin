@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import MultiSelectTypeahead from '@kubevirt-utils/components/MultiSelectTypeahead/MultiSelectTypeahead';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -9,7 +9,7 @@ import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
 import { useAdvancedSearchField } from '../store/useAdvancedSearchStore';
 
-const NodesField: FC = () => {
+const NodesField: FCC = () => {
   const { t } = useKubevirtTranslation();
   const { setValue, value } = useAdvancedSearchField(VirtualMachineRowFilterType.Node);
 

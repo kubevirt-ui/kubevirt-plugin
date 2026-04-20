@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { SyncedEditor } from '@kubevirt-utils/components/SyncedEditor/SyncedEditor';
 
@@ -8,7 +8,7 @@ import QuotaFormTitle from './components/QuotaFormTitle';
 import QuotaFormEditor from './QuotaFormEditor';
 import QuotaYAMLEditor from './QuotaYAMLEditor';
 
-const QuotaCreateForm: FC = () => {
+const QuotaCreateForm: FCC = () => {
   return (
     <>
       <QuotaFormTitle />

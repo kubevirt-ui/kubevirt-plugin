@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import ActionDropdownItem from '@kubevirt-utils/components/ActionDropdownItem/ActionDropdownItem';
 import { ActionDropdownItemType } from '@kubevirt-utils/components/ActionsDropdown/constants';
@@ -13,7 +13,7 @@ type GroupedRightClickActionMenuProps = RightClickActionMenuProps & {
   createVMAction?: ActionDropdownItemType;
 };
 
-const GroupedRightClickActionMenu: FC<GroupedRightClickActionMenuProps> = ({
+const GroupedRightClickActionMenu: FCC<GroupedRightClickActionMenuProps> = ({
   actions,
   createVMAction,
   hideMenu,

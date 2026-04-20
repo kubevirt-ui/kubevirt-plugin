@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useEffect, useState } from 'react';
+import React, { FCC, useCallback, useEffect, useState } from 'react';
 
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
@@ -16,7 +16,7 @@ type AutomaticSubscriptionCustomUrlProps = {
   isDisabled?: boolean;
 };
 
-const AutomaticSubscriptionCustomUrl: FC<AutomaticSubscriptionCustomUrlProps> = ({
+const AutomaticSubscriptionCustomUrl: FCC<AutomaticSubscriptionCustomUrlProps> = ({
   customUrl,
   isDisabled,
 }) => {

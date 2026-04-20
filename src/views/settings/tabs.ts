@@ -1,5 +1,5 @@
-import { FC } from 'react';
-import { TFunction } from 'react-i18next';
+import { FCC } from 'react';
+import { TFunction } from 'i18next';
 
 import ClusterTab from './tabs/ClusterTab/ClusterTab';
 import PreviewFeaturesTab from './tabs/PreviewFeaturesTab/PreviewFeaturesTab';
@@ -16,7 +16,7 @@ export type SettingsTab = (typeof SETTINGS_TABS)[keyof typeof SETTINGS_TABS];
 export const SETTINGS_TABS_ARRAY: SettingsTab[] = Object.values(SETTINGS_TABS);
 
 export type SettingsTabConfig = {
-  Component: FC;
+  Component: FCC;
   dataTest: string;
   isEnabled: boolean;
   name: SettingsTab;

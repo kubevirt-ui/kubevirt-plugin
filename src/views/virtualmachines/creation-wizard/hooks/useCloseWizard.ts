@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from 'react-router-dom-v5-compat';
+import { useNavigate, useParams } from 'react-router';
 
 import { clearCustomizeInstanceType } from '@kubevirt-utils/store/customizeInstanceType';
 import useClusterParam from '@multicluster/hooks/useClusterParam';

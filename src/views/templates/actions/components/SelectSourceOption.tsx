@@ -1,6 +1,6 @@
-import React, { FC, ReactNode, useCallback } from 'react';
-import { TFunction } from 'react-i18next';
-import { useParams } from 'react-router-dom-v5-compat';
+import React, { FCC, ReactNode, useCallback } from 'react';
+import { TFunction } from 'i18next';
+import { useParams } from 'react-router';
 
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
@@ -76,7 +76,7 @@ type SelectSourceOptionProps = {
   selectedSource: SOURCE_OPTIONS_IDS;
 };
 
-const SelectSourceOption: FC<SelectSourceOptionProps> = ({
+const SelectSourceOption: FCC<SelectSourceOptionProps> = ({
   label,
   onSelectSource,
   options,

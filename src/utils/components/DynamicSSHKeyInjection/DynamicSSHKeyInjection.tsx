@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from 'react';
+import React, { FCC, useEffect, useState } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getIsDynamicSSHInjectionEnabled } from '@kubevirt-utils/resources/vm';
@@ -12,7 +12,7 @@ type DynamicSSHKeyInjectionProps = {
   onSubmit: (checked: boolean) => void;
   vm?: V1VirtualMachine;
 };
-export const DynamicSSHKeyInjection: FC<DynamicSSHKeyInjectionProps> = ({
+export const DynamicSSHKeyInjection: FCC<DynamicSSHKeyInjectionProps> = ({
   hasDynamicSSHLabel,
   isDisabled,
   onSubmit,

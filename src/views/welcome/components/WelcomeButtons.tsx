@@ -1,5 +1,5 @@
-import React, { FC } from 'react';
-import { useNavigate } from 'react-router-dom-v5-compat';
+import React, { FCC } from 'react';
+import { useNavigate } from 'react-router';
 
 import CreateProjectModal from '@kubevirt-utils/components/CreateProjectModal/CreateProjectModal';
 import useTour from '@kubevirt-utils/components/GuidedTour/hooks/useTour';
@@ -15,7 +15,7 @@ type WelcomeButtonsProps = {
   onClose: () => Promise<void> | void;
 };
 
-const WelcomeButtons: FC<WelcomeButtonsProps> = ({ onClose }) => {
+const WelcomeButtons: FCC<WelcomeButtonsProps> = ({ onClose }) => {
   const { t } = useKubevirtTranslation();
   const [, setActiveNamespace] = useActiveNamespace();
   const navigate = useNavigate();

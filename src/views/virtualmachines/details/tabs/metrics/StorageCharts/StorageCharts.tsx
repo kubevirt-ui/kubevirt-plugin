@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import StorageIOPSTotalThresholdChart from '@kubevirt-utils/components/Charts/StorageUtil/StorageIOPSTotalThresholdChart';
@@ -26,7 +26,7 @@ const STORAGE_CHART_COMPONENTS = [
   { Chart: StorageWriteLatencyPerDriveChart, titleKey: 'Storage Write Latency per Drive' },
 ];
 
-const StorageCharts: FC<StorageChartsProps> = ({ prometheusUnavailable, vmi }) => {
+const StorageCharts: FCC<StorageChartsProps> = ({ prometheusUnavailable, vmi }) => {
   const { t } = useKubevirtTranslation();
 
   return (

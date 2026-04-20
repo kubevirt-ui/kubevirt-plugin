@@ -1,4 +1,4 @@
-import React, { FC, memo, useMemo } from 'react';
+import React, { FCC, memo, useMemo } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { ActionDropdownItemType } from '@kubevirt-utils/components/ActionsDropdown/constants';
@@ -18,7 +18,7 @@ type VirtualMachinesInstanceActionsProps = {
   vm: V1VirtualMachine;
 };
 
-const VirtualMachineActions: FC<VirtualMachinesInstanceActionsProps> = ({
+const VirtualMachineActions: FCC<VirtualMachinesInstanceActionsProps> = ({
   actions,
   isKebabToggle,
   vm,

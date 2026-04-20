@@ -1,4 +1,4 @@
-import React, { FC, ReactNode } from 'react';
+import React, { FCC, ReactNode } from 'react';
 
 import {
   V1VirtualMachine,
@@ -23,7 +23,7 @@ type VirtualMachinesOverviewTabFilesystemProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const VirtualMachinesOverviewTabFilesystem: FC<VirtualMachinesOverviewTabFilesystemProps> = ({
+const VirtualMachinesOverviewTabFilesystem: FCC<VirtualMachinesOverviewTabFilesystemProps> = ({
   guestAgentData,
   guestAgentDataLoaded,
   guestAgentDataLoadError,

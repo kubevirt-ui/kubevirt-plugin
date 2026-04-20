@@ -2,7 +2,7 @@ import React from 'react';
 
 import { Skeleton } from '@patternfly/react-core';
 
-const SelectSourceSkeleton: React.FC = () => (
+const SelectSourceSkeleton: React.FCC = () => (
   <>
     <br />
     <Skeleton className="select-source-option" fontSize="lg" />

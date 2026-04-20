@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useState } from 'react';
+import React, { FCC, useCallback, useState } from 'react';
 
 import { HyperConvergedModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import SectionWithSwitch from '@kubevirt-utils/components/SectionWithSwitch/SectionWithSwitch';
@@ -20,7 +20,7 @@ type AutomaticImagesDownloadProps = {
   newBadge: boolean;
 };
 
-const AutomaticImagesDownload: FC<AutomaticImagesDownloadProps> = ({
+const AutomaticImagesDownload: FCC<AutomaticImagesDownloadProps> = ({
   hyperConvergeConfiguration,
   newBadge,
 }) => {

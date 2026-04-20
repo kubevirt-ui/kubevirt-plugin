@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Link } from 'react-router-dom-v5-compat';
+import { Link } from 'react-router';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -41,7 +41,7 @@ type MigrationThresholdChartDiskRateProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const MigrationThresholdChartDiskRate: React.FC<MigrationThresholdChartDiskRateProps> = ({
+const MigrationThresholdChartDiskRate: React.FCC<MigrationThresholdChartDiskRateProps> = ({
   vmi,
 }) => {
   const { t } = useKubevirtTranslation();

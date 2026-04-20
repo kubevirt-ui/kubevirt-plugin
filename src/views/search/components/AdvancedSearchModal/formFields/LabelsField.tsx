@@ -1,4 +1,4 @@
-import React, { FC, useMemo } from 'react';
+import React, { FCC, useMemo } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { labelParser } from '@kubevirt-utils/components/ListPageFilter/utils';
@@ -13,7 +13,7 @@ type LabelsFieldProps = {
   vms: V1VirtualMachine[];
 };
 
-const LabelsField: FC<LabelsFieldProps> = ({ vms }) => {
+const LabelsField: FCC<LabelsFieldProps> = ({ vms }) => {
   const { t } = useKubevirtTranslation();
   const { setValue, value } = useAdvancedSearchField(VirtualMachineRowFilterType.Labels);
   const { value: labelInputValue } = useAdvancedSearchField('labelInputText');

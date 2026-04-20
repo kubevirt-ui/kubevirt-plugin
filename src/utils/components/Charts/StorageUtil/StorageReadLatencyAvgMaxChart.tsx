@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom-v5-compat';
+import { Link } from 'react-router';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { tickLabels } from '@kubevirt-utils/components/Charts/ChartLabels/styleOverrides';
@@ -41,7 +41,7 @@ type StorageReadLatencyAvgMaxChartProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const StorageReadLatencyAvgMaxChart: React.FC<StorageReadLatencyAvgMaxChartProps> = ({ vmi }) => {
+const StorageReadLatencyAvgMaxChart: React.FCC<StorageReadLatencyAvgMaxChartProps> = ({ vmi }) => {
   const { currentTime, duration, timespan } = useDuration();
 
   const { query: queryAvg, queryLink } = useVMQuery(vmi, VMQueries.STORAGE_READ_LATENCY_AVG);

@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Bullseye, Spinner, Stack, StackItem } from '@patternfly/react-core';
@@ -16,7 +16,7 @@ import HighAvailabilityConfigurationSection from './components/HighAvailabilityC
 
 import './ConfigurationStepContent.scss';
 
-const ConfigurationStepContent: FC = () => {
+const ConfigurationStepContent: FCC = () => {
   const { t } = useKubevirtTranslation();
   const { operatorResourcesLoaded } = useVirtualizationFeaturesContext();
 

@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -29,7 +29,7 @@ type TLSCertificateSectionProps = {
   tlsCertSource?: TLSCertSourceType;
 };
 
-const TLSCertificateSection: FC<TLSCertificateSectionProps> = ({
+const TLSCertificateSection: FCC<TLSCertificateSectionProps> = ({
   cluster,
   namespace,
   onExistingCertificateChange,

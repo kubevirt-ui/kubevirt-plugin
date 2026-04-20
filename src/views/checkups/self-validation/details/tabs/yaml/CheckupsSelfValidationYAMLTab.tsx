@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -7,7 +7,7 @@ import { Alert, AlertVariant, Bullseye } from '@patternfly/react-core';
 
 import useWatchCheckupData from '../../hooks/useWatchCheckupData';
 
-const CheckupsSelfValidationYAMLTab: FC = () => {
+const CheckupsSelfValidationYAMLTab: FCC = () => {
   const { t } = useKubevirtTranslation();
   const { configMap, loaded } = useWatchCheckupData();
 

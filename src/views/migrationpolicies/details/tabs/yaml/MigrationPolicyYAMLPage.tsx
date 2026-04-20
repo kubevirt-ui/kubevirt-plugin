@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { V1alpha1MigrationPolicy } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
@@ -9,7 +9,7 @@ type MigrationPolicyYAMLPageProps = {
   obj?: V1alpha1MigrationPolicy;
 };
 
-const MigrationPolicyYAMLPage: FC<MigrationPolicyYAMLPageProps> = ({ obj: mp }) => {
+const MigrationPolicyYAMLPage: FCC<MigrationPolicyYAMLPageProps> = ({ obj: mp }) => {
   const loading = (
     <Bullseye>
       <Loading />

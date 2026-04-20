@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -24,7 +24,7 @@ type ConfirmMultipleVMActionsModalProps = {
   vms: V1VirtualMachine[];
 };
 
-const ConfirmMultipleVMActionsModal: FC<ConfirmMultipleVMActionsModalProps> = ({
+const ConfirmMultipleVMActionsModal: FCC<ConfirmMultipleVMActionsModalProps> = ({
   action,
   actionType,
   checkToConfirmMessage,

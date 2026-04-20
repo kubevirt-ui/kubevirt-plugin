@@ -1,5 +1,5 @@
-import React, { FC } from 'react';
-import { Link } from 'react-router-dom-v5-compat';
+import React, { FCC } from 'react';
+import { Link } from 'react-router';
 
 import DetailsPageTitle from '@kubevirt-utils/components/DetailsPageTitle/DetailsPageTitle';
 import PaneHeading from '@kubevirt-utils/components/PaneHeading/PaneHeading';
@@ -15,7 +15,7 @@ type VMNetworkTitleProps = {
   network: ClusterUserDefinedNetworkKind;
 };
 
-const VMNetworkTitle: FC<VMNetworkTitleProps> = ({ network }) => {
+const VMNetworkTitle: FCC<VMNetworkTitleProps> = ({ network }) => {
   const { t } = useKubevirtTranslation();
 
   return (

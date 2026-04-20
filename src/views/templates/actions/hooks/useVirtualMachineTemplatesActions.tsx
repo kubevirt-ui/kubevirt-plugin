@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { useNavigate } from 'react-router-dom-v5-compat';
+import { useNavigate } from 'react-router';
 
 import { TemplateModel, V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { DataVolumeModel } from '@kubevirt-ui-ext/kubevirt-api/console';

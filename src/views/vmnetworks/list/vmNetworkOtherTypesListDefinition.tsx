@@ -1,5 +1,5 @@
-import React, { FC, ReactNode } from 'react';
-import { TFunction } from 'react-i18next';
+import React, { FCC, ReactNode } from 'react';
+import { TFunction } from 'i18next';
 
 import { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -47,7 +47,7 @@ type TypeCellProps = {
   row: OtherVMNetworkWithType;
 };
 
-const TypeCell: FC<TypeCellProps> = ({ row }) => {
+const TypeCell: FCC<TypeCellProps> = ({ row }) => {
   const { t } = useKubevirtTranslation();
   return (
     <span data-test={`vmnetwork-other-type-${getName(row)}`}>

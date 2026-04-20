@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { modelToGroupVersionKind, NodeModel } from '@kubevirt-utils/models';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
@@ -8,7 +8,7 @@ import { getCluster } from '@multicluster/helpers/selectors';
 
 import { VMCellWithCallbacksProps } from './types';
 
-const VMNodeCell: FC<VMCellWithCallbacksProps> = ({ callbacks, row }) => {
+const VMNodeCell: FCC<VMCellWithCallbacksProps> = ({ callbacks, row }) => {
   if (!row) return null;
 
   const vmi = callbacks.getVmi(row);

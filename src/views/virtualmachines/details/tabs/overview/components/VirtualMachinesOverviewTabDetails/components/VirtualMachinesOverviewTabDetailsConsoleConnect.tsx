@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 import cn from 'classnames';
 
 import LoadingEmptyState from '@kubevirt-utils/components/LoadingEmptyState/LoadingEmptyState';
@@ -14,7 +14,7 @@ type VirtualMachinesOverviewTabDetailsConsoleConnectProps = {
   isSessionAlreadyInUse?: boolean;
 };
 
-const VirtualMachinesOverviewTabDetailsConsoleConnect: FC<
+const VirtualMachinesOverviewTabDetailsConsoleConnect: FCC<
   VirtualMachinesOverviewTabDetailsConsoleConnectProps
 > = ({ connect, isConnecting, isDisabled, isHeadlessMode, isSessionAlreadyInUse }) => {
   const { t } = useKubevirtTranslation();

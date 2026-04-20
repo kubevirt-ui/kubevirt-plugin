@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FCC, useState } from 'react';
 import { Trans } from 'react-i18next';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -20,7 +20,7 @@ type MoveVMToFolderModalProps = {
   vm: V1VirtualMachine;
 };
 
-const MoveVMToFolderModal: FC<MoveVMToFolderModalProps> = ({ isOpen, onClose, onSubmit, vm }) => {
+const MoveVMToFolderModal: FCC<MoveVMToFolderModalProps> = ({ isOpen, onClose, onSubmit, vm }) => {
   const { t } = useKubevirtTranslation();
   const [folderName, setFolderName] = useState<string>(getLabel(vm, VM_FOLDER_LABEL));
 

@@ -1,4 +1,4 @@
-import React, { FC, ReactNode } from 'react';
+import React, { FCC, ReactNode } from 'react';
 
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverContentWithLightspeedButton/PopoverContentWithLightspeedButton';
@@ -11,7 +11,7 @@ type VirtualMachineDiagnosticTabTableTitleProps = {
   title: string;
 };
 
-const VirtualMachineDiagnosticTabTableTitle: FC<VirtualMachineDiagnosticTabTableTitleProps> = ({
+const VirtualMachineDiagnosticTabTableTitle: FCC<VirtualMachineDiagnosticTabTableTitleProps> = ({
   helpContent,
   olsPromptType,
   title,

@@ -1,5 +1,5 @@
-import React, { FC, useMemo } from 'react';
-import { Link } from 'react-router-dom-v5-compat';
+import React, { FCC, useMemo } from 'react';
+import { Link } from 'react-router';
 
 import {
   V1VirtualMachine,
@@ -63,7 +63,7 @@ type VirtualMachinesOverviewTabDetailsProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const VirtualMachinesOverviewTabDetails: FC<VirtualMachinesOverviewTabDetailsProps> = ({
+const VirtualMachinesOverviewTabDetails: FCC<VirtualMachinesOverviewTabDetailsProps> = ({
   error,
   guestAgentData,
   guestAgentDataLoaded,

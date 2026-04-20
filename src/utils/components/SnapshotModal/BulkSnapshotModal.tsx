@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FCC, useState } from 'react';
 
 import { VirtualMachineSnapshotModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
@@ -47,7 +47,7 @@ type BulkSnapshotModalProps = {
   vms: V1VirtualMachine[];
 };
 
-const BulkSnapshotModal: FC<BulkSnapshotModalProps> = ({ isOpen, onClose, vms }) => {
+const BulkSnapshotModal: FCC<BulkSnapshotModalProps> = ({ isOpen, onClose, vms }) => {
   const { t } = useKubevirtTranslation();
 
   const [snapshotSuffix, setSnapshotSuffix] = useState<string>(generateSnapshotSuffix());

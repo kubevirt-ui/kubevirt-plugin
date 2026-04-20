@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 import classNames from 'classnames';
 
 import { Button, ButtonVariant, SplitItem, Tooltip } from '@patternfly/react-core';
@@ -7,7 +7,7 @@ import { VMActionIconDetails } from '@virtualmachines/actions/components/VMActio
 
 import '../VMActionsIconBar.scss';
 
-const ActionIconButton: FC<VMActionIconDetails> = ({
+const ActionIconButton: FCC<VMActionIconDetails> = ({
   action,
   Icon,
   iconClassname,

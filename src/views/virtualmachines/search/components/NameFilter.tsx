@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import {
   STATIC_SEARCH_FILTERS_LABELS,
@@ -13,7 +13,7 @@ export type NameFilterProps = {
   onTextChange: SearchInputProps['onChange'];
 };
 
-const NameFilter: FC<NameFilterProps> = ({ inputText, onDelete, onTextChange }) => {
+const NameFilter: FCC<NameFilterProps> = ({ inputText, onDelete, onTextChange }) => {
   const { t } = useKubevirtTranslation();
 
   return (

@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import FileSystemList from '@kubevirt-utils/components/FileSystemList/FileSystemList';
@@ -13,7 +13,7 @@ type FileSystemTableProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const FileSystemTable: FC<FileSystemTableProps> = ({ vmi }) => {
+const FileSystemTable: FCC<FileSystemTableProps> = ({ vmi }) => {
   const [data, loaded, loadingError] = useGuestOS(vmi);
   const fileSystems: FileSystemData[] = data?.fsInfo?.disks ?? [];
 

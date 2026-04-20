@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import restrictedSignImg from '@images/restricted-sign.svg';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -16,7 +16,7 @@ type AccessDeniedProps = {
   message?: string;
 };
 
-const AccessDenied: FC<AccessDeniedProps> = ({ message }) => {
+const AccessDenied: FCC<AccessDeniedProps> = ({ message }) => {
   const { t } = useKubevirtTranslation();
   return (
     <Panel className="kv-access-denied">

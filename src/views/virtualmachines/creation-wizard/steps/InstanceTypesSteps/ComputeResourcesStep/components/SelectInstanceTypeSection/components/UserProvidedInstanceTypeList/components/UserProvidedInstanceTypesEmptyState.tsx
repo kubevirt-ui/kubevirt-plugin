@@ -1,10 +1,10 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Bullseye, EmptyState } from '@patternfly/react-core';
 import { SearchIcon } from '@patternfly/react-icons';
 
-const UserProvidedInstanceTypesEmptyState: FC = () => {
+const UserProvidedInstanceTypesEmptyState: FCC = () => {
   const { t } = useKubevirtTranslation();
   return (
     <Bullseye>

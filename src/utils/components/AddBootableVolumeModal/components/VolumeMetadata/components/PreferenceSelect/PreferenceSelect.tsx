@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useMemo } from 'react';
+import React, { FCC, useEffect, useMemo } from 'react';
 
 import {
   DEFAULT_PREFERENCE_KIND_LABEL,
@@ -26,7 +26,7 @@ type PreferenceSelectProps = {
   setBootableVolumeField: SetBootableVolumeFieldType;
 };
 
-const PreferenceSelect: FC<PreferenceSelectProps> = ({
+const PreferenceSelect: FCC<PreferenceSelectProps> = ({
   bootableVolume,
   deleteLabel,
   setBootableVolumeField,

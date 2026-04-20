@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 import { Trans } from 'react-i18next';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -41,7 +41,7 @@ type VirtualMachinesOverviewTabUtilizationProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const VirtualMachinesOverviewTabUtilization: FC<VirtualMachinesOverviewTabUtilizationProps> = ({
+const VirtualMachinesOverviewTabUtilization: FCC<VirtualMachinesOverviewTabUtilizationProps> = ({
   vm,
   vmi,
 }) => {

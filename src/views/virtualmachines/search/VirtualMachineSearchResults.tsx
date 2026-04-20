@@ -1,5 +1,5 @@
-import React, { FC, useCallback, useMemo, useRef } from 'react';
-import { useParams } from 'react-router-dom-v5-compat';
+import React, { FCC, useCallback, useMemo, useRef } from 'react';
+import { useParams } from 'react-router';
 
 import { ExposedFilterFunctions } from '@kubevirt-utils/components/ListPageFilter/types';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
@@ -11,7 +11,7 @@ import { useHideNamespaceBar } from '@virtualmachines/hooks/useHideNamespaceBar'
 import VirtualMachinesListPageHeader from '@virtualmachines/list/components/VirtualMachinesListPageHeader';
 import VirtualMachinesList from '@virtualmachines/list/VirtualMachinesList';
 
-const VirtualMachineSearchResults: FC = () => {
+const VirtualMachineSearchResults: FCC = () => {
   const { t } = useKubevirtTranslation();
   const [activeNamespace] = useActiveNamespace();
 

@@ -1,9 +1,9 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Content, ContentVariants } from '@patternfly/react-core';
 
-const PasstPopoverContent: FC = () => {
+const PasstPopoverContent: FCC = () => {
   const { t } = useKubevirtTranslation();
 
   return (

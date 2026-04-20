@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 import { Trans } from 'react-i18next';
 import useCanCreateVMNetwork from 'src/views/vmnetworks/hooks/useCanCreateVMNetwork';
 
@@ -20,7 +20,7 @@ type LocalnetEmptyStateProps = {
   onCreate: () => void;
 };
 
-const LocalnetEmptyState: FC<LocalnetEmptyStateProps> = ({ onCreate }) => {
+const LocalnetEmptyState: FCC<LocalnetEmptyStateProps> = ({ onCreate }) => {
   const { t } = useKubevirtTranslation();
 
   const kind = t('OVN localnet network');

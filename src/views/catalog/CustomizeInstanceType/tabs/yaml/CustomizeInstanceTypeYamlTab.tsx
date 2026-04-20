@@ -1,4 +1,4 @@
-import React, { FC, Suspense, useState } from 'react';
+import React, { FCC, Suspense, useState } from 'react';
 import { dump, load } from 'js-yaml';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -11,7 +11,7 @@ import { Alert, AlertVariant, Bullseye } from '@patternfly/react-core';
 
 import './CustomizeInstanceTypeYamlTab.scss';
 
-const CustomizeInstanceTypeYamlTab: FC = () => {
+const CustomizeInstanceTypeYamlTab: FCC = () => {
   const { t } = useKubevirtTranslation();
   const [error, setError] = useState<Error>(null);
 

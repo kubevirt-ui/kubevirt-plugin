@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -20,7 +20,7 @@ type VMAlertSeverityCountsProps = {
   warning: number;
 };
 
-const VMAlertSeverityCounts: FC<VMAlertSeverityCountsProps> = ({
+const VMAlertSeverityCounts: FCC<VMAlertSeverityCountsProps> = ({
   critical,
   info,
   isExternal,

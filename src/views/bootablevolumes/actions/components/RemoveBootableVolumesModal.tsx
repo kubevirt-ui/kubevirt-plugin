@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import DeleteModal from '@kubevirt-utils/components/DeleteModal/DeleteModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -13,7 +13,7 @@ type RemoveBootableVolumesModalProps = {
   source: BootableResource;
 };
 
-const RemoveBootableVolumesModal: FC<RemoveBootableVolumesModalProps> = ({
+const RemoveBootableVolumesModal: FCC<RemoveBootableVolumesModalProps> = ({
   isOpen,
   onClose,
   source,

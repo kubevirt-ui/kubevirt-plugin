@@ -1,3 +1,5 @@
+import { TabConfig } from '../../../views/checkups/utils/types';
+
 const YAML_TAB_HREF = 'yaml';
 
 const isYamlTab = <T extends { href?: string }>(tab: T): boolean => tab.href === YAML_TAB_HREF;
@@ -10,7 +12,7 @@ export const filterYamlTabs = <T extends { href?: string; isHidden?: boolean }>(
   return tabs.map((tab) => (isYamlTab(tab) ? { ...tab, isHidden: true } : tab));
 };
 
-export const removeYamlTabs = <T extends { href?: string }>(
+export const removeYamlTabs = <T extends { href?: string } = Partial<TabConfig>>(
   tabs: T[],
   hideYamlTab: boolean,
 ): T[] => {

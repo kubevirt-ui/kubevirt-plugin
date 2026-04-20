@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { RedHatInstanceTypeMetadata } from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/utils/types';
 import { Stack, StackItem } from '@patternfly/react-core';
@@ -10,7 +10,7 @@ type RedHatProvidedInstanceTypesSectionProps = {
   redHatMenuItems: RedHatInstanceTypeMetadata;
 };
 
-const RedHatProvidedInstanceTypesSection: FC<RedHatProvidedInstanceTypesSectionProps> = ({
+const RedHatProvidedInstanceTypesSection: FCC<RedHatProvidedInstanceTypesSectionProps> = ({
   redHatMenuItems,
 }) => {
   const { selectedSeries } = useInstanceTypeVMStore();

@@ -1,5 +1,5 @@
-import React, { FC, useMemo } from 'react';
-import { useParams } from 'react-router-dom-v5-compat';
+import React, { FCC, useMemo } from 'react';
+import { useParams } from 'react-router';
 
 import {
   modelToGroupVersionKind,
@@ -19,7 +19,7 @@ import useEditTemplateAccessReview from './hooks/useIsTemplateEditable';
 import { useVirtualMachineTabs } from './hooks/useTemplateTabs';
 import TemplatePageTitle from './TemplatePageTitle';
 
-const TemplateNavPage: FC = () => {
+const TemplateNavPage: FCC = () => {
   const { name } = useParams<{ name: string }>();
   const namespace = useNamespaceParam();
   const cluster = useClusterParam();

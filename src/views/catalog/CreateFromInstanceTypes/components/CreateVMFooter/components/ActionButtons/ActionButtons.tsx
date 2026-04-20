@@ -1,5 +1,5 @@
-import React, { FC, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom-v5-compat';
+import React, { FCC, useCallback } from 'react';
+import { useNavigate } from 'react-router';
 import { VirtualMachineModel } from 'src/views/dashboard-extensions/utils';
 
 import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
@@ -28,7 +28,7 @@ type ActionButtonsProps = {
   onViewYAML: () => void;
 };
 
-const ActionButtons: FC<ActionButtonsProps> = ({
+const ActionButtons: FCC<ActionButtonsProps> = ({
   isCreateLoading,
   isCustomizeLoading,
   onCreate,

@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -20,7 +20,7 @@ type TestStatisticsProps = {
   total?: number;
 };
 
-const TestStatistics: FC<TestStatisticsProps> = ({
+const TestStatistics: FCC<TestStatisticsProps> = ({
   failed = 0,
   passed = 0,
   size = 'medium',

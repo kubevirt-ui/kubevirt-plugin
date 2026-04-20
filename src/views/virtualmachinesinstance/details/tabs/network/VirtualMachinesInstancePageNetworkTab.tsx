@@ -1,4 +1,4 @@
-import React, { FC, useMemo } from 'react';
+import React, { FCC, useMemo } from 'react';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
@@ -14,7 +14,7 @@ type VirtualMachinesInstancePageNetworkTabProps = {
   obj: V1VirtualMachineInstance;
 };
 
-const VirtualMachinesInstancePageNetworkTab: FC<VirtualMachinesInstancePageNetworkTabProps> = ({
+const VirtualMachinesInstancePageNetworkTab: FCC<VirtualMachinesInstancePageNetworkTabProps> = ({
   obj: vmi,
 }) => {
   const { t } = useKubevirtTranslation();

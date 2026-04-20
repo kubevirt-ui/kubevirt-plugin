@@ -1,5 +1,5 @@
-import React, { FC } from 'react';
-import { useNavigate } from 'react-router-dom-v5-compat';
+import React, { FCC } from 'react';
+import { useNavigate } from 'react-router';
 
 import { TemplateModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
@@ -11,7 +11,7 @@ import useIsACMPage from '@multicluster/useIsACMPage';
 import { Button } from '@patternfly/react-core';
 import { useFleetAccessReview } from '@stolostron/multicluster-sdk';
 
-const VirtualMachineTemplatesCreateButton: FC = () => {
+const VirtualMachineTemplatesCreateButton: FCC = () => {
   const { t } = useKubevirtTranslation();
   const selectedCluster = useSelectedCluster();
   const selectedNamespaces = useListNamespaces();

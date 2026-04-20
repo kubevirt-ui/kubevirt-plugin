@@ -10,7 +10,7 @@ type DetailsPageBodyProps = {
   className?: string;
 };
 
-const DetailsPageBody: React.FC<DetailsPageBodyProps> = ({ children, className, ...props }) => {
+const DetailsPageBody: React.FCC<DetailsPageBodyProps> = ({ children, className, ...props }) => {
   return (
     <Flex
       className={classNames('co-m-page__body', className)}

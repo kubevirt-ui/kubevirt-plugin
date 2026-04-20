@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { printableVMStatus } from '@virtualmachines/utils';
 
@@ -7,7 +7,7 @@ import StatusWithPopover from '../../details/tabs/overview/components/VirtualMac
 
 import { VMCellWithCallbacksProps } from './types';
 
-const VMStatusCell: FC<VMCellWithCallbacksProps> = ({ callbacks, row }) => {
+const VMStatusCell: FCC<VMCellWithCallbacksProps> = ({ callbacks, row }) => {
   const vmi = callbacks.getVmi(row);
 
   return (

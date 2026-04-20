@@ -11,7 +11,7 @@ import RDPServiceModal from './RDPServiceModal';
 
 import './rdp-service.scss';
 
-const RDPServiceNotConfigured: React.FC<RDPServiceNotConfiguredProps> = ({ vm, vmi }) => {
+const RDPServiceNotConfigured: React.FCC<RDPServiceNotConfiguredProps> = ({ vm, vmi }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   return (

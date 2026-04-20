@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
@@ -8,7 +8,7 @@ import { deselectVM, isVMSelected, selectVM } from '../selectedVMs';
 
 import { VMCellProps } from './types';
 
-const VMSelectionCell: FC<VMCellProps> = ({ row }) => {
+const VMSelectionCell: FCC<VMCellProps> = ({ row }) => {
   const { t } = useKubevirtTranslation();
 
   if (!row) return null;

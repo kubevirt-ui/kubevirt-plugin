@@ -1,4 +1,4 @@
-import { TFunction } from 'react-i18next';
+import { TFunction } from 'i18next';
 
 import { MultiClusterObservabilityModel } from '@kubevirt-utils/models';
 import { isEmpty } from '@kubevirt-utils/utils/utils';

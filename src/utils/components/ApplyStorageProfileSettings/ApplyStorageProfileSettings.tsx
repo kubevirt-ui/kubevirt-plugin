@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useRef } from 'react';
+import React, { FCC, useEffect, useRef } from 'react';
 
 import {
   V1beta1StorageSpecAccessModesEnum,
@@ -23,7 +23,7 @@ type ApplyStorageProfileSettingsProps = {
   volumeMode: V1beta1StorageSpecVolumeModeEnum;
 };
 
-const ApplyStorageProfileSettings: FC<ApplyStorageProfileSettingsProps> = ({
+const ApplyStorageProfileSettings: FCC<ApplyStorageProfileSettingsProps> = ({
   accessMode,
   setAccessMode,
   setVolumeMode,

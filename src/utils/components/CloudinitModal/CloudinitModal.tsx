@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FCC, useState } from 'react';
 import produce from 'immer';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -18,7 +18,7 @@ import CloudinitForm from './CloudinitForm';
 
 import './cloud-init.scss';
 
-const CloudinitModal: FC<{
+const CloudinitModal: FCC<{
   hideYAMLEditor?: boolean;
   isOpen: boolean;
   onClose: () => void;

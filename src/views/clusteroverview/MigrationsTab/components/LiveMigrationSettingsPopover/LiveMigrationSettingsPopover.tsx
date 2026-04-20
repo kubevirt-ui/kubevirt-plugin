@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -7,7 +7,7 @@ import { OutlinedQuestionCircleIcon } from '@patternfly/react-icons';
 
 import useHyperConvergedMigrations from './hooks/useHyperConvergedMigrations';
 
-const LiveMigrationSettingsPopover: FC = () => {
+const LiveMigrationSettingsPopover: FCC = () => {
   const { t } = useKubevirtTranslation();
   const migrations = useHyperConvergedMigrations();
   const isAdmin = useIsAdmin();

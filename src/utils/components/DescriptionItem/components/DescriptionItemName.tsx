@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
@@ -12,7 +12,7 @@ type DescriptionItemNameProps = {
   resource: K8sResourceCommon;
 };
 
-const DescriptionItemName: FC<DescriptionItemNameProps> = ({ label, model, resource }) => {
+const DescriptionItemName: FCC<DescriptionItemNameProps> = ({ label, model, resource }) => {
   const { t } = useKubevirtTranslation();
 
   const name = getName(resource);

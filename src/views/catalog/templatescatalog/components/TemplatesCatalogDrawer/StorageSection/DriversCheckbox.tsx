@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import WindowsDrivers from '@kubevirt-utils/components/WindowsDrivers/WindowsDrivers';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -7,7 +7,7 @@ import { FormGroup } from '@patternfly/react-core';
 
 import { useDrawerContext } from '../hooks/useDrawerContext';
 
-const DriversCheckbox: FC = () => {
+const DriversCheckbox: FCC = () => {
   const { t } = useKubevirtTranslation();
 
   const { setVM, template, vm } = useDrawerContext();

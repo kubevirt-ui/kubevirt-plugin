@@ -1,4 +1,4 @@
-import { TFunction } from 'react-i18next';
+import { TFunction } from 'i18next';
 
 import { parseNADConfig } from '@kubevirt-utils/components/NetworkInterfaceModal/utils/helpers';
 import {

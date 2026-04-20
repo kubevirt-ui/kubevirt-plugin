@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Split, SplitItem } from '@patternfly/react-core';
@@ -13,7 +13,7 @@ import { getInstalledStatusMessage } from '@settings/tabs/ClusterTab/components/
 
 import './HAInstallStatusMessage.scss';
 
-const HAInstallStatusMessage: FC = () => {
+const HAInstallStatusMessage: FCC = () => {
   const { t } = useKubevirtTranslation();
   const { operatorDetailsMap } = useVirtualizationFeaturesContext();
 

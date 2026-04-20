@@ -1,4 +1,4 @@
-import React, { FC, useMemo } from 'react';
+import React, { FCC, useMemo } from 'react';
 
 import { VirtualMachinePreferenceModelRef } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1beta1VirtualMachinePreference } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -20,7 +20,7 @@ import { Pagination } from '@patternfly/react-core';
 import UserPreferencesEmptyState from './components/UserPreferencesEmptyState';
 import { getUserPreferenceColumns, getUserPreferenceRowId } from './userPreferenceDefinition';
 
-const UserPreferenceList: FC<ListPageProps> = ({
+const UserPreferenceList: FCC<ListPageProps> = ({
   fieldSelector,
   hideColumnManagement,
   hideNameLabelFilters,

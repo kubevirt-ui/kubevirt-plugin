@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
 import AdvancedSettings from '@kubevirt-utils/components/DiskModal/components/AdvancedSettings/AdvancedSettings';
@@ -24,7 +24,7 @@ import { isRunning } from '@virtualmachines/utils';
 import { getDefaultCreateValues, getDefaultEditValues } from './utils/form';
 import { SourceTypes, V1DiskFormState, V1SubDiskModalProps } from './utils/types';
 
-const RegistryDiskModal: FC<V1SubDiskModalProps> = (props) => {
+const RegistryDiskModal: FCC<V1SubDiskModalProps> = (props) => {
   const { defaultFormValues, editDiskName, isCreated, isOpen, onClose, onSubmit, pvc, vm } = props;
 
   const isEditDisk = !isEmpty(editDiskName);

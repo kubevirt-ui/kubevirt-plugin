@@ -1,10 +1,10 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { BootableDeviceType } from '@kubevirt-utils/resources/vm/utils/boot-order/bootOrder';
 import { Button, ButtonVariant, FormSelect, FormSelectOption } from '@patternfly/react-core';
 import { MinusCircleIcon } from '@patternfly/react-icons';
 
-export const AddDeviceFormSelect: FC<AddDeviceFormSelectProps> = ({
+export const AddDeviceFormSelect: FCC<AddDeviceFormSelectProps> = ({
   id,
   label,
   onAdd,

@@ -9,7 +9,7 @@ type VirtualMachinesInsanceActionsProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const VirtualMachineInstanceActions: React.FC<VirtualMachinesInsanceActionsProps> = ({ vmi }) => {
+const VirtualMachineInstanceActions: React.FCC<VirtualMachinesInsanceActionsProps> = ({ vmi }) => {
   return (
     <LazyActionMenu
       context={{ [VirtualMachineInstanceModelRef]: vmi }}

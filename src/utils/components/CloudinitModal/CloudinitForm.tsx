@@ -1,4 +1,4 @@
-import React, { FC, Fragment, Suspense, useState } from 'react';
+import React, { FCC, Fragment, Suspense, useState } from 'react';
 import { Trans } from 'react-i18next';
 import RandExp from 'randexp';
 
@@ -36,7 +36,7 @@ type CloudinitFormProps = {
   updateUserField: (key: keyof CloudInitUserData, value: string) => void;
   userData: CloudInitUserData;
 };
-const CloudinitForm: FC<CloudinitFormProps> = ({
+const CloudinitForm: FCC<CloudinitFormProps> = ({
   cloudInitVolume,
   enableNetworkData,
   networkData,

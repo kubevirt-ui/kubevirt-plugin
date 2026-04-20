@@ -7,7 +7,7 @@ type TimezoneProps = {
   guestAgentData: V1VirtualMachineInstanceGuestAgentInfo;
 };
 
-const Timezone: React.FC<TimezoneProps> = ({ guestAgentData }) => {
+const Timezone: React.FCC<TimezoneProps> = ({ guestAgentData }) => {
   const { t } = useKubevirtTranslation();
 
   return (

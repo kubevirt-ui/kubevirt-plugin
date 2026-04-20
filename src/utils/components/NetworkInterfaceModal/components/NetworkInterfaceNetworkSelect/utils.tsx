@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react';
-import { TFunction } from 'react-i18next';
+import { TFunction } from 'i18next';
 
 import { GLOBAL_NAD_NAMESPACES } from '@kubevirt-utils/constants/constants';
 import { interfaceTypesProxy } from '@kubevirt-utils/resources/vm/utils/network/constants';

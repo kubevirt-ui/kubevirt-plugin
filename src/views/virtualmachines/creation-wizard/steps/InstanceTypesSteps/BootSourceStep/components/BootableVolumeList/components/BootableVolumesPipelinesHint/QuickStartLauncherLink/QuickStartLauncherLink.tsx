@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { getName } from '@kubevirt-utils/resources/shared';
 import { useQuickStartContext } from '@openshift-console/dynamic-plugin-sdk';
@@ -18,7 +18,7 @@ type QuickStartLauncherLinkProps = {
   text: string;
 };
 
-const QuickStartLauncherLink: FC<QuickStartLauncherLinkProps> = ({
+const QuickStartLauncherLink: FCC<QuickStartLauncherLinkProps> = ({
   quickStart,
   quickStartLoaded,
   text,

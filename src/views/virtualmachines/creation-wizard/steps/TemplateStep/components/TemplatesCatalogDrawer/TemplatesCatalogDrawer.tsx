@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { Template } from '@kubevirt-utils/resources/template';
 import { getTemplateName } from '@kubevirt-utils/resources/template/utils/selectors';
@@ -22,7 +22,7 @@ type TemplatesCatalogDrawerProps = {
   template: Template | undefined;
 };
 
-export const TemplatesCatalogDrawer: FC<TemplatesCatalogDrawerProps> = ({ onClose, template }) => {
+export const TemplatesCatalogDrawer: FCC<TemplatesCatalogDrawerProps> = ({ onClose, template }) => {
   if (!template) return null;
 
   const templateName = getTemplateName(template);

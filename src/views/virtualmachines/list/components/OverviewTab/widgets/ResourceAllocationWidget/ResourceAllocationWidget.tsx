@@ -1,4 +1,4 @@
-import React, { FC, ReactNode, useMemo } from 'react';
+import React, { FCC, ReactNode, useMemo } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { convertBinaryUnit } from '@kubevirt-utils/utils/units';
@@ -32,7 +32,7 @@ type ResourceAllocationWidgetProps = {
   title: string;
 };
 
-const ResourceAllocationWidget: FC<ResourceAllocationWidgetProps> = ({
+const ResourceAllocationWidget: FCC<ResourceAllocationWidgetProps> = ({
   clusterData,
   graphTitle,
   metric,

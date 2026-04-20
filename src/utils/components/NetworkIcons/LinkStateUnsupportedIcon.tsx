@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Tooltip, TooltipPosition } from '@patternfly/react-core';
@@ -9,7 +9,7 @@ import StateText from './StateText';
 
 import './LinkStateIcon.scss';
 
-const LinkStateUnsupportedIcon: FC<NetworkIconProps> = ({ configuredState, runtimeState }) => {
+const LinkStateUnsupportedIcon: FCC<NetworkIconProps> = ({ configuredState, runtimeState }) => {
   const { t } = useKubevirtTranslation();
 
   return (

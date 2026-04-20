@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { Link } from 'react-router-dom-v5-compat';
-import * as _ from 'lodash-es';
+import { Link } from 'react-router';
+import { isEmpty } from 'lodash';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Selector as SelectorKind } from '@openshift-console/dynamic-plugin-sdk';
@@ -20,7 +20,7 @@ type SelectorProps = {
   selector: SelectorKind;
 };
 
-const Requirement: React.FC<RequirementProps> = ({ kind, namespace = '', requirements }) => {
+const Requirement: React.FCC<RequirementProps> = ({ kind, namespace = '', requirements }) => {
   // Strip off any trailing '=' characters for valueless selectors
   const requirementAsString = selectorToString(requirements).replace(/=,/g, ',').replace(/=$/g, '');
   const requirementAsUrlEncodedString = encodeURIComponent(requirementAsString);
@@ -39,7 +39,7 @@ const Requirement: React.FC<RequirementProps> = ({ kind, namespace = '', require
   );
 };
 
-export const Selector: React.FC<SelectorProps> = ({
+export const Selector: React.FCC<SelectorProps> = ({
   kind = 'Pod',
   namespace = undefined,
   selector = {},
@@ -47,7 +47,7 @@ export const Selector: React.FC<SelectorProps> = ({
   const { t } = useKubevirtTranslation();
   return (
     <div className="co-m-selector">
-      {_.isEmpty(selector) ? (
+      {isEmpty(selector) ? (
         <p className="pf-v6-u-text-color-subtle">{t('No selector')}</p>
       ) : (
         <Requirement kind={kind} namespace={namespace} requirements={selector} />

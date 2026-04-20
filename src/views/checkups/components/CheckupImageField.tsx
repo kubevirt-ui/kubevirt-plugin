@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
@@ -11,7 +11,7 @@ type CheckupImageFieldProps = {
   checkupImageLoadError?: Error;
 };
 
-const CheckupImageField: FC<CheckupImageFieldProps> = ({
+const CheckupImageField: FCC<CheckupImageFieldProps> = ({
   checkupImage,
   checkupImageLoaded,
   checkupImageLoadError,

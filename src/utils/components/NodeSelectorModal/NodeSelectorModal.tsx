@@ -1,4 +1,4 @@
-import React, { FC, useMemo } from 'react';
+import React, { FCC, useMemo } from 'react';
 import produce from 'immer';
 
 import { NodeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -26,7 +26,7 @@ type NodeSelectorModalProps = {
   vm: V1VirtualMachine;
 };
 
-const NodeSelectorModal: FC<NodeSelectorModalProps> = ({
+const NodeSelectorModal: FCC<NodeSelectorModalProps> = ({
   isOpen,
   nodes,
   nodesLoaded,

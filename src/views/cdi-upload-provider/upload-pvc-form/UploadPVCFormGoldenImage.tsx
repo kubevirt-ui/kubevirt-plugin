@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { PersistentVolumeClaimModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1beta1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -32,7 +32,7 @@ type UploadPVCFormGoldenImageProps = {
   pvcSizeFromTemplate: boolean;
 };
 
-const UploadPVCFormGoldenImage: FC<UploadPVCFormGoldenImageProps> = ({
+const UploadPVCFormGoldenImage: FCC<UploadPVCFormGoldenImageProps> = ({
   goldenPvcs,
   handleCDROMChange,
   handleOs,

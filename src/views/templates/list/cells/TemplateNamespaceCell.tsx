@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { modelToGroupVersionKind, NamespaceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
@@ -11,7 +11,7 @@ type TemplateNamespaceCellProps = {
   row: TemplateOrRequest;
 };
 
-const TemplateNamespaceCell: FC<TemplateNamespaceCellProps> = ({ row }) => {
+const TemplateNamespaceCell: FCC<TemplateNamespaceCellProps> = ({ row }) => {
   const clusterParam = useClusterParam();
   const cluster = getCluster(row) || clusterParam;
   const namespace = getNamespace(row);

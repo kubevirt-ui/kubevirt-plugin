@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { OPENSHIFT_OS_IMAGES_NS } from '@kubevirt-utils/constants/constants';
 import { HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
@@ -20,7 +20,7 @@ type BootableVolumeProjectSectionProps = {
   projectsData: [projects: K8sResourceCommon[], loaded: boolean, error: any];
 };
 
-const BootableVolumeProjectSection: FC<BootableVolumeProjectSectionProps> = ({
+const BootableVolumeProjectSection: FCC<BootableVolumeProjectSectionProps> = ({
   hyperConvergeConfiguration,
   projectsData,
 }) => {

@@ -1,5 +1,5 @@
 import React from 'react';
-import { TFunction } from 'react-i18next';
+import { TFunction } from 'i18next';
 
 import { V1alpha1MigrationPolicy } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';

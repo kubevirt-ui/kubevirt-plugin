@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Stack } from '@patternfly/react-core';
@@ -8,7 +8,7 @@ type MarkdownTooltipContentProps = {
   content: string;
 };
 
-const MarkdownTooltipContent: FC<MarkdownTooltipContentProps> = ({ content }) => {
+const MarkdownTooltipContent: FCC<MarkdownTooltipContentProps> = ({ content }) => {
   if (isEmpty(content)) return null;
 
   return (

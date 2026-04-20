@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { usePendingChanges } from '@kubevirt-utils/components/PendingChanges/hooks/usePendingChanges';
@@ -19,7 +19,7 @@ type VirtualMachinePendingChangesAlertProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const VirtualMachinePendingChangesAlert: FC<VirtualMachinePendingChangesAlertProps> = ({
+const VirtualMachinePendingChangesAlert: FCC<VirtualMachinePendingChangesAlertProps> = ({
   instanceTypeExpandedSpec,
   vm,
   vmi,

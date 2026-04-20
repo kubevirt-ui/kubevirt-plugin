@@ -1,4 +1,4 @@
-import React, { ChangeEvent, Dispatch, FC, SetStateAction } from 'react';
+import React, { ChangeEvent, Dispatch, FCC, SetStateAction } from 'react';
 
 import { memorySizesTypes } from '@kubevirt-utils/components/CPUMemoryModal/utils/CpuMemoryUtils';
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
@@ -15,7 +15,7 @@ type MemoryInputProps = {
   setMemoryUnit: Dispatch<SetStateAction<string>>;
 };
 
-const MemoryInput: FC<MemoryInputProps> = ({ memory, memoryUnit, setMemory, setMemoryUnit }) => {
+const MemoryInput: FCC<MemoryInputProps> = ({ memory, memoryUnit, setMemory, setMemoryUnit }) => {
   const { t } = useKubevirtTranslation();
 
   return (

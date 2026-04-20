@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { ApplicationAwareQuota } from '@kubevirt-utils/resources/quotas/types';
 
@@ -9,7 +9,7 @@ type QuotaAdditionalCellProps = {
   row: ApplicationAwareQuota;
 };
 
-const QuotaAdditionalCell: FC<QuotaAdditionalCellProps> = ({ row }) => {
+const QuotaAdditionalCell: FCC<QuotaAdditionalCellProps> = ({ row }) => {
   const quotaStatus = getStatus(row);
   const additionalResourceKeys = getAdditionalResourceKeys(row);
 

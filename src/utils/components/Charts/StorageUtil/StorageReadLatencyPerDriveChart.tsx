@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom-v5-compat';
+import { Link } from 'react-router';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { tickLabels } from '@kubevirt-utils/components/Charts/ChartLabels/styleOverrides';
@@ -49,7 +49,7 @@ const CHART_COLORS = [
   chart_color_purple_300.value,
 ];
 
-const StorageReadLatencyPerDriveChart: React.FC<StorageReadLatencyPerDriveChartProps> = ({
+const StorageReadLatencyPerDriveChart: React.FCC<StorageReadLatencyPerDriveChartProps> = ({
   vmi,
 }) => {
   const { currentTime, duration, timespan } = useDuration();

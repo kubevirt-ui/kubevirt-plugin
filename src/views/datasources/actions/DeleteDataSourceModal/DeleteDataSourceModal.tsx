@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FCC, useState } from 'react';
 import { Trans } from 'react-i18next';
 
 import { DataImportCronModel } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -25,7 +25,7 @@ type DeleteDataSourceModalProps = {
   onClose: () => void;
 };
 
-const DeleteDataSourceModal: FC<DeleteDataSourceModalProps> = ({
+const DeleteDataSourceModal: FCC<DeleteDataSourceModalProps> = ({
   dataImportCron,
   dataSource,
   isOpen,

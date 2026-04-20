@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 import { Trans } from 'react-i18next';
 
 import AddBootableVolumeLink from '@catalog/CreateFromInstanceTypes/components/AddBootableVolumeLink/AddBootableVolumeLink';
@@ -17,7 +17,7 @@ import './BootableVolumesPipelinesHint.scss';
 
 type BootableVolumesPipelinesHintProps = { bootableVolumes: BootableVolume[] };
 
-const BootableVolumesPipelinesHint: FC<BootableVolumesPipelinesHintProps> = ({
+const BootableVolumesPipelinesHint: FCC<BootableVolumesPipelinesHintProps> = ({
   bootableVolumes,
 }) => {
   const { t } = useKubevirtTranslation();

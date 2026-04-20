@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FCC } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -8,7 +8,7 @@ type DedicatedResourcesProps = {
   vm: V1VirtualMachine;
 };
 
-const DedicatedResources: FC<DedicatedResourcesProps> = ({ vm }) => {
+const DedicatedResources: FCC<DedicatedResourcesProps> = ({ vm }) => {
   const { t } = useKubevirtTranslation();
   const isDedicatedResources = getCPU(vm)?.dedicatedCpuPlacement;
 

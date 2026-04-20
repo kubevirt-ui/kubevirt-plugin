@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import MigrationThresholdChart from '@kubevirt-utils/components/Charts/MigrationUtil/MigrationThresholdChart';
@@ -27,7 +27,7 @@ type MigrationChartsProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const MigrationCharts: FC<MigrationChartsProps> = ({ prometheusUnavailable, vmi }) => {
+const MigrationCharts: FCC<MigrationChartsProps> = ({ prometheusUnavailable, vmi }) => {
   const { t } = useKubevirtTranslation();
 
   return (

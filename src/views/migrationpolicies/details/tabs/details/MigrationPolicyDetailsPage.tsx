@@ -1,5 +1,5 @@
-import React, { FC } from 'react';
-import { useLocation } from 'react-router-dom-v5-compat';
+import React, { FCC } from 'react';
+import { useLocation } from 'react-router';
 
 import { V1alpha1MigrationPolicy } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { PageSection } from '@patternfly/react-core';
@@ -12,7 +12,7 @@ type MigrationPolicyDetailsPageProps = {
   obj: V1alpha1MigrationPolicy;
 };
 
-const MigrationPolicyDetailsPage: FC<MigrationPolicyDetailsPageProps> = ({ obj: mp }) => {
+const MigrationPolicyDetailsPage: FCC<MigrationPolicyDetailsPageProps> = ({ obj: mp }) => {
   const location = useLocation();
   return (
     <div className="migration-policy-details-page">

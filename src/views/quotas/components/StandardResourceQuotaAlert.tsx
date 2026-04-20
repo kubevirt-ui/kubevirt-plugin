@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FCC, useState } from 'react';
 
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -18,7 +18,7 @@ type StandardResourceQuotaAlertProps = {
   namespace: string;
 };
 
-const StandardResourceQuotaAlert: FC<StandardResourceQuotaAlertProps> = ({
+const StandardResourceQuotaAlert: FCC<StandardResourceQuotaAlertProps> = ({
   className,
   namespace,
 }) => {

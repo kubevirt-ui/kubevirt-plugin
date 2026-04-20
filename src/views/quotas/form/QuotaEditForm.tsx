@@ -1,5 +1,5 @@
-import React, { FC } from 'react';
-import { useParams } from 'react-router-dom-v5-compat';
+import React, { FCC } from 'react';
+import { useParams } from 'react-router';
 
 import StateHandler from '@kubevirt-utils/components/StateHandler/StateHandler';
 import { SyncedEditor } from '@kubevirt-utils/components/SyncedEditor/SyncedEditor';
@@ -14,7 +14,7 @@ import QuotaFormTitle from './components/QuotaFormTitle';
 import QuotaFormEditor from './QuotaFormEditor';
 import QuotaYAMLEditor from './QuotaYAMLEditor';
 
-const QuotaEditForm: FC = () => {
+const QuotaEditForm: FCC = () => {
   const { name, ns: namespace } = useParams<{ name: string; ns?: string }>();
 
   const [quota, loaded, error] = useKubevirtWatchResource<ApplicationAwareQuota>({

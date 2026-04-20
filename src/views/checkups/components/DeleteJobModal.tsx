@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import ConfirmActionMessage from '@kubevirt-utils/components/ConfirmActionMessage/ConfirmActionMessage';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -20,7 +20,7 @@ type DeleteJobModalProps = {
   onDelete: () => void;
 };
 
-const DeleteJobModal: FC<DeleteJobModalProps> = ({
+const DeleteJobModal: FCC<DeleteJobModalProps> = ({
   isOpen,
   jobName,
   namespace,

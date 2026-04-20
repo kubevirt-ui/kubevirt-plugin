@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import ConfirmActionMessage from '@kubevirt-utils/components/ConfirmActionMessage/ConfirmActionMessage';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -20,7 +20,7 @@ type DeleteCheckupModalProps = {
   onDelete: () => void;
 };
 
-const DeleteCheckupModal: FC<DeleteCheckupModalProps> = ({
+const DeleteCheckupModal: FCC<DeleteCheckupModalProps> = ({
   isOpen,
   name,
   namespace,

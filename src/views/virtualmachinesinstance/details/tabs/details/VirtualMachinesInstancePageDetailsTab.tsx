@@ -1,5 +1,5 @@
-import React, { FC } from 'react';
-import { useLocation } from 'react-router-dom-v5-compat';
+import React, { FCC } from 'react';
+import { useLocation } from 'react-router';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { Divider, PageSection } from '@patternfly/react-core';
@@ -13,7 +13,7 @@ import './virtual-machines-instance-details-tab.scss';
 type VirtualMachinesInstancePageDetailsTabProps = {
   obj: V1VirtualMachineInstance;
 };
-const VirtualMachinesInstancePageDetailsTab: FC<VirtualMachinesInstancePageDetailsTabProps> = ({
+const VirtualMachinesInstancePageDetailsTab: FCC<VirtualMachinesInstancePageDetailsTabProps> = ({
   obj: vmi,
 }) => {
   const location = useLocation();

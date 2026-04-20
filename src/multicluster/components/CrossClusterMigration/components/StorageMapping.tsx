@@ -1,4 +1,4 @@
-import React, { FC, useMemo } from 'react';
+import React, { FCC, useMemo } from 'react';
 
 import { V1beta1StorageMap } from '@kubev2v/types';
 import { IoK8sApiStorageV1StorageClass } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
@@ -18,7 +18,7 @@ type StorageMappingProps = {
   storageMap: V1beta1StorageMap;
 };
 
-const StorageMapping: FC<StorageMappingProps> = ({
+const StorageMapping: FCC<StorageMappingProps> = ({
   changeStorageMap,
   storageClasses,
   storageMap,

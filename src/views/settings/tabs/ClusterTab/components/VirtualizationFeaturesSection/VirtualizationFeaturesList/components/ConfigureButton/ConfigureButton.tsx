@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
@@ -22,7 +22,7 @@ type ConfigureButtonProps = {
   spokeConsoleURL: string | undefined;
 };
 
-const ConfigureButton: FC<ConfigureButtonProps> = ({ spokeConsoleURL }) => {
+const ConfigureButton: FCC<ConfigureButtonProps> = ({ spokeConsoleURL }) => {
   const { t } = useKubevirtTranslation();
   const cluster = useSettingsCluster();
   const isSpokeCluster = useIsSettingsSpokeCluster();

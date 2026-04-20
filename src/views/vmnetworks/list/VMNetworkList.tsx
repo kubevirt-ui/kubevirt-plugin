@@ -1,4 +1,4 @@
-import React, { FC, useMemo } from 'react';
+import React, { FCC, useMemo } from 'react';
 
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
 import StateHandler from '@kubevirt-utils/components/StateHandler/StateHandler';
@@ -19,7 +19,7 @@ type VMNetworkListProps = {
   onCreate: () => void;
 };
 
-const VMNetworkList: FC<VMNetworkListProps> = ({ onCreate }) => {
+const VMNetworkList: FCC<VMNetworkListProps> = ({ onCreate }) => {
   const { t } = useKubevirtTranslation();
   const [vmNetworks, loaded, error] = useVMNetworks();
   const [data, filteredData, onFilterChange] = useListPageFilter(vmNetworks);

@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { modelToGroupVersionKind, PodModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { IoK8sApiCoreV1Pod } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
@@ -17,7 +17,7 @@ type VMPodDetailsItemProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const VMPodDetailsItem: FC<VMPodDetailsItemProps> = ({ pods, vmi }) => {
+const VMPodDetailsItem: FCC<VMPodDetailsItemProps> = ({ pods, vmi }) => {
   const { t } = useKubevirtTranslation();
 
   const launcherPod = getVMIPod(vmi, pods);

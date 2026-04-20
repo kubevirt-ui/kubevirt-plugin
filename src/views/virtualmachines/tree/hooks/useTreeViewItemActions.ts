@@ -1,5 +1,5 @@
 import { MouseEvent, useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom-v5-compat';
+import { useNavigate } from 'react-router';
 
 import { tourContextMenuTriggerSignal } from '@kubevirt-utils/components/GuidedTour/utils/guidedTourSignals';
 import useRemoveFolderQuery from '@kubevirt-utils/components/MoveVMToFolderModal/hooks/useRemoveFolderQuery';

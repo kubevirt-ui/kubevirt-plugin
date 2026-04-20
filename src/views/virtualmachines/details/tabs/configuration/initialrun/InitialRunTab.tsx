@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 import { VirtualMachineModel } from 'src/views/dashboard-extensions/utils';
 
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
@@ -16,7 +16,7 @@ import { ConfigurationInnerTabProps } from '../utils/types';
 import InitialRunTabCloudinit from './components/InitialRunTabCloudinit';
 import InitialRunTabSysprep from './components/InitialRunTabSysprep';
 
-const InitialRunTab: FC<ConfigurationInnerTabProps> = ({ vm, vmi }) => {
+const InitialRunTab: FCC<ConfigurationInnerTabProps> = ({ vm, vmi }) => {
   const { t } = useKubevirtTranslation();
   const accessReview = asAccessReview(VirtualMachineModel, vm, 'update' as K8sVerb);
   const [canUpdateVM] = useFleetAccessReview(accessReview || {});

@@ -1,4 +1,4 @@
-import React, { FC, ReactNode, useEffect, useState } from 'react';
+import React, { FCC, ReactNode, useEffect, useState } from 'react';
 
 import { HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -29,7 +29,7 @@ type GeneralSettingsProjectProps = {
   toggleText: string;
 };
 
-const GeneralSettingsProject: FC<GeneralSettingsProjectProps> = ({
+const GeneralSettingsProject: FCC<GeneralSettingsProjectProps> = ({
   description,
   hcoResourceNamespace,
   hyperConvergeConfiguration,

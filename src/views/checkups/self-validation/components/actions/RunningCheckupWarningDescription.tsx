@@ -1,5 +1,5 @@
-import React, { FC } from 'react';
-import { Link } from 'react-router-dom-v5-compat';
+import React, { FCC } from 'react';
+import { Link } from 'react-router';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getSelfValidationCheckupURL } from '@kubevirt-utils/resources/checkups/urls';
@@ -16,7 +16,7 @@ type RunningCheckupWarningDescriptionProps = {
   showTitle?: boolean;
 };
 
-const RunningCheckupWarningDescription: FC<RunningCheckupWarningDescriptionProps> = ({
+const RunningCheckupWarningDescription: FCC<RunningCheckupWarningDescriptionProps> = ({
   configMapCluster,
   configMapName,
   configMapNamespace,

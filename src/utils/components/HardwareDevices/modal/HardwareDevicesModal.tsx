@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FCC, useState } from 'react';
 
 import { produceVMDevices } from '@catalog/utils/WizardVMContext';
 import {
@@ -35,7 +35,7 @@ type HardwareDevicesModalProps = {
   vmi?: V1VirtualMachineInstance;
 };
 
-const HardwareDevicesModal: FC<HardwareDevicesModalProps> = ({
+const HardwareDevicesModal: FCC<HardwareDevicesModalProps> = ({
   btnText,
   headerText,
   initialDevices,

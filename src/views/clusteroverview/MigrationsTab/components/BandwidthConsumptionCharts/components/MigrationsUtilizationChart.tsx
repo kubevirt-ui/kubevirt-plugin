@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { tickLabels } from '@kubevirt-utils/components/Charts/ChartLabels/styleOverrides';
 import useResponsiveCharts from '@kubevirt-utils/components/Charts/hooks/useResponsiveCharts';
@@ -21,7 +21,7 @@ type MigrationsUtilizationChartProps = {
   title: string;
 };
 
-const MigrationsUtilizationChart: FC<MigrationsUtilizationChartProps> = ({
+const MigrationsUtilizationChart: FCC<MigrationsUtilizationChartProps> = ({
   chartData,
   domain = null,
   labels,

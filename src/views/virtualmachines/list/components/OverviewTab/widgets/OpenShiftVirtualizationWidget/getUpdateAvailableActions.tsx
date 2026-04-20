@@ -1,5 +1,5 @@
-import React, { FC } from 'react';
-import { Link } from 'react-router-dom-v5-compat';
+import React, { FCC } from 'react';
+import { Link } from 'react-router';
 
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -12,7 +12,7 @@ type UpdateAvailableActionProps = {
   updateAvailable: boolean;
 };
 
-const UpdateAvailableAction: FC<UpdateAvailableActionProps> = ({
+const UpdateAvailableAction: FCC<UpdateAvailableActionProps> = ({
   isSpokeCluster,
   operatorLink,
   operatorLinkExternal,

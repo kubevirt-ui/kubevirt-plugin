@@ -1,4 +1,4 @@
-import React, { FC, memo } from 'react';
+import React, { FCC, memo } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
@@ -10,7 +10,7 @@ type DiskReviewTableProps = {
   disks: DiskRowDataLayout[];
 };
 
-const DisksReviewTable: FC<DiskReviewTableProps> = memo(({ disks }) => {
+const DisksReviewTable: FCC<DiskReviewTableProps> = memo(({ disks }) => {
   const { t } = useKubevirtTranslation();
 
   return (

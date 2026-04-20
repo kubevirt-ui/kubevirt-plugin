@@ -1,4 +1,4 @@
-import React, { FC, MouseEvent, useState } from 'react';
+import React, { FCC, MouseEvent, useState } from 'react';
 
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -20,7 +20,7 @@ type WorkloadProfileModalProps = {
   onSubmit: (workload: WORKLOADS) => Promise<K8sResourceCommon | void>;
 };
 
-const WorkloadProfileModal: FC<WorkloadProfileModalProps> = ({
+const WorkloadProfileModal: FCC<WorkloadProfileModalProps> = ({
   initialWorkload,
   isOpen,
   onClose,

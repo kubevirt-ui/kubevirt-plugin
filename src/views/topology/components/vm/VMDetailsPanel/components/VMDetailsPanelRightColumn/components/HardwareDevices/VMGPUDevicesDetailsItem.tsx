@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
@@ -16,7 +16,7 @@ type VMGPUDevicesDetailsItemProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const VMGPUDevicesDetailsItem: FC<VMGPUDevicesDetailsItemProps> = ({ vm, vmi }) => {
+const VMGPUDevicesDetailsItem: FCC<VMGPUDevicesDetailsItemProps> = ({ vm, vmi }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const gpus = getGPUDevices(vm);

@@ -23,7 +23,7 @@ type DataImportCronDetailsGridProps = {
   dataImportCron: V1beta1DataImportCron;
 };
 
-export const DataImportCronDetailsGrid: React.FC<DataImportCronDetailsGridProps> = ({
+export const DataImportCronDetailsGrid: React.FCC<DataImportCronDetailsGridProps> = ({
   dataImportCron,
 }) => {
   const { createModal } = useModal();

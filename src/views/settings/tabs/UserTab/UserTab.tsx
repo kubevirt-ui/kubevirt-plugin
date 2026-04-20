@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { Divider } from '@patternfly/react-core';
 import { useIsSettingsSpokeCluster } from '@settings/context/SettingsClusterContext';
@@ -9,7 +9,7 @@ import TaskPermissionsSection from './components/TaskPermissionsSection/TaskPerm
 
 import './user-tab.scss';
 
-const UserTab: FC = () => {
+const UserTab: FCC = () => {
   const isSpokeCluster = useIsSettingsSpokeCluster();
 
   return (

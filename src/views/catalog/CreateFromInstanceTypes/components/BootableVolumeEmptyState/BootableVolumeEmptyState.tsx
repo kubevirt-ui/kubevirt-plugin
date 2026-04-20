@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 import { Trans } from 'react-i18next';
 
 import AddBootableVolumeLink from '@catalog/CreateFromInstanceTypes/components/AddBootableVolumeLink/AddBootableVolumeLink';
@@ -9,7 +9,7 @@ import { EmptyState, Title } from '@patternfly/react-core';
 
 import './BootableVolumeEmptyState.scss';
 
-const BootableVolumeEmptyState: FC = () => {
+const BootableVolumeEmptyState: FCC = () => {
   const { t } = useKubevirtTranslation();
   const { loadError } = useInstanceTypesAndPreferences();
 

@@ -1,4 +1,4 @@
-import React, { Dispatch, FC, MouseEvent, SetStateAction } from 'react';
+import React, { Dispatch, FCC, MouseEvent, SetStateAction } from 'react';
 
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import { describeNetworkState } from '@kubevirt-utils/components/NetworkIcons/utils';
@@ -12,7 +12,7 @@ type NetworkInterfaceLinkStateProps = {
   setLinkState: Dispatch<SetStateAction<string>>;
 };
 
-const NetworkInterfaceLinkState: FC<NetworkInterfaceLinkStateProps> = ({
+const NetworkInterfaceLinkState: FCC<NetworkInterfaceLinkStateProps> = ({
   isDisabled,
   linkState,
   setLinkState,

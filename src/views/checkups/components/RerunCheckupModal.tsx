@@ -1,4 +1,4 @@
-import React, { FC, ReactNode } from 'react';
+import React, { FCC, ReactNode } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -21,7 +21,7 @@ type RerunCheckupModalProps =
   | (RerunCheckupModalPropsBase & { onConfirm: () => Promise<void> | void; variant: 'warning' })
   | (RerunCheckupModalPropsBase & { onConfirm?: never; variant: 'error' });
 
-const RerunCheckupModal: FC<RerunCheckupModalProps> = ({
+const RerunCheckupModal: FCC<RerunCheckupModalProps> = ({
   isOpen,
   message,
   onClose,

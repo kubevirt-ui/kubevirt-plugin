@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ListPageHeader } from '@openshift-console/dynamic-plugin-sdk';
@@ -9,7 +9,7 @@ type VirtualMachinesListPageHeaderProps = {
   namespace: string;
 };
 
-const VirtualMachinesListPageHeader: FC<VirtualMachinesListPageHeaderProps> = ({ namespace }) => {
+const VirtualMachinesListPageHeader: FCC<VirtualMachinesListPageHeaderProps> = ({ namespace }) => {
   const { t } = useKubevirtTranslation();
 
   return (

@@ -3,7 +3,7 @@ import * as React from 'react';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Content, ContentVariants } from '@patternfly/react-core';
 
-const AffinityDescriptionText: React.FC = () => {
+const AffinityDescriptionText: React.FCC = () => {
   const { t } = useKubevirtTranslation();
   return (
     <>

@@ -1,5 +1,5 @@
-import React, { FC, ReactNode, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom-v5-compat';
+import React, { FCC, ReactNode, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router';
 
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
@@ -32,7 +32,7 @@ type CheckupsSelfValidationFormActionsProps = {
   testSkips?: string;
 };
 
-const CheckupsSelfValidationFormActions: FC<CheckupsSelfValidationFormActionsProps> = ({
+const CheckupsSelfValidationFormActions: FCC<CheckupsSelfValidationFormActionsProps> = ({
   checkupImage,
   isDryRun,
   name,

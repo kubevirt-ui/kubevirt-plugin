@@ -1,5 +1,5 @@
-import React, { FC, useState } from 'react';
-import { useNavigate } from 'react-router-dom-v5-compat';
+import React, { FCC, useState } from 'react';
+import { useNavigate } from 'react-router';
 
 import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
 import { useIsWindowsBootableVolume } from '@catalog/CreateFromInstanceTypes/utils/utils';
@@ -48,7 +48,7 @@ import useGeneratedVM from './hooks/useGeneratedVM';
 
 import './CreateVMFooter.scss';
 
-const CreateVMFooter: FC = () => {
+const CreateVMFooter: FCC = () => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
   const cluster = useClusterParam();

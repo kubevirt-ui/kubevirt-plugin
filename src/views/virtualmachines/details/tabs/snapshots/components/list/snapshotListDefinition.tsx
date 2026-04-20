@@ -1,5 +1,5 @@
-import React, { FC, ReactNode } from 'react';
-import { TFunction } from 'react-i18next';
+import React, { FCC, ReactNode } from 'react';
+import { TFunction } from 'i18next';
 
 import { VirtualMachineSnapshotModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
@@ -28,7 +28,7 @@ type SnapshotCellProps = {
   row: V1beta1VirtualMachineSnapshot;
 };
 
-const NameCell: FC<SnapshotCellProps> = ({ row }) => {
+const NameCell: FCC<SnapshotCellProps> = ({ row }) => {
   const name = getName(row);
   return (
     <span data-test-id={`snapshot-${name}`}>
@@ -42,19 +42,19 @@ const NameCell: FC<SnapshotCellProps> = ({ row }) => {
   );
 };
 
-const CreatedCell: FC<SnapshotCellProps> = ({ row }) => (
+const CreatedCell: FCC<SnapshotCellProps> = ({ row }) => (
   <span data-test-id={`snapshot-created-${getName(row)}`}>
     <Timestamp timestamp={row?.metadata?.creationTimestamp} />
   </span>
 );
 
-const StatusCell: FC<SnapshotCellProps> = ({ row }) => (
+const StatusCell: FCC<SnapshotCellProps> = ({ row }) => (
   <span data-test-id={`snapshot-status-${getName(row)}`}>
     <SnapshotStatusIcon phase={row?.status?.phase} />
   </span>
 );
 
-const LastRestoredCell: FC<SnapshotCellProps> = ({ callbacks, row }) => {
+const LastRestoredCell: FCC<SnapshotCellProps> = ({ callbacks, row }) => {
   const relevantRestore = callbacks?.restores?.[getName(row)];
   return <Timestamp timestamp={relevantRestore?.status?.restoreTime} />;
 };

@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { MigrationPolicyModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1alpha1MigrationPolicy } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -21,7 +21,7 @@ type CellProps = {
   row: V1alpha1MigrationPolicy;
 };
 
-export const NameCell: FC<CellProps> = ({ row }) => {
+export const NameCell: FCC<CellProps> = ({ row }) => {
   const isACMPage = useIsACMPage();
   const cluster = getCluster(row);
 
@@ -36,7 +36,7 @@ export const NameCell: FC<CellProps> = ({ row }) => {
   );
 };
 
-export const ClusterCell: FC<CellProps> = ({ row }) => {
+export const ClusterCell: FCC<CellProps> = ({ row }) => {
   const cluster = getCluster(row);
 
   return (
@@ -44,7 +44,7 @@ export const ClusterCell: FC<CellProps> = ({ row }) => {
   );
 };
 
-export const BandwidthCell: FC<CellProps> = ({ row }) => {
+export const BandwidthCell: FCC<CellProps> = ({ row }) => {
   const hasBandwidth = migrationPolicySpecKeys.BANDWIDTH_PER_MIGRATION in (row?.spec || {});
 
   return (
@@ -54,7 +54,7 @@ export const BandwidthCell: FC<CellProps> = ({ row }) => {
   );
 };
 
-export const AutoConvergeCell: FC<CellProps> = ({ row }) => {
+export const AutoConvergeCell: FCC<CellProps> = ({ row }) => {
   const hasAutoConverge = migrationPolicySpecKeys.ALLOW_AUTO_CONVERGE in (row?.spec || {});
 
   return (
@@ -64,7 +64,7 @@ export const AutoConvergeCell: FC<CellProps> = ({ row }) => {
   );
 };
 
-export const PostCopyCell: FC<CellProps> = ({ row }) => {
+export const PostCopyCell: FCC<CellProps> = ({ row }) => {
   const hasPostCopy = migrationPolicySpecKeys.ALLOW_POST_COPY in (row?.spec || {});
 
   return (
@@ -74,7 +74,7 @@ export const PostCopyCell: FC<CellProps> = ({ row }) => {
   );
 };
 
-export const CompletionTimeoutCell: FC<CellProps> = ({ row }) => {
+export const CompletionTimeoutCell: FCC<CellProps> = ({ row }) => {
   const hasCompletionTimeout =
     migrationPolicySpecKeys.COMPLETION_TIMEOUT_PER_GIB in (row?.spec || {});
 
@@ -87,13 +87,13 @@ export const CompletionTimeoutCell: FC<CellProps> = ({ row }) => {
   );
 };
 
-export const ProjectLabelsCell: FC<CellProps> = ({ row }) => (
+export const ProjectLabelsCell: FCC<CellProps> = ({ row }) => (
   <span data-test={`migration-policy-project-labels-${getName(row)}`}>
     <MigrationPolicySelectorList selector={row?.spec?.selectors?.namespaceSelector} />
   </span>
 );
 
-export const VMLabelsCell: FC<CellProps> = ({ row }) => (
+export const VMLabelsCell: FCC<CellProps> = ({ row }) => (
   <span data-test={`migration-policy-vm-labels-${getName(row)}`}>
     <MigrationPolicySelectorList
       isVMILabel
@@ -102,6 +102,6 @@ export const VMLabelsCell: FC<CellProps> = ({ row }) => (
   </span>
 );
 
-export const ActionsCell: FC<CellProps> = ({ row }) => (
+export const ActionsCell: FCC<CellProps> = ({ row }) => (
   <MigrationPoliciesActions isKebabToggle mp={row} />
 );

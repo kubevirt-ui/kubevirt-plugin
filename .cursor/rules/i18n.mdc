@@ -61,7 +61,7 @@ const { t } = useKubevirtTranslation();
 ### In Non-React Utility Functions
 Accept `t` as a parameter typed with `TFunction` from `react-i18next`:
 ```tsx
-import { TFunction } from 'react-i18next';
+import { TFunction } from 'i18next';
 
 export const getColumns = (t: TFunction) => [
   { label: t('Name'), key: 'name' },
@@ -72,7 +72,7 @@ export const getColumns = (t: TFunction) => [
 ### For Constants and Config Files
 Always accept `t` as a parameter -- never import `{ t }` directly:
 ```tsx
-import { TFunction } from 'react-i18next';
+import { TFunction } from 'i18next';
 
 // CORRECT - t is passed in, caller provides it from the hook
 export const getPageTitle = (t: TFunction) => t('Virtual Machines');
@@ -93,7 +93,7 @@ export const PAGE_TITLE = t('Virtual Machines');
 const getLabel = (t: (key: string) => string) => t('Name');
 
 // CORRECT - accept t: TFunction as a parameter
-import { TFunction } from 'react-i18next';
+import { TFunction } from 'i18next';
 export const getLabel = (t: TFunction) => t('Name');
 ```
 

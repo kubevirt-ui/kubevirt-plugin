@@ -1,4 +1,4 @@
-import React, { FC, ReactNode, useMemo } from 'react';
+import React, { FCC, ReactNode, useMemo } from 'react';
 import classNames from 'classnames';
 
 import { DescriptionItemHeader } from '@kubevirt-utils/components/DescriptionItem/DescriptionItemHeader';
@@ -43,7 +43,7 @@ type DescriptionItemProps = {
   subTitle?: string;
 };
 
-const DescriptionItem: FC<DescriptionItemProps> = ({
+const DescriptionItem: FCC<DescriptionItemProps> = ({
   additionalContent,
   bodyContent,
   breadcrumb,

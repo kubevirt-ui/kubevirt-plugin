@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { useNavigate } from 'react-router-dom-v5-compat';
+import { useNavigate } from 'react-router';
 
 import DeleteModal from '@kubevirt-utils/components/DeleteModal/DeleteModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';

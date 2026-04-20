@@ -1,5 +1,5 @@
-import React, { FC, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom-v5-compat';
+import React, { FCC, useMemo } from 'react';
+import { useNavigate } from 'react-router';
 
 import { DataSourceModelRef } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
@@ -34,7 +34,7 @@ type DataSourcesListProps = {
   namespace: string;
 };
 
-const DataSourcesList: FC<DataSourcesListProps> = ({ kind, namespace }) => {
+const DataSourcesList: FCC<DataSourcesListProps> = ({ kind, namespace }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const navigate = useNavigate();

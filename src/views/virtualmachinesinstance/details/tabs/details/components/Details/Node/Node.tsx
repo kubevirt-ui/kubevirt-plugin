@@ -8,7 +8,7 @@ type NodeProps = {
   nodeName: string;
 };
 
-const Node: React.FC<NodeProps> = ({ nodeName }) => {
+const Node: React.FCC<NodeProps> = ({ nodeName }) => {
   const { t } = useKubevirtTranslation();
   return nodeName ? (
     <ResourceLink kind={NodeModel.kind} name={nodeName} />

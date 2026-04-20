@@ -1,4 +1,4 @@
-import React, { FC, Suspense } from 'react';
+import React, { FCC, Suspense } from 'react';
 
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -10,7 +10,7 @@ import { NavPageComponentProps } from '@virtualmachines/details/utils/types';
 
 import './VirtualMachinePageEventsTab.scss';
 
-const VirtualMachinePageEventsTab: FC<NavPageComponentProps> = ({ obj: vm }) => {
+const VirtualMachinePageEventsTab: FCC<NavPageComponentProps> = ({ obj: vm }) => {
   const { t } = useKubevirtTranslation();
 
   return (

@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 import { FieldPath, useFormContext } from 'react-hook-form';
 
 import { V1DiskFormState } from '@kubevirt-utils/components/DiskModal/utils/types';
@@ -25,7 +25,7 @@ type DiskSourceUrlInputProps = {
   os: string;
 };
 
-const DiskSourceContainer: FC<DiskSourceUrlInputProps> = ({
+const DiskSourceContainer: FCC<DiskSourceUrlInputProps> = ({
   fieldName,
   isEphemeralDiskSource = false,
   os,

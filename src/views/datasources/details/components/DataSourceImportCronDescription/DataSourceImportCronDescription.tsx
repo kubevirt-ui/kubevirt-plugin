@@ -14,7 +14,7 @@ type DataSourceImportCronDescriptionProps = {
   namespace: string;
 };
 
-const DataSourceImportCronDescription: React.FC<DataSourceImportCronDescriptionProps> = ({
+const DataSourceImportCronDescription: React.FCC<DataSourceImportCronDescriptionProps> = ({
   dataImportCronName,
   namespace,
 }) => {

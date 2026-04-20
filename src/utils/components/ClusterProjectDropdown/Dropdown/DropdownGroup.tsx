@@ -1,4 +1,4 @@
-import React, { FC, JSX } from 'react';
+import React, { FCC, JSX } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Divider, MenuGroup, MenuItem, MenuList, TooltipPosition } from '@patternfly/react-core';
@@ -13,7 +13,7 @@ type DropdownGroupProps = {
   selectedKey: string;
 };
 
-const DropdownGroup: FC<DropdownGroupProps> = ({
+const DropdownGroup: FCC<DropdownGroupProps> = ({
   config,
   favorites,
   isFavorites,

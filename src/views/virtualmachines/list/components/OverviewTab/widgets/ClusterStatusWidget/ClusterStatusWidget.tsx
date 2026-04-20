@@ -1,4 +1,4 @@
-import React, { FC, useMemo } from 'react';
+import React, { FCC, useMemo } from 'react';
 
 import useIsAllClustersPage from '@multicluster/hooks/useIsAllClustersPage';
 import {
@@ -23,7 +23,7 @@ import ClustersUtilizationCard from './components/ClustersUtilizationCard/Cluste
 import NodeLoadDistributionCard from './components/NodeLoadDistributionCard/NodeLoadDistributionCard';
 import useClusterUtilizationData from './hooks/useClusterUtilizationData';
 
-const ClusterStatusWidget: FC<OverviewSectionData> = ({
+const ClusterStatusWidget: FCC<OverviewSectionData> = ({
   cluster,
   metricsUnavailable,
   title,

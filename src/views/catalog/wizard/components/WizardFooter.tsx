@@ -1,5 +1,5 @@
-import React, { FC, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom-v5-compat';
+import React, { FCC, useCallback } from 'react';
+import { useNavigate } from 'react-router';
 
 import { useWizardSourceAvailable } from '@catalog/utils/useWizardSourceAvailable';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
@@ -38,7 +38,7 @@ import { clearSessionStorageVM, useWizardVMContext } from '../../utils/WizardVMC
 
 import { WizardNoBootModal } from './WizardNoBootModal';
 
-export const WizardFooter: FC<{ namespace: string }> = ({ namespace }) => {
+export const WizardFooter: FCC<{ namespace: string }> = ({ namespace }) => {
   const navigate = useNavigate();
   const cluster = useClusterParam();
   const { t } = useKubevirtTranslation();

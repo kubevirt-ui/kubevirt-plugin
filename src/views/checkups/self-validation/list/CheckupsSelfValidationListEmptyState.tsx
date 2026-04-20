@@ -1,4 +1,4 @@
-import React, { FC, useMemo, useState } from 'react';
+import React, { FCC, useMemo, useState } from 'react';
 
 import { IoK8sApiRbacV1ClusterRoleBinding } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
@@ -21,7 +21,7 @@ type CheckupsSelfValidationListEmptyStateProps = {
   loadingPermissions: boolean;
 };
 
-const CheckupsSelfValidationListEmptyState: FC<CheckupsSelfValidationListEmptyStateProps> = ({
+const CheckupsSelfValidationListEmptyState: FCC<CheckupsSelfValidationListEmptyStateProps> = ({
   clusterRoleBinding: _clusterRoleBinding,
   isPermitted,
   isPermittedToInstall,

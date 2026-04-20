@@ -1,5 +1,5 @@
-import React, { FC } from 'react';
-import { Link } from 'react-router-dom-v5-compat';
+import React, { FCC } from 'react';
+import { Link } from 'react-router';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { OS_IMAGE_LINKS, OS_NAME_TYPES } from '@kubevirt-utils/resources/template';
@@ -7,7 +7,7 @@ import { OS_IMAGE_LINKS, OS_NAME_TYPES } from '@kubevirt-utils/resources/templat
 import { urlSourceHelperTextMapper } from './utils/constants';
 import { DiskSourceUrlInputProps } from './utils/types';
 
-const URLSourceHelperText: FC<DiskSourceUrlInputProps> = ({ os }) => {
+const URLSourceHelperText: FCC<DiskSourceUrlInputProps> = ({ os }) => {
   const { t } = useKubevirtTranslation();
   const { afterLabelText, beforeLabelText, label } =
     urlSourceHelperTextMapper[os || OS_NAME_TYPES.fedora];

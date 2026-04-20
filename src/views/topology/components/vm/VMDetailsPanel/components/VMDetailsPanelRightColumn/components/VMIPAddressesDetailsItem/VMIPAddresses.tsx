@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Button, ButtonVariant, Popover, PopoverPosition } from '@patternfly/react-core';
@@ -9,7 +9,7 @@ type VMIPAddressesProps = {
   ipAddresses: string[];
 };
 
-const VMIPAddresses: FC<VMIPAddressesProps> = ({ ipAddresses }) => {
+const VMIPAddresses: FCC<VMIPAddressesProps> = ({ ipAddresses }) => {
   const { t } = useKubevirtTranslation();
   const numIPs = ipAddresses?.length;
   const multipleIPsExist = numIPs > 1;

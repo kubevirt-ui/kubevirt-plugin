@@ -1,5 +1,5 @@
-import React, { FC, MouseEventHandler, useCallback, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom-v5-compat';
+import React, { FCC, MouseEventHandler, useCallback, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router';
 import { useImmer } from 'use-immer';
 
 import { TemplateParameter, V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -32,7 +32,7 @@ type TemplateParametersPageProps = {
   obj?: V1Template;
 };
 
-const TemplateParametersPage: FC<TemplateParametersPageProps> = ({ obj: template }) => {
+const TemplateParametersPage: FCC<TemplateParametersPageProps> = ({ obj: template }) => {
   const { t } = useKubevirtTranslation();
   const [editableTemplate, setEditableTemplate] = useImmer(template);
 

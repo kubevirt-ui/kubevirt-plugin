@@ -1,4 +1,4 @@
-import React, { FC, JSX, useMemo } from 'react';
+import React, { FCC, JSX, useMemo } from 'react';
 
 import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import Dropdown, {
@@ -20,7 +20,7 @@ type NamespaceDropdownProps = {
   selectedProject: string;
 };
 
-const NamespaceDropdown: FC<NamespaceDropdownProps> = ({
+const NamespaceDropdown: FCC<NamespaceDropdownProps> = ({
   cluster,
   disabled = false,
   disabledTooltip,

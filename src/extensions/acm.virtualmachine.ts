@@ -1,12 +1,12 @@
 import { ComponentType, ReactNode } from 'react';
 
-import { Extension, ExtensionDeclaration } from '@openshift-console/dynamic-plugin-sdk/lib/types';
+import { Extension } from '@openshift-console/dynamic-plugin-sdk/lib/types';
 import { TooltipProps } from '@patternfly/react-core';
 import { ITransform } from '@patternfly/react-table';
 
 // TODO: all ACM extension declarations should be provided by '@stolostron/multicluster-sdk'
 
-export type ACMVirtualMachineListColumn = ExtensionDeclaration<
+export type ACMVirtualMachineListColumn = Extension<
   'acm.virtualmachine/list/column',
   {
     /** component type */
@@ -22,7 +22,7 @@ export type ACMVirtualMachineListColumn = ExtensionDeclaration<
   }
 >;
 
-export type ACMVirtualMachineAction = ExtensionDeclaration<
+export type ACMVirtualMachineAction = Extension<
   'acm.virtualmachine/action',
   {
     /** Inject a separator horizontal rule immediately before an action */

@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
@@ -13,7 +13,7 @@ type DeschedulerProps = {
   template: V1Template;
 };
 
-const Descheduler: FC<DeschedulerProps> = ({ template }) => {
+const Descheduler: FCC<DeschedulerProps> = ({ template }) => {
   const { t } = useKubevirtTranslation();
   const { deschedulerEnabled, deschedulerSwitchDisabled, onDeschedulerChange } =
     useDeschedulerSetting(template);

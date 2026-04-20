@@ -1,4 +1,4 @@
-import React, { ChangeEvent, FC } from 'react';
+import React, { ChangeEvent, FCC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { BinaryUnit } from '@kubevirt-utils/utils/unitConstants';
@@ -24,7 +24,7 @@ type CapacityInputProps = {
   size: string;
 };
 
-const CapacityInput: FC<CapacityInputProps> = ({
+const CapacityInput: FCC<CapacityInputProps> = ({
   helperText,
   isDisabled,
   isEditingCreatedDisk,

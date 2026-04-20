@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import usePermissions from '@kubevirt-utils/hooks/usePermissions/usePermissions';
@@ -10,7 +10,7 @@ import { Divider, Flex, FlexItem, Skeleton, Title } from '@patternfly/react-core
 import ExpandSection from '@settings/ExpandSection/ExpandSection';
 import { USER_TAB_IDS } from '@settings/search/constants';
 
-const TaskPermissionsSection: FC = () => {
+const TaskPermissionsSection: FCC = () => {
   const { t } = useKubevirtTranslation();
   const { capabilitiesData, isLoading } = usePermissions();
   return (

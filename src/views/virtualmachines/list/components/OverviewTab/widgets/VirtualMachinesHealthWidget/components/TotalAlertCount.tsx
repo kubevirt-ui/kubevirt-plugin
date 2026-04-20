@@ -1,5 +1,5 @@
-import React, { FC } from 'react';
-import { Link } from 'react-router-dom-v5-compat';
+import React, { FCC } from 'react';
+import { Link } from 'react-router';
 
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 
@@ -13,7 +13,7 @@ type TotalAlertCountProps = {
   totalAlerts: number;
 };
 
-const TotalAlertCount: FC<TotalAlertCountProps> = ({
+const TotalAlertCount: FCC<TotalAlertCountProps> = ({
   alertsBaseHref,
   alertsBasePath,
   hasError,

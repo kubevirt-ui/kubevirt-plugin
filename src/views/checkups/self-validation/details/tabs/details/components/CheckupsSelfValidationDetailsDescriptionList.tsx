@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 import CheckupsStatusIcon from 'src/views/checkups/CheckupsStatusIcon';
 
 import { modelToGroupVersionKind, NamespaceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -28,7 +28,7 @@ type CheckupsSelfValidationDetailsDescriptionListProps = {
   results: JobResults | null;
 };
 
-const CheckupsSelfValidationDetailsDescriptionList: FC<
+const CheckupsSelfValidationDetailsDescriptionList: FCC<
   CheckupsSelfValidationDetailsDescriptionListProps
 > = ({ configMap, error, isJobCompleted, isJobFailed, job, loading, results }) => {
   const { t } = useKubevirtTranslation();

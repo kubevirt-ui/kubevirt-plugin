@@ -1,5 +1,5 @@
-import React, { FC, useMemo } from 'react';
-import { Link } from 'react-router-dom-v5-compat';
+import React, { FCC, useMemo } from 'react';
+import { Link } from 'react-router';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
@@ -19,7 +19,7 @@ type VirtualMachinesOverviewTabDisksProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const VirtualMachinesOverviewTabDisks: FC<VirtualMachinesOverviewTabDisksProps> = ({ vm, vmi }) => {
+const VirtualMachinesOverviewTabDisks: FCC<VirtualMachinesOverviewTabDisksProps> = ({ vm, vmi }) => {
   const { t } = useKubevirtTranslation();
   const [disks, loaded, loadError] = useDisksTableData(vm, vmi);
   const columns = useMemo(() => getOverviewDisksColumns(t), [t]);

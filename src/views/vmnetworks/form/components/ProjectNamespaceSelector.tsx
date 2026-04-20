@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
 import LabelsList from '@kubevirt-utils/components/NodeSelectorModal/components/LabelList';
@@ -11,7 +11,7 @@ import { VMNetworkForm } from '../constants';
 
 import SelectedProjects from './SelectedProjects';
 
-const ProjectNamespaceSelector: FC = () => {
+const ProjectNamespaceSelector: FCC = () => {
   const { t } = useKubevirtTranslation();
   const { control, watch } = useFormContext<VMNetworkForm>();
   const matchLabels = watch('network.spec.namespaceSelector.matchLabels') || {};

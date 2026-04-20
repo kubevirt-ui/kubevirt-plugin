@@ -1,4 +1,4 @@
-import React, { ChangeEvent, FC } from 'react';
+import React, { ChangeEvent, FCC } from 'react';
 
 import ContainerSource from '@catalog/templatescatalog/components/TemplatesCatalogDrawer/StorageSection/CustomizeSource/Sources/ContainerSource';
 import { formatRegistryURL } from '@kubevirt-utils/components/AddBootableVolumeModal/utils/utils';
@@ -12,7 +12,7 @@ type RegistrySourceProps = {
   setBootableVolumeField: SetBootableVolumeFieldType;
 };
 
-const RegistrySource: FC<RegistrySourceProps> = ({ bootableVolume, setBootableVolumeField }) => {
+const RegistrySource: FCC<RegistrySourceProps> = ({ bootableVolume, setBootableVolumeField }) => {
   const { t } = useKubevirtTranslation();
   const { registryCredentials = { password: '', username: '' }, registryURL = '' } = bootableVolume;
 

@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import PlugCircleCheckIcon from '@kubevirt-utils/components/NetworkIcons/PlugCircleCheckIcon';
 import { Tooltip, TooltipPosition } from '@patternfly/react-core';
@@ -8,7 +8,7 @@ import StateText from './StateText';
 
 import './LinkStateIcon.scss';
 
-const LinkStateUpIcon: FC<NetworkIconProps> = ({ configuredState, runtimeState }) => {
+const LinkStateUpIcon: FCC<NetworkIconProps> = ({ configuredState, runtimeState }) => {
   return (
     <Tooltip
       content={

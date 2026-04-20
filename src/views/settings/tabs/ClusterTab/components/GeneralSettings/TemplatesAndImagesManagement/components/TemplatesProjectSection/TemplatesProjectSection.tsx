@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 import { Trans } from 'react-i18next';
 
 import { HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
@@ -21,7 +21,7 @@ type TemplatesProjectSectionProps = {
   projectsData: [projects: K8sResourceCommon[], loaded: boolean, error: any];
 };
 
-const TemplatesProjectSection: FC<TemplatesProjectSectionProps> = ({
+const TemplatesProjectSection: FCC<TemplatesProjectSectionProps> = ({
   hyperConvergeConfiguration,
   projectsData,
 }) => {

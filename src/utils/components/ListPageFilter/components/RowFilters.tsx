@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -26,7 +26,7 @@ type RowFiltersProps = {
   updateRowFilterSelected: (id: string[]) => void;
 };
 
-const RowFilters: FC<RowFiltersProps> = ({
+const RowFilters: FCC<RowFiltersProps> = ({
   filters,
   filtersNameMap,
   generatedRowFilters,

@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-utils/models';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
@@ -10,7 +10,7 @@ type ProjectNameCellProps = {
   row: ProjectWithVMCount;
 };
 
-const ProjectNameCell: FC<ProjectNameCellProps> = ({ row }) => {
+const ProjectNameCell: FCC<ProjectNameCellProps> = ({ row }) => {
   const { projectName } = row;
 
   if (!projectName) {

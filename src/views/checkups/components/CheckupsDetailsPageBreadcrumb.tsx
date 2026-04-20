@@ -1,5 +1,5 @@
-import React, { FC } from 'react';
-import { useNavigate } from 'react-router-dom-v5-compat';
+import React, { FCC } from 'react';
+import { useNavigate } from 'react-router';
 
 import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
@@ -14,7 +14,7 @@ type CheckupsDetailsPageBreadcrumbProps = {
   parentLabel: string;
 };
 
-const CheckupsDetailsPageBreadcrumb: FC<CheckupsDetailsPageBreadcrumbProps> = ({
+const CheckupsDetailsPageBreadcrumb: FCC<CheckupsDetailsPageBreadcrumbProps> = ({
   checkupType,
   detailsLabel,
   parentLabel,

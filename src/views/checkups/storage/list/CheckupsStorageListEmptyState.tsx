@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FCC, useState } from 'react';
 
 import { IoK8sApiRbacV1ClusterRoleBinding } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
@@ -15,7 +15,7 @@ type CheckupsStorageListEmptyStateProps = {
   loadingPermissions: boolean;
 };
 
-const CheckupsStorageListEmptyState: FC<CheckupsStorageListEmptyStateProps> = ({
+const CheckupsStorageListEmptyState: FCC<CheckupsStorageListEmptyStateProps> = ({
   clusterRoleBinding,
   isPermitted,
   isPermittedToInstall,

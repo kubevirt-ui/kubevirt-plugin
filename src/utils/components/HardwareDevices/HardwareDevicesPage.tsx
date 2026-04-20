@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { V1PciHostDevice } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
@@ -9,7 +9,7 @@ import { Bullseye, Flex, PageSection, PopoverPosition, Title } from '@patternfly
 import useHCPermittedHostDevices from './hooks/useHCPermittedHostDevices';
 import HardwareDevicesPageTable from './HardwareDevicesPageTable';
 
-const HardwareDevicesPage: FC<any> = (props) => {
+const HardwareDevicesPage: FCC<any> = (props) => {
   const { t } = useKubevirtTranslation();
   const { hcError, hcLoaded, permittedHostDevices } = useHCPermittedHostDevices();
 

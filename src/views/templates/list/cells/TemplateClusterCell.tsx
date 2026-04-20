@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { modelToGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { TemplateOrRequest } from '@kubevirt-utils/resources/template';
@@ -11,7 +11,7 @@ type TemplateClusterCellProps = {
   row: TemplateOrRequest;
 };
 
-const TemplateClusterCell: FC<TemplateClusterCellProps> = ({ row }) => {
+const TemplateClusterCell: FCC<TemplateClusterCellProps> = ({ row }) => {
   const [hubClusterName] = useHubClusterName();
   const cluster = getCluster(row) || hubClusterName;
 

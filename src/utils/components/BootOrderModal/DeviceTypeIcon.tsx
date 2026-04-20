@@ -9,7 +9,7 @@ type DeviceTypeIconProps = {
   type: DeviceType;
 };
 
-const DeviceTypeIcon: React.FC<DeviceTypeIconProps> = ({ type }) => {
+const DeviceTypeIcon: React.FCC<DeviceTypeIconProps> = ({ type }) => {
   const { t } = useKubevirtTranslation();
 
   if (type === DeviceType.NIC) {

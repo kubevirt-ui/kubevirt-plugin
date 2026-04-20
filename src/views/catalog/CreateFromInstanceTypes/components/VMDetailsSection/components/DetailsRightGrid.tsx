@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
 import { instanceTypeActionType } from '@catalog/CreateFromInstanceTypes/state/utils/types';
@@ -24,7 +24,7 @@ import SysprepDescriptionItem from './SysprepDescriptionItem';
 
 import './details-right-grid.scss';
 
-const DetailsRightGrid: FC = () => {
+const DetailsRightGrid: FCC = () => {
   const { t } = useKubevirtTranslation();
   const isACMPage = useIsACMPage();
   const cluster = useClusterParam();

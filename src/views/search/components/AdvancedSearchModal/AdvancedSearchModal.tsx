@@ -1,4 +1,4 @@
-import React, { FC, useRef } from 'react';
+import React, { FCC, useRef } from 'react';
 
 import { VirtualMachineModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -54,7 +54,7 @@ type AdvancedSearchModalProps = Pick<ModalComponentProps, 'isOpen' | 'onClose'> 
   prefillInputs?: AdvancedSearchInputs;
 };
 
-const AdvancedSearchModal: FC<AdvancedSearchModalProps> = ({
+const AdvancedSearchModal: FCC<AdvancedSearchModalProps> = ({
   isOpen,
   onClose,
   onSubmit,

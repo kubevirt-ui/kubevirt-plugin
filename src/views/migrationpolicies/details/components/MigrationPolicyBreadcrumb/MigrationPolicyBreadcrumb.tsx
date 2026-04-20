@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Link } from 'react-router-dom-v5-compat';
+import { Link } from 'react-router';
 import { useMigrationPoliciesListURL } from 'src/views/migrationpolicies/hooks/useMigrationPoliciesListURL';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -7,7 +7,7 @@ import { Breadcrumb, BreadcrumbItem } from '@patternfly/react-core';
 
 import './MigrationPolicyBreadcrumb.scss';
 
-export const MigrationPolicyBreadcrumb: React.FC = () => {
+export const MigrationPolicyBreadcrumb: React.FCC = () => {
   const { t } = useKubevirtTranslation();
   const migrationPoliciesClusterListPage = useMigrationPoliciesListURL();
 

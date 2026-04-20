@@ -1,4 +1,4 @@
-import React, { FC, useMemo } from 'react';
+import React, { FCC, useMemo } from 'react';
 
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -24,7 +24,7 @@ export type ConditionsProps = {
   conditions: K8sResourceCondition[];
 };
 
-export const ConditionsTable: FC<ConditionsProps> = ({ conditions }) => {
+export const ConditionsTable: FCC<ConditionsProps> = ({ conditions }) => {
   const { t } = useKubevirtTranslation();
 
   const columns = useMemo(() => getConditionsColumns(t), [t]);

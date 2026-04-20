@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom-v5-compat';
+import { useNavigate } from 'react-router';
 
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { logITFlowEvent } from '@kubevirt-utils/extensions/telemetry/telemetry';

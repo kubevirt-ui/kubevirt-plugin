@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { IoK8sApiCoreV1Pod } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -14,7 +14,7 @@ type ViewPodLogLinkProps = {
   pod: IoK8sApiCoreV1Pod;
 };
 
-const ViewPodLogLink: FC<ViewPodLogLinkProps> = ({ pod }) => {
+const ViewPodLogLink: FCC<ViewPodLogLinkProps> = ({ pod }) => {
   const { t } = useKubevirtTranslation();
 
   if (isEmpty(pod) || exportInProgress(pod)) return null;

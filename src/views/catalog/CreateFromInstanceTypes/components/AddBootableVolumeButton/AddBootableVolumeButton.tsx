@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
 import AddBootableVolumeModal from '@kubevirt-utils/components/AddBootableVolumeModal/AddBootableVolumeModal';
@@ -13,7 +13,7 @@ export type AddBootableVolumeButtonProps = {
   loadError: Error;
 };
 
-const AddBootableVolumeButton: FC<AddBootableVolumeButtonProps> = ({ loadError }) => {
+const AddBootableVolumeButton: FCC<AddBootableVolumeButtonProps> = ({ loadError }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const { onSelectCreatedVolume, volumeListNamespace } = useInstanceTypeVMStore();

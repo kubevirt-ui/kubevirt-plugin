@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -13,7 +13,7 @@ type SelectProjectProps = {
   setSelectedProject: (newProject: string) => void;
 };
 
-const SelectProject: FC<SelectProjectProps> = ({
+const SelectProject: FCC<SelectProjectProps> = ({
   cluster,
   selectedProject,
   setSelectedProject,

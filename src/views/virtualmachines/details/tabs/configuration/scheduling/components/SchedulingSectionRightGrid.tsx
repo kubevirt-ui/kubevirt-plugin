@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useMemo } from 'react';
+import React, { FCC, useCallback, useMemo } from 'react';
 import produce from 'immer';
 
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -39,7 +39,7 @@ type SchedulingSectionRightGridProps = {
   vmi?: V1VirtualMachineInstance;
 };
 
-const SchedulingSectionRightGrid: FC<SchedulingSectionRightGridProps> = ({
+const SchedulingSectionRightGrid: FCC<SchedulingSectionRightGridProps> = ({
   canUpdateVM,
   instanceTypeVM,
   onUpdateVM,

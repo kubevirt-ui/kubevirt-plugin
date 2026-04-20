@@ -1,5 +1,5 @@
-import React, { FC, useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom-v5-compat';
+import React, { FCC, useEffect, useState } from 'react';
+import { useLocation } from 'react-router';
 import classNames from 'classnames';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -33,7 +33,7 @@ type DetailsSectionBootProps = {
   vmi?: V1VirtualMachineInstance;
 };
 
-const DetailsSectionBoot: FC<DetailsSectionBootProps> = ({
+const DetailsSectionBoot: FCC<DetailsSectionBootProps> = ({
   canUpdateVM,
   instanceTypeVM,
   isCustomizeInstanceType,

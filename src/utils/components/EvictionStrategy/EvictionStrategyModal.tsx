@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useMemo, useState } from 'react';
+import React, { FCC, useEffect, useMemo, useState } from 'react';
 import produce from 'immer';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -23,7 +23,7 @@ type EvictionStrategyModalProps = {
   vmi?: V1VirtualMachineInstance;
 };
 
-const EvictionStrategyModal: FC<EvictionStrategyModalProps> = ({
+const EvictionStrategyModal: FCC<EvictionStrategyModalProps> = ({
   headerText,
   isOpen,
   onClose,

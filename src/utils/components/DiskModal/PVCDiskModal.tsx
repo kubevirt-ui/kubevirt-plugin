@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
 import { isHotPluggableEnabled } from '@kubevirt-utils/components/DiskModal/utils/helpers';
@@ -22,7 +22,7 @@ import { diskModalTitle } from './utils/helpers';
 import { submit } from './utils/submit';
 import { SourceTypes, V1DiskFormState, V1SubDiskModalProps } from './utils/types';
 
-const PVCDiskModal: FC<V1SubDiskModalProps> = ({
+const PVCDiskModal: FCC<V1SubDiskModalProps> = ({
   editDiskName,
   isCreated,
   isOpen,

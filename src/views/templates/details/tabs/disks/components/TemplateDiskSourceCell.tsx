@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import TemplateValue from '@kubevirt-utils/components/TemplateValue/TemplateValue';
 import { modelToGroupVersionKind, PersistentVolumeClaimModel } from '@kubevirt-utils/models';
@@ -10,7 +10,7 @@ type TemplateDiskSourceCellProps = {
   row: DiskRowDataLayout;
 };
 
-const TemplateDiskSourceCell: FC<TemplateDiskSourceCellProps> = ({ row }) => {
+const TemplateDiskSourceCell: FCC<TemplateDiskSourceCellProps> = ({ row }) => {
   const isPVCSource = row?.namespace != null;
 
   if (isPVCSource) {

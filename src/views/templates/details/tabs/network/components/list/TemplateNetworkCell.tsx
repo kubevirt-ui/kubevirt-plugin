@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import TemplateValue from '@kubevirt-utils/components/TemplateValue/TemplateValue';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -10,7 +10,7 @@ type TemplateNetworkCellProps = {
   row: NetworkPresentation;
 };
 
-const TemplateNetworkCell: FC<TemplateNetworkCellProps> = ({ row }) => {
+const TemplateNetworkCell: FCC<TemplateNetworkCellProps> = ({ row }) => {
   const { t } = useKubevirtTranslation();
 
   if (isPodNetwork(row.network)) {

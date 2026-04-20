@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import ExpandSectionWithCustomToggle from '@kubevirt-utils/components/ExpandSectionWithCustomToggle/ExpandSectionWithCustomToggle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -19,7 +19,7 @@ import IconSkeleton from '../icons/IconSkeleton/IconSkeleton';
 
 import './LoadBalanceSection.scss';
 
-const LoadBalanceSection: FC = () => {
+const LoadBalanceSection: FCC = () => {
   const { t } = useKubevirtTranslation();
   const { operatorDetailsMap, operatorResourcesLoaded } = useVirtualizationFeaturesContext();
   const { installState } = operatorDetailsMap?.[DESCHEDULER_OPERATOR_NAME] || {};

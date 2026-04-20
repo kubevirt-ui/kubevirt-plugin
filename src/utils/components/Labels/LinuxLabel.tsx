@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Label } from '@patternfly/react-core';
@@ -6,7 +6,7 @@ import { LinuxIcon } from '@patternfly/react-icons';
 
 import './labels.scss';
 
-const LinuxLabel: FC = () => {
+const LinuxLabel: FCC = () => {
   const { t } = useKubevirtTranslation();
   return (
     <Label className="os-label" icon={<LinuxIcon />} variant="outline">

@@ -1,4 +1,4 @@
-import React, { FC, JSX, useMemo } from 'react';
+import React, { FCC, JSX, useMemo } from 'react';
 
 import Dropdown, {
   DropdownConfig,
@@ -19,7 +19,7 @@ type ClusterDropdownProps = {
   selectedCluster: string;
 };
 
-const ClusterDropdown: FC<ClusterDropdownProps> = ({
+const ClusterDropdown: FCC<ClusterDropdownProps> = ({
   bookmarkCluster,
   disabled = false,
   disabledClusters,

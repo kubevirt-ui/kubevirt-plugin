@@ -18,7 +18,7 @@ type DataImportCronPageProps = {
   namespace: string;
 };
 
-const DataImportCronNavPage: React.FC<DataImportCronPageProps> = ({ name, namespace }) => {
+const DataImportCronNavPage: React.FCC<DataImportCronPageProps> = ({ name, namespace }) => {
   const { t } = useKubevirtTranslation();
   const [dataImportCron, loaded] = useK8sWatchResource<V1beta1DataImportCron>({
     groupVersionKind: DataImportCronModelGroupVersionKind,

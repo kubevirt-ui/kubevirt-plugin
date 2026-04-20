@@ -5,7 +5,7 @@ type FeatureHighlightsTitleProps = {
   title: string;
 };
 
-const FeatureHighlightsTitle: React.FC<FeatureHighlightsTitleProps> = ({
+const FeatureHighlightsTitle: React.FCC<FeatureHighlightsTitleProps> = ({
   readTime,
   title,
 }): React.ReactElement => (

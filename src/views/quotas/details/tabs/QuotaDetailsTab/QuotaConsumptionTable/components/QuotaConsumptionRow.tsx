@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 import { getCountText } from 'src/views/quotas/details/utils';
 import {
   getQuotaNumbers,
@@ -17,7 +17,7 @@ type QuotaConsumptionRowProps = {
   resourceKey: string;
 };
 
-const QuotaConsumptionRow: FC<QuotaConsumptionRowProps> = ({ quotaStatus, resourceKey }) => {
+const QuotaConsumptionRow: FCC<QuotaConsumptionRowProps> = ({ quotaStatus, resourceKey }) => {
   const { t } = useKubevirtTranslation();
 
   const { max, percentage, used } = getQuotaNumbers(

@@ -1,5 +1,5 @@
-import React, { FC, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom-v5-compat';
+import React, { FCC, useMemo, useState } from 'react';
+import { Link } from 'react-router';
 import produce from 'immer';
 
 import { IoK8sApiCoreV1Node } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
@@ -38,7 +38,7 @@ type DedicatedResourcesModalProps = {
   vmi?: V1VirtualMachineInstance;
 };
 
-const DedicatedResourcesModal: FC<DedicatedResourcesModalProps> = ({
+const DedicatedResourcesModal: FCC<DedicatedResourcesModalProps> = ({
   headerText,
   isOpen,
   onClose,

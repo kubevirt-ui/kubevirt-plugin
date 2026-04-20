@@ -1,4 +1,4 @@
-import React, { FC, useMemo } from 'react';
+import React, { FCC, useMemo } from 'react';
 
 import useInstanceTypesAndPreferences from '@kubevirt-utils/hooks/useInstanceTypesAndPreferences';
 
@@ -8,7 +8,7 @@ import Loading from '../Loading/Loading';
 import { InstanceTypeModalProps } from './utils/types';
 import InstanceTypeModal from './InstanceTypeModal';
 
-const StandaloneInstanceTypeModal: FC<
+const StandaloneInstanceTypeModal: FCC<
   Pick<InstanceTypeModalProps, 'isOpen' | 'onClose' | 'onSubmit' | 'vm'>
 > = ({ isOpen, onClose, onSubmit, vm }) => {
   const { allInstanceTypes, loaded, loadError } = useInstanceTypesAndPreferences();

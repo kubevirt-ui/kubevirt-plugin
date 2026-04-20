@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import NumberTextInput from '@kubevirt-utils/components/NumberTextInput/NumberTextInput';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -9,7 +9,7 @@ import NumberOperatorSelect from '../../../../../utils/components/NumberOperator
 import MemoryUnitSelect from '../components/MemoryUnitSelect';
 import { useAdvancedSearchField } from '../store/useAdvancedSearchStore';
 
-const MemoryField: FC = () => {
+const MemoryField: FCC = () => {
   const { t } = useKubevirtTranslation();
   const { setValue: setMemory, value: memory } = useAdvancedSearchField(
     VirtualMachineRowFilterType.Memory,

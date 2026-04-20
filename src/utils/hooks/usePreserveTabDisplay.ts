@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { useLocation, useNavigate, useParams } from 'react-router-dom-v5-compat';
+import { useLocation, useNavigate, useParams } from 'react-router';
 
 import { runningTourSignal } from '@kubevirt-utils/components/GuidedTour/utils/guidedTourSignals';
 

@@ -1,4 +1,4 @@
-import React, { FC, memo, useCallback, useEffect, useMemo, useState } from 'react';
+import React, { FCC, memo, useCallback, useEffect, useMemo, useState } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
@@ -16,7 +16,7 @@ type WindowsDriversProps = {
   vm: V1VirtualMachine;
 };
 
-const WindowsDrivers: FC<WindowsDriversProps> = memo(({ isWindows, updateVM, vm }) => {
+const WindowsDrivers: FCC<WindowsDriversProps> = memo(({ isWindows, updateVM, vm }) => {
   const { t } = useKubevirtTranslation();
   const [isChecked, setIsChecked] = useState<boolean>(null);
   const [error, setError] = useState<Error>(undefined);

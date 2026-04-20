@@ -22,7 +22,7 @@ type NetworkUtilProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const NetworkUtil: React.FC<NetworkUtilProps> = ({ vmi }) => {
+const NetworkUtil: React.FCC<NetworkUtilProps> = ({ vmi }) => {
   const { t } = useKubevirtTranslation();
   const { currentTime } = useDuration();
 

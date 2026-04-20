@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import AllClustersResourcesCard from './AllClustersResourcesCard';
 import SingleClusterResourcesCard from './SingleClusterResourcesCard';
@@ -12,7 +12,7 @@ type ClusterResourcesCardProps = {
   vmsCount: number;
 };
 
-const ClusterResourcesCard: FC<ClusterResourcesCardProps> = ({
+const ClusterResourcesCard: FCC<ClusterResourcesCardProps> = ({
   clustersCount,
   isAllClustersPage,
   projectsCount,

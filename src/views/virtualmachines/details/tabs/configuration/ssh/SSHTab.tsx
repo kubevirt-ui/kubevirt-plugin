@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import LinuxLabel from '@kubevirt-utils/components/Labels/LinuxLabel';
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
@@ -13,7 +13,7 @@ import { ConfigurationInnerTabProps } from '../utils/types';
 import SSHTabAuthorizedSSHKey from './components/SSHTabAuthorizedSSHKey';
 import SSHTabSSHAccess from './components/SSHTabSSHAccess';
 
-const SSHTab: FC<ConfigurationInnerTabProps> = ({ vm }) => {
+const SSHTab: FCC<ConfigurationInnerTabProps> = ({ vm }) => {
   const { t } = useKubevirtTranslation();
 
   return (

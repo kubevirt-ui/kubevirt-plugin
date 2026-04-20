@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
@@ -16,7 +16,7 @@ type VMUserCredentialsDetailsItemProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const VMUserCredentialsDetailsItem: FC<VMUserCredentialsDetailsItemProps> = ({ vm, vmi }) => {
+const VMUserCredentialsDetailsItem: FCC<VMUserCredentialsDetailsItemProps> = ({ vm, vmi }) => {
   const { t } = useKubevirtTranslation();
   const [sshService] = useSSHService(vm);
   const { command, user } = useSSHCommand(vm, sshService);

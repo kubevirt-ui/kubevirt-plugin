@@ -1,4 +1,4 @@
-import React, { cloneElement, FC, isValidElement, ReactElement, ReactNode } from 'react';
+import React, { cloneElement, FCC, isValidElement, ReactElement, ReactNode } from 'react';
 
 import { SPACE_SYMBOL } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -22,7 +22,7 @@ const renderBodyContent = (bodyContent: ReactNode, hide: () => void): ReactNode 
   return bodyContent;
 };
 
-const DescriptionItemPopoverContent: FC<DescriptionItemPopoverContentProps> = ({
+const DescriptionItemPopoverContent: FCC<DescriptionItemPopoverContentProps> = ({
   bodyContent,
   breadcrumb,
   hide,

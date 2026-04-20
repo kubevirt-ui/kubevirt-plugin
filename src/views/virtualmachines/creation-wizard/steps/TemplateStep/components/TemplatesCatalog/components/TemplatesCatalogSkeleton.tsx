@@ -1,6 +1,6 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
-const CatalogSkeleton: FC = () => (
+const CatalogSkeleton: FCC = () => (
   <div className="loading-skeleton--catalog">
     <div className="skeleton-catalog--list" />
     <div className="skeleton-catalog--grid">

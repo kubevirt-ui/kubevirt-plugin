@@ -4,7 +4,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { EmptyState, EmptyStateBody, EmptyStateVariant } from '@patternfly/react-core';
 import { SearchIcon } from '@patternfly/react-icons';
 
-const MigrationEmptyState: React.FC = () => {
+const MigrationEmptyState: React.FCC = () => {
   const { t } = useKubevirtTranslation();
   return (
     <EmptyState

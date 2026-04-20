@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useMemo, useState } from 'react';
+import React, { FCC, useEffect, useMemo, useState } from 'react';
 
 import NewBadge from '@kubevirt-utils/components/badges/NewBadge/NewBadge';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
@@ -25,7 +25,7 @@ type AutomaticSubscriptionRHELGuestsProps = {
   newBadge?: boolean;
 };
 
-const AutomaticSubscriptionRHELGuests: FC<AutomaticSubscriptionRHELGuestsProps> = ({
+const AutomaticSubscriptionRHELGuests: FCC<AutomaticSubscriptionRHELGuestsProps> = ({
   newBadge = false,
 }) => {
   const { t } = useKubevirtTranslation();

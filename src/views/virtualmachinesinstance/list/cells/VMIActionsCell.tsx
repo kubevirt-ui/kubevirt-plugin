@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 
@@ -8,7 +8,7 @@ type VMIActionsCellProps = {
   row: V1VirtualMachineInstance;
 };
 
-const VMIActionsCell: FC<VMIActionsCellProps> = ({ row }) => (
+const VMIActionsCell: FCC<VMIActionsCellProps> = ({ row }) => (
   <div data-test="vmi-row-actions">
     <VirtualMachinesInstanceActions vmi={row} />
   </div>

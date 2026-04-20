@@ -1,4 +1,4 @@
-import React, { FC, useMemo } from 'react';
+import React, { FCC, useMemo } from 'react';
 
 import { V1VirtualMachineInstanceGuestOSUser } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
@@ -12,7 +12,7 @@ type ActiveUsersTableProps = {
   loadError?: Error;
 };
 
-const ActiveUsersTable: FC<ActiveUsersTableProps> = ({ data, loaded, loadError }) => {
+const ActiveUsersTable: FCC<ActiveUsersTableProps> = ({ data, loaded, loadError }) => {
   const { t } = useKubevirtTranslation();
 
   const columns = useMemo(() => getActiveUserColumns(t), [t]);

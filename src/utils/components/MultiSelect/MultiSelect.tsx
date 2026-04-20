@@ -1,4 +1,4 @@
-import React, { FC, MouseEvent as ReactMouseEvent, ReactNode, Ref, useState } from 'react';
+import React, { FCC, MouseEvent as ReactMouseEvent, ReactNode, Ref, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -21,7 +21,7 @@ type MultiSelectProps = {
   toggleText?: string;
 };
 
-const MultiSelect: FC<MultiSelectProps> = ({
+const MultiSelect: FCC<MultiSelectProps> = ({
   items,
   selectedItems,
   setSelectedItems,

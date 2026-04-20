@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react';
-import { TFunction } from 'react-i18next';
+import { TFunction } from 'i18next';
 
 import DiskNameCell from '@kubevirt-utils/components/DiskNameCell/DiskNameCell';
 import { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';

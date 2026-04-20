@@ -1,8 +1,8 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { Flex } from '@patternfly/react-core';
 
-const PaneHeading: FC = ({ children }) => (
+const PaneHeading: FCC = ({ children }) => (
   <Flex
     alignItems={{ default: 'alignItemsCenter' }}
     justifyContent={{ default: 'justifyContentSpaceBetween' }}

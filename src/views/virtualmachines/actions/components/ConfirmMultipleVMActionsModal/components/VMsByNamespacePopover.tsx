@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { Stack, StackItem } from '@patternfly/react-core';
 
@@ -8,7 +8,7 @@ type VMsByNamespaceListProps = {
   vmsByNamespace: { [p: string]: string[] };
 };
 
-const VMsByNamespacePopover: FC<VMsByNamespaceListProps> = ({ vmsByNamespace }) => (
+const VMsByNamespacePopover: FCC<VMsByNamespaceListProps> = ({ vmsByNamespace }) => (
   <div className="vm-by-namespace-popover">
     <Stack>
       {Object.keys(vmsByNamespace)

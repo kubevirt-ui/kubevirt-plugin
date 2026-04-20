@@ -1,4 +1,4 @@
-import React, { FC, useMemo } from 'react';
+import React, { FCC, useMemo } from 'react';
 
 import { VirtualMachineModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -24,7 +24,7 @@ import VMStatusItem from './VMStatusItem';
 
 import './VMStatusesCard.scss';
 
-const VMStatusesCard: FC = () => {
+const VMStatusesCard: FCC = () => {
   const activeNamespace = useActiveNamespace();
   const cluster = useActiveClusterParam();
   const namespace = useMemo(

@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { ControllerRevisionModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -19,7 +19,7 @@ type InstanceTypeDescriptionProps = {
   vm: V1VirtualMachine;
 };
 
-const InstanceTypeDescription: FC<InstanceTypeDescriptionProps> = ({ vm }) => {
+const InstanceTypeDescription: FCC<InstanceTypeDescriptionProps> = ({ vm }) => {
   const { t } = useKubevirtTranslation();
   const None = <MutedTextSpan text={t('None')} />;
 

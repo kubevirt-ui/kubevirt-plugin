@@ -1,4 +1,4 @@
-import React, { FC, FormEventHandler } from 'react';
+import React, { FCC, FormEventHandler } from 'react';
 import { useFormContext } from 'react-hook-form';
 
 import { useDrawerContext } from '@catalog/templatescatalog/components/TemplatesCatalogDrawer/hooks/useDrawerContext';
@@ -19,7 +19,7 @@ type HTTPSourceProps = {
   testId: string;
 };
 
-const HTTPSource: FC<HTTPSourceProps> = ({ httpSourceHelperURL, onInputValueChange, testId }) => {
+const HTTPSource: FCC<HTTPSourceProps> = ({ httpSourceHelperURL, onInputValueChange, testId }) => {
   const { t } = useKubevirtTranslation();
   const activeNamespace = useActiveNamespace();
   const namespace = getValidNamespace(activeNamespace);

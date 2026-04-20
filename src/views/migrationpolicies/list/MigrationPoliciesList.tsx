@@ -1,4 +1,4 @@
-import React, { FC, useMemo } from 'react';
+import React, { FCC, useMemo } from 'react';
 
 import { V1alpha1MigrationPolicy } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
@@ -28,7 +28,7 @@ import {
   getMigrationPoliciesRowId,
 } from './migrationPoliciesDefinition';
 
-const MigrationPoliciesList: FC<ListPageProps> = ({
+const MigrationPoliciesList: FCC<ListPageProps> = ({
   fieldSelector,
   hideColumnManagement,
   hideNameLabelFilters,

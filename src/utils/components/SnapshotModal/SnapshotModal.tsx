@@ -1,4 +1,4 @@
-import React, { FC, useMemo, useState } from 'react';
+import React, { FCC, useMemo, useState } from 'react';
 
 import { VirtualMachineSnapshotModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
@@ -40,7 +40,7 @@ type SnapshotModalProps = {
   vm: V1VirtualMachine;
 };
 
-const SnapshotModal: FC<SnapshotModalProps> = ({ isOpen, onClose, vm }) => {
+const SnapshotModal: FCC<SnapshotModalProps> = ({ isOpen, onClose, vm }) => {
   const { t } = useKubevirtTranslation();
   const [snapshotName, setSnapshotName] = useState<string>(generateSnapshotName(vm));
   const isSnapshotNameValid = isDNS1123Label(snapshotName);

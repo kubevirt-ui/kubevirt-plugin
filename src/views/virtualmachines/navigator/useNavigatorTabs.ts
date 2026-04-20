@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom-v5-compat';
+import { useLocation, useNavigate } from 'react-router';
 
 import { OVERVIEW_TAB_INDEX, TAB_INDEX_MAP, TAB_KEY_MAP, VM_LIST_TAB_PARAM } from './constants';
 

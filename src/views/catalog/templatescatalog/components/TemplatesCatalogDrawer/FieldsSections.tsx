@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FCC, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -8,7 +8,7 @@ import { useDrawerContext } from './hooks/useDrawerContext';
 import { FieldGroup } from './FieldGroup';
 import { changeTemplateParameterValue, getTemplateParametersSplit } from './utils';
 
-const FieldsSections: FC = () => {
+const FieldsSections: FCC = () => {
   const { t } = useKubevirtTranslation();
 
   const { setTemplate, template } = useDrawerContext();

@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useState } from 'react';
+import React, { FCC, useCallback, useState } from 'react';
 
 import useRegistryCredentials from '@catalog/utils/useRegistryCredentials/useRegistryCredentials';
 import { produceVMDisks, useWizardVMContext } from '@catalog/utils/WizardVMContext';
@@ -23,7 +23,7 @@ type DiskRowActionsProps = {
   diskName: string;
 };
 
-const DiskRowActions: FC<DiskRowActionsProps> = ({ diskName }) => {
+const DiskRowActions: FCC<DiskRowActionsProps> = ({ diskName }) => {
   const { t } = useKubevirtTranslation();
   const { tabsData, updateTabsData, updateVM, vm } = useWizardVMContext();
   const { createModal } = useModal();

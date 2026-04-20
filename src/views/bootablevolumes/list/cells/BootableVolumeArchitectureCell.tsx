@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import ArchitectureLabel from '@kubevirt-utils/components/ArchitectureLabel/ArchitectureLabel';
 import { getArchitecture } from '@kubevirt-utils/utils/architecture';
@@ -9,7 +9,7 @@ type BootableVolumeArchitectureCellProps = {
   row: BootableResource;
 };
 
-const BootableVolumeArchitectureCell: FC<BootableVolumeArchitectureCellProps> = ({ row }) => (
+const BootableVolumeArchitectureCell: FCC<BootableVolumeArchitectureCellProps> = ({ row }) => (
   <ArchitectureLabel architecture={getArchitecture(row)} />
 );
 

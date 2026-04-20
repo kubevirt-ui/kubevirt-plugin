@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 import DedicatedResources from 'src/views/templates/details/tabs/scheduling/components//DedicatedResources';
 import EvictionStrategy from 'src/views/templates/details/tabs/scheduling/components//EvictionStrategy';
 
@@ -7,7 +7,7 @@ import { DescriptionList } from '@patternfly/react-core';
 
 import { TemplateSchedulingGridProps } from './TemplateSchedulingLeftGrid';
 
-const TemplateSchedulingRightGrid: FC<TemplateSchedulingGridProps> = ({ editable, template }) => {
+const TemplateSchedulingRightGrid: FCC<TemplateSchedulingGridProps> = ({ editable, template }) => {
   return (
     <DescriptionList>
       <DedicatedResources editable={editable} onSubmit={updateTemplate} template={template} />

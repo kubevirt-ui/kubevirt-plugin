@@ -1,5 +1,5 @@
-import React, { FC, ReactNode } from 'react';
-import { useNavigate } from 'react-router-dom-v5-compat';
+import React, { FCC, ReactNode } from 'react';
+import { useNavigate } from 'react-router';
 
 import useManagedClusterConsoleURLs from '@multicluster/hooks/useManagedClusterConsoleURLs';
 import { Button } from '@patternfly/react-core';
@@ -17,7 +17,7 @@ type SettingsLinkProps = {
   to?: string;
 };
 
-const SettingsLink: FC<SettingsLinkProps> = ({
+const SettingsLink: FCC<SettingsLinkProps> = ({
   children,
   className,
   disabled,

@@ -1,5 +1,5 @@
-import React, { FC, useState } from 'react';
-import { Link } from 'react-router-dom-v5-compat';
+import React, { FCC, useState } from 'react';
+import { Link } from 'react-router';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ApplicationAwareResourceQuota } from '@kubevirt-utils/resources/quotas/types';
@@ -13,7 +13,7 @@ type AdvancedConfigAlertProps = {
   quota: ApplicationAwareResourceQuota;
 };
 
-const AdvancedConfigAlert: FC<AdvancedConfigAlertProps> = ({ isEdit, quota }) => {
+const AdvancedConfigAlert: FCC<AdvancedConfigAlertProps> = ({ isEdit, quota }) => {
   const { t } = useKubevirtTranslation();
   const [isAlertOpen, setIsAlertOpen] = useState(true);
 

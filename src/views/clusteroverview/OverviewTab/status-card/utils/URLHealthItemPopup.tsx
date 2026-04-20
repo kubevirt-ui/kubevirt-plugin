@@ -4,7 +4,7 @@ import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 
 import { COMPONENT_NOT_FOUND_ERROR } from './constants';
 
-const URLHealthItemPopup: React.FC<any> = ({ subsystem }) => {
+const URLHealthItemPopup: React.FCC<any> = ({ subsystem }) => {
   const [PopupComponent, setPopupComponent] = React.useState(null);
 
   React.useEffect(() => {

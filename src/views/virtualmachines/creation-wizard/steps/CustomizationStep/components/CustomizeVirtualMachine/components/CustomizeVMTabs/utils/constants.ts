@@ -1,4 +1,4 @@
-import { TFunction } from 'react-i18next';
+import { TFunction } from 'i18next';
 
 import { VirtualMachineDetailsTab } from '@kubevirt-utils/constants/tabs-constants';
 import CustomizeInstanceTypeDetailsTab from '@virtualmachines/creation-wizard/steps/CustomizationStep/components/CustomizeVirtualMachine/components/CustomizeVMTabs/tabs/CustomizeInstanceTypeDetailsTab';

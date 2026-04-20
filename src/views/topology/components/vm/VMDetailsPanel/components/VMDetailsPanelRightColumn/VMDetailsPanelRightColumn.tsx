@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
@@ -26,7 +26,7 @@ export type VMResourceListProps = {
   vmi?: V1VirtualMachineInstance;
 };
 
-const VMDetailsPanelRightColumn: FC<VMResourceListProps> = ({ instanceTypeVM, vm, vmi }) => {
+const VMDetailsPanelRightColumn: FCC<VMResourceListProps> = ({ instanceTypeVM, vm, vmi }) => {
   const { pods } = useVMIAndPodsForVM(getName(vm), getNamespace(vm));
   const launcherPod = getVMIPod(vmi, pods);
   const vmHasS390xArchitecture = hasS390xArchitecture(vm);

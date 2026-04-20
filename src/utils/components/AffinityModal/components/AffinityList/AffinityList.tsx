@@ -1,4 +1,4 @@
-import React, { FC, useMemo } from 'react';
+import React, { FCC, useMemo } from 'react';
 
 import { IoK8sApiCoreV1Node } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
@@ -22,7 +22,7 @@ type AffinityListProps = {
   qualifiedNodes: IoK8sApiCoreV1Node[];
 };
 
-const AffinityList: FC<AffinityListProps> = ({
+const AffinityList: FCC<AffinityListProps> = ({
   affinities,
   nodesLoaded,
   onAffinityClickAdd,

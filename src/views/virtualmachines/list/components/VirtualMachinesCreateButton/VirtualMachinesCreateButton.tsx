@@ -1,5 +1,5 @@
-import React, { FC, MouseEvent, Ref, useCallback, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom-v5-compat';
+import React, { FCC, MouseEvent, Ref, useCallback, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router';
 
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { DEFAULT_NAMESPACE, YAML } from '@kubevirt-utils/constants/constants';
@@ -25,7 +25,7 @@ type VirtualMachinesCreateButtonProps = {
   showDropdown?: boolean;
 };
 
-const VirtualMachinesCreateButton: FC<VirtualMachinesCreateButtonProps> = ({
+const VirtualMachinesCreateButton: FCC<VirtualMachinesCreateButtonProps> = ({
   buttonText,
   namespace,
   showDropdown = true,

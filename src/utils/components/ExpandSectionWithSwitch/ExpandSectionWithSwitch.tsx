@@ -1,4 +1,4 @@
-import React, { FC, ReactNode } from 'react';
+import React, { FCC, ReactNode } from 'react';
 
 import ExpandSectionWithCustomToggle from '@kubevirt-utils/components/ExpandSectionWithCustomToggle/ExpandSectionWithCustomToggle';
 import { Switch } from '@patternfly/react-core';
@@ -15,7 +15,7 @@ type ExpandSectionWithSwitchProps = {
   toggleSwitch: (checked: boolean) => void;
 };
 
-const ExpandSectionWithSwitch: FC<ExpandSectionWithSwitchProps> = ({
+const ExpandSectionWithSwitch: FCC<ExpandSectionWithSwitchProps> = ({
   children,
   helpTextContent,
   id,

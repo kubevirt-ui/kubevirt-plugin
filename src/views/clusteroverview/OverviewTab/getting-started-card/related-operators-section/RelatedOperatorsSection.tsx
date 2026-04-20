@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
@@ -12,7 +12,7 @@ import { GettingStartedLink } from '../utils/types';
 
 import './RelatedOperatorsSection.scss';
 
-const RelatedOperatorsSection: FC = () => {
+const RelatedOperatorsSection: FCC = () => {
   const { t } = useKubevirtTranslation();
   const { mtvLink, mtvLoaded } = useMTVResources();
   const isAdmin = useIsAdmin();

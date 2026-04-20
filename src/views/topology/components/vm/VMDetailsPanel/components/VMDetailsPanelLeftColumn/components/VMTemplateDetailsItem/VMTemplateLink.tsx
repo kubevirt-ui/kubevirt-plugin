@@ -1,5 +1,5 @@
-import React, { FC } from 'react';
-import { Link } from 'react-router-dom-v5-compat';
+import React, { FCC } from 'react';
+import { Link } from 'react-router';
 
 import { TemplateModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { getGroupVersionKindForModel, ResourceIcon } from '@openshift-console/dynamic-plugin-sdk';
@@ -12,7 +12,7 @@ type VMTemplateLinkProps = {
   uid?: string;
 };
 
-const VMTemplateLink: FC<VMTemplateLinkProps> = ({ name, namespace, uid }) => (
+const VMTemplateLink: FCC<VMTemplateLinkProps> = ({ name, namespace, uid }) => (
   <>
     <ResourceIcon groupVersionKind={getGroupVersionKindForModel(TemplateModel)} />
     <Link

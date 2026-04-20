@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 import { Trans } from 'react-i18next';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -17,7 +17,7 @@ type UserPreferencesEmptyStateProps = {
   namespace: string;
 };
 
-const UserPreferencesEmptyState: FC<UserPreferencesEmptyStateProps> = ({ namespace }) => {
+const UserPreferencesEmptyState: FCC<UserPreferencesEmptyStateProps> = ({ namespace }) => {
   const { t } = useKubevirtTranslation();
 
   return (

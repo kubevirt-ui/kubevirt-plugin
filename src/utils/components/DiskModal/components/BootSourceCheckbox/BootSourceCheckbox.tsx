@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -28,7 +28,7 @@ type BootSourceCheckboxProps = {
   vm: V1VirtualMachine;
 };
 
-const BootSourceCheckbox: FC<BootSourceCheckboxProps> = ({ editDiskName, isDisabled, vm }) => {
+const BootSourceCheckbox: FCC<BootSourceCheckboxProps> = ({ editDiskName, isDisabled, vm }) => {
   const initialBootDiskName = getBootDisk(vm)?.name;
 
   const isInitialBootDisk = initialBootDiskName === editDiskName;

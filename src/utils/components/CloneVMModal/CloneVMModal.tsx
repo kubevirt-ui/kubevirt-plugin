@@ -1,5 +1,5 @@
-import React, { FC, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom-v5-compat';
+import React, { FCC, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router';
 
 import {
   V1beta1VirtualMachineClone,
@@ -31,7 +31,7 @@ type CloneVMModalProps = {
   source: V1beta1VirtualMachineSnapshot | V1VirtualMachine;
 };
 
-const CloneVMModal: FC<CloneVMModalProps> = ({ headerText, isOpen, onClose, source }) => {
+const CloneVMModal: FCC<CloneVMModalProps> = ({ headerText, isOpen, onClose, source }) => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
   const namespace = getNamespace(source);

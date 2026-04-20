@@ -1,4 +1,4 @@
-import React, { FC, useMemo } from 'react';
+import React, { FCC, useMemo } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getSelectDataTestProps } from '@kubevirt-utils/utils/selectDataTest';
@@ -19,7 +19,7 @@ type DateSelectProps = {
   setDateToString: (date: string) => void;
 };
 
-const DateSelect: FC<DateSelectProps> = ({
+const DateSelect: FCC<DateSelectProps> = ({
   'data-test': dataTest,
   onSelect,
   selected,

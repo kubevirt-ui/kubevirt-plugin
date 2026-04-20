@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 import { Trans } from 'react-i18next';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -6,7 +6,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import OnboardingPopover from '../OnboardingPopover';
 import { OnboardingPopoverKey } from '../types';
 
-const CatalogOnboardingPopover: FC = () => {
+const CatalogOnboardingPopover: FCC = () => {
   const { t } = useKubevirtTranslation();
 
   const triggerElement = document.querySelector<HTMLElement>(

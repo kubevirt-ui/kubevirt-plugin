@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 import classnames from 'classnames';
 
 import { FLAG_LIGHTSPEED_PLUGIN } from '@kubevirt-utils/flags/consts';
@@ -8,7 +8,7 @@ import useCloseWizard from '@virtualmachines/creation-wizard/hooks/useCloseWizar
 import useInstanceTypeVMStore from '@virtualmachines/creation-wizard/state/instance-type-vm-store/useInstanceTypeVMStore';
 import useCreateVMFromInstanceType from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/hooks/useCreateVMFromInstanceType';
 
-const ComputeResourcesStepFooter: FC = () => {
+const ComputeResourcesStepFooter: FCC = () => {
   const hasOLSConsole = useFlag(FLAG_LIGHTSPEED_PLUGIN);
   const { activeStep, goToNextStep, goToPrevStep } = useWizardContext();
   const handleCreateVM = useCreateVMFromInstanceType();

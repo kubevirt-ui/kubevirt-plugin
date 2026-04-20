@@ -1,4 +1,4 @@
-import React, { FC, useMemo } from 'react';
+import React, { FCC, useMemo } from 'react';
 
 import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -24,7 +24,7 @@ import StorageMigrationPlansWidget from '../StorageMigrationPlansWidget/StorageM
 import MultiClusterMigrationStatusSection from './MultiClusterMigrationStatusSection';
 import { buildMigrationsSpokePath, getMigrationsTabPath, MIGRATIONS_DURATION } from './utils';
 
-const MigrationStatusSection: FC<OverviewSectionData> = ({
+const MigrationStatusSection: FCC<OverviewSectionData> = ({
   cluster,
   namespace,
   title,

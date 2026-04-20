@@ -1,4 +1,4 @@
-import React, { Dispatch, FC, SetStateAction } from 'react';
+import React, { Dispatch, FCC, SetStateAction } from 'react';
 
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -35,7 +35,7 @@ type VirtualMachineMigrationDestinationTabProps = {
 
 const StorageClassModelGroupVersionKind = modelToGroupVersionKind(StorageClassModel);
 
-const VirtualMachineMigrationDestinationTab: FC<VirtualMachineMigrationDestinationTabProps> = ({
+const VirtualMachineMigrationDestinationTab: FCC<VirtualMachineMigrationDestinationTabProps> = ({
   defaultStorageClassName,
   destinationStorageClass,
   isSameStorageClass,

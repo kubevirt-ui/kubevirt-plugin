@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { V1beta1DataImportCron } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
@@ -9,7 +9,7 @@ type DataImportCronYAMLPageProps = {
   obj?: V1beta1DataImportCron;
 };
 
-const DataImportCronYAMLPage: FC<DataImportCronYAMLPageProps> = ({ obj: dataImportCron }) => {
+const DataImportCronYAMLPage: FCC<DataImportCronYAMLPageProps> = ({ obj: dataImportCron }) => {
   const loading = (
     <Bullseye>
       <Loading />
