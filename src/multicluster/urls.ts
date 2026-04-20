@@ -1,6 +1,6 @@
 import { matchPath } from 'react-router-dom-v5-compat';
 
-import { VirtualMachineModelRef } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { TemplateModel, VirtualMachineModelRef } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
   ALL_CLUSTERS_KEY,
   ALL_NAMESPACES,
@@ -151,6 +151,9 @@ export const getFleetResourceRoute: GetFleetResourceRouteProps = ({
   name,
   namespace,
 }) => {
+  if (model.kind === TemplateModel.kind && model.apiGroup === TemplateModel.apiGroup) {
+    return `${getFleetTemplatesURL(cluster, namespace)}/${name}`;
+  }
   const extensionModel = {
     group: model.apiGroup,
     kind: model.kind,
