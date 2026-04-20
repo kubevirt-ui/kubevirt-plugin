@@ -12,6 +12,7 @@ type TabToConfirmTextInputProps = {
   className?: string;
   fieldId: string;
   helperText?: ReactNode;
+  isRequired?: boolean;
   label?: string;
   onChange?: (value: string) => void;
   onConfirm: () => void;
@@ -25,6 +26,7 @@ const TabToConfirmTextInput: FC<TabToConfirmTextInputProps> = ({
   className,
   fieldId,
   helperText,
+  isRequired = false,
   label,
   onChange,
   onConfirm,
@@ -91,7 +93,7 @@ const TabToConfirmTextInput: FC<TabToConfirmTextInputProps> = ({
   };
 
   return (
-    <FormGroup className={className} fieldId={fieldId} label={label}>
+    <FormGroup className={className} fieldId={fieldId} isRequired={isRequired} label={label}>
       <div className="tab-to-confirm-text-input">
         <TextInput
           className="tab-to-confirm-text-input__input"

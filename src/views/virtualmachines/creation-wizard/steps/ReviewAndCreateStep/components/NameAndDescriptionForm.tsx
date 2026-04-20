@@ -5,7 +5,7 @@ import TabToConfirmTextInput from '@kubevirt-utils/components/TabToConfirmTextIn
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getDescription, getName } from '@kubevirt-utils/resources/shared';
 import { updateCustomizeInstanceType, vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
-import { FormGroup, Stack, StackItem, TextInput, ValidatedOptions } from '@patternfly/react-core';
+import { Form, FormGroup, TextInput, ValidatedOptions } from '@patternfly/react-core';
 import { useSignals } from '@preact/signals-react/runtime';
 import useVMWizardStore from '@virtualmachines/creation-wizard/state/vm-wizard-store/useVMWizardStore';
 import { isCloneCreationMethod } from '@virtualmachines/creation-wizard/utils/utils';
@@ -49,35 +49,32 @@ const NameAndDescriptionForm: FC = () => {
   };
 
   return (
-    <Stack hasGutter>
-      <StackItem>
-        <TabToConfirmTextInput
-          helperText={
-            <Trans t={t}>
-              Press the <strong>Tab</strong> key to accept the suggestion or enter a custom name.
-            </Trans>
-          }
-          autoFocus
-          className="name-and-description-form__input"
-          fieldId="vm name"
-          label={t('Name')}
-          onChange={onNameChange}
-          onConfirm={() => setVMNameConfirmed(true)}
-          validated={nameValidated}
-          value={isCloneMethod ? cloneVMName : getName(vm)}
+    <Form>
+      <TabToConfirmTextInput
+        helperText={
+          <Trans t={t}>
+            Press the <strong>Tab</strong> key to accept the suggestion or enter a custom name.
+          </Trans>
+        }
+        autoFocus
+        className="name-and-description-form__input"
+        fieldId="vm name"
+        isRequired
+        label={t('Name')}
+        onChange={onNameChange}
+        onConfirm={() => setVMNameConfirmed(true)}
+        validated={nameValidated}
+        value={isCloneMethod ? cloneVMName : getName(vm)}
+      />
+      <FormGroup className="name-and-description-form__input" label={t('Description')}>
+        <TextInput
+          onChange={(_event, value: string) => onDescriptionChange(value)}
+          type="text"
+          validated={descriptionValidated}
+          value={isCloneMethod ? cloneVMDescription : getDescription(vm)}
         />
-      </StackItem>
-      <StackItem>
-        <FormGroup className="name-and-description-form__input" label={t('Description')}>
-          <TextInput
-            onChange={(_event, value: string) => onDescriptionChange(value)}
-            type="text"
-            validated={descriptionValidated}
-            value={isCloneMethod ? cloneVMDescription : getDescription(vm)}
-          />
-        </FormGroup>
-      </StackItem>
-    </Stack>
+      </FormGroup>
+    </Form>
   );
 };
 
