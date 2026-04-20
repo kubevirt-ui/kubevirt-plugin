@@ -6,9 +6,8 @@ import {
   ProjectModel,
   VirtualMachineModel,
 } from '@kubevirt-ui-ext/kubevirt-api/console';
-import useKubevirtHyperconvergeConfiguration, {
-  selectHyperconvergedConfiguration,
-} from '@kubevirt-utils/hooks/useKubevirtHyperconvergeConfiguration';
+import useKubevirtHyperconvergeConfiguration from '@kubevirt-utils/hooks/useKubevirtHyperconvergeConfiguration';
+import { getHyperconvergedRoleAggregationStrategy } from '@kubevirt-utils/resources/hyperconverged/selectors';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
@@ -29,7 +28,7 @@ const useVirtualizationNavVisibilityFlag = (setFeatureFlag: SetFeatureFlag) => {
     namespaced: false,
   });
 
-  const strategy = selectHyperconvergedConfiguration(hcConfig)?.roleAggregationStrategy;
+  const strategy = getHyperconvergedRoleAggregationStrategy(hcConfig);
 
   const isManualRoleAggregation = useMemo(
     () => strategy === HCO_MANUAL_ROLE_AGGREGATION_STRATEGY,

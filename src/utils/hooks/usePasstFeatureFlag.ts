@@ -3,9 +3,7 @@ import { useMemo } from 'react';
 import { HyperConvergedModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import useHyperConvergeConfiguration from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
-import useKubevirtHyperconvergeConfiguration, {
-  selectHyperconvergedConfiguration,
-} from '@kubevirt-utils/hooks/useKubevirtHyperconvergeConfiguration';
+import useKubevirtHyperconvergeConfiguration from '@kubevirt-utils/hooks/useKubevirtHyperconvergeConfiguration';
 import { getAnnotations } from '@kubevirt-utils/resources/shared';
 import {
   PASS_IP_STACK_MIGRATION_GATE,
@@ -25,8 +23,7 @@ const usePasstFeatureFlag = (clusterOverride?: string) => {
   const isAdmin = useIsAdmin();
 
   const featureEnabled = useMemo(
-    () =>
-      Boolean(selectHyperconvergedConfiguration(hcConfig)?.network?.binding?.[PASST_BINDING_NAME]),
+    () => Boolean(hcConfig?.spec?.configuration?.network?.binding?.[PASST_BINDING_NAME]),
     [hcConfig],
   );
 
