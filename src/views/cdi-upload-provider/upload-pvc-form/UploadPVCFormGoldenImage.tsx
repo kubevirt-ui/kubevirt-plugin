@@ -48,7 +48,7 @@ const UploadPVCFormGoldenImage: FC<UploadPVCFormGoldenImageProps> = ({
   const { t } = useKubevirtTranslation();
   return (
     <>
-      <FormGroup fieldId="golden-os-select" isRequired label={t('Operating System')}>
+      <FormGroup fieldId="golden-os-select" isRequired label={t('Operating system')}>
         <FormSelect
           id="golden-os-select"
           isDisabled={isLoading}
@@ -59,7 +59,7 @@ const UploadPVCFormGoldenImage: FC<UploadPVCFormGoldenImageProps> = ({
           <FormSelectOption
             isDisabled={!!os}
             key="defaultValue"
-            label={t('--- Pick an Operating system ---')}
+            label={t('Pick an operating system')}
             value=""
           />
           {operatingSystems.map(({ baseImageName, baseImageNamespace, id, name }) => {

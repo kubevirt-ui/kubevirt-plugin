@@ -67,10 +67,10 @@ export const fillReviewAndCreate = (vmData: VirtualMachineData) => {
         cy.get(cView.diskSourceDropDown).click();
         cy.wait(3000);
         cy.get(diskSource.catalogSelector).click();
-        cy.contains('.pf-v6-c-menu-toggle__text', '--- Select PVC project ---').click();
+        cy.contains('.pf-v6-c-menu-toggle__text', 'Select PVC project').click();
         cy.contains('#select-inline-filter-listbox li', diskSource.pvcNS).click();
         cy.wait(3000);
-        cy.contains('.pf-v6-c-menu-toggle__text', '--- Select PVC name ---').click();
+        cy.contains('.pf-v6-c-menu-toggle__text', 'Select PVC name').click();
         cy.contains('.pf-v6-c-menu__list-item', diskSource.pvcName).click();
         break;
       }
@@ -300,7 +300,7 @@ export const fillScripts = (vmData: VirtualMachineData) => {
   if (sysprepName) {
     cy.contains(descrGroup, sysPrep).find('button').eq(0).click();
     cy.byButtonText('Attach existing sysprep').click();
-    cy.byButtonText('--- Select sysprep ---').click();
+    cy.byButtonText('Select sysprep').click();
     cy.byButtonText(`sysprep-${sysprepName}`).click();
     cy.clickSaveBtn();
     cy.get(vmView.vmSysprep).within(() => {

@@ -45,7 +45,7 @@ const SelectSysprep: FCC<SelectSysprepProps> = ({
               value: name,
             };
           })}
-          placeholder={t('--- Select sysprep ---')}
+          placeholder={t('Select sysprep')}
           selected={selectedSysprepName}
           setSelected={onSelectSysprep}
           toggleProps={{ id }}

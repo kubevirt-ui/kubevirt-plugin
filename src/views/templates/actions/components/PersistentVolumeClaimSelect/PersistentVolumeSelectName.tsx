@@ -50,7 +50,7 @@ export const PersistentVolumeSelectName: FCC<PersistentVolumeSelectNameProps> = 
           isDisabled,
           isFullHeight: true,
         }}
-        placeholder={t('--- Select PVC name ---')}
+        placeholder={t('Select PVC name')}
         selected={pvcNameSelected}
         setSelected={onChange}
       />

@@ -41,7 +41,7 @@ const DiskSourcePVCSelectName: FCC<DiskSourcePVCSelectNameProps> = ({
             isDisabled,
             isFullWidth: true,
           }}
-          placeholder={t('--- Select Volume name ---')}
+          placeholder={t('Select volume name')}
           selected={pvcNameSelected}
           setSelected={onChange}
         />

@@ -34,20 +34,20 @@ export const addVolume = (vol: volData) => {
     case 'Volume': {
       cy.contains(iView.toggleText, 'Volume').click();
       cy.get('.pf-v6-c-menu__list-item').eq(1).click();
-      cy.contains('.pf-v6-c-menu-toggle__text', '--- Select Volume project ---').click();
+      cy.contains('.pf-v6-c-menu-toggle__text', 'Select volume project').click();
       cy.get(`[data-test-id="select-option-${project}"]`).click();
-      cy.contains('.pf-v6-c-menu-toggle__text', '--- Select Volume name ---').click();
+      cy.contains('.pf-v6-c-menu-toggle__text', 'Select volume name').click();
       cy.get(`[data-test-id="${pvcName}"]`).click();
       break;
     }
     case 'Volume snapshot': {
       cy.contains(iView.toggleText, 'Volume').click();
       cy.contains(iView.menuItemText, 'Volume snapshot').click();
-      cy.get('button[placeholder="--- Select VolumeSnapshot project ---"]').click();
-      cy.get('input[placeholder="--- Select VolumeSnapshot project ---"]').type('os-images');
+      cy.get('button[placeholder="Select VolumeSnapshot project"]').click();
+      cy.get('input[placeholder="Select VolumeSnapshot project"]').type('os-images');
       cy.byLegacyTestID(index.OS_IMAGES_NS).click();
       cy.wait(2000);
-      cy.contains(iView.toggleText, '--- Select VolumeSnapshot name ---').click();
+      cy.contains(iView.toggleText, 'Select VolumeSnapshot name').click();
       cy.byButtonText(volName).click();
       break;
     }
@@ -357,7 +357,7 @@ export const fillInitialRun = (vmData: VirtualMachineData) => {
     cy.get('[data-test-id="sysprep-button-edit"]').click();
     // cy.get(vmView.vmSysprepEdit).click();
     cy.byButtonText('Attach existing sysprep').click();
-    cy.byButtonText('--- Select sysprep ---').click();
+    cy.byButtonText('Select sysprep').click();
     cy.byButtonText(`sysprep-${sysprepName}`).click();
     cy.clickSaveBtn();
     cy.get(vmView.vmSysprep).within(() => {

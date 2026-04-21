@@ -65,7 +65,7 @@ export const PersistentVolumeClaimSelect: FCC<PersistentVolumeClaimSelectProps> 
               groupVersionKind: modelToGroupVersionKind(ProjectModel),
               value: name,
             }))}
-            placeholder={t('--- Select PVC project ---')}
+            placeholder={t('Select PVC project')}
             selected={projectSelected}
             setSelected={onSelectProject}
           />
@@ -87,7 +87,7 @@ export const PersistentVolumeClaimSelect: FCC<PersistentVolumeClaimSelectProps> 
               groupVersionKind: modelToGroupVersionKind(PersistentVolumeClaimModel),
               value: name,
             }))}
-            placeholder={t('--- Select PVC name ---')}
+            placeholder={t('Select PVC name')}
             selected={pvcNameSelected}
             setSelected={onPVCSelected}
           />

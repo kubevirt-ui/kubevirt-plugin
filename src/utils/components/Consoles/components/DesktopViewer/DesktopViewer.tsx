@@ -86,7 +86,7 @@ const DesktopViewer: FC<DesktopViewerProps> = ({
         <FormGroup fieldId="network-dropdown" label={t('Network interface')}>
           <FormPFSelect
             id="network-dropdown"
-            placeholder={t('--- Select network interface ---')}
+            placeholder={t('Select network interface')}
             selected={selectedNetwork?.name}
             toggleProps={{ id: 'pf-v6-c-console__actions-desktop-toggle-id' }}
           >

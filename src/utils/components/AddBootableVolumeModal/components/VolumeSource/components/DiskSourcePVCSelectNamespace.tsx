@@ -46,11 +46,11 @@ const DiskSourcePVCSelectNamespace: FCC<DiskSourcePVCSelectNamespaceProps> = ({
               isDisabled,
               isFullWidth: true,
             }}
-            placeholder={t('--- Select Volume project ---')}
+            placeholder={t('Select volume project')}
             selected={selectedProject}
             setSelected={onChange}
           />
-          <FormGroupHelperText>{t('Location of the existing Volume')}</FormGroupHelperText>
+          <FormGroupHelperText>{t('Location of the existing volume')}</FormGroupHelperText>
         </>
       ) : (
         <Loading />
