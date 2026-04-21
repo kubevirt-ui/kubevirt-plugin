@@ -11,9 +11,7 @@ type UseAlternativeOptionHelpIconProps = {
   olsPromptType: OLSPromptType;
 };
 
-const UseAlternativeOptionHelpIcon: FC<UseAlternativeOptionHelpIconProps> = ({
-  olsPromptType,
-}) => {
+const UseAlternativeOptionHelpIcon: FC<UseAlternativeOptionHelpIconProps> = ({ olsPromptType }) => {
   const { t } = useKubevirtTranslation();
 
   return (

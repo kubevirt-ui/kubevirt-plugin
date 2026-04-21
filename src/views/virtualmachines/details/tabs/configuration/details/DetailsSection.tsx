@@ -65,12 +65,7 @@ type DetailsSectionProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const DetailsSection: FC<DetailsSectionProps> = ({
-  allInstanceTypes,
-  instanceTypeVM,
-  vm,
-  vmi,
-}) => {
+const DetailsSection: FC<DetailsSectionProps> = ({ allInstanceTypes, instanceTypeVM, vm, vmi }) => {
   const { createModal } = useModal();
   const { t } = useKubevirtTranslation();
   const accessReview = asAccessReview(VirtualMachineModel, vm, 'update' as K8sVerb);

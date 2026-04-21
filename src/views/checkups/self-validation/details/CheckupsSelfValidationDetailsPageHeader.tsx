@@ -23,9 +23,10 @@ type CheckupsSelfValidationDetailsPageHeaderProps = {
   jobs: IoK8sApiBatchV1Job[];
 };
 
-const CheckupsSelfValidationDetailsPageHeader: FC<
-  CheckupsSelfValidationDetailsPageHeaderProps
-> = ({ configMap, jobs }) => {
+const CheckupsSelfValidationDetailsPageHeader: FC<CheckupsSelfValidationDetailsPageHeaderProps> = ({
+  configMap,
+  jobs,
+}) => {
   const { t } = useKubevirtTranslation();
 
   return (

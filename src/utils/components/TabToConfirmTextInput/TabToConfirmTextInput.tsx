@@ -1,12 +1,4 @@
-import React, {
-  FC,
-  FormEvent,
-  KeyboardEvent,
-  ReactNode,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import React, { FC, FormEvent, KeyboardEvent, ReactNode, useEffect, useRef, useState } from 'react';
 
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import { TAB } from '@kubevirt-utils/hooks/useClickOutside/constants';

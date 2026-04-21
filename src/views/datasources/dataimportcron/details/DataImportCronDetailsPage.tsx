@@ -14,9 +14,7 @@ type DataImportCronDetailsPageProps = {
   obj?: V1beta1DataImportCron;
 };
 
-const DataImportCronDetailsPage: FC<DataImportCronDetailsPageProps> = ({
-  obj: dataImportCron,
-}) => {
+const DataImportCronDetailsPage: FC<DataImportCronDetailsPageProps> = ({ obj: dataImportCron }) => {
   const { t } = useKubevirtTranslation();
 
   return (

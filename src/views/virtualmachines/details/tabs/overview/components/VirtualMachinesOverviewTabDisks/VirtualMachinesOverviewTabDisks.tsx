@@ -19,10 +19,7 @@ type VirtualMachinesOverviewTabDisksProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const VirtualMachinesOverviewTabDisks: FC<VirtualMachinesOverviewTabDisksProps> = ({
-  vm,
-  vmi,
-}) => {
+const VirtualMachinesOverviewTabDisks: FC<VirtualMachinesOverviewTabDisksProps> = ({ vm, vmi }) => {
   const { t } = useKubevirtTranslation();
   const [disks, loaded, loadError] = useDisksTableData(vm, vmi);
   const columns = useMemo(() => getOverviewDisksColumns(t), [t]);
