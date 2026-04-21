@@ -57,8 +57,8 @@ const DiskSourceSnapshotVolumeSelectNamespace: FCC = () => {
             }}
             toggleProps={{
               isFullWidth: true,
-              placeholder: t('Select Project'),
             }}
+            placeholder={t('Select Project')}
             selected={value}
           />
           <FormGroupHelperText

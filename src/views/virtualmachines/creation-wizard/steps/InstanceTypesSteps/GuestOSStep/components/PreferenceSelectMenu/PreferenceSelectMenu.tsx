@@ -25,9 +25,10 @@ const PreferenceSelectMenu: FCC = () => {
       <FormPFSelect
         className="pf-v6-u-mt-md"
         onSelect={(_, value) => setPreference(value as string)}
+        placeholder={t('Select guest operating system type')}
         selected={preference || ''}
         selectedLabel={preference || t('Select guest operating system type')}
-        toggleProps={{ isFullWidth: true, placeholder: t('Select guest operating system type') }}
+        toggleProps={{ isFullWidth: true }}
       >
         {preferenceNames.map((name) => (
           <SelectOption key={name} value={name}>

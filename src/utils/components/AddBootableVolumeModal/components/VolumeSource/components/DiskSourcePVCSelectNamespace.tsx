@@ -45,8 +45,8 @@ const DiskSourcePVCSelectNamespace: FCC<DiskSourcePVCSelectNamespaceProps> = ({
             toggleProps={{
               isDisabled,
               isFullWidth: true,
-              placeholder: t('--- Select Volume project ---'),
             }}
+            placeholder={t('--- Select Volume project ---')}
             selected={selectedProject}
             setSelected={onChange}
           />

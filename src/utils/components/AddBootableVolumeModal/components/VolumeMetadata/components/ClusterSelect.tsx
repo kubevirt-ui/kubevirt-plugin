@@ -40,9 +40,10 @@ const ClusterSelect: FCC<ClusterSelectProps> = ({ bootableVolume, setBootableVol
     <FormGroup isRequired label={t('Cluster')}>
       <InlineFilterSelect
         options={clusterOptions}
+        placeholder={t('Select cluster')}
         selected={bootableVolume.bootableVolumeCluster}
         setSelected={handleSelect}
-        toggleProps={{ isFullWidth: true, placeholder: t('Select cluster') }}
+        toggleProps={{ isFullWidth: true }}
       />
     </FormGroup>
   );

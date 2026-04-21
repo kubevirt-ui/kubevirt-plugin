@@ -79,9 +79,9 @@ const StorageClassSelect: FCC<StorageClassSelectProps> = ({ checkSC, setShowSCAl
             <InlineFilterSelect
               toggleProps={{
                 isFullWidth: true,
-                placeholder: t('Select {{label}}', { label: StorageClassModel.label }),
               }}
               options={getSCSelectOptions(readyStorageClasses)}
+              placeholder={t('Select {{label}}', { label: StorageClassModel.label })}
               popperProps={{ enableFlip: true }}
               selected={value}
               setSelected={onSelect}

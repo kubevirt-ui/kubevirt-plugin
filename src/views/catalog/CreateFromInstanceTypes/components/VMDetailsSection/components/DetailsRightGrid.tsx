@@ -80,8 +80,8 @@ const DetailsRightGrid: FCC = () => {
               }
               className="storageclass-select__dropdown"
               options={sortedStorageClasses?.map((scName) => ({ children: scName, value: scName }))}
+              placeholder={t('Select StorageClass')}
               setSelected={setSelectedStorageClass}
-              toggleProps={{ placeholder: t('Select StorageClass') }}
             />
           ) : (
             <Loading />

@@ -1,6 +1,6 @@
 import React from 'react';
-import { TFunction } from 'i18next';
 import { Step } from 'react-joyride';
+import { TFunction } from 'i18next';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
@@ -71,7 +71,7 @@ export const getTourSteps = (t: TFunction): Step[] => [
   },
 ];
 
-export const TOUR_STEPS_COUNT = getTourSteps((key: string) => key).length;
+export const TOUR_STEPS_COUNT = getTourSteps(((key: string) => key) as TFunction).length;
 
 export const tourGuideVM: V1VirtualMachine = {
   apiVersion: 'kubevirt.io/v1',

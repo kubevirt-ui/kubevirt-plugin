@@ -2263,7 +2263,6 @@
   "View {{alertType}}": "{{alertType}} 보기",
   "view {{qualifiedNodesCount}} matching nodes": "{{qualifiedNodesCount}} 일치하는 노드 보기",
   "View alert": "알림 표시",
-  "View alerts": "알림 표시",
   "View all": "모두 보기",
   "View all quick starts": "모든 퀵스타트보기",
   "View and manage available bootable volumes.": "사용 가능한 부팅 가능한 볼륨을 보고 관리합니다.",

@@ -29,9 +29,9 @@ const StorageClassSelect: FCC<StorageClassSelectProps> = ({
     >
       <InlineFilterSelect
         options={sortedStorageClasses?.map((name) => ({ children: name, value: name }))}
+        placeholder={t('Select storage class')}
         selected={storageClassName}
         setSelected={onStorageClassChange}
-        toggleProps={{ placeholder: t('Select storage class') }}
       />
     </FormGroup>
   );

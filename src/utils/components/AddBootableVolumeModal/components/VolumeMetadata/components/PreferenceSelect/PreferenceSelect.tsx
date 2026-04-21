@@ -87,9 +87,10 @@ const PreferenceSelect: FCC<PreferenceSelectProps> = ({
     >
       <InlineFilterSelect
         options={preferenceSelectOptions}
+        placeholder={t('Select preference')}
         selected={selectedPreferenceKey}
         setSelected={handleSelect}
-        toggleProps={{ isFullWidth: true, placeholder: t('Select preference') }}
+        toggleProps={{ isFullWidth: true }}
       />
     </FormGroup>
   );

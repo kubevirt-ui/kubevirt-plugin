@@ -31,9 +31,10 @@ const SelectProject: FCC<SelectProjectProps> = ({
         groupVersionKind: modelToGroupVersionKind(ProjectModel),
         value: projectName,
       }))}
+      placeholder={t('Select project')}
       selected={selectedProject}
       setSelected={setSelectedProject}
-      toggleProps={{ isFullWidth: true, placeholder: t('Select project') }}
+      toggleProps={{ isFullWidth: true }}
     />
   );
 };

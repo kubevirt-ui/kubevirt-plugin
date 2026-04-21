@@ -89,9 +89,10 @@ const VirtualMachineMigrationDestinationTab: FCC<VirtualMachineMigrationDestinat
           popperProps={{
             appendTo: () => document.getElementById(POPPER_CONTAINER_ID),
           }}
+          placeholder={t('Select StorageClass')}
           selected={destinationStorageClass}
           setSelected={setSelectedStorageClass}
-          toggleProps={{ isFullWidth: true, placeholder: t('Select StorageClass') }}
+          toggleProps={{ isFullWidth: true }}
         />
       </StackItem>
       {isSameStorageClass && (

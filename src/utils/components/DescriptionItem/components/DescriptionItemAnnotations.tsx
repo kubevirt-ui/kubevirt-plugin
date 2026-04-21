@@ -6,7 +6,6 @@ import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getAnnotations } from '@kubevirt-utils/resources/shared';
-import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverContentWithLightspeedButton/PopoverContentWithLightspeedButton';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { K8sModel, k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 
@@ -65,14 +64,8 @@ const DescriptionItemAnnotations: FCC<DescriptionItemAnnotationsProps> = ({
   return (
     <DescriptionItem
       // body-content text copied from: https://github.com/kubevirt-ui/kubevirt-api/blob/main/containerized-data-importer/models/V1ObjectMeta.ts#L32
-      bodyContent={(hide) => (
-        <PopoverContentWithLightspeedButton
-          content={t(
-            'Annotations is an unstructured key value map stored with a resource that may be set by external tools to store and retrieve arbitrary metadata. They are not queryable and should be preserved when modifying objects.',
-          )}
-          hide={hide}
-          promptType={OLSPromptType.ANNOTATIONS}
-        />
+      bodyContent={t(
+        'Annotations is an unstructured key value map stored with a resource that may be set by external tools to store and retrieve arbitrary metadata. They are not queryable and should be preserved when modifying objects.',
       )}
       breadcrumb={`${label ?? model.label}.metadata.annotations`}
       className={className}

@@ -68,8 +68,8 @@ const DiskSourcePVCSelectName: FCC<DiskSourcePVCSelectNameProps> = ({ vmNamespac
               toggleProps={{
                 isDisabled: isEmpty(vmNamespace),
                 isFullWidth: true,
-                placeholder: t('Select PersistentVolumeClaim'),
               }}
+              placeholder={t('Select PersistentVolumeClaim')}
               selected={value as string}
               setSelected={onChange}
             />

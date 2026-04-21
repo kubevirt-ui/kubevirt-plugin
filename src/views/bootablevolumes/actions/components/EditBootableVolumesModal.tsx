@@ -152,9 +152,9 @@ const EditBootableVolumesModal: FCC<EditBootableVolumesModalProps> = ({
             groupVersionKind: VirtualMachineClusterPreferenceModelGroupVersionKind,
             value: opt,
           }))}
+          placeholder={t('Select preference')}
           selected={preference}
           setSelected={setPreference}
-          toggleProps={{ placeholder: t('Select preference') }}
         />
       </FormGroup>
       <Grid hasGutter>

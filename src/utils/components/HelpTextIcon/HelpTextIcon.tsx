@@ -1,13 +1,20 @@
 import React, { FCC, MouseEventHandler, ReactNode } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Button, Icon, IconSize, Popover, PopoverPosition } from '@patternfly/react-core';
+import {
+  Button,
+  Icon,
+  IconSize,
+  Popover,
+  PopoverPosition,
+  PopoverProps,
+} from '@patternfly/react-core';
 import { HelpIcon } from '@patternfly/react-icons';
 
 import './HelpTextIcon.scss';
 
 type HelpTextIconProps = {
-  bodyContent: ((hide: () => void) => ReactNode) | ReactNode;
+  bodyContent: PopoverProps['bodyContent'];
   buttonAriaLabel?: string;
   className?: string;
   footerContent?: ReactNode;

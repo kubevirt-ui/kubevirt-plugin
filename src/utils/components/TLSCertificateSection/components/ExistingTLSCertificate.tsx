@@ -50,8 +50,8 @@ const ExistingTLSCertificate: FCC<ExistingTLSCertificateProps> = ({
               }}
               toggleProps={{
                 isFullWidth: true,
-                placeholder: t('Select project...'),
               }}
+              placeholder={t('Select project...')}
               selected={certProject || ''}
             />
           ) : (
@@ -75,8 +75,8 @@ const ExistingTLSCertificate: FCC<ExistingTLSCertificateProps> = ({
               }}
               toggleProps={{
                 isFullWidth: true,
-                placeholder: t('Select TLS certificate'),
               }}
+              placeholder={t('Select TLS certificate')}
               selected={selectedConfigMap || ''}
             />
           )}

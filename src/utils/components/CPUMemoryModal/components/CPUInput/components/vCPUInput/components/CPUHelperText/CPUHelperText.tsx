@@ -18,13 +18,15 @@ const CPUHelperText: FCC<CPUHelperTextProps> = ({ cpu, hide }) => {
   if (hide) return null;
 
   const formattedCPU = formatVCPUsAsSockets(cpu);
+  const { cores, sockets, threads } = parseCPU(formattedCPU);
 
   return (
     <div id="cpu-helper-text">
-      {t(
-        'Topology will be set to {{sockets}} socket, {{cores}} core, {{threads}} thread',
-        parseCPU(formattedCPU),
-      )}
+      {t('Topology will be set to {{sockets}} socket, {{cores}} core, {{threads}} thread', {
+        cores,
+        sockets,
+        threads,
+      })}
     </div>
   );
 };

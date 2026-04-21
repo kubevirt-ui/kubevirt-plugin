@@ -65,9 +65,9 @@ const AdvancedSettings: FCC<AdvancedSettingsProps> = ({
           <InlineFilterSelect
             toggleProps={{
               isFullWidth: true,
-              placeholder: t('Select {{label}}', { label: StorageClassModel.label }),
             }}
             options={getSCSelectOptions(storageClasses)}
+            placeholder={t('Select {{label}}', { label: StorageClassModel.label })}
             popperProps={{ enableFlip: true }}
             selected={storageClass || defaultSC?.metadata?.name || ''}
             setSelected={setStorageClass}

@@ -6,6 +6,7 @@ import {
   ExpandableSection,
   ExpandableSectionToggle,
   PopoverPosition,
+  PopoverProps,
   Split,
   SplitItem,
   Stack,
@@ -22,7 +23,7 @@ type ExpandSectionWithCustomToggleProps = {
   className?: string;
   customContent?: ReactNode;
   expandSectionClassName?: string;
-  helpTextContent?: ReactNode;
+  helpTextContent?: PopoverProps['bodyContent'];
   id: string;
   isExpanded?: boolean;
   isIndented?: boolean;

@@ -70,8 +70,8 @@ const DiskSourceSnapshotVolumeSelectName: FCC = () => {
             toggleProps={{
               isDisabled: isEmpty(namespace),
               isFullWidth: true,
-              placeholder: t('Select VolumeSnapshot'),
             }}
+            placeholder={t('Select VolumeSnapshot')}
             selected={value}
           />
           {error && (

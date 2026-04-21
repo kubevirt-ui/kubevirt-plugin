@@ -40,8 +40,9 @@ const VMNetworkSelect: FCC<VMNetworkSelectProps> = ({
   return (
     <FormPFSelect
       id="vm-network-select"
+      placeholder={t('Select a virtual machine network')}
       selected={selectedNetwork}
-      toggleProps={{ isFullWidth: true, placeholder: t('Select a virtual machine network') }}
+      toggleProps={{ isFullWidth: true }}
     >
       {isEmpty(vmNetworksWithProjects) ? (
         <SelectOption isDisabled key="no-networks" value="no-networks">

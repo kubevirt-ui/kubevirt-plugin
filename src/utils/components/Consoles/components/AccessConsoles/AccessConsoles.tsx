@@ -132,7 +132,6 @@ export const AccessConsoles: FCC<AccessConsolesProps> = ({
         aria-label={t('Select console type')}
         isOpen={isOpenSelectType}
         onOpenChange={setIsOpenSelectType}
-        placeholder={t('Select console type')}
         selected={type}
       >
         <SelectList>

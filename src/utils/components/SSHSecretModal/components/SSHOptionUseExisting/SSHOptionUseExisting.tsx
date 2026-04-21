@@ -122,9 +122,10 @@ const SSHOptionUseExisting: FCC<SSHOptionUseExistingProps> = ({
               }))}
               className="ssh-use-existing__form-group--project"
               data-test="ssh-use-existing-project"
+              placeholder={t('Select project')}
               selected={selectedProject}
               setSelected={onSelectProject}
-              toggleProps={{ isFullWidth: true, placeholder: t('Select project') }}
+              toggleProps={{ isFullWidth: true }}
             />
           </FormGroup>
         </GridItem>

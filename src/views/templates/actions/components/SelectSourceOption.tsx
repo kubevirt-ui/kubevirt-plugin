@@ -1,6 +1,6 @@
 import React, { FCC, ReactNode, useCallback } from 'react';
-import { TFunction } from 'i18next';
 import { useParams } from 'react-router';
+import { TFunction } from 'i18next';
 
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
@@ -101,9 +101,9 @@ const SelectSourceOption: FCC<SelectSourceOptionProps> = ({
     >
       <FormPFSelect
         onSelect={onSelect}
+        placeholder={t('Select boot source type')}
         selected={selectedSource}
         selectedLabel={selectedSource ? t(SOURCE_TYPE_LABELS[selectedSource]) : undefined}
-        toggleProps={{ placeholder: t('Select boot source type') }}
       >
         {options.map((option) => getSourceOption(option, ns, t))}
       </FormPFSelect>

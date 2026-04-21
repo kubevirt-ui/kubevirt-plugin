@@ -1,7 +1,8 @@
 import { useCallback, useMemo } from 'react';
 
 import { universalComparator } from '@kubevirt-utils/utils/utils';
-import { DataViewTh, useDataViewSort } from '@patternfly/react-data-view';
+import { useDataViewSort } from '@patternfly/react-data-view';
+import { DataViewTh } from '@patternfly/react-data-view/dist/esm/DataViewTable';
 import { SortByDirection, ThProps } from '@patternfly/react-table';
 
 import { useResponsiveColumns } from '../useResponsiveColumns/useResponsiveColumns';

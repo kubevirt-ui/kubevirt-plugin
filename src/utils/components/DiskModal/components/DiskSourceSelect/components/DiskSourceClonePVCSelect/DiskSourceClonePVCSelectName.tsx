@@ -70,8 +70,8 @@ const DiskSourceClonePVCSelectName: FCC = () => {
             toggleProps={{
               isDisabled: isEmpty(namespace),
               isFullWidth: true,
-              placeholder: t('Select PersistentVolumeClaim'),
             }}
+            placeholder={t('Select PersistentVolumeClaim')}
             selected={value}
           />
           {error && (

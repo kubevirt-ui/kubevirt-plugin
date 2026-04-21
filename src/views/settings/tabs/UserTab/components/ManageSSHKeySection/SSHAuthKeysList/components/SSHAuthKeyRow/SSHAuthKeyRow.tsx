@@ -88,8 +88,8 @@ const SSHAuthKeyRow: FCC<SSHAuthKeyRowProps> = ({
             toggleProps={{
               'data-test-id': 'select-project-toggle',
               isFullWidth: true,
-              placeholder: t('Select project'),
             }}
+            placeholder={t('Select project')}
             selected={projectName}
             setSelected={(newProject) => onAuthKeyChange({ ...row, projectName: newProject })}
           />

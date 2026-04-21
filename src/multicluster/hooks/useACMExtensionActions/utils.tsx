@@ -1,4 +1,4 @@
-import React, { ComponentType } from 'react';
+import React, { ComponentType, ReactNode } from 'react';
 
 import { ACMVirtualMachineAction } from '@kubevirt-extensions/acm.virtualmachine';
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -32,7 +32,7 @@ export function buildACMVirtualMachineActionsFromExtensions(
           ? action.properties.isDisabled(virtualMachine)
           : action.properties.isDisabled,
       id: action.properties.id,
-      label: action.properties.title,
+      label: action.properties.title as ReactNode,
     };
   });
 }
