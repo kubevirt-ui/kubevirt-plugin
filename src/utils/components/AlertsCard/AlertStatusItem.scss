@@ -3,6 +3,9 @@
   font-size: var(--pf-t--global--font--size--md);
   margin-top: var(--pf-t--global--spacer--xs);
   margin-bottom: var(--pf-t--global--spacer--xs);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .alert-item {
@@ -17,18 +20,19 @@
   &__message {
     display: flex;
     flex-direction: column;
+    min-width: 0;
   }
 
   &__more {
     display: flex;
     flex-shrink: 0;
-    justify-content: flex-end;
-    padding-left: var(--pf-v6-c-card--child--PaddingInlineStart);
+    justify-content: flex-start;
   }
 
   &__text {
     display: flex;
     justify-content: space-between;
+    min-width: 0;
     width: 100%;
   }
 
