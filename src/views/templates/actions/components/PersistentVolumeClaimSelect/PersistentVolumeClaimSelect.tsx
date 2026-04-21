@@ -1,4 +1,4 @@
-import React, { FCC, useCallback } from 'react';
+import React, { FC, useCallback } from 'react';
 
 import useProjects from '@kubevirt-utils/hooks/useProjects';
 import usePVCs from '@kubevirt-utils/hooks/usePVCs';
@@ -16,7 +16,7 @@ type PersistentVolumeClaimSelectProps = {
   selectPVC: (pvcNamespace: string, pvcName?: string) => void;
 };
 
-export const PersistentVolumeClaimSelect: FCC<PersistentVolumeClaimSelectProps> = ({
+export const PersistentVolumeClaimSelect: FC<PersistentVolumeClaimSelectProps> = ({
   projectSelected,
   pvcNameSelected,
   selectPVC,

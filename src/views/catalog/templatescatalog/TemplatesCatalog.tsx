@@ -1,4 +1,4 @@
-import React, { FCC, useMemo, useState } from 'react';
+import React, { FC, useMemo, useState } from 'react';
 import { useParams } from 'react-router';
 
 import { CREATE_VM_TAB } from '@catalog/CreateVMHorizontalNav/constants';
@@ -24,7 +24,7 @@ import './TemplatesCatalog.scss';
 
 type TemplatesCatalogProps = { currentTab: CREATE_VM_TAB };
 
-const TemplatesCatalog: FCC<TemplatesCatalogProps> = ({ currentTab }) => {
+const TemplatesCatalog: FC<TemplatesCatalogProps> = ({ currentTab }) => {
   const { ns: namespace } = useParams<{ ns: string }>();
   const [selectedTemplate, setSelectedTemplate] = useState<undefined | V1Template>(undefined);
 

@@ -1,4 +1,4 @@
-import React, { FCC, useEffect, useRef, useState } from 'react';
+import React, { FC, useEffect, useRef, useState } from 'react';
 import { Trans } from 'react-i18next';
 
 import {
@@ -40,7 +40,7 @@ type EditBootSourceModalProps = {
   onClose: () => void;
 };
 
-const EditBootSourceModal: FCC<EditBootSourceModalProps> = ({
+const EditBootSourceModal: FC<EditBootSourceModalProps> = ({
   dataSource,
   isOpen,
   obj,

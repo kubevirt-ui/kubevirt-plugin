@@ -1,4 +1,4 @@
-import React, { FCC, useMemo, useState } from 'react';
+import React, { FC, useMemo, useState } from 'react';
 import { Link } from 'react-router';
 
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -14,7 +14,7 @@ import { getAlertMessage } from './utils';
 
 type NoVMsAlertProps = { namespace?: string };
 
-const NoVMsAlert: FCC<NoVMsAlertProps> = ({ namespace }) => {
+const NoVMsAlert: FC<NoVMsAlertProps> = ({ namespace }) => {
   const { t } = useKubevirtTranslation();
   const [dismissed, setDismissed] = useState(false);
   const isACMPage = useIsACMPage();

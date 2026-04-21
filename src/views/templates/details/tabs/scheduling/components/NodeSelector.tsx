@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 import { TemplateSchedulingGridProps } from 'src/views/templates/details/tabs/scheduling/components/TemplateSchedulingLeftGrid';
 import { getNodeSelector } from 'src/views/templates/utils/selectors';
 
@@ -9,7 +9,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 
 import NodeSelectorModal from './NodeSelectorModal';
 
-const NodeSelector: FCC<TemplateSchedulingGridProps> = ({ editable, onSubmit, template }) => {
+const NodeSelector: FC<TemplateSchedulingGridProps> = ({ editable, onSubmit, template }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
 

@@ -1,10 +1,10 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { Skeleton } from '@patternfly/react-core';
 
 const SKELETON_ROWS = 3;
 
-const LoadingSkeleton: FCC = () => (
+const LoadingSkeleton: FC = () => (
   <div className="two-column-card__layout">
     <div className="two-column-card__left">
       {Array.from({ length: SKELETON_ROWS }, (_, i) => (

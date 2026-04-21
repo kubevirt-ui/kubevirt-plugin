@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
@@ -21,7 +21,7 @@ type AdvancedSettingsProps = {
   showApplyStorageProfileSettings?: boolean;
 };
 
-const AdvancedSettings: FCC<AdvancedSettingsProps> = ({
+const AdvancedSettings: FC<AdvancedSettingsProps> = ({
   olsObj,
   showApplyStorageProfileSettings,
 }) => {

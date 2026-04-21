@@ -1,4 +1,4 @@
-import React, { FCC, useCallback } from 'react';
+import React, { FC, useCallback } from 'react';
 import { useNavigate } from 'react-router';
 
 import { EditorType } from '@kubevirt-utils/components/SyncedEditor/utils/types';
@@ -15,7 +15,7 @@ type QuotasCreateButtonProps = {
   namespace?: string;
 };
 
-const QuotasCreateButton: FCC<QuotasCreateButtonProps> = ({ namespace }) => {
+const QuotasCreateButton: FC<QuotasCreateButtonProps> = ({ namespace }) => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
 

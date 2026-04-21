@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import ExpandSectionWithCustomToggle from '@kubevirt-utils/components/ExpandSectionWithCustomToggle/ExpandSectionWithCustomToggle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -18,7 +18,7 @@ type HighAvailabilitySummarySectionProps = {
   operatorDetailsMap: OperatorDetailsMap;
 };
 
-const HighAvailabilitySummarySection: FCC<HighAvailabilitySummarySectionProps> = ({
+const HighAvailabilitySummarySection: FC<HighAvailabilitySummarySectionProps> = ({
   operatorDetailsMap,
 }) => {
   const { t } = useKubevirtTranslation();

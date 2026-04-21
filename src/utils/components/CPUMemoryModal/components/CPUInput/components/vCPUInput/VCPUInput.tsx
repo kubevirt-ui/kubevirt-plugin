@@ -1,4 +1,4 @@
-import React, { ChangeEvent, Dispatch, FCC, SetStateAction } from 'react';
+import React, { ChangeEvent, Dispatch, FC, SetStateAction } from 'react';
 
 import { V1CPU } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import {
@@ -17,7 +17,7 @@ type vCPUInputProps = {
   setCPU: Dispatch<SetStateAction<V1CPU>>;
 };
 
-const VCPUInput: FCC<vCPUInputProps> = ({ cpu, isDisabled, setCPU }) => {
+const VCPUInput: FC<vCPUInputProps> = ({ cpu, isDisabled, setCPU }) => {
   const { t } = useKubevirtTranslation();
 
   const handleButtonInput = (newCPU: V1CPU) => {

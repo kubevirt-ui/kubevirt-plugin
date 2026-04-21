@@ -1,4 +1,4 @@
-import React, { FCC, JSX, useMemo, useState } from 'react';
+import React, { FC, JSX, useMemo, useState } from 'react';
 
 import ClusterProjectDropdown from '@kubevirt-utils/components/ClusterProjectDropdown/ClusterProjectDropdown';
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
@@ -18,7 +18,7 @@ import { initialMigrationPolicyState, produceMigrationPolicy } from './utils/uti
 import './MigrationPolicyCreateForm.scss';
 import '@kubevirt-utils/styles/forms.scss';
 
-const MigrationPolicyCreateForm: FCC = (): JSX.Element => {
+const MigrationPolicyCreateForm: FC = (): JSX.Element => {
   const { t } = useKubevirtTranslation();
   const isACMPage = useIsACMPage();
   const [state, setState] = useState(initialMigrationPolicyState);

@@ -1,4 +1,4 @@
-import React, { FCC, ReactNode } from 'react';
+import React, { FC, ReactNode } from 'react';
 import { Link } from 'react-router';
 
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
@@ -11,7 +11,7 @@ type CountContentProps = {
   statusMessage?: string;
 };
 
-const CountContent: FCC<CountContentProps> = ({
+const CountContent: FC<CountContentProps> = ({
   ariaLabel,
   displayValue,
   href,

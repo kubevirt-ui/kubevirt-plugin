@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ANNOTATIONS } from '@kubevirt-utils/resources/template';
@@ -16,7 +16,7 @@ type VolumeMetadataProps = {
   setBootableVolumeField: SetBootableVolumeFieldType;
 };
 
-const VolumeMetadata: FCC<VolumeMetadataProps> = ({
+const VolumeMetadata: FC<VolumeMetadataProps> = ({
   bootableVolume,
   deleteLabel,
   setBootableVolumeField,

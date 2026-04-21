@@ -1,4 +1,4 @@
-import React, { FCC, useState } from 'react';
+import React, { FC, useState } from 'react';
 import { useNavigate } from 'react-router';
 
 import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
@@ -42,7 +42,7 @@ import {
 
 import './CustomizeITVMFooter.scss';
 
-const CustomizeITVMFooter: FCC = () => {
+const CustomizeITVMFooter: FC = () => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
   const namespace = useNamespaceParam();

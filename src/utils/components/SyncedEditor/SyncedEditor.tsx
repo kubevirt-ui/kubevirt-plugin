@@ -1,4 +1,4 @@
-import React, { ComponentType, FCC, useState } from 'react';
+import React, { ComponentType, FC, useState } from 'react';
 import { isEqual } from 'lodash';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -35,7 +35,7 @@ type SyncedEditorProps = {
 //       - If it fails, nothing happens. formData remains unchanged.
 //       - If successful, formData is updated to resulting js
 //   - on toggle to form view, no action needs to be taken to sync because formData has remained up to date with each yaml change
-export const SyncedEditor: FCC<SyncedEditorProps> = ({
+export const SyncedEditor: FC<SyncedEditorProps> = ({
   context = {} as SyncedEditorProps['context'],
   displayConversionError,
   FormEditor,

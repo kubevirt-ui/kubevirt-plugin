@@ -1,4 +1,4 @@
-import React, { FCC, useEffect } from 'react';
+import React, { FC, useEffect } from 'react';
 
 import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
 import ProjectDropdown from '@kubevirt-utils/components/ProjectDropdown/ProjectDropdown';
@@ -37,7 +37,7 @@ type BootableVolumeListProps = {
   instanceTypesAndPreferencesData: UseInstanceTypeAndPreferencesValues;
 };
 
-const BootableVolumeList: FCC<BootableVolumeListProps> = ({
+const BootableVolumeList: FC<BootableVolumeListProps> = ({
   bootableVolumesData,
   instanceTypesAndPreferencesData,
 }) => {

@@ -1,4 +1,4 @@
-import React, { FCC, useMemo } from 'react';
+import React, { FC, useMemo } from 'react';
 
 import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
@@ -20,7 +20,7 @@ type NetworkInterfaceListProps = {
   template: V1Template;
 };
 
-const NetworkInterfaceList: FCC<NetworkInterfaceListProps> = ({ template }) => {
+const NetworkInterfaceList: FC<NetworkInterfaceListProps> = ({ template }) => {
   const { t } = useKubevirtTranslation();
   const vm = getTemplateVirtualMachineObject(template);
   const networks = getNetworks(vm);

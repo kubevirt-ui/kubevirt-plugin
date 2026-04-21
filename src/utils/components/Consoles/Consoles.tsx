@@ -1,4 +1,4 @@
-import React, { FCC, memo, useState } from 'react';
+import React, { FC, memo, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getConsoleStandaloneURL } from '@multicluster/urls';
@@ -39,7 +39,7 @@ type ConsolesProps = {
   vncLogLevel?: VncLogLevel;
 };
 
-const Consoles: FCC<ConsolesProps> = ({
+const Consoles: FC<ConsolesProps> = ({
   consoleContainerClass,
   isHeadlessMode,
   isStandAlone = false,

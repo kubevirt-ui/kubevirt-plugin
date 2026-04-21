@@ -1,4 +1,4 @@
-import React, { FCC, useState } from 'react';
+import React, { FC, useState } from 'react';
 
 import { V1beta1VirtualMachinePreference } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -20,7 +20,7 @@ type ShowAllBootableVolumesButtonProps = {
   userPreferencesData: V1beta1VirtualMachinePreference[];
 };
 
-const ShowAllBootableVolumesButton: FCC<ShowAllBootableVolumesButtonProps> = (props) => {
+const ShowAllBootableVolumesButton: FC<ShowAllBootableVolumesButtonProps> = (props) => {
   const { t } = useKubevirtTranslation();
   const [isOpen, setIsOpen] = useState(false);
 

@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { ApplicationAwareQuota, CalculationMethod } from '@kubevirt-utils/resources/quotas/types';
 
@@ -10,7 +10,7 @@ type QuotaCPUCellProps = {
   row: ApplicationAwareQuota;
 };
 
-const QuotaCPUCell: FCC<QuotaCPUCellProps> = ({ callbacks, row }) => {
+const QuotaCPUCell: FC<QuotaCPUCellProps> = ({ callbacks, row }) => {
   const { cpu } = getResourceKeysFromCallbacks(callbacks);
   const { hard, used } = getQuotaStatusData(row);
   const unit = callbacks.calculationMethod === CalculationMethod.VmiPodUsage ? 'CPU' : 'vCPU';

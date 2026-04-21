@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { TemplateModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import DescriptionItemAnnotations from '@kubevirt-utils/components/DescriptionItem/components/DescriptionItemAnnotations';
@@ -27,7 +27,7 @@ import CPUMemory from './CPUMemory';
 import DisplayName from './DisplayName';
 import WorkloadProfile from './WorkloadProfile';
 
-const TemplateDetailsLeftGrid: FCC<TemplateDetailsGridProps> = ({ template }) => {
+const TemplateDetailsLeftGrid: FC<TemplateDetailsGridProps> = ({ template }) => {
   const { t } = useKubevirtTranslation();
   const machineType = getMachineType(getTemplateVirtualMachineObject(template)) || NO_DATA_DASH;
   const { isTemplateEditable } = useEditTemplateAccessReview(template);

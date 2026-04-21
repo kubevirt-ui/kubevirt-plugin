@@ -1,4 +1,4 @@
-import React, { FCC, useCallback } from 'react';
+import React, { FC, useCallback } from 'react';
 import produce from 'immer';
 import { VirtualMachineModel } from 'src/views/dashboard-extensions/utils';
 
@@ -27,7 +27,7 @@ type VirtualMachinesEditNetworkInterfaceModalProps = {
   vm: V1VirtualMachine;
 };
 
-const VirtualMachinesEditNetworkInterfaceModal: FCC<
+const VirtualMachinesEditNetworkInterfaceModal: FC<
   VirtualMachinesEditNetworkInterfaceModalProps
 > = ({ isOpen, nicPresentation, onClose, vm }) => {
   const { t } = useKubevirtTranslation();

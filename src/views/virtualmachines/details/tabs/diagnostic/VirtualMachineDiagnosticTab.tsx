@@ -1,4 +1,4 @@
-import React, { FCC, useEffect, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useLocation } from 'react-router';
 
@@ -16,7 +16,7 @@ import VirtualMachineLogViewer from './VirtualMachineLogViewer/VirtualMachineLog
 
 import './virtual-machine-diagnostic-tab.scss';
 
-const VirtualMachineDiagnosticTab: FCC<NavPageComponentProps> = ({ obj: vm }) => {
+const VirtualMachineDiagnosticTab: FC<NavPageComponentProps> = ({ obj: vm }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useKubevirtTranslation();

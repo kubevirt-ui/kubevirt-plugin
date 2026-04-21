@@ -1,4 +1,4 @@
-import React, { FCC, memo } from 'react';
+import React, { FC, memo } from 'react';
 import { Link } from 'react-router';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -9,7 +9,7 @@ import { VIEW_EVENTS_PATH } from './utils/constants';
 import OngoingActivity from './utils/OngoingActivity';
 import RecentEvent from './utils/RecentEvent';
 
-const ActivityCard: FCC = memo(() => {
+const ActivityCard: FC = memo(() => {
   const { t } = useKubevirtTranslation();
   return (
     <Card className="co-overview-card--gradient" data-test-id="kv-activity-card">

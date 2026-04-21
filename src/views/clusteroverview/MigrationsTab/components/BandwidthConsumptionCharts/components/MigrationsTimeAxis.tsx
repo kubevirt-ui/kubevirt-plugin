@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { tickLabels } from '@kubevirt-utils/components/Charts/ChartLabels/styleOverrides';
 import useResponsiveCharts from '@kubevirt-utils/components/Charts/hooks/useResponsiveCharts';
@@ -12,7 +12,7 @@ type MigrationsTimeAxisProps = {
   timespan: number;
 };
 
-const MigrationsTimeAxis: FCC<MigrationsTimeAxisProps> = ({ domainX, timespan }) => {
+const MigrationsTimeAxis: FC<MigrationsTimeAxisProps> = ({ domainX, timespan }) => {
   const { t } = useKubevirtTranslation();
   const { width } = useResponsiveCharts();
   return (

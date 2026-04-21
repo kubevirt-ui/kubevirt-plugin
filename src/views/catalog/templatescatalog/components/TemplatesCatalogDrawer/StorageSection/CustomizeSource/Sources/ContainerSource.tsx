@@ -1,4 +1,4 @@
-import React, { Dispatch, FCC, FormEventHandler, SetStateAction } from 'react';
+import React, { Dispatch, FC, FormEventHandler, SetStateAction } from 'react';
 import { useFormContext } from 'react-hook-form';
 
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
@@ -18,7 +18,7 @@ type ContainerSourceProps = {
   testId: string;
 };
 
-const ContainerSource: FCC<ContainerSourceProps> = ({
+const ContainerSource: FC<ContainerSourceProps> = ({
   containerImage,
   onInputValueChange,
   registryCredentials,

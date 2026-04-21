@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -18,7 +18,7 @@ type TemplatesAndImagesManagementProps = {
   newBadge?: boolean;
 };
 
-const TemplatesAndImagesManagement: FCC<TemplatesAndImagesManagementProps> = ({
+const TemplatesAndImagesManagement: FC<TemplatesAndImagesManagementProps> = ({
   hyperConvergeConfiguration,
   newBadge,
 }) => {

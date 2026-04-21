@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { ClusterChartSeries } from '../../hooks/useTopClustersChartData';
 
@@ -8,7 +8,7 @@ type ClusterLegendProps = {
   clusters: ClusterChartSeries[];
 };
 
-const ClusterLegend: FCC<ClusterLegendProps> = ({ clusters }) => {
+const ClusterLegend: FC<ClusterLegendProps> = ({ clusters }) => {
   if (!clusters || clusters.length === 0) return null;
 
   return (

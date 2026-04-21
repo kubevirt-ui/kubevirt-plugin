@@ -1,4 +1,4 @@
-import React, { Dispatch, FCC, MouseEvent, SetStateAction } from 'react';
+import React, { Dispatch, FC, MouseEvent, SetStateAction } from 'react';
 
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
@@ -15,7 +15,7 @@ type NetworkInterfaceTypeSelectProps = {
   showTypeHelperText?: boolean;
 };
 
-const NetworkInterfaceTypeSelect: FCC<NetworkInterfaceTypeSelectProps> = ({
+const NetworkInterfaceTypeSelect: FC<NetworkInterfaceTypeSelectProps> = ({
   interfaceType,
   networkName,
   setInterfaceType,

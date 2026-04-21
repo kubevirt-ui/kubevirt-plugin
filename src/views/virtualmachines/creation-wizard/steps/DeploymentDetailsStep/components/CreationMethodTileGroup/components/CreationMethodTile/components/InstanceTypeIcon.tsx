@@ -1,6 +1,6 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
-export const InstanceTypeIcon: FCC = () => (
+export const InstanceTypeIcon: FC = () => (
   <svg fill="none" height="45" viewBox="0 0 16 16" width="45" xmlns="http://www.w3.org/2000/svg">
     <g clipPath="url(#clip0_1275_1323)">
       <path

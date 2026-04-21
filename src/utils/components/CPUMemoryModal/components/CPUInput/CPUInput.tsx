@@ -1,4 +1,4 @@
-import React, { Dispatch, FCC, SetStateAction, useState } from 'react';
+import React, { Dispatch, FC, SetStateAction, useState } from 'react';
 
 import { V1CPU } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import VCPUInput from '@kubevirt-utils/components/CPUMemoryModal/components/CPUInput/components/vCPUInput/VCPUInput';
@@ -24,7 +24,7 @@ type CPUInputProps = {
   userEnteredCPU: V1CPU;
 };
 
-const CPUInput: FCC<CPUInputProps> = ({
+const CPUInput: FC<CPUInputProps> = ({
   cpuLimits,
   currentCPU,
   setUserEnteredCPU,

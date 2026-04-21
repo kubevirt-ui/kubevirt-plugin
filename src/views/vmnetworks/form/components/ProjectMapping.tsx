@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
 import { PROJECT_NAME_LABEL_KEY } from '@kubevirt-utils/constants/constants';
@@ -16,7 +16,7 @@ type ProjectMappingProps = {
   isEditModal?: boolean;
 };
 
-const ProjectMapping: FCC<ProjectMappingProps> = ({ isEditModal = false }) => {
+const ProjectMapping: FC<ProjectMappingProps> = ({ isEditModal = false }) => {
   const { t } = useKubevirtTranslation();
   const { control, setValue, watch } = useFormContext<VMNetworkForm>();
 

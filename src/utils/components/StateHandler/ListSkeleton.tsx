@@ -1,8 +1,8 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { Flex, Skeleton, Stack, StackItem } from '@patternfly/react-core';
 
-const ListSkeleton: FCC = () => (
+const ListSkeleton: FC = () => (
   <div>
     <Stack hasGutter>
       <Flex justifyContent={{ default: 'justifyContentSpaceBetween' }}>

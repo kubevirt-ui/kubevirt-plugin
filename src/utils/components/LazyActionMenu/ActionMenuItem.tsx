@@ -1,4 +1,4 @@
-import React, { FCC, useCallback } from 'react';
+import React, { FC, useCallback } from 'react';
 import { connect } from 'react-redux';
 import { useNavigate } from 'react-router';
 import isObject from 'lodash/isObject';
@@ -18,7 +18,7 @@ export type ActionMenuItemProps = {
   onClick?: () => void;
 };
 
-const ActionItem: FCC<ActionMenuItemProps & { isAllowed: boolean }> = ({
+const ActionItem: FC<ActionMenuItemProps & { isAllowed: boolean }> = ({
   action,
   autoFocus,
   isAllowed,
@@ -65,7 +65,7 @@ const AccessReviewActionItem = connect(impersonateStateToProps)(
   },
 );
 
-const ActionMenuItem: FCC<ActionMenuItemProps & { checkAccess: CheckAccess }> = (props) => {
+const ActionMenuItem: FC<ActionMenuItemProps & { checkAccess: CheckAccess }> = (props) => {
   const { action } = props;
   const item = action.accessReview ? (
     <AccessReviewActionItem {...props} />

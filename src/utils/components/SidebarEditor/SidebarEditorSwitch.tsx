@@ -1,11 +1,11 @@
-import React, { FCC, memo, useContext } from 'react';
+import React, { FC, memo, useContext } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Switch } from '@patternfly/react-core';
 
 import { SidebarEditorContext } from './SidebarEditorContext';
 
-const SidebarEditorSwitch: FCC = memo(() => {
+const SidebarEditorSwitch: FC = memo(() => {
   const { t } = useKubevirtTranslation();
   const { setEditorVisible, showEditor, showSwitch } = useContext(SidebarEditorContext);
 

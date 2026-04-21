@@ -1,4 +1,4 @@
-import React, { Dispatch, FCC, SetStateAction, useCallback } from 'react';
+import React, { Dispatch, FC, SetStateAction, useCallback } from 'react';
 
 import {
   AddBootableVolumeState,
@@ -31,7 +31,7 @@ type AddBootableVolumeBodyProps = {
   upload: DataUpload;
 };
 
-const AddBootableVolumeBody: FCC<AddBootableVolumeBodyProps> = ({
+const AddBootableVolumeBody: FC<AddBootableVolumeBodyProps> = ({
   bootableVolume,
   setBootableVolume,
   setSourceType,

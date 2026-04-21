@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
@@ -16,7 +16,7 @@ export type VMNetworkSelectProps = {
   vms: V1VirtualMachine[];
 };
 
-const VMNetworkSelect: FCC<VMNetworkSelectProps> = ({
+const VMNetworkSelect: FC<VMNetworkSelectProps> = ({
   currentNetwork,
   onSelect,
   selectedNetwork,

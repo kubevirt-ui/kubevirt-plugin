@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { OS_NAME_LABELS } from '@kubevirt-utils/resources/template';
@@ -8,7 +8,7 @@ import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 import MultiSelectTypeahead from '../../../../../utils/components/MultiSelectTypeahead/MultiSelectTypeahead';
 import { useAdvancedSearchField } from '../store/useAdvancedSearchStore';
 
-const OperatingSystemField: FCC = () => {
+const OperatingSystemField: FC = () => {
   const { t } = useKubevirtTranslation();
   const { setValue, value } = useAdvancedSearchField(VirtualMachineRowFilterType.OS);
 

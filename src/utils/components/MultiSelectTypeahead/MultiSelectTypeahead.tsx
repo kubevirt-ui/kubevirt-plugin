@@ -1,4 +1,4 @@
-import React, { FCC, useMemo } from 'react';
+import React, { FC, useMemo } from 'react';
 
 import { getSelectDataTestProps } from '@kubevirt-utils/utils/selectDataTest';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -15,7 +15,7 @@ type MultiSelectTypeaheadProps = {
   setSelectedResourceNames: (selected: string[]) => void;
 };
 
-const MultiSelectTypeahead: FCC<MultiSelectTypeaheadProps> = ({
+const MultiSelectTypeahead: FC<MultiSelectTypeaheadProps> = ({
   allResourceNames,
   'data-test': dataTest,
   emptyValuePlaceholder = '',

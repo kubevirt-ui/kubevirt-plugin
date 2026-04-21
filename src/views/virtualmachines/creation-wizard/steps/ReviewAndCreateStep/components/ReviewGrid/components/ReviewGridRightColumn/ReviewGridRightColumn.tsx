@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getInterfaces, getNetworks } from '@kubevirt-utils/resources/vm';
@@ -11,7 +11,7 @@ import NetworksReviewTable from '@virtualmachines/creation-wizard/components/Net
 
 import './ReviewGridRightColumn.scss';
 
-const ReviewGridRightColumn: FCC = () => {
+const ReviewGridRightColumn: FC = () => {
   const { t } = useKubevirtTranslation();
 
   const vm = vmSignal.value;

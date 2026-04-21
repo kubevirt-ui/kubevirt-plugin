@@ -1,4 +1,4 @@
-import React, { FCC, useEffect, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 
 import SectionWithSwitch from '@kubevirt-utils/components/SectionWithSwitch/SectionWithSwitch';
 import { HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
@@ -13,7 +13,7 @@ type AutoComputeCPULimitsProps = {
   hyperConvergeConfiguration: [hyperConvergeConfig: HyperConverged, loaded: boolean, error: Error];
   newBadge?: boolean;
 };
-const AutoComputeCPULimits: FCC<AutoComputeCPULimitsProps> = ({
+const AutoComputeCPULimits: FC<AutoComputeCPULimitsProps> = ({
   hyperConvergeConfiguration,
   newBadge,
 }) => {

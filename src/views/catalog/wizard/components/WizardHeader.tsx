@@ -1,4 +1,4 @@
-import React, { FCC, memo } from 'react';
+import React, { FC, memo } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 
 import { useWizardVMContext } from '@catalog/utils/WizardVMContext';
@@ -19,7 +19,7 @@ import {
   Title,
 } from '@patternfly/react-core';
 
-export const WizardHeader: FCC<{ namespace: string }> = memo(({ namespace }) => {
+export const WizardHeader: FC<{ namespace: string }> = memo(({ namespace }) => {
   const { t } = useKubevirtTranslation();
   const { tabsData } = useWizardVMContext();
   const navigate = useNavigate();

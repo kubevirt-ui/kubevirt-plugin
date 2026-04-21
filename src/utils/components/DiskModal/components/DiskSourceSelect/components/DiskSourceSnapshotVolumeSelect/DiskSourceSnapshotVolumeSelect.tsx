@@ -1,9 +1,9 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import DiskSourceSnapshotVolumeSelectName from './DiskSourceSnapshotVolumeSelectName';
 import DiskSourceSnapshotVolumeSelectNamespace from './DiskSourceSnapshotVolumeSelectNamespace';
 
-const DiskSourceSnapshotVolumeSelect: FCC = () => {
+const DiskSourceSnapshotVolumeSelect: FC = () => {
   return (
     <>
       <DiskSourceSnapshotVolumeSelectNamespace />

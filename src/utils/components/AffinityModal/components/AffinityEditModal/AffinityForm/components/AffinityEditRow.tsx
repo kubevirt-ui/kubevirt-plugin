@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { LabelsEditor } from '@kubevirt-utils/components/LabelsEditor/LabelsEditor';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -16,7 +16,7 @@ type AffinityExpressionRowProps = {
   rowID?: string;
 };
 
-const AffinityExpressionRow: FCC<AffinityExpressionRowProps> = ({
+const AffinityExpressionRow: FC<AffinityExpressionRowProps> = ({
   expression,
   onChange,
   onDelete,

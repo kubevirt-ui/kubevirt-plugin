@@ -1,4 +1,4 @@
-import React, { FCC, useMemo, useState } from 'react';
+import React, { FC, useMemo, useState } from 'react';
 
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import { ModalComponentProps } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
@@ -25,7 +25,7 @@ type SaveSearchModalProps = Pick<ModalComponentProps, 'isOpen' | 'onClose'> & {
   onSubmit: (inputs: SaveSearchInputs) => void;
 };
 
-const SaveSearchModal: FCC<SaveSearchModalProps> = ({ isOpen, onClose, onSubmit }) => {
+const SaveSearchModal: FC<SaveSearchModalProps> = ({ isOpen, onClose, onSubmit }) => {
   const { t } = useKubevirtTranslation();
 
   const { searches } = useSavedSearchData();

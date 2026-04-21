@@ -1,4 +1,4 @@
-import React, { FCC, useMemo } from 'react';
+import React, { FC, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
@@ -16,7 +16,7 @@ import { useCheckupsStoragePermissions } from './storage/components/hooks/useChe
 import { CHECKUP_URLS } from './utils/constants';
 import { getCurrentCheckupType, getSelectProjectText, trimLastHistoryPath } from './utils/utils';
 
-const CheckupsRunButton: FCC = () => {
+const CheckupsRunButton: FC = () => {
   const namespace = useActiveNamespace();
   const isACMpage = useIsACMPage();
   const navigate = useNavigate();

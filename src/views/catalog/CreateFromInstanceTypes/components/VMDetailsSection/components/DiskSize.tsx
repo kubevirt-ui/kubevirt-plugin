@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
 import { getDiskSize } from '@catalog/CreateFromInstanceTypes/utils/utils';
@@ -6,7 +6,7 @@ import CapacityInput from '@kubevirt-utils/components/CapacityInput/CapacityInpu
 import { DEFAULT_DISK_SIZE } from '@kubevirt-utils/components/DiskModal/utils/constants';
 import { formatQuantityString } from '@kubevirt-utils/utils/units';
 
-const DiskSize: FCC = () => {
+const DiskSize: FC = () => {
   const { instanceTypeVMState, setCustomDiskSize } = useInstanceTypeVMStore();
 
   const { customDiskSize, dvSource, pvcSource, volumeSnapshotSource } = instanceTypeVMState;

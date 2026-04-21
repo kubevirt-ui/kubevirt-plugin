@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { modelToGroupVersionKind, SecretModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -9,7 +9,7 @@ type SecretNameLabelProps = {
   secretName: string;
 };
 
-const SecretNameLabel: FCC<SecretNameLabelProps> = ({ secretName }) => {
+const SecretNameLabel: FC<SecretNameLabelProps> = ({ secretName }) => {
   const { t } = useKubevirtTranslation();
 
   if (isEmpty(secretName)) return <span>{t('Not available')}</span>;

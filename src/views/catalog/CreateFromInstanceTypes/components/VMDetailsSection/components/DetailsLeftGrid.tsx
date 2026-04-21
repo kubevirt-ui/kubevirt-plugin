@@ -1,4 +1,4 @@
-import React, { FCC, useMemo, useState } from 'react';
+import React, { FC, useMemo, useState } from 'react';
 
 import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
 import {
@@ -25,7 +25,7 @@ export type DetailsLeftGridProps = {
   userPreferencesData: V1beta1VirtualMachinePreference[];
 };
 
-const DetailsLeftGrid: FCC<DetailsLeftGridProps> = ({
+const DetailsLeftGrid: FC<DetailsLeftGridProps> = ({
   instanceTypesAndPreferencesData,
   userPreferencesData,
 }) => {

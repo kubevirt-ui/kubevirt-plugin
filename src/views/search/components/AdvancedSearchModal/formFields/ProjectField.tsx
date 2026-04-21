@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import MultiSelectTypeahead from '@kubevirt-utils/components/MultiSelectTypeahead/MultiSelectTypeahead';
@@ -13,7 +13,7 @@ type ProjectFieldProps = {
   vms: V1VirtualMachine[];
 };
 
-const ProjectField: FCC<ProjectFieldProps> = ({ vms }) => {
+const ProjectField: FC<ProjectFieldProps> = ({ vms }) => {
   const { t } = useKubevirtTranslation();
   const { setValue, value } = useAdvancedSearchField(VirtualMachineRowFilterType.Project);
 

@@ -1,4 +1,4 @@
-import React, { FCC, useMemo } from 'react';
+import React, { FC, useMemo } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Alert, Flex } from '@patternfly/react-core';
@@ -10,7 +10,7 @@ import TotalAlertCount from './TotalAlertCount';
 import VMAlertsCard from './VMAlertsCard';
 import VMAlertSeverityCounts from './VMAlertSeverityCounts';
 
-const VMAlerts: FCC<VMAlertsProps> = ({ alertsBaseHref, alertsBasePath, vmNames }) => {
+const VMAlerts: FC<VMAlertsProps> = ({ alertsBaseHref, alertsBasePath, vmNames }) => {
   const { t } = useKubevirtTranslation();
   const { critical, error, info, loaded, warning } = useVMAlerts(vmNames);
   const totalAlerts = critical + warning + info;

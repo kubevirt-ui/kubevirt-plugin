@@ -1,5 +1,5 @@
 import React, {
-  FCC,
+  FC,
   forwardRef,
   RefAttributes,
   useEffect,
@@ -82,7 +82,7 @@ type VirtualMachinesListProps = {
   namespace: string;
 } & RefAttributes<ExposedFilterFunctions | null>;
 
-const VirtualMachinesList: FCC<VirtualMachinesListProps> = forwardRef((props, ref) => {
+const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref) => {
   const { t } = useKubevirtTranslation();
   const { allVMsLoaded, cluster, isSearchResultsPage = false, namespace } = props;
 

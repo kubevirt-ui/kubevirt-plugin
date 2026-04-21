@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import ActionsDropdown from '@kubevirt-utils/components/ActionsDropdown/ActionsDropdown';
@@ -10,7 +10,7 @@ type VMActionsCellProps = {
   row: V1VirtualMachine;
 };
 
-const VMActionsCell: FCC<VMActionsCellProps> = ({ getActions, row }) => {
+const VMActionsCell: FC<VMActionsCellProps> = ({ getActions, row }) => {
   const actions = getActions([row]);
   const actionId =
     getUID(row) ?? `${getNamespace(row)}-${getName(row)}`.replace(/[^a-zA-Z0-9-_]/g, '-');

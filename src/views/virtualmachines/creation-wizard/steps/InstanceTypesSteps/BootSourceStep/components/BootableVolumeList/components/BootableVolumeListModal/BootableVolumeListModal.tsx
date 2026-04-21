@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { V1beta1VirtualMachinePreference } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
@@ -25,7 +25,7 @@ type BootableVolumeListModalProps = {
   userPreferencesData: V1beta1VirtualMachinePreference[];
 };
 
-const BootableVolumeListModal: FCC<BootableVolumeListModalProps> = ({
+const BootableVolumeListModal: FC<BootableVolumeListModalProps> = ({
   isOpen,
   onClose,
   onSelect,

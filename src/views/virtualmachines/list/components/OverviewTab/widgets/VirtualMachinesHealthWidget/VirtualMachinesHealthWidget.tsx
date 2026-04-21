@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import useIsAllClustersPage from '@multicluster/hooks/useIsAllClustersPage';
 
@@ -12,7 +12,7 @@ import VMAlertsCard from './components/VMAlertsCard';
 import VMStatuses from './components/VMStatuses';
 import useVMAlertsNavigation from './hooks/useVMAlertsNavigation';
 
-const VirtualMachinesHealthWidget: FCC<OverviewSectionData> = ({
+const VirtualMachinesHealthWidget: FC<OverviewSectionData> = ({
   cluster,
   metricsUnavailable,
   title,

@@ -1,4 +1,4 @@
-import React, { FCC, useState } from 'react';
+import React, { FC, useState } from 'react';
 import { Trans } from 'react-i18next';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -27,7 +27,7 @@ export type DisconnectVMModalProps = {
   vms: V1VirtualMachine[];
 };
 
-const DisconnectVMModal: FCC<DisconnectVMModalProps> = ({ closeModal, currentNetwork, vms }) => {
+const DisconnectVMModal: FC<DisconnectVMModalProps> = ({ closeModal, currentNetwork, vms }) => {
   const { t } = useKubevirtTranslation();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<Error>();

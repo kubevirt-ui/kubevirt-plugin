@@ -1,4 +1,4 @@
-import React, { FCC, useEffect } from 'react';
+import React, { FC, useEffect } from 'react';
 import { useImmer } from 'use-immer';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -23,7 +23,7 @@ type EnvironmentFormProps = {
   vm: V1VirtualMachine;
 };
 
-const EnvironmentForm: FCC<EnvironmentFormProps> = ({ onEditChange, updateVM, vm }) => {
+const EnvironmentForm: FC<EnvironmentFormProps> = ({ onEditChange, updateVM, vm }) => {
   const [temporaryVM, setTemporaryVM] = useImmer(vm);
 
   const { t } = useKubevirtTranslation();

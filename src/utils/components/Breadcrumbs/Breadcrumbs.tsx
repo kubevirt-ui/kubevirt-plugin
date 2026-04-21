@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 import { isEmpty } from 'lodash';
 
 import { Breadcrumb, BreadcrumbItem } from '@patternfly/react-core';
@@ -7,7 +7,7 @@ type BreadcrumbsProps = {
   breadcrumb: string;
 };
 
-const Breadcrumbs: FCC<BreadcrumbsProps> = ({ breadcrumb }) => {
+const Breadcrumbs: FC<BreadcrumbsProps> = ({ breadcrumb }) => {
   if (isEmpty(breadcrumb)) return null;
 
   return (

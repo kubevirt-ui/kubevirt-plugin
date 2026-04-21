@@ -1,4 +1,4 @@
-import React, { FCC, ReactNode, useCallback, useEffect, useState } from 'react';
+import React, { FC, ReactNode, useCallback, useEffect, useState } from 'react';
 
 import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -59,7 +59,7 @@ type NetworkInterfaceModalProps = {
   vm: V1VirtualMachine;
 };
 
-const NetworkInterfaceModal: FCC<NetworkInterfaceModalProps> = ({
+const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
   fixedName = false,
   headerText,
   isOpen,

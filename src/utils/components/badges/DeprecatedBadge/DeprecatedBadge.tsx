@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 import cn from 'classnames';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -10,7 +10,7 @@ type DeprecatedBadgeProps = {
   className?: string;
 };
 
-const DeprecatedBadge: FCC<DeprecatedBadgeProps> = ({ className }) => {
+const DeprecatedBadge: FC<DeprecatedBadgeProps> = ({ className }) => {
   const { t } = useKubevirtTranslation();
 
   return (

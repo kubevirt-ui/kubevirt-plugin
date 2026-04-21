@@ -1,4 +1,4 @@
-import React, { FCC, useMemo } from 'react';
+import React, { FC, useMemo } from 'react';
 
 import { instanceTypeSeriesNameMapper } from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/utils/constants';
 import { RedHatInstanceTypeMetadata } from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/utils/types';
@@ -10,7 +10,7 @@ type RedHatInstanceTypeSeriesGalleryProps = {
   redHatMenuItems: RedHatInstanceTypeMetadata;
 };
 
-const RedHatInstanceTypeSeriesGallery: FCC<RedHatInstanceTypeSeriesGalleryProps> = ({
+const RedHatInstanceTypeSeriesGallery: FC<RedHatInstanceTypeSeriesGalleryProps> = ({
   redHatMenuItems,
 }) => {
   const sortedItems = useMemo(

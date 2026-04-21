@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import EnvironmentForm from '@kubevirt-utils/components/EnvironmentEditor/EnvironmentForm';
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
@@ -20,7 +20,7 @@ import { ConfigurationInnerTabProps } from '../utils/types';
 import { useUploadAlert } from './components/hooks/useUploadAlert';
 import DiskList from './components/tables/disk/DiskList';
 
-const StorageTab: FCC<ConfigurationInnerTabProps> = ({ vm, vmi }) => {
+const StorageTab: FC<ConfigurationInnerTabProps> = ({ vm, vmi }) => {
   const { t } = useKubevirtTranslation();
   const { alertConfig, dismissAlert, onUploadStarted, uploadError } = useUploadAlert();
   const vmIsRunning = isRunning(vm);

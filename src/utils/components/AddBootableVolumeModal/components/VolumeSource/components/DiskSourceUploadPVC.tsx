@@ -1,4 +1,4 @@
-import React, { ChangeEvent, FCC, useState } from 'react';
+import React, { ChangeEvent, FC, useState } from 'react';
 
 import { DataUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -18,7 +18,7 @@ type DiskSourceUploadPVCProps = {
   uploadFileName: string;
 };
 
-const DiskSourceUploadPVC: FCC<DiskSourceUploadPVCProps> = ({
+const DiskSourceUploadPVC: FC<DiskSourceUploadPVCProps> = ({
   isIso,
   label,
   relevantUpload,

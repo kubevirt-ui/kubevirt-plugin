@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SSHSecretModal from '@kubevirt-utils/components/SSHSecretModal/SSHSecretModal';
@@ -19,7 +19,7 @@ type AddProjectAuthKeyButtonProps = {
   selectedProject: string;
 };
 
-const AddProjectAuthKeyButton: FCC<AddProjectAuthKeyButtonProps> = ({
+const AddProjectAuthKeyButton: FC<AddProjectAuthKeyButtonProps> = ({
   cluster,
   onSubmit,
   secretName,

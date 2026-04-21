@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { getUID } from '@kubevirt-utils/resources/shared';
@@ -8,7 +8,7 @@ import { NavPageComponentProps } from '@virtualmachines/details/utils/types';
 
 import './virtual-machine-yaml-page.scss';
 
-const VirtualMachineYAMLPage: FCC<NavPageComponentProps> = (props) => {
+const VirtualMachineYAMLPage: FC<NavPageComponentProps> = (props) => {
   const { obj: vm } = props;
 
   const loading = (

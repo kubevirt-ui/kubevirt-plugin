@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { modelToGroupVersionKind, NodeModel } from '@kubevirt-utils/models';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm';
@@ -9,7 +9,7 @@ type NodeLinkProps = {
   nodeName: string;
 };
 
-const NodeLink: FCC<NodeLinkProps> = ({ cluster, nodeName }) => {
+const NodeLink: FC<NodeLinkProps> = ({ cluster, nodeName }) => {
   if (!nodeName) return <>{NO_DATA_DASH}</>;
 
   return (

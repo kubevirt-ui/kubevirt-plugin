@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 import { Link } from 'react-router';
 
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -35,7 +35,7 @@ type NetworkThresholdSingleSourceChartProps = {
   link: string;
 };
 
-const NetworkThresholdSingleSourceChart: FCC<NetworkThresholdSingleSourceChartProps> = ({
+const NetworkThresholdSingleSourceChart: FC<NetworkThresholdSingleSourceChartProps> = ({
   data,
   link,
 }) => {

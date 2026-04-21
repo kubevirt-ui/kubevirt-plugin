@@ -1,4 +1,4 @@
-import React, { FCC, useMemo } from 'react';
+import React, { FC, useMemo } from 'react';
 
 import { VirtualMachineClusterInstancetypeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -17,7 +17,7 @@ type RedHatInstanceTypeSeriesSizesMenuItemProps = {
   sizes: InstanceTypeSize[];
 };
 
-const RedHatInstanceTypeSeriesSizesMenuItems: FCC<RedHatInstanceTypeSeriesSizesMenuItemProps> = ({
+const RedHatInstanceTypeSeriesSizesMenuItems: FC<RedHatInstanceTypeSeriesSizesMenuItemProps> = ({
   isHugepages,
   onSelect,
   selected,

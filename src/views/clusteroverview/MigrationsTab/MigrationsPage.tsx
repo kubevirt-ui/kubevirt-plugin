@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 import { Link } from 'react-router';
 
 import DurationDropdown from '@kubevirt-utils/components/DurationOption/DurationDropdown';
@@ -22,7 +22,7 @@ import MigrationsTab from './MigrationsTab';
 
 import './MigrationsPage.scss';
 
-const MigrationsPage: FCC = () => {
+const MigrationsPage: FC = () => {
   const { t } = useKubevirtTranslation();
   const [activeNamespace] = useActiveNamespace();
 

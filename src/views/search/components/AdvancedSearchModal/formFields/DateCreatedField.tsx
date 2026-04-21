@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup } from '@patternfly/react-core';
@@ -9,7 +9,7 @@ import DateSelect from '../components/DateSelect';
 import { DateSelectOption } from '../constants/dateSelect';
 import { useAdvancedSearchField } from '../store/useAdvancedSearchStore';
 
-const DateCreatedField: FCC = () => {
+const DateCreatedField: FC = () => {
   const { t } = useKubevirtTranslation();
   const { setValue: setDateFromString, value: dateFromString } = useAdvancedSearchField(
     VirtualMachineRowFilterType.DateCreatedFrom,

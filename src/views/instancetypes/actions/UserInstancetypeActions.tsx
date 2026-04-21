@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { V1beta1VirtualMachineInstancetype } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import ActionsDropdown from '@kubevirt-utils/components/ActionsDropdown/ActionsDropdown';
@@ -10,7 +10,7 @@ type UserInstancetypeActionsProps = {
   isKebabToggle?: boolean;
 };
 
-const UserInstancetypeActions: FCC<UserInstancetypeActionsProps> = ({
+const UserInstancetypeActions: FC<UserInstancetypeActionsProps> = ({
   instanceType,
   isKebabToggle,
 }) => {

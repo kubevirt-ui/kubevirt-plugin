@@ -1,4 +1,4 @@
-import React, { FCC, ReactNode } from 'react';
+import React, { FC, ReactNode } from 'react';
 import { Link } from 'react-router';
 import { TFunction } from 'i18next';
 
@@ -18,7 +18,7 @@ type MTUCellProps = {
   obj: ClusterUserDefinedNetworkKind;
 };
 
-const MTUCell: FCC<MTUCellProps> = ({ obj }) => {
+const MTUCell: FC<MTUCellProps> = ({ obj }) => {
   const { t } = useKubevirtTranslation();
   const mtu = getMTU(obj);
 

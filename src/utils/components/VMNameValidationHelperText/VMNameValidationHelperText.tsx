@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -12,7 +12,7 @@ type VMNameValidationHelperTextProps = {
   vmName: string;
 };
 
-const VMNameValidationHelperText: FCC<VMNameValidationHelperTextProps> = ({
+const VMNameValidationHelperText: FC<VMNameValidationHelperTextProps> = ({
   showDefaultHelperText = false,
   touched = true,
   vmName,

@@ -1,4 +1,4 @@
-import React, { FCC, MouseEventHandler } from 'react';
+import React, { FC, MouseEventHandler } from 'react';
 
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
@@ -9,7 +9,7 @@ import { Flex, Stack } from '@patternfly/react-core';
 
 import HelpTextIcon from '../HelpTextIcon/HelpTextIcon';
 
-const HugepagesInfo: FCC = ({}) => {
+const HugepagesInfo: FC = ({}) => {
   const { t } = useKubevirtTranslation();
 
   const handleClick: MouseEventHandler<HTMLSpanElement> = (event) => {

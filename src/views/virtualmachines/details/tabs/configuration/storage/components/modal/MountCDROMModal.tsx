@@ -1,4 +1,4 @@
-import React, { FCC, useEffect } from 'react';
+import React, { FC, useEffect } from 'react';
 import { FormProvider, useWatch } from 'react-hook-form';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -45,7 +45,7 @@ type MountCDROMModalProps = {
   vm: V1VirtualMachine;
 };
 
-const MountCDROMModal: FCC<MountCDROMModalProps> = ({
+const MountCDROMModal: FC<MountCDROMModalProps> = ({
   cdromName,
   isOpen,
   onClose,

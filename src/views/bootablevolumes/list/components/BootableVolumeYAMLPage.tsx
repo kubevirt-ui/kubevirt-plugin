@@ -1,4 +1,4 @@
-import React, { FCC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { load } from 'js-yaml';
 
@@ -40,7 +40,7 @@ const buildDataSourceForDataVolume = (
 
 const YAML_EDITOR_CANCEL_BUTTON_ID = 'cancel';
 
-const BootableVolumeYAMLPage: FCC = () => {
+const BootableVolumeYAMLPage: FC = () => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
   const { ns: namespace } = useParams<{ ns: string }>();

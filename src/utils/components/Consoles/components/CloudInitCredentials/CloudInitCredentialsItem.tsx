@@ -1,4 +1,4 @@
-import React, { FCC, useState } from 'react';
+import React, { FC, useState } from 'react';
 
 import useHideCredentials from '@kubevirt-utils/hooks/useHideCredentials/useHideCredentials';
 import { Button, Flex, FlexItem, Tooltip } from '@patternfly/react-core';
@@ -14,7 +14,7 @@ type CloudInitCredentialsItemProps = {
   showCredentialText: string;
 };
 
-const CloudInitCredentialsItem: FCC<CloudInitCredentialsItemProps> = ({
+const CloudInitCredentialsItem: FC<CloudInitCredentialsItemProps> = ({
   'button-data-test': buttonDataTest,
   credentials,
   credentialTitle,

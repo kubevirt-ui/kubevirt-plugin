@@ -1,4 +1,4 @@
-import React, { FCC, useState } from 'react';
+import React, { FC, useState } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { isHeadlessMode } from '@kubevirt-utils/resources/vm';
@@ -9,7 +9,7 @@ type HeadlessModeProps = {
   vm: V1VirtualMachine;
 };
 
-const HeadlessMode: FCC<HeadlessModeProps> = ({ updateHeadlessMode, vm }) => {
+const HeadlessMode: FC<HeadlessModeProps> = ({ updateHeadlessMode, vm }) => {
   const [isChecked, setIsChecked] = useState<boolean>(isHeadlessMode(vm));
   return (
     <Switch

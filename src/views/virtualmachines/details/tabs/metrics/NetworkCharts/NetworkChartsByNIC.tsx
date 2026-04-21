@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import NetworkThresholdSingleSourceChart from '@kubevirt-utils/components/Charts/NetworkUtil/NetworkThresholdChartSingleSource';
@@ -13,7 +13,7 @@ type NetworkChartsByNICProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const NetworkChartsByNIC: FCC<NetworkChartsByNICProps> = ({ nic, vmi }) => {
+const NetworkChartsByNIC: FC<NetworkChartsByNICProps> = ({ nic, vmi }) => {
   const { t } = useKubevirtTranslation();
   const isACMPage = useIsACMPage();
   const { data, links } = useNetworkData(vmi, nic);

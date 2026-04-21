@@ -1,4 +1,4 @@
-import React, { FCC, useEffect, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 
 import { Split, SplitItem } from '@patternfly/react-core';
 import {
@@ -19,7 +19,7 @@ type HighAvailabilityToggleContentProps = {
   alternativeCheckedMap: HAAlternativeCheckedMap;
 };
 
-const HighAvailabilityToggleContent: FCC<HighAvailabilityToggleContentProps> = ({
+const HighAvailabilityToggleContent: FC<HighAvailabilityToggleContentProps> = ({
   alternativeCheckedMap,
 }) => {
   const [switchState, setSwitchState] = useState<boolean>(false);

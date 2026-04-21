@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { DEFAULT_PREFERENCE_LABEL } from '@catalog/CreateFromInstanceTypes/utils/constants';
 import {
@@ -14,7 +14,7 @@ type DataSourcePreferenceLinkProps = {
   dataSource: V1beta1DataSource;
 };
 
-const DataSourcePreferenceLink: FCC<DataSourcePreferenceLinkProps> = ({ dataSource }) => {
+const DataSourcePreferenceLink: FC<DataSourcePreferenceLinkProps> = ({ dataSource }) => {
   const hasDataSourceUserPreference = hasUserPreference(dataSource);
 
   return (

@@ -1,4 +1,4 @@
-import React, { FCC, useMemo, useState } from 'react';
+import React, { FC, useMemo, useState } from 'react';
 import { Link } from 'react-router';
 import produce from 'immer';
 
@@ -38,7 +38,7 @@ type DedicatedResourcesModalProps = {
   vmi?: V1VirtualMachineInstance;
 };
 
-const DedicatedResourcesModal: FCC<DedicatedResourcesModalProps> = ({
+const DedicatedResourcesModal: FC<DedicatedResourcesModalProps> = ({
   headerText,
   isOpen,
   onClose,

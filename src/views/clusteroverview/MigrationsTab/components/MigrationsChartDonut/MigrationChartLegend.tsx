@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 import { Link } from 'react-router';
 
 import { OnFilterChange } from '@openshift-console/dynamic-plugin-sdk';
@@ -12,7 +12,7 @@ type MigrationChartLegendProps = {
   onFilterChange: OnFilterChange;
 };
 
-const MigrationChartLegend: FCC<MigrationChartLegendProps> = ({ legendItems, onFilterChange }) => {
+const MigrationChartLegend: FC<MigrationChartLegendProps> = ({ legendItems, onFilterChange }) => {
   return (
     <Flex gap={{ default: 'gapMd' }}>
       {legendItems?.map((item, index) => {

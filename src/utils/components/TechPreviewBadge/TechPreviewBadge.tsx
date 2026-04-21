@@ -1,9 +1,9 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Label } from '@patternfly/react-core';
 
-const TechPreviewBadge: FCC = () => {
+const TechPreviewBadge: FC = () => {
   const { t } = useKubevirtTranslation();
 
   return (

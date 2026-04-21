@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import HTTPSource from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeSource/components/HTTPSource';
 import { DataUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
@@ -22,7 +22,7 @@ type VolumeSourceProps = {
   upload: DataUpload;
 };
 
-const VolumeSource: FCC<VolumeSourceProps> = ({
+const VolumeSource: FC<VolumeSourceProps> = ({
   bootableVolume,
   setBootableVolumeField,
   sourceType,

@@ -1,4 +1,4 @@
-import React, { FCC, useEffect, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import { useLocation } from 'react-router';
 import classNames from 'classnames';
 
@@ -33,7 +33,7 @@ type DetailsSectionBootProps = {
   vmi?: V1VirtualMachineInstance;
 };
 
-const DetailsSectionBoot: FCC<DetailsSectionBootProps> = ({
+const DetailsSectionBoot: FC<DetailsSectionBootProps> = ({
   canUpdateVM,
   instanceTypeVM,
   isCustomizeInstanceType,

@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ClipboardCopy } from '@patternfly/react-core';
@@ -11,7 +11,7 @@ type InlineCodeClipboardCopyProps = {
   isCredentialsVisible?: boolean;
 };
 
-const InlineCodeClipboardCopy: FCC<InlineCodeClipboardCopyProps> = ({
+const InlineCodeClipboardCopy: FC<InlineCodeClipboardCopyProps> = ({
   clipboardText,
   isCredentialsVisible = false,
 }) => {

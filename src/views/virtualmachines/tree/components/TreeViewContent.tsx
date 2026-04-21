@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import CreateProjectOnboardingPopover from '@kubevirt-utils/components/OnboardingPopover/components/CreateProjectOnboardingPopover';
@@ -37,7 +37,7 @@ type TreeViewContentProps = {
   treeData: TreeViewDataItem[];
 };
 
-const TreeViewContent: FCC<TreeViewContentProps> = ({
+const TreeViewContent: FC<TreeViewContentProps> = ({
   isOpen,
   isSmallScreen,
   loaded,

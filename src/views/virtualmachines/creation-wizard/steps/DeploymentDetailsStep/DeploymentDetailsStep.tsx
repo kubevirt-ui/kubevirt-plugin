@@ -1,4 +1,4 @@
-import React, { FCC, useState } from 'react';
+import React, { FC, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Stack, StackItem, Title, TitleSizes } from '@patternfly/react-core';
@@ -6,7 +6,7 @@ import CreationMethodTileGroup from '@virtualmachines/creation-wizard/steps/Depl
 import VMCreationLocationDisplay from '@virtualmachines/creation-wizard/steps/DeploymentDetailsStep/components/VMCreationLocationDisplay';
 import VMCreationLocationForm from '@virtualmachines/creation-wizard/steps/DeploymentDetailsStep/components/VMCreationLocationForm';
 
-const DeploymentDetailsStep: FCC = () => {
+const DeploymentDetailsStep: FC = () => {
   const { t } = useKubevirtTranslation();
   const [editCreationLocation, setEditCreationLocation] = useState(false);
 

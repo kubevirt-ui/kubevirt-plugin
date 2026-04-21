@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { V1beta1VirtualMachinePreference } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import ActionsDropdown from '@kubevirt-utils/components/ActionsDropdown/ActionsDropdown';
@@ -10,7 +10,7 @@ type UserPreferenceActionsProps = {
   preference: V1beta1VirtualMachinePreference;
 };
 
-const UserPreferenceActions: FCC<UserPreferenceActionsProps> = ({ isKebabToggle, preference }) => {
+const UserPreferenceActions: FC<UserPreferenceActionsProps> = ({ isKebabToggle, preference }) => {
   const actions = useUserPreferenceActionsProvider(preference);
   return (
     <ActionsDropdown

@@ -1,4 +1,4 @@
-import React, { Dispatch, FCC, SetStateAction, useMemo } from 'react';
+import React, { Dispatch, FC, SetStateAction, useMemo } from 'react';
 import { Trans } from 'react-i18next';
 
 import { IoK8sApiStorageV1StorageClass } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
@@ -49,7 +49,7 @@ type AdvancedSettingsProps = {
   storageClassesLoaded: boolean;
 };
 
-const AdvancedSettings: FCC<AdvancedSettingsProps> = ({
+const AdvancedSettings: FC<AdvancedSettingsProps> = ({
   defaultSC,
   setSettings,
   settings,

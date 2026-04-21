@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 import { useLocation } from 'react-router';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -13,7 +13,7 @@ import './virtual-machines-instance-details-tab.scss';
 type VirtualMachinesInstancePageDetailsTabProps = {
   obj: V1VirtualMachineInstance;
 };
-const VirtualMachinesInstancePageDetailsTab: FCC<VirtualMachinesInstancePageDetailsTabProps> = ({
+const VirtualMachinesInstancePageDetailsTab: FC<VirtualMachinesInstancePageDetailsTabProps> = ({
   obj: vmi,
 }) => {
   const location = useLocation();

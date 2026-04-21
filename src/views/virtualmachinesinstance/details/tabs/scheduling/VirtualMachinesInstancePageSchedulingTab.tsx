@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
@@ -16,7 +16,7 @@ type VirtualMachinesInstancePageSchedulingTabProps = {
   obj: V1VirtualMachineInstance;
 };
 
-const VirtualMachinesInstancePageSchedulingTab: FCC<
+const VirtualMachinesInstancePageSchedulingTab: FC<
   VirtualMachinesInstancePageSchedulingTabProps
 > = ({ obj: vmi }) => {
   const { t } = useKubevirtTranslation();

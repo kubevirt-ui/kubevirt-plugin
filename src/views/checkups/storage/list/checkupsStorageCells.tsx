@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 import { Link } from 'react-router';
 
 import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
@@ -23,7 +23,7 @@ import { CheckupsStorageCallbacks } from './checkupsStorageListDefinition';
 
 export { ClusterCell, NamespaceCell };
 
-export const NameCell: FCC<{ row: IoK8sApiCoreV1ConfigMap }> = ({ row }) => {
+export const NameCell: FC<{ row: IoK8sApiCoreV1ConfigMap }> = ({ row }) => {
   const [hubClusterName] = useHubClusterName();
   const isACMPage = useIsACMPage();
   const cluster = getCluster(row) || hubClusterName;
@@ -39,7 +39,7 @@ export const NameCell: FCC<{ row: IoK8sApiCoreV1ConfigMap }> = ({ row }) => {
   );
 };
 
-export const StatusCell: FCC<{
+export const StatusCell: FC<{
   callbacks: CheckupsStorageCallbacks;
   row: IoK8sApiCoreV1ConfigMap;
 }> = ({ callbacks, row }) => {
@@ -49,21 +49,21 @@ export const StatusCell: FCC<{
   return <CheckupsStatusIcon configMap={row} job={job} />;
 };
 
-export const FailureCell: FCC<{ row: IoK8sApiCoreV1ConfigMap }> = ({ row }) => (
+export const FailureCell: FC<{ row: IoK8sApiCoreV1ConfigMap }> = ({ row }) => (
   <span data-test={`checkup-failure-${getName(row) || row?.metadata?.uid || 'unknown'}`}>
     {row?.data?.[STATUS_FAILURE_REASON] || NO_DATA_DASH}
   </span>
 );
 
-export const StartTimeCell: FCC<{ row: IoK8sApiCoreV1ConfigMap }> = ({ row }) => (
+export const StartTimeCell: FC<{ row: IoK8sApiCoreV1ConfigMap }> = ({ row }) => (
   <Timestamp timestamp={row?.data?.[STATUS_START_TIME_STAMP]} />
 );
 
-export const CompleteTimeCell: FCC<{ row: IoK8sApiCoreV1ConfigMap }> = ({ row }) => (
+export const CompleteTimeCell: FC<{ row: IoK8sApiCoreV1ConfigMap }> = ({ row }) => (
   <Timestamp timestamp={row?.data?.[STATUS_COMPLETION_TIME_STAMP]} />
 );
 
-export const ActionsCell: FCC<{
+export const ActionsCell: FC<{
   callbacks: CheckupsStorageCallbacks;
   row: IoK8sApiCoreV1ConfigMap;
 }> = ({ callbacks, row }) => {

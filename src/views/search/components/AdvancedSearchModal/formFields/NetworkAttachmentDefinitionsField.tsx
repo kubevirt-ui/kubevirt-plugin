@@ -1,4 +1,4 @@
-import React, { FCC, useMemo } from 'react';
+import React, { FC, useMemo } from 'react';
 
 import { NetworkAttachmentDefinitionModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import MultiSelectTypeahead from '@kubevirt-utils/components/MultiSelectTypeahead/MultiSelectTypeahead';
@@ -11,7 +11,7 @@ import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
 import { useAdvancedSearchField } from '../store/useAdvancedSearchStore';
 
-const NetworkAttachmentDefinitionsField: FCC = () => {
+const NetworkAttachmentDefinitionsField: FC = () => {
   const { t } = useKubevirtTranslation();
   const { setValue, value } = useAdvancedSearchField(VirtualMachineRowFilterType.NAD);
 

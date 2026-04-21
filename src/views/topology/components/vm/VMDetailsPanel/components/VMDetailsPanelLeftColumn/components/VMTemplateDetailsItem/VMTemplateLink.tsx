@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 import { Link } from 'react-router';
 
 import { TemplateModel } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -12,7 +12,7 @@ type VMTemplateLinkProps = {
   uid?: string;
 };
 
-const VMTemplateLink: FCC<VMTemplateLinkProps> = ({ name, namespace, uid }) => (
+const VMTemplateLink: FC<VMTemplateLinkProps> = ({ name, namespace, uid }) => (
   <>
     <ResourceIcon groupVersionKind={getGroupVersionKindForModel(TemplateModel)} />
     <Link

@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 import { useNavigate } from 'react-router';
 
 import CreateProjectModal from '@kubevirt-utils/components/CreateProjectModal/CreateProjectModal';
@@ -15,7 +15,7 @@ type WelcomeButtonsProps = {
   onClose: () => Promise<void> | void;
 };
 
-const WelcomeButtons: FCC<WelcomeButtonsProps> = ({ onClose }) => {
+const WelcomeButtons: FC<WelcomeButtonsProps> = ({ onClose }) => {
   const { t } = useKubevirtTranslation();
   const [, setActiveNamespace] = useActiveNamespace();
   const navigate = useNavigate();

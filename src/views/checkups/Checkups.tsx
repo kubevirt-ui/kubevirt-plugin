@@ -1,4 +1,4 @@
-import React, { FCC, useMemo } from 'react';
+import React, { FC, useMemo } from 'react';
 
 import ClusterProjectDropdown from '@kubevirt-utils/components/ClusterProjectDropdown/ClusterProjectDropdown';
 import { PageTitles } from '@kubevirt-utils/constants/page-constants';
@@ -15,7 +15,7 @@ import CheckupsRunButton from './CheckupsRunButton';
 
 import './checkups.scss';
 
-const CheckupsList: FCC = () => {
+const CheckupsList: FC = () => {
   const { t } = useKubevirtTranslation();
 
   const pages = useMemo(() => getCheckUpTabs(t), [t]);

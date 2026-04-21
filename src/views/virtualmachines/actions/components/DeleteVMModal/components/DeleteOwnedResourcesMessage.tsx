@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
@@ -23,7 +23,7 @@ type DeleteOwnedResourcesMessageProps = {
   volumes: (IoK8sApiCoreV1PersistentVolumeClaim | V1beta1DataVolume)[];
 };
 
-const DeleteOwnedResourcesMessage: FCC<DeleteOwnedResourcesMessageProps> = ({
+const DeleteOwnedResourcesMessage: FC<DeleteOwnedResourcesMessageProps> = ({
   loaded,
   onToggle,
   shareableVolumes,

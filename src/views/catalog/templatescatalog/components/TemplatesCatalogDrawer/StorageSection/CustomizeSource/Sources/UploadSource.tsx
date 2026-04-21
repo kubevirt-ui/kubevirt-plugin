@@ -1,4 +1,4 @@
-import React, { ChangeEvent, FCC } from 'react';
+import React, { ChangeEvent, FC } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
@@ -23,7 +23,7 @@ type UploadSourceProps = {
   testId: string;
 };
 
-const UploadSource: FCC<UploadSourceProps> = ({ onFileSelected, relevantUpload, testId }) => {
+const UploadSource: FC<UploadSourceProps> = ({ onFileSelected, relevantUpload, testId }) => {
   const { t } = useKubevirtTranslation();
 
   const {

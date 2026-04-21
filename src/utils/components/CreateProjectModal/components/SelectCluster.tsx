@@ -1,4 +1,4 @@
-import React, { FCC, useState } from 'react';
+import React, { FC, useState } from 'react';
 
 import SelectToggle from '@kubevirt-utils/components/toggles/SelectToggle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -13,7 +13,7 @@ type SelectClusterProps = {
   setSelectedCluster: (newValue: string) => void;
 };
 
-const SelectCluster: FCC<SelectClusterProps> = ({ selectedCluster, setSelectedCluster }) => {
+const SelectCluster: FC<SelectClusterProps> = ({ selectedCluster, setSelectedCluster }) => {
   const { t } = useKubevirtTranslation();
   const [isOpen, setIsOpen] = useState(false);
 

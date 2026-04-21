@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { getActionMenuComponent } from './utils';
 
@@ -7,7 +7,7 @@ type TreeViewRightClickActionMenuProps = {
   triggerElement: HTMLElement | null;
 };
 
-const TreeViewRightClickActionMenu: FCC<TreeViewRightClickActionMenuProps> = ({
+const TreeViewRightClickActionMenu: FC<TreeViewRightClickActionMenuProps> = ({
   hideMenu,
   triggerElement,
 }) => {

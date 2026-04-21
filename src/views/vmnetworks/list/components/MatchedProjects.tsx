@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import ExpandableProjectList from '@kubevirt-utils/components/ExpandableProjectList/ExpandableProjectList';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -11,7 +11,7 @@ type MatchedProjectsProps = {
   obj: ClusterUserDefinedNetworkKind;
 };
 
-const MatchedProjects: FCC<MatchedProjectsProps> = ({ obj }) => {
+const MatchedProjects: FC<MatchedProjectsProps> = ({ obj }) => {
   const { t } = useKubevirtTranslation();
   const [matchingProjects, loaded] = useVMNetworkMatchedProjects(obj);
 

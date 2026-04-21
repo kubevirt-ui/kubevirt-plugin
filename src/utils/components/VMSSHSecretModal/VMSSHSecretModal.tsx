@@ -1,4 +1,4 @@
-import React, { FCC, useCallback, useMemo } from 'react';
+import React, { FC, useCallback, useMemo } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { createSSHSecret, getInitialSSHDetails } from '@kubevirt-utils/resources/secret/utils';
@@ -20,7 +20,7 @@ type VMSSHSecretModalProps = {
   vm: V1VirtualMachine;
 };
 
-const VMSSHSecretModal: FCC<VMSSHSecretModalProps> = ({
+const VMSSHSecretModal: FC<VMSSHSecretModalProps> = ({
   authorizedSSHKeys,
   isOpen,
   onClose,

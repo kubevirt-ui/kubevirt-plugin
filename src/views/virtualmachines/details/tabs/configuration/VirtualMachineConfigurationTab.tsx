@@ -1,4 +1,4 @@
-import React, { FCC, useCallback, useEffect, useMemo, useState } from 'react';
+import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useLocation } from 'react-router';
 
@@ -21,7 +21,7 @@ import { getInnerTabFromPath, getTabs, includesConfigurationPath } from './utils
 
 import './virtual-machine-configuration-tab.scss';
 
-const VirtualMachineConfigurationTab: FCC<NavPageComponentProps> = ({
+const VirtualMachineConfigurationTab: FC<NavPageComponentProps> = ({
   instanceTypeExpandedSpec,
   obj: vm,
 }) => {

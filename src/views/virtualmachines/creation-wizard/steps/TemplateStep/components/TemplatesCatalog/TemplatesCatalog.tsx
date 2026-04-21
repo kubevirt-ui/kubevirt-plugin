@@ -1,4 +1,4 @@
-import React, { FCC, useMemo } from 'react';
+import React, { FC, useMemo } from 'react';
 
 import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { logTemplateFlowEvent } from '@kubevirt-utils/extensions/telemetry/telemetry';
@@ -19,7 +19,7 @@ import { filterTemplates } from '@virtualmachines/creation-wizard/steps/Template
 
 import './TemplateCatalog.scss';
 
-const TemplatesCatalog: FCC = () => {
+const TemplatesCatalog: FC = () => {
   const { selectedTemplate, setSelectedTemplate, setTemplatesDrawerIsOpen } = useVMWizardStore();
 
   const [filters, onFilterChange, clearAll] = useTemplatesFilters();

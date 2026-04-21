@@ -1,4 +1,4 @@
-import React, { FCC, ReactNode, useMemo } from 'react';
+import React, { FC, ReactNode, useMemo } from 'react';
 
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
@@ -33,7 +33,7 @@ type CheckupsEmptyState = {
   topFooterActions?: ReactNode;
 };
 
-const CheckupsEmptyState: FCC<CheckupsEmptyState> = ({
+const CheckupsEmptyState: FC<CheckupsEmptyState> = ({
   bottomFooterActions,
   checkupType,
   isLoading,

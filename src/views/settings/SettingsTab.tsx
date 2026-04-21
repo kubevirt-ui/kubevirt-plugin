@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { Card, Tab, Tabs, TabTitleText } from '@patternfly/react-core';
 
@@ -7,7 +7,7 @@ import { useSettingsTabs } from './hooks/useSettingsTabs';
 import './settings-tab.scss';
 import '@kubevirt-utils/styles/cursor.scss';
 
-const SettingsTab: FCC = () => {
+const SettingsTab: FC = () => {
   const { activeTab, redirectTab, tabs } = useSettingsTabs();
 
   return (

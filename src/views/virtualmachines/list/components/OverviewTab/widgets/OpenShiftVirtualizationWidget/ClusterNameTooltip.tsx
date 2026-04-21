@@ -1,10 +1,10 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 type ClusterNameTooltipProps = {
   clusters: string[];
 };
 
-const ClusterNameTooltip: FCC<ClusterNameTooltipProps> = ({ clusters }) =>
+const ClusterNameTooltip: FC<ClusterNameTooltipProps> = ({ clusters }) =>
   clusters.length > 0 ? (
     <div>
       {clusters.map((name) => (

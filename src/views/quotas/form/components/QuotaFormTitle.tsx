@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 import { useNavigate } from 'react-router';
 
 import DetailsPageTitle from '@kubevirt-utils/components/DetailsPageTitle/DetailsPageTitle';
@@ -13,7 +13,7 @@ type QuotaFormTitleProps = {
   isEdit?: boolean;
 };
 
-const QuotaFormTitle: FCC<QuotaFormTitleProps> = ({ isEdit = false }) => {
+const QuotaFormTitle: FC<QuotaFormTitleProps> = ({ isEdit = false }) => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
   const namespace = useNamespaceParam();

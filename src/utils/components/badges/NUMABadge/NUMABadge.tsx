@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -6,7 +6,7 @@ import { Label, Popover } from '@patternfly/react-core';
 
 import './NUMABadge.scss';
 
-const NUMABadge: FCC = () => {
+const NUMABadge: FC = () => {
   const { t } = useKubevirtTranslation();
 
   const popoverContent = (

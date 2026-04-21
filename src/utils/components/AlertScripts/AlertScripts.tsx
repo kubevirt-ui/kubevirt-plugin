@@ -1,9 +1,9 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Alert, AlertVariant } from '@patternfly/react-core';
 
-const AlertScripts: FCC = () => {
+const AlertScripts: FC = () => {
   const { t } = useKubevirtTranslation();
   return (
     <Alert

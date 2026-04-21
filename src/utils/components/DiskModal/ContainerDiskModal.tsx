@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -20,7 +20,7 @@ import { diskModalTitle, getOS } from './utils/helpers';
 import { submit } from './utils/submit';
 import { SourceTypes, V1DiskFormState, V1SubDiskModalProps } from './utils/types';
 
-const ContainerDiskModal: FCC<V1SubDiskModalProps> = ({
+const ContainerDiskModal: FC<V1SubDiskModalProps> = ({
   editDiskName,
   isOpen,
   onClose,

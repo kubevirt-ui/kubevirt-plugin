@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import useTour from '@kubevirt-utils/components/GuidedTour/hooks/useTour';
 import { runningTourSignal } from '@kubevirt-utils/components/GuidedTour/utils/guidedTourSignals';
@@ -14,7 +14,7 @@ import { USER_TAB_IDS } from '@settings/search/constants';
 
 import './GettingStartedSection.scss';
 
-const GettingStartedSection: FCC = () => {
+const GettingStartedSection: FC = () => {
   useSignals();
   const { t } = useKubevirtTranslation();
   const [quickStarts, setQuickStarts] = useKubevirtUserSettings('quickStart');

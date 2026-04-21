@@ -1,4 +1,4 @@
-import React, { FCC, memo } from 'react';
+import React, { FC, memo } from 'react';
 
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
 import { PATHS_TO_HIGHLIGHT } from '@kubevirt-utils/resources/vm/utils/constants';
@@ -9,7 +9,7 @@ import { ConfigurationInnerTabProps } from '../utils/types';
 
 import SchedulingSection from './components/SchedulingSection';
 
-const SchedulingTab: FCC<ConfigurationInnerTabProps> = ({ instanceTypeVM, vm, vmi }) => (
+const SchedulingTab: FC<ConfigurationInnerTabProps> = ({ instanceTypeVM, vm, vmi }) => (
   <SidebarEditor
     onResourceUpdate={onSubmitYAML}
     pathsToHighlight={PATHS_TO_HIGHLIGHT.SCHEDULING_TAB}

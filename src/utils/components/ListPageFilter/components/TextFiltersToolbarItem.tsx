@@ -1,4 +1,4 @@
-import React, { Dispatch, FCC, SetStateAction } from 'react';
+import React, { Dispatch, FC, SetStateAction } from 'react';
 
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -38,7 +38,7 @@ type TextFiltersToolbarItemProps = {
   textFilters: TextFiltersType;
 };
 
-const TextFiltersToolbarItem: FCC<TextFiltersToolbarItemProps> = ({
+const TextFiltersToolbarItem: FC<TextFiltersToolbarItemProps> = ({
   applyTextFilters,
   applyTextFiltersWithDebounce,
   data,

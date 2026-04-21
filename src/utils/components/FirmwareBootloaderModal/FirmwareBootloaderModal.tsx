@@ -1,4 +1,4 @@
-import React, { FCC, MouseEvent, useMemo, useState } from 'react';
+import React, { FC, MouseEvent, useMemo, useState } from 'react';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import ModalPendingChangesAlert from '@kubevirt-utils/components/PendingChanges/ModalPendingChangesAlert/ModalPendingChangesAlert';
@@ -21,7 +21,7 @@ type FirmwareBootloaderModalProps = {
   vmi?: V1VirtualMachineInstance;
 };
 
-const FirmwareBootloaderModal: FCC<FirmwareBootloaderModalProps> = ({
+const FirmwareBootloaderModal: FC<FirmwareBootloaderModalProps> = ({
   isOpen,
   onClose,
   onSubmit,

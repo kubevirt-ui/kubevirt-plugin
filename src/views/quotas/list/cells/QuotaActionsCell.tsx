@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { ApplicationAwareQuota } from '@kubevirt-utils/resources/quotas/types';
 
@@ -8,7 +8,7 @@ type QuotaActionsCellProps = {
   row: ApplicationAwareQuota;
 };
 
-const QuotaActionsCell: FCC<QuotaActionsCellProps> = ({ row }) => (
+const QuotaActionsCell: FC<QuotaActionsCellProps> = ({ row }) => (
   <QuotaActions isKebabToggle quota={row} />
 );
 

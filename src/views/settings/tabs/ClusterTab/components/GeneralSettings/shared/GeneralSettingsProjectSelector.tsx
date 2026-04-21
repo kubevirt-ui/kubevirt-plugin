@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -13,7 +13,7 @@ type GeneralSettingsProjectSelectorProps = {
   projects: K8sResourceCommon[];
   selectedProject: string;
 };
-const GeneralSettingsProjectSelector: FCC<GeneralSettingsProjectSelectorProps> = ({
+const GeneralSettingsProjectSelector: FC<GeneralSettingsProjectSelectorProps> = ({
   loaded,
   onSelect,
   projects,

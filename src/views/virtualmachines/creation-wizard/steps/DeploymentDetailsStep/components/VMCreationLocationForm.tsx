@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import ClusterDropdown from '@kubevirt-utils/components/ClusterProjectDropdown/ClusterDropdown';
 import NamespaceDropdown from '@kubevirt-utils/components/ClusterProjectDropdown/NamespaceDropdown';
@@ -11,7 +11,7 @@ import useVMWizardStore from '@virtualmachines/creation-wizard/state/vm-wizard-s
 
 import './VMCreationLocationForm.scss';
 
-const VMCreationLocationForm: FCC = () => {
+const VMCreationLocationForm: FC = () => {
   const { t } = useKubevirtTranslation();
   const isACMPage = useIsACMPage();
   const { cluster, folder, project, setCluster, setFolder, setProject } = useVMWizardStore();

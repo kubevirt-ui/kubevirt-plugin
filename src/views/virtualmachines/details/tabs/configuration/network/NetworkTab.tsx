@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
@@ -14,7 +14,7 @@ import NetworkInterfaceList from './components/list/NetworkInterfaceList';
 
 import './network-tab.scss';
 
-const NetworkTab: FCC<ConfigurationInnerTabProps> = ({ vm, vmi }) => {
+const NetworkTab: FC<ConfigurationInnerTabProps> = ({ vm, vmi }) => {
   const { t } = useKubevirtTranslation();
 
   return (

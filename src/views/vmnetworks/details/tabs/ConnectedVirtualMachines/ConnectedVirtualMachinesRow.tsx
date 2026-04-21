@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import ActionsDropdown from '@kubevirt-utils/components/ActionsDropdown/ActionsDropdown';
@@ -20,7 +20,7 @@ export type ConnectedVirtualMachinesRowData = {
   vmNetwork: ClusterUserDefinedNetworkKind;
 };
 
-const ConnectedVirtualMachinesRow: FCC<
+const ConnectedVirtualMachinesRow: FC<
   RowProps<V1VirtualMachine, ConnectedVirtualMachinesRowData>
 > = ({ activeColumnIDs, obj, rowData: { isSelected, onSelect, vmNetwork } }) => {
   const actions = useVirtualMachineActions([obj], vmNetwork);

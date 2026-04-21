@@ -1,7 +1,7 @@
 import React, {
   ChangeEvent,
   DetailedHTMLProps,
-  FCC,
+  FC,
   HTMLAttributes,
   memo,
   useMemo,
@@ -31,7 +31,7 @@ type LabelsModalProps = {
   onLabelsSubmit: (labels: { [key: string]: string }) => Promise<any>;
 };
 
-export const LabelsModal: FCC<LabelsModalProps> = memo(
+export const LabelsModal: FC<LabelsModalProps> = memo(
   ({
     initialLabels,
     isOpen,

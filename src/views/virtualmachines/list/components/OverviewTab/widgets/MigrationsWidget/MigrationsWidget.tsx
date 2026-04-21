@@ -1,4 +1,4 @@
-import React, { FCC, useMemo } from 'react';
+import React, { FC, useMemo } from 'react';
 
 import { V1VirtualMachineInstanceMigration } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -34,7 +34,7 @@ type MigrationsWidgetProps = {
   vmims?: V1VirtualMachineInstanceMigration[];
 };
 
-const MigrationsWidget: FCC<MigrationsWidgetProps> = ({
+const MigrationsWidget: FC<MigrationsWidgetProps> = ({
   cardTitle,
   isLoading,
   migrationsTabHref,

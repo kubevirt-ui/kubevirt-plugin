@@ -1,4 +1,4 @@
-import React, { FCC, JSX, memo, useCallback } from 'react';
+import React, { FC, JSX, memo, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 
 import ClusterDropdown from '@kubevirt-utils/components/ClusterProjectDropdown/ClusterDropdown';
@@ -30,7 +30,7 @@ type ClusterProjectDropdownProps = {
   showProjectDropdown?: boolean;
 };
 
-const ClusterProjectDropdown: FCC<ClusterProjectDropdownProps> = memo(
+const ClusterProjectDropdown: FC<ClusterProjectDropdownProps> = memo(
   ({
     disabledClusters,
     disabledItemTooltip,

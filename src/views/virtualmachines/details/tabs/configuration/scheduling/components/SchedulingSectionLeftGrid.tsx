@@ -1,4 +1,4 @@
-import React, { FCC, useCallback } from 'react';
+import React, { FC, useCallback } from 'react';
 
 import Descheduler from '@catalog/wizard/tabs/scheduling/components/Descheduler';
 import DeschedulerPopover from '@catalog/wizard/tabs/scheduling/components/DeschedulerPopover';
@@ -30,7 +30,7 @@ type SchedulingSectionLeftGridProps = {
   vmi?: V1VirtualMachineInstance;
 };
 
-const SchedulingSectionLeftGrid: FCC<SchedulingSectionLeftGridProps> = ({
+const SchedulingSectionLeftGrid: FC<SchedulingSectionLeftGridProps> = ({
   canUpdateVM,
   nodes,
   nodesLoaded,

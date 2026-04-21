@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import {
   InstanceTypeVMStore,
@@ -36,7 +36,7 @@ type BootableVolumeTableProps = {
   userPreferencesMap: NamespacedResourceMap<V1beta1VirtualMachinePreference>;
 };
 
-const BootableVolumeTable: FCC<BootableVolumeTableProps> = ({
+const BootableVolumeTable: FC<BootableVolumeTableProps> = ({
   activeColumns,
   bootableVolumesData,
   favorites,

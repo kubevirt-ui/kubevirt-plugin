@@ -1,8 +1,8 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import aiExperienceIcon from '@lightspeed/images/aiExperienceIcon.svg';
 
-const AIExperienceIcon: FCC = () => (
+const AIExperienceIcon: FC = () => (
   <img
     alt="AI experience sparkle icon"
     className="pf-v6-u-mr-xs"

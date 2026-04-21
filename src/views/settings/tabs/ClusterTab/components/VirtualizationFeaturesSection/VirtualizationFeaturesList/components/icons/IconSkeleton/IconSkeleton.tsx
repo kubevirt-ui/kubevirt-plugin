@@ -1,9 +1,9 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { Skeleton } from '@patternfly/react-core';
 
 import './IconSkeleton.scss';
 
-const IconSkeleton: FCC = () => <Skeleton className="icon-skeleton" shape="circle" />;
+const IconSkeleton: FC = () => <Skeleton className="icon-skeleton" shape="circle" />;
 
 export default IconSkeleton;

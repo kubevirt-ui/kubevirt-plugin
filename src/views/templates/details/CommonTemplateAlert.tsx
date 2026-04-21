@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 import { useNavigate } from 'react-router';
 
 import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -17,7 +17,7 @@ type CommonTemplateAlertProps = {
   template: V1Template;
 };
 
-const CommonTemplateAlert: FCC<CommonTemplateAlertProps> = ({ template }) => {
+const CommonTemplateAlert: FC<CommonTemplateAlertProps> = ({ template }) => {
   const { t } = useKubevirtTranslation();
   const osName = getOperatingSystemName(template);
   const providerName = getTemplateProviderName(template);

@@ -1,4 +1,4 @@
-import React, { FCC, useEffect, useMemo, useState } from 'react';
+import React, { FC, useEffect, useMemo, useState } from 'react';
 
 import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
@@ -22,7 +22,7 @@ type VirtualMachineDiagnosticTabConditionsProps = {
   conditions: VirtualizationStatusCondition[];
 };
 
-const VirtualMachineDiagnosticTabConditions: FCC<VirtualMachineDiagnosticTabConditionsProps> = ({
+const VirtualMachineDiagnosticTabConditions: FC<VirtualMachineDiagnosticTabConditionsProps> = ({
   conditions,
 }) => {
   const { t } = useKubevirtTranslation();

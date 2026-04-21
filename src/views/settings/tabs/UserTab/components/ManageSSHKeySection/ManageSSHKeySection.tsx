@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -8,7 +8,7 @@ import { USER_TAB_IDS } from '@settings/search/constants';
 
 import SSHAuthKeysList from './SSHAuthKeysList/SSHAuthKeysList';
 
-const ManageSSHKeySection: FCC = () => {
+const ManageSSHKeySection: FC = () => {
   const { t } = useKubevirtTranslation();
 
   return (

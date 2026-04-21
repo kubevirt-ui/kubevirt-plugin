@@ -1,4 +1,4 @@
-import { FCC } from 'react';
+import { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
@@ -16,7 +16,7 @@ type ConfirmActionMessageProps = {
   obj: K8sResourceCommon;
 };
 
-const ConfirmActionMessage: FCC<ConfirmActionMessageProps> = ({
+const ConfirmActionMessage: FC<ConfirmActionMessageProps> = ({
   action = CONFIRM_ACTIONS.delete,
   obj,
 }) => {

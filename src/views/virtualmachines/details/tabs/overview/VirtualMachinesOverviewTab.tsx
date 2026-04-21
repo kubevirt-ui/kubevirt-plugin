@@ -1,4 +1,4 @@
-import React, { FCC, useRef } from 'react';
+import React, { FC, useRef } from 'react';
 
 import AlertsCard from '@kubevirt-utils/components/AlertsCard/AlertsCard';
 import useContainerWidth from '@kubevirt-utils/hooks/useContainerWidth';
@@ -21,7 +21,7 @@ import VirtualMachinesOverviewTabSnapshots from './components/VirtualMachinesOve
 import VirtualMachinesOverviewTabUtilization from './components/VirtualMachinesOverviewTabUtilization/VirtualMachinesOverviewTabUtilization';
 import useVMAlerts from './utils/hook/useVMAlerts';
 
-const VirtualMachinesOverviewTab: FCC<NavPageComponentProps> = ({
+const VirtualMachinesOverviewTab: FC<NavPageComponentProps> = ({
   instanceTypeExpandedSpec,
   obj: vm,
 }) => {

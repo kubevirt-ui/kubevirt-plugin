@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { getStartAfterCreationLabel } from '@kubevirt-utils/components/RunStrategyModal/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -13,7 +13,7 @@ import ReviewGrid from '@virtualmachines/creation-wizard/steps/ReviewAndCreateSt
 
 import NameAndDescriptionForm from './components/NameAndDescriptionForm';
 
-const ReviewAndCreateStep: FCC = () => {
+const ReviewAndCreateStep: FC = () => {
   const { t } = useKubevirtTranslation();
   const { setStartVM, startVM } = useVMWizardStore();
   return (

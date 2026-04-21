@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import DescriptionItemAnnotations from '@kubevirt-utils/components/DescriptionItem/components/DescriptionItemAnnotations';
 import DescriptionItemCreatedAt from '@kubevirt-utils/components/DescriptionItem/components/DescriptionItemCreatedAt';
@@ -18,7 +18,7 @@ type NetworkDetailsPageProps = {
   obj: ClusterUserDefinedNetworkKind;
 };
 
-const NetworkDetailsPage: FCC<NetworkDetailsPageProps> = ({ obj: network }) => {
+const NetworkDetailsPage: FC<NetworkDetailsPageProps> = ({ obj: network }) => {
   const { t } = useKubevirtTranslation();
   const name = getName(network);
 

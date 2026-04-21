@@ -1,4 +1,4 @@
-import React, { FCC, useMemo } from 'react';
+import React, { FC, useMemo } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
@@ -22,7 +22,7 @@ type NetworkInterfaceListProps = {
   vm: V1VirtualMachine;
 };
 
-const NetworkInterfaceList: FCC<NetworkInterfaceListProps> = ({ onUpdateVM, vm }) => {
+const NetworkInterfaceList: FC<NetworkInterfaceListProps> = ({ onUpdateVM, vm }) => {
   const { t } = useKubevirtTranslation();
   const networks = getNetworks(vm);
   const interfaces = getInterfaces(vm);

@@ -1,4 +1,4 @@
-import React, { ComponentType, FCC, useMemo } from 'react';
+import React, { ComponentType, FC, useMemo } from 'react';
 import Joyride, { ACTIONS, CallBackProps, EVENTS, TooltipRenderProps } from 'react-joyride';
 import { useLocation, useNavigate } from 'react-router';
 
@@ -13,7 +13,7 @@ import { getTourSteps } from './utils/constants';
 import { runningTourSignal, stepIndexSignal, tourStepsSeenSignal } from './utils/guidedTourSignals';
 import { handleClose, handleNext, handlePrev } from './utils/utils';
 
-const GuidedTour: FCC = () => {
+const GuidedTour: FC = () => {
   useSignals();
 
   const { t } = useKubevirtTranslation();

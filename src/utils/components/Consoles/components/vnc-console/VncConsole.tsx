@@ -1,4 +1,4 @@
-import React, { FCC, memo, useEffect, useRef } from 'react';
+import React, { FC, memo, useEffect, useRef } from 'react';
 
 import RFBCreate from '@novnc/novnc/lib/rfb';
 import { getLogging, initLogging } from '@novnc/novnc/lib/util/logging';
@@ -34,7 +34,7 @@ import './vnc-console.scss';
 
 const { connected, connecting } = ConsoleState;
 
-export const VncConsole: FCC<VncConsoleProps> = ({
+export const VncConsole: FC<VncConsoleProps> = ({
   basePath,
   scaleViewport = true,
   setState,

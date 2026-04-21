@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -11,7 +11,7 @@ type ISOBadgeProps = {
   vm: V1VirtualMachine;
 };
 
-const ISOBadge: FCC<ISOBadgeProps> = ({ diskName, vm }) => {
+const ISOBadge: FC<ISOBadgeProps> = ({ diskName, vm }) => {
   const { t } = useKubevirtTranslation();
 
   const disks = getDisks(vm) || [];

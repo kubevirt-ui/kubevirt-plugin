@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -12,7 +12,7 @@ type PVCOwnerWarningProps = {
   pvc: IoK8sApiCoreV1PersistentVolumeClaim;
 };
 
-const PVCOwnerWarning: FCC<PVCOwnerWarningProps> = ({ cluster, namespace, pvc }) => {
+const PVCOwnerWarning: FC<PVCOwnerWarningProps> = ({ cluster, namespace, pvc }) => {
   const { t } = useKubevirtTranslation();
   const vmOwnerName = usePVCOwnerVMName(pvc, namespace, cluster);
 

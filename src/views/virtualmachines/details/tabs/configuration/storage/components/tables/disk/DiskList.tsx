@@ -1,4 +1,4 @@
-import React, { FCC, useMemo } from 'react';
+import React, { FC, useMemo } from 'react';
 
 import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -41,7 +41,7 @@ type DiskListProps = {
   vmi?: V1VirtualMachineInstance;
 };
 
-const DiskList: FCC<DiskListProps> = ({
+const DiskList: FC<DiskListProps> = ({
   customize = false,
   onDiskUpdate,
   onUploadStarted,

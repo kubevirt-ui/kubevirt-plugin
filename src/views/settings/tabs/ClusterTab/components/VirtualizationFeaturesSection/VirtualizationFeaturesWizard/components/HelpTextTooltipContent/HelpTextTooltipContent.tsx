@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -12,7 +12,7 @@ type HelpTextTooltipContentProps = {
   titleText?: string;
 };
 
-const HelpTextTooltipContent: FCC<HelpTextTooltipContentProps> = ({
+const HelpTextTooltipContent: FC<HelpTextTooltipContentProps> = ({
   bodyText,
   linkURL,
   titleText,

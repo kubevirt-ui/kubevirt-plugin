@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { isDigitsOnly } from '@kubevirt-utils/utils/validation';
 import { TextInput, TextInputProps } from '@patternfly/react-core';
@@ -8,7 +8,7 @@ type NumberTextInputProps = {
   value: number;
 } & Omit<TextInputProps, 'value'>;
 
-const NumberTextInput: FCC<NumberTextInputProps> = ({ setValue, value, ...props }) => {
+const NumberTextInput: FC<NumberTextInputProps> = ({ setValue, value, ...props }) => {
   return (
     <TextInput
       onChange={(_, newValue) => {

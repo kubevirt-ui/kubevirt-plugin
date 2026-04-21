@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -11,7 +11,7 @@ type BootCDCheckboxProps = {
   onChange: (checked: boolean) => void;
 };
 
-const BootCDCheckbox: FCC<BootCDCheckboxProps> = ({ hasCDSource, onChange }) => {
+const BootCDCheckbox: FC<BootCDCheckboxProps> = ({ hasCDSource, onChange }) => {
   const { t } = useKubevirtTranslation();
 
   return (

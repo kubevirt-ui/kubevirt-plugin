@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 import { useLocation } from 'react-router';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -30,7 +30,7 @@ type VirtualMachineNavPageTitleProps = {
   vm: V1VirtualMachine;
 };
 
-const VirtualMachineNavPageTitle: FCC<VirtualMachineNavPageTitleProps> = ({
+const VirtualMachineNavPageTitle: FC<VirtualMachineNavPageTitleProps> = ({
   instanceTypeExpandedSpec,
   isLoaded,
   vm,

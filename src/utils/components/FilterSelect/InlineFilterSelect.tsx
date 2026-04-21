@@ -1,4 +1,4 @@
-import React, { FCC, ReactNode, SyntheticEvent, useMemo, useState } from 'react';
+import React, { FC, ReactNode, SyntheticEvent, useMemo, useState } from 'react';
 
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
@@ -35,7 +35,7 @@ type InlineFilterSelectProps = {
   toggleProps?: MenuTogglePropsWithTestId;
 };
 
-const InlineFilterSelect: FCC<InlineFilterSelectProps> = ({
+const InlineFilterSelect: FC<InlineFilterSelectProps> = ({
   className,
   menuFooter,
   options = [],

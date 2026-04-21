@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 import { Link } from 'react-router';
 
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
@@ -9,7 +9,7 @@ interface NetworkInterfacePasstHelperPopoverProps {
   namespace?: string;
 }
 
-const NetworkInterfacePasstHelperPopover: FCC<NetworkInterfacePasstHelperPopoverProps> = ({
+const NetworkInterfacePasstHelperPopover: FC<NetworkInterfacePasstHelperPopoverProps> = ({
   namespace,
 }) => {
   const { t } = useKubevirtTranslation();

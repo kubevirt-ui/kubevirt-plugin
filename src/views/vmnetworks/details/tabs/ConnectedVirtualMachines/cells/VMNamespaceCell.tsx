@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { modelToGroupVersionKind, NamespaceModel } from '@kubevirt-utils/models';
@@ -10,7 +10,7 @@ type VMNamespaceCellProps = {
   row: V1VirtualMachine;
 };
 
-const VMNamespaceCell: FCC<VMNamespaceCellProps> = ({ row }) => {
+const VMNamespaceCell: FC<VMNamespaceCellProps> = ({ row }) => {
   const namespace = getNamespace(row);
 
   if (!namespace) {

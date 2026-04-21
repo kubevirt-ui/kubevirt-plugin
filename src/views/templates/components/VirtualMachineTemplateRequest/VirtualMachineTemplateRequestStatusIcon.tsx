@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { V1alpha1VirtualMachineTemplateRequest } from '@kubevirt-ui-ext/kubevirt-api/virt-template';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -13,7 +13,7 @@ type VirtualMachineTemplateRequestStatusIconProps = {
   vmtr: V1alpha1VirtualMachineTemplateRequest;
 };
 
-const VirtualMachineTemplateRequestStatusIcon: FCC<
+const VirtualMachineTemplateRequestStatusIcon: FC<
   VirtualMachineTemplateRequestStatusIconProps
 > = ({ vmtr }) => {
   const { t } = useKubevirtTranslation();

@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Label, Tooltip, Truncate } from '@patternfly/react-core';
@@ -9,7 +9,7 @@ type StatusScoreItemProps = {
   item: StatusScoreItemType;
 };
 
-const StatusScoreItem: FCC<StatusScoreItemProps> = ({ item }) => {
+const StatusScoreItem: FC<StatusScoreItemProps> = ({ item }) => {
   const { t } = useKubevirtTranslation();
   const { extraCount, extraItems, name, score, tags } = item;
   const { description, status, value } = score;

@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -26,7 +26,7 @@ type HardwareDevicesProps = {
   vmi?: V1VirtualMachineInstance;
 };
 
-const HardwareDevices: FCC<HardwareDevicesProps> = ({
+const HardwareDevices: FC<HardwareDevicesProps> = ({
   canEdit = true,
   hideEdit = false,
   onSubmit,

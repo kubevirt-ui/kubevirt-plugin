@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 import { useNavigate } from 'react-router';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -14,7 +14,7 @@ type MetadataLabelsProps = {
   model: K8sModel;
 };
 
-const MetadataLabels: FCC<MetadataLabelsProps> = ({ cluster, labels, model }) => {
+const MetadataLabels: FC<MetadataLabelsProps> = ({ cluster, labels, model }) => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
 

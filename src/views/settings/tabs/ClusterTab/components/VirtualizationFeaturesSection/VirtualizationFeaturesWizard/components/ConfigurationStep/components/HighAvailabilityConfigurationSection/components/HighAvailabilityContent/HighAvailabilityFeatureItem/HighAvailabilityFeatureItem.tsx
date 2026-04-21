@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
@@ -22,7 +22,7 @@ type HighAvailabilityFeatureItemProps = {
   setAlternativeChecked: (newCheckedState: boolean) => void;
 };
 
-const HighAvailabilityFeatureItem: FCC<HighAvailabilityFeatureItemProps> = ({
+const HighAvailabilityFeatureItem: FC<HighAvailabilityFeatureItemProps> = ({
   alternativeChecked,
   checkboxLabel,
   description,

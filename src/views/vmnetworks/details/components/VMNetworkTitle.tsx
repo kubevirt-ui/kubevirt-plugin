@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 import { Link } from 'react-router';
 
 import DetailsPageTitle from '@kubevirt-utils/components/DetailsPageTitle/DetailsPageTitle';
@@ -15,7 +15,7 @@ type VMNetworkTitleProps = {
   network: ClusterUserDefinedNetworkKind;
 };
 
-const VMNetworkTitle: FCC<VMNetworkTitleProps> = ({ network }) => {
+const VMNetworkTitle: FC<VMNetworkTitleProps> = ({ network }) => {
   const { t } = useKubevirtTranslation();
 
   return (

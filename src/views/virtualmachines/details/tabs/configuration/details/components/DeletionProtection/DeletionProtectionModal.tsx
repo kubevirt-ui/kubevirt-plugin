@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -23,7 +23,7 @@ type DeletionProtectionModalProps = {
   vm: V1VirtualMachine;
 };
 
-const DeletionProtectionModal: FCC<DeletionProtectionModalProps> = ({
+const DeletionProtectionModal: FC<DeletionProtectionModalProps> = ({
   deletionProtectionOption,
   isOpen,
   onCancel,

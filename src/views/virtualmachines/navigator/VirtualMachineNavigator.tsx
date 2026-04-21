@@ -1,4 +1,4 @@
-import React, { FCC, useCallback, useRef } from 'react';
+import React, { FC, useCallback, useRef } from 'react';
 import { matchPath, useLocation, useParams } from 'react-router';
 
 import CreateResourceDefaultPage from '@kubevirt-utils/components/CreateResourceDefaultPage/CreateResourceDefaultPage';
@@ -30,7 +30,7 @@ import useNavigatorTabs from './useNavigatorTabs';
 
 import './VirtualMachineNavigator.scss';
 
-const VirtualMachineNavigator: FCC = () => {
+const VirtualMachineNavigator: FC = () => {
   useSignals();
   const { t } = useKubevirtTranslation();
   const vmListRef = useRef<{ onFilterChange: OnFilterChange } | null>(null);

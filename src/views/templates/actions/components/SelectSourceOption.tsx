@@ -1,4 +1,4 @@
-import React, { FCC, ReactNode, useCallback } from 'react';
+import React, { FC, ReactNode, useCallback } from 'react';
 import { useParams } from 'react-router';
 import { TFunction } from 'i18next';
 
@@ -76,7 +76,7 @@ type SelectSourceOptionProps = {
   selectedSource: SOURCE_OPTIONS_IDS;
 };
 
-const SelectSourceOption: FCC<SelectSourceOptionProps> = ({
+const SelectSourceOption: FC<SelectSourceOptionProps> = ({
   label,
   onSelectSource,
   options,

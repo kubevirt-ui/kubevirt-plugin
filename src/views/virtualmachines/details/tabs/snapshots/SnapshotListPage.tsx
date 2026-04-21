@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SnapshotModal from '@kubevirt-utils/components/SnapshotModal/SnapshotModal';
@@ -17,7 +17,7 @@ import useSnapshotData from './hooks/useSnapshotData';
 
 import './SnapshotListPage.scss';
 
-const SnapshotListPage: FCC<NavPageComponentProps> = ({ obj: vm }) => {
+const SnapshotListPage: FC<NavPageComponentProps> = ({ obj: vm }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const { error, loaded, restoresMap, snapshots } = useSnapshotData(vm);

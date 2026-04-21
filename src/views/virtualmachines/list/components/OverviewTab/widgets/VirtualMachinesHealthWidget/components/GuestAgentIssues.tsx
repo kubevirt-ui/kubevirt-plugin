@@ -1,4 +1,4 @@
-import React, { FCC, useMemo } from 'react';
+import React, { FC, useMemo } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -17,7 +17,7 @@ type GuestAgentIssuesProps = {
   vms: V1VirtualMachine[];
 };
 
-const GuestAgentIssues: FCC<GuestAgentIssuesProps> = ({ vms }) => {
+const GuestAgentIssues: FC<GuestAgentIssuesProps> = ({ vms }) => {
   const { t } = useKubevirtTranslation();
   const namespace = useNamespaceParam();
   const cluster = useActiveClusterParam();

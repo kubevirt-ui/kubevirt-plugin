@@ -1,4 +1,4 @@
-import React, { FCC, useState } from 'react';
+import React, { FC, useState } from 'react';
 import { useNavigate } from 'react-router';
 
 import { modelToGroupVersionKind, PodModel } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -27,7 +27,7 @@ type CDIInitErrorStatus = {
   pvcName: string;
 };
 
-const CDIInitErrorStatus: FCC<CDIInitErrorStatus> = ({ namespace, onErrorClick, pvcName }) => {
+const CDIInitErrorStatus: FC<CDIInitErrorStatus> = ({ namespace, onErrorClick, pvcName }) => {
   const { t } = useKubevirtTranslation();
   const [shouldKillDv, setShouldKillDv] = useState<boolean>(true);
   const [pod, podLoaded, podError] = useK8sWatchResource<K8sResourceCommon>({

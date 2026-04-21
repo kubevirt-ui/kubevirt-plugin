@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 import { useNavigate } from 'react-router';
 
 import { TemplateModel } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -11,7 +11,7 @@ import useIsACMPage from '@multicluster/useIsACMPage';
 import { Button } from '@patternfly/react-core';
 import { useFleetAccessReview } from '@stolostron/multicluster-sdk';
 
-const VirtualMachineTemplatesCreateButton: FCC = () => {
+const VirtualMachineTemplatesCreateButton: FC = () => {
   const { t } = useKubevirtTranslation();
   const selectedCluster = useSelectedCluster();
   const selectedNamespaces = useListNamespaces();

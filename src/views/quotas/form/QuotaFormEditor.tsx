@@ -1,4 +1,4 @@
-import React, { FCC, FormEvent, useState } from 'react';
+import React, { FC, FormEvent, useState } from 'react';
 import { useNavigate } from 'react-router';
 
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
@@ -34,7 +34,7 @@ type QuotaFormEditorProps = {
   onChange?: (data: ApplicationAwareResourceQuota) => void;
 };
 
-const QuotaFormEditor: FCC<QuotaFormEditorProps> = ({ formData, isEdit = false, onChange }) => {
+const QuotaFormEditor: FC<QuotaFormEditorProps> = ({ formData, isEdit = false, onChange }) => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
   const namespace = useNamespaceParam();

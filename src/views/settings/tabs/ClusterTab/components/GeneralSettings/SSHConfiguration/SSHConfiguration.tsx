@@ -1,4 +1,4 @@
-import React, { FCC, useCallback, useEffect, useState } from 'react';
+import React, { FC, useCallback, useEffect, useState } from 'react';
 import { useDebounceCallback } from 'src/views/clusteroverview/utils/hooks/useDebounceCallback';
 
 import { ConfigMapModel } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -21,7 +21,7 @@ import { CLUSTER_TAB_IDS } from '@settings/search/constants';
 
 type SSHConfigurationProps = { newBadge: boolean };
 
-const SSHConfiguration: FCC<SSHConfigurationProps> = ({ newBadge }) => {
+const SSHConfiguration: FC<SSHConfigurationProps> = ({ newBadge }) => {
   const { t } = useKubevirtTranslation();
   const cluster = useSettingsCluster();
   const [url, setUrl] = useState<string>(null);

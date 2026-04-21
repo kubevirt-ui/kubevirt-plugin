@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -16,7 +16,7 @@ type AdditionalQuotaPopoverProps = {
   quotaStatus: QuotaStatus;
 };
 
-const AdditionalQuotaPopover: FCC<AdditionalQuotaPopoverProps> = ({
+const AdditionalQuotaPopover: FC<AdditionalQuotaPopoverProps> = ({
   additionalResourceKeys,
   quotaStatus,
 }) => {

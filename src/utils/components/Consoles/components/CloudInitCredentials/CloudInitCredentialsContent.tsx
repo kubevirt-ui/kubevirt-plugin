@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -12,7 +12,7 @@ type CloudInitCredentialsContentProps = {
   vm: V1VirtualMachine;
 };
 
-const CloudInitCredentialsContent: FCC<CloudInitCredentialsContentProps> = ({ vm }) => {
+const CloudInitCredentialsContent: FC<CloudInitCredentialsContentProps> = ({ vm }) => {
   const { t } = useKubevirtTranslation();
   const { users } = getCloudInitCredentials(vm);
 

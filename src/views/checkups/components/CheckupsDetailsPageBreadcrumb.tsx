@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 import { useNavigate } from 'react-router';
 
 import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
@@ -14,7 +14,7 @@ type CheckupsDetailsPageBreadcrumbProps = {
   parentLabel: string;
 };
 
-const CheckupsDetailsPageBreadcrumb: FCC<CheckupsDetailsPageBreadcrumbProps> = ({
+const CheckupsDetailsPageBreadcrumb: FC<CheckupsDetailsPageBreadcrumbProps> = ({
   checkupType,
   detailsLabel,
   parentLabel,

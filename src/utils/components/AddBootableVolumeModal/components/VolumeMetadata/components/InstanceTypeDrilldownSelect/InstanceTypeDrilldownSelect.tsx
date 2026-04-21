@@ -1,4 +1,4 @@
-import React, { FCC, useCallback, useEffect, useMemo, useState } from 'react';
+import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 
 import {
   DEFAULT_INSTANCETYPE_KIND_LABEL,
@@ -31,7 +31,7 @@ type InstanceTypeMenuItemsProps = {
   setBootableVolumeField: SetBootableVolumeFieldType;
 };
 
-export const InstanceTypeDrilldownSelect: FCC<InstanceTypeMenuItemsProps> = ({
+export const InstanceTypeDrilldownSelect: FC<InstanceTypeMenuItemsProps> = ({
   bootableVolume,
   deleteLabel,
   setBootableVolumeField,

@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Bullseye, Spinner, Stack, StackItem, Title, TitleSizes } from '@patternfly/react-core';
@@ -14,7 +14,7 @@ import HighAvailabilitySummarySection from '@settings/tabs/ClusterTab/components
 
 import useCreateOperator from '../../utils/hooks/useCreateOperator/useCreateOperator';
 
-const SummaryStepContent: FCC = () => {
+const SummaryStepContent: FC = () => {
   const { t } = useKubevirtTranslation();
   const { operatorDetailsMap, operatorResourcesLoaded } = useVirtualizationFeaturesContext();
   useCreateOperator();

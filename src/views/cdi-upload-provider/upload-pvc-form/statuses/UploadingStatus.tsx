@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -19,7 +19,7 @@ import { UPLOAD_STATUS } from '../../utils/consts';
 import { UploadingStatusProps } from '../../utils/types';
 import { getProgressVariant } from '../../utils/utils';
 
-const UploadingStatus: FCC<UploadingStatusProps> = ({ onCancelClick, onSuccessClick, upload }) => {
+const UploadingStatus: FC<UploadingStatusProps> = ({ onCancelClick, onSuccessClick, upload }) => {
   const { t } = useKubevirtTranslation();
   return (
     <EmptyState

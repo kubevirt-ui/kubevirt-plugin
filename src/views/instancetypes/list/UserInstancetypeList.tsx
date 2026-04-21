@@ -1,4 +1,4 @@
-import React, { FCC, useMemo } from 'react';
+import React, { FC, useMemo } from 'react';
 
 import { VirtualMachineInstancetypeModelRef } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1beta1VirtualMachineInstancetype } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -26,7 +26,7 @@ import { getUserInstancetypeColumns, getUserInstancetypeRowId } from './userInst
 
 import '@kubevirt-utils/styles/list-managment-group.scss';
 
-const UserInstancetypeList: FCC<UserInstancetypeListProps> = ({
+const UserInstancetypeList: FC<UserInstancetypeListProps> = ({
   hideColumnManagement,
   hideNameLabelFilters,
   hideTextFilter,

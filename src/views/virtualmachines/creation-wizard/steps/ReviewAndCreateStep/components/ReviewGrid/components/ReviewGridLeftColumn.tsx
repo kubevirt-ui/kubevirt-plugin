@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -8,7 +8,7 @@ import { getCluster } from '@multicluster/helpers/selectors';
 import { DescriptionList, ExpandableSection } from '@patternfly/react-core';
 import useVMWizardStore from '@virtualmachines/creation-wizard/state/vm-wizard-store/useVMWizardStore';
 
-const ReviewGridLeftColumn: FCC = () => {
+const ReviewGridLeftColumn: FC = () => {
   const { t } = useKubevirtTranslation();
   const vm = vmSignal.value;
   const { project } = useVMWizardStore();

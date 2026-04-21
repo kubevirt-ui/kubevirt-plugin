@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import ActionDropdownItem from '@kubevirt-utils/components/ActionDropdownItem/ActionDropdownItem';
 import { ActionDropdownItemType } from '@kubevirt-utils/components/ActionsDropdown/constants';
@@ -13,7 +13,7 @@ export type RightClickActionMenuProps = {
   triggerRef: () => HTMLElement | null;
 };
 
-const RightClickActionMenu: FCC<RightClickActionMenuProps> = ({
+const RightClickActionMenu: FC<RightClickActionMenuProps> = ({
   actions,
   hideMenu,
   nestedLevel,

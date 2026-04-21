@@ -1,4 +1,4 @@
-import React, { FCC, MouseEvent, useEffect, useMemo, useState } from 'react';
+import React, { FC, MouseEvent, useEffect, useMemo, useState } from 'react';
 
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -27,7 +27,7 @@ import {
 
 import './RunStrategyModal.scss';
 
-const RunStrategyModal: FCC<RunStrategyModalProps> = ({
+const RunStrategyModal: FC<RunStrategyModalProps> = ({
   hasMixedStrategies,
   hasStoppedVMs,
   initialRunStrategy,

@@ -1,4 +1,4 @@
-import React, { FCC, useCallback } from 'react';
+import React, { FC, useCallback } from 'react';
 
 import { produceVMNetworks, UpdateValidatedVM } from '@catalog/utils/WizardVMContext';
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -16,7 +16,7 @@ type WizardNetworkInterfaceModalProps = {
   vm: V1VirtualMachine;
 };
 
-const WizardNetworkInterfaceModal: FCC<WizardNetworkInterfaceModalProps> = ({
+const WizardNetworkInterfaceModal: FC<WizardNetworkInterfaceModalProps> = ({
   headerText,
   isOpen,
   onClose,

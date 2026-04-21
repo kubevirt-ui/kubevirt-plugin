@@ -1,4 +1,4 @@
-import React, { FCC, useMemo } from 'react';
+import React, { FC, useMemo } from 'react';
 import { useNavigate } from 'react-router';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -21,7 +21,7 @@ import RunningCheckupWarningDescription from './actions/RunningCheckupWarningDes
 import { useAllRunningSelfValidationJobs } from './hooks/useAllRunningSelfValidationJobs';
 import useCheckupsSelfValidationPermissions from './hooks/useCheckupsSelfValidationPermissions';
 
-const SelfValidationCheckupRunButton: FCC = () => {
+const SelfValidationCheckupRunButton: FC = () => {
   const navigate = useNavigate();
   const isACMpage = useIsACMPage();
   const [hubClusterName] = useHubClusterName();

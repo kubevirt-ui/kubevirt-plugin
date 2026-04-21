@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 import { Trans } from 'react-i18next';
 
 import { MigrationPolicyModel } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -45,7 +45,7 @@ type MigrationPolicyDetailsSectionProps = {
   pathname: string;
 };
 
-const MigrationPolicyDetailsSection: FCC<MigrationPolicyDetailsSectionProps> = ({
+const MigrationPolicyDetailsSection: FC<MigrationPolicyDetailsSectionProps> = ({
   mp,
   pathname,
 }) => {

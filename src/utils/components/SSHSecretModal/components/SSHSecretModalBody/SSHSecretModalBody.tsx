@@ -1,4 +1,4 @@
-import React, { Dispatch, FCC, SetStateAction, useState } from 'react';
+import React, { Dispatch, FC, SetStateAction, useState } from 'react';
 
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import SecretSelectionRadioGroup from '@kubevirt-utils/components/SSHSecretModal/components/SecretSelectionRadioGroup';
@@ -28,7 +28,7 @@ type SSHSecretModalBodyProps = {
   sshDetails: SSHSecretDetails;
 };
 
-const SSHSecretModalBody: FCC<SSHSecretModalBodyProps> = ({
+const SSHSecretModalBody: FC<SSHSecretModalBodyProps> = ({
   cluster,
   isTemplate,
   isUserTab,

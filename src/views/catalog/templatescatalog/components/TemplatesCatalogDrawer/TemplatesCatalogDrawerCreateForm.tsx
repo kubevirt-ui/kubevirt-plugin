@@ -1,4 +1,4 @@
-import React, { FCC, memo, useState } from 'react';
+import React, { FC, memo, useState } from 'react';
 
 import { DRAWER_FORM_ID } from '@catalog/templatescatalog/utils/consts';
 import { getNotSupportedVMError } from '@catalog/utils/constants';
@@ -42,7 +42,7 @@ type TemplatesCatalogDrawerCreateFormProps = {
   subscriptionData: RHELAutomaticSubscriptionData;
 };
 
-export const TemplatesCatalogDrawerCreateForm: FCC<TemplatesCatalogDrawerCreateFormProps> = memo(
+export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFormProps> = memo(
   ({ authorizedSSHKey, namespace, onCancel, subscriptionData }) => {
     const { t } = useKubevirtTranslation();
     const isACMPage = useIsACMPage();

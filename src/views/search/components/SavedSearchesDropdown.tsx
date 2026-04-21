@@ -1,4 +1,4 @@
-import React, { FCC, useState } from 'react';
+import React, { FC, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -15,7 +15,7 @@ import { TrashIcon } from '@patternfly/react-icons';
 import { ExclamationCircleIcon } from '@patternfly/react-icons';
 import { useSavedSearchData } from '@search/hooks/useSavedSearchData';
 
-const SavedSearchesDropdown: FCC = () => {
+const SavedSearchesDropdown: FC = () => {
   const { t } = useKubevirtTranslation();
   const [open, setOpen] = useState(false);
 

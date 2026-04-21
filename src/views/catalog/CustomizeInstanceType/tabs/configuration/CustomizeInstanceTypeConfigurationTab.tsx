@@ -1,4 +1,4 @@
-import React, { FCC, useCallback, useEffect, useMemo, useState } from 'react';
+import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 
 import ConfigurationSearch from '@kubevirt-utils/components/ConfigurationSearch/ConfigurationSearch';
@@ -18,7 +18,7 @@ import { getTabs } from './utils/constants';
 
 import './CustomizeInstanceTypeConfigurationTab.scss';
 
-const CustomizeInstanceTypeConfigurationTab: FCC = () => {
+const CustomizeInstanceTypeConfigurationTab: FC = () => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
   const location = useLocation();

@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { getBootloaderTitleFromVM } from '@kubevirt-utils/components/FirmwareBootloaderModal/utils/utils';
@@ -17,7 +17,7 @@ type BootMethodProps = {
   template: V1Template;
 };
 
-const BootMethod: FCC<BootMethodProps> = ({ editable, template }) => {
+const BootMethod: FC<BootMethodProps> = ({ editable, template }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
 

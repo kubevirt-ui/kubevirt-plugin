@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { modelToGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { VirtualMachineSnapshotContentModel } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -21,7 +21,7 @@ type SnapshotContentConfigurationSummaryProps = {
   snapshot: V1beta1VirtualMachineSnapshot;
 };
 
-const SnapshotContentConfigurationSummary: FCC<SnapshotContentConfigurationSummaryProps> = ({
+const SnapshotContentConfigurationSummary: FC<SnapshotContentConfigurationSummaryProps> = ({
   snapshot,
 }) => {
   const { t } = useKubevirtTranslation();

@@ -1,4 +1,4 @@
-import React, { FCC, MouseEvent } from 'react';
+import React, { FC, MouseEvent } from 'react';
 
 import { TemplateParameter } from '@kubevirt-ui-ext/kubevirt-api/console';
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
@@ -14,7 +14,7 @@ type ParameterValueEditorProps = {
   parameter: TemplateParameter;
 };
 
-const SelectParameterValueType: FCC<ParameterValueEditorProps> = ({
+const SelectParameterValueType: FC<ParameterValueEditorProps> = ({
   isEditDisabled,
   onChange,
   parameter,

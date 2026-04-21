@@ -1,4 +1,4 @@
-import React, { FCC, useMemo } from 'react';
+import React, { FC, useMemo } from 'react';
 
 import { NodeModel, TemplateModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { NetworkAttachmentDefinitionModel } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -18,7 +18,7 @@ export type ResourcesSectionProps = {
   }>;
 };
 
-const ResourcesSection: FCC<ResourcesSectionProps> = ({ isAdmin, resources }) => {
+const ResourcesSection: FC<ResourcesSectionProps> = ({ isAdmin, resources }) => {
   const templates = useMemo(
     () => (isAdmin ? resources?.vmTemplates : getAllowedResourceData(resources, TemplateModel)),
     [resources, isAdmin],

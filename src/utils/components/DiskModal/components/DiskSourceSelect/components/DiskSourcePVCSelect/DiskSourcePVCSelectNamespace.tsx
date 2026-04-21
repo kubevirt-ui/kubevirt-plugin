@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
@@ -11,7 +11,7 @@ type DiskSourcePVCSelectNamespaceProps = {
   vmNamespace?: string;
 };
 
-const DiskSourcePVCSelectNamespace: FCC<DiskSourcePVCSelectNamespaceProps> = ({ vmNamespace }) => {
+const DiskSourcePVCSelectNamespace: FC<DiskSourcePVCSelectNamespaceProps> = ({ vmNamespace }) => {
   const { t } = useKubevirtTranslation();
 
   return (

@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 import { Updater } from 'use-immer';
 
 import { V1beta1NetworkMap, V1beta1Plan, V1beta1StorageMap } from '@kubev2v/types';
@@ -31,7 +31,7 @@ type ReadinessStepBodyProps = {
   vms: V1VirtualMachine[];
 };
 
-const ReadinessStepBody: FCC<ReadinessStepBodyProps> = ({
+const ReadinessStepBody: FC<ReadinessStepBodyProps> = ({
   migrationPlan,
   networkMap,
   setNetworkMap,

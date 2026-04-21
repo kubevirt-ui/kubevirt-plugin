@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 import { Link } from 'react-router';
 
 import { HyperConvergedModel } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -12,7 +12,7 @@ import { Skeleton, StackItem } from '@patternfly/react-core';
 import ConditionIcon from './ConditionIcon';
 import { HCO_HEALTH_METRIC, VALUE_TO_LABEL } from './constants';
 
-const Conditions: FCC = () => {
+const Conditions: FC = () => {
   const { t } = useKubevirtTranslation();
   const [hyperConverge, hyperLoaded] = useHyperConvergeConfiguration();
 

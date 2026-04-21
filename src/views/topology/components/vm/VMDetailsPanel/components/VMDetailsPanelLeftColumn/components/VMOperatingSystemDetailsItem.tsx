@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
@@ -14,7 +14,7 @@ type VMOperatingSystemDetailsItemProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const VMOperatingSystemDetailsItem: FCC<VMOperatingSystemDetailsItemProps> = ({ vm, vmi }) => {
+const VMOperatingSystemDetailsItem: FC<VMOperatingSystemDetailsItemProps> = ({ vm, vmi }) => {
   const { t } = useKubevirtTranslation();
 
   const os = getOperatingSystemName(vm) || getOperatingSystem(vm);

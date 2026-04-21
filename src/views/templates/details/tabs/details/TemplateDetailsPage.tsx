@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
@@ -22,7 +22,7 @@ type TemplateDetailsPageProps = {
   obj?: V1Template;
 };
 
-const TemplateDetailsPage: FCC<TemplateDetailsPageProps> = ({ obj: template }) => {
+const TemplateDetailsPage: FC<TemplateDetailsPageProps> = ({ obj: template }) => {
   const { t } = useKubevirtTranslation();
 
   return (

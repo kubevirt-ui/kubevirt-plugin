@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
@@ -8,7 +8,7 @@ import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverCo
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { PopoverPosition, Stack } from '@patternfly/react-core';
 
-const PreviewFeaturesPopover: FCC = () => {
+const PreviewFeaturesPopover: FC = () => {
   const { t } = useKubevirtTranslation();
   return (
     <HelpTextIcon

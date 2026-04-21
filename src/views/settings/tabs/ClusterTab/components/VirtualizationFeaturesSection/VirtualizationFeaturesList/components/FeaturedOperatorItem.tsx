@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -19,7 +19,7 @@ type FeaturedOperatorItemProps = {
   title: string;
 };
 
-const FeaturedOperatorItem: FCC<FeaturedOperatorItemProps> = ({
+const FeaturedOperatorItem: FC<FeaturedOperatorItemProps> = ({
   helpBody,
   isNew,
   operatorName,

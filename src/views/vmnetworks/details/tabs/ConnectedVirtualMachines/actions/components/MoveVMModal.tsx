@@ -1,4 +1,4 @@
-import React, { FCC, useState } from 'react';
+import React, { FC, useState } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
@@ -28,7 +28,7 @@ export type MoveVMModalProps = {
   vms: V1VirtualMachine[];
 };
 
-const MoveVMModal: FCC<MoveVMModalProps> = ({ closeModal, currentNetwork, vms }) => {
+const MoveVMModal: FC<MoveVMModalProps> = ({ closeModal, currentNetwork, vms }) => {
   const { t } = useKubevirtTranslation();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<Error>();

@@ -1,4 +1,4 @@
-import React, { FCC, useCallback } from 'react';
+import React, { FC, useCallback } from 'react';
 import produce from 'immer';
 import { VirtualMachineModel } from 'src/views/dashboard-extensions/utils';
 
@@ -37,7 +37,7 @@ type VirtualMachinesNetworkInterfaceModalProps = {
   vmi?: V1VirtualMachineInstance;
 };
 
-const VirtualMachinesNetworkInterfaceModal: FCC<VirtualMachinesNetworkInterfaceModalProps> = ({
+const VirtualMachinesNetworkInterfaceModal: FC<VirtualMachinesNetworkInterfaceModalProps> = ({
   headerText,
   isOpen,
   onAddNetworkInterface,

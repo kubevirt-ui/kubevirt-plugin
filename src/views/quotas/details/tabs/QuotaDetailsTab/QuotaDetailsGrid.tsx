@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 import { getQuotaModel } from 'src/views/quotas/utils/utils';
 
 import DescriptionItemCreatedAt from '@kubevirt-utils/components/DescriptionItem/components/DescriptionItemCreatedAt';
@@ -12,7 +12,7 @@ type QuotaDetailsGridProps = {
   quota: ApplicationAwareQuota;
 };
 
-const QuotaDetailsGrid: FCC<QuotaDetailsGridProps> = ({ quota }) => {
+const QuotaDetailsGrid: FC<QuotaDetailsGridProps> = ({ quota }) => {
   const { t } = useKubevirtTranslation();
 
   const quotaModel = getQuotaModel(quota);

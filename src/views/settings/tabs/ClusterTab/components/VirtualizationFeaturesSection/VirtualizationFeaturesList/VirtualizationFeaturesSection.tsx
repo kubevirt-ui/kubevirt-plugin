@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import ExpandSectionWithCustomToggle from '@kubevirt-utils/components/ExpandSectionWithCustomToggle/ExpandSectionWithCustomToggle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -23,7 +23,7 @@ import LoadBalanceSection from './components/LoadBalanceSection/LoadBalanceSecti
 
 import './VirtualizationFeaturesSection.scss';
 
-const VirtualizationFeaturesSection: FCC = () => {
+const VirtualizationFeaturesSection: FC = () => {
   const { t } = useKubevirtTranslation();
   const cluster = useSettingsCluster();
   const isSpokeCluster = useIsSettingsSpokeCluster();

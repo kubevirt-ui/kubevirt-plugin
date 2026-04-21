@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
@@ -17,7 +17,7 @@ type VirtualMachinesOverviewTabNetworkFQDN = {
   vm: V1VirtualMachine;
 };
 
-const VirtualMachinesOverviewTabNetworkFQDN: FCC<VirtualMachinesOverviewTabNetworkFQDN> = ({
+const VirtualMachinesOverviewTabNetworkFQDN: FC<VirtualMachinesOverviewTabNetworkFQDN> = ({
   vm,
 }) => {
   const { t } = useKubevirtTranslation();

@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Bullseye, EmptyState, EmptyStateBody, EmptyStateVariant } from '@patternfly/react-core';
@@ -8,7 +8,7 @@ type AutoAttachedNetworkEmptyStateProps = {
   isAutoAttached: boolean;
 };
 
-const AutoAttachedNetworkEmptyState: FCC<AutoAttachedNetworkEmptyStateProps> = ({
+const AutoAttachedNetworkEmptyState: FC<AutoAttachedNetworkEmptyStateProps> = ({
   isAutoAttached,
 }) => {
   const { t } = useKubevirtTranslation();

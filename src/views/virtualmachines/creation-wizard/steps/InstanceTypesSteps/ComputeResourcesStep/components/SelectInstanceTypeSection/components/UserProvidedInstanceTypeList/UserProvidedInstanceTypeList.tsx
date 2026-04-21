@@ -1,4 +1,4 @@
-import React, { FCC, useMemo, useState } from 'react';
+import React, { FC, useMemo, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
@@ -31,7 +31,7 @@ type UserProvidedInstanceTypesListProps = {
   userProvidedInstanceTypes: InstanceTypes;
 };
 
-const UserProvidedInstanceTypesList: FCC<UserProvidedInstanceTypesListProps> = ({
+const UserProvidedInstanceTypesList: FC<UserProvidedInstanceTypesListProps> = ({
   userProvidedInstanceTypes,
 }) => {
   const { t } = useKubevirtTranslation();

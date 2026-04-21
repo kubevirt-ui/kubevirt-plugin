@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { InstanceTypeSize } from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/utils/types';
 import { logITFlowEvent } from '@kubevirt-utils/extensions/telemetry/telemetry';
@@ -10,7 +10,7 @@ type InstanceTypeSizeMenuProps = {
   instanceTypeSizes: InstanceTypeSize[];
 };
 
-const InstanceTypeSizeMenu: FCC<InstanceTypeSizeMenuProps> = ({ instanceTypeSizes }) => {
+const InstanceTypeSizeMenu: FC<InstanceTypeSizeMenuProps> = ({ instanceTypeSizes }) => {
   const { selectedSeries, selectedSize, setSelectedSize } = useInstanceTypeVMStore();
 
   const handleSizeSelect = (size: string) => {

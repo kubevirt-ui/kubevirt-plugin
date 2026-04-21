@@ -1,4 +1,4 @@
-import React, { FCC, useState } from 'react';
+import React, { FC, useState } from 'react';
 import { saveAs } from 'file-saver';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -11,7 +11,7 @@ type YamlAndCLIEditorProps = {
   minHeight: string;
 };
 
-const YamlAndCLIEditor: FCC<YamlAndCLIEditorProps> = ({ code, minHeight }) => {
+const YamlAndCLIEditor: FC<YamlAndCLIEditorProps> = ({ code, minHeight }) => {
   const { t } = useKubevirtTranslation();
   const [copySuccess, setCopySuccess] = useState(false);
   const handleDownload = () => {

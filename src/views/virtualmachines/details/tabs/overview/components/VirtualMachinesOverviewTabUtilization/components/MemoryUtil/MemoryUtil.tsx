@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 import xbytes from 'xbytes';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -23,7 +23,7 @@ type MemoryUtilProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const MemoryUtil: FCC<MemoryUtilProps> = ({ vmi }) => {
+const MemoryUtil: FC<MemoryUtilProps> = ({ vmi }) => {
   const { t } = useKubevirtTranslation();
   const { currentTime } = useDuration();
 

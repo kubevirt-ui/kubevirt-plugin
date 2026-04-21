@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 import { useParams } from 'react-router';
 
 import { V1VirtualMachine } from '@kubev2v/types';
@@ -19,7 +19,7 @@ import { isVncLogLevel } from './components/vnc-console/utils/util';
 import { getConsoleBasePath } from './utils/utils';
 import Consoles from './Consoles';
 
-const ConsoleStandAlone: FCC = () => {
+const ConsoleStandAlone: FC = () => {
   const { cluster, name, ns } = useParams<{ cluster?: string; name: string; ns: string }>();
   const [apiPath, apiPathLoaded] = useK8sBaseAPIPath(cluster);
   const [vm, vmLoaded, vmLoadError] = useK8sWatchData<V1VirtualMachine>({

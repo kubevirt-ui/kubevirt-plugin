@@ -1,4 +1,4 @@
-import React, { FCC, useCallback, useEffect, useState } from 'react';
+import React, { FC, useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 
 import {
@@ -41,7 +41,7 @@ type CreateBootableVolumeModalProps = {
   vm: V1VirtualMachine;
 };
 
-const CreateBootableVolumeModal: FCC<CreateBootableVolumeModalProps> = ({
+const CreateBootableVolumeModal: FC<CreateBootableVolumeModalProps> = ({
   diskObj,
   isOpen,
   onClose,

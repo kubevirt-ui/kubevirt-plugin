@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getDataVolumeTemplates, getVolumes } from '@kubevirt-utils/resources/vm';
@@ -10,7 +10,7 @@ import { getDiskModalBySource } from './utils/getDiskModalBySource';
 import { getSourceFromVolume } from './utils/helpers';
 import { V1DiskModalProps } from './utils/types';
 
-const DiskModal: FCC<V1DiskModalProps> = ({
+const DiskModal: FC<V1DiskModalProps> = ({
   createDiskSource,
   createdPVCName,
   defaultFormValues,

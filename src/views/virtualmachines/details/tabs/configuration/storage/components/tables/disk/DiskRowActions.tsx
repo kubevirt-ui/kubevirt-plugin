@@ -1,4 +1,4 @@
-import React, { FCC, useMemo, useState } from 'react';
+import React, { FC, useMemo, useState } from 'react';
 
 import {
   V1VirtualMachine,
@@ -47,7 +47,7 @@ type DiskRowActionsProps = {
   vmi?: V1VirtualMachineInstance;
 };
 
-const DiskRowActions: FCC<DiskRowActionsProps> = ({
+const DiskRowActions: FC<DiskRowActionsProps> = ({
   customize = false,
   obj,
   onDiskUpdate,

@@ -1,4 +1,4 @@
-import React, { FCC, useState } from 'react';
+import React, { FC, useState } from 'react';
 
 import { IoK8sApiCoreV1Pod } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -40,7 +40,7 @@ type ExportModalProps = {
   vmName?: string;
 };
 
-const ExportModal: FCC<ExportModalProps> = ({
+const ExportModal: FC<ExportModalProps> = ({
   cluster,
   isOpen,
   namespace,

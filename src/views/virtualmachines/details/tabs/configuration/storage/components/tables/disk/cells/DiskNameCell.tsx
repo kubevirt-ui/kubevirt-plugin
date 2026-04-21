@@ -1,4 +1,4 @@
-import React, { FCC, useMemo } from 'react';
+import React, { FC, useMemo } from 'react';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -26,7 +26,7 @@ type DiskNameCellProps = {
   vmi?: V1VirtualMachineInstance;
 };
 
-const DiskNameCell: FCC<DiskNameCellProps> = ({ provisioningPercentages, row, vm, vmi }) => {
+const DiskNameCell: FC<DiskNameCellProps> = ({ provisioningPercentages, row, vm, vmi }) => {
   const { t } = useKubevirtTranslation();
   const { isBootDisk, isEnvDisk, name, source } = row;
 

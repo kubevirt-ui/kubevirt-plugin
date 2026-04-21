@@ -1,4 +1,4 @@
-import React, { FCC, JSX } from 'react';
+import React, { FC, JSX } from 'react';
 import { Route, Routes } from 'react-router';
 
 import ClusterProjectDropdown from '@kubevirt-utils/components/ClusterProjectDropdown/ClusterProjectDropdown';
@@ -11,7 +11,7 @@ import CustomizeInstanceTypeVirtualMachine from './CustomizeInstanceType/Customi
 import { WizardVMContextProvider } from './utils/WizardVMContext';
 import Wizard from './wizard/Wizard';
 
-const Catalog: FCC = (): JSX.Element => {
+const Catalog: FC = (): JSX.Element => {
   const isACMPage = useIsACMPage();
 
   return (

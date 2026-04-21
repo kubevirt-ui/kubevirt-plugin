@@ -1,4 +1,4 @@
-import React, { FCC, useMemo } from 'react';
+import React, { FC, useMemo } from 'react';
 
 import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
 import HorizontalNavbar from '@kubevirt-utils/components/HorizontalNavbar/HorizontalNavbar';
@@ -12,7 +12,7 @@ import { getPages } from './utils/constants';
 
 import './CustomizeInstanceTypeVirtualMachine.scss';
 
-const CustomizeInstanceTypeVirtualMachine: FCC = () => {
+const CustomizeInstanceTypeVirtualMachine: FC = () => {
   useSignals();
   const { t } = useKubevirtTranslation();
   const { vm } = useInstanceTypeVMStore();

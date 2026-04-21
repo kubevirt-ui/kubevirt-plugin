@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import {
   isVirtualMachineTemplate,
@@ -14,7 +14,7 @@ type TemplateActionsCellProps = {
   row: TemplateOrRequest;
 };
 
-const TemplateActionsCell: FCC<TemplateActionsCellProps> = ({ row }) => {
+const TemplateActionsCell: FC<TemplateActionsCellProps> = ({ row }) => {
   if (isVirtualMachineTemplateRequest(row)) {
     return <VirtualMachineTemplateRequestActions isKebabToggle request={row} />;
   }

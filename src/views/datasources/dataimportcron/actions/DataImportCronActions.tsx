@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { V1beta1DataImportCron } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import ActionsDropdown from '@kubevirt-utils/components/ActionsDropdown/ActionsDropdown';
@@ -12,7 +12,7 @@ type DataImportCronActionProps = {
   isKebabToggle?: boolean;
 };
 
-const DataImportCronActions: FCC<DataImportCronActionProps> = ({
+const DataImportCronActions: FC<DataImportCronActionProps> = ({
   dataImportCron,
   isKebabToggle,
 }) => {

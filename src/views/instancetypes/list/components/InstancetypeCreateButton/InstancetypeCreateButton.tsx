@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 import { useLocation } from 'react-router';
 
 import { VirtualMachineInstancetypeModelRef } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -14,7 +14,7 @@ type UserInstancetypeEmptyStateProps = {
   namespace: string;
 };
 
-const InstancetypeCreateButton: FCC<UserInstancetypeEmptyStateProps> = ({
+const InstancetypeCreateButton: FC<UserInstancetypeEmptyStateProps> = ({
   buttonText,
   namespace,
 }) => {

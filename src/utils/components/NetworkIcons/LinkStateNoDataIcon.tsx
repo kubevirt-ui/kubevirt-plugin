@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
@@ -10,7 +10,7 @@ import StateText from './StateText';
 
 import './LinkStateIcon.scss';
 
-const LinkStateNoDataIcon: FCC<NetworkIconProps> = ({ configuredState, runtimeState }) => {
+const LinkStateNoDataIcon: FC<NetworkIconProps> = ({ configuredState, runtimeState }) => {
   const { t } = useKubevirtTranslation();
 
   const unsupportedText =

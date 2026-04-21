@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { FCC, memo } from 'react';
+import { FC, memo } from 'react';
 
 import { V1Interface, V1Network } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -15,7 +15,7 @@ type NetworksReviewTableProps = {
   networks: V1Network[];
 };
 
-const NetworksReviewTable: FCC<NetworksReviewTableProps> = memo(({ interfaces, networks }) => {
+const NetworksReviewTable: FC<NetworksReviewTableProps> = memo(({ interfaces, networks }) => {
   const { t } = useKubevirtTranslation();
   const networkData = getNetworkInterfaceRowData(networks, interfaces);
 

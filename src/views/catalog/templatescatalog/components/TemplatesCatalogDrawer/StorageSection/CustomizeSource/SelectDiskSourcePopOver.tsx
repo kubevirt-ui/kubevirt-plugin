@@ -1,11 +1,11 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverContentWithLightspeedButton/PopoverContentWithLightspeedButton';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 
-const SelectDiskSourcePopOver: FCC = () => {
+const SelectDiskSourcePopOver: FC = () => {
   const { t } = useKubevirtTranslation();
 
   return (

@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import NetworkIcon from '@kubevirt-utils/components/NetworkIcons/NetworkIcon';
@@ -10,7 +10,7 @@ type StateCellProps = {
   vm: V1VirtualMachine;
 };
 
-const StateCell: FCC<StateCellProps> = ({ row, vm }) => (
+const StateCell: FC<StateCellProps> = ({ row, vm }) => (
   <NetworkIcon configuredState={getConfigInterfaceStateFromVM(vm, row.network?.name)} />
 );
 

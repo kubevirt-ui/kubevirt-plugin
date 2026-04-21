@@ -1,6 +1,6 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
-const TreeViewVirtualMachineIcon: FCC = () => (
+const TreeViewVirtualMachineIcon: FC = () => (
   <svg
     fill="none"
     height="1.5em"

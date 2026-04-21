@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { Stack } from '@patternfly/react-core';
 
@@ -10,7 +10,7 @@ type VirtualMachineUsageItemProps = {
   usageText: string;
 };
 
-const VirtualMachineUsageItem: FCC<VirtualMachineUsageItemProps> = ({
+const VirtualMachineUsageItem: FC<VirtualMachineUsageItemProps> = ({
   capacityText,
   metricName,
   usageText,

@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
@@ -9,7 +9,7 @@ type DataSourceYAMLPageProps = {
   obj?: V1beta1DataSource;
 };
 
-const DataSourceYAMLPage: FCC<DataSourceYAMLPageProps> = ({ obj: dataSource }) => {
+const DataSourceYAMLPage: FC<DataSourceYAMLPageProps> = ({ obj: dataSource }) => {
   const loading = (
     <Bullseye>
       <Loading />

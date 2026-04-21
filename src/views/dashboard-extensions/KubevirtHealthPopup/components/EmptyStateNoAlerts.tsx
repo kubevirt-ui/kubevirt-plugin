@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { EmptyState } from '@patternfly/react-core';
@@ -8,7 +8,7 @@ type EmptyStateNoAlertsProps = {
   classname?: string;
 };
 
-const EmptyStateNoAlerts: FCC<EmptyStateNoAlertsProps> = ({ classname }) => {
+const EmptyStateNoAlerts: FC<EmptyStateNoAlertsProps> = ({ classname }) => {
   const { t } = useKubevirtTranslation();
   return (
     <EmptyState

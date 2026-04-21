@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Checkbox } from '@patternfly/react-core';
@@ -8,7 +8,7 @@ type DiskSourceUploadISOProps = {
   setIsIso: (value: boolean) => void;
 };
 
-const DiskSourceUploadISO: FCC<DiskSourceUploadISOProps> = ({ isIso, setIsIso }) => {
+const DiskSourceUploadISO: FC<DiskSourceUploadISOProps> = ({ isIso, setIsIso }) => {
   const { t } = useKubevirtTranslation();
 
   return (

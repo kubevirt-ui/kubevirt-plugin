@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { V1VirtualMachine } from '@kubev2v/types';
 import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -19,7 +19,7 @@ type VirtualMachinesInstancePageConsoleTabProps = {
   obj: V1VirtualMachineInstance;
 };
 
-const VirtualMachinesInstancePageConsoleTab: FCC<VirtualMachinesInstancePageConsoleTabProps> = ({
+const VirtualMachinesInstancePageConsoleTab: FC<VirtualMachinesInstancePageConsoleTabProps> = ({
   obj: vmi,
 }) => {
   const cluster = getCluster(vmi);

@@ -1,4 +1,4 @@
-import React, { FCC, useState } from 'react';
+import React, { FC, useState } from 'react';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
@@ -23,7 +23,7 @@ type RDPServiceModalProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const RDPServiceModal: FCC<RDPServiceModalProps> = ({ isOpen, onClose, vm, vmi }) => {
+const RDPServiceModal: FC<RDPServiceModalProps> = ({ isOpen, onClose, vm, vmi }) => {
   const { t } = useKubevirtTranslation();
   const [isChecked, setChecked] = useState<boolean>(false);
 

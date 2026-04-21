@@ -1,4 +1,4 @@
-import React, { ComponentClass, FCC, ReactNode } from 'react';
+import React, { ComponentClass, FC, ReactNode } from 'react';
 
 import { TabTitleIcon, TabTitleText } from '@patternfly/react-core';
 
@@ -8,7 +8,7 @@ type CreateVMTabTitleProps = {
   titleText: string;
 };
 
-const CreateVMTabTitle: FCC<CreateVMTabTitleProps> = ({ badge, Icon, titleText }) => (
+const CreateVMTabTitle: FC<CreateVMTabTitleProps> = ({ badge, Icon, titleText }) => (
   <>
     <TabTitleIcon>
       <Icon />

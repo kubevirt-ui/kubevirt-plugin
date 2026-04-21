@@ -1,4 +1,4 @@
-import React, { FCC, useMemo } from 'react';
+import React, { FC, useMemo } from 'react';
 import { useParams } from 'react-router';
 
 import { MigrationPolicyModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -12,7 +12,7 @@ import { HorizontalNav } from '@openshift-console/dynamic-plugin-sdk';
 import MigrationPolicyDetailsNavTitle from './components/MigrationPolicyDetailsNavTitle/MigrationPolicyDetailsNavTitle';
 import { useMigrationPolicyTabs } from './hooks/useMigrationPolicyTabs';
 
-const MigrationPolicyDetailsNav: FCC = () => {
+const MigrationPolicyDetailsNav: FC = () => {
   const cluster = useClusterParam();
   const namespace = useNamespaceParam();
   const { name } = useParams();

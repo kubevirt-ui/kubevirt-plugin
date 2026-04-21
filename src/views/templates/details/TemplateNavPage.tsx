@@ -1,4 +1,4 @@
-import React, { FCC, useMemo } from 'react';
+import React, { FC, useMemo } from 'react';
 import { useParams } from 'react-router';
 
 import {
@@ -19,7 +19,7 @@ import useEditTemplateAccessReview from './hooks/useIsTemplateEditable';
 import { useVirtualMachineTabs } from './hooks/useTemplateTabs';
 import TemplatePageTitle from './TemplatePageTitle';
 
-const TemplateNavPage: FCC = () => {
+const TemplateNavPage: FC = () => {
   const { name } = useParams<{ name: string }>();
   const namespace = useNamespaceParam();
   const cluster = useClusterParam();

@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -22,7 +22,7 @@ export type SearchSuggestBoxFooterProps = {
   searchQuery: SearchSuggestBoxProps['searchQuery'];
 };
 
-const SearchSuggestBoxFooter: FCC<SearchSuggestBoxFooterProps> = ({
+const SearchSuggestBoxFooter: FC<SearchSuggestBoxFooterProps> = ({
   cluster,
   namespace,
   navigateToSearchResults,

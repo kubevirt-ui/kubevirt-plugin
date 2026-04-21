@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 import { useNavigate } from 'react-router';
 import { CREATE_PHYSICAL_NETWORK_FORM_PATH } from 'src/views/vmnetworks/constants';
 
@@ -7,7 +7,7 @@ import { Alert, AlertActionLink } from '@patternfly/react-core';
 
 import './NoPhysicalNetworkAlert.scss';
 
-const NoPhysicalNetworkAlert: FCC = () => {
+const NoPhysicalNetworkAlert: FC = () => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
 

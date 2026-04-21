@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { V1CPU } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
@@ -11,7 +11,7 @@ type CPUTopologyHelperTextProps = {
   cpu: V1CPU;
 };
 
-const CPUTopologyHelperText: FCC<CPUTopologyHelperTextProps> = ({ cpu }) => {
+const CPUTopologyHelperText: FC<CPUTopologyHelperTextProps> = ({ cpu }) => {
   const { t } = useKubevirtTranslation();
   const { cores, sockets, threads } = cpu || {};
 

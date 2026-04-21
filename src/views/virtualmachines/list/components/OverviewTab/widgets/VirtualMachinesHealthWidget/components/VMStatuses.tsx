@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -21,7 +21,7 @@ type VMStatusesProps = {
   vms: V1VirtualMachine[];
 };
 
-const VMStatuses: FCC<VMStatusesProps> = ({ vms }) => {
+const VMStatuses: FC<VMStatusesProps> = ({ vms }) => {
   const { t } = useKubevirtTranslation();
   const namespace = useNamespaceParam();
 

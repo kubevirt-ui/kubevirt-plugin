@@ -1,11 +1,11 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Label } from '@patternfly/react-core';
 
 import './PendingBadge.scss';
 
-const PendingBadge: FCC = () => {
+const PendingBadge: FC = () => {
   const { t } = useKubevirtTranslation();
   return (
     <Label className="pending-badge" color="orange">

@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
@@ -14,7 +14,7 @@ type AllClustersResourcesCardProps = {
   vmsCount: number;
 };
 
-const AllClustersResourcesCard: FCC<AllClustersResourcesCardProps> = ({
+const AllClustersResourcesCard: FC<AllClustersResourcesCardProps> = ({
   clustersCount,
   projectsCount,
   vmsCount,

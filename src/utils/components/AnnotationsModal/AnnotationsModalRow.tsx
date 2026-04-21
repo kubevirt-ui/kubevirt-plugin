@@ -1,10 +1,10 @@
-import React, { FCC, memo } from 'react';
+import React, { FC, memo } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Button, ButtonVariant, GridItem, TextInput } from '@patternfly/react-core';
 import { MinusCircleIcon } from '@patternfly/react-icons';
 
-export const AnnotationsModalRow: FCC<{
+export const AnnotationsModalRow: FC<{
   annotation: { key: string; value: string };
   onChange: ({ key, value }: { key: string; value: string }) => void;
   onDelete: () => void;

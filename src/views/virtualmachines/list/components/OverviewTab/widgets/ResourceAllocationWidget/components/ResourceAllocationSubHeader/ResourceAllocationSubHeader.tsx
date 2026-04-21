@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -22,7 +22,7 @@ type ResourceAllocationSubHeaderProps = {
   widgetConfigs: WidgetConfig[];
 };
 
-const ResourceAllocationSubHeader: FCC<ResourceAllocationSubHeaderProps> = ({
+const ResourceAllocationSubHeader: FC<ResourceAllocationSubHeaderProps> = ({
   isAllClusters,
   onDropdownChange,
   selectedMetric,

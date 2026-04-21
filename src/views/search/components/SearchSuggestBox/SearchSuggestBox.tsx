@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 import useIsAllClustersPage from 'src/multicluster/hooks/useIsAllClustersPage';
 
 import { VirtualMachineModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -42,7 +42,7 @@ export type SearchSuggestBoxProps = {
   showSearchModal: (prefillInputs?: AdvancedSearchInputs) => void;
 };
 
-const SearchSuggestBox: FCC<SearchSuggestBoxProps> = ({
+const SearchSuggestBox: FC<SearchSuggestBoxProps> = ({
   cluster,
   isSearchInProgress,
   maxResourceLinks = MAX_SUGGESTIONS,

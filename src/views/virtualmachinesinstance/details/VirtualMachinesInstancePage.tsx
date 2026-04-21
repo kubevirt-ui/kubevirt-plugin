@@ -1,4 +1,4 @@
-import React, { FCC, useMemo } from 'react';
+import React, { FC, useMemo } from 'react';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import useHideYamlTab, { removeYamlTabs } from '@kubevirt-utils/hooks/useHideYamlTab';
@@ -13,7 +13,7 @@ type VirtualMachinesInstanceDetailsProps = {
   namespace: string;
 };
 
-const VirtualMachinesInstanceDetails: FCC<VirtualMachinesInstanceDetailsProps> = ({
+const VirtualMachinesInstanceDetails: FC<VirtualMachinesInstanceDetailsProps> = ({
   kind,
   name,
   namespace,

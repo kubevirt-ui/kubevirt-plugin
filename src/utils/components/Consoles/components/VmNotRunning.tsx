@@ -1,9 +1,9 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { EmptyState, EmptyStateBody } from '@patternfly/react-core';
 
-const VmNotRunning: FCC = () => {
+const VmNotRunning: FC = () => {
   const { t } = useKubevirtTranslation();
   return (
     <EmptyState>

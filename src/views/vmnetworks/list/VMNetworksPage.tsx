@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
@@ -16,7 +16,7 @@ import { NADS_LIST_PATH, PATH_BY_TAB_INDEX, TAB_INDEX_BY_PATH, TAB_INDEXES } fro
 import VMNetworkList from './VMNetworkList';
 import VMNetworkOtherTypesList from './VMNetworkOtherTypesList';
 
-const VMNetworksPage: FCC = () => {
+const VMNetworksPage: FC = () => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
   const location = useLocation();

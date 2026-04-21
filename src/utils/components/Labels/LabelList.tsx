@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 import { useNavigate } from 'react-router';
 import classNames from 'classnames';
 
@@ -17,7 +17,7 @@ export type LabelProps = {
   value: string;
 };
 
-export const Label: FCC<LabelProps> = ({ cluster, expand, groupVersionKind, name, value }) => {
+export const Label: FC<LabelProps> = ({ cluster, expand, groupVersionKind, name, value }) => {
   const navigate = useNavigate();
 
   const href = getSearchLabelHREF(groupVersionKind.kind, name, value, cluster);
@@ -43,7 +43,7 @@ type LabelListProps = {
   labels: { [key: string]: string };
 };
 
-export const LabelList: FCC<LabelListProps> = ({
+export const LabelList: FC<LabelListProps> = ({
   cluster,
   expand = true,
   groupVersionKind,

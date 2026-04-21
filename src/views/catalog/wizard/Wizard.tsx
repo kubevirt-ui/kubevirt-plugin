@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 import { useParams } from 'react-router';
 
 import HorizontalNavbar from '@kubevirt-utils/components/HorizontalNavbar/HorizontalNavbar';
@@ -14,7 +14,7 @@ import { wizardNavPages } from './tabs';
 
 import './Wizard.scss';
 
-const Wizard: FCC = () => {
+const Wizard: FC = () => {
   const { ns } = useParams<{ ns: string }>();
   const { vm } = useWizardVMContext();
 

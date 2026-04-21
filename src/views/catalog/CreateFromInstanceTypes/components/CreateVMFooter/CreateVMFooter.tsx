@@ -1,4 +1,4 @@
-import React, { FCC, useState } from 'react';
+import React, { FC, useState } from 'react';
 import { useNavigate } from 'react-router';
 
 import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
@@ -48,7 +48,7 @@ import useGeneratedVM from './hooks/useGeneratedVM';
 
 import './CreateVMFooter.scss';
 
-const CreateVMFooter: FCC = () => {
+const CreateVMFooter: FC = () => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
   const cluster = useClusterParam();

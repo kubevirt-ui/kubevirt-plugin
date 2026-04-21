@@ -1,4 +1,4 @@
-import React, { FCC, useEffect } from 'react';
+import React, { FC, useEffect } from 'react';
 import produce from 'immer';
 
 import useIsIPv6SingleStackCluster from '@kubevirt-utils/hooks/useIPStackType/useIsIPv6SingleStackCluster';
@@ -11,7 +11,7 @@ import { Stack, StackItem, Title, TitleSizes } from '@patternfly/react-core';
 import useVMWizardStore from '@virtualmachines/creation-wizard/state/vm-wizard-store/useVMWizardStore';
 import CustomizeVirtualMachine from '@virtualmachines/creation-wizard/steps/CustomizationStep/components/CustomizeVirtualMachine/CustomizeVirtualMachine';
 
-const CustomizationStep: FCC = () => {
+const CustomizationStep: FC = () => {
   const { t } = useKubevirtTranslation();
   const { cluster } = useVMWizardStore();
   const isIPv6SingleStack = useIsIPv6SingleStackCluster(cluster);

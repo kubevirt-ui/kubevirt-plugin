@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 import { useFormContext } from 'react-hook-form';
 
 import { V1DiskFormState } from '@kubevirt-utils/components/DiskModal/utils/types';
@@ -13,7 +13,7 @@ import { HTTP_URL_PREFIX, HTTPS_URL_PREFIX } from './utils/constants';
 import { DiskSourceUrlInputProps } from './utils/types';
 import URLSourceHelperText from './URLSourceHelperText';
 
-const DiskSourceUrlInput: FCC<DiskSourceUrlInputProps> = ({ os }) => {
+const DiskSourceUrlInput: FC<DiskSourceUrlInputProps> = ({ os }) => {
   const { t } = useKubevirtTranslation();
   const {
     formState: { errors },

@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { Form } from '@patternfly/react-core';
 
@@ -15,7 +15,7 @@ type SysprepProps = {
   unattend: string;
 };
 
-const Sysprep: FCC<SysprepProps> = ({
+const Sysprep: FC<SysprepProps> = ({
   autoUnattend,
   onAutoUnattendChange,
   onUnattendChange,

@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -30,7 +30,7 @@ type GeneralInformationProps = {
   version: string;
 };
 
-const GeneralInformation: FCC<GeneralInformationProps> = ({
+const GeneralInformation: FC<GeneralInformationProps> = ({
   catalogSourceMissing,
   kubevirtSubscription,
   loaded,

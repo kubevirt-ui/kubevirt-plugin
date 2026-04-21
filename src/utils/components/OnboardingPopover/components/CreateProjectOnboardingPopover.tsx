@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
@@ -9,7 +9,7 @@ type CreateProjectOnboardingPopoverProps = {
   triggerElement?: HTMLElement;
 };
 
-const CreateProjectOnboardingPopover: FCC<CreateProjectOnboardingPopoverProps> = ({
+const CreateProjectOnboardingPopover: FC<CreateProjectOnboardingPopoverProps> = ({
   triggerElement,
 }) => {
   const { t } = useKubevirtTranslation();

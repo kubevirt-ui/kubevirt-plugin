@@ -1,4 +1,4 @@
-import React, { FCC, useEffect, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -13,7 +13,7 @@ import './AnnotationsModal.scss';
 const getIdAnnotations = (annotations: { [key: string]: string }) =>
   Object.fromEntries(Object.entries(annotations).map(([key, value], i) => [i, { key, value }]));
 
-export const AnnotationsModal: FCC<{
+export const AnnotationsModal: FC<{
   isOpen: boolean;
   obj: K8sResourceCommon;
   onClose: () => void;

@@ -1,4 +1,4 @@
-import React, { FCC, useState } from 'react';
+import React, { FC, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { load } from 'js-yaml';
 
@@ -17,7 +17,7 @@ import { ResourceYAMLEditor } from '@openshift-console/dynamic-plugin-sdk';
 import useModelFromParam from './hooks/useModelFromParam';
 import useYAMLTemplateExtension from './hooks/useYAMLTemplateExtension';
 
-const MulticlusterYAMLCreation: FCC = () => {
+const MulticlusterYAMLCreation: FC = () => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
   const isACMPage = useIsACMPage();

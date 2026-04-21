@@ -1,4 +1,4 @@
-import React, { FCC, useCallback, useEffect, useState } from 'react';
+import React, { FC, useCallback, useEffect, useState } from 'react';
 
 import AlertsCardAccordionItem from '@kubevirt-utils/components/AlertsCard/AlertsCardAccordionItem';
 import { AlertType, SimplifiedAlerts } from '@kubevirt-utils/components/AlertsCard/utils/types';
@@ -19,7 +19,7 @@ type AlertsDrawerProps = {
   sortedAlerts: SimplifiedAlerts;
 };
 
-const AlertsDrawer: FCC<AlertsDrawerProps> = ({ sortedAlerts }) => {
+const AlertsDrawer: FC<AlertsDrawerProps> = ({ sortedAlerts }) => {
   const [alertTypeOpen, setAlertTypeOpen] = useState<AlertType>(null);
 
   const [titleOpen, setTitleOpen] = useState<boolean>(false);

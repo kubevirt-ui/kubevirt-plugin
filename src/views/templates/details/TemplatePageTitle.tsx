@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 
 import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -35,7 +35,7 @@ type TemplatePageTitleTitleProps = {
   template: V1Template;
 };
 
-const TemplatePageTitle: FCC<TemplatePageTitleTitleProps> = ({ template }) => {
+const TemplatePageTitle: FC<TemplatePageTitleTitleProps> = ({ template }) => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
   const location = useLocation();

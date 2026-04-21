@@ -1,4 +1,4 @@
-import React, { FCC, memo } from 'react';
+import React, { FC, memo } from 'react';
 import { useNavigate } from 'react-router';
 
 import { VirtualMachineInstanceModelRef } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -6,7 +6,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { useLastNamespacePath } from '@kubevirt-utils/hooks/useLastNamespacePath';
 import { Breadcrumb, BreadcrumbItem, Button, ButtonVariant } from '@patternfly/react-core';
 
-const VirtualMachineInstanceBreadcrumb: FCC = memo(() => {
+const VirtualMachineInstanceBreadcrumb: FC = memo(() => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
   const lastNamespacePath = useLastNamespacePath();

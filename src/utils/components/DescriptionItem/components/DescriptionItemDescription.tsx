@@ -1,4 +1,4 @@
-import React, { FCC, useCallback } from 'react';
+import React, { FC, useCallback } from 'react';
 import produce from 'immer';
 
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
@@ -17,7 +17,7 @@ type DescriptionItemDescriptionProps = {
   resource: K8sResourceCommon;
 };
 
-const DescriptionItemDescription: FCC<DescriptionItemDescriptionProps> = ({
+const DescriptionItemDescription: FC<DescriptionItemDescriptionProps> = ({
   editable = true,
   model,
   resource,

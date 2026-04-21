@@ -1,4 +1,4 @@
-import React, { FCC, useState } from 'react';
+import React, { FC, useState } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import HardwareDevicesList from '@kubevirt-utils/components/HardwareDevices/list/HardwareDevicesList';
@@ -19,7 +19,7 @@ type VirtualMachinesOverviewTabHardwareDevicesProps = {
   vm: V1VirtualMachine;
 };
 
-const VirtualMachinesOverviewTabHardwareDevices: FCC<
+const VirtualMachinesOverviewTabHardwareDevices: FC<
   VirtualMachinesOverviewTabHardwareDevicesProps
 > = ({ vm }) => {
   const { t } = useKubevirtTranslation();

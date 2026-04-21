@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Alert, AlertVariant } from '@patternfly/react-core';
@@ -17,7 +17,7 @@ const toMessage = (value: unknown): string => {
   return String(value);
 };
 
-const GeneralSettingsError: FCC<GeneralSettingsErrorProps> = ({ error, loadingError }) => {
+const GeneralSettingsError: FC<GeneralSettingsErrorProps> = ({ error, loadingError }) => {
   const { t } = useKubevirtTranslation();
   const message = toMessage(error) || toMessage(loadingError);
 

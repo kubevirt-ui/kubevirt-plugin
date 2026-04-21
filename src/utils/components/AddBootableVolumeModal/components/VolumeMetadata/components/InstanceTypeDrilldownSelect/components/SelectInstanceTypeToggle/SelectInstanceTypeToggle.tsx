@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import {
   VirtualMachineClusterInstancetypeModelGroupVersionKind,
@@ -13,7 +13,7 @@ type SelectInstanceTypeToggleProps = {
   selected: string;
   selectedKind: string;
 };
-const SelectInstanceTypeToggle: FCC<SelectInstanceTypeToggleProps> = ({
+const SelectInstanceTypeToggle: FC<SelectInstanceTypeToggleProps> = ({
   selected,
   selectedKind,
 }) => {

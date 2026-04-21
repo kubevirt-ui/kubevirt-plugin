@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -20,7 +20,7 @@ import useSSHAuthKeys from './hooks/useSSHAuthKeys';
 
 import './SSHAuthKeysList.scss';
 
-const SSHAuthKeysList: FCC = () => {
+const SSHAuthKeysList: FC = () => {
   const { t } = useKubevirtTranslation();
   const {
     authKeyRows,

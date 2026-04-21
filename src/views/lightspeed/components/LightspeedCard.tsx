@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { FLAG_LIGHTSPEED_PLUGIN } from '@kubevirt-utils/flags/consts';
 import LightspeedContent from '@lightspeed/components/LightspeedContent';
@@ -9,7 +9,7 @@ type LightspeedCardProps = {
   prompt: string;
 };
 
-const LightspeedCard: FCC<LightspeedCardProps> = ({ prompt }) => {
+const LightspeedCard: FC<LightspeedCardProps> = ({ prompt }) => {
   const hasOLSConsole = useFlag(FLAG_LIGHTSPEED_PLUGIN);
 
   if (!hasOLSConsole) return null;

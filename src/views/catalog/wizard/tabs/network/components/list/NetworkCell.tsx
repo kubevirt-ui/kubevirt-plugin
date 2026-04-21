@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
@@ -9,7 +9,7 @@ type NetworkCellProps = {
   row: NetworkPresentation;
 };
 
-const NetworkCell: FCC<NetworkCellProps> = ({ row }) => {
+const NetworkCell: FC<NetworkCellProps> = ({ row }) => {
   const { t } = useKubevirtTranslation();
   return <>{getNetworkNameLabel(t, { network: row.network }) ?? NO_DATA_DASH}</>;
 };

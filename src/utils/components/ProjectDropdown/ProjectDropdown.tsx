@@ -1,4 +1,4 @@
-import React, { FCC, JSX, useMemo } from 'react';
+import React, { FC, JSX, useMemo } from 'react';
 
 import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
@@ -17,7 +17,7 @@ type ProjectDropdownProps = {
   useConsoleFavorites?: boolean;
 };
 
-const ProjectDropdown: FCC<ProjectDropdownProps> = ({
+const ProjectDropdown: FC<ProjectDropdownProps> = ({
   cluster,
   includeAllProjects = true,
   isDisabled = false,

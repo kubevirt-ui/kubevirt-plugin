@@ -1,9 +1,9 @@
-import React, { FCC, memo } from 'react';
+import React, { FC, memo } from 'react';
 
 import { V1VirtualMachineCondition } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { Label, LabelGroup, Popover, PopoverPosition } from '@patternfly/react-core';
 
-export const VMStatusConditionLabel: FCC<V1VirtualMachineCondition> = memo((condition) => {
+export const VMStatusConditionLabel: FC<V1VirtualMachineCondition> = memo((condition) => {
   const bodyContentMessage = condition?.message ?? condition?.reason;
 
   const InnerLabel = (
@@ -28,7 +28,7 @@ export const VMStatusConditionLabel: FCC<V1VirtualMachineCondition> = memo((cond
 });
 VMStatusConditionLabel.displayName = 'VMStatusConditionLabel';
 
-export const VMStatusConditionLabelList: FCC<{ conditions: V1VirtualMachineCondition[] }> = memo(
+export const VMStatusConditionLabelList: FC<{ conditions: V1VirtualMachineCondition[] }> = memo(
   ({ conditions }) => {
     return (
       <LabelGroup>

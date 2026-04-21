@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
@@ -12,7 +12,7 @@ type VMTimezoneDetailsItemProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const VMTimezoneDetailsItem: FCC<VMTimezoneDetailsItemProps> = ({ vmi }) => {
+const VMTimezoneDetailsItem: FC<VMTimezoneDetailsItemProps> = ({ vmi }) => {
   const { t } = useKubevirtTranslation();
   const [guestAgentData] = useGuestOS(vmi);
 

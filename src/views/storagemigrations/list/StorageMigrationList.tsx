@@ -1,4 +1,4 @@
-import React, { FCC, useMemo } from 'react';
+import React, { FC, useMemo } from 'react';
 
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
 import { buildColumnLayout } from '@kubevirt-utils/components/KubevirtTable/utils';
@@ -23,7 +23,7 @@ import { getStorageMigrationStatusFilters } from './StorageMigrationListFilters'
 
 import '@kubevirt-utils/styles/list-managment-group.scss';
 
-const StorageMigrationList: FCC = () => {
+const StorageMigrationList: FC = () => {
   const { t } = useKubevirtTranslation();
 
   const { loaded, loadError, storageMigPlans } = useStorageMigrationResources();

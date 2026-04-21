@@ -1,4 +1,4 @@
-import React, { AnchorHTMLAttributes, FCC, useMemo } from 'react';
+import React, { AnchorHTMLAttributes, FC, useMemo } from 'react';
 import { Link } from 'react-router';
 
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
@@ -17,7 +17,7 @@ type ViewAllLinkProps = {
   onClick?: () => void;
 };
 
-const ViewAllLink: FCC<ViewAllLinkProps> = ({
+const ViewAllLink: FC<ViewAllLinkProps> = ({
   'aria-label': ariaLabel,
   href,
   label,

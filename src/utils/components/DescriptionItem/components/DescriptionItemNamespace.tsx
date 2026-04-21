@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
@@ -17,7 +17,7 @@ type DescriptionItemNamespaceProps = {
   resource: K8sResourceCommon;
 };
 
-const DescriptionItemNamespace: FCC<DescriptionItemNamespaceProps> = ({
+const DescriptionItemNamespace: FC<DescriptionItemNamespaceProps> = ({
   label,
   model,
   resource,

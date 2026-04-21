@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
@@ -13,7 +13,7 @@ type VMActionsIconBarProps = {
   vm: V1VirtualMachine;
 };
 
-const VMActionsIconBar: FCC<VMActionsIconBarProps> = ({ vm }) => {
+const VMActionsIconBar: FC<VMActionsIconBarProps> = ({ vm }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const { featureEnabled: confirmVMActionsEnabled } = useFeatures(CONFIRM_VM_ACTIONS);

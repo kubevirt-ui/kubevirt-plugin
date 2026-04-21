@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
@@ -18,7 +18,7 @@ type VMWorkloadProfileDetailsItemProps = {
   vm: V1VirtualMachine;
 };
 
-const VMWorkloadProfileDetailsItem: FCC<VMWorkloadProfileDetailsItemProps> = ({ vm }) => {
+const VMWorkloadProfileDetailsItem: FC<VMWorkloadProfileDetailsItemProps> = ({ vm }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
 

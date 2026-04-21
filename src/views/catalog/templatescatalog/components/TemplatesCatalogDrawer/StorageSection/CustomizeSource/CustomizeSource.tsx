@@ -1,4 +1,4 @@
-import React, { FCC, useCallback, useRef } from 'react';
+import React, { FC, useCallback, useRef } from 'react';
 
 import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
@@ -39,7 +39,7 @@ export type CustomizeSourceProps = {
   template: V1Template;
 };
 
-export const CustomizeSource: FCC<CustomizeSourceProps> = ({ template }) => {
+export const CustomizeSource: FC<CustomizeSourceProps> = ({ template }) => {
   const { t } = useKubevirtTranslation();
   const {
     cdUpload,

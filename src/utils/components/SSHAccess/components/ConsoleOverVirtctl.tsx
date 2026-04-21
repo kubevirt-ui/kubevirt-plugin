@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 import { Trans } from 'react-i18next';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -32,7 +32,7 @@ type ConsoleOverVirtctlProps = {
   vm: V1VirtualMachine;
 };
 
-const ConsoleOverVirtctl: FCC<ConsoleOverVirtctlProps> = ({ vm }) => {
+const ConsoleOverVirtctl: FC<ConsoleOverVirtctlProps> = ({ vm }) => {
   const { t } = useKubevirtTranslation();
 
   const [isNamespaceManagedByUDN] = useNamespaceUDN(getNamespace(vm));

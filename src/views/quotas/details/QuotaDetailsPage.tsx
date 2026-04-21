@@ -1,4 +1,4 @@
-import React, { FCC, useMemo } from 'react';
+import React, { FC, useMemo } from 'react';
 import { useParams } from 'react-router';
 
 import Loading from '@kubevirt-utils/components/Loading/Loading';
@@ -16,7 +16,7 @@ import QuotaDetailsTab from './tabs/QuotaDetailsTab/QuotaDetailsTab';
 import QuotaYAMLTab from './tabs/QuotaYAMLTab';
 import QuotaPageTitle from './QuotaPageTitle';
 
-const QuotaDetailsPage: FCC = () => {
+const QuotaDetailsPage: FC = () => {
   const { t } = useKubevirtTranslation();
   const { name, ns: namespace } = useParams<{ name: string; ns?: string }>();
 

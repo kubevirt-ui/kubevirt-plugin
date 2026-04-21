@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 import { getVirtualMachineTemplatesCPUMemoryText } from 'src/views/templates/utils/utils';
 
 import CPUDescription from '@kubevirt-utils/components/CPUDescription/CPUDescription';
@@ -17,7 +17,7 @@ type CPUMemoryProps = {
   template: V1Template;
 };
 
-const CPUMemory: FCC<CPUMemoryProps> = ({ editable, template }) => {
+const CPUMemory: FC<CPUMemoryProps> = ({ editable, template }) => {
   const { t } = useKubevirtTranslation();
   const CPUMemData = getVirtualMachineTemplatesCPUMemoryText(template, t);
   const { createModal } = useModal();

@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { V1InstancetypeMatcher, V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import CPUMemory from '@kubevirt-utils/components/CPUMemory/CPUMemory';
@@ -33,7 +33,7 @@ type ConfigurationSummaryProps = {
   vm: V1VirtualMachine;
 };
 
-const ConfigurationSummary: FCC<ConfigurationSummaryProps> = ({ vm }) => {
+const ConfigurationSummary: FC<ConfigurationSummaryProps> = ({ vm }) => {
   const { t } = useKubevirtTranslation();
 
   const itMatcher: V1InstancetypeMatcher = getInstanceTypeMatcher(vm);

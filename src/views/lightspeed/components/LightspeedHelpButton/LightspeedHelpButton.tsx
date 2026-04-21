@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useResourceEvents from '@kubevirt-utils/hooks/useResourceEvents/useResourceEvents';
@@ -25,7 +25,7 @@ type LightspeedHelpButtonProps = {
   promptType: OLSPromptType;
 };
 
-const LightspeedHelpButton: FCC<LightspeedHelpButtonProps> = ({
+const LightspeedHelpButton: FC<LightspeedHelpButtonProps> = ({
   className,
   isTroubleshootContext,
   obj,

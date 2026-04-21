@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import {
@@ -14,7 +14,7 @@ type DataSourceDetailsPageProps = {
   obj?: V1beta1DataSource;
 };
 
-const DataSourceDetailsPage: FCC<DataSourceDetailsPageProps> = ({ obj: dataSource }) => {
+const DataSourceDetailsPage: FC<DataSourceDetailsPageProps> = ({ obj: dataSource }) => {
   const { t } = useKubevirtTranslation();
 
   return (

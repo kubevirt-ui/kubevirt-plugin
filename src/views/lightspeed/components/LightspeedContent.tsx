@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { FLAG_LIGHTSPEED_PLUGIN } from '@kubevirt-utils/flags/consts';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -9,7 +9,7 @@ import { Skeleton, Stack, StackItem } from '@patternfly/react-core';
 
 type LightspeedContentProps = { prompt: string };
 
-const LightspeedContent: FCC<LightspeedContentProps> = ({ prompt }) => {
+const LightspeedContent: FC<LightspeedContentProps> = ({ prompt }) => {
   const { t } = useKubevirtTranslation();
   const { data, dataLoaded, error } = useLightspeedQuery(prompt);
   const hasOLSConsole = useFlag(FLAG_LIGHTSPEED_PLUGIN);

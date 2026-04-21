@@ -1,4 +1,4 @@
-import React, { FCC, lazy, useMemo } from 'react';
+import React, { FC, lazy, useMemo } from 'react';
 import { useParams } from 'react-router';
 
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
@@ -12,7 +12,7 @@ import { HorizontalNav, useK8sWatchResource } from '@openshift-console/dynamic-p
 
 import VMNetworkTitle from './components/VMNetworkTitle';
 
-const VMNetworkDetailsPage: FCC = () => {
+const VMNetworkDetailsPage: FC = () => {
   const { t } = useKubevirtTranslation();
   const { name } = useParams<{ name: string }>();
   const [vmNetwork, loaded, error] = useK8sWatchResource<ClusterUserDefinedNetworkKind>({

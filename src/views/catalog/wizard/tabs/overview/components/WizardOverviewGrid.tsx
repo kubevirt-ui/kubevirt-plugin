@@ -1,4 +1,4 @@
-import React, { FCC, useEffect, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 
 import { UpdateValidatedVM } from '@catalog/utils/WizardVMContext';
@@ -55,7 +55,7 @@ type WizardOverviewGridProps = {
   vm: V1VirtualMachine;
 };
 
-const WizardOverviewGrid: FCC<WizardOverviewGridProps> = ({ tabsData, updateVM, vm }) => {
+const WizardOverviewGrid: FC<WizardOverviewGridProps> = ({ tabsData, updateVM, vm }) => {
   const navigate = useNavigate();
   const { ns } = useParams<{ ns: string }>();
   const { t } = useKubevirtTranslation();

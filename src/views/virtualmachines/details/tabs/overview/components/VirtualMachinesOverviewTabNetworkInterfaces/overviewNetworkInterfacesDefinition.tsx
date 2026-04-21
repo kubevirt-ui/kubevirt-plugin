@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 import { TFunction } from 'i18next';
 import FirstItemListPopover from 'src/views/virtualmachines/list/components/FirstItemListPopover/FirstItemListPopover';
 
@@ -24,7 +24,7 @@ import {
 
 import { InterfacesData } from './utils/types';
 
-const NameCell: FCC<{ row: InterfacesData }> = ({ row }) => {
+const NameCell: FC<{ row: InterfacesData }> = ({ row }) => {
   const { t } = useKubevirtTranslation();
   const fqdn = useFQDN(row?.network?.name, row?.vm);
   const isFQDNEnabled = useIsFQDNEnabled();
@@ -77,7 +77,7 @@ const NameCell: FCC<{ row: InterfacesData }> = ({ row }) => {
   );
 };
 
-const IpAddressCell: FCC<{ row: InterfacesData }> = ({ row }) => {
+const IpAddressCell: FC<{ row: InterfacesData }> = ({ row }) => {
   const { t } = useKubevirtTranslation();
   const ipAddresses = removeLinkLocalIPV6(row?.ipAddresses ?? []);
 

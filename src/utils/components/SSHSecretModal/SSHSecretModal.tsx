@@ -1,4 +1,4 @@
-import React, { FCC, useMemo, useState } from 'react';
+import React, { FC, useMemo, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { createSSHSecret } from '@kubevirt-utils/resources/secret/utils';
@@ -24,7 +24,7 @@ type SSHSecretModalProps = {
   onSubmit: (sshDetails: SSHSecretDetails) => Promise<any | void>;
 };
 
-const SSHSecretModal: FCC<SSHSecretModalProps> = ({
+const SSHSecretModal: FC<SSHSecretModalProps> = ({
   cluster: clusterOverride,
   initialSSHSecretDetails,
   isOpen,

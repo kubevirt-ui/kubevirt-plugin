@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import {
   GreenCheckCircleIcon,
@@ -10,7 +10,7 @@ type ConditionIconProps = {
   conditionValue: number | string;
 };
 
-const ConditionIcon: FCC<ConditionIconProps> = ({ conditionValue }) => {
+const ConditionIcon: FC<ConditionIconProps> = ({ conditionValue }) => {
   const valueToIcon = {
     0: <GreenCheckCircleIcon className="kv-health-popup__alerts-count--icon" />,
     1: <YellowExclamationTriangleIcon className="kv-health-popup__alerts-count--icon" />,

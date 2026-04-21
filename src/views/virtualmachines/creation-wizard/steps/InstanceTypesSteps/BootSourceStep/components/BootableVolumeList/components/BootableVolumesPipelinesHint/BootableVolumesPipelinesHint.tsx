@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 import { Trans } from 'react-i18next';
 
 import useInstanceTypesAndPreferences from '@kubevirt-utils/hooks/useInstanceTypesAndPreferences';
@@ -18,7 +18,7 @@ import './BootableVolumesPipelinesHint.scss';
 
 type BootableVolumesPipelinesHintProps = { bootableVolumes: BootableVolume[] };
 
-const BootableVolumesPipelinesHint: FCC<BootableVolumesPipelinesHintProps> = ({
+const BootableVolumesPipelinesHint: FC<BootableVolumesPipelinesHintProps> = ({
   bootableVolumes,
 }) => {
   const { t } = useKubevirtTranslation();

@@ -1,4 +1,4 @@
-import React, { FCC, useMemo } from 'react';
+import React, { FC, useMemo } from 'react';
 import { useParams } from 'react-router';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -21,7 +21,7 @@ import VirtualMachineNavPageTitle from './VirtualMachineNavPageTitle';
 
 import './virtual-machine-page.scss';
 
-const VirtualMachineNavPage: FCC = () => {
+const VirtualMachineNavPage: FC = () => {
   useSignals();
   const {
     cluster,

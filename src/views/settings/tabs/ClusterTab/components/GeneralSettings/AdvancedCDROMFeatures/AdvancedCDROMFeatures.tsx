@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import SectionWithSwitch from '@kubevirt-utils/components/SectionWithSwitch/SectionWithSwitch';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -14,7 +14,7 @@ type AdvancedCDROMFeaturesProps = {
   newBadge?: boolean;
 };
 
-const AdvancedCDROMFeatures: FCC<AdvancedCDROMFeaturesProps> = ({ newBadge }) => {
+const AdvancedCDROMFeatures: FC<AdvancedCDROMFeaturesProps> = ({ newBadge }) => {
   const { t } = useKubevirtTranslation();
   const cluster = useSettingsCluster();
   const { canEdit, featureEnabled, loading, toggleFeature } = useAdvancedCDROMFeatureFlag(cluster);

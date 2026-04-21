@@ -1,4 +1,4 @@
-import React, { FCC, useEffect } from 'react';
+import React, { FC, useEffect } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
@@ -31,7 +31,7 @@ import VLANIDField from './VLANIDField';
 
 import './NetworkDefinition.scss';
 
-const NetworkDefinition: FCC = () => {
+const NetworkDefinition: FC = () => {
   const { t } = useKubevirtTranslation();
   const { control, register, setValue, watch } = useFormContext<VMNetworkForm>();
 

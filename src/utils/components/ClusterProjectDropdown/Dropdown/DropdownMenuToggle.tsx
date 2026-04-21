@@ -1,4 +1,4 @@
-import React, { FCC, JSX } from 'react';
+import React, { FC, JSX } from 'react';
 
 import { MenuToggle } from '@patternfly/react-core';
 
@@ -13,7 +13,7 @@ type DropdownMenuToggleProps = {
   toggleRef: React.RefObject<HTMLButtonElement>;
 };
 
-const DropdownMenuToggle: FCC<DropdownMenuToggleProps> = React.memo(
+const DropdownMenuToggle: FC<DropdownMenuToggleProps> = React.memo(
   ({ config, disabled = false, isOpen, onToggle, title, toggleRef }): JSX.Element => (
     <MenuToggle
       aria-label={title}

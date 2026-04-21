@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
@@ -19,7 +19,7 @@ type CloudInitCredentialsProps = {
   vmNamespace: string;
 };
 
-const CloudInitCredentials: FCC<CloudInitCredentialsProps> = ({
+const CloudInitCredentials: FC<CloudInitCredentialsProps> = ({
   vmCluster,
   vmName: name,
   vmNamespace: namespace,

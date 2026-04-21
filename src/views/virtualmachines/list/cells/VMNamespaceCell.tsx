@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { modelToGroupVersionKind, NamespaceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
@@ -8,7 +8,7 @@ import useClusterParam from '@multicluster/hooks/useClusterParam';
 
 import { VMCellProps } from './types';
 
-const VMNamespaceCell: FCC<VMCellProps> = ({ row }) => {
+const VMNamespaceCell: FC<VMCellProps> = ({ row }) => {
   const clusterParam = useClusterParam();
 
   if (!row) return null;

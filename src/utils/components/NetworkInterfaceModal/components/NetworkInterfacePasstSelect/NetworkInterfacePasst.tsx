@@ -1,4 +1,4 @@
-import React, { FCC, useCallback, useState } from 'react';
+import React, { FC, useCallback, useState } from 'react';
 
 import NetworkInterfacePasstHelperPopover from '@kubevirt-utils/components/NetworkInterfaceModal/components/NetworkInterfacePasstSelect/NetworkInterfacePasstHelperPopover';
 import SelectToggle from '@kubevirt-utils/components/toggles/SelectToggle';
@@ -17,7 +17,7 @@ type NetworkInterfacePasstProps = {
   setInterfaceType: (newValue: string) => void;
 };
 
-const NetworkInterfacePasst: FCC<NetworkInterfacePasstProps> = ({
+const NetworkInterfacePasst: FC<NetworkInterfacePasstProps> = ({
   interfaceType,
   namespace,
   networkName,

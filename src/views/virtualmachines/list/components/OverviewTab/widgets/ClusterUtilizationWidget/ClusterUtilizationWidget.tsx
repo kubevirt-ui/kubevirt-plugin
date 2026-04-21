@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -17,7 +17,7 @@ type ClusterUtilizationWidgetProps = {
   storageLoad?: number;
 };
 
-const ClusterUtilizationWidget: FCC<ClusterUtilizationWidgetProps> = ({
+const ClusterUtilizationWidget: FC<ClusterUtilizationWidgetProps> = ({
   cpuLoad = 0,
   isLoading,
   memoryLoad = 0,

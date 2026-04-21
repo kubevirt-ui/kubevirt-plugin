@@ -1,9 +1,9 @@
-import React, { FCC, useState } from 'react';
+import React, { FC, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Button, ButtonVariant, ExpandableSection, Stack, StackItem } from '@patternfly/react-core';
 
-const TemplateExpandableDescription: FCC<{ description: string }> = ({ description }) => {
+const TemplateExpandableDescription: FC<{ description: string }> = ({ description }) => {
   const { t } = useKubevirtTranslation();
   const [isExpanded, setIsExpanded] = useState(description?.length <= 120);
 

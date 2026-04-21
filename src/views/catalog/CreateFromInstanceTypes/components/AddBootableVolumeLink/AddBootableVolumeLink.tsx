@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
 import AddBootableVolumeModal from '@kubevirt-utils/components/AddBootableVolumeModal/AddBootableVolumeModal';
@@ -15,7 +15,7 @@ type AddBootableVolumeLinkProps = {
   text?: string;
 };
 
-const AddBootableVolumeLink: FCC<AddBootableVolumeLinkProps> = ({
+const AddBootableVolumeLink: FC<AddBootableVolumeLinkProps> = ({
   hidePopover,
   loadError,
   text,

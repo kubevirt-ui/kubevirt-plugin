@@ -1,4 +1,4 @@
-import React, { FCC, Suspense, useCallback, useState } from 'react';
+import React, { FC, Suspense, useCallback, useState } from 'react';
 import { load } from 'js-yaml';
 
 import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -13,7 +13,7 @@ type TemplateYAMLPageProps = {
   obj: V1Template;
 };
 
-const TemplateYAMLPage: FCC<TemplateYAMLPageProps> = ({ obj: template }) => {
+const TemplateYAMLPage: FC<TemplateYAMLPageProps> = ({ obj: template }) => {
   const [error, setError] = useState<Error>(null);
   const [success, setSuccess] = useState<string>('');
 

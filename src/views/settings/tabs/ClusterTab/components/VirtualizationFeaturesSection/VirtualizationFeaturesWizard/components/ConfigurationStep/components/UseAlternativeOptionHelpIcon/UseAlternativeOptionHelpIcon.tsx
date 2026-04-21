@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -11,7 +11,7 @@ type UseAlternativeOptionHelpIconProps = {
   olsPromptType: OLSPromptType;
 };
 
-const UseAlternativeOptionHelpIcon: FCC<UseAlternativeOptionHelpIconProps> = ({
+const UseAlternativeOptionHelpIcon: FC<UseAlternativeOptionHelpIconProps> = ({
   olsPromptType,
 }) => {
   const { t } = useKubevirtTranslation();

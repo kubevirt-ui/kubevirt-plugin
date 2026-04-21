@@ -1,4 +1,4 @@
-import React, { FCC, useMemo } from 'react';
+import React, { FC, useMemo } from 'react';
 
 import VmNotRunning from '@kubevirt-utils/components/Consoles/components/VmNotRunning';
 import { KUBEVIRT_UI_VNC_LOG_LEVEL_LABEL } from '@kubevirt-utils/components/Consoles/components/vnc-console/utils/constants';
@@ -16,7 +16,7 @@ import { NavPageComponentProps } from '@virtualmachines/details/utils/types';
 
 import { isRunning, isStopped } from '../../../utils';
 
-const VirtualMachineConsolePage: FCC<NavPageComponentProps> = ({ obj: vm }) => {
+const VirtualMachineConsolePage: FC<NavPageComponentProps> = ({ obj: vm }) => {
   const cluster = getCluster(vm);
   const name = getName(vm);
   const namespace = getNamespace(vm);

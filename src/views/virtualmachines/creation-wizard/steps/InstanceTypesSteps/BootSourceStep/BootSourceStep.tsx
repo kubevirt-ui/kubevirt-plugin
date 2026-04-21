@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import useInstanceTypesAndPreferences from '@kubevirt-utils/hooks/useInstanceTypesAndPreferences';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -20,7 +20,7 @@ import BootableVolumesPipelinesHint from '@virtualmachines/creation-wizard/steps
 
 import AddBootableVolumeButton from './components/AddBootableVolumeButton';
 
-const BootSourceStep: FCC = () => {
+const BootSourceStep: FC = () => {
   const { t } = useKubevirtTranslation();
   const { setUseBootSource, useBootSource } = useInstanceTypeVMStore();
   const { project } = useVMWizardStore();

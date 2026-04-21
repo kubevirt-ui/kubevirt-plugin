@@ -1,4 +1,4 @@
-import React, { FCC, useMemo } from 'react';
+import React, { FC, useMemo } from 'react';
 
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
 import ListSkeleton from '@kubevirt-utils/components/StateHandler/ListSkeleton';
@@ -19,7 +19,7 @@ type ConnectedProjectsProps = {
   obj: ClusterUserDefinedNetworkKind;
 };
 
-const ConnectedProjects: FCC<ConnectedProjectsProps> = ({ obj }) => {
+const ConnectedProjects: FC<ConnectedProjectsProps> = ({ obj }) => {
   const { t } = useKubevirtTranslation();
   const [projectsWithVMCounts, loaded, error] = useProjectsWithVMCounts(obj);
 

@@ -1,4 +1,4 @@
-import React, { FCC, useCallback, useState } from 'react';
+import React, { FC, useCallback, useState } from 'react';
 
 import { VirtualMachineCloneModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { VirtualMachineSnapshotModel } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -22,7 +22,7 @@ type SnapshotActionsMenuProps = {
   snapshot: V1beta1VirtualMachineSnapshot;
 };
 
-const SnapshotActionsMenu: FCC<SnapshotActionsMenuProps> = ({
+const SnapshotActionsMenu: FC<SnapshotActionsMenuProps> = ({
   isCloneDisabled,
   isRestoreDisabled,
   snapshot,

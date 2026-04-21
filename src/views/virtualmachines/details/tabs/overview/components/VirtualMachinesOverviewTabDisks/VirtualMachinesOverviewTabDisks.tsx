@@ -1,4 +1,4 @@
-import React, { FCC, useMemo } from 'react';
+import React, { FC, useMemo } from 'react';
 import { Link } from 'react-router';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -19,7 +19,7 @@ type VirtualMachinesOverviewTabDisksProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const VirtualMachinesOverviewTabDisks: FCC<VirtualMachinesOverviewTabDisksProps> = ({
+const VirtualMachinesOverviewTabDisks: FC<VirtualMachinesOverviewTabDisksProps> = ({
   vm,
   vmi,
 }) => {

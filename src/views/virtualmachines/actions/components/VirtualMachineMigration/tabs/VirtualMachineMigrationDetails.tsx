@@ -1,4 +1,4 @@
-import React, { FCC, useState } from 'react';
+import React, { FC, useState } from 'react';
 import { Trans } from 'react-i18next';
 import { Updater } from 'use-immer';
 
@@ -47,7 +47,7 @@ type VirtualMachineMigrationDetailsProps = {
   vms: V1VirtualMachine[];
 };
 
-const VirtualMachineMigrationDetails: FCC<VirtualMachineMigrationDetailsProps> = ({
+const VirtualMachineMigrationDetails: FC<VirtualMachineMigrationDetailsProps> = ({
   migrationPlanName,
   pvcs,
   selectedPVCs,

@@ -1,4 +1,4 @@
-import React, { Dispatch, FCC, SetStateAction, useEffect, useState } from 'react';
+import React, { Dispatch, FC, SetStateAction, useEffect, useState } from 'react';
 
 import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { IoK8sApiStorageV1StorageClass } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
@@ -51,7 +51,7 @@ type UploadPVCFormProps = {
   storageClasses: IoK8sApiStorageV1StorageClass[];
 };
 
-const UploadPVCForm: FCC<UploadPVCFormProps> = ({
+const UploadPVCForm: FC<UploadPVCFormProps> = ({
   commonTemplates,
   fileName,
   fileValue,

@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
@@ -20,7 +20,7 @@ type VirtualMachineTableProps = {
   selectedVMState: [V1VirtualMachine, (vm: V1VirtualMachine) => void];
 };
 
-const VirtualMachineTable: FCC<VirtualMachineTableProps> = ({
+const VirtualMachineTable: FC<VirtualMachineTableProps> = ({
   callbacks,
   columns,
   data,

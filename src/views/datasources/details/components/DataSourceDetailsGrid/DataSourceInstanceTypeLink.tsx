@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { DEFAULT_INSTANCETYPE_LABEL } from '@catalog/CreateFromInstanceTypes/utils/constants';
 import {
@@ -14,7 +14,7 @@ type DataSourceInstanceTypeLinkProps = {
   dataSource: V1beta1DataSource;
 };
 
-const DataSourceInstanceTypeLink: FCC<DataSourceInstanceTypeLinkProps> = ({ dataSource }) => {
+const DataSourceInstanceTypeLink: FC<DataSourceInstanceTypeLinkProps> = ({ dataSource }) => {
   const hasDataSourceUserInstanceType = hasUserInstanceType(dataSource);
 
   return (

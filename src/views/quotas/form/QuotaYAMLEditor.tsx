@@ -1,4 +1,4 @@
-import React, { FCC, Suspense, useState } from 'react';
+import React, { FC, Suspense, useState } from 'react';
 import { load } from 'js-yaml';
 
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
@@ -9,7 +9,7 @@ import { ResourceYAMLEditor } from '@openshift-console/dynamic-plugin-sdk';
 
 import useOnQuotaSubmit from './hooks/useOnQuotaSubmit';
 
-const QuotaYAMLEditor: FCC<YAMLEditorProps> = ({ initialYAML = '', isEdit = false, onChange }) => {
+const QuotaYAMLEditor: FC<YAMLEditorProps> = ({ initialYAML = '', isEdit = false, onChange }) => {
   const [error, setError] = useState<Error | null>(null);
   const onQuotaSubmit = useOnQuotaSubmit(setError, isEdit);
 

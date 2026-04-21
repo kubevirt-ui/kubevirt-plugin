@@ -1,4 +1,4 @@
-import React, { FCC, memo, ReactNode } from 'react';
+import React, { FC, memo, ReactNode } from 'react';
 import { useNavigate } from 'react-router';
 
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
@@ -25,7 +25,7 @@ type DeleteModalProps = {
   shouldRedirect?: boolean;
 };
 
-const DeleteModal: FCC<DeleteModalProps> = memo(
+const DeleteModal: FC<DeleteModalProps> = memo(
   ({
     body,
     headerText,

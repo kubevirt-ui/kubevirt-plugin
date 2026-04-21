@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
@@ -15,7 +15,7 @@ type VMCreatedTimestampDetailsItemProps = {
   vm: V1VirtualMachine;
 };
 
-const VMCreatedTimestampDetailsItem: FCC<VMCreatedTimestampDetailsItemProps> = ({ vm }) => {
+const VMCreatedTimestampDetailsItem: FC<VMCreatedTimestampDetailsItemProps> = ({ vm }) => {
   const { t } = useKubevirtTranslation();
 
   const vmTimestamp = getCreationTimestamp(vm);

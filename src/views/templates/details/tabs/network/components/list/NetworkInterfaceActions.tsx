@@ -1,4 +1,4 @@
-import React, { FCC, useCallback, useState } from 'react';
+import React, { FC, useCallback, useState } from 'react';
 import produce from 'immer';
 
 import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -27,7 +27,7 @@ type NetworkInterfaceActionsProps = {
   template: V1Template;
 };
 
-const NetworkInterfaceActions: FCC<NetworkInterfaceActionsProps> = ({
+const NetworkInterfaceActions: FC<NetworkInterfaceActionsProps> = ({
   nicName,
   nicPresentation,
   template,

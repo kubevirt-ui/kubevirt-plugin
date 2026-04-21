@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { Split, SplitItem } from '@patternfly/react-core';
 import useVMWizardStore from '@virtualmachines/creation-wizard/state/vm-wizard-store/useVMWizardStore';
@@ -8,7 +8,7 @@ import CreationMethodTile from './components/CreationMethodTile/CreationMethodTi
 
 import './CreationMethodTileGroup.scss';
 
-const CreationMethodTileGroup: FCC = () => {
+const CreationMethodTileGroup: FC = () => {
   const { creationMethod, setCreationMethod } = useVMWizardStore();
 
   return (

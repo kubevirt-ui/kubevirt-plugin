@@ -1,4 +1,4 @@
-import React, { FCC, useMemo } from 'react';
+import React, { FC, useMemo } from 'react';
 
 import HugepagesInfo from '@kubevirt-utils/components/HugepagesInfo/HugepagesInfo';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -18,7 +18,7 @@ type DrilldownMenuItemWrapperProps = {
   series: RedHatInstanceTypeSeries;
 };
 
-const DrilldownMenuItemWrapper: FCC<DrilldownMenuItemWrapperProps> = ({
+const DrilldownMenuItemWrapper: FC<DrilldownMenuItemWrapperProps> = ({
   onSelect,
   selected,
   selectedKind,

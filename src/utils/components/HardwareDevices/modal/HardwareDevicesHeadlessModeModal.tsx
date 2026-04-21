@@ -1,4 +1,4 @@
-import React, { FCC, useMemo, useState } from 'react';
+import React, { FC, useMemo, useState } from 'react';
 import produce from 'immer';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -18,7 +18,7 @@ type HardwareDevicesHeadlessModeModalProps = {
   vmi?: V1VirtualMachineInstance;
 };
 
-const HardwareDevicesHeadlessModeModal: FCC<HardwareDevicesHeadlessModeModalProps> = ({
+const HardwareDevicesHeadlessModeModal: FC<HardwareDevicesHeadlessModeModalProps> = ({
   isOpen,
   onClose,
   onSubmit,

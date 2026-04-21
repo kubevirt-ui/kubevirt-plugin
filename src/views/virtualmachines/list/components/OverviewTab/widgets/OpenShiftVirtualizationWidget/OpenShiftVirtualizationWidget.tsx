@@ -1,4 +1,4 @@
-import React, { FCC, useMemo } from 'react';
+import React, { FC, useMemo } from 'react';
 
 import useInfrastructureAlerts from '@kubevirt-utils/hooks/useInfrastructureAlerts/useInfrastructureAlerts';
 import { useKubevirtClusterServiceVersion } from '@kubevirt-utils/hooks/useKubevirtClusterServiceVersion';
@@ -21,7 +21,7 @@ type OpenShiftVirtualizationWidgetProps = {
   metricsUnavailable?: boolean;
 };
 
-const OpenShiftVirtualizationWidget: FCC<OpenShiftVirtualizationWidgetProps> = ({
+const OpenShiftVirtualizationWidget: FC<OpenShiftVirtualizationWidgetProps> = ({
   cluster,
   isAllClustersPage,
   metricsUnavailable,

@@ -1,4 +1,4 @@
-import { FCC } from 'react';
+import { FC } from 'react';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { isDeschedulerEnabled } from '@kubevirt-utils/hooks/useDeschedulerSetting/utils';
@@ -9,7 +9,7 @@ type DeschedulerProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const Descheduler: FCC<DeschedulerProps> = ({ vmi }) => {
+const Descheduler: FC<DeschedulerProps> = ({ vmi }) => {
   const { t } = useKubevirtTranslation();
   const deschedulerEnabled = isDeschedulerEnabled(getAnnotations(vmi));
 

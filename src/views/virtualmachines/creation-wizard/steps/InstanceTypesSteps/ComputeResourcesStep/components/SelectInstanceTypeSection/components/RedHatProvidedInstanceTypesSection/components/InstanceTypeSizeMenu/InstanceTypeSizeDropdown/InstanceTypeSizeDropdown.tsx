@@ -1,4 +1,4 @@
-import React, { FCC, useMemo, useRef, useState } from 'react';
+import React, { FC, useMemo, useRef, useState } from 'react';
 
 import { InstanceTypeSize } from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/utils/types';
 import { is1GiInstanceType } from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/utils/utils';
@@ -28,7 +28,7 @@ type InstanceTypeSizeDropdownProps = {
   sizes: InstanceTypeSize[];
 };
 
-const InstanceTypeSizeDropdown: FCC<InstanceTypeSizeDropdownProps> = ({
+const InstanceTypeSizeDropdown: FC<InstanceTypeSizeDropdownProps> = ({
   isDisabled = false,
   onSizeSelect,
   selectedSize,

@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { modelToGroupVersionKind, NamespaceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
@@ -9,7 +9,7 @@ import useIsACMPage from '@multicluster/useIsACMPage';
 import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
 import { useHubClusterName } from '@stolostron/multicluster-sdk';
 
-export const ClusterCell: FCC<{ row: IoK8sApiCoreV1ConfigMap }> = ({ row }) => {
+export const ClusterCell: FC<{ row: IoK8sApiCoreV1ConfigMap }> = ({ row }) => {
   const [hubClusterName] = useHubClusterName();
   const cluster = getCluster(row) || hubClusterName;
 
@@ -18,7 +18,7 @@ export const ClusterCell: FCC<{ row: IoK8sApiCoreV1ConfigMap }> = ({ row }) => {
   );
 };
 
-export const NamespaceCell: FCC<{ row: IoK8sApiCoreV1ConfigMap }> = ({ row }) => {
+export const NamespaceCell: FC<{ row: IoK8sApiCoreV1ConfigMap }> = ({ row }) => {
   const [hubClusterName] = useHubClusterName();
   const isACMPage = useIsACMPage();
   const cluster = getCluster(row) || hubClusterName;

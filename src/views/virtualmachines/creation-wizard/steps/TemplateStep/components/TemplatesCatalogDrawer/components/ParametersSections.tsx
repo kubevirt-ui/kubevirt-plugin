@@ -1,4 +1,4 @@
-import React, { FCC, useState } from 'react';
+import React, { FC, useState } from 'react';
 import { cloneDeep } from 'lodash';
 
 import { TemplateParameter } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -16,7 +16,7 @@ type ParametersSectionProps = {
   requiredParameters: TemplateParameter[];
 };
 
-const ParametersSections: FCC<ParametersSectionProps> = ({ requiredParameters }) => {
+const ParametersSections: FC<ParametersSectionProps> = ({ requiredParameters }) => {
   const { t } = useKubevirtTranslation();
   const { setTemplate, template } = useDrawerContext();
   const { setSelectedTemplate } = useVMWizardStore();

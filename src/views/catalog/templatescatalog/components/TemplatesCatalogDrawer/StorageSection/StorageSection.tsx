@@ -1,4 +1,4 @@
-import React, { FCC, useState } from 'react';
+import React, { FC, useState } from 'react';
 
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -16,7 +16,7 @@ import { useDrawerContext } from '../hooks/useDrawerContext';
 
 import { CustomizeSource } from './CustomizeSource/CustomizeSource';
 
-const StorageSection: FCC = () => {
+const StorageSection: FC = () => {
   const { t } = useKubevirtTranslation();
   const { template, templateDataLoaded, vm } = useDrawerContext();
 

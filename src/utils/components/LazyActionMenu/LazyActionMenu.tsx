@@ -1,6 +1,6 @@
 import React, {
   Dispatch,
-  FCC,
+  FC,
   SetStateAction,
   useCallback,
   useEffect,
@@ -47,7 +47,7 @@ type LazyFetchProps = {
   setRemoteOptions: Dispatch<SetStateAction<MenuOption[]>>;
 };
 
-const ActionReceiver: FCC<
+const ActionReceiver: FC<
   ActionService & { setRemoteOptions: Dispatch<SetStateAction<MenuOption[]>> }
 > = ({ loaded, options, setRemoteOptions }) => {
   useEffect(
@@ -63,7 +63,7 @@ const ActionReceiver: FCC<
   return null;
 };
 
-const LazyFetchInternal: FCC<LazyFetchProps & { impersonate: ImpersonateKind }> = ({
+const LazyFetchInternal: FC<LazyFetchProps & { impersonate: ImpersonateKind }> = ({
   checkAccess,
   context,
   impersonate,
@@ -89,7 +89,7 @@ const LazyFetchInternal: FCC<LazyFetchProps & { impersonate: ImpersonateKind }> 
 
 const LazyFetch = connect(impersonateStateToProps)(LazyFetchInternal);
 
-const LazyActionMenu: FCC<ExtendedLazyActionMenuProps> = ({
+const LazyActionMenu: FC<ExtendedLazyActionMenuProps> = ({
   checkAccessDelegate = defaultCheckAccess,
   context,
   disabledTooltip,

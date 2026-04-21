@@ -1,4 +1,4 @@
-import React, { FCC, useCallback, useMemo } from 'react';
+import React, { FC, useCallback, useMemo } from 'react';
 
 import { AddBootableVolumeState } from '@kubevirt-utils/components/AddBootableVolumeModal/utils/constants';
 import { SetBootableVolumeFieldType } from '@kubevirt-utils/components/AddBootableVolumeModal/utils/constants';
@@ -15,7 +15,7 @@ type ClusterSelectProps = {
   setBootableVolumeField: SetBootableVolumeFieldType;
 };
 
-const ClusterSelect: FCC<ClusterSelectProps> = ({ bootableVolume, setBootableVolumeField }) => {
+const ClusterSelect: FC<ClusterSelectProps> = ({ bootableVolume, setBootableVolumeField }) => {
   const { t } = useKubevirtTranslation();
   const [clusters, clustersLoaded] = useFleetClusterNames();
 

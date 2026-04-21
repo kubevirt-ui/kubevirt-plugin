@@ -1,4 +1,4 @@
-import React, { FCC, useCallback, useMemo, useState } from 'react';
+import React, { FC, useCallback, useMemo, useState } from 'react';
 
 import { IoK8sApiBatchV1Job } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import ActionsDropdown from '@kubevirt-utils/components/ActionsDropdown/ActionsDropdown';
@@ -18,7 +18,7 @@ type CheckupsSelfValidationHistoryActionsProps = {
   job: IoK8sApiBatchV1Job;
 };
 
-const CheckupsSelfValidationHistoryActions: FCC<CheckupsSelfValidationHistoryActionsProps> = ({
+const CheckupsSelfValidationHistoryActions: FC<CheckupsSelfValidationHistoryActionsProps> = ({
   job,
 }) => {
   const { t } = useKubevirtTranslation();

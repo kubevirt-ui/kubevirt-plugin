@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -6,7 +6,7 @@ import { getGPUDevices, getHostDevices } from '@kubevirt-utils/resources/vm';
 import { vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
 import { DescriptionList, Stack, StackItem } from '@patternfly/react-core';
 
-const HardwareDevicesTable: FCC = () => {
+const HardwareDevicesTable: FC = () => {
   const { t } = useKubevirtTranslation();
   const vm = vmSignal.value;
   const hostDevices = getHostDevices(vm);

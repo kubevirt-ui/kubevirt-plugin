@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -9,7 +9,7 @@ type CloneStorageCheckboxProps = {
   onChange: (checked: boolean) => void;
 };
 
-const CloneStorageCheckbox: FCC<CloneStorageCheckboxProps> = ({ isChecked, onChange }) => {
+const CloneStorageCheckbox: FC<CloneStorageCheckboxProps> = ({ isChecked, onChange }) => {
   const { t } = useKubevirtTranslation();
 
   return (

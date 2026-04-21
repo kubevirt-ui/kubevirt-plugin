@@ -1,4 +1,4 @@
-import React, { FCC, useCallback, useEffect } from 'react';
+import React, { FC, useCallback, useEffect } from 'react';
 import { Trans } from 'react-i18next';
 import { uniq } from 'lodash';
 
@@ -27,7 +27,7 @@ type VolumeModeProps = {
   volumeMode: V1beta1StorageSpecVolumeModeEnum;
 };
 
-export const VolumeMode: FCC<VolumeModeProps> = ({
+export const VolumeMode: FC<VolumeModeProps> = ({
   claimPropertySets,
   setAccessMode,
   setVolumeMode,

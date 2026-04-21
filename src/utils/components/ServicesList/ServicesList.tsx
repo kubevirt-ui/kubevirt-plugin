@@ -1,4 +1,4 @@
-import React, { FCC, useMemo } from 'react';
+import React, { FC, useMemo } from 'react';
 
 import { IoK8sApiCoreV1Service } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
@@ -12,7 +12,7 @@ type ServicesListProps = {
   loadError: unknown;
 };
 
-const ServicesList: FCC<ServicesListProps> = ({ data, loaded, loadError }) => {
+const ServicesList: FC<ServicesListProps> = ({ data, loaded, loadError }) => {
   const { t } = useKubevirtTranslation();
 
   const columns = useMemo(() => getServicesColumns(t), [t]);

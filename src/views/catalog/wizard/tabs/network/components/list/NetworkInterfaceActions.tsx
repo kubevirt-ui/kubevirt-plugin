@@ -1,4 +1,4 @@
-import React, { FCC, useCallback, useState } from 'react';
+import React, { FC, useCallback, useState } from 'react';
 
 import { produceVMNetworks, useWizardVMContext } from '@catalog/utils/WizardVMContext';
 import { setInterfaceLinkState } from '@catalog/wizard/tabs/network/utils/utils';
@@ -26,7 +26,7 @@ type NetworkInterfaceActionsProps = {
   vm: V1VirtualMachine;
 };
 
-const NetworkInterfaceActions: FCC<NetworkInterfaceActionsProps> = ({
+const NetworkInterfaceActions: FC<NetworkInterfaceActionsProps> = ({
   nicName,
   nicPresentation,
   onUpdateVM,

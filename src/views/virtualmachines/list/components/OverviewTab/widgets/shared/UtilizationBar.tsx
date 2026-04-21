@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Skeleton } from '@patternfly/react-core';
@@ -11,7 +11,7 @@ type UtilizationBarProps = {
   title: string;
 };
 
-const UtilizationBar: FCC<UtilizationBarProps> = ({ isLoading, percentage, title }) => {
+const UtilizationBar: FC<UtilizationBarProps> = ({ isLoading, percentage, title }) => {
   const { t } = useKubevirtTranslation();
   const safePercentage = Number.isFinite(percentage) ? percentage : 0;
   const clampedPercentage = Math.min(100, Math.max(0, safePercentage));

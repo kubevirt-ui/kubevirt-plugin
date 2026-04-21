@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 import { useNavigate } from 'react-router';
 import { getMigrationPolicyURL } from 'src/views/migrationpolicies/utils/utils';
 
@@ -10,7 +10,7 @@ import { K8sVerb, ListPageCreateDropdown } from '@openshift-console/dynamic-plug
 import { Button, Tooltip } from '@patternfly/react-core';
 import { useFleetAccessReview } from '@stolostron/multicluster-sdk';
 
-const MigrationPoliciesCreateButton: FCC = () => {
+const MigrationPoliciesCreateButton: FC = () => {
   const { t } = useKubevirtTranslation();
   const selectedCluster = useSelectedCluster();
   const navigate = useNavigate();

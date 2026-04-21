@@ -1,4 +1,4 @@
-import React, { FCC, memo, useState } from 'react';
+import React, { FC, memo, useState } from 'react';
 import { useParams } from 'react-router';
 
 import { updateVMCPUMemory } from '@catalog/templatescatalog/utils/helpers';
@@ -34,7 +34,7 @@ import { Alert, DescriptionList, ExpandableSection } from '@patternfly/react-cor
 import { useDrawerContext } from './hooks/useDrawerContext';
 import TemplateExpandableDescription from './TemplateExpandableDescription';
 
-export const TemplateInfoSection: FCC = memo(() => {
+export const TemplateInfoSection: FC = memo(() => {
   const { t } = useKubevirtTranslation();
   const cluster = useClusterParam();
   const isIPv6SingleStack = useIsIPv6SingleStackCluster(cluster);

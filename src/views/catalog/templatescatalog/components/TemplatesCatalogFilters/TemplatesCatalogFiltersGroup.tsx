@@ -1,4 +1,4 @@
-import React, { FCC, memo, useMemo, useState } from 'react';
+import React, { FC, memo, useMemo, useState } from 'react';
 
 import {
   FilterSidePanelCategory,
@@ -9,7 +9,7 @@ import { AngleDownIcon, AngleRightIcon } from '@patternfly/react-icons';
 
 import './TemplatesCatalogFiltersGroup.scss';
 
-export const TemplatesCatalogFiltersGroup: FCC<{
+export const TemplatesCatalogFiltersGroup: FC<{
   defaultExpanded?: boolean;
   filters: {
     count?: number;

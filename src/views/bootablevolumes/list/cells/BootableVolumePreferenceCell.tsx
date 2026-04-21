@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 
@@ -9,7 +9,7 @@ type BootableVolumePreferenceCellProps = {
   row: BootableResource;
 };
 
-const BootableVolumePreferenceCell: FCC<BootableVolumePreferenceCellProps> = ({ row }) => (
+const BootableVolumePreferenceCell: FC<BootableVolumePreferenceCellProps> = ({ row }) => (
   <>{getSourcePreferenceLabelValue(row) || NO_DATA_DASH}</>
 );
 

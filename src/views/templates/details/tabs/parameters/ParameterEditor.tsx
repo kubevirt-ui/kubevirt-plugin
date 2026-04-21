@@ -1,4 +1,4 @@
-import React, { FCC, useState } from 'react';
+import React, { FC, useState } from 'react';
 
 import { TemplateParameter } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -12,7 +12,7 @@ type ParameterEditorProps = {
   parameter: TemplateParameter;
 };
 
-const ParameterEditor: FCC<ParameterEditorProps> = ({ isEditDisabled, onChange, parameter }) => {
+const ParameterEditor: FC<ParameterEditorProps> = ({ isEditDisabled, onChange, parameter }) => {
   const { t } = useKubevirtTranslation();
   const [isExpanded, setExpanded] = useState(true);
 

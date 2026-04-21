@@ -1,4 +1,4 @@
-import React, { FCC, useMemo } from 'react';
+import React, { FC, useMemo } from 'react';
 
 import { NodeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
@@ -24,7 +24,7 @@ type MigrationTableProps = {
   tableData: UseMigrationCardDataAndFiltersValues;
 };
 
-const MigrationTable: FCC<MigrationTableProps> = ({ tableData }) => {
+const MigrationTable: FC<MigrationTableProps> = ({ tableData }) => {
   const { t } = useKubevirtTranslation();
   const activeNamespace = useActiveNamespace();
 

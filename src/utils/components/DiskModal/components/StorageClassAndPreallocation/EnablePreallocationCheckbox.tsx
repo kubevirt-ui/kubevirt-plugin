@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { Trans } from 'react-i18next';
 import { Link } from 'react-router';
@@ -19,7 +19,7 @@ type EnablePreallocationCheckboxProps = {
   vm: V1VirtualMachine;
 };
 
-const EnablePreallocationCheckbox: FCC<EnablePreallocationCheckboxProps> = ({ isDisabled, vm }) => {
+const EnablePreallocationCheckbox: FC<EnablePreallocationCheckboxProps> = ({ isDisabled, vm }) => {
   const { t } = useKubevirtTranslation();
   const { control } = useFormContext<V1DiskFormState>();
 

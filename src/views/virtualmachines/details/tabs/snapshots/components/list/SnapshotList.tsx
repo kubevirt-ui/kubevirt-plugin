@@ -1,4 +1,4 @@
-import React, { FCC, useMemo } from 'react';
+import React, { FC, useMemo } from 'react';
 
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -15,7 +15,7 @@ import {
 
 type SnapshotsListProps = UseSnapshotData & { isVMRunning?: boolean };
 
-const SnapshotsList: FCC<SnapshotsListProps> = ({
+const SnapshotsList: FC<SnapshotsListProps> = ({
   error,
   isVMRunning,
   loaded,

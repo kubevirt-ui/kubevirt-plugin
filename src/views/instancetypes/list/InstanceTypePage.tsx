@@ -1,4 +1,4 @@
-import React, { FCC, useMemo } from 'react';
+import React, { FC, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 import classNames from 'classnames';
 
@@ -28,7 +28,7 @@ import UserInstancetypeList from './UserInstancetypeList';
 
 import '@kubevirt-utils/styles/list-managment-group.scss';
 
-const InstanceTypePage: FCC<ListPageProps> = (props) => {
+const InstanceTypePage: FC<ListPageProps> = (props) => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
   const location = useLocation();

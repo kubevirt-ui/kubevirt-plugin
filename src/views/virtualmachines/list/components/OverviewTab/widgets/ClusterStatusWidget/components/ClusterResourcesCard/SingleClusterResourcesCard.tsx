@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useResourcesQuantities from '@overview/OverviewTab/resources-inventory-card/hooks/useResourcesQuantities';
@@ -12,7 +12,7 @@ type SingleClusterResourcesCardProps = {
   vmsCount: number;
 };
 
-const SingleClusterResourcesCard: FCC<SingleClusterResourcesCardProps> = ({
+const SingleClusterResourcesCard: FC<SingleClusterResourcesCardProps> = ({
   projectsCount,
   vmsCount,
 }) => {

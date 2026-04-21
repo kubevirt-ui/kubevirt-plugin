@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 import { Trans } from 'react-i18next';
 
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
@@ -10,7 +10,7 @@ import { Button, ButtonVariant } from '@patternfly/react-core';
 
 import { ACTIVATION_KEYS_DOCUMENTATION_URL, ACTIVATION_KEYS_URL } from '../../utils/constants';
 
-const ActivationKeyHelpIcon: FCC = () => {
+const ActivationKeyHelpIcon: FC = () => {
   const { t } = useKubevirtTranslation();
   return (
     <HelpTextIcon

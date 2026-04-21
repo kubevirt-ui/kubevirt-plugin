@@ -1,4 +1,4 @@
-import React, { ChangeEvent, Dispatch, FCC, SetStateAction } from 'react';
+import React, { ChangeEvent, Dispatch, FC, SetStateAction } from 'react';
 
 import { V1CPU } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getCPUComponentTitle } from '@kubevirt-utils/components/CPUMemoryModal/components/CPUInput/components/CPUTopologyInput/utils/utils';
@@ -16,7 +16,7 @@ type CPUComponentInputProps = {
   setCPU: Dispatch<SetStateAction<V1CPU>>;
 };
 
-const CPUComponentInput: FCC<CPUComponentInputProps> = ({
+const CPUComponentInput: FC<CPUComponentInputProps> = ({
   cpu,
   cpuComponent,
   cpuLimits,

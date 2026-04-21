@@ -1,4 +1,4 @@
-import React, { FCC, useMemo, useRef } from 'react';
+import React, { FC, useMemo, useRef } from 'react';
 import classNames from 'classnames';
 
 import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
@@ -40,7 +40,7 @@ type RedHatSeriesMenuCardProps = {
   rhSeriesItem: RedHatInstanceTypeSeries;
 } & UseInstanceTypeCardMenuSectionValues;
 
-const RedHatSeriesMenuCard: FCC<RedHatSeriesMenuCardProps> = ({
+const RedHatSeriesMenuCard: FC<RedHatSeriesMenuCardProps> = ({
   activeMenu,
   onMenuSelect,
   onMenuToggle,

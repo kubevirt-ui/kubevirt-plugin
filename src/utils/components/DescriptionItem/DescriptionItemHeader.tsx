@@ -1,4 +1,4 @@
-import React, { FCC, ReactNode } from 'react';
+import React, { FC, ReactNode } from 'react';
 
 import DescriptionItemPopoverContent from '@kubevirt-utils/components/DescriptionItem/DescriptionItemPopoverContent';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
@@ -25,7 +25,7 @@ type DescriptionItemHeaderProps = {
   promptType?: OLSPromptType;
 };
 
-export const DescriptionItemHeader: FCC<DescriptionItemHeaderProps> = ({
+export const DescriptionItemHeader: FC<DescriptionItemHeaderProps> = ({
   bodyContent,
   breadcrumb,
   descriptionHeader,

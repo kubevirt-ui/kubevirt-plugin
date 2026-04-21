@@ -1,4 +1,4 @@
-import React, { FCC, useMemo } from 'react';
+import React, { FC, useMemo } from 'react';
 import { Updater } from 'use-immer';
 
 import { V1beta1NetworkMap, V1beta1Plan, V1beta1StorageMap } from '@kubev2v/types';
@@ -23,7 +23,7 @@ type ReadinessStepProps = {
   vms: V1VirtualMachine[];
 };
 
-const ReadinessStep: FCC<ReadinessStepProps> = ({
+const ReadinessStep: FC<ReadinessStepProps> = ({
   migrationPlan,
   networkMap,
   setMigrationPlan,

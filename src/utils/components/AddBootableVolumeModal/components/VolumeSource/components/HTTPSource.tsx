@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import {
   AddBootableVolumeState,
@@ -17,7 +17,7 @@ type HTTPSourceProps = {
   setBootableVolumeField: SetBootableVolumeFieldType;
 };
 
-const HTTPSource: FCC<HTTPSourceProps> = ({ bootableVolume, setBootableVolumeField }) => {
+const HTTPSource: FC<HTTPSourceProps> = ({ bootableVolume, setBootableVolumeField }) => {
   const { t } = useKubevirtTranslation();
 
   const httpSourceHelperURL =

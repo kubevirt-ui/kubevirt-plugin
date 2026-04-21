@@ -1,4 +1,4 @@
-import React, { FCC, useMemo } from 'react';
+import React, { FC, useMemo } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { NumberOperator, numberOperatorInfo } from '@kubevirt-utils/utils/constants';
@@ -11,7 +11,7 @@ type NumberOperatorSelectProps = {
   selected: NumberOperator;
 };
 
-const NumberOperatorSelect: FCC<NumberOperatorSelectProps> = ({
+const NumberOperatorSelect: FC<NumberOperatorSelectProps> = ({
   'data-test': dataTest,
   onSelect,
   selected,

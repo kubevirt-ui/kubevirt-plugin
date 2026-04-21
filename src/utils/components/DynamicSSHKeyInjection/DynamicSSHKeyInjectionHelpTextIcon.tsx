@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverContentWithLightspeedButton/PopoverContentWithLightspeedButton';
@@ -10,7 +10,7 @@ import HelpTextIcon from '../HelpTextIcon/HelpTextIcon';
 type DynamicSSHKeyInjectionHelpTextIconProps = {
   isDisabled: boolean;
 };
-const DynamicSSHKeyInjectionHelpTextIcon: FCC<DynamicSSHKeyInjectionHelpTextIconProps> = (
+const DynamicSSHKeyInjectionHelpTextIcon: FC<DynamicSSHKeyInjectionHelpTextIconProps> = (
   isDisabled,
 ) => {
   const { t } = useKubevirtTranslation();

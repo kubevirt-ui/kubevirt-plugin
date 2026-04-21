@@ -1,4 +1,4 @@
-import React, { FCC, MouseEvent } from 'react';
+import React, { FC, MouseEvent } from 'react';
 
 import {
   V1beta1DataImportCron,
@@ -60,7 +60,7 @@ type BootableVolumeRowProps = {
   };
 };
 
-const BootableVolumeRow: FCC<BootableVolumeRowProps> = ({
+const BootableVolumeRow: FC<BootableVolumeRowProps> = ({
   activeColumnIDs,
   bootableVolume,
   rowData: {

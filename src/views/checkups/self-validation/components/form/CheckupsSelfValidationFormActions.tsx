@@ -1,4 +1,4 @@
-import React, { FCC, ReactNode, useMemo, useState } from 'react';
+import React, { FC, ReactNode, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
 
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
@@ -32,7 +32,7 @@ type CheckupsSelfValidationFormActionsProps = {
   testSkips?: string;
 };
 
-const CheckupsSelfValidationFormActions: FCC<CheckupsSelfValidationFormActionsProps> = ({
+const CheckupsSelfValidationFormActions: FC<CheckupsSelfValidationFormActionsProps> = ({
   checkupImage,
   isDryRun,
   name,

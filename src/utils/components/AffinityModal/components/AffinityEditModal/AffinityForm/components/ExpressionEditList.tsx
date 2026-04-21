@@ -1,4 +1,4 @@
-import React, { FCC, ReactNode } from 'react';
+import React, { FC, ReactNode } from 'react';
 
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -18,7 +18,7 @@ type ExpressionEditListProps = {
   label: string;
 };
 
-const ExpressionEditList: FCC<ExpressionEditListProps> = ({
+const ExpressionEditList: FC<ExpressionEditListProps> = ({
   errorHelperText,
   expressions,
   helperText,

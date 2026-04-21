@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 import { Link } from 'react-router';
 
 import DetailsPageTitle from '@kubevirt-utils/components/DetailsPageTitle/DetailsPageTitle';
@@ -17,7 +17,7 @@ type QuotaPageTitleProps = {
   quota: ApplicationAwareQuota;
 };
 
-const QuotaPageTitle: FCC<QuotaPageTitleProps> = ({ name, namespace, quota }) => {
+const QuotaPageTitle: FC<QuotaPageTitleProps> = ({ name, namespace, quota }) => {
   const { t } = useKubevirtTranslation();
 
   const isClusterScoped = quota?.kind === ApplicationAwareClusterResourceQuotaModel.kind;

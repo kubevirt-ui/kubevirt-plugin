@@ -1,4 +1,4 @@
-import React, { FCC, useMemo } from 'react';
+import React, { FC, useMemo } from 'react';
 
 import { VirtualMachineModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -19,7 +19,7 @@ import useFolderFilter from './hooks/useFolderFilter';
 import { determineOverviewLevel, getOverviewConfig } from './config';
 import { OverviewTabProps } from './types';
 
-const OverviewTab: FCC<OverviewTabProps> = ({ cluster, namespace }) => {
+const OverviewTab: FC<OverviewTabProps> = ({ cluster, namespace }) => {
   useSignals();
   const { t } = useKubevirtTranslation();
 

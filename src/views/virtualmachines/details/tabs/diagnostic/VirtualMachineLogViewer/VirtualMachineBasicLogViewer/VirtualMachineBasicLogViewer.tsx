@@ -1,4 +1,4 @@
-import React, { FCC, useState } from 'react';
+import React, { FC, useState } from 'react';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
@@ -13,7 +13,7 @@ type VirtualMachineBasicLogViewerProps = {
   isExternal?: boolean;
   vmi: V1VirtualMachineInstance;
 };
-const VirtualMachineBasicLogViewer: FCC<VirtualMachineBasicLogViewerProps> = ({
+const VirtualMachineBasicLogViewer: FC<VirtualMachineBasicLogViewerProps> = ({
   data,
   isExternal = false,
   vmi,

@@ -1,4 +1,4 @@
-import React, { FCC, useMemo } from 'react';
+import React, { FC, useMemo } from 'react';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import DiskListTitle from '@kubevirt-utils/components/DiskListTitle/DiskListTitle';
@@ -19,7 +19,7 @@ type DisksTableProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const DisksTable: FCC<DisksTableProps> = ({ vmi }) => {
+const DisksTable: FC<DisksTableProps> = ({ vmi }) => {
   const { t } = useKubevirtTranslation();
   const columns = useMemo(() => getVMIDisksTableColumns(t), [t]);
   const [disks, loaded, loadingError] = useDisksTableDisks(vmi);

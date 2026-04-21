@@ -1,4 +1,4 @@
-import React, { ChangeEvent, Dispatch, FCC, SetStateAction, useCallback } from 'react';
+import React, { ChangeEvent, Dispatch, FC, SetStateAction, useCallback } from 'react';
 
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -22,7 +22,7 @@ type BandwidthInputProps = {
 
 const unitOptions = [BinaryUnit.Ki, BinaryUnit.Mi, BinaryUnit.Gi];
 
-const BandwidthInput: FCC<BandwidthInputProps> = ({ setState, state }) => {
+const BandwidthInput: FC<BandwidthInputProps> = ({ setState, state }) => {
   const { t } = useKubevirtTranslation();
 
   const onSelectUnit = useCallback(

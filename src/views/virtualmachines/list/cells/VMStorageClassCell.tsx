@@ -1,4 +1,4 @@
-import React, { FCC, useMemo } from 'react';
+import React, { FC, useMemo } from 'react';
 
 import { modelToGroupVersionKind, StorageClassModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
@@ -10,7 +10,7 @@ import { getVirtualMachineStorageClasses } from '@virtualmachines/utils/mappers'
 
 import { VMCellWithCallbacksProps } from './types';
 
-const VMStorageClassCell: FCC<VMCellWithCallbacksProps> = ({ callbacks, row }) => {
+const VMStorageClassCell: FC<VMCellWithCallbacksProps> = ({ callbacks, row }) => {
   const clusterParam = useClusterParam();
 
   const storageClasses = useMemo(

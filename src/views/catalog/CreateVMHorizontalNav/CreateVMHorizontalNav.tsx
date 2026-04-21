@@ -1,4 +1,4 @@
-import React, { FCC, MouseEvent, useMemo, useState } from 'react';
+import React, { FC, MouseEvent, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 
 import CreateFromInstanceType from '@catalog/CreateFromInstanceTypes/CreateFromInstanceType';
@@ -13,7 +13,7 @@ import { CREATE_VM_TAB } from './constants';
 
 import './CreateVMHorizontalNav.scss';
 
-const CreateVMHorizontalNav: FCC = () => {
+const CreateVMHorizontalNav: FC = () => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
   const params = useParams();

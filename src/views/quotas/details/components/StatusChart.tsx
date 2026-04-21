@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -16,7 +16,7 @@ type StatusChartProps = {
   used: string;
 };
 
-const StatusChart: FCC<StatusChartProps> = ({ hard: maxValue, resourceKey, used: usedValue }) => {
+const StatusChart: FC<StatusChartProps> = ({ hard: maxValue, resourceKey, used: usedValue }) => {
   const { t } = useKubevirtTranslation();
 
   const { availableText, percentage, resourceLabel, subTitle, title, usedText } =

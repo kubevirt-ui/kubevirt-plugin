@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { ConfigMapModel, modelToGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import SysprepInfo from '@kubevirt-utils/components/SysprepModal/SysprepInfo';
@@ -10,7 +10,7 @@ import { Alert, AlertVariant, DescriptionList, Stack, StackItem } from '@pattern
 import DescriptionItem from '../DescriptionItem/DescriptionItem';
 import Loading from '../Loading/Loading';
 
-export const SysprepDescription: FCC<{
+export const SysprepDescription: FC<{
   cluster?: string;
   error?: Error;
   loaded?: boolean;

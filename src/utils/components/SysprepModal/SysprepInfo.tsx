@@ -1,11 +1,11 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Content, ContentVariants, Stack, StackItem } from '@patternfly/react-core';
 
-const SysprepInfo: FCC = () => {
+const SysprepInfo: FC = () => {
   const { t } = useKubevirtTranslation();
 
   return (

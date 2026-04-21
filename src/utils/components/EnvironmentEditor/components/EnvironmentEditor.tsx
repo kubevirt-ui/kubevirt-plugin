@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { EnhancedSelectOptionProps } from '@kubevirt-utils/components/FilterSelect/utils/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -24,7 +24,7 @@ type EnvironmentEditorProps = {
   serial?: string;
 };
 
-const EnvironmentEditor: FCC<EnvironmentEditorProps> = ({
+const EnvironmentEditor: FC<EnvironmentEditorProps> = ({
   diskName,
   environmentName,
   id,

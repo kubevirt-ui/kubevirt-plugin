@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-shadow */
-import React, { FCC, MouseEvent, useRef, useState } from 'react';
+import React, { FC, MouseEvent, useRef, useState } from 'react';
 
 import { KeyboardLayout } from '@kubevirt-ui-ext/vnc-keymaps';
 import SelectToggle from '@kubevirt-utils/components/toggles/SelectToggle';
@@ -32,7 +32,7 @@ import './access-consoles.scss';
 
 const { connected } = ConsoleState;
 
-export const AccessConsoles: FCC<AccessConsolesProps> = ({
+export const AccessConsoles: FC<AccessConsolesProps> = ({
   actions,
   isWindowsVM,
   setType,

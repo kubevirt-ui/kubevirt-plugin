@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import AddBootableVolumeModal from '@kubevirt-utils/components/AddBootableVolumeModal/AddBootableVolumeModal';
 import { runningTourSignal } from '@kubevirt-utils/components/GuidedTour/utils/guidedTourSignals';
@@ -14,7 +14,7 @@ export type AddBootableVolumeButtonProps = {
   loadError: Error;
 };
 
-const AddBootableVolumeButton: FCC<AddBootableVolumeButtonProps> = ({ loadError }) => {
+const AddBootableVolumeButton: FC<AddBootableVolumeButtonProps> = ({ loadError }) => {
   const { t } = useKubevirtTranslation();
   useSignals();
   const { createModal } = useModal();

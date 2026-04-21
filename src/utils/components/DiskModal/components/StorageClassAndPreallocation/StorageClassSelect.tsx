@@ -1,4 +1,4 @@
-import React, { Dispatch, FCC, SetStateAction, useCallback, useEffect, useMemo } from 'react';
+import React, { Dispatch, FC, SetStateAction, useCallback, useEffect, useMemo } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
@@ -27,7 +27,7 @@ type StorageClassSelectProps = {
   setShowSCAlert: Dispatch<SetStateAction<boolean>>;
 };
 
-const StorageClassSelect: FCC<StorageClassSelectProps> = ({ checkSC, setShowSCAlert }) => {
+const StorageClassSelect: FC<StorageClassSelectProps> = ({ checkSC, setShowSCAlert }) => {
   const { t } = useKubevirtTranslation();
   const { control, setValue, watch } = useFormContext<V1DiskFormState>();
 

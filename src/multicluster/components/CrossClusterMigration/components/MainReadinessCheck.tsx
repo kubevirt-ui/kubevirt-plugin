@@ -1,4 +1,4 @@
-import { FCC } from 'react';
+import { FC } from 'react';
 import React from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -16,7 +16,7 @@ type MainReadinessCheckProps = {
   loadedChecks: boolean[];
 };
 
-const MainReadinessCheck: FCC<MainReadinessCheckProps> = ({ checks, loadedChecks }) => {
+const MainReadinessCheck: FC<MainReadinessCheckProps> = ({ checks, loadedChecks }) => {
   const { t } = useKubevirtTranslation();
 
   const subtitle = getSubtitleChecks(t, checks, loadedChecks);

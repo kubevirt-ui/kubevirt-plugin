@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 import { Link } from 'react-router';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -16,7 +16,7 @@ type RunningCheckupWarningDescriptionProps = {
   showTitle?: boolean;
 };
 
-const RunningCheckupWarningDescription: FCC<RunningCheckupWarningDescriptionProps> = ({
+const RunningCheckupWarningDescription: FC<RunningCheckupWarningDescriptionProps> = ({
   configMapCluster,
   configMapName,
   configMapNamespace,

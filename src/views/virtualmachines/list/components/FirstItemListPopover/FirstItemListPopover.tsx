@@ -1,4 +1,4 @@
-import React, { FCC, ReactNode } from 'react';
+import React, { FC, ReactNode } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
@@ -19,7 +19,7 @@ type FirstItemListPopoverProps = {
   items: IpAddresses;
 };
 
-const FirstItemListPopover: FCC<FirstItemListPopoverProps> = ({
+const FirstItemListPopover: FC<FirstItemListPopoverProps> = ({
   className,
   headerContent,
   includeCopyFirstItem,

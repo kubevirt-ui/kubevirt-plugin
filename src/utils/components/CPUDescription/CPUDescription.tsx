@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { V1CPU } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -10,7 +10,7 @@ type CPUDescriptionProps = {
   helperTextResource?: string;
 };
 
-const CPUDescription: FCC<CPUDescriptionProps> = ({
+const CPUDescription: FC<CPUDescriptionProps> = ({
   cpu,
   helperTextResource = CpuMemHelperTextResources.ActualVM,
 }) => {

@@ -1,4 +1,4 @@
-import React, { FCC, useEffect, useRef, useState } from 'react';
+import React, { FC, useEffect, useRef, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router';
 
@@ -30,7 +30,7 @@ import VMNetworkWizardHeader from './components/VMNetworkWizardHeader';
 import { getVLANIDValidatedOption } from './utils/utils';
 import { getDefaultFormValue, NODE_NETWORK_MAPPING_PARAM_KEY, VMNetworkForm } from './constants';
 
-const VMNetworkNewForm: FCC = () => {
+const VMNetworkNewForm: FC = () => {
   const navigate = useNavigate();
   const { t } = useKubevirtTranslation();
   const [apiError, setError] = useState<Error>(null);

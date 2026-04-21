@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { V1VirtualMachineCondition } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import PendingChangesBreadcrumb from '@kubevirt-utils/components/PendingChanges/PendingChangesBreadcrumb/PendingChangesBreadcrumb';
@@ -13,7 +13,7 @@ type RestartPendingChangesProps = {
   restartRequiredCondition?: V1VirtualMachineCondition;
 };
 
-const RestartPendingChanges: FCC<RestartPendingChangesProps> = ({
+const RestartPendingChanges: FC<RestartPendingChangesProps> = ({
   pendingChanges,
   restartRequiredCondition,
 }) => {

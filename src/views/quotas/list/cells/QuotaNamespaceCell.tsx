@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { modelToGroupVersionKind, NamespaceModel } from '@kubevirt-utils/models';
 import { ApplicationAwareQuota } from '@kubevirt-utils/resources/quotas/types';
@@ -13,7 +13,7 @@ type QuotaNamespaceCellProps = {
   row: ApplicationAwareQuota;
 };
 
-const QuotaNamespaceCell: FCC<QuotaNamespaceCellProps> = ({ row }) => {
+const QuotaNamespaceCell: FC<QuotaNamespaceCellProps> = ({ row }) => {
   if (isNamespacedQuota(row)) {
     return (
       <ResourceLink

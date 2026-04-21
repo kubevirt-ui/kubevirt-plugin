@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -11,7 +11,7 @@ type VMNotMigratableLabelProps = {
   vm: V1VirtualMachine;
 };
 
-const VMNotMigratableLabel: FCC<VMNotMigratableLabelProps> = ({ vm }) => {
+const VMNotMigratableLabel: FC<VMNotMigratableLabelProps> = ({ vm }) => {
   const { t } = useKubevirtTranslation();
   const isMigratable = isLiveMigratable(vm);
   const isRunning = vm?.status?.printableStatus === printableVMStatus.Running;

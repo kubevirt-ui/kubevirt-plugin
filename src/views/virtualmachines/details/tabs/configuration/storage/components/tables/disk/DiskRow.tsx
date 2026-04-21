@@ -1,4 +1,4 @@
-import React, { FCC, useMemo } from 'react';
+import React, { FC, useMemo } from 'react';
 
 import { DataVolumeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -40,7 +40,7 @@ const getTranslatedSource = (source: string, t: (key: string) => string): string
   return source;
 };
 
-const DiskRow: FCC<
+const DiskRow: FC<
   RowProps<
     DiskRowDataLayout,
     {

@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { NamespaceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -13,7 +13,7 @@ type VMNamespaceDetailsItemProps = {
   vm: V1VirtualMachine;
 };
 
-const VMNamespaceDetailsItem: FCC<VMNamespaceDetailsItemProps> = ({ vm }) => {
+const VMNamespaceDetailsItem: FC<VMNamespaceDetailsItemProps> = ({ vm }) => {
   const { t } = useKubevirtTranslation();
 
   const vmNamespace = getNamespace(vm);

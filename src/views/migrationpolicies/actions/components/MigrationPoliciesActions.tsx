@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { V1alpha1MigrationPolicy } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import ActionsDropdown from '@kubevirt-utils/components/ActionsDropdown/ActionsDropdown';
@@ -10,7 +10,7 @@ type MigrationPoliciesActionsProps = {
   mp: V1alpha1MigrationPolicy;
 };
 
-const MigrationPoliciesActions: FCC<MigrationPoliciesActionsProps> = ({ isKebabToggle, mp }) => {
+const MigrationPoliciesActions: FC<MigrationPoliciesActionsProps> = ({ isKebabToggle, mp }) => {
   const [actions] = useMigrationPoliciesActionsProvider(mp);
 
   return (

@@ -1,4 +1,4 @@
-import React, { FCC, useMemo } from 'react';
+import React, { FC, useMemo } from 'react';
 import produce from 'immer';
 
 import { SecretModel, TemplateModel, V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -41,7 +41,7 @@ type SSHKeyProps = {
   template: V1Template;
 };
 
-const SSHKey: FCC<SSHKeyProps> = ({ template }) => {
+const SSHKey: FC<SSHKeyProps> = ({ template }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const { isTemplateEditable } = useEditTemplateAccessReview(template);

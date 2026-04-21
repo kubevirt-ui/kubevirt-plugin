@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import { isBootableVolumePVCKind } from '@kubevirt-utils/resources/bootableresources/helpers';
@@ -14,7 +14,7 @@ type BootableVolumeActionsCellProps = {
   row: BootableResource;
 };
 
-const BootableVolumeActionsCell: FCC<BootableVolumeActionsCellProps> = ({ callbacks, row }) => {
+const BootableVolumeActionsCell: FC<BootableVolumeActionsCellProps> = ({ callbacks, row }) => {
   const cluster = getEffectiveCluster(row, callbacks);
   const clusterPreferences = getClusterPreferences(cluster, callbacks.preferences);
 

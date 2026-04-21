@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { KUBEVIRT_UI_VNC_LOG_LEVEL_LABEL } from '@kubevirt-utils/components/Consoles/components/vnc-console/utils/constants';
@@ -10,7 +10,7 @@ import { useFleetAccessReview } from '@stolostron/multicluster-sdk';
 
 import VirtualMachinesOverviewTabDetailsConsole from './VirtualMachinesOverviewTabDetailsConsole';
 
-const VirtualMachinesOverviewTabDetailsConsoleWrapper: FCC<{
+const VirtualMachinesOverviewTabDetailsConsoleWrapper: FC<{
   vm: V1VirtualMachine;
   vmi: V1VirtualMachineInstance;
 }> = ({ vm, vmi }) => {

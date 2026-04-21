@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 import { Trans } from 'react-i18next';
 
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
@@ -17,7 +17,7 @@ type VirtctlDisabledProps = {
   namespace: string;
 };
 
-const VirtctlDisabled: FCC<VirtctlDisabledProps> = ({ cluster, namespace }) => {
+const VirtctlDisabled: FC<VirtctlDisabledProps> = ({ cluster, namespace }) => {
   const { t } = useKubevirtTranslation();
 
   const [, , nad] = useNamespaceUDN(namespace);

@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 import { TooltipRenderProps } from 'react-joyride';
 import classNames from 'classnames';
 
@@ -11,7 +11,7 @@ import EndTourFooter from '../EndTourFooter/EndTourFooter';
 
 import './TourPopover.scss';
 
-const TourPopover: FCC<TooltipRenderProps> = ({
+const TourPopover: FC<TooltipRenderProps> = ({
   backProps,
   closeProps,
   index,

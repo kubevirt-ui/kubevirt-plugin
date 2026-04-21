@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -8,7 +8,7 @@ type NoDataMetricsCardProps = {
   title: string;
 };
 
-const NoDataMetricsCard: FCC<NoDataMetricsCardProps> = ({ title }) => {
+const NoDataMetricsCard: FC<NoDataMetricsCardProps> = ({ title }) => {
   const { t } = useKubevirtTranslation();
 
   return (

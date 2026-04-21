@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Button, ButtonVariant, DescriptionListTerm } from '@patternfly/react-core';
@@ -13,7 +13,7 @@ type HardwareDeviceTitleProps = {
   title: string;
 };
 
-const HardwareDeviceTitle: FCC<HardwareDeviceTitleProps> = ({
+const HardwareDeviceTitle: FC<HardwareDeviceTitleProps> = ({
   canEdit,
   hideEdit = false,
   onClick,

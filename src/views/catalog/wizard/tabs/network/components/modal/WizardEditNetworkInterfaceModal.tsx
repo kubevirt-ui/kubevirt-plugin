@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { produceVMNetworks, UpdateValidatedVM } from '@catalog/utils/WizardVMContext';
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -18,7 +18,7 @@ type WizardEditNetworkInterfaceModalProps = {
   vm: V1VirtualMachine;
 };
 
-const WizardEditNetworkInterfaceModal: FCC<WizardEditNetworkInterfaceModalProps> = ({
+const WizardEditNetworkInterfaceModal: FC<WizardEditNetworkInterfaceModalProps> = ({
   isOpen,
   nicPresentation,
   onClose,

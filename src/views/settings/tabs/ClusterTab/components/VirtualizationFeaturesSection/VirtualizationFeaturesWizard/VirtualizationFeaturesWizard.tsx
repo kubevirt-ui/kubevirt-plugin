@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Modal, ModalVariant, Wizard, WizardHeader, WizardStep } from '@patternfly/react-core';
@@ -13,7 +13,7 @@ type VirtualizationFeaturesWizardProps = {
   onClose: () => void;
 };
 
-const VirtualizationFeaturesWizard: FCC<VirtualizationFeaturesWizardProps> = ({
+const VirtualizationFeaturesWizard: FC<VirtualizationFeaturesWizardProps> = ({
   isOpen,
   onClose,
 }) => {

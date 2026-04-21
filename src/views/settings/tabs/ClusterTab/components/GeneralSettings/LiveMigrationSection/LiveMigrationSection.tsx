@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -14,7 +14,7 @@ type LiveMigrationSectionProps = {
   hyperConvergeConfiguration: [hyperConvergeConfig: HyperConverged, loaded: boolean, error: Error];
 };
 
-const LiveMigrationSection: FCC<LiveMigrationSectionProps> = ({ hyperConvergeConfiguration }) => {
+const LiveMigrationSection: FC<LiveMigrationSectionProps> = ({ hyperConvergeConfiguration }) => {
   const { t } = useKubevirtTranslation();
   const [hyperConverge] = hyperConvergeConfiguration;
 

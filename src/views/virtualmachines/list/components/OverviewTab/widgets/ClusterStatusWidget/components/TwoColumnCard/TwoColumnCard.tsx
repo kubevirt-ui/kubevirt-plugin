@@ -1,4 +1,4 @@
-import React, { CSSProperties, FCC } from 'react';
+import React, { CSSProperties, FC } from 'react';
 
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverContentWithLightspeedButton/PopoverContentWithLightspeedButton';
@@ -9,7 +9,7 @@ import { TwoColumnCardProps } from './types';
 
 import './TwoColumnCard.scss';
 
-const TwoColumnCard: FCC<TwoColumnCardProps> = ({
+const TwoColumnCard: FC<TwoColumnCardProps> = ({
   bottomLeftContent,
   gridColumns,
   headerActions,

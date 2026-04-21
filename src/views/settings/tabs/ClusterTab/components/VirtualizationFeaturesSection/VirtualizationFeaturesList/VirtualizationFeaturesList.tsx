@@ -1,10 +1,10 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import VirtualizationFeaturesSection from '@settings/tabs/ClusterTab/components/VirtualizationFeaturesSection/VirtualizationFeaturesList/VirtualizationFeaturesSection';
 
 import { VirtualizationFeaturesContextProvider } from '../utils/VirtualizationFeaturesContext/VirtualizationFeaturesContext';
 
-const VirtualizationFeaturesList: FCC = () => {
+const VirtualizationFeaturesList: FC = () => {
   return (
     <VirtualizationFeaturesContextProvider>
       <VirtualizationFeaturesSection />

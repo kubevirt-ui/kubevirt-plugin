@@ -1,4 +1,4 @@
-import React, { FCC, useCallback } from 'react';
+import React, { FC, useCallback } from 'react';
 
 import { TemplateModel, V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import NetworkInterfaceModal from '@kubevirt-utils/components/NetworkInterfaceModal/NetworkInterfaceModal';
@@ -21,7 +21,7 @@ type TemplatesNetworkInterfaceModalProps = {
   template: V1Template;
 };
 
-const TemplatesNetworkInterfaceModal: FCC<TemplatesNetworkInterfaceModalProps> = ({
+const TemplatesNetworkInterfaceModal: FC<TemplatesNetworkInterfaceModalProps> = ({
   headerText,
   isOpen,
   onClose,

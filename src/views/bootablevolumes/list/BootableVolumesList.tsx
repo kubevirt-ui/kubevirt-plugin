@@ -1,4 +1,4 @@
-import React, { FCC, useMemo } from 'react';
+import React, { FC, useMemo } from 'react';
 import { useParams } from 'react-router';
 
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
@@ -40,7 +40,7 @@ import {
 
 import '@kubevirt-utils/styles/list-managment-group.scss';
 
-const BootableVolumesList: FCC = () => {
+const BootableVolumesList: FC = () => {
   const { ns: namespace } = useParams<{ cluster: string; ns: string }>();
   const { t } = useKubevirtTranslation();
   const [activeNamespace] = useActiveNamespace();

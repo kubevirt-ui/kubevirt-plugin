@@ -1,4 +1,4 @@
-import React, { FCC, FormEvent, MouseEventHandler, SyntheticEvent, useState } from 'react';
+import React, { FC, FormEvent, MouseEventHandler, SyntheticEvent, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettingsTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettingsTableColumns';
@@ -31,7 +31,7 @@ type ColumnManagementModalProps = {
   onClose: () => void;
 };
 
-export const ColumnManagementModal: FCC<ColumnManagementModalProps> = ({
+export const ColumnManagementModal: FC<ColumnManagementModalProps> = ({
   columnLayout,
   isOpen,
   onClose,

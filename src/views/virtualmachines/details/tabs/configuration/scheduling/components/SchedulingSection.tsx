@@ -1,4 +1,4 @@
-import React, { FCC, memo } from 'react';
+import React, { FC, memo } from 'react';
 
 import { modelToGroupVersionKind, NodeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -23,7 +23,7 @@ type SchedulingSectionProps = {
   vmi?: V1VirtualMachineInstance;
 };
 
-const SchedulingSection: FCC<SchedulingSectionProps> = ({ instanceTypeVM, onSubmit, vm, vmi }) => {
+const SchedulingSection: FC<SchedulingSectionProps> = ({ instanceTypeVM, onSubmit, vm, vmi }) => {
   const { t } = useKubevirtTranslation();
   const [nodes, nodesLoaded] = useK8sWatchData<IoK8sApiCoreV1Node[]>({
     cluster: getCluster(vm),

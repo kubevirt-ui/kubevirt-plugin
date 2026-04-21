@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 import { Trans } from 'react-i18next';
 
 import useInstanceTypesAndPreferences from '@kubevirt-utils/hooks/useInstanceTypesAndPreferences';
@@ -9,7 +9,7 @@ import BootableVolumeOSIcons from '@virtualmachines/creation-wizard/steps/Instan
 
 import './BootableVolumeEmptyState.scss';
 
-const BootableVolumeEmptyState: FCC = () => {
+const BootableVolumeEmptyState: FC = () => {
   const { t } = useKubevirtTranslation();
   const { loadError } = useInstanceTypesAndPreferences();
 

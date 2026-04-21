@@ -1,4 +1,4 @@
-import React, { FCC, useEffect, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import { useLocation } from 'react-router';
 
 import {
@@ -24,7 +24,7 @@ import { MetricsTabExpendedSections } from './utils/utils';
 
 import './virtual-machine-metrics-tab.scss';
 
-const VirtualMachineMetricsTab: FCC<NavPageComponentProps> = ({ obj: vm }) => {
+const VirtualMachineMetricsTab: FC<NavPageComponentProps> = ({ obj: vm }) => {
   const { t } = useKubevirtTranslation();
   const location = useLocation();
   const { vmi, vmiLoaded } = useVMI(getName(vm), getNamespace(vm), getCluster(vm));

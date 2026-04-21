@@ -1,4 +1,4 @@
-import React, { FCC, ReactNode } from 'react';
+import React, { FC, ReactNode } from 'react';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import ActiveUsersTable from '@kubevirt-utils/components/ActiveUsersTable/ActiveUsersTable';
@@ -14,7 +14,7 @@ type ActiveUserListProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const ActiveUserList: FCC<ActiveUserListProps> = ({ pathname, vmi }) => {
+const ActiveUserList: FC<ActiveUserListProps> = ({ pathname, vmi }) => {
   const { t } = useKubevirtTranslation();
   const [{ userList = [] }, loaded, loadError, isGuestAgentConnected] = useGuestOS(vmi);
 

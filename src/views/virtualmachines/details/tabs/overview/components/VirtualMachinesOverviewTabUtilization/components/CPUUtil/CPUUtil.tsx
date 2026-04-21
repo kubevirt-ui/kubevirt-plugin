@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import SubTitleChartLabel from '@kubevirt-utils/components/Charts/ChartLabels/SubTitleChartLabel';
@@ -21,7 +21,7 @@ type CPUUtilProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const CPUUtil: FCC<CPUUtilProps> = ({ vmi }) => {
+const CPUUtil: FC<CPUUtilProps> = ({ vmi }) => {
   const { t } = useKubevirtTranslation();
   const { currentTime } = useDuration();
 

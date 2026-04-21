@@ -1,4 +1,4 @@
-import React, { FCC, useState } from 'react';
+import React, { FC, useState } from 'react';
 
 import {
   V1beta1VirtualMachineSnapshot,
@@ -33,7 +33,7 @@ type VirtualMachinesOverviewTabSnapshotsRowProps = {
   vm: V1VirtualMachine;
 };
 
-const VirtualMachinesOverviewTabSnapshotsRow: FCC<VirtualMachinesOverviewTabSnapshotsRowProps> = ({
+const VirtualMachinesOverviewTabSnapshotsRow: FC<VirtualMachinesOverviewTabSnapshotsRowProps> = ({
   snapshot,
   vm,
 }) => {

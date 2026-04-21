@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import { Bullseye } from '@patternfly/react-core';
@@ -9,7 +9,7 @@ import LoadingSkeleton from './LoadingSkeleton';
 import SeverityCountList from './SeverityCountList';
 import { TwoColumnCardBodyProps } from './types';
 
-const TwoColumnCardBody: FCC<TwoColumnCardBodyProps> = ({
+const TwoColumnCardBody: FC<TwoColumnCardBodyProps> = ({
   bottomLeftContent,
   isLoading,
   items,

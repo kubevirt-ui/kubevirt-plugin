@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
@@ -12,7 +12,7 @@ type SSHTabSSHAccessProps = {
   vm: V1VirtualMachine;
 };
 
-const SSHTabSSHAccess: FCC<SSHTabSSHAccessProps> = ({ isCustomizeInstanceType, vm }) => {
+const SSHTabSSHAccess: FC<SSHTabSSHAccessProps> = ({ isCustomizeInstanceType, vm }) => {
   const { t } = useKubevirtTranslation();
   const [sshService, sshServiceLoaded] = useSSHService(vm);
 

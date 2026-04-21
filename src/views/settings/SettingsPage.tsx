@@ -1,4 +1,4 @@
-import React, { FCC, useCallback, useState } from 'react';
+import React, { FC, useCallback, useState } from 'react';
 import { Link } from 'react-router';
 
 import ClusterDropdown from '@kubevirt-utils/components/ClusterProjectDropdown/ClusterDropdown';
@@ -28,7 +28,7 @@ import SettingsTab from './SettingsTab';
 
 import './SettingsPage.scss';
 
-const SettingsPage: FCC = () => {
+const SettingsPage: FC = () => {
   useSignals();
 
   const { t } = useKubevirtTranslation();

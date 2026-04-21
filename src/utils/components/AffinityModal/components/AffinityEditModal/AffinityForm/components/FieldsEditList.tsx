@@ -1,4 +1,4 @@
-import React, { FCC, ReactNode } from 'react';
+import React, { FC, ReactNode } from 'react';
 
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -18,7 +18,7 @@ type FieldsEditListProps = {
   label: string;
 };
 
-const FieldsEditList: FCC<FieldsEditListProps> = ({
+const FieldsEditList: FC<FieldsEditListProps> = ({
   errorHelperText,
   fields,
   helperText,

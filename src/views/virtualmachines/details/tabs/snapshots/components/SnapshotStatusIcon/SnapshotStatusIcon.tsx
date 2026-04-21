@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { ColoredIconProps, StatusIconAndText } from '@openshift-console/dynamic-plugin-sdk';
 
@@ -8,8 +8,8 @@ type SnapshotStatusIconProps = {
   phase: string;
 };
 
-const SnapshotStatusIcon: FCC<SnapshotStatusIconProps> = ({ phase }) => {
-  const StatusIcon: FCC<ColoredIconProps> = iconMapper?.[phase] || iconMapper.default;
+const SnapshotStatusIcon: FC<SnapshotStatusIconProps> = ({ phase }) => {
+  const StatusIcon: FC<ColoredIconProps> = iconMapper?.[phase] || iconMapper.default;
 
   return <StatusIconAndText icon={<StatusIcon />} title={phase} />;
 };

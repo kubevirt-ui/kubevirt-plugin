@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import Timestamp from '@kubevirt-utils/components/Timestamp/Timestamp';
@@ -9,7 +9,7 @@ type DataSourceUpdatedCellProps = {
   row: V1beta1DataSource;
 };
 
-const DataSourceUpdatedCell: FCC<DataSourceUpdatedCellProps> = ({ row }) => (
+const DataSourceUpdatedCell: FC<DataSourceUpdatedCellProps> = ({ row }) => (
   <Timestamp timestamp={getDataSourceLastUpdated(row)} />
 );
 

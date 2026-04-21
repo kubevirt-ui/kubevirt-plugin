@@ -1,4 +1,4 @@
-import React, { FCC, useState } from 'react';
+import React, { FC, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { DESCHEDULER_OPERATORS_URL } from '@kubevirt-utils/resources/descheduler/constants';
@@ -15,7 +15,7 @@ type LoadBalanceToggleContentProps = {
   alternativeChecked: boolean;
 };
 
-const LoadBalanceToggleContent: FCC<LoadBalanceToggleContentProps> = ({ alternativeChecked }) => {
+const LoadBalanceToggleContent: FC<LoadBalanceToggleContentProps> = ({ alternativeChecked }) => {
   const { t } = useKubevirtTranslation();
 
   const { operatorDetailsMap, updateInstallRequests } = useVirtualizationFeaturesContext();

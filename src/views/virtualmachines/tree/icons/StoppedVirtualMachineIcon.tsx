@@ -1,6 +1,6 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
-const StoppedVirtualMachineIcon: FCC = () => (
+const StoppedVirtualMachineIcon: FC = () => (
   <svg
     fill="none"
     height="1.5em"

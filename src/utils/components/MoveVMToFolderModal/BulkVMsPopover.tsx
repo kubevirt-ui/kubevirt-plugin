@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getName } from '@kubevirt-utils/resources/shared';
@@ -8,7 +8,7 @@ type BulkVMsPopoverProps = {
   vms: V1VirtualMachine[];
 };
 
-const BulkVMsPopover: FCC<BulkVMsPopoverProps> = ({ vms }) => (
+const BulkVMsPopover: FC<BulkVMsPopoverProps> = ({ vms }) => (
   <div>
     <Stack>
       {vms?.map((vm) => {

@@ -1,4 +1,4 @@
-import React, { FCC, useMemo, useState } from 'react';
+import React, { FC, useMemo, useState } from 'react';
 
 import {
   modelToGroupVersionKind,
@@ -24,7 +24,7 @@ import { MULTUS, POD } from './utils/constants';
 import { DesktopViewerProps, Network } from './utils/types';
 import { getDefaultNetwork, getRdpAddressPort, getVmRdpNetworks } from './utils/utils';
 
-const DesktopViewer: FCC<DesktopViewerProps> = ({
+const DesktopViewer: FC<DesktopViewerProps> = ({
   vmCluster,
   vmName: name,
   vmNamespace: namespace,

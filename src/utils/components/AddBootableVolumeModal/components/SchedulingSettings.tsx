@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
@@ -14,7 +14,7 @@ type SchedulingSettingsProps = {
   setBootableVolumeField: SetBootableVolumeFieldType;
 };
 
-const SchedulingSettings: FCC<SchedulingSettingsProps> = ({
+const SchedulingSettings: FC<SchedulingSettingsProps> = ({
   bootableVolume,
   setBootableVolumeField,
 }) => {

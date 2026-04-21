@@ -1,4 +1,4 @@
-import React, { Dispatch, FCC, SetStateAction } from 'react';
+import React, { Dispatch, FC, SetStateAction } from 'react';
 
 import { PaginationState } from '@kubevirt-utils/hooks/usePagination/utils/types';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
@@ -13,7 +13,7 @@ type BootableVolumeListPaginationProps = {
   setPagination: Dispatch<SetStateAction<PaginationState>>;
 };
 
-const BootableVolumeListPagination: FCC<BootableVolumeListPaginationProps> = ({
+const BootableVolumeListPagination: FC<BootableVolumeListPaginationProps> = ({
   data,
   displayShowAllButton,
   pagination,

@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
@@ -17,7 +17,7 @@ type VMStatusDetailsItemProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const VMStatusDetailsItem: FCC<VMStatusDetailsItemProps> = ({ vm, vmi }) => {
+const VMStatusDetailsItem: FC<VMStatusDetailsItemProps> = ({ vm, vmi }) => {
   const { t } = useKubevirtTranslation();
 
   const vmPrintableStatus = getVMStatus(vm);

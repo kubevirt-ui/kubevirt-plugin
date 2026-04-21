@@ -1,4 +1,4 @@
-import React, { FCC, memo, useMemo } from 'react';
+import React, { FC, memo, useMemo } from 'react';
 
 import { CATALOG_FILTERS } from '@catalog/templatescatalog/utils/consts';
 import { hasNoDefaultUserAllFilters } from '@catalog/templatescatalog/utils/helpers';
@@ -21,7 +21,7 @@ import { TemplatesCatalogProjectsDropdown } from '../TemplatesCatalogProjectsDro
 
 import { TemplatesCatalogFiltersGroup } from './TemplatesCatalogFiltersGroup';
 
-export const TemplatesCatalogFilters: FCC<{
+export const TemplatesCatalogFilters: FC<{
   filters: TemplateFilters;
   onFilterChange: (type: CATALOG_FILTERS, value: boolean | string) => void;
   templates: V1Template[];

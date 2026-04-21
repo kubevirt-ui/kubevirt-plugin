@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { IoK8sApiCoreV1Service } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -13,7 +13,7 @@ type SSHServiceStateIconProps = {
   sshServiceLoaded?: boolean;
 };
 
-const SSHServiceStateIcon: FCC<SSHServiceStateIconProps> = ({ sshService, sshServiceLoaded }) => {
+const SSHServiceStateIcon: FC<SSHServiceStateIconProps> = ({ sshService, sshServiceLoaded }) => {
   const { t } = useKubevirtTranslation();
 
   if (sshService?.spec?.type !== SERVICE_TYPES.LOAD_BALANCER) return null;

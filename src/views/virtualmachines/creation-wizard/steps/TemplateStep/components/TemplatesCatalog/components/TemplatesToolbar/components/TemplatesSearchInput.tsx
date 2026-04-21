@@ -1,4 +1,4 @@
-import React, { FCC, useEffect, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { SearchInput } from '@patternfly/react-core';
@@ -10,7 +10,7 @@ type TemplatesSearchInputProps = {
   onFilterChange: (type: CATALOG_FILTERS, value: boolean | string) => void;
 };
 
-const TemplatesSearchInput: FCC<TemplatesSearchInputProps> = ({ filters, onFilterChange }) => {
+const TemplatesSearchInput: FC<TemplatesSearchInputProps> = ({ filters, onFilterChange }) => {
   const { t } = useKubevirtTranslation();
   const [query, setQuery] = useState<string>(filters?.query || '');
 

@@ -1,4 +1,4 @@
-import React, { FCC, useEffect, useMemo, useState } from 'react';
+import React, { FC, useEffect, useMemo, useState } from 'react';
 import { getQuotaListURL } from 'src/views/quotas/utils/url';
 
 import SectionWithSwitch from '@kubevirt-utils/components/SectionWithSwitch/SectionWithSwitch';
@@ -24,7 +24,7 @@ type ApplicationAwareQuotaProps = {
   newBadge?: boolean;
 };
 
-const ApplicationAwareQuota: FCC<ApplicationAwareQuotaProps> = ({
+const ApplicationAwareQuota: FC<ApplicationAwareQuotaProps> = ({
   hyperConvergeConfiguration,
   newBadge = false,
 }) => {

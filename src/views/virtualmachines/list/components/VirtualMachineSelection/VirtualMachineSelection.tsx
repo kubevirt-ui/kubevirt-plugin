@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { PaginationState } from '@kubevirt-utils/hooks/usePagination/utils/types';
@@ -15,7 +15,7 @@ type VirtualMachineSelectionProps = {
   vms: V1VirtualMachine[];
 };
 
-const VirtualMachineSelection: FCC<VirtualMachineSelectionProps> = ({ pagination, vms }) => {
+const VirtualMachineSelection: FC<VirtualMachineSelectionProps> = ({ pagination, vms }) => {
   const existingSelectedVMs = useExistingSelectedVMs(vms);
   const currentPageVMs = vms.slice(pagination.startIndex, pagination.endIndex);
 

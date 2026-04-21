@@ -1,4 +1,4 @@
-import React, { FCC, ReactNode } from 'react';
+import React, { FC, ReactNode } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -18,7 +18,7 @@ type MultiClusterHealthStatusProps = {
   isLoading: boolean;
 };
 
-const MultiClusterHealthStatus: FCC<MultiClusterHealthStatusProps> = ({
+const MultiClusterHealthStatus: FC<MultiClusterHealthStatusProps> = ({
   criticalClusters,
   criticalCount,
   degradedClusters,

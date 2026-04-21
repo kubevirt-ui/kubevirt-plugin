@@ -1,4 +1,4 @@
-import React, { ClipboardEvent, FCC, MouseEventHandler, useState } from 'react';
+import React, { ClipboardEvent, FC, MouseEventHandler, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Button, clipboardCopyFunc, Tooltip } from '@patternfly/react-core';
@@ -10,7 +10,7 @@ type SimpleCopyButtonProps = {
   textToCopy: string;
 };
 
-const SimpleCopyButton: FCC<SimpleCopyButtonProps> = ({ textToCopy }) => {
+const SimpleCopyButton: FC<SimpleCopyButtonProps> = ({ textToCopy }) => {
   const { t } = useKubevirtTranslation();
   const [copiedState, setCopiedState] = useState<boolean>(false);
 

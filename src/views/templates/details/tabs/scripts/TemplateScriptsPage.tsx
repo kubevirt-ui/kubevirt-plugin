@@ -1,4 +1,4 @@
-import React, { FCC, useCallback } from 'react';
+import React, { FC, useCallback } from 'react';
 
 import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -37,7 +37,7 @@ type TemplateScriptsPageProps = {
   obj: V1Template;
 };
 
-const TemplateScriptsPage: FCC<TemplateScriptsPageProps> = ({ obj: template }) => {
+const TemplateScriptsPage: FC<TemplateScriptsPageProps> = ({ obj: template }) => {
   const { t } = useKubevirtTranslation();
   const { isTemplateEditable } = useEditTemplateAccessReview(template);
   const vm = getTemplateVirtualMachineObject(template);

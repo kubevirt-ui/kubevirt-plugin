@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import SectionWithSwitch from '@kubevirt-utils/components/SectionWithSwitch/SectionWithSwitch';
@@ -13,7 +13,7 @@ import PreviewFeaturesPopover from './PreviewFeaturesPopover';
 
 import './PreviewFeatures.scss';
 
-const PreviewFeaturesTab: FCC = () => {
+const PreviewFeaturesTab: FC = () => {
   const { t } = useKubevirtTranslation();
   const cluster = useSettingsCluster();
   const { features } = usePreviewFeaturesData(cluster);

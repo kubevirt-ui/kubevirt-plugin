@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Tooltip } from '@patternfly/react-core';
@@ -9,7 +9,7 @@ type PanelToggleButtonProps = {
   toggleDrawer: () => void;
 };
 
-const PanelToggleButton: FCC<PanelToggleButtonProps> = ({ isOpen, toggleDrawer }) => {
+const PanelToggleButton: FC<PanelToggleButtonProps> = ({ isOpen, toggleDrawer }) => {
   const { t } = useKubevirtTranslation();
 
   const SvgIcon = isOpen ? AngleLeftIcon : AngleRightIcon;

@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Radio, Stack, StackItem } from '@patternfly/react-core';
@@ -9,7 +9,7 @@ type MigrationOptionRadioGroupProps = {
   setMigrationOption: (migrationOption: MigrationOptions) => void;
 };
 
-const MigrationOptionRadioGroup: FCC<MigrationOptionRadioGroupProps> = ({
+const MigrationOptionRadioGroup: FC<MigrationOptionRadioGroupProps> = ({
   migrationOption,
   setMigrationOption,
 }) => {

@@ -1,4 +1,4 @@
-import React, { FCC, useMemo } from 'react';
+import React, { FC, useMemo } from 'react';
 import { VirtualMachineModel } from 'src/views/dashboard-extensions/utils';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -27,7 +27,7 @@ type SSHTabAuthorizedSSHKeyProps = {
   onUpdateVM?: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine>;
   vm: V1VirtualMachine;
 };
-const SSHTabAuthorizedSSHKey: FCC<SSHTabAuthorizedSSHKeyProps> = ({
+const SSHTabAuthorizedSSHKey: FC<SSHTabAuthorizedSSHKeyProps> = ({
   className,
   isCustomizeInstanceType,
   onUpdateVM,

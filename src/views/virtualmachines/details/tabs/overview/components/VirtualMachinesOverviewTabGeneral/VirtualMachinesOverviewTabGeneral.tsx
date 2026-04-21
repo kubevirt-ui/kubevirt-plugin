@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import {
   modelToGroupVersionKind,
@@ -31,7 +31,7 @@ type VirtualMachinesOverviewTabGeneralProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const VirtualMachinesOverviewTabGeneral: FCC<VirtualMachinesOverviewTabGeneralProps> = ({
+const VirtualMachinesOverviewTabGeneral: FC<VirtualMachinesOverviewTabGeneralProps> = ({
   pods,
   vm,
   vmi,

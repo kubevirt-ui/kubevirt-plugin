@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 import { Trans } from 'react-i18next';
 
 import { WizardDescriptionItem } from '@catalog/wizard/components/WizardDescriptionItem';
@@ -11,7 +11,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { Content, ContentVariants, Stack } from '@patternfly/react-core';
 
-const SSHKey: FCC = () => {
+const SSHKey: FC = () => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const { onSubmit, sshDetails, vm, vmAttachedSecretName } = useTemplateWizardSecrets();

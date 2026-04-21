@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import {
   IoK8sApiBatchV1Job,
@@ -20,7 +20,7 @@ type DownloadResultsButtonProps = {
   job: IoK8sApiBatchV1Job;
 };
 
-const DownloadResultsButton: FCC<DownloadResultsButtonProps> = ({ configMap, job }) => {
+const DownloadResultsButton: FC<DownloadResultsButtonProps> = ({ configMap, job }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const { download, isDownloading } = useDownloadResults();

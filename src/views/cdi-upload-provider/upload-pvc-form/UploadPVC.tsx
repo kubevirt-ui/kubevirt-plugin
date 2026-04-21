@@ -1,5 +1,5 @@
 import React, {
-  FCC,
+  FC,
   FormEvent,
   useCallback,
   useContext,
@@ -69,7 +69,7 @@ const templatesResource: WatchK8sResource = {
     matchLabels: { [TEMPLATE_TYPE_LABEL]: TEMPLATE_TYPE_BASE },
   },
 };
-const UploadPVCPage: FCC = () => {
+const UploadPVCPage: FC = () => {
   const { t } = useKubevirtTranslation();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isCheckingCertificate, setCheckingCertificate] = useState(false);

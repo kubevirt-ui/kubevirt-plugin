@@ -1,5 +1,5 @@
 /* Copyright Contributors to the Open Cluster Management project */
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 import { useNavigate } from 'react-router';
 import { useImmer } from 'use-immer';
 
@@ -29,7 +29,7 @@ import { getInitialMigrationPlan } from './utils';
 
 import './CrossClusterMigration.scss';
 
-const CrossClusterMigrationWizard: FCC<{
+const CrossClusterMigrationWizard: FC<{
   close: () => void;
   vms: V1VirtualMachine[];
 }> = ({ close, vms }) => {

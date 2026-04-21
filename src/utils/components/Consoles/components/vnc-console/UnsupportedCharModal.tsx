@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -21,7 +21,7 @@ export type UnsupportedCharModalProps = {
 
 const MAX_VISIBLE_UNSUPPORTED_CHARS = 10;
 
-const UnsupportedCharModal: FCC<UnsupportedCharModalProps> = ({
+const UnsupportedCharModal: FC<UnsupportedCharModalProps> = ({
   isOpen,
   onClose,
   unsupportedChars,

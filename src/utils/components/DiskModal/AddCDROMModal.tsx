@@ -1,4 +1,4 @@
-import React, { FCC, useEffect } from 'react';
+import React, { FC, useEffect } from 'react';
 import { FormProvider, useForm, useWatch } from 'react-hook-form';
 
 import { UPLOAD_FILENAME_FIELD } from '@kubevirt-utils/components/DiskModal/components/utils/constants';
@@ -31,7 +31,7 @@ import { getDefaultCreateValues } from './utils/form';
 import { submitCDROM } from './utils/submit';
 import { SourceTypes, V1DiskFormState, V1SubDiskModalProps } from './utils/types';
 
-const AddCDROMModal: FCC<V1SubDiskModalProps> = ({
+const AddCDROMModal: FC<V1SubDiskModalProps> = ({
   isOpen,
   onClose,
   onSubmit,

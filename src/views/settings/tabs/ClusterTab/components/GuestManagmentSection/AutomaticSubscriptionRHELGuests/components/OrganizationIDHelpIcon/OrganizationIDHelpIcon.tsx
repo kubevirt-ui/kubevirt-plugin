@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 import { Trans } from 'react-i18next';
 
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
@@ -9,7 +9,7 @@ import { Button, ButtonVariant } from '@patternfly/react-core';
 
 import { REDHAT_CONSOLE_URL } from '../../utils/constants';
 
-const OrganizationIDHelpIcon: FCC = () => {
+const OrganizationIDHelpIcon: FC = () => {
   const { t } = useKubevirtTranslation();
   return (
     <HelpTextIcon

@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 import { Trans } from 'react-i18next';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -18,7 +18,7 @@ type EjectCDROMModalProps = {
   vm: V1VirtualMachine;
 };
 
-const EjectCDROMModal: FCC<EjectCDROMModalProps> = ({
+const EjectCDROMModal: FC<EjectCDROMModalProps> = ({
   cdromName,
   isOpen,
   onClose,

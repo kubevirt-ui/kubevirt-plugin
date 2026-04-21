@@ -1,4 +1,4 @@
-import React, { FCC, useMemo, useState } from 'react';
+import React, { FC, useMemo, useState } from 'react';
 import { Link } from 'react-router';
 import produce from 'immer';
 import { isDedicatedCPUPlacement } from 'src/views/templates/utils/utils';
@@ -36,7 +36,7 @@ type DedicatedResourcesModalProps = {
   template: V1Template;
 };
 
-const DedicatedResourcesModal: FCC<DedicatedResourcesModalProps> = ({
+const DedicatedResourcesModal: FC<DedicatedResourcesModalProps> = ({
   isOpen,
   onClose,
   onSubmit,

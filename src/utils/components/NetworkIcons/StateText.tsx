@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { NetworkInterfaceState } from '@kubevirt-utils/resources/vm/utils/network/types';
@@ -12,7 +12,7 @@ type StateTextProps = {
   runtimeState?: NetworkInterfaceState;
 };
 
-const StateText: FCC<StateTextProps> = ({ configuredState, details, runtimeState }) => {
+const StateText: FC<StateTextProps> = ({ configuredState, details, runtimeState }) => {
   const { t } = useKubevirtTranslation();
   return (
     <List isPlain>

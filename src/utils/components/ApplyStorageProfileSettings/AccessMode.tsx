@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 import { Trans } from 'react-i18next';
 
 import {
@@ -26,7 +26,7 @@ type AccessModeProps = {
   volumeMode: V1beta1StorageSpecVolumeModeEnum;
 };
 
-export const AccessMode: FCC<AccessModeProps> = ({
+export const AccessMode: FC<AccessModeProps> = ({
   accessMode,
   claimPropertySets,
   setAccessMode,

@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getNoDataAvailableMessage } from '@kubevirt-utils/utils/utils';
@@ -11,7 +11,7 @@ type ClustersUtilizationCardProps = {
   metricsUnavailable?: boolean;
 };
 
-const ClustersUtilizationCard: FCC<ClustersUtilizationCardProps> = ({ metricsUnavailable }) => {
+const ClustersUtilizationCard: FC<ClustersUtilizationCardProps> = ({ metricsUnavailable }) => {
   const { t } = useKubevirtTranslation();
   const { items, loaded, severityCounts, totalCount } = useClustersUtilizationData();
 

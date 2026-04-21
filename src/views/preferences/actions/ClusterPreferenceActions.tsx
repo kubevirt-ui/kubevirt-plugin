@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import ActionsDropdown from '@kubevirt-utils/components/ActionsDropdown/ActionsDropdown';
@@ -10,7 +10,7 @@ type ClusterPreferenceActionsProps = {
   preference: V1beta1VirtualMachineClusterPreference;
 };
 
-const ClusterPreferenceActions: FCC<ClusterPreferenceActionsProps> = ({
+const ClusterPreferenceActions: FC<ClusterPreferenceActionsProps> = ({
   isKebabToggle,
   preference,
 }) => {

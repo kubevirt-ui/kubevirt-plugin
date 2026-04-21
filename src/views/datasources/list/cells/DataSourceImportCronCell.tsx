@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 import { TFunction } from 'i18next';
 
 import { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
@@ -10,7 +10,7 @@ type DataSourceImportCronCellProps = {
   t: TFunction;
 };
 
-const DataSourceImportCronCell: FCC<DataSourceImportCronCellProps> = ({ row, t }) => {
+const DataSourceImportCronCell: FC<DataSourceImportCronCellProps> = ({ row, t }) => {
   const importCron = getDataSourceCronJob(row);
   return <>{importCron ? t('Yes') : t('No')}</>;
 };

@@ -1,4 +1,4 @@
-import React, { FCC, useMemo } from 'react';
+import React, { FC, useMemo } from 'react';
 import { useNavigate } from 'react-router';
 
 import { DataSourceModelRef } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -34,7 +34,7 @@ type DataSourcesListProps = {
   namespace: string;
 };
 
-const DataSourcesList: FCC<DataSourcesListProps> = ({ kind, namespace }) => {
+const DataSourcesList: FC<DataSourcesListProps> = ({ kind, namespace }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const navigate = useNavigate();

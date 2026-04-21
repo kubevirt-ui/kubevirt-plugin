@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import {
   modelToGroupVersionKind,
@@ -32,7 +32,7 @@ type CellProps = {
   row: MigrationTableDataLayout;
 };
 
-export const VMNameCell: FCC<CellProps> = ({ row }) => {
+export const VMNameCell: FC<CellProps> = ({ row }) => {
   const { vmim, vmiObj } = row;
   const vmName = getName(vmiObj) ?? vmim?.spec?.vmiName;
   const vmNamespace = getNamespace(vmiObj) ?? getNamespace(vmim);
@@ -54,7 +54,7 @@ export const VMNameCell: FCC<CellProps> = ({ row }) => {
   );
 };
 
-export const NamespaceCell: FCC<CellProps> = ({ row }) => {
+export const NamespaceCell: FC<CellProps> = ({ row }) => {
   const { vmim, vmiObj } = row;
   const isACMPage = useIsACMPage();
   const namespace = getNamespace(vmiObj) ?? getNamespace(vmim);
@@ -75,7 +75,7 @@ export const NamespaceCell: FCC<CellProps> = ({ row }) => {
   );
 };
 
-export const StatusCell: FCC<CellProps> = ({ row }) => {
+export const StatusCell: FC<CellProps> = ({ row }) => {
   const { vmim, vmiObj } = row;
   const migrationPhase = getMigrationPhase(vmim);
   const StatusIcon = getStatusIcon(migrationPhase);
@@ -97,7 +97,7 @@ export const StatusCell: FCC<CellProps> = ({ row }) => {
   );
 };
 
-export const ProgressCell: FCC<CellProps> = ({ row }) => {
+export const ProgressCell: FC<CellProps> = ({ row }) => {
   const { vmim, vmiObj } = row;
   const migrationPhase = getMigrationPhase(vmim);
   const { percentage, progressVariant } = useMigrationProgress(vmiObj, migrationPhase);
@@ -118,7 +118,7 @@ export const ProgressCell: FCC<CellProps> = ({ row }) => {
   );
 };
 
-export const SourceNodeCell: FCC<CellProps> = ({ row }) => {
+export const SourceNodeCell: FC<CellProps> = ({ row }) => {
   const { vmim, vmiObj } = row;
   const cluster = getCluster(vmiObj) ?? getCluster(vmim) ?? '';
   const sourceNode = getMigrationSourceNode(vmim);
@@ -130,7 +130,7 @@ export const SourceNodeCell: FCC<CellProps> = ({ row }) => {
   );
 };
 
-export const TargetNodeCell: FCC<CellProps> = ({ row }) => {
+export const TargetNodeCell: FC<CellProps> = ({ row }) => {
   const { vmim, vmiObj } = row;
   const cluster = getCluster(vmiObj) ?? getCluster(vmim) ?? '';
   const targetNode = getMigrationTargetNode(vmim);
@@ -142,13 +142,13 @@ export const TargetNodeCell: FCC<CellProps> = ({ row }) => {
   );
 };
 
-export const MigrationPolicyCell: FCC<CellProps> = ({ row }) => (
+export const MigrationPolicyCell: FC<CellProps> = ({ row }) => (
   <span data-test={`migration-policy-${getName(row.vmim)}`}>
     <MigrationPolicyTooltip obj={row} />
   </span>
 );
 
-export const VMIMNameCell: FCC<CellProps> = ({ row }) => {
+export const VMIMNameCell: FC<CellProps> = ({ row }) => {
   const { vmim, vmiObj } = row;
   const cluster = getCluster(vmiObj) ?? getCluster(vmim);
 
@@ -164,12 +164,12 @@ export const VMIMNameCell: FCC<CellProps> = ({ row }) => {
   );
 };
 
-export const CreatedCell: FCC<CellProps> = ({ row }) => (
+export const CreatedCell: FC<CellProps> = ({ row }) => (
   <span data-test={`migration-created-${getName(row.vmim)}`}>
     <Timestamp timestamp={row.vmim?.metadata?.creationTimestamp} />
   </span>
 );
 
-export const ActionsCell: FCC<CellProps> = ({ row }) => (
+export const ActionsCell: FC<CellProps> = ({ row }) => (
   <MigrationActionsDropdown isKebabToggle vmim={row.vmim} />
 );

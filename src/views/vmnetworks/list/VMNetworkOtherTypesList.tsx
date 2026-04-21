@@ -1,4 +1,4 @@
-import React, { FCC, useMemo } from 'react';
+import React, { FC, useMemo } from 'react';
 
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
 import StateHandler from '@kubevirt-utils/components/StateHandler/StateHandler';
@@ -18,7 +18,7 @@ import {
   getVMNetworkOtherTypesColumns,
 } from './vmNetworkOtherTypesListDefinition';
 
-const VMNetworkOtherTypesList: FCC = () => {
+const VMNetworkOtherTypesList: FC = () => {
   const { t } = useKubevirtTranslation();
 
   const [otherVMNetworks, loaded, error] = useOtherVMNetworks();

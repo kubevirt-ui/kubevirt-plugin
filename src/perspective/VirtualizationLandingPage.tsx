@@ -1,4 +1,4 @@
-import React, { FCC, useEffect } from 'react';
+import React, { FC, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 
 import Loading from '@kubevirt-utils/components/Loading/Loading';
@@ -9,7 +9,7 @@ import { VirtualMachineModelRef } from '@kubevirt-utils/models';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Bullseye } from '@patternfly/react-core';
 
-const VirtualizationLandingPage: FCC = () => {
+const VirtualizationLandingPage: FC = () => {
   const isAdmin = useIsAdmin();
   const [projects, projectsLoaded] = useProjects();
   const navigate = useNavigate();

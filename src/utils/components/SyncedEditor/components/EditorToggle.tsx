@@ -1,4 +1,4 @@
-import React, { FCC, FormEvent } from 'react';
+import React, { FC, FormEvent } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Flex, Radio } from '@patternfly/react-core';
@@ -12,7 +12,7 @@ type EditorToggleProps = {
   value: EditorType;
 };
 
-export const EditorToggle: FCC<EditorToggleProps> = ({ onChange, value }) => {
+export const EditorToggle: FC<EditorToggleProps> = ({ onChange, value }) => {
   const { t } = useKubevirtTranslation();
 
   const handleChange = (event: FormEvent<HTMLInputElement>) => {

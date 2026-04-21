@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 import { useParams } from 'react-router';
 
 import StateHandler from '@kubevirt-utils/components/StateHandler/StateHandler';
@@ -14,7 +14,7 @@ import QuotaFormTitle from './components/QuotaFormTitle';
 import QuotaFormEditor from './QuotaFormEditor';
 import QuotaYAMLEditor from './QuotaYAMLEditor';
 
-const QuotaEditForm: FCC = () => {
+const QuotaEditForm: FC = () => {
   const { name, ns: namespace } = useParams<{ name: string; ns?: string }>();
 
   const [quota, loaded, error] = useKubevirtWatchResource<ApplicationAwareQuota>({

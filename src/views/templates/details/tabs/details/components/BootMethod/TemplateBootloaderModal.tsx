@@ -1,4 +1,4 @@
-import React, { FCC, MouseEvent, useMemo, useState } from 'react';
+import React, { FC, MouseEvent, useMemo, useState } from 'react';
 import produce from 'immer';
 
 import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -22,7 +22,7 @@ type TemplateBootloaderModalProps = {
   template: V1Template;
 };
 
-const TemplateBootloaderModal: FCC<TemplateBootloaderModalProps> = ({
+const TemplateBootloaderModal: FC<TemplateBootloaderModalProps> = ({
   isOpen,
   onClose,
   onSubmit,

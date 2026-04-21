@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 import xbytes from 'xbytes';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -11,7 +11,7 @@ type NetworkUsageProps = {
   vm: V1VirtualMachine;
 };
 
-const NetworkUsage: FCC<NetworkUsageProps> = ({ vm }) => {
+const NetworkUsage: FC<NetworkUsageProps> = ({ vm }) => {
   const totalTransferred = getNetworkUsagePercentage(vm);
 
   if (isEmpty(totalTransferred) || !isRunning(vm)) return <>{NO_DATA_DASH}</>;

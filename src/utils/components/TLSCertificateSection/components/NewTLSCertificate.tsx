@@ -1,4 +1,4 @@
-import React, { FCC, useState } from 'react';
+import React, { FC, useState } from 'react';
 
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -9,7 +9,7 @@ type NewTLSCertificateProps = {
   tlsCertificate?: string;
 };
 
-const NewTLSCertificate: FCC<NewTLSCertificateProps> = ({ onChange, tlsCertificate }) => {
+const NewTLSCertificate: FC<NewTLSCertificateProps> = ({ onChange, tlsCertificate }) => {
   const { t } = useKubevirtTranslation();
   const [isCertLoading, setIsCertLoading] = useState(false);
 

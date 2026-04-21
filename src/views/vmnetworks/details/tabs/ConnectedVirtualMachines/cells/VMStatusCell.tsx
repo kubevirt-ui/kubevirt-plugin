@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getName, getVMStatus } from '@kubevirt-utils/resources/shared';
@@ -8,7 +8,7 @@ type VMStatusCellProps = {
   row: V1VirtualMachine;
 };
 
-const VMStatusCell: FCC<VMStatusCellProps> = ({ row }) => {
+const VMStatusCell: FC<VMStatusCellProps> = ({ row }) => {
   const status = getVMStatus(row);
 
   return <span data-test={`vm-status-${getName(row)}`}>{status ?? NO_DATA_DASH}</span>;

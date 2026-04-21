@@ -1,4 +1,4 @@
-import React, { FCC, useEffect, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 
 import { HyperConvergedModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import SectionWithSwitch from '@kubevirt-utils/components/SectionWithSwitch/SectionWithSwitch';
@@ -18,7 +18,7 @@ type GuestSystemLogsAccessProps = {
   newBadge?: boolean;
 };
 
-const GuestSystemLogsAccess: FCC<GuestSystemLogsAccessProps> = ({
+const GuestSystemLogsAccess: FC<GuestSystemLogsAccessProps> = ({
   hyperConvergeConfiguration,
   newBadge = false,
 }) => {

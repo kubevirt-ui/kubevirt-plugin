@@ -1,4 +1,4 @@
-import React, { FCC, useMemo } from 'react';
+import React, { FC, useMemo } from 'react';
 import { TFunction } from 'i18next';
 
 import { DataSourceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -34,7 +34,7 @@ type BootableVolumeNameCellProps = {
   t: TFunction;
 };
 
-const BootableVolumeNameCell: FCC<BootableVolumeNameCellProps> = ({ callbacks, row, t }) => {
+const BootableVolumeNameCell: FC<BootableVolumeNameCellProps> = ({ callbacks, row, t }) => {
   const cluster = getEffectiveCluster(row, callbacks);
   const bootableVolumeName = getName(row);
   const bootableVolumeNamespace = getNamespace(row);

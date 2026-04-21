@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { SourceTypes } from '@kubevirt-utils/components/DiskModal/utils/types';
 import { SelectOption } from '@patternfly/react-core';
@@ -9,7 +9,7 @@ type DiskSourceOptionProps = {
   onSelect: (value: SourceTypes) => void;
 } & DiskSourceOptionGroupItem;
 
-const DiskSourceOption: FCC<DiskSourceOptionProps> = ({
+const DiskSourceOption: FC<DiskSourceOptionProps> = ({
   description,
   id,
   isDisabled,

@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 import { Link } from 'react-router';
 
 import { AlertType } from '@kubevirt-utils/components/AlertsCard/utils/types';
@@ -21,7 +21,7 @@ import { HEALTH_ALERTS_URL_PARAMS } from './utils/utils';
 
 import './KubevirtHealthPopup.scss';
 
-const KubevirtHealthPopup: FCC = () => {
+const KubevirtHealthPopup: FC = () => {
   const { t } = useKubevirtTranslation();
   const { alerts, loaded, numberOfAlerts } = useInfrastructureAlerts();
   const [perspective] = useActivePerspective();

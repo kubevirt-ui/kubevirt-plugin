@@ -1,5 +1,5 @@
 import React, {
-  FCC,
+  FC,
   JSXElementConstructor,
   ReactElement,
   ReactNode,
@@ -22,7 +22,7 @@ type SelectSourceOptionProps = {
   selectedSource: SOURCE_OPTIONS_IDS;
 };
 
-const SelectSourceOption: FCC<SelectSourceOptionProps> = ({
+const SelectSourceOption: FC<SelectSourceOptionProps> = ({
   'data-test-id': testId,
   label,
   onSelectSource,

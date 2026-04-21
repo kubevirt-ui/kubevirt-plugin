@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { DataSourceModel, modelToGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
@@ -9,7 +9,7 @@ type DataSourceNameCellProps = {
   row: V1beta1DataSource;
 };
 
-const DataSourceNameCell: FCC<DataSourceNameCellProps> = ({ row }) => (
+const DataSourceNameCell: FC<DataSourceNameCellProps> = ({ row }) => (
   <ResourceLink
     groupVersionKind={modelToGroupVersionKind(DataSourceModel)}
     name={getName(row)}

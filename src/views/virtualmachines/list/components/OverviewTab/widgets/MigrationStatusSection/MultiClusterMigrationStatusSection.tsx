@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { PlanModel } from '@kubev2v/types';
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
@@ -20,7 +20,7 @@ type MultiClusterMigrationStatusSectionProps = {
   title: string;
 };
 
-const MultiClusterMigrationStatusSection: FCC<MultiClusterMigrationStatusSectionProps> = ({
+const MultiClusterMigrationStatusSection: FC<MultiClusterMigrationStatusSectionProps> = ({
   title,
 }) => {
   const { isMTVInstalled, loaded: mtvLoaded, loadError, plans } = useMTVPlans();

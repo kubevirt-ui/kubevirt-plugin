@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { V1CPU, V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
@@ -11,7 +11,7 @@ type CPUPercentageProps = {
   vmiCPU: V1CPU;
 };
 
-const CPUPercentage: FCC<CPUPercentageProps> = ({ vm, vmiCPU }) => {
+const CPUPercentage: FC<CPUPercentageProps> = ({ vm, vmiCPU }) => {
   const cpuUsagePercentage = getCPUUsagePercentage(vm, vmiCPU);
 
   if (isEmpty(cpuUsagePercentage) || !isRunning(vm)) return <span>{NO_DATA_DASH}</span>;

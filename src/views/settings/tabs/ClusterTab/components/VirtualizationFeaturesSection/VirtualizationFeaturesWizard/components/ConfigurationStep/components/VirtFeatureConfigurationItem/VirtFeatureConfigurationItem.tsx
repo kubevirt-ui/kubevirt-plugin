@@ -1,4 +1,4 @@
-import React, { FCC, ReactNode, useState } from 'react';
+import React, { FC, ReactNode, useState } from 'react';
 
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -29,7 +29,7 @@ type VirtFeatureConfigurationItemProps = {
   title: string;
 };
 
-const VirtFeatureConfigurationItem: FCC<VirtFeatureConfigurationItemProps> = ({
+const VirtFeatureConfigurationItem: FC<VirtFeatureConfigurationItemProps> = ({
   description,
   helpTextContent,
   operatorName,

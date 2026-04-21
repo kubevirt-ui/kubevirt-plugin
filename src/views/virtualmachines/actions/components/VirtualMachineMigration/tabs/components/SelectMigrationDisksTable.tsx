@@ -1,4 +1,4 @@
-import React, { FCC, useCallback, useMemo } from 'react';
+import React, { FC, useCallback, useMemo } from 'react';
 import { Updater } from 'use-immer';
 
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
@@ -23,7 +23,7 @@ type SelectMigrationDisksTableProps = {
   vms: V1VirtualMachine[];
 };
 
-const SelectMigrationDisksTable: FCC<SelectMigrationDisksTableProps> = ({
+const SelectMigrationDisksTable: FC<SelectMigrationDisksTableProps> = ({
   pvcs,
   selectedPVCs,
   setSelectedMigrations,

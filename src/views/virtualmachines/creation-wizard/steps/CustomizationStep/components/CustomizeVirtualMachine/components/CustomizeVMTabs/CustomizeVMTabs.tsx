@@ -1,4 +1,4 @@
-import React, { FCC, useCallback, useEffect, useMemo, useState } from 'react';
+import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'react-router';
 
 import ConfigurationSearch from '@kubevirt-utils/components/ConfigurationSearch/ConfigurationSearch';
@@ -15,7 +15,7 @@ import { getTargetTab } from './utils/utils';
 
 import './CustomizeVMTabs.scss';
 
-const CustomizeVMTabs: FCC = () => {
+const CustomizeVMTabs: FC = () => {
   const { t } = useKubevirtTranslation();
   const location = useLocation();
   const [activeTabKey, setActiveTabKey] = useState<number | string>(

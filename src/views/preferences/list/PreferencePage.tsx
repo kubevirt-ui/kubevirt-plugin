@@ -1,4 +1,4 @@
-import React, { FCC, useMemo } from 'react';
+import React, { FC, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 import classNames from 'classnames';
 
@@ -24,7 +24,7 @@ import UserPreferenceList from './UserPreferenceList';
 
 import '@kubevirt-utils/styles/list-managment-group.scss';
 
-const PreferencePage: FCC<ListPageProps> = (props) => {
+const PreferencePage: FC<ListPageProps> = (props) => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
   const location = useLocation();

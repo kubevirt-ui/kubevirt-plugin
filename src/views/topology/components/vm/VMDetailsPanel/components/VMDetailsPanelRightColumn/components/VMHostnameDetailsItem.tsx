@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
@@ -16,7 +16,7 @@ type VMHostnameDetailsItemProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const VMHostnameDetailsItem: FCC<VMHostnameDetailsItemProps> = ({ vm, vmi }) => {
+const VMHostnameDetailsItem: FC<VMHostnameDetailsItemProps> = ({ vm, vmi }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
 

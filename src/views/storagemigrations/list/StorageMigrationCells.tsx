@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 import { useNavigate } from 'react-router';
 
 import LazyActionMenu from '@kubevirt-utils/components/LazyActionMenu/LazyActionMenu';
@@ -32,7 +32,7 @@ type CellProps = {
   row: MultiNamespaceVirtualMachineStorageMigrationPlan;
 };
 
-export const NameCell: FCC<CellProps> = ({ row }) => {
+export const NameCell: FC<CellProps> = ({ row }) => {
   const navigate = useNavigate();
   const clusterParam = useClusterParam();
   const cluster = getCluster(row) || clusterParam;
@@ -60,7 +60,7 @@ export const NameCell: FCC<CellProps> = ({ row }) => {
   );
 };
 
-export const NamespacesCell: FCC<CellProps> = ({ row }) => {
+export const NamespacesCell: FC<CellProps> = ({ row }) => {
   const clusterParam = useClusterParam();
   const isACMPage = useIsACMPage();
   const cluster = getCluster(row) || clusterParam;
@@ -84,7 +84,7 @@ export const NamespacesCell: FCC<CellProps> = ({ row }) => {
   );
 };
 
-export const StorageMigrationCell: FCC<CellProps> = ({ row }) => {
+export const StorageMigrationCell: FC<CellProps> = ({ row }) => {
   const { t } = useKubevirtTranslation();
   const volumeCount = getVolumeCountFromMigPlan(row) ?? 0;
 
@@ -95,7 +95,7 @@ export const StorageMigrationCell: FCC<CellProps> = ({ row }) => {
   );
 };
 
-export const TargetStorageClassCell: FCC<CellProps> = ({ row }) => {
+export const TargetStorageClassCell: FC<CellProps> = ({ row }) => {
   const navigate = useNavigate();
   const clusterParam = useClusterParam();
   const cluster = getCluster(row) || clusterParam;
@@ -120,7 +120,7 @@ export const TargetStorageClassCell: FCC<CellProps> = ({ row }) => {
   );
 };
 
-export const StatusCell: FCC<CellProps> = ({ row }) => {
+export const StatusCell: FC<CellProps> = ({ row }) => {
   const statusMigration = getStatusMigration(row);
   const percentage = getMigrationPercentage(row);
 
@@ -136,7 +136,7 @@ export const StatusCell: FCC<CellProps> = ({ row }) => {
   );
 };
 
-export const StartedCell: FCC<CellProps> = ({ row }) => {
+export const StartedCell: FC<CellProps> = ({ row }) => {
   const { t } = useKubevirtTranslation();
   const startTimestamp = getMigrationStartTimestamp(row);
 
@@ -147,7 +147,7 @@ export const StartedCell: FCC<CellProps> = ({ row }) => {
   );
 };
 
-export const ActionsCell: FCC<CellProps> = ({ row }) => (
+export const ActionsCell: FC<CellProps> = ({ row }) => (
   <LazyActionMenu
     context={{ [modelToRef(MultiNamespaceVirtualMachineStorageMigrationPlanModel)]: row }}
   />

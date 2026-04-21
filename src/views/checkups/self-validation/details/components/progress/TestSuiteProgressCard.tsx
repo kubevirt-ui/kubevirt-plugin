@@ -1,4 +1,4 @@
-import React, { FCC, useMemo } from 'react';
+import React, { FC, useMemo } from 'react';
 
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -38,7 +38,7 @@ type TestSuiteProgressCardProps = {
   progress: TestSuiteProgress;
 };
 
-const TestSuiteProgressCard: FCC<TestSuiteProgressCardProps> = ({ progress }) => {
+const TestSuiteProgressCard: FC<TestSuiteProgressCardProps> = ({ progress }) => {
   const { t } = useKubevirtTranslation();
 
   const progressStatusMap = useMemo(

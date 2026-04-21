@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { Split, SplitItem } from '@patternfly/react-core';
 import { TemplatesCatalogFilters } from '@virtualmachines/creation-wizard/steps/TemplateStep/components/TemplatesCatalog/components/TemplatesToolbar/components/TemplatesCatalogFilters/TemplatesCatalogFilters';
@@ -13,7 +13,7 @@ type TemplatesToolbarProps = {
   onFilterChange: (type: CATALOG_FILTERS, value: boolean | string) => void;
 };
 
-const TemplatesToolbar: FCC<TemplatesToolbarProps> = ({ filters, onFilterChange }) => {
+const TemplatesToolbar: FC<TemplatesToolbarProps> = ({ filters, onFilterChange }) => {
   return (
     <Split hasGutter>
       <SplitItem>

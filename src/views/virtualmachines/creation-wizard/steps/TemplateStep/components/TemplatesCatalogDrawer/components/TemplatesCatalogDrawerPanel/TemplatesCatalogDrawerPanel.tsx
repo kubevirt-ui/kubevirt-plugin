@@ -1,4 +1,4 @@
-import React, { FCC, memo, useCallback, useState } from 'react';
+import React, { FC, memo, useCallback, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getParameters } from '@kubevirt-utils/resources/template';
@@ -11,7 +11,7 @@ import { getTemplateParametersSplit } from '@virtualmachines/creation-wizard/ste
 import ParametersSections from '../ParametersSections';
 import TemplateInfoSection from '../TemplateInfoSection';
 
-const TemplatesCatalogDrawerPanel: FCC = memo(() => {
+const TemplatesCatalogDrawerPanel: FC = memo(() => {
   const { t } = useKubevirtTranslation();
   const [activeTabKey, setActiveTabKey] = useState<TemplatesDrawerTabKey>(
     TemplatesDrawerTabKey.Details,

@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 import { Trans } from 'react-i18next';
 
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
@@ -16,7 +16,7 @@ import { PficonTemplateIcon } from '@patternfly/react-icons';
 
 import VirtualMachineTemplatesCreateButton from '../VirtualMachineTemplatesCreateButton/VirtualMachineTemplatesCreateButton';
 
-const VirtualMachineTemplatesEmptyState: FCC = () => {
+const VirtualMachineTemplatesEmptyState: FC = () => {
   const { t } = useKubevirtTranslation();
 
   return (

@@ -1,4 +1,4 @@
-import React, { FCC, MouseEventHandler, ReactNode } from 'react';
+import React, { FC, MouseEventHandler, ReactNode } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -26,7 +26,7 @@ type HelpTextIconProps = {
   size?: IconSize;
 };
 
-const HelpTextIcon: FCC<HelpTextIconProps> = ({
+const HelpTextIcon: FC<HelpTextIconProps> = ({
   bodyContent,
   buttonAriaLabel,
   className,

@@ -1,4 +1,4 @@
-import React, { FCC, useCallback, useState } from 'react';
+import React, { FC, useCallback, useState } from 'react';
 
 import { produceVMDisks } from '@catalog/utils/WizardVMContext';
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -19,7 +19,7 @@ type DiskRowActionsProps = {
   vm: V1VirtualMachine;
 };
 
-const DiskRowActions: FCC<DiskRowActionsProps> = ({ diskName, isDisabled, onUpdate, vm }) => {
+const DiskRowActions: FC<DiskRowActionsProps> = ({ diskName, isDisabled, onUpdate, vm }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);

@@ -1,4 +1,4 @@
-import React, { Dispatch, FCC, SetStateAction } from 'react';
+import React, { Dispatch, FC, SetStateAction } from 'react';
 
 import { V1CPU } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import CPUTopologyHelperText from '@kubevirt-utils/components/CPUMemoryModal/components/CPUInput/components/CPUTopologyInput/components/TotalCPUHelperText/CPUTopologyHelperText';
@@ -15,7 +15,7 @@ type CPUTopologyInputProps = {
   setCPU: Dispatch<SetStateAction<V1CPU>>;
 };
 
-const CPUTopologyInput: FCC<CPUTopologyInputProps> = ({
+const CPUTopologyInput: FC<CPUTopologyInputProps> = ({
   cpu,
   cpuLimits,
   hide,

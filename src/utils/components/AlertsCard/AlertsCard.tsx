@@ -1,4 +1,4 @@
-import React, { FCC, useMemo } from 'react';
+import React, { FC, useMemo } from 'react';
 import { Link } from 'react-router';
 import classNames from 'classnames';
 
@@ -31,7 +31,7 @@ type AlertsCardProps = {
   sortedAlerts: SimplifiedAlerts;
 };
 
-const AlertsCard: FCC<AlertsCardProps> = ({ className, isOverviewPage = false, sortedAlerts }) => {
+const AlertsCard: FC<AlertsCardProps> = ({ className, isOverviewPage = false, sortedAlerts }) => {
   const { t } = useKubevirtTranslation();
   const isAdmin = useIsAdmin();
   const [perspective] = useActivePerspective();

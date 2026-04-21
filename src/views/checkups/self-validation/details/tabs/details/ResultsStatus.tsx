@@ -1,9 +1,9 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Spinner } from '@patternfly/react-core';
 
-const ResultsStatus: FCC<{
+const ResultsStatus: FC<{
   isJobFailed: boolean;
   isLoadingResults: boolean;
   isResultsError: boolean;

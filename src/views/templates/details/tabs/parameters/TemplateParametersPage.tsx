@@ -1,4 +1,4 @@
-import React, { FCC, MouseEventHandler, useCallback, useEffect, useState } from 'react';
+import React, { FC, MouseEventHandler, useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useImmer } from 'use-immer';
 
@@ -32,7 +32,7 @@ type TemplateParametersPageProps = {
   obj?: V1Template;
 };
 
-const TemplateParametersPage: FCC<TemplateParametersPageProps> = ({ obj: template }) => {
+const TemplateParametersPage: FC<TemplateParametersPageProps> = ({ obj: template }) => {
   const { t } = useKubevirtTranslation();
   const [editableTemplate, setEditableTemplate] = useImmer(template);
 

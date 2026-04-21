@@ -1,4 +1,4 @@
-import React, { FCC, useCallback, useMemo } from 'react';
+import React, { FC, useCallback, useMemo } from 'react';
 
 import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -29,7 +29,7 @@ type TemplateDisksPageProps = {
   obj: V1Template;
 };
 
-const TemplateDisksPage: FCC<TemplateDisksPageProps> = ({ obj: template }) => {
+const TemplateDisksPage: FC<TemplateDisksPageProps> = ({ obj: template }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const [disks, disksLoaded, loadError] = useTemplateDisksTableData(template);

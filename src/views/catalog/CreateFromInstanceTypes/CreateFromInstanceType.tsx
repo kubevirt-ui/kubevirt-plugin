@@ -1,4 +1,4 @@
-import React, { FCC, useEffect, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 
 import SelectInstanceTypeSection from '@catalog/CreateFromInstanceTypes/components/SelectInstanceTypeSection/SelectInstanceTypeSection';
 import VMDetailsSection from '@catalog/CreateFromInstanceTypes/components/VMDetailsSection/VMDetailsSection';
@@ -28,7 +28,7 @@ import './CreateFromInstanceType.scss';
 
 type CreateFromInstanceTypeProps = { currentTab: CREATE_VM_TAB };
 
-const CreateFromInstanceType: FCC<CreateFromInstanceTypeProps> = ({ currentTab }) => {
+const CreateFromInstanceType: FC<CreateFromInstanceTypeProps> = ({ currentTab }) => {
   const { t } = useKubevirtTranslation();
   const cluster = useClusterParam();
   const namespace = useActiveNamespace();

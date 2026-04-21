@@ -1,4 +1,4 @@
-import React, { FCC, useMemo } from 'react';
+import React, { FC, useMemo } from 'react';
 
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -19,7 +19,7 @@ type StorageMigrationPlansWidgetProps = {
   cluster?: string;
 };
 
-const StorageMigrationPlansWidget: FCC<StorageMigrationPlansWidgetProps> = ({ cluster }) => {
+const StorageMigrationPlansWidget: FC<StorageMigrationPlansWidgetProps> = ({ cluster }) => {
   const { t } = useKubevirtTranslation();
   const { loaded, loadError, storageMigPlans } = useStorageMigrationOverviewData(cluster);
   const { basePath, isExternal, pendingUrl, runningUrl } = useStorageMigrationNavigation(cluster);

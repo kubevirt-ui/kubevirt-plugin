@@ -1,4 +1,4 @@
-import React, { FCC, useMemo } from 'react';
+import React, { FC, useMemo } from 'react';
 import { Link } from 'react-router';
 
 import { ConfigMapModel, modelToGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -26,7 +26,7 @@ import { CheckupsSelfValidationCallbacks } from './checkupsSelfValidationListDef
 
 export { ClusterCell, NamespaceCell };
 
-export const NameCell: FCC<{ row: IoK8sApiCoreV1ConfigMap }> = ({ row }) => {
+export const NameCell: FC<{ row: IoK8sApiCoreV1ConfigMap }> = ({ row }) => {
   const [hubClusterName] = useHubClusterName();
   const isACMPage = useIsACMPage();
   const cluster = getCluster(row) || hubClusterName;
@@ -44,7 +44,7 @@ export const NameCell: FCC<{ row: IoK8sApiCoreV1ConfigMap }> = ({ row }) => {
   );
 };
 
-export const StatusCell: FCC<{
+export const StatusCell: FC<{
   callbacks: CheckupsSelfValidationCallbacks;
   row: IoK8sApiCoreV1ConfigMap;
 }> = ({ callbacks, row }) => {
@@ -60,7 +60,7 @@ type TimeCellProps = {
   type: 'completion' | 'start';
 };
 
-export const TimeCell: FCC<TimeCellProps> = ({ callbacks, row, type }) => {
+export const TimeCell: FC<TimeCellProps> = ({ callbacks, row, type }) => {
   const { t } = useKubevirtTranslation();
   const jobs = callbacks.getJobByName(row?.metadata?.name, false);
   const latestJob = jobs?.[0];
@@ -73,7 +73,7 @@ export const TimeCell: FCC<TimeCellProps> = ({ callbacks, row, type }) => {
   return <>{formatStatusTimestamp(timestamp, t, NO_DATA_DASH)}</>;
 };
 
-export const SummaryCell: FCC<{
+export const SummaryCell: FC<{
   callbacks: CheckupsSelfValidationCallbacks;
   row: IoK8sApiCoreV1ConfigMap;
 }> = ({ callbacks, row }) => {
@@ -117,7 +117,7 @@ export const SummaryCell: FCC<{
   return <>{summaryText}</>;
 };
 
-export const ActionsCell: FCC<{
+export const ActionsCell: FC<{
   callbacks: CheckupsSelfValidationCallbacks;
   row: IoK8sApiCoreV1ConfigMap;
 }> = ({ callbacks, row }) => {

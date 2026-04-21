@@ -1,4 +1,4 @@
-import React, { FCC, useCallback } from 'react';
+import React, { FC, useCallback } from 'react';
 import { useNavigate } from 'react-router';
 
 import { useWizardSourceAvailable } from '@catalog/utils/useWizardSourceAvailable';
@@ -38,7 +38,7 @@ import { clearSessionStorageVM, useWizardVMContext } from '../../utils/WizardVMC
 
 import { WizardNoBootModal } from './WizardNoBootModal';
 
-export const WizardFooter: FCC<{ namespace: string }> = ({ namespace }) => {
+export const WizardFooter: FC<{ namespace: string }> = ({ namespace }) => {
   const navigate = useNavigate();
   const cluster = useClusterParam();
   const { t } = useKubevirtTranslation();

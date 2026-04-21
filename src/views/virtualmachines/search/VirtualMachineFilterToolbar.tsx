@@ -1,4 +1,4 @@
-import React, { FCC, useEffect, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 
 import AdvancedFiltersToolbarItem from '@kubevirt-utils/components/ListPageFilter/components/AdvancedFiltersToolbarItem';
 import CheckboxSelectFilter from '@kubevirt-utils/components/ListPageFilter/components/CheckboxSelectFilter';
@@ -27,7 +27,7 @@ type VirtualMachineFilterToolbarProps = {
   onFilterChange?: OnFilterChange;
 };
 
-const VirtualMachineFilterToolbar: FCC<VirtualMachineFilterToolbarProps> = ({
+const VirtualMachineFilterToolbar: FC<VirtualMachineFilterToolbarProps> = ({
   className,
   filtersWithSelect = [],
   hiddenFilters = [],

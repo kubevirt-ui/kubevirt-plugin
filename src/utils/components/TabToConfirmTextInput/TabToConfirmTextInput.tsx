@@ -1,5 +1,5 @@
 import React, {
-  FCC,
+  FC,
   FormEvent,
   KeyboardEvent,
   ReactNode,
@@ -29,7 +29,7 @@ type TabToConfirmTextInputProps = {
   value?: string;
 };
 
-const TabToConfirmTextInput: FCC<TabToConfirmTextInputProps> = ({
+const TabToConfirmTextInput: FC<TabToConfirmTextInputProps> = ({
   autoFocus = false,
   className,
   fieldId,

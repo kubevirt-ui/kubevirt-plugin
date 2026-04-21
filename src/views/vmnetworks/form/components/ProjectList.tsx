@@ -1,4 +1,4 @@
-import React, { FCC, useCallback } from 'react';
+import React, { FC, useCallback } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
 import MultiSelectTypeahead from '@kubevirt-utils/components/MultiSelectTypeahead/MultiSelectTypeahead';
@@ -18,7 +18,7 @@ type ProjectListProps = {
   projects: K8sResourceCommon[];
 };
 
-const ProjectList: FCC<ProjectListProps> = ({ errorLoadingProjects, loadedProjects, projects }) => {
+const ProjectList: FC<ProjectListProps> = ({ errorLoadingProjects, loadedProjects, projects }) => {
   const { t } = useKubevirtTranslation();
   const { control, watch } = useFormContext<VMNetworkForm>();
 

@@ -1,4 +1,4 @@
-import React, { FCC, useCallback, useState } from 'react';
+import React, { FC, useCallback, useState } from 'react';
 import { Link } from 'react-router';
 
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
@@ -33,7 +33,7 @@ type VirtualMachineMigrationStatusProps = {
   storageMigrationPlan: MultiNamespaceVirtualMachineStorageMigrationPlan;
 };
 
-const VirtualMachineMigrationStatus: FCC<VirtualMachineMigrationStatusProps> = ({
+const VirtualMachineMigrationStatus: FC<VirtualMachineMigrationStatusProps> = ({
   onClose,
   storageMigrationPlan,
 }) => {

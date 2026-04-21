@@ -1,4 +1,4 @@
-import React, { Dispatch, FCC, MouseEvent, SetStateAction, useState } from 'react';
+import React, { Dispatch, FC, MouseEvent, SetStateAction, useState } from 'react';
 
 import SelectToggle from '@kubevirt-utils/components/toggles/SelectToggle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -13,7 +13,7 @@ type AffinityTypeSelectProps = {
   setFocusedAffinity: Dispatch<SetStateAction<AffinityRowData>>;
 };
 
-const AffinityTypeSelect: FCC<AffinityTypeSelectProps> = ({
+const AffinityTypeSelect: FC<AffinityTypeSelectProps> = ({
   focusedAffinity,
   setFocusedAffinity,
 }) => {

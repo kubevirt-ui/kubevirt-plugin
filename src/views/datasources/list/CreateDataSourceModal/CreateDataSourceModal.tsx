@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router';
 
@@ -28,7 +28,7 @@ type CreateDataSourceModalProps = {
   onClose: () => void;
 };
 
-export const CreateDataSourceModal: FCC<CreateDataSourceModalProps> = ({
+export const CreateDataSourceModal: FC<CreateDataSourceModalProps> = ({
   isOpen,
   namespace,
   onClose,

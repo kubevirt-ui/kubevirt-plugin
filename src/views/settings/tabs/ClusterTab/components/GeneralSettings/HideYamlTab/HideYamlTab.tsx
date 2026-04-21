@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import SectionWithSwitch from '@kubevirt-utils/components/SectionWithSwitch/SectionWithSwitch';
 import { HIDE_YAML_TAB } from '@kubevirt-utils/hooks/useFeatures/constants';
@@ -14,7 +14,7 @@ type HideYamlTabProps = {
   newBadge?: boolean;
 };
 
-const HideYamlTab: FCC<HideYamlTabProps> = ({ newBadge = false }) => {
+const HideYamlTab: FC<HideYamlTabProps> = ({ newBadge = false }) => {
   const { t } = useKubevirtTranslation();
   const cluster = useSettingsCluster();
   const { canEdit, error, featureEnabled, loading, toggleFeature } = useFeatures(

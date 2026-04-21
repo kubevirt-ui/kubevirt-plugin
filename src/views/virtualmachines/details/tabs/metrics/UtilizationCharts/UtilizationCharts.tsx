@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import CPUThresholdChart from '@kubevirt-utils/components/Charts/CPUUtil/CPUThresholdChart';
@@ -13,7 +13,7 @@ type UtilizationChartsProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const UtilizationCharts: FCC<UtilizationChartsProps> = ({ prometheusUnavailable, vmi }) => {
+const UtilizationCharts: FC<UtilizationChartsProps> = ({ prometheusUnavailable, vmi }) => {
   const { t } = useKubevirtTranslation();
 
   return (

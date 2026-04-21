@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -14,7 +14,7 @@ type ColumnManagementProps = {
   hideColumnManagement?: boolean;
 };
 
-const ColumnManagement: FCC<ColumnManagementProps> = ({ columnLayout, hideColumnManagement }) => {
+const ColumnManagement: FC<ColumnManagementProps> = ({ columnLayout, hideColumnManagement }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
 

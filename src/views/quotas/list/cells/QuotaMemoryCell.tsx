@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { ApplicationAwareQuota } from '@kubevirt-utils/resources/quotas/types';
 
@@ -11,7 +11,7 @@ type QuotaMemoryCellProps = {
   row: ApplicationAwareQuota;
 };
 
-const QuotaMemoryCell: FCC<QuotaMemoryCellProps> = ({ callbacks, row }) => {
+const QuotaMemoryCell: FC<QuotaMemoryCellProps> = ({ callbacks, row }) => {
   const { memory } = getResourceKeysFromCallbacks(callbacks);
   const { hard, used } = getQuotaStatusData(row);
 

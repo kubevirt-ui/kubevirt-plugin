@@ -1,4 +1,4 @@
-import React, { FCC, ReactNode, useCallback, useEffect } from 'react';
+import React, { FC, ReactNode, useCallback, useEffect } from 'react';
 
 import {
   runningTourSignal,
@@ -23,7 +23,7 @@ type OnboardingPopoverProps = {
   triggerElement: HTMLElement | null;
 };
 
-const OnboardingPopover: FCC<OnboardingPopoverProps> = ({
+const OnboardingPopover: FC<OnboardingPopoverProps> = ({
   bodyContent,
   coveredByTourSteps,
   headerContent,

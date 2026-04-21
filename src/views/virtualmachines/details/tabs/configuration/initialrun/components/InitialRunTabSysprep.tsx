@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { ConfigMapModel, modelToGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
@@ -28,7 +28,7 @@ type InitialRunTabSysprepProps = {
   onSubmit?: UpdateCustomizeInstanceType;
   vm: V1VirtualMachine;
 };
-const InitialRunTabSysprep: FCC<InitialRunTabSysprepProps> = ({ canUpdateVM, onSubmit, vm }) => {
+const InitialRunTabSysprep: FC<InitialRunTabSysprepProps> = ({ canUpdateVM, onSubmit, vm }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const vmVolumes = getVolumes(vm);

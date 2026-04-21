@@ -1,4 +1,4 @@
-import React, { FCC, useMemo } from 'react';
+import React, { FC, useMemo } from 'react';
 import { useNavigate } from 'react-router';
 
 import {
@@ -23,7 +23,7 @@ type CheckupsSelfValidationActionsProps = {
   jobs: IoK8sApiBatchV1Job[];
 };
 
-const CheckupsSelfValidationActions: FCC<CheckupsSelfValidationActionsProps> = ({
+const CheckupsSelfValidationActions: FC<CheckupsSelfValidationActionsProps> = ({
   configMap,
   isKebab = false,
   jobs,

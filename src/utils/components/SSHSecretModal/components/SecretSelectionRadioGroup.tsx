@@ -1,4 +1,4 @@
-import React, { Dispatch, FCC, SetStateAction, useCallback } from 'react';
+import React, { Dispatch, FC, SetStateAction, useCallback } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Radio, Split, SplitItem } from '@patternfly/react-core';
@@ -12,7 +12,7 @@ type SecretSelectionRadioGroupProps = {
   setSSHDetails: Dispatch<SetStateAction<SSHSecretDetails>>;
 };
 
-const SecretSelectionRadioGroup: FCC<SecretSelectionRadioGroupProps> = ({
+const SecretSelectionRadioGroup: FC<SecretSelectionRadioGroupProps> = ({
   selectedOption,
   setSelectedOption,
   setSSHDetails,

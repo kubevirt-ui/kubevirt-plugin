@@ -1,4 +1,4 @@
-import React, { FCC, memo, useEffect, useState } from 'react';
+import React, { FC, memo, useEffect, useState } from 'react';
 
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
@@ -22,7 +22,7 @@ import { CATALOG_FILTERS } from '../utils/consts';
 import { hasNoDefaultUserAllFilters } from '../utils/helpers';
 import { TemplateFilters } from '../utils/types';
 
-export const TemplatesCatalogHeader: FCC<{
+export const TemplatesCatalogHeader: FC<{
   filters: TemplateFilters;
   itemCount: number;
   onFilterChange: (type: CATALOG_FILTERS, value: boolean | string) => void;

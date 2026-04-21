@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 import { Link } from 'react-router';
 
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
@@ -12,7 +12,7 @@ import { Card, CardBody, CardFooter, CardHeader, CardTitle, Icon } from '@patter
 
 import './MTVNotInstalledCard.scss';
 
-const MTVNotInstalledCard: FCC = () => {
+const MTVNotInstalledCard: FC = () => {
   const { t } = useKubevirtTranslation();
   const isAdmin = useIsAdmin();
   const [activeNamespace] = useActiveNamespace();

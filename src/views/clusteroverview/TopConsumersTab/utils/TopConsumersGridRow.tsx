@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 import classNames from 'classnames';
 
 import {
@@ -19,7 +19,7 @@ type TopConsumersGridRowProps = {
   topGrid?: boolean;
 };
 
-const TopConsumersGridRow: FCC<TopConsumersGridRowProps> = ({
+const TopConsumersGridRow: FC<TopConsumersGridRowProps> = ({
   localStorageData,
   rowNumber,
   setLocalStorageData,

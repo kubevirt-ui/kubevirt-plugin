@@ -1,4 +1,4 @@
-import React, { FCC, ReactNode } from 'react';
+import React, { FC, ReactNode } from 'react';
 import { TFunction } from 'i18next';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -25,7 +25,7 @@ type NameCellProps = {
   row: SimpleNICPresentation;
 };
 
-const NameCell: FCC<NameCellProps> = ({ row }) => {
+const NameCell: FC<NameCellProps> = ({ row }) => {
   const { t } = useKubevirtTranslation();
   const { interfaceName, isInterfaceEphemeral, isPending, network } = row;
   const nicName = network?.name;
@@ -53,7 +53,7 @@ type StateCellProps = {
   row: SimpleNICPresentation;
 };
 
-const StateCell: FCC<StateCellProps> = ({ row }) => {
+const StateCell: FC<StateCellProps> = ({ row }) => {
   const { config, configLinkState, isSRIOV, runtimeLinkState } = row;
 
   return (
@@ -68,7 +68,7 @@ type NetworkCellProps = {
   row: SimpleNICPresentation;
 };
 
-const NetworkCell: FCC<NetworkCellProps> = ({ row }) => {
+const NetworkCell: FC<NetworkCellProps> = ({ row }) => {
   const { t } = useKubevirtTranslation();
   return (
     <span data-test-id={`nic-network-${row.network?.name}`}>

@@ -1,4 +1,4 @@
-import React, { FCC, memo } from 'react';
+import React, { FC, memo } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
 import { DRAWER_FORM_ID } from '@catalog/templatescatalog/utils/consts';
@@ -20,7 +20,7 @@ import StorageSection from './StorageSection/StorageSection';
 import FieldsSections from './FieldsSections';
 import { TemplateInfoSection } from './TemplateInfoSection';
 
-export const TemplatesCatalogDrawerPanel: FCC = memo(() => {
+export const TemplatesCatalogDrawerPanel: FC = memo(() => {
   const { t } = useKubevirtTranslation();
 
   const { vm } = useDrawerContext();

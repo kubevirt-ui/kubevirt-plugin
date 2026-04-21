@@ -1,4 +1,4 @@
-import React, { FCC, useMemo } from 'react';
+import React, { FC, useMemo } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -37,7 +37,7 @@ type TestSuiteCardProps = {
   suiteName: string;
 };
 
-const TestSuiteCard: FCC<TestSuiteCardProps> = ({ isExpanded, onToggle, suiteData, suiteName }) => {
+const TestSuiteCard: FC<TestSuiteCardProps> = ({ isExpanded, onToggle, suiteData, suiteName }) => {
   const { t } = useKubevirtTranslation();
 
   const totalTests = suiteData.tests_run || 0;

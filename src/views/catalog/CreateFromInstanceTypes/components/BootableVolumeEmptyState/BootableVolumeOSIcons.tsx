@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { getIconByOSName } from '@catalog/templatescatalog/utils/os-icons';
 import { LINUX, OS_NAME_TYPES } from '@kubevirt-utils/resources/template';
@@ -6,7 +6,7 @@ import { Split, SplitItem } from '@patternfly/react-core';
 
 import './BootableVolumeEmptyState.scss';
 
-const BootableVolumeOSIcons: FCC = () => {
+const BootableVolumeOSIcons: FC = () => {
   const linuxIcon = getIconByOSName(LINUX);
   const rhelIcon = getIconByOSName(OS_NAME_TYPES.rhel);
   const windowsIcon = getIconByOSName(OS_NAME_TYPES.windows);

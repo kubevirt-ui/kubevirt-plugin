@@ -1,4 +1,4 @@
-import React, { FCC, useState } from 'react';
+import React, { FC, useState } from 'react';
 
 import ApplyStorageProfileSettings from '@kubevirt-utils/components/ApplyStorageProfileSettings/ApplyStorageProfileSettings';
 import CapacityInput from '@kubevirt-utils/components/CapacityInput/CapacityInput';
@@ -19,7 +19,7 @@ type VolumeDestinationProps = {
   setBootableVolumeField: SetBootableVolumeFieldType;
 };
 
-const VolumeDestination: FCC<VolumeDestinationProps> = ({
+const VolumeDestination: FC<VolumeDestinationProps> = ({
   bootableVolume,
   isSnapshotSourceType,
   setBootableVolumeField,

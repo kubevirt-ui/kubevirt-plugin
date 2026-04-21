@@ -1,4 +1,4 @@
-import React, { Dispatch, FCC, memo, useCallback, useEffect, useRef } from 'react';
+import React, { Dispatch, FC, memo, useCallback, useEffect, useRef } from 'react';
 
 import { ClipboardAddon } from '@xterm/addon-clipboard';
 import { FitAddon } from '@xterm/addon-fit';
@@ -20,7 +20,7 @@ type SerialConsoleConnectorProps = {
   setState: Dispatch<React.SetStateAction<ConsoleComponentState>>;
 };
 
-const SerialConsole: FCC<SerialConsoleConnectorProps> = ({ basePath, setState }) => {
+const SerialConsole: FC<SerialConsoleConnectorProps> = ({ basePath, setState }) => {
   const xtermRef = useRef<Terminal>(null);
   const terminalRef = useRef(null);
   const resizeListenerRef = useRef(null);

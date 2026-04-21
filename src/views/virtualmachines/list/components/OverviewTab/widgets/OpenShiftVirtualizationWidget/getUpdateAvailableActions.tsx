@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 import { Link } from 'react-router';
 
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
@@ -12,7 +12,7 @@ type UpdateAvailableActionProps = {
   updateAvailable: boolean;
 };
 
-const UpdateAvailableAction: FCC<UpdateAvailableActionProps> = ({
+const UpdateAvailableAction: FC<UpdateAvailableActionProps> = ({
   isSpokeCluster,
   operatorLink,
   operatorLinkExternal,

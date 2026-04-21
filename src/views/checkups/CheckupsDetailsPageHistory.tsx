@@ -1,4 +1,4 @@
-import React, { FCC, ReactNode, useMemo } from 'react';
+import React, { FC, ReactNode, useMemo } from 'react';
 
 import { IoK8sApiBatchV1Job } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
@@ -20,7 +20,7 @@ type CheckupsDetailsPageHistoryProps = {
   loaded: boolean;
 };
 
-const CheckupsDetailsPageHistory: FCC<CheckupsDetailsPageHistoryProps> = ({
+const CheckupsDetailsPageHistory: FC<CheckupsDetailsPageHistoryProps> = ({
   customActions,
   error,
   initialSortDirection,

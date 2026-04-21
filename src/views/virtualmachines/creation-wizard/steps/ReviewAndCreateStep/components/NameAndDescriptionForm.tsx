@@ -1,4 +1,4 @@
-import React, { FCC, useState } from 'react';
+import React, { FC, useState } from 'react';
 import { Trans } from 'react-i18next';
 
 import TabToConfirmTextInput from '@kubevirt-utils/components/TabToConfirmTextInput/TabToConfirmTextInput';
@@ -12,7 +12,7 @@ import { isCloneCreationMethod } from '@virtualmachines/creation-wizard/utils/ut
 
 import './NameAndDescriptionForm.scss';
 
-const NameAndDescriptionForm: FCC = () => {
+const NameAndDescriptionForm: FC = () => {
   const { t } = useKubevirtTranslation();
   const {
     cloneVMDescription,

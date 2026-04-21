@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import PendingChangesBreadcrumb from '@kubevirt-utils/components/PendingChanges/PendingChangesBreadcrumb/PendingChangesBreadcrumb';
 import { PendingChange } from '@kubevirt-utils/components/PendingChanges/utils/types';
@@ -9,7 +9,7 @@ type PendingChangesProps = {
   pendingChanges: PendingChange[];
 };
 
-const PendingChanges: FCC<PendingChangesProps> = ({ pendingChanges }) => {
+const PendingChanges: FC<PendingChangesProps> = ({ pendingChanges }) => {
   const { t } = useKubevirtTranslation();
 
   return (

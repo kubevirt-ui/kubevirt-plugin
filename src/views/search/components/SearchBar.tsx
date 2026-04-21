@@ -1,4 +1,4 @@
-import React, { FCC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
@@ -32,7 +32,7 @@ type SearchBarProps = {
   vmsLoaded: boolean;
 };
 
-const SearchBar: FCC<SearchBarProps> = ({ onFilterChange, vmis, vmisLoaded, vms, vmsLoaded }) => {
+const SearchBar: FC<SearchBarProps> = ({ onFilterChange, vmis, vmisLoaded, vms, vmsLoaded }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const namespace = useNamespaceParam();

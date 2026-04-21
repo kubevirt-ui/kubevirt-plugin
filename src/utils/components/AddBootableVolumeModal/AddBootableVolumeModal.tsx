@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { InstanceTypeVMStoreActions } from '@catalog/CreateFromInstanceTypes/state/utils/types';
 import AddBootableVolumeBody from '@kubevirt-utils/components/AddBootableVolumeModal/components/AddBootableVolumeBody';
@@ -18,7 +18,7 @@ type AddBootableVolumeModalProps = {
   onCreateVolume?: InstanceTypeVMStoreActions['onSelectCreatedVolume'];
 };
 
-const AddBootableVolumeModal: FCC<AddBootableVolumeModalProps> = ({
+const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
   isOpen,
   onClose,
   onCreateVolume,

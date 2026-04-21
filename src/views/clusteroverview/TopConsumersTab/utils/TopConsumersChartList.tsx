@@ -1,4 +1,4 @@
-import React, { FCC, useMemo } from 'react';
+import React, { FC, useMemo } from 'react';
 
 import LoadingEmptyState from '@kubevirt-utils/components/LoadingEmptyState/LoadingEmptyState';
 import { ALL_CLUSTERS_KEY } from '@kubevirt-utils/hooks/constants';
@@ -31,7 +31,7 @@ type TopConsumersChartListProps = {
   scope: TopConsumerScope;
 };
 
-export const TopConsumersChartList: FCC<TopConsumersChartListProps> = ({
+export const TopConsumersChartList: FC<TopConsumersChartListProps> = ({
   localStorageData,
   metric,
   scope,

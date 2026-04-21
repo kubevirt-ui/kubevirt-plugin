@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -8,7 +8,7 @@ type DescriptionItemClusterProps = {
   resource: K8sResourceCommon;
 };
 
-const DescriptionItemCluster: FCC<DescriptionItemClusterProps> = ({ resource }) => {
+const DescriptionItemCluster: FC<DescriptionItemClusterProps> = ({ resource }) => {
   const { t } = useKubevirtTranslation();
 
   const cluster = getCluster(resource);

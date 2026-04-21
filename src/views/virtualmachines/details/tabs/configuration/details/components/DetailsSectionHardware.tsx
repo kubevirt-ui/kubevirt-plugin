@@ -1,4 +1,4 @@
-import React, { FCC, useEffect } from 'react';
+import React, { FC, useEffect } from 'react';
 import { useLocation } from 'react-router';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -24,7 +24,7 @@ type DetailsSectionHardwareProps = {
   vmi?: V1VirtualMachineInstance;
 };
 
-const DetailsSectionHardware: FCC<DetailsSectionHardwareProps> = ({
+const DetailsSectionHardware: FC<DetailsSectionHardwareProps> = ({
   onSubmit: onSubmitProp,
   vm,
   vmi,

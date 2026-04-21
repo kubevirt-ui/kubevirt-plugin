@@ -1,4 +1,4 @@
-import React, { FCC, useState } from 'react';
+import React, { FC, useState } from 'react';
 import produce from 'immer';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -17,7 +17,7 @@ import { BootOrderModalBody } from './BootOrderModalBody';
 
 import './boot-order.scss';
 
-const BootOrderModal: FCC<{
+const BootOrderModal: FC<{
   instanceTypeVM: V1VirtualMachine;
   isOpen: boolean;
   onClose: () => void;

@@ -1,4 +1,4 @@
-import React, { FCC, FormEvent, MouseEvent, useEffect, useState } from 'react';
+import React, { FC, FormEvent, MouseEvent, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
@@ -31,7 +31,7 @@ type ConfigurationSearchProps = {
   searchItems: SearchItemWithTab[];
 };
 
-const ConfigurationSearch: FCC<ConfigurationSearchProps> = ({
+const ConfigurationSearch: FC<ConfigurationSearchProps> = ({
   createSearchURL,
   placeholder,
   searchItems,

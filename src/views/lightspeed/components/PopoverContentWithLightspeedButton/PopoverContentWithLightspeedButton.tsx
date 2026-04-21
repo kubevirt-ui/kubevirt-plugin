@@ -1,4 +1,4 @@
-import React, { FCC, ReactNode } from 'react';
+import React, { FC, ReactNode } from 'react';
 
 import LightspeedPopoverContentFooter from '@lightspeed/components/LightspeedPopoverContentFooter';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
@@ -14,7 +14,7 @@ type PopoverContentWithLightspeedButtonProps = {
   promptType: OLSPromptType;
 };
 
-const PopoverContentWithLightspeedButton: FCC<PopoverContentWithLightspeedButtonProps> = ({
+const PopoverContentWithLightspeedButton: FC<PopoverContentWithLightspeedButtonProps> = ({
   breadcrumb,
   content,
   hide,

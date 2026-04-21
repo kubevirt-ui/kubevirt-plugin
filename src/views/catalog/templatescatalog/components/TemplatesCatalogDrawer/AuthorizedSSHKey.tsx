@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import useTemplateSecrets from '@catalog/templatescatalog/components/TemplatesCatalogDrawer/hooks/useTemplateSecrets/useTemplateSecrets';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
@@ -12,7 +12,7 @@ type AuthorizedSSHKeyProps = {
   authorizedSSHKey: string;
   namespace: string;
 };
-const AuthorizedSSHKey: FCC<AuthorizedSSHKeyProps> = ({ authorizedSSHKey, namespace }) => {
+const AuthorizedSSHKey: FC<AuthorizedSSHKeyProps> = ({ authorizedSSHKey, namespace }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const cluster = useClusterParam();

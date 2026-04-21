@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -13,7 +13,7 @@ type QuotaCalculationMethodTermProps = {
   calculationMethodContentMapper: CalculationMethodContentMapper;
 };
 
-const QuotaCalculationMethodTerm: FCC<QuotaCalculationMethodTermProps> = ({
+const QuotaCalculationMethodTerm: FC<QuotaCalculationMethodTermProps> = ({
   calculationMethodContentMapper,
 }) => {
   const { t } = useKubevirtTranslation();

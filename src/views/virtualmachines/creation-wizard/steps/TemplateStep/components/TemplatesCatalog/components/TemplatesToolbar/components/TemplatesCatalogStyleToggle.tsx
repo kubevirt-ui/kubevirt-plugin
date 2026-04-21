@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { ToggleGroup, ToggleGroupItem } from '@patternfly/react-core';
 import { ListIcon, ThIcon } from '@patternfly/react-icons';
@@ -10,7 +10,7 @@ type TemplatesCatalogStyleToggleProps = {
   onFilterChange: (type: CATALOG_FILTERS, value: boolean | string) => void;
 };
 
-const TemplatesCatalogStyleToggle: FCC<TemplatesCatalogStyleToggleProps> = ({
+const TemplatesCatalogStyleToggle: FC<TemplatesCatalogStyleToggleProps> = ({
   filters,
   onFilterChange,
 }) => {

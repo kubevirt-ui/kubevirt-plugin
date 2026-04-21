@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 import { useLocation } from 'react-router';
 
 import { V1alpha1MigrationPolicy } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -12,7 +12,7 @@ type MigrationPolicyDetailsPageProps = {
   obj: V1alpha1MigrationPolicy;
 };
 
-const MigrationPolicyDetailsPage: FCC<MigrationPolicyDetailsPageProps> = ({ obj: mp }) => {
+const MigrationPolicyDetailsPage: FC<MigrationPolicyDetailsPageProps> = ({ obj: mp }) => {
   const location = useLocation();
   return (
     <div className="migration-policy-details-page">

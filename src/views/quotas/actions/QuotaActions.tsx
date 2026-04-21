@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import ActionsDropdown from '@kubevirt-utils/components/ActionsDropdown/ActionsDropdown';
 import { ApplicationAwareQuota } from '@kubevirt-utils/resources/quotas/types';
@@ -10,7 +10,7 @@ type QuotaActionProps = {
   quota: ApplicationAwareQuota;
 };
 
-const QuotaActions: FCC<QuotaActionProps> = ({ isKebabToggle, quota }) => {
+const QuotaActions: FC<QuotaActionProps> = ({ isKebabToggle, quota }) => {
   const actions = useQuotaActions(quota);
 
   return <ActionsDropdown actions={actions} isKebabToggle={isKebabToggle} />;

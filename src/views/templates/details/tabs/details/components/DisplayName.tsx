@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 import produce from 'immer';
 import { ANNOTATIONS } from 'src/views/templates/utils/constants';
 
@@ -14,7 +14,7 @@ import { TemplateDetailsGridProps } from '../TemplateDetailsPage';
 
 import DisplayNameModal from './DisplayNameModal';
 
-const DisplayName: FCC<TemplateDetailsGridProps> = ({ editable, template }) => {
+const DisplayName: FC<TemplateDetailsGridProps> = ({ editable, template }) => {
   const { createModal } = useModal();
   const { t } = useKubevirtTranslation();
   const displayName = template?.metadata?.annotations?.[ANNOTATIONS.displayName];

@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -15,7 +15,7 @@ type ResourceManagementSectionProps = {
   newBadge?: boolean;
 };
 
-const ResourceManagementSection: FCC<ResourceManagementSectionProps> = ({
+const ResourceManagementSection: FC<ResourceManagementSectionProps> = ({
   hyperConvergeConfiguration,
   newBadge,
 }) => {

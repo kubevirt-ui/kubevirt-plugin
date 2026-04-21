@@ -1,4 +1,4 @@
-import React, { FCC, useState } from 'react';
+import React, { FC, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { VM_STATUS } from '@kubevirt-utils/resources/vm/utils/vmStatus';
@@ -28,7 +28,7 @@ type VMAdditionalStatusesProps = {
   otherStatusesCount: number;
 };
 
-const VMAdditionalStatuses: FCC<VMAdditionalStatusesProps> = ({
+const VMAdditionalStatuses: FC<VMAdditionalStatusesProps> = ({
   activeNamespace,
   enabledClusters,
   otherStatuses,

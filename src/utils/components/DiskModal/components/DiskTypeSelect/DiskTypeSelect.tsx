@@ -1,4 +1,4 @@
-import React, { FCC, useRef } from 'react';
+import React, { FC, useRef } from 'react';
 import { useFormContext } from 'react-hook-form';
 
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
@@ -21,7 +21,7 @@ type DiskTypeSelectProps = {
   isVMRunning?: boolean;
 };
 
-const DiskTypeSelect: FCC<DiskTypeSelectProps> = ({ isVMRunning }) => {
+const DiskTypeSelect: FC<DiskTypeSelectProps> = ({ isVMRunning }) => {
   const { t } = useKubevirtTranslation();
   const { setValue, watch } = useFormContext<V1DiskFormState>();
 

@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import ArchitectureLabel from '@kubevirt-utils/components/ArchitectureLabel/ArchitectureLabel';
@@ -35,7 +35,7 @@ type TemplatesTableRowProps = {
   template: Template;
 };
 
-const TemplatesTableRow: FCC<TemplatesTableRowProps> = ({
+const TemplatesTableRow: FC<TemplatesTableRowProps> = ({
   activeColumnIDs,
   availableDatasources,
   availableTemplatesUID,

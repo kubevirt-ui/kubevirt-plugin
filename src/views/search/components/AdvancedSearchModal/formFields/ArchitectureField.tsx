@@ -1,4 +1,4 @@
-import React, { FCC, useMemo } from 'react';
+import React, { FC, useMemo } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import MultiSelectTypeahead from '@kubevirt-utils/components/MultiSelectTypeahead/MultiSelectTypeahead';
@@ -13,7 +13,7 @@ type ArchitectureFieldProps = {
   vms: V1VirtualMachine[];
 };
 
-const ArchitectureField: FCC<ArchitectureFieldProps> = ({ vms }) => {
+const ArchitectureField: FC<ArchitectureFieldProps> = ({ vms }) => {
   const { t } = useKubevirtTranslation();
   const { setValue, value } = useAdvancedSearchField(VirtualMachineRowFilterType.Architecture);
 

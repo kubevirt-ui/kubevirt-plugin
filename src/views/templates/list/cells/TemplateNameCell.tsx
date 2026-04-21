@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
@@ -19,7 +19,7 @@ type TemplateNameCellProps = {
   row: TemplateOrRequest;
 };
 
-const TemplateNameCell: FCC<TemplateNameCellProps> = ({ row }) => {
+const TemplateNameCell: FC<TemplateNameCellProps> = ({ row }) => {
   const { t } = useKubevirtTranslation();
   const clusterParam = useClusterParam();
 

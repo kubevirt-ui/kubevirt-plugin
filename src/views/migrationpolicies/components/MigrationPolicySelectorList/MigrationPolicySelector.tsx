@@ -1,4 +1,4 @@
-import React, { FCC, memo } from 'react';
+import React, { FC, memo } from 'react';
 import classNames from 'classnames';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -12,7 +12,7 @@ type MigrationPolicySelectorProps = {
   value: string;
 };
 
-export const MigrationPolicySelector: FCC<MigrationPolicySelectorProps> = memo(
+export const MigrationPolicySelector: FC<MigrationPolicySelectorProps> = memo(
   ({ isVMILabel, matchKey, value }) => {
     const { t } = useKubevirtTranslation();
     const labelBodyContent = `${matchKey}: ${value}`;

@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { Card, CardBody, Skeleton, Split, SplitItem } from '@patternfly/react-core';
 
@@ -10,7 +10,7 @@ type ResourceTileProps = {
   label: string;
 };
 
-const ResourceTile: FCC<ResourceTileProps> = ({ count, isLoading, label }) => (
+const ResourceTile: FC<ResourceTileProps> = ({ count, isLoading, label }) => (
   <Card className="cluster-resources-card__tile">
     <CardBody className="cluster-resources-card__tile-body">
       <Split className="cluster-resources-card__tile-split" hasGutter>

@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
@@ -11,7 +11,7 @@ type MemoryPercentageProps = {
   vmiMemory: string;
 };
 
-const MemoryPercentage: FCC<MemoryPercentageProps> = ({ vm, vmiMemory }) => {
+const MemoryPercentage: FC<MemoryPercentageProps> = ({ vm, vmiMemory }) => {
   const memoryUsagePercentage = getMemoryUsagePercentage(vm, vmiMemory);
 
   if (isEmpty(memoryUsagePercentage) || !isRunning(vm)) return <span>{NO_DATA_DASH}</span>;

@@ -1,11 +1,11 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { NamespaceModel } from '@kubevirt-utils/models';
 import { getGroupVersionKindForModel, ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
 import { Flex } from '@patternfly/react-core';
 
-const InvalidNADNamespace: FCC<{ allowedNamespaces: string[] }> = ({ allowedNamespaces }) => {
+const InvalidNADNamespace: FC<{ allowedNamespaces: string[] }> = ({ allowedNamespaces }) => {
   const { t } = useKubevirtTranslation();
   return (
     <Flex direction={{ default: 'column' }} gap={{ default: 'gapXs' }}>

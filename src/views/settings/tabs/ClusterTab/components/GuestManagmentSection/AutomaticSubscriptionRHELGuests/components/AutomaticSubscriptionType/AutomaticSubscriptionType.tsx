@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import { SelectOption } from '@patternfly/react-core';
@@ -13,7 +13,7 @@ type AutomaticSubscriptionTypeProps = {
   updateSubscriptionType: (obj: { type: string }) => void;
 };
 
-const AutomaticSubscriptionType: FCC<AutomaticSubscriptionTypeProps> = ({
+const AutomaticSubscriptionType: FC<AutomaticSubscriptionTypeProps> = ({
   selected = selectItems[0],
   setSelected,
   updateSubscriptionType,

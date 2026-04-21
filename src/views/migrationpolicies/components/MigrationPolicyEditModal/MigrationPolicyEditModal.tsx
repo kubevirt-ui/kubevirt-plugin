@@ -1,4 +1,4 @@
-import React, { FCC, useMemo, useState } from 'react';
+import React, { FC, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 
 import { MigrationPolicyModel } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -27,7 +27,7 @@ type MigrationPolicyEditModalProps = {
   onClose: () => void;
 };
 
-const MigrationPolicyEditModal: FCC<MigrationPolicyEditModalProps> = ({ isOpen, mp, onClose }) => {
+const MigrationPolicyEditModal: FC<MigrationPolicyEditModalProps> = ({ isOpen, mp, onClose }) => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
   const location = useLocation();

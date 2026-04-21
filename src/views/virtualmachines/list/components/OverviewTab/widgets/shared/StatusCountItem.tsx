@@ -1,4 +1,4 @@
-import React, { FCC, ReactNode } from 'react';
+import React, { FC, ReactNode } from 'react';
 import classNames from 'classnames';
 
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
@@ -27,7 +27,7 @@ export const getLinkProps = (
   isExternal: boolean,
 ): Pick<StatusCountItemProps, 'href' | 'isExternal'> => ({ href: url, isExternal });
 
-const StatusCountItem: FCC<StatusCountItemProps> = ({
+const StatusCountItem: FC<StatusCountItemProps> = ({
   className,
   count,
   helpContent,

@@ -1,9 +1,9 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Panel, PanelMain, PanelMainBody, Title } from '@patternfly/react-core';
 
-const CheckupsNotFound: FCC = () => {
+const CheckupsNotFound: FC = () => {
   const { t } = useKubevirtTranslation();
 
   return (

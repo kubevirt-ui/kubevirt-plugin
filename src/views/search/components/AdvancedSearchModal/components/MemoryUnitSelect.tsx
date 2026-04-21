@@ -1,4 +1,4 @@
-import React, { FCC, useMemo } from 'react';
+import React, { FC, useMemo } from 'react';
 
 import {
   CAPACITY_UNITS,
@@ -13,7 +13,7 @@ type MemoryUnitSelectProps = {
   selected: CAPACITY_UNITS;
 };
 
-const MemoryUnitSelect: FCC<MemoryUnitSelectProps> = ({
+const MemoryUnitSelect: FC<MemoryUnitSelectProps> = ({
   'data-test': dataTest,
   onSelect,
   selected,

@@ -1,4 +1,4 @@
-import React, { FCC, memo } from 'react';
+import React, { FC, memo } from 'react';
 import { useLocation } from 'react-router';
 
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
@@ -8,7 +8,7 @@ import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverCo
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { Title } from '@patternfly/react-core';
 
-const EnvironmentFormTitle: FCC = memo(() => {
+const EnvironmentFormTitle: FC = memo(() => {
   const { t } = useKubevirtTranslation();
   const location = useLocation();
 

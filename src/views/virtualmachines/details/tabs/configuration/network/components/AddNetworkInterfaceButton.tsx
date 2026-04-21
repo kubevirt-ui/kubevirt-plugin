@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 import classNames from 'classnames';
 
 import {
@@ -24,7 +24,7 @@ type AddNetworkInterfaceButtonProps = {
   vmi?: V1VirtualMachineInstance;
 };
 
-const AddNetworkInterfaceButton: FCC<AddNetworkInterfaceButtonProps> = ({
+const AddNetworkInterfaceButton: FC<AddNetworkInterfaceButtonProps> = ({
   onAddNetworkInterface,
   vm,
   vmi,

@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 import { useParams } from 'react-router';
 
 import {
@@ -37,7 +37,7 @@ type SysPrepItemProps = {
   template: V1Template;
 };
 
-const SysPrepItem: FCC<SysPrepItemProps> = ({ template }) => {
+const SysPrepItem: FC<SysPrepItemProps> = ({ template }) => {
   const { ns: namespace } = useParams<{ ns: string }>();
   const { isTemplateEditable } = useEditTemplateAccessReview(template);
   const vm = getTemplateVirtualMachineObject(template);

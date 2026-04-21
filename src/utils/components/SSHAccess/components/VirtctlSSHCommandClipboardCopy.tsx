@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -13,7 +13,7 @@ type VirtctlSSHCommandClipboardCopyProps = {
   vm: V1VirtualMachine;
 };
 
-const VirtctlSSHCommandClipboardCopy: FCC<VirtctlSSHCommandClipboardCopyProps> = ({
+const VirtctlSSHCommandClipboardCopy: FC<VirtctlSSHCommandClipboardCopyProps> = ({
   isNamespaceManagedByUDN,
   vm,
 }) => {

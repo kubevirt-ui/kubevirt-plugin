@@ -1,4 +1,4 @@
-import React, { FCC, JSX } from 'react';
+import React, { FC, JSX } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { MenuSearch, MenuSearchInput, TextInput } from '@patternfly/react-core';
@@ -12,7 +12,7 @@ type FilterProps = {
   onFilterChange: (filterText: string) => void;
 };
 
-const Filter: FCC<FilterProps> = ({
+const Filter: FC<FilterProps> = ({
   config,
   filterRef,
   filterText,

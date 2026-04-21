@@ -1,4 +1,4 @@
-import React, { Dispatch, FCC, FormEvent, SetStateAction, useState } from 'react';
+import React, { Dispatch, FC, FormEvent, SetStateAction, useState } from 'react';
 
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -13,7 +13,7 @@ type NetworkInterfaceMacAddressInputProps = {
   setIsError: Dispatch<SetStateAction<boolean>>;
 };
 
-const NetworkInterfaceMacAddressInput: FCC<NetworkInterfaceMacAddressInputProps> = ({
+const NetworkInterfaceMacAddressInput: FC<NetworkInterfaceMacAddressInputProps> = ({
   interfaceMACAddress,
   isDisabled,
   setInterfaceMACAddress,

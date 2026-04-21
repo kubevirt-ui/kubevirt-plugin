@@ -1,4 +1,4 @@
-import React, { FCC, useMemo } from 'react';
+import React, { FC, useMemo } from 'react';
 
 import { VirtualMachineInstanceModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -23,7 +23,7 @@ type VirtualMachinesInstancesListProps = {
   namespace: string;
 };
 
-const VirtualMachinesInstancesList: FCC<VirtualMachinesInstancesListProps> = ({ namespace }) => {
+const VirtualMachinesInstancesList: FC<VirtualMachinesInstancesListProps> = ({ namespace }) => {
   const { t } = useKubevirtTranslation();
   const cluster = useClusterParam();
   const catalogURL = getCatalogURL(cluster, namespace || DEFAULT_NAMESPACE);

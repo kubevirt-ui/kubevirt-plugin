@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 import { Link } from 'react-router';
 import xbytes from 'xbytes';
 
@@ -42,7 +42,7 @@ type MemoryThresholdChartProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const MemoryThresholdChart: FCC<MemoryThresholdChartProps> = ({ vmi }) => {
+const MemoryThresholdChart: FC<MemoryThresholdChartProps> = ({ vmi }) => {
   const { currentTime, duration, timespan } = useDuration();
 
   const { query, queryLink } = useVMQuery(vmi, VMQueries.MEMORY_USAGE);

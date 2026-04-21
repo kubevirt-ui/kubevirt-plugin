@@ -1,4 +1,4 @@
-import React, { FCC, useState } from 'react';
+import React, { FC, useState } from 'react';
 import { useNavigate } from 'react-router';
 
 import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
@@ -19,7 +19,7 @@ type CheckupsStorageFormActionsProps = {
   timeOut: string;
 };
 
-const CheckupsStorageFormActions: FCC<CheckupsStorageFormActionsProps> = ({
+const CheckupsStorageFormActions: FC<CheckupsStorageFormActionsProps> = ({
   advancedSettings,
   checkupImage,
   name,

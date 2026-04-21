@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { COMMON_INSTANCETYPES } from '@kubevirt-utils/resources/bootableresources/constants';
@@ -11,7 +11,7 @@ type RedHatLabelProps<T extends K8sResourceCommon = K8sResourceCommon> = {
   obj: T;
 };
 
-const RedHatLabel: FCC<RedHatLabelProps> = ({ obj }) => {
+const RedHatLabel: FC<RedHatLabelProps> = ({ obj }) => {
   const { t } = useKubevirtTranslation();
 
   if (getLabel(obj, APP_NAME_LABEL) !== COMMON_INSTANCETYPES) return null;
