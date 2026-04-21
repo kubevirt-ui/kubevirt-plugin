@@ -56,7 +56,11 @@ const getDuration = (ms: number) => {
 export const isValid = (dateTime: Date): boolean =>
   dateTime instanceof Date && !isNaN(dateTime.valueOf());
 
-export const fromNow = (dateTime: Date | string, now?: Date, options?) => {
+export const fromNow = (
+  dateTime: Date | string,
+  now?: Date,
+  options?: Partial<{ omitSuffix: boolean }>,
+) => {
   // Check for null. If dateTime is null, it returns incorrect date Jan 1 1970.
   if (!dateTime) {
     return '-';

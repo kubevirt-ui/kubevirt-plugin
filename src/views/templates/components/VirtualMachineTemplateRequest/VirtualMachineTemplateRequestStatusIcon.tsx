@@ -13,9 +13,9 @@ type VirtualMachineTemplateRequestStatusIconProps = {
   vmtr: V1alpha1VirtualMachineTemplateRequest;
 };
 
-const VirtualMachineTemplateRequestStatusIcon: FCC<VirtualMachineTemplateRequestStatusIconProps> = ({
-  vmtr,
-}) => {
+const VirtualMachineTemplateRequestStatusIcon: FCC<
+  VirtualMachineTemplateRequestStatusIconProps
+> = ({ vmtr }) => {
   const { t } = useKubevirtTranslation();
   const status = getVMTemplateRequestStatus(vmtr);
   const message = getVMTemplateRequestStatusMessage(vmtr);

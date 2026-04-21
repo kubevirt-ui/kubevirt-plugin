@@ -10,7 +10,9 @@ import { MoreInformationDefaultProps } from '../utils/types';
 
 import Detail from './Detail';
 
-const MoreInformationDefault: React.FCC<MoreInformationDefaultProps> = ({ textMoreInfoContent }) => {
+const MoreInformationDefault: React.FCC<MoreInformationDefaultProps> = ({
+  textMoreInfoContent,
+}) => {
   const { t } = useKubevirtTranslation();
   return (
     <>

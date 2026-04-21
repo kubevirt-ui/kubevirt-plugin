@@ -15,7 +15,10 @@ type NetworkBreakdownPopoverProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const NetworkBreakdownPopover: React.FCC<NetworkBreakdownPopoverProps> = ({ networkTotal, vmi }) => {
+const NetworkBreakdownPopover: React.FCC<NetworkBreakdownPopoverProps> = ({
+  networkTotal,
+  vmi,
+}) => {
   const { t } = useKubevirtTranslation();
 
   const interfacesNames = useMemo(() => vmi?.spec?.domain?.devices?.interfaces, [vmi]);

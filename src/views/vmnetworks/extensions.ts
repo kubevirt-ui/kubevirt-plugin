@@ -1,7 +1,7 @@
 import type { RoutePage } from '@openshift-console/dynamic-plugin-sdk';
 import type {
-  EncodedExtension,
   ConsolePluginBuildMetadata,
+  EncodedExtension,
 } from '@openshift-console/dynamic-plugin-sdk-webpack';
 
 import { VM_NETWORKS_OTHER_TYPES_PATH, VM_NETWORKS_PATH } from './constants';

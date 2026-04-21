@@ -1,4 +1,4 @@
-import React, { ComponentType, ReactNode } from 'react';
+import React, { ComponentType } from 'react';
 
 import { ACMVirtualMachineAction } from '@kubevirt-extensions/acm.virtualmachine';
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -14,8 +14,9 @@ export function buildACMVirtualMachineActionsFromExtensions(
 ): ActionDropdownItemType[] {
   if (!actionExtensions?.length) return [];
 
-  return actionExtensions.map((action) => {
+  return actionExtensions.map<ActionDropdownItemType>((action) => {
     const ModalComp = action.properties.component as ComponentType<any>;
+
     return {
       cta: () =>
         createModal(({ isOpen, onClose }) => (
@@ -32,7 +33,7 @@ export function buildACMVirtualMachineActionsFromExtensions(
           ? action.properties.isDisabled(virtualMachine)
           : action.properties.isDisabled,
       id: action.properties.id,
-      label: action.properties.title as ReactNode,
+      label: action.properties.title as ACMVirtualMachineAction['properties']['title'],
     };
   });
 }

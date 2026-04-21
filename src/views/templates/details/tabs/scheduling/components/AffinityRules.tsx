@@ -9,7 +9,11 @@ import { getAffinityRules } from '@kubevirt-utils/resources/vmi';
 
 import AffinityRulesModal from './AffinityRulesModal';
 
-const AffinityRules: React.FCC<TemplateSchedulingGridProps> = ({ editable, onSubmit, template }) => {
+const AffinityRules: React.FCC<TemplateSchedulingGridProps> = ({
+  editable,
+  onSubmit,
+  template,
+}) => {
   const { createModal } = useModal();
   const { t } = useKubevirtTranslation();
   const rulesCount = t('{{rules}} Affinity rules', {

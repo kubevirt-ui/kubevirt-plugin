@@ -1,5 +1,5 @@
-import { TFunction } from 'i18next';
 import { NavigateFunction } from 'react-router';
+import { TFunction } from 'i18next';
 
 import { ActionDropdownItemType } from '@kubevirt-utils/components/ActionsDropdown/constants';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';

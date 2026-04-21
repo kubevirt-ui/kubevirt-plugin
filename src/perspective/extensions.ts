@@ -1,7 +1,7 @@
 import type { Perspective } from '@openshift-console/dynamic-plugin-sdk';
 import type {
-  EncodedExtension,
   ConsolePluginBuildMetadata,
+  EncodedExtension,
 } from '@openshift-console/dynamic-plugin-sdk-webpack';
 
 import { PERSPECTIVES } from '../utils/constants/constants';

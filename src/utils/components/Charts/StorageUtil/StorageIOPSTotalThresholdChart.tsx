@@ -37,7 +37,9 @@ type StorageIOPSTotalThresholdChartProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const StorageIOPSTotalThresholdChart: React.FCC<StorageIOPSTotalThresholdChartProps> = ({ vmi }) => {
+const StorageIOPSTotalThresholdChart: React.FCC<StorageIOPSTotalThresholdChartProps> = ({
+  vmi,
+}) => {
   const { currentTime, duration, timespan } = useDuration();
 
   const { query, queryLink } = useVMQuery(vmi, VMQueries.STORAGE_IOPS_TOTAL);

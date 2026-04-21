@@ -97,12 +97,12 @@ export const migrateVMs = async ({
     };
 
     // TODO: properly type migrationsPerVM
-    const migrationsPerVM = groupBy(migrations, 'vmName');
+    const migrationsPerVM: Record<string, any[]> = groupBy(migrations, 'vmName');
 
     Object.entries(migrationsPerVM).forEach(([vmName, vmMigrations]) => {
       namespaceMigrations.virtualMachines.push({
         name: vmName,
-        targetMigrationPVCs: (vmMigrations as any[]).map((migration) => ({
+        targetMigrationPVCs: vmMigrations.map((migration) => ({
           destinationPVC: {
             storageClassName: destinationStorageClass,
           },

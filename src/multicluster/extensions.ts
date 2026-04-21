@@ -7,8 +7,8 @@ import {
   StandaloneRoutePage,
 } from '@openshift-console/dynamic-plugin-sdk';
 import type {
-  EncodedExtension,
   ConsolePluginBuildMetadata,
+  EncodedExtension,
 } from '@openshift-console/dynamic-plugin-sdk-webpack';
 import { ResourceRoute } from '@stolostron/multicluster-sdk';
 

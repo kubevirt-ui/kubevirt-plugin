@@ -1,5 +1,6 @@
-import { OS_NAME_LABELS } from '@kubevirt-utils/resources/template';
 import { TFunction } from 'i18next';
+
+import { OS_NAME_LABELS } from '@kubevirt-utils/resources/template';
 
 import { getOSFilter } from '../getOSFilter';
 

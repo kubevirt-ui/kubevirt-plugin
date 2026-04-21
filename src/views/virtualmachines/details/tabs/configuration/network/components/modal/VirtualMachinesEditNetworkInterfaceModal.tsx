@@ -1,6 +1,6 @@
+import React, { FCC, useCallback } from 'react';
 import produce from 'immer';
 import { VirtualMachineModel } from 'src/views/dashboard-extensions/utils';
-import React, { FCC, useCallback } from 'react';
 
 import { V1Interface, V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import NetworkInterfaceModal from '@kubevirt-utils/components/NetworkInterfaceModal/NetworkInterfaceModal';

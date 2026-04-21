@@ -41,7 +41,9 @@ type StorageWriteLatencyAvgMaxChartProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const StorageWriteLatencyAvgMaxChart: React.FCC<StorageWriteLatencyAvgMaxChartProps> = ({ vmi }) => {
+const StorageWriteLatencyAvgMaxChart: React.FCC<StorageWriteLatencyAvgMaxChartProps> = ({
+  vmi,
+}) => {
   const { currentTime, duration, timespan } = useDuration();
   const { height, ref, width } = useResponsiveCharts();
 

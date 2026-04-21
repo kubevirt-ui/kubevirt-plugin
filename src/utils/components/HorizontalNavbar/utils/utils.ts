@@ -1,4 +1,4 @@
-import { ComponentType } from 'react';
+import { ComponentType, PropsWithChildren } from 'react';
 
 import { NavPage } from '@openshift-console/dynamic-plugin-sdk';
 import { NavPageComponentProps } from '@virtualmachines/details/utils/types';
@@ -21,6 +21,6 @@ export const trimLastHistoryPath = (currentPathname: string, paths: string[]): s
 };
 
 export type NavPageKubevirt = Omit<NavPage, 'component'> & {
-  component: ComponentType<NavPageComponentProps>;
+  component: ComponentType<PropsWithChildren<NavPageComponentProps>>;
   isHidden?: boolean;
 };

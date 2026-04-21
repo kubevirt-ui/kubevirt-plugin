@@ -47,7 +47,7 @@ export type TabModalProps<T extends K8sResourceCommon = K8sResourceCommon> = {
 
 export type TabModalFC = <T extends K8sResourceCommon = K8sResourceCommon>(
   props: TabModalProps<T>,
-) => JSX.Element;
+) => ReactNode;
 
 const TabModal: TabModalFC = memo(
   ({

@@ -1,6 +1,6 @@
 import React from 'react';
-import { TFunction } from 'i18next';
 import format from 'date-fns/format';
+import { TFunction } from 'i18next';
 import { VMStatusConditionLabelList } from 'src/views/virtualmachines/list/components/VMStatusConditionLabel';
 
 import { NodeModel } from '@kubevirt-ui-ext/kubevirt-api/console';

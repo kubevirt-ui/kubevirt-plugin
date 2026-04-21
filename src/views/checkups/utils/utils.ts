@@ -1,5 +1,5 @@
-import { TFunction } from 'i18next';
 import { Location } from 'react-router';
+import { TFunction } from 'i18next';
 
 import { JobModel, modelToGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {

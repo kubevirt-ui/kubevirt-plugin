@@ -1,7 +1,7 @@
 import type { ResourceListPage } from '@openshift-console/dynamic-plugin-sdk';
 import type {
-  EncodedExtension,
   ConsolePluginBuildMetadata,
+  EncodedExtension,
 } from '@openshift-console/dynamic-plugin-sdk-webpack';
 
 export const exposedModules: ConsolePluginBuildMetadata['exposedModules'] = {

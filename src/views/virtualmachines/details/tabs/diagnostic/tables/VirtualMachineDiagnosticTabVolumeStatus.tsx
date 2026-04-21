@@ -19,9 +19,9 @@ type VirtualMachineDiagnosticTabVolumeStatusProps = {
   volumeSnapshotStatuses: VirtualizationVolumeSnapshotStatus[];
 };
 
-const VirtualMachineDiagnosticTabVolumeStatus: FCC<VirtualMachineDiagnosticTabVolumeStatusProps> = ({
-  volumeSnapshotStatuses,
-}) => {
+const VirtualMachineDiagnosticTabVolumeStatus: FCC<
+  VirtualMachineDiagnosticTabVolumeStatusProps
+> = ({ volumeSnapshotStatuses }) => {
   const { t } = useKubevirtTranslation();
   const [expend, setExpend] = useState<{ [key: string]: Set<string> }>({
     expended: new Set(),

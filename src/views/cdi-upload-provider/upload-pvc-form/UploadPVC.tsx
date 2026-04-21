@@ -7,7 +7,6 @@ import React, {
   useMemo,
   useState,
 } from 'react';
-import { DocumentTitle } from '@openshift-console/dynamic-plugin-sdk';
 import { useNavigate } from 'react-router';
 import axios from 'axios';
 import classNames from 'classnames';
@@ -31,6 +30,7 @@ import {
   TEMPLATE_TYPE_LABEL,
   TEMPLATE_VM_COMMON_NAMESPACE,
 } from '@kubevirt-utils/resources/template';
+import { DocumentTitle } from '@openshift-console/dynamic-plugin-sdk';
 import {
   K8sVerb,
   useK8sWatchResource,
