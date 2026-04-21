@@ -13,10 +13,11 @@ import { isVM } from '@kubevirt-utils/utils/typeGuards';
 import { truncateToK8sName } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { getVMURL } from '@multicluster/urls';
-import { ModalVariant } from '@patternfly/react-core';
+import { Divider, ModalVariant } from '@patternfly/react-core';
 
+import CloneVMModalConfigSection from './components/CloneVMModalConfigSection';
 import CloningStatus from './components/CloningStatus';
-import ConfigurationSummary from './components/ConfigurationSummary';
+import DescriptionInput from './components/DescriptionInput';
 import NameInput from './components/NameInput';
 import SnapshotContentConfigurationSummary from './components/SnapshotContentConfigurationSummary';
 import StartClonedVMCheckbox from './components/StartClonedVMCheckbox/StartClonedVMCheckbox';
@@ -41,9 +42,18 @@ const CloneVMModal: FC<CloneVMModalProps> = ({ headerText, isOpen, onClose, sour
     truncateToK8sName(isVM(source) ? `${name}-clone` : name),
   );
 
+  const [vmNameConfirmed, setVmNameConfirmed] = useState(false);
+
+  const [cloneDescription, setCloneDescription] = useState('');
+
   const [startCloneVM, setStartCloneVM] = useState(false);
 
   const [initialCloneRequest, setInitialCloneRequest] = useState<V1beta1VirtualMachineClone>();
+
+  const onNameChange = (value: string) => {
+    setCloneName(value);
+    setVmNameConfirmed(true);
+  };
 
   const sendCloneRequest = async () => {
     const vmSameName = await vmExists(cloneName, namespace, getCluster(source));
@@ -52,7 +62,7 @@ const CloneVMModal: FC<CloneVMModalProps> = ({ headerText, isOpen, onClose, sour
       throw new Error(t('VirtualMachine with this name already exists'));
     }
 
-    const request = await cloneVM(source, cloneName, namespace, startCloneVM);
+    const request = await cloneVM(source, cloneName, namespace, startCloneVM, cloneDescription);
 
     setInitialCloneRequest(request);
   };
@@ -74,7 +84,7 @@ const CloneVMModal: FC<CloneVMModalProps> = ({ headerText, isOpen, onClose, sour
     <TabModal
       closeOnSubmit={false}
       headerText={headerText ?? t('Clone {{sourceKind}}', { sourceKind: source.kind })}
-      isDisabled={Boolean(initialCloneRequest)}
+      isDisabled={Boolean(initialCloneRequest) || !vmNameConfirmed}
       isHorizontal
       isLoading={Boolean(initialCloneRequest)}
       isOpen={isOpen}
@@ -85,10 +95,25 @@ const CloneVMModal: FC<CloneVMModalProps> = ({ headerText, isOpen, onClose, sour
       shouldWrapInForm
       submitBtnText={isVM(source) ? t('Clone') : t('Create')}
     >
-      <NameInput autoFocus name={cloneName} setName={setCloneName} />
+      <NameInput
+        autoFocus
+        name={cloneName}
+        onConfirm={() => setVmNameConfirmed(true)}
+        setName={onNameChange}
+      />
+      <DescriptionInput
+        placeholder={
+          isVM(source)
+            ? t('This is a cloned vm of {{name}}', { name })
+            : t('This is a vm created from snapshot {{name}}', { name })
+        }
+        description={cloneDescription}
+        setDescription={setCloneDescription}
+      />
       <StartClonedVMCheckbox setStartCloneVM={setStartCloneVM} startCloneVM={startCloneVM} />
+      <Divider />
       {isVM(source) ? (
-        <ConfigurationSummary vm={source} />
+        <CloneVMModalConfigSection vm={source} />
       ) : (
         <SnapshotContentConfigurationSummary snapshot={source} />
       )}

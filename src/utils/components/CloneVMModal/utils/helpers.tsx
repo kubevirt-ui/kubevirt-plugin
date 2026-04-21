@@ -44,6 +44,7 @@ export const cloneVM = (
   newVMName: string,
   namespace: string,
   startVM?: boolean,
+  description?: string,
 ) => {
   const cloningRequest = produce(cloneVMToVM, (draftCloneData) => {
     draftCloneData.spec.source = {
@@ -60,11 +61,20 @@ export const cloneVM = (
 
     draftCloneData.spec.volumeNamePolicy = VolumeNamePolicy.PrefixTargetName;
 
+    const patches = [];
+
     if (startVM) {
       const sourceVM = source as V1VirtualMachine;
       const targetRunStrategy = getStartingRunStrategy(getEffectiveRunStrategy(sourceVM));
-      const patches = buildRunStrategyPatches(sourceVM, targetRunStrategy);
-      draftCloneData.spec.patches = patches.map((p) => JSON.stringify(p));
+      patches.push(...buildRunStrategyPatches(sourceVM, targetRunStrategy));
+    }
+
+    if (description) {
+      patches.push({ op: 'add', path: '/metadata/annotations/description', value: description });
+    }
+
+    if (patches.length > 0) {
+      draftCloneData.spec.patches = patches;
     }
   });
 

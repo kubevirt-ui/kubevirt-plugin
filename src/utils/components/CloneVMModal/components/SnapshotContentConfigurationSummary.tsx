@@ -15,7 +15,7 @@ import { getCluster } from '@multicluster/helpers/selectors';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 import { Alert, AlertVariant } from '@patternfly/react-core';
 
-import ConfigurationSummary from './ConfigurationSummary';
+import CloneVMModalConfigSection from './CloneVMModalConfigSection';
 
 type SnapshotContentConfigurationSummaryProps = {
   snapshot: V1beta1VirtualMachineSnapshot;
@@ -50,7 +50,9 @@ const SnapshotContentConfigurationSummary: FC<SnapshotContentConfigurationSummar
   }
 
   return (
-    <ConfigurationSummary vm={snapshotContent?.spec?.source?.virtualMachine as V1VirtualMachine} />
+    <CloneVMModalConfigSection
+      vm={snapshotContent?.spec?.source?.virtualMachine as V1VirtualMachine}
+    />
   );
 };
 
