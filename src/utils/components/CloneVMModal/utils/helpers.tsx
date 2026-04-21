@@ -80,7 +80,7 @@ export const cloneVM = (
     }
 
     if (patches.length > 0) {
-      draftCloneData.spec.patches = patches;
+      draftCloneData.spec.patches = patches.map((p) => JSON.stringify(p));
     }
   });
 
