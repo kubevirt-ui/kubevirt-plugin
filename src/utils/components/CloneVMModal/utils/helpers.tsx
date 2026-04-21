@@ -70,7 +70,13 @@ export const cloneVM = (
     }
 
     if (description) {
-      patches.push({ op: 'add', path: '/metadata/annotations/description', value: description });
+      const hasExistingDescription =
+        isVM(source) && Boolean(source?.metadata?.annotations?.description);
+      patches.push({
+        op: hasExistingDescription ? 'replace' : 'add',
+        path: '/metadata/annotations/description',
+        value: description,
+      });
     }
 
     if (patches.length > 0) {

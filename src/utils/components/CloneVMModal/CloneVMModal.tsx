@@ -16,7 +16,6 @@ import { getVMURL } from '@multicluster/urls';
 import { Divider, ModalVariant } from '@patternfly/react-core';
 
 import CloneVMModalConfigSection from './components/CloneVMModalConfigSection';
-import CloningStatus from './components/CloningStatus';
 import DescriptionInput from './components/DescriptionInput';
 import NameInput from './components/NameInput';
 import SnapshotContentConfigurationSummary from './components/SnapshotContentConfigurationSummary';
@@ -117,7 +116,6 @@ const CloneVMModal: FC<CloneVMModalProps> = ({ headerText, isOpen, onClose, sour
       ) : (
         <SnapshotContentConfigurationSummary snapshot={source} />
       )}
-      <CloningStatus vmCloneRequest={cloneRequest || initialCloneRequest} />
     </TabModal>
   );
 };
