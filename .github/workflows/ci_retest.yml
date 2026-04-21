@@ -117,6 +117,12 @@ jobs:
             "error building.*creating build container"
           )
 
+          OPERATOR_SETUP_MARKERS=(
+            "hco-unstable-catalog-source created"
+            "hco-operatorhub created"
+            "kubevirt-hyperconverged-group created"
+          )
+
           while read -r job; do
             JOB_NAME=$(echo "$job" | jq -r '.job_name')
             LOG_URL=$(echo "$job" | jq -r '.log_url')
@@ -135,6 +141,7 @@ jobs:
               continue
             fi
 
+            MATCHED="false"
             for pattern in "${INFRA_PATTERNS[@]}"; do
               MATCH=$(grep -Ei "$pattern" /tmp/build-log.txt | tail -3 || true)
               if [ -n "$MATCH" ]; then
@@ -142,9 +149,24 @@ jobs:
                 echo "$JOB_NAME" >> /tmp/infra_jobs.txt
                 echo "$MATCH" >> /tmp/infra_reasons.txt
                 echo "---" >> /tmp/infra_reasons.txt
+                MATCHED="true"
                 break
               fi
             done
+
+            if [ "$MATCHED" = "false" ] && grep -q "no matching resources found" /tmp/build-log.txt; then
+              for marker in "${OPERATOR_SETUP_MARKERS[@]}"; do
+                if grep -q "$marker" /tmp/build-log.txt; then
+                  MATCH=$(grep "no matching resources found" /tmp/build-log.txt | tail -3)
+                  echo "INFRA match: operator setup failure (no matching resources + '$marker')"
+                  echo "$JOB_NAME" >> /tmp/infra_jobs.txt
+                  echo "$MATCH" >> /tmp/infra_reasons.txt
+                  echo "---" >> /tmp/infra_reasons.txt
+                  break
+                fi
+              done
+            fi
+
             echo "::endgroup::"
           done < <(echo "$JOBS_JSON" | jq -c '.[]')
 
