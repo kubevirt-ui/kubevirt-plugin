@@ -9,10 +9,15 @@ import {
   IoK8sApiCoreV1ServicePort,
 } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { buildOwnerReference } from '@kubevirt-utils/resources/shared';
+import {
+  getServicesForVmi,
+  getVMILabelForServiceSelector,
+  VM_NAME_LABEL,
+} from '@kubevirt-utils/resources/vmi/utils/services';
 import { escapeJsonPointerToken, kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { k8sCreate, k8sPatch, K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
-import { buildOwnerReference } from '../../../../../resources/shared';
 import { RDP_CONSOLE_TYPE, SPICE_CONSOLE_TYPE, VNC_CONSOLE_TYPE } from '../../utils/ConsoleConsts';
 
 import {
@@ -21,8 +26,6 @@ import {
   DEFAULT_VV_MIMETYPE,
   MULTUS,
   POD,
-  TEMPLATE_VM_NAME_LABEL,
-  VMI_LABEL_AS_RDP_SERVICE_SELECTOR,
 } from './constants';
 import { ConsoleDetailPropType, Network } from './types';
 
@@ -36,21 +39,23 @@ const findVMServiceWithPort = (
   vmi: V1VirtualMachineInstance,
   allServices: IoK8sApiCoreV1Service[],
   targetPort: number,
-): IoK8sApiCoreV1Service =>
-  allServices?.find(
-    (service) =>
-      vmi?.metadata?.name === service?.spec?.selector?.[TEMPLATE_VM_NAME_LABEL] &&
-      !!getServicePort(service, targetPort),
-  );
+  pod?: IoK8sApiCoreV1Pod,
+): IoK8sApiCoreV1Service | undefined => {
+  if (!vmi) return undefined;
+
+  const matchingServices = getServicesForVmi(allServices, pod, undefined, vmi);
+  return matchingServices.find((service) => !!getServicePort(service, targetPort));
+};
 
 export const findRDPServiceAndPort = (
   vmi: V1VirtualMachineInstance,
   allServices: IoK8sApiCoreV1Service[],
+  pod?: IoK8sApiCoreV1Pod,
 ): [IoK8sApiCoreV1Service, IoK8sApiCoreV1ServicePort] => {
   if (!vmi) {
     return [null, null];
   }
-  const service = findVMServiceWithPort(vmi, allServices, DEFAULT_RDP_PORT);
+  const service = findVMServiceWithPort(vmi, allServices, DEFAULT_RDP_PORT, pod);
   return [service, getServicePort(service, DEFAULT_RDP_PORT)];
 };
 
@@ -59,7 +64,7 @@ export const getRdpAddressPort = (
   services: IoK8sApiCoreV1Service[],
   launcherPod: IoK8sApiCoreV1Pod,
 ): ConsoleDetailPropType => {
-  const [rdpService, rdpPortObj] = findRDPServiceAndPort(vmi, services);
+  const [rdpService, rdpPortObj] = findRDPServiceAndPort(vmi, services, launcherPod);
 
   if (!rdpService || !rdpPortObj) {
     return null;
@@ -228,19 +233,25 @@ export const getDefaultNetwork = (networks: Network[]) => {
 export const createRDPService = (
   vm: V1VirtualMachine,
   vmi: V1VirtualMachineInstance,
+  pod?: IoK8sApiCoreV1Pod,
 ): Promise<K8sResourceCommon[]> => {
   const { name, namespace } = vm?.metadata || {};
-  const vmiLabels = vm?.spec?.template?.metadata?.labels;
-  const labelSelector = vmiLabels?.[VMI_LABEL_AS_RDP_SERVICE_SELECTOR] || name;
+
+  const labelSelector = pod
+    ? getVMILabelForServiceSelector(pod, vm)
+    : {
+        labelKey: VM_NAME_LABEL,
+        labelValue: vm?.spec?.template?.metadata?.labels?.[VM_NAME_LABEL] || name,
+      };
+
+  const { labelKey, labelValue } = labelSelector;
 
   const vmPromise = k8sPatch<V1VirtualMachine>({
     data: [
       {
         op: 'add',
-        path: `/spec/template/metadata/labels/${escapeJsonPointerToken(
-          VMI_LABEL_AS_RDP_SERVICE_SELECTOR,
-        )}`,
-        value: labelSelector,
+        path: `/spec/template/metadata/labels/${escapeJsonPointerToken(labelKey)}`,
+        value: labelValue,
       },
     ],
     model: VirtualMachineModel,
@@ -251,8 +262,8 @@ export const createRDPService = (
     data: [
       {
         op: 'add',
-        path: `/metadata/labels/${escapeJsonPointerToken(VMI_LABEL_AS_RDP_SERVICE_SELECTOR)}`,
-        value: labelSelector,
+        path: `/metadata/labels/${escapeJsonPointerToken(labelKey)}`,
+        value: labelValue,
       },
     ],
     model: VirtualMachineInstanceModel,
@@ -276,7 +287,7 @@ export const createRDPService = (
           },
         ],
         selector: {
-          [VMI_LABEL_AS_RDP_SERVICE_SELECTOR]: labelSelector,
+          [labelKey]: labelValue,
         },
         type: 'NodePort',
       },
