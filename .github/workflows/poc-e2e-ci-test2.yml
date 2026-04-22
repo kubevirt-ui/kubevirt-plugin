@@ -227,6 +227,7 @@ jobs:
           plugin-image: ${{ env.PLUGIN_IMAGE }}
           test-namespace: ${{ env.CYPRESS_TEST_NS }}
           configmap-name: ${{ env.CI_ENV_CM }}
+          ci-env-namespace: ${{ env.CI_ENV_NS }}
 
       - name: Create test secret
         run: |
@@ -234,6 +235,39 @@ jobs:
             .metadata.name = strenv(CYPRESS_TEST_SECRET_NAME) |
             .metadata.namespace = strenv(CYPRESS_TEST_NS)
           ' cypress/fixtures/secret.yaml | oc apply -f -
+
+      - name: Seed kubevirt-user-settings ConfigMap
+        run: |
+          # The ci-env-controller sets helm_release=cm_name when no override is
+          # provided, so CI_ENV_CM is always the Helm release name.
+          SA_NAME="${CI_ENV_CM}-console"
+
+          # The plugin hook (useKubevirtUserSettings) keys settings by:
+          #   user?.metadata?.uid  OR  sanitized(user?.metadata?.name)
+          # In no-auth mode the SA bearer token is used for all k8s calls, so
+          # users/~ returns a virtual user for system:serviceaccount:<ns>:<sa>.
+          # We patch both the SA UID and the sanitized name so the hook always
+          # finds the right key regardless of whether OpenShift populates the UID.
+          SA_UID="$(oc get sa "${SA_NAME}" -n "${CYPRESS_TEST_NS}" \
+            -o jsonpath='{.metadata.uid}' 2>/dev/null || true)"
+          SANITIZED_NAME="system-serviceaccount-${CYPRESS_TEST_NS}-${SA_NAME}"
+
+          USER_SETTINGS='{"quickStart":{"dontShowWelcomeModal":true},"onboardingPopoversHidden":{"vmsTab":true,"catalog":true,"createProject":true}}'
+
+          # Create the ConfigMap if HCO has not done so yet.
+          if ! oc get configmap kubevirt-user-settings -n "${CYPRESS_CNV_NS}" &>/dev/null; then
+            oc create configmap kubevirt-user-settings -n "${CYPRESS_CNV_NS}"
+          fi
+
+          # Build a merge-patch that sets both possible user keys.
+          PATCH=$(jq -cn \
+            --arg sa_uid    "${SA_UID}" \
+            --arg name_key  "${SANITIZED_NAME}" \
+            --arg val       "${USER_SETTINGS}" \
+            '{data: (if ($sa_uid | length) > 0 then {($sa_uid): $val, ($name_key): $val} else {($name_key): $val} end)}')
+
+          oc patch configmap kubevirt-user-settings -n "${CYPRESS_CNV_NS}" \
+            --type merge -p "${PATCH}"
 
       # TODO: Add dependency caching (either use the setup-node action with caching, or add explicit caching)
       - name: Install dependencies
@@ -314,3 +348,4 @@ jobs:
         uses: ./.github/actions/ci-env-release
         with:
           configmap-name: ${{ env.CI_ENV_CM }}
+          ci-env-namespace: ${{ env.CI_ENV_NS }}
