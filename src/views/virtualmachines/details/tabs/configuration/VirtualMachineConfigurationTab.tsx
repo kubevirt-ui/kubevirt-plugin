@@ -61,11 +61,11 @@ const VirtualMachineConfigurationTab: FC<NavPageComponentProps> = ({
         createSearchURL={createConfigurationSearchURL}
         searchItems={searchItems}
       />
-      <div className="VirtualMachineConfigurationTab--body">
-        <Tabs activeKey={activeTabKey} className="VirtualMachineConfigurationTab--main" isVertical>
+      <div className="VirtualMachineConfigurationTab__body">
+        <Tabs activeKey={activeTabKey} className="VirtualMachineConfigurationTab__tabs" isVertical>
           {tabs.map(({ Component, name, title }) => (
             <Tab
-              className="VirtualMachineConfigurationTab--content"
+              className="VirtualMachineConfigurationTab__content"
               data-test-id={`vm-configuration-${name}`}
               eventKey={name}
               key={name}

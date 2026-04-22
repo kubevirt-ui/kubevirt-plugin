@@ -16,7 +16,7 @@ const VirtualMachineDiagnosticTabTableTitle: FC<VirtualMachineDiagnosticTabTable
   olsPromptType,
   title,
 }) => (
-  <Title className="VirtualMachineDiagnosticTab--header" headingLevel="h2">
+  <Title className="VirtualMachineDiagnosticTab__header" headingLevel="h2">
     {title}
     <HelpTextIcon
       bodyContent={(hide) => (

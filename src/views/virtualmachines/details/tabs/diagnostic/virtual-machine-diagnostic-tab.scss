@@ -1,25 +1,35 @@
 .VirtualMachineDiagnosticTab {
-  &--main {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
+  &__body {
+    flex: 1;
+    min-height: 0;
     display: flex;
-    &__tabs {
-      flex-basis: max-content;
-      flex-shrink: 0;
+  }
+
+  &__body > &__tabs {
+    flex-basis: max-content;
+    flex-shrink: 0;
+    padding-right: var(--pf-t--global--spacer--2xl);
+  }
+
+  &__content {
+    overflow-y: auto;
+    width: 100%;
+
+    .co-m-pane__body {
+      padding-bottom: 0;
     }
-    &__content {
-      padding: var(--pf-t--global--spacer--sm);
-      width: 100%;
 
-      .co-m-pane__body {
-        padding-bottom: 0;
-      }
-
-      .pf-v6-c-table {
-        margin-bottom: var(--pf-t--global--spacer--xl);
-      }
+    .pf-v6-c-table {
+      margin-bottom: var(--pf-t--global--spacer--xl);
     }
   }
 
-  &--header {
+  &__header {
     margin-bottom: var(--pf-t--global--spacer--md);
   }
 }
