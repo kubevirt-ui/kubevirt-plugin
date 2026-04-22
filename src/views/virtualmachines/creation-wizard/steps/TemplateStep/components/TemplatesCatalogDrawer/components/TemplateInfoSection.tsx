@@ -3,6 +3,8 @@ import React, { FC, memo } from 'react';
 import CPUDescription from '@kubevirt-utils/components/CPUDescription/CPUDescription';
 import CPUMemory from '@kubevirt-utils/components/CPUMemory/CPUMemory';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
+import DisksReviewTable from '@kubevirt-utils/components/DisksReviewTable/DisksReviewTable';
+import NetworksReviewTable from '@kubevirt-utils/components/NetworksReviewTable/NetworksReviewTable';
 import useIsIPv6SingleStackCluster from '@kubevirt-utils/hooks/useIPStackType/useIsIPv6SingleStackCluster';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { WORKLOADS_LABELS } from '@kubevirt-utils/resources/template/utils/constants';
@@ -18,9 +20,7 @@ import { networksHavePodNetwork } from '@kubevirt-utils/resources/vm/utils/netwo
 import { getOperatingSystemName } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { Alert, DescriptionList } from '@patternfly/react-core';
-import DisksReviewTable from '@virtualmachines/creation-wizard/components/DisksReviewTable/DisksReviewTable';
 import useWizardDisksTableData from '@virtualmachines/creation-wizard/components/DisksReviewTable/hooks/useWizardDisksTableData/useWizardDisksTableData';
-import NetworksReviewTable from '@virtualmachines/creation-wizard/components/NetworksReviewTable';
 import useVMWizardStore from '@virtualmachines/creation-wizard/state/vm-wizard-store/useVMWizardStore';
 import { useDrawerContext } from '@virtualmachines/creation-wizard/steps/TemplateStep/components/TemplatesCatalogDrawer/hooks/useDrawerContext';
 

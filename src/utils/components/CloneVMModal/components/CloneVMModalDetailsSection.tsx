@@ -18,7 +18,7 @@ import InstanceTypeConfiguration from './InstanceTypeConfiguration';
 
 type CloneVMModalDetailsSectionProps = {
   vm: V1VirtualMachine;
-  vmi: V1VirtualMachineInstance;
+  vmi?: V1VirtualMachineInstance;
 };
 
 const CloneVMModalDetailsSection: FC<CloneVMModalDetailsSectionProps> = ({ vm, vmi }) => {

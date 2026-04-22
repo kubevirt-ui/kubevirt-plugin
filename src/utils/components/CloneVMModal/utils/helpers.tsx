@@ -70,13 +70,22 @@ export const cloneVM = (
     }
 
     if (description) {
-      const hasExistingDescription =
-        isVM(source) && Boolean(source?.metadata?.annotations?.description);
-      patches.push({
-        op: hasExistingDescription ? 'replace' : 'add',
-        path: '/metadata/annotations/description',
-        value: description,
-      });
+      const hasAnnotations = Boolean(source?.metadata?.annotations);
+      const hasExistingDescription = Boolean(source?.metadata?.annotations?.description);
+
+      if (!hasAnnotations) {
+        patches.push({
+          op: 'add',
+          path: '/metadata/annotations',
+          value: { description },
+        });
+      } else {
+        patches.push({
+          op: hasExistingDescription ? 'replace' : 'add',
+          path: '/metadata/annotations/description',
+          value: description,
+        });
+      }
     }
 
     if (patches.length > 0) {

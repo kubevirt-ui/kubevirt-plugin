@@ -62,7 +62,10 @@ const CloneVMModalConfigSection: FC<CloneVMModalConfigSectionProps> = ({ vm }) =
 
       <StackItem>
         <ExpandableSection isIndented toggleText={t('Networking')}>
-          <NetworksReviewTable interfaces={getInterfaces(vm)} networks={getNetworks(vm)} />
+          <NetworksReviewTable
+            interfaces={getInterfaces(vm) ?? []}
+            networks={getNetworks(vm) ?? []}
+          />
         </ExpandableSection>
       </StackItem>
 

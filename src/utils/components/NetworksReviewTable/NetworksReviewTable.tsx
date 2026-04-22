@@ -47,8 +47,10 @@ const NetworksReviewTable: FC<NetworksReviewTableProps> = memo(({ interfaces, ne
       <DescriptionItem
         descriptionData={
           <Stack>
-            {networkData.map((n) => (
-              <StackItem key={n.iface.name}>{getPrintableNetworkInterfaceType(n.iface)}</StackItem>
+            {networkData.map((n, idx) => (
+              <StackItem key={n.iface?.name ?? n.network?.name ?? `network-type-${idx}`}>
+                {n.iface ? getPrintableNetworkInterfaceType(n.iface) : NO_DATA_DASH}
+              </StackItem>
             ))}
           </Stack>
         }

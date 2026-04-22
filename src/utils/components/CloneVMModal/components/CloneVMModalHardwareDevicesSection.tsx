@@ -26,9 +26,7 @@ const CloneVMModalHardwareDevicesSection: FC<CloneVMModalHardwareDevicesSectionP
             descriptionData={
               <Stack>
                 {devices.map((device) => (
-                  <StackItem key={`${device?.name}-${device?.deviceName}`}>
-                    {device.deviceName}
-                  </StackItem>
+                  <StackItem key={`${device?.name}-${device?.deviceName}`}>{device.name}</StackItem>
                 ))}
               </Stack>
             }
@@ -38,7 +36,9 @@ const CloneVMModalHardwareDevicesSection: FC<CloneVMModalHardwareDevicesSectionP
             descriptionData={
               <Stack>
                 {devices.map((device) => (
-                  <StackItem key={device.name}>{device.name}</StackItem>
+                  <StackItem key={`${device?.name}-${device?.deviceName}`}>
+                    {device.deviceName}
+                  </StackItem>
                 ))}
               </Stack>
             }

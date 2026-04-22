@@ -51,7 +51,6 @@ const CloneVMModal: FC<CloneVMModalProps> = ({ headerText, isOpen, onClose, sour
 
   const onNameChange = (value: string) => {
     setCloneName(value);
-    setVmNameConfirmed(true);
   };
 
   const sendCloneRequest = async () => {
