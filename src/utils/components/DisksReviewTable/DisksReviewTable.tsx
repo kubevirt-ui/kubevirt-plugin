@@ -1,52 +1,54 @@
 import React, { FC, memo } from 'react';
 
+import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 import { readableSizeUnit } from '@kubevirt-utils/utils/units';
 import { DescriptionList, Stack, StackItem } from '@patternfly/react-core';
-import { WizardDescriptionItem } from '@virtualmachines/creation-wizard/components/WizardDescriptionItem';
 
-type DiskReviewTableProps = {
+type DisksReviewTableProps = {
   disks: DiskRowDataLayout[];
 };
 
-const DisksReviewTable: FC<DiskReviewTableProps> = memo(({ disks }) => {
+const DisksReviewTable: FC<DisksReviewTableProps> = memo(({ disks }) => {
   const { t } = useKubevirtTranslation();
 
   return (
     <DescriptionList columnModifier={{ default: '3Col' }}>
-      <WizardDescriptionItem
-        description={
+      <DescriptionItem
+        descriptionData={
           <Stack>
             {disks.map((disk) => (
               <StackItem key={disk.name}>{disk.name}</StackItem>
             ))}
           </Stack>
         }
-        title={t('Name')}
+        descriptionHeader={t('Name')}
       />
-      <WizardDescriptionItem
-        description={
+      <DescriptionItem
+        descriptionData={
           <Stack>
             {disks.map((disk) => (
               <StackItem key={disk.name}>{disk.drive}</StackItem>
             ))}
           </Stack>
         }
-        title={t('Drive')}
+        descriptionHeader={t('Drive')}
       />
-      <WizardDescriptionItem
-        description={
+      <DescriptionItem
+        descriptionData={
           <Stack>
             {disks.map((disk) => (
               <StackItem key={disk.name}>{readableSizeUnit(disk.size)}</StackItem>
             ))}
           </Stack>
         }
-        title={t('Size')}
+        descriptionHeader={t('Size')}
       />
     </DescriptionList>
   );
 });
+
+DisksReviewTable.displayName = 'DisksReviewTable';
 
 export default DisksReviewTable;

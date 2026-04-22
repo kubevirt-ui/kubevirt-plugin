@@ -1,13 +1,13 @@
 import React, { FC } from 'react';
 
+import DisksReviewTable from '@kubevirt-utils/components/DisksReviewTable/DisksReviewTable';
+import NetworksReviewTable from '@kubevirt-utils/components/NetworksReviewTable/NetworksReviewTable';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getInterfaces, getNetworks } from '@kubevirt-utils/resources/vm';
 import { vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
 import { ExpandableSection, Stack, StackItem } from '@patternfly/react-core';
-import DisksReviewTable from '@virtualmachines/creation-wizard/components/DisksReviewTable/DisksReviewTable';
 import useWizardDisksTableData from '@virtualmachines/creation-wizard/components/DisksReviewTable/hooks/useWizardDisksTableData/useWizardDisksTableData';
 import HardwareDevicesTable from '@virtualmachines/creation-wizard/components/HardwareDevicesTable';
-import NetworksReviewTable from '@virtualmachines/creation-wizard/components/NetworksReviewTable';
 
 import './ReviewGridRightColumn.scss';
 

@@ -1,14 +1,13 @@
-import * as React from 'react';
-import { FC, memo } from 'react';
+import React, { FC, memo } from 'react';
 
 import { V1Interface, V1Network } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { getNetworkNameLabel } from '@kubevirt-utils/resources/vm/utils/network/network-columns';
 import { getNetworkInterfaceRowData } from '@kubevirt-utils/resources/vm/utils/network/rowData';
 import { getPrintableNetworkInterfaceType } from '@kubevirt-utils/resources/vm/utils/network/selectors';
 import { DescriptionList, Stack, StackItem } from '@patternfly/react-core';
-import { WizardDescriptionItem } from '@virtualmachines/creation-wizard/components/WizardDescriptionItem';
 
 type NetworksReviewTableProps = {
   interfaces: V1Interface[];
@@ -21,8 +20,8 @@ const NetworksReviewTable: FC<NetworksReviewTableProps> = memo(({ interfaces, ne
 
   return (
     <DescriptionList columnModifier={{ default: '3Col' }}>
-      <WizardDescriptionItem
-        description={
+      <DescriptionItem
+        descriptionData={
           <Stack>
             {networkData.map((n, idx) => (
               <StackItem key={n.iface?.name || n.network?.name || `network-row-${idx}`}>
@@ -31,10 +30,10 @@ const NetworksReviewTable: FC<NetworksReviewTableProps> = memo(({ interfaces, ne
             ))}
           </Stack>
         }
-        title={t('Name')}
+        descriptionHeader={t('Name')}
       />
-      <WizardDescriptionItem
-        description={
+      <DescriptionItem
+        descriptionData={
           <Stack>
             {networkData.map((n, idx) => (
               <StackItem key={n.iface?.name || n.network?.name || `network-label-${idx}`}>
@@ -43,20 +42,24 @@ const NetworksReviewTable: FC<NetworksReviewTableProps> = memo(({ interfaces, ne
             ))}
           </Stack>
         }
-        title={t('Network')}
+        descriptionHeader={t('Network')}
       />
-      <WizardDescriptionItem
-        description={
+      <DescriptionItem
+        descriptionData={
           <Stack>
-            {networkData.map((n) => (
-              <StackItem key={n.iface.name}>{getPrintableNetworkInterfaceType(n.iface)}</StackItem>
+            {networkData.map((n, idx) => (
+              <StackItem key={n.iface?.name ?? n.network?.name ?? `network-type-${idx}`}>
+                {n.iface ? getPrintableNetworkInterfaceType(n.iface) : NO_DATA_DASH}
+              </StackItem>
             ))}
           </Stack>
         }
-        title={t('Type')}
+        descriptionHeader={t('Type')}
       />
     </DescriptionList>
   );
 });
+
+NetworksReviewTable.displayName = 'NetworksReviewTable';
 
 export default NetworksReviewTable;

@@ -18,6 +18,7 @@ const useCloneVM: UseCloneVM = () => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
   const {
+    cloneVMDescription,
     cloneVMName,
     cluster,
     project: targetNamespace,
@@ -47,7 +48,13 @@ const useCloneVM: UseCloneVM = () => {
       throw new Error(t('VirtualMachine with this name already exists'));
     }
 
-    const request = await cloneVM(source, cloneVMName, targetNamespace, startCloneVM);
+    const request = await cloneVM(
+      source,
+      cloneVMName,
+      targetNamespace,
+      startCloneVM,
+      cloneVMDescription,
+    );
 
     setInitialCloneRequest(request);
   };

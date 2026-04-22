@@ -1,5 +1,4 @@
 import { useMemo } from 'react';
-import { isRunning } from 'src/views/virtualmachines/utils';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import {
@@ -8,6 +7,7 @@ import {
 } from '@kubevirt-utils/components/DiskModal/utils/helpers';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { DiskRawData, DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
+import { isRunning } from '@virtualmachines/utils';
 
 import { getBootDisk, getDataVolumeTemplates, getDisks, getVolumes } from '../../utils';
 import { getDiskRowDataLayout } from '../../utils/disk/rowData';
