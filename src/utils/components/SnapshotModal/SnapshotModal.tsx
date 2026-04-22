@@ -34,6 +34,8 @@ import UnsupportedVolumesAlert from './alerts/UnsupportedVolumesAlert';
 import SnapshotDeadlineFormField from './SnapshotFormFields/SnapshotDeadlineFormField';
 import SnapshotSupportedVolumeList from './SnapshotFormFields/SnapshotSupportedVolumeList';
 
+import './SnapshotModal.scss';
+
 type SnapshotModalProps = {
   isOpen: boolean;
   onClose: () => void;
@@ -94,6 +96,7 @@ const SnapshotModal: FC<SnapshotModalProps> = ({ isOpen, onClose, vm }) => {
       </FormGroup>
       <FormGroup fieldId="description" label={t('Description')}>
         <TextArea
+          className="snapshot-modal__description-textarea"
           id="description"
           onChange={(_, newDescription: string) => setDescription(newDescription)}
           resizeOrientation="vertical"

@@ -22,7 +22,7 @@ const VirtualMachineLogViewerStandAlone = () => {
 
   return (
     <div className="VirtualMachineLogViewerStandAlone--main">
-      <VirtualMachineBasicLogViewer data={data} isExternal vmi={vmi} />;
+      <VirtualMachineBasicLogViewer data={data} isExternal vmi={vmi} />
     </div>
   );
 };

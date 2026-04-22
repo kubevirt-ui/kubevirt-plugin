@@ -98,7 +98,6 @@ export const AnnotationsModal: FC<{
             className="pf-m-link--align-left"
             icon={<PlusCircleIcon />}
             onClick={() => onAnnotationAdd()}
-            size="sm"
             variant={ButtonVariant.link}
           >
             {t('Add more')}
