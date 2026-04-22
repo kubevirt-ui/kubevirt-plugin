@@ -1,10 +1,9 @@
 import React, { FC, ReactNode } from 'react';
-import classNames from 'classnames';
 
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { K8sModel } from '@openshift-console/dynamic-plugin-sdk';
-import { Button, ButtonVariant, Grid, GridItem, Split, SplitItem } from '@patternfly/react-core';
+import { Button, ButtonVariant, Flex, Grid, GridItem, Stack } from '@patternfly/react-core';
 import { PlusCircleIcon } from '@patternfly/react-icons';
 
 type LabelsListProps = {
@@ -29,8 +28,9 @@ const LabelsList: FC<LabelsListProps> = ({
   const { t } = useKubevirtTranslation();
   const addRowTxt = addRowText || t('Add label');
   const emptyStateAddRowTxt = emptyStateAddRowText || t('Add label to specify qualifying nodes');
+
   return (
-    <>
+    <Stack hasGutter={!isEmpty}>
       <Grid hasGutter>
         {withKeyValueTitle && !isEmpty && (
           <>
@@ -44,30 +44,28 @@ const LabelsList: FC<LabelsListProps> = ({
         )}
         {children}
       </Grid>
-      <Split>
-        <SplitItem>
-          <Button
-            className={classNames('pf-m-link--align-left', { 'pf-v6-u-mt-md': !isEmpty })}
-            icon={<PlusCircleIcon />}
-            id="vm-labels-list-add-btn"
-            onClick={() => onLabelAdd()}
-            variant={ButtonVariant.link}
-          >
-            {isEmpty ? emptyStateAddRowTxt : addRowTxt}
-          </Button>
-        </SplitItem>
-        <SplitItem isFilled />
-        <SplitItem>
-          {model && (
-            <ExternalLink
-              dataTestID="explore-nodes-btn"
-              href={`/k8s/cluster/${model.plural}`}
-              text={t('Explore {{kind}} list', { kind: model.kind })}
-            />
-          )}
-        </SplitItem>
-      </Split>
-    </>
+      <Flex
+        alignItems={{ default: 'alignItemsCenter' }}
+        justifyContent={{ default: 'justifyContentSpaceBetween' }}
+      >
+        <Button
+          className="pf-m-link--align-left"
+          icon={<PlusCircleIcon />}
+          id="vm-labels-list-add-btn"
+          onClick={() => onLabelAdd()}
+          variant={ButtonVariant.link}
+        >
+          {isEmpty ? emptyStateAddRowTxt : addRowTxt}
+        </Button>
+        {model && (
+          <ExternalLink
+            dataTestID="explore-nodes-btn"
+            href={`/k8s/cluster/${model.plural}`}
+            text={t('Explore {{kind}} list', { kind: model.kind })}
+          />
+        )}
+      </Flex>
+    </Stack>
   );
 };
 

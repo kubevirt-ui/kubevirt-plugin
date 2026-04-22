@@ -92,7 +92,7 @@ const TolerationsModal: FC<TolerationsModalProps> = ({ isOpen, onClose, onSubmit
       onSubmit={onSubmit}
     >
       <TolerationModalDescriptionText />
-      <div className="pf-c-form">
+      <div className="pf-v6-c-form">
         <LabelsList
           addRowText={t('Add toleration')}
           emptyStateAddRowText={t('Add toleration to specify qualifying Nodes')}
