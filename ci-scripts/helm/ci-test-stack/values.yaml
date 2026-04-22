@@ -26,3 +26,10 @@ console:
 # ClusterRole pre-created at ARC install time (ci-console-clusterrole.yaml)
 rbac:
   consoleClusterRole: ci-console
+  # ClusterRole that grants test permissions inside the test namespace
+  testRunnerClusterRole: ci-env-test-runner
+
+# ARC runner ServiceAccount that needs namespace-scoped test permissions
+runner:
+  saName: kubevirt-plugin-ci-gha-rs-no-permission
+  saNamespace: arc-runners

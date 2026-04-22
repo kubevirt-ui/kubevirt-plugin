@@ -147,25 +147,6 @@ provision() {
   log "Creating namespace ${test_ns}..."
   oc create namespace "${test_ns}" --dry-run=client -o yaml | oc apply -f - || true
 
-  log "Granting runner SA ${RUNNER_SA_NS}/${RUNNER_SA_NAME} test permissions in ${test_ns}..."
-  oc apply -f - <<RBAC_EOF || log "WARN: failed to create runner RoleBinding in ${test_ns}"
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  name: ci-env-test-runner
-  namespace: ${test_ns}
-  labels:
-    app.kubernetes.io/component: ci-env-controller
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: ci-env-test-runner
-subjects:
-  - kind: ServiceAccount
-    name: ${RUNNER_SA_NAME}
-    namespace: ${RUNNER_SA_NS}
-RBAC_EOF
-
   log "Running helm upgrade --install ${helm_release}..."
   if ! helm upgrade --install "${helm_release}" \
     "${HELM_CHART_PATH}" \
@@ -177,6 +158,8 @@ RBAC_EOF
     --set "console.pluginProxy.endpoint=${PLUGIN_PROXY_ENDPOINT}" \
     --set "console.monitoring.thanosUrl=${THANOS_URL}" \
     --set "console.monitoring.alertmanagerUrl=${ALERTMANAGER_URL}" \
+    --set "runner.saName=${RUNNER_SA_NAME}" \
+    --set "runner.saNamespace=${RUNNER_SA_NS}" \
     --wait --timeout 5m 2>&1; then
 
     local err="helm install failed"
