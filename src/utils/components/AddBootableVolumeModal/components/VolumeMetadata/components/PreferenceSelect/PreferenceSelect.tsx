@@ -68,22 +68,20 @@ const PreferenceSelect: FC<PreferenceSelectProps> = ({
 
   return (
     <FormGroup
-      label={
-        <>
-          {t('Preference')}{' '}
-          <HelpTextIcon
-            bodyContent={(hide) => (
-              <PopoverContentWithLightspeedButton
-                content={<PreferencePopoverContent />}
-                hide={hide}
-                promptType={OLSPromptType.PREFERENCE}
-              />
-            )}
-            position={PopoverPosition.right}
-          />
-        </>
+      labelHelp={
+        <HelpTextIcon
+          bodyContent={(hide) => (
+            <PopoverContentWithLightspeedButton
+              content={<PreferencePopoverContent />}
+              hide={hide}
+              promptType={OLSPromptType.PREFERENCE}
+            />
+          )}
+          position={PopoverPosition.right}
+        />
       }
       isRequired
+      label={t('Preference')}
     >
       <InlineFilterSelect
         options={preferenceSelectOptions}

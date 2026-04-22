@@ -4,7 +4,7 @@ form.kv-sysprep--main.pf-v6-c-form {
 
 .kv-sysprep--title {
   display: inline-flex;
-  align-items: baseline;
+  gap: var(--pf-t--global--spacer--sm);
   margin-top: var(--pf-t--global--spacer--md);
 }
 

@@ -74,21 +74,19 @@ export const InstanceTypeDrilldownSelect: FC<InstanceTypeMenuItemsProps> = ({
 
   return (
     <FormGroup
-      label={
-        <>
-          {t('Default InstanceType')}{' '}
-          <HelpTextIcon
-            bodyContent={(hide) => (
-              <PopoverContentWithLightspeedButton
-                content={t('The default InstanceType for this volume.')}
-                hide={hide}
-                promptType={OLSPromptType.DEFAULT_INSTANCETYPE}
-              />
-            )}
-            position={PopoverPosition.right}
-          />
-        </>
+      labelHelp={
+        <HelpTextIcon
+          bodyContent={(hide) => (
+            <PopoverContentWithLightspeedButton
+              content={t('The default InstanceType for this volume.')}
+              hide={hide}
+              promptType={OLSPromptType.DEFAULT_INSTANCETYPE}
+            />
+          )}
+          position={PopoverPosition.right}
+        />
       }
+      label={t('Default InstanceType')}
     >
       <ComposableDrilldownSelect
         toggleLabel={
