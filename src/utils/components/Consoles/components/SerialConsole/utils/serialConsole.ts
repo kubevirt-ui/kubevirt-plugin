@@ -22,15 +22,13 @@ export const createURL = (host: string, path: string): string => {
   return url;
 };
 
-export const addResizeListener = (callback) => {
-  const resizeListener = debounce(callback, 100);
-  window.addEventListener('resize', resizeListener);
-  return resizeListener;
+export const addResizeObserver = (element: HTMLElement, callback: () => void): ResizeObserver => {
+  const debouncedCallback = debounce(callback, 100);
+  const observer = new ResizeObserver(debouncedCallback);
+  observer.observe(element);
+  return observer;
 };
 
-export const removeResizeListenerIfExists = (callback) => {
-  if (!callback) {
-    return;
-  }
-  window.removeEventListener('resize', callback);
+export const removeResizeObserver = (observer: null | ResizeObserver): void => {
+  observer?.disconnect();
 };
