@@ -1,5 +1,4 @@
 module.exports = {
-  ...(jest.requireActual('react-router-dom-v5-compat') as Record<string, any>),
   matchPath: () => null,
   useLocation: () => ({
     pathname: 'localhost:3000',
@@ -11,10 +10,7 @@ module.exports = {
       ns: 'default',
     },
   }),
-  useNavigate: () => ({
-    push: jest.fn(),
-    replace: jest.fn(),
-  }),
+  useNavigate: () => jest.fn(),
   useParams: () => ({
     ns: 'default',
   }),
