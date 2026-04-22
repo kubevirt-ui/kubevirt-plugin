@@ -307,3 +307,38 @@ jobs:
               issue_number: context.issue.number,
               body: body,
             });
+
+      - name: Escalate to CodeRabbit
+        if: steps.classify.outputs.is_infra == 'false' && steps.extract.outputs.found == 'true'
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
+        env:
+          JOBS_JSON: ${{ steps.extract.outputs.jobs }}
+        with:
+          script: |
+            const jobs = JSON.parse(process.env.JOBS_JSON);
+
+            const logList = jobs
+              .map(j => `- **${j.job_name}**: [View Raw Build Log](${j.log_url})`)
+              .join('\n');
+
+            const body = [
+              '## ⚠️ CI Failure Escalation',
+              '',
+              'Automated regex triage could not classify this failure.',
+              '',
+              '@coderabbitai Please analyze the build logs linked below.',
+              'If you determine the root cause is an infrastructure issue, network timeout,',
+              'or environment setup flake, please reply with exactly `/retest` on a new line.',
+              'Otherwise, explain the code failure.',
+              '',
+              '### Build Logs',
+              '',
+              logList,
+            ].join('\n');
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: body,
+            });
