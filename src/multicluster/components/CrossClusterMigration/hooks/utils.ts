@@ -1,9 +1,46 @@
-import { MigrationModel, V1beta1Plan } from '@kubev2v/types';
+import {
+  MigrationModel,
+  NetworkMapModel,
+  PlanModel,
+  StorageMapModel,
+  V1beta1NetworkMap,
+  V1beta1Plan,
+  V1beta1StorageMap,
+} from '@kubev2v/types';
 import { modelToGroupVersionKind } from '@kubevirt-utils/models';
 import { getName, getNamespace, getUID } from '@kubevirt-utils/resources/shared';
-import { getRandomChars, isEmpty } from '@kubevirt-utils/utils/utils';
+import { getRandomChars, isEmpty, kubevirtConsole } from '@kubevirt-utils/utils/utils';
+import { kubevirtK8sDelete } from '@multicluster/k8sRequests';
 
 import { MTV_MIGRATION_NAMESPACE } from '../constants';
+
+export type PartialResources = {
+  createdMigrationPlan?: undefined | V1beta1Plan;
+  createdNetworkMap?: undefined | V1beta1NetworkMap;
+  createdStorageMap?: undefined | V1beta1StorageMap;
+};
+
+export const cleanupPartialResources = ({
+  createdMigrationPlan,
+  createdNetworkMap,
+  createdStorageMap,
+}: PartialResources) => {
+  if (createdStorageMap) {
+    kubevirtK8sDelete({ model: StorageMapModel, resource: createdStorageMap }).catch((e) =>
+      kubevirtConsole.error('Failed to clean up StorageMap', e),
+    );
+  }
+  if (createdNetworkMap) {
+    kubevirtK8sDelete({ model: NetworkMapModel, resource: createdNetworkMap }).catch((e) =>
+      kubevirtConsole.error('Failed to clean up NetworkMap', e),
+    );
+  }
+  if (createdMigrationPlan) {
+    kubevirtK8sDelete({ model: PlanModel, resource: createdMigrationPlan }).catch((e) =>
+      kubevirtConsole.error('Failed to clean up Plan', e),
+    );
+  }
+};
 
 export const getSelectableOptions = (
   resources: string[],
