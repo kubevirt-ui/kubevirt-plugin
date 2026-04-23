@@ -1,4 +1,4 @@
-import { TEST_NS, TREEVIEW_ROOT_ID } from '../utils/const/index';
+import { ALL_PROJ_NS, TEST_NS, TREEVIEW_ROOT_ID } from '../utils/const/index';
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
@@ -37,7 +37,7 @@ Cypress.Commands.add('switchProjectUsingTreeView', (projectName: string) => {
       cy.get('.vms-tree-view__toolbar-switch input').uncheck({ force: true });
     }
   });
-  cy.get(projectSelector, { timeout: 10000 }).click();
+  cy.get(projectSelector, { timeout: 30000 }).click();
 });
 
 Cypress.Commands.add('switchProject', (projectName: string) => {
@@ -52,7 +52,7 @@ Cypress.Commands.add('switchProject', (projectName: string) => {
     .should('exist')
     .then(() => {
       cy.get('body').then(($body) => {
-        if ($body.find(TREEVIEW_ROOT_ID).length) {
+        if (name !== ALL_PROJ_NS && $body.find(`${TREEVIEW_ROOT_ID}:visible`).length) {
           cy.switchProjectUsingTreeView(name);
         } else {
           cy.byLegacyTestID('namespace-bar-dropdown').contains('Project:').click();

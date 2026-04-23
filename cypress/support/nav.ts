@@ -63,7 +63,7 @@ Cypress.Commands.add('visitNAD', () => {
   cy.get('[data-quickstart-id="qs-nav-networking"]', { timeout: MINUTE }).scrollIntoView();
   cy.contains('Networking').should('be.visible');
   cy.clickNavLink(['Networking', 'NetworkAttachmentDefinitions']);
-  cy.byButtonText('Create').should('be.visible');
+  cy.contains('h1', 'NetworkAttachmentDefinitions', { timeout: MINUTE }).should('be.visible');
 });
 
 Cypress.Commands.add('visitTemplates', () => {
@@ -72,6 +72,7 @@ Cypress.Commands.add('visitTemplates', () => {
 
 Cypress.Commands.add('visitTemplatesVirt', () => {
   cy.get(nav.templateNav, { timeout: 5 * MINUTE }).click();
+  cy.contains('h1', 'Templates', { timeout: MINUTE }).should('be.visible');
 });
 
 Cypress.Commands.add('visitITs', () => {
@@ -136,4 +137,5 @@ Cypress.Commands.add('visitStorageclass', () => {
   cy.get('[data-quickstart-id="qs-nav-storage"]', { timeout: MINUTE }).scrollIntoView();
   cy.containsExactMatch('Storage').should('be.visible');
   cy.clickNavLink(['Storage', 'StorageClasses']);
+  cy.contains('h1', 'StorageClasses', { timeout: MINUTE }).should('be.visible');
 });
