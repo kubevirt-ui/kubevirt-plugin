@@ -38,29 +38,3 @@ arc_github_config_secret_helm_auth() {
   trap '[[ -n "${AUTH_VALUES_FILE:-}" && -f "${AUTH_VALUES_FILE}" ]] && rm -f "${AUTH_VALUES_FILE}"' EXIT
   return 0
 }
-
-#
-# Multilabel (ARC 0.14+): optional comma-separated ARC_SCALE_SET_LABELS — workflows must use
-#   runs-on: [label1, label2, ...] matching every label (see HOT_CLUSTER_CI.md).
-#
-arc_helm_append_scale_set_labels() {
-  local -n _helm_arr="${1:?helm args array name required}"
-  [[ -z "${ARC_SCALE_SET_LABELS:-}" ]] && return 0
-  local json="["
-  local first=1
-  local lab
-  IFS=',' read -ra _arc_ssl <<< "${ARC_SCALE_SET_LABELS}"
-  for lab in "${_arc_ssl[@]}"; do
-    lab="${lab//[[:space:]]/}"
-    [[ -z "$lab" ]] && continue
-    [[ $first -eq 0 ]] && json+=","
-    first=0
-    json+="\"${lab//\"/\\\"}\""
-  done
-  json+="]"
-  if [[ $first -eq 1 ]]; then
-    return 0
-  fi
-  echo "Scale set labels (multilabel): ${ARC_SCALE_SET_LABELS}"
-  _helm_arr+=(--set-json "scaleSetLabels=${json}")
-}

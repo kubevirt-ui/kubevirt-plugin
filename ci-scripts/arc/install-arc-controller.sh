@@ -13,6 +13,8 @@
 set -euo pipefail
 ARC_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CI_SCRIPTS_DIR="$(cd "${ARC_DIR}/.." && pwd)"
+source "${CI_SCRIPTS_DIR}/_cluster-helpers.sh"
+verify_oc
 
 ARC_CONTROLLER_NS="${ARC_CONTROLLER_NS:-arc-systems}"
 ARC_CONTROLLER_INSTALL_NAME="${ARC_CONTROLLER_INSTALL_NAME:-arc}"
@@ -25,12 +27,6 @@ echo "  ARC_CONTROLLER_INSTALL_NAME: ${ARC_CONTROLLER_INSTALL_NAME}"
 echo "  ARC_HELM_REPO:               ${ARC_HELM_REPO}"
 echo "  ARC_VERSION:                 ${ARC_VERSION}"
 echo ""
-
-if ! oc get clusterversion version &>/dev/null; then
-  echo "ERROR: This script targets OpenShift only."
-  echo "  Expected cluster-scoped ClusterVersion 'version'; use 'oc login' to an OpenShift cluster."
-  exit 1
-fi
 
 echo "Creating namespace ${ARC_CONTROLLER_NS}..."
 oc create namespace "${ARC_CONTROLLER_NS}" --dry-run=client -o yaml | oc apply -f -
@@ -57,5 +53,4 @@ helm upgrade --install "${ARC_CONTROLLER_INSTALL_NAME}" \
 
 echo ""
 echo "=== ARC controller installation complete ==="
-echo "  Next: ./ci-scripts/arc/install-runner-scale-set.sh   (requires ARC_CONFIG_URL + GitHub auth)"
 echo ""
