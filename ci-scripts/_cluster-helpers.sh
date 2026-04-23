@@ -8,6 +8,7 @@
 # After sourcing, call:
 #   resolve_cli_downloads           # populates OC_URL, VIRTCTL_URL, HELM_URL
 #   resolve_oc_version              # populates OC_VERSION (if not already set)
+#   resolve_internal_registry       # populates INTERNAL_REGISTRY
 #
 # The functions use ConsoleCLIDownload resources and rewrite public route URLs
 # to cluster-internal service URLs so build pods don't need to trust the
@@ -15,6 +16,13 @@
 #
 # Requires: oc logged into OpenShift.
 # Optional: jq (URL resolution is silently skipped without it).
+
+verify_oc() {
+  if ! oc get clusterversion version &>/dev/null; then
+    echo "ERROR: OpenShift cluster required (clusterversion.version not found)."
+    exit 1
+  fi
+}
 
 # Rewrite a public https route URL to its backing cluster-internal HTTP service.
 # Arg: $1 = URL   Reads: _ALL_ROUTES_JSON (set by resolve_cli_downloads)
@@ -47,6 +55,14 @@ resolve_oc_version() {
   OC_VERSION=$(oc version --output json 2>/dev/null \
     | jq -r '.openshiftVersion | split(".") | .[0:2] | join(".") // empty') || true
   OC_VERSION="${OC_VERSION:-4.20}"
+}
+
+# Resolve the internal image registry hostname from the cluster.
+# Sets INTERNAL_REGISTRY; defaults to the well-known service address if detection fails.
+resolve_internal_registry() {
+  INTERNAL_REGISTRY="$(oc get image.config.openshift.io/cluster \
+    -o jsonpath='{.status.internalRegistryHostname}' 2>/dev/null \
+    || echo 'image-registry.openshift-image-registry.svc:5000')"
 }
 
 # Resolve binary download URLs from ConsoleCLIDownload resources.
