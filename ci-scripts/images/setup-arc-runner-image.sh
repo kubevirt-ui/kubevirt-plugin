@@ -16,7 +16,11 @@
 #
 # Binary URL resolution:
 #   Uses ci-scripts/_cluster-helpers.sh to resolve cluster resources
-
+#
+# Namespace note: If the namespace does not match the ci-env-runner deployment namespace,
+# the running service account will need to add role "system:image-puller" so the built image
+# can be pulled.
+#
 set -euo pipefail
 SCRIPT_DIR="$(dirname "${BASH_SOURCE[0]}")"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
@@ -24,7 +28,7 @@ REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 source "${REPO_ROOT}/ci-scripts/_cluster-helpers.sh"
 verify_oc
 
-NS="${NS:-ci-env-images}"
+NS="${NS:-arc-runners}"
 IMAGE_DIR="${SCRIPT_DIR}/arc-runner"
 IMAGE_NAME="arc-runner"
 
@@ -112,10 +116,11 @@ IMAGE_REF="${INTERNAL_REGISTRY}/${NS}/${IMAGE_NAME}:latest"
 echo ""
 echo "=== Build complete ==="
 echo "Image: ${IMAGE_REF}"
+echo ""
 
 # TODO: Better handling of passing the fqdn image name to the caller
 if [[ -n "${ARC_RUNNER_IMAGE_FILE:-}" ]]; then
   printf '%s\n' "${IMAGE_REF}" > "${ARC_RUNNER_IMAGE_FILE}"
   echo "Wrote ${ARC_RUNNER_IMAGE_FILE}"
 fi
-echo "IMAGE_REF=${IMAGE_REF}"
+#echo "IMAGE_REF=${IMAGE_REF}"

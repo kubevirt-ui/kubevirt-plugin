@@ -6,7 +6,7 @@
 # Output: prints IMAGE_REF= to stdout (and to CI_ENV_CONTROLLER_IMAGE_FILE if set).
 #
 # Optional environment variables:
-#   NS                     Namespace for the controller (default: ci-env-images)
+#   NS                     Namespace for the controller (default: ci-env)
 #   OC_VERSION             OpenShift client version build-arg (default: detect or 4.20)
 #   HELM_VERSION           Helm version build-arg (default: 3.19.0)
 #   YQ_VERSION             yq version build-arg (default: v4.52.5)
@@ -15,7 +15,11 @@
 #
 # Binary URL resolution:
 #   Uses ci-scripts/_cluster-helpers.sh to resolve cluster resources
-
+#
+# Namespace note: If the namespace does not match the ci-env-runner deployment namespace,
+# the running service account will need to add role "system:image-puller" so the built image
+# can be pulled.
+#
 set -euo pipefail
 SCRIPT_DIR="$(dirname "${BASH_SOURCE[0]}")"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
@@ -23,7 +27,7 @@ REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 source "${REPO_ROOT}/ci-scripts/_cluster-helpers.sh"
 verify_oc
 
-NS="${NS:-ci-env-images}"
+NS="${NS:-ci-env}"
 IMAGE_DIR="${SCRIPT_DIR}/ci-env-runner"
 IMAGE_NAME="ci-env-runner"
 
@@ -109,10 +113,11 @@ IMAGE_REF="${INTERNAL_REGISTRY}/${NS}/${IMAGE_NAME}:latest"
 echo ""
 echo "=== Build complete ==="
 echo "Image: ${IMAGE_REF}"
+echo ""
 
 # TODO: Better handling of passing the fqdn image name to the caller
 if [[ -n "${CI_ENV_RUNNER_IMAGE_FILE:-}" ]]; then
   printf '%s\n' "${IMAGE_REF}" > "${CI_ENV_RUNNER_IMAGE_FILE}"
   echo "Wrote ${CI_ENV_RUNNER_IMAGE_FILE}"
 fi
-echo "IMAGE_REF=${IMAGE_REF}"
+#echo "IMAGE_REF=${IMAGE_REF}"
