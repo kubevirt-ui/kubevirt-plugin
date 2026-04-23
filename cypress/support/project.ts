@@ -31,7 +31,13 @@ Cypress.Commands.add('selectTestProject', () => {
 });
 
 Cypress.Commands.add('switchProjectUsingTreeView', (projectName: string) => {
-  cy.get(`li#projectSelector/${projectName}`).click();
+  const projectSelector = `li[id="projectSelector/#single-cluster#/${projectName}"]`;
+  cy.get('body').then(($body) => {
+    if (!$body.find(projectSelector).length) {
+      cy.get('.vms-tree-view__toolbar-switch input').uncheck({ force: true });
+    }
+  });
+  cy.get(projectSelector, { timeout: 10000 }).click();
 });
 
 Cypress.Commands.add('switchProject', (projectName: string) => {
@@ -41,14 +47,18 @@ Cypress.Commands.add('switchProject', (projectName: string) => {
     );
   }
   const name = typeof projectName === 'string' ? projectName : String(projectName);
-  cy.get('body').then(($body) => {
-    if ($body.find(TREEVIEW_ROOT_ID).length) {
-      cy.switchProjectUsingTreeView(name);
-      return;
-    }
-
-    cy.byLegacyTestID('namespace-bar-dropdown').contains('Project:').click();
-    cy.byTestID('showSystemSwitch').check();
-    cy.byTestID('dropdown-menu-item-link').contains(name).click();
-  });
+  const namespaceBarSelector = '[data-test-id="namespace-bar-dropdown"]';
+  cy.get(`${namespaceBarSelector}, ${TREEVIEW_ROOT_ID}`, { timeout: 30000 })
+    .should('exist')
+    .then(() => {
+      cy.get('body').then(($body) => {
+        if ($body.find(TREEVIEW_ROOT_ID).length) {
+          cy.switchProjectUsingTreeView(name);
+        } else {
+          cy.byLegacyTestID('namespace-bar-dropdown').contains('Project:').click();
+          cy.byTestID('showSystemSwitch').check();
+          cy.byTestID('dropdown-menu-item-link').contains(name).click();
+        }
+      });
+    });
 });
