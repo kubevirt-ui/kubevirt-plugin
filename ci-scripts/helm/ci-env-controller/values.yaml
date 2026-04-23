@@ -1,0 +1,24 @@
+# Image for the ci-env-controller pod.
+# Required: set at install time via --set image=... or CI_ENV_CONTROLLER_IMAGE.
+image: ''
+
+# Namespace where the controller runs and where trigger ConfigMaps live.
+namespace: ci-env
+
+# Force-clean environments older than this many seconds (default: 2h).
+ttlSeconds: 7200
+
+# Label selector the controller uses to find trigger ConfigMaps.
+label: 'ci.kubevirt-plugin/type=test-environment'
+
+# Path to the ci-test-stack Helm chart embedded in the controller image.
+helmChartPath: /opt/ci-env/helm/ci-test-stack
+
+# Base registry for auto-resolving the console image from cluster version.
+consoleImageRegistry: quay.io/openshift/origin-console
+
+# ARC runner ServiceAccount that needs permission to create ConfigMaps in the
+# ci-env namespace (triggers environment provisioning).
+runner:
+  saName: kubevirt-plugin-ci-gha-rs-no-permission
+  saNamespace: arc-runners

@@ -23,7 +23,7 @@ console:
     thanosUrl: ''
     alertmanagerUrl: ''
 
-# ClusterRole pre-created at ARC install time (ci-console-clusterrole.yaml)
+# ClusterRole created by the ci-env-controller Helm chart (clusterrole-console.yaml).
 rbac:
   consoleClusterRole: ci-console
   # ClusterRole that grants test permissions inside the test namespace
