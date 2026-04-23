@@ -75,7 +75,7 @@ ready -> (runner sets desired-state=absent) -> cleaning -> cleaned
 Prerequisites: `oc` logged in to OpenShift with cluster-admin, `helm` available.
 
 ```bash
-# Install the controller (builds image, creates RBAC, deploys)
+# Install the controller (builds image, installs chart)
 ./ci-scripts/ci-env/install-ci-env-controller.sh
 
 # Or with a pre-built image:
@@ -83,44 +83,71 @@ CI_ENV_CONTROLLER_IMAGE=quay.io/myorg/ci-env-controller:latest \
   ./ci-scripts/ci-env/install-ci-env-controller.sh
 ```
 
-The install script:
+The install script resolves the controller image (building it if needed) then
+runs a single `helm upgrade --install` against the `ci-env-controller` chart.
 
-- Creates the `ci-env` namespace
-- Applies controller RBAC (ServiceAccount, ClusterRole, ClusterRoleBinding)
-- Applies the `ci-console` ClusterRole
-- Builds the controller image via OpenShift BuildConfig (or uses a pre-built image)
-- Creates ConfigMaps from the controller script, Helm chart, and cleanup script
-- Deploys the controller
-- Creates a namespaced RoleBinding so the ARC runner SA can manage ConfigMaps in `ci-env`
+To update the controller script without rebuilding the image, edit
+`ci-scripts/helm/ci-env-controller/scripts/ci-env-controller.sh` and re-run
+the install script (or `helm upgrade --install` directly). The chart checksum
+annotation on the Deployment triggers an automatic rolling restart.
+
+## Chart Layout
+
+All Kubernetes manifests live in the Helm chart under
+`ci-scripts/helm/ci-env-controller/`:
+
+```
+ci-env-controller/
+├── Chart.yaml
+├── values.yaml
+├── scripts/
+│   └── ci-env-controller.sh        # Controller watch loop (inlined into ConfigMap by Helm)
+└── templates/
+    ├── _helpers.tpl
+    ├── namespace.yaml
+    ├── serviceaccount.yaml
+    ├── clusterrole-controller.yaml
+    ├── clusterrole-test-runner.yaml
+    ├── clusterrole-console.yaml     # ci-console ClusterRole (used by ci-test-stack)
+    ├── clusterrolebinding.yaml
+    ├── role-trigger.yaml            # Allows runner SA to manage ConfigMaps in ci-env
+    ├── rolebinding-runner.yaml
+    ├── configmap-script.yaml        # Inlines ci-env-controller.sh via .Files.Get
+    └── deployment.yaml
+```
 
 ## Configuration
 
-Environment variables on the controller Deployment:
+`values.yaml` defaults — override via `--set` or a values file:
 
-| Variable             | Default                                    | Description                              |
-| -------------------- | ------------------------------------------ | ---------------------------------------- |
-| `CI_ENV_NS`          | `ci-env`                                   | Namespace for trigger ConfigMaps         |
-| `CI_ENV_TTL_SECONDS` | `7200`                                     | Force-clean stale environments (seconds) |
-| `CI_ENV_LABEL`       | `ci.kubevirt-plugin/type=test-environment` | ConfigMap label selector                 |
-| `HELM_CHART_PATH`    | `/opt/ci-env/helm/ci-test-stack`           | Path to Helm chart in container          |
+| Value                  | Default                                    | Description                              |
+| ---------------------- | ------------------------------------------ | ---------------------------------------- |
+| `image`                | _(required)_                               | Controller pod image                     |
+| `namespace`            | `ci-env`                                   | Namespace for controller and ConfigMaps  |
+| `ttlSeconds`           | `7200`                                     | Force-clean stale environments (seconds) |
+| `label`                | `ci.kubevirt-plugin/type=test-environment` | ConfigMap label selector                 |
+| `helmChartPath`        | `/opt/ci-env/helm/ci-test-stack`           | Path to embedded Helm chart in image     |
+| `consoleImageRegistry` | `quay.io/openshift/origin-console`         | Base registry for auto-resolved console  |
+| `runner.saName`        | `kubevirt-plugin-ci-gha-rs-no-permission`  | ARC runner ServiceAccount name           |
+| `runner.saNamespace`   | `arc-runners`                              | ARC runner ServiceAccount namespace      |
 
 ## Files
 
-| File                                | Purpose                                                |
-| ----------------------------------- | ------------------------------------------------------ |
-| `ci-env-controller.sh`              | Controller watch loop, provisioning, and cleanup logic |
-| `ci-env-namespace.yaml`             | Namespace definition                                   |
-| `ci-env-controller-rbac.yaml`       | ServiceAccount, ClusterRole, ClusterRoleBinding        |
-| `ci-env-controller-deployment.yaml` | Deployment manifest                                    |
-| `install-ci-env-controller.sh`      | Standalone install script                              |
-| `controller-image/Dockerfile`       | UBI9-based image with oc, helm, jq, yq, curl           |
+| File                           | Purpose                                         |
+| ------------------------------ | ----------------------------------------------- |
+| `install-ci-env-controller.sh` | Thin install wrapper: resolves image, runs helm |
+| `README.md`                    | This file                                       |
 
 ## Relationship to ARC
 
 The controller is fully independent of the ARC installation. It runs in its own
 namespace (`ci-env`) with its own ServiceAccount and ClusterRole. The only
-connection is a namespaced RoleBinding that allows the ARC runner SA to create
-ConfigMaps in `ci-env`.
+connection is a namespaced RoleBinding (in the chart) that allows the ARC
+runner SA to create ConfigMaps in `ci-env`.
+
+The `ci-console` ClusterRole (required by the ci-test-stack chart) is also
+owned by this chart, so the ci-env-controller must be installed before any
+test runs.
 
 ## Future Work
 
