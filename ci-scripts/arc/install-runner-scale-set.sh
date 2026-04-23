@@ -18,8 +18,6 @@
 #   ARC_CONTROLLER_INSTALL_NAME (default: arc)
 #   ARC_RUNNERS_NS              (default: arc-runners)
 #   ARC_VERSION                 Helm chart version (default: 0.14.0); set to "latest" to omit --version
-#   ARC_SCALE_SET_LABELS        Optional comma-separated multilabel (ARC 0.14+)
-#   ARC_RUNNER_EXTRA_VALUES     Optional second Helm values file (merged after pod.yaml)
 #   ARC_RUNNER_IMAGE            If set, use this image for the runner container
 #   SKIP_ARC_RUNNER_RBAC        Set to 1 to skip applying ci-scripts/arc/arc-runner-rbac.yaml
 #
@@ -28,6 +26,9 @@
 set -euo pipefail
 ARC_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CI_SCRIPTS_DIR="$(cd "${ARC_DIR}/.." && pwd)"
+source "${CI_SCRIPTS_DIR}/_cluster-helpers.sh"
+verify_oc
+
 source "${ARC_DIR}/arc-helm-helpers.sh"
 
 RUNNER_POD_VALUES="${ARC_DIR}/arc-runner-scale-set.pod.yaml"
@@ -45,6 +46,7 @@ ARC_VERSION="${ARC_VERSION:-0.14.0}"
 RUNNER_SCALE_SET_NAME="${RUNNER_SCALE_SET_NAME:-kubevirt-plugin-ci}"
 MIN_RUNNERS="${MIN_RUNNERS:-0}"
 MAX_RUNNERS="${MAX_RUNNERS:-5}"
+CONTROLLER_SA_NAME="${ARC_CONTROLLER_INSTALL_NAME}-gha-rs-controller"
 
 echo "=== ARC runner scale set installation (OpenShift) ==="
 echo "  ARC_CONFIG_URL:              ${ARC_CONFIG_URL}"
@@ -56,12 +58,8 @@ echo "  ARC_VERSION:                 ${ARC_VERSION}"
 echo "  RUNNER_SCALE_SET_NAME:       ${RUNNER_SCALE_SET_NAME}"
 echo "  MIN_RUNNERS / MAX_RUNNERS:   ${MIN_RUNNERS} / ${MAX_RUNNERS}"
 echo "  Runner pod values:           ${RUNNER_POD_VALUES}"
+echo "  Controller SA name:          ${CONTROLLER_SA_NAME}"
 echo ""
-
-if ! oc get clusterversion version &>/dev/null; then
-  echo "ERROR: This script targets OpenShift only."
-  exit 1
-fi
 
 echo "Creating namespace ${ARC_RUNNERS_NS}..."
 oc create namespace "${ARC_RUNNERS_NS}" --dry-run=client -o yaml | oc apply -f -
@@ -70,8 +68,6 @@ AUTH_ARGS=()
 if ! arc_github_config_secret_helm_auth AUTH_ARGS; then
   exit 1
 fi
-
-CONTROLLER_SA_NAME="${ARC_CONTROLLER_INSTALL_NAME}-gha-rs-controller"
 
 RUNNER_SET_ARGS=(
   --set "githubConfigUrl=${ARC_CONFIG_URL}"
@@ -86,14 +82,9 @@ if [[ -n "${ARC_RUNNER_IMAGE:-}" ]]; then
   echo "Using runner image from ARC_RUNNER_IMAGE"
   RUNNER_SET_ARGS+=(--set-string "template.spec.containers[0].image=${ARC_RUNNER_IMAGE}")
 fi
-if [[ -n "${ARC_RUNNER_EXTRA_VALUES:-}" && -f "${ARC_RUNNER_EXTRA_VALUES}" ]]; then
-  echo "Merging extra Helm values: ${ARC_RUNNER_EXTRA_VALUES}"
-  RUNNER_SET_ARGS+=(--values "${ARC_RUNNER_EXTRA_VALUES}")
-fi
 if [[ -n "${ARC_VERSION}" && "${ARC_VERSION}" != "latest" ]]; then
   RUNNER_SET_ARGS+=(--version "${ARC_VERSION}")
 fi
-arc_helm_append_scale_set_labels RUNNER_SET_ARGS
 
 echo "Installing runner scale set '${RUNNER_SCALE_SET_NAME}'..."
 helm upgrade --install "${RUNNER_SCALE_SET_NAME}" \
@@ -101,8 +92,6 @@ helm upgrade --install "${RUNNER_SCALE_SET_NAME}" \
   "${RUNNER_SET_ARGS[@]}" \
   "${ARC_HELM_REPO}/gha-runner-scale-set" \
   --wait
-
-[[ -n "${AUTH_VALUES_FILE:-}" ]] && rm -f "${AUTH_VALUES_FILE}"
 
 RUNNER_SA="${RUNNER_SCALE_SET_NAME}-gha-rs-no-permission"
 echo "Binding SCC github-arc to runner ServiceAccount ${RUNNER_SA}..."
