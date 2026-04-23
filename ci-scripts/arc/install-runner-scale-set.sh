@@ -53,6 +53,7 @@ echo "  ARC_CONFIG_URL:              ${ARC_CONFIG_URL}"
 echo "  ARC_CONTROLLER_NS:           ${ARC_CONTROLLER_NS}"
 echo "  ARC_CONTROLLER_INSTALL_NAME: ${ARC_CONTROLLER_INSTALL_NAME}"
 echo "  ARC_RUNNERS_NS:              ${ARC_RUNNERS_NS}"
+echo "  ARC_RUNNER_IMAGE:            ${ARC_RUNNER_IMAGE:-(not set, will use default)}"
 echo "  ARC_HELM_REPO:               ${ARC_HELM_REPO}"
 echo "  ARC_VERSION:                 ${ARC_VERSION}"
 echo "  RUNNER_SCALE_SET_NAME:       ${RUNNER_SCALE_SET_NAME}"
@@ -87,11 +88,13 @@ if [[ -n "${ARC_VERSION}" && "${ARC_VERSION}" != "latest" ]]; then
 fi
 
 echo "Installing runner scale set '${RUNNER_SCALE_SET_NAME}'..."
-helm upgrade --install "${RUNNER_SCALE_SET_NAME}" \
+helm upgrade \
+  "${RUNNER_SCALE_SET_NAME}" \
+  "${ARC_HELM_REPO}/gha-runner-scale-set" \
+  --install \
   --namespace "${ARC_RUNNERS_NS}" \
   "${RUNNER_SET_ARGS[@]}" \
-  "${ARC_HELM_REPO}/gha-runner-scale-set" \
-  --wait
+  --wait --timeout 5m
 
 RUNNER_SA="${RUNNER_SCALE_SET_NAME}-gha-rs-no-permission"
 echo "Binding SCC github-arc to runner ServiceAccount ${RUNNER_SA}..."
