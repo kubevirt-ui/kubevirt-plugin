@@ -34,7 +34,7 @@ oc create namespace "${ARC_CONTROLLER_NS}" --dry-run=client -o yaml | oc apply -
 echo "Applying ARC SCC and ClusterRole (github-arc)..."
 oc apply -f "${ARC_DIR}/arc-openshift-scc.yaml"
 
-CONTROLLER_ARGS=(--namespace "${ARC_CONTROLLER_NS}")
+CONTROLLER_ARGS=()
 if [[ -n "${ARC_VERSION}" && "${ARC_VERSION}" != "latest" ]]; then
   CONTROLLER_ARGS+=(--version "${ARC_VERSION}")
 fi
@@ -43,10 +43,13 @@ CONTROLLER_SA_NAME="${ARC_CONTROLLER_INSTALL_NAME}-gha-rs-controller"
 CONTROLLER_ARGS+=(--set "serviceAccount.name=${CONTROLLER_SA_NAME}")
 
 echo "Installing ARC controller (Helm release: ${ARC_CONTROLLER_INSTALL_NAME})..."
-helm upgrade --install "${ARC_CONTROLLER_INSTALL_NAME}" \
-  "${CONTROLLER_ARGS[@]}" \
+helm upgrade \
+  "${ARC_CONTROLLER_INSTALL_NAME}" \
   "${ARC_HELM_REPO}/gha-runner-scale-set-controller" \
-  --wait
+  --install \
+  --namespace "${ARC_CONTROLLER_NS}" \
+  "${CONTROLLER_ARGS[@]}" \
+  --wait --timeout 5m
 
 echo ""
 echo "=== ARC controller installation complete ==="

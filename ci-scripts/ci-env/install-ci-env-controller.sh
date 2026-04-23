@@ -19,6 +19,9 @@ set -euo pipefail
 
 CI_ENV_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CI_SCRIPTS_DIR="$(cd "${CI_ENV_DIR}/.." && pwd)"
+source "${CI_SCRIPTS_DIR}/_cluster-helpers.sh"
+verify_oc
+
 CHART_DIR="${CI_SCRIPTS_DIR}/helm/ci-env-controller"
 
 CI_ENV_NS="${CI_ENV_NS:-ci-env}"
@@ -27,15 +30,12 @@ RUNNER_SCALE_SET_NAME="${RUNNER_SCALE_SET_NAME:-kubevirt-plugin-ci}"
 RUNNER_SA_NAME="${RUNNER_SCALE_SET_NAME}-gha-rs-no-permission"
 
 echo "=== CI Environment Controller installation ==="
-echo "  CI_ENV_NS:           ${CI_ENV_NS}"
-echo "  ARC_RUNNERS_NS:      ${ARC_RUNNERS_NS}"
-echo "  RUNNER_SA_NAME:      ${RUNNER_SA_NAME}"
+echo "  CI_ENV_NS:               ${CI_ENV_NS}"
+echo "  CI_ENV_CONTROLLER_IMAGE: ${CI_ENV_CONTROLLER_IMAGE:-(not set, will build)}"
+echo "  ARC_RUNNERS_NS:          ${ARC_RUNNERS_NS}"
+echo "  RUNNER_SCALE_SET_NAME:   ${RUNNER_SCALE_SET_NAME}"
+echo "  RUNNER_SA_NAME:          ${RUNNER_SA_NAME}"
 echo ""
-
-if ! oc get clusterversion version &>/dev/null; then
-  echo "ERROR: This script targets OpenShift only."
-  exit 1
-fi
 
 # --- Resolve controller image ---
 if [[ -z "${CI_ENV_CONTROLLER_IMAGE:-}" ]]; then
@@ -49,20 +49,30 @@ if [[ -z "${CI_ENV_CONTROLLER_IMAGE:-}" ]]; then
   fi
   echo "Built image: ${CI_ENV_CONTROLLER_IMAGE}"
 else
-  echo "Using pre-built image: ${CI_ENV_CONTROLLER_IMAGE}"
+  echo "Using provided image: ${CI_ENV_CONTROLLER_IMAGE}"
 fi
 
+# --- Create namespace ---
+echo "Creating namespace ${CI_ENV_NS}..."
+oc create namespace "${CI_ENV_NS}" --dry-run=client -o yaml | oc apply -f -
+
 # --- Install / upgrade the chart ---
+VALUES_ARGS=(
+  --set "namespace=${CI_ENV_NS}"
+  --set "image=${CI_ENV_CONTROLLER_IMAGE}"
+  --set "runner.saName=${RUNNER_SA_NAME}"
+  --set "runner.saNamespace=${ARC_RUNNERS_NS}"
+)
+
 echo ""
 echo "Running helm upgrade --install..."
-helm upgrade --install ci-env-controller \
+helm upgrade \
+  ci-env-controller \
   "${CHART_DIR}" \
-  --create-namespace \
-  --set "namespace=${CI_ENV_NS}" \
-  --set "image=${CI_ENV_CONTROLLER_IMAGE}" \
-  --set "runner.saName=${RUNNER_SA_NAME}" \
-  --set "runner.saNamespace=${ARC_RUNNERS_NS}" \
-  --wait --timeout 120s
+  --install \
+  --namespace "${CI_ENV_NS}" \
+  "${VALUES_ARGS[@]}" \
+  --wait --timeout 5m
 
 echo ""
 echo "=== CI Environment Controller installation complete ==="
