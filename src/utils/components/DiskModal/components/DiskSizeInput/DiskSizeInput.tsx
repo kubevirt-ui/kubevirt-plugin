@@ -30,6 +30,7 @@ const DiskSizeInput: FC<DiskSizeInputProps> = ({ isCreated, isDisabled, namespac
     getSourceRef(diskState),
     getPVCClaimName(diskState),
     namespace,
+    diskState.cluster,
   );
 
   if (isCreated) return <ExpandPVC pvc={pvc} />;
