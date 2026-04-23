@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: ci-env
+  name: {{ .Values.namespace }}
   labels:
-    app.kubernetes.io/component: ci-env-controller
+    {{- include "ci-env-controller.labels" . | nindent 4 }}
     app.kubernetes.io/part-of: kubevirt-plugin-ci

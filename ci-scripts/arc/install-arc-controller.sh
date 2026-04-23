@@ -34,9 +34,6 @@ oc create namespace "${ARC_CONTROLLER_NS}" --dry-run=client -o yaml | oc apply -
 echo "Applying ARC SCC and ClusterRole (github-arc)..."
 oc apply -f "${ARC_DIR}/arc-openshift-scc.yaml"
 
-echo "Applying CI console ClusterRole (ci-console)..."
-oc apply -f "${ARC_DIR}/ci-console-clusterrole.yaml"
-
 CONTROLLER_ARGS=(--namespace "${ARC_CONTROLLER_NS}")
 if [[ -n "${ARC_VERSION}" && "${ARC_VERSION}" != "latest" ]]; then
   CONTROLLER_ARGS+=(--version "${ARC_VERSION}")

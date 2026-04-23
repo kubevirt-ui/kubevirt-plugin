@@ -1,26 +1,9 @@
-# RBAC for the ci-env-controller Deployment.
-#
-# This ClusterRole must be a SUPERSET of ci-console (ci-console-clusterrole.yaml)
-# because the controller creates ClusterRoleBindings to ci-console, and Kubernetes
-# prevents RBAC escalation -- you cannot grant permissions you do not hold.
-#
-# The controller also needs lifecycle permissions (namespaces, Helm resources,
-# Routes, ClusterRoleBindings) and cluster discovery reads.
----
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: ci-env-controller
-  namespace: ci-env
-  labels:
-    app.kubernetes.io/component: ci-env-controller
----
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: ci-env-controller
   labels:
-    app.kubernetes.io/component: ci-env-controller
+    {{- include "ci-env-controller.labels" . | nindent 4 }}
 rules:
   # -----------------------------------------------------------------------
   #  Cluster discovery (api-server, apps-domain, monitoring URLs, console image)
@@ -165,52 +148,3 @@ rules:
   - apiGroups: ['k8s.cni.cncf.io']
     resources: ['network-attachment-definitions']
     verbs: ['get', 'list', 'delete']
----
-# ClusterRole bound (via RoleBinding) to the ARC runner SA in each test namespace.
-# The ci-env-controller creates RoleBindings for this role during provisioning.
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: ci-env-test-runner
-  labels:
-    app.kubernetes.io/component: ci-env-controller
-rules:
-  - apiGroups: ['']
-    resources: ['secrets']
-    verbs: ['get', 'list', 'create', 'update', 'patch', 'delete']
-  - apiGroups: ['']
-    resources: ['persistentvolumeclaims']
-    verbs: ['get', 'list', 'delete']
-  - apiGroups: ['kubevirt.io']
-    resources: ['virtualmachines']
-    verbs: ['get', 'list', 'watch', 'create', 'update', 'patch', 'delete']
-  - apiGroups: ['snapshot.kubevirt.io']
-    resources: ['virtualmachinesnapshots']
-    verbs: ['get', 'list', 'delete']
-  - apiGroups: ['cdi.kubevirt.io']
-    resources: ['datavolumes', 'datasources']
-    verbs: ['get', 'list', 'delete']
-  - apiGroups: ['template.openshift.io']
-    resources: ['templates']
-    verbs: ['get', 'list', 'delete']
-  - apiGroups: ['k8s.cni.cncf.io']
-    resources: ['network-attachment-definitions']
-    verbs: ['get', 'list', 'delete']
-  - apiGroups: ['instancetype.kubevirt.io']
-    resources: ['virtualmachineinstancetypes', 'virtualmachinepreferences']
-    verbs: ['get', 'list', 'delete']
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
-  name: ci-env-controller
-  labels:
-    app.kubernetes.io/component: ci-env-controller
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: ci-env-controller
-subjects:
-  - kind: ServiceAccount
-    name: ci-env-controller
-    namespace: ci-env

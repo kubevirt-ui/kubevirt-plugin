@@ -4,27 +4,22 @@
 # This is a standalone script -- it does NOT depend on the ARC install.
 #
 # What it does:
-#   1. Creates the ci-env namespace
-#   2. Applies RBAC (ServiceAccount, ClusterRole, ClusterRoleBinding)
-#   3. Applies the ci-console ClusterRole (needed by the Helm chart)
-#   4. Builds the controller image via setup-controller-image.sh (or uses a pre-built image)
-#      The image embeds the Helm chart for the CI test stack.
-#   5. Creates a ConfigMap from the controller script (mounted for easy updates)
-#   6. Deploys the controller
-#   7. Creates a RoleBinding so the ARC runner SA can create ConfigMaps in ci-env
+#   1. Optionally builds the controller image via setup-ci-env-runner-image.sh
+#   2. Runs helm upgrade --install with the ci-env-controller chart
 #
 # Optional environment variables:
 #   CI_ENV_NS                    Namespace for the controller (default: ci-env)
-#   CI_ENV_CONTROLLER_IMAGE      Pre-built image; skips BuildConfig if set
+#   CI_ENV_CONTROLLER_IMAGE      Pre-built image; skips image build if set
 #   ARC_RUNNERS_NS               Namespace where ARC runner pods run (default: arc-runners)
 #   RUNNER_SCALE_SET_NAME        ARC scale set name (default: kubevirt-plugin-ci)
 #
-# Prerequisites: oc login to OpenShift with cluster-admin
+# Prerequisites: oc login to OpenShift with cluster-admin, helm available
 
 set -euo pipefail
 
 CI_ENV_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CI_SCRIPTS_DIR="$(cd "${CI_ENV_DIR}/.." && pwd)"
+CHART_DIR="${CI_SCRIPTS_DIR}/helm/ci-env-controller"
 
 CI_ENV_NS="${CI_ENV_NS:-ci-env}"
 ARC_RUNNERS_NS="${ARC_RUNNERS_NS:-arc-runners}"
@@ -42,25 +37,14 @@ if ! oc get clusterversion version &>/dev/null; then
   exit 1
 fi
 
-# --- 1. Namespace ---
-echo "Creating namespace ${CI_ENV_NS}..."
-oc apply -f "${CI_ENV_DIR}/ci-env-namespace.yaml"
-
-# --- 2. RBAC ---
-echo "Applying controller RBAC..."
-oc apply -f "${CI_ENV_DIR}/ci-env-controller-rbac.yaml"
-
-# --- 3. ci-console ClusterRole ---
-echo "Applying ci-console ClusterRole..."
-oc apply -f "${CI_SCRIPTS_DIR}/arc/ci-console-clusterrole.yaml"
-
-# --- 4. Controller image ---
+# --- Resolve controller image ---
 if [[ -z "${CI_ENV_CONTROLLER_IMAGE:-}" ]]; then
-  echo "Building controller image via setup-controller-image.sh..."
-  IMAGE_OUTPUT="$(CI_ENV_NS="${CI_ENV_NS}" bash "${CI_ENV_DIR}/setup-controller-image.sh")"
+  echo "Building controller image via setup-ci-env-runner-image.sh..."
+  IMAGE_OUTPUT="$(CI_ENV_NS="${CI_ENV_NS}" bash "${CI_SCRIPTS_DIR}/images/setup-ci-env-runner-image.sh" 2>&1)"
   CI_ENV_CONTROLLER_IMAGE="$(echo "${IMAGE_OUTPUT}" | grep '^IMAGE_REF=' | cut -d= -f2-)"
   if [[ -z "${CI_ENV_CONTROLLER_IMAGE}" ]]; then
-    echo "ERROR: setup-controller-image.sh did not output IMAGE_REF="
+    echo "ERROR: setup-ci-env-runner-image.sh did not output IMAGE_REF="
+    echo "${IMAGE_OUTPUT}"
     exit 1
   fi
   echo "Built image: ${CI_ENV_CONTROLLER_IMAGE}"
@@ -68,55 +52,17 @@ else
   echo "Using pre-built image: ${CI_ENV_CONTROLLER_IMAGE}"
 fi
 
-# --- 5. ConfigMap for controller script (mounted for easy updates) ---
-echo "Creating ConfigMap from controller script..."
-oc create configmap ci-env-controller-script \
-  -n "${CI_ENV_NS}" \
-  --from-file=ci-env-controller.sh="${CI_ENV_DIR}/ci-env-controller.sh" \
-  --dry-run=client -o yaml | oc apply -f -
-
-# --- 6. Deploy the controller ---
-echo "Deploying ci-env-controller..."
-sed -e "s|CI_ENV_CONTROLLER_IMAGE_PLACEHOLDER|${CI_ENV_CONTROLLER_IMAGE}|g" \
-    -e "s|RUNNER_SA_NAME_PLACEHOLDER|${RUNNER_SA_NAME}|g" \
-    -e "s|RUNNER_SA_NS_PLACEHOLDER|${ARC_RUNNERS_NS}|g" \
-  "${CI_ENV_DIR}/ci-env-controller-deployment.yaml" \
-  | oc apply -f -
-
-echo "Waiting for controller to be ready..."
-oc rollout status deployment/ci-env-controller -n "${CI_ENV_NS}" --timeout=120s || true
-
-# --- 7. RoleBinding for ARC runner SA ---
-echo "Creating RoleBinding for runner SA (${RUNNER_SA_NAME}) in ${CI_ENV_NS}..."
-oc apply -f - <<EOF
-apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
-metadata:
-  name: ci-env-trigger
-  namespace: ${CI_ENV_NS}
-  labels:
-    app.kubernetes.io/component: ci-env-controller
-rules:
-  - apiGroups: ['']
-    resources: ['configmaps']
-    verbs: ['get', 'list', 'watch', 'create', 'update', 'patch', 'delete']
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  name: ci-env-trigger-runner
-  namespace: ${CI_ENV_NS}
-  labels:
-    app.kubernetes.io/component: ci-env-controller
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: Role
-  name: ci-env-trigger
-subjects:
-  - kind: ServiceAccount
-    name: ${RUNNER_SA_NAME}
-    namespace: ${ARC_RUNNERS_NS}
-EOF
+# --- Install / upgrade the chart ---
+echo ""
+echo "Running helm upgrade --install..."
+helm upgrade --install ci-env-controller \
+  "${CHART_DIR}" \
+  --create-namespace \
+  --set "namespace=${CI_ENV_NS}" \
+  --set "image=${CI_ENV_CONTROLLER_IMAGE}" \
+  --set "runner.saName=${RUNNER_SA_NAME}" \
+  --set "runner.saNamespace=${ARC_RUNNERS_NS}" \
+  --wait --timeout 120s
 
 echo ""
 echo "=== CI Environment Controller installation complete ==="

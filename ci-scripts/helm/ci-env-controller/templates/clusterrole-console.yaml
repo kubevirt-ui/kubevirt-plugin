@@ -1,20 +1,18 @@
 # ClusterRole for the CI test stack console ServiceAccount.
-# Applied once at ARC install time by install-arc-controller.sh.
 # Bound per CI run by the ci-test-stack Helm chart's ClusterRoleBinding.
 #
 # Permissions cover what the OpenShift console needs to proxy browser requests
 # (including WebSocket watch) for KubeVirt/CDI management, plus cluster-info
 # reads for the console UI chrome and overview pages.
 #
-# IMPORTANT: ci-env-controller-rbac.yaml (ci-env-controller ClusterRole) must be
-# a SUPERSET of this file. Any additions here must also be added there.
----
+# IMPORTANT: clusterrole-controller.yaml must be a SUPERSET of this file.
+# Any additions here must also be added there.
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: ci-console
   labels:
-    app.kubernetes.io/component: ci-console-rbac
+    {{- include "ci-env-controller.labels" . | nindent 4 }}
 rules:
   # Cluster info (console chrome, overview pages, cluster version banner)
   - apiGroups: ['']
