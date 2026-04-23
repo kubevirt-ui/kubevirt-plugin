@@ -1,14 +1,15 @@
-import React, { ComponentClass, FCC, ReactNode } from 'react';
+import React, { ComponentClass, FC, ReactNode } from 'react';
 
 import { Divider, DrilldownMenu, MenuItem } from '@patternfly/react-core';
 
 type DrilldownMenuItemProps = {
+  children?: ReactNode;
   Icon?: ComponentClass;
   id: string;
   label: ReactNode;
 };
 
-const DrilldownMenuItem: FCC<DrilldownMenuItemProps> = ({ children, Icon, id, label }) => (
+const DrilldownMenuItem: FC<DrilldownMenuItemProps> = ({ children, Icon, id, label }) => (
   <MenuItem
     drilldownMenu={
       <DrilldownMenu id={id}>

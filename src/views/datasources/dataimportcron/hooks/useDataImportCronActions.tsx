@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
 
 import { DataImportCronModel, DataImportCronModelRef } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -29,14 +29,14 @@ export const useDataImportCronActionsProvider: UseDataImportCronActionsProvider 
   dataImportCron,
 ) => {
   const dataSourceName = dataImportCron?.spec?.managedDataSource;
-  const [dataSource, setDataSource] = React.useState<V1beta1DataSource>();
-  const [isLoading, setIsLoading] = React.useState<boolean>(false);
+  const [dataSource, setDataSource] = useState<V1beta1DataSource>();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const navigate = useNavigate();
   const isOwnedBySSP = isDataResourceOwnedBySSP(dataImportCron);
 
-  const lazyLoadDataSource = React.useCallback(() => {
+  const lazyLoadDataSource = useCallback(() => {
     if (dataSourceName && !dataSource && !isOwnedBySSP) {
       setIsLoading(true);
       k8sGet<V1beta1DataSource>({
@@ -50,7 +50,7 @@ export const useDataImportCronActionsProvider: UseDataImportCronActionsProvider 
     }
   }, [dataSource, dataSourceName, dataImportCron?.metadata?.namespace, isOwnedBySSP]);
 
-  const actions = React.useMemo(
+  const actions = useMemo(
     () => [
       {
         cta: () =>

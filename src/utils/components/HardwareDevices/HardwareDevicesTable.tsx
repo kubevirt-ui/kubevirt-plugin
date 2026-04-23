@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 
 import { V1GPU, V1HostDevice } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -12,7 +12,7 @@ type HardwareDevicesTableProps = {
   devices: V1GPU[] | V1HostDevice[];
 };
 
-const HardwareDevicesTable: React.FCC<HardwareDevicesTableProps> = ({ devices }) => {
+const HardwareDevicesTable: FC<HardwareDevicesTableProps> = ({ devices }) => {
   const { t } = useKubevirtTranslation();
 
   if (!devices?.length)

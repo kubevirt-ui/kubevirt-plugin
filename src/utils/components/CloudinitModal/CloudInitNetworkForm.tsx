@@ -1,4 +1,4 @@
-import React, { FormEvent, useEffect } from 'react';
+import React, { FC, FormEvent, useEffect } from 'react';
 import { Trans } from 'react-i18next';
 import * as ipaddr from 'ipaddr.js';
 
@@ -20,7 +20,7 @@ type CloudinitNetworkFormProps = {
   updateNetworkField: (key: keyof CloudInitNetworkData, value: string | string[]) => void;
 };
 
-export const CloudinitNetworkForm: React.FCC<CloudinitNetworkFormProps> = ({
+export const CloudinitNetworkForm: FC<CloudinitNetworkFormProps> = ({
   enableNetworkData,
   networkData,
   setEnableNetworkData,

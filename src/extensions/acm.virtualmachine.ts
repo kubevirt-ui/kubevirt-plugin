@@ -48,7 +48,7 @@ export type ACMVirtualMachineAction = Extension<
       kind: string;
     }[];
     /** Visible text for action */
-    title: ReactNode | string;
+    title: ReactNode;
     /** Display action for this GVK type */
     /** Display a tooltip for this action */
     tooltip?: string;

@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 
 import { EventModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
@@ -8,7 +8,7 @@ import { RecentEventsBody } from '@openshift-console/dynamic-plugin-sdk-internal
 import { VIEW_EVENTS_PATH } from './constants';
 import { eventTypes } from './utils';
 
-const RecentEvent: React.FCC = () => {
+const RecentEvent: FC = () => {
   const [events, loaded, loadError] = useK8sWatchResource<EventKind[]>({
     isList: true,
     kind: EventModel.kind,

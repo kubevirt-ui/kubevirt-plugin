@@ -1,4 +1,4 @@
-import React, { FC, JSX } from 'react';
+import React, { FC, JSX, Ref } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { MenuSearch, MenuSearchInput, TextInput } from '@patternfly/react-core';
@@ -7,7 +7,7 @@ import { DropdownConfig } from './types';
 
 type FilterProps = {
   config: DropdownConfig;
-  filterRef: React.Ref<HTMLInputElement>;
+  filterRef: Ref<HTMLInputElement>;
   filterText: string;
   onFilterChange: (filterText: string) => void;
 };

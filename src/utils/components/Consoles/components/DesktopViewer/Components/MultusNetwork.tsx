@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isGuestAgentConnected } from '@kubevirt-utils/resources/vmi/utils/guest-agent';
@@ -9,7 +9,7 @@ import { MultusNetworkProps } from '../utils/types';
 
 import RDP from './RDP';
 
-const MultusNetwork: React.FCC<MultusNetworkProps> = ({ selectedNetwork, vmi }) => {
+const MultusNetwork: FC<MultusNetworkProps> = ({ selectedNetwork, vmi }) => {
   const { t } = useKubevirtTranslation();
   const guestAgent = isGuestAgentConnected(vmi);
 

@@ -1,4 +1,4 @@
-import React, { createContext, FCC, PropsWithChildren, useContext } from 'react';
+import React, { createContext, FC, PropsWithChildren, useContext } from 'react';
 
 type SettingsClusterContextType = {
   cluster: string | undefined;
@@ -8,7 +8,7 @@ const SettingsClusterContext = createContext<SettingsClusterContextType>({
   cluster: undefined,
 });
 
-export const SettingsClusterProvider: FCC<PropsWithChildren<{ cluster: string | undefined }>> = ({
+export const SettingsClusterProvider: FC<PropsWithChildren<{ cluster: string | undefined }>> = ({
   children,
   cluster,
 }) => (

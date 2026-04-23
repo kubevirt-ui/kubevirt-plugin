@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import DetailsPageTitle from '@kubevirt-utils/components/DetailsPageTitle/DetailsPageTitle';
@@ -14,9 +14,7 @@ type VirtualMachinesInstancePageHeaderProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const VirtualMachinesInstancePageHeader: React.FCC<VirtualMachinesInstancePageHeaderProps> = ({
-  vmi,
-}) => {
+const VirtualMachinesInstancePageHeader: FC<VirtualMachinesInstancePageHeaderProps> = ({ vmi }) => {
   const { t } = useKubevirtTranslation();
   const status = vmi?.status?.phase;
   const IconComponent = icon?.[status];

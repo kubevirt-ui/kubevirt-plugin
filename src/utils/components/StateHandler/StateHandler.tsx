@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC, ReactNode } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -17,6 +17,7 @@ import Loading from '../Loading/Loading';
 import ListSkeleton from './ListSkeleton';
 
 type StateHandlerProps = {
+  children?: ReactNode;
   error?: any;
   hasData: boolean;
   loaded: boolean;
@@ -24,7 +25,7 @@ type StateHandlerProps = {
   withBullseye?: boolean;
 };
 
-const StateHandler: FCC<StateHandlerProps> = ({
+const StateHandler: FC<StateHandlerProps> = ({
   children,
   error,
   hasData,
@@ -38,7 +39,7 @@ const StateHandler: FCC<StateHandlerProps> = ({
     const status = error?.response?.status;
 
     if (status === 403) {
-      return <AccessDenied>{error.message}</AccessDenied>;
+      return <AccessDenied message={error.message} />;
     }
 
     if (status === 404) {

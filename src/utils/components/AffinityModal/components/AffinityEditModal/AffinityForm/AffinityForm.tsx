@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { Dispatch, FC, SetStateAction, useEffect } from 'react';
 
 import { IoK8sApiCoreV1Node } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import NodeCheckerAlert from '@kubevirt-utils/components/NodeSelectorModal/components/NodeCheckerAlert';
@@ -29,7 +29,7 @@ export type useIDEntitiesValue = {
   onEntityAdd: (newEntity: AffinityLabel) => void;
   onEntityChange: (updatedEntity: AffinityLabel) => void;
   onEntityDelete: (idToDelete: number) => void;
-  setEntities: React.Dispatch<React.SetStateAction<AffinityLabel[]>>;
+  setEntities: Dispatch<SetStateAction<AffinityLabel[]>>;
 };
 
 type AffinityFormProps = {
@@ -39,11 +39,11 @@ type AffinityFormProps = {
   isSubmitDisabled: boolean;
   nodesLoaded: boolean;
   qualifiedNodes: IoK8sApiCoreV1Node[];
-  setFocusedAffinity: React.Dispatch<React.SetStateAction<AffinityRowData>>;
-  setSubmitDisabled: React.Dispatch<React.SetStateAction<boolean>>;
+  setFocusedAffinity: Dispatch<SetStateAction<AffinityRowData>>;
+  setSubmitDisabled: Dispatch<SetStateAction<boolean>>;
 };
 
-const AffinityForm: React.FCC<AffinityFormProps> = ({
+const AffinityForm: FC<AffinityFormProps> = ({
   expressions,
   fields,
   focusedAffinity,
@@ -57,7 +57,7 @@ const AffinityForm: React.FCC<AffinityFormProps> = ({
 
   const isNodeAffinity = focusedAffinity?.type === AffinityType.node;
 
-  React.useEffect(() => {
+  useEffect(() => {
     setSubmitDisabled(
       (expressions?.entities?.length === 0 && fields?.entities?.length === 0) ||
         isTermsInvalid(expressions?.entities) ||

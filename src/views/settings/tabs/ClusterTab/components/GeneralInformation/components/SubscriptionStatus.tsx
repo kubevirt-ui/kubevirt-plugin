@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 
 import { SubscriptionKind, SubscriptionState } from '@overview/utils/types';
 
@@ -12,7 +12,7 @@ type SubscriptionStatusType = {
   subscription: SubscriptionKind;
 };
 
-const SubscriptionStatus: React.FCC<SubscriptionStatusType> = ({ operatorLink, subscription }) => {
+const SubscriptionStatus: FC<SubscriptionStatusType> = ({ operatorLink, subscription }) => {
   const Component = {
     default: <SubscriptionStateDefault subscription={subscription} />,
     [SubscriptionState.SubscriptionStateAtLatest]: <SubscriptionStateAtLatest />,

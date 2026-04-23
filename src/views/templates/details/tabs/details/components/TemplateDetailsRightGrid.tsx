@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { FC, useCallback } from 'react';
 import BootOrderItem from 'src/views/templates/details/tabs/details/components/BootOrderItem';
 import BootSource from 'src/views/templates/details/tabs/details/components/BootSource';
 import { TemplateDetailsGridProps } from 'src/views/templates/details/tabs/details/TemplateDetailsPage';
@@ -20,7 +20,7 @@ import { DescriptionList } from '@patternfly/react-core';
 
 import useEditTemplateAccessReview from '../../../hooks/useIsTemplateEditable';
 
-const TemplateDetailsRightGrid: React.FCC<TemplateDetailsGridProps> = ({ template }) => {
+const TemplateDetailsRightGrid: FC<TemplateDetailsGridProps> = ({ template }) => {
   const { t } = useKubevirtTranslation();
   const { isTemplateEditable } = useEditTemplateAccessReview(template);
 

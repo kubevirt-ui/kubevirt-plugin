@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { createRef, FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -24,7 +24,7 @@ import { MinusCircleIcon } from '@patternfly/react-icons';
 import { BootOrderEmptyState } from './BootOrderEmptyState';
 import DeviceTypeIcon from './DeviceTypeIcon';
 
-export const BootOrderModalBody: React.FCC<{
+export const BootOrderModalBody: FC<{
   changeEditMode: (isEditMode: boolean) => void;
   devices: BootableDeviceType[];
   isEditMode: boolean;
@@ -87,7 +87,7 @@ export const BootOrderModalBody: React.FCC<{
             <DataList aria-label="draggable data list example">
               {devices.map(({ type, value }, index) => (
                 <Draggable hasNoWrapper key={value.name}>
-                  <DataListItem aria-labelledby={value.name} ref={React.createRef()}>
+                  <DataListItem aria-labelledby={value.name} ref={createRef()}>
                     <DataListItemRow>
                       <DataListControl>
                         <DataListDragButton

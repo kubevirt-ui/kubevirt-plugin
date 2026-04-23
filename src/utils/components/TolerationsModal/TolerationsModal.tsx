@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC, useMemo } from 'react';
 import produce from 'immer';
 
 import { NodeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -36,7 +36,7 @@ type TolerationsModalProps = {
   vmi?: V1VirtualMachineInstance;
 };
 
-const TolerationsModal: React.FCC<TolerationsModalProps> = ({
+const TolerationsModal: FC<TolerationsModalProps> = ({
   isOpen,
   nodes,
   nodesLoaded,
@@ -67,7 +67,7 @@ const TolerationsModal: React.FCC<TolerationsModalProps> = ({
       value: '',
     });
 
-  const updatedVirtualMachine = React.useMemo(() => {
+  const updatedVirtualMachine = useMemo(() => {
     const updatedVM = produce<V1VirtualMachine>(vm, (vmDraft: V1VirtualMachine) => {
       ensurePath(vmDraft, ['spec.template.spec.tolerations']);
 

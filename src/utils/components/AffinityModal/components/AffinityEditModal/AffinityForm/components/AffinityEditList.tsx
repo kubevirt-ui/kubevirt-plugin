@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 
 import LabelsList from '@kubevirt-utils/components/NodeSelectorModal/components/LabelList';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -17,7 +17,7 @@ type AffinityExpressionListProps = {
   rowID: string;
 };
 
-const AffinityEditList: React.FCC<AffinityExpressionListProps> = ({
+const AffinityEditList: FC<AffinityExpressionListProps> = ({
   addRowText,
   expressions,
   onAdd,

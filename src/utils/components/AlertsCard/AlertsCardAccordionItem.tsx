@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 
 import AlertStatusItem from '@kubevirt-utils/components/AlertsCard/AlertStatusItem';
 import { AlertType, SimplifiedAlert } from '@kubevirt-utils/components/AlertsCard/utils/types';
@@ -25,7 +25,7 @@ type AlertsCardAccordionItemProps = {
   handleDrawerToggleClick: (alertType: AlertType) => void;
 };
 
-const AlertsCardAccordionItem: React.FCC<AlertsCardAccordionItemProps> = ({
+const AlertsCardAccordionItem: FC<AlertsCardAccordionItemProps> = ({
   alertOpen,
   alerts,
   alertType,

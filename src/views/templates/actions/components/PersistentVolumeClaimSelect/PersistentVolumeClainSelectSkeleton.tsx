@@ -1,8 +1,8 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 
 import { Skeleton } from '@patternfly/react-core';
 
-export const PersistentVolumeClainSelectSkeleton: React.FCC = () => {
+export const PersistentVolumeClainSelectSkeleton: FC = () => {
   return (
     <div>
       <br />

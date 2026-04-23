@@ -1,4 +1,4 @@
-import React, { FCC, useCallback, useEffect, useMemo } from 'react';
+import React, { FC, useCallback, useEffect, useMemo } from 'react';
 
 import {
   modelToGroupVersionKind,
@@ -26,7 +26,7 @@ type SelectSnapshotProps = {
   snapshotNamespaceSelected: string;
 };
 
-const SelectSnapshot: FCC<SelectSnapshotProps> = ({
+const SelectSnapshot: FC<SelectSnapshotProps> = ({
   cluster,
   selectSnapshotName,
   selectSnapshotNamespace,

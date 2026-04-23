@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Dispatch, FC, SetStateAction } from 'react';
 import classNames from 'classnames';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -11,14 +11,14 @@ import './SelectorLabelMatchGroup.scss';
 type SelectorLabelMatchGroupProps = {
   isVMILabel?: boolean;
   labels: { [key: string]: string };
-  setLabels?: React.Dispatch<
-    React.SetStateAction<{
+  setLabels?: Dispatch<
+    SetStateAction<{
       [key: string]: string;
     }>
   >;
 };
 
-const SelectorLabelMatchGroup: React.FCC<SelectorLabelMatchGroupProps> = ({
+const SelectorLabelMatchGroup: FC<SelectorLabelMatchGroupProps> = ({
   isVMILabel,
   labels,
   setLabels,

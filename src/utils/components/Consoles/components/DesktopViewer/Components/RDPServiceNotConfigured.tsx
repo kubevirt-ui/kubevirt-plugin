@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 import { Trans } from 'react-i18next';
 
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
@@ -11,7 +11,7 @@ import RDPServiceModal from './RDPServiceModal';
 
 import './rdp-service.scss';
 
-const RDPServiceNotConfigured: React.FCC<RDPServiceNotConfiguredProps> = ({ vm, vmi }) => {
+const RDPServiceNotConfigured: FC<RDPServiceNotConfiguredProps> = ({ vm, vmi }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   return (

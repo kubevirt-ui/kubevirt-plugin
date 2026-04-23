@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 import classNames from 'classnames';
 
 import { Flex, FlexItem, Grid, GridItem } from '@patternfly/react-core';
@@ -17,7 +17,7 @@ export type VMStatusSectionProps = {
   vmsLoaded: boolean;
 };
 
-const VMStatusSection: React.FCC<VMStatusSectionProps> = ({ vms, vmsLoaded }) => {
+const VMStatusSection: FC<VMStatusSectionProps> = ({ vms, vmsLoaded }) => {
   const statusCounts = getVMStatusCounts(vms);
 
   const statusItems = [];

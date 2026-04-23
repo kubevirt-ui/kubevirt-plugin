@@ -1,4 +1,4 @@
-import React, { ReactEventHandler } from 'react';
+import React, { FC, ReactEventHandler } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup, FormHelperText, HelperText, TextInput } from '@patternfly/react-core';
@@ -10,7 +10,7 @@ type UploadPVCFormPVCNameProps = {
   pvcName: string;
 };
 
-const UploadPVCFormPVCName: React.FCC<UploadPVCFormPVCNameProps> = ({
+const UploadPVCFormPVCName: FC<UploadPVCFormPVCNameProps> = ({
   handlePvcName,
   isGolden,
   isLoading,

@@ -1,4 +1,4 @@
-import React, { FC, ReactNode, SyntheticEvent, useMemo, useState } from 'react';
+import React, { FC, MouseEvent, ReactNode, SyntheticEvent, useMemo, useState } from 'react';
 
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
@@ -52,7 +52,7 @@ const InlineFilterSelect: FC<InlineFilterSelectProps> = ({
 
   const onToggle = () => setIsOpen((prevIsOpen) => !prevIsOpen);
 
-  const onSelect = (_event: React.MouseEvent<Element, MouseEvent> | undefined, value: string) => {
+  const onSelect = (_event: MouseEvent, value: string) => {
     if (value && value !== NO_RESULTS) {
       setFilterValue('');
     }

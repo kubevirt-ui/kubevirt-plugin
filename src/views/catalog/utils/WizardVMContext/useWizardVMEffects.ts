@@ -1,4 +1,4 @@
-import React from 'react';
+import { useEffect } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 
@@ -7,14 +7,14 @@ import { TabsData } from './utils/tabs-data';
 
 export const useWizardVMEffects = (vm: V1VirtualMachine, tabsData: TabsData) => {
   // session storage effects
-  React.useEffect(() => {
+  useEffect(() => {
     // whenever the vm changes, save the vm in session storage
     if (vm) {
       setSessionStorageVM(vm);
     }
   }, [vm]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     // whenever the tabs data changes, save the data in session storage
     if (tabsData) {
       setSessionStorageTabsData(tabsData);

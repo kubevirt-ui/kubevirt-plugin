@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 
 import { DataSourceModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { DataImportCronModel } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -23,7 +23,7 @@ type DataImportCronDetailsGridProps = {
   dataImportCron: V1beta1DataImportCron;
 };
 
-export const DataImportCronDetailsGrid: React.FCC<DataImportCronDetailsGridProps> = ({
+export const DataImportCronDetailsGrid: FC<DataImportCronDetailsGridProps> = ({
   dataImportCron,
 }) => {
   const { createModal } = useModal();

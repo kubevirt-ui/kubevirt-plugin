@@ -1,4 +1,4 @@
-import * as React from 'react';
+import { useState } from 'react';
 import produce from 'immer';
 import { Draft } from 'immer';
 import { useImmer } from 'use-immer';
@@ -21,8 +21,8 @@ type UseValidatedVMValues = {
 
 export const useValidatedVM = (initialVM: V1VirtualMachine): UseValidatedVMValues => {
   const [vm, setVM] = useImmer<V1VirtualMachine>(initialVM);
-  const [loaded, setLoaded] = React.useState<boolean>(true);
-  const [error, setError] = React.useState<any>();
+  const [loaded, setLoaded] = useState<boolean>(true);
+  const [error, setError] = useState<any>();
 
   const updateVM = (updatedVM: ((vmDraft: Draft<V1VirtualMachine>) => void) | V1VirtualMachine) => {
     setLoaded(false);

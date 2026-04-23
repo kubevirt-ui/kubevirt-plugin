@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Button, ButtonVariant } from '@patternfly/react-core';
@@ -9,7 +9,7 @@ type AddAffinityRuleButtonProps = {
   onAffinityClickAdd: () => void;
 };
 
-const AddAffinityRuleButton: React.FCC<AddAffinityRuleButtonProps> = ({
+const AddAffinityRuleButton: FC<AddAffinityRuleButtonProps> = ({
   isLinkButton,
   onAffinityClickAdd,
 }) => {

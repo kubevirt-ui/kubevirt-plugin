@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { FC, useMemo, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -39,7 +39,7 @@ const groupAlertsByCluster = (alerts: SimplifiedAlert[]): Record<string, Simplif
  * @param root0.alerts
  * @param root0.alertType
  */
-const AlertsClusterAccordion: React.FCC<AlertsClusterAccordionProps> = ({ alerts, alertType }) => {
+const AlertsClusterAccordion: FC<AlertsClusterAccordionProps> = ({ alerts, alertType }) => {
   const { t } = useKubevirtTranslation();
   const [expandedClusters, setExpandedClusters] = useState<Record<string, boolean>>({});
 

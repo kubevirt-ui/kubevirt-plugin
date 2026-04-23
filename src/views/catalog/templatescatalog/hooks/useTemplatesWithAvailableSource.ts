@@ -1,4 +1,4 @@
-import * as React from 'react';
+import { useMemo } from 'react';
 
 import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
@@ -32,7 +32,7 @@ export const useTemplatesWithAvailableSource = ({
     loaded: bootSourcesLoaded,
   } = useSingleClusterAvailableSources(templates, loaded);
 
-  const availableTemplates = React.useMemo(() => {
+  const availableTemplates = useMemo(() => {
     const isReady = loaded && availableDataSources && availablePVCs;
     const temps =
       isReady &&
@@ -68,13 +68,13 @@ export const useTemplatesWithAvailableSource = ({
     return temps || [];
   }, [availableDataSources, availablePVCs, loaded, templates]);
 
-  const filteredTemplates = React.useMemo(() => {
+  const filteredTemplates = useMemo(() => {
     return (onlyAvailable ? availableTemplates : templates).filter((template) =>
       onlyDefault ? isDefaultVariantTemplate(template) : true,
     );
   }, [availableTemplates, onlyAvailable, onlyDefault, templates]);
 
-  const availableTemplatesUID = React.useMemo(
+  const availableTemplatesUID = useMemo(
     () => new Set(availableTemplates.map((template) => template.metadata.uid)),
     [availableTemplates],
   );

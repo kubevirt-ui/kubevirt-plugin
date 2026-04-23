@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC, ReactNode } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isTemplateParameter } from '@kubevirt-utils/utils/utils';
@@ -6,15 +6,12 @@ import { isTemplateParameter } from '@kubevirt-utils/utils/utils';
 import './template-value.scss';
 
 type TemplateNameTableDataProps = {
+  children?: ReactNode;
   isNIC?: boolean;
   value: string;
 };
 
-const TemplateNameTableData: React.FCC<TemplateNameTableDataProps> = ({
-  children,
-  isNIC,
-  value,
-}) => {
+const TemplateNameTableData: FC<TemplateNameTableDataProps> = ({ children, isNIC, value }) => {
   const { t } = useKubevirtTranslation();
   return (
     <span className="template-value">

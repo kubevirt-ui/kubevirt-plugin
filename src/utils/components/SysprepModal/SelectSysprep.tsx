@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { ConfigMapModel, modelToGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -17,7 +17,7 @@ type SelectSysprepProps = {
   selectedSysprepName: string;
 };
 
-const SelectSysprep: FCC<SelectSysprepProps> = ({
+const SelectSysprep: FC<SelectSysprepProps> = ({
   id,
   namespace,
   onSelectSysprep,

@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { ChangeEvent, FC } from 'react';
 
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
@@ -36,7 +36,7 @@ const SchedulingSettings: FC<SchedulingSettingsProps> = ({
         label={t('Retain revisions')}
       >
         <NumberInput
-          onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+          onChange={(event: ChangeEvent<HTMLInputElement>) =>
             setBootableVolumeField('retainRevisions')(event.currentTarget.valueAsNumber)
           }
           id="volume-registry-retain-revisions"

@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC, ReactNode } from 'react';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getVMStatus } from '@kubevirt-utils/resources/shared';
@@ -15,14 +15,15 @@ const Popovers = {
 };
 
 type StatusWithPopoverProps = {
+  children?: ReactNode;
   vm: V1VirtualMachine;
   vmi: V1VirtualMachineInstance;
 };
 
-const StatusWithPopover: FCC<StatusWithPopoverProps> = ({ vm, vmi }) => {
+const StatusWithPopover: FC<StatusWithPopoverProps> = ({ vm, vmi }) => {
   const vmPrintableStatus = getVMStatus(vm);
 
-  const Popover: FCC<StatusWithPopoverProps> =
+  const Popover: FC<StatusWithPopoverProps> =
     Popovers[vmPrintableStatus] || VirtualMachineOverviewStatus;
 
   return (

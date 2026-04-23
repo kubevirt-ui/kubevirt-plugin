@@ -1,4 +1,4 @@
-import * as React from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { useURLParams } from '@kubevirt-utils/hooks/useURLParams';
 
@@ -24,9 +24,9 @@ export const useInputDebounce = ({
   let typingTimer: null | ReturnType<typeof setTimeout> = null;
 
   const { params, setParam } = useURLParams();
-  const [value, setValue] = React.useState<string>();
+  const [value, setValue] = useState<string>();
   const param = params.get(updateURLParam);
-  const inputRef = React.useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   // eslint-disable-next-line require-jsdoc
   const updateValue = (v: string) => {
@@ -53,14 +53,14 @@ export const useInputDebounce = ({
     typingTimer = setTimeout(() => updateValue(inputRef.current?.value || ''), delay);
   });
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (updateURLParam) {
       setValue(param ?? '');
       inputRef.current.value = param;
     }
   }, [param, updateURLParam]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (initialValue && !value) {
       setValue(initialValue);
       inputRef.current.value = initialValue;

@@ -1,4 +1,4 @@
-import * as React from 'react';
+import { ComponentClass, FC } from 'react';
 
 import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -55,5 +55,5 @@ export const iconMap = {
   Unknown: YellowExclamationTriangleIcon,
 };
 
-export const getVMStatusIcon = (status: string): React.ComponentClass | React.FCC =>
+export const getVMStatusIcon = (status: string): ComponentClass | FC =>
   iconMap[status] || iconMap.Unknown;

@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -22,7 +22,7 @@ type EnvironmentFormActionsProps = {
   onSave: () => void;
 };
 
-const EnvironmentFormActions: React.FCC<EnvironmentFormActionsProps> = ({
+const EnvironmentFormActions: FC<EnvironmentFormActionsProps> = ({
   closeError,
   error,
   isSaveDisabled,
@@ -30,9 +30,9 @@ const EnvironmentFormActions: React.FCC<EnvironmentFormActionsProps> = ({
   onSave,
 }) => {
   const { t } = useKubevirtTranslation();
-  const [success, setSuccess] = React.useState(false);
-  const [loading, setLoading] = React.useState(false);
-  const [apiError, setApiError] = React.useState<any>();
+  const [success, setSuccess] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [apiError, setApiError] = useState<any>();
 
   const onSubmit = async () => {
     setLoading(true);

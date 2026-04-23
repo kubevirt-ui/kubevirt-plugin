@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 import { Link } from 'react-router';
 
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -14,7 +14,7 @@ type AlertStatusItemProps = {
   alertType: AlertType;
 };
 
-const AlertStatusItem: React.FCC<AlertStatusItemProps> = ({ alertDetails, alertType }) => {
+const AlertStatusItem: FC<AlertStatusItemProps> = ({ alertDetails, alertType }) => {
   const { t } = useKubevirtTranslation();
   const { alertName, description, isVMAlert, link, time } = alertDetails;
   const Icon = alertIcon[alertType];

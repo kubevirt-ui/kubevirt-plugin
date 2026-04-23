@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import useVMQueries from '@kubevirt-utils/hooks/useVMQueries';
@@ -33,7 +33,7 @@ type StorageThresholdChartProps = {
 
 const GIB_IN_BYTES = 1024;
 
-const StorageWriteThresholdChart: React.FCC<StorageThresholdChartProps> = ({ vmi }) => {
+const StorageWriteThresholdChart: FC<StorageThresholdChartProps> = ({ vmi }) => {
   const { currentTime, duration, timespan } = useDuration();
 
   const queries = useVMQueries(vmi);

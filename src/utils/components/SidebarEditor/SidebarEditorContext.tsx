@@ -1,4 +1,4 @@
-import React, { createContext, FCC, useState } from 'react';
+import React, { createContext, FC, ReactNode, useState } from 'react';
 
 export type SidebarEditorContextType = {
   isEditable?: boolean;
@@ -14,10 +14,11 @@ export const SidebarEditorContext = createContext<SidebarEditorContextType>({
 });
 
 export type SidebarEditorProviderType = {
+  children?: ReactNode;
   isEditable?: boolean;
 };
 
-export const SidebarEditorProvider: FCC<SidebarEditorProviderType> = ({
+export const SidebarEditorProvider: FC<SidebarEditorProviderType> = ({
   children,
   isEditable = true,
 }) => {

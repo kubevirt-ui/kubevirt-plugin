@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 import { createUseStyles } from 'react-jss';
 
 import { RDPProps } from '../utils/types';
@@ -15,13 +15,7 @@ const useStyles = createUseStyles({
   },
 });
 
-const RDP: React.FunctionComponent<RDPProps> = ({
-  children = null,
-  rdp = null,
-  spice = null,
-  vnc = null,
-  ...props
-}) => (
+const RDP: FC<RDPProps> = ({ children = null, rdp = null, spice = null, vnc = null, ...props }) => (
   <div className={useStyles().consoleDesktopViewer}>
     <RemoteViewer
       onDownload={props?.onDownload}

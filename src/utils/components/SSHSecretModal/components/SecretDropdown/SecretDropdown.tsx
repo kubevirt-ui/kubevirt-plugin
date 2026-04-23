@@ -1,4 +1,4 @@
-import React, { Dispatch, FCC, SetStateAction, useEffect, useState } from 'react';
+import React, { Dispatch, FC, SetStateAction, useEffect, useState } from 'react';
 
 import { IoK8sApiCoreV1Secret } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
@@ -23,7 +23,7 @@ type SecretDropdownProps = {
   sshDetails: SSHSecretDetails;
 };
 
-const SecretDropdown: FCC<SecretDropdownProps> = ({
+const SecretDropdown: FC<SecretDropdownProps> = ({
   namespace,
   onSelectSecret,
   selectedProject,

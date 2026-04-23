@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 import { Trans } from 'react-i18next';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -11,7 +11,7 @@ type UploadErrorMessageProps = {
   uploadProxyURL?: string;
 };
 
-const UploadPVCErrorMessage: React.FCC<UploadErrorMessageProps> = ({ message, uploadProxyURL }) => {
+const UploadPVCErrorMessage: FC<UploadErrorMessageProps> = ({ message, uploadProxyURL }) => {
   const { t } = useKubevirtTranslation();
 
   const Error = {

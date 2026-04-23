@@ -1,4 +1,4 @@
-import React, { FC, RefObject, useMemo, useState } from 'react';
+import React, { FC, FormEvent, RefObject, useMemo, useState } from 'react';
 import debounce from 'lodash/debounce';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -34,7 +34,7 @@ const SearchTextInput: FC<SearchTextInputProps> = ({
 
   const debouncedSetSearchQuery = useMemo(() => debounce(setSearchQuery, 500), []);
 
-  const onChange = (_event: React.FormEvent<HTMLInputElement>, value: string) => {
+  const onChange = (_event: FormEvent<HTMLInputElement>, value: string) => {
     setInputValue(value);
     debouncedSetSearchQuery(value);
   };

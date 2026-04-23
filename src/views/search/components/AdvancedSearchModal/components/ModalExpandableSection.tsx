@@ -1,13 +1,14 @@
-import React, { FCC, useState } from 'react';
+import React, { FC, ReactNode, useState } from 'react';
 
 import { ExpandableSection, Title } from '@patternfly/react-core';
 
 type ModalExpandableSectionProps = {
+  children?: ReactNode;
   isDefaultExpanded?: boolean;
   title: string;
 };
 
-const ModalExpandableSection: FCC<ModalExpandableSectionProps> = ({
+const ModalExpandableSection: FC<ModalExpandableSectionProps> = ({
   children,
   isDefaultExpanded = true,
   title,

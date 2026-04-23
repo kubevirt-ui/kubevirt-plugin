@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { StatusPopupItem, StatusPopupSection } from '@openshift-console/dynamic-plugin-sdk';
@@ -11,10 +11,7 @@ type StatusCardStoragePopoverProps = {
   odfState: any;
 };
 
-const StatusCardStoragePopover: React.FCC<StatusCardStoragePopoverProps> = ({
-  lsoState,
-  odfState,
-}) => {
+const StatusCardStoragePopover: FC<StatusCardStoragePopoverProps> = ({ lsoState, odfState }) => {
   const { t } = useKubevirtTranslation();
 
   return (

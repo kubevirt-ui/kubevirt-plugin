@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 import { Link } from 'react-router';
 
 import { DataSourceModelRef } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -18,11 +18,7 @@ type DataSourcePageTitleProps = {
   namespace: string;
 };
 
-const DataSourcePageTitle: React.FCC<DataSourcePageTitleProps> = ({
-  dataSource,
-  name,
-  namespace,
-}) => {
+const DataSourcePageTitle: FC<DataSourcePageTitleProps> = ({ dataSource, name, namespace }) => {
   const { t } = useKubevirtTranslation();
 
   return (

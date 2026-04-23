@@ -1,14 +1,11 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 
 type FeatureHighlightsTitleProps = {
   readTime: string;
   title: string;
 };
 
-const FeatureHighlightsTitle: React.FCC<FeatureHighlightsTitleProps> = ({
-  readTime,
-  title,
-}): React.ReactElement => (
+const FeatureHighlightsTitle: FC<FeatureHighlightsTitleProps> = ({ readTime, title }) => (
   <span>
     {title} &#8226;{' '}
     <span className="kv-feature-highlights-card--time-estimate">{`${readTime} read`}</span>

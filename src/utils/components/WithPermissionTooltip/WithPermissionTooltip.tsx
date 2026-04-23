@@ -1,4 +1,4 @@
-import React, { FCC, ReactElement, ReactNode } from 'react';
+import React, { FC, ReactElement, ReactNode } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getNoPermissionTooltipContent } from '@kubevirt-utils/utils/utils';
@@ -8,11 +8,11 @@ import HidableTooltip from '../HidableTooltip/HidableTooltip';
 
 type WithPermissionTooltipProps = {
   allowed: boolean;
-  children: ReactNode;
+  children?: ReactNode;
   title?: string;
 };
 
-const WithPermissionTooltip: FCC<WithPermissionTooltipProps> = ({
+const WithPermissionTooltip: FC<WithPermissionTooltipProps> = ({
   allowed,
   children,
   title,

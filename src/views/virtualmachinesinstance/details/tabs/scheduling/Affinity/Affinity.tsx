@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -8,7 +8,7 @@ type AffinityProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const Affinity: React.FCC<AffinityProps> = ({ vmi }) => {
+const Affinity: FC<AffinityProps> = ({ vmi }) => {
   const { t } = useKubevirtTranslation();
   const affinity = vmi?.spec?.affinity;
 

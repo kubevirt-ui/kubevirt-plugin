@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 import { TemplateSchedulingGridProps } from 'src/views/templates/details/tabs/scheduling/components/TemplateSchedulingLeftGrid';
 import { getTolerations } from 'src/views/templates/utils/selectors';
 
@@ -8,7 +8,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 
 import TolerationsModal from './TolerationsModal';
 
-const Tolerations: React.FCC<TemplateSchedulingGridProps> = ({ editable, onSubmit, template }) => {
+const Tolerations: FC<TemplateSchedulingGridProps> = ({ editable, onSubmit, template }) => {
   const { createModal } = useModal();
   const { t } = useKubevirtTranslation();
   const tolerationsCount = t('{{tolerations}} Toleration rules', {

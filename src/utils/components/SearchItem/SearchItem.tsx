@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC, ReactNode } from 'react';
 import classNames from 'classnames';
 
 import { useIsHighlighted } from './useIsHighlighted';
@@ -6,10 +6,11 @@ import { useIsHighlighted } from './useIsHighlighted';
 import './search-item.scss';
 
 type SearchItemProps = {
+  children?: ReactNode;
   id: string;
 };
 
-const SearchItem: FCC<SearchItemProps> = ({ children, id }) => {
+const SearchItem: FC<SearchItemProps> = ({ children, id }) => {
   const isHighlighted = useIsHighlighted(id);
 
   return <span className={classNames({ isHighlighted })}>{children}</span>;

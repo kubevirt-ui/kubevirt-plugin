@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import axios from 'axios';
 
 import { CDIConfigModelRef } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -91,7 +91,7 @@ const useCDIUpload = (): CDIUploadContextProps => {
   };
 
   // multiple uploads could cause abuse of setUploads, so we use a Ref until state finished updating.
-  React.useEffect(() => {
+  useEffect(() => {
     if (!canUpdateState.current) {
       canUpdateState.current = true;
     }

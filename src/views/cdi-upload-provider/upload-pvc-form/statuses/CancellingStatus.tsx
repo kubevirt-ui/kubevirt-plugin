@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { EmptyState, EmptyStateBody, Spinner } from '@patternfly/react-core';
 
-const CancellingStatus: React.FCC = () => {
+const CancellingStatus: FC = () => {
   const { t } = useKubevirtTranslation();
   return (
     <EmptyState headingLevel="h4" icon={Spinner} titleText={t('Cancelling upload')}>

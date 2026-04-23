@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, Suspense } from 'react';
 
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { getUID } from '@kubevirt-utils/resources/shared';
@@ -19,11 +19,11 @@ const VirtualMachineYAMLPage: FC<NavPageComponentProps> = (props) => {
   return !vm ? (
     loading
   ) : (
-    <React.Suspense fallback={loading}>
+    <Suspense fallback={loading}>
       <div className="VirtualMachineYAML--main">
         <ResourceYAMLEditor initialResource={vm} key={getUID(vm)} />
       </div>
-    </React.Suspense>
+    </Suspense>
   );
 };
 

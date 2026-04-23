@@ -1,4 +1,4 @@
-import React, { FCC, ReactNode } from 'react';
+import React, { FC, ReactNode } from 'react';
 import classNames from 'classnames';
 
 import NewBadge from '@kubevirt-utils/components/badges/NewBadge/NewBadge';
@@ -12,6 +12,7 @@ import ExternalLink from '../ExternalLink/ExternalLink';
 import './section-with-switch.scss';
 
 type SectionWithSwitchProps = {
+  children?: ReactNode;
   dataTestID?: string;
   externalLink?: string;
   helpTextIconContent?: ReactNode;
@@ -29,7 +30,7 @@ type SectionWithSwitchProps = {
   turnOnSwitch: (checked: boolean) => void;
 };
 
-const SectionWithSwitch: FCC<SectionWithSwitchProps> = ({
+const SectionWithSwitch: FC<SectionWithSwitchProps> = ({
   children,
   dataTestID,
   externalLink,

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 
 import { killUploadPVC } from '@kubevirt-utils/hooks/useCDIUpload/utils';
 import { Bullseye } from '@patternfly/react-core';
@@ -20,7 +20,7 @@ type UploadPVCFormStatusProps = UploadingStatusProps & {
   onErrorClick: () => void;
 };
 
-const UploadPVCFormStatus: React.FCC<UploadPVCFormStatusProps> = ({
+const UploadPVCFormStatus: FC<UploadPVCFormStatusProps> = ({
   allocateError,
   dataVolume,
   isAllocating,

@@ -1,4 +1,4 @@
-import React from 'react';
+import { useMemo } from 'react';
 
 import { SimplifiedAlerts } from '@kubevirt-utils/components/AlertsCard/utils/types';
 import { createAlertKey } from '@kubevirt-utils/components/AlertsCard/utils/utils';
@@ -21,7 +21,7 @@ const useSimplifiedAlerts: UseSimplifiedAlerts = () => {
   const [hubClusterName] = useHubClusterName();
   const { getConsoleURL, loaded: consoleURLsLoaded } = useManagedClusterConsoleURLs();
 
-  const simplifiedAlerts = React.useMemo(() => {
+  const simplifiedAlerts = useMemo(() => {
     // eslint-disable-next-line perfectionist/sort-objects
     const data = { critical: [], warning: [], info: [] };
     return (

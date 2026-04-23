@@ -1,19 +1,20 @@
-import React, { FCC } from 'react';
+import React, { FC, ReactNode } from 'react';
 
 import { Button } from '@patternfly/react-core';
 import { ExternalLinkAltIcon } from '@patternfly/react-icons';
 
 type ExternalLinkProps = {
   ariaLabel?: string;
+  children?: ReactNode;
   className?: string;
   dataTestID?: string;
   hideIcon?: boolean;
   href: string;
   stopPropagation?: boolean;
-  text?: React.ReactNode;
+  text?: ReactNode;
 };
 
-const ExternalLink: FCC<ExternalLinkProps> = ({
+const ExternalLink: FC<ExternalLinkProps> = ({
   ariaLabel,
   children,
   className = '',

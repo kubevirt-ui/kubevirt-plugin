@@ -1,11 +1,4 @@
-import React, {
-  createContext,
-  FCC,
-  PropsWithChildren,
-  useCallback,
-  useContext,
-  useState,
-} from 'react';
+import React, { createContext, FC, ReactNode, useCallback, useContext, useState } from 'react';
 
 import { OperatorsToInstall } from '@settings/tabs/ClusterTab/components/VirtualizationFeaturesSection/utils/types';
 import {
@@ -16,7 +9,9 @@ import { defaultOperatorsToInstall } from '@settings/tabs/ClusterTab/components/
 
 export const VirtualizationFeaturesContext = createContext<VirtualizationFeaturesResources>({});
 
-export const VirtualizationFeaturesContextProvider: FCC = ({ children }) => {
+export const VirtualizationFeaturesContextProvider: FC<{ children?: ReactNode }> = ({
+  children,
+}) => {
   const context = useVirtualizationFeatures();
   return (
     <VirtualizationFeaturesContext.Provider value={context}>
@@ -25,12 +20,13 @@ export const VirtualizationFeaturesContextProvider: FCC = ({ children }) => {
   );
 };
 
-type VirtualizationFeaturesWizardProviderProps = PropsWithChildren<{
+type VirtualizationFeaturesWizardProviderProps = {
+  children?: ReactNode;
   preloadedResources: Omit<
     VirtualizationFeaturesResources,
     'operatorsToInstall' | 'updateInstallRequests'
   >;
-}>;
+};
 
 /**
  * Provides the wizard with operator resources for immediate display and live updates:
@@ -43,7 +39,7 @@ type VirtualizationFeaturesWizardProviderProps = PropsWithChildren<{
  * Note: the modal is rendered at ModalProvider level (outside the page's
  * VirtualizationFeaturesContextProvider), so we cannot rely on the parent context here.
  */
-export const VirtualizationFeaturesWizardProvider: FCC<
+export const VirtualizationFeaturesWizardProvider: FC<
   VirtualizationFeaturesWizardProviderProps
 > = ({ children, preloadedResources }) => {
   const [operatorsToInstall, setOperatorsToInstall] =

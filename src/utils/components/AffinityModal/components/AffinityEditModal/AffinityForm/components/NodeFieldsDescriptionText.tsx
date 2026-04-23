@@ -1,9 +1,9 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Content, ContentVariants } from '@patternfly/react-core';
 
-const NodeFieldsDescriptionText: React.FCC = () => {
+const NodeFieldsDescriptionText: FC = () => {
   const { t } = useKubevirtTranslation();
   return (
     <>

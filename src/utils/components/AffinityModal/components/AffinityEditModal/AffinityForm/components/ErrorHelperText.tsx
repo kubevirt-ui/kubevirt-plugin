@@ -1,6 +1,6 @@
-import * as React from 'react';
+import React, { FC, ReactNode } from 'react';
 
-const ErrorHelperText: React.FCC = ({ children }) => {
+const ErrorHelperText: FC<{ children?: ReactNode }> = ({ children }) => {
   return <div className="pf-v6-c-form__helper-text pf-m-error">{children}</div>;
 };
 export default ErrorHelperText;

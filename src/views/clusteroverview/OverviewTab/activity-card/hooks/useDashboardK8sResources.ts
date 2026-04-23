@@ -1,4 +1,4 @@
-import * as React from 'react';
+import { useMemo } from 'react';
 
 import { get } from '@kubevirt-utils/utils/utils';
 import {
@@ -30,7 +30,7 @@ const useDashboardK8sResources = () => {
 
   const resources = useK8sWatchResources(resourcesMap);
 
-  const k8sResourceActivities = React.useMemo(
+  const k8sResourceActivities = useMemo(
     () =>
       resourceActivities
         ?.map((activity, index) => {
@@ -63,7 +63,7 @@ const useDashboardK8sResources = () => {
     [resourceActivities, resources],
   );
 
-  const resourcesLoaded = React.useMemo(
+  const resourcesLoaded = useMemo(
     () =>
       resourceActivities?.every((activity, index) => {
         // TODO Fix typing

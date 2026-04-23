@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { VM_WORKLOAD_ANNOTATION } from '@kubevirt-utils/resources/vm';
@@ -9,7 +9,7 @@ type WorkloadProfileProps = {
   };
 };
 
-const WorkloadProfile: React.FCC<WorkloadProfileProps> = ({ annotations }) => {
+const WorkloadProfile: FC<WorkloadProfileProps> = ({ annotations }) => {
   const { t } = useKubevirtTranslation();
   const workloadProfile = annotations?.[VM_WORKLOAD_ANNOTATION];
 

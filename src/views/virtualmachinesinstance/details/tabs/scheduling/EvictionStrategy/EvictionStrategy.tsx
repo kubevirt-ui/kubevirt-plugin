@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -8,7 +8,7 @@ type EvictionStrategyProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const EvictionStrategy: React.FCC<EvictionStrategyProps> = ({ vmi }) => {
+const EvictionStrategy: FC<EvictionStrategyProps> = ({ vmi }) => {
   const { t } = useKubevirtTranslation();
   const evictionStrategy = getEvictionStrategy(vmi);
 

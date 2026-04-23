@@ -15,7 +15,7 @@ import { ButtonVariant } from '@patternfly/react-core';
 import ConfirmActionMessage from '../ConfirmActionMessage/ConfirmActionMessage';
 
 type DeleteModalProps = {
-  body?: ReactNode | string;
+  body?: ReactNode;
   headerText?: string;
   isOpen: boolean;
   obj: K8sResourceCommon;

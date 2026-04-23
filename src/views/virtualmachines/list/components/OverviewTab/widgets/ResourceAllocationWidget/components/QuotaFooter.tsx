@@ -1,10 +1,10 @@
-import React, { FC } from 'react';
+import React, { FC, ReactNode } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
 type QuotaFooterProps = {
   display: string;
-  icon?: React.ReactNode;
+  icon?: ReactNode;
 };
 
 const QuotaFooter: FC<QuotaFooterProps> = ({ display, icon }) => {

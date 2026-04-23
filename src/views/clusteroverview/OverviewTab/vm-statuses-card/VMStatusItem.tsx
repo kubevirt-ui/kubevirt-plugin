@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 import { Link } from 'react-router';
 
 import { VM_STATUS } from '@kubevirt-utils/resources/vm/utils/vmStatus';
@@ -20,7 +20,7 @@ type VMStatusItemProps = {
   statusLabel: string;
 };
 
-const VMStatusItem: React.FCC<VMStatusItemProps> = ({
+const VMStatusItem: FC<VMStatusItemProps> = ({
   count,
   enabledClusters,
   namespace,

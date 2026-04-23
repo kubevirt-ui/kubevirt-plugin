@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC, useMemo } from 'react';
 
 import { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
@@ -17,7 +17,7 @@ type DataSourcePageProps = {
   namespace: string;
 };
 
-const DataSourceNavPage: React.FCC<DataSourcePageProps> = ({ kind, name, namespace }) => {
+const DataSourceNavPage: FC<DataSourcePageProps> = ({ kind, name, namespace }) => {
   const { t } = useKubevirtTranslation();
   const [dataSource, loaded] = useK8sWatchResource<V1beta1DataSource>({
     kind,
@@ -26,7 +26,7 @@ const DataSourceNavPage: React.FCC<DataSourcePageProps> = ({ kind, name, namespa
   });
 
   const { hideYamlTab } = useHideYamlTab();
-  const pages = React.useMemo(
+  const pages = useMemo(
     () =>
       removeYamlTabs(
         [

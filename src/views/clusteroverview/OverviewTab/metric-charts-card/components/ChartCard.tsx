@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import LoadingEmptyState from '@kubevirt-utils/components/LoadingEmptyState/LoadingEmptyState';
@@ -15,7 +15,7 @@ import MetricChart from './MetricChart';
 
 import './ChartCard.scss';
 
-const ChartCard: React.FCC<ChartCardProps> = ({ metric }) => {
+const ChartCard: FC<ChartCardProps> = ({ metric }) => {
   const { t } = useKubevirtTranslation();
   const metricChartData = useMetricChartData(metric);
   const { chartData, error, isReady, loaded, numberOfTicks, unit } = metricChartData;

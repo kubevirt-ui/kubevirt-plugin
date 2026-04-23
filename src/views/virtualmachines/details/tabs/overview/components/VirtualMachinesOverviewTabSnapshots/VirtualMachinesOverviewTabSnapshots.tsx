@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 import { Link } from 'react-router';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -28,7 +28,7 @@ type VirtualMachinesOverviewTabSnapshotsProps = {
   vm: V1VirtualMachine;
 };
 
-const VirtualMachinesOverviewTabSnapshots: React.FCC<VirtualMachinesOverviewTabSnapshotsProps> = ({
+const VirtualMachinesOverviewTabSnapshots: FC<VirtualMachinesOverviewTabSnapshotsProps> = ({
   vm,
 }) => {
   const { t } = useKubevirtTranslation();

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 import { Link } from 'react-router';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -37,9 +37,7 @@ type StorageIOPSTotalThresholdChartProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const StorageIOPSTotalThresholdChart: React.FCC<StorageIOPSTotalThresholdChartProps> = ({
-  vmi,
-}) => {
+const StorageIOPSTotalThresholdChart: FC<StorageIOPSTotalThresholdChartProps> = ({ vmi }) => {
   const { currentTime, duration, timespan } = useDuration();
 
   const { query, queryLink } = useVMQuery(vmi, VMQueries.STORAGE_IOPS_TOTAL);

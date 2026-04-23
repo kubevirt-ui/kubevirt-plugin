@@ -1,4 +1,4 @@
-import React from 'react';
+import { useMemo } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { SimplifiedAlerts } from '@kubevirt-utils/components/AlertsCard/utils/types';
@@ -23,7 +23,7 @@ const useVMAlerts: UseVMAlerts = (vm: V1VirtualMachine) => {
     endpoint: PrometheusEndpoint?.RULES,
   });
 
-  const vmAlerts = React.useMemo(() => {
+  const vmAlerts = useMemo(() => {
     // eslint-disable-next-line perfectionist/sort-objects
     const data = { critical: [], warning: [], info: [] };
     const vmName = getName(vm);

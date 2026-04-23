@@ -1,5 +1,4 @@
-import * as React from 'react';
-import { FCC, ReactNode } from 'react';
+import React, { FC, ReactNode } from 'react';
 import classNames from 'classnames';
 
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
@@ -10,7 +9,7 @@ import { PlusCircleIcon } from '@patternfly/react-icons';
 
 type LabelsListProps = {
   addRowText?: string;
-  children: ReactNode;
+  children?: ReactNode;
   emptyStateAddRowText?: string;
   isEmpty: boolean;
   model?: K8sModel;
@@ -18,7 +17,7 @@ type LabelsListProps = {
   withKeyValueTitle?: boolean;
 };
 
-const LabelsList: FCC<LabelsListProps> = ({
+const LabelsList: FC<LabelsListProps> = ({
   addRowText = null,
   children,
   emptyStateAddRowText = null,

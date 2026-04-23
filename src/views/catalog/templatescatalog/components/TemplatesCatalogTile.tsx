@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC, memo, useMemo } from 'react';
 
 import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
@@ -32,7 +32,7 @@ export type TemplateTileProps = {
   template: V1Template;
 };
 
-export const TemplateTile: React.FCC<TemplateTileProps> = React.memo(
+export const TemplateTile: FC<TemplateTileProps> = memo(
   ({ availableDatasources, availableTemplatesUID, bootSourcesLoaded, onClick, template }) => {
     const { t } = useKubevirtTranslation();
 
@@ -47,7 +47,7 @@ export const TemplateTile: React.FCC<TemplateTileProps> = React.memo(
       ];
     const { cpuCount, memory } = getTemplateFlavorData(template);
 
-    const icon = React.useMemo(() => {
+    const icon = useMemo(() => {
       return getTemplateOSIcon(template);
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [template?.metadata?.annotations?.iconClass]);

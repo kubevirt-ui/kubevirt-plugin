@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Dispatch, FC, SetStateAction } from 'react';
 
 import { Button, ButtonVariant, Form, FormGroup, Split, SplitItem } from '@patternfly/react-core';
 import { MinusCircleIcon } from '@patternfly/react-icons';
@@ -14,16 +14,12 @@ import MigrationPolicyConfigurationDropdown from './compnents/MigrationPolicyCon
 import { getMigrationPolicyConfigurationOptions } from './utils/utils';
 
 type MigrationPolicyConfigurationsProps = {
-  setState: React.Dispatch<
-    React.SetStateAction<EditMigrationPolicyInitialState | InitialMigrationPolicyState>
-  >;
-  setStateField: (
-    field: string,
-  ) => React.Dispatch<React.SetStateAction<MigrationPolicyStateDispatch>>;
+  setState: Dispatch<SetStateAction<EditMigrationPolicyInitialState | InitialMigrationPolicyState>>;
+  setStateField: (field: string) => Dispatch<SetStateAction<MigrationPolicyStateDispatch>>;
   state: EditMigrationPolicyInitialState | InitialMigrationPolicyState;
 };
 
-const MigrationPolicyConfigurations: React.FCC<MigrationPolicyConfigurationsProps> = ({
+const MigrationPolicyConfigurations: FC<MigrationPolicyConfigurationsProps> = ({
   setState,
   setStateField,
   state,

@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC, memo } from 'react';
 
 import { WizardDescriptionItem } from '@catalog/wizard/components/WizardDescriptionItem';
 import useWizardDisksTableData from '@catalog/wizard/tabs/disks/hooks/useWizardDisksTableData';
@@ -7,10 +7,10 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { readableSizeUnit } from '@kubevirt-utils/utils/units';
 import { DescriptionList, Stack, StackItem } from '@patternfly/react-core';
 
-export const WizardOverviewDisksTable: React.FCC<{
+export const WizardOverviewDisksTable: FC<{
   isInlineGrid?: boolean;
   vm: V1VirtualMachine;
-}> = React.memo(({ isInlineGrid, vm }) => {
+}> = memo(({ isInlineGrid, vm }) => {
   const [disks] = useWizardDisksTableData(vm);
 
   const { t } = useKubevirtTranslation();

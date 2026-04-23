@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, Suspense } from 'react';
 
 import { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
@@ -18,9 +18,9 @@ const DataSourceYAMLPage: FC<DataSourceYAMLPageProps> = ({ obj: dataSource }) =>
   return !dataSource ? (
     loading
   ) : (
-    <React.Suspense fallback={loading}>
+    <Suspense fallback={loading}>
       <ResourceYAMLEditor initialResource={dataSource} />
-    </React.Suspense>
+    </Suspense>
   );
 };
 

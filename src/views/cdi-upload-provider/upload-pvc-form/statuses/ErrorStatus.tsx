@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Button, EmptyState, EmptyStateBody } from '@patternfly/react-core';
@@ -9,7 +9,7 @@ type ErrorStatusProps = {
   onErrorClick: () => void;
 };
 
-const ErrorStatus: React.FCC<ErrorStatusProps> = ({ error, onErrorClick }) => {
+const ErrorStatus: FC<ErrorStatusProps> = ({ error, onErrorClick }) => {
   const { t } = useKubevirtTranslation();
   return (
     <EmptyState

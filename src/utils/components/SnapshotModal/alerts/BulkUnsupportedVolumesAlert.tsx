@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 
 import { V1VolumeSnapshotStatus } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -18,7 +18,7 @@ type BulkUnsupportedVolumesAlertProps = {
   unsupportedVolumes: Record<string, V1VolumeSnapshotStatus[]>;
 };
 
-const BulkUnsupportedVolumesAlert: React.FCC<BulkUnsupportedVolumesAlertProps> = ({
+const BulkUnsupportedVolumesAlert: FC<BulkUnsupportedVolumesAlertProps> = ({
   unsupportedVolumes,
 }) => {
   const { t } = useKubevirtTranslation();

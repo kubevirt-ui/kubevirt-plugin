@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 
 import { V1VirtualMachineInstanceGuestAgentInfo } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -7,7 +7,7 @@ type HostnameProps = {
   guestAgentData: V1VirtualMachineInstanceGuestAgentInfo;
 };
 
-const Hostname: React.FCC<HostnameProps> = ({ guestAgentData }) => {
+const Hostname: FC<HostnameProps> = ({ guestAgentData }) => {
   const { t } = useKubevirtTranslation();
 
   return (

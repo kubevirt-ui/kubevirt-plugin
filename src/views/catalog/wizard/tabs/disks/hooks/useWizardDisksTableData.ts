@@ -1,4 +1,4 @@
-import * as React from 'react';
+import { useMemo } from 'react';
 
 import {
   modelToGroupVersionKind,
@@ -48,7 +48,7 @@ const useWizardDisksTableData: UseDisksTableDisks = (vm, pvcNamespace) => {
     namespaced: true,
   });
 
-  const disks = React.useMemo(() => {
+  const disks = useMemo(() => {
     const diskDevices = vmDisks?.map((disk) => {
       const volume = vmVolumes?.find(({ name }) => name === disk?.name);
       const pvcClaimName = volume?.persistentVolumeClaim?.claimName || volume?.dataVolume?.name;

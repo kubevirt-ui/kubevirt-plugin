@@ -1,10 +1,10 @@
-import React from 'react';
+import { FC } from 'react';
 
 import { MigrationPolicyStateDispatch } from '../../MigrationPolicyEditModal/utils/constants';
 
 export type MigrationPolicyConfigurationOption = {
   [key: string]: {
-    component: React.FCC<any>;
+    component: FC<any>;
     defaultValue: MigrationPolicyStateDispatch;
     description?: string;
     label: string;

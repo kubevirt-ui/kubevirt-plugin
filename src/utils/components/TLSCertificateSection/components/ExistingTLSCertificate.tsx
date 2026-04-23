@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
@@ -17,7 +17,7 @@ type ExistingTLSCertificateProps = {
   selectedProject?: null | string;
 };
 
-const ExistingTLSCertificate: FCC<ExistingTLSCertificateProps> = ({
+const ExistingTLSCertificate: FC<ExistingTLSCertificateProps> = ({
   cluster,
   namespace,
   onChange,

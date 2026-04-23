@@ -1,4 +1,4 @@
-import { FCC, ReactNode } from 'react';
+import { FC, ReactNode } from 'react';
 import React from 'react';
 import classNames from 'classnames';
 
@@ -33,7 +33,7 @@ type ExpandSectionWithCustomToggleProps = {
   toggleContent: ReactNode;
 };
 
-const ExpandSectionWithCustomToggle: FCC<ExpandSectionWithCustomToggleProps> = ({
+const ExpandSectionWithCustomToggle: FC<ExpandSectionWithCustomToggleProps> = ({
   children,
   className,
   customContent,

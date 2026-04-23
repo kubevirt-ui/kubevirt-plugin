@@ -1,4 +1,4 @@
-import * as React from 'react';
+import { useEffect, useState } from 'react';
 
 import {
   V1VirtualMachineInstance,
@@ -13,13 +13,13 @@ type UseGuestOS = (
 ) => [V1VirtualMachineInstanceGuestAgentInfo, boolean, any, boolean];
 
 const useGuestOS: UseGuestOS = (vmi) => {
-  const [loaded, setLoaded] = React.useState(false);
-  const [data, setData] = React.useState<V1VirtualMachineInstanceGuestAgentInfo>({});
-  const [error, setError] = React.useState(null);
+  const [loaded, setLoaded] = useState(false);
+  const [data, setData] = useState<V1VirtualMachineInstanceGuestAgentInfo>({});
+  const [error, setError] = useState(null);
   const isGuestAgent = isGuestAgentConnected(vmi);
   const [guestAgentURL, guestAgentURLLoaded] = useGuestAgentURL(vmi);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!guestAgentURLLoaded) return;
 
     setError(null);

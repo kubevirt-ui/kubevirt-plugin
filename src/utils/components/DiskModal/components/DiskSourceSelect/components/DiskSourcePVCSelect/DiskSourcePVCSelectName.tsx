@@ -1,4 +1,4 @@
-import React, { FCC, useMemo } from 'react';
+import React, { FC, useMemo } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
 import {
@@ -25,7 +25,7 @@ type DiskSourcePVCSelectNameProps = {
   vmNamespace?: string;
 };
 
-const DiskSourcePVCSelectName: FCC<DiskSourcePVCSelectNameProps> = ({ vmNamespace }) => {
+const DiskSourcePVCSelectName: FC<DiskSourcePVCSelectNameProps> = ({ vmNamespace }) => {
   const { t } = useKubevirtTranslation();
   const {
     control,

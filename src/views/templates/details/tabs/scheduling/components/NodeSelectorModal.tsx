@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC, useMemo } from 'react';
 import produce from 'immer';
 import { getNodeSelector } from 'src/views/templates/utils/selectors';
 
@@ -32,12 +32,7 @@ type NodeSelectorModalProps = {
   template: V1Template;
 };
 
-const NodeSelectorModal: React.FCC<NodeSelectorModalProps> = ({
-  isOpen,
-  onClose,
-  onSubmit,
-  template,
-}) => {
+const NodeSelectorModal: FC<NodeSelectorModalProps> = ({ isOpen, onClose, onSubmit, template }) => {
   const { t } = useKubevirtTranslation();
   const {
     entities: selectorLabels,
@@ -56,7 +51,7 @@ const NodeSelectorModal: React.FCC<NodeSelectorModalProps> = ({
 
   const onSelectorLabelAdd = () => onLabelAdd({ id: null, key: '', value: '' });
 
-  const updatedTemplate = React.useMemo(
+  const updatedTemplate = useMemo(
     () =>
       produce<V1Template>(template, (templateDraft: V1Template) => {
         const draftVM = getTemplateVirtualMachineObject(templateDraft);

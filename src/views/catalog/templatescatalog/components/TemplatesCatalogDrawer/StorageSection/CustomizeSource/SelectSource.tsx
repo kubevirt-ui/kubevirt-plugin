@@ -55,7 +55,7 @@ export type SelectSourceProps = {
   registrySourceHelperText?: string;
   relevantUpload?: DataUpload;
   selectedSource?: V1beta1DataVolumeSpec | V1ContainerDiskSource;
-  sourceLabel: ReactNode | string;
+  sourceLabel: ReactNode;
   sourceOptions: SOURCE_OPTIONS_IDS[];
   sourcePopOver?: ReactElement<any, JSXElementConstructor<any> | string>;
 };

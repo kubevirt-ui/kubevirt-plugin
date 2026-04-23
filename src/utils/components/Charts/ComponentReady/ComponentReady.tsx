@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC, PropsWithChildren } from 'react';
 import { Link } from 'react-router';
 
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
@@ -7,7 +7,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { getNoDataAvailableMessage } from '@kubevirt-utils/utils/utils';
 import { Bullseye } from '@patternfly/react-core';
 
-type ComponentReadyProps = React.PropsWithChildren<{
+type ComponentReadyProps = PropsWithChildren<{
   error?: Error | unknown;
   isLoading?: boolean;
   isReady: boolean;
@@ -15,7 +15,7 @@ type ComponentReadyProps = React.PropsWithChildren<{
   text?: string;
 }>;
 
-const ComponentReady: React.FCC<ComponentReadyProps> = ({
+const ComponentReady: FC<ComponentReadyProps> = ({
   children,
   error,
   isLoading,

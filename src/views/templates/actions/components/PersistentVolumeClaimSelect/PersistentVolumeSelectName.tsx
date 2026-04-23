@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -12,7 +12,7 @@ type PersistentVolumeSelectNameProps = {
   pvcNameSelected: string;
 };
 
-export const PersistentVolumeSelectName: FCC<PersistentVolumeSelectNameProps> = ({
+export const PersistentVolumeSelectName: FC<PersistentVolumeSelectNameProps> = ({
   isDisabled,
   isLoading,
   onChange,

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 
 import { DataImportCronModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1beta1DataImportCron } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
@@ -14,7 +14,7 @@ type DataSourceImportCronDescriptionProps = {
   namespace: string;
 };
 
-const DataSourceImportCronDescription: React.FCC<DataSourceImportCronDescriptionProps> = ({
+const DataSourceImportCronDescription: FC<DataSourceImportCronDescriptionProps> = ({
   dataImportCronName,
   namespace,
 }) => {

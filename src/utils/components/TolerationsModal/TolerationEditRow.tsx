@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 
 import { K8sIoApiCoreV1TolerationEffectEnum } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -20,7 +20,7 @@ type TolerationEditRowProps = {
   onDelete: (id: any) => void;
 };
 
-const TolerationEditRow: React.FCC<TolerationEditRowProps> = ({ label, onChange, onDelete }) => {
+const TolerationEditRow: FC<TolerationEditRowProps> = ({ label, onChange, onDelete }) => {
   const { effect, id, key, value } = label;
   const { t } = useKubevirtTranslation();
   return (

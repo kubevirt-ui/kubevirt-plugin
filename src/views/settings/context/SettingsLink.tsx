@@ -1,4 +1,4 @@
-import React, { FCC, ReactNode } from 'react';
+import React, { FC, ReactNode } from 'react';
 import { useNavigate } from 'react-router';
 
 import useManagedClusterConsoleURLs from '@multicluster/hooks/useManagedClusterConsoleURLs';
@@ -17,7 +17,7 @@ type SettingsLinkProps = {
   to?: string;
 };
 
-const SettingsLink: FCC<SettingsLinkProps> = ({
+const SettingsLink: FC<SettingsLinkProps> = ({
   children,
   className,
   disabled,

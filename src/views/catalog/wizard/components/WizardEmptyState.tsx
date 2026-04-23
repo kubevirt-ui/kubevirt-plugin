@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 import { useNavigate } from 'react-router';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -12,7 +12,7 @@ import {
   EmptyStateFooter,
 } from '@patternfly/react-core';
 
-export const WizardEmptyState: React.FCC<{ namespace: string }> = ({ namespace }) => {
+export const WizardEmptyState: FC<{ namespace: string }> = ({ namespace }) => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
   const cluster = useClusterParam();

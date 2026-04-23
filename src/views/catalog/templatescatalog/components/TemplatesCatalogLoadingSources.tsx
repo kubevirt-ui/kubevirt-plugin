@@ -1,10 +1,10 @@
-import * as React from 'react';
+import React, { memo } from 'react';
 
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { EmptyState, EmptyStateBody, EmptyStateVariant } from '@patternfly/react-core';
 
-export const TemplatesCatalogLoadingSources = React.memo(() => {
+export const TemplatesCatalogLoadingSources = memo(() => {
   const { t } = useKubevirtTranslation();
 
   return (

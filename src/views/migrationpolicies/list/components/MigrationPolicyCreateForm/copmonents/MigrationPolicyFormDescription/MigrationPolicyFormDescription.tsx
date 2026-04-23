@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Content, ContentVariants } from '@patternfly/react-core';
 
-const MigrationPolicyFormDescription: React.FCC = () => {
+const MigrationPolicyFormDescription: FC = () => {
   const { t } = useKubevirtTranslation();
 
   return (

@@ -1,4 +1,4 @@
-import * as React from 'react';
+import { useCallback, useState } from 'react';
 import axios from 'axios';
 
 import { modelToGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -31,10 +31,10 @@ export const useCDIUpload = (clusterInput?: string): UseCDIUploadValues => {
     namespaced: false,
   });
 
-  const [upload, setUpload] = React.useState<DataUpload>();
+  const [upload, setUpload] = useState<DataUpload>();
   const uploadProxyURL = getUploadProxyURL(cdiConfig);
 
-  const checkUploadReady = React.useCallback(async (): Promise<void> => {
+  const checkUploadReady = useCallback(async (): Promise<void> => {
     const noRouteFound = configError || !configLoaded || !uploadProxyURL;
 
     if (noRouteFound) {

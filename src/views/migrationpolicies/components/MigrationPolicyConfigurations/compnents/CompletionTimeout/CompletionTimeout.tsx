@@ -1,14 +1,14 @@
-import React from 'react';
+import React, { ChangeEvent, Dispatch, FC, SetStateAction } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { NumberInput } from '@patternfly/react-core';
 
 type CompletionTimeoutProps = {
-  setState: React.Dispatch<React.SetStateAction<number>>;
+  setState: Dispatch<SetStateAction<number>>;
   state: number;
 };
 
-const CompletionTimeout: React.FCC<CompletionTimeoutProps> = ({
+const CompletionTimeout: FC<CompletionTimeoutProps> = ({
   setState,
   state: completionTimeoutInGib,
 }) => {
@@ -16,7 +16,7 @@ const CompletionTimeout: React.FCC<CompletionTimeoutProps> = ({
 
   return (
     <NumberInput
-      onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+      onChange={(event: ChangeEvent<HTMLInputElement>) =>
         +event?.target?.value >= 0 && setState(+event.target.value)
       }
       data-test-id="migration-policy-completion-timeout-input"

@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { ReactNode } from 'react';
 
 import { modelToGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { NetworkAddonsConfigModel } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -128,7 +128,7 @@ export const healthStateMapping: { [key in HealthState]: HealthStateMappingValue
 
 export type HealthStateMappingValues = {
   health: HealthState;
-  icon: React.ReactNode;
+  icon: ReactNode;
   priority: number;
 };
 

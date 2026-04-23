@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 
 import {
   V1beta1DataImportCron,
@@ -25,7 +25,7 @@ type DataImportCronManageDetailsProps = {
   onEditClick: () => void;
 };
 
-export const DataImportCronManageDetails: React.FCC<DataImportCronManageDetailsProps> = ({
+export const DataImportCronManageDetails: FC<DataImportCronManageDetailsProps> = ({
   dataImportCron,
   dataSource,
   onEditClick,

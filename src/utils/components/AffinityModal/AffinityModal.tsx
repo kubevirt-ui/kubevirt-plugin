@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC, useMemo, useState } from 'react';
 import produce from 'immer';
 
 import { IoK8sApiCoreV1Node } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
@@ -31,7 +31,7 @@ type AffinityModalProps = {
   vm: V1VirtualMachine;
 };
 
-const AffinityModal: React.FCC<AffinityModalProps> = ({
+const AffinityModal: FC<AffinityModalProps> = ({
   isOpen,
   nodes,
   nodesLoaded,
@@ -41,13 +41,13 @@ const AffinityModal: React.FCC<AffinityModalProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
 
-  const [affinities, setAffinities] = React.useState<AffinityRowData[]>(
+  const [affinities, setAffinities] = useState<AffinityRowData[]>(
     getRowsDataFromAffinity(getAffinity(vm)),
   );
-  const [focusedAffinity, setFocusedAffinity] = React.useState<AffinityRowData>(defaultNewAffinity);
+  const [focusedAffinity, setFocusedAffinity] = useState<AffinityRowData>(defaultNewAffinity);
 
-  const [isEditing, setIsEditing] = React.useState(false);
-  const [isCreating, setIsCreating] = React.useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
 
   const [qualifiedRequiredNodes, qualifiedPreferredNodes] = useRequiredAndPreferredQualifiedNodes(
     nodes,
@@ -92,7 +92,7 @@ const AffinityModal: React.FCC<AffinityModalProps> = ({
 
   const onSaveAffinity = isCreating ? onAffinityAdd : onAffinityChange;
 
-  const updatedVirtualMachine = React.useMemo(() => {
+  const updatedVirtualMachine = useMemo(() => {
     const updatedVM = produce<V1VirtualMachine>(vm, (vmDraft: V1VirtualMachine) => {
       if (!vmDraft.spec.template.spec.affinity) {
         vmDraft.spec.template.spec.affinity = {};

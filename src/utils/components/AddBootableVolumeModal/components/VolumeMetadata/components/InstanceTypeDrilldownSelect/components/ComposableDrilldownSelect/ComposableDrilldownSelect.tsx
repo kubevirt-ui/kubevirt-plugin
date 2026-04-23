@@ -1,7 +1,8 @@
 import React, {
   Dispatch,
-  FCC,
+  FC,
   KeyboardEvent,
+  MouseEvent,
   ReactNode,
   SetStateAction,
   useRef,
@@ -23,6 +24,7 @@ type MenuHeightsType = {
 };
 
 type ComposableDrilldownMenuProps = {
+  children?: ReactNode;
   id?: string;
   isOpen: boolean;
   isScrollable?: boolean;
@@ -32,7 +34,7 @@ type ComposableDrilldownMenuProps = {
   trigger?: ReactNode;
 } & Pick<PopperProps, 'appendTo' | 'direction' | 'triggerRef'>;
 
-const ComposableDrilldownSelect: FCC<ComposableDrilldownMenuProps> = ({
+const ComposableDrilldownSelect: FC<ComposableDrilldownMenuProps> = ({
   appendTo,
   children,
   direction,
@@ -51,7 +53,7 @@ const ComposableDrilldownSelect: FCC<ComposableDrilldownMenuProps> = ({
   const [menuHeights, setMenuHeights] = useState<MenuHeightsType>({});
   const menuRef = useRef<HTMLDivElement>(null);
 
-  const onToggleClick = (ev?: React.MouseEvent) => {
+  const onToggleClick = (ev?: MouseEvent) => {
     ev?.stopPropagation(); // Stop handleClickOutside from handling
     setIsOpen(!isOpen);
     setMenuDrilledIn([]);
@@ -60,7 +62,7 @@ const ComposableDrilldownSelect: FCC<ComposableDrilldownMenuProps> = ({
   };
 
   const drillIn = (
-    _event: KeyboardEvent | React.MouseEvent,
+    _event: KeyboardEvent | MouseEvent,
     fromMenuId: string,
     toMenuId: string,
     pathId: string,
@@ -70,7 +72,7 @@ const ComposableDrilldownSelect: FCC<ComposableDrilldownMenuProps> = ({
     setActiveMenu(toMenuId);
   };
 
-  const drillOut = (_event: KeyboardEvent | React.MouseEvent, toMenuId: string) => {
+  const drillOut = (_event: KeyboardEvent | MouseEvent, toMenuId: string) => {
     setMenuDrilledIn(menuDrilledIn.slice(0, menuDrilledIn.length - 1));
     setDrilldownPath(drilldownPath.slice(0, drilldownPath.length - 1));
     setActiveMenu(toMenuId);

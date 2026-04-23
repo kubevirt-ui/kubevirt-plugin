@@ -1,4 +1,4 @@
-import React, { FCC, useMemo } from 'react';
+import React, { FC, useMemo } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
 import {
@@ -26,7 +26,7 @@ import {
 import { getErrorPVCName } from '../../../utils/selectors';
 import { diskSourcePVCNameFieldID } from '../../utils/constants';
 
-const DiskSourceClonePVCSelectName: FCC = () => {
+const DiskSourceClonePVCSelectName: FC = () => {
   const { t } = useKubevirtTranslation();
   const {
     control,

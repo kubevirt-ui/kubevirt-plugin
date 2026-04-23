@@ -15,7 +15,7 @@ import { SOURCE_OPTIONS_IDS, sourceOptions } from '../constants';
 
 type SelectSourceOptionProps = {
   'data-test-id': string;
-  label: ReactNode | string;
+  label: ReactNode;
   onSelectSource: (selection: SOURCE_OPTIONS_IDS) => void;
   options: SOURCE_OPTIONS_IDS[];
   popOver?: ReactElement<any, JSXElementConstructor<any> | string>;

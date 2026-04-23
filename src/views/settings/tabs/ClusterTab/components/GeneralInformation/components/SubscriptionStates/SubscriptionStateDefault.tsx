@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 import cn from 'classnames';
 import { SubscriptionKind } from 'src/views/clusteroverview/utils/types';
 
@@ -9,7 +9,7 @@ type SubscriptionStateDefaultProps = {
   subscription: SubscriptionKind;
 };
 
-const SubscriptionStateDefault: React.FCC<SubscriptionStateDefaultProps> = ({ subscription }) => {
+const SubscriptionStateDefault: FC<SubscriptionStateDefaultProps> = ({ subscription }) => {
   const { t } = useKubevirtTranslation();
 
   return (

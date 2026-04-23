@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { FC, useContext } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
@@ -11,7 +11,7 @@ type PVCAlertExtension = {
   pvc: K8sResourceCommon;
 };
 
-const PVCAlertExtension: React.FCC<PVCAlertExtension> = ({ pvc }) => {
+const PVCAlertExtension: FC<PVCAlertExtension> = ({ pvc }) => {
   const { uploads } = useContext(CDIUploadContext);
   const { t } = useKubevirtTranslation();
   const isUploading = uploads?.find(

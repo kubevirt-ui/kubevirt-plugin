@@ -89,7 +89,7 @@ Follow this systematic approach to identify and fix issues:
 - Verify state is being set with new reference
 - Check useEffect dependencies
 - Log state values to confirm changes
-- Check React.memo conditions
+- Check memo conditions
 - Verify key props in lists
 
 ### Data Not Loading

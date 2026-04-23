@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import BlueArrowCircleUpIcon from '@overview/utils/Components/BlueArrowCircleUpIcon';
@@ -13,7 +13,7 @@ type SubscriptionStateUpgradePendingProps = {
   subscription: SubscriptionKind;
 };
 
-const SubscriptionStateUpgradePending: React.FCC<SubscriptionStateUpgradePendingProps> = ({
+const SubscriptionStateUpgradePending: FC<SubscriptionStateUpgradePendingProps> = ({
   operatorLink,
   subscription,
 }) => {

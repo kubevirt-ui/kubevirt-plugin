@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC, useMemo, useState } from 'react';
 import produce from 'immer';
 import { getAffinity } from 'src/views/templates/utils/selectors';
 
@@ -30,19 +30,14 @@ type AffinityModalProps = {
   template: V1Template;
 };
 
-const AffinityRulesModal: React.FCC<AffinityModalProps> = ({
-  isOpen,
-  onClose,
-  onSubmit,
-  template,
-}) => {
+const AffinityRulesModal: FC<AffinityModalProps> = ({ isOpen, onClose, onSubmit, template }) => {
   const { t } = useKubevirtTranslation();
-  const [affinities, setAffinities] = React.useState<AffinityRowData[]>(
+  const [affinities, setAffinities] = useState<AffinityRowData[]>(
     getRowsDataFromAffinity(getAffinity(template)),
   );
-  const [focusedAffinity, setFocusedAffinity] = React.useState<AffinityRowData>(defaultNewAffinity);
-  const [isEditing, setIsEditing] = React.useState(false);
-  const [isCreating, setIsCreating] = React.useState(false);
+  const [focusedAffinity, setFocusedAffinity] = useState<AffinityRowData>(defaultNewAffinity);
+  const [isEditing, setIsEditing] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
   const [nodes, nodesLoaded] = useK8sWatchResource<IoK8sApiCoreV1Node[]>({
     groupVersionKind: modelToGroupVersionKind(NodeModel),
     isList: true,
@@ -90,7 +85,7 @@ const AffinityRulesModal: React.FCC<AffinityModalProps> = ({
 
   const onSaveAffinity = isCreating ? onAffinityAdd : onAffinityChange;
 
-  const updatedTemplate = React.useMemo(() => {
+  const updatedTemplate = useMemo(() => {
     return produce<V1Template>(template, (templateDraft: V1Template) => {
       const draftVM = getTemplateVirtualMachineObject(templateDraft);
       if (!getAffinity(templateDraft)) {

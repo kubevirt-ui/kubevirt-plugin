@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 import { Link } from 'react-router';
 
 import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
@@ -23,7 +23,7 @@ type RunningVMsChartLegendLabelProps = {
   item: RunningVMsChartLegendLabelItem;
 };
 
-const RunningVMsChartLegendLabel: React.FCC<RunningVMsChartLegendLabelProps> = ({ item }) => {
+const RunningVMsChartLegendLabel: FC<RunningVMsChartLegendLabelProps> = ({ item }) => {
   const activeNamespace = useActiveNamespace();
   const cluster = useActiveClusterParam();
   const iconStyle = { color: item.color };

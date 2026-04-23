@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 
 import { NodeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -8,7 +8,7 @@ type NodeProps = {
   nodeName: string;
 };
 
-const Node: React.FCC<NodeProps> = ({ nodeName }) => {
+const Node: FC<NodeProps> = ({ nodeName }) => {
   const { t } = useKubevirtTranslation();
   return nodeName ? (
     <ResourceLink kind={NodeModel.kind} name={nodeName} />

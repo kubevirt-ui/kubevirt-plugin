@@ -1,4 +1,12 @@
-import * as React from 'react';
+import React, {
+  createContext,
+  Dispatch,
+  FC,
+  ReactNode,
+  SetStateAction,
+  useContext,
+  useState,
+} from 'react';
 import { Updater, useImmer } from 'use-immer';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -16,7 +24,7 @@ export type WizardVMContextType = {
   /** loaded state of the vm context */
   loaded?: boolean;
   /** Set the isCreatedDisabled variable */
-  setDisableVmCreate?: React.Dispatch<React.SetStateAction<boolean>>;
+  setDisableVmCreate?: Dispatch<SetStateAction<boolean>>;
   /** additional tabs data, not related to the vm */
   tabsData?: TabsData;
   /** update tabs data */
@@ -33,7 +41,7 @@ export type WizardVMContextType = {
 export const useWizardVM = (): WizardVMContextType => {
   const { error, loaded, updateVM, vm } = useValidatedVM(getSessionStorageVM());
   const [tabsData, updateTabsData] = useImmer<TabsData>(getSessionStorageTabsData());
-  const [disableVmCreate, setDisableVmCreate] = React.useState(false);
+  const [disableVmCreate, setDisableVmCreate] = useState(false);
 
   useWizardVMEffects(vm, tabsData);
 
@@ -49,11 +57,11 @@ export const useWizardVM = (): WizardVMContextType => {
   };
 };
 
-export const WizardVMContext = React.createContext<WizardVMContextType>({});
+export const WizardVMContext = createContext<WizardVMContextType>({});
 
-export const WizardVMContextProvider: React.FCC = ({ children }) => {
+export const WizardVMContextProvider: FC<{ children?: ReactNode }> = ({ children }) => {
   const context = useWizardVM();
   return <WizardVMContext.Provider value={context}>{children}</WizardVMContext.Provider>;
 };
 
-export const useWizardVMContext = () => React.useContext(WizardVMContext);
+export const useWizardVMContext = () => useContext(WizardVMContext);

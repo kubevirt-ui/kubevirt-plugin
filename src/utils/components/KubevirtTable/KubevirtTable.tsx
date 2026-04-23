@@ -1,4 +1,4 @@
-import React, { ReactElement, ReactNode, useMemo } from 'react';
+import React, { ReactElement, ReactNode, useEffect, useMemo } from 'react';
 
 import { PF_TABLE_CHECK_CLASS } from '@kubevirt-utils/hooks/useDataViewTableSort/constants';
 import { useDataViewTableSort } from '@kubevirt-utils/hooks/useDataViewTableSort/useDataViewTableSort';
@@ -114,7 +114,7 @@ const KubevirtTable = <TData, TCallbacks = undefined>(
   });
 
   // Sync valid selection back to parent when orphaned items are detected
-  React.useEffect(() => {
+  useEffect(() => {
     if (isSelectable && validSelectedItems.length !== selectedItems.length) {
       onSelect?.(validSelectedItems);
     }

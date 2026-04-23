@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-shadow */
-import React, { FCC, useRef, useState } from 'react';
+import React, { FC, FormEvent, KeyboardEvent, MouseEvent, Ref, useRef, useState } from 'react';
 import { TFunction } from 'i18next';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -55,7 +55,7 @@ type SelectTypeaheadProps = {
 const getDisplayValue = (option: SelectTypeaheadOptionProps) =>
   option?.label ?? option?.value ?? '';
 
-const SelectTypeahead: FCC<SelectTypeaheadProps> = ({
+const SelectTypeahead: FC<SelectTypeaheadProps> = ({
   addOption,
   canCreate = false,
   dataTestId,
@@ -160,10 +160,7 @@ const SelectTypeahead: FCC<SelectTypeaheadProps> = ({
     setSelectedValue(option.value);
   };
 
-  const onSelect = (
-    _event: React.MouseEvent<Element, MouseEvent> | undefined,
-    value: number | string | undefined,
-  ) => {
+  const onSelect = (_event: MouseEvent, value: number | string | undefined) => {
     if (!value) return;
 
     if (value === createActionId) {
@@ -179,7 +176,7 @@ const SelectTypeahead: FCC<SelectTypeaheadProps> = ({
     }
   };
 
-  const onTextInputChange = (_event: React.FormEvent<HTMLInputElement>, value: string) => {
+  const onTextInputChange = (_event: FormEvent<HTMLInputElement>, value: string) => {
     setInputValue(value);
 
     if (value) {
@@ -235,7 +232,7 @@ const SelectTypeahead: FCC<SelectTypeaheadProps> = ({
     setActiveAndFocusedItem(indexToFocus);
   };
 
-  const onInputKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+  const onInputKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
     const focusedItem = focusedItemIndex !== null ? selectOptions[focusedItemIndex] : null;
 
     switch (event.key) {
@@ -270,7 +267,7 @@ const SelectTypeahead: FCC<SelectTypeaheadProps> = ({
     textInputRef?.current?.focus();
   };
 
-  const toggle = (toggleRef: React.Ref<MenuToggleElement>) => (
+  const toggle = (toggleRef: Ref<MenuToggleElement>) => (
     <MenuToggle
       aria-label="Typeahead menu toggle"
       isDisabled={isDisabled}

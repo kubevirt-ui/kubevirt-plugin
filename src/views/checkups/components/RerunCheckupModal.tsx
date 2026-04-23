@@ -13,7 +13,7 @@ import {
 
 type RerunCheckupModalPropsBase = {
   isOpen: boolean;
-  message: ReactNode | string;
+  message: ReactNode;
   onClose: () => void;
 };
 

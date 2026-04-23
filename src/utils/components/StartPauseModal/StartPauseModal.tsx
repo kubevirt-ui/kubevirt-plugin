@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { FC, useMemo, useState } from 'react';
 import produce from 'immer';
 import { printableVMStatus } from 'src/views/virtualmachines/utils';
 
@@ -20,7 +20,7 @@ type StartPauseModalProps = {
   vmi?: V1VirtualMachineInstance;
 };
 
-const StartPauseModal: React.FCC<StartPauseModalProps> = ({
+const StartPauseModal: FC<StartPauseModalProps> = ({
   headerText,
   isOpen,
   onClose,

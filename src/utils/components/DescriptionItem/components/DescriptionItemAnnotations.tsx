@@ -1,4 +1,4 @@
-import React, { FCC, ReactNode } from 'react';
+import React, { FC, ReactNode } from 'react';
 
 import { AnnotationsModal } from '@kubevirt-utils/components/AnnotationsModal/AnnotationsModal';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
@@ -19,7 +19,7 @@ type DescriptionItemAnnotationsProps = {
   resource: K8sResourceCommon;
 };
 
-const DescriptionItemAnnotations: FCC<DescriptionItemAnnotationsProps> = ({
+const DescriptionItemAnnotations: FC<DescriptionItemAnnotationsProps> = ({
   className,
   descriptionHeaderWrapper,
   editable = true,

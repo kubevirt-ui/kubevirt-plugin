@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { FC, useContext, useEffect, useState } from 'react';
 
 import { V1beta1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { killUploadPVC } from '@kubevirt-utils/hooks/useCDIUpload/utils';
@@ -14,7 +14,7 @@ type PVCUploadStatusProps = {
   title?: string;
 };
 
-const UploadPVCPopover: React.FCC<PVCUploadStatusProps> = ({ pvc, title }) => {
+const UploadPVCPopover: FC<PVCUploadStatusProps> = ({ pvc, title }) => {
   const { t } = useKubevirtTranslation();
   const { uploads } = useContext(CDIUploadContext);
   const upload = uploads?.find(

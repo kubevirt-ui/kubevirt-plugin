@@ -59,7 +59,7 @@ const useMigrationPoliciesActionsProvider: UseMigrationPoliciesActionsProvider =
     ];
   }, [createModal, mp, t]);
 
-  return React.useMemo(() => [actions, !inFlight], [actions, inFlight]);
+  return useMemo(() => [actions, !inFlight], [actions, inFlight]);
 };
 
 export default useMigrationPoliciesActionsProvider;

@@ -1,4 +1,4 @@
-import React, { FCC, ReactNode, useState } from 'react';
+import React, { FC, ReactNode, useState } from 'react';
 import classNames from 'classnames';
 
 import { ExpandableSection, Title } from '@patternfly/react-core';
@@ -13,7 +13,7 @@ type OverviewSectionProps = {
   title: string;
 };
 
-const OverviewSection: FCC<OverviewSectionProps> = ({
+const OverviewSection: FC<OverviewSectionProps> = ({
   children,
   dataTestId,
   defaultExpanded = true,

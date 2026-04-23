@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ProgressStatus } from '@openshift-console/dynamic-plugin-sdk';
@@ -9,7 +9,7 @@ type UploadPVCPopoverProgressStatusProps = {
   title: string;
 };
 
-const UploadPVCPopoverProgressStatus: React.FCC<UploadPVCPopoverProgressStatusProps> = ({
+const UploadPVCPopoverProgressStatus: FC<UploadPVCPopoverProgressStatusProps> = ({
   onCancelClick,
   title,
 }) => {

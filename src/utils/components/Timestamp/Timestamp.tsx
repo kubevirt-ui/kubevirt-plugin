@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 import classnames from 'classnames';
 
 import { pluralize, Tooltip } from '@patternfly/react-core';
@@ -13,12 +13,7 @@ export type TimestampProps = {
   timestamp: number | string;
 };
 
-const Timestamp: React.FCC<TimestampProps> = ({
-  className,
-  hideIcon = false,
-  omitSuffix,
-  timestamp,
-}) => {
+const Timestamp: FC<TimestampProps> = ({ className, hideIcon = false, omitSuffix, timestamp }) => {
   // Check for null. If props.timestamp is null, it returns incorrect date and time of Wed Dec 31 1969 19:00:00 GMT-0500 (Eastern Standard Time)
   if (!timestamp || !isValid(new Date(timestamp))) {
     return <div className="co-timestamp">-</div>;

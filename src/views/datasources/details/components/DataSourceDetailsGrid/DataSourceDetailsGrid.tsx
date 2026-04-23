@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 import { getDataSourceCronJob } from 'src/views/datasources/utils';
 
 import { PersistentVolumeClaimModel } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -26,7 +26,7 @@ type DataSourceDetailsGridProps = {
   dataSource: V1beta1DataSource;
 };
 
-export const DataSourceDetailsGrid: React.FCC<DataSourceDetailsGridProps> = ({ dataSource }) => {
+export const DataSourceDetailsGrid: FC<DataSourceDetailsGridProps> = ({ dataSource }) => {
   const { t } = useKubevirtTranslation();
   const dataImportCron = getDataSourceCronJob(dataSource);
   const { name: pvcSourceName, namespace: pvcSourceNamespace } =

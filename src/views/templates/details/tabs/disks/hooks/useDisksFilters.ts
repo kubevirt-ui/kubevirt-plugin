@@ -1,4 +1,4 @@
-import * as React from 'react';
+import { useMemo } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { diskTypes } from '@kubevirt-utils/resources/vm/utils/disk/constants';
@@ -6,7 +6,7 @@ import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 
 const useDisksFilters = (): RowFilter[] => {
   const { t } = useKubevirtTranslation();
-  const filters: RowFilter[] = React.useMemo(
+  const filters: RowFilter[] = useMemo(
     () => [
       {
         filter: (drives, obj) => {

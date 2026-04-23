@@ -1,4 +1,4 @@
-import React, { FC, useEffect } from 'react';
+import React, { FC, useEffect, useRef } from 'react';
 import { FormProvider, useForm, useWatch } from 'react-hook-form';
 
 import { UPLOAD_FILENAME_FIELD } from '@kubevirt-utils/components/DiskModal/components/utils/constants';
@@ -93,7 +93,7 @@ const AddCDROMModal: FC<V1SubDiskModalProps> = ({
   const hasValidSelection = selectedISO || (uploadEnabled && hasUploadFile) || emptyDriveSelected;
   const isFormValid = Boolean(!hasFormErrors && hasValidSelection);
 
-  const isBackgroundUploadInProgress = React.useRef(false);
+  const isBackgroundUploadInProgress = useRef(false);
 
   const handleModalClose = async () => {
     const shouldCancelUpload =

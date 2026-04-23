@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 
 import { DataUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import {
@@ -17,7 +17,7 @@ import {
   StackItem,
 } from '@patternfly/react-core';
 
-export const SelectSourceUploadPVCProgress: React.FCC<{ upload: DataUpload }> = ({ upload }) => {
+export const SelectSourceUploadPVCProgress: FC<{ upload: DataUpload }> = ({ upload }) => {
   const { t } = useKubevirtTranslation();
   return (
     <FormGroup fieldId="upload-progress">

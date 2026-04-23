@@ -1,4 +1,4 @@
-import * as React from 'react';
+import { ChangeEvent, MouseEvent, ReactElement } from 'react';
 
 export interface GettingStartedLink {
   description?: string;
@@ -8,10 +8,10 @@ export interface GettingStartedLink {
   id: string;
   loading?: boolean;
   /** OnClick callback for the SimpleList item */
-  onClick?: (event: React.ChangeEvent | React.MouseEvent) => void;
+  onClick?: (event: ChangeEvent | MouseEvent) => void;
   secondaryLinkExternal?: boolean;
   secondaryLinkHref?: string;
   secondaryLinkText?: string;
   showSecondaryLink?: boolean;
-  title?: React.ReactElement | string;
+  title?: ReactElement | string;
 }

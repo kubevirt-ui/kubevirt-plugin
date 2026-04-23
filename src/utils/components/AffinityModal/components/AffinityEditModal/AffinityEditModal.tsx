@@ -1,4 +1,4 @@
-import React, { Dispatch, FC, SetStateAction } from 'react';
+import React, { Dispatch, FC, SetStateAction, useState } from 'react';
 
 import { IoK8sApiCoreV1Node } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { useIDEntities } from '@kubevirt-utils/components/NodeSelectorModal/hooks/useIDEntities';
@@ -43,7 +43,7 @@ const AffinityEditModal: FC<AffinityEditModalProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
 
-  const [isDisabled, setIsDisabled] = React.useState(false);
+  const [isDisabled, setIsDisabled] = useState(false);
   const expressions = useIDEntities<AffinityLabel>(focusedAffinity?.expressions);
   const fields = useIDEntities<AffinityLabel>(focusedAffinity?.fields);
 

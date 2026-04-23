@@ -1,9 +1,9 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Content, ContentVariants } from '@patternfly/react-core';
 
-const WorkloadExpressionDescriptionText: React.FCC = () => {
+const WorkloadExpressionDescriptionText: FC = () => {
   const { t } = useKubevirtTranslation();
   return (
     <Content className="pf-v6-u-text-color-subtle" component={ContentVariants.p}>

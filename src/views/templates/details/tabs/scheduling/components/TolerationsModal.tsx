@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC, useMemo } from 'react';
 import produce from 'immer';
 import { getTolerations } from 'src/views/templates/utils/selectors';
 
@@ -36,12 +36,7 @@ type TolerationsModalProps = {
   template: V1Template;
 };
 
-const TolerationsModal: React.FCC<TolerationsModalProps> = ({
-  isOpen,
-  onClose,
-  onSubmit,
-  template,
-}) => {
+const TolerationsModal: FC<TolerationsModalProps> = ({ isOpen, onClose, onSubmit, template }) => {
   const { t } = useKubevirtTranslation();
   const {
     entities: tolerationsLabels,
@@ -67,7 +62,7 @@ const TolerationsModal: React.FCC<TolerationsModalProps> = ({
       value: '',
     });
 
-  const updatedTemplate = React.useMemo(
+  const updatedTemplate = useMemo(
     () =>
       produce<V1Template>(template, (templateDraft: V1Template) => {
         const updatedTolerations: K8sIoApiCoreV1Toleration[] = (tolerationsLabels || []).map(

@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { FC, useMemo } from 'react';
 import { Link } from 'react-router';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -44,7 +44,7 @@ type MigrationThresholdChartProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const MigrationThresholdChart: React.FCC<MigrationThresholdChartProps> = ({ vmi }) => {
+const MigrationThresholdChart: FC<MigrationThresholdChartProps> = ({ vmi }) => {
   const { t } = useKubevirtTranslation();
   const isACMPage = useIsACMPage();
 

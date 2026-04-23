@@ -14,7 +14,7 @@ import { IpAddresses } from '@virtualmachines/details/tabs/overview/components/V
 
 type FirstItemListPopoverProps = {
   className?: string;
-  headerContent?: ReactNode | string;
+  headerContent?: ReactNode;
   includeCopyFirstItem?: boolean;
   items: IpAddresses;
 };

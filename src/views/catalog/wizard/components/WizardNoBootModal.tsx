@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 import { Trans } from 'react-i18next';
 import { useNavigate } from 'react-router';
 
@@ -8,7 +8,7 @@ import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { getCatalogURL } from '@multicluster/urls';
 import { Button, ButtonVariant, Stack, StackItem } from '@patternfly/react-core';
 
-export const WizardNoBootModal: React.VFC<{
+export const WizardNoBootModal: FC<{
   isOpen: boolean;
   namespace: string;
   onClose: () => void;

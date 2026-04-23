@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Content, ContentVariants } from '@patternfly/react-core';
@@ -8,7 +8,7 @@ import SysprepFileField from '../SysprepFileField';
 
 import SysprepAutounattendHelperPopup from './SysprepAutounattendHelperPopup';
 
-const SysprepAutounattend: React.FCC<{
+const SysprepAutounattend: FC<{
   onChange: (value: string) => void;
   value: string;
 }> = ({ onChange, value }) => {

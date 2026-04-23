@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { MouseEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import fuzzysearch from 'fuzzysearch';
 
 import { useClickOutside } from '@kubevirt-utils/hooks/useClickOutside/useClickOutside';
@@ -167,7 +167,7 @@ const Dropdown = <T,>({
   );
 
   const onSelect = useCallback(
-    (_event: React.MouseEvent, itemId: string) => {
+    (_event: MouseEvent, itemId: string) => {
       setIsOpen(false);
       onChange(itemId);
     },
@@ -175,7 +175,7 @@ const Dropdown = <T,>({
   );
 
   const onActionClick = useCallback(
-    (event: React.MouseEvent, itemID: string) => {
+    (event: MouseEvent, itemID: string) => {
       event.preventDefault();
       event.stopPropagation();
       const isCurrentFavorite = bookmarks.bookmarks?.[itemID];

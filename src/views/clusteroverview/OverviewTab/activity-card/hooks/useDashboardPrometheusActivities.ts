@@ -1,4 +1,4 @@
-import * as React from 'react';
+import { useMemo } from 'react';
 
 import { PrometheusResponse, ResolvedExtension } from '@openshift-console/dynamic-plugin-sdk';
 import { DashboardsOverviewPrometheusActivity as DynamicDashboardsOverviewPrometheusActivity } from '@openshift-console/dynamic-plugin-sdk/lib/extensions/dashboards';
@@ -24,7 +24,7 @@ const useDashboardPrometheusActivities = () => {
     prometheusQueries: Array.from(queries),
   });
 
-  const allPrometheusActivities = React.useMemo(
+  const allPrometheusActivities = useMemo(
     () =>
       prometheusActivities
         ?.filter((a) => {
@@ -50,7 +50,7 @@ const useDashboardPrometheusActivities = () => {
     [prometheusActivities, prometheusResults],
   );
 
-  const prometheusQueriesLoaded = React.useMemo(
+  const prometheusQueriesLoaded = useMemo(
     () =>
       prometheusActivities.every((a) =>
         a.properties.queries.every(

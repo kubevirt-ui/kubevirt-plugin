@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 import { Link } from 'react-router';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -41,7 +41,7 @@ type StorageReadLatencyAvgMaxChartProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const StorageReadLatencyAvgMaxChart: React.FCC<StorageReadLatencyAvgMaxChartProps> = ({ vmi }) => {
+const StorageReadLatencyAvgMaxChart: FC<StorageReadLatencyAvgMaxChartProps> = ({ vmi }) => {
   const { currentTime, duration, timespan } = useDuration();
 
   const { query: queryAvg, queryLink } = useVMQuery(vmi, VMQueries.STORAGE_READ_LATENCY_AVG);

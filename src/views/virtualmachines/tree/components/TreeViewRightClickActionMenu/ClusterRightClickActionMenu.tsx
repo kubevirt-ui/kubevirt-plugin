@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import useClusterActions from '@virtualmachines/tree/hooks/useClusterActions';
@@ -11,7 +11,7 @@ type ClusterRightClickActionMenuProps = {
   triggerElement: HTMLElement | null;
 };
 
-const ClusterRightClickActionMenu: FCC<ClusterRightClickActionMenuProps> = ({
+const ClusterRightClickActionMenu: FC<ClusterRightClickActionMenuProps> = ({
   hideMenu,
   triggerElement,
 }) => {

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import CPUThresholdChart from '@kubevirt-utils/components/Charts/CPUUtil/CPUThresholdChart';
@@ -10,7 +10,7 @@ import { Grid, GridItem } from '@patternfly/react-core';
 type UtilizationThresholdChartsProps = {
   vmi: V1VirtualMachineInstance;
 };
-const UtilizationThresholdCharts: React.FCC<UtilizationThresholdChartsProps> = ({ vmi }) => {
+const UtilizationThresholdCharts: FC<UtilizationThresholdChartsProps> = ({ vmi }) => {
   return (
     <Grid>
       <GridItem span={3}>

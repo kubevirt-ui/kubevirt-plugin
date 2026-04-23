@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 import { Trans } from 'react-i18next';
 import { Link } from 'react-router';
 import BootOrder from 'src/views/virtualmachinesinstance/details/tabs/details/components/Details/BootOrder/BootOrder';
@@ -12,7 +12,7 @@ type BootOrderProps = {
   template: V1Template;
 };
 
-const BootOrderItem: React.FCC<BootOrderProps> = ({ template }) => {
+const BootOrderItem: FC<BootOrderProps> = ({ template }) => {
   const { t } = useKubevirtTranslation();
   const disks = getTemplateDisks(template);
   const interfaces = getTemplateInterfaces(template);

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { FC, PropsWithChildren, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router';
 
 import { MigrationPolicyModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -16,11 +16,11 @@ import { Popover, PopoverPosition, Stack, StackItem } from '@patternfly/react-co
 
 import { getMigrationPhaseIcon } from './utils';
 
-type MigrationProgressPopoverProps = React.PropsWithChildren<{
+type MigrationProgressPopoverProps = PropsWithChildren<{
   vmi: V1VirtualMachineInstance;
 }>;
 
-const MigrationProgressPopover: React.FCC<MigrationProgressPopoverProps> = ({ children, vmi }) => {
+const MigrationProgressPopover: FC<MigrationProgressPopoverProps> = ({ children, vmi }) => {
   const { t } = useKubevirtTranslation();
   const vmim = useVirtualMachineInstanceMigration(vmi);
   const Icon = getMigrationPhaseIcon(vmim?.status?.phase);

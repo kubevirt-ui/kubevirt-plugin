@@ -1,4 +1,4 @@
-import * as React from 'react';
+import { useMemo } from 'react';
 
 import { PersistentVolumeClaimModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -27,7 +27,7 @@ const useDisksTableDisks: UseDisksTableDisks = (vmi) => {
     namespaced: true,
   });
 
-  const disks = React.useMemo(() => {
+  const disks = useMemo(() => {
     const diskDevices: DiskRaw[] = vmiVolumes?.map((volume) => {
       const disk = vmiDisks?.find(({ name }) => name === volume.name);
       const pvc = pvcs?.find(

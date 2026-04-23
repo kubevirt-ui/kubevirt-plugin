@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 
 import { V1alpha1MigrationPolicy } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import DetailsPageTitle from '@kubevirt-utils/components/DetailsPageTitle/DetailsPageTitle';
@@ -15,7 +15,7 @@ type MigrationPolicyDetailsNavTitleProps = {
   mp: V1alpha1MigrationPolicy;
 };
 
-const MigrationPolicyDetailsNavTitle: React.FCC<MigrationPolicyDetailsNavTitleProps> = ({ mp }) => {
+const MigrationPolicyDetailsNavTitle: FC<MigrationPolicyDetailsNavTitleProps> = ({ mp }) => {
   const { t } = useKubevirtTranslation();
   return (
     <DetailsPageTitle breadcrumb={<MigrationPolicyBreadcrumb />}>

@@ -1,11 +1,11 @@
-import * as React from 'react';
+import React, { ComponentType, createContext, FC, ReactNode, useContext, useState } from 'react';
 
 export type ModalComponentProps = {
   appendTo: () => HTMLElement;
   isOpen: boolean;
   onClose: () => void;
 };
-export type ModalComponent = React.ComponentType<ModalComponentProps>;
+export type ModalComponent = ComponentType<ModalComponentProps>;
 
 export type ModalContextType = {
   /** receives a modal component as an argument and injects it to the dom, the component callback will receive the following parameters,
@@ -29,7 +29,7 @@ export type ModalContextType = {
   onClose?: () => void;
 };
 
-export const ModalContext = React.createContext<ModalContextType>({});
+export const ModalContext = createContext<ModalContextType>({});
 /**
  * A hook that returns a global modal context. This context is used to inject a modal component to the dom.
  * @example
@@ -39,11 +39,11 @@ export const ModalContext = React.createContext<ModalContextType>({});
  *  <ExampleModal isOpen={isOpen} onClose={onClose} appendTo={appendTo} />
  * ))
  */
-export const useModal = () => React.useContext(ModalContext);
+export const useModal = () => useContext(ModalContext);
 
 export const useModalValue = (): ModalContextType => {
-  const [modal, setModal] = React.useState<ModalComponent>();
-  const [isOpen, setIsOpen] = React.useState(false);
+  const [modal, setModal] = useState<ModalComponent>();
+  const [isOpen, setIsOpen] = useState(false);
 
   const createModal = (newModal: ModalComponent) => {
     setIsOpen(true);
@@ -58,7 +58,10 @@ export const useModalValue = (): ModalContextType => {
   return { createModal, isOpen, modal, onClose };
 };
 
-export const ModalProvider: React.FCC<{ value: ModalContextType }> = ({ children, value = {} }) => {
+export const ModalProvider: FC<{
+  children?: ReactNode;
+  value: ModalContextType;
+}> = ({ children, value = {} }) => {
   const { isOpen, modal: Modal, onClose } = value;
 
   return (

@@ -1,4 +1,4 @@
-import React, { FCC, Ref, useRef } from 'react';
+import React, { FC, ReactNode, Ref, useRef } from 'react';
 import classNames from 'classnames';
 
 import { TopologyDataObject } from '@openshift-console/dynamic-plugin-sdk/lib/extensions/topology-types';
@@ -26,6 +26,7 @@ import './VMNode.scss';
 
 export type VMNodeProps = {
   canDrop?: boolean;
+  children?: ReactNode;
   dragging?: boolean;
   dropTarget?: boolean;
   edgeDragging?: boolean;
@@ -43,7 +44,7 @@ const VM_STATUS_GAP = 7;
 const VM_STATUS_WIDTH = 7;
 const VM_STATUS_RADIUS = 7;
 
-const ObservedVMNode: FCC<VMNodeProps> = ({ canDrop, children, dropTarget, element, ...rest }) => {
+const ObservedVMNode: FC<VMNodeProps> = ({ canDrop, children, dropTarget, element, ...rest }) => {
   const ref = useRef();
   useAnchor(RectAnchor);
   const { height, width } = element.getBounds();

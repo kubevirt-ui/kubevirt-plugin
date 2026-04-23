@@ -1,4 +1,4 @@
-import React, { FCC, useCallback, useEffect } from 'react';
+import React, { FC, useCallback, useEffect } from 'react';
 import { Updater } from 'use-immer';
 
 import { V1beta1Plan } from '@kubev2v/types';
@@ -37,7 +37,7 @@ type TargetStepProps = {
   vms: V1VirtualMachine[];
 };
 
-const TargetStep: FCC<TargetStepProps> = ({ migrationPlan, setMigrationPlan, vms }) => {
+const TargetStep: FC<TargetStepProps> = ({ migrationPlan, setMigrationPlan, vms }) => {
   const { t } = useKubevirtTranslation();
   const [hubClusterName] = useHubClusterName();
   const sourceCluster = getCluster(vms?.[0]) ?? hubClusterName;

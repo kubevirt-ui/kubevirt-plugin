@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 
 import { Grid, GridItem } from '@patternfly/react-core';
 
@@ -8,7 +8,7 @@ import ChartCard from './ChartCard';
 
 import './ChartsCard.scss';
 
-const ChartsCard: React.FCC = () => {
+const ChartsCard: FC = () => {
   return (
     <div className="metric-charts-card">
       <Grid className="metric-charts-card__grid" hasGutter>

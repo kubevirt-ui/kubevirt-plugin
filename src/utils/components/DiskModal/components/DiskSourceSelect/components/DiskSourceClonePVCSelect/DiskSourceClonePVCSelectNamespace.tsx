@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 import { Controller, FieldPath, useFormContext } from 'react-hook-form';
 
 import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -17,7 +17,7 @@ import {
 } from '../../../utils/constants';
 import { diskSourcePVCNamespaceFieldID } from '../../utils/constants';
 
-const DiskSourcePVCSelectNamespace: FCC = () => {
+const DiskSourcePVCSelectNamespace: FC = () => {
   const { t } = useKubevirtTranslation();
   const {
     control,

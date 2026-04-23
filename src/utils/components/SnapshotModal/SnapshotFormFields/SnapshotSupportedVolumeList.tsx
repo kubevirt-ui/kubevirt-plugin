@@ -1,14 +1,14 @@
-import React, { FCC, ReactNode, useState } from 'react';
+import React, { FC, ReactNode, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Alert, ExpandableSection, FormGroup } from '@patternfly/react-core';
 
 type SupportedSnapshotVolumesListProps = {
-  children: ReactNode;
+  children?: ReactNode;
   volumesCount: number;
 };
 
-const SnapshotSupportedVolumeList: FCC<SupportedSnapshotVolumesListProps> = ({
+const SnapshotSupportedVolumeList: FC<SupportedSnapshotVolumesListProps> = ({
   children,
   volumesCount,
 }) => {

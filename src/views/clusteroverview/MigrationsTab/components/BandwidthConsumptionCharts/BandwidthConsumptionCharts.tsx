@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 import xbytes from 'xbytes';
 
 import useResponsiveCharts from '@kubevirt-utils/components/Charts/hooks/useResponsiveCharts';
@@ -19,7 +19,7 @@ type BandwidthConsumptionChartsProps = {
   duration: string;
 };
 
-const BandwidthConsumptionCharts: React.FCC<BandwidthConsumptionChartsProps> = ({ duration }) => {
+const BandwidthConsumptionCharts: FC<BandwidthConsumptionChartsProps> = ({ duration }) => {
   const { t } = useKubevirtTranslation();
 
   const currentTime = useCurrentTime();

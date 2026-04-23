@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 import { Link } from 'react-router';
 import { getMigrationPolicyURL } from 'src/views/migrationpolicies/utils/utils';
 
@@ -6,7 +6,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import useSelectedCluster from '@kubevirt-utils/hooks/useSelectedCluster';
 import { Title } from '@patternfly/react-core';
 
-const MigrationPolicyCreateFormHeader: React.FCC = () => {
+const MigrationPolicyCreateFormHeader: FC = () => {
   const { t } = useKubevirtTranslation();
   const selectedCluster = useSelectedCluster();
 

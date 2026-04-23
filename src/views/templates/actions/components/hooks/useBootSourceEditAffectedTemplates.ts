@@ -1,4 +1,4 @@
-import * as React from 'react';
+import { useMemo } from 'react';
 
 import {
   modelToGroupVersionKind,
@@ -18,7 +18,7 @@ const useBootSourceEditAffectedTemplates = (obj: V1Template) => {
     isList: true,
   });
 
-  const affectedTemplates = React.useMemo(() => {
+  const affectedTemplates = useMemo(() => {
     if (!allTemplates) {
       return [];
     }

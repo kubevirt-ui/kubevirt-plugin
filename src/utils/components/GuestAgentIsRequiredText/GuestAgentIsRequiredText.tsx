@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -9,7 +9,7 @@ type GuestAgentIsRequiredTextProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const GuestAgentIsRequiredText: React.FCC<GuestAgentIsRequiredTextProps> = ({ vmi }) => {
+const GuestAgentIsRequiredText: FC<GuestAgentIsRequiredTextProps> = ({ vmi }) => {
   const { t } = useKubevirtTranslation();
 
   return <MutedTextSpan text={vmi ? t('Guest agent is required') : t('Not available')} />;

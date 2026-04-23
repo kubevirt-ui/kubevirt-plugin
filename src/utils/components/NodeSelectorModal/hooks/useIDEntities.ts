@@ -1,4 +1,4 @@
-import * as React from 'react';
+import { Dispatch, SetStateAction, useCallback, useState } from 'react';
 
 import { IDEntity } from '../utils/types';
 
@@ -10,16 +10,16 @@ type UseIDEntitiesProps = <T extends IDEntity = IDEntity>(
   onEntityAdd: (newEntity: T) => void;
   onEntityChange: (updatedEntity: T) => void;
   onEntityDelete: (idToDelete: number) => void;
-  setEntities: React.Dispatch<React.SetStateAction<T[]>>;
+  setEntities: Dispatch<SetStateAction<T[]>>;
 };
 
 export const useIDEntities: UseIDEntitiesProps = <T extends IDEntity = IDEntity>(
   initialEntities = [],
 ) => {
-  const [entities, setEntities] = React.useState<T[]>(initialEntities);
-  const [initialEntitiesChanged, setInitialEntitiesChanged] = React.useState<boolean>(false);
+  const [entities, setEntities] = useState<T[]>(initialEntities);
+  const [initialEntitiesChanged, setInitialEntitiesChanged] = useState<boolean>(false);
 
-  const onEntityAdd = React.useCallback(
+  const onEntityAdd = useCallback(
     (newEntity: T) => {
       setInitialEntitiesChanged(true);
       const id = entities[entities.length - 1]?.id + 1 || 0;
@@ -28,7 +28,7 @@ export const useIDEntities: UseIDEntitiesProps = <T extends IDEntity = IDEntity>
     [entities],
   );
 
-  const onEntityChange = React.useCallback(
+  const onEntityChange = useCallback(
     (updatedEntity: T) => {
       setInitialEntitiesChanged(true);
       setEntities(
@@ -43,7 +43,7 @@ export const useIDEntities: UseIDEntitiesProps = <T extends IDEntity = IDEntity>
     [entities],
   );
 
-  const onEntityDelete = React.useCallback(
+  const onEntityDelete = useCallback(
     (idToDelete: number) => {
       setInitialEntitiesChanged(true);
       setEntities(entities.filter(({ id }) => id !== idToDelete));

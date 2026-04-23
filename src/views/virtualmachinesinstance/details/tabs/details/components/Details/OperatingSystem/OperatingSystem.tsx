@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 
 import {
   V1VirtualMachineInstance,
@@ -16,11 +16,7 @@ type OperatingSystemProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const OperatingSystem: React.FCC<OperatingSystemProps> = ({
-  guestAgentData,
-  loadedGuestAgent,
-  vmi,
-}) => {
+const OperatingSystem: FC<OperatingSystemProps> = ({ guestAgentData, loadedGuestAgent, vmi }) => {
   const { t } = useKubevirtTranslation();
   return (
     <DescriptionItem

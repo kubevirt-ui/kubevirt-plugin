@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC, useState } from 'react';
 import { Trans } from 'react-i18next';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -16,7 +16,7 @@ import { downloadFile, generateDescriptorFile } from '../utils/utils';
 
 import MoreInformationDefault from './MoreInformationDefault';
 
-const RemoteViewer: React.FCC<RemoteViewerProps> = ({
+const RemoteViewer: FC<RemoteViewerProps> = ({
   onDownload = downloadFile,
   onGenerate = generateDescriptorFile,
   rdp = null,
@@ -30,8 +30,8 @@ const RemoteViewer: React.FCC<RemoteViewerProps> = ({
   vnc = null,
 }) => {
   const { t } = useKubevirtTranslation();
-  const [isExpandedDefault, setIsExpandedDefault] = React.useState<boolean>(false);
-  const [isExpandedRDP, setIsExpandedRDP] = React.useState<boolean>(false);
+  const [isExpandedDefault, setIsExpandedDefault] = useState<boolean>(false);
+  const [isExpandedRDP, setIsExpandedRDP] = useState<boolean>(false);
 
   const console = spice || vnc;
 

@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC, ReactNode } from 'react';
 import { Link } from 'react-router';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -16,10 +16,11 @@ import { isErrorPrintableStatus } from '@virtualmachines/utils';
 import './VirtualMachineOverviewStatus.scss';
 
 type VirtualMachineOverviewStatusProps = {
+  children?: ReactNode;
   vm: V1VirtualMachine;
 };
 
-const VirtualMachineOverviewStatus: FCC<VirtualMachineOverviewStatusProps> = ({ children, vm }) => {
+const VirtualMachineOverviewStatus: FC<VirtualMachineOverviewStatusProps> = ({ children, vm }) => {
   const { t } = useKubevirtTranslation();
   const vmPrintableStatus = getVMStatus(vm);
   const isErrorStatus = isErrorPrintableStatus(vmPrintableStatus);

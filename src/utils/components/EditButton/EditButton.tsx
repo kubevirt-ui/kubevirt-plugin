@@ -1,10 +1,11 @@
-import React, { FCC } from 'react';
+import React, { FC, ReactNode } from 'react';
 
 import { Button, ButtonVariant } from '@patternfly/react-core';
 import { PencilAltIcon } from '@patternfly/react-icons';
 
 type EditButtonProps = {
   ariaLabel?: string;
+  children?: ReactNode;
   className?: string;
   isDisabled?: boolean;
   isInline?: boolean;
@@ -13,7 +14,7 @@ type EditButtonProps = {
   variant?: ButtonVariant;
 };
 
-const EditButton: FCC<EditButtonProps> = ({
+const EditButton: FC<EditButtonProps> = ({
   ariaLabel,
   children,
   className,

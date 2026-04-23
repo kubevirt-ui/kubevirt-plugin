@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Label, Popover } from '@patternfly/react-core';
@@ -6,7 +6,7 @@ import { InfoCircleIcon } from '@patternfly/react-icons';
 
 import './DeveloperPreviewLabel.scss';
 
-const DeveloperPreviewLabel: React.FCC = () => {
+const DeveloperPreviewLabel: FC = () => {
   const { t } = useKubevirtTranslation();
 
   return (

@@ -1,4 +1,4 @@
-import React, { FCC, ReactNode, useEffect } from 'react';
+import React, { FC, ReactNode, useEffect } from 'react';
 import classNames from 'classnames';
 
 import { ExpandableSection } from '@patternfly/react-core';
@@ -8,6 +8,7 @@ import useIsExpandedAndHighlighted from './hooks/useIsExpandedAndHighlighted';
 import './ExpandSection.scss';
 
 type ExpandSectionProps = {
+  children?: ReactNode;
   className?: string;
   dataTestID?: string;
   id?: string;
@@ -18,7 +19,7 @@ type ExpandSectionProps = {
   toggleText?: string;
 };
 
-const ExpandSection: FCC<ExpandSectionProps> = ({
+const ExpandSection: FC<ExpandSectionProps> = ({
   children,
   className,
   dataTestID,

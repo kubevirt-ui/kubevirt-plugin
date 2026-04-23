@@ -1,4 +1,4 @@
-import React, { Dispatch, FCC, SetStateAction } from 'react';
+import React, { Dispatch, FC, SetStateAction } from 'react';
 
 import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
@@ -15,7 +15,7 @@ type DiskSourcePVCSelectNamespaceProps = {
   selectedProject: string;
 };
 
-const DiskSourcePVCSelectNamespace: FCC<DiskSourcePVCSelectNamespaceProps> = ({
+const DiskSourcePVCSelectNamespace: FC<DiskSourcePVCSelectNamespaceProps> = ({
   isDisabled,
   onChange,
   projectNames,

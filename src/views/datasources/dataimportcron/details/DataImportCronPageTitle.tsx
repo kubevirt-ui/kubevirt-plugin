@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 import { Link } from 'react-router';
 
 import { DataImportCronModelRef } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -17,7 +17,7 @@ type DataImportCronPageTitleProps = {
   namespace: string;
 };
 
-const DataImportCronPageTitle: React.FCC<DataImportCronPageTitleProps> = ({
+const DataImportCronPageTitle: FC<DataImportCronPageTitleProps> = ({
   dataImportCron,
   name,
   namespace,

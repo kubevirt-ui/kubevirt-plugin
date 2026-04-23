@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 import { Link } from 'react-router';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -49,9 +49,7 @@ const CHART_COLORS = [
   chart_color_purple_300.value,
 ];
 
-const StorageWriteLatencyPerDriveChart: React.FCC<StorageWriteLatencyPerDriveChartProps> = ({
-  vmi,
-}) => {
+const StorageWriteLatencyPerDriveChart: FC<StorageWriteLatencyPerDriveChartProps> = ({ vmi }) => {
   const { currentTime, duration, timespan } = useDuration();
 
   const { query, queryLink } = useVMQuery(vmi, VMQueries.STORAGE_WRITE_LATENCY_PER_DRIVE);

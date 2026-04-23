@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, Suspense } from 'react';
 
 import { V1alpha1MigrationPolicy } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
@@ -18,9 +18,9 @@ const MigrationPolicyYAMLPage: FC<MigrationPolicyYAMLPageProps> = ({ obj: mp }) 
   return !mp ? (
     loading
   ) : (
-    <React.Suspense fallback={loading}>
+    <Suspense fallback={loading}>
       <ResourceYAMLEditor initialResource={mp} />
-    </React.Suspense>
+    </Suspense>
   );
 };
 

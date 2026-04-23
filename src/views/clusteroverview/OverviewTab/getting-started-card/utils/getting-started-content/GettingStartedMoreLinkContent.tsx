@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 import { Link } from 'react-router';
 
 import { Button, ButtonVariant } from '@patternfly/react-core';
@@ -9,9 +9,7 @@ export type GettingStartedMoreLinkContentProps = {
   moreLink: GettingStartedLink;
 };
 
-const GettingStartedMoreLinkContent: React.FCC<GettingStartedMoreLinkContentProps> = ({
-  moreLink,
-}) => {
+const GettingStartedMoreLinkContent: FC<GettingStartedMoreLinkContentProps> = ({ moreLink }) => {
   if (!moreLink) {
     return null;
   }
