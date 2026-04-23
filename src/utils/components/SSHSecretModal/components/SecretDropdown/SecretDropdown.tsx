@@ -66,11 +66,10 @@ const SecretDropdown: FCC<SecretDropdownProps> = ({
         const name = getName(secret);
         return { children: name, value: name };
       })}
-      data-test-id="select-secret"
       placeholder={t('Select secret')}
       selected={secretName}
       setSelected={onSelect}
-      toggleProps={{ isFullWidth: true }}
+      toggleProps={{ 'data-test-id': 'select-secret', isFullWidth: true }}
     />
   );
 };

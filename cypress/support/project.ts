@@ -1,4 +1,10 @@
-import { TEST_NS, TREEVIEW_ROOT_ID } from '../utils/const/index';
+import {
+  ALL_NAMESPACES_KEY,
+  ALL_PROJ_NS,
+  SINGLE_CLUSTER_KEY,
+  TEST_NS,
+  TREEVIEW_ROOT_ID,
+} from '../utils/const/index';
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
@@ -31,7 +37,11 @@ Cypress.Commands.add('selectTestProject', () => {
 });
 
 Cypress.Commands.add('switchProjectUsingTreeView', (projectName: string) => {
-  cy.get(`li#projectSelector/${projectName}`).click();
+  if (projectName === ALL_PROJ_NS) {
+    cy.get(`li[id="${ALL_NAMESPACES_KEY}"]`).click();
+  } else {
+    cy.get(`li[id="projectSelector/${SINGLE_CLUSTER_KEY}/${projectName}"]`).click();
+  }
 });
 
 Cypress.Commands.add('switchProject', (projectName: string) => {
@@ -42,13 +52,16 @@ Cypress.Commands.add('switchProject', (projectName: string) => {
   }
   const name = typeof projectName === 'string' ? projectName : String(projectName);
   cy.get('body').then(($body) => {
-    if ($body.find(TREEVIEW_ROOT_ID).length) {
-      cy.switchProjectUsingTreeView(name);
-      return;
-    }
+    const hasTreeView = $body.find(TREEVIEW_ROOT_ID).length > 0;
+    const nsBarHidden = $body.find('.co-namespace-bar').css('display') === 'none';
 
-    cy.byLegacyTestID('namespace-bar-dropdown').contains('Project:').click();
-    cy.byTestID('showSystemSwitch').check();
-    cy.byTestID('dropdown-menu-item-link').contains(name).click();
+    if (hasTreeView || nsBarHidden) {
+      cy.get(TREEVIEW_ROOT_ID, { timeout: 30000 });
+      cy.switchProjectUsingTreeView(name);
+    } else {
+      cy.byLegacyTestID('namespace-bar-dropdown').contains('Project:').click();
+      cy.byTestID('showSystemSwitch').check();
+      cy.byTestID('dropdown-menu-item-link').contains(name).click();
+    }
   });
 });

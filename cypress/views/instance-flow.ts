@@ -124,11 +124,11 @@ export const fillInstanceType = (vmData: VirtualMachineData) => {
     if (secretProject !== undefined) {
       cy.get('button[placeholder="Select project"]').click();
       cy.get(`[data-test-id="select-option-${secretProject}"]`).click();
-      cy.get('button[placeholder="Select secret"]').click();
+      cy.get(iView.selectSecret).click();
       cy.contains(iView.menuItemText, existSecret).click();
       cy.get('input[id="new-secret-name"]').clear().type(newSecretName);
     } else {
-      cy.get('button[placeholder="Select secret"]').click();
+      cy.get(iView.selectSecret).click();
       cy.contains(iView.menuItemText, existSecret).click();
     }
     if (applyKey) {
@@ -312,7 +312,7 @@ export const fillSSH = (vmData: VirtualMachineData) => {
     cy.contains('.pf-v6-c-tabs__item-text', 'SSH').click();
     cy.get('[data-test-id="ssh-tab-edit-authorized"]').click();
     cy.get(iView.useExisting).click();
-    cy.get('button[placeholder="Select secret"]').click();
+    cy.get(iView.selectSecret).click();
     cy.contains(existSecret).click();
     cy.clickSaveBtn();
     cy.wait(2000);

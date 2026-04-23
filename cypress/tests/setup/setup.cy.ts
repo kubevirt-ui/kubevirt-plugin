@@ -2,13 +2,14 @@ import { TEST_NS, TEST_SECRET_NAME } from '../../utils/const/index';
 import { authSSHKey, YAML } from '../../utils/const/string';
 import { itemCreateBtn, mastheadLogo, saveBtn } from '../../views/selector';
 import { manageKeysText, useExisting } from '../../views/selector-catalog';
+import { selectSecret } from '../../views/selector-instance';
 
 function configureSSHSecret() {
   cy.byLegacyTestID('select-project-toggle').click();
   cy.byLegacyTestID(`select-option-${TEST_NS}`).click({ force: true });
   cy.get('button.project-ssh-row__secret-name').click();
   cy.get(useExisting).click();
-  cy.contains('Select secret').click();
+  cy.get(selectSecret).click();
   cy.byButtonText(TEST_SECRET_NAME).click();
   cy.clickSaveBtn();
 }

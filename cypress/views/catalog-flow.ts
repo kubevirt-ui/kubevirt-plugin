@@ -284,7 +284,7 @@ export const fillScripts = (vmData: VirtualMachineData) => {
   if (existSecret) {
     cy.contains(descrGroup, authSSHKey).find('button').click();
     cy.get(iView.useExisting).click();
-    cy.get('button[placeholder="Select secret"]').click();
+    cy.get(iView.selectSecret).click();
     cy.get(`button#select-inline-filter-${existSecret}`).click();
     cy.clickSaveBtn();
     cy.contains('.co-resource-item__resource-name', existSecret).should('exist');
