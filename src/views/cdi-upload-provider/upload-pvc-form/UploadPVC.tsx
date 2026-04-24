@@ -1,6 +1,5 @@
 import React, { FC, FormEvent, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { Helmet } from 'react-helmet';
-import { useNavigate } from 'react-router-dom-v5-compat';
+import { useNavigate } from 'react-router';
 import axios from 'axios';
 import classNames from 'classnames';
 
@@ -23,6 +22,7 @@ import {
   TEMPLATE_TYPE_LABEL,
   TEMPLATE_VM_COMMON_NAMESPACE,
 } from '@kubevirt-utils/resources/template';
+import { DocumentTitle } from '@openshift-console/dynamic-plugin-sdk';
 import {
   K8sVerb,
   useK8sWatchResource,
@@ -178,9 +178,7 @@ const UploadPVCPage: FC = () => {
 
   return (
     <>
-      <Helmet>
-        <title>{title}</title>
-      </Helmet>
+      <DocumentTitle>{title}</DocumentTitle>
       <PageSection
         className={classNames('kv-m-pane__form', {
           'kv--create-upload__hide': isSubmitting,

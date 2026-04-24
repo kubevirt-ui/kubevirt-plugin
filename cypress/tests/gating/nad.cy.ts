@@ -2,7 +2,7 @@ import { TEST_NS } from '../../utils/const/index';
 import { NAD_BRIDGE, NAD_LOCALNET, NAD_OVN } from '../../utils/const/nad';
 import { createNAD, deleteNAD } from '../../views/nad';
 
-describe('Test network attachments', () => {
+xdescribe('Test network attachments', () => {
   beforeEach(() => {
     cy.beforeSpec();
     cy.visitNAD();

@@ -1,6 +1,6 @@
 import React, { FC, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom-v5-compat';
-import { useLocation } from 'react-router-dom-v5-compat';
+import { useNavigate } from 'react-router';
+import { useLocation } from 'react-router';
 
 import { VirtualMachineDetailsTab } from '@kubevirt-utils/constants/tabs-constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';

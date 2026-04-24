@@ -10,7 +10,7 @@ type UploadPVCFormPVCNameProps = {
   pvcName: string;
 };
 
-const UploadPVCFormPVCName: React.FC<UploadPVCFormPVCNameProps> = ({
+const UploadPVCFormPVCName: React.FCC<UploadPVCFormPVCNameProps> = ({
   handlePvcName,
   isGolden,
   isLoading,

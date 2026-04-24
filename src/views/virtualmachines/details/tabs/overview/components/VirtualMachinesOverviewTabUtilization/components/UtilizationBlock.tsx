@@ -10,7 +10,7 @@ type UtilizationBlockProps = {
   usedOfTotalText: string;
 };
 
-export const UtilizationBlock: React.FC<UtilizationBlockProps> = ({
+export const UtilizationBlock: React.FCC<UtilizationBlockProps> = ({
   children,
   dataTestId,
   isNetworkUtil = false,

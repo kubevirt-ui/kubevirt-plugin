@@ -1,6 +1,6 @@
 import React from 'react';
 import { Trans } from 'react-i18next';
-import { Link } from 'react-router-dom-v5-compat';
+import { Link } from 'react-router';
 import BootOrder from 'src/views/virtualmachinesinstance/details/tabs/details/components/Details/BootOrder/BootOrder';
 
 import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -12,7 +12,7 @@ type BootOrderProps = {
   template: V1Template;
 };
 
-const BootOrderItem: React.FC<BootOrderProps> = ({ template }) => {
+const BootOrderItem: React.FCC<BootOrderProps> = ({ template }) => {
   const { t } = useKubevirtTranslation();
   const disks = getTemplateDisks(template);
   const interfaces = getTemplateInterfaces(template);

@@ -1,5 +1,4 @@
 import { ACMVirtualMachineAction } from '@kubevirt-extensions/acm.virtualmachine';
-import { EncodedExtension } from '@openshift/dynamic-plugin-sdk-webpack';
 import {
   FeatureFlagHookProvider,
   HrefNavItem,
@@ -7,7 +6,10 @@ import {
   Separator,
   StandaloneRoutePage,
 } from '@openshift-console/dynamic-plugin-sdk';
-import type { ConsolePluginBuildMetadata } from '@openshift-console/dynamic-plugin-sdk-webpack';
+import type {
+  ConsolePluginBuildMetadata,
+  EncodedExtension,
+} from '@openshift-console/dynamic-plugin-sdk-webpack';
 import { ResourceRoute } from '@stolostron/multicluster-sdk';
 
 import { PERSPECTIVES } from '../utils/constants/constants';

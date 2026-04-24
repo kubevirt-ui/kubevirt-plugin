@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom-v5-compat';
+import { useNavigate } from 'react-router';
 import { getMigrationPolicyURL } from 'src/views/migrationpolicies/utils/utils';
 
 import { MigrationPolicyModel } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -22,7 +22,7 @@ type MigrationPolicyFormFooterProps = {
   migrationPolicy: V1alpha1MigrationPolicy;
 };
 
-const MigrationPolicyFormFooter: React.FC<MigrationPolicyFormFooterProps> = ({
+const MigrationPolicyFormFooter: React.FCC<MigrationPolicyFormFooterProps> = ({
   migrationPolicy,
 }) => {
   const { t } = useKubevirtTranslation();

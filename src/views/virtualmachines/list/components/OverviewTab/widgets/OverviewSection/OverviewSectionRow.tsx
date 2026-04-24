@@ -1,4 +1,4 @@
-import React, { CSSProperties, FC, ReactNode } from 'react';
+import React, { CSSProperties, FCC, ReactNode } from 'react';
 import classNames from 'classnames';
 
 import './OverviewSection.scss';
@@ -9,7 +9,7 @@ type OverviewSectionRowProps = {
   gridColumns?: string;
 };
 
-const OverviewSectionRow: FC<OverviewSectionRowProps> = ({ children, className, gridColumns }) => {
+const OverviewSectionRow: FCC<OverviewSectionRowProps> = ({ children, className, gridColumns }) => {
   const rowStyle: CSSProperties | undefined = gridColumns
     ? ({ '--overview-row-columns': gridColumns } as CSSProperties)
     : undefined;

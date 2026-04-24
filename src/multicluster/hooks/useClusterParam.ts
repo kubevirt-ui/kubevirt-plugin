@@ -1,4 +1,4 @@
-import { useMatch } from 'react-router-dom-v5-compat';
+import { useMatch } from 'react-router';
 
 import { FLEET_BASE_PATH } from '@multicluster/constants';
 import useIsACMPage from '@multicluster/useIsACMPage';

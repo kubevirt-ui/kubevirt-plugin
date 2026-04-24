@@ -1,10 +1,12 @@
-import { EncodedExtension } from '@openshift/dynamic-plugin-sdk-webpack';
-import {
+import type {
   ResourceActionProvider,
   RoutePage,
   StandaloneRoutePage,
 } from '@openshift-console/dynamic-plugin-sdk';
-import type { ConsolePluginBuildMetadata } from '@openshift-console/dynamic-plugin-sdk-webpack';
+import type {
+  ConsolePluginBuildMetadata,
+  EncodedExtension,
+} from '@openshift-console/dynamic-plugin-sdk-webpack';
 
 export const exposedModules: ConsolePluginBuildMetadata['exposedModules'] = {
   LogsStandAlone:

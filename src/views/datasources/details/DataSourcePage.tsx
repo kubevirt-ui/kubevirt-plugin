@@ -17,7 +17,7 @@ type DataSourcePageProps = {
   namespace: string;
 };
 
-const DataSourceNavPage: React.FC<DataSourcePageProps> = ({ kind, name, namespace }) => {
+const DataSourceNavPage: React.FCC<DataSourcePageProps> = ({ kind, name, namespace }) => {
   const { t } = useKubevirtTranslation();
   const [dataSource, loaded] = useK8sWatchResource<V1beta1DataSource>({
     kind,

@@ -18,7 +18,7 @@ import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
 
 import { TemplateDetailsGridProps } from '../TemplateDetailsPage';
 
-const WorkloadProfile: React.FC<TemplateDetailsGridProps> = ({ editable, template }) => {
+const WorkloadProfile: React.FCC<TemplateDetailsGridProps> = ({ editable, template }) => {
   const { createModal } = useModal();
   const { t } = useKubevirtTranslation();
   const workload = getWorkloadProfile(template);

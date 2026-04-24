@@ -13,7 +13,7 @@ type SubscriptionStateUpgradePendingProps = {
   subscription: SubscriptionKind;
 };
 
-const SubscriptionStateUpgradePending: React.FC<SubscriptionStateUpgradePendingProps> = ({
+const SubscriptionStateUpgradePending: React.FCC<SubscriptionStateUpgradePendingProps> = ({
   operatorLink,
   subscription,
 }) => {

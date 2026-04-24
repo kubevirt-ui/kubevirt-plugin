@@ -16,7 +16,7 @@ import { downloadFile, generateDescriptorFile } from '../utils/utils';
 
 import MoreInformationDefault from './MoreInformationDefault';
 
-const RemoteViewer: React.FC<RemoteViewerProps> = ({
+const RemoteViewer: React.FCC<RemoteViewerProps> = ({
   onDownload = downloadFile,
   onGenerate = generateDescriptorFile,
   rdp = null,

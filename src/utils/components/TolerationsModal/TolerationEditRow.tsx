@@ -20,7 +20,7 @@ type TolerationEditRowProps = {
   onDelete: (id: any) => void;
 };
 
-const TolerationEditRow: React.FC<TolerationEditRowProps> = ({ label, onChange, onDelete }) => {
+const TolerationEditRow: React.FCC<TolerationEditRowProps> = ({ label, onChange, onDelete }) => {
   const { effect, id, key, value } = label;
   const { t } = useKubevirtTranslation();
   return (

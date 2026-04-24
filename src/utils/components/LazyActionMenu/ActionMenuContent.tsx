@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import {
   Action,
@@ -18,7 +18,7 @@ type GroupMenuContentProps = {
   option: GroupedMenuOption;
 };
 
-const GroupMenuContent: FC<GroupMenuContentProps & { checkAccess: CheckAccess }> = ({
+const GroupMenuContent: FCC<GroupMenuContentProps & { checkAccess: CheckAccess }> = ({
   checkAccess,
   onClick,
   option,
@@ -34,7 +34,7 @@ const GroupMenuContent: FC<GroupMenuContentProps & { checkAccess: CheckAccess }>
 );
 
 // Need to keep this in the same file to avoid circular dependency.
-const SubMenuContent: FC<GroupMenuContentProps & { checkAccess: CheckAccess }> = ({
+const SubMenuContent: FCC<GroupMenuContentProps & { checkAccess: CheckAccess }> = ({
   checkAccess,
   onClick,
   option,
@@ -66,7 +66,7 @@ type ActionMenuContentProps = {
   options: MenuOption[];
 };
 
-const ActionMenuContent: FC<ActionMenuContentProps> = ({ checkAccess, onClick, options }) => {
+const ActionMenuContent: FCC<ActionMenuContentProps> = ({ checkAccess, onClick, options }) => {
   const sortedOptions = orderExtensionBasedOnInsertBeforeAndAfter(options);
   return (
     <>

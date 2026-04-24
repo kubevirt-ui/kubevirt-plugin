@@ -2262,7 +2262,6 @@
   "View {{alertType}}": "{{alertType}} の表示",
   "view {{qualifiedNodesCount}} matching nodes": "{{qualifiedNodesCount}} 個の一致するノードを表示",
   "View alert": "アラートの表示",
-  "View alerts": "アラートの表示",
   "View all": "すべてを表示",
   "View all quick starts": "すべてのクイックスタートの表示",
   "View and manage available bootable volumes.": "利用できるブート可能なボリュームを表示および管理します。",

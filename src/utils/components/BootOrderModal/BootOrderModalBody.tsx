@@ -24,7 +24,7 @@ import { MinusCircleIcon } from '@patternfly/react-icons';
 import { BootOrderEmptyState } from './BootOrderEmptyState';
 import DeviceTypeIcon from './DeviceTypeIcon';
 
-export const BootOrderModalBody: React.FC<{
+export const BootOrderModalBody: React.FCC<{
   changeEditMode: (isEditMode: boolean) => void;
   devices: BootableDeviceType[];
   isEditMode: boolean;

@@ -1,6 +1,6 @@
 import React, { FC, ReactNode } from 'react';
-import { TFunction } from 'react-i18next';
-import { Link } from 'react-router-dom-v5-compat';
+import { Link } from 'react-router';
+import { TFunction } from 'i18next';
 
 import { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';

@@ -7,7 +7,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { readableSizeUnit } from '@kubevirt-utils/utils/units';
 import { DescriptionList, Stack, StackItem } from '@patternfly/react-core';
 
-export const WizardOverviewDisksTable: React.FC<{
+export const WizardOverviewDisksTable: React.FCC<{
   isInlineGrid?: boolean;
   vm: V1VirtualMachine;
 }> = React.memo(({ isInlineGrid, vm }) => {

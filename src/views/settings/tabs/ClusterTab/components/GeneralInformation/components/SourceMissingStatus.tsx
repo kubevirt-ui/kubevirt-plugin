@@ -6,7 +6,7 @@ import {
   YellowExclamationTriangleIcon,
 } from '@openshift-console/dynamic-plugin-sdk';
 
-const SourceMissingStatus: React.FC = () => {
+const SourceMissingStatus: React.FCC = () => {
   const { t } = useKubevirtTranslation();
 
   return (

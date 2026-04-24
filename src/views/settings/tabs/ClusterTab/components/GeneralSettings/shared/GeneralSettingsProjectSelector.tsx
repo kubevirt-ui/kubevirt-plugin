@@ -34,8 +34,8 @@ const GeneralSettingsProjectSelector: FC<GeneralSettingsProjectSelectorProps> = 
       toggleProps={{
         icon: !loaded && <Spinner size="sm" />,
         isDisabled: !loaded,
-        placeholder: t('Select project'),
       }}
+      placeholder={t('Select project')}
       selected={selectedProject}
       setSelected={onSelect}
     />

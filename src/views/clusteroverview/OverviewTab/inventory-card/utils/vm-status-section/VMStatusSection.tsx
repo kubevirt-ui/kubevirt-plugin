@@ -17,7 +17,7 @@ export type VMStatusSectionProps = {
   vmsLoaded: boolean;
 };
 
-const VMStatusSection: React.FC<VMStatusSectionProps> = ({ vms, vmsLoaded }) => {
+const VMStatusSection: React.FCC<VMStatusSectionProps> = ({ vms, vmsLoaded }) => {
   const statusCounts = getVMStatusCounts(vms);
 
   const statusItems = [];

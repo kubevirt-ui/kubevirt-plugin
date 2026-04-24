@@ -9,7 +9,7 @@ type AddAffinityRuleButtonProps = {
   onAffinityClickAdd: () => void;
 };
 
-const AddAffinityRuleButton: React.FC<AddAffinityRuleButtonProps> = ({
+const AddAffinityRuleButton: React.FCC<AddAffinityRuleButtonProps> = ({
   isLinkButton,
   onAffinityClickAdd,
 }) => {

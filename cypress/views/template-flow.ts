@@ -154,7 +154,7 @@ export const template = {
     if (tData.existSecret) {
       cy.contains(descrGroup, authSSHKey).find('button').eq(0).click();
       cy.get(iView.useExisting).click();
-      cy.contains(iView.selectSecretText).click();
+      cy.get(iView.selectSecret).click();
       cy.contains(tData.existSecret).click();
       cy.clickSaveBtn();
       cy.wait(3000);

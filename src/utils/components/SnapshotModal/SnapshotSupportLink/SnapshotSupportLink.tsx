@@ -3,7 +3,7 @@ import * as React from 'react';
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
-const SnapshotSupportLink: React.FC = () => {
+const SnapshotSupportLink: React.FCC = () => {
   const { t } = useKubevirtTranslation();
   return (
     <a href={documentationURL.SNAPSHOT} rel="noreferrer" target="_blank">

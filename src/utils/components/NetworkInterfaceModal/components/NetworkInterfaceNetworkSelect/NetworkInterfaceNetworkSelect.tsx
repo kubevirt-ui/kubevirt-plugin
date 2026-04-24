@@ -1,6 +1,6 @@
 import React, {
   Dispatch,
-  FC,
+  FCC,
   ReactNode,
   SetStateAction,
   useCallback,
@@ -57,7 +57,7 @@ export type NetworkSelectTypeaheadOptionProps = SelectTypeaheadOptionProps & {
   type: string;
 };
 
-const NetworkInterfaceNetworkSelect: FC<NetworkInterfaceNetworkSelectProps> = ({
+const NetworkInterfaceNetworkSelect: FCC<NetworkInterfaceNetworkSelectProps> = ({
   editInitValueNetworkName,
   isEditing,
   namespace,

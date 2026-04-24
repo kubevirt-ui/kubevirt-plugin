@@ -1,5 +1,5 @@
 import React, { FC, JSX } from 'react';
-import { useParams } from 'react-router-dom-v5-compat';
+import { useParams } from 'react-router';
 
 import { Divider, PageSection } from '@patternfly/react-core';
 

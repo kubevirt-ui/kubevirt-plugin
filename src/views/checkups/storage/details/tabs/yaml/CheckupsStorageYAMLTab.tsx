@@ -1,5 +1,5 @@
 import React, { FC } from 'react';
-import { useParams } from 'react-router-dom-v5-compat';
+import { useParams } from 'react-router';
 
 import { ResourceYAMLEditor } from '@openshift-console/dynamic-plugin-sdk';
 

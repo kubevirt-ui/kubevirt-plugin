@@ -27,6 +27,7 @@ type InlineFilterSelectProps = {
   menuFooter?: ReactNode;
   optionLabelText?: string;
   options: EnhancedSelectOptionProps[];
+  placeholder?: string;
   popperProps?: SelectPopperProps;
   selected: string;
   selectProps?: Omit<SelectProps, 'toggle'>;
@@ -38,6 +39,7 @@ const InlineFilterSelect: FC<InlineFilterSelectProps> = ({
   className,
   menuFooter,
   options = [],
+  placeholder,
   popperProps,
   selected,
   selectProps,
@@ -60,11 +62,11 @@ const InlineFilterSelect: FC<InlineFilterSelectProps> = ({
   };
 
   const selectedComponent = useMemo(() => {
-    if (isEmpty(selected)) return toggleProps?.placeholder;
+    if (isEmpty(selected)) return placeholder;
 
     const selectOption = options?.find((opt) => opt?.value === selected);
     return <InlineFilterSelectOptionContent option={selectOption} />;
-  }, [selected, toggleProps?.placeholder, options]);
+  }, [selected, placeholder, options]);
 
   const filterOptions = useMemo(
     () =>
@@ -113,7 +115,7 @@ const InlineFilterSelect: FC<InlineFilterSelectProps> = ({
               e.stopPropagation();
               setFilterValue('');
             }}
-            placeholder={toggleProps?.placeholder}
+            placeholder={placeholder}
             value={filterValue}
           />
         </MenuSearchInput>

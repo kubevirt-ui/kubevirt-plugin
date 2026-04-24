@@ -3,7 +3,7 @@ import * as React from 'react';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Content, ContentVariants, GridItem } from '@patternfly/react-core';
 
-const TolerationListHeaders: React.FC = () => {
+const TolerationListHeaders: React.FCC = () => {
   const { t } = useKubevirtTranslation();
   return (
     <>

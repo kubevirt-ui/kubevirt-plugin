@@ -7,7 +7,7 @@ type SupportedVolumesAlertProps = {
   isVMRunning?: boolean;
 };
 
-const SupportedVolumesAlert: React.FC<SupportedVolumesAlertProps> = ({ isVMRunning }) => {
+const SupportedVolumesAlert: React.FCC<SupportedVolumesAlertProps> = ({ isVMRunning }) => {
   const { t } = useKubevirtTranslation();
 
   if (!isVMRunning) {

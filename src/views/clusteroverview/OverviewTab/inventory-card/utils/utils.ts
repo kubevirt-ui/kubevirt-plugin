@@ -55,5 +55,5 @@ export const iconMap = {
   Unknown: YellowExclamationTriangleIcon,
 };
 
-export const getVMStatusIcon = (status: string): React.ComponentClass | React.FC =>
+export const getVMStatusIcon = (status: string): React.ComponentClass | React.FCC =>
   iconMap[status] || iconMap.Unknown;

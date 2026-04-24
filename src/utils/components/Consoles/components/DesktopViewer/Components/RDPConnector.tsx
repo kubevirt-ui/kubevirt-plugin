@@ -7,7 +7,7 @@ import { RDPConnectorProps } from '../utils/types';
 import RDP from './RDP';
 import RDPServiceNotConfigured from './RDPServiceNotConfigured';
 
-const RDPConnector: React.FC<RDPConnectorProps> = ({
+const RDPConnector: React.FCC<RDPConnectorProps> = ({
   isLoading,
   rdpServiceAddressPort,
   vm,

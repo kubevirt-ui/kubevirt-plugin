@@ -9,7 +9,7 @@ type GuestAgentIsRequiredTextProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const GuestAgentIsRequiredText: React.FC<GuestAgentIsRequiredTextProps> = ({ vmi }) => {
+const GuestAgentIsRequiredText: React.FCC<GuestAgentIsRequiredTextProps> = ({ vmi }) => {
   const { t } = useKubevirtTranslation();
 
   return <MutedTextSpan text={vmi ? t('Guest agent is required') : t('Not available')} />;

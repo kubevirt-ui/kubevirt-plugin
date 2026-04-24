@@ -7,7 +7,7 @@ type TolerationsProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const Tolerations: React.FC<TolerationsProps> = ({ vmi }) => {
+const Tolerations: React.FCC<TolerationsProps> = ({ vmi }) => {
   const { t } = useKubevirtTranslation();
   const tolerations = vmi?.spec?.tolerations;
 

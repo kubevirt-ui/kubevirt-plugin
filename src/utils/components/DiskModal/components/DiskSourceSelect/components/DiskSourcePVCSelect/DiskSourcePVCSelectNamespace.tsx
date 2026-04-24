@@ -24,8 +24,8 @@ const DiskSourcePVCSelectNamespace: FC<DiskSourcePVCSelectNamespaceProps> = ({ v
         toggleProps={{
           isDisabled: true,
           isFullWidth: true,
-          placeholder: vmNamespace,
         }}
+        placeholder={vmNamespace}
       />
       <FormGroupHelperText>{t('Location of the existing PVC')}</FormGroupHelperText>
     </FormGroup>

@@ -8,7 +8,7 @@ import ChartCard from './ChartCard';
 
 import './ChartsCard.scss';
 
-const ChartsCard: React.FC = () => {
+const ChartsCard: React.FCC = () => {
   return (
     <div className="metric-charts-card">
       <Grid className="metric-charts-card__grid" hasGutter>

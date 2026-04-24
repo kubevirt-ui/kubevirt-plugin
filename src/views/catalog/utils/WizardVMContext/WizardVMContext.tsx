@@ -51,7 +51,7 @@ export const useWizardVM = (): WizardVMContextType => {
 
 export const WizardVMContext = React.createContext<WizardVMContextType>({});
 
-export const WizardVMContextProvider: React.FC = ({ children }) => {
+export const WizardVMContextProvider: React.FCC = ({ children }) => {
   const context = useWizardVM();
   return <WizardVMContext.Provider value={context}>{children}</WizardVMContext.Provider>;
 };

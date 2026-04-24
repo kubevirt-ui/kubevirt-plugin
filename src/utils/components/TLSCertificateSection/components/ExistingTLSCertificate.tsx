@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
@@ -17,7 +17,7 @@ type ExistingTLSCertificateProps = {
   selectedProject?: null | string;
 };
 
-const ExistingTLSCertificate: FC<ExistingTLSCertificateProps> = ({
+const ExistingTLSCertificate: FCC<ExistingTLSCertificateProps> = ({
   cluster,
   namespace,
   onChange,
@@ -50,8 +50,8 @@ const ExistingTLSCertificate: FC<ExistingTLSCertificateProps> = ({
               }}
               toggleProps={{
                 isFullWidth: true,
-                placeholder: t('Select project...'),
               }}
+              placeholder={t('Select project...')}
               selected={certProject || ''}
             />
           ) : (
@@ -75,8 +75,8 @@ const ExistingTLSCertificate: FC<ExistingTLSCertificateProps> = ({
               }}
               toggleProps={{
                 isFullWidth: true,
-                placeholder: t('Select TLS certificate'),
               }}
+              placeholder={t('Select TLS certificate')}
               selected={selectedConfigMap || ''}
             />
           )}

@@ -1,5 +1,5 @@
 import React, { FC, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom-v5-compat';
+import { useNavigate } from 'react-router';
 
 import { useWizardSourceAvailable } from '@catalog/utils/useWizardSourceAvailable';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';

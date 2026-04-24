@@ -1,4 +1,4 @@
-import { Example } from '../../utils/const/string';
+import { DEFAULT_VM_NAME, TEST_NS } from '../../utils/const/index';
 import { action, CONTROL_MENU, RESTART } from '../../views/actions';
 import { tab } from '../../views/tab';
 
@@ -16,7 +16,8 @@ describe('Test VM actions confirm', () => {
 
   it('navigate to example vm', () => {
     cy.visitVMsVirt();
-    cy.byLegacyTestID(Example).click();
+    cy.switchProject(TEST_NS);
+    cy.byLegacyTestID(DEFAULT_VM_NAME).click();
   });
 
   it('verify confirm message on VM actions', () => {

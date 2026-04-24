@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useLocation } from 'react-router-dom-v5-compat';
+import { useLocation } from 'react-router';
 
 import { idIsHighlighted } from '@kubevirt-utils/components/SearchItem/useIsHighlighted';
 import { isSearchItemChildrenHighlighted } from '@settings/search/search';

@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom-v5-compat';
+import { Link } from 'react-router';
 
 import { MigrationPolicyModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -20,7 +20,7 @@ type MigrationProgressPopoverProps = React.PropsWithChildren<{
   vmi: V1VirtualMachineInstance;
 }>;
 
-const MigrationProgressPopover: React.FC<MigrationProgressPopoverProps> = ({ children, vmi }) => {
+const MigrationProgressPopover: React.FCC<MigrationProgressPopoverProps> = ({ children, vmi }) => {
   const { t } = useKubevirtTranslation();
   const vmim = useVirtualMachineInstanceMigration(vmi);
   const Icon = getMigrationPhaseIcon(vmim?.status?.phase);

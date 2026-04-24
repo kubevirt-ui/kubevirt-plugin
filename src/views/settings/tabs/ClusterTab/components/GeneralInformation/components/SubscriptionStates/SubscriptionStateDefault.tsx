@@ -9,7 +9,7 @@ type SubscriptionStateDefaultProps = {
   subscription: SubscriptionKind;
 };
 
-const SubscriptionStateDefault: React.FC<SubscriptionStateDefaultProps> = ({ subscription }) => {
+const SubscriptionStateDefault: React.FCC<SubscriptionStateDefaultProps> = ({ subscription }) => {
   const { t } = useKubevirtTranslation();
 
   return (

@@ -11,7 +11,7 @@ type ServiceActionsProps = {
   service: IoK8sApiCoreV1Service;
 };
 
-const ServiceActions: React.FC<ServiceActionsProps> = ({ service }) => {
+const ServiceActions: React.FCC<ServiceActionsProps> = ({ service }) => {
   const serviceModelRef = modelToRef({ apiGroup: 'core', ...ServiceModel });
 
   if (!service) return null;

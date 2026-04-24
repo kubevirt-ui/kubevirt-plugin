@@ -1,5 +1,5 @@
 import React, { FC, MouseEvent, useMemo, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom-v5-compat';
+import { useNavigate, useParams } from 'react-router';
 
 import CreateFromInstanceType from '@catalog/CreateFromInstanceTypes/CreateFromInstanceType';
 import TemplatesCatalog from '@catalog/templatescatalog/TemplatesCatalog';

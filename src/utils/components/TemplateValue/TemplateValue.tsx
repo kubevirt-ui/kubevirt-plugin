@@ -10,7 +10,7 @@ type TemplateNameTableDataProps = {
   value: string;
 };
 
-const TemplateNameTableData: React.FC<TemplateNameTableDataProps> = ({
+const TemplateNameTableData: React.FCC<TemplateNameTableDataProps> = ({
   children,
   isNIC,
   value,

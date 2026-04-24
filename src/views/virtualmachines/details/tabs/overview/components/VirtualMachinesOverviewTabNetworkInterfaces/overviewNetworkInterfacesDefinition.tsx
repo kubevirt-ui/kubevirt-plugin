@@ -1,5 +1,5 @@
 import React, { FC } from 'react';
-import { TFunction } from 'react-i18next';
+import { TFunction } from 'i18next';
 import FirstItemListPopover from 'src/views/virtualmachines/list/components/FirstItemListPopover/FirstItemListPopover';
 
 import InlineCodeClipboardCopy from '@kubevirt-utils/components/Consoles/components/CloudInitCredentials/InlineCodeClipboardCopy';

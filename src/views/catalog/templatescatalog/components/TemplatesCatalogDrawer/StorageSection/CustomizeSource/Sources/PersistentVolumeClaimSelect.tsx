@@ -1,4 +1,4 @@
-import React, { FC, useCallback } from 'react';
+import React, { FCC, useCallback } from 'react';
 
 import {
   modelToGroupVersionKind,
@@ -24,7 +24,7 @@ type PersistentVolumeClaimSelectProps = {
   pvcNameSelected: string;
 };
 
-export const PersistentVolumeClaimSelect: FC<PersistentVolumeClaimSelectProps> = ({
+export const PersistentVolumeClaimSelect: FCC<PersistentVolumeClaimSelectProps> = ({
   currentSize,
   'data-test-id': testId,
   onSourceChange,
@@ -65,9 +65,7 @@ export const PersistentVolumeClaimSelect: FC<PersistentVolumeClaimSelectProps> =
               groupVersionKind: modelToGroupVersionKind(ProjectModel),
               value: name,
             }))}
-            toggleProps={{
-              placeholder: t('--- Select PVC project ---'),
-            }}
+            placeholder={t('--- Select PVC project ---')}
             selected={projectSelected}
             setSelected={onSelectProject}
           />
@@ -89,9 +87,7 @@ export const PersistentVolumeClaimSelect: FC<PersistentVolumeClaimSelectProps> =
               groupVersionKind: modelToGroupVersionKind(PersistentVolumeClaimModel),
               value: name,
             }))}
-            toggleProps={{
-              placeholder: t('--- Select PVC name ---'),
-            }}
+            placeholder={t('--- Select PVC name ---')}
             selected={pvcNameSelected}
             setSelected={onPVCSelected}
           />

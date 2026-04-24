@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -24,7 +24,7 @@ type StateHandlerProps = {
   withBullseye?: boolean;
 };
 
-const StateHandler: FC<StateHandlerProps> = ({
+const StateHandler: FCC<StateHandlerProps> = ({
   children,
   error,
   hasData,

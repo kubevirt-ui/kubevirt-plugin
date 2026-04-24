@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -11,7 +11,7 @@ type StorageClassSelectProps = {
   storageClassRequired: boolean;
 };
 
-const StorageClassSelect: FC<StorageClassSelectProps> = ({
+const StorageClassSelect: FCC<StorageClassSelectProps> = ({
   onStorageClassChange,
   storageClassName,
   storageClassRequired,
@@ -29,9 +29,9 @@ const StorageClassSelect: FC<StorageClassSelectProps> = ({
     >
       <InlineFilterSelect
         options={sortedStorageClasses?.map((name) => ({ children: name, value: name }))}
+        placeholder={t('Select storage class')}
         selected={storageClassName}
         setSelected={onStorageClassChange}
-        toggleProps={{ placeholder: t('Select storage class') }}
       />
     </FormGroup>
   );

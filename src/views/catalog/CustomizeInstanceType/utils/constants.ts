@@ -1,5 +1,6 @@
-import { TFunction } from 'react-i18next';
+import { TFunction } from 'i18next';
 
+import { NavPageKubevirt } from '@kubevirt-utils/components/HorizontalNavbar/utils/utils';
 import {
   getVirtualMachineDetailsTabLabel,
   VirtualMachineDetailsTab,
@@ -9,7 +10,7 @@ import { getTabHrefAndName } from '@virtualmachines/details/utils/utils';
 import CustomizeInstanceTypeConfigurationTab from '../tabs/configuration/CustomizeInstanceTypeConfigurationTab';
 import CustomizeInstanceTypeYamlTab from '../tabs/yaml/CustomizeInstanceTypeYamlTab';
 
-export const getPages = (t: TFunction) => {
+export const getPages = (t: TFunction): NavPageKubevirt[] => {
   const tabLabels = getVirtualMachineDetailsTabLabel(t);
   return [
     {

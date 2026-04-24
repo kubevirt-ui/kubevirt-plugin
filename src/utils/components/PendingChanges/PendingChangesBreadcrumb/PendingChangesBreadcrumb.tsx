@@ -9,7 +9,7 @@ type PendingChangesBreadcrumbProps = {
   pendingChanges: PendingChange[];
 };
 
-const PendingChangesBreadcrumb: React.FC<PendingChangesBreadcrumbProps> = ({ pendingChanges }) => {
+const PendingChangesBreadcrumb: React.FCC<PendingChangesBreadcrumbProps> = ({ pendingChanges }) => {
   if (isEmpty(pendingChanges)) {
     return null;
   }

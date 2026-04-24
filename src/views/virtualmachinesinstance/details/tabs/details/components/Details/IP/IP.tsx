@@ -9,7 +9,7 @@ type IPProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const IP: React.FC<IPProps> = ({ vmi }) => {
+const IP: React.FCC<IPProps> = ({ vmi }) => {
   const { t } = useKubevirtTranslation();
   const ipAddressesWithNames = getVMIIPAddressesWithName(vmi);
 

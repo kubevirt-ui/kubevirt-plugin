@@ -1,4 +1,4 @@
-import { matchPath } from 'react-router-dom-v5-compat';
+import { matchPath } from 'react-router';
 
 import { TemplateModel, VirtualMachineModelRef } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {

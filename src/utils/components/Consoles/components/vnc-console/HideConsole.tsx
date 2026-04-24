@@ -1,8 +1,8 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import '../../consoles.scss';
 
-const HideConsole: FC<{ isHidden: boolean }> = ({ children, isHidden }) => (
+const HideConsole: FCC<{ isHidden: boolean }> = ({ children, isHidden }) => (
   <div className="console-container" style={isHidden ? { display: 'none' } : {}}>
     {children}
   </div>

@@ -1,5 +1,5 @@
 import React, { FC, useEffect, useMemo, useState } from 'react';
-import { NavLink, Route, Routes, useLocation, useParams } from 'react-router-dom-v5-compat';
+import { NavLink, Route, Routes, useLocation, useParams } from 'react-router';
 import classNames from 'classnames';
 import { VirtualMachineModel } from 'src/views/dashboard-extensions/utils';
 

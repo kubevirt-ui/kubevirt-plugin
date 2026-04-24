@@ -21,7 +21,7 @@ export const interfacesTypes = {
   [SRIOV]: 'SR-IOV',
 };
 
-export const WizardOverviewNetworksTable: React.FC<{
+export const WizardOverviewNetworksTable: React.FCC<{
   interfaces: V1Interface[];
   isInlineGrid?: boolean;
   networks: V1Network[];

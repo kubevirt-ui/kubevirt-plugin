@@ -67,9 +67,9 @@ const StorageClassSelect: FC<StorageClassSelectProps> = ({
           <InlineFilterSelect
             toggleProps={{
               isFullWidth: true,
-              placeholder: t('Select {{label}}', { label: StorageClassModel.label }),
             }}
             options={getSCSelectOptions(readyStorageClasses)}
+            placeholder={t('Select {{label}}', { label: StorageClassModel.label })}
             popperProps={{ enableFlip: true }}
             selected={storageClass || getName(clusterDefaultStorageClass)}
             setSelected={onSelect}

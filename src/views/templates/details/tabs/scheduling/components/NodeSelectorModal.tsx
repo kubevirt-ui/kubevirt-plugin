@@ -32,7 +32,7 @@ type NodeSelectorModalProps = {
   template: V1Template;
 };
 
-const NodeSelectorModal: React.FC<NodeSelectorModalProps> = ({
+const NodeSelectorModal: React.FCC<NodeSelectorModalProps> = ({
   isOpen,
   onClose,
   onSubmit,

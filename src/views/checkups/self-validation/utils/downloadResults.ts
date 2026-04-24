@@ -1,6 +1,6 @@
-import { TFunction } from 'react-i18next';
 import axios from 'axios';
 import { saveAs } from 'file-saver';
+import { TFunction } from 'i18next';
 
 import { ConfigMapModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {

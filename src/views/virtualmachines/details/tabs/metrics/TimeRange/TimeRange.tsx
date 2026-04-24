@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom-v5-compat';
+import { Link } from 'react-router';
 
 import DurationDropdown from '@kubevirt-utils/components/DurationOption/DurationDropdown';
 import DurationOption from '@kubevirt-utils/components/DurationOption/DurationOption';
@@ -11,7 +11,7 @@ import useIsACMPage from '@multicluster/useIsACMPage';
 import useDuration from '../hooks/useDuration';
 import { MONITORING_LINK } from '../utils/constants';
 
-const TimeRange: React.FC = () => {
+const TimeRange: React.FCC = () => {
   const { t } = useKubevirtTranslation();
   const isACMPage = useIsACMPage();
   const virtualizationObservabilityLink = useVirtualizationObservabilityLink();

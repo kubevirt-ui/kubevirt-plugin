@@ -20,7 +20,7 @@ import { DescriptionList } from '@patternfly/react-core';
 
 import useEditTemplateAccessReview from '../../../hooks/useIsTemplateEditable';
 
-const TemplateDetailsRightGrid: React.FC<TemplateDetailsGridProps> = ({ template }) => {
+const TemplateDetailsRightGrid: React.FCC<TemplateDetailsGridProps> = ({ template }) => {
   const { t } = useKubevirtTranslation();
   const { isTemplateEditable } = useEditTemplateAccessReview(template);
 

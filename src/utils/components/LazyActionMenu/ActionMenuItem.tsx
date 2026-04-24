@@ -1,9 +1,9 @@
 import React, { FC, useCallback } from 'react';
 import { connect } from 'react-redux';
-import { useNavigate } from 'react-router-dom-v5-compat';
-import isFunction from 'lodash/isFunction';
+import { useNavigate } from 'react-router';
 import isObject from 'lodash/isObject';
 
+import { isCallable } from '@kubevirt-utils/utils/typeGuards';
 import { Action } from '@openshift-console/dynamic-plugin-sdk';
 import { impersonateStateToProps } from '@openshift-console/dynamic-plugin-sdk/lib/app/core/reducers/coreSelectors';
 import { ImpersonateKind } from '@openshift-console/dynamic-plugin-sdk/lib/app/redux-types';
@@ -32,7 +32,7 @@ const ActionItem: FC<ActionMenuItemProps & { isAllowed: boolean }> = ({
   const handleClick = useCallback(
     (event: MouseEvent) => {
       event.preventDefault();
-      if (isFunction(cta)) {
+      if (isCallable(cta)) {
         cta();
       } else if (isObject(cta) && !cta.external) {
         navigate(cta.href);

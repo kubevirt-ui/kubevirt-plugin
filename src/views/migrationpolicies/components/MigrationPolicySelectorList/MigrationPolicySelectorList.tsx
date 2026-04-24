@@ -10,7 +10,7 @@ type MigrationPolicySelectorListProps = {
   selector: { [key: string]: string };
 };
 
-export const MigrationPolicySelectorList: React.FC<MigrationPolicySelectorListProps> = memo(
+export const MigrationPolicySelectorList: React.FCC<MigrationPolicySelectorListProps> = memo(
   ({ isVMILabel, selector }) => {
     if (isEmpty(selector)) return null;
     return (

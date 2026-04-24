@@ -36,7 +36,7 @@ type SSHCommandProps = {
   vm: V1VirtualMachine;
 };
 
-const SSHCommand: React.FC<SSHCommandProps> = ({
+const SSHCommand: React.FCC<SSHCommandProps> = ({
   sshService: initialSSHService,
   sshServiceLoaded,
   vm,

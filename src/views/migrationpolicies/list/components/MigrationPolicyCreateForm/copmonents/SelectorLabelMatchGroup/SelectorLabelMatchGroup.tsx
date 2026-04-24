@@ -18,7 +18,7 @@ type SelectorLabelMatchGroupProps = {
   >;
 };
 
-const SelectorLabelMatchGroup: React.FC<SelectorLabelMatchGroupProps> = ({
+const SelectorLabelMatchGroup: React.FCC<SelectorLabelMatchGroupProps> = ({
   isVMILabel,
   labels,
   setLabels,

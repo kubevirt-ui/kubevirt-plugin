@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { FC, ReactNode } from 'react';
+import { FCC, ReactNode } from 'react';
 import classNames from 'classnames';
 
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
@@ -18,7 +18,7 @@ type LabelsListProps = {
   withKeyValueTitle?: boolean;
 };
 
-const LabelsList: FC<LabelsListProps> = ({
+const LabelsList: FCC<LabelsListProps> = ({
   addRowText = null,
   children,
   emptyStateAddRowText = null,

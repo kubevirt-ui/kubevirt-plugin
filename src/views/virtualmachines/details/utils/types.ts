@@ -1,4 +1,4 @@
-import { Params } from 'react-router-dom-v5-compat';
+import { Params } from 'react-router';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 

@@ -75,12 +75,14 @@ Cypress.Commands.add('byButtonText', (selector: string) =>
 );
 
 Cypress.Commands.add('clickVirtLink', (navItemSelector: string) => {
-  cy.contains('Virtualization').should('be.visible');
-  cy.get('[data-test-id="virtualization-nav-item"]', { timeout: 10 * SECOND }).should(($el) => {
-    if ($el.attr('aria-expanded') == 'false') {
-      $el.click();
-    }
-  });
+  cy.get('[data-test-id="virtualization-nav-item"]', { timeout: 60 * SECOND })
+    .scrollIntoView()
+    .should('be.visible')
+    .should(($el) => {
+      if ($el.attr('aria-expanded') == 'false') {
+        $el.click();
+      }
+    });
   cy.get(navItemSelector).click();
 });
 

@@ -185,9 +185,9 @@ const MountCDROMModal: FC<MountCDROMModalProps> = ({
                       toggleProps={{
                         isDisabled: isUploading,
                         isFullWidth: true,
-                        placeholder: t('Select ISO file'),
                       }}
                       options={isoOptions}
+                      placeholder={t('Select ISO file')}
                       selected={selectedISO}
                     />
                   </div>

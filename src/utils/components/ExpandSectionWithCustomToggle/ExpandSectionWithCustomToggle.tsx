@@ -1,4 +1,4 @@
-import { FC, ReactNode } from 'react';
+import { FCC, ReactNode } from 'react';
 import React from 'react';
 import classNames from 'classnames';
 
@@ -6,6 +6,7 @@ import {
   ExpandableSection,
   ExpandableSectionToggle,
   PopoverPosition,
+  PopoverProps,
   Split,
   SplitItem,
   Stack,
@@ -22,7 +23,7 @@ type ExpandSectionWithCustomToggleProps = {
   className?: string;
   customContent?: ReactNode;
   expandSectionClassName?: string;
-  helpTextContent?: ReactNode;
+  helpTextContent?: PopoverProps['bodyContent'];
   id: string;
   isExpanded?: boolean;
   isIndented?: boolean;
@@ -32,7 +33,7 @@ type ExpandSectionWithCustomToggleProps = {
   toggleContent: ReactNode;
 };
 
-const ExpandSectionWithCustomToggle: FC<ExpandSectionWithCustomToggleProps> = ({
+const ExpandSectionWithCustomToggle: FCC<ExpandSectionWithCustomToggleProps> = ({
   children,
   className,
   customContent,

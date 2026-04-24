@@ -87,8 +87,9 @@ const InstanceTypeModal: FC<InstanceTypeModalProps> = ({
                   setSize(undefined);
                 }
               }}
+              placeholder={t('Select series')}
               selected={series}
-              toggleProps={{ isFullWidth: true, placeholder: t('Select series') }}
+              toggleProps={{ isFullWidth: true }}
             >
               {Object.entries(mappedInstanceTypes).map(([key, value]) => (
                 <SelectOption
@@ -106,8 +107,9 @@ const InstanceTypeModal: FC<InstanceTypeModalProps> = ({
               onSelect={(_, value) => {
                 setSize(value as string);
               }}
+              placeholder={t('Select size')}
               selected={size}
-              toggleProps={{ isFullWidth: true, placeholder: t('Select size') }}
+              toggleProps={{ isFullWidth: true }}
             >
               {getInstanceTypeSizes(mappedInstanceTypes, series)?.map((item) => (
                 <SelectOption key={item.prettyDisplaySize} value={item.prettyDisplaySize}>
@@ -131,8 +133,9 @@ const InstanceTypeModal: FC<InstanceTypeModalProps> = ({
               ) : undefined
             }
             onSelect={(_, value: string) => setSelectedName(value)}
+            placeholder={t('Select InstanceType')}
             selected={selectedName}
-            toggleProps={{ isFullWidth: true, placeholder: t('Select InstanceType') }}
+            toggleProps={{ isFullWidth: true }}
           >
             {userInstanceTypes.map((it) => {
               const itName = getName(it);

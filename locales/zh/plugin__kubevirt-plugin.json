@@ -2262,7 +2262,6 @@
   "View {{alertType}}": "查看 {{alertType}}",
   "view {{qualifiedNodesCount}} matching nodes": "查看 {{qualifiedNodesCount}} 匹配节点",
   "View alert": "查看警报",
-  "View alerts": "查看警报",
   "View all": "查看所有",
   "View all quick starts": "查看所有快速开始",
   "View and manage available bootable volumes.": "查看并管理可用的可引导卷。",

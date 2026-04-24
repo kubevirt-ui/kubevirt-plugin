@@ -19,7 +19,7 @@ type BandwidthConsumptionChartsProps = {
   duration: string;
 };
 
-const BandwidthConsumptionCharts: React.FC<BandwidthConsumptionChartsProps> = ({ duration }) => {
+const BandwidthConsumptionCharts: React.FCC<BandwidthConsumptionChartsProps> = ({ duration }) => {
   const { t } = useKubevirtTranslation();
 
   const currentTime = useCurrentTime();

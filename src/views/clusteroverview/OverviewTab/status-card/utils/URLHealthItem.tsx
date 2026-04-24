@@ -23,7 +23,7 @@ type URLHealthItemProps = {
     | ResolvedExtension<DynamicDashboardsOverviewHealthURLSubsystem<any>>['properties'];
 };
 
-const URLHealthItem: React.FC<URLHealthItemProps> = ({ subsystem }) => {
+const URLHealthItem: React.FCC<URLHealthItemProps> = ({ subsystem }) => {
   const k8sURL = `${k8sBasePath}/${subsystem?.url}`;
   const [response, error] = useURLPoll(k8sURL);
 

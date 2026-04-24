@@ -1,4 +1,4 @@
-import React, { FC, useMemo } from 'react';
+import React, { FCC, useMemo } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
 import {
@@ -25,7 +25,7 @@ type DiskSourcePVCSelectNameProps = {
   vmNamespace?: string;
 };
 
-const DiskSourcePVCSelectName: FC<DiskSourcePVCSelectNameProps> = ({ vmNamespace }) => {
+const DiskSourcePVCSelectName: FCC<DiskSourcePVCSelectNameProps> = ({ vmNamespace }) => {
   const { t } = useKubevirtTranslation();
   const {
     control,
@@ -68,8 +68,8 @@ const DiskSourcePVCSelectName: FC<DiskSourcePVCSelectNameProps> = ({ vmNamespace
               toggleProps={{
                 isDisabled: isEmpty(vmNamespace),
                 isFullWidth: true,
-                placeholder: t('Select PersistentVolumeClaim'),
               }}
+              placeholder={t('Select PersistentVolumeClaim')}
               selected={value as string}
               setSelected={onChange}
             />

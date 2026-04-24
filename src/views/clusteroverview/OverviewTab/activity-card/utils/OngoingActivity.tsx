@@ -5,7 +5,7 @@ import { OngoingActivityBody } from '@openshift-console/dynamic-plugin-sdk-inter
 import useDashboardK8sResources from '../hooks/useDashboardK8sResources';
 import useDashboardPrometheusActivities from '../hooks/useDashboardPrometheusActivities';
 
-const OngoingActivity: React.FC = () => {
+const OngoingActivity: React.FCC = () => {
   const { k8sResourceActivities, k8sResourcesLoaded } = useDashboardK8sResources();
   const { prometheusActivities, prometheusQueriesLoaded } = useDashboardPrometheusActivities();
 

@@ -1,5 +1,5 @@
 import React, { FC, memo } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom-v5-compat';
+import { useLocation, useNavigate } from 'react-router';
 
 import { useWizardVMContext } from '@catalog/utils/WizardVMContext';
 import SidebarEditorSwitch from '@kubevirt-utils/components/SidebarEditor/SidebarEditorSwitch';

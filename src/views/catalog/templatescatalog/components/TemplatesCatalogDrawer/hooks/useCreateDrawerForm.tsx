@@ -1,5 +1,5 @@
 import { MouseEvent, useState } from 'react';
-import { useNavigate } from 'react-router-dom-v5-compat';
+import { useNavigate } from 'react-router';
 import produce from 'immer';
 
 import { quickCreateVM } from '@catalog/utils/quick-create-vm';

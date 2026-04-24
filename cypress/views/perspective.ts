@@ -17,11 +17,17 @@ const menu = '[data-test-id="perspective-switcher-menu"]';
 export const switchPerspective = (perspective: Perspective) => {
   cy.get(header, { timeout: 5 * MINUTE }).should('be.visible');
   cy.wait(10 * SECOND); // for safety and remove flaky
-  cy.get(header).within(($title) => {
-    if ($title.find('h2').text() !== perspective) {
-      cy.get(toggle).click();
-      cy.get(menu).should('be.visible');
-      cy.contains(option, perspective).click();
-    }
-  });
+
+  cy.get(header)
+    .find('h2')
+    .invoke('text')
+    .then((currentText) => {
+      if (currentText.trim() !== perspective) {
+        cy.get(toggle).click();
+        cy.get(menu, { timeout: 30 * SECOND }).should('be.visible');
+        cy.contains(option, perspective).click();
+      }
+    });
+
+  cy.get(header).find('h2').should('have.text', perspective);
 };

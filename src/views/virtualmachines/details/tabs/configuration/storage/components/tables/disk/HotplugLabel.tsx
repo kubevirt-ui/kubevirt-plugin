@@ -11,7 +11,7 @@ type HotplugLabelProps = {
   vmi?: V1VirtualMachineInstance;
 };
 
-export const HotplugLabel: React.FC<HotplugLabelProps> = ({ diskName, vm, vmi }) => {
+export const HotplugLabel: React.FCC<HotplugLabelProps> = ({ diskName, vm, vmi }) => {
   const { t } = useKubevirtTranslation();
 
   const hotplugText = React.useMemo(() => {

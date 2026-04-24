@@ -11,7 +11,7 @@ type UploadErrorMessageProps = {
   uploadProxyURL?: string;
 };
 
-const UploadPVCErrorMessage: React.FC<UploadErrorMessageProps> = ({ message, uploadProxyURL }) => {
+const UploadPVCErrorMessage: React.FCC<UploadErrorMessageProps> = ({ message, uploadProxyURL }) => {
   const { t } = useKubevirtTranslation();
 
   const Error = {

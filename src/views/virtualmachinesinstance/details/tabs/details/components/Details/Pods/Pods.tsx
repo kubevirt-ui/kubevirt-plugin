@@ -12,7 +12,7 @@ type PodsProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const Pods: React.FC<PodsProps> = ({ vmi }) => {
+const Pods: React.FCC<PodsProps> = ({ vmi }) => {
   const [pods] = usePods(getNamespace(vmi), getCluster(vmi));
   const vmiPod = getVMIPod(vmi, pods);
   return vmiPod ? (

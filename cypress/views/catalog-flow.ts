@@ -88,7 +88,8 @@ export const fillReviewAndCreate = (vmData: VirtualMachineData) => {
   if (mountWinDriver !== undefined && mountWinDriver === false) {
     cy.get(cView.winDrivers).uncheck();
   }
-  cy.get(cView.vmName).clear().type(name);
+  cy.get(cView.vmName).clear();
+  cy.get(cView.vmName).type(name);
   if (cpu) {
     cy.get(cView.editCPU).click();
     cy.get(cpuInput).clear().type(cpu);
@@ -284,7 +285,7 @@ export const fillScripts = (vmData: VirtualMachineData) => {
   if (existSecret) {
     cy.contains(descrGroup, authSSHKey).find('button').click();
     cy.get(iView.useExisting).click();
-    cy.get('button[placeholder="Select secret"]').click();
+    cy.get(iView.selectSecret).click();
     cy.get(`button#select-inline-filter-${existSecret}`).click();
     cy.clickSaveBtn();
     cy.contains('.co-resource-item__resource-name', existSecret).should('exist');

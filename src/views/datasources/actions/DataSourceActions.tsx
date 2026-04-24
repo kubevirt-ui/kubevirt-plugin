@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FCC, useState } from 'react';
 
 import { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import DropdownToggle from '@kubevirt-utils/components/toggles/DropdownToggle';
@@ -23,7 +23,7 @@ type DataSourceActionProps = {
   isKebabToggle?: boolean;
 };
 
-const DataSourceActions: FC<DataSourceActionProps> = ({ dataSource, isKebabToggle }) => {
+const DataSourceActions: FCC<DataSourceActionProps> = ({ dataSource, isKebabToggle }) => {
   const { t } = useKubevirtTranslation();
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [actions, onLazyOpen] = useDataSourceActionsProvider(dataSource);

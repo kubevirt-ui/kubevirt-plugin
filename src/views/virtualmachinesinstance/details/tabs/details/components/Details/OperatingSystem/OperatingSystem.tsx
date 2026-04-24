@@ -16,7 +16,7 @@ type OperatingSystemProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const OperatingSystem: React.FC<OperatingSystemProps> = ({
+const OperatingSystem: React.FCC<OperatingSystemProps> = ({
   guestAgentData,
   loadedGuestAgent,
   vmi,

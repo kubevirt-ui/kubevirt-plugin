@@ -109,9 +109,10 @@ export const vm = {
   customizeCreate: (vmData: VirtualMachineData, waitForRunning = true) => {
     cy.visitCatalog();
     cy.get(cView.templateTab).click();
+    cy.get(cView.templateTab).closest('button').should('have.attr', 'aria-selected', 'true');
     cy.get(`[data-test-id="boot-source-available-Boot source available"]`)
       .find(':checkbox')
-      .check();
+      .check({ force: true });
     if (vmData.userTemplate) {
       cy.get(cView.uTemplate).click();
     }

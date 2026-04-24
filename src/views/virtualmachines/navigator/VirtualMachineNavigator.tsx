@@ -1,5 +1,5 @@
 import React, { FC, useCallback, useRef } from 'react';
-import { matchPath, useLocation, useParams } from 'react-router-dom-v5-compat';
+import { matchPath, useLocation, useParams } from 'react-router';
 
 import CreateResourceDefaultPage from '@kubevirt-utils/components/CreateResourceDefaultPage/CreateResourceDefaultPage';
 import GuidedTour from '@kubevirt-utils/components/GuidedTour/GuidedTour';

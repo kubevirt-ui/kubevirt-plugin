@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { TFunction } from 'react-i18next';
+import { TFunction } from 'i18next';
 
 import ClusterTab from './tabs/ClusterTab/ClusterTab';
 import PreviewFeaturesTab from './tabs/PreviewFeaturesTab/PreviewFeaturesTab';

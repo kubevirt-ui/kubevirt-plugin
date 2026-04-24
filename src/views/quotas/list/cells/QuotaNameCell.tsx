@@ -1,5 +1,5 @@
 import React, { FC } from 'react';
-import { Link } from 'react-router-dom-v5-compat';
+import { Link } from 'react-router';
 
 import { ApplicationAwareQuota } from '@kubevirt-utils/resources/quotas/types';
 import { getName } from '@kubevirt-utils/resources/shared';

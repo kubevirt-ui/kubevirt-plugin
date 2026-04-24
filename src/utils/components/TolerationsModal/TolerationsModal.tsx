@@ -36,7 +36,7 @@ type TolerationsModalProps = {
   vmi?: V1VirtualMachineInstance;
 };
 
-const TolerationsModal: React.FC<TolerationsModalProps> = ({
+const TolerationsModal: React.FCC<TolerationsModalProps> = ({
   isOpen,
   nodes,
   nodesLoaded,

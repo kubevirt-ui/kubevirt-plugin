@@ -1,4 +1,4 @@
-import React, { Dispatch, FC, SetStateAction } from 'react';
+import React, { Dispatch, FCC, SetStateAction } from 'react';
 
 import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
@@ -15,7 +15,7 @@ type DiskSourcePVCSelectNamespaceProps = {
   selectedProject: string;
 };
 
-const DiskSourcePVCSelectNamespace: FC<DiskSourcePVCSelectNamespaceProps> = ({
+const DiskSourcePVCSelectNamespace: FCC<DiskSourcePVCSelectNamespaceProps> = ({
   isDisabled,
   onChange,
   projectNames,
@@ -45,8 +45,8 @@ const DiskSourcePVCSelectNamespace: FC<DiskSourcePVCSelectNamespaceProps> = ({
             toggleProps={{
               isDisabled,
               isFullWidth: true,
-              placeholder: t('--- Select Volume project ---'),
             }}
+            placeholder={t('--- Select Volume project ---')}
             selected={selectedProject}
             setSelected={onChange}
           />

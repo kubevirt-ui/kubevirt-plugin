@@ -1,5 +1,6 @@
 import React, { ReactElement } from 'react';
-import { TFunction, Trans } from 'react-i18next';
+import { Trans } from 'react-i18next';
+import { TFunction } from 'i18next';
 
 export const VM_ACTIONS = {
   pause: 'pause',

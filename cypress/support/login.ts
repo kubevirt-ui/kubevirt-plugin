@@ -39,35 +39,34 @@ Cypress.Commands.add(
         return;
       }
 
-      // Clear session token
-      cy.clearCookie('openshift-session-token');
-
-      // Login flow
-      cy.get(SELECTORS.loginButton, { timeout: 300000 }).should('be.visible');
-
-      // Handle IDP selection if present
-      const idp = provider || KUBEADMIN_IDP;
-      cy.get('body').then(($body) => {
-        if ($body.text().includes(idp)) {
-          cy.contains(idp).should('be.visible').click();
+      const loginOrDashboard = `${SELECTORS.usernameInput}, ${SELECTORS.loginButton}, ${SELECTORS.userDropdown}`;
+      cy.get(loginOrDashboard, { timeout: 5 * MINUTE }).then(($el) => {
+        if ($el.filter(SELECTORS.userDropdown).length > 0) {
+          cy.log('Already logged in — skipping login flow');
+          return;
         }
+
+        cy.clearCookie('openshift-session-token');
+
+        const idp = provider || KUBEADMIN_IDP;
+        cy.get('body').then(($idpBody) => {
+          if ($idpBody.text().includes(idp)) {
+            cy.contains(idp).should('be.visible').click();
+          }
+        });
+
+        cy.get(SELECTORS.usernameInput).type(username);
+        cy.get(SELECTORS.passwordInput).type(password, { log: false });
+        cy.get(SELECTORS.submitButton).click();
+
+        cy.get(SELECTORS.userDropdown, { timeout: 300000 }).should('be.visible');
       });
 
-      // Fill and submit credentials
-      cy.get(SELECTORS.usernameInput).type(username);
-      cy.get(SELECTORS.passwordInput).type(password, { log: false }); // Hide password in logs
-      cy.get(SELECTORS.submitButton).click();
-
-      cy.wait(20000);
-
-      // Close tour popup if present
       cy.get('body').then(($body) => {
         if ($body.find(SELECTORS.tourPopup).length) {
           cy.get(SELECTORS.tourPopup).click();
         }
       });
-
-      cy.get(SELECTORS.userDropdown, { timeout: 300000 }).should('be.visible');
 
       // Verify login via CLI
       cy.exec('oc whoami').then((result) => {

@@ -9,6 +9,8 @@ import {
 } from '@kubevirt-utils/resources/udn/types';
 import { NetworkInterfaceState } from '@kubevirt-utils/resources/vm/utils/network/types';
 
+export const isCallable = (value: unknown): value is () => void => typeof value === 'function';
+
 export const isVM = (source: unknown): source is V1VirtualMachine =>
   (source as V1VirtualMachine)?.kind === VirtualMachineModel.kind;
 

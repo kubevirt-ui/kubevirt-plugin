@@ -11,7 +11,7 @@ type PVCAlertExtension = {
   pvc: K8sResourceCommon;
 };
 
-const PVCAlertExtension: React.FC<PVCAlertExtension> = ({ pvc }) => {
+const PVCAlertExtension: React.FCC<PVCAlertExtension> = ({ pvc }) => {
   const { uploads } = useContext(CDIUploadContext);
   const { t } = useKubevirtTranslation();
   const isUploading = uploads?.find(

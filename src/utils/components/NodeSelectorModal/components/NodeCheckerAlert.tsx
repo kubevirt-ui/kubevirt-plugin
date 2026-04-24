@@ -25,7 +25,7 @@ type NodeCheckerAlertProps = {
   qualifiedNodes: IoK8sApiCoreV1Node[];
 };
 
-const NodeCheckerAlert: React.FC<NodeCheckerAlertProps> = ({
+const NodeCheckerAlert: React.FCC<NodeCheckerAlertProps> = ({
   nodesLoaded,
   preferredQualifiedNodes,
   qualifiedNodes,

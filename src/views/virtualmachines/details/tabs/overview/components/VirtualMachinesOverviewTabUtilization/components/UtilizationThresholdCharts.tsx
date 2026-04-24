@@ -10,7 +10,7 @@ import { Grid, GridItem } from '@patternfly/react-core';
 type UtilizationThresholdChartsProps = {
   vmi: V1VirtualMachineInstance;
 };
-const UtilizationThresholdCharts: React.FC<UtilizationThresholdChartsProps> = ({ vmi }) => {
+const UtilizationThresholdCharts: React.FCC<UtilizationThresholdChartsProps> = ({ vmi }) => {
   return (
     <Grid>
       <GridItem span={3}>

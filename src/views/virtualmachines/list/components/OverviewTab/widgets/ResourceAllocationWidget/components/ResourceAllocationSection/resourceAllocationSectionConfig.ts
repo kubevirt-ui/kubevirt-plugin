@@ -1,4 +1,4 @@
-import { TFunction } from 'react-i18next';
+import { TFunction } from 'i18next';
 
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { METRICS } from '@overview/OverviewTab/metric-charts-card/utils/constants';

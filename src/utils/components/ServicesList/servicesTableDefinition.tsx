@@ -1,6 +1,6 @@
 import React, { ReactNode } from 'react';
-import { TFunction } from 'react-i18next';
 import classNames from 'classnames';
+import { TFunction } from 'i18next';
 
 import { IoK8sApiCoreV1Service } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';

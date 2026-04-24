@@ -1,7 +1,6 @@
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { ActionDropdownItemType } from '@kubevirt-utils/components/ActionsDropdown/constants';
-import { cleanup } from '@testing-library/react';
-import { renderHook } from '@testing-library/react-hooks';
+import { cleanup, renderHook } from '@testing-library/react';
 
 import useVirtualMachineActionsProvider from '../hooks/useVirtualMachineActionsProvider';
 

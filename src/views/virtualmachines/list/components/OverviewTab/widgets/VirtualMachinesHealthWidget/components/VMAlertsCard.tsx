@@ -1,4 +1,4 @@
-import React, { FC, PropsWithChildren, ReactNode } from 'react';
+import React, { FCC, PropsWithChildren, ReactNode } from 'react';
 
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -17,7 +17,7 @@ type VMAlertsCardProps = PropsWithChildren<
   }
 >;
 
-const VMAlertsCard: FC<VMAlertsCardProps> = ({
+const VMAlertsCard: FCC<VMAlertsCardProps> = ({
   alertsBaseHref,
   alertsBasePath,
   children,

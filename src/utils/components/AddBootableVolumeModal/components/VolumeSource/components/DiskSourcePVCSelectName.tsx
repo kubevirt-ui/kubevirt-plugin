@@ -1,4 +1,4 @@
-import React, { Dispatch, FC, SetStateAction } from 'react';
+import React, { Dispatch, FCC, SetStateAction } from 'react';
 
 import {
   modelToGroupVersionKind,
@@ -17,7 +17,7 @@ type DiskSourcePVCSelectNameProps = {
   pvcsLoaded: boolean;
 };
 
-const DiskSourcePVCSelectName: FC<DiskSourcePVCSelectNameProps> = ({
+const DiskSourcePVCSelectName: FCC<DiskSourcePVCSelectNameProps> = ({
   isDisabled,
   onChange,
   pvcNames,
@@ -40,8 +40,8 @@ const DiskSourcePVCSelectName: FC<DiskSourcePVCSelectNameProps> = ({
           toggleProps={{
             isDisabled,
             isFullWidth: true,
-            placeholder: t('--- Select Volume name ---'),
           }}
+          placeholder={t('--- Select Volume name ---')}
           selected={pvcNameSelected}
           setSelected={onChange}
         />

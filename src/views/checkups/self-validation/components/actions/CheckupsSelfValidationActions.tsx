@@ -1,5 +1,5 @@
 import React, { FC, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom-v5-compat';
+import { useNavigate } from 'react-router';
 
 import {
   IoK8sApiBatchV1Job,

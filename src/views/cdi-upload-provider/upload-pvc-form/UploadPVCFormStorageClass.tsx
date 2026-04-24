@@ -21,9 +21,9 @@ const UploadPVCFormStorageClass = ({
         <FormGroup isRequired label={t('StorageClass')}>
           <InlineFilterSelect
             options={getSCSelectOptions(storageClasses)}
+            placeholder={t('Select {{label}}', { label: StorageClassModel.label })}
             selected={storageClassName}
             setSelected={(scName: string) => setStorageClassName(scName)}
-            toggleProps={{ placeholder: t('Select {{label}}', { label: StorageClassModel.label }) }}
           />
         </FormGroup>
       </StackItem>

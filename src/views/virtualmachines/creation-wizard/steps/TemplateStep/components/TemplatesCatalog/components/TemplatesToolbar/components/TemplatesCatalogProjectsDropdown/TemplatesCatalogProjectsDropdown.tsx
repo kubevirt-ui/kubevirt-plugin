@@ -1,4 +1,4 @@
-import React, { FC, memo, useMemo } from 'react';
+import React, { FCC, memo, useMemo } from 'react';
 
 import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
@@ -15,7 +15,7 @@ type TemplatesCatalogProjectsDropdownProps = {
   selectedProject: string;
 };
 
-export const TemplatesCatalogProjectsDropdown: FC<TemplatesCatalogProjectsDropdownProps> = memo(
+export const TemplatesCatalogProjectsDropdown: FCC<TemplatesCatalogProjectsDropdownProps> = memo(
   ({ onChange, selectedProject }) => {
     const cluster = useClusterParam();
     const [projects] = useK8sWatchData<K8sResourceCommon[]>({

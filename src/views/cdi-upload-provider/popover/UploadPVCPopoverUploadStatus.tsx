@@ -25,7 +25,7 @@ type UploadPVCPopoverUploadStatusProps = {
   upload: DataUpload;
 };
 
-const UploadPVCPopoverUploadStatus: React.FC<UploadPVCPopoverUploadStatusProps> = ({
+const UploadPVCPopoverUploadStatus: React.FCC<UploadPVCPopoverUploadStatusProps> = ({
   error,
   onCancelClick,
   onErrorDeleteSource,

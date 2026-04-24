@@ -9,7 +9,7 @@ import { HARDWARE_DEVICE_TYPE } from '../utils/constants';
 type HardwareDevicesModalProps = {
   type: HARDWARE_DEVICE_TYPE.GPUS | HARDWARE_DEVICE_TYPE.HOST_DEVICES;
 };
-const HardwareDeviceModalDescription: React.FC<HardwareDevicesModalProps> = ({ type }) => {
+const HardwareDeviceModalDescription: React.FCC<HardwareDevicesModalProps> = ({ type }) => {
   const { t } = useKubevirtTranslation();
 
   return (

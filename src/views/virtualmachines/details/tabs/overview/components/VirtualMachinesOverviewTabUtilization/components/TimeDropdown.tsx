@@ -4,7 +4,7 @@ import DurationDropdown from '@kubevirt-utils/components/DurationOption/Duration
 import DurationOption from '@kubevirt-utils/components/DurationOption/DurationOption';
 import useDuration from '@virtualmachines/details/tabs/metrics/hooks/useDuration';
 
-const TimeDropdown: React.FC = () => {
+const TimeDropdown: React.FCC = () => {
   const { duration, setDuration } = useDuration();
 
   const onDurationSelect = (value: string) =>

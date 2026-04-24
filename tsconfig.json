@@ -34,5 +34,5 @@
     "target": "es2021",
     "typeRoots": ["node_modules/@types", "@types"]
   },
-  "include": ["src/**/*", "images/**/*", "plugin-metadata.ts"]
+  "include": ["src/**/*", "images/**/*", "plugin-metadata.ts", "@types/**/*"]
 }

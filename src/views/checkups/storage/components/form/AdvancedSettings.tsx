@@ -75,9 +75,9 @@ const AdvancedSettings: FC<AdvancedSettingsProps> = ({
           <InlineFilterSelect
             toggleProps={{
               isFullWidth: true,
-              placeholder: t('Select {{label}}', { label: StorageClassModel.label }),
             }}
             options={getSCSelectOptions(storageClasses) ?? []}
+            placeholder={t('Select {{label}}', { label: StorageClassModel.label })}
             popperProps={{ enableFlip: true }}
             selected={settings.storageClass || defaultSC?.metadata?.name || ''}
             setSelected={(value) => updateSetting('storageClass', value)}

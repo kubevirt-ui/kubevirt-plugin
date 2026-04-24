@@ -1,12 +1,12 @@
 import React from 'react';
-import { Link } from 'react-router-dom-v5-compat';
+import { Link } from 'react-router';
 import { getMigrationPolicyURL } from 'src/views/migrationpolicies/utils/utils';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useSelectedCluster from '@kubevirt-utils/hooks/useSelectedCluster';
 import { Title } from '@patternfly/react-core';
 
-const MigrationPolicyCreateFormHeader: React.FC = () => {
+const MigrationPolicyCreateFormHeader: React.FCC = () => {
   const { t } = useKubevirtTranslation();
   const selectedCluster = useSelectedCluster();
 

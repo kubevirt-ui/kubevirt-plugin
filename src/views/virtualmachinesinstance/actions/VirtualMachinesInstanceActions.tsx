@@ -7,7 +7,7 @@ import { ActionMenuVariant } from '@openshift-console/dynamic-plugin-sdk/lib/api
 
 type VirtualMachinesInsanceActionsProps = { vmi: V1VirtualMachineInstance };
 
-const VirtualMachinesInsanceActions: React.FC<VirtualMachinesInsanceActionsProps> = ({ vmi }) => {
+const VirtualMachinesInsanceActions: React.FCC<VirtualMachinesInsanceActionsProps> = ({ vmi }) => {
   return (
     <LazyActionMenu
       context={{ [VirtualMachineInstanceModelRef]: vmi }}

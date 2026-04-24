@@ -30,7 +30,7 @@ type AffinityModalProps = {
   template: V1Template;
 };
 
-const AffinityRulesModal: React.FC<AffinityModalProps> = ({
+const AffinityRulesModal: React.FCC<AffinityModalProps> = ({
   isOpen,
   onClose,
   onSubmit,

@@ -4,7 +4,7 @@ import { AlertItem, AlertsBody } from '@openshift-console/dynamic-plugin-sdk-int
 import { Alert } from '@openshift-console/dynamic-plugin-sdk-internal/lib/api/common-types';
 
 // File will be removed with the rest of clusteroverview/OverviewTab/status-card
-const VirtualizationAlerts: React.FC = () => {
+const VirtualizationAlerts: React.FCC = () => {
   const alerts: Alert[] = [];
 
   return (

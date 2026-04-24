@@ -20,7 +20,7 @@ type StartPauseModalProps = {
   vmi?: V1VirtualMachineInstance;
 };
 
-const StartPauseModal: React.FC<StartPauseModalProps> = ({
+const StartPauseModal: React.FCC<StartPauseModalProps> = ({
   headerText,
   isOpen,
   onClose,

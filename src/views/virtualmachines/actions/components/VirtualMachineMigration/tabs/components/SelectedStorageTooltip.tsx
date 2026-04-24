@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FCC, useState } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -15,7 +15,7 @@ type SelectedStorageTooltipProps = {
   vms: V1VirtualMachine[];
 };
 
-const SelectedStorageTooltip: FC<SelectedStorageTooltipProps> = ({ children, vms }) => {
+const SelectedStorageTooltip: FCC<SelectedStorageTooltipProps> = ({ children, vms }) => {
   const [showMore, setShowMore] = useState(false);
 
   const { t } = useKubevirtTranslation();

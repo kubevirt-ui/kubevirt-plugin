@@ -1,5 +1,5 @@
-import { EncodedExtension } from '@openshift/dynamic-plugin-sdk-webpack';
-import { HrefNavItem, ModelFeatureFlag } from '@openshift-console/dynamic-plugin-sdk';
+import type { HrefNavItem, ModelFeatureFlag } from '@openshift-console/dynamic-plugin-sdk';
+import type { EncodedExtension } from '@openshift-console/dynamic-plugin-sdk-webpack';
 
 import { extensions as MulticlusterExtensions } from './src/multicluster/extensions';
 import { extensions as VirtualizationPerspectiveExtensions } from './src/perspective/extensions';

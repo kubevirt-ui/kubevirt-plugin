@@ -1,5 +1,5 @@
 import { MouseEvent } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom-v5-compat';
+import { useLocation, useNavigate } from 'react-router';
 
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';

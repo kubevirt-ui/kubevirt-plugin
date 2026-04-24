@@ -1,4 +1,4 @@
-import { useLocation, useNavigate } from 'react-router-dom-v5-compat';
+import { useLocation, useNavigate } from 'react-router';
 
 import { ALL_NAMESPACES } from '@kubevirt-utils/hooks/constants';
 import useNamespaceParam from '@kubevirt-utils/hooks/useNamespaceParam';

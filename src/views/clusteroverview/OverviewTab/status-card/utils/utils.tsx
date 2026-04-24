@@ -7,15 +7,12 @@ import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   GreenCheckCircleIcon,
   HealthState,
-  K8sModel,
   PrometheusLabels,
   RedExclamationCircleIcon,
-  ResolvedExtension,
   WatchK8sResource,
   YellowExclamationTriangleIcon,
 } from '@openshift-console/dynamic-plugin-sdk';
 import { Alert } from '@openshift-console/dynamic-plugin-sdk';
-import { Extension, ExtensionTypeGuard } from '@openshift-console/dynamic-plugin-sdk/lib/types';
 import { InProgressIcon } from '@patternfly/react-icons';
 
 import BlueArrowCircleUpIcon from '../../../utils/Components/BlueArrowCircleUpIcon';
@@ -32,25 +29,6 @@ export const NetworkAddonsConfigResource: WatchK8sResource = {
 };
 
 export const getClusterNAC = (nacList) => nacList?.find((nac) => nac?.metadata?.name === CLUSTER);
-
-export const filterSubsystems = <E extends Extension>(
-  subsystems: ResolvedExtension<E>[],
-  typeGuard: ExtensionTypeGuard<E>,
-  k8sModels: { [key: string]: K8sModel },
-) =>
-  subsystems.filter((s) => {
-    // TODO Fix typing
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    if (typeGuard(s)) {
-      const subsystem = s as unknown as ResolvedExtension<E>;
-      return subsystem?.properties?.additionalResource &&
-        !subsystem?.properties?.additionalResource?.optional
-        ? !!k8sModels[subsystem?.properties?.additionalResource?.kind]
-        : true;
-    }
-    return true;
-  });
 
 export const getHealthStatusFromCSV = (
   csvPhase: ClusterServiceVersionPhase | undefined,

@@ -1,5 +1,5 @@
 import { useEffect, useMemo } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom-v5-compat';
+import { useLocation, useNavigate } from 'react-router';
 
 import { PERSPECTIVES } from '@kubevirt-utils/constants/constants';
 import { useActivePerspective } from '@openshift-console/dynamic-plugin-sdk';

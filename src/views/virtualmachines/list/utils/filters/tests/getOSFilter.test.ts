@@ -1,3 +1,5 @@
+import { TFunction } from 'i18next';
+
 import { OS_NAME_LABELS } from '@kubevirt-utils/resources/template';
 
 import { getOSFilter } from '../getOSFilter';
@@ -12,7 +14,7 @@ jest.mock('@kubevirt-utils/hooks/useKubevirtTranslation', () => ({
 }));
 
 describe('VM OS Filter', () => {
-  const osFilter = getOSFilter(t);
+  const osFilter = getOSFilter(t as TFunction);
 
   describe('filter function', () => {
     it('should return true when no OS is selected', () => {

@@ -1,6 +1,6 @@
 import React, {
   Dispatch,
-  FC,
+  FCC,
   KeyboardEvent,
   ReactNode,
   SetStateAction,
@@ -32,7 +32,7 @@ type ComposableDrilldownMenuProps = {
   trigger?: ReactNode;
 } & Pick<PopperProps, 'appendTo' | 'direction' | 'triggerRef'>;
 
-const ComposableDrilldownSelect: FC<ComposableDrilldownMenuProps> = ({
+const ComposableDrilldownSelect: FCC<ComposableDrilldownMenuProps> = ({
   appendTo,
   children,
   direction,

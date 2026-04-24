@@ -22,7 +22,7 @@ type EnvironmentFormActionsProps = {
   onSave: () => void;
 };
 
-const EnvironmentFormActions: React.FC<EnvironmentFormActionsProps> = ({
+const EnvironmentFormActions: React.FCC<EnvironmentFormActionsProps> = ({
   closeError,
   error,
   isSaveDisabled,

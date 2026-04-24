@@ -89,9 +89,9 @@ const RunStrategyModal: FC<RunStrategyModalProps> = ({
                 'aria-describedby': showMixedStrategiesHint ? MIXED_HINT_ID : undefined,
                 id: 'run-strategy-select',
                 isFullWidth: true,
-                placeholder: t('Select a run strategy'),
               }}
               onSelect={handleChange}
+              placeholder={t('Select a run strategy')}
               selected={runStrategy || undefined}
               selectedLabel={runStrategy ? labels[runStrategy] || runStrategy : undefined}
             >

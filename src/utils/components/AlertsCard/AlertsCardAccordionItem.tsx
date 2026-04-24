@@ -25,7 +25,7 @@ type AlertsCardAccordionItemProps = {
   handleDrawerToggleClick: (alertType: AlertType) => void;
 };
 
-const AlertsCardAccordionItem: React.FC<AlertsCardAccordionItemProps> = ({
+const AlertsCardAccordionItem: React.FCC<AlertsCardAccordionItemProps> = ({
   alertOpen,
   alerts,
   alertType,

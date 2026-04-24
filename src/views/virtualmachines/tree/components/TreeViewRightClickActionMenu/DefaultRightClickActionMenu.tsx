@@ -1,5 +1,5 @@
-import React, { FC, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom-v5-compat';
+import React, { FCC, useMemo } from 'react';
+import { useNavigate } from 'react-router';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useVirtualMachineInstanceMigrationMapper from '@kubevirt-utils/resources/vmim/hooks/useVirtualMachineInstanceMigrationMapper';
@@ -20,7 +20,7 @@ type DefaultRightClickActionMenuProps = {
   triggerElement: HTMLElement | null;
 };
 
-const DefaultRightClickActionMenu: FC<DefaultRightClickActionMenuProps> = ({
+const DefaultRightClickActionMenu: FCC<DefaultRightClickActionMenuProps> = ({
   hideMenu,
   triggerElement,
 }) => {

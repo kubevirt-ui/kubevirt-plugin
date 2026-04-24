@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom-v5-compat';
+import { Link } from 'react-router';
 
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import StateHandler from '@kubevirt-utils/components/StateHandler/StateHandler';
@@ -15,7 +15,7 @@ type ComponentReadyProps = React.PropsWithChildren<{
   text?: string;
 }>;
 
-const ComponentReady: React.FC<ComponentReadyProps> = ({
+const ComponentReady: React.FCC<ComponentReadyProps> = ({
   children,
   error,
   isLoading,

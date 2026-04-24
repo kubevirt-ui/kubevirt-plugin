@@ -1,4 +1,4 @@
-import React, { FC, memo, ReactNode, useRef, useState } from 'react';
+import React, { FCC, memo, ReactNode, useRef, useState } from 'react';
 import classNames from 'classnames';
 
 import DropdownToggle from '@kubevirt-utils/components/toggles/DropdownToggle';
@@ -22,7 +22,7 @@ type ActionsDropdownProps = {
   variant?: 'default' | 'plain' | 'plainText' | 'primary' | 'secondary' | 'typeahead';
 };
 
-const ActionsDropdown: FC<ActionsDropdownProps> = ({
+const ActionsDropdown: FCC<ActionsDropdownProps> = ({
   actions = [],
   className,
   disabledTooltip,

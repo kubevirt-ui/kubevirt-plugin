@@ -1,4 +1,4 @@
-import { TFunction } from 'react-i18next';
+import { TFunction } from 'i18next';
 
 export const getNotSupportedVMError = (t: TFunction) => ({
   message: t(

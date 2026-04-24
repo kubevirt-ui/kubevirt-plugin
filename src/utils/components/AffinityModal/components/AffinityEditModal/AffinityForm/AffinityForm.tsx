@@ -43,7 +43,7 @@ type AffinityFormProps = {
   setSubmitDisabled: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-const AffinityForm: React.FC<AffinityFormProps> = ({
+const AffinityForm: React.FCC<AffinityFormProps> = ({
   expressions,
   fields,
   focusedAffinity,

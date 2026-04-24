@@ -17,7 +17,7 @@ type UploadPVCButtonBarProps = {
   uploadProxyURL?: string;
 };
 
-const UploadPVCButtonBar: React.FC<UploadPVCButtonBarProps> = ({
+const UploadPVCButtonBar: React.FCC<UploadPVCButtonBarProps> = ({
   children,
   className,
   errorMessage,

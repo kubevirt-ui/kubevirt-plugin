@@ -18,7 +18,7 @@ type BulkUnsupportedVolumesAlertProps = {
   unsupportedVolumes: Record<string, V1VolumeSnapshotStatus[]>;
 };
 
-const BulkUnsupportedVolumesAlert: React.FC<BulkUnsupportedVolumesAlertProps> = ({
+const BulkUnsupportedVolumesAlert: React.FCC<BulkUnsupportedVolumesAlertProps> = ({
   unsupportedVolumes,
 }) => {
   const { t } = useKubevirtTranslation();

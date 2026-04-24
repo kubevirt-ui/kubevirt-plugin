@@ -13,7 +13,7 @@ import VMStatusSection from './utils/vm-status-section/VMStatusSection';
 
 import './InventoryCard.scss';
 
-const InventoryCard: React.FC = () => {
+const InventoryCard: React.FCC = () => {
   const { t } = useKubevirtTranslation();
   const isAdmin = useIsAdmin();
 

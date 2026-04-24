@@ -1,6 +1,8 @@
-import { EncodedExtension } from '@openshift/dynamic-plugin-sdk-webpack';
-import { FeatureFlagHookProvider, NavSection } from '@openshift-console/dynamic-plugin-sdk';
-import type { ConsolePluginBuildMetadata } from '@openshift-console/dynamic-plugin-sdk-webpack';
+import type { FeatureFlagHookProvider, NavSection } from '@openshift-console/dynamic-plugin-sdk';
+import type {
+  ConsolePluginBuildMetadata,
+  EncodedExtension,
+} from '@openshift-console/dynamic-plugin-sdk-webpack';
 
 export const exposedModules: ConsolePluginBuildMetadata['exposedModules'] = {
   StorageMigrationList: './views/storagemigrations/list/StorageMigrationList.tsx',

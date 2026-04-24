@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useNavigate } from 'react-router-dom-v5-compat';
+import { useNavigate } from 'react-router';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
@@ -12,7 +12,7 @@ import {
   EmptyStateFooter,
 } from '@patternfly/react-core';
 
-export const WizardEmptyState: React.FC<{ namespace: string }> = ({ namespace }) => {
+export const WizardEmptyState: React.FCC<{ namespace: string }> = ({ namespace }) => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
   const cluster = useClusterParam();

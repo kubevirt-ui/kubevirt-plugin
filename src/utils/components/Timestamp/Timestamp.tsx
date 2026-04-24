@@ -13,7 +13,7 @@ export type TimestampProps = {
   timestamp: number | string;
 };
 
-const Timestamp: React.FC<TimestampProps> = ({
+const Timestamp: React.FCC<TimestampProps> = ({
   className,
   hideIcon = false,
   omitSuffix,

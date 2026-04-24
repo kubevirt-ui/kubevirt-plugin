@@ -9,7 +9,7 @@ type BootSourceProps = {
   template: V1Template;
 };
 
-const BootSource: React.FC<BootSourceProps> = ({ template }) => {
+const BootSource: React.FCC<BootSourceProps> = ({ template }) => {
   const { t } = useKubevirtTranslation();
   const { isBootSourceAvailable } = useVMTemplateSource(template);
 

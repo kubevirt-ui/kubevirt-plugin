@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Link } from 'react-router-dom-v5-compat';
+import { Link } from 'react-router';
 
 import { DataSourceModelRef } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
@@ -18,7 +18,7 @@ type DataSourcePageTitleProps = {
   namespace: string;
 };
 
-const DataSourcePageTitle: React.FC<DataSourcePageTitleProps> = ({
+const DataSourcePageTitle: React.FCC<DataSourcePageTitleProps> = ({
   dataSource,
   name,
   namespace,

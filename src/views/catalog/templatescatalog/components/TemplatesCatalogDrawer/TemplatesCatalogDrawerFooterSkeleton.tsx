@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import { Skeleton, Stack, StackItem } from '@patternfly/react-core';
 
-export const TemplatesCatalogDrawerFooterSkeleton: React.FC = React.memo(() => (
+export const TemplatesCatalogDrawerFooterSkeleton: React.FCC = React.memo(() => (
   <Stack className="template-catalog-drawer-info" hasGutter>
     <StackItem className="template-catalog-drawer-footer-section">
       <Stack hasGutter>

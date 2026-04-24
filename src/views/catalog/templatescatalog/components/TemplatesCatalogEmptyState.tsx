@@ -12,7 +12,7 @@ import {
   EmptyStateVariant,
 } from '@patternfly/react-core';
 
-export const TemplatesCatalogEmptyState: React.FC<{
+export const TemplatesCatalogEmptyState: React.FCC<{
   bootSourcesLoaded: boolean;
   onClearFilters: () => void;
 }> = React.memo(({ bootSourcesLoaded, onClearFilters }) => {

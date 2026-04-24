@@ -7,7 +7,7 @@ type TolerationsProps = {
   vm: V1VirtualMachine;
 };
 
-const Tolerations: React.FC<TolerationsProps> = ({ vm }) => {
+const Tolerations: React.FCC<TolerationsProps> = ({ vm }) => {
   const { t } = useKubevirtTranslation();
   const tolerations = vm?.spec?.template?.spec?.tolerations;
 

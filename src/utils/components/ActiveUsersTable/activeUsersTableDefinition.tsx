@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react';
-import { TFunction } from 'react-i18next';
+import { TFunction } from 'i18next';
 
 import { V1VirtualMachineInstanceGuestOSUser } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import Timestamp from '@kubevirt-utils/components/Timestamp/Timestamp';
@@ -17,7 +17,7 @@ const renderLoginTime = (user: V1VirtualMachineInstanceGuestOSUser): ReactNode =
 const renderElapsedTime = (user: V1VirtualMachineInstanceGuestOSUser): ReactNode => {
   if (isEmpty(user?.loginTime)) return NO_DATA_DASH;
   const time = user.loginTime * 1000;
-  return fromNow(new Date(time), new Date());
+  return fromNow(new Date(time), new Date()) as string;
 };
 
 export const getActiveUserColumns = (

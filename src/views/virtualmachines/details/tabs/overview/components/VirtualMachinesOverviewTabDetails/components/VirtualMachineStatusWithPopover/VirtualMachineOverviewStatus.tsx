@@ -1,5 +1,5 @@
-import React, { FC } from 'react';
-import { Link } from 'react-router-dom-v5-compat';
+import React, { FCC } from 'react';
+import { Link } from 'react-router';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -19,7 +19,7 @@ type VirtualMachineOverviewStatusProps = {
   vm: V1VirtualMachine;
 };
 
-const VirtualMachineOverviewStatus: FC<VirtualMachineOverviewStatusProps> = ({ children, vm }) => {
+const VirtualMachineOverviewStatus: FCC<VirtualMachineOverviewStatusProps> = ({ children, vm }) => {
   const { t } = useKubevirtTranslation();
   const vmPrintableStatus = getVMStatus(vm);
   const isErrorStatus = isErrorPrintableStatus(vmPrintableStatus);

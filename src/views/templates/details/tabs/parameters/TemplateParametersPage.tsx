@@ -1,5 +1,5 @@
 import React, { FC, MouseEventHandler, useCallback, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom-v5-compat';
+import { useNavigate } from 'react-router';
 import { useImmer } from 'use-immer';
 
 import { TemplateParameter, V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';

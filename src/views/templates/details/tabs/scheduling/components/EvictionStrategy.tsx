@@ -10,7 +10,7 @@ import { getCluster } from '@multicluster/helpers/selectors';
 
 import EvictionStrategyModal from './EvictionStrategyModal';
 
-const EvictionStrategy: React.FC<TemplateSchedulingGridProps> = ({
+const EvictionStrategy: React.FCC<TemplateSchedulingGridProps> = ({
   editable,
   onSubmit,
   template,

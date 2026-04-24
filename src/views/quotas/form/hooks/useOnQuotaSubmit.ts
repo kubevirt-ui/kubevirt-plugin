@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { useNavigate } from 'react-router-dom-v5-compat';
+import { useNavigate } from 'react-router';
 
 import { ApplicationAwareQuota } from '@kubevirt-utils/resources/quotas/types';
 import { kubevirtK8sCreate, kubevirtK8sUpdate } from '@multicluster/k8sRequests';

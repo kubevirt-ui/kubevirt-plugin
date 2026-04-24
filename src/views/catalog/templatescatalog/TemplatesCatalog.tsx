@@ -1,5 +1,5 @@
 import React, { FC, useMemo, useState } from 'react';
-import { useParams } from 'react-router-dom-v5-compat';
+import { useParams } from 'react-router';
 
 import { CREATE_VM_TAB } from '@catalog/CreateVMHorizontalNav/constants';
 import useHideDeprecatedTemplateTiles from '@catalog/templatescatalog/hooks/useHideDeprecatedTemplateTiles';

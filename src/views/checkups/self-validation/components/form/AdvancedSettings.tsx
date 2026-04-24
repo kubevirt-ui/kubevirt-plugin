@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 import { Trans } from 'react-i18next';
 
 import { IoK8sApiStorageV1StorageClass } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
@@ -41,7 +41,7 @@ type AdvancedSettingsProps = {
   testSkips: string;
 };
 
-const AdvancedSettings: FC<AdvancedSettingsProps> = ({
+const AdvancedSettings: FCC<AdvancedSettingsProps> = ({
   defaultSC,
   handleStorageCapabilitySelect,
   isDryRun,
@@ -65,9 +65,9 @@ const AdvancedSettings: FC<AdvancedSettingsProps> = ({
           <InlineFilterSelect
             toggleProps={{
               isFullWidth: true,
-              placeholder: t('Select {{label}}', { label: StorageClassModel.label }),
             }}
             options={getSCSelectOptions(storageClasses)}
+            placeholder={t('Select {{label}}', { label: StorageClassModel.label })}
             popperProps={{ enableFlip: true }}
             selected={storageClass || defaultSC?.metadata?.name || ''}
             setSelected={setStorageClass}

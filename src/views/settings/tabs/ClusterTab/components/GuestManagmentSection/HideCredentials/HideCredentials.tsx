@@ -46,7 +46,7 @@ const HideCredentials: FC<HideCredentialsProps> = ({ newBadge = false }) => {
           title={t('Error')}
           variant={AlertVariant.danger}
         >
-          {error}
+          {error.message}
         </Alert>
       )}
     </>

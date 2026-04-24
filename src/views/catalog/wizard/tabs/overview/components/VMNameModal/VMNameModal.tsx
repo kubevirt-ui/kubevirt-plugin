@@ -18,7 +18,7 @@ type HostnameModalProps = {
   vm: V1VirtualMachine;
 };
 
-const VMNameModal: React.FC<HostnameModalProps> = ({ isOpen, onClose, onSubmit, vm }) => {
+const VMNameModal: React.FCC<HostnameModalProps> = ({ isOpen, onClose, onSubmit, vm }) => {
   const { t } = useKubevirtTranslation();
   const [vmName, setVMName] = useState<string>(vm?.metadata?.name);
 

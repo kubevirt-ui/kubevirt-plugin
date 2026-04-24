@@ -1,5 +1,5 @@
 import React, { FC, memo, useState } from 'react';
-import { useParams } from 'react-router-dom-v5-compat';
+import { useParams } from 'react-router';
 
 import { updateVMCPUMemory } from '@catalog/templatescatalog/utils/helpers';
 import { WizardOverviewDisksTable } from '@catalog/wizard/tabs/overview/components/WizardOverviewDisksTable/WizardOverviewDisksTable';

@@ -12,7 +12,7 @@ type TopConsumersProgressChartProps = {
   value: number;
 };
 
-const TopConsumersProgressChart: React.FC<TopConsumersProgressChartProps> = ({
+const TopConsumersProgressChart: React.FCC<TopConsumersProgressChartProps> = ({
   labelUnit,
   labelValue,
   maxValue,

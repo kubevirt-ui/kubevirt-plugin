@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import ConfirmActionMessage from '@kubevirt-utils/components/ConfirmActionMessage/ConfirmActionMessage';
 import { CONFIRM_ACTIONS } from '@kubevirt-utils/components/ConfirmActionMessage/constants';
@@ -7,7 +7,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 
 type DetachModalProps = Omit<TabModalProps, 'children'> & { diskName: string };
 
-const DetachModal: FC<DetachModalProps> = (props) => {
+const DetachModal: FCC<DetachModalProps> = (props) => {
   const { t } = useKubevirtTranslation();
   return (
     <TabModal headerText={t('Detach disk?')} {...props}>

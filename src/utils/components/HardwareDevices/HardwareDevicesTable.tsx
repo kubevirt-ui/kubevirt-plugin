@@ -12,7 +12,7 @@ type HardwareDevicesTableProps = {
   devices: V1GPU[] | V1HostDevice[];
 };
 
-const HardwareDevicesTable: React.FC<HardwareDevicesTableProps> = ({ devices }) => {
+const HardwareDevicesTable: React.FCC<HardwareDevicesTableProps> = ({ devices }) => {
   const { t } = useKubevirtTranslation();
 
   if (!devices?.length)

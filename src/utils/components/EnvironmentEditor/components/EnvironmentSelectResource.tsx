@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import { EnhancedSelectOptionProps } from '@kubevirt-utils/components/FilterSelect/utils/types';
@@ -24,7 +24,7 @@ type EnvironmentSelectResourceProps = {
   serial: string;
 };
 
-const EnvironmentSelectResource: FC<EnvironmentSelectResourceProps> = ({
+const EnvironmentSelectResource: FCC<EnvironmentSelectResourceProps> = ({
   diskName,
   environmentName,
   kind,

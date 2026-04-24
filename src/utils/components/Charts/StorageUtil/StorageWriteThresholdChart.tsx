@@ -33,7 +33,7 @@ type StorageThresholdChartProps = {
 
 const GIB_IN_BYTES = 1024;
 
-const StorageWriteThresholdChart: React.FC<StorageThresholdChartProps> = ({ vmi }) => {
+const StorageWriteThresholdChart: React.FCC<StorageThresholdChartProps> = ({ vmi }) => {
   const { currentTime, duration, timespan } = useDuration();
 
   const queries = useVMQueries(vmi);

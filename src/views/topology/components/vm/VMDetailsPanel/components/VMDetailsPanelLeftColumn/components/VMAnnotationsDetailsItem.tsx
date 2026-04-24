@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -12,7 +12,7 @@ type VMAnnotationsDetailsItemProps = {
   vm: V1VirtualMachine;
 };
 
-const VMAnnotationsDetailsItem: FC<VMAnnotationsDetailsItemProps> = ({ vm }) => {
+const VMAnnotationsDetailsItem: FCC<VMAnnotationsDetailsItemProps> = ({ vm }) => {
   return (
     <DescriptionItemAnnotations
       className="topology-vm-details-panel__item"

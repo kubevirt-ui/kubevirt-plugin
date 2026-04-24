@@ -1,4 +1,4 @@
-import React, { Dispatch, FC, SetStateAction, useCallback, useEffect, useState } from 'react';
+import React, { Dispatch, FCC, SetStateAction, useCallback, useEffect, useState } from 'react';
 
 import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { IoK8sApiCoreV1Secret } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
@@ -41,7 +41,7 @@ type SSHOptionUseExistingProps = {
   sshDetails: SSHSecretDetails;
 };
 
-const SSHOptionUseExisting: FC<SSHOptionUseExistingProps> = ({
+const SSHOptionUseExisting: FCC<SSHOptionUseExistingProps> = ({
   cluster,
   localNSProject,
   namespace,
@@ -122,9 +122,10 @@ const SSHOptionUseExisting: FC<SSHOptionUseExistingProps> = ({
               }))}
               className="ssh-use-existing__form-group--project"
               data-test="ssh-use-existing-project"
+              placeholder={t('Select project')}
               selected={selectedProject}
               setSelected={onSelectProject}
-              toggleProps={{ isFullWidth: true, placeholder: t('Select project') }}
+              toggleProps={{ isFullWidth: true }}
             />
           </FormGroup>
         </GridItem>

@@ -58,7 +58,7 @@ export const useModalValue = (): ModalContextType => {
   return { createModal, isOpen, modal, onClose };
 };
 
-export const ModalProvider: React.FC<{ value: ModalContextType }> = ({ children, value = {} }) => {
+export const ModalProvider: React.FCC<{ value: ModalContextType }> = ({ children, value = {} }) => {
   const { isOpen, modal: Modal, onClose } = value;
 
   return (

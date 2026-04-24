@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FCC } from 'react';
 import { Controller, FieldPath, useFormContext } from 'react-hook-form';
 
 import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -17,7 +17,7 @@ import {
 } from '../../../utils/constants';
 import { diskSourcePVCNamespaceFieldID } from '../../utils/constants';
 
-const DiskSourcePVCSelectNamespace: FC = () => {
+const DiskSourcePVCSelectNamespace: FCC = () => {
   const { t } = useKubevirtTranslation();
   const {
     control,
@@ -56,8 +56,8 @@ const DiskSourcePVCSelectNamespace: FC = () => {
             }}
             toggleProps={{
               isFullWidth: true,
-              placeholder: t('Select Project'),
             }}
+            placeholder={t('Select Project')}
             selected={value}
           />
           <FormGroupHelperText

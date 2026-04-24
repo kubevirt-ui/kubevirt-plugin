@@ -23,7 +23,7 @@ type CreateProjectModalProps = {
   onClose: () => void;
 };
 
-const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
+const CreateProjectModal: React.FCC<CreateProjectModalProps> = ({
   createdProject,
   initialCluster,
   isOpen,

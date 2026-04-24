@@ -1,4 +1,4 @@
-import React, { FC, useMemo } from 'react';
+import React, { FCC, useMemo } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
 import {
@@ -25,7 +25,7 @@ import {
 import { getErrorSnapshotName } from '../../../utils/selectors';
 import { diskSourceSnapshotVolumeNameFieldID } from '../../utils/constants';
 
-const DiskSourceSnapshotVolumeSelectName: FC = () => {
+const DiskSourceSnapshotVolumeSelectName: FCC = () => {
   const { t } = useKubevirtTranslation();
   const {
     control,
@@ -70,8 +70,8 @@ const DiskSourceSnapshotVolumeSelectName: FC = () => {
             toggleProps={{
               isDisabled: isEmpty(namespace),
               isFullWidth: true,
-              placeholder: t('Select VolumeSnapshot'),
             }}
+            placeholder={t('Select VolumeSnapshot')}
             selected={value}
           />
           {error && (

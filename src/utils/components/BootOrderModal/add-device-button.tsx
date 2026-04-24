@@ -3,7 +3,7 @@ import * as React from 'react';
 import { Button, ButtonVariant, Content, ContentVariants } from '@patternfly/react-core';
 import { PlusCircleIcon } from '@patternfly/react-icons';
 
-export const AddDeviceButton: React.FC<AddDeviceButtonType> = ({
+export const AddDeviceButton: React.FCC<AddDeviceButtonType> = ({
   disabledMessage,
   id,
   isDisabled,

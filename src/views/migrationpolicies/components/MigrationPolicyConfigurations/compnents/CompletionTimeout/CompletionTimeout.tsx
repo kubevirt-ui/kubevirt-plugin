@@ -8,7 +8,7 @@ type CompletionTimeoutProps = {
   state: number;
 };
 
-const CompletionTimeout: React.FC<CompletionTimeoutProps> = ({
+const CompletionTimeout: React.FCC<CompletionTimeoutProps> = ({
   setState,
   state: completionTimeoutInGib,
 }) => {

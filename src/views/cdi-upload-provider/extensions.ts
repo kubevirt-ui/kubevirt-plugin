@@ -1,5 +1,4 @@
-import { EncodedExtension } from '@openshift/dynamic-plugin-sdk-webpack';
-import {
+import type {
   ContextProvider,
   PVCAlert,
   PVCCreateProp,
@@ -7,7 +6,10 @@ import {
   PVCStatus,
   RoutePage,
 } from '@openshift-console/dynamic-plugin-sdk';
-import type { ConsolePluginBuildMetadata } from '@openshift-console/dynamic-plugin-sdk-webpack';
+import type {
+  ConsolePluginBuildMetadata,
+  EncodedExtension,
+} from '@openshift-console/dynamic-plugin-sdk-webpack';
 
 export const exposedModules: ConsolePluginBuildMetadata['exposedModules'] = {
   contextProvider: 'src/views/cdi-upload-provider/utils/context.tsx',

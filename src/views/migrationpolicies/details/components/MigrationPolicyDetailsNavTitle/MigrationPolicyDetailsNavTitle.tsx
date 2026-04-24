@@ -15,7 +15,7 @@ type MigrationPolicyDetailsNavTitleProps = {
   mp: V1alpha1MigrationPolicy;
 };
 
-const MigrationPolicyDetailsNavTitle: React.FC<MigrationPolicyDetailsNavTitleProps> = ({ mp }) => {
+const MigrationPolicyDetailsNavTitle: React.FCC<MigrationPolicyDetailsNavTitleProps> = ({ mp }) => {
   const { t } = useKubevirtTranslation();
   return (
     <DetailsPageTitle breadcrumb={<MigrationPolicyBreadcrumb />}>

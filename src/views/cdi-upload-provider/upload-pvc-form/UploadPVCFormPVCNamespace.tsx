@@ -5,7 +5,7 @@ import { FormGroup, FormHelperText, HelperText, TextInput } from '@patternfly/re
 
 type UploadPVCFormPVCNamespaceProps = { namespace: string };
 
-const UploadPVCFormPVCNamespace: React.FC<UploadPVCFormPVCNamespaceProps> = ({ namespace }) => {
+const UploadPVCFormPVCNamespace: React.FCC<UploadPVCFormPVCNamespaceProps> = ({ namespace }) => {
   const { t } = useKubevirtTranslation();
   return (
     <FormGroup fieldId="pvc-namespace" isRequired label={t('Namespace')}>

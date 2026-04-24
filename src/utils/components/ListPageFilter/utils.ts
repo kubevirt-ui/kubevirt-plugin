@@ -1,5 +1,5 @@
-import { TFunction } from 'react-i18next';
 import * as fuzzy from 'fuzzysearch';
+import { TFunction } from 'i18next';
 
 import { numberOperatorInfo } from '@kubevirt-utils/utils/constants';
 import {

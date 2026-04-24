@@ -20,7 +20,7 @@ type OwnerDetailsItemProps = {
   obj: K8sResourceCommon;
 };
 
-const OwnerDetailsItem: React.FC<OwnerDetailsItemProps> = ({ className, obj }) => {
+const OwnerDetailsItem: React.FCC<OwnerDetailsItemProps> = ({ className, obj }) => {
   const { t } = useKubevirtTranslation();
 
   return (

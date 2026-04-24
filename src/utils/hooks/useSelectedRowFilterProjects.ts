@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { useSearchParams } from 'react-router-dom-v5-compat';
+import { useSearchParams } from 'react-router';
 
 import { PROJECT_LIST_FILTER_PARAM } from '@kubevirt-utils/utils/constants';
 

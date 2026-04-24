@@ -1,4 +1,4 @@
-import React, { FC, ReactNode } from 'react';
+import React, { FCC, ReactNode } from 'react';
 
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { LabelsModal } from '@kubevirt-utils/components/LabelsModal/LabelsModal';
@@ -22,7 +22,7 @@ type DescriptionItemLabelsProps = {
   resource: K8sResourceCommon;
 };
 
-const DescriptionItemLabels: FC<DescriptionItemLabelsProps> = ({
+const DescriptionItemLabels: FCC<DescriptionItemLabelsProps> = ({
   className,
   descriptionHeaderWrapper,
   editable = true,

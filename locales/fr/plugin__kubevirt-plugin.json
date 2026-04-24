@@ -2286,7 +2286,6 @@
   "View {{alertType}}": "Voir {{alertType}}",
   "view {{qualifiedNodesCount}} matching nodes": "voir{{qualifiedNodesCount}} nœuds correspondants",
   "View alert": "Afficher l’alerte",
-  "View alerts": "Afficher les alertes",
   "View all": "Afficher tout",
   "View all quick starts": "Afficher tous les démarrages rapides",
   "View and manage available bootable volumes.": "Afficher et gérer les volumes de démarrage disponibles.",

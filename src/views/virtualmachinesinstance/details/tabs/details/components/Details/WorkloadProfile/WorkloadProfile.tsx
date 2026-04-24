@@ -9,7 +9,7 @@ type WorkloadProfileProps = {
   };
 };
 
-const WorkloadProfile: React.FC<WorkloadProfileProps> = ({ annotations }) => {
+const WorkloadProfile: React.FCC<WorkloadProfileProps> = ({ annotations }) => {
   const { t } = useKubevirtTranslation();
   const workloadProfile = annotations?.[VM_WORKLOAD_ANNOTATION];
 

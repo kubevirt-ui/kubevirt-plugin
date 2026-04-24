@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useLocation, useParams } from 'react-router-dom-v5-compat';
-import { useNavigate, useSearchParams } from 'react-router-dom-v5-compat';
+import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router';
 
 import { runningTourSignal } from '@kubevirt-utils/components/GuidedTour/utils/guidedTourSignals';
 import { ALL_NAMESPACES, ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';

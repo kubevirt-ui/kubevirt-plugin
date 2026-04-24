@@ -1,4 +1,4 @@
-import React, { FC, ReactNode } from 'react';
+import React, { FCC, ReactNode } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useToggle } from '@kubevirt-utils/hooks/useToggle';
@@ -19,7 +19,7 @@ type GettingStartedGridProps = {
   children?: ReactNode[];
 };
 
-export const GettingStartedGrid: FC<GettingStartedGridProps> = ({ children }) => {
+export const GettingStartedGrid: FCC<GettingStartedGridProps> = ({ children }) => {
   const { t } = useKubevirtTranslation();
   const [isExpanded, setIsExpanded] = useToggle('virtualization-getting-started-resources', true);
 

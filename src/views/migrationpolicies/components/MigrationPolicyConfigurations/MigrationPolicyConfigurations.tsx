@@ -23,7 +23,7 @@ type MigrationPolicyConfigurationsProps = {
   state: EditMigrationPolicyInitialState | InitialMigrationPolicyState;
 };
 
-const MigrationPolicyConfigurations: React.FC<MigrationPolicyConfigurationsProps> = ({
+const MigrationPolicyConfigurations: React.FCC<MigrationPolicyConfigurationsProps> = ({
   setState,
   setStateField,
   state,

@@ -20,7 +20,7 @@ type UploadPVCFormStatusProps = UploadingStatusProps & {
   onErrorClick: () => void;
 };
 
-const UploadPVCFormStatus: React.FC<UploadPVCFormStatusProps> = ({
+const UploadPVCFormStatus: React.FCC<UploadPVCFormStatusProps> = ({
   allocateError,
   dataVolume,
   isAllocating,

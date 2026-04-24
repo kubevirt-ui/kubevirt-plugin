@@ -1,4 +1,4 @@
-import { TFunction } from 'react-i18next';
+import { TFunction } from 'i18next';
 
 const HEXCH_REGEX = '[0-9A-Fa-f]';
 const MAC_REGEX_COLON_DELIMITER = new RegExp(

@@ -6,7 +6,7 @@ import { InfoCircleIcon } from '@patternfly/react-icons';
 
 import './DeveloperPreviewLabel.scss';
 
-const DeveloperPreviewLabel: React.FC = () => {
+const DeveloperPreviewLabel: React.FCC = () => {
   const { t } = useKubevirtTranslation();
 
   return (

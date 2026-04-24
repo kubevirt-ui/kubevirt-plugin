@@ -1,4 +1,4 @@
-import { TFunction } from 'react-i18next';
+import { TFunction } from 'i18next';
 
 import { HCOHealthStatus } from '@kubevirt-utils/extensions/dashboard/types';
 import { HealthState, PrometheusResult } from '@openshift-console/dynamic-plugin-sdk';

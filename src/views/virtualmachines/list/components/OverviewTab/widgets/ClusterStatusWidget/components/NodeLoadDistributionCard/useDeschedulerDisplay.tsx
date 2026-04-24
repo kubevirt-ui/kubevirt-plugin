@@ -14,7 +14,7 @@ import useManagedClusterConsoleURLs from '@multicluster/hooks/useManagedClusterC
 import { GreenCheckCircleIcon } from '@openshift-console/dynamic-plugin-sdk';
 import { BlueInfoCircleIcon } from '@openshift-console/dynamic-plugin-sdk/lib/app/components/status/icons';
 import { Button, ButtonVariant, Popover } from '@patternfly/react-core';
-import { UnknownIcon } from '@patternfly/react-icons/dist/esm/icons';
+import { UnknownIcon } from '@patternfly/react-icons';
 import {
   DESCHEDULER_OPERATOR_NAME,
   OPERATOR_HUB_PATH,

@@ -1,6 +1,6 @@
 import React, {
   createContext,
-  FC,
+  FCC,
   PropsWithChildren,
   useCallback,
   useContext,
@@ -16,7 +16,7 @@ import { defaultOperatorsToInstall } from '@settings/tabs/ClusterTab/components/
 
 export const VirtualizationFeaturesContext = createContext<VirtualizationFeaturesResources>({});
 
-export const VirtualizationFeaturesContextProvider: FC = ({ children }) => {
+export const VirtualizationFeaturesContextProvider: FCC = ({ children }) => {
   const context = useVirtualizationFeatures();
   return (
     <VirtualizationFeaturesContext.Provider value={context}>
@@ -43,7 +43,7 @@ type VirtualizationFeaturesWizardProviderProps = PropsWithChildren<{
  * Note: the modal is rendered at ModalProvider level (outside the page's
  * VirtualizationFeaturesContextProvider), so we cannot rely on the parent context here.
  */
-export const VirtualizationFeaturesWizardProvider: FC<
+export const VirtualizationFeaturesWizardProvider: FCC<
   VirtualizationFeaturesWizardProviderProps
 > = ({ children, preloadedResources }) => {
   const [operatorsToInstall, setOperatorsToInstall] =
