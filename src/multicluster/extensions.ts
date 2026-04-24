@@ -15,6 +15,7 @@ import { FLAG_KUBEVIRT_VIRTUALIZATION_NAV } from '../utils/flags/consts';
 
 import {
   CROSS_CLUSTER_MIGRATION_ACTION_ID,
+  FLAG_DISALLOWED_KUBEVIRT_DYNAMIC_ACM,
   FLEET_BOOTABLE_VOLUMES_PATH,
   FLEET_CATALOG_PATH,
   FLEET_CHECKUPS_PATH,
@@ -38,7 +39,7 @@ export const exposedModules: ConsolePluginBuildMetadata['exposedModules'] = {
 export const extensions: EncodedExtension[] = [
   {
     flags: {
-      disallowed: ['KUBEVIRT_DISALLOW_DYNAMIC_ACM'],
+      disallowed: [FLAG_DISALLOWED_KUBEVIRT_DYNAMIC_ACM],
       required: [FLAG_KUBEVIRT_VIRTUALIZATION_NAV],
     },
     properties: {
