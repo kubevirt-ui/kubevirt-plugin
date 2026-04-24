@@ -5,14 +5,12 @@ import * as nav from '../views/selector';
 import { vmListTab } from '../views/selector-common';
 
 function ensureVirtNavVisible(selector: string) {
-  cy.get(nav.virtualizationNav, { timeout: MINUTE })
-    .scrollIntoView()
-    .should('be.visible')
-    .then(($btn) => {
-      if ($btn.attr('aria-expanded') === 'false') {
-        $btn[0].click();
-      }
-    });
+  cy.get(selector, { timeout: MINUTE }).then(($el) => {
+    const $hiddenSection = $el.closest('[hidden]');
+    if ($hiddenSection.length) {
+      $hiddenSection.prev('button[aria-expanded="false"]').each((_, btn) => btn.click());
+    }
+  });
   cy.get(selector, { timeout: MINUTE }).should('be.visible');
 }
 

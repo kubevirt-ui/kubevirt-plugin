@@ -64,7 +64,9 @@ describe('Test Cluster General settings', () => {
 
     it('disable memory density', () => {
       cy.get('[data-test-id="memory-density"]').uncheck({ force: true });
-      cy.get('[data-test-id="memory-density-disable-confirm-button"]').click({ force: true });
+      cy.get('[data-test-id="memory-density-disable-confirm-button"]', { timeout: 30000 })
+        .should('be.visible')
+        .click();
       cy.wait(10 * SECOND);
     });
 
