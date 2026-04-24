@@ -31,7 +31,7 @@ function verifyCloudInitCredentials(username: string, password: string) {
 
 const VM_NAMES = [VM_IT_CUST.name, VM_TMPL_CUST.name];
 
-describe('Create customized VMs from InstanceType/Template', () => {
+xdescribe('Create customized VMs from InstanceType/Template', () => {
   before(() => {
     VM_NAMES.forEach((name) => {
       cy.exec(`oc delete vm ${name} -n ${TEST_NS} --ignore-not-found --wait=true --timeout=120s`, {

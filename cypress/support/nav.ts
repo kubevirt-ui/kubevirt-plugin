@@ -81,7 +81,7 @@ Cypress.Commands.add('visitNAD', () => {
   cy.get('[data-quickstart-id="qs-nav-networking"]', { timeout: MINUTE }).scrollIntoView();
   cy.contains('Networking').should('be.visible');
   cy.clickNavLink(['Networking', 'NetworkAttachmentDefinitions']);
-  cy.byButtonText('Create').should('be.visible');
+  cy.contains('h1', 'NetworkAttachmentDefinitions', { timeout: MINUTE }).should('be.visible');
 });
 
 Cypress.Commands.add('visitTemplates', () => {
