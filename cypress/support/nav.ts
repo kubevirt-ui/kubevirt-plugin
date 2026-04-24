@@ -5,12 +5,15 @@ import * as nav from '../views/selector';
 import { vmListTab } from '../views/selector-common';
 
 function ensureVirtNavVisible(selector: string) {
-  cy.get(selector, { timeout: 5 * MINUTE }).then(($el) => {
-    if (!$el.is(':visible')) {
-      cy.get(nav.virtualizationNav).scrollIntoView().click();
-    }
-  });
-  cy.get(selector, { timeout: MINUTE }).scrollIntoView().should('be.visible');
+  cy.get(nav.virtualizationNav, { timeout: MINUTE })
+    .scrollIntoView()
+    .should('be.visible')
+    .then(($btn) => {
+      if ($btn.attr('aria-expanded') === 'false') {
+        $btn[0].click();
+      }
+    });
+  cy.get(selector, { timeout: MINUTE }).should('be.visible');
 }
 
 declare global {
