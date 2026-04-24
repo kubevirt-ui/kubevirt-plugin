@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 
 import {
@@ -34,31 +34,37 @@ export const useMountCDROMForm = () => {
   const selectedISO = useWatch({ control, name: FORM_FIELD_SELECTED_ISO });
   const uploadFile = useWatch({ control, name: FORM_FIELD_UPLOAD_FILE });
 
-  const handleISOSelection = (selectedValue: string) => {
-    setValue(FORM_FIELD_SELECTED_ISO, selectedValue);
-    setValue(FORM_FIELD_UPLOAD_MODE, UPLOAD_MODE_SELECT);
-    handleClearUpload(false);
-  };
+  const handleClearUpload = useCallback(
+    (resetMode: boolean = true) => {
+      clearErrors(FORM_FIELD_UPLOAD_FILE);
+      setValue(FORM_FIELD_UPLOAD_FILE, null);
+      setUploadFilename('');
+      if (resetMode) {
+        setValue(FORM_FIELD_UPLOAD_MODE, '');
+      }
+    },
+    [clearErrors, setValue],
+  );
 
-  const handleFileUpload = () => {
+  const handleISOSelection = useCallback(
+    (selectedValue: string) => {
+      setValue(FORM_FIELD_SELECTED_ISO, selectedValue);
+      setValue(FORM_FIELD_UPLOAD_MODE, UPLOAD_MODE_SELECT);
+      handleClearUpload(false);
+    },
+    [setValue, handleClearUpload],
+  );
+
+  const handleFileUpload = useCallback(() => {
     setValue(FORM_FIELD_UPLOAD_MODE, UPLOAD_MODE_UPLOAD);
     setValue(FORM_FIELD_SELECTED_ISO, '');
-  };
+  }, [setValue]);
 
-  const handleClearUpload = (resetMode: boolean = true) => {
-    clearErrors(FORM_FIELD_UPLOAD_FILE);
-    setValue(FORM_FIELD_UPLOAD_FILE, null);
-    setUploadFilename('');
-    if (resetMode) {
-      setValue(FORM_FIELD_UPLOAD_MODE, '');
-    }
-  };
-
-  const handleEmptyDriveSelection = () => {
+  const handleEmptyDriveSelection = useCallback(() => {
     setValue(FORM_FIELD_UPLOAD_MODE, UPLOAD_MODE_EMPTY);
     setValue(FORM_FIELD_SELECTED_ISO, '');
     handleClearUpload(false);
-  };
+  }, [setValue, handleClearUpload]);
 
   const isFormValid = Boolean(selectedISO || uploadFile?.filename);
 
