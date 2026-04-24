@@ -1,0 +1,174 @@
+name: IBM Cloud Hot Cluster Auto-Teardown
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
+    inputs:
+      cluster_name:
+        description: 'Cluster name to check'
+        required: true
+        default: 'kubevirt-plugin-ci'
+        type: string
+      idle_threshold_minutes:
+        description: 'Idle threshold in minutes before teardown'
+        required: true
+        default: '120'
+        type: string
+
+permissions:
+  contents: read
+  actions: write
+
+env:
+  CLUSTER_NAME: ${{ inputs.cluster_name || 'kubevirt-plugin-ci' }}
+  IDLE_THRESHOLD_MINUTES: ${{ inputs.idle_threshold_minutes || '120' }}
+
+jobs:
+  check-and-teardown:
+    name: Check Idle & Teardown
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - name: Check CI jobs
+        id: check_ci
+        uses: actions/github-script@v8
+        env:
+          INCLUDE_WORKFLOWS: '[".github/workflows/poc-e2e-ci-test.yml", ".github/workflows/poc-e2e-ci-test2.yml"]'
+        with:
+          script: |
+            const INCLUDE_WORKFLOWS = JSON.parse(process.env.INCLUDE_WORKFLOWS);
+
+            let inProgress = 0;
+            let queued = 0;
+            let completed = 0;
+            let lastRunTime = null;
+
+            try {
+              const results = await Promise.all(
+                INCLUDE_WORKFLOWS.map(workflow =>
+                  Promise.all([
+                    github.rest.actions.listWorkflowRuns({ ...context.repo, workflow_id: workflow, status: 'in_progress', per_page: 1 }),
+                    github.rest.actions.listWorkflowRuns({ ...context.repo, workflow_id: workflow, status: 'queued',      per_page: 1 }),
+                    github.rest.actions.listWorkflowRuns({ ...context.repo, workflow_id: workflow, status: 'completed',   per_page: 1 }),
+                  ])
+                )
+              );
+
+              for (const [ipRes, qRes, completedRes] of results) {
+                inProgress += ipRes.data.total_count;
+                queued     += qRes.data.total_count;
+                completed  += completedRes.data.total_count;
+
+                const lastRun = completedRes.data.workflow_runs[0];
+                if (lastRun) {
+                  const t = new Date(lastRun.updated_at);
+                  if (!lastRunTime || t > lastRunTime) lastRunTime = t;
+                }
+              }
+            } catch (err) {
+              core.setFailed(`Failed to query workflow runs: ${err.message}`);
+              return;
+            }
+
+            const minutesAgo = lastRunTime ? Math.floor((new Date().getTime() - lastRunTime.getTime()) / 60000) : 'N/A';
+            core.summary.addList([
+              `In-progress CI runs: ${inProgress}`,
+              `Queued CI runs: ${queued}`,
+              `Completed CI runs: ${completed}`,
+              `Last run time: ${lastRunTime ? lastRunTime.toISOString() : 'N/A'} (${minutesAgo} minutes ago)`,
+            ]);
+            await core.summary.write();
+            core.setOutput('active_jobs', (inProgress > 0 || queued > 0) ? 'true' : 'false');
+            core.setOutput('last_run_time', lastRunTime ? lastRunTime.toISOString() : '');
+
+      - name: Setup IBM Cloud CLI
+        uses: IBM/actions-ibmcloud-cli@v1
+        if: steps.check_ci.outputs.active_jobs == 'false'
+        with:
+          api_key: ${{ secrets.IBM_CLOUD_API_KEY }}
+          plugins: kubernetes-service
+
+      - name: Check idle threshold
+        id: check_idle
+        if: steps.check_ci.outputs.active_jobs == 'false'
+        env:
+          LAST_RUN_TIME: ${{ steps.check_ci.outputs.last_run_time }}
+        run: |
+          if [[ -z "${LAST_RUN_TIME}" ]]; then
+            echo "No completed CI runs found, checking cluster creation time as fallback..."
+            LAST_RUN_TIME=$(ibmcloud oc cluster get --cluster "${CLUSTER_NAME}" --output json 2>/dev/null \
+              | jq -r '.createdDate // empty')
+            if [[ -n "${LAST_RUN_TIME}" ]]; then
+              echo "Using cluster creation time: ${LAST_RUN_TIME}"
+            else
+              echo "Cannot determine last activity time, skipping teardown for safety"
+              echo "recent_activity=true" >> "$GITHUB_OUTPUT"
+              echo "reason=Cannot determine last activity timestamp" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+          fi
+
+          echo "Last activity: ${LAST_RUN_TIME}"
+
+          LAST_EPOCH=$(date -d "${LAST_RUN_TIME}" +%s)
+          IDLE_MINUTES=$(( ($(date +%s) - LAST_EPOCH) / 60 ))
+          echo "Idle for ${IDLE_MINUTES} minutes (threshold: ${IDLE_THRESHOLD_MINUTES} minutes)"
+
+          if [[ ${IDLE_MINUTES} -ge ${IDLE_THRESHOLD_MINUTES} ]]; then
+            echo "recent_activity=false" >> "$GITHUB_OUTPUT"
+            echo "reason=CI jobs have been idle for ${IDLE_MINUTES} minutes (threshold: ${IDLE_THRESHOLD_MINUTES})" >> "$GITHUB_OUTPUT"
+          else
+            REMAINING=$((IDLE_THRESHOLD_MINUTES - IDLE_MINUTES))
+            echo "recent_activity=true" >> "$GITHUB_OUTPUT"
+            echo "reason=CI jobs last ran ${IDLE_MINUTES} minutes ago, ${REMAINING} minutes remaining before threshold" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Check if cluster exists
+        id: check_cluster
+        if: steps.check_idle.outputs.recent_activity == 'false'
+        run: |
+          if ibmcloud oc cluster get --cluster "${CLUSTER_NAME}" &>/dev/null; then
+            STATE=$(ibmcloud oc cluster get --cluster "${CLUSTER_NAME}" --output json 2>/dev/null | jq -r '.state // "unknown"')
+            echo "Cluster '${CLUSTER_NAME}' exists (state: ${STATE})"
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Cluster '${CLUSTER_NAME}' does not exist, nothing to do"
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Trigger teardown
+        if: steps.check_idle.outputs.recent_activity == 'false' && steps.check_cluster.outputs.exists == 'true'
+        uses: actions/github-script@v8
+        with:
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'ibmc-cluster-teardown.yml',
+              ref: context.ref,
+              inputs: {
+                cluster_name: '${{ env.CLUSTER_NAME }}'
+              }
+            });
+            core.info('Teardown workflow triggered for cluster ${{ env.CLUSTER_NAME }}');
+
+      - name: Summary
+        if: always()
+        env:
+          CLUSTER_EXISTS: ${{ steps.check_cluster.outputs.exists }}
+          WORKFLOW_ACTIVE_JOBS: ${{ steps.check_ci.outputs.active_jobs }}
+          WORKFLOW_LAST_RUN_TIME: ${{ steps.check_ci.outputs.last_run_time }}
+          IDLE_RECENT_ACTIVITY: ${{ steps.check_idle.outputs.recent_activity }}
+          IDLE_REASON: ${{ steps.check_idle.outputs.reason }}
+        run: |
+          echo "## Auto-Teardown Check" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Check | Result |" >> "$GITHUB_STEP_SUMMARY"
+          echo "|-------|--------|" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Cluster | \`${CLUSTER_NAME}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Cluster Exists | \`${CLUSTER_EXISTS:-(unknown)}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Workflow Active Jobs? | \`${WORKFLOW_ACTIVE_JOBS:-N/A}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Workflow Last Run Time | \`${WORKFLOW_LAST_RUN_TIME:-N/A}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Idle Recent Activity? | \`${IDLE_RECENT_ACTIVITY:-N/A}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Idle Reason | \`${IDLE_REASON:-N/A}\` |" >> "$GITHUB_STEP_SUMMARY"

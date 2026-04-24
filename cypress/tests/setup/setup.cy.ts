@@ -5,7 +5,7 @@ import { manageKeysText, useExisting } from '../../views/selector-catalog';
 
 function configureSSHSecret() {
   cy.byLegacyTestID('select-project-toggle').click();
-  cy.byLegacyTestID(`select-option-${TEST_NS}`).click({ force: true });
+  cy.get(`[data-test-id="select-option-${TEST_NS}"] button`).click();
   cy.get('button.project-ssh-row__secret-name').click();
   cy.get(useExisting).click();
   cy.contains('Select secret').click();

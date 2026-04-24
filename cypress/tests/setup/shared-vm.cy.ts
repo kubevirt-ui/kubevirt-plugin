@@ -29,7 +29,7 @@ function verifyCloudInitCredentials(username: string, password: string) {
   cy.contains('.pf-v6-c-clipboard-copy', password).should('be.visible');
 }
 
-const VM_NAMES = [VM_IT_CUST.name, VM_TMPL_CUST.name];
+const VMS = [VM_IT_CUST, VM_TMPL_CUST];
 
 describe('Create customized VMs from InstanceType/Template', () => {
   before(() => {
@@ -39,7 +39,7 @@ describe('Create customized VMs from InstanceType/Template', () => {
   });
 
   after(() => {
-    cy.stopVM(VM_NAMES);
+    cy.stopVM(VMS);
   });
 
   describe('Custom VM from InstanceType', () => {

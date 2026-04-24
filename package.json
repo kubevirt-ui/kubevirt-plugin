@@ -35,7 +35,6 @@
     "js-abbreviation-number": "^1.4.0",
     "js-yaml": "^4.1.1",
     "lodash": "^4.18.1",
-    "mochawesome-report-generator": "^6.2.0",
     "murmurhash-js": "1.0.0",
     "randexp": "^0.5.3",
     "react": "17.0.2",
@@ -70,6 +69,7 @@
     "zustand": "^4.3.7"
   },
   "devDependencies": {
+    "@bahmutov/cypress-esbuild-preprocessor": "^2.2.8",
     "@cypress/webpack-preprocessor": "^6.0.2",
     "@openshift-console/dynamic-plugin-sdk": "4.21.0",
     "@openshift-console/dynamic-plugin-sdk-internal": "4.21.0",
@@ -88,7 +88,8 @@
     "css-loader": "^6.11.0",
     "cypress": "^14.3.x",
     "cypress-multi-reporters": "^1.5.0",
-    "esbuild-loader": "^4.4.1",
+    "esbuild": "^0.28.0",
+    "esbuild-loader": "^4.4.3",
     "eslint": "^8.57.1",
     "eslint-config-prettier": "^8.5.0",
     "eslint-import-resolver-typescript": "^3.10.1",
@@ -113,6 +114,7 @@
     "mocha-junit-reporter": "^2.0.2",
     "mochawesome": "^7.0.1",
     "mochawesome-merge": "^4.2.1",
+    "mochawesome-report-generator": "^6.2.0",
     "pluralize": "^8.0.0",
     "prettier": "^2.5.1",
     "process": "^0.11.10",
@@ -182,9 +184,9 @@
     "start-console-with-nmstate": "./start-console.sh nmstate-console-plugin",
     "test": "jest",
     "test-cov": "jest --coverage",
-    "test-cypress": "cd cypress && ../node_modules/cypress/bin/cypress open --config-file ./cypress.config.js --env openshift=true",
-    "test-cypress-docker": "echo 'visit http://localhost:10000' && cd cypress && DISPLAY=:14 LIBGL_ALWAYS_INDIRECT=0 cypress open --config-file ./cypress.config.js --env openshift=true",
-    "test-cypress-headless": "cd cypress && node --max-old-space-size=4096 ../node_modules/cypress/bin/cypress run --config-file ./cypress.config.js --env openshift=true --headless",
+    "test-cypress": "cd cypress && cypress open --e2e --config-file ./cypress.config.js --env openshift=true",
+    "test-cypress-docker": "echo 'visit http://localhost:10000' && cd cypress && DISPLAY=:14 LIBGL_ALWAYS_INDIRECT=0 cypress open --e2e --config-file ./cypress.config.js --env openshift=true",
+    "test-cypress-headless": "cd cypress && cypress run --e2e --config-file ./cypress.config.js --env openshift=true",
     "ts-node": "ts-node -O '{\"module\":\"commonjs\"}'"
   },
   "version": "0.0.0"

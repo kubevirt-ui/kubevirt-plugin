@@ -6,6 +6,7 @@ import {
   QUICK_VM_IT_NAME,
   QUICK_VM_TMPL_NAME,
   TEST_NS,
+  TEST_SECRET_NAME,
 } from './index';
 import { TEMPLATE } from './template';
 
@@ -38,7 +39,7 @@ export const VM_TMPL_CUST: VirtualMachineData = {
   cloudInitPwd: 'set-own-pwd',
   cloudInitUname: 'cnv-test',
   description: 'Customized VM from Template',
-  existSecret: 'auto-test-secret',
+  existSecret: TEST_SECRET_NAME,
   hostname: 'vm-template-host',
   name: CUST_VM_TMPL_NAME,
   namespace: TEST_NS,
