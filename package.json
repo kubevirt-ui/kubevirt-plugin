@@ -69,9 +69,9 @@
   },
   "devDependencies": {
     "@cypress/webpack-preprocessor": "^6.0.2",
-    "@openshift-console/dynamic-plugin-sdk": "4.22.0-prerelease.2",
-    "@openshift-console/dynamic-plugin-sdk-internal": "4.22.0-prerelease.2",
-    "@openshift-console/dynamic-plugin-sdk-webpack": "4.22.0-prerelease.2",
+    "@openshift-console/dynamic-plugin-sdk": "4.22.0-prerelease.3",
+    "@openshift-console/dynamic-plugin-sdk-internal": "4.22.0-prerelease.3",
+    "@openshift-console/dynamic-plugin-sdk-webpack": "4.22.0-prerelease.3",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.1",
@@ -143,7 +143,7 @@
   "name": "kubevirt-plugin",
   "overrides": {
     "@stolostron/multicluster-sdk": {
-      "@openshift-console/dynamic-plugin-sdk": "4.22.0-prerelease.2",
+      "@openshift-console/dynamic-plugin-sdk": "4.22.0-prerelease.3",
       "react-i18next": "~16.5.8"
     },
     "eslint": "^8.57.1",
