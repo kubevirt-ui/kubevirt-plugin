@@ -137,7 +137,8 @@ export const fillInstanceType = (vmData: VirtualMachineData) => {
     cy.clickSaveBtn();
     cy.contains(newSecretName).should('exist');
   }
-  cy.get(iView.vmName).clear().type(name);
+  cy.get(iView.vmName).clear();
+  cy.get(iView.vmName).type(name);
   if (folder) {
     cy.get(iView.vmDetails).within(() => {
       cy.get(iView.vmFolder).type(folder);
@@ -367,9 +368,21 @@ export const fillInitialRun = (vmData: VirtualMachineData) => {
 };
 
 export const customizeIT = (vmData: VirtualMachineData) => {
-  cy.contains(iView.volName, vmData.volume).click();
-  cy.get(iView.vmName).clear().type(vmData.name);
-  cy.byButtonText('Customize VirtualMachine').click();
+  cy.contains(iView.volName, vmData.volume).scrollIntoView().click();
+
+  // Verify volume selection registered; retry click if row is not selected
+  cy.contains(iView.volName, vmData.volume)
+    .closest('tr')
+    .then(($row) => {
+      if (!$row.hasClass('pf-m-selected')) {
+        cy.wrap($row).click({ force: true });
+      }
+    });
+  cy.contains(iView.volName, vmData.volume).closest('tr').should('have.class', 'pf-m-selected');
+
+  cy.get(iView.vmName).clear();
+  cy.get(iView.vmName).type(vmData.name);
+  cy.byButtonText('Customize VirtualMachine', { timeout: 120000 }).should('be.enabled').click();
   fillDetails(vmData);
   addDisks(vmData);
   addNics(vmData);

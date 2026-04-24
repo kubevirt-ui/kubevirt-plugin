@@ -1,10 +1,4 @@
-import {
-  ALL_NAMESPACES_KEY,
-  ALL_PROJ_NS,
-  SINGLE_CLUSTER_KEY,
-  TEST_NS,
-  TREEVIEW_ROOT_ID,
-} from '../utils/const/index';
+import { ALL_PROJ_NS, TEST_NS } from '../utils/const/index';
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
@@ -36,12 +30,32 @@ Cypress.Commands.add('selectTestProject', () => {
   cy.selectProject(TEST_NS);
 });
 
+// Switches project by rewriting the URL namespace segment, preserving the current resource type.
+// Only the first resource path segment is kept (e.g. /k8s/ns/<ns>/<resource>);
+// deeper sub-paths (VM detail pages, tabs) are dropped intentionally.
 Cypress.Commands.add('switchProjectUsingTreeView', (projectName: string) => {
-  if (projectName === ALL_PROJ_NS) {
-    cy.get(`li[id="${ALL_NAMESPACES_KEY}"]`).click();
-  } else {
-    cy.get(`li[id="projectSelector/${SINGLE_CLUSTER_KEY}/${projectName}"]`).click();
-  }
+  cy.url().then((currentUrl) => {
+    const url = new URL(currentUrl);
+    const path = url.pathname;
+    const nsSegment = projectName === ALL_PROJ_NS ? 'all-namespaces' : `ns/${projectName}`;
+
+    let resource: string;
+    if (path.includes('/fleet-virtualization/')) {
+      const match = path.match(/\/fleet-virtualization\/([^/]+)/);
+      resource = match?.[1] ?? 'kubevirt.io~v1~VirtualMachine';
+    } else {
+      // Standard pattern: /k8s/ns/<ns>/<resource>/... or /k8s/all-namespaces/<resource>/...
+      const match = path.match(/\/k8s\/(?:ns\/[^/]+|all-namespaces)\/([^/]+)/);
+      resource = match?.[1] ?? 'kubevirt.io~v1~VirtualMachine';
+    }
+    const newPath = `/k8s/${nsSegment}/${resource}`;
+
+    cy.visit(newPath + url.search + url.hash, {
+      onBeforeLoad(win) {
+        win.localStorage.setItem('showEmptyProjects', 'show');
+      },
+    });
+  });
 });
 
 Cypress.Commands.add('switchProject', (projectName: string) => {
@@ -51,17 +65,5 @@ Cypress.Commands.add('switchProject', (projectName: string) => {
     );
   }
   const name = typeof projectName === 'string' ? projectName : String(projectName);
-  cy.get('body').then(($body) => {
-    const hasTreeView = $body.find(TREEVIEW_ROOT_ID).length > 0;
-    const nsBarHidden = $body.find('.co-namespace-bar').css('display') === 'none';
-
-    if (hasTreeView || nsBarHidden) {
-      cy.get(TREEVIEW_ROOT_ID, { timeout: 30000 });
-      cy.switchProjectUsingTreeView(name);
-    } else {
-      cy.byLegacyTestID('namespace-bar-dropdown').contains('Project:').click();
-      cy.byTestID('showSystemSwitch').check();
-      cy.byTestID('dropdown-menu-item-link').contains(name).click();
-    }
-  });
+  cy.switchProjectUsingTreeView(name);
 });

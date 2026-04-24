@@ -88,7 +88,8 @@ export const fillReviewAndCreate = (vmData: VirtualMachineData) => {
   if (mountWinDriver !== undefined && mountWinDriver === false) {
     cy.get(cView.winDrivers).uncheck();
   }
-  cy.get(cView.vmName).clear().type(name);
+  cy.get(cView.vmName).clear();
+  cy.get(cView.vmName).type(name);
   if (cpu) {
     cy.get(cView.editCPU).click();
     cy.get(cpuInput).clear().type(cpu);

@@ -73,14 +73,17 @@ Cypress.Commands.add(
 
 Cypress.Commands.add('patchVM', (vmName: string, status: string) => {
   cy.exec(
-    `oc patch virtualmachine ${vmName} --type merge -p '{"spec":{"runStrategy":"${status}"}}'`,
+    `oc patch virtualmachine ${vmName} -n ${TEST_NS} --type merge -p '{"spec":{"runStrategy":"${status}"}}'`,
+    { failOnNonZeroExit: false },
   );
 });
 
 Cypress.Commands.add('startVM', (vms: string[]) => {
   vms.forEach((vmName) => {
     cy.patchVM(vmName, 'Always');
-    cy.exec(`oc wait --for=condition=ready vm/${vmName} --timeout=300s`, { timeout: 300000 });
+    cy.exec(`oc wait --for=condition=ready vm/${vmName} -n ${TEST_NS} --timeout=300s`, {
+      timeout: 300000,
+    });
   });
 });
 
@@ -95,20 +98,15 @@ Cypress.Commands.add('switchToVirt', () => {
 });
 
 Cypress.Commands.add('beforeSpec', () => {
-  cy.visit('');
-  cy.get('[data-test="username"]', { timeout: 180000 }).should('exist');
-  cy.wait(15000); // wait here because page refresh might happen
+  cy.login();
   cy.switchToVirt();
-  cy.get('[data-test-id="virtualmachines-nav-item"]', { timeout: 300000 })
-    .should('be.visible')
-    .click();
-  cy.byTestID('vm-list-tab', { timeout: 180000 }).should('be.visible');
+  cy.visitVMsVirt();
 });
 
 Cypress.Commands.add('deleteVM', (vms: string[]) => {
   vms.forEach((vmName) => {
     cy.exec(
-      `oc delete --ignore-not-found=true --cascade ${K8S_KIND.VM} ${vmName} --wait=true --timeout=180s`,
+      `oc delete --ignore-not-found=true --cascade ${K8S_KIND.VM} ${vmName} -n ${TEST_NS} --wait=true --timeout=180s`,
       { failOnNonZeroExit: false, timeout: 1800000 },
     );
   });

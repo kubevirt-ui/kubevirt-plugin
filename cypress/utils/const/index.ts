@@ -1,12 +1,18 @@
 export const dsIT = Cypress.env('DOWNSTREAM') ? it : xit;
-export const QUICK_VM_IT_NAME = 'vm-it-quick';
-export const CUST_VM_IT_NAME = 'vm-it-custom';
-export const QUICK_VM_TMPL_NAME = 'vm-template-quick';
-export const CUST_VM_TMPL_NAME = 'vm-template-custom';
 export const TEST_NS = Cypress.env('TEST_NS');
+if (!TEST_NS || !/^[a-z0-9]([a-z0-9-]*[a-z0-9])?$/.test(TEST_NS)) {
+  throw new Error(
+    `TEST_NS must be a valid Kubernetes namespace (got: "${TEST_NS}"). ` +
+      'Set Cypress env variable TEST_NS before running tests.',
+  );
+}
+export const QUICK_VM_IT_NAME = `${TEST_NS}-vm-it-quick`;
+export const CUST_VM_IT_NAME = `${TEST_NS}-vm-it-custom`;
+export const QUICK_VM_TMPL_NAME = `${TEST_NS}-vm-template-quick`;
+export const CUST_VM_TMPL_NAME = `${TEST_NS}-vm-template-custom`;
 export const OCP_NS = 'openshift'; // use default can reduce flaky
 export const TEST_PVC_NAME = 'auto-test-pvc';
-export const DEFAULT_VM_NAME = 'example';
+export const DEFAULT_VM_NAME = `${TEST_NS}-example`;
 export const DEFAULT_TEMPLATE_NAME = 'example';
 export const OS_IMAGES_NS = Cypress.env('OS_IMAGES_NS');
 export const CNV_NS = Cypress.env('CNV_NS');
@@ -17,6 +23,8 @@ export const YAML_MP_NAME = 'example';
 export const LOCAL_IMAGE = Cypress.env('LOCAL_IMAGE');
 export const ARTIFACTORY_SERVER = Cypress.env('ARTIFACTORY_SERVER');
 export const ARTIFACTORY_PATH = Cypress.env('ARTIFACTORY_PATH');
+export const RHEL_GUEST_IMAGE =
+  Cypress.env('RHEL_GUEST_IMAGE') || 'registry.redhat.io/rhel10/rhel-guest-image';
 export const CIRROS_IMAGE = Cypress.env('CIRROS_IMAGE');
 export const URL_IMAGE = `https://${ARTIFACTORY_SERVER}/${ARTIFACTORY_PATH}/cnv-tests/rhel-images/rhel-92.qcow2`;
 export const CONTAINER_IMAGE = 'quay.io/containerdisks/fedora:latest';

@@ -1,4 +1,11 @@
-import { ALL_PROJ_NS, MINUTE, SECOND, TEST_NS, VM_STATUS } from '../../utils/const/index';
+import {
+  ALL_PROJ_NS,
+  DEFAULT_VM_NAME,
+  MINUTE,
+  SECOND,
+  TEST_NS,
+  VM_STATUS,
+} from '../../utils/const/index';
 import { Example, YAML } from '../../utils/const/string';
 import { TEMPLATE } from '../../utils/const/template';
 import * as sel from '../../views/selector';
@@ -7,13 +14,23 @@ import { navigateToConfigurationSubTab, subTabName, tab } from '../../views/tab'
 
 describe('Check all virtualization pages can be loaded', () => {
   before(() => {
+    const cleanup = [
+      `oc delete template ${Example} -n ${TEST_NS} --ignore-not-found`,
+      `oc delete virtualmachineclusterinstancetype ${Example} --ignore-not-found`,
+      `oc delete virtualmachineinstancetype ${Example} -n ${TEST_NS} --ignore-not-found`,
+      `oc delete datasource ${Example} -n ${TEST_NS} --ignore-not-found`,
+      `oc delete datavolume ${Example} -n ${TEST_NS} --ignore-not-found`,
+      `oc delete migrationpolicy ${Example} --ignore-not-found`,
+    ];
+    cleanup.forEach((cmd) => cy.exec(cmd, { failOnNonZeroExit: false }));
+
     cy.beforeSpec();
-    cy.visitVMsVirt();
+    cy.switchProject(TEST_NS);
   });
 
   describe('Check VirtualMachines page', () => {
     it('start example vm', () => {
-      cy.byLegacyTestID(Example).click();
+      cy.byLegacyTestID(DEFAULT_VM_NAME).click();
       cy.get(sel.iconStartBtn, { timeout: MINUTE }).click();
       cy.wait(15 * SECOND);
     });
@@ -80,7 +97,7 @@ describe('Check all virtualization pages can be loaded', () => {
     it('vmi tabs are loaded', () => {
       tab.navigateToOverview();
       cy.contains('VirtualMachineInstance').should('be.visible');
-      cy.byLegacyTestID(Example).click();
+      cy.byLegacyTestID(DEFAULT_VM_NAME).click();
 
       cy.contains('Annotations').should('be.visible');
 
@@ -106,7 +123,7 @@ describe('Check all virtualization pages can be loaded', () => {
 
   describe('Check Templates page', () => {
     it('visit template page', () => {
-      cy.visitTemplates();
+      cy.visitTemplatesVirt();
       cy.switchProject(ALL_PROJ_NS);
     });
 
@@ -139,6 +156,7 @@ describe('Check all virtualization pages can be loaded', () => {
     it('create example template', () => {
       cy.switchProject(TEST_NS);
       cy.get(sel.itemCreateBtn).click();
+      cy.contains('name: example', { timeout: 30000 }).should('be.visible');
       cy.get(sel.saveBtn).click();
     });
 
@@ -167,12 +185,13 @@ describe('Check all virtualization pages can be loaded', () => {
 
   describe('Check InstanceTypes tabs', () => {
     it('instanceTypes page is loaded', () => {
-      cy.visitITs();
+      cy.visitITsVirt();
       cy.contains('cx1.2xlarge').should('exist');
     });
 
     it('create VirtualMachineClusterInstanceType from YAML', () => {
       cy.get('div.co-m-list').find(sel.itemCreateBtn).eq(0).click();
+      cy.contains('name: example', { timeout: 30000 }).should('be.visible');
       cy.get(sel.saveBtn).click();
       cy.get(sel.breadcrumb).click();
       cy.get(sel.nameFilter).first().type(Example);
@@ -184,6 +203,7 @@ describe('Check all virtualization pages can be loaded', () => {
       cy.contains('span.pf-v6-c-tabs__item-text', userButtonTxt).click();
       cy.switchProject(TEST_NS);
       cy.get(sel.itemCreateBtn).click();
+      cy.contains('name: example', { timeout: 30000 }).should('be.visible');
       cy.get(sel.saveBtn).click();
       cy.get(sel.breadcrumb).click();
       cy.byLegacyTestID(Example).should('exist');
@@ -192,7 +212,7 @@ describe('Check all virtualization pages can be loaded', () => {
 
   describe('Check Bootable volumes page', () => {
     it('bootable volume page is loaded', () => {
-      cy.visitVolumes();
+      cy.visitVolumesVirt();
       cy.switchProject(ALL_PROJ_NS);
       cy.contains('fedora').should('exist');
     });
@@ -202,6 +222,7 @@ describe('Check all virtualization pages can be loaded', () => {
       cy.wait(3000);
       cy.get(sel.itemCreateBtn).click();
       cy.byButtonText(YAML).click();
+      cy.contains('name: example', { timeout: 30000 }).should('be.visible');
       cy.get(sel.saveBtn).click();
       cy.byLegacyTestID(Example).should('exist');
     });
@@ -209,13 +230,14 @@ describe('Check all virtualization pages can be loaded', () => {
 
   describe('Check MigrationPolicies page', () => {
     it('migration policy page is loaded', () => {
-      cy.visitMPs();
+      cy.visitMPsVirt();
       cy.contains('No MigrationPolicies found').should('exist');
     });
 
     it('create migration policy from YAML', () => {
       cy.get(sel.itemCreateBtn).click();
       cy.byButtonText(YAML).click();
+      cy.contains('name: example', { timeout: 30000 }).should('be.visible');
       cy.get(sel.saveBtn).click();
       cy.get('.pf-v6-c-breadcrumb__item').eq(0).click();
       cy.byLegacyTestID(Example).should('exist');
@@ -224,7 +246,7 @@ describe('Check all virtualization pages can be loaded', () => {
 
   describe('Check Checkups tabs', () => {
     it('storage checkup pages is loaded', () => {
-      cy.visitCheckups();
+      cy.visitCheckupsVirt();
       cy.contains('.pf-v6-c-tabs__item-text', 'Storage').click();
       cy.contains('No storage checkups found').should('exist');
     });
