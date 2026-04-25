@@ -10,7 +10,7 @@ import { PasteParams } from '../AccessConsoles/utils/accessConsoles';
 import { ConsoleState, SERIAL_CONSOLE_TYPE, WS, WSS } from '../utils/ConsoleConsts';
 import { ConsoleComponentState } from '../utils/types';
 
-import { addResizeListener, createURL, removeResizeListenerIfExists } from './utils/serialConsole';
+import { addResizeObserver, createURL, removeResizeObserver } from './utils/serialConsole';
 import { addSocketListener, BlobOnlyAttachAddon } from './BlobOnlyAttachAddon';
 
 import '@xterm/xterm/css/xterm.css';
@@ -23,7 +23,7 @@ type SerialConsoleConnectorProps = {
 const SerialConsole: FC<SerialConsoleConnectorProps> = ({ basePath, setState }) => {
   const xtermRef = useRef<Terminal>(null);
   const terminalRef = useRef(null);
-  const resizeListenerRef = useRef(null);
+  const resizeObserverRef = useRef<ResizeObserver>(null);
   const setSerialState = useCallback(
     (producer: (state: ConsoleComponentState) => Partial<ConsoleComponentState>) =>
       setState((oldState) =>
@@ -33,7 +33,8 @@ const SerialConsole: FC<SerialConsoleConnectorProps> = ({ basePath, setState }) 
   );
 
   const disconnect = useCallback(() => {
-    removeResizeListenerIfExists(resizeListenerRef.current);
+    removeResizeObserver(resizeObserverRef.current);
+    resizeObserverRef.current = null;
     if (!xtermRef.current) {
       return;
     }
@@ -68,9 +69,11 @@ const SerialConsole: FC<SerialConsoleConnectorProps> = ({ basePath, setState }) 
         }));
         terminal.open(terminalRef.current);
         terminal.focus();
-        removeResizeListenerIfExists(resizeListenerRef.current);
-        resizeListenerRef.current = addResizeListener(fitAddon.fit.bind(fitAddon));
-        fitAddon.fit();
+        removeResizeObserver(resizeObserverRef.current);
+        resizeObserverRef.current = addResizeObserver(
+          terminalRef.current,
+          fitAddon.fit.bind(fitAddon),
+        );
       }),
       addSocketListener(ws, 'close', () => {
         disconnect();
