@@ -1,5 +1,5 @@
 import React, { FC } from 'react';
-import { useLocation } from 'react-router';
+import { useLocation, useParams } from 'react-router';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import DetailsPageTitle from '@kubevirt-utils/components/DetailsPageTitle/DetailsPageTitle';
@@ -37,9 +37,10 @@ const VirtualMachineNavPageTitle: FC<VirtualMachineNavPageTitleProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const location = useLocation();
+  const params = useParams<{ name: string; ns: string }>();
 
-  const name = getName(vm);
-  const namespace = getNamespace(vm);
+  const name = getName(vm) ?? params.name;
+  const namespace = getNamespace(vm) ?? params.ns;
   const cluster = useClusterParam();
 
   const { vmi } = useVMI(name, namespace, cluster, isRunning(vm));
