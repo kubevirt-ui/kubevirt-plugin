@@ -7,6 +7,7 @@ import { CLONING_STATUSES } from '@kubevirt-utils/components/CloneVMModal/utils/
 import { cloneVM, vmExists } from '@kubevirt-utils/components/CloneVMModal/utils/helpers';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
+import { RUNSTRATEGY_HALTED } from '@kubevirt-utils/resources/vm/utils/constants';
 import { vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { getVMURL } from '@multicluster/urls';
@@ -17,13 +18,7 @@ type UseCloneVM = () => () => Promise<void>;
 const useCloneVM: UseCloneVM = () => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
-  const {
-    cloneVMDescription,
-    cloneVMName,
-    cluster,
-    project: targetNamespace,
-    startVM: startCloneVM,
-  } = useVMWizardStore();
+  const { cloneVMDescription, cloneVMName, cluster, project: targetNamespace } = useVMWizardStore();
 
   const source = vmSignal.value;
 
@@ -52,7 +47,7 @@ const useCloneVM: UseCloneVM = () => {
       source,
       cloneVMName,
       targetNamespace,
-      startCloneVM,
+      vmSignal.value?.spec?.runStrategy !== RUNSTRATEGY_HALTED,
       cloneVMDescription,
     );
 
