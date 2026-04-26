@@ -38,6 +38,7 @@ const useInstanceTypeVMStore = create<InstanceTypeVMStore>()((set) => {
           draftState.selectedSize = size;
         }),
       ),
+    resetInstanceTypeVMState: () => set({ ...initialInstanceTypeVMState }),
     setDVSource: (dvSource: V1beta1DataVolume) =>
       set({
         dvSource,
