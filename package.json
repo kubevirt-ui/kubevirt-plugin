@@ -141,6 +141,8 @@
   "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e",
   "private": true,
   "resolutions": {
+    "@openshift-console/dynamic-plugin-sdk-internal/immutable": "^3.8.3",
+    "@openshift-console/dynamic-plugin-sdk/immutable": "^3.8.3",
     "@types/react": "^17.0.40",
     "@types/react-dom": "^17.0.0",
     "delaunator": "4.0.1"
