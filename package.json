@@ -173,6 +173,8 @@
   },
   "resolutions": {
     "webpack": "^5.68.0",
-    "@types/react": "17.0.40"
+    "@types/react": "17.0.40",
+    "@openshift-console/dynamic-plugin-sdk/immutable": "^3.8.3",
+    "@openshift-console/dynamic-plugin-sdk-internal/immutable": "^3.8.3"
   }
 }
