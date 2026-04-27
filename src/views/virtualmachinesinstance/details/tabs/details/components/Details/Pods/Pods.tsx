@@ -1,9 +1,10 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { usePods } from '@kubevirt-utils/hooks/usePods';
 import { modelToGroupVersionKind, PodModel } from '@kubevirt-utils/models';
 import { getName, getNamespace, getUID } from '@kubevirt-utils/resources/shared';
+import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm';
 import { getVMIPod } from '@kubevirt-utils/resources/vmi';
 import MulticlusterResourceLink from '@multicluster/components/MulticlusterResourceLink/MulticlusterResourceLink';
 import { getCluster } from '@multicluster/helpers/selectors';
@@ -12,7 +13,7 @@ type PodsProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const Pods: React.FCC<PodsProps> = ({ vmi }) => {
+const Pods: FC<PodsProps> = ({ vmi }) => {
   const [pods] = usePods(getNamespace(vmi), getCluster(vmi));
   const vmiPod = getVMIPod(vmi, pods);
   return vmiPod ? (
@@ -24,7 +25,7 @@ const Pods: React.FCC<PodsProps> = ({ vmi }) => {
       namespace={getNamespace(vmiPod)}
     />
   ) : (
-    <>-</>
+    <>{NO_DATA_DASH}</>
   );
 };
 

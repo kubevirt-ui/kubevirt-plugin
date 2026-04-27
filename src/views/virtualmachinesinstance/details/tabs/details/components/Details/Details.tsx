@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 
 import { VirtualMachineInstanceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { VirtualMachineModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -43,7 +43,7 @@ type DetailsProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const Details: React.FCC<DetailsProps> = ({ pathname, vmi }) => {
+const Details: FC<DetailsProps> = ({ pathname, vmi }) => {
   const { t } = useKubevirtTranslation();
   const [guestAgentData, loadedGuestAgent] = useGuestOS(vmi);
   const [vm] = useK8sWatchData<V1VirtualMachine>({

@@ -225,7 +225,7 @@ Patterns and conventions for React components in this project.
 
 ## 9. Performance
 
-### React.memo
+### memo
 - Components receiving stable props
 - Expensive render trees
 - List items with stable data

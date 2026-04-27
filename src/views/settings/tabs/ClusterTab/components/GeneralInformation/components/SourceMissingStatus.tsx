@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -6,7 +6,7 @@ import {
   YellowExclamationTriangleIcon,
 } from '@openshift-console/dynamic-plugin-sdk';
 
-const SourceMissingStatus: React.FCC = () => {
+const SourceMissingStatus: FC = () => {
   const { t } = useKubevirtTranslation();
 
   return (

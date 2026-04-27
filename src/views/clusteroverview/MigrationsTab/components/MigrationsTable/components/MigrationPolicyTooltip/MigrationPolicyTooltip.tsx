@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { FC, useMemo } from 'react';
 
 import { MigrationPolicyModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
@@ -20,7 +20,7 @@ type MigrationPolicyTooltipProps = {
   obj: MigrationTableDataLayout;
 };
 
-const MigrationPolicyTooltip: React.FCC<MigrationPolicyTooltipProps> = ({ obj }) => {
+const MigrationPolicyTooltip: FC<MigrationPolicyTooltipProps> = ({ obj }) => {
   const { t } = useKubevirtTranslation();
 
   const { defaultConfig, mpConfig } = useMemo<TooltipObject>(() => {

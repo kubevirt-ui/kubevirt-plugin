@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 
 import { WizardTab } from '@catalog/wizard/tabs';
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';

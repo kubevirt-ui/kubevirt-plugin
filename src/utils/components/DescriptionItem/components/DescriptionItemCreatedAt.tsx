@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import Timestamp from '@kubevirt-utils/components/Timestamp/Timestamp';
@@ -13,7 +13,7 @@ type DescriptionItemCreatedAtProps = {
   resource: K8sResourceCommon;
 };
 
-const DescriptionItemCreatedAt: React.FCC<DescriptionItemCreatedAtProps> = ({
+const DescriptionItemCreatedAt: FC<DescriptionItemCreatedAtProps> = ({
   label,
   model,
   resource,

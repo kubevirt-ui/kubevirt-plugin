@@ -6,7 +6,7 @@ export type DiskSourceOptionGroupItem = {
   description?: string;
   id: SourceTypes;
   isDisabled?: boolean;
-  label: ReactNode | string;
+  label: ReactNode;
 };
 
 export type DiskSourceOptionGroup = {

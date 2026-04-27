@@ -1,4 +1,4 @@
-import React, { Dispatch, FCC, SetStateAction, useState } from 'react';
+import React, { Dispatch, FC, SetStateAction, useState } from 'react';
 
 import DropdownToggle from '@kubevirt-utils/components/toggles/DropdownToggle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -18,7 +18,7 @@ type MigrationPolicyConfigurationDropdownProps = {
   state: EditMigrationPolicyInitialState | InitialMigrationPolicyState;
 };
 
-const MigrationPolicyConfigurationDropdown: FCC<MigrationPolicyConfigurationDropdownProps> = ({
+const MigrationPolicyConfigurationDropdown: FC<MigrationPolicyConfigurationDropdownProps> = ({
   isDisabled,
   options,
   setState,

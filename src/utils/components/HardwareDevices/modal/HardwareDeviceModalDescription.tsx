@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 import { Trans } from 'react-i18next';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -9,7 +9,7 @@ import { HARDWARE_DEVICE_TYPE } from '../utils/constants';
 type HardwareDevicesModalProps = {
   type: HARDWARE_DEVICE_TYPE.GPUS | HARDWARE_DEVICE_TYPE.HOST_DEVICES;
 };
-const HardwareDeviceModalDescription: React.FCC<HardwareDevicesModalProps> = ({ type }) => {
+const HardwareDeviceModalDescription: FC<HardwareDevicesModalProps> = ({ type }) => {
   const { t } = useKubevirtTranslation();
 
   return (

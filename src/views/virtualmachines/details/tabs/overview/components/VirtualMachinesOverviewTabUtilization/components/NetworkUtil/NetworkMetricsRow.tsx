@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 import xbytes from 'xbytes';
 
 import { Grid, GridItem } from '@patternfly/react-core';
@@ -8,7 +8,7 @@ type NetworkMetricsRowProps = {
   value: number;
 };
 
-const NetworkMetricsRow: React.FCC<NetworkMetricsRowProps> = ({ label, value }) => {
+const NetworkMetricsRow: FC<NetworkMetricsRowProps> = ({ label, value }) => {
   return (
     <Grid className="pf-v6-u-text-color-subtle">
       <GridItem span={6}>

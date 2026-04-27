@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { YellowExclamationTriangleIcon } from '@openshift-console/dynamic-plugin-sdk';
@@ -8,7 +8,7 @@ type SubscriptionStateUpgradeAvailableProps = {
   operatorLink: string;
 };
 
-const SubscriptionStateUpgradeAvailable: React.FCC<SubscriptionStateUpgradeAvailableProps> = ({
+const SubscriptionStateUpgradeAvailable: FC<SubscriptionStateUpgradeAvailableProps> = ({
   operatorLink,
 }) => {
   const { t } = useKubevirtTranslation();

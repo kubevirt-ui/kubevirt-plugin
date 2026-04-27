@@ -1,4 +1,4 @@
-import React, { FCC, MouseEvent, useCallback, useMemo, useState } from 'react';
+import React, { FC, MouseEvent, useCallback, useMemo, useState } from 'react';
 
 import {
   CategoryDetails,
@@ -42,7 +42,7 @@ type EditBootableVolumesModalProps = {
   source: BootableResource;
 };
 
-const EditBootableVolumesModal: FCC<EditBootableVolumesModalProps> = ({
+const EditBootableVolumesModal: FC<EditBootableVolumesModalProps> = ({
   isOpen,
   onClose,
   preferences,

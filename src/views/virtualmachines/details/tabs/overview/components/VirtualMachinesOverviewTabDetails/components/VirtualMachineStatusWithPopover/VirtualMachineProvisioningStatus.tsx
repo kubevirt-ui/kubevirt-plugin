@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC, ReactNode } from 'react';
 import { Link } from 'react-router';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -13,10 +13,11 @@ import useProvisioningPercentage from '../../../../../../../../../utils/resource
 import './virtualmachine-provisioning-status.scss';
 
 type VirtualMachineProvisioningStatusProps = {
+  children?: ReactNode;
   vm: V1VirtualMachine;
 };
 
-const VirtualMachineProvisioningStatus: FCC<VirtualMachineProvisioningStatusProps> = ({
+const VirtualMachineProvisioningStatus: FC<VirtualMachineProvisioningStatusProps> = ({
   children,
   vm,
 }) => {

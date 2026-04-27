@@ -1,4 +1,4 @@
-import React, { CSSProperties, FCC, useMemo } from 'react';
+import React, { CSSProperties, FC, ReactNode, useMemo } from 'react';
 
 import useIsSmallScreen from '@kubevirt-utils/hooks/useIsSmallScreen';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -34,10 +34,11 @@ import { treeDataMap } from './utils/utils';
 import './VirtualMachineTreeView.scss';
 
 type VirtualMachineTreeViewProps = {
+  children?: ReactNode;
   onFilterChange?: OnFilterChange;
 } & UseTreeViewData;
 
-const VirtualMachineTreeView: FCC<VirtualMachineTreeViewProps> = ({
+const VirtualMachineTreeView: FC<VirtualMachineTreeViewProps> = ({
   children,
   loaded,
   loadError,

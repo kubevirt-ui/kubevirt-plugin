@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 import { Link } from 'react-router';
 
 import './ResourcesInventoryCard.scss';
@@ -9,11 +9,7 @@ type ResourceInventoryItemProps = {
   quantity: number;
 };
 
-const ResourceInventoryItem: React.FCC<ResourceInventoryItemProps> = ({
-  label,
-  path,
-  quantity,
-}) => (
+const ResourceInventoryItem: FC<ResourceInventoryItemProps> = ({ label, path, quantity }) => (
   <div className="resources-inventory-card__resource">
     <Link to={path}>
       <div className="resources-inventory-card__quantity">{quantity}</div>

@@ -4,7 +4,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { EmptyState, EmptyStateBody, Spinner } from '@patternfly/react-core';
 
 type LoadingEmptyStateProps = {
-  bodyContents?: ReactNode | string;
+  bodyContents?: ReactNode;
   iconComponent?: ComponentType;
 };
 

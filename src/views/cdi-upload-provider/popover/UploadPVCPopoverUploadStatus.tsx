@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -25,7 +25,7 @@ type UploadPVCPopoverUploadStatusProps = {
   upload: DataUpload;
 };
 
-const UploadPVCPopoverUploadStatus: React.FCC<UploadPVCPopoverUploadStatusProps> = ({
+const UploadPVCPopoverUploadStatus: FC<UploadPVCPopoverUploadStatusProps> = ({
   error,
   onCancelClick,
   onErrorDeleteSource,

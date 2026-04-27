@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 import { Controller, FieldPath, useFormContext } from 'react-hook-form';
 
 import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -18,7 +18,7 @@ import {
 import { getErrorSnapshotNamespace } from '../../../utils/selectors';
 import { diskSourceSnapshotVolumeNamespaceFieldID } from '../../utils/constants';
 
-const DiskSourceSnapshotVolumeSelectNamespace: FCC = () => {
+const DiskSourceSnapshotVolumeSelectNamespace: FC = () => {
   const { t } = useKubevirtTranslation();
   const {
     control,

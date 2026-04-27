@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
@@ -13,7 +13,7 @@ import VMStatusSection from './utils/vm-status-section/VMStatusSection';
 
 import './InventoryCard.scss';
 
-const InventoryCard: React.FCC = () => {
+const InventoryCard: FC = () => {
   const { t } = useKubevirtTranslation();
   const isAdmin = useIsAdmin();
 

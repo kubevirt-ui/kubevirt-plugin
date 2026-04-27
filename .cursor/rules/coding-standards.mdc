@@ -119,11 +119,11 @@ export default VMCard;
 - Follow the `use` prefix convention
 
 ### Memoization
-- Use `React.memo` for components with stable props but re-rendering parents
+- Use `memo` for components with stable props but re-rendering parents
 - Use `useMemo` for expensive calculations
 - Use `useCallback` for callbacks passed to memoized children
 - Don't over-memoize simple operations
-- Lazy load components with `React.lazy` and `Suspense`
+- Lazy load components with `lazy` and `Suspense`
 
 ### Logic Separation
 - Extract logic from components into custom hooks or utility files

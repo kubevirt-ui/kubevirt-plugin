@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC, useMemo } from 'react';
 
 import { DataImportCronModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1beta1DataImportCron } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
@@ -18,7 +18,7 @@ type DataImportCronPageProps = {
   namespace: string;
 };
 
-const DataImportCronNavPage: React.FCC<DataImportCronPageProps> = ({ name, namespace }) => {
+const DataImportCronNavPage: FC<DataImportCronPageProps> = ({ name, namespace }) => {
   const { t } = useKubevirtTranslation();
   const [dataImportCron, loaded] = useK8sWatchResource<V1beta1DataImportCron>({
     groupVersionKind: DataImportCronModelGroupVersionKind,
@@ -27,7 +27,7 @@ const DataImportCronNavPage: React.FCC<DataImportCronPageProps> = ({ name, names
   });
 
   const { hideYamlTab } = useHideYamlTab();
-  const pages = React.useMemo(
+  const pages = useMemo(
     () =>
       removeYamlTabs(
         [

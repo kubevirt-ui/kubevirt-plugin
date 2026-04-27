@@ -1,4 +1,4 @@
-import React, { Dispatch, FC, memo, useCallback, useEffect, useRef } from 'react';
+import React, { Dispatch, FC, memo, SetStateAction, useCallback, useEffect, useRef } from 'react';
 
 import { ClipboardAddon } from '@xterm/addon-clipboard';
 import { FitAddon } from '@xterm/addon-fit';
@@ -17,7 +17,7 @@ import '@xterm/xterm/css/xterm.css';
 
 type SerialConsoleConnectorProps = {
   basePath: string;
-  setState: Dispatch<React.SetStateAction<ConsoleComponentState>>;
+  setState: Dispatch<SetStateAction<ConsoleComponentState>>;
 };
 
 const SerialConsole: FC<SerialConsoleConnectorProps> = ({ basePath, setState }) => {

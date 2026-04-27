@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 
 import {
   modelToGroupVersionKind,
@@ -26,7 +26,7 @@ const useResourcesQuantities: UseResourcesQuantities = () => {
   const [activeNamespace] = useActiveNamespace();
   const cluster = useClusterParam();
 
-  const namespace = React.useMemo(
+  const namespace = useMemo(
     () => (activeNamespace === ALL_NAMESPACES_SESSION_KEY ? null : activeNamespace),
     [activeNamespace],
   );

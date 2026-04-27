@@ -1,4 +1,4 @@
-import React, { FCC, memo, PropsWithChildren, ReactNode, useMemo } from 'react';
+import React, { FC, memo, PropsWithChildren, ReactNode, useMemo } from 'react';
 
 import { Tooltip } from '@patternfly/react-core';
 
@@ -11,7 +11,7 @@ type EditButtonWithTooltipProps = PropsWithChildren<{
   tooltipContent?: ReactNode;
 }>;
 
-const EditButtonWithTooltip: FCC<EditButtonWithTooltipProps> = ({
+const EditButtonWithTooltip: FC<EditButtonWithTooltipProps> = ({
   children,
   isEditable,
   onEditClick,

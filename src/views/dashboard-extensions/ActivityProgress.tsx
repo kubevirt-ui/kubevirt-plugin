@@ -1,13 +1,14 @@
-import React from 'react';
+import React, { FC, ReactNode } from 'react';
 
 import { Progress, ProgressSize } from '@patternfly/react-core';
 
 type ActivityProgressProps = {
+  children?: ReactNode;
   progress: number;
   title: string;
 };
 
-const ActivityProgress: React.FCC<ActivityProgressProps> = ({ children, progress, title }) => (
+const ActivityProgress: FC<ActivityProgressProps> = ({ children, progress, title }) => (
   <>
     <Progress
       className="co-activity-item__progress"

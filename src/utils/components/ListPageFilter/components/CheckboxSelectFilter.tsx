@@ -1,4 +1,4 @@
-import React, { FCC, ReactNode, useMemo } from 'react';
+import React, { FC, ReactNode, useMemo } from 'react';
 
 import useQuery from '@kubevirt-utils/hooks/useQuery';
 import { SelectProps, ToolbarFilter } from '@patternfly/react-core';
@@ -18,7 +18,7 @@ type CheckboxSelectFilterProps = {
   tooltipContent?: ReactNode;
 };
 
-const CheckboxSelectFilter: FCC<CheckboxSelectFilterProps> = ({
+const CheckboxSelectFilter: FC<CheckboxSelectFilterProps> = ({
   allValues,
   applyFilters: applyFiltersProp,
   badgeNumber,

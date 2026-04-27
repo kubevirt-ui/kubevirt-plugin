@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 
 import { NodeModel, TemplateModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { NetworkAttachmentDefinitionModel } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -14,7 +14,7 @@ import ResourceInventoryItem from './ResourceInventoryItem';
 
 import './ResourcesInventoryCard.scss';
 
-const ResourcesInventoryCard: React.FCC = () => {
+const ResourcesInventoryCard: FC = () => {
   const { t } = useKubevirtTranslation();
   const isAdmin = useIsAdmin();
   const { nads, nodes, vms, vmTemplates } = useResourcesQuantities();

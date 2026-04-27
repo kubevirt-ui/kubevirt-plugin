@@ -1,11 +1,11 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import { MouseEvent, useCallback, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 
 import { OVERVIEW_TAB_INDEX, TAB_INDEX_MAP, TAB_KEY_MAP, VM_LIST_TAB_PARAM } from './constants';
 
 type UseNavigatorTabsResult = {
   activeTabKey: number;
-  handleTabSelect: (event: React.MouseEvent<HTMLElement>, tabIndex: number | string) => void;
+  handleTabSelect: (event: MouseEvent<HTMLElement>, tabIndex: number | string) => void;
 };
 
 const getTabKeyFromSearch = (search: string): number => {
@@ -29,7 +29,7 @@ const useNavigatorTabs = (): UseNavigatorTabsResult => {
   }, [location.search]);
 
   const handleTabSelect = useCallback(
-    (_event: React.MouseEvent<HTMLElement>, tabIndex: number | string) => {
+    (_event: MouseEvent<HTMLElement>, tabIndex: number | string) => {
       const tabValue = TAB_INDEX_MAP[tabIndex as number];
       if (!tabValue) return;
 

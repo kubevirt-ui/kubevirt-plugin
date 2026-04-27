@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 import { Link } from 'react-router';
 
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
@@ -11,9 +11,7 @@ export type GettingStartedLinkExtraContentProps = {
   link: GettingStartedLink;
 };
 
-const GettingStartedLinkExtraContent: React.FCC<GettingStartedLinkExtraContentProps> = ({
-  link,
-}) => {
+const GettingStartedLinkExtraContent: FC<GettingStartedLinkExtraContentProps> = ({ link }) => {
   let ExtraLink = null;
 
   if (link?.secondaryLinkHref) {

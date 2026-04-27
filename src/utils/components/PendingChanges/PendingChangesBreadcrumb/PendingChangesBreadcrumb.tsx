@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Breadcrumb, BreadcrumbHeading, BreadcrumbItem, ListItem } from '@patternfly/react-core';
@@ -9,7 +9,7 @@ type PendingChangesBreadcrumbProps = {
   pendingChanges: PendingChange[];
 };
 
-const PendingChangesBreadcrumb: React.FCC<PendingChangesBreadcrumbProps> = ({ pendingChanges }) => {
+const PendingChangesBreadcrumb: FC<PendingChangesBreadcrumbProps> = ({ pendingChanges }) => {
   if (isEmpty(pendingChanges)) {
     return null;
   }

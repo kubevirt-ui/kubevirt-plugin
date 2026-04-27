@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { FC, useState } from 'react';
 import { Trans } from 'react-i18next';
 
 import { ProjectRequestModel } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -23,7 +23,7 @@ type CreateProjectModalProps = {
   onClose: () => void;
 };
 
-const CreateProjectModal: React.FCC<CreateProjectModalProps> = ({
+const CreateProjectModal: FC<CreateProjectModalProps> = ({
   createdProject,
   initialCluster,
   isOpen,

@@ -1,8 +1,7 @@
-import React, { FCC } from 'react';
+import React, { FC, ReactNode } from 'react';
 
 import restrictedSignImg from '@images/restricted-sign.svg';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   Alert,
   AlertVariant,
@@ -13,10 +12,10 @@ import {
 } from '@patternfly/react-core';
 
 type AccessDeniedProps = {
-  message?: string;
+  message?: ReactNode;
 };
 
-const AccessDenied: FCC<AccessDeniedProps> = ({ message }) => {
+const AccessDenied: FC<AccessDeniedProps> = ({ message }) => {
   const { t } = useKubevirtTranslation();
   return (
     <Panel className="kv-access-denied">
@@ -32,7 +31,7 @@ const AccessDenied: FCC<AccessDeniedProps> = ({ message }) => {
           <div className="pf-v6-u-text-align-center" data-test="msg-box-detail">
             {t("You don't have access to this section due to cluster policy.")}
           </div>
-          {!isEmpty(message) && (
+          {message && (
             <Alert isInline title={t('Error details')} variant={AlertVariant.danger}>
               {message}
             </Alert>

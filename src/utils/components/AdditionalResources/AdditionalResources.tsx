@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 
 import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -12,7 +12,7 @@ type AdditionalResourcesProps = {
   template: V1Template;
 };
 
-const AdditionalResources: React.FCC<AdditionalResourcesProps> = ({ template }) => {
+const AdditionalResources: FC<AdditionalResourcesProps> = ({ template }) => {
   const { t } = useKubevirtTranslation();
 
   const additionalResources: K8sResourceCommon[] = template?.objects?.filter(

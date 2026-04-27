@@ -1,4 +1,4 @@
-import React, { FCC, useState } from 'react';
+import React, { FC, ReactNode, useState } from 'react';
 import { Controller, FieldPath, useFormContext } from 'react-hook-form';
 
 import { V1DiskFormState } from '@kubevirt-utils/components/DiskModal/utils/types';
@@ -15,7 +15,7 @@ import { DiskSourceUploadPVCProgress } from './DiskSourceUploadPVCProgress';
 
 type DiskSourceUploadPVCProps = {
   acceptedFileTypes?: Record<string, string[]>;
-  children?: React.ReactNode;
+  children?: ReactNode;
   handleClearUpload?: () => void;
   handleUpload?: () => void;
   isRequired?: boolean;
@@ -23,7 +23,7 @@ type DiskSourceUploadPVCProps = {
   relevantUpload: DataUpload;
 };
 
-const DiskSourceUploadPVC: FCC<DiskSourceUploadPVCProps> = ({
+const DiskSourceUploadPVC: FC<DiskSourceUploadPVCProps> = ({
   acceptedFileTypes,
   children,
   handleClearUpload,

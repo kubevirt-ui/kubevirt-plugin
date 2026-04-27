@@ -1,6 +1,6 @@
-import React from 'react';
+import { lazy } from 'react';
 
-const CloudInitEditor = React.lazy(() =>
+const CloudInitEditor = lazy(() =>
   import('./CloudInitEditor').then((module) => ({ default: module._CloudInitEditor })),
 );
 

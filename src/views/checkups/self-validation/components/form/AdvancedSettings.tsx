@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 import { Trans } from 'react-i18next';
 
 import { IoK8sApiStorageV1StorageClass } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
@@ -41,7 +41,7 @@ type AdvancedSettingsProps = {
   testSkips: string;
 };
 
-const AdvancedSettings: FCC<AdvancedSettingsProps> = ({
+const AdvancedSettings: FC<AdvancedSettingsProps> = ({
   defaultSC,
   handleStorageCapabilitySelect,
   isDryRun,

@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 
 import TemplateValue from '@kubevirt-utils/components/TemplateValue/TemplateValue';
 import { List, ListComponent, ListItem, OrderType } from '@patternfly/react-core';
@@ -9,7 +9,7 @@ type BootableDevicesListProps = {
   devices: BootableDeviceType[];
 };
 
-const BootableDevicesList: React.FCC<BootableDevicesListProps> = ({ devices }) => (
+const BootableDevicesList: FC<BootableDevicesListProps> = ({ devices }) => (
   <List component={ListComponent.ol} type={OrderType.number}>
     {devices?.map((device) => (
       <ListItem key={`${device?.value?.name}-${device?.value?.bootOrder}`}>

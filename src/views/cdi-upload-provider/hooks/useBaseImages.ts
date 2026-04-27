@@ -1,4 +1,4 @@
-import React from 'react';
+import { useMemo } from 'react';
 
 import {
   modelToGroupVersionKind,
@@ -13,7 +13,7 @@ import { getPVCNamespace } from '../utils/selectors';
 type BaseImages = [V1beta1PersistentVolumeClaim[], boolean, any];
 
 const useBaseImages = (commonTemplates: V1Template[]): BaseImages => {
-  const [pvcWatches] = React.useMemo(() => {
+  const [pvcWatches] = useMemo(() => {
     const namespaces = [
       ...new Set(
         (commonTemplates || []).map((template) => getPVCNamespace(template)).filter((ns) => !!ns),

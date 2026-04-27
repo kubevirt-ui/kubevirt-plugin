@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 import { Link } from 'react-router';
 import { isEmpty } from 'lodash';
 
@@ -20,7 +20,7 @@ type SelectorProps = {
   selector: SelectorKind;
 };
 
-const Requirement: React.FCC<RequirementProps> = ({ kind, namespace = '', requirements }) => {
+const Requirement: FC<RequirementProps> = ({ kind, namespace = '', requirements }) => {
   // Strip off any trailing '=' characters for valueless selectors
   const requirementAsString = selectorToString(requirements).replace(/=,/g, ',').replace(/=$/g, '');
   const requirementAsUrlEncodedString = encodeURIComponent(requirementAsString);
@@ -39,7 +39,7 @@ const Requirement: React.FCC<RequirementProps> = ({ kind, namespace = '', requir
   );
 };
 
-export const Selector: React.FCC<SelectorProps> = ({
+export const Selector: FC<SelectorProps> = ({
   kind = 'Pod',
   namespace = undefined,
   selector = {},

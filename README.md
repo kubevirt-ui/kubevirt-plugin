@@ -86,7 +86,7 @@ OC_PASS=<password>
 You should use the `useKubevirtTranslation` hook as follows:
 
 ```tsx
-conster Header: React.FC = () => {
+conster Header: FC = () => {
   const { t } = useKubevirtTranslation();
   return <h1>{t('Hello, World!')}</h1>;
 };

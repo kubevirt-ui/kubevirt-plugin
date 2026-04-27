@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Content, DescriptionList } from '@patternfly/react-core';
@@ -7,7 +7,7 @@ import { ManualConnectionProps } from '../utils/types';
 
 import Detail from './Detail';
 
-const ManualConnection: React.FunctionComponent<ManualConnectionProps> = ({
+const ManualConnection: FC<ManualConnectionProps> = ({
   rdp = null,
   spice = null,
   textAddress,

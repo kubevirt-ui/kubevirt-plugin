@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC, ReactNode } from 'react';
 
 import {
   FormHelperText,
@@ -10,10 +10,11 @@ import {
 import { ErrorIcon } from '../ErrorIcon/ErrorIcon';
 
 type FormGroupHelperTextProps = {
+  children?: ReactNode;
   validated?: ValidatedOptions;
 };
 
-const FormGroupHelperText: FCC<FormGroupHelperTextProps> = ({
+const FormGroupHelperText: FC<FormGroupHelperTextProps> = ({
   children,
   validated = ValidatedOptions.default,
 }) => (

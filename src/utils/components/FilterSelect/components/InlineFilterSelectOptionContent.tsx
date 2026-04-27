@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
@@ -9,7 +9,7 @@ type InlineFilterSelectOptionContentProps = {
   option: EnhancedSelectOptionProps;
 };
 
-const InlineFilterSelectOptionContent: FCC<InlineFilterSelectOptionContentProps> = ({ option }) =>
+const InlineFilterSelectOptionContent: FC<InlineFilterSelectOptionContentProps> = ({ option }) =>
   !isEmpty(option?.groupVersionKind) ? (
     <ResourceLink
       groupVersionKind={option.groupVersionKind}

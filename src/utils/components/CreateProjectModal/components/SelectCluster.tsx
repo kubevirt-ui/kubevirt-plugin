@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FC, MouseEvent, useState } from 'react';
 
 import SelectToggle from '@kubevirt-utils/components/toggles/SelectToggle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -21,7 +21,7 @@ const SelectCluster: FC<SelectClusterProps> = ({ selectedCluster, setSelectedClu
 
   const onToggle = () => setIsOpen((prevIsOpen) => !prevIsOpen);
 
-  const onSelect = (_?: React.MouseEvent<Element, MouseEvent>, newValue?: string) => {
+  const onSelect = (_?: MouseEvent, newValue?: string) => {
     setSelectedCluster(newValue);
     onToggle();
   };

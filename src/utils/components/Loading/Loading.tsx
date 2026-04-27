@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, memo } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Spinner, SpinnerProps, spinnerSize } from '@patternfly/react-core';
@@ -10,4 +10,4 @@ const Loading: FC<Loading> = ({ size = spinnerSize.md }) => {
   return <Spinner aria-label={t('Loading')} size={size} />;
 };
 
-export default React.memo(Loading);
+export default memo(Loading);

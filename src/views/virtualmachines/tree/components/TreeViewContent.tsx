@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, MouseEvent } from 'react';
 
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import CreateProjectOnboardingPopover from '@kubevirt-utils/components/OnboardingPopover/components/CreateProjectOnboardingPopover';
@@ -31,7 +31,7 @@ type TreeViewContentProps = {
   isOpen: boolean;
   isSmallScreen: boolean;
   loaded: boolean;
-  onSelect: (_event: React.MouseEvent, treeViewItem: TreeViewDataItem) => void;
+  onSelect: (_event: MouseEvent, treeViewItem: TreeViewDataItem) => void;
   selectedTreeItem: TreeViewDataItem;
   toggleDrawer: () => void;
   treeData: TreeViewDataItem[];

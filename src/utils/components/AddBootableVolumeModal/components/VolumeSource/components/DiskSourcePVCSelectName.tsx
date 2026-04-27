@@ -1,4 +1,4 @@
-import React, { Dispatch, FCC, SetStateAction } from 'react';
+import React, { Dispatch, FC, SetStateAction } from 'react';
 
 import {
   modelToGroupVersionKind,
@@ -17,7 +17,7 @@ type DiskSourcePVCSelectNameProps = {
   pvcsLoaded: boolean;
 };
 
-const DiskSourcePVCSelectName: FCC<DiskSourcePVCSelectNameProps> = ({
+const DiskSourcePVCSelectName: FC<DiskSourcePVCSelectNameProps> = ({
   isDisabled,
   onChange,
   pvcNames,

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 import { Link } from 'react-router';
 import xbytes from 'xbytes';
 
@@ -42,7 +42,7 @@ type StorageTotalReadWriteThresholdChartProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const StorageTotalReadWriteThresholdChart: React.FCC<StorageTotalReadWriteThresholdChartProps> = ({
+const StorageTotalReadWriteThresholdChart: FC<StorageTotalReadWriteThresholdChartProps> = ({
   vmi,
 }) => {
   const { currentTime, duration, timespan } = useDuration();

@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { KeyEventMap, KeyEventModes, textInputKeyHandler } from '../constants';
 
@@ -42,7 +42,7 @@ export const useDocumentListener = <T extends HTMLElement>(
     }
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     document.addEventListener('click', handleEvent, true);
     document.addEventListener('keydown', handleKeyEvents, true);
     return () => {

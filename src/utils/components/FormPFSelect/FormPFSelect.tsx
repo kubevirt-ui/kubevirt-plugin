@@ -1,4 +1,4 @@
-import React, { FCC, useState } from 'react';
+import React, { FC, ReactNode, useState } from 'react';
 
 import { MenuToggleProps, Select, SelectList, SelectProps } from '@patternfly/react-core';
 
@@ -7,6 +7,7 @@ import SelectToggle from '../toggles/SelectToggle';
 import './FormPFSelect.scss';
 
 type FormPFSelectProps = Omit<SelectProps, 'isOpen' | 'toggle'> & {
+  children?: ReactNode;
   closeOnSelect?: boolean;
   isDisabled?: boolean;
   placeholder?: string;
@@ -27,7 +28,7 @@ type FormPFSelectProps = Omit<SelectProps, 'isOpen' | 'toggle'> & {
  * @param root0.toggleProps
  * @param root0.placeholder
  */
-const FormPFSelect: FCC<FormPFSelectProps> = ({
+const FormPFSelect: FC<FormPFSelectProps> = ({
   children,
   className,
   closeOnSelect = true,

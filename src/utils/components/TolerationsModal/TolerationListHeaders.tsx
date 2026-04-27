@@ -1,9 +1,9 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Content, ContentVariants, GridItem } from '@patternfly/react-core';
 
-const TolerationListHeaders: React.FCC = () => {
+const TolerationListHeaders: FC = () => {
   const { t } = useKubevirtTranslation();
   return (
     <>

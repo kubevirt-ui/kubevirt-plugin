@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
@@ -12,7 +12,7 @@ type PersistentVolumeSelectProjectProps = {
   selectedProject: string;
 };
 
-export const PersistentVolumeSelectProject: FCC<PersistentVolumeSelectProjectProps> = ({
+export const PersistentVolumeSelectProject: FC<PersistentVolumeSelectProjectProps> = ({
   onChange,
   projectsName,
   selectedProject,

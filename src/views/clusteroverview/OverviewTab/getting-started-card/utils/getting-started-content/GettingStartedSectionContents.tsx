@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC, ReactElement } from 'react';
 
 import {
   Content,
@@ -22,7 +22,7 @@ import './GettingStartedSectionContents.scss';
 
 type GettingStartedSectionContentsProps = {
   description?: string;
-  icon?: React.ReactElement;
+  icon?: ReactElement;
   id: string;
   links: GettingStartedLink[];
   moreLink?: GettingStartedLink;
@@ -30,7 +30,7 @@ type GettingStartedSectionContentsProps = {
   titleColor?: string;
 };
 
-const GettingStartedSectionContents: React.FCC<GettingStartedSectionContentsProps> = ({
+const GettingStartedSectionContents: FC<GettingStartedSectionContentsProps> = ({
   description,
   icon,
   id,

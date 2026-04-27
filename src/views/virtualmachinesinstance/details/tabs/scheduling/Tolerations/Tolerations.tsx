@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -7,7 +7,7 @@ type TolerationsProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const Tolerations: React.FCC<TolerationsProps> = ({ vmi }) => {
+const Tolerations: FC<TolerationsProps> = ({ vmi }) => {
   const { t } = useKubevirtTranslation();
   const tolerations = vmi?.spec?.tolerations;
 

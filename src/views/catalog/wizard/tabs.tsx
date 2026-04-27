@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 
 import { NavPageKubevirt } from '@kubevirt-utils/components/HorizontalNavbar/utils/utils';
 
@@ -13,7 +13,7 @@ import WizardSchedulingTab from './tabs/scheduling/WizardSchedulingTab';
 import WizardScriptsTab from './tabs/scripts/WizardScriptsTab';
 import WizardYAMLTab from './tabs/yaml/WizardYAMLTab';
 
-export type WizardTab = React.VFC<WizardVMContextType>;
+export type WizardTab = FC<WizardVMContextType>;
 
 const withWizardVMContext = (Tab: WizardTab) => (routeProps) => {
   const vmContext = useWizardVMContext();

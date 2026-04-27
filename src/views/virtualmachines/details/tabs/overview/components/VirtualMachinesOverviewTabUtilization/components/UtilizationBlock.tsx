@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { FC, ReactNode } from 'react';
 
 import { Flex } from '@patternfly/react-core';
 
 type UtilizationBlockProps = {
+  children?: ReactNode;
   dataTestId: string;
   isNetworkUtil?: boolean;
   title: string;
@@ -10,7 +11,7 @@ type UtilizationBlockProps = {
   usedOfTotalText: string;
 };
 
-export const UtilizationBlock: React.FCC<UtilizationBlockProps> = ({
+export const UtilizationBlock: FC<UtilizationBlockProps> = ({
   children,
   dataTestId,
   isNetworkUtil = false,

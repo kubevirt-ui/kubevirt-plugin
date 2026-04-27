@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 
 import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
@@ -9,7 +9,7 @@ type BootSourceProps = {
   template: V1Template;
 };
 
-const BootSource: React.FCC<BootSourceProps> = ({ template }) => {
+const BootSource: FC<BootSourceProps> = ({ template }) => {
   const { t } = useKubevirtTranslation();
   const { isBootSourceAvailable } = useVMTemplateSource(template);
 

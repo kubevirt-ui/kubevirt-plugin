@@ -1,3 +1,5 @@
+import { HTMLProps, ReactNode } from 'react';
+
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 
 export type ConsoleDetailPropType = {
@@ -13,9 +15,9 @@ export type onGenerateFunctionType = (
 
 export type onDownloadFunctionType = (fileName: string, content: string, mimeType: string) => void;
 
-export type ConnectWithRemoteViewerProps = React.HTMLProps<HTMLDivElement> & {
+export type ConnectWithRemoteViewerProps = HTMLProps<HTMLDivElement> & {
   /** Custom content of more-info section  */
-  children?: React.ReactNode;
+  children?: ReactNode;
 
   /** Callback function. Perform file download.
    * Default implementation is usually good enough, but i.e. in case of environment with tight
@@ -45,16 +47,16 @@ export type ConnectWithRemoteViewerProps = React.HTMLProps<HTMLDivElement> & {
 
   textConnectWithRemoteViewer?: string;
   textMoreInfo?: string;
-  textMoreInfoContent?: React.ReactNode | string;
+  textMoreInfoContent?: ReactNode;
   textMoreRDPInfo?: string;
-  textMoreRDPInfoContent?: React.ReactNode | string;
+  textMoreRDPInfoContent?: ReactNode;
   /** Connection details for VNC */
   vnc?: ConsoleDetailPropType;
 };
 
 export type RDPProps = ConnectWithRemoteViewerProps & {
   /** Custom content of more-info section  */
-  children?: React.ReactNode;
+  children?: ReactNode;
   isLoading?: boolean;
   /** Connection details for RDP */
   rdp?: ConsoleDetailPropType;
@@ -70,11 +72,11 @@ export type RDPProps = ConnectWithRemoteViewerProps & {
   /** Text that appears in the toggle */
   textMoreInfo?: string;
   /** The information content appearing above the description list for guidelines to install virt-viewer */
-  textMoreInfoContent?: React.ReactNode | string;
+  textMoreInfoContent?: ReactNode;
   /** Text that appears in the toggle */
   textMoreRDPInfo?: string;
   /** The information content appearing above the description list for guidelines to install virt-viewer */
-  textMoreRDPInfoContent?: React.ReactNode | string;
+  textMoreRDPInfoContent?: ReactNode;
   textNoProtocol?: string;
   textRdpAddress?: string;
   textRDPPort?: string;
@@ -89,7 +91,7 @@ export type RDPProps = ConnectWithRemoteViewerProps & {
   vnc?: ConsoleDetailPropType;
 };
 
-export type ManualConnectionProps = React.HTMLProps<HTMLDivElement> & {
+export type ManualConnectionProps = HTMLProps<HTMLDivElement> & {
   rdp?: ConsoleDetailPropType;
   spice?: ConsoleDetailPropType;
   textAddress: string;
@@ -109,9 +111,9 @@ export type ManualConnectionProps = React.HTMLProps<HTMLDivElement> & {
   vnc?: ConsoleDetailPropType;
 };
 
-export type RemoteViewerProps = React.HTMLProps<HTMLDivElement> & {
+export type RemoteViewerProps = HTMLProps<HTMLDivElement> & {
   /** Custom content of more-info section  */
-  children?: React.ReactNode;
+  children?: ReactNode;
 
   /** Callback function. Perform file download.
    * Default implementation is usually good enough, but i.e. in case of environment with tight
@@ -141,15 +143,15 @@ export type RemoteViewerProps = React.HTMLProps<HTMLDivElement> & {
 
   textConnectWithRemoteViewer?: string;
   textMoreInfo?: string;
-  textMoreInfoContent?: React.ReactNode | string;
+  textMoreInfoContent?: ReactNode;
   textMoreRDPInfo?: string;
-  textMoreRDPInfoContent?: React.ReactNode | string;
+  textMoreRDPInfoContent?: ReactNode;
   /** Connection details for VNC */
   vnc?: ConsoleDetailPropType;
 };
 
 export type MoreInformationDefaultProps = {
-  textMoreInfoContent?: React.ReactNode | string;
+  textMoreInfoContent?: ReactNode;
 };
 
 export type DesktopViewerProps = {

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 
 import { IoK8sApiCoreV1Service } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { modelToRef, ServiceModel } from '@kubevirt-utils/models';
@@ -11,7 +11,7 @@ type ServiceActionsProps = {
   service: IoK8sApiCoreV1Service;
 };
 
-const ServiceActions: React.FCC<ServiceActionsProps> = ({ service }) => {
+const ServiceActions: FC<ServiceActionsProps> = ({ service }) => {
   const serviceModelRef = modelToRef({ apiGroup: 'core', ...ServiceModel });
 
   if (!service) return null;

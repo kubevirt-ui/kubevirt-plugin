@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 
 import { VirtualMachineInstanceModelRef } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -9,7 +9,7 @@ type VirtualMachinesInsanceActionsProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const VirtualMachineInstanceActions: React.FCC<VirtualMachinesInsanceActionsProps> = ({ vmi }) => {
+const VirtualMachineInstanceActions: FC<VirtualMachinesInsanceActionsProps> = ({ vmi }) => {
   return (
     <LazyActionMenu
       context={{ [VirtualMachineInstanceModelRef]: vmi }}

@@ -1,8 +1,8 @@
-import * as React from 'react';
+import React, { FC, memo } from 'react';
 
 import { Skeleton, Stack, StackItem } from '@patternfly/react-core';
 
-export const TemplatesCatalogDrawerFooterSkeleton: React.FCC = React.memo(() => (
+export const TemplatesCatalogDrawerFooterSkeleton: FC = memo(() => (
   <Stack className="template-catalog-drawer-info" hasGutter>
     <StackItem className="template-catalog-drawer-footer-section">
       <Stack hasGutter>
@@ -20,4 +20,5 @@ export const TemplatesCatalogDrawerFooterSkeleton: React.FCC = React.memo(() => 
     </StackItem>
   </Stack>
 ));
+
 TemplatesCatalogDrawerFooterSkeleton.displayName = 'TemplatesCatalogDrawerFooterSkeleton';

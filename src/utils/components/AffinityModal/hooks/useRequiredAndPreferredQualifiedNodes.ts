@@ -1,4 +1,4 @@
-import * as React from 'react';
+import { useCallback, useMemo } from 'react';
 
 import { IoK8sApiCoreV1Node } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 
@@ -18,7 +18,7 @@ export const useRequiredAndPreferredQualifiedNodes: UseRequiredAndPreferredQuali
   nodesLoaded,
   affinities,
 ) => {
-  const [requiredNodeAffinities, preferredNodeAffinities] = React.useMemo(
+  const [requiredNodeAffinities, preferredNodeAffinities] = useMemo(
     () => [
       affinities?.filter(
         (aff) => aff?.type === AffinityType.node && aff?.condition === AffinityCondition.required,
@@ -34,7 +34,7 @@ export const useRequiredAndPreferredQualifiedNodes: UseRequiredAndPreferredQuali
     nodes,
     nodesLoaded,
     requiredNodeAffinities,
-    React.useCallback(
+    useCallback(
       (suitableNodes) => suitableNodes.reduce((acc, curr) => unionWith(acc, curr), []),
       [],
     ),
@@ -45,7 +45,7 @@ export const useRequiredAndPreferredQualifiedNodes: UseRequiredAndPreferredQuali
     nodes,
     nodesLoaded,
     preferredNodeAffinities,
-    React.useCallback(
+    useCallback(
       (suitableNodes) =>
         suitableNodes.reduce((acc, curr) => intersectionWith(acc, curr), suitableNodes[0]),
       [],

@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC, memo } from 'react';
 
 import { WizardDescriptionItem } from '@catalog/wizard/components/WizardDescriptionItem';
 import { V1Interface, V1Network } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -21,11 +21,11 @@ export const interfacesTypes = {
   [SRIOV]: 'SR-IOV',
 };
 
-export const WizardOverviewNetworksTable: React.FCC<{
+export const WizardOverviewNetworksTable: FC<{
   interfaces: V1Interface[];
   isInlineGrid?: boolean;
   networks: V1Network[];
-}> = React.memo(({ interfaces = [], isInlineGrid, networks = [] }) => {
+}> = memo(({ interfaces = [], isInlineGrid, networks = [] }) => {
   const { t } = useKubevirtTranslation();
   const networkData = getNetworkInterfaceRowData(networks, interfaces);
 

@@ -1,4 +1,4 @@
-import React, { Dispatch, FCC, SetStateAction, useCallback, useEffect, useState } from 'react';
+import React, { Dispatch, FC, SetStateAction, useCallback, useEffect, useState } from 'react';
 
 import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { IoK8sApiCoreV1Secret } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
@@ -41,7 +41,7 @@ type SSHOptionUseExistingProps = {
   sshDetails: SSHSecretDetails;
 };
 
-const SSHOptionUseExisting: FCC<SSHOptionUseExistingProps> = ({
+const SSHOptionUseExisting: FC<SSHOptionUseExistingProps> = ({
   cluster,
   localNSProject,
   namespace,

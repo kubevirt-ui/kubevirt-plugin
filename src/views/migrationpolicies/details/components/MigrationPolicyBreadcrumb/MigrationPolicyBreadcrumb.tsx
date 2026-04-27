@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 import { Link } from 'react-router';
 import { useMigrationPoliciesListURL } from 'src/views/migrationpolicies/hooks/useMigrationPoliciesListURL';
 
@@ -7,7 +7,7 @@ import { Breadcrumb, BreadcrumbItem } from '@patternfly/react-core';
 
 import './MigrationPolicyBreadcrumb.scss';
 
-export const MigrationPolicyBreadcrumb: React.FCC = () => {
+export const MigrationPolicyBreadcrumb: FC = () => {
   const { t } = useKubevirtTranslation();
   const migrationPoliciesClusterListPage = useMigrationPoliciesListURL();
 

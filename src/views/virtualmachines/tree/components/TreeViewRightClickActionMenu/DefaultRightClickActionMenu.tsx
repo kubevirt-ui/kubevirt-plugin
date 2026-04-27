@@ -1,4 +1,4 @@
-import React, { FCC, useMemo } from 'react';
+import React, { FC, useMemo } from 'react';
 import { useNavigate } from 'react-router';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -20,7 +20,7 @@ type DefaultRightClickActionMenuProps = {
   triggerElement: HTMLElement | null;
 };
 
-const DefaultRightClickActionMenu: FCC<DefaultRightClickActionMenuProps> = ({
+const DefaultRightClickActionMenu: FC<DefaultRightClickActionMenuProps> = ({
   hideMenu,
   triggerElement,
 }) => {

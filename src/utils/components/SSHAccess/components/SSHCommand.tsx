@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 
 import { VirtualMachineInstanceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { IoK8sApiCoreV1Service } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
@@ -36,7 +36,7 @@ type SSHCommandProps = {
   vm: V1VirtualMachine;
 };
 
-const SSHCommand: React.FCC<SSHCommandProps> = ({
+const SSHCommand: FC<SSHCommandProps> = ({
   sshService: initialSSHService,
   sshServiceLoaded,
   vm,

@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FC, MouseEvent, useState } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import HardwareDevicesList from '@kubevirt-utils/components/HardwareDevices/list/HardwareDevicesList';
@@ -31,10 +31,7 @@ const VirtualMachinesOverviewTabHardwareDevices: FC<
   const gpusCount = gpus?.length ?? 0;
   const vmHasS390xArchitecture = hasS390xArchitecture(vm);
 
-  const handleTabClick = (
-    _: React.MouseEvent<HTMLElement, MouseEvent>,
-    tabIndex: number | string,
-  ) => {
+  const handleTabClick = (_: MouseEvent<HTMLElement>, tabIndex: number | string) => {
     setActiveTabKey(tabIndex);
   };
 

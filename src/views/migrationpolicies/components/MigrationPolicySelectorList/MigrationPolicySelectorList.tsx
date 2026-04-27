@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import React, { FC, memo } from 'react';
 
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { LabelGroup } from '@patternfly/react-core';
@@ -10,7 +10,7 @@ type MigrationPolicySelectorListProps = {
   selector: { [key: string]: string };
 };
 
-export const MigrationPolicySelectorList: React.FCC<MigrationPolicySelectorListProps> = memo(
+export const MigrationPolicySelectorList: FC<MigrationPolicySelectorListProps> = memo(
   ({ isVMILabel, selector }) => {
     if (isEmpty(selector)) return null;
     return (

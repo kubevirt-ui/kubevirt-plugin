@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { Td, TdProps } from '@patternfly/react-table';
 
@@ -6,7 +6,7 @@ type TemplatesTableRowCellProps = Omit<TdProps, 'ref'> & {
   activeColumnIDs: string[];
 };
 
-const TemplatesTableRowCell: FCC<TemplatesTableRowCellProps> = ({
+const TemplatesTableRowCell: FC<TemplatesTableRowCellProps> = ({
   activeColumnIDs,
   children,
   id,

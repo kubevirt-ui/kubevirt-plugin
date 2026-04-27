@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC, MouseEventHandler, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { getMigrationPolicyURL } from 'src/views/migrationpolicies/utils/utils';
 
@@ -22,18 +22,16 @@ type MigrationPolicyFormFooterProps = {
   migrationPolicy: V1alpha1MigrationPolicy;
 };
 
-const MigrationPolicyFormFooter: React.FCC<MigrationPolicyFormFooterProps> = ({
-  migrationPolicy,
-}) => {
+const MigrationPolicyFormFooter: FC<MigrationPolicyFormFooterProps> = ({ migrationPolicy }) => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
   const cluster = useClusterParam();
 
-  const [isSubmitting, setIsSubmitting] = React.useState(false);
-  const [error, setError] = React.useState(undefined);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState(undefined);
   const migrationPolicyName = migrationPolicy?.metadata?.name;
 
-  const handleSubmit: React.MouseEventHandler<HTMLButtonElement> = (e) => {
+  const handleSubmit: MouseEventHandler<HTMLButtonElement> = (e) => {
     e.preventDefault();
     setIsSubmitting(true);
     setError(undefined);

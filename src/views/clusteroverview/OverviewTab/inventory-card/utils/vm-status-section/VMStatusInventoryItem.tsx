@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 import { Link } from 'react-router';
 
 import { ALL_NAMESPACES } from '@kubevirt-utils/hooks/constants';
@@ -14,7 +14,7 @@ export type VMStatusInventoryItemProps = {
   status: string;
 };
 
-const VMStatusInventoryItem: React.FCC<VMStatusInventoryItemProps> = ({ count, status }) => {
+const VMStatusInventoryItem: FC<VMStatusInventoryItemProps> = ({ count, status }) => {
   const cluster = useActiveClusterParam();
   const Icon = getVMStatusIcon(status);
   const to = getVMListPathWithRowFilters(ALL_NAMESPACES, { status }, cluster);

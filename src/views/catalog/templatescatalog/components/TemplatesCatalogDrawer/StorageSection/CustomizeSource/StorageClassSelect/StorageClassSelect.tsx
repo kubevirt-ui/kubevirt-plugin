@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -11,7 +11,7 @@ type StorageClassSelectProps = {
   storageClassRequired: boolean;
 };
 
-const StorageClassSelect: FCC<StorageClassSelectProps> = ({
+const StorageClassSelect: FC<StorageClassSelectProps> = ({
   onStorageClassChange,
   storageClassName,
   storageClassRequired,

@@ -1,4 +1,4 @@
-import * as React from 'react';
+import { useMemo } from 'react';
 
 import {
   DashboardsOverviewPrometheusActivity,
@@ -25,7 +25,7 @@ const useDashboardActivities = () => {
   const resourceActivities: (
     | LoadedExtension<DashboardsOverviewResourceActivity>
     | ResolvedExtension<DynamicDashboardsOverviewResourceActivity>
-  )[] = React.useMemo(
+  )[] = useMemo(
     () =>
       dynamicResourceActivityExtensions?.filter((e) => !!models?.[e.properties.k8sResource.kind]),
     [dynamicResourceActivityExtensions, models],

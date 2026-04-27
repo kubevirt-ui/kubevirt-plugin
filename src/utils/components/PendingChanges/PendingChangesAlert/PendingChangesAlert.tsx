@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC, ReactNode } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Alert, AlertVariant } from '@patternfly/react-core';
@@ -6,13 +6,14 @@ import { Alert, AlertVariant } from '@patternfly/react-core';
 import './PendingChangesAlert.scss';
 
 type PendingChangesAlertProps = {
+  children?: ReactNode;
   isExpandable?: boolean;
   isWarning?: boolean;
   title?: string;
   warningMsg?: string;
 };
 
-export const PendingChangesAlert: FCC<PendingChangesAlertProps> = ({
+export const PendingChangesAlert: FC<PendingChangesAlertProps> = ({
   children,
   isExpandable,
   isWarning,

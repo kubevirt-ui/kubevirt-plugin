@@ -72,7 +72,7 @@ export const TopConsumersChartList: FC<TopConsumersChartListProps> = ({
   const numQueryResults = query?.data?.result?.length;
   const isLoading = !loaded;
 
-  const ChartList = React.useMemo(() => {
+  const ChartList = useMemo(() => {
     const numLinesToShow = numQueryResults >= numItemsToShow ? numItemsToShow : numQueryResults;
     const max = getValue(query?.data?.result[0]?.value?.[1]);
     const charts = [];

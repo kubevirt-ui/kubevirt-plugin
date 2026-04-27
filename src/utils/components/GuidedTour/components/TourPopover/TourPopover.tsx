@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, MouseEventHandler } from 'react';
 import { TooltipRenderProps } from 'react-joyride';
 import classNames from 'classnames';
 
@@ -32,7 +32,7 @@ const TourPopover: FC<TooltipRenderProps> = ({
             className="pf-v6-c-popover__close"
             data-action="close"
             icon={<CloseIcon />}
-            onClick={closeProps.onClick as React.MouseEventHandler<HTMLButtonElement>}
+            onClick={closeProps.onClick as MouseEventHandler<HTMLButtonElement>}
             variant={ButtonVariant.plain}
           />
         </SplitItem>

@@ -1,3 +1,5 @@
+import { MouseEvent } from 'react';
+
 import { K8sGroupVersionKind } from '@openshift-console/dynamic-plugin-sdk';
 import { SelectOptionProps } from '@patternfly/react-core';
 
@@ -7,7 +9,7 @@ export type EnhancedSelectOptionProps = SelectOptionProps & {
   isFavorite?: boolean;
   label?: string;
   name?: string;
-  onFavorite?: (e: React.MouseEvent) => void;
+  onFavorite?: (e: MouseEvent) => void;
   value: string;
   /** Value for the text filter. Takes precedence over value, useful when value does not reflect the text content of the option. */
   valueForFilter?: string;

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 import { TemplateSchedulingGridProps } from 'src/views/templates/details/tabs/scheduling/components/TemplateSchedulingLeftGrid';
 import { getAffinity } from 'src/views/templates/utils/selectors';
 
@@ -9,11 +9,7 @@ import { getAffinityRules } from '@kubevirt-utils/resources/vmi';
 
 import AffinityRulesModal from './AffinityRulesModal';
 
-const AffinityRules: React.FCC<TemplateSchedulingGridProps> = ({
-  editable,
-  onSubmit,
-  template,
-}) => {
+const AffinityRules: FC<TemplateSchedulingGridProps> = ({ editable, onSubmit, template }) => {
   const { createModal } = useModal();
   const { t } = useKubevirtTranslation();
   const rulesCount = t('{{rules}} Affinity rules', {

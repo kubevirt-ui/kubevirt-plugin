@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 import { Link } from 'react-router';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -41,9 +41,7 @@ type StorageWriteLatencyAvgMaxChartProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const StorageWriteLatencyAvgMaxChart: React.FCC<StorageWriteLatencyAvgMaxChartProps> = ({
-  vmi,
-}) => {
+const StorageWriteLatencyAvgMaxChart: FC<StorageWriteLatencyAvgMaxChartProps> = ({ vmi }) => {
   const { currentTime, duration, timespan } = useDuration();
   const { height, ref, width } = useResponsiveCharts();
 

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 import xbytes from 'xbytes';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -22,7 +22,7 @@ type NetworkUtilProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const NetworkUtil: React.FCC<NetworkUtilProps> = ({ vmi }) => {
+const NetworkUtil: FC<NetworkUtilProps> = ({ vmi }) => {
   const { t } = useKubevirtTranslation();
   const { currentTime } = useDuration();
 

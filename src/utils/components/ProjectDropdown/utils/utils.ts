@@ -1,4 +1,4 @@
-import React from 'react';
+import { MouseEvent } from 'react';
 
 import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { EnhancedSelectOptionProps } from '@kubevirt-utils/components/FilterSelect/utils/types';
@@ -29,7 +29,7 @@ export const getProjectOptions = (
       name,
       onFavorite:
         updateBookmarks &&
-        ((e: React.MouseEvent) => {
+        ((e: MouseEvent) => {
           e.stopPropagation();
           const newBookmarks = {
             ...bookmarks,

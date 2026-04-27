@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC, useMemo } from 'react';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -11,10 +11,10 @@ type HotplugLabelProps = {
   vmi?: V1VirtualMachineInstance;
 };
 
-export const HotplugLabel: React.FCC<HotplugLabelProps> = ({ diskName, vm, vmi }) => {
+export const HotplugLabel: FC<HotplugLabelProps> = ({ diskName, vm, vmi }) => {
   const { t } = useKubevirtTranslation();
 
-  const hotplugText = React.useMemo(() => {
+  const hotplugText = useMemo(() => {
     const volumeStatus = vmi?.status?.volumeStatus?.find(
       (volStatus) => volStatus.name === diskName,
     );

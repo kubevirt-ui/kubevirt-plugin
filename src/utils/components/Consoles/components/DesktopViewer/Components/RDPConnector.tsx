@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 
 import ComponentReady from '@kubevirt-utils/components/Charts/ComponentReady/ComponentReady';
 
@@ -7,12 +7,7 @@ import { RDPConnectorProps } from '../utils/types';
 import RDP from './RDP';
 import RDPServiceNotConfigured from './RDPServiceNotConfigured';
 
-const RDPConnector: React.FCC<RDPConnectorProps> = ({
-  isLoading,
-  rdpServiceAddressPort,
-  vm,
-  vmi,
-}) => {
+const RDPConnector: FC<RDPConnectorProps> = ({ isLoading, rdpServiceAddressPort, vm, vmi }) => {
   return (
     <ComponentReady isLoading={isLoading} isReady={!isLoading}>
       {rdpServiceAddressPort ? (

@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -9,7 +9,7 @@ type VirtualMachinesInstancesIPProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const VirtualMachinesInstancesIP: React.FCC<VirtualMachinesInstancesIPProps> = ({ vmi }) => {
+const VirtualMachinesInstancesIP: FC<VirtualMachinesInstancesIPProps> = ({ vmi }) => {
   const { t } = useKubevirtTranslation();
   const ips = getVMIIPAddresses(vmi);
 

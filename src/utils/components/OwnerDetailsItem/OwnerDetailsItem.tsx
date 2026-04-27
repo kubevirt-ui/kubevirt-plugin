@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 import { Trans } from 'react-i18next';
 import classNames from 'classnames';
 
@@ -20,7 +20,7 @@ type OwnerDetailsItemProps = {
   obj: K8sResourceCommon;
 };
 
-const OwnerDetailsItem: React.FCC<OwnerDetailsItemProps> = ({ className, obj }) => {
+const OwnerDetailsItem: FC<OwnerDetailsItemProps> = ({ className, obj }) => {
   const { t } = useKubevirtTranslation();
 
   return (

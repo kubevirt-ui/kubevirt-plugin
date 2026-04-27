@@ -1,4 +1,4 @@
-import React, { createContext, FCC, useContext, useEffect, useMemo } from 'react';
+import React, { createContext, FC, ReactNode, useContext, useEffect, useMemo } from 'react';
 import { Updater, useImmer } from 'use-immer';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -52,7 +52,10 @@ const initialValue: DrawerContext = {
 
 export const DrawerContext = createContext<DrawerContext>(initialValue);
 
-export const DrawerContextProvider: FCC<{ template: Template }> = ({ children, template }) => {
+export const DrawerContextProvider: FC<{ children?: ReactNode; template: Template }> = ({
+  children,
+  template,
+}) => {
   const context = useDrawer(template);
   return <DrawerContext.Provider value={context}>{children}</DrawerContext.Provider>;
 };

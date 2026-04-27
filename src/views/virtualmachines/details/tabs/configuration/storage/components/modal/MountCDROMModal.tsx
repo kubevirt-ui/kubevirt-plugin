@@ -1,4 +1,4 @@
-import React, { FC, useEffect } from 'react';
+import React, { FC, useEffect, useRef } from 'react';
 import { FormProvider, useWatch } from 'react-hook-form';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -81,7 +81,7 @@ const MountCDROMModal: FC<MountCDROMModalProps> = ({
   const hasValidSelection = selectedISO || (uploadEnabled && hasUploadFile);
   const isFormValid = Boolean(hasValidSelection);
 
-  const isBackgroundUploadInProgress = React.useRef(false);
+  const isBackgroundUploadInProgress = useRef(false);
 
   const { isoOptions } = useISOOptions(vmNamespace);
 

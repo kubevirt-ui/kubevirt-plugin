@@ -1,4 +1,4 @@
-import * as React from 'react';
+import { useMemo } from 'react';
 
 import { IoK8sApiCoreV1Node } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 
@@ -11,7 +11,7 @@ export const useAffinitiesQualifiedNodes = (
   affinities: AffinityRowData[],
   filter: (nodes: IoK8sApiCoreV1Node[][]) => IoK8sApiCoreV1Node[],
 ): IoK8sApiCoreV1Node[] => {
-  return React.useMemo(() => {
+  return useMemo(() => {
     if (isNodesLoaded) {
       const suitableNodes = affinities.map((aff) =>
         (nodes || []).filter(

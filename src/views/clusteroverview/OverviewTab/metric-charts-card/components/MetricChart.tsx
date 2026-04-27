@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 
 import { tickLabels } from '@kubevirt-utils/components/Charts/ChartLabels/styleOverrides';
 import useResponsiveCharts from '@kubevirt-utils/components/Charts/hooks/useResponsiveCharts';
@@ -19,7 +19,7 @@ import { formatPopoverLabel, getLabelUnit } from '../utils/utils';
 
 import './MetricChart.scss';
 
-const MetricChart: React.FCC<MetricChartProps> = ({ metric, metricChartData }) => {
+const MetricChart: FC<MetricChartProps> = ({ metric, metricChartData }) => {
   const { chartData, domain, unit } = metricChartData;
   const { height, ref, width } = useResponsiveCharts();
   const displayUnit = getLabelUnit(metric, unit);

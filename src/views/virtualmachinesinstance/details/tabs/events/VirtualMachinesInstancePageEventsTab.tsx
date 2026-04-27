@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, Suspense } from 'react';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
@@ -13,7 +13,7 @@ const VirtualMachinesInstancePageEventsTab: FC<VirtualMachinesInstancePageEvents
   obj: vmi,
 }) => {
   return (
-    <React.Suspense
+    <Suspense
       fallback={
         <Bullseye>
           <Loading />
@@ -21,7 +21,7 @@ const VirtualMachinesInstancePageEventsTab: FC<VirtualMachinesInstancePageEvents
       }
     >
       {vmi?.metadata && <ResourceEventStream resource={vmi} />}
-    </React.Suspense>
+    </Suspense>
   );
 };
 

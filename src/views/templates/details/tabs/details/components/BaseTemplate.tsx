@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 import { getVMTemplateBaseName } from 'src/views/templates/utils/selectors';
 
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
@@ -11,7 +11,7 @@ type BaseTemplateProps = {
   template: V1Template;
 };
 
-const BaseTemplate: React.FCC<BaseTemplateProps> = ({ template }) => {
+const BaseTemplate: FC<BaseTemplateProps> = ({ template }) => {
   const { t } = useKubevirtTranslation();
   const baseTemplate = getVMTemplateBaseName(template);
 

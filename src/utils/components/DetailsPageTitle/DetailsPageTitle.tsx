@@ -1,4 +1,4 @@
-import React, { FCC, ReactNode } from 'react';
+import React, { FC, ReactNode } from 'react';
 
 import { PageBreadcrumb, PageGroup, PageSection } from '@patternfly/react-core';
 
@@ -6,9 +6,10 @@ import './details-page-title.scss';
 
 type DetailsPageTitleProps = {
   breadcrumb?: ReactNode;
+  children?: ReactNode;
 };
 
-const DetailsPageTitle: FCC<DetailsPageTitleProps> = ({ breadcrumb, children }) => (
+const DetailsPageTitle: FC<DetailsPageTitleProps> = ({ breadcrumb, children }) => (
   <div>
     <PageGroup>
       <PageBreadcrumb>{breadcrumb}</PageBreadcrumb>

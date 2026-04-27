@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { DeviceType } from '@kubevirt-utils/resources/vm/utils/boot-order/bootOrder';
@@ -9,7 +9,7 @@ type DeviceTypeIconProps = {
   type: DeviceType;
 };
 
-const DeviceTypeIcon: React.FCC<DeviceTypeIconProps> = ({ type }) => {
+const DeviceTypeIcon: FC<DeviceTypeIconProps> = ({ type }) => {
   const { t } = useKubevirtTranslation();
 
   if (type === DeviceType.NIC) {

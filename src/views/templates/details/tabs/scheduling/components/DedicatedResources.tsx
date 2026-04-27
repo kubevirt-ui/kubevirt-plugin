@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 import { TemplateSchedulingGridProps } from 'src/views/templates/details/tabs/scheduling/components/TemplateSchedulingLeftGrid';
 import { isDedicatedCPUPlacement } from 'src/views/templates/utils/utils';
 
@@ -8,11 +8,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 
 import DedicatedResourcesModal from './DedicatedResourcesModal';
 
-const DedicatedResources: React.FCC<TemplateSchedulingGridProps> = ({
-  editable,
-  onSubmit,
-  template,
-}) => {
+const DedicatedResources: FC<TemplateSchedulingGridProps> = ({ editable, onSubmit, template }) => {
   const { createModal } = useModal();
   const { t } = useKubevirtTranslation();
   const dedicatedResourcesText = isDedicatedCPUPlacement(template)

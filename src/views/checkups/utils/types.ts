@@ -1,9 +1,9 @@
-import React from 'react';
+import { ComponentType } from 'react';
 
 import { CHECKUP_URLS } from './constants';
 
 export type TabConfig = {
-  component: React.ComponentType;
+  component: ComponentType;
   href: string;
   name: string;
 };

@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react';
+import React, { FC, ReactNode } from 'react';
 
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { Alert, AlertGroup, AlertVariant } from '@patternfly/react-core';
@@ -17,7 +17,7 @@ type UploadPVCButtonBarProps = {
   uploadProxyURL?: string;
 };
 
-const UploadPVCButtonBar: React.FCC<UploadPVCButtonBarProps> = ({
+const UploadPVCButtonBar: FC<UploadPVCButtonBarProps> = ({
   children,
   className,
   errorMessage,

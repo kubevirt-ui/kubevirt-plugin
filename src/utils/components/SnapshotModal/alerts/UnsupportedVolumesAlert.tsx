@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 
 import { V1VolumeSnapshotStatus } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -11,9 +11,7 @@ type UnsupportedVolumesAlertProps = {
   unsupportedVolumes: V1VolumeSnapshotStatus[];
 };
 
-const UnsupportedVolumesAlert: React.FCC<UnsupportedVolumesAlertProps> = ({
-  unsupportedVolumes,
-}) => {
+const UnsupportedVolumesAlert: FC<UnsupportedVolumesAlertProps> = ({ unsupportedVolumes }) => {
   const { t } = useKubevirtTranslation();
   if (isEmpty(unsupportedVolumes)) {
     return null;

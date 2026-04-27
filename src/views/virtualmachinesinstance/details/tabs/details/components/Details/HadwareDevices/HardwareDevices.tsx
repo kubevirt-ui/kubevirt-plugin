@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import HardwareDevicesTable from '@kubevirt-utils/components/HardwareDevices/HardwareDevicesTable';
@@ -16,7 +16,7 @@ type HardwareDevicesProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const HardwareDevices: React.FCC<HardwareDevicesProps> = ({ vmi }) => {
+const HardwareDevices: FC<HardwareDevicesProps> = ({ vmi }) => {
   const { t } = useKubevirtTranslation();
 
   const devices = getVMIDevices(vmi);

@@ -1,4 +1,4 @@
-import React, { FCC, ReactNode, useState } from 'react';
+import React, { FC, ReactNode, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ExpandableSection } from '@patternfly/react-core';
@@ -9,7 +9,7 @@ type CurrentMemoryDensityProps = {
   isLoading: boolean;
 };
 
-const CurrentMemoryDensity: FCC<CurrentMemoryDensityProps> = ({
+const CurrentMemoryDensity: FC<CurrentMemoryDensityProps> = ({
   children,
   currentOvercommit,
   isLoading,

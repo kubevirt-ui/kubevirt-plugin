@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 
 import AlertsCard from '@kubevirt-utils/components/AlertsCard/AlertsCard';
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
@@ -9,7 +9,7 @@ import useSimplifiedAlerts from './hooks/useSimplifiedAlerts';
 
 import './OverviewAlertsCard.scss';
 
-const OverviewAlertsCard = () => {
+const OverviewAlertsCard: FC = () => {
   const { alerts: simplifiedAlerts, error, loaded } = useSimplifiedAlerts();
   const { t } = useKubevirtTranslation();
   if (!loaded || error) {

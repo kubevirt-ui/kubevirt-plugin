@@ -1,4 +1,4 @@
-import React, { Dispatch, FCC, ReactNode, SetStateAction } from 'react';
+import React, { Dispatch, FC, ReactNode, SetStateAction } from 'react';
 import classNames from 'classnames';
 
 import { ListItem, Split, SplitItem } from '@patternfly/react-core';
@@ -6,13 +6,14 @@ import { ListItem, Split, SplitItem } from '@patternfly/react-core';
 import { INSTANCE_TYPES_SECTIONS } from '../../utils/constants';
 
 type SectionListItemProps = {
+  children?: ReactNode;
   headerAction?: ReactNode;
   headerText: ReactNode;
   sectionKey: INSTANCE_TYPES_SECTIONS;
   sectionState: [INSTANCE_TYPES_SECTIONS, Dispatch<SetStateAction<INSTANCE_TYPES_SECTIONS>>];
 };
 
-const SectionListItem: FCC<SectionListItemProps> = ({
+const SectionListItem: FC<SectionListItemProps> = ({
   children,
   headerAction,
   headerText,

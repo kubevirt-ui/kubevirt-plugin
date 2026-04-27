@@ -1,4 +1,4 @@
-import React, { FCC, useMemo } from 'react';
+import React, { FC, useMemo } from 'react';
 
 import { V1beta1NetworkMap } from '@kubev2v/types';
 import { NetworkAttachmentDefinitionModel } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -19,7 +19,7 @@ type NetworkMappingProps = {
   networkMap: V1beta1NetworkMap;
 };
 
-const NetworkMapping: FCC<NetworkMappingProps> = ({ changeNetworkMap, nads, networkMap }) => {
+const NetworkMapping: FC<NetworkMappingProps> = ({ changeNetworkMap, nads, networkMap }) => {
   const { t } = useKubevirtTranslation();
   const nadsOptions = useMemo(
     () =>

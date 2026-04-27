@@ -31,7 +31,7 @@ Internationalization patterns and requirements for this project.
 ```tsx
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
-const MyComponent: React.FC = () => {
+const MyComponent: FC = () => {
   const { t } = useKubevirtTranslation();
 
   return (

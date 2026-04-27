@@ -1,4 +1,4 @@
-import React, { FCC } from 'react';
+import React, { FC } from 'react';
 
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import DescriptionItemAnnotations from '@kubevirt-utils/components/DescriptionItem/components/DescriptionItemAnnotations';
@@ -10,7 +10,7 @@ import { DescriptionList, Grid, PageSection, Title } from '@patternfly/react-cor
 import { updateAnnotation, updateLabels } from '../details/utils/utils';
 import { ConfigurationInnerTabProps } from '../utils/types';
 
-const MetadataTab: FCC<ConfigurationInnerTabProps> = ({ vm }) => {
+const MetadataTab: FC<ConfigurationInnerTabProps> = ({ vm }) => {
   const { t } = useKubevirtTranslation();
 
   return (

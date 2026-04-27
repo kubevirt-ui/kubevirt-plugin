@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 import { Trans } from 'react-i18next';
 
 import {
@@ -28,7 +28,7 @@ const templatesResource: WatchK8sResource = {
   },
 };
 
-const PVCDeleteAlertExtension: React.FCC<{ pvc: V1beta1PersistentVolumeClaim }> = ({ pvc }) => {
+const PVCDeleteAlertExtension: FC<{ pvc: V1beta1PersistentVolumeClaim }> = ({ pvc }) => {
   const [commonTemplates, loadedTemplates, errorTemplates] =
     useK8sWatchResource<V1Template[]>(templatesResource);
   const { t } = useKubevirtTranslation();

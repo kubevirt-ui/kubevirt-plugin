@@ -131,7 +131,7 @@ Your approach:
 - useEffect used when useMemo or event handler is appropriate
 
 **Memoization Issues**
-- Missing React.memo on components that receive stable props but parent re-renders
+- Missing memo on components that receive stable props but parent re-renders
 - useMemo not used for expensive calculations
 - useCallback not used for functions passed to memoized children
 - Over-memoization of cheap operations (premature optimization)
@@ -195,7 +195,7 @@ Your approach:
 - Components re-rendering unnecessarily
 - Missing or incorrect key props in lists
 - Index used as key for dynamic lists
-- Large component trees without React.lazy
+- Large component trees without lazy (from 'react')
 - Expensive operations in render path
 - State updates causing cascade re-renders
 - Missing Suspense boundaries

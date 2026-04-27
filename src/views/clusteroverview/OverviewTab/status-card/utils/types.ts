@@ -1,4 +1,4 @@
-import * as React from 'react';
+import { ReactNode } from 'react';
 
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
@@ -43,4 +43,4 @@ export type ClusterServiceVersionKind = {
   };
 } & K8sResourceCommon;
 
-export type VirtStatusItems = { Component: React.ReactNode; title: string }[];
+export type VirtStatusItems = { Component: ReactNode; title: string }[];

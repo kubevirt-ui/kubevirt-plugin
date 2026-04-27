@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 import { Trans } from 'react-i18next';
 
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
@@ -10,9 +10,7 @@ import { MoreInformationDefaultProps } from '../utils/types';
 
 import Detail from './Detail';
 
-const MoreInformationDefault: React.FCC<MoreInformationDefaultProps> = ({
-  textMoreInfoContent,
-}) => {
+const MoreInformationDefault: FC<MoreInformationDefaultProps> = ({ textMoreInfoContent }) => {
   const { t } = useKubevirtTranslation();
   return (
     <>

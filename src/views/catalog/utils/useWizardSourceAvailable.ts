@@ -1,4 +1,4 @@
-import * as React from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import {
   V1beta1DataVolumeSourcePVC,
@@ -23,11 +23,11 @@ type UseWizardSourceAvailable = {
 export const useWizardSourceAvailable = (): UseWizardSourceAvailable => {
   const { vm } = useWizardVMContext();
   const cluster = useClusterParam();
-  const [isBootSourceAvailable, setIsBootSourceAvailable] = React.useState<boolean>(true);
-  const [loaded, setLoaded] = React.useState<boolean>(true);
-  const [error, setError] = React.useState<any>();
+  const [isBootSourceAvailable, setIsBootSourceAvailable] = useState<boolean>(true);
+  const [loaded, setLoaded] = useState<boolean>(true);
+  const [error, setError] = useState<any>();
 
-  const bootSource = React.useMemo(() => {
+  const bootSource = useMemo(() => {
     return getVMBootSourceType(vm);
   }, [vm]);
 
@@ -63,7 +63,7 @@ export const useWizardSourceAvailable = (): UseWizardSourceAvailable => {
       .finally(() => setLoaded(true));
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     setError(undefined);
 
     switch (bootSource?.type) {

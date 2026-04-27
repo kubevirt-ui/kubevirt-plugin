@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 
 import { icon } from '@kubevirt-utils/resources/vmi';
 
@@ -6,9 +6,7 @@ type VirtualMachinesInstancesStatusProps = {
   status: string;
 };
 
-const VirtualMachinesInstancesStatus: React.FCC<VirtualMachinesInstancesStatusProps> = ({
-  status,
-}) => {
+const VirtualMachinesInstancesStatus: FC<VirtualMachinesInstancesStatusProps> = ({ status }) => {
   const IconComponent = icon?.[status];
   return (
     <>

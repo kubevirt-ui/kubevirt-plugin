@@ -1,4 +1,4 @@
-import React, { FCC, useCallback } from 'react';
+import React, { FC, useCallback } from 'react';
 
 import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
@@ -27,7 +27,7 @@ type SSHAuthKeyRowProps = {
   selectableProjects: string[];
 };
 
-const SSHAuthKeyRow: FCC<SSHAuthKeyRowProps> = ({
+const SSHAuthKeyRow: FC<SSHAuthKeyRowProps> = ({
   isRemoveDisabled,
   onAuthKeyChange,
   onAuthKeyDelete,

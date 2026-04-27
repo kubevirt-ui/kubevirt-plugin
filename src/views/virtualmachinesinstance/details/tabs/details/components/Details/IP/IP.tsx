@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 import FirstItemListPopover from 'src/views/virtualmachines/list/components/FirstItemListPopover/FirstItemListPopover';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -9,7 +9,7 @@ type IPProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const IP: React.FCC<IPProps> = ({ vmi }) => {
+const IP: FC<IPProps> = ({ vmi }) => {
   const { t } = useKubevirtTranslation();
   const ipAddressesWithNames = getVMIIPAddressesWithName(vmi);
 

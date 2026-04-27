@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 
 import { Progress, ProgressMeasureLocation, ProgressSize } from '@patternfly/react-core';
 
@@ -12,7 +12,7 @@ type TopConsumersProgressChartProps = {
   value: number;
 };
 
-const TopConsumersProgressChart: React.FCC<TopConsumersProgressChartProps> = ({
+const TopConsumersProgressChart: FC<TopConsumersProgressChartProps> = ({
   labelUnit,
   labelValue,
   maxValue,

@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 
 import { modelToGroupVersionKind, NodeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { IoK8sApiCoreV1Node } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
@@ -25,7 +25,7 @@ type NodeCheckerAlertProps = {
   qualifiedNodes: IoK8sApiCoreV1Node[];
 };
 
-const NodeCheckerAlert: React.FCC<NodeCheckerAlertProps> = ({
+const NodeCheckerAlert: FC<NodeCheckerAlertProps> = ({
   nodesLoaded,
   preferredQualifiedNodes,
   qualifiedNodes,

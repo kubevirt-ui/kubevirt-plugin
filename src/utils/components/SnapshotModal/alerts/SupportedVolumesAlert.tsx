@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Alert, AlertVariant, FormGroup, Stack, StackItem } from '@patternfly/react-core';
@@ -7,7 +7,7 @@ type SupportedVolumesAlertProps = {
   isVMRunning?: boolean;
 };
 
-const SupportedVolumesAlert: React.FCC<SupportedVolumesAlertProps> = ({ isVMRunning }) => {
+const SupportedVolumesAlert: FC<SupportedVolumesAlertProps> = ({ isVMRunning }) => {
   const { t } = useKubevirtTranslation();
 
   if (!isVMRunning) {

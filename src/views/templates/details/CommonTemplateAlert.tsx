@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, useCallback } from 'react';
 import { useNavigate } from 'react-router';
 
 import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -25,7 +25,7 @@ const CommonTemplateAlert: FC<CommonTemplateAlertProps> = ({ template }) => {
   const navigate = useNavigate();
   const isACMPage = useIsACMPage();
 
-  const goToTemplatePage = React.useCallback(
+  const goToTemplatePage = useCallback(
     (clonedTemplate: V1Template) => {
       navigate(
         getTemplateURL(

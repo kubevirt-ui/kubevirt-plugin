@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useMemo } from 'react';
 
 import { VirtualMachineInstanceModelRef } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { VirtualMachineInstanceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -22,7 +22,7 @@ const useVirtualMachineInstanceActionsProvider: UseVirtualMachineInstanceActions
   const { t } = useKubevirtTranslation();
   const [, inFlight] = useK8sModel(VirtualMachineInstanceModelRef);
   const { createModal } = useModal();
-  const actions = React.useMemo(
+  const actions = useMemo(
     () => [
       {
         cta: () =>
@@ -110,7 +110,7 @@ const useVirtualMachineInstanceActionsProvider: UseVirtualMachineInstanceActions
     [vmi, inFlight, createModal, t],
   );
 
-  return React.useMemo(() => [actions, !inFlight, undefined], [actions, inFlight]);
+  return useMemo(() => [actions, !inFlight, undefined], [actions, inFlight]);
 };
 
 export default useVirtualMachineInstanceActionsProvider;

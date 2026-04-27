@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC, memo } from 'react';
 
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -12,10 +12,10 @@ import {
   EmptyStateVariant,
 } from '@patternfly/react-core';
 
-export const TemplatesCatalogEmptyState: React.FCC<{
+export const TemplatesCatalogEmptyState: FC<{
   bootSourcesLoaded: boolean;
   onClearFilters: () => void;
-}> = React.memo(({ bootSourcesLoaded, onClearFilters }) => {
+}> = memo(({ bootSourcesLoaded, onClearFilters }) => {
   const { t } = useKubevirtTranslation();
 
   if (!bootSourcesLoaded) {
