@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { Updater } from 'use-immer';
 
 import {
@@ -16,7 +16,7 @@ import { kubevirtK8sCreate } from '@multicluster/k8sRequests';
 
 import { MTV_MIGRATION_NAMESPACE } from '../constants';
 
-import { getCreateMigration } from './utils';
+import { cleanupPartialResources, getCreateMigration } from './utils';
 
 const useCrossClusterMigrationSubmit = (
   migrationPlan: V1beta1Plan,
@@ -28,10 +28,21 @@ const useCrossClusterMigrationSubmit = (
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
+  // Ref guard prevents duplicate submissions from rapid/concurrent clicks
+  // before the React state update re-render can disable the button.
+  const isSubmittingRef = useRef(false);
+
   const onSubmit = useCallback(async () => {
+    if (isSubmittingRef.current) return;
+    isSubmittingRef.current = true;
+
     setIsSubmitting(true);
     setError(null);
     setSuccess(false);
+
+    let createdStorageMap: undefined | V1beta1StorageMap;
+    let createdNetworkMap: undefined | V1beta1NetworkMap;
+    let createdMigrationPlan: undefined | V1beta1Plan;
 
     try {
       const finalStorageMap = {
@@ -58,11 +69,11 @@ const useCrossClusterMigrationSubmit = (
         },
       };
 
-      const createdStorageMap = await kubevirtK8sCreate({
+      createdStorageMap = await kubevirtK8sCreate({
         data: finalStorageMap,
         model: StorageMapModel,
       });
-      const createdNetworkMap = await kubevirtK8sCreate({
+      createdNetworkMap = await kubevirtK8sCreate({
         data: finalNetworkMap,
         model: NetworkMapModel,
       });
@@ -94,7 +105,7 @@ const useCrossClusterMigrationSubmit = (
         },
       };
 
-      const createdMigrationPlan = await kubevirtK8sCreate({
+      createdMigrationPlan = await kubevirtK8sCreate({
         data: finalMigrationPlan,
         model: PlanModel,
         ns: MTV_MIGRATION_NAMESPACE,
@@ -108,9 +119,11 @@ const useCrossClusterMigrationSubmit = (
       setMigrationPlan(createdMigrationPlan);
       setSuccess(true);
     } catch (apiError) {
+      cleanupPartialResources({ createdMigrationPlan, createdNetworkMap, createdStorageMap });
       setError(apiError);
     } finally {
       setIsSubmitting(false);
+      isSubmittingRef.current = false;
     }
   }, [storageMap, migrationPlan, networkMap, setMigrationPlan]);
 
