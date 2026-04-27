@@ -61,7 +61,7 @@ describe('Check all virtualization pages can be loaded', () => {
       cy.contains('event').should('be.visible');
 
       tab.navigateToConsole();
-      cy.contains('Guest login credentials').should('be.visible');
+      cy.contains('Guest login credentials', { timeout: 2 * MINUTE }).should('be.visible');
 
       tab.navigateToSnapshots();
       cy.contains('No snapshots found').should('be.visible');

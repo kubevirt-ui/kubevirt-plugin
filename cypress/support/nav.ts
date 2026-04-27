@@ -5,13 +5,27 @@ import * as nav from '../views/selector';
 import { vmListTab } from '../views/selector-common';
 
 function ensureVirtNavVisible(selector: string) {
-  cy.get(selector, { timeout: MINUTE }).then(($el) => {
-    const $hiddenSection = $el.closest('[hidden]');
-    if ($hiddenSection.length) {
-      $hiddenSection.prev('button[aria-expanded="false"]').each((_, btn) => btn.click());
-    }
-  });
-  cy.get(selector, { timeout: MINUTE }).should('be.visible');
+  // The left nav can be mid-transition: PF6 collapses items with `visibility: hidden`.
+  // Always ensure the "Virtualization" nav group is expanded first, then wait for the
+  // target item to become visible (and not `visibility: hidden`) before interacting.
+  cy.get(nav.virtualizationNav, { timeout: MINUTE })
+    .scrollIntoView()
+    .should('be.visible')
+    .then(($virtNav) => {
+      if ($virtNav.attr('aria-expanded') === 'false') {
+        cy.wrap($virtNav).click();
+      }
+    });
+
+  cy.get(selector, { timeout: MINUTE })
+    .scrollIntoView()
+    .should(($el) => {
+      const $li = $el.closest('li');
+      if ($li.length) {
+        expect($li.css('visibility')).not.to.eq('hidden');
+      }
+    })
+    .should('be.visible');
 }
 
 declare global {
