@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import {
   V1beta1VirtualMachineClusterPreference,
@@ -11,6 +11,7 @@ import { PaginationState } from '@kubevirt-utils/hooks/usePagination/utils/types
 import useBootableVolumes from '@kubevirt-utils/resources/bootableresources/hooks/useBootableVolumes';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { NamespacedResourceMap, ResourceMap } from '@kubevirt-utils/resources/shared';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   ColumnLayout,
   OnFilterChange,
@@ -19,6 +20,7 @@ import {
   useListPageFilter,
 } from '@openshift-console/dynamic-plugin-sdk';
 import { ThSortType } from '@patternfly/react-table/dist/esm/components/Table/base/types';
+import useInstanceTypeVMStore from '@virtualmachines/creation-wizard/state/instance-type-vm-store/useInstanceTypeVMStore';
 import useVMWizardStore from '@virtualmachines/creation-wizard/state/vm-wizard-store/useVMWizardStore';
 import useBootVolumeColumns from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/BootSourceStep/components/BootableVolumeList/hooks/useBootVolumeColumns';
 import useBootVolumeFilters from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/BootSourceStep/components/BootableVolumeList/hooks/useBootVolumeFilters';
@@ -27,6 +29,10 @@ import {
   paginationInitialStateForm,
   paginationInitialStateModal,
 } from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/BootSourceStep/components/BootableVolumeList/utils/constants';
+import {
+  filterBootableVolumesByPreference,
+  isLinuxGenericPreference,
+} from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/BootSourceStep/components/BootableVolumeList/utils/utils';
 
 type UseBootableVolumesTableData = (
   volumeListNamespace: string,
@@ -40,6 +46,8 @@ type UseBootableVolumesTableData = (
   favorites: UserSettingFavorites;
   filters: RowFilter<BootableVolume>[];
   getSortType: (columnIndex: number) => ThSortType;
+  isEmptyVolumes: boolean;
+  isPreferenceFilterEmpty: boolean;
   loadedColumns: boolean;
   onFilterChange: OnFilterChange;
   pagination: PaginationState;
@@ -58,20 +66,42 @@ const useBootableVolumesTableData: UseBootableVolumesTableData = (
   userPreferencesMap,
 ) => {
   const { cluster } = useVMWizardStore();
+  const { preference } = useInstanceTypeVMStore();
   const bootableVolumesData = useBootableVolumes(volumeListNamespace);
   const { bootableVolumes, dvSources, pvcSources, volumeSnapshotSources } = bootableVolumesData;
+
+  const preferenceFilteredVolumes = useMemo(
+    () => filterBootableVolumesByPreference(bootableVolumes, preference),
+    [bootableVolumes, preference],
+  );
+
+  const isPreferenceFilterEmpty =
+    !!preference && !isEmpty(bootableVolumes) && isEmpty(preferenceFilteredVolumes);
 
   const favoritesData = useKubevirtUserSettings('favoriteBootableVolumes', cluster);
   const [favorites = [], updaterFavorites] = favoritesData;
   const volumeFavorites = favorites as [];
 
-  const filters = useBootVolumeFilters(bootableVolumes, !displayShowAllButton);
+  const allFilters = useBootVolumeFilters(preferenceFilteredVolumes, !displayShowAllButton);
 
-  const [unfilteredData, data, onFilterChange] = useListPageFilter(bootableVolumes, filters);
+  const filters = useMemo(() => {
+    if (!preference || isLinuxGenericPreference(preference)) return allFilters;
+    const osFilterType = `osName${!displayShowAllButton && '-modal'}`;
+    return allFilters.filter((f) => f.type !== osFilterType);
+  }, [allFilters, preference, displayShowAllButton]);
+
+  const [unfilteredData, data, onFilterChange] = useListPageFilter(
+    preferenceFilteredVolumes,
+    filters,
+  );
 
   const [pagination, setPagination] = useState(
     displayShowAllButton ? paginationInitialStateForm : paginationInitialStateModal,
   );
+
+  useEffect(() => {
+    setPagination(displayShowAllButton ? paginationInitialStateForm : paginationInitialStateModal);
+  }, [preference, displayShowAllButton]);
 
   const { getSortType, sortedData, sortedPaginatedData } = useBootVolumeSortColumns(
     data,
@@ -97,6 +127,8 @@ const useBootableVolumesTableData: UseBootableVolumesTableData = (
     favorites: [favorites as [], updaterFavorites],
     filters,
     getSortType,
+    isEmptyVolumes: isEmpty(bootableVolumes),
+    isPreferenceFilterEmpty,
     loadedColumns,
     onFilterChange,
     pagination,

@@ -11,10 +11,38 @@ import { getPreference } from '@kubevirt-utils/resources/bootableresources/helpe
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import {
   getAnnotation,
+  getLabel,
   NamespacedResourceMap,
   ResourceMap,
 } from '@kubevirt-utils/resources/shared';
 import { OS_NAME_TYPES } from '@kubevirt-utils/resources/template';
+
+export const isLinuxGenericPreference = (preference: string): boolean =>
+  preference === 'linux' || preference.startsWith('linux.') || preference.startsWith('linux-');
+
+export const filterBootableVolumesByPreference = (
+  bootableVolumes: BootableVolume[],
+  preference: string,
+): BootableVolume[] => {
+  if (!preference) return bootableVolumes;
+
+  if (isLinuxGenericPreference(preference)) {
+    return bootableVolumes.filter((vol) => {
+      const osCategory = getBootVolumeOS(vol);
+      return osCategory !== OS_NAME_TYPES.rhel && osCategory !== OS_NAME_TYPES.windows;
+    });
+  }
+
+  return bootableVolumes.filter((vol) => {
+    const volLabel = getLabel(vol, DEFAULT_PREFERENCE_LABEL);
+    if (!volLabel) return true;
+    return (
+      preference === volLabel ||
+      preference.startsWith(`${volLabel}.`) ||
+      preference.startsWith(`${volLabel}-`)
+    );
+  });
+};
 
 export const getBootVolumeOS = (bootVolume: BootableVolume): OS_NAME_TYPES => {
   const bootVolumePreference = bootVolume?.metadata?.labels?.[DEFAULT_PREFERENCE_LABEL];
