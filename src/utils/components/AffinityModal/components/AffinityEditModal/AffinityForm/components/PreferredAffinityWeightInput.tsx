@@ -1,8 +1,9 @@
 import React, { Dispatch, FC, SetStateAction, useEffect, useState } from 'react';
 
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
+import NumberTextInput from '@kubevirt-utils/components/NumberTextInput/NumberTextInput';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { FormGroup, TextInput, ValidatedOptions } from '@patternfly/react-core';
+import { FormGroup, ValidatedOptions } from '@patternfly/react-core';
 
 import { AffinityRowData } from '../../../../utils/types';
 
@@ -18,31 +19,25 @@ const PreferredAffinityWeightInput: FC<PreferredAffinityWeightInputProps> = ({
   setSubmitDisabled,
 }) => {
   const { t } = useKubevirtTranslation();
-  const [validated, setValidated] = useState<ValidatedOptions>(ValidatedOptions.default);
+  const [isTouched, setIsTouched] = useState(false);
   const { weight } = focusedAffinity || {};
 
-  const onChange = (value: string) => {
-    setFocusedAffinity({ ...focusedAffinity, weight: +value });
+  const isValid = weight >= 1 && weight <= 100;
+
+  const onChange = (value: number) => {
+    setIsTouched(true);
+    setFocusedAffinity({ ...focusedAffinity, weight: value });
   };
 
   useEffect(() => {
-    if (!weight || weight < 1 || weight > 100) {
-      setValidated(ValidatedOptions.error);
-      setSubmitDisabled(true);
-    } else {
-      setValidated(ValidatedOptions.default);
-      setSubmitDisabled(false);
-    }
-  }, [weight, setSubmitDisabled]);
+    setSubmitDisabled(!isValid);
+  }, [isValid, setSubmitDisabled]);
+
+  const validated = isTouched && !isValid ? ValidatedOptions.error : ValidatedOptions.default;
 
   return (
     <FormGroup fieldId="weight" isRequired label={t('Weight')}>
-      <TextInput
-        onChange={(_event, value: string) => onChange(value)}
-        type="text"
-        validated={validated}
-        value={weight}
-      />
+      <NumberTextInput setValue={onChange} validated={validated} value={weight} />
       <FormGroupHelperText validated={validated}>
         {t('Weight must be a number between 1-100')}
       </FormGroupHelperText>
