@@ -138,6 +138,8 @@
   "name": "kubevirt-plugin",
   "private": true,
   "resolutions": {
+    "@openshift-console/dynamic-plugin-sdk-internal/immutable": "^3.8.3",
+    "@openshift-console/dynamic-plugin-sdk/immutable": "^3.8.3",
     "@types/react": "^17.0.40",
     "@types/react-dom": "^17.0.0"
   },
