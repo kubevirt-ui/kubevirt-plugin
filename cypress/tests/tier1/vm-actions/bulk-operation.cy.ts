@@ -12,18 +12,18 @@ import { tab } from '../../../views/tab';
 import { waitForStatus } from '../../../views/vm-flow';
 
 const DESTINATION_STORAGE_CLASS = 'hostpath-csi-basic';
-const VM_NAMES = [VM_IT_CUST.name, VM_TMPL_CUST.name];
+const VMS = [VM_IT_CUST, VM_TMPL_CUST];
 const WAIT_TIME = 30 * SECOND;
 
 describe('Test bulk actions', () => {
   before(() => {
-    cy.startVM(VM_NAMES);
+    cy.startVM(VMS);
     cy.beforeSpec();
     cy.visitVMsVirt();
   });
 
   after(() => {
-    cy.stopVM(VM_NAMES);
+    cy.stopVM(VMS);
   });
 
   it('stop all VMs by selection', () => {
@@ -42,13 +42,13 @@ describe('Test bulk actions', () => {
     cy.clickVirtLink(nav.vmNav);
     cy.byTestID(vmListTab).should('be.visible').closest('button').click();
 
-    VM_NAMES.forEach((vmName) => waitForStatus(vmName, VM_STATUS.Stopped));
+    VMS.forEach(({ name }) => waitForStatus(name, VM_STATUS.Stopped));
   });
 
   it('bulk storageclass migration', () => {
     // Select VMs for migration
-    VM_NAMES.forEach((vmName) => {
-      getRow(vmName, () => cy.get('input[type="checkbox"]').check({ force: true }));
+    VMS.forEach(({ name }) => {
+      getRow(name, () => cy.get('input[type="checkbox"]').check({ force: true }));
     });
 
     // Perform migration

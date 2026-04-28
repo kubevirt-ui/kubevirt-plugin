@@ -1,19 +1,20 @@
 import { DEFAULT_VM_NAME, TEST_NS } from '../../../utils/const/index';
+import { Example } from '../../../utils/const/string';
 import { navigateToConfigurationSubTab, subTabName } from '../../../views/tab';
 
 const spec = '.spec.template.spec.domain.devices.interfaces';
 const state_down = `"state":"down"`;
 const state_up = `"state":"up"`;
-const VM_NAMES = [DEFAULT_VM_NAME];
+const VMS = [{ name: Example, namespace: TEST_NS }];
 
 describe('Set network down/up', () => {
   before(() => {
-    cy.startVM(VM_NAMES);
+    cy.startVM(VMS);
     cy.beforeSpec();
   });
 
   after(() => {
-    cy.stopVM(VM_NAMES);
+    cy.stopVM(VMS);
   });
 
   it('navigate to network tab', () => {
