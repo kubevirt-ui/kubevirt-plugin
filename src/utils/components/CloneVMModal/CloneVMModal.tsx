@@ -41,7 +41,7 @@ const CloneVMModal: FC<CloneVMModalProps> = ({ headerText, isOpen, onClose, sour
     truncateToK8sName(isVM(source) ? `${name}-clone` : name),
   );
 
-  const [vmNameConfirmed, setVmNameConfirmed] = useState(false);
+  const [isVMNameValid, setIsVMNameValid] = useState(false);
 
   const [cloneDescription, setCloneDescription] = useState('');
 
@@ -82,7 +82,7 @@ const CloneVMModal: FC<CloneVMModalProps> = ({ headerText, isOpen, onClose, sour
     <TabModal
       closeOnSubmit={false}
       headerText={headerText ?? t('Clone {{sourceKind}}', { sourceKind: source.kind })}
-      isDisabled={Boolean(initialCloneRequest) || !vmNameConfirmed}
+      isDisabled={Boolean(initialCloneRequest) || !isVMNameValid}
       isHorizontal
       isLoading={Boolean(initialCloneRequest)}
       isOpen={isOpen}
@@ -93,12 +93,7 @@ const CloneVMModal: FC<CloneVMModalProps> = ({ headerText, isOpen, onClose, sour
       shouldWrapInForm
       submitBtnText={isVM(source) ? t('Clone') : t('Create')}
     >
-      <NameInput
-        autoFocus
-        name={cloneName}
-        onConfirm={() => setVmNameConfirmed(true)}
-        setName={onNameChange}
-      />
+      <NameInput autoFocus name={cloneName} setIsValid={setIsVMNameValid} setName={onNameChange} />
       <DescriptionInput
         placeholder={
           isVM(source)

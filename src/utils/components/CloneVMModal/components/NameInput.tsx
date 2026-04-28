@@ -3,15 +3,16 @@ import { Trans } from 'react-i18next';
 
 import TabToConfirmTextInput from '@kubevirt-utils/components/TabToConfirmTextInput/TabToConfirmTextInput';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getDNS1123LabelError } from '@kubevirt-utils/utils/validation';
 
 type NameInputProps = {
   autoFocus?: boolean;
   name: string;
-  onConfirm: () => void;
+  setIsValid: (valid: boolean) => void;
   setName: Dispatch<SetStateAction<string>>;
 };
 
-const NameInput: FC<NameInputProps> = ({ autoFocus, name, onConfirm, setName }) => {
+const NameInput: FC<NameInputProps> = ({ autoFocus, name, setIsValid, setName }) => {
   const { t } = useKubevirtTranslation();
   return (
     <TabToConfirmTextInput
@@ -26,7 +27,8 @@ const NameInput: FC<NameInputProps> = ({ autoFocus, name, onConfirm, setName }) 
       isRequired
       label={t('Name')}
       onChange={setName}
-      onConfirm={onConfirm}
+      setIsValid={setIsValid}
+      validator={getDNS1123LabelError}
       value={name}
     />
   );
