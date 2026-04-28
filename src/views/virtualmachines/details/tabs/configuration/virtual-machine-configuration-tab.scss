@@ -4,17 +4,17 @@
   flex-direction: column;
   overflow: hidden;
 
-  &--body > &--main {
+  &__body > &__tabs {
     margin: var(--pf-t--global--spacer--sm);
     width: max-content;
     padding-right: var(--pf-t--global--spacer--3xl);
   }
 
-  &--content {
+  &__content {
     width: 100%;
   }
 
-  &--body {
+  &__body {
     flex: 1;
     min-height: 0;
     display: flex;

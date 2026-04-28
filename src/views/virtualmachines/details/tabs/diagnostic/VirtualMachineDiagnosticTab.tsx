@@ -4,7 +4,7 @@ import { useLocation } from 'react-router';
 
 import { VirtualMachineDetailsTab } from '@kubevirt-utils/constants/tabs-constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Tab, Tabs, TabTitleText } from '@patternfly/react-core';
+import { PageSection, Tab, Tabs, TabTitleText } from '@patternfly/react-core';
 import { NavPageComponentProps } from '@virtualmachines/details/utils/types';
 
 import useDiagnosticData from './hooks/useDianosticData';
@@ -32,41 +32,45 @@ const VirtualMachineDiagnosticTab: FC<NavPageComponentProps> = ({ obj: vm }) => 
   }, [location.pathname]);
 
   return (
-    <div className="VirtualMachineDiagnosticTab--main">
-      <Tabs
-        onSelect={(_, key: string) => {
-          navigate(createURLDiagnostic(location.pathname, key));
-          setActiveTabKey(key);
-        }}
-        activeKey={activeTabKey}
-        className="VirtualMachineDiagnosticTab--main__tabs"
-        isVertical
-      >
-        <Tab
-          className="VirtualMachineDiagnosticTab--main__content"
-          data-test-id="vm-diagnostics-status-conditions"
-          eventKey={VirtualMachineDetailsTab.Tables}
-          title={<TabTitleText>{t('Status & Conditions')}</TabTitleText>}
+    <PageSection className="VirtualMachineDiagnosticTab" hasBodyWrapper={false}>
+      <div className="VirtualMachineDiagnosticTab__body">
+        <Tabs
+          onSelect={(_, key: string) => {
+            navigate(createURLDiagnostic(location.pathname, key));
+            setActiveTabKey(key);
+          }}
+          activeKey={activeTabKey}
+          className="VirtualMachineDiagnosticTab__tabs"
+          isVertical
         >
-          <VirtualMachineDiagnosticTabConditions conditions={conditions} />
-          <VirtualMachineDiagnosticTabVolumeStatus
-            volumeSnapshotStatuses={volumeSnapshotStatuses}
-          />
-          <VirtualMachineDiagnosticTabDataVolumeStatus dataVolumesStatuses={dataVolumesStatuses} />
-        </Tab>
-        <Tab
-          className="VirtualMachineDiagnosticTab--main__content"
-          data-test-id="vm-diagnostics-guest-system-log"
-          eventKey={VirtualMachineDetailsTab.Logs}
-          title={<TabTitleText>{t('Guest system log')}</TabTitleText>}
-        >
-          <VirtualMachineLogViewer
-            connect={activeTabKey === VirtualMachineDetailsTab.Logs}
-            vm={vm}
-          />
-        </Tab>
-      </Tabs>
-    </div>
+          <Tab
+            className="VirtualMachineDiagnosticTab__content"
+            data-test-id="vm-diagnostics-status-conditions"
+            eventKey={VirtualMachineDetailsTab.Tables}
+            title={<TabTitleText>{t('Status & Conditions')}</TabTitleText>}
+          >
+            <VirtualMachineDiagnosticTabConditions conditions={conditions} />
+            <VirtualMachineDiagnosticTabVolumeStatus
+              volumeSnapshotStatuses={volumeSnapshotStatuses}
+            />
+            <VirtualMachineDiagnosticTabDataVolumeStatus
+              dataVolumesStatuses={dataVolumesStatuses}
+            />
+          </Tab>
+          <Tab
+            className="VirtualMachineDiagnosticTab__content"
+            data-test-id="vm-diagnostics-guest-system-log"
+            eventKey={VirtualMachineDetailsTab.Logs}
+            title={<TabTitleText>{t('Guest system log')}</TabTitleText>}
+          >
+            <VirtualMachineLogViewer
+              connect={activeTabKey === VirtualMachineDetailsTab.Logs}
+              vm={vm}
+            />
+          </Tab>
+        </Tabs>
+      </div>
+    </PageSection>
   );
 };
 
