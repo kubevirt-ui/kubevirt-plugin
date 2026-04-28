@@ -19,6 +19,7 @@ const useKubevirtUserSettings: UseKubevirtUserSettings = (key, cluster) => {
   const [error, setError] = useState<Error>();
   const [userSettings, setUserSettings] = useState<UserSettingsState>();
   const [loading, setLoading] = useState<boolean>(false);
+  const [settingsInitialized, setSettingsInitialized] = useState<boolean>(false);
   const operatorNamespace = operatorNamespaceSignal.value;
 
   const [user, loadedUser, errorUser] = useK8sWatchData<IoK8sApiCoreV1ConfigMap>({
@@ -39,13 +40,20 @@ const useKubevirtUserSettings: UseKubevirtUserSettings = (key, cluster) => {
       },
   );
 
+  const loadedCM = (loadedConfigMap || !isEmpty(configMapError)) && !isEmpty(operatorNamespace);
+  const loadedUsr = loadedUser || !isEmpty(errorUser);
+
   useEffect(() => {
+    if (!loadedCM || !loadedUsr) return;
+
     if (!isEmpty(userConfigMap) && userName) {
       setUserSettings(
         (<unknown>parseNestedJSON(userConfigMap?.data?.[userName]) || {}) as UserSettingsState,
       );
     }
-  }, [userConfigMap, userName]);
+
+    setSettingsInitialized(true);
+  }, [userConfigMap, userName, loadedCM, loadedUsr]);
 
   const pushUserSettingsChanges = async (data, resolve, reject) => {
     setLoading(true);
@@ -73,13 +81,10 @@ const useKubevirtUserSettings: UseKubevirtUserSettings = (key, cluster) => {
     });
   };
 
-  const loadedCM = (loadedConfigMap || !isEmpty(configMapError)) && !isEmpty(operatorNamespace);
-  const loadedUsr = loadedUser || !isEmpty(errorUser);
-
   return [
     key ? userSettings?.[key] : userSettings,
     userSettings && updateUserSetting,
-    !loading && loadedUsr && loadedCM,
+    !loading && settingsInitialized,
     error || errorUser || configMapError,
   ];
 };
