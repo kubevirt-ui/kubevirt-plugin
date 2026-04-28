@@ -129,22 +129,20 @@ const EditBootableVolumesModal: FC<EditBootableVolumesModalProps> = ({
       shouldWrapInForm
     >
       <FormGroup
-        label={
-          <>
-            {t('Preference')}{' '}
-            <HelpTextIcon
-              bodyContent={(hide) => (
-                <PopoverContentWithLightspeedButton
-                  content={<PreferencePopoverContent />}
-                  hide={hide}
-                  promptType={OLSPromptType.PREFERENCE}
-                />
-              )}
-              position={PopoverPosition.right}
-            />
-          </>
+        labelHelp={
+          <HelpTextIcon
+            bodyContent={(hide) => (
+              <PopoverContentWithLightspeedButton
+                content={<PreferencePopoverContent />}
+                hide={hide}
+                promptType={OLSPromptType.PREFERENCE}
+              />
+            )}
+            position={PopoverPosition.right}
+          />
         }
         isRequired
+        label={t('Preference')}
       >
         <InlineFilterSelect
           options={preferencesNames?.map((opt) => ({
@@ -160,21 +158,19 @@ const EditBootableVolumesModal: FC<EditBootableVolumesModalProps> = ({
       <Grid hasGutter>
         <GridItem span={6}>
           <FormGroup
-            label={
-              <>
-                {t('Default InstanceType')}{' '}
-                <HelpTextIcon
-                  bodyContent={(hide) => (
-                    <PopoverContentWithLightspeedButton
-                      content={t('The default InstanceType for this volume.')}
-                      hide={hide}
-                      promptType={OLSPromptType.DEFAULT_INSTANCETYPE}
-                    />
-                  )}
-                  position={PopoverPosition.right}
-                />
-              </>
+            labelHelp={
+              <HelpTextIcon
+                bodyContent={(hide) => (
+                  <PopoverContentWithLightspeedButton
+                    content={t('The default InstanceType for this volume.')}
+                    hide={hide}
+                    promptType={OLSPromptType.DEFAULT_INSTANCETYPE}
+                  />
+                )}
+                position={PopoverPosition.right}
+              />
             }
+            label={t('Default InstanceType')}
           >
             <FormPFSelect onSelect={onInstanceTypeSelect} selected={instanceType}>
               {Object.keys(InstanceTypeCategory)?.map((instanceTypeCategory) => {
