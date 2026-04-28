@@ -126,6 +126,11 @@ export const getVMListNamespacesURL = (cluster: string, namespace: string): stri
         model: VirtualMachineModel,
       });
 
+export const getACMTextSearchURL = (textSearch: string): string => {
+  const encodedTextFilter = encodeURIComponent(textSearch);
+  return `/multicloud/search?filters={"textsearch":"${encodedTextFilter}"}`;
+};
+
 export const getMulticlusterSearchURL = (
   model: K8sModel,
   name: string,
