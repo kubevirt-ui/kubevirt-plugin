@@ -3,7 +3,7 @@ import classnames from 'classnames';
 
 import { FLAG_LIGHTSPEED_PLUGIN } from '@kubevirt-utils/flags/consts';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { clearCustomizeInstanceType, vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
+import { vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
 import { getValidNamespace, isEmpty } from '@kubevirt-utils/utils/utils';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { useActiveNamespace, useFlag } from '@openshift-console/dynamic-plugin-sdk';
@@ -55,8 +55,6 @@ const VMCreationWizard: FC = () => {
 
   useEffect(() => {
     if (!hasInitialized.current) {
-      // clear any previous state
-      clearCustomizeInstanceType();
       resetWizardState();
       setTemplatesDrawerIsOpen(false);
 
