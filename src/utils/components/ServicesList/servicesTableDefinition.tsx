@@ -58,9 +58,16 @@ const renderLabels = (service: IoK8sApiCoreV1Service): ReactNode => {
   );
 };
 
-const renderSelector = (service: IoK8sApiCoreV1Service): ReactNode => (
-  <Selector namespace={getNamespace(service)} selector={service?.spec?.selector} />
-);
+const renderSelector = (service: IoK8sApiCoreV1Service): ReactNode => {
+  const cluster = getCluster(service);
+  return (
+    <Selector
+      cluster={cluster}
+      namespace={getNamespace(service)}
+      selector={service?.spec?.selector}
+    />
+  );
+};
 
 const renderLocation = (service: IoK8sApiCoreV1Service): ReactNode => (
   <ServiceLocation service={service} />
