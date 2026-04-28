@@ -56,7 +56,7 @@ const VirtualMachineNavPage: FC = () => {
       <SidebarEditorProvider>
         <div className="VirtualMachineNavPage">
           <DocumentTitle>
-            {getResourceDetailsTitle(getName(vmToShow), 'VirtualMachine')}
+            {getResourceDetailsTitle(getName(vmToShow) || name, 'VirtualMachine')}
           </DocumentTitle>
 
           <VirtualMachineNavPageTitle
