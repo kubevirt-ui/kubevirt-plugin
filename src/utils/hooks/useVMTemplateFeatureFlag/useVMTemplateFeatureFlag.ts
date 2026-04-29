@@ -33,7 +33,7 @@ const useVMTemplateFeatureFlag = (clusterOverride?: string) => {
   return {
     canEdit: isAdmin,
     featureEnabled,
-    loading: !hcLoaded || !hcConfigLoaded || !hyperConvergeConfiguration,
+    loading: !hcLoaded || !hcConfigLoaded,
     toggleFeature: (isChecked: boolean) => {
       if (!hyperConvergeConfiguration) {
         return Promise.reject(new Error('HyperConverged configuration is not loaded'));

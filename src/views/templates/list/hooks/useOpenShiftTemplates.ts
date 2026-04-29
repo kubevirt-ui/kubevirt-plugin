@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 
 import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { OPENSHIFT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import useListClusters from '@kubevirt-utils/hooks/useListClusters';
 import useListMulticlusterFilters from '@kubevirt-utils/hooks/useListMulticlusterFilters';
 import {
@@ -30,6 +31,11 @@ export const useOpenShiftTemplates: UseOpenShiftTemplates = ({
   const multiclusterFilters = useListMulticlusterFilters();
   const clusters = useListClusters();
   const cluster = clusters?.length === 1 ? clusters[0] : undefined;
+
+  const templateWatchNamespaces = useMemo(
+    () => (namespace ? [OPENSHIFT_NAMESPACE, namespace] : [OPENSHIFT_NAMESPACE]),
+    [namespace],
+  );
 
   const templateMulticlusterFilters = useMemo(
     () => [
@@ -66,6 +72,7 @@ export const useOpenShiftTemplates: UseOpenShiftTemplates = ({
         },
       ],
     },
+    watchNamespaces: templateWatchNamespaces,
   });
 
   return {
