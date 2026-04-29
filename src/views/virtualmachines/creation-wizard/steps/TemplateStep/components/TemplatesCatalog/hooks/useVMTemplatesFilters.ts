@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router';
 
 import { useURLParams } from '@kubevirt-utils/hooks/useURLParams';
 
@@ -10,7 +11,10 @@ export const useTemplatesFilters = (): [
   (type: CATALOG_FILTERS, value: boolean | string) => void,
   () => void,
 ] => {
-  const { appendParam, deleteParam, params, setParam } = useURLParams();
+  // replace: true uses history.replaceState instead of pushState for every filter change. Firefox caps pushState at 50/10s and throws SecurityError when exceeded.
+  const { appendParam, deleteParam, params, setParam } = useURLParams({ replace: true });
+  const location = useLocation();
+  const navigate = useNavigate();
   const onlyDefaultParam = params.get(CATALOG_FILTERS.ONLY_DEFAULT);
   const onlyDefaultParamIsTrue = onlyDefaultParam === 'true';
   const onlyUserParamIsTrue = params.get(CATALOG_FILTERS.ONLY_USER) === 'true';
@@ -86,20 +90,16 @@ export const useTemplatesFilters = (): [
         break;
 
       default: {
+        const isSelected = (filters?.[type] as Set<string>)?.has(value);
+        if (isSelected) {
+          deleteParam(type, value);
+        } else {
+          appendParam(type, value);
+        }
         setFilters((prev) => {
           const filterSet = new Set<string>(prev?.[type] as Set<string>);
-          if (filterSet.has(value)) {
-            filterSet.delete(value);
-            deleteParam(type, value);
-          } else {
-            filterSet.add(value);
-            appendParam(type, value);
-          }
-
-          return {
-            ...prev,
-            [type]: filterSet,
-          };
+          isSelected ? filterSet.delete(value) : filterSet.add(value);
+          return { ...prev, [type]: filterSet };
         });
       }
     }
@@ -119,9 +119,10 @@ export const useTemplatesFilters = (): [
       [CATALOG_FILTERS.QUERY]: '',
       [CATALOG_FILTERS.WORKLOAD]: new Set(),
     });
-    Object.keys(filters).forEach((key) => {
-      deleteParam(key);
-    });
+
+    const newParams = new URLSearchParams(location.search);
+    Object.values(CATALOG_FILTERS).forEach((key) => newParams.delete(key));
+    navigate({ pathname: location.pathname, search: newParams.toString() }, { replace: true });
   };
 
   useEffect(() => {

@@ -14,11 +14,12 @@ import {
 
 export type TemplatesCatalogEmptyStateProps = {
   bootSourcesLoaded: boolean;
+  isNamespaceEmpty?: boolean;
   onClearFilters: () => void;
 };
 
 const TemplatesCatalogEmptyState: FC<TemplatesCatalogEmptyStateProps> = memo(
-  ({ bootSourcesLoaded, onClearFilters }) => {
+  ({ bootSourcesLoaded, isNamespaceEmpty, onClearFilters }) => {
     const { t } = useKubevirtTranslation();
 
     if (!bootSourcesLoaded) {
@@ -31,6 +32,27 @@ const TemplatesCatalogEmptyState: FC<TemplatesCatalogEmptyStateProps> = memo(
           <EmptyStateBody>
             <Loading />
           </EmptyStateBody>
+        </EmptyState>
+      );
+    }
+
+    if (isNamespaceEmpty) {
+      return (
+        <EmptyState
+          headingLevel="h4"
+          titleText={t('No templates found in this project')}
+          variant={EmptyStateVariant.sm}
+        >
+          <EmptyStateBody>
+            {t('This project does not have any virtual machine templates.')}
+          </EmptyStateBody>
+          <EmptyStateFooter>
+            <EmptyStateActions>
+              <Button onClick={() => onClearFilters()} variant={ButtonVariant.link}>
+                {t('View all projects')}
+              </Button>
+            </EmptyStateActions>
+          </EmptyStateFooter>
         </EmptyState>
       );
     }

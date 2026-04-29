@@ -16,6 +16,12 @@ const TemplatesSearchInput: FC<TemplatesSearchInputProps> = ({ filters, onFilter
 
   const filterByKeywordMsg = t('Filter by keyword...');
 
+  // When filters.query is cleared externally (e.g. by clearAll), reset local state to cancel
+  // any pending debounce timer that could fire a stale navigation.
+  useEffect(() => {
+    if (!filters?.query) setQuery('');
+  }, [filters?.query]);
+
   useEffect(
     () => {
       // Update debounced value after delay
@@ -46,7 +52,7 @@ const TemplatesSearchInput: FC<TemplatesSearchInputProps> = ({ filters, onFilter
       id="filter-text-input"
       placeholder={filterByKeywordMsg}
       type="text"
-      value={filters?.query}
+      value={query}
     />
   );
 };
