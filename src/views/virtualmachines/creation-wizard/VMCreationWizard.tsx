@@ -2,6 +2,7 @@ import React, { FC, useEffect, useRef } from 'react';
 import classnames from 'classnames';
 
 import { FLAG_LIGHTSPEED_PLUGIN } from '@kubevirt-utils/flags/consts';
+import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
 import { getValidNamespace, isEmpty } from '@kubevirt-utils/utils/utils';
@@ -50,22 +51,27 @@ const VMCreationWizard: FC = () => {
   const clusterParam = useClusterParam();
   const hasInitialized = useRef(false);
   const closeWizard = useCloseWizard();
+  const isAdmin = useIsAdmin();
   const [activeNamespace] = useActiveNamespace();
   const namespace = getValidNamespace(activeNamespace);
 
   useEffect(() => {
     if (!hasInitialized.current) {
+      const currentProject = project; // capture before resetWizardState clears it
       resetWizardState();
       setTemplatesDrawerIsOpen(false);
 
       setCluster(clusterParam);
-      setProject(Boolean(project) ? project : namespace);
+      // Non-admin: always use the active namespace.
+      // Admin: keep their previously selected project if set, otherwise use the active namespace.
+      setProject(!isAdmin ? namespace : currentProject || namespace);
       hasInitialized.current = true;
     }
   }, [
     clusterParam,
-    project,
+    isAdmin,
     namespace,
+    project,
     resetWizardState,
     setCluster,
     setProject,
