@@ -29,8 +29,8 @@ const NoVMsAlert: FC<NoVMsAlertProps> = ({ namespace }) => {
   });
 
   const vmWizardURL = useMemo(
-    () => getVMWizardURL(isACMPage ? cluster || '' : ''),
-    [isACMPage, cluster],
+    () => getVMWizardURL(isACMPage ? cluster || '' : '', namespace),
+    [isACMPage, cluster, namespace],
   );
 
   const alertMessage = getAlertMessage(canCreateVM, t);
