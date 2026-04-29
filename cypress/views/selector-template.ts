@@ -43,5 +43,5 @@ export const diskHTTP = '[data-test-id="disk-source-select-http"]';
 export const diskURL = '[data-test-id="disk-source-url"]';
 
 // clone modal
-export const selectProjectStr = '--- Select PVC project ---';
+export const selectProjectStr = 'Select PVC project';
 export const selectPVC = '.pf-v6-c-form-control.pf-v6-c-select__toggle-typeahead';

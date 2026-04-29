@@ -40,7 +40,7 @@ export const PersistentVolumeSelectProject: FC<PersistentVolumeSelectProjectProp
         toggleProps={{
           isFullHeight: true,
         }}
-        placeholder={t('--- Select PVC project ---')}
+        placeholder={t('Select PVC project')}
         selected={selectedProject}
         setSelected={onChange}
       />

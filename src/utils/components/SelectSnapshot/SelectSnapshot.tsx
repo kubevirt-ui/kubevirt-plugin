@@ -82,7 +82,7 @@ const SelectSnapshot: FC<SelectSnapshotProps> = ({
               isDisabled: !selectSnapshotNamespace,
               isFullWidth: true,
             }}
-            placeholder={t('--- Select VolumeSnapshot project ---')}
+            placeholder={t('Select VolumeSnapshot project')}
             selected={snapshotNamespaceSelected}
             setSelected={onSelectProject}
           />
@@ -103,7 +103,7 @@ const SelectSnapshot: FC<SelectSnapshotProps> = ({
               isDisabled: !snapshotNamespaceSelected,
               isFullWidth: true,
             }}
-            placeholder={t('--- Select VolumeSnapshot name ---')}
+            placeholder={t('Select VolumeSnapshot name')}
             selected={snapshotNameSelected}
             setSelected={selectSnapshotName}
           />

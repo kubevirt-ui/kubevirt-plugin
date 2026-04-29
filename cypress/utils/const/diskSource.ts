@@ -40,8 +40,8 @@ export const DiskSource = {
     pvcName: 'rhel9',
     pvcNS: OS_IMAGES_NS,
     selector: '[data-test-id="disk-source-select-dataSource"]',
-    selectPVCName: '--- Select DataSource name ---',
-    selectPVCNS: '--- Select DataSource project ---',
+    selectPVCName: 'Select DataSource name',
+    selectPVCNS: 'Select DataSource project',
   },
   Default: {
     name: 'Default',
@@ -144,9 +144,9 @@ export const CDSource = {
     name: 'PVC',
     pvcName: TEST_PVC_NAME,
     pvcNS: TEST_NS,
-    selectPVCName: '--- Select PVC name ---',
+    selectPVCName: 'Select PVC name',
     // selector: '[data-test-id="disk-source-select-pvc"]',
-    selectPVCNS: '--- Select PVC project ---',
+    selectPVCNS: 'Select PVC project',
   },
   Registry: {
     catalogInput: 'input[data-test-id="cd-boot-source-container-source-input"]',
