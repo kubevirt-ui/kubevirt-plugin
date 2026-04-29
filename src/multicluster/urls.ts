@@ -78,12 +78,15 @@ export const getCatalogURL = (cluster: string, namespace?: string): string => {
     : `/k8s/${namespacePath}/catalog`;
 };
 
-export const getVMWizardURL = (cluster: string): string => {
+export const getVMWizardURL = (cluster: string, namespace?: string): string => {
   if (!cluster) return `/vm-wizard`;
 
+  const namespacePath =
+    namespace && !isAllNamespaces(namespace) ? `ns/${namespace}` : ALL_NAMESPACES;
+
   return cluster === ALL_CLUSTERS_KEY
-    ? `${FLEET_WIZARD_PATH}/${ALL_CLUSTERS_KEY}`
-    : `${FLEET_WIZARD_PATH}/cluster/${cluster}`;
+    ? `${FLEET_WIZARD_PATH}/${ALL_CLUSTERS_KEY}/${ALL_NAMESPACES}`
+    : `${FLEET_WIZARD_PATH}/cluster/${cluster}/${namespacePath}`;
 };
 
 export const getConsoleStandaloneURL = (
