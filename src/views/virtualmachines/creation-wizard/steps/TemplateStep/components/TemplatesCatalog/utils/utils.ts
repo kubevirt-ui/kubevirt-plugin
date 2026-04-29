@@ -75,3 +75,12 @@ export const filterTemplates = (templates: Template[], filters: TemplateFilters)
 
 export const hasNoDefaultUserAllFilters = (filters: TemplateFilters): boolean =>
   !filters?.allItems && !filters?.onlyDefault && !filters?.onlyUser; // none of the filters are set - when first time in
+
+/**
+ * Returns true only when the selected namespace genuinely has no templates.
+ * Uses the pre-client-filter template count so that templates hidden by
+ * hideDeprecatedTemplates, text search, workload, etc. do not incorrectly
+ * trigger the "No templates in this project" empty state.
+ */
+export const isNamespaceEmpty = (filters: TemplateFilters, templatesCount: number): boolean =>
+  !!filters.namespace && templatesCount === 0 && !filters.onlyAvailable && !filters.onlyDefault;

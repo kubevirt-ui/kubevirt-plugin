@@ -12,43 +12,69 @@ import {
   EmptyStateVariant,
 } from '@patternfly/react-core';
 
-export const TemplatesCatalogEmptyState: FC<{
+export type TemplatesCatalogEmptyStateProps = {
   bootSourcesLoaded: boolean;
+  isNamespaceEmpty?: boolean;
   onClearFilters: () => void;
-}> = memo(({ bootSourcesLoaded, onClearFilters }) => {
-  const { t } = useKubevirtTranslation();
+};
 
-  if (!bootSourcesLoaded) {
+export const TemplatesCatalogEmptyState: FC<TemplatesCatalogEmptyStateProps> = memo(
+  ({ bootSourcesLoaded, isNamespaceEmpty, onClearFilters }) => {
+    const { t } = useKubevirtTranslation();
+
+    if (!bootSourcesLoaded) {
+      return (
+        <EmptyState
+          headingLevel="h4"
+          titleText={<>{t('Loading Templates with available boot source')}</>}
+          variant={EmptyStateVariant.lg}
+        >
+          <EmptyStateBody>
+            <Loading />
+          </EmptyStateBody>
+        </EmptyState>
+      );
+    }
+
+    if (isNamespaceEmpty) {
+      return (
+        <EmptyState
+          headingLevel="h4"
+          titleText={<>{t('No templates found in this project')}</>}
+          variant={EmptyStateVariant.sm}
+        >
+          <EmptyStateBody>
+            {t('This project does not have any virtual machine templates.')}
+          </EmptyStateBody>
+          <EmptyStateFooter>
+            <EmptyStateActions>
+              <Button onClick={() => onClearFilters()} variant={ButtonVariant.link}>
+                {t('View all projects')}
+              </Button>
+            </EmptyStateActions>
+          </EmptyStateFooter>
+        </EmptyState>
+      );
+    }
+
     return (
       <EmptyState
         headingLevel="h4"
-        titleText={<>{t('Loading Templates with available boot source')}</>}
-        variant={EmptyStateVariant.lg}
+        titleText={<>{t('No Results Match the Filter Criteria')}</>}
+        variant={EmptyStateVariant.sm}
       >
         <EmptyStateBody>
-          <Loading />
+          {t('No Template items are being shown due to the filters being applied.')}
         </EmptyStateBody>
+        <EmptyStateFooter>
+          <EmptyStateActions>
+            <Button onClick={() => onClearFilters()} variant={ButtonVariant.link}>
+              {t('Clear all filters')}
+            </Button>
+          </EmptyStateActions>
+        </EmptyStateFooter>
       </EmptyState>
     );
-  }
-
-  return (
-    <EmptyState
-      headingLevel="h4"
-      titleText={<>{t('No Results Match the Filter Criteria')}</>}
-      variant={EmptyStateVariant.sm}
-    >
-      <EmptyStateBody>
-        {t('No Template items are being shown due to the filters being applied.')}
-      </EmptyStateBody>
-      <EmptyStateFooter>
-        <EmptyStateActions>
-          <Button onClick={() => onClearFilters()} variant={ButtonVariant.link}>
-            {t('Clear all filters')}
-          </Button>
-        </EmptyStateActions>
-      </EmptyStateFooter>
-    </EmptyState>
-  );
-});
+  },
+);
 TemplatesCatalogEmptyState.displayName = 'TemplatesCatalogEmptyState';
