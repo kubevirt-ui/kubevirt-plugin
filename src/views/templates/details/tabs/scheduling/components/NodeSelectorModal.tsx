@@ -90,12 +90,13 @@ const NodeSelectorModal: FC<NodeSelectorModalProps> = ({ isOpen, onClose, onSubm
       >
         {selectorLabels.length > 0 && (
           <>
-            {selectorLabels.map((label) => (
+            {selectorLabels.map((label, index) => (
               <LabelRow
                 key={label.id}
                 label={label}
                 onChange={onLabelChange}
                 onDelete={onLabelDelete}
+                withKeyValueTitle={index === 0}
               />
             ))}
           </>

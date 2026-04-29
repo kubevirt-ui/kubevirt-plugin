@@ -102,7 +102,7 @@ const TolerationsModal: FC<TolerationsModalProps> = ({
           <TolerationModalDescriptionText />
         </StackItem>
         <StackItem>
-          <div className="pf-c-form">
+          <div className="pf-v6-c-form">
             <LabelsList
               addRowText={t('Add toleration')}
               emptyStateAddRowText={t('Add toleration to specify qualifying Nodes')}
