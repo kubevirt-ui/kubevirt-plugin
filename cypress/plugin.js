@@ -16,14 +16,15 @@ module.exports = (on, config) => {
 
   // `on` is used to hook into various events Cypress emits
   on('task', {
-    log(message) {
+    /** @argument {string|string[]} messages */
+    log(messages) {
       // eslint-disable-next-line no-console
-      console.log(message);
+      console.log(...[].concat(messages));
       return null;
     },
-    logError(message) {
+    logError(messages) {
       // eslint-disable-next-line no-console
-      console.error(message);
+      console.error(...[].concat(messages));
       return null;
     },
     logTable(data) {

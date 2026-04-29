@@ -30,6 +30,20 @@ Cypress.Commands.add('containsExactMatch', (matchString: string, options) =>
 );
 
 Cypress.Commands.add('checkHCOSpec', (spec: string, matchString: string, include: boolean) => {
+  cy.exec(`oc get -n ${CNV_NS} hyperconverged kubevirt-hyperconverged -o jsonpath='{.spec}'`).then(
+    (result) => {
+      let hcoSpec;
+      try {
+        hcoSpec = JSON.parse(result.stdout);
+        hcoSpec = JSON.stringify(hcoSpec, undefined, 2);
+      } catch (error) {
+        hcoSpec = '(not found)';
+      }
+      cy.task('log', ['HCO .spec', hcoSpec]);
+      cy.log('HCO .spec', hcoSpec);
+    },
+  );
+
   cy.exec(
     `oc get -n ${CNV_NS} hyperconverged kubevirt-hyperconverged -o jsonpath='{${spec}}'`,
   ).then((result) => {
