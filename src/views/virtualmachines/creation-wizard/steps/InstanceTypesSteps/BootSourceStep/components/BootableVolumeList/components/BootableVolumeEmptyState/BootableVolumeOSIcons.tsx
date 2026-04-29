@@ -6,22 +6,37 @@ import { getIconByOSName } from '@virtualmachines/creation-wizard/utils/os-icons
 
 import './BootableVolumeEmptyState.scss';
 
-const BootableVolumeOSIcons: FC = () => {
-  const linuxIcon = getIconByOSName(LINUX);
-  const rhelIcon = getIconByOSName(OS_NAME_TYPES.rhel);
-  const windowsIcon = getIconByOSName(OS_NAME_TYPES.windows);
+type BootableVolumeOSIconsProps = {
+  osName?: string;
+};
 
-  const osIcons = [linuxIcon, rhelIcon, windowsIcon];
+const BootableVolumeOSIcons: FC<BootableVolumeOSIconsProps> = ({ osName }) => {
+  if (osName) {
+    const icon = getIconByOSName(osName);
+    if (icon) {
+      return (
+        <Split className="bootable-volume-empty-state__icon-bar">
+          <SplitItem>
+            <img alt="" className="bootable-volume-empty-state__icon" src={icon} />
+          </SplitItem>
+        </Split>
+      );
+    }
+  }
+
+  const osIcons = [
+    getIconByOSName(LINUX),
+    getIconByOSName(OS_NAME_TYPES.rhel),
+    getIconByOSName(OS_NAME_TYPES.windows),
+  ];
 
   return (
     <Split className="bootable-volume-empty-state__icon-bar">
-      {osIcons?.map((icon) => {
-        return (
-          <SplitItem key={icon}>
-            <img alt="" className="bootable-volume-empty-state__icon" src={icon} />
-          </SplitItem>
-        );
-      })}
+      {osIcons?.map((icon) => (
+        <SplitItem key={icon}>
+          <img alt="" className="bootable-volume-empty-state__icon" src={icon} />
+        </SplitItem>
+      ))}
     </Split>
   );
 };
