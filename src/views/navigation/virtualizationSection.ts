@@ -7,6 +7,8 @@ import {
 } from '@openshift-console/dynamic-plugin-sdk';
 import { EncodedExtension } from '@openshift-console/dynamic-plugin-sdk-webpack';
 
+import { FLAG_KUBEVIRT_VIRTUALIZATION_NAV } from '../../utils/flags/consts';
+
 import { NAV_ID, VIRT_SECTION_ID } from './constants';
 
 // Navigation order:
@@ -25,6 +27,9 @@ import { NAV_ID, VIRT_SECTION_ID } from './constants';
 
 export const extensions: EncodedExtension[] = [
   {
+    flags: {
+      required: [FLAG_KUBEVIRT_VIRTUALIZATION_NAV],
+    },
     properties: {
       dataAttributes: {
         'data-quickstart-id': 'qs-nav-sec-virtualization',
