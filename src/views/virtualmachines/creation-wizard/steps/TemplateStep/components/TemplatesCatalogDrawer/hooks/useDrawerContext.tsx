@@ -5,6 +5,7 @@ import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getTemplateVirtualMachineObject, Template } from '@kubevirt-utils/resources/template';
 import { useVMTemplateSource } from '@kubevirt-utils/resources/template';
 import useVMTemplateGeneratedParams from '@kubevirt-utils/resources/template/hooks/useVMTemplateGeneratedParams';
+import useVMWizardStore from '@virtualmachines/creation-wizard/state/vm-wizard-store/useVMWizardStore';
 
 export type DrawerContext = {
   setTemplate: Updater<Template>;
@@ -16,8 +17,11 @@ export type DrawerContext = {
 
 const useDrawer = (initialTemplate: Template) => {
   const [template, setTemplate] = useImmer(initialTemplate);
-  const [templateWithGeneratedParams, loading, error] =
-    useVMTemplateGeneratedParams(initialTemplate);
+  const { project } = useVMWizardStore();
+  const [templateWithGeneratedParams, loading, error] = useVMTemplateGeneratedParams(
+    initialTemplate,
+    project || undefined,
+  );
   const { loaded: bootSourceLoaded } = useVMTemplateSource(initialTemplate);
 
   // reset drawer template state when selected template changes
