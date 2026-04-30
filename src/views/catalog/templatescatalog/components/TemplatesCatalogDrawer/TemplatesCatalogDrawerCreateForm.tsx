@@ -4,7 +4,10 @@ import { DRAWER_FORM_ID } from '@catalog/templatescatalog/utils/consts';
 import { getNotSupportedVMError } from '@catalog/utils/constants';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import FolderSelect from '@kubevirt-utils/components/FolderSelect/FolderSelect';
-import { getStartAfterCreationLabel } from '@kubevirt-utils/components/RunStrategyModal/utils';
+import {
+  getStartAfterCreationLabel,
+  START_AFTER_CREATION_CHECKBOX_ID,
+} from '@kubevirt-utils/components/RunStrategyModal/utils';
 import { validateVMName } from '@kubevirt-utils/components/VMNameValidationHelperText/utils/utils';
 import VMNameValidationHelperText from '@kubevirt-utils/components/VMNameValidationHelperText/VMNameValidationHelperText';
 import { TREE_VIEW_FOLDERS } from '@kubevirt-utils/hooks/useFeatures/constants';
@@ -129,7 +132,7 @@ export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFo
           </StackItem>
           <StackItem>
             <Checkbox
-              id="start-after-create-checkbox"
+              id={START_AFTER_CREATION_CHECKBOX_ID}
               isChecked={startVM}
               label={getStartAfterCreationLabel(t)}
               onChange={(_, checked: boolean) => onChangeStartVM(checked)}

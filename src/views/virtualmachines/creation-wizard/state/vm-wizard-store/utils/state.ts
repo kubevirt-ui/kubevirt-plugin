@@ -9,7 +9,6 @@ export const initialVMWizardState: VMWizardState = {
   folder: '',
   project: '',
   selectedTemplate: null,
-  startVM: false,
   templatesDrawerIsOpen: false,
   vmNameConfirmed: false,
 };
