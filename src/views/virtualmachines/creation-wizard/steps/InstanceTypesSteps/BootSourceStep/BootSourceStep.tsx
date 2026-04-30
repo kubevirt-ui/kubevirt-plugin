@@ -16,7 +16,6 @@ import {
 import useInstanceTypeVMStore from '@virtualmachines/creation-wizard/state/instance-type-vm-store/useInstanceTypeVMStore';
 import useVMWizardStore from '@virtualmachines/creation-wizard/state/vm-wizard-store/useVMWizardStore';
 import BootableVolumeList from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/BootSourceStep/components/BootableVolumeList/BootableVolumeList';
-import BootableVolumesPipelinesHint from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/BootSourceStep/components/BootableVolumeList/components/BootableVolumesPipelinesHint/BootableVolumesPipelinesHint';
 
 import AddBootableVolumeButton from './components/AddBootableVolumeButton';
 
@@ -71,10 +70,6 @@ const BootSourceStep: FC = () => {
           name="boot-volume"
           onChange={() => setUseBootSource(false)}
         />
-      </StackItem>
-      <StackItem isFilled />
-      <StackItem>
-        <BootableVolumesPipelinesHint bootableVolumes={bootableVolumesData?.bootableVolumes} />
       </StackItem>
     </Stack>
   );
