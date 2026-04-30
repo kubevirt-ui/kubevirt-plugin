@@ -1,7 +1,16 @@
 {
   "compilerOptions": {
-    "module": "esnext",
-    "target": "es2021",
-    "types": ["cypress"]
+    "baseUrl": ".",
+    "target": "es2022",
+    "lib": ["es2022", "DOM", "DOM.Iterable"],
+    "module": "es2022",
+    "moduleResolution": "bundler",
+    "types": ["node", "cypress"],
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "allowJs": true,
+    "resolveJsonModule": true,
+    "sourceMap": true,
+    "noEmit": true
   }
 }

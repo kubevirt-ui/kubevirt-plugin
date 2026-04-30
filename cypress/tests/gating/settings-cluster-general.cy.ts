@@ -28,13 +28,9 @@ describe('Test Cluster General settings', () => {
     });
 
     it('verify live migration limits in HCO', () => {
+      // TODO: These json paths are HCO version specific and may break depending on the HCO version.
       const maxPerCluster = '.spec.liveMigrationConfig.parallelMigrationsPerCluster';
       const maxPerNode = '.spec.liveMigrationConfig.parallelOutboundMigrationsPerNode';
-      const spec = '.spec.liveMigrationConfig';
-      const cmd = `oc get -n ${CNV_NS} hyperconverged kubevirt-hyperconverged -o jsonpath='{${spec}}'`;
-      cy.exec(cmd).then((res) => {
-        cy.task('log', res.stdout);
-      });
       cy.checkHCOSpec(maxPerCluster, '4', true);
       cy.checkHCOSpec(maxPerNode, '1', true);
     });
@@ -58,6 +54,7 @@ describe('Test Cluster General settings', () => {
     });
 
     it('verify higherWorkloadDensity in HCO', () => {
+      // TODO: These json paths are HCO version specific and may break depending on the HCO version.
       const percentage = '.spec.higherWorkloadDensity.memoryOvercommitPercentage';
       cy.checkHCOSpec(percentage, MEMORY_DENSITY_VALUE, true);
     });
@@ -71,6 +68,7 @@ describe('Test Cluster General settings', () => {
     });
 
     it('verify higherWorkloadDensity in HCO', () => {
+      // TODO: These json paths are HCO version specific and may break depending on the HCO version.
       const percentage = '.spec.higherWorkloadDensity.memoryOvercommitPercentage';
       cy.checkHCOSpec(percentage, '100', true);
     });

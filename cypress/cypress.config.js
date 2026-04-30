@@ -1,15 +1,25 @@
 /* eslint @typescript-eslint/no-var-requires: "off" */
 const { defineConfig } = require('cypress');
+const plugin = require('./plugin.js');
+
+const baseAddress = process.env.BRIDGE_BASE_ADDRESS || 'http://localhost:9000';
+const basePath = process.env.BRIDGE_BASE_PATH || '/';
+const baseUrl = `${baseAddress}${basePath}`.replace(/\/$/, '');
 
 module.exports = defineConfig({
   defaultCommandTimeout: 60000,
   e2e: {
-    // We've imported your old cypress plugins here.
-    baseUrl: process.env.BRIDGE_BASE_ADDRESS,
+    baseUrl,
     injectDocumentDomain: true,
-    // You may want to clean this up later by importing these.
+
     setupNodeEvents(on, config) {
-      return require('./plugin.js')(on, config);
+      config.env.BRIDGE_HTPASSWD_IDP = process.env.BRIDGE_HTPASSWD_IDP;
+      config.env.BRIDGE_HTPASSWD_USERNAME = process.env.BRIDGE_HTPASSWD_USERNAME;
+      config.env.BRIDGE_HTPASSWD_PASSWORD = process.env.BRIDGE_HTPASSWD_PASSWORD;
+      config.env.BRIDGE_KUBEADMIN_PASSWORD = process.env.BRIDGE_KUBEADMIN_PASSWORD;
+
+      plugin(on, config);
+      return config;
     },
     specPattern: 'tests/*.cy.{js,jsx,ts,tsx}',
     supportFile: 'support/index.ts',
