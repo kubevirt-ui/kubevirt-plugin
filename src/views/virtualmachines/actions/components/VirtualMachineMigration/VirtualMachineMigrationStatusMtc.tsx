@@ -4,8 +4,10 @@ import { Link } from 'react-router-dom-v5-compat';
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import { ALL_NAMESPACES } from '@kubevirt-utils/hooks/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { MultiNamespaceVirtualMachineStorageMigrationPlan } from '@kubevirt-utils/resources/migrations/constants';
-import { STATUS_COMPLETED } from '@kubevirt-utils/resources/migrations/constants';
+import {
+  MigMigration,
+  MigMigrationStatuses,
+} from '@kubevirt-utils/resources/migrations/migrationsMtcConstants';
 import { Timestamp } from '@openshift-console/dynamic-plugin-sdk';
 import {
   ActionList,
@@ -19,18 +21,23 @@ import {
 } from '@patternfly/react-core';
 import { CloseIcon } from '@patternfly/react-icons';
 
-import useProgressMigration from './hooks/useProgressMigration';
-import { getStorageMigrationStatusLabel } from './utils/utils';
+import useProgressMigrationMtc from './hooks/useProgressMigrationMtc';
 
-type VirtualMachineMigrationStatusProps = {
+const getMigMigrationStatusLabel = (status: string, t: (s: string) => string): string => {
+  if (status === MigMigrationStatuses.Failed) return t('Failed');
+  if (status === MigMigrationStatuses.Completed) return t('Migration completed successfully');
+  return t('In progress');
+};
+
+type VirtualMachineMigrationStatusMtcProps = {
+  migMigration: MigMigration;
   onClose: () => void;
-  storageMigrationPlan: MultiNamespaceVirtualMachineStorageMigrationPlan;
   vmNamespace?: string;
 };
 
-const VirtualMachineMigrationStatus: FC<VirtualMachineMigrationStatusProps> = ({
+const VirtualMachineMigrationStatusMtc: FC<VirtualMachineMigrationStatusMtcProps> = ({
+  migMigration,
   onClose,
-  storageMigrationPlan,
   vmNamespace,
 }) => {
   const { t } = useKubevirtTranslation();
@@ -43,14 +50,13 @@ const VirtualMachineMigrationStatus: FC<VirtualMachineMigrationStatusProps> = ({
     creationTimestamp,
     error: fetchingError,
     status,
-    watchStorageMigrationPlan,
-  } = useProgressMigration(storageMigrationPlan);
+  } = useProgressMigrationMtc(migMigration);
 
-  const migrationCompleted = status === STATUS_COMPLETED;
+  const migrationCompleted = status === MigMigrationStatuses.Completed;
 
   return (
     <div className="pf-v6-c-wizard migration-status">
-      <div className="pf-v6-c-wizard__header">
+      <header className="pf-v6-c-wizard__header">
         <div className="pf-v6-c-wizard__close">
           <Button
             aria-label={t('Close')}
@@ -65,13 +71,11 @@ const VirtualMachineMigrationStatus: FC<VirtualMachineMigrationStatusProps> = ({
         <div className="pf-v6-c-wizard__description">
           {t('Migrate VirtualMachine storage to a different StorageClass.')}
         </div>
-      </div>
+      </header>
 
       <DescriptionList className="migration-status__body">
         <DescriptionListGroup>
-          <DescriptionListTerm>
-            {getStorageMigrationStatusLabel(watchStorageMigrationPlan)}
-          </DescriptionListTerm>
+          <DescriptionListTerm>{getMigMigrationStatusLabel(status, t)}</DescriptionListTerm>
         </DescriptionListGroup>
 
         <DescriptionListGroup>
@@ -85,13 +89,11 @@ const VirtualMachineMigrationStatus: FC<VirtualMachineMigrationStatusProps> = ({
           <DescriptionListTerm>{t('Status')}</DescriptionListTerm>
           <DescriptionListDescription>
             {status || t('Requested')}
-
             {migrationCompleted && (
               <>
                 {t('Migrated at')} <Timestamp timestamp={completedMigrationTimestamp} />{' '}
               </>
             )}
-
             <ErrorAlert error={fetchingError} />
           </DescriptionListDescription>
         </DescriptionListGroup>
@@ -108,4 +110,4 @@ const VirtualMachineMigrationStatus: FC<VirtualMachineMigrationStatusProps> = ({
   );
 };
 
-export default VirtualMachineMigrationStatus;
+export default VirtualMachineMigrationStatusMtc;

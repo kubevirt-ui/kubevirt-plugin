@@ -6,19 +6,22 @@ import Loading from '@kubevirt-utils/components/Loading/Loading';
 import StateHandler from '@kubevirt-utils/components/StateHandler/StateHandler';
 import useDefaultStorageClass from '@kubevirt-utils/hooks/useDefaultStorage/useDefaultStorageClass';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getName } from '@kubevirt-utils/resources/shared';
+import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { Modal, ModalBody, Wizard, WizardHeader, WizardStep } from '@patternfly/react-core';
+import useIsMTCInstalled from '@virtualmachines/actions/hooks/useIsMTCInstalled';
 
 import useMigrationNamespacesPVCs from './hooks/useMigrationNamespacesPVCs';
 import useMigrationState from './hooks/useMigrationState';
+import useMigrationStateMtc from './hooks/useMigrationStateMtc';
 import VirtualMachineMigrationDestinationTab from './tabs/VirtualMachineMigrationDestinationTab';
 import VirtualMachineMigrationDetails from './tabs/VirtualMachineMigrationDetails';
 import VirtualMachineMigrationReviewTab from './tabs/VirtualMachineMigrationReviewTab';
 import { SelectedMigration } from './utils/constants';
 import { getAllSelectedMigrations } from './utils/utils';
 import VirtualMachineMigrationStatus from './VirtualMachineMigrationStatus';
+import VirtualMachineMigrationStatusMtc from './VirtualMachineMigrationStatusMtc';
 
 import './virtual-machine-migration-modal.scss';
 
@@ -34,6 +37,7 @@ const VirtualMachineMigrateModal: FC<VirtualMachineMigrateModalProps> = ({
   vms,
 }) => {
   const { t } = useKubevirtTranslation();
+  const mtcInstalled = useIsMTCInstalled();
 
   const cluster = getCluster(vms?.[0]);
   const [selectedStorageClass, setSelectedStorageClass] = useState('');
@@ -74,8 +78,16 @@ const VirtualMachineMigrateModal: FC<VirtualMachineMigrateModalProps> = ({
     [defaultStorageClassName, selectedStorageClass],
   );
 
-  const { migrationError, migrationLoading, migrationPlan, migrationStarted, onSubmit } =
-    useMigrationState(selectedMigrations, destinationStorageClass);
+  const vmsmpState = useMigrationState(selectedMigrations, destinationStorageClass);
+  const mtcState = useMigrationStateMtc(
+    selectedMigrations,
+    migrationNamespacesPVCs,
+    destinationStorageClass,
+  );
+
+  const { migrationError, migrationLoading, migrationStarted, onSubmit } = mtcInstalled
+    ? mtcState
+    : vmsmpState;
 
   const nothingSelected = isEmpty(selectedPVCs);
 
@@ -100,9 +112,21 @@ const VirtualMachineMigrateModal: FC<VirtualMachineMigrateModalProps> = ({
           hasData
           loaded={migrationNamespacesPVCsLoaded && selectedMigrations !== null}
         >
-          {migrationStarted ? (
-            <VirtualMachineMigrationStatus onClose={onClose} storageMigrationPlan={migrationPlan} />
-          ) : (
+          {migrationStarted && mtcInstalled && (
+            <VirtualMachineMigrationStatusMtc
+              migMigration={mtcState.migMigration}
+              onClose={onClose}
+              vmNamespace={getNamespace(vms?.[0])}
+            />
+          )}
+          {migrationStarted && !mtcInstalled && (
+            <VirtualMachineMigrationStatus
+              onClose={onClose}
+              storageMigrationPlan={vmsmpState.migrationPlan}
+              vmNamespace={getNamespace(vms?.[0])}
+            />
+          )}
+          {!migrationStarted && (
             <Wizard
               header={
                 <WizardHeader
