@@ -5,7 +5,7 @@ import { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { humanizeBinaryBytes } from '@kubevirt-utils/utils/humanize.js';
 import Status from '@openshift-console/dynamic-plugin-sdk/lib/app/components/status/Status';
-import { Checkbox } from '@patternfly/react-core';
+import { Radio } from '@patternfly/react-core';
 
 import { NodeData } from '../../utils/types';
 
@@ -23,10 +23,12 @@ const SelectionCell: FC<SelectionCellProps> = ({ callbacks, row }) => {
   const { t } = useKubevirtTranslation();
   const { handleNodeSelection, selectedNode } = callbacks;
   return (
-    <Checkbox
+    <Radio
       aria-label={t('Select node {{name}}', { name: row.name })}
       id={`select-${row.name}`}
       isChecked={selectedNode === row.name}
+      label=""
+      name="compute-migration-node-selection"
       onChange={() => handleNodeSelection(row.name)}
     />
   );

@@ -44,7 +44,7 @@ const ComputeMigrationModal: FC<ComputeMigrationModalProps> = ({ isOpen, onClose
   const [error, setError] = useState<Error>(null);
 
   const handleNodeSelection = (changedNode: string) => {
-    changedNode === selectedNode ? setSelectedNode('') : setSelectedNode(changedNode);
+    setSelectedNode(changedNode);
   };
 
   const initiateMigration = async () => {
