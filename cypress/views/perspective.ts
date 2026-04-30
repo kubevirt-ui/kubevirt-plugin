@@ -26,6 +26,8 @@ export const switchPerspective = (perspective: Perspective) => {
         cy.get(toggle).click();
         cy.get(menu, { timeout: 30 * SECOND }).should('be.visible');
         cy.contains(option, perspective).click();
+      } else {
+        cy.task('log', `Already on ${perspective} perspective`);
       }
     });
 

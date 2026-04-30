@@ -8,7 +8,6 @@ declare global {
       selectProject(name: string): void;
       selectTestProject(): void;
       switchProject(name: string): void;
-      switchProjectUsingTreeView(projectName: string): void;
     }
   }
 }

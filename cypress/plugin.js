@@ -3,39 +3,28 @@
 // the project's config changing)
 const fs = require('fs');
 const path = require('path');
-const wp = require('@cypress/webpack-preprocessor');
+const createBundler = require('@bahmutov/cypress-esbuild-preprocessor');
 
 module.exports = (on, config) => {
-  const options = {
-    webpackOptions: {
-      module: {
-        rules: [
-          {
-            exclude: /node_modules/,
-            loader: 'esbuild-loader',
-            test: /\.ts$/,
-          },
-        ],
-      },
-      output: {
-        filename: 'bundle.js',
-        path: path.resolve(__dirname, 'cypress-dist'),
-      },
-      resolve: {
-        extensions: ['.ts', '.js'],
-      },
-    },
-  };
+  on(
+    'file:preprocessor',
+    createBundler({
+      sourcemap: true,
+      sourcesContent: true,
+    }),
+  );
+
   // `on` is used to hook into various events Cypress emits
   on('task', {
-    log(message) {
+    /** @argument {string|string[]} messages */
+    log(messages) {
       // eslint-disable-next-line no-console
-      console.log(message);
+      console.log(...[].concat(messages));
       return null;
     },
-    logError(message) {
+    logError(messages) {
       // eslint-disable-next-line no-console
-      console.error(message);
+      console.error(...[].concat(messages));
       return null;
     },
     logTable(data) {
@@ -50,6 +39,7 @@ module.exports = (on, config) => {
       return null;
     },
   });
+
   on('after:screenshot', (details) => {
     // Prepend "1_", "2_", etc. to screenshot filenames because they are sorted alphanumerically in CI's artifacts dir
     const pathObj = path.parse(details.path);
@@ -66,14 +56,6 @@ module.exports = (on, config) => {
       });
     });
   });
-  on('file:preprocessor', wp(options));
-  // `config` is the resolved Cypress config
-  config.baseUrl = `${process.env.BRIDGE_BASE_ADDRESS || 'http://localhost:9000'}${(
-    process.env.BRIDGE_BASE_PATH || '/'
-  ).replace(/\/$/, '')}`;
-  config.env.BRIDGE_HTPASSWD_IDP = process.env.BRIDGE_HTPASSWD_IDP;
-  config.env.BRIDGE_HTPASSWD_USERNAME = process.env.BRIDGE_HTPASSWD_USERNAME;
-  config.env.BRIDGE_HTPASSWD_PASSWORD = process.env.BRIDGE_HTPASSWD_PASSWORD;
-  config.env.BRIDGE_KUBEADMIN_PASSWORD = process.env.BRIDGE_KUBEADMIN_PASSWORD;
+
   return config;
 };

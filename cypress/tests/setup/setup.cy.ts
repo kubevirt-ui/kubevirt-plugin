@@ -34,16 +34,9 @@ function isSSHKeyConfiguredForTestNS($section: JQuery): boolean {
 }
 
 function configureSSHSecret() {
-  cy.byLegacyTestID(SSH_SECTION).then(($section) => {
-    if ($section.find('[data-test-id="select-project-toggle"]').length === 0) {
-      cy.contains('button', 'Add public SSH key to project').click();
-    }
-  });
-
-  cy.get('[data-test-id="select-project-toggle"]', { timeout: 30000 }).click();
-  cy.get(`[data-test-id="select-option-${TEST_NS}"]`, { timeout: 60000 }).click({ force: true });
-
-  cy.contains('button.project-ssh-row__secret-name', 'Not configured', { timeout: 10000 }).click();
+  cy.byLegacyTestID('select-project-toggle').click();
+  cy.get(`[data-test-id="select-option-${TEST_NS}"] button`).click();
+  cy.get('button.project-ssh-row__secret-name').click();
   cy.get(useExisting).click();
   cy.get(selectSecret).click();
   cy.byButtonText(TEST_SECRET_NAME).click();

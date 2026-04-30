@@ -1,3 +1,5 @@
+import { VirtualMachineData } from 'types/vm';
+
 import { CNV_NS, K8S_KIND, TEST_NS } from '../utils/const/index';
 import { Perspective, switchPerspective } from '../views/perspective';
 
@@ -15,9 +17,9 @@ declare global {
         options?: Partial<Loggable & Timeoutable & Withinable & Shadow>,
       ): Chainable;
       deleteVM(vmName: string[]): void;
-      patchVM(vmName: string, status: string): void;
-      startVM(vmName: string[]): void;
-      stopVM(vmName: string[]): void;
+      patchVM(vmName: string, namespace: string, status: string): void;
+      startVM(vmName: VirtualMachineData[]): void;
+      stopVM(vmName: VirtualMachineData[]): void;
       switchToVirt(): void;
     }
   }
@@ -28,6 +30,20 @@ Cypress.Commands.add('containsExactMatch', (matchString: string, options) =>
 );
 
 Cypress.Commands.add('checkHCOSpec', (spec: string, matchString: string, include: boolean) => {
+  cy.exec(`oc get -n ${CNV_NS} hyperconverged kubevirt-hyperconverged -o jsonpath='{.spec}'`).then(
+    (result) => {
+      let hcoSpec;
+      try {
+        hcoSpec = JSON.parse(result.stdout);
+        hcoSpec = JSON.stringify(hcoSpec, undefined, 2);
+      } catch (error) {
+        hcoSpec = '(not found)';
+      }
+      cy.task('log', ['HCO .spec', hcoSpec]);
+      cy.log('HCO .spec', hcoSpec);
+    },
+  );
+
   cy.exec(
     `oc get -n ${CNV_NS} hyperconverged kubevirt-hyperconverged -o jsonpath='{${spec}}'`,
   ).then((result) => {
@@ -71,25 +87,24 @@ Cypress.Commands.add(
   },
 );
 
-Cypress.Commands.add('patchVM', (vmName: string, status: string) => {
+Cypress.Commands.add('patchVM', (vmName: string, namespace: string, status: string) => {
   cy.exec(
-    `oc patch virtualmachine ${vmName} -n ${TEST_NS} --type merge -p '{"spec":{"runStrategy":"${status}"}}'`,
-    { failOnNonZeroExit: false },
+    `oc -n "${namespace}" patch virtualmachine "${vmName}" --type merge -p '{"spec":{"runStrategy":"${status}"}}'`,
   );
 });
 
-Cypress.Commands.add('startVM', (vms: string[]) => {
-  vms.forEach((vmName) => {
-    cy.patchVM(vmName, 'Always');
-    cy.exec(`oc wait --for=condition=ready vm/${vmName} -n ${TEST_NS} --timeout=300s`, {
+Cypress.Commands.add('startVM', (vms: VirtualMachineData[]) => {
+  vms.forEach(({ name, namespace }) => {
+    cy.patchVM(name, namespace, 'Always');
+    cy.exec(`oc wait --for=condition=ready vm/${name} -n ${namespace} --timeout=300s`, {
       timeout: 300000,
     });
   });
 });
 
-Cypress.Commands.add('stopVM', (vms: string[]) => {
-  vms.forEach((vmName) => {
-    cy.patchVM(vmName, 'Halted');
+Cypress.Commands.add('stopVM', (vms: VirtualMachineData[]) => {
+  vms.forEach(({ name, namespace }) => {
+    cy.patchVM(name, namespace, 'Halted');
   });
 });
 
