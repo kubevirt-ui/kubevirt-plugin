@@ -4,6 +4,7 @@ import { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-d
 import { getUID } from '@kubevirt-utils/resources/shared';
 import { isDefaultVariantTemplate, Template } from '@kubevirt-utils/resources/template';
 import { useSingleClusterAvailableSources } from '@kubevirt-utils/resources/template/hooks/useSingleClusterAvailableSources';
+import { isVirtualMachineTemplate } from '@kubevirt-utils/resources/template/utils/types';
 import useAvailableTemplates from '@virtualmachines/creation-wizard/steps/TemplateStep/components/TemplatesCatalog/hooks/useTemplatesWithAvailableSource/useAvailableTemplates';
 import useTemplates from '@virtualmachines/creation-wizard/steps/TemplateStep/components/TemplatesCatalog/hooks/useTemplatesWithAvailableSource/useTemplates';
 
@@ -41,8 +42,9 @@ const useTemplatesWithAvailableSource: UseTemplatesWithAvailableSource = ({
   );
 
   const filteredTemplates = useMemo(() => {
-    return (onlyAvailable ? availableTemplates : templates).filter((template) =>
-      onlyDefault ? isDefaultVariantTemplate(template) : true,
+    return (onlyAvailable ? availableTemplates : templates).filter(
+      (template) =>
+        !onlyDefault || isDefaultVariantTemplate(template) || isVirtualMachineTemplate(template),
     );
   }, [availableTemplates, onlyAvailable, onlyDefault, templates]);
 

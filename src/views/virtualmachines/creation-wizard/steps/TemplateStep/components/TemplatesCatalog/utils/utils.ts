@@ -11,6 +11,7 @@ import {
   getTemplateOS,
   getTemplateWorkload,
 } from '@kubevirt-utils/resources/template/utils/selectors';
+import { isVirtualMachineTemplate } from '@kubevirt-utils/resources/template/utils/types';
 import { getArchitecture } from '@kubevirt-utils/utils/architecture';
 
 import { TemplateFilters } from './types';
@@ -32,7 +33,8 @@ export const filterTemplates = (templates: Template[], filters: TemplateFilters)
 
         const defaultVariantFilter =
           (!filters?.onlyDefault && !hasNoDefaultUserAllFilters(filters)) ||
-          isDefaultVariantTemplate(tmp);
+          isDefaultVariantTemplate(tmp) ||
+          isVirtualMachineTemplate(tmp);
 
         const userFilter = !filters.onlyUser || isUserTemplate(tmp);
 
