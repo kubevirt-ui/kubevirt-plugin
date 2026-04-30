@@ -7,11 +7,12 @@ export type VMWizardState = {
   cluster: string;
   creationMethod: VMCreationMethod;
   folder: string;
+  isVMNameValid: boolean;
   project: string;
   selectedTemplate: Template;
   startVM: boolean;
   templatesDrawerIsOpen: boolean;
-  vmNameConfirmed: boolean;
+  vmNameInteracted: boolean;
 };
 
 export type VMWizardActions = {
@@ -21,11 +22,12 @@ export type VMWizardActions = {
   setCluster: (cluster: string) => void;
   setCreationMethod: (creationMethod: VMCreationMethod) => void;
   setFolder: (folder: string) => void;
+  setIsVMNameValid: (isVMNameValid: boolean) => void;
   setProject: (project: string) => void;
   setSelectedTemplate: (template: Template) => void;
   setStartVM: (startVM: boolean) => void;
   setTemplatesDrawerIsOpen: (templatesDrawerIsOpen: boolean) => void;
-  setVMNameConfirmed: (vmNameConfirmed: boolean) => void;
+  setVMNameInteracted: (vmNameInteracted: boolean) => void;
 };
 
 export type VMWizardStore = VMWizardState & VMWizardActions;

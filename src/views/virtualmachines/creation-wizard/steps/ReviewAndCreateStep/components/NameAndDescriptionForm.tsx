@@ -1,11 +1,12 @@
-import React, { FC, useState } from 'react';
+import React, { FC } from 'react';
 import { Trans } from 'react-i18next';
 
 import TabToConfirmTextInput from '@kubevirt-utils/components/TabToConfirmTextInput/TabToConfirmTextInput';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getDescription, getName } from '@kubevirt-utils/resources/shared';
 import { updateCustomizeInstanceType, vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
-import { Form, FormGroup, TextInput, ValidatedOptions } from '@patternfly/react-core';
+import { getDNS1123LabelError } from '@kubevirt-utils/utils/validation';
+import { Form, FormGroup, TextInput } from '@patternfly/react-core';
 import { useSignals } from '@preact/signals-react/runtime';
 import useVMWizardStore from '@virtualmachines/creation-wizard/state/vm-wizard-store/useVMWizardStore';
 import { isCloneCreationMethod } from '@virtualmachines/creation-wizard/utils/utils';
@@ -20,22 +21,23 @@ const NameAndDescriptionForm: FC = () => {
     creationMethod,
     setCloneVMDescription,
     setCloneVMName,
-    setVMNameConfirmed,
+    setIsVMNameValid,
+    setVMNameInteracted,
+    vmNameInteracted,
   } = useVMWizardStore();
   const isCloneMethod = isCloneCreationMethod(creationMethod);
 
-  const [nameValidated, setNameValidated] = useState<ValidatedOptions>(ValidatedOptions.default);
-  const [descriptionValidated, setDescriptionValidated] = useState<ValidatedOptions>(
-    ValidatedOptions.default,
-  );
   useSignals();
   const vm = vmSignal.value;
+
+  const handleSetIsValid = (valid: boolean) => {
+    setIsVMNameValid(valid);
+    if (!vmNameInteracted) setVMNameInteracted(true);
+  };
 
   const onNameChange = (name: string) => {
     if (isCloneMethod) setCloneVMName(name);
     else updateCustomizeInstanceType([{ data: name, path: 'metadata.name' }]);
-
-    setNameValidated(ValidatedOptions.success);
   };
 
   const onDescriptionChange = (description: string) => {
@@ -44,8 +46,6 @@ const NameAndDescriptionForm: FC = () => {
       updateCustomizeInstanceType([
         { data: description, path: 'metadata.annotations.description' },
       ]);
-
-    setDescriptionValidated(ValidatedOptions.success);
   };
 
   return (
@@ -58,19 +58,19 @@ const NameAndDescriptionForm: FC = () => {
         }
         autoFocus
         className="name-and-description-form__input"
+        defaultInteracted={vmNameInteracted}
         fieldId="vm name"
         isRequired
         label={t('Name')}
         onChange={onNameChange}
-        onConfirm={() => setVMNameConfirmed(true)}
-        validated={nameValidated}
+        setIsValid={handleSetIsValid}
+        validator={getDNS1123LabelError}
         value={isCloneMethod ? cloneVMName : getName(vm)}
       />
       <FormGroup className="name-and-description-form__input" label={t('Description')}>
         <TextInput
           onChange={(_event, value: string) => onDescriptionChange(value)}
           type="text"
-          validated={descriptionValidated}
           value={isCloneMethod ? cloneVMDescription : getDescription(vm)}
         />
       </FormGroup>

@@ -1,4 +1,5 @@
 import React, { FC, FormEvent, KeyboardEvent, ReactNode, useEffect, useRef, useState } from 'react';
+import { TFunction } from 'i18next';
 
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import { TAB } from '@kubevirt-utils/hooks/useClickOutside/constants';
@@ -10,34 +11,55 @@ import './TabToConfirmTextInput.scss';
 type TabToConfirmTextInputProps = {
   autoFocus?: boolean;
   className?: string;
+  defaultInteracted?: boolean;
   fieldId: string;
   helperText?: ReactNode;
   isRequired?: boolean;
   label?: string;
   onChange?: (value: string) => void;
-  onConfirm: () => void;
   placeholder?: string;
-  validated?: ValidatedOptions;
+  setIsValid: (valid: boolean) => void;
+  validator?: (value: string) => (t: TFunction) => string;
   value?: string;
 };
 
 const TabToConfirmTextInput: FC<TabToConfirmTextInputProps> = ({
   autoFocus = false,
   className,
+  defaultInteracted = false,
   fieldId,
   helperText,
   isRequired = false,
   label,
   onChange,
-  onConfirm,
   placeholder,
-  validated = ValidatedOptions.default,
+  setIsValid,
+  validator,
   value = '',
 }) => {
   const { t } = useKubevirtTranslation();
   const [isFocused, setIsFocused] = useState<boolean>(false);
-  const [isConfirmed, setIsConfirmed] = useState<boolean>(false);
+  const [hasInteracted, setHasInteracted] = useState<boolean>(defaultInteracted);
+  const [errorText, setErrorText] = useState<string>();
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const validate = (nameValue: string): void => {
+    if (validator) {
+      const error = validator(nameValue);
+      if (error) {
+        setErrorText(error(t));
+        setIsValid(false);
+        return;
+      }
+    }
+    setErrorText(undefined);
+    setIsValid(true);
+  };
+
+  useEffect(() => {
+    if (defaultInteracted) validate(value);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (!autoFocus || !inputRef.current) return;
@@ -73,10 +95,10 @@ const TabToConfirmTextInput: FC<TabToConfirmTextInputProps> = ({
   }, [autoFocus]);
 
   const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>): void => {
-    if (event.key === TAB && isFocused && !isConfirmed) {
+    if (event.key === TAB && isFocused && !hasInteracted) {
       event.preventDefault();
-      setIsConfirmed(true);
-      onConfirm();
+      setHasInteracted(true);
+      validate(value);
     }
   };
 
@@ -89,7 +111,9 @@ const TabToConfirmTextInput: FC<TabToConfirmTextInputProps> = ({
   };
 
   const handleChange = (_event: FormEvent<HTMLInputElement>, newValue: string): void => {
+    if (!hasInteracted) setHasInteracted(true);
     onChange?.(newValue);
+    validate(newValue);
   };
 
   return (
@@ -105,16 +129,19 @@ const TabToConfirmTextInput: FC<TabToConfirmTextInputProps> = ({
           placeholder={placeholder}
           ref={inputRef}
           type="text"
-          validated={validated}
+          validated={errorText ? ValidatedOptions.error : ValidatedOptions.default}
           value={value}
         />
-        {isFocused && !isConfirmed && (
+        {isFocused && !hasInteracted && (
           <Label className="tab-to-confirm-text-input__badge" isCompact>
             {t('Tab')}
           </Label>
         )}
       </div>
-      {helperText && <FormGroupHelperText validated={validated}>{helperText}</FormGroupHelperText>}
+      {!hasInteracted && helperText && <FormGroupHelperText>{helperText}</FormGroupHelperText>}
+      {errorText && (
+        <FormGroupHelperText validated={ValidatedOptions.error}>{errorText}</FormGroupHelperText>
+      )}
     </FormGroup>
   );
 };
