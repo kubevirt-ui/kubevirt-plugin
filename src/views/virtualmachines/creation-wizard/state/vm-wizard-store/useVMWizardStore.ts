@@ -22,7 +22,6 @@ const useVMWizardStore = create<VMWizardStore>()((set) => {
     setFolder: (folder: string) => set({ folder }),
     setProject: (project: string) => set({ project }),
     setSelectedTemplate: (selectedTemplate: Template) => set(() => ({ selectedTemplate })),
-    setStartVM: (startVM: boolean) => set({ startVM }),
     setTemplatesDrawerIsOpen: (templatesDrawerIsOpen: boolean) =>
       set(() => ({ templatesDrawerIsOpen })),
     setVMNameConfirmed: (vmNameConfirmed: boolean) => set({ vmNameConfirmed }),
