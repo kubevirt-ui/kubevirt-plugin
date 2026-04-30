@@ -154,7 +154,6 @@ jobs:
 
   build-kubevirt-plugin-image:
     name: Build Kubevirt Plugin Image
-    needs: check-runner
     runs-on: ubuntu-latest
     outputs:
       kubevirt-plugin-image: ${{ env.KUBEVIRT_PLUGIN_IMAGE }}
@@ -210,7 +209,7 @@ jobs:
 
   run-gating-tests:
     name: Run Gating Tests
-    needs: build-kubevirt-plugin-image
+    needs: [check-runner, build-kubevirt-plugin-image]
     runs-on: kubevirt-plugin-ci
     timeout-minutes: 120
     env:
