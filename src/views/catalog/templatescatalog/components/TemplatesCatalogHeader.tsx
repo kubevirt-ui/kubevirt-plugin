@@ -1,5 +1,6 @@
 import React, { FC, memo, useEffect, useState } from 'react';
 
+import useSearchQuerySync from '@catalog/templatescatalog/hooks/useSearchQuerySync';
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
@@ -29,6 +30,8 @@ export const TemplatesCatalogHeader: FC<{
 }> = memo(({ filters, itemCount, onFilterChange }) => {
   const { t } = useKubevirtTranslation();
   const [query, setQuery] = useState<string>(filters?.query || '');
+
+  useSearchQuerySync(filters?.query, setQuery);
 
   useEffect(
     () => {
@@ -90,7 +93,7 @@ export const TemplatesCatalogHeader: FC<{
             id="filter-text-input"
             placeholder={t('Filter by keyword...')}
             type="text"
-            value={filters?.query}
+            value={query}
           />
         </div>
 

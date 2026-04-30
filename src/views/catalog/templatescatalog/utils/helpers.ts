@@ -108,3 +108,6 @@ export const updateVMCPUMemory = (
 
 export const hasNoDefaultUserAllFilters = (filters: TemplateFilters): boolean =>
   !filters?.allItems && !filters?.onlyDefault && !filters?.onlyUser; // none of the filters are set - when first time in
+
+export const isNamespaceEmpty = (filters: TemplateFilters, templatesCount: number): boolean =>
+  !!filters.namespace && templatesCount === 0 && !filters.onlyAvailable && !filters.onlyDefault;

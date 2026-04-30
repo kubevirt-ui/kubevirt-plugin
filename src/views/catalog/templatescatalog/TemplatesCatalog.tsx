@@ -18,7 +18,7 @@ import { TemplatesCatalogItems } from './components/TemplatesCatalogItems';
 import { skeletonCatalog } from './components/TemplatesCatalogSkeleton';
 import { useTemplatesWithAvailableSource } from './hooks/useTemplatesWithAvailableSource';
 import { useTemplatesFilters } from './hooks/useVmTemplatesFilters';
-import { filterTemplates } from './utils/helpers';
+import { filterTemplates, isNamespaceEmpty } from './utils/helpers';
 
 import './TemplatesCatalog.scss';
 
@@ -78,6 +78,7 @@ const TemplatesCatalog: FC<TemplatesCatalogProps> = ({ currentTab }) => {
                 ) : (
                   <TemplatesCatalogEmptyState
                     bootSourcesLoaded={bootSourcesLoaded}
+                    isNamespaceEmpty={isNamespaceEmpty(filters, templates.length)}
                     onClearFilters={clearAll}
                   />
                 )}

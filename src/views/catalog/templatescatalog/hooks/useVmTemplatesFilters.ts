@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router';
 
 import { useURLParams } from '@kubevirt-utils/hooks/useURLParams';
 
@@ -10,12 +11,18 @@ export const useTemplatesFilters = (): [
   (type: CATALOG_FILTERS, value: boolean | string) => void,
   () => void,
 ] => {
-  const { appendParam, deleteParam, params, setParam } = useURLParams();
+  // replace: true uses history.replaceState instead of pushState for every filter change.Firefox caps pushState at 50/10s and throws SecurityError when exceeded.
+  const { appendParam, deleteParam, params, setParam } = useURLParams({ replace: true });
+  const location = useLocation();
+  const navigate = useNavigate();
   const onlyDefaultParam = params.get(CATALOG_FILTERS.ONLY_DEFAULT);
+  const onlyDefaultParamIsTrue = onlyDefaultParam === 'true';
+  const onlyUserParamIsTrue = params.get(CATALOG_FILTERS.ONLY_USER) === 'true';
+
   const hasNoDefaultUserAllParams =
-    !!params.get(CATALOG_FILTERS.ONLY_DEFAULT) &&
-    !!params.get(CATALOG_FILTERS.ONLY_USER) &&
-    !!params.get(CATALOG_FILTERS.ALL_ITEMS); // has none of these params when accessing catalog for the first time
+    onlyDefaultParamIsTrue &&
+    onlyUserParamIsTrue &&
+    params.get(CATALOG_FILTERS.ALL_ITEMS) === 'true'; // has none of these params when accessing catalog for the first time
 
   const [filters, setFilters] = useState<TemplateFilters>({
     [CATALOG_FILTERS.ALL_ITEMS]: params.get(CATALOG_FILTERS.ONLY_DEFAULT) === 'false',
@@ -25,9 +32,8 @@ export const useTemplatesFilters = (): [
     [CATALOG_FILTERS.IS_LIST]: params.get(CATALOG_FILTERS.IS_LIST) === 'true',
     [CATALOG_FILTERS.NAMESPACE]: params.get(CATALOG_FILTERS.NAMESPACE) || '',
     [CATALOG_FILTERS.ONLY_AVAILABLE]: params.get(CATALOG_FILTERS.ONLY_AVAILABLE) === 'true',
-    [CATALOG_FILTERS.ONLY_DEFAULT]:
-      !!params.get(CATALOG_FILTERS.ONLY_DEFAULT) || hasNoDefaultUserAllParams,
-    [CATALOG_FILTERS.ONLY_USER]: !!params.get(CATALOG_FILTERS.ONLY_USER),
+    [CATALOG_FILTERS.ONLY_DEFAULT]: onlyDefaultParamIsTrue || hasNoDefaultUserAllParams,
+    [CATALOG_FILTERS.ONLY_USER]: onlyUserParamIsTrue,
     [CATALOG_FILTERS.OS_NAME]: new Set([...params.getAll(CATALOG_FILTERS.OS_NAME)]),
     [CATALOG_FILTERS.QUERY]: params.get(CATALOG_FILTERS.QUERY) || '',
     [CATALOG_FILTERS.WORKLOAD]: new Set([...params.getAll(CATALOG_FILTERS.WORKLOAD)]),
@@ -84,18 +90,16 @@ export const useTemplatesFilters = (): [
         break;
 
       default: {
-        const filterSet = new Set<string>(filters?.[type]);
-        if (filterSet.has(value)) {
-          filterSet.delete(value);
+        const isSelected = (filters?.[type] as Set<string>)?.has(value);
+        if (isSelected) {
           deleteParam(type, value);
         } else {
-          filterSet.add(value);
           appendParam(type, value);
         }
-
-        setFilters({
-          ...filters,
-          [type]: filterSet,
+        setFilters((prev) => {
+          const filterSet = new Set<string>(prev?.[type] as Set<string>);
+          isSelected ? filterSet.delete(value) : filterSet.add(value);
+          return { ...prev, [type]: filterSet };
         });
       }
     }
@@ -115,14 +119,15 @@ export const useTemplatesFilters = (): [
       [CATALOG_FILTERS.QUERY]: '',
       [CATALOG_FILTERS.WORKLOAD]: new Set(),
     });
-    Object.keys(filters).forEach((key) => {
-      deleteParam(key);
-    });
+
+    const newParams = new URLSearchParams(location.search);
+    Object.values(CATALOG_FILTERS).forEach((key) => newParams.delete(key));
+    navigate({ pathname: location.pathname, search: newParams.toString() }, { replace: true });
   };
 
   useEffect(() => {
-    onlyDefaultParam && updateFilter(CATALOG_FILTERS.ONLY_DEFAULT, onlyDefaultParam === 'true');
-  }, [hasNoDefaultUserAllParams, onlyDefaultParam]);
+    onlyDefaultParam && updateFilter(CATALOG_FILTERS.ONLY_DEFAULT, onlyDefaultParamIsTrue);
+  }, [hasNoDefaultUserAllParams, onlyDefaultParam, onlyDefaultParamIsTrue]);
 
   return [filters, onFilterChange, clearAll];
 };
