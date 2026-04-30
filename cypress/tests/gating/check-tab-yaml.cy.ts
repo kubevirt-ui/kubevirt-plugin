@@ -32,7 +32,7 @@ describe('Check all virtualization pages can be loaded', () => {
     it('start example vm', () => {
       cy.byLegacyTestID(DEFAULT_VM_NAME).click();
       cy.get(sel.iconStartBtn, { timeout: MINUTE }).click();
-      cy.wait(15 * SECOND);
+      cy.wait(MINUTE);
     });
 
     it(
