@@ -8,6 +8,10 @@ describe('Test template list page', () => {
     cy.visitTemplatesVirt();
   });
 
+  after(() => {
+    cy.toggleVMTemplatesFeature(false);
+  });
+
   it('filter template by name', () => {
     cy.switchProject(ALL_PROJ_NS);
     cy.get(tView.itemFilter).type(TEMPLATE.CENTOSSTREAM9.metadataName);
@@ -15,11 +19,17 @@ describe('Test template list page', () => {
     cy.byLegacyTestID(TEMPLATE.CENTOSSTREAM10.metadataName).should('not.exist');
   });
 
-  it('filter by template type', () => {
+  it('Type filter should not be visible when VM templates feature is disabled', () => {
     cy.get(tView.dropdownFilter).click();
-    cy.get('[data-test-row-filter="templates"]')
-      .find('input[type="checkbox"]')
-      .check({ force: true });
+    cy.get('[data-test-row-filter="templates"]').should('not.exist');
+    cy.get('[data-test-row-filter="vm-templates"]').should('not.exist');
+  });
+
+  it('Type filter should work after enabling VM templates feature', () => {
+    cy.toggleVMTemplatesFeature(true);
+    cy.visitTemplatesVirt();
+    cy.get(tView.dropdownFilter).click();
+    cy.get('[data-test-row-filter="templates"]').click();
     cy.get(tView.dropdownFilter).click();
     cy.byLegacyTestID(TEMPLATE.RHEL9.metadataName).should('exist');
     cy.byLegacyTestID(TEMPLATE.FEDORA.metadataName).should('exist');
@@ -28,18 +38,18 @@ describe('Test template list page', () => {
 
   it('filter templates by OS', () => {
     cy.get(tView.dropdownFilter).click();
-    cy.get('[data-test-row-filter="windows"]')
-      .find('input[type="checkbox"]')
-      .check({ force: true });
+    cy.get('[data-test-row-filter="windows"]').click();
+    cy.get(tView.dropdownFilter).click();
     cy.byLegacyTestID(TEMPLATE.RHEL9.metadataName).should('not.exist');
     cy.byLegacyTestID(TEMPLATE.RHEL8.metadataName).should('not.exist');
     cy.byLegacyTestID(TEMPLATE.RHEL7.metadataName).should('not.exist');
     cy.byLegacyTestID(TEMPLATE.WIN2K22.metadataName).should('exist');
   });
 
-  xit('filter templates by Provider', () => {
+  it('filter templates by Provider', () => {
     cy.get(tView.dropdownFilter).click();
-    cy.get('[data-test-row-filter="Other"]').find('input[type="checkbox"]').check({ force: true });
+    cy.get('[data-test-row-filter="Other"]').click();
+    cy.get(tView.dropdownFilter).click();
     cy.byLegacyTestID(TEMPLATE.RHEL9.metadataName).should('not.exist');
     cy.byLegacyTestID(TEMPLATE.RHEL8.metadataName).should('not.exist');
     cy.byLegacyTestID(TEMPLATE.RHEL7.metadataName).should('not.exist');
@@ -52,14 +62,10 @@ describe('Test template list page', () => {
     cy.contains('Source available').should('not.exist');
   });
 
-  xit('filter templates by OS and Provider combined', () => {
+  it('filter templates by OS and Provider combined', () => {
     cy.get(tView.dropdownFilter).click();
-    cy.get('[data-test-row-filter="Red Hat"]')
-      .find('input[type="checkbox"]')
-      .check({ force: true });
-    cy.get('[data-test-row-filter="windows"]')
-      .find('input[type="checkbox"]')
-      .check({ force: true });
+    cy.get('[data-test-row-filter="Red Hat"]').click();
+    cy.get('[data-test-row-filter="windows"]').click();
     cy.get(tView.dropdownFilter).click();
     cy.byLegacyTestID(TEMPLATE.RHEL9.metadataName).should('not.exist');
     cy.byLegacyTestID(TEMPLATE.FEDORA.metadataName).should('not.exist');

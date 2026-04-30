@@ -1,4 +1,4 @@
-import { CNV_NS, K8S_KIND, TEST_NS } from '../utils/const/index';
+import { CNV_NS, K8S_KIND, MINUTE, TEST_NS } from '../utils/const/index';
 import { Perspective, switchPerspective } from '../views/perspective';
 
 export {};
@@ -19,6 +19,7 @@ declare global {
       startVM(vmName: string[]): void;
       stopVM(vmName: string[]): void;
       switchToVirt(): void;
+      toggleVMTemplatesFeature(enable: boolean): void;
     }
   }
 }
@@ -110,4 +111,17 @@ Cypress.Commands.add('deleteVM', (vms: string[]) => {
       { failOnNonZeroExit: false, timeout: 1800000 },
     );
   });
+});
+
+Cypress.Commands.add('toggleVMTemplatesFeature', (enable: boolean) => {
+  const vmTemplatesSwitch = '[data-test-id="vmTemplates"]';
+  cy.get('[data-test-id="virtualization-settings-nav-item"]', { timeout: 5 * MINUTE }).click();
+  cy.get('[data-test="preview-features"]', { timeout: MINUTE }).click();
+  cy.get(vmTemplatesSwitch, { timeout: MINUTE })
+    .then(($switch) => {
+      if ($switch.is(':checked') !== enable) {
+        cy.wrap($switch).parents('label').click();
+      }
+    })
+    .should(enable ? 'be.checked' : 'not.be.checked');
 });

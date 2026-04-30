@@ -554,7 +554,7 @@
   "Created": "작성",
   "Created at": "작성일",
   "Creates a DataImportCron, which defines a cron job to poll and import the disk image.": "디스크 이미지를 폴링하고 가져오는 cron 작업을 정의하는 DataImportCron을 생성합니다.",
-  "Creating a template from a running VirtualMachine may result in inconsistent data because the system is still actively writing changes. For best results, consider stopping the VM before creating the template.": "Creating a template from a running VirtualMachine may result in inconsistent data because the system is still actively writing changes. For best results, consider stopping the VM before creating the template.",
+  "Creating a template from a running virtual machine might result in inconsistent data because the system is still writing changes. For best results, stop the VM before creating the template.": "Creating a template from a running virtual machine might result in inconsistent data because the system is still writing changes. For best results, stop the VM before creating the template.",
   "CreationTimestamp is a timestamp representing the server time when this object was created. It is not guaranteed to be set in happens-before order across separate operations. Clients may not set this value. It is represented in RFC3339 form and is in UTC.": "CreationTimestamp는 이 개체가 생성될 때 서버 시간을 나타내는 타임스탬프입니다. 서로 다른 작업 간에 발생 순서(happens-before)로 설정된다는 보장은 없습니다. 클라이언트는 이 값을 설정할 수 없습니다. 이 값은 RFC3339 형식의 UTC 시간으로 표시됩니다.",
   "Critical": "심각",
   "Cron expression": "Cron 표현식",

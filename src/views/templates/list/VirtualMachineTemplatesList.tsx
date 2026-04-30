@@ -43,7 +43,7 @@ const VirtualMachineTemplatesList: FC<ListPageProps> = ({
 
   const { t } = useKubevirtTranslation();
 
-  const { allTemplates, error, loaded } = useAllTemplateResources({
+  const { allTemplates, allTemplatesWithRequests, error, loaded } = useAllTemplateResources({
     fieldSelector,
     namespace: namespaceParam,
     selector,
@@ -57,7 +57,7 @@ const VirtualMachineTemplatesList: FC<ListPageProps> = ({
   );
 
   const [unfilteredData, filteredData, onFilterChange] = useListPageFilter(
-    allTemplates,
+    allTemplatesWithRequests,
     allFilters,
     {
       name: { selected: [nameFilter] },

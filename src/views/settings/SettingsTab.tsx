@@ -14,8 +14,9 @@ const SettingsTab: FC = () => {
     <div className="settings-tab__layout">
       <div className="settings-tab__tabs-wrapper">
         <Tabs activeKey={activeTab} className="settings-tab__tabs">
-          {tabs.map(({ name, title }) => (
+          {tabs.map(({ dataTest, name, title }) => (
             <Tab
+              data-test={dataTest}
               eventKey={name}
               key={name}
               onClick={() => redirectTab(name)}
@@ -26,9 +27,9 @@ const SettingsTab: FC = () => {
       </div>
       <div className="settings-tab__scrollable">
         <Card className="settings-tab__card">
-          {tabs.map(({ Component, dataTest, name }) =>
+          {tabs.map(({ Component, name }) =>
             activeTab === name ? (
-              <div className="settings-tab__content" data-test={dataTest} key={name}>
+              <div className="settings-tab__content" key={name}>
                 <Component />
               </div>
             ) : null,

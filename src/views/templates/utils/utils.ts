@@ -3,12 +3,20 @@ import { TFunction } from 'i18next';
 import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
   getTemplateVirtualMachineObject,
+  isVirtualMachineTemplateRequest,
   Template,
   TEMPLATE_TYPE_BASE,
   TEMPLATE_TYPE_LABEL,
+  TemplateOrRequest,
   vCPUCount,
 } from '@kubevirt-utils/resources/template';
-import { getCPU, getMemoryCPU, NO_DATA_DASH } from '@kubevirt-utils/resources/vm';
+import {
+  getArchitecture as getVMArchitecture,
+  getCPU,
+  getMemoryCPU,
+  NO_DATA_DASH,
+} from '@kubevirt-utils/resources/vm';
+import { getArchitecture } from '@kubevirt-utils/utils/architecture';
 import { readableSizeUnit } from '@kubevirt-utils/utils/units';
 
 export const isCommonVMTemplate = (template: V1Template): boolean =>
@@ -27,3 +35,13 @@ export const getVirtualMachineTemplatesCPUMemoryText = (
     'Memory',
   )}`;
 };
+
+export const getTemplateArchitecture = (template: TemplateOrRequest): string | undefined => {
+  if (isVirtualMachineTemplateRequest(template)) {
+    return undefined;
+  }
+  return getArchitecture(template) ?? getVMArchitecture(getTemplateVirtualMachineObject(template));
+};
+
+export const getUniqueTemplateArchitectures = (templates: Template[]): string[] =>
+  Array.from(new Set(templates.map((template) => getTemplateArchitecture(template))));
