@@ -2,7 +2,7 @@ import React, { Dispatch, FC, MouseEvent, SetStateAction, useState } from 'react
 
 import SelectToggle from '@kubevirt-utils/components/toggles/SelectToggle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { FormGroup, Select, SelectOption } from '@patternfly/react-core';
+import { FormGroup, Select, SelectList, SelectOption } from '@patternfly/react-core';
 
 import { AffinityCondition, AffinityRowData } from '../../../../utils/types';
 import { AFFINITY_CONDITION_LABELS } from '../../../AffinityList/utils/constants';
@@ -41,11 +41,13 @@ const AffinityConditionSelect: FC<AffinityConditionSelectProps> = ({
         onSelect={handleChange}
         selected={focusedAffinity?.condition}
       >
-        {Object.entries(AFFINITY_CONDITION_LABELS).map(([key, value]) => (
-          <SelectOption key={key} value={key}>
-            {value}
-          </SelectOption>
-        ))}
+        <SelectList>
+          {Object.entries(AFFINITY_CONDITION_LABELS).map(([key, value]) => (
+            <SelectOption key={key} value={key}>
+              {value}
+            </SelectOption>
+          ))}
+        </SelectList>
       </Select>
     </FormGroup>
   );

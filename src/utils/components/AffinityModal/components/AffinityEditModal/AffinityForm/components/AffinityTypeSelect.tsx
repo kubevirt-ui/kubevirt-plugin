@@ -2,7 +2,7 @@ import React, { Dispatch, FC, MouseEvent, SetStateAction, useState } from 'react
 
 import SelectToggle from '@kubevirt-utils/components/toggles/SelectToggle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { FormGroup } from '@patternfly/react-core';
+import { FormGroup, SelectList } from '@patternfly/react-core';
 import { Select, SelectOption } from '@patternfly/react-core';
 
 import { AffinityRowData, AffinityType } from '../../../../utils/types';
@@ -40,11 +40,13 @@ const AffinityTypeSelect: FC<AffinityTypeSelectProps> = ({
         onSelect={handleChange}
         selected={focusedAffinity?.type}
       >
-        {Object.entries(AFFINITY_TYPE_LABLES).map(([key, value]) => (
-          <SelectOption key={key} value={key}>
-            {value}
-          </SelectOption>
-        ))}
+        <SelectList>
+          {Object.entries(AFFINITY_TYPE_LABLES).map(([key, value]) => (
+            <SelectOption key={key} value={key}>
+              {value}
+            </SelectOption>
+          ))}
+        </SelectList>
       </Select>
     </FormGroup>
   );

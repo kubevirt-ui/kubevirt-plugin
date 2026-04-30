@@ -88,7 +88,7 @@ const AffinityEditModal: FC<AffinityEditModalProps> = ({
         >
           {t('Save affinity rule')}
         </Button>
-        <Button onClick={onCancel} size="sm" variant={ButtonVariant.link}>
+        <Button onClick={onCancel} variant={ButtonVariant.link}>
           {t('Cancel')}
         </Button>
       </ModalFooter>
