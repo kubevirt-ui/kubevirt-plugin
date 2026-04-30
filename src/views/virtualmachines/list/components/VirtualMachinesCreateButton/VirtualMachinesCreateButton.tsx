@@ -2,6 +2,7 @@ import React, { FC, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom-v5-compat';
 
 import { VirtualMachineModelRef } from '@kubevirt-ui/kubevirt-api/console';
+import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getVMListPath } from '@kubevirt-utils/resources/vm';
@@ -9,7 +10,7 @@ import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { getACMVMListURL, getCatalogURL } from '@multicluster/urls';
 import useIsACMPage from '@multicluster/useIsACMPage';
 import { ListPageCreateDropdown } from '@openshift-console/dynamic-plugin-sdk';
-import { useHubClusterName } from '@stolostron/multicluster-sdk';
+import { useFleetAccessReview, useHubClusterName } from '@stolostron/multicluster-sdk';
 
 type VirtualMachinesCreateButtonProps = {
   buttonText?: string;
@@ -27,6 +28,14 @@ const VirtualMachinesCreateButton: FC<VirtualMachinesCreateButtonProps> = ({
   const clusterParam = useClusterParam();
   const cluster = clusterParam || hubClusterName;
   const selectedNamespace = namespace || DEFAULT_NAMESPACE;
+
+  const [canCreateVM] = useFleetAccessReview({
+    cluster,
+    group: VirtualMachineModel.apiGroup,
+    namespace: selectedNamespace,
+    resource: VirtualMachineModel.plural,
+    verb: 'create',
+  });
 
   const createItems = {
     instanceType: t('From InstanceType'),
@@ -58,9 +67,13 @@ const VirtualMachinesCreateButton: FC<VirtualMachinesCreateButtonProps> = ({
     [catalogURL, navigate, namespace, cluster],
   );
 
+  if (isACMPage && !canCreateVM) return null;
+
   return (
     <ListPageCreateDropdown
-      createAccessReview={{ groupVersionKind: VirtualMachineModelRef, namespace }}
+      createAccessReview={
+        !isACMPage ? { groupVersionKind: VirtualMachineModelRef, namespace } : undefined
+      }
       items={createItems}
       onClick={onCreate}
     >
