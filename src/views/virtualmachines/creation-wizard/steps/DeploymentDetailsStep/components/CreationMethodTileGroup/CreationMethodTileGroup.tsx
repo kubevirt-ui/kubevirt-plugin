@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 
-import { Split, SplitItem } from '@patternfly/react-core';
+import { Flex, FlexItem } from '@patternfly/react-core';
 import useVMWizardStore from '@virtualmachines/creation-wizard/state/vm-wizard-store/useVMWizardStore';
 import { VMCreationMethod } from '@virtualmachines/creation-wizard/utils/constants';
 
@@ -12,22 +12,24 @@ const CreationMethodTileGroup: FC = () => {
   const { creationMethod, setCreationMethod } = useVMWizardStore();
 
   return (
-    <Split
-      className="pf-v6-u-justify-content-space-between vm-creation-method-tile-group"
-      hasGutter
+    <Flex
+      className="vm-creation-method-tile-group"
+      flexWrap={{ default: 'wrap' }}
+      gap={{ default: 'gapMd' }}
+      justifyContent={{ default: 'justifyContentFlexStart' }}
     >
       {[VMCreationMethod.INSTANCE_TYPE, VMCreationMethod.TEMPLATE, VMCreationMethod.CLONE].map(
         (method) => (
-          <SplitItem key={method}>
+          <FlexItem className="vm-creation-method-tile-group__item" key={method}>
             <CreationMethodTile
               creationMethod={method}
               isChecked={creationMethod === method}
               setSelectedCreationMethod={setCreationMethod}
             />
-          </SplitItem>
+          </FlexItem>
         ),
       )}
-    </Split>
+    </Flex>
   );
 };
 
