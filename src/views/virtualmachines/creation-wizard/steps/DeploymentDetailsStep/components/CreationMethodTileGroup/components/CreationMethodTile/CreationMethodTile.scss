@@ -1,6 +1,7 @@
 .vm-creation-method-tile {
   height: 14rem; /* 224px */
-  width: 22rem; /* 352px */
+  max-width: 22rem; /* 352px */
+  width: 100%;
 
   // Icon wrapper - set color so SVG currentColor inherits it
   &__icon {
