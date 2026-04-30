@@ -1,3 +1,5 @@
+import { ALL_CLUSTERS_KEY } from '@kubevirt-utils/hooks/constants';
+import { getACMTextSearchURL } from '@multicluster/urls';
 import { MatchExpression, Operator, Selector } from '@openshift-console/dynamic-plugin-sdk';
 
 const toArray = (value) => (Array.isArray(value) ? value : [value]);
@@ -41,4 +43,31 @@ export const toRequirements = (selector: Selector = {}) => {
 export const selectorToString = (selector: Selector): string => {
   const requirements = toRequirements(selector);
   return requirements.map(requirementToString).join(',');
+};
+
+export const getSelectorSearchURL = (
+  requirementAsString: string,
+  kind: string,
+  namespace: string,
+  isACMPage: boolean,
+  cluster?: string,
+  hubClusterName?: string,
+): string => {
+  if (cluster || isACMPage) {
+    const labelFilters = requirementAsString
+      .split(',')
+      .map((r) => `label:${r.trim()}`)
+      .join(' ');
+    const selectedCluster = cluster || hubClusterName;
+    const clusterPart =
+      selectedCluster && selectedCluster !== ALL_CLUSTERS_KEY ? `cluster:${selectedCluster} ` : '';
+    const namespacePart = namespace ? ` namespace:${namespace}` : '';
+    const textSearch = `${clusterPart}kind:${kind}${namespacePart} ${labelFilters}`;
+    return getACMTextSearchURL(textSearch);
+  }
+
+  const requirementAsUrlEncodedString = encodeURIComponent(requirementAsString);
+  return `/search/ns/${
+    namespace || 'all-namespaces'
+  }?kind=${kind}&q=${requirementAsUrlEncodedString}`;
 };

@@ -1,3 +1,5 @@
+import { getACMTextSearchURL } from '@multicluster/urls';
+
 export const getSearchLabelHREF = (
   kind: string,
   labelKey: string,
@@ -5,10 +7,7 @@ export const getSearchLabelHREF = (
   cluster?: string,
 ) => {
   if (cluster) {
-    const encodedTextFilter = encodeURIComponent(
-      `cluster:${cluster} kind:${kind} label:${labelKey}=${labelValue}`,
-    );
-    return `/multicloud/search?filters={"textsearch":"${encodedTextFilter}"}`;
+    return getACMTextSearchURL(`cluster:${cluster} kind:${kind} label:${labelKey}=${labelValue}`);
   }
 
   return `/search?kind=${kind}&q=${encodeURIComponent(`${labelKey}=${labelValue}`)}`;
