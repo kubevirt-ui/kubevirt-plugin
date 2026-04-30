@@ -81,6 +81,7 @@
     "@types/react-dom": "^18.3.7",
     "@typescript-eslint/eslint-plugin": "^8.33.0",
     "@typescript-eslint/parser": "^8.33.0",
+    "concurrently": "^9.2.1",
     "copy-webpack-plugin": "^12.0.2",
     "css-loader": "^6.11.0",
     "cypress": "^14.3.x",
@@ -123,6 +124,7 @@
     "ts-node": "^10.9.2",
     "tsconfig-paths-webpack-plugin": "^4.2.0",
     "typescript": "5.9.3",
+    "wait-on": "^9.0.5",
     "webpack": "^5.104.1",
     "webpack-cli": "^5.1.4",
     "webpack-dev-server": "^5.2.3"
@@ -153,13 +155,15 @@
   },
   "private": true,
   "scripts": {
-    "build": "npm run clean && NODE_ENV=production NODE_OPTIONS=--max-old-space-size=8192 npm run ts-node -- node_modules/.bin/webpack",
+    "build": "npm run clean && NODE_ENV=production NODE_OPTIONS=--max-old-space-size=8192 webpack",
     "check-types": "tsc",
     "clean": "rm -rf dist",
     "cypress-generate": "cd cypress && marge -o ./gui-test-screenshots/ -f cypress-report -t 'Kubevirt Cypress Test Results' -p 'Kubevirt Test Results' --showPassed false --assetsDir ./gui-test-screenshots/cypress/assets ./gui-test-screenshots/cypress.json",
     "cypress-merge": "cd cypress && mochawesome-merge ./gui-test-screenshots/cypress_report*.json > ./gui-test-screenshots/cypress.json",
     "cypress-postreport": "npm run cypress-merge && npm run cypress-generate",
-    "dev": "npm run clean && NODE_ENV=development NODE_OPTIONS=--max-old-space-size=8192 npm run ts-node -- node_modules/.bin/webpack serve --progress",
+    "dev": "concurrently -n plugin,console -c yellow,blue 'npm:dev:plugin' 'npm:dev:console'",
+    "dev:plugin": "NODE_ENV=development NODE_OPTIONS=--max-old-space-size=8192 webpack serve --progress",
+    "dev:console": "wait-on -d 30000 -t 10m http://localhost:9001/plugin-manifest.json && npm run start-console",
     "export-pos": "./i18n-scripts/export-pos.sh",
     "i18n": "i18next --silent && node ./i18n-scripts/set-english-defaults.js && ./i18n-scripts/replace-br.sh",
     "i18n:verbose": "i18next && node ./i18n-scripts/set-english-defaults.js && ./i18n-scripts/replace-br.sh",
@@ -174,7 +178,7 @@
     "po-to-i18n": "node ./i18n-scripts/po-to-i18n.js",
     "postinstall": "cp node_modules/@openshift-console/dynamic-plugin-sdk/docs/console-extensions.md .",
     "prepare": "husky install",
-    "start": "npm run ts-node -- node_modules/.bin/webpack serve",
+    "start": "NODE_ENV=development NODE_OPTIONS=--max-old-space-size=8192 webpack serve",
     "start-console": "./start-console.sh",
     "start-console-with-monitoring": "./start-console.sh monitoring-plugin",
     "start-console-with-networking": "./start-console.sh networking-console-plugin",
@@ -183,8 +187,7 @@
     "test-cov": "jest --coverage",
     "test-cypress": "cd cypress && cypress open --e2e --config-file ./cypress.config.js --env openshift=true",
     "test-cypress-docker": "echo 'visit http://localhost:10000' && cd cypress && DISPLAY=:14 LIBGL_ALWAYS_INDIRECT=0 cypress open --e2e --config-file ./cypress.config.js --env openshift=true",
-    "test-cypress-headless": "cd cypress && cypress run --e2e --config-file ./cypress.config.js --env openshift=true",
-    "ts-node": "ts-node -O '{\"module\":\"commonjs\"}'"
+    "test-cypress-headless": "cd cypress && cypress run --e2e --config-file ./cypress.config.js --env openshift=true"
   },
   "version": "0.0.0"
 }
