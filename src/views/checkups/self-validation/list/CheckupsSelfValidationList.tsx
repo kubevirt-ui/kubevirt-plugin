@@ -41,9 +41,11 @@ const CheckupsSelfValidationList: FC = () => {
     clusterRoleBinding,
     isPermitted,
     isPermittedToInstall,
+    loadError: permissionsError,
     loading: loadingPermissions,
   } = useCheckupsSelfValidationPermissions();
-  const { configMaps, error, jobs, loaded } = useCheckupsSelfValidationData();
+  const { configMaps, error: dataError, jobs, loaded } = useCheckupsSelfValidationData();
+  const error = dataError || permissionsError;
 
   const [unfilteredData, filteredData, onFilterChange, filters] =
     useCheckupsSelfValidationListFilters(configMaps || []);

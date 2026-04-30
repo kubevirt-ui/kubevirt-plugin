@@ -15,7 +15,8 @@ import {
   kubevirtK8sGet,
   kubevirtK8sPatch,
 } from '@multicluster/k8sRequests';
-import { checkAccess, K8sModel, K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import { K8sModel, K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import { checkAccess } from '@stolostron/multicluster-sdk/lib/internal/checkAccess';
 
 import {
   SELF_VALIDATION_CLUSTER_ROLE_BINDING,
@@ -34,24 +35,31 @@ export type PermissionOperationResult = {
   success: boolean;
 };
 
+type K8sError = {
+  code?: number;
+  json?: { code?: number };
+  response?: { status?: number };
+};
+
 /**
  * Extracts HTTP status code from k8s SDK error
  * Checks multiple possible error properties as the SDK may structure errors differently
  * @param error - The error object from k8s SDK
  * @returns The HTTP status code or undefined if not found
  */
-const getErrorStatusCode = (error: any): number | undefined => {
+const getErrorStatusCode = (error: unknown): number | undefined => {
+  const err = error as K8sError | null | undefined;
   // Check error.response.status (standard HTTP error structure)
-  if (error?.response?.status) {
-    return error.response.status;
+  if (err?.response?.status) {
+    return err.response.status;
   }
   // Check error.code (some SDK versions use this)
-  if (typeof error?.code === 'number') {
-    return error.code;
+  if (typeof err?.code === 'number') {
+    return err.code;
   }
   // Check error.json.code (some SDK versions nest the code)
-  if (typeof error?.json?.code === 'number') {
-    return error.json.code;
+  if (typeof err?.json?.code === 'number') {
+    return err.json.code;
   }
   return undefined;
 };
@@ -62,7 +70,7 @@ const getErrorStatusCode = (error: any): number | undefined => {
  * @param statusCode - The HTTP status code to check for
  * @returns True if the error matches the status code
  */
-const isErrorStatusCode = (error: any, statusCode: number): boolean => {
+const isErrorStatusCode = (error: unknown, statusCode: number): boolean => {
   return getErrorStatusCode(error) === statusCode;
 };
 
@@ -75,7 +83,7 @@ const isErrorStatusCode = (error: any, statusCode: number): boolean => {
  * @returns Error result if error is not 404, null if 404 (can be ignored)
  */
 const handleDeleteError = (
-  error: any,
+  error: unknown,
   resourceKind: string,
   t: TFunction,
 ): null | PermissionOperationResult => {
@@ -105,10 +113,8 @@ const getOrCreateResource = async (
 ): Promise<null | string> => {
   try {
     await kubevirtK8sGet(getOptions);
-    // Resource exists, no need to create
     return null;
   } catch (error) {
-    // Only create if resource doesn't exist (404)
     if (isErrorStatusCode(error, 404)) {
       try {
         await kubevirtK8sCreate(createOptions);
@@ -119,7 +125,6 @@ const getOrCreateResource = async (
         return errorMessage;
       }
     }
-    // Re-throw non-404 errors (permission errors, etc.)
     const errorMessage = getFailedToModifyMessage(t, resourceKind);
     kubevirtConsole.error(`Failed to get ${resourceKind}:`, error);
     return errorMessage;
@@ -171,6 +176,29 @@ export const installPermissions = async (
   cluster: string,
   t: TFunction,
 ): Promise<PermissionOperationResult> => {
+  // Check cluster-admin permission first to avoid creating partial namespaced RBAC state
+  // when the user lacks permission to bind to cluster-admin.
+  try {
+    const accessReview = await checkAccess(
+      ClusterRoleBindingModel.apiGroup,
+      ClusterRoleBindingModel.plural,
+      null,
+      'create',
+      null,
+      null,
+      cluster,
+    );
+
+    if (!accessReview?.status?.allowed) {
+      const errorMessage = getPermissionDeniedMessage(t);
+      kubevirtConsole.error('Permission check failed:', errorMessage);
+      return { error: errorMessage, success: false };
+    }
+  } catch (checkAccessError) {
+    // If checkAccess itself fails, proceed and let Kubernetes enforce permissions on the target cluster
+    kubevirtConsole.warn('checkAccess for ClusterRoleBinding failed:', checkAccessError);
+  }
+
   // Create ServiceAccount, Role, and RoleBinding if they don't exist
   const [serviceAccountError, roleError, roleBindingError] = await Promise.all([
     getOrCreateResource(
@@ -217,37 +245,15 @@ export const installPermissions = async (
     ),
   ]);
 
-  // Check if any operation failed
   const error = serviceAccountError || roleError || roleBindingError;
   if (error) {
     return { error, success: false };
   }
 
-  // Check if user has permission to create ClusterRoleBinding
-  // Note: Kubernetes will enforce binding permissions when we try to bind to cluster-admin
-  try {
-    const accessReview = await checkAccess({
-      group: 'rbac.authorization.k8s.io',
-      resource: ClusterRoleBindingModel.plural,
-      verb: 'create',
-    });
-
-    if (!accessReview?.status?.allowed) {
-      const errorMessage = getPermissionDeniedMessage(t);
-      kubevirtConsole.error('Permission check failed:', errorMessage);
-      return {
-        error: errorMessage,
-        success: false,
-      };
-    }
-  } catch (checkAccessError) {
-    // If checkAccess itself fails, we'll still try to create and let Kubernetes enforce permissions
-    // This allows the operation to proceed if checkAccess is unavailable, but Kubernetes will still enforce permissions
-  }
-
   // Create or update ClusterRoleBinding
   try {
     const existingClusterRoleBinding = await kubevirtK8sGet({
+      cluster,
       model: ClusterRoleBindingModel,
       name: SELF_VALIDATION_CLUSTER_ROLE_BINDING,
     });

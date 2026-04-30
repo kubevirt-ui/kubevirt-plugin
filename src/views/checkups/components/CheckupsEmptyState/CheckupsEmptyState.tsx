@@ -47,7 +47,7 @@ const CheckupsEmptyState: FC<CheckupsEmptyState> = ({
 
   const bodyText = useMemo(
     () => getBodyText(checkupType, isAllNamespaces, isPermitted, t),
-    [isAllNamespaces, isPermitted, t],
+    [checkupType, isAllNamespaces, isPermitted, t],
   );
 
   const { isDisabled, onClick } = permissionsButtonProps;
@@ -76,7 +76,7 @@ const CheckupsEmptyState: FC<CheckupsEmptyState> = ({
                   onClick={onClick}
                   variant={isLoading ? ButtonVariant.plain : ButtonVariant.secondary}
                 >
-                  {!isLoading && isPermitted ? t('Remove permissions') : t('Install permissions')}
+                  {isPermitted ? t('Remove permissions') : t('Install permissions')}
                 </Button>
               </StackItem>
               {isDisabled && !isLoading && (
