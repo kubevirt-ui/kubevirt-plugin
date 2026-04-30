@@ -6,6 +6,10 @@ import {
   CUSTOMIZE_VM_FAILED,
 } from '@kubevirt-utils/extensions/telemetry/utils/constants';
 import { getLabels } from '@kubevirt-utils/resources/shared';
+import {
+  LABEL_USED_TEMPLATE_NAME,
+  LABEL_USED_TEMPLATE_NAMESPACE,
+} from '@kubevirt-utils/resources/template';
 import { getDefaultRunningStrategy, getRunStrategy } from '@kubevirt-utils/resources/vm';
 import { vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
 import useVMWizardStore from '@virtualmachines/creation-wizard/state/vm-wizard-store/useVMWizardStore';
@@ -30,7 +34,13 @@ const useCreateVMFromTemplate: UseCreateVMFromTemplate = () => {
       const vmObject = await resolveVMFromTemplate(selectedTemplate, namespace, cluster);
 
       vmObject.metadata.namespace = namespace;
-      if (folder) vmObject.metadata.labels = { ...getLabels(vmObject), [VM_FOLDER_LABEL]: folder };
+      vmObject.metadata.labels = {
+        ...getLabels(vmObject),
+        [LABEL_USED_TEMPLATE_NAME]: selectedTemplate.metadata.name,
+        [LABEL_USED_TEMPLATE_NAMESPACE]: selectedTemplate.metadata.namespace,
+        ...(folder ? { [VM_FOLDER_LABEL]: folder } : {}),
+      };
+
       if (!getRunStrategy(vmObject)) vmObject.spec.runStrategy = getDefaultRunningStrategy();
 
       vmSignal.value = vmObject;

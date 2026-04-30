@@ -32,10 +32,11 @@ const useWatchNonAdminTemplates = () => {
     namespaced: false,
   });
 
-  const projectNames = projects?.map((proj) => getName(proj));
-  if (projectNames && !projectNames.includes(OPENSHIFT_NAMESPACE)) {
-    projectNames.push(OPENSHIFT_NAMESPACE);
-  }
+  const projectNames = useMemo(() => {
+    const names = new Set(projects?.map((proj) => getName(proj)) ?? []);
+    names.add(OPENSHIFT_NAMESPACE);
+    return [...names];
+  }, [projects]);
 
   // user has limited access, so we can only get templates from allowed namespaces
   const allowedResources = useK8sWatchResources<{ [key: string]: V1Template[] }>(
@@ -74,6 +75,12 @@ const useWatchNonAdminTemplates = () => {
       if (errorKey) {
         setAllowedTemplatesError(allowedResources[errorKey].loadError);
       }
+
+      if (loaded && isEmpty(Object.keys(allowedResources))) {
+        setAllowedTemplatesLoaded(true);
+        return;
+      }
+
       if (
         Object.keys(allowedResources).length > 0 &&
         Object.keys(allowedResources).every((key) => {
@@ -84,7 +91,7 @@ const useWatchNonAdminTemplates = () => {
         setAllowedTemplatesLoaded(true);
       }
     }
-  }, [allowedResources, isAdmin]);
+  }, [allowedResources, isAdmin, loaded]);
 
   return useMemo(
     () => ({
