@@ -190,7 +190,7 @@ To turn off dind (no Docker daemon in the pod): `export CONTAINER_MODE=none` and
 | `.github/workflows/ibmc-cluster-setup.yml`         | IBM Cloud Hot Cluster Setup                |
 | `.github/workflows/ibmc-cluster-teardown.yml`      | IBM Cloud Hot Cluster Teardown             |
 | `.github/workflows/ibmc-cluster-auto-teardown.yml` | IBM Cloud Hot Cluster Auto-Teardown        |
-| `.github/workflows/poc-e2e-ci-test.yml`            | POC Hot ClusterE2E CI Test                 |
+| `.github/workflows/poc-e2e-ci-test.yml`            | POC Hot Cluster E2E CI Test                |
 | `.github/workflows/poc-e2e-ci-test2.yml`           | POC Hot Cluster E2E CI Test 2              |
 
 ### Setting up the hot cluster
@@ -205,7 +205,7 @@ To turn off dind (no Docker daemon in the pod): `export CONTAINER_MODE=none` and
 
 **Variant A — `poc-e2e-ci-test.yml` (IBM Cloud cluster health checks then run `poc-e2e-ci-test2.yml`)**
 
-1. Actions → **POC Hot ClusterE2E CI Test**
+1. Actions → **POC Hot Cluster E2E CI Test**
 2. Inputs: Cypress spec (default `tests/gating.cy.ts`), cluster name
 3. Runs `check-cluster-health.sh` on `ubuntu-latest` with an IBM Cloud kubeconfig; fails fast if the cluster is unhealthy
 4. On success, calls `poc-e2e-ci-test2.yml` via `workflow_call` to run the tests
