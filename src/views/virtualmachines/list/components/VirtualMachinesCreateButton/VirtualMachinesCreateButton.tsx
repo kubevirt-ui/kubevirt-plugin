@@ -47,8 +47,8 @@ const VirtualMachinesCreateButton: FC<VirtualMachinesCreateButtonProps> = ({
   });
 
   const vmWizardURL = useMemo(
-    () => getVMWizardURL(isACMPage ? cluster || '' : ''),
-    [isACMPage, cluster],
+    () => getVMWizardURL(isACMPage ? cluster || '' : '', namespace),
+    [isACMPage, cluster, namespace],
   );
 
   const yamlURL = useMemo(

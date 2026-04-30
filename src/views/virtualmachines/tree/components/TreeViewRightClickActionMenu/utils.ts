@@ -29,7 +29,7 @@ export const getCreateVMAction = (
   return {
     cta: () => {
       setProject(namespace);
-      navigate(`${getVMWizardURL(cluster)}`);
+      navigate(getVMWizardURL(cluster, namespace));
     },
     id: 'create-vm',
     label: t('Create VirtualMachine'),
