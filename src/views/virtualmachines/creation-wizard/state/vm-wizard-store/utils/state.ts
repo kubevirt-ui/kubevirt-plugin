@@ -7,8 +7,9 @@ export const initialVMWizardState: VMWizardState = {
   cluster: '',
   creationMethod: VMCreationMethod.INSTANCE_TYPE,
   folder: '',
+  isVMNameValid: false,
   project: '',
   selectedTemplate: null,
   templatesDrawerIsOpen: false,
-  vmNameConfirmed: false,
+  vmNameInteracted: false,
 };
