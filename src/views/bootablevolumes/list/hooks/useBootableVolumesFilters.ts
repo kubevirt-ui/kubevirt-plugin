@@ -23,6 +23,7 @@ import {
   getArchitecture,
 } from '@kubevirt-utils/utils/architecture';
 import { getItemNameWithOther, includeFilter } from '@kubevirt-utils/utils/utils';
+import useIsACMPage from '@multicluster/useIsACMPage';
 import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 
 import { BootableResource } from '../../utils/types';
@@ -37,6 +38,7 @@ const useBootableVolumesFilters = (
   rowFilters: RowFilter<BootableResource>[];
 } => {
   const { t } = useKubevirtTranslation();
+  const isACMPage = useIsACMPage();
   const clusterFilter = useClusterFilter();
   const projectFilter = useProjectFilter();
 
@@ -55,8 +57,8 @@ const useBootableVolumesFilters = (
   );
 
   const filtersWithSelect = useMemo(
-    () => [clusterFilter, projectFilter],
-    [clusterFilter, projectFilter],
+    () => (isACMPage ? [clusterFilter, projectFilter] : [projectFilter]),
+    [isACMPage, clusterFilter, projectFilter],
   );
 
   const rowFilters = useMemo(
