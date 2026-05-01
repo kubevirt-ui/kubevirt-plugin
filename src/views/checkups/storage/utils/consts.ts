@@ -1,6 +1,8 @@
+import { CHECKUP_LABEL_VALUES } from '../../utils/constants';
+
 export const STORAGE_CHECKUP_SA = 'storage-checkup-sa';
 export const STORAGE_CHECKUP_ROLE = 'storage-checkup-role';
-export const KUBEVIRT_STORAGE_LABEL_VALUE = 'kubevirt-vm-storage';
+export const KUBEVIRT_STORAGE_LABEL_VALUE = CHECKUP_LABEL_VALUES.STORAGE;
 export const STORAGE_CLUSTER_ROLE_BINDING = 'kubevirt-storage-checkup-clustereader';
 export const STORAGE_CHECKUP_TIMEOUT = 'spec.timeout';
 export const STORAGE_CHECKUP_DEFAULT_STORAGE_CLASS = 'status.result.defaultStorageClass';

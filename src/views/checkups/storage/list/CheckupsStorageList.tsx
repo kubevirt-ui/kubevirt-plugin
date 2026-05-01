@@ -19,15 +19,15 @@ import { ListPageBody } from '@openshift-console/dynamic-plugin-sdk';
 import { Pagination } from '@patternfly/react-core';
 import { useHubClusterName } from '@stolostron/multicluster-sdk';
 
-import { getJobByName } from '../../utils/utils';
+import useCheckupsListFilters from '../../utils/hooks/useCheckupsListFilters';
+import { getCheckupsConfigMapRowId, getJobByName } from '../../utils/utils';
 import useCheckupsStorageData from '../components/hooks/useCheckupsStorageData';
-import useCheckupsStorageListFilters from '../components/hooks/useCheckupsStorageListFilters';
 import { useCheckupsStoragePermissions } from '../components/hooks/useCheckupsStoragePermissions';
+import { getFilters } from '../utils/filters';
 
 import {
   CheckupsStorageCallbacks,
   getCheckupsStorageColumns,
-  getCheckupsStorageRowId,
 } from './checkupsStorageListDefinition';
 import CheckupsStorageListEmptyState from './CheckupsStorageListEmptyState';
 
@@ -48,8 +48,9 @@ const CheckupsStorageList = () => {
   } = useCheckupsStoragePermissions();
   const { configMaps, error, jobs, loaded } = useCheckupsStorageData();
 
-  const [unfilteredData, filteredData, onFilterChange, filters] = useCheckupsStorageListFilters(
+  const [unfilteredData, filteredData, onFilterChange, filters] = useCheckupsListFilters(
     configMaps || [],
+    getFilters,
   );
 
   const { handleFilterChange, handlePerPageSelect, handleSetPage, pagination } =
@@ -133,7 +134,7 @@ const CheckupsStorageList = () => {
         data={filteredData ?? []}
         dataTest="checkups-storage-table"
         fixedLayout
-        getRowId={getCheckupsStorageRowId}
+        getRowId={getCheckupsConfigMapRowId}
         loaded={isLoaded}
         loadError={error}
         noDataMsg={t('No storage checkups found')}
