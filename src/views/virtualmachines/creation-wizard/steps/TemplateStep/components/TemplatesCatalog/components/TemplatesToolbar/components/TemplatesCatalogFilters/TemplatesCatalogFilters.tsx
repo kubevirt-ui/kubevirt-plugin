@@ -101,7 +101,7 @@ export const TemplatesCatalogFilters: FC<{
         ),
       }}
       className="templates-catalog-filters-dropdown"
-      closeOnSelect={false}
+      closeOnSelect
       onSelect={onFilterSelect}
       selected={selectedFilters}
       selectedLabel={t('Filter')}

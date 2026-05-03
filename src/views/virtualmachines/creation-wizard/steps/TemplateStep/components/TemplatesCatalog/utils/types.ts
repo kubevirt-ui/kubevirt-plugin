@@ -16,6 +16,7 @@ export type TemplateFilters = {
   [CATALOG_FILTERS.QUERY]: string;
   [CATALOG_FILTERS.WORKLOAD]: Set<string>;
 };
+
 export type TemplatesCatalogCallbacks = {
   availableDatasources: Record<string, V1beta1DataSource>;
   availableTemplatesUID: Set<string>;
