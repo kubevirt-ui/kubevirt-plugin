@@ -15,7 +15,10 @@ import TemplatesToolbar from '@virtualmachines/creation-wizard/steps/TemplateSte
 import useHideDeprecatedTemplateTiles from '@virtualmachines/creation-wizard/steps/TemplateStep/components/TemplatesCatalog/hooks/useHideDeprecatedTemplateTiles';
 import useTemplatesWithAvailableSource from '@virtualmachines/creation-wizard/steps/TemplateStep/components/TemplatesCatalog/hooks/useTemplatesWithAvailableSource/useTemplatesWithAvailableSource';
 import { useTemplatesFilters } from '@virtualmachines/creation-wizard/steps/TemplateStep/components/TemplatesCatalog/hooks/useVMTemplatesFilters';
-import { filterTemplates } from '@virtualmachines/creation-wizard/steps/TemplateStep/components/TemplatesCatalog/utils/utils';
+import {
+  filterTemplates,
+  isNamespaceEmpty,
+} from '@virtualmachines/creation-wizard/steps/TemplateStep/components/TemplatesCatalog/utils/utils';
 
 import './TemplateCatalog.scss';
 
@@ -66,6 +69,7 @@ const TemplatesCatalog: FC = () => {
             ) : (
               <TemplatesCatalogEmptyState
                 bootSourcesLoaded={bootSourcesLoaded}
+                isNamespaceEmpty={isNamespaceEmpty(filters, templates.length)}
                 onClearFilters={clearAll}
               />
             )}
