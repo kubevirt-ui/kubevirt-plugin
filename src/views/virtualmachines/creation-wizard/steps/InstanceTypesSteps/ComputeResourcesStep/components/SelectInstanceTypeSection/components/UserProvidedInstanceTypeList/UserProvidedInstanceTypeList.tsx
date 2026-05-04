@@ -36,8 +36,7 @@ const UserProvidedInstanceTypesList: FC<UserProvidedInstanceTypesListProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const [activeNamespace] = useActiveNamespace();
-  const { selectedInstanceType, setSelectedInstanceType, setSelectedSeries, setSelectedSize } =
-    useInstanceTypeVMStore();
+  const { selectedInstanceType, setSelectedInstanceType } = useInstanceTypeVMStore();
 
   const [searchInput, setSearchInput] = useState('');
   const [pagination, setPagination] = useState(paginationInitialState);
@@ -74,8 +73,6 @@ const UserProvidedInstanceTypesList: FC<UserProvidedInstanceTypesListProps> = ({
 
   const handleRowClick = (itName: string, itNamespace: string) => {
     setSelectedInstanceType({ name: itName, namespace: itNamespace });
-    setSelectedSeries('');
-    setSelectedSize('');
   };
 
   return (
