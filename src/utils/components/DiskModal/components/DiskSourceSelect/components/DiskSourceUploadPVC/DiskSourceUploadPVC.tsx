@@ -20,7 +20,7 @@ type DiskSourceUploadPVCProps = {
   handleUpload?: () => void;
   isRequired?: boolean;
   label?: string;
-  relevantUpload: DataUpload;
+  relevantUpload?: DataUpload;
 };
 
 const DiskSourceUploadPVC: FC<DiskSourceUploadPVCProps> = ({

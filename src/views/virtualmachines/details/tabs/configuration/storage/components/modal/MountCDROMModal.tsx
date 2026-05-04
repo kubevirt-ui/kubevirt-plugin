@@ -1,9 +1,10 @@
-import React, { FC, useEffect, useRef } from 'react';
+import React, { FC, useEffect } from 'react';
 import { FormProvider, useWatch } from 'react-hook-form';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import DiskSourceUploadPVC from '@kubevirt-utils/components/DiskModal/components/DiskSourceSelect/components/DiskSourceUploadPVC/DiskSourceUploadPVC';
+import CDROMSourceOptions from '@kubevirt-utils/components/DiskModal/components/CDROMSourceOptions/CDROMSourceOptions';
 import { UPLOAD_FILENAME_FIELD } from '@kubevirt-utils/components/DiskModal/components/utils/constants';
+import { useCDROMUploadClose } from '@kubevirt-utils/components/DiskModal/hooks/useCDROMUploadClose';
 import {
   FORM_FIELD_UPLOAD_FILE,
   UPLOAD_MODE_SELECT,
@@ -14,23 +15,14 @@ import {
   mountISOToCDROM,
 } from '@kubevirt-utils/components/DiskModal/utils/helpers';
 import { uploadDataVolume } from '@kubevirt-utils/components/DiskModal/utils/submit';
-import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useCDIUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
-import { isUploadingDisk } from '@kubevirt-utils/hooks/useCDIUpload/utils';
 import useKubevirtHyperconvergeConfiguration from '@kubevirt-utils/hooks/useKubevirtHyperconvergeConfiguration';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
-import { isEmpty, kubevirtConsole } from '@kubevirt-utils/utils/utils';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
-import {
-  ButtonVariant,
-  Content,
-  ContentVariants,
-  Radio,
-  Stack,
-  StackItem,
-} from '@patternfly/react-core';
+import { ButtonVariant, Stack } from '@patternfly/react-core';
 
 import { useISOOptions } from './hooks/useISOOptions';
 import { useMountCDROMForm } from './hooks/useMountCDROMForm';
@@ -77,11 +69,13 @@ const MountCDROMModal: FC<MountCDROMModalProps> = ({
   const existingISOSelected = uploadMode === UPLOAD_MODE_SELECT || uploadMode === '';
 
   const hasUploadFile = !isEmpty(watchedUploadFile?.file);
-  const isUploading = isUploadingDisk(upload?.uploadStatus);
   const hasValidSelection = selectedISO || (uploadEnabled && hasUploadFile);
   const isFormValid = Boolean(hasValidSelection);
 
-  const isBackgroundUploadInProgress = useRef(false);
+  const { handleModalClose, isUploading, markBackgroundUploadStarted } = useCDROMUploadClose(
+    upload,
+    onClose,
+  );
 
   const { isoOptions } = useISOOptions(vmNamespace);
 
@@ -91,19 +85,14 @@ const MountCDROMModal: FC<MountCDROMModalProps> = ({
     }
   }, [uploadEnabled, clearErrors]);
 
-  const handleModalClose = async () => {
-    const shouldCancelUpload =
-      isUploading && !isBackgroundUploadInProgress.current && upload?.cancelUpload;
+  const handleISOSelect = (value: string): void => {
+    handleISOSelection(value);
+    setValue(UPLOAD_FILENAME_FIELD, '');
+  };
 
-    if (shouldCancelUpload) {
-      try {
-        await upload.cancelUpload();
-      } catch (error) {
-        kubevirtConsole.error(error);
-      }
-    }
-    isBackgroundUploadInProgress.current = false;
-    onClose();
+  const handleClearUploadAndFilename = (): void => {
+    handleClearUpload();
+    setValue(UPLOAD_FILENAME_FIELD, '');
   };
 
   const handleModalSubmit = async () => {
@@ -121,7 +110,7 @@ const MountCDROMModal: FC<MountCDROMModalProps> = ({
 
     if (data.uploadFile?.file) {
       await checkUploadReady();
-      isBackgroundUploadInProgress.current = true;
+      markBackgroundUploadStarted();
 
       const uploadPromise = uploadDataVolume(vm, uploadData, diskState);
 
@@ -161,66 +150,18 @@ const MountCDROMModal: FC<MountCDROMModalProps> = ({
         submitBtnVariant={ButtonVariant.primary}
       >
         <Stack hasGutter>
-          <StackItem className="pf-v6-u-mt-md">
-            <Content component={ContentVariants.p}>{t('Select mount option')}</Content>
-          </StackItem>
-          <StackItem>
-            <Stack hasGutter>
-              <StackItem>
-                <Radio
-                  id="mount-source-existing"
-                  isChecked={existingISOSelected}
-                  isDisabled={isUploading}
-                  label={t('Use existing ISO')}
-                  name="mount-source"
-                  onChange={() => handleISOSelection('')}
-                />
-                {existingISOSelected && (
-                  <div className="pf-v6-u-ml-lg pf-v6-u-mt-sm">
-                    <InlineFilterSelect
-                      setSelected={(e) => {
-                        handleISOSelection(e);
-                        setValue(UPLOAD_FILENAME_FIELD, '');
-                      }}
-                      toggleProps={{
-                        isDisabled: isUploading,
-                        isFullWidth: true,
-                      }}
-                      options={isoOptions}
-                      placeholder={t('Select ISO file')}
-                      selected={selectedISO}
-                    />
-                  </div>
-                )}
-              </StackItem>
-              <StackItem>
-                <Radio
-                  id="mount-source-upload"
-                  isChecked={uploadEnabled}
-                  isDisabled={isUploading}
-                  label={t('Upload new ISO')}
-                  name="mount-source"
-                  onChange={handleFileUpload}
-                />
-                {uploadEnabled && (
-                  <div className="pf-v6-u-ml-lg pf-v6-u-mt-sm">
-                    <DiskSourceUploadPVC
-                      acceptedFileTypes={{
-                        'application/*': ['.iso', '.img', '.qcow2', '.gz', '.xz'],
-                      }}
-                      handleClearUpload={() => {
-                        handleClearUpload();
-                        setValue(UPLOAD_FILENAME_FIELD, '');
-                      }}
-                      handleUpload={handleFileUpload}
-                      label=""
-                      relevantUpload={upload}
-                    />
-                  </div>
-                )}
-              </StackItem>
-            </Stack>
-          </StackItem>
+          <CDROMSourceOptions
+            existingISOSelected={existingISOSelected}
+            isoOptions={isoOptions}
+            isUploading={isUploading}
+            onClearUpload={handleClearUploadAndFilename}
+            onFileUpload={handleFileUpload}
+            onISOSelect={handleISOSelect}
+            radioNamePrefix="mount-source"
+            relevantUpload={upload}
+            selectedISO={selectedISO}
+            uploadEnabled={uploadEnabled}
+          />
         </Stack>
       </TabModal>
     </FormProvider>
