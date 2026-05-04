@@ -26,6 +26,7 @@ export type InstanceTypeVMActions = {
     volumeSnapshotSource: VolumeSnapshotKind,
     dvSource: V1beta1DataVolume,
   ) => void;
+  resetInstanceTypeVMState: () => void;
   setDVSource: (dvSource: V1beta1DataVolume) => void;
   setOperatingSystemType: (osType: OperatingSystemType) => void;
   setPreference: (preference: string) => void;
