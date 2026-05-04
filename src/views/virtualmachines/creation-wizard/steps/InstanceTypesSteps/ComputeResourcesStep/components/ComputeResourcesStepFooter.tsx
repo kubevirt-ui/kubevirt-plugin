@@ -13,19 +13,23 @@ const ComputeResourcesStepFooter: FC = () => {
   const { activeStep, goToNextStep, goToPrevStep } = useWizardContext();
   const handleCreateVM = useCreateVMFromInstanceType();
   const closeWizard = useCloseWizard();
-  const { selectedSeries, selectedSize } = useInstanceTypeVMStore();
+  const { selectedInstanceType, selectedSeries, selectedSize } = useInstanceTypeVMStore();
 
   const handleGoToNextStep = async () => {
     await handleCreateVM();
     goToNextStep();
   };
 
+  const isRedHatProvided = Boolean(selectedSeries) && Boolean(selectedSize);
+  const isUserProvided =
+    Boolean(selectedInstanceType?.namespace) && Boolean(selectedInstanceType?.name);
+
   return (
     <WizardFooter
       activeStep={activeStep}
       cancelButtonProps={{ className: classnames({ 'pf-v6-u-mr-4xl': hasOLSConsole }) }}
       isBackDisabled={activeStep.index === 1}
-      isNextDisabled={!selectedSeries || !selectedSize}
+      isNextDisabled={!isRedHatProvided && !isUserProvided}
       onBack={goToPrevStep}
       onClose={closeWizard}
       onNext={handleGoToNextStep}
