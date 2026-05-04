@@ -1189,6 +1189,7 @@
   "Memory density percentage": "메모리 밀도 비율",
   "Memory Dirty Rate": "메모리 더티 비율",
   "Memory limits": "Memory limits",
+  "Memory limits are equal to memory requests. This can cause the virt-launcher pod to be OOM-killed during live migration. Consider increasing memory limits or enabling auto-compute resource limits.": "Memory limits are equal to memory requests. This can cause the virt-launcher pod to be OOM-killed during live migration. Consider increasing memory limits or enabling auto-compute resource limits.",
   "Memory load": "Memory load",
   "Memory requests": "Memory requests",
   "Memory swap traffic": "메모리 스왑 트래픽",
