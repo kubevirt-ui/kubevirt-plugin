@@ -57,7 +57,7 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
   const { preferencesMap, userPreferencesData, userPreferencesLoaded, userPreferencesMap } =
     usePreferencesData(volumeListNamespace, preferencesData);
 
-  const { bootableVolumes, loaded } = bootableVolumesData;
+  const { loaded } = bootableVolumesData;
 
   const displayShowAllButton = true;
 
@@ -68,6 +68,8 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
     favorites,
     filters,
     getSortType,
+    isEmptyVolumes,
+    isPreferenceFilterEmpty,
     loadedColumns,
     onFilterChange,
     pagination,
@@ -101,8 +103,7 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
   }, [isAdmin, volumeListNamespace, setVolumeListNamespace, operatorNamespace]);
 
   const isVolumesLoaded = loaded && loadedColumns && userPreferencesLoaded;
-  const isEmptyVolumes = isEmpty(bootableVolumes);
-  const displayVolumes = isVolumesLoaded && !isEmptyVolumes;
+  const displayVolumes = isVolumesLoaded && !isEmptyVolumes && !isPreferenceFilterEmpty;
 
   const onModalBootableVolumeSelect = (modalSelectedVolume: BootableVolume) => {
     const selectedVolumeIndex = sortedData?.findIndex(
@@ -188,6 +189,9 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
           </>
         )}
         {isVolumesLoaded && isEmptyVolumes && <BootableVolumeEmptyState />}
+        {isVolumesLoaded && isPreferenceFilterEmpty && (
+          <BootableVolumeEmptyState isPreferenceFilter />
+        )}
         {!isVolumesLoaded && (
           <>
             <Skeleton className="pf-v6-u-my-md" />
