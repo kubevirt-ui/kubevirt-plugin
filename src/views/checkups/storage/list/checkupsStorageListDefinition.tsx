@@ -105,19 +105,3 @@ export const getCheckupsStorageColumns = (
     sortable: false,
   },
 ];
-
-export const getCheckupsStorageRowId = (
-  configMap: IoK8sApiCoreV1ConfigMap,
-  index: number,
-): string => {
-  if (configMap?.metadata?.uid) {
-    return configMap.metadata.uid;
-  }
-  const cluster = getCluster(configMap) || 'local';
-  const namespace = configMap?.metadata?.namespace;
-  const name = configMap?.metadata?.name;
-  if (namespace && name) {
-    return `${cluster}-${namespace}-${name}`;
-  }
-  return `configmap-${index}`;
-};

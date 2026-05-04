@@ -1,4 +1,4 @@
-import { CHECKUP_STATUS_COLORS } from '../../utils/constants';
+import { CHECKUP_LABEL_VALUES, CHECKUP_STATUS_COLORS } from '../../utils/constants';
 
 // ===========================
 // RBAC Constants
@@ -12,7 +12,7 @@ export const SELF_VALIDATION_CLUSTER_ROLE_BINDING = 'ocp-virt-validation-cluster
 // Checkup Configuration
 // ===========================
 
-export const SELF_VALIDATION_LABEL_VALUE = 'kubevirt-self-validation';
+export const SELF_VALIDATION_LABEL_VALUE = CHECKUP_LABEL_VALUES.SELF_VALIDATION;
 export const SELF_VALIDATION_NAME = 'ocp-virt-self-validation';
 export const SELF_VALIDATION_RESULTS_KEY = 'self-validation-results';
 export const SELF_VALIDATION_RESULTS_URL_KEY = 'detailed_results_url';

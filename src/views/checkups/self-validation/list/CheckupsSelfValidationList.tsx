@@ -18,15 +18,15 @@ import { Pagination } from '@patternfly/react-core';
 import { useHubClusterName } from '@stolostron/multicluster-sdk';
 
 import { CHECKUPS_COLUMN_KEYS } from '../../utils/constants';
-import { getJobByName } from '../../utils/utils';
+import useCheckupsListFilters from '../../utils/hooks/useCheckupsListFilters';
+import { getCheckupsConfigMapRowId, getJobByName } from '../../utils/utils';
 import useCheckupsSelfValidationData from '../components/hooks/useCheckupsSelfValidationData';
-import useCheckupsSelfValidationListFilters from '../components/hooks/useCheckupsSelfValidationListFilters';
 import useCheckupsSelfValidationPermissions from '../components/hooks/useCheckupsSelfValidationPermissions';
+import { getCheckupsSelfValidationListFilters } from '../utils';
 
 import {
   CheckupsSelfValidationCallbacks,
   getCheckupsSelfValidationColumns,
-  getCheckupsSelfValidationRowId,
 } from './checkupsSelfValidationListDefinition';
 import CheckupsSelfValidationListEmptyState from './CheckupsSelfValidationListEmptyState';
 
@@ -47,8 +47,10 @@ const CheckupsSelfValidationList: FC = () => {
   const { configMaps, error: dataError, jobs, loaded } = useCheckupsSelfValidationData();
   const error = dataError || permissionsError;
 
-  const [unfilteredData, filteredData, onFilterChange, filters] =
-    useCheckupsSelfValidationListFilters(configMaps || []);
+  const [unfilteredData, filteredData, onFilterChange, filters] = useCheckupsListFilters(
+    configMaps || [],
+    getCheckupsSelfValidationListFilters,
+  );
 
   const { handleFilterChange, handlePerPageSelect, handleSetPage, pagination } =
     usePaginationWithFilters(filteredData?.length ?? 0, onFilterChange);
@@ -127,7 +129,7 @@ const CheckupsSelfValidationList: FC = () => {
         data={filteredData ?? []}
         dataTest="checkups-self-validation-table"
         fixedLayout
-        getRowId={getCheckupsSelfValidationRowId}
+        getRowId={getCheckupsConfigMapRowId}
         initialSortDirection="desc"
         initialSortKey={CHECKUPS_COLUMN_KEYS.START_TIME_CAMEL}
         loaded={isLoaded}

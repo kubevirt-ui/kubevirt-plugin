@@ -1,3 +1,6 @@
+import { useMemo } from 'react';
+import { TFunction } from 'i18next';
+
 import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -6,26 +9,27 @@ import {
   useListPageFilter,
 } from '@openshift-console/dynamic-plugin-sdk';
 
-import { getFilters } from '../../utils/filters';
-
-type UseCheckupsStorageFilters = (
+type UseCheckupsListFilters = (
   data: IoK8sApiCoreV1ConfigMap[],
+  getFiltersImpl: (t: TFunction) => RowFilter<IoK8sApiCoreV1ConfigMap>[],
 ) => [
   unfilteredData: IoK8sApiCoreV1ConfigMap[],
-  dataFilter: IoK8sApiCoreV1ConfigMap[],
+  filteredData: IoK8sApiCoreV1ConfigMap[],
   onFilterChange: OnFilterChange,
   filters: RowFilter<IoK8sApiCoreV1ConfigMap>[],
 ];
 
-const useCheckupsStorageListFilters: UseCheckupsStorageFilters = (data) => {
+const useCheckupsListFilters: UseCheckupsListFilters = (data, getFiltersImpl) => {
   const { t } = useKubevirtTranslation();
-  const filters = getFilters(t);
-  const [unfilterData, dataFilters, onFilterChange] = useListPageFilter<
+
+  const filters = useMemo(() => getFiltersImpl(t), [t, getFiltersImpl]);
+
+  const [unfilteredData, filteredData, onFilterChange] = useListPageFilter<
     IoK8sApiCoreV1ConfigMap,
     IoK8sApiCoreV1ConfigMap
   >(data, filters);
 
-  return [unfilterData, dataFilters, onFilterChange, filters];
+  return [unfilteredData, filteredData, onFilterChange, filters];
 };
 
-export default useCheckupsStorageListFilters;
+export default useCheckupsListFilters;

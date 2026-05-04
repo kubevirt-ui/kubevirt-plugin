@@ -3,6 +3,13 @@ export const CHECKUP_URLS = {
   STORAGE: 'storage',
 } as const;
 
+export const CHECKUP_LABEL_VALUES = {
+  SELF_VALIDATION: 'kubevirt-self-validation',
+  STORAGE: 'kubevirt-vm-storage',
+} as const;
+
+export type CheckupLabelValue = (typeof CHECKUP_LABEL_VALUES)[keyof typeof CHECKUP_LABEL_VALUES];
+
 export const CHECKUP_STATUS_COLORS = {
   COMPLETED: 'var(--pf-t--global--icon--color--status--success--default)',
   FAILED: 'var(--pf-t--global--icon--color--status--danger--default)',
