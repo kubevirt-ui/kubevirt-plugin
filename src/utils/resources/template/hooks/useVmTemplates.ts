@@ -20,20 +20,24 @@ export const useVmTemplates = (namespace?: string, cluster?: string): useVmTempl
   const { allowedTemplates, allowedTemplatesError, allowedTemplatesloaded } =
     useWatchNonAdminTemplates();
 
-  const [allTemplates, allTemplatesLoaded, allTemplatesError] = useK8sWatchData<V1Template[]>({
-    cluster,
-    groupVersionKind: TemplateModelGroupVersionKind,
-    isList: true,
-    selector: {
-      matchExpressions: [
-        {
-          key: TEMPLATE_TYPE_LABEL,
-          operator: Operator.In,
-          values: [TEMPLATE_TYPE_BASE, TEMPLATE_TYPE_VM],
-        },
-      ],
-    },
-  });
+  const [allTemplates, allTemplatesLoaded, allTemplatesError] = useK8sWatchData<V1Template[]>(
+    isAdmin
+      ? {
+          cluster,
+          groupVersionKind: TemplateModelGroupVersionKind,
+          isList: true,
+          selector: {
+            matchExpressions: [
+              {
+                key: TEMPLATE_TYPE_LABEL,
+                operator: Operator.In,
+                values: [TEMPLATE_TYPE_BASE, TEMPLATE_TYPE_VM],
+              },
+            ],
+          },
+        }
+      : null,
+  );
 
   const templates = useMemo(
     () => (isAdmin ? allTemplates : allowedTemplates),

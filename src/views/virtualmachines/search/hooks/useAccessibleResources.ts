@@ -4,6 +4,7 @@ import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { KubevirtDataPodFilters } from '@kubevirt-utils/hooks/useKubevirtDataPod/useKubevirtDataPodFilters';
 import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
 import useProjects from '@kubevirt-utils/hooks/useProjects';
+import { isSystemNamespace } from '@kubevirt-utils/resources/namespace/helper';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import useIsACMPage from '@multicluster/useIsACMPage';
@@ -22,8 +23,10 @@ type UseAccessibleResourcesArgs = {
   filterOptions?: KubevirtDataPodFilters;
   groupVersionKind: K8sGroupVersionKind;
   namespace?: string;
+  onlyUserProjects?: boolean;
   searchQueries?: AdvancedSearchFilter;
   selector?: Selector;
+  watchNamespaces?: string[];
 };
 
 type UseAccessibleResources = <T extends K8sResourceCommon>(
@@ -40,13 +43,21 @@ export const useAccessibleResources: UseAccessibleResources = <T>({
   filterOptions,
   groupVersionKind,
   namespace,
+  onlyUserProjects,
   searchQueries,
   selector,
+  watchNamespaces,
 }) => {
   const isAdmin = useIsAdmin();
   const isACMPage = useIsACMPage();
   const cluster = useClusterParam();
   const [projectNames, projectNamesLoaded, projectNamesError] = useProjects();
+
+  const namespacesToWatch = useMemo(() => {
+    if (watchNamespaces) return watchNamespaces;
+    if (!onlyUserProjects || !projectNames) return projectNames;
+    return projectNames.filter((ns) => !isSystemNamespace(ns));
+  }, [onlyUserProjects, projectNames, watchNamespaces]);
 
   const loadPerNamespace = !isACMPage && projectNamesLoaded && !isAdmin;
 
@@ -71,12 +82,14 @@ export const useAccessibleResources: UseAccessibleResources = <T>({
   const allowedResources = useK8sWatchResources<{ [key: string]: T[] }>(
     Object.fromEntries(
       loadPerNamespace
-        ? (projectNames || []).map((ns) => [
+        ? (namespacesToWatch || []).map((ns) => [
             ns,
             {
+              fieldSelector,
               groupVersionKind,
               isList: true,
               namespace: ns,
+              selector,
             },
           ])
         : [],
