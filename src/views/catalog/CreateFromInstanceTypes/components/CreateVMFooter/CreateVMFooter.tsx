@@ -9,7 +9,10 @@ import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui-ext/kubevirt-api/kubernete
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useRunStrategyToggle } from '@kubevirt-utils/components/RunStrategyModal/useRunStrategyToggle';
-import { getStartAfterCreationLabel } from '@kubevirt-utils/components/RunStrategyModal/utils';
+import {
+  getStartAfterCreationLabel,
+  START_AFTER_CREATION_CHECKBOX_ID,
+} from '@kubevirt-utils/components/RunStrategyModal/utils';
 import { SecretSelectionOption } from '@kubevirt-utils/components/SSHSecretModal/utils/types';
 import {
   AUTOUNATTEND,
@@ -165,7 +168,7 @@ const CreateVMFooter: FC = () => {
               const { newStrategy } = onToggle(checked);
               setRunStrategy(newStrategy);
             }}
-            id="start-after-create-checkbox"
+            id={START_AFTER_CREATION_CHECKBOX_ID}
             isChecked={isStartChecked}
             label={getStartAfterCreationLabel(t)}
           />

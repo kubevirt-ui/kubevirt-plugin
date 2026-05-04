@@ -5,7 +5,10 @@ import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/u
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import { useRunStrategyToggle } from '@kubevirt-utils/components/RunStrategyModal/useRunStrategyToggle';
-import { getStartAfterCreationLabel } from '@kubevirt-utils/components/RunStrategyModal/utils';
+import {
+  getStartAfterCreationLabel,
+  START_AFTER_CREATION_CHECKBOX_ID,
+} from '@kubevirt-utils/components/RunStrategyModal/utils';
 import { SecretSelectionOption } from '@kubevirt-utils/components/SSHSecretModal/utils/types';
 import { logITFlowEvent } from '@kubevirt-utils/extensions/telemetry/telemetry';
 import {
@@ -79,7 +82,7 @@ const CustomizeITVMFooter: FC = () => {
                 },
               ]);
             }}
-            id="start-after-create-checkbox"
+            id={START_AFTER_CREATION_CHECKBOX_ID}
             isChecked={isStartChecked}
             label={getStartAfterCreationLabel(t)}
           />

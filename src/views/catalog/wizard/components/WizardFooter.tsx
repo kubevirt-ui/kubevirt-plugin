@@ -7,6 +7,7 @@ import { useRunStrategyToggle } from '@kubevirt-utils/components/RunStrategyModa
 import {
   applyRunStrategyToSpec,
   getStartAfterCreationLabel,
+  START_AFTER_CREATION_CHECKBOX_ID,
 } from '@kubevirt-utils/components/RunStrategyModal/utils';
 import { logTemplateFlowEvent } from '@kubevirt-utils/extensions/telemetry/telemetry';
 import {
@@ -96,7 +97,7 @@ export const WizardFooter: FC<{ namespace: string }> = ({ namespace }) => {
       <Stack hasGutter>
         <StackItem>
           <Checkbox
-            id="start-after-create-checkbox"
+            id={START_AFTER_CREATION_CHECKBOX_ID}
             isChecked={isStartChecked}
             isDisabled={!loaded || disableVmCreate || !isBootSourceAvailable}
             label={getStartAfterCreationLabel(t)}

@@ -21,7 +21,7 @@ export const useRunStrategyToggle = (
   const runStrategy =
     typeof vmOrRunStrategy === 'string'
       ? vmOrRunStrategy
-      : getEffectiveRunStrategy(vmOrRunStrategy);
+      : getEffectiveRunStrategy(vmOrRunStrategy) ?? getDefaultRunningStrategy();
 
   const isManual = isRunStrategyManual(runStrategy);
   const isActive = isRunStrategyNotHalted(runStrategy);

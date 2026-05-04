@@ -1,21 +1,22 @@
 import React, { FC } from 'react';
 
-import { getStartAfterCreationLabel } from '@kubevirt-utils/components/RunStrategyModal/utils';
-import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { useRunStrategyToggle } from '@kubevirt-utils/components/RunStrategyModal/useRunStrategyToggle';
 import {
-  getDefaultRunningStrategy,
-  RUNSTRATEGY_HALTED,
-} from '@kubevirt-utils/resources/vm/utils/constants';
-import { updateCustomizeInstanceType } from '@kubevirt-utils/store/customizeInstanceType';
+  getStartAfterCreationLabel,
+  START_AFTER_CREATION_CHECKBOX_ID,
+} from '@kubevirt-utils/components/RunStrategyModal/utils';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { updateCustomizeInstanceType, vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
 import { Checkbox, Stack, StackItem, Title, TitleSizes } from '@patternfly/react-core';
-import useVMWizardStore from '@virtualmachines/creation-wizard/state/vm-wizard-store/useVMWizardStore';
+import { useSignals } from '@preact/signals-react/runtime';
 import ReviewGrid from '@virtualmachines/creation-wizard/steps/ReviewAndCreateStep/components/ReviewGrid/ReviewGrid';
 
 import NameAndDescriptionForm from './components/NameAndDescriptionForm';
 
 const ReviewAndCreateStep: FC = () => {
   const { t } = useKubevirtTranslation();
-  const { setStartVM, startVM } = useVMWizardStore();
+  useSignals();
+  const { isStartChecked, onToggle } = useRunStrategyToggle(vmSignal.value ?? undefined);
   return (
     <Stack hasGutter>
       <StackItem>
@@ -41,16 +42,11 @@ const ReviewAndCreateStep: FC = () => {
       <StackItem>
         <Checkbox
           onChange={(_, checked: boolean) => {
-            setStartVM(checked);
-            updateCustomizeInstanceType([
-              {
-                data: checked ? getDefaultRunningStrategy() : RUNSTRATEGY_HALTED,
-                path: 'spec.runStrategy',
-              },
-            ]);
+            const { newStrategy } = onToggle(checked);
+            updateCustomizeInstanceType([{ data: newStrategy, path: 'spec.runStrategy' }]);
           }}
-          id="start-after-create-checkbox"
-          isChecked={startVM}
+          id={START_AFTER_CREATION_CHECKBOX_ID}
+          isChecked={isStartChecked}
           label={getStartAfterCreationLabel(t)}
         />
       </StackItem>

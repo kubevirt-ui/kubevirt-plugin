@@ -85,6 +85,8 @@ export const getRunStrategyDisplayValue = (t: TFunction, vm: V1VirtualMachine): 
 export const getStartAfterCreationLabel = (t: TFunction): string =>
   t('Start this VirtualMachine after creation');
 
+export const START_AFTER_CREATION_CHECKBOX_ID = 'start-after-create-checkbox';
+
 export const getRunStrategyHelpText = (t: TFunction): string =>
   t('Controls how the VM behaves after a failure, shutdown, or restart.');
 
