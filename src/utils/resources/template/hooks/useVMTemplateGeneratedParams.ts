@@ -15,10 +15,12 @@ import { generateParamsWithPrettyName } from './../utils/helpers';
 
 const useVMTemplateGeneratedParams = (
   template: Template,
+  namespaceOverride?: string,
 ): [template: Template, loading: boolean, error: Error] => {
   const cluster = useClusterParam();
   const [error, setError] = useState<Error>();
-  const { ns: namespace = DEFAULT_NAMESPACE } = useParams<{ ns: string }>();
+  const { ns: nsFromParams = DEFAULT_NAMESPACE } = useParams<{ ns: string }>();
+  const namespace = namespaceOverride || nsFromParams;
   const [templateWithGeneratedValues, setTemplateWithGeneratedValues] = useState<Template>();
   const [loading, setLoading] = useState<boolean>(false);
 
