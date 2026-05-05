@@ -85,7 +85,7 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({
     const mounted = isMountedVolume(vol);
 
     return {
-      isCDROMMountedState: mounted,
+      isCDROMMountedState: isCDROM && mounted,
       volume: vol,
     };
   }, [vm, vmi, isVMRunning, diskName, isCDROM]);
@@ -208,7 +208,7 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({
         <DropdownItem key="disk-delete" onClick={() => onModalOpen(createDeleteDiskModal)}>
           {deleteBtnText}
         </DropdownItem>
-        {isHotplug && !isCDROMMountedState && (
+        {isHotplug && !isCDROM && (
           <DropdownItem
             description={t('Will make disk persistent on next reboot')}
             key="make-persistent"
