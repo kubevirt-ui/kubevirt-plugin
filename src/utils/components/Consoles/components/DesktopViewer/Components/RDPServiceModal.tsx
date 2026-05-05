@@ -5,6 +5,10 @@ import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { usePods } from '@kubevirt-utils/hooks/usePods';
+import { getNamespace } from '@kubevirt-utils/resources/shared';
+import { getVMIPod } from '@kubevirt-utils/resources/vmi/utils/pod';
+import { getCluster } from '@multicluster/helpers/selectors';
 import {
   Alert,
   AlertVariant,
@@ -27,14 +31,17 @@ const RDPServiceModal: FC<RDPServiceModalProps> = ({ isOpen, onClose, vm, vmi })
   const { t } = useKubevirtTranslation();
   const [isChecked, setChecked] = useState<boolean>(false);
 
+  const [pods, podsLoaded] = usePods(getNamespace(vmi), getCluster(vmi));
+  const pod = getVMIPod(vmi, pods);
+
   return (
     <TabModal
       headerText={t('RDP Service')}
-      isDisabled={!isChecked}
+      isDisabled={!isChecked || !podsLoaded}
       isOpen={isOpen}
       modalVariant={ModalVariant.medium}
       onClose={onClose}
-      onSubmit={() => createRDPService(vm, vmi)}
+      onSubmit={() => createRDPService(vm, vmi, pod)}
     >
       <Stack hasGutter>
         <StackItem>
