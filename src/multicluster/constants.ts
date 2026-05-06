@@ -8,6 +8,10 @@ import { K8sModel } from '@openshift-console/dynamic-plugin-sdk';
 
 export const BASE_K8S_API_PATH = '/api/kubernetes';
 
+/** Proxy path prefix used by the multicluster SDK to reach spoke-cluster K8s APIs. */
+export const FLEET_SPOKE_PROXY_BASE_PATH =
+  '/api/proxy/plugin/mce/console/multicloud/managedclusterproxy';
+
 export const FLEET_BASE_PATH = '/fleet-virtualization';
 
 export const FLEET_VIRTUAL_MACHINES_PATH = `${FLEET_BASE_PATH}/${VirtualMachineModelRef}`;
