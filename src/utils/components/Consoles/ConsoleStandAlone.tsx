@@ -10,6 +10,7 @@ import { isWindows } from '@kubevirt-utils/resources/vm/utils/operation-system/o
 import useK8sBaseAPIPath from '@multicluster/hooks/useK8sBaseAPIPath';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 import { Bullseye, Spinner } from '@patternfly/react-core';
+import { useIsFleetAvailable } from '@stolostron/multicluster-sdk';
 
 import ErrorAlert from '../ErrorAlert/ErrorAlert';
 import { ModalProvider, useModalValue } from '../ModalProvider/ModalProvider';
@@ -28,16 +29,19 @@ const ConsoleStandAlone: FC = () => {
     name,
     namespace: ns,
   });
-  const { vmi, vmiLoaded, vmiLoadError } = useVMI(name, ns, cluster);
+  const { vmi, vmiLoadError } = useVMI(name, ns, cluster);
+  const isFleetAvailable = useIsFleetAvailable();
   const value = useModalValue();
 
-  if (!vmi && vmiLoadError) {
+  // For local/no-cluster flows show errors immediately; for fleet/spoke flows wait
+  // until the fleet SDK is initialised to avoid false positives during startup.
+  if (!vmi && vmiLoadError && (!cluster || isFleetAvailable)) {
     return <ErrorAlert error={vmiLoadError} />;
   }
 
   const waitingForVm = !vmLoaded && !vmLoadError;
 
-  if (!apiPathLoaded || !vmiLoaded || waitingForVm)
+  if (!apiPathLoaded || waitingForVm)
     return (
       <Bullseye>
         <Spinner />
