@@ -20,11 +20,12 @@ const useVMWizardStore = create<VMWizardStore>()((set) => {
     setCluster: (cluster: string) => set({ cluster }),
     setCreationMethod: (creationMethod: VMCreationMethod) => set({ creationMethod }),
     setFolder: (folder: string) => set({ folder }),
+    setIsVMNameValid: (isVMNameValid: boolean) => set({ isVMNameValid }),
     setProject: (project: string) => set({ project }),
     setSelectedTemplate: (selectedTemplate: Template) => set(() => ({ selectedTemplate })),
     setTemplatesDrawerIsOpen: (templatesDrawerIsOpen: boolean) =>
       set(() => ({ templatesDrawerIsOpen })),
-    setVMNameConfirmed: (vmNameConfirmed: boolean) => set({ vmNameConfirmed }),
+    setVMNameInteracted: (vmNameInteracted: boolean) => set({ vmNameInteracted }),
   };
 });
 

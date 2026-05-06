@@ -13,7 +13,7 @@ import { isCloneCreationMethod } from '@virtualmachines/creation-wizard/utils/ut
 const ReviewAndCreateStepFooter: FC = () => {
   const hasOLSConsole = useFlag(FLAG_LIGHTSPEED_PLUGIN);
   const { activeStep, goToPrevStep } = useWizardContext();
-  const { creationMethod, vmNameConfirmed } = useVMWizardStore();
+  const { creationMethod, isVMNameValid } = useVMWizardStore();
   const isCloneMethod = isCloneCreationMethod(creationMethod);
   const createVM = useCreateVM();
   const closeWizard = useCloseWizard();
@@ -22,7 +22,7 @@ const ReviewAndCreateStepFooter: FC = () => {
     <WizardFooter
       activeStep={activeStep}
       cancelButtonProps={{ className: classnames({ 'pf-v6-u-mr-4xl': hasOLSConsole }) }}
-      isNextDisabled={!vmNameConfirmed}
+      isNextDisabled={!isVMNameValid}
       nextButtonText={isCloneMethod ? t('Clone VirtualMachine') : t('Create VirtualMachine')}
       onBack={goToPrevStep}
       onClose={closeWizard}
