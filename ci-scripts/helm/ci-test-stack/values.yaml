@@ -1,0 +1,35 @@
+# Plugin (kubevirt-plugin nginx image built from the PR)
+plugin:
+  image: ''
+  port: 9080
+  replicas: 1
+
+# Console (origin-console in off-cluster mode)
+console:
+  image: 'quay.io/openshift/origin-console:latest'
+  port: 9000
+  replicas: 1
+  apiServer: ''
+
+  route:
+    enabled: true
+    host: ''
+
+  # kubevirt-apiserver-proxy endpoint (Route or internal Service URL)
+  pluginProxy:
+    endpoint: ''
+
+  monitoring:
+    thanosUrl: ''
+    alertmanagerUrl: ''
+
+# ClusterRole created by the ci-env-controller Helm chart (clusterrole-console.yaml).
+rbac:
+  consoleClusterRole: ci-console
+  # ClusterRole that grants test permissions inside the test namespace
+  testRunnerClusterRole: ci-env-test-runner
+
+# ARC runner ServiceAccount that needs namespace-scoped test permissions
+runner:
+  saName: kubevirt-plugin-ci-gha-rs-no-permission
+  saNamespace: arc-runners

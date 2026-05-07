@@ -1,0 +1,351 @@
+name: POC Hot Cluster E2E CI Test 2
+
+on:
+  workflow_dispatch:
+    inputs:
+      test_spec:
+        description: Cypress test spec to run
+        required: true
+        default: tests/poc-gating.cy.ts
+        type: string
+  workflow_call:
+    inputs:
+      test_spec:
+        description: Cypress test spec to run
+        type: string
+        required: false
+        default: tests/poc-gating.cy.ts
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  CYPRESS_CNV_NS: kubevirt-hyperconverged
+  CYPRESS_OS_IMAGES_NS: kubevirt-os-images
+  CYPRESS_TEST_NS: kubevirt-plugin-ci-test-${{ github.run_id }}
+  CYPRESS_TEST_SECRET_NAME: ci-test-secret
+
+  KUBEVIRT_PLUGIN_IMAGE: 'ttl.sh/kubevirt-plugin-ci-${{ github.run_id }}-${{ github.run_number }}:2h'
+  # KUBEVIRT_PLUGIN_IMAGE: ttl.sh/kubevirt-plugin-ci-1234:6h
+
+  CI_ENV_NS: ci-env
+  CI_ENV_CM: ci-env-${{ github.run_id }}
+
+jobs:
+  check-runner:
+    name: Check Runner Image
+    runs-on: kubevirt-plugin-ci
+    timeout-minutes: 15
+    steps:
+      - name: Log environment summary
+        run: |
+          {
+            echo "<details><summary>Key Environment Variables</summary>"
+            echo ""
+            echo "| Variable | Value |"
+            echo "| --- | --- |"
+            for var in HOME USER RUNNER_NAME RUNNER_OS RUNNER_ARCH \
+                       GITHUB_REPOSITORY GITHUB_REF GITHUB_SHA GITHUB_RUN_ID GITHUB_RUN_NUMBER \
+                       CYPRESS_CNV_NS CYPRESS_OS_IMAGES_NS \
+                       CYPRESS_TEST_NS KUBEVIRT_PLUGIN_IMAGE KUBEVIRT_UI_PLUGIN_RUNNER; do
+              echo "| \`$var\` | \`${!var:-<unset>}\` |"
+            done
+            echo "</details>"
+            echo ""
+
+            echo "<details><summary>Tool Availability</summary>"
+            echo ""
+            echo "| Tool | Available |"
+            echo "| --- | --- |"
+            for cmd in jq yq envsubst curl kubectl oc virtctl helm npm node; do
+              if command -v "$cmd" &>/dev/null; then
+                echo "| \`$cmd\` | ✅ |"
+              else
+                echo "| \`$cmd\` | ❌ |"
+              fi
+            done
+            echo "</details>"
+            echo ""
+
+            echo "<details><summary>npm / Node Versions</summary>"
+            echo ""
+            echo "\`\`\`json"
+            npm version --json 2>/dev/null || echo "npm not found"
+            echo "\`\`\`"
+            echo "</details>"
+            echo ""
+          } | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - name: Log Client / Server Versions
+        run: |
+          {
+            echo "<details><summary>Client / Server Versions</summary>"
+            echo ""
+            echo "| Tool | Client Version | Server Version |"
+            echo "| --- | --- | --- |"
+            for cmd in oc virtctl; do
+              if command -v "$cmd" &>/dev/null; then
+                client=""
+                server=""
+                version_output=$("$cmd" version 2>/dev/null || true)
+                client=$(echo "$version_output" | grep -i "client" | head -1 | sed 's/^[[:space:]]*//')
+                server=$(echo "$version_output" | grep -i "server" | head -1 | sed 's/^[[:space:]]*//')
+                echo "| \`$cmd\` | ${client:-N/A} | ${server:-N/A} |"
+              else
+                echo "| \`$cmd\` | ❌ not found | — |"
+              fi
+            done
+            echo "</details>"
+            echo ""
+          } | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - name: Log HCO and managed operator versions
+        continue-on-error: true
+        run: |
+          {
+            echo "<details><summary>HCO & Managed Operator Versions</summary>"
+            echo ""
+
+            if ! command -v oc &>/dev/null; then
+              echo "> ⚠️ \`oc\` not found — skipping cluster version checks."
+            else
+              # HCO itself is installed via OLM; its CSV is the authoritative version.
+              echo "### HCO Version (OLM CSV)"
+              echo ""
+              echo "| Name | Version | Phase |"
+              echo "| --- | --- | --- |"
+              oc get csv -n kubevirt-hyperconverged --no-headers 2>/dev/null \
+                | grep -i hyperconverged \
+                | awk '{ print "| `" $1 "` | `" $2 "` | " $NF " |" }' \
+                || echo "| — | HCO CSV not found | — |"
+              echo ""
+
+              echo "### HCO Managed Operand Versions"
+              echo ""
+              echo "| Operand | Version |"
+              echo "| --- | --- |"
+
+              HCO_LABEL="app.kubernetes.io/managed-by=hco-operator"
+
+              kv_ver=$(oc get kubevirt -A -l "${HCO_LABEL}" \
+                -o jsonpath='{.items[0].status.observedKubeVirtVersion}' 2>/dev/null || echo "")
+              echo "| \`kubevirt\` | \`${kv_ver:-not found}\` |"
+
+              cdi_ver=$(oc get cdi -A -l "${HCO_LABEL}" \
+                -o jsonpath='{.items[0].status.observedVersion}' 2>/dev/null || echo "")
+              echo "| \`cdi\` | \`${cdi_ver:-not found}\` |"
+
+              ssp_ver=$(oc get ssp -A -l "${HCO_LABEL}" \
+                -o jsonpath='{.items[0].status.observedVersion}' 2>/dev/null || echo "")
+              echo "| \`ssp\` | \`${ssp_ver:-not found}\` |"
+
+              cnao_ver=$(oc get networkaddonsconfig -A -l "${HCO_LABEL}" \
+                -o jsonpath='{.items[0].status.observedVersion}' 2>/dev/null || echo "")
+              echo "| \`cnao\` | \`${cnao_ver:-not found}\` |"
+
+              hpp_ver=$(oc get hostpathprovisioner -A -l "${HCO_LABEL}" \
+                -o jsonpath='{.items[0].status.observedVersion}' 2>/dev/null || echo "")
+              echo "| \`hostpath-provisioner\` | \`${hpp_ver:-not found}\` |"
+            fi
+            echo "</details>"
+            echo ""
+          } | tee -a "$GITHUB_STEP_SUMMARY"
+
+  build-kubevirt-plugin-image:
+    name: Build Kubevirt Plugin Image
+    needs: check-runner
+    runs-on: ubuntu-latest
+    outputs:
+      kubevirt-plugin-image: ${{ env.KUBEVIRT_PLUGIN_IMAGE }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Check if kubevirt-plugin image exists in registry
+        id: check_image
+        run: |
+          if skopeo inspect docker://${KUBEVIRT_PLUGIN_IMAGE} &>/dev/null; then
+            echo "IMAGE_EXISTS=true" >> $GITHUB_OUTPUT
+          else
+            echo "IMAGE_EXISTS=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Generate tags for the kubevirt-plugin image
+        id: meta
+        if: steps.check_image.outputs.IMAGE_EXISTS == 'false'
+        uses: docker/metadata-action@v6
+        env:
+          DOCKER_METADATA_SET_OUTPUT_ENV: false
+        with:
+          images: ${{ env.KUBEVIRT_PLUGIN_IMAGE }}
+          tags: |
+            type=schedule
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+            type=sha
+
+      - name: Build and push
+        if: steps.check_image.outputs.IMAGE_EXISTS == 'false'
+        env:
+          LABELS: ${{ steps.meta.outputs.labels }}
+        run: |
+          {
+            echo "## Labels"
+            echo "\`\`\`"
+            echo "${LABELS}"
+            echo "\`\`\`"
+          } | tee -a "$GITHUB_STEP_SUMMARY"
+
+          LABEL_ARGS=()
+          while IFS= read -r line; do
+            [ -n "$line" ] && LABEL_ARGS+=(--label "$line")
+          done <<< "$LABELS"
+
+          podman build "${LABEL_ARGS[@]}" -t ${KUBEVIRT_PLUGIN_IMAGE} -f Dockerfile .
+          podman push ${KUBEVIRT_PLUGIN_IMAGE}
+
+  run-gating-tests:
+    name: Run Gating Tests
+    needs: build-kubevirt-plugin-image
+    runs-on: kubevirt-plugin-ci
+    timeout-minutes: 120
+    env:
+      PLUGIN_IMAGE: ${{ needs.build-kubevirt-plugin-image.outputs.kubevirt-plugin-image }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Provision CI test environment
+        id: ci-env
+        uses: ./.github/actions/ci-env-request
+        with:
+          plugin-image: ${{ env.PLUGIN_IMAGE }}
+          test-namespace: ${{ env.CYPRESS_TEST_NS }}
+          configmap-name: ${{ env.CI_ENV_CM }}
+          ci-env-namespace: ${{ env.CI_ENV_NS }}
+
+      - name: Create test secret
+        run: |
+          yq e '
+            .metadata.name = strenv(CYPRESS_TEST_SECRET_NAME) |
+            .metadata.namespace = strenv(CYPRESS_TEST_NS)
+          ' cypress/fixtures/secret.yaml | oc apply -f -
+
+      - name: Seed kubevirt-user-settings ConfigMap
+        run: |
+          # The ci-env-controller sets helm_release=cm_name when no override is
+          # provided, so CI_ENV_CM is always the Helm release name.
+          SA_NAME="${CI_ENV_CM}-console"
+
+          # The plugin hook (useKubevirtUserSettings) keys settings by:
+          #   user?.metadata?.uid  OR  sanitized(user?.metadata?.name)
+          # In no-auth mode the SA bearer token is used for all k8s calls, so
+          # users/~ returns a virtual user for system:serviceaccount:<ns>:<sa>.
+          # We patch both the SA UID and the sanitized name so the hook always
+          # finds the right key regardless of whether OpenShift populates the UID.
+          SA_UID="$(oc get sa "${SA_NAME}" -n "${CYPRESS_TEST_NS}" \
+            -o jsonpath='{.metadata.uid}' 2>/dev/null || true)"
+          SANITIZED_NAME="system-serviceaccount-${CYPRESS_TEST_NS}-${SA_NAME}"
+
+          USER_SETTINGS='{"quickStart":{"dontShowWelcomeModal":true},"onboardingPopoversHidden":{"vmsTab":true,"catalog":true,"createProject":true}}'
+
+          # Create the ConfigMap if HCO has not done so yet.
+          if ! oc get configmap kubevirt-user-settings -n "${CYPRESS_CNV_NS}" &>/dev/null; then
+            oc create configmap kubevirt-user-settings -n "${CYPRESS_CNV_NS}"
+          fi
+
+          # Build a merge-patch that sets both possible user keys.
+          PATCH=$(jq -cn \
+            --arg sa_uid    "${SA_UID}" \
+            --arg name_key  "${SANITIZED_NAME}" \
+            --arg val       "${USER_SETTINGS}" \
+            '{data: (if ($sa_uid | length) > 0 then {($sa_uid): $val, ($name_key): $val} else {($name_key): $val} end)}')
+
+          oc patch configmap kubevirt-user-settings -n "${CYPRESS_CNV_NS}" \
+            --type merge -p "${PATCH}"
+
+      # TODO: Add dependency caching (either use the setup-node action with caching, or add explicit caching)
+      - name: Install dependencies
+        run: |
+          npm ci --ignore-scripts --no-audit
+          npx cypress install
+
+      - name: Run gating tests
+        uses: cypress-io/github-action@v7
+        env:
+          BRIDGE_BASE_ADDRESS: ${{ steps.ci-env.outputs.bridge-base-address }}
+        with:
+          summary-title: 'Cypress gating tests'
+          install: false
+          working-directory: ./cypress
+          env: openshift=true
+          spec: '${{ inputs.test_spec }}'
+
+      - name: Generate test report
+        if: always()
+        run: npm run cypress-postreport || true
+
+      - name: Upload test artifacts
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: cypress-results-${{ github.run_id }}
+          path: |
+            cypress/gui-test-screenshots/
+            cypress/videos/
+            cypress/results/
+          retention-days: 7
+          if-no-files-found: ignore
+
+      - name: e2e CI diagnostics - Collect console and plugin pod logs
+        if: always()
+        run: |
+          TMP=/tmp/e2e-ci-diagnostics/pod-logs
+          mkdir -p "${TMP}"
+
+          HELM_RELEASE="$(oc get configmap "${CI_ENV_CM}" -n "${CI_ENV_NS}" \
+            -o jsonpath='{.data.helm-release}' 2>/dev/null || echo "${CI_ENV_CM}")"
+
+          oc logs -n "${CYPRESS_TEST_NS}" -l "app=${HELM_RELEASE}-console" --tail=-1 \
+            > "${TMP}/console.log" 2>&1 || true
+          oc logs -n "${CYPRESS_TEST_NS}" -l "app=${HELM_RELEASE}-plugin" --tail=-1 \
+            > "${TMP}/kubevirt-plugin.log" 2>&1 || true
+
+      - name: e2e CI diagnostics - Collect OpenShift cluster information
+        if: failure()
+        run: |
+          TMP=/tmp/e2e-ci-diagnostics/cluster
+          mkdir -p "${TMP}"
+
+          oc cluster-info dump > "${TMP}/cluster_info.json" 2>/dev/null || true
+          oc get pods -n kubevirt-hyperconverged -o wide > "${TMP}/hco_pods.txt" 2>/dev/null || true
+          oc get nodes -o wide > "${TMP}/nodes.txt" 2>/dev/null || true
+          oc get events -n "${CYPRESS_TEST_NS}" --sort-by='.lastTimestamp' > "${TMP}/test_ns_events.txt" 2>/dev/null || true
+          oc get pods -n "${CYPRESS_TEST_NS}" -o wide > "${TMP}/test_ns_pods.txt" 2>/dev/null || true
+
+      - name: e2e CI diagnostics - Upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: e2e-ci-diagnostics-${{ github.run_id }}
+          path: /tmp/e2e-ci-diagnostics/
+          retention-days: 7
+          if-no-files-found: ignore
+
+      - name: Clean up test entities
+        if: always()
+        run: |
+          echo "Cleaning test entities in ${CYPRESS_TEST_NS}..."
+          bash ci-scripts/test-cleanup.sh
+
+      - name: Release CI test environment
+        if: always()
+        uses: ./.github/actions/ci-env-release
+        with:
+          configmap-name: ${{ env.CI_ENV_CM }}
+          ci-env-namespace: ${{ env.CI_ENV_NS }}

@@ -1,0 +1,124 @@
+name: Request CI Test Environment
+description: >
+  Create a trigger ConfigMap for the ci-env-controller and wait until the
+  test environment (namespace, console, plugin) is provisioned and ready.
+
+inputs:
+  plugin-image:
+    description: Plugin container image to deploy
+    required: true
+  test-namespace:
+    description: Kubernetes namespace for the test environment
+    required: true
+  configmap-name:
+    description: Name of the trigger ConfigMap
+    required: true
+  ci-env-namespace:
+    description: Namespace where ci-env-controller runs
+    default: ci-env
+  timeout:
+    description: Max seconds to wait for environment to become ready
+    default: '360'
+
+outputs:
+  bridge-base-address:
+    description: In-cluster URL for the console bridge
+    value: ${{ steps.wait.outputs.bridge-base-address }}
+  console-route:
+    description: External HTTPS route for the console
+    value: ${{ steps.wait.outputs.console-route }}
+
+runs:
+  using: composite
+  steps:
+    - name: Create trigger ConfigMap
+      shell: bash
+      run: |
+        cat <<EOF | oc create -f -
+        apiVersion: v1
+        kind: ConfigMap
+        metadata:
+          name: ${{ inputs.configmap-name }}
+          namespace: ${{ inputs.ci-env-namespace }}
+          labels:
+            ci.kubevirt-plugin/type: test-environment
+        data:
+          desired-state: "present"
+          plugin-image: "${{ inputs.plugin-image }}"
+          test-namespace: "${{ inputs.test-namespace }}"
+        EOF
+        echo "Created trigger ConfigMap ${{ inputs.configmap-name }} in ${{ inputs.ci-env-namespace }}"
+
+    - name: Wait for environment ready
+      id: wait
+      shell: bash
+      env:
+        CM_NAME: ${{ inputs.configmap-name }}
+        CM_NS: ${{ inputs.ci-env-namespace }}
+        TIMEOUT: ${{ inputs.timeout }}
+      run: |
+        echo "Waiting for ci-env-controller to provision the test environment..."
+        INTERVAL=10
+        ELAPSED=0
+
+        while true; do
+          STATUS="$(oc get configmap "${CM_NAME}" -n "${CM_NS}" \
+            -o jsonpath='{.data.status}' 2>/dev/null || echo "")"
+
+          case "${STATUS}" in
+            ready)
+              echo "Environment is ready."
+              break
+              ;;
+            error)
+              ERR_MSG="$(oc get configmap "${CM_NAME}" -n "${CM_NS}" \
+                -o jsonpath='{.data.error-message}' 2>/dev/null || echo "unknown error")"
+              echo "::error::Environment provisioning failed: ${ERR_MSG}"
+              exit 1
+              ;;
+            *)
+              if (( ELAPSED >= TIMEOUT )); then
+                echo "::error::Timed out waiting for environment (status=${STATUS:-pending})"
+                exit 1
+              fi
+              echo "  status=${STATUS:-pending} (${ELAPSED}s / ${TIMEOUT}s)..."
+              sleep "${INTERVAL}"
+              ELAPSED=$(( ELAPSED + INTERVAL ))
+              ;;
+          esac
+        done
+
+        BRIDGE_BASE_ADDRESS="$(oc get configmap "${CM_NAME}" -n "${CM_NS}" \
+          -o jsonpath='{.data.bridge-base-address}')"
+        CONSOLE_ROUTE="$(oc get configmap "${CM_NAME}" -n "${CM_NS}" \
+          -o jsonpath='{.data.console-route}' 2>/dev/null || echo "")"
+
+        echo "bridge-base-address=${BRIDGE_BASE_ADDRESS}" >> "${GITHUB_OUTPUT}"
+        echo "console-route=${CONSOLE_ROUTE}" >> "${GITHUB_OUTPUT}"
+
+    - name: Write job summary
+      shell: bash
+      env:
+        CM_NAME: ${{ inputs.configmap-name }}
+        CM_NS: ${{ inputs.ci-env-namespace }}
+        PLUGIN_IMAGE: ${{ inputs.plugin-image }}
+        TEST_NS: ${{ inputs.test-namespace }}
+        BRIDGE: ${{ steps.wait.outputs.bridge-base-address }}
+        ROUTE: ${{ steps.wait.outputs.console-route }}
+      run: |
+        {
+          echo "<details><summary>CI Test Environment</summary>"
+          echo ""
+          echo "| Input Parameter | Value |"
+          echo "|------|-------|"
+          echo "| ConfigMap | \`${CM_NS}/${CM_NAME}\` |"
+          echo "| Plugin image | \`${PLUGIN_IMAGE}\` |"
+          echo "| Test namespace | \`${TEST_NS}\` |"
+          echo ""
+          echo "| Output Parameter | Value |"
+          echo "|------|-------|"
+          echo "| Bridge base address | \`${BRIDGE}\` |"
+          echo "| Console route | \`${ROUTE}\` |"
+          echo ""
+          echo "</details>"
+        } >> "${GITHUB_STEP_SUMMARY}"

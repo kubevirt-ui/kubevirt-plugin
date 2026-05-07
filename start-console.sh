@@ -1,5 +1,5 @@
-#!/bin/sh
-set -eu
+#!/usr/bin/env bash
+set -euo pipefail
 
 source ./route-console.sh
 
@@ -49,7 +49,7 @@ for arg in "$@"; do
     [ -n "$pid" ] && kill -9 "$pid"
 
     if [ "$arg" = "monitoring-plugin" ]; then
-        cd web 
+        cd web
     fi
 
     if [ -f yarn.lock ]; then
@@ -69,48 +69,51 @@ for arg in "$@"; do
     cd "$BASE_DIR"
 done
 
-CONSOLE_IMAGE=${CONSOLE_IMAGE:-"quay.io/openshift/origin-console:latest"}
+eval "$(bash ./ci-scripts/resolve-console-image.sh)" || true
+CONSOLE_IMAGE="${CONSOLE_IMAGE:-quay.io/openshift/origin-console:latest}"
 CONSOLE_PORT=${CONSOLE_PORT:-9000}
 
-echo "Starting local OpenShift console..."
-
 # Set required env vars
-BRIDGE_USER_AUTH="disabled"
-BRIDGE_K8S_MODE="off-cluster"
-BRIDGE_K8S_AUTH="bearer-token"
-BRIDGE_K8S_MODE_OFF_CLUSTER_SKIP_VERIFY_TLS=true
-BRIDGE_K8S_MODE_OFF_CLUSTER_ENDPOINT=$(oc whoami --show-server)
-BRIDGE_K8S_MODE_OFF_CLUSTER_THANOS=$(oc -n openshift-config-managed get configmap monitoring-shared-config -o jsonpath='{.data.thanosPublicURL}' 2>/dev/null || echo "")
-BRIDGE_K8S_MODE_OFF_CLUSTER_ALERTMANAGER=$(oc -n openshift-config-managed get configmap monitoring-shared-config -o jsonpath='{.data.alertmanagerPublicURL}' 2>/dev/null || echo "")
-BRIDGE_K8S_AUTH_BEARER_TOKEN=$(oc whoami --show-token 2>/dev/null)
-BRIDGE_USER_SETTINGS_LOCATION="localstorage"
-BRIDGE_I18N_NAMESPACES="plugin__kubevirt-plugin"
+export BRIDGE_USER_AUTH="disabled"
+export BRIDGE_K8S_MODE="off-cluster"
+export BRIDGE_K8S_MODE_OFF_CLUSTER_SKIP_VERIFY_TLS=true
+export BRIDGE_K8S_MODE_OFF_CLUSTER_ENDPOINT=$(oc whoami --show-server)
+export BRIDGE_K8S_MODE_OFF_CLUSTER_THANOS=$(oc -n openshift-config-managed get configmap monitoring-shared-config -o jsonpath='{.data.thanosPublicURL}' 2>/dev/null || echo "")
+export BRIDGE_K8S_MODE_OFF_CLUSTER_ALERTMANAGER=$(oc -n openshift-config-managed get configmap monitoring-shared-config -o jsonpath='{.data.alertmanagerPublicURL}' 2>/dev/null || echo "")
+export BRIDGE_K8S_AUTH_BEARER_TOKEN=$(oc whoami --show-token 2>/dev/null)
+export BRIDGE_USER_SETTINGS_LOCATION="localstorage"
+export BRIDGE_I18N_NAMESPACES="plugin__kubevirt-plugin"
+export BRIDGE_BASE_ADDRESS="http://localhost:${CONSOLE_PORT}"
 
-echo "API Server: $BRIDGE_K8S_MODE_OFF_CLUSTER_ENDPOINT"
+echo "API Server: ${BRIDGE_K8S_MODE_OFF_CLUSTER_ENDPOINT}"
 echo "Console Image: $CONSOLE_IMAGE"
 echo "Console URL: http://localhost:${CONSOLE_PORT}"
 
-# Build --env args dynamically
-env_args=""
-for var in $(set | grep '^BRIDGE_' | cut -d= -f1); do
-    eval val=\$$var
-    env_args="$env_args --env $var='$val'"
-done
+# Build env file for container
+env_file=$(mktemp)
+trap 'rm -f "$env_file"' EXIT
+function build_env_file() {
+    compgen -v | grep '^BRIDGE_' > "$env_file"
+}
 
 # Prefer podman
+echo "Starting local OpenShift console..."
 if command -v podman >/dev/null; then
     if [ "$(uname -s)" = "Linux" ]; then
-        env_args="$env_args --env BRIDGE_PLUGINS=$running_podman_linux"
-        sh -c "podman run --pull=always --rm --network=host $env_args \"$CONSOLE_IMAGE\""
+        export BRIDGE_PLUGINS=${running_podman_linux}
+        build_env_file
+        podman run --pull=always --rm --network=host --env-file "$env_file" "${CONSOLE_IMAGE}"
     else
-        env_args="$env_args --env BRIDGE_PLUGINS=$running_podman"
-        sh -c "podman run --platform=linux/x86_64 --pull=always --rm -p \"$CONSOLE_PORT\":9000 $env_args \"$CONSOLE_IMAGE\""
+        export BRIDGE_PLUGINS=${running_podman}
+        build_env_file
+        podman run --platform=linux/x86_64 --pull=always --rm -p "${CONSOLE_PORT}:9000" --env-file "$env_file" "${CONSOLE_IMAGE}"
     fi
 else
-    env_args="$env_args --env BRIDGE_PLUGINS=$running_docker"
+    export BRIDGE_PLUGINS=${running_docker}
+    build_env_file
     if [ "$(uname)" = "Darwin" ]; then
-        sh -c "docker run --platform=linux/x86_64 --pull=always --rm -p \"$CONSOLE_PORT\":9000 $env_args \"$CONSOLE_IMAGE\""
+        docker run --platform=linux/x86_64 --pull=always --rm -p "${CONSOLE_PORT}:9000" --env-file "$env_file" "${CONSOLE_IMAGE}"
     else
-        sh -c "docker run --pull=always --rm -p \"$CONSOLE_PORT\":9000 $env_args \"$CONSOLE_IMAGE\""
+        docker run --pull=always --rm -p "${CONSOLE_PORT}:9000" --env-file "$env_file" "${CONSOLE_IMAGE}"
     fi
 fi

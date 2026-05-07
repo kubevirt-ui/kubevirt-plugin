@@ -9,6 +9,9 @@ cypress/gui-test-screenshots
 cypress/cypress-a11y-report.json
 /locales
 
+# Helm templates contain Go template syntax that Prettier cannot parse
+ci-scripts/helm/**/templates/
+
 # Ignore anything that eslint will look at since eslint also applies prettier.
 #
 **/*.js

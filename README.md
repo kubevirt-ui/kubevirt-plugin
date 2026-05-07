@@ -30,22 +30,35 @@ Click the Create button at the bottom then click on the link in the alert that p
 
 ## Local development
 
-### Option 1 (recommended):
+### Option 1 (recommended): Run console and plugin independently
 
 Open two terminals and navigate to the kubevirt-plugin directory in both of them. The first terminal will run a containerized instance of console and the second will run the kubevirt-plugin. In case you are using Openshift, make sure to set the environment variable `BRIDGE_BRANDING=openshift` in both terminals before starting. Set environment variable `PROXY_ENV=local` if you are running `kubevirt-apiserver-proxy` locally.
 
 In the first terminal:
 
 1. Log into the OpenShift cluster you are using with `oc login` command.
-2. Run `npm run start-console` OR `./start-console.sh` OR `./start-console-auth-mode.sh`.
+2. Run `npm run start-console` OR `./start-console.sh` with authentication disabled, OR `./start-console-auth-mode.sh` when authentication is needed.
 
 In the second terminal:
 
-1. Run `npm ci && npm run dev`
+1. Run `npm ci && npm run dev:plugin`
 
-NOTE: `./start-console-auth-mode.sh` is when authentication is needed, `start-console.sh`, ignores authentication.
+When both are running, navigate to `http://localhost:9000`
 
-### Option 2: Docker + VSCode Remote Container
+### Option 2: Run console and plugin concurrently
+
+To run with OpenShift branding:
+
+```sh
+oc login # copy login command from the target OpenShift's console
+export BRIDGE_BRANDING=openshift
+npm ci
+npm run dev
+```
+
+Once running, navigate to `http://localhost:9000`
+
+### Option 3: Docker + VSCode Remote Container
 
 Make sure the [Remote Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
 extension is installed. This method uses Docker Compose where one container is
@@ -73,7 +86,7 @@ OC_PASS=<password>
 2. Navigate to <http://localhost:10000>
 3. login with password `kubevirt` (no need for username)
 
-### Option 3:
+### Option 4: Manually build then run console with plugin dev server running
 
 1. Set up [Console](https://github.com/openshift/console) and See the plugin development section in [Console Dynamic Plugins README](https://github.com/openshift/console/blob/master/frontend/packages/console-dynamic-plugin-sdk/README.md) for details on how to run OpenShift console using local plugins.
 2. Run bridge with `-plugins kubevirt-plugin=http://localhost:9001/ -i18n-namespaces=plugin__kubevirt-plugin`

@@ -5,8 +5,10 @@ set -ex
 # create test namespace
 oc get namespace ${CYPRESS_TEST_NS} || oc new-project ${CYPRESS_TEST_NS}
 
-# dismiss welcome modal and onboarding popovers
-oc patch configmap -n ${CYPRESS_CNV_NS} kubevirt-user-settings --type=merge --patch '{"data": {"kube-admin": "{\"quickStart\":{\"dontShowWelcomeModal\":true},\"onboardingPopoversHidden\":{\"vmsTab\":true,\"catalog\":true,\"createProject\":true}}"}}'
+# close welcome modal
+oc patch configmap -n ${CYPRESS_CNV_NS} kubevirt-user-settings --type=merge --patch '{"data": {"kube-admin": "{\"quickStart\":{\"dontShowWelcomeModal\":true}}"}}'
+
+# enable advanced search and tree view folders
 oc patch configmap -n ${CYPRESS_CNV_NS} kubevirt-ui-features --type=merge --patch '{"data": {"advancedSearch": "true", "treeViewFolders": "true"}}'
 
 # create secret
