@@ -45,7 +45,7 @@ const SaveAsTemplateModal: FC<SaveAsTemplateModalProps> = ({ isOpen, onClose, vm
       {isRunning(vm) && (
         <Alert
           title={t(
-            'Creating a template from a running VirtualMachine may result in inconsistent data because the system is still actively writing changes. For best results, consider stopping the VM before creating the template.',
+            'Creating a template from a running virtual machine might result in inconsistent data because the system is still writing changes. For best results, stop the VM before creating the template.',
           )}
           isInline
           variant={AlertVariant.info}

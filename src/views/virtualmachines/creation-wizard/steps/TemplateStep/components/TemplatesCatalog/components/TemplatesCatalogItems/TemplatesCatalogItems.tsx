@@ -1,12 +1,11 @@
 import React, { FC, useMemo } from 'react';
 
-import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import { getUID } from '@kubevirt-utils/resources/shared';
 import { getTemplateName, Template } from '@kubevirt-utils/resources/template';
 import { Gallery, StackItem } from '@patternfly/react-core';
+import { sortCatalogTemplates } from '@virtualmachines/creation-wizard/steps/TemplateStep/components/TemplatesCatalog/utils/utils';
 
-import { TemplateFilters } from '../../utils/types';
 import TemplatesTable from '../TemplatesTable/TemplatesTable';
 
 import TemplatesCatalogTile from './components/TemplatesCatalogTile';
@@ -15,33 +14,26 @@ type TemplatesCatalogItemsProps = {
   availableDatasources: Record<string, V1beta1DataSource>;
   availableTemplatesUID: Set<string>;
   bootSourcesLoaded: boolean;
-  filters: TemplateFilters;
+  isList: boolean;
   loaded: boolean;
   onTemplateClick: (template: Template) => void;
   selectedTemplate?: Template;
   templates: Template[];
-  unfilteredTemplates: Template[];
 };
 
 const TemplatesCatalogItems: FC<TemplatesCatalogItemsProps> = ({
   availableDatasources,
   availableTemplatesUID,
   bootSourcesLoaded,
-  filters,
+  isList,
   loaded,
   onTemplateClick,
   selectedTemplate,
   templates,
 }) => {
-  const sortedTemplates = useMemo(
-    () =>
-      [...templates].sort((a: V1Template, b: V1Template) =>
-        (getTemplateName(a) ?? '').localeCompare(getTemplateName(b) ?? ''),
-      ),
-    [templates],
-  );
+  const sortedTemplates = useMemo(() => sortCatalogTemplates(templates), [templates]);
 
-  return filters?.isList ? (
+  return isList ? (
     <div className="vm-catalog-table-container">
       <TemplatesTable
         availableDatasources={availableDatasources}
@@ -49,7 +41,7 @@ const TemplatesCatalogItems: FC<TemplatesCatalogItemsProps> = ({
         bootSourcesLoaded={bootSourcesLoaded}
         loaded={loaded}
         onTemplateClick={onTemplateClick}
-        templates={templates}
+        templates={sortedTemplates}
       />
     </div>
   ) : (

@@ -11,8 +11,9 @@ import {
   TemplateOrRequest,
 } from '@kubevirt-utils/resources/template';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm';
-import { ARCHITECTURE_ID, getArchitecture } from '@kubevirt-utils/utils/architecture';
+import { ARCHITECTURE_ID } from '@kubevirt-utils/utils/architecture';
 import { getCluster } from '@multicluster/helpers/selectors';
+import { getTemplateArchitecture } from '@templates/utils/utils';
 
 import { getWorkloadProfile } from '../utils/selectors';
 
@@ -81,16 +82,11 @@ export const getTemplateColumns = (
       sortable: true,
     },
     {
-      getValue: (row) => (isVirtualMachineTemplateRequest(row) ? '' : getArchitecture(row) ?? ''),
+      getValue: (row) => getTemplateArchitecture(row) ?? '',
       key: TEMPLATE_COLUMN_KEYS.architecture,
       label: t('Architecture'),
       props: { className: 'pf-m-width-10' },
-      renderCell: (row) =>
-        isVirtualMachineTemplateRequest(row) ? (
-          NO_DATA_DASH
-        ) : (
-          <ArchitectureLabel architecture={getArchitecture(row)} />
-        ),
+      renderCell: (row) => <ArchitectureLabel architecture={getTemplateArchitecture(row)} />,
       sortable: true,
     },
     {

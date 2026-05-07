@@ -37,9 +37,11 @@ test.describe('Cluster Test Preparation', () => {
     oc(`create secret generic ${TEST_SECRET_NAME} -n ${TEST_NS} --from-file=key=${RSA_PUB}`);
   });
 
-  test('configure public ssh key', async ({ loginPage, page, settingsPage }) => {
+  test('configure cluster settings', async ({ loginPage, page, settingsPage }) => {
     await loginPage.login();
     await page.context().storageState({ path: 'playwright/.auth/session.json' });
+
+    // SSH key configuration
     await settingsPage.navigateToSSHKeys(); // waits for 'Public SSH key' internally
     await settingsPage.expectSSHSectionVisible(SSH_SECTION);
 
@@ -52,5 +54,8 @@ test.describe('Cluster Test Preparation', () => {
     }
 
     await settingsPage.expectSSHSecretConfigured(TEST_SECRET_NAME);
+
+    // Preview features
+    await settingsPage.enablePreviewFeature('vmTemplates');
   });
 });
