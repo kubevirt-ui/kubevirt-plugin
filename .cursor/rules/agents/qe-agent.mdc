@@ -151,6 +151,34 @@ Your approach:
 
 ### 5. Test Coverage Analysis
 
+**Before anything else — scan for existing tests**
+
+When invoked for a feature or change, **always start by searching the codebase for related tests** before giving any coverage opinion:
+
+1. **Search Jest unit tests** — look in `src/` for `*.test.ts(x)` files near the changed files or matching the feature name.
+2. **Search Playwright E2E tests** — look in `playwright/tests/` for spec files that reference the feature, component name, or resource kind.
+3. **Search Cypress E2E tests** — look in `cypress/tests/` for the same.
+
+Use `Grep` or `Glob` with the feature/component/hook name, the resource kind (e.g. `VirtualMachine`, `StorageClass`), or the route segment (e.g. `vm-actions`, `set-default-sc`) as search terms.
+
+**After the scan, branch on what you found:**
+
+#### No tests found → prompt the user
+If no tests exist for the feature, explicitly tell the user:
+> "No tests were found for this feature. Would you like me to add unit tests, Playwright E2E tests, or both?"
+
+Wait for the user's answer before proceeding. If they say yes, follow the guidance in `.cursor/commands/create-test.md`.
+
+#### Tests found → analyse for breakage
+If tests exist, do **all** of the following:
+
+- **Read each test file** that touches the feature.
+- **Check for hardcoded values** that the change may invalidate (selectors, names, status strings, URLs).
+- **Check for missing assertions** — does the test cover the new behaviour, or does it only cover the old path?
+- **Check for timing assumptions** — does the test wait for state that the change affects?
+- **Check for setup/teardown coupling** — does the test depend on data that is now created or deleted differently?
+- Report each risk using the output format below, tagging it `🔴 BREAKING` if the test will fail as-is, or `🟡 NEEDS UPDATE` if the test passes but no longer covers the new behaviour.
+
 **Unit Test Coverage**
 - All public functions tested
 - All branches covered (if/else, switch)
@@ -273,11 +301,17 @@ Your approach:
 ## Output Format
 
 ```
-🔴 BREAKING: [scenario that will break]
-   Steps: [how to reproduce]
-   Impact: [user impact]
-   
-🟡 UNTESTED: [scenario missing test]
+🔴 BREAKING: [existing test that will fail due to the change]
+   File: [path/to/test.spec.ts]
+   Reason: [why it breaks]
+   Fix: [what needs to change in the test]
+
+🟡 NEEDS UPDATE: [existing test that still passes but no longer covers new behaviour]
+   File: [path/to/test.spec.ts]
+   Gap: [what the test misses]
+   Suggestion: [assertion or scenario to add]
+
+🟡 UNTESTED: [scenario with no test at all]
    Risk: [what could go wrong]
    Test: [suggested test case]
 

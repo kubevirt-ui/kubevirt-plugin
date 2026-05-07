@@ -64,7 +64,7 @@ NAMESPACE="openshift-marketplace"
 SECRET_NAME="ocs-secret"
 NS="kubevirt-hyperconverged"
 ARTIFACT_DIR=${ARTIFACT_DIR:=/tmp/artifacts}
-SCREENSHOTS_DIR="cypress/gui-test-screenshots"
+SCREENSHOTS_DIR="playwright/test-results"
 
 function createSecret {
     oc create secret generic ${SECRET_NAME} --from-file=.dockerconfigjson=${PULL_SECRET_PATH} --type=kubernetes.io/dockerconfigjson -n $1
@@ -138,15 +138,12 @@ export BRIDGE_KUBEADMIN_PASSWORD
 BRIDGE_BASE_ADDRESS="$(oc get consoles.config.openshift.io cluster -o jsonpath='{.status.consoleURL}')"
 export BRIDGE_BASE_ADDRESS
 
-# Disable color codes in Cypress since they do not render well CI test logs.
-# https://docs.cypress.io/guides/guides/continuous-integration.html#Colors
-export NO_COLOR=1
-
-# Export namespace for upstream test
-export CYPRESS_CNV_NS='kubevirt-hyperconverged'
-export CYPRESS_OS_IMAGES_NS='kubevirt-os-images'
-export CYPRESS_TEST_NS='auto-test-ns'
-export CYPRESS_TEST_SECRET_NAME='auto-test-secret'
+# Export namespaces for Playwright tests
+export CNV_NS='kubevirt-hyperconverged'
+export OS_IMAGES_NS='kubevirt-os-images'
+export TEST_NS='auto-test-ns'
+export TEST_SECRET_NAME='auto-test-secret'
+export HEADLESS='true'
 
 # Setup cluster
 bash test-setup.sh
@@ -154,8 +151,9 @@ bash test-setup.sh
 # Install dependencies.
 npm ci
 
-# Run tests.
-npm run test-cypress-headless -- --spec="tests/gating.cy.ts"
+# Install Playwright browsers.
+npm run playwright-install
 
-# Generate Cypress report.
-npm run cypress-postreport
+# Run tests (gating suite).
+npm run test-playwright-headless -- --grep "@gating" 2>&1 || \
+  npm run test-playwright-headless -- playwright/tests/gating/ playwright/tests/setup/
