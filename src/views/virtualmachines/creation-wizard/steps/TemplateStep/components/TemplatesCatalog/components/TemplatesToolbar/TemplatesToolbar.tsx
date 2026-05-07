@@ -1,36 +1,37 @@
 import React, { FC } from 'react';
 
+import { OnFilterChange } from '@openshift-console/dynamic-plugin-sdk';
 import { Split, SplitItem } from '@patternfly/react-core';
-import { TemplatesCatalogFilters } from '@virtualmachines/creation-wizard/steps/TemplateStep/components/TemplatesCatalog/components/TemplatesToolbar/components/TemplatesCatalogFilters/TemplatesCatalogFilters';
 import { TemplatesCatalogProjectsDropdown } from '@virtualmachines/creation-wizard/steps/TemplateStep/components/TemplatesCatalog/components/TemplatesToolbar/components/TemplatesCatalogProjectsDropdown/TemplatesCatalogProjectsDropdown';
 import TemplatesCatalogStyleToggle from '@virtualmachines/creation-wizard/steps/TemplateStep/components/TemplatesCatalog/components/TemplatesToolbar/components/TemplatesCatalogStyleToggle';
 import TemplatesSearchInput from '@virtualmachines/creation-wizard/steps/TemplateStep/components/TemplatesCatalog/components/TemplatesToolbar/components/TemplatesSearchInput';
-import { CATALOG_FILTERS } from '@virtualmachines/creation-wizard/steps/TemplateStep/components/TemplatesCatalog/utils/consts';
-import { TemplateFilters } from '@virtualmachines/creation-wizard/steps/TemplateStep/components/TemplatesCatalog/utils/types';
 
 type TemplatesToolbarProps = {
-  filters: TemplateFilters;
-  onFilterChange: (type: CATALOG_FILTERS, value: boolean | string) => void;
+  isList: boolean;
+  namespace: string;
+  onFilterChange: OnFilterChange;
+  setIsList: (value: boolean) => void;
+  setNamespace: (value: string) => void;
 };
 
-const TemplatesToolbar: FC<TemplatesToolbarProps> = ({ filters, onFilterChange }) => {
+const TemplatesToolbar: FC<TemplatesToolbarProps> = ({
+  isList,
+  namespace,
+  onFilterChange,
+  setIsList,
+  setNamespace,
+}) => {
   return (
     <Split hasGutter>
       <SplitItem>
-        <TemplatesCatalogProjectsDropdown
-          onChange={(project) => onFilterChange(CATALOG_FILTERS.NAMESPACE, project)}
-          selectedProject={filters.namespace}
-        />
+        <TemplatesCatalogProjectsDropdown onChange={setNamespace} selectedProject={namespace} />
       </SplitItem>
       <SplitItem>
-        <TemplatesCatalogFilters filters={filters} onFilterChange={onFilterChange} />
-      </SplitItem>
-      <SplitItem>
-        <TemplatesSearchInput filters={filters} onFilterChange={onFilterChange} />
+        <TemplatesSearchInput onFilterChange={onFilterChange} />
       </SplitItem>
       <SplitItem isFilled />
       <SplitItem>
-        <TemplatesCatalogStyleToggle filters={filters} onFilterChange={onFilterChange} />
+        <TemplatesCatalogStyleToggle isList={isList} setIsList={setIsList} />
       </SplitItem>
     </Split>
   );

@@ -4,6 +4,9 @@ import { modelToRef, TemplateModel } from '@kubevirt-ui-ext/kubevirt-api/console
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
 import { buildColumnLayout } from '@kubevirt-utils/components/KubevirtTable/utils';
 import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
+import TemplatesFilter from '@kubevirt-utils/components/TemplatesFilter/TemplatesFilter';
+import { TemplatesFilterVariant } from '@kubevirt-utils/components/TemplatesFilter/types';
+import useFiltersFromURL from '@kubevirt-utils/hooks/useFiltersFromURL';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettingsTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettingsTableColumns';
 import useNamespaceParam from '@kubevirt-utils/hooks/useNamespaceParam';
@@ -43,7 +46,7 @@ const VirtualMachineTemplatesList: FC<ListPageProps> = ({
 
   const { t } = useKubevirtTranslation();
 
-  const { allTemplates, error, loaded } = useAllTemplateResources({
+  const { allTemplates, allTemplatesWithRequests, error, loaded } = useAllTemplateResources({
     fieldSelector,
     namespace: namespaceParam,
     selector,
@@ -56,12 +59,20 @@ const VirtualMachineTemplatesList: FC<ListPageProps> = ({
     [filters, filtersWithSelect],
   );
 
+  const filtersFromURL = useFiltersFromURL(allFilters);
+
+  const staticFilters = useMemo(
+    () => ({
+      ...filtersFromURL,
+      ...(nameFilter && { name: { selected: [nameFilter] } }),
+    }),
+    [filtersFromURL, nameFilter],
+  );
+
   const [unfilteredData, filteredData, onFilterChange] = useListPageFilter(
-    allTemplates,
+    allTemplatesWithRequests,
     allFilters,
-    {
-      name: { selected: [nameFilter] },
-    },
+    staticFilters,
   );
 
   const columns = useMemo(
@@ -109,6 +120,13 @@ const VirtualMachineTemplatesList: FC<ListPageProps> = ({
       <ListPageBody>
         <div className="list-managment-group">
           <ListPageFilter
+            customRowFiltersMenu={
+              <TemplatesFilter
+                onFilterChange={onFilterChange}
+                rowFilters={filters}
+                variant={TemplatesFilterVariant.Menu}
+              />
+            }
             columnLayout={columnLayout}
             data={unfilteredData}
             filtersWithSelect={filtersWithSelect}

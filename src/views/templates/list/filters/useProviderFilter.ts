@@ -3,6 +3,7 @@ import { useMemo } from 'react';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getLabel } from '@kubevirt-utils/resources/shared';
 import {
+  isOpenShiftTemplate,
   isVirtualMachineTemplateRequest,
   TEMPLATE_TYPE_BASE,
   TEMPLATE_TYPE_LABEL,
@@ -14,7 +15,12 @@ import { RowFilter, RowFilterItem } from '@openshift-console/dynamic-plugin-sdk'
 
 import { getTemplateProviderName } from '../../utils/selectors';
 
-const RED_HAT = 'Red Hat';
+import { TemplateFilterType } from './types';
+
+const PROVIDER_ID = {
+  OTHER: 'Other',
+  RED_HAT: 'Red Hat',
+} as const;
 
 const isBaseTemplate = (obj: TemplateOrRequest): boolean =>
   getLabel(obj, TEMPLATE_TYPE_LABEL) === TEMPLATE_TYPE_BASE;
@@ -24,10 +30,10 @@ const getRowProvider = (obj: TemplateOrRequest): string => {
 
   const provider = getTemplateProviderName(obj);
   if (provider) {
-    return provider.startsWith(RED_HAT) ? RED_HAT : provider;
+    return provider.startsWith(PROVIDER_ID.RED_HAT) ? PROVIDER_ID.RED_HAT : provider;
   }
 
-  if (isBaseTemplate(obj)) return RED_HAT;
+  if (isBaseTemplate(obj)) return PROVIDER_ID.RED_HAT;
 
   return OTHER;
 };
@@ -38,11 +44,11 @@ const useProviderFilter = (): RowFilter<TemplateOrRequest> => {
   const providers: RowFilterItem[] = useMemo(
     () => [
       {
-        id: 'Red Hat',
+        id: PROVIDER_ID.RED_HAT,
         title: t('Red Hat'),
       },
       {
-        id: 'Other',
+        id: PROVIDER_ID.OTHER,
         title: t('Other'),
       },
     ],
@@ -52,11 +58,12 @@ const useProviderFilter = (): RowFilter<TemplateOrRequest> => {
   return useMemo(
     () => ({
       filter: (availableTemplateProviders, obj) =>
+        !isOpenShiftTemplate(obj) ||
         includeFilter(availableTemplateProviders, providers, getRowProvider(obj)),
       filterGroupName: t('Provider'),
       items: providers,
       reducer: (obj) => getItemNameWithOther(getRowProvider(obj), providers),
-      type: 'provider',
+      type: TemplateFilterType.Provider,
     }),
     [providers, t],
   );

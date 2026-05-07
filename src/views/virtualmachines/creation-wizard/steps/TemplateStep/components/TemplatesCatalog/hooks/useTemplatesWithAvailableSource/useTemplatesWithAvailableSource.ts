@@ -2,17 +2,12 @@ import { useMemo } from 'react';
 
 import { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import { getUID } from '@kubevirt-utils/resources/shared';
-import { isDefaultVariantTemplate, Template } from '@kubevirt-utils/resources/template';
+import { Template } from '@kubevirt-utils/resources/template';
 import { useSingleClusterAvailableSources } from '@kubevirt-utils/resources/template/hooks/useSingleClusterAvailableSources';
-import { isVirtualMachineTemplate } from '@kubevirt-utils/resources/template/utils/types';
 import useAvailableTemplates from '@virtualmachines/creation-wizard/steps/TemplateStep/components/TemplatesCatalog/hooks/useTemplatesWithAvailableSource/useAvailableTemplates';
 import useTemplates from '@virtualmachines/creation-wizard/steps/TemplateStep/components/TemplatesCatalog/hooks/useTemplatesWithAvailableSource/useTemplates';
 
-type UseTemplatesWithAvailableSource = (args: {
-  namespace?: string;
-  onlyAvailable: boolean;
-  onlyDefault: boolean;
-}) => {
+type UseTemplatesWithAvailableSource = (args: { namespace?: string }) => {
   availableDataSources: Record<string, V1beta1DataSource>;
   availableTemplatesUID: Set<string>;
   bootSourcesLoaded: boolean;
@@ -21,11 +16,7 @@ type UseTemplatesWithAvailableSource = (args: {
   templates: Template[];
 };
 
-const useTemplatesWithAvailableSource: UseTemplatesWithAvailableSource = ({
-  namespace,
-  onlyAvailable,
-  onlyDefault,
-}) => {
+const useTemplatesWithAvailableSource: UseTemplatesWithAvailableSource = ({ namespace }) => {
   const { allTemplates: templates, error: loadError, loaded } = useTemplates(namespace);
 
   const {
@@ -41,13 +32,6 @@ const useTemplatesWithAvailableSource: UseTemplatesWithAvailableSource = ({
     loaded,
   );
 
-  const filteredTemplates = useMemo(() => {
-    return (onlyAvailable ? availableTemplates : templates).filter(
-      (template) =>
-        !onlyDefault || isDefaultVariantTemplate(template) || isVirtualMachineTemplate(template),
-    );
-  }, [availableTemplates, onlyAvailable, onlyDefault, templates]);
-
   const availableTemplatesUID = useMemo(
     () => new Set(availableTemplates.map((template) => getUID(template))),
     [availableTemplates],
@@ -59,7 +43,7 @@ const useTemplatesWithAvailableSource: UseTemplatesWithAvailableSource = ({
     bootSourcesLoaded,
     error: loadError,
     loaded,
-    templates: filteredTemplates,
+    templates,
   };
 };
 

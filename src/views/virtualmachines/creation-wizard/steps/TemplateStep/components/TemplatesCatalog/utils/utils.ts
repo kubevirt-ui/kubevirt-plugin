@@ -1,88 +1,21 @@
-import { getName } from '@kubevirt-utils/resources/shared';
-import {
-  isCommonTemplate,
-  isDefaultVariantTemplate,
-  isDeprecatedTemplate,
-  OS_NAME_TYPES,
-  Template,
-} from '@kubevirt-utils/resources/template';
 import {
   getTemplateName,
   getTemplateOS,
-  getTemplateWorkload,
-} from '@kubevirt-utils/resources/template/utils/selectors';
-import { isVirtualMachineTemplate } from '@kubevirt-utils/resources/template/utils/types';
-import { getArchitecture } from '@kubevirt-utils/utils/architecture';
+  isVirtualMachineTemplate,
+  Template,
+} from '@kubevirt-utils/resources/template';
+import { OS_NAME_TYPES } from '@kubevirt-utils/resources/template/utils/constants';
+import { universalComparator } from '@kubevirt-utils/utils/utils';
 
-import { TemplateFilters } from './types';
-
-const isUserTemplate = (template: Template): boolean =>
-  !isDefaultVariantTemplate(template) && !isCommonTemplate(template);
-
-export const filterTemplates = (templates: Template[], filters: TemplateFilters): Template[] => {
-  return (
-    templates
-      .filter((tmp) => {
-        const textFilterLowerCase = filters?.query.toLowerCase();
-        const workload = getTemplateWorkload(tmp);
-
-        const textFilter =
-          !textFilterLowerCase ||
-          getTemplateName(tmp).toLowerCase().includes(textFilterLowerCase) ||
-          getName(tmp)?.toLowerCase()?.includes(textFilterLowerCase);
-
-        const defaultVariantFilter =
-          (!filters?.onlyDefault && !hasNoDefaultUserAllFilters(filters)) ||
-          isDefaultVariantTemplate(tmp) ||
-          isVirtualMachineTemplate(tmp);
-
-        const userFilter = !filters.onlyUser || isUserTemplate(tmp);
-
-        const workloadFilter = filters?.workload?.size <= 0 || filters.workload.has(workload);
-
-        const osNameFilter = filters?.osName?.size <= 0 || filters?.osName?.has(getTemplateOS(tmp));
-
-        const architectureFilter =
-          filters?.architecture?.size <= 0 || filters?.architecture?.has(getArchitecture(tmp));
-
-        const hideDeprecatedTemplatesFilter =
-          !filters?.hideDeprecatedTemplates || !isDeprecatedTemplate(tmp);
-
-        return (
-          defaultVariantFilter &&
-          userFilter &&
-          textFilter &&
-          workloadFilter &&
-          osNameFilter &&
-          architectureFilter &&
-          hideDeprecatedTemplatesFilter
-        );
-      })
-      // show RHEL templates first, then alphabetically
-      .sort((a, b) => {
-        const aIsRHEL = getTemplateOS(a) === OS_NAME_TYPES.rhel;
-        const bIsRHEL = getTemplateOS(b) === OS_NAME_TYPES.rhel;
-
-        if (aIsRHEL !== bIsRHEL) {
-          return aIsRHEL ? -1 : 1;
-        }
-
-        const aName = getTemplateName(a) || a?.metadata?.name || '';
-        const bName = getTemplateName(b) || b?.metadata?.name || '';
-
-        return aName.localeCompare(bName);
-      })
-  );
+const getSortPriority = (template: Template): number => {
+  if (isVirtualMachineTemplate(template)) return 0;
+  if (getTemplateOS(template) === OS_NAME_TYPES.rhel) return 1;
+  return 2;
 };
 
-export const hasNoDefaultUserAllFilters = (filters: TemplateFilters): boolean =>
-  !filters?.allItems && !filters?.onlyDefault && !filters?.onlyUser; // none of the filters are set - when first time in
-
-/**
- * Returns true only when the selected namespace genuinely has no templates.
- * Uses the pre-client-filter template count so that templates hidden by
- * hideDeprecatedTemplates, text search, workload, etc. do not incorrectly
- * trigger the "No templates in this project" empty state.
- */
-export const isNamespaceEmpty = (filters: TemplateFilters, templatesCount: number): boolean =>
-  !!filters.namespace && templatesCount === 0 && !filters.onlyAvailable && !filters.onlyDefault;
+export const sortCatalogTemplates = (templates: Template[]): Template[] =>
+  [...templates].sort((a, b) => {
+    const priorityDiff = getSortPriority(a) - getSortPriority(b);
+    if (priorityDiff !== 0) return priorityDiff;
+    return universalComparator(getTemplateName(a) ?? '', getTemplateName(b) ?? '');
+  });

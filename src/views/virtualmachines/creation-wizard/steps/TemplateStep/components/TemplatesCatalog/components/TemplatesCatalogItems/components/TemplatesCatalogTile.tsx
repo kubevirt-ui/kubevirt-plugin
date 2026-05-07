@@ -5,11 +5,12 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { getAnnotations, getName, getNamespace, getUID } from '@kubevirt-utils/resources/shared';
 import {
   getTemplateFlavorData,
+  getTemplateOSLabelName,
   isDeprecatedTemplate,
   Template,
 } from '@kubevirt-utils/resources/template';
-import { getTemplateName } from '@kubevirt-utils/resources/template/utils/selectors';
-import { getArchitecture } from '@kubevirt-utils/utils/architecture';
+import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm';
+import { getOperatingSystemName } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
 import { readableSizeUnit } from '@kubevirt-utils/utils/units';
 import {
   Badge,
@@ -21,6 +22,7 @@ import {
   Stack,
   StackItem,
 } from '@patternfly/react-core';
+import { getTemplateArchitecture } from '@templates/utils/utils';
 import { getTemplateOSIcon } from '@virtualmachines/creation-wizard/utils/os-icons/os-icons';
 
 import './TemplatesCatalogTile.scss';
@@ -38,9 +40,10 @@ const TemplatesCatalogTile: FC<TemplatesCatalogTileProps> = memo(
     const isDeprecated = isDeprecatedTemplate(template);
     const templateID = getUID(template);
     const templateName = getName(template);
-    const displayName = getTemplateName(template);
     const { cpuCount, memory } = getTemplateFlavorData(template);
-    const architecture = getArchitecture(template);
+    const architecture = getTemplateArchitecture(template);
+    const osName =
+      getOperatingSystemName(template) || getTemplateOSLabelName(template) || NO_DATA_DASH;
 
     const icon = useMemo(() => {
       return getTemplateOSIcon(template);
@@ -79,12 +82,17 @@ const TemplatesCatalogTile: FC<TemplatesCatalogTileProps> = memo(
                   </SplitItem>
                 )}
                 <SplitItem>
-                  <div className="pf-v6-u-font-weight-bold">{displayName}</div>
+                  <div
+                    className="pf-v6-u-font-weight-bold"
+                    id={`template-catalog-tile-${templateName}`}
+                  >
+                    {templateName}
+                  </div>
                 </SplitItem>
                 <SplitItem isFilled />
                 <SplitItem>
                   <Stack className="badge-stack pf-v6-u-ml-xs" key="badge-stack">
-                    {architecture && <Badge key="architecture">{getArchitecture(template)}</Badge>}
+                    {architecture && <Badge key="architecture">{architecture}</Badge>}
                     {isDeprecated ? <DeprecatedBadge className="deprecated-template" /> : null}
                   </Stack>
                 </SplitItem>
@@ -100,7 +108,7 @@ const TemplatesCatalogTile: FC<TemplatesCatalogTileProps> = memo(
                   <b>{t('Project')}</b> {getNamespace(template)}
                 </StackItem>
                 <StackItem>
-                  <b>{t('OS')}</b> {displayName}
+                  <b>{t('OS')}</b> {osName}
                 </StackItem>
                 <StackItem>
                   <b>{t('vCPU | Memory')}</b> {cpuCount} | {readableSizeUnit(memory)}
