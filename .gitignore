@@ -4,8 +4,8 @@ dist
 **/.env
 /coverage
 /gui-test-screenshots
-cypress/gui-test-screenshots
-cypress/cypress-a11y-report.json
+# Playwright - ignore all test results (artifacts, traces, reports)
+playwright/test-results/
 .DS_Store
 .devcontainer/dev.env
 console-extensions.md
