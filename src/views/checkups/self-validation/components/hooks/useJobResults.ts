@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 
 import { ConfigMapModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
@@ -6,8 +6,9 @@ import {
   IoK8sApiCoreV1ConfigMap,
 } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
-import { kubevirtK8sGet } from '@multicluster/k8sRequests';
+import useK8sGetData from '@multicluster/hooks/useK8sGetData';
 
 import { CONFIGMAP_NAME, getJobContainers } from '../../../utils/utils';
 import { JobResults, parseResults } from '../../utils';
@@ -25,7 +26,7 @@ type UseJobResultsResult = {
 };
 
 const determineResultsConfigMapName = (job: IoK8sApiBatchV1Job): string => {
-  const configMapName = job.metadata?.name;
+  const configMapName = getName(job);
 
   const jobSpec = getJobContainers(job)?.[0];
   if (jobSpec?.env) {
@@ -42,99 +43,107 @@ const determineResultsConfigMapName = (job: IoK8sApiBatchV1Job): string => {
   return configMapName;
 };
 
-const readResultsConfigMap = async (
-  configMapName: string,
-  namespace: string,
-  cluster: string,
-): Promise<IoK8sApiCoreV1ConfigMap> => {
-  try {
-    const configMap = await kubevirtK8sGet<IoK8sApiCoreV1ConfigMap>({
-      cluster,
-      model: ConfigMapModel,
-      name: configMapName,
-      ns: namespace,
-    });
-
-    return configMap;
-  } catch (error) {
-    kubevirtConsole.warn('Could not read ConfigMap:', error);
-    throw new Error(
-      `Failed to read results from ConfigMap ${configMapName}: ${
-        error instanceof Error ? error.message : 'Unknown error'
-      }`,
-    );
-  }
-};
-
 export const useJobResults = ({
   cluster,
   job,
   namespace,
 }: UseJobResultsProps): UseJobResultsResult => {
   const { t } = useKubevirtTranslation();
-  const [results, setResults] = useState<JobResults | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<null | string>(null);
 
-  useEffect(() => {
-    if (!job || job.status?.succeeded !== 1) {
-      setResults(null);
-      setError(null);
-      return;
+  const jobSucceeded = job?.status?.succeeded === 1;
+
+  // Resolve the ConfigMap name outside the render path to avoid throwing during render
+  let configMapName: null | string = null;
+  let nameResolutionError: null | string = null;
+
+  if (jobSucceeded && job) {
+    try {
+      configMapName = determineResultsConfigMapName(job);
+    } catch (e) {
+      nameResolutionError =
+        e instanceof Error ? e.message : t('Could not determine ConfigMap name');
+    }
+  }
+
+  const [configMap, configMapLoaded, configMapError] = useK8sGetData<IoK8sApiCoreV1ConfigMap>(
+    configMapName && namespace && cluster
+      ? { cluster, model: ConfigMapModel, name: configMapName, ns: namespace }
+      : null,
+  );
+
+  // Parse results and track parse failure in a single memo to avoid chained dependency
+  const { parseError, results } = useMemo<{
+    parseError: boolean;
+    results: JobResults | null;
+  }>(() => {
+    if (!configMapLoaded || configMapError || !configMap)
+      return { parseError: false, results: null };
+
+    if (getName(configMap) !== configMapName || getNamespace(configMap) !== namespace) {
+      return { parseError: false, results: null };
     }
 
-    let canceled = false;
+    const parsedResults = parseResults(configMap);
 
-    const fetchResults = async () => {
-      if (canceled) return;
-      setIsLoading(true);
-      setError(null);
+    if (!parsedResults) return { parseError: true, results: null };
 
-      try {
-        const configMapName = determineResultsConfigMapName(job);
-        const resultsConfigMap = await readResultsConfigMap(configMapName, namespace, cluster);
-
-        if (canceled) return;
-
-        const parsedResults = parseResults(resultsConfigMap);
-
-        if (parsedResults) {
-          const detailedResults = {
-            tests: parsedResults,
-            timestamps: {
-              completionTimestamp: resultsConfigMap.data?.['status.completionTimestamp'],
-              startTimestamp: resultsConfigMap.data?.['status.startTimestamp'],
-            },
-          };
-          if (!canceled) {
-            setResults(detailedResults);
-          }
-        } else {
-          if (canceled) return;
-          const errorMessage = t('No valid results found in ConfigMap');
-          kubevirtConsole.error('Error reading job results:', errorMessage);
-          setError(errorMessage);
-          setResults(null);
-        }
-      } catch (err) {
-        if (canceled) return;
-        const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
-        kubevirtConsole.error('Error reading job results:', errorMessage);
-        setError(errorMessage);
-        setResults(null);
-      } finally {
-        if (!canceled) {
-          setIsLoading(false);
-        }
-      }
+    return {
+      parseError: false,
+      results: {
+        tests: parsedResults,
+        timestamps: {
+          completionTimestamp: configMap.data?.['status.completionTimestamp'],
+          startTimestamp: configMap.data?.['status.startTimestamp'],
+        },
+      },
     };
+  }, [configMap, configMapLoaded, configMapError, configMapName, namespace]);
 
-    fetchResults();
+  // Log errors as side effects, not inside useMemo
+  useEffect(() => {
+    if (configMapError) {
+      kubevirtConsole.warn('Could not read ConfigMap:', configMapError);
+    }
+  }, [configMapError]);
 
-    return () => {
-      canceled = true;
-    };
-  }, [job, namespace, cluster, t]);
+  useEffect(() => {
+    if (parseError) {
+      kubevirtConsole.error('Error reading job results:', t('No valid results found in ConfigMap'));
+    }
+  }, [parseError, t]);
+
+  const error = useMemo<null | string>(() => {
+    if (nameResolutionError) return nameResolutionError;
+    if (jobSucceeded && (!namespace || !cluster))
+      return t('Missing namespace or cluster configuration');
+    if (configMapError) {
+      const reason =
+        configMapError instanceof Error ? configMapError.message : t('Unknown error occurred');
+      return `Failed to read results from ConfigMap ${configMapName}: ${reason}`;
+    }
+    if (parseError) return t('No valid results found in ConfigMap');
+    return null;
+  }, [
+    nameResolutionError,
+    jobSucceeded,
+    namespace,
+    cluster,
+    configMapName,
+    configMapError,
+    parseError,
+    t,
+  ]);
+
+  const configMapIsStale =
+    !!configMap && (getName(configMap) !== configMapName || getNamespace(configMap) !== namespace);
+
+  const isLoading =
+    !nameResolutionError &&
+    !!namespace &&
+    !!cluster &&
+    jobSucceeded &&
+    !!configMapName &&
+    (!configMapLoaded || configMapIsStale || (!configMap && !configMapError));
 
   return { error, isLoading, results };
 };

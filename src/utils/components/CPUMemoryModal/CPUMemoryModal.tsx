@@ -140,7 +140,7 @@ const CPUMemoryModal: FC<CPUMemoryModalProps> = ({
         </Button>
         <Button
           isDisabled={
-            !templateName || !defaultsLoaded || !defaultCpu || !defaultMemory || defaultLoadError
+            !templateName || !defaultsLoaded || !defaultCpu || !defaultMemory || !!defaultLoadError
           }
           onClick={() => {
             setCPU(defaultCpu);
