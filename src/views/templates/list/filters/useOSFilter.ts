@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   getTemplateOS,
-  isVirtualMachineTemplateRequest,
+  isOpenShiftTemplate,
   OS_NAME_TYPES,
   OS_NAMES,
   TemplateOrRequest,
@@ -11,19 +11,22 @@ import {
 import { getItemNameWithOther, includeFilter } from '@kubevirt-utils/utils/utils';
 import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 
+import { TemplateFilterType } from './types';
+
 const getRowOS = (obj: TemplateOrRequest): string =>
-  isVirtualMachineTemplateRequest(obj) ? OS_NAME_TYPES.other : getTemplateOS(obj);
+  isOpenShiftTemplate(obj) ? getTemplateOS(obj) : OS_NAME_TYPES.other;
 
 const useOSFilter = (): RowFilter<TemplateOrRequest> => {
   const { t } = useKubevirtTranslation();
 
   return useMemo(
     () => ({
-      filter: (availableOsNames, obj) => includeFilter(availableOsNames, OS_NAMES, getRowOS(obj)),
+      filter: (availableOsNames, obj) =>
+        !isOpenShiftTemplate(obj) || includeFilter(availableOsNames, OS_NAMES, getRowOS(obj)),
       filterGroupName: t('Operating system'),
       items: OS_NAMES,
       reducer: (obj) => getItemNameWithOther(getRowOS(obj), OS_NAMES),
-      type: 'osName',
+      type: TemplateFilterType.OSName,
     }),
     [t],
   );

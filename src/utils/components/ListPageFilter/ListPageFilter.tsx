@@ -1,4 +1,4 @@
-import React, { FC, useMemo, useState } from 'react';
+import React, { FC, ReactNode, useMemo, useState } from 'react';
 
 import useDeepCompareMemoize from '@kubevirt-utils/hooks/useDeepCompareMemoize/useDeepCompareMemoize';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -26,6 +26,7 @@ import { Filter, FilterKeys, generateRowFilters, getFiltersData } from './utils'
 type ListPageFilterProps = {
   className?: string;
   columnLayout?: ColumnLayout;
+  customRowFiltersMenu?: ReactNode;
   data?: K8sResourceCommon[];
   filtersWithSelect?: RowFilter[];
   hideColumnManagement?: boolean;
@@ -41,6 +42,7 @@ type ListPageFilterProps = {
 const ListPageFilter: FC<ListPageFilterProps> = ({
   className,
   columnLayout,
+  customRowFiltersMenu,
   data,
   filtersWithSelect = [],
   hideColumnManagement,
@@ -121,6 +123,7 @@ const ListPageFilter: FC<ListPageFilterProps> = ({
       <ToolbarContent>
         <ToolbarToggleGroup breakpoint="md" toggleIcon={<FilterIcon />}>
           <RowFilters
+            customMenu={customRowFiltersMenu}
             filters={filters}
             filtersNameMap={filtersNameMap}
             generatedRowFilters={generatedRowFilters}

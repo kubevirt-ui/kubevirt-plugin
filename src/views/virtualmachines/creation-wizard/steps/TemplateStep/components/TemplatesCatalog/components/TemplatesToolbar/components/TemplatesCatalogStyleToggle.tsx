@@ -2,17 +2,15 @@ import React, { FC } from 'react';
 
 import { ToggleGroup, ToggleGroupItem } from '@patternfly/react-core';
 import { ListIcon, ThIcon } from '@patternfly/react-icons';
-import { CATALOG_FILTERS } from '@virtualmachines/creation-wizard/steps/TemplateStep/components/TemplatesCatalog/utils/consts';
-import { TemplateFilters } from '@virtualmachines/creation-wizard/steps/TemplateStep/components/TemplatesCatalog/utils/types';
 
 type TemplatesCatalogStyleToggleProps = {
-  filters: TemplateFilters;
-  onFilterChange: (type: CATALOG_FILTERS, value: boolean | string) => void;
+  isList: boolean;
+  setIsList: (value: boolean) => void;
 };
 
 const TemplatesCatalogStyleToggle: FC<TemplatesCatalogStyleToggleProps> = ({
-  filters,
-  onFilterChange,
+  isList,
+  setIsList,
 }) => {
   return (
     <ToggleGroup aria-label="list-or-grid-toggle" isCompact>
@@ -20,15 +18,15 @@ const TemplatesCatalogStyleToggle: FC<TemplatesCatalogStyleToggleProps> = ({
         aria-label="template list button"
         buttonId="template-list-btn"
         icon={<ListIcon />}
-        isSelected={filters?.isList}
-        onChange={() => onFilterChange(CATALOG_FILTERS.IS_LIST, true)}
+        isSelected={isList}
+        onChange={() => setIsList(true)}
       />
       <ToggleGroupItem
         aria-label="template grid button"
         buttonId="template-grid-btn"
         icon={<ThIcon />}
-        isSelected={!filters?.isList}
-        onChange={() => onFilterChange(CATALOG_FILTERS.IS_LIST, false)}
+        isSelected={!isList}
+        onChange={() => setIsList(false)}
       />
     </ToggleGroup>
   );
