@@ -49,5 +49,8 @@ export const processVirtualMachineTemplate = async (
   });
 
   const result: ProcessedVirtualMachineTemplate = await response.json();
-  return { ...result.virtualMachine, cluster };
+
+  if (cluster) result.virtualMachine.cluster = cluster;
+
+  return result.virtualMachine;
 };
