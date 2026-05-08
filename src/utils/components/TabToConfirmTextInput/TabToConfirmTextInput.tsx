@@ -4,7 +4,9 @@ import { TFunction } from 'i18next';
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import { TAB } from '@kubevirt-utils/hooks/useClickOutside/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { FormGroup, Label, TextInput, ValidatedOptions } from '@patternfly/react-core';
+import { FormGroup, Label, TextInput } from '@patternfly/react-core';
+
+import { getHelperTextContent, getInputValidated } from './utils';
 
 import './TabToConfirmTextInput.scss';
 
@@ -19,6 +21,7 @@ type TabToConfirmTextInputProps = {
   onChange?: (value: string) => void;
   placeholder?: string;
   setIsValid: (valid: boolean) => void;
+  successHelperText?: ReactNode;
   validator?: (value: string) => (t: TFunction) => string;
   value?: string;
 };
@@ -34,6 +37,7 @@ const TabToConfirmTextInput: FC<TabToConfirmTextInputProps> = ({
   onChange,
   placeholder,
   setIsValid,
+  successHelperText,
   validator,
   value = '',
 }) => {
@@ -116,6 +120,13 @@ const TabToConfirmTextInput: FC<TabToConfirmTextInputProps> = ({
     validate(newValue);
   };
 
+  const helperTextProps = getHelperTextContent(
+    hasInteracted,
+    errorText,
+    helperText,
+    successHelperText,
+  );
+
   return (
     <FormGroup className={className} fieldId={fieldId} isRequired={isRequired} label={label}>
       <div className="tab-to-confirm-text-input">
@@ -129,7 +140,7 @@ const TabToConfirmTextInput: FC<TabToConfirmTextInputProps> = ({
           placeholder={placeholder}
           ref={inputRef}
           type="text"
-          validated={errorText ? ValidatedOptions.error : ValidatedOptions.default}
+          validated={getInputValidated(errorText, hasInteracted)}
           value={value}
         />
         {isFocused && !hasInteracted && (
@@ -138,9 +149,10 @@ const TabToConfirmTextInput: FC<TabToConfirmTextInputProps> = ({
           </Label>
         )}
       </div>
-      {!hasInteracted && helperText && <FormGroupHelperText>{helperText}</FormGroupHelperText>}
-      {errorText && (
-        <FormGroupHelperText validated={ValidatedOptions.error}>{errorText}</FormGroupHelperText>
+      {helperTextProps && (
+        <FormGroupHelperText validated={helperTextProps.validated}>
+          {helperTextProps.content}
+        </FormGroupHelperText>
       )}
     </FormGroup>
   );

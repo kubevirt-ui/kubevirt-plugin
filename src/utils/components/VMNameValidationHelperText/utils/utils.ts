@@ -15,7 +15,7 @@ export const isValidVMName = (vmName: string): boolean => {
 };
 
 export const validateVMName = (vmName: string): ValidatedOptions =>
-  isValidVMName(vmName) ? ValidatedOptions.default : ValidatedOptions.error;
+  isValidVMName(vmName) ? ValidatedOptions.success : ValidatedOptions.error;
 
 export const getVMNameValidationMessage = (
   t: TFunction,

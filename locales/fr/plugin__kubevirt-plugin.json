@@ -2364,6 +2364,7 @@
   "VirtualMachine name": "Nom de la machine virtuelle",
   "VirtualMachine name can not be empty.": "Le nom de la machine virtuelle ne peut pas être vide.",
   "VirtualMachine name field is mandatory": "Le champ Nom de la machine virtuelle est obligatoire",
+  "VirtualMachine name is valid.": "VirtualMachine name is valid.",
   "VirtualMachine name not valid": "Nom de la machine virtuelle non valide",
   "VirtualMachine name: {{vmName}}": "Nom de la machine virtuelle: {{vmName}}",
   "VirtualMachine resource is required": "La ressource VirtualMachine est requise.",

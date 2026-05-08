@@ -2344,6 +2344,7 @@
   "VirtualMachine name": "VirtualMachine 이름",
   "VirtualMachine name can not be empty.": "VirtualMachine 이름은 비워 둘 수 없습니다.",
   "VirtualMachine name field is mandatory": "VirtualMachine 이름 필드는 필수입니다",
+  "VirtualMachine name is valid.": "VirtualMachine name is valid.",
   "VirtualMachine name not valid": "VirtualMachine 이름이 유효하지 않음",
   "VirtualMachine name: {{vmName}}": "VirtualMachine 이름: {{vmName}}",
   "VirtualMachine resource is required": "VirtualMachine 리소스가 필요합니다.",

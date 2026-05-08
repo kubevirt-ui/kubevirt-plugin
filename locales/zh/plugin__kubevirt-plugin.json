@@ -2344,6 +2344,7 @@
   "VirtualMachine name": "VirtualMachine 名称",
   "VirtualMachine name can not be empty.": "VirtualMachine 名称不能为空。",
   "VirtualMachine name field is mandatory": "VirtualMachine 名称字段是必需的",
+  "VirtualMachine name is valid.": "VirtualMachine name is valid.",
   "VirtualMachine name not valid": "VirtualMachine 名称无效",
   "VirtualMachine name: {{vmName}}": "VirtualMachine 名称: {{vmName}}",
   "VirtualMachine resource is required": "虚拟机资源是必需的",

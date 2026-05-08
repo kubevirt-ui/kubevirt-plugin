@@ -2344,6 +2344,7 @@
   "VirtualMachine name": "VirtualMachine 名",
   "VirtualMachine name can not be empty.": "VirtualMachine 名は空にできません。",
   "VirtualMachine name field is mandatory": "VirtualMachine 名フィールドは必須です",
+  "VirtualMachine name is valid.": "VirtualMachine name is valid.",
   "VirtualMachine name not valid": "VirtualMachine 名が無効です",
   "VirtualMachine name: {{vmName}}": "VirtualMachine 名: {{vmName}}",
   "VirtualMachine resource is required": "VirtualMachine リソースが必要です",

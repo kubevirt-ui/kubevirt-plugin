@@ -28,6 +28,7 @@ const NameInput: FC<NameInputProps> = ({ autoFocus, name, setIsValid, setName })
       label={t('Name')}
       onChange={setName}
       setIsValid={setIsValid}
+      successHelperText={t('VirtualMachine name is valid.')}
       validator={getDNS1123LabelError}
       value={name}
     />

@@ -23,9 +23,10 @@ const VMNameValidationHelperText: FC<VMNameValidationHelperTextProps> = ({
 
   const isEmptyString = !vmName?.trim();
   const shouldSuppressError = !touched && isEmptyString;
+  const isValid = vmNameValidated === ValidatedOptions.success;
 
   const displayValidated = shouldSuppressError ? ValidatedOptions.default : vmNameValidated;
-  const displayMessage = shouldSuppressError ? '' : vmNameValidationMessage;
+  const displayMessage = shouldSuppressError || isValid ? '' : vmNameValidationMessage;
 
   return <FormGroupHelperText validated={displayValidated}>{displayMessage}</FormGroupHelperText>;
 };

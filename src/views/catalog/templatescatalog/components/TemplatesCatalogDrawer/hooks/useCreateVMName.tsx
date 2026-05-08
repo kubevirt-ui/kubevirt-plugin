@@ -24,7 +24,7 @@ const useCreateVMName = () => {
       ? setTemplate((draftTemplate) =>
           changeTemplateParameterValue(draftTemplate, NAME_INPUT_FIELD, newName),
         )
-      : setVMName(vmName);
+      : setVMName(newName);
   };
 
   return { nameField, onVMNameChange };

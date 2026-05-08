@@ -64,6 +64,7 @@ const NameAndDescriptionForm: FC = () => {
         label={t('Name')}
         onChange={onNameChange}
         setIsValid={handleSetIsValid}
+        successHelperText={t('VirtualMachine name is valid.')}
         validator={getDNS1123LabelError}
         value={isCloneMethod ? cloneVMName : getName(vm)}
       />
