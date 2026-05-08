@@ -6,6 +6,8 @@ import { RedHatInstanceTypeSeries } from '@kubevirt-utils/components/AddBootable
 import {
   getSeriesLabel,
   getSeriesSymbol,
+  is1GiInstanceType,
+  seriesHasHugepagesVariant,
 } from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/utils/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Card, CardBody, CardHeader, Flex, Tooltip } from '@patternfly/react-core';
@@ -21,9 +23,9 @@ type RedHatSeriesMenuCardProps = {
 const RedHatSeriesMenuCard: FC<RedHatSeriesMenuCardProps> = ({ rhSeriesItem }) => {
   const { t } = useKubevirtTranslation();
 
-  const { selectedSeries, setSelectedSeries } = useInstanceTypeVMStore();
+  const { selectedSeries, setSelectedSeries, setSelectedSize } = useInstanceTypeVMStore();
 
-  const { classDisplayNameAnnotation, descriptionAnnotation, seriesName } = rhSeriesItem;
+  const { classDisplayNameAnnotation, descriptionAnnotation, seriesName, sizes } = rhSeriesItem;
 
   const { Icon, seriesLabel } = instanceTypeSeriesNameMapper[seriesName] || {};
 
@@ -35,7 +37,12 @@ const RedHatSeriesMenuCard: FC<RedHatSeriesMenuCardProps> = ({ rhSeriesItem }) =
   const defaultSeriesLabel = useMemo(() => getSeriesLabel(seriesName, t), [seriesName, t]);
 
   const handleSeriesClick = () => {
+    const standardSizes = seriesHasHugepagesVariant(seriesName)
+      ? sizes?.filter((s) => !is1GiInstanceType(s.sizeLabel))
+      : sizes;
+    const defaultSize = (standardSizes?.[0] ?? sizes?.[0])?.sizeLabel;
     setSelectedSeries(seriesName);
+    setSelectedSize(defaultSize);
   };
 
   const card = (
