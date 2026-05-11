@@ -1,7 +1,7 @@
 name: Jira PR Validation
 
 on:
-  pull_request:
+  pull_request_target:
     types: [opened, edited, synchronize, reopened, labeled, unlabeled]
 
 permissions:
@@ -18,9 +18,10 @@ jobs:
     name: jira-validation
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout base branch scripts
         uses: actions/checkout@v6
         with:
+          ref: ${{ github.event.pull_request.base.ref }}
           sparse-checkout: .github/scripts
 
       - name: Setup Node
