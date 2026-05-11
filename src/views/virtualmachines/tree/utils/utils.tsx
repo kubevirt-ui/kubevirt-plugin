@@ -219,8 +219,8 @@ export const getVMInfoFromPathname = (pathname: string) => {
   if (isACMTreeView) {
     const currentVMTab = splitPathname?.[8] || '';
     const vmName = splitPathname?.[7];
-    const vmNamespace = splitPathname?.[5];
-    const vmCluster = splitPathname?.[3];
+    const vmNamespace = splitPathname?.[6];
+    const vmCluster = splitPathname?.[4];
 
     return { currentVMTab, vmCluster, vmName, vmNamespace };
   }
