@@ -37,6 +37,10 @@ const RedHatSeriesMenuCard: FC<RedHatSeriesMenuCardProps> = ({ rhSeriesItem }) =
   const defaultSeriesLabel = useMemo(() => getSeriesLabel(seriesName, t), [seriesName, t]);
 
   const handleSeriesClick = () => {
+    if (seriesName === selectedSeries) {
+      return;
+    }
+
     const standardSizes = seriesHasHugepagesVariant(seriesName)
       ? sizes?.filter((s) => !is1GiInstanceType(s.sizeLabel))
       : sizes;
