@@ -14,7 +14,6 @@ import {
 } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { buildColumnLayout } from '@kubevirt-utils/components/KubevirtTable/utils';
-import { useQueryParamsMethods } from '@kubevirt-utils/components/ListPageFilter/hooks/useQueryParamsMethods';
 import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
 import useContainerWidth from '@kubevirt-utils/hooks/useContainerWidth';
 import { KUBEVIRT_APISERVER_PROXY } from '@kubevirt-utils/hooks/useFeatures/constants';
@@ -27,18 +26,16 @@ import {
   paginationInitialState,
 } from '@kubevirt-utils/hooks/usePagination/utils/constants';
 import { usePVCMapper } from '@kubevirt-utils/hooks/usePVCMapper';
-import useQuery from '@kubevirt-utils/hooks/useQuery';
 import { getDescription, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import useVirtualMachineInstanceMigrationMapper from '@kubevirt-utils/resources/vmim/hooks/useVirtualMachineInstanceMigrationMapper';
 import useVirtualMachineInstanceMigrations from '@kubevirt-utils/resources/vmim/hooks/useVirtualMachineInstanceMigrations';
 import { clearCustomizeInstanceType, vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
-import { PROJECT_LIST_FILTER_PARAM } from '@kubevirt-utils/utils/constants';
 import { isVM } from '@kubevirt-utils/utils/typeGuards';
 import { isEmpty, truncateToK8sName } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import useIsAllClustersPage from '@multicluster/hooks/useIsAllClustersPage';
 import { K8sVerb, ListPageBody, useListPageFilter } from '@openshift-console/dynamic-plugin-sdk';
-import { Bullseye, Pagination, Split, SplitItem } from '@patternfly/react-core';
+import { Bullseye, Label, Pagination, Split, SplitItem } from '@patternfly/react-core';
 import { useSignals } from '@preact/signals-react/runtime';
 import { useFleetAccessReview } from '@stolostron/multicluster-sdk';
 import useVMWizardStore from '@virtualmachines/creation-wizard/state/vm-wizard-store/useVMWizardStore';
@@ -71,21 +68,6 @@ const VirtualMachinesList = forwardRef(({}, ref) => {
     setCloneVMDescription,
     setCloneVMName,
   } = useVMWizardStore();
-
-  // Initialize project dropdown filter to targetNamespace
-  const queryParams = useQuery();
-  const { setAllQueryArguments } = useQueryParamsMethods();
-  const hasInitializedFilter = useRef(false);
-
-  useEffect(() => {
-    if (hasInitializedFilter.current || !targetNamespace) return;
-
-    setAllQueryArguments({
-      [PROJECT_LIST_FILTER_PARAM]: targetNamespace,
-    });
-
-    hasInitializedFilter.current = true;
-  }, [targetNamespace, queryParams, setAllQueryArguments]);
 
   const isAllClustersPage = useIsAllClustersPage();
   const { loading: loadingFeatureProxy } = useFeatures(KUBEVIRT_APISERVER_PROXY);
@@ -127,14 +109,14 @@ const VirtualMachinesList = forwardRef(({}, ref) => {
   const vmimMapper = useVirtualMachineInstanceMigrationMapper(vmims);
   const pvcMapper = usePVCMapper(targetNamespace, cluster);
 
-  const { filtersWithSelect, rowFilters } = useCloneSourceVMFilters(vms, vmiMapper, pvcMapper);
+  const { rowFilters } = useCloneSourceVMFilters(vms, vmiMapper, pvcMapper);
 
   const [pagination, setPagination] = useState(paginationInitialState);
 
   const [unfilteredData, filteredVMs, onFilterChange] = useListPageFilter<
     V1VirtualMachine,
     V1VirtualMachine
-  >(vms, [...filtersWithSelect, ...rowFilters], {});
+  >(vms, rowFilters, {});
 
   // Clear selection when namespace/cluster changes
   useEffect(() => {
@@ -256,6 +238,11 @@ const VirtualMachinesList = forwardRef(({}, ref) => {
       <ListPageBody>
         <div className="vm-listpagebody" ref={listPageBodyRef}>
           <>
+            {targetNamespace && (
+              <Label className="pf-v6-u-mb-sm" data-test="clone-source-project-label">
+                {t('Project: {{project}}', { project: targetNamespace })}
+              </Label>
+            )}
             <Split hasGutter>
               <SplitItem>
                 <ListPageFilter
@@ -270,7 +257,6 @@ const VirtualMachinesList = forwardRef(({}, ref) => {
                   }}
                   columnLayout={columnLayout}
                   data={unfilteredData}
-                  filtersWithSelect={filtersWithSelect}
                   loaded={loaded}
                   rowFilters={rowFilters}
                 />
