@@ -38,7 +38,7 @@ const VirtualMachineRow: FC<
     <VirtualMachineRowLayout
       activeColumnIDs={activeColumnIDs}
       obj={vm}
-      rowData={{ ips: NO_DATA_DASH, node: NO_DATA_DASH, vmim: null }}
+      rowData={{ ips: NO_DATA_DASH, node: NO_DATA_DASH, vmiCPU: null, vmim: null }}
     />
   );
 };

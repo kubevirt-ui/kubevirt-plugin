@@ -2,6 +2,7 @@ import React, { FC, ReactNode, useMemo } from 'react';
 
 import { VirtualMachineModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
 import {
+  V1CPU,
   V1VirtualMachine,
   V1VirtualMachineInstanceMigration,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -28,11 +29,12 @@ const VirtualMachineRowLayout: FC<
     {
       ips: ReactNode | string;
       node: ReactNode | string;
+      vmiCPU: V1CPU;
       vmim: V1VirtualMachineInstanceMigration;
       vmiMemory?: string;
     }
   >
-> = ({ activeColumnIDs, obj, rowData: { ips, node, vmim, vmiMemory } }) => {
+> = ({ activeColumnIDs, obj, rowData: { ips, node, vmiCPU, vmim, vmiMemory } }) => {
   const selected = isVMSelected(obj);
 
   const vmName = useMemo(() => getName(obj), [obj]);
@@ -76,7 +78,7 @@ const VirtualMachineRowLayout: FC<
         <MemoryPercentage vmiMemory={vmiMemory} vmName={vmName} vmNamespace={vmNamespace} />
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} className="vm-column" id="cpu-usage">
-        <CPUPercentage vmName={vmName} vmNamespace={vmNamespace} />
+        <CPUPercentage vmiCPU={vmiCPU} vmName={vmName} vmNamespace={vmNamespace} />
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} className="vm-column" id="network-usage">
         <NetworkUsage vmName={vmName} vmNamespace={vmNamespace} />
