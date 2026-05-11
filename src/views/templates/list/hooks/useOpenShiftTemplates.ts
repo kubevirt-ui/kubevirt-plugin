@@ -30,7 +30,6 @@ export const useOpenShiftTemplates: UseOpenShiftTemplates = ({
 }) => {
   const multiclusterFilters = useListMulticlusterFilters();
   const clusters = useListClusters();
-  const cluster = clusters?.length === 1 ? clusters[0] : undefined;
 
   const templateWatchNamespaces = useMemo(
     () => (namespace ? [OPENSHIFT_NAMESPACE, namespace] : [OPENSHIFT_NAMESPACE]),
@@ -56,7 +55,7 @@ export const useOpenShiftTemplates: UseOpenShiftTemplates = ({
     loadError,
     resources: templates,
   } = useAccessibleResources<V1Template>({
-    clusters: cluster ? [cluster] : undefined,
+    clusters,
     fieldSelector,
     groupVersionKind: TemplateModelGroupVersionKind,
     namespace,
