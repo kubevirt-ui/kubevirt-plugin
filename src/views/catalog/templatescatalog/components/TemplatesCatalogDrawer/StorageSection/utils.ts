@@ -5,6 +5,7 @@ import {
   V1beta1DataVolumeSpec,
   V1ContainerDiskSource,
   V1DataVolumeTemplateSpec,
+  V1PersistentVolumeClaimVolumeSource,
   V1VirtualMachine,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { ROOTDISK } from '@kubevirt-utils/constants/constants';
@@ -26,7 +27,11 @@ export const getRegistryHelperText = (template: V1Template) => {
 export const getDiskSource = (
   vm: V1VirtualMachine,
   diskName: string,
-): undefined | V1beta1DataVolumeSpec | V1ContainerDiskSource => {
+):
+  | undefined
+  | V1beta1DataVolumeSpec
+  | V1ContainerDiskSource
+  | V1PersistentVolumeClaimVolumeSource => {
   if (!diskName) return;
 
   const disk = getDisks(vm)?.find((d) => d.name === diskName);
@@ -36,6 +41,10 @@ export const getDiskSource = (
 
   if (volume.containerDisk) {
     return volume.containerDisk;
+  }
+
+  if (volume.persistentVolumeClaim) {
+    return volume.persistentVolumeClaim;
   }
 
   if (volume.dataVolume) {
