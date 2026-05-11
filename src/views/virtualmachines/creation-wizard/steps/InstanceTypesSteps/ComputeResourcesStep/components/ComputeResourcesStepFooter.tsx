@@ -5,31 +5,28 @@ import { FLAG_LIGHTSPEED_PLUGIN } from '@kubevirt-utils/flags/consts';
 import { useFlag } from '@openshift-console/dynamic-plugin-sdk';
 import { useWizardContext, WizardFooter } from '@patternfly/react-core';
 import useCloseWizard from '@virtualmachines/creation-wizard/hooks/useCloseWizard';
-import useInstanceTypeVMStore from '@virtualmachines/creation-wizard/state/instance-type-vm-store/useInstanceTypeVMStore';
+import useWizardStepValidation from '@virtualmachines/creation-wizard/hooks/useWizardStepValidation';
 import useCreateVMFromInstanceType from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/hooks/useCreateVMFromInstanceType';
+import { VMWizardStep } from '@virtualmachines/creation-wizard/utils/constants';
 
 const ComputeResourcesStepFooter: FC = () => {
   const hasOLSConsole = useFlag(FLAG_LIGHTSPEED_PLUGIN);
   const { activeStep, goToNextStep, goToPrevStep } = useWizardContext();
   const handleCreateVM = useCreateVMFromInstanceType();
   const closeWizard = useCloseWizard();
-  const { selectedInstanceType, selectedSeries, selectedSize } = useInstanceTypeVMStore();
+  const { isNextDisabledForStep } = useWizardStepValidation();
 
   const handleGoToNextStep = async () => {
     await handleCreateVM();
     goToNextStep();
   };
 
-  const isRedHatProvided = Boolean(selectedSeries) && Boolean(selectedSize);
-  const isUserProvided =
-    Boolean(selectedInstanceType?.namespace) && Boolean(selectedInstanceType?.name);
-
   return (
     <WizardFooter
       activeStep={activeStep}
       cancelButtonProps={{ className: classnames({ 'pf-v6-u-mr-4xl': hasOLSConsole }) }}
       isBackDisabled={activeStep.index === 1}
-      isNextDisabled={!isRedHatProvided && !isUserProvided}
+      isNextDisabled={isNextDisabledForStep(VMWizardStep.COMPUTE_RESOURCES)}
       onBack={goToPrevStep}
       onClose={closeWizard}
       onNext={handleGoToNextStep}

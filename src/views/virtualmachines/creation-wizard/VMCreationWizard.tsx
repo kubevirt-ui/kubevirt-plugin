@@ -4,15 +4,14 @@ import classnames from 'classnames';
 import { FLAG_LIGHTSPEED_PLUGIN } from '@kubevirt-utils/flags/consts';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
-import { getValidNamespace, isEmpty } from '@kubevirt-utils/utils/utils';
+import { getValidNamespace } from '@kubevirt-utils/utils/utils';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { useActiveNamespace, useFlag } from '@openshift-console/dynamic-plugin-sdk';
 import { Wizard, WizardHeader, WizardStep } from '@patternfly/react-core';
-import { useSignals } from '@preact/signals-react/runtime';
 import DefaultWizardFooter from '@virtualmachines/creation-wizard/components/DefaultWizardFooter';
 import useCloseWizard from '@virtualmachines/creation-wizard/hooks/useCloseWizard';
-import useInstanceTypeVMStore from '@virtualmachines/creation-wizard/state/instance-type-vm-store/useInstanceTypeVMStore';
+import useVMGenerationNavItem from '@virtualmachines/creation-wizard/hooks/useVMGenerationNavItem';
+import useWizardStepValidation from '@virtualmachines/creation-wizard/hooks/useWizardStepValidation';
 import useVMWizardStore from '@virtualmachines/creation-wizard/state/vm-wizard-store/useVMWizardStore';
 import CloneSourceStep from '@virtualmachines/creation-wizard/steps/CloneSourceStep/CloneSourceStep';
 import CustomizationStep from '@virtualmachines/creation-wizard/steps/CustomizationStep/CustomizationStep';
@@ -36,18 +35,18 @@ import DeploymentDetailsStep from './steps/DeploymentDetailsStep/DeploymentDetai
 
 const VMCreationWizard: FC = () => {
   const { t } = useKubevirtTranslation();
-  useSignals();
   const hasOLSConsole = useFlag(FLAG_LIGHTSPEED_PLUGIN);
   const {
     creationMethod,
+    markStepVisited,
     project,
     resetWizardState,
     setCluster,
     setProject,
     setTemplatesDrawerIsOpen,
   } = useVMWizardStore();
-  const { operatingSystemType, preference, selectedBootableVolume, useBootSource } =
-    useInstanceTypeVMStore();
+  const { isNextDisabledForStep, isStepDisabled } = useWizardStepValidation();
+  const { navItemWithVMGeneration } = useVMGenerationNavItem(creationMethod);
   const clusterParam = useClusterParam();
   const hasInitialized = useRef(false);
   const closeWizard = useCloseWizard();
@@ -89,10 +88,10 @@ const VMCreationWizard: FC = () => {
       <Wizard
         onStepChange={(_, currentStep) => {
           if (currentStep?.id !== VMWizardStep.TEMPLATE) setTemplatesDrawerIsOpen(false);
+          if (currentStep?.id) markStepVisited(String(currentStep.id));
         }}
         className="vm-creation-wizard"
         header={<WizardHeader isCloseHidden title={t('Create VirtualMachine')} />}
-        isVisitRequired
         onClose={closeWizard}
         title={t('Create VirtualMachine')}
       >
@@ -106,7 +105,7 @@ const VMCreationWizard: FC = () => {
         <WizardStep
           footer={{
             cancelButtonProps,
-            isNextDisabled: !operatingSystemType || !preference,
+            isNextDisabled: isNextDisabledForStep(VMWizardStep.GUEST_OS),
           }}
           id={VMWizardStep.GUEST_OS}
           isHidden={!isInstanceTypeMethod}
@@ -117,9 +116,10 @@ const VMCreationWizard: FC = () => {
         <WizardStep
           footer={{
             cancelButtonProps,
-            isNextDisabled: useBootSource && isEmpty(selectedBootableVolume),
+            isNextDisabled: isNextDisabledForStep(VMWizardStep.BOOT_SOURCE),
           }}
           id={VMWizardStep.BOOT_SOURCE}
+          isDisabled={isStepDisabled(VMWizardStep.BOOT_SOURCE)}
           isHidden={!isInstanceTypeMethod}
           name={t('Boot source')}
         >
@@ -128,6 +128,7 @@ const VMCreationWizard: FC = () => {
         <WizardStep
           footer={<ComputeResourcesStepFooter />}
           id={VMWizardStep.COMPUTE_RESOURCES}
+          isDisabled={isStepDisabled(VMWizardStep.COMPUTE_RESOURCES)}
           isHidden={!isInstanceTypeMethod}
           name={t('Compute resources')}
         >
@@ -137,6 +138,7 @@ const VMCreationWizard: FC = () => {
         <WizardStep
           footer={<TemplateStepFooter />}
           id={VMWizardStep.TEMPLATE}
+          isDisabled={isStepDisabled(VMWizardStep.TEMPLATE)}
           isHidden={!isTemplateMethod}
           name={t('Template')}
         >
@@ -145,17 +147,20 @@ const VMCreationWizard: FC = () => {
         <WizardStep
           footer={<DefaultWizardFooter />}
           id={VMWizardStep.CUSTOMIZATION}
+          isDisabled={isStepDisabled(VMWizardStep.CUSTOMIZATION)}
           isHidden={isCloneMethod}
           name={t('Customization')}
+          navItem={navItemWithVMGeneration}
         >
           <CustomizationStep />
         </WizardStep>
         <WizardStep
           footer={{
             cancelButtonProps,
-            isNextDisabled: isEmpty(vmSignal.value),
+            isNextDisabled: isNextDisabledForStep(VMWizardStep.CLONE),
           }}
           id={VMWizardStep.CLONE}
+          isDisabled={isStepDisabled(VMWizardStep.CLONE)}
           isHidden={!isCloneMethod}
           name={t('Source')}
         >
@@ -164,7 +169,9 @@ const VMCreationWizard: FC = () => {
         <WizardStep
           footer={<ReviewAndCreateStepFooter />}
           id={VMWizardStep.REVIEW_AND_CREATE}
+          isDisabled={isStepDisabled(VMWizardStep.REVIEW_AND_CREATE)}
           name={t('Review and create')}
+          navItem={navItemWithVMGeneration}
         >
           <ReviewAndCreateStep />
         </WizardStep>

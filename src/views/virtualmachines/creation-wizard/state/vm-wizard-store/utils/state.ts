@@ -1,5 +1,5 @@
 import { VMWizardState } from '@virtualmachines/creation-wizard/state/vm-wizard-store/utils/types';
-import { VMCreationMethod } from '@virtualmachines/creation-wizard/utils/constants';
+import { VMCreationMethod, VMWizardStep } from '@virtualmachines/creation-wizard/utils/constants';
 
 export const initialVMWizardState: VMWizardState = {
   cloneVMDescription: '',
@@ -11,5 +11,6 @@ export const initialVMWizardState: VMWizardState = {
   project: '',
   selectedTemplate: null,
   templatesDrawerIsOpen: false,
+  visitedSteps: new Set([VMWizardStep.DEPLOYMENT_DETAILS]),
   vmNameInteracted: false,
 };
