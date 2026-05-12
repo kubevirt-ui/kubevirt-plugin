@@ -69,26 +69,26 @@ export class JiraClient {
   getAllFields = async (): Promise<JiraFieldMeta[]> =>
     this.request<JiraFieldMeta[]>('/field');
 
-  /** Auto-discover custom field IDs for "Story Points" and "Product Type" (cached). */
+  /** Auto-discover custom field IDs for "Story Points" and "Activity Type" (cached). */
   discoverCustomFields = async (): Promise<DiscoveredFields> => {
     if (this.fieldCache) return this.fieldCache;
 
     const fields = await this.getAllFields();
     let storyPointsFieldId: string | null = null;
-    let productTypeFieldId: string | null = null;
+    let activityTypeFieldId: string | null = null;
 
     for (const field of fields) {
       const nameLower = field.name.toLowerCase();
       if (!storyPointsFieldId && nameLower === 'story points') {
         storyPointsFieldId = field.id;
       }
-      if (!productTypeFieldId && nameLower === 'product type') {
-        productTypeFieldId = field.id;
+      if (!activityTypeFieldId && nameLower === 'activity type') {
+        activityTypeFieldId = field.id;
       }
-      if (storyPointsFieldId && productTypeFieldId) break;
+      if (storyPointsFieldId && activityTypeFieldId) break;
     }
 
-    this.fieldCache = { storyPointsFieldId, productTypeFieldId };
+    this.fieldCache = { storyPointsFieldId, activityTypeFieldId };
     return this.fieldCache;
   };
 

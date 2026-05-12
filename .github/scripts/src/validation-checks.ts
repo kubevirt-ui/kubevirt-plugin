@@ -7,7 +7,7 @@ import {
 import { JIRA_BASE_URL, MIN_STORY_POINTS, REQUIRED_COMPONENT } from './types/index.js';
 import type { JiraIssue, ValidationCheck } from './types/index.js';
 
-/** Validate story points, fix version, component, and product type on a Jira ticket. */
+/** Validate story points, fix version, component, and activity type on a Jira ticket. */
 export const validateTicket = async (
   jira: JiraClient,
   issue: JiraIssue,
@@ -71,17 +71,17 @@ export const validateTicket = async (
       : `Component "${REQUIRED_COMPONENT}" is not set (found: ${issue.fields.components.map((c) => c.name).join(', ') || 'none'})`,
   });
 
-  const ptFieldId = discoveredFields.productTypeFieldId;
-  let productTypeSet = false;
-  if (ptFieldId) {
-    const raw = issue.fields[ptFieldId as `customfield_${string}`];
-    productTypeSet = raw != null && raw !== '';
+  const atFieldId = discoveredFields.activityTypeFieldId;
+  let activityTypeSet = false;
+  if (atFieldId) {
+    const raw = issue.fields[atFieldId as `customfield_${string}`];
+    activityTypeSet = raw != null && raw !== '';
   }
   checks.push({
-    name: 'Product Type', passed: productTypeSet,
-    message: productTypeSet
-      ? 'Product Type is set'
-      : ptFieldId ? 'Product Type is not set on the ticket' : 'Could not discover "Product Type" custom field',
+    name: 'Activity Type', passed: activityTypeSet,
+    message: activityTypeSet
+      ? 'Activity Type is set'
+      : atFieldId ? 'Activity Type is not set on the ticket' : 'Could not discover "Activity Type" custom field',
   });
 
   return checks;
