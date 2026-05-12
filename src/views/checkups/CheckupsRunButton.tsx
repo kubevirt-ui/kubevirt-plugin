@@ -1,6 +1,7 @@
 import React, { FC, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 
+import { trimLastHistoryPath } from '@kubevirt-utils/components/HorizontalNavbar/utils/utils';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -14,7 +15,7 @@ import { createURL } from '@virtualmachines/details/tabs/overview/utils/utils';
 import SelfValidationCheckupRunButton from './self-validation/components/SelfValidationCheckupRunButton';
 import { useCheckupsStoragePermissions } from './storage/components/hooks/useCheckupsStoragePermissions';
 import { CHECKUP_URLS } from './utils/constants';
-import { getCurrentCheckupType, getSelectProjectText, trimLastHistoryPath } from './utils/utils';
+import { getCurrentCheckupType, getSelectProjectText } from './utils/utils';
 
 const CheckupsRunButton: FC = () => {
   const namespace = useActiveNamespace();
@@ -53,7 +54,7 @@ const CheckupsRunButton: FC = () => {
   const handleRunCheckup = () => {
     if (isDisabled || !currentCheckupType) return;
 
-    const basePath = trimLastHistoryPath(location.pathname);
+    const basePath = trimLastHistoryPath(location.pathname, Object.values(CHECKUP_URLS));
     switch (currentCheckupType) {
       case CHECKUP_URLS.STORAGE:
         navigate(
