@@ -36,8 +36,3 @@ export const setVMCPUUsage = (vmName: string, vmNamespace: string, cpuUsage: num
   const vmMetrics = getVMMetrics(vmName, vmNamespace);
   vmMetrics.cpuUsage = cpuUsage;
 };
-
-export const setVMCPURequested = (vmName: string, vmNamespace: string, cpuRequested: number) => {
-  const vmMetrics = getVMMetrics(vmName, vmNamespace);
-  vmMetrics.cpuRequested = cpuRequested;
-};
