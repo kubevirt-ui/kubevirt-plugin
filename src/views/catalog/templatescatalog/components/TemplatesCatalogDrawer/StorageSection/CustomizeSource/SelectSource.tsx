@@ -11,6 +11,7 @@ import { useDrawerContext } from '@catalog/templatescatalog/components/Templates
 import {
   V1beta1DataVolumeSpec,
   V1ContainerDiskSource,
+  V1PersistentVolumeClaimVolumeSource,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import CapacityInput from '@kubevirt-utils/components/CapacityInput/CapacityInput';
 import { getIsMinusDisabled } from '@kubevirt-utils/components/CapacityInput/utils';
@@ -26,6 +27,7 @@ import {
   CONTAINER_DISK_SOURCE_NAME,
   DEFAULT_SOURCE,
   HTTP_SOURCE_NAME,
+  PVC_EPHEMERAL_SOURCE_NAME,
   PVC_SOURCE_NAME,
   REGISTRY_SOURCE_NAME,
   SOURCE_OPTIONS_IDS,
@@ -51,10 +53,18 @@ export type SelectSourceProps = {
   diskSource?: boolean;
   httpSourceHelperURL?: string;
   onFileSelected: (file: File | string) => void;
-  onSourceChange: (customSource: V1beta1DataVolumeSpec | V1ContainerDiskSource) => void;
+  onSourceChange: (
+    customSource:
+      | V1beta1DataVolumeSpec
+      | V1ContainerDiskSource
+      | V1PersistentVolumeClaimVolumeSource,
+  ) => void;
   registrySourceHelperText?: string;
   relevantUpload?: DataUpload;
-  selectedSource?: V1beta1DataVolumeSpec | V1ContainerDiskSource;
+  selectedSource?:
+    | V1beta1DataVolumeSpec
+    | V1ContainerDiskSource
+    | V1PersistentVolumeClaimVolumeSource;
   sourceLabel: ReactNode | string;
   sourceOptions: SOURCE_OPTIONS_IDS[];
   sourcePopOver?: ReactElement<any, JSXElementConstructor<any> | string>;
@@ -113,7 +123,8 @@ export const SelectSource: FC<SelectSourceProps> = ({
       : sourceType;
 
   const cdSourceWithSizeInput = [HTTP_SOURCE_NAME, UPLOAD_SOURCE_NAME].includes(sourceType);
-  const diskSourceWithSizeInput = sourceType !== CONTAINER_DISK_SOURCE_NAME;
+  const diskSourceWithSizeInput =
+    sourceType !== CONTAINER_DISK_SOURCE_NAME && sourceType !== PVC_EPHEMERAL_SOURCE_NAME;
 
   const showSizeInput = diskSource ? diskSourceWithSizeInput : cdSourceWithSizeInput;
 

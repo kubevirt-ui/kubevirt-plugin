@@ -1,8 +1,8 @@
 import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
-  V1beta1DataVolumeSource,
   V1beta1DataVolumeSpec,
   V1ContainerDiskSource,
+  V1PersistentVolumeClaimVolumeSource,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { DEFAULT_DISK_SIZE } from '@kubevirt-utils/components/DiskModal/utils/constants';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -20,6 +20,7 @@ import {
   CONTAINER_DISK_SOURCE_NAME,
   DEFAULT_SOURCE,
   HTTP_SOURCE_NAME,
+  PVC_EPHEMERAL_SOURCE_NAME,
   PVC_SOURCE_NAME,
   REGISTRY_SOURCE_NAME,
   SOURCE_OPTIONS_IDS,
@@ -30,11 +31,13 @@ export const getQuantityFromSource = (source: V1beta1DataVolumeSpec) =>
   formatQuantityString(source?.storage?.resources?.requests?.storage);
 
 export const getSourceTypeFromDiskSource = (
-  diskSource: V1beta1DataVolumeSpec | V1ContainerDiskSource,
+  diskSource: V1beta1DataVolumeSpec | V1ContainerDiskSource | V1PersistentVolumeClaimVolumeSource,
 ): SOURCE_OPTIONS_IDS => {
   if ('image' in diskSource) return CONTAINER_DISK_SOURCE_NAME;
 
-  const dataVolumeSource = diskSource.source as V1beta1DataVolumeSource;
+  if ('claimName' in diskSource) return PVC_EPHEMERAL_SOURCE_NAME;
+
+  const dataVolumeSource = (diskSource as V1beta1DataVolumeSpec)?.source;
 
   if (isEmpty(dataVolumeSource)) return DEFAULT_SOURCE;
 
