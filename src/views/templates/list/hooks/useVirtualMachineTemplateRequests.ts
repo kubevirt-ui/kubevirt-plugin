@@ -1,8 +1,8 @@
-import { VirtualMachineTemplateRequestModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { VirtualMachineTemplateRequestModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1alpha1VirtualMachineTemplateRequest } from '@kubevirt-ui-ext/kubevirt-api/virt-template';
 import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
 import useListClusters from '@kubevirt-utils/hooks/useListClusters';
-import { getGroupVersionKindForModel } from '@openshift-console/dynamic-plugin-sdk';
+import { useK8sModel } from '@openshift-console/dynamic-plugin-sdk';
 
 type UseVirtualMachineTemplateRequests = (
   namespace?: string,
@@ -19,14 +19,18 @@ const useVirtualMachineTemplateRequests: UseVirtualMachineTemplateRequests = (
 ) => {
   const clusters = useListClusters();
   const cluster = clusters?.length === 1 ? clusters[0] : undefined;
+  const [model, inFlight] = useK8sModel(VirtualMachineTemplateRequestModelGroupVersionKind);
+
+  const modelAvailable = !!model && !inFlight;
+  const shouldWatch = enabled && modelAvailable;
 
   const [vmTemplateRequests, loaded, loadError] = useKubevirtWatchResource<
     V1alpha1VirtualMachineTemplateRequest[]
   >(
-    enabled
+    shouldWatch
       ? {
           cluster,
-          groupVersionKind: getGroupVersionKindForModel(VirtualMachineTemplateRequestModel),
+          groupVersionKind: VirtualMachineTemplateRequestModelGroupVersionKind,
           isList: true,
           namespace,
           namespaced: true,
@@ -36,7 +40,7 @@ const useVirtualMachineTemplateRequests: UseVirtualMachineTemplateRequests = (
 
   return {
     error: loadError,
-    loaded,
+    loaded: shouldWatch ? loaded : true,
     vmTemplateRequests: vmTemplateRequests ?? [],
   };
 };
