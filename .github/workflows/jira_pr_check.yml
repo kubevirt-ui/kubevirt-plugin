@@ -11,14 +11,13 @@ permissions:
   issues: write
   statuses: write
 
-concurrency:
-  group: jira-check-${{ github.event.pull_request.number || github.event.issue.number }}
-  cancel-in-progress: true
-
 jobs:
   jira-validation:
     name: jira-validation
     runs-on: ubuntu-latest
+    concurrency:
+      group: jira-check-${{ github.event.pull_request.number || github.event.issue.number }}
+      cancel-in-progress: true
     if: >
       github.event_name == 'pull_request_target' ||
       (github.event_name == 'issue_comment' &&
