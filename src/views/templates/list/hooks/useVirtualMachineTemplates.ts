@@ -1,9 +1,9 @@
-import { VirtualMachineTemplateModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { VirtualMachineTemplateModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1alpha1VirtualMachineTemplate } from '@kubevirt-ui-ext/kubevirt-api/virt-template';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
 import useListClusters from '@kubevirt-utils/hooks/useListClusters';
-import { getGroupVersionKindForModel } from '@openshift-console/dynamic-plugin-sdk';
+import { useK8sModel } from '@openshift-console/dynamic-plugin-sdk';
 
 type UseVirtualMachineTemplates = (
   namespace?: string,
@@ -18,8 +18,10 @@ const useVirtualMachineTemplates: UseVirtualMachineTemplates = (namespace, enabl
   const clusters = useListClusters();
   const cluster = clusters?.length === 1 ? clusters[0] : undefined;
   const isAdmin = useIsAdmin();
+  const [model, inFlight] = useK8sModel(VirtualMachineTemplateModelGroupVersionKind);
 
-  const shouldWatch = enabled && (isAdmin || Boolean(namespace));
+  const modelAvailable = !!model && !inFlight;
+  const shouldWatch = enabled && modelAvailable && (isAdmin || Boolean(namespace));
 
   const [vmTemplates, loaded, loadError] = useKubevirtWatchResource<
     V1alpha1VirtualMachineTemplate[]
@@ -27,7 +29,7 @@ const useVirtualMachineTemplates: UseVirtualMachineTemplates = (namespace, enabl
     shouldWatch
       ? {
           cluster,
-          groupVersionKind: getGroupVersionKindForModel(VirtualMachineTemplateModel),
+          groupVersionKind: VirtualMachineTemplateModelGroupVersionKind,
           isList: true,
           namespace,
           namespaced: true,
