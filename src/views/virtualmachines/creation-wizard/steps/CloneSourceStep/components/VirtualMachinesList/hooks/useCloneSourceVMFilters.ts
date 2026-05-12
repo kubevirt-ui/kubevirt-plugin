@@ -1,6 +1,5 @@
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { useProjectFilter } from '@kubevirt-utils/hooks/useProjectFilter';
 import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 import { useNodesFilter } from '@virtualmachines/list/hooks/useVMListFilters/useNodesFilter';
 import { useStorageClassFilter } from '@virtualmachines/list/hooks/useVMListFilters/useStorageClassFilter';
@@ -17,15 +16,10 @@ export const useCloneSourceVMFilters = (
   vmiMapper: VMIMapper,
   pvcMapper: PVCMapper,
 ): {
-  filtersWithSelect: RowFilter<V1VirtualMachine>[];
   rowFilters: RowFilter<V1VirtualMachine>[];
 } => {
   const { t } = useKubevirtTranslation();
 
-  // Only project filter shown separately
-  const projectFilter = useProjectFilter<V1VirtualMachine>();
-
-  // All other filters grouped into rowFilters dropdown
   const statusFilter = getStatusFilter(t);
   const osFilters = getOSFilter(t);
   const storageClassFilter = useStorageClassFilter(vms, pvcMapper);
@@ -36,7 +30,6 @@ export const useCloneSourceVMFilters = (
   const architectureFilter = getArchitectureFilter(t, vms);
 
   return {
-    filtersWithSelect: [projectFilter],
     rowFilters: [
       statusFilter,
       osFilters,
