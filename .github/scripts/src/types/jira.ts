@@ -90,5 +90,5 @@ export type JiraCreateIssuePayload = {
 
 export type DiscoveredFields = {
   storyPointsFieldId: string | null;
-  productTypeFieldId: string | null;
+  activityTypeFieldId: string | null;
 };
