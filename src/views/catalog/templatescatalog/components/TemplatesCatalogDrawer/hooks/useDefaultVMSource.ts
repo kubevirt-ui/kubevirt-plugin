@@ -3,6 +3,7 @@ import { useCallback, useRef } from 'react';
 import {
   V1beta1DataVolumeSpec,
   V1ContainerDiskSource,
+  V1PersistentVolumeClaimVolumeSource,
   V1VirtualMachine,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { isEqualObject } from '@kubevirt-utils/components/NodeSelectorModal/utils/helpers';
@@ -11,7 +12,9 @@ import { getBootDisk } from '@kubevirt-utils/resources/vm';
 import { getDiskSource } from '../StorageSection/utils';
 
 const useDefaultVMSource = (vm: V1VirtualMachine) => {
-  const defaultDiskSource = useRef<V1beta1DataVolumeSpec | V1ContainerDiskSource>();
+  const defaultDiskSource = useRef<
+    V1beta1DataVolumeSpec | V1ContainerDiskSource | V1PersistentVolumeClaimVolumeSource
+  >();
 
   const bootDisk = useRef(getBootDisk(vm));
   const currentDiskSource = getDiskSource(vm, bootDisk.current?.name);
