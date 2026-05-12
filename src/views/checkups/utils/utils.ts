@@ -1,4 +1,3 @@
-import { Location } from 'react-router';
 import { TFunction } from 'i18next';
 
 import { JobModel, modelToGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -77,10 +76,6 @@ export const columnsSorting = (
 
     return sortByDirection(universalComparator, sortDirection)(aParam, bParam);
   });
-
-export const trimLastHistoryPath = (pathName: Location['pathname']): string => {
-  return pathName.endsWith('checkups') ? pathName : pathName.replace(/\/[^\/]*$/, '');
-};
 
 export const getJobContainers = (job: IoK8sApiBatchV1Job): IoK8sApiCoreV1Container[] =>
   job?.spec?.template?.spec?.containers;
