@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
 set -x
-set +e
 
 # Export namespaces for downstream
 export DOWNSTREAM=true
@@ -26,6 +25,7 @@ do
   case "${flag}" in
     u) ui=${OPTARG};;
     s) spec=${OPTARG};;
+    *) echo "Usage: $0 [-u] [-s <spec>]" >&2; exit 1;;
   esac
 done
 
@@ -33,10 +33,13 @@ done
 if [ -n "${ui-}" ]; then
   npm run test-playwright-ui
 elif [ -n "${spec-}" ]; then
-  npm run test-playwright -- $spec
+  npm run test-playwright -- "$spec"
 else
   npm run test-playwright-headless
 fi
+EXIT_CODE=$?
 
 # Clean up
 bash test-cleanup.sh
+
+exit $EXIT_CODE

@@ -13,13 +13,3 @@ export const byTest = (page: Page, value: string): Locator =>
  */
 export const byTestId = (page: Page, value: string): Locator =>
   page.locator(`[data-test-id="${value}"]`);
-
-/**
- * Returns a locator scoped to a specific `[data-test-id]` container.
- * Useful for finding child elements within a known section.
- *
- * @example
- *   withinTestId(page, 'vm-row-actions').getByText('Start')
- */
-export const withinTestId = (page: Page, value: string): Locator =>
-  page.locator(`[data-test-id="${value}"]`);

@@ -36,7 +36,7 @@ export function waitForJsonpath(
 
 /** Apply a Kubernetes manifest from a heredoc string. */
 export function applyManifest(yaml: string) {
-  execSync(`echo '${yaml.replace(/'/g, "'\\''")}' | oc apply -f -`, DEFAULT_OPTS);
+  execSync('oc apply -f -', { ...DEFAULT_OPTS, input: yaml });
 }
 
 /** Delete a resource, ignoring not-found errors. */

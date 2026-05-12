@@ -91,8 +91,13 @@ export class ResourceListPage {
         .first()
         .waitFor({ state: 'visible', timeout: 30 * SECOND }),
       this.page.getByRole('table').waitFor({ state: 'visible', timeout: 30 * SECOND }),
-    ]).catch(() => {
-      // Page may not have these elements (e.g. empty state); proceed and let the test assert
+    ]).catch((err: unknown) => {
+      // All three 30-second waits timed out — surface the error so tests fail fast
+      // rather than continuing and producing a cryptic failure at a later assertion.
+      throw new Error(
+        `navigate(${url}): page did not render a filter input, create button, or table within 30s. ` +
+          String(err),
+      );
     });
   }
 

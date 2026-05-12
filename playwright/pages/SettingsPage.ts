@@ -131,7 +131,7 @@ export class SettingsPage {
     await expect(this.page.locator('[data-test-id]').first()).toBeVisible({
       timeout: 30 * SECOND,
     });
-    await this.page.waitForTimeout(10 * SECOND);
+    await this.page.getByText('Configure features').waitFor({ timeout: 30 * SECOND });
   }
 
   async navigateToSSHKeys() {

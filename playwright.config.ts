@@ -1,8 +1,8 @@
 import { defineConfig, devices } from '@playwright/test';
 
-const baseAddress = process.env.BRIDGE_BASE_ADDRESS ?? 'http://localhost:9000';
-const basePath = process.env.BRIDGE_BASE_PATH ?? '/';
-export const baseURL = `${baseAddress}${basePath}`.replace(/\/$/, '');
+import { env } from './playwright/utils/env';
+
+export const baseURL = env.baseURL;
 
 const chromeArgs = [
   '--ignore-certificate-errors',

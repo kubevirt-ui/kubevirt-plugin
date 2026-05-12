@@ -155,5 +155,4 @@ npm ci
 npm run playwright-install
 
 # Run tests (gating suite).
-npm run test-playwright-headless -- --grep "@gating" 2>&1 || \
-  npm run test-playwright-headless -- playwright/tests/gating/ playwright/tests/setup/
+npm run test-playwright-headless

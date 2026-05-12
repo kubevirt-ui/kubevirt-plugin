@@ -42,6 +42,7 @@ export class VMDetailsPage {
   /** Hover a flyout sub-menu then click the target item inside it. */
   async clickSubmenuAction(submenuId: string, actionId: string) {
     await byTestId(this.page, submenuId).hover();
+    await expect(byTestId(this.page, actionId)).toBeVisible();
     await byTestId(this.page, actionId).click();
   }
 

@@ -9,7 +9,7 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "resolveJsonModule": true,
-    "strict": false,
+    "strict": true,
     "noEmit": true
   },
   "include": ["./**/*.ts", "../playwright.config.ts"],
