@@ -157,7 +157,6 @@ When invoked for a feature or change, **always start by searching the codebase f
 
 1. **Search Jest unit tests** — look in `src/` for `*.test.ts(x)` files near the changed files or matching the feature name.
 2. **Search Playwright E2E tests** — look in `playwright/tests/` for spec files that reference the feature, component name, or resource kind.
-3. **Search Cypress E2E tests** — look in `cypress/tests/` for the same.
 
 Use `Grep` or `Glob` with the feature/component/hook name, the resource kind (e.g. `VirtualMachine`, `StorageClass`), or the route segment (e.g. `vm-actions`, `set-default-sc`) as search terms.
 

@@ -1,7 +1,16 @@
 import { expect, Page } from '@playwright/test';
 
-import { ITEM_CREATE, KEBAB_BUTTON, SAVE_CHANGES, SECOND } from '../utils/constants';
+import {
+  ITEM_CREATE,
+  KEBAB_BUTTON,
+  NAV_TIMEOUT,
+  SAVE_CHANGES,
+  SECOND,
+  SHORT_TIMEOUT,
+} from '../utils/constants';
+import { env } from '../utils/env';
 import { byTest, byTestId } from '../utils/locators';
+import { urls } from '../utils/urls';
 
 const BREADCRUMB_LINK_0 = 'breadcrumb-link-0';
 const DROPDOWN_TEXT_FILTER = 'dropdown-text-filter';
@@ -9,6 +18,8 @@ const ITEM_FILTER = 'item-filter';
 const NAME_FILTER_INPUT = 'name-filter-input';
 
 const SET_AS_DEFAULT_ACTION_SELECTOR = '[data-test-action="Set as default"]';
+
+const NO_STORAGE_CHECKUPS_TEXT = 'No storage checkups found';
 
 /**
  * Generic resource list page — covers any k8s resource list that uses the
@@ -48,7 +59,7 @@ export class ResourceListPage {
     if (await withYAML.isVisible({ timeout: 3 * SECOND }).catch(() => false)) {
       await withYAML.click();
     }
-    await expect(this.page.getByText('name: example')).toBeVisible({ timeout: 30 * SECOND });
+    await expect(this.page.getByText('name: example')).toBeVisible({ timeout: NAV_TIMEOUT });
   }
 
   async expectEmptyState(text: string) {
@@ -59,7 +70,7 @@ export class ResourceListPage {
     await expect(byTestId(this.page, testId)).toHaveCount(0);
   }
 
-  async expectItemVisible(testId: string, timeout = 30 * SECOND) {
+  async expectItemVisible(testId: string, timeout = NAV_TIMEOUT) {
     await expect(byTestId(this.page, testId).first()).toBeVisible({ timeout });
   }
 
@@ -73,32 +84,36 @@ export class ResourceListPage {
     const input = this.page
       .locator(`[data-test="${NAME_FILTER_INPUT}"], [data-test-id="${ITEM_FILTER}"]`)
       .nth(inputIndex);
-    await input.waitFor({ state: 'visible', timeout: 10 * SECOND });
+    await input.waitFor({ state: 'visible', timeout: SHORT_TIMEOUT });
     await input.fill(name);
   }
 
   async navigate(url: string) {
-    await this.page.goto(url);
-    await this.page.waitForLoadState('domcontentloaded');
+    await this.page.goto(url, { waitUntil: 'domcontentloaded' });
     // Wait for either the filter input or the create button to confirm React rendered
     await Promise.any([
       this.page
         .locator(`[data-test="${NAME_FILTER_INPUT}"]`)
         .first()
-        .waitFor({ state: 'visible', timeout: 30 * SECOND }),
+        .waitFor({ state: 'visible', timeout: NAV_TIMEOUT }),
       this.page
         .locator(`[data-test="${ITEM_CREATE}"]`)
         .first()
-        .waitFor({ state: 'visible', timeout: 30 * SECOND }),
-      this.page.getByRole('table').waitFor({ state: 'visible', timeout: 30 * SECOND }),
+        .waitFor({ state: 'visible', timeout: NAV_TIMEOUT }),
+      this.page.getByRole('table').waitFor({ state: 'visible', timeout: NAV_TIMEOUT }),
     ]).catch((err: unknown) => {
-      // All three 30-second waits timed out — surface the error so tests fail fast
+      // All three waits timed out — surface the error so tests fail fast
       // rather than continuing and producing a cryptic failure at a later assertion.
       throw new Error(
         `navigate(${url}): page did not render a filter input, create button, or table within 30s. ` +
           String(err),
       );
     });
+  }
+
+  /** Click a tab by its visible name. */
+  async openTab(name: string) {
+    await this.page.getByRole('tab', { name }).click();
   }
 
   /** Save the YAML editor form. */
@@ -113,9 +128,18 @@ export class ResourceListPage {
   async switchProject(ns: string) {
     await this.page.locator('.co-namespace-dropdown__menu-toggle').click();
     const searchInput = byTest(this.page, DROPDOWN_TEXT_FILTER);
-    await searchInput.waitFor({ state: 'visible', timeout: 10 * SECOND });
+    await searchInput.waitFor({ state: 'visible', timeout: SHORT_TIMEOUT });
     await searchInput.fill(ns);
     await this.page.getByRole('menuitem', { exact: true, name: ns }).click();
+  }
+
+  /** Wait for the first data row (index 1 skips the header) to be visible. */
+  protected async waitForFirstDataRow() {
+    await this.page
+      .getByRole('row')
+      .nth(1)
+      .waitFor({ state: 'visible', timeout: NAV_TIMEOUT })
+      .catch(() => {});
   }
 }
 
@@ -127,42 +151,35 @@ export class InstanceTypesPage extends ResourceListPage {
   }
 
   async navigate() {
-    await super.navigate(
-      '/k8s/cluster/instancetype.kubevirt.io~v1beta1~VirtualMachineClusterInstancetype',
-    );
+    await super.navigate(urls.instanceTypes());
   }
 }
 
 export class BootableVolumesPage extends ResourceListPage {
   async navigate(ns?: string) {
-    const { env } = await import('../utils/env');
-    const namespace = ns ?? env.osImagesNamespace;
-    await super.navigate(`/k8s/ns/${namespace}/bootablevolumes`);
+    await super.navigate(urls.bootableVolumes(ns ?? env.osImagesNamespace));
   }
 }
 
 export class MigrationPoliciesPage extends ResourceListPage {
   async navigate() {
-    await super.navigate('/k8s/cluster/migrations.kubevirt.io~v1alpha1~MigrationPolicy');
+    await super.navigate(urls.migrationPolicies());
   }
 }
 
 export class CheckupsPage extends ResourceListPage {
   async expectNoStorageCheckups() {
-    await expect(this.page.getByText('No storage checkups found')).toBeVisible();
+    await expect(this.page.getByText(NO_STORAGE_CHECKUPS_TEXT)).toBeVisible();
   }
 
   async navigate() {
-    const { env } = await import('../utils/env');
-    // URL is /checkups (not /virtualization-checkups); the router redirects to /checkups/storage
-    await this.page.goto(`/k8s/ns/${env.cnvNamespace}/checkups`);
-    await this.page.waitForLoadState('domcontentloaded');
+    await this.page.goto(urls.checkups(env.cnvNamespace), { waitUntil: 'domcontentloaded' });
     // Wait for the heading which is always rendered (even in empty state)
-    await this.page.getByRole('heading', { name: 'Checkups' }).waitFor({ timeout: 30 * SECOND });
+    await this.page.getByRole('heading', { name: 'Checkups' }).waitFor({ timeout: NAV_TIMEOUT });
   }
 
   async openStorageTab() {
-    await this.page.getByRole('tab', { name: 'Storage' }).click();
+    await this.openTab('Storage');
   }
 }
 
@@ -170,7 +187,7 @@ export class StorageClassesPage extends ResourceListPage {
   async clickAction(action: string) {
     await this.page
       .locator(`[data-test-action="${action}"]`)
-      .waitFor({ state: 'visible', timeout: 30 * SECOND });
+      .waitFor({ state: 'visible', timeout: NAV_TIMEOUT });
     await this.page.locator(`[data-test-action="${action}"]`).click();
   }
 
@@ -179,13 +196,8 @@ export class StorageClassesPage extends ResourceListPage {
   }
 
   async navigate() {
-    await super.navigate('/k8s/cluster/storage.k8s.io~v1~StorageClass');
-    // Wait for the first data row (nth(1) skips the header row)
-    await this.page
-      .getByRole('row')
-      .nth(1)
-      .waitFor({ state: 'visible', timeout: 30 * SECOND })
-      .catch(() => {});
+    await super.navigate(urls.storageClasses());
+    await this.waitForFirstDataRow();
   }
 
   async openRowMenu(scName: string) {
@@ -211,11 +223,7 @@ export class StorageClassesPage extends ResourceListPage {
    */
   async setAsDefault(scName: string, retries = 3) {
     for (let attempt = 1; attempt <= retries; attempt++) {
-      // Wait for the table to be stable before touching the menu
-      await this.page
-        .getByRole('row')
-        .nth(1)
-        .waitFor({ state: 'visible', timeout: 30 * SECOND });
+      await this.waitForFirstDataRow();
       await this.openRowMenu(scName);
 
       const action = this.page.locator(SET_AS_DEFAULT_ACTION_SELECTOR);
@@ -232,12 +240,7 @@ export class StorageClassesPage extends ResourceListPage {
 
       await Promise.all([this.page.waitForLoadState('domcontentloaded'), action.click()]);
 
-      // Wait for the table to re-render after the reload
-      await this.page
-        .getByRole('row')
-        .nth(1)
-        .waitFor({ state: 'visible', timeout: 30 * SECOND })
-        .catch(() => {});
+      await this.waitForFirstDataRow();
       return;
     }
 

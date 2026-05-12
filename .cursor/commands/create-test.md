@@ -18,78 +18,23 @@ Execute these phases sequentially, operating as each agent role per the orchestr
 
 ---
 
-### Phase 0: Branch Setup
-
-1. Fetch and rebase on `origin/main`
-2. Resolve the current git username from the email prefix:
-   ```bash
-   GIT_USER=$(git config user.email | cut -d@ -f1)
-   ```
-3. Create a new branch following the naming convention:
-   - Single ticket: `<git-user>/<jira-key-lowercase>-test` (e.g., `jdoe/ticket-12345-test`)
-   - Multiple tickets: `<git-user>/test-automation-<first-jira-key-lowercase>` (e.g., `jdoe/test-automation-ticket-12345`)
-4. Confirm the branch is clean and ready
-
----
-
 ### Phase 1: Business Analyst — Exploration & Scenario Design
 
 Follow `business-analyst.mdc` rules.
 
 **For each Jira ticket** provided in the input:
 
-1. **Fetch the Jira ticket from the REST API** (MANDATORY — never skip this step, never rely on user-provided summaries or cached data):
+1. **Fetch the Jira ticket** via the Atlassian MCP (MANDATORY — never skip, never rely on cached summaries).
+2. **Extract key fields**: summary, type, status, labels, components, description, parent, subtasks. Fetch each subtask too.
+3. **Explore linked PRs** — find implementation PRs via remote links, read their changed files to identify new `data-test` / `data-test-id` selectors, routes, and components.
+4. **Search for existing Playwright tests**:
    ```bash
-   curl -s "https://<JIRA_HOST>/rest/api/3/issue/{TICKET_KEY}" | python3 -c "
-   import sys, json
-   data = json.load(sys.stdin)
-   fields = data.get('fields', {})
-   print(f'Key: {data.get(\"key\")}')
-   print(f'Summary: {fields.get(\"summary\")}')
-   print(f'Type: {fields.get(\"issuetype\", {}).get(\"name\")}')
-   print(f'Status: {fields.get(\"status\", {}).get(\"name\")}')
-   print(f'Priority: {fields.get(\"priority\", {}).get(\"name\")}')
-   print(f'Labels: {fields.get(\"labels\", [])}')
-   print(f'Components: {[c.get(\"name\") for c in fields.get(\"components\", [])]}')
-   print(f'Fix Versions: {[v.get(\"name\") for v in fields.get(\"fixVersions\", [])]}')
-   print(f'Parent: {fields.get(\"parent\", {}).get(\"key\", \"N/A\")}')
-   subtasks = fields.get('subtasks', [])
-   print(f'Subtasks ({len(subtasks)}): {[s.get(\"key\") for s in subtasks]}')
-   print(f'Description: {fields.get(\"description\", \"N/A\")[:500]}')
-   "
-   ```
-   > **Note**: Replace `<JIRA_HOST>` with your Jira instance hostname (e.g., `your-org.atlassian.net`).
-2. **Extract key fields**: summary, type, status, labels, components, fix versions, description, parent, subtasks
-3. **Fetch subtasks** (if any) to understand the full scope — each subtask must also be fetched from the API
-4. **Explore attached PRs / GitHub links** — fetch remote links from the Jira ticket to find implementation PRs:
-   ```bash
-   curl -s "https://<JIRA_HOST>/rest/api/3/issue/{TICKET_KEY}/remotelink" | python3 -c "
-   import sys, json
-   links = json.load(sys.stdin)
-   for link in links:
-       obj = link.get('object', {})
-       url = obj.get('url', '')
-       title = obj.get('title', '')
-       if 'github.com' in url or 'pull' in url or 'merge_request' in url:
-           print(f'PR: {title} — {url}')
-   "
-   ```
-   For each PR found:
-   - Use `gh` CLI or `WebFetch` to read the PR description and changed files list
-   - Identify new UI components, actions, selectors (`data-test`, `data-test-id`), routes, or API endpoints introduced by the PR
-   - Note any new `data-test-id` values — these become locators for the test framework
-   - This informs scenario design, locator strategy, and gap analysis in later phases
-5. **Search the codebase** for existing test references:
-   ```bash
-   rg "TICKET-XXXXX" playwright/tests/ playwright/docs/
+   rg "TICKET-XXXXX" playwright/tests/
    rg "<feature-keyword>" playwright/tests/ --type ts -l
    ```
-6. **Design test scenarios** using the BA scenario template — map steps to existing StepDriver methods
-7. **Determine tier placement** (gating vs tier1 vs tier2) based on complexity and resource needs
+5. **Design test scenarios** — map steps to existing page-object methods; determine tier placement (gating / tier1 / tier2).
 
-After processing all tickets:
-
-8. **Output**: A consolidated scenario document listing all proposed test cases across all tickets, with steps, assertions, tags, and cleanup. Group scenarios by ticket for traceability.
+**Output**: A consolidated scenario document with proposed test cases, steps, assertions, tags, and cleanup — grouped by ticket.
 
 ---
 

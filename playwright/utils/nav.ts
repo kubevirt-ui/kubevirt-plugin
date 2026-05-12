@@ -3,38 +3,21 @@ import { expect, Page } from '@playwright/test';
 import { SECOND } from './constants';
 import { env } from './env';
 import { byTestId } from './locators';
+import { urls } from './urls';
 
-const { cnvNamespace: CNV_NS, testNamespace: NS } = env;
+const { testNamespace: NS } = env;
 
 /** Direct-URL navigation helpers — bypass the sidebar for reliability. */
 export const goto = {
-  bootableVolumes: (page: Page, ns?: string) =>
-    page.goto(
-      `/k8s/${ns ? `ns/${ns}` : `ns/${env.osImagesNamespace}`}/cdi.kubevirt.io~v1beta1~DataSource`,
-    ),
-
-  checkups: (page: Page) => page.goto(`/k8s/ns/${CNV_NS}/virtualization-checkups`),
-
-  instanceTypes: (page: Page) =>
-    page.goto(`/k8s/cluster/instancetype.kubevirt.io~v1beta1~VirtualMachineClusterInstancetype`),
-
-  migrationPolicies: (page: Page) =>
-    page.goto(`/k8s/cluster/migrations.kubevirt.io~v1alpha1~MigrationPolicy`),
-
-  networking: (page: Page, ns?: string) =>
-    page.goto(
-      `/k8s/${ns ? `ns/${ns}` : 'all-namespaces'}/k8s.cni.cncf.io~v1~NetworkAttachmentDefinition`,
-    ),
-
-  settings: (page: Page) => page.goto(`/k8s/ns/${CNV_NS}/virtualization-settings`),
-
-  storageClasses: (page: Page) => page.goto(`/k8s/cluster/storage.k8s.io~v1~StorageClass`),
-
-  templates: (page: Page, ns?: string) =>
-    page.goto(`/k8s/${ns ? `ns/${ns}` : 'all-namespaces'}/templates.openshift.io~v1~Template`),
-
-  vms: (page: Page, ns = NS) =>
-    page.goto(`/k8s/${ns ? `ns/${ns}` : 'all-namespaces'}/kubevirt.io~v1~VirtualMachine`),
+  bootableVolumes: (page: Page, ns?: string) => page.goto(urls.bootableVolumes(ns)),
+  checkups: (page: Page) => page.goto(urls.checkups()),
+  instanceTypes: (page: Page) => page.goto(urls.instanceTypes()),
+  migrationPolicies: (page: Page) => page.goto(urls.migrationPolicies()),
+  networking: (page: Page, ns?: string) => page.goto(urls.networking(ns)),
+  settings: (page: Page) => page.goto(urls.settings()),
+  storageClasses: (page: Page) => page.goto(urls.storageClasses()),
+  templates: (page: Page, ns?: string) => page.goto(urls.templates(ns)),
+  vms: (page: Page, ns?: string) => page.goto(urls.vms(ns ?? NS)),
 };
 
 /** Switch the URL namespace segment without a full reload. */

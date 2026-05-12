@@ -1,12 +1,15 @@
 import { expect, Page } from '@playwright/test';
 
-import { CONFIRM_VM_ACTIONS, SECOND } from '../utils/constants';
+import { CONFIRM_VM_ACTIONS, NAV_TIMEOUT, SECOND, SHORT_TIMEOUT } from '../utils/constants';
 import { env } from '../utils/env';
 import { byTest, byTestId } from '../utils/locators';
+
+const DEFAULT_RETRIES = 3;
 
 const CLUSTER_SETTINGS = 'cluster-settings';
 const GENERAL_INFORMATION_INSTALLED_VERSION = 'general-information-installed-version';
 const GENERAL_INFORMATION_UPDATE_STATUS = 'general-information-update-status';
+const GENERAL_SETTINGS_SECTION = 'General settings';
 const MEMORY_DENSITY = 'memory-density';
 const MEMORY_DENSITY_DISABLE_CONFIRM_BUTTON = 'memory-density-disable-confirm-button';
 const MEMORY_DENSITY_MODIFY_BUTTON = 'memory-density-modify-button';
@@ -24,14 +27,14 @@ export class SettingsPage {
   private async toggleVMActionsConfirmation(enable: boolean, retries: number) {
     for (let attempt = 1; attempt <= retries; attempt++) {
       try {
-        await this.openSection('General settings');
+        await this.openSection(GENERAL_SETTINGS_SECTION);
         await this.openSection('VirtualMachine actions confirmation');
         const switchInput = byTestId(this.page, CONFIRM_VM_ACTIONS);
-        await expect(switchInput).toBeVisible({ timeout: 10 * SECOND });
+        await expect(switchInput).toBeVisible({ timeout: SHORT_TIMEOUT });
         const isOn = await switchInput.evaluate((el) => (el as HTMLInputElement).checked);
         if (isOn !== enable) {
           await switchInput.locator('..').click();
-          await expect(switchInput).toBeChecked({ checked: enable, timeout: 10 * SECOND });
+          await expect(switchInput).toBeChecked({ checked: enable, timeout: SHORT_TIMEOUT });
         }
         return;
       } catch (err) {
@@ -39,7 +42,7 @@ export class SettingsPage {
         await this.page.waitForLoadState('domcontentloaded');
         await this.page
           .getByText('Configure features')
-          .waitFor({ timeout: 30 * SECOND })
+          .waitFor({ timeout: NAV_TIMEOUT })
           .catch(() => {});
       }
     }
@@ -60,37 +63,37 @@ export class SettingsPage {
   // ── Section clicks ───────────────────────────────────────────────────────────
 
   async disableMemoryDensity() {
-    await this.openSection('General settings');
+    await this.openSection(GENERAL_SETTINGS_SECTION);
     await this.openSection('Memory density');
     // Wait for the switch to be rendered inside the expanded section
     const switchInput = byTestId(this.page, MEMORY_DENSITY);
-    await expect(switchInput).toBeVisible({ timeout: 10 * SECOND });
+    await expect(switchInput).toBeVisible({ timeout: SHORT_TIMEOUT });
     const isOn = await switchInput.evaluate((el) => (el as HTMLInputElement).checked);
     if (isOn) {
       await switchInput.locator('..').click();
     }
     await expect(byTestId(this.page, MEMORY_DENSITY_DISABLE_CONFIRM_BUTTON)).toBeVisible({
-      timeout: 30 * SECOND,
+      timeout: NAV_TIMEOUT,
     });
     await byTestId(this.page, MEMORY_DENSITY_DISABLE_CONFIRM_BUTTON).click();
     // Wait for the confirm button to disappear (confirms HCO reconciliation started)
     await expect(byTestId(this.page, MEMORY_DENSITY_DISABLE_CONFIRM_BUTTON)).toBeHidden({
-      timeout: 30 * SECOND,
+      timeout: NAV_TIMEOUT,
     });
   }
 
   // ── VM Actions confirmation ───────────────────────────────────────────────────
 
   /** Disable VM actions confirmation, retrying if the page reloads during the click. */
-  async disableVMActionsConfirmation(retries = 3) {
+  async disableVMActionsConfirmation(retries = DEFAULT_RETRIES) {
     await this.toggleVMActionsConfirmation(false, retries);
   }
 
   async enableMemoryDensity() {
-    await this.openSection('General settings');
+    await this.openSection(GENERAL_SETTINGS_SECTION);
     await this.openSection('Memory density');
     const switchInput = byTestId(this.page, MEMORY_DENSITY);
-    await expect(switchInput).toBeVisible({ timeout: 10 * SECOND });
+    await expect(switchInput).toBeVisible({ timeout: SHORT_TIMEOUT });
     await switchInput.check({ force: true });
     // The slider lives inside "Current memory density" ExpandableSection, which starts
     // collapsed. Waiting for the expandable container is sufficient to confirm the switch
@@ -101,7 +104,7 @@ export class SettingsPage {
   }
 
   /** Enable VM actions confirmation, retrying if the page reloads during the click. */
-  async enableVMActionsConfirmation(retries = 3) {
+  async enableVMActionsConfirmation(retries = DEFAULT_RETRIES) {
     await this.toggleVMActionsConfirmation(true, retries);
   }
 
@@ -126,25 +129,26 @@ export class SettingsPage {
   }
 
   async navigate() {
-    await this.page.goto(`/k8s/ns/${env.cnvNamespace}/virtualization-settings`);
-    await this.page.waitForLoadState('domcontentloaded');
-    await expect(this.page.locator('[data-test-id]').first()).toBeVisible({
-      timeout: 30 * SECOND,
+    await this.page.goto(`/k8s/ns/${env.cnvNamespace}/virtualization-settings`, {
+      waitUntil: 'domcontentloaded',
     });
-    await this.page.getByText('Configure features').waitFor({ timeout: 30 * SECOND });
+    await expect(this.page.locator('[data-test-id]').first()).toBeVisible({
+      timeout: NAV_TIMEOUT,
+    });
+    await this.page.getByText('Configure features').waitFor({ timeout: NAV_TIMEOUT });
   }
 
   async navigateToSSHKeys() {
     await this.navigate();
     await expect(byTestId(this.page, GENERAL_INFORMATION_INSTALLED_VERSION)).toBeVisible({
-      timeout: 30 * SECOND,
+      timeout: NAV_TIMEOUT,
     });
     await this.page.getByRole('tab', { exact: true, name: 'User' }).click();
     // Wait for the URL hash to reflect the tab change before navigating to #ssh-keys
-    await this.page.waitForURL(/user/, { timeout: 10 * SECOND }).catch(() => {});
+    await this.page.waitForURL(/user/, { timeout: SHORT_TIMEOUT }).catch(() => {});
     const baseUrl = this.page.url().split('#')[0];
     await this.page.goto(`${baseUrl}#ssh-keys`);
-    await expect(this.page.getByText('Public SSH key')).toBeVisible({ timeout: 30 * SECOND });
+    await expect(this.page.getByText('Public SSH key')).toBeVisible({ timeout: NAV_TIMEOUT });
   }
 
   /**
@@ -155,20 +159,20 @@ export class SettingsPage {
   async openSection(sectionName: string) {
     const content = byTest(this.page, CLUSTER_SETTINGS);
     const toggle = content.getByRole('button').filter({ hasText: sectionName }).first();
-    await expect(toggle).toBeVisible({ timeout: 10 * SECOND });
+    await expect(toggle).toBeVisible({ timeout: SHORT_TIMEOUT });
     const expanded = await toggle.evaluate((el) => el.getAttribute('aria-expanded') === 'true');
     if (!expanded) {
       await toggle.click();
-      await expect(toggle).toHaveAttribute('aria-expanded', 'true', { timeout: 10 * SECOND });
+      await expect(toggle).toHaveAttribute('aria-expanded', 'true', { timeout: SHORT_TIMEOUT });
     }
   }
 
   async setLiveMigrationLimits(parallelPerCluster: string, parallelPerNode: string) {
-    await this.openSection('General settings');
+    await this.openSection(GENERAL_SETTINGS_SECTION);
     await this.openSection('Live migration');
     // Wait for inputs to be interactive after accordion opens
     const clusterInput = this.page.locator('input[name="parallelMigrationsPerCluster"]');
-    await expect(clusterInput).toBeVisible({ timeout: 10 * SECOND });
+    await expect(clusterInput).toBeVisible({ timeout: SHORT_TIMEOUT });
     await clusterInput.clear();
     await clusterInput.fill(parallelPerCluster);
     await this.page.locator('input[name="parallelOutboundMigrationsPerNode"]').clear();
@@ -182,7 +186,7 @@ export class SettingsPage {
     // Wait for "Current memory density" to be clickable after enableMemoryDensity
     await this.page.getByText('Current memory density').click();
     const input = byTestId(this.page, MEMORY_DENSITY_SLIDER).locator('input[type="number"]');
-    await expect(input).toBeVisible({ timeout: 10 * SECOND });
+    await expect(input).toBeVisible({ timeout: SHORT_TIMEOUT });
     await input.dblclick();
     await input.fill(value);
     await this.page.getByText('Requested memory density').click();
