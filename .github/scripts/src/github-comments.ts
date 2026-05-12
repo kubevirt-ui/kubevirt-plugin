@@ -78,6 +78,25 @@ export const hasLabel = async (
   return labels.some((l) => l.name === label);
 };
 
+/** Create or update a GitHub commit status for the jira-validation check. */
+export const setCommitStatus = async (
+  octokit: Octokit,
+  owner: string,
+  repo: string,
+  sha: string,
+  state: 'pending' | 'success' | 'failure' | 'error',
+  description: string,
+): Promise<void> => {
+  await octokit.repos.createCommitStatus({
+    owner,
+    repo,
+    sha,
+    state,
+    context: 'jira-validation',
+    description: description.slice(0, 140),
+  });
+};
+
 /** Update the validation comment and add/remove the block label based on result. */
 export const reportValidation = async (
   octokit: Octokit,

@@ -1,6 +1,6 @@
 import { JiraClient } from './jira-client.js';
 import { createOctokit, getReleaseBranches } from './github-repo.js';
-import { hasLabel, reportValidation } from './github-comments.js';
+import { hasLabel, reportValidation, setCommitStatus } from './github-comments.js';
 import { extractTicketIds, getExpectedVersionForBranch } from './version-utils.js';
 import { validateTicket, formatValidationComment } from './validation-checks.js';
 import { requireEnv, safeErrorMessage } from './utils.js';
@@ -18,7 +18,12 @@ const main = async (): Promise<void> => {
   const prNumber = parseInt(requireEnv('PR_NUMBER'), 10);
   const prTitle = requireEnv('PR_TITLE');
   const baseBranch = requireEnv('BASE_BRANCH');
+  const headSha = process.env.PR_HEAD_SHA;
   const octokit = createOctokit(ghConfig);
+
+  if (headSha) {
+    await setCommitStatus(octokit, ghConfig.owner, ghConfig.repo, headSha, 'pending', 'Jira validation in progress…');
+  }
 
   const shouldSkip = await hasLabel(octokit, ghConfig.owner, ghConfig.repo, prNumber, SKIP_LABEL);
   if (shouldSkip) {
@@ -27,6 +32,9 @@ const main = async (): Promise<void> => {
       octokit, ghConfig.owner, ghConfig.repo, prNumber, true,
       `:white_check_mark: **Jira Validation Skipped** — \`${SKIP_LABEL}\` label is present.`,
     );
+    if (headSha) {
+      await setCommitStatus(octokit, ghConfig.owner, ghConfig.repo, headSha, 'success', 'Jira validation skipped');
+    }
     return;
   }
 
@@ -41,6 +49,9 @@ const main = async (): Promise<void> => {
       '> Edit your PR title to include a valid Jira ticket ID.';
 
     await reportValidation(octokit, ghConfig.owner, ghConfig.repo, prNumber, false, msg);
+    if (headSha) {
+      await setCommitStatus(octokit, ghConfig.owner, ghConfig.repo, headSha, 'failure', 'No CNV ticket ID found in PR title');
+    }
     process.exit(1);
   }
 
@@ -79,6 +90,14 @@ const main = async (): Promise<void> => {
   const commentBody = formatValidationComment(ticketIds, allChecks, allPassed);
   await reportValidation(octokit, ghConfig.owner, ghConfig.repo, prNumber, allPassed, commentBody);
 
+  if (headSha) {
+    await setCommitStatus(
+      octokit, ghConfig.owner, ghConfig.repo, headSha,
+      allPassed ? 'success' : 'failure',
+      allPassed ? 'All Jira checks passed' : 'One or more Jira checks failed',
+    );
+  }
+
   if (!allPassed) {
     console.error('Jira validation failed. See PR comment for details.');
     process.exit(1);
@@ -87,7 +106,21 @@ const main = async (): Promise<void> => {
   console.log('Jira validation passed.');
 };
 
-main().catch((err) => {
+main().catch(async (err) => {
   console.error('Unexpected error:', safeErrorMessage(err));
+  const headSha = process.env.PR_HEAD_SHA;
+  if (headSha) {
+    try {
+      const ghConfig: GitHubConfig = {
+        token: process.env.GITHUB_TOKEN ?? '',
+        owner: process.env.REPO_OWNER ?? '',
+        repo: process.env.REPO_NAME ?? '',
+      };
+      const octokit = createOctokit(ghConfig);
+      await setCommitStatus(octokit, ghConfig.owner, ghConfig.repo, headSha, 'error', 'Jira validation encountered an unexpected error');
+    } catch {
+      // best-effort
+    }
+  }
   process.exit(1);
 });

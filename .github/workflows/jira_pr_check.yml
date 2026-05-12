@@ -37,6 +37,7 @@ jobs:
             });
             core.setOutput('title', pr.title);
             core.setOutput('base_ref', pr.base.ref);
+            core.setOutput('head_sha', pr.head.sha);
 
       - name: Checkout base branch scripts
         uses: actions/checkout@v6
@@ -61,6 +62,7 @@ jobs:
           PR_NUMBER: ${{ github.event.pull_request.number || github.event.issue.number }}
           PR_TITLE: ${{ github.event.pull_request.title || steps.pr-info.outputs.title }}
           BASE_BRANCH: ${{ github.event.pull_request.base.ref || steps.pr-info.outputs.base_ref }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha || steps.pr-info.outputs.head_sha }}
           REPO_OWNER: ${{ github.repository_owner }}
           REPO_NAME: ${{ github.event.repository.name }}
         run: npx tsx src/validate-pr.ts
