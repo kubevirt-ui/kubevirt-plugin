@@ -1,6 +1,13 @@
 import React, { Dispatch, FC, SetStateAction } from 'react';
 
-import { Menu, MenuContent, MenuItem, MenuList, TooltipPosition } from '@patternfly/react-core';
+import {
+  Menu,
+  MenuContent,
+  MenuItem,
+  MenuList,
+  Tooltip,
+  TooltipPosition,
+} from '@patternfly/react-core';
 import { useFleetAccessReview } from '@stolostron/multicluster-sdk';
 
 import { ActionDropdownItemType } from '../ActionsDropdown/constants';
@@ -10,14 +17,21 @@ import './ActionDropdownItem.scss';
 type ActionDropdownItemProps = {
   action: ActionDropdownItemType;
   setIsOpen: Dispatch<SetStateAction<boolean>>;
+  tooltipPosition?: TooltipPosition;
+  tooltipZIndex?: number;
 };
 
-const ActionDropdownItem: FC<ActionDropdownItemProps> = ({ action, setIsOpen }) => {
+const ActionDropdownItem: FC<ActionDropdownItemProps> = ({
+  action,
+  setIsOpen,
+  tooltipPosition,
+  tooltipZIndex,
+}) => {
   const [accessReview] = useFleetAccessReview(action?.accessReview || {});
 
   const actionAllowed = accessReview || action?.accessReview === undefined;
   const isDisabled = !actionAllowed || action?.disabled;
-  const displayDisabledTooltip = isDisabled && action?.disabledTooltip;
+  const showTooltip = isDisabled && action?.disabledTooltip;
 
   const handleClick = () => {
     if (typeof action?.cta === 'function') {
@@ -26,14 +40,7 @@ const ActionDropdownItem: FC<ActionDropdownItemProps> = ({ action, setIsOpen }) 
     }
   };
 
-  const tooltipProps = displayDisabledTooltip
-    ? {
-        content: action?.disabledTooltip,
-        position: TooltipPosition.left,
-      }
-    : null;
-
-  return (
+  const menuItem = (
     <MenuItem
       flyoutMenu={
         action?.options && (
@@ -41,7 +48,13 @@ const ActionDropdownItem: FC<ActionDropdownItemProps> = ({ action, setIsOpen }) 
             <MenuContent>
               <MenuList>
                 {action?.options?.map((option) => (
-                  <ActionDropdownItem action={option} key={option.id} setIsOpen={setIsOpen} />
+                  <ActionDropdownItem
+                    action={option}
+                    key={option.id}
+                    setIsOpen={setIsOpen}
+                    tooltipPosition={tooltipPosition}
+                    tooltipZIndex={tooltipZIndex}
+                  />
                 ))}
               </MenuList>
             </MenuContent>
@@ -50,10 +63,9 @@ const ActionDropdownItem: FC<ActionDropdownItemProps> = ({ action, setIsOpen }) 
       }
       data-test-id={`${action?.id}`}
       description={action?.description}
-      isDisabled={isDisabled}
+      isAriaDisabled={isDisabled}
       key={action?.id}
       onClick={handleClick}
-      tooltipProps={tooltipProps}
     >
       {action?.label}
       {action?.icon && (
@@ -64,6 +76,20 @@ const ActionDropdownItem: FC<ActionDropdownItemProps> = ({ action, setIsOpen }) 
       )}
     </MenuItem>
   );
+
+  if (showTooltip) {
+    return (
+      <Tooltip
+        content={action.disabledTooltip}
+        position={tooltipPosition ?? TooltipPosition.left}
+        {...(tooltipZIndex && { zIndex: tooltipZIndex })}
+      >
+        <div>{menuItem}</div>
+      </Tooltip>
+    );
+  }
+
+  return menuItem;
 };
 
 export default ActionDropdownItem;

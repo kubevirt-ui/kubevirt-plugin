@@ -3,9 +3,10 @@ import React, { FC } from 'react';
 import ActionDropdownItem from '@kubevirt-utils/components/ActionDropdownItem/ActionDropdownItem';
 import { ActionDropdownItemType } from '@kubevirt-utils/components/ActionsDropdown/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Divider, MenuGroup, MenuList } from '@patternfly/react-core';
+import { Divider, MenuGroup, MenuList, TooltipPosition } from '@patternfly/react-core';
 
 import useGroupedActions from './hooks/useGroupedActions';
+import { RIGHT_CLICK_MENU_Z_INDEX } from './constants';
 import { RightClickActionMenuProps } from './RightClickActionMenu';
 import RightClickMenuWrapper from './RightClickMenuWrapper';
 
@@ -33,6 +34,8 @@ const GroupedRightClickActionMenu: FC<GroupedRightClickActionMenuProps> = ({
                 action={createVMAction}
                 key={createVMAction.id}
                 setIsOpen={hideMenu}
+                tooltipPosition={TooltipPosition.right}
+                tooltipZIndex={RIGHT_CLICK_MENU_Z_INDEX + 1}
               />
             </MenuList>
           </MenuGroup>
@@ -42,7 +45,13 @@ const GroupedRightClickActionMenu: FC<GroupedRightClickActionMenuProps> = ({
       <MenuGroup label={t('Manage all VMs')}>
         <MenuList>
           {manageVMsActions.map((action) => (
-            <ActionDropdownItem action={action} key={action.id} setIsOpen={hideMenu} />
+            <ActionDropdownItem
+              action={action}
+              key={action.id}
+              setIsOpen={hideMenu}
+              tooltipPosition={TooltipPosition.right}
+              tooltipZIndex={RIGHT_CLICK_MENU_Z_INDEX + 1}
+            />
           ))}
         </MenuList>
       </MenuGroup>
@@ -50,7 +59,13 @@ const GroupedRightClickActionMenu: FC<GroupedRightClickActionMenuProps> = ({
       <MenuGroup>
         <MenuList>
           {bottomActions.map((action) => (
-            <ActionDropdownItem action={action} key={action.id} setIsOpen={hideMenu} />
+            <ActionDropdownItem
+              action={action}
+              key={action.id}
+              setIsOpen={hideMenu}
+              tooltipPosition={TooltipPosition.right}
+              tooltipZIndex={RIGHT_CLICK_MENU_Z_INDEX + 1}
+            />
           ))}
         </MenuList>
       </MenuGroup>
