@@ -90,7 +90,7 @@ Your approach:
 
 **i18n Compliance**
 - Every user-facing string must use `t()` from `useKubevirtTranslation`
-- Utility functions that accept `t` must type it as `t: TFunction` from `react-i18next`
+- Utility functions that accept `t` must type it as `t: TFunction` from `i18next`
 - Never define custom types like `(key: string) => string` for the translation function
 - No string concatenation with `t()` results -- use interpolation: `t('Delete {{name}}', { name })`
 - No comment-only `// t('...')` patterns -- they do NOT wire up translations. **Exception**: `src/utils/i18n.ts` uses comment-only `// t('...')` intentionally for `i18next-parser` string extraction (see `.cursor/rules/i18n.mdc` Section 4); do not flag those

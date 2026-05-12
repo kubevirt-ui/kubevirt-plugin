@@ -56,3 +56,9 @@ export {
   parseFailedTest,
   parseResults,
 } from './selfValidationResults';
+export {
+  claimPropertySetsToCapabilities,
+  mergeProfileDerivedCapabilities,
+  STORAGE_CAPABILITIES_FROM_PROFILE,
+  stripProfileDerivedCapabilities,
+} from './storageProfileMapping';

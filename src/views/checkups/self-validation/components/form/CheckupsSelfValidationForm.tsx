@@ -7,7 +7,9 @@ import ClusterProjectDropdown from '@kubevirt-utils/components/ClusterProjectDro
 import { getDefaultStorageClass } from '@kubevirt-utils/components/DiskModal/components/StorageClassAndPreallocation/utils/helpers';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useRelatedImage from '@kubevirt-utils/hooks/useRelatedImage';
+import useStorageProfileClaimPropertySets from '@kubevirt-utils/hooks/useStorageProfileClaimPropertySets';
 import { modelToGroupVersionKind, StorageClassModel } from '@kubevirt-utils/models';
+import { getName } from '@kubevirt-utils/resources/shared';
 import { generatePrettyName, isEmpty } from '@kubevirt-utils/utils/utils';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
@@ -33,6 +35,14 @@ import { calculatePVCStorageSize } from '../../utils/selfValidationJob/resourceT
 
 import AdvancedSettings from './AdvancedSettings';
 import CheckupsSelfValidationFormActions from './CheckupsSelfValidationFormActions';
+import useStorageProfileCapabilitiesSync from './useStorageProfileCapabilitiesSync';
+import {
+  addStorageCapability,
+  addTestSuite,
+  getTestSuitesToggleTitle,
+  removeStorageCapability,
+  removeTestSuite,
+} from './utils';
 
 import './checkups-self-validation-form.scss';
 
@@ -49,14 +59,12 @@ const CheckupsSelfValidationForm = () => {
   const [testSkips, setTestSkips] = useState<string>('');
   const [storageCapabilities, setStorageCapabilities] = useState<string[]>([]);
 
-  // Calculate default PVC size based on selected test suites
   const defaultPvcSize = useMemo(
     () => calculatePVCStorageSize(selectedTestSuites),
     [selectedTestSuites],
   );
   const [pvcSize, setPvcSize] = useState<string>(defaultPvcSize);
 
-  // Update PVC size when test suites change
   useEffect(() => {
     setPvcSize(defaultPvcSize);
   }, [defaultPvcSize]);
@@ -68,63 +76,48 @@ const CheckupsSelfValidationForm = () => {
   });
 
   const defaultSC = useMemo(() => getDefaultStorageClass(storageClasses), [storageClasses]);
+  const effectiveStorageClass = storageClass || getName(defaultSC) || '';
+
+  const {
+    claimPropertySets,
+    error: storageProfileError,
+    loaded: storageProfileLoaded,
+  } = useStorageProfileClaimPropertySets(effectiveStorageClass, cluster);
+
+  useStorageProfileCapabilitiesSync(
+    effectiveStorageClass,
+    claimPropertySets,
+    storageProfileLoaded,
+    setStorageCapabilities,
+  );
 
   useEffect(() => {
     if (!storageClass && storageClassesLoaded && !isEmpty(defaultSC)) {
-      setStorageClass(defaultSC?.metadata?.name);
+      setStorageClass(getName(defaultSC));
     }
   }, [defaultSC, storageClass, storageClassesLoaded]);
 
-  const handleTestSuiteCheck = useCallback((optionValue: string) => {
-    setSelectedTestSuites((prev) => {
-      const newSuites = new Set([...prev, optionValue]);
-      return TEST_SUITES.filter((suite) => newSuites.has(suite));
-    });
-  }, []);
-
-  const handleTestSuiteUncheck = useCallback((optionValue: string) => {
-    setSelectedTestSuites((prev) => prev.filter((suite) => suite !== optionValue));
-  }, []);
-
-  const handleStorageCapabilityCheck = useCallback((optionValue: string) => {
-    setStorageCapabilities((prev) => {
-      const newCapabilities = new Set([...prev, optionValue]);
-      return Array.from(newCapabilities);
-    });
-  }, []);
-
-  const handleStorageCapabilityUncheck = useCallback((optionValue: string) => {
-    setStorageCapabilities((prev) => prev.filter((capability) => capability !== optionValue));
-  }, []);
-
   const handleStorageCapabilitySelect: SelectProps['onSelect'] = useCallback(
     (_event, value: string) => {
-      if (storageCapabilities.includes(value)) {
-        handleStorageCapabilityUncheck(value);
-      } else {
-        handleStorageCapabilityCheck(value);
-      }
+      setStorageCapabilities((prev) =>
+        prev.includes(value)
+          ? removeStorageCapability(prev, value)
+          : addStorageCapability(prev, value),
+      );
     },
-    [storageCapabilities, handleStorageCapabilityCheck, handleStorageCapabilityUncheck],
+    [],
   );
 
-  const handleTestSuiteSelect: SelectProps['onSelect'] = useCallback(
-    (_event, value: string) => {
-      if (selectedTestSuites.includes(value)) {
-        handleTestSuiteUncheck(value);
-      } else {
-        handleTestSuiteCheck(value);
-      }
-    },
-    [selectedTestSuites, handleTestSuiteCheck, handleTestSuiteUncheck],
-  );
+  const handleTestSuiteSelect: SelectProps['onSelect'] = useCallback((_event, value: string) => {
+    setSelectedTestSuites((prev) =>
+      prev.includes(value) ? removeTestSuite(prev, value) : addTestSuite(prev, value),
+    );
+  }, []);
 
-  const testSuitesToggleTitle = useMemo(() => {
-    if (selectedTestSuites.length === TEST_SUITES.length) {
-      return t('All');
-    }
-    return t('Test suites');
-  }, [selectedTestSuites, t]);
+  const testSuitesToggleTitle = useMemo(
+    () => getTestSuitesToggleTitle(selectedTestSuites, t),
+    [selectedTestSuites, t],
+  );
 
   return (
     <>
@@ -174,7 +167,7 @@ const CheckupsSelfValidationForm = () => {
                 />
               </FormGroup>
               <AdvancedSettings
-                defaultSC={defaultSC}
+                effectiveStorageClassName={effectiveStorageClass}
                 handleStorageCapabilitySelect={handleStorageCapabilitySelect}
                 isDryRun={isDryRun}
                 pvcSize={pvcSize}
@@ -183,9 +176,11 @@ const CheckupsSelfValidationForm = () => {
                 setStorageClass={setStorageClass}
                 setTestSkips={setTestSkips}
                 storageCapabilities={storageCapabilities}
-                storageClass={storageClass}
                 storageClasses={storageClasses}
                 storageClassesLoaded={storageClassesLoaded}
+                storageProfileError={Boolean(storageProfileError)}
+                storageProfileHasClaimPropertySets={Boolean(claimPropertySets?.length)}
+                storageProfileLoaded={storageProfileLoaded}
                 testSkips={testSkips}
               />
 
@@ -196,7 +191,7 @@ const CheckupsSelfValidationForm = () => {
                 pvcSize={pvcSize}
                 selectedTestSuites={selectedTestSuites}
                 storageCapabilities={storageCapabilities}
-                storageClass={storageClass || defaultSC?.metadata?.name}
+                storageClass={effectiveStorageClass}
                 testSkips={testSkips}
               />
             </FormSection>
