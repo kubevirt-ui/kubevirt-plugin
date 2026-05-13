@@ -25,10 +25,7 @@ import useVMWizardStore from '@virtualmachines/creation-wizard/state/vm-wizard-s
 import useBootVolumeColumns from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/BootSourceStep/components/BootableVolumeList/hooks/useBootVolumeColumns';
 import useBootVolumeFilters from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/BootSourceStep/components/BootableVolumeList/hooks/useBootVolumeFilters';
 import useBootVolumeSortColumns from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/BootSourceStep/components/BootableVolumeList/hooks/useBootVolumeSortColumns';
-import {
-  paginationInitialStateForm,
-  paginationInitialStateModal,
-} from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/BootSourceStep/components/BootableVolumeList/utils/constants';
+import { paginationInitialStateForm } from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/BootSourceStep/components/BootableVolumeList/utils/constants';
 import {
   filterBootableVolumesByPreference,
   isLinuxGenericPreference,
@@ -36,7 +33,6 @@ import {
 
 type UseBootableVolumesTableData = (
   volumeListNamespace: string,
-  displayShowAllButton: boolean,
   preferencesMap: ResourceMap<V1beta1VirtualMachineClusterPreference>,
   userPreferencesMap: NamespacedResourceMap<V1beta1VirtualMachinePreference>,
 ) => {
@@ -61,7 +57,6 @@ type UseBootableVolumesTableData = (
 
 const useBootableVolumesTableData: UseBootableVolumesTableData = (
   volumeListNamespace,
-  displayShowAllButton,
   preferencesMap,
   userPreferencesMap,
 ) => {
@@ -82,26 +77,23 @@ const useBootableVolumesTableData: UseBootableVolumesTableData = (
   const [favorites = [], updaterFavorites] = favoritesData;
   const volumeFavorites = favorites as [];
 
-  const allFilters = useBootVolumeFilters(preferenceFilteredVolumes, !displayShowAllButton);
+  const allFilters = useBootVolumeFilters(preferenceFilteredVolumes);
 
   const filters = useMemo(() => {
     if (!preference || isLinuxGenericPreference(preference)) return allFilters;
-    const osFilterType = `osName${!displayShowAllButton && '-modal'}`;
-    return allFilters.filter((f) => f.type !== osFilterType);
-  }, [allFilters, preference, displayShowAllButton]);
+    return allFilters.filter((f) => f.type !== 'osName');
+  }, [allFilters, preference]);
 
   const [unfilteredData, data, onFilterChange] = useListPageFilter(
     preferenceFilteredVolumes,
     filters,
   );
 
-  const [pagination, setPagination] = useState(
-    displayShowAllButton ? paginationInitialStateForm : paginationInitialStateModal,
-  );
+  const [pagination, setPagination] = useState(paginationInitialStateForm);
 
   useEffect(() => {
-    setPagination(displayShowAllButton ? paginationInitialStateForm : paginationInitialStateModal);
-  }, [preference, displayShowAllButton]);
+    setPagination(paginationInitialStateForm);
+  }, [preference]);
 
   const { getSortType, sortedData, sortedPaginatedData } = useBootVolumeSortColumns(
     data,
@@ -115,10 +107,7 @@ const useBootableVolumesTableData: UseBootableVolumesTableData = (
     dvSources,
   );
 
-  const { activeColumns, columnLayout, loadedColumns } = useBootVolumeColumns(
-    volumeListNamespace,
-    !displayShowAllButton,
-  );
+  const { activeColumns, columnLayout, loadedColumns } = useBootVolumeColumns(volumeListNamespace);
 
   return {
     activeColumns,

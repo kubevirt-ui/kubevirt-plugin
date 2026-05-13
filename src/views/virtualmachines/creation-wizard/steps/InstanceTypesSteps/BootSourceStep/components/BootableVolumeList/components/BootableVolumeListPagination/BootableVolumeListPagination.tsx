@@ -4,18 +4,16 @@ import { PaginationState } from '@kubevirt-utils/hooks/usePagination/utils/types
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { Pagination } from '@patternfly/react-core';
 
-import { paginationDefaultValuesForm, paginationDefaultValuesModal } from '../../utils/constants';
+import { paginationDefaultValuesForm } from '../../utils/constants';
 
 type BootableVolumeListPaginationProps = {
   data: BootableVolume[];
-  displayShowAllButton: boolean;
   pagination: PaginationState;
   setPagination: Dispatch<SetStateAction<PaginationState>>;
 };
 
 const BootableVolumeListPagination: FC<BootableVolumeListPaginationProps> = ({
   data,
-  displayShowAllButton,
   pagination,
   setPagination,
 }) => {
@@ -35,14 +33,11 @@ const BootableVolumeListPagination: FC<BootableVolumeListPaginationProps> = ({
       onSetPage={(_e, page, perPage, startIndex, endIndex) =>
         onPageChange({ endIndex, page, perPage, startIndex })
       }
-      perPageOptions={
-        displayShowAllButton ? paginationDefaultValuesForm : paginationDefaultValuesModal
-      }
-      isCompact={displayShowAllButton}
       isLastFullPageShown
       itemCount={data?.length}
       page={pagination?.page}
       perPage={pagination?.perPage}
+      perPageOptions={paginationDefaultValuesForm}
     />
   );
 };
