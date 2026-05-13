@@ -1,6 +1,9 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
 reviews:
   profile: chill
   high_level_summary: true
+  # required for pre_merge_checks with mode:error to actually block the PR
+  request_changes_workflow: true
   auto_review:
     auto_incremental_review: true
     enabled: true
@@ -10,12 +13,64 @@ reviews:
   path_filters:
     - '!locales/**'
   collapse_walkthrough: true
+  # Block merging for Epics/Stories that have no Playwright tests.
+  # The check also instructs CodeRabbit to apply do-not-merge/no-tests-added.
+  pre_merge_checks:
+    custom_checks:
+      - name: 'Playwright tests required for Epics/Stories'
+        mode: 'error'
+        instructions: |
+          Perform the following steps to determine PASS or FAIL:
+
+          Step 1 - Extract Jira ticket ID.
+          Parse the PR title for a ticket ID matching CNV-<digits>.
+          If no ID is found, PASS.
+
+          Step 2 - Fetch the Jira ticket.
+          Use the Jira integration to read the issue type for that ticket ID.
+          If the ticket cannot be fetched for any reason, PASS (fail-safe).
+
+          Step 3 - Check issue type.
+          If the issue type is NOT "Epic" or "Story" (e.g. Bug, Task, Sub-task), PASS.
+
+          Step 4 - Check whether the Epic/Story is a new feature (not chore/CI).
+          Read the Jira ticket title, description, and labels. Also inspect the PR
+          title, description, and changed files for signals. PASS without enforcement if
+          any of the following are true:
+          - The Jira ticket or PR title/description uses keywords like: chore, ci,
+            refactor, cleanup, dependency, bump, upgrade, lint, config, workflow,
+            documentation, docs, i18n, translation, test-infra, tooling, release,
+            cherry-pick, revert, hotfix, infrastructure.
+          - The changed files are exclusively in: .github/, .cursor/, scripts/,
+            locales/, *.md, *.yaml, *.yml, *.json (config/lock files), or similar
+            non-feature paths.
+          - The PR title starts with "chore:", "ci:", "docs:", "refactor:",
+            "build:", "release:", or "revert:".
+          Only continue to Step 5 when the Epic/Story clearly describes a
+          new user-facing feature or enhancement.
+
+          Step 5 - Check for actual Playwright test or page-object files.
+          Inspect the PR diff for files under playwright/tests/** or playwright/pages/**.
+          Do NOT count playwright/fixtures/**, playwright/utils/**, playwright/types/**,
+          or playwright/tsconfig.json — those are pure helpers with no test logic.
+          - At least one file added or modified under playwright/tests/ or
+            playwright/pages/ -> PASS.
+          - Only fixture/util/type files changed, or no playwright/ files at all ->
+            FAIL and apply the label "do-not-merge/no-tests-added" with this message:
+            "This PR is linked to a Jira Epic/Story for a new feature but no
+            Playwright test or page-object files were added under playwright/tests/
+            or playwright/pages/. Please add or update those files, or ask a
+            maintainer to remove the do-not-merge/no-tests-added label."
 
 knowledge_base:
   code_guidelines:
     enabled: true
     filePatterns:
-      - '**/CODING_STANDARDS.md'
+      - '**​/CODING_STANDARDS.md'
+  jira:
+    usage: enabled
+    project_keys:
+      - CNV
 
 chat:
   integrations:
