@@ -5,6 +5,7 @@ import {
   V1beta1DataVolumeSpec,
   V1ContainerDiskSource,
   V1DataVolumeTemplateSpec,
+  V1PersistentVolumeClaimVolumeSource,
   V1VirtualMachine,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { ROOTDISK } from '@kubevirt-utils/constants/constants';
@@ -26,7 +27,11 @@ export const getRegistryHelperText = (template: V1Template) => {
 export const getDiskSource = (
   vm: V1VirtualMachine,
   diskName: string,
-): undefined | V1beta1DataVolumeSpec | V1ContainerDiskSource => {
+):
+  | undefined
+  | V1beta1DataVolumeSpec
+  | V1ContainerDiskSource
+  | V1PersistentVolumeClaimVolumeSource => {
   if (!diskName) return;
 
   const disk = getDisks(vm)?.find((d) => d.name === diskName);
@@ -36,6 +41,10 @@ export const getDiskSource = (
 
   if (volume.containerDisk) {
     return volume.containerDisk;
+  }
+
+  if (volume.persistentVolumeClaim) {
+    return volume.persistentVolumeClaim;
   }
 
   if (volume.dataVolume) {
@@ -56,11 +65,6 @@ const emptySourceDataVolume: V1DataVolumeTemplateSpec = {
   spec: {},
 };
 
-const createDataVolumeWithSource = (customSource: V1beta1DataVolumeSpec) => ({
-  ...emptySourceDataVolume,
-  spec: customSource,
-});
-
 export const overrideVirtualMachineDataVolumeSpec = (
   virtualMachine: V1VirtualMachine,
   diskName: string,
@@ -78,16 +82,20 @@ export const overrideVirtualMachineDataVolumeSpec = (
     if (isEmpty(customSource)) return;
 
     if (isEmpty(rootDataVolume)) {
-      draftVM.spec.template.spec.volumes = getVolumes(draftVM).filter((v) => v.name !== ROOTDISK);
+      draftVM.spec.template.spec.volumes = getVolumes(draftVM).filter((v) => v.name !== diskName);
       draftVM.spec.template.spec.volumes.push({
         dataVolume: {
-          name: `dv-${ROOTDISK}`,
+          name: `dv-${diskName}`,
         },
-        name: ROOTDISK,
+        name: diskName,
       });
 
       draftVM.spec.dataVolumeTemplates ??= [];
-      draftVM.spec.dataVolumeTemplates.push(createDataVolumeWithSource(customSource));
+      draftVM.spec.dataVolumeTemplates.push({
+        ...emptySourceDataVolume,
+        metadata: { ...emptySourceDataVolume.metadata, name: `dv-${diskName}` },
+        spec: customSource,
+      });
 
       return;
     }
