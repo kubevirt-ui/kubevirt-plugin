@@ -7,15 +7,29 @@ import { vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { DescriptionList, ExpandableSection } from '@patternfly/react-core';
 import useVMWizardStore from '@virtualmachines/creation-wizard/state/vm-wizard-store/useVMWizardStore';
+import { isCloneCreationMethod } from '@virtualmachines/creation-wizard/utils/utils';
+
+import CloneDescriptionInput from './CloneDescriptionInput';
+import CloneNameInput from './CloneNameInput';
 
 const ReviewGridLeftColumn: FC = () => {
   const { t } = useKubevirtTranslation();
   const vm = vmSignal.value;
-  const { project } = useVMWizardStore();
+  const { creationMethod, project, vmName } = useVMWizardStore();
+
+  const isCloneMethod = isCloneCreationMethod(creationMethod);
 
   return (
     <ExpandableSection isExpanded isIndented toggleText={t('Details')}>
       <DescriptionList isHorizontal>
+        {isCloneMethod ? (
+          <>
+            <CloneNameInput />
+            <CloneDescriptionInput />
+          </>
+        ) : (
+          <DescriptionItem descriptionData={vmName || NO_DATA_DASH} descriptionHeader={t('Name')} />
+        )}
         <DescriptionItem
           descriptionData={getCluster(vm) || NO_DATA_DASH}
           descriptionHeader={t('Cluster')}

@@ -2,15 +2,15 @@ import { VMWizardState } from '@virtualmachines/creation-wizard/state/vm-wizard-
 import { VMCreationMethod, VMWizardStep } from '@virtualmachines/creation-wizard/utils/constants';
 
 export const initialVMWizardState: VMWizardState = {
-  cloneVMDescription: '',
-  cloneVMName: '',
   cluster: '',
   creationMethod: VMCreationMethod.INSTANCE_TYPE,
   folder: '',
-  isVMNameValid: false,
+  lastProcessedTemplateKey: '',
   project: '',
   selectedTemplate: null,
+  shouldCheckVMNameProperly: false,
   templatesDrawerIsOpen: false,
   visitedSteps: new Set([VMWizardStep.DEPLOYMENT_DETAILS]),
-  vmNameInteracted: false,
+  vmDescription: '',
+  vmName: undefined,
 };
