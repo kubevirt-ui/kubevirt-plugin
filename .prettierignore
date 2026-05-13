@@ -8,3 +8,6 @@ i18n-scripts/
 cypress/gui-test-screenshots
 cypress/cypress-a11y-report.json
 /locales
+
+# Helm templates contain Go template syntax that Prettier cannot parse
+ci-scripts/**/helm/**/templates/

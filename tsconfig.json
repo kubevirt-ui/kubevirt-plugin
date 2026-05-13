@@ -34,5 +34,11 @@
     "target": "es2021",
     "typeRoots": ["node_modules/@types", "@types"]
   },
-  "include": ["src/**/*", "images/**/*", "plugin-metadata.ts", "@types/**/*"]
+  "include": ["src/**/*", "images/**/*", "plugin-metadata.ts", "@types/**/*"],
+
+  "ts-node": {
+    "compilerOptions": {
+      "module": "commonjs" // node16 == commonjs or es2020 depending on package.json/type
+    }
+  }
 }

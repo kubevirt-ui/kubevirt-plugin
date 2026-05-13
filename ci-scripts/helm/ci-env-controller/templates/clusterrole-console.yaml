@@ -1,0 +1,114 @@
+# ClusterRole for the CI test stack console ServiceAccount.
+# Bound per CI run by the ci-test-stack Helm chart's ClusterRoleBinding.
+#
+# Permissions cover what the OpenShift console needs to proxy browser requests
+# (including WebSocket watch) for KubeVirt/CDI management, plus cluster-info
+# reads for the console UI chrome and overview pages.
+#
+# IMPORTANT: clusterrole-controller.yaml must be a SUPERSET of this file.
+# Any additions here must also be added there.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: ci-console
+  labels:
+    {{- include "ci-env-controller.labels" . | nindent 4 }}
+rules:
+  # Cluster info (console chrome, overview pages, cluster version banner)
+  - apiGroups: ['']
+    resources: ['nodes', 'namespaces']
+    verbs: ['get', 'list', 'watch']
+  - apiGroups: ['config.openshift.io']
+    resources: ['consoles', 'clusterversions', 'ingresses', 'infrastructures', 'dnses']
+    verbs: ['get', 'list', 'watch']
+  - apiGroups: ['storage.k8s.io']
+    resources: ['storageclasses']
+    verbs: ['get', 'list', 'watch']
+
+  # Operator lifecycle (HCO subscription/CSV status, console watches these via WebSocket)
+  - apiGroups: ['operators.coreos.com']
+    resources: ['clusterserviceversions', 'subscriptions']
+    verbs: ['get', 'list', 'watch']
+  - apiGroups: ['packages.operators.coreos.com']
+    resources: ['packagemanifests']
+    verbs: ['get', 'list']
+
+  # Console operator config (console watches its own operator CR)
+  - apiGroups: ['operator.openshift.io']
+    resources: ['consoles']
+    verbs: ['get', 'list', 'watch']
+
+  # Console UI resources (notifications, quick starts, links, plugins, YAML samples)
+  - apiGroups: ['console.openshift.io']
+    resources:
+      - consoleplugins
+      - consolenotifications
+      - consolequickstarts
+      - consolelinks
+      - consoleyamlsamples
+    verbs: ['get', 'list', 'watch']
+
+  # User identity (console watches current user, even with disabled auth)
+  - apiGroups: ['user.openshift.io']
+    resources: ['users']
+    verbs: ['get', 'list', 'watch']
+
+  # Projects (self-scoped, but console needs watch for project list)
+  - apiGroups: ['project.openshift.io']
+    resources: ['projects']
+    verbs: ['get', 'list', 'watch']
+
+  # Core namespaced resources (VM creation, test fixtures, etc.)
+  - apiGroups: ['']
+    resources:
+      - pods
+      - pods/log
+      - services
+      - secrets
+      - configmaps
+      - events
+      - serviceaccounts
+      - persistentvolumeclaims
+    verbs: ['get', 'list', 'watch', 'create', 'update', 'patch', 'delete']
+
+  # KubeVirt
+  - apiGroups: ['kubevirt.io']
+    resources:
+      - kubevirts
+      - virtualmachines
+      - virtualmachineinstances
+      - virtualmachineinstancemigrations
+    verbs: ['get', 'list', 'watch', 'create', 'update', 'patch', 'delete']
+  - apiGroups: ['subresources.kubevirt.io']
+    resources:
+      - virtualmachineinstances/console
+      - virtualmachineinstances/vnc
+    verbs: ['get']
+  - apiGroups: ['instancetype.kubevirt.io']
+    resources:
+      - virtualmachineclusterinstancetypes
+      - virtualmachineinstancetypes
+      - virtualmachineclusterpreferences
+      - virtualmachinepreferences
+    verbs: ['get', 'list', 'watch']
+
+  # CDI
+  - apiGroups: ['cdi.kubevirt.io']
+    resources: ['cdis', 'cdiconfigs', 'datavolumes', 'datasources']
+    verbs: ['get', 'list', 'watch', 'create', 'update', 'patch', 'delete']
+
+  # HCO operand reads (version checks, overview status)
+  - apiGroups: ['ssp.kubevirt.io']
+    resources: ['ssps']
+    verbs: ['get', 'list']
+  - apiGroups: ['networkaddonsoperator.network.kubevirt.io']
+    resources: ['networkaddonsconfigs']
+    verbs: ['get', 'list']
+  - apiGroups: ['hostpathprovisioner.kubevirt.io']
+    resources: ['hostpathprovisioners']
+    verbs: ['get', 'list']
+
+  # Snapshots
+  - apiGroups: ['snapshot.storage.k8s.io']
+    resources: ['volumesnapshots']
+    verbs: ['get', 'list', 'watch', 'create', 'update', 'patch', 'delete']

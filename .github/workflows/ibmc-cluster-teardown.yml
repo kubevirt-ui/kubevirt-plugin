@@ -1,0 +1,124 @@
+name: IBM Cloud Hot Cluster Teardown
+
+on:
+  workflow_dispatch:
+    inputs:
+      cluster_name:
+        description: 'Cluster name to tear down'
+        required: true
+        default: 'kubevirt-plugin-ci'
+        type: string
+  workflow_call:
+    inputs:
+      cluster_name:
+        description: 'Cluster name to tear down'
+        required: false
+        default: 'kubevirt-plugin-ci'
+        type: string
+    secrets:
+      IBM_CLOUD_API_KEY:
+        required: true
+      BOT_PAT:
+        required: false
+
+permissions:
+  contents: read
+
+env:
+  CLUSTER_NAME: ${{ inputs.cluster_name || 'kubevirt-plugin-ci' }}
+
+jobs:
+  teardown:
+    name: Tear Down Hot Cluster
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Setup IBM Cloud CLI
+        uses: IBM/actions-ibmcloud-cli@v1
+        with:
+          api_key: ${{ secrets.IBM_CLOUD_API_KEY }}
+          plugins: kubernetes-service
+
+      - name: Check cluster exists
+        id: check_cluster
+        run: |
+          if ibmcloud oc cluster get --cluster "${CLUSTER_NAME}" &>/dev/null; then
+            echo "Cluster '${CLUSTER_NAME}' found"
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+
+            ibmcloud oc cluster config --cluster "${CLUSTER_NAME}" --admin || true
+          else
+            echo "Cluster '${CLUSTER_NAME}' not found, nothing to tear down"
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Deregister ARC runners
+        if: steps.check_cluster.outputs.exists == 'true'
+        continue-on-error: true
+        run: |
+          if command -v helm &>/dev/null || (curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash); then
+            echo "Uninstalling ARC runner scale set..."
+            helm uninstall kubevirt-plugin-ci --namespace arc-runners --wait --timeout 5m 2>/dev/null || echo "Runner scale set not found or already removed"
+
+            echo "Uninstalling ARC controller..."
+            helm uninstall arc --namespace arc-systems --wait --timeout 5m 2>/dev/null || echo "ARC controller not found or already removed"
+          else
+            echo "WARNING: Helm not available, skipping Helm uninstall"
+          fi
+
+      - name: Delete cluster
+        if: steps.check_cluster.outputs.exists == 'true'
+        run: |
+          echo "Deleting cluster '${CLUSTER_NAME}'..."
+          ibmcloud oc cluster rm --cluster "${CLUSTER_NAME}" -f --force-delete-storage
+          echo "Cluster deletion initiated"
+
+          echo "Waiting for cluster to be fully removed..."
+          MAX_WAIT=7200  # 2 hours
+          INTERVAL=30
+          ELAPSED=0
+
+          while [[ ${ELAPSED} -lt ${MAX_WAIT} ]]; do
+            if ! ibmcloud oc cluster get --cluster "${CLUSTER_NAME}" &>/dev/null; then
+              echo "Cluster has been removed"
+              break
+            fi
+            echo "[$(date '+%H:%M:%S')] Cluster still being deleted... (${ELAPSED}s elapsed)"
+            sleep ${INTERVAL}
+            ELAPSED=$((ELAPSED + INTERVAL))
+          done
+
+          if ibmcloud oc cluster get --cluster "${CLUSTER_NAME}" &>/dev/null; then
+            echo "::error::Timed out waiting for cluster deletion"
+            exit 1
+          fi
+
+      # TODO: Followup about how to manually delete "Runner scale sets" from ARC
+      - name: Clean up ghost runners
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.BOT_PAT }}
+        run: |
+          echo "Checking for offline self-hosted runners..."
+          RUNNERS=$(gh api "/repos/${{ github.repository }}/actions/runners" --jq '.runners[] | select(.status == "offline") | select(.labels[].name == "kubevirt-plugin-ci") | .id' 2>/dev/null || true)
+
+          if [[ -z "${RUNNERS}" ]]; then
+            echo "No offline 'kubevirt-plugin-ci' runners found"
+          else
+            for runner_id in ${RUNNERS}; do
+              echo "Deleting offline runner ${runner_id}..."
+              gh api -X DELETE "/repos/${{ github.repository }}/actions/runners/${runner_id}" || echo "Failed to delete runner ${runner_id}"
+            done
+            echo "Ghost runner cleanup complete"
+          fi
+
+      - name: Teardown summary
+        if: always()
+        run: |
+          echo "## Hot Cluster Teardown Summary" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Parameter | Value |" >> "$GITHUB_STEP_SUMMARY"
+          echo "|-----------|-------|" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Cluster | \`${CLUSTER_NAME}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Cluster Found | \`${{ steps.check_cluster.outputs.exists }}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
