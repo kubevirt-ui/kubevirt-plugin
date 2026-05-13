@@ -17,4 +17,3 @@ scripts/console-client-secret
 
 # Personal Cursor rules (not shared with team)
 .cursor/rules/personal-*.mdc
-.playwright-mcp/

@@ -14,6 +14,9 @@ export const paginationInitialStateForm: PaginationState = {
 
 export const WINDOWS_BOOTSOURCE_PIPELINE = 'windows-bootsource-pipeline';
 
+export const OS_NAME_FILTER_TYPE = 'osName';
+export const RESOURCE_KIND_FILTER_TYPE = 'resourceKind';
+
 export const NAME_COLUMN_ID = 'name';
 export const NAMESPACE_COLUMN_ID = 'namespace';
 export const FAVORITES_COLUMN_ID = 'favorites';

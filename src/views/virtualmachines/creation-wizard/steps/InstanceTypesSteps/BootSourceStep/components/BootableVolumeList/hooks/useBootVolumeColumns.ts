@@ -18,7 +18,7 @@ import {
 
 type UseBootVolumesColumns = (volumeListNamespace: string) => {
   activeColumns: TableColumn<BootableVolume>[];
-  columnLayout: ColumnLayout | null;
+  columnLayout: ColumnLayout;
   columns: TableColumn<BootableVolume>[];
   loadedColumns: boolean;
 };
