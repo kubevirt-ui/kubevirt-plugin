@@ -26,10 +26,7 @@ import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 
 import { getBootVolumeOS } from '../utils/utils';
 
-const useBootVolumeFilters = (
-  bootableVolumes: BootableVolume[],
-  isModal: boolean,
-): RowFilter<BootableVolume>[] => {
+const useBootVolumeFilters = (bootableVolumes: BootableVolume[]): RowFilter<BootableVolume>[] => {
   const { t } = useKubevirtTranslation();
 
   const workloadsArchitecturesItems = useMemo(
@@ -76,7 +73,7 @@ const useBootVolumeFilters = (
         filterGroupName: t('Operating system'),
         items: OS_NAMES,
         reducer: (obj) => getItemNameWithOther(getBootVolumeOS(obj), OS_NAMES),
-        type: `osName${isModal && '-modal'}`,
+        type: 'osName',
       },
       {
         filter: (availableResourceNames, obj) =>
@@ -90,7 +87,7 @@ const useBootVolumeFilters = (
           },
         ],
         reducer: (obj) => obj?.kind,
-        type: `resourceKind${isModal && '-modal'}`,
+        type: 'resourceKind',
       },
       {
         filter: (filters, obj) => isEmpty(filters?.selected?.length) || isBootableVolumeISO(obj),
@@ -105,7 +102,7 @@ const useBootVolumeFilters = (
         type: ISO,
       },
     ],
-    [workloadsArchitecturesItems, t, isModal],
+    [workloadsArchitecturesItems, t],
   );
 };
 export default useBootVolumeFilters;

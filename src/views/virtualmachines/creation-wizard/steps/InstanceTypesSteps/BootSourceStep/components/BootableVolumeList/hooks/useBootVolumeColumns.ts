@@ -16,17 +16,14 @@ import {
   STORAGE_CLASS_COLUMN_ID,
 } from '../utils/constants';
 
-type UseBootVolumesColumns = (
-  volumeListNamespace: string,
-  isModal: boolean,
-) => {
+type UseBootVolumesColumns = (volumeListNamespace: string) => {
   activeColumns: TableColumn<BootableVolume>[];
   columnLayout: ColumnLayout | null;
   columns: TableColumn<BootableVolume>[];
   loadedColumns: boolean;
 };
 
-const useBootVolumeColumns: UseBootVolumesColumns = (volumeListNamespace, isModal) => {
+const useBootVolumeColumns: UseBootVolumesColumns = (volumeListNamespace) => {
   const { t } = useKubevirtTranslation();
 
   const columns: TableColumn<BootableVolume>[] = [
@@ -85,7 +82,7 @@ const useBootVolumeColumns: UseBootVolumesColumns = (volumeListNamespace, isModa
     type: t('Bootable volumes'),
   };
 
-  return { activeColumns, columnLayout: isModal ? null : columnLayout, columns, loadedColumns };
+  return { activeColumns, columnLayout, columns, loadedColumns };
 };
 
 export default useBootVolumeColumns;
