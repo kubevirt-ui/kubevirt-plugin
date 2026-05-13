@@ -5,15 +5,22 @@ import { clearCustomizeInstanceType } from '@kubevirt-utils/store/customizeInsta
 import useInstanceTypeVMStore from '@virtualmachines/creation-wizard/state/instance-type-vm-store/useInstanceTypeVMStore';
 import { initialVMWizardState } from '@virtualmachines/creation-wizard/state/vm-wizard-store/utils/state';
 import { VMWizardStore } from '@virtualmachines/creation-wizard/state/vm-wizard-store/utils/types';
-import { VMCreationMethod } from '@virtualmachines/creation-wizard/utils/constants';
+import { VMCreationMethod, VMWizardStep } from '@virtualmachines/creation-wizard/utils/constants';
 
 const useVMWizardStore = create<VMWizardStore>()((set) => {
   return {
     ...initialVMWizardState,
+    markStepVisited: (stepId: string) =>
+      set((state) => {
+        if (state.visitedSteps.has(stepId)) return state;
+        const next = new Set(state.visitedSteps);
+        next.add(stepId);
+        return { visitedSteps: next };
+      }),
     resetWizardState: () => {
       clearCustomizeInstanceType();
       useInstanceTypeVMStore.getState().resetInstanceTypeVMState();
-      set({ ...initialVMWizardState });
+      set({ ...initialVMWizardState, visitedSteps: new Set([VMWizardStep.DEPLOYMENT_DETAILS]) });
     },
     setCloneVMDescription: (cloneVMDescription: string) => set({ cloneVMDescription }),
     setCloneVMName: (cloneVMName: string) => set({ cloneVMName }),

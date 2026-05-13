@@ -11,7 +11,13 @@ import {
 import CloneIcon from '@virtualmachines/creation-wizard/steps/DeploymentDetailsStep/components/CreationMethodTileGroup/components/CreationMethodTile/components/CloneIcon';
 import { InstanceTypeIcon } from '@virtualmachines/creation-wizard/steps/DeploymentDetailsStep/components/CreationMethodTileGroup/components/CreationMethodTile/components/InstanceTypeIcon';
 import TemplateIcon from '@virtualmachines/creation-wizard/steps/DeploymentDetailsStep/components/CreationMethodTileGroup/components/CreationMethodTile/components/TemplateIcon';
-import { VMCreationMethod } from '@virtualmachines/creation-wizard/utils/constants';
+import {
+  CLONE_FLOW,
+  INSTANCE_TYPE_FLOW,
+  TEMPLATE_FLOW,
+  VMCreationMethod,
+  VMWizardStep,
+} from '@virtualmachines/creation-wizard/utils/constants';
 
 export const isCloneCreationMethod = (creationMethod: VMCreationMethod) =>
   creationMethod === VMCreationMethod.CLONE;
@@ -19,6 +25,13 @@ export const isTemplateCreationMethod = (creationMethod: VMCreationMethod) =>
   creationMethod === VMCreationMethod.TEMPLATE;
 export const isInstanceTypeCreationMethod = (creationMethod: VMCreationMethod) =>
   creationMethod === VMCreationMethod.INSTANCE_TYPE;
+
+export const getActiveFlow = (creationMethod: VMCreationMethod): VMWizardStep[] => {
+  if (isInstanceTypeCreationMethod(creationMethod)) return INSTANCE_TYPE_FLOW;
+  if (isTemplateCreationMethod(creationMethod)) return TEMPLATE_FLOW;
+  if (isCloneCreationMethod(creationMethod)) return CLONE_FLOW;
+  return INSTANCE_TYPE_FLOW;
+};
 
 export const getVMCreationMethodsDetails = (t: TFunction) => {
   return {

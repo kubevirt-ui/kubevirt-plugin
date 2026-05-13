@@ -14,3 +14,30 @@ export enum VMWizardStep {
   REVIEW_AND_CREATE = 'vm-creation-review-and-create-step',
   TEMPLATE = 'vm-creation-template-step',
 }
+
+export const INSTANCE_TYPE_FLOW: VMWizardStep[] = [
+  VMWizardStep.DEPLOYMENT_DETAILS,
+  VMWizardStep.GUEST_OS,
+  VMWizardStep.BOOT_SOURCE,
+  VMWizardStep.COMPUTE_RESOURCES,
+  VMWizardStep.CUSTOMIZATION,
+  VMWizardStep.REVIEW_AND_CREATE,
+];
+
+export const TEMPLATE_FLOW: VMWizardStep[] = [
+  VMWizardStep.DEPLOYMENT_DETAILS,
+  VMWizardStep.TEMPLATE,
+  VMWizardStep.CUSTOMIZATION,
+  VMWizardStep.REVIEW_AND_CREATE,
+];
+
+export const CLONE_FLOW: VMWizardStep[] = [
+  VMWizardStep.DEPLOYMENT_DETAILS,
+  VMWizardStep.CLONE,
+  VMWizardStep.REVIEW_AND_CREATE,
+];
+
+export const VM_GENERATION_STEPS = new Set<number | string>([
+  VMWizardStep.TEMPLATE,
+  VMWizardStep.COMPUTE_RESOURCES,
+]);

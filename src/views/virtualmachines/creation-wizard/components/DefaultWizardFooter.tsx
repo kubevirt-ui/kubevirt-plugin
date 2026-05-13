@@ -6,7 +6,11 @@ import { useFlag } from '@openshift-console/dynamic-plugin-sdk';
 import { useWizardContext, WizardFooter } from '@patternfly/react-core';
 import useCloseWizard from '@virtualmachines/creation-wizard/hooks/useCloseWizard';
 
-const DefaultWizardFooter: FC = () => {
+type DefaultWizardFooterProps = {
+  isNextDisabled?: boolean;
+};
+
+const DefaultWizardFooter: FC<DefaultWizardFooterProps> = ({ isNextDisabled }) => {
   const { activeStep, goToNextStep, goToPrevStep } = useWizardContext();
   const closeWizard = useCloseWizard();
   const hasOLSConsole = useFlag(FLAG_LIGHTSPEED_PLUGIN);
@@ -16,6 +20,7 @@ const DefaultWizardFooter: FC = () => {
       activeStep={activeStep}
       cancelButtonProps={{ className: classnames({ 'pf-v6-u-mr-4xl': hasOLSConsole }) }}
       isBackDisabled={activeStep.index === 1}
+      isNextDisabled={isNextDisabled}
       onBack={goToPrevStep}
       onClose={closeWizard}
       onNext={goToNextStep}

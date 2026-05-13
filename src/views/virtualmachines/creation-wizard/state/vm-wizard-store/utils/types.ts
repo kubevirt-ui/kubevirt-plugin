@@ -11,10 +11,12 @@ export type VMWizardState = {
   project: string;
   selectedTemplate: Template;
   templatesDrawerIsOpen: boolean;
+  visitedSteps: Set<string>;
   vmNameInteracted: boolean;
 };
 
 export type VMWizardActions = {
+  markStepVisited: (stepId: string) => void;
   resetWizardState: () => void;
   setCloneVMDescription: (cloneVMDescription: string) => void;
   setCloneVMName: (cloneVMName: string) => void;

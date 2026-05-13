@@ -2,19 +2,21 @@ import React, { FC } from 'react';
 import classnames from 'classnames';
 
 import { FLAG_LIGHTSPEED_PLUGIN } from '@kubevirt-utils/flags/consts';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { useFlag } from '@openshift-console/dynamic-plugin-sdk';
 import { useWizardContext, WizardFooter } from '@patternfly/react-core';
 import useCloseWizard from '@virtualmachines/creation-wizard/hooks/useCloseWizard';
+import useWizardStepValidation from '@virtualmachines/creation-wizard/hooks/useWizardStepValidation';
 import useVMWizardStore from '@virtualmachines/creation-wizard/state/vm-wizard-store/useVMWizardStore';
 import useCreateVMFromTemplate from '@virtualmachines/creation-wizard/steps/TemplateStep/hooks/useCreateVMFromTemplate';
+import { VMWizardStep } from '@virtualmachines/creation-wizard/utils/constants';
 
-const TemplateStepFooter: FC = ({}) => {
+const TemplateStepFooter: FC = () => {
   const hasOLSConsole = useFlag(FLAG_LIGHTSPEED_PLUGIN);
   const { activeStep, goToNextStep, goToPrevStep } = useWizardContext();
   const { createVMFromTemplate } = useCreateVMFromTemplate();
   const closeWizard = useCloseWizard();
-  const { selectedTemplate, setTemplatesDrawerIsOpen } = useVMWizardStore();
+  const { setTemplatesDrawerIsOpen } = useVMWizardStore();
+  const { isNextDisabledForStep } = useWizardStepValidation();
 
   const handleGoToNextStep = async () => {
     await createVMFromTemplate();
@@ -27,7 +29,7 @@ const TemplateStepFooter: FC = ({}) => {
       activeStep={activeStep}
       cancelButtonProps={{ className: classnames({ 'pf-v6-u-mr-4xl': hasOLSConsole }) }}
       isBackDisabled={activeStep.index === 1}
-      isNextDisabled={isEmpty(selectedTemplate)}
+      isNextDisabled={isNextDisabledForStep(VMWizardStep.TEMPLATE)}
       onBack={goToPrevStep}
       onClose={closeWizard}
       onNext={handleGoToNextStep}
