@@ -32,10 +32,11 @@ const CheckupsStorageForm = () => {
   const cluster = useClusterParam();
   const [name, setName] = useState<string>(generatePrettyName('kubevirt-storage-checkup'));
   const [timeOut, setTimeOut] = useState<string>('10');
-  const [checkupImage, checkupImageLoaded, checkupImageLoadError] = useRelatedImage({
-    ...storageCheckupImageSettings,
-    cluster,
-  });
+  const [checkupImage, checkupImageLoaded, checkupImageLoadError, checkupImageIsFallback] =
+    useRelatedImage({
+      ...storageCheckupImageSettings,
+      cluster,
+    });
 
   const [advancedSettings, setAdvancedSettings] = useState<StorageCheckupAdvancedSettings>({
     numOfVMs: '',
@@ -102,11 +103,12 @@ const CheckupsStorageForm = () => {
                 value={timeOut}
               />
             </FormGroup>
-            {checkupImageLoadError && (
+            {(checkupImageLoadError || checkupImageIsFallback) && (
               <CheckupImageField
                 checkupImage={checkupImage}
                 checkupImageLoaded={checkupImageLoaded}
                 checkupImageLoadError={checkupImageLoadError}
+                isFallback={checkupImageIsFallback}
               />
             )}
             <AdvancedSettings
