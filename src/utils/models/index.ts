@@ -136,6 +136,30 @@ export const MultiNamespaceVirtualMachineStorageMigrationModel: K8sModel = {
   plural: 'multinamespacevirtualmachinestoragemigrations',
 };
 
+export const MigPlanModel: K8sModel = {
+  abbr: 'MP',
+  apiGroup: 'migration.openshift.io',
+  apiVersion: 'v1alpha1',
+  crd: true,
+  kind: 'MigPlan',
+  label: 'MigPlan',
+  labelPlural: 'MigPlans',
+  namespaced: true,
+  plural: 'migplans',
+};
+
+export const MigMigrationModel: K8sModel = {
+  abbr: 'MM',
+  apiGroup: 'migration.openshift.io',
+  apiVersion: 'v1alpha1',
+  crd: true,
+  kind: 'MigMigration',
+  label: 'MigMigration',
+  labelPlural: 'MigMigrations',
+  namespaced: true,
+  plural: 'migmigrations',
+};
+
 export const MultiClusterObservabilityModel: K8sModel = {
   abbr: 'MCO',
   apiGroup: 'observability.open-cluster-management.io',

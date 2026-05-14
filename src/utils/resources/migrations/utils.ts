@@ -6,6 +6,7 @@ import {
   STATUS_READY,
   STORAGE_MIGRATION_PHASE,
 } from './constants';
+import { getStorageMigrationPlanSpecNamespaces } from './selectors';
 
 const getMigrationConditionTimestamp = (
   migration: MultiNamespaceVirtualMachineStorageMigrationPlan,
@@ -36,7 +37,7 @@ export const getMigrationCompletedTimestamp = (
 export const getVolumeCountFromMigPlan = (
   migrationPlan: MultiNamespaceVirtualMachineStorageMigrationPlan,
 ) => {
-  return (migrationPlan?.spec?.namespaces ?? []).flatMap((namespaceMigration) =>
+  return getStorageMigrationPlanSpecNamespaces(migrationPlan).flatMap((namespaceMigration) =>
     (namespaceMigration?.virtualMachines ?? []).flatMap((vm) =>
       (vm?.targetMigrationPVCs ?? []).filter((pvc) => !isEmpty(pvc.destinationPVC)),
     ),
@@ -56,9 +57,9 @@ export const isMigrationCompleted = (
   migrationPlan: MultiNamespaceVirtualMachineStorageMigrationPlan,
 ) => {
   const statusNamespaces = getStatusNamespaces(migrationPlan);
-  const specNamespaces = migrationPlan?.spec?.namespaces;
+  const specNamespaces = getStorageMigrationPlanSpecNamespaces(migrationPlan);
 
-  if (!statusNamespaces?.length || statusNamespaces.length !== specNamespaces?.length) return false;
+  if (!statusNamespaces?.length || statusNamespaces.length !== specNamespaces.length) return false;
 
   return statusNamespaces.every(
     (namespaceStatus, index) =>

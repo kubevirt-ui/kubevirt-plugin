@@ -84,6 +84,7 @@ export const getFailedMigrations = (
 ): MigrationStatus[] =>
   plan?.status?.namespaces?.flatMap((ns) => ns?.[STORAGE_MIGRATION_PHASE.FAILED] ?? []) ?? [];
 
+/** Maps completion/failure/in-progress to EmptyState heading, icon, and PatternFly status. */
 export const getMigrationStateConfig = (
   migrationCompleted: boolean,
   hasFailed: boolean,
@@ -93,18 +94,21 @@ export const getMigrationStateConfig = (
   migrationIcon: typeof CheckCircleIcon;
   migrationStatus: EmptyStateStatus;
 } => {
-  if (migrationCompleted)
+  if (migrationCompleted) {
     return {
       migrationHeading: t('Storage migration completed'),
       migrationIcon: CheckCircleIcon,
       migrationStatus: EmptyStateStatus.success,
     };
-  if (hasFailed)
+  }
+  if (hasFailed) {
     return {
       migrationHeading: t('Storage migration failed'),
       migrationIcon: ExclamationCircleIcon,
       migrationStatus: EmptyStateStatus.danger,
     };
+  }
+  // No definitive outcome yet (including APIs that have not populated status) → in progress.
   return {
     migrationHeading: t('Storage migration in progress...'),
     migrationIcon: CogIcon,

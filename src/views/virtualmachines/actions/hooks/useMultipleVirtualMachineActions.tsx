@@ -10,12 +10,14 @@ import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useProviderByClusterName from '@multicluster/components/CrossClusterMigration/hooks/useProviderByClusterName';
 import { getCluster } from '@multicluster/helpers/selectors';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { useHubClusterName } from '@stolostron/multicluster-sdk';
 import { isPaused, isRunning, isStopped } from '@virtualmachines/utils';
 import { getVMIMFromMapper, VMIMMapper } from '@virtualmachines/utils/mappers';
 
 import { createBulkVirtualMachineActionFactory } from '../BulkVirtualMachineActionFactory';
 
+import useClusterStorageMigrationAPI from './storageMigrationApi/useClusterStorageMigrationAPI';
 import { ACTIONS_ID } from './constants';
 import useIsMTVInstalled from './useIsMTVInstalled';
 import useVirtualMachineActionsProvider from './useVirtualMachineActionsProvider';
@@ -38,15 +40,22 @@ const useMultipleVirtualMachineActions: UseMultipleVirtualMachineActions = (
   const { featureEnabled: treeViewFoldersEnabled } = useFeatures(TREE_VIEW_FOLDERS);
   const [mtvInstalled] = useIsMTVInstalled();
   const [hubClusterName] = useHubClusterName();
+  const clusterParam = useClusterParam();
+  const effectiveCluster = getCluster(vms?.[0]) ?? clusterParam ?? undefined;
 
-  const [provider, providerLoaded] = useProviderByClusterName(
-    getCluster(vms?.[0]) ?? hubClusterName,
-  );
+  const [provider, providerLoaded] = useProviderByClusterName(effectiveCluster ?? hubClusterName);
+
+  const storageMigAPI = useClusterStorageMigrationAPI(effectiveCluster);
 
   const singleVM = vms?.[0];
   const [singleVMActions] = useVirtualMachineActionsProvider(
     singleVM,
-    getVMIMFromMapper(vmimMapper, getName(singleVM), getNamespace(singleVM), getCluster(singleVM)),
+    getVMIMFromMapper(
+      vmimMapper,
+      getName(singleVM),
+      getNamespace(singleVM),
+      effectiveCluster ?? getCluster(singleVM),
+    ),
   );
 
   const BulkVirtualMachineActionFactory = useMemo(
@@ -63,7 +72,11 @@ const useMultipleVirtualMachineActions: UseMultipleVirtualMachineActions = (
     const clusters = new Set(vms?.map((vm) => getCluster(vm)));
 
     const migrateCompute = BulkVirtualMachineActionFactory.migrateCompute(vms, createModal);
-    const migrateStorage = BulkVirtualMachineActionFactory.migrateStorage(vms, createModal);
+    const migrateStorage = BulkVirtualMachineActionFactory.migrateStorage(
+      vms,
+      createModal,
+      storageMigAPI,
+    );
 
     const migrationActions =
       clusters.size === 1 ? [migrateCompute, migrateStorage] : [migrateCompute];
@@ -120,6 +133,8 @@ const useMultipleVirtualMachineActions: UseMultipleVirtualMachineActions = (
     mtvInstalled,
     provider,
     providerLoaded,
+    storageMigAPI,
+    t,
     treeViewFoldersEnabled,
     vms,
     vmimMapper,

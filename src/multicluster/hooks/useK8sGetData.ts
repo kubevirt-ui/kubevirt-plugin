@@ -35,10 +35,11 @@ const useK8sGetData = <T extends K8sResourceCommon>(
           setLoaded(true);
         }
       })
-      .catch((err: Error) => {
+      .catch((err: unknown) => {
+        const normalizedError = err instanceof Error ? err : new Error(String(err));
         if (!canceled) {
           setData(undefined);
-          setError(err);
+          setError(normalizedError);
           setLoaded(true);
         }
       });
