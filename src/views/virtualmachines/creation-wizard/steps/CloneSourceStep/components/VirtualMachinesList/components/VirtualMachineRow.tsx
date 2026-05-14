@@ -4,6 +4,7 @@ import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getCluster } from '@multicluster/helpers/selectors';
+import { Radio } from '@patternfly/react-core';
 import { Td, Tr } from '@patternfly/react-table';
 import { VMCallbacks } from '@virtualmachines/list/virtualMachinesDefinition';
 
@@ -38,9 +39,18 @@ const VirtualMachineRow: FC<VirtualMachineRowProps> = ({
   const handleOnClick = () => {
     setSelectedVM(vm);
   };
+  const rowId = `${vmCluster}-${vmNamespace}-${vmName}`;
 
   return (
-    <Tr isClickable isRowSelected={isRowSelected} isSelectable onClick={handleOnClick}>
+    <Tr isRowSelected={isRowSelected} onClick={handleOnClick}>
+      <Td className="pf-v6-u-pl-sm">
+        <Radio
+          id={`select-vm-${rowId}`}
+          isChecked={isRowSelected}
+          name="clone-source-vm"
+          onChange={handleOnClick}
+        />
+      </Td>
       {columns.map((col) => (
         <Td key={col.key} {...col.props}>
           {col.renderCell(vm, callbacks)}
