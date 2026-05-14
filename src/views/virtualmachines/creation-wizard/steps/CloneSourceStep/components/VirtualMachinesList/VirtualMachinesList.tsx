@@ -34,11 +34,11 @@ import useVirtualMachineInstanceMigrations from '@kubevirt-utils/resources/vmim/
 import { clearCustomizeInstanceType, vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
 import { PROJECT_LIST_FILTER_PARAM } from '@kubevirt-utils/utils/constants';
 import { isVM } from '@kubevirt-utils/utils/typeGuards';
-import { isEmpty, truncateToK8sName } from '@kubevirt-utils/utils/utils';
+import { truncateToK8sName } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import useIsAllClustersPage from '@multicluster/hooks/useIsAllClustersPage';
-import { K8sVerb, ListPageBody, useListPageFilter } from '@openshift-console/dynamic-plugin-sdk';
-import { Bullseye, Pagination, Split, SplitItem } from '@patternfly/react-core';
+import { K8sVerb, useListPageFilter } from '@openshift-console/dynamic-plugin-sdk';
+import { Label, Pagination, Split, SplitItem } from '@patternfly/react-core';
 import { useSignals } from '@preact/signals-react/runtime';
 import { useFleetAccessReview } from '@stolostron/multicluster-sdk';
 import useVMWizardStore from '@virtualmachines/creation-wizard/state/vm-wizard-store/useVMWizardStore';
@@ -46,7 +46,6 @@ import { useVirtualMachineInstanceMapper } from '@virtualmachines/list/hooks/use
 import useVMMetrics from '@virtualmachines/list/hooks/useVMMetrics';
 import { getListPageBodySize, ListPageBodySize } from '@virtualmachines/list/listPageBodySize';
 import { VM_FILTER_OPTIONS } from '@virtualmachines/list/utils/constants';
-import { filterVMsByClusterAndNamespace } from '@virtualmachines/list/utils/utils';
 import {
   getVMColumns,
   VM_COLUMN_KEYS,
@@ -54,7 +53,6 @@ import {
 } from '@virtualmachines/list/virtualMachinesDefinition';
 import { useAccessibleResources } from '@virtualmachines/search/hooks/useAccessibleResources';
 import useVMSearchQueries from '@virtualmachines/search/hooks/useVMSearchQueries';
-import { vmsSignal } from '@virtualmachines/tree/utils/signals';
 import { OBJECTS_FETCHING_LIMIT } from '@virtualmachines/utils';
 import { getVMIFromMapper, getVMIMFromMapper } from '@virtualmachines/utils/mappers';
 
@@ -213,13 +211,6 @@ const VirtualMachinesList = forwardRef(({}, ref) => {
 
   const loaded = vmsLoaded && vmisLoaded && vmimsLoaded && !loadingFeatureProxy && loadedColumns;
 
-  const allVMsInNamespace = useMemo(
-    () => filterVMsByClusterAndNamespace(vmsSignal.value, undefined, cluster),
-    [cluster],
-  );
-
-  const hasNoVMs = useMemo(() => isEmpty(allVMsInNamespace), [allVMsInNamespace]);
-
   const callbacks: VMCallbacks = useMemo(
     () => ({
       getVmi: (vm: V1VirtualMachine) => getVMIFromMapper(vmiMapper, vm),
@@ -252,64 +243,58 @@ const VirtualMachinesList = forwardRef(({}, ref) => {
   };
 
   return (
-    <>
-      <ListPageBody>
-        <div className="vm-listpagebody" ref={listPageBodyRef}>
-          <>
-            <Split hasGutter>
-              <SplitItem>
-                <ListPageFilter
-                  onFilterChange={(...args) => {
-                    onFilterChange(...args);
-                    setPagination((prevPagination) => ({
-                      ...prevPagination,
-                      endIndex: prevPagination?.perPage,
-                      page: 1,
-                      startIndex: 0,
-                    }));
-                  }}
-                  columnLayout={columnLayout}
-                  data={unfilteredData}
-                  filtersWithSelect={filtersWithSelect}
-                  loaded={loaded}
-                  rowFilters={rowFilters}
-                />
-              </SplitItem>
-              <SplitItem isFilled />
-              <SplitItem>
-                <Pagination
-                  onPerPageSelect={(_e, perPage, page, startIndex, endIndex) =>
-                    onPageChange({ endIndex, page, perPage, startIndex })
-                  }
-                  onSetPage={(_e, page, perPage, startIndex, endIndex) =>
-                    onPageChange({ endIndex, page, perPage, startIndex })
-                  }
-                  className="list-managment-group__pagination"
-                  isCompact={listPageBodySize !== ListPageBodySize.lg}
-                  isLastFullPageShown
-                  itemCount={filteredVMs?.length}
-                  page={pagination?.page}
-                  perPage={pagination?.perPage}
-                  perPageOptions={paginationDefaultValues}
-                />
-              </SplitItem>
-            </Split>
-            {vmsLoaded && hasNoVMs ? (
-              <Bullseye>{t('No VirtualMachines found')}</Bullseye>
-            ) : (
-              <VirtualMachineTable
-                callbacks={callbacks}
-                columns={activeTableColumns}
-                data={paginatedData}
-                loaded={loaded}
-                loadError={vmsLoadError}
-                selectedVMState={[vmSignal.value, setVM]}
-              />
-            )}
-          </>
-        </div>
-      </ListPageBody>
-    </>
+    <div className="pf-v6-u-mt-sm" ref={listPageBodyRef}>
+      {targetNamespace && (
+        <Label className="pf-v6-u-mb-sm" data-test="clone-source-project-label">
+          {t('Project: {{project}}', { project: targetNamespace })}
+        </Label>
+      )}
+      <Split className="pf-v6-u-mb-sm" hasGutter>
+        <SplitItem>
+          <ListPageFilter
+            onFilterChange={(...args) => {
+              onFilterChange(...args);
+              setPagination((prevPagination) => ({
+                ...prevPagination,
+                endIndex: prevPagination?.perPage,
+                page: 1,
+                startIndex: 0,
+              }));
+            }}
+            columnLayout={columnLayout}
+            data={unfilteredData}
+            loaded
+            rowFilters={rowFilters}
+          />
+        </SplitItem>
+        <SplitItem isFilled />
+        <SplitItem>
+          <Pagination
+            onPerPageSelect={(_e, perPage, page, startIndex, endIndex) =>
+              onPageChange({ endIndex, page, perPage, startIndex })
+            }
+            onSetPage={(_e, page, perPage, startIndex, endIndex) =>
+              onPageChange({ endIndex, page, perPage, startIndex })
+            }
+            className="list-managment-group__pagination"
+            isCompact={listPageBodySize !== ListPageBodySize.lg}
+            isLastFullPageShown
+            itemCount={filteredVMs?.length}
+            page={pagination?.page}
+            perPage={pagination?.perPage}
+            perPageOptions={paginationDefaultValues}
+          />
+        </SplitItem>
+      </Split>
+      <VirtualMachineTable
+        callbacks={callbacks}
+        columns={activeTableColumns}
+        data={paginatedData}
+        loaded={loaded}
+        loadError={vmsLoadError}
+        selectedVMState={[vmSignal.value, setVM]}
+      />
+    </div>
   );
 });
 
