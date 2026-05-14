@@ -1573,6 +1573,7 @@
   "Project name to clone the template to": "Project name to clone the template to",
   "Project root": "Project root",
   "Project-scoped": "Project-scoped",
+  "Project: {{project}}": "Project: {{project}}",
   "Projects": "Projects",
   "Provider": "Provider",
   "Provisioning": "Provisioning",

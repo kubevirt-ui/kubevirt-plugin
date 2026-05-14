@@ -1590,6 +1590,7 @@
   "Project name to clone the template to": "Nombre del proyecto para clonar la plantilla en",
   "Project root": "Root del proyecto",
   "Project-scoped": "Delimitado por el alcance del proyecto",
+  "Project: {{project}}": "Project: {{project}}",
   "Projects": "Proyectos",
   "Provider": "Proveedor",
   "Provisioning": "Aprovisionamiento",

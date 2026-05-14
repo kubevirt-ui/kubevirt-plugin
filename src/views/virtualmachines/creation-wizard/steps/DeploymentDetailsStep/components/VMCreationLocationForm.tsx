@@ -37,6 +37,7 @@ const VMCreationLocationForm: FC = () => {
             setFolder('');
           }}
           cluster={cluster}
+          includeAllProjects={false}
           selectedProject={project || DEFAULT_NAMESPACE}
         />
       </FormGroup>
