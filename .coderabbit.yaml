@@ -17,7 +17,7 @@ reviews:
   # The check also instructs CodeRabbit to apply do-not-merge/no-tests-added.
   pre_merge_checks:
     custom_checks:
-      - name: 'Playwright tests required for Epics/Stories'
+      - name: 'Tests required for Epics/Stories'
         mode: 'error'
         instructions: |
           Perform the following steps to determine PASS or FAIL:
@@ -49,24 +49,35 @@ reviews:
           Only continue to Step 5 when the Epic/Story clearly describes a
           new user-facing feature or enhancement.
 
-          Step 5 - Check for actual Playwright test or page-object files.
-          Inspect the PR diff for files under playwright/tests/** or playwright/pages/**.
-          Do NOT count playwright/fixtures/**, playwright/utils/**, playwright/types/**,
-          or playwright/tsconfig.json — those are pure helpers with no test logic.
-          - At least one file added or modified under playwright/tests/ or
-            playwright/pages/ -> PASS.
-          - Only fixture/util/type files changed, or no playwright/ files at all ->
+          Step 5 - Check for test files.
+          Inspect the PR diff for any file that qualifies as a test. A file qualifies if
+          it matches ANY of the following patterns:
+          - playwright/tests/**/*.ts or playwright/tests/**/*.spec.ts (Playwright tests)
+          - playwright/pages/**/*.ts (Playwright page-object models)
+          - **/*.test.ts or **/*.test.tsx (unit/integration tests)
+          - **/*.spec.ts or **/*.spec.tsx (unit/integration spec files)
+
+          Do NOT count these as tests:
+          - playwright/fixtures/**, playwright/utils/**, playwright/types/**,
+            playwright/tsconfig.json — these are pure helpers with no test logic.
+
+          - At least one qualifying test file added or modified -> PASS.
+          - No qualifying test file found ->
             FAIL and apply the label "do-not-merge/no-tests-added" with this message:
-            "This PR is linked to a Jira Epic/Story for a new feature but no
-            Playwright test or page-object files were added under playwright/tests/
-            or playwright/pages/. Please add or update those files, or ask a
-            maintainer to remove the do-not-merge/no-tests-added label."
+            "This PR is linked to a Jira Epic/Story for a new feature but no test
+            files were added or modified. Please either:
+            • Add or update Playwright tests under playwright/tests/ or page-object
+              models under playwright/pages/
+            • Add or update unit/integration tests (*.test.ts, *.test.tsx,
+              *.spec.ts, *.spec.tsx)
+            • Or ask a maintainer to remove the do-not-merge/no-tests-added label
+              if tests are not applicable for this change."
 
 knowledge_base:
   code_guidelines:
     enabled: true
     filePatterns:
-      - '**​/CODING_STANDARDS.md'
+      - '**/CODING_STANDARDS.md'
   jira:
     usage: enabled
     project_keys:
