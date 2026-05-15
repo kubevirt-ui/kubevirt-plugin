@@ -40,9 +40,8 @@ const CheckupsSelfValidationForm = () => {
   const { t } = useKubevirtTranslation();
   const cluster = useClusterParam();
   const [name, setName] = useState<string>(generatePrettyName(SELF_VALIDATION_NAME));
-  const [checkupImage, checkupImageLoaded, checkupImageLoadError] = useRelatedImage(
-    selfValidationCheckupImageSettings,
-  );
+  const [checkupImage, checkupImageLoaded, checkupImageLoadError, checkupImageIsFallback] =
+    useRelatedImage(selfValidationCheckupImageSettings);
   const [selectedTestSuites, setSelectedTestSuites] = useState<string[]>(TEST_SUITES);
   const [isDryRun, setIsDryRun] = useState<boolean>(false);
   const [storageClass, setStorageClass] = useState<string>('');
@@ -153,11 +152,12 @@ const CheckupsSelfValidationForm = () => {
                 />
               </FormGroup>
 
-              {checkupImageLoadError && (
+              {(checkupImageLoadError || checkupImageIsFallback) && (
                 <CheckupImageField
                   checkupImage={checkupImage}
                   checkupImageLoaded={checkupImageLoaded}
                   checkupImageLoadError={checkupImageLoadError}
+                  isFallback={checkupImageIsFallback}
                 />
               )}
 
