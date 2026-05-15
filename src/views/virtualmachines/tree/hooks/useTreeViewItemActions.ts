@@ -40,6 +40,7 @@ const useTreeViewItemActions: UseTreeViewItemActions = (treeData) => {
     const handler = (event) => {
       event.preventDefault();
       event.stopPropagation();
+      document.body.click();
       setTriggerElement(element);
     };
 
