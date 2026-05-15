@@ -14,7 +14,7 @@ reviews:
     - '!locales/**'
   collapse_walkthrough: true
   # Block merging for Epics/Stories that have no Playwright tests.
-  # The check also instructs CodeRabbit to apply do-not-merge/no-tests-added.
+  # The check also instructs CodeRabbit to apply do-not-merge/no-tests.
   pre_merge_checks:
     custom_checks:
       - name: 'Tests required for Epics/Stories'
@@ -63,14 +63,14 @@ reviews:
 
           - At least one qualifying test file added or modified -> PASS.
           - No qualifying test file found ->
-            FAIL and apply the label "do-not-merge/no-tests-added" with this message:
+            FAIL and apply the label "do-not-merge/no-tests" with this message:
             "This PR is linked to a Jira Epic/Story for a new feature but no test
             files were added or modified. Please either:
             • Add or update Playwright tests under playwright/tests/ or page-object
               models under playwright/pages/
             • Add or update unit/integration tests (*.test.ts, *.test.tsx,
               *.spec.ts, *.spec.tsx)
-            • Or ask a maintainer to remove the do-not-merge/no-tests-added label
+            • Or ask a maintainer to remove the do-not-merge/no-tests label
               if tests are not applicable for this change."
 
 knowledge_base:
