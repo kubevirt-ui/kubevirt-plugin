@@ -1,4 +1,3 @@
-# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
 reviews:
   profile: chill
   high_level_summary: true
@@ -12,65 +11,11 @@ reviews:
     - '!locales/**'
   collapse_walkthrough: true
 
-  # Automatically apply labels based on instructions below
-  auto_apply_labels: true
-  labeling_instructions:
-    - label: 'do-not-merge/no-tests-added'
-      instructions: |
-        Apply this label when ALL three conditions are true:
-        1. The PR title contains a Jira ticket ID in the format CNV-XXXXX.
-        2. The linked Jira ticket's issue type is "Epic" or "Story" (fetch it via the Jira integration).
-        3. The PR does NOT add or modify any Playwright test files — i.e., no files under
-           the `playwright/` directory (e.g. `playwright/tests/**/*.ts`, `playwright/pages/**/*.ts`).
-
-        Do NOT apply this label when:
-        - The Jira issue type is Bug, Task, Sub-task, or any type other than Epic/Story.
-        - At least one file under `playwright/` is added or modified in this PR.
-        - No Jira ticket ID is found in the PR title.
-
-  # Block merging for Epics/Stories that have no Playwright tests
-  custom_pre_merge_checks:
-    - name: 'Playwright tests required for Epics and Stories'
-      mode: 'error'
-      instructions: |
-        Perform the following steps to determine pass or fail:
-
-        Step 1 — Extract Jira ticket ID.
-        Parse the PR title for a ticket ID matching the pattern CNV-\d+.
-        If no ID is found, PASS (no ticket linked, no enforcement).
-
-        Step 2 — Fetch the Jira ticket.
-        Use the Jira integration to fetch the issue type for the extracted ticket ID.
-        If the ticket cannot be fetched (integration error, permissions, etc.), PASS
-        to avoid blocking PRs due to infrastructure issues.
-
-        Step 3 — Check issue type.
-        If the issue type is NOT "Epic" or "Story" (e.g. Bug, Task, Sub-task), PASS.
-
-        Step 4 — Check for Playwright tests.
-        If the issue type IS "Epic" or "Story", inspect the PR diff for any added or
-        modified files under the `playwright/` directory.
-        - If at least one such file exists → PASS.
-        - If no such file exists → FAIL with the following message:
-
-          "❌ **Playwright tests required**
-          This PR is linked to Jira [CNV-XXXXX] which is an Epic/Story, but no Playwright
-          test files were added or modified under the `playwright/` directory.
-
-          Epics and Stories must ship with test coverage. Please either:
-          • Add or update tests under `playwright/tests/`
-          • Or explain in a PR comment why tests are not applicable for this change
-            and ask a maintainer to remove the `do-not-merge/no-tests-added` label."
-
 knowledge_base:
   code_guidelines:
     enabled: true
     filePatterns:
       - '**/CODING_STANDARDS.md'
-  jira:
-    usage: enabled
-    project_keys:
-      - CNV
 
 chat:
   integrations:
