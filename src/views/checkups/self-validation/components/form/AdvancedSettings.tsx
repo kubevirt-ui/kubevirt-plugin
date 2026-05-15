@@ -4,10 +4,8 @@ import { Trans } from 'react-i18next';
 import { IoK8sApiStorageV1StorageClass } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import CapacityInput from '@kubevirt-utils/components/CapacityInput/CapacityInput';
 import CheckboxSelect from '@kubevirt-utils/components/CheckboxSelect/CheckboxSelect';
-import {
-  getDefaultStorageClass,
-  getSCSelectOptions,
-} from '@kubevirt-utils/components/DiskModal/components/StorageClassAndPreallocation/utils/helpers';
+import { getSCSelectOptions } from '@kubevirt-utils/components/DiskModal/components/StorageClassAndPreallocation/utils/helpers';
+import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
@@ -17,6 +15,8 @@ import { StorageClassModel } from '@kubevirt-utils/models';
 import {
   ExpandableSection,
   FormGroup,
+  HelperText,
+  HelperTextItem,
   PopoverPosition,
   SelectProps,
   Switch,
@@ -26,7 +26,7 @@ import {
 import { STORAGE_CAPABILITY_OPTIONS } from '../../utils';
 
 type AdvancedSettingsProps = {
-  defaultSC: ReturnType<typeof getDefaultStorageClass>;
+  effectiveStorageClassName: string;
   handleStorageCapabilitySelect: SelectProps['onSelect'];
   isDryRun: boolean;
   pvcSize: string;
@@ -35,14 +35,16 @@ type AdvancedSettingsProps = {
   setStorageClass: (storageClass: string) => void;
   setTestSkips: (testSkips: string) => void;
   storageCapabilities: string[];
-  storageClass: string;
   storageClasses: IoK8sApiStorageV1StorageClass[];
   storageClassesLoaded: boolean;
+  storageProfileError: boolean;
+  storageProfileHasClaimPropertySets: boolean;
+  storageProfileLoaded: boolean;
   testSkips: string;
 };
 
 const AdvancedSettings: FC<AdvancedSettingsProps> = ({
-  defaultSC,
+  effectiveStorageClassName,
   handleStorageCapabilitySelect,
   isDryRun,
   pvcSize,
@@ -51,12 +53,25 @@ const AdvancedSettings: FC<AdvancedSettingsProps> = ({
   setStorageClass,
   setTestSkips,
   storageCapabilities,
-  storageClass,
   storageClasses,
   storageClassesLoaded,
+  storageProfileError,
+  storageProfileHasClaimPropertySets,
+  storageProfileLoaded,
   testSkips,
 }) => {
   const { t } = useKubevirtTranslation();
+
+  const showStorageProfilePrefilledHint =
+    storageProfileLoaded &&
+    !storageProfileError &&
+    storageProfileHasClaimPropertySets &&
+    Boolean(effectiveStorageClassName);
+
+  const showStorageProfileManualFallbackHint =
+    storageProfileLoaded &&
+    effectiveStorageClassName &&
+    (storageProfileError || !storageProfileHasClaimPropertySets);
 
   return (
     <ExpandableSection isIndented toggleText={t('Advanced settings')}>
@@ -69,7 +84,7 @@ const AdvancedSettings: FC<AdvancedSettingsProps> = ({
             options={getSCSelectOptions(storageClasses)}
             placeholder={t('Select {{label}}', { label: StorageClassModel.label })}
             popperProps={{ enableFlip: true }}
-            selected={storageClass || defaultSC?.metadata?.name || ''}
+            selected={effectiveStorageClassName}
             setSelected={setStorageClass}
           />
         ) : (
@@ -81,9 +96,13 @@ const AdvancedSettings: FC<AdvancedSettingsProps> = ({
           id="test-skips"
           name="test-skips"
           onChange={(_event, value) => setTestSkips(value)}
-          placeholder={t('Pipe-separated list of tests to skip (e.g., test_id:1783|test_id:1853)')}
           value={testSkips}
         />
+        <HelperText>
+          <HelperTextItem>
+            {t('Pipe-separated list of tests to skip (e.g., test_id:1783|test_id:1853)')}
+          </HelperTextItem>
+        </HelperText>
       </FormGroup>
       <FormGroup className="form-group-spacing" fieldId="pvc-size" label={t('PVC size')}>
         <CapacityInput onChange={setPvcSize} size={pvcSize} />
@@ -94,13 +113,9 @@ const AdvancedSettings: FC<AdvancedSettingsProps> = ({
             bodyContent={
               <Trans ns="plugin__kubevirt-plugin" t={t}>
                 Select the storage capabilities your storage class supports. Check the{' '}
-                <a
-                  href={documentationURL.STORAGE_PROFILES}
-                  rel="noopener noreferrer"
-                  target="_blank"
-                >
+                <ExternalLink hideIcon href={documentationURL.STORAGE_PROFILES}>
                   StorageProfile
-                </a>{' '}
+                </ExternalLink>{' '}
                 to see supported access and volume modes. Note: Storage Snapshot must be selected
                 for snapshot tests to run.
               </Trans>
@@ -122,6 +137,32 @@ const AdvancedSettings: FC<AdvancedSettingsProps> = ({
           selectedValues={storageCapabilities}
           toggleTitle={t('Storage capabilities')}
         />
+        {(showStorageProfilePrefilledHint || showStorageProfileManualFallbackHint) && (
+          <div aria-live="polite" className="pf-v6-u-pt-sm">
+            {showStorageProfilePrefilledHint && (
+              <HelperText>
+                <HelperTextItem variant="default">
+                  <Trans ns="plugin__kubevirt-plugin" t={t}>
+                    Access and volume mode capabilities were pre-filled from the StorageProfile for
+                    storage class <strong>{{ storageClassName: effectiveStorageClassName }}</strong>
+                    .
+                    <br />
+                    You can override them if needed.
+                  </Trans>
+                </HelperTextItem>
+              </HelperText>
+            )}
+            {showStorageProfileManualFallbackHint && (
+              <HelperText>
+                <HelperTextItem variant="warning">
+                  {t(
+                    'StorageProfile data is not available for this storage class. Select storage capabilities manually.',
+                  )}
+                </HelperTextItem>
+              </HelperText>
+            )}
+          </div>
+        )}
       </FormGroup>
       <Switch
         label={

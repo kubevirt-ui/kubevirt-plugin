@@ -57,7 +57,7 @@ Use *"/review"* to run **all five review agents in parallel** on the current cha
 
 ### i18n Compliance
 - React components use `const { t } = useKubevirtTranslation()` from `@kubevirt-utils/hooks/useKubevirtTranslation`
-- Utility functions accept `t: TFunction` imported from `react-i18next` -- never custom types like `(key: string) => string`
+- Utility functions accept `t: TFunction` imported from `i18next` -- never custom types like `(key: string) => string`
 - Every user-facing string (labels, headings, buttons, errors, tooltips, table headers, empty states, placeholders) wrapped in `t()`
 - No string concatenation with `t()` results; use interpolation: `t('Delete {{name}}', { name })`
 - No comment-only `// t('...')` patterns -- they do NOT wire up translations. **Exception**: `src/utils/i18n.ts` uses comment-only `// t('...')` intentionally for `i18next-parser` string extraction
@@ -144,7 +144,7 @@ For thorough analysis from a single perspective, invoke a specific agent:
 - [ ] **UX**: Accessibility, states, consistency
 - [ ] **QE**: Edge cases, tests, async issues
 - [ ] **Security**: Input validation, auth, XSS
-- [ ] **i18n**: All strings translated, `TFunction` from `react-i18next`, no concatenation
+- [ ] **i18n**: All strings translated, `TFunction` from `i18next`, no concatenation
 - [ ] **Standards**: One component per file, filename matches, files under 150 lines
 
 ### After Review

@@ -314,7 +314,7 @@ Before completing any code generation or review, verify **all** of the following
 
 ### i18n
 - [ ] Every user-facing string wrapped in `t()` from `useKubevirtTranslation`
-- [ ] Utility functions use `t: TFunction` from `react-i18next` (not custom types)
+- [ ] Utility functions use `t: TFunction` from `i18next` (not custom types)
 - [ ] No string concatenation with `t()` results -- use interpolation
 - [ ] No comment-only `// t('...')` patterns
 - [ ] `npm run i18n` run after adding/changing strings

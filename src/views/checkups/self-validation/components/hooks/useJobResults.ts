@@ -66,8 +66,13 @@ export const useJobResults = ({
   }
 
   const [configMap, configMapLoaded, configMapError] = useK8sGetData<IoK8sApiCoreV1ConfigMap>(
-    configMapName && namespace && cluster
-      ? { cluster, model: ConfigMapModel, name: configMapName, ns: namespace }
+    configMapName && namespace
+      ? {
+          ...(cluster ? { cluster } : {}),
+          model: ConfigMapModel,
+          name: configMapName,
+          ns: namespace,
+        }
       : null,
   );
 
@@ -114,25 +119,18 @@ export const useJobResults = ({
 
   const error = useMemo<null | string>(() => {
     if (nameResolutionError) return nameResolutionError;
-    if (jobSucceeded && (!namespace || !cluster))
-      return t('Missing namespace or cluster configuration');
+    if (jobSucceeded && !namespace) return t('Missing namespace configuration');
     if (configMapError) {
       const reason =
         configMapError instanceof Error ? configMapError.message : t('Unknown error occurred');
-      return `Failed to read results from ConfigMap ${configMapName}: ${reason}`;
+      return t('Failed to read results from ConfigMap {{configMapName}}: {{reason}}', {
+        configMapName,
+        reason,
+      });
     }
     if (parseError) return t('No valid results found in ConfigMap');
     return null;
-  }, [
-    nameResolutionError,
-    jobSucceeded,
-    namespace,
-    cluster,
-    configMapName,
-    configMapError,
-    parseError,
-    t,
-  ]);
+  }, [nameResolutionError, jobSucceeded, namespace, configMapName, configMapError, parseError, t]);
 
   const configMapIsStale =
     !!configMap && (getName(configMap) !== configMapName || getNamespace(configMap) !== namespace);
@@ -140,7 +138,6 @@ export const useJobResults = ({
   const isLoading =
     !nameResolutionError &&
     !!namespace &&
-    !!cluster &&
     jobSucceeded &&
     !!configMapName &&
     (!configMapLoaded || configMapIsStale || (!configMap && !configMapError));
