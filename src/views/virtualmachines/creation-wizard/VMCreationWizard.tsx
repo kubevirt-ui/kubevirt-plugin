@@ -1,12 +1,10 @@
 import React, { FC, useEffect, useRef } from 'react';
-import classnames from 'classnames';
 
-import { FLAG_LIGHTSPEED_PLUGIN } from '@kubevirt-utils/flags/consts';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getValidNamespace } from '@kubevirt-utils/utils/utils';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
-import { useActiveNamespace, useFlag } from '@openshift-console/dynamic-plugin-sdk';
+import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
 import { Wizard, WizardHeader, WizardStep } from '@patternfly/react-core';
 import DefaultWizardFooter from '@virtualmachines/creation-wizard/components/DefaultWizardFooter';
 import useCloseWizard from '@virtualmachines/creation-wizard/hooks/useCloseWizard';
@@ -33,9 +31,10 @@ import {
 import TemplatesDrawerWrapper from './components/TemplatesDrawerWrapper';
 import DeploymentDetailsStep from './steps/DeploymentDetailsStep/DeploymentDetailsStep';
 
+import '@catalog/wizard/Wizard.scss';
+
 const VMCreationWizard: FC = () => {
   const { t } = useKubevirtTranslation();
-  const hasOLSConsole = useFlag(FLAG_LIGHTSPEED_PLUGIN);
   const {
     creationMethod,
     markStepVisited,
@@ -81,8 +80,6 @@ const VMCreationWizard: FC = () => {
   const isCloneMethod = isCloneCreationMethod(creationMethod);
   const isTemplateMethod = isTemplateCreationMethod(creationMethod);
 
-  const cancelButtonProps = { className: classnames({ 'pf-v6-u-mr-4xl': hasOLSConsole }) };
-
   return (
     <TemplatesDrawerWrapper>
       <Wizard
@@ -104,7 +101,6 @@ const VMCreationWizard: FC = () => {
         </WizardStep>
         <WizardStep
           footer={{
-            cancelButtonProps,
             isNextDisabled: isNextDisabledForStep(VMWizardStep.GUEST_OS),
           }}
           id={VMWizardStep.GUEST_OS}
@@ -115,7 +111,6 @@ const VMCreationWizard: FC = () => {
         </WizardStep>
         <WizardStep
           footer={{
-            cancelButtonProps,
             isNextDisabled: isNextDisabledForStep(VMWizardStep.BOOT_SOURCE),
           }}
           id={VMWizardStep.BOOT_SOURCE}
@@ -156,7 +151,6 @@ const VMCreationWizard: FC = () => {
         </WizardStep>
         <WizardStep
           footer={{
-            cancelButtonProps,
             isNextDisabled: isNextDisabledForStep(VMWizardStep.CLONE),
           }}
           id={VMWizardStep.CLONE}
