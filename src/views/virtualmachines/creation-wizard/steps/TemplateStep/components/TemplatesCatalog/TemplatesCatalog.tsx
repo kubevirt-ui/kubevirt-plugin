@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, useMemo } from 'react';
 
 import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { useApplyFiltersWithQuery } from '@kubevirt-utils/components/ListPageFilter/hooks/useApplyFiltersWithQuery';
@@ -7,7 +7,9 @@ import { TemplatesFilterVariant } from '@kubevirt-utils/components/TemplatesFilt
 import { logTemplateFlowEvent } from '@kubevirt-utils/extensions/telemetry/telemetry';
 import { TEMPLATE_SELECTED } from '@kubevirt-utils/extensions/telemetry/utils/constants';
 import useFiltersFromURL from '@kubevirt-utils/hooks/useFiltersFromURL';
-import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
+import useIsWindowsSupportedArchitecture from '@kubevirt-utils/hooks/useIsWindowsSupportedArchitecture';
+import { getTemplateVirtualMachineObject, OS_NAME_TYPES } from '@kubevirt-utils/resources/template';
+import { getTemplateOS } from '@kubevirt-utils/resources/template/utils/selectors';
 import { vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { useListPageFilter } from '@openshift-console/dynamic-plugin-sdk';
@@ -31,10 +33,20 @@ const TemplatesCatalog: FC = () => {
   const { availableDataSources, availableTemplatesUID, bootSourcesLoaded, loaded, templates } =
     useTemplatesWithAvailableSource({ namespace });
 
-  const { filters } = useVirtualMachineTemplatesFilters(templates);
+  const isWindowsSupported = useIsWindowsSupportedArchitecture();
+
+  const supportedTemplates = useMemo(
+    () =>
+      isWindowsSupported
+        ? templates
+        : templates.filter((t) => getTemplateOS(t) !== OS_NAME_TYPES.windows),
+    [templates, isWindowsSupported],
+  );
+
+  const { filters } = useVirtualMachineTemplatesFilters(supportedTemplates);
   const filtersFromURL = useFiltersFromURL(filters);
   const [, filteredTemplates, onFilterChange] = useListPageFilter(
-    templates,
+    supportedTemplates,
     filters,
     filtersFromURL,
   );
