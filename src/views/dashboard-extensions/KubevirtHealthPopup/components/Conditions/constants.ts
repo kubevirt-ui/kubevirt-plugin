@@ -1,6 +1,13 @@
-export const HCO_HEALTH_METRIC = 'kubevirt_hco_system_health_status';
+import { AlertType } from '@kubevirt-utils/components/AlertsCard/utils/types';
 
-export const VALUE_TO_LABEL = {
+export const SEVERITY_TO_CONDITION_VALUE: Record<'none' | AlertType, number> = {
+  [AlertType.critical]: 2,
+  [AlertType.info]: 0,
+  [AlertType.warning]: 1,
+  none: 0,
+};
+
+export const VALUE_TO_LABEL: Record<number, string> = {
   0: 'Healthy',
   1: 'Warning',
   2: 'Error',
