@@ -1,5 +1,6 @@
 import React, { FC } from 'react';
 
+import useIsWindowsSupportedArchitecture from '@kubevirt-utils/hooks/useIsWindowsSupportedArchitecture';
 import { LINUX, OS_NAME_TYPES } from '@kubevirt-utils/resources/template';
 import { Split, SplitItem } from '@patternfly/react-core';
 import { getIconByOSName } from '@virtualmachines/creation-wizard/utils/os-icons/os-icons';
@@ -11,6 +12,8 @@ type BootableVolumeOSIconsProps = {
 };
 
 const BootableVolumeOSIcons: FC<BootableVolumeOSIconsProps> = ({ osName }) => {
+  const isWindowsSupported = useIsWindowsSupportedArchitecture();
+
   if (osName) {
     const icon = getIconByOSName(osName);
     if (icon) {
@@ -27,7 +30,7 @@ const BootableVolumeOSIcons: FC<BootableVolumeOSIconsProps> = ({ osName }) => {
   const osIcons = [
     getIconByOSName(LINUX),
     getIconByOSName(OS_NAME_TYPES.rhel),
-    getIconByOSName(OS_NAME_TYPES.windows),
+    ...(isWindowsSupported ? [getIconByOSName(OS_NAME_TYPES.windows)] : []),
   ];
 
   return (
