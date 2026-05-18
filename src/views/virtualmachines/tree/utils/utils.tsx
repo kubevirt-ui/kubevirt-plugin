@@ -48,6 +48,18 @@ export interface TreeViewDataItemWithHref extends TreeViewDataItem {
 export const getVMTreeViewItemID = (vmName: string, vmNamespace: string, vmCluster: string) =>
   `${vmCluster || SINGLE_CLUSTER_KEY}/${vmNamespace}/${vmName}`;
 
+export const getProjectTreeViewItemID = (cluster: string | undefined, project: string) =>
+  `${PROJECT_SELECTOR_PREFIX}/${cluster ?? SINGLE_CLUSTER_KEY}/${project}`;
+
+export const getFolderTreeViewItemID = (
+  cluster: string | undefined,
+  project: string,
+  folder: string,
+) => `${FOLDER_SELECTOR_PREFIX}/${cluster ?? SINGLE_CLUSTER_KEY}/${project}/${folder}`;
+
+export const getClusterTreeViewItemID = (clusterName: string) =>
+  `${CLUSTER_SELECTOR_PREFIX}/${clusterName}`;
+
 const buildProjectMap = (
   vms: V1VirtualMachine[],
   currentPageVMName: string,
@@ -116,9 +128,7 @@ const createFolderTreeItems = (
   cluster?: string,
 ): TreeViewDataItemWithHref[] =>
   Object.entries(folders).map(([folder, vmItems]) => {
-    const folderTreeItemID = `${FOLDER_SELECTOR_PREFIX}/${
-      cluster || SINGLE_CLUSTER_KEY
-    }/${project}/${folder}`;
+    const folderTreeItemID = getFolderTreeViewItemID(cluster, project, folder);
     const folderExpanded =
       currentPageVMName && vmItems.some((item) => (item.name as string) === currentPageVMName);
 
@@ -165,9 +175,7 @@ const createProjectTreeItem = (
 
   const projectChildren = [...sortProjectFolders, ...(projectMap[project]?.ungrouped || [])];
 
-  const projectTreeItemID = `${PROJECT_SELECTOR_PREFIX}/${
-    cluster ?? SINGLE_CLUSTER_KEY
-  }/${project}`;
+  const projectTreeItemID = getProjectTreeViewItemID(cluster, project);
   const projectTreeItem: TreeViewDataItemWithHref = {
     children: projectChildren,
     customBadgeContent: projectMap[project]?.count || '0',
@@ -351,7 +359,7 @@ export const createMultiClusterTreeViewData = (
             <ClusterIcon />
           </Tooltip>
         ),
-        id: `${CLUSTER_SELECTOR_PREFIX}/${clusterName}`,
+        id: getClusterTreeViewItemID(clusterName),
         name: clusterName,
       };
 
