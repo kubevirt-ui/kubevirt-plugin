@@ -1,19 +1,20 @@
 import { useMemo } from 'react';
 
+import { AlertType } from '@kubevirt-utils/components/AlertsCard/utils/types';
 import useAlerts from '@kubevirt-utils/hooks/useAlerts/useAlerts';
 import {
   getNumberOfAlerts,
+  isCriticalHealthImpactAlert,
   isFiringOrSilencedAlert,
-  isImportantInfrastructureAlert,
-  sortAlertsByHealthImpact,
+  sortAlertsBySeverity,
 } from '@kubevirt-utils/hooks/useInfrastructureAlerts/utils/utils';
 import { isKubeVirtAlert } from '@kubevirt-utils/utils/prometheus';
 import { Alert } from '@openshift-console/dynamic-plugin-sdk';
 
-export type AlertsByHealthImpact = { critical: Alert[]; none: Alert[]; warning: Alert[] };
+export type AlertsBySeverity = { [key in AlertType]: Alert[] };
 
 type UseInfrastructureAlerts = () => {
-  alerts: AlertsByHealthImpact;
+  alerts: AlertsBySeverity;
   loaded: boolean;
   numberOfAlerts: number;
 };
@@ -21,21 +22,21 @@ type UseInfrastructureAlerts = () => {
 const useInfrastructureAlerts: UseInfrastructureAlerts = () => {
   const { alerts, loaded } = useAlerts();
 
-  const alertsByHealthImpact = useMemo(() => {
+  const alertsBySeverity = useMemo(() => {
     const filteredAlerts = alerts?.filter(
       (alert) =>
         isKubeVirtAlert(alert) &&
         isFiringOrSilencedAlert(alert) &&
-        isImportantInfrastructureAlert(alert),
+        isCriticalHealthImpactAlert(alert),
     );
 
-    return sortAlertsByHealthImpact(filteredAlerts);
+    return sortAlertsBySeverity(filteredAlerts);
   }, [alerts]);
 
   return {
-    alerts: alertsByHealthImpact,
+    alerts: alertsBySeverity,
     loaded,
-    numberOfAlerts: getNumberOfAlerts(alertsByHealthImpact) || 0,
+    numberOfAlerts: getNumberOfAlerts(alertsBySeverity) || 0,
   };
 };
 

@@ -16,7 +16,6 @@ import { Divider, Grid, GridItem, Stack, StackItem } from '@patternfly/react-cor
 
 import Conditions from './components/Conditions/Conditions';
 import HealthPopupChart from './components/HealthPopupChart';
-import { HealthImpactLevel } from './utils/types';
 import { HEALTH_ALERTS_URL_PARAMS } from './utils/utils';
 
 import './KubevirtHealthPopup.scss';
@@ -30,7 +29,7 @@ const KubevirtHealthPopup: FC = () => {
     'You can host and manage virtualized workloads on the same platform as container-based workloads.',
   );
 
-  const numCriticalAlerts = alerts?.[HealthImpactLevel.critical]?.length;
+  const numCriticalAlerts = alerts?.[AlertType.critical]?.length;
   const numWarningAlerts = alerts?.[AlertType.warning]?.length;
   const healthAlertsURLBasePath = getAlertsPath(perspective, null, HEALTH_ALERTS_URL_PARAMS);
 
@@ -49,7 +48,7 @@ const KubevirtHealthPopup: FC = () => {
               <StackItem>
                 <div className="kv-health-popup__alerts-count">
                   <RedExclamationCircleIcon className="kv-health-popup__alerts-count--icon" />
-                  <Link to={`${healthAlertsURLBasePath}${HealthImpactLevel.critical}`}>
+                  <Link to={`${healthAlertsURLBasePath}${AlertType.critical}`}>
                     {numCriticalAlerts} {t('Critical')}
                   </Link>
                 </div>
@@ -59,7 +58,7 @@ const KubevirtHealthPopup: FC = () => {
               <StackItem>
                 <div className="kv-health-popup__alerts-count">
                   <YellowExclamationTriangleIcon className="kv-health-popup__alerts-count--icon" />{' '}
-                  <Link to={`${healthAlertsURLBasePath}${HealthImpactLevel.warning}`}>
+                  <Link to={`${healthAlertsURLBasePath}${AlertType.warning}`}>
                     {numWarningAlerts} {t('Warning')}
                   </Link>
                 </div>
