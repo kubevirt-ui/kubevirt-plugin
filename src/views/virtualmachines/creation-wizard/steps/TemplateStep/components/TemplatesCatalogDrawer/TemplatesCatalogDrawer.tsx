@@ -1,5 +1,6 @@
 import React, { FC } from 'react';
 
+import { getName } from '@kubevirt-utils/resources/shared';
 import { Template } from '@kubevirt-utils/resources/template';
 import { getTemplateName } from '@kubevirt-utils/resources/template/utils/selectors';
 import { CatalogItemHeader } from '@patternfly/react-catalog-view-extension';
@@ -25,7 +26,8 @@ type TemplatesCatalogDrawerProps = {
 export const TemplatesCatalogDrawer: FC<TemplatesCatalogDrawerProps> = ({ onClose, template }) => {
   if (!template) return null;
 
-  const templateName = getTemplateName(template);
+  const name = getName(template);
+  const displayName = getTemplateName(template);
   const osIcon = getTemplateOSIcon(template);
 
   return (
@@ -35,8 +37,8 @@ export const TemplatesCatalogDrawer: FC<TemplatesCatalogDrawerProps> = ({ onClos
           <CatalogItemHeader
             className="co-catalog-page__overlay-header"
             iconImg={osIcon}
-            title={templateName}
-            vendor={template?.metadata?.name}
+            title={name}
+            vendor={displayName}
           />
           <DrawerActions>
             <DrawerCloseButton onClick={onClose} />

@@ -1,8 +1,7 @@
-import React, { FC } from 'react';
+import React, { FC, ReactNode } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Badge,
   Icon,
@@ -15,18 +14,21 @@ import {
 import { FilterIcon } from '@patternfly/react-icons';
 
 import FormPFSelect from '../../FormPFSelect/FormPFSelect';
+import { ExtendedRowFilter } from '../types';
 import { Filter, FilterKeys, generateRowFilters, intersection } from '../utils';
 
 type RowFiltersProps = {
+  customMenu?: ReactNode;
   filters: Filter;
   filtersNameMap: FilterKeys;
   generatedRowFilters: ReturnType<typeof generateRowFilters>;
-  rowFilters: RowFilter[];
+  rowFilters: ExtendedRowFilter[];
   selectedRowFilters: string[];
   updateRowFilterSelected: (id: string[]) => void;
 };
 
 const RowFilters: FC<RowFiltersProps> = ({
+  customMenu,
   filters,
   filtersNameMap,
   generatedRowFilters,
@@ -82,28 +84,31 @@ const RowFilters: FC<RowFiltersProps> = ({
             selected={selectedRowFilters}
             selectedLabel={t('Filter')}
           >
-            {generatedRowFilters.map((rowFilter) => (
-              <SelectGroup key={rowFilter.filterGroupName} label={rowFilter.filterGroupName}>
-                {rowFilter.items?.map?.((item) =>
-                  item.hideIfEmpty && (item.count === 0 || item.count === '0') ? (
-                    <></>
-                  ) : (
-                    <SelectOption
-                      data-test-row-filter={item.id}
-                      hasCheckbox
-                      isSelected={selectedRowFilters?.includes(item.id)}
-                      key={item.id}
-                      value={item.id}
-                    >
-                      <span className="co-filter-dropdown-item__name">{item.title}</span>
-                      <Badge isRead key={item.id}>
-                        {item.count}
-                      </Badge>
-                    </SelectOption>
-                  ),
-                )}
-              </SelectGroup>
-            ))}
+            {customMenu ??
+              generatedRowFilters.map((rowFilter) => (
+                <SelectGroup key={rowFilter.filterGroupName} label={rowFilter.filterGroupName}>
+                  {rowFilter.items?.map?.((item) =>
+                    item.hideIfEmpty && (item.count === 0 || item.count === '0') ? (
+                      <></>
+                    ) : (
+                      <SelectOption
+                        data-test-row-filter={item.id}
+                        hasCheckbox
+                        isSelected={selectedRowFilters?.includes(item.id)}
+                        key={item.id}
+                        value={item.id}
+                      >
+                        <span className="co-filter-dropdown-item__name">
+                          {item.content ?? item.title}
+                        </span>
+                        <Badge isRead key={item.id}>
+                          {item.count}
+                        </Badge>
+                      </SelectOption>
+                    ),
+                  )}
+                </SelectGroup>
+              ))}
           </FormPFSelect>
         </div>,
       )}

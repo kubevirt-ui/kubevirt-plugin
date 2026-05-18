@@ -1,58 +1,37 @@
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useUniversalFilter from '@kubevirt-utils/hooks/useUniversalFilter/useUniversalFilter';
+import { OnFilterChange } from '@openshift-console/dynamic-plugin-sdk';
 import { SearchInput } from '@patternfly/react-core';
-import { CATALOG_FILTERS } from '@virtualmachines/creation-wizard/steps/TemplateStep/components/TemplatesCatalog/utils/consts';
-import { TemplateFilters } from '@virtualmachines/creation-wizard/steps/TemplateStep/components/TemplatesCatalog/utils/types';
 
 type TemplatesSearchInputProps = {
-  filters: TemplateFilters;
-  onFilterChange: (type: CATALOG_FILTERS, value: boolean | string) => void;
+  onFilterChange: OnFilterChange;
 };
 
-const TemplatesSearchInput: FC<TemplatesSearchInputProps> = ({ filters, onFilterChange }) => {
+const TemplatesSearchInput: FC<TemplatesSearchInputProps> = ({ onFilterChange }) => {
   const { t } = useKubevirtTranslation();
-  const [query, setQuery] = useState<string>(filters?.query || '');
+  const { setValueWithDebounce } = useUniversalFilter({ onFilterChange });
+  const [name, setName] = useState('');
 
   const filterByKeywordMsg = t('Filter by keyword...');
 
-  // When filters.query is cleared externally (e.g. by clearAll), reset local state to cancel
-  // any pending debounce timer that could fire a stale navigation.
-  useEffect(() => {
-    if (!filters?.query) setQuery('');
-  }, [filters?.query]);
-
-  useEffect(
-    () => {
-      // Update debounced value after delay
-      const handler = setTimeout(() => {
-        onFilterChange(CATALOG_FILTERS.QUERY, query);
-      }, 150);
-      // Cancel the timeout if value changes (also on delay change or unmount)
-      return () => {
-        clearTimeout(handler);
-      };
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [query], // Only re-call effect if value or delay changes
-  );
+  const updateName = (val: string) => {
+    setName(val);
+    setValueWithDebounce('name', val);
+  };
 
   return (
     <SearchInput
-      onChange={(_, val) => {
-        setQuery(val);
-      }}
-      onClear={() => {
-        setQuery('');
-        onFilterChange(CATALOG_FILTERS.QUERY, '');
-      }}
       aria-label={filterByKeywordMsg}
       className="co-catalog-page__input"
       data-test="search-catalog"
       id="filter-text-input"
+      onChange={(_, val) => updateName(val)}
+      onClear={() => updateName('')}
       placeholder={filterByKeywordMsg}
       type="text"
-      value={query}
+      value={name}
     />
   );
 };

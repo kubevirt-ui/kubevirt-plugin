@@ -16,7 +16,7 @@ import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
 import { useSearchFiltersParameters } from './hooks/useSearchFiltersParameters';
 import { STATIC_SEARCH_FILTERS, STATIC_SEARCH_FILTERS_PLACEHOLDERS } from './constants';
-import { TextFiltersType } from './types';
+import { ExtendedRowFilter, TextFiltersType } from './types';
 
 export type Filter = {
   [key: string]: string[];
@@ -43,7 +43,7 @@ export const getInitialSearchType = (
   );
 };
 
-export const generateRowFilters = (rowFilters: RowFilter[], data: K8sResourceCommon[]) =>
+export const generateRowFilters = (rowFilters: ExtendedRowFilter[], data: K8sResourceCommon[]) =>
   rowFilters.map((rowFilter) => ({
     ...rowFilter,
     items: rowFilter.items.map((item) => ({
