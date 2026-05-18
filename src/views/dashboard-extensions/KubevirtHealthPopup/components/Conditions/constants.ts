@@ -8,7 +8,7 @@ export const SEVERITY_TO_CONDITION_VALUE: Record<'none' | AlertType, number> = {
 };
 
 export const VALUE_TO_LABEL: Record<number, string> = {
-  0: 'Healthy',
-  1: 'Warning',
-  2: 'Error',
+  0: 'Healthy', // t('Healthy')
+  1: 'Warning', // t('Warning')
+  2: 'Degraded', // t('Degraded')
 };
