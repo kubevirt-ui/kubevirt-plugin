@@ -19,6 +19,12 @@
   z-index: 1000;
 }
 
+.vm-creation-wizard {
+  .pf-v6-c-wizard__footer .pf-v6-c-action-list {
+    justify-content: flex-start;
+  }
+}
+
 .wizard-header {
   .pf-l-split {
     justify-content: space-between;
