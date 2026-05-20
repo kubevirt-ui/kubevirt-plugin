@@ -22,18 +22,21 @@ import {
 import { useFleetAccessReview } from '@stolostron/multicluster-sdk';
 import { VM_LIST_TAB_PARAM, VM_LIST_TAB_VMS } from '@virtualmachines/navigator/constants';
 
+import useAddCreateFromVMToast from './hooks/useAddCreateFromVMToast';
 import { CreateTemplateItems } from './constants';
 
 const VirtualMachineTemplatesCreateButton: FC = () => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
+  const addCreateFromVMToast = useAddCreateFromVMToast();
   const cluster = useSelectedCluster();
   const selectedNamespaces = useListNamespaces();
   const isACMPage = useIsACMPage();
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
 
-  const namespace = selectedNamespaces?.[0] || DEFAULT_NAMESPACE;
+  const currentNamespace = selectedNamespaces?.[0];
+  const namespace = currentNamespace || DEFAULT_NAMESPACE;
 
   const [canCreateTemplate] = useFleetAccessReview({
     cluster,
@@ -55,9 +58,10 @@ const VirtualMachineTemplatesCreateButton: FC = () => {
       }
 
       if (value === CreateTemplateItems.fromVM) {
-        return navigate(
-          getVMListPath(namespace, cluster, `${VM_LIST_TAB_PARAM}=${VM_LIST_TAB_VMS}`),
+        navigate(
+          getVMListPath(currentNamespace, cluster, `${VM_LIST_TAB_PARAM}=${VM_LIST_TAB_VMS}`),
         );
+        return addCreateFromVMToast();
       }
 
       if (value === CreateTemplateItems.fromTemplate) {
