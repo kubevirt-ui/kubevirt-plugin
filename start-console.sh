@@ -8,6 +8,7 @@ plugins="
 monitoring-plugin=https://github.com/openshift/monitoring-plugin.git
 networking-console-plugin=https://github.com/openshift/networking-console-plugin.git
 nmstate-console-plugin=https://github.com/openshift/nmstate-console-plugin.git
+lightspeed-console-plugin=https://github.com/openshift/lightspeed-console.git
 "
 
 # Plugin URLs per container runtime
@@ -22,6 +23,9 @@ get_plugin_url() {
     done
 }
 
+OLS_PORT=${OLS_PORT:-8080}
+LIGHTSPEED_ENABLED=false
+
 INITIAL_PORT=9002
 BASE_DIR=$(pwd)
 
@@ -33,14 +37,28 @@ for arg in "$@"; do
         exit 1
     fi
 
-    if [ ! -d "../$arg" ]; then
-        echo "Creating folder $arg ..."
+    # Lightspeed needs special handling: source helper and start OLS backend
+    if [ "$arg" = "lightspeed-console-plugin" ]; then
+        LIGHTSPEED_ENABLED=true
+        . ./start-lightspeed.sh
+        start_lightspeed_service
+    fi
+
+    # The git repo name differs from the plugin name for lightspeed
+    if [ "$arg" = "lightspeed-console-plugin" ]; then
+        repo_dir="lightspeed-console"
+    else
+        repo_dir="$arg"
+    fi
+
+    if [ ! -d "../$repo_dir" ]; then
+        echo "Creating folder $repo_dir ..."
         cd ..
         echo "Cloning $plugin_url ..."
         git clone "$plugin_url"
-        cd "$arg"
+        cd "$repo_dir"
     else
-        cd "../$arg"
+        cd "../$repo_dir"
     fi
 
     git pull
@@ -52,13 +70,22 @@ for arg in "$@"; do
         cd web 
     fi
 
+    # Build env vars for the plugin dev server
+    plugin_env="PORT=$INITIAL_PORT"
+    if [ "$arg" = "lightspeed-console-plugin" ]; then
+        plugin_env="$plugin_env OLS_API_BASE_URL=http://127.0.0.1:${OLS_PORT}"
+    fi
+
     if [ -f yarn.lock ]; then
         echo "Detected yarn.lock → using yarn to run $arg"
         yarn install
-        PORT=$INITIAL_PORT yarn start --port="$INITIAL_PORT" &
+        env $plugin_env yarn start --port="$INITIAL_PORT" &
+    elif [ "$arg" = "lightspeed-console-plugin" ]; then
+        npm ci
+        env $plugin_env npx ts-node -O '{"module":"commonjs"}' node_modules/.bin/webpack serve --port="$INITIAL_PORT" &
     else
         npm ci
-        PORT=$INITIAL_PORT npm run start -- --port="$INITIAL_PORT" &
+        env $plugin_env npm run start -- --port="$INITIAL_PORT" &
     fi
 
     running_podman_linux="$running_podman_linux,$arg=http://localhost:$INITIAL_PORT"
@@ -86,9 +113,17 @@ BRIDGE_K8S_AUTH_BEARER_TOKEN=$(oc whoami --show-token 2>/dev/null)
 BRIDGE_USER_SETTINGS_LOCATION="localstorage"
 BRIDGE_I18N_NAMESPACES="plugin__kubevirt-plugin"
 
+if [ "$LIGHTSPEED_ENABLED" = "true" ]; then
+    configure_lightspeed_proxy
+fi
+
 echo "API Server: $BRIDGE_K8S_MODE_OFF_CLUSTER_ENDPOINT"
 echo "Console Image: $CONSOLE_IMAGE"
 echo "Console URL: http://localhost:${CONSOLE_PORT}"
+
+if [ "$LIGHTSPEED_ENABLED" = "true" ]; then
+    launch_chrome_insecure
+fi
 
 # Build --env args dynamically
 env_args=""

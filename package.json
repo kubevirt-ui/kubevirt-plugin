@@ -167,6 +167,7 @@
     "start-console": "./start-console.sh",
     "start-console-with-monitoring": "./start-console.sh monitoring-plugin",
     "start-console-with-networking": "./start-console.sh networking-console-plugin",
+    "start-console-with-lightspeed": "./start-console.sh lightspeed-console-plugin",
     "start-console-with-nmstate": "./start-console.sh nmstate-console-plugin",
     "test": "jest",
     "test-cov": "jest --coverage",
