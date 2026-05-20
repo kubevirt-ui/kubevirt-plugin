@@ -1,6 +1,5 @@
 import React, { FC, useMemo, useState } from 'react';
 
-import { InstanceTypes } from '@catalog/CreateFromInstanceTypes/state/utils/types';
 import { VirtualMachineInstancetypeModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { VirtualMachineClusterInstancetypeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { isRedHatInstanceType } from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/utils/utils';
@@ -10,6 +9,7 @@ import { getName } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { ResourceIcon } from '@openshift-console/dynamic-plugin-sdk';
 import { MenuItem, MenuSearch, MenuSearchInput, SearchInput } from '@patternfly/react-core';
+import { InstanceTypes } from '@virtualmachines/creation-wizard/utils/types';
 
 type UserInstanceTypeMenuProps = {
   allInstanceTypes: InstanceTypes;

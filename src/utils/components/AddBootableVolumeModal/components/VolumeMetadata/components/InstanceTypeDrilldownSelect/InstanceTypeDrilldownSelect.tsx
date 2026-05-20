@@ -1,15 +1,15 @@
 import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 
-import {
-  DEFAULT_INSTANCETYPE_KIND_LABEL,
-  DEFAULT_INSTANCETYPE_LABEL,
-} from '@catalog/CreateFromInstanceTypes/utils/constants';
 import { VirtualMachineClusterInstancetypeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
   AddBootableVolumeState,
   SetBootableVolumeFieldType,
 } from '@kubevirt-utils/components/AddBootableVolumeModal/utils/constants';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
+import {
+  DEFAULT_INSTANCETYPE_KIND_LABEL,
+  DEFAULT_INSTANCETYPE_LABEL,
+} from '@kubevirt-utils/constants/instancetypes-and-preferences';
 import useInstanceTypesAndPreferences from '@kubevirt-utils/hooks/useInstanceTypesAndPreferences';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { universalComparator } from '@kubevirt-utils/utils/utils';

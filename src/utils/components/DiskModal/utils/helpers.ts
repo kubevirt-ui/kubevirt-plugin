@@ -190,6 +190,33 @@ export const produceVMDisks = (
   });
 };
 
+export const produceVMNetworks = (
+  vm: V1VirtualMachine,
+  updateNetworks: (vmDraft: Draft<V1VirtualMachine>) => void,
+): V1VirtualMachine => {
+  return produce(vm, (draftVM) => {
+    ensurePath(draftVM, ['spec.template.spec']);
+    if (!draftVM.spec.template.spec.networks) draftVM.spec.template.spec.networks = [];
+    if (!draftVM.spec.template.spec.domain.devices.interfaces)
+      draftVM.spec.template.spec.domain.devices.interfaces = [];
+    updateNetworks(draftVM);
+  });
+};
+
+export const produceVMDevices = (
+  vm: V1VirtualMachine,
+  updateDevices: (vmDraft: Draft<V1VirtualMachine>) => void,
+): V1VirtualMachine => {
+  return produce(vm, (draftVM) => {
+    ensurePath(draftVM, ['spec.template.spec.domain.devices']);
+    if (!draftVM.spec.template.spec.domain.devices.gpus)
+      draftVM.spec.template.spec.domain.devices.gpus = [];
+    if (!draftVM.spec.template.spec.domain.devices.hostDevices)
+      draftVM.spec.template.spec.domain.devices.hostDevices = [];
+    updateDevices(draftVM);
+  });
+};
+
 export const doesSourceRequireDataVolume = (diskSource: SourceTypes): boolean => {
   return [
     SourceTypes.BLANK,

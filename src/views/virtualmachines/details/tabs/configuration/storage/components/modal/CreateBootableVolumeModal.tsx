@@ -1,10 +1,6 @@
 import React, { FC, useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 
-import {
-  DEFAULT_INSTANCETYPE_LABEL,
-  DEFAULT_PREFERENCE_LABEL,
-} from '@catalog/CreateFromInstanceTypes/utils/constants';
 import { DataSourceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
@@ -18,6 +14,10 @@ import {
 } from '@kubevirt-utils/components/AddBootableVolumeModal/utils/constants';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
+import {
+  DEFAULT_INSTANCETYPE_LABEL,
+  DEFAULT_PREFERENCE_LABEL,
+} from '@kubevirt-utils/constants/instancetypes-and-preferences';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { modelToGroupVersionKind, PersistentVolumeClaimModel } from '@kubevirt-utils/models';
 import { getPVCSize } from '@kubevirt-utils/resources/bootableresources/selectors';

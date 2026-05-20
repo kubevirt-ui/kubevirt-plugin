@@ -1,0 +1,84 @@
+import React, { FC } from 'react';
+
+import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { produceVMNetworks } from '@kubevirt-utils/components/DiskModal/utils/helpers';
+import NetworkInterfaceModal from '@kubevirt-utils/components/NetworkInterfaceModal/NetworkInterfaceModal';
+import {
+  createInterface,
+  createNetwork,
+} from '@kubevirt-utils/components/NetworkInterfaceModal/utils/helpers';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { NetworkPresentation } from '@kubevirt-utils/resources/vm/utils/network/constants';
+
+type UpdateVM = (updatedVM: V1VirtualMachine) => Promise<void>;
+
+type WizardEditNetworkInterfaceModalProps = {
+  isOpen: boolean;
+  nicPresentation: NetworkPresentation;
+  onClose: () => void;
+  updateVM: UpdateVM;
+  vm: V1VirtualMachine;
+};
+
+const WizardEditNetworkInterfaceModal: FC<WizardEditNetworkInterfaceModalProps> = ({
+  isOpen,
+  nicPresentation,
+  onClose,
+  updateVM,
+  vm,
+}) => {
+  const { t } = useKubevirtTranslation();
+
+  const onSubmit =
+    ({
+      interfaceLinkState,
+      interfaceMACAddress,
+      interfaceModel,
+      interfaceType,
+      isLegacyPasst,
+      networkName,
+      nicName,
+    }) =>
+    (currentVM: V1VirtualMachine) => {
+      const resultNetwork = createNetwork(nicName, networkName);
+      const resultInterface = createInterface({
+        interfaceLinkState,
+        interfaceMACAddress,
+        interfaceModel,
+        interfaceType,
+        isLegacyPasst,
+        nicName,
+      });
+
+      const networkProducer = produceVMNetworks(currentVM, (draftVM) => {
+        draftVM.spec.template.spec.domain.devices.interfaces = [
+          ...(draftVM.spec.template.spec.domain.devices.interfaces.filter(
+            ({ name }) => name !== nicPresentation?.network?.name,
+          ) || []),
+          resultInterface,
+        ];
+
+        draftVM.spec.template.spec.networks = [
+          ...(draftVM.spec.template.spec.networks.filter(
+            ({ name }) => name !== nicPresentation?.network?.name,
+          ) || []),
+          resultNetwork,
+        ];
+      });
+
+      return updateVM(networkProducer);
+    };
+
+  return (
+    <NetworkInterfaceModal
+      headerText={t('Edit network interface')}
+      isOpen={isOpen}
+      nicPresentation={nicPresentation}
+      onClose={onClose}
+      onSubmit={onSubmit}
+      vm={vm}
+    />
+  );
+};
+
+export default WizardEditNetworkInterfaceModal;

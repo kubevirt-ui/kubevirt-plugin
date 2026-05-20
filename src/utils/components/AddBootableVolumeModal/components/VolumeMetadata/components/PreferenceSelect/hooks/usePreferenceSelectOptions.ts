@@ -1,6 +1,5 @@
 import { useMemo } from 'react';
 
-import { DEFAULT_PREFERENCE_KIND_LABEL } from '@catalog/CreateFromInstanceTypes/utils/constants';
 import {
   VirtualMachineClusterPreferenceModelGroupVersionKind,
   VirtualMachinePreferenceModelGroupVersionKind,
@@ -10,6 +9,7 @@ import { VirtualMachinePreferenceModel } from '@kubevirt-ui-ext/kubevirt-api/con
 import { getResourceDropdownOptions } from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/PreferenceSelect/utils/utils';
 import { SetBootableVolumeFieldType } from '@kubevirt-utils/components/AddBootableVolumeModal/utils/constants';
 import { EnhancedSelectOptionProps } from '@kubevirt-utils/components/FilterSelect/utils/types';
+import { DEFAULT_PREFERENCE_KIND_LABEL } from '@kubevirt-utils/constants/instancetypes-and-preferences';
 import useClusterPreferences from '@kubevirt-utils/hooks/useClusterPreferences';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useUserPreferences from '@kubevirt-utils/hooks/useUserPreferences';

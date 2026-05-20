@@ -1,6 +1,6 @@
 import React, { ChangeEvent, FC } from 'react';
 
-import ContainerSource from '@catalog/templatescatalog/components/TemplatesCatalogDrawer/StorageSection/CustomizeSource/Sources/ContainerSource';
+import ContainerSource from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeSource/components/ContainerSource';
 import { formatRegistryURL } from '@kubevirt-utils/components/AddBootableVolumeModal/utils/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { removeAllWhitespace } from '@kubevirt-utils/utils/utils';

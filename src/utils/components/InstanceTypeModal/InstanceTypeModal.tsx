@@ -1,8 +1,8 @@
 import React, { FC } from 'react';
 
-import { groupVersionKindFromCommonResource } from '@catalog/CreateFromInstanceTypes/utils/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { InstanceTypeUnion } from '@kubevirt-utils/resources/instancetype/types';
+import { groupVersionKindFromCommonResource } from '@kubevirt-utils/resources/shared';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
 import { FormGroup, Radio, SelectOption } from '@patternfly/react-core';
