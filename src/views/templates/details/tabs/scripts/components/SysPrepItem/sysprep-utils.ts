@@ -1,8 +1,8 @@
 import produce from 'immer';
 
-import { produceVMDisks } from '@catalog/utils/WizardVMContext';
 import { TemplateModel, V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { produceVMDisks } from '@kubevirt-utils/components/DiskModal/utils/helpers';
 import {
   addSysprepConfig,
   AUTOUNATTEND,

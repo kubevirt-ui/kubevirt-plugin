@@ -1,6 +1,5 @@
 import React from 'react';
 
-import NetworkInterfaceList from '@catalog/wizard/tabs/network/components/list/NetworkInterfaceList';
 import {
   V1Disk,
   V1Interface,
@@ -13,6 +12,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { updateCustomizeInstanceType } from '@kubevirt-utils/store/customizeInstanceType';
 import { vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
 import { PageSection, Title } from '@patternfly/react-core';
+import NetworkInterfaceList from '@virtualmachines/creation-wizard/steps/CustomizationStep/components/CustomizeVirtualMachine/components/CustomizeVMTabs/tabs/network/NetworkInterfaceList';
 import AddNetworkInterfaceButton from '@virtualmachines/details/tabs/configuration/network/components/AddNetworkInterfaceButton';
 
 const CustomizeInstanceTypeNetworkTab = () => {

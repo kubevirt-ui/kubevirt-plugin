@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
 
-import { CREATE_VM_TAB } from '@catalog/CreateVMHorizontalNav/constants';
 import { SHOW_DEPRECATED_BOOTABLE_VOLUMES } from '@kubevirt-utils/resources/bootableresources/constants';
 import { OnFilterChange } from '@openshift-console/dynamic-plugin-sdk';
+import { CREATE_VM_TAB } from '@virtualmachines/creation-wizard/utils/constants';
 
 type UseHideDeprecatedBootableVolumes = (
   onFilterChange: OnFilterChange,

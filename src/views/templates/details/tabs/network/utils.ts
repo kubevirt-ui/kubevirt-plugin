@@ -1,9 +1,9 @@
 import produce from 'immer';
 import { Draft } from 'immer';
 
-import { produceVMNetworks } from '@catalog/utils/WizardVMContext';
 import { TemplateModel, V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { produceVMNetworks } from '@kubevirt-utils/components/DiskModal/utils/helpers';
 import {
   getTemplateVirtualMachineObject,
   replaceTemplateVM,

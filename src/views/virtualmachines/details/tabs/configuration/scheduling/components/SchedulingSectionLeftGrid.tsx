@@ -1,7 +1,5 @@
 import React, { FC, useCallback } from 'react';
 
-import Descheduler from '@catalog/wizard/tabs/scheduling/components/Descheduler';
-import DeschedulerPopover from '@catalog/wizard/tabs/scheduling/components/DeschedulerPopover';
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { IoK8sApiCoreV1Node } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -18,6 +16,8 @@ import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sUpdate } from '@multicluster/k8sRequests';
 import { DescriptionList, GridItem } from '@patternfly/react-core';
+import Descheduler from '@virtualmachines/details/tabs/configuration/scheduling/components/Descheduler';
+import DeschedulerPopover from '@virtualmachines/details/tabs/configuration/scheduling/components/DeschedulerPopover';
 
 import Affinity from './Affinity';
 

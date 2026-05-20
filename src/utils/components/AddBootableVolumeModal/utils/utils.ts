@@ -1,6 +1,5 @@
 import produce from 'immer';
 
-import { DEFAULT_INSTANCETYPE_LABEL } from '@catalog/CreateFromInstanceTypes/utils/constants';
 import { ConfigMapModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { DataImportCronModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { DataSourceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -12,6 +11,7 @@ import {
 import { V1beta1DataVolumeSource } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getOrCreateTLSCertConfigMapName } from '@kubevirt-utils/components/TLSCertificateSection';
 import { OPENSHIFT_CNV } from '@kubevirt-utils/constants/constants';
+import { DEFAULT_INSTANCETYPE_LABEL } from '@kubevirt-utils/constants/instancetypes-and-preferences';
 import { UploadDataProps } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import { KUBEVIRT_ISO_LABEL } from '@kubevirt-utils/resources/bootableresources/constants';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';

@@ -1,8 +1,3 @@
-import { DEFAULT_INSTANCETYPE_KIND_LABEL } from '@catalog/CreateFromInstanceTypes/utils/constants';
-import {
-  DEFAULT_PREFERENCE_KIND_LABEL,
-  DEFAULT_PREFERENCE_LABEL,
-} from '@catalog/CreateFromInstanceTypes/utils/constants';
 import {
   modelToGroupVersionKind,
   PersistentVolumeClaimModel,
@@ -24,6 +19,11 @@ import {
   V1beta1VirtualMachineClusterPreference,
   V1beta1VirtualMachinePreference,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import {
+  DEFAULT_INSTANCETYPE_KIND_LABEL,
+  DEFAULT_PREFERENCE_KIND_LABEL,
+  DEFAULT_PREFERENCE_LABEL,
+} from '@kubevirt-utils/constants/instancetypes-and-preferences';
 import {
   getDataSourcePVCName,
   getDataSourcePVCNamespace,
