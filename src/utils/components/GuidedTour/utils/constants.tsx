@@ -6,6 +6,7 @@ import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { SINGLE_CLUSTER_KEY } from '@kubevirt-utils/resources/constants';
 import { RUNSTRATEGY_ALWAYS } from '@kubevirt-utils/resources/vm/utils/constants';
+import { NAV_TOGGLE_BUTTON_SELECTORS } from '@virtualmachines/hooks/useAutoHideNavigation/constants';
 
 import EndTourContent from '../components/EndTourContent/EndTourContent';
 import PowerfulShortcutsContent from '../components/PowerfulShortcutsContent/PowerfulShortcutsContent';
@@ -60,6 +61,15 @@ export const getTourSteps = (t: TFunction): Step[] => [
     spotlightPadding: 12,
     target: '#tour-step-create-button',
     title: t('Create a VM'),
+  },
+  {
+    content: t('Collapse or expand the main navigation menu using this hamburger icon.'),
+    data: { route: VM_LIST_ROUTE },
+    disableBeacon: true,
+    placement: 'bottom',
+    spotlightPadding: 8,
+    target: NAV_TOGGLE_BUTTON_SELECTORS.join(', '),
+    title: t('Maximize your workspace'),
   },
   {
     content: <EndTourContent />,
