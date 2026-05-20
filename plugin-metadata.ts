@@ -5,7 +5,6 @@ import { exposedModules as VirtualizationPerspectiveExposedModules } from './src
 import { exposedModules as YamlTemplatesExposedModules } from './src/templates/extensions';
 import { exposedModules as utilsExposedModules } from './src/utils/extension';
 import { exposedModules as BootableVolumesExposedModules } from './src/views/bootablevolumes/extensions';
-import { exposedModules as CatalogExposedModules } from './src/views/catalog/extensions';
 import { exposedModules as CDIUploadProviderExposedModules } from './src/views/cdi-upload-provider/extensions';
 import { exposedModules as CheckupsExposedModules } from './src/views/checkups/extensions';
 import { exposedModules as ClusterOverviewExposedModules } from './src/views/clusteroverview/extensions';
@@ -43,7 +42,6 @@ const metadata: ConsolePluginBuildMetadata = {
     ...StorageMigrationExposedModules,
     ...VMNetworksExposedModules,
     ...ClusterOverviewExposedModules,
-    ...CatalogExposedModules,
     ...VirtualMachinesExposedModules,
     ...TemplatesExposedModules,
     ...BootableVolumesExposedModules,

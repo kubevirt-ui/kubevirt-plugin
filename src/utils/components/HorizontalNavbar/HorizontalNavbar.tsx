@@ -5,7 +5,7 @@ import { VirtualMachineModel } from 'src/views/dashboard-extensions/utils';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { isCatalogURL } from '@multicluster/urls';
+import { isVMWizardURL } from '@multicluster/urls';
 
 import StateHandler from '../StateHandler/StateHandler';
 
@@ -36,7 +36,7 @@ const HorizontalNavbar: FC<HorizontalNavbarProps> = ({
   const location = useLocation();
   const params = useParams();
 
-  const vmCreated = !isCatalogURL(location.pathname);
+  const vmCreated = !isVMWizardURL(location.pathname);
 
   const dynamicPluginPages = useDynamicPages(VirtualMachineModel, vm, vmCreated);
 

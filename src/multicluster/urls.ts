@@ -16,7 +16,6 @@ import { VirtualMachineModel } from '../views/dashboard-extensions/utils';
 import {
   FLEET_BASE_PATH,
   FLEET_BOOTABLE_VOLUMES_PATH,
-  FLEET_CATALOG_PATH,
   FLEET_CHECKUPS_PATH,
   FLEET_MIGRATION_POLICIES_PATH,
   FLEET_TEMPLATES_PATH,
@@ -62,21 +61,8 @@ export const getACMVMSearchURL = (): string =>
 export const getACMVMListNamespacesURL = (cluster: string, namespace: string): string =>
   `${FLEET_VIRTUAL_MACHINES_PATH}/cluster/${cluster}/ns/${namespace}`;
 
-// based on dns1123LabelRegexp
-const catalogWithNs = new RegExp('/ns/[-a-z0-9]+$');
-
-export const isCatalogURL = (path: string = ''): boolean =>
-  path.startsWith(FLEET_CATALOG_PATH) ||
-  path.includes(`${ALL_NAMESPACES}/catalog`) ||
-  catalogWithNs.test(path);
-
-export const getCatalogURL = (cluster: string, namespace?: string): string => {
-  const namespacePath = isAllNamespaces(namespace) ? ALL_NAMESPACES : `ns/${namespace}`;
-
-  return cluster
-    ? `${FLEET_CATALOG_PATH}/cluster/${cluster}/${namespacePath}`
-    : `/k8s/${namespacePath}/catalog`;
-};
+export const isVMWizardURL = (path: string = ''): boolean =>
+  path.startsWith(FLEET_WIZARD_PATH) || path.startsWith('/vm-wizard');
 
 export const getVMWizardURL = (cluster: string, namespace?: string): string => {
   if (!cluster) return `/vm-wizard`;
