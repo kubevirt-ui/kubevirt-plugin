@@ -113,7 +113,7 @@ kubevirt-plugin/
 
 ### Main Views
 - `src/views/virtualmachines/` - VM management UI
-- `src/views/catalog/` - VM creation wizard
+- `src/views/virtualmachines/creation-wizard` - VM creation wizard
 - `src/views/templates/` - Template management
 
 ### Shared Code
