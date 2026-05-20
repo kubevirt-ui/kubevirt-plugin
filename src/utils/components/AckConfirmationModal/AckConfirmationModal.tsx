@@ -1,4 +1,4 @@
-import React, { FC, ReactNode, useState } from 'react';
+import React, { FC, ReactNode, useEffect, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -13,24 +13,26 @@ import {
   StackItem,
 } from '@patternfly/react-core';
 
-type ConfirmVMActionBaseModalProps = {
-  action: () => Promise<string | void>;
+export type AckConfirmationModalProps = {
+  action: () => Promise<string | void> | void;
   actionLabel: string;
-  actionType: string;
+  actionType?: string;
   checkToConfirmMessage?: string;
   children?: ReactNode;
+  className?: string;
   isOpen: boolean;
   onClose: () => void;
   severityVariant?: 'danger' | 'warning' | undefined;
   title: string;
 };
 
-const ConfirmVMActionBaseModal: FC<ConfirmVMActionBaseModalProps> = ({
+const AckConfirmationModal: FC<AckConfirmationModalProps> = ({
   action,
   actionLabel,
   actionType,
   checkToConfirmMessage,
   children,
+  className,
   isOpen,
   onClose,
   severityVariant,
@@ -38,42 +40,56 @@ const ConfirmVMActionBaseModal: FC<ConfirmVMActionBaseModalProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const [isChecked, setIsChecked] = useState<boolean>(!checkToConfirmMessage);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
-  const submitHandler = () => {
-    action();
-    onClose();
+  useEffect(() => {
+    if (!isOpen) {
+      setIsChecked(!checkToConfirmMessage);
+    }
+  }, [checkToConfirmMessage, isOpen]);
+
+  const submitHandler = async () => {
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+    try {
+      await action();
+      onClose();
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
     <Modal
-      className="confirm-multiple-vm-actions-modal"
+      className={className}
       isOpen={isOpen}
       onClose={onClose}
       onSubmit={submitHandler}
-      variant={'small'}
+      variant="small"
     >
-      <ModalHeader title={title} titleIconVariant={severityVariant} />
+      <ModalHeader title={title} titleIconVariant={severityVariant ? 'warning' : undefined} />
       <ModalBody>
         <Stack hasGutter>
           <StackItem>{children}</StackItem>
-          <StackItem>
-            {checkToConfirmMessage && (
+          {checkToConfirmMessage && (
+            <StackItem>
               <Checkbox
-                id={`check-to-confirm-action-${actionType}`}
+                id={`ack-confirm-${actionType ?? 'action'}`}
                 isChecked={isChecked}
                 label={checkToConfirmMessage}
                 onChange={(_, checked) => setIsChecked(checked)}
               />
-            )}
-          </StackItem>
+            </StackItem>
+          )}
         </Stack>
       </ModalBody>
       <ModalFooter>
         <Button
-          isDisabled={!isChecked}
+          isDisabled={!isChecked || isSubmitting}
+          isLoading={isSubmitting}
           key="confirm"
           onClick={submitHandler}
-          variant={severityVariant}
+          variant={severityVariant === 'danger' ? ButtonVariant.danger : ButtonVariant.primary}
         >
           {actionLabel}
         </Button>
@@ -85,4 +101,4 @@ const ConfirmVMActionBaseModal: FC<ConfirmVMActionBaseModalProps> = ({
   );
 };
 
-export default ConfirmVMActionBaseModal;
+export default AckConfirmationModal;

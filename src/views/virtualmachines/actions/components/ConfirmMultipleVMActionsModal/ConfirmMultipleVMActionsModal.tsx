@@ -1,12 +1,12 @@
 import React, { FC } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import AckConfirmationModal from '@kubevirt-utils/components/AckConfirmationModal/AckConfirmationModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { isEmpty, kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { Stack, StackItem } from '@patternfly/react-core';
 import { getVMNamesByNamespace } from '@virtualmachines/actions/components/ConfirmMultipleVMActionsModal/utils/utils';
 
-import ConfirmVMActionBaseModal from './components/ConfirmVMActionBaseModal';
 import VMsCountByNamespacePopoverLink from './components/VMsCountByNamespacePopoverLink';
 
 import './ConfirmMultipleVMActionsModal.scss';
@@ -45,12 +45,25 @@ const ConfirmMultipleVMActionsModal: FC<ConfirmMultipleVMActionsModalProps> = ({
   const numExcludedVMs = excludedVMs?.length;
   const totalSelectedVMs = numVMs + (numExcludedVMs || 0);
 
-  const actionOnVms = async () =>
-    Promise.any(
-      vms?.map((vm) => {
-        action(vm);
-      }),
+  const actionOnVms = async (): Promise<void> => {
+    const results = await Promise.allSettled(vms?.map((vm) => action(vm)) ?? []);
+    const failures = results.filter(
+      (result): result is PromiseRejectedResult => result.status === 'rejected',
     );
+
+    if (failures.length === 0) {
+      return;
+    }
+
+    failures.forEach((failure) =>
+      kubevirtConsole.error(`Failed to ${actionType.toLowerCase()}:`, failure.reason),
+    );
+    throw new Error(
+      `Failed to ${actionType.toLowerCase()} for ${failures.length} of ${
+        vms?.length ?? 0
+      } VirtualMachine(s)`,
+    );
+  };
 
   const defaultBody = (
     <>
@@ -82,7 +95,7 @@ const ConfirmMultipleVMActionsModal: FC<ConfirmMultipleVMActionsModalProps> = ({
     : t('{{actionType}} {{numVMs}} VirtualMachines?', { actionType, numVMs });
 
   return (
-    <ConfirmVMActionBaseModal
+    <AckConfirmationModal
       action={actionOnVms}
       actionLabel={t(actionType)}
       actionType={actionType}
@@ -93,7 +106,7 @@ const ConfirmMultipleVMActionsModal: FC<ConfirmMultipleVMActionsModalProps> = ({
       title={title}
     >
       {body}
-    </ConfirmVMActionBaseModal>
+    </AckConfirmationModal>
   );
 };
 
