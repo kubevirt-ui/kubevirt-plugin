@@ -15,7 +15,6 @@
     "noUnusedParameters": true,
     "outDir": "dist",
     "paths": {
-      "@catalog/*": ["src/views/catalog/*"],
       "@images/*": ["./images/*"],
       "@kubevirt-extensions/*": ["src/extensions/*"],
       "@kubevirt-utils": ["src/utils"],
