@@ -146,6 +146,19 @@ const config: Configuration = {
     new ConsoleRemotePlugin({
       extensions,
       pluginMetadata,
+      sharedDynamicModuleSettings: {
+        moduleFilter: (moduleRequest) => {
+          const isCode = /\.(jsx?|tsx?)$/.test(moduleRequest);
+          const isVendor = moduleRequest.includes('/node_modules/');
+
+          return (
+            isCode &&
+            (!isVendor ||
+              moduleRequest.includes('/node_modules/@openshift-console/') ||
+              moduleRequest.includes('/node_modules/@patternfly/react-data-view/'))
+          );
+        },
+      },
     }),
     new ForkTsCheckerWebpackPlugin({
       typescript: {

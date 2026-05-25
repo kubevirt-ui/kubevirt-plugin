@@ -17,8 +17,8 @@ This is the OpenShift Console dynamic plugin for KubeVirt virtualization managem
 - Enables VM lifecycle management, monitoring, and configuration
 
 ### Technology Stack
-- **React 17** - UI framework
-- **TypeScript 5.7** - Type-safe JavaScript
+- **React 18** - UI framework
+- **TypeScript 5.9** - Type-safe JavaScript
 - **PatternFly 6** - Red Hat design system components
 - **OpenShift Console SDK** - Plugin integration framework
 - **Zustand** - Lightweight state management

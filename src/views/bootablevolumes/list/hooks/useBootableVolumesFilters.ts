@@ -1,15 +1,11 @@
 import { useMemo } from 'react';
 
-import { PersistentVolumeClaimModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { DataSourceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { useClusterFilter } from '@kubevirt-utils/hooks/useClusterFilter';
+import { DataSourceModel, PersistentVolumeClaimModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import useClusterFilter from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/filters/useClusterFilter';
+import useProjectFilter from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/filters/useProjectFilter';
+import { KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { useProjectFilter } from '@kubevirt-utils/hooks/useProjectFilter';
-import {
-  ISO,
-  SHOW_DEPRECATED_BOOTABLE_VOLUMES,
-  SHOW_DEPRECATED_BOOTABLE_VOLUMES_LABEL,
-} from '@kubevirt-utils/resources/bootableresources/constants';
+import { ISO } from '@kubevirt-utils/resources/bootableresources/constants';
 import {
   isBootableVolumeISO,
   isDeprecated,
@@ -17,26 +13,14 @@ import {
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { OS_NAMES } from '@kubevirt-utils/resources/template';
-import {
-  ARCHITECTURE_ID,
-  ARCHITECTURE_TITLE,
-  getArchitecture,
-} from '@kubevirt-utils/utils/architecture';
-import { getItemNameWithOther, includeFilter } from '@kubevirt-utils/utils/utils';
+import { getArchitecture } from '@kubevirt-utils/utils/architecture';
 import useIsACMPage from '@multicluster/useIsACMPage';
-import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 
-import { BootableResource } from '../../utils/types';
 import { getPreferenceOSType } from '../../utils/utils';
 
-import { NODATA_ID, NODATA_TITLE } from './constants';
+import { BootableVolumesFilterID, NODATA_ID, NODATA_TITLE } from './constants';
 
-const useBootableVolumesFilters = (
-  bootableVolumes: BootableVolume[],
-): {
-  filtersWithSelect: RowFilter<BootableResource>[];
-  rowFilters: RowFilter<BootableResource>[];
-} => {
+const useBootableVolumesFilters = (bootableVolumes: BootableVolume[]): KubevirtFilter[] => {
   const { t } = useKubevirtTranslation();
   const isACMPage = useIsACMPage();
   const clusterFilter = useClusterFilter();
@@ -47,91 +31,62 @@ const useBootableVolumesFilters = (
       Array.from(new Set(bootableVolumes.map((bootableVolume) => getArchitecture(bootableVolume)))),
     [bootableVolumes],
   );
-  const workloadsArchitecturesItems = useMemo(
-    () =>
-      workloadsArchitectures.map((arch) => ({
-        id: arch ?? NODATA_ID,
-        title: arch ?? NODATA_TITLE,
-      })),
-    [workloadsArchitectures],
-  );
 
-  const filtersWithSelect = useMemo(
-    () => (isACMPage ? [clusterFilter, projectFilter] : [projectFilter]),
-    [isACMPage, clusterFilter, projectFilter],
-  );
+  return useMemo(() => {
+    const filters: KubevirtFilter<BootableVolume>[] = [];
 
-  const rowFilters = useMemo(
-    () => [
+    if (isACMPage) {
+      filters.push(clusterFilter);
+    }
+
+    filters.push(
+      projectFilter,
       {
-        filter: (availableResourceNames, obj) =>
-          availableResourceNames?.selected?.length === 0 ? !isDeprecated(getName(obj)) : true,
-        filterGroupName: ' ',
-        items: [
+        applyWhenEmpty: true,
+        hideCountBadge: true,
+        id: BootableVolumesFilterID.SHOW_DEPRECATED_BOOTABLE_VOLUMES,
+        match: (obj, selected) => (selected.length === 0 ? !isDeprecated(getName(obj)) : true),
+        options: [
           {
-            id: t('Show deprecated bootable volumes'),
-            title: t('Show deprecated bootable volumes'),
+            label: t('Show deprecated bootable volumes'),
+            value: 'true',
           },
         ],
-        reducer: (obj) => isDeprecated(getName(obj)) && SHOW_DEPRECATED_BOOTABLE_VOLUMES_LABEL,
-        type: SHOW_DEPRECATED_BOOTABLE_VOLUMES,
       },
       {
-        filter: (availableArchitectures, obj) =>
-          includeFilter(
-            availableArchitectures,
-            workloadsArchitecturesItems,
-            getArchitecture(obj) ?? NODATA_ID,
-          ),
-        filterGroupName: ARCHITECTURE_TITLE,
-        items: workloadsArchitecturesItems,
-        reducer: (obj) =>
-          getItemNameWithOther(getArchitecture(obj) ?? NODATA_ID, workloadsArchitecturesItems),
-        type: ARCHITECTURE_ID,
+        categoryLabel: t('Architecture'),
+        id: BootableVolumesFilterID.ARCHITECTURE,
+        match: (obj, selected) => selected.includes(getArchitecture(obj) ?? NODATA_ID),
+        options: workloadsArchitectures.map((arch) => ({
+          label: arch ?? NODATA_TITLE,
+          value: arch ?? NODATA_ID,
+        })),
       },
       {
-        filter: (availableOsNames, obj) =>
-          includeFilter(availableOsNames, OS_NAMES, getPreferenceOSType(obj)),
-        filterGroupName: t('Operating system'),
-        items: OS_NAMES,
-        reducer: (obj) => getItemNameWithOther(getPreferenceOSType(obj), OS_NAMES),
-        type: 'osName',
+        categoryLabel: t('Operating system'),
+        id: BootableVolumesFilterID.OS,
+        match: (obj, selected) => selected.includes(getPreferenceOSType(obj)),
+        options: OS_NAMES.map(({ id, title }) => ({ label: title, value: id })),
       },
       {
-        filter: (availableResourceNames, obj) =>
-          availableResourceNames?.selected?.length === 0 ||
-          availableResourceNames?.selected?.includes(obj?.kind),
-        filterGroupName: t('Resource'),
-        items: [
-          {
-            id: PersistentVolumeClaimModel.kind,
-            title: PersistentVolumeClaimModel.abbr,
-          },
-          {
-            id: DataSourceModel.kind,
-            title: 'DS',
-          },
+        categoryLabel: t('Resource'),
+        id: BootableVolumesFilterID.RESOURCE_KIND,
+        match: (obj, selected) => selected.includes(obj?.kind),
+        options: [
+          { label: PersistentVolumeClaimModel.abbr, value: PersistentVolumeClaimModel.kind },
+          { label: 'DS', value: DataSourceModel.kind },
         ],
-        reducer: (obj) => obj?.kind,
-        type: `resourceKind`,
       },
       {
-        filter: (filters, obj) => filters?.selected?.length === 0 || isBootableVolumeISO(obj),
-        filterGroupName: t('Type'),
-        items: [
-          {
-            id: ISO,
-            title: ISO,
-          },
-        ],
-        reducer: (obj) => isBootableVolumeISO(obj) && ISO,
-        type: ISO,
+        categoryLabel: t('Type'),
+        id: BootableVolumesFilterID.TYPE,
+        match: (obj) => isBootableVolumeISO(obj),
+        options: [{ label: ISO, value: ISO }],
       },
-    ],
-    [t, workloadsArchitecturesItems],
-  );
+    );
 
-  return { filtersWithSelect, rowFilters };
+    return filters;
+  }, [t, isACMPage, clusterFilter, projectFilter, workloadsArchitectures]);
 };
 
 export default useBootableVolumesFilters;

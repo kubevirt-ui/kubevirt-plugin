@@ -1,0 +1,43 @@
+import React, { FC, PropsWithChildren } from 'react';
+
+import {
+  KubevirtFilter,
+  KubevirtFilterState,
+} from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
+import { ToolbarFilter, ToolbarLabel } from '@patternfly/react-core';
+
+type ToolbarFilterMultiChipProps = PropsWithChildren<{
+  filterDef: KubevirtFilter;
+  filters: KubevirtFilterState;
+  onSetFilters: (newFilters: Partial<KubevirtFilterState>) => void;
+}>;
+
+const ToolbarFilterMultiChip: FC<ToolbarFilterMultiChipProps> = ({
+  children,
+  filterDef,
+  filters,
+  onSetFilters,
+}) => {
+  const selected = filters[filterDef.id] ?? [];
+
+  return (
+    <ToolbarFilter
+      deleteLabel={(_f, label: ToolbarLabel) => {
+        onSetFilters({
+          [filterDef.id]: selected.filter((v) => v !== label.key),
+        });
+      }}
+      labels={selected.map((val) => ({
+        key: val,
+        node: filterDef.options.find((o) => o.value === val)?.label ?? val,
+      }))}
+      categoryName={filterDef.categoryLabel ?? ' '}
+      deleteLabelGroup={() => onSetFilters({ [filterDef.id]: [] })}
+      showToolbarItem={Boolean(children)}
+    >
+      {children}
+    </ToolbarFilter>
+  );
+};
+
+export default ToolbarFilterMultiChip;

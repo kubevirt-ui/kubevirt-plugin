@@ -1,20 +1,18 @@
 import React, { FC, useMemo } from 'react';
 import { useParams } from 'react-router';
 
+import KubevirtFilterToolbar from '@kubevirt-utils/components/KubevirtFilterToolbar/KubevirtFilterToolbar';
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
 import { buildColumnLayout } from '@kubevirt-utils/components/KubevirtTable/utils';
-import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
 import { PageTitles } from '@kubevirt-utils/constants/page-constants';
 import useClusterPreferences from '@kubevirt-utils/hooks/useClusterPreferences';
+import useKubevirtDataViewFilters from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/useKubevirtDataViewFilters';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtTableColumns';
 import { COLUMN_MANAGEMENT_IDS } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/const';
 import usePaginationWithFilters from '@kubevirt-utils/hooks/usePagination/usePaginationWithFilters';
 import { paginationDefaultValues } from '@kubevirt-utils/hooks/usePagination/utils/constants';
-import useSelectedRowFilterClusters from '@kubevirt-utils/hooks/useSelectedRowFilterClusters';
-import useSelectedRowFilterProjects from '@kubevirt-utils/hooks/useSelectedRowFilterProjects';
 import useBootableVolumes from '@kubevirt-utils/resources/bootableresources/hooks/useBootableVolumes';
-import useHideDeprecatedBootableVolumes from '@kubevirt-utils/resources/bootableresources/hooks/useHideDeprecatedBootableVolumes';
 import { isAllNamespaces, isEmpty } from '@kubevirt-utils/utils/utils';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import useIsAllClustersPage from '@multicluster/hooks/useIsAllClustersPage';
@@ -23,7 +21,6 @@ import {
   ListPageBody,
   ListPageHeader,
   useActiveNamespace,
-  useListPageFilter,
 } from '@openshift-console/dynamic-plugin-sdk';
 import { Pagination, Stack, StackItem } from '@patternfly/react-core';
 
@@ -46,20 +43,19 @@ const BootableVolumesList: FC = () => {
   const [activeNamespace] = useActiveNamespace();
   const isAllClustersPage = useIsAllClustersPage();
   const clusterParam = useClusterParam();
-  const filteredClusters = useSelectedRowFilterClusters();
-  const filteredNamespaces = useSelectedRowFilterProjects();
   const { bootableVolumes, dataImportCrons, dvSources, error, loaded } =
     useBootableVolumes(namespace);
   const [preferences] = useClusterPreferences();
 
-  const { filtersWithSelect, rowFilters } = useBootableVolumesFilters(bootableVolumes);
-  const [unfilteredData, filteredData, onFilterChange] = useListPageFilter(bootableVolumes, [
-    ...filtersWithSelect,
-    ...rowFilters,
-  ]);
+  const filterDefinitions = useBootableVolumesFilters(bootableVolumes);
+  const { clearAllFilters, filteredData, filters, onSetFilters } = useKubevirtDataViewFilters({
+    data: bootableVolumes,
+    filters: filterDefinitions,
+  });
 
-  const { handleFilterChange, handlePerPageSelect, handleSetPage, pagination } =
-    usePaginationWithFilters(filteredData?.length ?? 0, onFilterChange);
+  const { handlePerPageSelect, handleSetPage, pagination } = usePaginationWithFilters(
+    filteredData?.length ?? 0,
+  );
 
   const columns = useMemo(
     () =>
@@ -98,17 +94,9 @@ const BootableVolumesList: FC = () => {
     [clusterParam, dataImportCrons, dvSources, preferences],
   );
 
-  useHideDeprecatedBootableVolumes(handleFilterChange);
-
   const isLoaded = loaded && loadedColumns;
 
-  if (
-    loaded &&
-    !error &&
-    isEmpty(bootableVolumes) &&
-    isEmpty(filteredClusters) &&
-    isEmpty(filteredNamespaces)
-  ) {
+  if (loaded && !error && isEmpty(bootableVolumes)) {
     return <BootableVolumesEmptyState namespace={namespace} />;
   }
 
@@ -124,13 +112,14 @@ const BootableVolumesList: FC = () => {
           <StackItem>{t('View and manage available bootable volumes.')}</StackItem>
 
           <StackItem className="list-managment-group">
-            <ListPageFilter
+            <KubevirtFilterToolbar
+              clearAllFilters={clearAllFilters}
               columnLayout={columnLayout}
-              data={unfilteredData}
-              filtersWithSelect={filtersWithSelect}
+              data={bootableVolumes}
+              filterDefinitions={filterDefinitions}
+              filters={filters}
               loaded={isLoaded}
-              onFilterChange={handleFilterChange}
-              rowFilters={rowFilters}
+              onSetFilters={onSetFilters}
             />
             {!isEmpty(filteredData) && isLoaded && (
               <Pagination
@@ -158,7 +147,7 @@ const BootableVolumesList: FC = () => {
             loadError={error}
             noDataMsg={t('No bootable volumes found')}
             pagination={pagination}
-            unfilteredData={unfilteredData}
+            unfilteredData={bootableVolumes}
           />
         </Stack>
       </ListPageBody>
