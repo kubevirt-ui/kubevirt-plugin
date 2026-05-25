@@ -2,37 +2,38 @@ import React, { FC } from 'react';
 import { Link } from 'react-router';
 
 import { HyperConvergedModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { AlertType } from '@kubevirt-utils/components/AlertsCard/utils/types';
 import useHyperConvergeConfiguration from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
+import useInfrastructureAlerts from '@kubevirt-utils/hooks/useInfrastructureAlerts/useInfrastructureAlerts';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getResourceUrl } from '@kubevirt-utils/resources/shared';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { PrometheusEndpoint, usePrometheusPoll } from '@openshift-console/dynamic-plugin-sdk';
 import { Skeleton, StackItem } from '@patternfly/react-core';
 
 import ConditionIcon from './ConditionIcon';
-import { HCO_HEALTH_METRIC, VALUE_TO_LABEL } from './constants';
+import { SEVERITY_TO_CONDITION_VALUE, VALUE_TO_LABEL } from './constants';
 
 const Conditions: FC = () => {
   const { t } = useKubevirtTranslation();
   const [hyperConverge, hyperLoaded] = useHyperConvergeConfiguration();
-
-  const [queryData, loaded] = usePrometheusPoll({
-    endpoint: PrometheusEndpoint.QUERY,
-    query: HCO_HEALTH_METRIC,
-  });
-
-  const condition = queryData?.data?.result?.[0]?.value?.[1];
+  const { alerts, loaded } = useInfrastructureAlerts();
 
   if (!loaded || !hyperLoaded)
     return (
       <StackItem>
-        <Skeleton screenreaderText="Loading contents" />
+        <Skeleton screenreaderText={t('Loading contents')} />
       </StackItem>
     );
 
-  if (isEmpty(condition)) return null;
+  const getConditionValue = (): number => {
+    if (alerts?.[AlertType.critical]?.length)
+      return SEVERITY_TO_CONDITION_VALUE[AlertType.critical];
+    if (alerts?.[AlertType.warning]?.length) return SEVERITY_TO_CONDITION_VALUE[AlertType.warning];
+    return SEVERITY_TO_CONDITION_VALUE.none;
+  };
 
-  const label = VALUE_TO_LABEL[condition] ? t(VALUE_TO_LABEL[condition]) : condition;
+  const condition = getConditionValue();
+
+  const label = t(VALUE_TO_LABEL[condition]);
 
   return (
     <>
