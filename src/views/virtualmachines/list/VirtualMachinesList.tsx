@@ -64,6 +64,7 @@ import VirtualMachineSelection from './components/VirtualMachineSelection/Virtua
 import useFiltersFromURL from './hooks/useFiltersFromURL';
 import { useVirtualMachineInstanceMapper } from './hooks/useVirtualMachineInstanceMapper';
 import { useVMListFilters } from './hooks/useVMListFilters/useVMListFilters';
+import useVMListSearchTelemetry from './hooks/useVMListSearchTelemetry';
 import useVMMetrics from './hooks/useVMMetrics';
 import { VM_FILTER_OPTIONS } from './utils/constants';
 import { filterVMsByClusterAndNamespace } from './utils/utils';
@@ -80,18 +81,11 @@ type VirtualMachinesListProps = {
   isSearchResultsPage?: boolean;
   kind: string;
   namespace: string;
-  onSearchResultsReady?: (resultCount: number) => void;
 } & RefAttributes<ExposedFilterFunctions | null>;
 
 const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref) => {
   const { t } = useKubevirtTranslation();
-  const {
-    allVMsLoaded,
-    cluster,
-    isSearchResultsPage = false,
-    namespace,
-    onSearchResultsReady,
-  } = props;
+  const { allVMsLoaded, cluster, isSearchResultsPage = false, namespace } = props;
 
   const isAllClustersPage = useIsAllClustersPage();
 
@@ -232,11 +226,11 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref
 
   const loaded = vmsLoaded && vmisLoaded && vmimsLoaded && !loadingFeatureProxy && loadedColumns;
 
-  useEffect(() => {
-    if (!isSearchResultsPage || !loaded) return;
-
-    onSearchResultsReady?.(filteredVMs?.length ?? 0);
-  }, [filteredVMs, isSearchResultsPage, loaded, onSearchResultsReady]);
+  useVMListSearchTelemetry({
+    isSearchResultsPage,
+    loaded,
+    resultCount: filteredVMs?.length ?? 0,
+  });
 
   const allVMsInNamespace = useMemo(
     () => filterVMsByClusterAndNamespace(vmsSignal.value, namespace, cluster),
