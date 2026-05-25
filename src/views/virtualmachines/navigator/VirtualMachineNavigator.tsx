@@ -1,9 +1,14 @@
-import React, { FC, useCallback, useRef } from 'react';
+import React, { FC, useCallback, useEffect, useRef } from 'react';
 import { matchPath, useLocation, useParams } from 'react-router';
 
 import GuidedTour from '@kubevirt-utils/components/GuidedTour/GuidedTour';
 import CatalogOnboardingPopover from '@kubevirt-utils/components/OnboardingPopover/components/CatalogOnboardingPopover';
 import VMsTabOnboardingPopover from '@kubevirt-utils/components/OnboardingPopover/components/VMsTabOnboardingPopover';
+import { logConsoleUsed } from '@kubevirt-utils/extensions/telemetry/multicluster';
+import {
+  TELEMETRY_CONSOLE_ACTION,
+  TELEMETRY_CONSOLE_TYPE,
+} from '@kubevirt-utils/extensions/telemetry/utils/property-constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { VirtualMachineModelRef } from '@kubevirt-utils/models';
 import { FLEET_VIRTUAL_MACHINES_PATH } from '@multicluster/constants';
@@ -57,6 +62,17 @@ const VirtualMachineNavigator: FC = () => {
   const onFilterChange: OnFilterChange = useCallback((type, value) => {
     vmListRef.current?.onFilterChange(type, value);
   }, []);
+
+  useEffect(() => {
+    if (!isVirtualMachineListPage) return;
+
+    logConsoleUsed(
+      isFleetPage
+        ? TELEMETRY_CONSOLE_TYPE.MULTI_CLUSTER_HUB
+        : TELEMETRY_CONSOLE_TYPE.SINGLE_CLUSTER,
+      TELEMETRY_CONSOLE_ACTION.VIEW_VM_LIST,
+    );
+  }, [isFleetPage, isVirtualMachineListPage]);
 
   if (location.pathname.endsWith(`${VirtualMachineModelRef}/~new`)) {
     return <VirtualMachineYAMLCreatePage />;
