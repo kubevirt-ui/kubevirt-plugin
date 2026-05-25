@@ -10,17 +10,17 @@ import {
 import { isACMPath } from '@multicluster/urls';
 import { getUrlSearchQuery } from '@search/utils/query';
 
-type UseVMListSearchTelemetryParams = {
+type UseVMListTelemetryParams = {
   isSearchResultsPage: boolean;
   loaded: boolean;
   resultCount: number;
 };
 
-const useVMListSearchTelemetry = ({
+const useVMListTelemetry = ({
   isSearchResultsPage,
   loaded,
   resultCount,
-}: UseVMListSearchTelemetryParams): void => {
+}: UseVMListTelemetryParams): void => {
   const location = useLocation();
   const hasLoggedSearchRef = useRef(false);
   const hasLoggedConsoleRef = useRef(false);
@@ -60,4 +60,4 @@ const useVMListSearchTelemetry = ({
   }, [isFleetPage, isSearchResultsPage, loaded, resultCount, searchTerm]);
 };
 
-export default useVMListSearchTelemetry;
+export default useVMListTelemetry;

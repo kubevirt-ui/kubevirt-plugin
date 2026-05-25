@@ -64,7 +64,7 @@ import VirtualMachineSelection from './components/VirtualMachineSelection/Virtua
 import useFiltersFromURL from './hooks/useFiltersFromURL';
 import { useVirtualMachineInstanceMapper } from './hooks/useVirtualMachineInstanceMapper';
 import { useVMListFilters } from './hooks/useVMListFilters/useVMListFilters';
-import useVMListSearchTelemetry from './hooks/useVMListSearchTelemetry';
+import useVMListTelemetry from './hooks/useVMListTelemetry';
 import useVMMetrics from './hooks/useVMMetrics';
 import { VM_FILTER_OPTIONS } from './utils/constants';
 import { filterVMsByClusterAndNamespace } from './utils/utils';
@@ -226,7 +226,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref
 
   const loaded = vmsLoaded && vmisLoaded && vmimsLoaded && !loadingFeatureProxy && loadedColumns;
 
-  useVMListSearchTelemetry({
+  useVMListTelemetry({
     isSearchResultsPage,
     loaded,
     resultCount: filteredVMs?.length ?? 0,
