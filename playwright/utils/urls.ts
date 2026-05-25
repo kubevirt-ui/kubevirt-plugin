@@ -8,8 +8,7 @@ export const resourceUrl = (gvk: string, ns?: string) =>
 export const clusterResourceUrl = (gvk: string) => `/k8s/cluster/${gvk}`;
 
 export const urls = {
-  bootableVolumes: (ns = env.osImagesNamespace) =>
-    resourceUrl('cdi.kubevirt.io~v1beta1~DataSource', ns),
+  bootableVolumes: (ns = env.osImagesNamespace) => resourceUrl('bootablevolumes', ns),
   checkups: (ns = env.cnvNamespace) => `/k8s/ns/${ns}/checkups`,
   instanceTypes: () =>
     clusterResourceUrl('instancetype.kubevirt.io~v1beta1~VirtualMachineClusterInstancetype'),

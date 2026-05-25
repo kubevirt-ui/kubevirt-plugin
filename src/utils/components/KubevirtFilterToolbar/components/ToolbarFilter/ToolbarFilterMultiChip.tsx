@@ -22,7 +22,7 @@ const ToolbarFilterMultiChip: FC<ToolbarFilterMultiChipProps> = ({
 
   return (
     <ToolbarFilter
-      deleteLabel={(_f, label: ToolbarLabel) => {
+      deleteLabel={(_, label: ToolbarLabel) => {
         onSetFilters({
           [filterDef.id]: selected.filter((v) => v !== label.key),
         });

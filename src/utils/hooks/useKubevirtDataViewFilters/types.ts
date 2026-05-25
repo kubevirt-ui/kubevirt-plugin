@@ -1,3 +1,4 @@
+import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { DataViewFilterOption } from '@patternfly/react-data-view';
 
 export enum KubevirtFilterLayout {

@@ -6,7 +6,7 @@ import {
   KubevirtFilterState,
 } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 
-import useOnSelect from '../hooks/useOnSelect';
+import { getOnSelect } from '../utils';
 
 import ToolbarFilterMultiChip from './ToolbarFilter/ToolbarFilterMultiChip';
 
@@ -18,7 +18,7 @@ type SelectFilterItemProps = {
 
 const SelectFilterItem: FC<SelectFilterItemProps> = ({ filterDef, filters, onSetFilters }) => {
   const selected = filters[filterDef.id] ?? [];
-  const onSelect = useOnSelect({ filters, onSetFilters });
+  const onSelect = getOnSelect(filters, onSetFilters);
 
   return (
     <ToolbarFilterMultiChip filterDef={filterDef} filters={filters} onSetFilters={onSetFilters}>

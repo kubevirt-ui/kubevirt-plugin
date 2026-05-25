@@ -11,14 +11,10 @@ import { Badge, Icon, SelectGroup, SelectOption, ToolbarItem } from '@patternfly
 import { FilterIcon } from '@patternfly/react-icons';
 
 import useItemCounts from '../hooks/useItemCounts';
-import useOnSelect from '../hooks/useOnSelect';
+import { GroupedFilterOptionValue } from '../types';
+import { getOnSelect } from '../utils';
 
 import ToolbarFilterMultiChip from './ToolbarFilter/ToolbarFilterMultiChip';
-
-type GroupedFilterOptionValue = {
-  filterId: string;
-  value: string;
-};
 
 type GroupedFilterDropdownProps = {
   data?: K8sResourceCommon[];
@@ -34,11 +30,11 @@ const GroupedFilterDropdown: FC<GroupedFilterDropdownProps> = ({
   onSetFilters,
 }) => {
   const { t } = useKubevirtTranslation();
-  const onSelect = useOnSelect({ filters, onSetFilters });
+  const onSelect = getOnSelect(filters, onSetFilters);
 
   const itemCounts = useItemCounts(groupedFilters, data);
 
-  const onGroupedFilterSelect = (_event: unknown, selectedOption: GroupedFilterOptionValue) => {
+  const onGroupedFilterSelect = (_, selectedOption: GroupedFilterOptionValue) => {
     const { filterId, value } = selectedOption;
     const filterDef = groupedFilters.find((f) => f.id === filterId);
     if (!filterDef) return;
