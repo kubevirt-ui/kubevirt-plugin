@@ -195,7 +195,7 @@ export const produceVMNetworks = (
   updateNetworks: (vmDraft: Draft<V1VirtualMachine>) => void,
 ): V1VirtualMachine => {
   return produce(vm, (draftVM) => {
-    ensurePath(draftVM, ['spec.template.spec']);
+    ensurePath(draftVM, ['spec.template.spec.domain.devices']);
     if (!draftVM.spec.template.spec.networks) draftVM.spec.template.spec.networks = [];
     if (!draftVM.spec.template.spec.domain.devices.interfaces)
       draftVM.spec.template.spec.domain.devices.interfaces = [];

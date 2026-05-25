@@ -45,12 +45,12 @@ export const extensions: EncodedExtension[] = [
   } as EncodedExtension<FeatureFlagHookProvider>,
   {
     properties: {
-      description: '%plugin__kubevirt-plugin~Create a Virtual Machine from a template%',
+      description: '%plugin__kubevirt-plugin~Create a VirtualMachine from a template%',
       groupId: 'developer-catalog',
       href: '/vm-wizard',
       icon: { $codeRef: 'icons.vmIconElement' },
       id: 'dev-catalog-virtualization',
-      label: '%plugin__kubevirt-plugin~Virtual Machines%',
+      label: '%plugin__kubevirt-plugin~VirtualMachines%',
     },
     type: 'dev-console.add/action',
   } as EncodedExtension<AddAction>,
