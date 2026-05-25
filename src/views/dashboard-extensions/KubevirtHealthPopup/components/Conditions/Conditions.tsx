@@ -20,7 +20,7 @@ const Conditions: FC = () => {
   if (!loaded || !hyperLoaded)
     return (
       <StackItem>
-        <Skeleton screenreaderText="Loading contents" />
+        <Skeleton screenreaderText={t('Loading contents')} />
       </StackItem>
     );
 
