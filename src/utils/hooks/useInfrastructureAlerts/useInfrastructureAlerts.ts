@@ -22,7 +22,7 @@ type UseInfrastructureAlerts = () => {
 const useInfrastructureAlerts: UseInfrastructureAlerts = () => {
   const { alerts, loaded } = useAlerts();
 
-  const alertsBySeverity = useMemo(() => {
+  const alertsBySeverity = useMemo((): AlertsBySeverity => {
     const filteredAlerts = alerts?.filter(
       (alert) =>
         isKubeVirtAlert(alert) &&

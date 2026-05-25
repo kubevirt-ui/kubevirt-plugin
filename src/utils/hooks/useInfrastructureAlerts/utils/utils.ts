@@ -13,14 +13,6 @@ const getHealthImpact = (alert: Alert) => alert?.labels?.[OPERATOR_HEALTH_IMPACT
 export const isCriticalHealthImpactAlert = (alert: Alert): boolean =>
   getHealthImpact(alert) === HealthImpactLevel.critical;
 
-export const isImportantInfrastructureAlert = (alert: Alert) => {
-  const healthImpact = getHealthImpact(alert);
-  return (
-    healthImpact &&
-    (healthImpact === HealthImpactLevel.warning || healthImpact === HealthImpactLevel.critical)
-  );
-};
-
 export const sortAlertsBySeverity = (alerts: Alert[]): AlertsBySeverity =>
   alerts?.reduce(
     (acc, alert) => {
@@ -31,7 +23,7 @@ export const sortAlertsBySeverity = (alerts: Alert[]): AlertsBySeverity =>
     { [AlertType.critical]: [], [AlertType.info]: [], [AlertType.warning]: [] } as AlertsBySeverity,
   ) ?? { [AlertType.critical]: [], [AlertType.info]: [], [AlertType.warning]: [] };
 
-export const getNumberOfAlerts = (alerts: AlertsBySeverity) =>
+export const getNumberOfAlerts = (alerts: AlertsBySeverity): number =>
   Object.values(alerts)?.reduce((acc, alertsForLevel) => {
     acc += alertsForLevel?.length || 0;
     return acc;
