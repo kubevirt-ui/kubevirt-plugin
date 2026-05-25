@@ -1,11 +1,9 @@
 import React, { FC, useCallback, useRef } from 'react';
 import { matchPath, useLocation, useParams } from 'react-router';
 
-import CreateResourceDefaultPage from '@kubevirt-utils/components/CreateResourceDefaultPage/CreateResourceDefaultPage';
 import GuidedTour from '@kubevirt-utils/components/GuidedTour/GuidedTour';
 import CatalogOnboardingPopover from '@kubevirt-utils/components/OnboardingPopover/components/CatalogOnboardingPopover';
 import VMsTabOnboardingPopover from '@kubevirt-utils/components/OnboardingPopover/components/VMsTabOnboardingPopover';
-import useIsIPv6SingleStackCluster from '@kubevirt-utils/hooks/useIPStackType/useIsIPv6SingleStackCluster';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { VirtualMachineModelRef } from '@kubevirt-utils/models';
 import { FLEET_VIRTUAL_MACHINES_PATH } from '@multicluster/constants';
@@ -21,12 +19,12 @@ import VirtualMachinesList from '@virtualmachines/list/VirtualMachinesList';
 import { useTreeViewData } from '@virtualmachines/tree/hooks/useTreeViewData';
 import VirtualMachineTreeView from '@virtualmachines/tree/VirtualMachineTreeView';
 
-import { defaultVMYamlTemplate } from '../../../templates';
 import WelcomeModal from '../../welcome/WelcomeModal';
 import OverviewTab from '../list/components/OverviewTab/OverviewTab';
 
 import { OVERVIEW_TAB_INDEX, VM_LIST_TAB_INDEX } from './constants';
 import useNavigatorTabs from './useNavigatorTabs';
+import VirtualMachineYAMLCreatePage from './VirtualMachineYAMLCreatePage';
 
 import './VirtualMachineNavigator.scss';
 
@@ -38,8 +36,6 @@ const VirtualMachineNavigator: FC = () => {
   const { activeTabKey, handleTabSelect } = useNavigatorTabs();
 
   const { cluster, ns: namespace } = useParams<{ cluster?: string; ns: string }>();
-  const isIPv6SingleStack = useIsIPv6SingleStackCluster(cluster);
-
   const isFleetPage = isACMPath(location.pathname);
 
   const isACMVMListPage =
@@ -63,12 +59,7 @@ const VirtualMachineNavigator: FC = () => {
   }, []);
 
   if (location.pathname.endsWith(`${VirtualMachineModelRef}/~new`)) {
-    return (
-      <CreateResourceDefaultPage
-        header={t('Create VirtualMachine')}
-        initialResource={defaultVMYamlTemplate(isIPv6SingleStack)}
-      />
-    );
+    return <VirtualMachineYAMLCreatePage />;
   }
 
   return (

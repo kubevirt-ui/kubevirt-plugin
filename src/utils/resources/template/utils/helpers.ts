@@ -11,6 +11,7 @@ import {
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { V1alpha1VirtualMachineTemplateSpecParameters } from '@kubevirt-ui-ext/kubevirt-api/virt-template';
+import { logTemplateEdited } from '@kubevirt-utils/extensions/telemetry/templates';
 import { getAnnotation, getLabels, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import {
   getParameters,
@@ -151,14 +152,16 @@ export const isValidTemplateIconUrl = (url: string): boolean => {
   return false;
 };
 
-export const updateTemplate = (template: V1Template) => {
-  return kubevirtK8sUpdate({
+export const updateTemplate = async (template: V1Template) => {
+  const result = await kubevirtK8sUpdate({
     cluster: getCluster(template),
     data: template,
     model: TemplateModel,
     name: getName(template),
     ns: getNamespace(template),
   });
+  logTemplateEdited(template as Template);
+  return result;
 };
 
 export const createProcessedTemplate = <T extends Template>(

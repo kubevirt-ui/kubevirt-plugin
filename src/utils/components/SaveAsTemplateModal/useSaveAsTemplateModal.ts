@@ -2,11 +2,14 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { logTemplateCreated } from '@kubevirt-utils/extensions/telemetry/templates';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import {
   getACMTemplateListURL,
   getTemplateListURL,
 } from '@kubevirt-utils/resources/template/utils/url';
+import { getOperatingSystem } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
+import { getWorkload } from '@kubevirt-utils/resources/vm/utils/selectors';
 import useIsACMPage from '@multicluster/useIsACMPage';
 
 import { createVMTemplateRequest } from '../../../views/templates/components/VirtualMachineTemplateRequest/utils';
@@ -23,6 +26,11 @@ const useSaveAsTemplateModal = (vm: V1VirtualMachine) => {
 
   const onSubmit = async () => {
     await createVMTemplateRequest(vm, templateName, selectedProject);
+    logTemplateCreated({
+      osType: getOperatingSystem(vm),
+      sourceVmId: getName(vm),
+      workloadProfile: getWorkload(vm),
+    });
     navigate(isACMPage ? getACMTemplateListURL() : getTemplateListURL(selectedProject));
   };
 

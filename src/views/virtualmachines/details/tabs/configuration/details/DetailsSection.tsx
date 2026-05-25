@@ -17,6 +17,8 @@ import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import WorkloadProfileModal from '@kubevirt-utils/components/WorkloadProfileModal/WorkloadProfileModal';
+import { WorkloadTypeTelemetry } from '@kubevirt-utils/extensions/telemetry/utils/types';
+import { logVMWorkloadCollected } from '@kubevirt-utils/extensions/telemetry/workload';
 import { DISABLED_GUEST_SYSTEM_LOGS_ACCESS } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -144,10 +146,16 @@ const DetailsSection: FC<DetailsSectionProps> = ({ allInstanceTypes, instanceTyp
                 onEditClick={() =>
                   createModal(({ isOpen, onClose }) => (
                     <WorkloadProfileModal
+                      onSubmit={async (workload) => {
+                        const result = await updateWorkload(vm, workload);
+                        logVMWorkloadCollected({
+                          workloadType: workload as WorkloadTypeTelemetry,
+                        });
+                        return result;
+                      }}
                       initialWorkload={vmWorkload}
                       isOpen={isOpen}
                       onClose={onClose}
-                      onSubmit={(workload) => updateWorkload(vm, workload)}
                     />
                   ))
                 }

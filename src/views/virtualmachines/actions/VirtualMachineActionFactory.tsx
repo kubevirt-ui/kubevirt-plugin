@@ -20,6 +20,8 @@ import RunStrategyModal from '@kubevirt-utils/components/RunStrategyModal/RunStr
 import { updateRunStrategy } from '@kubevirt-utils/components/RunStrategyModal/utils';
 import SaveAsTemplateModal from '@kubevirt-utils/components/SaveAsTemplateModal/SaveAsTemplateModal';
 import SnapshotModal from '@kubevirt-utils/components/SnapshotModal/SnapshotModal';
+import { logVMConsoleOpened } from '@kubevirt-utils/extensions/telemetry/dashboard';
+import { TELEMETRY_CONSOLE_SESSION_TYPE } from '@kubevirt-utils/extensions/telemetry/utils/property-constants';
 import {
   MultiNamespaceVirtualMachineStorageMigrationPlanModel,
   VirtualMachineInstanceSubresourcesModel,
@@ -333,7 +335,10 @@ export const createVirtualMachineActionFactory = (t: TFunction) => ({
     const vmName = getName(vm);
 
     return {
-      cta: () => window.open(getConsoleStandaloneURL(vmNamespace, vmName, vmCluster)),
+      cta: () => {
+        logVMConsoleOpened(TELEMETRY_CONSOLE_SESSION_TYPE.VNC);
+        window.open(getConsoleStandaloneURL(vmNamespace, vmName, vmCluster));
+      },
       description: isRunning(vm)
         ? t('Open console in new tab')
         : t('The VirtualMachine is not running'),

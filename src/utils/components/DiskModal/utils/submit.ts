@@ -3,6 +3,11 @@ import produce from 'immer';
 import { V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { TELEMETRY_HOTPLUG_OPERATION } from '@kubevirt-utils/extensions/telemetry/utils/property-constants';
+import {
+  logVMDiskAttached,
+  logVMDiskHotplug,
+} from '@kubevirt-utils/extensions/telemetry/vm-storage';
 import { UploadDataProps } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import { PersistentVolumeClaimModel } from '@kubevirt-utils/models';
 import { getName } from '@kubevirt-utils/resources/shared';
@@ -190,11 +195,35 @@ export const submit = async ({
 
     if (data.dataVolumeTemplate) {
       const resizedVM = resizeVMDataVolumeTemplate(data, newVM);
-      return shouldHotplug ? hotplugPromise(resizedVM, data) : onSubmit(resizedVM, data);
+      if (shouldHotplug) {
+        try {
+          const result = await hotplugPromise(resizedVM, data);
+          logVMDiskHotplug(TELEMETRY_HOTPLUG_OPERATION.ADD);
+          return result;
+        } catch (error) {
+          logVMDiskHotplug(TELEMETRY_HOTPLUG_OPERATION.ADD, error);
+          throw error;
+        }
+      }
+      const result = await onSubmit(resizedVM, data);
+      logVMDiskAttached();
+      return result;
     }
   }
 
-  return shouldHotplug ? hotplugPromise(newVM, data) : onSubmit(newVM, data);
+  if (shouldHotplug) {
+    try {
+      const result = await hotplugPromise(newVM, data);
+      logVMDiskHotplug(TELEMETRY_HOTPLUG_OPERATION.ADD);
+      return result;
+    } catch (error) {
+      logVMDiskHotplug(TELEMETRY_HOTPLUG_OPERATION.ADD, error);
+      throw error;
+    }
+  }
+  const result = await onSubmit(newVM, data);
+  logVMDiskAttached();
+  return result;
 };
 
 type SubmitCDROMInput = {

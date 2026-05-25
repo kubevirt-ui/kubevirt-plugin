@@ -8,6 +8,8 @@ import HardwareDevicesModal from '@kubevirt-utils/components/HardwareDevices/mod
 import { HARDWARE_DEVICE_TYPE } from '@kubevirt-utils/components/HardwareDevices/utils/constants';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
+import { TELEMETRY_GPU_PASSTHROUGH_TYPE } from '@kubevirt-utils/extensions/telemetry/utils/property-constants';
+import { logVMGPUAttached } from '@kubevirt-utils/extensions/telemetry/workload';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useToggle } from '@kubevirt-utils/hooks/useToggle';
 import { getGPUDevices, getHostDevices } from '@kubevirt-utils/resources/vm';
@@ -61,12 +63,20 @@ const DetailsSectionHardware: FC<DetailsSectionHardwareProps> = ({
   const onEditGPU = () => {
     createModal(({ isOpen, onClose }) => (
       <HardwareDevicesModal
+        onSubmit={async (updatedVM) => {
+          const result = await onSubmit(HARDWARE_DEVICE_TYPE.GPUS, updatedVM);
+          const gpuDevices = getGPUDevices(updatedVM);
+          logVMGPUAttached({
+            gpuCount: gpuDevices?.length,
+            passthroughType: TELEMETRY_GPU_PASSTHROUGH_TYPE.GPU,
+          });
+          return result;
+        }}
         btnText={t('Add GPU device')}
         headerText={t('GPU devices')}
         initialDevices={gpus}
         isOpen={isOpen}
         onClose={onClose}
-        onSubmit={(updatedVM) => onSubmit(HARDWARE_DEVICE_TYPE.GPUS, updatedVM)}
         type={HARDWARE_DEVICE_TYPE.GPUS}
         vm={vm}
         vmi={vmi}

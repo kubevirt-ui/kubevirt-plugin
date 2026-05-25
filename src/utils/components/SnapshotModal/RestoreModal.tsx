@@ -7,6 +7,11 @@ import {
   V1beta1VirtualMachineSnapshot,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
+import {
+  TELEMETRY_STATUS,
+  TELEMETRY_UNKNOWN_ERROR_MESSAGE,
+} from '@kubevirt-utils/extensions/telemetry/utils/property-constants';
+import { logVMSnapshotRestored } from '@kubevirt-utils/extensions/telemetry/vm-storage';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { getCluster } from '@multicluster/helpers/selectors';
@@ -30,13 +35,22 @@ const RestoreModal: FC<RestoreModalProps> = ({ isOpen, onClose, snapshot }) => {
 
   return (
     <TabModal<V1beta1VirtualMachineRestore>
-      onSubmit={(obj) =>
-        kubevirtK8sCreate({
-          cluster: getCluster(snapshot),
-          data: obj,
-          model: VirtualMachineRestoreModel,
-        })
-      }
+      onSubmit={async (obj) => {
+        try {
+          const result = await kubevirtK8sCreate({
+            cluster: getCluster(snapshot),
+            data: obj,
+            model: VirtualMachineRestoreModel,
+          });
+          logVMSnapshotRestored(TELEMETRY_STATUS.SUCCESS);
+          return result;
+        } catch (error) {
+          logVMSnapshotRestored(TELEMETRY_STATUS.FAILURE, {
+            errorMessage: error instanceof Error ? error.message : TELEMETRY_UNKNOWN_ERROR_MESSAGE,
+          });
+          throw error;
+        }
+      }}
       headerText={t('Restore snapshot')}
       isOpen={isOpen}
       obj={resultRestore}

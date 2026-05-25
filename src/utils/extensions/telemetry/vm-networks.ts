@@ -7,12 +7,13 @@ import {
   VM_NETWORK_MTU_CHANGED,
   VM_NETWORK_VLAN_ENABLED,
 } from './utils/constants';
+import { TELEMETRY_PROJECT_MAPPING_METHOD } from './utils/property-constants';
 import { logEventWithName } from './telemetry';
 
 const projectMappingMethodMap: Record<ProjectMappingOption, string> = {
-  [ProjectMappingOption.AllProjects]: 'all_projects',
-  [ProjectMappingOption.SelectByLabels]: 'label_selector',
-  [ProjectMappingOption.SelectFromList]: 'select_from_list',
+  [ProjectMappingOption.AllProjects]: TELEMETRY_PROJECT_MAPPING_METHOD.ALL_PROJECTS,
+  [ProjectMappingOption.SelectByLabels]: TELEMETRY_PROJECT_MAPPING_METHOD.LABEL_SELECTOR,
+  [ProjectMappingOption.SelectFromList]: TELEMETRY_PROJECT_MAPPING_METHOD.SELECT_FROM_LIST,
 };
 
 export const logVMNetworkCreated = (

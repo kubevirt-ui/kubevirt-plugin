@@ -1,5 +1,6 @@
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { createVMFlowTypes } from '@kubevirt-utils/extensions/telemetry/utils/constants';
+import { TELEMETRY_UNKNOWN_ERROR_MESSAGE } from '@kubevirt-utils/extensions/telemetry/utils/property-constants';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { Template } from '@kubevirt-utils/resources/template';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
@@ -17,7 +18,21 @@ export const eventMonitor = (eventType: string, properties?: any) => {
     return;
   }
 
-  segmentAnalytics.analytics.track(eventType, properties);
+  const payload =
+    properties &&
+    Object.fromEntries(Object.entries(properties).filter(([, value]) => value !== undefined));
+
+  segmentAnalytics.analytics.track(eventType, payload);
+};
+
+export const getTelemetryErrorMessage = (error: unknown): string => {
+  if (error instanceof Error) {
+    return error.message;
+  }
+  if (typeof error === 'string') {
+    return error;
+  }
+  return TELEMETRY_UNKNOWN_ERROR_MESSAGE;
 };
 
 export const logEventWithName = (
@@ -50,6 +65,6 @@ export const logTemplateFlowEvent = (
 
 export const logCreationFailed = (eventName: string, error: any) => {
   logEventWithName(eventName, {
-    errorMessage: error?.message || 'Unknown error',
+    errorMessage: error?.message || TELEMETRY_UNKNOWN_ERROR_MESSAGE,
   });
 };

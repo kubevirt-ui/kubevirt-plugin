@@ -22,6 +22,11 @@ import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTabl
 import { buildColumnLayout } from '@kubevirt-utils/components/KubevirtTable/utils';
 import { ExposedFilterFunctions } from '@kubevirt-utils/components/ListPageFilter/types';
 import { PageTitles } from '@kubevirt-utils/constants/page-constants';
+import { logConsoleUsed } from '@kubevirt-utils/extensions/telemetry/multicluster';
+import {
+  TELEMETRY_CONSOLE_ACTION,
+  TELEMETRY_CONSOLE_TYPE,
+} from '@kubevirt-utils/extensions/telemetry/utils/property-constants';
 import useContainerWidth from '@kubevirt-utils/hooks/useContainerWidth';
 import { KUBEVIRT_APISERVER_PROXY } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
@@ -40,6 +45,7 @@ import useVirtualMachineInstanceMigrations from '@kubevirt-utils/resources/vmim/
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import useIsAllClustersPage from '@multicluster/hooks/useIsAllClustersPage';
+import useIsACMPage from '@multicluster/useIsACMPage';
 import {
   DocumentTitle,
   K8sVerb,
@@ -87,6 +93,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref
   const { allVMsLoaded, cluster, isSearchResultsPage = false, namespace } = props;
 
   const isAllClustersPage = useIsAllClustersPage();
+  const isACMPage = useIsACMPage();
 
   const searchQueries = useVMSearchQueries();
 
@@ -128,6 +135,15 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref
   const vmsLoadError = namespace ? loadError : accessibleVMsError;
 
   const vmsToShow = useMemo(() => (runningTourSignal.value ? [tourGuideVM] : vms), [vms]);
+
+  useEffect(() => {
+    if (!vmsLoaded) return;
+
+    logConsoleUsed(
+      isACMPage ? TELEMETRY_CONSOLE_TYPE.MULTI_CLUSTER_HUB : TELEMETRY_CONSOLE_TYPE.SINGLE_CLUSTER,
+      TELEMETRY_CONSOLE_ACTION.VIEW_VM_LIST,
+    );
+  }, [isACMPage, vmsLoaded]);
 
   const [vmims, vmimsLoaded] = useVirtualMachineInstanceMigrations(cluster, namespace);
 

@@ -1,6 +1,8 @@
 import React, { FC } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { mapVMActionTypeToTelemetry } from '@kubevirt-utils/extensions/telemetry/utils/action-source';
+import { logVMBulkActionPerformed } from '@kubevirt-utils/extensions/telemetry/vm-actions';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Stack, StackItem } from '@patternfly/react-core';
@@ -45,12 +47,14 @@ const ConfirmMultipleVMActionsModal: FC<ConfirmMultipleVMActionsModalProps> = ({
   const numExcludedVMs = excludedVMs?.length;
   const totalSelectedVMs = numVMs + (numExcludedVMs || 0);
 
-  const actionOnVms = async () =>
-    Promise.any(
-      vms?.map((vm) => {
-        action(vm);
-      }),
-    );
+  const actionOnVms = async () => {
+    await Promise.any(vms?.map((vm) => action(vm)) ?? []);
+
+    const telemetryAction = mapVMActionTypeToTelemetry(actionType);
+    if (telemetryAction && numVMs) {
+      logVMBulkActionPerformed(telemetryAction, numVMs);
+    }
+  };
 
   const defaultBody = (
     <>

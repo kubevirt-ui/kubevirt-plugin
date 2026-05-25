@@ -4,6 +4,9 @@ import classNames from 'classnames';
 import { VirtualMachineModel } from 'src/views/dashboard-extensions/utils';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { logVMDetailTabViewed } from '@kubevirt-utils/extensions/telemetry/dashboard';
+import { VMDetailTabTelemetry } from '@kubevirt-utils/extensions/telemetry/utils/types';
+import { getName } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { isCatalogURL } from '@multicluster/urls';
 
@@ -92,6 +95,13 @@ const HorizontalNavbar: FC<HorizontalNavbarProps> = ({
                 key={item.name}
               >
                 <NavLink
+                  onClick={() => {
+                    setActiveItem(item.name.toLowerCase());
+                    logVMDetailTabViewed(
+                      item.name.toLowerCase() as VMDetailTabTelemetry,
+                      vm ? getName(vm) : undefined,
+                    );
+                  }}
                   to={
                     basePath +
                     trimLastHistoryPath(location.pathname.replace(basePath, ''), paths) +
@@ -100,7 +110,6 @@ const HorizontalNavbar: FC<HorizontalNavbarProps> = ({
                   className="pf-v6-c-tabs__link"
                   data-test-id={`horizontal-link-${item.name}`}
                   id={`horizontal-pageHeader-${item.name}`}
-                  onClick={() => setActiveItem(item.name.toLowerCase())}
                 >
                   {item.name}
                 </NavLink>

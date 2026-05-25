@@ -1,5 +1,9 @@
 import React, { useEffect, useState } from 'react';
 
+import {
+  logVMMigrationClusterLimitConfigured,
+  logVMMigrationNodeLimitConfigured,
+} from '@kubevirt-utils/extensions/telemetry/vm-migration';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { useDebounceCallback } from '@overview/utils/hooks/useDebounceCallback';
@@ -27,10 +31,14 @@ const Limits = ({ hyperConverge }) => {
   const updateConfigWithDebounceNode: typeof updateLiveMigrationConfig =
     useDebounceCallback(updateLiveMigrationConfig);
 
-  const updateValueCluster = (value: number) =>
+  const updateValueCluster = (value: number) => {
+    logVMMigrationClusterLimitConfigured(value);
     updateConfigWithDebounceCluster(hyperConverge, value, MIGRATION_PER_CLUSTER, cluster);
-  const updateValueNode = (value: number) =>
+  };
+  const updateValueNode = (value: number) => {
+    logVMMigrationNodeLimitConfigured(value);
     updateConfigWithDebounceNode(hyperConverge, value, MIGRATION_PER_NODE, cluster);
+  };
 
   useEffect(() => {
     if (!hyperConverge) {
