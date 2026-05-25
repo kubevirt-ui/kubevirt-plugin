@@ -31,7 +31,7 @@ import {
 import TemplatesDrawerWrapper from './components/TemplatesDrawerWrapper';
 import DeploymentDetailsStep from './steps/DeploymentDetailsStep/DeploymentDetailsStep';
 
-import '@catalog/wizard/Wizard.scss';
+import './Wizard.scss';
 
 const VMCreationWizard: FC = () => {
   const { t } = useKubevirtTranslation();

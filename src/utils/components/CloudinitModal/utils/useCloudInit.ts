@@ -1,12 +1,12 @@
 import { useMemo, useState } from 'react';
 import { load } from 'js-yaml';
 
-import { produceVMDisks } from '@catalog/utils/WizardVMContext';
 import {
   V1CloudInitNoCloudSource,
   V1VirtualMachine,
   V1Volume,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { produceVMDisks } from '@kubevirt-utils/components/DiskModal/utils/helpers';
 import { InterfaceTypes } from '@kubevirt-utils/components/DiskModal/utils/types';
 import { getVolumes } from '@kubevirt-utils/resources/vm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';

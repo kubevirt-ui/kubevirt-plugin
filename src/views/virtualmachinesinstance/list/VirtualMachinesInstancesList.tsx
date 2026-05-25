@@ -7,7 +7,7 @@ import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
-import { getCatalogURL } from '@multicluster/urls';
+import { getVMWizardURL } from '@multicluster/urls';
 import {
   ListPageBody,
   ListPageFilter,
@@ -26,7 +26,7 @@ type VirtualMachinesInstancesListProps = {
 const VirtualMachinesInstancesList: FC<VirtualMachinesInstancesListProps> = ({ namespace }) => {
   const { t } = useKubevirtTranslation();
   const cluster = useClusterParam();
-  const catalogURL = getCatalogURL(cluster, namespace || DEFAULT_NAMESPACE);
+  const wizardURL = getVMWizardURL(cluster, namespace || DEFAULT_NAMESPACE);
 
   const [vmis, loaded, loadError] = useK8sWatchData<V1VirtualMachineInstance[]>({
     cluster,
@@ -57,7 +57,7 @@ const VirtualMachinesInstancesList: FC<VirtualMachinesInstancesListProps> = ({ n
           initialSortKey={VMI_COLUMN_KEYS.name}
           loaded={loaded}
           loadError={loadError}
-          noDataMsg={<VirtualMachineInstanceEmptyState catalogURL={catalogURL} />}
+          noDataMsg={<VirtualMachineInstanceEmptyState wizardURL={wizardURL} />}
           unfilteredData={unfilteredData}
         />
       </ListPageBody>

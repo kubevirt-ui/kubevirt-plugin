@@ -1,7 +1,6 @@
 import produce from 'immer';
 import { Draft } from 'immer';
 
-import { DEFAULT_PREFERENCE_LABEL } from '@catalog/CreateFromInstanceTypes/utils/constants';
 import { DataVolumeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import {
@@ -23,6 +22,7 @@ import {
   UPLOAD_SUFFIX,
 } from '@kubevirt-utils/components/DiskModal/utils/constants';
 import { InterfaceTypes, V1DiskFormState } from '@kubevirt-utils/components/DiskModal/utils/types';
+import { DEFAULT_PREFERENCE_LABEL } from '@kubevirt-utils/constants/instancetypes-and-preferences';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import {
   getDataVolumeTemplates,

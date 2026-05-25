@@ -32,7 +32,10 @@ const AddBootableVolumeLink: FC<AddBootableVolumeLinkProps> = ({
       onClick={() => {
         hidePopover?.();
         createModal((props) => (
-          <AddBootableVolumeModal onCreateVolume={onSelectCreatedVolume} {...props} />
+          <AddBootableVolumeModal
+            onCreateVolume={(volume) => onSelectCreatedVolume(volume, null, null, null)}
+            {...props}
+          />
         ));
       }}
       className="add-bootable-volume-link__inline-text"

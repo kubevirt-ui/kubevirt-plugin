@@ -7,7 +7,6 @@ import { extensions as YamlTemplatesExtensions } from './src/templates/extension
 import { extensions as utilsExtensions } from './src/utils/extension';
 import { FLAG_KUBEVIRT_VIRTUALIZATION_NAV } from './src/utils/flags/consts';
 import { extensions as BootableVolumesExtensions } from './src/views/bootablevolumes/extensions';
-import { extensions as CatalogExtensions } from './src/views/catalog/extensions';
 import { extensions as CDIUploadProviderExtensions } from './src/views/cdi-upload-provider/extensions';
 import { extensions as CheckupsExtensions } from './src/views/checkups/extensions';
 import { extensions as ClusterOverviewExtensions } from './src/views/clusteroverview/extensions';
@@ -41,7 +40,6 @@ const extensions: EncodedExtension[] = [
   ...StorageClassExtensions,
   ...StorageMigrationExtensions,
   ...ClusterOverviewExtensions,
-  ...CatalogExtensions,
   ...VirtualMachinesExtensions,
   ...TemplatesExtensions,
   ...BootableVolumesExtensions,

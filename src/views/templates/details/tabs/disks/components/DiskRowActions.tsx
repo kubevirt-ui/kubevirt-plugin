@@ -1,10 +1,10 @@
 import React, { FC, useCallback, useState } from 'react';
 
-import { produceVMDisks } from '@catalog/utils/WizardVMContext';
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import ConfirmActionMessage from '@kubevirt-utils/components/ConfirmActionMessage/ConfirmActionMessage';
 import { CONFIRM_ACTIONS } from '@kubevirt-utils/components/ConfirmActionMessage/constants';
 import DiskModal from '@kubevirt-utils/components/DiskModal/DiskModal';
+import { produceVMDisks } from '@kubevirt-utils/components/DiskModal/utils/helpers';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import KebabToggle from '@kubevirt-utils/components/toggles/KebabToggle';

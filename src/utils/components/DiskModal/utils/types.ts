@@ -1,4 +1,3 @@
-import { RegistryCredentials } from '@catalog/utils/useRegistryCredentials/utils/types';
 import { V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import {
@@ -7,6 +6,8 @@ import {
   V1VirtualMachine,
   V1Volume,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+
+export type RegistryCredentials = { password: string; username: string };
 
 export enum SourceTypes {
   BLANK = 'blank',

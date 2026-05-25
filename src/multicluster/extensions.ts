@@ -19,7 +19,6 @@ import {
   CROSS_CLUSTER_MIGRATION_ACTION_ID,
   FLAG_DISALLOWED_KUBEVIRT_DYNAMIC_ACM,
   FLEET_BOOTABLE_VOLUMES_PATH,
-  FLEET_CATALOG_PATH,
   FLEET_CHECKUPS_PATH,
   FLEET_INSTANCETYPES_PATH,
   FLEET_MIGRATION_POLICIES_PATH,
@@ -271,22 +270,6 @@ export const extensions: EncodedExtension[] = [
         `${FLEET_WIZARD_PATH}/all-clusters/all-namespaces`,
         `${FLEET_WIZARD_PATH}/cluster/:cluster/ns/:ns`,
         `${FLEET_WIZARD_PATH}/cluster/:cluster/all-namespaces`,
-      ],
-    },
-    type: 'console.page/route',
-  } as EncodedExtension<RoutePage>,
-  {
-    flags: {
-      required: ['KUBEVIRT_DYNAMIC_ACM'],
-    },
-    properties: {
-      component: {
-        $codeRef: 'Catalog',
-      },
-      path: [
-        `${FLEET_CATALOG_PATH}/all-clusters/all-namespaces`,
-        `${FLEET_CATALOG_PATH}/cluster/:cluster/ns/:ns`,
-        `${FLEET_CATALOG_PATH}/cluster/:cluster/all-namespaces`,
       ],
     },
     type: 'console.page/route',

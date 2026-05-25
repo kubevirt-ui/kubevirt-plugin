@@ -1,12 +1,12 @@
 import React, { FC, useState } from 'react';
 
-import { produceVMDevices } from '@catalog/utils/WizardVMContext';
 import {
   V1GPU,
   V1HostDevice,
   V1VirtualMachine,
   V1VirtualMachineInstance,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { produceVMDevices } from '@kubevirt-utils/components/DiskModal/utils/helpers';
 import ModalPendingChangesAlert from '@kubevirt-utils/components/PendingChanges/ModalPendingChangesAlert/ModalPendingChangesAlert';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { generatePrettyName, isEmpty } from '@kubevirt-utils/utils/utils';

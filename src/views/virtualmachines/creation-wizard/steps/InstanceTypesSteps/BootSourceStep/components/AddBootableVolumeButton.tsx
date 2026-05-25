@@ -29,7 +29,10 @@ const AddBootableVolumeButton: FC<AddBootableVolumeButtonProps> = ({ loadError }
     <Button
       onClick={() =>
         createModal((props) => (
-          <AddBootableVolumeModal onCreateVolume={onSelectCreatedVolume} {...props} />
+          <AddBootableVolumeModal
+            onCreateVolume={(volume) => onSelectCreatedVolume(volume, null, null, null)}
+            {...props}
+          />
         ))
       }
       id="tour-step-add-volume"
