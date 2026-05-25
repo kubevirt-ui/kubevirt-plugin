@@ -8,7 +8,7 @@ import {
   createNetwork,
 } from '@kubevirt-utils/components/NetworkInterfaceModal/utils/helpers';
 
-type UpdateVM = (updatedVM: V1VirtualMachine) => Promise<void>;
+export type UpdateVM = (updatedVM: V1VirtualMachine) => Promise<void>;
 
 type WizardNetworkInterfaceModalProps = {
   headerText: string;

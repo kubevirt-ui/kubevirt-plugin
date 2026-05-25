@@ -36,7 +36,7 @@ const VirtualMachineInstanceEmptyState: FC<VirtualMachineInstanceEmptyStateProps
           <Button isInline onClick={() => navigate(wizardURL)} variant={ButtonVariant.link}>
             VM creation wizard
           </Button>{' '}
-          to quickly create a VirtualMachine from the available Templates.
+          to quickly create a VirtualMachine.
         </Trans>
       </EmptyStateBody>
       <EmptyStateFooter>

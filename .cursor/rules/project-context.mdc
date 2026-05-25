@@ -76,7 +76,7 @@ kubevirt-plugin/
 │   ├── views/                    # Main UI views
 │   │   ├── virtualmachines/      # VM list, details, actions
 │   │   ├── templates/            # Template management
-│   │   ├── catalog/              # VM creation wizard
+│   │   ├── virtualmachines/creation-wizard/  # VM creation wizard
 │   │   ├── clusteroverview/      # Dashboard overview
 │   │   ├── checkups/             # Health checkups
 │   │   ├── migrationpolicies/    # Migration policies

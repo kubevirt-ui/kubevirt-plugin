@@ -7,7 +7,6 @@ import { V1beta1Condition, V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-ap
 import { TemplateModel } from '@kubevirt-utils/models';
 import { getCluster } from '@multicluster/helpers/selectors';
 import {
-  K8sGroupVersionKind,
   K8sModel,
   K8sResourceCommon,
   K8sResourceCondition,
@@ -542,10 +541,3 @@ export const haveSamePropValue = (
 
 export const findOwnerRefByKind = (resource: K8sResourceCommon, kind: string): string | undefined =>
   resource?.metadata?.ownerReferences?.find((ref) => ref.kind === kind)?.name;
-
-export const groupVersionKindFromCommonResource = (
-  resource: K8sResourceCommon,
-): K8sGroupVersionKind => {
-  const [group, version] = (resource?.apiVersion ?? '').split('/');
-  return { group, kind: resource?.kind, version };
-};

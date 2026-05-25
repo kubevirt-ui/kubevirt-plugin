@@ -10,7 +10,7 @@ import {
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { NetworkPresentation } from '@kubevirt-utils/resources/vm/utils/network/constants';
 
-type UpdateVM = (updatedVM: V1VirtualMachine) => Promise<void>;
+import { UpdateVM } from './WizardNetworkInterfaceModal';
 
 type WizardEditNetworkInterfaceModalProps = {
   isOpen: boolean;

@@ -49,7 +49,7 @@
 // t('plugin__kubevirt-plugin~Project')
 // t('plugin__kubevirt-plugin~VM')
 // t('plugin__kubevirt-plugin~Node')
-// t('plugin__kubevirt-plugin~Create a Virtual Machine from a template')
+// t('plugin__kubevirt-plugin~Create a VirtualMachine from a template')
 // t('plugin__kubevirt-plugin~Hardware Devices')
 // t('plugin__kubevirt-plugin~OpenShift Virtualization')
 // t('plugin__kubevirt-plugin~Storage migrations')
