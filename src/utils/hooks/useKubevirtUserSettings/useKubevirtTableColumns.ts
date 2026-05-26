@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 
 import { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 
-import { ACTIONS, COLUMNS } from './utils/const';
+import { ACTIONS, USER_SETTINGS_KEYS } from './utils/const';
 import useKubevirtUserSettings from './useKubevirtUserSettings';
 
 type UseKubevirtTableColumnsType = <TData, TCallbacks = undefined>(input: {
@@ -15,7 +15,7 @@ type UseKubevirtTableColumnsType = <TData, TCallbacks = undefined>(input: {
 };
 
 const useKubevirtTableColumns: UseKubevirtTableColumnsType = ({ columnManagementID, columns }) => {
-  const [userColumns, , loadedColumns, error] = useKubevirtUserSettings(COLUMNS);
+  const [userColumns, , loadedColumns, error] = useKubevirtUserSettings(USER_SETTINGS_KEYS.columns);
 
   const activeColumnKeys = useMemo(() => {
     const savedColumnKeys = userColumns?.[columnManagementID];

@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from 'react-router';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
+import { USER_SETTINGS_KEYS } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/const';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { useSignals } from '@preact/signals-react/runtime';
 
@@ -21,7 +22,7 @@ const GuidedTour: FC = () => {
   const navigate = useNavigate();
 
   const { resetTour } = useTour();
-  const [quickStarts, setQuickStarts] = useKubevirtUserSettings('quickStart');
+  const [quickStarts, setQuickStarts] = useKubevirtUserSettings(USER_SETTINGS_KEYS.quickStart);
 
   const steps = useMemo(() => getTourSteps(t), [t]);
 

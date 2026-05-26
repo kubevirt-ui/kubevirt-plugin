@@ -4,13 +4,14 @@ import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import SectionWithSwitch from '@kubevirt-utils/components/SectionWithSwitch/SectionWithSwitch';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
+import { USER_SETTINGS_KEYS } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/const';
 import ExpandSection from '@settings/ExpandSection/ExpandSection';
 import { USER_TAB_IDS } from '@settings/search/constants';
 import { AUTO_HIDE_NAV_DEFAULT } from '@virtualmachines/hooks/useAutoHideNavigation/constants';
 
 const GeneralSection: FC = () => {
   const { t } = useKubevirtTranslation();
-  const [navigation, setNavigation] = useKubevirtUserSettings('navigation');
+  const [navigation, setNavigation] = useKubevirtUserSettings(USER_SETTINGS_KEYS.navigation);
 
   const isChecked = navigation?.autoHideNav ?? AUTO_HIDE_NAV_DEFAULT;
 

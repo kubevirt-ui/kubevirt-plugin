@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { SecretModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
+import { USER_SETTINGS_KEYS } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/const';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { kubevirtK8sGet } from '@multicluster/k8sRequests';
 import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
@@ -48,7 +49,7 @@ const filterAuthRows = async (rows: AuthKeyRow[], cluster?: string) => {
 const useSSHAuthKeys: UseSSHAuthKeys = () => {
   const cluster = useSettingsCluster();
   const [authorizedSSHKeys = {}, updateAuthorizedSSHKeys, loadedSettings] = useKubevirtUserSettings(
-    'ssh',
+    USER_SETTINGS_KEYS.ssh,
     cluster,
   );
 

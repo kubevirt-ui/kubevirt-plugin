@@ -8,6 +8,7 @@ import {
 import useIsWindowsSupportedArchitecture from '@kubevirt-utils/hooks/useIsWindowsSupportedArchitecture';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
+import { USER_SETTINGS_KEYS } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/const';
 import {
   Checkbox,
   Content,
@@ -30,7 +31,9 @@ const WelcomeModal: FC = () => {
   useSignals();
   const { t } = useKubevirtTranslation();
   const [isOpen, setIsOpen] = useState<boolean>(true);
-  const [quickStarts, setQuickStarts, loaded] = useKubevirtUserSettings('quickStart');
+  const [quickStarts, setQuickStarts, loaded] = useKubevirtUserSettings(
+    USER_SETTINGS_KEYS.quickStart,
+  );
   const isWindowsSupported = useIsWindowsSupportedArchitecture();
 
   useEffect(() => {
