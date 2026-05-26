@@ -1,15 +1,6 @@
-export enum CATALOG_FILTERS {
-  ALL_ITEMS = 'allItems',
-  ARCHITECTURE = 'architecture',
-  HIDE_DEPRECATED_TEMPLATES = 'hideDeprecatedTemplates',
-  IS_LIST = 'isList',
-  NAMESPACE = 'namespace',
-  ONLY_AVAILABLE = 'onlyAvailable',
-  ONLY_DEFAULT = 'onlyDefault',
-  ONLY_USER = 'onlyUser',
-  OS_NAME = 'osName',
-  QUERY = 'query',
-  WORKLOAD = 'workload',
-}
+export const NAMESPACE_PARAM = 'namespace';
+export const IS_LIST_PARAM = 'isList';
 
 export const NAME_INPUT_FIELD = 'NAME';
+
+export const INSTALLATION_CDROM_NAME = 'installation-cdrom';

@@ -1,12 +1,11 @@
 import React, { FC } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import AckConfirmationModal from '@kubevirt-utils/components/AckConfirmationModal/AckConfirmationModal';
 import { mapVMActionTypeToTelemetry } from '@kubevirt-utils/extensions/telemetry/utils/action-source';
 import { logVMActionPerformed } from '@kubevirt-utils/extensions/telemetry/vm-actions';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
-
-import ConfirmVMActionBaseModal from '../ConfirmMultipleVMActionsModal/components/ConfirmVMActionBaseModal';
 
 import { getVmActionLabels, getVmActionMessages, getVmActionTitles, VMAction } from './constants';
 
@@ -42,7 +41,7 @@ const ConfirmVMActionModal: FC<ConfirmVMActionModalProps> = ({
   };
 
   return (
-    <ConfirmVMActionBaseModal
+    <AckConfirmationModal
       action={actionOnVm}
       actionLabel={getVmActionLabels[actionType](t)}
       actionType={actionType}
@@ -53,7 +52,7 @@ const ConfirmVMActionModal: FC<ConfirmVMActionModalProps> = ({
       title={getVmActionTitles[actionType](t)}
     >
       {body}
-    </ConfirmVMActionBaseModal>
+    </AckConfirmationModal>
   );
 };
 

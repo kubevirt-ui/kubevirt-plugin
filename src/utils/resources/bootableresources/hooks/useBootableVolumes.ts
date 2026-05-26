@@ -1,7 +1,5 @@
 import { useMemo } from 'react';
 
-import { UseBootableVolumesValues } from '@catalog/CreateFromInstanceTypes/state/utils/types';
-import { DEFAULT_PREFERENCE_LABEL } from '@catalog/CreateFromInstanceTypes/utils/constants';
 import {
   DataSourceModelGroupVersionKind,
   modelToGroupVersionKind,
@@ -17,6 +15,7 @@ import {
 } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { VolumeSnapshotKind } from '@kubevirt-utils/components/SelectSnapshot/types';
+import { DEFAULT_PREFERENCE_LABEL } from '@kubevirt-utils/constants/instancetypes-and-preferences';
 import { ALL_PROJECTS } from '@kubevirt-utils/hooks/constants';
 import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
 import useListMulticlusterFilters from '@kubevirt-utils/hooks/useListMulticlusterFilters';
@@ -30,6 +29,7 @@ import {
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { Operator } from '@openshift-console/dynamic-plugin-sdk';
+import { UseBootableVolumesValues } from '@virtualmachines/creation-wizard/utils/types';
 
 type UseBootableVolumes = (namespace?: string) => UseBootableVolumesValues;
 

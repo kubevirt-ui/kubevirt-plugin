@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 
 import useVMTemplateFeatureFlag from '@kubevirt-utils/hooks/useVMTemplateFeatureFlag/useVMTemplateFeatureFlag';
-import { TemplateOrRequest } from '@kubevirt-utils/resources/template/utils';
+import { Template, TemplateOrRequest } from '@kubevirt-utils/resources/template/utils';
 import { Selector } from '@openshift-console/dynamic-plugin-sdk';
 
 import { VMTemplateRequestStatus } from '../../components/VirtualMachineTemplateRequest/constants';
@@ -16,7 +16,8 @@ type UseAllTemplateResources = (props: {
   namespace?: string;
   selector?: Selector;
 }) => {
-  allTemplates: TemplateOrRequest[];
+  allTemplates: Template[];
+  allTemplatesWithRequests: TemplateOrRequest[];
   error: any;
   loaded: boolean;
 };
@@ -56,12 +57,18 @@ const useAllTemplateResources: UseAllTemplateResources = ({
   );
 
   const allTemplates = useMemo(
-    () => (vmTemplatesEnabled ? [...visibleRequests, ...vmTemplates, ...templates] : templates),
-    [vmTemplatesEnabled, visibleRequests, vmTemplates, templates],
+    () => (vmTemplatesEnabled ? [...vmTemplates, ...templates] : templates),
+    [vmTemplatesEnabled, vmTemplates, templates],
+  );
+
+  const allTemplatesWithRequests = useMemo(
+    () => (vmTemplatesEnabled ? [...visibleRequests, ...allTemplates] : allTemplates),
+    [vmTemplatesEnabled, visibleRequests, allTemplates],
   );
 
   return {
     allTemplates,
+    allTemplatesWithRequests,
     error: vmTemplatesEnabled ? templatesError || vmtError || vmtrError : templatesError,
     loaded:
       !vmTemplatesFeatureLoading &&

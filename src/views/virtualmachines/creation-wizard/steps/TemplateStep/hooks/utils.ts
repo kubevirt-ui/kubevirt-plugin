@@ -1,10 +1,10 @@
-import { INSTALLATION_CDROM_NAME } from '@catalog/templatescatalog/components/TemplatesCatalogDrawer/StorageSection/constants';
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { isVirtualMachineTemplate, Template } from '@kubevirt-utils/resources/template';
 import { processOpenShiftTemplate } from '@kubevirt-utils/resources/template/utils/processOpenShiftTemplate';
 import { processVirtualMachineTemplate } from '@kubevirt-utils/resources/template/utils/processVirtualMachineTemplate';
 import { getDataVolumeSourceHTTP } from '@kubevirt-utils/resources/vm/utils/dataVolumeTemplate/selectors';
+import { INSTALLATION_CDROM_NAME } from '@virtualmachines/creation-wizard/steps/TemplateStep/components/TemplatesCatalog/utils/consts';
 
 export const resolveVMFromTemplate = (
   selectedTemplate: Template,

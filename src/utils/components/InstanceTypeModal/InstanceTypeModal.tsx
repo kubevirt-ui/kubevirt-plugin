@@ -1,10 +1,12 @@
 import React, { FC } from 'react';
 
-import { groupVersionKindFromCommonResource } from '@catalog/CreateFromInstanceTypes/utils/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { InstanceTypeUnion } from '@kubevirt-utils/resources/instancetype/types';
 import { getName } from '@kubevirt-utils/resources/shared';
-import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
+import {
+  getGroupVersionKindForResource,
+  ResourceLink,
+} from '@openshift-console/dynamic-plugin-sdk';
 import { FormGroup, Radio, SelectOption } from '@patternfly/react-core';
 import { RedhatIcon, UserIcon } from '@patternfly/react-icons';
 
@@ -126,7 +128,7 @@ const InstanceTypeModal: FC<InstanceTypeModalProps> = ({
             selectedLabel={
               selectedName && selectedInstanceType ? (
                 <ResourceLink
-                  groupVersionKind={groupVersionKindFromCommonResource(selectedInstanceType)}
+                  groupVersionKind={getGroupVersionKindForResource(selectedInstanceType)}
                   linkTo={false}
                   name={selectedName}
                 />
@@ -142,7 +144,7 @@ const InstanceTypeModal: FC<InstanceTypeModalProps> = ({
               return (
                 <SelectOption key={itName} value={itName}>
                   <ResourceLink
-                    groupVersionKind={groupVersionKindFromCommonResource(it)}
+                    groupVersionKind={getGroupVersionKindForResource(it)}
                     linkTo={false}
                     name={itName}
                   />

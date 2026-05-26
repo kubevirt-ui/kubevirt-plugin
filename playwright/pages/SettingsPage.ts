@@ -15,6 +15,7 @@ const MEMORY_DENSITY_DISABLE_CONFIRM_BUTTON = 'memory-density-disable-confirm-bu
 const MEMORY_DENSITY_MODIFY_BUTTON = 'memory-density-modify-button';
 const MEMORY_DENSITY_SAVE_BUTTON = 'memory-density-save-button';
 const MEMORY_DENSITY_SLIDER = 'memory-density-slider';
+const PREVIEW_FEATURES_TAB = 'Preview features';
 const SAVE_BUTTON = 'save-button';
 const SELECT_PROJECT_TOGGLE = 'select-project-toggle';
 const SELECT_SECRET = 'select-secret';
@@ -101,6 +102,22 @@ export class SettingsPage {
     await expect(byTestId(this.page, MEMORY_DENSITY_MODIFY_BUTTON)).toBeVisible({
       timeout: 15 * SECOND,
     });
+  }
+
+  /** Enable a preview feature toggle if it is not already on. */
+  async enablePreviewFeature(featureTestId: string) {
+    await this.navigate();
+    await this.page.getByRole('tab', { exact: true, name: PREVIEW_FEATURES_TAB }).click();
+
+    const switchInput = byTestId(this.page, featureTestId);
+    await expect(switchInput).toBeVisible({ timeout: NAV_TIMEOUT });
+
+    const isOn = await switchInput.isChecked();
+
+    if (!isOn) {
+      await switchInput.locator('..').click();
+      await expect(switchInput).toBeChecked({ timeout: SHORT_TIMEOUT });
+    }
   }
 
   /** Enable VM actions confirmation, retrying if the page reloads during the click. */

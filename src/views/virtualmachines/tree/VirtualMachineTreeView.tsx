@@ -1,13 +1,10 @@
 import React, { CSSProperties, FC, ReactNode, useMemo } from 'react';
 
 import useIsSmallScreen from '@kubevirt-utils/hooks/useIsSmallScreen';
-import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useLocalStorage from '@kubevirt-utils/hooks/useLocalStorage';
 import { getContentScrollableElement } from '@kubevirt-utils/utils/utils';
 import { OnFilterChange } from '@openshift-console/dynamic-plugin-sdk';
 import {
-  Alert,
-  AlertVariant,
   Drawer,
   DrawerContent,
   DrawerContentBody,
@@ -17,7 +14,7 @@ import {
 import { useHideNamespaceBar } from '../hooks/useHideNamespaceBar';
 
 import TreeViewContent from './components/TreeViewContent';
-import useAutoSelectTreeViewItem from './hooks/useAutoSelectTreeViewItem';
+import useAutoSelectTreeViewItem from './hooks/useAutoSelectTreeViewItem/useAutoSelectTreeViewItem';
 import { UseTreeViewData } from './hooks/useTreeViewData';
 import {
   CLOSED_DRAWER_SIZE,
@@ -46,13 +43,13 @@ const VirtualMachineTreeView: FC<VirtualMachineTreeViewProps> = ({
   treeData,
 }) => {
   const isSmallScreen = useIsSmallScreen();
-  const { t } = useKubevirtTranslation();
 
   const [drawerWidth, setDrawerWidth] = useLocalStorage(TREE_VIEW_LAST_WIDTH, OPEN_DRAWER_SIZE);
   const [drawerOpen, setDrawerOpen] = useLocalStorage(SHOW_TREE_VIEW, SHOW);
 
-  const { alertMessage, onSelect, selected } = useAutoSelectTreeViewItem({
+  const { onSelect, selected } = useAutoSelectTreeViewItem({
     dataMap: treeDataMap.value,
+    loaded,
     onFilterChange,
   });
 
@@ -113,16 +110,6 @@ const VirtualMachineTreeView: FC<VirtualMachineTreeViewProps> = ({
           }
         >
           <DrawerContentBody className="vms-drawer-content-body" style={heightStyles}>
-            {alertMessage && (
-              <Alert
-                className="co-alert co-alert-space"
-                isInline
-                title={t('Warning')}
-                variant={AlertVariant.warning}
-              >
-                {alertMessage}
-              </Alert>
-            )}
             {children}
           </DrawerContentBody>
         </DrawerContent>

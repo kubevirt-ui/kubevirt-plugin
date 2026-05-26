@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 
-import { DEFAULT_PREFERENCE_LABEL } from '@catalog/CreateFromInstanceTypes/utils/constants';
 import { TLS_CERT_SOURCE_EXISTING } from '@kubevirt-utils/components/TLSCertificateSection';
+import { DEFAULT_PREFERENCE_LABEL } from '@kubevirt-utils/constants/instancetypes-and-preferences';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 
 import { AddBootableVolumeState, DROPDOWN_FORM_SELECTION } from '../utils/constants';

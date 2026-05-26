@@ -35,14 +35,6 @@ const TemplatesTable: FC<TemplatesTableProps> = ({
     [],
   );
 
-  const sortedTemplates = useMemo(
-    () =>
-      [...templates].sort((a: Template, b: Template) =>
-        (getTemplateName(a) ?? '').localeCompare(getTemplateName(b) ?? ''),
-      ),
-    [templates],
-  );
-
   const handleSelectTemplate = (template: Template) => {
     onTemplateClick(template);
   };
@@ -71,7 +63,7 @@ const TemplatesTable: FC<TemplatesTableProps> = ({
         </Tr>
       </Thead>
       <Tbody>
-        {sortedTemplates.map((template, idx) => (
+        {templates.map((template, idx) => (
           <TemplatesTableRow
             activeColumnIDs={activeColumnIDs}
             availableDatasources={availableDatasources}

@@ -8,7 +8,7 @@ import { logVMDetailTabViewed } from '@kubevirt-utils/extensions/telemetry/dashb
 import { VMDetailTabTelemetry } from '@kubevirt-utils/extensions/telemetry/utils/types';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { isCatalogURL } from '@multicluster/urls';
+import { isVMWizardURL } from '@multicluster/urls';
 
 import StateHandler from '../StateHandler/StateHandler';
 
@@ -39,7 +39,7 @@ const HorizontalNavbar: FC<HorizontalNavbarProps> = ({
   const location = useLocation();
   const params = useParams();
 
-  const vmCreated = !isCatalogURL(location.pathname);
+  const vmCreated = !isVMWizardURL(location.pathname);
 
   const dynamicPluginPages = useDynamicPages(VirtualMachineModel, vm, vmCreated);
 

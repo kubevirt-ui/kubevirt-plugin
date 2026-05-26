@@ -1,14 +1,5 @@
 import React, { FC, MouseEvent, useCallback, useMemo, useState } from 'react';
 
-import {
-  CategoryDetails,
-  InstanceTypeCategory,
-} from '@catalog/CreateFromInstanceTypes/components/SelectInstanceTypeSection/utils/types';
-import { categoryDetailsMap } from '@catalog/CreateFromInstanceTypes/components/SelectInstanceTypeSection/utils/utils';
-import {
-  DEFAULT_INSTANCETYPE_LABEL,
-  DEFAULT_PREFERENCE_LABEL,
-} from '@catalog/CreateFromInstanceTypes/utils/constants';
 import { VirtualMachineClusterPreferenceModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import PreferencePopoverContent from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/PreferenceSelect/PreferencePopoverContent';
@@ -16,6 +7,10 @@ import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFi
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
+import {
+  DEFAULT_INSTANCETYPE_LABEL,
+  DEFAULT_PREFERENCE_LABEL,
+} from '@kubevirt-utils/constants/instancetypes-and-preferences';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { convertResourceArrayToMap } from '@kubevirt-utils/resources/shared';
 import { ANNOTATIONS } from '@kubevirt-utils/resources/template';
@@ -31,6 +26,11 @@ import {
   SelectOption,
   TextArea,
 } from '@patternfly/react-core';
+import {
+  CategoryDetails,
+  InstanceTypeCategory,
+} from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/ComputeResourcesStep/components/SelectInstanceTypeSection/utils/types';
+import { categoryDetailsMap } from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/ComputeResourcesStep/components/SelectInstanceTypeSection/utils/utils';
 
 import { BootableResource, BootableVolumeMetadata } from '../../utils/types';
 import { changeBootableVolumeMetadata } from '../../utils/utils';

@@ -1,9 +1,5 @@
 import React, { FC, useEffect, useMemo } from 'react';
 
-import {
-  DEFAULT_PREFERENCE_KIND_LABEL,
-  DEFAULT_PREFERENCE_LABEL,
-} from '@catalog/CreateFromInstanceTypes/utils/constants';
 import usePreferenceSelectOptions from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/PreferenceSelect/hooks/usePreferenceSelectOptions';
 import {
   AddBootableVolumeState,
@@ -12,6 +8,10 @@ import {
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
+import {
+  DEFAULT_PREFERENCE_KIND_LABEL,
+  DEFAULT_PREFERENCE_LABEL,
+} from '@kubevirt-utils/constants/instancetypes-and-preferences';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverContentWithLightspeedButton/PopoverContentWithLightspeedButton';
 import { OLSPromptType } from '@lightspeed/utils/prompts';

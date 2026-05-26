@@ -20,10 +20,10 @@ npm ci
 # Install Playwright browsers
 npm run playwright-install
 
-while getopts u:s: flag
+while getopts us: flag
 do
   case "${flag}" in
-    u) ui=${OPTARG};;
+    u) ui=true;;
     s) spec=${OPTARG};;
     *) echo "Usage: $0 [-u] [-s <spec>]" >&2; exit 1;;
   esac

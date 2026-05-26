@@ -15,10 +15,10 @@ import {
 import { RocketIcon, VirtualMachineIcon } from '@patternfly/react-icons';
 
 type VirtualMachineInstanceEmptyStateProps = {
-  catalogURL: string;
+  wizardURL: string;
 };
 const VirtualMachineInstanceEmptyState: FC<VirtualMachineInstanceEmptyStateProps> = ({
-  catalogURL,
+  wizardURL,
 }) => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
@@ -32,16 +32,16 @@ const VirtualMachineInstanceEmptyState: FC<VirtualMachineInstanceEmptyStateProps
     >
       <EmptyStateBody>
         <Trans ns="plugin__kubevirt-plugin" t={t}>
-          See the{' '}
-          <Button isInline onClick={() => navigate(catalogURL)} variant={ButtonVariant.link}>
-            catalog tab
+          Use the{' '}
+          <Button isInline onClick={() => navigate(wizardURL)} variant={ButtonVariant.link}>
+            VM creation wizard
           </Button>{' '}
-          to quickly create a VirtualMachine from the available Templates.
+          to quickly create a VirtualMachine.
         </Trans>
       </EmptyStateBody>
       <EmptyStateFooter>
         <EmptyStateActions>
-          <Button onClick={() => navigate(catalogURL)} variant={ButtonVariant.primary}>
+          <Button onClick={() => navigate(wizardURL)} variant={ButtonVariant.primary}>
             {t('Create VirtualMachine')}
           </Button>
         </EmptyStateActions>

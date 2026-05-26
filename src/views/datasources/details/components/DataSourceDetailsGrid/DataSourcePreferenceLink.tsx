@@ -1,11 +1,11 @@
 import React, { FC } from 'react';
 
-import { DEFAULT_PREFERENCE_LABEL } from '@catalog/CreateFromInstanceTypes/utils/constants';
 import {
   VirtualMachineClusterPreferenceModelGroupVersionKind,
   VirtualMachinePreferenceModelGroupVersionKind,
 } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
+import { DEFAULT_PREFERENCE_LABEL } from '@kubevirt-utils/constants/instancetypes-and-preferences';
 import { hasUserPreference } from '@kubevirt-utils/resources/bootableresources/helpers';
 import { getLabel, getNamespace } from '@kubevirt-utils/resources/shared';
 import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';

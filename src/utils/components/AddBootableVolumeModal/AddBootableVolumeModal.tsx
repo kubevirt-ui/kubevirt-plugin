@@ -1,11 +1,11 @@
 import React, { FC } from 'react';
 
-import { InstanceTypeVMStoreActions } from '@catalog/CreateFromInstanceTypes/state/utils/types';
 import AddBootableVolumeBody from '@kubevirt-utils/components/AddBootableVolumeModal/components/AddBootableVolumeBody';
 import useAddBootableVolumeModalData from '@kubevirt-utils/components/AddBootableVolumeModal/hooks/useAddBootableVolumeModalData';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { UPLOAD_STATUS } from '@kubevirt-utils/hooks/useCDIUpload/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 
 import { useAddBootableVolumeFormValidation } from './hooks/useAddBootableVolumeFormValidation';
@@ -15,7 +15,7 @@ import { createBootableVolume } from './utils/utils';
 type AddBootableVolumeModalProps = {
   isOpen: boolean;
   onClose: () => void;
-  onCreateVolume?: InstanceTypeVMStoreActions['onSelectCreatedVolume'];
+  onCreateVolume?: (createdVolume: BootableVolume) => void;
 };
 
 const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
