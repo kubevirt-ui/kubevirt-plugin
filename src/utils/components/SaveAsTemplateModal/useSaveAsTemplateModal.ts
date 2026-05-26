@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { logTemplateCreated } from '@kubevirt-utils/extensions/telemetry/templates';
-import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
+import { getName, getNamespace, getUID } from '@kubevirt-utils/resources/shared';
 import {
   getACMTemplateListURL,
   getTemplateListURL,
@@ -28,7 +28,7 @@ const useSaveAsTemplateModal = (vm: V1VirtualMachine) => {
     await createVMTemplateRequest(vm, templateName, selectedProject);
     logTemplateCreated({
       osType: getOperatingSystem(vm),
-      sourceVmId: getName(vm),
+      sourceVmId: getUID(vm),
       workloadProfile: getWorkload(vm),
     });
     navigate(isACMPage ? getACMTemplateListURL() : getTemplateListURL(selectedProject));

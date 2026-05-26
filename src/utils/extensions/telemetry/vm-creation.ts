@@ -6,7 +6,6 @@ import {
   TELEMETRY_TASK_ERROR_TYPE,
   TELEMETRY_TASK_TYPE,
   TELEMETRY_TEMPLATE_TYPE,
-  TELEMETRY_UNKNOWN_ERROR_MESSAGE,
   TELEMETRY_VM_CREATION_METHOD,
 } from './utils/property-constants';
 import { TemplateTypeTelemetry, VMCreationMethodTelemetry } from './utils/types';
