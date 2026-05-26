@@ -11,6 +11,8 @@ import { VirtualMachineStatusConditionTypes } from '@kubevirt-utils/resources/vm
 import PendingChanges from '@virtualmachines/details/VirtualMachinePendingChangesAlert/PendingChanges';
 import { isRunning } from '@virtualmachines/utils';
 
+import { getPendingChangesAlertTitle } from './utils/utils';
+import MigrationPendingChanges from './MigrationPendingChanges';
 import RestartPendingChanges from './RestartPendingChanges';
 
 type VirtualMachinePendingChangesAlertProps = {
@@ -37,24 +39,37 @@ const VirtualMachinePendingChangesAlert: FC<VirtualMachinePendingChangesAlertPro
     VirtualMachineStatusConditionTypes.RestartRequired,
   );
 
-  const isRestartRequired = restartRequiredCondition?.status === 'True';
+  const migrationRequiredCondition = getStatusConditionByType(
+    vm,
+    VirtualMachineStatusConditionTypes.MigrationRequired,
+  );
 
-  if (!vmi || !isRunning(vm) || (!isRestartRequired && !pendingChangesNICsTab.length)) {
+  const isRestartRequired = restartRequiredCondition?.status === 'True';
+  const isMigrationRequired = migrationRequiredCondition?.status === 'True';
+  const hasHotPlugNICChanges = pendingChangesNICsTab.length > 0;
+
+  if (
+    !vmi ||
+    !isRunning(vm) ||
+    (!isRestartRequired && !isMigrationRequired && !hasHotPlugNICChanges)
+  ) {
     return null;
   }
+
+  const alertTitle = getPendingChangesAlertTitle(t, isRestartRequired, isMigrationRequired);
+
   return (
-    <PendingChangesAlert
-      isExpandable
-      isWarning
-      title={isRestartRequired ? t('Restart required') : undefined}
-    >
+    <PendingChangesAlert isExpandable isWarning title={alertTitle}>
+      {isMigrationRequired && (
+        <MigrationPendingChanges migrationRequiredCondition={migrationRequiredCondition} />
+      )}
       {isRestartRequired && (
         <RestartPendingChanges
           pendingChanges={pendingChanges}
           restartRequiredCondition={restartRequiredCondition}
         />
       )}
-      {!isRestartRequired && pendingChangesNICsTab.length > 0 && (
+      {!isRestartRequired && !isMigrationRequired && hasHotPlugNICChanges && (
         <PendingChanges pendingChanges={pendingChangesNICsTab} />
       )}
     </PendingChangesAlert>
