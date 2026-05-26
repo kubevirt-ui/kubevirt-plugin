@@ -16,7 +16,12 @@ import { getName, getNamespace, getUID } from '@kubevirt-utils/resources/shared'
 import { getNetworks, getVolumes } from '@kubevirt-utils/resources/vm';
 import { getRandomChars } from '@kubevirt-utils/utils/utils';
 
-import { CCLM_LABEL_KEY, CCLM_LABEL_VALUE, MTV_MIGRATION_NAMESPACE, POD_NETWORK_TYPE } from './constants';
+import {
+  CCLM_LABEL_KEY,
+  CCLM_LABEL_VALUE,
+  MTV_MIGRATION_NAMESPACE,
+  POD_NETWORK_TYPE,
+} from './constants';
 import { GetInitialStorageMapParams } from './types';
 
 export const getInitialMigrationPlan = (vms: V1VirtualMachine[]): V1beta1Plan => ({
