@@ -2,7 +2,7 @@ import { expect, Page } from '@playwright/test';
 
 import { SECOND } from './constants';
 import { env } from './env';
-import { byTestId } from './locators';
+import { byTest, byTestId } from './locators';
 import { urls } from './urls';
 
 const { testNamespace: NS } = env;
@@ -61,7 +61,7 @@ export async function goToConfigSubTab(page: Page, subTabId: string) {
 /** Navigate to a Diagnostics sub-tab. */
 export async function goToDiagnosticsSubTab(page: Page, subTabId: string) {
   await goToTab(page, 'Diagnostics');
-  const sub = byTestId(page, `vm-diagnostics-${subTabId}`);
+  const sub = byTest(page, `vm-diagnostics-${subTabId}`);
   await expect(sub).toBeVisible();
   await sub.click();
 }

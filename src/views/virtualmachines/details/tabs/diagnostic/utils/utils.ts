@@ -1,111 +1,114 @@
-import { v4 as uuidv4 } from 'uuid';
+import { TFunction } from 'i18next';
 
-import { DataVolumeModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
-import {
-  V1VirtualMachine,
-  V1VirtualMachineCondition,
-  V1VolumeSnapshotStatus,
-} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { TabBadge } from '@kubevirt-utils/components/HorizontalNavbar/utils/utils';
 import { VirtualMachineDetailsTab } from '@kubevirt-utils/constants/tabs-constants';
-import { getCluster } from '@multicluster/helpers/selectors';
-import { FleetWatchK8sResults } from '@stolostron/multicluster-sdk';
+import { LabelProps } from '@patternfly/react-core';
 
-import {
-  VirtualizationDataVolumeStatus,
-  VirtualizationStatusCondition,
-  VirtualizationVolumeSnapshotStatus,
-} from './types';
+import { INVERTED_CONDITION_TYPES, SEVERITY_TO_CONDITION } from './constants';
+import { DiagnosticFilters, DiagnosticSeverity } from './types';
 
-export const volumeSnapshotStatusesTransformer = (
-  volumeSnapshotStatuses: V1VolumeSnapshotStatus[] = [],
-): VirtualizationVolumeSnapshotStatus[] => {
-  return volumeSnapshotStatuses.map((vss) => {
-    const copyVSS: VirtualizationVolumeSnapshotStatus = {
-      ...vss,
-      metadata: { condition: 'Other', type: 'Storage' },
-    };
-    copyVSS.status = vss?.enabled;
-    const index = vss?.reason?.indexOf(':');
-    copyVSS.metadata.name = vss?.reason || vss?.name;
-    if (index !== -1) {
-      copyVSS.reason = vss?.reason?.slice(0, index);
-      copyVSS.message = vss?.reason?.slice(index + 1, vss?.reason?.length);
-      copyVSS.metadata.name = vss?.reason?.slice(0, index);
-    }
+export const isActiveFilter = (filters: DiagnosticFilters, searchText: string): boolean =>
+  filters.categories.size > 0 || filters.conditions.size > 0 || searchText.trim().length > 0;
 
-    if (!copyVSS?.message) {
-      copyVSS.message = copyVSS.reason;
-      copyVSS.reason = copyVSS.name;
-    }
-    copyVSS.id = uuidv4();
-    return { ...copyVSS };
-  });
+export const matchesFilters = (
+  filters: DiagnosticFilters,
+  category: string,
+  severity: DiagnosticSeverity,
+): boolean => {
+  const { categories, conditions } = filters;
+  const categoryMatch = categories.size === 0 || categories.has(category);
+  const conditionLabel = SEVERITY_TO_CONDITION[severity];
+  const conditionMatch = conditions.size === 0 || conditions.has(conditionLabel);
+  return categoryMatch && conditionMatch;
 };
 
-export const conditionsTransformer = (
-  conditions: V1VirtualMachineCondition[] = [],
-): VirtualizationStatusCondition[] => {
-  return conditions?.map((condition) => {
-    const id = uuidv4();
-    const copyConditions: VirtualizationStatusCondition = {
-      ...condition,
-      id,
-      metadata: {
-        condition: condition?.status === 'False' ? 'Error' : 'Other',
-        name: condition?.reason || condition?.type,
-        type: 'VirtualMachines',
-      },
-    };
-    return copyConditions;
-  });
+export const filterBySearchText = (
+  searchText: string,
+  ...fields: (string | undefined)[]
+): boolean => {
+  const trimmed = searchText?.trim();
+  if (!trimmed) return true;
+  const lower = trimmed.toLowerCase();
+  return fields.some((f) => f?.toLowerCase().includes(lower));
 };
 
-export const buildDVStatus = (
-  data: FleetWatchK8sResults<{ [name: string]: V1beta1DataVolume }>,
-): VirtualizationDataVolumeStatus[] => {
-  const elements = Object.values(data).map((dv) => dv.data);
-  return elements.map((element) => {
-    const conditions = element?.status?.conditions;
-    const message = conditions?.[conditions.length - 1]?.message;
+const DV_FAILED_PHASES = new Set(['Failed', 'Unknown']);
 
-    return {
-      id: element?.metadata?.uid,
-      message,
-      name: element?.metadata?.name,
-      phase: element?.status?.phase,
-      progress: element?.status?.progress,
-    };
-  });
+export const getConditionSeverity = (status: string, type?: string): DiagnosticSeverity => {
+  if (INVERTED_CONDITION_TYPES.has(type)) {
+    return status === 'False' ? 'healthy' : 'warning';
+  }
+  if (status === 'False') return 'critical';
+  if (status === 'True') return 'healthy';
+  return 'warning';
 };
 
-const getDataVolumesNames = (vm: V1VirtualMachine) =>
-  vm?.spec?.template?.spec?.volumes
-    .filter((volume) => volume?.dataVolume)
-    .map((volume) => volume?.dataVolume?.name);
+export const getDVSeverity = (phase: string): DiagnosticSeverity => {
+  if (DV_FAILED_PHASES.has(phase)) return 'critical';
+  if (phase === 'Succeeded') return 'healthy';
+  return 'warning';
+};
 
-export const buildDataVolumeResources = (vm: V1VirtualMachine) =>
-  Object.fromEntries(
-    getDataVolumesNames(vm)?.map((name) => [
-      name,
-      {
-        cluster: getCluster(vm),
-        groupVersionKind: DataVolumeModelGroupVersionKind,
-        name,
-        namespace: vm?.metadata?.namespace,
-      },
-    ]) || [],
-  );
+export const getSnapshotSeverity = (enabled: boolean): DiagnosticSeverity =>
+  enabled ? 'healthy' : 'warning';
+
+export const getDiagnosticBadge = (vm: V1VirtualMachine): TabBadge | undefined => {
+  const conditions = vm?.status?.conditions ?? [];
+  const volumeSnapshotStatuses = vm?.status?.volumeSnapshotStatuses ?? [];
+
+  const conditionSeverities = conditions.map((c) => getConditionSeverity(c.status, c.type));
+  const critical = conditionSeverities.filter((s) => s === 'critical').length;
+  const conditionWarnings = conditionSeverities.filter((s) => s === 'warning').length;
+  const snapshotWarnings = volumeSnapshotStatuses.filter((v) => !v.enabled).length;
+
+  const totalIssues = critical + conditionWarnings + snapshotWarnings;
+  if (totalIssues === 0) return undefined;
+
+  return {
+    color: critical > 0 ? 'red' : 'yellow',
+    count: totalIssues,
+  };
+};
+
+type StatusLabel = { color: LabelProps['color']; text: string };
+
+export const getConditionLabel = (status: string, type: string, t: TFunction): StatusLabel => {
+  const severity = getConditionSeverity(status, type);
+  if (severity === 'critical') return { color: 'red', text: t('Failed') };
+  if (severity === 'healthy') return { color: 'green', text: t('Healthy') };
+  return { color: 'orange', text: t('Degraded') };
+};
+
+export const getEnabledLabel = (enabled: boolean, t: TFunction): StatusLabel =>
+  enabled ? { color: 'green', text: t('True') } : { color: 'red', text: t('False') };
+
+export const getPhaseLabel = (phase: string, t: TFunction): StatusLabel => {
+  switch (phase) {
+    case 'Succeeded':
+      return { color: 'green', text: t('Succeeded') };
+    case 'Failed':
+      return { color: 'red', text: t('Failed') };
+    case 'Unknown':
+      return { color: 'red', text: t('Unknown') };
+    case 'ImportInProgress':
+      return { color: 'blue', text: t('ImportInProgress') };
+    case 'CloneInProgress':
+      return { color: 'blue', text: t('CloneInProgress') };
+    default:
+      return { color: 'grey', text: phase || t('Unknown') };
+  }
+};
 
 export const createURLDiagnostic = (str: string, append: string): string => {
-  const urlSpitted = str.split('/');
+  const urlSplit = str.split('/');
   if (
-    urlSpitted[urlSpitted.length - 1] === VirtualMachineDetailsTab.Logs ||
-    urlSpitted[urlSpitted.length - 1] === VirtualMachineDetailsTab.Tables
+    urlSplit[urlSplit.length - 1] === VirtualMachineDetailsTab.Logs ||
+    urlSplit[urlSplit.length - 1] === VirtualMachineDetailsTab.Tables
   ) {
-    urlSpitted.pop();
-    urlSpitted.push(append);
-    return urlSpitted.join('/');
+    urlSplit.pop();
+    urlSplit.push(append);
+    return urlSplit.join('/');
   }
   return str.concat('/' + append);
 };

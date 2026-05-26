@@ -4,3 +4,18 @@
   min-height: 0;
   overflow-y: auto;
 }
+
+.horizontal-navbar__badge {
+  margin-left: var(--pf-t--global--spacer--sm);
+
+  &--red {
+    --pf-v6-c-badge--m-unread--BackgroundColor: var(--pf-t--global--color--status--danger--default);
+  }
+
+  &--yellow {
+    --pf-v6-c-badge--m-unread--BackgroundColor: var(
+      --pf-t--global--color--status--warning--default
+    );
+    --pf-v6-c-badge--m-unread--Color: var(--pf-t--global--text--color--regular);
+  }
+}

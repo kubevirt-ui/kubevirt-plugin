@@ -1,0 +1,42 @@
+.diagnostics-overview-cards {
+  margin-bottom: var(--pf-t--global--spacer--lg);
+  overflow: visible;
+
+  &__card {
+    cursor: pointer;
+    border: var(--pf-t--global--border--width--regular) solid
+      var(--pf-t--global--border--color--default);
+    border-radius: var(--pf-t--global--border--radius--small);
+
+    &--critical {
+      border-inline-start: var(--pf-t--global--border--width--extra-strong) solid
+        var(--pf-t--global--color--status--danger--default);
+    }
+
+    &--warning {
+      border-inline-start: var(--pf-t--global--border--width--extra-strong) solid
+        var(--pf-t--global--color--status--warning--default);
+    }
+
+    &--healthy {
+      border-inline-start: var(--pf-t--global--border--width--extra-strong) solid
+        var(--pf-t--global--color--status--success--default);
+    }
+
+    &--all {
+      border-inline-start: var(--pf-t--global--border--width--extra-strong) solid
+        var(--pf-t--global--color--status--info--default);
+    }
+
+    &--selected {
+      outline: var(--pf-t--global--border--width--strong) solid
+        var(--pf-t--global--color--brand--default);
+      outline-offset: -1px;
+    }
+  }
+
+  &__count {
+    font-size: var(--pf-t--global--font--size--2xl);
+    font-weight: var(--pf-t--global--font--weight--heading--bold);
+  }
+}

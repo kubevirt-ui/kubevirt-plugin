@@ -1,26 +1,19 @@
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettingsTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettingsTableColumns';
 import { TableColumn } from '@openshift-console/dynamic-plugin-sdk';
-import { ThSortType } from '@patternfly/react-table/dist/esm/components/Table/base/types';
 
-import { DiagnosticSort } from '../utils/types';
+import { DiagnosticColumn, DiagnosticSort } from '../utils/types';
 
 import useDiagnosticSort from './useDiagnosticSort';
 
-type DiagnosticColumn = {
-  id: string;
-  sort: (columnIndex: any) => ThSortType;
-  title: string;
+type UseDiagnosticConditionsTableColumnsResult = {
+  activeColumns: TableColumn<DiagnosticColumn>[];
+  columns: TableColumn<DiagnosticColumn>[];
+  loaded: boolean;
+  sorting: DiagnosticSort;
 };
 
-type UseDiagnosticConditionsTableColumns = () => [
-  columns: TableColumn<DiagnosticColumn>[],
-  activeColumns: TableColumn<DiagnosticColumn>[],
-  sort: DiagnosticSort,
-  loadedColumns: boolean,
-];
-
-const useDiagnosticConditionsTableColumns: UseDiagnosticConditionsTableColumns = () => {
+const useDiagnosticConditionsTableColumns = (): UseDiagnosticConditionsTableColumnsResult => {
   const { t } = useKubevirtTranslation();
   const { getSorting, sort } = useDiagnosticSort();
 
@@ -28,12 +21,12 @@ const useDiagnosticConditionsTableColumns: UseDiagnosticConditionsTableColumns =
     {
       cell: { sort: (columnIndex) => getSorting('type', columnIndex) },
       id: 'type',
-      title: t('Type'),
+      title: t('Condition type'),
     },
     {
       cell: { sort: (columnIndex) => getSorting('status', columnIndex) },
       id: 'status',
-      title: t('Status'),
+      title: t('Condition'),
     },
     {
       cell: { sort: (columnIndex) => getSorting('reason', columnIndex) },
@@ -41,19 +34,23 @@ const useDiagnosticConditionsTableColumns: UseDiagnosticConditionsTableColumns =
       title: t('Reason'),
     },
     {
+      cell: { sort: (columnIndex) => getSorting('lastTransitionTime', columnIndex) },
+      id: 'lastTransitionTime',
+      title: t('Last transition'),
+    },
+    {
       cell: { sort: (columnIndex) => getSorting('message', columnIndex) },
       id: 'message',
-
-      title: t('Message'),
+      title: t('Technical message'),
     },
   ];
 
-  const [activeColumns, , loadedColumns] = useKubevirtUserSettingsTableColumns<DiagnosticColumn>({
+  const [activeColumns, , loaded] = useKubevirtUserSettingsTableColumns<DiagnosticColumn>({
     columnManagementID: 'diagnostic-tab-status',
     columns,
   });
 
-  return [columns, activeColumns, sort, loadedColumns];
+  return { activeColumns, columns, loaded, sorting: sort };
 };
 
 export default useDiagnosticConditionsTableColumns;

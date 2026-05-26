@@ -1,20 +1,18 @@
-import React, { FC, useEffect, useMemo, useState } from 'react';
+import React, { FC, useMemo } from 'react';
 
-import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
+import Timestamp from '@kubevirt-utils/components/Timestamp/Timestamp';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import usePagination from '@kubevirt-utils/hooks/usePagination/usePagination';
-import { paginationDefaultValues } from '@kubevirt-utils/hooks/usePagination/utils/constants';
+import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { columnSorting, isEmpty } from '@kubevirt-utils/utils/utils';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
-import { ListPageBody, useListPageFilter } from '@openshift-console/dynamic-plugin-sdk';
-import { Bullseye, Flex, FlexItem, Pagination } from '@patternfly/react-core';
-import { Table, Th, Thead, Tr } from '@patternfly/react-table';
+import { ListPageBody } from '@openshift-console/dynamic-plugin-sdk';
+import { Bullseye, Label } from '@patternfly/react-core';
+import { Table, Tbody, Td, Th, Thead, Tr } from '@patternfly/react-table';
 
 import useDiagnosticConditionsTableColumns from '../hooks/useDiagnosticConditionsTableColumns';
-import useDiagnosticFilter from '../hooks/useDiagnosticFilter';
 import { VirtualizationStatusCondition } from '../utils/types';
-import VirtualMachineDiagnosticTabRow from '../VirtualMachineDiagnosticTabRow';
+import { getConditionLabel } from '../utils/utils';
 
 import VirtualMachineDiagnosticTabTableTitle from './components/VirtualMachineDiagnosticTabTableTitle';
 
@@ -26,38 +24,22 @@ const VirtualMachineDiagnosticTabConditions: FC<VirtualMachineDiagnosticTabCondi
   conditions,
 }) => {
   const { t } = useKubevirtTranslation();
+  const { activeColumns, loaded, sorting } = useDiagnosticConditionsTableColumns();
 
-  const [expend, setExpend] = useState<{ [key: string]: Set<string> }>({
-    expended: new Set(),
-    ids: new Set(),
-  });
-
-  const [columns, activeColumns, sorting, loadedColumns] = useDiagnosticConditionsTableColumns();
-  const { onPaginationChange, pagination } = usePagination();
   const sortedData = useMemo(
-    () => columnSorting(conditions, sorting?.direction, pagination, sorting?.column),
-    [conditions, sorting, pagination],
-  );
-  const filters = useDiagnosticFilter();
-  const [unfilteredData, filteredData, onFilterChange] = useListPageFilter(sortedData, filters);
-
-  useEffect(
-    () =>
-      sortedData.forEach(({ id }) => {
-        setExpend((expendObj) => {
-          return { expended: new Set(), ids: new Set(expendObj?.ids).add(id) };
-        });
-      }),
-    [sortedData],
+    () => columnSorting(conditions, sorting?.direction, undefined, sorting?.column),
+    [conditions, sorting],
   );
 
-  if (!loadedColumns) {
+  if (!loaded) {
     return (
       <Bullseye>
         <Loading />
       </Bullseye>
     );
   }
+
+  if (isEmpty(sortedData)) return null;
 
   return (
     <>
@@ -69,86 +51,48 @@ const VirtualMachineDiagnosticTabConditions: FC<VirtualMachineDiagnosticTabCondi
           olsPromptType={OLSPromptType.STATUS_CONDITIONS}
           title={t('Status conditions')}
         />
-        <Flex justifyContent={{ default: 'justifyContentSpaceBetween' }}>
-          <FlexItem>
-            <ListPageFilter
-              columnLayout={{
-                columns: columns?.map(({ id, title }) => ({
-                  id,
-                  title,
-                })),
-                id: 'diagnostic-tab-status',
-                selectedColumns: new Set(activeColumns?.map((col) => col?.id)),
-                type: t('VirtualMachine'),
-              }}
-              onFilterChange={(...args) => {
-                onFilterChange(...args);
-                onPaginationChange({
-                  endIndex: pagination?.perPage,
-                  page: 1,
-                  perPage: pagination?.perPage,
-                  startIndex: 0,
-                });
-              }}
-              data={unfilteredData}
-              hideLabelFilter
-              loaded={!isEmpty(unfilteredData) && loadedColumns}
-              nameFilterPlaceholder={t('Search by reason...')}
-              rowFilters={filters}
-            />
-          </FlexItem>
-          <FlexItem>
-            <Pagination
-              onPerPageSelect={(_e, perPage, page, startIndex, endIndex) =>
-                onPaginationChange({ endIndex, page, perPage, startIndex })
-              }
-              onSetPage={(_e, page, perPage, startIndex, endIndex) =>
-                onPaginationChange({ endIndex, page, perPage, startIndex })
-              }
-              isLastFullPageShown
-              itemCount={filteredData?.length}
-              page={pagination?.page}
-              perPage={pagination?.perPage}
-              perPageOptions={paginationDefaultValues}
-            />
-          </FlexItem>
-        </Flex>
       </ListPageBody>
 
-      <Table isExpandable>
+      <Table aria-label={t('Status conditions')}>
         <Thead>
           <Tr>
-            <Th
-              expand={{
-                areAllExpanded: expend.expended.size !== expend.ids.size,
-                collapseAllAriaLabel: '',
-                onToggle: (_, __, isOpen) => {
-                  setExpend((expendObj) => ({
-                    expended: new Set(!isOpen ? [] : expendObj.ids),
-                    ids: new Set(expendObj?.ids),
-                  }));
-                },
-              }}
-            />
-            {activeColumns?.map(({ cell: { sort }, title }, index) => {
-              return (
-                <Th key={title} modifier="nowrap" sort={sort(index)}>
-                  {title}
-                </Th>
-              );
-            })}
+            {activeColumns?.map(({ cell: { sort }, title }, index) => (
+              <Th key={title} modifier="nowrap" sort={sort(index)}>
+                {title}
+              </Th>
+            ))}
           </Tr>
         </Thead>
-        {filteredData.map((row, index) => (
-          <VirtualMachineDiagnosticTabRow
-            activeColumns={activeColumns}
-            expend={expend}
-            index={index}
-            key={row?.metadata?.name}
-            obj={row}
-            setExpend={setExpend}
-          />
-        ))}
+        <Tbody>
+          {sortedData.map((row) => (
+            <Tr key={row.id}>
+              {activeColumns.map(({ id: colId }) => {
+                if (colId === 'status') {
+                  const { color, text } = getConditionLabel(row.status, row.type, t);
+                  return (
+                    <Td key={colId}>
+                      <Label color={color}>{text}</Label>
+                    </Td>
+                  );
+                }
+
+                if (colId === 'lastTransitionTime') {
+                  return (
+                    <Td key={colId}>
+                      {row.lastTransitionTime ? (
+                        <Timestamp timestamp={row.lastTransitionTime} />
+                      ) : (
+                        NO_DATA_DASH
+                      )}
+                    </Td>
+                  );
+                }
+
+                return <Td key={colId}>{row[colId]?.toString() || NO_DATA_DASH}</Td>;
+              })}
+            </Tr>
+          ))}
+        </Tbody>
       </Table>
     </>
   );

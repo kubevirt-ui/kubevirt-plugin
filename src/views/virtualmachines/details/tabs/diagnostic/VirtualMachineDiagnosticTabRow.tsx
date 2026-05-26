@@ -1,6 +1,7 @@
 import React from 'react';
 import cn from 'classnames';
 
+import { NAME_COLUMN_ID } from '@kubevirt-utils/components/ColumnManagementModal/constants';
 import useNamespaceParam from '@kubevirt-utils/hooks/useNamespaceParam';
 import { DataVolumeModelGroupVersionKind } from '@kubevirt-utils/models';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
@@ -11,8 +12,6 @@ import {
   YellowExclamationTriangleIcon,
 } from '@openshift-console/dynamic-plugin-sdk';
 import { ExpandableRowContent, Tbody, Td, Tr } from '@patternfly/react-table';
-
-import { NAME_COLUMN_ID } from './hooks/constants';
 
 const VirtualMachineDiagnosticTabRow = ({
   activeColumns,

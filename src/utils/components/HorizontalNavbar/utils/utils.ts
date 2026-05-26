@@ -20,7 +20,13 @@ export const trimLastHistoryPath = (currentPathname: string, paths: string[]): s
   return relativeUrl;
 };
 
+export type TabBadge = {
+  color: 'red' | 'yellow';
+  count: number;
+};
+
 export type NavPageKubevirt = Omit<NavPage, 'component'> & {
+  badge?: TabBadge;
   component: ComponentType<PropsWithChildren<NavPageComponentProps>>;
   isHidden?: boolean;
 };
