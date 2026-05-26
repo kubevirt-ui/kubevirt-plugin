@@ -47,6 +47,7 @@ const TreeViewToolbar: FC<TreeViewToolbarProps> = ({ onSearch }) => {
               </SplitItem>
               <SplitItem isFilled />
               <Switch
+                aria-label={t('Show only projects with VirtualMachines')}
                 checked={showEmptyProjects === HIDE}
                 className="vms-tree-view__toolbar-switch"
                 isReversed

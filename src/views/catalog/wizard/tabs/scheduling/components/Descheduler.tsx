@@ -1,6 +1,7 @@
 import React, { FC } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useDeschedulerSetting from '@kubevirt-utils/hooks/useDeschedulerSetting/useDeschedulerSetting';
 import { Switch } from '@patternfly/react-core';
 
@@ -9,12 +10,14 @@ type DeschedulerProps = {
 };
 
 const Descheduler: FC<DeschedulerProps> = ({ vm }) => {
+  const { t } = useKubevirtTranslation();
   const { deschedulerEnabled, deschedulerSwitchDisabled, onDeschedulerChange } =
     useDeschedulerSetting(vm);
 
   return (
     <>
       <Switch
+        aria-label={t('Descheduler')}
         id="descheduler-switch"
         isChecked={deschedulerEnabled}
         isDisabled={deschedulerSwitchDisabled}

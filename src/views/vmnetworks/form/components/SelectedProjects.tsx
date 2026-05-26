@@ -3,7 +3,8 @@ import { useFormContext } from 'react-hook-form';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useProjectResources from '@kubevirt-utils/hooks/useProjectResources';
-import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-utils/models';
+import { modelToGroupVersionKind } from '@kubevirt-utils/models';
+import { useProjectOrNamespaceModel } from '@kubevirt-utils/hooks/useProjectOrNamespaceModel';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { ResourceIcon } from '@openshift-console/dynamic-plugin-sdk';
 import {
@@ -20,6 +21,7 @@ import { getVMNetworkProjects } from '../../utils';
 import { VMNetworkForm } from '../constants';
 
 const SelectedProjects: FC = () => {
+  const model = useProjectOrNamespaceModel();
   const { t } = useKubevirtTranslation();
 
   const { watch } = useFormContext<VMNetworkForm>();
@@ -48,7 +50,7 @@ const SelectedProjects: FC = () => {
             <List>
               {matchingProjects?.map((project) => (
                 <ListItem key={getName(project)}>
-                  <ResourceIcon groupVersionKind={modelToGroupVersionKind(ProjectModel)} />
+                  <ResourceIcon groupVersionKind={modelToGroupVersionKind(model)} />
                   {getName(project)}
                 </ListItem>
               ))}

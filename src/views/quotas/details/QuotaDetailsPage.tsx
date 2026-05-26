@@ -25,7 +25,7 @@ const QuotaDetailsPage: FC = () => {
     : ApplicationAwareClusterResourceQuotaModel;
 
   const [quota, loaded] = useK8sWatchResource<ApplicationAwareQuota>({
-    groupVersionKind: modelToGroupVersionKind(model),
+        groupVersionKind: modelToGroupVersionKind(model),
     name,
     namespace,
   });

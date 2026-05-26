@@ -1,12 +1,4 @@
-FROM registry.access.redhat.com/ubi9/ubi:latest AS policy
-
-RUN update-crypto-policies --set DEFAULT:PQ
-# NOTE: Since the `:latest` tag can have npm version changes, we are using
-#       a specific version tag. Container build errors have come up when
-#       the `:latest` is updated.
-#
-# Image info: https://catalog.redhat.com/en/software/containers/ubi9/nodejs-22/66431d1785c5c3a31edd24f1
-FROM registry.access.redhat.com/ubi9/nodejs-22:9.7-1776701988 AS builder
+FROM node:22@sha256:1031993481795705055273f2eef0c24597abdcb277d6e058c82f78cbbdef92a6 AS builder
 USER root
 
 COPY . /opt/app-root/src
@@ -17,11 +9,13 @@ RUN npm config set fetch-timeout 1200000
 RUN npm ci --ignore-scripts
 RUN npm run build
 
-# Image info: https://catalog.redhat.com/en/software/containers/ubi9/nginx-124/657b066b6c1bc124a1d7ff39
-FROM registry.access.redhat.com/ubi9/nginx-124:9.7-1776735087
+FROM nginx:stable-alpine@sha256:5f979dcfed4ce6461873f087e8c980d6e29b084b9e8776d9704a7e989b5f4898
 
-COPY --from=policy /etc/crypto-policies /etc/crypto-policies
 COPY --from=builder /opt/app-root/src/dist /usr/share/nginx/html
-COPY default.conf /opt/app-root/etc/nginx.d/default.conf
-USER 1001
-CMD /usr/libexec/s2i/run
+COPY default.conf /etc/nginx/conf.d/default.conf
+
+WORKDIR /usr/share/nginx/html
+
+USER nginx
+
+EXPOSE 8080 9443

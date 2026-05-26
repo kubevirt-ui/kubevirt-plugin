@@ -6,6 +6,7 @@ import { Switch } from '@patternfly/react-core';
 import './ExpandSectionWithSwitch.scss';
 
 type ExpandSectionWithSwitchProps = {
+  ariaLabel?: string;
   children?: ReactNode;
   helpTextContent?: ReactNode;
   id: string;
@@ -16,6 +17,7 @@ type ExpandSectionWithSwitchProps = {
 };
 
 const ExpandSectionWithSwitch: FC<ExpandSectionWithSwitchProps> = ({
+  ariaLabel,
   children,
   helpTextContent,
   id,
@@ -28,6 +30,7 @@ const ExpandSectionWithSwitch: FC<ExpandSectionWithSwitchProps> = ({
     customContent={
       <div className="expand-section-with-switch__switch-container">
         <Switch
+          aria-label={ariaLabel}
           isChecked={switchState}
           isDisabled={isDisabled}
           onChange={(_, checked: boolean) => toggleSwitch(checked)}

@@ -1,6 +1,7 @@
 import React, { FC } from 'react';
 
-import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { modelToGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { useProjectOrNamespaceModel } from '@kubevirt-utils/hooks/useProjectOrNamespaceModel';
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -23,6 +24,7 @@ export const PersistentVolumeSelectProject: FC<PersistentVolumeSelectProjectProp
 
   const validated = !selectedProject ? ValidatedOptions.error : ValidatedOptions.default;
 
+  const model = useProjectOrNamespaceModel();
   return (
     <FormGroup
       className="pvc-selection-formgroup"
@@ -34,7 +36,7 @@ export const PersistentVolumeSelectProject: FC<PersistentVolumeSelectProjectProp
       <InlineFilterSelect
         options={projectsName?.map((name) => ({
           children: name,
-          groupVersionKind: modelToGroupVersionKind(ProjectModel),
+          groupVersionKind: modelToGroupVersionKind(model),
           value: name,
         }))}
         toggleProps={{

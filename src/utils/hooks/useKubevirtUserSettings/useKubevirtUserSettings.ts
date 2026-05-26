@@ -1,9 +1,7 @@
 import { useEffect, useState } from 'react';
-
 import {
   ConfigMapModel,
   modelToGroupVersionKind,
-  UserModel,
 } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { operatorNamespaceSignal } from '@kubevirt-utils/store/operatorNamespace';
@@ -15,6 +13,38 @@ import { UseKubevirtUserSettings } from './utils/types';
 import { UserSettingsState } from './utils/userSettingsInitialState';
 import { parseNestedJSON, patchUserConfigMap } from './utils/utils';
 
+const alwaysUseLocalStorage = (window as Window & {
+  SERVER_FLAGS?: { userSettingsLocation?: 'configmap' | 'localstorage' };
+}).SERVER_FLAGS?.userSettingsLocation === 'localstorage';
+
+const getIsImpersonating = (): boolean => !!localStorage.getItem('impersonate-user');
+
+const getUserUid = (): string | null => {
+  const rawUserID = localStorage.getItem('userID');
+  if (rawUserID) {
+    try {
+      const decoded = atob(rawUserID);
+      if (decoded) return decoded;
+    } catch {
+      return rawUserID;
+    }
+  }
+  return null;
+};
+
+const getLsKey = (): string | null => {
+  const userUid = getUserUid();
+  const isImpersonating = getIsImpersonating();
+
+  if (!userUid) {
+    return null;
+  }
+
+  return alwaysUseLocalStorage && !isImpersonating
+    ? 'kubevirt-user-settings'
+    : `kubevirt-user-settings-${userUid}`;
+};
+
 const useKubevirtUserSettings: UseKubevirtUserSettings = (key, cluster) => {
   const [error, setError] = useState<Error>();
   const [userSettings, setUserSettings] = useState<UserSettingsState>();
@@ -22,44 +52,63 @@ const useKubevirtUserSettings: UseKubevirtUserSettings = (key, cluster) => {
   const [settingsInitialized, setSettingsInitialized] = useState<boolean>(false);
   const operatorNamespace = operatorNamespaceSignal.value;
 
-  const [user, loadedUser, errorUser] = useK8sWatchData<IoK8sApiCoreV1ConfigMap>({
-    cluster,
-    groupVersionKind: modelToGroupVersionKind(UserModel),
-    name: '~',
-  });
-
-  const userName = user?.metadata?.uid || user?.metadata?.name?.replace(/[^-._a-zA-Z0-9]+/g, '-');
+  const lsKey = getLsKey();
+  const isLocalStorage = alwaysUseLocalStorage || getIsImpersonating();
 
   const [userConfigMap, loadedConfigMap, configMapError] = useK8sWatchData<IoK8sApiCoreV1ConfigMap>(
-    operatorNamespace &&
-      userName && {
-        cluster,
-        groupVersionKind: modelToGroupVersionKind(ConfigMapModel),
-        name: KUBEVIRT_USER_SETTINGS_CONFIG_MAP_NAME,
-        namespace: operatorNamespace,
-      },
+    !isLocalStorage && operatorNamespace && lsKey
+      ? {
+          cluster,
+          groupVersionKind: modelToGroupVersionKind(ConfigMapModel),
+          name: KUBEVIRT_USER_SETTINGS_CONFIG_MAP_NAME,
+          namespace: operatorNamespace,
+        }
+      : null,
   );
 
   const loadedCM = (loadedConfigMap || !isEmpty(configMapError)) && !isEmpty(operatorNamespace);
-  const loadedUsr = loadedUser || !isEmpty(errorUser);
+  const loadedUsr = true;
+
+  const lsData = isLocalStorage
+    ? (() => {
+        try {
+          const raw = lsKey ? localStorage.getItem(lsKey) : null;
+          return raw ? JSON.parse(raw) : {};
+        } catch {
+          return {};
+        }
+      })()
+    : null;
 
   useEffect(() => {
+    if (isLocalStorage) {
+      setUserSettings(lsData as UserSettingsState);
+      setSettingsInitialized(true);
+      return;
+    }
+
     if (!loadedCM || !loadedUsr) return;
 
-    if (!isEmpty(userConfigMap) && userName) {
+    if (!isEmpty(userConfigMap) && lsKey) {
       setUserSettings(
-        (<unknown>parseNestedJSON(userConfigMap?.data?.[userName]) || {}) as UserSettingsState,
+        (<unknown>parseNestedJSON(userConfigMap?.data?.[lsKey]) || {}) as UserSettingsState,
       );
     }
 
     setSettingsInitialized(true);
-  }, [userConfigMap, userName, loadedCM, loadedUsr]);
+  }, [userConfigMap, lsKey, loadedCM, loadedUsr, lsData]);
 
   const pushUserSettingsChanges = async (data, resolve, reject) => {
     setLoading(true);
 
     try {
-      await patchUserConfigMap(userConfigMap, userName, data, cluster);
+      if (isLocalStorage) {
+        if (lsKey) {
+          localStorage.setItem(lsKey, JSON.stringify(data));
+        }
+      } else {
+        await patchUserConfigMap(userConfigMap, lsKey, data, cluster);
+      }
       resolve(key ? data[key] : data);
     } catch (apiError) {
       setError(apiError);
@@ -85,7 +134,7 @@ const useKubevirtUserSettings: UseKubevirtUserSettings = (key, cluster) => {
     key ? userSettings?.[key] : userSettings,
     userSettings && updateUserSetting,
     !loading && settingsInitialized,
-    error || errorUser || configMapError,
+    error || (!isLocalStorage ? configMapError : undefined),
   ];
 };
 

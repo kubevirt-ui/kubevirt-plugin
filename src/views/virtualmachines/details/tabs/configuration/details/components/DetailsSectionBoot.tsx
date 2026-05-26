@@ -125,6 +125,9 @@ const DetailsSectionBoot: FC<DetailsSectionBootProps> = ({
         )}
         descriptionData={
           <Switch
+            aria-label={t('Start in pause mode')}
+            id="start-in-pause-mode"
+            isChecked={isChecked}
             onChange={(_event, checked) => {
               setIsChecked(checked);
               isCustomizeInstanceType
@@ -138,8 +141,6 @@ const DetailsSectionBoot: FC<DetailsSectionBootProps> = ({
                   )
                 : updateStartStrategy(checked, vm);
             }}
-            id="start-in-pause-mode"
-            isChecked={isChecked}
           />
         }
         descriptionHeader={

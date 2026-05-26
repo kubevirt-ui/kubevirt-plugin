@@ -1,7 +1,8 @@
 import React, { FC } from 'react';
 import { Controller, FieldPath, useFormContext } from 'react-hook-form';
 
-import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { modelToGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { useProjectOrNamespaceModel } from '@kubevirt-utils/hooks/useProjectOrNamespaceModel';
 import { V1DiskFormState } from '@kubevirt-utils/components/DiskModal/utils/types';
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
@@ -33,6 +34,7 @@ const DiskSourcePVCSelectNamespace: FC = () => {
 
   const error = errors?.dataVolumeTemplate?.spec?.source?.pvc?.namespace;
 
+  const model = useProjectOrNamespaceModel();
   return (
     <Controller
       render={({ field: { onChange, value } }) => (
@@ -45,7 +47,7 @@ const DiskSourcePVCSelectNamespace: FC = () => {
           <InlineFilterSelect
             options={projectNames?.map((name) => ({
               children: name,
-              groupVersionKind: modelToGroupVersionKind(ProjectModel),
+              groupVersionKind: modelToGroupVersionKind(model),
               value: name,
             }))}
             setSelected={(val) => {

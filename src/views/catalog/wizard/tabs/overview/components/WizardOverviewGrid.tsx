@@ -273,12 +273,13 @@ const WizardOverviewGrid: FC<WizardOverviewGridProps> = ({ tabsData, updateVM, v
           <WizardDescriptionItem
             description={
               <Switch
+                aria-label={t('Start in pause mode')}
+                id="start-in-pause-mode"
+                isChecked={isChecked}
                 onChange={(_event, checked) => {
                   setIsChecked(checked);
                   updateStartStrategy(checked);
                 }}
-                id="start-in-pause-mode"
-                isChecked={isChecked}
               />
             }
             helperPopover={{
@@ -357,6 +358,10 @@ const WizardOverviewGrid: FC<WizardOverviewGridProps> = ({ tabsData, updateVM, v
           <WizardDescriptionItem
             description={
               <Switch
+                aria-label={t('Guest system log access')}
+                id="guest-system-log-access"
+                isChecked={isCheckedGuestSystemLogAccess}
+                isDisabled={isDisabledGuestSystemLogs}
                 onChange={(_event, checked) => {
                   setIsCheckedGuestSystemLogAccess(checked);
                   updateVM((vmDraft) => {
@@ -368,9 +373,6 @@ const WizardOverviewGrid: FC<WizardOverviewGridProps> = ({ tabsData, updateVM, v
                     return vmDraft;
                   });
                 }}
-                id="guest-system-log-access"
-                isChecked={isCheckedGuestSystemLogAccess}
-                isDisabled={isDisabledGuestSystemLogs}
               />
             }
             helperPopover={{
@@ -389,6 +391,9 @@ const WizardOverviewGrid: FC<WizardOverviewGridProps> = ({ tabsData, updateVM, v
           <WizardDescriptionItem
             description={
               <Switch
+                aria-label={t('Deletion protection')}
+                id="deletion-protection"
+                isChecked={deletionProtectionEnabled}
                 onChange={(_event, checked) =>
                   createModal(({ isOpen, onClose }) => (
                     <DeletionProtectionModal
@@ -412,8 +417,6 @@ const WizardOverviewGrid: FC<WizardOverviewGridProps> = ({ tabsData, updateVM, v
                     />
                   ))
                 }
-                id="deletion-protection"
-                isChecked={deletionProtectionEnabled}
               />
             }
             helperPopover={{

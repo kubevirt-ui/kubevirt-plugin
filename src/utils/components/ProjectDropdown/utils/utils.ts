@@ -1,6 +1,7 @@
 import { MouseEvent } from 'react';
 
-import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { modelToGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { useProjectOrNamespaceModel } from '@kubevirt-utils/hooks/useProjectOrNamespaceModel';
 import { EnhancedSelectOptionProps } from '@kubevirt-utils/components/FilterSelect/utils/types';
 import { ALL_PROJECTS } from '@kubevirt-utils/hooks/constants';
 import { getName } from '@kubevirt-utils/resources/shared';
@@ -15,6 +16,7 @@ export const getProjectOptions = (
   bookmarks: ConsoleNamespaceBookmarks = {},
   updateBookmarks?: UpdateBookmarks,
 ): EnhancedSelectOptionProps[] => {
+  const model = useProjectOrNamespaceModel();
   const favoriteOptions: EnhancedSelectOptionProps[] = [];
   const regularOptions: EnhancedSelectOptionProps[] = [];
 
@@ -24,7 +26,7 @@ export const getProjectOptions = (
     const option: EnhancedSelectOptionProps = {
       children: name,
       group: isFavorite ? 'Favorites' : undefined,
-      groupVersionKind: modelToGroupVersionKind(ProjectModel),
+      groupVersionKind: modelToGroupVersionKind(model),
       isFavorite,
       name,
       onFavorite:
@@ -59,7 +61,7 @@ export const getProjectOptions = (
     ? [
         {
           children: ALL_PROJECTS,
-          groupVersionKind: modelToGroupVersionKind(ProjectModel),
+          groupVersionKind: modelToGroupVersionKind(model),
           value: ALL_PROJECTS,
         },
       ]

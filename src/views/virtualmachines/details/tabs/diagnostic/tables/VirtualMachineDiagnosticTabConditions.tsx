@@ -119,9 +119,10 @@ const VirtualMachineDiagnosticTabConditions: FC<VirtualMachineDiagnosticTabCondi
         <Thead>
           <Tr>
             <Th
+              aria-label={t('Expand all rows')}
               expand={{
                 areAllExpanded: expend.expended.size !== expend.ids.size,
-                collapseAllAriaLabel: '',
+                collapseAllAriaLabel: t('Collapse all rows'),
                 onToggle: (_, __, isOpen) => {
                   setExpend((expendObj) => ({
                     expended: new Set(!isOpen ? [] : expendObj.ids),

@@ -2,9 +2,9 @@ import { useMemo } from 'react';
 
 import {
   modelToGroupVersionKind,
-  ProjectModel,
   VolumeSnapshotModel,
 } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { useProjectOrNamespaceModel } from '@kubevirt-utils/hooks/useProjectOrNamespaceModel';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
@@ -19,9 +19,10 @@ type UseSnapshotsReturnType = {
 };
 
 const useSnapshots = (projectSelected: string, cluster?: string): UseSnapshotsReturnType => {
+  const model = useProjectOrNamespaceModel();
   const [projects, projectsLoaded, projectsErrors] = useK8sWatchData<K8sResourceCommon[]>({
     cluster,
-    groupVersionKind: modelToGroupVersionKind(ProjectModel),
+    groupVersionKind: modelToGroupVersionKind(model),
     isList: true,
     namespaced: false,
   });

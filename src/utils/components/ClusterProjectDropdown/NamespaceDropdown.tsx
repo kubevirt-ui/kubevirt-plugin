@@ -1,6 +1,7 @@
 import React, { FC, JSX, useMemo } from 'react';
 
-import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { modelToGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { useProjectOrNamespaceModel } from '@kubevirt-utils/hooks/useProjectOrNamespaceModel';
 import Dropdown, {
   DropdownConfig,
 } from '@kubevirt-utils/components/ClusterProjectDropdown/Dropdown/Dropdown';
@@ -30,9 +31,10 @@ const NamespaceDropdown: FC<NamespaceDropdownProps> = ({
 }): JSX.Element => {
   const { t } = useKubevirtTranslation();
 
+  const model = useProjectOrNamespaceModel();
   const [projects, projectsLoaded] = useK8sWatchData<K8sResourceCommon[]>({
     cluster,
-    groupVersionKind: modelToGroupVersionKind(ProjectModel),
+    groupVersionKind: modelToGroupVersionKind(model),
     isList: true,
     namespaced: false,
   });

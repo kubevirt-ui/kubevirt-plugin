@@ -1,10 +1,8 @@
 import React, { FC, useCallback } from 'react';
 
-import {
-  modelToGroupVersionKind,
-  PersistentVolumeClaimModel,
-  ProjectModel,
-} from '@kubevirt-ui-ext/kubevirt-api/console';
+import { modelToGroupVersionKind,
+  PersistentVolumeClaimModel, } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { useProjectOrNamespaceModel } from '@kubevirt-utils/hooks/useProjectOrNamespaceModel';
 import { V1beta1DataVolumeSpec } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
@@ -31,6 +29,7 @@ export const PersistentVolumeClaimSelect: FC<PersistentVolumeClaimSelectProps> =
   projectSelected,
   pvcNameSelected,
 }) => {
+  const model = useProjectOrNamespaceModel();
   const { t } = useKubevirtTranslation();
   const { filteredPVCNames, projectsLoaded, projectsNames, pvcMapper, pvcsLoaded } =
     useProjectsAndPVCs(projectSelected);
@@ -62,7 +61,7 @@ export const PersistentVolumeClaimSelect: FC<PersistentVolumeClaimSelectProps> =
           <InlineFilterSelect
             options={projectsNames.map((name) => ({
               children: name,
-              groupVersionKind: modelToGroupVersionKind(ProjectModel),
+              groupVersionKind: modelToGroupVersionKind(model),
               value: name,
             }))}
             placeholder={t('Select PVC project')}

@@ -3,7 +3,8 @@ import { useCallback, useMemo } from 'react';
 import { V1beta1Provider } from '@kubev2v/types';
 import { EnhancedSelectOptionProps } from '@kubevirt-utils/components/FilterSelect/utils/types';
 import useProjects from '@kubevirt-utils/hooks/useProjects';
-import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-utils/models';
+import { modelToGroupVersionKind } from '@kubevirt-utils/models';
+import { useProjectOrNamespaceModel } from '@kubevirt-utils/hooks/useProjectOrNamespaceModel';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { ManagedClusterModel } from '@multicluster/constants';
 import { useFleetClusterNames } from '@stolostron/multicluster-sdk';
@@ -46,7 +47,8 @@ const useClustersAndProjects: UseClustersAndProjects = (sourceCluster, selectedC
   );
 
   const [projects, projectsLoaded, projectsError] = useProjects(selectedClusterTarget);
-  const projectOptions = getSelectableOptions(projects, modelToGroupVersionKind(ProjectModel));
+  const model = useProjectOrNamespaceModel();
+  const projectOptions = getSelectableOptions(projects, modelToGroupVersionKind(model));
 
   const getProviderFromClusterName = useCallback(
     (clusterName: string) => {

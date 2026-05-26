@@ -1,10 +1,8 @@
 import { useMemo } from 'react';
 
-import {
-  modelToGroupVersionKind,
-  PersistentVolumeClaimModel,
-  ProjectModel,
-} from '@kubevirt-ui-ext/kubevirt-api/console';
+import { modelToGroupVersionKind,
+  PersistentVolumeClaimModel, } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { useProjectOrNamespaceModel } from '@kubevirt-utils/hooks/useProjectOrNamespaceModel';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { convertResourceArrayToMap } from '@kubevirt-utils/resources/shared';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
@@ -21,10 +19,11 @@ type useProjectsAndPVCsReturnType = {
 };
 
 export const useProjectsAndPVCs = (projectSelected: string): useProjectsAndPVCsReturnType => {
+  const model = useProjectOrNamespaceModel();
   const cluster = useClusterParam();
   const [projects, projectsLoaded, projectsErrors] = useK8sWatchData<K8sResourceCommon[]>({
     cluster,
-    groupVersionKind: modelToGroupVersionKind(ProjectModel),
+    groupVersionKind: modelToGroupVersionKind(model),
     isList: true,
     namespaced: true,
   });

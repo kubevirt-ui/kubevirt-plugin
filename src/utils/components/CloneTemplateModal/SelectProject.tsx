@@ -1,6 +1,7 @@
 import React, { FC } from 'react';
 
-import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { modelToGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { useProjectOrNamespaceModel } from '@kubevirt-utils/hooks/useProjectOrNamespaceModel';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useProjects from '@kubevirt-utils/hooks/useProjects';
 
@@ -19,6 +20,7 @@ const SelectProject: FC<SelectProjectProps> = ({
   setSelectedProject,
 }) => {
   const { t } = useKubevirtTranslation();
+  const model = useProjectOrNamespaceModel();
 
   const [projectNames, projectsLoaded] = useProjects(cluster);
 
@@ -28,7 +30,7 @@ const SelectProject: FC<SelectProjectProps> = ({
     <InlineFilterSelect
       options={projectNames?.map((projectName) => ({
         children: projectName,
-        groupVersionKind: modelToGroupVersionKind(ProjectModel),
+        groupVersionKind: modelToGroupVersionKind(model),
         value: projectName,
       }))}
       placeholder={t('Select project')}
