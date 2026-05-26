@@ -45,6 +45,7 @@ const LoadBalanceToggleContent: FC<LoadBalanceToggleContentProps> = ({ alternati
           <InstalledIconWithTooltip />
         ) : (
           <Switch
+            aria-label={t('Load balance')}
             data-test-id="load-balance"
             isChecked={switchState}
             onChange={(_event, newSwitchState) => handleSwitchChange(newSwitchState)}

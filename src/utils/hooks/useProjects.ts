@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 
-import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { modelToGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { useProjectOrNamespaceModel } from './useProjectOrNamespaceModel';
 import { isSystemNamespace } from '@kubevirt-utils/resources/namespace/helper';
 import { getName } from '@kubevirt-utils/resources/shared';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
@@ -9,9 +10,10 @@ import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 type UseProjects = (cluster?: string, onlyUserProjects?: boolean) => [string[], boolean, any];
 
 const useProjects: UseProjects = (cluster, onlyUserProjects = false) => {
+  const model = useProjectOrNamespaceModel();
   const [projectsData, loaded, error] = useK8sWatchData<K8sResourceCommon[]>({
     cluster,
-    groupVersionKind: modelToGroupVersionKind(ProjectModel),
+    groupVersionKind: modelToGroupVersionKind(model),
     isList: true,
   });
 

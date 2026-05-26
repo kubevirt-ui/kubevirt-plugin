@@ -1,10 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 
-import {
-  modelToGroupVersionKind,
-  ProjectModel,
-  SecretModel,
-} from '@kubevirt-ui-ext/kubevirt-api/console';
+import { modelToGroupVersionKind,  SecretModel,
+ } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { useProjectOrNamespaceModel } from '@kubevirt-utils/hooks/useProjectOrNamespaceModel';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
@@ -19,10 +17,11 @@ type UseSSHAuthProjects = (authKeyRows: AuthKeyRow[]) => {
 };
 
 const useSSHAuthProjects: UseSSHAuthProjects = (authKeyRows) => {
+  const model = useProjectOrNamespaceModel();
   const cluster = useSettingsCluster();
   const [projects, loaded] = useK8sWatchData<K8sResourceCommon[]>({
     cluster,
-    groupVersionKind: modelToGroupVersionKind(ProjectModel),
+    groupVersionKind: modelToGroupVersionKind(model),
     isList: true,
     namespaced: false,
   });

@@ -44,12 +44,13 @@ const HardwareDevicesHeadlessMode: FC<HardwareDevicesHeadlessModeProps> = ({ onS
           <Flex spaceItems={{ default: 'spaceItemsNone' }}>
             <FlexItem>
               <Switch
+                aria-label={t('Headless mode')}
+                id="headless-mode"
+                isChecked={isChecked}
                 onChange={(_event, checked) => {
                   setIsChecked(checked);
                   updateHeadlessMode(checked);
                 }}
-                id="headless-mode"
-                isChecked={isChecked}
               />
             </FlexItem>
           </Flex>

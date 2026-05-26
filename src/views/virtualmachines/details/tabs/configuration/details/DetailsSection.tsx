@@ -242,13 +242,14 @@ const DetailsSection: FC<DetailsSectionProps> = ({ allInstanceTypes, instanceTyp
               )}
               descriptionData={
                 <Switch
+                  aria-label={t('Guest system log access')}
+                  id="guest-system-log-access"
+                  isChecked={isCheckedGuestSystemAccessLog}
+                  isDisabled={isGuestSystemLogsDisabled}
                   onChange={(_event, checked) => {
                     setIsCheckedGuestSystemAccessLog(checked);
                     updateGuestSystemAccessLog(vm, checked);
                   }}
-                  id="guest-system-log-access"
-                  isChecked={isCheckedGuestSystemAccessLog}
-                  isDisabled={isGuestSystemLogsDisabled}
                 />
               }
               descriptionHeader={
@@ -265,6 +266,9 @@ const DetailsSection: FC<DetailsSectionProps> = ({ allInstanceTypes, instanceTyp
               )}
               descriptionData={
                 <Switch
+                  aria-label={t('Deletion protection')}
+                  id="deletion-protection"
+                  isChecked={deletionProtectionEnabled}
                   onChange={(_event, checked) =>
                     createModal(({ isOpen, onClose }) => (
                       <DeletionProtectionModal
@@ -283,8 +287,6 @@ const DetailsSection: FC<DetailsSectionProps> = ({ allInstanceTypes, instanceTyp
                       />
                     ))
                   }
-                  id="deletion-protection"
-                  isChecked={deletionProtectionEnabled}
                 />
               }
               descriptionHeader={

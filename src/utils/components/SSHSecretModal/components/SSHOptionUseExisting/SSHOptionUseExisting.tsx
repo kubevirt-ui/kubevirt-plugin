@@ -1,6 +1,7 @@
 import React, { Dispatch, FC, SetStateAction, useCallback, useEffect, useState } from 'react';
 
-import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { modelToGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { useProjectOrNamespaceModel } from '@kubevirt-utils/hooks/useProjectOrNamespaceModel';
 import { IoK8sApiCoreV1Secret } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
@@ -102,6 +103,7 @@ const SSHOptionUseExisting: FC<SSHOptionUseExistingProps> = ({
 
   if (isEmpty(userProjects)) return <Bullseye>{t('No SSH keys found')}</Bullseye>;
 
+  const model = useProjectOrNamespaceModel();
   return (
     <>
       <Alert
@@ -117,7 +119,7 @@ const SSHOptionUseExisting: FC<SSHOptionUseExistingProps> = ({
             <InlineFilterSelect
               options={userProjects.map((project) => ({
                 children: project,
-                groupVersionKind: modelToGroupVersionKind(ProjectModel),
+                groupVersionKind: modelToGroupVersionKind(model),
                 value: project,
               }))}
               className="ssh-use-existing__form-group--project"

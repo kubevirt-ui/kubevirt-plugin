@@ -48,6 +48,7 @@ const SectionWithSwitch: FC<SectionWithSwitchProps> = ({
   title,
   turnOnSwitch,
 }) => {
+  const ariaLabel = typeof title === 'string' ? title : undefined;
   const Wrapper = inlineCheckbox ? 'div' : Split;
 
   return (
@@ -85,6 +86,7 @@ const SectionWithSwitch: FC<SectionWithSwitchProps> = ({
       <SplitItem className={classNames({ 'section-with-switch__inline': inlineCheckbox })}>
         {children}{' '}
         <Switch
+          aria-label={ariaLabel}
           className={isLoading && 'kv-cursor--loading'}
           data-test-id={dataTestID}
           isChecked={switchIsOn}

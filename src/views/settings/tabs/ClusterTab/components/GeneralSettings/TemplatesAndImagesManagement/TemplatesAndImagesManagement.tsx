@@ -2,7 +2,8 @@ import React, { FC } from 'react';
 
 import { HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-utils/models';
+import { modelToGroupVersionKind } from '@kubevirt-utils/models';
+import { useProjectOrNamespaceModel } from '@kubevirt-utils/hooks/useProjectOrNamespaceModel';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { Stack, StackItem } from '@patternfly/react-core';
@@ -24,12 +25,12 @@ const TemplatesAndImagesManagement: FC<TemplatesAndImagesManagementProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const cluster = useSettingsCluster();
+  const model = useProjectOrNamespaceModel();
   const projectsData = useK8sWatchData<K8sResourceCommon[]>({
     cluster,
-    groupVersionKind: modelToGroupVersionKind(ProjectModel),
+    groupVersionKind: modelToGroupVersionKind(model),
     isList: true,
   });
-
   return (
     <ExpandSection
       searchItemId={CLUSTER_TAB_IDS.templatesManagement}

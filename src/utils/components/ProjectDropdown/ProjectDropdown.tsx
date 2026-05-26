@@ -1,6 +1,7 @@
 import React, { FC, JSX, useMemo } from 'react';
 
-import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { modelToGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { useProjectOrNamespaceModel } from '@kubevirt-utils/hooks/useProjectOrNamespaceModel';
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import { getProjectOptions } from '@kubevirt-utils/components/ProjectDropdown/utils/utils';
 import { ALL_PROJECTS } from '@kubevirt-utils/hooks/constants';
@@ -25,9 +26,10 @@ const ProjectDropdown: FC<ProjectDropdownProps> = ({
   selectedProject,
   useConsoleFavorites = true,
 }): JSX.Element => {
+  const model = useProjectOrNamespaceModel();
   const [projects] = useK8sWatchData<K8sResourceCommon[]>({
     cluster,
-    groupVersionKind: modelToGroupVersionKind(ProjectModel),
+    groupVersionKind: modelToGroupVersionKind(model),
     isList: true,
     namespaced: false,
   });

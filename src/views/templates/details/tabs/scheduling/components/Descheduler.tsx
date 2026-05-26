@@ -33,6 +33,7 @@ const Descheduler: FC<DeschedulerProps> = ({ template }) => {
         }
         descriptionData={
           <Switch
+            aria-label={t('Descheduler')}
             id="descheduler-switch"
             isChecked={deschedulerEnabled}
             isDisabled={deschedulerSwitchDisabled}

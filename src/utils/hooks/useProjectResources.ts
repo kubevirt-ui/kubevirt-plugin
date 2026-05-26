@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 
-import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { modelToGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { useProjectOrNamespaceModel } from './useProjectOrNamespaceModel';
 import { isSystemNamespace } from '@kubevirt-utils/resources/namespace/helper';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { universalComparator } from '@kubevirt-utils/utils/utils';
@@ -13,9 +14,10 @@ type UseProjectResources = (
 ) => [K8sResourceCommon[], boolean, Error];
 
 const useProjectResources: UseProjectResources = (cluster, onlyUserProjects = false) => {
+  const model = useProjectOrNamespaceModel();
   const [projects, loaded, error] = useK8sWatchData<K8sResourceCommon[]>({
     cluster,
-    groupVersionKind: modelToGroupVersionKind(ProjectModel),
+    groupVersionKind: modelToGroupVersionKind(model),
     isList: true,
   });
 

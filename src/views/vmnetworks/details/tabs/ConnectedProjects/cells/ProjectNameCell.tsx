@@ -1,6 +1,7 @@
 import React, { FC } from 'react';
 
-import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-utils/models';
+import { modelToGroupVersionKind } from '@kubevirt-utils/models';
+import { useProjectOrNamespaceModel } from '@kubevirt-utils/hooks/useProjectOrNamespaceModel';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
 
@@ -11,6 +12,7 @@ type ProjectNameCellProps = {
 };
 
 const ProjectNameCell: FC<ProjectNameCellProps> = ({ row }) => {
+  const model = useProjectOrNamespaceModel();
   const { projectName } = row;
 
   if (!projectName) {
@@ -19,7 +21,7 @@ const ProjectNameCell: FC<ProjectNameCellProps> = ({ row }) => {
 
   return (
     <span data-test={`project-name-${projectName}`}>
-      <ResourceLink groupVersionKind={modelToGroupVersionKind(ProjectModel)} name={projectName} />
+      <ResourceLink groupVersionKind={modelToGroupVersionKind(model)} name={projectName} />
     </span>
   );
 };

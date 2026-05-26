@@ -1,6 +1,7 @@
 import React, { FC, useCallback } from 'react';
 
-import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { modelToGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { useProjectOrNamespaceModel } from '@kubevirt-utils/hooks/useProjectOrNamespaceModel';
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import { isEqualObject } from '@kubevirt-utils/components/NodeSelectorModal/utils/helpers';
 import {
@@ -36,6 +37,7 @@ const SSHAuthKeyRow: FC<SSHAuthKeyRowProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const cluster = useSettingsCluster();
+  const model = useProjectOrNamespaceModel();
   const { projectName, secretName } = row;
 
   const onSubmit = useCallback(
@@ -82,7 +84,7 @@ const SSHAuthKeyRow: FC<SSHAuthKeyRowProps> = ({
           <InlineFilterSelect
             options={selectableProjects?.sort().map((opt) => ({
               children: opt,
-              groupVersionKind: modelToGroupVersionKind(ProjectModel),
+              groupVersionKind: modelToGroupVersionKind(model),
               value: opt,
             }))}
             toggleProps={{

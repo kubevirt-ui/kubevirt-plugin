@@ -1,6 +1,7 @@
 import React, { FC } from 'react';
 
-import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { modelToGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { useProjectOrNamespaceModel } from '@kubevirt-utils/hooks/useProjectOrNamespaceModel';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName } from '@kubevirt-utils/resources/shared';
@@ -27,6 +28,7 @@ const ProjectCheckerAlert: FC<ProjectCheckerAlertProps> = ({
   projectsLoaded,
   qualifiedProjects = [],
 }) => {
+  const model = useProjectOrNamespaceModel();
   const { t } = useKubevirtTranslation();
   if (!projectsLoaded) {
     return <Loading />;
@@ -62,7 +64,7 @@ const ProjectCheckerAlert: FC<ProjectCheckerAlertProps> = ({
                   <FlexItem spacer={{ default: 'spacerXs' }}>
                     <MulticlusterResourceLink
                       cluster={getCluster(project)}
-                      groupVersionKind={modelToGroupVersionKind(ProjectModel)}
+                      groupVersionKind={modelToGroupVersionKind(model)}
                       name={getName(project)}
                     />
                   </FlexItem>

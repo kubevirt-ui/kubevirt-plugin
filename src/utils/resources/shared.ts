@@ -254,7 +254,7 @@ export const getAllowedResources = (projectNames: string[], model: K8sModel) => 
     (projectNames || []).map((projName) => [
       `${projName}/${model.plural}`,
       {
-        groupVersionKind: modelToGroupVersionKind(model),
+                groupVersionKind: modelToGroupVersionKind(model),
         isList: true,
         namespace: projName,
         namespaced: true,

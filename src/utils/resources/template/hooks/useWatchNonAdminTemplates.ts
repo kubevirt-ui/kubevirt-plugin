@@ -2,7 +2,8 @@ import { useEffect, useMemo, useState } from 'react';
 
 import { OPENSHIFT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
-import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-utils/models';
+import { modelToGroupVersionKind } from '@kubevirt-utils/models';
+import { useProjectOrNamespaceModel } from '@kubevirt-utils/hooks/useProjectOrNamespaceModel';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
@@ -26,8 +27,9 @@ const useWatchNonAdminTemplates = () => {
 
   const isLocalCluster = isEmpty(cluster) || cluster === hubClusterName;
 
+  const model = useProjectOrNamespaceModel();
   const [projects, loaded] = useK8sWatchData<K8sResourceCommon[]>({
-    groupVersionKind: modelToGroupVersionKind(ProjectModel),
+    groupVersionKind: modelToGroupVersionKind(model),
     isList: true,
     namespaced: false,
   });
