@@ -38,9 +38,13 @@ export const getClusterTabIds: SearchItemGetter = () => [
 ];
 
 const getUserTabIds: SearchItemGetter = () => [
+  { id: USER_TAB_IDS.general, title: t('General') },
+  { id: USER_TAB_IDS.autoHideNav, title: t('Auto-hide navigation menu') },
   { id: USER_TAB_IDS.sshKeys, title: t('SSH keys') },
   { id: USER_TAB_IDS.permissions, title: t('Permissions') },
   { id: USER_TAB_IDS.gettingStarted, title: t('Getting started') },
+  { id: USER_TAB_IDS.welcomeInformation, title: t('Welcome information') },
+  { id: USER_TAB_IDS.guidedTour, title: t('Guided tour') },
 ];
 
 const getPreviewFeaturesTabIds: SearchItemGetter = () => [

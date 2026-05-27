@@ -24,7 +24,12 @@ test.describe('Cluster Test Preparation', () => {
     // page renders the project-selector UI cleanly (no stale SSH entries).
     const defaultUserSettings = JSON.stringify({
       guidedTour: false,
-      onboardingPopoversHidden: { catalog: true, createProject: true, vmsTab: true },
+      onboardingPopoversHidden: {
+        catalog: true,
+        createProject: true,
+        navCollapse: true,
+        vmsTab: true,
+      },
       quickStart: { activeQuickStartID: '', dontShowWelcomeModal: true },
     });
     ocIgnore(
