@@ -6,6 +6,7 @@ import {
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { ALL_PROJECTS } from '@kubevirt-utils/hooks/constants';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
+import { USER_SETTINGS_KEYS } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/const';
 import { UserSettingFavorites } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/types';
 import { PaginationState } from '@kubevirt-utils/hooks/usePagination/utils/types';
 import useBootableVolumes from '@kubevirt-utils/resources/bootableresources/hooks/useBootableVolumes';
@@ -73,7 +74,10 @@ const useBootableVolumesTableData: UseBootableVolumesTableData = (
   const isPreferenceFilterEmpty =
     !!preference && !isEmpty(bootableVolumes) && isEmpty(preferenceFilteredVolumes);
 
-  const favoritesData = useKubevirtUserSettings('favoriteBootableVolumes', cluster);
+  const favoritesData = useKubevirtUserSettings(
+    USER_SETTINGS_KEYS.favoriteBootableVolumes,
+    cluster,
+  );
   const [favorites = [], updaterFavorites] = favoritesData;
   const volumeFavorites = favorites as [];
 

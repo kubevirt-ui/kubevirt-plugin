@@ -541,3 +541,13 @@ export const haveSamePropValue = (
 
 export const findOwnerRefByKind = (resource: K8sResourceCommon, kind: string): string | undefined =>
   resource?.metadata?.ownerReferences?.find((ref) => ref.kind === kind)?.name;
+
+/**
+ * Function to get a unique key (identifier) for a resource
+ * @param {K8sResourceCommon} resource - resource to get the key from
+ * @returns {string} the unique key for the resource
+ */
+export const getResourceKey = (resource: K8sResourceCommon): string =>
+  `${getKind(resource)}/${getCluster(resource) || ''}/${getNamespace(resource)}/${getName(
+    resource,
+  )}`;

@@ -11,13 +11,13 @@ import {
   TOP_CONSUMERS_NUM_ITEMS_KEY,
 } from './../../../views/clusteroverview/TopConsumersTab/utils/constants';
 import { initialTopConsumerCardSettings } from './../../../views/clusteroverview/TopConsumersTab/utils/utils';
-import { TOP_CONSUMERS_CARD } from './utils/const';
+import { TOP_CONSUMERS_CARD, USER_SETTINGS_KEYS } from './utils/const';
 import { TopConsumersData, UseKubevirtUserSettingsTopConsumerCards } from './utils/types';
 import useKubevirtUserSettings from './useKubevirtUserSettings';
 
 const useKubevirtUserSettingsTopConsumerCards: UseKubevirtUserSettingsTopConsumerCards = () => {
   const updateOnceFromUserSetting = useRef(null);
-  const [cards, setCards, loaded] = useKubevirtUserSettings('cards');
+  const [cards, setCards, loaded] = useKubevirtUserSettings(USER_SETTINGS_KEYS.cards);
   const [topConsumerSettingsLocalStorage, setTopConsumerSettingsLocalStorage] =
     useLocalStorage<TopConsumersData>(TOP_CONSUMERS_CARD);
 

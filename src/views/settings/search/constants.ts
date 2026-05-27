@@ -19,9 +19,13 @@ export const CLUSTER_TAB_IDS = {
 };
 
 export const USER_TAB_IDS = {
+  autoHideNav: 'auto-hide-nav',
+  general: 'general',
   gettingStarted: 'getting-started',
+  guidedTour: 'guided-tour',
   permissions: 'permissions',
   sshKeys: 'ssh-keys',
+  welcomeInformation: 'welcome-information',
 };
 
 export const PREVIEW_FEATURES_TAB_IDS = {
@@ -53,4 +57,6 @@ export const SEARCH_ITEM_CHILDREN_TREE = {
     PREVIEW_FEATURES_TAB_IDS.passtUDNNetwork,
     PREVIEW_FEATURES_TAB_IDS.vmTemplates,
   ],
+  [USER_TAB_IDS.general]: [USER_TAB_IDS.autoHideNav],
+  [USER_TAB_IDS.gettingStarted]: [USER_TAB_IDS.welcomeInformation, USER_TAB_IDS.guidedTour],
 };

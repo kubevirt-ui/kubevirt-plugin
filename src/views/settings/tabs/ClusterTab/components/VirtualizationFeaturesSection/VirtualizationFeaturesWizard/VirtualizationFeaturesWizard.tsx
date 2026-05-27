@@ -1,6 +1,7 @@
 import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useWizardFooterProps from '@kubevirt-utils/hooks/useWizardFooterProps';
 import { Modal, ModalVariant, Wizard, WizardHeader, WizardStep } from '@patternfly/react-core';
 import { useVirtualizationFeaturesContext } from '@settings/tabs/ClusterTab/components/VirtualizationFeaturesSection/utils/VirtualizationFeaturesContext/VirtualizationFeaturesContext';
 import ConfigurationStepContent from '@settings/tabs/ClusterTab/components/VirtualizationFeaturesSection/VirtualizationFeaturesWizard/components/ConfigurationStep/ConfigurationStepContent';
@@ -19,12 +20,7 @@ const VirtualizationFeaturesWizard: FC<VirtualizationFeaturesWizardProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const { operatorResourcesLoaded } = useVirtualizationFeaturesContext();
-
-  const wizardFooterProps = {
-    backButtonText: t('Back'),
-    cancelButtonText: t('Cancel'),
-    nextButtonText: t('Next'),
-  };
+  const wizardFooterProps = useWizardFooterProps();
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} variant={ModalVariant.large}>
