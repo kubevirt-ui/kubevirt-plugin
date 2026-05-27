@@ -1,13 +1,12 @@
 import React, { useMemo } from 'react';
 
 import { VirtualMachineInstancetypeModelRef } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { VirtualMachineInstancetypeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1beta1VirtualMachineInstancetype } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import CloneResourceModal from '@kubevirt-utils/components/CloneResourceModal/CloneResourceModal';
 import DeleteModal from '@kubevirt-utils/components/DeleteModal/DeleteModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { asAccessReview } from '@kubevirt-utils/resources/shared';
+import { asAccessReview, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { kubevirtK8sDelete } from '@multicluster/k8sRequests';
 import { Action, useK8sModel } from '@openshift-console/dynamic-plugin-sdk';
 
@@ -21,17 +20,17 @@ const useUserInstancetypeActionsProvider: UseUserInstancetypeActionsProvider = (
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
 
-  const [, inFlight] = useK8sModel(VirtualMachineInstancetypeModelRef);
+  const [model, inFlight] = useK8sModel(VirtualMachineInstancetypeModelRef);
   const actions: Action[] = useMemo(() => {
     return [
       {
-        accessReview: asAccessReview(VirtualMachineInstancetypeModel, instanceType, 'create'),
+        accessReview: asAccessReview(model, instanceType, 'create'),
         cta: () =>
           createModal((modalProps) => {
             return (
               <CloneResourceModal
                 {...modalProps}
-                model={VirtualMachineInstancetypeModel}
+                model={model}
                 namespace={instanceType?.metadata?.namespace}
                 object={instanceType}
               />
@@ -42,7 +41,7 @@ const useUserInstancetypeActionsProvider: UseUserInstancetypeActionsProvider = (
         label: t('Clone'),
       },
       {
-        accessReview: asAccessReview(VirtualMachineInstancetypeModel, instanceType, 'delete'),
+        accessReview: asAccessReview(model, instanceType, 'delete'),
         cta: () =>
           createModal(({ isOpen, onClose }) => {
             return (
@@ -50,7 +49,9 @@ const useUserInstancetypeActionsProvider: UseUserInstancetypeActionsProvider = (
                 onDeleteSubmit={() =>
                   kubevirtK8sDelete({
                     cluster: instanceType?.cluster,
-                    model: VirtualMachineInstancetypeModel,
+                    model,
+                    name: getName(instanceType),
+                    ns: getNamespace(instanceType),
                     resource: instanceType,
                   })
                 }
