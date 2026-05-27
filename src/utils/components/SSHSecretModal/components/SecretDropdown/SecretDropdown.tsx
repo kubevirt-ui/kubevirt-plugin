@@ -17,8 +17,8 @@ import { SecretSelectionOption, SSHSecretDetails } from '../../utils/types';
 type SecretDropdownProps = {
   namespace: string;
   onSelectSecret: (generatedSecretName: string) => void;
-  selectedProject: string;
-  selectedProjectSecrets: IoK8sApiCoreV1Secret[];
+  selectedNamespace: string;
+  selectedNamespaceSecrets: IoK8sApiCoreV1Secret[];
   setSSHDetails: Dispatch<SetStateAction<SSHSecretDetails>>;
   sshDetails: SSHSecretDetails;
 };
@@ -26,8 +26,8 @@ type SecretDropdownProps = {
 const SecretDropdown: FC<SecretDropdownProps> = ({
   namespace,
   onSelectSecret,
-  selectedProject,
-  selectedProjectSecrets,
+  selectedNamespace,
+  selectedNamespaceSecrets,
   setSSHDetails,
   sshDetails,
 }) => {
@@ -42,10 +42,10 @@ const SecretDropdown: FC<SecretDropdownProps> = ({
   }, [sshDetails?.sshPubKey, sshDetails?.sshSecretName]);
 
   const onSelect = (newSecretName: string) => {
-    const selectedSecret = selectedProjectSecrets.find(
+    const selectedSecret = selectedNamespaceSecrets.find(
       (secret: IoK8sApiCoreV1Secret) => getName(secret) === newSecretName,
     );
-    const addNew = addNewSecret(namespace, selectedProject, activeNamespace);
+    const addNew = addNewSecret(namespace, selectedNamespace, activeNamespace);
     const sshPubKey = decodeSecret(selectedSecret);
     const generatedSecretName = generateValidSecretName(newSecretName);
 
@@ -62,7 +62,7 @@ const SecretDropdown: FC<SecretDropdownProps> = ({
 
   return (
     <InlineFilterSelect
-      options={selectedProjectSecrets?.map((secret: IoK8sApiCoreV1Secret) => {
+      options={selectedNamespaceSecrets?.map((secret: IoK8sApiCoreV1Secret) => {
         const name = getName(secret);
         return { children: name, value: name };
       })}

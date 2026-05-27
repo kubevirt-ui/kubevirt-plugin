@@ -21,12 +21,12 @@ test.describe('Cluster Test Preparation', () => {
     if (!TEST_NS || !TEST_SECRET_NAME) return;
 
     // Reset kubevirt-user-settings to standard default data so the SSH settings
-    // page renders the project-selector UI cleanly (no stale SSH entries).
+    // page renders the namespace-selector UI cleanly (no stale SSH entries).
     const defaultUserSettings = JSON.stringify({
       guidedTour: false,
       onboardingPopoversHidden: {
         catalog: true,
-        createProject: true,
+        createNamespace: true,
         navCollapse: true,
         vmsTab: true,
       },

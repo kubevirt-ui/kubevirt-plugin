@@ -1,4 +1,4 @@
-import { DEFAULT_MTU, ProjectMappingOption } from 'src/views/vmnetworks/form/constants';
+import { DEFAULT_MTU, NamespaceMappingOption } from 'src/views/vmnetworks/form/constants';
 
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 
@@ -9,18 +9,18 @@ import {
 } from './utils/constants';
 import { logEventWithName } from './telemetry';
 
-const projectMappingMethodMap: Record<ProjectMappingOption, string> = {
-  [ProjectMappingOption.AllProjects]: 'all_projects',
-  [ProjectMappingOption.SelectByLabels]: 'label_selector',
-  [ProjectMappingOption.SelectFromList]: 'select_from_list',
+const namespaceMappingMethodMap: Record<NamespaceMappingOption, string> = {
+  [NamespaceMappingOption.AllNamespaces]: 'all_namespaces',
+  [NamespaceMappingOption.SelectByLabels]: 'label_selector',
+  [NamespaceMappingOption.SelectFromList]: 'select_from_list',
 };
 
 export const logVMNetworkCreated = (
   resource: { spec?: any } & K8sResourceCommon,
-  projectMappingOption: ProjectMappingOption,
+  namespaceMappingOption: NamespaceMappingOption,
 ) => {
   logEventWithName(VM_NETWORK_CREATED, {
-    projectMappingMethod: projectMappingMethodMap[projectMappingOption],
+    namespaceMappingMethod: namespaceMappingMethodMap[namespaceMappingOption],
   });
 
   const localnet = resource?.spec?.network?.localnet;

@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import SelectProject from '@kubevirt-utils/components/CloneTemplateModal/SelectProject';
+import SelectNamespace from '@kubevirt-utils/components/CloneTemplateModal/SelectNamespace';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getCluster } from '@multicluster/helpers/selectors';
@@ -27,13 +27,13 @@ type SaveAsTemplateModalProps = {
 const SaveAsTemplateModal: FC<SaveAsTemplateModalProps> = ({ isOpen, onClose, vm }) => {
   const { t } = useKubevirtTranslation();
 
-  const { onSubmit, selectedProject, setSelectedProject, setTemplateName, templateName } =
+  const { onSubmit, selectedNamespace, setSelectedNamespace, setTemplateName, templateName } =
     useSaveAsTemplateModal(vm);
 
   return (
     <TabModal<K8sResourceCommon>
       headerText={t('Save as template')}
-      isDisabled={!templateName.trim() || !selectedProject}
+      isDisabled={!templateName.trim() || !selectedNamespace}
       isOpen={isOpen}
       modalVariant={ModalVariant.medium}
       onClose={onClose}
@@ -61,11 +61,11 @@ const SaveAsTemplateModal: FC<SaveAsTemplateModalProps> = ({ isOpen, onClose, vm
         />
       </FormGroup>
 
-      <FormGroup fieldId="template-project" isRequired label={t('Project')}>
-        <SelectProject
+      <FormGroup fieldId="template-namespace" isRequired label={t('Namespace')}>
+        <SelectNamespace
           cluster={getCluster(vm)}
-          selectedProject={selectedProject}
-          setSelectedProject={setSelectedProject}
+          selectedNamespace={selectedNamespace}
+          setSelectedNamespace={setSelectedNamespace}
         />
       </FormGroup>
     </TabModal>

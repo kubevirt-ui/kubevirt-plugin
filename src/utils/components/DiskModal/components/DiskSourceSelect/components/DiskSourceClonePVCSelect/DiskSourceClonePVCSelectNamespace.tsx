@@ -1,16 +1,14 @@
 import React, { FC } from 'react';
 import { Controller, FieldPath, useFormContext } from 'react-hook-form';
 
-import { modelToGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { useProjectOrNamespaceModel } from '@kubevirt-utils/hooks/useProjectOrNamespaceModel';
+import { modelToGroupVersionKind, NamespaceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1DiskFormState } from '@kubevirt-utils/components/DiskModal/utils/types';
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import useProjects from '@kubevirt-utils/hooks/useProjects';
 import { FormGroup, ValidatedOptions } from '@patternfly/react-core';
-
+import useNamespaces from '@kubevirt-utils/hooks/useNamespaces';
 import {
   DATAVOLUME_PVC_NAME,
   DATAVOLUME_PVC_NAMESPACE,
@@ -28,13 +26,12 @@ const DiskSourcePVCSelectNamespace: FC = () => {
   } = useFormContext<V1DiskFormState>();
 
   const vmCluster = watch(VM_CLUSTER_FIELD);
-  const [projectNames, projectsLoaded] = useProjects(vmCluster);
+  const [namespaceNames, namespacesLoaded] = useNamespaces(vmCluster);
 
-  if (!projectsLoaded) return <Loading />;
+  if (!namespacesLoaded) return <Loading />;
 
   const error = errors?.dataVolumeTemplate?.spec?.source?.pvc?.namespace;
 
-  const model = useProjectOrNamespaceModel();
   return (
     <Controller
       render={({ field: { onChange, value } }) => (
@@ -42,12 +39,12 @@ const DiskSourcePVCSelectNamespace: FC = () => {
           fieldId={diskSourcePVCNamespaceFieldID}
           id={diskSourcePVCNamespaceFieldID}
           isRequired
-          label={t('PersistentVolumeClaim project')}
+          label={t('PersistentVolumeClaim namespace')}
         >
           <InlineFilterSelect
-            options={projectNames?.map((name) => ({
+            options={namespaceNames?.map((name) => ({
               children: name,
-              groupVersionKind: modelToGroupVersionKind(model),
+              groupVersionKind: modelToGroupVersionKind(NamespaceModel),
               value: name,
             }))}
             setSelected={(val) => {
@@ -59,7 +56,7 @@ const DiskSourcePVCSelectNamespace: FC = () => {
             toggleProps={{
               isFullWidth: true,
             }}
-            placeholder={t('Select Project')}
+            placeholder={t('Select Namespace')}
             selected={value}
           />
           <FormGroupHelperText
@@ -71,7 +68,7 @@ const DiskSourcePVCSelectNamespace: FC = () => {
       )}
       control={control}
       name={DATAVOLUME_PVC_NAMESPACE}
-      rules={{ required: t('Project is required.') }}
+      rules={{ required: t('Namespace is required.') }}
     />
   );
 };

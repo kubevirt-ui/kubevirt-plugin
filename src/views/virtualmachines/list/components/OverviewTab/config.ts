@@ -3,7 +3,7 @@ import { TFunction } from 'i18next';
 import {
   OVERVIEW_LEVEL_CLUSTER,
   OVERVIEW_LEVEL_MULTICLUSTER,
-  OVERVIEW_LEVEL_PROJECT,
+  OVERVIEW_LEVEL_NAMESPACE,
   OverviewConfig,
   OverviewLevel,
   OverviewSectionConfig,
@@ -40,12 +40,12 @@ const getSharedSections = (t: TFunction): OverviewSectionConfig[] => [
 /**
  * Returns the appropriate overview configuration based on the current level.
  * Cluster and multi-cluster levels prepend the Cluster status section;
- * project level shows only the shared sections.
+ * namespace level shows only the shared sections.
  */
 export const getOverviewConfig = (level: OverviewLevel, t: TFunction): OverviewConfig => {
   const shared = getSharedSections(t);
 
-  if (level === OVERVIEW_LEVEL_PROJECT) {
+  if (level === OVERVIEW_LEVEL_NAMESPACE) {
     return { sections: shared };
   }
 
@@ -69,7 +69,7 @@ export const determineOverviewLevel = (
   isMultiCluster?: boolean,
 ): OverviewLevel => {
   if (namespace) {
-    return OVERVIEW_LEVEL_PROJECT;
+    return OVERVIEW_LEVEL_NAMESPACE;
   }
   if (isMultiCluster) {
     return OVERVIEW_LEVEL_MULTICLUSTER;

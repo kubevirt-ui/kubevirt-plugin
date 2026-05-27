@@ -12,7 +12,7 @@ import { VolumeSnapshotKind } from '@kubevirt-utils/components/SelectSnapshot/ty
 import { PREFERENCE_DISPLAY_NAME_KEY } from '@kubevirt-utils/constants/instancetypes-and-preferences';
 import { logITFlowEvent } from '@kubevirt-utils/extensions/telemetry/telemetry';
 import { BOOTABLE_VOLUME_SELECTED } from '@kubevirt-utils/extensions/telemetry/utils/constants';
-import { ALL_PROJECTS } from '@kubevirt-utils/hooks/constants';
+import { ALL_NAMESPACES } from '@kubevirt-utils/hooks/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isDeprecated } from '@kubevirt-utils/resources/bootableresources/helpers';
 import { getVolumeSnapshotStorageClass } from '@kubevirt-utils/resources/bootableresources/selectors';
@@ -131,7 +131,7 @@ const BootableVolumeRow: FC<BootableVolumeRowProps> = ({
       <TableData activeColumnIDs={activeColumnIDs} id={ARCHITECTURE_ID} width={10}>
         <ArchitectureLabel architecture={getArchitecture(bootableVolume)} />
       </TableData>
-      {volumeListNamespace === ALL_PROJECTS && (
+      {volumeListNamespace === ALL_NAMESPACES && (
         <TableData activeColumnIDs={activeColumnIDs} id="namespace" width={15}>
           {bootVolumeNamespace}
         </TableData>

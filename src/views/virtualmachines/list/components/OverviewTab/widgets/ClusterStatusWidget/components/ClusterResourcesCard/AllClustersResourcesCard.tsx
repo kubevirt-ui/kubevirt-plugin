@@ -10,13 +10,13 @@ import './ClusterResourcesCard.scss';
 
 type AllClustersResourcesCardProps = {
   clustersCount: number;
-  projectsCount: number;
+  namespacesCount: number;
   vmsCount: number;
 };
 
 const AllClustersResourcesCard: FC<AllClustersResourcesCardProps> = ({
   clustersCount,
-  projectsCount,
+  namespacesCount,
   vmsCount,
 }) => {
   const { t } = useKubevirtTranslation();
@@ -26,7 +26,7 @@ const AllClustersResourcesCard: FC<AllClustersResourcesCardProps> = ({
     <div className="cluster-resources-card" data-test="cluster-resources-card">
       <ResourceTile count={clustersCount} label={t('Clusters')} />
       <ResourceTile count={nodesCount} isLoading={!nodesLoaded} label={t('Nodes')} />
-      <ResourceTile count={projectsCount} label={t('Projects')} />
+      <ResourceTile count={namespacesCount} label={t('Namespaces')} />
       <ResourceTile count={vmsCount} label={t('VMs')} />
     </div>
   );

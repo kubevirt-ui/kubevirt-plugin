@@ -8,27 +8,27 @@ import './ClusterResourcesCard.scss';
 type ClusterResourcesCardProps = {
   clustersCount?: number;
   isAllClustersPage: boolean;
-  projectsCount: number;
+  namespacesCount: number;
   vmsCount: number;
 };
 
 const ClusterResourcesCard: FC<ClusterResourcesCardProps> = ({
   clustersCount,
   isAllClustersPage,
-  projectsCount,
+  namespacesCount,
   vmsCount,
 }) => {
   if (isAllClustersPage) {
     return (
       <AllClustersResourcesCard
         clustersCount={clustersCount || 0}
-        projectsCount={projectsCount}
+        namespacesCount={namespacesCount}
         vmsCount={vmsCount}
       />
     );
   }
 
-  return <SingleClusterResourcesCard projectsCount={projectsCount} vmsCount={vmsCount} />;
+  return <SingleClusterResourcesCard namespacesCount={namespacesCount} vmsCount={vmsCount} />;
 };
 
 export default ClusterResourcesCard;

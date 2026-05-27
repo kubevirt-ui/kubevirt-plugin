@@ -3,7 +3,7 @@ import { ChangeEvent, useCallback, useMemo, useState } from 'react';
 import useLocalStorage from '@kubevirt-utils/hooks/useLocalStorage';
 import { TreeViewDataItem } from '@patternfly/react-core';
 
-import { HIDE, SHOW, SHOW_EMPTY_PROJECTS_KEY } from '../utils/constants';
+import { HIDE, SHOW, SHOW_EMPTY_NAMESPACES_KEY } from '../utils/constants';
 import { filterItems, filterNamespaceItems } from '../utils/utils';
 
 type UseFilteredTreeView = (treeData: TreeViewDataItem[]) => {
@@ -13,7 +13,7 @@ type UseFilteredTreeView = (treeData: TreeViewDataItem[]) => {
 };
 
 const useFilteredTreeView: UseFilteredTreeView = (treeData) => {
-  const [showEmptyProjects] = useLocalStorage(SHOW_EMPTY_PROJECTS_KEY, HIDE);
+  const [showEmptyNamespaces] = useLocalStorage(SHOW_EMPTY_NAMESPACES_KEY, HIDE);
   const [filteredItems, setFilteredItems] = useState<TreeViewDataItem[]>(null);
   const [searchText, setSearchText] = useState('');
 
@@ -40,8 +40,8 @@ const useFilteredTreeView: UseFilteredTreeView = (treeData) => {
 
     return items
       .map((opt) => Object.assign({}, opt))
-      .filter((item) => filterNamespaceItems(item, showEmptyProjects === SHOW));
-  }, [filteredItems, treeData, showEmptyProjects]);
+      .filter((item) => filterNamespaceItems(item, showEmptyNamespaces === SHOW));
+  }, [filteredItems, treeData, showEmptyNamespaces]);
 
   return { filteredTreeData, onSearch, searchText };
 };

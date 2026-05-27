@@ -19,7 +19,7 @@ const UploadPVCFormPVCNamespace: FC<UploadPVCFormPVCNamespaceProps> = ({ namespa
       />
       <FormHelperText>
         <HelperText id="pvc-namespace-help">
-          {t('A unique namespace for the storage claim within the project')}
+          {t('A unique namespace for the storage claim within the namespace')}
         </HelperText>
       </FormHelperText>
     </FormGroup>

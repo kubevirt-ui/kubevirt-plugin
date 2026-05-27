@@ -13,7 +13,7 @@ const SelectedFolderIndicator: FC<SelectedFolderIndicatorProps> = ({ folderName 
   return (
     <StackItem>
       {folderName ? <FolderIcon /> : <ProjectDiagramIcon />}
-      <span className="pf-v6-u-ml-sm">{folderName || t('Project root')}</span>
+      <span className="pf-v6-u-ml-sm">{folderName || t('Namespace root')}</span>
     </StackItem>
   );
 };

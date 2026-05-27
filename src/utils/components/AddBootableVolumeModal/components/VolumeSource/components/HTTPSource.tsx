@@ -61,13 +61,13 @@ const HTTPSource: FC<HTTPSourceProps> = ({ bootableVolume, setBootableVolumeFiel
 
       <TLSCertificateSection
         onExistingCertificateChange={(certNamespace, configMapName) => {
-          setBootableVolumeField(TLS_CERT_FIELD_NAMES.tlsCertProject)(certNamespace);
+          setBootableVolumeField(TLS_CERT_FIELD_NAMES.tlsCertNamespace)(certNamespace);
           setBootableVolumeField(TLS_CERT_FIELD_NAMES.tlsCertConfigMapName)(configMapName);
           setBootableVolumeField(TLS_CERT_FIELD_NAMES.tlsCertificate)(null);
         }}
         onNewCertificateChange={(certificate) => {
           setBootableVolumeField(TLS_CERT_FIELD_NAMES.tlsCertificate)(certificate);
-          setBootableVolumeField(TLS_CERT_FIELD_NAMES.tlsCertProject)(null);
+          setBootableVolumeField(TLS_CERT_FIELD_NAMES.tlsCertNamespace)(null);
           setBootableVolumeField(TLS_CERT_FIELD_NAMES.tlsCertConfigMapName)(null);
         }}
         onRequiredChange={(required) =>
@@ -81,7 +81,7 @@ const HTTPSource: FC<HTTPSourceProps> = ({ bootableVolume, setBootableVolumeFiel
         tlsCertConfigMapName={bootableVolume?.tlsCertConfigMapName}
         tlsCertificate={bootableVolume?.tlsCertificate}
         tlsCertificateRequired={bootableVolume?.tlsCertificateRequired}
-        tlsCertProject={bootableVolume?.tlsCertProject}
+        tlsCertNamespace={bootableVolume?.tlsCertNamespace}
         tlsCertSource={bootableVolume?.tlsCertSource}
       />
     </>

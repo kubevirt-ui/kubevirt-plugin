@@ -25,7 +25,7 @@ const GeneralSettingsError: FC<GeneralSettingsErrorProps> = ({ error, loadingErr
 
   return (
     <Alert
-      className="project-tab__main--error"
+      className="namespace-tab__main--error"
       isInline
       title={t('Error')}
       variant={AlertVariant.danger}

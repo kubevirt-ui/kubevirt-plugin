@@ -4,7 +4,7 @@ import { PersistentVolumeClaimModel } from '@kubevirt-ui-ext/kubevirt-api/consol
 import { DataSourceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { useClusterFilter } from '@kubevirt-utils/hooks/useClusterFilter';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { useProjectFilter } from '@kubevirt-utils/hooks/useProjectFilter';
+import { useNamespaceFilter } from '@kubevirt-utils/hooks/useNamespaceFilter';
 import {
   ISO,
   SHOW_DEPRECATED_BOOTABLE_VOLUMES,
@@ -40,7 +40,7 @@ const useBootableVolumesFilters = (
   const { t } = useKubevirtTranslation();
   const isACMPage = useIsACMPage();
   const clusterFilter = useClusterFilter();
-  const projectFilter = useProjectFilter();
+  const namespaceFilter = useNamespaceFilter();
 
   const workloadsArchitectures = useMemo(
     () =>
@@ -57,8 +57,8 @@ const useBootableVolumesFilters = (
   );
 
   const filtersWithSelect = useMemo(
-    () => (isACMPage ? [clusterFilter, projectFilter] : [projectFilter]),
-    [isACMPage, clusterFilter, projectFilter],
+    () => (isACMPage ? [clusterFilter, namespaceFilter] : [namespaceFilter]),
+    [isACMPage, clusterFilter, namespaceFilter],
   );
 
   const rowFilters = useMemo(

@@ -9,10 +9,10 @@ import useMetricChartData from '@overview/OverviewTab/metric-charts-card/utils/h
 import { Bullseye, Card, CardBody } from '@patternfly/react-core';
 
 import { determineOverviewLevel } from '../../../../config';
-import { GRID_FOUR_EQUAL, OVERVIEW_LEVEL_PROJECT, OverviewSectionData } from '../../../../types';
+import { GRID_FOUR_EQUAL, OVERVIEW_LEVEL_NAMESPACE, OverviewSectionData } from '../../../../types';
 import OverviewSection from '../../../OverviewSection/OverviewSection';
 import OverviewSectionRow from '../../../OverviewSection/OverviewSectionRow';
-import useProjectResourceQuota from '../../hooks/useProjectResourceQuota';
+import useNamespaceResourceQuota from '../../hooks/useNamespaceResourceQuota';
 import { useTopClusterNames, useTopClustersChartData } from '../../hooks/useTopClustersChartData';
 import ResourceAllocationWidget from '../../ResourceAllocationWidget';
 import ClusterLegend from '../ResourceAllocationChart/ClusterLegend';
@@ -28,8 +28,8 @@ const ResourceAllocationSection: FC<OverviewSectionData> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const isAllClusters = useIsAllClustersPage();
-  const isProjectLevel =
-    determineOverviewLevel(namespace, isAllClusters) === OVERVIEW_LEVEL_PROJECT;
+  const isNamespaceLevel =
+    determineOverviewLevel(namespace, isAllClusters) === OVERVIEW_LEVEL_NAMESPACE;
   const widgetConfigs = getWidgetConfigs(t);
   const [selectedMetric, setSelectedMetric] = useState<string>(widgetConfigs[0].metric);
 
@@ -38,7 +38,7 @@ const ResourceAllocationSection: FC<OverviewSectionData> = ({
   const memoryData = useMetricChartData(METRICS.MEMORY, vmNames);
   const storageData = useMetricChartData(METRICS.STORAGE, vmNames);
 
-  const { projectQuota } = useProjectResourceQuota(namespace);
+  const { namespaceQuota } = useNamespaceResourceQuota(namespace);
 
   const { topClusterNames } = useTopClusterNames(selectedMetric, isAllClusters);
   const vmClusterData = useTopClustersChartData(
@@ -63,22 +63,22 @@ const ResourceAllocationSection: FC<OverviewSectionData> = ({
       [METRICS.MEMORY]: {
         clusterData: memClusterData,
         metricChartData: memoryData,
-        quotaData: projectQuota?.memory,
+        quotaData: namespaceQuota?.memory,
       },
       [METRICS.RUNNING_VMS]: {
         clusterData: vmClusterData,
         metricChartData: runningVmData,
-        quotaData: projectQuota?.vms,
+        quotaData: namespaceQuota?.vms,
       },
       [METRICS.STORAGE]: {
         clusterData: storageClusterData,
         metricChartData: storageData,
-        quotaData: projectQuota?.storage,
+        quotaData: namespaceQuota?.storage,
       },
       [METRICS.VCPU_USAGE]: {
         clusterData: cpuClusterData,
         metricChartData: cpuData,
-        quotaData: projectQuota?.cpu,
+        quotaData: namespaceQuota?.cpu,
       },
     }),
     [
@@ -90,7 +90,7 @@ const ResourceAllocationSection: FC<OverviewSectionData> = ({
       cpuClusterData,
       memClusterData,
       storageClusterData,
-      projectQuota,
+      namespaceQuota,
     ],
   );
 
@@ -132,7 +132,7 @@ const ResourceAllocationSection: FC<OverviewSectionData> = ({
               key={metric}
               metric={metric}
               metricChartData={!isAllClusters ? metricChartData : undefined}
-              quotaData={isProjectLevel ? quotaData : undefined}
+              quotaData={isNamespaceLevel ? quotaData : undefined}
               subtitle={subtitle(metricChartData, t)}
               title={widgetTitle}
             />

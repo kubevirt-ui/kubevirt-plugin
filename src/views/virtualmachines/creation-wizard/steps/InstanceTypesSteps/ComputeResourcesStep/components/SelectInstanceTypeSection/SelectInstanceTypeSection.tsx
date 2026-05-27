@@ -15,9 +15,9 @@ import { TabKey } from './utils/constants';
 const SelectInstanceTypeSection: FC = ({}) => {
   const [activeTabKey, setActiveTabKey] = useState<TabKey>(TabKey.RedHat);
 
-  const { cluster, project } = useVMWizardStore();
+  const { cluster, namespace } = useVMWizardStore();
   const { selectedInstanceType } = useInstanceTypeVMStore();
-  const { allInstanceTypes, loaded } = useInstanceTypesAndPreferences(project, cluster);
+  const { allInstanceTypes, loaded } = useInstanceTypesAndPreferences(namespace, cluster);
 
   const menuItems = useMemo(() => getInstanceTypeMenuItems(allInstanceTypes), [allInstanceTypes]);
 

@@ -25,7 +25,7 @@ type TLSCertificateSectionProps = {
   tlsCertConfigMapName?: null | string;
   tlsCertificate?: null | string;
   tlsCertificateRequired?: boolean;
-  tlsCertProject?: null | string;
+  tlsCertNamespace?: null | string;
   tlsCertSource?: TLSCertSourceType;
 };
 
@@ -39,7 +39,7 @@ const TLSCertificateSection: FC<TLSCertificateSectionProps> = ({
   tlsCertConfigMapName,
   tlsCertificate,
   tlsCertificateRequired,
-  tlsCertProject,
+  tlsCertNamespace,
   tlsCertSource,
 }) => {
   const { t } = useKubevirtTranslation();
@@ -105,7 +105,7 @@ const TLSCertificateSection: FC<TLSCertificateSectionProps> = ({
                     namespace={namespace}
                     onChange={onExistingCertificateChange}
                     selectedConfigMapName={tlsCertConfigMapName}
-                    selectedProject={tlsCertProject}
+                    selectedNamespace={tlsCertNamespace}
                   />
                 </StackItem>
               ) : (

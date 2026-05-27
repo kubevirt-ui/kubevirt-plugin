@@ -10,9 +10,9 @@ import { Action, useModal } from '@openshift-console/dynamic-plugin-sdk';
 import DeleteVMNetworkModal, {
   DeleteVMNetworkModalProps,
 } from '../components/DeleteVMNetworkModal';
-import EditProjectMappingModal, {
-  EditProjectMappingModalProps,
-} from '../components/EditProjectMappingModal';
+import EditNamespaceMappingModal, {
+  EditNamespaceMappingModalProps,
+} from '../components/EditNamespaceMappingModal';
 
 const useVMNetworkActions = (obj: ClusterUserDefinedNetworkKind) => {
   const { t } = useKubevirtTranslation();
@@ -35,11 +35,11 @@ const useVMNetworkActions = (obj: ClusterUserDefinedNetworkKind) => {
       {
         accessReview: asAccessReview(ClusterUserDefinedNetworkModel, obj, 'patch'),
         cta: () =>
-          createModal<EditProjectMappingModalProps>(EditProjectMappingModal, {
+          createModal<EditNamespaceMappingModalProps>(EditNamespaceMappingModal, {
             obj,
           }),
-        id: 'edit-vm-network-project-mapping',
-        label: t('Edit projects mapping'),
+        id: 'edit-vm-network-namespace-mapping',
+        label: t('Edit namespaces mapping'),
       },
       {
         accessReview: asAccessReview(ClusterUserDefinedNetworkModel, obj, 'delete'),

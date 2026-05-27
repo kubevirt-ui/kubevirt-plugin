@@ -54,7 +54,7 @@ const ClusterStatusWidget: FC<OverviewSectionData> = ({
         <ClusterResourcesCard
           clustersCount={clustersWithVMsCount}
           isAllClustersPage={isAllClustersPage}
-          projectsCount={namespacesWithVMsCount}
+          namespacesCount={namespacesWithVMsCount}
           vmsCount={vms?.length || 0}
         />
       </OverviewSectionRow>

@@ -27,7 +27,7 @@ import {
 } from '../../utils/types';
 import AdvancedSearchIcon from '../AdvancedSearchIcon';
 
-import ClusterProjectInfo from './components/ClusterProjectInfo';
+import ClusterNamespaceInfo from './components/ClusterNamespaceInfo';
 import RelatedSuggestions from './components/RelatedSuggestions';
 import SearchSuggestBoxFooter from './components/SearchSuggestBoxFooter';
 
@@ -90,7 +90,7 @@ const SearchSuggestBox: FC<SearchSuggestBoxProps> = ({
                             name={resource.name}
                             namespace={resource.namespace}
                           />
-                          <ClusterProjectInfo
+                          <ClusterNamespaceInfo
                             isAllClusters={isAllClusters}
                             isAllNamespaces={isEmpty(namespace)}
                             resource={resource}

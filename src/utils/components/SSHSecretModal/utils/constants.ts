@@ -2,7 +2,7 @@ import { SecretSelectionOption, SSHSecretDetails } from './types';
 
 export const initialSSHCredentials: SSHSecretDetails = {
   appliedDefaultKey: false,
-  applyKeyToProject: false,
+  applyKeyToNamespace: false,
   secretOption: SecretSelectionOption.none,
   sshPubKey: '',
   sshSecretName: '',

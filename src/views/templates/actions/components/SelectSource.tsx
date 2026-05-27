@@ -107,7 +107,7 @@ export const SelectSource: FC<SelectSourceProps> = ({
               getPVCSource(newPVCName, newPVCNamespace, withSize ? volumeQuantity : null),
             )
           }
-          projectSelected={pvcNamespaceSelected}
+          namespaceSelected={pvcNamespaceSelected}
           pvcNameSelected={pvcNameSelected}
         />
       )}

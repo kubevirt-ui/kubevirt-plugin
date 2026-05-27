@@ -37,9 +37,9 @@ export const disconnectVMsFromNetwork = async (vms: V1VirtualMachine[], vmNetwor
 const getNewNetworkName = (
   vm: V1VirtualMachine,
   newVMNetworkName: string,
-  matchingProjectNames: string[],
+  matchingNamespaceNames: string[],
 ) => {
-  if (matchingProjectNames.includes(getNamespace(vm))) {
+  if (matchingNamespaceNames.includes(getNamespace(vm))) {
     return newVMNetworkName;
   }
   return `${DEFAULT_NAMESPACE}/${newVMNetworkName}`;
@@ -49,10 +49,10 @@ const replaceNetworkInVM = async (
   vm: V1VirtualMachine,
   oldNetworkName: string,
   newVMNetworkName: string,
-  matchingProjectNames: string[],
+  matchingNamespaceNames: string[],
 ) => {
   const oldNetworks = getMatchingNetworks(vm, oldNetworkName);
-  const newNetworkName = getNewNetworkName(vm, newVMNetworkName, matchingProjectNames);
+  const newNetworkName = getNewNetworkName(vm, newVMNetworkName, matchingNamespaceNames);
 
   const patchItems = oldNetworks.flatMap((oldNetwork) => {
     const network: V1Network = {
@@ -76,9 +76,9 @@ export const moveVMsToNewNetwork = async (
   vms: V1VirtualMachine[],
   oldNetworkName: string,
   newVMNetworkName: string,
-  matchingProjectNames: string[],
+  matchingNamespaceNames: string[],
 ) => {
   return Promise.all(
-    vms.map((vm) => replaceNetworkInVM(vm, oldNetworkName, newVMNetworkName, matchingProjectNames)),
+    vms.map((vm) => replaceNetworkInVM(vm, oldNetworkName, newVMNetworkName, matchingNamespaceNames)),
   );
 };

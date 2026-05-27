@@ -4,8 +4,6 @@ import {
   IoK8sApiRbacV1Role,
   IoK8sApiRbacV1RoleBinding,
 } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
-import { operatorNamespaceSignal } from '@kubevirt-utils/store/operatorNamespace';
-import { DEFAULT_OPERATOR_NAMESPACE } from '@kubevirt-utils/utils/utils';
 import { kubevirtK8sCreate, kubevirtK8sPatch } from '@multicluster/k8sRequests';
 
 import {
@@ -14,9 +12,10 @@ import {
   getFeaturesRole,
   getFeaturesRoleBinding,
 } from './constants';
+import { OPERATOR_NAMESPACE } from '@kubevirt-utils/constants/constants';
 
 export const createFeaturesConfigMap = async (cluster?: string) => {
-  const namespace = operatorNamespaceSignal.value ?? DEFAULT_OPERATOR_NAMESPACE;
+  const namespace = OPERATOR_NAMESPACE;
 
   await kubevirtK8sCreate<IoK8sApiCoreV1ConfigMap>({
     cluster,

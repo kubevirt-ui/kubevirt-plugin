@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { KubevirtDataPodFilters } from '@kubevirt-utils/hooks/useKubevirtDataPod/useKubevirtDataPodFilters';
 import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
-import useProjects from '@kubevirt-utils/hooks/useProjects';
+import useNamespaces from '@kubevirt-utils/hooks/useNamespaces';
 import { isSystemNamespace } from '@kubevirt-utils/resources/namespace/helper';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
@@ -23,7 +23,7 @@ type UseAccessibleResourcesArgs = {
   filterOptions?: KubevirtDataPodFilters;
   groupVersionKind: K8sGroupVersionKind;
   namespace?: string;
-  onlyUserProjects?: boolean;
+  onlyUserNamespaces?: boolean;
   searchQueries?: AdvancedSearchFilter;
   selector?: Selector;
   watchNamespaces?: string[];
@@ -41,7 +41,7 @@ export const useAccessibleResources = <T>({
   filterOptions,
   groupVersionKind,
   namespace,
-  onlyUserProjects,
+  onlyUserNamespaces,
   searchQueries,
   selector,
   watchNamespaces,
@@ -49,7 +49,7 @@ export const useAccessibleResources = <T>({
   const isAdmin = useIsAdmin();
   const isACMPage = useIsACMPage();
   const cluster = useClusterParam();
-  const [projectNames, projectNamesLoaded, projectNamesError] = useProjects();
+  const [namespaceNames, namespaceNamesLoaded, namespaceNamesError] = useNamespaces();
 
   const clusterToWatch = useMemo(() => {
     if (clusters?.length === 1) return clusters[0];
@@ -58,11 +58,11 @@ export const useAccessibleResources = <T>({
 
   const namespacesToWatch = useMemo(() => {
     if (watchNamespaces) return watchNamespaces;
-    if (!onlyUserProjects || !projectNames) return projectNames;
-    return projectNames.filter((ns) => !isSystemNamespace(ns));
-  }, [onlyUserProjects, projectNames, watchNamespaces]);
+    if (!onlyUserNamespaces || !namespaceNames) return namespaceNames;
+    return namespaceNames.filter((ns) => !isSystemNamespace(ns));
+  }, [onlyUserNamespaces, namespaceNames, watchNamespaces]);
 
-  const loadPerNamespace = !isACMPage && projectNamesLoaded && !isAdmin;
+  const loadPerNamespace = !isACMPage && namespaceNamesLoaded && !isAdmin;
 
   const shouldFetchClusterWide = isAdmin || isACMPage;
   const [allResources, allResourcesLoaded] = useKubevirtWatchResource<T[]>(
@@ -107,11 +107,11 @@ export const useAccessibleResources = <T>({
   }, [allResources, allowedResources, loadPerNamespace]);
 
   const loaded =
-    projectNamesLoaded &&
+    namespaceNamesLoaded &&
     (loadPerNamespace
       ? isEmpty(allowedResources) ||
         Object.values(allowedResources).some((resource) => resource.loaded || resource.loadError)
       : allResourcesLoaded);
 
-  return { loaded, loadError: projectNamesError, resources };
+  return { loaded, loadError: namespaceNamesError, resources };
 };

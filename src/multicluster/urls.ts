@@ -3,7 +3,7 @@ import { matchPath } from 'react-router';
 import { TemplateModel, VirtualMachineModelRef } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
   ALL_CLUSTERS_KEY,
-  ALL_NAMESPACES,
+  ALL_NAMESPACES_KEY,
   ALL_NAMESPACES_SESSION_KEY,
 } from '@kubevirt-utils/hooks/constants';
 import { getResourceUrl } from '@kubevirt-utils/resources/shared';
@@ -51,12 +51,12 @@ export const getACMVMListURL = (cluster?: string, namespace?: string): string =>
   }
 
   return cluster && cluster !== ALL_CLUSTERS_KEY
-    ? `${FLEET_VIRTUAL_MACHINES_PATH}/cluster/${cluster}/${ALL_NAMESPACES}`
-    : `${FLEET_VIRTUAL_MACHINES_PATH}/${ALL_CLUSTERS_KEY}/${ALL_NAMESPACES}`;
+    ? `${FLEET_VIRTUAL_MACHINES_PATH}/cluster/${cluster}/${ALL_NAMESPACES_KEY}`
+    : `${FLEET_VIRTUAL_MACHINES_PATH}/${ALL_CLUSTERS_KEY}/${ALL_NAMESPACES_KEY}`;
 };
 
 export const getACMVMSearchURL = (): string =>
-  `${FLEET_VIRTUAL_MACHINES_PATH}/${ALL_CLUSTERS_KEY}/${ALL_NAMESPACES}/search`;
+  `${FLEET_VIRTUAL_MACHINES_PATH}/${ALL_CLUSTERS_KEY}/${ALL_NAMESPACES_KEY}/search`;
 
 export const getACMVMListNamespacesURL = (cluster: string, namespace: string): string =>
   `${FLEET_VIRTUAL_MACHINES_PATH}/cluster/${cluster}/ns/${namespace}`;
@@ -71,10 +71,10 @@ export const getVMWizardURL = (cluster: string, namespace?: string): string => {
   if (!cluster) return `/vm-wizard`;
 
   const namespacePath =
-    namespace && !isAllNamespaces(namespace) ? `ns/${namespace}` : ALL_NAMESPACES;
+    namespace && !isAllNamespaces(namespace) ? `ns/${namespace}` : ALL_NAMESPACES_KEY;
 
   return cluster === ALL_CLUSTERS_KEY
-    ? `${FLEET_WIZARD_PATH}/${ALL_CLUSTERS_KEY}/${ALL_NAMESPACES}`
+    ? `${FLEET_WIZARD_PATH}/${ALL_CLUSTERS_KEY}/${ALL_NAMESPACES_KEY}`
     : `${FLEET_WIZARD_PATH}/cluster/${cluster}/${namespacePath}`;
 };
 

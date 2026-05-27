@@ -5,9 +5,9 @@ import { SourceTypes } from '@kubevirt-utils/components/DiskModal/utils/types';
 import { DiskSourceOptionGroup, DiskSourceOptionGroupItem } from './types';
 
 export const diskSourceSnapshotVolumeNameFieldID = 'snapshot-name-select';
-export const diskSourceSnapshotVolumeNamespaceFieldID = 'snapshot-project-select';
+export const diskSourceSnapshotVolumeNamespaceFieldID = 'snapshot-namespace-select';
 export const diskSourcePVCNameFieldID = 'pvc-name-select';
-export const diskSourcePVCNamespaceFieldID = 'pvc-project-select';
+export const diskSourcePVCNamespaceFieldID = 'pvc-namespace-select';
 export const diskSourceUploadFieldID = 'disk-source-upload';
 export const diskSourceURLFieldID = 'disk-source-url';
 export const ephemeralDiskSizeFieldID = 'ephemeral-disk-size';

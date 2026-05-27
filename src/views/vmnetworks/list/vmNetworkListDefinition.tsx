@@ -12,7 +12,7 @@ import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import VMNetworkActions from '../actions/VMNetworkActions';
 import { VM_NETWORKS_PATH } from '../constants';
 
-import MatchedProjects from './components/MatchedProjects';
+import MatchedNamespaces from './components/MatchedNamespaces';
 
 type MTUCellProps = {
   obj: ClusterUserDefinedNetworkKind;
@@ -55,9 +55,14 @@ export const getVMNetworkListColumns = (
     sortable: true,
   },
   {
-    key: 'connected-projects',
-    label: t('Connected projects'),
-    renderCell: (row) => <MatchedProjects obj={row} />,
+    key: 'connected-namespaces',
+    label: t('Connected namespaces'),
+    renderCell: (row) => <MatchedNamespaces obj={row} />,
+  },
+  {
+    key: 'connected-namespaces',
+    label: t('Connected namespaces'),
+    renderCell: (row) => <MatchedNamespaces obj={row} />,
   },
   {
     getValue: (row) => getLocalnet(row)?.physicalNetworkName ?? '',

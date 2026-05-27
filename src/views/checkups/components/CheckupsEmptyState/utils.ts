@@ -4,7 +4,7 @@ import { documentationURL } from '@kubevirt-utils/constants/documentation';
 
 import { CHECKUP_URLS } from '../../utils/constants';
 import { CheckupType } from '../../utils/types';
-import { getSelectProjectText } from '../../utils/utils';
+import { getSelectNamespaceText } from '../../utils/utils';
 
 export const getTitleText = (checkupType: CheckupType, t: TFunction) => {
   if (checkupType === CHECKUP_URLS.STORAGE) {
@@ -31,7 +31,7 @@ export const getBodyText = (
   t: TFunction,
 ) => {
   if (isAllNamespaces) {
-    return getSelectProjectText(t);
+    return getSelectNamespaceText(t);
   }
   if (!isPermitted) {
     return t('To get started, install permissions and then run a checkup');

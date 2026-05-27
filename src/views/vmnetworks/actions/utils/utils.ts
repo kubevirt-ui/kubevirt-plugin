@@ -1,18 +1,18 @@
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
-import { PROJECT_NAME_LABEL_KEY } from '@kubevirt-utils/constants/constants';
+import { NAMESPACE_NAME_LABEL_KEY } from '@kubevirt-utils/constants/constants';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Selector } from '@openshift-console/dynamic-plugin-sdk';
 
-import { ProjectMappingOption } from '../../form/constants';
+import { NamespaceMappingOption } from '../../form/constants';
 
-export const getDefaultProjectMappingOption = (
+export const getDefaultNamespaceMappingOption = (
   namespaceSelector: Selector,
-): ProjectMappingOption => {
+): NamespaceMappingOption => {
   if (!isEmpty(namespaceSelector?.matchExpressions)) {
-    return ProjectMappingOption.SelectFromList;
+    return NamespaceMappingOption.SelectFromList;
   }
-  if (namespaceSelector?.matchLabels?.[PROJECT_NAME_LABEL_KEY] === DEFAULT_NAMESPACE) {
-    return ProjectMappingOption.AllProjects;
+  if (namespaceSelector?.matchLabels?.[NAMESPACE_NAME_LABEL_KEY] === DEFAULT_NAMESPACE) {
+    return NamespaceMappingOption.AllNamespaces;
   }
-  return ProjectMappingOption.SelectByLabels;
+  return NamespaceMappingOption.SelectByLabels;
 };

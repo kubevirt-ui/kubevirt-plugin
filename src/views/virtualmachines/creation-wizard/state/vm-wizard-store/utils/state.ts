@@ -6,7 +6,7 @@ export const initialVMWizardState: VMWizardState = {
   creationMethod: VMCreationMethod.INSTANCE_TYPE,
   folder: '',
   lastProcessedTemplateKey: '',
-  project: '',
+  namespace: '',
   selectedTemplate: null,
   shouldCheckVMNameProperly: false,
   templatesDrawerIsOpen: false,

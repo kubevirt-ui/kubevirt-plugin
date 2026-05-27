@@ -12,7 +12,7 @@ import { COLUMN_MANAGEMENT_IDS } from '@kubevirt-utils/hooks/useKubevirtUserSett
 import usePaginationWithFilters from '@kubevirt-utils/hooks/usePagination/usePaginationWithFilters';
 import { paginationDefaultValues } from '@kubevirt-utils/hooks/usePagination/utils/constants';
 import useSelectedRowFilterClusters from '@kubevirt-utils/hooks/useSelectedRowFilterClusters';
-import useSelectedRowFilterProjects from '@kubevirt-utils/hooks/useSelectedRowFilterProjects';
+import useSelectedRowFilterNamespaces from '@kubevirt-utils/hooks/useSelectedRowFilterNamespaces';
 import useBootableVolumes from '@kubevirt-utils/resources/bootableresources/hooks/useBootableVolumes';
 import useHideDeprecatedBootableVolumes from '@kubevirt-utils/resources/bootableresources/hooks/useHideDeprecatedBootableVolumes';
 import { isAllNamespaces, isEmpty } from '@kubevirt-utils/utils/utils';
@@ -47,7 +47,7 @@ const BootableVolumesList: FC = () => {
   const isAllClustersPage = useIsAllClustersPage();
   const clusterParam = useClusterParam();
   const filteredClusters = useSelectedRowFilterClusters();
-  const filteredNamespaces = useSelectedRowFilterProjects();
+  const filteredNamespaces = useSelectedRowFilterNamespaces();
   const { bootableVolumes, dataImportCrons, dvSources, error, loaded } =
     useBootableVolumes(namespace);
   const [preferences] = useClusterPreferences();

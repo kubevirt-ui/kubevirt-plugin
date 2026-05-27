@@ -40,16 +40,16 @@ const TemplatesCatalogEmptyState: FC<TemplatesCatalogEmptyStateProps> = memo(
       return (
         <EmptyState
           headingLevel="h4"
-          titleText={t('No templates found in this project')}
+          titleText={t('No templates found in this namespace')}
           variant={EmptyStateVariant.sm}
         >
           <EmptyStateBody>
-            {t('This project does not have any virtual machine templates.')}
+            {t('This namespace does not have any virtual machine templates.')}
           </EmptyStateBody>
           <EmptyStateFooter>
             <EmptyStateActions>
               <Button onClick={() => onClearFilters()} variant={ButtonVariant.link}>
-                {t('View all projects')}
+                {t('View all namespaces')}
               </Button>
             </EmptyStateActions>
           </EmptyStateFooter>

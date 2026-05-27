@@ -1,5 +1,5 @@
 export type AuthKeyRow = {
   id: number;
-  projectName: string;
+  namespaceName: string;
   secretName: any;
 };

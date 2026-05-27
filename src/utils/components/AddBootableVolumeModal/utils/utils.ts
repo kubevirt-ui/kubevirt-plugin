@@ -227,7 +227,7 @@ const createHTTPDataSource = async (
       tlsCertConfigMapName: bootableVolume.tlsCertConfigMapName,
       tlsCertificate: bootableVolume.tlsCertificate,
       tlsCertificateRequired: bootableVolume.tlsCertificateRequired,
-      tlsCertProject: bootableVolume.tlsCertProject,
+      tlsCertNamespace: bootableVolume.tlsCertNamespace,
       tlsCertSource: bootableVolume.tlsCertSource,
     },
     namespace,

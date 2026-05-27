@@ -1,4 +1,4 @@
-export type VMNetworkWithProjects = {
-  projectNames: string[];
+export type VMNetworkWithNamespaces = {
+  namespaceNames: string[];
   vmNetworkName: string;
 };

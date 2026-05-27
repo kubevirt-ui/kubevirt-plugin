@@ -2,8 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 
 import { OPENSHIFT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
-import { modelToGroupVersionKind } from '@kubevirt-utils/models';
-import { useProjectOrNamespaceModel } from '@kubevirt-utils/hooks/useProjectOrNamespaceModel';
+import { modelToGroupVersionKind, NamespaceModel } from '@kubevirt-utils/models';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
@@ -27,24 +26,23 @@ const useWatchNonAdminTemplates = () => {
 
   const isLocalCluster = isEmpty(cluster) || cluster === hubClusterName;
 
-  const model = useProjectOrNamespaceModel();
-  const [projects, loaded] = useK8sWatchData<K8sResourceCommon[]>({
-    groupVersionKind: modelToGroupVersionKind(model),
+  const [namespaces, loaded] = useK8sWatchData<K8sResourceCommon[]>({
+    groupVersionKind: modelToGroupVersionKind(NamespaceModel),
     isList: true,
     namespaced: false,
   });
 
-  const projectNames = useMemo(() => {
-    const names = new Set(projects?.map((proj) => getName(proj)) ?? []);
+  const namespaceNames = useMemo(() => {
+    const names = new Set(namespaces?.map((ns) => getName(ns)) ?? []);
     names.add(OPENSHIFT_NAMESPACE);
     return [...names];
-  }, [projects]);
+  }, [namespaces]);
 
   // user has limited access, so we can only get templates from allowed namespaces
   const allowedResources = useK8sWatchResources<{ [key: string]: V1Template[] }>(
     Object.fromEntries(
       loaded && !isAdmin && isLocalCluster
-        ? (projectNames || []).map((name) => [
+        ? (namespaceNames || []).map((name) => [
             name,
             {
               groupVersionKind: TemplateModelGroupVersionKind,

@@ -1,6 +1,6 @@
 import React, { FC, JSX, useMemo, useState } from 'react';
 
-import ClusterProjectDropdown from '@kubevirt-utils/components/ClusterProjectDropdown/ClusterProjectDropdown';
+import ClusterNamespaceDropdown from '@kubevirt-utils/components/ClusterNamespaceDropdown/ClusterNamespaceDropdown';
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useIsACMPage from '@multicluster/useIsACMPage';
@@ -36,7 +36,7 @@ const MigrationPolicyCreateForm: FC = (): JSX.Element => {
     <div className="migration-policy__form kv-m-pane__form">
       <DocumentTitle>{t('Create MigrationPolicy')}</DocumentTitle>
       {isACMPage && (
-        <ClusterProjectDropdown includeAllClusters={false} showProjectDropdown={false} />
+        <ClusterNamespaceDropdown includeAllClusters={false} showNamespaceDropdown={false} />
       )}
       <MigrationPolicyCreateFormHeader />
       <Form className="migration-policy__form-body">
@@ -63,7 +63,7 @@ const MigrationPolicyCreateForm: FC = (): JSX.Element => {
           state={state}
         />
         <h2>{t('Labels')}</h2>
-        <FormGroup fieldId="migration-policy-project-selector" label={t('Project labels')}>
+        <FormGroup fieldId="migration-policy-namespace-selector" label={t('Namespace labels')}>
           <SelectorLabelMatchGroup
             labels={state?.namespaceSelectorMatchLabel}
             setLabels={setStateField('namespaceSelectorMatchLabel')}

@@ -38,8 +38,8 @@ const SSHSecretModal: FC<SSHSecretModalProps> = ({
   const clusterParam = useClusterParam();
   const cluster = clusterOverride ?? clusterParam;
   const [sshDetails, setSSHDetails] = useState<SSHSecretDetails>(initialSSHSecretDetails);
-  const [localNSProject, setLocalNSProject] = useState<string>(namespace);
-  const secretsData = useSecretsData(localNSProject, namespace, cluster);
+  const [localNamespace, setLocalNamespace] = useState<string>(namespace);
+  const secretsData = useSecretsData(localNamespace, namespace, cluster);
 
   const isDisabled = useMemo(() => {
     const { allSecrets, secretsLoaded } = secretsData;
@@ -53,9 +53,9 @@ const SSHSecretModal: FC<SSHSecretModalProps> = ({
           isEmpty(sshSecretName) ||
           !validateSSHPublicKey(sshPubKey) ||
           !validateSecretName(sshSecretName) ||
-          !validateSecretNameUnique(sshSecretName, localNSProject, allSecrets)))
+          !validateSecretNameUnique(sshSecretName, localNamespace, allSecrets)))
     );
-  }, [localNSProject, secretsData, sshDetails]);
+  }, [localNamespace, secretsData, sshDetails]);
 
   return (
     <TabModal
@@ -72,15 +72,15 @@ const SSHSecretModal: FC<SSHSecretModalProps> = ({
       isOpen={isOpen}
       onClose={onClose}
     >
-      <MutedTextSpan text={t('SSH key is saved in the project as a secret')} />
+      <MutedTextSpan text={t('SSH key is saved in the namespace as a secret')} />
       <SSHSecretModalBody
         cluster={cluster}
         isTemplate={isTemplate}
         isUserTab={isUserTab}
-        localNSProject={localNSProject}
+        localNamespace={localNamespace}
         namespace={namespace}
         secretsData={secretsData}
-        setLocalNSProject={setLocalNSProject}
+        setLocalNamespace={setLocalNamespace}
         setSSHDetails={setSSHDetails}
         sshDetails={sshDetails}
       />

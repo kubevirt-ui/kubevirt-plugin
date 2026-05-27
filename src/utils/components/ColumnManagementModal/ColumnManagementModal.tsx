@@ -99,7 +99,7 @@ export const ColumnManagementModal: FC<ColumnManagementModalProps> = ({
           title={t('You can select up to {{maxColumnsToSelect}} columns', { maxColumnsToSelect })}
           variant={AlertVariant.info}
         >
-          {!showNamespaceOverride && t('The namespace column is only shown when in "All projects"')}
+          {!showNamespaceOverride && t('The namespace column is only shown when in "All namespaces"')}
         </Alert>
         <div className="co-m-form-row pf-v6-u-mt-lg">
           <Grid hasGutter>

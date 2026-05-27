@@ -6,7 +6,7 @@ export type VMWizardState = {
   creationMethod: VMCreationMethod;
   folder: string;
   lastProcessedTemplateKey: string;
-  project: string;
+  namespace: string;
   selectedTemplate: Template;
   shouldCheckVMNameProperly: boolean;
   templatesDrawerIsOpen: boolean;
@@ -22,7 +22,7 @@ export type VMWizardActions = {
   setCreationMethod: (creationMethod: VMCreationMethod) => void;
   setFolder: (folder: string) => void;
   setLastProcessedTemplateKey: (key: string) => void;
-  setProject: (project: string) => void;
+  setNamespace: (namespace: string) => void;
   setSelectedTemplate: (template: Template) => void;
   setShouldCheckVMNameProperly: (shouldCheckVMNameProperly: boolean) => void;
   setTemplatesDrawerIsOpen: (templatesDrawerIsOpen: boolean) => void;

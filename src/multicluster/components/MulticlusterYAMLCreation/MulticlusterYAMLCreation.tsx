@@ -2,7 +2,7 @@ import React, { FC, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { load } from 'js-yaml';
 
-import ClusterProjectDropdown from '@kubevirt-utils/components/ClusterProjectDropdown/ClusterProjectDropdown';
+import ClusterNamespaceDropdown from '@kubevirt-utils/components/ClusterNamespaceDropdown/ClusterNamespaceDropdown';
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -61,10 +61,10 @@ const MulticlusterYAMLCreation: FC = () => {
   return (
     <>
       {isACMPage && (
-        <ClusterProjectDropdown
+        <ClusterNamespaceDropdown
           includeAllClusters={false}
-          includeAllProjects={false}
-          showProjectDropdown={model?.namespaced}
+          includeAllNamespaces={false}
+          showNamespaceDropdown={model?.namespaced}
         />
       )}
       <ResourceYAMLEditor

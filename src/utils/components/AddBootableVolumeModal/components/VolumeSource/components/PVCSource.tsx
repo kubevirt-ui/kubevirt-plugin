@@ -45,7 +45,7 @@ const PVCSource: FC<PVCSourceProps> = ({ bootableVolume, setBootableVolumeField 
             bodyContent={(hide) => (
               <PopoverContentWithLightspeedButton
                 content={t(
-                  'This will create a cloned copy of the Volume in the destination project.',
+                  'This will create a cloned copy of the Volume in the destination namespace.',
                 )}
                 hide={hide}
                 promptType={OLSPromptType.CLONE_VOLUME}

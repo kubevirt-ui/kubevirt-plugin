@@ -110,7 +110,7 @@ export const getChartTitle = (scope, queryData) => {
     case TopConsumerScope.NODE:
       title = metricData?.node;
       break;
-    case TopConsumerScope.PROJECT:
+    case TopConsumerScope.NAMESPACE:
       title = metricData?.namespace;
       break;
     case TopConsumerScope.VM:

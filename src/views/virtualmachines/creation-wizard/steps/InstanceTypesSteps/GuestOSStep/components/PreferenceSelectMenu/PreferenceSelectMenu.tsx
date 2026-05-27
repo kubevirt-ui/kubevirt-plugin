@@ -11,10 +11,10 @@ import './PreferenceSelectMenu.scss';
 
 const PreferenceSelectMenu: FC = () => {
   const { t } = useKubevirtTranslation();
-  const { cluster, project } = useVMWizardStore();
+  const { cluster, namespace } = useVMWizardStore();
   const { operatingSystemType, preference, setPreference } = useInstanceTypeVMStore();
 
-  const { preferenceNames } = usePreferenceSelectOptions(project, cluster, operatingSystemType);
+  const { preferenceNames } = usePreferenceSelectOptions(namespace, cluster, operatingSystemType);
 
   return (
     <FormGroup

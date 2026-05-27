@@ -11,9 +11,9 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import useKubevirtTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtTableColumns';
 import usePaginationWithFilters from '@kubevirt-utils/hooks/usePagination/usePaginationWithFilters';
 import { paginationDefaultValues } from '@kubevirt-utils/hooks/usePagination/utils/constants';
-import { useProjectFilter } from '@kubevirt-utils/hooks/useProjectFilter';
+import { useNamespaceFilter } from '@kubevirt-utils/hooks/useNamespaceFilter';
 import useSelectedRowFilterClusters from '@kubevirt-utils/hooks/useSelectedRowFilterClusters';
-import useSelectedRowFilterProjects from '@kubevirt-utils/hooks/useSelectedRowFilterProjects';
+import useSelectedRowFilterNamespaces from '@kubevirt-utils/hooks/useSelectedRowFilterNamespaces';
 import { isAllNamespaces, isEmpty } from '@kubevirt-utils/utils/utils';
 import useIsAllClustersPage from '@multicluster/hooks/useIsAllClustersPage';
 import useIsACMPage from '@multicluster/useIsACMPage';
@@ -38,19 +38,19 @@ const UserInstancetypeList: FC<UserInstancetypeListProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const filteredClusters = useSelectedRowFilterClusters();
-  const namespaceFilterParams = useSelectedRowFilterProjects();
+  const namespaceFilterParams = useSelectedRowFilterNamespaces();
   const activeNamespace = useActiveNamespace();
   const effectiveNamespace = namespace ?? activeNamespace;
 
   const clusterFilter = useClusterFilter();
-  const projectFilter = useProjectFilter();
+  const namespaceFilter = useNamespaceFilter();
   const isACMPage = useIsACMPage();
   const showClusterColumn = useIsAllClustersPage();
   const showNamespaceColumn = isAllNamespaces(effectiveNamespace);
 
   const filtersWithSelect = useMemo(
-    () => (isACMPage ? [clusterFilter, projectFilter] : []),
-    [clusterFilter, projectFilter, isACMPage],
+    () => (isACMPage ? [clusterFilter, namespaceFilter] : []),
+    [clusterFilter, namespaceFilter, isACMPage],
   );
 
   const [unfilteredData, filteredData, onFilterChange] = useListPageFilter<

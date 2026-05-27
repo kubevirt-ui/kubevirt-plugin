@@ -1,5 +1,5 @@
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
-import { PROJECT_NAME_LABEL_KEY } from '@kubevirt-utils/constants/constants';
+import { NAMESPACE_NAME_LABEL_KEY } from '@kubevirt-utils/constants/constants';
 import { ClusterUserDefinedNetworkModel } from '@kubevirt-utils/models';
 import { IPAM_MODE_DISABLED, UDNRole, UDNTopology } from '@kubevirt-utils/resources/udn/constants';
 import { ClusterUserDefinedNetworkKind } from '@kubevirt-utils/resources/udn/types';
@@ -15,7 +15,7 @@ export const getDefaultVMNetwork = (nodeNetworkMapping = ''): ClusterUserDefined
     name: '',
   },
   spec: {
-    namespaceSelector: { matchLabels: { [PROJECT_NAME_LABEL_KEY]: DEFAULT_NAMESPACE } },
+    namespaceSelector: { matchLabels: { [NAMESPACE_NAME_LABEL_KEY]: DEFAULT_NAMESPACE } },
     network: {
       localnet: {
         ipam: {
@@ -30,20 +30,20 @@ export const getDefaultVMNetwork = (nodeNetworkMapping = ''): ClusterUserDefined
   },
 });
 
-export enum ProjectMappingOption {
-  AllProjects = 'all-projects',
+export enum NamespaceMappingOption {
+  AllNamespaces = 'all-namespaces',
   SelectByLabels = 'select-by-labels',
   SelectFromList = 'select-from-list',
 }
 
 export type VMNetworkForm = {
   network: ClusterUserDefinedNetworkKind;
-  projectMappingOption: ProjectMappingOption;
+  namespaceMappingOption: NamespaceMappingOption;
 };
 
 export const getDefaultFormValue = (nodeNetworkMapping?: string): VMNetworkForm => ({
   network: getDefaultVMNetwork(nodeNetworkMapping),
-  projectMappingOption: ProjectMappingOption.AllProjects,
+  namespaceMappingOption: NamespaceMappingOption.AllNamespaces,
 });
 
 export const MIN_VLAN_ID = 1;

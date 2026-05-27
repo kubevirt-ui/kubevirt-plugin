@@ -26,7 +26,7 @@ import {
 export type UseGenerateVM = () => V1VirtualMachine;
 
 const useGenerateVM: UseGenerateVM = () => {
-  const { cluster, folder, project: namespace, vmDescription, vmName } = useVMWizardStore();
+  const { cluster, folder, namespace, vmDescription, vmName } = useVMWizardStore();
   const { featureEnabled: autoUpdateEnabled } = useFeatures(AUTOMATIC_UPDATE_FEATURE_NAME);
 
   const { subscriptionData } = useRHELAutomaticSubscription();

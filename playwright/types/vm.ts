@@ -101,7 +101,7 @@ export type secretData = {
   existSecret?: string;
   newSecret?: string;
   newSecretName?: string;
-  secretProject?: string;
+  secretNamespace?: string;
 };
 
 export type TemplateData = detailsData &

@@ -51,7 +51,7 @@ const getInitialState = (prefillInputs: AdvancedSearchInputs = {}): AdvancedSear
     [VirtualMachineRowFilterType.Name]: '',
     [VirtualMachineRowFilterType.Node]: [],
     [VirtualMachineRowFilterType.OS]: [],
-    [VirtualMachineRowFilterType.Project]: [],
+    [VirtualMachineRowFilterType.Namespace]: [],
     [VirtualMachineRowFilterType.Scheduling]: initialScheduling,
     [VirtualMachineRowFilterType.Status]: [],
     [VirtualMachineRowFilterType.StorageClass]: [],

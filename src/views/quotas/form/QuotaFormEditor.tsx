@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router';
 
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
-import ProjectDropdown from '@kubevirt-utils/components/ProjectDropdown/ProjectDropdown';
+import NamespaceDropdown from '@kubevirt-utils/components/NamespaceDropdown/NamespaceDropdown';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useNamespaceParam from '@kubevirt-utils/hooks/useNamespaceParam';
 import { ApplicationAwareResourceQuota } from '@kubevirt-utils/resources/quotas/types';
@@ -88,15 +88,15 @@ const QuotaFormEditor: FC<QuotaFormEditorProps> = ({ formData, isEdit = false, o
             {t('A unique name for the application-aware quota')}
           </FormGroupHelperText>
         </FormGroup>
-        <FormGroup fieldId="quota-project" isRequired label={t('Project')}>
-          <ProjectDropdown
-            includeAllProjects={false}
+        <FormGroup fieldId="quota-namespace" isRequired label={t('Namespace')}>
+          <NamespaceDropdown
+            includeAllNamespaces={false}
             isDisabled={isEdit}
-            onChange={(project) => updateMetadata('namespace', project)}
-            selectedProject={selectedNamespace}
+            onChange={(namespace) => updateMetadata('namespace', namespace)}
+            selectedNamespace={selectedNamespace}
           />
           <FormGroupHelperText>
-            {t('Applies the quota to the selected project')}
+            {t('Applies the quota to the selected namespace')}
           </FormGroupHelperText>
           {!isEdit && (
             <StandardResourceQuotaAlert className="pf-v6-u-mt-md" namespace={selectedNamespace} />

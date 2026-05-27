@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 
 import { useClusterFilter } from '@kubevirt-utils/hooks/useClusterFilter';
-import { useProjectFilter } from '@kubevirt-utils/hooks/useProjectFilter';
+import { useNamespaceFilter } from '@kubevirt-utils/hooks/useNamespaceFilter';
 import { Template, TemplateOrRequest } from '@kubevirt-utils/resources/template';
 import useIsACMPage from '@multicluster/useIsACMPage';
 import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
@@ -20,7 +20,7 @@ const useVirtualMachineTemplatesFilters = (
 } => {
   const isACMPage = useIsACMPage();
   const clusterFilter = useClusterFilter();
-  const projectFilter = useProjectFilter();
+  const namespaceFilter = useNamespaceFilter();
 
   const typeFilter = useTypeFilter();
   const architectureFilter = useArchitectureFilter(templates);
@@ -29,8 +29,8 @@ const useVirtualMachineTemplatesFilters = (
   const osFilter = useOSFilter();
 
   const filtersWithSelect = useMemo(
-    () => (isACMPage ? [clusterFilter, projectFilter] : []),
-    [isACMPage, clusterFilter, projectFilter],
+    () => (isACMPage ? [clusterFilter, namespaceFilter] : []),
+    [isACMPage, clusterFilter, namespaceFilter],
   );
 
   const filters = useMemo<RowFilter<TemplateOrRequest>[]>(

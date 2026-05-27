@@ -36,7 +36,7 @@ import {
   ALL_CLUSTERS_ID,
   CLUSTER_SELECTOR_PREFIX,
   FOLDER_SELECTOR_PREFIX,
-  PROJECT_SELECTOR_PREFIX,
+  NAMESPACE_SELECTOR_PREFIX,
   VM_FOLDER_LABEL,
 } from './constants';
 
@@ -48,19 +48,19 @@ export interface TreeViewDataItemWithHref extends TreeViewDataItem {
 export const getVMTreeViewItemID = (vmName: string, vmNamespace: string, vmCluster: string) =>
   `${vmCluster || SINGLE_CLUSTER_KEY}/${vmNamespace}/${vmName}`;
 
-export const getProjectTreeViewItemID = (cluster: string | undefined, project: string) =>
-  `${PROJECT_SELECTOR_PREFIX}/${cluster ?? SINGLE_CLUSTER_KEY}/${project}`;
+export const getNamespaceTreeViewItemID = (cluster: string | undefined, namespace: string) =>
+  `${NAMESPACE_SELECTOR_PREFIX}/${cluster ?? SINGLE_CLUSTER_KEY}/${namespace}`;
 
 export const getFolderTreeViewItemID = (
   cluster: string | undefined,
-  project: string,
+  namespace: string,
   folder: string,
-) => `${FOLDER_SELECTOR_PREFIX}/${cluster ?? SINGLE_CLUSTER_KEY}/${project}/${folder}`;
+) => `${FOLDER_SELECTOR_PREFIX}/${cluster ?? SINGLE_CLUSTER_KEY}/${namespace}/${folder}`;
 
 export const getClusterTreeViewItemID = (clusterName: string) =>
   `${CLUSTER_SELECTOR_PREFIX}/${clusterName}`;
 
-const buildProjectMap = (
+const buildNamespaceMap = (
   vms: V1VirtualMachine[],
   currentPageVMName: string,
   currentVMTab: string,
@@ -70,7 +70,7 @@ const buildProjectMap = (
 ) => {
   if (isEmpty(vms)) return {};
 
-  const projectMap: Record<
+  const namespaceMap: Record<
     string,
     {
       count: number;
@@ -101,34 +101,34 @@ const buildProjectMap = (
       treeViewDataMap[vmTreeItemID] = vmTreeItem;
     }
 
-    if (!projectMap[vmNamespace]) {
-      projectMap[vmNamespace] = { count: 0, folders: {}, ungrouped: [] };
+    if (!namespaceMap[vmNamespace]) {
+      namespaceMap[vmNamespace] = { count: 0, folders: {}, ungrouped: [] };
     }
 
-    projectMap[vmNamespace].count++;
+    namespaceMap[vmNamespace].count++;
     if (folder) {
-      if (!projectMap[vmNamespace].folders[folder]) {
-        projectMap[vmNamespace].folders[folder] = [];
+      if (!namespaceMap[vmNamespace].folders[folder]) {
+        namespaceMap[vmNamespace].folders[folder] = [];
       }
-      return projectMap[vmNamespace].folders[folder].push(vmTreeItem);
+      return namespaceMap[vmNamespace].folders[folder].push(vmTreeItem);
     }
 
-    projectMap[vmNamespace].ungrouped.push(vmTreeItem);
+    namespaceMap[vmNamespace].ungrouped.push(vmTreeItem);
   });
 
-  return projectMap;
+  return namespaceMap;
 };
 
 const createFolderTreeItems = (
   folders: Record<string, TreeViewDataItemWithHref[]>,
-  project: string,
+  namespace: string,
   currentPageVMName: string,
   treeViewDataMap: Record<string, TreeViewDataItemWithHref>,
   queryParams?: string,
   cluster?: string,
 ): TreeViewDataItemWithHref[] =>
   Object.entries(folders).map(([folder, vmItems]) => {
-    const folderTreeItemID = getFolderTreeViewItemID(cluster, project, folder);
+    const folderTreeItemID = getFolderTreeViewItemID(cluster, namespace, folder);
     const folderExpanded =
       currentPageVMName && vmItems.some((item) => (item.name as string) === currentPageVMName);
 
@@ -136,7 +136,7 @@ const createFolderTreeItems = (
       children: vmItems,
       defaultExpanded: folderExpanded,
       expandedIcon: <FolderOpenIcon />,
-      href: `${getVMListNamespacesURL(cluster, project)}${queryParams || ''}`,
+      href: `${getVMListNamespacesURL(cluster, namespace)}${queryParams || ''}`,
       icon: <FolderIcon />,
       id: folderTreeItemID,
       name: folder,
@@ -149,9 +149,9 @@ const createFolderTreeItems = (
     return folderTreeItem;
   });
 
-const createProjectTreeItem = (
-  project: string,
-  projectMap: Record<string, any>,
+const createNamespaceTreeItem = (
+  namespace: string,
+  namespaceMap: Record<string, any>,
   currentPageVMName: string,
   currentPageNamespace: string,
   treeViewDataMap: Record<string, TreeViewDataItemWithHref>,
@@ -160,43 +160,43 @@ const createProjectTreeItem = (
   clusterSelected = true,
   isTourRunning = false,
 ): TreeViewDataItemWithHref => {
-  const projectFolders = createFolderTreeItems(
-    projectMap[project]?.folders || {},
-    project,
+  const namespaceFolders = createFolderTreeItems(
+    namespaceMap[namespace]?.folders || {},
+    namespace,
     currentPageVMName,
     treeViewDataMap,
     queryParams,
     cluster,
   );
 
-  const sortProjectFolders = projectFolders.sort((folderA, folderB) =>
+  const sortNamespaceFolders = namespaceFolders.sort((folderA, folderB) =>
     folderA.id.localeCompare(folderB.id),
   );
 
-  const projectChildren = [...sortProjectFolders, ...(projectMap[project]?.ungrouped || [])];
+  const namespaceChildren = [...sortNamespaceFolders, ...(namespaceMap[namespace]?.ungrouped || [])];
 
-  const projectTreeItemID = getProjectTreeViewItemID(cluster, project);
-  const projectTreeItem: TreeViewDataItemWithHref = {
-    children: projectChildren,
-    customBadgeContent: projectMap[project]?.count || '0',
-    defaultExpanded: (currentPageNamespace === project && clusterSelected) || isTourRunning,
-    href: `${getVMListNamespacesURL(cluster, project)}${
+  const namespaceTreeItemID = getNamespaceTreeViewItemID(cluster, namespace);
+  const namespaceTreeItem: TreeViewDataItemWithHref = {
+    children: namespaceChildren,
+    customBadgeContent: namespaceMap[namespace]?.count || '0',
+    defaultExpanded: (currentPageNamespace === namespace && clusterSelected) || isTourRunning,
+    href: `${getVMListNamespacesURL(cluster, namespace)}${
       removeFilterQueryParams(queryParams) || ''
     }`,
     icon: (
-      <Tooltip content={t('Project')}>
+      <Tooltip content={t('Namespace')}>
         <ProjectDiagramIcon />
       </Tooltip>
     ),
-    id: projectTreeItemID,
-    name: project,
+    id: namespaceTreeItemID,
+    name: namespace,
   };
 
-  if (!treeViewDataMap[projectTreeItemID]) {
-    treeViewDataMap[projectTreeItemID] = projectTreeItem;
+  if (!treeViewDataMap[namespaceTreeItemID]) {
+    treeViewDataMap[namespaceTreeItemID] = namespaceTreeItem;
   }
 
-  return projectTreeItem;
+  return namespaceTreeItem;
 };
 
 const createAllNamespacesTreeItem = (
@@ -241,7 +241,7 @@ export const getVMInfoFromPathname = (pathname: string) => {
 };
 
 export const createSingleClusterTreeViewData = (
-  projectNames: string[],
+  namespaceNames: string[],
   vms: V1VirtualMachine[],
   pathname: string,
   foldersEnabled: boolean,
@@ -250,11 +250,11 @@ export const createSingleClusterTreeViewData = (
 ): TreeViewDataItem[] => {
   const { currentVMTab, vmName, vmNamespace } = getVMInfoFromPathname(pathname);
 
-  const projectsToShow = isTourRunning ? [getNamespace(tourGuideVM)] : projectNames;
+  const namespacesToShow = isTourRunning ? [getNamespace(tourGuideVM)] : namespaceNames;
   const vmsToShow = isTourRunning ? [tourGuideVM] : vms;
 
   const treeViewDataMap: Record<string, TreeViewDataItem> = {};
-  const projectMap = buildProjectMap(
+  const namespaceMap = buildNamespaceMap(
     vmsToShow,
     vmName,
     currentVMTab,
@@ -263,10 +263,10 @@ export const createSingleClusterTreeViewData = (
     isTourRunning,
   );
 
-  const treeViewData = projectsToShow.map((project) =>
-    createProjectTreeItem(
-      project,
-      projectMap,
+  const treeViewData = namespacesToShow.map((namespace) =>
+    createNamespaceTreeItem(
+      namespace,
+      namespaceMap,
       vmName,
       vmNamespace,
       treeViewDataMap,
@@ -306,7 +306,7 @@ export const createMultiClusterTreeViewData = (
   vms: V1VirtualMachine[],
   pathname: string,
   foldersEnabled: boolean,
-  projectsByClusters: UseMulticlusterNamespacesReturn['namespacesByCluster'],
+  namespacesByClusters: UseMulticlusterNamespacesReturn['namespacesByCluster'],
   allClustersLabel: string,
   queryParams?: string,
   clusterNames?: string[],
@@ -322,11 +322,11 @@ export const createMultiClusterTreeViewData = (
     ?.map((clusterName) => {
       const clusterVMs = vmsPerCluster[clusterName] ?? [];
 
-      const clusterProjects = projectsByClusters[clusterName]
-        ?.map((project) => getName(project))
+      const clusterNamespaces = namespacesByClusters[clusterName]
+        ?.map((namespace) => getName(namespace))
         ?.sort((a, b) => universalComparator(a, b));
 
-      const projectMap = buildProjectMap(
+      const namespaceMap = buildNamespaceMap(
         clusterVMs,
         vmName,
         currentVMTab,
@@ -336,10 +336,10 @@ export const createMultiClusterTreeViewData = (
 
       const clusterSelected = vmCluster === clusterName;
 
-      const treeViewData = clusterProjects?.map((project) =>
-        createProjectTreeItem(
-          project,
-          projectMap,
+      const treeViewData = clusterNamespaces?.map((namespace) =>
+        createNamespaceTreeItem(
+          namespace,
+          namespaceMap,
           vmName,
           vmNamespace,
           treeViewDataMap,
@@ -395,15 +395,15 @@ const isAllNamespacesItem = (item: TreeViewDataItem): boolean =>
 const isClusterItem = (item: TreeViewDataItem): boolean =>
   item.id?.startsWith(CLUSTER_SELECTOR_PREFIX);
 
-const isProjectItem = (item: TreeViewDataItem): boolean =>
-  item.id?.startsWith(PROJECT_SELECTOR_PREFIX);
+const isNamespaceItem = (item: TreeViewDataItem): boolean =>
+  item.id?.startsWith(NAMESPACE_SELECTOR_PREFIX);
 
 const isFolderItem = (item: TreeViewDataItem): boolean =>
   item.id?.startsWith(FOLDER_SELECTOR_PREFIX);
 
 const isVMItem = (item: TreeViewDataItem): boolean => !item.children;
 
-// searches for clusters, projects and folders
+// searches for clusters, namespaces and folders
 export const filterItems = (item: TreeViewDataItem, input: string) => {
   if (isVMItem(item)) {
     return false;
@@ -426,24 +426,24 @@ export const filterItems = (item: TreeViewDataItem, input: string) => {
   }
 };
 
-// Show projects that have VMs all the time
-// Show / hide projects that have no VMs depending on showEmptyProjects flag
+// Show namespaces that have VMs all the time
+// Show / hide namespaces that have no VMs depending on showEmptyNamespaces flag
 // Hide system namespaces unless they contain VMs
-export const filterNamespaceItems = (item: TreeViewDataItem, showEmptyProjects: boolean) => {
-  if (isProjectItem(item)) {
+export const filterNamespaceItems = (item: TreeViewDataItem, showEmptyNamespaces: boolean) => {
+  if (isNamespaceItem(item)) {
     const hasVMs = item.children?.length > 0;
     if (hasVMs) return true;
 
-    const projectName = item.name as string;
-    if (isSystemNamespace(projectName)) return false;
+    const namespaceName = item.name as string;
+    if (isSystemNamespace(namespaceName)) return false;
 
-    return showEmptyProjects;
+    return showEmptyNamespaces;
   }
 
   if (item.children) {
     item.children = item.children
       .map((opt) => Object.assign({}, opt))
-      .filter((child) => filterNamespaceItems(child, showEmptyProjects));
+      .filter((child) => filterNamespaceItems(child, showEmptyNamespaces));
 
     return item.children.length > 0 || isClusterItem(item) || isAllNamespacesItem(item);
   }
@@ -466,17 +466,17 @@ export const getAllRightClickableTreeViewItems = (
 export const getAllTreeViewFolderItems = (treeData: TreeViewDataItem[]): TreeViewDataItem[] =>
   getAllTreeViewItems(treeData)?.filter((treeItem) => isFolderItem(treeItem)) || [];
 
-export const getAllTreeViewProjectItems = (treeData: TreeViewDataItem[]): TreeViewDataItem[] =>
-  getAllTreeViewItems(treeData).filter((treeItem) => isProjectItem(treeItem));
+export const getAllTreeViewNamespaceItems = (treeData: TreeViewDataItem[]): TreeViewDataItem[] =>
+  getAllTreeViewItems(treeData).filter((treeItem) => isNamespaceItem(treeItem));
 
 export const getAllTreeViewClusterItems = (treeData: TreeViewDataItem[]): TreeViewDataItem[] =>
   getAllTreeViewItems(treeData).filter((treeItem) => isClusterItem(treeItem));
 
-export const getMatchedProjectItems = (
+export const getMatchedNamespaceItems = (
   treeData: TreeViewDataItem[],
   searchText: string,
 ): TreeViewDataItem[] =>
-  getAllTreeViewProjectItems(treeData).filter((item) => nameMatchesSearch(item, searchText));
+  getAllTreeViewNamespaceItems(treeData).filter((item) => nameMatchesSearch(item, searchText));
 
 export const getMatchedClusterItems = (
   treeData: TreeViewDataItem[],
@@ -493,7 +493,7 @@ export const highlightMatchedTreeItems = (
   return treeData.map((item) => {
     const copy = { ...item };
 
-    if ((isProjectItem(copy) || isClusterItem(copy)) && nameMatchesSearch(copy, searchText)) {
+    if ((isNamespaceItem(copy) || isClusterItem(copy)) && nameMatchesSearch(copy, searchText)) {
       copy.name = <b className="pf-v6-u-font-weight-bold">{copy.name}</b>;
     }
 

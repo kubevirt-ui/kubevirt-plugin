@@ -1,55 +1,55 @@
 import React, { FC, useCallback } from 'react';
 
-import useProjects from '@kubevirt-utils/hooks/useProjects';
+import useNamespaces from '@kubevirt-utils/hooks/useNamespaces';
 import usePVCs from '@kubevirt-utils/hooks/usePVCs';
 import { getName } from '@kubevirt-utils/resources/shared';
 
 import { PersistentVolumeClainSelectSkeleton } from './PersistentVolumeClainSelectSkeleton';
 import { PersistentVolumeSelectName } from './PersistentVolumeSelectName';
-import { PersistentVolumeSelectProject } from './PersistentVolumeSelectProject';
+import { PersistentVolumeSelectNamespace } from './PersistentVolumeSelectNamespace';
 
 import './PersistentVolumeClaimSelect.scss';
 
 type PersistentVolumeClaimSelectProps = {
-  projectSelected: string;
+  namespaceSelected: string;
   pvcNameSelected: string;
   selectPVC: (pvcNamespace: string, pvcName?: string) => void;
 };
 
 export const PersistentVolumeClaimSelect: FC<PersistentVolumeClaimSelectProps> = ({
-  projectSelected,
+  namespaceSelected,
   pvcNameSelected,
   selectPVC,
 }) => {
-  const [projectsNames, projectsLoaded] = useProjects();
-  const [pvcs, pvcsLoaded] = usePVCs(projectSelected);
+  const [namespaces, namespacesLoaded] = useNamespaces();
+  const [pvcs, pvcsLoaded] = usePVCs(namespaceSelected);
   const filteredPVCNames = pvcs?.map(getName);
 
-  const onSelectProject = useCallback(
-    (newProject) => {
-      selectPVC(newProject);
+  const onSelectNamespace = useCallback(
+    (newNamespace) => {
+      selectPVC(newNamespace);
     },
     [selectPVC],
   );
 
   const onPVCSelected = useCallback(
     (selection) => {
-      selectPVC(projectSelected, selection);
+      selectPVC(namespaceSelected, selection);
     },
-    [selectPVC, projectSelected],
+    [selectPVC, namespaceSelected],
   );
 
-  if (!projectsLoaded) return <PersistentVolumeClainSelectSkeleton />;
+  if (!namespacesLoaded) return <PersistentVolumeClainSelectSkeleton />;
 
   return (
     <div>
-      <PersistentVolumeSelectProject
-        onChange={onSelectProject}
-        projectsName={projectsNames}
-        selectedProject={projectSelected}
+      <PersistentVolumeSelectNamespace
+        onChange={onSelectNamespace}
+        namespaces={namespaces}
+        selectedNamespace={namespaceSelected}
       />
       <PersistentVolumeSelectName
-        isDisabled={!projectSelected}
+        isDisabled={!namespaceSelected}
         isLoading={!pvcsLoaded}
         onChange={onPVCSelected}
         pvcNames={filteredPVCNames}

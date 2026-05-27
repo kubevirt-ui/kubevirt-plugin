@@ -2,7 +2,7 @@ import { VirtualMachineModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-a
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useClusterFilter } from '@kubevirt-utils/hooks/useClusterFilter';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { useProjectFilter } from '@kubevirt-utils/hooks/useProjectFilter';
+import { useNamespaceFilter } from '@kubevirt-utils/hooks/useNamespaceFilter';
 import useIsACMPage from '@multicluster/useIsACMPage';
 import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 import { useAccessibleResources } from '@virtualmachines/search/hooks/useAccessibleResources';
@@ -39,7 +39,7 @@ export const useVMListFilters = (
   });
 
   const clusterFilter = useClusterFilter();
-  const projectFilter = useProjectFilter<V1VirtualMachine>();
+  const namespaceFilter = useNamespaceFilter();
   const statusFilter = getStatusFilter(t);
   const osFilters = getOSFilter(t);
   const storageClassFilter = useStorageClassFilter(vms, pvcMapper);
@@ -58,7 +58,7 @@ export const useVMListFilters = (
   const nadFilter = getNADsFilter();
 
   const filtersWithSelect = [
-    projectFilter,
+    namespaceFilter,
     statusFilter,
     osFilters,
     storageClassFilter,

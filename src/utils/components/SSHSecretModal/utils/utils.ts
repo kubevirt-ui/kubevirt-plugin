@@ -177,7 +177,7 @@ export const getAllSecretsFromSecretData = (secretsResourceData: IoK8sApiCoreV1S
   return sshKeySecrets;
 };
 
-export const getMappedProjectsWithKeys = (
+export const getMappedNamespacesWithKeys = (
   secretsData: IoK8sApiCoreV1Secret[],
 ): { [namespace: string]: IoK8sApiCoreV1Secret[] } => {
   const sshKeySecrets = getAllSecretsFromSecretData(secretsData);
@@ -202,6 +202,6 @@ export const generateValidSecretName = (secretName: string) =>
 
 export const addNewSecret = (
   namespace: string,
-  targetProject: string,
+  targetNamespace: string,
   activeNamespace: string,
-): boolean => (namespace ? targetProject !== namespace : targetProject !== activeNamespace);
+): boolean => (namespace ? targetNamespace !== namespace : targetNamespace !== activeNamespace);

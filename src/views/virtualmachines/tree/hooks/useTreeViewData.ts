@@ -16,7 +16,7 @@ import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
-import useProjects from '@kubevirt-utils/hooks/useProjects';
+import useNamespaces from '@kubevirt-utils/hooks/useNamespaces';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { isEmpty, universalComparator } from '@kubevirt-utils/utils/utils';
 import useMulticlusterNamespaces from '@multicluster/hooks/useMulticlusterNamespaces';
@@ -48,14 +48,14 @@ export const useTreeViewData = (): UseTreeViewData => {
   const isTourRunning = runningTourSignal.value;
 
   const { featureEnabled: treeViewFoldersEnabled } = useFeatures(TREE_VIEW_FOLDERS);
-  const [projectNames, projectNamesLoaded, projectNamesError] = useProjects();
+  const [namespaceNames, namespaceNamesLoaded, namespaceNamesError] = useNamespaces();
   const {
     error: multiclusterNamespacesError,
     loaded: multiclusterNamespacesLoaded,
     namespacesByCluster,
   } = useMulticlusterNamespaces();
 
-  const loadVMsPerNamespace = !isACMTreeView && projectNamesLoaded && !isAdmin;
+  const loadVMsPerNamespace = !isACMTreeView && namespaceNamesLoaded && !isAdmin;
 
   const [allVMs, allVMsLoaded] = useKubevirtWatchResource<V1VirtualMachine[]>(
     (isAdmin || isACMTreeView
@@ -71,7 +71,7 @@ export const useTreeViewData = (): UseTreeViewData => {
   const allowedResources = useK8sWatchResources<{ [key: string]: V1VirtualMachine[] }>(
     Object.fromEntries(
       loadVMsPerNamespace
-        ? (projectNames || []).map((namespace) => [
+        ? (namespaceNames || []).map((namespace) => [
             namespace,
             {
               groupVersionKind: VirtualMachineModelGroupVersionKind,
@@ -98,7 +98,7 @@ export const useTreeViewData = (): UseTreeViewData => {
   }>(
     Object.fromEntries(
       loadVMsPerNamespace
-        ? (projectNames || []).map((namespace) => [
+        ? (namespaceNames || []).map((namespace) => [
             namespace,
             {
               groupVersionKind: VirtualMachineInstanceMigrationModelGroupVersionKind,
@@ -131,10 +131,10 @@ export const useTreeViewData = (): UseTreeViewData => {
 
   vmsSignal.value = sortedMemoizedVMs;
 
-  const projectsLoaded = isACMTreeView ? multiclusterNamespacesLoaded : projectNamesLoaded;
+  const namespacesLoaded = isACMTreeView ? multiclusterNamespacesLoaded : namespaceNamesLoaded;
 
   const loaded =
-    projectsLoaded &&
+    namespacesLoaded &&
     (loadVMsPerNamespace
       ? isEmpty(allowedResources) ||
         Object.values(allowedResources).every((resource) => resource.loaded || resource.loadError)
@@ -156,7 +156,7 @@ export const useTreeViewData = (): UseTreeViewData => {
     }
 
     return createSingleClusterTreeViewData(
-      projectNames,
+      namespaceNames,
       sortedMemoizedVMs,
       location.pathname,
       treeViewFoldersEnabled,
@@ -167,7 +167,7 @@ export const useTreeViewData = (): UseTreeViewData => {
     loaded,
     isACMTreeView,
     isTourRunning,
-    projectNames,
+    namespaceNames,
     sortedMemoizedVMs,
     location.pathname,
     treeViewFoldersEnabled,
@@ -180,9 +180,9 @@ export const useTreeViewData = (): UseTreeViewData => {
   return useMemo(
     () => ({
       loaded,
-      loadError: projectNamesError || multiclusterNamespacesError,
+      loadError: namespaceNamesError || multiclusterNamespacesError,
       treeData,
     }),
-    [loaded, multiclusterNamespacesError, projectNamesError, treeData],
+    [loaded, multiclusterNamespacesError, namespaceNamesError, treeData],
   );
 };

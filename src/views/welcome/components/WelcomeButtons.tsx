@@ -1,15 +1,16 @@
 import React, { FC } from 'react';
 import { useNavigate } from 'react-router';
 
-import CreateProjectModal from '@kubevirt-utils/components/CreateProjectModal/CreateProjectModal';
+import CreateNamespaceModal from '@kubevirt-utils/components/CreateNamespaceModal/CreateNamespaceModal';
 import useTour from '@kubevirt-utils/components/GuidedTour/hooks/useTour';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import useProjects from '@kubevirt-utils/hooks/useProjects';
+import useNamespaces from '@kubevirt-utils/hooks/useNamespaces';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { getVMWizardURL } from '@multicluster/urls';
 import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
 import { Button, ButtonVariant, Split, SplitItem } from '@patternfly/react-core';
+
 
 type WelcomeButtonsProps = {
   onClose: () => Promise<void> | void;
@@ -22,21 +23,21 @@ const WelcomeButtons: FC<WelcomeButtonsProps> = ({ onClose }) => {
   const { createModal } = useModal();
 
   const { startTour } = useTour();
-  const [projects, projectsLoaded, projectsError] = useProjects(undefined, true);
-  const hasNoProjects = projectsLoaded && !projectsError && (!projects || projects.length === 0);
+  const [namespaces, namespacesLoaded, namespacesError] = useNamespaces(undefined, true);
+  const hasNoNamespaces = namespacesLoaded && !namespacesError && (!namespaces || namespaces.length === 0);
 
   const onCreateVM = () => {
     navigate(getVMWizardURL(''));
     onClose();
   };
 
-  const onCreateProject = () => {
+  const onCreateNamespace = () => {
     onClose();
     createModal?.((props) => (
-      <CreateProjectModal
+      <CreateNamespaceModal
         {...props}
-        createdProject={(newProject) => {
-          const name = getName(newProject);
+        createdNamespace={(newNamespace) => {
+          const name = getName(newNamespace);
           if (name) setActiveNamespace(name);
         }}
       />
@@ -48,12 +49,12 @@ const WelcomeButtons: FC<WelcomeButtonsProps> = ({ onClose }) => {
       <SplitItem>
         <Button
           className="WelcomeModal__button"
-          isDisabled={!projectsLoaded}
-          isLoading={!projectsLoaded}
-          onClick={hasNoProjects ? onCreateProject : onCreateVM}
+          isDisabled={!namespacesLoaded}
+          isLoading={!namespacesLoaded}
+          onClick={hasNoNamespaces ? onCreateNamespace : onCreateVM}
           variant={ButtonVariant.primary}
         >
-          {hasNoProjects ? t('Create first project') : t('Create virtual machine')}
+          {hasNoNamespaces ? t('Create first namespace') : t('Create virtual machine')}
         </Button>
       </SplitItem>
       <SplitItem>

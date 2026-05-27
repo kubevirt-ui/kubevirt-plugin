@@ -5,7 +5,7 @@ import { METRICS } from '@overview/OverviewTab/metric-charts-card/utils/constant
 import { MetricChartData } from '@overview/OverviewTab/metric-charts-card/utils/hooks/useMetricChartData';
 import { getCurrentValue } from '@overview/OverviewTab/metric-charts-card/utils/utils';
 
-import { MetricQuotaData } from '../../hooks/useProjectResourceQuota';
+import { MetricQuotaData } from '../../hooks/useNamespaceResourceQuota';
 import { TopClustersMetricData } from '../../hooks/useTopClustersChartData';
 import { getMetricSubtitle } from '../../utils/utils';
 

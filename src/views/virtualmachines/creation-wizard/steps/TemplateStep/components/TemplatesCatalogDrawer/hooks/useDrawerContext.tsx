@@ -17,10 +17,10 @@ export type DrawerContext = {
 
 const useDrawer = (initialTemplate: Template) => {
   const [template, setTemplate] = useImmer(initialTemplate);
-  const { project } = useVMWizardStore();
+  const { namespace } = useVMWizardStore();
   const [templateWithGeneratedParams, loading, error] = useVMTemplateGeneratedParams(
     initialTemplate,
-    project || undefined,
+    namespace || undefined,
   );
   const { loaded: bootSourceLoaded } = useVMTemplateSource(initialTemplate);
 

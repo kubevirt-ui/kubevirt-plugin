@@ -18,7 +18,7 @@ const DiskSourcePVCSelectNamespace: FC<DiskSourcePVCSelectNamespaceProps> = ({ v
     <FormGroup
       fieldId={diskSourcePVCNamespaceFieldID}
       id={diskSourcePVCNamespaceFieldID}
-      label={t('PersistentVolumeClaim project')}
+      label={t('PersistentVolumeClaim namespace')}
     >
       <FormPFSelect
         toggleProps={{

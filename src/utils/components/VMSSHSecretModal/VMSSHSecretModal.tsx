@@ -33,7 +33,7 @@ const VMSSHSecretModal: FC<VMSSHSecretModalProps> = ({
   const initialSSHDetails = useMemo(
     () =>
       getInitialSSHDetails({
-        applyKeyToProject: !isEmpty(secretName) && authorizedSSHKeys?.[namespace] === secretName,
+        applyKeyToNamespace: !isEmpty(secretName) && authorizedSSHKeys?.[namespace] === secretName,
         sshSecretName: secretName,
       }),
     [authorizedSSHKeys, namespace, secretName],
@@ -41,13 +41,13 @@ const VMSSHSecretModal: FC<VMSSHSecretModalProps> = ({
 
   const onSubmit = useCallback(
     (sshDetails: SSHSecretDetails) => {
-      const { applyKeyToProject, secretOption, sshPubKey, sshSecretName } = sshDetails;
+      const { applyKeyToNamespace, secretOption, sshPubKey, sshSecretName } = sshDetails;
 
       if (isEqualObject(sshDetails, initialSSHDetails)) {
         return Promise.resolve();
       }
 
-      if (applyKeyToProject && authorizedSSHKeys?.[namespace] !== sshSecretName) {
+      if (applyKeyToNamespace && authorizedSSHKeys?.[namespace] !== sshSecretName) {
         updateAuthorizedSSHKeys({ ...authorizedSSHKeys, [namespace]: sshSecretName });
       }
 

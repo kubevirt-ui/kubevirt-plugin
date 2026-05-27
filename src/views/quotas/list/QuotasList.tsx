@@ -131,8 +131,8 @@ const QuotasList: FC = () => {
       {showTabs && (
         <Tabs activeKey={activeTab} onSelect={handleTabSelect} usePageInsets>
           <Tab
-            eventKey={QuotaScope.PROJECT}
-            title={<TabTitleText>{t('Project-scoped')}</TabTitleText>}
+            eventKey={QuotaScope.NAMESPACE}
+            title={<TabTitleText>{t('Namespace-scoped')}</TabTitleText>}
           />
           <Tab
             eventKey={QuotaScope.CLUSTER}

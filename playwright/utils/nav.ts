@@ -27,7 +27,7 @@ export async function switchNamespace(page: Page, ns: string) {
   const newPath = url.pathname.replace(/\/k8s\/(ns\/[^/]+|all-namespaces)\//, `/k8s/ns/${ns}/`);
   await page.evaluate(
     ({ path }: { path: string }) => {
-      localStorage.setItem('showEmptyProjects', 'show');
+      localStorage.setItem('showEmptyNamespaces', 'show');
       window.history.pushState(null, '', path);
       window.dispatchEvent(new PopStateEvent('popstate'));
     },

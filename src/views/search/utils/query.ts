@@ -78,5 +78,5 @@ export const buildContextSearchInputs = (
   namespace?: string,
 ): AdvancedSearchQueryInputs => ({
   ...(cluster && { [VirtualMachineRowFilterType.Cluster]: [cluster] }),
-  ...(namespace && { [VirtualMachineRowFilterType.Project]: [namespace] }),
+  ...(namespace && { [VirtualMachineRowFilterType.Namespace]: [namespace] }),
 });

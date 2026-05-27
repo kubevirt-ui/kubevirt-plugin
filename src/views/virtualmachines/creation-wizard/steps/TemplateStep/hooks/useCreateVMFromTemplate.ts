@@ -27,7 +27,7 @@ const useCreateVMFromTemplate: UseCreateVMFromTemplate = () => {
     cluster,
     folder,
     lastProcessedTemplateKey,
-    project: namespace,
+    namespace,
     selectedTemplate,
     setLastProcessedTemplateKey,
     vmDescription,

@@ -3,10 +3,10 @@ import { useMemo } from 'react';
 import { isEmpty } from '../utils/utils';
 
 import useNamespaceParam from './useNamespaceParam';
-import useSelectedRowFilterProjects from './useSelectedRowFilterProjects';
+import useSelectedRowFilterNamespaces from './useSelectedRowFilterNamespaces';
 
 const useListNamespaces = (): string[] => {
-  const rowFilterNamespaces = useSelectedRowFilterProjects();
+  const rowFilterNamespaces = useSelectedRowFilterNamespaces();
   const namespace = useNamespaceParam();
   const namespaces = useMemo(() => {
     if (!isEmpty(rowFilterNamespaces)) return rowFilterNamespaces;

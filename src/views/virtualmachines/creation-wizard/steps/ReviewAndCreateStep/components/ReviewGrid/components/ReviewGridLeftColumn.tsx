@@ -15,7 +15,7 @@ import CloneNameInput from './CloneNameInput';
 const ReviewGridLeftColumn: FC = () => {
   const { t } = useKubevirtTranslation();
   const vm = vmSignal.value;
-  const { creationMethod, project, vmName } = useVMWizardStore();
+  const { creationMethod, namespace, vmName } = useVMWizardStore();
 
   const isCloneMethod = isCloneCreationMethod(creationMethod);
 
@@ -35,8 +35,8 @@ const ReviewGridLeftColumn: FC = () => {
           descriptionHeader={t('Cluster')}
         />
         <DescriptionItem
-          descriptionData={project || NO_DATA_DASH}
-          descriptionHeader={t('Project')}
+          descriptionData={namespace || NO_DATA_DASH}
+          descriptionHeader={t('Namespace')}
         />
         <DescriptionItem
           descriptionData={getFolder(vm) || NO_DATA_DASH}

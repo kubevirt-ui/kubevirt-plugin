@@ -4,34 +4,34 @@ import { useNavigate } from 'react-router';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
-import useProjects from '@kubevirt-utils/hooks/useProjects';
+import useNamespaces from '@kubevirt-utils/hooks/useNamespaces';
 import { VirtualMachineModelRef } from '@kubevirt-utils/models';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Bullseye } from '@patternfly/react-core';
 
 const VirtualizationLandingPage: FC = () => {
   const isAdmin = useIsAdmin();
-  const [projects, projectsLoaded] = useProjects();
+  const [namespaces, namespacesLoaded] = useNamespaces();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!projectsLoaded) return;
+    if (!namespacesLoaded) return;
 
     if (isAdmin) {
       navigate(`/k8s/all-namespaces/${VirtualMachineModelRef}`);
       return;
     }
 
-    if (!isEmpty(projects)) {
-      const preferredProject = projects.includes(DEFAULT_NAMESPACE)
+    if (!isEmpty(namespaces)) {
+      const preferredNamespace = namespaces.includes(DEFAULT_NAMESPACE)
         ? DEFAULT_NAMESPACE
-        : projects[0];
-      navigate(`/k8s/ns/${preferredProject}/${VirtualMachineModelRef}`);
+        : namespaces[0];
+      navigate(`/k8s/ns/${preferredNamespace}/${VirtualMachineModelRef}`);
       return;
     }
 
     navigate(`/k8s/all-namespaces/${VirtualMachineModelRef}`);
-  }, [isAdmin, projects, projectsLoaded, navigate]);
+  }, [isAdmin, namespaces, namespacesLoaded, navigate]);
 
   return (
     <Bullseye>

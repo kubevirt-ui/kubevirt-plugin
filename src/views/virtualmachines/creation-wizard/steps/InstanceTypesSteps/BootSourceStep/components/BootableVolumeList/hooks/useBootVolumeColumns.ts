@@ -1,4 +1,4 @@
-import { ALL_PROJECTS } from '@kubevirt-utils/hooks/constants';
+import { ALL_NAMESPACES } from '@kubevirt-utils/hooks/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettingsTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettingsTableColumns';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
@@ -39,7 +39,7 @@ const useBootVolumeColumns: UseBootVolumesColumns = (volumeListNamespace) => {
       id: ARCHITECTURE_ID,
       title: ARCHITECTURE_TITLE,
     },
-    ...(volumeListNamespace === ALL_PROJECTS
+    ...(volumeListNamespace === ALL_NAMESPACES
       ? [
           {
             id: NAMESPACE_COLUMN_ID,

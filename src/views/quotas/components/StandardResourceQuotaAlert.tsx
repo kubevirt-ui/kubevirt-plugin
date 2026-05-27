@@ -49,18 +49,18 @@ const StandardResourceQuotaAlert: FC<StandardResourceQuotaAlertProps> = ({
       actionLinks={
         <ExternalLink
           href={getStandardResourceQuotaListURL(namespace)}
-          text={t('View ResourceQuotas for this project')}
+          text={t('View ResourceQuotas for this namespace')}
         />
       }
       actionClose={<AlertActionCloseButton onClose={() => setIsAlertOpen(false)} />}
       className={className}
       isInline
-      title={t('Standard ResourceQuota detected on project')}
+      title={t('Standard ResourceQuota detected on namespace')}
       variant="warning"
     >
       <p>
         {t(
-          'This project is also governed by a ResourceQuota. Review to ensure accurate and consistent resource enforcement.',
+          'This namespace is also governed by a ResourceQuota. Review to ensure accurate and consistent resource enforcement.',
         )}
       </p>
     </Alert>

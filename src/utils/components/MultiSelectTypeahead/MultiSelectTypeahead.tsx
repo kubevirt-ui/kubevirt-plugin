@@ -39,8 +39,8 @@ const MultiSelectTypeahead: FC<MultiSelectTypeaheadProps> = ({
 
   return (
     <MultiTypeaheadSelect
-      onSelectionChange={(_e, selectedProjects: string[]) => {
-        setSelectedResourceNames(selectedProjects);
+      onSelectionChange={(_e, selectedNamespaces: string[]) => {
+        setSelectedResourceNames(selectedNamespaces);
       }}
       initialInputValue={initialInputValue}
       initialOptions={resourceOptions}

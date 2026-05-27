@@ -1,6 +1,6 @@
 import { useLocation, useNavigate } from 'react-router';
 
-import { ALL_NAMESPACES } from '@kubevirt-utils/hooks/constants';
+import { ALL_NAMESPACES_KEY } from '@kubevirt-utils/hooks/constants';
 import useNamespaceParam from '@kubevirt-utils/hooks/useNamespaceParam';
 
 import { TOUR_STEPS_COUNT } from '../utils/constants';
@@ -20,8 +20,8 @@ const useTour = () => {
   const stopTour = () => {
     runningTourSignal.value = false;
     // Navigate back to the user's namespace URL if the tour moved them to all-namespaces
-    if (location.pathname.includes(ALL_NAMESPACES) && namespaceSignal.value) {
-      navigate(location.pathname.replace(ALL_NAMESPACES, `ns/${namespaceSignal.value}`), {
+    if (location.pathname.includes(ALL_NAMESPACES_KEY) && namespaceSignal.value) {
+      navigate(location.pathname.replace(ALL_NAMESPACES_KEY, `ns/${namespaceSignal.value}`), {
         replace: true,
       });
     }

@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 
-import ClusterDropdown from '@kubevirt-utils/components/ClusterProjectDropdown/ClusterDropdown';
-import NamespaceDropdown from '@kubevirt-utils/components/ClusterProjectDropdown/NamespaceDropdown';
+import ClusterDropdown from '@kubevirt-utils/components/ClusterNamespaceDropdown/ClusterDropdown';
+import NamespaceDropdown from '@kubevirt-utils/components/ClusterNamespaceDropdown/NamespaceDropdown';
 import FolderSelect from '@kubevirt-utils/components/FolderSelect/FolderSelect';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -14,7 +14,7 @@ import './VMCreationLocationForm.scss';
 const VMCreationLocationForm: FC = () => {
   const { t } = useKubevirtTranslation();
   const isACMPage = useIsACMPage();
-  const { cluster, folder, project, setCluster, setFolder, setProject } = useVMWizardStore();
+  const { cluster, folder, namespace, setCluster, setFolder, setNamespace } = useVMWizardStore();
 
   return (
     <Form className="vm-creation-location-form">
@@ -24,27 +24,27 @@ const VMCreationLocationForm: FC = () => {
             onChange={(selectedCluster) => {
               setCluster(selectedCluster);
               setFolder('');
-              if (selectedCluster !== cluster) setProject('');
+              if (selectedCluster !== cluster) setNamespace('');
             }}
             selectedCluster={cluster}
           />
         </FormGroup>
       )}
-      <FormGroup isRequired label={t('Project')}>
+      <FormGroup isRequired label={t('Namespace')}>
         <NamespaceDropdown
-          onChange={(selectedProject) => {
-            setProject(selectedProject);
+          onChange={(selectedNamespace) => {
+            setNamespace(selectedNamespace);
             setFolder('');
           }}
           cluster={cluster}
-          includeAllProjects={false}
-          selectedProject={project || DEFAULT_NAMESPACE}
+          includeAllNamespaces={false}
+          selectedNamespace={namespace || DEFAULT_NAMESPACE}
         />
       </FormGroup>
       <FormGroup label={t('Folder (optional)')}>
         <FolderSelect
           cluster={cluster}
-          namespace={project}
+          namespace={namespace}
           selectedFolder={folder}
           setSelectedFolder={(newFolder) => setFolder(newFolder)}
         />

@@ -35,7 +35,7 @@ export const TLS_CERT_FIELD_NAMES = {
   tlsCertConfigMapName: 'tlsCertConfigMapName',
   tlsCertificate: 'tlsCertificate',
   tlsCertificateRequired: 'tlsCertificateRequired',
-  tlsCertProject: 'tlsCertProject',
+  tlsCertNamespace: 'tlsCertNamespace',
   tlsCertSource: 'tlsCertSource',
 } as const;
 
@@ -62,7 +62,7 @@ export type AddBootableVolumeState = {
   tlsCertConfigMapName?: string;
   tlsCertificate?: string;
   tlsCertificateRequired?: boolean;
-  tlsCertProject?: string;
+  tlsCertNamespace?: string;
   tlsCertSource?: typeof TLS_CERT_SOURCE_EXISTING | typeof TLS_CERT_SOURCE_NEW;
   uploadFile?: File | string;
   uploadFilename?: string;
@@ -97,7 +97,7 @@ export const initialBootableVolumeState: AddBootableVolumeState = {
   tlsCertConfigMapName: null,
   tlsCertificate: null,
   tlsCertificateRequired: false,
-  tlsCertProject: null,
+  tlsCertNamespace: null,
   tlsCertSource: TLS_CERT_SOURCE_EXISTING,
   uploadFile: null,
   uploadFilename: null,

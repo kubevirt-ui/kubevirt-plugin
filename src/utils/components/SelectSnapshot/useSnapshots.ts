@@ -2,9 +2,9 @@ import { useMemo } from 'react';
 
 import {
   modelToGroupVersionKind,
+  NamespaceModel,
   VolumeSnapshotModel,
 } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { useProjectOrNamespaceModel } from '@kubevirt-utils/hooks/useProjectOrNamespaceModel';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
@@ -12,32 +12,31 @@ import { VolumeSnapshotKind } from './types';
 
 type UseSnapshotsReturnType = {
   error: Error;
-  projectsLoaded: boolean;
-  projectsNames: string[];
+  namespacesLoaded: boolean;
+  namespacesNames: string[];
   snapshots: VolumeSnapshotKind[];
   snapshotsLoaded: boolean;
 };
 
-const useSnapshots = (projectSelected: string, cluster?: string): UseSnapshotsReturnType => {
-  const model = useProjectOrNamespaceModel();
-  const [projects, projectsLoaded, projectsErrors] = useK8sWatchData<K8sResourceCommon[]>({
+const useSnapshots = (namespaceSelected: string, cluster?: string): UseSnapshotsReturnType => {
+  const [namespaces, namespacesLoaded, namespacesErrors] = useK8sWatchData<K8sResourceCommon[]>({
     cluster,
-    groupVersionKind: modelToGroupVersionKind(model),
+    groupVersionKind: modelToGroupVersionKind(NamespaceModel),
     isList: true,
     namespaced: false,
   });
 
-  const projectsNames = useMemo(
-    () => projects?.map((project) => project?.metadata?.name)?.sort((a, b) => a?.localeCompare(b)),
-    [projects],
+  const namespacesNames = useMemo(
+    () => namespaces?.map((namespace) => namespace?.metadata?.name)?.sort((a, b) => a?.localeCompare(b)),
+    [namespaces],
   );
 
-  const snapshotWathcResource = projectSelected
+  const snapshotWathcResource = namespaceSelected
     ? {
         cluster,
         groupVersionKind: modelToGroupVersionKind(VolumeSnapshotModel),
         isList: true,
-        namespace: projectSelected,
+        namespace: namespaceSelected,
         namespaced: true,
       }
     : null;
@@ -51,9 +50,9 @@ const useSnapshots = (projectSelected: string, cluster?: string): UseSnapshotsRe
   );
 
   return {
-    error: projectsErrors || snapshotsErrors,
-    projectsLoaded,
-    projectsNames,
+    error: namespacesErrors || snapshotsErrors,
+    namespacesLoaded,
+    namespacesNames,
     snapshots,
     snapshotsLoaded,
   };

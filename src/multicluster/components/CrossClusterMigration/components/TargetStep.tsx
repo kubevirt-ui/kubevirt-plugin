@@ -26,7 +26,7 @@ import {
 import { ArrowRightIcon } from '@patternfly/react-icons';
 import { useHubClusterName } from '@stolostron/multicluster-sdk';
 
-import useClustersAndProjects from '../hooks/useClustersAndProjects';
+import useClustersAndNamespaces from '../hooks/useClustersAndNamespaces';
 import { getClusterFromProvider } from '../utils';
 
 import './TargetStep.scss';
@@ -45,18 +45,18 @@ const TargetStep: FC<TargetStepProps> = ({ migrationPlan, setMigrationPlan, vms 
 
   const selectedProviderTarget = getTargetProviderName(migrationPlan);
   const selectedClusterTarget = getClusterFromProvider(selectedProviderTarget);
-  const selectedProjectTarget = getTargetNamespace(migrationPlan);
+  const selectedNamespaceTarget = getTargetNamespace(migrationPlan);
 
   const {
     clustersError,
     clustersLoaded,
     clustersOptions,
     getProviderFromClusterName,
-    projectOptions,
-    projectsError,
-    projectsLoaded,
+    namespaceOptions,
+    namespacesError,
+    namespacesLoaded,
     providers,
-  } = useClustersAndProjects(sourceCluster, selectedClusterTarget);
+  } = useClustersAndNamespaces(sourceCluster, selectedClusterTarget);
 
   useEffect(() => {
     if (clustersOptions?.length && !selectedProviderTarget) {
@@ -92,10 +92,10 @@ const TargetStep: FC<TargetStepProps> = ({ migrationPlan, setMigrationPlan, vms 
     [setMigrationPlan, getProviderFromClusterName],
   );
 
-  const onProjectChange = useCallback(
-    (newProjectTarget: string) => {
+  const onNamespaceChange = useCallback(
+    (newNamespaceTarget: string) => {
       setMigrationPlan((plan) => {
-        plan.spec.targetNamespace = newProjectTarget;
+        plan.spec.targetNamespace = newNamespaceTarget;
       });
     },
     [setMigrationPlan],
@@ -103,7 +103,7 @@ const TargetStep: FC<TargetStepProps> = ({ migrationPlan, setMigrationPlan, vms 
 
   return (
     <StateHandler
-      error={clustersError || projectsError}
+      error={clustersError || namespacesError}
       hasData={!isEmpty(providers)}
       loaded={clustersLoaded}
     >
@@ -125,11 +125,11 @@ const TargetStep: FC<TargetStepProps> = ({ migrationPlan, setMigrationPlan, vms 
               />
             </FormGroup>
 
-            <FormGroup label={t('Project')}>
+            <FormGroup label={t('Namespace')}>
               <InlineFilterSelect
                 options={[]}
                 selected={sourceNamespace}
-                selectProps={{ id: 'source-project-select' }}
+                selectProps={{ id: 'source-namespace-select' }}
                 setSelected={undefined}
                 toggleProps={{ children: sourceNamespace, isDisabled: true, isFullWidth: true }}
               />
@@ -153,13 +153,13 @@ const TargetStep: FC<TargetStepProps> = ({ migrationPlan, setMigrationPlan, vms 
               />
             </FormGroup>
 
-            {projectsLoaded ? (
-              <FormGroup label={t('Project')}>
+            {namespacesLoaded ? (
+              <FormGroup label={t('Namespace')}>
                 <InlineFilterSelect
-                  options={projectOptions}
-                  selected={selectedProjectTarget}
-                  selectProps={{ id: 'target-project-select' }}
-                  setSelected={onProjectChange}
+                  options={namespaceOptions}
+                  selected={selectedNamespaceTarget}
+                  selectProps={{ id: 'target-namespace-select' }}
+                  setSelected={onNamespaceChange}
                   toggleProps={{ isFullWidth: true }}
                 />
               </FormGroup>

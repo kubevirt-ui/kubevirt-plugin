@@ -86,7 +86,7 @@ const AlertsCard: FC<AlertsCardProps> = ({ className, isOverviewPage = false, so
                 ) : (
                   <Popover
                     bodyContent={
-                      <div>{t('Only VM-related alerts in your project will be shown')}</div>
+                      <div>{t('Only VM-related alerts in your namespace will be shown')}</div>
                     }
                     aria-label="Only VM-related alerts notification"
                     className="alerts-card__nonadmin-popover"

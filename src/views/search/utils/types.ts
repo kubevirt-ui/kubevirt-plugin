@@ -23,7 +23,7 @@ export type AdvancedSearchQueryInputs = Partial<{
   [VirtualMachineRowFilterType.Name]: string;
   [VirtualMachineRowFilterType.Node]: string[];
   [VirtualMachineRowFilterType.OS]: string[];
-  [VirtualMachineRowFilterType.Project]: string[];
+  [VirtualMachineRowFilterType.Namespace]: string[];
   [VirtualMachineRowFilterType.Scheduling]: SchedulingValue;
   [VirtualMachineRowFilterType.Status]: string[];
   [VirtualMachineRowFilterType.StorageClass]: string[];

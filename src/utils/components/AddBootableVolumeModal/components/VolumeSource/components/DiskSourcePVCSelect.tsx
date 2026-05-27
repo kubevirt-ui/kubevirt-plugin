@@ -1,6 +1,6 @@
 import React, { FC, useCallback, useMemo } from 'react';
 
-import useProjects from '@kubevirt-utils/hooks/useProjects';
+import useNamespaces from '@kubevirt-utils/hooks/useNamespaces';
 import usePVCs from '@kubevirt-utils/hooks/usePVCs';
 import { getPVCSize } from '@kubevirt-utils/resources/bootableresources/selectors';
 import { formatQuantityString } from '@kubevirt-utils/utils/units';
@@ -25,12 +25,12 @@ const DiskSourcePVCSelect: FC<DiskSourcePVCSelectProps> = ({
   selectPVCNamespace,
   setDiskSize,
 }) => {
-  const [projectsNames, projectNamesLoaded] = useProjects(cluster);
+  const [namespaceNames, namespacesLoaded] = useNamespaces(cluster);
   const [pvcs, pvcsLoaded] = usePVCs(pvcNamespaceSelected, cluster);
 
-  const onSelectProject = useCallback(
-    (newProject) => {
-      selectPVCNamespace && selectPVCNamespace(newProject);
+  const onSelectNamespace = useCallback(
+    (newNamespace) => {
+      selectPVCNamespace && selectPVCNamespace(newNamespace);
       selectPVCName(undefined);
     },
     [selectPVCNamespace, selectPVCName],
@@ -54,10 +54,10 @@ const DiskSourcePVCSelect: FC<DiskSourcePVCSelectProps> = ({
     <div>
       <DiskSourcePVCSelectNamespace
         isDisabled={!selectPVCNamespace}
-        onChange={onSelectProject}
-        projectNames={projectsNames}
-        projectsLoaded={projectNamesLoaded}
-        selectedProject={pvcNamespaceSelected}
+        onChange={onSelectNamespace}
+        namespaceNames={namespaceNames}
+        namespacesLoaded={namespacesLoaded}
+        selectedNamespace={pvcNamespaceSelected}
       />
       <DiskSourcePVCSelectName
         isDisabled={!pvcNamespaceSelected}

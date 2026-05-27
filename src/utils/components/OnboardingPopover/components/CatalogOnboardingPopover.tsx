@@ -19,7 +19,7 @@ const CatalogOnboardingPopover: FC = () => {
         <Trans ns="plugin__kubevirt-plugin" t={t}>
           You can now create VMs directly from the{' '}
           <span className="pf-v6-u-font-weight-bold">VirtualMachines</span> page or by
-          right-clicking a project in the navigation tree.
+          right-clicking a namespace in the navigation tree.
         </Trans>
       }
       headerContent={t('Looking for the catalog? VM creation has moved!')}

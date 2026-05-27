@@ -1,7 +1,7 @@
 import React, { FC, MouseEvent } from 'react';
 
 import Loading from '@kubevirt-utils/components/Loading/Loading';
-import CreateProjectOnboardingPopover from '@kubevirt-utils/components/OnboardingPopover/components/CreateProjectOnboardingPopover';
+import CreateNamespaceOnboardingPopover from '@kubevirt-utils/components/OnboardingPopover/components/CreateNamespaceOnboardingPopover';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
@@ -19,7 +19,7 @@ import useTreeViewItemActions from '../hooks/useTreeViewItemActions';
 import {
   getClusterElement,
   getMatchedClusterItems,
-  getMatchedProjectItems,
+  getMatchedNamespaceItems,
   highlightMatchedTreeItems,
 } from '../utils/utils';
 
@@ -65,21 +65,21 @@ const TreeViewContent: FC<TreeViewContentProps> = ({
     return panelToggleButton;
   }
 
-  const filteredProjectsCount = getMatchedProjectItems(filteredTreeData, searchText).length;
+  const filteredNamespacesCount = getMatchedNamespaceItems(filteredTreeData, searchText).length;
   const filteredClustersCount = getMatchedClusterItems(filteredTreeData, searchText).length;
 
   const getSearchResultInfo = () => {
-    if (filteredClustersCount && filteredProjectsCount) {
-      return t('{{clustersCount}} clusters, {{projectsCount}} projects found', {
+    if (filteredClustersCount && filteredNamespacesCount) {
+      return t('{{clustersCount}} clusters, {{namespacesCount}} namespaces found', {
         clustersCount: filteredClustersCount,
-        projectsCount: filteredProjectsCount,
+        namespacesCount: filteredNamespacesCount,
       });
     }
     if (filteredClustersCount) {
       return t('{{clustersCount}} clusters found', { clustersCount: filteredClustersCount });
     }
-    if (filteredProjectsCount) {
-      return t('{{projectsCount}} projects found', { projectsCount: filteredProjectsCount });
+    if (filteredNamespacesCount) {
+      return t('{{namespacesCount}} namespaces found', { namespacesCount: filteredNamespacesCount });
     }
     return undefined;
   };
@@ -92,7 +92,7 @@ const TreeViewContent: FC<TreeViewContentProps> = ({
         {isEmpty(filteredTreeData) ? (
           <EmptyState
             headingLevel="h6"
-            titleText={t('No projects with VirtualMachines found')}
+            titleText={t('No namespaces with VirtualMachines found')}
             variant="xs"
           />
         ) : (
@@ -115,7 +115,7 @@ const TreeViewContent: FC<TreeViewContentProps> = ({
         )}
         <TreeViewRightClickActionMenu hideMenu={hideMenu} triggerElement={triggerElement} />
       </DrawerPanelBody>
-      <CreateProjectOnboardingPopover triggerElement={getClusterElement(treeData)} />
+      <CreateNamespaceOnboardingPopover triggerElement={getClusterElement(treeData)} />
     </>
   );
 };

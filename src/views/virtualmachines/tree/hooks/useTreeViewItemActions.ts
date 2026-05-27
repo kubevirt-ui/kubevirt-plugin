@@ -9,7 +9,7 @@ import { CLUSTER_SELECTOR_PREFIX } from '../utils/constants';
 import {
   getAllRightClickableTreeViewItems,
   getAllTreeViewFolderItems,
-  getAllTreeViewProjectItems,
+  getAllTreeViewNamespaceItems,
   getAllTreeViewVMItems,
   TreeViewDataItemWithHref,
 } from '../utils/utils';
@@ -30,7 +30,7 @@ const useTreeViewItemActions: UseTreeViewItemActions = (treeData) => {
   const navigate = useNavigate();
 
   const dropElements = useMemo(
-    () => [...getAllTreeViewFolderItems(treeData), ...getAllTreeViewProjectItems(treeData)],
+    () => [...getAllTreeViewFolderItems(treeData), ...getAllTreeViewNamespaceItems(treeData)],
     [treeData],
   );
 
@@ -87,7 +87,7 @@ const useTreeViewItemActions: UseTreeViewItemActions = (treeData) => {
         const vmItems = getAllTreeViewVMItems([item]);
         const dropInnerElements = [
           ...getAllTreeViewFolderItems([item]),
-          ...getAllTreeViewProjectItems([item]),
+          ...getAllTreeViewNamespaceItems([item]),
         ];
 
         vmItems?.forEach(addDragEventListener);

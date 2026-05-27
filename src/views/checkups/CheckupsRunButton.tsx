@@ -15,7 +15,7 @@ import { createURL } from '@virtualmachines/details/tabs/overview/utils/utils';
 import SelfValidationCheckupRunButton from './self-validation/components/SelfValidationCheckupRunButton';
 import { useCheckupsStoragePermissions } from './storage/components/hooks/useCheckupsStoragePermissions';
 import { CHECKUP_URLS } from './utils/constants';
-import { getCurrentCheckupType, getSelectProjectText } from './utils/utils';
+import { getCurrentCheckupType, getSelectNamespaceText } from './utils/utils';
 
 const CheckupsRunButton: FC = () => {
   const namespace = useActiveNamespace();
@@ -84,7 +84,7 @@ const CheckupsRunButton: FC = () => {
 
   if (isAllNamespaces) {
     return (
-      <Tooltip content={getSelectProjectText(t)}>
+      <Tooltip content={getSelectNamespaceText(t)}>
         <span>{button}</span>
       </Tooltip>
     );

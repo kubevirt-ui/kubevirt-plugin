@@ -10,7 +10,7 @@ export type TLSCertConfig = {
   tlsCertConfigMapName?: string;
   tlsCertificate?: string;
   tlsCertificateRequired?: boolean;
-  tlsCertProject?: string;
+  tlsCertNamespace?: string;
   tlsCertSource?: TLSCertSourceType;
 };
 
@@ -47,29 +47,29 @@ export const getOrCreateTLSCertConfigMapName = async (
 ): Promise<string | undefined> => {
   if (!tlsConfig?.tlsCertificateRequired) return undefined;
 
-  const { cluster, tlsCertConfigMapName, tlsCertificate, tlsCertProject, tlsCertSource } =
+  const { cluster, tlsCertConfigMapName, tlsCertificate, tlsCertNamespace, tlsCertSource } =
     tlsConfig;
 
   const useExisting = tlsCertSource === TLS_CERT_SOURCE_EXISTING;
 
   if (useExisting && tlsCertConfigMapName?.trim()) {
     const trimmedName = tlsCertConfigMapName.trim();
-    if (tlsCertProject === targetNamespace) {
+    if (tlsCertNamespace === targetNamespace) {
       return trimmedName;
     }
-    if (!tlsCertProject) {
+    if (!tlsCertNamespace) {
       return undefined;
     }
     const sourceConfigMap = await kubevirtK8sGet<IoK8sApiCoreV1ConfigMap>({
       cluster,
       model: ConfigMapModel,
       name: trimmedName,
-      ns: tlsCertProject,
+      ns: tlsCertNamespace,
     });
     const certData = sourceConfigMap?.data?.[TLS_CERT_CONFIGMAP_KEY];
     if (!certData) {
       throw new Error(
-        `ConfigMap "${trimmedName}" in namespace "${tlsCertProject}" does not contain key "${TLS_CERT_CONFIGMAP_KEY}"`,
+        `ConfigMap "${trimmedName}" in namespace "${tlsCertNamespace}" does not contain key "${TLS_CERT_CONFIGMAP_KEY}"`,
       );
     }
     const newName = `tls-cert-${getRandomChars()}`;

@@ -11,7 +11,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import useKubevirtUserSettingsTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettingsTableColumns';
 import useNamespaceParam from '@kubevirt-utils/hooks/useNamespaceParam';
 import useSelectedRowFilterClusters from '@kubevirt-utils/hooks/useSelectedRowFilterClusters';
-import useSelectedRowFilterProjects from '@kubevirt-utils/hooks/useSelectedRowFilterProjects';
+import useSelectedRowFilterNamespaces from '@kubevirt-utils/hooks/useSelectedRowFilterNamespaces';
 import { TemplateOrRequest } from '@kubevirt-utils/resources/template/utils';
 import { ListPageProps } from '@kubevirt-utils/utils/types';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -40,7 +40,7 @@ const VirtualMachineTemplatesList: FC<ListPageProps> = ({
   showTitle = true,
 }) => {
   const selectedClusters = useSelectedRowFilterClusters();
-  const selectedProjects = useSelectedRowFilterProjects();
+  const selectedNamespaces = useSelectedRowFilterNamespaces();
   const namespaceParam = useNamespaceParam();
   const isAllClustersPage = useIsAllClustersPage();
 
@@ -107,7 +107,7 @@ const VirtualMachineTemplatesList: FC<ListPageProps> = ({
     !error &&
     isEmpty(allTemplatesWithRequests) &&
     isEmpty(selectedClusters) &&
-    isEmpty(selectedProjects)
+    isEmpty(selectedNamespaces)
   ) {
     return <VirtualMachineTemplatesEmptyState />;
   }

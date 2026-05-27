@@ -18,7 +18,7 @@ type UseCloneVM = () => () => Promise<void>;
 const useCloneVM: UseCloneVM = () => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
-  const { cluster, project: targetNamespace, vmDescription, vmName } = useVMWizardStore();
+  const { cluster, namespace: targetNamespace, vmDescription, vmName } = useVMWizardStore();
 
   const source = vmSignal.value;
 

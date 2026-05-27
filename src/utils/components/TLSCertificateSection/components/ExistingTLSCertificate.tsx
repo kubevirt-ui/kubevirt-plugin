@@ -3,7 +3,7 @@ import React, { FC } from 'react';
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import useProjects from '@kubevirt-utils/hooks/useProjects';
+import useNamespaces from '@kubevirt-utils/hooks/useNamespaces';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { Alert, Flex, FlexItem, FormGroup } from '@patternfly/react-core';
 
@@ -14,7 +14,7 @@ type ExistingTLSCertificateProps = {
   namespace: string;
   onChange: (namespace: string, configMapName: string) => void;
   selectedConfigMapName?: null | string;
-  selectedProject?: null | string;
+  selectedNamespace?: null | string;
 };
 
 const ExistingTLSCertificate: FC<ExistingTLSCertificateProps> = ({
@@ -22,26 +22,26 @@ const ExistingTLSCertificate: FC<ExistingTLSCertificateProps> = ({
   namespace,
   onChange,
   selectedConfigMapName,
-  selectedProject,
+  selectedNamespace,
 }) => {
   const { t } = useKubevirtTranslation();
 
-  const certProject = selectedProject || namespace;
+  const certNamespace = selectedNamespace || namespace;
   const selectedConfigMap = selectedConfigMapName || '';
 
-  const [projectNames, projectsLoaded] = useProjects(cluster);
+  const [namespaceNames, namespacesLoaded] = useNamespaces(cluster);
   const [tlsCertConfigMaps, certMapsLoaded, certMapsError] = useTLSCertConfigMaps(
-    certProject,
+    certNamespace,
     cluster,
   );
 
   return (
     <Flex direction={{ default: 'row' }} gap={{ default: 'gapMd' }}>
       <FlexItem grow={{ default: 'grow' }}>
-        <FormGroup label={t('Project')}>
-          {projectsLoaded ? (
+        <FormGroup label={t('Namespace')}>
+          {namespacesLoaded ? (
             <InlineFilterSelect
-              options={projectNames?.map((name) => ({
+              options={namespaceNames?.map((name) => ({
                 children: name,
                 value: name,
               }))}
@@ -51,8 +51,8 @@ const ExistingTLSCertificate: FC<ExistingTLSCertificateProps> = ({
               toggleProps={{
                 isFullWidth: true,
               }}
-              placeholder={t('Select project...')}
-              selected={certProject || ''}
+              placeholder={t('Select namespace...')}
+              selected={certNamespace || ''}
             />
           ) : (
             <Loading />
@@ -71,7 +71,7 @@ const ExistingTLSCertificate: FC<ExistingTLSCertificateProps> = ({
                 return { children: name, value: name };
               })}
               setSelected={(name: string) => {
-                onChange(certProject, name);
+                onChange(certNamespace, name);
               }}
               toggleProps={{
                 isFullWidth: true,

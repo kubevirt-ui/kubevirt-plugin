@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 
-import { ALL_PROJECTS } from '@kubevirt-utils/hooks/constants';
+import { ALL_NAMESPACES } from '@kubevirt-utils/hooks/constants';
 import useInstanceTypesAndPreferences from '@kubevirt-utils/hooks/useInstanceTypesAndPreferences';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -25,15 +25,15 @@ const BootSourceStep: FC = () => {
   const { t } = useKubevirtTranslation();
   const isAdmin = useIsAdmin();
   const { setUseBootSource, useBootSource, volumeListNamespace } = useInstanceTypeVMStore();
-  const { project } = useVMWizardStore();
+  const { namespace } = useVMWizardStore();
   const instanceTypesAndPreferencesData = useInstanceTypesAndPreferences(
-    getValidNamespace(project),
+    getValidNamespace(namespace),
   );
 
   // For non-admin users with no explicit selection, always scope to the OS images
   // namespace — they cannot do cluster-wide watches. Respect any explicit selection.
   const effectiveNamespace =
-    isAdmin || (volumeListNamespace && volumeListNamespace !== ALL_PROJECTS)
+    isAdmin || (volumeListNamespace && volumeListNamespace !== ALL_NAMESPACES)
       ? volumeListNamespace
       : OS_IMAGES_NS;
   const bootableVolumesData = useBootableVolumes(effectiveNamespace);

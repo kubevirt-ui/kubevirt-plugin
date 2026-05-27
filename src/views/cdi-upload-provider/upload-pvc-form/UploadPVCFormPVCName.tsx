@@ -31,7 +31,7 @@ const UploadPVCFormPVCName: FC<UploadPVCFormPVCNameProps> = ({
       />
       <FormHelperText>
         <HelperText id="pvc-name-help">
-          {t('A unique name for the storage claim within the project')}
+          {t('A unique name for the storage claim within the namespace')}
         </HelperText>
       </FormHelperText>
     </FormGroup>

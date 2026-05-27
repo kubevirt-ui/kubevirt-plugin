@@ -8,7 +8,7 @@ import { StackItem } from '@patternfly/react-core';
 const DynamicSSHKeyInjectionDescription = ({ isDynamicSSHInjectionEnabled }) => {
   const { t } = useKubevirtTranslation();
 
-  if (isDynamicSSHInjectionEnabled) return <>{t('Store the key in a project secret.')}</>;
+  if (isDynamicSSHInjectionEnabled) return <>{t('Store the key in a namespace secret.')}</>;
 
   return (
     <StackItem className="pf-v6-u-text-color-subtle">

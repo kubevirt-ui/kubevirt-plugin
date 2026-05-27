@@ -11,14 +11,14 @@ import useIsACMPage from '@multicluster/useIsACMPage';
 import { useLastNamespace } from '@openshift-console/dynamic-plugin-sdk-internal';
 import { TEXT_FILTER_LABELS_ID } from '@virtualmachines/list/hooks/constants';
 
-import { FOLDER_SELECTOR_PREFIX, HIDE, SHOW_EMPTY_PROJECTS_KEY } from '../../utils/constants';
+import { FOLDER_SELECTOR_PREFIX, HIDE, SHOW_EMPTY_NAMESPACES_KEY } from '../../utils/constants';
 import { getVMInfoFromPathname, getVMTreeViewItemID } from '../../utils/utils';
 import useTreeViewSelect from '../useTreeViewSelect';
 
 import {
   getClusterTreeItem,
-  getProjectTreeItem,
-  isProjectVisibleInTree,
+  getNamespaceTreeItem,
+  isNamespaceVisibleInTree,
   UseAutoSelectTreeViewItemProps,
 } from './utils';
 
@@ -37,7 +37,7 @@ const useAutoSelectTreeViewItem = ({
   const location = useLocation();
   const cluster = useClusterParam();
   const { ns } = useParams<{ ns: string }>();
-  const [showEmptyProjects] = useLocalStorage(SHOW_EMPTY_PROJECTS_KEY, HIDE);
+  const [showEmptyNamespaces] = useLocalStorage(SHOW_EMPTY_NAMESPACES_KEY, HIDE);
 
   // Select VM tree view item based on path
   useEffect(() => {
@@ -47,7 +47,7 @@ const useAutoSelectTreeViewItem = ({
     }
   }, [location.pathname, dataMap, setSelected]);
 
-  // Select cluster or project tree view item when on ACM page (only when not viewing a specific VM)
+  // Select cluster or namesspace tree view item when on ACM page (only when not viewing a specific VM)
   useEffect(() => {
     if (!isACMPage) return;
 
@@ -59,11 +59,11 @@ const useAutoSelectTreeViewItem = ({
       const hasFolderFilter = searchParams.has(TEXT_FILTER_LABELS_ID);
       if (selected?.id?.startsWith(folderPrefix) && hasFolderFilter) return;
 
-      const projectTreeItem = getProjectTreeItem(dataMap, cluster, ns);
+      const namespaceTreeItem = getNamespaceTreeItem(dataMap, cluster, ns);
 
-      if (projectTreeItem && isProjectVisibleInTree(projectTreeItem, showEmptyProjects)) {
-        if (selected?.id !== projectTreeItem.id) {
-          setSelected(projectTreeItem);
+      if (namespaceTreeItem && isNamespaceVisibleInTree(namespaceTreeItem, showEmptyNamespaces)) {
+        if (selected?.id !== namespaceTreeItem.id) {
+          setSelected(namespaceTreeItem);
         }
         return;
       }
@@ -92,7 +92,7 @@ const useAutoSelectTreeViewItem = ({
     searchParams,
     selected?.id,
     setSelected,
-    showEmptyProjects,
+    showEmptyNamespaces,
   ]);
 
   // Select namespace based on current URL and filter state
@@ -114,16 +114,16 @@ const useAutoSelectTreeViewItem = ({
      * Selects the tree node for the current namespace (ns) if it is visible in the tree.
      * Navigates to the all-namespaces list and selects the root node when:
      *  - ns is undefined (all-namespaces URL), or
-     *  - the namespace has no VMs and the "show only projects with VMs" filter hides it.
+     *  - the namespace has no VMs and the "show only namespaces with VMs" filter hides it.
      * navigate() and selectAllNamespaces() always run together so the URL and tree
      * selection stay in sync.
      */
     const selectNamespaceOrFallback = (): void => {
       if (ns) {
-        const projectTreeItem = getProjectTreeItem(dataMap, SINGLE_CLUSTER_KEY, ns);
+        const namespaceTreeItem = getNamespaceTreeItem(dataMap, SINGLE_CLUSTER_KEY, ns);
 
-        if (projectTreeItem && isProjectVisibleInTree(projectTreeItem, showEmptyProjects)) {
-          setSelected(projectTreeItem);
+        if (namespaceTreeItem && isNamespaceVisibleInTree(namespaceTreeItem, showEmptyNamespaces)) {
+          setSelected(namespaceTreeItem);
           return;
         }
 
@@ -141,9 +141,9 @@ const useAutoSelectTreeViewItem = ({
     // Always redirect away from a namespace that is hidden by the filter, even when
     // the URL already matches the selection (e.g. filter toggled while on the page).
     if (ns) {
-      const projectTreeItem = getProjectTreeItem(dataMap, SINGLE_CLUSTER_KEY, ns);
+      const namespaceTreeItem = getNamespaceTreeItem(dataMap, SINGLE_CLUSTER_KEY, ns);
 
-      if (projectTreeItem && !isProjectVisibleInTree(projectTreeItem, showEmptyProjects)) {
+      if (namespaceTreeItem && !isNamespaceVisibleInTree(namespaceTreeItem, showEmptyNamespaces)) {
         selectNamespaceOrFallback();
         return;
       }
@@ -165,7 +165,7 @@ const useAutoSelectTreeViewItem = ({
     selected?.id,
     setLastNamespace,
     setSelected,
-    showEmptyProjects,
+    showEmptyNamespaces,
   ]);
 
   return {

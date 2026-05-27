@@ -1,6 +1,6 @@
 import {
   CLUSTER_LIST_FILTER_TYPE,
-  PROJECT_LIST_FILTER_TYPE,
+  NAMESPACE_LIST_FILTER_TYPE,
   ROW_FILTERS_PREFIX,
 } from '@kubevirt-utils/utils/constants';
 
@@ -27,7 +27,7 @@ export enum VirtualMachineRowFilterType {
   Name = 'name',
   Node = 'node',
   OS = 'os',
-  Project = PROJECT_LIST_FILTER_TYPE,
+  Namespace = NAMESPACE_LIST_FILTER_TYPE,
   Scheduling = 'scheduling',
   Status = 'status',
   StorageClass = 'storageClass',

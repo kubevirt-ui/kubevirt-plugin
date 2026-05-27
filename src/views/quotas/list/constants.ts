@@ -10,5 +10,5 @@ export enum QuotaColumn {
 
 export enum QuotaScope {
   CLUSTER = 'cluster',
-  PROJECT = 'project',
+  NAMESPACE = 'namespace',
 }

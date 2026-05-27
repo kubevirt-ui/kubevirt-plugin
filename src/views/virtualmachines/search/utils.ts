@@ -7,12 +7,12 @@ import { VirtualMachineRowFilterType } from '@virtualmachines/utils/constants';
 export const getTooltipContent = (filterType: VirtualMachineRowFilterType, t: TFunction) => {
   if (filterType === VirtualMachineRowFilterType.Cluster) {
     return t(
-      'Cluster is already selected. To update filters, choose another project or cluster in the tree view.',
+      'Cluster is already selected. To update filters, choose another namespace or cluster in the tree view.',
     );
   }
-  if (filterType === VirtualMachineRowFilterType.Project) {
+  if (filterType === VirtualMachineRowFilterType.Namespace) {
     return t(
-      'Project is already selected. To update filters, choose another project or cluster in the tree view.',
+      'Namespace is already selected. To update filters, choose another namespace or cluster in the tree view.',
     );
   }
   return null;

@@ -1,7 +1,6 @@
 import React, { Dispatch, FC, SetStateAction, useCallback, useEffect, useState } from 'react';
 
-import { modelToGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { useProjectOrNamespaceModel } from '@kubevirt-utils/hooks/useProjectOrNamespaceModel';
+import { modelToGroupVersionKind, NamespaceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { IoK8sApiCoreV1Secret } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
@@ -12,7 +11,7 @@ import {
 } from '@kubevirt-utils/components/SSHSecretModal/utils/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useNamespaceParam from '@kubevirt-utils/hooks/useNamespaceParam';
-import useProjects from '@kubevirt-utils/hooks/useProjects';
+import useNamespaces from '@kubevirt-utils/hooks/useNamespaces';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   Alert,
@@ -32,48 +31,48 @@ import './SSHOptionUseExisting.scss';
 
 type SSHOptionUseExistingProps = {
   cluster?: string;
-  localNSProject: string;
+  localNamespace: string;
   namespace?: string;
-  projectsWithSecrets: { [namespace: string]: IoK8sApiCoreV1Secret[] };
+  namespacesWithSecrets: { [namespace: string]: IoK8sApiCoreV1Secret[] };
   secrets: IoK8sApiCoreV1Secret[];
   secretsLoaded: boolean;
-  setLocalNSProject: Dispatch<SetStateAction<string>>;
+  setLocalNamespace: Dispatch<SetStateAction<string>>;
   setSSHDetails: Dispatch<SetStateAction<SSHSecretDetails>>;
   sshDetails: SSHSecretDetails;
 };
 
 const SSHOptionUseExisting: FC<SSHOptionUseExistingProps> = ({
   cluster,
-  localNSProject,
+  localNamespace,
   namespace,
-  projectsWithSecrets,
+  namespacesWithSecrets,
   secrets,
   secretsLoaded,
-  setLocalNSProject,
+  setLocalNamespace,
   setSSHDetails,
   sshDetails,
 }) => {
   const { t } = useKubevirtTranslation();
   const activeNamespace = useNamespaceParam();
   const [nameErrorMessage, setNameErrorMessage] = useState<string>(null);
-  const [selectedProject, setSelectedProject] = useState<string>(
-    localNSProject || namespace || sshDetails?.sshSecretNamespace,
+  const [selectedNamespace, setSelectedNamespace] = useState<string>(
+    localNamespace || namespace || sshDetails?.sshSecretNamespace,
   );
-  const [userProjects] = useProjects(cluster, true);
+  const [userNamespaces] = useNamespaces(cluster, true);
 
   useEffect(() => {
-    if (!selectedProject) {
-      setSelectedProject(
-        localNSProject || namespace || sshDetails?.sshSecretNamespace || userProjects?.[0],
+    if (!selectedNamespace) {
+      setSelectedNamespace(
+        localNamespace || namespace || sshDetails?.sshSecretNamespace || userNamespaces?.[0],
       );
     }
-  }, [namespace, localNSProject, userProjects, selectedProject, sshDetails?.sshSecretNamespace]);
+  }, [namespace, localNamespace, userNamespaces, selectedNamespace, sshDetails?.sshSecretNamespace]);
 
-  const onSelectProject = useCallback(
-    (newProject: string) => {
-      setSelectedProject(newProject);
-      setLocalNSProject(newProject);
-      const addNew = addNewSecret(namespace, newProject, activeNamespace);
+  const onSelectNamespace = useCallback(
+    (newNamespace: string) => {
+      setSelectedNamespace(newNamespace);
+      setLocalNamespace(newNamespace);
+      const addNew = addNewSecret(namespace, newNamespace, activeNamespace);
       setSSHDetails((prev) => ({
         ...prev,
         secretOption: addNew ? SecretSelectionOption.addNew : SecretSelectionOption.useExisting,
@@ -82,7 +81,7 @@ const SSHOptionUseExisting: FC<SSHOptionUseExistingProps> = ({
         sshSecretNamespace: namespace,
       }));
     },
-    [setLocalNSProject, namespace, activeNamespace, setSSHDetails],
+    [setLocalNamespace, namespace, activeNamespace, setSSHDetails],
   );
 
   const onSelectSecret = (generatedSecretName: string) => {
@@ -98,35 +97,34 @@ const SSHOptionUseExisting: FC<SSHOptionUseExistingProps> = ({
   };
 
   const showNewSecretNameField = namespace
-    ? selectedProject !== namespace
-    : selectedProject !== sshDetails?.sshSecretNamespace;
+    ? selectedNamespace !== namespace
+    : selectedNamespace !== sshDetails?.sshSecretNamespace;
 
-  if (isEmpty(userProjects)) return <Bullseye>{t('No SSH keys found')}</Bullseye>;
+  if (isEmpty(userNamespaces)) return <Bullseye>{t('No SSH keys found')}</Bullseye>;
 
-  const model = useProjectOrNamespaceModel();
   return (
     <>
       <Alert
         title={t(
-          'Select a secret from a different project to copy the secret to your current project.',
+          'Select a secret from a different namespace to copy the secret to your current namespace.',
         )}
         isInline
         variant={AlertVariant.info}
       />
       <Grid className="ssh-use-existing__body">
         <GridItem span={6}>
-          <FormGroup fieldId="project" label={t('Project')}>
+          <FormGroup fieldId="namespace" label={t('Namespace')}>
             <InlineFilterSelect
-              options={userProjects.map((project) => ({
-                children: project,
-                groupVersionKind: modelToGroupVersionKind(model),
-                value: project,
+              options={userNamespaces.map((namespace) => ({
+                children: namespace,
+                groupVersionKind: modelToGroupVersionKind(NamespaceModel),
+                value: namespace,
               }))}
-              className="ssh-use-existing__form-group--project"
-              data-test="ssh-use-existing-project"
-              placeholder={t('Select project')}
-              selected={selectedProject}
-              setSelected={onSelectProject}
+              className="ssh-use-existing__form-group--namespace"
+              data-test="ssh-use-existing-namespace"
+              placeholder={t('Select namespace')}
+              selected={selectedNamespace}
+              setSelected={onSelectNamespace}
               toggleProps={{ isFullWidth: true }}
             />
           </FormGroup>
@@ -142,8 +140,8 @@ const SSHOptionUseExisting: FC<SSHOptionUseExistingProps> = ({
               <SecretDropdown
                 namespace={namespace}
                 onSelectSecret={onSelectSecret}
-                selectedProject={selectedProject}
-                selectedProjectSecrets={projectsWithSecrets?.[selectedProject]}
+                selectedNamespace={selectedNamespace}
+                selectedNamespaceSecrets={namespacesWithSecrets?.[selectedNamespace]}
                 setSSHDetails={setSSHDetails}
                 sshDetails={sshDetails}
               />

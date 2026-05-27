@@ -11,7 +11,7 @@ import { Button, ButtonVariant, Tooltip } from '@patternfly/react-core';
 import { useHubClusterName } from '@stolostron/multicluster-sdk';
 
 import { CHECKUP_URLS } from '../../utils/constants';
-import { getSelectProjectText } from '../../utils/utils';
+import { getSelectNamespaceText } from '../../utils/utils';
 
 import {
   getActionState,
@@ -84,7 +84,7 @@ const SelfValidationCheckupRunButton: FC = () => {
 
   if (isAllNamespaces) {
     return (
-      <Tooltip content={getSelectProjectText(t)}>
+      <Tooltip content={getSelectNamespaceText(t)}>
         <span>{button}</span>
       </Tooltip>
     );

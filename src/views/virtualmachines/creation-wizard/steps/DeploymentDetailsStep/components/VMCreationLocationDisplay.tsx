@@ -16,7 +16,7 @@ const VMCreationLocationDisplay: FC<VMCreationLocationDisplayProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const isACMPage = useIsACMPage();
-  const { cluster, folder, project } = useVMWizardStore();
+  const { cluster, folder, namespace } = useVMWizardStore();
 
   return (
     <>
@@ -27,8 +27,8 @@ const VMCreationLocationDisplay: FC<VMCreationLocationDisplayProps> = ({
           <span className="pf-v6-u-font-weight-bold pf-v6-u-mx-xs">{'>'}</span>
         </span>
       )}
-      <span className="pf-v6-u-font-weight-bold pf-v6-u-mr-xs">{t('Project')}</span>
-      {project || NO_DATA_DASH}
+      <span className="pf-v6-u-font-weight-bold pf-v6-u-mr-xs">{t('Namespace')}</span>
+      {namespace || NO_DATA_DASH}
       <span className="pf-v6-u-font-weight-bold pf-v6-u-mx-xs">{'>'}</span>
       <span className="pf-v6-u-font-weight-bold pf-v6-u-mr-xs">{t('Folder')}</span>
       {folder || NO_DATA_DASH}

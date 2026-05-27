@@ -14,13 +14,13 @@ import {
 import { getAllowedResources, getAllowedTemplateResources } from '@kubevirt-utils/resources/shared';
 import { TEMPLATE_TYPE_LABEL } from '@kubevirt-utils/resources/template';
 
-import { useProjectNames } from './useProjectNames';
+import { useNamespaceNames } from './useNamespaceNames';
 
 const useNonAdminResourcesInventoryCard = () => {
-  const projectNames = useProjectNames();
-  const allowedVMResources = getAllowedResources(projectNames, VirtualMachineModel);
-  const allowedNADResources = getAllowedResources(projectNames, NetworkAttachmentDefinitionModel);
-  const allowedTemplateResources = getAllowedTemplateResources(projectNames);
+  const namespaceNames = useNamespaceNames();
+  const allowedVMResources = getAllowedResources(namespaceNames, VirtualMachineModel);
+  const allowedNADResources = getAllowedResources(namespaceNames, NetworkAttachmentDefinitionModel);
+  const allowedTemplateResources = getAllowedTemplateResources(namespaceNames);
 
   const watchedResources = {
     ...allowedVMResources,

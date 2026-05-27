@@ -122,10 +122,10 @@ export class ResourceListPage {
   }
 
   /**
-   * Switch the active project/namespace using the OpenShift Console namespace-bar
-   * dropdown. Clicks the toggle, types the project name to filter, then selects it.
+   * Switch the active namespace using the OpenShift Console namespace-bar
+   * dropdown. Clicks the toggle, types the namespace name to filter, then selects it.
    */
-  async switchProject(ns: string) {
+  async switchNamespace(ns: string) {
     await this.page.locator('.co-namespace-dropdown__menu-toggle').click();
     const searchInput = byTest(this.page, DROPDOWN_TEXT_FILTER);
     await searchInput.waitFor({ state: 'visible', timeout: SHORT_TIMEOUT });

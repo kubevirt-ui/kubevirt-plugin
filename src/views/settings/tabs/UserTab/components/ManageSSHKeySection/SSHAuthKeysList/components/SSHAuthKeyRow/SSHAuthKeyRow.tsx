@@ -1,7 +1,6 @@
 import React, { FC, useCallback } from 'react';
 
-import { modelToGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { useProjectOrNamespaceModel } from '@kubevirt-utils/hooks/useProjectOrNamespaceModel';
+import { modelToGroupVersionKind, NamespaceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import { isEqualObject } from '@kubevirt-utils/components/NodeSelectorModal/utils/helpers';
 import {
@@ -16,7 +15,7 @@ import { MinusCircleIcon } from '@patternfly/react-icons';
 import { useSettingsCluster } from '@settings/context/SettingsClusterContext';
 
 import { AuthKeyRow } from '../../utils/types';
-import AddProjectAuthKeyButton from '../AddProjectAuthKeyButton/AddProjectAuthKeyButton';
+import AddNamespaceAuthKeyButton from '../AddNamespaceAuthKeyButton/AddNamespaceAuthKeyButton';
 
 import './SSHAuthKeyRow.scss';
 
@@ -25,7 +24,7 @@ type SSHAuthKeyRowProps = {
   onAuthKeyChange: (updatedKey: AuthKeyRow) => void;
   onAuthKeyDelete: (keyToRemove: AuthKeyRow) => void;
   row: AuthKeyRow;
-  selectableProjects: string[];
+  selectableNamespaces: string[];
 };
 
 const SSHAuthKeyRow: FC<SSHAuthKeyRowProps> = ({
@@ -33,12 +32,11 @@ const SSHAuthKeyRow: FC<SSHAuthKeyRowProps> = ({
   onAuthKeyChange,
   onAuthKeyDelete,
   row,
-  selectableProjects,
+  selectableNamespaces,
 }) => {
   const { t } = useKubevirtTranslation();
   const cluster = useSettingsCluster();
-  const model = useProjectOrNamespaceModel();
-  const { projectName, secretName } = row;
+  const { namespaceName, secretName } = row;
 
   const onSubmit = useCallback(
     (sshDetails: SSHSecretDetails) => {
@@ -71,41 +69,41 @@ const SSHAuthKeyRow: FC<SSHAuthKeyRowProps> = ({
       ) {
         const updatedRow = { ...row, secretName: sshSecretName };
         onAuthKeyChange(updatedRow);
-        return createSSHSecret(sshPubKey, sshSecretName, projectName, cluster);
+        return createSSHSecret(sshPubKey, sshSecretName, namespaceName, cluster);
       }
     },
-    [cluster, secretName, row, onAuthKeyChange, projectName],
+    [cluster, secretName, row, onAuthKeyChange, namespaceName],
   );
 
   return (
     <Grid className="pf-v6-u-mb-sm">
-      <GridItem className="ssh-auth-row__project-name" span={5}>
+      <GridItem className="ssh-auth-row__namespace-name" span={5}>
         {isEmpty(secretName) ? (
           <InlineFilterSelect
-            options={selectableProjects?.sort().map((opt) => ({
+            options={selectableNamespaces?.sort().map((opt) => ({
               children: opt,
-              groupVersionKind: modelToGroupVersionKind(model),
+              groupVersionKind: modelToGroupVersionKind(NamespaceModel),
               value: opt,
             }))}
             toggleProps={{
-              'data-test-id': 'select-project-toggle',
+              'data-test-id': 'select-namespace-toggle',
               isFullWidth: true,
             }}
-            placeholder={t('Select project')}
-            selected={projectName}
-            setSelected={(newProject) => onAuthKeyChange({ ...row, projectName: newProject })}
+            placeholder={t('Select namespace')}
+            selected={namespaceName}
+            setSelected={(newNamespace) => onAuthKeyChange({ ...row, namespaceName: newNamespace })}
           />
         ) : (
-          <Truncate content={projectName} />
+          <Truncate content={namespaceName} />
         )}
       </GridItem>
       <GridItem span={1} />
       <GridItem className="ssh-auth-row__edit-button" data-test="configure-ssh-key" span={5}>
-        <AddProjectAuthKeyButton
+        <AddNamespaceAuthKeyButton
           cluster={cluster}
           onSubmit={onSubmit}
           secretName={secretName}
-          selectedProject={projectName}
+          selectedNamespace={namespaceName}
         />
       </GridItem>
       <GridItem span={1}>

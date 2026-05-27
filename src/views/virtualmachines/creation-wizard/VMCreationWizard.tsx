@@ -40,10 +40,10 @@ const VMCreationWizard: FC = () => {
   const {
     creationMethod,
     markStepVisited,
-    project,
+    namespace,
     resetWizardState,
     setCluster,
-    setProject,
+    setNamespace,
     setTemplatesDrawerIsOpen,
   } = useVMWizardStore();
   const syncDescription = useSyncDescription();
@@ -54,28 +54,26 @@ const VMCreationWizard: FC = () => {
   const closeWizard = useCloseWizard();
   const isAdmin = useIsAdmin();
   const [activeNamespace] = useActiveNamespace();
-  const namespace = getValidNamespace(activeNamespace);
+  const activeValidNamespace = getValidNamespace(activeNamespace);
 
   useEffect(() => {
     if (!hasInitialized.current) {
-      const currentProject = project; // capture before resetWizardState clears it
+      const currentNamespace = activeValidNamespace;
       resetWizardState();
       setTemplatesDrawerIsOpen(false);
 
       setCluster(clusterParam);
-      // Non-admin: always use the active namespace.
-      // Admin: keep their previously selected project if set, otherwise use the active namespace.
-      setProject(!isAdmin ? namespace : currentProject || namespace);
+      setNamespace(!isAdmin ? activeValidNamespace : currentNamespace || activeValidNamespace);
       hasInitialized.current = true;
     }
   }, [
     clusterParam,
     isAdmin,
     namespace,
-    project,
+    activeValidNamespace,
     resetWizardState,
     setCluster,
-    setProject,
+    setNamespace,
     setTemplatesDrawerIsOpen,
   ]);
 

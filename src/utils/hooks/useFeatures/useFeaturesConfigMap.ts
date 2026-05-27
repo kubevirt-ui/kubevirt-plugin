@@ -1,6 +1,6 @@
 import { ConfigMapModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
-import { operatorNamespaceSignal } from '@kubevirt-utils/store/operatorNamespace';
+import { OPERATOR_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 import { getGroupVersionKindForModel, WatchK8sResult } from '@openshift-console/dynamic-plugin-sdk';
 
@@ -18,18 +18,19 @@ type UseFeaturesConfigMap = (
 
 const useFeaturesConfigMap: UseFeaturesConfigMap = (cluster, enableQuery: boolean = true) => {
   const isAdmin = useIsAdmin();
-  const operatorNamespace = operatorNamespaceSignal.value;
 
   const featuresConfigMapData = useK8sWatchData<IoK8sApiCoreV1ConfigMap>(
-    enableQuery &&
-      operatorNamespace && {
-        cluster,
-        groupVersionKind: getGroupVersionKindForModel(ConfigMapModel),
-        isList: false,
-        name: FEATURES_CONFIG_MAP_NAME,
-        namespace: operatorNamespace,
-      },
+    enableQuery
+      ? {
+          cluster,
+          groupVersionKind: getGroupVersionKindForModel(ConfigMapModel),
+          isList: false,
+          name: FEATURES_CONFIG_MAP_NAME,
+          namespace: OPERATOR_NAMESPACE,
+        }
+      : null,
   );
+
   return { featuresConfigMapData: [...featuresConfigMapData], isAdmin };
 };
 

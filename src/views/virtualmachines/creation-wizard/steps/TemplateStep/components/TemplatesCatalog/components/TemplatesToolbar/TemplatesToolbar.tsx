@@ -2,7 +2,7 @@ import React, { FC } from 'react';
 
 import { OnFilterChange } from '@openshift-console/dynamic-plugin-sdk';
 import { Split, SplitItem } from '@patternfly/react-core';
-import { TemplatesCatalogProjectsDropdown } from '@virtualmachines/creation-wizard/steps/TemplateStep/components/TemplatesCatalog/components/TemplatesToolbar/components/TemplatesCatalogProjectsDropdown/TemplatesCatalogProjectsDropdown';
+import { TemplatesCatalogNamespacesDropdown } from '@virtualmachines/creation-wizard/steps/TemplateStep/components/TemplatesCatalog/components/TemplatesToolbar/components/TemplatesCatalogNamespacesDropdown/TemplatesCatalogNamespacesDropdown';
 import TemplatesCatalogStyleToggle from '@virtualmachines/creation-wizard/steps/TemplateStep/components/TemplatesCatalog/components/TemplatesToolbar/components/TemplatesCatalogStyleToggle';
 import TemplatesSearchInput from '@virtualmachines/creation-wizard/steps/TemplateStep/components/TemplatesCatalog/components/TemplatesToolbar/components/TemplatesSearchInput';
 
@@ -24,7 +24,7 @@ const TemplatesToolbar: FC<TemplatesToolbarProps> = ({
   return (
     <Split hasGutter>
       <SplitItem>
-        <TemplatesCatalogProjectsDropdown onChange={setNamespace} selectedProject={namespace} />
+        <TemplatesCatalogNamespacesDropdown onChange={setNamespace} selectedNamespace={namespace} />
       </SplitItem>
       <SplitItem>
         <TemplatesSearchInput onFilterChange={onFilterChange} />

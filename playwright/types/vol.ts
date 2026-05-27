@@ -3,7 +3,7 @@ export type volData = {
   iso?: boolean;
   name?: string;
   preference?: string;
-  project?: string;
+  namespace?: string;
   pvcName?: string;
   registryURL?: string;
   sourceType?: string;

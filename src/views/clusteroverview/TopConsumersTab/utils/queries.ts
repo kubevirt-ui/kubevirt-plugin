@@ -34,7 +34,7 @@ const topConsumerQueries = {
     [Metric.VCPU_WAIT.getValue()]: (numItemsToShow, duration, namespaceFilter) =>
       `sort_desc(topk(${numItemsToShow}, sum(rate(kubevirt_vmi_vcpu_wait_seconds_total${namespaceFilter}[${duration}])) by (node))) > 0`,
   },
-  [Scope.PROJECT.getValue()]: {
+  [Scope.NAMESPACE.getValue()]: {
     [Metric.CPU.getValue()]: (numItemsToShow, duration, clusterFilter) =>
       `sort_desc(topk(${numItemsToShow}, sum(rate(kubevirt_vmi_cpu_usage_seconds_total${clusterFilter}[${duration}])) by (namespace))) > 0`,
     [Metric.MEMORY_SWAP_TRAFFIC.getValue()]: (numItemsToShow, _duration, clusterFilter) =>
@@ -90,9 +90,9 @@ export const getTopConsumerQuery = (
   const clusterFilterString = clusterFilter ? `{${clusterFilter}}` : '';
   const namespaceFilter = getNamespaceFilter(namespace || '', clusterFilter);
 
-  // PROJECT scope aggregates by namespace, so it uses clusterFilter directly
+  // NAMESPACE scope aggregates by namespace, so it uses clusterFilter directly
   // NODE and VM scopes use namespaceFilter which includes both namespace and cluster
-  return scope === Scope.PROJECT.getValue()
+  return scope === Scope.NAMESPACE.getValue()
     ? topConsumerQueries?.[scope]?.[metric]?.(numItemsToShow, duration, clusterFilterString)
     : topConsumerQueries?.[scope]?.[metric]?.(numItemsToShow, duration, namespaceFilter);
 };

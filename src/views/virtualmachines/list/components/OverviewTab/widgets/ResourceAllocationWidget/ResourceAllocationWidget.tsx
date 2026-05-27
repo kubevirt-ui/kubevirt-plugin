@@ -13,7 +13,7 @@ import {
   MetricQuotaData,
   UNIT_GIB,
   UNIT_VCPU,
-} from './hooks/useProjectResourceQuota';
+} from './hooks/useNamespaceResourceQuota';
 import { TopClustersMetricData } from './hooks/useTopClustersChartData';
 import { EMPTY_METRIC_DATA, formatBinaryValue, toMetricChartData } from './utils/utils';
 
@@ -26,7 +26,7 @@ type ResourceAllocationWidgetProps = {
   metric: string;
   /** Single aggregated metric data (used when NOT in all-clusters mode). */
   metricChartData?: MetricChartData;
-  /** Quota data for the project-level footer and chart lines. */
+  /** Quota data for the namespace-level footer and chart lines. */
   quotaData?: MetricQuotaData;
   subtitle: ReactNode;
   title: string;

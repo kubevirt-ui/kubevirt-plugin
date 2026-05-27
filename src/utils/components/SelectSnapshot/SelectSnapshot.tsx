@@ -35,14 +35,14 @@ const SelectSnapshot: FC<SelectSnapshotProps> = ({
   snapshotNamespaceSelected,
 }) => {
   const { t } = useKubevirtTranslation();
-  const { projectsLoaded, projectsNames, snapshots, snapshotsLoaded } = useSnapshots(
+  const { namespacesLoaded, namespacesNames, snapshots, snapshotsLoaded } = useSnapshots(
     snapshotNamespaceSelected,
     cluster,
   );
 
-  const onSelectProject = useCallback(
-    (newProject) => {
-      selectSnapshotNamespace && selectSnapshotNamespace(newProject);
+  const onSelectNamespace = useCallback(
+    (newNamespace) => {
+      selectSnapshotNamespace && selectSnapshotNamespace(newNamespace);
       selectSnapshotName(undefined);
       setDiskSize(initialBootableVolumeState.size);
     },
@@ -65,15 +65,15 @@ const SelectSnapshot: FC<SelectSnapshotProps> = ({
 
   return (
     <div>
-      {projectsLoaded ? (
+      {namespacesLoaded ? (
         <FormGroup
           className="snapshot-selection-formgroup"
-          fieldId="snapshot-project-select"
+          fieldId="snapshot-namespace-select"
           isRequired
-          label={t('VolumeSnapshot project')}
+          label={t('VolumeSnapshot namespace')}
         >
           <InlineFilterSelect
-            options={projectsNames.map((name) => ({
+            options={namespacesNames.map((name) => ({
               children: name,
               groupVersionKind: modelToGroupVersionKind(NamespaceModel),
               value: name,
@@ -82,9 +82,9 @@ const SelectSnapshot: FC<SelectSnapshotProps> = ({
               isDisabled: !selectSnapshotNamespace,
               isFullWidth: true,
             }}
-            placeholder={t('Select VolumeSnapshot project')}
+            placeholder={t('Select VolumeSnapshot namespace')}
             selected={snapshotNamespaceSelected}
-            setSelected={onSelectProject}
+            setSelected={onSelectNamespace}
           />
         </FormGroup>
       ) : (

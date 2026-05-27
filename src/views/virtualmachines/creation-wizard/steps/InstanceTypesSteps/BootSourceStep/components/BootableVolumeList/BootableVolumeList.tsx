@@ -1,8 +1,8 @@
 import React, { FC } from 'react';
 
 import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
-import ProjectDropdown from '@kubevirt-utils/components/ProjectDropdown/ProjectDropdown';
-import { ALL_PROJECTS } from '@kubevirt-utils/hooks/constants';
+import NamespaceDropdown from '@kubevirt-utils/components/NamespaceDropdown/NamespaceDropdown';
+import { ALL_NAMESPACES } from '@kubevirt-utils/hooks/constants';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useHideDeprecatedBootableVolumes from '@kubevirt-utils/resources/bootableresources/hooks/useHideDeprecatedBootableVolumes';
@@ -40,10 +40,10 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
     volumeListNamespace,
   } = useInstanceTypeVMStore();
 
-  // Non-admin users cannot list across all projects — default to the OS images
+  // Non-admin users cannot list across all namespaces — default to the OS images
   // namespace where system bootable volumes live. If they explicitly pick a
-  // different project via the dropdown, respect that choice.
-  const isNamespaceUnset = !volumeListNamespace || volumeListNamespace === ALL_PROJECTS;
+  // different namespace via the dropdown, respect that choice.
+  const isNamespaceUnset = !volumeListNamespace || volumeListNamespace === ALL_NAMESPACES;
   const effectiveNamespace = !isAdmin && isNamespaceUnset ? OS_IMAGES_NS : volumeListNamespace;
 
   const { preferences: preferencesData } = instanceTypesAndPreferencesData;
@@ -83,12 +83,12 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
           <SplitItem>
             <FormGroup
               className="bootable-volume-list-bar__volume-namespace"
-              label={t('Volumes project')}
+              label={t('Volumes namespace')}
             >
-              <ProjectDropdown
-                includeAllProjects={isAdmin}
+              <NamespaceDropdown
+                includeAllNamespaces={isAdmin}
                 onChange={setVolumeListNamespace}
-                selectedProject={effectiveNamespace}
+                selectedNamespace={effectiveNamespace}
               />
             </FormGroup>
           </SplitItem>

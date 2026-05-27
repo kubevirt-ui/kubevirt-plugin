@@ -5,16 +5,16 @@ import {
 import { isEmpty, verifyMatchExpressions } from '@kubevirt-utils/utils/utils';
 import { MatchExpression, Operator } from '@openshift-console/dynamic-plugin-sdk';
 
-import { ProjectMappingOption } from './form/constants';
+import { NamespaceMappingOption } from './form/constants';
 
-export const isValidProjectMapping = (
-  projectMappingOption: ProjectMappingOption,
+export const isValidNamespaceMapping = (
+  namespaceMappingOption: NamespaceMappingOption,
   namespaceSelector: ClusterUserDefinedNetworkSpec['namespaceSelector'],
 ): boolean => {
-  if (projectMappingOption === ProjectMappingOption.AllProjects) {
+  if (namespaceMappingOption === NamespaceMappingOption.AllNamespaces) {
     return true;
   }
-  if (projectMappingOption === ProjectMappingOption.SelectByLabels) {
+  if (namespaceMappingOption === NamespaceMappingOption.SelectByLabels) {
     return (
       !isEmpty(namespaceSelector?.matchLabels) &&
       !(
@@ -29,9 +29,9 @@ export const isValidProjectMapping = (
   );
 };
 
-export const getVMNetworkProjects = (
+export const getVMNetworkNamespaces = (
   vmNetwork: ClusterUserDefinedNetworkKind,
-  projects: K8sResourceCommon[],
+  namespaces: K8sResourceCommon[],
 ): K8sResourceCommon[] => {
   const namespaceSelector = vmNetwork?.spec?.namespaceSelector || {};
 
@@ -47,5 +47,5 @@ export const getVMNetworkProjects = (
 
   const combinedExpressions = [...matchLabelsToExpressions, ...matchExpressions];
 
-  return projects?.filter((project) => verifyMatchExpressions(project, combinedExpressions)) ?? [];
+  return namespaces?.filter((namespace) => verifyMatchExpressions(namespace, combinedExpressions)) ?? [];
 };

@@ -8,12 +8,12 @@ import ResourceTile from './ResourceTile';
 import './ClusterResourcesCard.scss';
 
 type SingleClusterResourcesCardProps = {
-  projectsCount: number;
+  namespacesCount: number;
   vmsCount: number;
 };
 
 const SingleClusterResourcesCard: FC<SingleClusterResourcesCardProps> = ({
-  projectsCount,
+  namespacesCount,
   vmsCount,
 }) => {
   const { t } = useKubevirtTranslation();
@@ -26,7 +26,7 @@ const SingleClusterResourcesCard: FC<SingleClusterResourcesCardProps> = ({
         className="cluster-resources-card__tile cluster-resources-card__tile--placeholder"
       />
       <ResourceTile count={nodesCount} isLoading={!nodesLoaded} label={t('Nodes')} />
-      <ResourceTile count={projectsCount} label={t('Projects')} />
+      <ResourceTile count={namespacesCount} label={t('Namespaces')} />
       <ResourceTile count={vmsCount} label={t('VMs')} />
     </div>
   );

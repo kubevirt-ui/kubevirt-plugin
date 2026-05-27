@@ -19,7 +19,7 @@ const useQuotasListTab: UseQuotasListTab = () => {
   const namespace = activeNamespace === ALL_NAMESPACES_SESSION_KEY ? undefined : activeNamespace;
 
   const isClusterScoped = location.pathname.includes(CLUSTER_QUOTA_LIST_URL);
-  const activeTab = isClusterScoped ? QuotaScope.CLUSTER : QuotaScope.PROJECT;
+  const activeTab = isClusterScoped ? QuotaScope.CLUSTER : QuotaScope.NAMESPACE;
 
   const handleTabSelect = (_event: MouseEvent, tabKey: QuotaScope) =>
     navigate(tabKey === QuotaScope.CLUSTER ? CLUSTER_QUOTA_LIST_URL : getQuotaListURL(namespace));

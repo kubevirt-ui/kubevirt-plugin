@@ -65,8 +65,8 @@ const UserProvidedInstanceTypesList: FC<UserProvidedInstanceTypesListProps> = ({
 
   if (isAllNamespaces(activeNamespace) && isEmpty(userProvidedInstanceTypes)) {
     return (
-      <Bullseye className={'instance-type-list__all-projects'}>
-        {t('Select a project in order to see user-provided InstanceTypes')}
+      <Bullseye className={'instance-type-list__all-namespaces'}>
+        {t('Select a namespace in order to see user-provided InstanceTypes')}
       </Bullseye>
     );
   }

@@ -37,7 +37,7 @@ import NameField from './formFields/NameField';
 import NetworkAttachmentDefinitionsField from './formFields/NetworkAttachmentDefinitionsField';
 import NodesField from './formFields/NodesField';
 import OperatingSystemField from './formFields/OperatingSystemField';
-import ProjectField from './formFields/ProjectField';
+import NamespaceField from './formFields/NamespaceField';
 import SchedulingField from './formFields/SchedulingField';
 import StatusField from './formFields/StatusField';
 import StorageClassField from './formFields/StorageClassField';
@@ -107,7 +107,7 @@ const AdvancedSearchModal: FC<AdvancedSearchModalProps> = ({
             <Form isHorizontal>
               <NameField />
               {isACMPage && <ClusterField />}
-              <ProjectField vms={vms} />
+              <NamespaceField vms={vms} />
               <DescriptionField />
               <StatusField />
               <OperatingSystemField />

@@ -8,7 +8,7 @@ import {
   getLabelUnit,
 } from '@overview/OverviewTab/metric-charts-card/utils/utils';
 
-import { getUnitLabel, UNIT_GIB } from '../hooks/useProjectResourceQuota';
+import { getUnitLabel, UNIT_GIB } from '../hooks/useNamespaceResourceQuota';
 import { TopClustersMetricData } from '../hooks/useTopClustersChartData';
 
 import { CHART_DAYS_WINDOW, MIB_PER_GIB } from './constants';

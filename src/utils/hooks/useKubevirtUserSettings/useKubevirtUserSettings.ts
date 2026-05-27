@@ -4,7 +4,7 @@ import {
   modelToGroupVersionKind,
 } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
-import { operatorNamespaceSignal } from '@kubevirt-utils/store/operatorNamespace';
+import { OPERATOR_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 
@@ -50,23 +50,22 @@ const useKubevirtUserSettings: UseKubevirtUserSettings = (key, cluster) => {
   const [userSettings, setUserSettings] = useState<UserSettingsState>();
   const [loading, setLoading] = useState<boolean>(false);
   const [settingsInitialized, setSettingsInitialized] = useState<boolean>(false);
-  const operatorNamespace = operatorNamespaceSignal.value;
 
   const lsKey = getLsKey();
   const isLocalStorage = alwaysUseLocalStorage || getIsImpersonating();
 
   const [userConfigMap, loadedConfigMap, configMapError] = useK8sWatchData<IoK8sApiCoreV1ConfigMap>(
-    !isLocalStorage && operatorNamespace && lsKey
+    !isLocalStorage && lsKey
       ? {
           cluster,
           groupVersionKind: modelToGroupVersionKind(ConfigMapModel),
           name: KUBEVIRT_USER_SETTINGS_CONFIG_MAP_NAME,
-          namespace: operatorNamespace,
+          namespace: OPERATOR_NAMESPACE,
         }
       : null,
   );
 
-  const loadedCM = (loadedConfigMap || !isEmpty(configMapError)) && !isEmpty(operatorNamespace);
+  const loadedCM = loadedConfigMap || !isEmpty(configMapError);
   const loadedUsr = true;
 
   const lsData = isLocalStorage

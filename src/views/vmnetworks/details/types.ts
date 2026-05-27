@@ -1,4 +1,4 @@
-export type ProjectWithVMCount = {
-  projectName: string;
+export type NamespaceWithVMCount = {
+  namespaceName: string;
   vmCount: number;
 };

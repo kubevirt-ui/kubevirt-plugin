@@ -11,7 +11,7 @@ import { useSettingsCluster } from '@settings/context/SettingsClusterContext';
 import { AuthKeyRow } from '../utils/types';
 import { createAuthKeyRow } from '../utils/utils';
 
-import useSSHAuthProjects from './useSSHAuthProjects';
+import useSSHAuthNamespaces from './useSSHAuthNamespaces';
 
 type UseSSHAuthKeys = () => {
   authKeyRows: AuthKeyRow[];
@@ -19,20 +19,20 @@ type UseSSHAuthKeys = () => {
   onAuthKeyAdd: () => void;
   onAuthKeyChange: (updatedKey: AuthKeyRow) => void;
   onAuthKeyDelete: (keyToRemove: AuthKeyRow) => void;
-  selectableProjects: string[];
+  selectableNamespaces: string[];
 };
 
 const filterAuthRows = async (rows: AuthKeyRow[], cluster?: string) => {
   const filteredRows = await Promise.all(
     rows.map(async (row) => {
-      if (!row?.projectName || !row?.secretName) return null;
+      if (!row?.namespaceName || !row?.secretName) return null;
 
       try {
         await kubevirtK8sGet({
           cluster,
           model: SecretModel,
           name: row.secretName,
-          ns: row.projectName,
+          ns: row.namespaceName,
         });
         return row;
       } catch {
@@ -43,7 +43,7 @@ const filterAuthRows = async (rows: AuthKeyRow[], cluster?: string) => {
 
   const validRows = filteredRows.filter((r): r is AuthKeyRow => r !== null);
 
-  return validRows.length > 0 ? validRows : [createAuthKeyRow(rows[0].projectName)];
+  return validRows.length > 0 ? validRows : [createAuthKeyRow(rows[0].namespaceName)];
 };
 
 const useSSHAuthKeys: UseSSHAuthKeys = () => {
@@ -62,9 +62,9 @@ const useSSHAuthKeys: UseSSHAuthKeys = () => {
     if (loadedSettings) {
       if (!isEmpty(authorizedSSHKeys)) {
         const authRows: AuthKeyRow[] = Object.entries(authorizedSSHKeys).map(
-          ([projectName, secretName], id) => ({
+          ([namespaceName, secretName], id) => ({
             id,
-            projectName,
+            namespaceName,
             secretName,
           }),
         );
@@ -80,7 +80,7 @@ const useSSHAuthKeys: UseSSHAuthKeys = () => {
     }
   }, [loadedSettings, authorizedSSHKeys, cluster]);
 
-  const { loaded, selectableProjects } = useSSHAuthProjects(authKeyRows);
+  const { loaded, selectableNamespaces } = useSSHAuthNamespaces(authKeyRows);
 
   const onAuthKeyAdd = useCallback(() => {
     setAuthKeyRows((prevKeys) => [
@@ -95,11 +95,11 @@ const useSSHAuthKeys: UseSSHAuthKeys = () => {
         prevKeys.map((key) => (key.id === updatedKey.id ? updatedKey : key)),
       );
 
-      const { projectName, secretName } = updatedKey;
-      if (!isEmpty(projectName) && !isEmpty(secretName)) {
+      const { namespaceName, secretName } = updatedKey;
+      if (!isEmpty(namespaceName) && !isEmpty(secretName)) {
         updateAuthorizedSSHKeys({
           ...authorizedSSHKeys,
-          [projectName]: secretName,
+          [namespaceName]: secretName,
         });
       }
     },
@@ -109,7 +109,7 @@ const useSSHAuthKeys: UseSSHAuthKeys = () => {
   const onAuthKeyDelete = useCallback(
     (keyToRemove: AuthKeyRow) => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { [keyToRemove.projectName]: _, ...rest } = authorizedSSHKeys;
+      const { [keyToRemove.namespaceName]: _, ...rest } = authorizedSSHKeys;
       updateAuthorizedSSHKeys(rest);
 
       setAuthKeyRows((prevKeys) => {
@@ -126,7 +126,7 @@ const useSSHAuthKeys: UseSSHAuthKeys = () => {
     onAuthKeyAdd,
     onAuthKeyChange,
     onAuthKeyDelete,
-    selectableProjects,
+    selectableNamespaces,
   };
 };
 

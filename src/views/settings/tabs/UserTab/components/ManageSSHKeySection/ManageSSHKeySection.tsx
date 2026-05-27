@@ -20,7 +20,7 @@ const ManageSSHKeySection: FC = () => {
       <Stack hasGutter>
         <MutedTextSpan
           text={t(
-            'Set the public SSH key to automatically apply to any new VirtualMachine you create in the selected project.',
+            'Set the public SSH key to automatically apply to any new VirtualMachine you create in the selected namespace.',
           )}
         />
         <SSHAuthKeysList />

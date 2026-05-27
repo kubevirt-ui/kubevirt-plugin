@@ -7,6 +7,6 @@ export const createAuthKeyRow: (activeNamespace: string, id?: number) => AuthKey
   id,
 ) => ({
   id: id ?? 0,
-  projectName: activeNamespace === ALL_NAMESPACES_SESSION_KEY ? '' : activeNamespace,
+  namespaceName: activeNamespace === ALL_NAMESPACES_SESSION_KEY ? '' : activeNamespace,
   secretName: '',
 });

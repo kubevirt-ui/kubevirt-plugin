@@ -32,7 +32,7 @@ const useCreateCustomizedVM: UseCreateCustomizedVM = () => {
   useSignals();
   const navigate = useNavigate();
   const cluster = useClusterParam();
-  const { project: vmNamespaceTarget, vmName } = useVMWizardStore();
+  const { namespace: vmNamespaceTarget, vmName } = useVMWizardStore();
   const isIPv6SingleStack = useIsIPv6SingleStackCluster(cluster);
   const [isUDNManagedNamespace] = useNamespaceUDN(vmNamespaceTarget);
 

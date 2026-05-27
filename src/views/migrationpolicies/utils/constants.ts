@@ -12,7 +12,7 @@ export const MIGRATION_POLICY_COLUMN_KEYS = {
   COMPLETION_TIMEOUT: 'completion-timeout',
   NAME: 'name',
   POST_COPY: 'post-copy',
-  PROJECT_LABELS: 'project-labels',
+  NAMESPACE_LABELS: 'namespace-labels',
   VM_LABELS: 'vm-labels',
 } as const;
 

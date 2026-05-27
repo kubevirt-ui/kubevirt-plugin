@@ -28,7 +28,7 @@ const SSHAuthKeysList: FC = () => {
     onAuthKeyAdd,
     onAuthKeyChange,
     onAuthKeyDelete,
-    selectableProjects,
+    selectableNamespaces,
   } = useSSHAuthKeys();
 
   if (!loaded) return <Skeleton />;
@@ -39,7 +39,7 @@ const SSHAuthKeysList: FC = () => {
         <PanelMain maxHeight="12.25rem">
           <Grid>
             <GridItem span={5}>
-              <Content component={ContentVariants.h6}>{t('Project')}</Content>
+              <Content component={ContentVariants.h6}>{t('Namespace')}</Content>
             </GridItem>
             <GridItem span={1} />
             <GridItem span={5}>
@@ -48,12 +48,12 @@ const SSHAuthKeysList: FC = () => {
           </Grid>
           {authKeyRows?.map((row) => (
             <SSHAuthKeyRow
-              isRemoveDisabled={authKeyRows.length === 1 && isEmpty(row.projectName)}
+              isRemoveDisabled={authKeyRows.length === 1 && isEmpty(row.namespaceName)}
               key={row.id}
               onAuthKeyChange={onAuthKeyChange}
               onAuthKeyDelete={onAuthKeyDelete}
               row={row}
-              selectableProjects={selectableProjects}
+              selectableNamespaces={selectableNamespaces}
             />
           ))}
         </PanelMain>
@@ -61,12 +61,12 @@ const SSHAuthKeysList: FC = () => {
       <Button
         className="add-row-btn"
         icon={<PlusCircleIcon />}
-        isDisabled={isEmpty(selectableProjects)}
+        isDisabled={isEmpty(selectableNamespaces)}
         isInline
         onClick={onAuthKeyAdd}
         variant={ButtonVariant.link}
       >
-        {t('Add public SSH key to project')}
+        {t('Add public SSH key to namespace')}
       </Button>
     </>
   );

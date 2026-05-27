@@ -25,7 +25,7 @@ import { ButtonVariant, FormGroup, TextInput } from '@patternfly/react-core';
 import FormGroupHelperText from '../FormGroupHelperText/FormGroupHelperText';
 
 import CloneStorageCheckbox from './CloneStorageCheckbox';
-import SelectProject from './SelectProject';
+import SelectNamespace from './SelectNamespace';
 import { cloneStorage, getTemplateBootSourcePVC } from './utils';
 
 import './clone-template-modal.scss';
@@ -49,7 +49,7 @@ const CloneTemplateModal: FC<CloneTemplateModalProps> = ({
   const clonableStorage = !!templateVMPVC;
   const [pvcName, setPVCName] = useState(`${templateVMPVC?.name}-clone`);
   const [templateProvider, setTemplateProvider] = useState('');
-  const [selectedProject, setSelectedProject] = useState(obj?.metadata?.namespace);
+  const [selectedNamespace, setSelectedNamespace] = useState(obj?.metadata?.namespace);
   const [isCloneStorageEnabled, setCloneStorage] = useState(false);
   const [templateDisplayName, setTemplateDisplayName] = useState(
     obj?.metadata?.annotations?.[ANNOTATIONS.displayName] || '',
@@ -72,23 +72,23 @@ const CloneTemplateModal: FC<CloneTemplateModalProps> = ({
           [LABELS.type]: TEMPLATE_TYPE_VM,
         },
         name: templateName,
-        namespace: selectedProject,
+        namespace: selectedNamespace,
       };
 
       draftVM.metadata.labels[LABEL_USED_TEMPLATE_NAME] = templateName;
-      draftVM.metadata.labels[LABEL_USED_TEMPLATE_NAMESPACE] = selectedProject;
+      draftVM.metadata.labels[LABEL_USED_TEMPLATE_NAMESPACE] = selectedNamespace;
       delete draftVM.metadata.labels[TEMPLATE_VERSION_LABEL];
       delete draftTemplate.metadata.labels[TEMPLATE_DEFAULT_VARIANT_LABEL];
     });
 
     if (isCloneStorageEnabled) {
-      await cloneStorage(obj, pvcName, selectedProject);
+      await cloneStorage(obj, pvcName, selectedNamespace);
 
       templateToCreate = produce(templateToCreate, (draftTemplate) => {
         const draftVM = getTemplateVirtualMachineObject(draftTemplate);
         delete draftVM.spec.dataVolumeTemplates[0].spec.sourceRef;
         draftVM.spec.dataVolumeTemplates[0].spec.source.pvc.name = pvcName;
-        draftVM.spec.dataVolumeTemplates[0].spec.source.pvc.namespace = selectedProject;
+        draftVM.spec.dataVolumeTemplates[0].spec.source.pvc.namespace = selectedNamespace;
       });
     }
     const clonedTemplate = await kubevirtK8sCreate<V1Template>({
@@ -120,13 +120,13 @@ const CloneTemplateModal: FC<CloneTemplateModalProps> = ({
           value={templateName}
         />
       </FormGroup>
-      <FormGroup fieldId="namespace" label={t('Template project')}>
-        <SelectProject
+      <FormGroup fieldId="namespace" label={t('Template namespace')}>
+        <SelectNamespace
           cluster={getCluster(obj)}
-          selectedProject={selectedProject}
-          setSelectedProject={setSelectedProject}
+          selectedNamespace={selectedNamespace}
+          setSelectedNamespace={setSelectedNamespace}
         />
-        <FormGroupHelperText>{t('Project name to clone the template to')}</FormGroupHelperText>
+        <FormGroupHelperText>{t('Namespace name to clone the template to')}</FormGroupHelperText>
       </FormGroup>
       <FormGroup fieldId="display-name" label={t('Template display name')}>
         <TextInput

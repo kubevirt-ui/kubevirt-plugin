@@ -105,7 +105,7 @@ const TemplatesCatalogTile: FC<TemplatesCatalogTileProps> = memo(
             <StackItem>
               <Stack>
                 <StackItem>
-                  <b>{t('Project')}</b> {getNamespace(template)}
+                  <b>{t('Namespace')}</b> {getNamespace(template)}
                 </StackItem>
                 <StackItem>
                   <b>{t('OS')}</b> {osName}

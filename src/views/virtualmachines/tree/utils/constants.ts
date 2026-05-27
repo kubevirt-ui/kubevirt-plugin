@@ -1,5 +1,5 @@
 export const VM_FOLDER_LABEL = 'vm.openshift.io/folder';
-export const PROJECT_SELECTOR_PREFIX = 'projectSelector';
+export const NAMESPACE_SELECTOR_PREFIX = 'namespaceSelector';
 export const FOLDER_SELECTOR_PREFIX = 'folderSelector';
 export const CLUSTER_SELECTOR_PREFIX = 'clusterSelector';
 
@@ -9,7 +9,7 @@ export const OPEN_DRAWER_SIZE = '400px';
 export const CLOSED_DRAWER_SIZE = '30px';
 export const PANEL_WIDTH_PROPERTY = '--pf-v6-c-drawer__panel--md--FlexBasis';
 
-export const SHOW_EMPTY_PROJECTS_KEY = 'showEmptyProjects';
+export const SHOW_EMPTY_NAMESPACES_KEY = 'showEmptyNamespaces';
 export const TREE_VIEW_LAST_WIDTH = 'treeViewLastWidth';
 export const SHOW_TREE_VIEW = 'showTreeView';
 export const SELECTED_ITEM = 'selectedItem';

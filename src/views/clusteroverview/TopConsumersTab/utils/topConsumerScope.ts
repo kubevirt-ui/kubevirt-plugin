@@ -19,8 +19,8 @@ export class TopConsumerScope extends TopConsumerScopeObjectEnum<string> {
     dropdownLabel: 'Node',
   });
 
-  static readonly PROJECT = new TopConsumerScope('PROJECT', {
-    dropdownLabel: 'Project',
+  static readonly NAMESPACE = new TopConsumerScope('NAMESPACE', {
+    dropdownLabel: 'Namespace',
   });
 
   static readonly VM = new TopConsumerScope('VM', {

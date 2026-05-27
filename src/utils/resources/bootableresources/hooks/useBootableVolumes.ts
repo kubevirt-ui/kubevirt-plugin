@@ -16,7 +16,7 @@ import {
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { VolumeSnapshotKind } from '@kubevirt-utils/components/SelectSnapshot/types';
 import { DEFAULT_PREFERENCE_LABEL } from '@kubevirt-utils/constants/instancetypes-and-preferences';
-import { ALL_PROJECTS } from '@kubevirt-utils/hooks/constants';
+import { ALL_NAMESPACES } from '@kubevirt-utils/hooks/constants';
 import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
 import useListMulticlusterFilters from '@kubevirt-utils/hooks/useListMulticlusterFilters';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
@@ -34,7 +34,7 @@ import { UseBootableVolumesValues } from '@virtualmachines/creation-wizard/utils
 type UseBootableVolumes = (namespace?: string) => UseBootableVolumesValues;
 
 const useBootableVolumes: UseBootableVolumes = (namespace) => {
-  const projectsNamespace = namespace === ALL_PROJECTS ? null : namespace;
+  const selectedNamespace = namespace === ALL_NAMESPACES ? null : namespace;
   const cluster = useClusterParam();
 
   const multiclusterFilters = useListMulticlusterFilters();
@@ -46,7 +46,7 @@ const useBootableVolumes: UseBootableVolumes = (namespace) => {
       cluster,
       groupVersionKind: DataSourceModelGroupVersionKind,
       isList: true,
-      namespace: projectsNamespace,
+      namespace: selectedNamespace,
       selector: {
         matchExpressions: [{ key: DEFAULT_PREFERENCE_LABEL, operator: Operator.Exists }],
       },
@@ -62,7 +62,7 @@ const useBootableVolumes: UseBootableVolumes = (namespace) => {
       cluster,
       groupVersionKind: modelToGroupVersionKind(DataImportCronModel),
       isList: true,
-      namespace: projectsNamespace,
+      namespace: selectedNamespace,
     },
     null,
     multiclusterFilters,
@@ -76,7 +76,7 @@ const useBootableVolumes: UseBootableVolumes = (namespace) => {
       cluster,
       groupVersionKind: modelToGroupVersionKind(PersistentVolumeClaimModel),
       isList: true,
-      namespace: projectsNamespace,
+      namespace: selectedNamespace,
     },
     null,
     multiclusterFilters,
@@ -87,7 +87,7 @@ const useBootableVolumes: UseBootableVolumes = (namespace) => {
       cluster,
       groupVersionKind: modelToGroupVersionKind(DataVolumeModel),
       isList: true,
-      namespace: projectsNamespace,
+      namespace: selectedNamespace,
     },
     null,
     multiclusterFilters,
@@ -99,7 +99,7 @@ const useBootableVolumes: UseBootableVolumes = (namespace) => {
       cluster,
       groupVersionKind: modelToGroupVersionKind(VolumeSnapshotModel),
       isList: true,
-      namespace: projectsNamespace,
+      namespace: selectedNamespace,
     },
     null,
     multiclusterFilters,

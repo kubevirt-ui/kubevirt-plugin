@@ -17,7 +17,7 @@ const useVMSearchQueries = (): VMSearchQueries => {
   const vmName = searchParams.get(STATIC_SEARCH_FILTERS.name);
 
   const ip = searchParams.get(getRowFilterQueryKey(VirtualMachineRowFilterType.IP));
-  const project = searchParams.get(getRowFilterQueryKey(VirtualMachineRowFilterType.Project));
+  const namespace = searchParams.get(getRowFilterQueryKey(VirtualMachineRowFilterType.Namespace));
   const clusters = searchParams.get(getRowFilterQueryKey(VirtualMachineRowFilterType.Cluster));
   const createdFrom = searchParams.get(
     getRowFilterQueryKey(VirtualMachineRowFilterType.DateCreatedFrom),
@@ -51,13 +51,13 @@ const useVMSearchQueries = (): VMSearchQueries => {
 
     if (ip) queries.vmiQueries.push({ property: 'ipaddress', values: [`*${ip}*`] });
 
-    if (project) {
-      queries.vmQueries.push({ property: 'namespace', values: project.split(',') });
-      queries.vmiQueries.push({ property: 'namespace', values: project.split(',') });
+    if (namespace) {
+      queries.vmQueries.push({ property: 'namespace', values: namespace.split(',') });
+      queries.vmiQueries.push({ property: 'namespace', values: namespace.split(',') });
     }
 
     return queries;
-  }, [createdFrom, createdTo, vmName, ip, project, clusters]);
+  }, [createdFrom, createdTo, vmName, ip, namespace, clusters]);
 };
 
 export default useVMSearchQueries;

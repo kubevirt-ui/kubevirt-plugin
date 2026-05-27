@@ -17,7 +17,7 @@ import {
   ModalVariant,
 } from '@patternfly/react-core';
 
-import { VMNetworkWithProjects } from '../types';
+import { VMNetworkWithNamespaces } from '../types';
 import { moveVMsToNewNetwork } from '../utils';
 
 import VMNetworkSelect from './VMNetworkSelect';
@@ -33,20 +33,20 @@ const MoveVMModal: FC<MoveVMModalProps> = ({ closeModal, currentNetwork, vms }) 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<Error>();
   const [newNetwork, setNewNetwork] = useState<string>();
-  const [newNetworkProjects, setNewNetworkProjects] = useState<string[]>([]);
+  const [newNetworkNamespaces, setNewNetworkNamespaces] = useState<string[]>([]);
 
   const vmsCount = vms.length;
   const isSingleVM = vmsCount === 1;
 
-  const onSelect = ({ projectNames, vmNetworkName }: VMNetworkWithProjects) => {
+  const onSelect = ({ namespaceNames, vmNetworkName }: VMNetworkWithNamespaces) => {
     setNewNetwork(vmNetworkName);
-    setNewNetworkProjects(projectNames);
+    setNewNetworkNamespaces(namespaceNames);
   };
 
   const onSubmit = async () => {
     setIsSubmitting(true);
     try {
-      await moveVMsToNewNetwork(vms, currentNetwork, newNetwork, newNetworkProjects);
+      await moveVMsToNewNetwork(vms, currentNetwork, newNetwork, newNetworkNamespaces);
       closeModal();
     } catch (error) {
       setSubmitError(error);

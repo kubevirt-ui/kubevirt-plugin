@@ -43,12 +43,12 @@ export const generateSSHKeySecret = (name: string, namespace: string, sshKey: st
 });
 
 export const getInitialSSHDetails = ({
-  applyKeyToProject = false,
+  applyKeyToNamespace = false,
   secretToCreate,
   sshSecretName,
   sshSecretNamespace = '',
 }: {
-  applyKeyToProject?: boolean;
+  applyKeyToNamespace?: boolean;
   secretToCreate?: IoK8sApiCoreV1Secret;
   sshSecretName: string;
   sshSecretNamespace?: string;
@@ -56,7 +56,7 @@ export const getInitialSSHDetails = ({
   !isEmpty(secretToCreate)
     ? {
         appliedDefaultKey: false,
-        applyKeyToProject,
+        applyKeyToNamespace,
         secretOption: SecretSelectionOption.addNew,
         sshPubKey: decodeSecret(secretToCreate),
         sshSecretName: getName(secretToCreate),
@@ -64,7 +64,7 @@ export const getInitialSSHDetails = ({
       }
     : {
         appliedDefaultKey: true,
-        applyKeyToProject,
+        applyKeyToNamespace,
         secretOption: !isEmpty(sshSecretName)
           ? SecretSelectionOption.useExisting
           : SecretSelectionOption.none,

@@ -2,14 +2,14 @@ import { FC, ReactNode } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 
-export const OVERVIEW_LEVEL_PROJECT = 'project' as const;
+export const OVERVIEW_LEVEL_NAMESPACE = 'namespace' as const;
 export const OVERVIEW_LEVEL_CLUSTER = 'cluster' as const;
 export const OVERVIEW_LEVEL_MULTICLUSTER = 'multicluster' as const;
 
 export type OverviewLevel =
   | typeof OVERVIEW_LEVEL_CLUSTER
   | typeof OVERVIEW_LEVEL_MULTICLUSTER
-  | typeof OVERVIEW_LEVEL_PROJECT;
+  | typeof OVERVIEW_LEVEL_NAMESPACE;
 
 export const SECTION_ID_VM_HEALTH = 'vm-health';
 export const SECTION_ID_CLUSTER_STATUS = 'cluster-status';

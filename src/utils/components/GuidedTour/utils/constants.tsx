@@ -25,7 +25,7 @@ export const getTourSteps = (t: TFunction): Step[] => [
     placement: 'right',
     spotlightPadding: 4,
     target: `[id="${ALL_NAMESPACES_SESSION_KEY}"] > div`,
-    title: t('Create a new project'),
+    title: t('Create a new namespace'),
   },
   {
     content: <PowerfulShortcutsContent />,
@@ -53,7 +53,7 @@ export const getTourSteps = (t: TFunction): Step[] => [
   },
   {
     content: t(
-      'Choose to create a VM from a guided flow or from the YAML. You can also create a VM directly from the side navigation by right-clicking in any project.',
+      'Choose to create a VM from a guided flow or from the YAML. You can also create a VM directly from the side navigation by right-clicking in any namespace.',
     ),
     data: { route: VM_LIST_ROUTE },
     disableBeacon: true,

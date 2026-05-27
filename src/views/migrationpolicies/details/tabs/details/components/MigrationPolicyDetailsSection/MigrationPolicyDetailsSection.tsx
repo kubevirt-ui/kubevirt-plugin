@@ -35,7 +35,7 @@ import {
   getCompletionTimeoutText,
 } from '../../../../../utils/utils';
 
-import MigrationPolicyProjectLabels from './components/MigrationPolicyProjectLabels';
+import MigrationPolicyNamespaceLabels from './components/MigrationPolicyNamespaceLabels';
 import MigrationPolicyVirtualMachineLabels from './components/MigrationPolicyVirtualMachineLabels';
 
 import './MigrationPolicyDetailsSection.scss';
@@ -177,7 +177,7 @@ const MigrationPolicyDetailsSection: FC<MigrationPolicyDetailsSectionProps> = ({
                 <DescriptionListTermHelpTextButton>{t('Labels')}</DescriptionListTermHelpTextButton>
               </Popover>
             </Title>
-            <MigrationPolicyProjectLabels mp={mp} />
+            <MigrationPolicyNamespaceLabels mp={mp} />
             <MigrationPolicyVirtualMachineLabels mp={mp} />
           </DescriptionList>
         </GridItem>

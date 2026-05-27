@@ -4,7 +4,7 @@ import {
   V1beta1VirtualMachineClusterPreference,
   V1beta1VirtualMachinePreference,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { ALL_PROJECTS } from '@kubevirt-utils/hooks/constants';
+import { ALL_NAMESPACES } from '@kubevirt-utils/hooks/constants';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
 import { USER_SETTINGS_KEYS } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/const';
 import { UserSettingFavorites } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/types';
@@ -107,7 +107,7 @@ const useBootableVolumesTableData: UseBootableVolumesTableData = (
     pvcSources,
     volumeSnapshotSources,
     pagination,
-    volumeListNamespace === ALL_PROJECTS,
+    volumeListNamespace === ALL_NAMESPACES,
     dvSources,
   );
 

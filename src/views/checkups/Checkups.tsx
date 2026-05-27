@@ -1,6 +1,6 @@
 import React, { FC, useMemo } from 'react';
 
-import ClusterProjectDropdown from '@kubevirt-utils/components/ClusterProjectDropdown/ClusterProjectDropdown';
+import ClusterNamespaceDropdown from '@kubevirt-utils/components/ClusterNamespaceDropdown/ClusterNamespaceDropdown';
 import { PageTitles } from '@kubevirt-utils/constants/page-constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -26,7 +26,7 @@ const CheckupsList: FC = () => {
   return (
     <>
       <DocumentTitle>{PageTitles.Checkups}</DocumentTitle>
-      <ClusterProjectDropdown includeAllClusters={false} includeAllProjects={false} />
+      <ClusterNamespaceDropdown includeAllClusters={false} includeAllNamespaces={false} />
       <ListPageHeader title={PageTitles.Checkups}>
         <CheckupsRunButton />
       </ListPageHeader>

@@ -60,7 +60,7 @@ const VirtualMachinesList = forwardRef(({}, ref) => {
   const { t } = useKubevirtTranslation();
   useSignals();
   useVMMetrics();
-  const { cluster, project: targetNamespace, setVMDescription, setVMName } = useVMWizardStore();
+  const { cluster, namespace: targetNamespace, setVMDescription, setVMName } = useVMWizardStore();
 
   const isAllClustersPage = useIsAllClustersPage();
   const { loading: loadingFeatureProxy } = useFeatures(KUBEVIRT_APISERVER_PROXY);
@@ -222,8 +222,8 @@ const VirtualMachinesList = forwardRef(({}, ref) => {
   return (
     <div className="pf-v6-u-mt-sm" ref={listPageBodyRef}>
       {targetNamespace && (
-        <Label className="pf-v6-u-mb-sm" data-test="clone-source-project-label">
-          {t('Project: {{project}}', { project: targetNamespace })}
+        <Label className="pf-v6-u-mb-sm" data-test="clone-source-namespace-label">
+          {t('Namespace: {{namespace}}', { namespace: targetNamespace })}
         </Label>
       )}
       <Split className="pf-v6-u-mb-sm" hasGutter>

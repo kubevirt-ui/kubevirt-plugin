@@ -10,7 +10,7 @@ import {
   OPENSHIFT_CNV,
   OPENSHIFT_OS_IMAGES_NS,
 } from '@kubevirt-utils/constants/constants';
-import { ALL_NAMESPACES, ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
+import { ALL_NAMESPACES, ALL_NAMESPACES_KEY, ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { getLabels } from '@kubevirt-utils/resources/shared';
 import { MAX_K8S_NAME_LENGTH, OTHER } from '@kubevirt-utils/utils/constants';
 import {
@@ -39,7 +39,7 @@ export const getValidNamespace = (activeNamespace: string) =>
   activeNamespace === ALL_NAMESPACES_SESSION_KEY ? DEFAULT_NAMESPACE : activeNamespace;
 
 export const getNamespacePathSegment = (namespace: string) =>
-  isAllNamespaces(namespace) ? ALL_NAMESPACES : `ns/${namespace}`;
+  isAllNamespaces(namespace) ? ALL_NAMESPACES_KEY : `ns/${namespace}`;
 
 export const isEmpty = (obj) =>
   [Array, Object].includes((obj || {}).constructor) && !Object.entries(obj || {}).length;

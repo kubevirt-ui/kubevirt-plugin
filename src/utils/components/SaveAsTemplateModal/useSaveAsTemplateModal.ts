@@ -19,17 +19,17 @@ const useSaveAsTemplateModal = (vm: V1VirtualMachine) => {
   const vmNamespace = getNamespace(vm);
 
   const [templateName, setTemplateName] = useState(`${vmName}-template`);
-  const [selectedProject, setSelectedProject] = useState(vmNamespace);
+  const [selectedNamespace, setSelectedNamespace] = useState(vmNamespace);
 
   const onSubmit = async () => {
-    await createVMTemplateRequest(vm, templateName, selectedProject);
-    navigate(isACMPage ? getACMTemplateListURL() : getTemplateListURL(selectedProject));
+    await createVMTemplateRequest(vm, templateName, selectedNamespace);
+    navigate(isACMPage ? getACMTemplateListURL() : getTemplateListURL(selectedNamespace));
   };
 
   return {
     onSubmit,
-    selectedProject,
-    setSelectedProject,
+    selectedNamespace,
+    setSelectedNamespace,
     setTemplateName,
     templateName,
   };

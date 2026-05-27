@@ -16,7 +16,7 @@ import {
   TreeViewSearch,
 } from '@patternfly/react-core';
 
-import { HIDE, SHOW, SHOW_EMPTY_PROJECTS_KEY, TREE_VIEW_SEARCH_ID } from '../utils/constants';
+import { HIDE, SHOW, SHOW_EMPTY_NAMESPACES_KEY, TREE_VIEW_SEARCH_ID } from '../utils/constants';
 
 type TreeViewToolbarProps = {
   onSearch: (event: ChangeEvent<HTMLInputElement>) => void;
@@ -25,7 +25,7 @@ type TreeViewToolbarProps = {
 const TreeViewToolbar: FC<TreeViewToolbarProps> = ({ onSearch }) => {
   const { t } = useKubevirtTranslation();
   const isACMPage = useIsACMPage();
-  const [showEmptyProjects, setShowEmptyProjects] = useLocalStorage(SHOW_EMPTY_PROJECTS_KEY, HIDE);
+  const [showEmptyNamespaces, setShowEmptyNamespaces] = useLocalStorage(SHOW_EMPTY_NAMESPACES_KEY, HIDE);
 
   return (
     <Toolbar className="vms-tree-view-toolbar" isSticky>
@@ -37,21 +37,21 @@ const TreeViewToolbar: FC<TreeViewToolbarProps> = ({ onSearch }) => {
               id={TREE_VIEW_SEARCH_ID}
               name={TREE_VIEW_SEARCH_ID}
               onSearch={onSearch}
-              placeholder={isACMPage ? t('Search clusters and projects') : t('Search projects')}
+              placeholder={isACMPage ? t('Search clusters and namespaces') : t('Search namespaces')}
             />
           </StackItem>
           <StackItem className="pf-v6-u-mb-md">
             <Split>
               <SplitItem className="pf-v6-u-ml-md">
-                <Content component="p">{t('Show only projects with VirtualMachines')}</Content>
+                <Content component="p">{t('Show only namespaces with VirtualMachines')}</Content>
               </SplitItem>
               <SplitItem isFilled />
               <Switch
-                aria-label={t('Show only projects with VirtualMachines')}
-                checked={showEmptyProjects === HIDE}
+                aria-label={t('Show only namespaces with VirtualMachines')}
+                checked={showEmptyNamespaces === HIDE}
                 className="vms-tree-view__toolbar-switch"
                 isReversed
-                onChange={(_, checked) => setShowEmptyProjects(checked ? HIDE : SHOW)}
+                onChange={(_, checked) => setShowEmptyNamespaces(checked ? HIDE : SHOW)}
               />
             </Split>
           </StackItem>

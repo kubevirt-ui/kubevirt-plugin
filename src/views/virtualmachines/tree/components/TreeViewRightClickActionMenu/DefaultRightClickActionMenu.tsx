@@ -9,7 +9,7 @@ import useMultipleVirtualMachineActions from '@virtualmachines/actions/hooks/use
 import useVMWizardStore from '@virtualmachines/creation-wizard/state/vm-wizard-store/useVMWizardStore';
 import {
   FOLDER_SELECTOR_PREFIX,
-  PROJECT_SELECTOR_PREFIX,
+  NAMESPACE_SELECTOR_PREFIX,
 } from '@virtualmachines/tree/utils/constants';
 
 import GroupedRightClickActionMenu from './GroupedRightClickActionMenu';
@@ -32,15 +32,15 @@ const DefaultRightClickActionMenu: FC<DefaultRightClickActionMenuProps> = ({
   const [vmims] = useVirtualMachineInstanceMigrations(cluster, namespace);
   const vmimMapper = useVirtualMachineInstanceMigrationMapper(vmims);
   const baseActions = useMultipleVirtualMachineActions(vms, vmimMapper, true);
-  const { setProject } = useVMWizardStore();
+  const { setNamespace } = useVMWizardStore();
 
   const navigate = useNavigate();
 
   const createVMAction = useMemo(() => {
-    return prefix === PROJECT_SELECTOR_PREFIX
-      ? getCreateVMAction(t, navigate, namespace, setProject, isACMPage ? cluster : '')
+    return prefix === NAMESPACE_SELECTOR_PREFIX
+      ? getCreateVMAction(t, navigate, namespace, setNamespace, isACMPage ? cluster : '')
       : undefined;
-  }, [cluster, isACMPage, namespace, navigate, prefix, setProject, t]);
+  }, [cluster, isACMPage, namespace, navigate, prefix, setNamespace, t]);
 
   const getNestedLevel = () => {
     if (prefix === FOLDER_SELECTOR_PREFIX) {

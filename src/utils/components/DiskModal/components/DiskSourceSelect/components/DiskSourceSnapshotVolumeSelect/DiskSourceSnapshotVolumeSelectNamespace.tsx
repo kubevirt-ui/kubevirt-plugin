@@ -1,13 +1,13 @@
 import React, { FC } from 'react';
 import { Controller, FieldPath, useFormContext } from 'react-hook-form';
 
-import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { modelToGroupVersionKind, NamespaceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1DiskFormState } from '@kubevirt-utils/components/DiskModal/utils/types';
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import useProjects from '@kubevirt-utils/hooks/useProjects';
+import useNamespaces from '@kubevirt-utils/hooks/useNamespaces';
 import { FormGroup, ValidatedOptions } from '@patternfly/react-core';
 
 import {
@@ -28,9 +28,9 @@ const DiskSourceSnapshotVolumeSelectNamespace: FC = () => {
   } = useFormContext<V1DiskFormState>();
 
   const vmCluster = watch(VM_CLUSTER_FIELD);
-  const [projectNames, projectsLoaded] = useProjects(vmCluster);
+  const [namespaceNames, namespacesLoaded] = useNamespaces(vmCluster);
 
-  if (!projectsLoaded) return <Loading />;
+  if (!namespacesLoaded) return <Loading />;
 
   const error = getErrorSnapshotNamespace(errors);
 
@@ -41,12 +41,12 @@ const DiskSourceSnapshotVolumeSelectNamespace: FC = () => {
           fieldId={diskSourceSnapshotVolumeNamespaceFieldID}
           id={diskSourceSnapshotVolumeNamespaceFieldID}
           isRequired
-          label={t('VolumeSnapshot project')}
+          label={t('VolumeSnapshot namespace')}
         >
           <InlineFilterSelect
-            options={projectNames?.map((name) => ({
+            options={namespaceNames?.map((name) => ({
               children: name,
-              groupVersionKind: modelToGroupVersionKind(ProjectModel),
+              groupVersionKind: modelToGroupVersionKind(NamespaceModel),
               value: name,
             }))}
             setSelected={(val) => {
@@ -58,7 +58,7 @@ const DiskSourceSnapshotVolumeSelectNamespace: FC = () => {
             toggleProps={{
               isFullWidth: true,
             }}
-            placeholder={t('Select Project')}
+            placeholder={t('Select Namespace')}
             selected={value}
           />
           <FormGroupHelperText
@@ -70,7 +70,7 @@ const DiskSourceSnapshotVolumeSelectNamespace: FC = () => {
       )}
       control={control}
       name={DATAVOLUME_SNAPSHOT_NAMESPACE}
-      rules={{ required: t('Project is required.') }}
+      rules={{ required: t('Namespace is required.') }}
     />
   );
 };

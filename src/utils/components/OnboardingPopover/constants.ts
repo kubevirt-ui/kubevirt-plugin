@@ -4,5 +4,5 @@ export const ONBOARDING_POPOVER_CHAIN: OnboardingPopoverKey[] = [
   OnboardingPopoverKey.NavCollapse,
   OnboardingPopoverKey.VMsTab,
   OnboardingPopoverKey.Catalog,
-  OnboardingPopoverKey.CreateProject,
+  OnboardingPopoverKey.CreateNamespace,
 ];

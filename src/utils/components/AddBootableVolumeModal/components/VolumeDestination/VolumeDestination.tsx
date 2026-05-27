@@ -3,7 +3,7 @@ import React, { FC, useState } from 'react';
 import ApplyStorageProfileSettings from '@kubevirt-utils/components/ApplyStorageProfileSettings/ApplyStorageProfileSettings';
 import CapacityInput from '@kubevirt-utils/components/CapacityInput/CapacityInput';
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
-import ProjectDropdown from '@kubevirt-utils/components/ProjectDropdown/ProjectDropdown';
+import NamespaceDropdown from '@kubevirt-utils/components/NamespaceDropdown/NamespaceDropdown';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useRequiredFieldValidation } from '@kubevirt-utils/hooks/useRequiredFieldValidation';
 import { ExpandableSection, FormGroup, Grid, GridItem, TextInput } from '@patternfly/react-core';
@@ -60,12 +60,12 @@ const VolumeDestination: FC<VolumeDestinationProps> = ({
           </FormGroupHelperText>
         )}
       </FormGroup>
-      <FormGroup label={t('Destination project')}>
-        <ProjectDropdown
+      <FormGroup label={t('Destination namespace')}>
+        <NamespaceDropdown
           cluster={bootableVolumeCluster}
-          includeAllProjects={false}
+          includeAllNamespaces={false}
           onChange={setBootableVolumeField('bootableVolumeNamespace')}
-          selectedProject={bootableVolumeNamespace}
+          selectedNamespace={bootableVolumeNamespace}
         />
       </FormGroup>
 

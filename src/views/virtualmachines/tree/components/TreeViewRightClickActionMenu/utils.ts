@@ -10,7 +10,7 @@ import { getVMWizardURL } from '@multicluster/urls';
 import {
   CLUSTER_SELECTOR_PREFIX,
   FOLDER_SELECTOR_PREFIX,
-  PROJECT_SELECTOR_PREFIX,
+  NAMESPACE_SELECTOR_PREFIX,
   VM_FOLDER_LABEL,
 } from '@virtualmachines/tree/utils/constants';
 import { vmsSignal } from '@virtualmachines/tree/utils/signals';
@@ -23,12 +23,12 @@ export const getCreateVMAction = (
   t: TFunction,
   navigate: NavigateFunction,
   namespace: string,
-  setProject: (project: string) => void,
+  setNamespace: (namespace: string) => void,
   cluster?: string,
 ): ActionDropdownItemType => {
   return {
     cta: () => {
-      setProject(namespace);
+      setNamespace(namespace);
       navigate(getVMWizardURL(cluster, namespace));
     },
     id: 'create-vm',
@@ -82,7 +82,7 @@ export const getActionMenuComponent = (triggerElement: HTMLElement | null) => {
   if (prefix === CLUSTER_SELECTOR_PREFIX || triggerElement?.id === ALL_NAMESPACES_SESSION_KEY) {
     return ClusterRightClickActionMenu;
   }
-  if (prefix === PROJECT_SELECTOR_PREFIX || prefix === FOLDER_SELECTOR_PREFIX) {
+  if (prefix === NAMESPACE_SELECTOR_PREFIX || prefix === FOLDER_SELECTOR_PREFIX) {
     return DefaultRightClickActionMenu;
   }
   return VMRightClickActionMenu;

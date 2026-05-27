@@ -22,10 +22,10 @@ import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
 import { Form, FormGroup, ValidatedOptions, Wizard, WizardStep } from '@patternfly/react-core';
 
 import { VM_NETWORKS_PATH } from '../constants';
-import { isValidProjectMapping } from '../utils';
+import { isValidNamespaceMapping } from '../utils';
 
 import NetworkDefinition from './components/NetworkDefinition';
-import ProjectMapping from './components/ProjectMapping';
+import NamespaceMapping from './components/NamespaceMapping';
 import VMNetworkWizardHeader from './components/VMNetworkWizardHeader';
 import { getVLANIDValidatedOption } from './utils/utils';
 import { getDefaultFormValue, NODE_NETWORK_MAPPING_PARAM_KEY, VMNetworkForm } from './constants';
@@ -68,7 +68,7 @@ const VMNetworkNewForm: FC = () => {
   const mtu = watch('network.spec.network.localnet.mtu');
   const vlan = watch('network.spec.network.localnet.vlan');
   const namespaceSelector = watch('network.spec.namespaceSelector');
-  const projectMappingOption = watch('projectMappingOption');
+  const namespaceMappingOption = watch('namespaceMappingOption');
 
   const isVLANInvalid =
     vlan?.mode &&
@@ -77,7 +77,7 @@ const VMNetworkNewForm: FC = () => {
   const isRequiredFieldsInvalid =
     isEmpty(name) || isEmpty(bridgeMapping) || isEmpty(mtu) || mtu > MAX_MTU || isVLANInvalid;
 
-  const isProjectMappingInvalid = !isValidProjectMapping(projectMappingOption, namespaceSelector);
+  const isNamespaceMappingInvalid = !isValidNamespaceMapping(namespaceMappingOption, namespaceSelector);
 
   const onSubmit = async (data: VMNetworkForm) => {
     try {
@@ -87,7 +87,7 @@ const VMNetworkNewForm: FC = () => {
       });
 
       completed.current = true;
-      logVMNetworkCreated(data.network, data.projectMappingOption);
+      logVMNetworkCreated(data.network, data.namespaceMappingOption);
 
       navigate(`${VM_NETWORKS_PATH}/${name}`);
     } catch (error) {
@@ -120,17 +120,17 @@ const VMNetworkNewForm: FC = () => {
         </WizardStep>
         <WizardStep
           footer={{
-            isNextDisabled: isRequiredFieldsInvalid || isSubmitting || isProjectMappingInvalid,
+            isNextDisabled: isRequiredFieldsInvalid || isSubmitting || isNamespaceMappingInvalid,
             nextButtonProps: { isLoading: isSubmitting },
             nextButtonText: t('Create'),
             onClose,
           }}
-          id="wizard-project-mapping"
+          id="wizard-namespace-mapping"
           isDisabled={isRequiredFieldsInvalid || isSubmitting}
-          name={t('Project mapping')}
+          name={t('Namespace mapping')}
         >
           <Form>
-            <ProjectMapping />
+            <NamespaceMapping />
             {apiError && (
               <FormGroup>
                 <ErrorAlert error={apiError} />

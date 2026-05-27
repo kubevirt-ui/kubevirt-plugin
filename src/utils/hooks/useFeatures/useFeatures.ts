@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { ConfigMapModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { operatorNamespaceSignal } from '@kubevirt-utils/store/operatorNamespace';
+import { OPERATOR_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
 
@@ -24,7 +24,6 @@ export const useFeatures: UseFeatures = (featureName, clusterOverride) => {
   const clusterParam = useClusterParam();
   const configMapCluster = clusterOverride ?? (isUIFeature ? null : clusterParam);
   const cluster = configMapCluster ?? undefined;
-  const operatorNamespace = operatorNamespaceSignal.value;
 
   const { featuresConfigMapData, isAdmin } = useFeaturesConfigMap(configMapCluster, !createError);
 
@@ -46,7 +45,7 @@ export const useFeatures: UseFeatures = (featureName, clusterOverride) => {
   }, [cluster]);
 
   useEffect(() => {
-    if (createError || createInProgress || !operatorNamespace) {
+    if (createError || createInProgress) {
       return;
     }
 
@@ -84,7 +83,6 @@ export const useFeatures: UseFeatures = (featureName, clusterOverride) => {
           setFeatureEnabled(false);
           break;
         }
-        // In case of features config-map exists but there is a new feature to enter that is missing
         case undefined:
         case null: {
           (async () => {
@@ -111,13 +109,11 @@ export const useFeatures: UseFeatures = (featureName, clusterOverride) => {
     featureEnabled,
     createError,
     createInProgress,
-    operatorNamespace,
     cluster,
   ]);
 
   const toggleFeature = useCallback(
     async (value: boolean) => {
-      if (!operatorNamespace) return;
       setLoading(true);
 
       try {
@@ -129,7 +125,7 @@ export const useFeatures: UseFeatures = (featureName, clusterOverride) => {
             data: {},
             metadata: {
               name: FEATURES_CONFIG_MAP_NAME,
-              namespace: operatorNamespace,
+              namespace: OPERATOR_NAMESPACE,
             },
           },
         });
@@ -142,7 +138,7 @@ export const useFeatures: UseFeatures = (featureName, clusterOverride) => {
         setError(updateError);
       }
     },
-    [cluster, featureName, operatorNamespace],
+    [cluster, featureName],
   );
 
   return {

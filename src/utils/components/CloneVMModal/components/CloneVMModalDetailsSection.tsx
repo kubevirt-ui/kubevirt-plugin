@@ -47,7 +47,7 @@ const CloneVMModalDetailsSection: FC<CloneVMModalDetailsSectionProps> = ({ vm, v
       <DescriptionList isHorizontal>
         <DescriptionItem
           descriptionData={getNamespace(vm) || notAvailable}
-          descriptionHeader={t('Project')}
+          descriptionHeader={t('Namespace')}
         />
         <DescriptionItem
           descriptionData={sshSecretName || <MutedTextSpan text={t('Not configured')} />}

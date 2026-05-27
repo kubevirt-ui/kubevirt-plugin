@@ -17,7 +17,7 @@ const MEMORY_DENSITY_SAVE_BUTTON = 'memory-density-save-button';
 const MEMORY_DENSITY_SLIDER = 'memory-density-slider';
 const PREVIEW_FEATURES_TAB = 'Preview features';
 const SAVE_BUTTON = 'save-button';
-const SELECT_PROJECT_TOGGLE = 'select-project-toggle';
+const SELECT_NAMESPACE_TOGGLE = 'select-namespace-toggle';
 const SELECT_SECRET = 'select-secret';
 
 export class SettingsPage {
@@ -50,7 +50,7 @@ export class SettingsPage {
   }
 
   async configureSSHSecret(ns: string, secretName: string) {
-    await byTestId(this.page, SELECT_PROJECT_TOGGLE).click();
+    await byTestId(this.page, SELECT_NAMESPACE_TOGGLE).click();
     await byTestId(this.page, `select-option-${ns}`).locator('button').click();
     await this.page.getByRole('button', { name: 'Not configured' }).click();
     await this.page.locator('#useExisting').click();

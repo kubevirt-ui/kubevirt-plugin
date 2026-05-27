@@ -6,12 +6,12 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Alert, AlertVariant, SelectOption, Skeleton } from '@patternfly/react-core';
 
-import useSelectableVMNetworksWithProjects from '../hooks/useSelectableVMNetworksWithProjects';
-import { VMNetworkWithProjects } from '../types';
+import useSelectableVMNetworksWithNamespaces from '../hooks/useSelectableVMNetworksWithNamespaces';
+import { VMNetworkWithNamespaces } from '../types';
 
 export type VMNetworkSelectProps = {
   currentNetwork: string;
-  onSelect: (newSelection: VMNetworkWithProjects) => void;
+  onSelect: (newSelection: VMNetworkWithNamespaces) => void;
   selectedNetwork: string;
   vms: V1VirtualMachine[];
 };
@@ -23,7 +23,7 @@ const VMNetworkSelect: FC<VMNetworkSelectProps> = ({
   vms,
 }) => {
   const { t } = useKubevirtTranslation();
-  const [vmNetworksWithProjects, loaded, error] = useSelectableVMNetworksWithProjects(
+  const [vmNetworksWithNamespaces, loaded, error] = useSelectableVMNetworksWithNamespaces(
     currentNetwork,
     vms,
   );
@@ -44,15 +44,15 @@ const VMNetworkSelect: FC<VMNetworkSelectProps> = ({
       selected={selectedNetwork}
       toggleProps={{ isFullWidth: true }}
     >
-      {isEmpty(vmNetworksWithProjects) ? (
+      {isEmpty(vmNetworksWithNamespaces) ? (
         <SelectOption isDisabled key="no-networks" value="no-networks">
           {t('No other networks available')}
         </SelectOption>
       ) : (
-        vmNetworksWithProjects.map(({ projectNames, vmNetworkName }) => (
+        vmNetworksWithNamespaces.map(({ namespaceNames, vmNetworkName }) => (
           <SelectOption
             key={vmNetworkName}
-            onClick={() => onSelect({ projectNames, vmNetworkName })}
+            onClick={() => onSelect({ namespaceNames, vmNetworkName })}
             value={vmNetworkName}
           >
             {vmNetworkName}

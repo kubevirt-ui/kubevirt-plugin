@@ -246,7 +246,7 @@ test.describe('Check all virtualization pages can be loaded', () => {
     test('create VirtualMachineInstanceType from YAML', async ({ instanceTypesPage }) => {
       await instanceTypesPage.navigate();
       await instanceTypesPage.clickUserTab();
-      await instanceTypesPage.switchProject(NS);
+      await instanceTypesPage.switchNamespace(NS);
       await instanceTypesPage.createFromYAML();
       await instanceTypesPage.save();
       await instanceTypesPage.backToBreadcrumb();

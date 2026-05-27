@@ -14,12 +14,14 @@ export const GLOBAL_NAD_NAMESPACES = [
 ];
 
 export const VENDOR_LABEL = 'instancetype.kubevirt.io/vendor';
-export const PROJECT_NAME_LABEL_KEY = 'kubernetes.io/metadata.name';
+export const NAMESPACE_NAME_LABEL_KEY = 'kubernetes.io/metadata.name';
 
 export const ROOTDISK = 'rootdisk';
 export const CLOUDINITDISK = 'cloudinitdisk';
 
-export const KUBEVIRT_HYPERCONVERGED = 'kubevirt-hyperconverged';
+export const OPERATOR_NAMESPACE = process.env.KUBEVIRT_OPERATOR_NAMESPACE || 'kubevirt';
+export const OS_IMAGES_NS = 'kubevirt-os-images';
+export const KUBEVIRT_HYPERCONVERGED = 'kubevirt';
 
 export const OPENSHIFT_CNV = 'openshift-cnv';
 export const CNV_OBSERVABILITY = 'cnv-observability';

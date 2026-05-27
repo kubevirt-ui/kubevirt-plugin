@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 
 import { modelToGroupVersionKind, SecretModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { IoK8sApiCoreV1Secret } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
-import { getMappedProjectsWithKeys } from '@kubevirt-utils/components/SSHSecretModal/utils/utils';
+import { getMappedNamespacesWithKeys } from '@kubevirt-utils/components/SSHSecretModal/utils/utils';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 
 import { SecretsData } from '../utils/types';
@@ -43,11 +43,11 @@ const useSecretsData: UseSecretsData = (secretsNamespace, currentNamespace, clus
   const secretsLoaded = currentNamespaceSecretsLoaded && secretsNamespaceSecretsLoaded;
   const secretsLoadError = currentNamespaceSecretsError || secretsNamespaceSecretsError;
 
-  const projectsWithSecrets = useMemo(() => getMappedProjectsWithKeys(allSecrets), [allSecrets]);
+  const namespacesWithSecrets = useMemo(() => getMappedNamespacesWithKeys(allSecrets), [allSecrets]);
 
   return {
     allSecrets,
-    projectsWithSecrets,
+    namespacesWithSecrets,
     secretsLoaded,
     secretsLoadError: secretsLoadError || null,
   };

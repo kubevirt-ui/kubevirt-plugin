@@ -1,7 +1,7 @@
 import React, { FC, useCallback, useState } from 'react';
 import { Link } from 'react-router';
 
-import ClusterDropdown from '@kubevirt-utils/components/ClusterProjectDropdown/ClusterDropdown';
+import ClusterDropdown from '@kubevirt-utils/components/ClusterNamespaceDropdown/ClusterDropdown';
 import ConfigurationSearch from '@kubevirt-utils/components/ConfigurationSearch/ConfigurationSearch';
 import GuidedTour from '@kubevirt-utils/components/GuidedTour/GuidedTour';
 import LoadingEmptyState from '@kubevirt-utils/components/LoadingEmptyState/LoadingEmptyState';

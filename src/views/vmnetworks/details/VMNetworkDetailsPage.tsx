@@ -38,9 +38,9 @@ const VMNetworkDetailsPage: FC = () => {
             name: t('YAML'),
           },
           {
-            component: lazy(() => import('./tabs/ConnectedProjects/ConnectedProjects')),
-            href: 'connected-projects',
-            name: t('Connected projects'),
+            component: lazy(() => import('./tabs/ConnectedNamespaces/ConnectedNamespaces')),
+            href: 'connected-namespaces',
+            name: t('Connected namespaces'),
           },
           {
             component: lazy(

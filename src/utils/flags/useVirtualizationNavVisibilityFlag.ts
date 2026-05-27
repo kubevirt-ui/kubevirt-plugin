@@ -1,9 +1,8 @@
 import { useEffect, useMemo } from 'react';
 import useMultipleAccessReviews from 'src/views/cdi-upload-provider/hooks/useMultipleAccessReviews';
 
-import { modelToGroupVersionKind,  VirtualMachineModel,
+import { modelToGroupVersionKind,  NamespaceModel,  VirtualMachineModel,
  } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { useProjectOrNamespaceModel } from '@kubevirt-utils/hooks/useProjectOrNamespaceModel';
 import useKubevirtHyperconvergeConfiguration from '@kubevirt-utils/hooks/useKubevirtHyperconvergeConfiguration';
 import { getHyperconvergedRoleAggregationStrategy } from '@kubevirt-utils/resources/hyperconverged/selectors';
 import { getName } from '@kubevirt-utils/resources/shared';
@@ -18,11 +17,10 @@ import {
 import { FLAG_KUBEVIRT_VIRTUALIZATION_NAV, HCO_MANUAL_ROLE_AGGREGATION_STRATEGY } from './consts';
 
 const useVirtualizationNavVisibilityFlag = (setFeatureFlag: SetFeatureFlag) => {
-  const model = useProjectOrNamespaceModel();
   const { hcConfig, hcError, hcLoaded } = useKubevirtHyperconvergeConfiguration();
 
-  const [projects, projectsLoaded] = useK8sWatchResource<K8sResourceCommon[]>({
-        groupVersionKind: modelToGroupVersionKind(model),
+  const [namespaces, namespacesLoaded] = useK8sWatchResource<K8sResourceCommon[]>({
+    groupVersionKind: modelToGroupVersionKind(NamespaceModel),
     isList: true,
     namespaced: false,
   });
@@ -34,28 +32,28 @@ const useVirtualizationNavVisibilityFlag = (setFeatureFlag: SetFeatureFlag) => {
     [strategy],
   );
 
-  const fetchAccessReview = hcLoaded && projectsLoaded && isManualRoleAggregation;
+  const fetchAccessReview = hcLoaded && namespacesLoaded && isManualRoleAggregation;
 
-  const projectNames = useMemo(
+  const namespaceNames = useMemo(
     () =>
-      (projects ?? [])
+      (namespaces ?? [])
         .map((p) => getName(p))
         .filter((n) => !isEmpty(n))
         .sort((a, b) => a.localeCompare(b)),
-    [projects],
+    [namespaces],
   );
 
   const accessReviewAttributes = useMemo(
     () =>
       fetchAccessReview
-        ? projectNames.map((name) => ({
+        ? namespaceNames.map((name) => ({
             group: VirtualMachineModel.apiGroup,
             namespace: name,
             resource: VirtualMachineModel.plural,
             verb: 'list' as K8sVerb,
           }))
         : [],
-    [fetchAccessReview, projectNames],
+    [fetchAccessReview, namespaceNames],
   );
 
   const [allowed, accessReviewsLoading] = useMultipleAccessReviews(accessReviewAttributes);

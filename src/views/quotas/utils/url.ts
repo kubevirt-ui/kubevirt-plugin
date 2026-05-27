@@ -1,5 +1,5 @@
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
-import { ALL_NAMESPACES } from '@kubevirt-utils/hooks/constants';
+import { ALL_NAMESPACES_KEY } from '@kubevirt-utils/hooks/constants';
 import { ResourceQuotaModel } from '@kubevirt-utils/models';
 import { ApplicationAwareQuota } from '@kubevirt-utils/resources/quotas/types';
 import { getName, getNamespace, getResourceUrl } from '@kubevirt-utils/resources/shared';
@@ -12,7 +12,7 @@ export const getQuotaListURL = (namespace?: string): string => {
   if (namespace) {
     return `/k8s/ns/${namespace}/quotas`;
   }
-  return `/k8s/${ALL_NAMESPACES}/quotas`;
+  return `/k8s/${ALL_NAMESPACES_KEY}/quotas`;
 };
 
 export const getQuotaCreateFormURL = (namespace?: string): string => {

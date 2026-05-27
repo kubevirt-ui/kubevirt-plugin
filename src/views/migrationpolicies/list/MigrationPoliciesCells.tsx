@@ -87,8 +87,8 @@ export const CompletionTimeoutCell: FC<CellProps> = ({ row }) => {
   );
 };
 
-export const ProjectLabelsCell: FC<CellProps> = ({ row }) => (
-  <span data-test={`migration-policy-project-labels-${getName(row)}`}>
+export const NamespaceLabelsCell: FC<CellProps> = ({ row }) => (
+  <span data-test={`migration-policy-namespace-labels-${getName(row)}`}>
     <MigrationPolicySelectorList selector={row?.spec?.selectors?.namespaceSelector} />
   </span>
 );

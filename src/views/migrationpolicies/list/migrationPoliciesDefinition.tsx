@@ -17,7 +17,7 @@ import {
   CompletionTimeoutCell,
   NameCell,
   PostCopyCell,
-  ProjectLabelsCell,
+  NamespaceLabelsCell,
   VMLabelsCell,
 } from './MigrationPoliciesCells';
 
@@ -82,9 +82,9 @@ export const getMigrationPoliciesColumns = (
     },
     {
       additional: true,
-      key: MIGRATION_POLICY_COLUMN_KEYS.PROJECT_LABELS,
-      label: t('Project labels'),
-      renderCell: (row) => <ProjectLabelsCell row={row} />,
+      key: MIGRATION_POLICY_COLUMN_KEYS.NAMESPACE_LABELS,
+      label: t('Namespace labels'),
+      renderCell: (row) => <NamespaceLabelsCell row={row} />,
       sortable: false,
     },
     {

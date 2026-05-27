@@ -9,7 +9,7 @@ import { waitForJsonpath } from '../../utils/oc';
 
 const CNV_NS = env.cnvNamespace;
 const MEMORY_DENSITY_VALUE = '400';
-const KUBEVIRT_CR = 'kubevirt/kubevirt-kubevirt-hyperconverged';
+const KUBEVIRT_CR = 'kubevirt/kubevirt';
 const MIGRATIONS_PATH = '.spec.configuration.migrations';
 
 test.describe.configure({ mode: 'serial' });

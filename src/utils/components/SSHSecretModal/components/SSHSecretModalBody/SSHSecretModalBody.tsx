@@ -20,10 +20,10 @@ type SSHSecretModalBodyProps = {
   cluster?: string;
   isTemplate: boolean;
   isUserTab: boolean;
-  localNSProject: string;
+  localNamespace: string;
   namespace?: string;
   secretsData: SecretsData;
-  setLocalNSProject: Dispatch<SetStateAction<string>>;
+  setLocalNamespace: Dispatch<SetStateAction<string>>;
   setSSHDetails: Dispatch<SetStateAction<SSHSecretDetails>>;
   sshDetails: SSHSecretDetails;
 };
@@ -32,10 +32,10 @@ const SSHSecretModalBody: FC<SSHSecretModalBodyProps> = ({
   cluster,
   isTemplate,
   isUserTab,
-  localNSProject,
+  localNamespace,
   namespace,
   secretsData,
-  setLocalNSProject,
+  setLocalNamespace,
   setSSHDetails,
   sshDetails,
 }) => {
@@ -44,11 +44,11 @@ const SSHSecretModalBody: FC<SSHSecretModalBodyProps> = ({
     sshDetails.secretOption,
   );
 
-  const { allSecrets, projectsWithSecrets, secretsLoaded, secretsLoadError } = secretsData;
+  const { allSecrets, namespacesWithSecrets, secretsLoaded, secretsLoadError } = secretsData;
 
   const showDefaultCheckbox =
     (secretSelectionOption === SecretSelectionOption.addNew && !isTemplate) ||
-    (!isEmpty(projectsWithSecrets) && secretSelectionOption === SecretSelectionOption.useExisting);
+    (!isEmpty(namespacesWithSecrets) && secretSelectionOption === SecretSelectionOption.useExisting);
 
   return (
     <Grid span={12}>
@@ -63,12 +63,12 @@ const SSHSecretModalBody: FC<SSHSecretModalBodyProps> = ({
         {secretSelectionOption === SecretSelectionOption.useExisting && (
           <SSHOptionUseExisting
             cluster={cluster}
-            localNSProject={localNSProject}
+            localNamespace={localNamespace}
             namespace={namespace}
-            projectsWithSecrets={projectsWithSecrets}
+            namespacesWithSecrets={namespacesWithSecrets}
             secrets={allSecrets}
             secretsLoaded={secretsLoaded}
-            setLocalNSProject={setLocalNSProject}
+            setLocalNamespace={setLocalNamespace}
             setSSHDetails={setSSHDetails}
             sshDetails={sshDetails}
           />
@@ -84,14 +84,14 @@ const SSHSecretModalBody: FC<SSHSecretModalBodyProps> = ({
       {showDefaultCheckbox && (
         <Checkbox
           label={t(
-            'Automatically apply this key to any new VirtualMachine you create in this project.',
+            'Automatically apply this key to any new VirtualMachine you create in this namespace.',
           )}
           onClick={() =>
-            setSSHDetails((prev) => ({ ...prev, applyKeyToProject: !prev.applyKeyToProject }))
+            setSSHDetails((prev) => ({ ...prev, applyKeyToNamespace: !prev.applyKeyToNamespace }))
           }
           className="pf-v6-u-mt-md"
-          id="apply-key-to-project-per-user"
-          isChecked={sshDetails.applyKeyToProject || isUserTab}
+          id="apply-key-to-namespace-per-user"
+          isChecked={sshDetails.applyKeyToNamespace || isUserTab}
           isDisabled={isUserTab}
         />
       )}

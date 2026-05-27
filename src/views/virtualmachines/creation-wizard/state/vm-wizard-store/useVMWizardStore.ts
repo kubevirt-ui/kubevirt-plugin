@@ -27,7 +27,7 @@ const useVMWizardStore = create<VMWizardStore>()((set) => {
     setFolder: (folder: string) => set({ folder }),
     setLastProcessedTemplateKey: (lastProcessedTemplateKey: string) =>
       set({ lastProcessedTemplateKey }),
-    setProject: (project: string) => set({ project }),
+    setNamespace: (namespace: string) => set({ namespace }),
     setSelectedTemplate: (selectedTemplate: Template) => set(() => ({ selectedTemplate })),
     setShouldCheckVMNameProperly: (shouldCheckVMNameProperly: boolean) =>
       set({ shouldCheckVMNameProperly }),

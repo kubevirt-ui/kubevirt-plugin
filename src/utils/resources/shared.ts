@@ -94,7 +94,7 @@ type ResourceUrlProps = {
 
 /**
  * function for getting a resource URL
- * @param {ResourceUrlProps} urlProps - object with model, resource to get the URL from (optional) and active namespace/project name (optional)
+ * @param {ResourceUrlProps} urlProps - object with model, resource to get the URL from (optional) and active namespace name (optional)
  * @returns {string} the URL for the resource
  */
 export const getResourceUrl = (urlProps: ResourceUrlProps): string => {
@@ -242,21 +242,21 @@ export const getVMSnapshottingStatus = (vm: V1VirtualMachine) => vm?.status?.sna
 export const getVMRestoringStatus = (vm: V1VirtualMachine) => vm?.status?.restoreInProgress;
 
 /**
- * Get allowed resource for project
+ * Get allowed resource for namespace
  * @date 7/6/2022 - 11:23:32 AM
  *
- * @param {string[]} projectNames - project names
+ * @param {string[]} namespaceNames - namespace names
  * @param {K8sModel} model - k8s model
  * @returns {*}
  */
-export const getAllowedResources = (projectNames: string[], model: K8sModel) => {
+export const getAllowedResources = (namespaceNames: string[], model: K8sModel) => {
   return Object.fromEntries(
-    (projectNames || []).map((projName) => [
-      `${projName}/${model.plural}`,
+    (namespaceNames || []).map((namespaceName) => [
+      `${namespaceName}/${model.plural}`,
       {
                 groupVersionKind: modelToGroupVersionKind(model),
         isList: true,
-        namespace: projName,
+        namespace: namespaceName,
         namespaced: true,
       },
     ]),
@@ -302,18 +302,18 @@ export const getAllowedResourceData = (
  * Get allowed templates resources
  * @date 7/6/2022 - 11:23:32 AM
  *
- * @param {string[]} projectNames - project names
+ * @param {string[]} namespaceNames - namespace names
  * @returns {*}
  */
-export const getAllowedTemplateResources = (projectNames: string[]) => {
+export const getAllowedTemplateResources = (namespaceNames: string[]) => {
   const TemplateModelGroupVersionKind = modelToGroupVersionKind(TemplateModel);
   return Object.fromEntries(
-    (projectNames || []).map((projName) => [
-      `${projName}/${TemplateModel.plural}`,
+    (namespaceNames || []).map((namespaceName) => [
+      `${namespaceName}/${TemplateModel.plural}`,
       {
         groupVersionKind: TemplateModelGroupVersionKind,
         isList: true,
-        namespace: projName,
+        namespace: namespaceName,
         selector: {
           matchExpressions: [
             {

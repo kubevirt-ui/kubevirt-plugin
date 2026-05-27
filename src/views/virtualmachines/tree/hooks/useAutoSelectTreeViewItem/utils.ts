@@ -5,7 +5,7 @@ import { OnFilterChange } from '@openshift-console/dynamic-plugin-sdk';
 import { ALL_CLUSTERS_ID, SHOW } from '../../utils/constants';
 import {
   getClusterTreeViewItemID,
-  getProjectTreeViewItemID,
+  getNamespaceTreeViewItemID,
   TreeViewDataItemWithHref,
 } from '../../utils/utils';
 
@@ -16,22 +16,22 @@ export type UseAutoSelectTreeViewItemProps = {
 };
 
 /**
- * Returns true when the project node will be rendered in the tree (i.e. not hidden
- * by the "show empty projects" filter). Mirrors the logic in `filterNamespaceItems`:
+ * Returns true when the namespace node will be rendered in the tree (i.e. not hidden
+ * by the "show empty namespaces" filter). Mirrors the logic in `filterNamespaceItems`:
  *  - namespaces with VMs are always visible
  *  - empty system namespaces are always hidden
- *  - empty non-system namespaces are shown only when showEmptyProjects === SHOW
+ *  - empty non-system namespaces are shown only when showEmptyNamespaces === SHOW
  */
-export const isProjectVisibleInTree = (
-  projectTreeItem: TreeViewDataItemWithHref,
-  showEmptyProjects: string,
+export const isNamespaceVisibleInTree = (
+  namespaceTreeItem: TreeViewDataItemWithHref,
+  showEmptyNamespaces: string,
 ): boolean => {
-  const hasVMs = !isEmpty(projectTreeItem.children);
+  const hasVMs = !isEmpty(namespaceTreeItem.children);
   if (hasVMs) return true;
 
-  if (isSystemNamespace(projectTreeItem.name as string)) return false;
+  if (isSystemNamespace(namespaceTreeItem.name as string)) return false;
 
-  return showEmptyProjects === SHOW;
+  return showEmptyNamespaces === SHOW;
 };
 
 export const getClusterTreeItem = (
@@ -40,9 +40,9 @@ export const getClusterTreeItem = (
 ): TreeViewDataItemWithHref | undefined =>
   dataMap?.[cluster ? getClusterTreeViewItemID(cluster) : ALL_CLUSTERS_ID];
 
-export const getProjectTreeItem = (
+export const getNamespaceTreeItem = (
   dataMap: Record<string, TreeViewDataItemWithHref>,
   clusterKey: string,
   namespace: string,
 ): TreeViewDataItemWithHref | undefined =>
-  dataMap?.[getProjectTreeViewItemID(clusterKey, namespace)];
+  dataMap?.[getNamespaceTreeViewItemID(clusterKey, namespace)];

@@ -48,7 +48,7 @@ const QuotaFormResourceLimitFields: FC<QuotaFormResourceLimitFieldsProps> = ({
                   'The maximum number of CPU cores permitted for pods that run VM workloads. Resource usage includes both the VM and pod overhead.',
                 )
               : t(
-                  'The maximum number of virtual CPUs permitted for all VMs in this project, excluding pod overhead.',
+                  'The maximum number of virtual CPUs permitted for all VMs in this namespace, excluding pod overhead.',
                 )
           }
           placeholder={t('i.e., 8')}
@@ -74,7 +74,7 @@ const QuotaFormResourceLimitFields: FC<QuotaFormResourceLimitFieldsProps> = ({
                   'The maximum memory capacity (GiB) permitted for pods that run VM workloads. Resource usage includes both the VM and pod overhead.',
                 )
               : t(
-                  'The maximum memory capacity (GiB) permitted for all VMs in this project, excluding pod overhead.',
+                  'The maximum memory capacity (GiB) permitted for all VMs in this namespace, excluding pod overhead.',
                 )
           }
           placeholder={t('i.e., 16')}
@@ -85,7 +85,7 @@ const QuotaFormResourceLimitFields: FC<QuotaFormResourceLimitFieldsProps> = ({
         />
         <QuotaFormResourceLimitInput
           tooltipText={t(
-            'The maximum number of actively running virtual machine instances permitted in this project.',
+            'The maximum number of actively running virtual machine instances permitted in this namespace.',
           )}
           placeholder={t('i.e., 4')}
           promptType={OLSPromptType.VMI_LIMITS}

@@ -78,7 +78,7 @@ const VirtualMachineFilterToolbar: FC<VirtualMachineFilterToolbarProps> = ({
       filterGroupNameShortcut: t('OS'),
       showAllBadge: true,
     },
-    [VirtualMachineRowFilterType.Project]: {
+    [VirtualMachineRowFilterType.Namespace]: {
       showAllBadge: true,
     },
     [VirtualMachineRowFilterType.Status]: {
@@ -109,7 +109,7 @@ const VirtualMachineFilterToolbar: FC<VirtualMachineFilterToolbarProps> = ({
 
           const isToggleDisabled =
             (filter.type === VirtualMachineRowFilterType.Cluster && Boolean(cluster)) ||
-            (filter.type === VirtualMachineRowFilterType.Project && Boolean(namespace));
+            (filter.type === VirtualMachineRowFilterType.Namespace && Boolean(namespace));
           const badgeNumber = isToggleDisabled ? 1 : undefined;
 
           return (

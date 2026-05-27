@@ -1,7 +1,7 @@
 import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
 export const FILTERS_SHOWN_VM_LIST = [
-  VirtualMachineRowFilterType.Project,
+  VirtualMachineRowFilterType.Namespace,
   VirtualMachineRowFilterType.Status,
   VirtualMachineRowFilterType.OS,
 ];

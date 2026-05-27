@@ -232,8 +232,8 @@ export const getCurrentCheckupType = (pathname: string): CheckupType | null => {
   return null;
 };
 
-export const getSelectProjectText = (t: TFunction) =>
-  t('Select a specific project in order to run a checkup');
+export const getSelectNamespaceText = (t: TFunction) =>
+  t('Select a specific namespace in order to run a checkup');
 
 export const getCheckupsConfigMapRowId = (
   configMap: IoK8sApiCoreV1ConfigMap,

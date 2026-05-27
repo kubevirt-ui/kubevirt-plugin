@@ -3,7 +3,7 @@ import CheckupImageField from 'src/views/checkups/components/CheckupImageField';
 
 import { IoK8sApiStorageV1StorageClass } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import CheckboxSelect from '@kubevirt-utils/components/CheckboxSelect/CheckboxSelect';
-import ClusterProjectDropdown from '@kubevirt-utils/components/ClusterProjectDropdown/ClusterProjectDropdown';
+import ClusterNamespaceDropdown from '@kubevirt-utils/components/ClusterNamespaceDropdown/ClusterNamespaceDropdown';
 import { getDefaultStorageClass } from '@kubevirt-utils/components/DiskModal/components/StorageClassAndPreallocation/utils/helpers';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useRelatedImage from '@kubevirt-utils/hooks/useRelatedImage';
@@ -120,7 +120,7 @@ const CheckupsSelfValidationForm = () => {
 
   return (
     <>
-      <ClusterProjectDropdown includeAllClusters={false} includeAllProjects={false} />
+      <ClusterNamespaceDropdown includeAllClusters={false} includeAllNamespaces={false} />
       <Grid>
         <GridItem span={6}>
           <Form className={'CheckupsSelfValidationForm--main'}>
