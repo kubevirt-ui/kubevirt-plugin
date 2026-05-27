@@ -2055,7 +2055,6 @@
   "This suite was skipped.": "This suite was skipped.",
   "This user is not allowed to edit this boot source": "This user is not allowed to edit this boot source",
   "This VirtualMachine has": "This VirtualMachine has",
-  "This VirtualMachine has pending changes that require migration or restart before they can take effect.": "This VirtualMachine has pending changes that require migration or restart before they can take effect.",
   "This VirtualMachine is down. Please start it to access its console.": "This VirtualMachine is down. Please start it to access its console.",
   "This will create a cloned copy of the Volume in the destination project.": "This will create a cloned copy of the Volume in the destination project.",
   "This will stop the selected VM.": "This will stop the selected VM.",

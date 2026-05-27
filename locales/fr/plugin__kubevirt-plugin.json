@@ -2075,7 +2075,6 @@
   "This suite was skipped.": "Cette suite a été ignorée.",
   "This user is not allowed to edit this boot source": "Cet utilisateur n'est pas autorisé à modifier cette source de démarrage",
   "This VirtualMachine has": "Cette machine virtuelle a",
-  "This VirtualMachine has pending changes that require migration or restart before they can take effect.": "This VirtualMachine has pending changes that require migration or restart before they can take effect.",
   "This VirtualMachine is down. Please start it to access its console.": "Cette machine virtuelle est en panne. Veuillez la démarrer pour accéder à sa console.",
   "This will create a cloned copy of the Volume in the destination project.": "Cela créera une copie clonée du volume dans le projet de destination.",
   "This will stop the selected VM.": "Cela arrêtera la machine virtuelle sélectionnée.",

@@ -2055,7 +2055,6 @@
   "This suite was skipped.": "このスイートはスキップされました。",
   "This user is not allowed to edit this boot source": "このユーザーはこのブートソースを編集できません",
   "This VirtualMachine has": "この VirtualMachine には以下があります",
-  "This VirtualMachine has pending changes that require migration or restart before they can take effect.": "This VirtualMachine has pending changes that require migration or restart before they can take effect.",
   "This VirtualMachine is down. Please start it to access its console.": "この VirtualMachine はダウンしています。コンソールにアクセスするには起動してください。",
   "This will create a cloned copy of the Volume in the destination project.": "これにより、移行先プロジェクトにボリュームのクローンコピーが作成されます。",
   "This will stop the selected VM.": "これにより、選択した仮想マシンが停止します。",

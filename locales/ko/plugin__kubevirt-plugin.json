@@ -2055,7 +2055,6 @@
   "This suite was skipped.": "이 모음은 건너뛰었습니다.",
   "This user is not allowed to edit this boot source": "이 사용자는 이 부팅 소스를 편집할 수 없습니다",
   "This VirtualMachine has": "이 VirtualMachine에는 다음이 있습니다",
-  "This VirtualMachine has pending changes that require migration or restart before they can take effect.": "This VirtualMachine has pending changes that require migration or restart before they can take effect.",
   "This VirtualMachine is down. Please start it to access its console.": "이 VirtualMachine이 중단되었습니다. 콘솔에 액세스하려면 VirtualMachine을 시작하십시오.",
   "This will create a cloned copy of the Volume in the destination project.": "대상 프로젝트에서 볼륨의 복제본이 생성됩니다.",
   "This will stop the selected VM.": "이렇게 하면 선택한 VM이 중지됩니다.",
