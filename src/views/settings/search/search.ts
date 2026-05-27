@@ -1,9 +1,9 @@
+import { TFunction } from 'i18next';
+
 import { idIsHighlighted } from '@kubevirt-utils/components/SearchItem/useIsHighlighted';
 import { VIRTUALIZATION_PATHS } from '@kubevirt-utils/constants/constants';
-import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   SearchItem,
-  SearchItemGetter,
   SearchItemWithTab,
 } from '@virtualmachines/details/tabs/configuration/utils/search';
 
@@ -14,7 +14,7 @@ import {
   USER_TAB_IDS,
 } from './constants';
 
-export const getClusterTabIds: SearchItemGetter = () => [
+export const getClusterTabIds = (t: TFunction): SearchItem[] => [
   { id: CLUSTER_TAB_IDS.virtualizationFeatures, title: t('Virtualization features') },
   { id: CLUSTER_TAB_IDS.generalSettings, title: t('General settings') },
   { id: CLUSTER_TAB_IDS.liveMigration, title: t('Live migration') },
@@ -37,7 +37,7 @@ export const getClusterTabIds: SearchItemGetter = () => [
   { id: CLUSTER_TAB_IDS.persistentReservation, title: t('Persistent reservation') },
 ];
 
-const getUserTabIds: SearchItemGetter = () => [
+const getUserTabIds = (t: TFunction): SearchItem[] => [
   { id: USER_TAB_IDS.general, title: t('General') },
   { id: USER_TAB_IDS.autoHideNav, title: t('Auto-hide navigation menu') },
   { id: USER_TAB_IDS.sshKeys, title: t('SSH keys') },
@@ -47,7 +47,7 @@ const getUserTabIds: SearchItemGetter = () => [
   { id: USER_TAB_IDS.guidedTour, title: t('Guided tour') },
 ];
 
-const getPreviewFeaturesTabIds: SearchItemGetter = () => [
+const getPreviewFeaturesTabIds = (t: TFunction): SearchItem[] => [
   { id: PREVIEW_FEATURES_TAB_IDS.previewFeatures, title: t('Preview features') },
   {
     id: PREVIEW_FEATURES_TAB_IDS.treeViewFolders,
@@ -63,16 +63,18 @@ const getPreviewFeaturesTabIds: SearchItemGetter = () => [
   },
 ];
 
-const tabsIds: { [key: string]: SearchItem[] } = {
-  cluster: getClusterTabIds(),
-  features: getPreviewFeaturesTabIds(),
-  user: getUserTabIds(),
-};
+export const getSearchItems = (t: TFunction): SearchItemWithTab[] => {
+  const tabsIds: { [key: string]: SearchItem[] } = {
+    cluster: getClusterTabIds(t),
+    features: getPreviewFeaturesTabIds(t),
+    user: getUserTabIds(t),
+  };
 
-export const SEARCH_ITEMS: SearchItemWithTab[] = Object.entries(tabsIds)
-  .map(([tab, value]) => value.map((element) => ({ element, tab })))
-  .flat()
-  .sort((a, b) => a.element.title.localeCompare(b.element.title));
+  return Object.entries(tabsIds)
+    .map(([tab, value]) => value.map((element) => ({ element, tab })))
+    .flat()
+    .sort((a, b) => a.element.title.localeCompare(b.element.title));
+};
 
 export const createSettingsSearchURL = (
   tab: string,

@@ -2,6 +2,7 @@ import { useCallback, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
+import { USER_SETTINGS_KEYS } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/const';
 import useVMSearchURL from '@multicluster/hooks/useVMSearchURL';
 import { validSearchQueryParams } from '@search/utils/constants';
 
@@ -45,7 +46,7 @@ export const useSavedSearchData: UseSavedSearchData = () => {
   }, [location.search]);
 
   const [savedSearches, setSavedSearches, searchesLoaded, searchesLoadError] =
-    useKubevirtUserSettings('savedSearches');
+    useKubevirtUserSettings(USER_SETTINGS_KEYS.savedSearches);
 
   const searchEntries = useMemo(
     () =>

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
+import { USER_SETTINGS_KEYS } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/const';
 import { useSignals } from '@preact/signals-react/runtime';
 
 import { AUTO_HIDE_NAV_DEFAULT, userExpandedNavSignal } from './constants';
@@ -14,7 +15,7 @@ import { collapseSidebar, expandSidebar, getNavToggleButton, isSidebarOpen } fro
  */
 const useAutoHideNavigation = (): boolean => {
   useSignals();
-  const [navigation, , loaded] = useKubevirtUserSettings('navigation');
+  const [navigation, , loaded] = useKubevirtUserSettings(USER_SETTINGS_KEYS.navigation);
   const [wasCollapsed, setWasCollapsed] = useState(false);
   const mountedRef = useRef(false);
 

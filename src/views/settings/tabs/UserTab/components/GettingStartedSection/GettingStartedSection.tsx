@@ -6,6 +6,7 @@ import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import SectionWithSwitch from '@kubevirt-utils/components/SectionWithSwitch/SectionWithSwitch';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
+import { USER_SETTINGS_KEYS } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/const';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { Stack } from '@patternfly/react-core';
 import { useSignals } from '@preact/signals-react/runtime';
@@ -15,7 +16,7 @@ import { USER_TAB_IDS } from '@settings/search/constants';
 const GettingStartedSection: FC = () => {
   useSignals();
   const { t } = useKubevirtTranslation();
-  const [quickStarts, setQuickStarts] = useKubevirtUserSettings('quickStart');
+  const [quickStarts, setQuickStarts] = useKubevirtUserSettings(USER_SETTINGS_KEYS.quickStart);
   const run = runningTourSignal.value;
   const { startTour, stopTour } = useTour();
 
