@@ -60,12 +60,7 @@ const VirtualMachinesList = forwardRef(({}, ref) => {
   const { t } = useKubevirtTranslation();
   useSignals();
   useVMMetrics();
-  const {
-    cluster,
-    project: targetNamespace,
-    setCloneVMDescription,
-    setCloneVMName,
-  } = useVMWizardStore();
+  const { cluster, project: targetNamespace, setVMDescription, setVMName } = useVMWizardStore();
 
   const isAllClustersPage = useIsAllClustersPage();
   const { loading: loadingFeatureProxy } = useFeatures(KUBEVIRT_APISERVER_PROXY);
@@ -218,9 +213,9 @@ const VirtualMachinesList = forwardRef(({}, ref) => {
 
   const setVM = (vm: V1VirtualMachine) => {
     const sourceVMName = getName(vm);
-    const cloneVMName = truncateToK8sName(isVM(vm) ? `${sourceVMName}-clone` : sourceVMName);
-    setCloneVMName(cloneVMName);
-    setCloneVMDescription(getDescription(vm));
+    const name = truncateToK8sName(isVM(vm) ? `${sourceVMName}-clone` : sourceVMName);
+    setVMName(name);
+    setVMDescription(getDescription(vm));
     vmSignal.value = vm;
   };
 

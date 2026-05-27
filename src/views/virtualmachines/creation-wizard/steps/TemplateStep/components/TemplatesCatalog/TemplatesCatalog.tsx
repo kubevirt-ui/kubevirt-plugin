@@ -8,9 +8,8 @@ import { logTemplateFlowEvent } from '@kubevirt-utils/extensions/telemetry/telem
 import { TEMPLATE_SELECTED } from '@kubevirt-utils/extensions/telemetry/utils/constants';
 import useFiltersFromURL from '@kubevirt-utils/hooks/useFiltersFromURL';
 import useIsWindowsSupportedArchitecture from '@kubevirt-utils/hooks/useIsWindowsSupportedArchitecture';
-import { getTemplateVirtualMachineObject, OS_NAME_TYPES } from '@kubevirt-utils/resources/template';
+import { OS_NAME_TYPES } from '@kubevirt-utils/resources/template';
 import { getTemplateOS } from '@kubevirt-utils/resources/template/utils/selectors';
-import { vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { useListPageFilter } from '@openshift-console/dynamic-plugin-sdk';
 import { Card, Split, SplitItem } from '@patternfly/react-core';
@@ -55,8 +54,6 @@ const TemplatesCatalog: FC = () => {
 
   const handleTemplateSelect = (template: V1Template) => {
     setSelectedTemplate(template);
-    const vm = getTemplateVirtualMachineObject(template);
-    vmSignal.value = vm;
     logTemplateFlowEvent(TEMPLATE_SELECTED, template);
     setTemplatesDrawerIsOpen(true);
   };
