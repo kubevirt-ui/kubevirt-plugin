@@ -3,11 +3,13 @@ import { Step } from 'react-joyride';
 import { TFunction } from 'i18next';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { OPENSHIFT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { SINGLE_CLUSTER_KEY } from '@kubevirt-utils/resources/constants';
 import { RUNSTRATEGY_ALWAYS } from '@kubevirt-utils/resources/vm/utils/constants';
 import { NAV_TOGGLE_BUTTON_SELECTORS } from '@virtualmachines/hooks/useAutoHideNavigation/constants';
 
+import CreateTemplateContent from '../components/CreateTemplateContent/CreateTemplateContent';
 import EndTourContent from '../components/EndTourContent/EndTourContent';
 import PowerfulShortcutsContent from '../components/PowerfulShortcutsContent/PowerfulShortcutsContent';
 
@@ -16,6 +18,7 @@ const TOUR_GUIDE_VM_NAME = 'rhel9-tour-guide';
 export const TOUR_GUIDE_VM_TREE_ID = `${SINGLE_CLUSTER_KEY}/${TOUR_GUIDE_VM_NAMESPACE}/${TOUR_GUIDE_VM_NAME}`;
 
 const VM_LIST_ROUTE = '/k8s/all-namespaces/kubevirt.io~v1~VirtualMachine';
+const TEMPLATES_LIST_ROUTE = `/k8s/ns/${OPENSHIFT_NAMESPACE}/templates`;
 
 export const getTourSteps = (t: TFunction): Step[] => [
   {
@@ -70,6 +73,15 @@ export const getTourSteps = (t: TFunction): Step[] => [
     spotlightPadding: 8,
     target: NAV_TOGGLE_BUTTON_SELECTORS.join(', '),
     title: t('Maximize your workspace'),
+  },
+  {
+    content: <CreateTemplateContent />,
+    data: { route: TEMPLATES_LIST_ROUTE },
+    disableBeacon: true,
+    placement: 'bottom',
+    spotlightPadding: 12,
+    target: '#tour-step-create-template',
+    title: t('New ways to create templates'),
   },
   {
     content: <EndTourContent />,

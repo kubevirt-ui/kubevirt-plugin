@@ -5,7 +5,12 @@ import {
   V1beta1DataVolumeSpec,
 } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import { V1beta1DataVolumeSourcePVC } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
+import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
+import {
+  getTemplateVirtualMachineObject,
+  isOpenShiftTemplate,
+  Template,
+} from '@kubevirt-utils/resources/template';
 import { getBootDisk, getDataVolumeTemplates, getVolumes } from '@kubevirt-utils/resources/vm';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sCreate } from '@multicluster/k8sRequests';
@@ -21,10 +26,19 @@ const getBootSourceDataVolumeTemplate = (template: V1Template) => {
     );
 };
 
-export const getTemplateBootSourcePVC = (template: V1Template): V1beta1DataVolumeSourcePVC => {
+export const getTemplateBootSourcePVC = (
+  template: Template,
+): undefined | V1beta1DataVolumeSourcePVC => {
+  if (!isOpenShiftTemplate(template)) {
+    return undefined;
+  }
+
   const rootDiskDataVolumeTemplate = getBootSourceDataVolumeTemplate(template);
   return rootDiskDataVolumeTemplate?.spec?.source?.pvc;
 };
+
+export const getTemplateOptionKey = (template: Template | undefined): string =>
+  template ? `${getNamespace(template)}/${getName(template)}` : '';
 
 const produceDataVolume = (
   name: string,

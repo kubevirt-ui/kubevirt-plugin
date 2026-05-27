@@ -1,7 +1,11 @@
 import { useMemo } from 'react';
 
 import useVMTemplateFeatureFlag from '@kubevirt-utils/hooks/useVMTemplateFeatureFlag/useVMTemplateFeatureFlag';
-import { Template, TemplateOrRequest } from '@kubevirt-utils/resources/template/utils';
+import {
+  sortTemplates,
+  Template,
+  TemplateOrRequest,
+} from '@kubevirt-utils/resources/template/utils';
 import { Selector } from '@openshift-console/dynamic-plugin-sdk';
 
 import { VMTemplateRequestStatus } from '../../components/VirtualMachineTemplateRequest/constants';
@@ -56,12 +60,12 @@ const useAllTemplateResources: UseAllTemplateResources = ({
     [vmTemplateRequests],
   );
 
-  const allTemplates = useMemo(
-    () => (vmTemplatesEnabled ? [...vmTemplates, ...templates] : templates),
+  const allTemplates = useMemo<Template[]>(
+    () => sortTemplates(vmTemplatesEnabled ? [...vmTemplates, ...templates] : templates),
     [vmTemplatesEnabled, vmTemplates, templates],
   );
 
-  const allTemplatesWithRequests = useMemo(
+  const allTemplatesWithRequests = useMemo<TemplateOrRequest[]>(
     () => (vmTemplatesEnabled ? [...visibleRequests, ...allTemplates] : allTemplates),
     [vmTemplatesEnabled, visibleRequests, allTemplates],
   );
