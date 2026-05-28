@@ -39,9 +39,6 @@ export const extensions: EncodedExtension[] = [
   } as EncodedExtension<NavSection>,
 
   {
-    flags: {
-      required: ['SHOW_MIGRATION_SECTION'],
-    },
     properties: {
       component: { $codeRef: 'StorageMigrationList' },
       path: ['/k8s/ns/:ns/storagemigrations', '/k8s/all-namespaces/storagemigrations'],
