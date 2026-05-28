@@ -1,6 +1,7 @@
-import { DEFAULT_MTU, ProjectMappingOption } from 'src/views/vmnetworks/form/constants';
-
 import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+
+import { DEFAULT_MTU, ProjectMappingOption } from '../../../views/vmnetworks/form/constants';
 
 import {
   VM_NETWORK_CREATED,
