@@ -1,6 +1,7 @@
 import { JiraClient } from './jira-client.js';
 import { buildClonePayload } from './jira-clone-builder.js';
-import type { ClonedTicket, JiraIssue } from './types/index.js';
+import { jiraErrorMessage } from './utils.js';
+import type { ClonedTicket, JiraCreateIssuePayload, JiraIssue } from './types/index.js';
 
 /** Clone all Jira tickets for a release branch, linking and commenting on each original. */
 export const cloneAllTickets = async (
@@ -23,17 +24,24 @@ export const cloneAllTickets = async (
     try {
       originalIssue = await jira.getIssue(originalKey);
     } catch (err) {
-      console.warn(`Warning: could not fetch ${originalKey}, skipping: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      console.warn(`Warning: could not fetch ${originalKey}, skipping: ${jiraErrorMessage(err)}`);
       continue;
     }
 
-    const clonePayload = buildClonePayload(originalIssue, matchedVersion, discoveredFields);
+    let clonePayload: JiraCreateIssuePayload;
+    try {
+      clonePayload = buildClonePayload(originalIssue, matchedVersion, discoveredFields);
+    } catch (err) {
+      console.warn(`Warning: could not clone ${originalKey}: ${jiraErrorMessage(err)}`);
+      continue;
+    }
+
     let clonedIssue: JiraIssue;
 
     try {
       clonedIssue = await jira.createIssue(clonePayload);
     } catch (err) {
-      console.warn(`Warning: could not clone ${originalKey}: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      console.warn(`Warning: could not clone ${originalKey}: ${jiraErrorMessage(err)}`);
       continue;
     }
 
@@ -43,7 +51,7 @@ export const cloneAllTickets = async (
     try {
       await jira.createIssueLink(clonedIssue.key, originalKey, 'Cloners');
     } catch (err) {
-      console.warn(`Warning: could not link ${clonedIssue.key}: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      console.warn(`Warning: could not link ${clonedIssue.key}: ${jiraErrorMessage(err)}`);
     }
 
     try {
@@ -52,7 +60,7 @@ export const cloneAllTickets = async (
         `Cloned to ${clonedIssue.key} for ${targetBranch} via PR #${prNumber} (${repoFullName})`,
       );
     } catch (err) {
-      console.warn(`Warning: could not comment on ${originalKey}: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      console.warn(`Warning: could not comment on ${originalKey}: ${jiraErrorMessage(err)}`);
     }
   }
 

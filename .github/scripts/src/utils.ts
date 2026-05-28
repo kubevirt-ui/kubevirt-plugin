@@ -13,3 +13,17 @@ export const safeErrorMessage = (err: unknown): string => {
   if (err instanceof Error) return err.message;
   return 'Unknown error';
 };
+
+/** Format a Jira API error, including the response body when present. */
+export const jiraErrorMessage = (err: unknown): string => {
+  if (!(err instanceof Error)) {
+    return 'Unknown error';
+  }
+
+  const cause = err.cause;
+  if (typeof cause === 'string' && cause.length > 0) {
+    return `${err.message}: ${cause}`;
+  }
+
+  return err.message;
+};
