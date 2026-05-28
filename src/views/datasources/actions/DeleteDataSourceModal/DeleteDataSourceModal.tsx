@@ -12,24 +12,27 @@ import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { deleteDVAndRelatedResources } from '@kubevirt-utils/resources/bootableresources/helpers';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
-import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { kubevirtK8sDelete } from '@multicluster/k8sRequests';
 import { ButtonVariant, Checkbox, Stack, StackItem } from '@patternfly/react-core';
 
 import useUnderlyingPVC from './hooks/useUnderlyingPVC';
 
 type DeleteDataSourceModalProps = {
-  dataImportCron: V1beta1DataImportCron;
+  dataImportCron?: V1beta1DataImportCron;
   dataSource: V1beta1DataSource;
+  isBootableVolume?: boolean;
   isOpen: boolean;
   onClose: () => void;
+  onSuccess?: () => Promise<void> | void;
 };
 
 const DeleteDataSourceModal: FC<DeleteDataSourceModalProps> = ({
   dataImportCron,
   dataSource,
+  isBootableVolume,
   isOpen,
   onClose,
+  onSuccess,
 }) => {
   const { t } = useKubevirtTranslation();
 
@@ -37,19 +40,17 @@ const DeleteDataSourceModal: FC<DeleteDataSourceModalProps> = ({
   const { dv, pvc, sourceExists } = useUnderlyingPVC(dataSource);
 
   const onDelete = async () => {
-    try {
+    if (dataImportCron) {
       await kubevirtK8sDelete({
         model: DataImportCronModel,
         resource: dataImportCron,
       });
-    } catch (e) {
-      kubevirtConsole.log(e?.message);
-    } finally {
-      await kubevirtK8sDelete({
-        model: DataSourceModel,
-        resource: dataSource,
-      });
     }
+
+    await kubevirtK8sDelete({
+      model: DataSourceModel,
+      resource: dataSource,
+    });
 
     if (deletePVC && sourceExists) {
       await deleteDVAndRelatedResources(dv, dataSource, pvc);
@@ -58,11 +59,12 @@ const DeleteDataSourceModal: FC<DeleteDataSourceModalProps> = ({
 
   return (
     <TabModal<V1beta1DataSource>
-      headerText={t('Delete DataSource?')}
+      headerText={isBootableVolume ? t('Delete bootable volume?') : t('Delete DataSource?')}
       isOpen={isOpen}
       obj={dataSource}
       onClose={onClose}
       onSubmit={onDelete}
+      onSuccess={onSuccess}
       submitBtnText={t('Delete')}
       submitBtnVariant={ButtonVariant.danger}
     >

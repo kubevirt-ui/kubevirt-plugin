@@ -149,5 +149,4 @@ export const exportSucceeded = (pod: IoK8sApiCoreV1Pod) =>
 export const exportInProgress = (pod: IoK8sApiCoreV1Pod) =>
   !isEmpty(pod) && !exportFailed(pod) && !exportSucceeded(pod);
 
-export const isExportFormIncomplete = (fields: string[]) =>
-  fields.some((field) => isEmpty(field.trim()));
+export const isExportFormIncomplete = (fields: string[]) => fields.some((field) => !field?.trim());

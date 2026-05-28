@@ -1,6 +1,7 @@
 import React, { ChangeEvent, FC, useState } from 'react';
 
 import { DataUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
+import { isUploadingDisk } from '@kubevirt-utils/hooks/useCDIUpload/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { DropEvent, FileUpload, FormGroup } from '@patternfly/react-core';
 
@@ -30,6 +31,7 @@ const DiskSourceUploadPVC: FC<DiskSourceUploadPVCProps> = ({
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const { t } = useKubevirtTranslation();
+  const isUploading = isUploadingDisk(relevantUpload?.uploadStatus);
 
   return (
     <>
@@ -52,6 +54,7 @@ const DiskSourceUploadPVC: FC<DiskSourceUploadPVCProps> = ({
           filename={uploadFileName}
           filenamePlaceholder={t('Drag and drop an image or upload one')}
           id="simple-file"
+          isDisabled={isUploading || isLoading}
           isLoading={isLoading}
           onDataChange={(_event: DropEvent, droppedFile: string) => setUploadFile(droppedFile)}
           onReadFinished={() => setIsLoading(false)}
@@ -59,7 +62,7 @@ const DiskSourceUploadPVC: FC<DiskSourceUploadPVCProps> = ({
           value={uploadFile}
         />
       </FormGroup>
-      <DiskSourceUploadISO isIso={isIso} setIsIso={setIsIso} />
+      <DiskSourceUploadISO isDisabled={isUploading} isIso={isIso} setIsIso={setIsIso} />
       {relevantUpload && <DiskSourceUploadPVCProgress upload={relevantUpload} />}
     </>
   );

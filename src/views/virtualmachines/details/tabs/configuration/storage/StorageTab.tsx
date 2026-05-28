@@ -12,7 +12,6 @@ import {
   GridItem,
   PageSection,
 } from '@patternfly/react-core';
-import { isRunning } from '@virtualmachines/utils';
 
 import { onSubmitYAML } from '../details/utils/utils';
 import { ConfigurationInnerTabProps } from '../utils/types';
@@ -22,10 +21,9 @@ import DiskList from './components/tables/disk/DiskList';
 
 const StorageTab: FC<ConfigurationInnerTabProps> = ({ vm, vmi }) => {
   const { t } = useKubevirtTranslation();
-  const { alertConfig, dismissAlert, onUploadStarted, uploadError } = useUploadAlert();
-  const vmIsRunning = isRunning(vm);
+  const { alertConfig, dismissAlert, onUploadStarted, uploadError } = useUploadAlert(vm);
 
-  const showUploadAlert = alertConfig && vmIsRunning;
+  const showUploadAlert = Boolean(alertConfig);
 
   return (
     <SidebarEditor

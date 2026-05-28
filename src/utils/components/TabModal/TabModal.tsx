@@ -4,26 +4,24 @@ import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
-import {
-  Alert,
-  AlertVariant,
-  Button,
-  ButtonVariant,
-  Flex,
-  Form,
-  Modal,
-  ModalBody,
-  ModalFooter,
-  ModalHeader,
-  ModalVariant,
-  Stack,
-  StackItem,
-} from '@patternfly/react-core';
+import { ButtonVariant, Modal, ModalHeader, ModalVariant } from '@patternfly/react-core';
+
+import TabModalBody from './components/TabModalBody';
+import TabModalFooter from './components/TabModalFooter';
 
 import './TabModal.scss';
 
+export type TabModalResult<T extends K8sResourceCommon = K8sResourceCommon> =
+  | string
+  | T
+  | T[]
+  | V1VirtualMachine
+  | void;
+
 export type TabModalProps<T extends K8sResourceCommon = K8sResourceCommon> = {
   actionItemLink?: ReactNode;
+  cancelBtnText?: string;
+  cancelBtnVariant?: ButtonVariant;
   children: ReactNode;
   closeOnSubmit?: boolean;
   formClassName?: string;
@@ -33,11 +31,13 @@ export type TabModalProps<T extends K8sResourceCommon = K8sResourceCommon> = {
   isHorizontal?: boolean;
   isLoading?: boolean;
   isOpen: boolean;
-  modalError?: any;
+  modalError?: Error;
   modalVariant?: ModalVariant;
   obj?: T;
+  onCancel?: () => Promise<void> | void;
   onClose: () => Promise<void> | void;
-  onSubmit: (obj: T) => Promise<string | T | T[] | V1VirtualMachine | void>;
+  onSubmit: (obj: T) => Promise<TabModalResult<T>>;
+  onSuccess?: (result: TabModalResult<T>) => void;
   positionTop?: boolean;
   shouldWrapInForm?: boolean;
   submitBtnText?: string;
@@ -52,6 +52,8 @@ export type TabModalFC = <T extends K8sResourceCommon = K8sResourceCommon>(
 const TabModal: TabModalFC = memo(
   ({
     actionItemLink,
+    cancelBtnText,
+    cancelBtnVariant,
     children,
     closeOnSubmit = true,
     formClassName,
@@ -64,8 +66,10 @@ const TabModal: TabModalFC = memo(
     modalError,
     modalVariant,
     obj,
+    onCancel,
     onClose,
     onSubmit,
+    onSuccess,
     positionTop = true,
     shouldWrapInForm,
     submitBtnText,
@@ -77,17 +81,17 @@ const TabModal: TabModalFC = memo(
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [apiError, setApiError] = useState<Error>(undefined);
 
-    const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
-      executeSubmit();
-    };
-
     const executeSubmit = () => {
       setIsSubmitting(true);
       setApiError(undefined);
 
       onSubmit(obj)
-        .then(() => closeOnSubmit && onClose())
+        .then(async (result) => {
+          onSuccess?.(result);
+          if (closeOnSubmit) {
+            await onClose();
+          }
+        })
         .catch((submitError) => {
           setApiError(submitError);
           kubevirtConsole.error(submitError);
@@ -104,7 +108,10 @@ const TabModal: TabModalFC = memo(
       if (promise) promise?.catch(setApiError);
     };
 
-    const error = apiError || modalError;
+    const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      executeSubmit();
+    };
 
     return (
       <Modal
@@ -121,62 +128,29 @@ const TabModal: TabModalFC = memo(
           title={headerText}
           titleIconVariant={titleIconVariant}
         />
-
-        <ModalBody>
-          {shouldWrapInForm ? (
-            <Form
-              className={formClassName}
-              form="tab-modal-form"
-              id="tab-modal-form"
-              isHorizontal={isHorizontal}
-              onSubmit={handleSubmit}
-            >
-              {children}
-            </Form>
-          ) : (
-            <>{children}</>
-          )}
-        </ModalBody>
-        <ModalFooter>
-          <Stack className="kv-tabmodal-footer" hasGutter>
-            {error && (
-              <StackItem>
-                <Alert isInline title={t('An error occurred')} variant={AlertVariant.danger}>
-                  <Stack hasGutter>
-                    <StackItem>{error.message}</StackItem>
-                    {error.response?.data && <StackItem>{error.response?.data}</StackItem>}
-                    {error?.href && (
-                      <StackItem>
-                        <a href={error.href} rel="noreferrer" target="_blank">
-                          {error.href}
-                        </a>
-                      </StackItem>
-                    )}
-                  </Stack>
-                </Alert>
-              </StackItem>
-            )}
-            <Flex spaceItems={{ default: 'spaceItemsSm' }}>
-              <Button
-                data-test="save-button"
-                form="tab-modal-form"
-                isDisabled={isDisabled || isSubmitting}
-                isLoading={isLoading || isSubmitting}
-                onClick={shouldWrapInForm ? undefined : executeSubmit}
-                type="submit"
-                variant={submitBtnVariant ?? ButtonVariant.primary}
-              >
-                {submitBtnText || t('Save')}
-              </Button>
-              <Button data-test="cancel-button" onClick={closeModal} variant={ButtonVariant.link}>
-                {t('Cancel')}
-              </Button>
-              {actionItemLink && (
-                <div className="kv-tabmodal-footer__action-item-link">{actionItemLink}</div>
-              )}
-            </Flex>
-          </Stack>
-        </ModalFooter>
+        <TabModalBody
+          formClassName={formClassName}
+          isHorizontal={isHorizontal}
+          onSubmit={handleSubmit}
+          shouldWrapInForm={shouldWrapInForm}
+        >
+          {children}
+        </TabModalBody>
+        <TabModalFooter
+          actionItemLink={actionItemLink}
+          cancelBtnText={cancelBtnText}
+          cancelBtnVariant={cancelBtnVariant}
+          error={apiError || modalError}
+          executeSubmit={executeSubmit}
+          isDisabled={isDisabled}
+          isLoading={isLoading}
+          isSubmitting={isSubmitting}
+          onCancel={onCancel}
+          onClose={closeModal}
+          shouldWrapInForm={shouldWrapInForm}
+          submitBtnText={submitBtnText || t('Save')}
+          submitBtnVariant={submitBtnVariant}
+        />
       </Modal>
     );
   },

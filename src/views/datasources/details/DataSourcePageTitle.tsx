@@ -10,6 +10,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { Breadcrumb, BreadcrumbItem, Label, Title } from '@patternfly/react-core';
 
 import DataSourceActions from '../actions/DataSourceActions';
+import useIsBootableVolumeContext from '../hooks/useIsBootableVolumeContext';
 import { isDataSourceReady } from '../utils';
 
 type DataSourcePageTitleProps = {
@@ -20,17 +21,27 @@ type DataSourcePageTitleProps = {
 
 const DataSourcePageTitle: FC<DataSourcePageTitleProps> = ({ dataSource, name, namespace }) => {
   const { t } = useKubevirtTranslation();
+  const fromBootableVolumes = useIsBootableVolumeContext();
+  const ns = namespace || DEFAULT_NAMESPACE;
 
   return (
     <DetailsPageTitle
       breadcrumb={
         <Breadcrumb>
           <BreadcrumbItem>
-            <Link to={`/k8s/ns/${namespace || DEFAULT_NAMESPACE}/${DataSourceModelRef}`}>
-              {t('DataSources')}
+            <Link
+              to={
+                fromBootableVolumes
+                  ? `/k8s/ns/${ns}/bootablevolumes`
+                  : `/k8s/ns/${ns}/${DataSourceModelRef}`
+              }
+            >
+              {fromBootableVolumes ? t('Bootable volumes') : t('DataSources')}
             </Link>
           </BreadcrumbItem>
-          <BreadcrumbItem>{t('DataSource Details')}</BreadcrumbItem>
+          <BreadcrumbItem>
+            {fromBootableVolumes ? t('Bootable volume details') : t('DataSource Details')}
+          </BreadcrumbItem>
         </Breadcrumb>
       }
     >
@@ -44,7 +55,7 @@ const DataSourcePageTitle: FC<DataSourcePageTitleProps> = ({ dataSource, name, n
             </span>
           )}
         </Title>
-        <DataSourceActions dataSource={dataSource} />
+        <DataSourceActions dataSource={dataSource} isBootableVolume={fromBootableVolumes} />
       </PaneHeading>
     </DetailsPageTitle>
   );

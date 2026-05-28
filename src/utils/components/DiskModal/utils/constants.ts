@@ -13,6 +13,11 @@ export const FORM_FIELD_SELECTED_ISO = 'selectedISO';
 export const FORM_FIELD_UPLOAD_MODE = 'uploadMode';
 export const FORM_FIELD_UPLOAD_TYPE = 'uploadType';
 
+export const isUploadMode = (mode: string): boolean => mode === UPLOAD_MODE_UPLOAD;
+export const isEmptyDriveMode = (mode: string): boolean => mode === UPLOAD_MODE_EMPTY;
+export const isExistingISOMode = (mode: string): boolean =>
+  mode === UPLOAD_MODE_SELECT || mode === '';
+
 export const HotPlugFeatures = {
   DeclarativeHotplugVolumes: 'DeclarativeHotplugVolumes',
   HotplugVolumes: 'HotplugVolumes',

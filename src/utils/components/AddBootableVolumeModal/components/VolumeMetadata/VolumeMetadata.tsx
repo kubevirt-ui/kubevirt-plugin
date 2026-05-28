@@ -13,12 +13,14 @@ import PreferenceSelect from './components/PreferenceSelect/PreferenceSelect';
 type VolumeMetadataProps = {
   bootableVolume: AddBootableVolumeState;
   deleteLabel: (labelKey: string) => void;
+  isDisabled?: boolean;
   setBootableVolumeField: SetBootableVolumeFieldType;
 };
 
 const VolumeMetadata: FC<VolumeMetadataProps> = ({
   bootableVolume,
   deleteLabel,
+  isDisabled,
   setBootableVolumeField,
 }) => {
   const { t } = useKubevirtTranslation();
@@ -30,15 +32,18 @@ const VolumeMetadata: FC<VolumeMetadataProps> = ({
       <PreferenceSelect
         bootableVolume={bootableVolume}
         deleteLabel={deleteLabel}
+        isDisabled={isDisabled}
         setBootableVolumeField={setBootableVolumeField}
       />
       <InstanceTypeDrilldownSelect
         bootableVolume={bootableVolume}
         deleteLabel={deleteLabel}
+        isDisabled={isDisabled}
         setBootableVolumeField={setBootableVolumeField}
       />
       <ArchitectureSelect
         bootableVolumeState={bootableVolume}
+        isDisabled={isDisabled}
         setBootableVolumeField={setBootableVolumeField}
       />
       <FormGroup label={t('Description')}>
@@ -47,6 +52,7 @@ const VolumeMetadata: FC<VolumeMetadataProps> = ({
             setBootableVolumeField('annotations', ANNOTATIONS.description)(value)
           }
           id="description"
+          isDisabled={isDisabled}
           value={annotations?.description}
         />
       </FormGroup>

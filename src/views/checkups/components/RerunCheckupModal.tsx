@@ -1,15 +1,7 @@
 import React, { FC, ReactNode } from 'react';
 
+import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import {
-  Button,
-  ButtonVariant,
-  Modal,
-  ModalBody,
-  ModalFooter,
-  ModalHeader,
-  ModalVariant,
-} from '@patternfly/react-core';
 
 type RerunCheckupModalPropsBase = {
   isOpen: boolean;
@@ -34,26 +26,23 @@ const RerunCheckupModal: FC<RerunCheckupModalProps> = ({
   const title = isWarning ? t('Rerun checkup') : t('Failed to rerun checkup');
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} variant={ModalVariant.medium}>
-      <ModalHeader title={title} titleIconVariant={isWarning ? 'warning' : 'danger'} />
-      <ModalBody>{message}</ModalBody>
-      <ModalFooter>
-        {isWarning ? (
-          <>
-            <Button onClick={onConfirm} variant={ButtonVariant.primary}>
-              {t('Rerun')}
-            </Button>
-            <Button onClick={onClose} variant={ButtonVariant.link}>
-              {t('Cancel')}
-            </Button>
-          </>
-        ) : (
-          <Button onClick={onClose} variant={ButtonVariant.primary}>
-            {t('Close')}
-          </Button>
-        )}
-      </ModalFooter>
-    </Modal>
+    <TabModal
+      onSubmit={async () => {
+        if (isWarning) {
+          await onConfirm?.();
+        } else {
+          onClose();
+        }
+      }}
+      headerText={title}
+      isOpen={isOpen}
+      obj={{}}
+      onClose={onClose}
+      submitBtnText={isWarning ? t('Rerun') : t('Close')}
+      titleIconVariant={isWarning ? 'warning' : 'danger'}
+    >
+      {message}
+    </TabModal>
   );
 };
 

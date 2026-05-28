@@ -35,7 +35,6 @@ const MoveVMToFolderModal: FC<MoveVMToFolderModalProps> = ({ isOpen, onClose, on
       headerText={t('Move to folder')}
       isOpen={isOpen}
       onClose={onClose}
-      submitBtnText={t('Save')}
     >
       <Stack hasGutter>
         <StackItem>

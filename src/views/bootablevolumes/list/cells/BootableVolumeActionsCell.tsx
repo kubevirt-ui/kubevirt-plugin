@@ -22,7 +22,7 @@ const BootableVolumeActionsCell: FC<BootableVolumeActionsCellProps> = ({ callbac
     return <BootableVolumesActions preferences={clusterPreferences} source={row} />;
   }
 
-  return <DataSourceActions dataSource={row as V1beta1DataSource} isKebabToggle />;
+  return <DataSourceActions dataSource={row as V1beta1DataSource} isBootableVolume isKebabToggle />;
 };
 
 export default BootableVolumeActionsCell;

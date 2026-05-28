@@ -5,7 +5,12 @@ import {
   DROPDOWN_FORM_SELECTION,
   initialBootableVolumeState,
   SetBootableVolumeFieldType,
+  SOURCE_DETAILS_SECTION_ID,
 } from '@kubevirt-utils/components/AddBootableVolumeModal/utils/constants';
+import {
+  deleteBootableVolumeLabel,
+  updateBootableVolumeField,
+} from '@kubevirt-utils/components/AddBootableVolumeModal/utils/utils';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { DataUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -25,6 +30,7 @@ import SchedulingSettings from './SchedulingSettings';
 
 type AddBootableVolumeBodyProps = {
   bootableVolume: AddBootableVolumeState;
+  isUploading?: boolean;
   setBootableVolume: Dispatch<SetStateAction<AddBootableVolumeState>>;
   setSourceType: Dispatch<SetStateAction<DROPDOWN_FORM_SELECTION>>;
   sourceType: DROPDOWN_FORM_SELECTION;
@@ -33,6 +39,7 @@ type AddBootableVolumeBodyProps = {
 
 const AddBootableVolumeBody: FC<AddBootableVolumeBodyProps> = ({
   bootableVolume,
+  isUploading,
   setBootableVolume,
   setSourceType,
   sourceType,
@@ -45,23 +52,14 @@ const AddBootableVolumeBody: FC<AddBootableVolumeBodyProps> = ({
 
   const setBootableVolumeField: SetBootableVolumeFieldType = useCallback(
     (key, fieldKey) => (value) =>
-      setBootableVolume((prevState) => ({
-        ...prevState,
-        ...(fieldKey
-          ? { [key]: { ...(prevState[key] as object), [fieldKey]: value } }
-          : { ...prevState, [key]: value }),
-      })),
+      setBootableVolume((prevState) => updateBootableVolumeField(prevState, key, value, fieldKey)),
     [],
   );
 
-  const deleteLabel = useCallback((labelKey: string) => {
-    setBootableVolume((prev) => {
-      const updatedLabels = { ...prev?.labels };
-      delete updatedLabels[labelKey];
-
-      return { ...prev, labels: updatedLabels };
-    });
-  }, []);
+  const deleteLabel = useCallback(
+    (labelKey: string) => setBootableVolume((prev) => deleteBootableVolumeLabel(prev, labelKey)),
+    [],
+  );
 
   const resetDiskSize = () => setBootableVolumeField('size')(initialBootableVolumeState.size);
 
@@ -70,16 +68,18 @@ const AddBootableVolumeBody: FC<AddBootableVolumeBodyProps> = ({
       {isACMPage && (
         <ClusterSelect
           bootableVolume={bootableVolume}
+          isDisabled={isUploading}
           setBootableVolumeField={setBootableVolumeField}
         />
       )}
       <SourceTypeSelection
         formSelection={sourceType}
+        isDisabled={isUploading}
         namespace={namespace}
         resetDiskSize={resetDiskSize}
         setFormSelection={setSourceType}
       />
-      <Title headingLevel="h5" id="source-details-section">
+      <Title headingLevel="h5" id={SOURCE_DETAILS_SECTION_ID}>
         {t('Source details')}
       </Title>
       <VolumeSource
@@ -91,18 +91,18 @@ const AddBootableVolumeBody: FC<AddBootableVolumeBodyProps> = ({
       {sourceType === DROPDOWN_FORM_SELECTION.USE_REGISTRY && (
         <SchedulingSettings
           bootableVolume={bootableVolume}
+          isDisabled={isUploading}
           setBootableVolumeField={setBootableVolumeField}
         />
       )}
-      <Title className="pf-v6-u-mt-md" headingLevel="h5">
-        {t('Destination details')}
-      </Title>
+      <Title headingLevel="h5">{t('Destination details')}</Title>
       <VolumeDestination
         bootableVolume={bootableVolume}
+        isDisabled={isUploading}
         isSnapshotSourceType={sourceType === DROPDOWN_FORM_SELECTION.USE_SNAPSHOT}
         setBootableVolumeField={setBootableVolumeField}
       />
-      <Title className="pf-v6-u-mt-md" headingLevel="h5">
+      <Title headingLevel="h5">
         {t('Volume metadata')}{' '}
         <HelpTextIcon
           bodyContent={(hide) => (
@@ -119,6 +119,7 @@ const AddBootableVolumeBody: FC<AddBootableVolumeBodyProps> = ({
       <VolumeMetadata
         bootableVolume={bootableVolume}
         deleteLabel={deleteLabel}
+        isDisabled={isUploading}
         setBootableVolumeField={setBootableVolumeField}
       />
     </Form>

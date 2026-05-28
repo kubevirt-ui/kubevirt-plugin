@@ -11,6 +11,18 @@ export enum CLONING_STATUSES {
   UNKNOWN = 'Unknown',
 }
 
+export const CLONE_IN_PROGRESS_PHASES: ReadonlySet<CLONING_STATUSES> = new Set([
+  CLONING_STATUSES.SNAPSHOT_IN_PROGRESS,
+  CLONING_STATUSES.CREATING_TARGET_VM,
+  CLONING_STATUSES.RESTORE_IN_PROGRESS,
+]);
+
+export const isClonePhaseFailed = (phase?: string): boolean =>
+  phase === CLONING_STATUSES.FAILED || phase === CLONING_STATUSES.UNKNOWN;
+
+export const isClonePhaseInProgress = (phase?: string): boolean =>
+  !phase || CLONE_IN_PROGRESS_PHASES.has(phase as CLONING_STATUSES);
+
 export enum VolumeNamePolicy {
   PrefixTargetName = 'PrefixTargetName',
   RandomizeNames = 'RandomizeNames',

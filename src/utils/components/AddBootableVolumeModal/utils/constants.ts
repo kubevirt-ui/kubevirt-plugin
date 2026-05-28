@@ -16,6 +16,8 @@ import {
 import { OPENSHIFT_OS_IMAGES_NS } from '@kubevirt-utils/constants/constants';
 import { CDI_BIND_REQUESTED_ANNOTATION } from '@kubevirt-utils/hooks/useCDIUpload/consts';
 
+export const SOURCE_DETAILS_SECTION_ID = 'source-details-section';
+
 export enum DROPDOWN_FORM_SELECTION {
   UPLOAD_VOLUME = 'volume',
   USE_EXISTING_PVC = 'pvc',

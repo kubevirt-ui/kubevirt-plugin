@@ -19,7 +19,7 @@ import { logVMActionPerformed } from '@kubevirt-utils/extensions/telemetry/vm-ac
 import { logVMSnapshotCreated } from '@kubevirt-utils/extensions/telemetry/vm-storage';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getVolumeSnapshotStatuses } from '@kubevirt-utils/resources/vm';
-import { getDNS1123LabelError, isDNS1123Label } from '@kubevirt-utils/utils/validation';
+import { isDNS1123Label, validateDNS1123Label } from '@kubevirt-utils/utils/validation';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sCreate } from '@multicluster/k8sRequests';
 import {
@@ -107,7 +107,7 @@ const SnapshotModal: FC<SnapshotModalProps> = ({ isOpen, onClose, vm }) => {
         />
         {!isSnapshotNameValid && (
           <FormGroupHelperText validated={ValidatedOptions.error}>
-            {getDNS1123LabelError(snapshotName)?.(t)}
+            {validateDNS1123Label(t, snapshotName)}
           </FormGroupHelperText>
         )}
       </FormGroup>

@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 
+import { UPLOAD_FILENAME_FIELD } from '@kubevirt-utils/components/DiskModal/components/utils/constants';
 import {
   FORM_FIELD_SELECTED_ISO,
   FORM_FIELD_UPLOAD_FILE,
@@ -16,7 +17,27 @@ type MountCDROMFormState = {
   uploadMode: '' | typeof UPLOAD_MODE_EMPTY | typeof UPLOAD_MODE_SELECT | typeof UPLOAD_MODE_UPLOAD;
 };
 
-export const useMountCDROMForm = () => {
+export type UseMountCDROMFormOptions = {
+  /** Clears upload filename on a separate form (e.g. Add CD-ROM disk form). */
+  clearExtraUploadFilename?: () => void;
+};
+
+type UseMountCDROMFormReturn = {
+  handleClearUpload: (resetMode?: boolean) => void;
+  handleClearUploadAndFilename: () => void;
+  handleEmptyDriveSelection: () => void;
+  handleFileUpload: () => void;
+  handleISOSelect: (value: string) => void;
+  handleISOSelection: (selectedValue: string) => void;
+  isFormValid: boolean;
+  methods: ReturnType<typeof useForm<MountCDROMFormState>>;
+  selectedISO: string;
+  uploadFile: MountCDROMFormState['uploadFile'];
+  uploadFilename: string;
+  uploadMode: MountCDROMFormState['uploadMode'];
+};
+
+export const useMountCDROMForm = (options?: UseMountCDROMFormOptions): UseMountCDROMFormReturn => {
   const [uploadFilename, setUploadFilename] = useState('');
 
   const methods = useForm<MountCDROMFormState>({
@@ -66,12 +87,34 @@ export const useMountCDROMForm = () => {
     handleClearUpload(false);
   }, [setValue, handleClearUpload]);
 
+  const clearExtraUploadFilename = options?.clearExtraUploadFilename;
+
+  const clearUploadFilenameFields = useCallback(() => {
+    setValue(UPLOAD_FILENAME_FIELD, '');
+    clearExtraUploadFilename?.();
+  }, [clearExtraUploadFilename, setValue]);
+
+  const handleISOSelect = useCallback(
+    (value: string) => {
+      handleISOSelection(value);
+      clearUploadFilenameFields();
+    },
+    [handleISOSelection, clearUploadFilenameFields],
+  );
+
+  const handleClearUploadAndFilename = useCallback(() => {
+    handleClearUpload();
+    clearUploadFilenameFields();
+  }, [handleClearUpload, clearUploadFilenameFields]);
+
   const isFormValid = Boolean(selectedISO || uploadFile?.filename);
 
   return {
     handleClearUpload,
+    handleClearUploadAndFilename,
     handleEmptyDriveSelection,
     handleFileUpload,
+    handleISOSelect,
     handleISOSelection,
     isFormValid,
     methods,

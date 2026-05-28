@@ -26,6 +26,7 @@ type MenuHeightsType = {
 type ComposableDrilldownMenuProps = {
   children?: ReactNode;
   id?: string;
+  isDisabled?: boolean;
   isOpen: boolean;
   isScrollable?: boolean;
   scrollableMenuIDs?: string[];
@@ -39,6 +40,7 @@ const ComposableDrilldownSelect: FC<ComposableDrilldownMenuProps> = ({
   children,
   direction,
   id = 'rootMenu',
+  isDisabled,
   isOpen,
   isScrollable = false,
   scrollableMenuIDs = [],
@@ -54,6 +56,9 @@ const ComposableDrilldownSelect: FC<ComposableDrilldownMenuProps> = ({
   const menuRef = useRef<HTMLDivElement>(null);
 
   const onToggleClick = (ev?: MouseEvent) => {
+    if (isDisabled) {
+      return;
+    }
     ev?.stopPropagation(); // Stop handleClickOutside from handling
     setIsOpen(!isOpen);
     setMenuDrilledIn([]);
@@ -111,7 +116,12 @@ const ComposableDrilldownSelect: FC<ComposableDrilldownMenuProps> = ({
       }
       trigger={
         trigger ?? (
-          <MenuToggle isExpanded={isOpen} isFullWidth onClick={onToggleClick}>
+          <MenuToggle
+            isDisabled={isDisabled}
+            isExpanded={isOpen}
+            isFullWidth
+            onClick={onToggleClick}
+          >
             {toggleLabel}
           </MenuToggle>
         )
