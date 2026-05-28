@@ -1,11 +1,7 @@
 import React, { FC } from 'react';
 import { useParams } from 'react-router';
 
-import {
-  ConfigMapModel,
-  modelToGroupVersionKind,
-  V1Template,
-} from '@kubevirt-ui-ext/kubevirt-api/console';
+import { ConfigMapModel, modelToGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import WindowsLabel from '@kubevirt-utils/components/Labels/WindowsLabel';
@@ -15,7 +11,7 @@ import { SysprepDescription } from '@kubevirt-utils/components/SysprepModal/Sysp
 import { SysprepModal } from '@kubevirt-utils/components/SysprepModal/SysprepModal';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
+import { getTemplateVirtualMachineObject, Template } from '@kubevirt-utils/resources/template';
 import { getVolumes } from '@kubevirt-utils/resources/vm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
@@ -34,7 +30,7 @@ import {
 } from './sysprep-utils';
 
 type SysPrepItemProps = {
-  template: V1Template;
+  template: Template;
 };
 
 const SysPrepItem: FC<SysPrepItemProps> = ({ template }) => {

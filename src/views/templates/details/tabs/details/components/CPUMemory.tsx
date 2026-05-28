@@ -6,15 +6,18 @@ import { CpuMemHelperTextResources } from '@kubevirt-utils/components/CPUDescrip
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { V1Template } from '@kubevirt-utils/models';
-import { getTemplateVirtualMachineCPU, updateTemplate } from '@kubevirt-utils/resources/template';
+import {
+  getTemplateVirtualMachineCPU,
+  Template,
+  updateTemplate,
+} from '@kubevirt-utils/resources/template';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 
 import CPUMemoryModal from './CPUMemoryModal/CPUMemoryModal';
 
 type CPUMemoryProps = {
   editable: boolean;
-  template: V1Template;
+  template: Template;
 };
 
 const CPUMemory: FC<CPUMemoryProps> = ({ editable, template }) => {

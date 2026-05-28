@@ -10,15 +10,14 @@ import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import useHyperConvergeConfiguration from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { V1Template } from '@kubevirt-utils/models';
-import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
+import { getTemplateVirtualMachineObject, Template } from '@kubevirt-utils/resources/template';
 import { Checkbox, FormGroup } from '@patternfly/react-core';
 
 type EvictionStrategyModalProps = {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (updatedVM: V1Template) => Promise<V1Template | void>;
-  template: V1Template;
+  onSubmit: (updatedVM: Template) => Promise<Template | void>;
+  template: Template;
 };
 
 const EvictionStrategyModal: FC<EvictionStrategyModalProps> = ({
@@ -48,7 +47,7 @@ const EvictionStrategyModal: FC<EvictionStrategyModalProps> = ({
   }, [hyperConverge, hyperLoaded, hyperLoadingError, templateEvictionStrategy]);
 
   const updatedTemplate = useMemo(() => {
-    return produce<V1Template>(template, (templateDraft: V1Template) => {
+    return produce<Template>(template, (templateDraft: Template) => {
       const draftVM = getTemplateVirtualMachineObject(templateDraft);
       isChecked
         ? (draftVM.spec.template.spec.evictionStrategy = EVICTION_STRATEGIES.LiveMigrate)

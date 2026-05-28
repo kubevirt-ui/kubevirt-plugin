@@ -6,6 +6,7 @@ import {
   TemplateModel,
   TemplateParameter,
   V1Template,
+  VirtualMachineTemplateModel,
   VirtualMachineTemplateRequestModel,
 } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -53,10 +54,19 @@ export const isCommonTemplate = (template: Template): boolean =>
 export const isDeprecatedTemplate = (template: K8sResourceCommon): boolean =>
   getAnnotation(template, ANNOTATIONS.deprecated) === 'true';
 
-export const replaceTemplateVM = (template: V1Template, vm: V1VirtualMachine) => {
-  const vmIndex = template.objects?.findIndex((object) => object.kind === VirtualMachineModel.kind);
+export const replaceTemplateVM = (template: Template, vm: V1VirtualMachine): Template => {
+  if (isVirtualMachineTemplate(template)) {
+    return produce(template, (draftTemplate) => {
+      draftTemplate.spec.virtualMachine = vm;
+    });
+  }
 
-  return produce(template, (draftTemplate) => {
+  const osTemplate = template as V1Template;
+  const vmIndex = osTemplate.objects?.findIndex(
+    (object) => object.kind === VirtualMachineModel.kind,
+  );
+
+  return produce(osTemplate, (draftTemplate) => {
     draftTemplate.objects.splice(vmIndex, 1, vm);
   });
 };
@@ -151,11 +161,12 @@ export const isValidTemplateIconUrl = (url: string): boolean => {
   return false;
 };
 
-export const updateTemplate = (template: V1Template) => {
+export const updateTemplate = (template: Template) => {
+  const model = isVirtualMachineTemplate(template) ? VirtualMachineTemplateModel : TemplateModel;
   return kubevirtK8sUpdate({
     cluster: getCluster(template),
     data: template,
-    model: TemplateModel,
+    model,
     name: getName(template),
     ns: getNamespace(template),
   });

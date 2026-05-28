@@ -2307,7 +2307,6 @@
   "VirtualMachine name": "VirtualMachine 이름",
   "VirtualMachine name can not be empty.": "VirtualMachine 이름은 비워 둘 수 없습니다.",
   "VirtualMachine name: {{vmName}}": "VirtualMachine 이름: {{vmName}}",
-  "VirtualMachine resource is required": "VirtualMachine 리소스가 필요합니다.",
   "VirtualMachine statuses": "VirtualMachine 상태",
   "VirtualMachine storage migration plan name": "VirtualMachine 스토리지 마이그레이션 계획 이름",
   "VirtualMachine templates": "VirtualMachine 템플릿",

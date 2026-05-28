@@ -1,7 +1,6 @@
 import React, { FC, MouseEvent, useMemo, useState } from 'react';
 import produce from 'immer';
 
-import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { BootModeTitles } from '@kubevirt-utils/components/FirmwareBootloaderModal/utils/constants';
 import { BootloaderOptionValue } from '@kubevirt-utils/components/FirmwareBootloaderModal/utils/types';
 import {
@@ -12,14 +11,14 @@ import {
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
+import { getTemplateVirtualMachineObject, Template } from '@kubevirt-utils/resources/template';
 import { FormGroup, SelectOption } from '@patternfly/react-core';
 
 type TemplateBootloaderModalProps = {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (updatedVM: V1Template) => Promise<V1Template | void>;
-  template: V1Template;
+  onSubmit: (updatedVM: Template) => Promise<Template | void>;
+  template: Template;
 };
 
 const TemplateBootloaderModal: FC<TemplateBootloaderModalProps> = ({
@@ -41,7 +40,7 @@ const TemplateBootloaderModal: FC<TemplateBootloaderModalProps> = ({
   };
 
   const updatedTemplate = useMemo(() => {
-    return produce<V1Template>(template, (templateDraft: V1Template) => {
+    return produce<Template>(template, (templateDraft: Template) => {
       const vmDraft = getTemplateVirtualMachineObject(templateDraft);
       const updatedVM = updatedVMBootMode(vmDraft, selectedFirmwareBootloader);
 

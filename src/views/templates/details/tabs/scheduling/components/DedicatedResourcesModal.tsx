@@ -13,8 +13,8 @@ import { getDedicatedResourcesSearchHREF } from '@kubevirt-utils/components/Dedi
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { modelToGroupVersionKind, NodeModel, V1Template } from '@kubevirt-utils/models';
-import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
+import { modelToGroupVersionKind, NodeModel } from '@kubevirt-utils/models';
+import { getTemplateVirtualMachineObject, Template } from '@kubevirt-utils/resources/template';
 import { ensurePath, isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { ResourceLink, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
@@ -32,8 +32,8 @@ import {
 type DedicatedResourcesModalProps = {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (updatedTemplate: V1Template) => Promise<V1Template | void>;
-  template: V1Template;
+  onSubmit: (updatedTemplate: Template) => Promise<Template | void>;
+  template: Template;
 };
 
 const DedicatedResourcesModal: FC<DedicatedResourcesModalProps> = ({
@@ -61,7 +61,7 @@ const DedicatedResourcesModal: FC<DedicatedResourcesModalProps> = ({
   }, [nodes]);
 
   const updatedTemplate = useMemo(() => {
-    return produce<V1Template>(template, (templateDraft: V1Template) => {
+    return produce<Template>(template, (templateDraft: Template) => {
       const draftVM = getTemplateVirtualMachineObject(templateDraft);
       ensurePath(draftVM, ['spec.template.spec.domain.cpu']);
       draftVM.spec.template.spec.domain.cpu.dedicatedCpuPlacement = checked;

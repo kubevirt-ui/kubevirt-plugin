@@ -1,14 +1,13 @@
 import React, { FC, useEffect, useMemo, useState } from 'react';
 import produce from 'immer';
 
-import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1CPU } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import CPUInput from '@kubevirt-utils/components/CPUMemoryModal/components/CPUInput/CPUInput';
 import { getCPULimitsFromTemplate } from '@kubevirt-utils/components/CPUMemoryModal/components/CPUInput/utils/utils';
 import MemoryInput from '@kubevirt-utils/components/CPUMemoryModal/components/MemoryInput/MemoryInput';
 import { getMemorySize } from '@kubevirt-utils/components/CPUMemoryModal/utils/CpuMemoryUtils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
+import { getTemplateVirtualMachineObject, Template } from '@kubevirt-utils/resources/template';
 import { getCPU, getMemory } from '@kubevirt-utils/resources/vm';
 import { ensurePath } from '@kubevirt-utils/utils/utils';
 import {
@@ -32,8 +31,8 @@ import '@kubevirt-utils/components/CPUMemoryModal/cpu-memory-modal.scss';
 type CPUMemoryModalProps = {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (updatedVMTemplate: V1Template) => Promise<V1Template | void>;
-  template: V1Template;
+  onSubmit: (updatedVMTemplate: Template) => Promise<Template | void>;
+  template: Template;
 };
 
 const CPUMemoryModal: FC<CPUMemoryModalProps> = ({ isOpen, onClose, onSubmit, template }) => {
@@ -53,7 +52,7 @@ const CPUMemoryModal: FC<CPUMemoryModalProps> = ({ isOpen, onClose, onSubmit, te
     setUpdateInProcess(true);
     setUpdateError(null);
 
-    const updatedTemplate = produce<V1Template>(template, (templateDraft: V1Template) => {
+    const updatedTemplate = produce<Template>(template, (templateDraft: Template) => {
       const draftVM = getTemplateVirtualMachineObject(templateDraft);
 
       ensurePath(draftVM, [

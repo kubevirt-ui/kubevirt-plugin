@@ -1,10 +1,9 @@
-import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
-import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
+import { getTemplateVirtualMachineObject, Template } from '@kubevirt-utils/resources/template';
 import { DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 import useWizardDisksTableData from '@virtualmachines/creation-wizard/components/DisksReviewTable/hooks/useWizardDisksTableData/useWizardDisksTableData';
 
-type UseDisksTableDisks = (template: V1Template) => [DiskRowDataLayout[], boolean, Error | null];
+type UseDisksTableDisks = (template: Template) => [DiskRowDataLayout[], boolean, Error | null];
 
 /**
  * A Hook for getting disks data for a VM template

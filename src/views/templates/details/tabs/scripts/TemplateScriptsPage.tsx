@@ -1,6 +1,5 @@
 import React, { FC, useCallback } from 'react';
 
-import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { CloudInitDescription } from '@kubevirt-utils/components/CloudinitDescription/CloudInitDescription';
 import CloudinitModal from '@kubevirt-utils/components/CloudinitModal/CloudinitModal';
@@ -12,6 +11,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import {
   getTemplateVirtualMachineObject,
   replaceTemplateVM,
+  Template,
   updateTemplate,
 } from '@kubevirt-utils/resources/template';
 import {
@@ -34,7 +34,7 @@ import SysPrepItem from './components/SysPrepItem/SysPrepItem';
 import './template-scripts-tab.scss';
 
 type TemplateScriptsPageProps = {
-  obj: V1Template;
+  obj: Template;
 };
 
 const TemplateScriptsPage: FC<TemplateScriptsPageProps> = ({ obj: template }) => {
@@ -54,7 +54,7 @@ const TemplateScriptsPage: FC<TemplateScriptsPageProps> = ({ obj: template }) =>
 
   return (
     <PageSection>
-      <SidebarEditor<V1Template> onResourceUpdate={updateTemplate} resource={template}>
+      <SidebarEditor<Template> onResourceUpdate={updateTemplate} resource={template}>
         <DescriptionList className="template-scripts-tab__description-list">
           <DescriptionItem
             descriptionHeader={

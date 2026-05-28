@@ -296,6 +296,15 @@ export const extensions: EncodedExtension[] = [
     },
     type: 'console.page/route',
   } as EncodedExtension<RoutePage>,
+  {
+    properties: {
+      component: {
+        $codeRef: 'TemplateNavPage',
+      },
+      path: [`${FLEET_TEMPLATES_PATH}/cluster/:cluster/ns/:ns/vmt/:name`],
+    },
+    type: 'console.page/route',
+  } as EncodedExtension<RoutePage>,
 
   {
     properties: {

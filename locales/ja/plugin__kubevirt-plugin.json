@@ -2307,7 +2307,6 @@
   "VirtualMachine name": "VirtualMachine 名",
   "VirtualMachine name can not be empty.": "VirtualMachine 名は空にできません。",
   "VirtualMachine name: {{vmName}}": "VirtualMachine 名: {{vmName}}",
-  "VirtualMachine resource is required": "VirtualMachine リソースが必要です",
   "VirtualMachine statuses": "VirtualMachine のステータス",
   "VirtualMachine storage migration plan name": "VirtualMachine のストレージ移行計画名",
   "VirtualMachine templates": "VirtualMachine テンプレート",

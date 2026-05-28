@@ -1,9 +1,8 @@
 import React, { FC } from 'react';
 
-import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { updateTemplate } from '@kubevirt-utils/resources/template';
+import { Template, updateTemplate } from '@kubevirt-utils/resources/template';
 import { Grid, GridItem, PageSection, Title } from '@patternfly/react-core';
 
 import TemplateDetailsLeftGrid from './components/TemplateDetailsLeftGrid';
@@ -13,13 +12,13 @@ import './TemplateDetailsPage.scss';
 
 export type TemplateDetailsGridProps = {
   editable?: boolean;
-  template: V1Template;
+  template: Template;
 };
 
 export type LabelsAnnotationsType = { [key: string]: string };
 
 type TemplateDetailsPageProps = {
-  obj?: V1Template;
+  obj?: Template;
 };
 
 const TemplateDetailsPage: FC<TemplateDetailsPageProps> = ({ obj: template }) => {
@@ -27,7 +26,7 @@ const TemplateDetailsPage: FC<TemplateDetailsPageProps> = ({ obj: template }) =>
 
   return (
     <PageSection>
-      <SidebarEditor<V1Template> onResourceUpdate={updateTemplate} resource={template}>
+      <SidebarEditor<Template> onResourceUpdate={updateTemplate} resource={template}>
         {(resource) => (
           <>
             <Title headingLevel="h2">{t('Template details')}</Title>

@@ -2,11 +2,7 @@ import React, { FC, useMemo } from 'react';
 import produce from 'immer';
 import { getNodeSelector } from 'src/views/templates/utils/selectors';
 
-import {
-  modelToGroupVersionKind,
-  NodeModel,
-  V1Template,
-} from '@kubevirt-ui-ext/kubevirt-api/console';
+import { modelToGroupVersionKind, NodeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { IoK8sApiCoreV1Node } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import LabelsList from '@kubevirt-utils/components/NodeSelectorModal/components/LabelList';
 import LabelRow from '@kubevirt-utils/components/NodeSelectorModal/components/LabelRow';
@@ -20,7 +16,7 @@ import {
 import { IDLabel } from '@kubevirt-utils/components/NodeSelectorModal/utils/types';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
+import { getTemplateVirtualMachineObject, Template } from '@kubevirt-utils/resources/template';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
@@ -28,8 +24,8 @@ import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 type NodeSelectorModalProps = {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (updatedTemplate: V1Template) => Promise<V1Template | void>;
-  template: V1Template;
+  onSubmit: (updatedTemplate: Template) => Promise<Template | void>;
+  template: Template;
 };
 
 const NodeSelectorModal: FC<NodeSelectorModalProps> = ({ isOpen, onClose, onSubmit, template }) => {
@@ -53,7 +49,7 @@ const NodeSelectorModal: FC<NodeSelectorModalProps> = ({ isOpen, onClose, onSubm
 
   const updatedTemplate = useMemo(
     () =>
-      produce<V1Template>(template, (templateDraft: V1Template) => {
+      produce<Template>(template, (templateDraft: Template) => {
         const draftVM = getTemplateVirtualMachineObject(templateDraft);
         if (!getNodeSelector(templateDraft)) {
           draftVM.spec.template.spec.nodeSelector = {};

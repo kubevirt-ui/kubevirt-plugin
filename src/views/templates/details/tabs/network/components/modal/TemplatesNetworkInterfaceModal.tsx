@@ -1,6 +1,6 @@
 import React, { FC, useCallback } from 'react';
 
-import { TemplateModel, V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { TemplateModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import NetworkInterfaceModal from '@kubevirt-utils/components/NetworkInterfaceModal/NetworkInterfaceModal';
 import {
   createInterface,
@@ -8,7 +8,7 @@ import {
 } from '@kubevirt-utils/components/NetworkInterfaceModal/utils/helpers';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
-import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
+import { getTemplateVirtualMachineObject, Template } from '@kubevirt-utils/resources/template';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sUpdate } from '@multicluster/k8sRequests';
 
@@ -18,7 +18,7 @@ type TemplatesNetworkInterfaceModalProps = {
   headerText: string;
   isOpen: boolean;
   onClose: () => void;
-  template: V1Template;
+  template: Template;
 };
 
 const TemplatesNetworkInterfaceModal: FC<TemplatesNetworkInterfaceModalProps> = ({

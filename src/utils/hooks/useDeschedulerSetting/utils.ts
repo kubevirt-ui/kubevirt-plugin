@@ -1,11 +1,14 @@
 import produce from 'immer';
 
-import { TemplateModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { TemplateModel, VirtualMachineTemplateModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { V1Template } from '@kubevirt-utils/models';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
-import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
+import {
+  getTemplateVirtualMachineObject,
+  isVirtualMachineTemplate,
+  Template,
+} from '@kubevirt-utils/resources/template';
 import {
   DESCHEDULER_EVICT_ANNOTATION,
   DESCHEDULER_PREFER_NO_EVICTION_ANNOTATION,
@@ -53,18 +56,20 @@ export const updateDeschedulerForVM = (
 };
 
 export const updateDeschedulerForTemplate = (
-  template: V1Template,
+  template: Template,
   settingChecked: boolean,
-): Promise<V1Template> => {
-  const updatedTemplate = produce<V1Template>(template, (draftTemplate: V1Template) => {
+): Promise<Template> => {
+  const updatedTemplate = produce<Template>(template, (draftTemplate: Template) => {
     const draftVM = getTemplateVirtualMachineObject(draftTemplate);
     updateVMDeschedulerSetting(draftVM, settingChecked);
   });
 
+  const model = isVirtualMachineTemplate(template) ? VirtualMachineTemplateModel : TemplateModel;
+
   return kubevirtK8sUpdate({
     cluster: getCluster(template),
     data: updatedTemplate,
-    model: TemplateModel,
+    model,
     name: getName(updatedTemplate),
     ns: getNamespace(updatedTemplate),
   });

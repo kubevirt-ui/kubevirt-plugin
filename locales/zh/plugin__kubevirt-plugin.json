@@ -2307,7 +2307,6 @@
   "VirtualMachine name": "VirtualMachine 名称",
   "VirtualMachine name can not be empty.": "VirtualMachine 名称不能为空。",
   "VirtualMachine name: {{vmName}}": "VirtualMachine 名称: {{vmName}}",
-  "VirtualMachine resource is required": "虚拟机资源是必需的",
   "VirtualMachine statuses": "VirtualMachine 状态",
   "VirtualMachine storage migration plan name": "虚拟机存储迁移计划名称",
   "VirtualMachine templates": "虚拟机模板",
