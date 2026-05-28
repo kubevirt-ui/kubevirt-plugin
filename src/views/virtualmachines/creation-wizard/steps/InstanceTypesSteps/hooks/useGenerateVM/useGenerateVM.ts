@@ -26,7 +26,7 @@ import {
 export type UseGenerateVM = () => V1VirtualMachine;
 
 const useGenerateVM: UseGenerateVM = () => {
-  const { cluster, folder, project: namespace } = useVMWizardStore();
+  const { cluster, folder, project: namespace, vmDescription, vmName } = useVMWizardStore();
   const { featureEnabled: autoUpdateEnabled } = useFeatures(AUTOMATIC_UPDATE_FEATURE_NAME);
 
   const { subscriptionData } = useRHELAutomaticSubscription();
@@ -62,7 +62,6 @@ const useGenerateVM: UseGenerateVM = () => {
         dvSource,
         enableMultiArchBootImageImport,
         folder,
-        generatedVMName,
         isIPv6SingleStack,
         isUDNManagedNamespace,
         populatedCloudInitYAML,
@@ -70,6 +69,8 @@ const useGenerateVM: UseGenerateVM = () => {
         selectedBootableVolume,
         selectedInstanceType,
         targetNamespace: namespace,
+        vmDescription,
+        vmName: vmName || generatedVMName,
       }),
     [
       cluster,
@@ -85,6 +86,8 @@ const useGenerateVM: UseGenerateVM = () => {
       pvcSource,
       selectedBootableVolume,
       selectedInstanceType,
+      vmDescription,
+      vmName,
     ],
   );
 

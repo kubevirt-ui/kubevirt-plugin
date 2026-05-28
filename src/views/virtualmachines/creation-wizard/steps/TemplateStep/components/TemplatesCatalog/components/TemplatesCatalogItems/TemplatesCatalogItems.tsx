@@ -2,9 +2,8 @@ import React, { FC, useMemo } from 'react';
 
 import { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import { getUID } from '@kubevirt-utils/resources/shared';
-import { getTemplateName, Template } from '@kubevirt-utils/resources/template';
+import { getTemplateName, sortTemplates, Template } from '@kubevirt-utils/resources/template';
 import { Gallery, StackItem } from '@patternfly/react-core';
-import { sortCatalogTemplates } from '@virtualmachines/creation-wizard/steps/TemplateStep/components/TemplatesCatalog/utils/utils';
 
 import TemplatesTable from '../TemplatesTable/TemplatesTable';
 
@@ -31,7 +30,7 @@ const TemplatesCatalogItems: FC<TemplatesCatalogItemsProps> = ({
   selectedTemplate,
   templates,
 }) => {
-  const sortedTemplates = useMemo(() => sortCatalogTemplates(templates), [templates]);
+  const sortedTemplates = useMemo(() => sortTemplates(templates), [templates]);
 
   return isList ? (
     <div className="vm-catalog-table-container">

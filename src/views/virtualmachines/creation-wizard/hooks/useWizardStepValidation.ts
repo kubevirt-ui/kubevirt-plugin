@@ -2,11 +2,12 @@ import { useCallback, useMemo } from 'react';
 
 import { vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { isDNS1123Label } from '@kubevirt-utils/utils/validation';
 import { useSignals } from '@preact/signals-react/runtime';
 import useInstanceTypeVMStore from '@virtualmachines/creation-wizard/state/instance-type-vm-store/useInstanceTypeVMStore';
 import useVMWizardStore from '@virtualmachines/creation-wizard/state/vm-wizard-store/useVMWizardStore';
 import { VMWizardStep } from '@virtualmachines/creation-wizard/utils/constants';
-import { getActiveFlow } from '@virtualmachines/creation-wizard/utils/utils';
+import { getActiveFlow, isCloneCreationMethod } from '@virtualmachines/creation-wizard/utils/utils';
 
 type WizardStepValidation = {
   isNextDisabledForStep: (stepId: VMWizardStep) => boolean;
@@ -15,7 +16,7 @@ type WizardStepValidation = {
 
 const useWizardStepValidation = (): WizardStepValidation => {
   useSignals();
-  const { creationMethod, selectedTemplate, visitedSteps } = useVMWizardStore();
+  const { creationMethod, selectedTemplate, visitedSteps, vmName } = useVMWizardStore();
   const {
     operatingSystemType,
     preference,
@@ -34,13 +35,15 @@ const useWizardStepValidation = (): WizardStepValidation => {
 
   const currentVMSignalValue = vmSignal.value;
 
+  const isValidVMName = isCloneCreationMethod(creationMethod) || isDNS1123Label(vmName);
+
   const stepNextDisabled: Record<VMWizardStep, boolean> = useMemo(
     () => ({
       [VMWizardStep.BOOT_SOURCE]: useBootSource && isEmpty(selectedBootableVolume),
       [VMWizardStep.CLONE]: isEmpty(currentVMSignalValue),
       [VMWizardStep.COMPUTE_RESOURCES]: !isRedHatProvided && !isUserProvided,
       [VMWizardStep.CUSTOMIZATION]: false,
-      [VMWizardStep.DEPLOYMENT_DETAILS]: false,
+      [VMWizardStep.DEPLOYMENT_DETAILS]: !isValidVMName,
       [VMWizardStep.GUEST_OS]: !operatingSystemType || !preference,
       [VMWizardStep.REVIEW_AND_CREATE]: false,
       [VMWizardStep.TEMPLATE]: isEmpty(selectedTemplate),
@@ -54,6 +57,7 @@ const useWizardStepValidation = (): WizardStepValidation => {
       selectedBootableVolume,
       selectedTemplate,
       useBootSource,
+      isValidVMName,
     ],
   );
 

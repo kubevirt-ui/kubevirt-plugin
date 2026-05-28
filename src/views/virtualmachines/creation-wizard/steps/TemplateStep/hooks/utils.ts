@@ -10,12 +10,13 @@ export const resolveVMFromTemplate = (
   selectedTemplate: Template,
   namespace: string,
   cluster: string,
+  vmName?: string,
 ): Promise<V1VirtualMachine> => {
   if (isVirtualMachineTemplate(selectedTemplate)) {
-    return processVirtualMachineTemplate(selectedTemplate, cluster);
+    return processVirtualMachineTemplate(selectedTemplate, cluster, vmName);
   }
 
-  return processOpenShiftTemplate(selectedTemplate, namespace, cluster);
+  return processOpenShiftTemplate(selectedTemplate, namespace, cluster, vmName);
 };
 
 export const applyCertConfigMapToCDRom = (

@@ -1,38 +1,21 @@
-import React, { FC, useState } from 'react';
-import produce from 'immer';
-import { LABELS } from 'src/views/templates/utils/constants';
+import React, { FC } from 'react';
+import { FormProvider } from 'react-hook-form';
 
-import { TemplateModel, V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import {
-  ANNOTATIONS,
-  APP_NAME_LABEL,
-  CUSTOM_TEMPLATES,
-  getTemplateVirtualMachineObject,
-  LABEL_USED_TEMPLATE_NAME,
-  LABEL_USED_TEMPLATE_NAMESPACE,
-  TEMPLATE_DEFAULT_VARIANT_LABEL,
-  TEMPLATE_TYPE_VM,
-  TEMPLATE_VERSION_LABEL,
-} from '@kubevirt-utils/resources/template';
-import { getRandomChars } from '@kubevirt-utils/utils/utils';
-import { getCluster } from '@multicluster/helpers/selectors';
-import { kubevirtK8sCreate } from '@multicluster/k8sRequests';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
-import { ButtonVariant, FormGroup, TextInput } from '@patternfly/react-core';
+import { ButtonVariant } from '@patternfly/react-core';
 
-import FormGroupHelperText from '../FormGroupHelperText/FormGroupHelperText';
-
-import CloneStorageCheckbox from './CloneStorageCheckbox';
-import SelectProject from './SelectProject';
-import { cloneStorage, getTemplateBootSourcePVC } from './utils';
+import { CloneTemplateField } from './form/types';
+import useCloneTemplate from './hooks/useCloneTemplate';
+import CloneTemplateModalBody from './CloneTemplateModalBody';
 
 import './clone-template-modal.scss';
 
 type CloneTemplateModalProps = {
   isOpen: boolean;
-  obj: V1Template;
+  obj?: V1Template;
   onClose: () => void;
   onTemplateCloned?: (clonedTemplate: V1Template) => void;
 };
@@ -44,126 +27,26 @@ const CloneTemplateModal: FC<CloneTemplateModalProps> = ({
   onTemplateCloned,
 }) => {
   const { t } = useKubevirtTranslation();
-  const [templateName, setTemplateName] = useState(`${obj?.metadata?.name}-${getRandomChars(9)}`);
-  const templateVMPVC = getTemplateBootSourcePVC(obj);
-  const clonableStorage = !!templateVMPVC;
-  const [pvcName, setPVCName] = useState(`${templateVMPVC?.name}-clone`);
-  const [templateProvider, setTemplateProvider] = useState('');
-  const [selectedProject, setSelectedProject] = useState(obj?.metadata?.namespace);
-  const [isCloneStorageEnabled, setCloneStorage] = useState(false);
-  const [templateDisplayName, setTemplateDisplayName] = useState(
-    obj?.metadata?.annotations?.[ANNOTATIONS.displayName] || '',
-  );
-  const onSubmit = async () => {
-    let templateToCreate: V1Template = produce(obj, (draftTemplate) => {
-      const draftVM = getTemplateVirtualMachineObject(draftTemplate);
-      draftTemplate.metadata = {
-        annotations: {
-          ...draftTemplate?.metadata?.annotations,
-          [ANNOTATIONS.displayName]: templateDisplayName,
-          [ANNOTATIONS.providerDisplayName]: templateProvider,
-          [LABELS.provider]: templateProvider,
-        },
-        labels: {
-          ...draftTemplate?.metadata?.labels,
-          [APP_NAME_LABEL]: CUSTOM_TEMPLATES,
-          [LABELS.name]: obj?.metadata?.name,
-          [LABELS.namespace]: obj?.metadata?.namespace,
-          [LABELS.type]: TEMPLATE_TYPE_VM,
-        },
-        name: templateName,
-        namespace: selectedProject,
-      };
-
-      draftVM.metadata.labels[LABEL_USED_TEMPLATE_NAME] = templateName;
-      draftVM.metadata.labels[LABEL_USED_TEMPLATE_NAMESPACE] = selectedProject;
-      delete draftVM.metadata.labels[TEMPLATE_VERSION_LABEL];
-      delete draftTemplate.metadata.labels[TEMPLATE_DEFAULT_VARIANT_LABEL];
-    });
-
-    if (isCloneStorageEnabled) {
-      await cloneStorage(obj, pvcName, selectedProject);
-
-      templateToCreate = produce(templateToCreate, (draftTemplate) => {
-        const draftVM = getTemplateVirtualMachineObject(draftTemplate);
-        delete draftVM.spec.dataVolumeTemplates[0].spec.sourceRef;
-        draftVM.spec.dataVolumeTemplates[0].spec.source.pvc.name = pvcName;
-        draftVM.spec.dataVolumeTemplates[0].spec.source.pvc.namespace = selectedProject;
-      });
-    }
-    const clonedTemplate = await kubevirtK8sCreate<V1Template>({
-      cluster: getCluster(obj),
-      data: templateToCreate,
-      model: TemplateModel,
-    });
-
-    if (onTemplateCloned) onTemplateCloned(clonedTemplate);
-  };
+  const { form, onSubmit, onTemplateSelected } = useCloneTemplate(obj, onTemplateCloned);
+  const template = form.watch(CloneTemplateField.template);
 
   return (
-    <TabModal<K8sResourceCommon>
-      formClassName="clone-template-modal"
-      headerText={t('Clone template')}
-      isOpen={isOpen}
-      obj={obj}
-      onClose={onClose}
-      onSubmit={onSubmit}
-      shouldWrapInForm
-      submitBtnText={t('Clone')}
-      submitBtnVariant={ButtonVariant.primary}
-    >
-      <FormGroup fieldId="name" isRequired label={t('Template name')}>
-        <TextInput
-          id="name"
-          onChange={(_, value: string) => setTemplateName(value)}
-          type="text"
-          value={templateName}
-        />
-      </FormGroup>
-      <FormGroup fieldId="namespace" label={t('Template project')}>
-        <SelectProject
-          cluster={getCluster(obj)}
-          selectedProject={selectedProject}
-          setSelectedProject={setSelectedProject}
-        />
-        <FormGroupHelperText>{t('Project name to clone the template to')}</FormGroupHelperText>
-      </FormGroup>
-      <FormGroup fieldId="display-name" label={t('Template display name')}>
-        <TextInput
-          id="display-name"
-          onChange={(_, value: string) => setTemplateDisplayName(value)}
-          type="text"
-          value={templateDisplayName}
-        />
-      </FormGroup>
-      <FormGroup fieldId="provider" label={t('Template provider')}>
-        <TextInput
-          id="provider"
-          onChange={(_, value: string) => setTemplateProvider(value)}
-          type="text"
-          value={templateProvider}
-        />
-        <FormGroupHelperText>{t('Example: your company name')}</FormGroupHelperText>
-      </FormGroup>
-      {clonableStorage && (
-        <CloneStorageCheckbox isChecked={isCloneStorageEnabled} onChange={setCloneStorage} />
-      )}
-      {isCloneStorageEnabled && (
-        <FormGroup
-          className="pvc-name-form-group"
-          fieldId="pvc-name"
-          isRequired
-          label={t('Name of the template new disk')}
-        >
-          <TextInput
-            id="pvc-name"
-            onChange={(_, value: string) => setPVCName(value)}
-            type="text"
-            value={pvcName}
-          />
-        </FormGroup>
-      )}
-    </TabModal>
+    <FormProvider {...form}>
+      <TabModal<K8sResourceCommon>
+        formClassName="clone-template-modal"
+        headerText={t('Clone template')}
+        isDisabled={!template}
+        isOpen={isOpen}
+        obj={template}
+        onClose={onClose}
+        onSubmit={onSubmit}
+        shouldWrapInForm
+        submitBtnText={t('Clone')}
+        submitBtnVariant={ButtonVariant.primary}
+      >
+        <CloneTemplateModalBody initialTemplate={obj} onTemplateSelected={onTemplateSelected} />
+      </TabModal>
+    </FormProvider>
   );
 };
 
