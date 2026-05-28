@@ -1,11 +1,12 @@
-import React, { FC, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router';
+import React, { FC, useState } from 'react';
+import { TFunction } from 'i18next';
 
 import {
   V1beta1VirtualMachineClone,
   V1beta1VirtualMachineSnapshot,
   V1VirtualMachine,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import BackgroundOperationAlert from '@kubevirt-utils/components/TabModal/BackgroundOperationAlert';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useNameValidation } from '@kubevirt-utils/hooks/useNameValidation';
@@ -13,8 +14,7 @@ import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { isVM } from '@kubevirt-utils/utils/typeGuards';
 import { truncateToK8sName } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
-import { getVMURL } from '@multicluster/urls';
-import { Divider, ModalVariant } from '@patternfly/react-core';
+import { Alert, AlertVariant, Divider, ModalVariant } from '@patternfly/react-core';
 
 import CloneVMModalConfigSection from './components/CloneVMModalConfigSection';
 import DescriptionInput from './components/DescriptionInput';
@@ -22,8 +22,19 @@ import NameInput from './components/NameInput';
 import SnapshotContentConfigurationSummary from './components/SnapshotContentConfigurationSummary';
 import StartClonedVMCheckbox from './components/StartClonedVMCheckbox/StartClonedVMCheckbox';
 import useCloneVMModal from './hooks/useCloneVMModal';
-import { CLONING_STATUSES } from './utils/constants';
+import { CLONING_STATUSES, isClonePhaseFailed, isClonePhaseInProgress } from './utils/constants';
 import { cloneVM, vmExists } from './utils/helpers';
+
+const getSubmitBtnText = (
+  isCloneSucceeded: boolean,
+  isCloneLoading: boolean,
+  isVMSource: boolean,
+  t: TFunction,
+) => {
+  if (isCloneSucceeded) return t('Close');
+  if (isCloneLoading) return t('Cloning');
+  return isVMSource ? t('Clone') : t('Create');
+};
 
 type CloneVMModalProps = {
   headerText?: string;
@@ -34,7 +45,6 @@ type CloneVMModalProps = {
 
 const CloneVMModal: FC<CloneVMModalProps> = ({ headerText, isOpen, onClose, source }) => {
   const { t } = useKubevirtTranslation();
-  const navigate = useNavigate();
   const namespace = getNamespace(source);
   const name = getName(source);
 
@@ -76,28 +86,63 @@ const CloneVMModal: FC<CloneVMModalProps> = ({ headerText, isOpen, onClose, sour
     getCluster(initialCloneRequest),
   );
 
-  useEffect(() => {
-    if (cloneRequest?.status?.phase === CLONING_STATUSES.SUCCEEDED) {
-      navigate(getVMURL(cloneRequest?.cluster, namespace, cloneName));
-      onClose();
-    }
-  }, [cloneRequest, cloneName, namespace, onClose, navigate, source]);
+  const clonePhase = cloneRequest?.status?.phase;
+  const isCloneSucceeded = clonePhase === CLONING_STATUSES.SUCCEEDED;
+  const isCloneFailed = isClonePhaseFailed(clonePhase);
+  const isCloneInProgress =
+    Boolean(initialCloneRequest) &&
+    !isCloneSucceeded &&
+    !isCloneFailed &&
+    isClonePhaseInProgress(clonePhase);
+  const cloneFailureMessage = cloneRequest?.status?.conditions?.find(
+    (condition) => condition.status === 'False',
+  )?.message;
 
   return (
     <TabModal
+      onSubmit={async () => {
+        if (isCloneSucceeded) {
+          onClose();
+          return;
+        }
+        return sendCloneRequest();
+      }}
+      cancelBtnText={initialCloneRequest ? t('Close') : undefined}
       closeOnSubmit={false}
       headerText={headerText ?? t('Clone {{sourceKind}}', { sourceKind: source.kind })}
-      isDisabled={Boolean(initialCloneRequest) || !isCloneNameValid}
+      isDisabled={!isCloneNameValid || isCloneInProgress}
       isHorizontal
-      isLoading={Boolean(initialCloneRequest)}
+      isLoading={isCloneInProgress}
       isOpen={isOpen}
       modalVariant={ModalVariant.medium}
       obj={source}
       onClose={onClose}
-      onSubmit={sendCloneRequest}
       shouldWrapInForm
-      submitBtnText={isVM(source) ? t('Clone') : t('Create')}
+      submitBtnText={getSubmitBtnText(isCloneSucceeded, isCloneInProgress, isVM(source), t)}
     >
+      <BackgroundOperationAlert
+        description={t(
+          'Cloning may take several minutes. You can close this dialog — the process will continue in the background. The cloned virtual machine may take some time to appear in the list.',
+        )}
+        isVisible={isCloneInProgress}
+      />
+      {isCloneFailed && (
+        <Alert isInline title={t('Clone failed')} variant={AlertVariant.danger}>
+          {cloneFailureMessage ||
+            t(
+              'The operation could not be completed. Please try again or contact your administrator.',
+            )}
+        </Alert>
+      )}
+      {isCloneSucceeded && (
+        <Alert
+          title={t(
+            'Clone completed. The cloned virtual machine may take some time to appear in the list.',
+          )}
+          isInline
+          variant={AlertVariant.success}
+        />
+      )}
       <NameInput
         autoFocus
         errorText={errorText}

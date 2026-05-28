@@ -7,7 +7,8 @@ import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getHostname } from '@kubevirt-utils/resources/vm';
 import { ensurePath } from '@kubevirt-utils/utils/utils';
-import { FormGroup, TextInput } from '@patternfly/react-core';
+import { getFieldRequiredMessage, validateDNS1123Label } from '@kubevirt-utils/utils/validation';
+import { FormGroup, TextInput, ValidatedOptions } from '@patternfly/react-core';
 
 import FormGroupHelperText from '../FormGroupHelperText/FormGroupHelperText';
 
@@ -22,6 +23,12 @@ type HostnameModalProps = {
 const HostnameModal: FC<HostnameModalProps> = ({ isOpen, onClose, onSubmit, vm, vmi }) => {
   const { t } = useKubevirtTranslation();
   const [newHostname, setNewHostname] = useState<string>(getHostname(vm));
+  const [isTouched, setIsTouched] = useState(false);
+
+  const hostnameError = newHostname?.trim()
+    ? validateDNS1123Label(t, newHostname)
+    : getFieldRequiredMessage(t);
+  const isHostnameInvalid = isTouched && !!hostnameError;
 
   const updatedVirtualMachine = useMemo(() => {
     const updatedVM = produce<V1VirtualMachine>(vm, (vmDraft: V1VirtualMachine) => {
@@ -33,6 +40,7 @@ const HostnameModal: FC<HostnameModalProps> = ({ isOpen, onClose, onSubmit, vm, 
   return (
     <TabModal
       headerText={t('Edit hostname')}
+      isDisabled={!newHostname?.trim() || !!validateDNS1123Label(t, newHostname)}
       isOpen={isOpen}
       obj={updatedVirtualMachine}
       onClose={onClose}
@@ -40,15 +48,19 @@ const HostnameModal: FC<HostnameModalProps> = ({ isOpen, onClose, onSubmit, vm, 
       shouldWrapInForm
     >
       {vmi && <ModalPendingChangesAlert />}
-      <FormGroup fieldId="hostname" label={t('Hostname')}>
+      <FormGroup fieldId="hostname" isRequired label={t('Hostname')}>
         <TextInput
           autoFocus
           id="hostname"
+          onBlur={() => setIsTouched(true)}
           onChange={(_event, val) => setNewHostname(val)}
           type="text"
+          validated={isHostnameInvalid ? ValidatedOptions.error : ValidatedOptions.default}
           value={newHostname}
         />
-        <FormGroupHelperText>{t('Please provide hostname.')}</FormGroupHelperText>
+        <FormGroupHelperText validated={isHostnameInvalid ? ValidatedOptions.error : undefined}>
+          {isHostnameInvalid ? hostnameError : t('Please provide hostname.')}
+        </FormGroupHelperText>
       </FormGroup>
     </TabModal>
   );

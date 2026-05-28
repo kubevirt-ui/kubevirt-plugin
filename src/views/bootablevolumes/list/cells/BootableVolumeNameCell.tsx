@@ -1,4 +1,5 @@
 import React, { FC, useMemo } from 'react';
+import { Link } from 'react-router';
 import { TFunction } from 'i18next';
 
 import { DataSourceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -13,6 +14,7 @@ import {
   getName,
   getNamespace,
   getResourceFromClusterMap,
+  getResourceUrl,
   isDataImportCronProgressing,
 } from '@kubevirt-utils/resources/shared';
 import {
@@ -20,8 +22,10 @@ import {
   isDataSourceReady,
 } from '@kubevirt-utils/resources/template/hooks/useVmTemplateSource/utils';
 import MulticlusterResourceLink from '@multicluster/components/MulticlusterResourceLink/MulticlusterResourceLink';
+import { ResourceIcon } from '@openshift-console/dynamic-plugin-sdk';
 import { Label } from '@patternfly/react-core';
 
+import { appendBootableVolumeContext } from '../../../datasources/hooks/useIsBootableVolumeContext';
 import { BootableResource } from '../../utils/types';
 import { BootableVolumeCallbacks } from '../bootableVolumesDefinition';
 import { getEffectiveCluster } from '../utils/helpers';
@@ -63,8 +67,21 @@ const BootableVolumeNameCell: FC<BootableVolumeNameCellProps> = ({ callbacks, ro
     );
   }, [isDataSource, callbacks, row, cluster, bootableVolumeNamespace, bootableVolumeName]);
 
-  return (
-    <>
+  const resourceLink = useMemo(() => {
+    if (isDataSource && !cluster) {
+      const url = getResourceUrl({ model: DataSourceModel, resource: row });
+      return (
+        <Link
+          className="bootable-volume-row__name-link co-resource-item"
+          to={appendBootableVolumeContext(url)}
+        >
+          <ResourceIcon groupVersionKind={getBootableVolumeGroupVersionKind(row)} />
+          {bootableVolumeName}
+        </Link>
+      );
+    }
+
+    return (
       <MulticlusterResourceLink
         className="bootable-volume-row__name-link"
         cluster={cluster}
@@ -73,6 +90,12 @@ const BootableVolumeNameCell: FC<BootableVolumeNameCellProps> = ({ callbacks, ro
         name={bootableVolumeName}
         namespace={bootableVolumeNamespace}
       />
+    );
+  }, [isDataSource, cluster, row, bootableVolumeName, bootableVolumeNamespace]);
+
+  return (
+    <>
+      {resourceLink}
       {isDeprecated(bootableVolumeName) && <DeprecatedBadge />}
       {isDataSource && isCloning && <Label>{t('Clone in progress')}</Label>}
     </>

@@ -17,7 +17,7 @@ import '../tables.scss';
 export type DiskListCallbacks = {
   customize?: boolean;
   onSubmit?: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine>;
-  onUploadStarted?: (promise: Promise<unknown>) => void;
+  onUploadStarted?: (promise: Promise<unknown>, cdromDiskName?: string) => void;
   provisioningPercentages: NameWithPercentages;
   sourcesLoaded?: boolean;
   vm: V1VirtualMachine;

@@ -14,6 +14,7 @@ import { FormGroup } from '@patternfly/react-core';
 type StorageClassSelectProps = {
   checkSC?: (selectedSC: string) => boolean;
   cluster?: string;
+  isDisabled?: boolean;
   setShowSCAlert: Dispatch<SetStateAction<boolean>>;
   setStorageClassName: (value: string) => void;
   setStorageClassProvisioner?: Dispatch<SetStateAction<string>>;
@@ -23,6 +24,7 @@ type StorageClassSelectProps = {
 const StorageClassSelect: FC<StorageClassSelectProps> = ({
   checkSC,
   cluster,
+  isDisabled,
   setShowSCAlert,
   setStorageClassName,
   setStorageClassProvisioner,
@@ -66,6 +68,7 @@ const StorageClassSelect: FC<StorageClassSelectProps> = ({
         {loaded ? (
           <InlineFilterSelect
             toggleProps={{
+              isDisabled,
               isFullWidth: true,
             }}
             options={getSCSelectOptions(readyStorageClasses)}

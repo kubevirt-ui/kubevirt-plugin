@@ -16,11 +16,13 @@ import { FormGroup, PopoverPosition, SelectOption } from '@patternfly/react-core
 
 type ArchitectureSelectProps = {
   bootableVolumeState: AddBootableVolumeState;
+  isDisabled?: boolean;
   setBootableVolumeField: SetBootableVolumeFieldType;
 };
 
 const ArchitectureSelect: FC<ArchitectureSelectProps> = ({
   bootableVolumeState,
+  isDisabled,
   setBootableVolumeField,
 }) => {
   const { t } = useKubevirtTranslation();
@@ -56,6 +58,7 @@ const ArchitectureSelect: FC<ArchitectureSelectProps> = ({
             architectures?.length ? architectures.join(', ') : t('Select architecture')
           }
           closeOnSelect={true}
+          isDisabled={isDisabled}
           selected={architectures}
           toggleProps={{ isFullWidth: true }}
         >

@@ -2,36 +2,55 @@ import { useMemo } from 'react';
 
 import {
   modelToGroupVersionKind,
-  ProjectModel,
   VolumeSnapshotModel,
 } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { getNamespace } from '@kubevirt-utils/resources/shared';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
-import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
 import { VolumeSnapshotKind } from './types';
+
+type ProjectSnapshotCount = {
+  count: number;
+  name: string;
+};
 
 type UseSnapshotsReturnType = {
   error: Error;
   projectsLoaded: boolean;
-  projectsNames: string[];
+  projectsWithSnapshots: ProjectSnapshotCount[];
   snapshots: VolumeSnapshotKind[];
   snapshotsLoaded: boolean;
 };
 
 const useSnapshots = (projectSelected: string, cluster?: string): UseSnapshotsReturnType => {
-  const [projects, projectsLoaded, projectsErrors] = useK8sWatchData<K8sResourceCommon[]>({
+  const [allSnapshots, allSnapshotsLoaded, allSnapshotsErrors] = useK8sWatchData<
+    VolumeSnapshotKind[]
+  >({
     cluster,
-    groupVersionKind: modelToGroupVersionKind(ProjectModel),
+    groupVersionKind: modelToGroupVersionKind(VolumeSnapshotModel),
     isList: true,
-    namespaced: false,
+    namespace: '',
+    namespaced: true,
   });
 
-  const projectsNames = useMemo(
-    () => projects?.map((project) => project?.metadata?.name)?.sort((a, b) => a?.localeCompare(b)),
-    [projects],
-  );
+  const projectsWithSnapshots = useMemo(() => {
+    const countByNamespace = (allSnapshots || []).reduce<Record<string, number>>(
+      (acc, snapshot) => {
+        const ns = getNamespace(snapshot);
+        if (ns) {
+          acc[ns] = (acc[ns] || 0) + 1;
+        }
+        return acc;
+      },
+      {},
+    );
 
-  const snapshotWathcResource = projectSelected
+    return Object.entries(countByNamespace)
+      .map(([name, count]) => ({ count, name }))
+      .sort((a, b) => a.name.localeCompare(b.name));
+  }, [allSnapshots]);
+
+  const snapshotWatchResource = projectSelected
     ? {
         cluster,
         groupVersionKind: modelToGroupVersionKind(VolumeSnapshotModel),
@@ -42,7 +61,7 @@ const useSnapshots = (projectSelected: string, cluster?: string): UseSnapshotsRe
     : null;
 
   const [snapshotsRaw, snapshotsLoaded, snapshotsErrors] =
-    useK8sWatchData<VolumeSnapshotKind[]>(snapshotWathcResource);
+    useK8sWatchData<VolumeSnapshotKind[]>(snapshotWatchResource);
 
   const snapshots = useMemo(
     () => (snapshotsRaw || [])?.sort((a, b) => a?.metadata?.name?.localeCompare(b?.metadata?.name)),
@@ -50,9 +69,9 @@ const useSnapshots = (projectSelected: string, cluster?: string): UseSnapshotsRe
   );
 
   return {
-    error: projectsErrors || snapshotsErrors,
-    projectsLoaded,
-    projectsNames,
+    error: allSnapshotsErrors || snapshotsErrors,
+    projectsLoaded: allSnapshotsLoaded,
+    projectsWithSnapshots,
     snapshots,
     snapshotsLoaded,
   };

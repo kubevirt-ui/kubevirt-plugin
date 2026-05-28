@@ -6,12 +6,11 @@ import {
   IoK8sApiCoreV1ConfigMap,
 } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { ActionDropdownItemType } from '@kubevirt-utils/components/ActionsDropdown/constants';
+import DeleteModal from '@kubevirt-utils/components/DeleteModal/DeleteModal';
 import { trimLastHistoryPath } from '@kubevirt-utils/components/HorizontalNavbar/utils/utils';
 import { ModalComponent } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
-import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 
-import DeleteCheckupModal from '../../../components/DeleteCheckupModal';
 import { deleteSelfValidationCheckup } from '../../utils';
 
 import { getConfigMapInfo } from './CheckupsSelfValidationActionsUtils';
@@ -49,11 +48,8 @@ export const createCheckupsSelfValidationActionFactory = (
     jobs,
     navigate,
   }: CheckupsSelfValidationActionFactoryParams): ActionDropdownItemType => {
-    const deleteCheckup = () => {
-      // No need to wait for the deletion to complete, just navigate away
-      deleteSelfValidationCheckup(configMap, jobs).catch((err) => {
-        kubevirtConsole.error('Failed to delete self-validation checkup:', err);
-      });
+    const deleteCheckup = async (): Promise<void> => {
+      await deleteSelfValidationCheckup(configMap, jobs);
 
       const newPath = trimLastHistoryPath(location.pathname, [
         getName(configMap),
@@ -67,11 +63,12 @@ export const createCheckupsSelfValidationActionFactory = (
     return {
       cta: () => {
         createModal((props) => (
-          <DeleteCheckupModal
+          <DeleteModal
             {...props}
-            name={getName(configMap)}
-            namespace={getNamespace(configMap)}
-            onDelete={deleteCheckup}
+            headerText={t('Delete checkup')}
+            obj={{ metadata: { name: getName(configMap), namespace: getNamespace(configMap) } }}
+            onDeleteSubmit={deleteCheckup}
+            shouldRedirect={false}
           />
         ));
       },

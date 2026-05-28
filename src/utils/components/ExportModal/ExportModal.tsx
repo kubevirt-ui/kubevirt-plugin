@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 
 import { IoK8sApiCoreV1Pod } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -16,13 +16,16 @@ import {
   TextInput,
 } from '@patternfly/react-core';
 
+import BackgroundOperationAlert from '../TabModal/BackgroundOperationAlert';
 import TabModal from '../TabModal/TabModal';
 
 import { ALREADY_CREATED_ERROR_CODE } from './constants';
+import { persistExportPod, useExportUploadStore } from './exportUploadStore';
 import ShowProgress from './ShowProgress';
 import {
   createServiceAccount,
   createUploaderPod,
+  exportFailed,
   exportInProgress,
   exportSucceeded,
   isExportFormIncomplete,
@@ -55,15 +58,35 @@ const ExportModal: FC<ExportModalProps> = ({
   const [password, setPassword] = useState('');
   const [destination, setDestination] = useState('');
 
+  const persistedUpload = useExportUploadStore((state) =>
+    state.getUpload(cluster, namespace, pvcName),
+  );
+
   const [createdPod, setCreatedPod] = useState<IoK8sApiCoreV1Pod>();
 
+  useEffect(() => {
+    if (!persistedUpload || createdPod) {
+      return;
+    }
+
+    setCreatedPod({
+      metadata: {
+        name: persistedUpload.podName,
+        namespace: persistedUpload.namespace,
+      },
+    } as IoK8sApiCoreV1Pod);
+  }, [createdPod, persistedUpload]);
+
+  const watchPodName = getName(createdPod) || persistedUpload?.podName;
+  const watchPodNamespace = getNamespace(createdPod) || persistedUpload?.namespace;
+
   const [uploadPod] = useKubevirtWatchResource<IoK8sApiCoreV1Pod>(
-    createdPod
+    watchPodName
       ? {
           cluster,
           groupVersionKind: modelToGroupVersionKind(PodModel),
-          name: getName(createdPod),
-          namespace: getNamespace(createdPod),
+          name: watchPodName,
+          namespace: watchPodNamespace,
         }
       : {},
   );
@@ -71,6 +94,15 @@ const ExportModal: FC<ExportModalProps> = ({
   const uploadInProgress = exportInProgress(uploadPod || createdPod);
   const isUploadSucceeded = exportSucceeded(uploadPod || createdPod);
   const isFormIncomplete = isExportFormIncomplete([destination, username, password, registryName]);
+
+  const isUploadFailed = !!uploadPod && exportFailed(uploadPod);
+  const isUploadFinished = isUploadSucceeded || isUploadFailed;
+
+  useEffect(() => {
+    if (isUploadFinished) {
+      useExportUploadStore.getState().clearUpload(cluster, namespace, pvcName);
+    }
+  }, [cluster, isUploadFinished, namespace, pvcName]);
 
   return (
     <TabModal
@@ -98,6 +130,7 @@ const ExportModal: FC<ExportModalProps> = ({
         });
 
         setCreatedPod(pod);
+        persistExportPod(pod, cluster, pvcName);
       }}
       actionItemLink={<ViewPodLogLink pod={uploadPod} />}
       closeOnSubmit={false}
@@ -110,6 +143,7 @@ const ExportModal: FC<ExportModalProps> = ({
       submitBtnText={isUploadSucceeded ? t('Close') : t('Save')}
     >
       <Stack className="kv-exportmodal" hasGutter>
+        <BackgroundOperationAlert isVisible={uploadInProgress} />
         <Alert
           title={t(
             'Before uploading to a registry, it is recommended to remove any private information from the image',

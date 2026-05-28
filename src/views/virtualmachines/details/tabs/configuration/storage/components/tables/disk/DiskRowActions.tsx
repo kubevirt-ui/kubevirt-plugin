@@ -25,10 +25,17 @@ import {
 } from '@kubevirt-utils/resources/vm/utils/disk/selectors';
 import { isEmptyContainerDiskImage } from '@kubevirt-utils/resources/vm/utils/disk/utils';
 import { getContentScrollableElement } from '@kubevirt-utils/utils/utils';
-import { ButtonVariant, Dropdown, DropdownItem, DropdownList } from '@patternfly/react-core';
+import {
+  ButtonVariant,
+  Dropdown,
+  DropdownItem,
+  DropdownList,
+  Tooltip,
+} from '@patternfly/react-core';
 import { updateDisks } from '@virtualmachines/details/tabs/configuration/details/utils/utils';
 import { isRunning } from '@virtualmachines/utils';
 
+import { useMountIsoUploadForDisk } from '../../hooks/useMountIsoUploadForDisk';
 import CreateBootableVolumeModal from '../../modal/CreateBootableVolumeModal';
 import DeleteDiskModal from '../../modal/DeleteDiskModal';
 import DetachModal from '../../modal/DetachModal';
@@ -42,7 +49,7 @@ type DiskRowActionsProps = {
   customize?: boolean;
   obj: DiskRowDataLayout;
   onDiskUpdate?: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine>;
-  onUploadStarted?: (promise: Promise<unknown>) => void;
+  onUploadStarted?: (promise: Promise<unknown>, cdromDiskName?: string) => void;
   vm: V1VirtualMachine;
   vmi?: V1VirtualMachineInstance;
 };
@@ -93,12 +100,18 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({
   }, [vm, vmi, isVMRunning, diskName, isCDROM]);
 
   const isCDROMOperationsEnabled = isCDROM && isDeclarativeHotplugVolumesFeatureGateEnabled;
+  const { cancelUpload, isUploadInProgress } = useMountIsoUploadForDisk(vm, diskName);
 
   const editBtnText = t('Edit');
+  const mountIsoUploadInProgressTooltip = t('Upload in progress');
   const deleteBtnText = t('Detach');
   const removeHotplugBtnText = t('Make persistent');
 
-  const onCustomizeDeleteDisk = () => {
+  const onCustomizeDeleteDisk = async () => {
+    if (isCDROM) {
+      await cancelUpload();
+    }
+
     const newVM = produceVMDisks(vm, (draftVM) => {
       const volumeToDelete = getVolumes(vm).find((v) => v.name === diskName);
       draftVM.spec.template.spec.domain.devices.disks = getDisks(draftVM)?.filter(
@@ -184,6 +197,26 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({
 
   const onToggle = () => setIsDropdownOpen((prevIsOpen) => !prevIsOpen);
 
+  const handleCancelMountIsoUpload = () => {
+    cancelUpload();
+    setIsDropdownOpen(false);
+  };
+
+  const mountCdromItem =
+    isCDROMMountedState || !isUploadInProgress ? (
+      <DropdownItem key="cdrom" onClick={() => onModalOpen(createCDROMModal)}>
+        {isCDROMMountedState ? t('Eject') : t('Mount')}
+      </DropdownItem>
+    ) : (
+      <Tooltip content={mountIsoUploadInProgressTooltip}>
+        <span>
+          <DropdownItem isDisabled key="cdrom">
+            {t('Mount')}
+          </DropdownItem>
+        </span>
+      </Tooltip>
+    );
+
   return (
     <Dropdown
       toggle={KebabToggle({
@@ -207,9 +240,10 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({
         <DropdownItem key="disk-edit" onClick={() => onModalOpen(createEditDiskModal)}>
           {editBtnText}
         </DropdownItem>
-        {isCDROMOperationsEnabled && (
-          <DropdownItem key="cdrom" onClick={() => onModalOpen(createCDROMModal)}>
-            {isCDROMMountedState ? t('Eject') : t('Mount')}
+        {isCDROMOperationsEnabled && mountCdromItem}
+        {isCDROMOperationsEnabled && isUploadInProgress && (
+          <DropdownItem key="cdrom-cancel-upload" onClick={handleCancelMountIsoUpload}>
+            {t('Cancel upload')}
           </DropdownItem>
         )}
         <DropdownItem key="disk-delete" onClick={() => onModalOpen(createDeleteDiskModal)}>

@@ -27,9 +27,13 @@ import { getDataSourceCronJob, isDataResourceOwnedBySSP } from '../utils';
 
 type UseDataSourceActionsProvider = (
   dataSource: V1beta1DataSource,
+  isBootableVolume?: boolean,
 ) => [actions: Action[], onOpen: () => void];
 
-export const useDataSourceActionsProvider: UseDataSourceActionsProvider = (dataSource) => {
+export const useDataSourceActionsProvider: UseDataSourceActionsProvider = (
+  dataSource,
+  isBootableVolume,
+) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
 
@@ -149,6 +153,7 @@ export const useDataSourceActionsProvider: UseDataSourceActionsProvider = (dataS
             <DeleteDataSourceModal
               dataImportCron={dataImportCron}
               dataSource={dataSource}
+              isBootableVolume={isBootableVolume}
               isOpen={isOpen}
               onClose={onClose}
             />
@@ -184,7 +189,7 @@ export const useDataSourceActionsProvider: UseDataSourceActionsProvider = (dataS
         ),
       },
     ],
-    [t, dataSource, isOwnedBySSP, dataImportCron, isLoading, createModal],
+    [t, dataSource, isOwnedBySSP, dataImportCron, isLoading, isBootableVolume, createModal],
   );
 
   return [actions, lazyLoadDataImportCron];

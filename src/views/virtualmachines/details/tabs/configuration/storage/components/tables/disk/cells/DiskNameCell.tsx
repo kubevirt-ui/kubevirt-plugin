@@ -18,6 +18,7 @@ import {
 
 import { HotplugLabel } from '../HotplugLabel';
 import ISOBadge from '../ISOBadge';
+import MountIsoUploadLabel from '../MountIsoUploadLabel';
 
 type DiskNameCellProps = {
   provisioningPercentages: NameWithPercentages;
@@ -70,6 +71,7 @@ const DiskNameCell: FC<DiskNameCellProps> = ({ provisioningPercentages, row, vm,
         )}{' '}
         <HotplugLabel diskName={name} vm={vm} vmi={vmi} />
         <ISOBadge diskName={name} vm={vm} />
+        <MountIsoUploadLabel diskName={name} vm={vm} />
       </StackItem>
       {isBootDisk && (
         <StackItem>

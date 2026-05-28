@@ -23,12 +23,14 @@ import PreferencePopoverContent from './PreferencePopoverContent';
 type PreferenceSelectProps = {
   bootableVolume: AddBootableVolumeState;
   deleteLabel: (labelKey: string) => void;
+  isDisabled?: boolean;
   setBootableVolumeField: SetBootableVolumeFieldType;
 };
 
 const PreferenceSelect: FC<PreferenceSelectProps> = ({
   bootableVolume,
   deleteLabel,
+  isDisabled,
   setBootableVolumeField,
 }) => {
   const { t } = useKubevirtTranslation();
@@ -88,7 +90,7 @@ const PreferenceSelect: FC<PreferenceSelectProps> = ({
         placeholder={t('Select preference')}
         selected={selectedPreferenceKey}
         setSelected={handleSelect}
-        toggleProps={{ isFullWidth: true }}
+        toggleProps={{ isDisabled, isFullWidth: true }}
       />
     </FormGroup>
   );

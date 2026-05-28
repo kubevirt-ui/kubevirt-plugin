@@ -7,7 +7,7 @@ import {
 } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName } from '@kubevirt-utils/resources/shared';
-import { FormGroup } from '@patternfly/react-core';
+import { Content, FormGroup } from '@patternfly/react-core';
 
 import { initialBootableVolumeState } from '../AddBootableVolumeModal/utils/constants';
 import InlineFilterSelect from '../FilterSelect/InlineFilterSelect';
@@ -35,7 +35,7 @@ const SelectSnapshot: FC<SelectSnapshotProps> = ({
   snapshotNamespaceSelected,
 }) => {
   const { t } = useKubevirtTranslation();
-  const { projectsLoaded, projectsNames, snapshots, snapshotsLoaded } = useSnapshots(
+  const { projectsLoaded, projectsWithSnapshots, snapshots, snapshotsLoaded } = useSnapshots(
     snapshotNamespaceSelected,
     cluster,
   );
@@ -44,19 +44,22 @@ const SelectSnapshot: FC<SelectSnapshotProps> = ({
     (newProject) => {
       selectSnapshotNamespace && selectSnapshotNamespace(newProject);
       selectSnapshotName(undefined);
-      setDiskSize(initialBootableVolumeState.size);
+      setDiskSize?.(initialBootableVolumeState.size);
     },
-    [selectSnapshotNamespace, selectSnapshotName],
+    [selectSnapshotNamespace, selectSnapshotName, setDiskSize],
   );
 
-  const getSnapshotSize = (snapshotName: string) =>
-    snapshots?.find((snapshot) => getName(snapshot) === snapshotName)?.status?.restoreSize;
+  const getSnapshotSize = useCallback(
+    (snapshotName: string) =>
+      snapshots?.find((snapshot) => getName(snapshot) === snapshotName)?.status?.restoreSize,
+    [snapshots],
+  );
 
   useEffect(() => {
     if (snapshotNameSelected && snapshotsLoaded) {
-      setDiskSize(getSnapshotSize(snapshotNameSelected));
+      setDiskSize?.(getSnapshotSize(snapshotNameSelected));
     }
-  }, [snapshotNameSelected, snapshotsLoaded]);
+  }, [snapshotNameSelected, snapshotsLoaded, getSnapshotSize, setDiskSize]);
 
   const snapshotNames = useMemo(
     () => snapshots?.map((snapshot) => getName(snapshot))?.sort((a, b) => a?.localeCompare(b)),
@@ -65,7 +68,11 @@ const SelectSnapshot: FC<SelectSnapshotProps> = ({
 
   return (
     <div>
-      {projectsLoaded ? (
+      {!projectsLoaded && <Loading />}
+      {projectsLoaded && projectsWithSnapshots.length === 0 && (
+        <Content component="p">{t('No VolumeSnapshots found in the cluster.')}</Content>
+      )}
+      {projectsLoaded && projectsWithSnapshots.length > 0 && (
         <FormGroup
           className="snapshot-selection-formgroup"
           fieldId="snapshot-project-select"
@@ -73,10 +80,12 @@ const SelectSnapshot: FC<SelectSnapshotProps> = ({
           label={t('VolumeSnapshot project')}
         >
           <InlineFilterSelect
-            options={projectsNames.map((name) => ({
-              children: name,
+            options={projectsWithSnapshots.map(({ count, name }) => ({
+              children: `${name} (${count})`,
               groupVersionKind: modelToGroupVersionKind(NamespaceModel),
+              label: `${name} (${count})`,
               value: name,
+              valueForFilter: `${name} (${count})`,
             }))}
             toggleProps={{
               isDisabled: !selectSnapshotNamespace,
@@ -87,8 +96,6 @@ const SelectSnapshot: FC<SelectSnapshotProps> = ({
             setSelected={onSelectProject}
           />
         </FormGroup>
-      ) : (
-        <Loading />
       )}
 
       {snapshotsLoaded ? (

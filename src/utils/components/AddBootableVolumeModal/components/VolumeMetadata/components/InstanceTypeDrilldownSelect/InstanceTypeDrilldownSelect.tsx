@@ -28,12 +28,14 @@ import { getInstanceTypeMenuItems, isExistingInstanceType } from './utils/utils'
 type InstanceTypeMenuItemsProps = {
   bootableVolume: AddBootableVolumeState;
   deleteLabel: (labelKey: string) => void;
+  isDisabled?: boolean;
   setBootableVolumeField: SetBootableVolumeFieldType;
 };
 
 export const InstanceTypeDrilldownSelect: FC<InstanceTypeMenuItemsProps> = ({
   bootableVolume,
   deleteLabel,
+  isDisabled,
   setBootableVolumeField,
 }) => {
   const { t } = useKubevirtTranslation();
@@ -98,6 +100,7 @@ export const InstanceTypeDrilldownSelect: FC<InstanceTypeMenuItemsProps> = ({
         appendTo={document.getElementById('tab-modal')}
         direction="up"
         id={MENUS.root}
+        isDisabled={isDisabled}
         isOpen={isOpen}
         scrollableMenuIDs={[MENUS.userProvided]}
         setIsOpen={setIsOpen}

@@ -22,6 +22,7 @@ import './ApplyStorageProfileSettings.scss';
 type AccessModeProps = {
   accessMode: V1beta1StorageSpecAccessModesEnum;
   claimPropertySets: ClaimPropertySets;
+  isDisabled?: boolean;
   setAccessMode: (accessMode: V1beta1StorageSpecAccessModesEnum) => void;
   volumeMode: V1beta1StorageSpecVolumeModeEnum;
 };
@@ -29,6 +30,7 @@ type AccessModeProps = {
 export const AccessMode: FC<AccessModeProps> = ({
   accessMode,
   claimPropertySets,
+  isDisabled,
   setAccessMode,
   volumeMode,
 }) => {
@@ -75,6 +77,7 @@ export const AccessMode: FC<AccessModeProps> = ({
           }}
           id={value}
           isChecked={value === accessMode}
+          isDisabled={isDisabled}
           key={value}
           name="accessMode"
         />

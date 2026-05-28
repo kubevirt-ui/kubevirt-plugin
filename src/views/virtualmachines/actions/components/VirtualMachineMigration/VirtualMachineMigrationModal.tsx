@@ -141,6 +141,7 @@ const VirtualMachineMigrateModal: FC<VirtualMachineMigrateModalProps> = ({
                   title={t('Migrate VirtualMachine storage')}
                 />
               }
+              isVisitRequired
               onClose={onClose}
               onSave={onSubmit}
               title={t('Migrate VirtualMachine storage')}

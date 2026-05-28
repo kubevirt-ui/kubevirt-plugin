@@ -25,6 +25,7 @@ import {
   createMutableUploadData,
   getEmptyVMDataVolumeResource,
   hotplugPromise,
+  mountISOToCDROM,
   produceVMDisks,
 } from './helpers';
 import { V1DiskFormState, V1DiskModalProps } from './types';
@@ -270,35 +271,53 @@ export const submitCDROM = async (
       uploadFile: { file, filename: file?.name },
     };
 
-    const uploadPromise = uploadDataVolume(vm, uploadData, mutableData, dvName);
-
     if (vmIsRunning) {
-      const fullPromise = uploadPromise.then(async (uploaded) => {
-        onUploadedDataVolume?.(uploaded);
+      const emptyData = produceEmptyDriveData(data);
+      const vmWithEmptyCdrom = addDisk(emptyData, vm);
+      const updatedVMWithEmpty = reorderBootDisk(
+        vmWithEmptyCdrom,
+        diskName,
+        data.isBootSource,
+        false,
+      );
 
-        const dataWithVolume = produce(data, (draft) => {
-          draft.volume.dataVolume = { hotpluggable: isHotPluggable, name: dvName };
-          delete draft.volume.persistentVolumeClaim;
-          delete draft.dataVolumeTemplate;
-        });
+      const submitResult = await onSubmit(updatedVMWithEmpty);
+      const vmAfterEmptyAdd: V1VirtualMachine =
+        submitResult && typeof submitResult === 'object' ? submitResult : updatedVMWithEmpty;
 
-        const vmWithDisk = addDisk(dataWithVolume, vm);
-        const updatedVM = reorderBootDisk(vmWithDisk, diskName, data.isBootSource, false);
-        await onSubmit(updatedVM);
-      });
+      const fullPromise = uploadDataVolume(vm, uploadData, mutableData, dvName).then(
+        async (uploaded) => {
+          onUploadedDataVolume?.(uploaded);
 
-      onUploadStarted?.(fullPromise);
+          const dataWithVolume = produce(data, (draft) => {
+            draft.volume = {
+              dataVolume: { hotpluggable: isHotPluggable, name: dvName },
+              name: diskName,
+            };
+            delete draft.dataVolumeTemplate;
+          });
 
-      return Promise.resolve();
+          const mountedVm = await mountISOToCDROM(vmAfterEmptyAdd, dataWithVolume, isHotPluggable);
+          await onSubmit(mountedVm);
+        },
+      );
+
+      onUploadStarted?.(fullPromise, diskName);
+
+      return;
     }
 
-    const fullPromise = uploadPromise.then((uploaded) => {
+    const fullPromise = uploadDataVolume(vm, uploadData, mutableData, dvName).then((uploaded) => {
       onUploadedDataVolume?.(uploaded);
     });
 
-    onUploadStarted?.(fullPromise);
+    onUploadStarted?.(fullPromise, diskName);
 
     const dataWithVolume = produce(data, (draft) => {
+      if (!draft.volume) {
+        draft.volume = { name: diskName };
+      }
+      draft.volume.name = diskName;
       draft.volume.persistentVolumeClaim = { claimName: dvName };
       delete draft.volume.dataVolume;
       delete draft.dataVolumeTemplate;

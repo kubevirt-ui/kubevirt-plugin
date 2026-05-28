@@ -3,6 +3,7 @@ import { useMemo } from 'react';
 import { TLS_CERT_SOURCE_EXISTING } from '@kubevirt-utils/components/TLSCertificateSection';
 import { DEFAULT_PREFERENCE_LABEL } from '@kubevirt-utils/constants/instancetypes-and-preferences';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { isValidCronExpression } from '@kubevirt-utils/utils/validation';
 
 import { AddBootableVolumeState, DROPDOWN_FORM_SELECTION } from '../utils/constants';
 
@@ -25,7 +26,12 @@ export const useAddBootableVolumeFormValidation = ({
     const areCredentialsFilled = !isEmpty(username) && !isEmpty(password);
     const areCredentialsValid = areCredentialsFilled || areCredentialsEmpty;
 
-    return !!(registryURL && areCredentialsValid && cronExpression?.trim());
+    return !!(
+      registryURL &&
+      areCredentialsValid &&
+      cronExpression?.trim() &&
+      isValidCronExpression(cronExpression)
+    );
   }, [sourceType, bootableVolume]);
 
   const isTlsCertValid = useMemo(() => {

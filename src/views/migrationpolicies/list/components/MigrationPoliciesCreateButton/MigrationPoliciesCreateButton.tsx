@@ -4,16 +4,20 @@ import { getMigrationPolicyURL } from 'src/views/migrationpolicies/utils/utils';
 
 import { MigrationPolicyModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { MigrationPolicyModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useSelectedCluster from '@kubevirt-utils/hooks/useSelectedCluster';
 import { K8sVerb, ListPageCreateDropdown } from '@openshift-console/dynamic-plugin-sdk';
 import { Button, Tooltip } from '@patternfly/react-core';
 import { useFleetAccessReview } from '@stolostron/multicluster-sdk';
 
+import MigrationPolicyCreateModal from '../../../components/MigrationPolicyCreateModal/MigrationPolicyCreateModal';
+
 const MigrationPoliciesCreateButton: FC = () => {
   const { t } = useKubevirtTranslation();
   const selectedCluster = useSelectedCluster();
   const navigate = useNavigate();
+  const { createModal } = useModal();
 
   const createItems = {
     form: t('From Form'),
@@ -28,7 +32,12 @@ const MigrationPoliciesCreateButton: FC = () => {
   });
 
   const onCreate = (type: string) => {
-    return navigate(getMigrationPolicyURL(type === 'form' ? 'form' : '~new', selectedCluster));
+    if (type === 'form') {
+      return createModal(({ isOpen, onClose }) => (
+        <MigrationPolicyCreateModal isOpen={isOpen} onClose={onClose} />
+      ));
+    }
+    return navigate(getMigrationPolicyURL('~new', selectedCluster));
   };
 
   if (!canCreateMigrationPolicy) {

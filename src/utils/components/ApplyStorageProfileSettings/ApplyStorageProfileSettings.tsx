@@ -16,6 +16,7 @@ import './ApplyStorageProfileSettings.scss';
 
 type ApplyStorageProfileSettingsProps = {
   accessMode: V1beta1StorageSpecAccessModesEnum;
+  isDisabled?: boolean;
   setAccessMode: (accessMode?: V1beta1StorageSpecAccessModesEnum) => void;
   setVolumeMode: (volumeMode?: V1beta1StorageSpecVolumeModeEnum) => void;
   storageClassName: string;
@@ -25,6 +26,7 @@ type ApplyStorageProfileSettingsProps = {
 
 const ApplyStorageProfileSettings: FC<ApplyStorageProfileSettingsProps> = ({
   accessMode,
+  isDisabled,
   setAccessMode,
   setVolumeMode,
   storageClassName,
@@ -60,12 +62,14 @@ const ApplyStorageProfileSettings: FC<ApplyStorageProfileSettingsProps> = ({
       <FlexItem>
         <VolumeMode
           claimPropertySets={claimPropertySets ?? []}
+          isDisabled={isDisabled}
           {...{ setAccessMode, setVolumeMode, volumeMode }}
         />
       </FlexItem>
       <FlexItem>
         <AccessMode
           claimPropertySets={claimPropertySets ?? []}
+          isDisabled={isDisabled}
           {...{ accessMode, setAccessMode, volumeMode }}
         />
       </FlexItem>

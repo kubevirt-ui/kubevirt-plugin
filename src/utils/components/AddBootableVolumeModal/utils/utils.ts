@@ -1,3 +1,4 @@
+import { TFunction } from 'i18next';
 import produce from 'immer';
 
 import { ConfigMapModel } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -25,6 +26,7 @@ import {
   isEmpty,
   truncateToK8sName,
 } from '@kubevirt-utils/utils/utils';
+import { getFieldRequiredMessage } from '@kubevirt-utils/utils/validation';
 import { kubevirtK8sCreate, kubevirtK8sDelete } from '@multicluster/k8sRequests';
 
 import {
@@ -36,6 +38,49 @@ import {
 
 export const formatRegistryURL = (registryURL: string) =>
   registryURL?.replace(/^(https?:\/\/)/i, '');
+
+export const extractCreatedDataSources = (result: unknown): V1beta1DataSource[] => {
+  const items = Array.isArray(result) ? result : [result];
+  return items.filter(
+    (item): item is V1beta1DataSource =>
+      !!item &&
+      typeof item === 'object' &&
+      'kind' in item &&
+      (item as { kind: string }).kind === DataSourceModel.kind,
+  );
+};
+
+export const updateBootableVolumeField = (
+  prevState: AddBootableVolumeState,
+  key: keyof AddBootableVolumeState,
+  value: AddBootableVolumeState[keyof AddBootableVolumeState],
+  fieldKey?: string,
+): AddBootableVolumeState => ({
+  ...prevState,
+  ...(fieldKey
+    ? { [key]: { ...(prevState[key] as object), [fieldKey]: value } }
+    : { [key]: value }),
+});
+
+export const deleteBootableVolumeLabel = (
+  prevState: AddBootableVolumeState,
+  labelKey: string,
+): AddBootableVolumeState => {
+  const updatedLabels = { ...prevState?.labels };
+  delete updatedLabels[labelKey];
+  return { ...prevState, labels: updatedLabels };
+};
+
+export const getCronHelperText = (
+  t: TFunction,
+  isCronFormatInvalid: boolean,
+  isCronRequiredInvalid: boolean,
+  cronFormatError: string | undefined,
+): string => {
+  if (isCronFormatInvalid) return cronFormatError ?? t('Invalid cron format');
+  if (isCronRequiredInvalid) return getFieldRequiredMessage(t);
+  return t('Example (At 00:00 on Tuesday): 0 0 * * 2.');
+};
 
 type CreateBootableVolumeType = (input: {
   bootableVolume: AddBootableVolumeState;

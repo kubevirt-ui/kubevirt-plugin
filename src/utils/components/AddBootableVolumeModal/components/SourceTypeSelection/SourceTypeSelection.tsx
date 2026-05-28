@@ -12,6 +12,7 @@ import { DROPDOWN_FORM_SELECTION, optionsValueLabelMapper } from '../../utils/co
 
 type SourceTypeSelectionProps = {
   formSelection: DROPDOWN_FORM_SELECTION;
+  isDisabled?: boolean;
   namespace: string;
   resetDiskSize: () => void;
   setFormSelection: (value: DROPDOWN_FORM_SELECTION) => void;
@@ -19,6 +20,7 @@ type SourceTypeSelectionProps = {
 
 const SourceTypeSelection: FC<SourceTypeSelectionProps> = ({
   formSelection,
+  isDisabled,
   namespace,
   resetDiskSize,
   setFormSelection,
@@ -63,9 +65,10 @@ const SourceTypeSelection: FC<SourceTypeSelectionProps> = ({
       <Select
         toggle={SelectToggle({
           'data-test-id': 'source-type-select',
+          isDisabled,
           isExpanded: isOpen,
           isFullWidth: true,
-          onClick: onToggle,
+          onClick: isDisabled ? undefined : onToggle,
           selected: t(optionsValueLabelMapper[formSelection]),
         })}
         isOpen={isOpen}
