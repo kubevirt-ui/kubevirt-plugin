@@ -4,12 +4,17 @@ export type UserSettingsState = {
   cards: CardsUserSettings;
   columns: ColumnsUserSettings;
   favoriteBootableVolumes: string[];
+  navigation: NavigationUserSettings;
   onboardingPopoversHidden: OnboardingPopoversHidden;
   quickStart: QuickStartUserSettings;
   savedSearches: {
     [key: string]: any;
   };
   ssh: SSHUserSettings;
+};
+
+type NavigationUserSettings = {
+  autoHideNav?: boolean;
 };
 
 type SSHUserSettings = {

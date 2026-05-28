@@ -22,17 +22,19 @@ const useVMWizardStore = create<VMWizardStore>()((set) => {
       useInstanceTypeVMStore.getState().resetInstanceTypeVMState();
       set({ ...initialVMWizardState, visitedSteps: new Set([VMWizardStep.DEPLOYMENT_DETAILS]) });
     },
-    setCloneVMDescription: (cloneVMDescription: string) => set({ cloneVMDescription }),
-    setCloneVMName: (cloneVMName: string) => set({ cloneVMName }),
     setCluster: (cluster: string) => set({ cluster }),
     setCreationMethod: (creationMethod: VMCreationMethod) => set({ creationMethod }),
     setFolder: (folder: string) => set({ folder }),
-    setIsVMNameValid: (isVMNameValid: boolean) => set({ isVMNameValid }),
+    setLastProcessedTemplateKey: (lastProcessedTemplateKey: string) =>
+      set({ lastProcessedTemplateKey }),
     setProject: (project: string) => set({ project }),
     setSelectedTemplate: (selectedTemplate: Template) => set(() => ({ selectedTemplate })),
+    setShouldCheckVMNameProperly: (shouldCheckVMNameProperly: boolean) =>
+      set({ shouldCheckVMNameProperly }),
     setTemplatesDrawerIsOpen: (templatesDrawerIsOpen: boolean) =>
       set(() => ({ templatesDrawerIsOpen })),
-    setVMNameInteracted: (vmNameInteracted: boolean) => set({ vmNameInteracted }),
+    setVMDescription: (vmDescription: string) => set({ vmDescription }),
+    setVMName: (vmName: string) => set({ vmName }),
   };
 });
 

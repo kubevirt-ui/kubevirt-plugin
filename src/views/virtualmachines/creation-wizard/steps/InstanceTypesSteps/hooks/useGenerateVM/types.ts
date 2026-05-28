@@ -9,7 +9,6 @@ type GenerateVMArgs = {
   dvSource: V1beta1DataVolume;
   enableMultiArchBootImageImport?: boolean;
   folder: string;
-  generatedVMName: string;
   isIPv6SingleStack?: boolean;
   isUDNManagedNamespace: boolean;
   populatedCloudInitYAML: string;
@@ -17,6 +16,8 @@ type GenerateVMArgs = {
   selectedBootableVolume: BootableVolume;
   selectedInstanceType: { name: string; namespace: string };
   targetNamespace: string;
+  vmDescription?: string;
+  vmName?: string;
 };
 
 export type GenerateVMCallback = (props: GenerateVMArgs) => V1VirtualMachine;

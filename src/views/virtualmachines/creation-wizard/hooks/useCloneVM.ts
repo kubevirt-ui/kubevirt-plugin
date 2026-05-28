@@ -23,7 +23,7 @@ type UseCloneVM = () => () => Promise<void>;
 const useCloneVM: UseCloneVM = () => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
-  const { cloneVMDescription, cloneVMName, cluster, project: targetNamespace } = useVMWizardStore();
+  const { cluster, project: targetNamespace, vmDescription, vmName } = useVMWizardStore();
 
   const source = vmSignal.value;
 
@@ -38,17 +38,13 @@ const useCloneVM: UseCloneVM = () => {
   useEffect(() => {
     if (cloneRequest?.status?.phase === CLONING_STATUSES.SUCCEEDED) {
       logVMCreated(TELEMETRY_VM_CREATION_METHOD.CLONE);
-      navigate(getVMURL(cloneRequest?.cluster, targetNamespace, cloneVMName));
+      navigate(getVMURL(cloneRequest?.cluster, targetNamespace, vmName));
     }
-  }, [cloneRequest, cloneVMName, targetNamespace, navigate, source]);
+  }, [cloneRequest, vmName, targetNamespace, navigate, source]);
 
   const sendCloneRequest = async () => {
     try {
-      const vmSameName = await vmExists(
-        cloneVMName,
-        targetNamespace,
-        getCluster(source) || cluster,
-      );
+      const vmSameName = await vmExists(vmName, targetNamespace, getCluster(source) || cluster);
 
       if (vmSameName) {
         throw new Error(t('VirtualMachine with this name already exists'));
@@ -56,10 +52,10 @@ const useCloneVM: UseCloneVM = () => {
 
       const request = await cloneVM(
         source,
-        cloneVMName,
+        vmName,
         targetNamespace,
         vmSignal.value?.spec?.runStrategy !== RUNSTRATEGY_HALTED,
-        cloneVMDescription,
+        vmDescription,
       );
 
       setInitialCloneRequest(request);

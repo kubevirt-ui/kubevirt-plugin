@@ -12,11 +12,13 @@ import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
 import { Wizard, WizardHeader, WizardStep } from '@patternfly/react-core';
 import DefaultWizardFooter from '@virtualmachines/creation-wizard/components/DefaultWizardFooter';
 import useCloseWizard from '@virtualmachines/creation-wizard/hooks/useCloseWizard';
+import useSyncDescription from '@virtualmachines/creation-wizard/hooks/useSyncDescription';
 import useVMGenerationNavItem from '@virtualmachines/creation-wizard/hooks/useVMGenerationNavItem';
 import useWizardStepValidation from '@virtualmachines/creation-wizard/hooks/useWizardStepValidation';
 import useVMWizardStore from '@virtualmachines/creation-wizard/state/vm-wizard-store/useVMWizardStore';
 import CloneSourceStep from '@virtualmachines/creation-wizard/steps/CloneSourceStep/CloneSourceStep';
 import CustomizationStep from '@virtualmachines/creation-wizard/steps/CustomizationStep/CustomizationStep';
+import DeploymentDetailsStepFooter from '@virtualmachines/creation-wizard/steps/DeploymentDetailsStep/components/DeploymentDetailsStepFooter';
 import BootSourceStep from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/BootSourceStep/BootSourceStep';
 import ComputeResourcesStepFooter from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/ComputeResourcesStep/components/ComputeResourcesStepFooter';
 import ComputeResourcesStep from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/ComputeResourcesStep/ComputeResourcesStep';
@@ -48,6 +50,7 @@ const VMCreationWizard: FC = () => {
     setProject,
     setTemplatesDrawerIsOpen,
   } = useVMWizardStore();
+  const syncDescription = useSyncDescription();
   const { isNextDisabledForStep, isStepDisabled } = useWizardStepValidation();
   const { navItemWithVMGeneration } = useVMGenerationNavItem(creationMethod);
   const clusterParam = useClusterParam();
@@ -88,7 +91,8 @@ const VMCreationWizard: FC = () => {
   return (
     <TemplatesDrawerWrapper>
       <Wizard
-        onStepChange={(_, currentStep) => {
+        onStepChange={(_, currentStep, prevStep) => {
+          syncDescription(currentStep, prevStep);
           if (currentStep?.id !== VMWizardStep.TEMPLATE) setTemplatesDrawerIsOpen(false);
           if (currentStep?.id) markStepVisited(String(currentStep.id));
 
@@ -106,7 +110,7 @@ const VMCreationWizard: FC = () => {
         title={t('Create VirtualMachine')}
       >
         <WizardStep
-          footer={<DefaultWizardFooter />}
+          footer={<DeploymentDetailsStepFooter />}
           id={VMWizardStep.DEPLOYMENT_DETAILS}
           name={t('Deployment details')}
         >
@@ -117,6 +121,7 @@ const VMCreationWizard: FC = () => {
             isNextDisabled: isNextDisabledForStep(VMWizardStep.GUEST_OS),
           }}
           id={VMWizardStep.GUEST_OS}
+          isDisabled={isStepDisabled(VMWizardStep.GUEST_OS)}
           isHidden={!isInstanceTypeMethod}
           name={t('Guest OS')}
         >

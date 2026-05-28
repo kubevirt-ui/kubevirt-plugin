@@ -7,6 +7,7 @@ import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/Descript
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getDisplayName } from '@kubevirt-utils/resources/shared';
 import { updateTemplate } from '@kubevirt-utils/resources/template';
 import { ensurePath } from '@kubevirt-utils/utils/utils';
 
@@ -17,7 +18,7 @@ import DisplayNameModal from './DisplayNameModal';
 const DisplayName: FC<TemplateDetailsGridProps> = ({ editable, template }) => {
   const { createModal } = useModal();
   const { t } = useKubevirtTranslation();
-  const displayName = template?.metadata?.annotations?.[ANNOTATIONS.displayName];
+  const displayName = getDisplayName(template);
 
   const updateDisplayName = (updatedDisplayName: string) => {
     const updatedTemplate = produce<V1Template>(template, (templateDraft: V1Template) => {

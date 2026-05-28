@@ -31,6 +31,7 @@ import useHideYamlTab from '@kubevirt-utils/hooks/useHideYamlTab';
 import useHyperConvergeConfiguration from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
+import { USER_SETTINGS_KEYS } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/const';
 import { isInstanceTypeVM } from '@kubevirt-utils/resources/instancetype/helper';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { getCPU, getGPUDevices, getHostDevices } from '@kubevirt-utils/resources/vm';
@@ -78,7 +79,9 @@ export const usePendingChanges = (
 
   const navigate = useNavigate();
   const { createModal } = useModal();
-  const [authorizedSSHKeys, updateAuthorizedSSHKeys] = useKubevirtUserSettings('ssh');
+  const [authorizedSSHKeys, updateAuthorizedSSHKeys] = useKubevirtUserSettings(
+    USER_SETTINGS_KEYS.ssh,
+  );
   const { hideYamlTab } = useHideYamlTab();
 
   const [hyperConverge, hyperLoaded, hyperLoadingError] = useHyperConvergeConfiguration(cluster);

@@ -16,13 +16,21 @@ import { getName, getNamespace, getUID } from '@kubevirt-utils/resources/shared'
 import { getNetworks, getVolumes } from '@kubevirt-utils/resources/vm';
 import { getRandomChars } from '@kubevirt-utils/utils/utils';
 
-import { MTV_MIGRATION_NAMESPACE, POD_NETWORK_TYPE } from './constants';
+import {
+  CCLM_LABEL_KEY,
+  CCLM_LABEL_VALUE,
+  MTV_MIGRATION_NAMESPACE,
+  POD_NETWORK_TYPE,
+} from './constants';
 import { GetInitialStorageMapParams } from './types';
 
 export const getInitialMigrationPlan = (vms: V1VirtualMachine[]): V1beta1Plan => ({
   apiVersion: `${PlanModel.apiGroup}/${PlanModel.apiVersion}`,
   kind: PlanModel.kind,
   metadata: {
+    labels: {
+      [CCLM_LABEL_KEY]: CCLM_LABEL_VALUE,
+    },
     name: `cross-cluster-migration-${getRandomChars()}`,
     namespace: MTV_MIGRATION_NAMESPACE,
   },
@@ -80,6 +88,9 @@ export const getInitialNetworkMap = (
     apiVersion: `${NetworkMapModel.apiGroup}/${NetworkMapModel.apiVersion}`,
     kind: NetworkMapModel.kind,
     metadata: {
+      labels: {
+        [CCLM_LABEL_KEY]: CCLM_LABEL_VALUE,
+      },
       name: `cross-cluster-migration-${getRandomChars()}`,
       namespace: MTV_MIGRATION_NAMESPACE,
     },
@@ -159,6 +170,9 @@ export const getInitialStorageMap = ({
     apiVersion: `${StorageMapModel.apiGroup}/${StorageMapModel.apiVersion}`,
     kind: StorageMapModel.kind,
     metadata: {
+      labels: {
+        [CCLM_LABEL_KEY]: CCLM_LABEL_VALUE,
+      },
       name: `cross-cluster-migration-${getRandomChars()}`,
       namespace: MTV_MIGRATION_NAMESPACE,
     },

@@ -1,6 +1,7 @@
 export enum OnboardingPopoverKey {
   Catalog = 'catalog',
   CreateProject = 'createProject',
+  NavCollapse = 'navCollapse',
   VMsTab = 'vmsTab',
 }
 

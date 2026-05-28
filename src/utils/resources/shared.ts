@@ -31,7 +31,7 @@ import {
   isDataSourceUploading,
 } from './template/hooks/useVmTemplateSource/utils';
 import { SINGLE_CLUSTER_KEY } from './constants';
-import { TEMPLATE_TYPE_LABEL } from './template';
+import { ANNOTATIONS, TEMPLATE_TYPE_LABEL } from './template';
 
 /**
  * A selector for a resource's description
@@ -75,6 +75,14 @@ export const getAnnotation = (
   annotationName: string,
   defaultValue?: string,
 ): string => entity?.metadata?.annotations?.[annotationName] ?? defaultValue;
+
+/**
+ * function for getting an entity's display name
+ * @param {K8sResourceCommon} entity - entity to get display name from
+ * @returns the display name or empty string if not found
+ */
+export const getDisplayName = (entity: K8sResourceCommon): string | undefined =>
+  getAnnotation(entity, ANNOTATIONS.displayName);
 
 /**
  * function for getting an entity's label
@@ -541,3 +549,13 @@ export const haveSamePropValue = (
 
 export const findOwnerRefByKind = (resource: K8sResourceCommon, kind: string): string | undefined =>
   resource?.metadata?.ownerReferences?.find((ref) => ref.kind === kind)?.name;
+
+/**
+ * Function to get a unique key (identifier) for a resource
+ * @param {K8sResourceCommon} resource - resource to get the key from
+ * @returns {string} the unique key for the resource
+ */
+export const getResourceKey = (resource: K8sResourceCommon): string =>
+  `${getKind(resource)}/${getCluster(resource) || ''}/${getNamespace(resource)}/${getName(
+    resource,
+  )}`;

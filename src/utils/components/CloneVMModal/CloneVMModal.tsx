@@ -14,6 +14,7 @@ import {
 import { logVMActionPerformed } from '@kubevirt-utils/extensions/telemetry/vm-actions';
 import { logVMCloned } from '@kubevirt-utils/extensions/telemetry/vm-storage';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { useNameValidation } from '@kubevirt-utils/hooks/useNameValidation';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { isVM } from '@kubevirt-utils/utils/typeGuards';
 import { truncateToK8sName } from '@kubevirt-utils/utils/utils';
@@ -47,7 +48,11 @@ const CloneVMModal: FC<CloneVMModalProps> = ({ headerText, isOpen, onClose, sour
     truncateToK8sName(isVM(source) ? `${name}-clone` : name),
   );
 
-  const [isVMNameValid, setIsVMNameValid] = useState(false);
+  const {
+    errorText,
+    isValid: isCloneNameValid,
+    validated,
+  } = useNameValidation({ name: cloneName });
 
   const [cloneDescription, setCloneDescription] = useState('');
 
@@ -92,7 +97,7 @@ const CloneVMModal: FC<CloneVMModalProps> = ({ headerText, isOpen, onClose, sour
     <TabModal
       closeOnSubmit={false}
       headerText={headerText ?? t('Clone {{sourceKind}}', { sourceKind: source.kind })}
-      isDisabled={Boolean(initialCloneRequest) || !isVMNameValid}
+      isDisabled={Boolean(initialCloneRequest) || !isCloneNameValid}
       isHorizontal
       isLoading={Boolean(initialCloneRequest)}
       isOpen={isOpen}
@@ -103,7 +108,13 @@ const CloneVMModal: FC<CloneVMModalProps> = ({ headerText, isOpen, onClose, sour
       shouldWrapInForm
       submitBtnText={isVM(source) ? t('Clone') : t('Create')}
     >
-      <NameInput autoFocus name={cloneName} setIsValid={setIsVMNameValid} setName={onNameChange} />
+      <NameInput
+        autoFocus
+        errorText={errorText}
+        name={cloneName}
+        setName={onNameChange}
+        validated={validated}
+      />
       <DescriptionInput
         placeholder={
           isVM(source)

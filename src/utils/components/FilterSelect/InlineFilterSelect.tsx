@@ -29,9 +29,11 @@ type InlineFilterSelectProps = {
   options: EnhancedSelectOptionProps[];
   placeholder?: string;
   popperProps?: SelectPopperProps;
+  searchPlaceholder?: string;
   selected: string;
   selectProps?: Omit<SelectProps, 'toggle'>;
   setSelected: (val: string) => void;
+  showSearch?: boolean;
   toggleProps?: MenuTogglePropsWithTestId;
 };
 
@@ -41,9 +43,11 @@ const InlineFilterSelect: FC<InlineFilterSelectProps> = ({
   options = [],
   placeholder,
   popperProps,
+  searchPlaceholder,
   selected,
   selectProps,
   setSelected,
+  showSearch = true,
   toggleProps,
 }) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -101,26 +105,30 @@ const InlineFilterSelect: FC<InlineFilterSelectProps> = ({
       toggle={toggle}
       {...selectProps}
     >
-      <MenuSearch>
-        <MenuSearchInput>
-          <SearchInput
-            onChange={(_, newFilterValue) => {
-              if (filterValue !== newFilterValue) {
-                setFilterValue(newFilterValue);
-              }
+      {showSearch && (
+        <>
+          <MenuSearch>
+            <MenuSearchInput>
+              <SearchInput
+                onChange={(_, newFilterValue) => {
+                  if (filterValue !== newFilterValue) {
+                    setFilterValue(newFilterValue);
+                  }
 
-              setFocusedItemIndex(null);
-            }}
-            onClear={(e: SyntheticEvent<HTMLButtonElement>) => {
-              e.stopPropagation();
-              setFilterValue('');
-            }}
-            placeholder={placeholder}
-            value={filterValue}
-          />
-        </MenuSearchInput>
-      </MenuSearch>
-      <Divider />
+                  setFocusedItemIndex(null);
+                }}
+                onClear={(e: SyntheticEvent<HTMLButtonElement>) => {
+                  e.stopPropagation();
+                  setFilterValue('');
+                }}
+                placeholder={searchPlaceholder ?? placeholder}
+                value={filterValue}
+              />
+            </MenuSearchInput>
+          </MenuSearch>
+          <Divider />
+        </>
+      )}
       <SelectList id="select-inline-filter-listbox">
         <InlineFilterSelectOptions
           filterOptions={filterOptions}

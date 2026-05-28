@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
+import produce from 'immer';
 
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { logITFlowEvent } from '@kubevirt-utils/extensions/telemetry/telemetry';
@@ -43,7 +44,12 @@ const useCreateCustomizedVM: UseCreateCustomizedVM = () => {
   useSignals();
   const navigate = useNavigate();
   const cluster = useClusterParam();
-  const { creationMethod, project: vmNamespaceTarget, selectedTemplate } = useVMWizardStore();
+  const {
+    creationMethod,
+    project: vmNamespaceTarget,
+    selectedTemplate,
+    vmName,
+  } = useVMWizardStore();
   const isIPv6SingleStack = useIsIPv6SingleStackCluster(cluster);
   const [isUDNManagedNamespace] = useNamespaceUDN(vmNamespaceTarget);
 
@@ -62,11 +68,14 @@ const useCreateCustomizedVM: UseCreateCustomizedVM = () => {
     }
 
     try {
-      if (isIPv6SingleStack) removePodNetworkFromVM(storeVM);
+      const vmToCreate = produce(storeVM, (draft) => {
+        if (vmName && vmName !== getName(draft)) draft.metadata.name = vmName;
+        if (isIPv6SingleStack) removePodNetworkFromVM(draft);
+      });
 
       const createdVM = await kubevirtK8sCreate({
         cluster,
-        data: storeVM,
+        data: vmToCreate,
         model: VirtualMachineModel,
       });
 

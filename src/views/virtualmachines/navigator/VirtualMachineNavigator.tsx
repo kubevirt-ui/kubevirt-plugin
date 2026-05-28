@@ -3,6 +3,7 @@ import { matchPath, useLocation, useParams } from 'react-router';
 
 import GuidedTour from '@kubevirt-utils/components/GuidedTour/GuidedTour';
 import CatalogOnboardingPopover from '@kubevirt-utils/components/OnboardingPopover/components/CatalogOnboardingPopover';
+import NavCollapseOnboardingPopover from '@kubevirt-utils/components/OnboardingPopover/components/NavCollapseOnboardingPopover';
 import VMsTabOnboardingPopover from '@kubevirt-utils/components/OnboardingPopover/components/VMsTabOnboardingPopover';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { VirtualMachineModelRef } from '@kubevirt-utils/models';
@@ -20,6 +21,7 @@ import { useTreeViewData } from '@virtualmachines/tree/hooks/useTreeViewData';
 import VirtualMachineTreeView from '@virtualmachines/tree/VirtualMachineTreeView';
 
 import WelcomeModal from '../../welcome/WelcomeModal';
+import useAutoHideNavigation from '../hooks/useAutoHideNavigation/useAutoHideNavigation';
 import OverviewTab from '../list/components/OverviewTab/OverviewTab';
 
 import { OVERVIEW_TAB_INDEX, VM_LIST_TAB_INDEX } from './constants';
@@ -52,6 +54,8 @@ const VirtualMachineNavigator: FC = () => {
     location.pathname.endsWith(VirtualMachineModelRef) ||
     location.pathname.endsWith(`${VirtualMachineModelRef}/`);
 
+  const isNavCollapsed = useAutoHideNavigation();
+
   const treeProps = useTreeViewData();
 
   const onFilterChange: OnFilterChange = useCallback((type, value) => {
@@ -72,6 +76,7 @@ const VirtualMachineNavigator: FC = () => {
             {!isFleetPage && <GuidedTour />}
             {!isFleetPage && <WelcomeModal />}
             <CatalogOnboardingPopover />
+            <NavCollapseOnboardingPopover isNavCollapsed={isNavCollapsed} />
             <VMsTabOnboardingPopover />
             {isVirtualMachineListPage ? (
               <Tabs

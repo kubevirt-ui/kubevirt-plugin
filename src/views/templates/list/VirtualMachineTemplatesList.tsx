@@ -1,6 +1,8 @@
 import React, { FC, useMemo } from 'react';
 
 import { modelToRef, TemplateModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import GuidedTour from '@kubevirt-utils/components/GuidedTour/GuidedTour';
+import { runningTourSignal } from '@kubevirt-utils/components/GuidedTour/utils/guidedTourSignals';
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
 import { buildColumnLayout } from '@kubevirt-utils/components/KubevirtTable/utils';
 import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
@@ -21,6 +23,7 @@ import {
   ListPageHeader,
   useListPageFilter,
 } from '@openshift-console/dynamic-plugin-sdk';
+import { useSignals } from '@preact/signals-react/runtime';
 
 import VirtualMachineTemplatesCreateButton from './components/VirtualMachineTemplatesCreateButton/VirtualMachineTemplatesCreateButton';
 import VirtualMachineTemplatesEmptyState from './components/VirtualMachineTemplatesEmptyState/VirtualMachineTemplatesEmptyState';
@@ -39,6 +42,7 @@ const VirtualMachineTemplatesList: FC<ListPageProps> = ({
   selector,
   showTitle = true,
 }) => {
+  useSignals();
   const selectedClusters = useSelectedRowFilterClusters();
   const selectedProjects = useSelectedRowFilterProjects();
   const namespaceParam = useNamespaceParam();
@@ -103,6 +107,7 @@ const VirtualMachineTemplatesList: FC<ListPageProps> = ({
   );
 
   if (
+    !runningTourSignal.value &&
     loaded &&
     !error &&
     isEmpty(allTemplatesWithRequests) &&
@@ -114,6 +119,7 @@ const VirtualMachineTemplatesList: FC<ListPageProps> = ({
 
   return (
     <>
+      <GuidedTour />
       <ListPageHeader title={showTitle && t('Templates')}>
         <VirtualMachineTemplatesCreateButton />
       </ListPageHeader>

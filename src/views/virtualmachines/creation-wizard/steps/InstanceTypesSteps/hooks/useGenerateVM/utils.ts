@@ -220,7 +220,6 @@ export const generateVM: GenerateVMCallback = ({
   dvSource,
   enableMultiArchBootImageImport,
   folder,
-  generatedVMName,
   isIPv6SingleStack,
   isUDNManagedNamespace,
   populatedCloudInitYAML,
@@ -228,6 +227,8 @@ export const generateVM: GenerateVMCallback = ({
   selectedBootableVolume,
   selectedInstanceType,
   targetNamespace,
+  vmDescription,
+  vmName,
 }) => {
   const selectedPreference = getLabel(selectedBootableVolume, DEFAULT_PREFERENCE_LABEL);
   const selectPreferenceKind = getLabel(
@@ -245,12 +246,14 @@ export const generateVM: GenerateVMCallback = ({
     : DEFAULT_NETWORK_INTERFACE;
 
   const volumeArchitecture = getArchitecture(selectedBootableVolume);
+  const volumeName = `${vmName}-volume`;
 
   let emptyVM: V1VirtualMachine = {
     apiVersion: `${VirtualMachineModel.apiGroup}/${VirtualMachineModel.apiVersion}`,
     kind: VirtualMachineModel.kind,
     metadata: {
-      name: generatedVMName,
+      ...(vmDescription && { annotations: { description: vmDescription } }),
+      name: vmName,
       namespace: targetNamespace,
       ...(folder && { labels: { [VM_FOLDER_LABEL]: folder } }),
     },
@@ -258,7 +261,7 @@ export const generateVM: GenerateVMCallback = ({
       dataVolumeTemplates: [
         {
           metadata: {
-            name: `${generatedVMName}-volume`,
+            name: volumeName,
           },
           spec: {
             sourceRef: {
@@ -317,7 +320,7 @@ export const generateVM: GenerateVMCallback = ({
           subdomain: HEADLESS_SERVICE_NAME,
           volumes: [
             {
-              dataVolume: { name: `${generatedVMName}-volume` },
+              dataVolume: { name: volumeName },
               name: ROOTDISK,
             },
             ...(!isWindowsVM

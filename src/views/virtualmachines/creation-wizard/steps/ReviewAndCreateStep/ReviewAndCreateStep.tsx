@@ -9,12 +9,15 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { updateCustomizeInstanceType, vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
 import { Checkbox, Stack, StackItem, Title, TitleSizes } from '@patternfly/react-core';
 import { useSignals } from '@preact/signals-react/runtime';
+import useVMWizardStore from '@virtualmachines/creation-wizard/state/vm-wizard-store/useVMWizardStore';
 import ReviewGrid from '@virtualmachines/creation-wizard/steps/ReviewAndCreateStep/components/ReviewGrid/ReviewGrid';
-
-import NameAndDescriptionForm from './components/NameAndDescriptionForm';
+import { isCloneCreationMethod } from '@virtualmachines/creation-wizard/utils/utils';
 
 const ReviewAndCreateStep: FC = () => {
   const { t } = useKubevirtTranslation();
+  const { creationMethod } = useVMWizardStore();
+  const isCloneMethod = isCloneCreationMethod(creationMethod);
+
   useSignals();
   const { isStartChecked, onToggle } = useRunStrategyToggle(vmSignal.value ?? undefined);
   return (
@@ -25,20 +28,16 @@ const ReviewAndCreateStep: FC = () => {
         </Title>
       </StackItem>
       <StackItem>
-        {t(
-          "Review your VirtualMachine configuration. After the name is set, you're ready to create your VirtualMachine.",
-        )}
+        {isCloneMethod
+          ? t(
+              'Before you clone your VirtualMachine, review its configuration. You can create your own unique VM name, or we can generate a name for you.',
+            )
+          : t('Before you create your VirtualMachine, review its configuration.')}
       </StackItem>
       <StackItem>
         <ReviewGrid />
       </StackItem>
       <StackItem isFilled />
-      <StackItem>
-        <hr className="pf-v6-c-divider" />
-      </StackItem>
-      <StackItem>
-        <NameAndDescriptionForm />
-      </StackItem>
       <StackItem>
         <Checkbox
           onChange={(_, checked: boolean) => {

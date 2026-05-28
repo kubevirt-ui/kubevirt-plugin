@@ -6,7 +6,7 @@ import {
   CUSTOMIZE_VM_FAILED,
 } from '@kubevirt-utils/extensions/telemetry/utils/constants';
 import { logVMCreationFailedFromTemplate } from '@kubevirt-utils/extensions/telemetry/vm-creation';
-import { getLabels } from '@kubevirt-utils/resources/shared';
+import { getLabels, getResourceKey } from '@kubevirt-utils/resources/shared';
 import {
   LABEL_USED_TEMPLATE_NAME,
   LABEL_USED_TEMPLATE_NAMESPACE,
@@ -24,15 +24,27 @@ type UseCreateVMFromTemplate = () => {
 
 const useCreateVMFromTemplate: UseCreateVMFromTemplate = () => {
   const [createError, setCreateError] = useState(undefined);
-  const { cluster, folder, project: namespace, selectedTemplate } = useVMWizardStore();
+  const {
+    cluster,
+    folder,
+    lastProcessedTemplateKey,
+    project: namespace,
+    selectedTemplate,
+    setLastProcessedTemplateKey,
+    vmDescription,
+    vmName,
+  } = useVMWizardStore();
 
   const createVMFromTemplate = async () => {
     setCreateError(undefined);
 
+    const selectedKey = getResourceKey(selectedTemplate);
+    if (selectedKey === lastProcessedTemplateKey) return;
+
     logTemplateFlowEvent(CUSTOMIZE_VM_BUTTON_CLICKED, selectedTemplate);
 
     try {
-      const vmObject = await resolveVMFromTemplate(selectedTemplate, namespace, cluster);
+      const vmObject = await resolveVMFromTemplate(selectedTemplate, namespace, cluster, vmName);
 
       vmObject.metadata.namespace = namespace;
       vmObject.metadata.labels = {
@@ -41,9 +53,16 @@ const useCreateVMFromTemplate: UseCreateVMFromTemplate = () => {
         [LABEL_USED_TEMPLATE_NAMESPACE]: selectedTemplate.metadata.namespace,
         ...(folder ? { [VM_FOLDER_LABEL]: folder } : {}),
       };
+      if (vmDescription) {
+        vmObject.metadata.annotations = {
+          ...vmObject.metadata.annotations,
+          description: vmDescription,
+        };
+      }
       vmObject.spec.runStrategy = getDefaultRunningStrategy();
 
       vmSignal.value = vmObject;
+      setLastProcessedTemplateKey(selectedKey);
     } catch (error) {
       setCreateError(error);
       logTemplateFlowEvent(CUSTOMIZE_VM_FAILED, selectedTemplate);
