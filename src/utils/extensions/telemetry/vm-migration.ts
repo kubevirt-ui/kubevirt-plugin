@@ -13,6 +13,13 @@ import {
 import { MigrationStatusTelemetry } from './utils/types';
 import { eventMonitor, getTelemetryErrorMessage } from './telemetry';
 
+type MigrationProperties = {
+  clusterLimit?: number;
+  currentParallelCount?: number;
+  vmDiskGB?: number;
+  vmMemoryMB?: number;
+};
+
 export const logVMMigrationStarted = (
   vm: V1VirtualMachine,
   properties?: {
@@ -30,22 +37,16 @@ export const logVMMigrationStarted = (
 export const logVMMigrationCompleted = (
   vm: V1VirtualMachine,
   status: MigrationStatusTelemetry,
-  properties?: {
-    clusterLimit?: number;
-    currentParallelCount?: number;
-    vmDiskGB?: number;
-    vmMemoryMB?: number;
-  },
-) => {
+  properties: MigrationProperties = {},
+): void => {
+  const cleanProperties = Object.fromEntries(
+    Object.entries(properties).filter(([, value]) => value !== undefined),
+  );
+
   eventMonitor(VM_MIGRATION_COMPLETED, {
     status,
     vmName: getName(vm),
-    ...(properties?.vmMemoryMB !== undefined && { vmMemoryMB: properties.vmMemoryMB }),
-    ...(properties?.vmDiskGB !== undefined && { vmDiskGB: properties.vmDiskGB }),
-    ...(properties?.clusterLimit !== undefined && { clusterLimit: properties.clusterLimit }),
-    ...(properties?.currentParallelCount !== undefined && {
-      currentParallelCount: properties.currentParallelCount,
-    }),
+    ...cleanProperties,
   });
 };
 

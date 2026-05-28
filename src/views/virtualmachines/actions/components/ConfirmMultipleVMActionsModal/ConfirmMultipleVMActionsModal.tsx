@@ -2,7 +2,7 @@ import React, { FC } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import AckConfirmationModal from '@kubevirt-utils/components/AckConfirmationModal/AckConfirmationModal';
-import { mapVMActionTypeToTelemetry } from '@kubevirt-utils/extensions/telemetry/utils/action-source';
+import { VMActionTelemetry } from '@kubevirt-utils/extensions/telemetry';
 import { logVMBulkActionPerformed } from '@kubevirt-utils/extensions/telemetry/vm-actions';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty, kubevirtConsole } from '@kubevirt-utils/utils/utils';
@@ -49,15 +49,16 @@ const ConfirmMultipleVMActionsModal: FC<ConfirmMultipleVMActionsModalProps> = ({
 
   const actionOnVms = async (): Promise<void> => {
     const results = await Promise.allSettled(vms?.map((vm) => action(vm)) ?? []);
+
+    if (numVMs) {
+      logVMBulkActionPerformed(actionType as VMActionTelemetry, numVMs);
+    }
+
     const failures = results.filter(
       (result): result is PromiseRejectedResult => result.status === 'rejected',
     );
 
     if (failures.length === 0) {
-      const telemetryAction = mapVMActionTypeToTelemetry(actionType);
-      if (telemetryAction && numVMs) {
-        logVMBulkActionPerformed(telemetryAction, numVMs);
-      }
       return;
     }
 

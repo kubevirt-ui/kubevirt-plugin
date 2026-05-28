@@ -180,6 +180,23 @@ export const submit = async ({
 
   const newVM = reorderBootDisk(vmWithDisk, data.disk.name, data.isBootSource, isInitialBootDisk);
 
+  const updateDisk = async (vmToSubmit: V1VirtualMachine) => {
+    if (shouldHotplug) {
+      try {
+        const result = await hotplugPromise(vmToSubmit, data);
+        logVMDiskHotplug(TELEMETRY_HOTPLUG_OPERATION.ADD);
+        return result;
+      } catch (error) {
+        logVMDiskHotplug(TELEMETRY_HOTPLUG_OPERATION.ADD, error);
+        throw error;
+      }
+    }
+
+    const result = await onSubmit(vmToSubmit, data);
+    logVMDiskAttached();
+    return result;
+  };
+
   if (data.expandPVCSize && pvc) {
     await kubevirtK8sPatch({
       cluster: getCluster(vm),
@@ -195,36 +212,11 @@ export const submit = async ({
     });
 
     if (data.dataVolumeTemplate) {
-      const resizedVM = resizeVMDataVolumeTemplate(data, newVM);
-      if (shouldHotplug) {
-        try {
-          const result = await hotplugPromise(resizedVM, data);
-          logVMDiskHotplug(TELEMETRY_HOTPLUG_OPERATION.ADD);
-          return result;
-        } catch (error) {
-          logVMDiskHotplug(TELEMETRY_HOTPLUG_OPERATION.ADD, error);
-          throw error;
-        }
-      }
-      const result = await onSubmit(resizedVM, data);
-      logVMDiskAttached();
-      return result;
+      return updateDisk(resizeVMDataVolumeTemplate(data, newVM));
     }
   }
 
-  if (shouldHotplug) {
-    try {
-      const result = await hotplugPromise(newVM, data);
-      logVMDiskHotplug(TELEMETRY_HOTPLUG_OPERATION.ADD);
-      return result;
-    } catch (error) {
-      logVMDiskHotplug(TELEMETRY_HOTPLUG_OPERATION.ADD, error);
-      throw error;
-    }
-  }
-  const result = await onSubmit(newVM, data);
-  logVMDiskAttached();
-  return result;
+  return updateDisk(newVM);
 };
 
 type SubmitCDROMInput = {

@@ -1,12 +1,11 @@
 import React, { ComponentType, FC, useState } from 'react';
 import { isEqual } from 'lodash';
 
-import { TELEMETRY_EDITOR_VIEW_SWITCH } from '@kubevirt-utils/extensions/telemetry/utils/property-constants';
 import {
-  EditorViewSwitchTelemetry,
-  ResourceTypeTelemetry,
-} from '@kubevirt-utils/extensions/telemetry/utils/types';
-import { logEditorViewSwitched } from '@kubevirt-utils/extensions/telemetry/yaml-vs-ui';
+  logEditorViewSwitched,
+  TELEMETRY_EDITOR_VIEW_SWITCH,
+} from '@kubevirt-utils/extensions/telemetry';
+import { ResourceTypeTelemetry } from '@kubevirt-utils/extensions/telemetry/utils/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { K8sResourceKind } from '@openshift-console/dynamic-plugin-sdk';
 import { Alert, AlertVariant, Button, ButtonVariant } from '@patternfly/react-core';
@@ -88,17 +87,18 @@ export const SyncedEditor: FC<SyncedEditorProps> = ({
   const changeEditorType = (newType: EditorType): void => {
     setEditorType(newType);
     onChangeEditorType(newType);
-  };
 
-  const logViewSwitch = (switchDirection: EditorViewSwitchTelemetry) => {
-    if (telemetryResourceType) {
-      logEditorViewSwitched(telemetryResourceType, switchDirection, telemetryStepOrField);
-    }
+    logEditorViewSwitched(
+      telemetryResourceType,
+      newType === EditorType.YAML
+        ? TELEMETRY_EDITOR_VIEW_SWITCH.YAML_TO_FORM
+        : TELEMETRY_EDITOR_VIEW_SWITCH.FORM_TO_YAML,
+      telemetryStepOrField,
+    );
   };
 
   const handleToggleToForm = () => {
     if (switchError === undefined) {
-      logViewSwitch(TELEMETRY_EDITOR_VIEW_SWITCH.YAML_TO_FORM);
       changeEditorType(EditorType.Form);
     } else {
       setYAMLWarning(true);
@@ -107,14 +107,12 @@ export const SyncedEditor: FC<SyncedEditorProps> = ({
 
   const handleToggleToYAML = () => {
     setYAML(safeJSToYAML(formData, yaml, YAML_TO_JS_OPTIONS));
-    logViewSwitch(TELEMETRY_EDITOR_VIEW_SWITCH.FORM_TO_YAML);
     changeEditorType(EditorType.YAML);
   };
 
   const onClickYAMLWarningConfirm = () => {
     setSwitchError(undefined);
     setYAMLWarning(false);
-    logViewSwitch(TELEMETRY_EDITOR_VIEW_SWITCH.YAML_TO_FORM);
     changeEditorType(EditorType.Form);
   };
 

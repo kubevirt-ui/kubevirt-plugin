@@ -1,4 +1,5 @@
 import { V1VirtualMachine, V1Volume } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { getVolumes } from '@kubevirt-utils/resources/vm';
 
 import {
   VM_CLONED,
@@ -16,7 +17,7 @@ import {
   TELEMETRY_VM_STATE,
 } from './utils/property-constants';
 import { HotplugOperationTelemetry, SnapshotStatusTelemetry } from './utils/types';
-import { eventMonitor } from './telemetry';
+import { eventMonitor, getTelemetryErrorMessage } from './telemetry';
 
 const getDiskTypes = (volumes: V1Volume[]): string[] =>
   volumes
@@ -39,9 +40,8 @@ export const logVMDiskAttached = (properties?: {
 
 export const logVMDiskHotplug = (operation: HotplugOperationTelemetry, error?: Error | string) => {
   if (error) {
-    const errorMessage = typeof error === 'string' ? error : error?.message;
     eventMonitor(VM_DISK_HOTPLUG_FAILED, {
-      errorMessage,
+      errorMessage: getTelemetryErrorMessage(error),
       operation,
       vmState: TELEMETRY_VM_STATE.RUNNING,
     });
@@ -82,7 +82,7 @@ export const logVMCloned = (properties: {
 };
 
 export const logVMDiskSummary = (vm: V1VirtualMachine) => {
-  const volumes = vm?.spec?.template?.spec?.volumes ?? [];
+  const volumes = getVolumes(vm);
   eventMonitor(VM_DISK_SUMMARY, {
     diskCount: volumes.length,
     diskTypes: getDiskTypes(volumes),

@@ -8,7 +8,7 @@ import {
   V1VirtualMachine,
   V1VirtualMachineInstanceMigration,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { VMActionTelemetry } from '@kubevirt-utils/extensions/telemetry';
+import { TELEMETRY_VM_ACTION, VMActionTelemetry } from '@kubevirt-utils/extensions/telemetry';
 import { logVMActionPerformed } from '@kubevirt-utils/extensions/telemetry/vm-actions';
 import { MultiNamespaceVirtualMachineStorageMigrationPlanModel } from '@kubevirt-utils/models';
 import { MultiNamespaceVirtualMachineStorageMigrationPlan } from '@kubevirt-utils/resources/migrations/constants';
@@ -37,11 +37,12 @@ const logDirectVMAction = (vm: V1VirtualMachine, action: VMActionTelemetry) => {
 };
 
 const actionTelemetryMap: Partial<Record<VMActionType, VMActionTelemetry>> = {
-  [VMActionType.Pause]: 'pause',
-  [VMActionType.Restart]: 'restart',
-  [VMActionType.Start]: 'start',
-  [VMActionType.Stop]: 'stop',
-  [VMActionType.Unpause]: 'unpause',
+  [VMActionType.Pause]: TELEMETRY_VM_ACTION.PAUSE,
+  [VMActionType.Reset]: TELEMETRY_VM_ACTION.RESET,
+  [VMActionType.Restart]: TELEMETRY_VM_ACTION.RESTART,
+  [VMActionType.Start]: TELEMETRY_VM_ACTION.START,
+  [VMActionType.Stop]: TELEMETRY_VM_ACTION.STOP,
+  [VMActionType.Unpause]: TELEMETRY_VM_ACTION.UNPAUSE,
 };
 
 export const VMActionRequest = async (

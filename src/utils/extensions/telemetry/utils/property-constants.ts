@@ -29,6 +29,7 @@ export const TELEMETRY_VM_ACTION = {
   DELETE: 'delete',
   MIGRATE: 'migrate',
   PAUSE: 'pause',
+  RESET: 'reset',
   RESTART: 'restart',
   SNAPSHOT: 'snapshot',
   START: 'start',
@@ -130,6 +131,15 @@ export const TELEMETRY_SOURCE_PROVIDER = {
   OVIRT: 'ovirt',
   RHV: 'rhv',
   VSPHERE: 'vsphere',
+} as const;
+
+export const MTV_PROVIDER_TYPE = {
+  OPENSTACK: TELEMETRY_SOURCE_PROVIDER.OPENSTACK,
+  OVIRT: TELEMETRY_SOURCE_PROVIDER.OVIRT,
+  REDHAT: 'redhat',
+  RHV: TELEMETRY_SOURCE_PROVIDER.RHV,
+  VMWARE: 'vmware',
+  VSPHERE: TELEMETRY_SOURCE_PROVIDER.VSPHERE,
 } as const;
 
 export const TELEMETRY_ALERT_SEVERITY = {

@@ -3,7 +3,7 @@ import { createVMFlowTypes } from '@kubevirt-utils/extensions/telemetry/utils/co
 import { TELEMETRY_UNKNOWN_ERROR_MESSAGE } from '@kubevirt-utils/extensions/telemetry/utils/property-constants';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { Template } from '@kubevirt-utils/resources/template';
-import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
+import { getErrorMessage, kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { getSegmentAnalytics } from '@openshift-console/dynamic-plugin-sdk-internal';
 
 export const eventMonitor = (eventType: string, properties?: any) => {
@@ -25,15 +25,8 @@ export const eventMonitor = (eventType: string, properties?: any) => {
   segmentAnalytics.analytics.track(eventType, payload);
 };
 
-export const getTelemetryErrorMessage = (error: unknown): string => {
-  if (error instanceof Error) {
-    return error.message;
-  }
-  if (typeof error === 'string') {
-    return error;
-  }
-  return TELEMETRY_UNKNOWN_ERROR_MESSAGE;
-};
+export const getTelemetryErrorMessage = (error: unknown): string =>
+  getErrorMessage(error) ?? TELEMETRY_UNKNOWN_ERROR_MESSAGE;
 
 export const logEventWithName = (
   key: string,
