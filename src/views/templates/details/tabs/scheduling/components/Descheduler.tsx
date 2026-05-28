@@ -5,12 +5,12 @@ import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import useDeschedulerSetting from '@kubevirt-utils/hooks/useDeschedulerSetting/useDeschedulerSetting';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { V1Template } from '@kubevirt-utils/models';
+import { Template } from '@kubevirt-utils/resources/template';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { Switch } from '@patternfly/react-core';
 
 type DeschedulerProps = {
-  template: V1Template;
+  template: Template;
 };
 
 const Descheduler: FC<DeschedulerProps> = ({ template }) => {

@@ -32,4 +32,15 @@ export const extensions: EncodedExtension[] = [
     },
     type: 'console.page/resource/details',
   } as EncodedExtension<ResourceDetailsPage>,
+  {
+    properties: {
+      component: { $codeRef: 'TemplateNavPage' },
+      model: {
+        group: 'template.kubevirt.io',
+        kind: 'VirtualMachineTemplate',
+        version: 'v1alpha1',
+      },
+    },
+    type: 'console.page/resource/details',
+  } as EncodedExtension<ResourceDetailsPage>,
 ];

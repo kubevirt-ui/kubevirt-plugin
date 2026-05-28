@@ -1,12 +1,11 @@
 import React, { FC } from 'react';
 
-import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { useVMTemplateSource } from '@kubevirt-utils/resources/template';
+import { Template, useVMTemplateSource } from '@kubevirt-utils/resources/template';
 
 type BootSourceProps = {
-  template: V1Template;
+  template: Template;
 };
 
 const BootSource: FC<BootSourceProps> = ({ template }) => {

@@ -1,7 +1,6 @@
 import React, { FC, useCallback, useState } from 'react';
 import produce from 'immer';
 
-import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import ConfirmActionMessage from '@kubevirt-utils/components/ConfirmActionMessage/ConfirmActionMessage';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
@@ -9,6 +8,7 @@ import KebabToggle from '@kubevirt-utils/components/toggles/KebabToggle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   getTemplateVirtualMachineObject,
+  Template,
   updateTemplate,
 } from '@kubevirt-utils/resources/template';
 import { NetworkPresentation } from '@kubevirt-utils/resources/vm/utils/network/constants';
@@ -24,7 +24,7 @@ import TemplatesEditNetworkInterfaceModal from '../modal/TemplatesEditNetworkInt
 type NetworkInterfaceActionsProps = {
   nicName: string;
   nicPresentation: NetworkPresentation;
-  template: V1Template;
+  template: Template;
 };
 
 const NetworkInterfaceActions: FC<NetworkInterfaceActionsProps> = ({
@@ -70,7 +70,7 @@ const NetworkInterfaceActions: FC<NetworkInterfaceActionsProps> = ({
 
   const onDeleteModalToggle = () => {
     createModal(({ isOpen, onClose }) => (
-      <TabModal<V1Template>
+      <TabModal<Template>
         headerText={label}
         isOpen={isOpen}
         obj={template}

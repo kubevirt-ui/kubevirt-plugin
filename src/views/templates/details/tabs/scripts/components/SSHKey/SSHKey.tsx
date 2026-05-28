@@ -1,7 +1,7 @@
 import React, { FC, useMemo } from 'react';
 import produce from 'immer';
 
-import { SecretModel, TemplateModel, V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { SecretModel, TemplateModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { IoK8sApiCoreV1Secret } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import LinuxLabel from '@kubevirt-utils/components/Labels/LinuxLabel';
@@ -16,7 +16,11 @@ import {
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { createSSHSecret, getInitialSSHDetails } from '@kubevirt-utils/resources/secret/utils';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
-import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
+import {
+  getTemplateVirtualMachineObject,
+  isOpenShiftTemplate,
+  Template,
+} from '@kubevirt-utils/resources/template';
 import { getVMSSHSecretName } from '@kubevirt-utils/resources/vm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
@@ -38,7 +42,7 @@ import useEditTemplateAccessReview from '../../../../hooks/useIsTemplateEditable
 import { removeAccessCredential, updateAccessCredential } from './sshkey-utils';
 
 type SSHKeyProps = {
-  template: V1Template;
+  template: Template;
 };
 
 const SSHKey: FC<SSHKeyProps> = ({ template }) => {
@@ -50,8 +54,11 @@ const SSHKey: FC<SSHKeyProps> = ({ template }) => {
   const vmAttachedSecretName = useMemo(() => getVMSSHSecretName(vm), [vm]);
 
   const secretToCreate: IoK8sApiCoreV1Secret = useMemo(
-    () => template?.objects?.find((obj) => obj.kind === SecretModel.kind),
-    [template.objects],
+    () =>
+      isOpenShiftTemplate(template)
+        ? template?.objects?.find((obj) => obj.kind === SecretModel.kind)
+        : undefined,
+    [template],
   );
 
   const initialSSHDetails = useMemo(

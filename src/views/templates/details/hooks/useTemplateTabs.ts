@@ -10,7 +10,7 @@ import TemplateSchedulingTab from '../tabs/scheduling/TemplateSchedulingTab';
 import TemplateScriptsPage from '../tabs/scripts/TemplateScriptsPage';
 import TemplateYAMLPage from '../tabs/yaml/TemplateYAMLPage';
 
-export const useVirtualMachineTabs = () => {
+export const useTemplateTabs = () => {
   const { t } = useKubevirtTranslation();
 
   const tabs = useMemo(

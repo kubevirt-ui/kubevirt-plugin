@@ -1,17 +1,20 @@
 import React, { FC } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 
-import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { TemplateModel, VirtualMachineTemplateModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import DetailsPageTitle from '@kubevirt-utils/components/DetailsPageTitle/DetailsPageTitle';
 import PaneHeading from '@kubevirt-utils/components/PaneHeading/PaneHeading';
 import SidebarEditorSwitch from '@kubevirt-utils/components/SidebarEditor/SidebarEditorSwitch';
 import { VirtualMachineDetailsTab } from '@kubevirt-utils/constants/tabs-constants';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getName } from '@kubevirt-utils/resources/shared';
 import {
   getACMTemplateListURL,
   getTemplateListURL,
   isDeprecatedTemplate,
+  isOpenShiftTemplate,
+  Template,
 } from '@kubevirt-utils/resources/template';
 import useIsACMPage from '@multicluster/useIsACMPage';
 import { useLastNamespace } from '@openshift-console/dynamic-plugin-sdk-internal';
@@ -32,7 +35,7 @@ import CommonTemplateAlert from './CommonTemplateAlert';
 import NoPermissionTemplateAlert from './NoPermissionTemplateAlert';
 
 type TemplatePageTitleTitleProps = {
-  template: V1Template;
+  template: Template;
 };
 
 const TemplatePageTitle: FC<TemplatePageTitleTitleProps> = ({ template }) => {
@@ -43,8 +46,12 @@ const TemplatePageTitle: FC<TemplatePageTitleTitleProps> = ({ template }) => {
   const isACMPage = useIsACMPage();
   const { hasEditPermission, isCommonTemplate } = useEditTemplateAccessReview(template);
 
+  const templateName = getName(template);
+
+  const isOSTemplate = isOpenShiftTemplate(template);
+
   const isSidebarEditorDisplayed = !location.pathname.includes(
-    `/templates/${template?.metadata?.name}/${VirtualMachineDetailsTab.YAML}`,
+    `/${templateName}/${VirtualMachineDetailsTab.YAML}`,
   );
 
   return (
@@ -68,24 +75,26 @@ const TemplatePageTitle: FC<TemplatePageTitleTitleProps> = ({ template }) => {
               {t('Templates')}
             </Button>
           </BreadcrumbItem>
-          <BreadcrumbItem>{template?.metadata?.name}</BreadcrumbItem>
+          <BreadcrumbItem>{templateName}</BreadcrumbItem>
         </Breadcrumb>
       }
     >
       <PaneHeading>
         <Title headingLevel="h1">
-          <span className="co-m-resource-icon co-m-resource-icon--lg">T</span>
+          <span className="co-m-resource-icon co-m-resource-icon--lg">
+            {isOSTemplate ? TemplateModel.abbr : VirtualMachineTemplateModel.abbr}
+          </span>
           <span>
-            {template?.metadata?.name}{' '}
+            {templateName}{' '}
             {isDeprecatedTemplate(template) && <Label isCompact>{t('Deprecated')}</Label>}
           </span>
         </Title>
         <Flex alignItems={{ default: 'alignItemsCenter' }}>
           {isSidebarEditorDisplayed && <SidebarEditorSwitch />}
-          <VirtualMachineTemplatesActions template={template} />
+          {isOSTemplate && <VirtualMachineTemplatesActions template={template} />}
         </Flex>
       </PaneHeading>
-      {isCommonTemplate && <CommonTemplateAlert template={template} />}
+      {isCommonTemplate && isOSTemplate && <CommonTemplateAlert template={template} />}
       {!isCommonTemplate && !hasEditPermission && <NoPermissionTemplateAlert />}
     </DetailsPageTitle>
   );

@@ -2344,7 +2344,6 @@
   "VirtualMachine name": "Nombre de VirtualMachine",
   "VirtualMachine name can not be empty.": "El nombre de la VirtualMachine no puede estar vacío.",
   "VirtualMachine name: {{vmName}}": "Nombre de VirtualMachine: {{vmName}}",
-  "VirtualMachine resource is required": "Se requiere un recurso de VirtualMachine",
   "VirtualMachine statuses": "Estados de VirtualMachine",
   "VirtualMachine storage migration plan name": "Nombre del plan de migración de almacenamiento de VirtualMachine",
   "VirtualMachine templates": "Plantillas de VirtualMachine",

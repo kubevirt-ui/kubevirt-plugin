@@ -1,16 +1,15 @@
 import React, { FC, Suspense, useCallback, useState } from 'react';
 import { load } from 'js-yaml';
 
-import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { getName } from '@kubevirt-utils/resources/shared';
-import { updateTemplate } from '@kubevirt-utils/resources/template';
+import { Template, updateTemplate } from '@kubevirt-utils/resources/template';
 import { ResourceYAMLEditor } from '@openshift-console/dynamic-plugin-sdk';
 import { Alert, AlertVariant, Bullseye } from '@patternfly/react-core';
 
 type TemplateYAMLPageProps = {
-  obj: V1Template;
+  obj: Template;
 };
 
 const TemplateYAMLPage: FC<TemplateYAMLPageProps> = ({ obj: template }) => {
@@ -22,7 +21,7 @@ const TemplateYAMLPage: FC<TemplateYAMLPageProps> = ({ obj: template }) => {
     setError(null);
 
     try {
-      const updatedTemplate = await updateTemplate(load(yaml) as V1Template);
+      const updatedTemplate = await updateTemplate(load(yaml) as Template);
       setSuccess(
         `${getName(updatedTemplate)} has been updated to version ${
           updatedTemplate.metadata.resourceVersion

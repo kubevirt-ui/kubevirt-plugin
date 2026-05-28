@@ -1,6 +1,6 @@
 import produce from 'immer';
 
-import { TemplateModel, V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { TemplateModel, VirtualMachineTemplateModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { produceVMDisks } from '@kubevirt-utils/components/DiskModal/utils/helpers';
 import {
@@ -14,31 +14,41 @@ import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { getName } from '@kubevirt-utils/resources/shared';
 import {
   getTemplateVirtualMachineObject,
+  isOpenShiftTemplate,
+  isVirtualMachineTemplate,
   replaceTemplateVM,
+  Template,
 } from '@kubevirt-utils/resources/template';
 import { getVolumes } from '@kubevirt-utils/resources/vm';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sUpdate } from '@multicluster/k8sRequests';
 
 export const getTemplateSysprepObject = (
-  template: V1Template,
+  template: Template,
   sysprepName: string,
 ): IoK8sApiCoreV1ConfigMap | undefined =>
-  template.objects.find((object) => object?.metadata?.name === sysprepName);
+  isOpenShiftTemplate(template)
+    ? template.objects.find((object) => object?.metadata?.name === sysprepName)
+    : undefined;
 
-export const deleteTemplateSysprepObject = (template: V1Template, sysprepName: string) =>
-  produce(template, (draftTemplate) => {
+export const deleteTemplateSysprepObject = (template: Template, sysprepName: string) => {
+  if (!isOpenShiftTemplate(template)) return template;
+
+  return produce(template, (draftTemplate) => {
     draftTemplate.objects = (draftTemplate?.objects || []).filter(
       (object) => object?.metadata?.name !== sysprepName,
     );
   });
+};
 
 export const replaceTemplateSysprepObject = (
-  template: V1Template,
+  template: Template,
   sysprepConfig: IoK8sApiCoreV1ConfigMap,
   oldSysprepName?: string,
-) =>
-  produce(template, (draftTemplate) => {
+) => {
+  if (!isOpenShiftTemplate(template)) return template;
+
+  return produce(template, (draftTemplate) => {
     const sysprepIndex = draftTemplate.objects.findIndex(
       (object) => object?.metadata?.name === oldSysprepName,
     );
@@ -49,9 +59,10 @@ export const replaceTemplateSysprepObject = (
       draftTemplate.objects.push(sysprepConfig);
     }
   });
+};
 
 export const updateTemplateWithSysprep = async (
-  template: V1Template,
+  template: Template,
   newSysprepName?: string,
   oldSysprepName?: string,
 ) => {
@@ -83,10 +94,12 @@ export const updateTemplateWithSysprep = async (
 
   const updatedTemplate = replaceTemplateVM(template, newVM);
 
+  const model = isVirtualMachineTemplate(template) ? VirtualMachineTemplateModel : TemplateModel;
+
   await kubevirtK8sUpdate({
     cluster: getCluster(template),
     data: updatedTemplate,
-    model: TemplateModel,
+    model,
     name: getName(updatedTemplate),
     ns: getNamespace(updatedTemplate),
   });

@@ -1,4 +1,9 @@
-import { TemplateModel, V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { TemplateModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import {
+  isOpenShiftTemplate,
+  isVirtualMachineTemplate,
+  Template,
+} from '@kubevirt-utils/resources/template';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { useFleetAccessReview } from '@stolostron/multicluster-sdk';
 
@@ -13,14 +18,14 @@ import { isCommonVMTemplate } from '../../utils/utils';
  * @returns boolean value
  */
 const useEditTemplateAccessReview = (
-  template: V1Template,
+  template: Template,
 ): {
   hasEditPermission: boolean;
   isCommonTemplate: boolean;
   isLoading: boolean;
   isTemplateEditable: boolean;
 } => {
-  const isCommonTemplate = isCommonVMTemplate(template);
+  const isCommonTemplate = isOpenShiftTemplate(template) && isCommonVMTemplate(template);
   const [canUpdateTemplate, canUpdateLoading] = useFleetAccessReview({
     cluster: getCluster(template),
     group: TemplateModel.apiGroup,
@@ -38,6 +43,15 @@ const useEditTemplateAccessReview = (
   });
 
   const hasEditPermission = canUpdateTemplate && canPatchTemplate;
+
+  // VMT editing not yet supported — always read-only
+  if (isVirtualMachineTemplate(template))
+    return {
+      hasEditPermission: false,
+      isCommonTemplate: false,
+      isLoading: false,
+      isTemplateEditable: false,
+    };
 
   if (!template || canUpdateLoading || canPatchLoading)
     return {

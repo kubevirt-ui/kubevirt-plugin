@@ -1,12 +1,12 @@
 import React, { FC, ReactNode, useCallback, useEffect, useState } from 'react';
 
-import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import NetworkInterfaceLinkState from '@kubevirt-utils/components/NetworkInterfaceModal/components/NetworkInterfaceLinkState/NetworkInterfaceLinkState';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import usePasstFeatureFlag from '@kubevirt-utils/hooks/usePasstFeatureFlag';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
+import { Template } from '@kubevirt-utils/resources/template';
 import {
   interfaceTypesProxy,
   NetworkPresentation,
@@ -55,7 +55,7 @@ type NetworkInterfaceModalProps = {
     args: NetworkInterfaceModalOnSubmit,
   ) => (
     obj: V1VirtualMachine,
-  ) => Promise<string | V1Template | V1Template[] | V1VirtualMachine | V1VirtualMachine[] | void>;
+  ) => Promise<string | Template | Template[] | V1VirtualMachine | V1VirtualMachine[] | void>;
   vm: V1VirtualMachine;
 };
 
