@@ -4,7 +4,8 @@ import { MINUTE, SECOND } from '../utils/constants';
 import { byTest, byTestId } from '../utils/locators';
 
 const ACTIONS_DROPDOWN = 'actions-dropdown';
-const PENDING_CHANGES_WARNING = 'pending-changes-warning';
+const VM_MIGRATION_PENDING_CHANGES_MESSAGE = 'vm-migration-pending-changes-message';
+const VM_PENDING_CHANGES_ALERT = 'vm-pending-changes-alert';
 const VIRTUAL_MACHINE_OVERVIEW_DETAILS_STATUS = 'virtual-machine-overview-details-status';
 const VM_ACTION_PAUSE_BUTTON = 'vm-action-pause-button';
 const VM_ACTION_RESTART_BUTTON = 'vm-action-restart-button';
@@ -50,15 +51,26 @@ export class VMDetailsPage {
     await byTestId(this.page, VM_ACTION_UNPAUSE_BUTTON).click();
   }
 
+  async expectMigrationRequiredAlert(expectedMessagePart?: RegExp | string) {
+    const alert = byTestId(this.page, VM_PENDING_CHANGES_ALERT);
+    await expect(alert).toBeVisible({ timeout: 30 * SECOND });
+    await expect(alert.getByText('Migration required')).toBeVisible();
+    if (expectedMessagePart) {
+      await expect(byTestId(this.page, VM_MIGRATION_PENDING_CHANGES_MESSAGE)).toContainText(
+        expectedMessagePart,
+      );
+    }
+  }
+
   async expectName(vmName: string) {
     await expect(this.page.locator('h1').getByText(vmName)).toBeVisible();
   }
 
-  // ── Actions dropdown ─────────────────────────────────────────────────────────
-
-  async expectNoPendingChanges() {
-    await expect(byTest(this.page, PENDING_CHANGES_WARNING)).toHaveCount(0);
+  async expectNoPendingChangesAlert() {
+    await expect(byTestId(this.page, VM_PENDING_CHANGES_ALERT)).toHaveCount(0);
   }
+
+  // ── Actions dropdown ─────────────────────────────────────────────────────────
 
   async expectOverviewStatus(status: string, timeout = 30 * MINUTE) {
     await expect(

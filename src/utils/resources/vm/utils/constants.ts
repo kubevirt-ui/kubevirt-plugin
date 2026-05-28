@@ -68,6 +68,7 @@ export enum VirtualMachineStatusConditionTypes {
   AgentConnected = 'AgentConnected',
   DataVolumesReady = 'DataVolumesReady',
   LiveMigratable = 'LiveMigratable',
+  MigrationRequired = 'MigrationRequired',
   Ready = 'Ready',
   RestartRequired = 'RestartRequired',
   StorageLiveMigratable = 'StorageLiveMigratable',
