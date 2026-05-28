@@ -12,10 +12,15 @@ import { useFleetClusterNames } from '@stolostron/multicluster-sdk';
 
 type ClusterSelectProps = {
   bootableVolume: AddBootableVolumeState;
+  isDisabled?: boolean;
   setBootableVolumeField: SetBootableVolumeFieldType;
 };
 
-const ClusterSelect: FC<ClusterSelectProps> = ({ bootableVolume, setBootableVolumeField }) => {
+const ClusterSelect: FC<ClusterSelectProps> = ({
+  bootableVolume,
+  isDisabled,
+  setBootableVolumeField,
+}) => {
   const { t } = useKubevirtTranslation();
   const [clusters, clustersLoaded] = useFleetClusterNames();
 
@@ -43,7 +48,7 @@ const ClusterSelect: FC<ClusterSelectProps> = ({ bootableVolume, setBootableVolu
         placeholder={t('Select cluster')}
         selected={bootableVolume.bootableVolumeCluster}
         setSelected={handleSelect}
-        toggleProps={{ isFullWidth: true }}
+        toggleProps={{ isDisabled, isFullWidth: true }}
       />
     </FormGroup>
   );

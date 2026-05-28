@@ -5,17 +5,28 @@ import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useRequiredFieldValidation } from '@kubevirt-utils/hooks/useRequiredFieldValidation';
-import { Content, FormGroup, NumberInput, TextInput, Title } from '@patternfly/react-core';
+import { validateCronExpression } from '@kubevirt-utils/utils/validation';
+import {
+  Content,
+  FormGroup,
+  NumberInput,
+  TextInput,
+  Title,
+  ValidatedOptions,
+} from '@patternfly/react-core';
 
 import { AddBootableVolumeState, SetBootableVolumeFieldType } from '../utils/constants';
+import { getCronHelperText } from '../utils/utils';
 
 type SchedulingSettingsProps = {
   bootableVolume: AddBootableVolumeState;
+  isDisabled?: boolean;
   setBootableVolumeField: SetBootableVolumeFieldType;
 };
 
 const SchedulingSettings: FC<SchedulingSettingsProps> = ({
   bootableVolume,
+  isDisabled,
   setBootableVolumeField,
 }) => {
   const { t } = useKubevirtTranslation();
@@ -23,10 +34,14 @@ const SchedulingSettings: FC<SchedulingSettingsProps> = ({
   const { cronExpression, retainRevisions } = bootableVolume || {};
 
   const {
-    isInvalid: isCronInvalid,
+    isInvalid: isCronRequiredInvalid,
     onBlur: onCronBlur,
-    validated: cronValidated,
+    validated: cronRequiredValidated,
   } = useRequiredFieldValidation(cronExpression);
+
+  const cronFormatError = validateCronExpression(t, cronExpression);
+  const isCronFormatInvalid = Boolean(cronFormatError);
+  const cronValidated = isCronFormatInvalid ? ValidatedOptions.error : cronRequiredValidated;
 
   return (
     <>
@@ -40,6 +55,7 @@ const SchedulingSettings: FC<SchedulingSettingsProps> = ({
             setBootableVolumeField('retainRevisions')(event.currentTarget.valueAsNumber)
           }
           id="volume-registry-retain-revisions"
+          isDisabled={isDisabled}
           min={0}
           minusBtnAriaLabel={t('Decrement')}
           onMinus={() => setBootableVolumeField('retainRevisions')(retainRevisions - 1)}
@@ -70,6 +86,7 @@ const SchedulingSettings: FC<SchedulingSettingsProps> = ({
         <TextInput
           data-test-id="volume-registry-retain-cron-expression"
           id="volume-registry-retain-cron-expression"
+          isDisabled={isDisabled}
           onBlur={onCronBlur}
           onChange={(_, value: string) => setBootableVolumeField('cronExpression')(value)}
           type="text"
@@ -77,9 +94,7 @@ const SchedulingSettings: FC<SchedulingSettingsProps> = ({
           value={cronExpression ?? ''}
         />
         <FormGroupHelperText validated={cronValidated}>
-          {isCronInvalid
-            ? t('This field is required')
-            : t('Example (At 00:00 on Tuesday): 0 0 * * 2.')}
+          {getCronHelperText(t, isCronFormatInvalid, isCronRequiredInvalid, cronFormatError)}
         </FormGroupHelperText>
       </FormGroup>
     </>

@@ -115,7 +115,6 @@ const CreateBootableVolumeModal: FC<CreateBootableVolumeModalProps> = ({
       onClose={onClose}
       onSubmit={onSubmit}
       shouldWrapInForm
-      submitBtnText={t('Save')}
     >
       <Stack hasGutter>
         <Title className="pf-v6-u-mt-md" headingLevel="h5">

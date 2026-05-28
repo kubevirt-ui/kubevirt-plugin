@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useState } from 'react';
 
 import { DataUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import { isUploadingDisk } from '@kubevirt-utils/hooks/useCDIUpload/utils';
@@ -7,6 +7,7 @@ import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 type UseCDROMUploadCloseReturn = {
   handleModalClose: () => Promise<void>;
   isUploading: boolean;
+  markBackgroundUploadEnded: () => void;
   markBackgroundUploadStarted: () => void;
 };
 
@@ -14,12 +15,14 @@ export const useCDROMUploadClose = (
   upload: DataUpload,
   onClose: () => void,
 ): UseCDROMUploadCloseReturn => {
-  const isBackgroundUploadInProgress = useRef(false);
-  const isUploading = isUploadingDisk(upload?.uploadStatus);
+  const [isBackgroundUploadActive, setIsBackgroundUploadActive] = useState(false);
+
+  const isCdiUploadInProgress = isUploadingDisk(upload?.uploadStatus);
+  const isUploading = isCdiUploadInProgress || isBackgroundUploadActive;
 
   const handleModalClose = async (): Promise<void> => {
     const shouldCancelUpload =
-      isUploading && !isBackgroundUploadInProgress.current && upload?.cancelUpload;
+      isCdiUploadInProgress && !isBackgroundUploadActive && upload?.cancelUpload;
 
     if (shouldCancelUpload) {
       try {
@@ -28,13 +31,22 @@ export const useCDROMUploadClose = (
         kubevirtConsole.error(error);
       }
     }
-    isBackgroundUploadInProgress.current = false;
+    setIsBackgroundUploadActive(false);
     onClose();
   };
 
   const markBackgroundUploadStarted = (): void => {
-    isBackgroundUploadInProgress.current = true;
+    setIsBackgroundUploadActive(true);
   };
 
-  return { handleModalClose, isUploading, markBackgroundUploadStarted };
+  const markBackgroundUploadEnded = (): void => {
+    setIsBackgroundUploadActive(false);
+  };
+
+  return {
+    handleModalClose,
+    isUploading,
+    markBackgroundUploadEnded,
+    markBackgroundUploadStarted,
+  };
 };

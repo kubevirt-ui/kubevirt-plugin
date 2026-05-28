@@ -10,6 +10,7 @@ import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 
 import { useKubevirtTranslation } from '../useKubevirtTranslation';
 
+import { CANCEL_ALLOCATION_MESSAGE, UploadCanceledError } from './errors';
 import {
   CDIConfig,
   createUploadPVC,
@@ -84,29 +85,32 @@ export const useCDIUpload = (clusterInput?: string): UseCDIUploadValues => {
       });
     }
 
-    // check if CORS is permitting
-    try {
-      await axios.get(getUploadURL(uploadProxyURL));
-    } catch (catchError) {
-      if (!catchError?.response) {
-        return Promise.reject({
-          href: getUploadURL(uploadProxyURL),
-          message: t('Invalid certificate, please visit the following URL and approve it'),
-        });
-      }
+    if (noRouteFound) {
+      setUpload(newUpload);
+      return Promise.reject(new Error(t('No Upload URL found {{configError}}', { configError })));
     }
 
+    setUpload({ ...newUpload, uploadStatus: UPLOAD_STATUS.ALLOCATING });
+
     try {
-      if (noRouteFound) {
-        setUpload(newUpload);
-        throw new Error(t('No Upload URL found {{configError}}', { configError }));
+      // check if CORS is permitting
+      try {
+        await axios.get(getUploadURL(uploadProxyURL));
+      } catch (catchError) {
+        if (!catchError?.response) {
+          const certificateError = {
+            href: getUploadURL(uploadProxyURL),
+            message: t('Invalid certificate, please visit the following URL and approve it'),
+          };
+          setUpload((prev) => ({
+            ...prev,
+            uploadError: certificateError,
+            uploadStatus: UPLOAD_STATUS.ERROR,
+          }));
+          return Promise.reject(certificateError);
+        }
       }
 
-      // allocating
-      setUpload((prev) => ({
-        ...prev,
-        uploadStatus: UPLOAD_STATUS.ALLOCATING,
-      }));
       const { token } = await createUploadPVC(dataVolume);
 
       // uploading
@@ -140,14 +144,18 @@ export const useCDIUpload = (clusterInput?: string): UseCDIUploadValues => {
       }));
     } catch (e) {
       // if cancelled, 'not found' is a case where the user clicked cancel while allocating
-      const isCanceled = axios.isCancel(e) || e?.message.includes('not found');
+      const isCanceled = axios.isCancel(e) || e?.message?.includes(CANCEL_ALLOCATION_MESSAGE);
 
       setUpload((prev) => ({
         ...prev,
         uploadError: !isCanceled && { message: `${e?.message}: ${e?.response?.data}` },
         uploadStatus: isCanceled ? UPLOAD_STATUS.CANCELED : UPLOAD_STATUS.ERROR,
       }));
-      return Promise.reject(isCanceled ? { message: t('Upload cancelled') } : e);
+      if (isCanceled) {
+        return Promise.reject(new UploadCanceledError());
+      }
+
+      return Promise.reject(e);
     }
   };
 

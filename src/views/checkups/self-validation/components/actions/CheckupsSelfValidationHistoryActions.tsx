@@ -3,12 +3,13 @@ import React, { FC, useCallback, useMemo, useState } from 'react';
 import { IoK8sApiBatchV1Job } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import ActionsDropdown from '@kubevirt-utils/components/ActionsDropdown/ActionsDropdown';
 import { ActionDropdownItemType } from '@kubevirt-utils/components/ActionsDropdown/constants';
+import DeleteModal from '@kubevirt-utils/components/DeleteModal/DeleteModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { Spinner } from '@patternfly/react-core';
 
-import DeleteJobModal from '../../../components/DeleteJobModal';
 import { deleteSelfValidationJob } from '../../utils';
 import { getDefaultErrorMessage } from '../../utils/downloadResults';
 import DownloadResultsErrorModal from '../DownloadResultsErrorModal';
@@ -26,27 +27,31 @@ const CheckupsSelfValidationHistoryActions: FC<CheckupsSelfValidationHistoryActi
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
   const { download, isDownloading } = useDownloadResults();
   const isJobCompleted = job?.status?.succeeded === 1 && job?.status?.terminating !== 1;
-  const namespace = job?.metadata?.namespace || null;
+  const namespace = getNamespace(job) || null;
 
   const handleDeleteClick = useCallback(() => {
     createModal((props) => (
-      <DeleteJobModal
+      <DeleteModal
         {...props}
-        onDelete={async () => {
+        obj={{
+          metadata: { name: getName(job), namespace: getNamespace(job) },
+        }}
+        onDeleteSubmit={async () => {
           setIsDeleting(true);
           try {
             await deleteSelfValidationJob(job);
           } catch (error) {
             kubevirtConsole.error('Failed to delete job:', error);
+            throw error;
           } finally {
             setIsDeleting(false);
           }
         }}
-        jobName={job?.metadata?.name}
-        namespace={job?.metadata?.namespace}
+        headerText={t('Delete job')}
+        shouldRedirect={false}
       />
     ));
-  }, [job, createModal]);
+  }, [job, createModal, t]);
 
   const handleDownloadResultsClick = useCallback(async () => {
     if (!isJobCompleted || !job) {

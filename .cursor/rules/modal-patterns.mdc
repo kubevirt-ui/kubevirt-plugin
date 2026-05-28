@@ -1,0 +1,105 @@
+---
+description: Modal patterns and contracts for virtualization UI (TabModal, DeleteModal, wizards)
+globs: ["src/**/*Modal*.tsx", "src/utils/components/TabModal/**"]
+alwaysApply: false
+---
+
+# Modal patterns (KubeVirt plugin)
+
+All virtualization modals should use one of four standard types. Each type has a fixed contract for validation, errors, and success behavior.
+
+## Shared building blocks
+
+| Building block | Location | Responsibility |
+|----------------|----------|----------------|
+| `TabModal` | `src/utils/components/TabModal/TabModal.tsx` | Canonical modal shell: submit, loading, footer errors |
+| `TabModalBody` | `src/utils/components/TabModal/components/TabModalBody.tsx` | `ModalBody` + optional `Form` wrapper (`shouldWrapInForm`) |
+| `TabModalFooter` | `src/utils/components/TabModal/components/TabModalFooter.tsx` | Footer buttons, loading state, danger `Alert` on error |
+| `DeleteModal` | `src/utils/components/DeleteModal/DeleteModal.tsx` | Delete/confirm flows wrapping `TabModal` |
+| `BackgroundOperationAlert` | `src/utils/components/TabModal/BackgroundOperationAlert.tsx` | Info alert when work continues after closing the dialog |
+| `formatK8sError` | `src/utils/utils/formatK8sError.ts` | Explicit `t('...')` per known API error; unmatched errors shown as-is |
+| `getK8sErrorHref` | `src/utils/utils/formatK8sError.ts` | Optional `href` on API errors; `TabModalFooter` renders `ExternalLink` when present |
+| `exportUploadStore` | `src/utils/components/ExportModal/exportUploadStore.ts` | Zustand store for in-flight export uploads across modal re-opens |
+| Validators | `src/utils/utils/validation.ts` | `validateDNS1123Label`, `validateCronExpression`, etc. |
+
+## 1. Form modal
+
+**Examples:** `DiskModal`, `NetworkInterfaceModal`, `HostnameModal`, `SnapshotModal`, `SaveSearchModal`, `MigrationPolicyCreateModal`, `MountCDROMModal` (select-existing-ISO path)
+
+| Concern | Contract |
+|---------|----------|
+| Base | `TabModal` with `shouldWrapInForm` |
+| Validation | `isDisabled={!isValid}` from react-hook-form or a validation hook |
+| Required fields | Inline `validated="error"` after blur when empty (`useRequiredFieldValidation` or RHF) |
+| Errors | `TabModal` footer danger `Alert` via `formatK8sError` |
+| Success | Default `closeOnSubmit={true}` |
+
+## 2. Confirm / delete modal
+
+**Examples:** `DeleteModal`, `DeleteVMModal`, `EjectCDROMModal`, `RestoreModal`
+
+| Concern | Contract |
+|---------|----------|
+| Base | `DeleteModal` (wraps `TabModal`) — use directly; do not create thin wrapper modals |
+| Validation | None by default; domain-specific options (e.g. optional related-resource delete) live in the modal body |
+| Errors | `TabModal` footer via `formatK8sError` |
+| Success | Close; optional redirect via `shouldRedirect` |
+
+## 3. Progress / background modal
+
+Use the sub-variant that matches the flow. All variants use `TabModal` with `closeOnSubmit={false}` unless noted.
+
+### 3a. Long-running with progress
+
+**Examples:** `CloneVMModal`, `ExportModal`
+
+| Concern | Contract |
+|---------|----------|
+| Base | `TabModal` with `closeOnSubmit={false}` |
+| Validation | Same as form modal before submit; disabled + loading after submit starts |
+| Errors | `TabModal` footer |
+| Success | Show progress in body; include `BackgroundOperationAlert` when work continues after close |
+| Persistence | Use `exportUploadStore` (or similar) when reopening the modal must resume an in-flight upload |
+| Copy | Import `BackgroundOperationAlert` — do not duplicate the string inline |
+
+### 3b. Post-submit confirmation
+
+**Examples:** `AddBootableVolumeModal`
+
+| Concern | Contract |
+|---------|----------|
+| Base | `TabModal`; `closeOnSubmit` toggles after success (e.g. `closeOnSubmit={!!createdResource}`) |
+| Success | `onSuccess` captures result; swap body for a success view (e.g. `CreatedVolumeConfirmation`) |
+| Actions | Submit becomes "Close"; cancel may become a destructive undo (e.g. "Delete volume") |
+| Close guard | Use `onCancel` for destructive undo (e.g. delete created resource); `onClose` / Close submit only dismiss |
+
+### 3c. Fire-and-forget upload
+
+**Examples:** `AddCDROMModal` (upload path), `MountCDROMModal` (upload path)
+
+| Concern | Contract |
+|---------|----------|
+| Base | `TabModal` with `shouldWrapInForm`; show `BackgroundOperationAlert` while upload is starting |
+| Success | Kick off upload, return promise to parent via `onUploadStarted`; modal may close immediately |
+| Parent | Parent watches the upload promise and surfaces completion/errors outside the modal |
+
+## 4. Wizard modal
+
+**Examples:** `VirtualMachineMigrationModal`, `VirtualizationFeaturesWizard`
+
+| Concern | Contract |
+|---------|----------|
+| Base | PatternFly `Modal` + `Wizard` (or `TabModal` for simple flows) |
+| Validation | `isNextDisabled` on each step; `isVisitRequired` on wizard to block sidebar skipping |
+| Errors | Inline danger `Alert` on review/final step (consistent placement) |
+| Success | Status/completion view, then `onClose` |
+
+## Do not
+
+- Use raw PatternFly `Modal` for new flows — use `TabModal` or extend `DeleteModal`
+- Show raw K8s API strings without adding a branch in `formatK8sError` — add an explicit case when a new error is observed
+- Leave submit enabled when required fields are missing
+- Add confirmation checkboxes to `DeleteModal` unless product requires them — prefer `ConfirmActionMessage` only
+- Duplicate delete modals that only wrap `TabModal` + `ConfirmActionMessage` — use `DeleteModal` at the call site
+- Duplicate `BackgroundOperationAlert` text inline — import the shared component
+- Reimplement `TabModalBody` or `TabModalFooter` — extend `TabModal` props instead

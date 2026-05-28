@@ -20,13 +20,18 @@ import './DataSourceActions.scss';
 
 type DataSourceActionProps = {
   dataSource: V1beta1DataSource;
+  isBootableVolume?: boolean;
   isKebabToggle?: boolean;
 };
 
-const DataSourceActions: FC<DataSourceActionProps> = ({ dataSource, isKebabToggle }) => {
+const DataSourceActions: FC<DataSourceActionProps> = ({
+  dataSource,
+  isBootableVolume,
+  isKebabToggle,
+}) => {
   const { t } = useKubevirtTranslation();
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const [actions, onLazyOpen] = useDataSourceActionsProvider(dataSource);
+  const [actions, onLazyOpen] = useDataSourceActionsProvider(dataSource, isBootableVolume);
 
   const dsActions = actions.filter((a) => a.id !== 'datasource-action-manage-source');
   const manageAction = actions.find((a) => a.id === 'datasource-action-manage-source');
@@ -60,7 +65,10 @@ const DataSourceActions: FC<DataSourceActionProps> = ({ dataSource, isKebabToggl
       toggle={Toggle}
     >
       <DropdownList>
-        <DropdownGroup key="datasource-actions" label={t('DataSource')}>
+        <DropdownGroup
+          key="datasource-actions"
+          label={isBootableVolume ? t('Bootable volume') : t('DataSource')}
+        >
           {dsActions?.map((action) => (
             <DropdownItem
               data-test-id={action?.id}

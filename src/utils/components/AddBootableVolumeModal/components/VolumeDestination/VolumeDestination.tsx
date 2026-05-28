@@ -15,12 +15,14 @@ import StorageClassSelect from './StorageClass/StorageClassSelect';
 
 type VolumeDestinationProps = {
   bootableVolume: AddBootableVolumeState;
+  isDisabled?: boolean;
   isSnapshotSourceType?: boolean;
   setBootableVolumeField: SetBootableVolumeFieldType;
 };
 
 const VolumeDestination: FC<VolumeDestinationProps> = ({
   bootableVolume,
+  isDisabled,
   isSnapshotSourceType,
   setBootableVolumeField,
 }) => {
@@ -48,6 +50,7 @@ const VolumeDestination: FC<VolumeDestinationProps> = ({
       <FormGroup fieldId="volume-name" isRequired label={t('Volume name')}>
         <TextInput
           id="volume-name"
+          isDisabled={isDisabled}
           onBlur={onVolumeNameBlur}
           onChange={(_, value: string) => setBootableVolumeField('bootableVolumeName')(value)}
           type="text"
@@ -64,6 +67,7 @@ const VolumeDestination: FC<VolumeDestinationProps> = ({
         <ProjectDropdown
           cluster={bootableVolumeCluster}
           includeAllProjects={false}
+          isDisabled={isDisabled}
           onChange={setBootableVolumeField('bootableVolumeNamespace')}
           selectedProject={bootableVolumeNamespace}
         />
@@ -75,7 +79,7 @@ const VolumeDestination: FC<VolumeDestinationProps> = ({
             helperText={
               isSnapshotSourceType && t('Disk size will be determined by the volume snapshot size')
             }
-            isDisabled={isSnapshotSourceType}
+            isDisabled={isDisabled || isSnapshotSourceType}
             label={t('Disk size')}
             onChange={setBootableVolumeField('size')}
             size={size}
@@ -84,15 +88,17 @@ const VolumeDestination: FC<VolumeDestinationProps> = ({
         <GridItem>
           <StorageClassSelect
             cluster={bootableVolumeCluster}
+            isDisabled={isDisabled}
             setShowSCAlert={setShowSCAlert}
             setStorageClassName={setBootableVolumeField('storageClassName')}
             storageClass={storageClassName}
           />
         </GridItem>
         <GridItem>
-          <ExpandableSection isIndented toggleText={t('Advanced settings')}>
+          <ExpandableSection disabled={isDisabled} isIndented toggleText={t('Advanced settings')}>
             <ApplyStorageProfileSettings
               {...{ accessMode, storageClassName, volumeMode }}
+              isDisabled={isDisabled}
               setAccessMode={setBootableVolumeField('accessMode')}
               setVolumeMode={setBootableVolumeField('volumeMode')}
             />

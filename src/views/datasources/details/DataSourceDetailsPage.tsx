@@ -8,6 +8,8 @@ import {
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Divider, PageSection, Title } from '@patternfly/react-core';
 
+import useIsBootableVolumeContext from '../hooks/useIsBootableVolumeContext';
+
 import { DataSourceDetailsGrid } from './components/DataSourceDetailsGrid/DataSourceDetailsGrid';
 
 type DataSourceDetailsPageProps = {
@@ -16,12 +18,13 @@ type DataSourceDetailsPageProps = {
 
 const DataSourceDetailsPage: FC<DataSourceDetailsPageProps> = ({ obj: dataSource }) => {
   const { t } = useKubevirtTranslation();
+  const isBootableVolume = useIsBootableVolumeContext();
 
   return (
     <div>
       <PageSection>
         <Title className="co-section-heading" headingLevel="h2">
-          {t('DataSource details')}
+          {isBootableVolume ? t('Bootable volume details') : t('DataSource details')}
         </Title>
         <DataSourceDetailsGrid dataSource={dataSource} />
       </PageSection>

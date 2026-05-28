@@ -1,6 +1,5 @@
+import { UploadAlertStatus } from '@kubevirt-utils/hooks/mountIsoUploadStore';
 import { AlertVariant } from '@patternfly/react-core';
-
-export type UploadAlertStatus = 'error' | 'success' | 'uploading';
 
 export type UploadAlertConfig = { body: string; title: string; variant: AlertVariant };
 

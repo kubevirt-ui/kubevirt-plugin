@@ -35,7 +35,7 @@ import './disklist.scss';
 type DiskListProps = {
   customize?: boolean;
   onDiskUpdate?: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine>;
-  onUploadStarted?: (uploadPromise: Promise<unknown>) => void;
+  onUploadStarted?: (uploadPromise: Promise<unknown>, cdromDiskName?: string) => void;
   vm: V1VirtualMachine;
   vmi?: V1VirtualMachineInstance;
 };
