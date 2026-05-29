@@ -1,7 +1,6 @@
 import React, { FC } from 'react';
 import { Trans } from 'react-i18next';
 
-import { IoK8sApiStorageV1StorageClass } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import CapacityInput from '@kubevirt-utils/components/CapacityInput/CapacityInput';
 import CheckboxSelect from '@kubevirt-utils/components/CheckboxSelect/CheckboxSelect';
 import { getSCSelectOptions } from '@kubevirt-utils/components/DiskModal/components/StorageClassAndPreallocation/utils/helpers';
@@ -18,30 +17,13 @@ import {
   HelperText,
   HelperTextItem,
   PopoverPosition,
-  SelectProps,
   Switch,
   TextInput,
 } from '@patternfly/react-core';
 
 import { STORAGE_CAPABILITY_OPTIONS } from '../../utils';
 
-type AdvancedSettingsProps = {
-  effectiveStorageClassName: string;
-  handleStorageCapabilitySelect: SelectProps['onSelect'];
-  isDryRun: boolean;
-  pvcSize: string;
-  setIsDryRun: (checked: boolean) => void;
-  setPvcSize: (size: string) => void;
-  setStorageClass: (storageClass: string) => void;
-  setTestSkips: (testSkips: string) => void;
-  storageCapabilities: string[];
-  storageClasses: IoK8sApiStorageV1StorageClass[];
-  storageClassesLoaded: boolean;
-  storageProfileError: boolean;
-  storageProfileHasClaimPropertySets: boolean;
-  storageProfileLoaded: boolean;
-  testSkips: string;
-};
+import { AdvancedSettingsProps } from './types';
 
 const AdvancedSettings: FC<AdvancedSettingsProps> = ({
   effectiveStorageClassName,
@@ -98,7 +80,7 @@ const AdvancedSettings: FC<AdvancedSettingsProps> = ({
           onChange={(_event, value) => setTestSkips(value)}
           value={testSkips}
         />
-        <HelperText>
+        <HelperText className="checkups-self-validation-form__helper-text">
           <HelperTextItem>
             {t('Pipe-separated list of tests to skip (e.g., test_id:1783|test_id:1853)')}
           </HelperTextItem>
@@ -140,7 +122,7 @@ const AdvancedSettings: FC<AdvancedSettingsProps> = ({
         {(showStorageProfilePrefilledHint || showStorageProfileManualFallbackHint) && (
           <div aria-live="polite" className="pf-v6-u-pt-sm">
             {showStorageProfilePrefilledHint && (
-              <HelperText>
+              <HelperText className="checkups-self-validation-form__helper-text">
                 <HelperTextItem variant="default">
                   <Trans ns="plugin__kubevirt-plugin" t={t}>
                     Access and volume mode capabilities were pre-filled from the StorageProfile for
@@ -153,7 +135,7 @@ const AdvancedSettings: FC<AdvancedSettingsProps> = ({
               </HelperText>
             )}
             {showStorageProfileManualFallbackHint && (
-              <HelperText>
+              <HelperText className="checkups-self-validation-form__helper-text">
                 <HelperTextItem variant="warning">
                   {t(
                     'StorageProfile data is not available for this storage class. Select storage capabilities manually.',

@@ -5,12 +5,15 @@ import { k8sList } from '@openshift-console/dynamic-plugin-sdk';
 
 import { getJobContainers, KUBEVIRT_VM_LATENCY_LABEL } from '../../../utils/utils';
 import {
+  JOB_ENV_ACCEPT_WINDOWS_EULA,
   JOB_ENV_DRY_RUN,
   JOB_ENV_STORAGE_CAPABILITIES,
   JOB_ENV_STORAGE_CLASS,
   JOB_ENV_TEST_SKIPS,
   JOB_ENV_TEST_SUITES,
   JOB_ENV_TIMESTAMP,
+  JOB_ENV_WIN_IMAGE_DOWNLOAD_URL,
+  JOB_ENV_WIN_IMAGE_NAME,
   JOB_VOLUME_RESULTS,
   SELF_VALIDATION_LABEL_VALUE,
 } from '../constants';
@@ -19,39 +22,52 @@ import {
 // Job Information Extraction
 // ===========================
 
-export const getTestSuitesFromJob = (job: IoK8sApiBatchV1Job): string[] => {
-  const containers = getJobContainers(job);
-  if (!containers?.[0]?.env) {
-    return [];
-  }
-
-  const testSuitesEnv = containers[0].env.find((env) => env.name === JOB_ENV_TEST_SUITES);
-
-  if (!testSuitesEnv?.value) {
-    return [];
-  }
-
-  return testSuitesEnv.value.split(',');
+const getEnvVarFromJob = (job: IoK8sApiBatchV1Job, envName: string): string | undefined => {
+  const env = getJobContainers(job)?.[0]?.env;
+  return env?.find((e) => e.name === envName)?.value;
 };
 
-export const getDryRunFromJob = (job: IoK8sApiBatchV1Job): boolean => {
-  const containers = getJobContainers(job);
-  if (!containers?.[0]?.env) {
-    return false;
-  }
+export const getTestSuitesFromJob = (job: IoK8sApiBatchV1Job): string[] =>
+  getEnvVarFromJob(job, JOB_ENV_TEST_SUITES)
+    ?.split(',')
+    .map((t) => t.trim())
+    .filter(Boolean) ?? [];
 
-  const dryRunEnv = containers[0].env.find((env) => env.name === JOB_ENV_DRY_RUN);
+export const getDryRunFromJob = (job: IoK8sApiBatchV1Job): boolean =>
+  getEnvVarFromJob(job, JOB_ENV_DRY_RUN) === 'true';
 
-  return dryRunEnv?.value === 'true';
+export const getAcceptWindowsEulaFromJob = (job: IoK8sApiBatchV1Job): boolean =>
+  getEnvVarFromJob(job, JOB_ENV_ACCEPT_WINDOWS_EULA) === 'true';
+
+export const getWinImageDownloadUrlFromJob = (job: IoK8sApiBatchV1Job): string | undefined =>
+  getEnvVarFromJob(job, JOB_ENV_WIN_IMAGE_DOWNLOAD_URL);
+
+export const getWinImageNameFromJob = (job: IoK8sApiBatchV1Job): string | undefined =>
+  getEnvVarFromJob(job, JOB_ENV_WIN_IMAGE_NAME);
+
+export const getTimestampFromJob = (job: IoK8sApiBatchV1Job): null | string =>
+  getEnvVarFromJob(job, JOB_ENV_TIMESTAMP) ?? null;
+
+export const getStorageClassFromJob = (job: IoK8sApiBatchV1Job): string | undefined =>
+  getEnvVarFromJob(job, JOB_ENV_STORAGE_CLASS);
+
+export const getTestSkipsFromJob = (job: IoK8sApiBatchV1Job): string | undefined =>
+  getEnvVarFromJob(job, JOB_ENV_TEST_SKIPS);
+
+export const getStorageCapabilitiesFromJob = (job: IoK8sApiBatchV1Job): string[] | undefined => {
+  const value = getEnvVarFromJob(job, JOB_ENV_STORAGE_CAPABILITIES);
+  if (value === undefined) return undefined;
+  const tokens = value
+    .split(',')
+    .map((t) => t.trim())
+    .filter(Boolean);
+  return tokens.length ? tokens : undefined;
 };
 
-export const getCheckupImageFromJob = (job: IoK8sApiBatchV1Job): string => {
-  return getJobContainers(job)?.[0]?.image || '';
-};
+export const getCheckupImageFromJob = (job: IoK8sApiBatchV1Job): string =>
+  getJobContainers(job)?.[0]?.image || '';
 
-export const isJobRunning = (job: IoK8sApiBatchV1Job): boolean => {
-  return !!job?.status?.active;
-};
+export const isJobRunning = (job: IoK8sApiBatchV1Job): boolean => !!job?.status?.active;
 
 /**
  * Fetches all running self-validation jobs across the cluster
@@ -76,56 +92,6 @@ export const getAllRunningSelfValidationJobs = async (): Promise<IoK8sApiBatchV1
     kubevirtConsole.error('Failed to fetch running self-validation jobs:', error);
     return [];
   }
-};
-
-export const getTimestampFromJob = (job: IoK8sApiBatchV1Job): null | string => {
-  const containers = getJobContainers(job);
-  if (!containers?.[0]?.env) {
-    return null;
-  }
-
-  const timestampEnv = containers[0].env.find((env) => env.name === JOB_ENV_TIMESTAMP);
-
-  return timestampEnv?.value || null;
-};
-
-export const getStorageClassFromJob = (job: IoK8sApiBatchV1Job): string | undefined => {
-  const containers = getJobContainers(job);
-  if (!containers?.[0]?.env) {
-    return undefined;
-  }
-
-  const storageClassEnv = containers[0].env.find((env) => env.name === JOB_ENV_STORAGE_CLASS);
-
-  return storageClassEnv?.value;
-};
-
-export const getTestSkipsFromJob = (job: IoK8sApiBatchV1Job): string | undefined => {
-  const containers = getJobContainers(job);
-  if (!containers?.[0]?.env) {
-    return undefined;
-  }
-
-  const testSkipsEnv = containers[0].env.find((env) => env.name === JOB_ENV_TEST_SKIPS);
-
-  return testSkipsEnv?.value;
-};
-
-export const getStorageCapabilitiesFromJob = (job: IoK8sApiBatchV1Job): string[] | undefined => {
-  const containers = getJobContainers(job);
-  if (!containers?.[0]?.env) {
-    return undefined;
-  }
-
-  const storageCapabilitiesEnv = containers[0].env.find(
-    (env) => env.name === JOB_ENV_STORAGE_CAPABILITIES,
-  );
-
-  if (!storageCapabilitiesEnv?.value) {
-    return undefined;
-  }
-
-  return storageCapabilitiesEnv.value.split(',');
 };
 
 export const getPVCNameFromJob = (job: IoK8sApiBatchV1Job): string | undefined => {
