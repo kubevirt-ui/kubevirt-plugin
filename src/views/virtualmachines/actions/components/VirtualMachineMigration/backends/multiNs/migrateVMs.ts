@@ -1,6 +1,5 @@
 import groupBy from 'lodash/groupBy';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import {
   MultiNamespaceVirtualMachineStorageMigrationModel,
   MultiNamespaceVirtualMachineStorageMigrationPlanModel,
@@ -11,25 +10,11 @@ import {
   STORAGE_MIGRATION_PLAN_RETENTION_POLICY,
 } from '@kubevirt-utils/resources/migrations/constants';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
-import { MAX_K8S_NAME_LENGTH } from '@kubevirt-utils/utils/constants';
 import { getRandomChars, truncateToK8sName } from '@kubevirt-utils/utils/utils';
 import { kubevirtK8sCreate } from '@multicluster/k8sRequests';
 
-import { MIGPLAN_PREFIX, MIGRATION_PREFIX, SelectedMigration } from './constants';
-
-export const sanitizeK8sResourceName = (value: string): string =>
-  value
-    .toLowerCase()
-    .replace(/[^a-z0-9-]/g, '-')
-    .replace(/-{2,}/g, '-')
-    .slice(0, MAX_K8S_NAME_LENGTH);
-
-export const generateMigPlanName = (vms: V1VirtualMachine[]): string => {
-  const vmNames = vms.map((vm) => getName(vm)).filter(Boolean);
-  const vmPart = vmNames.length === 1 ? vmNames[0] : `${vmNames.length || 0}vms`;
-
-  return truncateToK8sName(`${MIGPLAN_PREFIX}-${vmPart}`, getRandomChars());
-};
+import { MIGPLAN_PREFIX, MIGRATION_PREFIX } from '../../utils/constants';
+import type { MigrateVMsParams } from '../types';
 
 export const getEmptyMigPlan = (
   namespace: string,
@@ -64,14 +49,6 @@ export const getMigration = (
     },
   },
 });
-
-type MigrateVMsParams = {
-  cluster: string;
-  destinationStorageClass: string;
-  keepOriginalVolumes: boolean;
-  migrationPlanName?: string;
-  selectedMigrations: SelectedMigration[];
-};
 
 export const migrateVMs = async ({
   cluster,
@@ -123,7 +100,7 @@ export const migrateVMs = async ({
 
   await kubevirtK8sCreate<MultiNamespaceVirtualMachineStorageMigration>({
     cluster,
-    data: getMigration(migrationPlan),
+    data: getMigration(createdMigrationPlan),
     model: MultiNamespaceVirtualMachineStorageMigrationModel,
   });
 

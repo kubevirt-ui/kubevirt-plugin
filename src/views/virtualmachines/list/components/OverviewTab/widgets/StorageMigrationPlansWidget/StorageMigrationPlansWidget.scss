@@ -1,4 +1,9 @@
 .storage-migration-plans-widget {
+  &__view-all-skeleton {
+    display: inline-block;
+    margin-top: var(--pf-t--global--spacer--sm);
+  }
+
   &__body {
     display: flex;
     flex-direction: column;

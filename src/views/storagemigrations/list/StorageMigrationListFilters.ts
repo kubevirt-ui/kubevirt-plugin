@@ -1,39 +1,15 @@
 import { TFunction } from 'i18next';
 
+import { MultiNamespaceVirtualMachineStorageMigrationPlan } from '@kubevirt-utils/resources/migrations/constants';
 import {
-  MultiNamespaceVirtualMachineStorageMigrationPlan,
-  STORAGE_MIGRATION_PHASE,
-} from '@kubevirt-utils/resources/migrations/constants';
-import { isMigrationCompleted } from '@kubevirt-utils/resources/migrations/utils';
-import { getStatusNamespaces } from '@kubevirt-utils/resources/shared';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
+  getStorageMigrationStatus,
+  StorageMigrationStatusFilterValue,
+} from '@kubevirt-utils/resources/migrations/storageMigrationLifecycle';
 import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 
 export const STORAGE_MIGRATION_STATUS_FILTER_TYPE = 'storage-migration-status';
 
-export enum StorageMigrationStatusFilterValue {
-  Completed = 'Completed',
-  Failed = 'Failed',
-  Pending = 'Pending',
-  Running = 'Running',
-}
-
-export const getStorageMigrationStatus = (
-  plan: MultiNamespaceVirtualMachineStorageMigrationPlan,
-): StorageMigrationStatusFilterValue => {
-  const namespaces = getStatusNamespaces(plan);
-  const hasFailed = namespaces?.some((ns) => !isEmpty(ns?.[STORAGE_MIGRATION_PHASE.FAILED]));
-  const hasInvalid = namespaces?.some((ns) => !isEmpty(ns?.[STORAGE_MIGRATION_PHASE.INVALID]));
-  const hasInProgress = namespaces?.some(
-    (ns) => !isEmpty(ns?.[STORAGE_MIGRATION_PHASE.IN_PROGRESS]),
-  );
-  const completed = isMigrationCompleted(plan);
-
-  if (hasFailed || hasInvalid) return StorageMigrationStatusFilterValue.Failed;
-  if (hasInProgress) return StorageMigrationStatusFilterValue.Running;
-  if (completed) return StorageMigrationStatusFilterValue.Completed;
-  return StorageMigrationStatusFilterValue.Pending;
-};
+export { getStorageMigrationStatus, StorageMigrationStatusFilterValue };
 
 export const getStorageMigrationStatusFilters = (
   t: TFunction,
