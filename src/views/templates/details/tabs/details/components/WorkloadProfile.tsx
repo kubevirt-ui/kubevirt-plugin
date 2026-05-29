@@ -1,14 +1,14 @@
 import React, { FC } from 'react';
 import { getWorkloadProfile } from 'src/views/templates/utils/selectors';
 
-import { TemplateModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { TemplateModel, VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import WorkloadProfileModal from '@kubevirt-utils/components/WorkloadProfileModal/WorkloadProfileModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   getTemplateWorkload,
+  isOpenShiftTemplate,
   TEMPLATE_WORKLOAD_LABEL,
   WORKLOADS,
 } from '@kubevirt-utils/resources/template';
@@ -24,6 +24,8 @@ const WorkloadProfile: FC<TemplateDetailsGridProps> = ({ editable, template }) =
   const workload = getWorkloadProfile(template);
 
   const updateWorkload = (updatedWorkload: WORKLOADS) => {
+    if (!isOpenShiftTemplate(template)) return;
+
     const vmObjectIndex = template?.objects.findIndex(
       (obj) => obj.kind === VirtualMachineModel.kind,
     );

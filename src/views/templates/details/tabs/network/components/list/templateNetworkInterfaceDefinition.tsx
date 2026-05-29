@@ -1,9 +1,9 @@
 import React, { ReactNode } from 'react';
 import { TFunction } from 'i18next';
 
-import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import TemplateValue from '@kubevirt-utils/components/TemplateValue/TemplateValue';
 import { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
+import { Template } from '@kubevirt-utils/resources/template';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import {
   NetworkPresentation,
@@ -19,7 +19,7 @@ import TemplateNetworkCell from './TemplateNetworkCell';
 import TemplateStateCell from './TemplateStateCell';
 
 export type TemplateNetworkCallbacks = {
-  template: V1Template;
+  template: Template;
 };
 
 const renderActionsCell = (

@@ -9,6 +9,26 @@
           min-width: 220px;
         }
       }
+
+      .checkups-self-validation-form__helper-text {
+        margin-top: var(--pf-t--global--spacer--xs);
+      }
+    }
+
+    .win-image-name-select {
+      position: relative;
+
+      &__clear {
+        position: absolute;
+        right: var(--pf-t--global--spacer--xl);
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 1;
+      }
+    }
+
+    .windows-eula-checkbox {
+      margin-bottom: var(--pf-t--global--spacer--md);
     }
 
     .pf-v6-c-switch__toggle {

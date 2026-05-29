@@ -1,10 +1,9 @@
 import React, { FC } from 'react';
 
-import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { updateTemplate } from '@kubevirt-utils/resources/template';
+import { Template, updateTemplate } from '@kubevirt-utils/resources/template';
 import { Button, PageSection, Stack, StackItem, Title } from '@patternfly/react-core';
 
 import useEditTemplateAccessReview from '../../hooks/useIsTemplateEditable';
@@ -13,7 +12,7 @@ import NetworkInterfaceList from './components/list/NetworkInterfaceList';
 import TemplatesNetworkInterfaceModal from './components/modal/TemplatesNetworkInterfaceModal';
 
 type TemplateNetworkProps = {
-  obj: V1Template;
+  obj: Template;
 };
 
 const TemplateNetwork: FC<TemplateNetworkProps> = ({ obj: template }) => {
@@ -24,7 +23,7 @@ const TemplateNetwork: FC<TemplateNetworkProps> = ({ obj: template }) => {
 
   return (
     <PageSection>
-      <SidebarEditor<V1Template> onResourceUpdate={updateTemplate} resource={template}>
+      <SidebarEditor<Template> onResourceUpdate={updateTemplate} resource={template}>
         <Stack hasGutter>
           <Title headingLevel="h2">{t('Network interfaces')}</Title>
           <StackItem>

@@ -2,11 +2,7 @@ import React, { FC, useMemo } from 'react';
 import produce from 'immer';
 import { getTolerations } from 'src/views/templates/utils/selectors';
 
-import {
-  modelToGroupVersionKind,
-  NodeModel,
-  V1Template,
-} from '@kubevirt-ui-ext/kubevirt-api/console';
+import { modelToGroupVersionKind, NodeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { IoK8sApiCoreV1Node } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import {
   K8sIoApiCoreV1Toleration,
@@ -23,7 +19,7 @@ import TolerationModalDescriptionText from '@kubevirt-utils/components/Toleratio
 import { TolerationLabel } from '@kubevirt-utils/components/TolerationsModal/utils/constants';
 import { getNodeTaintQualifier } from '@kubevirt-utils/components/TolerationsModal/utils/helpers';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
+import { getTemplateVirtualMachineObject, Template } from '@kubevirt-utils/resources/template';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
@@ -32,8 +28,8 @@ import { ModalVariant } from '@patternfly/react-core';
 type TolerationsModalProps = {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (updatedTemplate: V1Template) => Promise<V1Template | void>;
-  template: V1Template;
+  onSubmit: (updatedTemplate: Template) => Promise<Template | void>;
+  template: Template;
 };
 
 const TolerationsModal: FC<TolerationsModalProps> = ({ isOpen, onClose, onSubmit, template }) => {
@@ -64,7 +60,7 @@ const TolerationsModal: FC<TolerationsModalProps> = ({ isOpen, onClose, onSubmit
 
   const updatedTemplate = useMemo(
     () =>
-      produce<V1Template>(template, (templateDraft: V1Template) => {
+      produce<Template>(template, (templateDraft: Template) => {
         const updatedTolerations: K8sIoApiCoreV1Toleration[] = (tolerationsLabels || []).map(
           (toleration) => {
             return {

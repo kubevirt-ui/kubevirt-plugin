@@ -13,6 +13,7 @@ import {
   STATUS_START_TIME_STAMP,
 } from '../../../utils/utils';
 import {
+  JOB_ENV_ACCEPT_WINDOWS_EULA,
   JOB_ENV_DRY_RUN,
   JOB_ENV_POD_NAME,
   JOB_ENV_POD_NAMESPACE,
@@ -22,8 +23,11 @@ import {
   JOB_ENV_TEST_SKIPS,
   JOB_ENV_TEST_SUITES,
   JOB_ENV_TIMESTAMP,
+  JOB_ENV_WIN_IMAGE_DOWNLOAD_URL,
+  JOB_ENV_WIN_IMAGE_NAME,
   JOB_RESULTS_DIR_PATH,
   JOB_VOLUME_RESULTS,
+  SELF_VALIDATION_ACCEPT_WINDOWS_EULA_KEY,
   SELF_VALIDATION_CHECKUP_IMAGE_KEY,
   SELF_VALIDATION_DRY_RUN_KEY,
   SELF_VALIDATION_LABEL_VALUE,
@@ -34,6 +38,8 @@ import {
   SELF_VALIDATION_STORAGE_CLASS_KEY,
   SELF_VALIDATION_TEST_SKIPS_KEY,
   SELF_VALIDATION_TEST_SUITES_KEY,
+  SELF_VALIDATION_WIN_IMAGE_DOWNLOAD_URL_KEY,
+  SELF_VALIDATION_WIN_IMAGE_NAME_KEY,
   TEST_SUITE_TIER2,
 } from '../constants';
 
@@ -63,6 +69,7 @@ import { generateTimestamp } from './helpers';
 // ===========================
 
 export type SelfValidationJobOptions = {
+  acceptWindowsEula?: boolean;
   checkupImage: string;
   createResultsResources?: boolean;
   isDryRun: boolean;
@@ -75,6 +82,8 @@ export type SelfValidationJobOptions = {
   storageClass?: string;
   testSkips?: string;
   timestamp?: string;
+  winImageDownloadUrl?: string;
+  winImageName?: string;
 };
 
 /**
@@ -126,17 +135,35 @@ export const selfValidationPVC = (
   };
 };
 
-const selfValidationConfigMap = (
-  namespace: string,
-  name: string,
-  checkupImage: string,
-  selectedTestSuites: string[],
-  isDryRun: boolean,
-  pvcSize: string,
-  storageClass?: string,
-  testSkips?: string,
-  storageCapabilities?: string[],
-): IoK8sApiCoreV1ConfigMap => ({
+type SelfValidationConfigMapOptions = {
+  acceptWindowsEula?: boolean;
+  checkupImage: string;
+  isDryRun: boolean;
+  name: string;
+  namespace: string;
+  pvcSize: string;
+  selectedTestSuites: string[];
+  storageCapabilities?: string[];
+  storageClass?: string;
+  testSkips?: string;
+  winImageDownloadUrl?: string;
+  winImageName?: string;
+};
+
+const selfValidationConfigMap = ({
+  acceptWindowsEula,
+  checkupImage,
+  isDryRun,
+  name,
+  namespace,
+  pvcSize,
+  selectedTestSuites,
+  storageCapabilities,
+  storageClass,
+  testSkips,
+  winImageDownloadUrl,
+  winImageName,
+}: SelfValidationConfigMapOptions): IoK8sApiCoreV1ConfigMap => ({
   apiVersion: 'v1',
   data: {
     [SELF_VALIDATION_CHECKUP_IMAGE_KEY]: checkupImage,
@@ -144,12 +171,21 @@ const selfValidationConfigMap = (
     [SELF_VALIDATION_PVC_SIZE_KEY]: pvcSize,
     [SELF_VALIDATION_TEST_SUITES_KEY]: selectedTestSuites.join(','),
     [STATUS_START_TIME_STAMP]: new Date().toISOString(),
+    ...(acceptWindowsEula && {
+      [SELF_VALIDATION_ACCEPT_WINDOWS_EULA_KEY]: acceptWindowsEula.toString(),
+    }),
     ...(storageClass && { [SELF_VALIDATION_STORAGE_CLASS_KEY]: storageClass }),
     ...(testSkips && { [SELF_VALIDATION_TEST_SKIPS_KEY]: testSkips }),
     ...(storageCapabilities &&
       storageCapabilities.length > 0 && {
         [SELF_VALIDATION_STORAGE_CAPABILITIES_KEY]: storageCapabilities.join(','),
       }),
+    ...(acceptWindowsEula &&
+      winImageDownloadUrl && {
+        [SELF_VALIDATION_WIN_IMAGE_DOWNLOAD_URL_KEY]: winImageDownloadUrl,
+      }),
+    ...(acceptWindowsEula &&
+      winImageName && { [SELF_VALIDATION_WIN_IMAGE_NAME_KEY]: winImageName }),
   },
   kind: 'ConfigMap',
   metadata: {
@@ -160,6 +196,7 @@ const selfValidationConfigMap = (
 });
 
 export const selfValidationJob = ({
+  acceptWindowsEula,
   checkupImage,
   createResultsResources,
   isDryRun,
@@ -172,6 +209,8 @@ export const selfValidationJob = ({
   storageClass,
   testSkips,
   timestamp,
+  winImageDownloadUrl,
+  winImageName,
 }: SelfValidationJobOptions): IoK8sApiBatchV1Job => {
   const jobName = jobNameOverride || generateWithNumbers(name);
   // ConfigMap name logic:
@@ -182,6 +221,15 @@ export const selfValidationJob = ({
     { name: CONFIGMAP_NAME, value: configMapName },
     { name: CONFIGMAP_NAMESPACE, value: namespace },
     { name: JOB_ENV_DRY_RUN, value: isDryRun.toString() },
+    ...(acceptWindowsEula
+      ? [{ name: JOB_ENV_ACCEPT_WINDOWS_EULA, value: acceptWindowsEula.toString() }]
+      : []),
+    ...(acceptWindowsEula && winImageDownloadUrl
+      ? [{ name: JOB_ENV_WIN_IMAGE_DOWNLOAD_URL, value: winImageDownloadUrl }]
+      : []),
+    ...(acceptWindowsEula && winImageName
+      ? [{ name: JOB_ENV_WIN_IMAGE_NAME, value: winImageName }]
+      : []),
     { name: JOB_ENV_TEST_SUITES, value: selectedTestSuites.join(',') },
     { name: JOB_ENV_TEST_SKIPS, value: testSkips || '' },
     { name: JOB_ENV_RESULTS_DIR, value: JOB_RESULTS_DIR_PATH },

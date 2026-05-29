@@ -1,9 +1,8 @@
 import React, { FC, useMemo } from 'react';
 
-import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
+import { getTemplateVirtualMachineObject, Template } from '@kubevirt-utils/resources/template';
 import { getInterfaces, getNetworks } from '@kubevirt-utils/resources/vm';
 import { getNetworkInterfaceRowData } from '@kubevirt-utils/resources/vm/utils/network/rowData';
 import { ListPageFilter, useListPageFilter } from '@openshift-console/dynamic-plugin-sdk';
@@ -17,7 +16,7 @@ import {
 } from './templateNetworkInterfaceDefinition';
 
 type NetworkInterfaceListProps = {
-  template: V1Template;
+  template: Template;
 };
 
 const NetworkInterfaceList: FC<NetworkInterfaceListProps> = ({ template }) => {

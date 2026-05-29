@@ -1,6 +1,5 @@
 import React, { FC, useCallback, useMemo } from 'react';
 
-import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import DiskListTitle from '@kubevirt-utils/components/DiskListTitle/DiskListTitle';
 import DiskSourceSelect from '@kubevirt-utils/components/DiskModal/components/DiskSourceSelect/DiskSourceSelect';
@@ -10,7 +9,7 @@ import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTabl
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { replaceTemplateVM, updateTemplate } from '@kubevirt-utils/resources/template';
+import { replaceTemplateVM, Template, updateTemplate } from '@kubevirt-utils/resources/template';
 import { ListPageFilter, useListPageFilter } from '@openshift-console/dynamic-plugin-sdk';
 import { PageSection, Stack, StackItem } from '@patternfly/react-core';
 
@@ -26,7 +25,7 @@ import {
 import { getTemplateVMWithNamespace } from './utils';
 
 type TemplateDisksPageProps = {
-  obj: V1Template;
+  obj: Template;
 };
 
 const TemplateDisksPage: FC<TemplateDisksPageProps> = ({ obj: template }) => {
@@ -54,7 +53,7 @@ const TemplateDisksPage: FC<TemplateDisksPageProps> = ({ obj: template }) => {
 
   return (
     <PageSection>
-      <SidebarEditor<V1Template> onResourceUpdate={updateTemplate} resource={template}>
+      <SidebarEditor<Template> onResourceUpdate={updateTemplate} resource={template}>
         <Stack hasGutter>
           <DiskListTitle />
           {isTemplateEditable && vm && (

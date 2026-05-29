@@ -1,5 +1,6 @@
-import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1CPU, V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { getAnnotations } from '@kubevirt-utils/resources/shared';
+import { Template } from '@kubevirt-utils/resources/template';
 import { parseJSONAnnotation } from '@settings/tabs/ClusterTab/components/VirtualizationFeaturesSection/utils/VirtualizationFeaturesContext/utils/utils';
 
 export enum CPUInputType {
@@ -62,8 +63,8 @@ export const getCPULimitsFromVM = (vm: V1VirtualMachine): Record<string, number>
   return parseValidationAnnotations(vm?.metadata?.annotations);
 };
 
-export const getCPULimitsFromTemplate = (template: V1Template): Record<string, number> => {
-  return parseValidationAnnotations(template?.metadata?.annotations);
+export const getCPULimitsFromTemplate = (template: Template): Record<string, number> => {
+  return parseValidationAnnotations(getAnnotations(template));
 };
 
 export const getInitialCPUInputType = (cpu: V1CPU): CPUInputType => {

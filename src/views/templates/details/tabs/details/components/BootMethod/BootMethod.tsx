@@ -4,9 +4,9 @@ import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/Descript
 import { getBootloaderTitleFromVM } from '@kubevirt-utils/components/FirmwareBootloaderModal/utils/utils';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { V1Template } from '@kubevirt-utils/models';
 import {
   getTemplateVirtualMachineObject,
+  Template,
   updateTemplate,
 } from '@kubevirt-utils/resources/template';
 
@@ -14,7 +14,7 @@ import TemplateBootloaderModal from './TemplateBootloaderModal';
 
 type BootMethodProps = {
   editable: boolean;
-  template: V1Template;
+  template: Template;
 };
 
 const BootMethod: FC<BootMethodProps> = ({ editable, template }) => {

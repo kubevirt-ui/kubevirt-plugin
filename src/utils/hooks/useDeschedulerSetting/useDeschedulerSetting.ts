@@ -1,6 +1,5 @@
 import { useState } from 'react';
 
-import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useDeschedulerInstalled } from '@kubevirt-utils/hooks/useDeschedulerInstalled';
 import {
@@ -9,16 +8,16 @@ import {
   updateDeschedulerForVM,
 } from '@kubevirt-utils/hooks/useDeschedulerSetting/utils';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
-import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
+import { getTemplateVirtualMachineObject, Template } from '@kubevirt-utils/resources/template';
 import { getVMTemplateAnnotations } from '@kubevirt-utils/resources/vm';
 import { isVM } from '@kubevirt-utils/utils/typeGuards';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { isLiveMigratable } from '@virtualmachines/utils';
 
-type UseDeschedulerSetting = (obj: V1Template | V1VirtualMachine) => {
+type UseDeschedulerSetting = (obj: Template | V1VirtualMachine) => {
   deschedulerEnabled: boolean;
   deschedulerSwitchDisabled: boolean;
-  onDeschedulerChange: (checked: boolean) => Promise<V1Template | V1VirtualMachine>;
+  onDeschedulerChange: (checked: boolean) => Promise<Template | V1VirtualMachine>;
 };
 
 const useDeschedulerSetting: UseDeschedulerSetting = (obj) => {

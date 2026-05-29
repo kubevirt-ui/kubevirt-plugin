@@ -1,7 +1,6 @@
-import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1CPU } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getMemorySize } from '@kubevirt-utils/components/CPUMemoryModal/utils/CpuMemoryUtils';
-import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
+import { getTemplateVirtualMachineObject, Template } from '@kubevirt-utils/resources/template';
 import { getCPU, getMemory } from '@kubevirt-utils/resources/vm';
 
 type CPUMemoryValues = {
@@ -9,7 +8,7 @@ type CPUMemoryValues = {
   defaultMemory: { defaultMemorySize: number; defaultMemoryUnit: string };
 };
 
-export const getDefaultCPUMemoryValues = (template: V1Template): CPUMemoryValues => {
+export const getDefaultCPUMemoryValues = (template: Template): CPUMemoryValues => {
   const vmObject = getTemplateVirtualMachineObject(template);
   const defaultCPU = getCPU(vmObject);
   const defaultMemory = getMemorySize(getMemory(vmObject));

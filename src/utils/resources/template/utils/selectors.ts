@@ -71,7 +71,7 @@ export const getTemplateProviderName = (template: V1Template): string =>
  * A selector that returns the support level of a given template
  * @param {V1Template} template - template
  */
-export const getTemplateSupportLevel = (template: V1Template): string =>
+export const getTemplateSupportLevel = (template: Template): string =>
   getAnnotation(template, ANNOTATIONS.supportLevel);
 
 /**
@@ -137,7 +137,7 @@ export const getTemplateInterfaces = (template: Template): V1Interface[] => {
  * A selector that returns the disks of a given template
  * @param {V1Template} template - template
  */
-export const getTemplateDisks = (template: V1Template): V1Disk[] => {
+export const getTemplateDisks = (template: Template): V1Disk[] => {
   return (
     getTemplateVirtualMachineObject(template)?.spec?.template?.spec?.domain?.devices?.disks ?? []
   );
@@ -192,5 +192,5 @@ export const getTemplateDescription = (template: Template): string =>
  * A selector that returns the CPU of a given template
  * @param {V1Template} template - template
  */
-export const getTemplateVirtualMachineCPU = (template: V1Template) =>
+export const getTemplateVirtualMachineCPU = (template: Template) =>
   getCPU(getTemplateVirtualMachineObject(template));

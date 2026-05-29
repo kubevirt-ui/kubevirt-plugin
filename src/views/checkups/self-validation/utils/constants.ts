@@ -23,6 +23,10 @@ export const SELF_VALIDATION_CHECKUP_IMAGE_KEY = 'checkup-image';
 export const SELF_VALIDATION_TEST_SUITES_KEY = 'test-suites';
 export const SELF_VALIDATION_TEST_SKIPS_KEY = 'test-skips';
 export const SELF_VALIDATION_DRY_RUN_KEY = 'dry-run';
+export const SELF_VALIDATION_ACCEPT_WINDOWS_EULA_KEY = 'accept-windows-eula';
+export const SELF_VALIDATION_WIN_IMAGE_DOWNLOAD_URL_KEY = 'win-image-download-url';
+export const SELF_VALIDATION_WIN_IMAGE_NAME_KEY = 'win-image-name';
+export const WINDOWS_EULA_URL = 'https://www.microsoft.com/UseTerms/#areaheading-uid673824';
 export const SELF_VALIDATION_STORAGE_CLASS_KEY = 'storage-class';
 export const SELF_VALIDATION_STORAGE_CAPABILITIES_KEY = 'storage-capabilities';
 export const SELF_VALIDATION_PVC_SIZE_KEY = 'pvc-size';
@@ -199,6 +203,9 @@ export const DEFAULT_POLL_INTERVAL_MS = 2000;
 // ===========================
 
 export const JOB_ENV_DRY_RUN = 'DRY_RUN';
+export const JOB_ENV_ACCEPT_WINDOWS_EULA = 'ACCEPT_WINDOWS_EULA';
+export const JOB_ENV_WIN_IMAGE_DOWNLOAD_URL = 'WIN_IMAGE_DOWNLOAD_URL';
+export const JOB_ENV_WIN_IMAGE_NAME = 'WIN_IMAGE_NAME';
 export const JOB_ENV_TEST_SUITES = 'TEST_SUITES';
 export const JOB_ENV_TEST_SKIPS = 'TEST_SKIPS';
 export const JOB_ENV_RESULTS_DIR = 'RESULTS_DIR';
@@ -234,6 +241,7 @@ export type JobResults = {
 // ===========================
 
 export type ValidatedJobParameters = {
+  acceptWindowsEula: boolean;
   baseName: string;
   checkupImage: string;
   cluster: string;
@@ -248,4 +256,6 @@ export type ValidatedJobParameters = {
   testSkips: string | undefined;
   testSuites: string[];
   timestamp: string;
+  winImageDownloadUrl: string | undefined;
+  winImageName: string | undefined;
 };

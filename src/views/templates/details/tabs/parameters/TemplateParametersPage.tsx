@@ -2,12 +2,12 @@ import React, { FC, MouseEventHandler, useCallback, useEffect, useState } from '
 import { useNavigate } from 'react-router';
 import { useImmer } from 'use-immer';
 
-import { TemplateParameter, V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { TemplateParameter } from '@kubevirt-ui-ext/kubevirt-api/console';
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import { isEqualObject } from '@kubevirt-utils/components/NodeSelectorModal/utils/helpers';
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { updateTemplate } from '@kubevirt-utils/resources/template';
+import { getParameters, Template, updateTemplate } from '@kubevirt-utils/resources/template';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   ActionGroup,
@@ -29,7 +29,7 @@ import ParameterEditor from './ParameterEditor';
 import './template-parameters-page.scss';
 
 type TemplateParametersPageProps = {
-  obj?: V1Template;
+  obj?: Template;
 };
 
 const TemplateParametersPage: FC<TemplateParametersPageProps> = ({ obj: template }) => {
@@ -47,19 +47,20 @@ const TemplateParametersPage: FC<TemplateParametersPageProps> = ({ obj: template
     navigate(-1);
   }, [navigate]);
 
-  if (isEmpty(editableTemplate?.parameters))
+  const parameters = getParameters(editableTemplate);
+
+  if (isEmpty(parameters))
     return <EmptyState>{t('No parameters found in this template.')}</EmptyState>;
 
   const onParameterChange = (parameter: TemplateParameter) => {
-    setEditableTemplate(({ parameters: draftParameters }) => {
-      const parameterIndex = draftParameters.findIndex((p) => p.name === parameter.name);
-      draftParameters[parameterIndex] = parameter;
+    setEditableTemplate((draft) => {
+      const draftParameters = getParameters(draft);
+      const parameterIndex = draftParameters?.findIndex((p) => p.name === parameter.name);
+      if (parameterIndex >= 0) draftParameters[parameterIndex] = parameter;
     });
   };
 
-  const parameters = editableTemplate.parameters;
-
-  const isSaveDisabled = isEqualObject(template.parameters, parameters);
+  const isSaveDisabled = isEqualObject(getParameters(template), parameters);
 
   const onSave: MouseEventHandler<HTMLButtonElement> = async (event) => {
     event.preventDefault();

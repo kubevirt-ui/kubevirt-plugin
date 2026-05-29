@@ -1,8 +1,8 @@
 import React, { FC, memo } from 'react';
 
-import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { Template } from '@kubevirt-utils/resources/template';
 import { updateTemplate } from '@kubevirt-utils/resources/template/utils';
 import { Grid, GridItem, PageSection, Title } from '@patternfly/react-core';
 
@@ -12,7 +12,7 @@ import TemplateSchedulingLeftGrid from './components/TemplateSchedulingLeftGrid'
 import TemplateSchedulingRightGrid from './components/TemplateSchedulingRightGrid';
 
 type TemplateSchedulingTabProps = {
-  obj?: V1Template;
+  obj?: Template;
 };
 
 const TemplateSchedulingTab: FC<TemplateSchedulingTabProps> = ({ obj: template }) => {
@@ -21,7 +21,7 @@ const TemplateSchedulingTab: FC<TemplateSchedulingTabProps> = ({ obj: template }
 
   return (
     <PageSection>
-      <SidebarEditor<V1Template> onResourceUpdate={updateTemplate} resource={template}>
+      <SidebarEditor<Template> onResourceUpdate={updateTemplate} resource={template}>
         <>
           <Title headingLevel="h2">{t('Scheduling and resource requirements')}</Title>
           <Grid className="pf-v6-u-mt-md">

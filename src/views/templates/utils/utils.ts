@@ -22,7 +22,7 @@ import { readableSizeUnit } from '@kubevirt-utils/utils/units';
 export const isCommonVMTemplate = (template: V1Template): boolean =>
   template?.metadata?.labels?.[TEMPLATE_TYPE_LABEL] === TEMPLATE_TYPE_BASE;
 
-export const isDedicatedCPUPlacement = (template: V1Template): boolean =>
+export const isDedicatedCPUPlacement = (template: Template): boolean =>
   getCPU(getTemplateVirtualMachineObject(template))?.dedicatedCpuPlacement;
 
 export const getVirtualMachineTemplatesCPUMemoryText = (

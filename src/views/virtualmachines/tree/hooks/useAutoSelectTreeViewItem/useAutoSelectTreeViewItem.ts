@@ -99,6 +99,9 @@ const useAutoSelectTreeViewItem = ({
   useEffect(() => {
     if (isACMPage || runningTourSignal.value || !loaded) return;
 
+    const { vmName, vmNamespace } = getVMInfoFromPathname(location.pathname);
+    if (vmName && vmNamespace) return;
+
     const hasFolderFilter = searchParams.has(TEXT_FILTER_LABELS_ID);
     const isFolderSelected =
       ns && selected?.id?.startsWith(`${FOLDER_SELECTOR_PREFIX}/${SINGLE_CLUSTER_KEY}/${ns}/`);
