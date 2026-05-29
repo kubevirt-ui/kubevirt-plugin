@@ -23,7 +23,7 @@ import {
 } from '@kubevirt-utils/components/DiskModal/utils/constants';
 import { InterfaceTypes, V1DiskFormState } from '@kubevirt-utils/components/DiskModal/utils/types';
 import { DEFAULT_PREFERENCE_LABEL } from '@kubevirt-utils/constants/instancetypes-and-preferences';
-import { getNamespace } from '@kubevirt-utils/resources/shared';
+import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import {
   getDataVolumeTemplates,
   getDisks,
@@ -31,6 +31,7 @@ import {
   getVolumes,
 } from '@kubevirt-utils/resources/vm';
 import { DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
+import { getDataVolumeName } from '@kubevirt-utils/resources/vm/utils/disk/selectors';
 import { getVMIDevices } from '@kubevirt-utils/resources/vmi';
 import { ARCHITECTURE_LABEL } from '@kubevirt-utils/utils/architecture';
 import { ensurePath, generateUploadDiskName, isEmpty } from '@kubevirt-utils/utils/utils';
@@ -160,6 +161,45 @@ export const persistVolume = (
       await addDataVolumeToVM(draftVM, volumeToPersist?.dataVolume?.name);
 
     return draftVM;
+  });
+
+/**
+ * Aligns mount upload volume with Add CD-ROM upload so Storage tab watches resolve the source.
+ * Running hot-pluggable VMs use a dataVolume ref; stopped VMs use a PVC claim on the upload DV name.
+ */
+export const produceMountUploadVolumeState = (
+  diskState: V1DiskFormState,
+  cdromName: string,
+  isHotPluggable: boolean,
+  isVMRunning: boolean,
+): V1DiskFormState =>
+  produce(diskState, (draft) => {
+    const dvName = getName(draft.dataVolumeTemplate) ?? getDataVolumeName(draft.volume);
+
+    if (!dvName) {
+      return;
+    }
+
+    if (isVMRunning && isHotPluggable) {
+      draft.volume = {
+        dataVolume: {
+          hotpluggable: true,
+          name: dvName,
+        },
+        name: cdromName,
+      };
+      delete draft.dataVolumeTemplate;
+      return;
+    }
+
+    draft.volume = {
+      name: cdromName,
+      persistentVolumeClaim: {
+        claimName: dvName,
+        ...(isHotPluggable && { hotpluggable: true }),
+      },
+    };
+    delete draft.dataVolumeTemplate;
   });
 
 export const buildDiskState = (

@@ -282,8 +282,7 @@ export const submitCDROM = async (
       );
 
       const submitResult = await onSubmit(updatedVMWithEmpty);
-      const vmAfterEmptyAdd: V1VirtualMachine =
-        submitResult && typeof submitResult === 'object' ? submitResult : updatedVMWithEmpty;
+      const vmAfterEmptyAdd = submitResult || updatedVMWithEmpty;
 
       const fullPromise = uploadDataVolume(vm, uploadData, mutableData, dvName).then(
         async (uploaded) => {

@@ -39,6 +39,7 @@
   "{{count}} Volumes_other": "{{count}} Volumes",
   "{{cpu}} CPU | {{memory}} Memory": "{{cpu}} CPU | {{memory}} Memory",
   "{{cpus}} CPUs, {{memory}} Memory": "{{cpus}} CPUs, {{memory}} Memory",
+  "{{diskName}}: upload in progress": "{{diskName}}: upload in progress",
   "{{gpusCount}} GPU devices": "{{gpusCount}} GPU devices",
   "{{hostDevicesCount}} Host devices": "{{hostDevicesCount}} Host devices",
   "{{hours}}h {{minutes}}m {{seconds}}s": "{{hours}}h {{minutes}}m {{seconds}}s",

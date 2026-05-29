@@ -10,8 +10,6 @@ import MulticlusterResourceLink from '@multicluster/components/MulticlusterResou
 import { getCluster } from '@multicluster/helpers/selectors';
 import { Skeleton } from '@patternfly/react-core';
 
-import { isPVCSource } from '../utils/helpers';
-
 type DiskSourceCellProps = {
   row: DiskRowDataLayout;
   sourcesLoaded?: boolean;
@@ -19,10 +17,8 @@ type DiskSourceCellProps = {
 };
 
 const DiskSourceCell: FC<DiskSourceCellProps> = ({ row, sourcesLoaded, vm }) => {
-  const { hasDataVolume, namespace, source } = row;
+  const { hasDataVolume, hasPVC, namespace, source } = row;
   const dataTestId = `disk-source-${row.name}`;
-
-  const hasPVC = isPVCSource(row);
 
   if (!sourcesLoaded && (hasPVC || hasDataVolume)) {
     return <Skeleton data-test-id={dataTestId} width="200px" />;

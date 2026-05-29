@@ -7,6 +7,7 @@ import {
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import DiskModal from '@kubevirt-utils/components/DiskModal/DiskModal';
 import {
+  ejectISOFromCDROM,
   isDeclarativeHotplugVolumesEnabled,
   produceVMDisks,
 } from '@kubevirt-utils/components/DiskModal/utils/helpers';
@@ -197,25 +198,28 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({
 
   const onToggle = () => setIsDropdownOpen((prevIsOpen) => !prevIsOpen);
 
-  const handleCancelMountIsoUpload = () => {
-    cancelUpload();
+  const handleCancelMountIsoUpload = async () => {
     setIsDropdownOpen(false);
+    const wasCanceled = await cancelUpload();
+    if (wasCanceled) {
+      const ejectedVM = ejectISOFromCDROM(vm, diskName);
+      await (onDiskUpdate || updateDisks)(ejectedVM);
+    }
   };
 
-  const mountCdromItem =
-    isCDROMMountedState || !isUploadInProgress ? (
-      <DropdownItem key="cdrom" onClick={() => onModalOpen(createCDROMModal)}>
-        {isCDROMMountedState ? t('Eject') : t('Mount')}
-      </DropdownItem>
-    ) : (
-      <Tooltip content={mountIsoUploadInProgressTooltip}>
-        <span>
-          <DropdownItem isDisabled key="cdrom">
-            {t('Mount')}
-          </DropdownItem>
-        </span>
-      </Tooltip>
-    );
+  const mountCdromItem = isUploadInProgress ? (
+    <Tooltip content={mountIsoUploadInProgressTooltip}>
+      <span>
+        <DropdownItem isDisabled key="cdrom">
+          {isCDROMMountedState ? t('Eject') : t('Mount')}
+        </DropdownItem>
+      </span>
+    </Tooltip>
+  ) : (
+    <DropdownItem key="cdrom" onClick={() => onModalOpen(createCDROMModal)}>
+      {isCDROMMountedState ? t('Eject') : t('Mount')}
+    </DropdownItem>
+  );
 
   return (
     <Dropdown

@@ -13,6 +13,7 @@ export type DiskRawData = {
 export type DiskRowDataLayout = {
   drive: string;
   hasDataVolume?: boolean;
+  hasPVC?: boolean;
   interface: string;
   isBootDisk: boolean;
   isEnvDisk: boolean;

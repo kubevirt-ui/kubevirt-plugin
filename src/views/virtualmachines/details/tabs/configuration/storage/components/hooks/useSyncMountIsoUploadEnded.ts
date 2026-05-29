@@ -7,19 +7,19 @@ import {
 } from '@kubevirt-utils/hooks/mountIsoUploadStore';
 
 export const useSyncMountIsoUploadEnded = (
-  vmUploadKey: string,
+  cdromUploadKey: string,
   markBackgroundUploadEnded: () => void,
 ): void => {
   const persistedUploadStatus = useMountIsoUploadStore(
-    (state) => state.uploads[vmUploadKey]?.status,
+    (state) => state.uploads[cdromUploadKey]?.status,
   );
   const previousStatusRef = useRef<undefined | UploadAlertStatus>(undefined);
-  const previousKeyRef = useRef(vmUploadKey);
+  const previousKeyRef = useRef(cdromUploadKey);
 
   useEffect(() => {
-    if (previousKeyRef.current !== vmUploadKey) {
+    if (previousKeyRef.current !== cdromUploadKey) {
       previousStatusRef.current = undefined;
-      previousKeyRef.current = vmUploadKey;
+      previousKeyRef.current = cdromUploadKey;
       return;
     }
 
@@ -33,5 +33,5 @@ export const useSyncMountIsoUploadEnded = (
     }
 
     previousStatusRef.current = persistedUploadStatus;
-  }, [markBackgroundUploadEnded, persistedUploadStatus, vmUploadKey]);
+  }, [cdromUploadKey, markBackgroundUploadEnded, persistedUploadStatus]);
 };

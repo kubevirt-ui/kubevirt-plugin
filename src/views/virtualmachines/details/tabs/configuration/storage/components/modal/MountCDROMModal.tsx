@@ -23,6 +23,10 @@ import { useCDIUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import useKubevirtHyperconvergeConfiguration from '@kubevirt-utils/hooks/useKubevirtHyperconvergeConfiguration';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
+import {
+  getDataVolumeName,
+  getPVCClaimName,
+} from '@kubevirt-utils/resources/vm/utils/disk/selectors';
 import { isEmpty, kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { ButtonVariant, Stack, StackItem } from '@patternfly/react-core';
@@ -30,7 +34,7 @@ import { isRunning } from '@virtualmachines/utils';
 
 import { useISOOptions } from './hooks/useISOOptions';
 import { useMountCDROMForm } from './hooks/useMountCDROMForm';
-import { buildDiskState } from './utils';
+import { buildDiskState, produceMountUploadVolumeState } from './utils';
 
 type MountCDROMModalProps = {
   cdromName: string;
@@ -80,8 +84,9 @@ const MountCDROMModal: FC<MountCDROMModalProps> = ({
   const { handleModalClose, isUploading, markBackgroundUploadEnded, markBackgroundUploadStarted } =
     useCDROMUploadClose(upload, onClose);
 
-  const { clearCancelUpload, clearPersistedUpload, isUploadActive, vmUploadKey } =
+  const { cdromUploadKey, clearCancelUpload, clearPersistedUpload, isUploadActive } =
     useCDROMUploadStore({
+      cdromDiskName: cdromName,
       isUploading,
       markBackgroundUploadEnded,
       upload,
@@ -113,29 +118,42 @@ const MountCDROMModal: FC<MountCDROMModalProps> = ({
     if (data.uploadFile?.file) {
       markBackgroundUploadStarted();
 
-      const uploadPromise = uploadDataVolume(vm, uploadData, diskState);
+      const diskStateForMount = produceMountUploadVolumeState(
+        diskState,
+        cdromName,
+        isHotPluggable,
+        isVMRunning,
+      );
+      const dvName =
+        getName(diskState.dataVolumeTemplate) ??
+        getDataVolumeName(diskState.volume) ??
+        getPVCClaimName(diskState.volume);
+
+      let vmAfterMount: V1VirtualMachine;
+      try {
+        const vmWithMountedDv = await mountISOToCDROM(vm, diskStateForMount, isHotPluggable);
+        const submitResult = await onSubmit?.(vmWithMountedDv);
+        vmAfterMount = submitResult ?? vmWithMountedDv;
+      } catch (error) {
+        markBackgroundUploadEnded();
+        throw error;
+      }
+
+      const uploadPromise = uploadDataVolume(vmAfterMount, uploadData, diskState, dvName);
 
       const fullPromise = uploadPromise
-        .then(async (uploadedDataVolume) => {
-          diskState.volume = {
-            dataVolume: { name: getName(uploadedDataVolume) },
-            name: diskState.volume.name,
-          };
-          delete diskState.dataVolumeTemplate;
-
-          const updatedVM = await mountISOToCDROM(vm, diskState, isHotPluggable);
-          await onSubmit?.(updatedVM);
+        .then(() => {
           onClose();
         })
         .catch((error: unknown) => {
           if (isUploadCanceledError(error)) {
-            clearPersistedUpload(vmUploadKey);
+            clearPersistedUpload(cdromUploadKey);
           }
           throw error;
         })
         .finally(() => {
           markBackgroundUploadEnded();
-          clearCancelUpload(vmUploadKey);
+          clearCancelUpload(cdromUploadKey);
         });
 
       if (onUploadStarted) {

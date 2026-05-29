@@ -339,6 +339,16 @@ export const mountISOToCDROM = async (
     } else {
       draftVM.spec.template.spec.volumes = [...volumes, newVolume];
     }
+
+    if (diskState.dataVolumeTemplate) {
+      const templates = draftVM.spec.dataVolumeTemplates || [];
+      const templateName = getName(diskState.dataVolumeTemplate);
+      const hasTemplate = templates.some((template) => getName(template) === templateName);
+
+      if (!hasTemplate) {
+        draftVM.spec.dataVolumeTemplates = [...templates, diskState.dataVolumeTemplate];
+      }
+    }
   });
 };
 
