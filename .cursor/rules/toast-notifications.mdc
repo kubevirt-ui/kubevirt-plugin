@@ -1,0 +1,55 @@
+---
+description: Toast notification patterns using useKubevirtToast
+globs: ["src/**/*.ts", "src/**/*.tsx"]
+alwaysApply: false
+---
+
+# Toast Notifications
+
+Use `useKubevirtToast` from `@kubevirt-utils/hooks/useKubevirtToast` for all toast notifications. Never import `useToast` from `@openshift-console/dynamic-plugin-sdk` directly — the wrapper provides backward compatibility with Console <= 4.22 where `useToast` does not exist.
+
+## API
+
+```typescript
+import useKubevirtToast from '@kubevirt-utils/hooks/useKubevirtToast';
+
+const { addSuccessToast, addDangerToast, addInfoToast, addWarningToast, addToast, removeToast } =
+  useKubevirtToast();
+```
+
+### Variant Helpers
+
+Each helper takes an options object (same as `ToastOptions` minus `variant`, with `content` optional) and returns the toast ID (`string`). Only `title` is required.
+
+| Helper | Default behavior |
+|--------|-----------------|
+| `addSuccessToast` | dismissible, auto-dismiss after 8s |
+| `addInfoToast` | dismissible, auto-dismiss after 8s |
+| `addWarningToast` | dismissible, persists until closed |
+| `addDangerToast` | dismissible, persists until closed |
+
+### Raw `addToast`
+
+For full control, use `addToast(options)` with the SDK's `ToastOptions` type directly (requires `variant`).
+
+### `removeToast`
+
+Call `removeToast(id)` with the toast ID returned by any `add*Toast` call.
+
+## Examples
+
+```typescript
+// Title only
+addSuccessToast({ title: t('VM created successfully') });
+
+// Title + body content
+addDangerToast({ content: errorMessage, title: t('Failed to delete VM') });
+
+// With extra options
+addInfoToast({ content: t('You can navigate away.'), timeout: 15000, title: t('Upload started') });
+
+// Store ID for later removal
+const id = addWarningToast({ title: t('Migration in progress') });
+// ... later
+removeToast(id);
+```

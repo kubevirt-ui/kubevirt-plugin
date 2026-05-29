@@ -2120,7 +2120,7 @@
   "To add a boot source, click <1></1> or select \"No boot source\" to assign one later": "To add a boot source, click <1></1> or select \"No boot source\" to assign one later",
   "To add a bootable volume, click <1></1>": "To add a bootable volume, click <1></1>",
   "To change a network definition, create a new one and reassign virtual machines to it. Existing definitions can't be edited directly": "ネットワーク定義を変更するには、新しい定義を作成し、その定義に仮想マシンを再度割り当てます。既存の定義は直接編集できません",
-  "To create a template from a VM, select a VM and choose Save as template from the Actions menu.": "To create a template from a VM, select a VM and choose Save as template from the Actions menu.",
+  "To create a template from a VM, select a VM and choose \"Save as template\" from the Actions menu.": "To create a template from a VM, select a VM and choose \"Save as template\" from the Actions menu.",
   "To create a virtual machine, contact an administrator.": "仮想マシンを作成するには、管理者にお問い合わせください。",
   "To create an OVN localnet network, you must first define a physical network.": "OVN ローカルネットネットワークを作成するには、まず物理ネットワークを定義する必要があります。",
   "To edit this template, contact your administrator.": "このテンプレートを編集するには、管理者にお問い合わせください。",

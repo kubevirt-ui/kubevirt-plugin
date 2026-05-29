@@ -2120,7 +2120,7 @@
   "To add a boot source, click <1></1> or select \"No boot source\" to assign one later": "To add a boot source, click <1></1> or select \"No boot source\" to assign one later",
   "To add a bootable volume, click <1></1>": "To add a bootable volume, click <1></1>",
   "To change a network definition, create a new one and reassign virtual machines to it. Existing definitions can't be edited directly": "네트워크 정의를 변경하려면 새 정의를 생성하고 VirtualMachines를 다시 할당합니다. 기존 정의는 직접 편집할 수 없습니다.",
-  "To create a template from a VM, select a VM and choose Save as template from the Actions menu.": "To create a template from a VM, select a VM and choose Save as template from the Actions menu.",
+  "To create a template from a VM, select a VM and choose \"Save as template\" from the Actions menu.": "To create a template from a VM, select a VM and choose \"Save as template\" from the Actions menu.",
   "To create a virtual machine, contact an administrator.": "가상 머신을 생성하려면 관리자에게 문의하십시오.",
   "To create an OVN localnet network, you must first define a physical network.": "OVN localnet 네트워크를 생성하려면 먼저 물리적 네트워크를 정의해야 합니다.",
   "To edit this template, contact your administrator.": "이 템플릿을 편집하려면 관리자에게 문의하십시오.",
