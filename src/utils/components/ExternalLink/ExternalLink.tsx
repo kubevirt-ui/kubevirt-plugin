@@ -10,6 +10,7 @@ type ExternalLinkProps = {
   dataTestID?: string;
   hideIcon?: boolean;
   href: string;
+  onClick?: () => void;
   stopPropagation?: boolean;
   text?: ReactNode;
 };
@@ -21,10 +22,17 @@ const ExternalLink: FC<ExternalLinkProps> = ({
   dataTestID,
   hideIcon,
   href,
+  onClick,
   stopPropagation,
   text,
 }) => (
   <Button
+    onClick={(e) => {
+      if (stopPropagation) {
+        e.stopPropagation();
+      }
+      onClick?.();
+    }}
     aria-label={ariaLabel}
     className={className}
     component="a"
@@ -36,7 +44,6 @@ const ExternalLink: FC<ExternalLinkProps> = ({
     rel="noopener noreferrer"
     target="_blank"
     variant="link"
-    {...(stopPropagation ? { onClick: (e) => e.stopPropagation() } : {})}
   >
     {children ?? text}
   </Button>

@@ -7,6 +7,7 @@ import { runningTourSignal } from '@kubevirt-utils/components/GuidedTour/utils/g
 import HorizontalNavbar from '@kubevirt-utils/components/HorizontalNavbar/HorizontalNavbar';
 import { SidebarEditorProvider } from '@kubevirt-utils/components/SidebarEditor/SidebarEditorContext';
 import { getResourceDetailsTitle } from '@kubevirt-utils/constants/page-constants';
+import { TELEMETRY_RESOURCE_TYPE } from '@kubevirt-utils/extensions/telemetry/utils/property-constants';
 import { VirtualMachineModelGroupVersionKind } from '@kubevirt-utils/models';
 import { getName } from '@kubevirt-utils/resources/shared';
 import useInstanceTypeExpandSpec from '@kubevirt-utils/resources/vm/hooks/useInstanceTypeExpandSpec';
@@ -17,6 +18,7 @@ import { DocumentTitle } from '@openshift-console/dynamic-plugin-sdk';
 import { useSignals } from '@preact/signals-react/runtime';
 
 import { useVirtualMachineTabs } from './hooks/useVirtualMachineTabs';
+import useVMErrorTelemetry from './hooks/useVMErrorTelemetry';
 import VirtualMachineNavPageTitle from './VirtualMachineNavPageTitle';
 
 import './virtual-machine-page.scss';
@@ -46,6 +48,8 @@ const VirtualMachineNavPage: FC = () => {
 
   const vmToShow = useMemo(() => (runningTourSignal.value ? tourGuideVM : vm), [vm]);
 
+  useVMErrorTelemetry(vmToShow);
+
   const [instanceTypeExpandedSpec, expandedSpecLoading, expandedSpecError] =
     useInstanceTypeExpandSpec(vmToShow);
 
@@ -53,7 +57,7 @@ const VirtualMachineNavPage: FC = () => {
 
   return useMemo(
     () => (
-      <SidebarEditorProvider>
+      <SidebarEditorProvider telemetryResourceType={TELEMETRY_RESOURCE_TYPE.VM}>
         <div className="VirtualMachineNavPage">
           <DocumentTitle>
             {getResourceDetailsTitle(getName(vmToShow) || name, 'VirtualMachine')}

@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router';
 
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { DEFAULT_NAMESPACE, YAML } from '@kubevirt-utils/constants/constants';
+import { TELEMETRY_VM_CREATION_METHOD } from '@kubevirt-utils/extensions/telemetry/utils/property-constants';
+import { logVMCreationStarted } from '@kubevirt-utils/extensions/telemetry/vm-creation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getVMListPath } from '@kubevirt-utils/resources/vm';
 import useCluster from '@multicluster/hooks/useCluster';
@@ -64,6 +66,7 @@ const VirtualMachinesCreateButton: FC<VirtualMachinesCreateButtonProps> = ({
       setIsOpen(false);
       switch (value) {
         case YAML:
+          logVMCreationStarted(TELEMETRY_VM_CREATION_METHOD.SCRATCH);
           return navigate(yamlURL);
         default:
           return navigate(vmWizardURL);

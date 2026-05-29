@@ -1,6 +1,11 @@
 import React, { ComponentType, FC, useState } from 'react';
 import { isEqual } from 'lodash';
 
+import {
+  logEditorViewSwitched,
+  TELEMETRY_EDITOR_VIEW_SWITCH,
+} from '@kubevirt-utils/extensions/telemetry';
+import { ResourceTypeTelemetry } from '@kubevirt-utils/extensions/telemetry/utils/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { K8sResourceKind } from '@openshift-console/dynamic-plugin-sdk';
 import { Alert, AlertVariant, Button, ButtonVariant } from '@patternfly/react-core';
@@ -22,6 +27,8 @@ type SyncedEditorProps = {
   isEdit?: boolean;
   onChange?: (data: K8sResourceKind) => void;
   onChangeEditorType?: (newType: EditorType) => void;
+  telemetryResourceType?: ResourceTypeTelemetry;
+  telemetryStepOrField?: string;
   YAMLEditor: ComponentType<YAMLEditorProps>;
 };
 
@@ -43,6 +50,8 @@ export const SyncedEditor: FC<SyncedEditorProps> = ({
   isEdit = false,
   onChange = () => null,
   onChangeEditorType = () => null,
+  telemetryResourceType,
+  telemetryStepOrField,
   YAMLEditor,
 }) => {
   const { t } = useKubevirtTranslation();
@@ -78,6 +87,14 @@ export const SyncedEditor: FC<SyncedEditorProps> = ({
   const changeEditorType = (newType: EditorType): void => {
     setEditorType(newType);
     onChangeEditorType(newType);
+
+    logEditorViewSwitched(
+      telemetryResourceType,
+      newType === EditorType.YAML
+        ? TELEMETRY_EDITOR_VIEW_SWITCH.YAML_TO_FORM
+        : TELEMETRY_EDITOR_VIEW_SWITCH.FORM_TO_YAML,
+      telemetryStepOrField,
+    );
   };
 
   const handleToggleToForm = () => {

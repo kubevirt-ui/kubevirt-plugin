@@ -1,8 +1,9 @@
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { createVMFlowTypes } from '@kubevirt-utils/extensions/telemetry/utils/constants';
+import { TELEMETRY_UNKNOWN_ERROR_MESSAGE } from '@kubevirt-utils/extensions/telemetry/utils/property-constants';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { Template } from '@kubevirt-utils/resources/template';
-import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
+import { getErrorMessage, kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { getSegmentAnalytics } from '@openshift-console/dynamic-plugin-sdk-internal';
 
 export const eventMonitor = (eventType: string, properties?: any) => {
@@ -17,8 +18,15 @@ export const eventMonitor = (eventType: string, properties?: any) => {
     return;
   }
 
-  segmentAnalytics.analytics.track(eventType, properties);
+  const payload =
+    properties &&
+    Object.fromEntries(Object.entries(properties).filter(([, value]) => value !== undefined));
+
+  segmentAnalytics.analytics.track(eventType, payload);
 };
+
+export const getTelemetryErrorMessage = (error: unknown): string =>
+  getErrorMessage(error) ?? TELEMETRY_UNKNOWN_ERROR_MESSAGE;
 
 export const logEventWithName = (
   key: string,
@@ -50,6 +58,6 @@ export const logTemplateFlowEvent = (
 
 export const logCreationFailed = (eventName: string, error: any) => {
   logEventWithName(eventName, {
-    errorMessage: error?.message || 'Unknown error',
+    errorMessage: error?.message || TELEMETRY_UNKNOWN_ERROR_MESSAGE,
   });
 };

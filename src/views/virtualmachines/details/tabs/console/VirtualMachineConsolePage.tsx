@@ -1,10 +1,12 @@
-import React, { FC, useMemo } from 'react';
+import React, { FC, useEffect, useMemo, useRef } from 'react';
 
 import VmNotRunning from '@kubevirt-utils/components/Consoles/components/VmNotRunning';
 import { KUBEVIRT_UI_VNC_LOG_LEVEL_LABEL } from '@kubevirt-utils/components/Consoles/components/vnc-console/utils/constants';
 import { isVncLogLevel } from '@kubevirt-utils/components/Consoles/components/vnc-console/utils/util';
 import Consoles from '@kubevirt-utils/components/Consoles/Consoles';
 import { getConsoleBasePath } from '@kubevirt-utils/components/Consoles/utils/utils';
+import { logVMConsoleOpened } from '@kubevirt-utils/extensions/telemetry/dashboard';
+import { TELEMETRY_CONSOLE_SESSION_TYPE } from '@kubevirt-utils/extensions/telemetry/utils/property-constants';
 import { getLabel, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { isHeadlessMode } from '@kubevirt-utils/resources/vm';
 import useVMI from '@kubevirt-utils/resources/vm/hooks/useVMI';
@@ -17,6 +19,17 @@ import { NavPageComponentProps } from '@virtualmachines/details/utils/types';
 import { isRunning, isStopped } from '../../../utils';
 
 const VirtualMachineConsolePage: FC<NavPageComponentProps> = ({ obj: vm }) => {
+  const consoleOpenedRef = useRef(false);
+
+  useEffect(() => {
+    if (!consoleOpenedRef.current && vm) {
+      consoleOpenedRef.current = true;
+      logVMConsoleOpened(
+        isWindows(vm) ? TELEMETRY_CONSOLE_SESSION_TYPE.RDP : TELEMETRY_CONSOLE_SESSION_TYPE.VNC,
+      );
+    }
+  }, [vm]);
+
   const cluster = getCluster(vm);
   const name = getName(vm);
   const namespace = getNamespace(vm);

@@ -5,6 +5,7 @@ import {
   CUSTOMIZE_VM_BUTTON_CLICKED,
   CUSTOMIZE_VM_FAILED,
 } from '@kubevirt-utils/extensions/telemetry/utils/constants';
+import { logVMCreationFailedFromTemplate } from '@kubevirt-utils/extensions/telemetry/vm-creation';
 import { getLabels, getResourceKey } from '@kubevirt-utils/resources/shared';
 import {
   LABEL_USED_TEMPLATE_NAME,
@@ -65,6 +66,7 @@ const useCreateVMFromTemplate: UseCreateVMFromTemplate = () => {
     } catch (error) {
       setCreateError(error);
       logTemplateFlowEvent(CUSTOMIZE_VM_FAILED, selectedTemplate);
+      logVMCreationFailedFromTemplate(selectedTemplate, error);
     }
   };
 

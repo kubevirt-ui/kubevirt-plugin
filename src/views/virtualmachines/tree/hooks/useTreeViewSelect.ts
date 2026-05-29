@@ -2,6 +2,8 @@ import { MouseEvent, useCallback, useState } from 'react';
 import { useNavigate } from 'react-router';
 
 import { useQueryParamsMethods } from '@kubevirt-utils/components/ListPageFilter/hooks/useQueryParamsMethods';
+import { logTreeViewAction } from '@kubevirt-utils/extensions/telemetry/multicluster';
+import { TELEMETRY_TREE_VIEW_ACTION } from '@kubevirt-utils/extensions/telemetry/utils/property-constants';
 import { OnFilterChange } from '@openshift-console/dynamic-plugin-sdk';
 import { TEXT_FILTER_LABELS_ID } from '@virtualmachines/list/hooks/constants';
 
@@ -22,6 +24,9 @@ const useTreeViewSelect = (
   const onSelect = useCallback(
     (_event: MouseEvent, treeViewItem: TreeViewDataItemWithHref) => {
       setSelected(treeViewItem);
+      logTreeViewAction(
+        treeViewItem.href ? TELEMETRY_TREE_VIEW_ACTION.NAVIGATE : TELEMETRY_TREE_VIEW_ACTION.FILTER,
+      );
       if (treeViewItem.href) navigate(treeViewItem.href);
 
       if (treeViewItem.id.startsWith(FOLDER_SELECTOR_PREFIX)) {

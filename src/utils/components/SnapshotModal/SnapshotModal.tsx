@@ -10,6 +10,13 @@ import {
   generateSnapshotName,
 } from '@kubevirt-utils/components/SnapshotModal/utils/utils';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
+import {
+  TELEMETRY_STATUS,
+  TELEMETRY_UNKNOWN_ERROR_MESSAGE,
+  TELEMETRY_VM_ACTION,
+} from '@kubevirt-utils/extensions/telemetry/utils/property-constants';
+import { logVMActionPerformed } from '@kubevirt-utils/extensions/telemetry/vm-actions';
+import { logVMSnapshotCreated } from '@kubevirt-utils/extensions/telemetry/vm-storage';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getVolumeSnapshotStatuses } from '@kubevirt-utils/resources/vm';
 import { isDNS1123Label, validateDNS1123Label } from '@kubevirt-utils/utils/validation';
@@ -63,13 +70,23 @@ const SnapshotModal: FC<SnapshotModalProps> = ({ isOpen, onClose, vm }) => {
 
   return (
     <TabModal<V1beta1VirtualMachineSnapshot>
-      onSubmit={(obj) =>
-        kubevirtK8sCreate<V1beta1VirtualMachineSnapshot>({
-          cluster: getCluster(vm),
-          data: obj,
-          model: VirtualMachineSnapshotModel,
-        })
-      }
+      onSubmit={async (obj) => {
+        try {
+          const result = await kubevirtK8sCreate<V1beta1VirtualMachineSnapshot>({
+            cluster: getCluster(vm),
+            data: obj,
+            model: VirtualMachineSnapshotModel,
+          });
+          logVMActionPerformed(TELEMETRY_VM_ACTION.SNAPSHOT, vm);
+          logVMSnapshotCreated(TELEMETRY_STATUS.SUCCESS);
+          return result;
+        } catch (error) {
+          logVMSnapshotCreated(TELEMETRY_STATUS.FAILURE, {
+            errorMessage: error instanceof Error ? error.message : TELEMETRY_UNKNOWN_ERROR_MESSAGE,
+          });
+          throw error;
+        }
+      }}
       headerText={t('Take snapshot')}
       isDisabled={isSubmitDisabled || !isSnapshotNameValid}
       isOpen={isOpen}

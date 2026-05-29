@@ -3,6 +3,7 @@ import React, { FC, useEffect, useState } from 'react';
 import AdvancedFiltersToolbarItem from '@kubevirt-utils/components/ListPageFilter/components/AdvancedFiltersToolbarItem';
 import CheckboxSelectFilter from '@kubevirt-utils/components/ListPageFilter/components/CheckboxSelectFilter';
 import { useApplyFiltersWithQuery } from '@kubevirt-utils/components/ListPageFilter/hooks/useApplyFiltersWithQuery';
+import { logVMListFiltered } from '@kubevirt-utils/extensions/telemetry/dashboard';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useNamespaceParam from '@kubevirt-utils/hooks/useNamespaceParam';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
@@ -51,7 +52,10 @@ const VirtualMachineFilterToolbar: FC<VirtualMachineFilterToolbarProps> = ({
     }
   }, [listPageBodySize]);
 
-  const applyFilters: OnFilterChange = (type, input) => onFilterChange?.(type, input);
+  const applyFilters: OnFilterChange = (type, input) => {
+    logVMListFiltered({ filterType: type });
+    onFilterChange?.(type, input);
+  };
   const applyFiltersWithQuery = useApplyFiltersWithQuery(applyFilters);
 
   const nameFilter = useNameFilter(applyFiltersWithQuery);

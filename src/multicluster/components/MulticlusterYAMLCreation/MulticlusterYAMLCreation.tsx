@@ -2,9 +2,20 @@ import React, { FC, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { load } from 'js-yaml';
 
+import { TemplateModel, VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import ClusterProjectDropdown from '@kubevirt-utils/components/ClusterProjectDropdown/ClusterProjectDropdown';
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
+import {
+  TELEMETRY_RESOURCE_CREATION_METHOD,
+  TELEMETRY_RESOURCE_TYPE,
+  TELEMETRY_VM_CREATION_METHOD,
+} from '@kubevirt-utils/extensions/telemetry/utils/property-constants';
+import {
+  logVMCreated,
+  logVMCreationFailed,
+} from '@kubevirt-utils/extensions/telemetry/vm-creation';
+import { logResourceCreated } from '@kubevirt-utils/extensions/telemetry/yaml-vs-ui';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useNamespaceParam from '@kubevirt-utils/hooks/useNamespaceParam';
 import { getName } from '@kubevirt-utils/resources/shared';
@@ -27,6 +38,8 @@ const MulticlusterYAMLCreation: FC = () => {
   const cluster = useClusterParam();
   const namespace = useNamespaceParam();
   const [error, setError] = useState<Error>(null);
+  const isVirtualMachineModel = model?.kind === VirtualMachineModel.kind;
+  const isTemplateModel = model?.kind === TemplateModel.kind;
 
   const onSave = async (yaml: string) => {
     setError(null);
@@ -40,6 +53,16 @@ const MulticlusterYAMLCreation: FC = () => {
         ns: namespace,
       });
 
+      if (isVirtualMachineModel) {
+        logResourceCreated(TELEMETRY_RESOURCE_TYPE.VM, TELEMETRY_RESOURCE_CREATION_METHOD.YAML);
+        logVMCreated(TELEMETRY_VM_CREATION_METHOD.SCRATCH);
+      } else if (isTemplateModel) {
+        logResourceCreated(
+          TELEMETRY_RESOURCE_TYPE.TEMPLATE,
+          TELEMETRY_RESOURCE_CREATION_METHOD.YAML,
+        );
+      }
+
       const kubevirtURL = getFleetResourceRoute({
         cluster,
         model,
@@ -52,6 +75,9 @@ const MulticlusterYAMLCreation: FC = () => {
           getMulticlusterSearchURL(model, getName(createdResource), namespace, cluster),
       );
     } catch (apiError) {
+      if (isVirtualMachineModel) {
+        logVMCreationFailed(TELEMETRY_VM_CREATION_METHOD.SCRATCH, apiError);
+      }
       setError(apiError);
     }
   };

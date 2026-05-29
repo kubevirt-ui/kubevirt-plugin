@@ -2,6 +2,9 @@ import React, { FC, useState } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
+import { TELEMETRY_VM_ACTION } from '@kubevirt-utils/extensions/telemetry/utils/property-constants';
+import { logVMActionPerformed } from '@kubevirt-utils/extensions/telemetry/vm-actions';
+import { logVMMigrationStarted } from '@kubevirt-utils/extensions/telemetry/vm-migration';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Alert, AlertVariant, ModalVariant, Stack, StackItem } from '@patternfly/react-core';
 import { migrateVM } from '@virtualmachines/actions/actions';
@@ -35,7 +38,13 @@ const ComputeMigrationModal: FC<ComputeMigrationModalProps> = ({ isOpen, onClose
   return (
     <TabModal
       onSubmit={async () => {
-        await migrateVM(vm, migrationOption === MigrationOptions.MANUAL ? selectedNode : undefined);
+        const targetNode = migrationOption === MigrationOptions.MANUAL ? selectedNode : undefined;
+        logVMMigrationStarted(vm, {
+          targetNode,
+          targetNodeSpecified: migrationOption === MigrationOptions.MANUAL,
+        });
+        logVMActionPerformed(TELEMETRY_VM_ACTION.MIGRATE, vm);
+        await migrateVM(vm, targetNode);
       }}
       headerDescription={t('Select the target Node to migrate your VirtualMachine to.')}
       headerText={t('Migrate VirtualMachine to a different Node')}

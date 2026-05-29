@@ -10,6 +10,8 @@ import {
 } from '@kubevirt-utils/components/DiskModal/utils/helpers';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
+import { TELEMETRY_HOTPLUG_OPERATION } from '@kubevirt-utils/extensions/telemetry/utils/property-constants';
+import { logVMDiskHotplug } from '@kubevirt-utils/extensions/telemetry/vm-storage';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { buildOwnerReference, compareOwnerReferences } from '@kubevirt-utils/resources/shared';
 import { getDataVolumeTemplates, getDisks, getVolumes } from '@kubevirt-utils/resources/vm';
@@ -71,6 +73,10 @@ const DeleteDiskModal: FC<DeleteDiskModalProps> = ({
       : updateDisks(updatedVM);
 
     return deletePromise.then(() => {
+      if (isHotPluginVolume) {
+        logVMDiskHotplug(TELEMETRY_HOTPLUG_OPERATION.REMOVE);
+      }
+
       if (volumeResource) {
         if (deleteOwnedResource) {
           // we need to delete the owned resource

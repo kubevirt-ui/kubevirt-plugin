@@ -1,5 +1,9 @@
 import React, { FC, useEffect, useRef } from 'react';
 
+import {
+  logVMCreationStarted,
+  mapWizardStepToCreationMethodTelemetry,
+} from '@kubevirt-utils/extensions/telemetry/vm-creation';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getValidNamespace } from '@kubevirt-utils/utils/utils';
@@ -51,6 +55,7 @@ const VMCreationWizard: FC = () => {
   const { navItemWithVMGeneration } = useVMGenerationNavItem(creationMethod);
   const clusterParam = useClusterParam();
   const hasInitialized = useRef(false);
+  const hasLoggedCreationStarted = useRef(false);
   const closeWizard = useCloseWizard();
   const isAdmin = useIsAdmin();
   const [activeNamespace] = useActiveNamespace();
@@ -90,6 +95,14 @@ const VMCreationWizard: FC = () => {
           syncDescription(currentStep, prevStep);
           if (currentStep?.id !== VMWizardStep.TEMPLATE) setTemplatesDrawerIsOpen(false);
           if (currentStep?.id) markStepVisited(String(currentStep.id));
+
+          const creationMethodTelemetry = mapWizardStepToCreationMethodTelemetry(
+            String(currentStep?.id),
+          );
+          if (!hasLoggedCreationStarted.current && creationMethodTelemetry) {
+            hasLoggedCreationStarted.current = true;
+            logVMCreationStarted(creationMethodTelemetry);
+          }
         }}
         className="vm-creation-wizard"
         header={<WizardHeader isCloseHidden title={t('Create VirtualMachine')} />}

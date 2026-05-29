@@ -8,6 +8,17 @@ import {
   CUSTOMIZE_VM_FAILED,
   CUSTOMIZE_VM_SUCCEEDED,
 } from '@kubevirt-utils/extensions/telemetry/utils/constants';
+import {
+  TELEMETRY_RESOURCE_CREATION_METHOD,
+  TELEMETRY_RESOURCE_TYPE,
+} from '@kubevirt-utils/extensions/telemetry/utils/property-constants';
+import {
+  logVMCreated,
+  logVMCreatedFromTemplate,
+  logVMCreationFailed,
+  mapCreationMethodToTelemetry,
+} from '@kubevirt-utils/extensions/telemetry/vm-creation';
+import { logResourceCreated } from '@kubevirt-utils/extensions/telemetry/yaml-vs-ui';
 import useIsIPv6SingleStackCluster from '@kubevirt-utils/hooks/useIPStackType/useIsIPv6SingleStackCluster';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName } from '@kubevirt-utils/resources/shared';
@@ -21,6 +32,7 @@ import { kubevirtK8sCreate } from '@multicluster/k8sRequests';
 import { getVMURL } from '@multicluster/urls';
 import { useSignals } from '@preact/signals-react/runtime';
 import useVMWizardStore from '@virtualmachines/creation-wizard/state/vm-wizard-store/useVMWizardStore';
+import { VMCreationMethod } from '@virtualmachines/creation-wizard/utils/constants';
 
 type UseCreateCustomizedVM = () => {
   createCustomizedVM: () => Promise<void>;
@@ -32,7 +44,12 @@ const useCreateCustomizedVM: UseCreateCustomizedVM = () => {
   useSignals();
   const navigate = useNavigate();
   const cluster = useClusterParam();
-  const { project: vmNamespaceTarget, vmName } = useVMWizardStore();
+  const {
+    creationMethod,
+    project: vmNamespaceTarget,
+    selectedTemplate,
+    vmName,
+  } = useVMWizardStore();
   const isIPv6SingleStack = useIsIPv6SingleStackCluster(cluster);
   const [isUDNManagedNamespace] = useNamespaceUDN(vmNamespaceTarget);
 
@@ -63,6 +80,14 @@ const useCreateCustomizedVM: UseCreateCustomizedVM = () => {
       });
 
       logITFlowEvent(CUSTOMIZE_VM_SUCCEEDED, createdVM);
+      logResourceCreated(TELEMETRY_RESOURCE_TYPE.VM, TELEMETRY_RESOURCE_CREATION_METHOD.FORM);
+      if (creationMethod === VMCreationMethod.TEMPLATE && selectedTemplate) {
+        logVMCreatedFromTemplate(selectedTemplate);
+      } else {
+        logVMCreated(
+          mapCreationMethodToTelemetry(creationMethod ?? VMCreationMethod.INSTANCE_TYPE),
+        );
+      }
       clearCustomizeInstanceType();
 
       if (!isUDNManagedNamespace) {
@@ -78,6 +103,10 @@ const useCreateCustomizedVM: UseCreateCustomizedVM = () => {
       setError(err);
       kubevirtConsole.error('Error: ', getErrorMessage(err));
       logITFlowEvent(CUSTOMIZE_VM_FAILED, storeVM);
+      logVMCreationFailed(
+        mapCreationMethodToTelemetry(creationMethod ?? VMCreationMethod.INSTANCE_TYPE),
+        err,
+      );
     } finally {
       setIsSubmitting(false);
     }

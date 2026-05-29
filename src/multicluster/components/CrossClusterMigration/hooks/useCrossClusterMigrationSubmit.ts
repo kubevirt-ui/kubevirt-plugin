@@ -10,12 +10,16 @@ import {
   V1beta1Plan,
   V1beta1StorageMap,
 } from '@kubev2v/types';
+import { logMigrationPlanCreated } from '@kubevirt-utils/extensions/telemetry/mtv';
+import { getMtvSourceTelemetry } from '@kubevirt-utils/extensions/telemetry/utils/mtv-provider';
+import { getSourceProviderName } from '@kubevirt-utils/resources/plan/selectors';
 import { getName, getNamespace, getUID } from '@kubevirt-utils/resources/shared';
 import { getRandomChars } from '@kubevirt-utils/utils/utils';
 import { kubevirtK8sCreate } from '@multicluster/k8sRequests';
 
 import { MTV_MIGRATION_NAMESPACE } from '../constants';
 
+import useProviders from './useProviders';
 import { cleanupPartialResources, getCreateMigration } from './utils';
 
 const useCrossClusterMigrationSubmit = (
@@ -31,6 +35,7 @@ const useCrossClusterMigrationSubmit = (
   // Ref guard prevents duplicate submissions from rapid/concurrent clicks
   // before the React state update re-render can disable the button.
   const isSubmittingRef = useRef(false);
+  const [providers] = useProviders();
 
   const onSubmit = useCallback(async () => {
     if (isSubmittingRef.current) return;
@@ -117,6 +122,18 @@ const useCrossClusterMigrationSubmit = (
         ns: MTV_MIGRATION_NAMESPACE,
       });
       setMigrationPlan(createdMigrationPlan);
+
+      const sourceProviderName = getSourceProviderName(migrationPlan);
+      const sourceProviderResource = providers?.find(
+        (provider) => getName(provider) === sourceProviderName,
+      );
+
+      logMigrationPlanCreated({
+        ...getMtvSourceTelemetry(sourceProviderResource),
+        networkMappingCount: networkMap?.spec?.map?.length ?? 0,
+        storageMappingCount: storageMap?.spec?.map?.length ?? 0,
+        vmCount: migrationPlan?.spec?.vms?.length,
+      });
       setSuccess(true);
     } catch (apiError) {
       cleanupPartialResources({ createdMigrationPlan, createdNetworkMap, createdStorageMap });
@@ -125,7 +142,7 @@ const useCrossClusterMigrationSubmit = (
       setIsSubmitting(false);
       isSubmittingRef.current = false;
     }
-  }, [storageMap, migrationPlan, networkMap, setMigrationPlan]);
+  }, [storageMap, migrationPlan, networkMap, providers, setMigrationPlan]);
 
   return {
     error,

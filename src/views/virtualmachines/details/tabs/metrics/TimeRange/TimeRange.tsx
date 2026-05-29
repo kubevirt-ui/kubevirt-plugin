@@ -4,6 +4,11 @@ import { Link } from 'react-router';
 import DurationDropdown from '@kubevirt-utils/components/DurationOption/DurationDropdown';
 import DurationOption from '@kubevirt-utils/components/DurationOption/DurationOption';
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
+import { logExternalMonitoringNavigation } from '@kubevirt-utils/extensions/telemetry/dashboard';
+import {
+  TELEMETRY_EXTERNAL_MONITORING_TOOL,
+  TELEMETRY_VM_DETAIL_TAB,
+} from '@kubevirt-utils/extensions/telemetry/utils/property-constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useVirtualizationObservabilityLink } from '@kubevirt-utils/hooks/useVirtualizationObservabilityLink/useVirtualizationObservabilityLink';
 import useIsACMPage from '@multicluster/useIsACMPage';
@@ -30,12 +35,32 @@ const TimeRange: FC = () => {
       </span>
 
       {isACMPage && virtualizationObservabilityLink && (
-        <ExternalLink href={virtualizationObservabilityLink}>
+        <ExternalLink
+          onClick={() =>
+            logExternalMonitoringNavigation(
+              TELEMETRY_EXTERNAL_MONITORING_TOOL.GRAFANA,
+              TELEMETRY_VM_DETAIL_TAB.METRICS,
+            )
+          }
+          href={virtualizationObservabilityLink}
+        >
           {t('Virtualization dashboard')}
         </ExternalLink>
       )}
 
-      {!isACMPage && <Link to={MONITORING_LINK}>{t('Virtualization dashboard')}</Link>}
+      {!isACMPage && (
+        <Link
+          onClick={() =>
+            logExternalMonitoringNavigation(
+              TELEMETRY_EXTERNAL_MONITORING_TOOL.PROMETHEUS,
+              TELEMETRY_VM_DETAIL_TAB.METRICS,
+            )
+          }
+          to={MONITORING_LINK}
+        >
+          {t('Virtualization dashboard')}
+        </Link>
+      )}
     </div>
   );
 };

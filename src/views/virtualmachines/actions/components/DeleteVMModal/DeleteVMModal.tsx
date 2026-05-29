@@ -5,6 +5,8 @@ import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import ConfirmActionMessage from '@kubevirt-utils/components/ConfirmActionMessage/ConfirmActionMessage';
 import { GracePeriodInput } from '@kubevirt-utils/components/GracePeriodInput/GracePeriodInput';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
+import { TELEMETRY_VM_ACTION } from '@kubevirt-utils/extensions/telemetry/utils/property-constants';
+import { logVMActionPerformed } from '@kubevirt-utils/extensions/telemetry/vm-actions';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { getShareableVolumes } from '@kubevirt-utils/resources/vm';
@@ -53,6 +55,8 @@ const DeleteVMModal: FC<DeleteVMModalProps> = ({ isOpen, onClose, vm }) => {
     });
 
     if (isVMSelected(updatedVM)) deselectVM(updatedVM);
+
+    logVMActionPerformed(TELEMETRY_VM_ACTION.DELETE, vm);
 
     if (isVMDetailsPage(location.pathname)) {
       const cluster = getCluster(vm) ?? hubClusterName;

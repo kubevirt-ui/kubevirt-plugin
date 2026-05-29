@@ -5,6 +5,11 @@ import { V1beta1VirtualMachineClone } from '@kubevirt-ui-ext/kubevirt-api/kubevi
 import useCloneVMModal from '@kubevirt-utils/components/CloneVMModal/hooks/useCloneVMModal';
 import { CLONING_STATUSES } from '@kubevirt-utils/components/CloneVMModal/utils/constants';
 import { cloneVM, vmExists } from '@kubevirt-utils/components/CloneVMModal/utils/helpers';
+import { TELEMETRY_VM_CREATION_METHOD } from '@kubevirt-utils/extensions/telemetry/utils/property-constants';
+import {
+  logVMCreated,
+  logVMCreationFailed,
+} from '@kubevirt-utils/extensions/telemetry/vm-creation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { RUNSTRATEGY_HALTED } from '@kubevirt-utils/resources/vm/utils/constants';
@@ -32,26 +37,32 @@ const useCloneVM: UseCloneVM = () => {
 
   useEffect(() => {
     if (cloneRequest?.status?.phase === CLONING_STATUSES.SUCCEEDED) {
+      logVMCreated(TELEMETRY_VM_CREATION_METHOD.CLONE);
       navigate(getVMURL(cloneRequest?.cluster, targetNamespace, vmName));
     }
   }, [cloneRequest, vmName, targetNamespace, navigate, source]);
 
   const sendCloneRequest = async () => {
-    const vmSameName = await vmExists(vmName, targetNamespace, getCluster(source) || cluster);
+    try {
+      const vmSameName = await vmExists(vmName, targetNamespace, getCluster(source) || cluster);
 
-    if (vmSameName) {
-      throw new Error(t('VirtualMachine with this name already exists'));
+      if (vmSameName) {
+        throw new Error(t('VirtualMachine with this name already exists'));
+      }
+
+      const request = await cloneVM(
+        source,
+        vmName,
+        targetNamespace,
+        vmSignal.value?.spec?.runStrategy !== RUNSTRATEGY_HALTED,
+        vmDescription,
+      );
+
+      setInitialCloneRequest(request);
+    } catch (err) {
+      logVMCreationFailed(TELEMETRY_VM_CREATION_METHOD.CLONE, err);
+      throw err;
     }
-
-    const request = await cloneVM(
-      source,
-      vmName,
-      targetNamespace,
-      vmSignal.value?.spec?.runStrategy !== RUNSTRATEGY_HALTED,
-      vmDescription,
-    );
-
-    setInitialCloneRequest(request);
   };
 
   return sendCloneRequest;

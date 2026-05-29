@@ -2,7 +2,7 @@ import { ROW_FILTERS_PREFIX } from '@kubevirt-utils/utils/constants';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
-import { skipRowFilterPrefix } from './constants';
+import { skipRowFilterPrefix, validSearchQueryParams } from './constants';
 import { AdvancedSearchQueryInputs } from './types';
 
 type AdvancedSearchQueryInputValue = AdvancedSearchQueryInputs[keyof AdvancedSearchQueryInputs];
@@ -72,6 +72,19 @@ export const getRowFilterQueryKey = (fieldKey: string) =>
   skipRowFilterPrefix.has(fieldKey as VirtualMachineRowFilterType)
     ? fieldKey
     : `${ROW_FILTERS_PREFIX}${fieldKey}`;
+
+export const getUrlSearchQuery = (search: string): string => {
+  const allParams = new URLSearchParams(search);
+  const searchParams = new URLSearchParams();
+
+  for (const key of allParams.keys()) {
+    if (validSearchQueryParams.includes(key)) {
+      searchParams.set(key, allParams.get(key));
+    }
+  }
+
+  return searchParams.toString();
+};
 
 export const buildContextSearchInputs = (
   cluster?: string,

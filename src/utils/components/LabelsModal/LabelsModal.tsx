@@ -10,6 +10,7 @@ import React, {
 import TagsInput from 'react-tagsinput';
 
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
+import { logVMLabelsCollectedIfVirtualMachine } from '@kubevirt-utils/extensions/telemetry/labels';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
@@ -124,13 +125,20 @@ export const LabelsModal: FC<LabelsModalProps> = memo(
     // Backspace deletes tags, but not if there is text being edited in the input field
     const removeKeys = inputValue.length ? [] : [8];
 
+    const handleSubmit = async () => {
+      const updatedLabels = labelsArrayToObject(labels);
+      const result = await onLabelsSubmit(updatedLabels);
+      logVMLabelsCollectedIfVirtualMachine(obj, updatedLabels);
+      return result;
+    };
+
     return (
       <TabModal
         headerText={t('Edit labels')}
         isOpen={isOpen}
         obj={obj}
         onClose={onClose}
-        onSubmit={() => onLabelsSubmit(labelsArrayToObject(labels))}
+        onSubmit={handleSubmit}
       >
         <Stack hasGutter>
           <StackItem>

@@ -1,4 +1,7 @@
+import { useEffect, useRef } from 'react';
+
 import { PlanModel, V1beta1Plan } from '@kubev2v/types';
+import { logMTVDetected } from '@kubevirt-utils/extensions/telemetry/mtv';
 import { modelToGroupVersionKind } from '@kubevirt-utils/models';
 import { MTV_MIGRATION_NAMESPACE } from '@multicluster/components/CrossClusterMigration/constants';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
@@ -13,6 +16,14 @@ type UseMTVPlansResult = {
 
 const useMTVPlans = (): UseMTVPlansResult => {
   const [isMTVInstalled, isMTVInFlight] = useIsMTVInstalled();
+  const hasLoggedMTVRef = useRef(false);
+
+  useEffect(() => {
+    if (isMTVInstalled && !hasLoggedMTVRef.current) {
+      hasLoggedMTVRef.current = true;
+      logMTVDetected({ mtvInstalled: true });
+    }
+  }, [isMTVInstalled]);
 
   const [plans, loaded, loadError] = useK8sWatchResource<V1beta1Plan[]>(
     isMTVInstalled
