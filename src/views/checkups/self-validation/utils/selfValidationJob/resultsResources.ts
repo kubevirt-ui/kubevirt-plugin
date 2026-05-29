@@ -17,6 +17,7 @@ export const createResultsResourcesJob = async (
   validatedParams: ValidatedJobParameters,
 ): Promise<IoK8sApiBatchV1Job> => {
   const {
+    acceptWindowsEula,
     baseName,
     checkupImage,
     cluster,
@@ -29,10 +30,13 @@ export const createResultsResourcesJob = async (
     testSkips,
     testSuites,
     timestamp,
+    winImageDownloadUrl,
+    winImageName,
   } = validatedParams;
 
   // Create the job with CREATE_RESULTS_RESOURCES=true
   const jobData = selfValidationJob({
+    acceptWindowsEula,
     checkupImage,
     createResultsResources: true,
     isDryRun,
@@ -45,6 +49,8 @@ export const createResultsResourcesJob = async (
     storageClass,
     testSkips,
     timestamp,
+    winImageDownloadUrl,
+    winImageName,
   });
 
   // Create the job (no PVC creation needed - reusing existing one)

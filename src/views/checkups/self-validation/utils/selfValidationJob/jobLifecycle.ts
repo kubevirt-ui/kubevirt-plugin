@@ -13,6 +13,7 @@ import { kubevirtK8sCreate, kubevirtK8sDelete, kubevirtK8sPatch } from '@multicl
 
 import { STATUS_COMPLETION_TIME_STAMP, STATUS_START_TIME_STAMP } from '../../../utils/utils';
 import {
+  SELF_VALIDATION_ACCEPT_WINDOWS_EULA_KEY,
   SELF_VALIDATION_CHECKUP_IMAGE_KEY,
   SELF_VALIDATION_DRY_RUN_KEY,
   SELF_VALIDATION_PVC_SIZE_KEY,
@@ -20,6 +21,8 @@ import {
   SELF_VALIDATION_STORAGE_CLASS_KEY,
   SELF_VALIDATION_TEST_SKIPS_KEY,
   SELF_VALIDATION_TEST_SUITES_KEY,
+  SELF_VALIDATION_WIN_IMAGE_DOWNLOAD_URL_KEY,
+  SELF_VALIDATION_WIN_IMAGE_NAME_KEY,
 } from '../constants';
 import { getResultsConfigMapName } from '../selfValidationResults';
 
@@ -32,6 +35,7 @@ import { selfValidationConfigMap, selfValidationJob, selfValidationPVC } from '.
 // ===========================
 
 export type CreateSelfValidationCheckupOptions = {
+  acceptWindowsEula?: boolean;
   checkupImage: string;
   cluster: string;
   isDryRun: boolean;
@@ -42,6 +46,8 @@ export type CreateSelfValidationCheckupOptions = {
   storageCapabilities?: string[];
   storageClass?: string;
   testSkips?: string;
+  winImageDownloadUrl?: string;
+  winImageName?: string;
 };
 
 /**
@@ -118,6 +124,7 @@ const createJobWithPVC = async (
  * @returns The created Job resource
  */
 export const createSelfValidationCheckup = async ({
+  acceptWindowsEula,
   checkupImage,
   cluster,
   isDryRun,
@@ -128,8 +135,11 @@ export const createSelfValidationCheckup = async ({
   storageCapabilities,
   storageClass,
   testSkips,
+  winImageDownloadUrl,
+  winImageName,
 }: CreateSelfValidationCheckupOptions): Promise<IoK8sApiBatchV1Job> => {
   const jobData = selfValidationJob({
+    acceptWindowsEula,
     checkupImage,
     isDryRun,
     name,
@@ -138,21 +148,26 @@ export const createSelfValidationCheckup = async ({
     storageCapabilities,
     storageClass,
     testSkips,
+    winImageDownloadUrl,
+    winImageName,
   });
 
   await kubevirtK8sCreate({
     cluster,
-    data: selfValidationConfigMap(
-      namespace,
-      name,
+    data: selfValidationConfigMap({
+      acceptWindowsEula,
       checkupImage,
-      selectedTestSuites,
       isDryRun,
+      name,
+      namespace,
       pvcSize,
+      selectedTestSuites,
+      storageCapabilities,
       storageClass,
       testSkips,
-      storageCapabilities,
-    ),
+      winImageDownloadUrl,
+      winImageName,
+    }),
     model: ConfigMapModel,
   });
 
@@ -218,12 +233,19 @@ export const rerunSelfValidationCheckup = async (
   }
 
   const isDryRun = configMap?.data?.[SELF_VALIDATION_DRY_RUN_KEY] === 'true';
+  const acceptWindowsEula = configMap?.data?.[SELF_VALIDATION_ACCEPT_WINDOWS_EULA_KEY] === 'true';
   const imageFromConfigMap = configMap?.data?.[SELF_VALIDATION_CHECKUP_IMAGE_KEY];
   const storageClass = configMap?.data?.[SELF_VALIDATION_STORAGE_CLASS_KEY];
   const testSkips = configMap?.data?.[SELF_VALIDATION_TEST_SKIPS_KEY];
   const pvcSize = configMap?.data?.[SELF_VALIDATION_PVC_SIZE_KEY];
   const storageCapabilities =
     configMap?.data?.[SELF_VALIDATION_STORAGE_CAPABILITIES_KEY]?.split(',');
+  const winImageDownloadUrl = acceptWindowsEula
+    ? configMap?.data?.[SELF_VALIDATION_WIN_IMAGE_DOWNLOAD_URL_KEY]
+    : undefined;
+  const winImageName = acceptWindowsEula
+    ? configMap?.data?.[SELF_VALIDATION_WIN_IMAGE_NAME_KEY]
+    : undefined;
 
   if (!imageFromConfigMap) {
     throw new Error('Cannot rerun checkup: no checkup image configured in ConfigMap');
@@ -278,6 +300,7 @@ export const rerunSelfValidationCheckup = async (
 
   // Create new Job and PVC
   const jobData = selfValidationJob({
+    acceptWindowsEula,
     checkupImage: imageFromConfigMap,
     isDryRun,
     name,
@@ -286,6 +309,8 @@ export const rerunSelfValidationCheckup = async (
     storageCapabilities,
     storageClass,
     testSkips,
+    winImageDownloadUrl,
+    winImageName,
   });
 
   return createJobWithPVC(jobData, cluster, namespace, pvcSize, storageClass);

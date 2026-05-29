@@ -8,39 +8,34 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { getSelfValidationCheckupURL } from '@kubevirt-utils/resources/checkups/urls';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
-import { ActionGroup, Button, ButtonVariant, Tooltip } from '@patternfly/react-core';
+import { ActionGroup, Button, ButtonVariant } from '@patternfly/react-core';
 
 import { createSelfValidationCheckup } from '../../utils';
 import {
   getActionState,
   SELF_VALIDATION_ACTION_MODE,
 } from '../actions/CheckupsSelfValidationActionsUtils';
-import RunningCheckupWarningDescription from '../actions/RunningCheckupWarningDescription';
 import { useAllRunningSelfValidationJobs } from '../hooks/useAllRunningSelfValidationJobs';
 import useCheckupsSelfValidationPermissions from '../hooks/useCheckupsSelfValidationPermissions';
 
 import HeavyLoadCheckupConfirmationModal from './HeavyLoadCheckupConfirmationModal';
-
-type CheckupsSelfValidationFormActionsProps = {
-  checkupImage: string;
-  isDryRun: boolean;
-  name: string;
-  pvcSize: string;
-  selectedTestSuites: string[];
-  storageCapabilities?: string[];
-  storageClass?: string;
-  testSkips?: string;
-};
+import RunButtonWithTooltip from './RunButtonWithTooltip';
+import { CheckupsSelfValidationFormActionsProps } from './types';
+import { resolveWinImageName } from './utils';
 
 const CheckupsSelfValidationFormActions: FC<CheckupsSelfValidationFormActionsProps> = ({
+  acceptWindowsEula,
   checkupImage,
   isDryRun,
+  isEulaConfirmed,
   name,
   pvcSize,
   selectedTestSuites,
   storageCapabilities,
   storageClass,
   testSkips,
+  winImageDownloadUrl,
+  winImageName,
 }) => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
@@ -71,20 +66,30 @@ const CheckupsSelfValidationFormActions: FC<CheckupsSelfValidationFormActionsPro
     [selfValidationActionState],
   );
 
+  const resolvedWinImageName = resolveWinImageName(winImageName);
+
+  const eulaPendingConfirmation = acceptWindowsEula && !isEulaConfirmed;
   const isFormValid = name && checkupImage && selectedTestSuites.length > 0;
   const isSubmitDisabled =
-    isSubmitting || !isFormValid || hasRunningCheckup || !selfValidationActionState?.isEnabled;
+    isSubmitting ||
+    !isFormValid ||
+    hasRunningCheckup ||
+    !selfValidationActionState?.isEnabled ||
+    eulaPendingConfirmation;
 
-  const showTooltip =
+  const showRunningCheckupTooltip =
     hasRunningCheckup &&
     selfValidationActionState?.showWarning &&
     selfValidationActionState?.configMapInfo;
+
+  const showTooltip = eulaPendingConfirmation || showRunningCheckupTooltip;
 
   const executeRun = async () => {
     setError(null);
     setIsSubmitting(true);
     try {
       await createSelfValidationCheckup({
+        acceptWindowsEula,
         checkupImage,
         cluster,
         isDryRun,
@@ -95,6 +100,8 @@ const CheckupsSelfValidationFormActions: FC<CheckupsSelfValidationFormActionsPro
         storageCapabilities,
         storageClass,
         testSkips,
+        ...(acceptWindowsEula && winImageDownloadUrl && { winImageDownloadUrl }),
+        ...(acceptWindowsEula && resolvedWinImageName && { winImageName: resolvedWinImageName }),
       });
       navigate(getSelfValidationCheckupURL(name, namespace, cluster));
     } catch (e) {
@@ -118,36 +125,19 @@ const CheckupsSelfValidationFormActions: FC<CheckupsSelfValidationFormActionsPro
     ));
   };
 
-  const runButton = (
-    <Button
-      isDisabled={isSubmitDisabled}
-      isLoading={isSubmitting}
-      onClick={handleOpenConfirmation}
-      variant={ButtonVariant.primary}
-    >
-      {t('Run')}
-    </Button>
-  );
-
   return (
     <>
       {error && <ErrorAlert error={{ message: error }} />}
       <ActionGroup>
-        {showTooltip && selfValidationActionState?.configMapInfo ? (
-          <Tooltip
-            content={
-              <RunningCheckupWarningDescription
-                configMapCluster={selfValidationActionState.configMapInfo.cluster}
-                configMapName={selfValidationActionState.configMapInfo.name}
-                configMapNamespace={selfValidationActionState.configMapInfo.namespace}
-              />
-            }
-          >
-            <span>{runButton}</span>
-          </Tooltip>
-        ) : (
-          runButton
-        )}
+        <RunButtonWithTooltip
+          configMapInfo={selfValidationActionState?.configMapInfo}
+          eulaPendingConfirmation={eulaPendingConfirmation}
+          isSubmitDisabled={isSubmitDisabled}
+          isSubmitting={isSubmitting}
+          onClick={handleOpenConfirmation}
+          showRunningCheckupTooltip={Boolean(showRunningCheckupTooltip)}
+          showTooltip={Boolean(showTooltip)}
+        />
         <Button onClick={() => navigate(-1)} variant={ButtonVariant.secondary}>
           {t('Cancel')}
         </Button>

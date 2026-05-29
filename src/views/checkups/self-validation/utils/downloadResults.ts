@@ -14,6 +14,7 @@ import { kubevirtK8sGet, kubevirtK8sPatch } from '@multicluster/k8sRequests';
 import { CONFIGMAP_NAME, extractConfigMapBaseName } from '../../utils/utils';
 
 import {
+  getAcceptWindowsEulaFromJob,
   getCheckupImageFromJob,
   getDryRunFromJob,
   getPVCNameFromJob,
@@ -22,6 +23,8 @@ import {
   getTestSkipsFromJob,
   getTestSuitesFromJob,
   getTimestampFromJob,
+  getWinImageDownloadUrlFromJob,
+  getWinImageNameFromJob,
 } from './selfValidationJob/jobExtraction';
 import { createResultsResourcesJob } from './selfValidationJob/resultsResources';
 import {
@@ -359,9 +362,12 @@ const validateJobParametersForResults = (
   }
 
   const isDryRun = getDryRunFromJob(job);
+  const acceptWindowsEula = getAcceptWindowsEulaFromJob(job);
   const storageClass = getStorageClassFromJob(job);
   const testSkips = getTestSkipsFromJob(job);
   const storageCapabilities = getStorageCapabilitiesFromJob(job);
+  const winImageDownloadUrl = getWinImageDownloadUrlFromJob(job);
+  const winImageName = getWinImageNameFromJob(job);
 
   // Extract PVC name from original job (to reuse it)
   const pvcName = getPVCNameFromJob(job);
@@ -394,6 +400,7 @@ const validateJobParametersForResults = (
   const baseName = extractConfigMapBaseName(resultsConfigMapName);
 
   return {
+    acceptWindowsEula,
     baseName,
     checkupImage,
     cluster,
@@ -408,6 +415,8 @@ const validateJobParametersForResults = (
     testSkips,
     testSuites,
     timestamp,
+    winImageDownloadUrl,
+    winImageName,
   };
 };
 

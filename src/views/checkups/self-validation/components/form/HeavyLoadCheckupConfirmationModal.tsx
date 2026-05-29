@@ -3,11 +3,7 @@ import React, { FC } from 'react';
 import AckConfirmationModal from '@kubevirt-utils/components/AckConfirmationModal/AckConfirmationModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
-type HeavyLoadCheckupConfirmationModalProps = {
-  isOpen: boolean;
-  onClose: () => void;
-  onConfirm: () => void;
-};
+import { HeavyLoadCheckupConfirmationModalProps } from './types';
 
 const HeavyLoadCheckupConfirmationModal: FC<HeavyLoadCheckupConfirmationModalProps> = ({
   isOpen,

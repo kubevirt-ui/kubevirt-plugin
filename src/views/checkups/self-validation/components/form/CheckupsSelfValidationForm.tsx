@@ -22,6 +22,7 @@ import {
   Grid,
   GridItem,
   SelectProps,
+  Stack,
   TextInput,
 } from '@patternfly/react-core';
 
@@ -36,6 +37,7 @@ import { calculatePVCStorageSize } from '../../utils/selfValidationJob/resourceT
 import AdvancedSettings from './AdvancedSettings';
 import CheckupsSelfValidationFormActions from './CheckupsSelfValidationFormActions';
 import useStorageProfileCapabilitiesSync from './useStorageProfileCapabilitiesSync';
+import useWindowsValidationFormState from './useWindowsValidationFormState';
 import {
   addStorageCapability,
   addTestSuite,
@@ -43,6 +45,7 @@ import {
   removeStorageCapability,
   removeTestSuite,
 } from './utils';
+import WindowsValidationSettings from './WindowsValidationSettings';
 
 import './checkups-self-validation-form.scss';
 
@@ -57,6 +60,8 @@ const CheckupsSelfValidationForm = () => {
   const [storageClass, setStorageClass] = useState<string>('');
   const [testSkips, setTestSkips] = useState<string>('');
   const [storageCapabilities, setStorageCapabilities] = useState<string[]>([]);
+
+  const windowsState = useWindowsValidationFormState(selectedTestSuites, cluster);
 
   const defaultPvcSize = useMemo(
     () => calculatePVCStorageSize(selectedTestSuites),
@@ -166,6 +171,22 @@ const CheckupsSelfValidationForm = () => {
                   toggleTitle={testSuitesToggleTitle}
                 />
               </FormGroup>
+              <Stack hasGutter>
+                <WindowsValidationSettings
+                  acceptWindowsEula={windowsState.acceptWindowsEula}
+                  dataSourceOptions={windowsState.dataSourceOptions}
+                  dataSourcesError={windowsState.dataSourcesError}
+                  dataSourcesLoaded={windowsState.dataSourcesLoaded}
+                  isEulaConfirmed={windowsState.isEulaConfirmed}
+                  isTier2Selected={windowsState.isTier2Selected}
+                  setAcceptWindowsEula={windowsState.handleAcceptWindowsEulaChange}
+                  setIsEulaConfirmed={windowsState.setIsEulaConfirmed}
+                  setWinImageDownloadUrl={windowsState.setWinImageDownloadUrl}
+                  setWinImageName={windowsState.setWinImageName}
+                  winImageDownloadUrl={windowsState.winImageDownloadUrl}
+                  winImageName={windowsState.winImageName}
+                />
+              </Stack>
               <AdvancedSettings
                 effectiveStorageClassName={effectiveStorageClass}
                 handleStorageCapabilitySelect={handleStorageCapabilitySelect}
@@ -185,14 +206,18 @@ const CheckupsSelfValidationForm = () => {
               />
 
               <CheckupsSelfValidationFormActions
+                acceptWindowsEula={windowsState.acceptWindowsEula}
                 checkupImage={checkupImage}
                 isDryRun={isDryRun}
+                isEulaConfirmed={windowsState.isEulaConfirmed}
                 name={name}
                 pvcSize={pvcSize}
                 selectedTestSuites={selectedTestSuites}
                 storageCapabilities={storageCapabilities}
                 storageClass={effectiveStorageClass}
                 testSkips={testSkips}
+                winImageDownloadUrl={windowsState.winImageDownloadUrl}
+                winImageName={windowsState.winImageName}
               />
             </FormSection>
           </Form>
