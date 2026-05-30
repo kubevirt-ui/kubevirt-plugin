@@ -364,6 +364,18 @@ import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 <ExternalLink href={documentationURL.SOME_DOC} text={t('Learn more')} />
 ```
 
+#### useKubevirtToast
+- Use `useKubevirtToast` for all toast notifications — never import `useToast` from the SDK directly
+- Provides variant helpers (`addSuccessToast`, `addDangerToast`, `addInfoToast`, `addWarningToast`) with sensible defaults
+- See `.cursor/rules/toast-notifications.mdc` for full API and examples
+
+```typescript
+import useKubevirtToast from '@kubevirt-utils/hooks/useKubevirtToast';
+
+const { addSuccessToast } = useKubevirtToast();
+addSuccessToast({ title: t('VM created successfully') });
+```
+
 ---
 
 ## 13. PatternFly Token Verification
