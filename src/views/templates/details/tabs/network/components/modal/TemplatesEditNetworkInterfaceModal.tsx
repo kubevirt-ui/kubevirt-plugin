@@ -1,6 +1,5 @@
 import React, { FC } from 'react';
 
-import { TemplateModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import NetworkInterfaceModal from '@kubevirt-utils/components/NetworkInterfaceModal/NetworkInterfaceModal';
 import {
   createInterface,
@@ -9,7 +8,11 @@ import {
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
-import { getTemplateVirtualMachineObject, Template } from '@kubevirt-utils/resources/template';
+import {
+  getTemplateModel,
+  getTemplateVirtualMachineObject,
+  Template,
+} from '@kubevirt-utils/resources/template';
 import { NetworkPresentation } from '@kubevirt-utils/resources/vm/utils/network/constants';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sUpdate } from '@multicluster/k8sRequests';
@@ -72,7 +75,7 @@ const TemplatesEditNetworkInterfaceModal: FC<TemplatesEditNetworkInterfaceModalP
       return kubevirtK8sUpdate({
         cluster: getCluster(template),
         data: updatedTemplate,
-        model: TemplateModel,
+        model: getTemplateModel(template),
         name: getName(updatedTemplate),
         ns: getNamespace(updatedTemplate),
       });

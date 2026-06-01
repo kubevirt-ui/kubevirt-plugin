@@ -1,7 +1,7 @@
 import React, { FC, useMemo } from 'react';
 import produce from 'immer';
 
-import { SecretModel, TemplateModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { SecretModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { IoK8sApiCoreV1Secret } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import LinuxLabel from '@kubevirt-utils/components/Labels/LinuxLabel';
@@ -17,6 +17,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { createSSHSecret, getInitialSSHDetails } from '@kubevirt-utils/resources/secret/utils';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import {
+  getTemplateModel,
   getTemplateVirtualMachineObject,
   isOpenShiftTemplate,
   Template,
@@ -98,7 +99,7 @@ const SSHKey: FC<SSHKeyProps> = ({ template }) => {
     return kubevirtK8sUpdate({
       cluster: getCluster(newTemplate),
       data: newTemplate,
-      model: TemplateModel,
+      model: getTemplateModel(newTemplate),
       name: getName(newTemplate),
       ns: getNamespace(newTemplate),
     });
