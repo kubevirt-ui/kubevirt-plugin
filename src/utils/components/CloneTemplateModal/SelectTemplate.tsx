@@ -9,6 +9,7 @@ import useTemplateOptions from './hooks/useTemplateOptions';
 import { getTemplateOptionKey } from './utils';
 
 type SelectTemplateProps = {
+  dataTestId?: string;
   isDisabled?: boolean;
   namespace?: string;
   onTemplateSelect: (template: Template) => void;
@@ -16,6 +17,7 @@ type SelectTemplateProps = {
 };
 
 const SelectTemplate: FC<SelectTemplateProps> = ({
+  dataTestId,
   isDisabled,
   namespace,
   onTemplateSelect,
@@ -34,7 +36,7 @@ const SelectTemplate: FC<SelectTemplateProps> = ({
       searchPlaceholder={t('Search templates')}
       selected={getTemplateOptionKey(selectedTemplate)}
       showSearch={hasOptions}
-      toggleProps={{ isDisabled, isFullWidth: true }}
+      toggleProps={{ 'data-test-id': dataTestId, isDisabled, isFullWidth: true }}
     />
   );
 };

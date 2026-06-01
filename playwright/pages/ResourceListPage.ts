@@ -1,8 +1,8 @@
 import { expect, Page } from '@playwright/test';
 
 import {
+  ACTIONS_DROPDOWN,
   ITEM_CREATE,
-  KEBAB_BUTTON,
   NAV_TIMEOUT,
   SAVE_CHANGES,
   SECOND,
@@ -54,6 +54,7 @@ export class ResourceListPage {
    * editor. This method handles both cases.
    */
   async createFromYAML() {
+    await this.waitForListLoaded();
     await this.clickCreate();
     const withYAML = this.page.getByRole('menuitem', { name: 'With YAML' });
     if (await withYAML.isVisible({ timeout: 3 * SECOND }).catch(() => false)) {
@@ -111,9 +112,27 @@ export class ResourceListPage {
     });
   }
 
+  /**
+   * Open the kebab / actions menu for a row identified by visible text.
+   */
+  async openRowMenu(rowText: string) {
+    const row = this.row(rowText);
+    await row
+      .locator(`[data-test="${ACTIONS_DROPDOWN}"]`)
+      .getByRole('button')
+      .or(row.getByRole('button', { name: 'Actions' }))
+      .first()
+      .click();
+  }
+
   /** Click a tab by its visible name. */
   async openTab(name: string) {
     await this.page.getByRole('tab', { name }).click();
+  }
+
+  /** Locate a table row by visible text content. */
+  row(rowText: string) {
+    return this.page.getByRole('row').filter({ hasText: rowText });
   }
 
   /** Save the YAML editor form. */
@@ -140,6 +159,21 @@ export class ResourceListPage {
       .nth(1)
       .waitFor({ state: 'visible', timeout: NAV_TIMEOUT })
       .catch(() => {});
+  }
+
+  /**
+   * Wait until the list page finishes loading — either data rows appear
+   * or the empty state renders. This prevents clicking a Create button
+   * that is about to remount in a different location.
+   */
+  async waitForListLoaded() {
+    const dataRow = this.page.getByRole('row').nth(1);
+    const emptyState = this.page.locator('.pf-v6-c-empty-state');
+
+    await Promise.any([
+      dataRow.waitFor({ state: 'visible', timeout: NAV_TIMEOUT }),
+      emptyState.waitFor({ state: 'visible', timeout: NAV_TIMEOUT }),
+    ]);
   }
 }
 
@@ -198,21 +232,6 @@ export class StorageClassesPage extends ResourceListPage {
   async navigate() {
     await super.navigate(urls.storageClasses());
     await this.waitForFirstDataRow();
-  }
-
-  async openRowMenu(scName: string) {
-    const row = this.row(scName);
-    // Console renders the kebab as data-test, data-test-id, or a plain "Actions" button
-    // depending on the console version and resource type — handle all three.
-    await row
-      .locator(`[data-test="${KEBAB_BUTTON}"], [data-test-id="${KEBAB_BUTTON}"]`)
-      .or(row.getByRole('button', { name: 'Actions' }))
-      .first()
-      .click();
-  }
-
-  row(scName: string) {
-    return this.page.getByRole('row').filter({ hasText: scName });
   }
 
   /**
