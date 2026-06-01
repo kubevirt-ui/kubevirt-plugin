@@ -1,20 +1,20 @@
 import React, { FC } from 'react';
+import produce from 'immer';
 import { getWorkloadProfile } from 'src/views/templates/utils/selectors';
 
-import { TemplateModel, VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import WorkloadProfileModal from '@kubevirt-utils/components/WorkloadProfileModal/WorkloadProfileModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
+  getTemplateVirtualMachineObject,
   getTemplateWorkload,
-  isOpenShiftTemplate,
   TEMPLATE_WORKLOAD_LABEL,
+  updateTemplate,
   WORKLOADS,
 } from '@kubevirt-utils/resources/template';
-import { getWorkload } from '@kubevirt-utils/resources/vm';
-import { getCluster } from '@multicluster/helpers/selectors';
-import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
+import { VM_WORKLOAD_ANNOTATION } from '@kubevirt-utils/resources/vm/utils';
+import { ensurePath } from '@kubevirt-utils/utils/utils';
 
 import { TemplateDetailsGridProps } from '../TemplateDetailsPage';
 
@@ -24,35 +24,19 @@ const WorkloadProfile: FC<TemplateDetailsGridProps> = ({ editable, template }) =
   const workload = getWorkloadProfile(template);
 
   const updateWorkload = (updatedWorkload: WORKLOADS) => {
-    if (!isOpenShiftTemplate(template)) return;
+    const updatedTemplate = produce(template, (draftTemplate) => {
+      const draftVM = getTemplateVirtualMachineObject(draftTemplate);
+      ensurePath(draftVM, ['spec.template.metadata.annotations']);
+      draftVM.spec.template.metadata.annotations[VM_WORKLOAD_ANNOTATION] = updatedWorkload;
 
-    const vmObjectIndex = template?.objects.findIndex(
-      (obj) => obj.kind === VirtualMachineModel.kind,
-    );
-    const hasWorkload = getWorkload(template?.objects?.[vmObjectIndex]);
-    const workloadPath = `/objects/${vmObjectIndex}/spec/template/metadata/annotations/vm.kubevirt.io~1workload`;
-
-    return kubevirtK8sPatch({
-      cluster: getCluster(template),
-      data: [
-        {
-          op: hasWorkload ? 'replace' : 'add',
-          path: workloadPath,
-          value: updatedWorkload,
-        },
-        {
-          op: 'remove',
-          path: `/metadata/labels/${TEMPLATE_WORKLOAD_LABEL}~1${getTemplateWorkload(template)}`,
-        },
-        {
-          op: 'add',
-          path: `/metadata/labels/${TEMPLATE_WORKLOAD_LABEL}~1${updatedWorkload}`,
-          value: 'true',
-        },
-      ],
-      model: TemplateModel,
-      resource: template,
+      const currentWorkload = getTemplateWorkload(template);
+      if (currentWorkload) {
+        delete draftTemplate.metadata.labels[`${TEMPLATE_WORKLOAD_LABEL}/${currentWorkload}`];
+      }
+      draftTemplate.metadata.labels[`${TEMPLATE_WORKLOAD_LABEL}/${updatedWorkload}`] = 'true';
     });
+
+    return updateTemplate(updatedTemplate);
   };
 
   const onEditClick = () =>

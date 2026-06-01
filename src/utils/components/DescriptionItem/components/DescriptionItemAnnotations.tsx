@@ -7,7 +7,9 @@ import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getAnnotations } from '@kubevirt-utils/resources/shared';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
-import { K8sModel, k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
+import { getCluster } from '@multicluster/helpers/selectors';
+import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
+import { K8sModel } from '@openshift-console/dynamic-plugin-sdk';
 
 type DescriptionItemAnnotationsProps = {
   className?: string;
@@ -36,7 +38,8 @@ const DescriptionItemAnnotations: FC<DescriptionItemAnnotationsProps> = ({
   });
 
   const onAnnotationsSubmitInternal = (updatedAnnotations: { [key: string]: string }) =>
-    k8sPatch({
+    kubevirtK8sPatch({
+      cluster: getCluster(resource),
       data: [
         {
           op: 'replace',

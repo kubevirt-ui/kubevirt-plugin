@@ -1,7 +1,7 @@
-import { TemplateModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { getNamespace } from '@kubevirt-utils/resources/shared';
 import {
+  getTemplateModel,
   isOpenShiftTemplate,
-  isVirtualMachineTemplate,
   Template,
 } from '@kubevirt-utils/resources/template';
 import { getCluster } from '@multicluster/helpers/selectors';
@@ -26,32 +26,25 @@ const useEditTemplateAccessReview = (
   isTemplateEditable: boolean;
 } => {
   const isCommonTemplate = isOpenShiftTemplate(template) && isCommonVMTemplate(template);
-  const [canUpdateTemplate, canUpdateLoading] = useFleetAccessReview({
+  const model = getTemplateModel(template);
+  const accessReviewOptions = {
     cluster: getCluster(template),
-    group: TemplateModel.apiGroup,
-    namespace: template?.metadata?.namespace,
-    resource: TemplateModel.plural,
+    group: model.apiGroup,
+    namespace: getNamespace(template),
+    resource: model.plural,
+  };
+
+  const [canUpdateTemplate, canUpdateLoading] = useFleetAccessReview({
+    ...accessReviewOptions,
     verb: 'update',
   });
 
   const [canPatchTemplate, canPatchLoading] = useFleetAccessReview({
-    cluster: getCluster(template),
-    group: TemplateModel.apiGroup,
-    namespace: template?.metadata?.namespace,
-    resource: TemplateModel.plural,
+    ...accessReviewOptions,
     verb: 'patch',
   });
 
   const hasEditPermission = canUpdateTemplate && canPatchTemplate;
-
-  // VMT editing not yet supported — always read-only
-  if (isVirtualMachineTemplate(template))
-    return {
-      hasEditPermission: false,
-      isCommonTemplate: false,
-      isLoading: false,
-      isTemplateEditable: false,
-    };
 
   if (!template || canUpdateLoading || canPatchLoading)
     return {

@@ -24,6 +24,7 @@ import { vmBootDiskSourceIsRegistry } from '@kubevirt-utils/resources/vm/utils/s
 import { generatePrettyName } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sCreate, kubevirtK8sUpdate } from '@multicluster/k8sRequests';
+import { K8sModel } from '@openshift-console/dynamic-plugin-sdk';
 
 import { ANNOTATIONS } from './annotations';
 import {
@@ -162,8 +163,11 @@ export const isValidTemplateIconUrl = (url: string): boolean => {
   return false;
 };
 
+export const getTemplateModel = (template: Template): K8sModel =>
+  isVirtualMachineTemplate(template) ? VirtualMachineTemplateModel : TemplateModel;
+
 export const updateTemplate = async (template: Template) => {
-  const model = isVirtualMachineTemplate(template) ? VirtualMachineTemplateModel : TemplateModel;
+  const model = getTemplateModel(template);
   const result = await kubevirtK8sUpdate({
     cluster: getCluster(template),
     data: template,

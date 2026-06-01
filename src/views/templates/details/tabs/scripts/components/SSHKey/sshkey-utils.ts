@@ -2,19 +2,23 @@ import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { addSecretToVM } from '@kubevirt-utils/components/SSHSecretModal/utils/utils';
 import {
   getTemplateVirtualMachineObject,
-  isOpenShiftTemplate,
+  isVirtualMachineTemplate,
   Template,
 } from '@kubevirt-utils/resources/template';
 import { getAccessCredentials } from '@kubevirt-utils/resources/vm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 
 export const updateAccessCredential = (template: Template, secretName: string) => {
-  if (!isOpenShiftTemplate(template)) return;
-
   const vm = getTemplateVirtualMachineObject(template);
+  const updatedVM = addSecretToVM(vm, secretName);
+
+  if (isVirtualMachineTemplate(template)) {
+    template.spec.virtualMachine = updatedVM;
+    return;
+  }
 
   template.objects = (template?.objects || []).map((object) =>
-    object.kind !== VirtualMachineModel.kind ? object : addSecretToVM(vm, secretName),
+    object.kind !== VirtualMachineModel.kind ? object : updatedVM,
   );
 };
 
