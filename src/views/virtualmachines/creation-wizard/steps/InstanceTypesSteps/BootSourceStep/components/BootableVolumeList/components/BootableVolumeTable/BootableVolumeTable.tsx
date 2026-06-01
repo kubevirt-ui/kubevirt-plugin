@@ -5,7 +5,6 @@ import {
   V1beta1VirtualMachineClusterPreference,
   V1beta1VirtualMachinePreference,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { UserSettingFavorites } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/types';
 import {
   getBootableVolumePVCSource,
   getDataImportCronFromDataSource,
@@ -20,13 +19,11 @@ import { ThSortType } from '@patternfly/react-table/dist/esm/components/Table/ba
 import { InstanceTypeVMStore } from '@virtualmachines/creation-wizard/state/instance-type-vm-store/utils/types';
 import { UseBootableVolumesValues } from '@virtualmachines/creation-wizard/utils/types';
 
-import { FAVORITES_COLUMN_ID } from '../../utils/constants';
 import BootableVolumeRow from '../BootableVolumeRow/BootableVolumeRow';
 
 type BootableVolumeTableProps = {
   activeColumns: TableColumn<BootableVolume>[];
   bootableVolumesData: UseBootableVolumesValues;
-  favorites: UserSettingFavorites;
   getSortType: (columnIndex: number) => ThSortType;
   preferencesMap: ResourceMap<V1beta1VirtualMachineClusterPreference>;
   selectedBootableVolumeState?: [BootableVolume, InstanceTypeVMStore['onSelectCreatedVolume']];
@@ -37,14 +34,12 @@ type BootableVolumeTableProps = {
 const BootableVolumeTable: FC<BootableVolumeTableProps> = ({
   activeColumns,
   bootableVolumesData,
-  favorites,
   getSortType,
   preferencesMap,
   selectedBootableVolumeState,
   sortedPaginatedData,
   userPreferencesMap,
 }) => {
-  const [volumeFavorites, updateFavorites] = favorites;
   const { dataImportCrons, dvSources, pvcSources, volumeSnapshotSources } = bootableVolumesData;
 
   return (
@@ -52,15 +47,7 @@ const BootableVolumeTable: FC<BootableVolumeTableProps> = ({
       <Thead>
         <Tr>
           {activeColumns.map((col, columnIndex) => (
-            <Th
-              sort={
-                col.id === FAVORITES_COLUMN_ID
-                  ? { ...getSortType(columnIndex), isFavorites: true }
-                  : getSortType(columnIndex)
-              }
-              id={col?.id}
-              key={col?.id}
-            >
+            <Th id={col?.id} key={col?.id} sort={getSortType(columnIndex)}>
               {col?.title}
             </Th>
           ))}
@@ -80,15 +67,6 @@ const BootableVolumeTable: FC<BootableVolumeTableProps> = ({
                   bootSource as V1beta1DataSource,
                 ),
                 dvSource: getDataVolumeForPVC(pvcSource, dvSources),
-                favorites: [
-                  volumeFavorites?.includes(bootSourceName),
-                  (addTofavorites: boolean) =>
-                    updateFavorites(
-                      addTofavorites
-                        ? [...volumeFavorites, bootSourceName]
-                        : volumeFavorites.filter((fav: string) => fav !== bootSourceName),
-                    ),
-                ],
                 preference: getPreference(bootSource, preferencesMap, userPreferencesMap),
                 pvcSource,
                 volumeSnapshotSource: volumeSnapshotSources?.[bootSourceName],
