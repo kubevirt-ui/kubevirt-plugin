@@ -1,4 +1,4 @@
-import React, { FC, MouseEvent } from 'react';
+import React, { FC } from 'react';
 
 import {
   V1beta1DataImportCron,
@@ -53,7 +53,6 @@ type BootableVolumeRowProps = {
     bootableVolumeSelectedState: [BootableVolume, InstanceTypeVMStore['onSelectCreatedVolume']];
     dataImportCron: V1beta1DataImportCron;
     dvSource: V1beta1DataVolume;
-    favorites: [isFavorite: boolean, updaterFavorites: (val: boolean) => void];
     preference: VirtualMachinePreference;
     pvcSource: IoK8sApiCoreV1PersistentVolumeClaim;
     volumeSnapshotSource: VolumeSnapshotKind;
@@ -67,7 +66,6 @@ const BootableVolumeRow: FC<BootableVolumeRowProps> = ({
     bootableVolumeSelectedState: [selectedBootableVolume, setSelectedBootableVolume],
     dataImportCron,
     dvSource,
-    favorites,
     preference,
     pvcSource,
     volumeSnapshotSource,
@@ -79,8 +77,6 @@ const BootableVolumeRow: FC<BootableVolumeRowProps> = ({
   const bootVolumeNamespace = getNamespace(bootableVolume);
   const sizeData = getHumanizedSize(getDiskSize(dvSource, pvcSource, volumeSnapshotSource)).string;
   const icon = getVolumeNameOSIcon(bootVolumeName) || getTemplateOSIcon(preference);
-
-  const [isFavorite, addOrRemoveFavorite] = favorites;
 
   const handleOnClick = () => {
     setSelectedBootableVolume(bootableVolume, pvcSource, volumeSnapshotSource, dvSource);
@@ -103,18 +99,6 @@ const BootableVolumeRow: FC<BootableVolumeRowProps> = ({
       isSelectable
       onClick={() => handleOnClick()}
     >
-      <TableData
-        favorites={{
-          isFavorited: isFavorite,
-          onFavorite: (e: MouseEvent, isFavoring: boolean) => {
-            e.stopPropagation();
-            addOrRemoveFavorite(isFavoring);
-          },
-        }}
-        activeColumnIDs={activeColumnIDs}
-        id="favorites"
-        modifier="fitContent"
-      />
       <TableData activeColumnIDs={activeColumnIDs} id="name" width={15}>
         <Flex alignItems={{ default: 'alignItemsCenter' }} columnGap={{ default: 'columnGapXs' }}>
           <img alt="os-icon" className="bootable-volume-row-icon" src={icon} />

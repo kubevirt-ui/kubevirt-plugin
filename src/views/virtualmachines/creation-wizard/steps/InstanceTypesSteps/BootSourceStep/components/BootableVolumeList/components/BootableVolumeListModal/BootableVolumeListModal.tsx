@@ -3,7 +3,6 @@ import React, { FC } from 'react';
 import { V1beta1VirtualMachinePreference } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { UserSettingFavorites } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/types';
 import useBootableVolumes from '@kubevirt-utils/resources/bootableresources/hooks/useBootableVolumes';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { ModalVariant } from '@patternfly/react-core';
@@ -17,7 +16,6 @@ import BootableVolumeList from '../../BootableVolumeList';
 
 type BootableVolumeListModalProps = {
   bootableVolumesData: UseBootableVolumesValues;
-  favorites: UserSettingFavorites;
   isOpen: boolean;
   onClose: () => void;
   onSelect: (selectedBootableVolume: BootableVolume) => void;

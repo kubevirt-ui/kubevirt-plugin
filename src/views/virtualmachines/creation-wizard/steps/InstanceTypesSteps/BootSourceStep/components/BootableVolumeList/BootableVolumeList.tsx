@@ -65,7 +65,6 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
     activeColumns,
     columnLayout,
     data,
-    favorites,
     filters,
     getSortType,
     isEmptyVolumes,
@@ -149,7 +148,6 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
               {displayShowAllButton && (
                 <ShowAllBootableVolumesButton
                   bootableVolumesData={bootableVolumesData}
-                  favorites={favorites}
                   onSelect={onModalBootableVolumeSelect}
                   preferencesData={instanceTypesAndPreferencesData}
                   userPreferencesData={userPreferencesData}
@@ -159,18 +157,15 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
           )}
         </Split>
         {displayVolumes && (
-          <>
-            <BootableVolumeTable
-              activeColumns={activeColumns}
-              bootableVolumesData={bootableVolumesData}
-              favorites={favorites}
-              getSortType={getSortType}
-              preferencesMap={preferencesMap}
-              selectedBootableVolumeState={[selectedBootableVolume, onSelectCreatedVolume]}
-              sortedPaginatedData={sortedPaginatedData}
-              userPreferencesMap={userPreferencesMap}
-            />
-          </>
+          <BootableVolumeTable
+            activeColumns={activeColumns}
+            bootableVolumesData={bootableVolumesData}
+            getSortType={getSortType}
+            preferencesMap={preferencesMap}
+            selectedBootableVolumeState={[selectedBootableVolume, onSelectCreatedVolume]}
+            sortedPaginatedData={sortedPaginatedData}
+            userPreferencesMap={userPreferencesMap}
+          />
         )}
         {isVolumesLoaded && isEmptyVolumes && <BootableVolumeEmptyState />}
         {isVolumesLoaded && isPreferenceFilterEmpty && (

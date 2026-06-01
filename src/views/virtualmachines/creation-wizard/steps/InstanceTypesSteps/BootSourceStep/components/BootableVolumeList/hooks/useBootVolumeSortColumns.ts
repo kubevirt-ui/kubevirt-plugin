@@ -29,7 +29,6 @@ import { getDiskSize } from '@virtualmachines/creation-wizard/utils/utils';
 
 type UseBootVolumeSortColumns = (
   unsortedData: BootableVolume[],
-  volumeFavorites: string[],
   clusterPreferencesMap: ResourceMap<V1beta1VirtualMachineClusterPreference>,
   userPreferencesMap: NamespacedResourceMap<V1beta1VirtualMachinePreference>,
   pvcSources: ClusterNamespacedResourceMap<IoK8sApiCoreV1PersistentVolumeClaim>,
@@ -47,7 +46,6 @@ type UseBootVolumeSortColumns = (
 
 const useBootVolumeSortColumns: UseBootVolumeSortColumns = (
   unsortedData = [],
-  volumeFavorites,
   clusterPreferencesMap,
   userPreferencesMap,
   pvcSources,
@@ -76,9 +74,8 @@ const useBootVolumeSortColumns: UseBootVolumeSortColumns = (
   };
 
   const sortVolumes = (a: BootableVolume, b: BootableVolume): number => {
-    //favorites is column 0, so we need to decrease index by 1
-    const aValue = getSortableRowValues(a)[activeSortIndex - 1];
-    const bValue = getSortableRowValues(b)[activeSortIndex - 1];
+    const aValue = getSortableRowValues(a)[activeSortIndex];
+    const bValue = getSortableRowValues(b)[activeSortIndex];
 
     if (activeSortDirection === 'asc') {
       return aValue?.localeCompare(bValue, undefined, { numeric: true, sensitivity: 'base' });
@@ -99,26 +96,7 @@ const useBootVolumeSortColumns: UseBootVolumeSortColumns = (
     },
   });
 
-  // will try to keep the same sorting for other fields such as name and only arrange the favorites to be first
-  const arrangeFavorites = (
-    acc: [favorites: BootableVolume[], notFavorites: BootableVolume[]],
-    volume: BootableVolume,
-  ): [BootableVolume[], BootableVolume[]] => {
-    if (activeSortIndex === 0) {
-      const isASC = activeSortDirection === 'asc';
-      if (volumeFavorites?.includes(volume?.metadata?.name)) {
-        acc[isASC ? 0 : 1].push(volume);
-      } else {
-        acc[isASC ? 1 : 0].push(volume);
-      }
-      return acc;
-    }
-    acc[0].push(volume);
-    return acc;
-  };
-
-  const sortedData = [...unsortedData].sort(sortVolumes).reduce(arrangeFavorites, [[], []]).flat();
-
+  const sortedData = [...unsortedData].sort(sortVolumes);
   const sortedPaginatedData = sortedData.slice(pagination.startIndex, pagination.endIndex);
 
   return { getSortType, sortedData, sortedPaginatedData };

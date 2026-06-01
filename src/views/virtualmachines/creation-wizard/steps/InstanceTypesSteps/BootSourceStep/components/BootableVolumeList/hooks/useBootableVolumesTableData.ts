@@ -5,8 +5,6 @@ import {
   V1beta1VirtualMachinePreference,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { ALL_PROJECTS } from '@kubevirt-utils/hooks/constants';
-import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
-import { UserSettingFavorites } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/types';
 import { PaginationState } from '@kubevirt-utils/hooks/usePagination/utils/types';
 import useBootableVolumes from '@kubevirt-utils/resources/bootableresources/hooks/useBootableVolumes';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
@@ -21,7 +19,6 @@ import {
 } from '@openshift-console/dynamic-plugin-sdk';
 import { ThSortType } from '@patternfly/react-table/dist/esm/components/Table/base/types';
 import useInstanceTypeVMStore from '@virtualmachines/creation-wizard/state/instance-type-vm-store/useInstanceTypeVMStore';
-import useVMWizardStore from '@virtualmachines/creation-wizard/state/vm-wizard-store/useVMWizardStore';
 import useBootVolumeColumns from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/BootSourceStep/components/BootableVolumeList/hooks/useBootVolumeColumns';
 import useBootVolumeFilters from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/BootSourceStep/components/BootableVolumeList/hooks/useBootVolumeFilters';
 import useBootVolumeSortColumns from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/BootSourceStep/components/BootableVolumeList/hooks/useBootVolumeSortColumns';
@@ -43,7 +40,6 @@ type UseBootableVolumesTableData = (
   activeColumns: TableColumn<BootableVolume>[];
   columnLayout: ColumnLayout;
   data: BootableVolume[];
-  favorites: UserSettingFavorites;
   filters: RowFilter<BootableVolume>[];
   getSortType: (columnIndex: number) => ThSortType;
   isEmptyVolumes: boolean;
@@ -65,7 +61,6 @@ const useBootableVolumesTableData: UseBootableVolumesTableData = (
   preferencesMap,
   userPreferencesMap,
 ) => {
-  const { cluster } = useVMWizardStore();
   const { preference } = useInstanceTypeVMStore();
   const bootableVolumesData = useBootableVolumes(volumeListNamespace);
   const { bootableVolumes, dvSources, pvcSources, volumeSnapshotSources } = bootableVolumesData;
@@ -77,10 +72,6 @@ const useBootableVolumesTableData: UseBootableVolumesTableData = (
 
   const isPreferenceFilterEmpty =
     !!preference && !isEmpty(bootableVolumes) && isEmpty(preferenceFilteredVolumes);
-
-  const favoritesData = useKubevirtUserSettings('favoriteBootableVolumes', cluster);
-  const [favorites = [], updaterFavorites] = favoritesData;
-  const volumeFavorites = favorites as [];
 
   const allFilters = useBootVolumeFilters(preferenceFilteredVolumes, !displayShowAllButton);
 
@@ -105,7 +96,6 @@ const useBootableVolumesTableData: UseBootableVolumesTableData = (
 
   const { getSortType, sortedData, sortedPaginatedData } = useBootVolumeSortColumns(
     data,
-    volumeFavorites,
     preferencesMap,
     userPreferencesMap,
     pvcSources,
@@ -124,7 +114,6 @@ const useBootableVolumesTableData: UseBootableVolumesTableData = (
     activeColumns,
     columnLayout,
     data,
-    favorites: [favorites as [], updaterFavorites],
     filters,
     getSortType,
     isEmptyVolumes: isEmpty(bootableVolumes),
