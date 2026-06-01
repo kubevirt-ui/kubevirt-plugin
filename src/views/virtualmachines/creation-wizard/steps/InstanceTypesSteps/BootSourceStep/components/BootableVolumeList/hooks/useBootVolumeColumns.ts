@@ -8,7 +8,6 @@ import { ColumnLayout } from '@openshift-console/dynamic-plugin-sdk-internal/lib
 
 import {
   DESCRIPTION_COLUMN_ID,
-  FAVORITES_COLUMN_ID,
   NAME_COLUMN_ID,
   NAMESPACE_COLUMN_ID,
   OPERATING_SYSTEM_COLUMN_ID,
@@ -27,10 +26,6 @@ const useBootVolumeColumns: UseBootVolumesColumns = (volumeListNamespace) => {
   const { t } = useKubevirtTranslation();
 
   const columns: TableColumn<BootableVolume>[] = [
-    {
-      id: FAVORITES_COLUMN_ID,
-      title: '',
-    },
     {
       id: NAME_COLUMN_ID,
       title: t('Volume name'),

@@ -58,7 +58,6 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
     activeColumns,
     columnLayout,
     data,
-    favorites,
     filters,
     getSortType,
     isEmptyVolumes,
@@ -128,7 +127,6 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
           <BootableVolumeTable
             activeColumns={activeColumns}
             bootableVolumesData={bootableVolumesData}
-            favorites={favorites}
             getSortType={getSortType}
             preferencesMap={preferencesMap}
             selectedBootableVolumeState={[selectedBootableVolume, onSelectCreatedVolume]}
