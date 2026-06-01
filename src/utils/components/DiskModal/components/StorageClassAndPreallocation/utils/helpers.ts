@@ -1,17 +1,18 @@
 import { modelToGroupVersionKind, StorageClassModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { IoK8sApiStorageV1StorageClass } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { EnhancedSelectOptionProps } from '@kubevirt-utils/components/FilterSelect/utils/types';
-import { DEFAULT_STORAGE_CLASS_ANNOTATION } from '@kubevirt-utils/hooks/useDefaultStorage/constants';
+import {
+  isDefaultStorageClass,
+  isVirtDefaultStorageClass,
+} from '@kubevirt-utils/hooks/useDefaultStorage/utils';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getAnnotation, getName } from '@kubevirt-utils/resources/shared';
 import { DESCRIPTION_ANNOTATION } from '@kubevirt-utils/resources/vm';
 
-const isDefaultStorageClass = (storageClass: IoK8sApiStorageV1StorageClass): boolean =>
-  storageClass?.metadata?.annotations?.[DEFAULT_STORAGE_CLASS_ANNOTATION] === 'true';
-
 export const getDefaultStorageClass = (
   storageClasses: IoK8sApiStorageV1StorageClass[],
-): IoK8sApiStorageV1StorageClass => storageClasses?.find(isDefaultStorageClass);
+): IoK8sApiStorageV1StorageClass =>
+  storageClasses?.find(isVirtDefaultStorageClass) || storageClasses?.find(isDefaultStorageClass);
 
 export const getSCSelectOptions = (
   storageClasses: IoK8sApiStorageV1StorageClass[],

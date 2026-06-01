@@ -4,6 +4,7 @@ import { Controller, useFormContext } from 'react-hook-form';
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import useDefaultStorageClass from '@kubevirt-utils/hooks/useDefaultStorage/useDefaultStorageClass';
+import { getPreferredDefaultStorageClass } from '@kubevirt-utils/hooks/useDefaultStorage/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useReadyStorageClasses from '@kubevirt-utils/hooks/useReadyStorageClasses/useReadyStorageClasses';
 import { StorageClassModel } from '@kubevirt-utils/models';
@@ -37,11 +38,14 @@ const StorageClassSelect: FC<StorageClassSelectProps> = ({ checkSC, setShowSCAle
     VM_CLUSTER_FIELD,
   ]);
 
-  const [{ clusterDefaultStorageClass }, defaultSCLoaded] = useDefaultStorageClass(vmCluster);
+  const [defaultStorageClasses, defaultSCLoaded] = useDefaultStorageClass(vmCluster);
   const [{ readyStorageClasses }, readySCLoaded] = useReadyStorageClasses(vmCluster);
 
   const loaded = defaultSCLoaded && readySCLoaded;
-  const defaultSC = useMemo(() => clusterDefaultStorageClass, [clusterDefaultStorageClass]);
+  const defaultSC = useMemo(
+    () => getPreferredDefaultStorageClass(defaultStorageClasses),
+    [defaultStorageClasses],
+  );
 
   const checkAndShowAlerts = useCallback(
     (selection: string) => !blankSource && setShowSCAlert(checkSC ? checkSC(selection) : false),
