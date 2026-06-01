@@ -1,9 +1,15 @@
 import {
   V1Bootloader,
   V1Devices,
+  V1VirtualMachineCondition,
   V1VirtualMachineInstance,
   V1VirtualMachineInstanceNetworkInterface,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import {
+  getStatusConditions as getResourceStatusConditions,
+  getStatusConditionsByType as getResourceStatusConditionsByType,
+} from '@kubevirt-utils/resources/shared';
+
 /**
  * A selector for the virtual machine instance's volumes
  * @param {V1VirtualMachineInstance} vmi the virtual machine instance
@@ -72,3 +78,24 @@ export const getVMIArchitecture = (vmi: V1VirtualMachineInstance): string =>
   vmi?.spec?.architecture;
 
 export const getVMIDisks = (vmi: V1VirtualMachineInstance) => vmi?.spec?.domain?.devices?.disks;
+
+/**
+ * A selector that returns the VMI's status conditions
+ * @param {V1VirtualMachineInstance} vmi the virtual machine instance
+ * @returns {V1VirtualMachineCondition[]} the VMI's status conditions
+ */
+export const getVMIStatusConditions = (
+  vmi: V1VirtualMachineInstance,
+): V1VirtualMachineCondition[] => getResourceStatusConditions<V1VirtualMachineCondition>(vmi);
+
+/**
+ * A selector that returns a VMI status condition by type
+ * @param {V1VirtualMachineInstance} vmi the virtual machine instance
+ * @param conditionType - type of the condition
+ * @returns the matching condition, if present
+ */
+export const getVMIStatusConditionByType = (
+  vmi: V1VirtualMachineInstance,
+  conditionType: string,
+): undefined | V1VirtualMachineCondition =>
+  getResourceStatusConditionsByType<V1VirtualMachineCondition>(vmi, conditionType);

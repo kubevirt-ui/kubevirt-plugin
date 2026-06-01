@@ -1,6 +1,6 @@
 # /review -- Full Team Review Command
 
-Run **all five review agents in parallel** on the current changes and present a unified summary.
+Run **all six review agents in parallel** on the current changes and present a unified summary.
 
 Agent types, i18n compliance rules, code standards, and severity levels are defined in `.cursor/rules/team-review.mdc` (the single source of truth). This command file only covers scope detection, launch orchestration, output format, and post-review actions.
 
@@ -21,26 +21,29 @@ Read all changed files so you can pass their content to the agents.
 
 ## 2. Agent Execution
 
-Launch **all five agents in parallel** using the Task tool. Use the agent types from `team-review.mdc` Section 2 (Developer, UX, QE, Security, KubeVirt Expert).
+Launch **all six agents in parallel** using the Task tool. Use the agent types from `team-review.mdc` Section 2 (Developer, UX, QE, Security, KubeVirt Expert, Selector Reviewer).
 
 Each agent receives:
 
 - The **full content** of every changed file
 - The **diff** showing what changed
 - The agent's **specific focus areas** (from its rule file in `.cursor/rules/agents/`)
-- Instruction to check **i18n compliance** and **code standards** per `team-review.mdc` Section 2
+- Instruction to check **i18n compliance** and **code standards** per `team-review.mdc` Section 2 (Developer agent); selector checks are handled by Task 6
 
 ### Launch Pattern
 
 ```text
-Use the Task tool five times in a single message:
+Use the Task tool six times in a single message:
 
 Task 1: subagent_type="developer", prompt includes developer focus + i18n + code standards
 Task 2: subagent_type="ux-reviewer", prompt includes UX focus
 Task 3: subagent_type="qe-agent", prompt includes QE focus
 Task 4: subagent_type="security-reviewer", prompt includes security focus
 Task 5: subagent_type="kubevirt-expert", prompt includes KubeVirt focus
+Task 6: subagent_type="generalPurpose", prompt includes selector-reviewer focus from `.cursor/rules/agents/selector-reviewer.mdc`
 ```
+
+For Task 6, read `.cursor/rules/agents/selector-reviewer.mdc` and apply its checklist to every changed file (excluding selector definition files and tests per the agent's exceptions).
 
 ---
 
@@ -73,6 +76,10 @@ After all agents complete, present a unified summary:
 [findings with severity icons]
 
 ### KubeVirt Expert
+
+[findings with severity icons]
+
+### Selector Usage
 
 [findings with severity icons]
 

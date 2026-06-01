@@ -18,7 +18,7 @@ When reviewing code or implementing features, automatically consider all team pe
 Do NOT wait for user confirmation to start - begin immediately upon receiving a ticket.
 
 ### /review Command
-Use *"/review"* to run **all five review agents in parallel** on the current changes. This follows the workflow defined in `.cursor/commands/review.md`. It detects changed files, launches all agents simultaneously, and returns a unified summary.
+Use *"/review"* to run **all six review agents in parallel** on the current changes. This follows the workflow defined in `.cursor/commands/review.md`. It detects changed files, launches all agents simultaneously, and returns a unified summary.
 
 ### Quick vs Deep Reviews
 - **Quick Review** (default): High-level feedback from all perspectives
@@ -106,6 +106,10 @@ Use *"/review"* to run **all five review agents in parallel** on the current cha
 ### 🔒 Security
 ✅ [Security looks good]
 
+### 🔍 Selector Usage
+🟡 [Direct property access instead of selector]
+✅ [Selectors used correctly]
+
 ### 🌐 i18n Compliance
 🔴 [Untranslated string / wrong TFunction type]
 ✅ [All strings properly translated]
@@ -128,6 +132,7 @@ For thorough analysis from a single perspective, invoke a specific agent:
 | *"as qe"* | QE Agent | Testing, edge cases, error scenarios |
 | *"as security"* | Security Agent | Vulnerabilities, input validation, auth |
 | *"as kubevirt expert"* | KubeVirt Expert | K8s patterns, VM lifecycle, API usage |
+| *"review:selectors"* | Selector Reviewer | Selector usage, field access patterns |
 
 ---
 
@@ -144,6 +149,8 @@ For thorough analysis from a single perspective, invoke a specific agent:
 - [ ] **UX**: Accessibility, states, consistency
 - [ ] **QE**: Edge cases, tests, async issues
 - [ ] **Security**: Input validation, auth, XSS
+- [ ] **KubeVirt**: K8s patterns, VM lifecycle, API usage
+- [ ] **Selectors**: Field access via selectors, no unnecessary inline property chains
 - [ ] **i18n**: All strings translated, `TFunction` from `i18next`, no concatenation
 - [ ] **Standards**: One component per file, filename matches, files under 150 lines
 

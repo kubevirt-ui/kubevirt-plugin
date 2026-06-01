@@ -8,7 +8,13 @@ import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt
 import { getK8sRowId } from '@kubevirt-utils/components/KubevirtTable/utils';
 import { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { ACTIONS } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/const';
-import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
+import {
+  getCreationTimestamp,
+  getName,
+  getNamespace,
+  getStatusPhase,
+} from '@kubevirt-utils/resources/shared';
+import { getVMINodeName, getVMIStatusConditions } from '@kubevirt-utils/resources/vmi';
 import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
 import { GlobeAmericasIcon } from '@patternfly/react-icons';
 
@@ -54,10 +60,10 @@ export const getVMIColumns = (
 
   columns.push(
     {
-      getValue: (row) => row?.status?.phase ?? '',
+      getValue: (row) => getStatusPhase(row) ?? '',
       key: VMI_COLUMN_KEYS.status,
       label: t('Status'),
-      renderCell: (row) => <VirtualMachinesInstancesStatus status={row?.status?.phase} />,
+      renderCell: (row) => <VirtualMachinesInstancesStatus status={getStatusPhase(row)} />,
       sortable: true,
     },
     {
@@ -65,15 +71,17 @@ export const getVMIColumns = (
       key: VMI_COLUMN_KEYS.conditions,
       label: t('Conditions'),
       renderCell: (row) => (
-        <VMStatusConditionLabelList conditions={row?.status?.conditions?.filter((c) => c.reason)} />
+        <VMStatusConditionLabelList
+          conditions={getVMIStatusConditions(row).filter((c) => c.reason)}
+        />
       ),
     },
     {
-      getValue: (row) => row?.metadata?.creationTimestamp ?? '',
+      getValue: (row) => getCreationTimestamp(row) ?? '',
       key: VMI_COLUMN_KEYS.created,
       label: t('Created'),
       renderCell: (row) => {
-        const creationTimestamp = row?.metadata?.creationTimestamp;
+        const creationTimestamp = getCreationTimestamp(row);
         if (!creationTimestamp) return null;
         return (
           <>
@@ -84,11 +92,11 @@ export const getVMIColumns = (
       sortable: true,
     },
     {
-      getValue: (row) => row?.status?.nodeName ?? '',
+      getValue: (row) => getVMINodeName(row) ?? '',
       key: VMI_COLUMN_KEYS.node,
       label: t('Node'),
       renderCell: (row) => {
-        const nodeName = row?.status?.nodeName;
+        const nodeName = getVMINodeName(row);
         if (!nodeName) return null;
         return <ResourceLink kind={NodeModel.kind} name={nodeName} />;
       },
