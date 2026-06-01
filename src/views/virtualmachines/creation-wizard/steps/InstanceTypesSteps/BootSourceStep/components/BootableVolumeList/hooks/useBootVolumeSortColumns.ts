@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import { V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
@@ -57,47 +57,66 @@ const useBootVolumeSortColumns: UseBootVolumeSortColumns = (
   const [activeSortIndex, setActiveSortIndex] = useState<null | number>(0);
   const [activeSortDirection, setActiveSortDirection] = useState<'asc' | 'desc' | null>('asc');
 
-  const getSortableRowValues = (bootableVolume: BootableVolume): string[] => {
-    const pvcSource = getBootableVolumePVCSource(bootableVolume, pvcSources);
-    const dvSource = getDataVolumeForPVC(pvcSource, dvSources);
-    const volumeSnapshotSource = volumeSnapshotSources?.[bootableVolume?.metadata?.name];
+  const getSortableRowValues = useCallback(
+    (bootableVolume: BootableVolume): string[] => {
+      const pvcSource = getBootableVolumePVCSource(bootableVolume, pvcSources);
+      const dvSource = getDataVolumeForPVC(pvcSource, dvSources);
+      const volumeSnapshotSource = volumeSnapshotSources?.[bootableVolume?.metadata?.name];
 
-    return [
-      getName(bootableVolume),
-      getArchitecture(bootableVolume),
-      ...(includeNamespaceColumn ? [getNamespace(bootableVolume)] : []),
-      getOSFromDefaultPreference(bootableVolume, clusterPreferencesMap, userPreferencesMap),
-      pvcSource?.spec?.storageClassName || getVolumeSnapshotStorageClass(volumeSnapshotSource),
-      getDiskSize(dvSource, pvcSource, volumeSnapshotSource),
-      bootableVolume?.metadata?.annotations?.[DESCRIPTION_ANNOTATION],
-    ];
-  };
-
-  const sortVolumes = (a: BootableVolume, b: BootableVolume): number => {
-    const aValue = getSortableRowValues(a)[activeSortIndex];
-    const bValue = getSortableRowValues(b)[activeSortIndex];
-
-    if (activeSortDirection === 'asc') {
-      return aValue?.localeCompare(bValue, undefined, { numeric: true, sensitivity: 'base' });
-    }
-    return bValue?.localeCompare(aValue, undefined, { numeric: true, sensitivity: 'base' });
-  };
-
-  const getSortType = (columnIndex: number): ThSortType => ({
-    columnIndex,
-    onSort: (_event, index, direction) => {
-      setActiveSortIndex(index);
-      setActiveSortDirection(direction);
+      return [
+        getName(bootableVolume),
+        getArchitecture(bootableVolume),
+        ...(includeNamespaceColumn ? [getNamespace(bootableVolume)] : []),
+        getOSFromDefaultPreference(bootableVolume, clusterPreferencesMap, userPreferencesMap),
+        pvcSource?.spec?.storageClassName || getVolumeSnapshotStorageClass(volumeSnapshotSource),
+        getDiskSize(dvSource, pvcSource, volumeSnapshotSource),
+        bootableVolume?.metadata?.annotations?.[DESCRIPTION_ANNOTATION],
+      ];
     },
-    sortBy: {
-      defaultDirection: 'asc',
-      direction: activeSortDirection,
-      index: activeSortIndex,
-    },
-  });
+    [
+      clusterPreferencesMap,
+      dvSources,
+      includeNamespaceColumn,
+      pvcSources,
+      userPreferencesMap,
+      volumeSnapshotSources,
+    ],
+  );
 
-  const sortedData = [...unsortedData].sort(sortVolumes);
-  const sortedPaginatedData = sortedData.slice(pagination.startIndex, pagination.endIndex);
+  const sortedData = useMemo(() => {
+    const sortVolumes = (a: BootableVolume, b: BootableVolume): number => {
+      const aValue = getSortableRowValues(a)[activeSortIndex];
+      const bValue = getSortableRowValues(b)[activeSortIndex];
+
+      if (activeSortDirection === 'asc') {
+        return aValue?.localeCompare(bValue, undefined, { numeric: true, sensitivity: 'base' });
+      }
+      return bValue?.localeCompare(aValue, undefined, { numeric: true, sensitivity: 'base' });
+    };
+
+    return unsortedData?.sort(sortVolumes);
+  }, [activeSortDirection, activeSortIndex, getSortableRowValues, unsortedData]);
+
+  const sortedPaginatedData = useMemo(
+    () => sortedData.slice(pagination.startIndex, pagination.endIndex),
+    [pagination.endIndex, pagination.startIndex, sortedData],
+  );
+
+  const getSortType = useCallback(
+    (columnIndex: number): ThSortType => ({
+      columnIndex,
+      onSort: (_event, index, direction) => {
+        setActiveSortIndex(index);
+        setActiveSortDirection(direction);
+      },
+      sortBy: {
+        defaultDirection: 'asc',
+        direction: activeSortDirection,
+        index: activeSortIndex,
+      },
+    }),
+    [activeSortDirection, activeSortIndex],
+  );
 
   return { getSortType, sortedData, sortedPaginatedData };
 };
