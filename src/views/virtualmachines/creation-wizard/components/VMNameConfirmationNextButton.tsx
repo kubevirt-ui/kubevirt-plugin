@@ -8,11 +8,13 @@ import useVMWizardStore from '../state/vm-wizard-store/useVMWizardStore';
 
 type VMNameConfirmationNextButtonProps = {
   children: ReactNode;
+  isSubmitting?: boolean;
   onClick: () => void;
 };
 
 const VMNameConfirmationNextButton: FC<VMNameConfirmationNextButtonProps> = ({
   children,
+  isSubmitting = false,
   onClick,
 }) => {
   const { t } = useKubevirtTranslation();
@@ -20,7 +22,8 @@ const VMNameConfirmationNextButton: FC<VMNameConfirmationNextButtonProps> = ({
 
   const isVMNameValid = isDNS1123Label(vmName);
   const isVMNameAlmostValid = isDNS1123LabelLenient(vmName);
-  const isDisabled = shouldCheckVMNameProperly ? !isVMNameValid : !isVMNameAlmostValid;
+  const isVMNameInvalid = shouldCheckVMNameProperly ? !isVMNameValid : !isVMNameAlmostValid;
+  const isDisabled = isSubmitting || isVMNameInvalid;
 
   const handleClick = () => {
     if (isVMNameValid) {
