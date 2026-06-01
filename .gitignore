@@ -22,3 +22,6 @@ console-extensions.md
 scripts/ca.crt
 scripts/console-client-secret
 *.json-*
+/playwright
+.env.local
+local.env
