@@ -39,6 +39,7 @@
   "{{count}} Volumes_other": "{{count}} 个卷_other",
   "{{cpu}} CPU | {{memory}} Memory": "{{cpu}} CPU | {{memory}} 内存",
   "{{cpus}} CPUs, {{memory}} Memory": "{{cpus}} CPU, {{memory}} 内存",
+  "{{diskName}}: upload in progress": "{{diskName}}: upload in progress",
   "{{gpusCount}} GPU devices": "{{gpusCount}} GPU 设备",
   "{{hostDevicesCount}} Host devices": "{{hostDevicesCount}} 主机设备",
   "{{hours}}h {{minutes}}m {{seconds}}s": "{{hours}}h {{minutes}}m {{seconds}}s",

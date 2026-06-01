@@ -82,6 +82,7 @@ const AddCDROMModal: FC<V1SubDiskModalProps> = ({
   const existingISOSelected = isExistingISOMode(mountUploadMode);
 
   const uploadFile = useWatch({ control, name: FORM_FIELD_UPLOAD_FILE });
+  const diskName = useWatch({ control, name: 'disk.name' });
   const hasUploadFile = !isEmpty(uploadFile?.file);
   const hasFormErrors = !isEmpty(errors);
 
@@ -89,6 +90,7 @@ const AddCDROMModal: FC<V1SubDiskModalProps> = ({
     useCDROMUploadClose(upload, onClose);
 
   const { isUploadActive } = useCDROMUploadStore({
+    cdromDiskName: diskName ?? '',
     isUploading,
     markBackgroundUploadEnded,
     upload,

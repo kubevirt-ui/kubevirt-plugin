@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import {
-  getVmUploadKeyFromVm,
+  getCdromUploadKeyFromVm,
   UPLOAD_ALERT_STATUS,
   useMountIsoUploadStore,
 } from '@kubevirt-utils/hooks/mountIsoUploadStore';
@@ -10,6 +10,7 @@ import { DataUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import { useSyncMountIsoUploadEnded } from '@virtualmachines/details/tabs/configuration/storage/components/hooks/useSyncMountIsoUploadEnded';
 
 type UseCDROMUploadStoreParams = {
+  cdromDiskName: string;
   isUploading: boolean;
   markBackgroundUploadEnded: () => void;
   upload: DataUpload;
@@ -17,41 +18,40 @@ type UseCDROMUploadStoreParams = {
 };
 
 type UseCDROMUploadStoreResult = {
+  cdromUploadKey: string;
   clearCancelUpload: (key: string) => void;
   clearPersistedUpload: (key: string) => void;
   isUploadActive: boolean;
-  vmUploadKey: string;
 };
 
 export const useCDROMUploadStore = ({
+  cdromDiskName,
   isUploading,
   markBackgroundUploadEnded,
   upload,
   vm,
 }: UseCDROMUploadStoreParams): UseCDROMUploadStoreResult => {
-  const vmUploadKey = getVmUploadKeyFromVm(vm);
+  const cdromUploadKey = getCdromUploadKeyFromVm(vm, cdromDiskName);
 
-  const persistedUploadStatus = useMountIsoUploadStore(
-    (state) => state.uploads[vmUploadKey]?.status,
-  );
+  const persistedUpload = useMountIsoUploadStore((state) => state.uploads[cdromUploadKey]);
   const clearPersistedUpload = useMountIsoUploadStore((state) => state.clearUpload);
   const setCancelUpload = useMountIsoUploadStore((state) => state.setCancelUpload);
   const clearCancelUpload = useMountIsoUploadStore((state) => state.clearCancelUpload);
 
-  const isUploadActive = isUploading || persistedUploadStatus === UPLOAD_ALERT_STATUS.UPLOADING;
+  const isUploadActive = isUploading || persistedUpload?.status === UPLOAD_ALERT_STATUS.UPLOADING;
 
-  useSyncMountIsoUploadEnded(vmUploadKey, markBackgroundUploadEnded);
+  useSyncMountIsoUploadEnded(cdromUploadKey, markBackgroundUploadEnded);
 
   useEffect(() => {
     if (upload?.cancelUpload) {
-      setCancelUpload(vmUploadKey, upload.cancelUpload);
+      setCancelUpload(cdromUploadKey, upload.cancelUpload);
     }
-  }, [setCancelUpload, upload?.cancelUpload, vmUploadKey]);
+  }, [cdromUploadKey, setCancelUpload, upload?.cancelUpload]);
 
   return {
+    cdromUploadKey,
     clearCancelUpload,
     clearPersistedUpload,
     isUploadActive,
-    vmUploadKey,
   };
 };

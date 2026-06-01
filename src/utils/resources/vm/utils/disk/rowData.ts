@@ -15,8 +15,12 @@ import {
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { DiskRawData, DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 import {
+  getDataVolumeName,
   getPrintableDiskDrive,
   getPrintableDiskInterface,
+  getPVCClaimName,
+  hasDataVolume,
+  hasPersistentVolumeClaim,
 } from '@kubevirt-utils/resources/vm/utils/disk/selectors';
 import { getHumanizedSize } from '@kubevirt-utils/utils/units';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -43,6 +47,7 @@ export const getDiskRowDataLayout = (
     const diskRowDataObject: DiskRowDataLayout = {
       drive: isEmpty(disk) || !isDiskConfigured ? NO_DATA_DASH : getPrintableDiskDrive(disk),
       hasDataVolume: Boolean(dataVolume),
+      hasPVC: Boolean(pvc),
       interface:
         isEmpty(disk) || !isDiskConfigured
           ? NO_DATA_DASH
@@ -71,6 +76,14 @@ export const getDiskRowDataLayout = (
       diskRowDataObject.sourceStatus = getPhase(source);
       diskRowDataObject.storageClass =
         getPVCStorageClassName(pvc) || getDataVolumeStorageClassName(dataVolume);
+    } else {
+      const volumeSourceName = getPVCClaimName(volume) ?? getDataVolumeName(volume);
+
+      if (volumeSourceName) {
+        diskRowDataObject.source = volumeSourceName;
+        diskRowDataObject.hasDataVolume = hasDataVolume(volume) || Boolean(dataVolumeTemplate);
+        diskRowDataObject.hasPVC = hasPersistentVolumeClaim(volume);
+      }
     }
 
     if (volumeSource === VolumeTypes.CONTAINER_DISK) {

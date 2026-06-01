@@ -39,6 +39,7 @@
   "{{count}} Volumes_other": "{{count}} 볼륨",
   "{{cpu}} CPU | {{memory}} Memory": "{{cpu}} CPU |{{memory}} 메모리",
   "{{cpus}} CPUs, {{memory}} Memory": "{{cpus}} CPU, {{memory}} 메모리",
+  "{{diskName}}: upload in progress": "{{diskName}}: upload in progress",
   "{{gpusCount}} GPU devices": "{{gpusCount}} GPU 장치",
   "{{hostDevicesCount}} Host devices": "{{hostDevicesCount}} 호스트 장치",
   "{{hours}}h {{minutes}}m {{seconds}}s": "{{hours}}h {{minutes}}m {{seconds}}s",

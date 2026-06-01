@@ -22,50 +22,75 @@ type CancelUploadHandler = () => Promise<unknown> | void;
 
 type MountIsoUploadStore = {
   cancelUploads: Record<string, CancelUploadHandler>;
-  clearCancelUpload: (vmKey: string) => void;
-  clearUpload: (vmKey: string) => void;
-  getCancelUpload: (vmKey: string) => CancelUploadHandler | undefined;
-  getUpload: (vmKey: string) => MountIsoUploadState | undefined;
-  setCancelUpload: (vmKey: string, cancelUpload: CancelUploadHandler) => void;
-  setUpload: (vmKey: string, state: MountIsoUploadState) => void;
+  clearCancelUpload: (uploadKey: string) => void;
+  clearUpload: (uploadKey: string) => void;
+  getCancelUpload: (uploadKey: string) => CancelUploadHandler | undefined;
+  getUpload: (uploadKey: string) => MountIsoUploadState | undefined;
+  setCancelUpload: (uploadKey: string, cancelUpload: CancelUploadHandler) => void;
+  setUpload: (uploadKey: string, state: MountIsoUploadState) => void;
   uploads: Record<string, MountIsoUploadState>;
 };
 
+/**
+ * VM scope prefix: cluster/namespace/vmName
+ * @param cluster
+ * @param namespace
+ * @param vmName
+ */
 export const getVmUploadKey = (cluster: string, namespace: string, vmName: string): string =>
   `${cluster || ''}/${namespace}/${vmName}`;
 
 export const getVmUploadKeyFromVm = (vm: {
+  cluster?: string;
   metadata?: { name?: string; namespace?: string };
 }): string => getVmUploadKey(getCluster(vm), getNamespace(vm), getName(vm));
 
+export const getCdromUploadKey = (
+  cluster: string,
+  namespace: string,
+  vmName: string,
+  cdromDiskName: string,
+): string => `${getVmUploadKey(cluster, namespace, vmName)}/${cdromDiskName}`;
+
+export const getCdromUploadKeyFromVm = (
+  vm: { cluster?: string; metadata?: { name?: string; namespace?: string } },
+  cdromDiskName: string,
+): string => getCdromUploadKey(getCluster(vm), getNamespace(vm), getName(vm), cdromDiskName);
+
+export const getUploadEntriesForVm = (
+  uploads: Record<string, MountIsoUploadState>,
+  vmKey: string,
+): [string, MountIsoUploadState][] =>
+  Object.entries(uploads).filter(([key]) => key.startsWith(`${vmKey}/`));
+
 export const useMountIsoUploadStore = create<MountIsoUploadStore>((set, get) => ({
   cancelUploads: {},
-  clearCancelUpload: (vmKey) =>
+  clearCancelUpload: (uploadKey) =>
     set((state) => {
       const nextCancelUploads = { ...state.cancelUploads };
-      delete nextCancelUploads[vmKey];
+      delete nextCancelUploads[uploadKey];
       return { cancelUploads: nextCancelUploads };
     }),
-  clearUpload: (vmKey) =>
+  clearUpload: (uploadKey) =>
     set((state) => {
       const nextUploads = { ...state.uploads };
-      delete nextUploads[vmKey];
+      delete nextUploads[uploadKey];
       return { uploads: nextUploads };
     }),
-  getCancelUpload: (vmKey) => get().cancelUploads[vmKey],
-  getUpload: (vmKey) => get().uploads[vmKey],
-  setCancelUpload: (vmKey, cancelUpload) =>
+  getCancelUpload: (uploadKey) => get().cancelUploads[uploadKey],
+  getUpload: (uploadKey) => get().uploads[uploadKey],
+  setCancelUpload: (uploadKey, cancelUpload) =>
     set((state) => ({
       cancelUploads: {
         ...state.cancelUploads,
-        [vmKey]: cancelUpload,
+        [uploadKey]: cancelUpload,
       },
     })),
-  setUpload: (vmKey, uploadState) =>
+  setUpload: (uploadKey, uploadState) =>
     set((state) => ({
       uploads: {
         ...state.uploads,
-        [vmKey]: uploadState,
+        [uploadKey]: uploadState,
       },
     })),
   uploads: {},

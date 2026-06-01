@@ -39,6 +39,7 @@
   "{{count}} Volumes_other": "{{count}} 台のボリューム",
   "{{cpu}} CPU | {{memory}} Memory": "{{cpu}} CPU | {{memory}} メモリー",
   "{{cpus}} CPUs, {{memory}} Memory": "{{cpus}} CPU、{{memory}} メモリー",
+  "{{diskName}}: upload in progress": "{{diskName}}: upload in progress",
   "{{gpusCount}} GPU devices": "{{gpusCount}} 台の GPU デバイス",
   "{{hostDevicesCount}} Host devices": "{{hostDevicesCount}} 台のホストデバイス",
   "{{hours}}h {{minutes}}m {{seconds}}s": "{{hours}}h {{minutes}}m {{seconds}}s",

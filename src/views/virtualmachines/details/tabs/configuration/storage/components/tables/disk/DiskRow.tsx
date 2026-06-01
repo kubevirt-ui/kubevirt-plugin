@@ -26,7 +26,6 @@ import {
   StackItem,
 } from '@patternfly/react-core';
 
-import { isPVCSource } from './utils/helpers';
 import DiskRowActions from './DiskRowActions';
 import { HotplugLabel } from './HotplugLabel';
 import ISOBadge from './ISOBadge';
@@ -62,6 +61,7 @@ const DiskRow: FC<
   const {
     drive,
     hasDataVolume,
+    hasPVC,
     interface: iface,
     isBootDisk,
     isEnvDisk,
@@ -73,8 +73,6 @@ const DiskRow: FC<
   } = obj;
 
   const provisioningPercentage = provisioningPercentages?.[source];
-
-  const hasPVC = isPVCSource(obj);
 
   const { displayName } = useMemo(() => {
     const disks = getDisks(vm) || [];
@@ -139,7 +137,7 @@ const DiskRow: FC<
 
         {!sourcesLoaded && (hasPVC || hasDataVolume) && <Skeleton width="200px" />}
 
-        {!hasPVC && getTranslatedSource(source, t)}
+        {!hasPVC && !hasDataVolume && getTranslatedSource(source, t)}
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="size">
         {readableSizeUnit(size)}
