@@ -7,6 +7,7 @@ import {
 } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import ActionsDropdown from '@kubevirt-utils/components/ActionsDropdown/ActionsDropdown';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import useKubevirtToast from '@kubevirt-utils/hooks/useKubevirtToast';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { SINGLE_CLUSTER_KEY } from '@kubevirt-utils/resources/constants';
 import { getName } from '@kubevirt-utils/resources/shared';
@@ -31,6 +32,7 @@ const CheckupsSelfValidationActions: FC<CheckupsSelfValidationActionsProps> = ({
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
   const { createModal } = useModal();
+  const toast = useKubevirtToast();
   const [clusterRunningJobs] = useAllRunningSelfValidationJobs();
 
   const checkupsSelfValidationActionFactory = useMemo(
@@ -61,9 +63,11 @@ const CheckupsSelfValidationActions: FC<CheckupsSelfValidationActionsProps> = ({
       createModal,
       hasCurrentCheckupRunningJobs,
       hasOtherRunningJobs,
+      isKebab,
       jobs,
       navigate: (path: string) => navigate(path),
       otherRunningJobs,
+      toast,
     });
 
     const goToAction = checkupsSelfValidationActionFactory.goToRunningCheckup({
@@ -77,6 +81,7 @@ const CheckupsSelfValidationActions: FC<CheckupsSelfValidationActionsProps> = ({
       createModal,
       jobs,
       navigate: (path: string) => navigate(path),
+      toast,
     });
 
     return [rerunAction, goToAction, deleteAction].filter(Boolean);
@@ -84,11 +89,13 @@ const CheckupsSelfValidationActions: FC<CheckupsSelfValidationActionsProps> = ({
     checkupsSelfValidationActionFactory,
     configMap,
     createModal,
+    isKebab,
     jobs,
     navigate,
     otherRunningJobs,
     hasOtherRunningJobs,
     hasCurrentCheckupRunningJobs,
+    toast,
   ]);
 
   return (

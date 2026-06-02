@@ -12,13 +12,16 @@ type AddToast = ReturnType<typeof useToast>['addToast'];
 type RemoveToast = ReturnType<typeof useToast>['removeToast'];
 type ToastHelper = (opts: HelperOptions) => ReturnType<AddToast>;
 
-type UseKubevirtToastResult = {
+export type ToastActions = {
   addDangerToast: ToastHelper;
   addInfoToast: ToastHelper;
   addSuccessToast: ToastHelper;
-  addToast: AddToast;
   addWarningToast: ToastHelper;
   removeToast: RemoveToast;
+};
+
+type UseKubevirtToastResult = ToastActions & {
+  addToast: AddToast;
 };
 
 const noopAddToast = () => '';

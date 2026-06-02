@@ -5,6 +5,7 @@ import ActionsDropdown from '@kubevirt-utils/components/ActionsDropdown/ActionsD
 import { ActionDropdownItemType } from '@kubevirt-utils/components/ActionsDropdown/constants';
 import DeleteModal from '@kubevirt-utils/components/DeleteModal/DeleteModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import useKubevirtToast from '@kubevirt-utils/hooks/useKubevirtToast';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
@@ -24,6 +25,7 @@ const CheckupsSelfValidationHistoryActions: FC<CheckupsSelfValidationHistoryActi
 }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
+  const { addDangerToast } = useKubevirtToast();
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
   const { download, isDownloading } = useDownloadResults();
   const isJobCompleted = job?.status?.succeeded === 1 && job?.status?.terminating !== 1;
@@ -59,15 +61,22 @@ const CheckupsSelfValidationHistoryActions: FC<CheckupsSelfValidationHistoryActi
     }
     const result = await download(job, namespace);
     if (result && !result.success && result.error) {
-      createModal((props) => (
-        <DownloadResultsErrorModal
-          {...props}
-          errorMessage={result.error.message || getDefaultErrorMessage(t)}
-          url={result.error.certificateUrl}
-        />
-      ));
+      if (result.error.certificateUrl) {
+        createModal((props) => (
+          <DownloadResultsErrorModal
+            {...props}
+            errorMessage={result.error.message || getDefaultErrorMessage(t)}
+            url={result.error.certificateUrl}
+          />
+        ));
+      } else {
+        addDangerToast({
+          content: result.error.message || getDefaultErrorMessage(t),
+          title: t('Could not download results file'),
+        });
+      }
     }
-  }, [job, namespace, isJobCompleted, download, createModal, t]);
+  }, [job, namespace, isJobCompleted, download, createModal, addDangerToast, t]);
 
   const actions = useMemo<ActionDropdownItemType[]>(() => {
     const actionItems: ActionDropdownItemType[] = [];

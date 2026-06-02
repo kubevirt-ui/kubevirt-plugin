@@ -9,6 +9,7 @@ import { ActionDropdownItemType } from '@kubevirt-utils/components/ActionsDropdo
 import DeleteModal from '@kubevirt-utils/components/DeleteModal/DeleteModal';
 import { trimLastHistoryPath } from '@kubevirt-utils/components/HorizontalNavbar/utils/utils';
 import { ModalComponent } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import { ToastActions } from '@kubevirt-utils/hooks/useKubevirtToast';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 
 import { deleteSelfValidationCheckup } from '../../utils';
@@ -24,9 +25,11 @@ type CheckupsSelfValidationActionFactoryParams = {
   createModal: (modal: ModalComponent) => void;
   hasCurrentCheckupRunningJobs?: boolean;
   hasOtherRunningJobs?: boolean;
+  isKebab?: boolean;
   jobs: IoK8sApiBatchV1Job[];
   navigate: (path: string) => void;
   otherRunningJobs?: IoK8sApiBatchV1Job[];
+  toast: ToastActions;
 };
 
 export type CheckupsSelfValidationActionFactoryReturn = {
@@ -47,14 +50,21 @@ export const createCheckupsSelfValidationActionFactory = (
     createModal,
     jobs,
     navigate,
+    toast,
   }: CheckupsSelfValidationActionFactoryParams): ActionDropdownItemType => {
+    const checkupName = getName(configMap);
+
     const deleteCheckup = async (): Promise<void> => {
       await deleteSelfValidationCheckup(configMap, jobs);
 
+      toast.addSuccessToast({
+        title: t('Checkup {{name}} deleted successfully', { name: checkupName }),
+      });
+
       const newPath = trimLastHistoryPath(location.pathname, [
-        getName(configMap),
-        `${getName(configMap)}/`,
-        `${getName(configMap)}/yaml`,
+        checkupName,
+        `${checkupName}/`,
+        `${checkupName}/yaml`,
       ]);
 
       navigate(newPath);
@@ -102,17 +112,23 @@ export const createCheckupsSelfValidationActionFactory = (
     createModal,
     hasCurrentCheckupRunningJobs = false,
     hasOtherRunningJobs = false,
+    isKebab = false,
     jobs,
+    navigate,
     otherRunningJobs,
+    toast,
   }: CheckupsSelfValidationActionFactoryParams): ActionDropdownItemType => {
     return createRerunAction({
       configMap,
       createModal,
       hasCurrentCheckupRunningJobs,
       hasOtherRunningJobs,
+      isKebab,
       jobs,
+      navigate,
       otherRunningJobs,
       t,
+      toast,
     });
   },
 });

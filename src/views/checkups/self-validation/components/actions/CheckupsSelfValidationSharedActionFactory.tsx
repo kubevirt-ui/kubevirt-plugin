@@ -6,10 +6,12 @@ import {
 } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { ActionDropdownItemType } from '@kubevirt-utils/components/ActionsDropdown/constants';
 import { ModalComponent } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import { ToastActions } from '@kubevirt-utils/hooks/useKubevirtToast';
 import { getSelfValidationCheckupURL } from '@kubevirt-utils/resources/checkups/urls';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 
 import RerunCheckupModal from '../../../components/RerunCheckupModal';
+import { showRerunToast } from '../../../utils/showRerunToast';
 import { isJobRunning, rerunSelfValidationCheckup } from '../../utils';
 
 import { ActionState, getRerunModeState } from './CheckupsSelfValidationActionsUtils';
@@ -22,9 +24,12 @@ type RerunActionParams = {
   createModal: (modal: ModalComponent) => void;
   hasCurrentCheckupRunningJobs?: boolean;
   hasOtherRunningJobs?: boolean;
+  isKebab?: boolean;
   jobs?: IoK8sApiBatchV1Job[];
+  navigate: (path: string) => void;
   otherRunningJobs?: IoK8sApiBatchV1Job[];
   t: TranslationFunction;
+  toast: ToastActions;
 };
 
 export const createRerunAction = ({
@@ -32,9 +37,12 @@ export const createRerunAction = ({
   createModal,
   hasCurrentCheckupRunningJobs = false,
   hasOtherRunningJobs = false,
+  isKebab = false,
   jobs = [],
+  navigate,
   otherRunningJobs = [],
   t,
+  toast,
 }: RerunActionParams): ActionDropdownItemType => {
   const { isEnabled } = getRerunModeState(
     hasOtherRunningJobs,
@@ -49,16 +57,24 @@ export const createRerunAction = ({
     }
 
     try {
-      await rerunSelfValidationCheckup(configMap, jobs);
+      await rerunSelfValidationCheckup(configMap, jobs, () =>
+        toast.addWarningToast({ title: t('PVC may need manual cleanup') }),
+      );
+      if (isKebab) {
+        showRerunToast({
+          configMap,
+          getUrl: getSelfValidationCheckupURL,
+          navigate,
+          t,
+          toast,
+        });
+      }
     } catch (e) {
       kubevirtConsole.error('Failed to rerun checkup:', e);
-      createModal((props) => (
-        <RerunCheckupModal
-          {...props}
-          message={e?.message || t('An unknown error occurred')}
-          variant="error"
-        />
-      ));
+      toast.addDangerToast({
+        content: e?.message || t('An unknown error occurred'),
+        title: t('Failed to rerun checkup'),
+      });
     }
   };
 
