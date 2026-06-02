@@ -61,6 +61,26 @@ export default defineConfig({
         viewport: { height: 1080, width: 1920 },
       },
     },
+    ...(process.env.RUN_FEATURE_TESTS === 'true'
+      ? [
+          {
+            dependencies: ['setup'],
+            fullyParallel: false,
+            name: 'features',
+            retries: 2,
+            testDir: './playwright/tests/features',
+            use: {
+              ...devices['Desktop Chrome'],
+              launchOptions: {
+                args: chromeArgs,
+                headless: !process.env.DEBUG_MODE && !process.env.HEADED,
+              },
+              storageState: 'playwright/.auth/session.json',
+              viewport: { height: 1080, width: 1920 },
+            },
+          },
+        ]
+      : []),
   ],
   reporter: [
     ['list'],
