@@ -10,7 +10,7 @@ import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { Modal, ModalBody, Wizard, WizardHeader, WizardStep } from '@patternfly/react-core';
-import useIsMTCInstalled from '@virtualmachines/actions/hooks/useIsMTCInstalled';
+import useShouldUseMtcMigration from '@virtualmachines/actions/hooks/useShouldUseMtcMigration';
 
 import useMigrationNamespacesPVCs from './hooks/useMigrationNamespacesPVCs';
 import useMigrationState from './hooks/useMigrationState';
@@ -37,7 +37,7 @@ const VirtualMachineMigrateModal: FC<VirtualMachineMigrateModalProps> = ({
   vms,
 }) => {
   const { t } = useKubevirtTranslation();
-  const mtcInstalled = useIsMTCInstalled();
+  const shouldUseMtcMigration = useShouldUseMtcMigration();
 
   const cluster = getCluster(vms?.[0]);
   const [selectedStorageClass, setSelectedStorageClass] = useState('');
@@ -85,7 +85,7 @@ const VirtualMachineMigrateModal: FC<VirtualMachineMigrateModalProps> = ({
     destinationStorageClass,
   );
 
-  const { migrationError, migrationLoading, migrationStarted, onSubmit } = mtcInstalled
+  const { migrationError, migrationLoading, migrationStarted, onSubmit } = shouldUseMtcMigration
     ? mtcState
     : vmsmpState;
 
@@ -112,14 +112,14 @@ const VirtualMachineMigrateModal: FC<VirtualMachineMigrateModalProps> = ({
           hasData
           loaded={migrationNamespacesPVCsLoaded && selectedMigrations !== null}
         >
-          {migrationStarted && mtcInstalled && (
+          {migrationStarted && shouldUseMtcMigration && (
             <VirtualMachineMigrationStatusMtc
               migMigration={mtcState.migMigration}
               onClose={onClose}
               vmNamespace={getNamespace(vms?.[0])}
             />
           )}
-          {migrationStarted && !mtcInstalled && (
+          {migrationStarted && !shouldUseMtcMigration && (
             <VirtualMachineMigrationStatus
               onClose={onClose}
               storageMigrationPlan={vmsmpState.migrationPlan}

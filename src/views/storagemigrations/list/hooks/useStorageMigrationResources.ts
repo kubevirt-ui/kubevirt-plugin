@@ -10,7 +10,7 @@ import {
   MigPlanModel,
 } from '@kubevirt-utils/resources/migrations/migrationsMtcConstants';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
-import useIsMTCInstalled from '@virtualmachines/actions/hooks/useIsMTCInstalled';
+import useShouldUseMtcMigration from '@virtualmachines/actions/hooks/useShouldUseMtcMigration';
 
 const adaptMigPlanToVmsmp = (
   migPlan: MigPlan,
@@ -57,7 +57,7 @@ type UseStorageMigrationResources = () => {
 
 const useStorageMigrationResources: UseStorageMigrationResources = () => {
   const namespace = useNamespaceParam();
-  const mtcInstalled = useIsMTCInstalled();
+  const shouldUseMtcMigration = useShouldUseMtcMigration();
 
   const [vmsmpPlans, vmsmpLoaded, vmsmpError] = useK8sWatchData<
     MultiNamespaceVirtualMachineStorageMigrationPlan[]
@@ -76,7 +76,7 @@ const useStorageMigrationResources: UseStorageMigrationResources = () => {
     namespace: DEFAULT_MIGRATION_NAMESPACE,
   });
 
-  if (mtcInstalled) {
+  if (shouldUseMtcMigration) {
     const adaptedPlans = (migPlans || []).map(adaptMigPlanToVmsmp);
     const filteredPlans = namespace
       ? adaptedPlans.filter((plan) => plan.spec?.namespaces?.some((ns) => ns.name === namespace))
