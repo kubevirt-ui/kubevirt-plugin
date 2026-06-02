@@ -16,4 +16,5 @@ export const CONFIRM_ACTION = 'confirm-action';
 export const CONFIRM_VM_ACTIONS = 'confirm-vm-actions';
 export const ITEM_CREATE = 'item-create';
 export const KEBAB_BUTTON = 'kebab-button';
+export const ACTIONS_DROPDOWN = 'actions-dropdown';
 export const SAVE_CHANGES = 'save-changes';

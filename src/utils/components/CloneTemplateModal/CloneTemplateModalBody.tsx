@@ -11,6 +11,7 @@ import FormGroupHelperText from '../FormGroupHelperText/FormGroupHelperText';
 import FormGroupTextInput from './components/FormGroupTextInput';
 import { CloneTemplateField, CloneTemplateFormValues } from './form/types';
 import CloneStorageCheckbox from './CloneStorageCheckbox';
+import { SOURCE_TEMPLATE_TOGGLE_TEST_ID } from './constants';
 import SelectProject from './SelectProject';
 import SelectTemplate from './SelectTemplate';
 import { getTemplateBootSourcePVC } from './utils';
@@ -52,6 +53,7 @@ const CloneTemplateModalBody: FC<CloneTemplateModalBodyProps> = ({
       )}
       <FormGroup isRequired label={t('Source template')}>
         <SelectTemplate
+          dataTestId={SOURCE_TEMPLATE_TOGGLE_TEST_ID}
           isDisabled={!!initialTemplate}
           namespace={sourceProject}
           onTemplateSelect={onTemplateSelected}
