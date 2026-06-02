@@ -141,13 +141,20 @@ export const getConditionReason = (condition: V1beta1Condition): string => condi
 export const isConditionStatusTrue = (condition: V1beta1Condition): boolean =>
   condition?.status === 'True';
 
+export type ResourceWithConditions<C = K8sResourceCondition> = {
+  status?: {
+    conditions?: C[];
+  };
+};
+
 /**
  * A selector for a resource's conditions
  * @param entity - entity to get condition from
  * @returns array of conditions
  */
-export const getStatusConditions = (entity): K8sResourceCondition[] =>
-  entity?.status?.conditions ?? [];
+export const getStatusConditions = <C = K8sResourceCondition>(
+  entity: ResourceWithConditions<C>,
+): C[] => entity?.status?.conditions ?? [];
 
 /**
  * A selector for a resource's conditions based on type
@@ -155,8 +162,49 @@ export const getStatusConditions = (entity): K8sResourceCondition[] =>
  * @param type - type of the condition
  * @returns condition based on type
  */
-export const getStatusConditionsByType = (entity, type: string): K8sResourceCondition =>
-  getStatusConditions(entity)?.find((condition) => condition?.type === type);
+export const getStatusConditionsByType = <C extends { type?: string } = K8sResourceCondition>(
+  entity: ResourceWithConditions<C>,
+  type: string,
+): C | undefined => getStatusConditions<C>(entity)?.find((condition) => condition?.type === type);
+
+/**
+ * A selector that checks whether a resource has a condition of the given type with status True
+ * @param entity - entity to get condition from
+ * @param type - type of the condition
+ * @returns true if the condition exists and its status is True
+ */
+export const isStatusConditionTrue = <
+  C extends { status?: string; type?: string } = K8sResourceCondition,
+>(
+  entity: ResourceWithConditions<C>,
+  type: string,
+): boolean => getStatusConditionsByType(entity, type)?.status === 'True';
+
+/**
+ * A selector for a resource's condition message by type
+ * @param entity - entity to get condition from
+ * @param type - type of the condition
+ * @returns the condition message, if present
+ */
+export const getStatusConditionMessage = <
+  C extends { message?: string; type?: string } = K8sResourceCondition,
+>(
+  entity: ResourceWithConditions<C>,
+  type: string,
+): string | undefined => getStatusConditionsByType(entity, type)?.message;
+
+/**
+ * A selector for a resource's condition reason by type
+ * @param entity - entity to get condition from
+ * @param type - type of the condition
+ * @returns the condition reason, if present
+ */
+export const getStatusConditionReason = <
+  C extends { reason?: string; type?: string } = K8sResourceCondition,
+>(
+  entity: ResourceWithConditions<C>,
+  type: string,
+): string | undefined => getStatusConditionsByType(entity, type)?.reason;
 
 /**
  * function for creating a resource's owner reference from a resource
@@ -476,8 +524,7 @@ export const getAvailableDataSources = (dataSources: V1beta1DataSource[]): V1bet
   dataSources?.filter((dataSource) => isDataSourceReady(dataSource));
 
 export const isDataImportCronProgressing = (dataImportCron: V1beta1DataImportCron): boolean =>
-  dataImportCron?.status?.conditions?.find((condition) => condition.type === 'UpToDate')?.reason ===
-  'ImportProgressing';
+  getStatusConditionReason(dataImportCron, 'UpToDate') === 'ImportProgressing';
 
 /**
  * function to get all V1beta1DataSource objects with condition type 'Ready'and status 'True'

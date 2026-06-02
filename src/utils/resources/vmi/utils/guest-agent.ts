@@ -3,16 +3,12 @@ import {
   V1VirtualMachineInstance,
   V1VirtualMachineInstanceGuestAgentInfo,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { getVMStatus } from '@kubevirt-utils/resources/shared';
+import { getVMStatus, isStatusConditionTrue } from '@kubevirt-utils/resources/shared';
+import { VirtualMachineStatusConditionTypes } from '@kubevirt-utils/resources/vm/utils/constants';
 import { VM_STATUS } from '@kubevirt-utils/resources/vm/utils/vmStatus';
 
-const AGENT_CONNECTED = 'AgentConnected';
-
-const hasAgentConnectedCondition = (conditions?: { status?: string; type?: string }[]): boolean =>
-  conditions?.some((c) => c?.type === AGENT_CONNECTED && c?.status === 'True') ?? false;
-
 export const isGuestAgentConnected = (vmi: V1VirtualMachineInstance): boolean =>
-  hasAgentConnectedCondition(vmi?.status?.conditions);
+  isStatusConditionTrue(vmi, VirtualMachineStatusConditionTypes.AgentConnected);
 
 /**
  * Check whether the guest agent is connected by looking at the VM's own conditions.
@@ -21,7 +17,7 @@ export const isGuestAgentConnected = (vmi: V1VirtualMachineInstance): boolean =>
  * @param vm - the virtual machine to check
  */
 export const isVMGuestAgentConnected = (vm: V1VirtualMachine): boolean =>
-  hasAgentConnectedCondition(vm?.status?.conditions);
+  isStatusConditionTrue(vm, VirtualMachineStatusConditionTypes.AgentConnected);
 
 export const getOSNameFromGuestAgent = (
   guestAgentData: V1VirtualMachineInstanceGuestAgentInfo,

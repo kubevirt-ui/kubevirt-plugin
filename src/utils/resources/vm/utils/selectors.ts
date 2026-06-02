@@ -18,7 +18,13 @@ import {
 import { DYNAMIC_CREDENTIALS_SUPPORT } from '@kubevirt-utils/components/DynamicSSHKeyInjection/constants/constants';
 import { ROOTDISK } from '@kubevirt-utils/constants/constants';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
-import { getAnnotation, getLabel, getLabels } from '@kubevirt-utils/resources/shared';
+import {
+  getAnnotation,
+  getLabel,
+  getLabels,
+  getStatusConditions as getResourceStatusConditions,
+  getStatusConditionsByType as getResourceStatusConditionsByType,
+} from '@kubevirt-utils/resources/shared';
 import { WORKLOADS } from '@kubevirt-utils/resources/template';
 import { isVM } from '@kubevirt-utils/utils/typeGuards';
 import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
@@ -356,13 +362,13 @@ export const getPreferenceMatcher = (vm: V1VirtualMachine): V1PreferenceMatcher 
  * @returns {V1VirtualMachineCondition[]} the VM's status conditions
  */
 export const getStatusConditions = (vm: V1VirtualMachine): V1VirtualMachineCondition[] =>
-  vm?.status?.conditions;
+  getResourceStatusConditions<V1VirtualMachineCondition>(vm);
 
 export const getStatusConditionByType = (
   vm: V1VirtualMachine,
   conditionType: VirtualMachineStatusConditionTypes,
-): V1VirtualMachineCondition =>
-  vm?.status?.conditions?.find((condition) => condition.type === conditionType);
+): undefined | V1VirtualMachineCondition =>
+  getResourceStatusConditionsByType<V1VirtualMachineCondition>(vm, conditionType);
 
 export const getUpdateStrategy = (vm: V1VirtualMachine): UPDATE_STRATEGIES =>
   vm?.spec?.updateVolumesStrategy as UPDATE_STRATEGIES;
