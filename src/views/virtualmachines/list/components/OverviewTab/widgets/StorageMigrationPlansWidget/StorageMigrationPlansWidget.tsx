@@ -50,7 +50,7 @@ const StorageMigrationPlansWidget: FC<StorageMigrationPlansWidgetProps> = ({ clu
     if (!loaded && !loadError) {
       return (
         <span className="storage-migration-plans-widget__view-all-skeleton">
-          <Skeleton fontSize="sm" screenreaderText={t('Loading')} width="4.5rem" />
+          <Skeleton fontSize="sm" screenreaderText={t('Loading')} />
         </span>
       );
     }

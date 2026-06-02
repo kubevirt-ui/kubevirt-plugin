@@ -73,7 +73,7 @@ type OnMultiNs404Args = {
   canceled: () => boolean;
   cluster: string | undefined;
   csvLoaded: boolean;
-  csvMinor: null | number;
+  csvVersion: string | undefined;
   finish: FinishProbe;
   phaseRef: { current: StorageMigrationProbeFallbackPhase };
   scheduleDelayedProbe: (run: () => void) => void;
@@ -83,12 +83,12 @@ export const onMultiNamespaceStorageMigration404 = ({
   canceled,
   cluster,
   csvLoaded,
-  csvMinor,
+  csvVersion,
   finish,
   phaseRef,
   scheduleDelayedProbe,
 }: OnMultiNs404Args): void => {
-  if (csvLoadedIndicatesMultiNsStorageMigrationApi(csvLoaded, csvMinor)) {
+  if (csvLoadedIndicatesMultiNsStorageMigrationApi(csvLoaded, csvVersion)) {
     finish(STORAGE_MIGRATION_API.MULTI_NS);
     return;
   }
