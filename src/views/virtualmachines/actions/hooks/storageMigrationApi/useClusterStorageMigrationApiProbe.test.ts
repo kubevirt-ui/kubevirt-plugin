@@ -63,6 +63,21 @@ describe('useClusterStorageMigrationApiProbe', () => {
     expect(kubevirtK8sListItems).not.toHaveBeenCalled();
   });
 
+  it('resolves MULTI_NS without LIST when CSV major is above 4 even if minor is below 21', async () => {
+    const csv = {
+      installedCSV: { spec: { version: '5.1.0' } },
+      loaded: true,
+    } as StorageMigrationProbeCsv;
+
+    const { result } = renderHook(() => useClusterStorageMigrationApiProbe('my-cluster', csv));
+
+    await waitFor(() => {
+      expect(result.current).toBe(STORAGE_MIGRATION_API.MULTI_NS);
+    });
+
+    expect(kubevirtK8sListItems).not.toHaveBeenCalled();
+  });
+
   it('runs LIST probe when CSV minor is below 21', async () => {
     (kubevirtK8sListItems as jest.Mock).mockResolvedValue([]);
 

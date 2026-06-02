@@ -8,7 +8,15 @@ import {
 } from '@kubevirt-utils/resources/vmim/utils';
 import { GreenCheckCircleIcon } from '@openshift-console/dynamic-plugin-sdk';
 import { vmStatusIcon } from '@overview/OverviewTab/vm-statuses-card/utils/utils';
-import { Card, CardBody, CardHeader, CardTitle, Content, Grid } from '@patternfly/react-core';
+import {
+  Card,
+  CardBody,
+  CardHeader,
+  CardTitle,
+  Content,
+  Grid,
+  Skeleton,
+} from '@patternfly/react-core';
 
 import StatusCountItem, { getLinkProps } from '../shared/StatusCountItem';
 import ViewAllLink from '../shared/ViewAllLink';
@@ -66,13 +74,27 @@ const MigrationsWidget: FC<MigrationsWidgetProps> = ({
 
   const hasNavigation = !!migrationsTabPath || !!migrationsTabHref;
 
+  const headerActions = (() => {
+    if (hasNavigation) {
+      return <ViewAllLink href={migrationsTabHref} linkPath={migrationsTabPath} />;
+    }
+    if (isLoading) {
+      return (
+        <span className="migrations-widget__view-all-skeleton">
+          <Skeleton fontSize="sm" screenreaderText={t('Loading')} width="4.5rem" />
+        </span>
+      );
+    }
+    return null;
+  })();
+
   return (
     <Card className="migrations-widget" data-test="migrations-widget" isCompact>
       <CardHeader
         actions={
-          hasNavigation
+          headerActions
             ? {
-                actions: <ViewAllLink href={migrationsTabHref} linkPath={migrationsTabPath} />,
+                actions: headerActions,
                 hasNoOffset: false,
               }
             : undefined
