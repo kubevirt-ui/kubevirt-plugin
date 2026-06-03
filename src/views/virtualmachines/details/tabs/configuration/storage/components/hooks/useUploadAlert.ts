@@ -10,14 +10,16 @@ import {
   useMountIsoUploadStore,
 } from '@kubevirt-utils/hooks/mountIsoUploadStore';
 import { isUploadCanceledError } from '@kubevirt-utils/hooks/useCDIUpload/errors';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
-import { UploadAlertConfig, uploadAlertConfig } from '../../utils/constants';
+import { getUploadAlertConfig, UploadAlertConfig } from '../../utils/constants';
 
 type UseUploadAlertResult = {
   alertConfig: null | UploadAlertConfig;
   dismissAlert: () => void;
   onUploadStarted: (uploadPromise: Promise<unknown>, cdromDiskName?: string) => void;
   uploadError: string;
+  uploadErrorHref?: string;
 };
 
 const pickVmAlertStatus = (
@@ -37,6 +39,7 @@ const pickVmAlertStatus = (
 };
 
 export const useUploadAlert = (vm: V1VirtualMachine): UseUploadAlertResult => {
+  const { t } = useKubevirtTranslation();
   const vmKey = getVmUploadKeyFromVm(vm);
 
   const uploads = useMountIsoUploadStore((state) => state.uploads);
@@ -48,10 +51,11 @@ export const useUploadAlert = (vm: V1VirtualMachine): UseUploadAlertResult => {
   const vmUploads = useMemo(() => getUploadEntriesForVm(uploads, vmKey), [uploads, vmKey]);
 
   const uploadStatus = pickVmAlertStatus(vmUploads);
-  const uploadError =
-    vmUploads.find(
-      ([, upload]) => !upload.alertDismissed && upload.status === UPLOAD_ALERT_STATUS.ERROR,
-    )?.[1]?.errorMessage ?? '';
+  const errorUpload = vmUploads.find(
+    ([, upload]) => !upload.alertDismissed && upload.status === UPLOAD_ALERT_STATUS.ERROR,
+  )?.[1];
+  const uploadError = errorUpload?.errorMessage ?? '';
+  const uploadErrorHref = errorUpload?.errorHref;
 
   const onUploadStarted = useCallback(
     (uploadPromise: Promise<unknown>, cdromDiskName?: string): void => {
@@ -78,12 +82,14 @@ export const useUploadAlert = (vm: V1VirtualMachine): UseUploadAlertResult => {
             return;
           }
 
+          const errorWithHref = err as { href?: string; message?: string };
           const errorMessage =
-            (err instanceof Error ? err.message : (err as { message?: string })?.message) ||
-            String(err);
+            (err instanceof Error ? err.message : errorWithHref?.message) || String(err);
+          const errorHref = errorWithHref?.href;
 
           setUpload(uploadKey, {
             cdromDiskName: getUpload(uploadKey)?.cdromDiskName ?? diskName,
+            errorHref,
             errorMessage,
             status: UPLOAD_ALERT_STATUS.ERROR,
           });
@@ -104,7 +110,7 @@ export const useUploadAlert = (vm: V1VirtualMachine): UseUploadAlertResult => {
     });
   }, [clearCancelUpload, clearUpload, setUpload, vmUploads]);
 
-  const alertConfig = uploadStatus ? uploadAlertConfig[uploadStatus] : null;
+  const alertConfig = uploadStatus ? getUploadAlertConfig(t)[uploadStatus] : null;
 
-  return { alertConfig, dismissAlert, onUploadStarted, uploadError };
+  return { alertConfig, dismissAlert, onUploadStarted, uploadError, uploadErrorHref };
 };

@@ -1,24 +1,26 @@
+import { TFunction } from 'i18next';
+
 import { UploadAlertStatus } from '@kubevirt-utils/hooks/mountIsoUploadStore';
 import { AlertVariant } from '@patternfly/react-core';
 
 export type UploadAlertConfig = { body: string; title: string; variant: AlertVariant };
 
-// t('You can navigate away. The upload will continue in the background.')
-// t('Upload in progress')
-export const uploadAlertConfig: Record<UploadAlertStatus, UploadAlertConfig> = {
+export const getUploadAlertConfig = (
+  t: TFunction,
+): Record<UploadAlertStatus, UploadAlertConfig> => ({
   error: {
-    body: 'The ISO upload failed. Check the DataVolume status for details.',
-    title: 'Upload failed',
+    body: t('The ISO upload failed. Check the DataVolume status for details.'),
+    title: t('Upload failed'),
     variant: AlertVariant.danger,
   },
   success: {
-    body: 'The ISO has been uploaded successfully.',
-    title: 'Upload completed',
+    body: t('The ISO has been uploaded successfully.'),
+    title: t('Upload completed'),
     variant: AlertVariant.success,
   },
   uploading: {
-    body: 'You can navigate away. The upload will continue in the background.',
-    title: 'Upload in progress',
+    body: t('You can navigate away. The upload will continue in the background.'),
+    title: t('Upload in progress'),
     variant: AlertVariant.info,
   },
-};
+});
