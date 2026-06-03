@@ -6,7 +6,7 @@ import usePagination from './usePagination';
 type OnFilterChange = (...args: unknown[]) => void;
 
 type UsePaginationWithFiltersResult = {
-  handleFilterChange: (...args: Parameters<OnFilterChange>) => void;
+  handleFilterChange?: (...args: Parameters<OnFilterChange>) => void;
   handlePerPageSelect: (
     _e: unknown,
     perPage: number,
@@ -27,13 +27,13 @@ type UsePaginationWithFiltersResult = {
 
 const usePaginationWithFilters = (
   filteredDataLength: number,
-  onFilterChange: OnFilterChange,
+  onFilterChange?: OnFilterChange,
 ): UsePaginationWithFiltersResult => {
   const { onPaginationChange, pagination } = usePagination();
 
   const handleFilterChange = useCallback(
     (...args: Parameters<OnFilterChange>) => {
-      onFilterChange(...args);
+      onFilterChange?.(...args);
       onPaginationChange({
         endIndex: pagination?.perPage,
         page: 1,
@@ -68,7 +68,7 @@ const usePaginationWithFilters = (
   }, [filteredDataLength, pagination?.startIndex, pagination?.perPage, onPaginationChange]);
 
   return {
-    handleFilterChange,
+    ...(onFilterChange && { handleFilterChange }),
     handlePerPageSelect,
     handleSetPage,
     onPaginationChange,

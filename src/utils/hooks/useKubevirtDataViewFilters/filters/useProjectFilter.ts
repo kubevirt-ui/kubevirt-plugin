@@ -1,23 +1,26 @@
 import { useMemo } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useListClusters from '@kubevirt-utils/hooks/useListClusters';
 import useProjects from '@kubevirt-utils/hooks/useProjects';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
-import { PROJECT_LIST_FILTER_TYPE } from '@kubevirt-utils/utils/constants';
-import { isEmpty, universalComparator } from '@kubevirt-utils/utils/utils';
+import {
+  CLUSTER_LIST_FILTER_TYPE,
+  PROJECT_LIST_FILTER_TYPE,
+} from '@kubevirt-utils/utils/constants';
+import { universalComparator } from '@kubevirt-utils/utils/utils';
 import useMulticlusterNamespaces from '@multicluster/hooks/useMulticlusterNamespaces';
 import useIsACMPage from '@multicluster/useIsACMPage';
-import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 
-import useListClusters from './useListClusters';
+import { KubevirtFilter, KubevirtFilterLayout } from '../types';
 
-export const useProjectFilter = <R extends K8sResourceCommon>(): RowFilter<R> => {
+const useProjectFilter = (): KubevirtFilter => {
   const { t } = useKubevirtTranslation();
-  const allClustersSelected = useListClusters();
   const isACMPage = useIsACMPage();
+  const selectedClusters = useListClusters(CLUSTER_LIST_FILTER_TYPE);
 
   const [projects] = useProjects();
-  const { allNamespaces: multiclusterNamespaces } = useMulticlusterNamespaces(allClustersSelected);
+  const { allNamespaces: multiclusterNamespaces } = useMulticlusterNamespaces(selectedClusters);
 
   const multiclusterNamespacesNames = useMemo(
     () =>
@@ -38,20 +41,16 @@ export const useProjectFilter = <R extends K8sResourceCommon>(): RowFilter<R> =>
     [isACMPage, multiclusterNamespacesNames, projects],
   );
 
-  return {
-    filter: (input, obj) => {
-      if (isEmpty(input.selected)) {
-        return true;
-      }
-
-      return input.selected.some((projectName) => projectName === getNamespace(obj));
-    },
-    filterGroupName: t('Project'),
-    isMatch: () => true,
-    items: projectNames.map((project) => ({
-      id: project,
-      title: project,
-    })),
-    type: PROJECT_LIST_FILTER_TYPE,
-  };
+  return useMemo(
+    () => ({
+      categoryLabel: t('Project'),
+      filterLayout: KubevirtFilterLayout.SELECT,
+      id: PROJECT_LIST_FILTER_TYPE,
+      match: (obj, selected) => selected.includes(getNamespace(obj)),
+      options: projectNames.map((project) => ({ label: project, value: project })),
+    }),
+    [projectNames, t],
+  );
 };
+
+export default useProjectFilter;

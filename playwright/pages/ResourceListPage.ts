@@ -40,6 +40,11 @@ export class ResourceListPage {
 
   // ── List interactions ────────────────────────────────────────────────────────
 
+  /** Click the "Clear all filters" button rendered by the PatternFly Toolbar. */
+  async clearAllFilters() {
+    await this.page.getByRole('button', { name: /clear all filters/i }).click();
+  }
+
   /** Click the primary Create button. */
   async clickCreate() {
     await byTest(this.page, ITEM_CREATE).click();
@@ -63,6 +68,15 @@ export class ResourceListPage {
     await expect(this.page.getByText('name: example')).toBeVisible({ timeout: NAV_TIMEOUT });
   }
 
+  // ── Assertions ────────────────────────────────────────────────────────────────
+
+  /** Assert a toolbar filter chip with the given label text is visible. */
+  async expectChipVisible(label: string) {
+    await expect(
+      this.page.locator('.pf-v6-c-label__content').filter({ hasText: label }),
+    ).toBeVisible();
+  }
+
   async expectEmptyState(text: string) {
     await expect(this.page.getByText(text)).toBeVisible();
   }
@@ -75,7 +89,44 @@ export class ResourceListPage {
     await expect(byTestId(this.page, testId).first()).toBeVisible({ timeout });
   }
 
-  // ── Assertions ────────────────────────────────────────────────────────────────
+  /** Assert the name search input contains the expected value. */
+  async expectNameInputValue(value: string) {
+    await expect(this.page.locator(`[data-test="${NAME_FILTER_INPUT}"]`)).toHaveValue(value);
+  }
+
+  /** Assert no table row containing the given text is visible. */
+  async expectRowNotVisible(name: string) {
+    await expect(this.page.getByRole('row').filter({ hasText: name })).toHaveCount(0);
+  }
+
+  // ── Filter toolbar interactions ─────────────────────────────────────────────
+
+  /** Assert at least one table row containing the given text is visible. */
+  async expectRowVisible(name: string, timeout = NAV_TIMEOUT) {
+    await expect(this.page.getByRole('row').filter({ hasText: name }).first()).toBeVisible({
+      timeout,
+    });
+  }
+
+  /** Assert the current URL contains a specific search param value (waits for async URL update). */
+  async expectUrlContainsParam(key: string, value: string) {
+    await expect
+      .poll(() => new URL(this.page.url()).searchParams.getAll(key), {
+        message: `Expected URL param "${key}" to contain "${value}"`,
+        timeout: SHORT_TIMEOUT,
+      })
+      .toContain(value);
+  }
+
+  /** Assert the current URL has no search params (waits for async URL update). */
+  async expectUrlHasNoFilterParams() {
+    await expect
+      .poll(() => new URL(this.page.url()).search, {
+        message: 'Expected URL to have no search params',
+        timeout: SHORT_TIMEOUT,
+      })
+      .toBe('');
+  }
 
   /** Fill the name filter input.
    * Plugin pages render data-test-id="item-filter"; the standard console SDK
@@ -87,6 +138,18 @@ export class ResourceListPage {
       .nth(inputIndex);
     await input.waitFor({ state: 'visible', timeout: SHORT_TIMEOUT });
     await input.fill(name);
+  }
+
+  /**
+   * Open the grouped filter dropdown and select a row filter option.
+   * Uses `data-test-id="filter-dropdown-toggle"` and `data-test-row-filter`.
+   */
+  async filterByRowFilter(rowFilterKey: string) {
+    const toggle = byTestId(this.page, 'filter-dropdown-toggle');
+    await toggle.waitFor({ state: 'visible', timeout: SHORT_TIMEOUT });
+    await toggle.click();
+    await this.page.locator(`[data-test-row-filter="${rowFilterKey}"]`).click();
+    await toggle.click();
   }
 
   async navigate(url: string) {
@@ -192,6 +255,12 @@ export class InstanceTypesPage extends ResourceListPage {
 export class BootableVolumesPage extends ResourceListPage {
   async navigate(ns?: string) {
     await super.navigate(urls.bootableVolumes(ns ?? env.osImagesNamespace));
+  }
+
+  async navigateWithParams(params: Record<string, string>, ns?: string) {
+    const baseUrl = urls.bootableVolumes(ns ?? env.osImagesNamespace);
+    const searchParams = new URLSearchParams(params).toString();
+    await super.navigate(`${baseUrl}?${searchParams}`);
   }
 }
 
