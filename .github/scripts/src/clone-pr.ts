@@ -120,7 +120,7 @@ const main = async (): Promise<void> => {
 
   let result: Awaited<ReturnType<typeof performCherryPick>>;
   try {
-    result = performCherryPick(targetBranch, commitSha, cherryPickBranch);
+    result = performCherryPick(targetBranch, commitSha, cherryPickBranch, clonedTickets);
   } catch (err) {
     const keys = clonedTickets
       .map((ct) => `[${ct.clonedKey}](${JIRA_BASE_URL}/browse/${ct.clonedKey})`)
