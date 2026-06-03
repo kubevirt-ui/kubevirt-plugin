@@ -22,7 +22,7 @@ const AddBootableVolumeLink: FC<AddBootableVolumeLinkProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
-  const { onSelectCreatedVolume, volumeListNamespace } = useInstanceTypeVMStore();
+  const { onSelectCreatedVolume, preference, volumeListNamespace } = useInstanceTypeVMStore();
 
   const { canCreateDS, canCreatePVC } = useCanCreateBootableVolume(volumeListNamespace);
   const canCreate = canCreateDS || canCreatePVC;
@@ -33,6 +33,7 @@ const AddBootableVolumeLink: FC<AddBootableVolumeLinkProps> = ({
         hidePopover?.();
         createModal((props) => (
           <AddBootableVolumeModal
+            lockedPreference={preference ?? undefined}
             onCreateVolume={(volume) => onSelectCreatedVolume(volume, null, null, null)}
             {...props}
           />

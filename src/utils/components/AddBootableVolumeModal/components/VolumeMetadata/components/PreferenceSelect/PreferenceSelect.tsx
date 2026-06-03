@@ -15,7 +15,7 @@ import {
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverContentWithLightspeedButton/PopoverContentWithLightspeedButton';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
-import { FormGroup, PopoverPosition } from '@patternfly/react-core';
+import { FormGroup, HelperText, PopoverPosition } from '@patternfly/react-core';
 
 import { getSelectedKeyByLabel } from './utils/utils';
 import PreferencePopoverContent from './PreferencePopoverContent';
@@ -44,6 +44,7 @@ const PreferenceSelect: FC<PreferenceSelectProps> = ({
 
   const handleSelect = (value: string) => {
     const selectedOption = preferenceSelectOptions.find((option) => option.value === value);
+    if (!selectedOption) return;
     setBootableVolumeField('labels', DEFAULT_PREFERENCE_LABEL)(selectedOption.label);
   };
 
@@ -60,11 +61,12 @@ const PreferenceSelect: FC<PreferenceSelectProps> = ({
   );
 
   useEffect(() => {
+    if (!preferencesLoaded || bootableVolume.lockedPreference) return;
     if (!isExistingOption) {
       deleteLabel(DEFAULT_PREFERENCE_LABEL);
       deleteLabel(DEFAULT_PREFERENCE_KIND_LABEL);
     }
-  }, [deleteLabel, isExistingOption]);
+  }, [deleteLabel, isExistingOption, bootableVolume.lockedPreference, preferencesLoaded]);
 
   if (!preferencesLoaded) return <Loading />;
 
@@ -86,12 +88,18 @@ const PreferenceSelect: FC<PreferenceSelectProps> = ({
       label={t('Preference')}
     >
       <InlineFilterSelect
+        toggleProps={{
+          isDisabled: isDisabled || !!bootableVolume.lockedPreference,
+          isFullWidth: true,
+        }}
         options={preferenceSelectOptions}
         placeholder={t('Select preference')}
         selected={selectedPreferenceKey}
         setSelected={handleSelect}
-        toggleProps={{ isDisabled, isFullWidth: true }}
       />
+      {bootableVolume.lockedPreference && (
+        <HelperText>{t('Automatically set by the VM Guest OS selection.')}</HelperText>
+      )}
     </FormGroup>
   );
 };

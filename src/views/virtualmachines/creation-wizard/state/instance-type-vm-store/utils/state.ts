@@ -5,7 +5,7 @@ export const initialInstanceTypeVMState: InstanceTypeVMState = {
   customDiskSize: '',
   dvSource: null,
   operatingSystemType: OperatingSystemType.RHEL,
-  preference: '',
+  preference: null,
   pvcSource: null,
   selectedBootableVolume: null,
   selectedInstanceType: null,

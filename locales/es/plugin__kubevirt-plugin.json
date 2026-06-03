@@ -288,6 +288,7 @@
   "Automatically collapse the side navigation when managing your virtual machines to maximize your workspace": "Automatically collapse the side navigation when managing your virtual machines to maximize your workspace",
   "Automatically pull updates from the RHEL repository. Activation key and Organization ID are mandatory to enable this.": "Obtenga actualizaciones automáticamente del repositorio RHEL. Para ello, se requieren la clave de activación y el ID de la organización.",
   "Automatically selected Node": "Nodo seleccionado automáticamente",
+  "Automatically set by the VM Guest OS selection.": "Automatically set by the VM Guest OS selection.",
   "Autounattend will be picked up automatically during windows installation. it can be used with destructive actions such as disk formatting. Autounattend will only be used once during installation.": "Autounattend will be picked up automatically during windows installation. it can be used with destructive actions such as disk formatting. Autounattend will only be used once during installation.",
   "Autounattend.xml": "Autounattend.xml",
   "Autounattend.xml answer file": "Archivo de respuesta Autounattend.xml",

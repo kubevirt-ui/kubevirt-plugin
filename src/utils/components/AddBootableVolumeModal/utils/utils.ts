@@ -89,6 +89,11 @@ type CreateBootableVolumeType = (input: {
   uploadData: ({ dataVolume, file }: UploadDataProps) => Promise<void>;
 }) => (dataSource: V1beta1DataSource) => Promise<V1beta1DataSource[]>;
 
+export type PreferenceOption = {
+  kind?: string;
+  name: string;
+};
+
 const getBootableVolumePromise = ({
   arch,
   bootableVolume,

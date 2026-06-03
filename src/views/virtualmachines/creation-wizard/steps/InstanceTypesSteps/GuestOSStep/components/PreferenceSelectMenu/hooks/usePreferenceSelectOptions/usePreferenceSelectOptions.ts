@@ -10,7 +10,7 @@ type UsePreferenceSelectOptions = (
   cluster: string,
   operatingSystemType: OperatingSystemType,
 ) => {
-  preferenceNames: string[];
+  preferences: { kind: string; name: string }[];
   preferencesLoaded: boolean;
 };
 
@@ -27,13 +27,13 @@ const usePreferenceSelectOptions: UsePreferenceSelectOptions = (
     cluster,
   );
 
-  const preferenceNames = useMemo(() => {
+  const preferences = useMemo(() => {
     const allPreferences = [...(clusterPreferences || []), ...(userPreferences || [])];
     return getPreferenceNamesFilteredByOSType(allPreferences, operatingSystemType);
   }, [clusterPreferences, userPreferences, operatingSystemType]);
 
   return {
-    preferenceNames,
+    preferences,
     preferencesLoaded: clusterPreferencesLoaded && userPreferencesLoaded,
   };
 };

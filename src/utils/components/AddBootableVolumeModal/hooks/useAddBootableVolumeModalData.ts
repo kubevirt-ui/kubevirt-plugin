@@ -5,6 +5,11 @@ import {
   DROPDOWN_FORM_SELECTION,
   initialBootableVolumeState,
 } from '@kubevirt-utils/components/AddBootableVolumeModal/utils/constants';
+import { PreferenceOption } from '@kubevirt-utils/components/AddBootableVolumeModal/utils/utils';
+import {
+  DEFAULT_PREFERENCE_KIND_LABEL,
+  DEFAULT_PREFERENCE_LABEL,
+} from '@kubevirt-utils/constants/instancetypes-and-preferences';
 import {
   DataUpload,
   UploadDataProps,
@@ -14,7 +19,7 @@ import useSelectedCluster from '@kubevirt-utils/hooks/useSelectedCluster';
 import { getValidNamespace } from '@kubevirt-utils/utils/utils';
 import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
 
-type UseAddBootableVolumeModalData = () => {
+type UseAddBootableVolumeModalData = (lockedPreference?: PreferenceOption) => {
   bootableVolume: AddBootableVolumeState;
   setBootableVolume: Dispatch<SetStateAction<AddBootableVolumeState>>;
   setSourceType: Dispatch<SetStateAction<DROPDOWN_FORM_SELECTION>>;
@@ -23,7 +28,7 @@ type UseAddBootableVolumeModalData = () => {
   uploadData: ({ dataVolume, file }: UploadDataProps) => Promise<void>;
 };
 
-const useAddBootableVolumeModalData: UseAddBootableVolumeModalData = () => {
+const useAddBootableVolumeModalData: UseAddBootableVolumeModalData = (lockedPreference) => {
   const [activeNamespace] = useActiveNamespace();
   const namespace = getValidNamespace(activeNamespace);
 
@@ -33,6 +38,14 @@ const useAddBootableVolumeModalData: UseAddBootableVolumeModalData = () => {
     ...initialBootableVolumeState,
     bootableVolumeCluster: selectedCluster,
     bootableVolumeNamespace: namespace,
+    labels: lockedPreference
+      ? {
+          ...initialBootableVolumeState.labels,
+          [DEFAULT_PREFERENCE_KIND_LABEL]: lockedPreference.kind,
+          [DEFAULT_PREFERENCE_LABEL]: lockedPreference.name,
+        }
+      : { ...initialBootableVolumeState.labels },
+    lockedPreference: lockedPreference?.name,
   });
 
   const { upload, uploadData } = useCDIUpload(selectedCluster);
