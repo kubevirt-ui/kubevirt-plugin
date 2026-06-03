@@ -7,7 +7,7 @@ import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getHostname } from '@kubevirt-utils/resources/vm';
 import { ensurePath } from '@kubevirt-utils/utils/utils';
-import { getFieldRequiredMessage, validateDNS1123Label } from '@kubevirt-utils/utils/validation';
+import { getNameValidationMessage } from '@kubevirt-utils/utils/validation';
 import { FormGroup, TextInput, ValidatedOptions } from '@patternfly/react-core';
 
 import FormGroupHelperText from '../FormGroupHelperText/FormGroupHelperText';
@@ -25,9 +25,7 @@ const HostnameModal: FC<HostnameModalProps> = ({ isOpen, onClose, onSubmit, vm, 
   const [newHostname, setNewHostname] = useState<string>(getHostname(vm));
   const [isTouched, setIsTouched] = useState(false);
 
-  const hostnameError = newHostname?.trim()
-    ? validateDNS1123Label(t, newHostname)
-    : getFieldRequiredMessage(t);
+  const hostnameError = getNameValidationMessage(t, newHostname);
   const isHostnameInvalid = isTouched && !!hostnameError;
 
   const updatedVirtualMachine = useMemo(() => {
@@ -40,7 +38,7 @@ const HostnameModal: FC<HostnameModalProps> = ({ isOpen, onClose, onSubmit, vm, 
   return (
     <TabModal
       headerText={t('Edit hostname')}
-      isDisabled={!newHostname?.trim() || !!validateDNS1123Label(t, newHostname)}
+      isDisabled={!!getNameValidationMessage(t, newHostname)}
       isOpen={isOpen}
       obj={updatedVirtualMachine}
       onClose={onClose}

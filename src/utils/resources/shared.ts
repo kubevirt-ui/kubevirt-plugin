@@ -392,6 +392,19 @@ export const getName = <A extends K8sResourceCommon = K8sResourceCommon>(resourc
   resource?.metadata?.name;
 
 /**
+ * Builds a composite key from cluster, namespace, and resource name.
+ * Used for keyed maps in zustand stores and similar lookups.
+ * @param cluster
+ * @param namespace
+ * @param name
+ */
+export const getClusterNamespaceNameKey = (
+  cluster: string,
+  namespace: string,
+  name: string,
+): string => `${cluster || ''}/${namespace}/${name}`;
+
+/**
  * function to get a resource's namespace
  * @param resource k8s resource
  * @returns resource's namespace

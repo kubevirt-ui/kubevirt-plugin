@@ -1,6 +1,10 @@
 import { create } from 'zustand';
 
-import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
+import {
+  getClusterNamespaceNameKey,
+  getName,
+  getNamespace,
+} from '@kubevirt-utils/resources/shared';
 import { getCluster } from '@multicluster/helpers/selectors';
 
 export const UPLOAD_ALERT_STATUS = {
@@ -38,7 +42,7 @@ type MountIsoUploadStore = {
  * @param vmName
  */
 export const getVmUploadKey = (cluster: string, namespace: string, vmName: string): string =>
-  `${cluster || ''}/${namespace}/${vmName}`;
+  getClusterNamespaceNameKey(cluster, namespace, vmName);
 
 export const getVmUploadKeyFromVm = (vm: {
   cluster?: string;
