@@ -1,4 +1,5 @@
 import React from 'react';
+import { TFunction } from 'i18next';
 
 import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { ToastActions } from '@kubevirt-utils/hooks/useKubevirtToast';
@@ -11,7 +12,7 @@ type ShowRerunToastParams = {
   configMap: IoK8sApiCoreV1ConfigMap;
   getUrl: (name: string, namespace: string, cluster: string) => string;
   navigate: (path: string) => void;
-  t: (key: string, options?: Record<string, unknown>) => string;
+  t: TFunction;
   toast: ToastActions;
 };
 

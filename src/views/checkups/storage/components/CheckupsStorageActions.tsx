@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
 
 import {
@@ -13,11 +13,10 @@ import useKubevirtToast from '@kubevirt-utils/hooks/useKubevirtToast';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getStorageCheckupURL } from '@kubevirt-utils/resources/checkups/urls';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
-import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { Dropdown, DropdownItem, DropdownList } from '@patternfly/react-core';
 
 import { CHECKUP_URLS } from '../../utils/constants';
-import { showRerunToast } from '../../utils/showRerunToast';
+import { createCheckupRerunHandler } from '../../utils/createCheckupRerunHandler';
 import { getCheckupImageFromNewestJob } from '../../utils/utils';
 import { deleteStorageCheckup, rerunStorageCheckup } from '../utils/utils';
 
@@ -47,6 +46,25 @@ const CheckupsStorageActions = ({
 
   const checkupName = getName(configMap);
 
+  const handleRerunAction = useMemo(
+    () =>
+      createCheckupRerunHandler({
+        configMap,
+        createModal,
+        getUrl: getStorageCheckupURL,
+        isKebab,
+        jobs,
+        navigate,
+        rerun: () => rerunStorageCheckup(configMap, checkupImage, jobs),
+        runningJobWarningMessage: t(
+          'This storage checkup is currently running. If you rerun the checkup, the running job will be deleted.',
+        ),
+        t,
+        toast,
+      }),
+    [checkupImage, configMap, createModal, isKebab, jobs, navigate, t, toast],
+  );
+
   const deleteCheckup = async (): Promise<void> => {
     setIsActionsOpen(false);
     try {
@@ -67,26 +85,9 @@ const CheckupsStorageActions = ({
     <Dropdown isOpen={isActionsOpen} onOpenChange={setIsActionsOpen} toggle={Toggle}>
       <DropdownList>
         <DropdownItem
-          onClick={async () => {
+          onClick={() => {
             setIsActionsOpen(false);
-            try {
-              await rerunStorageCheckup(configMap, checkupImage);
-              if (isKebab) {
-                showRerunToast({
-                  configMap,
-                  getUrl: getStorageCheckupURL,
-                  navigate,
-                  t,
-                  toast,
-                });
-              }
-            } catch (error) {
-              kubevirtConsole.error('Failed to rerun checkup:', error);
-              toast.addDangerToast({
-                content: error?.message || t('An unknown error occurred'),
-                title: t('Failed to rerun checkup'),
-              });
-            }
+            handleRerunAction();
           }}
           isDisabled={!checkupImage}
           key="rerun"

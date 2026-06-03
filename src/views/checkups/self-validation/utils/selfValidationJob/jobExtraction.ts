@@ -3,7 +3,7 @@ import { IoK8sApiBatchV1Job } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { k8sList } from '@openshift-console/dynamic-plugin-sdk';
 
-import { getJobContainers, KUBEVIRT_VM_LATENCY_LABEL } from '../../../utils/utils';
+import { getJobContainers, isJobRunning, KUBEVIRT_VM_LATENCY_LABEL } from '../../../utils/utils';
 import {
   JOB_ENV_ACCEPT_WINDOWS_EULA,
   JOB_ENV_DRY_RUN,
@@ -67,7 +67,7 @@ export const getStorageCapabilitiesFromJob = (job: IoK8sApiBatchV1Job): string[]
 export const getCheckupImageFromJob = (job: IoK8sApiBatchV1Job): string =>
   getJobContainers(job)?.[0]?.image || '';
 
-export const isJobRunning = (job: IoK8sApiBatchV1Job): boolean => !!job?.status?.active;
+export { isJobRunning } from '../../../utils/utils';
 
 /**
  * Fetches all running self-validation jobs across the cluster

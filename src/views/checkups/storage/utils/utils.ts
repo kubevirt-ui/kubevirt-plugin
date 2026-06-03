@@ -14,7 +14,7 @@ import {
   IoK8sApiRbacV1ClusterRoleBinding,
 } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
-import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
+import { isEmpty, kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sCreate, kubevirtK8sDelete, kubevirtK8sPatch } from '@multicluster/k8sRequests';
 import { SimpleSelectOption } from '@patternfly/react-templates';
@@ -24,6 +24,7 @@ import {
   CONFIGMAP_NAME,
   CONFIGMAP_NAMESPACE,
   generateWithNumbers,
+  isJobRunning,
   KUBEVIRT_VM_LATENCY_LABEL,
   STATUS_COMPLETION_TIME_STAMP,
   STATUS_FAILURE_REASON,
@@ -390,41 +391,75 @@ export const deleteStorageCheckup = async (
   }
 };
 
+export const deleteStorageJob = async (job: IoK8sApiBatchV1Job): Promise<void> => {
+  await kubevirtK8sDelete({
+    cluster: getCluster(job),
+    model: JobModel,
+    resource: job,
+  });
+};
+
 export const rerunStorageCheckup = async (
   resource: IoK8sApiCoreV1ConfigMap,
   checkupImage: string,
+  jobs: IoK8sApiBatchV1Job[] = [],
 ): Promise<IoK8sApiBatchV1Job> => {
+  const runningJobs = jobs.filter(isJobRunning);
+  const deletionErrors: string[] = [];
+
+  for (const job of runningJobs) {
+    try {
+      await deleteStorageJob(job);
+      kubevirtConsole.log('Deleted running job:', getName(job));
+    } catch (error) {
+      deletionErrors.push(getName(job) || 'job');
+      kubevirtConsole.error('Failed to delete running job:', error);
+    }
+  }
+
+  if (deletionErrors.length > 0) {
+    throw new Error(
+      `Failed to delete running jobs: ${deletionErrors.join(', ')}. Cannot proceed with rerun.`,
+    );
+  }
+
   const isSucceeded = resource?.data?.[STATUS_SUCCEEDED] === 'true';
-  await kubevirtK8sPatch<IoK8sApiCoreV1ConfigMap>({
-    cluster: getCluster(resource),
-    data: [
-      { op: 'remove', path: `/data/${STATUS_COMPLETION_TIME_STAMP}` },
-      { op: 'remove', path: `/data/${STATUS_SUCCEEDED}` },
-      { op: 'remove', path: `/data/${STATUS_FAILURE_REASON}` },
-      { op: 'remove', path: `/data/${STATUS_START_TIME_STAMP}` },
-      ...(isSucceeded
-        ? [
-            { op: 'remove', path: `/data/${STORAGE_CHECKUP_DEFAULT_STORAGE_CLASS}` },
-            { op: 'remove', path: `/data/${STORAGE_CHECKUP_LIVE_MIGRATION}` },
-            { op: 'remove', path: `/data/${STORAGE_CHECKUPS_UNSET_EFS_STORAGE_CLASS}` },
-            { op: 'remove', path: `/data/${STORAGE_CHECKUPS_WITH_NON_RBD_STORAGE_CLASS}` },
-            { op: 'remove', path: `/data/${STORAGE_CHECKUPS_VM_HOT_PLUG_VOLUME}` },
-            { op: 'remove', path: `/data/${STORAGE_CHECKUPS_BOOT_GOLDEN_IMAGE}` },
-            { op: 'remove', path: `/data/${STORAGE_CHECKUPS_STORAGE_WITH_RWX}` },
-            { op: 'remove', path: `/data/${STORAGE_CHECKUPS_WITH_CLAIM_PROPERTY_SETS}` },
-            { op: 'remove', path: `/data/${STORAGE_CHECKUPS_MISSING_VOLUME_SNAP_SHOT}` },
-            { op: 'remove', path: `/data/${STORAGE_CHECKUPS_GOLDEN_IMAGE_NOT_UP_TO_DATE}` },
-            { op: 'remove', path: `/data/${STORAGE_CHECKUPS_VM_VOLUME_CLONE}` },
-          ]
-        : []),
-    ],
-    model: ConfigMapModel,
-    resource,
-  });
+  const patchOperations = [
+    STATUS_COMPLETION_TIME_STAMP,
+    STATUS_SUCCEEDED,
+    STATUS_FAILURE_REASON,
+    STATUS_START_TIME_STAMP,
+    ...(isSucceeded
+      ? [
+          STORAGE_CHECKUP_DEFAULT_STORAGE_CLASS,
+          STORAGE_CHECKUP_LIVE_MIGRATION,
+          STORAGE_CHECKUPS_UNSET_EFS_STORAGE_CLASS,
+          STORAGE_CHECKUPS_WITH_NON_RBD_STORAGE_CLASS,
+          STORAGE_CHECKUPS_VM_HOT_PLUG_VOLUME,
+          STORAGE_CHECKUPS_BOOT_GOLDEN_IMAGE,
+          STORAGE_CHECKUPS_STORAGE_WITH_RWX,
+          STORAGE_CHECKUPS_WITH_CLAIM_PROPERTY_SETS,
+          STORAGE_CHECKUPS_MISSING_VOLUME_SNAP_SHOT,
+          STORAGE_CHECKUPS_GOLDEN_IMAGE_NOT_UP_TO_DATE,
+          STORAGE_CHECKUPS_VM_VOLUME_CLONE,
+        ]
+      : []),
+  ]
+    .filter((key) => resource?.data?.[key])
+    .map((key) => ({ op: 'remove', path: `/data/${key}` }));
+
+  if (!isEmpty(patchOperations)) {
+    await kubevirtK8sPatch<IoK8sApiCoreV1ConfigMap>({
+      cluster: getCluster(resource),
+      data: patchOperations,
+      model: ConfigMapModel,
+      resource,
+    });
+  }
 
   return kubevirtK8sCreate({
     cluster: getCluster(resource),
-    data: storageCheckupJob(resource.metadata.name, resource.metadata.namespace, checkupImage),
+    data: storageCheckupJob(getName(resource), getNamespace(resource), checkupImage),
     model: JobModel,
   });
 };

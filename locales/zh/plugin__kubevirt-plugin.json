@@ -2105,6 +2105,7 @@
   "This project is also governed by a ResourceQuota. Review to ensure accurate and consistent resource enforcement.": "此项目也受 ResourceQuota 管理。请检查它以确保在资源强制管理方面准确且一致。",
   "This quota contains advanced settings (such as pod limits) that cannot be displayed in this simplified form. These configurations remain active and can be viewed or edited in the YAML view.": "此配额包含无法以此简化形式显示的高级设置（如 pod 限制）。这些配置仍处于活动状态，可以在 YAML 视图中查看和编辑。",
   "This self validation checkup is currently running. If you rerun the checkup, the running job will be deleted.": "此自我验证检查当前正在运行。如果您重新运行检查，则会删除正在运行的作业。",
+  "This storage checkup is currently running. If you rerun the checkup, the running job will be deleted.": "This storage checkup is currently running. If you rerun the checkup, the running job will be deleted.",
   "This suite was skipped.": "这个套件已被跳过。",
   "This user is not allowed to edit this boot source": "不允许此用户编辑这个引导源",
   "This VirtualMachine has": "此 VirtualMachine 具有",
