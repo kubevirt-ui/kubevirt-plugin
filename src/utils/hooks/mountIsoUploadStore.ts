@@ -14,6 +14,7 @@ export type UploadAlertStatus = (typeof UPLOAD_ALERT_STATUS)[keyof typeof UPLOAD
 export type MountIsoUploadState = {
   alertDismissed?: boolean;
   cdromDiskName?: string;
+  errorHref?: string;
   errorMessage?: string;
   status: UploadAlertStatus;
 };

@@ -55,7 +55,7 @@ const MountCDROMModal: FC<MountCDROMModalProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const vmNamespace = getNamespace(vm);
-  const { upload, uploadData } = useCDIUpload(getCluster(vm));
+  const { checkUploadReady, upload, uploadData } = useCDIUpload(getCluster(vm));
   const { featureGates } = useKubevirtHyperconvergeConfiguration();
   const isHotPluggable = isHotPluggableEnabled(featureGates);
 
@@ -116,6 +116,8 @@ const MountCDROMModal: FC<MountCDROMModalProps> = ({
     if (!diskState) return;
 
     if (data.uploadFile?.file) {
+      await checkUploadReady();
+      clearPersistedUpload(cdromUploadKey);
       markBackgroundUploadStarted();
 
       const diskStateForMount = produceMountUploadVolumeState(
