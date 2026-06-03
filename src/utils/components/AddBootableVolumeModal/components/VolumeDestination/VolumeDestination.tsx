@@ -6,6 +6,7 @@ import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/
 import ProjectDropdown from '@kubevirt-utils/components/ProjectDropdown/ProjectDropdown';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useRequiredFieldValidation } from '@kubevirt-utils/hooks/useRequiredFieldValidation';
+import { getFieldRequiredMessage } from '@kubevirt-utils/utils/validation';
 import { ExpandableSection, FormGroup, Grid, GridItem, TextInput } from '@patternfly/react-core';
 
 import { AddBootableVolumeState, SetBootableVolumeFieldType } from '../../utils/constants';
@@ -59,7 +60,7 @@ const VolumeDestination: FC<VolumeDestinationProps> = ({
         />
         {isVolumeNameInvalid && (
           <FormGroupHelperText validated={volumeNameValidated}>
-            {t('This field is required')}
+            {getFieldRequiredMessage(t)}
           </FormGroupHelperText>
         )}
       </FormGroup>

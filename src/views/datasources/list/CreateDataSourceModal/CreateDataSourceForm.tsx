@@ -9,6 +9,7 @@ import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getFieldRequiredMessage } from '@kubevirt-utils/utils/validation';
 import {
   Form,
   FormGroup,
@@ -52,7 +53,7 @@ export const CreateDataSourceForm: FC<CreateDataSourceFormProps> = ({
         <FormGroupHelperText
           validated={errors?.['name'] ? ValidatedOptions.error : ValidatedOptions.default}
         >
-          {errors?.['name'] && t('This field is required')}
+          {errors?.['name'] && getFieldRequiredMessage(t)}
         </FormGroupHelperText>
       </FormGroup>
       <FormGroup
@@ -73,7 +74,7 @@ export const CreateDataSourceForm: FC<CreateDataSourceFormProps> = ({
           validated={errors?.['url'] ? ValidatedOptions.error : ValidatedOptions.default}
         >
           {errors?.['url']
-            ? t('This field is required')
+            ? getFieldRequiredMessage(t)
             : t('Example: {{exampleURL}}', {
                 exampleURL: 'quay.io/containerdisks/centos:7-2009',
               })}
@@ -149,7 +150,7 @@ export const CreateDataSourceForm: FC<CreateDataSourceFormProps> = ({
           validated={errors?.['schedule'] ? ValidatedOptions.error : ValidatedOptions.default}
         >
           {errors?.['schedule']
-            ? t('This field is required')
+            ? getFieldRequiredMessage(t)
             : t('Example (At 00:00 on Tuesday): {{exampleCron}}', {
                 exampleCron: '0 0 * * 2',
               })}

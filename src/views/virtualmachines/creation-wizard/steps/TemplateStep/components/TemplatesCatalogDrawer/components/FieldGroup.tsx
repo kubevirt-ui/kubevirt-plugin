@@ -4,6 +4,7 @@ import classNames from 'classnames';
 import { TemplateParameter } from '@kubevirt-ui-ext/kubevirt-api/console';
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getFieldRequiredMessage } from '@kubevirt-utils/utils/validation';
 import { FormGroup, TextInput, ValidatedOptions } from '@patternfly/react-core';
 
 type FieldGroupProps = {
@@ -51,7 +52,7 @@ const FieldGroup: FC<FieldGroupProps> = ({
         value={value}
       />
       <FormGroupHelperText validated={validated}>
-        {showError && !value ? t('This field is required') : description}
+        {showError && !value ? getFieldRequiredMessage(t) : description}
       </FormGroupHelperText>
     </FormGroup>
   );
