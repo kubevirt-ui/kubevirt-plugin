@@ -66,7 +66,7 @@ const RemoteViewer: FC<RemoteViewerProps> = ({
         <ExpandableSection
           isExpanded={isExpandedDefault}
           onToggle={(_event, isExpanded) => setIsExpandedDefault(isExpanded)}
-          toggleText={textMoreInfo || t('Remote Viewer Details')}
+          toggleText={textMoreInfo || t('Remote Viewer details')}
         >
           <MoreInformationDefault textMoreInfoContent={textMoreInfoContent} />
         </ExpandableSection>
@@ -75,7 +75,7 @@ const RemoteViewer: FC<RemoteViewerProps> = ({
         <ExpandableSection
           isExpanded={isExpandedRDP}
           onToggle={(_event, isExpanded) => setIsExpandedRDP(isExpanded)}
-          toggleText={textMoreRDPInfo || t('Remote Desktop Details')}
+          toggleText={textMoreRDPInfo || t('Remote Desktop details')}
         >
           {textMoreRDPInfoContent ?? (
             <Content>

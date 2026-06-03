@@ -49,11 +49,11 @@ const useEnvironmentSelectOptions = (
         ...getEnhancedSelectOptionProps(secret.metadata.name, EnvironmentKind.secret),
       })),
       ...configMaps.map((configMap) => ({
-        group: t('Config Maps'),
+        group: t('ConfigMaps'),
         ...getEnhancedSelectOptionProps(configMap.metadata.name, EnvironmentKind.configMap),
       })),
       ...serviceAccounts.map((serviceAccount) => ({
-        group: t('Service Accounts'),
+        group: t('ServiceAccounts'),
         ...getEnhancedSelectOptionProps(
           serviceAccount.metadata.name,
           EnvironmentKind.serviceAccount,

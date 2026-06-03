@@ -232,7 +232,7 @@ const useVirtualMachineTemplatesActions: UseVirtualMachineTemplatesActions = (
       cta: () =>
         createModal(({ isOpen, onClose }) => (
           <DeleteModal
-            headerText={t('Delete VirtualMachine Template?')}
+            headerText={t('Delete VirtualMachine template?')}
             isOpen={isOpen}
             obj={template}
             onClose={onClose}

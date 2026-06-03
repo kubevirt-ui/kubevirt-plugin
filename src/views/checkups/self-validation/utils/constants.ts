@@ -130,13 +130,13 @@ export const STORAGE_CAPABILITIES = [
 ];
 
 export const STORAGE_CAPABILITY_OPTIONS = [
-  { label: 'Storage Class RHEL', value: STORAGE_CAPABILITY_STORAGE_CLASS_RHEL },
-  { label: 'Storage Class Windows', value: STORAGE_CAPABILITY_STORAGE_CLASS_WINDOWS },
+  { label: 'StorageClass RHEL', value: STORAGE_CAPABILITY_STORAGE_CLASS_RHEL },
+  { label: 'StorageClass Windows', value: STORAGE_CAPABILITY_STORAGE_CLASS_WINDOWS },
   { label: 'Storage RWX Block', value: STORAGE_CAPABILITY_STORAGE_RWX_BLOCK },
   { label: 'Storage RWX FileSystem', value: STORAGE_CAPABILITY_STORAGE_RWX_FILESYSTEM },
   { label: 'Storage RWO FileSystem', value: STORAGE_CAPABILITY_STORAGE_RWO_FILESYSTEM },
   { label: 'Storage RWO Block', value: STORAGE_CAPABILITY_STORAGE_RWO_BLOCK },
-  { label: 'Storage Class CSI', value: STORAGE_CAPABILITY_STORAGE_CLASS_CSI },
+  { label: 'StorageClass CSI', value: STORAGE_CAPABILITY_STORAGE_CLASS_CSI },
   { label: 'Storage Snapshot', value: STORAGE_CAPABILITY_STORAGE_SNAPSHOT },
   { label: 'Online Resize', value: STORAGE_CAPABILITY_ONLINE_RESIZE },
   { label: 'WFFC', value: STORAGE_CAPABILITY_WFFC },

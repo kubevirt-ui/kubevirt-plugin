@@ -21,14 +21,14 @@ export const HotplugLabel: FC<HotplugLabelProps> = ({ diskName, vm, vmi }) => {
     const vmDisk = getDisks(vm)?.find((vol) => vol?.name === diskName);
     const vmVolume = getVolumes(vm)?.find((vol) => vol?.name === diskName);
     if (!(vmVolume || vmDisk) && vmi) {
-      return t('AutoDetach Hotplug');
+      return t('AutoDetach hotplug');
     }
     if (
       volumeStatus?.hotplugVolume ||
       vmVolume?.dataVolume?.hotpluggable ||
       vmVolume?.persistentVolumeClaim?.hotpluggable
     ) {
-      return t('Persistent Hotplug');
+      return t('Persistent hotplug');
     }
     return null;
   }, [diskName, t, vm, vmi]);

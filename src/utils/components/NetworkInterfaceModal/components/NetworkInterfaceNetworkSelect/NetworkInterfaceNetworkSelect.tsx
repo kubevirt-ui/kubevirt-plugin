@@ -123,7 +123,7 @@ const NetworkInterfaceNetworkSelect: FC<NetworkInterfaceNetworkSelectProps> = ({
     [hasNads, hasPodNetwork],
   );
 
-  const podNetworkingText = useMemo(() => t('Pod Networking'), [t]);
+  const podNetworkingText = useMemo(() => t('Pod networking'), [t]);
 
   const networkOptions: NetworkSelectTypeaheadOptionProps[] = useMemo(() => {
     const options = filteredNADs?.map((nad) => {

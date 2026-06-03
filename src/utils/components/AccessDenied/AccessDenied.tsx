@@ -25,7 +25,7 @@ const AccessDenied: FC<AccessDeniedProps> = ({ message }) => {
             <img src={restrictedSignImg} />
           </div>
           <Title className="pf-v6-u-text-align-center" headingLevel="h2">
-            {t('Restricted Access')}
+            {t('Restricted access')}
           </Title>
 
           <div className="pf-v6-u-text-align-center" data-test="msg-box-detail">

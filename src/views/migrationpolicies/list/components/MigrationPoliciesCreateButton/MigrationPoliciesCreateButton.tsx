@@ -20,7 +20,7 @@ const MigrationPoliciesCreateButton: FC = () => {
   const { createModal } = useModal();
 
   const createItems = {
-    form: t('From Form'),
+    form: t('With form'),
     yaml: t('With YAML'),
   };
 

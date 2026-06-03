@@ -38,7 +38,7 @@ const MigrationsUtilizationChart: FC<MigrationsUtilizationChartProps> = ({
       <div className="co-utilization-card__item-description">{title}</div>
       {isEmpty(chartData) ? (
         <HelperText>
-          <HelperTextItem variant="warning">{t('No Datapoints found')}</HelperTextItem>
+          <HelperTextItem variant="warning">{t('No datapoints found')}</HelperTextItem>
         </HelperText>
       ) : (
         <div>

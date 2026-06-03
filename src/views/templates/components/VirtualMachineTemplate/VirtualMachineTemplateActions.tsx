@@ -60,7 +60,7 @@ const VirtualMachineTemplateActions: FC<VirtualMachineTemplateActionsProps> = ({
                 resource: vmTemplate,
               })
             }
-            headerText={t('Delete VirtualMachine Template?')}
+            headerText={t('Delete VirtualMachine template?')}
             isOpen={isOpen}
             obj={vmTemplate}
             onClose={onClose}

@@ -60,7 +60,7 @@ const MigrationThresholdChartDiskRate: FC<MigrationThresholdChartDiskRateProps> 
   const dataProcessed = useMemo(() => getPrometheusData(diskRate), [diskRate]);
 
   const chartDataProcessed = dataProcessed?.map(([x, y]) => {
-    return { name: t('Data Processed'), x: new Date(x * MILLISECONDS_MULTIPLIER), y: Number(y) };
+    return { name: t('Data processed'), x: new Date(x * MILLISECONDS_MULTIPLIER), y: Number(y) };
   });
 
   const isReady = !isEmpty(chartDataProcessed);

@@ -17,7 +17,7 @@ const useDisksFilters = (): RowFilter[] => {
             !drives?.all?.find((item) => item === drive)
           );
         },
-        filterGroupName: t('Disk Type'),
+        filterGroupName: t('Disk type'),
         items: Object.keys(diskTypesLabels).map((type) => ({
           id: diskTypesLabels[type],
           title: diskTypesLabels[type],

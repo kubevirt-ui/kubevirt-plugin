@@ -94,15 +94,15 @@ const MigrationThresholdChart: FC<MigrationThresholdChartProps> = ({ vmi }) => {
   );
 
   const chartDataProcessed = dataProcessed?.map(([x, y]) => {
-    return { name: t('Data Processed'), x: new Date(x * MILLISECONDS_MULTIPLIER), y: Number(y) };
+    return { name: t('Data processed'), x: new Date(x * MILLISECONDS_MULTIPLIER), y: Number(y) };
   });
 
   const chartDataRemaining = dataRemaining?.map(([x, y]) => {
-    return { name: t('Data Remaining'), x: new Date(x * MILLISECONDS_MULTIPLIER), y: Number(y) };
+    return { name: t('Data remaining'), x: new Date(x * MILLISECONDS_MULTIPLIER), y: Number(y) };
   });
 
   const chartDataDirtyRate = dataDirtyRate?.map(([x, y]) => {
-    return { name: t('Memory Dirty Rate'), x: new Date(x * MILLISECONDS_MULTIPLIER), y: Number(y) };
+    return { name: t('Memory dirty rate'), x: new Date(x * MILLISECONDS_MULTIPLIER), y: Number(y) };
   });
 
   const isReady =
@@ -140,9 +140,9 @@ const MigrationThresholdChart: FC<MigrationThresholdChartProps> = ({ vmi }) => {
               ...(yRange && { y: yRange }),
             }}
             legendData={[
-              { name: t('Data Processed') },
-              { name: t('Data Remaining'), symbol: { fill: chart_color_green_300.var } },
-              { name: t('Memory Dirty Rate'), symbol: { fill: chart_color_orange_300.var } },
+              { name: t('Data processed') },
+              { name: t('Data remaining'), symbol: { fill: chart_color_green_300.var } },
+              { name: t('Memory dirty rate'), symbol: { fill: chart_color_orange_300.var } },
             ]}
             height={height}
             legendOrientation="horizontal"

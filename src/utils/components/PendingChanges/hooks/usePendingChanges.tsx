@@ -262,7 +262,7 @@ export const usePendingChanges = (
       ...createProps(VirtualMachineDetailsTab.Details, () =>
         createModal(({ isOpen, onClose }) => (
           <HardwareDevicesModal
-            btnText={t('Add Host device')}
+            btnText={t('Add host device')}
             headerText={t('Host devices')}
             initialDevices={getHostDevices(vm)}
             isOpen={isOpen}

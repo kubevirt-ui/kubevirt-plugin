@@ -379,7 +379,7 @@ export const createVirtualMachineActionFactory = (t: TFunction) => ({
         : t('The VirtualMachine is not running'),
       disabled: !isRunning(vm),
       id: ACTIONS_ID.OPEN_CONSOLE,
-      label: t('Open Console'),
+      label: t('Open console'),
     };
   },
   pause: (

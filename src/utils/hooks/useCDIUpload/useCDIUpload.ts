@@ -40,7 +40,7 @@ export const useCDIUpload = (clusterInput?: string): UseCDIUploadValues => {
 
     if (noRouteFound) {
       return Promise.reject({
-        message: t('No Upload URL found {{configError}}', { configError }),
+        message: t('No upload URL found {{configError}}', { configError }),
       });
     }
 
@@ -74,7 +74,7 @@ export const useCDIUpload = (clusterInput?: string): UseCDIUploadValues => {
       progress: 0,
       pvcName: name,
       uploadError: noRouteFound && {
-        message: t('No Upload URL found {{configError}}', { configError }),
+        message: t('No upload URL found {{configError}}', { configError }),
       },
       uploadStatus: noRouteFound ? UPLOAD_STATUS.ERROR : UPLOAD_STATUS.ALLOCATING,
     };
@@ -87,7 +87,7 @@ export const useCDIUpload = (clusterInput?: string): UseCDIUploadValues => {
 
     if (noRouteFound) {
       setUpload(newUpload);
-      return Promise.reject(new Error(t('No Upload URL found {{configError}}', { configError })));
+      return Promise.reject(new Error(t('No upload URL found {{configError}}', { configError })));
     }
 
     setUpload({ ...newUpload, uploadStatus: UPLOAD_STATUS.ALLOCATING });

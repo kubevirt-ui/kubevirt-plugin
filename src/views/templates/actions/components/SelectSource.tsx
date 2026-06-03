@@ -117,10 +117,10 @@ export const SelectSource: FC<SelectSourceProps> = ({
           className="disk-source-form-group"
           fieldId={`disk-source-required-${selectedSourceType}`}
           isRequired
-          label={t('Container Image')}
+          label={t('Container image')}
         >
           <TextInput
-            aria-label={t('Container Image')}
+            aria-label={t('Container image')}
             onChange={(_event, newContainerURL) => onContainerChange(newContainerURL)}
             type="text"
             value={containerImage}

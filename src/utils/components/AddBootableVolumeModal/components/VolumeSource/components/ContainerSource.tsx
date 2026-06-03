@@ -45,11 +45,11 @@ const ContainerSource: FC<ContainerSourceProps> = ({
         className="disk-source-form-group"
         fieldId={`${testId}-${selectedSourceType}`}
         isRequired
-        label={t('Container Image')}
+        label={t('Container image')}
       >
         <FormTextInput
           {...(register ? register(`${testId}-containerImage`, { required: true }) : {})}
-          aria-label={t('Container Image')}
+          aria-label={t('Container image')}
           data-test-id={`${testId}-container-source-input`}
           id={`${testId}-${selectedSourceType}`}
           onChange={onInputValueChange}

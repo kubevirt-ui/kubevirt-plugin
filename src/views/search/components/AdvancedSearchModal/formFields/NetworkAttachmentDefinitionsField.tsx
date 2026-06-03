@@ -27,7 +27,7 @@ const NetworkAttachmentDefinitionsField: FC = () => {
   const placeholder = t('Find by name');
 
   return (
-    <FormGroup label={t('Network Attachment Definitions')}>
+    <FormGroup label={t('NetworkAttachmentDefinitions')}>
       <MultiSelectTypeahead
         allResourceNames={allOptions}
         data-test="adv-search-vm-nad"

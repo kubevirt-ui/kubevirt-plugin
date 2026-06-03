@@ -58,7 +58,7 @@ const getSourceOption = (source: SOURCE_OPTIONS_IDS, ns: string, t: TFunction) =
               .open(`/k8s/ns/${ns || DEFAULT_NAMESPACE}/persistentvolumeclaims/~new/data`, '_blank')
               .focus()
           }
-          description={t('Upload new file using the "Upload data to Persistent Volume Claim" page')}
+          description={t('Upload new file using the "Upload data to PersistentVolumeClaim" page')}
           value={SOURCE_TYPES.uploadSource}
         >
           {t('Upload (Upload a new file to a PVC)')} <ExternalLinkAltIcon />

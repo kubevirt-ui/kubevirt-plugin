@@ -32,7 +32,7 @@ const useVirtualMachineInstanceActionsProvider: UseVirtualMachineInstanceActions
         disabled: inFlight,
         icon: <ExternalLinkAltIcon />,
         id: 'open-console',
-        label: t('Open Console'),
+        label: t('Open console'),
       },
       {
         cta: () =>
@@ -57,7 +57,7 @@ const useVirtualMachineInstanceActionsProvider: UseVirtualMachineInstanceActions
             />
           )),
         id: 'edit-labels',
-        label: t('Edit Labels'),
+        label: t('Edit labels'),
       },
       {
         cta: () =>
@@ -82,7 +82,7 @@ const useVirtualMachineInstanceActionsProvider: UseVirtualMachineInstanceActions
             />
           )),
         id: 'edit-annotations',
-        label: t('Edit Annotations'),
+        label: t('Edit annotations'),
       },
       {
         accessReview: asAccessReview(VirtualMachineInstanceModel, vmi, 'delete'),

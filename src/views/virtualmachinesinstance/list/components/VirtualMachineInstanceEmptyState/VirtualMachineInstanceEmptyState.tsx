@@ -27,7 +27,7 @@ const VirtualMachineInstanceEmptyState: FC<VirtualMachineInstanceEmptyStateProps
     <EmptyState
       headingLevel="h4"
       icon={VirtualMachineIcon}
-      titleText={<>{t('No VirtualMachinesInstances found')}</>}
+      titleText={t('No VirtualMachineInstances found')}
       variant={EmptyStateVariant.lg}
     >
       <EmptyStateBody>

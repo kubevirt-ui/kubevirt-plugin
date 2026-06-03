@@ -129,7 +129,7 @@ export const computeSection: EncodedExtension[] = [
       href: '/hardwaredevices',
       id: 'hardwaredevices-virt-perspective',
       insertBefore: 'baremetalhosts',
-      name: '%plugin__kubevirt-plugin~Hardware Devices%',
+      name: '%plugin__kubevirt-plugin~Hardware devices%',
       perspective: PERSPECTIVES.VIRTUALIZATION,
       section: 'compute-virt-perspective',
     },

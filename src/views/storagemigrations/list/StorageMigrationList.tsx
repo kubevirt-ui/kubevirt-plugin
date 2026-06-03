@@ -59,7 +59,7 @@ const StorageMigrationList: FC = () => {
 
   return (
     <>
-      <ListPageHeader title={t('Storage MigrationPlans')} />
+      <ListPageHeader title={t('Storage migration plans')} />
 
       <ListPageBody>
         <div className="list-managment-group">

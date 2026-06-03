@@ -75,7 +75,7 @@ export const getVMIDisksTableColumns = (t: TFunction): ColumnConfig<DiskPresenta
   {
     getValue: (row) => row.storageClass ?? '',
     key: 'storageClass',
-    label: t('Storage Class'),
+    label: t('Storage class'),
     renderCell: (row) => (
       <span data-test={`disk-storageclass-${row.name}`}>{row.storageClass ?? NO_DATA_DASH}</span>
     ),

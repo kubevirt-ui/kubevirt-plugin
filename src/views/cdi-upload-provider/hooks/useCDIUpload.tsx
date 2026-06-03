@@ -3,6 +3,7 @@ import axios from 'axios';
 
 import { CDIConfigModelRef } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { CDIConfig, getUploadProxyURL } from '@kubevirt-utils/hooks/useCDIUpload/utils';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useK8sWatchResource, WatchK8sResource } from '@openshift-console/dynamic-plugin-sdk';
 
 import { CDI_UPLOAD_URL_BUILDER, UPLOAD_STATUS } from '../utils/consts';
@@ -17,6 +18,7 @@ const resource: WatchK8sResource = {
 };
 
 const useCDIUpload = (): CDIUploadContextProps => {
+  const { t } = useKubevirtTranslation();
   const [cdiConfig, configLoaded, configError] = useK8sWatchResource<CDIConfig>(resource);
   const [uploads, setUploads] = useState<DataUpload[]>([]);
   const canUpdateState = useRef<boolean>(true);
@@ -48,7 +50,9 @@ const useCDIUpload = (): CDIUploadContextProps => {
       namespace,
       progress: 0,
       pvcName,
-      uploadError: noRouteFound && { message: `No Upload URL found ${configError}` },
+      uploadError: noRouteFound && {
+        message: t('No upload URL found {{configError}}', { configError }),
+      },
       uploadStatus: noRouteFound ? UPLOAD_STATUS.ERROR : UPLOAD_STATUS.UPLOADING,
     };
 

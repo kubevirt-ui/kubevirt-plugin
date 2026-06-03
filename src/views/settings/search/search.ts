@@ -51,7 +51,7 @@ const getPreviewFeaturesTabIds = (t: TFunction): SearchItem[] => [
   { id: PREVIEW_FEATURES_TAB_IDS.previewFeatures, title: t('Preview features') },
   {
     id: PREVIEW_FEATURES_TAB_IDS.treeViewFolders,
-    title: t('Enable folders in Virtual Machines tree view'),
+    title: t('Enable folders in VirtualMachines tree view'),
   },
   {
     id: PREVIEW_FEATURES_TAB_IDS.passtUDNNetwork,

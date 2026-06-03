@@ -60,7 +60,7 @@ export const AccessMode: FC<AccessModeProps> = ({
         />
       }
       isStack
-      label={t('Access Mode')}
+      label={t('Access mode')}
     >
       {ACCESS_MODE_RADIO_OPTIONS.map(({ label, value }) => (
         <Radio

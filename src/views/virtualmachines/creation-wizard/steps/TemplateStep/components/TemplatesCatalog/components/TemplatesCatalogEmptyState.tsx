@@ -26,7 +26,7 @@ const TemplatesCatalogEmptyState: FC<TemplatesCatalogEmptyStateProps> = memo(
       return (
         <EmptyState
           headingLevel="h4"
-          titleText={t('Loading Templates with available boot source')}
+          titleText={t('Loading templates with available boot source')}
           variant={EmptyStateVariant.lg}
         >
           <EmptyStateBody>
@@ -60,11 +60,11 @@ const TemplatesCatalogEmptyState: FC<TemplatesCatalogEmptyStateProps> = memo(
     return (
       <EmptyState
         headingLevel="h4"
-        titleText={t('No Results Match the Filter Criteria')}
+        titleText={t('No results match the filter criteria')}
         variant={EmptyStateVariant.sm}
       >
         <EmptyStateBody>
-          {t('No Template items are being shown due to the filters being applied.')}
+          {t('No template items are being shown due to the filters being applied.')}
         </EmptyStateBody>
         <EmptyStateFooter>
           <EmptyStateActions>

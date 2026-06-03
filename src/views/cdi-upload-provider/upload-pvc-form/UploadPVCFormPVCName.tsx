@@ -18,7 +18,7 @@ const UploadPVCFormPVCName: FC<UploadPVCFormPVCNameProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   return (
-    <FormGroup fieldId="pvc-name" isRequired label={t('Persistent Volume Claim Name')}>
+    <FormGroup fieldId="pvc-name" isRequired label={t('PersistentVolumeClaim name')}>
       <TextInput
         aria-describedby="pvc-name-help"
         id="pvc-name"

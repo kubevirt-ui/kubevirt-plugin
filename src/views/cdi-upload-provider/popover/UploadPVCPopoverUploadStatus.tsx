@@ -43,7 +43,7 @@ const UploadPVCPopoverUploadStatus: FC<UploadPVCPopoverUploadStatusProps> = ({
         };
       case UPLOAD_STATUS.CANCELED:
         return {
-          body: error ? error?.message : t('Removing Resources'),
+          body: error ? error?.message : t('Removing resources'),
           icon: (
             <BanIcon className="co-icon-and-text__icon" color={error ? dangerColor?.var : ''} />
           ),

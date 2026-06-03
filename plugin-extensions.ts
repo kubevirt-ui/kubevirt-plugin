@@ -78,7 +78,7 @@ const extensions: EncodedExtension[] = [
     type: 'console.flag/model',
   } as EncodedExtension<ModelFeatureFlag>,
 
-  // Hardware Devices (compute section, not virtualization)
+  // Hardware devices (compute section, not virtualization)
   {
     flags: {
       required: [FLAG_KUBEVIRT_VIRTUALIZATION_NAV],
@@ -87,7 +87,7 @@ const extensions: EncodedExtension[] = [
       href: '/hardwaredevices',
       id: 'hardwaredevices',
       insertBefore: 'baremetalhosts',
-      name: '%plugin__kubevirt-plugin~Hardware Devices%',
+      name: '%plugin__kubevirt-plugin~Hardware devices%',
       section: 'compute',
     },
     type: 'console.navigation/href',

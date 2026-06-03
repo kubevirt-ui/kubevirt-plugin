@@ -61,7 +61,7 @@ export const filters: RowFilter[] = [
         !drives?.all?.find((s) => s === status)
       );
     },
-    filterGroupName: 'Disk Type',
+    filterGroupName: 'Disk type',
     items: Object.keys(diskTypes).map((type) => ({
       id: type,
       title: diskTypes[type],

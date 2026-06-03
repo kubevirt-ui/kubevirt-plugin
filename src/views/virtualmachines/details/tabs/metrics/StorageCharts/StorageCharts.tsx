@@ -20,10 +20,10 @@ type StorageChartsProps = {
 const STORAGE_CHART_COMPONENTS = [
   { Chart: StorageTotalReadWriteThresholdChart, titleKey: 'Storage total read / write' },
   { Chart: StorageIOPSTotalThresholdChart, titleKey: 'Storage IOPS total read / write' },
-  { Chart: StorageReadLatencyAvgMaxChart, titleKey: 'Storage Read Avg/Max Latency (all drives)' },
-  { Chart: StorageWriteLatencyAvgMaxChart, titleKey: 'Storage Write Avg/Max Latency (all drives)' },
-  { Chart: StorageReadLatencyPerDriveChart, titleKey: 'Storage Read Latency per Drive' },
-  { Chart: StorageWriteLatencyPerDriveChart, titleKey: 'Storage Write Latency per Drive' },
+  { Chart: StorageReadLatencyAvgMaxChart, titleKey: 'Storage read avg/max latency (all drives)' },
+  { Chart: StorageWriteLatencyAvgMaxChart, titleKey: 'Storage write avg/max latency (all drives)' },
+  { Chart: StorageReadLatencyPerDriveChart, titleKey: 'Storage read latency per drive' },
+  { Chart: StorageWriteLatencyPerDriveChart, titleKey: 'Storage write latency per drive' },
 ];
 
 const StorageCharts: FC<StorageChartsProps> = ({ prometheusUnavailable, vmi }) => {

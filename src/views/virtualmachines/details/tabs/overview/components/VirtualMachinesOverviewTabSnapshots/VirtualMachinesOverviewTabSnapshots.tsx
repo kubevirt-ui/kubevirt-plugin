@@ -71,7 +71,7 @@ const VirtualMachinesOverviewTabSnapshots: FC<VirtualMachinesOverviewTabSnapshot
           <CardFooter>
             <Link to={snapshotsTabLink}>
               <Label color="blue" variant="outline">
-                {t('View More')}
+                {t('View more')}
               </Label>
             </Link>
           </CardFooter>

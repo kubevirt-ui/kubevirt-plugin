@@ -7,8 +7,7 @@
 // t('plugin__kubevirt-plugin~Cluster')
 // t('plugin__kubevirt-plugin~Virtualization')
 // t('plugin__kubevirt-plugin~VirtualMachines')
-// t('plugin__kubevirt-plugin~Virtual Machines')
-// t('plugin__kubevirt-plugin~Create Virtual Machine')
+// t('plugin__kubevirt-plugin~Create VirtualMachine')
 // t('plugin__kubevirt-plugin~Catalog')
 // t('plugin__kubevirt-plugin~VirtualMachineInstances')
 // t('plugin__kubevirt-plugin~Templates')
@@ -50,10 +49,10 @@
 // t('plugin__kubevirt-plugin~VM')
 // t('plugin__kubevirt-plugin~Node')
 // t('plugin__kubevirt-plugin~Create a VirtualMachine from a template')
-// t('plugin__kubevirt-plugin~Hardware Devices')
+// t('plugin__kubevirt-plugin~Hardware devices')
 // t('plugin__kubevirt-plugin~OpenShift Virtualization')
 // t('plugin__kubevirt-plugin~Storage migrations')
-// t('plugin__kubevirt-plugin~Storage MigrationPlans')
+// t('plugin__kubevirt-plugin~Storage migration plans')
 // t('plugin__kubevirt-plugin~Cross cluster migration')
 // t('plugin__kubevirt-plugin~Fleet virtualization')
 
@@ -127,7 +126,7 @@
 
 // Workload descriptions - WORKLOADS_DESCRIPTIONS values translated in WorkloadProfileModal via t(WORKLOADS_DESCRIPTIONS[key])
 // t('Small scale consumption, recommended for using the graphical console')
-// t('Optimized for High resource consumption workloads')
+// t('Optimized for high resource consumption workloads')
 // t('Balances performance, compatible with a broad range of workloads')
 
 // Boot source labels - BOOT_SOURCE_LABELS values translated in components via t(getVMBootSourceLabel(...))
@@ -180,10 +179,10 @@
 // Storage chart titles - used in StorageCharts.tsx via STORAGE_CHART_COMPONENTS t(titleKey)
 // t('Storage total read / write')
 // t('Storage IOPS total read / write')
-// t('Storage Read Avg/Max Latency (all drives)')
-// t('Storage Write Avg/Max Latency (all drives)')
-// t('Storage Read Latency per Drive')
-// t('Storage Write Latency per Drive')
+// t('Storage read avg/max latency (all drives)')
+// t('Storage write avg/max latency (all drives)')
+// t('Storage read latency per drive')
+// t('Storage write latency per drive')
 
 //Disk size input
 // t('Dynamic')
