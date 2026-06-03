@@ -17,6 +17,8 @@ export const generateTimestamp = (): string => {
   return `${year}${month}${day}-${hours}${minutes}${seconds}`;
 };
 
+export type WarningCallback = (message: string) => void;
+
 /**
  * Adds an owner reference to a Kubernetes resource
  * Ensures dependent resources are automatically cleaned up when the owner is deleted
@@ -24,6 +26,7 @@ export const generateTimestamp = (): string => {
  * @param resourceName - Name of the resource to add the owner reference to
  * @param namespace - Namespace of the resource
  * @param owner - Owner resource details (apiVersion, kind, name, uid)
+ * @param onWarning - Optional callback invoked when the operation fails (best-effort)
  */
 export const addOwnerReference = async (
   model: K8sModel,
@@ -36,6 +39,7 @@ export const addOwnerReference = async (
     name: string;
     uid: string;
   },
+  onWarning?: WarningCallback,
 ): Promise<void> => {
   try {
     await kubevirtK8sPatch({
@@ -59,6 +63,8 @@ export const addOwnerReference = async (
       resource: { metadata: { name: resourceName, namespace } },
     });
   } catch (error) {
-    kubevirtConsole.warn(`Failed to add owner reference to ${model.kind}:`, error);
+    const message = `Failed to add owner reference to ${model.kind}`;
+    kubevirtConsole.warn(message, error);
+    onWarning?.(message);
   }
 };

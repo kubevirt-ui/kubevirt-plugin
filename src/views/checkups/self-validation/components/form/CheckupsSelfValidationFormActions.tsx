@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router';
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
+import useKubevirtToast from '@kubevirt-utils/hooks/useKubevirtToast';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getSelfValidationCheckupURL } from '@kubevirt-utils/resources/checkups/urls';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
@@ -41,6 +42,7 @@ const CheckupsSelfValidationFormActions: FC<CheckupsSelfValidationFormActionsPro
   const navigate = useNavigate();
   const namespace = useActiveNamespace();
   const { createModal } = useModal();
+  const { addWarningToast } = useKubevirtToast();
   const cluster = useClusterParam();
 
   const [error, setError] = useState<ReactNode>(null);
@@ -95,6 +97,7 @@ const CheckupsSelfValidationFormActions: FC<CheckupsSelfValidationFormActionsPro
         isDryRun,
         name,
         namespace,
+        onWarning: () => addWarningToast({ title: t('PVC may need manual cleanup') }),
         pvcSize,
         selectedTestSuites,
         storageCapabilities,

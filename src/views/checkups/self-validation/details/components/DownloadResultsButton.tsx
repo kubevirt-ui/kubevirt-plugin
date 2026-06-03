@@ -5,6 +5,7 @@ import {
   IoK8sApiCoreV1ConfigMap,
 } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import useKubevirtToast from '@kubevirt-utils/hooks/useKubevirtToast';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { Button, ButtonVariant, FlexItem } from '@patternfly/react-core';
@@ -23,6 +24,7 @@ type DownloadResultsButtonProps = {
 const DownloadResultsButton: FC<DownloadResultsButtonProps> = ({ configMap, job }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
+  const { addDangerToast } = useKubevirtToast();
   const { download, isDownloading } = useDownloadResults();
 
   const jobStatus = job ? getJobStatus(job) : null;
@@ -40,13 +42,20 @@ const DownloadResultsButton: FC<DownloadResultsButtonProps> = ({ configMap, job 
     }
     const result = await download(job, namespace);
     if (result && !result.success && result.error) {
-      createModal((props) => (
-        <DownloadResultsErrorModal
-          {...props}
-          errorMessage={result.error.message || getDefaultErrorMessage(t)}
-          url={result.error.certificateUrl}
-        />
-      ));
+      if (result.error.certificateUrl) {
+        createModal((props) => (
+          <DownloadResultsErrorModal
+            {...props}
+            errorMessage={result.error.message || getDefaultErrorMessage(t)}
+            url={result.error.certificateUrl}
+          />
+        ));
+      } else {
+        addDangerToast({
+          content: result.error.message || getDefaultErrorMessage(t),
+          title: t('Could not download results file'),
+        });
+      }
     }
   };
 

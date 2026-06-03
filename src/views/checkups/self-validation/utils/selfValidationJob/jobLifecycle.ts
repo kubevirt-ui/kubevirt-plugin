@@ -26,7 +26,7 @@ import {
 } from '../constants';
 import { getResultsConfigMapName } from '../selfValidationResults';
 
-import { addOwnerReference } from './helpers';
+import { addOwnerReference, WarningCallback } from './helpers';
 import { isJobRunning } from './jobExtraction';
 import { selfValidationConfigMap, selfValidationJob, selfValidationPVC } from './resourceTemplates';
 
@@ -41,6 +41,7 @@ export type CreateSelfValidationCheckupOptions = {
   isDryRun: boolean;
   name: string;
   namespace: string;
+  onWarning?: WarningCallback;
   pvcSize: string;
   selectedTestSuites: string[];
   storageCapabilities?: string[];
@@ -56,6 +57,7 @@ export type CreateSelfValidationCheckupOptions = {
  * @param jobData - The job data to create
  * @param namespace - Kubernetes namespace
  * @param storageClass - Optional storage class for the PVC
+ * @param onWarning - Optional callback for non-fatal warnings (e.g. owner reference failure)
  * @returns The created Job resource
  */
 const createJobWithPVC = async (
@@ -64,6 +66,7 @@ const createJobWithPVC = async (
   namespace: string,
   pvcSize: string,
   storageClass?: string,
+  onWarning?: WarningCallback,
 ): Promise<IoK8sApiBatchV1Job> => {
   const jobName = jobData.metadata.name;
 
@@ -99,19 +102,19 @@ const createJobWithPVC = async (
 
   // Best-effort: add owner reference so PVC is GC'd with the Job
   if (job.metadata?.uid) {
-    try {
-      await addOwnerReference(PersistentVolumeClaimModel, jobName, namespace, cluster, {
+    await addOwnerReference(
+      PersistentVolumeClaimModel,
+      jobName,
+      namespace,
+      cluster,
+      {
         apiVersion: 'batch/v1',
         kind: 'Job',
         name: jobName,
         uid: job.metadata.uid,
-      });
-    } catch (error) {
-      kubevirtConsole.warn(
-        'Failed to add owner reference to self-validation PVC; PVC may need manual cleanup:',
-        error,
-      );
-    }
+      },
+      onWarning,
+    );
   }
 
   return job;
@@ -130,6 +133,7 @@ export const createSelfValidationCheckup = async ({
   isDryRun,
   name,
   namespace,
+  onWarning,
   pvcSize,
   selectedTestSuites,
   storageCapabilities,
@@ -171,41 +175,45 @@ export const createSelfValidationCheckup = async ({
     model: ConfigMapModel,
   });
 
-  return createJobWithPVC(jobData, cluster, namespace, pvcSize, storageClass);
+  return createJobWithPVC(jobData, cluster, namespace, pvcSize, storageClass, onWarning);
 };
 
 /**
  * Deletes a single self-validation job and its associated resources
- * Cleans up: job, result ConfigMap, and PVC
+ * Cleans up: job, result ConfigMap, and PVC (same name as job)
  * @param job - The job to delete
- * @throws Error if job deletion fails (ConfigMap deletion failures are logged but not thrown)
+ * @throws Error if job deletion fails (ConfigMap/PVC deletion failures are logged but not thrown)
  */
 export const deleteSelfValidationJob = async (job: IoK8sApiBatchV1Job): Promise<void> => {
   const jobName = job.metadata.name;
   const namespace = job.metadata.namespace;
+  const cluster = getCluster(job);
 
-  // Delete the job (errors propagate to caller)
   await kubevirtK8sDelete({
-    cluster: getCluster(job),
+    cluster,
     model: JobModel,
     resource: job,
   });
 
-  // Delete the job's results ConfigMap (best-effort, errors are logged but not thrown)
   const resultsConfigMapName = getResultsConfigMapName(jobName);
   try {
     await kubevirtK8sDelete({
-      cluster: getCluster(job),
+      cluster,
       model: ConfigMapModel,
-      resource: {
-        metadata: {
-          name: resultsConfigMapName,
-          namespace,
-        },
-      },
+      resource: { metadata: { name: resultsConfigMapName, namespace } },
     });
   } catch (error) {
     kubevirtConsole.warn('Failed to delete results ConfigMap:', error);
+  }
+
+  try {
+    await kubevirtK8sDelete({
+      cluster,
+      model: PersistentVolumeClaimModel,
+      resource: { metadata: { name: jobName, namespace } },
+    });
+  } catch (error) {
+    kubevirtConsole.warn('Failed to delete PVC:', error);
   }
 };
 
@@ -220,6 +228,7 @@ export const deleteSelfValidationJob = async (job: IoK8sApiBatchV1Job): Promise<
 export const rerunSelfValidationCheckup = async (
   configMap: IoK8sApiCoreV1ConfigMap,
   jobs: IoK8sApiBatchV1Job[],
+  onWarning?: WarningCallback,
 ): Promise<IoK8sApiBatchV1Job> => {
   const cluster = getCluster(configMap);
   const { name, namespace } = configMap.metadata;
@@ -313,7 +322,7 @@ export const rerunSelfValidationCheckup = async (
     winImageName,
   });
 
-  return createJobWithPVC(jobData, cluster, namespace, pvcSize, storageClass);
+  return createJobWithPVC(jobData, cluster, namespace, pvcSize, storageClass, onWarning);
 };
 
 /**
@@ -321,31 +330,36 @@ export const rerunSelfValidationCheckup = async (
  * Cleans up: all jobs, PVCs, result ConfigMaps, nginx resources (Jobs, Services, Routes, ConfigMaps)
  * @param configMap - The tracking ConfigMap for the checkup
  * @param jobs - Array of all jobs for this checkup
+ * @throws Error if any job deletion or ConfigMap deletion fails
  */
 export const deleteSelfValidationCheckup = async (
   configMap: IoK8sApiCoreV1ConfigMap,
   jobs: IoK8sApiBatchV1Job[],
 ): Promise<void> => {
-  // Delete all resources for each self-validation job
+  const errors: string[] = [];
+
   for (const job of jobs) {
     try {
-      const jobName = job.metadata.name;
-      kubevirtConsole.log(`Cleaning up resources for job: ${jobName}`);
       await deleteSelfValidationJob(job);
     } catch (error) {
-      kubevirtConsole.error('Failed to delete job resources:', error);
+      const jobName = job.metadata?.name || 'unknown';
+      kubevirtConsole.error(`Failed to delete job ${jobName}:`, error);
+      errors.push(jobName);
     }
   }
 
-  // Finally, delete the tracking ConfigMap
   try {
     await kubevirtK8sDelete({
       cluster: getCluster(configMap),
       model: ConfigMapModel,
       resource: configMap,
     });
-    kubevirtConsole.log(`Deleted tracking configmap: ${configMap.metadata.name}`);
   } catch (error) {
     kubevirtConsole.error('Failed to delete tracking configmap:', error);
+    errors.push(configMap.metadata?.name || 'configmap');
+  }
+
+  if (errors.length > 0) {
+    throw new Error(`Failed to delete resources: ${errors.join(', ')}`);
   }
 };

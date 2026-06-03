@@ -367,13 +367,26 @@ export const deleteStorageCheckup = async (
   resource: IoK8sApiCoreV1ConfigMap,
   jobs: IoK8sApiBatchV1Job[],
 ) => {
+  const errors: string[] = [];
+
   try {
     await kubevirtK8sDelete({ cluster: getCluster(resource), model: ConfigMapModel, resource });
-    for (const job of jobs) {
-      await kubevirtK8sDelete({ cluster: getCluster(job), model: JobModel, resource: job });
-    }
   } catch (e) {
-    kubevirtConsole.log(e?.message);
+    kubevirtConsole.error('Failed to delete storage checkup ConfigMap:', e);
+    errors.push(getName(resource) || 'configmap');
+  }
+
+  for (const job of jobs) {
+    try {
+      await kubevirtK8sDelete({ cluster: getCluster(job), model: JobModel, resource: job });
+    } catch (e) {
+      kubevirtConsole.error(`Failed to delete job ${getName(job)}:`, e);
+      errors.push(getName(job) || 'job');
+    }
+  }
+
+  if (errors.length > 0) {
+    throw new Error(`Failed to delete resources: ${errors.join(', ')}`);
   }
 };
 
