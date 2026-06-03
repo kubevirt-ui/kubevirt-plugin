@@ -61,14 +61,14 @@ const EnvironmentForm: FC<EnvironmentFormProps> = ({ onEditChange, updateVM, vm 
               id="environment-name-header"
               sm={5}
             >
-              {t('config map / secret / service account')}
+              {t('ConfigMap / Secret / ServiceAccount')}
             </GridItem>
             <GridItem
               className="pf-v6-u-text-color-subtle text-uppercase"
               id="environment-serial-header"
               sm={5}
             >
-              {t('Serial Number')}
+              {t('Serial number')}
             </GridItem>
             <GridItem className="co-empty__header" sm={1} />
           </Grid>
@@ -98,7 +98,7 @@ const EnvironmentForm: FC<EnvironmentFormProps> = ({ onEditChange, updateVM, vm 
             type="button"
             variant={ButtonVariant.link}
           >
-            {t('Add Config Map, Secret, or Service Account')}
+            {t('Add ConfigMap, Secret, or ServiceAccount')}
           </Button>
         </div>
 

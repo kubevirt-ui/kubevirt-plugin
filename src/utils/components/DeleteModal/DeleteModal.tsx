@@ -49,7 +49,7 @@ const DeleteModal: FC<DeleteModalProps> = memo(
           await onDeleteSubmit();
           shouldRedirect && navigate(url);
         }}
-        headerText={headerText || t('Delete Resource?')}
+        headerText={headerText || t('Delete resource?')}
         isOpen={isOpen}
         obj={obj}
         onClose={onClose}

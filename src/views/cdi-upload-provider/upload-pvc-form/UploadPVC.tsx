@@ -111,7 +111,7 @@ const UploadPVCPage: FC = () => {
   const namespace = getNamespace(dvObj) || namespaceParam;
   const urlParams = new URLSearchParams(window.location.search);
   const osParam = urlParams.get(CDI_UPLOAD_OS_URL_PARAM);
-  const title = t('Upload data to Persistent Volume Claim');
+  const title = t('Upload data to PersistentVolumeClaim');
   const fileNameExtText = fileNameExtension
     ? t('Detected file extension is {{fileNameExtension}}', { fileNameExtension })
     : t('No file extension detected');

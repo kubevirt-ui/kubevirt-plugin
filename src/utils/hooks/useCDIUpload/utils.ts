@@ -69,8 +69,8 @@ const DV_UPLOAD_STATES = {
 
 export class PVCInitError extends Error {
   constructor() {
-    // t('Data Volume failed to initiate upload.')
-    super('Data Volume failed to initiate upload.');
+    // t('DataVolume failed to initiate upload.')
+    super('DataVolume failed to initiate upload.');
   }
 }
 

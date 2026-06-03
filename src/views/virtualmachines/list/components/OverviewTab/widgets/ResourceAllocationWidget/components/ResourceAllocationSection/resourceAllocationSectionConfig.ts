@@ -40,7 +40,7 @@ export const getWidgetConfigs = (t: TFunction): WidgetConfig[] => [
     graphTitle: t('Running'),
     metric: METRICS.RUNNING_VMS,
     subtitle: vmSubtitle,
-    title: t('Virtual Machines'),
+    title: t('Virtual machines'),
   },
   {
     graphTitle: t('Usage'),

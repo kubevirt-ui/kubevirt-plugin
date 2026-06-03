@@ -12,7 +12,7 @@ This is the OpenShift Console dynamic plugin for KubeVirt virtualization managem
 ## 1. What Is This Project
 
 ### Purpose
-- Provides a web UI for managing Virtual Machines on OpenShift/Kubernetes
+- Provides a web UI for managing virtual machines on OpenShift/Kubernetes
 - Integrates with OpenShift Console as a dynamic plugin
 - Enables VM lifecycle management, monitoring, and configuration
 
@@ -60,7 +60,7 @@ This is the OpenShift Console dynamic plugin for KubeVirt virtualization managem
 - Custom templates for organization standards
 - Define defaults, validations, parameters
 
-### Instance Types & Preferences
+### Instance types & Preferences
 - Instance types define compute resources (CPU, memory)
 - Preferences define OS-specific settings
 - Separate concerns from VM definition

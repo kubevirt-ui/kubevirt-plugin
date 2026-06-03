@@ -91,7 +91,7 @@ const SchedulingSectionRightGrid: FC<SchedulingSectionRightGridProps> = ({
             <SearchItem id="dedicated-resources">{t('Dedicated resources')}</SearchItem>
           }
           messageOnDisabled={t(
-            'Can not configure dedicated resources if the VirtualMachine is created from Instance Type',
+            'Can not configure dedicated resources if the VirtualMachine is created from an instance type',
           )}
           onEditClick={() =>
             createModal(({ isOpen, onClose }) => (

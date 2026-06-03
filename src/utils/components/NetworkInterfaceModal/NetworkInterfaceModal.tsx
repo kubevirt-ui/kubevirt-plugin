@@ -160,7 +160,7 @@ const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
         className="NetworkInterfaceModal__advanced"
         isExpanded={isExpanded}
         onToggle={(_, expand) => setIsExpanded(expand)}
-        toggleText={t('Advanced Settings')}
+        toggleText={t('Advanced settings')}
       >
         <NetworkInterfacePasst
           interfaceType={interfaceType}

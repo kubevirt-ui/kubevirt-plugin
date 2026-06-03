@@ -18,7 +18,7 @@ const useNetworkRowFilters = (): RowFilter[] => {
             !interfaces?.all?.find((item) => item === drive)
           );
         },
-        filterGroupName: t('Interface Type'),
+        filterGroupName: t('Interface type'),
         items: Object.keys(interfaceTypesProxy).map((type) => ({
           id: type,
           title: interfaceTypesProxy[type],

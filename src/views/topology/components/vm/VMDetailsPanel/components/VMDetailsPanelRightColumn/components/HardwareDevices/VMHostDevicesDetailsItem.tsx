@@ -29,7 +29,7 @@ const VMHostDevicesDetailsItem: FC<VMHostDevicesDetailsItemProps> = ({ vm, vmi }
         onSubmit={(updatedVM) =>
           updateHardwareDevices(HARDWARE_DEVICE_TYPE.HOST_DEVICES, updatedVM)
         }
-        btnText={t('Add Host device')}
+        btnText={t('Add host device')}
         headerText={t('Host devices')}
         initialDevices={hostDevices}
         isOpen={isOpen}
@@ -45,7 +45,7 @@ const VMHostDevicesDetailsItem: FC<VMHostDevicesDetailsItemProps> = ({ vm, vmi }
     <DescriptionItem
       descriptionData={
         <span>
-          {t('{{hostDevicesCount}} Host devices', {
+          {t('{{hostDevicesCount}} host devices', {
             hostDevicesCount,
           })}
         </span>

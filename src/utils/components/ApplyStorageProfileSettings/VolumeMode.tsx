@@ -84,7 +84,7 @@ export const VolumeMode: FC<VolumeModeProps> = ({
         />
       }
       isStack
-      label={t('Volume Mode')}
+      label={t('Volume mode')}
     >
       {VOLUME_MODE_RADIO_OPTIONS.map(({ label, value }) => (
         <Radio

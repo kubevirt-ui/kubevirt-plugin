@@ -33,7 +33,7 @@ const DataImportCronPageTitle: FC<DataImportCronPageTitleProps> = ({
               {t('DataImportCrons')}
             </Link>
           </BreadcrumbItem>
-          <BreadcrumbItem>{t('DataImportCron Details')}</BreadcrumbItem>
+          <BreadcrumbItem>{t('DataImportCron details')}</BreadcrumbItem>
         </Breadcrumb>
       }
     >

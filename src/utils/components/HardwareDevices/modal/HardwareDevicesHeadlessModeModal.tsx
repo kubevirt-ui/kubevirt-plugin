@@ -61,7 +61,7 @@ const HardwareDevicesHeadlessModeModal: FC<HardwareDevicesHeadlessModeModalProps
         />
         <FormGroupHelperText>
           {t(
-            'Applying the headless mode to this Virtual Machine will cause the VNC not be available if checked.',
+            'Applying the headless mode to this virtual machine will cause the VNC not be available if checked.',
           )}
         </FormGroupHelperText>
       </FormGroup>

@@ -25,7 +25,7 @@ const UploadingStatus: FC<UploadingStatusProps> = ({ onCancelClick, onSuccessCli
     <EmptyState
       headingLevel="h4"
       icon={InProgressIcon}
-      titleText={t('Uploading data to Persistent Volume Claim')}
+      titleText={t('Uploading data to PersistentVolumeClaim')}
     >
       <EmptyStateBody>
         <Stack hasGutter>
@@ -43,7 +43,7 @@ const UploadingStatus: FC<UploadingStatusProps> = ({ onCancelClick, onSuccessCli
           )}
           <StackItem>
             {t(
-              'Persistent Volume Claim has been created and your data source is now being uploaded to it. Once the uploading is completed the Persistent Volume Claim will become available',
+              'PersistentVolumeClaim has been created and your data source is now being uploaded to it. Once the uploading is completed the PersistentVolumeClaim will become available',
             )}
           </StackItem>
           <StackItem>
@@ -53,13 +53,13 @@ const UploadingStatus: FC<UploadingStatusProps> = ({ onCancelClick, onSuccessCli
       </EmptyStateBody>
       {onSuccessClick && (
         <Button id="cdi-upload-primary-pvc" onClick={onSuccessClick}>
-          {t('View Persistent Volume Claim details')}
+          {t('View PersistentVolumeClaim details')}
         </Button>
       )}
       {onCancelClick && upload?.uploadStatus === UPLOAD_STATUS.UPLOADING && (
         <EmptyStateActions>
           <Button id="cdi-upload-cancel-btn" onClick={onCancelClick} variant={ButtonVariant.link}>
-            {t('Cancel Upload')}
+            {t('Cancel upload')}
           </Button>
         </EmptyStateActions>
       )}

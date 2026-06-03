@@ -23,7 +23,7 @@ const HardwareDevicesPage: FC<any> = (props) => {
         </PageSection>
       ),
       href: '',
-      name: t('PCI Host devices'),
+      name: t('PCI host devices'),
       pageData: {
         devices: permittedHostDevices?.pciHostDevices?.map(
           (device: V1PciHostDevice & { pciDeviceSelector: string }) => ({
@@ -60,7 +60,7 @@ const HardwareDevicesPage: FC<any> = (props) => {
     <div>
       <PageSection>
         <Flex alignItems={{ default: 'alignItemsCenter' }} gap={{ default: 'gapSm' }}>
-          <Title headingLevel="h1">{t('Hardware Devices')}</Title>
+          <Title headingLevel="h1">{t('Hardware devices')}</Title>
           <HelpTextIcon
             bodyContent={t(
               'Various types of hardware devices are assigned to virtual machines in the cluster',

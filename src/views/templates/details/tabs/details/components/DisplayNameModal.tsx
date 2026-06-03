@@ -21,7 +21,7 @@ const DisplayNameModal: FC<DisplayNameModalProps> = memo(({ isOpen, obj, onClose
 
   return (
     <TabModal
-      headerText={t('Edit Display name')}
+      headerText={t('Edit display name')}
       isOpen={isOpen}
       obj={obj}
       onClose={onClose}

@@ -35,7 +35,7 @@ const ManualConnection: FC<ManualConnectionProps> = ({
   return (
     <div>
       <Content>
-        <h2>{textManualConnection || t('Manual Connection')}</h2>
+        <h2>{textManualConnection || t('Manual connection')}</h2>
         <p>{msg}</p>
       </Content>
       <DescriptionList className="pf-v6-u-mt-md">

@@ -28,7 +28,7 @@ export const getCalculationMethodContentMapper = (
       'Applies to pods that run VM workloads. Resource usage includes both VM and pod overhead.',
     ),
     label: t('VMI pod usage'),
-    longLabel: t('Virtual Machine Instance (VMI) pod usage'),
+    longLabel: t('VirtualMachineInstance (VMI) pod usage'),
     popover: t('counts the full pod running the VM, including overhead.'),
   },
 });

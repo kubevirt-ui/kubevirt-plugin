@@ -43,7 +43,7 @@ const PVCDeleteAlertExtension: FC<{ pvc: V1beta1PersistentVolumeClaim }> = ({ pv
       <Trans ns="plugin__kubevirt-plugin" t={t}>
         <p>
           Deleting this PVC will also delete{' '}
-          <strong className="co-break-word">{{ pvcName: pvc?.metadata?.name }}</strong> Data Volume
+          <strong className="co-break-word">{{ pvcName: pvc?.metadata?.name }}</strong> DataVolume
         </p>
       </Trans>
       {!loadedPvcs && !loadedTemplates && <p>{t('Checking for usages of this PVC...')}</p>}

@@ -40,7 +40,7 @@ const DataSourcePageTitle: FC<DataSourcePageTitleProps> = ({ dataSource, name, n
             </Link>
           </BreadcrumbItem>
           <BreadcrumbItem>
-            {fromBootableVolumes ? t('Bootable volume details') : t('DataSource Details')}
+            {fromBootableVolumes ? t('Bootable volume details') : t('DataSource details')}
           </BreadcrumbItem>
         </Breadcrumb>
       }

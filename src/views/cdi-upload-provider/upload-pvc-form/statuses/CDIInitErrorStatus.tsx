@@ -48,13 +48,13 @@ const CDIInitErrorStatus: FC<CDIInitErrorStatus> = ({ namespace, onErrorClick, p
       headingLevel="h4"
       icon={ErrorCircleOIcon}
       status="danger"
-      titleText={t('CDI Error: Could not initiate Data Volume')}
+      titleText={t('CDI Error: Could not initiate DataVolume')}
     >
       <EmptyStateBody>
         <Stack hasGutter>
           <StackItem>
             {t(
-              'Data Volume failed to initiate upload, you can either delete the Data Volume and try again, or check logs',
+              'DataVolume failed to initiate upload, you can either delete the DataVolume and try again, or check logs',
             )}
           </StackItem>
           <StackItem>
@@ -65,7 +65,7 @@ const CDIInitErrorStatus: FC<CDIInitErrorStatus> = ({ namespace, onErrorClick, p
                 data-checked-state={shouldKillDv}
                 id="approve-checkbox"
                 isChecked={shouldKillDv}
-                label={t('Delete Data Volume: {{pvcName}}', { pvcName })}
+                label={t('Delete DataVolume: {{pvcName}}', { pvcName })}
                 onChange={(_event, checked) => setShouldKillDv(checked)}
               />
               <SplitItem isFilled />

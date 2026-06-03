@@ -36,7 +36,7 @@ const MyComponent: FC = () => {
 
   return (
     <div>
-      <h1>{t('Virtual Machines')}</h1>
+      <h1>{t('VirtualMachines')}</h1>
       <p>{t('Manage your virtual machines')}</p>
     </div>
   );
@@ -75,7 +75,7 @@ Always accept `t` as a parameter -- never import `{ t }` directly:
 import { TFunction } from 'i18next';
 
 // CORRECT - t is passed in, caller provides it from the hook
-export const getPageTitle = (t: TFunction) => t('Virtual Machines');
+export const getPageTitle = (t: TFunction) => t('VirtualMachines');
 
 export const getStatusLabels = (t: TFunction) => ({
   running: t('Running'),
@@ -87,7 +87,7 @@ export const getStatusLabels = (t: TFunction) => ({
 ```tsx
 // WRONG - importing t directly bypasses the hook lifecycle
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-export const PAGE_TITLE = t('Virtual Machines');
+export const PAGE_TITLE = t('VirtualMachines');
 
 // WRONG - custom function type
 const getLabel = (t: (key: string) => string) => t('Name');
@@ -106,7 +106,7 @@ Always import `TFunction` from `i18next`. Never import `{ t }` directly from `us
 ### Simple Strings
 ```tsx
 // Basic translation
-{t('Virtual Machines')}
+{t('VirtualMachines')}
 {t('Create VM')}
 {t('Delete')}
 ```
@@ -154,7 +154,7 @@ For labels in plugin extension files, use the special format:
 {
   "type": "console.navigation/href",
   "properties": {
-    "name": "%plugin__kubevirt-plugin~Virtual Machines%",
+    "name": "%plugin__kubevirt-plugin~VirtualMachines%",
     "href": "/virtualization/vms"
   }
 }
@@ -165,7 +165,7 @@ Add a comment in `src/utils/i18n.ts` for the parser. This is the **only** file w
 
 ```typescript
 // Console extension strings - these are used in plugin-extensions.ts
-// t('plugin__kubevirt-plugin~Virtual Machines')
+// t('plugin__kubevirt-plugin~VirtualMachines')
 // t('plugin__kubevirt-plugin~Templates')
 // t('plugin__kubevirt-plugin~Catalog')
 ```
@@ -273,7 +273,7 @@ npm run i18n
 ### File Format
 ```json
 {
-  "Virtual Machines": "Virtual Machines",
+  "VirtualMachines": "VirtualMachines",
   "Create VM": "Create VM",
   "{{count}} item": "{{count}} item",
   "{{count}} item_plural": "{{count}} items",

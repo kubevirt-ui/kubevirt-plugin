@@ -11,7 +11,7 @@ const NUMABadge: FC = () => {
 
   const popoverContent = (
     <div>
-      <div>{t('Virtual NUMA topology is configured for this Virtual Machine.')}</div>
+      <div>{t('Virtual NUMA topology is configured for this virtual machine.')}</div>
       <ExternalLink
         href="https://kubevirt.io/user-guide/virtual_machines/numa/"
         text={t('Learn more')}

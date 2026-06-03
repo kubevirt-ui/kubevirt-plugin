@@ -62,7 +62,7 @@ const Details: FC<DetailsProps> = ({ pathname, vmi }) => {
         </Icon>
       </a>
       <Title className="co-section-heading" headingLevel="h2">
-        {t('VirtualMachineInstance Details')}
+        {t('VirtualMachineInstance details')}
       </Title>
       <Grid hasGutter>
         <GridItem span={5}>

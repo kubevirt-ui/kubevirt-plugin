@@ -47,7 +47,7 @@ const DetailsSectionHardware: FC<DetailsSectionHardwareProps> = ({
   const onEditHostDevices = () => {
     createModal(({ isOpen, onClose }) => (
       <HardwareDevicesModal
-        btnText={t('Add Host device')}
+        btnText={t('Add host device')}
         headerText={t('Host devices')}
         initialDevices={hostDevices}
         isOpen={isOpen}

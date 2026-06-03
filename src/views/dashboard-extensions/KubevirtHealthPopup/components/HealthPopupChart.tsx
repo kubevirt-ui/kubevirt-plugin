@@ -49,8 +49,8 @@ const HealthPopupChart: FC<HealthPopupChartProps> = ({ alerts, numberOfAlerts })
             fill: ({ datum }) => datum?.fill,
           },
         }}
-        ariaDesc={t('Virtualization Alerts')}
-        ariaTitle={t('Virtualization Alerts donut chart')}
+        ariaDesc={t('Virtualization alerts')}
+        ariaTitle={t('Virtualization alerts donut chart')}
         data={chartData}
         height={150}
         labels={({ datum }) => `${datum?.x}: ${datum?.y}%`}

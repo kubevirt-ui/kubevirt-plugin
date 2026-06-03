@@ -62,7 +62,7 @@ export const WORKLOADS_LABELS = {
 
 export const WORKLOADS_DESCRIPTIONS = {
   [WORKLOADS.desktop]: 'Small scale consumption, recommended for using the graphical console',
-  [WORKLOADS.highperformance]: 'Optimized for High resource consumption workloads',
+  [WORKLOADS.highperformance]: 'Optimized for high resource consumption workloads',
   [WORKLOADS.server]: 'Balances performance, compatible with a broad range of workloads',
 };
 

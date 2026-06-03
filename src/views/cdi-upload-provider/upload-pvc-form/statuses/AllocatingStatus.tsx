@@ -9,7 +9,7 @@ const AllocatingStatus: FC = () => {
     <EmptyState headingLevel="h4" icon={Spinner} titleText={t('Allocating resources')}>
       <EmptyStateBody>
         {t(
-          'Please wait, once the Data Volume has been created the data will start uploading into this Persistent Volume Claims.',
+          'Please wait, once the DataVolume has been created the data will start uploading into this PersistentVolumeClaim.',
         )}
       </EmptyStateBody>
     </EmptyState>

@@ -57,7 +57,7 @@ const StartPauseModal: FC<StartPauseModalProps> = ({
         />
         <FormGroupHelperText>
           {t(
-            'Applying the start/pause mode to this Virtual Machine will cause it to partially reboot and pause.',
+            'Applying the start/pause mode to this virtual machine will cause it to partially reboot and pause.',
           )}
         </FormGroupHelperText>
       </FormGroup>

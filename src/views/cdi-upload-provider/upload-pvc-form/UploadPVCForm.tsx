@@ -189,9 +189,9 @@ const UploadPVCForm: FC<UploadPVCFormProps> = ({
   return (
     <>
       <FormGroup>
-        <Alert isInline title={t('Persistent Volume Claim creation')} variant={AlertVariant.info}>
+        <Alert isInline title={t('PersistentVolumeClaim creation')} variant={AlertVariant.info}>
           {t(
-            'This Persistent Volume Claim will be created using a DataVolume through Containerized Data Importer (CDI)',
+            'This PersistentVolumeClaim will be created using a DataVolume through Containerized Data Importer (CDI)',
           )}
         </Alert>
       </FormGroup>
@@ -224,7 +224,7 @@ const UploadPVCForm: FC<UploadPVCFormProps> = ({
             data-checked-state={isGolden}
             id="golden-os-switch"
             isChecked={isGolden}
-            label={t('Attach this data to a Virtual Machine operating system')}
+            label={t('Attach this data to a VirtualMachine operating system')}
             onChange={(_event, checked: boolean) => handleGoldenCheckbox(checked)}
           />
         )}
