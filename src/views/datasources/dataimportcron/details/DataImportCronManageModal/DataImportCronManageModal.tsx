@@ -14,6 +14,7 @@ import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpa
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getFieldRequiredMessage } from '@kubevirt-utils/utils/validation';
 import {
   Checkbox,
   Divider,
@@ -111,7 +112,7 @@ export const DataImportCronManageModal: FC<DataImportCronManageModalProps> = ({
                 validated={errors?.['url'] ? ValidatedOptions.error : ValidatedOptions.default}
               >
                 {errors?.['url']
-                  ? t('This field is required')
+                  ? getFieldRequiredMessage(t)
                   : t('Example: {{exampleURL}}', {
                       exampleURL: 'docker://quay.io/containerdisks/centos:7-2009',
                     })}
@@ -204,7 +205,7 @@ export const DataImportCronManageModal: FC<DataImportCronManageModalProps> = ({
                     }
                   >
                     {errors?.['schedule']
-                      ? t('This field is required')
+                      ? getFieldRequiredMessage(t)
                       : t('Example (At 00:00 on Tuesday): {{exampleCron}}', {
                           exampleCron: '0 0 * * 2',
                         })}

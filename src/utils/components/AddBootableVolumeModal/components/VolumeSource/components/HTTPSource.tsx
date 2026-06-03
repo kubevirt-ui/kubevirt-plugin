@@ -10,6 +10,7 @@ import { FormTextInput } from '@kubevirt-utils/components/FormTextInput/FormText
 import { TLSCertificateSection } from '@kubevirt-utils/components/TLSCertificateSection';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useRequiredFieldValidation } from '@kubevirt-utils/hooks/useRequiredFieldValidation';
+import { getFieldRequiredMessage } from '@kubevirt-utils/utils/validation';
 import { FormGroup } from '@patternfly/react-core';
 
 type HTTPSourceProps = {
@@ -47,7 +48,7 @@ const HTTPSource: FC<HTTPSourceProps> = ({ bootableVolume, setBootableVolumeFiel
         />
         <FormGroupHelperText validated={urlValidated}>
           {isUrlInvalid ? (
-            t('This field is required')
+            getFieldRequiredMessage(t)
           ) : (
             <>
               {t('Enter URL to download. For example:')}{' '}

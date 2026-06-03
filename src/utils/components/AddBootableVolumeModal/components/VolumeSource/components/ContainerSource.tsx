@@ -5,6 +5,7 @@ import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/
 import { FormPasswordInput } from '@kubevirt-utils/components/FormPasswordInput/FormPasswordInput';
 import { FormTextInput } from '@kubevirt-utils/components/FormTextInput/FormTextInput';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getFieldRequiredMessage } from '@kubevirt-utils/utils/validation';
 import { FormGroup, ValidatedOptions } from '@patternfly/react-core';
 
 type ContainerSourceProps = {
@@ -59,7 +60,7 @@ const ContainerSource: FC<ContainerSourceProps> = ({
         />
         <FormGroupHelperText validated={validated}>
           {errors?.[`${testId}-containerImage`]
-            ? t('This field is required')
+            ? getFieldRequiredMessage(t)
             : registrySourceHelperText}
         </FormGroupHelperText>
       </FormGroup>
