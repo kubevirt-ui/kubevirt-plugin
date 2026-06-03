@@ -6,10 +6,7 @@ import useClusterParam from '@multicluster/hooks/useClusterParam';
 
 import { isEmpty } from '../../utils/utils';
 
-import {
-  DEFAULT_STORAGE_CLASS_ANNOTATION,
-  DEFAULT_VIRT_STORAGE_CLASS_ANNOTATION,
-} from './constants';
+import { isDefaultStorageClass, isVirtDefaultStorageClass } from './utils';
 
 type UseDefaultStorageClass = (cluster?: string) => [
   {
@@ -29,13 +26,9 @@ const useDefaultStorageClass: UseDefaultStorageClass = (cluster) => {
     if (!loaded || isEmpty(storageClasses)) return defaultSC;
 
     return storageClasses?.reduce((acc, sc) => {
-      const annotations = sc?.metadata?.annotations;
+      if (isDefaultStorageClass(sc)) acc.clusterDefaultStorageClass = sc;
 
-      if (annotations?.[DEFAULT_STORAGE_CLASS_ANNOTATION] === 'true')
-        acc.clusterDefaultStorageClass = sc;
-
-      if (annotations?.[DEFAULT_VIRT_STORAGE_CLASS_ANNOTATION] === 'true')
-        acc.virtDefaultStorageClass = sc;
+      if (isVirtDefaultStorageClass(sc)) acc.virtDefaultStorageClass = sc;
 
       return acc;
     }, defaultSC);
