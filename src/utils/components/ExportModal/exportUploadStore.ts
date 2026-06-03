@@ -1,7 +1,11 @@
 import { create } from 'zustand';
 
 import { IoK8sApiCoreV1Pod } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
-import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
+import {
+  getClusterNamespaceNameKey,
+  getName,
+  getNamespace,
+} from '@kubevirt-utils/resources/shared';
 
 export type ExportUploadState = {
   cluster: string;
@@ -18,7 +22,7 @@ type ExportUploadStore = {
 };
 
 const uploadKey = (cluster: string, namespace: string, pvcName: string) =>
-  `${cluster || ''}/${namespace}/${pvcName}`;
+  getClusterNamespaceNameKey(cluster, namespace, pvcName);
 
 export const useExportUploadStore = create<ExportUploadStore>((set, get) => ({
   clearUpload: (cluster, namespace, pvcName) =>

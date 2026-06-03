@@ -57,9 +57,22 @@ export const validateDNS1123Label = (t: TFunction, value: string): string | unde
   const errorFn = getDNS1123LabelError(value);
   return errorFn ? errorFn(t) : undefined;
 };
-export const isDigitsOnly = (value: string): boolean => /^\d+$/.test(value);
 
 export const getFieldRequiredMessage = (t: TFunction): string => t('This field is required');
+
+/**
+ * Validates a required DNS-1123 name field (trims whitespace before format validation).
+ * @param t
+ * @param value
+ */
+export const getNameValidationMessage = (t: TFunction, value: string): string | undefined => {
+  if (!value?.trim()) {
+    return getFieldRequiredMessage(t);
+  }
+  return validateDNS1123Label(t, value);
+};
+
+export const isDigitsOnly = (value: string): boolean => /^\d+$/.test(value);
 
 // Standard 5-field cron (minute hour day-of-month month day-of-week)
 const CRON_FIELD_PATTERN =

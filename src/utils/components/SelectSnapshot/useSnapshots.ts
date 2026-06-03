@@ -4,7 +4,7 @@ import {
   modelToGroupVersionKind,
   VolumeSnapshotModel,
 } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { getNamespace } from '@kubevirt-utils/resources/shared';
+import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 
 import { VolumeSnapshotKind } from './types';
@@ -50,30 +50,20 @@ const useSnapshots = (projectSelected: string, cluster?: string): UseSnapshotsRe
       .sort((a, b) => a.name.localeCompare(b.name));
   }, [allSnapshots]);
 
-  const snapshotWatchResource = projectSelected
-    ? {
-        cluster,
-        groupVersionKind: modelToGroupVersionKind(VolumeSnapshotModel),
-        isList: true,
-        namespace: projectSelected,
-        namespaced: true,
-      }
-    : null;
-
-  const [snapshotsRaw, snapshotsLoaded, snapshotsErrors] =
-    useK8sWatchData<VolumeSnapshotKind[]>(snapshotWatchResource);
-
   const snapshots = useMemo(
-    () => (snapshotsRaw || [])?.sort((a, b) => a?.metadata?.name?.localeCompare(b?.metadata?.name)),
-    [snapshotsRaw],
+    () =>
+      (allSnapshots || [])
+        .filter((snapshot) => getNamespace(snapshot) === projectSelected)
+        .sort((a, b) => getName(a)?.localeCompare(getName(b))),
+    [allSnapshots, projectSelected],
   );
 
   return {
-    error: allSnapshotsErrors || snapshotsErrors,
+    error: allSnapshotsErrors,
     projectsLoaded: allSnapshotsLoaded,
     projectsWithSnapshots,
     snapshots,
-    snapshotsLoaded,
+    snapshotsLoaded: allSnapshotsLoaded,
   };
 };
 
