@@ -1,4 +1,5 @@
-import type { JiraVersion } from './types/index.js';
+import { JIRA_BASE_URL } from './types/index.js';
+import type { ClonedTicket, JiraVersion } from './types/index.js';
 
 const RELEASE_BRANCH_REGEX = /^release-(\d+\.\d+)$/;
 const VERSION_NUMBER_REGEX = /(\d+\.\d+)/;
@@ -46,9 +47,10 @@ export const computeNextVersion = (highestReleaseVersion: string): string => {
   const major = parts[0];
   const minorStr = parts[1]!;
   const nextMinor = parseInt(minorStr, 10) + 1;
-  const padded = minorStr.length > 1 && minorStr.startsWith('0')
-    ? String(nextMinor).padStart(minorStr.length, '0')
-    : String(nextMinor);
+  const padded =
+    minorStr.length > 1 && minorStr.startsWith('0')
+      ? String(nextMinor).padStart(minorStr.length, '0')
+      : String(nextMinor);
   return `${major}.${padded}`;
 };
 
@@ -70,7 +72,10 @@ export const getExpectedVersionForBranch = (
 };
 
 /** Check if a Jira fix version's embedded number matches an expected version. */
-export const fixVersionMatchesBranch = (fixVersion: JiraVersion, expectedVersion: string): boolean => {
+export const fixVersionMatchesBranch = (
+  fixVersion: JiraVersion,
+  expectedVersion: string,
+): boolean => {
   const fvVersion = extractVersionNumber(fixVersion.name);
   return fvVersion === expectedVersion;
 };
@@ -104,6 +109,26 @@ export const extractTicketIds = (title: string): string[] => {
   const matches = title.match(/CNV-\d+/gi);
   if (!matches) return [];
   return [...new Set(matches.map((m) => m.toUpperCase()))];
+};
+
+/** Replace original Jira keys with clone keys (e.g. in cherry-picked commit messages). */
+export const rewriteJiraKeysInText = (text: string, clonedTickets: ClonedTicket[]): string => {
+  let result = text;
+  for (const { originalKey, clonedKey } of clonedTickets) {
+    result = result.replace(new RegExp(originalKey, 'gi'), clonedKey);
+  }
+  return result;
+};
+
+/** Remove original Jira keys from text so Prow does not update the source ticket. */
+export const stripOriginalJiraKeys = (text: string, clonedTickets: ClonedTicket[]): string => {
+  let result = text;
+  for (const { originalKey } of clonedTickets) {
+    result = result.replace(new RegExp(`\\[${originalKey}\\]\\([^)]*\\)`, 'gi'), '');
+    result = result.replace(new RegExp(`${JIRA_BASE_URL}/browse/${originalKey}`, 'gi'), '');
+    result = result.replace(new RegExp(`\\b${originalKey}\\b`, 'gi'), '');
+  }
+  return result.replace(/\n{3,}/g, '\n\n').trim();
 };
 
 /** Check if a branch name matches the release-X.YY pattern. */
