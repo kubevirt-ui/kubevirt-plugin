@@ -73,6 +73,8 @@ const VMCreationWizard: FC = () => {
       setProject(!isAdmin ? namespace : currentProject || namespace);
       hasInitialized.current = true;
     }
+
+    return () => resetWizardState();
   }, [
     clusterParam,
     isAdmin,

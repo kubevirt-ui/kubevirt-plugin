@@ -23,12 +23,17 @@ const DeploymentDetailsStepFooter: FC = () => {
   const { creationMethod } = useVMWizardStore();
   const isCloneMethod = isCloneCreationMethod(creationMethod);
   const closeWizard = useCloseWizard();
-  const { cancelButtonText, nextButtonText } = useWizardFooterProps();
+  const { backButtonText, cancelButtonText, nextButtonText } = useWizardFooterProps();
 
   return (
     <WizardFooterWrapper>
       <ActionList>
         <ActionListGroup>
+          <ActionListItem>
+            <Button isDisabled variant="secondary">
+              {backButtonText}
+            </Button>
+          </ActionListItem>
           <ActionListItem>
             {isCloneMethod ? (
               <Button onClick={goToNextStep} variant="primary">
