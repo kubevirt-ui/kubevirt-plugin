@@ -36,7 +36,7 @@ const FirmwareBootloaderModal: FC<FirmwareBootloaderModalProps> = ({
   vmi,
 }) => {
   const { t } = useKubevirtTranslation();
-  const clusterWorkloadArchitectures = useHcoWorkloadArchitectures();
+  const [clusterWorkloadArchitectures] = useHcoWorkloadArchitectures();
   const clusterOnlyArchitecture = getClusterOnlyArchitecture(clusterWorkloadArchitectures);
   const [selectedFirmwareBootloader, setSelectedFirmwareBootloader] =
     useState<BootloaderOptionValue>(

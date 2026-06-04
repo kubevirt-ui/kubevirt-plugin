@@ -51,7 +51,7 @@ const DetailsSectionBoot: FC<DetailsSectionBootProps> = ({
   const [isChecked, setIsChecked] = useState<boolean>(!!vm?.spec?.template?.spec?.startStrategy);
   const [isExpanded, setIsExpanded] = useToggle('boot-management');
   const vmName = getName(vm);
-  const clusterWorkloadArchitectures = useHcoWorkloadArchitectures();
+  const [clusterWorkloadArchitectures] = useHcoWorkloadArchitectures();
   const clusterOnlyArchitecture = getClusterOnlyArchitecture(clusterWorkloadArchitectures);
   useEffect(() => {
     expandURLHash(getSearchItemsIds(getDetailsTabBootIds(vm)), location?.hash, setIsExpanded);
