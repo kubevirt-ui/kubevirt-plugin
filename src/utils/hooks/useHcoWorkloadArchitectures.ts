@@ -2,13 +2,16 @@ import useHyperConvergeConfiguration from '@kubevirt-utils/hooks/useHyperConverg
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { useHubClusterName } from '@stolostron/multicluster-sdk';
 
-const useHcoWorkloadArchitectures = (cluster?: string): string[] => {
-  const [hyperConverge] = useHyperConvergeConfiguration(cluster);
+const useHcoWorkloadArchitectures = (cluster?: string): [string[], boolean] => {
+  const [hyperConverge, loaded, error] = useHyperConvergeConfiguration(cluster);
   const [hubClusterName] = useHubClusterName();
   const defaultWorkloadArchitectures =
     isEmpty(cluster) || cluster === hubClusterName ? window.SERVER_FLAGS?.nodeArchitectures : [];
 
-  return hyperConverge?.status?.nodeInfo?.workloadsArchitectures ?? defaultWorkloadArchitectures;
+  const architectures =
+    hyperConverge?.status?.nodeInfo?.workloadsArchitectures ?? defaultWorkloadArchitectures;
+
+  return [architectures, loaded || !!error];
 };
 
 export default useHcoWorkloadArchitectures;

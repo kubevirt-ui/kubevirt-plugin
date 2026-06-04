@@ -17,6 +17,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { useToggle } from '@kubevirt-utils/hooks/useToggle';
 import { getGPUDevices, getHostDevices } from '@kubevirt-utils/resources/vm';
 import { hasS390xArchitecture } from '@kubevirt-utils/resources/vm/utils/architecture';
+import { getCluster } from '@multicluster/helpers/selectors';
 import { Bullseye, Divider, ExpandableSection, Flex, Grid, GridItem } from '@patternfly/react-core';
 
 import { getSearchItemsIds } from '../../search/utils/utils';
@@ -37,7 +38,7 @@ const DetailsSectionHardware: FC<DetailsSectionHardwareProps> = ({
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const location = useLocation();
-  const clusterWorkloadArchitectures = useHcoWorkloadArchitectures();
+  const [clusterWorkloadArchitectures] = useHcoWorkloadArchitectures(getCluster(vm));
   const clusterOnlyArchitecture = getClusterOnlyArchitecture(clusterWorkloadArchitectures);
   const [isExpanded, setIsExpanded] = useToggle('hardware-devices');
   const onSubmit = onSubmitProp || updateHardwareDevices;
