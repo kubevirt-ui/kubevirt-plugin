@@ -23,23 +23,25 @@ import {
   emptyDataSource,
   SOURCE_DETAILS_SECTION_ID,
 } from './utils/constants';
-import { createBootableVolume, extractCreatedDataSources } from './utils/utils';
+import { createBootableVolume, extractCreatedDataSources, PreferenceOption } from './utils/utils';
 
 type AddBootableVolumeModalProps = {
   isOpen: boolean;
+  lockedPreference?: PreferenceOption;
   onClose: () => void;
   onCreateVolume?: (createdVolume: BootableVolume) => void;
 };
 
 const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
   isOpen,
+  lockedPreference,
   onClose,
   onCreateVolume,
 }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const { bootableVolume, setBootableVolume, setSourceType, sourceType, upload, uploadData } =
-    useAddBootableVolumeModalData();
+    useAddBootableVolumeModalData(lockedPreference);
 
   const isFormValid = useAddBootableVolumeFormValidation({
     bootableVolume,

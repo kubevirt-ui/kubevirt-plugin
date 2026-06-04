@@ -1,5 +1,6 @@
 import React, { FC } from 'react';
 
+import { PreferenceOption } from '@kubevirt-utils/components/AddBootableVolumeModal/utils/utils';
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup, SelectOption } from '@patternfly/react-core';
@@ -14,7 +15,7 @@ const PreferenceSelectMenu: FC = () => {
   const { cluster, project } = useVMWizardStore();
   const { operatingSystemType, preference, setPreference } = useInstanceTypeVMStore();
 
-  const { preferenceNames } = usePreferenceSelectOptions(project, cluster, operatingSystemType);
+  const { preferences } = usePreferenceSelectOptions(project, cluster, operatingSystemType);
 
   return (
     <FormGroup
@@ -23,16 +24,18 @@ const PreferenceSelectMenu: FC = () => {
       label={t('Guest operating system type')}
     >
       <FormPFSelect
+        onSelect={(_, value) => {
+          setPreference(value as PreferenceOption);
+        }}
         className="pf-v6-u-mt-md"
-        onSelect={(_, value) => setPreference(value as string)}
         placeholder={t('Select guest operating system type')}
-        selected={preference || ''}
-        selectedLabel={preference || t('Select guest operating system type')}
+        selected={preference?.name || ''}
+        selectedLabel={preference?.name || t('Select guest operating system type')}
         toggleProps={{ isFullWidth: true }}
       >
-        {preferenceNames.map((name) => (
-          <SelectOption key={name} value={name}>
-            {name}
+        {preferences.map((pref) => (
+          <SelectOption key={pref.name} value={pref}>
+            {pref.name}
           </SelectOption>
         ))}
       </FormPFSelect>

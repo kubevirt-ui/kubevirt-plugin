@@ -10,7 +10,7 @@ import { OperatingSystemType } from '@virtualmachines/creation-wizard/steps/Inst
 export const getPreferenceNamesFilteredByOSType = (
   preferences: (V1beta1VirtualMachineClusterPreference | V1beta1VirtualMachinePreference)[],
   osType: OperatingSystemType,
-): string[] => {
+): { kind: string; name: string }[] => {
   const filteredPreferences = preferences.filter((pref) => {
     const os = pref?.spec?.annotations?.[VM_OS_ANNOTATION];
     const name = getName(pref)?.toLowerCase() || '';
@@ -27,5 +27,7 @@ export const getPreferenceNamesFilteredByOSType = (
     }
   });
 
-  return filteredPreferences.map(getName).sort((a, b) => a.localeCompare(b));
+  return filteredPreferences
+    .map((pref) => ({ kind: pref.kind, name: getName(pref) }))
+    .sort((a, b) => a.name.localeCompare(b.name));
 };

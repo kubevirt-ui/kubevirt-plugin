@@ -18,7 +18,7 @@ const AddBootableVolumeButton: FC<AddBootableVolumeButtonProps> = ({ loadError }
   const { t } = useKubevirtTranslation();
   useSignals();
   const { createModal } = useModal();
-  const { onSelectCreatedVolume, volumeListNamespace } = useInstanceTypeVMStore();
+  const { onSelectCreatedVolume, preference, volumeListNamespace } = useInstanceTypeVMStore();
 
   const { canCreateDS, canCreatePVC } = useCanCreateBootableVolume(volumeListNamespace);
   const canCreate = canCreateDS || canCreatePVC;
@@ -30,6 +30,7 @@ const AddBootableVolumeButton: FC<AddBootableVolumeButtonProps> = ({ loadError }
       onClick={() =>
         createModal((props) => (
           <AddBootableVolumeModal
+            lockedPreference={preference ?? undefined}
             onCreateVolume={(volume) => onSelectCreatedVolume(volume, null, null, null)}
             {...props}
           />

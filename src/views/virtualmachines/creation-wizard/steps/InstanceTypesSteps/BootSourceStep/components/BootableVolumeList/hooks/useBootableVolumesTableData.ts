@@ -61,17 +61,17 @@ const useBootableVolumesTableData: UseBootableVolumesTableData = (
   const { bootableVolumes, dvSources, pvcSources, volumeSnapshotSources } = bootableVolumesData;
 
   const preferenceFilteredVolumes = useMemo(
-    () => filterBootableVolumesByPreference(bootableVolumes, preference),
+    () => filterBootableVolumesByPreference(bootableVolumes, preference?.name),
     [bootableVolumes, preference],
   );
 
   const isPreferenceFilterEmpty =
-    !!preference && !isEmpty(bootableVolumes) && isEmpty(preferenceFilteredVolumes);
+    !!preference?.name && !isEmpty(bootableVolumes) && isEmpty(preferenceFilteredVolumes);
 
   const allFilters = useBootVolumeFilters(preferenceFilteredVolumes);
 
   const filters = useMemo(() => {
-    if (!preference || isLinuxGenericPreference(preference)) return allFilters;
+    if (!preference?.name || isLinuxGenericPreference(preference?.name)) return allFilters;
     return allFilters.filter((f) => f.type !== 'osName');
   }, [allFilters, preference]);
 

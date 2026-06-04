@@ -51,6 +51,7 @@ export type AddBootableVolumeState = {
   cronExpression?: string;
   isIso?: boolean;
   labels?: { [key: string]: string };
+  lockedPreference?: string;
   pvcName: string;
   pvcNamespace: string;
   registryCredentials?: { password: string; username: string };

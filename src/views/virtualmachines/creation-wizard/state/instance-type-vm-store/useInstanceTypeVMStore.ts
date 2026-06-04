@@ -4,6 +4,7 @@ import { create } from 'zustand';
 import { V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { getInstanceTypeFromVolume } from '@kubevirt-utils/components/AddBootableVolumeModal/utils/utils';
+import { PreferenceOption } from '@kubevirt-utils/components/AddBootableVolumeModal/utils/utils';
 import { VolumeSnapshotKind } from '@kubevirt-utils/components/SelectSnapshot/types';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { initialInstanceTypeVMState } from '@virtualmachines/creation-wizard/state/instance-type-vm-store/utils/state';
@@ -47,9 +48,9 @@ const useInstanceTypeVMStore = create<InstanceTypeVMStore>()((set) => {
       set((state) => ({
         ...state,
         operatingSystemType: osType,
-        preference: '',
+        preference: null,
       })),
-    setPreference: (preference: string) =>
+    setPreference: (preference: null | PreferenceOption) =>
       set({
         preference,
       }),

@@ -22,7 +22,7 @@ const BootableVolumeEmptyState: FC<BootableVolumeEmptyStateProps> = ({ isPrefere
 
   const osName = preference
     ? (() => {
-        const base = preference.split('.')[0].split('-')[0];
+        const base = preference.name.split('.')[0].split('-')[0];
         return base === OS_NAME_TYPES.rhel || base === OS_NAME_TYPES.windows ? base : LINUX;
       })()
     : undefined;
