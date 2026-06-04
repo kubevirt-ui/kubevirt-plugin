@@ -1,6 +1,6 @@
 import React, { FC, useMemo } from 'react';
 
-import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { DataVolumeModel, VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import DiskListTitle from '@kubevirt-utils/components/DiskListTitle/DiskListTitle';
 import DiskSourceSelect from '@kubevirt-utils/components/DiskModal/components/DiskSourceSelect/DiskSourceSelect';
@@ -71,9 +71,9 @@ const DiskList: FC<DiskListProps> = ({
   const canAddDisk = canUpdate || canHotplug;
 
   const [canCreateDataVolume] = useAccessReview({
-    group: VirtualMachineModel.apiGroup,
+    group: DataVolumeModel.apiGroup,
     namespace: getNamespace(vm),
-    resource: VirtualMachineModel.plural,
+    resource: DataVolumeModel.plural,
     verb: 'create' as K8sVerb,
   });
 
