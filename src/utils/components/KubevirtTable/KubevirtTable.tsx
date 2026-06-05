@@ -4,7 +4,6 @@ import { PF_TABLE_CHECK_CLASS } from '@kubevirt-utils/hooks/useDataViewTableSort
 import { useDataViewTableSort } from '@kubevirt-utils/hooks/useDataViewTableSort/useDataViewTableSort';
 import { generateRows } from '@kubevirt-utils/hooks/useDataViewTableSort/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { ACTIONS } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/const';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Checkbox, EmptyState, EmptyStateVariant } from '@patternfly/react-core';
 import { DataViewTable, DataViewTr } from '@patternfly/react-data-view';
@@ -13,6 +12,7 @@ import MutedTextSpan from '../MutedTextSpan/MutedTextSpan';
 import StateHandler from '../StateHandler/StateHandler';
 
 import { useTableSelection } from './hooks/useTableSelection';
+import { getActiveColumns } from './utils/getActiveColumns';
 import { KubevirtTableProps } from './types';
 
 import './KubevirtTable.scss';
@@ -63,16 +63,10 @@ const KubevirtTable = <TData, TCallbacks = undefined>(
   const selectedItems = isSelectable ? props.selectedItems : [];
   const showSelectAllCheckbox = isSelectable ? props.showSelectAllCheckbox ?? true : false;
 
-  const activeColumns = useMemo(() => {
-    if (!activeColumnKeys) {
-      return columns.filter((col) => !col.additional);
-    }
-    const filtered = columns.filter(
-      (col) => activeColumnKeys.includes(col.key) || col.key === ACTIONS,
-    );
-    // Fall back to default columns if persisted keys no longer match any column
-    return filtered.length > 0 ? filtered : columns.filter((col) => !col.additional);
-  }, [columns, activeColumnKeys]);
+  const activeColumns = useMemo(
+    () => getActiveColumns(columns, activeColumnKeys),
+    [columns, activeColumnKeys],
+  );
 
   const effectiveInitialSortKey = useMemo(() => {
     if (initialSortKey) return initialSortKey;

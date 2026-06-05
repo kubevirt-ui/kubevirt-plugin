@@ -1,0 +1,22 @@
+.kubevirt-table-toolbar-actions {
+  align-items: center;
+  display: inline-flex;
+  flex-shrink: 0;
+  gap: 0;
+
+  .pf-v6-c-toolbar__group {
+    margin: 0;
+    padding-block: 0;
+    padding-inline: 0;
+  }
+
+  .pf-v6-c-toolbar__item {
+    margin: 0;
+  }
+}
+
+.kubevirt-table-toolbar-action {
+  align-items: center;
+  display: inline-flex;
+  margin-left: var(--pf-t--global--spacer--sm);
+}

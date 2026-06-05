@@ -1,7 +1,7 @@
 import React, { FC, useCallback } from 'react';
 
 import { IoK8sApiBatchV1Job } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
-import { getNamespace } from '@kubevirt-utils/resources/shared';
+import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { Divider, PageSection } from '@patternfly/react-core';
 
@@ -77,6 +77,7 @@ const CheckupsSelfValidationDetailsTab: FC = () => {
       </PageSection>
       <PageSection>
         <CheckupsDetailsPageHistory
+          checkupName={getName(configMap)}
           customActions={renderCustomActions}
           error={error instanceof Error ? error : undefined}
           initialSortDirection="desc"

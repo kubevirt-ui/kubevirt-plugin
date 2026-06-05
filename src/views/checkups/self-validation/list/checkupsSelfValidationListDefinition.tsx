@@ -7,6 +7,7 @@ import {
 } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { ACTIONS } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/const';
+import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { SortByDirection } from '@patternfly/react-table';
 
@@ -15,6 +16,7 @@ import {
   CheckupsStatus,
   columnsSorting,
   getConfigMapStatus,
+  getCSVExportStatusLabel,
   getJobStatus,
   STATUS_START_TIME_STAMP,
 } from '../../utils/utils';
@@ -26,7 +28,6 @@ import {
   NameCell,
   NamespaceCell,
   StatusCell,
-  SummaryCell,
   TimeCell,
 } from './checkupsSelfValidationCells';
 
@@ -62,13 +63,17 @@ export const getCheckupsSelfValidationColumns = (
         ]
       : []),
     {
-      getValue: (row) => row?.metadata?.namespace ?? '',
+      getValue: (row) => getNamespace(row) ?? '',
       key: 'namespace',
       label: t('Namespace'),
       renderCell: (row) => <NamespaceCell row={row} />,
       sortable: true,
     },
     {
+      getValue: (row, callbacks) => {
+        const latestJob = callbacks?.getJobByName(getName(row), false)?.[0];
+        return getCSVExportStatusLabel(getConfigMapStatus(row, getJobStatus(latestJob)), t);
+      },
       key: 'status',
       label: t('Status'),
       renderCell: (row, callbacks) => <StatusCell callbacks={callbacks} row={row} />,
@@ -96,6 +101,10 @@ export const getCheckupsSelfValidationColumns = (
       sortable: true,
     },
     {
+      getValue: (row, callbacks) => {
+        const latestJob = callbacks?.getJobByName(row?.metadata?.name, false)?.[0];
+        return latestJob?.status?.startTime || row?.data?.[STATUS_START_TIME_STAMP] || '';
+      },
       key: CHECKUPS_COLUMN_KEYS.START_TIME_CAMEL,
       label: t('Start time'),
       renderCell: (row, callbacks) => <TimeCell callbacks={callbacks} row={row} type="start" />,
@@ -103,6 +112,10 @@ export const getCheckupsSelfValidationColumns = (
       sortable: true,
     },
     {
+      getValue: (row, callbacks) => {
+        const latestJob = callbacks?.getJobByName(row?.metadata?.name, false)?.[0];
+        return latestJob?.status?.completionTime || '';
+      },
       key: 'completionTime',
       label: t('Completion time'),
       renderCell: (row, callbacks) => (
@@ -126,12 +139,6 @@ export const getCheckupsSelfValidationColumns = (
         });
       },
       sortable: true,
-    },
-    {
-      key: 'summary',
-      label: t('Summary'),
-      renderCell: (row, callbacks) => <SummaryCell callbacks={callbacks} row={row} />,
-      sortable: false,
     },
     {
       key: ACTIONS,

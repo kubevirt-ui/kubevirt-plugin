@@ -14,6 +14,7 @@ import { paginationDefaultValues } from '@kubevirt-utils/hooks/usePagination/uti
 import { useProjectFilter } from '@kubevirt-utils/hooks/useProjectFilter';
 import useSelectedRowFilterClusters from '@kubevirt-utils/hooks/useSelectedRowFilterClusters';
 import useSelectedRowFilterProjects from '@kubevirt-utils/hooks/useSelectedRowFilterProjects';
+import { EXPORT_TABLE_KEYS, KubevirtTableExport } from '@kubevirt-utils/hooks/useTableExport';
 import { isAllNamespaces, isEmpty } from '@kubevirt-utils/utils/utils';
 import useIsAllClustersPage from '@multicluster/hooks/useIsAllClustersPage';
 import useIsACMPage from '@multicluster/useIsACMPage';
@@ -94,6 +95,16 @@ const UserInstancetypeList: FC<UserInstancetypeListProps> = ({
     <ListPageBody>
       <div className="list-managment-group">
         <ListPageFilter
+          toolbarEndContent={
+            <KubevirtTableExport
+              activeColumnKeys={activeColumnKeys}
+              asToolbarItem
+              columns={columns}
+              data={filteredData ?? []}
+              exportKey={EXPORT_TABLE_KEYS.USER_INSTANCETYPES}
+              loaded={isLoaded}
+            />
+          }
           columnLayout={columnLayout}
           data={unfilteredData}
           filtersWithSelect={filtersWithSelect}

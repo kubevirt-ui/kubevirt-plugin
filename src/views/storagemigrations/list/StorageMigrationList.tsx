@@ -7,6 +7,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import useKubevirtTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtTableColumns';
 import usePaginationWithFilters from '@kubevirt-utils/hooks/usePagination/usePaginationWithFilters';
 import { paginationDefaultValues } from '@kubevirt-utils/hooks/usePagination/utils/constants';
+import { EXPORT_TABLE_KEYS, KubevirtTableExport } from '@kubevirt-utils/hooks/useTableExport';
 import { MultiNamespaceVirtualMachineStorageMigrationPlan } from '@kubevirt-utils/resources/migrations/constants';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
@@ -64,6 +65,16 @@ const StorageMigrationList: FC = () => {
       <ListPageBody>
         <div className="list-managment-group">
           <ListPageFilter
+            toolbarEndContent={
+              <KubevirtTableExport
+                activeColumnKeys={activeColumnKeys}
+                asToolbarItem
+                columns={columns}
+                data={data ?? []}
+                exportKey={EXPORT_TABLE_KEYS.STORAGE_MIGRATIONS}
+                loaded={isLoaded}
+              />
+            }
             columnLayout={columnLayout}
             data={unfilteredData}
             loaded={isLoaded}

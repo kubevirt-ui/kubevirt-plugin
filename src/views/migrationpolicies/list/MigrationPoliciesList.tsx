@@ -8,6 +8,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import useKubevirtTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtTableColumns';
 import useMigrationPolicies from '@kubevirt-utils/hooks/useMigrationPolicies';
 import useSelectedRowFilterClusters from '@kubevirt-utils/hooks/useSelectedRowFilterClusters';
+import { EXPORT_TABLE_KEYS, KubevirtTableExport } from '@kubevirt-utils/hooks/useTableExport';
 import { ListPageProps } from '@kubevirt-utils/utils/types';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useIsAllClustersPage from '@multicluster/hooks/useIsAllClustersPage';
@@ -90,6 +91,16 @@ const MigrationPoliciesList: FC<ListPageProps> = ({
 
       <ListPageBody>
         <ListPageFilter
+          toolbarEndContent={
+            <KubevirtTableExport
+              activeColumnKeys={activeColumnKeys}
+              asToolbarItem
+              columns={columns}
+              data={data ?? []}
+              exportKey={EXPORT_TABLE_KEYS.MIGRATION_POLICIES}
+              loaded={isLoaded}
+            />
+          }
           columnLayout={columnLayout}
           data={unfilteredData}
           filtersWithSelect={filters}

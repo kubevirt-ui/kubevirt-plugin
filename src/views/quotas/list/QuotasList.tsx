@@ -8,6 +8,7 @@ import useKubevirtTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettin
 import useNamespaceParam from '@kubevirt-utils/hooks/useNamespaceParam';
 import usePaginationWithFilters from '@kubevirt-utils/hooks/usePagination/usePaginationWithFilters';
 import { paginationDefaultValues } from '@kubevirt-utils/hooks/usePagination/utils/constants';
+import { EXPORT_TABLE_KEYS, KubevirtTableExport } from '@kubevirt-utils/hooks/useTableExport';
 import {
   ApplicationAwareClusterResourceQuotaModel,
   ApplicationAwareResourceQuotaModel,
@@ -147,6 +148,17 @@ const QuotasList: FC = () => {
           <>
             <div className="list-managment-group">
               <ListPageFilter
+                toolbarEndContent={
+                  <KubevirtTableExport<ApplicationAwareQuota, QuotaCallbacks>
+                    activeColumnKeys={activeColumnKeys}
+                    asToolbarItem
+                    callbacks={callbacks}
+                    columns={columns}
+                    data={filteredData ?? []}
+                    exportKey={EXPORT_TABLE_KEYS.APPLICATION_AWARE_QUOTAS}
+                    loaded={isLoaded}
+                  />
+                }
                 columnLayout={columnLayout}
                 data={unfilteredData}
                 loaded={isLoaded}

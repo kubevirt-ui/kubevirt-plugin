@@ -10,6 +10,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import useKubevirtTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtTableColumns';
 import usePaginationWithFilters from '@kubevirt-utils/hooks/usePagination/usePaginationWithFilters';
 import { paginationDefaultValues } from '@kubevirt-utils/hooks/usePagination/utils/constants';
+import { EXPORT_TABLE_KEYS, KubevirtTableExport } from '@kubevirt-utils/hooks/useTableExport';
 import { ListPageProps } from '@kubevirt-utils/utils/types';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useIsAllClustersPage from '@multicluster/hooks/useIsAllClustersPage';
@@ -76,6 +77,16 @@ const ClusterInstancetypeList: FC<ListPageProps> = ({
     <ListPageBody>
       <div className="list-managment-group">
         <ListPageFilter
+          toolbarEndContent={
+            <KubevirtTableExport
+              activeColumnKeys={activeColumnKeys}
+              asToolbarItem
+              columns={columns}
+              data={filteredData ?? []}
+              exportKey={EXPORT_TABLE_KEYS.CLUSTER_INSTANCETYPES}
+              loaded={isLoaded}
+            />
+          }
           columnLayout={columnLayout}
           data={unfilteredData}
           filtersWithSelect={filtersWithSelect}

@@ -104,7 +104,7 @@ const ConnectedVirtualMachines: FC<ConnectedVirtualMachinesProps> = ({ obj: vmNe
   return (
     <ListPageBody>
       <div className="list-managment-group">
-        <Flex>
+        <Flex className="list-managment-group__flex">
           <BulkSelect
             onSelect={(value) => {
               if (value === BulkSelectValue.all) {

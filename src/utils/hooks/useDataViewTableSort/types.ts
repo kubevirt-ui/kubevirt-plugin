@@ -5,6 +5,7 @@ import { SortByDirection } from '@patternfly/react-table';
 export type ColumnConfig<TData, TCallbacks = undefined> = {
   /** If true, column is hidden by default in column management (user must explicitly enable) */
   additional?: boolean;
+  /** Plain value for CSV export and default column sorting when no custom sort is defined. */
   getValue?: (row: TData, callbacks?: TCallbacks) => number | string;
   key: string;
   label: string;

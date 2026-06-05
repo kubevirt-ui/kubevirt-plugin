@@ -21,6 +21,7 @@ import { runningTourSignal } from '@kubevirt-utils/components/GuidedTour/utils/g
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
 import { buildColumnLayout } from '@kubevirt-utils/components/KubevirtTable/utils';
 import { ExposedFilterFunctions } from '@kubevirt-utils/components/ListPageFilter/types';
+import { TableToolbarActionsFlex } from '@kubevirt-utils/components/TableToolbarActions/TableToolbarActionsFlex';
 import { PageTitles } from '@kubevirt-utils/constants/page-constants';
 import useContainerWidth from '@kubevirt-utils/hooks/useContainerWidth';
 import { KUBEVIRT_APISERVER_PROXY } from '@kubevirt-utils/hooks/useFeatures/constants';
@@ -35,6 +36,7 @@ import {
 } from '@kubevirt-utils/hooks/usePagination/utils/constants';
 import { usePVCMapper } from '@kubevirt-utils/hooks/usePVCMapper';
 import useQuery from '@kubevirt-utils/hooks/useQuery';
+import { EXPORT_TABLE_KEYS, KubevirtTableExport } from '@kubevirt-utils/hooks/useTableExport';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import useVirtualMachineInstanceMigrationMapper from '@kubevirt-utils/resources/vmim/hooks/useVirtualMachineInstanceMigrationMapper';
 import useVirtualMachineInstanceMigrations from '@kubevirt-utils/resources/vmim/hooks/useVirtualMachineInstanceMigrations';
@@ -251,6 +253,19 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref
     [vmiMapper, vmimMapper, pvcMapper],
   );
 
+  const exportButton = (
+    <KubevirtTableExport<V1VirtualMachine, VMCallbacks>
+      activeColumnKeys={activeColumnKeys}
+      asToolbarItem={false}
+      callbacks={callbacks}
+      columns={columns}
+      data={filteredVMs ?? []}
+      exportKey={EXPORT_TABLE_KEYS.VIRTUAL_MACHINES}
+      initialSortKey={VM_COLUMN_KEYS.name}
+      loaded={loaded}
+    />
+  );
+
   return (
     <>
       <DocumentTitle>{PageTitles.VirtualMachines}</DocumentTitle>
@@ -288,9 +303,12 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref
               />
               <div className="list-managment-group">
                 <VirtualMachineSelection pagination={pagination} vms={filteredVMs} />
-                <Flex flexWrap={{ default: 'nowrap' }}>
+                <Flex className="list-managment-group__flex" flexWrap={{ default: 'nowrap' }}>
                   <VirtualMachineBulkActionButton vmimMapper={vmimMapper} vms={filteredVMs} />
-                  <ColumnManagement columnLayout={columnLayout} />
+                  <TableToolbarActionsFlex>
+                    {exportButton}
+                    <ColumnManagement columnLayout={columnLayout} />
+                  </TableToolbarActionsFlex>
                   <Pagination
                     onPerPageSelect={(_e, perPage, page, startIndex, endIndex) =>
                       onPageChange({ endIndex, page, perPage, startIndex })
