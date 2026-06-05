@@ -1,3 +1,4 @@
+import { K8sIoApimachineryPkgApiResourceQuantity } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { Quantity } from '@kubevirt-utils/types/quantity.js';
 
 import {
@@ -32,8 +33,8 @@ export const addByteSuffix = (unit: QuantityUnit | string): string =>
  * @param {string} combinedStr - string containing both the value and the unit
  * @returns {string} string for displaying the value and the unit with 'B' suffix, with the space between them
  */
-export const readableSizeUnit = (combinedStr: string): string => {
-  const combinedString = combinedStr?.replace(/\s/g, ''); // remove empty spaces if there are any, to split the value and unit correctly
+export const readableSizeUnit = (combinedStr: K8sIoApimachineryPkgApiResourceQuantity): string => {
+  const combinedString = combinedStr?.toString()?.replace(/\s/g, ''); // remove empty spaces if there are any, to split the value and unit correctly
   const index = combinedString?.search(/([a-zA-Z]+)/g);
   const [value, unit] =
     index === -1
@@ -41,15 +42,15 @@ export const readableSizeUnit = (combinedStr: string): string => {
       : [combinedString?.slice(0, index), combinedString?.slice(index)];
 
   // if there isn't any specific value/size present, return the original string, for example for the dynamic disk size
-  return !value ? combinedStr : `${value} ${addByteSuffix(unit)}`;
+  return !value ? combinedStr?.toString() : `${value} ${addByteSuffix(unit)}`;
 };
 
 export const getHumanizedSize = (
-  size: string,
+  size: K8sIoApimachineryPkgApiResourceQuantity,
   bytesOption: 'withB' | 'withoutB' = 'withB',
   preferredUnit?: string,
 ) => {
-  const baseValue = convertToBaseValue(size);
+  const baseValue = convertToBaseValue(size?.toString());
 
   if (bytesOption === 'withoutB') {
     return humanizeBinaryBytesWithoutB(baseValue, null, preferredUnit);

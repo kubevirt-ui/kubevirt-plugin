@@ -1,10 +1,7 @@
 import React, { FC } from 'react';
 
 import { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
-import {
-  ConditionsTable,
-  K8sResourceCondition,
-} from '@kubevirt-utils/components/ConditionsTable/ConditionsTable';
+import { ConditionsTable } from '@kubevirt-utils/components/ConditionsTable/ConditionsTable';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Divider, PageSection, Title } from '@patternfly/react-core';
 
@@ -33,7 +30,7 @@ const DataSourceDetailsPage: FC<DataSourceDetailsPageProps> = ({ obj: dataSource
         <Title className="co-section-heading" headingLevel="h2">
           {t('Conditions')}
         </Title>
-        <ConditionsTable conditions={dataSource?.status?.conditions as K8sResourceCondition[]} />
+        <ConditionsTable conditions={dataSource?.status?.conditions} />
       </PageSection>
     </div>
   );

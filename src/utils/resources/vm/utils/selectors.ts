@@ -172,7 +172,7 @@ export const getRootDiskSecretRef = (vm: V1VirtualMachine): string => {
  */
 export const getRootDiskStorageRequests = (vm: V1VirtualMachine): string => {
   const dataVolumeTemplateSpec = getRootDataVolumeTemplateSpec(vm);
-  return dataVolumeTemplateSpec?.spec?.storage?.resources?.requests?.storage;
+  return dataVolumeTemplateSpec?.spec?.storage?.resources?.requests?.storage?.toString();
 };
 
 /**
@@ -294,7 +294,8 @@ export const getDomain = <T extends Record<string, any>>(obj: T): V1DomainSpec =
   obj?.spec?.domain || obj?.spec?.template?.spec?.domain;
 
 export const getMemory = <T>(obj: T): string =>
-  getDomain(obj)?.memory?.guest || getDomain(obj)?.resources?.requests?.['memory'];
+  getDomain(obj)?.memory?.guest?.toString() ||
+  getDomain(obj)?.resources?.requests?.['memory']?.toString();
 
 export const getCPU = <T>(obj: T): V1CPU => getDomain(obj)?.cpu;
 

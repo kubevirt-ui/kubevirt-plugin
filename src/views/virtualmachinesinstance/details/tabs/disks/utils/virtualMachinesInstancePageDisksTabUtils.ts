@@ -44,7 +44,7 @@ export const diskStructureCreator = (disks: DiskRaw[]): DiskPresentation[] => {
       metadata: { name: device?.name },
       name: device?.name,
       namespace: device?.pvc?.metadata?.namespace,
-      size: device?.pvc?.spec?.resources?.requests?.storage,
+      size: device?.pvc?.spec?.resources?.requests?.storage?.toString(),
       source: device?.pvc?.metadata?.name || 'Other',
       storageClass: device?.pvc?.spec?.storageClassName || '-',
     };
