@@ -1,6 +1,7 @@
 import {
   V1beta1StorageSpecAccessModesEnum,
   V1beta1StorageSpecVolumeModeEnum,
+  V1Condition,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { K8sResourceCommon, K8sResourceCondition } from '@openshift-console/dynamic-plugin-sdk';
 
@@ -148,7 +149,7 @@ export type MigPlan = K8sResourceCommon & {
     srcMigClusterRef?: { name: string; namespace: string };
   };
   status?: {
-    conditions?: K8sResourceCondition[];
+    conditions?: V1Condition[];
     destStorageClasses?: { name: string }[];
     srcStorageClasses?: { name: string }[];
   };
@@ -165,7 +166,7 @@ export type MigMigration = K8sResourceCommon & {
     verify?: boolean;
   };
   status?: {
-    conditions?: K8sResourceCondition[];
+    conditions?: V1Condition[];
     phase?: string;
   };
 };

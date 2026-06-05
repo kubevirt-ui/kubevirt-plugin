@@ -1,19 +1,16 @@
 import React, { ReactNode } from 'react';
 import { TFunction } from 'i18next';
 
+import { V1Condition } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import Timestamp from '@kubevirt-utils/components/Timestamp/Timestamp';
 import { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 
-import { K8sResourceCondition } from './ConditionsTable';
-
-const renderTimestamp = (condition: K8sResourceCondition): ReactNode => (
+const renderTimestamp = (condition: V1Condition): ReactNode => (
   <Timestamp timestamp={condition.lastTransitionTime} />
 );
 
-export const getConditionsColumns = (
-  t: TFunction,
-): ColumnConfig<K8sResourceCondition, undefined>[] => [
+export const getConditionsColumns = (t: TFunction): ColumnConfig<V1Condition, undefined>[] => [
   {
     getValue: (r) => r.type ?? '',
     key: 'type',
@@ -49,5 +46,5 @@ export const getConditionsColumns = (
   },
 ];
 
-export const getConditionRowId = (condition: K8sResourceCondition, index: number): string =>
+export const getConditionRowId = (condition: V1Condition, index: number): string =>
   `${condition.type}-${index}`;

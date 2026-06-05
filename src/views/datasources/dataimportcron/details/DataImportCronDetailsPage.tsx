@@ -1,10 +1,7 @@
 import React, { FC } from 'react';
 
 import { V1beta1DataImportCron } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
-import {
-  ConditionsTable,
-  K8sResourceCondition,
-} from '@kubevirt-utils/components/ConditionsTable/ConditionsTable';
+import { ConditionsTable } from '@kubevirt-utils/components/ConditionsTable/ConditionsTable';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Divider, PageSection, Title } from '@patternfly/react-core';
 
@@ -30,9 +27,7 @@ const DataImportCronDetailsPage: FC<DataImportCronDetailsPageProps> = ({ obj: da
         <Title className="co-section-heading" headingLevel="h2">
           {t('Conditions')}
         </Title>
-        <ConditionsTable
-          conditions={dataImportCron?.status?.conditions as K8sResourceCondition[]}
-        />
+        <ConditionsTable conditions={dataImportCron?.status?.conditions} />
       </PageSection>
     </div>
   );

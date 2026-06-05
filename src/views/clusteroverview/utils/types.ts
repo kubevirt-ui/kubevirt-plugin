@@ -1,4 +1,5 @@
 import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { V1Condition } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { K8sResourceCommon, Selector } from '@openshift-console/dynamic-plugin-sdk';
 
 export type Descriptor<T = any> = {
@@ -143,20 +144,6 @@ export type ObjectReference = {
   uid?: string;
 };
 
-export enum K8sResourceConditionStatus {
-  False = 'False',
-  True = 'True',
-  Unknown = 'Unknown',
-}
-
-export type K8sResourceCondition = {
-  lastTransitionTime?: string;
-  message?: string;
-  reason?: string;
-  status: keyof typeof K8sResourceConditionStatus;
-  type: string;
-};
-
 export enum SubscriptionState {
   SubscriptionStateAtLatest = 'AtLatestKnown',
   SubscriptionStateFailed = 'UpgradeFailed',
@@ -182,7 +169,7 @@ export type SubscriptionKind = {
       healthy?: boolean;
       lastUpdated?: string;
     }[];
-    conditions?: K8sResourceCondition[];
+    conditions?: V1Condition[];
     currentCSV?: string;
     installedCSV?: string;
     installPlanRef?: ObjectReference;
