@@ -10,7 +10,7 @@ import { InfoIcon } from '@patternfly/react-icons';
 import { isNadFullName } from '../../utils/helpers';
 
 import InvalidNADNamespace from './components/InvalidNADNamespace';
-import { NetworkSelectTypeaheadOptionProps } from './NetworkInterfaceNetworkSelect';
+import { NetworkSelectTypeaheadOptionProps } from './types';
 
 export const createNewNetworkOption = (value): NetworkSelectTypeaheadOptionProps => ({
   optionProps: {
