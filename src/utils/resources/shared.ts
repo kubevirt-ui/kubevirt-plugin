@@ -17,6 +17,7 @@ import {
   WatchK8sResults,
 } from '@openshift-console/dynamic-plugin-sdk';
 import { FleetAccessReviewResourceAttributes } from '@stolostron/multicluster-sdk';
+import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
 
 import { isDataSourceReady } from '../../views/datasources/utils';
 
@@ -619,3 +620,6 @@ export const getResourceKey = (resource: K8sResourceCommon): string =>
   `${getKind(resource)}/${getCluster(resource) || ''}/${getNamespace(resource)}/${getName(
     resource,
   )}`;
+
+export const isFolderLabel = (label: string): boolean =>
+  label?.startsWith(`${VM_FOLDER_LABEL}=`) ?? false;

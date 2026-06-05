@@ -1,9 +1,8 @@
 import { V1CPU } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { isAllNamespaces, isEmpty } from '@kubevirt-utils/utils/utils';
 import { getACMVMListURL, getVMListNamespacesURL, getVMListURL } from '@multicluster/urls';
-import { getRowFilterQueryKey } from '@search/utils/query';
 
-export const getVMListPath = (namespace: string, cluster?: string, params?: string) => {
+export const getVMListPath = (namespace: string, cluster?: string, params?: string): string => {
   const vmListURL = isAllNamespaces(namespace)
     ? getVMListURL(cluster)
     : getVMListNamespacesURL(cluster, namespace);
@@ -13,24 +12,30 @@ export const getVMListPath = (namespace: string, cluster?: string, params?: stri
   return `${vmListURL}?${params}`;
 };
 
-const getRowFiltersString = (rowFilters: Record<string, string>) =>
-  isEmpty(rowFilters)
-    ? ''
-    : Object.entries(rowFilters)
-        .map(([key, value]) => `${getRowFilterQueryKey(key)}=${value}`)
-        .join('&');
+type FilterQueryValue = string | string[];
 
-export const getVMListPathWithRowFilters = (
+const getFiltersQueryString = (filters: Record<string, FilterQueryValue>): string => {
+  if (isEmpty(filters)) return '';
+
+  const params = new URLSearchParams();
+  Object.entries(filters).forEach(([key, value]) => {
+    (Array.isArray(value) ? value : [value]).forEach((item) => params.append(key, item));
+  });
+
+  return params.toString();
+};
+
+export const getVMListPathWithFilters = (
   namespace: string,
-  rowFilters: Record<string, string>,
+  filters: Record<string, FilterQueryValue>,
   cluster?: string,
-) => `${getVMListURL(cluster, namespace)}?${getRowFiltersString(rowFilters)}`;
+): string => `${getVMListURL(cluster, namespace)}?${getFiltersQueryString(filters)}`;
 
-export const getACMMListPathWithRowFilters = (
+export const getACMListPathWithFilters = (
   cluster: string,
   namespace: string,
-  rowFilters: Record<string, string>,
-) => `${getACMVMListURL(cluster, namespace)}?${getRowFiltersString(rowFilters)}`;
+  filters: Record<string, FilterQueryValue>,
+): string => `${getACMVMListURL(cluster, namespace)}?${getFiltersQueryString(filters)}`;
 
-export const getVCPUCount = (cpu: V1CPU) =>
+export const getVCPUCount = (cpu: V1CPU): number =>
   (cpu?.sockets || 1) * (cpu?.cores || 1) * (cpu?.threads || 1);

@@ -2,7 +2,7 @@ import React, { FC } from 'react';
 import { Link } from 'react-router';
 
 import { ALL_NAMESPACES } from '@kubevirt-utils/hooks/constants';
-import { getVMListPathWithRowFilters } from '@kubevirt-utils/resources/vm/utils/utils';
+import { getVMListPathWithFilters } from '@kubevirt-utils/resources/vm/utils/utils';
 import useActiveClusterParam from '@multicluster/hooks/useActiveClusterParam';
 
 import { getVMStatusIcon } from '../utils';
@@ -17,7 +17,7 @@ export type VMStatusInventoryItemProps = {
 const VMStatusInventoryItem: FC<VMStatusInventoryItemProps> = ({ count, status }) => {
   const cluster = useActiveClusterParam();
   const Icon = getVMStatusIcon(status);
-  const to = getVMListPathWithRowFilters(ALL_NAMESPACES, { status }, cluster);
+  const to = getVMListPathWithFilters(ALL_NAMESPACES, { status }, cluster);
 
   return (
     <div className="co-inventory-card__status">

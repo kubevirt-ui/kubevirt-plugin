@@ -1,0 +1,47 @@
+import { TFunction } from 'i18next';
+
+import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import {
+  KubevirtFilter,
+  KubevirtFilterLayout,
+} from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
+import { getAnnotation } from '@kubevirt-utils/resources/shared';
+import { ANNOTATIONS, OS_NAME_LABELS } from '@kubevirt-utils/resources/template';
+import { getPreferenceMatcher } from '@kubevirt-utils/resources/vm';
+import {
+  getOperatingSystem,
+  getOperatingSystemName,
+  OS_WINDOWS_PREFIX,
+} from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
+import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
+
+const getOSName = (obj: V1VirtualMachine) => {
+  const osAnnotation = getAnnotation(obj?.spec?.template, ANNOTATIONS.os);
+  const osLabel = getOperatingSystemName(obj) || getOperatingSystem(obj);
+  const osPreference = getPreferenceMatcher(obj)?.name;
+
+  const termStartsWithOSName = (os: string, term?: string) =>
+    term?.toLowerCase()?.startsWith(os.toLowerCase());
+
+  return Object.values(OS_NAME_LABELS).find((osNameLabel) => {
+    const osName = osNameLabel === OS_NAME_LABELS.windows ? OS_WINDOWS_PREFIX : osNameLabel;
+    return (
+      termStartsWithOSName(osName, osAnnotation) ||
+      termStartsWithOSName(osName, osLabel) ||
+      termStartsWithOSName(osName, osPreference)
+    );
+  });
+};
+
+export const getOSFilter = (t: TFunction): KubevirtFilter<V1VirtualMachine> => ({
+  categoryLabel: t('Operating system'),
+  categoryLabelShort: t('OS'),
+  filterLayout: KubevirtFilterLayout.SELECT,
+  id: VirtualMachineRowFilterType.OS,
+  match: (obj, selected) => selected.includes(getOSName(obj)),
+  options: Object.values(OS_NAME_LABELS).map((osName) => ({
+    label: osName,
+    value: osName,
+  })),
+  showAllBadge: true,
+});

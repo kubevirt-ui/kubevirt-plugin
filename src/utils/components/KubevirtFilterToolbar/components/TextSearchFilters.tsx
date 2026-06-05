@@ -8,7 +8,11 @@ import {
   STATIC_SEARCH_FILTERS_LABELS,
   STATIC_SEARCH_FILTERS_PLACEHOLDERS,
 } from '@kubevirt-utils/components/ListPageFilter/constants';
-import { KubevirtFilterState } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
+import { getLabelFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/filters/getLabelFilter';
+import {
+  KubevirtFilterState,
+  OnSetFilters,
+} from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import {
@@ -19,10 +23,12 @@ import {
   ToolbarItem,
 } from '@patternfly/react-core';
 
+import ToolbarFilterMultiChip from './ToolbarFilter/ToolbarFilterMultiChip';
+
 type TextSearchFiltersProps = {
   data?: K8sResourceCommon[];
   filters: KubevirtFilterState;
-  onSetFilters: (newFilters: Partial<KubevirtFilterState>) => void;
+  onSetFilters: OnSetFilters;
   searchInputText: string;
   setSearchInputText: (text: string) => void;
 };
@@ -45,8 +51,6 @@ const TextSearchFilters: FC<TextSearchFiltersProps> = ({
     }),
     [t],
   );
-
-  const labelValues = filters.labels;
 
   return (
     <ToolbarItem className="co-filter-search--full-width">
@@ -75,7 +79,7 @@ const TextSearchFilters: FC<TextSearchFiltersProps> = ({
           {searchType === STATIC_SEARCH_FILTERS.labels ? (
             <AutocompleteInput
               onSuggestionSelect={(selected) => {
-                onSetFilters({ labels: [...labelValues, selected] });
+                onSetFilters({ labels: [...(filters.labels ?? []), selected] });
                 setSearchInputText('');
               }}
               data={data}
@@ -98,16 +102,13 @@ const TextSearchFilters: FC<TextSearchFiltersProps> = ({
         </InputGroup>
       </ToolbarFilter>
 
-      <ToolbarFilter
-        deleteLabel={(_, labelToDelete: string) => {
-          onSetFilters({ labels: labelValues.filter((l) => l !== labelToDelete) });
-        }}
-        categoryName={t('Label')}
-        deleteLabelGroup={() => onSetFilters({ labels: [] })}
-        labels={labelValues}
+      <ToolbarFilterMultiChip
+        filterDef={getLabelFilter(t)}
+        filters={filters}
+        onSetFilters={onSetFilters}
       >
         <></>
-      </ToolbarFilter>
+      </ToolbarFilterMultiChip>
     </ToolbarItem>
   );
 };

@@ -1,6 +1,5 @@
 import { isSystemNamespace } from '@kubevirt-utils/resources/namespace/helper';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { OnFilterChange } from '@openshift-console/dynamic-plugin-sdk';
 
 import { ALL_CLUSTERS_ID, SHOW } from '../../utils/constants';
 import {
@@ -12,7 +11,6 @@ import {
 export type UseAutoSelectTreeViewItemProps = {
   dataMap: Record<string, TreeViewDataItemWithHref>;
   loaded: boolean;
-  onFilterChange?: OnFilterChange;
 };
 
 /**

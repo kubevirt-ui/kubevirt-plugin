@@ -2,10 +2,10 @@ import React, { FC, useCallback, useEffect, useMemo, useRef, useState } from 're
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import { OnSetFilters } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useNamespaceParam from '@kubevirt-utils/hooks/useNamespaceParam';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
-import { OnFilterChange } from '@openshift-console/dynamic-plugin-sdk';
 import { Button, InputGroup, InputGroupItem, Menu, Popper } from '@patternfly/react-core';
 import { VM_SEARCH_INPUT_ID } from '@search/utils/constants';
 import { buildContextSearchInputs } from '@search/utils/query';
@@ -25,14 +25,22 @@ import SearchTextInput from './SearchTextInput';
 import './search-bar.scss';
 
 type SearchBarProps = {
-  onFilterChange: OnFilterChange;
+  clearAllFilters: () => void;
+  onSetFilters: OnSetFilters;
   vmis: V1VirtualMachineInstance[];
   vmisLoaded: boolean;
   vms: V1VirtualMachine[];
   vmsLoaded: boolean;
 };
 
-const SearchBar: FC<SearchBarProps> = ({ onFilterChange, vmis, vmisLoaded, vms, vmsLoaded }) => {
+const SearchBar: FC<SearchBarProps> = ({
+  clearAllFilters,
+  onSetFilters,
+  vmis,
+  vmisLoaded,
+  vms,
+  vmsLoaded,
+}) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const namespace = useNamespaceParam();
@@ -51,7 +59,7 @@ const SearchBar: FC<SearchBarProps> = ({ onFilterChange, vmis, vmisLoaded, vms, 
     vms,
     vmsLoaded,
   });
-  const navigateToSearchResults = useNavigateToSearchResults(onFilterChange);
+  const navigateToSearchResults = useNavigateToSearchResults(onSetFilters, clearAllFilters);
   const { saveSearch, urlSearchQuery } = useSavedSearchData();
 
   const searchSuggestResult: SearchSuggestResult | undefined = useMemo(() => {

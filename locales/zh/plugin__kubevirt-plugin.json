@@ -1273,6 +1273,7 @@
   "N Series": "N 系列",
   "N/A": "不适用",
   "n1": "n1",
+  "NADs": "NADs",
   "Name": "名称",
   "Name must be unique within a namespace. Is required when creating resources, although some resources may allow a client to request the generation of an appropriate name automatically. Name is primarily intended for creation idempotence and configuration definition. Cannot be updated.": "名称在命名空间内必须是唯一的。在创建资源时需要，虽然有些资源可能会允许客户端自动请求生成适当的名称。名称主要用于创建 idempotence 和配置定义。 不能更新。",
   "Name of the new template's disk": "Name of the new template's disk",

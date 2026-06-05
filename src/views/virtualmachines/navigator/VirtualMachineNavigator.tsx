@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useRef } from 'react';
+import React, { FC } from 'react';
 import { matchPath, useLocation, useParams } from 'react-router';
 
 import GuidedTour from '@kubevirt-utils/components/GuidedTour/GuidedTour';
@@ -9,7 +9,6 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { VirtualMachineModelRef } from '@kubevirt-utils/models';
 import { FLEET_VIRTUAL_MACHINES_PATH } from '@multicluster/constants';
 import { isACMPath } from '@multicluster/urls';
-import { OnFilterChange } from '@openshift-console/dynamic-plugin-sdk';
 import { Divider, Tab, Tabs, TabTitleText } from '@patternfly/react-core';
 import { useSignals } from '@preact/signals-react/runtime';
 import { SettingsClusterProvider } from '@settings/context/SettingsClusterContext';
@@ -33,7 +32,6 @@ import './VirtualMachineNavigator.scss';
 const VirtualMachineNavigator: FC = () => {
   useSignals();
   const { t } = useKubevirtTranslation();
-  const vmListRef = useRef<{ onFilterChange: OnFilterChange } | null>(null);
   const location = useLocation();
   const { activeTabKey, handleTabSelect } = useNavigatorTabs();
 
@@ -58,10 +56,6 @@ const VirtualMachineNavigator: FC = () => {
 
   const treeProps = useTreeViewData();
 
-  const onFilterChange: OnFilterChange = useCallback((type, value) => {
-    vmListRef.current?.onFilterChange(type, value);
-  }, []);
-
   if (location.pathname.endsWith(`${VirtualMachineModelRef}/~new`)) {
     return <VirtualMachineYAMLCreatePage />;
   }
@@ -72,7 +66,7 @@ const VirtualMachineNavigator: FC = () => {
       <Divider />
       <SettingsClusterProvider cluster={cluster}>
         <VirtualizationFeaturesContextProvider>
-          <VirtualMachineTreeView onFilterChange={onFilterChange} {...treeProps}>
+          <VirtualMachineTreeView {...treeProps}>
             {!isFleetPage && <GuidedTour />}
             {!isFleetPage && <WelcomeModal />}
             <CatalogOnboardingPopover />
@@ -102,9 +96,7 @@ const VirtualMachineNavigator: FC = () => {
                     allVMsLoaded={treeProps.loaded}
                     cluster={cluster}
                     key={`vms-${activeTabKey}`}
-                    kind={VirtualMachineModelRef}
                     namespace={namespace}
-                    ref={vmListRef}
                   />
                 </Tab>
               </Tabs>

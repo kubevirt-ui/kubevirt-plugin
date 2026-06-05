@@ -1290,6 +1290,7 @@
   "N Series": "Séries N",
   "N/A": "N/A",
   "n1": "n1",
+  "NADs": "NADs",
   "Name": "Nom",
   "Name must be unique within a namespace. Is required when creating resources, although some resources may allow a client to request the generation of an appropriate name automatically. Name is primarily intended for creation idempotence and configuration definition. Cannot be updated.": "Le nom doit être unique au sein d'un espace de noms. Il est requis lors de la création de ressources, bien que certaines ressources permettent à un client de demander automatiquement la génération d'un nom approprié. Le nom est principalement destiné à l'idempotence de création et à la définition de configuration. Il ne peut pas être mis à jour.",
   "Name of the new template's disk": "Name of the new template's disk",

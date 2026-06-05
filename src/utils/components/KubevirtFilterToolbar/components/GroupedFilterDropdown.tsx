@@ -4,6 +4,7 @@ import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import {
   KubevirtFilter,
   KubevirtFilterState,
+  OnSetFilters,
 } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
@@ -20,7 +21,7 @@ type GroupedFilterDropdownProps = {
   data?: K8sResourceCommon[];
   filters: KubevirtFilterState;
   groupedFilters: KubevirtFilter[];
-  onSetFilters: (newFilters: Partial<KubevirtFilterState>) => void;
+  onSetFilters: OnSetFilters;
 };
 
 const GroupedFilterDropdown: FC<GroupedFilterDropdownProps> = ({
@@ -59,7 +60,7 @@ const GroupedFilterDropdown: FC<GroupedFilterDropdownProps> = ({
         >
           {groupedFilters.map((filterDef) => (
             <SelectGroup key={filterDef.id} label={filterDef.categoryLabel}>
-              {filterDef.options.map(({ label, value }) => (
+              {filterDef.options?.map(({ label, value }) => (
                 <SelectOption
                   data-test-row-filter={value}
                   hasCheckbox

@@ -4,6 +4,7 @@ import CheckboxSelect from '@kubevirt-utils/components/CheckboxSelect/CheckboxSe
 import {
   KubevirtFilter,
   KubevirtFilterState,
+  OnSetFilters,
 } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 
 import { getOnSelect } from '../utils';
@@ -13,24 +14,34 @@ import ToolbarFilterMultiChip from './ToolbarFilter/ToolbarFilterMultiChip';
 type SelectFilterItemProps = {
   filterDef: KubevirtFilter;
   filters: KubevirtFilterState;
-  onSetFilters: (newFilters: Partial<KubevirtFilterState>) => void;
+  onSetFilters: OnSetFilters;
+  toggleTitle?: string;
 };
 
-const SelectFilterItem: FC<SelectFilterItemProps> = ({ filterDef, filters, onSetFilters }) => {
+const SelectFilterItem: FC<SelectFilterItemProps> = ({
+  filterDef,
+  filters,
+  onSetFilters,
+  toggleTitle,
+}) => {
   const selected = filters[filterDef.id] ?? [];
   const onSelect = getOnSelect(filters, onSetFilters);
 
   return (
     <ToolbarFilterMultiChip filterDef={filterDef} filters={filters} onSetFilters={onSetFilters}>
       <CheckboxSelect
-        options={filterDef.options.map(({ label, value }) => ({
+        options={filterDef.options?.map(({ label, value }) => ({
           children: label,
           isSelected: selected.includes(value),
           value,
         }))}
+        badgeNumber={filterDef.toggleBadgeNumber}
+        isToggleDisabled={filterDef.disabled}
         onSelect={(_event, value: string) => onSelect(filterDef.id, value)}
         selectedValues={selected}
-        toggleTitle={filterDef.categoryLabel}
+        showAllBadge={filterDef.showAllBadge}
+        toggleTitle={toggleTitle ?? filterDef.categoryLabel}
+        tooltipContent={filterDef.disabledTooltip}
       />
     </ToolbarFilterMultiChip>
   );

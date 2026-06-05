@@ -14,17 +14,15 @@ export type VMSearchQueries = {
 const useVMSearchQueries = (): VMSearchQueries => {
   const [searchParams] = useSearchParams();
 
-  const vmName = searchParams.get(STATIC_SEARCH_FILTERS.name);
+  const getParam = (filterType: VirtualMachineRowFilterType) =>
+    searchParams.get(filterType) || searchParams.get(getRowFilterQueryKey(filterType));
 
-  const ip = searchParams.get(getRowFilterQueryKey(VirtualMachineRowFilterType.IP));
-  const project = searchParams.get(getRowFilterQueryKey(VirtualMachineRowFilterType.Project));
-  const clusters = searchParams.get(getRowFilterQueryKey(VirtualMachineRowFilterType.Cluster));
-  const createdFrom = searchParams.get(
-    getRowFilterQueryKey(VirtualMachineRowFilterType.DateCreatedFrom),
-  );
-  const createdTo = searchParams.get(
-    getRowFilterQueryKey(VirtualMachineRowFilterType.DateCreatedTo),
-  );
+  const vmName = searchParams.get(STATIC_SEARCH_FILTERS.name);
+  const ip = getParam(VirtualMachineRowFilterType.IP);
+  const project = getParam(VirtualMachineRowFilterType.Project);
+  const clusters = getParam(VirtualMachineRowFilterType.Cluster);
+  const createdFrom = getParam(VirtualMachineRowFilterType.DateCreatedFrom);
+  const createdTo = getParam(VirtualMachineRowFilterType.DateCreatedTo);
 
   return useMemo(() => {
     const queries: VMSearchQueries = {

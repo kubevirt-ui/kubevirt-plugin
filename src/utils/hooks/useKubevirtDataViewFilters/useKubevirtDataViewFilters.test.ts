@@ -47,6 +47,8 @@ const createResource = (name: string, labels?: Record<string, string>): K8sResou
 describe('useKubevirtDataViewFilters', () => {
   beforeEach(() => {
     mockFiltersState = { labels: [], name: [] };
+    // labels are read from searchParams directly (not from useDataViewFilters state)
+    Array.from(searchParamsMock.keys()).forEach((key) => searchParamsMock.delete(key));
     jest.clearAllMocks();
   });
 
@@ -73,7 +75,7 @@ describe('useKubevirtDataViewFilters', () => {
       mockFiltersState = { labels: [], name: [], status: [] };
 
       const { result } = renderHook(() =>
-        useKubevirtDataViewFilters({ data: sampleData, filters: baseFilters }),
+        useKubevirtDataViewFilters({ data: sampleData, filterDefinitions: baseFilters }),
       );
 
       expect(result.current.filteredData).toHaveLength(3);
@@ -83,7 +85,7 @@ describe('useKubevirtDataViewFilters', () => {
       mockFiltersState = { labels: [], name: ['alpha'], status: [] };
 
       const { result } = renderHook(() =>
-        useKubevirtDataViewFilters({ data: sampleData, filters: baseFilters }),
+        useKubevirtDataViewFilters({ data: sampleData, filterDefinitions: baseFilters }),
       );
 
       expect(result.current.filteredData).toHaveLength(1);
@@ -94,7 +96,7 @@ describe('useKubevirtDataViewFilters', () => {
       mockFiltersState = { labels: [], name: ['BETA'], status: [] };
 
       const { result } = renderHook(() =>
-        useKubevirtDataViewFilters({ data: sampleData, filters: baseFilters }),
+        useKubevirtDataViewFilters({ data: sampleData, filterDefinitions: baseFilters }),
       );
 
       expect(result.current.filteredData).toHaveLength(1);
@@ -102,10 +104,11 @@ describe('useKubevirtDataViewFilters', () => {
     });
 
     it('should filter by labels (must match all selected labels)', () => {
-      mockFiltersState = { labels: ['app=web'], name: [], status: [] };
+      mockFiltersState = { labels: [], name: [], status: [] };
+      searchParamsMock.append('labels', 'app=web');
 
       const { result } = renderHook(() =>
-        useKubevirtDataViewFilters({ data: sampleData, filters: baseFilters }),
+        useKubevirtDataViewFilters({ data: sampleData, filterDefinitions: baseFilters }),
       );
 
       expect(result.current.filteredData).toHaveLength(2);
@@ -116,10 +119,12 @@ describe('useKubevirtDataViewFilters', () => {
     });
 
     it('should require all labels to match when multiple labels selected', () => {
-      mockFiltersState = { labels: ['app=web', 'status=running'], name: [], status: [] };
+      mockFiltersState = { labels: [], name: [], status: [] };
+      searchParamsMock.append('labels', 'app=web');
+      searchParamsMock.append('labels', 'status=running');
 
       const { result } = renderHook(() =>
-        useKubevirtDataViewFilters({ data: sampleData, filters: baseFilters }),
+        useKubevirtDataViewFilters({ data: sampleData, filterDefinitions: baseFilters }),
       );
 
       expect(result.current.filteredData).toHaveLength(2);
@@ -129,7 +134,7 @@ describe('useKubevirtDataViewFilters', () => {
       mockFiltersState = { labels: [], name: [], status: ['running'] };
 
       const { result } = renderHook(() =>
-        useKubevirtDataViewFilters({ data: sampleData, filters: baseFilters }),
+        useKubevirtDataViewFilters({ data: sampleData, filterDefinitions: baseFilters }),
       );
 
       expect(result.current.filteredData).toHaveLength(2);
@@ -140,10 +145,11 @@ describe('useKubevirtDataViewFilters', () => {
     });
 
     it('should combine name + labels + custom filters with AND logic', () => {
-      mockFiltersState = { labels: ['app=web'], name: ['alpha'], status: ['running'] };
+      mockFiltersState = { labels: [], name: ['alpha'], status: ['running'] };
+      searchParamsMock.append('labels', 'app=web');
 
       const { result } = renderHook(() =>
-        useKubevirtDataViewFilters({ data: sampleData, filters: baseFilters }),
+        useKubevirtDataViewFilters({ data: sampleData, filterDefinitions: baseFilters }),
       );
 
       expect(result.current.filteredData).toHaveLength(1);
@@ -156,7 +162,7 @@ describe('useKubevirtDataViewFilters', () => {
       const { result } = renderHook(() =>
         useKubevirtDataViewFilters({
           data: undefined as unknown as K8sResourceCommon[],
-          filters: baseFilters,
+          filterDefinitions: baseFilters,
         }),
       );
 
@@ -167,7 +173,7 @@ describe('useKubevirtDataViewFilters', () => {
       mockFiltersState = { labels: [], name: ['nonexistent'], status: [] };
 
       const { result } = renderHook(() =>
-        useKubevirtDataViewFilters({ data: sampleData, filters: baseFilters }),
+        useKubevirtDataViewFilters({ data: sampleData, filterDefinitions: baseFilters }),
       );
 
       expect(result.current.filteredData).toEqual([]);
@@ -190,7 +196,7 @@ describe('useKubevirtDataViewFilters', () => {
       mockFiltersState = { app: ['web'], labels: [], name: [], status: ['running'] };
 
       const { result } = renderHook(() =>
-        useKubevirtDataViewFilters({ data: sampleData, filters: multiFilters }),
+        useKubevirtDataViewFilters({ data: sampleData, filterDefinitions: multiFilters }),
       );
 
       expect(result.current.filteredData).toHaveLength(2);
@@ -221,7 +227,9 @@ describe('useKubevirtDataViewFilters', () => {
         },
       ];
 
-      renderHook(() => useKubevirtDataViewFilters({ data: [], filters: filtersWithDefaults }));
+      renderHook(() =>
+        useKubevirtDataViewFilters({ data: [], filterDefinitions: filtersWithDefaults }),
+      );
 
       const callArgs = useDataViewFilters.mock.calls[0][0];
       expect(callArgs.initialFilters).toEqual({
