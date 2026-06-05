@@ -13,7 +13,6 @@ const NS = env.testNamespace;
 const DEFAULT_VM_NAME = `${NS}-example`;
 const RHEL9 = 'rhel9-server-small';
 const EXAMPLE = 'example';
-const VM_DIAGNOSTICS_GUEST_SYSTEM_LOG = 'vm-diagnostics-guest-system-log';
 
 test.describe.configure({ mode: 'serial' });
 
@@ -98,10 +97,11 @@ test.describe('Check all virtualization pages can be loaded', () => {
     await expect(page.getByText('No snapshots found')).toBeVisible();
 
     await vmDetails.goToTab('Diagnostics');
-    await expect(page.getByText('Status conditions')).toBeVisible();
+    await vmDetails.expectDiagnosticsOverviewVisible();
+    await expect(vmDetails.issuesHeading).toBeVisible();
+    await expect(vmDetails.statusConditionsHeading).toBeVisible();
 
     await vmDetails.goToDiagnosticsSubTab('guest-system-log');
-    await expect(byTestId(page, VM_DIAGNOSTICS_GUEST_SYSTEM_LOG)).toBeVisible();
 
     await vmDetails.goToConfigSubTab('details');
     await expect(page.getByText('Headless mode')).toBeVisible();

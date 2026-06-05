@@ -1,11 +1,13 @@
 import { useMemo } from 'react';
 
+import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { VirtualMachineDetailsTab } from '@kubevirt-utils/constants/tabs-constants';
 import useHideYamlTab, { filterYamlTabs } from '@kubevirt-utils/hooks/useHideYamlTab';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
 import VirtualMachineConfigurationTab from '../tabs/configuration/VirtualMachineConfigurationTab';
 import VirtualMachineConsolePage from '../tabs/console/VirtualMachineConsolePage';
+import { getDiagnosticBadge } from '../tabs/diagnostic/utils/utils';
 import VirtualMachineDiagnosticTab from '../tabs/diagnostic/VirtualMachineDiagnosticTab';
 import VirtualMachinePageEventsTab from '../tabs/events/VirtualMachinePageEvents';
 import VirtualMachineMetricsTab from '../tabs/metrics/VirtualMachineMetricsTab';
@@ -14,9 +16,11 @@ import SnapshotListPage from '../tabs/snapshots/SnapshotListPage';
 import VirtualMachineYAMLPage from '../tabs/yaml/VirtualMachineYAMLPage';
 import { getTabHrefAndName } from '../utils/utils';
 
-export const useVirtualMachineTabs = () => {
+export const useVirtualMachineTabs = (vm: V1VirtualMachine) => {
   const { t } = useKubevirtTranslation();
   const { hideYamlTab } = useHideYamlTab();
+
+  const diagnosticBadge = useMemo(() => getDiagnosticBadge(vm), [vm]);
 
   const tabs = useMemo(
     () =>
@@ -86,6 +90,7 @@ export const useVirtualMachineTabs = () => {
             ...getTabHrefAndName(VirtualMachineDetailsTab.Snapshots, t),
           },
           {
+            badge: diagnosticBadge,
             component: VirtualMachineDiagnosticTab,
             ...getTabHrefAndName(VirtualMachineDetailsTab.Diagnostics, t),
           },
@@ -104,7 +109,7 @@ export const useVirtualMachineTabs = () => {
         ],
         hideYamlTab,
       ),
-    [t, hideYamlTab],
+    [t, hideYamlTab, diagnosticBadge],
   );
   return tabs;
 };

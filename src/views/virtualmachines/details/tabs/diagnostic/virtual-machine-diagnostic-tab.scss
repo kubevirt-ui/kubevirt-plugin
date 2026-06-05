@@ -33,17 +33,3 @@
     margin-bottom: var(--pf-t--global--spacer--md);
   }
 }
-
-.VirtualMachineDiagnosticTabRow--expanded {
-  display: inline-flex;
-  align-items: baseline;
-  margin-left: var(--pf-t--global--spacer--3xl);
-  svg {
-    margin-right: var(--pf-t--global--spacer--sm);
-  }
-}
-.pf-v6-c-table {
-  tr.VirtualMachineDiagnosticTabRow--row {
-    border-bottom: none;
-  }
-}

@@ -9,6 +9,7 @@ import { VMDetailTabTelemetry } from '@kubevirt-utils/extensions/telemetry/utils
 import { getName } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { isVMWizardURL } from '@multicluster/urls';
+import { Badge } from '@patternfly/react-core';
 
 import StateHandler from '../StateHandler/StateHandler';
 
@@ -112,6 +113,13 @@ const HorizontalNavbar: FC<HorizontalNavbarProps> = ({
                   id={`horizontal-pageHeader-${item.name}`}
                 >
                   {item.name}
+                  {item.badge?.count > 0 && (
+                    <Badge
+                      className={`horizontal-navbar__badge horizontal-navbar__badge--${item.badge.color}`}
+                    >
+                      {item.badge.count}
+                    </Badge>
+                  )}
                 </NavLink>
               </li>
             );

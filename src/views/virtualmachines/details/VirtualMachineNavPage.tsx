@@ -53,7 +53,7 @@ const VirtualMachineNavPage: FC = () => {
   const [instanceTypeExpandedSpec, expandedSpecLoading, expandedSpecError] =
     useInstanceTypeExpandSpec(vmToShow);
 
-  const pages = useVirtualMachineTabs();
+  const pages = useVirtualMachineTabs(vmToShow);
 
   return useMemo(
     () => (
