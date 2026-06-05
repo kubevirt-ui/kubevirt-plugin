@@ -106,7 +106,7 @@ const handleDeleteError = (
  * @returns Error message if creation fails, null if successful
  */
 const getOrCreateResource = async (
-  getOptions: { model: K8sModel; name: string; ns?: string },
+  getOptions: { cluster?: string; model: K8sModel; name: string; ns?: string },
   createOptions: { cluster: string; data: K8sResourceCommon; model: K8sModel },
   resourceKind: string,
   t: TFunction,
@@ -120,6 +120,9 @@ const getOrCreateResource = async (
         await kubevirtK8sCreate(createOptions);
         return null;
       } catch (createError) {
+        if (isErrorStatusCode(createError, 409)) {
+          return null;
+        }
         const errorMessage = getFailedToModifyMessage(t, resourceKind);
         kubevirtConsole.error(`Failed to create ${resourceKind}:`, createError);
         return errorMessage;
@@ -203,6 +206,7 @@ export const installPermissions = async (
   const [serviceAccountError, roleError, roleBindingError] = await Promise.all([
     getOrCreateResource(
       {
+        cluster,
         model: ServiceAccountModel,
         name: SELF_VALIDATION_SA,
         ns: namespace,
@@ -217,6 +221,7 @@ export const installPermissions = async (
     ),
     getOrCreateResource(
       {
+        cluster,
         model: RoleModel,
         name: SELF_VALIDATION_ROLE,
         ns: namespace,
@@ -231,6 +236,7 @@ export const installPermissions = async (
     ),
     getOrCreateResource(
       {
+        cluster,
         model: RoleBindingModel,
         name: SELF_VALIDATION_ROLE,
         ns: namespace,
