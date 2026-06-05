@@ -19,7 +19,7 @@ export const extractEditMigrationPolicyInitialValues = (
     initState.allowAutoConverge = mp?.spec?.allowAutoConverge;
   }
   if (migrationPolicySpecKeys.BANDWIDTH_PER_MIGRATION in mp?.spec) {
-    initState.bandwidthPerMigration = toQuantity(mp?.spec?.bandwidthPerMigration);
+    initState.bandwidthPerMigration = toQuantity(mp?.spec?.bandwidthPerMigration.toString());
   }
   if (migrationPolicySpecKeys.COMPLETION_TIMEOUT_PER_GIB in mp?.spec) {
     initState.completionTimeoutPerGiB = mp?.spec?.completionTimeoutPerGiB;

@@ -15,11 +15,11 @@ export const getDataVolumePVCStorageClassName = (
 
 export const getDataVolumeStorageRequest = (
   dataVolume: V1beta1DataVolume | V1DataVolumeTemplateSpec,
-): string => dataVolume?.spec?.storage?.resources?.requests?.storage;
+): string => dataVolume?.spec?.storage?.resources?.requests?.storage?.toString();
 
 export const getDataVolumePVCStorageRequest = (
   dataVolume: V1beta1DataVolume | V1DataVolumeTemplateSpec,
-): string => dataVolume?.spec?.pvc?.resources?.requests?.storage;
+): string => dataVolume?.spec?.pvc?.resources?.requests?.storage?.toString();
 
 export const getDataVolumeSourceRef = (
   dataVolume: V1beta1DataVolume | V1DataVolumeTemplateSpec,

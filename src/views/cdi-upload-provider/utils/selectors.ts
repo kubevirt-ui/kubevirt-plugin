@@ -43,7 +43,7 @@ const getAnnotation = (
 ): string => pvc?.metadata?.annotations?.[annotationName] || defaultValue;
 
 const getStorageSize = (value: K8sIoApiCoreV1VolumeResourceRequirements): string =>
-  value?.requests.storage;
+  value?.requests.storage.toString();
 
 const getParameterValue = (obj: V1Template, name: string, defaultValue = null): string =>
   obj?.parameters?.find((parameter) => parameter.name === name)?.value || defaultValue;
