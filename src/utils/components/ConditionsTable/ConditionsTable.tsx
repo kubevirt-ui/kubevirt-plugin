@@ -8,10 +8,10 @@ import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getConditionRowId, getConditionsColumns } from './conditionsTableDefinition';
 
 export type ConditionsProps = {
-  conditions: V1Condition[];
+  conditions?: V1Condition[];
 };
 
-export const ConditionsTable: FC<ConditionsProps> = ({ conditions }) => {
+export const ConditionsTable: FC<ConditionsProps> = ({ conditions = [] }) => {
   const { t } = useKubevirtTranslation();
 
   const columns = useMemo(() => getConditionsColumns(t), [t]);
