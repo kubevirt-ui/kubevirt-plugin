@@ -3,6 +3,7 @@ import { Octokit } from '@octokit/rest';
 
 import { addLabel } from './github-comments.js';
 import { createPullRequest } from './github-repo.js';
+import { rewriteJiraKeysInText, stripOriginalJiraKeys } from './version-utils.js';
 import { CONFLICT_LABEL, JIRA_BASE_URL } from './types/index.js';
 import type { CherryPickResult, ClonedTicket, JiraVersion } from './types/index.js';
 
@@ -22,11 +23,21 @@ const gitSafe = (...args: string[]): string => {
   }
 };
 
+/** Amend the latest commit message, preserving multi-line bodies. */
+const amendCommitMessage = (message: string): void => {
+  execFileSync('git', ['commit', '--amend', '-F', '-'], {
+    encoding: 'utf-8',
+    input: message,
+    stdio: ['pipe', 'pipe', 'pipe'],
+  });
+};
+
 /** Cherry-pick a commit onto a target branch; aborts cleanly on conflicts. */
 export const performCherryPick = (
   targetBranch: string,
   commitSha: string,
   branchName: string,
+  clonedTickets: ClonedTicket[],
 ): CherryPickResult => {
   let cherryPickClean = true;
   let conflictDetails = '';
@@ -36,12 +47,24 @@ export const performCherryPick = (
 
   try {
     git('cherry-pick', commitSha, '-m', '1', '--allow-empty');
+
+    if (clonedTickets.length > 0) {
+      const originalMessage = git('log', '-1', '--format=%B');
+      const rewrittenMessage = rewriteJiraKeysInText(originalMessage, clonedTickets);
+      if (rewrittenMessage !== originalMessage) {
+        amendCommitMessage(rewrittenMessage);
+      }
+    }
   } catch {
     cherryPickClean = false;
     conflictDetails = gitSafe('diff', '--name-only', '--diff-filter=U');
     git('cherry-pick', '--abort');
-    git('commit', '--allow-empty', '-m',
-      `[CONFLICTS] Cherry-pick ${commitSha} to ${targetBranch} - manual resolution required`);
+    git(
+      'commit',
+      '--allow-empty',
+      '-m',
+      `[CONFLICTS] Cherry-pick ${commitSha} to ${targetBranch} - manual resolution required`,
+    );
   }
 
   git('push', 'origin', branchName);
@@ -49,7 +72,42 @@ export const performCherryPick = (
   return { cherryPickClean, conflictDetails, cherryPickBranch: branchName };
 };
 
-/** Open a cherry-pick PR with ticket mapping table; marks as draft if conflicts. */
+/** Build PR body with clone ticket references only (no original Jira keys). */
+export const buildCherryPickPrBody = (params: {
+  originalPrNumber: number;
+  targetBranch: string;
+  matchedVersion: JiraVersion;
+  clonedTickets: ClonedTicket[];
+  cherryPickClean: boolean;
+  conflictDetails: string;
+}): string => {
+  const { originalPrNumber, targetBranch, matchedVersion, clonedTickets, cherryPickClean, conflictDetails } =
+    params;
+
+  const jiraLines = clonedTickets.map(
+    (ct) => `- [${ct.clonedKey}](${JIRA_BASE_URL}/browse/${ct.clonedKey})`,
+  );
+
+  const statusLine = cherryPickClean
+    ? ':white_check_mark: Cherry-pick applied cleanly.'
+    : `:warning: **Cherry-pick had conflicts.** Files needing resolution:\n\`\`\`\n${conflictDetails}\n\`\`\``;
+
+  const body = [
+    `## Cherry-pick to \`${targetBranch}\``,
+    '',
+    `**Source PR**: #${originalPrNumber}`,
+    `**Fix version**: ${matchedVersion.name}`,
+    '',
+    '### Jira',
+    ...jiraLines,
+    '',
+    statusLine,
+  ].join('\n');
+
+  return stripOriginalJiraKeys(body, clonedTickets);
+};
+
+/** Open a cherry-pick PR referencing only clone tickets; marks as draft if conflicts. */
 export const openCherryPickPR = async (
   octokit: Octokit,
   owner: string,
@@ -65,33 +123,13 @@ export const openCherryPickPR = async (
     matchedVersion: JiraVersion;
   },
 ): Promise<{ number: number; html_url: string }> => {
-  const { originalPrNumber, targetBranch, matchedVersion, clonedTickets } = params;
-
-  const ticketMappingLines = clonedTickets.map((ct) =>
-    `| [${ct.originalKey}](${JIRA_BASE_URL}/browse/${ct.originalKey}) | [${ct.clonedKey}](${JIRA_BASE_URL}/browse/${ct.clonedKey}) |`,
-  );
-
-  const prBody = [
-    `## Cherry-pick of #${originalPrNumber} to \`${targetBranch}\``,
-    '',
-    `**Original PR**: #${originalPrNumber}`,
-    `**Fix version**: ${matchedVersion.name}`,
-    '',
-    '### Cloned tickets',
-    '| Original | Clone |',
-    '|----------|-------|',
-    ...ticketMappingLines,
-    '',
-    params.cherryPickClean
-      ? ':white_check_mark: Cherry-pick applied cleanly.'
-      : `:warning: **Cherry-pick had conflicts.** Files needing resolution:\n\`\`\`\n${params.conflictDetails}\n\`\`\``,
-  ].join('\n');
+  const prBody = buildCherryPickPrBody(params);
 
   const newPr = await createPullRequest(octokit, owner, repo, {
     title: params.prTitle,
     body: prBody,
     head: params.cherryPickBranch,
-    base: targetBranch,
+    base: params.targetBranch,
     draft: !params.cherryPickClean,
   });
 
