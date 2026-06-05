@@ -2091,6 +2091,7 @@
   "This project is also governed by a ResourceQuota. Review to ensure accurate and consistent resource enforcement.": "이 프로젝트는 ResourceQuota에 의해 관리됩니다. 리소스가 정확하고 일관되게 적용되도록 검토합니다.",
   "This quota contains advanced settings (such as pod limits) that cannot be displayed in this simplified form. These configurations remain active and can be viewed or edited in the YAML view.": "이 할당량에는 이 간소화된 형식으로 표시할 수 없는 고급 설정(예: Pod 제한)이 포함되어 있습니다. 이러한 구성은 활성 상태로 유지되며 YAML 보기에서 보거나 편집할 수 있습니다.",
   "This self validation checkup is currently running. If you rerun the checkup, the running job will be deleted.": "이 자체 검증 검사가 현재 실행 중입니다. 점검을 재실행하면 실행 중인 작업이 삭제됩니다.",
+  "This storage checkup is currently running. If you rerun the checkup, the running job will be deleted.": "This storage checkup is currently running. If you rerun the checkup, the running job will be deleted.",
   "This suite was skipped.": "이 모음은 건너뛰었습니다.",
   "This user is not allowed to edit this boot source": "이 사용자는 이 부팅 소스를 편집할 수 없습니다",
   "This VirtualMachine has": "이 VirtualMachine에는 다음이 있습니다",

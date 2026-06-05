@@ -1,4 +1,5 @@
 import React, { ReactNode } from 'react';
+import { TFunction } from 'i18next';
 
 import {
   IoK8sApiBatchV1Job,
@@ -10,14 +11,11 @@ import { ToastActions } from '@kubevirt-utils/hooks/useKubevirtToast';
 import { getSelfValidationCheckupURL } from '@kubevirt-utils/resources/checkups/urls';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 
-import RerunCheckupModal from '../../../components/RerunCheckupModal';
-import { showRerunToast } from '../../../utils/showRerunToast';
-import { isJobRunning, rerunSelfValidationCheckup } from '../../utils';
+import { createCheckupRerunHandler } from '../../../utils/createCheckupRerunHandler';
+import { rerunSelfValidationCheckup } from '../../utils';
 
 import { ActionState, getRerunModeState } from './CheckupsSelfValidationActionsUtils';
 import RunningCheckupWarningDescription from './RunningCheckupWarningDescription';
-
-type TranslationFunction = (key: string, options?: Record<string, unknown>) => string;
 
 type RerunActionParams = {
   configMap: IoK8sApiCoreV1ConfigMap;
@@ -28,7 +26,7 @@ type RerunActionParams = {
   jobs?: IoK8sApiBatchV1Job[];
   navigate: (path: string) => void;
   otherRunningJobs?: IoK8sApiBatchV1Job[];
-  t: TranslationFunction;
+  t: TFunction;
   toast: ToastActions;
 };
 
@@ -50,54 +48,29 @@ export const createRerunAction = ({
     otherRunningJobs,
   );
 
-  const executeRerun = async () => {
-    if (!configMap) {
-      kubevirtConsole.error('Cannot rerun checkup: configMap is missing');
-      return;
-    }
+  const handleRerunAction = createCheckupRerunHandler({
+    configMap,
+    createModal,
+    getUrl: getSelfValidationCheckupURL,
+    isKebab,
+    jobs,
+    navigate,
+    rerun: async () => {
+      if (!configMap) {
+        kubevirtConsole.error('Cannot rerun checkup: configMap is missing');
+        return;
+      }
 
-    try {
       await rerunSelfValidationCheckup(configMap, jobs, () =>
         toast.addWarningToast({ title: t('PVC may need manual cleanup') }),
       );
-      if (isKebab) {
-        showRerunToast({
-          configMap,
-          getUrl: getSelfValidationCheckupURL,
-          navigate,
-          t,
-          toast,
-        });
-      }
-    } catch (e) {
-      kubevirtConsole.error('Failed to rerun checkup:', e);
-      toast.addDangerToast({
-        content: e?.message || t('An unknown error occurred'),
-        title: t('Failed to rerun checkup'),
-      });
-    }
-  };
-
-  const handleRerunAction = () => {
-    const runningJobs = jobs.filter((job) => isJobRunning(job));
-    if (runningJobs.length > 0) {
-      createModal((props) => (
-        <RerunCheckupModal
-          {...props}
-          message={t(
-            'This self validation checkup is currently running. If you rerun the checkup, the running job will be deleted.',
-          )}
-          onConfirm={() => {
-            props.onClose();
-            executeRerun();
-          }}
-          variant="warning"
-        />
-      ));
-    } else {
-      executeRerun();
-    }
-  };
+    },
+    runningJobWarningMessage: t(
+      'This self validation checkup is currently running. If you rerun the checkup, the running job will be deleted.',
+    ),
+    t,
+    toast,
+  });
 
   return {
     cta: handleRerunAction,
@@ -111,7 +84,7 @@ export const createRerunAction = ({
 type GoToRunningCheckupActionParams = {
   configMapInfo: ActionState['configMapInfo'];
   navigate: (path: string) => void;
-  t: TranslationFunction;
+  t: TFunction;
 };
 
 export const createGoToRunningCheckupAction = ({

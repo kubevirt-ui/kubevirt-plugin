@@ -126,6 +126,9 @@ export const getJobStatus = (job?: IoK8sApiBatchV1Job): CheckupsStatus => {
   return CheckupsStatus.Pending;
 };
 
+export const isJobRunning = (job?: IoK8sApiBatchV1Job): boolean =>
+  getJobStatus(job) === CheckupsStatus.Running;
+
 const STATUS_RANK: Record<CheckupsStatus, number> = {
   [CheckupsStatus.Deleting]: 3,
   [CheckupsStatus.Done]: 5,

@@ -2111,6 +2111,7 @@
   "This project is also governed by a ResourceQuota. Review to ensure accurate and consistent resource enforcement.": "Ce projet est également soumis à un quota de ressources. Un examen est nécessaire pour garantir une application précise et cohérente des ressources.",
   "This quota contains advanced settings (such as pod limits) that cannot be displayed in this simplified form. These configurations remain active and can be viewed or edited in the YAML view.": "Ce quota contient des paramètres avancés (tels que les limites de pods) qui ne peuvent pas être affichés sous cette forme simplifiée. Ces configurations restent actives et peuvent être consultées ou modifiées dans la vue YAML.",
   "This self validation checkup is currently running. If you rerun the checkup, the running job will be deleted.": "Cette vérification d'autovalidation est en cours. Si vous la relancez, la tâche en cours sera supprimée.",
+  "This storage checkup is currently running. If you rerun the checkup, the running job will be deleted.": "This storage checkup is currently running. If you rerun the checkup, the running job will be deleted.",
   "This suite was skipped.": "Cette suite a été ignorée.",
   "This user is not allowed to edit this boot source": "Cet utilisateur n'est pas autorisé à modifier cette source de démarrage",
   "This VirtualMachine has": "Cette machine virtuelle a",
