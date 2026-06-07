@@ -18,6 +18,7 @@ type DescriptionItemLabelsProps = {
   editable?: boolean;
   label?: string;
   model: K8sModel;
+  onEditClick?: () => void;
   onLabelsSubmit?: (labels: { [key: string]: string }) => Promise<any>;
   resource: K8sResourceCommon;
 };
@@ -28,6 +29,7 @@ const DescriptionItemLabels: FC<DescriptionItemLabelsProps> = ({
   editable = true,
   label,
   model,
+  onEditClick: onEditClickOverride,
   onLabelsSubmit,
   resource,
 }) => {
@@ -48,7 +50,7 @@ const DescriptionItemLabels: FC<DescriptionItemLabelsProps> = ({
       resource,
     });
 
-  const onEditClick = () =>
+  const onEditClickDefault = () =>
     createModal(({ isOpen, onClose }) => (
       <LabelsModal
         isOpen={isOpen}
@@ -57,6 +59,8 @@ const DescriptionItemLabels: FC<DescriptionItemLabelsProps> = ({
         onLabelsSubmit={onLabelsSubmit ?? onLabelsSubmitInternal}
       />
     ));
+
+  const onEditClick = onEditClickOverride ?? onEditClickDefault;
 
   const labelsHeader = t('Labels');
   const descriptionHeader = descriptionHeaderWrapper?.(labelsHeader) ?? labelsHeader;

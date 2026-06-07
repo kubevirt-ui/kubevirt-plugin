@@ -3,9 +3,9 @@ import React, { useMemo } from 'react';
 import { VirtualMachineInstanceModelRef } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { VirtualMachineInstanceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { AnnotationsModal } from '@kubevirt-utils/components/AnnotationsModal/AnnotationsModal';
 import DeleteModal from '@kubevirt-utils/components/DeleteModal/DeleteModal';
 import { LabelsModal } from '@kubevirt-utils/components/LabelsModal/LabelsModal';
+import { KeyValueModal } from '@kubevirt-utils/components/MetadataModal/KeyValueModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { asAccessReview } from '@kubevirt-utils/resources/shared';
@@ -62,7 +62,7 @@ const useVirtualMachineInstanceActionsProvider: UseVirtualMachineInstanceActions
       {
         cta: () =>
           createModal(({ isOpen, onClose }) => (
-            <AnnotationsModal
+            <KeyValueModal
               onSubmit={(annotations) =>
                 k8sPatch({
                   data: [

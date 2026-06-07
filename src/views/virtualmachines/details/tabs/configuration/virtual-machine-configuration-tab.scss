@@ -19,6 +19,7 @@
     min-height: 0;
     display: flex;
     flex-direction: row;
+    overflow-y: auto;
 
     h2 {
       margin-bottom: var(--pf-t--global--spacer--md);

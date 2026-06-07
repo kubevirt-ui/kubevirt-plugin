@@ -20,6 +20,7 @@ import {
   getVolumes,
   getWorkload,
 } from '@kubevirt-utils/resources/vm';
+import { escapeJsonPointerToken } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sPatch, kubevirtK8sUpdate } from '@multicluster/k8sRequests';
 import { printableVMStatus } from '@virtualmachines/utils';
@@ -116,6 +117,23 @@ export const updateAnnotation = (updatedVM: V1VirtualMachine, data: { [key: stri
 
 export const updateLabels = (updatedVM: V1VirtualMachine, data: { [key: string]: string }) =>
   updateMetadata(updatedVM, data, 'labels');
+
+export const removeMetadataKey = (
+  vm: V1VirtualMachine,
+  key: string,
+  type: 'annotations' | 'labels',
+) =>
+  kubevirtK8sPatch({
+    cluster: getCluster(vm),
+    data: [
+      {
+        op: 'remove',
+        path: `/metadata/${type}/${escapeJsonPointerToken(key)}`,
+      },
+    ],
+    model: VirtualMachineModel,
+    resource: vm,
+  });
 
 export const updateHardwareDevices = (type: string, vm: V1VirtualMachine) =>
   kubevirtK8sPatch({

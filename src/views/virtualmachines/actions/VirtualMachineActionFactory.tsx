@@ -14,7 +14,7 @@ import {
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { ActionDropdownItemType } from '@kubevirt-utils/components/ActionsDropdown/constants';
 import CloneVMModal from '@kubevirt-utils/components/CloneVMModal/CloneVMModal';
-import { LabelsModal } from '@kubevirt-utils/components/LabelsModal/LabelsModal';
+import { EditLabelsModal } from '@kubevirt-utils/components/MetadataModal/EditLabelsModal';
 import { ModalComponent } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import RunStrategyModal from '@kubevirt-utils/components/RunStrategyModal/RunStrategyModal';
 import { updateRunStrategy } from '@kubevirt-utils/components/RunStrategyModal/utils';
@@ -204,7 +204,7 @@ export const createVirtualMachineActionFactory = (t: TFunction) => ({
     accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
     cta: () =>
       createModal(({ isOpen, onClose }) => (
-        <LabelsModal
+        <EditLabelsModal
           onLabelsSubmit={(labels) =>
             kubevirtK8sPatch({
               data: [
