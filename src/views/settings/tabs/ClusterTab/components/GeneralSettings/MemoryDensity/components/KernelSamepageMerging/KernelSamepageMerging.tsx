@@ -27,7 +27,6 @@ const KernelSamepageMerging: FC<KernelSamepageMergingProps> = ({
   const [isEnabled, setIsEnabled] = useState<boolean>();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<null | string>(null);
-
   useEffect(() => {
     if (hyperLoaded) {
       setIsEnabled(
@@ -39,8 +38,6 @@ const KernelSamepageMerging: FC<KernelSamepageMergingProps> = ({
       );
     }
   }, [ksmConfiguration, hyperLoaded]);
-
-  
 
   const onKSMchange = (value: boolean) => {
     setError(null);
