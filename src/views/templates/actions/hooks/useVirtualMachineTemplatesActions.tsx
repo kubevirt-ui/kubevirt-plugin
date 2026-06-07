@@ -4,11 +4,11 @@ import { useNavigate } from 'react-router';
 import { TemplateModel, V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { DataVolumeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
-import { AnnotationsModal } from '@kubevirt-utils/components/AnnotationsModal/AnnotationsModal';
 import CloneTemplateModal from '@kubevirt-utils/components/CloneTemplateModal/CloneTemplateModal';
 import DeleteModal from '@kubevirt-utils/components/DeleteModal/DeleteModal';
 import { LabelsModal } from '@kubevirt-utils/components/LabelsModal/LabelsModal';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
+import { KeyValueModal } from '@kubevirt-utils/components/MetadataModal/KeyValueModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useNamespaceParam from '@kubevirt-utils/hooks/useNamespaceParam';
@@ -200,7 +200,7 @@ const useVirtualMachineTemplatesActions: UseVirtualMachineTemplatesActions = (
       accessReview: asAccessReview(TemplateModel, template, 'patch'),
       cta: () =>
         createModal(({ isOpen, onClose }) => (
-          <AnnotationsModal
+          <KeyValueModal
             onSubmit={(updatedAnnotations) =>
               kubevirtK8sPatch({
                 cluster,

@@ -1,6 +1,7 @@
 import { expect, test as base } from '@playwright/test';
 
 import { LoginPage } from '../pages/LoginPage';
+import { MetadataTabPage } from '../pages/MetadataTabPage';
 import {
   BootableVolumesPage,
   CheckupsPage,
@@ -19,6 +20,7 @@ type KubevirtFixtures = {
   checkupsPage: CheckupsPage;
   instanceTypesPage: InstanceTypesPage;
   loginPage: LoginPage;
+  metadataTab: MetadataTabPage;
   migrationPoliciesPage: MigrationPoliciesPage;
   settingsPage: SettingsPage;
   storageClassesPage: StorageClassesPage;
@@ -45,6 +47,10 @@ export const test = base.extend<KubevirtFixtures>({
     const lp = new LoginPage(page);
     await lp.seedGuidedTourState();
     await use(lp);
+  },
+
+  metadataTab: async ({ page }, use) => {
+    await use(new MetadataTabPage(page));
   },
 
   migrationPoliciesPage: async ({ page }, use) => {
