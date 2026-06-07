@@ -25,6 +25,7 @@ import GeneralSettingsError from '../shared/GeneralSettingsError';
 
 import AppliedMemory from './components/AppliedMemory';
 import CurrentMemoryDensity from './components/CurrentMemoryDensity';
+import KernelSamepageMerging from './components/KernelSamepageMerging/KernelSamepageMerging';
 import MemoryDensitySlider from './components/MemoryDensitySlider';
 import useAppliedOvercommitRatio from './hooks/useAppliedOvercommitRatio';
 import { useMemoryDensityValue } from './hooks/useMemoryDensityValue';
@@ -134,6 +135,13 @@ const MemoryDensity: FC<MemoryDensityProps> = ({ hyperConvergeConfiguration, new
               )}
             </CurrentMemoryDensity>
           )}
+
+          <StackItem isFilled>
+            <KernelSamepageMerging
+              hyperConvergeConfiguration={hyperConvergeConfiguration}
+              newBadge={newBadge}
+            />
+          </StackItem>
         </Stack>
       </ExpandSection>
 
