@@ -2476,6 +2476,6 @@
   "You're in view-only mode": "You're in view-only mode",
   "You're ready to start managing your VMs. For more tips and deep dives, check out our <2>documentation</2> or follow the <6>blog</6>.": "You're ready to start managing your VMs. For more tips and deep dives, check out our <2>documentation</2> or follow the <6>blog</6>.",
   "Your physical network switch must be configured with a VLAN trunk that is permitted to carry traffic for this specific ID.": "Your physical network switch must be configured with a VLAN trunk that is permitted to carry traffic for this specific ID.",
-  "Your VirtualMachine will be created in the following location unless you edit it:": "Your VirtualMachine will be created in the following location unless you edit it:",
+  "Your VirtualMachine will be created in the following location": "Your VirtualMachine will be created in the following location",
   "zero": "zero"
 }

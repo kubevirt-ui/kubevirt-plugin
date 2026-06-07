@@ -2475,6 +2475,6 @@
   "You're in view-only mode": "뷰 전용 모드입니다.",
   "You're ready to start managing your VMs. For more tips and deep dives, check out our <2>documentation</2> or follow the <6>blog</6>.": "VM 관리를 시작할 준비가 되었습니다. 자세한 내용은 <2>문서</2>를 확인하거나 <6>블로그</6>를 참조하십시오.",
   "Your physical network switch must be configured with a VLAN trunk that is permitted to carry traffic for this specific ID.": "이 특정 ID에 대한 트래픽을 전송할 수 있는 VLAN 트렁크를 사용하여 물리적 네트워크 스위치를 구성해야 합니다.",
-  "Your VirtualMachine will be created in the following location unless you edit it:": "편집하지 않는 한 다음 위치에 VirtualMachine가 생성됩니다.",
+  "Your VirtualMachine will be created in the following location": "Your VirtualMachine will be created in the following location",
   "zero": "0"
 }

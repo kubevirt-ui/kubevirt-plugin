@@ -1,9 +1,9 @@
 import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import BlueSyncIcon from '@kubevirt-utils/icons/BlueSyncIcon';
 import { generatePrettyName } from '@kubevirt-utils/utils/utils';
 import { Button, Tooltip } from '@patternfly/react-core';
-import { SyncAltIcon } from '@patternfly/react-icons';
 
 type GenerateVMNameButtonProps = {
   applyName: (name: string) => void;
@@ -21,7 +21,7 @@ const GenerateVMNameButton: FC<GenerateVMNameButtonProps> = ({ applyName }) => {
         onClick={() => applyName(generatePrettyName())}
         variant="plain"
       >
-        <SyncAltIcon />
+        <BlueSyncIcon />
       </Button>
     </Tooltip>
   );
