@@ -8,8 +8,10 @@ import HardwareDevicesModal from '@kubevirt-utils/components/HardwareDevices/mod
 import { HARDWARE_DEVICE_TYPE } from '@kubevirt-utils/components/HardwareDevices/utils/constants';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
+import { ARCHITECTURES } from '@kubevirt-utils/constants/constants';
 import { TELEMETRY_GPU_PASSTHROUGH_TYPE } from '@kubevirt-utils/extensions/telemetry/utils/property-constants';
 import { logVMGPUAttached } from '@kubevirt-utils/extensions/telemetry/workload';
+import useHcoWorkloadArchitectures from '@kubevirt-utils/hooks/useHcoWorkloadArchitectures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useToggle } from '@kubevirt-utils/hooks/useToggle';
 import { getGPUDevices, getHostDevices } from '@kubevirt-utils/resources/vm';
@@ -34,6 +36,8 @@ const DetailsSectionHardware: FC<DetailsSectionHardwareProps> = ({
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const location = useLocation();
+  const clusterWorkloadArchitectures = useHcoWorkloadArchitectures() ?? [];
+  const clusterHasS390xArchitecture = clusterWorkloadArchitectures.includes(ARCHITECTURES.S390X);
   const [isExpanded, setIsExpanded] = useToggle('hardware-devices');
   const onSubmit = onSubmitProp || updateHardwareDevices;
   const hostDevices = getHostDevices(vm);
@@ -98,7 +102,7 @@ const DetailsSectionHardware: FC<DetailsSectionHardwareProps> = ({
       onToggle={(_event, val) => setIsExpanded(val)}
     >
       <Grid>
-        {!vmHasS390xArchitecture && (
+        {!vmHasS390xArchitecture && !clusterHasS390xArchitecture && (
           <>
             <GridItem span={5}>
               <HardwareDeviceTitle canEdit onClick={onEditGPU} title={t('GPU devices')} />
@@ -115,7 +119,7 @@ const DetailsSectionHardware: FC<DetailsSectionHardwareProps> = ({
           </>
         )}
 
-        <GridItem span={vmHasS390xArchitecture ? 11 : 5}>
+        <GridItem span={vmHasS390xArchitecture || clusterHasS390xArchitecture ? 11 : 5}>
           <HardwareDeviceTitle canEdit onClick={onEditHostDevices} title={t('Host devices')} />
           <HardwareDevicesTable devices={hostDevices} />
         </GridItem>
