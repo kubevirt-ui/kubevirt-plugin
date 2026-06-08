@@ -73,8 +73,6 @@ const VMCreationWizard: FC = () => {
       setProject(!isAdmin ? namespace : currentProject || namespace);
       hasInitialized.current = true;
     }
-
-    return () => resetWizardState();
   }, [
     clusterParam,
     isAdmin,
@@ -85,6 +83,9 @@ const VMCreationWizard: FC = () => {
     setProject,
     setTemplatesDrawerIsOpen,
   ]);
+
+  // Reset wizard state only on unmount (separate from init to avoid wiping user selections when store values in the dep array change).
+  useEffect(() => () => resetWizardState(), []);
 
   const isInstanceTypeMethod = isInstanceTypeCreationMethod(creationMethod);
   const isCloneMethod = isCloneCreationMethod(creationMethod);
