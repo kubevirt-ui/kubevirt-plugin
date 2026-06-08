@@ -5,6 +5,7 @@ import {
   KubevirtFilterState,
   OnSetFilters,
 } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ToolbarFilter, ToolbarLabel } from '@patternfly/react-core';
 
 type ToolbarFilterMultiChipProps = PropsWithChildren<{
@@ -19,7 +20,20 @@ const ToolbarFilterMultiChip: FC<ToolbarFilterMultiChipProps> = ({
   filters,
   onSetFilters,
 }) => {
+  const { t } = useKubevirtTranslation();
   const selected = filters[filterDef.id] ?? [];
+
+  const resolveLabel = (val: string): string =>
+    (filterDef.options?.find((o) => o.value === val)?.label as string) ??
+    filterDef.getChipLabel?.(val) ??
+    val;
+
+  const getChipText = (val: string) => {
+    if (val.startsWith('!')) {
+      return t('Exclude {{value}}', { value: resolveLabel(val.slice(1)) });
+    }
+    return resolveLabel(val);
+  };
 
   return (
     <ToolbarFilter
@@ -30,10 +44,7 @@ const ToolbarFilterMultiChip: FC<ToolbarFilterMultiChipProps> = ({
       }}
       labels={selected.map((val) => ({
         key: val,
-        node:
-          filterDef.options?.find((o) => o.value === val)?.label ??
-          filterDef.getChipLabel?.(val) ??
-          val,
+        node: getChipText(val),
       }))}
       categoryName={filterDef.categoryLabel ?? ' '}
       deleteLabelGroup={() => onSetFilters({ [filterDef.id]: [] })}

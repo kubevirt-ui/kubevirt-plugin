@@ -121,10 +121,6 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = (props) => {
   const [vmims, vmimsLoaded] = useVirtualMachineInstanceMigrations(cluster, namespace);
 
   const { vmiMapper, vmisLoaded } = useVirtualMachineInstanceMapper();
-  const vmis = useMemo(
-    () => vmsToShow?.map((vm) => getVMIFromMapper(vmiMapper, vm)).filter(Boolean),
-    [vmiMapper, vmsToShow],
-  );
 
   const vmimMapper = useVirtualMachineInstanceMigrationMapper(vmims);
   const pvcMapper = usePVCMapper(namespace, cluster);
@@ -276,11 +272,8 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = (props) => {
             <>
               <SearchBar
                 clearAllFilters={clearAllFilters}
+                filterDefinitions={filterDefinitions}
                 onSetFilters={handleSetFilters}
-                vmis={vmis}
-                vmisLoaded={vmisLoaded}
-                vms={vmsToShow}
-                vmsLoaded={vmsLoaded}
               />
               <VirtualMachineFilterToolbar
                 clearAllFilters={() => {

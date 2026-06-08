@@ -12,6 +12,7 @@ import { getLabelFilter } from './filters/getLabelFilter';
 import useMigratedSearchParams from './hooks/useMigratedSearchParams';
 import useSyncedLabelsFilter from './hooks/useSyncedLabelsFilter';
 import { KubevirtFilter, KubevirtFilterState, OnSetFilters } from './types';
+import { matchesWithExclusion } from './utils';
 
 type UseKubevirtDataViewFiltersArgs<T extends K8sResourceCommon> = {
   data: T[];
@@ -71,8 +72,11 @@ const useKubevirtDataViewFilters = <T extends K8sResourceCommon>({
           matchesName &&
           filterDefinitions.every((filterDef) => {
             const selected = syncedFilters[filterDef.id];
-            if (filterDef.applyWhenEmpty) return filterDef.match(obj, selected);
-            return isEmpty(selected) || filterDef.match(obj, selected);
+
+            if (filterDef.applyWhenEmpty) {
+              return matchesWithExclusion(filterDef, obj, selected ?? []);
+            }
+            return isEmpty(selected) || matchesWithExclusion(filterDef, obj, selected);
           })
         );
       }) ?? [],

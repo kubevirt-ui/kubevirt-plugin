@@ -1,6 +1,9 @@
-import React, { FC, FormEvent, RefObject, useMemo, useState } from 'react';
-import debounce from 'lodash/debounce';
+import React, { FC, RefObject } from 'react';
 
+import {
+  KubevirtFilter,
+  OnSetFilters,
+} from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   Button,
@@ -12,58 +15,35 @@ import {
 import { SearchIcon, TimesIcon } from '@patternfly/react-icons';
 import { VM_SEARCH_INPUT_ID } from '@search/utils/constants';
 
+import { useSearchLanguageInput } from '../searchLanguage/hooks/useSearchLanguageInput/useSearchLanguageInput';
+
 import AdvancedSearchIcon from './AdvancedSearchIcon';
 
 type SearchTextInputProps = {
+  filterDefinitions: KubevirtFilter[];
   inputRef: RefObject<HTMLInputElement>;
-  onEnterKeyDown: () => void;
   onOpenAdvancedSearch: () => void;
-  setIsSearchSuggestBoxOpen: (isOpen: boolean) => void;
-  setSearchQuery: (query: string) => void;
+  onSetFilters: OnSetFilters;
 };
 
 const SearchTextInput: FC<SearchTextInputProps> = ({
+  filterDefinitions,
   inputRef,
-  onEnterKeyDown,
   onOpenAdvancedSearch,
-  setIsSearchSuggestBoxOpen,
-  setSearchQuery,
+  onSetFilters,
 }) => {
   const { t } = useKubevirtTranslation();
-  const [inputValue, setInputValue] = useState('');
-
-  const debouncedSetSearchQuery = useMemo(() => debounce(setSearchQuery, 500), []);
-
-  const onChange = (_event: FormEvent<HTMLInputElement>, value: string) => {
-    setInputValue(value);
-    debouncedSetSearchQuery(value);
-  };
-
-  const onClear = () => {
-    debouncedSetSearchQuery.cancel();
-    setInputValue('');
-    setSearchQuery('');
-  };
-
-  const onInputClick = () => inputValue && setIsSearchSuggestBoxOpen(true);
+  const { inputValue, onChange, onClear, onKeyDown } = useSearchLanguageInput(
+    onSetFilters,
+    filterDefinitions,
+  );
 
   return (
     <TextInputGroup data-test={VM_SEARCH_INPUT_ID} id={VM_SEARCH_INPUT_ID} innerRef={inputRef}>
       <TextInputGroupMain
-        onKeyDown={(e) => {
-          if (!inputValue) {
-            return;
-          }
-          if (e.key === 'Enter') {
-            onEnterKeyDown();
-          }
-          if (e.key === 'Escape') {
-            setIsSearchSuggestBoxOpen(false);
-          }
-        }}
         icon={<SearchIcon />}
         onChange={onChange}
-        onClick={onInputClick}
+        onKeyDown={onKeyDown}
         placeholder={t('Search virtual machines')}
         value={inputValue}
       />
