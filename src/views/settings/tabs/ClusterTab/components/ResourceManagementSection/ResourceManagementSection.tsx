@@ -8,7 +8,6 @@ import { CLUSTER_TAB_IDS } from '@settings/search/constants';
 
 import ApplicationAwareQuota from './components/ApplicationAwareQuota/ApplicationAwareQuota';
 import AutoComputeCPULimits from './components/AutoComputeCPULimits/AutoComputeCPULimits';
-import KernelSamepageMerging from './components/KernelSamepageMerging/KernelSamepageMerging';
 
 type ResourceManagementSectionProps = {
   hyperConvergeConfiguration: [hyperConvergeConfig: HyperConverged, loaded: boolean, error: Error];
@@ -29,12 +28,6 @@ const ResourceManagementSection: FC<ResourceManagementSectionProps> = ({
       <Stack hasGutter>
         <StackItem isFilled>
           <AutoComputeCPULimits
-            hyperConvergeConfiguration={hyperConvergeConfiguration}
-            newBadge={newBadge}
-          />
-        </StackItem>
-        <StackItem isFilled>
-          <KernelSamepageMerging
             hyperConvergeConfiguration={hyperConvergeConfiguration}
             newBadge={newBadge}
           />

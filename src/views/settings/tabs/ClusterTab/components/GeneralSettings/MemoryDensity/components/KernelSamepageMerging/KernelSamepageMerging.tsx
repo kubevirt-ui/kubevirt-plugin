@@ -25,7 +25,8 @@ const KernelSamepageMerging: FC<KernelSamepageMergingProps> = ({
   const [hyperConverge, hyperLoaded] = hyperConvergeConfiguration;
   const ksmConfiguration = hyperConverge?.spec?.ksmConfiguration;
   const [isEnabled, setIsEnabled] = useState<boolean>();
-
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [error, setError] = useState<null | string>(null);
   useEffect(() => {
     if (hyperLoaded) {
       setIsEnabled(
@@ -37,9 +38,6 @@ const KernelSamepageMerging: FC<KernelSamepageMergingProps> = ({
       );
     }
   }, [ksmConfiguration, hyperLoaded]);
-
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [error, setError] = useState<null | string>(null);
 
   const onKSMchange = (value: boolean) => {
     setError(null);
