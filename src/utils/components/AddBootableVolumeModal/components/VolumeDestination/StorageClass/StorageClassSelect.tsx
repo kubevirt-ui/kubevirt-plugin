@@ -4,6 +4,7 @@ import { getSCSelectOptions } from '@kubevirt-utils/components/DiskModal/compone
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import useDefaultStorageClass from '@kubevirt-utils/hooks/useDefaultStorage/useDefaultStorageClass';
+import { getPreferredDefaultStorageClass } from '@kubevirt-utils/hooks/useDefaultStorage/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useReadyStorageClasses from '@kubevirt-utils/hooks/useReadyStorageClasses/useReadyStorageClasses';
 import { StorageClassModel } from '@kubevirt-utils/models';
@@ -30,10 +31,11 @@ const StorageClassSelect: FC<StorageClassSelectProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
 
-  const [{ clusterDefaultStorageClass }, defaultSCLoaded] = useDefaultStorageClass(cluster);
+  const [defaultStorageClasses, defaultSCLoaded] = useDefaultStorageClass(cluster);
   const [{ readyStorageClasses }, readySCLoaded] = useReadyStorageClasses(cluster);
 
   const loaded = defaultSCLoaded && readySCLoaded;
+  const defaultSC = getPreferredDefaultStorageClass(defaultStorageClasses);
 
   const onSelect = useCallback(
     (selection: string) => {
@@ -48,17 +50,11 @@ const StorageClassSelect: FC<StorageClassSelectProps> = ({
   );
 
   useEffect(() => {
-    if (!storageClass && loaded && !isEmpty(clusterDefaultStorageClass)) {
-      setStorageClassName(getName(clusterDefaultStorageClass));
-      setStorageClassProvisioner?.(clusterDefaultStorageClass?.provisioner);
+    if (!storageClass && loaded && !isEmpty(defaultSC)) {
+      setStorageClassName(getName(defaultSC));
+      setStorageClassProvisioner?.(defaultSC?.provisioner);
     }
-  }, [
-    clusterDefaultStorageClass,
-    setStorageClassName,
-    setStorageClassProvisioner,
-    storageClass,
-    loaded,
-  ]);
+  }, [defaultSC, setStorageClassName, setStorageClassProvisioner, storageClass, loaded]);
 
   return (
     <FormGroup fieldId="storage-class" label={t('StorageClass')}>
@@ -71,7 +67,7 @@ const StorageClassSelect: FC<StorageClassSelectProps> = ({
             options={getSCSelectOptions(readyStorageClasses)}
             placeholder={t('Select {{label}}', { label: StorageClassModel.label })}
             popperProps={{ enableFlip: true }}
-            selected={storageClass || getName(clusterDefaultStorageClass)}
+            selected={storageClass || getName(defaultSC)}
             setSelected={onSelect}
           />
         ) : (
