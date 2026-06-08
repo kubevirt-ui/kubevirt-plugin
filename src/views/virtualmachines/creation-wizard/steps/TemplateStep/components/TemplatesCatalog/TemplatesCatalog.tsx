@@ -3,7 +3,9 @@ import React, { FC, useMemo } from 'react';
 import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { logTemplateFlowEvent } from '@kubevirt-utils/extensions/telemetry/telemetry';
 import { TEMPLATE_SELECTED } from '@kubevirt-utils/extensions/telemetry/utils/constants';
-import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
+import useIsWindowsSupportedArchitecture from '@kubevirt-utils/hooks/useIsWindowsSupportedArchitecture';
+import { getTemplateVirtualMachineObject, OS_NAME_TYPES } from '@kubevirt-utils/resources/template';
+import { getTemplateOS } from '@kubevirt-utils/resources/template/utils/selectors';
 import { vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { PageSection, Stack } from '@patternfly/react-core';
@@ -33,9 +35,19 @@ const TemplatesCatalog: FC = () => {
       onlyDefault: filters.onlyDefault,
     });
 
+  const isWindowsSupported = useIsWindowsSupportedArchitecture();
+
+  const supportedTemplates = useMemo(
+    () =>
+      isWindowsSupported
+        ? templates
+        : templates.filter((t) => getTemplateOS(t) !== OS_NAME_TYPES.windows),
+    [templates, isWindowsSupported],
+  );
+
   const filteredTemplates = useMemo(
-    () => filterTemplates(templates, filters),
-    [templates, filters],
+    () => filterTemplates(supportedTemplates, filters),
+    [supportedTemplates, filters],
   );
 
   useHideDeprecatedTemplateTiles(onFilterChange);

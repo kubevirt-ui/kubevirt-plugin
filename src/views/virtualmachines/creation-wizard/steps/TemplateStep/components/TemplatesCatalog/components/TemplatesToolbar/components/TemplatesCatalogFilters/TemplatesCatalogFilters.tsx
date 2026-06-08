@@ -2,7 +2,9 @@ import React, { FC, memo, useMemo } from 'react';
 
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import useHcoWorkloadArchitectures from '@kubevirt-utils/hooks/useHcoWorkloadArchitectures';
+import useIsWindowsSupportedArchitecture from '@kubevirt-utils/hooks/useIsWindowsSupportedArchitecture';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { OS_NAME_TYPES } from '@kubevirt-utils/resources/template';
 import {
   HIDE_DEPRECATED_TEMPLATES_KEY,
   OS_NAMES,
@@ -25,6 +27,13 @@ export const TemplatesCatalogFilters: FC<{
   onFilterChange: (type: CATALOG_FILTERS, value: boolean | string) => void;
 }> = memo(({ filters, onFilterChange }) => {
   const { t } = useKubevirtTranslation();
+  const isWindowsSupported = useIsWindowsSupportedArchitecture();
+
+  const osNames = useMemo(
+    () =>
+      isWindowsSupported ? OS_NAMES : OS_NAMES.filter((item) => item.id !== OS_NAME_TYPES.windows),
+    [isWindowsSupported],
+  );
 
   const workloadsArchitectures = useHcoWorkloadArchitectures();
   const workloadsArchitecturesItems = useMemo(
@@ -73,7 +82,7 @@ export const TemplatesCatalogFilters: FC<{
     }
 
     // Handle OS name filters
-    if (OS_NAMES.some((item) => item.id === value)) {
+    if (osNames.some((item) => item.id === value)) {
       onFilterChange(CATALOG_FILTERS.OS_NAME, value);
       return;
     }
@@ -140,7 +149,7 @@ export const TemplatesCatalogFilters: FC<{
       </SelectGroup>
 
       <SelectGroup label={t('Operating system')}>
-        {OS_NAMES.map((item) => (
+        {osNames.map((item) => (
           <SelectOption
             data-test-row-filter={item.id}
             hasCheckbox
