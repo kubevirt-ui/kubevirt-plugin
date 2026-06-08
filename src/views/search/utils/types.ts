@@ -2,7 +2,7 @@ import { CAPACITY_UNITS } from '@kubevirt-utils/components/CapacityInput/utils';
 import { NumberOperator } from '@kubevirt-utils/utils/constants';
 import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
-import { HWDeviceKind, SchedulingKind } from './constants';
+import { GuestAgentStatus, HWDeviceKind, SchedulingKind } from './constants';
 
 export type AdvancedSearchInputs = AdvancedSearchQueryInputs & {
   labelInputText?: string;
@@ -15,6 +15,7 @@ export type AdvancedSearchQueryInputs = Partial<{
   [VirtualMachineRowFilterType.DateCreatedFrom]: string;
   [VirtualMachineRowFilterType.DateCreatedTo]: string;
   [VirtualMachineRowFilterType.Description]: string;
+  [VirtualMachineRowFilterType.GuestAgent]: GuestAgentValue;
   [VirtualMachineRowFilterType.HWDevices]: HWDevicesValue;
   [VirtualMachineRowFilterType.IP]: string;
   [VirtualMachineRowFilterType.Labels]: string[];
@@ -43,6 +44,11 @@ export type SearchSuggestResult = {
     | VirtualMachineRowFilterType.Labels,
     number
   >;
+};
+
+export type GuestAgentValue = {
+  [GuestAgentStatus.NOT_REPORTING]: boolean;
+  [GuestAgentStatus.REPORTING]: boolean;
 };
 
 export type SchedulingValue = {

@@ -233,14 +233,6 @@ export const extensions: EncodedExtension[] = [
     type: 'console.page/route',
   } as EncodedExtension<RoutePage>,
   {
-    properties: {
-      component: { $codeRef: 'VirtualMachineSearchResults' },
-      path: [`${FLEET_VIRTUAL_MACHINES_PATH}/all-clusters/all-namespaces/search`],
-    },
-    type: 'console.page/route',
-  } as EncodedExtension<RoutePage>,
-
-  {
     properties: { handler: { $codeRef: 'acmFlags.useKubevirtDynamicACMFlag' } },
     type: 'console.flag/hookProvider',
   } as EncodedExtension<FeatureFlagHookProvider>,

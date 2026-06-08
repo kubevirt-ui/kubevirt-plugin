@@ -1,179 +1,78 @@
-import React, { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { FC, RefObject, useCallback } from 'react';
 
-import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
-import { OnSetFilters } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
-import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import useNamespaceParam from '@kubevirt-utils/hooks/useNamespaceParam';
-import useClusterParam from '@multicluster/hooks/useClusterParam';
-import { Button, InputGroup, InputGroupItem, Menu, Popper } from '@patternfly/react-core';
-import { VM_SEARCH_INPUT_ID } from '@search/utils/constants';
-import { buildContextSearchInputs } from '@search/utils/query';
-import { SearchSuggestResult } from '@search/utils/types';
-import { useVirtualMachineSearchSuggestions } from '@virtualmachines/search/hooks/useVirtualMachineSearchSuggestions';
+import {
+  KubevirtFilter,
+  KubevirtFilterState,
+  OnSetFilters,
+} from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
+import { InputGroup, InputGroupItem } from '@patternfly/react-core';
+import useShowAdvancedSearchModal from '@search/hooks/useShowAdvancedSearchModal';
+import { useSearchLanguageInput } from '@search/searchLanguage/hooks/useSearchLanguageInput/useSearchLanguageInput';
 
-import { useNavigateToSearchResults } from '../hooks/useNavigateToSearchResults';
-import { useSavedSearchData } from '../hooks/useSavedSearchData';
-import { AdvancedSearchInputs } from '../utils/types';
-
-import AdvancedSearchModal from './AdvancedSearchModal/AdvancedSearchModal';
-import SearchSuggestBox from './SearchSuggestBox/SearchSuggestBox';
+import useRecentSearches from './SearchDropdown/hooks/useRecentSearches';
+import SearchTipsPopover from './SearchTipsPopover/SearchTipsPopover';
 import SavedSearchesDropdown from './SavedSearchesDropdown';
-import SaveSearchModal from './SaveSearchModal';
+import SaveSearchButton from './SaveSearchButton';
 import SearchTextInput from './SearchTextInput';
 
 import './search-bar.scss';
 
 type SearchBarProps = {
   clearAllFilters: () => void;
+  filterDefinitions: KubevirtFilter[];
+  filters: KubevirtFilterState;
+  inputRef?: RefObject<HTMLInputElement>;
   onSetFilters: OnSetFilters;
-  vmis: V1VirtualMachineInstance[];
-  vmisLoaded: boolean;
-  vms: V1VirtualMachine[];
-  vmsLoaded: boolean;
 };
 
 const SearchBar: FC<SearchBarProps> = ({
   clearAllFilters,
+  filterDefinitions,
+  filters,
+  inputRef,
   onSetFilters,
-  vmis,
-  vmisLoaded,
-  vms,
-  vmsLoaded,
 }) => {
-  const { t } = useKubevirtTranslation();
-  const { createModal } = useModal();
-  const namespace = useNamespaceParam();
-  const cluster = useClusterParam();
+  const showSearchModal = useShowAdvancedSearchModal(onSetFilters, clearAllFilters);
 
-  const [searchQuery, setSearchQuery] = useState('');
-  const [isSearchSuggestBoxOpen, setIsSearchSuggestBoxOpen] = useState(false);
+  const { addRecentSearch, recentSearches } = useRecentSearches();
 
-  const searchInputRef = useRef<HTMLInputElement>();
-  const searchSuggestBoxRef = useRef<HTMLDivElement>();
-
-  const [vmSuggestions, vmSuggestionsLoaded] = useVirtualMachineSearchSuggestions({
-    searchQuery,
-    vmis,
-    vmisLoaded,
-    vms,
-    vmsLoaded,
+  const { onCommitText, ...searchInputProps } = useSearchLanguageInput({
+    addRecentSearch,
+    clearAllFilters,
+    filterDefinitions,
+    filters,
+    onSetFilters,
   });
-  const navigateToSearchResults = useNavigateToSearchResults(onSetFilters, clearAllFilters);
-  const { saveSearch, urlSearchQuery } = useSavedSearchData();
 
-  const searchSuggestResult: SearchSuggestResult | undefined = useMemo(() => {
-    if (!searchQuery) {
-      return undefined;
-    }
-    return vmSuggestions;
-  }, [searchQuery, vmSuggestions]);
-
-  useEffect(() => {
-    if (searchQuery) {
-      setIsSearchSuggestBoxOpen(true);
-    } else {
-      setIsSearchSuggestBoxOpen(false);
-    }
-  }, [searchQuery]);
-
-  const isSearchInProgress = useMemo(() => {
-    return searchQuery ? !vmSuggestionsLoaded : false;
-  }, [searchQuery, vmSuggestionsLoaded]);
-
-  const onEnterKeyDown = () => {
-    if (isSearchSuggestBoxOpen && searchSuggestResult?.resources.length > 0) {
-      navigateToSearchResults({
-        ...buildContextSearchInputs(cluster, namespace),
-        name: searchQuery,
-      });
-      setIsSearchSuggestBoxOpen(false);
-    }
-    if (!isSearchSuggestBoxOpen) {
-      setIsSearchSuggestBoxOpen(true);
-    }
-  };
-
-  const showSearchModal = useCallback(
-    (prefillInputs?: AdvancedSearchInputs) => {
-      createModal(({ isOpen, onClose }) => (
-        <AdvancedSearchModal
-          onSubmit={(searchInputs) => {
-            navigateToSearchResults(searchInputs);
-            onClose();
-          }}
-          isOpen={isOpen}
-          onClose={onClose}
-          prefillInputs={prefillInputs}
-        />
-      ));
+  const onSelectQueryText = useCallback(
+    (token: string) => {
+      onCommitText(token, { closeDropdown: true });
     },
-    [createModal, navigateToSearchResults],
+    [onCommitText],
   );
-
-  const showSaveSearchModal = useCallback(() => {
-    createModal(({ isOpen, onClose }) => (
-      <SaveSearchModal
-        onSubmit={({ description, name }) => {
-          saveSearch(name, { description, query: urlSearchQuery });
-          onClose();
-        }}
-        isOpen={isOpen}
-        onClose={onClose}
-      />
-    ));
-  }, [createModal, saveSearch, urlSearchQuery]);
 
   return (
     <InputGroup className="pf-v6-u-mb-md" data-test="vm-adv-search-toolbar">
-      <Popper
-        popper={
-          <Menu
-            aria-label={t('Search suggest box')}
-            className="pf-v6-u-py-0"
-            data-test="search-results"
-            ref={searchSuggestBoxRef}
-            role="dialog"
-          >
-            <SearchSuggestBox
-              cluster={cluster}
-              isSearchInProgress={isSearchInProgress}
-              namespace={namespace}
-              navigateToSearchResults={navigateToSearchResults}
-              searchQuery={searchQuery}
-              searchSuggestResult={searchSuggestResult}
-              showSearchModal={showSearchModal}
-            />
-          </Menu>
-        }
-        trigger={
-          <SearchTextInput
-            inputRef={searchInputRef}
-            onEnterKeyDown={onEnterKeyDown}
-            onOpenAdvancedSearch={() => showSearchModal()}
-            setIsSearchSuggestBoxOpen={setIsSearchSuggestBoxOpen}
-            setSearchQuery={setSearchQuery}
-          />
-        }
-        appendTo={() => document.querySelector(`#${VM_SEARCH_INPUT_ID}`)}
-        enableFlip={false}
-        isVisible={isSearchSuggestBoxOpen}
-        onDocumentClick={() => setIsSearchSuggestBoxOpen(false)}
-        popperRef={searchSuggestBoxRef}
-        triggerRef={searchInputRef}
-      />
-      <InputGroupItem>
-        <Button
-          data-test="save-search"
-          isDisabled={!urlSearchQuery}
-          onClick={showSaveSearchModal}
-          variant="link"
-        >
-          {t('Save search')}
-        </Button>
+      <InputGroupItem isFill>
+        <SearchTextInput
+          filterDefinitions={filterDefinitions}
+          filters={filters}
+          inputRef={inputRef}
+          onOpenAdvancedSearch={showSearchModal}
+          onSelectQueryText={onSelectQueryText}
+          onSetFilters={onSetFilters}
+          recentSearches={recentSearches}
+          {...searchInputProps}
+        />
       </InputGroupItem>
       <InputGroupItem>
-        <SavedSearchesDropdown />
+        <SearchTipsPopover onSelectTip={onSelectQueryText} />
+      </InputGroupItem>
+      <InputGroupItem>
+        <SaveSearchButton filters={filters} onSetFilters={onSetFilters} />
+      </InputGroupItem>
+      <InputGroupItem>
+        <SavedSearchesDropdown filters={filters} onSetFilters={onSetFilters} />
       </InputGroupItem>
     </InputGroup>
   );

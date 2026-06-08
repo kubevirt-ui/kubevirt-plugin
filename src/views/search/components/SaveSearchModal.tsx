@@ -5,7 +5,6 @@ import { ModalComponentProps } from '@kubevirt-utils/components/ModalProvider/Mo
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup, TextInput, ValidatedOptions } from '@patternfly/react-core';
-import { useSavedSearchData } from '@search/hooks/useSavedSearchData';
 
 type SaveSearchInputs = {
   description: string;
@@ -14,18 +13,22 @@ type SaveSearchInputs = {
 
 type SaveSearchModalProps = Pick<ModalComponentProps, 'isOpen' | 'onClose'> & {
   onSubmit: (inputs: SaveSearchInputs) => void;
+  savedSearchNames: string[];
 };
 
-const SaveSearchModal: FC<SaveSearchModalProps> = ({ isOpen, onClose, onSubmit }) => {
+const SaveSearchModal: FC<SaveSearchModalProps> = ({
+  isOpen,
+  onClose,
+  onSubmit,
+  savedSearchNames,
+}) => {
   const { t } = useKubevirtTranslation();
-
-  const { searches } = useSavedSearchData();
 
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
 
   const isNameEmpty = !name.trim();
-  const invalidName = !isNameEmpty && searches?.some((search) => search.name === name);
+  const invalidName = !isNameEmpty && savedSearchNames.includes(name);
 
   return (
     <TabModal

@@ -59,9 +59,6 @@ export const getACMVMListURL = (cluster?: string, namespace?: string): string =>
     : `${FLEET_VIRTUAL_MACHINES_PATH}/${ALL_CLUSTERS_KEY}/${ALL_NAMESPACES}`;
 };
 
-export const getACMVMSearchURL = (): string =>
-  `${FLEET_VIRTUAL_MACHINES_PATH}/${ALL_CLUSTERS_KEY}/${ALL_NAMESPACES}/search`;
-
 export const getACMVMListNamespacesURL = (cluster: string, namespace: string): string =>
   `${FLEET_VIRTUAL_MACHINES_PATH}/cluster/${cluster}/ns/${namespace}`;
 
