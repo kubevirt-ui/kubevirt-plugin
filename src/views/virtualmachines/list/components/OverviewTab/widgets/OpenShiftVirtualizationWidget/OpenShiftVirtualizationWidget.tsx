@@ -57,11 +57,11 @@ const OpenShiftVirtualizationWidget: FC<OpenShiftVirtualizationWidgetProps> = ({
     if (isAllClustersPage) {
       return NBSP;
     }
-    if (isLoading) {
+    if (!csvLoaded) {
       return <Skeleton width="50%" />;
     }
     return t('Installed version {{version}}', { version: version || t('Unknown') });
-  }, [isAllClustersPage, isLoading, version, t]);
+  }, [isAllClustersPage, csvLoaded, version, t]);
 
   return (
     <Card
