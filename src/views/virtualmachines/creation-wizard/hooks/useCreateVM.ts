@@ -3,15 +3,22 @@ import useCreateCustomizedVM from '@virtualmachines/creation-wizard/hooks/useCre
 import useVMWizardStore from '@virtualmachines/creation-wizard/state/vm-wizard-store/useVMWizardStore';
 import { isCloneCreationMethod } from '@virtualmachines/creation-wizard/utils/utils';
 
-type UseCreateVM = () => () => Promise<void>;
+type UseCreateVM = () => {
+  createVM: () => Promise<void>;
+  error: Error | unknown;
+  isSubmitting: boolean;
+};
 
 const useCreateVM: UseCreateVM = () => {
   const { creationMethod } = useVMWizardStore();
   const cloneVM = useCloneVM();
-  const { createCustomizedVM } = useCreateCustomizedVM();
+  const { createCustomizedVM, error, isSubmitting } = useCreateCustomizedVM();
 
-  if (isCloneCreationMethod(creationMethod)) return cloneVM;
-  else return createCustomizedVM;
+  return {
+    createVM: isCloneCreationMethod(creationMethod) ? cloneVM : createCustomizedVM,
+    error,
+    isSubmitting,
+  };
 };
 
 export default useCreateVM;

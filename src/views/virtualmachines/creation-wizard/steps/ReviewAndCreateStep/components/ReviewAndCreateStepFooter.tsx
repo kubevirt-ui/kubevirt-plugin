@@ -1,10 +1,11 @@
 import React, { FC } from 'react';
 import classnames from 'classnames';
 
+import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import { FLAG_LIGHTSPEED_PLUGIN } from '@kubevirt-utils/flags/consts';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useFlag } from '@openshift-console/dynamic-plugin-sdk';
-import { useWizardContext, WizardFooter } from '@patternfly/react-core';
+import { Stack, useWizardContext, WizardFooter } from '@patternfly/react-core';
 import useCloseWizard from '@virtualmachines/creation-wizard/hooks/useCloseWizard';
 import useCreateVM from '@virtualmachines/creation-wizard/hooks/useCreateVM';
 import useVMWizardStore from '@virtualmachines/creation-wizard/state/vm-wizard-store/useVMWizardStore';
@@ -15,19 +16,22 @@ const ReviewAndCreateStepFooter: FC = () => {
   const { activeStep, goToPrevStep } = useWizardContext();
   const { creationMethod, isVMNameValid } = useVMWizardStore();
   const isCloneMethod = isCloneCreationMethod(creationMethod);
-  const createVM = useCreateVM();
+  const { createVM, error, isSubmitting } = useCreateVM();
   const closeWizard = useCloseWizard();
 
   return (
-    <WizardFooter
-      activeStep={activeStep}
-      cancelButtonProps={{ className: classnames({ 'pf-v6-u-mr-4xl': hasOLSConsole }) }}
-      isNextDisabled={!isVMNameValid}
-      nextButtonText={isCloneMethod ? t('Clone VirtualMachine') : t('Create VirtualMachine')}
-      onBack={goToPrevStep}
-      onClose={closeWizard}
-      onNext={createVM}
-    />
+    <Stack hasGutter>
+      {error && <ErrorAlert error={error} />}
+      <WizardFooter
+        activeStep={activeStep}
+        cancelButtonProps={{ className: classnames({ 'pf-v6-u-mr-4xl': hasOLSConsole }) }}
+        isNextDisabled={!isVMNameValid || isSubmitting}
+        nextButtonText={isCloneMethod ? t('Clone VirtualMachine') : t('Create VirtualMachine')}
+        onBack={goToPrevStep}
+        onClose={closeWizard}
+        onNext={createVM}
+      />
+    </Stack>
   );
 };
 
