@@ -23,7 +23,7 @@ jobs:
     steps:
       - name: Check for hold label
         id: hold-check
-        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         with:
           script: |
             const { data: labels } = await github.rest.issues.listLabelsOnIssue({
@@ -37,7 +37,7 @@ jobs:
       - name: Extract build URLs from comment
         if: steps.hold-check.outputs.held == 'false'
         id: extract
-        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         with:
           script: |
             const body = context.payload.comment.body;
@@ -195,7 +195,7 @@ jobs:
       - name: Count previous retests for this SHA
         if: steps.classify.outputs.is_infra == 'true'
         id: count
-        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         with:
           script: |
             const { data: pr } = await github.rest.pulls.get({
@@ -223,7 +223,7 @@ jobs:
 
       - name: Post retest comment
         if: steps.classify.outputs.is_infra == 'true' && fromJSON(steps.count.outputs.count) < 5
-        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         env:
           SHA_SHORT: ${{ steps.count.outputs.sha_short }}
           INFRA_JOBS: ${{ steps.classify.outputs.infra_jobs }}
@@ -266,7 +266,7 @@ jobs:
 
       - name: Post exhaustion notice
         if: steps.classify.outputs.is_infra == 'true' && fromJSON(steps.count.outputs.count) >= 5
-        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         env:
           SHA_SHORT: ${{ steps.count.outputs.sha_short }}
           INFRA_JOBS: ${{ steps.classify.outputs.infra_jobs }}
@@ -310,7 +310,7 @@ jobs:
 
       - name: Escalate to CodeRabbit
         if: steps.classify.outputs.is_infra == 'false' && steps.extract.outputs.found == 'true'
-        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         env:
           JOBS_JSON: ${{ steps.extract.outputs.jobs }}
         with:

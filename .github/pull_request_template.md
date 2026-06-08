@@ -2,6 +2,9 @@
 Thanks for creating a Pull Request 💖!
 
 Please read the following before submitting:
+- PR title MUST start with a Jira ticket ID: "CNV-XXXXX: short description"
+  - For release branches: "[release-4.XX] CNV-XXXXX: short description"
+  - The Jira ticket must have: story points > 1, fix version set, component "CNV User Interface", product type set
 - PRs that adds new external dependencies might take a while to review.
 - Keep your PR as small as possible.
 - Limit your PR to one type (feature, refactoring, ci, or bugfix)
@@ -10,6 +13,10 @@ Please read the following before submitting:
 ## 📝 Description
 
 > Add a brief description
+
+## 🔗 Links
+
+> Add JIRA, Docs, and other PR/Issue links
 
 ## 🎥 Demo
 
