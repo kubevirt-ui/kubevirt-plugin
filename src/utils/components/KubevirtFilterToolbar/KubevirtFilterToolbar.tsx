@@ -1,4 +1,4 @@
-import React, { FC, useMemo, useState } from 'react';
+import React, { FC, ReactNode, useMemo, useState } from 'react';
 
 import {
   KubevirtFilter,
@@ -10,7 +10,7 @@ import { ColumnLayout, K8sResourceCommon } from '@openshift-console/dynamic-plug
 import { Toolbar, ToolbarContent, ToolbarToggleGroup } from '@patternfly/react-core';
 import { FilterIcon } from '@patternfly/react-icons';
 
-import ColumnManagement from '../ColumnManagementModal/ColumnManagement';
+import ListPageFilterToolbarActions from '../ListPageFilter/components/ListPageFilterToolbarActions';
 
 import GroupedFilterDropdown from './components/GroupedFilterDropdown';
 import SelectFilterItem from './components/SelectFilterItem';
@@ -25,6 +25,7 @@ type KubevirtFilterToolbarProps = {
   hideColumnManagement?: boolean;
   loaded?: boolean;
   onSetFilters: (newFilters: Partial<KubevirtFilterState>) => void;
+  toolbarEndContent?: ReactNode;
 };
 
 const KubevirtFilterToolbar: FC<KubevirtFilterToolbarProps> = ({
@@ -36,6 +37,7 @@ const KubevirtFilterToolbar: FC<KubevirtFilterToolbarProps> = ({
   hideColumnManagement,
   loaded,
   onSetFilters,
+  toolbarEndContent,
 }) => {
   const { t } = useKubevirtTranslation();
 
@@ -85,7 +87,11 @@ const KubevirtFilterToolbar: FC<KubevirtFilterToolbarProps> = ({
             setSearchInputText={setSearchInputText}
           />
         </ToolbarToggleGroup>
-        <ColumnManagement columnLayout={columnLayout} hideColumnManagement={hideColumnManagement} />
+        <ListPageFilterToolbarActions
+          columnLayout={columnLayout}
+          hideColumnManagement={hideColumnManagement}
+          toolbarEndContent={toolbarEndContent}
+        />
       </ToolbarContent>
     </Toolbar>
   );

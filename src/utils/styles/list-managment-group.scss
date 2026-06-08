@@ -4,7 +4,12 @@
   padding-block: var(--pf-t--global--spacer--md);
 
   &__pagination {
+    align-self: center;
     flex-grow: 1;
+  }
+
+  > .list-managment-group__flex {
+    align-items: center;
   }
 
   .pf-v6-c-toolbar {

@@ -11,6 +11,7 @@ import {
 } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/const';
 import usePaginationWithFilters from '@kubevirt-utils/hooks/usePagination/usePaginationWithFilters';
 import { paginationDefaultValues } from '@kubevirt-utils/hooks/usePagination/utils/constants';
+import { EXPORT_TABLE_KEYS, KubevirtTableExport } from '@kubevirt-utils/hooks/useTableExport';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useIsACMPage from '@multicluster/useIsACMPage';
 import { ListPageBody } from '@openshift-console/dynamic-plugin-sdk';
@@ -102,6 +103,19 @@ const CheckupsSelfValidationList: FC = () => {
     <ListPageBody>
       <div className="list-managment-group">
         <ListPageFilter
+          toolbarEndContent={
+            <KubevirtTableExport
+              activeColumnKeys={activeColumnKeys}
+              asToolbarItem
+              callbacks={callbacks}
+              columns={columns}
+              data={filteredData ?? []}
+              exportKey={EXPORT_TABLE_KEYS.SELF_VALIDATION_CHECKUPS}
+              initialSortDirection="desc"
+              initialSortKey={CHECKUPS_COLUMN_KEYS.START_TIME_CAMEL}
+              loaded={isLoaded}
+            />
+          }
           columnLayout={columnLayout}
           data={unfilteredData}
           loaded={isLoaded}

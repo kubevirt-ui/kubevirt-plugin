@@ -1,3 +1,8 @@
+.kubevirt-table__export-toolbar {
+  justify-content: flex-end;
+  width: 100%;
+}
+
 // Default table layout for all KubevirtTables
 .kubevirt-table.pf-v6-c-table {
   table-layout: fixed;

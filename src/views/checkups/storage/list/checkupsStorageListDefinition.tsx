@@ -13,6 +13,9 @@ import { getCluster } from '@multicluster/helpers/selectors';
 import { CHECKUPS_COLUMN_KEYS } from '../../utils/constants';
 import {
   columnsSorting,
+  getConfigMapStatus,
+  getCSVExportStatusLabel,
+  getJobStatus,
   STATUS_COMPLETION_TIME_STAMP,
   STATUS_FAILURE_REASON,
   STATUS_START_TIME_STAMP,
@@ -70,6 +73,10 @@ export const getCheckupsStorageColumns = (
       ]
     : []),
   {
+    getValue: (row, callbacks) => {
+      const latestJob = callbacks?.getJobByName(getName(row))?.[0];
+      return getCSVExportStatusLabel(getConfigMapStatus(row, getJobStatus(latestJob)), t);
+    },
     key: 'status',
     label: t('Status'),
     renderCell: (row, callbacks) => <StatusCell callbacks={callbacks} row={row} />,
@@ -77,6 +84,7 @@ export const getCheckupsStorageColumns = (
     sortable: true,
   },
   {
+    getValue: (row) => row?.data?.[STATUS_FAILURE_REASON] || '',
     key: 'failure',
     label: t('Failure reason'),
     renderCell: (row) => <FailureCell row={row} />,
@@ -84,6 +92,7 @@ export const getCheckupsStorageColumns = (
     sortable: true,
   },
   {
+    getValue: (row) => row?.data?.[STATUS_START_TIME_STAMP] || '',
     key: CHECKUPS_COLUMN_KEYS.START_TIME,
     label: t('Start time'),
     renderCell: (row) => <StartTimeCell row={row} />,
@@ -91,6 +100,7 @@ export const getCheckupsStorageColumns = (
     sortable: true,
   },
   {
+    getValue: (row) => row?.data?.[STATUS_COMPLETION_TIME_STAMP] || '',
     key: CHECKUPS_COLUMN_KEYS.COMPLETE_TIME,
     label: t('Completion time'),
     renderCell: (row) => <CompleteTimeCell row={row} />,

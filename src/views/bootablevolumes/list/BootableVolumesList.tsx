@@ -12,6 +12,7 @@ import useKubevirtTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettin
 import { COLUMN_MANAGEMENT_IDS } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/const';
 import usePaginationWithFilters from '@kubevirt-utils/hooks/usePagination/usePaginationWithFilters';
 import { paginationDefaultValues } from '@kubevirt-utils/hooks/usePagination/utils/constants';
+import { EXPORT_TABLE_KEYS, KubevirtTableExport } from '@kubevirt-utils/hooks/useTableExport';
 import useBootableVolumes from '@kubevirt-utils/resources/bootableresources/hooks/useBootableVolumes';
 import { isAllNamespaces, isEmpty } from '@kubevirt-utils/utils/utils';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
@@ -94,6 +95,17 @@ const BootableVolumesList: FC = () => {
     [clusterParam, dataImportCrons, dvSources, preferences],
   );
 
+  const toolbarEndContent = (
+    <KubevirtTableExport<BootableResource, BootableVolumeCallbacks>
+      activeColumnKeys={activeColumnKeys}
+      callbacks={callbacks}
+      columns={columns}
+      data={filteredData ?? []}
+      exportKey={EXPORT_TABLE_KEYS.BOOTABLE_VOLUMES}
+      loaded={loaded && loadedColumns}
+    />
+  );
+
   const isLoaded = loaded && loadedColumns;
 
   if (loaded && !error && isEmpty(bootableVolumes)) {
@@ -120,6 +132,7 @@ const BootableVolumesList: FC = () => {
               filters={filters}
               loaded={isLoaded}
               onSetFilters={onSetFilters}
+              toolbarEndContent={toolbarEndContent}
             />
             {!isEmpty(filteredData) && isLoaded && (
               <Pagination

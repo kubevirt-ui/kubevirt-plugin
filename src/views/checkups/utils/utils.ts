@@ -142,6 +142,17 @@ export const getJobStatusRank = (job?: IoK8sApiBatchV1Job): number => {
   return STATUS_RANK[status];
 };
 
+export const getCSVExportStatusLabel = (status: CheckupsStatus, t: TFunction): string => {
+  const labels: Record<CheckupsStatus, string> = {
+    [CheckupsStatus.Deleting]: t('Deleting'),
+    [CheckupsStatus.Done]: t('Succeeded'),
+    [CheckupsStatus.Failed]: t('Failed'),
+    [CheckupsStatus.Pending]: t('Pending'),
+    [CheckupsStatus.Running]: t('Running'),
+  };
+  return labels[status] ?? t('Unknown');
+};
+
 export const getConfigMapStatus = (
   configMap: IoK8sApiCoreV1ConfigMap | undefined,
   jobStatus: CheckupsStatus,

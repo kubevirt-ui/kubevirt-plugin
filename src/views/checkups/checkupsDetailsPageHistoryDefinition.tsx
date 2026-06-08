@@ -10,10 +10,11 @@ import MulticlusterResourceLink from '@multicluster/components/MulticlusterResou
 import { getCluster } from '@multicluster/helpers/selectors';
 import useIsACMPage from '@multicluster/useIsACMPage';
 import { Timestamp } from '@openshift-console/dynamic-plugin-sdk';
+import { SortByDirection } from '@patternfly/react-table';
 import { useHubClusterName } from '@stolostron/multicluster-sdk';
 
 import { CHECKUPS_COLUMN_KEYS } from './utils/constants';
-import { getJobStatusRank } from './utils/utils';
+import { getCSVExportStatusLabel, getJobStatus, getJobStatusRank } from './utils/utils';
 import CheckupsStatusIcon from './CheckupsStatusIcon';
 
 export type CheckupsHistoryCallbacks = {
@@ -63,10 +64,16 @@ export const getCheckupsHistoryColumns = (
     sortable: true,
   },
   {
-    getValue: (row) => getJobStatusRank(row),
+    getValue: (row) => getCSVExportStatusLabel(getJobStatus(row), t),
     key: 'status',
     label: t('Status'),
     renderCell: (row) => <StatusCell row={row} />,
+    sort: (data, direction) =>
+      [...data].sort((a, b) => {
+        const rankA = getJobStatusRank(a);
+        const rankB = getJobStatusRank(b);
+        return direction === SortByDirection.asc ? rankA - rankB : rankB - rankA;
+      }),
     sortable: true,
   },
   {

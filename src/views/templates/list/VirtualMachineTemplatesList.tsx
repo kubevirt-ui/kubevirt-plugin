@@ -14,6 +14,7 @@ import useKubevirtUserSettingsTableColumns from '@kubevirt-utils/hooks/useKubevi
 import useNamespaceParam from '@kubevirt-utils/hooks/useNamespaceParam';
 import useSelectedRowFilterClusters from '@kubevirt-utils/hooks/useSelectedRowFilterClusters';
 import useSelectedRowFilterProjects from '@kubevirt-utils/hooks/useSelectedRowFilterProjects';
+import { EXPORT_TABLE_KEYS, KubevirtTableExport } from '@kubevirt-utils/hooks/useTableExport';
 import { TemplateOrRequest } from '@kubevirt-utils/resources/template/utils';
 import { ListPageProps } from '@kubevirt-utils/utils/types';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -131,6 +132,17 @@ const VirtualMachineTemplatesList: FC<ListPageProps> = ({
                 onFilterChange={onFilterChange}
                 rowFilters={filters}
                 variant={TemplatesFilterVariant.Menu}
+              />
+            }
+            toolbarEndContent={
+              <KubevirtTableExport
+                activeColumnKeys={activeColumnKeys}
+                asToolbarItem
+                columns={columns}
+                data={filteredData ?? []}
+                exportKey={EXPORT_TABLE_KEYS.TEMPLATES}
+                initialSortKey="none"
+                loaded={loaded && loadedColumns}
               />
             }
             columnLayout={columnLayout}

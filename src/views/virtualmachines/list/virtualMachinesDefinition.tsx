@@ -12,9 +12,17 @@ import { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { ACTIONS } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/const';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getCPU, getMemory } from '@kubevirt-utils/resources/vm';
+import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
+import { getVMIIPAddresses, getVMINodeName } from '@kubevirt-utils/resources/vmi';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { getDeletionProtectionPrintableStatus } from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/utils/utils';
-import { PVCMapper, VMIMapper, VMIMMapper } from '@virtualmachines/utils/mappers';
+import {
+  getVirtualMachineStorageClasses,
+  PVCMapper,
+  VMIMapper,
+  VMIMMapper,
+} from '@virtualmachines/utils/mappers';
 
 import VMActionsCell from './cells/VMActionsCell';
 import VMClusterCell from './cells/VMClusterCell';
@@ -117,7 +125,12 @@ export const getVMColumns = (
       sortable: true,
     },
     {
-      getValue: () => '',
+      getValue: (row) => {
+        const types = filterConditions(row)
+          ?.map((condition) => condition?.type)
+          .filter(Boolean);
+        return !isEmpty(types) ? types.join(', ') : NO_DATA_DASH;
+      },
       key: VM_COLUMN_KEYS.conditions,
       label: t('Conditions'),
       renderCell: (row) => <VMStatusConditionLabelList conditions={filterConditions(row)} />,
@@ -126,6 +139,7 @@ export const getVMColumns = (
 
   if (canGetNode) {
     columns.push({
+      getValue: (row, callbacks) => getVMINodeName(callbacks?.getVmi(row)) ?? NO_DATA_DASH,
       key: VM_COLUMN_KEYS.node,
       label: t('Node'),
       renderCell: (row, callbacks) => <VMNodeCell callbacks={callbacks} row={row} />,
@@ -144,7 +158,14 @@ export const getVMColumns = (
       sortable: true,
     },
     {
-      getValue: () => '',
+      getValue: (row, callbacks) => {
+        const vmi = callbacks?.getVmi(row);
+        if (!vmi) {
+          return NO_DATA_DASH;
+        }
+        const ips = getVMIIPAddresses(vmi);
+        return !isEmpty(ips) ? ips.join(', ') : NO_DATA_DASH;
+      },
       key: VM_COLUMN_KEYS.ipAddress,
       label: t('IP address'),
       renderCell: (row, callbacks) => <VMIPCell callbacks={callbacks} row={row} />,
@@ -187,6 +208,12 @@ export const getVMColumns = (
     },
     {
       additional: true,
+      getValue: (row, callbacks) => {
+        const storageClasses = callbacks?.pvcMapper
+          ? getVirtualMachineStorageClasses(row, callbacks.pvcMapper)
+          : [];
+        return !isEmpty(storageClasses) ? storageClasses.join(', ') : NO_DATA_DASH;
+      },
       key: VM_COLUMN_KEYS.storageclassname,
       label: t('Storage class'),
       renderCell: (row, callbacks) => <VMStorageClassCell callbacks={callbacks} row={row} />,

@@ -12,6 +12,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import useKubevirtTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtTableColumns';
 import usePaginationWithFilters from '@kubevirt-utils/hooks/usePagination/usePaginationWithFilters';
 import { paginationDefaultValues } from '@kubevirt-utils/hooks/usePagination/utils/constants';
+import { EXPORT_TABLE_KEYS, KubevirtTableExport } from '@kubevirt-utils/hooks/useTableExport';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   ListPageBody,
@@ -91,6 +92,16 @@ const DataSourcesList: FC<DataSourcesListProps> = ({ kind, namespace }) => {
       <ListPageBody>
         <div className="list-managment-group">
           <ListPageFilter
+            toolbarEndContent={
+              <KubevirtTableExport
+                activeColumnKeys={activeColumnKeys}
+                asToolbarItem
+                columns={columns}
+                data={filteredData ?? []}
+                exportKey={EXPORT_TABLE_KEYS.DATASOURCES}
+                loaded={isLoaded}
+              />
+            }
             columnLayout={columnLayout}
             data={unfilteredData}
             loaded={isLoaded}

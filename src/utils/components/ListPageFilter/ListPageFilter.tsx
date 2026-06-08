@@ -1,4 +1,4 @@
-import React, { FC, ReactNode, useMemo, useState } from 'react';
+import React, { ReactNode, useMemo, useState } from 'react';
 
 import useDeepCompareMemoize from '@kubevirt-utils/hooks/useDeepCompareMemoize/useDeepCompareMemoize';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -12,9 +12,8 @@ import { Toolbar, ToolbarContent, ToolbarToggleGroup } from '@patternfly/react-c
 import { FilterIcon } from '@patternfly/react-icons';
 import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
-import ColumnManagement from '../ColumnManagementModal/ColumnManagement';
-
 import CheckboxSelectFilter from './components/CheckboxSelectFilter';
+import ListPageFilterToolbarActions from './components/ListPageFilterToolbarActions';
 import RowFilters from './components/RowFilters';
 import TextFiltersToolbarItem from './components/TextFiltersToolbarItem';
 import useListPageFiltersMethods from './hooks/useListPageFiltersMethods';
@@ -37,9 +36,11 @@ type ListPageFilterProps = {
   onFilterChange?: OnFilterChange;
   rowFilters?: RowFilter[];
   searchFilters?: RowFilter[];
+  /** Rendered in the toolbar row before column management */
+  toolbarEndContent?: ReactNode;
 };
 
-const ListPageFilter: FC<ListPageFilterProps> = ({
+const ListPageFilter = ({
   className,
   columnLayout,
   customRowFiltersMenu,
@@ -53,7 +54,8 @@ const ListPageFilter: FC<ListPageFilterProps> = ({
   onFilterChange,
   rowFilters,
   searchFilters = [],
-}) => {
+  toolbarEndContent,
+}: ListPageFilterProps): null | React.ReactElement => {
   const { t } = useKubevirtTranslation();
 
   const [toolbarIsExpanded, setToolbarIsExpanded] = useState(false);
@@ -106,6 +108,8 @@ const ListPageFilter: FC<ListPageFilterProps> = ({
       setSearchInputText,
     });
 
+  const hasToolbarActions = toolbarEndContent || (!hideColumnManagement && columnLayout?.id);
+
   if (!loaded) return null;
 
   return (
@@ -154,7 +158,13 @@ const ListPageFilter: FC<ListPageFilterProps> = ({
             textFilters={textFilters}
           />
         </ToolbarToggleGroup>
-        <ColumnManagement columnLayout={columnLayout} hideColumnManagement={hideColumnManagement} />
+        {hasToolbarActions && (
+          <ListPageFilterToolbarActions
+            columnLayout={columnLayout}
+            hideColumnManagement={hideColumnManagement}
+            toolbarEndContent={toolbarEndContent}
+          />
+        )}
       </ToolbarContent>
     </Toolbar>
   );
