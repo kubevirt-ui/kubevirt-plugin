@@ -20,11 +20,19 @@ import { BootloaderOption, BootloaderOptionValue } from './types';
 
 export const isObjectEmpty = (obj: object): boolean => obj && isEmpty(obj);
 
+export const getClusterOnlyArchitecture = (
+  clusterWorkloadArchitectures?: string[],
+): string | undefined => {
+  return clusterWorkloadArchitectures?.length === 1 ? clusterWorkloadArchitectures[0] : undefined;
+};
+
 export const getBootloaderFromVM = (
   vm: V1VirtualMachine,
   defaultBootmode = BootMode.bios,
+  clusterOnlyArchitecture?: string,
 ): BootloaderOptionValue => {
-  if (getArchitecture(vm) === ARCHITECTURES.S390X) {
+  const architecture = getArchitecture(vm) || clusterOnlyArchitecture;
+  if (architecture === ARCHITECTURES.S390X) {
     return BootMode.ipl;
   }
 
@@ -46,13 +54,17 @@ export const getBootloaderTitleFromVM = (
   vm: V1VirtualMachine,
   t: TFunction,
   defaultBootmode?: BootMode,
+  clusterOnlyArchitecture?: string,
 ): string => {
-  const bootloader = getBootloaderFromVM(vm, defaultBootmode);
+  const bootloader = getBootloaderFromVM(vm, defaultBootmode, clusterOnlyArchitecture);
   return t(BootModeTitles[bootloader]);
 };
 
-export const getBootloaderOptions = (vm: V1VirtualMachine): BootloaderOption[] => {
-  const architecture = getArchitecture(vm);
+export const getBootloaderOptions = (
+  vm: V1VirtualMachine,
+  clusterOnlyArchitecture?: string,
+): BootloaderOption[] => {
+  const architecture = getArchitecture(vm) || clusterOnlyArchitecture;
 
   if (architecture === ARCHITECTURES.S390X) {
     return s390xBootloaderOptions;
@@ -65,14 +77,17 @@ export const getBootloaderOptions = (vm: V1VirtualMachine): BootloaderOption[] =
  * A function to return the VirtualMachine object updated with a given boot mode
  * @param {V1VirtualMachine} vm - VirtualMachine object
  * @param {BootloaderOptionValue} firmwareBootloader - selected boot mode
+ * @param clusterOnlyArchitecture
  * @returns {V1VirtualMachine} updated VirtualMachine object
  */
 export const updatedVMBootMode = (
   vm: V1VirtualMachine,
   firmwareBootloader: BootloaderOptionValue,
+  clusterOnlyArchitecture?: string,
 ) =>
   produce<V1VirtualMachine>(vm as V1VirtualMachine, (vmDraft: V1VirtualMachine) => {
-    if (getArchitecture(vm) === ARCHITECTURES.S390X && firmwareBootloader === BootMode.ipl) {
+    const architecture = getArchitecture(vm) || clusterOnlyArchitecture;
+    if (architecture === ARCHITECTURES.S390X && firmwareBootloader === BootMode.ipl) {
       if (getBootloader(vmDraft)) {
         delete vmDraft.spec.template.spec.domain.firmware.bootloader;
       }

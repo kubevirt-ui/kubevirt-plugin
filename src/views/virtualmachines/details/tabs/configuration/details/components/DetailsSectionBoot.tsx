@@ -8,9 +8,13 @@ import BootOrderModal from '@kubevirt-utils/components/BootOrderModal/BootOrderM
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import FirmwareBootloaderModal from '@kubevirt-utils/components/FirmwareBootloaderModal/FirmwareBootloaderModal';
 import { BootMode } from '@kubevirt-utils/components/FirmwareBootloaderModal/utils/constants';
-import { getBootloaderTitleFromVM } from '@kubevirt-utils/components/FirmwareBootloaderModal/utils/utils';
+import {
+  getBootloaderTitleFromVM,
+  getClusterOnlyArchitecture,
+} from '@kubevirt-utils/components/FirmwareBootloaderModal/utils/utils';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
+import useHcoWorkloadArchitectures from '@kubevirt-utils/hooks/useHcoWorkloadArchitectures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useToggle } from '@kubevirt-utils/hooks/useToggle';
 import { getName } from '@kubevirt-utils/resources/shared';
@@ -47,7 +51,8 @@ const DetailsSectionBoot: FC<DetailsSectionBootProps> = ({
   const [isChecked, setIsChecked] = useState<boolean>(!!vm?.spec?.template?.spec?.startStrategy);
   const [isExpanded, setIsExpanded] = useToggle('boot-management');
   const vmName = getName(vm);
-
+  const clusterWorkloadArchitectures = useHcoWorkloadArchitectures();
+  const clusterOnlyArchitecture = getClusterOnlyArchitecture(clusterWorkloadArchitectures);
   useEffect(() => {
     expandURLHash(getSearchItemsIds(getDetailsTabBootIds(vm)), location?.hash, setIsExpanded);
   }, [vm, location?.hash, setIsExpanded]);
@@ -62,7 +67,12 @@ const DetailsSectionBoot: FC<DetailsSectionBootProps> = ({
       <DescriptionItem
         descriptionData={
           <div className={classNames({ 'pf-v6-u-text-color-subtle': !canUpdateVM })}>
-            {getBootloaderTitleFromVM(instanceTypeVM || vm, t, preferredBootmode)}
+            {getBootloaderTitleFromVM(
+              instanceTypeVM || vm,
+              t,
+              preferredBootmode,
+              clusterOnlyArchitecture,
+            )}
           </div>
         }
         onEditClick={() =>

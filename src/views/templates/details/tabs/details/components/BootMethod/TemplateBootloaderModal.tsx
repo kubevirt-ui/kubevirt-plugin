@@ -6,10 +6,12 @@ import { BootloaderOptionValue } from '@kubevirt-utils/components/FirmwareBootlo
 import {
   getBootloaderFromVM,
   getBootloaderOptions,
+  getClusterOnlyArchitecture,
   updatedVMBootMode,
 } from '@kubevirt-utils/components/FirmwareBootloaderModal/utils/utils';
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
+import useHcoWorkloadArchitectures from '@kubevirt-utils/hooks/useHcoWorkloadArchitectures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getTemplateVirtualMachineObject, Template } from '@kubevirt-utils/resources/template';
 import { FormGroup, SelectOption } from '@patternfly/react-core';
@@ -29,10 +31,15 @@ const TemplateBootloaderModal: FC<TemplateBootloaderModalProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const vm = getTemplateVirtualMachineObject(template);
+  const clusterWorkloadArchitectures = useHcoWorkloadArchitectures();
+  const clusterOnlyArchitecture = getClusterOnlyArchitecture(clusterWorkloadArchitectures);
   const [selectedFirmwareBootloader, setSelectedFirmwareBootloader] =
-    useState<BootloaderOptionValue>(getBootloaderFromVM(vm));
+    useState<BootloaderOptionValue>(getBootloaderFromVM(vm, undefined, clusterOnlyArchitecture));
 
-  const bootloaderOptions = useMemo(() => getBootloaderOptions(vm), [vm]);
+  const bootloaderOptions = useMemo(
+    () => getBootloaderOptions(vm, clusterOnlyArchitecture),
+    [vm, clusterOnlyArchitecture],
+  );
 
   const handleChange = (event: MouseEvent<HTMLSelectElement>, value: BootloaderOptionValue) => {
     event.preventDefault();
@@ -42,11 +49,15 @@ const TemplateBootloaderModal: FC<TemplateBootloaderModalProps> = ({
   const updatedTemplate = useMemo(() => {
     return produce<Template>(template, (templateDraft: Template) => {
       const vmDraft = getTemplateVirtualMachineObject(templateDraft);
-      const updatedVM = updatedVMBootMode(vmDraft, selectedFirmwareBootloader);
+      const updatedVM = updatedVMBootMode(
+        vmDraft,
+        selectedFirmwareBootloader,
+        clusterOnlyArchitecture,
+      );
 
       vmDraft.spec.template.spec.domain = updatedVM.spec.template.spec.domain;
     });
-  }, [selectedFirmwareBootloader, template]);
+  }, [selectedFirmwareBootloader, template, clusterOnlyArchitecture]);
 
   return (
     <TabModal
