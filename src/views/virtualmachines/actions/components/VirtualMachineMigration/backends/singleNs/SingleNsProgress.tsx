@@ -1,5 +1,6 @@
 import React, { FC } from 'react';
 
+import { useKubevirtClusterServiceVersion } from '@kubevirt-utils/hooks/useKubevirtClusterServiceVersion';
 import type { ProgressComponentProps } from '@kubevirt-utils/resources/migrations/backends/types';
 import useStorageMigrationNavigation from '@virtualmachines/list/components/OverviewTab/widgets/StorageMigrationPlansWidget/useStorageMigrationNavigation';
 
@@ -9,7 +10,12 @@ import useSingleNsPlanPolling from './useSingleNsPlanPolling';
 
 const SingleNsProgress: FC<ProgressComponentProps> = (props) => {
   const { cluster, storageMigAPI, storageMigrationPlan } = props;
-  const { basePath, isExternal } = useStorageMigrationNavigation(cluster, storageMigAPI);
+  const { installedCSV } = useKubevirtClusterServiceVersion(cluster);
+  const { basePath, isExternal } = useStorageMigrationNavigation(
+    cluster,
+    storageMigAPI,
+    installedCSV?.spec?.version,
+  );
   const [singleNsWatchedPlan, , singleNsError] = useSingleNsPlanPolling(storageMigrationPlan);
 
   return (

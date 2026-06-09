@@ -12,7 +12,6 @@ const normalizePlanForOverview = (plan: K8sResourceCommon) =>
 
 export const singleNsBackend: StorageMigrationBackendDescriptor = {
   api: STORAGE_MIGRATION_API.SINGLE_NS,
-  listConsolePathUsesResourceUrl: false,
   migrateVMs: migrateVMsSingleNs,
   normalizePlanForOverview,
   overviewUsesClusterScopedPlanWatch: false,

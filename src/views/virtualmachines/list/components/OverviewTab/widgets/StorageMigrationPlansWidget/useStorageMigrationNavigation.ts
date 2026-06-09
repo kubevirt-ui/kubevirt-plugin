@@ -1,6 +1,5 @@
 import { useMemo } from 'react';
 
-import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
 import { getStorageMigrationBackend } from '@kubevirt-utils/resources/migrations/backends';
 import {
   type StorageMigrationAPI,
@@ -11,6 +10,7 @@ import { ROW_FILTERS_PREFIX } from '@kubevirt-utils/utils/constants';
 import useManagedClusterConsoleURLs from '@multicluster/hooks/useManagedClusterConsoleURLs';
 import { buildSpokeConsoleUrl } from '@multicluster/urls';
 import { useHubClusterName } from '@stolostron/multicluster-sdk';
+import { spokeSupportsCustomMigrationsRoute } from '@virtualmachines/actions/hooks/storageMigrationApi/constants';
 
 import {
   STORAGE_MIGRATION_STATUS_FILTER_TYPE,
@@ -23,20 +23,26 @@ const STATUS_FILTER_PARAM = `${ROW_FILTERS_PREFIX}${STORAGE_MIGRATION_STATUS_FIL
 const withStatusFilter = (base: string, value: StorageMigrationStatusFilterValue): string =>
   `${base}?${STATUS_FILTER_PARAM}=${value}`;
 
-export const getStorageMigrationListConsolePath = (
-  activeNamespace: string | undefined,
+/**
+ * Resolves the console path for spoke clusters.
+ * MTC uses its own GVK resource page (our custom list doesn't show MigPlans).
+ * For other backends, use the custom route if the spoke supports it (>= 4.23),
+ * otherwise fall back to the GVK resource URL.
+ */
+const getSpokeStorageMigrationListPath = (
   storageMigAPI: StorageMigrationAPI,
+  spokeCsvVersion: string | undefined,
 ): string => {
-  const backend = getStorageMigrationBackend(storageMigAPI);
-  if (backend?.listConsolePathUsesResourceUrl) {
-    return (
-      getResourceUrl({
-        activeNamespace,
-        model: backend.planModel,
-      }) ?? ''
-    );
+  const usesCustomRoute =
+    storageMigAPI !== STORAGE_MIGRATION_API.MTC &&
+    spokeSupportsCustomMigrationsRoute(spokeCsvVersion);
+
+  if (usesCustomRoute) {
+    return ALL_NAMESPACES_STORAGE_MIGRATIONS_LIST;
   }
-  return ALL_NAMESPACES_STORAGE_MIGRATIONS_LIST;
+
+  const backend = getStorageMigrationBackend(storageMigAPI);
+  return getResourceUrl({ model: backend?.planModel }) ?? ALL_NAMESPACES_STORAGE_MIGRATIONS_LIST;
 };
 
 type StorageMigrationNavigation = {
@@ -49,16 +55,16 @@ type StorageMigrationNavigation = {
 const useStorageMigrationNavigation = (
   cluster?: string,
   storageMigAPI: StorageMigrationAPI = STORAGE_MIGRATION_API.MULTI_NS,
+  spokeCsvVersion?: string,
 ): StorageMigrationNavigation => {
-  const activeNamespace = useActiveNamespace();
   const [hubClusterName, hubClusterLoaded] = useHubClusterName();
   const { spokeConsoleURL } = useManagedClusterConsoleURLs(cluster);
 
-  const isLoading =
+  const isUnavailable =
     storageMigAPI === STORAGE_MIGRATION_API.LOADING || storageMigAPI === STORAGE_MIGRATION_API.NONE;
 
   return useMemo(() => {
-    if (isLoading) {
+    if (isUnavailable) {
       return {
         basePath: '',
         isExternal: false,
@@ -67,13 +73,17 @@ const useStorageMigrationNavigation = (
       };
     }
 
-    const listPath = getStorageMigrationListConsolePath(activeNamespace, storageMigAPI);
-
     const isManagedSpokeCluster =
       Boolean(cluster) && hubClusterLoaded && cluster !== hubClusterName;
     const useSpokeConsoleUrl = Boolean(spokeConsoleURL) && isManagedSpokeCluster;
 
-    const base = useSpokeConsoleUrl ? buildSpokeConsoleUrl(spokeConsoleURL, listPath) : listPath;
+    const consolePath = useSpokeConsoleUrl
+      ? getSpokeStorageMigrationListPath(storageMigAPI, spokeCsvVersion)
+      : ALL_NAMESPACES_STORAGE_MIGRATIONS_LIST;
+
+    const base = useSpokeConsoleUrl
+      ? buildSpokeConsoleUrl(spokeConsoleURL, consolePath)
+      : consolePath;
 
     const pendingUrl = withStatusFilter(base, StorageMigrationStatusFilterValue.Pending);
     const runningUrl = withStatusFilter(base, StorageMigrationStatusFilterValue.Running);
@@ -85,11 +95,11 @@ const useStorageMigrationNavigation = (
       runningUrl,
     };
   }, [
-    activeNamespace,
     cluster,
     hubClusterLoaded,
     hubClusterName,
-    isLoading,
+    isUnavailable,
+    spokeCsvVersion,
     spokeConsoleURL,
     storageMigAPI,
   ]);

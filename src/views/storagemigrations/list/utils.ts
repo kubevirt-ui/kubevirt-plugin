@@ -1,4 +1,6 @@
+import { getStorageMigrationPlanModelForKind } from '@kubevirt-utils/resources/migrations/backends';
 import { MultiNamespaceVirtualMachineStorageMigrationPlan } from '@kubevirt-utils/resources/migrations/constants';
+import { getStorageMigrationPlanSpecNamespaces } from '@kubevirt-utils/resources/migrations/selectors';
 import {
   getMigrationStartTimestamp,
   getVolumeCountFromMigPlan,
@@ -11,7 +13,7 @@ export const getStorageClassesFromMigPlan = (
 ): string[] =>
   Array.from(
     new Set(
-      (migrationPlan?.spec?.namespaces ?? []).flatMap((namespace) =>
+      getStorageMigrationPlanSpecNamespaces(migrationPlan).flatMap((namespace) =>
         (namespace?.virtualMachines ?? []).flatMap((vm) =>
           (vm?.targetMigrationPVCs ?? [])
             .map((pvc) => pvc.destinationPVC?.storageClassName)
@@ -20,6 +22,10 @@ export const getStorageClassesFromMigPlan = (
       ),
     ),
   );
+
+export const getStorageMigrationRowModel = (
+  row: MultiNamespaceVirtualMachineStorageMigrationPlan,
+) => getStorageMigrationPlanModelForKind(row?.kind);
 
 export const compareMigrationVolumes = (
   a: MultiNamespaceVirtualMachineStorageMigrationPlan,
@@ -35,26 +41,29 @@ export const compareMigrationNamespaces = (
   a: MultiNamespaceVirtualMachineStorageMigrationPlan,
   b: MultiNamespaceVirtualMachineStorageMigrationPlan,
 ) => {
-  return (a?.spec?.namespaces?.length || 0) - (b?.spec?.namespaces?.length || 0);
+  return (
+    getStorageMigrationPlanSpecNamespaces(a).length -
+    getStorageMigrationPlanSpecNamespaces(b).length
+  );
 };
 
 export const compareMigrationStorageClasses = (
   a: MultiNamespaceVirtualMachineStorageMigrationPlan,
   b: MultiNamespaceVirtualMachineStorageMigrationPlan,
 ) => {
-  const aStorageClasses = getStorageClassesFromMigPlan(a)?.[0];
-  const bStorageClasses = getStorageClassesFromMigPlan(b)?.[0];
+  const aStorageClasses = getStorageClassesFromMigPlan(a)?.[0] ?? '';
+  const bStorageClasses = getStorageClassesFromMigPlan(b)?.[0] ?? '';
 
-  return aStorageClasses?.localeCompare(bStorageClasses);
+  return aStorageClasses.localeCompare(bStorageClasses);
 };
 
 export const compareMigrationStarted = (
   a: MultiNamespaceVirtualMachineStorageMigrationPlan,
   b: MultiNamespaceVirtualMachineStorageMigrationPlan,
 ) => {
-  const aStarted = getMigrationStartTimestamp(a);
-  const bStarted = getMigrationStartTimestamp(b);
-  return aStarted?.localeCompare(bStarted);
+  const aStarted = getMigrationStartTimestamp(a) ?? '';
+  const bStarted = getMigrationStartTimestamp(b) ?? '';
+  return aStarted.localeCompare(bStarted);
 };
 
 export const compareMigrationStatus = (
