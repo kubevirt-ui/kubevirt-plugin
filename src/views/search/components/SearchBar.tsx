@@ -1,20 +1,15 @@
-import React, { FC, useCallback, useRef } from 'react';
+import React, { FC, useRef, useState } from 'react';
 
-import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import {
   KubevirtFilter,
   OnSetFilters,
 } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
-import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Button, InputGroup, InputGroupItem } from '@patternfly/react-core';
+import { InputGroup, InputGroupItem } from '@patternfly/react-core';
+import useShowAdvancedSearchModal from '@search/hooks/useShowAdvancedSearchModal';
 
-import { useNavigateToSearchResults } from '../hooks/useNavigateToSearchResults';
-import { useSavedSearchData } from '../hooks/useSavedSearchData';
-import { AdvancedSearchInputs } from '../utils/types';
-
-import AdvancedSearchModal from './AdvancedSearchModal/AdvancedSearchModal';
+import SearchTipsPopover from './SearchTipsPopover/SearchTipsPopover';
 import SavedSearchesDropdown from './SavedSearchesDropdown';
-import SaveSearchModal from './SaveSearchModal';
+import SaveSearchButton from './SaveSearchButton';
 import SearchTextInput from './SearchTextInput';
 
 import './search-bar.scss';
@@ -26,42 +21,10 @@ type SearchBarProps = {
 };
 
 const SearchBar: FC<SearchBarProps> = ({ clearAllFilters, filterDefinitions, onSetFilters }) => {
-  const { t } = useKubevirtTranslation();
-  const { createModal } = useModal();
   const searchInputRef = useRef<HTMLInputElement>();
+  const showSearchModal = useShowAdvancedSearchModal(onSetFilters, clearAllFilters);
 
-  const navigateToSearchResults = useNavigateToSearchResults(onSetFilters, clearAllFilters);
-  const { saveSearch, urlSearchQuery } = useSavedSearchData();
-
-  const showSearchModal = useCallback(
-    (prefillInputs?: AdvancedSearchInputs) => {
-      createModal(({ isOpen, onClose }) => (
-        <AdvancedSearchModal
-          onSubmit={(searchInputs) => {
-            navigateToSearchResults(searchInputs);
-            onClose();
-          }}
-          isOpen={isOpen}
-          onClose={onClose}
-          prefillInputs={prefillInputs}
-        />
-      ));
-    },
-    [createModal, navigateToSearchResults],
-  );
-
-  const showSaveSearchModal = useCallback(() => {
-    createModal(({ isOpen, onClose }) => (
-      <SaveSearchModal
-        onSubmit={({ description, name }) => {
-          saveSearch(name, { description, query: urlSearchQuery });
-          onClose();
-        }}
-        isOpen={isOpen}
-        onClose={onClose}
-      />
-    ));
-  }, [createModal, saveSearch, urlSearchQuery]);
+  const [inputValue, setInputValue] = useState('');
 
   return (
     <InputGroup className="pf-v6-u-mb-md" data-test="vm-adv-search-toolbar">
@@ -69,19 +32,17 @@ const SearchBar: FC<SearchBarProps> = ({ clearAllFilters, filterDefinitions, onS
         <SearchTextInput
           filterDefinitions={filterDefinitions}
           inputRef={searchInputRef}
+          inputValue={inputValue}
           onOpenAdvancedSearch={() => showSearchModal()}
           onSetFilters={onSetFilters}
+          setInputValue={setInputValue}
         />
       </InputGroupItem>
       <InputGroupItem>
-        <Button
-          data-test="save-search"
-          isDisabled={!urlSearchQuery}
-          onClick={showSaveSearchModal}
-          variant="link"
-        >
-          {t('Save search')}
-        </Button>
+        <SearchTipsPopover onSelectTip={setInputValue} />
+      </InputGroupItem>
+      <InputGroupItem>
+        <SaveSearchButton />
       </InputGroupItem>
       <InputGroupItem>
         <SavedSearchesDropdown />

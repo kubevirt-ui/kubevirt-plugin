@@ -15,6 +15,7 @@ type UseCommitTokenResult = (tokenText: string) => void;
 const useCommitToken = (
   onSetFilters: OnSetFilters,
   filterDefinitions: KubevirtFilter[],
+  addRecentSearch?: (token: string) => void,
 ): UseCommitTokenResult => {
   const optionsLookup = useMemo(() => buildOptionsLookup(filterDefinitions), [filterDefinitions]);
 
@@ -33,8 +34,9 @@ const useCommitToken = (
       }
 
       onSetFilters(normalizedUpdate);
+      addRecentSearch?.(trimmed);
     },
-    [onSetFilters, optionsLookup],
+    [onSetFilters, optionsLookup, addRecentSearch],
   );
 
   return commitToken;

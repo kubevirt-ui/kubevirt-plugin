@@ -5,7 +5,11 @@ import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 export const EXCLUSION_PREFIX = '!';
 
 export const KEY_ALIASES: Record<string, VirtualMachineRowFilterType> = {
+  created: VirtualMachineRowFilterType.DateCreatedFrom,
   has: VirtualMachineRowFilterType.HWDevices,
+  label: VirtualMachineRowFilterType.Labels,
+  storage: VirtualMachineRowFilterType.StorageClass,
+  vcpu: VirtualMachineRowFilterType.CPU,
 };
 
 export const SIGN_TO_OPERATOR: Record<string, NumberOperator> = {
