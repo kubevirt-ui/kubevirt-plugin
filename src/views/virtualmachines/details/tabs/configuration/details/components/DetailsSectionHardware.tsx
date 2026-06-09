@@ -2,6 +2,7 @@ import React, { FC, useEffect } from 'react';
 import { useLocation } from 'react-router';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { getClusterOnlyArchitecture } from '@kubevirt-utils/components/FirmwareBootloaderModal/utils/utils';
 import HardwareDevicesTable from '@kubevirt-utils/components/HardwareDevices/HardwareDevicesTable';
 import HardwareDeviceTitle from '@kubevirt-utils/components/HardwareDevices/HardwareDeviceTitle';
 import HardwareDevicesModal from '@kubevirt-utils/components/HardwareDevices/modal/HardwareDevicesModal';
@@ -36,13 +37,14 @@ const DetailsSectionHardware: FC<DetailsSectionHardwareProps> = ({
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const location = useLocation();
-  const clusterWorkloadArchitectures = useHcoWorkloadArchitectures() ?? [];
-  const clusterHasS390xArchitecture = clusterWorkloadArchitectures.includes(ARCHITECTURES.S390X);
+  const clusterWorkloadArchitectures = useHcoWorkloadArchitectures();
+  const clusterOnlyArchitecture = getClusterOnlyArchitecture(clusterWorkloadArchitectures);
   const [isExpanded, setIsExpanded] = useToggle('hardware-devices');
   const onSubmit = onSubmitProp || updateHardwareDevices;
   const hostDevices = getHostDevices(vm);
   const gpus = getGPUDevices(vm);
   const vmHasS390xArchitecture = hasS390xArchitecture(vm);
+  const isClusterS390xArchitecture = clusterOnlyArchitecture === ARCHITECTURES.S390X;
 
   useEffect(() => {
     expandURLHash(getSearchItemsIds(getDetailsTabHardwareIds(vm)), location?.hash, setIsExpanded);
@@ -102,7 +104,7 @@ const DetailsSectionHardware: FC<DetailsSectionHardwareProps> = ({
       onToggle={(_event, val) => setIsExpanded(val)}
     >
       <Grid>
-        {!vmHasS390xArchitecture && !clusterHasS390xArchitecture && (
+        {!vmHasS390xArchitecture && !isClusterS390xArchitecture && (
           <>
             <GridItem span={5}>
               <HardwareDeviceTitle canEdit onClick={onEditGPU} title={t('GPU devices')} />
@@ -119,7 +121,7 @@ const DetailsSectionHardware: FC<DetailsSectionHardwareProps> = ({
           </>
         )}
 
-        <GridItem span={vmHasS390xArchitecture || clusterHasS390xArchitecture ? 11 : 5}>
+        <GridItem span={vmHasS390xArchitecture || isClusterS390xArchitecture ? 11 : 5}>
           <HardwareDeviceTitle canEdit onClick={onEditHostDevices} title={t('Host devices')} />
           <HardwareDevicesTable devices={hostDevices} />
         </GridItem>
