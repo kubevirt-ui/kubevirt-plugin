@@ -1,7 +1,6 @@
 import React, { FC } from 'react';
 
-import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
-import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { DataVolumeModel, VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import DiskListTitle from '@kubevirt-utils/components/DiskListTitle/DiskListTitle';
 import DiskSourceSelect from '@kubevirt-utils/components/DiskModal/components/DiskSourceSelect/DiskSourceSelect';
@@ -9,7 +8,7 @@ import DiskModal from '@kubevirt-utils/components/DiskModal/DiskModal';
 import { SourceTypes } from '@kubevirt-utils/components/DiskModal/utils/types';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import WindowsDrivers from '@kubevirt-utils/components/WindowsDrivers/WindowsDrivers';
-import { asAccessReview } from '@kubevirt-utils/resources/shared';
+import { asAccessReview, getNamespace } from '@kubevirt-utils/resources/shared';
 import useDisksTableData from '@kubevirt-utils/resources/vm/hooks/disk/useDisksTableData';
 import useProvisioningPercentage from '@kubevirt-utils/resources/vm/hooks/useProvisioningPercentage';
 import { K8sVerb, useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
@@ -40,7 +39,6 @@ const DiskList: FC<DiskListProps> = ({ customize = false, onDiskUpdate, vm, vmi 
   const { createModal } = useModal();
   const columns = useDiskColumns();
   const [disks, sourcesLoaded, loadError] = useDisksTableData(vm, vmi);
-  const instanceTypeVMStore = useInstanceTypeVMStore();
   const filters = useDisksFilters();
   const [data, filteredData, onFilterChange] = useListPageFilter(disks, filters);
 
@@ -48,9 +46,9 @@ const DiskList: FC<DiskListProps> = ({ customize = false, onDiskUpdate, vm, vmi 
   const [canUpdate] = useFleetAccessReview(accessReview || {});
 
   const [canCreateDataVolume] = useAccessReview({
-    group: VirtualMachineModel.apiGroup,
-    namespace: instanceTypeVMStore?.vmNamespaceTarget,
-    resource: VirtualMachineModel.plural,
+    group: DataVolumeModel.apiGroup,
+    namespace: getNamespace(vm),
+    resource: DataVolumeModel.plural,
     verb: 'create' as K8sVerb,
   });
 
