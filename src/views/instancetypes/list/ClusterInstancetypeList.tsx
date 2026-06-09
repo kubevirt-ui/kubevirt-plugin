@@ -118,7 +118,7 @@ const ClusterInstancetypeList: FC<ListPageProps> = ({
         getRowId={getClusterInstancetypeRowId}
         loaded={isLoaded}
         loadError={loadError}
-        noDataMsg={t('No VirtualMachineClusterInstanceType found')}
+        noDataMsg={t("You don't have any VirtualMachineClusterInstanceTypes yet")}
         pagination={pagination}
         unfilteredData={unfilteredData}
       />

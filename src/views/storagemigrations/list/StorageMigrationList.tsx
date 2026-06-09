@@ -103,7 +103,7 @@ const StorageMigrationList: FC = () => {
           getRowId={getStorageMigrationRowId}
           loaded={isLoaded}
           loadError={loadError}
-          noDataMsg={t('No storage migration found')}
+          noDataMsg={t("You don't have any storage migrations yet")}
           pagination={pagination}
           unfilteredData={unfilteredData}
         />
