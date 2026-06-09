@@ -3,6 +3,7 @@ import React, { FC, MouseEvent, useMemo, useState } from 'react';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import ModalPendingChangesAlert from '@kubevirt-utils/components/PendingChanges/ModalPendingChangesAlert/ModalPendingChangesAlert';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
+import useHcoWorkloadArchitectures from '@kubevirt-utils/hooks/useHcoWorkloadArchitectures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup, SelectOption } from '@patternfly/react-core';
 
@@ -10,7 +11,12 @@ import FormPFSelect from '../FormPFSelect/FormPFSelect';
 
 import { BootMode, BootModeTitles } from './utils/constants';
 import { BootloaderOptionValue } from './utils/types';
-import { getBootloaderFromVM, getBootloaderOptions, updatedVMBootMode } from './utils/utils';
+import {
+  getBootloaderFromVM,
+  getBootloaderOptions,
+  getClusterOnlyArchitecture,
+  updatedVMBootMode,
+} from './utils/utils';
 
 type FirmwareBootloaderModalProps = {
   isOpen: boolean;
@@ -30,10 +36,17 @@ const FirmwareBootloaderModal: FC<FirmwareBootloaderModalProps> = ({
   vmi,
 }) => {
   const { t } = useKubevirtTranslation();
+  const clusterWorkloadArchitectures = useHcoWorkloadArchitectures();
+  const clusterOnlyArchitecture = getClusterOnlyArchitecture(clusterWorkloadArchitectures);
   const [selectedFirmwareBootloader, setSelectedFirmwareBootloader] =
-    useState<BootloaderOptionValue>(getBootloaderFromVM(vm, preferredBootmode));
+    useState<BootloaderOptionValue>(
+      getBootloaderFromVM(vm, preferredBootmode, clusterOnlyArchitecture),
+    );
 
-  const bootloaderOptions = useMemo(() => getBootloaderOptions(vm), [vm]);
+  const bootloaderOptions = useMemo(
+    () => getBootloaderOptions(vm, clusterOnlyArchitecture),
+    [vm, clusterOnlyArchitecture],
+  );
 
   const handleChange = (event: MouseEvent<HTMLSelectElement>, value: BootloaderOptionValue) => {
     event.preventDefault();
@@ -41,8 +54,8 @@ const FirmwareBootloaderModal: FC<FirmwareBootloaderModalProps> = ({
   };
 
   const updatedVirtualMachine = useMemo(
-    () => updatedVMBootMode(vm, selectedFirmwareBootloader),
-    [vm, selectedFirmwareBootloader],
+    () => updatedVMBootMode(vm, selectedFirmwareBootloader, clusterOnlyArchitecture),
+    [vm, selectedFirmwareBootloader, clusterOnlyArchitecture],
   );
 
   return (
