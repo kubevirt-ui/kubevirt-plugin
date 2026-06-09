@@ -20,6 +20,12 @@ import { BootloaderOption, BootloaderOptionValue } from './types';
 
 export const isObjectEmpty = (obj: object): boolean => obj && isEmpty(obj);
 
+export const getClusterOnlyArchitecture = (
+  clusterWorkloadArchitectures?: string[],
+): string | undefined => {
+  return clusterWorkloadArchitectures?.length === 1 ? clusterWorkloadArchitectures[0] : undefined;
+};
+
 export const getBootloaderFromVM = (
   vm: V1VirtualMachine,
   defaultBootmode = BootMode.bios,
