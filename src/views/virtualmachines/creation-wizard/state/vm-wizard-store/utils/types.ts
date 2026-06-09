@@ -15,7 +15,13 @@ export type VMWizardState = {
   vmName: string | undefined;
 };
 
+export type InitializeVMCreateWizardValues = Partial<VMWizardState> & {
+  isAdmin: boolean;
+  namespace: string;
+};
+
 export type VMWizardActions = {
+  initializeVMCreationWizardValues: (values: InitializeVMCreateWizardValues) => void;
   markStepVisited: (stepId: string) => void;
   resetWizardState: () => void;
   setCluster: (cluster: string) => void;

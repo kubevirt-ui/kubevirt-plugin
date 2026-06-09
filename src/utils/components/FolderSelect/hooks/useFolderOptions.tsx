@@ -24,7 +24,10 @@ const useFolderOptions: UseFolderOptions = (namespace, cluster) => {
   });
 
   useEffect(() => {
-    if (isEmpty(vms)) return;
+    if (isEmpty(vms)) {
+      setFolders([]);
+      return;
+    }
 
     const folderOptions = vms.reduce((uniqueValues, vm) => {
       const folderLabel = getLabel(vm, VM_FOLDER_LABEL);
