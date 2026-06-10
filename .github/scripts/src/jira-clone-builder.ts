@@ -1,4 +1,5 @@
 import { sanitizeDescriptionForClone } from './jira-adf-utils.js';
+import { buildClonedIssueSummary } from './version-utils.js';
 import type {
   DiscoveredFields,
   JiraCreateIssuePayload,
@@ -30,7 +31,7 @@ export const buildClonePayload = (
     fields: {
       project: { key: 'CNV' },
       issuetype: { id: fields.issuetype.id },
-      summary: fields.summary,
+      summary: buildClonedIssueSummary(fields.summary, targetFixVersion.name),
       description,
       labels: [...fields.labels],
       components: fields.components.map((c) => ({ id: c.id })),
@@ -39,6 +40,9 @@ export const buildClonePayload = (
   };
   if (fields.assignee) {
     payload.fields.assignee = { accountId: fields.assignee.accountId };
+  }
+  if (fields.reporter) {
+    payload.fields.reporter = { accountId: fields.reporter.accountId };
   }
   if (fields.priority) {
     payload.fields.priority = { id: fields.priority.id };

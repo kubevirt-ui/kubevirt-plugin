@@ -82,6 +82,7 @@ export type JiraCreateIssuePayload = {
     labels?: string[];
     components?: Array<{ id: string }>;
     assignee?: { accountId: string } | null;
+    reporter?: { accountId: string } | null;
     priority?: { id: string };
     fixVersions?: Array<{ id: string }>;
     [customField: `customfield_${string}`]: unknown;
