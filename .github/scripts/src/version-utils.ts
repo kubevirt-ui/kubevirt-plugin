@@ -104,6 +104,23 @@ export const suggestBranchForFixVersion = (fixVersionName: string): string | nul
   return `release-${version}`;
 };
 
+const RELEASE_SUMMARY_PREFIX_REGEX = /^\[release-\d+\.\d+\]\s*/i;
+
+/** Strip an existing [release-X.YY] prefix from a Jira summary. */
+export const stripReleaseSummaryPrefix = (summary: string): string =>
+  summary.replace(RELEASE_SUMMARY_PREFIX_REGEX, '').trim();
+
+/** Prefix a Jira summary with [release-X.YY] derived from a fix version name (e.g., "CNV v4.21.z"). */
+export const buildClonedIssueSummary = (
+  originalSummary: string,
+  fixVersionName: string,
+): string => {
+  const releaseBranch = suggestBranchForFixVersion(fixVersionName);
+  const baseSummary = stripReleaseSummaryPrefix(originalSummary);
+  if (!releaseBranch) return baseSummary;
+  return `[${releaseBranch}] ${baseSummary}`;
+};
+
 /** Extract all CNV-XXXXX ticket IDs from a PR title. */
 export const extractTicketIds = (title: string): string[] => {
   const matches = title.match(/CNV-\d+/gi);
