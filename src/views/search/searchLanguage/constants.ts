@@ -2,7 +2,8 @@ import { CAPACITY_UNITS } from '@kubevirt-utils/components/CapacityInput/utils';
 import { NumberOperator } from '@kubevirt-utils/utils/constants';
 import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
-export const EXCLUSION_PREFIX = '!';
+export const EXCLUSION_URL_PREFIX = '!';
+export const EXCLUSION_PREFIX = '-';
 
 export const KEY_ALIASES: Record<string, VirtualMachineRowFilterType> = {
   created: VirtualMachineRowFilterType.DateCreatedFrom,

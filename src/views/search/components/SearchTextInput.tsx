@@ -1,4 +1,4 @@
-import React, { FC, RefObject, useRef } from 'react';
+import React, { FC, RefObject, useCallback, useEffect, useRef, useState } from 'react';
 
 import { useClickOutside } from '@kubevirt-utils/hooks/useClickOutside/useClickOutside';
 import {
@@ -21,8 +21,12 @@ import { VM_SEARCH_INPUT_ID } from '@search/utils/constants';
 
 import { useSearchLanguageInput } from '../searchLanguage/hooks/useSearchLanguageInput/useSearchLanguageInput';
 
+import { useAutocompleteMode } from './SearchDropdown/hooks/useAutocompleteMode/useAutocompleteMode';
+import { useKeyListNavigation } from './SearchDropdown/hooks/useKeyListNavigation/useKeyListNavigation';
 import useRecentSearches from './SearchDropdown/hooks/useRecentSearches';
+import { useValueListNavigation } from './SearchDropdown/hooks/useValueListNavigation/useValueListNavigation';
 import SearchDropdown from './SearchDropdown/SearchDropdown';
+import { DropdownType } from './SearchDropdown/types';
 import AdvancedSearchIcon from './AdvancedSearchIcon';
 
 type SearchTextInputProps = {
@@ -47,15 +51,62 @@ const SearchTextInput: FC<SearchTextInputProps> = ({
   const toggleRef = useRef<HTMLDivElement>();
   const menuRef = useRef<HTMLDivElement>();
 
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [focusedItemIndex, setFocusedItemIndex] = useState(-1);
+
+  const onCloseDropdown = useCallback(() => {
+    setIsDropdownOpen(false);
+    setFocusedItemIndex(-1);
+  }, []);
+  const onOpenDropdown = useCallback(() => setIsDropdownOpen(true), []);
+
   const { addRecentSearch, recentSearches } = useRecentSearches();
   const commitToken = useCommitToken(onSetFilters, filterDefinitions, addRecentSearch);
 
-  const { isDropdownOpen, onChange, onClear, onCloseDropdown, onInputFocus, onKeyDown } =
-    useSearchLanguageInput({ commitToken, inputValue, setInputValue });
+  const autocompleteMode = useAutocompleteMode(inputValue.trimStart(), filterDefinitions);
 
-  const { onSelectExample, onSelectKey, onSelectRecentSearch } = useSearchLanguageDropdown({
+  const { onSelectExample, onSelectKey, onSelectRecentSearch, onSelectValue } =
+    useSearchLanguageDropdown({
+      autocompleteMode,
+      commitToken,
+      inputValue,
+      onCloseDropdown,
+      setInputValue,
+    });
+
+  const { onArrowKey: onValueArrowKey, onSelectHighlighted: onValueSelectHighlighted } =
+    useValueListNavigation({
+      autocompleteMode,
+      filterDefinitions,
+      focusedItemIndex,
+      onSelectValue,
+      setFocusedItemIndex,
+    });
+
+  const { onArrowKey: onKeyArrowKey, onSelectHighlighted: onKeySelectHighlighted } =
+    useKeyListNavigation({
+      autocompleteMode,
+      focusedItemIndex,
+      onSelectKey,
+      setFocusedItemIndex,
+    });
+
+  const onArrowKey = onValueArrowKey ?? onKeyArrowKey;
+  const onSelectHighlighted = onValueSelectHighlighted ?? onKeySelectHighlighted;
+
+  useEffect(() => {
+    setFocusedItemIndex(-1);
+  }, [autocompleteMode]);
+
+  const { onChange, onClear, onInputFocus, onKeyDown } = useSearchLanguageInput({
+    autocompleteMode,
     commitToken,
+    filterDefinitions,
+    inputValue,
+    onArrowKey,
     onCloseDropdown,
+    onOpenDropdown,
+    onSelectHighlighted,
     setInputValue,
   });
 
@@ -98,16 +149,21 @@ const SearchTextInput: FC<SearchTextInputProps> = ({
   const dropdown = (
     <div ref={menuRef}>
       <SearchDropdown
+        autocompleteMode={autocompleteMode}
         filterDefinitions={filterDefinitions}
+        focusedItemIndex={focusedItemIndex}
         onSelectExample={onSelectExample}
         onSelectKey={onSelectKey}
         onSelectRecentSearch={onSelectRecentSearch}
+        onSelectValue={onSelectValue}
         recentSearches={recentSearches}
       />
     </div>
   );
 
-  return <Popper isVisible={isDropdownOpen} popper={dropdown} trigger={searchInput} />;
+  const shouldShowDropdown = isDropdownOpen && autocompleteMode.type !== DropdownType.HIDDEN;
+
+  return <Popper isVisible={shouldShowDropdown} popper={dropdown} trigger={searchInput} />;
 };
 
 export default SearchTextInput;

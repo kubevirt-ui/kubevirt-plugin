@@ -2,22 +2,20 @@ import React, { FC, useMemo } from 'react';
 
 import { KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Content, ContentVariants } from '@patternfly/react-core';
+import { Content, ContentVariants, MenuList } from '@patternfly/react-core';
 
-import { getSearchKeyBadges } from '../constants';
+import { SEARCH_KEY_BADGES } from '../constants';
 import { SearchKeyBadge } from '../types';
 
 import SearchKeyItem from './SearchKeyItem';
 
 type SearchByKeysProps = {
   filterDefinitions: KubevirtFilter[];
-  onSelectKey: (key: string) => void;
+  onSelectKey: (badge: SearchKeyBadge) => void;
 };
 
 const SearchByKeys: FC<SearchByKeysProps> = ({ filterDefinitions, onSelectKey }) => {
   const { t } = useKubevirtTranslation();
-
-  const searchKeyBadges = useMemo(() => getSearchKeyBadges(t), [t]);
 
   const labelLookup = useMemo(() => {
     const map = new Map<string, string>();
@@ -28,16 +26,26 @@ const SearchByKeys: FC<SearchByKeysProps> = ({ filterDefinitions, onSelectKey })
   }, [filterDefinitions]);
 
   const getCategoryLabel = (badge: SearchKeyBadge): string =>
-    labelLookup.get(badge.filterType) || badge.displayKey;
+    labelLookup.get(badge.filterType) || badge.searchKey;
 
-  const handleClick = (badge: SearchKeyBadge) => {
-    const keyText = badge.usesColon ? `${badge.displayKey}:` : badge.displayKey;
-    onSelectKey(keyText);
+  const midpoint = Math.ceil(SEARCH_KEY_BADGES.length / 2);
+  const leftBadges = SEARCH_KEY_BADGES.slice(0, midpoint);
+  const rightBadges = SEARCH_KEY_BADGES.slice(midpoint);
+
+  const getMenuList = (badges: SearchKeyBadge[]) => {
+    return (
+      <MenuList>
+        {badges.map((badge) => (
+          <SearchKeyItem
+            badge={badge}
+            categoryLabel={getCategoryLabel(badge)}
+            key={badge.searchKey}
+            onClick={onSelectKey}
+          />
+        ))}
+      </MenuList>
+    );
   };
-
-  const midpoint = Math.ceil(searchKeyBadges.length / 2);
-  const leftBadges = searchKeyBadges.slice(0, midpoint);
-  const rightBadges = searchKeyBadges.slice(midpoint);
 
   return (
     <div className="search-dropdown__section">
@@ -48,27 +56,9 @@ const SearchByKeys: FC<SearchByKeysProps> = ({ filterDefinitions, onSelectKey })
         </Content>
       </div>
       <div className="search-dropdown__keys-grid">
-        <div>
-          {leftBadges.map((badge) => (
-            <SearchKeyItem
-              badge={badge}
-              categoryLabel={getCategoryLabel(badge)}
-              key={badge.displayKey}
-              onClick={handleClick}
-            />
-          ))}
-        </div>
+        {getMenuList(leftBadges)}
         <div className="search-dropdown__keys-divider" />
-        <div>
-          {rightBadges.map((badge) => (
-            <SearchKeyItem
-              badge={badge}
-              categoryLabel={getCategoryLabel(badge)}
-              key={badge.displayKey}
-              onClick={handleClick}
-            />
-          ))}
-        </div>
+        {getMenuList(rightBadges)}
       </div>
     </div>
   );

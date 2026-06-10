@@ -54,17 +54,6 @@
     }
   }
 
-  &__key-item {
-    align-items: center;
-    display: flex;
-    gap: var(--pf-t--global--spacer--sm);
-  }
-
-  &__key-label {
-    color: var(--pf-t--global--text--color--regular);
-    font-size: var(--pf-t--global--font--size--body--default);
-  }
-
   &__list {
     list-style: none;
     margin: 0;

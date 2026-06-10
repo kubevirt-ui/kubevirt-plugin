@@ -4,80 +4,82 @@ import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
 import { SearchExample, SearchKeyBadge } from './types';
 
-export const getSearchKeyBadges = (t: TFunction): SearchKeyBadge[] => [
+export const SEARCH_KEY_BADGES: SearchKeyBadge[] = [
   {
-    description: t('VM name - contains match (or just type free text)'),
-    displayKey: 'name',
     filterType: VirtualMachineRowFilterType.Name,
+    getDescription: (t) => t('VM name - contains match (or just type free text)'),
+    searchKey: 'name',
   },
   {
-    description: t('Namespace / project e.g. project:default,openshift'),
-    displayKey: 'project',
     filterType: VirtualMachineRowFilterType.Project,
+    getDescription: (t) => t('Namespace / project e.g. project:default,openshift'),
+    searchKey: 'project',
   },
   {
-    description: t('VM status e.g. status:running,error'),
-    displayKey: 'status',
     filterType: VirtualMachineRowFilterType.Status,
+    getDescription: (t) => t('VM status e.g. status:running,error'),
+    searchKey: 'status',
   },
   {
-    description: t('vCPU count e.g. vcpu >2 vcpu>4 (also supports > =)'),
-    displayKey: 'vcpu',
     filterType: VirtualMachineRowFilterType.CPU,
+    getDescription: (t) => t('vCPU count e.g. vcpu >2 vcpu>4 (also supports > =)'),
+    searchKey: 'vcpu',
     usesColon: false,
   },
   {
-    description: t('Storage class e.g. storage:gold,silver'),
-    displayKey: 'storage',
     filterType: VirtualMachineRowFilterType.StorageClass,
+    getDescription: (t) => t('Storage class e.g. storage:gold,silver'),
+    searchKey: 'storage',
   },
   {
-    description: t('Creation date e.g. created:today created:last-7-days'),
-    displayKey: 'created',
     filterType: VirtualMachineRowFilterType.DateCreatedFrom,
+    getDescription: (t) => t('Creation date e.g. created:today created:last-7-days'),
+    searchKey: 'created',
   },
   {
-    description: t('Scheduling constraints e.g. scheduling:nodeSelector,affinityRules'),
-    displayKey: 'scheduling',
     filterType: VirtualMachineRowFilterType.Scheduling,
+    getDescription: (t) => t('Scheduling constraints e.g. scheduling:nodeSelector,affinityRules'),
+    searchKey: 'scheduling',
   },
   {
-    description: t('Cluster name e.g. cluster:production,local-cluster'),
-    displayKey: 'cluster',
     filterType: VirtualMachineRowFilterType.Cluster,
+    getDescription: (t) => t('Cluster name e.g. cluster:production,local-cluster'),
+    searchKey: 'cluster',
   },
   {
-    description: t('Free-text match in VM description e.g. description:database'),
-    displayKey: 'description',
     filterType: VirtualMachineRowFilterType.Description,
+    getDescription: (t) => t('Free-text match in VM description e.g. description:database'),
+    searchKey: 'description',
   },
   {
-    description: t('Operating system e.g. os:CentOS,Fedora'),
-    displayKey: 'os',
     filterType: VirtualMachineRowFilterType.OS,
+    getDescription: (t) => t('Operating system e.g. os:CentOS,Fedora'),
+    searchKey: 'os',
   },
   {
-    description: t('RAM e.g. memory>4GiB or memory>=8GiB'),
-    displayKey: 'memory',
     filterType: VirtualMachineRowFilterType.Memory,
+    getDescription: (t) => t('RAM e.g. memory>4GiB or memory>=8GiB'),
+    searchKey: 'memory',
     usesColon: false,
   },
   {
-    description: t('Hardware capability e.g. has:gpu,host'),
-    displayKey: 'has',
     filterType: VirtualMachineRowFilterType.HWDevices,
+    getDescription: (t) => t('Hardware capability e.g. has:gpu,host'),
+    searchKey: 'has',
   },
   {
-    description: t('Metadata label e.g. label:app=database,app=frontend'),
-    displayKey: 'label',
     filterType: VirtualMachineRowFilterType.Labels,
+    getDescription: (t) => t('Metadata label e.g. label:app=database,app=frontend'),
+    searchKey: 'label',
   },
   {
-    description: t('Scheduled node e.g. node:worker-01,worker-02'),
-    displayKey: 'node',
     filterType: VirtualMachineRowFilterType.Node,
+    getDescription: (t) => t('Scheduled node e.g. node:worker-01,worker-02'),
+    searchKey: 'node',
   },
 ];
+
+export const SEARCH_KEYS = SEARCH_KEY_BADGES.map((badge) => badge.searchKey);
 
 export const getSearchExamples = (t: TFunction): SearchExample[] => [
   {

@@ -1,6 +1,6 @@
 import { ROW_FILTERS_PREFIX } from '@kubevirt-utils/utils/constants';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { EXCLUSION_PREFIX } from '@search/searchLanguage/constants';
+import { EXCLUSION_URL_PREFIX } from '@search/searchLanguage/constants';
 
 import { KubevirtFilter } from './types';
 
@@ -35,7 +35,7 @@ export const migrateLegacyFilterParams = (params: URLSearchParams): null | URLSe
   return migrated;
 };
 
-export const isExcludedValue = (value: string): boolean => value.startsWith(EXCLUSION_PREFIX);
+export const isExcludedValue = (value: string): boolean => value.startsWith(EXCLUSION_URL_PREFIX);
 
 export const matchesWithExclusion = <T extends K8sResourceCommon>(
   filterDef: KubevirtFilter<T>,
@@ -52,4 +52,4 @@ export const matchesWithExclusion = <T extends K8sResourceCommon>(
 };
 
 export const formatFilterValue = (value: string, excluded = false): string =>
-  excluded ? `${EXCLUSION_PREFIX}${value}` : value;
+  excluded ? `${EXCLUSION_URL_PREFIX}${value}` : value;
