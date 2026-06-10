@@ -2475,6 +2475,6 @@
   "You're in view-only mode": "表示専用モードです",
   "You're ready to start managing your VMs. For more tips and deep dives, check out our <2>documentation</2> or follow the <6>blog</6>.": "仮想マシンの管理を開始する準備が整いました。さらに詳しいヒントや情報については、<2>ドキュメント</2> を参照するか、<6>ブログ</6> をフォローしてください。",
   "Your physical network switch must be configured with a VLAN trunk that is permitted to carry traffic for this specific ID.": "物理ネットワークスイッチには、この特定の ID のトラフィックを伝送することが許可された VLAN トランクを設定する必要があります。",
-  "Your VirtualMachine will be created in the following location unless you edit it:": "VirtualMachine は、編集しない限り、以下の場所に作成されます:",
+  "Your VirtualMachine will be created in the following location": "Your VirtualMachine will be created in the following location",
   "zero": "ゼロ"
 }
