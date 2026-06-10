@@ -6,15 +6,10 @@ import { CloseIcon } from '@patternfly/react-icons';
 
 type MigrationStatusShellProps = {
   children: ReactNode;
-  isTerminal?: boolean;
   onHeaderClose: () => void;
 };
 
-const MigrationStatusShell: FC<MigrationStatusShellProps> = ({
-  children,
-  isTerminal,
-  onHeaderClose,
-}) => {
+const MigrationStatusShell: FC<MigrationStatusShellProps> = ({ children, onHeaderClose }) => {
   const { t } = useKubevirtTranslation();
 
   return (
@@ -22,7 +17,7 @@ const MigrationStatusShell: FC<MigrationStatusShellProps> = ({
       <div className="pf-v6-c-wizard__header">
         <div className="pf-v6-c-wizard__close">
           <Button
-            aria-label={isTerminal ? t('Close') : t('Cancel migration')}
+            aria-label={t('Close')}
             icon={<CloseIcon />}
             onClick={onHeaderClose}
             variant={ButtonVariant.plain}
