@@ -7,61 +7,52 @@ import { AdvancedSearchQueryInputs } from './types';
 
 type AdvancedSearchQueryInputValue = AdvancedSearchQueryInputs[keyof AdvancedSearchQueryInputs];
 
-const transformObjectToQueryString = (object: Record<string, boolean>) => {
-  const truthyKeys = Object.keys(object).filter((key) => object[key]);
-  return isEmpty(truthyKeys) ? undefined : truthyKeys.join(',');
-};
+const transformObjectToQueryValues = (object: Record<string, boolean>) =>
+  Object.keys(object).filter((key) => object[key]);
 
-const customQueryStringMap: Record<
-  string,
-  (value: AdvancedSearchQueryInputValue) => string | undefined
-> = {
+const customQueryValuesMap: Record<string, (value: AdvancedSearchQueryInputValue) => string[]> = {
   [VirtualMachineRowFilterType.CPU]: (
     vCPU: AdvancedSearchQueryInputs[VirtualMachineRowFilterType.CPU],
-  ) => (!isNaN(vCPU?.value) ? `${vCPU.operator} ${vCPU.value}` : undefined),
+  ) => (!isNaN(vCPU?.value) ? [`${vCPU.operator} ${vCPU.value}`] : []),
   [VirtualMachineRowFilterType.HWDevices]: (
     hwDevices: AdvancedSearchQueryInputs[VirtualMachineRowFilterType.HWDevices],
-  ) => transformObjectToQueryString(hwDevices),
+  ) => transformObjectToQueryValues(hwDevices),
   [VirtualMachineRowFilterType.Memory]: (
     memory: AdvancedSearchQueryInputs[VirtualMachineRowFilterType.Memory],
-  ) => (!isNaN(memory?.value) ? `${memory.operator} ${memory.value} ${memory.unit}` : undefined),
+  ) => (!isNaN(memory?.value) ? [`${memory.operator} ${memory.value} ${memory.unit}`] : []),
   [VirtualMachineRowFilterType.Scheduling]: (
     scheduling: AdvancedSearchQueryInputs[VirtualMachineRowFilterType.Scheduling],
-  ) => transformObjectToQueryString(scheduling),
+  ) => transformObjectToQueryValues(scheduling),
 };
 
-const createQueryString = (
-  value: AdvancedSearchQueryInputValue,
-  fieldKey: string,
-): string | undefined => {
-  const transformToQueryFunction = customQueryStringMap[fieldKey];
+const createQueryValues = (value: AdvancedSearchQueryInputValue, fieldKey: string): string[] => {
+  const transformToQueryFunction = customQueryValuesMap[fieldKey];
 
   if (transformToQueryFunction) {
     return transformToQueryFunction(value);
   }
 
   if (Array.isArray(value)) {
-    return isEmpty(value) ? undefined : value.join(',');
+    return value;
   }
 
   if (value) {
-    return value.toString();
+    return [value.toString()];
   }
 };
 
 export const generateQueryParams = (searchInputs: AdvancedSearchQueryInputs) => {
-  const queryArgs: Record<string, string> = {};
+  const queryArgs: Record<string, string[]> = {};
 
   Object.entries(searchInputs).forEach(([fieldKey, value]) => {
     if (isEmpty(value)) {
       return;
     }
 
-    const queryString = createQueryString(value, fieldKey);
+    const queryValues = createQueryValues(value, fieldKey);
 
-    if (queryString) {
-      const queryKey = getRowFilterQueryKey(fieldKey);
-      queryArgs[queryKey] = queryString;
+    if (!isEmpty(queryValues)) {
+      queryArgs[fieldKey] = queryValues;
     }
   });
 

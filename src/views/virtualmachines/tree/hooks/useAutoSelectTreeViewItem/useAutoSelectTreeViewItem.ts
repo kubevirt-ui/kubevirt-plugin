@@ -22,12 +22,8 @@ import {
   UseAutoSelectTreeViewItemProps,
 } from './utils';
 
-const useAutoSelectTreeViewItem = ({
-  dataMap,
-  loaded,
-  onFilterChange,
-}: UseAutoSelectTreeViewItemProps) => {
-  const [selected, onSelect, setSelected] = useTreeViewSelect(onFilterChange);
+const useAutoSelectTreeViewItem = ({ dataMap, loaded }: UseAutoSelectTreeViewItemProps) => {
+  const [selected, onSelect, setSelected] = useTreeViewSelect();
 
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();

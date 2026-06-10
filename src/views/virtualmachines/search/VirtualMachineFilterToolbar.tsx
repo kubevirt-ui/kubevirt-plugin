@@ -1,14 +1,17 @@
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC, useMemo } from 'react';
 
-import AdvancedFiltersToolbarItem from '@kubevirt-utils/components/ListPageFilter/components/AdvancedFiltersToolbarItem';
-import CheckboxSelectFilter from '@kubevirt-utils/components/ListPageFilter/components/CheckboxSelectFilter';
-import { useApplyFiltersWithQuery } from '@kubevirt-utils/components/ListPageFilter/hooks/useApplyFiltersWithQuery';
+import HiddenFilterChips from '@kubevirt-utils/components/KubevirtFilterToolbar/components/HiddenFilterChips';
+import SelectFilterItem from '@kubevirt-utils/components/KubevirtFilterToolbar/components/SelectFilterItem';
 import { logVMListFiltered } from '@kubevirt-utils/extensions/telemetry/dashboard';
+import { getLabelFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/filters/getLabelFilter';
+import {
+  KubevirtFilter,
+  KubevirtFilterLayout,
+  KubevirtFilterState,
+  OnSetFilters,
+} from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import useNamespaceParam from '@kubevirt-utils/hooks/useNamespaceParam';
-import useClusterParam from '@multicluster/hooks/useClusterParam';
 import useIsACMPage from '@multicluster/useIsACMPage';
-import { OnFilterChange, RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 import { Toolbar, ToolbarContent } from '@patternfly/react-core';
 import { ListPageBodySize } from '@virtualmachines/list/listPageBodySize';
 import { VirtualMachineRowFilterType } from '@virtualmachines/utils/constants';
@@ -16,131 +19,93 @@ import { VirtualMachineRowFilterType } from '@virtualmachines/utils/constants';
 import NameFilter from './components/NameFilter';
 import useNameFilter from './hooks/useNameFilter';
 import { ACM_FILTERS_SHOWN_VM_LIST, FILTERS_SHOWN_VM_LIST } from './constants';
-import { getTooltipContent } from './utils';
 
 type VirtualMachineFilterToolbarProps = {
   className?: string;
-  filtersWithSelect?: RowFilter[];
-  hiddenFilters?: RowFilter[];
+  clearAllFilters: () => void;
+  filterDefinitions: KubevirtFilter[];
+  filters: KubevirtFilterState;
   isSearchResultsPage?: boolean;
   listPageBodySize?: ListPageBodySize;
   loaded?: boolean;
-  onFilterChange?: OnFilterChange;
+  onSetFilters: OnSetFilters;
 };
 
 const VirtualMachineFilterToolbar: FC<VirtualMachineFilterToolbarProps> = ({
   className,
-  filtersWithSelect = [],
-  hiddenFilters = [],
+  clearAllFilters,
+  filterDefinitions,
+  filters,
   isSearchResultsPage,
   listPageBodySize,
   loaded,
-  onFilterChange,
+  onSetFilters,
 }) => {
   const { t } = useKubevirtTranslation();
   const isACMPage = useIsACMPage();
-  const cluster = useClusterParam();
-  const namespace = useNamespaceParam();
 
   const filtersShown = isACMPage ? ACM_FILTERS_SHOWN_VM_LIST : FILTERS_SHOWN_VM_LIST;
 
-  const [toolbarIsExpanded, setToolbarIsExpanded] = useState(false);
+  const selectFilters = useMemo(
+    () =>
+      filterDefinitions.filter(
+        (f) =>
+          f.filterLayout === KubevirtFilterLayout.SELECT &&
+          (isSearchResultsPage || filtersShown.includes(f.id as VirtualMachineRowFilterType)),
+      ),
+    [filterDefinitions, isSearchResultsPage, filtersShown],
+  );
 
-  useEffect(() => {
-    if (listPageBodySize !== ListPageBodySize.sm) {
-      setToolbarIsExpanded(false);
-    }
-  }, [listPageBodySize]);
+  const hiddenFilters = useMemo(
+    () => [
+      ...filterDefinitions.filter((f) => f.filterLayout === KubevirtFilterLayout.HIDDEN),
+      getLabelFilter(t),
+    ],
+    [filterDefinitions, t],
+  );
 
-  const applyFilters: OnFilterChange = (type, input) => {
-    logVMListFiltered({ filterType: type });
-    onFilterChange?.(type, input);
+  const useShortLabels = isSearchResultsPage && listPageBodySize !== ListPageBodySize.lg;
+
+  const handleSetFilters: OnSetFilters = (newFilters) => {
+    const filterType = Object.keys(newFilters)[0];
+    if (filterType) logVMListFiltered({ filterType });
+    onSetFilters(newFilters);
   };
-  const applyFiltersWithQuery = useApplyFiltersWithQuery(applyFilters);
 
-  const nameFilter = useNameFilter(applyFiltersWithQuery);
-
-  const clearAll = () => {
-    nameFilter.onDelete();
-    applyFiltersWithQuery(VirtualMachineRowFilterType.Labels);
-
-    [...filtersWithSelect, ...hiddenFilters].forEach(
-      (filter) => filter && applyFiltersWithQuery(filter.type),
-    );
-  };
+  const nameFilter = useNameFilter(filters, handleSetFilters);
 
   if (!loaded) return null;
 
-  const filterSettings = {
-    [VirtualMachineRowFilterType.Cluster]: {
-      showAllBadge: true,
-    },
-    [VirtualMachineRowFilterType.HWDevices]: {
-      filterGroupNameShortcut: t('HW devices'),
-    },
-    [VirtualMachineRowFilterType.OS]: {
-      filterGroupNameShortcut: t('OS'),
-      showAllBadge: true,
-    },
-    [VirtualMachineRowFilterType.Project]: {
-      showAllBadge: true,
-    },
-    [VirtualMachineRowFilterType.Status]: {
-      showAllBadge: true,
-    },
-  };
-
   return (
     <Toolbar
-      toggleIsExpanded={() => {
-        setToolbarIsExpanded(!toolbarIsExpanded);
+      clearAllFilters={() => {
+        nameFilter.resetInputText();
+        clearAllFilters();
       }}
       className={className}
-      clearAllFilters={clearAll}
       clearFiltersButtonText={t('Clear all filters')}
       data-test="filter-toolbar"
       id="filter-toolbar"
-      isExpanded={toolbarIsExpanded}
     >
       <ToolbarContent>
-        {filtersWithSelect.map((filter) => {
-          if (
-            !isSearchResultsPage &&
-            !filtersShown.includes(filter.type as VirtualMachineRowFilterType)
-          ) {
-            return null;
-          }
-
-          const isToggleDisabled =
-            (filter.type === VirtualMachineRowFilterType.Cluster && Boolean(cluster)) ||
-            (filter.type === VirtualMachineRowFilterType.Project && Boolean(namespace));
-          const badgeNumber = isToggleDisabled ? 1 : undefined;
-
-          return (
-            <CheckboxSelectFilter
-              categoryName={
-                listPageBodySize !== ListPageBodySize.lg && isSearchResultsPage
-                  ? filterSettings[filter.type as VirtualMachineRowFilterType]
-                      ?.filterGroupNameShortcut ?? filter.filterGroupName
-                  : filter.filterGroupName
-              }
-              showAllBadge={
-                filterSettings[filter.type as VirtualMachineRowFilterType]?.showAllBadge
-              }
-              allValues={filter.items}
-              applyFilters={applyFiltersWithQuery}
-              badgeNumber={badgeNumber}
-              filterType={filter.type as VirtualMachineRowFilterType}
-              isToggleDisabled={isToggleDisabled}
-              key={filter.type}
-              tooltipContent={getTooltipContent(filter.type as VirtualMachineRowFilterType, t)}
-            />
-          );
-        })}
+        {selectFilters.map((filterDef) => (
+          <SelectFilterItem
+            toggleTitle={
+              useShortLabels
+                ? filterDef.categoryLabelShort ?? filterDef.categoryLabel
+                : filterDef.categoryLabel
+            }
+            filterDef={filterDef}
+            filters={filters}
+            key={filterDef.id}
+            onSetFilters={handleSetFilters}
+          />
+        ))}
         <NameFilter {...nameFilter} />
-        <AdvancedFiltersToolbarItem
-          advancedFilters={hiddenFilters}
-          applyFilters={applyFiltersWithQuery}
+        <HiddenFilterChips
+          filters={filters}
+          hiddenFilters={hiddenFilters}
+          onSetFilters={handleSetFilters}
         />
       </ToolbarContent>
     </Toolbar>

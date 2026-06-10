@@ -3,7 +3,6 @@ import React, { CSSProperties, FC, ReactNode, useMemo } from 'react';
 import useIsSmallScreen from '@kubevirt-utils/hooks/useIsSmallScreen';
 import useLocalStorage from '@kubevirt-utils/hooks/useLocalStorage';
 import { getContentScrollableElement } from '@kubevirt-utils/utils/utils';
-import { OnFilterChange } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Drawer,
   DrawerContent,
@@ -32,14 +31,12 @@ import './VirtualMachineTreeView.scss';
 
 type VirtualMachineTreeViewProps = {
   children?: ReactNode;
-  onFilterChange?: OnFilterChange;
 } & UseTreeViewData;
 
 const VirtualMachineTreeView: FC<VirtualMachineTreeViewProps> = ({
   children,
   loaded,
   loadError,
-  onFilterChange,
   treeData,
 }) => {
   const isSmallScreen = useIsSmallScreen();
@@ -50,7 +47,6 @@ const VirtualMachineTreeView: FC<VirtualMachineTreeViewProps> = ({
   const { onSelect, selected } = useAutoSelectTreeViewItem({
     dataMap: treeDataMap.value,
     loaded,
-    onFilterChange,
   });
 
   const isOpen = useMemo(() => drawerOpen === SHOW, [drawerOpen]);

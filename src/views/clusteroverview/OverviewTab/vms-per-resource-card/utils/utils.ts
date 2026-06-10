@@ -7,7 +7,7 @@ import {
   LABEL_USED_TEMPLATE_NAME,
   LABEL_USED_TEMPLATE_NAMESPACE,
 } from '@kubevirt-utils/resources/template';
-import { getVMListPathWithRowFilters } from '@kubevirt-utils/resources/vm/utils/utils';
+import { getVMListPathWithFilters } from '@kubevirt-utils/resources/vm/utils/utils';
 
 import { RunningVMsChartLegendLabelItem } from '../RunningVMsChartLegendLabel';
 
@@ -122,5 +122,5 @@ export const getLinkPath = (
       ? { instanceType: 'No+InstanceType', template: 'None' }
       : { [filterKey]: getInstanceTypePrefix(resourceItem.name) };
 
-  return getVMListPathWithRowFilters(namespace, filters, cluster);
+  return getVMListPathWithFilters(namespace, filters, cluster);
 };

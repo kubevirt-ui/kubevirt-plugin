@@ -1273,6 +1273,7 @@
   "N Series": "N 시리즈",
   "N/A": "해당 없음",
   "n1": "n1",
+  "NADs": "NADs",
   "Name": "이름",
   "Name must be unique within a namespace. Is required when creating resources, although some resources may allow a client to request the generation of an appropriate name automatically. Name is primarily intended for creation idempotence and configuration definition. Cannot be updated.": "이름은 네임스페이스 내에서 고유해야 합니다. 리소스를 생성할 때 필수로 지정해야 하지만, 일부 리소스에서 클라이언트가 적절한 이름을 자동으로 생성하도록 요청할 수 있습니다.이름은 주로 생성의 멱등성(idempotence) 보장과 구성 정의를 위해 사용됩니다. 한 번 지정된 이름은 수정할 수 없습니다.",
   "Name of the new template's disk": "Name of the new template's disk",

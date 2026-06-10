@@ -1,13 +1,4 @@
-import React, {
-  FC,
-  forwardRef,
-  RefAttributes,
-  useEffect,
-  useImperativeHandle,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import React, { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import {
   NodeModel,
@@ -20,13 +11,13 @@ import { tourGuideVM } from '@kubevirt-utils/components/GuidedTour/utils/constan
 import { runningTourSignal } from '@kubevirt-utils/components/GuidedTour/utils/guidedTourSignals';
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
 import { buildColumnLayout } from '@kubevirt-utils/components/KubevirtTable/utils';
-import { ExposedFilterFunctions } from '@kubevirt-utils/components/ListPageFilter/types';
 import { TableToolbarActionsFlex } from '@kubevirt-utils/components/TableToolbarActions/TableToolbarActionsFlex';
 import { PageTitles } from '@kubevirt-utils/constants/page-constants';
 import useContainerWidth from '@kubevirt-utils/hooks/useContainerWidth';
 import { KUBEVIRT_APISERVER_PROXY } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
-import useFiltersFromURL from '@kubevirt-utils/hooks/useFiltersFromURL';
+import { KubevirtFilterState } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
+import useKubevirtDataViewFilters from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/useKubevirtDataViewFilters';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettingsTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettingsTableColumns';
 import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
@@ -43,12 +34,7 @@ import useVirtualMachineInstanceMigrations from '@kubevirt-utils/resources/vmim/
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import useIsAllClustersPage from '@multicluster/hooks/useIsAllClustersPage';
-import {
-  DocumentTitle,
-  K8sVerb,
-  ListPageBody,
-  useListPageFilter,
-} from '@openshift-console/dynamic-plugin-sdk';
+import { DocumentTitle, K8sVerb, ListPageBody } from '@openshift-console/dynamic-plugin-sdk';
 import { Flex, Pagination } from '@patternfly/react-core';
 import { useSignals } from '@preact/signals-react/runtime';
 import SearchBar from '@search/components/SearchBar';
@@ -57,15 +43,16 @@ import { useAccessibleResources } from '@virtualmachines/search/hooks/useAccessi
 import useVMSearchQueries from '@virtualmachines/search/hooks/useVMSearchQueries';
 import VirtualMachineFilterToolbar from '@virtualmachines/search/VirtualMachineFilterToolbar';
 import { vmsSignal } from '@virtualmachines/tree/utils/signals';
-import { OBJECTS_FETCHING_LIMIT, VirtualMachineRowFilterType } from '@virtualmachines/utils';
+import { OBJECTS_FETCHING_LIMIT } from '@virtualmachines/utils';
 import { getVMIFromMapper, getVMIMFromMapper } from '@virtualmachines/utils/mappers';
 
 import VirtualMachineBulkActionButton from './components/VirtualMachineBulkActionButton';
 import VirtualMachineEmptyState from './components/VirtualMachineEmptyState/VirtualMachineEmptyState';
 import VirtualMachineSearchResultsHeader from './components/VirtualMachineSearchResultsHeader';
 import VirtualMachineSelection from './components/VirtualMachineSelection/VirtualMachineSelection';
+import useClearFiltersOnClusterNamespaceChange from './hooks/useClearFiltersOnClusterNamespaceChange';
 import { useVirtualMachineInstanceMapper } from './hooks/useVirtualMachineInstanceMapper';
-import { useVMListFilters } from './hooks/useVMListFilters/useVMListFilters';
+import useVMListFilters from './hooks/useVMListFilters';
 import useVMListTelemetry from './hooks/useVMListTelemetry';
 import useVMMetrics from './hooks/useVMMetrics';
 import { VM_FILTER_OPTIONS } from './utils/constants';
@@ -81,11 +68,10 @@ type VirtualMachinesListProps = {
   allVMsLoaded?: boolean;
   cluster?: string;
   isSearchResultsPage?: boolean;
-  kind: string;
   namespace: string;
-} & RefAttributes<ExposedFilterFunctions | null>;
+};
 
-const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref) => {
+const VirtualMachinesList: FC<VirtualMachinesListProps> = (props) => {
   const { t } = useKubevirtTranslation();
   const { allVMsLoaded, cluster, isSearchResultsPage = false, namespace } = props;
 
@@ -143,36 +129,48 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref
   const vmimMapper = useVirtualMachineInstanceMigrationMapper(vmims);
   const pvcMapper = usePVCMapper(namespace, cluster);
 
-  const { filtersWithSelect, hiddenFilters } = useVMListFilters(vmiMapper, pvcMapper);
-
-  const filtersFromURL = useFiltersFromURL([...filtersWithSelect, ...hiddenFilters]);
+  const filterDefinitions = useVMListFilters(vmiMapper, pvcMapper);
+  const {
+    clearAllFilters,
+    filteredData: filteredVMs,
+    filters,
+    onSetFilters,
+  } = useKubevirtDataViewFilters({
+    data: vmsToShow ?? [],
+    filterDefinitions,
+  });
 
   const [pagination, setPagination] = useState(paginationInitialState);
 
-  const [, filteredVMs, onFilterChange] = useListPageFilter<V1VirtualMachine, V1VirtualMachine>(
-    vmsToShow,
-    [...filtersWithSelect, ...hiddenFilters],
-    filtersFromURL,
+  const resetPagination = useCallback(() => {
+    setPagination((prev) => ({
+      ...prev,
+      endIndex: prev?.perPage,
+      page: 1,
+      startIndex: 0,
+    }));
+  }, []);
+
+  const handleSetFilters = useCallback(
+    (newFilters: Partial<KubevirtFilterState>) => {
+      deselectAllVMs();
+      resetPagination();
+      onSetFilters(newFilters);
+    },
+    [onSetFilters, resetPagination],
   );
+
+  useClearFiltersOnClusterNamespaceChange({
+    cluster,
+    filters,
+    namespace,
+    onSetFilters,
+    resetPagination,
+  });
 
   useEffect(() => {
     deselectAllVMs();
-  }, [namespace, cluster]);
-
-  useEffect(() => {
-    deselectAllVMs();
-    Object.values(VirtualMachineRowFilterType).forEach((filterType) => {
-      onFilterChange?.(filterType, filtersFromURL[filterType]);
-    });
-  }, [query]);
-
-  useImperativeHandle(
-    ref,
-    () => ({
-      onFilterChange,
-    }),
-    [onFilterChange],
-  );
+  }, [namespace, cluster, query]);
 
   const listPageBodyRef = useRef<HTMLDivElement>(null);
   const listPageBodySize = getListPageBodySize(useContainerWidth(listPageBodyRef));
@@ -277,29 +275,26 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref
           ) : (
             <>
               <SearchBar
-                onFilterChange={onFilterChange}
+                clearAllFilters={clearAllFilters}
+                onSetFilters={handleSetFilters}
                 vmis={vmis}
                 vmisLoaded={vmisLoaded}
                 vms={vmsToShow}
                 vmsLoaded={vmsLoaded}
               />
               <VirtualMachineFilterToolbar
-                onFilterChange={(...args) => {
+                clearAllFilters={() => {
                   deselectAllVMs();
-                  onFilterChange(...args);
-                  setPagination((prevPagination) => ({
-                    ...prevPagination,
-                    endIndex: prevPagination?.perPage,
-                    page: 1,
-                    startIndex: 0,
-                  }));
+                  resetPagination();
+                  clearAllFilters();
                 }}
                 className="list-managment-group__toolbar"
-                filtersWithSelect={filtersWithSelect}
-                hiddenFilters={hiddenFilters}
+                filterDefinitions={filterDefinitions}
+                filters={filters}
                 isSearchResultsPage={isSearchResultsPage}
                 listPageBodySize={listPageBodySize}
                 loaded
+                onSetFilters={handleSetFilters}
               />
               <div className="list-managment-group">
                 <VirtualMachineSelection pagination={pagination} vms={filteredVMs} />
@@ -346,6 +341,6 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref
       </ListPageBody>
     </>
   );
-});
+};
 
 export default VirtualMachinesList;

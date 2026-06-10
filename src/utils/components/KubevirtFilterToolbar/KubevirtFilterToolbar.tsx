@@ -4,8 +4,10 @@ import {
   KubevirtFilter,
   KubevirtFilterLayout,
   KubevirtFilterState,
+  OnSetFilters,
 } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { ColumnLayout, K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { Toolbar, ToolbarContent, ToolbarToggleGroup } from '@patternfly/react-core';
 import { FilterIcon } from '@patternfly/react-icons';
@@ -13,6 +15,7 @@ import { FilterIcon } from '@patternfly/react-icons';
 import ListPageFilterToolbarActions from '../ListPageFilter/components/ListPageFilterToolbarActions';
 
 import GroupedFilterDropdown from './components/GroupedFilterDropdown';
+import HiddenFilterChips from './components/HiddenFilterChips';
 import SelectFilterItem from './components/SelectFilterItem';
 import TextSearchFilters from './components/TextSearchFilters';
 
@@ -24,7 +27,7 @@ type KubevirtFilterToolbarProps = {
   filters: KubevirtFilterState;
   hideColumnManagement?: boolean;
   loaded?: boolean;
-  onSetFilters: (newFilters: Partial<KubevirtFilterState>) => void;
+  onSetFilters: OnSetFilters;
   toolbarEndContent?: ReactNode;
 };
 
@@ -42,11 +45,18 @@ const KubevirtFilterToolbar: FC<KubevirtFilterToolbarProps> = ({
   const { t } = useKubevirtTranslation();
 
   const groupedFilters = useMemo(
-    () => filterDefinitions.filter((f) => f.filterLayout !== KubevirtFilterLayout.SELECT),
+    () =>
+      filterDefinitions.filter(
+        (f) => ![KubevirtFilterLayout.HIDDEN, KubevirtFilterLayout.SELECT].includes(f.filterLayout),
+      ),
     [filterDefinitions],
   );
   const selectFilters = useMemo(
     () => filterDefinitions.filter((f) => f.filterLayout === KubevirtFilterLayout.SELECT),
+    [filterDefinitions],
+  );
+  const hiddenFilters = useMemo(
+    () => filterDefinitions.filter((f) => f.filterLayout === KubevirtFilterLayout.HIDDEN),
     [filterDefinitions],
   );
   const [searchInputText, setSearchInputText] = useState('');
@@ -65,12 +75,14 @@ const KubevirtFilterToolbar: FC<KubevirtFilterToolbarProps> = ({
     >
       <ToolbarContent>
         <ToolbarToggleGroup breakpoint="md" toggleIcon={<FilterIcon />}>
-          <GroupedFilterDropdown
-            data={data}
-            filters={filters}
-            groupedFilters={groupedFilters}
-            onSetFilters={onSetFilters}
-          />
+          {!isEmpty(groupedFilters) && (
+            <GroupedFilterDropdown
+              data={data}
+              filters={filters}
+              groupedFilters={groupedFilters}
+              onSetFilters={onSetFilters}
+            />
+          )}
           {selectFilters.map((filterDef) => (
             <SelectFilterItem
               filterDef={filterDef}
@@ -85,6 +97,11 @@ const KubevirtFilterToolbar: FC<KubevirtFilterToolbarProps> = ({
             onSetFilters={onSetFilters}
             searchInputText={searchInputText}
             setSearchInputText={setSearchInputText}
+          />
+          <HiddenFilterChips
+            filters={filters}
+            hiddenFilters={hiddenFilters}
+            onSetFilters={onSetFilters}
           />
         </ToolbarToggleGroup>
         <ListPageFilterToolbarActions

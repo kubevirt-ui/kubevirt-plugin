@@ -10,14 +10,17 @@ export enum SchedulingKind {
   NODE_SELECTOR = 'nodeSelector',
 }
 
+export enum GuestAgentStatus {
+  NOT_REPORTING = 'notReporting',
+  REPORTING = 'reporting',
+}
+
 export const skipRowFilterPrefix = new Set([
   VirtualMachineRowFilterType.Name,
   VirtualMachineRowFilterType.Labels,
   VirtualMachineRowFilterType.IP,
 ]);
 
-export const validSearchQueryParams: string[] = Object.values(VirtualMachineRowFilterType).map(
-  (type) => (skipRowFilterPrefix.has(type) ? type : `rowFilter-${type}`),
-);
+export const validSearchQueryParams: string[] = Object.values(VirtualMachineRowFilterType);
 
 export const VM_SEARCH_INPUT_ID = 'vm-search-input';

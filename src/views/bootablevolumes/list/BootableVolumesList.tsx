@@ -51,7 +51,7 @@ const BootableVolumesList: FC = () => {
   const filterDefinitions = useBootableVolumesFilters(bootableVolumes);
   const { clearAllFilters, filteredData, filters, onSetFilters } = useKubevirtDataViewFilters({
     data: bootableVolumes,
-    filters: filterDefinitions,
+    filterDefinitions,
   });
 
   const { handlePerPageSelect, handleSetPage, pagination } = usePaginationWithFilters(

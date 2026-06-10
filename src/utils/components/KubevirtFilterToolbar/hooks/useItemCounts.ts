@@ -11,9 +11,9 @@ const useItemCounts = (
     const counts: Record<string, Record<string, number>> = {};
     for (const filterDef of filters) {
       counts[filterDef.id] = {};
-      for (const option of filterDef.options) {
-        counts[filterDef.id][option.value] =
-          data?.filter((obj) => filterDef.match(obj, [option.value])).length ?? 0;
+      for (const { value } of filterDef.options ?? []) {
+        counts[filterDef.id][value] =
+          data?.filter((obj) => filterDef.match(obj, [value])).length ?? 0;
       }
     }
     return counts;

@@ -27,7 +27,7 @@ import {
   ProjectDiagramIcon,
 } from '@patternfly/react-icons';
 import { signal } from '@preact/signals-react';
-import { skipRowFilterPrefix } from '@search/utils/constants';
+import { skipRowFilterPrefix, validSearchQueryParams } from '@search/utils/constants';
 import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
 import { statusIcon } from '../icons/utils';
@@ -511,13 +511,16 @@ export const getClusterElement = (treeData: TreeViewDataItem[]): HTMLElement => 
   return document.getElementById(targetId)?.querySelector('.pf-v6-c-tree-view__node-text');
 };
 
+const plainFilterKeys = new Set<string>(validSearchQueryParams);
+
 const removeFilterQueryParams = (query?: string): string => {
   const params = new URLSearchParams(query ?? '');
 
   [...params.keys()].forEach((key) => {
     if (
       key.startsWith(ROW_FILTERS_PREFIX) ||
-      skipRowFilterPrefix.has(key as VirtualMachineRowFilterType)
+      skipRowFilterPrefix.has(key as VirtualMachineRowFilterType) ||
+      plainFilterKeys.has(key)
     ) {
       params.delete(key);
     }

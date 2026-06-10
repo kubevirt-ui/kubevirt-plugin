@@ -1,39 +1,42 @@
 import { useEffect, useState } from 'react';
 
-import useQuery from '@kubevirt-utils/hooks/useQuery';
+import {
+  KubevirtFilterState,
+  OnSetFilters,
+} from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { useDebounceCallback } from '@overview/utils/hooks/useDebounceCallback';
-import { VirtualMachineRowFilterType } from '@virtualmachines/utils/constants';
 
 import { NameFilterProps } from '../components/NameFilter';
 
-type UseNameFilter = (applyFilters: (type: string, value?: string) => void) => NameFilterProps;
-
-const useNameFilter: UseNameFilter = (applyFilters) => {
-  const queryParams = useQuery();
-  const nameQuery = queryParams.get(VirtualMachineRowFilterType.Name);
-
-  const [inputText, setInputText] = useState(nameQuery || '');
+const useNameFilter = (
+  filters: KubevirtFilterState,
+  onSetFilters: OnSetFilters,
+): NameFilterProps => {
+  const nameFromFilters = filters.name?.[0] ?? '';
+  const [inputText, setInputText] = useState(nameFromFilters);
 
   useEffect(() => {
-    setInputText(nameQuery || '');
-  }, [nameQuery]);
+    setInputText(nameFromFilters);
+  }, [nameFromFilters]);
 
-  const applyFiltersWithDebounce = useDebounceCallback(applyFilters, 250);
+  const debouncedSetFilters = useDebounceCallback(onSetFilters, 250);
 
   const onDelete = () => {
     setInputText('');
-    applyFilters(VirtualMachineRowFilterType.Name);
+    onSetFilters({ name: [] });
   };
 
   const onTextChange = (_, newInput: string) => {
     setInputText(newInput);
-    applyFiltersWithDebounce(VirtualMachineRowFilterType.Name, newInput);
+    const trimmed = newInput.trim();
+    debouncedSetFilters({ name: trimmed ? [trimmed] : [] });
   };
 
   return {
     inputText,
     onDelete,
     onTextChange,
+    resetInputText: () => setInputText(''),
   };
 };
 

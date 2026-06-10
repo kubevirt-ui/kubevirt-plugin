@@ -11,6 +11,7 @@ export type NameFilterProps = {
   inputText: string;
   onDelete: () => void;
   onTextChange: SearchInputProps['onChange'];
+  resetInputText: () => void;
 };
 
 const NameFilter: FC<NameFilterProps> = ({ inputText, onDelete, onTextChange }) => {

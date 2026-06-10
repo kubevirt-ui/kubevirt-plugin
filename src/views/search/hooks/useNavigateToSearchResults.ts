@@ -1,49 +1,48 @@
 import { useCallback } from 'react';
-import { useNavigate } from 'react-router';
+import { useLocation, useNavigate } from 'react-router';
 
-import { useQueryParamsMethods } from '@kubevirt-utils/components/ListPageFilter/hooks/useQueryParamsMethods';
+import { OnSetFilters } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import useVMSearchURL from '@multicluster/hooks/useVMSearchURL';
-import { OnFilterChange } from '@openshift-console/dynamic-plugin-sdk';
 import { generateQueryParams } from '@search/utils/query';
-import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
 import { AdvancedSearchQueryInputs } from '../utils/types';
 
 type UseNavigateToSearchResults = (
-  onFilterChange: OnFilterChange,
+  onSetFilters: OnSetFilters,
+  clearAllFilters: () => void,
 ) => (searchInputs: AdvancedSearchQueryInputs) => void;
 
-export const useNavigateToSearchResults: UseNavigateToSearchResults = (onFilterChange) => {
+export const useNavigateToSearchResults: UseNavigateToSearchResults = (
+  onSetFilters,
+  clearAllFilters,
+) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const searchURL = useVMSearchURL();
-  const { setAllQueryArguments } = useQueryParamsMethods();
 
-  const resetCurrentFilter = useCallback(() => {
-    Object.values(VirtualMachineRowFilterType).forEach((type) => {
-      if (type === VirtualMachineRowFilterType.Labels) {
-        onFilterChange(type, { all: [] });
-      } else {
-        onFilterChange(type, { selected: [] });
-      }
-    });
-  }, [onFilterChange]);
-
-  const applyFilter = useCallback(
-    (searchInputs: AdvancedSearchQueryInputs) => {
-      resetCurrentFilter();
-
-      const queryArgs = generateQueryParams(searchInputs);
-
-      setAllQueryArguments(queryArgs);
-    },
-    [setAllQueryArguments, resetCurrentFilter],
-  );
+  const isOnSearchResultsPage = location.pathname.endsWith(searchURL);
 
   return useCallback(
     (searchInputs: AdvancedSearchQueryInputs) => {
-      navigate(searchURL);
-      applyFilter(searchInputs);
+      const queryArgs = generateQueryParams(searchInputs);
+
+      if (isOnSearchResultsPage) {
+        clearAllFilters();
+        onSetFilters(queryArgs);
+        return;
+      }
+
+      const params = new URLSearchParams();
+
+      Object.entries(queryArgs).forEach(([key, values]) => {
+        values.forEach((value) => {
+          params.append(key, value);
+        });
+      });
+      const queryString = params.toString();
+
+      navigate(queryString ? `${searchURL}?${queryString}` : searchURL);
     },
-    [navigate, applyFilter, searchURL],
+    [navigate, searchURL, onSetFilters, clearAllFilters, isOnSearchResultsPage],
   );
 };
