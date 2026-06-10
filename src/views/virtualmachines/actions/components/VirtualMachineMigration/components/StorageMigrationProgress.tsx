@@ -46,13 +46,8 @@ const StorageMigrationProgress: FC<StorageMigrationProgressProps> = ({
     storageMigrationPlan,
   });
 
-  const onHeaderClose = migrationCompleted || hasFailed ? onClose : onCancelMigration;
-
   return (
-    <MigrationStatusShell
-      isTerminal={migrationCompleted || hasFailed}
-      onHeaderClose={onHeaderClose}
-    >
+    <MigrationStatusShell onHeaderClose={onClose}>
       <MigrationProgressDisplay
         basePath={basePath}
         cancelError={cancelError}
