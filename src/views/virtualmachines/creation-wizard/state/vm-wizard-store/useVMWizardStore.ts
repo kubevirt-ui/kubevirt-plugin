@@ -4,12 +4,34 @@ import { Template } from '@kubevirt-utils/resources/template';
 import { clearCustomizeInstanceType } from '@kubevirt-utils/store/customizeInstanceType';
 import useInstanceTypeVMStore from '@virtualmachines/creation-wizard/state/instance-type-vm-store/useInstanceTypeVMStore';
 import { initialVMWizardState } from '@virtualmachines/creation-wizard/state/vm-wizard-store/utils/state';
-import { VMWizardStore } from '@virtualmachines/creation-wizard/state/vm-wizard-store/utils/types';
+import {
+  InitializeVMCreateWizardValues,
+  VMWizardStore,
+} from '@virtualmachines/creation-wizard/state/vm-wizard-store/utils/types';
 import { VMCreationMethod, VMWizardStep } from '@virtualmachines/creation-wizard/utils/constants';
+
+const clearWizardRelatedStores = (): void => {
+  clearCustomizeInstanceType();
+  useInstanceTypeVMStore.getState().resetInstanceTypeVMState();
+};
 
 const useVMWizardStore = create<VMWizardStore>()((set) => {
   return {
     ...initialVMWizardState,
+    initializeVMCreationWizardValues: ({
+      cluster,
+      isAdmin,
+      namespace,
+    }: InitializeVMCreateWizardValues) => {
+      clearWizardRelatedStores();
+      set(({ project: previousProject }) => ({
+        ...initialVMWizardState,
+        cluster,
+        // Non-admin: always use the active namespace.
+        // Admin: keep their previously selected project if set, otherwise use the active namespace.
+        project: !isAdmin ? namespace : previousProject || namespace,
+      }));
+    },
     markStepVisited: (stepId: string) =>
       set((state) => {
         if (state.visitedSteps.has(stepId)) return state;
@@ -18,8 +40,7 @@ const useVMWizardStore = create<VMWizardStore>()((set) => {
         return { visitedSteps: next };
       }),
     resetWizardState: () => {
-      clearCustomizeInstanceType();
-      useInstanceTypeVMStore.getState().resetInstanceTypeVMState();
+      clearWizardRelatedStores();
       set({ ...initialVMWizardState, visitedSteps: new Set([VMWizardStep.DEPLOYMENT_DETAILS]) });
     },
     setCluster: (cluster: string) => set({ cluster }),

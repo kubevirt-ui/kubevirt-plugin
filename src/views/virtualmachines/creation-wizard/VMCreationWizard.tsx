@@ -43,11 +43,9 @@ const VMCreationWizard: FC = () => {
   const { t } = useKubevirtTranslation();
   const {
     creationMethod,
+    initializeVMCreationWizardValues,
     markStepVisited,
-    project,
     resetWizardState,
-    setCluster,
-    setProject,
     setTemplatesDrawerIsOpen,
   } = useVMWizardStore();
   const syncDescription = useSyncDescription();
@@ -63,29 +61,20 @@ const VMCreationWizard: FC = () => {
 
   useEffect(() => {
     if (!hasInitialized.current) {
-      const currentProject = project; // capture before resetWizardState clears it
-      resetWizardState();
       setTemplatesDrawerIsOpen(false);
-
-      setCluster(clusterParam);
-      // Non-admin: always use the active namespace.
-      // Admin: keep their previously selected project if set, otherwise use the active namespace.
-      setProject(!isAdmin ? namespace : currentProject || namespace);
+      initializeVMCreationWizardValues({ cluster: clusterParam, isAdmin, namespace });
       hasInitialized.current = true;
     }
+
+    return () => resetWizardState();
   }, [
     clusterParam,
     isAdmin,
     namespace,
-    project,
     resetWizardState,
-    setCluster,
-    setProject,
     setTemplatesDrawerIsOpen,
+    initializeVMCreationWizardValues,
   ]);
-
-  // Reset wizard state only on unmount (separate from init to avoid wiping user selections when store values in the dep array change).
-  useEffect(() => () => resetWizardState(), []);
 
   const isInstanceTypeMethod = isInstanceTypeCreationMethod(creationMethod);
   const isCloneMethod = isCloneCreationMethod(creationMethod);
