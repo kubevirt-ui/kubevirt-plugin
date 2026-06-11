@@ -9,6 +9,10 @@
     "@octokit/rest": "^21.1.1",
     "tsx": "^4.19.4"
   },
+  "scripts": {
+    "test": "node --import tsx --test src/**/*.test.ts",
+    "check-types": "tsc --noEmit"
+  },
   "devDependencies": {
     "@types/node": "^22.15.17",
     "typescript": "^5.8.3"

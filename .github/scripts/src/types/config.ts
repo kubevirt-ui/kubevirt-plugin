@@ -36,3 +36,9 @@ export const BLOCK_LABEL = 'do-not-merge/jira-invalid';
 export const SKIP_LABEL = 'skip-jira-check';
 export const CONFLICT_LABEL = 'do-not-merge/has-conflicts';
 export const MIN_STORY_POINTS = 2;
+
+export const AI_CONFIG_BLOCK_LABEL = 'do-not-merge/ai-config-review';
+export const AI_CONFIG_SKIP_LABEL = 'skip-ai-config-check';
+export const AI_CONFIG_ALERT_LABEL = 'ai-config-changed';
+export const AI_CONFIG_REVIEWED_LABEL = 'ai-config-reviewed';
+export const AI_CONFIG_STATUS_CONTEXT = 'ai-config-validation';

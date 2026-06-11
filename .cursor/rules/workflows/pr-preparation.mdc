@@ -252,10 +252,25 @@ When generating PR descriptions, also include:
 
 ---
 
-## 8. Reviewer Selection
+## 8. AI / Editor Configuration PRs
+
+If the PR modifies `.cursor/`, `.claude/`, `.vscode/`, `.github/scripts/`, or PR validation workflows:
+
+- [ ] CodeRabbit security findings reviewed and resolved
+- [ ] A designated reviewer reads the **full diff**
+- [ ] Check for Miasma-style attacks: `folderOpen` tasks, SessionStart hooks, `alwaysApply` setup rules, MCP hijacking
+- [ ] No prompt injection, credential exfiltration, or merge-gate bypass instructions
+- [ ] Maintainer adds **`ai-config-reviewed`** label after approval (required to merge — label change re-runs the check)
+
+See `AI_README.md` for the full merge policy. Do not use PR comments to approve; labels only.
+
+---
+
+## 9. Reviewer Selection
 
 ### Who to Include
 - **Required**: At least one code owner
+- **AI/editor config**: Security reviewer when `.cursor/`, `.claude/`, `.vscode/`, or `.github/scripts/` change
 - **Domain expert**: For KubeVirt-specific logic
 - **UX**: For significant UI changes
 - **QE**: For testability concerns
@@ -269,7 +284,7 @@ When generating PR descriptions, also include:
 
 ---
 
-## 9. Post-PR Actions
+## 10. Post-PR Actions
 
 ### Respond to Feedback
 - Address all comments
@@ -290,7 +305,7 @@ When generating PR descriptions, also include:
 
 ---
 
-## 10. Final Checklist
+## 11. Final Checklist
 
 ### Code
 - [ ] All checks pass (types, lint, test)
@@ -304,6 +319,7 @@ When generating PR descriptions, also include:
 - [ ] JIRA linked
 - [ ] Demo attached (if UI)
 - [ ] Reviewers assigned
+- [ ] `ai-config-reviewed` label added (if AI/editor config or `.github/scripts/` changed)
 
 ### Ready
 - [ ] Branch up-to-date
