@@ -1,4 +1,4 @@
-import React, { FC, useRef, useState } from 'react';
+import React, { FC, RefObject } from 'react';
 
 import {
   KubevirtFilter,
@@ -17,21 +17,28 @@ import './search-bar.scss';
 type SearchBarProps = {
   clearAllFilters: () => void;
   filterDefinitions: KubevirtFilter[];
+  inputRef?: RefObject<HTMLInputElement>;
+  inputValue: string;
   onSetFilters: OnSetFilters;
+  setInputValue: (value: string) => void;
 };
 
-const SearchBar: FC<SearchBarProps> = ({ clearAllFilters, filterDefinitions, onSetFilters }) => {
-  const searchInputRef = useRef<HTMLInputElement>();
+const SearchBar: FC<SearchBarProps> = ({
+  clearAllFilters,
+  filterDefinitions,
+  inputRef,
+  inputValue,
+  onSetFilters,
+  setInputValue,
+}) => {
   const showSearchModal = useShowAdvancedSearchModal(onSetFilters, clearAllFilters);
-
-  const [inputValue, setInputValue] = useState('');
 
   return (
     <InputGroup className="pf-v6-u-mb-md" data-test="vm-adv-search-toolbar">
       <InputGroupItem isFill>
         <SearchTextInput
           filterDefinitions={filterDefinitions}
-          inputRef={searchInputRef}
+          inputRef={inputRef}
           inputValue={inputValue}
           onOpenAdvancedSearch={() => showSearchModal()}
           onSetFilters={onSetFilters}

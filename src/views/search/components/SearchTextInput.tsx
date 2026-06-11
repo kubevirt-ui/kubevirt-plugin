@@ -114,13 +114,14 @@ const SearchTextInput: FC<SearchTextInputProps> = ({
 
   const searchInput = (
     <div className="pf-v6-u-w-100" ref={toggleRef}>
-      <TextInputGroup data-test={VM_SEARCH_INPUT_ID} id={VM_SEARCH_INPUT_ID} innerRef={inputRef}>
+      <TextInputGroup data-test={VM_SEARCH_INPUT_ID} id={VM_SEARCH_INPUT_ID}>
         <TextInputGroupMain
           icon={<SearchIcon />}
           onChange={onChange}
           onFocus={onInputFocus}
           onKeyDown={onKeyDown}
           placeholder={t('Search virtual machines...')}
+          ref={inputRef}
           value={inputValue}
         />
         <TextInputGroupUtilities>
@@ -134,10 +135,13 @@ const SearchTextInput: FC<SearchTextInputProps> = ({
           )}
           <Tooltip content={t('Advanced search')}>
             <Button
+              onClick={() => {
+                onCloseDropdown();
+                onOpenAdvancedSearch();
+              }}
               aria-label={t('Advanced search')}
               data-test="vm-advanced-search-button"
               icon={<AdvancedSearchIcon isLarge />}
-              onClick={onOpenAdvancedSearch}
               variant="plain"
             />
           </Tooltip>

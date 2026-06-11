@@ -6,6 +6,7 @@ import {
   KubevirtFilterState,
   OnSetFilters,
 } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
+import { OnEditChip } from '@virtualmachines/list/hooks/useEditChip';
 
 import { getOnSelect } from '../utils';
 
@@ -14,6 +15,7 @@ import ToolbarFilterMultiChip from './ToolbarFilter/ToolbarFilterMultiChip';
 type SelectFilterItemProps = {
   filterDef: KubevirtFilter;
   filters: KubevirtFilterState;
+  onEditChip?: OnEditChip;
   onSetFilters: OnSetFilters;
   toggleTitle?: string;
 };
@@ -21,6 +23,7 @@ type SelectFilterItemProps = {
 const SelectFilterItem: FC<SelectFilterItemProps> = ({
   filterDef,
   filters,
+  onEditChip,
   onSetFilters,
   toggleTitle,
 }) => {
@@ -28,7 +31,12 @@ const SelectFilterItem: FC<SelectFilterItemProps> = ({
   const onSelect = getOnSelect(filters, onSetFilters);
 
   return (
-    <ToolbarFilterMultiChip filterDef={filterDef} filters={filters} onSetFilters={onSetFilters}>
+    <ToolbarFilterMultiChip
+      filterDef={filterDef}
+      filters={filters}
+      onEditChip={onEditChip}
+      onSetFilters={onSetFilters}
+    >
       <CheckboxSelect
         options={filterDef.options?.map(({ label, value }) => ({
           children: label,

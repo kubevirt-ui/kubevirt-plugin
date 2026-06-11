@@ -6,18 +6,21 @@ import {
   OnSetFilters,
 } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { OnEditChip } from '@virtualmachines/list/hooks/useEditChip';
 
 import ToolbarFilterMultiChip from './ToolbarFilter/ToolbarFilterMultiChip';
 
 type HiddenFilterChipsProps = {
   filters: KubevirtFilterState;
   hiddenFilters: KubevirtFilter[];
+  onEditChip?: OnEditChip;
   onSetFilters: OnSetFilters;
 };
 
 const HiddenFilterChips: FC<HiddenFilterChipsProps> = ({
   filters,
   hiddenFilters,
+  onEditChip,
   onSetFilters,
 }) => {
   if (isEmpty(hiddenFilters)) return null;
@@ -29,6 +32,7 @@ const HiddenFilterChips: FC<HiddenFilterChipsProps> = ({
           filterDef={filterDef}
           filters={filters}
           key={filterDef.id}
+          onEditChip={onEditChip}
           onSetFilters={onSetFilters}
         />
       ))}

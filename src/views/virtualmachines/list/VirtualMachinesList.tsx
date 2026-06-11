@@ -48,9 +48,11 @@ import { getVMIFromMapper, getVMIMFromMapper } from '@virtualmachines/utils/mapp
 
 import VirtualMachineBulkActionButton from './components/VirtualMachineBulkActionButton';
 import VirtualMachineEmptyState from './components/VirtualMachineEmptyState/VirtualMachineEmptyState';
+import VirtualMachineFilteredEmptyState from './components/VirtualMachineFilteredEmptyState/VirtualMachineFilteredEmptyState';
 import VirtualMachineSearchResultsHeader from './components/VirtualMachineSearchResultsHeader';
 import VirtualMachineSelection from './components/VirtualMachineSelection/VirtualMachineSelection';
 import useClearFiltersOnClusterNamespaceChange from './hooks/useClearFiltersOnClusterNamespaceChange';
+import { useEditChip } from './hooks/useEditChip';
 import { useVirtualMachineInstanceMapper } from './hooks/useVirtualMachineInstanceMapper';
 import useVMListFilters from './hooks/useVMListFilters';
 import useVMListTelemetry from './hooks/useVMListTelemetry';
@@ -168,6 +170,9 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = (props) => {
     deselectAllVMs();
   }, [namespace, cluster, query]);
 
+  const [searchInputValue, setSearchInputValue] = useState('');
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
   const listPageBodyRef = useRef<HTMLDivElement>(null);
   const listPageBodySize = getListPageBodySize(useContainerWidth(listPageBodyRef));
 
@@ -247,6 +252,19 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = (props) => {
     [vmiMapper, vmimMapper, pvcMapper],
   );
 
+  const clearAllFiltersWithReset = useCallback(() => {
+    deselectAllVMs();
+    resetPagination();
+    clearAllFilters();
+  }, [clearAllFilters, resetPagination]);
+
+  const handleEditChip = useEditChip({
+    filters,
+    onSetFilters: handleSetFilters,
+    searchInputRef,
+    setSearchInputValue: setSearchInputValue,
+  });
+
   const exportButton = (
     <KubevirtTableExport<V1VirtualMachine, VMCallbacks>
       activeColumnKeys={activeColumnKeys}
@@ -273,20 +291,20 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = (props) => {
               <SearchBar
                 clearAllFilters={clearAllFilters}
                 filterDefinitions={filterDefinitions}
+                inputRef={searchInputRef}
+                inputValue={searchInputValue}
                 onSetFilters={handleSetFilters}
+                setInputValue={setSearchInputValue}
               />
               <VirtualMachineFilterToolbar
-                clearAllFilters={() => {
-                  deselectAllVMs();
-                  resetPagination();
-                  clearAllFilters();
-                }}
                 className="list-managment-group__toolbar"
+                clearAllFilters={clearAllFiltersWithReset}
                 filterDefinitions={filterDefinitions}
                 filters={filters}
                 isSearchResultsPage={isSearchResultsPage}
                 listPageBodySize={listPageBodySize}
                 loaded
+                onEditChip={handleEditChip}
                 onSetFilters={handleSetFilters}
               />
               <div className="list-managment-group">
@@ -315,6 +333,13 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = (props) => {
                 </Flex>
               </div>
               <KubevirtTable<V1VirtualMachine, VMCallbacks>
+                noFilteredDataMsg={
+                  <VirtualMachineFilteredEmptyState
+                    clearAllFilters={clearAllFiltersWithReset}
+                    filters={filters}
+                    searchInputRef={searchInputRef}
+                  />
+                }
                 activeColumnKeys={activeColumnKeys}
                 ariaLabel={t('VirtualMachines table')}
                 callbacks={callbacks}
@@ -324,7 +349,6 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = (props) => {
                 initialSortKey={VM_COLUMN_KEYS.name}
                 loaded={loaded}
                 loadError={vmsLoadError}
-                noFilteredDataMsg={t('No VirtualMachines found')}
                 pagination={pagination}
                 unfilteredData={allVMsInNamespace}
               />

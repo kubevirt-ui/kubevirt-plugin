@@ -1,7 +1,5 @@
 import { useMemo } from 'react';
 
-import { fuzzyCaseInsensitive } from '@kubevirt-utils/components/ListPageFilter/utils';
-import { getName } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { useDataViewFilters } from '@patternfly/react-data-view';
@@ -9,6 +7,7 @@ import { useDataViewFilters } from '@patternfly/react-data-view';
 import { useKubevirtTranslation } from '../useKubevirtTranslation';
 
 import { getLabelFilter } from './filters/getLabelFilter';
+import { getNameFilter } from './filters/getNameFilter';
 import useMigratedSearchParams from './hooks/useMigratedSearchParams';
 import useSyncedLabelsFilter from './hooks/useSyncedLabelsFilter';
 import { KubevirtFilter, KubevirtFilterState, OnSetFilters } from './types';
@@ -34,19 +33,16 @@ const useKubevirtDataViewFilters = <T extends K8sResourceCommon>({
   const [searchParams, setSearchParams] = useMigratedSearchParams();
 
   const filterDefinitions = useMemo(
-    () => [getLabelFilter(t), ...filterDefinitionsProp],
+    () => [getNameFilter(t), getLabelFilter(t), ...filterDefinitionsProp],
     [filterDefinitionsProp, t],
   );
 
   const initialFilters = useMemo<KubevirtFilterState>(
     () =>
-      filterDefinitions.reduce<KubevirtFilterState>(
-        (acc, filter) => {
-          acc[filter.id] = filter.defaultSelected ?? [];
-          return acc;
-        },
-        { name: [] },
-      ),
+      filterDefinitions.reduce<KubevirtFilterState>((acc, filter) => {
+        acc[filter.id] = filter.defaultSelected ?? [];
+        return acc;
+      }, {} as KubevirtFilterState),
     [filterDefinitions],
   );
 
@@ -64,22 +60,16 @@ const useKubevirtDataViewFilters = <T extends K8sResourceCommon>({
 
   const filteredData = useMemo(
     () =>
-      data?.filter((obj) => {
-        const nameFilter = syncedFilters.name[0] ?? '';
-        const matchesName = !nameFilter || fuzzyCaseInsensitive(nameFilter, getName(obj) ?? '');
+      data?.filter((obj) =>
+        filterDefinitions.every((filterDef) => {
+          const selected = syncedFilters[filterDef.id];
 
-        return (
-          matchesName &&
-          filterDefinitions.every((filterDef) => {
-            const selected = syncedFilters[filterDef.id];
-
-            if (filterDef.applyWhenEmpty) {
-              return matchesWithExclusion(filterDef, obj, selected ?? []);
-            }
-            return isEmpty(selected) || matchesWithExclusion(filterDef, obj, selected);
-          })
-        );
-      }) ?? [],
+          if (filterDef.applyWhenEmpty) {
+            return matchesWithExclusion(filterDef, obj, selected ?? []);
+          }
+          return isEmpty(selected) || matchesWithExclusion(filterDef, obj, selected);
+        }),
+      ) ?? [],
     [data, syncedFilters, filterDefinitions],
   );
 
