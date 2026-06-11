@@ -1,0 +1,81 @@
+import React, { FC, memo } from 'react';
+
+import Loading from '@kubevirt-utils/components/Loading/Loading';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import {
+  Button,
+  ButtonVariant,
+  EmptyState,
+  EmptyStateActions,
+  EmptyStateBody,
+  EmptyStateFooter,
+  EmptyStateVariant,
+} from '@patternfly/react-core';
+
+export type TemplatesCatalogEmptyStateProps = {
+  bootSourcesLoaded: boolean;
+  isNamespaceEmpty?: boolean;
+  onClearFilters: () => void;
+};
+
+const TemplatesCatalogEmptyState: FC<TemplatesCatalogEmptyStateProps> = memo(
+  ({ bootSourcesLoaded, isNamespaceEmpty, onClearFilters }) => {
+    const { t } = useKubevirtTranslation();
+
+    if (!bootSourcesLoaded) {
+      return (
+        <EmptyState
+          headingLevel="h4"
+          titleText={t('Loading templates with available boot source')}
+          variant={EmptyStateVariant.lg}
+        >
+          <EmptyStateBody>
+            <Loading />
+          </EmptyStateBody>
+        </EmptyState>
+      );
+    }
+
+    if (isNamespaceEmpty) {
+      return (
+        <EmptyState
+          headingLevel="h4"
+          titleText={t("You don't have any templates in this project yet")}
+          variant={EmptyStateVariant.sm}
+        >
+          <EmptyStateBody>
+            {t('To get started, view all projects or create a template.')}
+          </EmptyStateBody>
+          <EmptyStateFooter>
+            <EmptyStateActions>
+              <Button onClick={() => onClearFilters()} variant={ButtonVariant.link}>
+                {t('View all projects')}
+              </Button>
+            </EmptyStateActions>
+          </EmptyStateFooter>
+        </EmptyState>
+      );
+    }
+
+    return (
+      <EmptyState
+        headingLevel="h4"
+        titleText={t('No results match the filter criteria')}
+        variant={EmptyStateVariant.sm}
+      >
+        <EmptyStateBody>
+          {t('No template items are being shown due to the filters being applied.')}
+        </EmptyStateBody>
+        <EmptyStateFooter>
+          <EmptyStateActions>
+            <Button onClick={() => onClearFilters()} variant={ButtonVariant.link}>
+              {t('Clear all filters')}
+            </Button>
+          </EmptyStateActions>
+        </EmptyStateFooter>
+      </EmptyState>
+    );
+  },
+);
+
+export default TemplatesCatalogEmptyState;
