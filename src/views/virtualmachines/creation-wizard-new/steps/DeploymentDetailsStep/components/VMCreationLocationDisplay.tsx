@@ -1,4 +1,5 @@
 import React, { FC } from 'react';
+import { useWatch } from 'react-hook-form';
 import classNames from 'classnames';
 
 import EditButton from '@kubevirt-utils/components/EditButton/EditButton';
@@ -8,7 +9,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm';
 import useIsACMPage from '@multicluster/useIsACMPage';
 import { ButtonVariant } from '@patternfly/react-core';
-import useVMWizardStore from '@virtualmachines/creation-wizard-new/state/vm-wizard-store/useVMWizardStore';
+import { useVMWizard } from '@virtualmachines/creation-wizard-new/state/vm-wizard-context/VMWizardContext';
 
 import './VMCreationLocationDisplay.scss';
 
@@ -23,9 +24,15 @@ const VMCreationLocationDisplay: FC<VMCreationLocationDisplayProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const isACMPage = useIsACMPage();
+
   const { featureEnabled: treeViewFoldersEnabled, loading: treeViewFoldersLoading } =
     useFeatures(TREE_VIEW_FOLDERS);
-  const { cluster, folder, project } = useVMWizardStore();
+
+  const { control } = useVMWizard();
+  const [cluster, folder, project] = useWatch({
+    control,
+    name: ['vmData.cluster', 'vmData.folder', 'vmData.project'],
+  });
 
   return (
     <div

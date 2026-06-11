@@ -1,7 +1,8 @@
 import React, { FC } from 'react';
+import { useWatch } from 'react-hook-form';
 
 import { Flex, FlexItem } from '@patternfly/react-core';
-import useVMWizardStore from '@virtualmachines/creation-wizard-new/state/vm-wizard-store/useVMWizardStore';
+import { useVMWizard } from '@virtualmachines/creation-wizard-new/state/vm-wizard-context/VMWizardContext';
 import { VMCreationMethod } from '@virtualmachines/creation-wizard-new/utils/constants';
 
 import CreationMethodTile from './components/CreationMethodTile/CreationMethodTile';
@@ -9,7 +10,8 @@ import CreationMethodTile from './components/CreationMethodTile/CreationMethodTi
 import './CreationMethodTileGroup.scss';
 
 const CreationMethodTileGroup: FC = () => {
-  const { creationMethod, setCreationMethod } = useVMWizardStore();
+  const { control, setValue } = useVMWizard();
+  const creationMethod = useWatch({ control, name: 'vmData.creationMethod' });
 
   return (
     <Flex
@@ -22,9 +24,11 @@ const CreationMethodTileGroup: FC = () => {
         (method) => (
           <FlexItem className="vm-creation-method-tile-group__item" key={method}>
             <CreationMethodTile
+              setSelectedCreationMethod={(selectedCreationMethod) =>
+                setValue('vmData.creationMethod', selectedCreationMethod)
+              }
               creationMethod={method}
               isChecked={creationMethod === method}
-              setSelectedCreationMethod={setCreationMethod}
             />
           </FlexItem>
         ),

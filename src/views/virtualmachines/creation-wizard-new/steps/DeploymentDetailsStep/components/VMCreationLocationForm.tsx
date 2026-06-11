@@ -1,4 +1,5 @@
 import React, { FC } from 'react';
+import { Controller, useWatch } from 'react-hook-form';
 
 import ClusterDropdown from '@kubevirt-utils/components/ClusterProjectDropdown/ClusterDropdown';
 import NamespaceDropdown from '@kubevirt-utils/components/ClusterProjectDropdown/NamespaceDropdown';
@@ -10,41 +11,60 @@ import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useIsACMPage from '@multicluster/useIsACMPage';
 import { Form, FormGroup } from '@patternfly/react-core';
-import useVMWizardStore from '@virtualmachines/creation-wizard-new/state/vm-wizard-store/useVMWizardStore';
+import { useVMWizard } from '@virtualmachines/creation-wizard-new/state/vm-wizard-context/VMWizardContext';
 
 import './VMCreationLocationForm.scss';
 
 const VMCreationLocationForm: FC = () => {
   const { t } = useKubevirtTranslation();
   const isACMPage = useIsACMPage();
+
   const { featureEnabled: treeViewFoldersEnabled, loading: treeViewFoldersLoading } =
     useFeatures(TREE_VIEW_FOLDERS);
-  const { cluster, folder, project, setCluster, setFolder, setProject } = useVMWizardStore();
-  const isTreeViewFoldersDisabled = treeViewFoldersLoading || !treeViewFoldersEnabled;
+
+  const { control, setValue } = useVMWizard();
+  const [cluster, folder, project] = useWatch({
+    control,
+    name: ['vmData.cluster', 'vmData.folder', 'vmData.project'],
+  });
 
   return (
     <Form className="vm-creation-location-form">
       {isACMPage && (
         <FormGroup isRequired label={t('Cluster')}>
-          <ClusterDropdown
-            onChange={(selectedCluster) => {
-              setCluster(selectedCluster);
-              setFolder('');
-              if (selectedCluster !== cluster) setProject('');
-            }}
-            selectedCluster={cluster}
+          <Controller
+            render={({ field: { ref: _, ...field } }) => (
+              <ClusterDropdown
+                {...field}
+                onChange={(selectedCluster) => {
+                  field.onChange(selectedCluster);
+                  setValue('vmData.folder', '');
+                  if (selectedCluster !== cluster) setValue('vmData.project', '');
+                }}
+                selectedCluster={field.value}
+              />
+            )}
+            control={control}
+            name="vmData.cluster"
           />
         </FormGroup>
       )}
       <FormGroup isRequired label={t('Project')}>
-        <NamespaceDropdown
-          onChange={(selectedProject) => {
-            setProject(selectedProject);
-            setFolder('');
-          }}
-          cluster={cluster}
-          includeAllProjects={false}
-          selectedProject={project || DEFAULT_NAMESPACE}
+        <Controller
+          render={({ field: { ref: _, ...field } }) => (
+            <NamespaceDropdown
+              {...field}
+              onChange={(selectedProject) => {
+                field.onChange(selectedProject);
+                setValue('vmData.folder', '');
+              }}
+              cluster={cluster}
+              includeAllProjects={false}
+              selectedProject={project || DEFAULT_NAMESPACE}
+            />
+          )}
+          control={control}
+          name="vmData.project"
         />
       </FormGroup>
       <FormGroup
@@ -61,10 +81,10 @@ const VMCreationLocationForm: FC = () => {
       >
         <FolderSelect
           cluster={cluster}
-          isDisabled={isTreeViewFoldersDisabled}
+          isDisabled={treeViewFoldersLoading || !treeViewFoldersEnabled}
           namespace={project}
           selectedFolder={folder}
-          setSelectedFolder={(newFolder) => setFolder(newFolder)}
+          setSelectedFolder={(newFolder) => setValue('vmData.folder', newFolder)}
         />
       </FormGroup>
     </Form>
