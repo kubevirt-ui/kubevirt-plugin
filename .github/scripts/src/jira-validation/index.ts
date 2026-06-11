@@ -1,12 +1,12 @@
 /* eslint-disable no-console */
-import { JiraClient } from './jira-client.js';
-import { createOctokit, getReleaseBranches } from './github-repo.js';
-import { hasLabel, reportValidation, setCommitStatus } from './github-comments.js';
-import { extractTicketIds, getExpectedVersionForBranch } from './version-utils.js';
+import { JiraClient } from '../jira-client.js';
+import { createOctokit, getReleaseBranches } from '../github-repo.js';
+import { hasLabel, reportValidation, setCommitStatus } from '../github-comments.js';
+import { extractTicketIds, getExpectedVersionForBranch } from '../version-utils.js';
 import { validateTicket, formatValidationComment } from './validation-checks.js';
-import { requireEnv, safeErrorMessage } from './utils.js';
-import { JIRA_BASE_URL, SKIP_LABEL } from './types/index.js';
-import type { GitHubConfig, JiraIssue, ValidationCheck } from './types/index.js';
+import { requireEnv, safeErrorMessage } from '../utils.js';
+import { JIRA_BASE_URL, SKIP_LABEL } from '../types/index.js';
+import type { GitHubConfig, JiraIssue, ValidationCheck } from '../types/index.js';
 
 /** Entrypoint: extract ticket IDs from PR title and validate each against Jira. */
 const main = async (): Promise<void> => {

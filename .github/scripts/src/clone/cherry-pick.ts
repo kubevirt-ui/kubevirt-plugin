@@ -1,11 +1,11 @@
 import { execFileSync } from 'node:child_process';
 import { Octokit } from '@octokit/rest';
 
-import { addLabel } from './github-comments.js';
-import { createPullRequest } from './github-repo.js';
-import { rewriteJiraKeysInText, stripOriginalJiraKeys } from './version-utils.js';
-import { CONFLICT_LABEL, JIRA_BASE_URL } from './types/index.js';
-import type { CherryPickResult, ClonedTicket, JiraVersion } from './types/index.js';
+import { addLabel } from '../github-comments.js';
+import { createPullRequest } from '../github-repo.js';
+import { rewriteJiraKeysInText, stripOriginalJiraKeys } from '../version-utils.js';
+import { CONFLICT_LABEL, JIRA_BASE_URL } from '../types/index.js';
+import type { CherryPickResult, ClonedTicket, JiraVersion } from '../types/index.js';
 
 /** Run a git command via execFileSync, returning trimmed stdout. */
 const git = (...args: string[]): string =>

@@ -47,6 +47,20 @@ export const branchExists = async (
   }
 };
 
+/** List all file paths changed in a pull request. */
+export const getPullRequestFiles = async (
+  octokit: Octokit,
+  owner: string,
+  repo: string,
+  pullNumber: number,
+): Promise<Array<{ filename: string; patch?: string }>> =>
+  octokit.paginate(octokit.pulls.listFiles, {
+    owner,
+    repo,
+    pull_number: pullNumber,
+    per_page: 100,
+  });
+
 /** Create a pull request and return its number and URL. */
 export const createPullRequest = async (
   octokit: Octokit,

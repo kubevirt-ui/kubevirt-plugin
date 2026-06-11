@@ -245,6 +245,27 @@ All rule files are in `.cursor/rules/`. Click to view each one.
 4. Test that they work as expected
 5. Submit a PR with your changes
 
+### AI / Editor Configuration Merge Policy
+
+Changes to AI tooling, editor config, or PR automation are **high-risk** (supply-chain attacks like the Miasma worm target `.cursor/`, `.claude/`, `.vscode/tasks.json`, and similar paths).
+
+**Protected paths:** `.cursor/`, `.claude/`, `.vscode/`, `.gemini/`, `.github/scripts/`, PR validation workflows, `.coderabbit.yaml`
+
+**When your PR touches these paths:**
+
+| Label                           | Set by       | Purpose                                           |
+| ------------------------------- | ------------ | ------------------------------------------------- |
+| `ai-config-changed`             | Automation   | PR touches sensitive paths — review carefully     |
+| `do-not-merge/ai-config-review` | Automation   | Blocks merge until reviewed                       |
+| **`ai-config-reviewed`**        | **Reviewer** | **Required to merge** — add after security review |
+| `skip-ai-config-check`          | Maintainer   | Emergency bypass                                  |
+
+**CodeRabbit** runs assertive security review automatically (`.coderabbit.yaml`). OpenShift **OWNERS** automation handles required approvers separately.
+
+Approval is **label-only** — no PR comments trigger this check. When `ai-config-reviewed` or `skip-ai-config-check` is added or removed, the workflow re-runs via the `labeled` / `unlabeled` event.
+
+New commits to sensitive paths clear `ai-config-reviewed` and require re-review.
+
 ---
 
 ## Troubleshooting

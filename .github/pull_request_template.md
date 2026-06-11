@@ -6,6 +6,7 @@ Please read the following before submitting:
   - For release branches: "[release-4.XX] CNV-XXXXX: short description"
   - The Jira ticket must have: story points > 1, fix version set, component "CNV User Interface", product type set
 - PRs that adds new external dependencies might take a while to review.
+- PRs that modify `.cursor/`, `.claude/`, `.vscode/`, or `.github/scripts/` require **strict security review**, CodeRabbit approval of findings, and the **`ai-config-reviewed`** label before merge.
 - Keep your PR as small as possible.
 - Limit your PR to one type (feature, refactoring, ci, or bugfix)
 -->
