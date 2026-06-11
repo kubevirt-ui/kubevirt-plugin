@@ -44,6 +44,7 @@ const VirtualMachineBulkActionButton: FC<VirtualMachineBulkActionButtonProps> = 
       disabledTooltip={t('Select multiple VirtualMachines to perform an action for all of them')}
       isDisabled={isEmpty(selectedVirtualMachines)}
       localOptions={localOptions}
+      toggleSize="sm"
       variant={ActionMenuVariant.DROPDOWN}
     />
   );

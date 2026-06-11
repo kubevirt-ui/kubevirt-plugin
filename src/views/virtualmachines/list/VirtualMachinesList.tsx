@@ -57,7 +57,7 @@ import useVMListTelemetry from './hooks/useVMListTelemetry';
 import useVMMetrics from './hooks/useVMMetrics';
 import { VM_FILTER_OPTIONS } from './utils/constants';
 import { filterVMsByClusterAndNamespace } from './utils/utils';
-import { getListPageBodySize, ListPageBodySize } from './listPageBodySize';
+import { getListPageBodySize } from './listPageBodySize';
 import { deselectAllVMs } from './selectedVMs';
 import { getVMColumns, getVMRowId, VM_COLUMN_KEYS, VMCallbacks } from './virtualMachinesDefinition';
 
@@ -305,7 +305,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = (props) => {
                       onPageChange({ endIndex, page, perPage, startIndex })
                     }
                     className="list-managment-group__pagination"
-                    isCompact={listPageBodySize !== ListPageBodySize.lg}
+                    isCompact
                     isLastFullPageShown
                     itemCount={filteredVMs?.length}
                     page={pagination?.page}

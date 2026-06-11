@@ -40,6 +40,7 @@ const SelectFilterItem: FC<SelectFilterItemProps> = ({
         onSelect={(_event, value: string) => onSelect(filterDef.id, value)}
         selectedValues={selected}
         showAllBadge={filterDef.showAllBadge}
+        toggleSize="sm"
         toggleTitle={toggleTitle ?? filterDef.categoryLabel}
         tooltipContent={filterDef.disabledTooltip}
       />

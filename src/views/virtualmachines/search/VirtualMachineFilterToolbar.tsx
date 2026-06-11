@@ -16,8 +16,6 @@ import { Toolbar, ToolbarContent } from '@patternfly/react-core';
 import { ListPageBodySize } from '@virtualmachines/list/listPageBodySize';
 import { VirtualMachineRowFilterType } from '@virtualmachines/utils/constants';
 
-import NameFilter from './components/NameFilter';
-import useNameFilter from './hooks/useNameFilter';
 import { ACM_FILTERS_SHOWN_VM_LIST, FILTERS_SHOWN_VM_LIST } from './constants';
 
 type VirtualMachineFilterToolbarProps = {
@@ -72,17 +70,12 @@ const VirtualMachineFilterToolbar: FC<VirtualMachineFilterToolbarProps> = ({
     onSetFilters(newFilters);
   };
 
-  const nameFilter = useNameFilter(filters, handleSetFilters);
-
   if (!loaded) return null;
 
   return (
     <Toolbar
-      clearAllFilters={() => {
-        nameFilter.resetInputText();
-        clearAllFilters();
-      }}
       className={className}
+      clearAllFilters={clearAllFilters}
       clearFiltersButtonText={t('Clear all filters')}
       data-test="filter-toolbar"
       id="filter-toolbar"
@@ -101,7 +94,6 @@ const VirtualMachineFilterToolbar: FC<VirtualMachineFilterToolbarProps> = ({
             onSetFilters={handleSetFilters}
           />
         ))}
-        <NameFilter {...nameFilter} />
         <HiddenFilterChips
           filters={filters}
           hiddenFilters={hiddenFilters}
