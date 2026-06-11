@@ -4,7 +4,7 @@ import type {
 } from '@openshift-console/dynamic-plugin-sdk-webpack';
 
 export const exposedModules: ConsolePluginBuildMetadata['exposedModules'] = {
-  VMWizard: './views/virtualmachines/creation-wizard-new/VMCreationWizard.tsx',
+  VMWizard: './views/virtualmachines/creation-wizard-new/VMCreationWizardNew.tsx',
 };
 
 export const extensions: EncodedExtension[] = [

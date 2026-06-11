@@ -39,7 +39,7 @@ import DeploymentDetailsStep from './steps/DeploymentDetailsStep/DeploymentDetai
 
 import './Wizard.scss';
 
-const VMCreationWizard: FC = () => {
+const VMCreationWizardContent: FC = () => {
   const { t } = useKubevirtTranslation();
   const {
     creationMethod,
@@ -184,4 +184,4 @@ const VMCreationWizard: FC = () => {
   );
 };
 
-export default VMCreationWizard;
+export default VMCreationWizardContent;
