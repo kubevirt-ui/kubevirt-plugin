@@ -40,7 +40,7 @@ const AddCDROMModal: FC<V1SubDiskModalProps> = ({
   const { t } = useKubevirtTranslation();
   const { checkUploadReady, uploadData } = useCDIUpload(getCluster(vm));
   const isVMRunning = isRunning(vm);
-  const [hyperConvergeConfig] = useHyperConvergeConfiguration();
+  const [hyperConvergeConfig] = useHyperConvergeConfiguration(getCluster(vm));
   const [isSubmitting, setIsSubmitting] = useState(false);
   const vmNamespace = getNamespace(vm);
 
