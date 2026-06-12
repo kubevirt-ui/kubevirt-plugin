@@ -56,7 +56,7 @@ const MountCDROMModal: FC<MountCDROMModalProps> = ({
   const { t } = useKubevirtTranslation();
   const vmNamespace = getNamespace(vm);
   const { checkUploadReady, upload, uploadData } = useCDIUpload(getCluster(vm));
-  const { featureGates } = useKubevirtHyperconvergeConfiguration();
+  const { featureGates } = useKubevirtHyperconvergeConfiguration(getCluster(vm));
   const isHotPluggable = isHotPluggableEnabled(featureGates);
 
   const {

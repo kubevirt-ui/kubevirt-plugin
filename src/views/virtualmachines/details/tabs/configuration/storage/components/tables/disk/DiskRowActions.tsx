@@ -26,6 +26,7 @@ import {
 } from '@kubevirt-utils/resources/vm/utils/disk/selectors';
 import { isEmptyContainerDiskImage } from '@kubevirt-utils/resources/vm/utils/disk/utils';
 import { getContentScrollableElement } from '@kubevirt-utils/utils/utils';
+import { getCluster } from '@multicluster/helpers/selectors';
 import {
   ButtonVariant,
   Dropdown,
@@ -65,7 +66,7 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
-  const { featureGates } = useKubevirtHyperconvergeConfiguration();
+  const { featureGates } = useKubevirtHyperconvergeConfiguration(getCluster(vm));
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const { name: diskName, source: diskSource } = obj || {};
