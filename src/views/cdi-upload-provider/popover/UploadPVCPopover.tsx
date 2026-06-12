@@ -1,7 +1,7 @@
 import React, { FC, useContext, useEffect, useState } from 'react';
 
 import { V1beta1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { killUploadPVC } from '@kubevirt-utils/hooks/useCDIUpload/utils';
+import { cancelUploadPVC } from '@kubevirt-utils/hooks/useCDIUpload/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
 import { CDIUploadContext } from '../utils/context';
@@ -24,11 +24,11 @@ const UploadPVCPopover: FC<PVCUploadStatusProps> = ({ pvc, title }) => {
 
   const onCancelClick = () => {
     upload?.cancelUpload?.();
-    killUploadPVC(pvc?.metadata?.name, pvc?.metadata?.namespace).catch(setError);
+    cancelUploadPVC(pvc?.metadata?.name, pvc?.metadata?.namespace).catch(setError);
   };
 
   const onErrorDeleteSource = () => {
-    killUploadPVC(pvc?.metadata?.name, pvc?.metadata?.namespace).catch(setError);
+    cancelUploadPVC(pvc?.metadata?.name, pvc?.metadata?.namespace).catch(setError);
   };
 
   useEffect(() => {

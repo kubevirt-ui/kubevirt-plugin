@@ -1,10 +1,13 @@
 import React, { FC } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
+import { isUploadCanceledError } from '@kubevirt-utils/hooks/useCDIUpload/errors';
 import { useCDIUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
-import { UPLOAD_STATUS } from '@kubevirt-utils/hooks/useCDIUpload/utils';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { cancelTrackedUploadOnModalClose } from '@kubevirt-utils/hooks/useUploadProgressToast/utils/modalUploadCancel';
+import { completeVmDiskUpload } from '@kubevirt-utils/hooks/useUploadProgressToast/utils/uploadCompletion';
+import { getVmDiskUploadKey } from '@kubevirt-utils/hooks/useUploadProgressToast/utils/uploadKeys';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
-import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { isRunning } from '@virtualmachines/utils';
 
@@ -19,9 +22,10 @@ import DiskSourceUploadPVC from './components/DiskSourceSelect/components/DiskSo
 import DiskTypeSelect from './components/DiskTypeSelect/DiskTypeSelect';
 import PendingChanges from './components/PendingChanges';
 import StorageClassAndPreallocation from './components/StorageClassAndPreallocation/StorageClassAndPreallocation';
+import { reorderBootDisk } from './utils/bootDiskUtils';
 import { getDefaultCreateValues } from './utils/form';
 import { diskModalTitle, hotplugPromise } from './utils/helpers';
-import { addDisk, reorderBootDisk, uploadDataVolume } from './utils/submit';
+import { addDisk, uploadDataVolume } from './utils/submit';
 import { SourceTypes, V1DiskFormState, V1SubDiskModalProps } from './utils/types';
 
 const UploadDiskModal: FC<V1SubDiskModalProps> = ({
@@ -31,6 +35,7 @@ const UploadDiskModal: FC<V1SubDiskModalProps> = ({
   onUploadedDataVolume,
   vm,
 }) => {
+  const { t } = useKubevirtTranslation();
   const { upload, uploadData } = useCDIUpload(getCluster(vm));
   const isVMRunning = isRunning(vm);
   const vmNamespace = getNamespace(vm);
@@ -42,6 +47,7 @@ const UploadDiskModal: FC<V1SubDiskModalProps> = ({
 
   const {
     formState: { isSubmitting, isValid },
+    getValues,
     handleSubmit,
   } = methods;
 
@@ -49,18 +55,47 @@ const UploadDiskModal: FC<V1SubDiskModalProps> = ({
     <FormProvider {...methods}>
       <TabModal
         onClose={() => {
-          if (upload?.uploadStatus === UPLOAD_STATUS.UPLOADING) {
-            try {
-              upload.cancelUpload();
-            } catch (error) {
-              kubevirtConsole.error(error);
-            }
-          }
+          const diskName = getValues('disk.name');
+          const uploadKey = diskName
+            ? getVmDiskUploadKey(getCluster(vm), getNamespace(vm), getName(vm), diskName)
+            : undefined;
+
+          cancelTrackedUploadOnModalClose({ upload, uploadKey });
           onClose();
         }}
         onSubmit={() =>
           handleSubmit(async (data) => {
-            const uploadedDataVolume = await uploadDataVolume(vm, uploadData, data);
+            const uploadKey = getVmDiskUploadKey(
+              getCluster(vm),
+              getNamespace(vm),
+              getName(vm),
+              data.disk.name,
+            );
+            let uploadedDataVolume;
+
+            try {
+              uploadedDataVolume = await uploadDataVolume(
+                vm,
+                uploadData,
+                data,
+                undefined,
+                uploadKey,
+                t,
+              );
+            } catch (error) {
+              if (isUploadCanceledError(error)) {
+                return;
+              }
+              throw error;
+            }
+
+            completeVmDiskUpload({
+              dataVolumeName: getName(uploadedDataVolume),
+              diskName: data.disk.name,
+              t,
+              uploadKey,
+              vm,
+            });
 
             onUploadedDataVolume?.(uploadedDataVolume);
 

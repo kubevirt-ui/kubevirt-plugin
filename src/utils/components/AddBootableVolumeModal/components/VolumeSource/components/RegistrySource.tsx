@@ -1,11 +1,11 @@
 import React, { ChangeEvent, FC } from 'react';
 
 import ContainerSource from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeSource/components/ContainerSource';
-import { formatRegistryURL } from '@kubevirt-utils/components/AddBootableVolumeModal/utils/utils';
+import { formatRegistryURL } from '@kubevirt-utils/components/AddBootableVolumeModal/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { removeAllWhitespace } from '@kubevirt-utils/utils/utils';
 
-import { AddBootableVolumeState, SetBootableVolumeFieldType } from '../../../utils/constants';
+import { AddBootableVolumeState, SetBootableVolumeFieldType } from '../../../types';
 
 type RegistrySourceProps = {
   bootableVolume: AddBootableVolumeState;

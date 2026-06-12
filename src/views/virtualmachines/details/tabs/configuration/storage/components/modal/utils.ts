@@ -10,11 +10,9 @@ import {
   V1VirtualMachineInstance,
   V1Volume,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import {
-  AddBootableVolumeState,
-  emptyDataSource,
-} from '@kubevirt-utils/components/AddBootableVolumeModal/utils/constants';
-import { createPVCBootableVolume } from '@kubevirt-utils/components/AddBootableVolumeModal/utils/utils';
+import { createPVCBootableVolume } from '@kubevirt-utils/components/AddBootableVolumeModal/bootableVolumeSources';
+import { emptyDataSource } from '@kubevirt-utils/components/AddBootableVolumeModal/consts';
+import { AddBootableVolumeState } from '@kubevirt-utils/components/AddBootableVolumeModal/types';
 import {
   DEFAULT_CDROM_DISK_SIZE,
   UPLOAD_MODE_SELECT,

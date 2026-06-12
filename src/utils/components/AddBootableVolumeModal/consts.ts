@@ -5,16 +5,16 @@ import {
   V1beta1DataImportCron,
   V1beta1DataSource,
   V1beta1DataVolume,
-  V1beta1StorageSpecAccessModesEnum,
-  V1beta1StorageSpecVolumeModeEnum,
 } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import { DEFAULT_DISK_SIZE } from '@kubevirt-utils/components/DiskModal/utils/constants';
 import {
   TLS_CERT_SOURCE_EXISTING,
-  TLS_CERT_SOURCE_NEW,
+  TLSCertSourceType,
 } from '@kubevirt-utils/components/TLSCertificateSection';
 import { OPENSHIFT_OS_IMAGES_NS } from '@kubevirt-utils/constants/constants';
 import { CDI_BIND_REQUESTED_ANNOTATION } from '@kubevirt-utils/hooks/useCDIUpload/consts';
+
+import { AddBootableVolumeState } from './types';
 
 export const SOURCE_DETAILS_SECTION_ID = 'source-details-section';
 
@@ -33,6 +33,7 @@ export const optionsValueLabelMapper = {
   [DROPDOWN_FORM_SELECTION.USE_REGISTRY]: 'Registry',
   [DROPDOWN_FORM_SELECTION.USE_SNAPSHOT]: 'Volume snapshot',
 };
+
 export const TLS_CERT_FIELD_NAMES = {
   tlsCertConfigMapName: 'tlsCertConfigMapName',
   tlsCertificate: 'tlsCertificate',
@@ -41,70 +42,29 @@ export const TLS_CERT_FIELD_NAMES = {
   tlsCertSource: 'tlsCertSource',
 } as const;
 
-export type AddBootableVolumeState = {
-  accessMode?: V1beta1StorageSpecAccessModesEnum;
-  annotations?: { [key: string]: string };
-  architectures?: string[];
-  bootableVolumeCluster?: string;
-  bootableVolumeName: string;
-  bootableVolumeNamespace: string;
-  cronExpression?: string;
-  isIso?: boolean;
-  labels?: { [key: string]: string };
-  lockedPreference?: string;
-  pvcName: string;
-  pvcNamespace: string;
-  registryCredentials?: { password: string; username: string };
-  registryURL?: string;
-  retainRevisions?: number;
-  size?: string;
-  snapshotName?: string;
-  snapshotNamespace?: string;
-  storageClassName?: string;
-  storageClassProvisioner?: string;
-  tlsCertConfigMapName?: string;
-  tlsCertificate?: string;
-  tlsCertificateRequired?: boolean;
-  tlsCertProject?: string;
-  tlsCertSource?: typeof TLS_CERT_SOURCE_EXISTING | typeof TLS_CERT_SOURCE_NEW;
-  uploadFile?: File | string;
-  uploadFilename?: string;
-  url?: string;
-  volumeMode?: V1beta1StorageSpecVolumeModeEnum;
-};
-
-export type SetBootableVolumeFieldType = (
-  key: keyof AddBootableVolumeState,
-  fieldKey?: string,
-) => (
-  value: { password: string; username: string } | boolean | File | number | string | string[],
-) => void;
-
-export const initialBootableVolumeState: AddBootableVolumeState = {
+export const initialBootableVolumeState = {
   annotations: {},
-  bootableVolumeName: null,
-  bootableVolumeNamespace: null,
-  cronExpression: null,
+  bootableVolumeName: '',
+  bootableVolumeNamespace: '',
+  cronExpression: '',
   isIso: false,
   labels: {},
-  pvcName: null,
-  pvcNamespace: null,
+  pvcName: '',
+  pvcNamespace: '',
   registryCredentials: { password: '', username: '' },
-  registryURL: null,
+  registryURL: '',
   retainRevisions: 3,
   size: DEFAULT_DISK_SIZE,
-  snapshotName: null,
-  snapshotNamespace: null,
-  storageClassName: null,
-  storageClassProvisioner: null,
-  tlsCertConfigMapName: null,
-  tlsCertificate: null,
+  snapshotName: '',
+  snapshotNamespace: '',
+  storageClassName: '',
+  tlsCertConfigMapName: '',
+  tlsCertificate: '',
   tlsCertificateRequired: false,
-  tlsCertProject: null,
-  tlsCertSource: TLS_CERT_SOURCE_EXISTING,
-  uploadFile: null,
-  uploadFilename: null,
-};
+  tlsCertProject: '',
+  tlsCertSource: TLS_CERT_SOURCE_EXISTING as TLSCertSourceType,
+  uploadFilename: '',
+} satisfies AddBootableVolumeState;
 
 export const initialDataImportCron: V1beta1DataImportCron = {
   apiVersion: 'cdi.kubevirt.io/v1beta1',
@@ -155,3 +115,14 @@ export const emptyDataSource: V1beta1DataSource = {
   },
   spec: { source: {} },
 };
+
+const BACKGROUND_IMPORT_SOURCE_TYPES = [
+  DROPDOWN_FORM_SELECTION.USE_HTTP,
+  DROPDOWN_FORM_SELECTION.USE_REGISTRY,
+];
+
+export const isUploadVolumeSource = (sourceType: DROPDOWN_FORM_SELECTION): boolean =>
+  sourceType === DROPDOWN_FORM_SELECTION.UPLOAD_VOLUME;
+
+export const isBackgroundImportSource = (sourceType: DROPDOWN_FORM_SELECTION): boolean =>
+  BACKGROUND_IMPORT_SOURCE_TYPES.includes(sourceType);

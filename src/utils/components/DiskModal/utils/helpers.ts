@@ -1,7 +1,7 @@
 import produce from 'immer';
 import { Draft } from 'immer';
 
-import { DataVolumeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { DataVolumeModel, VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import {
   V1AddVolumeOptions,
@@ -25,8 +25,9 @@ import { getOperatingSystem } from '@kubevirt-utils/resources/vm/utils/operation
 import { ensurePath, getRandomChars, isEmpty } from '@kubevirt-utils/utils/utils';
 import { isDNS1123Label } from '@kubevirt-utils/utils/validation';
 import { getCluster } from '@multicluster/helpers/selectors';
-import { kubevirtK8sCreate } from '@multicluster/k8sRequests';
+import { kubevirtK8sCreate, kubevirtK8sGet } from '@multicluster/k8sRequests';
 import { addPersistentVolume, removeVolume } from '@virtualmachines/actions/actions';
+import { updateDisks } from '@virtualmachines/details/tabs/configuration/details/utils/utils';
 
 import { HotPlugFeatures } from './constants';
 import { SourceTypes, V1DiskFormState } from './types';
@@ -174,7 +175,7 @@ export const hotplugPromise = (vmObj: V1VirtualMachine, diskState: V1DiskFormSta
 
 export const produceVMDisks = (
   vm: V1VirtualMachine,
-  updateDisks: (vmDraft: Draft<V1VirtualMachine>) => void,
+  updateDraftDisks: (vmDraft: Draft<V1VirtualMachine>) => void,
 ) => {
   return produce(vm, (draftVM) => {
     ensurePath(draftVM, ['spec.template.spec.domain.devices']);
@@ -186,7 +187,7 @@ export const produceVMDisks = (
 
     if (!draftVM.spec.dataVolumeTemplates) draftVM.spec.dataVolumeTemplates = [];
 
-    updateDisks(draftVM);
+    updateDraftDisks(draftVM);
   });
 };
 
@@ -372,6 +373,54 @@ export const ejectISOFromCDROM = (vm: V1VirtualMachine, cdromName: string): V1Vi
     );
   });
 };
+
+export const detachDiskFromVM = (vm: V1VirtualMachine, diskName: string): V1VirtualMachine => {
+  return produceVMDisks(vm, (draftVM) => {
+    const volumeToRemove = (draftVM.spec.template.spec.volumes || []).find(
+      (volume) => volume.name === diskName,
+    );
+
+    draftVM.spec.template.spec.domain.devices.disks = (
+      draftVM.spec.template.spec.domain.devices.disks || []
+    ).filter((disk) => disk.name !== diskName);
+
+    draftVM.spec.template.spec.volumes = (draftVM.spec.template.spec.volumes || []).filter(
+      (volume) => volume.name !== diskName,
+    );
+
+    if (volumeToRemove?.dataVolume?.name) {
+      draftVM.spec.dataVolumeTemplates = (draftVM.spec.dataVolumeTemplates || []).filter(
+        (dv) => dv.metadata?.name !== volumeToRemove.dataVolume.name,
+      );
+    }
+  });
+};
+
+const createDiskCancelCleanup =
+  (
+    vm: V1VirtualMachine,
+    diskName: string,
+    transform: (vm: V1VirtualMachine, name: string) => V1VirtualMachine,
+  ): (() => Promise<void>) =>
+  async () => {
+    const freshVM = await kubevirtK8sGet<V1VirtualMachine>({
+      cluster: getCluster(vm),
+      model: VirtualMachineModel,
+      name: getName(vm),
+      ns: getNamespace(vm),
+    });
+    await updateDisks(transform(freshVM, diskName));
+  };
+
+export const createEjectMountedDiskCancelCleanup = (
+  vm: V1VirtualMachine,
+  diskName: string,
+): (() => Promise<void>) => createDiskCancelCleanup(vm, diskName, ejectISOFromCDROM);
+
+export const createDetachDiskCancelCleanup = (
+  vm: V1VirtualMachine,
+  diskName: string,
+): (() => Promise<void>) => createDiskCancelCleanup(vm, diskName, detachDiskFromVM);
 
 /**
  * Creates a shallow copy of the form data with a mutable dataVolumeTemplate.spec.source.

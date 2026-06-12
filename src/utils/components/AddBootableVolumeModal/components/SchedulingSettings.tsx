@@ -15,8 +15,8 @@ import {
   ValidatedOptions,
 } from '@patternfly/react-core';
 
-import { AddBootableVolumeState, SetBootableVolumeFieldType } from '../utils/constants';
-import { getCronHelperText } from '../utils/utils';
+import { AddBootableVolumeState, SetBootableVolumeFieldType } from '../types';
+import { getCronHelperText } from '../utils';
 
 type SchedulingSettingsProps = {
   bootableVolume: AddBootableVolumeState;

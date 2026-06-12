@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useMemo } from 'react';
+import React, { FC, useEffect, useMemo, useState } from 'react';
 import { FormProvider, useForm, useWatch } from 'react-hook-form';
 
 import { UPLOAD_FILENAME_FIELD } from '@kubevirt-utils/components/DiskModal/components/utils/constants';
@@ -8,7 +8,6 @@ import {
   isExistingISOMode,
   isUploadMode,
 } from '@kubevirt-utils/components/DiskModal/utils/constants';
-import BackgroundOperationAlert from '@kubevirt-utils/components/TabModal/BackgroundOperationAlert';
 import { useCDIUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import useHyperConvergeConfiguration from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -26,10 +25,8 @@ import TabModal from '../TabModal/TabModal';
 import CDROMRestartRequiredAlert from './components/CDROMRestartRequiredAlert/CDROMRestartRequiredAlert';
 import CDROMSourceOptions from './components/CDROMSourceOptions/CDROMSourceOptions';
 import DiskNameInput from './components/DiskNameInput/DiskNameInput';
-import { useCDROMUploadClose } from './hooks/useCDROMUploadClose';
-import { useCDROMUploadStore } from './hooks/useCDROMUploadStore';
 import { getDefaultCreateValues } from './utils/form';
-import { submitCDROM } from './utils/submit';
+import { submitCDROM } from './utils/submitCDROM';
 import { SourceTypes, V1DiskFormState, V1SubDiskModalProps } from './utils/types';
 
 const AddCDROMModal: FC<V1SubDiskModalProps> = ({
@@ -41,9 +38,10 @@ const AddCDROMModal: FC<V1SubDiskModalProps> = ({
   vm,
 }) => {
   const { t } = useKubevirtTranslation();
-  const { checkUploadReady, upload, uploadData } = useCDIUpload(getCluster(vm));
+  const { checkUploadReady, uploadData } = useCDIUpload(getCluster(vm));
   const isVMRunning = isRunning(vm);
   const [hyperConvergeConfig] = useHyperConvergeConfiguration();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const vmNamespace = getNamespace(vm);
 
   const isDeclarativeHotplugEnabled = Boolean(
@@ -82,20 +80,8 @@ const AddCDROMModal: FC<V1SubDiskModalProps> = ({
   const existingISOSelected = isExistingISOMode(mountUploadMode);
 
   const uploadFile = useWatch({ control, name: FORM_FIELD_UPLOAD_FILE });
-  const diskName = useWatch({ control, name: 'disk.name' });
   const hasUploadFile = !isEmpty(uploadFile?.file);
   const hasFormErrors = !isEmpty(errors);
-
-  const { handleModalClose, isUploading, markBackgroundUploadEnded, markBackgroundUploadStarted } =
-    useCDROMUploadClose(upload, onClose);
-
-  const { isUploadActive } = useCDROMUploadStore({
-    cdromDiskName: diskName ?? '',
-    isUploading,
-    markBackgroundUploadEnded,
-    upload,
-    vm,
-  });
 
   const closesOnSubmitAfterSave =
     !uploadEnabled || Boolean(selectedISO) || emptyDriveSelected || !hasUploadFile;
@@ -110,24 +96,32 @@ const AddCDROMModal: FC<V1SubDiskModalProps> = ({
   const isFormValid = Boolean(!hasFormErrors && hasValidSelection);
 
   const handleModalSubmit = async () => {
-    if (uploadEnabled && hasUploadFile) {
-      await checkUploadReady();
-      markBackgroundUploadStarted();
-    }
+    setIsSubmitting(true);
     try {
-      return await submitCDROM(getValues(), {
+      if (uploadEnabled && hasUploadFile) {
+        await checkUploadReady();
+      }
+
+      const result = await submitCDROM(getValues(), {
         isHotPluggable,
         onSubmit,
         onUploadedDataVolume,
         onUploadStarted,
         selectedISO,
+        t,
         uploadData,
         uploadEnabled,
         vm,
       });
-    } catch (error) {
-      markBackgroundUploadEnded();
-      throw error;
+
+      if (uploadEnabled && hasUploadFile) {
+        onClose();
+        return;
+      }
+
+      return result;
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -146,16 +140,14 @@ const AddCDROMModal: FC<V1SubDiskModalProps> = ({
   return (
     <FormProvider {...methods}>
       <TabModal
-        cancelBtnText={isUploadActive ? t('Close') : undefined}
-        closeOnSubmit={closesOnSubmitAfterSave && !isUploadActive}
+        closeOnSubmit={closesOnSubmitAfterSave}
         headerText={t('Add CD-ROM')}
-        isDisabled={!isFormValid || isUploadActive}
-        isLoading={isUploadActive}
+        isDisabled={!isFormValid}
         isOpen={isOpen}
-        onClose={handleModalClose}
+        onClose={onClose}
         onSubmit={handleModalSubmit}
         shouldWrapInForm
-        submitBtnText={isUploadActive ? t('Uploading') : t('Add')}
+        submitBtnText={t('Add')}
         submitBtnVariant={ButtonVariant.primary}
       >
         <Stack hasGutter>
@@ -164,19 +156,14 @@ const AddCDROMModal: FC<V1SubDiskModalProps> = ({
             isVMRunning={isVMRunning}
             variant="add"
           />
-          {isUploadActive && (
-            <StackItem>
-              <BackgroundOperationAlert isVisible />
-            </StackItem>
-          )}
           <StackItem>
-            <DiskNameInput isDisabled={isUploadActive} />
+            <DiskNameInput />
           </StackItem>
           <CDROMSourceOptions
             emptyDriveOption={emptyDriveOption}
             existingISOSelected={existingISOSelected}
             isoOptions={isoOptions}
-            isUploading={isUploadActive}
+            isSubmitting={isSubmitting}
             onClearUpload={handleClearUploadAndFilename}
             onFileUpload={handleFileUpload}
             onISOSelect={handleISOSelect}

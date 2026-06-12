@@ -2,7 +2,7 @@ import React, { FC, useState } from 'react';
 import { useNavigate } from 'react-router';
 
 import { modelToGroupVersionKind, PodModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { killUploadPVC } from '@kubevirt-utils/hooks/useCDIUpload/utils';
+import { cancelUploadPVC } from '@kubevirt-utils/hooks/useCDIUpload/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { K8sResourceCommon, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import {
@@ -29,7 +29,7 @@ type CDIInitErrorStatus = {
 
 const CDIInitErrorStatus: FC<CDIInitErrorStatus> = ({ namespace, onErrorClick, pvcName }) => {
   const { t } = useKubevirtTranslation();
-  const [shouldKillDv, setShouldKillDv] = useState<boolean>(true);
+  const [shouldDeleteDv, setShouldDeleteDv] = useState<boolean>(true);
   const [pod, podLoaded, podError] = useK8sWatchResource<K8sResourceCommon>({
     groupVersionKind: modelToGroupVersionKind(PodModel),
     name: `cdi-upload-${pvcName}`,
@@ -39,7 +39,7 @@ const CDIInitErrorStatus: FC<CDIInitErrorStatus> = ({ namespace, onErrorClick, p
   const navigate = useNavigate();
 
   const onClick = async () => {
-    shouldKillDv && (await killUploadPVC(pvcName, namespace));
+    shouldDeleteDv && (await cancelUploadPVC(pvcName, namespace));
     onErrorClick();
   };
 
@@ -62,11 +62,11 @@ const CDIInitErrorStatus: FC<CDIInitErrorStatus> = ({ namespace, onErrorClick, p
               <SplitItem isFilled />
               <Checkbox
                 aria-label="kill datavolume checkbox"
-                data-checked-state={shouldKillDv}
+                data-checked-state={shouldDeleteDv}
                 id="approve-checkbox"
-                isChecked={shouldKillDv}
+                isChecked={shouldDeleteDv}
                 label={t('Delete DataVolume: {{pvcName}}', { pvcName })}
-                onChange={(_event, checked) => setShouldKillDv(checked)}
+                onChange={(_event, checked) => setShouldDeleteDv(checked)}
               />
               <SplitItem isFilled />
             </Split>
@@ -74,7 +74,7 @@ const CDIInitErrorStatus: FC<CDIInitErrorStatus> = ({ namespace, onErrorClick, p
         </Stack>
       </EmptyStateBody>
       <Button id="cdi-upload-error-btn" onClick={onClick}>
-        {shouldKillDv ? t('Back to form (Deletes DataVolume)') : t('Back to form')}
+        {shouldDeleteDv ? t('Back to form (Deletes DataVolume)') : t('Back to form')}
       </Button>
       {podLoaded && !podError && pod && (
         <EmptyStateActions>

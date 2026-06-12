@@ -3,7 +3,7 @@ import React, { FC } from 'react';
 import {
   AddBootableVolumeState,
   SetBootableVolumeFieldType,
-} from '@kubevirt-utils/components/AddBootableVolumeModal/utils/constants';
+} from '@kubevirt-utils/components/AddBootableVolumeModal/types';
 import SelectSnapshot from '@kubevirt-utils/components/SelectSnapshot/SelectSnapshot';
 
 type SnapshotSourceProps = {

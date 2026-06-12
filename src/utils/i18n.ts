@@ -115,7 +115,7 @@
 // NOT_SUPPORTED_VM_ERROR - used in catalog/CreateFromInstanceTypes via t(NOT_SUPPORTED_VM_ERROR.message)
 // t('VirtualMachine creation is not supported due to incompatible UserDefinedNetwork configuration')
 
-// CDI upload form - back button labels in CDIInitErrorStatus.tsx (when shouldKillDv true/false)
+// CDI upload form - back button labels in CDIInitErrorStatus.tsx (when shouldDeleteDv true/false)
 // t('Back to form')
 // t('Back to form (Deletes DataVolume)')
 

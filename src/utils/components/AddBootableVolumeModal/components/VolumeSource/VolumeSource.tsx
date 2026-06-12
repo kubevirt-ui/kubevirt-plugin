@@ -1,14 +1,11 @@
 import React, { FC } from 'react';
 
 import HTTPSource from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeSource/components/HTTPSource';
-import { DataUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
+import { DataUpload } from '@kubevirt-utils/hooks/useCDIUpload/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
-import {
-  AddBootableVolumeState,
-  DROPDOWN_FORM_SELECTION,
-  SetBootableVolumeFieldType,
-} from '../../utils/constants';
+import { DROPDOWN_FORM_SELECTION } from '../../consts';
+import { AddBootableVolumeState, SetBootableVolumeFieldType } from '../../types';
 
 import DiskSourceUploadPVC from './components/DiskSourceUploadPVC';
 import PVCSource from './components/PVCSource';

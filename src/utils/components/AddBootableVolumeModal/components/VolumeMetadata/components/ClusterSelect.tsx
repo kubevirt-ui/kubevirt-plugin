@@ -1,7 +1,9 @@
 import React, { FC, useCallback, useMemo } from 'react';
 
-import { AddBootableVolumeState } from '@kubevirt-utils/components/AddBootableVolumeModal/utils/constants';
-import { SetBootableVolumeFieldType } from '@kubevirt-utils/components/AddBootableVolumeModal/utils/constants';
+import {
+  AddBootableVolumeState,
+  SetBootableVolumeFieldType,
+} from '@kubevirt-utils/components/AddBootableVolumeModal/types';
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';

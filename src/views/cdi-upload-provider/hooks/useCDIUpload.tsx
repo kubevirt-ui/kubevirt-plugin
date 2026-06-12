@@ -2,7 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 import axios from 'axios';
 
 import { CDIConfigModelRef } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { CDIConfig, getUploadProxyURL } from '@kubevirt-utils/hooks/useCDIUpload/utils';
+import { CDIConfig } from '@kubevirt-utils/hooks/useCDIUpload/types';
+import { getUploadProxyURL } from '@kubevirt-utils/hooks/useCDIUpload/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useK8sWatchResource, WatchK8sResource } from '@openshift-console/dynamic-plugin-sdk';
 

@@ -1,5 +1,7 @@
 import React, { ComponentType, createContext, FC, ReactNode, useContext, useState } from 'react';
 
+import UploadProgressToastProvider from '@kubevirt-utils/hooks/useUploadProgressToast/UploadProgressToastProvider';
+
 export type ModalComponentProps = {
   appendTo: () => HTMLElement;
   isOpen: boolean;
@@ -66,14 +68,16 @@ export const ModalProvider: FC<{
 
   return (
     <ModalContext.Provider value={value}>
-      {Modal && isOpen && (
-        <Modal
-          appendTo={() => document.querySelector('#modal-container')}
-          isOpen
-          onClose={onClose}
-        />
-      )}
-      {children}
+      <UploadProgressToastProvider>
+        {Modal && isOpen && (
+          <Modal
+            appendTo={() => document.querySelector('#modal-container')}
+            isOpen
+            onClose={onClose}
+          />
+        )}
+        {children}
+      </UploadProgressToastProvider>
     </ModalContext.Provider>
   );
 };

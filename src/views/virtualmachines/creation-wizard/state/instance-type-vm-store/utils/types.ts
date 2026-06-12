@@ -1,6 +1,6 @@
 import { V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
-import { PreferenceOption } from '@kubevirt-utils/components/AddBootableVolumeModal/utils/utils';
+import { PreferenceOption } from '@kubevirt-utils/components/AddBootableVolumeModal/types';
 import { VolumeSnapshotKind } from '@kubevirt-utils/components/SelectSnapshot/types';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { OperatingSystemType } from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/GuestOSStep/utils/constants';
