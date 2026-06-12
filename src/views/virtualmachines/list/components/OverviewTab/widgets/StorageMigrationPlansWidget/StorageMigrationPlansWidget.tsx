@@ -31,11 +31,12 @@ type StorageMigrationPlansWidgetProps = {
 
 const StorageMigrationPlansWidget: FC<StorageMigrationPlansWidgetProps> = ({ cluster }) => {
   const { t } = useKubevirtTranslation();
-  const { loaded, loadError, storageMigAPI, storageMigPlans } =
+  const { csvVersion, loaded, loadError, storageMigAPI, storageMigPlans } =
     useStorageMigrationOverviewData(cluster);
   const { basePath, isExternal, pendingUrl, runningUrl } = useStorageMigrationNavigation(
     cluster,
     storageMigAPI,
+    csvVersion,
   );
 
   const statusCounts = useMemo(

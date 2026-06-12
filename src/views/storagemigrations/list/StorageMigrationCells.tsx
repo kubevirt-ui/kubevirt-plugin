@@ -6,11 +6,11 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import {
   modelToGroupVersionKind,
   modelToRef,
-  MultiNamespaceVirtualMachineStorageMigrationPlanModel,
   NamespaceModel,
   StorageClassModel,
 } from '@kubevirt-utils/models';
 import { MultiNamespaceVirtualMachineStorageMigrationPlan } from '@kubevirt-utils/resources/migrations/constants';
+import { getStorageMigrationPlanSpecNamespaces } from '@kubevirt-utils/resources/migrations/selectors';
 import {
   getMigrationStartTimestamp,
   getVolumeCountFromMigPlan,
@@ -26,7 +26,7 @@ import { Timestamp } from '@openshift-console/dynamic-plugin-sdk';
 import { Progress } from '@patternfly/react-core';
 
 import { getMigrationPercentage, getStatusMigration } from './components/utils';
-import { getStorageClassesFromMigPlan } from './utils';
+import { getStorageClassesFromMigPlan, getStorageMigrationRowModel } from './utils';
 
 type CellProps = {
   row: MultiNamespaceVirtualMachineStorageMigrationPlan;
@@ -37,22 +37,21 @@ export const NameCell: FC<CellProps> = ({ row }) => {
   const clusterParam = useClusterParam();
   const cluster = getCluster(row) || clusterParam;
   const migPlanName = getName(row);
+  const planModel = getStorageMigrationRowModel(row);
 
   return (
     <span data-test={`storage-migration-name-${migPlanName}`}>
       <MulticlusterResourceLink
-        groupVersionKind={modelToGroupVersionKind(
-          MultiNamespaceVirtualMachineStorageMigrationPlanModel,
-        )}
         onClick={() =>
           navigate(
             getResourceUrl({
-              model: MultiNamespaceVirtualMachineStorageMigrationPlanModel,
+              model: planModel,
               resource: row,
             }),
           )
         }
         cluster={cluster}
+        groupVersionKind={modelToGroupVersionKind(planModel)}
         name={migPlanName}
         namespace={getNamespace(row)}
       />
@@ -64,7 +63,7 @@ export const NamespacesCell: FC<CellProps> = ({ row }) => {
   const clusterParam = useClusterParam();
   const isACMPage = useIsACMPage();
   const cluster = getCluster(row) || clusterParam;
-  const namespaces = row?.spec?.namespaces;
+  const namespaces = getStorageMigrationPlanSpecNamespaces(row);
 
   if (isEmpty(namespaces)) {
     return <span data-test={`storage-migration-namespaces-${getName(row)}`}>{NO_DATA_DASH}</span>;
@@ -135,7 +134,6 @@ export const StatusCell: FC<CellProps> = ({ row }) => {
     </span>
   );
 };
-
 export const StartedCell: FC<CellProps> = ({ row }) => {
   const { t } = useKubevirtTranslation();
   const startTimestamp = getMigrationStartTimestamp(row);
@@ -148,7 +146,5 @@ export const StartedCell: FC<CellProps> = ({ row }) => {
 };
 
 export const ActionsCell: FC<CellProps> = ({ row }) => (
-  <LazyActionMenu
-    context={{ [modelToRef(MultiNamespaceVirtualMachineStorageMigrationPlanModel)]: row }}
-  />
+  <LazyActionMenu context={{ [modelToRef(getStorageMigrationRowModel(row))]: row }} />
 );

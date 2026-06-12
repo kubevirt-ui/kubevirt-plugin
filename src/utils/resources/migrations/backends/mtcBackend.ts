@@ -14,7 +14,6 @@ const normalizePlanForOverview = (plan: K8sResourceCommon) =>
 export const mtcBackend: StorageMigrationBackendDescriptor = {
   api: STORAGE_MIGRATION_API.MTC,
   fixedPlanNamespace: MTC_MIGRATION_NAMESPACE,
-  listConsolePathUsesResourceUrl: false,
   migrateVMs: migrateVMsMTC,
   normalizePlanForOverview,
   overviewUsesClusterScopedPlanWatch: false,
