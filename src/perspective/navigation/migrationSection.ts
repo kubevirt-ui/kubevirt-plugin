@@ -1,4 +1,4 @@
-import { NavSection, ResourceNSNavItem } from '@openshift-console/dynamic-plugin-sdk';
+import { HrefNavItem, NavSection } from '@openshift-console/dynamic-plugin-sdk';
 import { EncodedExtension } from '@openshift-console/dynamic-plugin-sdk-webpack';
 
 import { PERSPECTIVES } from '../../utils/constants/constants';
@@ -21,21 +21,21 @@ export const migrationSection: EncodedExtension[] = [
     type: 'console.navigation/section',
   } as EncodedExtension<NavSection>,
   {
+    flags: {
+      required: ['SHOW_MIGRATION_SECTION'],
+    },
     properties: {
       dataAttributes: {
         'data-quickstart-id': 'qs-nav-storagemigrations-virt-perspective',
         'data-test-id': 'storagemigrations-virt-perspective-nav-item',
       },
+      href: 'storagemigrations',
       id: 'storagemigrations-virt-perspective',
-      model: {
-        group: 'migration.openshift.io',
-        kind: 'MigPlan',
-        version: 'v1alpha1',
-      },
       name: '%plugin__kubevirt-plugin~Storage migrations%',
       perspective: PERSPECTIVES.VIRTUALIZATION,
+      prefixNamespaced: true,
       section: 'migration-virt-perspective',
     },
-    type: 'console.navigation/resource-ns',
-  } as EncodedExtension<ResourceNSNavItem>,
+    type: 'console.navigation/href',
+  } as EncodedExtension<HrefNavItem>,
 ];

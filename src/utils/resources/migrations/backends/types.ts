@@ -33,8 +33,6 @@ export type StorageMigrationBackendDescriptor = {
   api: StorageMigrationAPI;
   /** Namespace for fleet LIST when plans are not in the VM namespace (e.g. MTC). */
   fixedPlanNamespace?: string;
-  /** When true, console list links use `getResourceUrl` for `planModel`; otherwise the custom storagemigrations route. */
-  listConsolePathUsesResourceUrl: boolean;
   migrateVMs: MigrateVMsFn;
   normalizePlanForOverview: StorageMigrationPlanOverviewNormalizer;
   /**
