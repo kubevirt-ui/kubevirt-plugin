@@ -124,7 +124,7 @@
     "@openshift-console/dynamic-plugin-sdk/immutable": "^3.8.3",
     "@types/react": "^17.0.40",
     "@types/react-dom": "^17.0.0",
-    "dompurify": "3.4.0"
+    "dompurify": "^3.4.0"
   },
   "scripts": {
     "build": "yarn clean && NODE_ENV=production NODE_OPTIONS=--max-old-space-size=8192 yarn ts-node node_modules/.bin/webpack",
