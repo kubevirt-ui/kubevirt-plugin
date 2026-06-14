@@ -1,0 +1,6 @@
+.search-tips-popover {
+  &__body {
+    max-height: min(50vh, 500px);
+    overflow-y: auto;
+  }
+}

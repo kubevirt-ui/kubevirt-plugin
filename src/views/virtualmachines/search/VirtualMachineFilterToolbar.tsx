@@ -4,6 +4,7 @@ import HiddenFilterChips from '@kubevirt-utils/components/KubevirtFilterToolbar/
 import SelectFilterItem from '@kubevirt-utils/components/KubevirtFilterToolbar/components/SelectFilterItem';
 import { logVMListFiltered } from '@kubevirt-utils/extensions/telemetry/dashboard';
 import { getLabelFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/filters/getLabelFilter';
+import { getNameFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/filters/getNameFilter';
 import {
   KubevirtFilter,
   KubevirtFilterLayout,
@@ -13,11 +14,10 @@ import {
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useIsACMPage from '@multicluster/useIsACMPage';
 import { Toolbar, ToolbarContent } from '@patternfly/react-core';
+import { OnEditChip } from '@virtualmachines/list/hooks/useEditChip';
 import { ListPageBodySize } from '@virtualmachines/list/listPageBodySize';
 import { VirtualMachineRowFilterType } from '@virtualmachines/utils/constants';
 
-import NameFilter from './components/NameFilter';
-import useNameFilter from './hooks/useNameFilter';
 import { ACM_FILTERS_SHOWN_VM_LIST, FILTERS_SHOWN_VM_LIST } from './constants';
 
 type VirtualMachineFilterToolbarProps = {
@@ -28,6 +28,7 @@ type VirtualMachineFilterToolbarProps = {
   isSearchResultsPage?: boolean;
   listPageBodySize?: ListPageBodySize;
   loaded?: boolean;
+  onEditChip?: OnEditChip;
   onSetFilters: OnSetFilters;
 };
 
@@ -39,6 +40,7 @@ const VirtualMachineFilterToolbar: FC<VirtualMachineFilterToolbarProps> = ({
   isSearchResultsPage,
   listPageBodySize,
   loaded,
+  onEditChip,
   onSetFilters,
 }) => {
   const { t } = useKubevirtTranslation();
@@ -56,12 +58,22 @@ const VirtualMachineFilterToolbar: FC<VirtualMachineFilterToolbarProps> = ({
     [filterDefinitions, isSearchResultsPage, filtersShown],
   );
 
+  const chipOnlyFilters = useMemo(
+    () =>
+      filterDefinitions.filter(
+        (f) => f.filterLayout === KubevirtFilterLayout.SELECT && !selectFilters.includes(f),
+      ),
+    [filterDefinitions, selectFilters],
+  );
+
   const hiddenFilters = useMemo(
     () => [
-      ...filterDefinitions.filter((f) => f.filterLayout === KubevirtFilterLayout.HIDDEN),
+      getNameFilter(t),
       getLabelFilter(t),
+      ...chipOnlyFilters,
+      ...filterDefinitions.filter((f) => f.filterLayout === KubevirtFilterLayout.HIDDEN),
     ],
-    [filterDefinitions, t],
+    [filterDefinitions, chipOnlyFilters, t],
   );
 
   const useShortLabels = isSearchResultsPage && listPageBodySize !== ListPageBodySize.lg;
@@ -72,17 +84,12 @@ const VirtualMachineFilterToolbar: FC<VirtualMachineFilterToolbarProps> = ({
     onSetFilters(newFilters);
   };
 
-  const nameFilter = useNameFilter(filters, handleSetFilters);
-
   if (!loaded) return null;
 
   return (
     <Toolbar
-      clearAllFilters={() => {
-        nameFilter.resetInputText();
-        clearAllFilters();
-      }}
       className={className}
+      clearAllFilters={clearAllFilters}
       clearFiltersButtonText={t('Clear all filters')}
       data-test="filter-toolbar"
       id="filter-toolbar"
@@ -98,13 +105,14 @@ const VirtualMachineFilterToolbar: FC<VirtualMachineFilterToolbarProps> = ({
             filterDef={filterDef}
             filters={filters}
             key={filterDef.id}
+            onEditChip={onEditChip}
             onSetFilters={handleSetFilters}
           />
         ))}
-        <NameFilter {...nameFilter} />
         <HiddenFilterChips
           filters={filters}
           hiddenFilters={hiddenFilters}
+          onEditChip={onEditChip}
           onSetFilters={handleSetFilters}
         />
       </ToolbarContent>

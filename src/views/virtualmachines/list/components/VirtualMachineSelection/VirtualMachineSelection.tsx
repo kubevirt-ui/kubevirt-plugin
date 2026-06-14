@@ -27,6 +27,9 @@ const VirtualMachineSelection: FC<VirtualMachineSelectionProps> = ({ pagination,
   return (
     <FlexItem className="virtual-machine-selection">
       <BulkSelect
+        menuToggleProps={{
+          size: 'sm',
+        }}
         canSelectAll
         onSelect={(value) => handleBulkSelect(value, vms, currentPageVMs)}
         pageCount={currentPageVMs.length}
