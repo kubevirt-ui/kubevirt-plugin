@@ -3,7 +3,7 @@ import { Controller, FieldPath, useFormContext } from 'react-hook-form';
 
 import { V1DiskFormState } from '@kubevirt-utils/components/DiskModal/utils/types';
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
-import { DataUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
+import { DataUpload } from '@kubevirt-utils/hooks/useCDIUpload/types';
 import { isUploadingDisk } from '@kubevirt-utils/hooks/useCDIUpload/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { DropEvent, FileUpload, FormGroup, ValidatedOptions } from '@patternfly/react-core';

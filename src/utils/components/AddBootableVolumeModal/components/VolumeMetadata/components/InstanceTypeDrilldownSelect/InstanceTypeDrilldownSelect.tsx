@@ -4,7 +4,7 @@ import { VirtualMachineClusterInstancetypeModel } from '@kubevirt-ui-ext/kubevir
 import {
   AddBootableVolumeState,
   SetBootableVolumeFieldType,
-} from '@kubevirt-utils/components/AddBootableVolumeModal/utils/constants';
+} from '@kubevirt-utils/components/AddBootableVolumeModal/types';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import {
   DEFAULT_INSTANCETYPE_KIND_LABEL,

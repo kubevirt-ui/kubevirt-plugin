@@ -1,5 +1,6 @@
 import React, { FC } from 'react';
 
+import { getCancelUploadLabel } from '@kubevirt-utils/hooks/useCDIUpload/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ProgressStatus } from '@openshift-console/dynamic-plugin-sdk';
 import { Button, ButtonVariant } from '@patternfly/react-core';
@@ -23,7 +24,7 @@ const UploadPVCPopoverProgressStatus: FC<UploadPVCPopoverProgressStatusProps> = 
         onMouseUp={onCancelClick}
         variant={ButtonVariant.link}
       >
-        {t('Cancel upload')}
+        {getCancelUploadLabel(t)}
       </Button>
     </ProgressStatus>
   );

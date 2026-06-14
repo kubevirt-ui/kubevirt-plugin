@@ -1,10 +1,10 @@
 import React, { FC } from 'react';
 
+import { TLS_CERT_FIELD_NAMES } from '@kubevirt-utils/components/AddBootableVolumeModal/consts';
 import {
   AddBootableVolumeState,
   SetBootableVolumeFieldType,
-  TLS_CERT_FIELD_NAMES,
-} from '@kubevirt-utils/components/AddBootableVolumeModal/utils/constants';
+} from '@kubevirt-utils/components/AddBootableVolumeModal/types';
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import { FormTextInput } from '@kubevirt-utils/components/FormTextInput/FormTextInput';
 import { TLSCertificateSection } from '@kubevirt-utils/components/TLSCertificateSection';

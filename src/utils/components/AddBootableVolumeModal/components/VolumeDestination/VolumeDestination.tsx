@@ -9,7 +9,7 @@ import { useRequiredFieldValidation } from '@kubevirt-utils/hooks/useRequiredFie
 import { getFieldRequiredMessage } from '@kubevirt-utils/utils/validation';
 import { ExpandableSection, FormGroup, Grid, GridItem, TextInput } from '@patternfly/react-core';
 
-import { AddBootableVolumeState, SetBootableVolumeFieldType } from '../../utils/constants';
+import { AddBootableVolumeState, SetBootableVolumeFieldType } from '../../types';
 
 import DefaultStorageClassAlert from './StorageClass/DefaultStorageClassAlert';
 import StorageClassSelect from './StorageClass/StorageClassSelect';

@@ -1,5 +1,6 @@
 import React, { FC } from 'react';
 
+import { getCancelUploadLabel } from '@kubevirt-utils/hooks/useCDIUpload/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   Button,
@@ -91,7 +92,7 @@ const UploadPVCPopoverUploadStatus: FC<UploadPVCPopoverUploadStatusProps> = ({
                 onMouseUp={onCancelClick}
                 variant={ButtonVariant.link}
               >
-                {t('Cancel upload')}
+                {getCancelUploadLabel(t)}
               </Button>
             </StackItem>
           )}

@@ -3,7 +3,7 @@ import React, { FC } from 'react';
 import {
   AddBootableVolumeState,
   SetBootableVolumeFieldType,
-} from '@kubevirt-utils/components/AddBootableVolumeModal/utils/constants';
+} from '@kubevirt-utils/components/AddBootableVolumeModal/types';
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import useHcoWorkloadArchitectures from '@kubevirt-utils/hooks/useHcoWorkloadArchitectures';

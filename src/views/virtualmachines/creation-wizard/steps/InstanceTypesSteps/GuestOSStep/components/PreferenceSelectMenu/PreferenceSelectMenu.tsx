@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 
-import { PreferenceOption } from '@kubevirt-utils/components/AddBootableVolumeModal/utils/utils';
+import { PreferenceOption } from '@kubevirt-utils/components/AddBootableVolumeModal/types';
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup, SelectOption } from '@patternfly/react-core';

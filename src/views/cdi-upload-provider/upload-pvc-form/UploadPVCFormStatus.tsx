@@ -1,6 +1,6 @@
 import React, { FC, useEffect, useState } from 'react';
 
-import { killUploadPVC } from '@kubevirt-utils/hooks/useCDIUpload/utils';
+import { cancelUploadPVC } from '@kubevirt-utils/hooks/useCDIUpload/utils';
 import { Bullseye } from '@patternfly/react-core';
 
 import { UPLOAD_STATUS, uploadErrorType } from '../utils/consts';
@@ -39,7 +39,7 @@ const UploadPVCFormStatus: FC<UploadPVCFormStatusProps> = ({
 
   const onCancelFinish = () => {
     upload.cancelUpload();
-    killUploadPVC(upload?.pvcName, upload?.namespace)
+    cancelUploadPVC(upload?.pvcName, upload?.namespace)
       .then(onCancelClick)
       .catch((err) => setError(err?.message));
   };

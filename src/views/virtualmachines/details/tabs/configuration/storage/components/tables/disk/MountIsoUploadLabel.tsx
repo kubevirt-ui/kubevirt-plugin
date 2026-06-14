@@ -1,12 +1,10 @@
 import React, { FC } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import {
-  getCdromUploadKeyFromVm,
-  UPLOAD_ALERT_STATUS,
-  useMountIsoUploadStore,
-} from '@kubevirt-utils/hooks/mountIsoUploadStore';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { useUploadProgressStore } from '@kubevirt-utils/hooks/useUploadProgressToast/uploadProgressStore';
+import { UPLOAD_PROGRESS_STATUS } from '@kubevirt-utils/hooks/useUploadProgressToast/utils/constants';
+import { getVmCdromUploadKeyFromVm } from '@kubevirt-utils/hooks/useUploadProgressToast/utils/uploadKeys';
 import { Label, Spinner } from '@patternfly/react-core';
 
 type MountIsoUploadLabelProps = {
@@ -16,10 +14,10 @@ type MountIsoUploadLabelProps = {
 
 const MountIsoUploadLabel: FC<MountIsoUploadLabelProps> = ({ diskName, vm }) => {
   const { t } = useKubevirtTranslation();
-  const uploadKey = getCdromUploadKeyFromVm(vm, diskName);
-  const upload = useMountIsoUploadStore((state) => state.uploads[uploadKey]);
+  const uploadKey = getVmCdromUploadKeyFromVm(vm, diskName);
+  const upload = useUploadProgressStore((state) => state.uploads[uploadKey]);
 
-  if (upload?.status !== UPLOAD_ALERT_STATUS.UPLOADING) {
+  if (upload?.status !== UPLOAD_PROGRESS_STATUS.UPLOADING) {
     return null;
   }
 

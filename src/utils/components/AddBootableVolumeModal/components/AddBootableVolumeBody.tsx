@@ -1,18 +1,20 @@
 import React, { Dispatch, FC, SetStateAction, useCallback } from 'react';
 
 import {
-  AddBootableVolumeState,
   DROPDOWN_FORM_SELECTION,
   initialBootableVolumeState,
-  SetBootableVolumeFieldType,
   SOURCE_DETAILS_SECTION_ID,
-} from '@kubevirt-utils/components/AddBootableVolumeModal/utils/constants';
+} from '@kubevirt-utils/components/AddBootableVolumeModal/consts';
+import {
+  AddBootableVolumeState,
+  SetBootableVolumeFieldType,
+} from '@kubevirt-utils/components/AddBootableVolumeModal/types';
 import {
   deleteBootableVolumeLabel,
   updateBootableVolumeField,
-} from '@kubevirt-utils/components/AddBootableVolumeModal/utils/utils';
+} from '@kubevirt-utils/components/AddBootableVolumeModal/utils';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
-import { DataUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
+import { DataUpload } from '@kubevirt-utils/hooks/useCDIUpload/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getValidNamespace } from '@kubevirt-utils/utils/utils';
 import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverContentWithLightspeedButton/PopoverContentWithLightspeedButton';
@@ -53,12 +55,12 @@ const AddBootableVolumeBody: FC<AddBootableVolumeBodyProps> = ({
   const setBootableVolumeField: SetBootableVolumeFieldType = useCallback(
     (key, fieldKey) => (value) =>
       setBootableVolume((prevState) => updateBootableVolumeField(prevState, key, value, fieldKey)),
-    [],
+    [setBootableVolume],
   );
 
   const deleteLabel = useCallback(
     (labelKey: string) => setBootableVolume((prev) => deleteBootableVolumeLabel(prev, labelKey)),
-    [],
+    [setBootableVolume],
   );
 
   const resetDiskSize = () => setBootableVolumeField('size')(initialBootableVolumeState.size);

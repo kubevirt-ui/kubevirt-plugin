@@ -17,7 +17,6 @@ import '../tables.scss';
 export type DiskListCallbacks = {
   customize?: boolean;
   onSubmit?: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine>;
-  onUploadStarted?: (promise: Promise<unknown>, cdromDiskName?: string) => void;
   provisioningPercentages: NameWithPercentages;
   sourcesLoaded?: boolean;
   vm: V1VirtualMachine;
@@ -25,16 +24,9 @@ export type DiskListCallbacks = {
 };
 
 const renderActionsCell = (row: DiskRowDataLayout, callbacks: DiskListCallbacks): ReactNode => {
-  const { customize, onSubmit, onUploadStarted, vm, vmi } = callbacks;
+  const { customize, onSubmit, vm, vmi } = callbacks;
   return (
-    <DiskRowActions
-      customize={customize}
-      obj={row}
-      onDiskUpdate={onSubmit}
-      onUploadStarted={onUploadStarted}
-      vm={vm}
-      vmi={vmi}
-    />
+    <DiskRowActions customize={customize} obj={row} onDiskUpdate={onSubmit} vm={vm} vmi={vmi} />
   );
 };
 

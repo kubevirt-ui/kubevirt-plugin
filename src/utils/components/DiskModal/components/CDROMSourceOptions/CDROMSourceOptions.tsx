@@ -3,7 +3,7 @@ import React, { FC } from 'react';
 import DiskSourceUploadPVC from '@kubevirt-utils/components/DiskModal/components/DiskSourceSelect/components/DiskSourceUploadPVC/DiskSourceUploadPVC';
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import { EnhancedSelectOptionProps } from '@kubevirt-utils/components/FilterSelect/utils/types';
-import { DataUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
+import { DataUpload } from '@kubevirt-utils/hooks/useCDIUpload/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Content, ContentVariants, Radio, Stack, StackItem } from '@patternfly/react-core';
 
@@ -18,7 +18,7 @@ type CDROMSourceOptionsProps = {
   emptyDriveOption?: EmptyDriveOption;
   existingISOSelected: boolean;
   isoOptions: EnhancedSelectOptionProps[];
-  isUploading: boolean;
+  isSubmitting: boolean;
   onClearUpload?: () => void;
   onFileUpload: () => void;
   onISOSelect: (value: string) => void;
@@ -32,7 +32,7 @@ const CDROMSourceOptions: FC<CDROMSourceOptionsProps> = ({
   emptyDriveOption,
   existingISOSelected,
   isoOptions,
-  isUploading,
+  isSubmitting,
   onClearUpload,
   onFileUpload,
   onISOSelect,
@@ -57,7 +57,7 @@ const CDROMSourceOptions: FC<CDROMSourceOptionsProps> = ({
             <Radio
               id={`${radioNamePrefix}-existing`}
               isChecked={existingISOSelected}
-              isDisabled={isUploading}
+              isDisabled={isSubmitting}
               label={t('Use existing ISO')}
               name={radioNamePrefix}
               onChange={() => onISOSelect('')}
@@ -66,7 +66,7 @@ const CDROMSourceOptions: FC<CDROMSourceOptionsProps> = ({
               <div className="pf-v6-u-ml-lg pf-v6-u-mt-sm">
                 <InlineFilterSelect
                   toggleProps={{
-                    isDisabled: isUploading,
+                    isDisabled: isSubmitting,
                     isFullWidth: true,
                   }}
                   options={isoOptions}
@@ -81,7 +81,7 @@ const CDROMSourceOptions: FC<CDROMSourceOptionsProps> = ({
             <Radio
               id={`${radioNamePrefix}-upload`}
               isChecked={uploadEnabled}
-              isDisabled={isUploading}
+              isDisabled={isSubmitting}
               label={t('Upload new ISO')}
               name={radioNamePrefix}
               onChange={onFileUpload}
@@ -106,7 +106,7 @@ const CDROMSourceOptions: FC<CDROMSourceOptionsProps> = ({
                 description={emptyDriveOption.description}
                 id={`${radioNamePrefix}-empty`}
                 isChecked={emptyDriveOption.isSelected}
-                isDisabled={isUploading || !emptyDriveOption.isAllowed}
+                isDisabled={isSubmitting || !emptyDriveOption.isAllowed}
                 label={t('Leave empty drive')}
                 name={radioNamePrefix}
                 onChange={emptyDriveOption.onSelect}

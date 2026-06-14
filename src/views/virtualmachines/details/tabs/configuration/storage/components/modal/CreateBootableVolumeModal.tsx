@@ -7,11 +7,11 @@ import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-a
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import VolumeDestination from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeDestination/VolumeDestination';
 import VolumeMetadata from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/VolumeMetadata';
+import { initialBootableVolumeState } from '@kubevirt-utils/components/AddBootableVolumeModal/consts';
 import {
   AddBootableVolumeState,
-  initialBootableVolumeState,
   SetBootableVolumeFieldType,
-} from '@kubevirt-utils/components/AddBootableVolumeModal/utils/constants';
+} from '@kubevirt-utils/components/AddBootableVolumeModal/types';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import {
