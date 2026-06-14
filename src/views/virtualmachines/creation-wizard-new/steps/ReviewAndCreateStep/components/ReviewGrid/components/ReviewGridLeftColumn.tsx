@@ -8,7 +8,8 @@ import { getFolder, NO_DATA_DASH } from '@kubevirt-utils/resources/vm';
 import { vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { DescriptionList, ExpandableSection } from '@patternfly/react-core';
-import useVMWizardStore from '@virtualmachines/creation-wizard-new/state/vm-wizard-store/useVMWizardStore';
+import { useVMWizard } from '@virtualmachines/creation-wizard-new/state/vm-wizard-context/VMWizardContext';
+import { CREATE_VM_FORM_FIELDS_VM_DATA } from '@virtualmachines/creation-wizard-new/state/vm-wizard-form/consts';
 import { isCloneCreationMethod } from '@virtualmachines/creation-wizard-new/utils/utils';
 
 import CloneDescriptionInput from './CloneDescriptionInput';
@@ -17,9 +18,12 @@ import CloneNameInput from './CloneNameInput';
 const ReviewGridLeftColumn: FC = () => {
   const { t } = useKubevirtTranslation();
   const vm = vmSignal.value;
-  const { creationMethod, project, vmName } = useVMWizardStore();
+
   const { featureEnabled: treeViewFoldersEnabled, loading: treeViewFoldersLoading } =
     useFeatures(TREE_VIEW_FOLDERS);
+
+  const { getValues } = useVMWizard();
+  const { creationMethod, name, project } = getValues(CREATE_VM_FORM_FIELDS_VM_DATA.ROOT);
 
   const isCloneMethod = isCloneCreationMethod(creationMethod);
 
@@ -32,7 +36,7 @@ const ReviewGridLeftColumn: FC = () => {
             <CloneDescriptionInput />
           </>
         ) : (
-          <DescriptionItem descriptionData={vmName || NO_DATA_DASH} descriptionHeader={t('Name')} />
+          <DescriptionItem descriptionData={name || NO_DATA_DASH} descriptionHeader={t('Name')} />
         )}
         <DescriptionItem
           descriptionData={getCluster(vm) || NO_DATA_DASH}

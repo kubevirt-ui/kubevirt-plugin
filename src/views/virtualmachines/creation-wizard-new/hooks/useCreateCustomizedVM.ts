@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useWatch } from 'react-hook-form';
 import { useNavigate } from 'react-router';
 import produce from 'immer';
 
@@ -31,8 +32,10 @@ import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { kubevirtK8sCreate } from '@multicluster/k8sRequests';
 import { getVMURL } from '@multicluster/urls';
 import { useSignals } from '@preact/signals-react/runtime';
-import useVMWizardStore from '@virtualmachines/creation-wizard-new/state/vm-wizard-store/useVMWizardStore';
 import { VMCreationMethod } from '@virtualmachines/creation-wizard-new/utils/constants';
+
+import { useVMWizard } from '../state/vm-wizard-context/VMWizardContext';
+import { CREATE_VM_FORM_FIELDS_VM_DATA } from '../state/vm-wizard-form/consts';
 
 type UseCreateCustomizedVM = () => {
   createCustomizedVM: () => Promise<void>;
@@ -44,12 +47,8 @@ const useCreateCustomizedVM: UseCreateCustomizedVM = () => {
   useSignals();
   const navigate = useNavigate();
   const cluster = useClusterParam();
-  const {
-    creationMethod,
-    project: vmNamespaceTarget,
-    selectedTemplate,
-    vmName,
-  } = useVMWizardStore();
+  const { control, getValues } = useVMWizard();
+  const vmNamespaceTarget = useWatch({ control, name: CREATE_VM_FORM_FIELDS_VM_DATA.PROJECT });
   const isIPv6SingleStack = useIsIPv6SingleStackCluster(cluster);
   const [isUDNManagedNamespace] = useNamespaceUDN(vmNamespaceTarget);
 
@@ -57,6 +56,11 @@ const useCreateCustomizedVM: UseCreateCustomizedVM = () => {
   const [error, setError] = useState<any | Error>(null);
 
   const createCustomizedVM = async () => {
+    const {
+      creationMethod,
+      name: vmName,
+      selectedTemplate,
+    } = getValues(CREATE_VM_FORM_FIELDS_VM_DATA.ROOT);
     setIsSubmitting(true);
     setError(null);
     const storeVM = vmSignal.value;

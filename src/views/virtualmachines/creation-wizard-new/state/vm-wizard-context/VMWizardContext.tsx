@@ -6,8 +6,8 @@ import { clearCustomizeInstanceType } from '@kubevirt-utils/store/customizeInsta
 import { getValidNamespace } from '@kubevirt-utils/utils/utils';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import useInstanceTypeVMStore from '@virtualmachines/creation-wizard-new/state/instance-type-vm-store/useInstanceTypeVMStore';
+import { createInitialVMWizardFormValues } from '@virtualmachines/creation-wizard-new/state/vm-wizard-form/consts';
 import { VMWizardFormValues } from '@virtualmachines/creation-wizard-new/state/vm-wizard-form/types';
-import { createInitialVMWizardFormValues } from '@virtualmachines/creation-wizard-new/state/vm-wizard-form/utils';
 
 type VMWizardProviderProps = {
   children?: ReactNode;
@@ -21,7 +21,7 @@ export const VMWizardProvider: FC<VMWizardProviderProps> = ({ children }) => {
     defaultValues: createInitialVMWizardFormValues({ cluster: clusterParam ?? '', namespace }),
   });
 
-  // TODO: check if this is needed
+  // TODO: delete useEffect after migration to form is completed
   useEffect(
     () => () => {
       clearCustomizeInstanceType();

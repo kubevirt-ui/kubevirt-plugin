@@ -1,4 +1,5 @@
 import { Template } from '@kubevirt-utils/resources/template';
+import { InstanceTypeVMState } from '@virtualmachines/creation-wizard-new/state/instance-type-vm-store/utils/types';
 import { VMCreationMethod } from '@virtualmachines/creation-wizard-new/utils/constants';
 
 /** VM identity, placement, and provisioning choices collected across wizard steps. */
@@ -24,7 +25,11 @@ export type VMWizardStepNavigation = {
   visitedSteps: Set<string>;
 };
 
+/** Guest OS, boot source, and compute resource selections for the instance-type flow. */
+export type VMWizardInstanceTypeData = InstanceTypeVMState;
+
 export type VMWizardFormValues = {
+  instanceTypeData: VMWizardInstanceTypeData;
   stepNavigation: VMWizardStepNavigation;
   uiState: VMWizardUIState;
   vmData: VMWizardVirtualMachineData;

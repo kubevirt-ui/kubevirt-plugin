@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useWatch } from 'react-hook-form';
 
 import {
   V1beta1VirtualMachineClusterPreference,
@@ -18,7 +19,8 @@ import {
   useListPageFilter,
 } from '@openshift-console/dynamic-plugin-sdk';
 import { ThSortType } from '@patternfly/react-table/dist/esm/components/Table/base/types';
-import useInstanceTypeVMStore from '@virtualmachines/creation-wizard-new/state/instance-type-vm-store/useInstanceTypeVMStore';
+import { useVMWizard } from '@virtualmachines/creation-wizard-new/state/vm-wizard-context/VMWizardContext';
+import { CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA } from '@virtualmachines/creation-wizard-new/state/vm-wizard-form/consts';
 import useBootVolumeColumns from '@virtualmachines/creation-wizard-new/steps/InstanceTypesSteps/BootSourceStep/components/BootableVolumeList/hooks/useBootVolumeColumns';
 import useBootVolumeFilters from '@virtualmachines/creation-wizard-new/steps/InstanceTypesSteps/BootSourceStep/components/BootableVolumeList/hooks/useBootVolumeFilters';
 import useBootVolumeSortColumns from '@virtualmachines/creation-wizard-new/steps/InstanceTypesSteps/BootSourceStep/components/BootableVolumeList/hooks/useBootVolumeSortColumns';
@@ -56,7 +58,12 @@ const useBootableVolumesTableData: UseBootableVolumesTableData = (
   preferencesMap,
   userPreferencesMap,
 ) => {
-  const { preference } = useInstanceTypeVMStore();
+  const { control } = useVMWizard();
+  const preference = useWatch({
+    control,
+    name: CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.PREFERENCE,
+  });
+
   const bootableVolumesData = useBootableVolumes(volumeListNamespace);
   const { bootableVolumes, dvSources, pvcSources, volumeSnapshotSources } = bootableVolumesData;
 

@@ -34,8 +34,7 @@ import { ARCHITECTURE_ID, getArchitecture } from '@kubevirt-utils/utils/architec
 import { getHumanizedSize } from '@kubevirt-utils/utils/units';
 import { Content, ContentVariants, Flex, FlexItem, Label } from '@patternfly/react-core';
 import { TableText, Tr, WrapModifier } from '@patternfly/react-table';
-import useInstanceTypeVMStore from '@virtualmachines/creation-wizard-new/state/instance-type-vm-store/useInstanceTypeVMStore';
-import { InstanceTypeVMStore } from '@virtualmachines/creation-wizard-new/state/instance-type-vm-store/utils/types';
+import { OnSelectCreatedVolumeHandler } from '@virtualmachines/creation-wizard-new/hooks/useOnSelectCreatedVolume';
 import {
   getTemplateOSIcon,
   getVolumeNameOSIcon,
@@ -50,11 +49,12 @@ type BootableVolumeRowProps = {
   activeColumnIDs: string[];
   bootableVolume: BootableVolume;
   rowData: {
-    bootableVolumeSelectedState: [BootableVolume, InstanceTypeVMStore['onSelectCreatedVolume']];
+    bootableVolumeSelectedState: [BootableVolume, OnSelectCreatedVolumeHandler];
     dataImportCron: V1beta1DataImportCron;
     dvSource: V1beta1DataVolume;
     preference: VirtualMachinePreference;
     pvcSource: IoK8sApiCoreV1PersistentVolumeClaim;
+    volumeListNamespace: string;
     volumeSnapshotSource: VolumeSnapshotKind;
   };
 };
@@ -68,11 +68,11 @@ const BootableVolumeRow: FC<BootableVolumeRowProps> = ({
     dvSource,
     preference,
     pvcSource,
+    volumeListNamespace,
     volumeSnapshotSource,
   },
 }) => {
   const { t } = useKubevirtTranslation();
-  const volumeListNamespace = useInstanceTypeVMStore((state) => state.volumeListNamespace);
   const bootVolumeName = getName(bootableVolume);
   const bootVolumeNamespace = getNamespace(bootableVolume);
   const sizeData = getHumanizedSize(getDiskSize(dvSource, pvcSource, volumeSnapshotSource)).string;
