@@ -12,7 +12,7 @@ import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
 import { Wizard, WizardHeader, WizardStep } from '@patternfly/react-core';
 import DefaultWizardFooter from '@virtualmachines/creation-wizard/components/DefaultWizardFooter';
 import useCloseWizard from '@virtualmachines/creation-wizard/hooks/useCloseWizard';
-import useSyncDescription from '@virtualmachines/creation-wizard/hooks/useSyncDescription';
+import { useSyncDeploymentDetails } from '@virtualmachines/creation-wizard/hooks/useSyncDeploymentDetails';
 import useVMGenerationNavItem from '@virtualmachines/creation-wizard/hooks/useVMGenerationNavItem';
 import useWizardStepValidation from '@virtualmachines/creation-wizard/hooks/useWizardStepValidation';
 import useVMWizardStore from '@virtualmachines/creation-wizard/state/vm-wizard-store/useVMWizardStore';
@@ -48,7 +48,7 @@ const VMCreationWizard: FC = () => {
     resetWizardState,
     setTemplatesDrawerIsOpen,
   } = useVMWizardStore();
-  const syncDescription = useSyncDescription();
+  const syncDeploymentDetails = useSyncDeploymentDetails();
   const { isNextDisabledForStep, isStepDisabled } = useWizardStepValidation();
   const { navItemWithVMGeneration } = useVMGenerationNavItem(creationMethod);
   const clusterParam = useClusterParam();
@@ -84,7 +84,7 @@ const VMCreationWizard: FC = () => {
     <TemplatesDrawerWrapper>
       <Wizard
         onStepChange={(_, currentStep, prevStep) => {
-          syncDescription(currentStep, prevStep);
+          syncDeploymentDetails(currentStep, prevStep);
           if (currentStep?.id !== VMWizardStep.TEMPLATE) setTemplatesDrawerIsOpen(false);
           if (currentStep?.id) markStepVisited(String(currentStep.id));
 

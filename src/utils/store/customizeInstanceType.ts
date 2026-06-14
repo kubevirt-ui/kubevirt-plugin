@@ -29,6 +29,22 @@ type UpdateCustomizeInstanceTypeArgs = {
   path?: string | string[];
 }[];
 
+// ensurePath joins array segments with "." and re-splits, which breaks keys that
+// contain dots (e.g. label "vm.openshift.io/folder") into nested objects.
+const ensurePathParts = (obj: object, pathParts: string[]): void => {
+  let current = obj;
+
+  for (let index = 0; index < pathParts.length - 1; index++) {
+    const part = pathParts[index];
+
+    if (!current[part]) {
+      current[part] = {};
+    }
+
+    current = current[part];
+  }
+};
+
 export type UpdateCustomizeInstanceType = (
   args: UpdateCustomizeInstanceTypeArgs,
 ) => V1VirtualMachine;
@@ -69,7 +85,13 @@ export const updateCustomizeInstanceType: UpdateCustomizeInstanceType = (
       if (validPathParts.length === 0) {
         return;
       }
-      ensurePath(vmDraft, validPathParts.join('.'));
+
+      if (typeof path === 'string') {
+        ensurePath(vmDraft, validPathParts.join('.'));
+      } else {
+        ensurePathParts(vmDraft, validPathParts);
+      }
+
       let obj = vmDraft;
       validPathParts.forEach((part, index) => {
         if (index < validPathParts.length - 1) {

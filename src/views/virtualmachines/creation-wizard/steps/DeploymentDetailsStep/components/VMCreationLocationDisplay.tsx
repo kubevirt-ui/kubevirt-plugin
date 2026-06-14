@@ -2,6 +2,8 @@ import React, { FC } from 'react';
 import classNames from 'classnames';
 
 import EditButton from '@kubevirt-utils/components/EditButton/EditButton';
+import { TREE_VIEW_FOLDERS } from '@kubevirt-utils/hooks/useFeatures/constants';
+import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm';
 import useIsACMPage from '@multicluster/useIsACMPage';
@@ -21,6 +23,8 @@ const VMCreationLocationDisplay: FC<VMCreationLocationDisplayProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const isACMPage = useIsACMPage();
+  const { featureEnabled: treeViewFoldersEnabled, loading: treeViewFoldersLoading } =
+    useFeatures(TREE_VIEW_FOLDERS);
   const { cluster, folder, project } = useVMWizardStore();
 
   return (
@@ -40,9 +44,13 @@ const VMCreationLocationDisplay: FC<VMCreationLocationDisplayProps> = ({
           )}
           <span className="pf-v6-u-font-weight-bold pf-v6-u-mr-xs">{t('Project')}</span>
           {project || NO_DATA_DASH}
-          <span className="pf-v6-u-font-weight-bold pf-v6-u-mx-xs">{'>'}</span>
-          <span className="pf-v6-u-font-weight-bold pf-v6-u-mr-xs">{t('Folder')}</span>
-          {folder || NO_DATA_DASH}
+          {!treeViewFoldersLoading && treeViewFoldersEnabled && (
+            <>
+              <span className="pf-v6-u-font-weight-bold pf-v6-u-mx-xs">{'>'}</span>
+              <span className="pf-v6-u-font-weight-bold pf-v6-u-mr-xs">{t('Folder')}</span>
+              {folder || NO_DATA_DASH}
+            </>
+          )}
         </span>
       </div>
       <EditButton
