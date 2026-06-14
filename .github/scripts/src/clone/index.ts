@@ -1,16 +1,16 @@
-import { JiraClient } from './jira-client.js';
-import { createOctokit, branchExists } from './github-repo.js';
-import { upsertComment } from './github-comments.js';
+import { JiraClient } from '../jira-client.js';
+import { createOctokit, branchExists } from '../github-repo.js';
+import { upsertComment } from '../github-comments.js';
 import {
   extractTicketIds,
   extractVersionFromBranch,
   findMatchingFixVersion,
-} from './version-utils.js';
+} from '../version-utils.js';
 import { cloneAllTickets } from './clone-tickets.js';
 import { performCherryPick, openCherryPickPR } from './cherry-pick.js';
-import { requireEnv } from './utils.js';
-import { CLONE_COMMENT_MARKER, JIRA_BASE_URL, JIRA_PROJECT_KEY } from './types/index.js';
-import type { GitHubConfig } from './types/index.js';
+import { requireEnv } from '../utils.js';
+import { CLONE_COMMENT_MARKER, JIRA_BASE_URL, JIRA_PROJECT_KEY } from '../types/index.js';
+import type { GitHubConfig } from '../types/index.js';
 
 const ALLOWED_ASSOCIATIONS = new Set(['MEMBER', 'OWNER', 'COLLABORATOR']);
 const CLONE_CMD_REGEX = /^\/clone\s+(release-\d+\.\d+)\s*$/m;
