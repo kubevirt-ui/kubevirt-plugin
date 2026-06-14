@@ -186,6 +186,8 @@ export const buildNetworkSelectOptions = ({
     };
   });
 
+  options.sort((a, b) => a.label.localeCompare(b.label, undefined, { numeric: true }));
+
   if (showPodNetworkingOption) {
     options.unshift({
       label: podNetworkingText,
