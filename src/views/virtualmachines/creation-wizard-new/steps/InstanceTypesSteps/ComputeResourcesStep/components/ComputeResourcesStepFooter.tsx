@@ -1,19 +1,20 @@
 import React, { FC } from 'react';
 
+import { setVMSignal } from '@kubevirt-utils/store/customizeInstanceType';
 import { useWizardContext, WizardFooter } from '@patternfly/react-core';
 import useCloseWizard from '@virtualmachines/creation-wizard-new/hooks/useCloseWizard';
 import useWizardStepValidation from '@virtualmachines/creation-wizard-new/hooks/useWizardStepValidation';
-import useCreateVMFromInstanceType from '@virtualmachines/creation-wizard-new/steps/InstanceTypesSteps/hooks/useCreateVMFromInstanceType';
 import { VMWizardStep } from '@virtualmachines/creation-wizard-new/utils/constants';
+import useGenerateVM from '../../hooks/useGenerateVM/useGenerateVM';
 
 const ComputeResourcesStepFooter: FC = () => {
   const { activeStep, goToNextStep, goToPrevStep } = useWizardContext();
-  const handleCreateVM = useCreateVMFromInstanceType();
+  const generatedVM = useGenerateVM();
   const closeWizard = useCloseWizard();
   const { isNextDisabledForStep } = useWizardStepValidation();
 
-  const handleGoToNextStep = async () => {
-    await handleCreateVM();
+  const handleGoToNextStep = () => {
+    setVMSignal(generatedVM);
     goToNextStep();
   };
 

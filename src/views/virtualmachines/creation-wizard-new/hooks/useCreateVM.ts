@@ -9,21 +9,25 @@ import { CREATE_VM_FORM_FIELDS_VM_DATA } from '../state/vm-wizard-form/consts';
 
 type UseCreateVM = () => {
   createVM: () => Promise<void>;
-  error: Error | unknown;
+  error: unknown;
   isSubmitting: boolean;
 };
 
 const useCreateVM: UseCreateVM = () => {
   const { control } = useVMWizard();
   const creationMethod = useWatch({ control, name: CREATE_VM_FORM_FIELDS_VM_DATA.CREATION_METHOD });
-  const cloneVM = useCloneVM();
-  const { createCustomizedVM, error, isSubmitting } = useCreateCustomizedVM();
+  const { cloneVM, error: cloneError, isSubmitting: isCloneSubmitting } = useCloneVM();
+  const {
+    createCustomizedVM,
+    error: createError,
+    isSubmitting: isCreateSubmitting,
+  } = useCreateCustomizedVM();
 
-  return {
-    createVM: isCloneCreationMethod(creationMethod) ? cloneVM : createCustomizedVM,
-    error,
-    isSubmitting,
-  };
+  const isCloneMethod = isCloneCreationMethod(creationMethod);
+
+  return isCloneMethod
+    ? { createVM: cloneVM, error: cloneError, isSubmitting: isCloneSubmitting }
+    : { createVM: createCustomizedVM, error: createError, isSubmitting: isCreateSubmitting };
 };
 
 export default useCreateVM;

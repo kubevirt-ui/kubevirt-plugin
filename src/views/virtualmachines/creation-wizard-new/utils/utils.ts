@@ -27,7 +27,50 @@ import {
 } from '../state/vm-wizard-form/consts';
 import { VMWizardFormValues } from '../state/vm-wizard-form/types';
 
-import { ApplySelectedBootableVolumeToForm } from './types';
+import {
+  ApplySelectedBootableVolumeToForm,
+  VMCreationMethodCardDetails,
+  VMCreationMethodConfig,
+} from './types';
+
+const VM_CREATION_METHOD_MAPPER: Record<VMCreationMethod, VMCreationMethodConfig> = {
+  [VMCreationMethod.CLONE]: {
+    activeFlow: CLONE_FLOW,
+    cardDetails: (t) => ({
+      description: t('Create a copy of an existing VirtualMachine.'),
+      IconComponent: CloneIcon,
+      label: t('Clone existing VirtualMachine'),
+    }),
+  },
+  [VMCreationMethod.INSTANCE_TYPE]: {
+    activeFlow: INSTANCE_TYPE_FLOW,
+    cardDetails: (t) => ({
+      description: t(
+        'Create a new VM by selecting an operating system and the right performance for your workload.',
+      ),
+      IconComponent: InstanceTypeIcon,
+      label: t('Custom configuration (default)'),
+    }),
+  },
+  [VMCreationMethod.TEMPLATE]: {
+    activeFlow: TEMPLATE_FLOW,
+    cardDetails: (t) => ({
+      description: t(
+        'Create a pre-configured VM using standardized images. This option requires an existing template.',
+      ),
+      IconComponent: TemplateIcon,
+      label: t('Create from Template'),
+    }),
+  },
+};
+
+export const getActiveFlow = (creationMethod: VMCreationMethod): readonly VMWizardStep[] =>
+  VM_CREATION_METHOD_MAPPER[creationMethod].activeFlow;
+
+export const getVMCreationMethodDetails = (
+  creationMethod: VMCreationMethod,
+  t: TFunction,
+): VMCreationMethodCardDetails => VM_CREATION_METHOD_MAPPER[creationMethod].cardDetails(t);
 
 export const isCloneCreationMethod = (creationMethod: VMCreationMethod) =>
   creationMethod === VMCreationMethod.CLONE;
@@ -35,40 +78,6 @@ export const isTemplateCreationMethod = (creationMethod: VMCreationMethod) =>
   creationMethod === VMCreationMethod.TEMPLATE;
 export const isInstanceTypeCreationMethod = (creationMethod: VMCreationMethod) =>
   creationMethod === VMCreationMethod.INSTANCE_TYPE;
-
-export const getActiveFlow = (creationMethod: VMCreationMethod): VMWizardStep[] => {
-  if (isInstanceTypeCreationMethod(creationMethod)) return INSTANCE_TYPE_FLOW;
-  if (isTemplateCreationMethod(creationMethod)) return TEMPLATE_FLOW;
-  if (isCloneCreationMethod(creationMethod)) return CLONE_FLOW;
-  return INSTANCE_TYPE_FLOW;
-};
-
-export const getVMCreationMethodsDetails = (t: TFunction) => {
-  return {
-    [VMCreationMethod.CLONE]: {
-      description: t('Create a copy of an existing VirtualMachine.'),
-      IconComponent: CloneIcon,
-      label: t('Clone existing VirtualMachine'),
-    },
-    [VMCreationMethod.INSTANCE_TYPE]: {
-      description: t(
-        'Create a new VM by selecting an operating system and the right performance for your workload.',
-      ),
-      IconComponent: InstanceTypeIcon,
-      label: t('Custom configuration (default)'),
-    },
-    [VMCreationMethod.TEMPLATE]: {
-      description: t(
-        'Create a pre-configured VM using standardized images. This option requires an existing template.',
-      ),
-      IconComponent: TemplateIcon,
-      label: t('Create from Template'),
-    },
-  };
-};
-
-export const getVMCreationMethodDetails = (creationMethod: VMCreationMethod, t: TFunction) =>
-  getVMCreationMethodsDetails(t)[creationMethod];
 
 export const getDiskSize = (
   dataVolume: V1beta1DataVolume,

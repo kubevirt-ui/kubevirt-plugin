@@ -1,6 +1,8 @@
 import { createElement } from 'react';
 import { VMCreationMethod, VMWizardStep } from './constants';
 
+import { TFunction } from 'i18next';
+import DefaultWizardFooter from '../components/DefaultWizardFooter';
 import CloneSourceStep from '../steps/CloneSourceStep/CloneSourceStep';
 import CustomizationStep from '../steps/CustomizationStep/CustomizationStep';
 import DeploymentDetailsStepFooter from '../steps/DeploymentDetailsStep/components/DeploymentDetailsStepFooter';
@@ -13,10 +15,12 @@ import ReviewAndCreateStepFooter from '../steps/ReviewAndCreateStep/components/R
 import ReviewAndCreateStep from '../steps/ReviewAndCreateStep/ReviewAndCreateStep';
 import TemplateStepFooter from '../steps/TemplateStep/components/TemplateStepFooter';
 import TemplateStep from '../steps/TemplateStep/TemplateStep';
-import { GetStepsToDisplayByCreationMethodArgs, VMWizardStepDisplay } from './types';
-import { TFunction } from 'i18next';
-import { CustomWizardNavItemFunction } from '@patternfly/react-core';
-import DefaultWizardFooter from '../components/DefaultWizardFooter';
+import { getVMGenerationNavItem } from './steps';
+import {
+  GetStepsToDisplayByCreationMethodArgs,
+  VMWizardStepDisplay,
+  WizardStepNavItemConfig,
+} from './types';
 
 const getDeploymentDetailsStep = (t: TFunction): VMWizardStepDisplay => ({
   children: createElement(DeploymentDetailsStep),
@@ -26,9 +30,9 @@ const getDeploymentDetailsStep = (t: TFunction): VMWizardStepDisplay => ({
   name: t('Deployment details'),
 });
 
-export const getCustomizationStep = (
+const getCustomizationStep = (
   t: TFunction,
-  navItemWithVMGeneration: CustomWizardNavItemFunction,
+  navItemConfig: WizardStepNavItemConfig,
   isStepDisabled: (stepId: VMWizardStep) => boolean,
 ): VMWizardStepDisplay => ({
   children: createElement(CustomizationStep),
@@ -37,12 +41,12 @@ export const getCustomizationStep = (
   id: VMWizardStep.CUSTOMIZATION,
   isDisabled: isStepDisabled(VMWizardStep.CUSTOMIZATION),
   name: t('Customization'),
-  navItem: navItemWithVMGeneration,
+  navItem: getVMGenerationNavItem(navItemConfig),
 });
 
-export const getReviewAndCreateStep = (
+const getReviewAndCreateStep = (
   t: TFunction,
-  navItemWithVMGeneration: CustomWizardNavItemFunction,
+  navItemConfig: WizardStepNavItemConfig,
   isStepDisabled: (stepId: VMWizardStep) => boolean,
 ): VMWizardStepDisplay => ({
   children: createElement(ReviewAndCreateStep),
@@ -51,17 +55,19 @@ export const getReviewAndCreateStep = (
   id: VMWizardStep.REVIEW_AND_CREATE,
   isDisabled: isStepDisabled(VMWizardStep.REVIEW_AND_CREATE),
   name: t('Review and create'),
-  navItem: navItemWithVMGeneration,
+  navItem: getVMGenerationNavItem(navItemConfig),
 });
 
 export const getStepsToDisplayByCreationMethod = ({
-  customizationStep,
   isNextDisabledForStep,
   isStepDisabled,
-  reviewAndCreateStep,
+  navItemConfig,
   t,
 }: GetStepsToDisplayByCreationMethodArgs): Record<VMCreationMethod, VMWizardStepDisplay[]> => {
   const deploymentDetailsStep = getDeploymentDetailsStep(t);
+  const customizationStep = getCustomizationStep(t, navItemConfig, isStepDisabled);
+  const reviewAndCreateStep = getReviewAndCreateStep(t, navItemConfig, isStepDisabled);
+
   return {
     [VMCreationMethod.CLONE]: [
       deploymentDetailsStep,

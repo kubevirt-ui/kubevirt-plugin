@@ -110,3 +110,7 @@ export const updateCustomizeInstanceType: UpdateCustomizeInstanceType = (
 
 export const updateVMCustomizeIT = (vm: V1VirtualMachine) =>
   Promise.resolve(updateCustomizeInstanceType([{ data: vm }]));
+
+export const setVMSignal = (vm: V1VirtualMachine) => {
+  vmSignal.value = vm;
+};

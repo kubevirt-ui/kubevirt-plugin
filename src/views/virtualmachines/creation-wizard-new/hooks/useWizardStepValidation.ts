@@ -55,8 +55,6 @@ const useWizardStepValidation = (): WizardStepValidation => {
     ],
   });
 
-  const currentVMSignalValue = vmSignal.value;
-
   const activeFlow = useMemo(() => getActiveFlow(creationMethod), [creationMethod]);
 
   const stepNextDisabled: Record<VMWizardStep, boolean> = useMemo(() => {
@@ -67,7 +65,7 @@ const useWizardStepValidation = (): WizardStepValidation => {
 
     return {
       [VMWizardStep.BOOT_SOURCE]: useBootSource && isEmpty(selectedBootableVolume),
-      [VMWizardStep.CLONE]: isEmpty(currentVMSignalValue),
+      [VMWizardStep.CLONE]: isEmpty(vmSignal.value),
       [VMWizardStep.COMPUTE_RESOURCES]: !isRedHatProvided && !isUserProvided,
       [VMWizardStep.CUSTOMIZATION]: false,
       [VMWizardStep.DEPLOYMENT_DETAILS]: !isValidVMName,
@@ -77,7 +75,6 @@ const useWizardStepValidation = (): WizardStepValidation => {
     };
   }, [
     creationMethod,
-    currentVMSignalValue,
     name,
     operatingSystemType,
     preference,
@@ -91,17 +88,20 @@ const useWizardStepValidation = (): WizardStepValidation => {
 
   const isStepDisabled = useCallback(
     (stepId: VMWizardStep): boolean => {
+      if (!activeFlow.includes(stepId)) return false;
+
       const stepIndex = activeFlow.indexOf(stepId);
+
       if (stepIndex <= 0) return false;
 
-      for (let i = 0; i < stepIndex; i++) {
-        if (stepNextDisabled[activeFlow[i]]) return true;
-      }
+      const activeFlowUntilCurrentStep = activeFlow.slice(0, stepIndex);
 
-      if (visitedSteps.has(stepId)) return false;
+      const isSomePreviousStepsDisabledOrNotVisited = activeFlowUntilCurrentStep.some(
+        (activeFlowStepId) =>
+          stepNextDisabled[activeFlowStepId] || !visitedSteps.has(activeFlowStepId),
+      );
 
-      const previousStep = activeFlow[stepIndex - 1];
-      return !visitedSteps.has(previousStep) || stepNextDisabled[previousStep];
+      return isSomePreviousStepsDisabledOrNotVisited;
     },
     [activeFlow, stepNextDisabled, visitedSteps],
   );

@@ -55,10 +55,10 @@ type BootableVolumeRowProps = {
       (args: ApplySelectedBootableVolumeToForm) => void,
     ];
     dataImportCron: V1beta1DataImportCron;
+    volumeListNamespace: string;
     dvSource: V1beta1DataVolume;
     preference: VirtualMachinePreference;
     pvcSource: IoK8sApiCoreV1PersistentVolumeClaim;
-    volumeListNamespace: string;
     volumeSnapshotSource: VolumeSnapshotKind;
   };
 };
