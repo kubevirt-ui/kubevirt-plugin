@@ -780,6 +780,7 @@
   "Enable persistent reservation": "영구 예약 활성화",
   "Enable preallocation": "사전 할당 활성화",
   "Enable predictive analytics": "예측 분석 활성화",
+  "Enable the \"Enable folders in VirtualMachines tree view\" preview feature in Settings > Preview features to use folders.": "Enable the \"Enable folders in VirtualMachines tree view\" preview feature in Settings > Preview features to use folders.",
   "Enable the creation of LoadBalancer services for SSH connections to VirtualMachines. A load balancer must be configured": "VirtualMachines에 대한 SSH 연결을 위해 LoadBalancer 서비스 생성을 활성화합니다. 로드 밸런서는 별도로 구성되어 있어야 합니다.",
   "Enable Windows Server 2022 golden image creation and testing. Requires accepting the Windows End User License Agreement (EULA).": "Enable Windows Server 2022 golden image creation and testing. Requires accepting the Windows End User License Agreement (EULA).",
   "Enabled": "활성화됨",

@@ -1,15 +1,17 @@
-import React, { FC } from 'react';
+import React, { FC, useMemo } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
 import SelectTypeahead from '../SelectTypeahead/SelectTypeahead';
 
 import useFolderOptions from './hooks/useFolderOptions';
+import { getFolderSelectOptions } from './utils/getFolderSelectOptions';
 import { createNewFolderOption, getCreateNewFolderOption } from './utils/options';
 import { getToggleStatus } from './utils/validation';
 
 type FoldersSelectProps = {
   cluster?: string;
+  isDisabled?: boolean;
   isFullWidth?: boolean;
   namespace: string;
   selectedFolder: string;
@@ -17,6 +19,7 @@ type FoldersSelectProps = {
 };
 const FolderSelect: FC<FoldersSelectProps> = ({
   cluster,
+  isDisabled = false,
   isFullWidth = false,
   namespace,
   selectedFolder,
@@ -24,6 +27,10 @@ const FolderSelect: FC<FoldersSelectProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const [folderOptions, setFolderOptions] = useFolderOptions(namespace, cluster);
+  const options = useMemo(
+    () => getFolderSelectOptions(folderOptions, selectedFolder),
+    [folderOptions, selectedFolder],
+  );
 
   return (
     <SelectTypeahead
@@ -38,8 +45,9 @@ const FolderSelect: FC<FoldersSelectProps> = ({
       dataTestId="vm-folder-select"
       getCreateAction={getCreateNewFolderOption}
       getToggleStatus={getToggleStatus}
+      isDisabled={isDisabled}
       isFullWidth={isFullWidth}
-      options={folderOptions?.map((option) => ({ optionProps: option, value: option.value })) ?? []}
+      options={options}
       placeholder={t('Search folder')}
       selectedValue={selectedFolder}
       setSelectedValue={setSelectedFolder}
