@@ -5,6 +5,7 @@ import { Button, InputGroup, InputGroupItem, TextInput } from '@patternfly/react
 import { SyncAltIcon } from '@patternfly/react-icons';
 
 import { useVMWizard } from '../state/vm-wizard-context/VMWizardContext';
+import { CREATE_VM_FORM_FIELDS_VM_DATA } from '../state/vm-wizard-form/consts';
 
 const DescriptionInput: FC = () => {
   const { control } = useVMWizard();
@@ -17,7 +18,7 @@ const DescriptionInput: FC = () => {
             <TextInput id="vm-description" type="text" {...field} />
           )}
           control={control}
-          name="vmData.description"
+          name={CREATE_VM_FORM_FIELDS_VM_DATA.DESCRIPTION}
         />
       </InputGroupItem>
       <InputGroupItem style={{ visibility: 'hidden' }}>

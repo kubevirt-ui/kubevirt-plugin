@@ -17,14 +17,10 @@ const maxNameLengthErrorMsg = (t: TFunction) =>
     maxNameLength: DNS1123LabelMaxLength,
   });
 
-// IsDNS1123Label tests for a string that conforms to the definition of a label in
-// DNS (RFC 1123).
+// DNS-1123 (RFC 1123) is the Kubernetes resource naming convention.
+// The "DNS1123" prefix mirrors Kubernetes' own naming (e.g. IsDNS1123Label in apimachinery).
 export const isDNS1123Label = (value: string): boolean => !getDNS1123LabelError(value);
 
-/**
- * @deprecated Prefer `validateDNS1123Label(t, value)` which returns the error string directly.
- * @param value - the DNS label string to validate
- */
 export const getDNS1123LabelError = (value: string): ((t: TFunction) => string) | undefined => {
   if (value?.length > DNS1123LabelMaxLength) {
     return maxNameLengthErrorMsg;

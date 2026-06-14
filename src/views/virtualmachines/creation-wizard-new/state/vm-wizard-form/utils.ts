@@ -1,13 +1,9 @@
-import { VMWizardFormValues } from '@virtualmachines/creation-wizard-new/state/vm-wizard-form/types';
 import {
   VMCreationMethod,
   VMWizardStep,
 } from '@virtualmachines/creation-wizard-new/utils/constants';
 
-export type CreateInitialVMWizardFormValuesArgs = {
-  cluster: string;
-  namespace: string;
-};
+import { CreateInitialVMWizardFormValuesArgs, VMWizardFormValues } from './types';
 
 export const createInitialVMWizardFormValues = ({
   cluster,

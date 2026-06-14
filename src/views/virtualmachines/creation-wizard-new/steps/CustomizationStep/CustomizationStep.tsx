@@ -1,4 +1,5 @@
 import React, { FC, useEffect } from 'react';
+import { useWatch } from 'react-hook-form';
 import produce from 'immer';
 
 import useIsIPv6SingleStackCluster from '@kubevirt-utils/hooks/useIPStackType/useIsIPv6SingleStackCluster';
@@ -8,12 +9,14 @@ import { isPodNetwork } from '@kubevirt-utils/resources/vm/utils/network/selecto
 import { removePodNetworkFromVM } from '@kubevirt-utils/resources/vm/utils/network/utils';
 import { vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
 import { Stack, StackItem, Title, TitleSizes } from '@patternfly/react-core';
-import useVMWizardStore from '@virtualmachines/creation-wizard-new/state/vm-wizard-store/useVMWizardStore';
+import { useVMWizard } from '@virtualmachines/creation-wizard-new/state/vm-wizard-context/VMWizardContext';
+import { CREATE_VM_FORM_FIELDS_VM_DATA } from '@virtualmachines/creation-wizard-new/state/vm-wizard-form/consts';
 import CustomizeVirtualMachine from '@virtualmachines/creation-wizard-new/steps/CustomizationStep/components/CustomizeVirtualMachine/CustomizeVirtualMachine';
 
 const CustomizationStep: FC = () => {
   const { t } = useKubevirtTranslation();
-  const { cluster } = useVMWizardStore();
+  const { control } = useVMWizard();
+  const cluster = useWatch({ control, name: CREATE_VM_FORM_FIELDS_VM_DATA.CLUSTER });
   const isIPv6SingleStack = useIsIPv6SingleStackCluster(cluster);
   const vm = vmSignal.value;
 

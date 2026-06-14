@@ -10,6 +10,7 @@ import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm';
 import useIsACMPage from '@multicluster/useIsACMPage';
 import { ButtonVariant } from '@patternfly/react-core';
 import { useVMWizard } from '@virtualmachines/creation-wizard-new/state/vm-wizard-context/VMWizardContext';
+import { CREATE_VM_FORM_FIELDS_VM_DATA } from '@virtualmachines/creation-wizard-new/state/vm-wizard-form/consts';
 
 import './VMCreationLocationDisplay.scss';
 
@@ -31,7 +32,11 @@ const VMCreationLocationDisplay: FC<VMCreationLocationDisplayProps> = ({
   const { control } = useVMWizard();
   const [cluster, folder, project] = useWatch({
     control,
-    name: ['vmData.cluster', 'vmData.folder', 'vmData.project'],
+    name: [
+      CREATE_VM_FORM_FIELDS_VM_DATA.CLUSTER,
+      CREATE_VM_FORM_FIELDS_VM_DATA.FOLDER,
+      CREATE_VM_FORM_FIELDS_VM_DATA.PROJECT,
+    ],
   });
 
   return (

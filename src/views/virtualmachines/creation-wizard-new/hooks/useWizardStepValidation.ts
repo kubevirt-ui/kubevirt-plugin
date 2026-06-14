@@ -1,4 +1,5 @@
 import { useCallback, useMemo } from 'react';
+import { useWatch } from 'react-hook-form';
 
 import { vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -12,6 +13,9 @@ import {
   isCloneCreationMethod,
 } from '@virtualmachines/creation-wizard-new/utils/utils';
 
+import { useVMWizard } from '../state/vm-wizard-context/VMWizardContext';
+import { CREATE_VM_FORM_FIELDS_VM_DATA } from '../state/vm-wizard-form/consts';
+
 type WizardStepValidation = {
   isNextDisabledForStep: (stepId: VMWizardStep) => boolean;
   isStepDisabled: (stepId: VMWizardStep) => boolean;
@@ -19,7 +23,7 @@ type WizardStepValidation = {
 
 const useWizardStepValidation = (): WizardStepValidation => {
   useSignals();
-  const { creationMethod, selectedTemplate, visitedSteps, vmName } = useVMWizardStore();
+  const { visitedSteps } = useVMWizardStore();
   const {
     operatingSystemType,
     preference,
@@ -29,6 +33,13 @@ const useWizardStepValidation = (): WizardStepValidation => {
     selectedSize,
     useBootSource,
   } = useInstanceTypeVMStore();
+  const { control } = useVMWizard();
+  const creationMethod = useWatch({ control, name: CREATE_VM_FORM_FIELDS_VM_DATA.CREATION_METHOD });
+  const name = useWatch({ control, name: CREATE_VM_FORM_FIELDS_VM_DATA.NAME });
+  const selectedTemplate = useWatch({
+    control,
+    name: CREATE_VM_FORM_FIELDS_VM_DATA.SELECTED_TEMPLATE,
+  });
 
   const activeFlow = getActiveFlow(creationMethod);
 
@@ -38,7 +49,7 @@ const useWizardStepValidation = (): WizardStepValidation => {
 
   const currentVMSignalValue = vmSignal.value;
 
-  const isValidVMName = isCloneCreationMethod(creationMethod) || isDNS1123Label(vmName);
+  const isValidVMName = isCloneCreationMethod(creationMethod) || isDNS1123Label(name);
 
   const stepNextDisabled: Record<VMWizardStep, boolean> = useMemo(
     () => ({

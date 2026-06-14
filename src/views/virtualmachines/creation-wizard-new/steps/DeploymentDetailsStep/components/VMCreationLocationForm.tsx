@@ -13,6 +13,7 @@ import useIsACMPage from '@multicluster/useIsACMPage';
 import { Form, FormGroup } from '@patternfly/react-core';
 import { useHubClusterName } from '@stolostron/multicluster-sdk';
 import { useVMWizard } from '@virtualmachines/creation-wizard-new/state/vm-wizard-context/VMWizardContext';
+import { CREATE_VM_FORM_FIELDS_VM_DATA } from '@virtualmachines/creation-wizard-new/state/vm-wizard-form/consts';
 
 import './VMCreationLocationForm.scss';
 
@@ -27,7 +28,11 @@ const VMCreationLocationForm: FC = () => {
   const { control, setValue } = useVMWizard();
   const [cluster, folder, project] = useWatch({
     control,
-    name: ['vmData.cluster', 'vmData.folder', 'vmData.project'],
+    name: [
+      CREATE_VM_FORM_FIELDS_VM_DATA.CLUSTER,
+      CREATE_VM_FORM_FIELDS_VM_DATA.FOLDER,
+      CREATE_VM_FORM_FIELDS_VM_DATA.PROJECT,
+    ],
   });
 
   return (
@@ -40,8 +45,9 @@ const VMCreationLocationForm: FC = () => {
                 {...field}
                 onChange={(selectedCluster) => {
                   field.onChange(selectedCluster);
-                  setValue('vmData.folder', '');
-                  if (selectedCluster !== cluster) setValue('vmData.project', '');
+                  setValue(CREATE_VM_FORM_FIELDS_VM_DATA.FOLDER, '');
+                  if (selectedCluster !== cluster)
+                    setValue(CREATE_VM_FORM_FIELDS_VM_DATA.PROJECT, '');
                 }}
                 bookmarkCluster={hubClusterName}
                 includeAllClusters={false}
@@ -49,7 +55,7 @@ const VMCreationLocationForm: FC = () => {
               />
             )}
             control={control}
-            name="vmData.cluster"
+            name={CREATE_VM_FORM_FIELDS_VM_DATA.CLUSTER}
           />
         </FormGroup>
       )}
@@ -60,7 +66,7 @@ const VMCreationLocationForm: FC = () => {
               {...field}
               onChange={(selectedProject) => {
                 field.onChange(selectedProject);
-                setValue('vmData.folder', '');
+                setValue(CREATE_VM_FORM_FIELDS_VM_DATA.FOLDER, '');
               }}
               bookmarkCluster={hubClusterName}
               cluster={cluster}
@@ -69,7 +75,7 @@ const VMCreationLocationForm: FC = () => {
             />
           )}
           control={control}
-          name="vmData.project"
+          name={CREATE_VM_FORM_FIELDS_VM_DATA.PROJECT}
         />
       </FormGroup>
       <FormGroup
@@ -85,11 +91,13 @@ const VMCreationLocationForm: FC = () => {
         label={t('Folder (optional)')}
       >
         <FolderSelect
+          setSelectedFolder={(newFolder) =>
+            setValue(CREATE_VM_FORM_FIELDS_VM_DATA.FOLDER, newFolder)
+          }
           cluster={cluster}
           isDisabled={treeViewFoldersLoading || !treeViewFoldersEnabled}
           namespace={project}
           selectedFolder={folder}
-          setSelectedFolder={(newFolder) => setValue('vmData.folder', newFolder)}
         />
       </FormGroup>
     </Form>

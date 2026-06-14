@@ -1,4 +1,5 @@
 import React, { FC } from 'react';
+import { useWatch } from 'react-hook-form';
 
 import { ALL_PROJECTS } from '@kubevirt-utils/hooks/constants';
 import useInstanceTypesAndPreferences from '@kubevirt-utils/hooks/useInstanceTypesAndPreferences';
@@ -16,7 +17,8 @@ import {
   TitleSizes,
 } from '@patternfly/react-core';
 import useInstanceTypeVMStore from '@virtualmachines/creation-wizard-new/state/instance-type-vm-store/useInstanceTypeVMStore';
-import useVMWizardStore from '@virtualmachines/creation-wizard-new/state/vm-wizard-store/useVMWizardStore';
+import { useVMWizard } from '@virtualmachines/creation-wizard-new/state/vm-wizard-context/VMWizardContext';
+import { CREATE_VM_FORM_FIELDS_VM_DATA } from '@virtualmachines/creation-wizard-new/state/vm-wizard-form/consts';
 import BootableVolumeList from '@virtualmachines/creation-wizard-new/steps/InstanceTypesSteps/BootSourceStep/components/BootableVolumeList/BootableVolumeList';
 
 import AddBootableVolumeButton from './components/AddBootableVolumeButton';
@@ -25,7 +27,8 @@ const BootSourceStep: FC = () => {
   const { t } = useKubevirtTranslation();
   const isAdmin = useIsAdmin();
   const { setUseBootSource, useBootSource, volumeListNamespace } = useInstanceTypeVMStore();
-  const { project } = useVMWizardStore();
+  const { control } = useVMWizard();
+  const project = useWatch({ control, name: CREATE_VM_FORM_FIELDS_VM_DATA.PROJECT });
   const instanceTypesAndPreferencesData = useInstanceTypesAndPreferences(
     getValidNamespace(project),
   );

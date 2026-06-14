@@ -1,10 +1,9 @@
-import { useCallback } from 'react';
-
 import { getAnnotation } from '@kubevirt-utils/resources/shared';
 import { DESCRIPTION_ANNOTATION, getFolder } from '@kubevirt-utils/resources/vm';
 import { updateCustomizeInstanceType, vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
 import type { WizardStepType } from '@patternfly/react-core';
-import useVMWizardStore from '@virtualmachines/creation-wizard-new/state/vm-wizard-store/useVMWizardStore';
+import { useVMWizard } from '@virtualmachines/creation-wizard-new/state/vm-wizard-context/VMWizardContext';
+import { CREATE_VM_FORM_FIELDS_VM_DATA } from '@virtualmachines/creation-wizard-new/state/vm-wizard-form/consts';
 import { VMWizardStep } from '@virtualmachines/creation-wizard-new/utils/constants';
 import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
 
@@ -14,37 +13,39 @@ type UseSyncDeploymentDetails = () => (
 ) => void;
 
 /**
- * Keeps the wizard store's Deployment Details buffers in sync with vmSignal
- * across step transitions. Flushes store values to the signal when leaving
- * Deployment Details, and hydrates the store from the signal when entering it.
+ * Keeps the form's Deployment Details buffers in sync with vmSignal's annotation
+ * across step transitions. Flushes the form value to the signal when leaving Deployment Details,
+ * and hydrates the form from the signal when entering Deployment Details.
  */
 export const useSyncDeploymentDetails: UseSyncDeploymentDetails = () => {
-  const { folder, setFolder, setVMDescription, vmDescription } = useVMWizardStore();
+  const { getValues, setValue } = useVMWizard();
 
-  return useCallback(
-    (currentStep: WizardStepType, prevStep: WizardStepType) => {
-      if (!vmSignal.value) {
-        return;
-      }
+  return (currentStep: WizardStepType, prevStep: WizardStepType) => {
+    if (!vmSignal.value) {
+      return;
+    }
 
-      if (prevStep?.id === VMWizardStep.DEPLOYMENT_DETAILS) {
-        updateCustomizeInstanceType([
-          {
-            data: vmDescription || undefined,
-            path: `metadata.annotations.${DESCRIPTION_ANNOTATION}`,
-          },
-          {
-            data: folder || undefined,
-            path: ['metadata', 'labels', VM_FOLDER_LABEL],
-          },
-        ]);
-      }
+    if (prevStep?.id === VMWizardStep.DEPLOYMENT_DETAILS) {
+      const description = getValues(CREATE_VM_FORM_FIELDS_VM_DATA.DESCRIPTION);
+      const folder = getValues(CREATE_VM_FORM_FIELDS_VM_DATA.FOLDER);
+      updateCustomizeInstanceType([
+        {
+          data: description || undefined,
+          path: `metadata.annotations.${DESCRIPTION_ANNOTATION}`,
+        },
+        {
+          data: folder || undefined,
+          path: ['metadata', 'labels', VM_FOLDER_LABEL],
+        },
+      ]);
+    }
 
-      if (currentStep?.id === VMWizardStep.DEPLOYMENT_DETAILS) {
-        setVMDescription(getAnnotation(vmSignal.value, DESCRIPTION_ANNOTATION, ''));
-        setFolder(getFolder(vmSignal.value) || '');
-      }
-    },
-    [folder, setFolder, setVMDescription, vmDescription],
-  );
+    if (currentStep?.id === VMWizardStep.DEPLOYMENT_DETAILS) {
+      setValue(
+        CREATE_VM_FORM_FIELDS_VM_DATA.DESCRIPTION,
+        getAnnotation(vmSignal.value, DESCRIPTION_ANNOTATION, ''),
+      );
+      setValue(CREATE_VM_FORM_FIELDS_VM_DATA.FOLDER, getFolder(vmSignal.value) || '');
+    }
+  };
 };

@@ -11,24 +11,28 @@ import {
 import { InputGroup, InputGroupItem, TextInput } from '@patternfly/react-core';
 
 import { useVMWizard } from '../state/vm-wizard-context/VMWizardContext';
+import {
+  CREATE_VM_FORM_FIELDS_UI_STATE,
+  CREATE_VM_FORM_FIELDS_VM_DATA,
+} from '../state/vm-wizard-form/consts';
 
 import GenerateVMNameButton from './GenerateVMNameButton';
 
 const NameInput: FC = () => {
   const { t } = useKubevirtTranslation();
   const { control, setValue } = useVMWizard();
-  const vmName = useWatch({ control, name: 'vmData.name' });
+  const vmName = useWatch({ control, name: CREATE_VM_FORM_FIELDS_VM_DATA.NAME });
   const shouldCheckVMNameProperly = useWatch({
     control,
-    name: 'uiState.shouldCheckVMNameProperly',
+    name: CREATE_VM_FORM_FIELDS_UI_STATE.SHOULD_CHECK_VM_NAME_PROPERLY,
   });
   const getError = shouldCheckVMNameProperly ? getDNS1123LabelError : getDNS1123LabelErrorLenient;
   const { errorText, validated } = useNameValidation({ getError, name: vmName });
 
   const applyName = useCallback(
     (newName: string) => {
-      setValue('uiState.shouldCheckVMNameProperly', false);
-      setValue('vmData.name', newName);
+      setValue(CREATE_VM_FORM_FIELDS_UI_STATE.SHOULD_CHECK_VM_NAME_PROPERLY, false);
+      setValue(CREATE_VM_FORM_FIELDS_VM_DATA.NAME, newName);
     },
     [setValue],
   );
@@ -49,7 +53,7 @@ const NameInput: FC = () => {
               />
             )}
             control={control}
-            name={'vmData.name'}
+            name={CREATE_VM_FORM_FIELDS_VM_DATA.NAME}
           />
         </InputGroupItem>
         <InputGroupItem>
