@@ -1,7 +1,9 @@
 import { TFunction } from 'i18next';
+import { UseFormGetValues, UseFormSetValue } from 'react-hook-form';
 
 import { V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { getInstanceTypeFromVolume } from '@kubevirt-utils/components/AddBootableVolumeModal/utils';
 import { VolumeSnapshotKind } from '@kubevirt-utils/components/SelectSnapshot/types';
 import {
   getDataVolumeSize,
@@ -18,6 +20,14 @@ import {
   VMCreationMethod,
   VMWizardStep,
 } from '@virtualmachines/creation-wizard-new/utils/constants';
+
+import {
+  CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA,
+  CREATE_VM_FORM_FIELDS_STEP_NAVIGATION,
+} from '../state/vm-wizard-form/consts';
+import { VMWizardFormValues } from '../state/vm-wizard-form/types';
+
+import { ApplySelectedBootableVolumeToForm } from './types';
 
 export const isCloneCreationMethod = (creationMethod: VMCreationMethod) =>
   creationMethod === VMCreationMethod.CLONE;
@@ -65,3 +75,45 @@ export const getDiskSize = (
   pvc: IoK8sApiCoreV1PersistentVolumeClaim,
   volumeSnapshot: VolumeSnapshotKind,
 ) => getDataVolumeSize(dataVolume) || getPVCSize(pvc) || getVolumeSnapshotSize(volumeSnapshot);
+
+export const applySelectedBootableVolumeToForm = ({
+  dvSource,
+  getValues,
+  pvcSource,
+  selectedVolume,
+  setValue,
+  volumeSnapshotSource,
+}: ApplySelectedBootableVolumeToForm): void => {
+  const instanceTypeName = getInstanceTypeFromVolume(selectedVolume);
+  const [series = '', size = ''] = instanceTypeName?.split('.') || [];
+
+  setValue(CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.ROOT, {
+    ...getValues(CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.ROOT),
+    customDiskSize: getDiskSize(dvSource, pvcSource, volumeSnapshotSource),
+    dvSource,
+    pvcSource,
+    selectedBootableVolume: selectedVolume,
+    selectedInstanceType: {
+      name: instanceTypeName,
+      namespace: null,
+    },
+    selectedSeries: series,
+    selectedSize: size,
+    volumeSnapshotSource,
+  });
+};
+
+export const markStepVisited = (
+  stepId: string,
+  getValues: UseFormGetValues<VMWizardFormValues>,
+  setValue: UseFormSetValue<VMWizardFormValues>,
+) => {
+  const visitedSteps = getValues(CREATE_VM_FORM_FIELDS_STEP_NAVIGATION.VISITED_STEPS);
+  if (visitedSteps.has(stepId)) {
+    return;
+  }
+
+  const nextVisitedSteps = new Set(visitedSteps);
+  nextVisitedSteps.add(stepId);
+  setValue(CREATE_VM_FORM_FIELDS_STEP_NAVIGATION.VISITED_STEPS, nextVisitedSteps);
+};

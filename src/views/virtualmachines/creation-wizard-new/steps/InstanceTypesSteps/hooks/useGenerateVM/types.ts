@@ -2,6 +2,7 @@ import { V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-d
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
+import { VMWizardFormValues } from '@virtualmachines/creation-wizard-new/state/vm-wizard-form/types';
 
 type GenerateVMArgs = {
   cluster?: string;
@@ -21,3 +22,39 @@ type GenerateVMArgs = {
 };
 
 export type GenerateVMCallback = (props: GenerateVMArgs) => V1VirtualMachine;
+
+export type GenerateVMSpecConfiguration = {
+  selectedBootableVolume: BootableVolume;
+  dvSource: VMWizardFormValues['instanceTypeData']['dvSource'];
+  pvcSource: VMWizardFormValues['instanceTypeData']['pvcSource'];
+  customDiskSize: string;
+  vmName: string;
+  selectedInstanceType: VMWizardFormValues['instanceTypeData']['selectedInstanceType'];
+  enableMultiArchBootImageImport: boolean;
+  isIPv6SingleStack: boolean;
+  populatedCloudInitYAML: string;
+  isUDNManagedNamespace: boolean;
+};
+
+export type GenerateVMSpecTemplateConfiguration = {
+  isUDNManagedNamespace: boolean;
+  enableMultiArchBootImageImport: boolean;
+  isIPv6SingleStack: boolean;
+  isIso: boolean;
+  vmName: string;
+  populatedCloudInitYAML: string;
+  volumeName: string;
+  selectedPreference: string;
+  selectedBootableVolume: BootableVolume;
+};
+
+export type GenerateVMSpecDataVolumeTemplates = {
+  volumeName: string;
+  selectedBootableVolume: BootableVolume;
+  dvSource: Parameters<GenerateVMCallback>[0]['dvSource'];
+  pvcSource: Parameters<GenerateVMCallback>[0]['pvcSource'];
+  customDiskSize: string | undefined;
+  isIso: boolean;
+  storageClassName: string;
+  vmName: string;
+};

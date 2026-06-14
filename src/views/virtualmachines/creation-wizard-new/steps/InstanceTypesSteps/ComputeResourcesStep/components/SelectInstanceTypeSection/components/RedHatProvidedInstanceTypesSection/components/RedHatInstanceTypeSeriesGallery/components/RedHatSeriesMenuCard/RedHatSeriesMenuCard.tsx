@@ -1,4 +1,5 @@
 import React, { FC, useMemo } from 'react';
+import { useWatch } from 'react-hook-form';
 import classNames from 'classnames';
 
 import { instanceTypeSeriesNameMapper } from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/utils/constants';
@@ -11,7 +12,8 @@ import {
 } from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/utils/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Card, CardBody, CardHeader, Flex, Tooltip } from '@patternfly/react-core';
-import useInstanceTypeVMStore from '@virtualmachines/creation-wizard-new/state/instance-type-vm-store/useInstanceTypeVMStore';
+import { useVMWizard } from '@virtualmachines/creation-wizard-new/state/vm-wizard-context/VMWizardContext';
+import { CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA } from '@virtualmachines/creation-wizard-new/state/vm-wizard-form/consts';
 import MarkdownTooltipContent from '@virtualmachines/creation-wizard-new/steps/InstanceTypesSteps/ComputeResourcesStep/components/SelectInstanceTypeSection/components/RedHatProvidedInstanceTypesSection/components/RedHatInstanceTypeSeriesGallery/components/RedHatSeriesMenuCard/MarkdownTooltipContent';
 
 import './RedHatSeriesMenuCard.scss';
@@ -23,7 +25,11 @@ type RedHatSeriesMenuCardProps = {
 const RedHatSeriesMenuCard: FC<RedHatSeriesMenuCardProps> = ({ rhSeriesItem }) => {
   const { t } = useKubevirtTranslation();
 
-  const { selectedSeries, setSelectedSeries, setSelectedSize } = useInstanceTypeVMStore();
+  const { control, setValue } = useVMWizard();
+  const selectedSeries = useWatch({
+    control,
+    name: CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.SELECTED_SERIES,
+  });
 
   const { classDisplayNameAnnotation, descriptionAnnotation, seriesName, sizes } = rhSeriesItem;
 
@@ -45,8 +51,12 @@ const RedHatSeriesMenuCard: FC<RedHatSeriesMenuCardProps> = ({ rhSeriesItem }) =
       ? sizes?.filter((s) => !is1GiInstanceType(s.sizeLabel))
       : sizes;
     const defaultSize = (standardSizes?.[0] ?? sizes?.[0])?.sizeLabel;
-    setSelectedSeries(seriesName);
-    setSelectedSize(defaultSize);
+    setValue(CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.SELECTED_SERIES, seriesName);
+    setValue(CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.SELECTED_SIZE, defaultSize);
+    setValue(CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.SELECTED_INSTANCE_TYPE, {
+      name: seriesName,
+      namespace: null,
+    });
   };
 
   const card = (

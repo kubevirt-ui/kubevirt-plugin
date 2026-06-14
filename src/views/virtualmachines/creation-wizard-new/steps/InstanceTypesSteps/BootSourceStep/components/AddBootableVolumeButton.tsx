@@ -9,9 +9,9 @@ import useCanCreateBootableVolume from '@kubevirt-utils/resources/bootableresour
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Button, ButtonVariant } from '@patternfly/react-core';
 import { useSignals } from '@preact/signals-react/runtime';
-import useOnSelectCreatedVolume from '@virtualmachines/creation-wizard-new/hooks/useOnSelectCreatedVolume';
 import { useVMWizard } from '@virtualmachines/creation-wizard-new/state/vm-wizard-context/VMWizardContext';
 import { CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA } from '@virtualmachines/creation-wizard-new/state/vm-wizard-form/consts';
+import { applySelectedBootableVolumeToForm } from '@virtualmachines/creation-wizard-new/utils/utils';
 
 export type AddBootableVolumeButtonProps = {
   loadError: Error;
@@ -21,8 +21,7 @@ const AddBootableVolumeButton: FC<AddBootableVolumeButtonProps> = ({ loadError }
   const { t } = useKubevirtTranslation();
   useSignals();
   const { createModal } = useModal();
-  const onSelectCreatedVolume = useOnSelectCreatedVolume();
-  const { control } = useVMWizard();
+  const { control, getValues, setValue } = useVMWizard();
 
   const [volumeListNamespace, preference] = useWatch({
     control,
@@ -42,8 +41,17 @@ const AddBootableVolumeButton: FC<AddBootableVolumeButtonProps> = ({ loadError }
       onClick={() =>
         createModal((props) => (
           <AddBootableVolumeModal
+            onCreateVolume={(volume) =>
+              applySelectedBootableVolumeToForm({
+                dvSource: null,
+                getValues,
+                pvcSource: null,
+                selectedVolume: volume,
+                setValue,
+                volumeSnapshotSource: null,
+              })
+            }
             lockedPreference={preference ?? undefined}
-            onCreateVolume={(volume) => onSelectCreatedVolume(volume, null, null, null)}
             {...props}
           />
         ))

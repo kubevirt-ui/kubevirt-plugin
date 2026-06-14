@@ -34,11 +34,12 @@ import { ARCHITECTURE_ID, getArchitecture } from '@kubevirt-utils/utils/architec
 import { getHumanizedSize } from '@kubevirt-utils/utils/units';
 import { Content, ContentVariants, Flex, FlexItem, Label } from '@patternfly/react-core';
 import { TableText, Tr, WrapModifier } from '@patternfly/react-table';
-import { OnSelectCreatedVolumeHandler } from '@virtualmachines/creation-wizard-new/hooks/useOnSelectCreatedVolume';
+import { useVMWizard } from '@virtualmachines/creation-wizard-new/state/vm-wizard-context/VMWizardContext';
 import {
   getTemplateOSIcon,
   getVolumeNameOSIcon,
 } from '@virtualmachines/creation-wizard-new/utils/os-icons/os-icons';
+import { ApplySelectedBootableVolumeToForm } from '@virtualmachines/creation-wizard-new/utils/types';
 import { getDiskSize } from '@virtualmachines/creation-wizard-new/utils/utils';
 
 import TableData from './TableData';
@@ -49,7 +50,10 @@ type BootableVolumeRowProps = {
   activeColumnIDs: string[];
   bootableVolume: BootableVolume;
   rowData: {
-    bootableVolumeSelectedState: [BootableVolume, OnSelectCreatedVolumeHandler];
+    bootableVolumeSelectedState: [
+      BootableVolume,
+      (args: ApplySelectedBootableVolumeToForm) => void,
+    ];
     dataImportCron: V1beta1DataImportCron;
     dvSource: V1beta1DataVolume;
     preference: VirtualMachinePreference;
@@ -77,9 +81,17 @@ const BootableVolumeRow: FC<BootableVolumeRowProps> = ({
   const bootVolumeNamespace = getNamespace(bootableVolume);
   const sizeData = getHumanizedSize(getDiskSize(dvSource, pvcSource, volumeSnapshotSource)).string;
   const icon = getVolumeNameOSIcon(bootVolumeName) || getTemplateOSIcon(preference);
+  const { getValues, setValue } = useVMWizard();
 
   const handleOnClick = () => {
-    setSelectedBootableVolume(bootableVolume, pvcSource, volumeSnapshotSource, dvSource);
+    setSelectedBootableVolume({
+      dvSource,
+      getValues,
+      pvcSource,
+      selectedVolume: bootableVolume,
+      setValue,
+      volumeSnapshotSource,
+    });
     logITFlowEvent(BOOTABLE_VOLUME_SELECTED, null, {
       selectedBootableVolume: getName(bootableVolume),
     });

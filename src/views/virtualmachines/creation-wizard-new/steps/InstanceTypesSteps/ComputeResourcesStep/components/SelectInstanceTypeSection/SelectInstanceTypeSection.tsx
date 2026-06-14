@@ -5,9 +5,11 @@ import { getInstanceTypeMenuItems } from '@kubevirt-utils/components/AddBootable
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import useInstanceTypesAndPreferences from '@kubevirt-utils/hooks/useInstanceTypesAndPreferences';
 import { Tab, Tabs } from '@patternfly/react-core';
-import useInstanceTypeVMStore from '@virtualmachines/creation-wizard-new/state/instance-type-vm-store/useInstanceTypeVMStore';
 import { useVMWizard } from '@virtualmachines/creation-wizard-new/state/vm-wizard-context/VMWizardContext';
-import { CREATE_VM_FORM_FIELDS_VM_DATA } from '@virtualmachines/creation-wizard-new/state/vm-wizard-form/consts';
+import {
+  CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA,
+  CREATE_VM_FORM_FIELDS_VM_DATA,
+} from '@virtualmachines/creation-wizard-new/state/vm-wizard-form/consts';
 import RedHatProvidedInstanceTypesSection from '@virtualmachines/creation-wizard-new/steps/InstanceTypesSteps/ComputeResourcesStep/components/SelectInstanceTypeSection/components/RedHatProvidedInstanceTypesSection/RedHatProvidedInstanceTypesSection';
 import UserProvidedInstanceTypesList from '@virtualmachines/creation-wizard-new/steps/InstanceTypesSteps/ComputeResourcesStep/components/SelectInstanceTypeSection/components/UserProvidedInstanceTypeList/UserProvidedInstanceTypeList';
 import { getUserProvidedInstanceTypes } from '@virtualmachines/creation-wizard-new/steps/InstanceTypesSteps/ComputeResourcesStep/components/SelectInstanceTypeSection/components/UserProvidedInstanceTypeList/utils/utils';
@@ -18,11 +20,14 @@ const SelectInstanceTypeSection: FC = ({}) => {
   const [activeTabKey, setActiveTabKey] = useState<TabKey>(TabKey.RedHat);
 
   const { control } = useVMWizard();
-  const [cluster, project] = useWatch({
+  const [cluster, project, selectedInstanceType] = useWatch({
     control,
-    name: [CREATE_VM_FORM_FIELDS_VM_DATA.CLUSTER, CREATE_VM_FORM_FIELDS_VM_DATA.PROJECT],
+    name: [
+      CREATE_VM_FORM_FIELDS_VM_DATA.CLUSTER,
+      CREATE_VM_FORM_FIELDS_VM_DATA.PROJECT,
+      CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.SELECTED_INSTANCE_TYPE,
+    ],
   });
-  const { selectedInstanceType } = useInstanceTypeVMStore();
   const { allInstanceTypes, loaded } = useInstanceTypesAndPreferences(project, cluster);
 
   const menuItems = useMemo(() => getInstanceTypeMenuItems(allInstanceTypes), [allInstanceTypes]);

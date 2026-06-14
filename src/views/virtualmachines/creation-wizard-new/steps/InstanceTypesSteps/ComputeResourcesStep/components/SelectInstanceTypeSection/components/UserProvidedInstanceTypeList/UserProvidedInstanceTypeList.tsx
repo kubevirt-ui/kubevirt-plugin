@@ -1,4 +1,5 @@
 import React, { FC, useMemo, useState } from 'react';
+import { useWatch } from 'react-hook-form';
 
 import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -18,7 +19,8 @@ import {
   SearchInput,
 } from '@patternfly/react-core';
 import { Table, TableVariant, Tbody, Td, Th, Thead, Tr } from '@patternfly/react-table';
-import useInstanceTypeVMStore from '@virtualmachines/creation-wizard-new/state/instance-type-vm-store/useInstanceTypeVMStore';
+import { useVMWizard } from '@virtualmachines/creation-wizard-new/state/vm-wizard-context/VMWizardContext';
+import { CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA } from '@virtualmachines/creation-wizard-new/state/vm-wizard-form/consts';
 import { InstanceTypes } from '@virtualmachines/creation-wizard-new/utils/types';
 
 import UserProvidedInstanceTypesEmptyState from './components/UserProvidedInstanceTypesEmptyState';
@@ -36,7 +38,11 @@ const UserProvidedInstanceTypesList: FC<UserProvidedInstanceTypesListProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const activeNamespace = useActiveNamespace();
-  const { selectedInstanceType, setSelectedInstanceType } = useInstanceTypeVMStore();
+  const { control, setValue } = useVMWizard();
+  const selectedInstanceType = useWatch({
+    control,
+    name: CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.SELECTED_INSTANCE_TYPE,
+  });
 
   const [searchInput, setSearchInput] = useState('');
   const [pagination, setPagination] = useState(paginationInitialState);
@@ -72,7 +78,10 @@ const UserProvidedInstanceTypesList: FC<UserProvidedInstanceTypesListProps> = ({
   }
 
   const handleRowClick = (itName: string, itNamespace: string) => {
-    setSelectedInstanceType({ name: itName, namespace: itNamespace });
+    setValue(CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.SELECTED_INSTANCE_TYPE, {
+      name: itName,
+      namespace: itNamespace,
+    });
   };
 
   return (

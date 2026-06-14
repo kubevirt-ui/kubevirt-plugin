@@ -9,7 +9,6 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import useHideDeprecatedBootableVolumes from '@kubevirt-utils/resources/bootableresources/hooks/useHideDeprecatedBootableVolumes';
 import { OS_IMAGES_NS } from '@kubevirt-utils/utils/utils';
 import { Card, FormGroup, Skeleton, Split, SplitItem } from '@patternfly/react-core';
-import useOnSelectCreatedVolume from '@virtualmachines/creation-wizard-new/hooks/useOnSelectCreatedVolume';
 import { useVMWizard } from '@virtualmachines/creation-wizard-new/state/vm-wizard-context/VMWizardContext';
 import { CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA } from '@virtualmachines/creation-wizard-new/state/vm-wizard-form/consts';
 import usePreferencesData from '@virtualmachines/creation-wizard-new/steps/InstanceTypesSteps/BootSourceStep/components/BootableVolumeList/hooks/usePreferencesData';
@@ -17,6 +16,7 @@ import {
   UseBootableVolumesValues,
   UseInstanceTypeAndPreferencesValues,
 } from '@virtualmachines/creation-wizard-new/utils/types';
+import { applySelectedBootableVolumeToForm } from '@virtualmachines/creation-wizard-new/utils/utils';
 
 import BootableVolumeEmptyState from './components/BootableVolumeEmptyState/BootableVolumeEmptyState';
 import BootableVolumeListPagination from './components/BootableVolumeListPagination/BootableVolumeListPagination';
@@ -37,7 +37,6 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
   const { t } = useKubevirtTranslation();
   const isAdmin = useIsAdmin();
   const { control } = useVMWizard();
-  const onSelectCreatedVolume = useOnSelectCreatedVolume();
 
   const [volumeListNamespace, selectedBootableVolume] = useWatch({
     control,
@@ -141,11 +140,14 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
         </Split>
         {displayVolumes && (
           <BootableVolumeTable
+            selectedBootableVolumeState={[
+              selectedBootableVolume,
+              applySelectedBootableVolumeToForm,
+            ]}
             activeColumns={activeColumns}
             bootableVolumesData={bootableVolumesData}
             getSortType={getSortType}
             preferencesMap={preferencesMap}
-            selectedBootableVolumeState={[selectedBootableVolume, onSelectCreatedVolume]}
             sortedPaginatedData={sortedPaginatedData}
             userPreferencesMap={userPreferencesMap}
             volumeListNamespace={volumeListNamespace}
