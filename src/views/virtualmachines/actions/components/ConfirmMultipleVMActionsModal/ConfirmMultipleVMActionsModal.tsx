@@ -3,11 +3,13 @@ import React, { FC } from 'react';
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import AckConfirmationModal from '@kubevirt-utils/components/AckConfirmationModal/AckConfirmationModal';
 import { VMActionTelemetry } from '@kubevirt-utils/extensions/telemetry';
-import { logVMBulkActionPerformed } from '@kubevirt-utils/extensions/telemetry/vm-actions';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { isEmpty, kubevirtConsole } from '@kubevirt-utils/utils/utils';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Stack, StackItem } from '@patternfly/react-core';
-import { getVMNamesByNamespace } from '@virtualmachines/actions/components/ConfirmMultipleVMActionsModal/utils/utils';
+import {
+  getVMNamesByNamespace,
+  runActionOnVMs,
+} from '@virtualmachines/actions/components/ConfirmMultipleVMActionsModal/utils/utils';
 
 import VMsCountByNamespacePopoverLink from './components/VMsCountByNamespacePopoverLink';
 
@@ -22,6 +24,7 @@ type ConfirmMultipleVMActionsModalProps = {
   includedVMsDescription?: string;
   isOpen: boolean;
   onClose: () => void;
+  projectName?: string;
   severityVariant?: 'danger' | 'warning' | undefined;
   vms: V1VirtualMachine[];
 };
@@ -47,30 +50,7 @@ const ConfirmMultipleVMActionsModal: FC<ConfirmMultipleVMActionsModalProps> = ({
   const numExcludedVMs = excludedVMs?.length;
   const totalSelectedVMs = numVMs + (numExcludedVMs || 0);
 
-  const actionOnVms = async (): Promise<void> => {
-    const results = await Promise.allSettled(vms?.map((vm) => action(vm)) ?? []);
-
-    if (numVMs) {
-      logVMBulkActionPerformed(actionType as VMActionTelemetry, numVMs);
-    }
-
-    const failures = results.filter(
-      (result): result is PromiseRejectedResult => result.status === 'rejected',
-    );
-
-    if (failures.length === 0) {
-      return;
-    }
-
-    failures.forEach((failure) =>
-      kubevirtConsole.error(`Failed to ${actionType.toLowerCase()}:`, failure.reason),
-    );
-    throw new Error(
-      `Failed to ${actionType.toLowerCase()} for ${failures.length} of ${
-        vms?.length ?? 0
-      } VirtualMachine(s)`,
-    );
-  };
+  const actionOnVms = () => runActionOnVMs(vms, action, actionType as VMActionTelemetry);
 
   const defaultBody = (
     <>
