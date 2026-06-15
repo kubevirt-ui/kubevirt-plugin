@@ -1350,6 +1350,7 @@
   "No file extension detected": "ファイル拡張子が検出されませんでした",
   "No file systems found": "ファイルシステムが見つかりません",
   "No GPU devices found": "GPU デバイスが見つかりません",
+  "No guest operating system types available": "No guest operating system types available",
   "No hardware devices found": "ハードウェアデバイスが見つかりません",
   "No host devices exists": "ホストデバイスが存在しません",
   "No host devices found": "ホストデバイスが見つかりません",

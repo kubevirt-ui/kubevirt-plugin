@@ -5,6 +5,7 @@ import ModalPendingChangesAlert from '@kubevirt-utils/components/PendingChanges/
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import useHcoWorkloadArchitectures from '@kubevirt-utils/hooks/useHcoWorkloadArchitectures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getCluster } from '@multicluster/helpers/selectors';
 import { FormGroup, SelectOption } from '@patternfly/react-core';
 
 import FormPFSelect from '../FormPFSelect/FormPFSelect';
@@ -36,7 +37,7 @@ const FirmwareBootloaderModal: FC<FirmwareBootloaderModalProps> = ({
   vmi,
 }) => {
   const { t } = useKubevirtTranslation();
-  const clusterWorkloadArchitectures = useHcoWorkloadArchitectures();
+  const [clusterWorkloadArchitectures] = useHcoWorkloadArchitectures(getCluster(vm));
   const clusterOnlyArchitecture = getClusterOnlyArchitecture(clusterWorkloadArchitectures);
   const [selectedFirmwareBootloader, setSelectedFirmwareBootloader] =
     useState<BootloaderOptionValue>(

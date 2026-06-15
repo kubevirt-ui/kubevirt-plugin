@@ -14,6 +14,7 @@ import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import useHcoWorkloadArchitectures from '@kubevirt-utils/hooks/useHcoWorkloadArchitectures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getTemplateVirtualMachineObject, Template } from '@kubevirt-utils/resources/template';
+import { getCluster } from '@multicluster/helpers/selectors';
 import { FormGroup, SelectOption } from '@patternfly/react-core';
 
 type TemplateBootloaderModalProps = {
@@ -31,7 +32,7 @@ const TemplateBootloaderModal: FC<TemplateBootloaderModalProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const vm = getTemplateVirtualMachineObject(template);
-  const clusterWorkloadArchitectures = useHcoWorkloadArchitectures();
+  const [clusterWorkloadArchitectures] = useHcoWorkloadArchitectures(getCluster(vm));
   const clusterOnlyArchitecture = getClusterOnlyArchitecture(clusterWorkloadArchitectures);
   const [selectedFirmwareBootloader, setSelectedFirmwareBootloader] =
     useState<BootloaderOptionValue>(getBootloaderFromVM(vm, undefined, clusterOnlyArchitecture));

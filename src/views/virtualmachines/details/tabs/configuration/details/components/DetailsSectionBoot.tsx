@@ -21,6 +21,7 @@ import { getName } from '@kubevirt-utils/resources/shared';
 import { getDisks, getInterfaces } from '@kubevirt-utils/resources/vm';
 import { updateCustomizeInstanceType } from '@kubevirt-utils/store/customizeInstanceType';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
+import { getCluster } from '@multicluster/helpers/selectors';
 import { ExpandableSection, Switch } from '@patternfly/react-core';
 import { printableVMStatus } from '@virtualmachines/utils';
 
@@ -51,7 +52,7 @@ const DetailsSectionBoot: FC<DetailsSectionBootProps> = ({
   const [isChecked, setIsChecked] = useState<boolean>(!!vm?.spec?.template?.spec?.startStrategy);
   const [isExpanded, setIsExpanded] = useToggle('boot-management');
   const vmName = getName(vm);
-  const clusterWorkloadArchitectures = useHcoWorkloadArchitectures();
+  const [clusterWorkloadArchitectures] = useHcoWorkloadArchitectures(getCluster(vm));
   const clusterOnlyArchitecture = getClusterOnlyArchitecture(clusterWorkloadArchitectures);
   useEffect(() => {
     expandURLHash(getSearchItemsIds(getDetailsTabBootIds(vm)), location?.hash, setIsExpanded);

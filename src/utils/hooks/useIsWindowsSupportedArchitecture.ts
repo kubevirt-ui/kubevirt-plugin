@@ -7,7 +7,7 @@ const WINDOWS_SUPPORTED_ARCHITECTURES: string[] = [ARCHITECTURES.AMD64, ARCHITEC
 const useIsWindowsSupportedArchitecture = (cluster?: string): boolean => {
   const clusterParam = useClusterParam();
   const resolvedCluster = cluster || clusterParam;
-  const architectures = useHcoWorkloadArchitectures(resolvedCluster);
+  const [architectures] = useHcoWorkloadArchitectures(resolvedCluster);
 
   if (!architectures?.length) return true;
 
