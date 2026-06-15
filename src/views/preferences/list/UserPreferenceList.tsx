@@ -106,7 +106,7 @@ const UserPreferenceList: FC<ListPageProps> = ({
         getRowId={getUserPreferenceRowId}
         loaded={isLoaded}
         loadError={loadError}
-        noDataMsg={t('No preferences found')}
+        noDataMsg={t("You don't have any VirtualMachinePreferences yet")}
         pagination={pagination}
         unfilteredData={unfilteredData}
       />

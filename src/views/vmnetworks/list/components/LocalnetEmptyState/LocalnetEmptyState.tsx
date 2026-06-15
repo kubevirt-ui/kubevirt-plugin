@@ -1,18 +1,11 @@
 import React, { FC } from 'react';
-import { Trans } from 'react-i18next';
 import useCanCreateVMNetwork from 'src/views/vmnetworks/hooks/useCanCreateVMNetwork';
 
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
+import ListEmptyState from '@kubevirt-utils/components/ListEmptyState/ListEmptyState';
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import {
-  Button,
-  EmptyState,
-  EmptyStateActions,
-  EmptyStateBody,
-  EmptyStateFooter,
-} from '@patternfly/react-core';
-import { AddCircleOIcon } from '@patternfly/react-icons';
+import { Button } from '@patternfly/react-core';
 
 import NoPhysicalNetworkAlert from './NoPhysicalNetworkAlert';
 
@@ -29,33 +22,26 @@ const LocalnetEmptyState: FC<LocalnetEmptyStateProps> = ({ onCreate }) => {
   const { canCreate, showNoPhysicalNetworkAlert } = useCanCreateVMNetwork();
 
   return (
-    <EmptyState
-      headingLevel="h4"
-      icon={AddCircleOIcon}
-      titleText={t('No {{kind}} found', { kind })}
-    >
-      <EmptyStateBody>
-        {showNoPhysicalNetworkAlert ? (
+    <ListEmptyState
+      bodyContent={
+        showNoPhysicalNetworkAlert ? (
           <NoPhysicalNetworkAlert />
         ) : (
-          <Trans t={t}>
-            Click <b>{{ createButtonText }}</b> to create your first {{ kind }}
-          </Trans>
-        )}
-      </EmptyStateBody>
-      <EmptyStateFooter>
-        <EmptyStateActions>
-          <Button isDisabled={!canCreate} onClick={onCreate}>
-            {createButtonText}
-          </Button>
-        </EmptyStateActions>
-        <EmptyStateActions>
-          <ExternalLink href={documentationURL.NETWORKING}>
-            {t('Learn more about {{ kind }}', { kind })}
-          </ExternalLink>
-        </EmptyStateActions>
-      </EmptyStateFooter>
-    </EmptyState>
+          t('To get started, create a network.')
+        )
+      }
+      buttonAction={
+        <Button isDisabled={!canCreate} onClick={onCreate}>
+          {createButtonText}
+        </Button>
+      }
+      learnMoreLink={
+        <ExternalLink href={documentationURL.NETWORKING}>
+          {t('Learn more about {{ kind }}', { kind })}
+        </ExternalLink>
+      }
+      titleText={t("You don't have any {{kind}} yet", { kind })}
+    />
   );
 };
 

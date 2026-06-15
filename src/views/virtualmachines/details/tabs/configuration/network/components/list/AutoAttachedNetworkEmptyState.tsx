@@ -19,10 +19,10 @@ const AutoAttachedNetworkEmptyState: FC<AutoAttachedNetworkEmptyStateProps> = ({
         <EmptyStateBody>
           {isAutoAttached
             ? t(
-                "No network interface definitions found. The VirtualMachine has no networks and interfaces specified, therefore it's using a default interface and network configuration.",
+                "You don't have any network interface definitions yet. The VirtualMachine has no networks and interfaces specified, therefore it's using a default interface and network configuration.",
               )
             : t(
-                'No network interface definitions found. Click the "Add network interface" to define one.',
+                "You don't have any network interface definitions yet. To get started, add a network interface.",
               )}
         </EmptyStateBody>
       </EmptyState>

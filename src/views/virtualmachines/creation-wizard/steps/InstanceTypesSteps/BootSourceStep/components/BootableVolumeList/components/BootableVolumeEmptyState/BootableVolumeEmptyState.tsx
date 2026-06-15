@@ -31,16 +31,18 @@ const BootableVolumeEmptyState: FC<BootableVolumeEmptyStateProps> = ({ isPrefere
     <EmptyState>
       <div className="bootable-volume-empty-state">
         <Title className="bootable-volume-empty-state__title" headingLevel="h3">
-          {isPreferenceFilter ? t('No volumes found for the chosen OS') : t('No volumes found')}
+          {isPreferenceFilter
+            ? t("You don't have any volumes for the chosen OS yet")
+            : t("You don't have any volumes yet")}
         </Title>
         {isPreferenceFilter ? (
           <Trans ns="plugin__kubevirt-plugin" t={t}>
-            To add a boot source, click <AddBootableVolumeLink loadError={loadError} /> or select
-            &quot;No boot source&quot; to assign one later
+            To get started, <AddBootableVolumeLink loadError={loadError} /> or select &quot;No boot
+            source&quot; to assign one later.
           </Trans>
         ) : (
           <Trans ns="plugin__kubevirt-plugin" t={t}>
-            To add a bootable volume, click <AddBootableVolumeLink loadError={loadError} />
+            To get started, <AddBootableVolumeLink loadError={loadError} />.
           </Trans>
         )}
         <BootableVolumeOSIcons osName={osName} />

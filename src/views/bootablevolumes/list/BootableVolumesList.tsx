@@ -158,7 +158,7 @@ const BootableVolumesList: FC = () => {
             getRowId={getBootableVolumeRowId}
             loaded={isLoaded}
             loadError={error}
-            noDataMsg={t('No bootable volumes found')}
+            noDataMsg={t("You don't have any bootable volumes yet")}
             pagination={pagination}
             unfilteredData={bootableVolumes}
           />

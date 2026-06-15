@@ -119,7 +119,7 @@ const MigrationPoliciesList: FC<ListPageProps> = ({
           getRowId={getMigrationPoliciesRowId}
           loaded={isLoaded}
           loadError={loadError}
-          noDataMsg={t('No MigrationPolicies found')}
+          noDataMsg={t("You don't have any MigrationPolicies yet")}
           unfilteredData={unfilteredData}
         />
       </ListPageBody>

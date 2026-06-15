@@ -130,7 +130,7 @@ const DataSourcesList: FC<DataSourcesListProps> = ({ kind, namespace }) => {
           getRowId={getDataSourceRowId}
           loaded={isLoaded}
           loadError={loadError}
-          noDataMsg={t('No DataSources found')}
+          noDataMsg={t("You don't have any DataSources yet")}
           pagination={pagination}
           unfilteredData={unfilteredData}
         />

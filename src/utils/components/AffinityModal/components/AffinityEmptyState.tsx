@@ -1,13 +1,8 @@
 import React, { FC } from 'react';
 
+import ListEmptyState from '@kubevirt-utils/components/ListEmptyState/ListEmptyState';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import {
-  EmptyState,
-  EmptyStateActions,
-  EmptyStateBody,
-  EmptyStateFooter,
-  EmptyStateVariant,
-} from '@patternfly/react-core';
+import { EmptyStateVariant } from '@patternfly/react-core';
 
 import AddAffinityRuleButton from './AddAffinityRuleButton';
 import AffinityDescriptionText from './AffinityDescriptionText';
@@ -19,20 +14,14 @@ type AffinityEmptyStateProps = {
 const AffinityEmptyState: FC<AffinityEmptyStateProps> = ({ onAffinityClickAdd }) => {
   const { t } = useKubevirtTranslation();
   return (
-    <EmptyState
+    <ListEmptyState
+      bodyContent={<AffinityDescriptionText />}
+      buttonAction={<AddAffinityRuleButton onAffinityClickAdd={onAffinityClickAdd} />}
       headingLevel="h5"
-      titleText={<>{t('No affinity rules found')}</>}
+      icon={null}
+      titleText={t("You don't have any affinity rules yet")}
       variant={EmptyStateVariant.full}
-    >
-      <EmptyStateBody>
-        <AffinityDescriptionText />
-      </EmptyStateBody>
-      <EmptyStateFooter>
-        <EmptyStateActions>
-          <AddAffinityRuleButton onAffinityClickAdd={onAffinityClickAdd} />
-        </EmptyStateActions>
-      </EmptyStateFooter>
-    </EmptyState>
+    />
   );
 };
 

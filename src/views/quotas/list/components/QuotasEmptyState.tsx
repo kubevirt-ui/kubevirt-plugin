@@ -1,14 +1,8 @@
 import React, { FC } from 'react';
-import { Trans } from 'react-i18next';
 
+import ListEmptyState from '@kubevirt-utils/components/ListEmptyState/ListEmptyState';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import {
-  EmptyState,
-  EmptyStateActions,
-  EmptyStateBody,
-  EmptyStateFooter,
-} from '@patternfly/react-core';
-import { AddCircleOIcon } from '@patternfly/react-icons';
+import { EmptyStateVariant } from '@patternfly/react-core';
 
 import QuotasCreateButton from './QuotasCreateButton';
 import QuotasLearnMoreLink from './QuotasLearnMoreLink';
@@ -21,27 +15,15 @@ const QuotasEmptyState: FC<QuotasEmptyStateProps> = ({ namespace }) => {
   const { t } = useKubevirtTranslation();
 
   return (
-    <EmptyState
-      headingLevel="h4"
-      icon={AddCircleOIcon}
-      titleText={t('No application-aware quotas found')}
-      variant="sm"
-    >
-      <EmptyStateBody>
-        <Trans t={t}>
-          Click <b>Create quota</b> to create your first application-aware quota to limit VMs, pods,
-          or both.
-        </Trans>
-      </EmptyStateBody>
-      <EmptyStateFooter>
-        <EmptyStateActions>
-          <QuotasCreateButton namespace={namespace} />
-        </EmptyStateActions>
-        <EmptyStateActions>
-          <QuotasLearnMoreLink />
-        </EmptyStateActions>
-      </EmptyStateFooter>
-    </EmptyState>
+    <ListEmptyState
+      bodyContent={t(
+        'To get started, create an application-aware quota to limit VMs, pods, or both.',
+      )}
+      buttonAction={<QuotasCreateButton namespace={namespace} />}
+      learnMoreLink={<QuotasLearnMoreLink />}
+      titleText={t("You don't have any application-aware quotas yet")}
+      variant={EmptyStateVariant.sm}
+    />
   );
 };
 
