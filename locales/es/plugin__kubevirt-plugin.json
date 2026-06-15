@@ -1366,6 +1366,7 @@
   "No file extension detected": "No se detectó ninguna extensión de archivo",
   "No file systems found": "No se encontraron sistemas de archivos",
   "No GPU devices found": "No se encontraron dispositivos GPU",
+  "No guest operating system types available": "No guest operating system types available",
   "No hardware devices found": "No se encontraron dispositivos de hardware",
   "No host devices exists": "No existen dispositivos host",
   "No host devices found": "No se encontraron dispositivos host",

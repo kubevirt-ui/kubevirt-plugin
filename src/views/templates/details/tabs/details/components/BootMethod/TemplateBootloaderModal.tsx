@@ -31,7 +31,7 @@ const TemplateBootloaderModal: FC<TemplateBootloaderModalProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const vm = getTemplateVirtualMachineObject(template);
-  const clusterWorkloadArchitectures = useHcoWorkloadArchitectures();
+  const [clusterWorkloadArchitectures] = useHcoWorkloadArchitectures();
   const clusterOnlyArchitecture = getClusterOnlyArchitecture(clusterWorkloadArchitectures);
   const [selectedFirmwareBootloader, setSelectedFirmwareBootloader] =
     useState<BootloaderOptionValue>(getBootloaderFromVM(vm, undefined, clusterOnlyArchitecture));
