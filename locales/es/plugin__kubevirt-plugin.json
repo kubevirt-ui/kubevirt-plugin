@@ -794,6 +794,7 @@
   "Enable persistent reservation": "Habilitar la reserva persistente",
   "Enable preallocation": "Habilitar preasignación",
   "Enable predictive analytics": "Habilitar el análisis predictivo",
+  "Enable the \"Enable folders in VirtualMachines tree view\" preview feature in Settings > Preview features to use folders.": "Enable the \"Enable folders in VirtualMachines tree view\" preview feature in Settings > Preview features to use folders.",
   "Enable the creation of LoadBalancer services for SSH connections to VirtualMachines. A load balancer must be configured": "Habilite la creación de servicios de LoadBalancer para conexiones SSH a VirtualMachines. Se debe configurar un equilibrador de carga.",
   "Enable Windows Server 2022 golden image creation and testing. Requires accepting the Windows End User License Agreement (EULA).": "Enable Windows Server 2022 golden image creation and testing. Requires accepting the Windows End User License Agreement (EULA).",
   "Enabled": "Activado",

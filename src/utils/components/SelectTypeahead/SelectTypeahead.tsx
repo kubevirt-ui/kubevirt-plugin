@@ -1,5 +1,14 @@
 /* eslint-disable @typescript-eslint/no-shadow */
-import React, { FC, FormEvent, KeyboardEvent, MouseEvent, Ref, useRef, useState } from 'react';
+import React, {
+  FC,
+  FormEvent,
+  KeyboardEvent,
+  MouseEvent,
+  Ref,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import { TFunction } from 'i18next';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -55,6 +64,18 @@ type SelectTypeaheadProps = {
 const getDisplayValue = (option: SelectTypeaheadOptionProps) =>
   option?.label ?? option?.value ?? '';
 
+const getSelectedDisplayValue = (
+  selectedValue: string,
+  options: SelectTypeaheadOptionProps[],
+): string => {
+  if (!selectedValue) {
+    return '';
+  }
+
+  const option = options.find((o) => o.value === selectedValue);
+  return option ? getDisplayValue(option) : selectedValue;
+};
+
 const SelectTypeahead: FC<SelectTypeaheadProps> = ({
   addOption,
   canCreate = false,
@@ -75,7 +96,17 @@ const SelectTypeahead: FC<SelectTypeaheadProps> = ({
   const selected = options.find((option) => option.value === selectedValue);
 
   const [isOpen, setIsOpen] = useState(false);
-  const [inputValue, setInputValue] = useState<string>(getDisplayValue(selected));
+  const [inputValue, setInputValue] = useState<string>(() =>
+    getSelectedDisplayValue(selectedValue, options),
+  );
+
+  useEffect(() => {
+    if (isOpen) {
+      return;
+    }
+
+    setInputValue(getSelectedDisplayValue(selectedValue, options));
+  }, [isOpen, options, selectedValue]);
 
   const [focusedItemIndex, setFocusedItemIndex] = useState<null | number>(null);
   const [activeItemId, setActiveItemId] = useState<null | string>(null);
@@ -148,10 +179,7 @@ const SelectTypeahead: FC<SelectTypeaheadProps> = ({
   };
 
   const setInputToSelected = () => {
-    const option = options.find((o) => o.value === selectedValue);
-    if (option) {
-      setInputValue(getDisplayValue(option));
-    }
+    setInputValue(getSelectedDisplayValue(selectedValue, options));
   };
 
   const selectOption = (option: SelectTypeaheadOptionProps) => {
