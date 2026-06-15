@@ -40,11 +40,11 @@ const TemplatesCatalogEmptyState: FC<TemplatesCatalogEmptyStateProps> = memo(
       return (
         <EmptyState
           headingLevel="h4"
-          titleText={t('No templates found in this project')}
+          titleText={t("You don't have any templates in this project yet")}
           variant={EmptyStateVariant.sm}
         >
           <EmptyStateBody>
-            {t('This project does not have any virtual machine templates.')}
+            {t('To get started, view all projects or create a template.')}
           </EmptyStateBody>
           <EmptyStateFooter>
             <EmptyStateActions>

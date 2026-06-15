@@ -16,7 +16,7 @@ const EmptyStateNoVMs: FC<EmptyStateNoVMsProps> = ({ className }) => {
       className={className}
       headingLevel="h4"
       icon={VirtualMachineIcon}
-      titleText={<>{t('No VirtualMachines found')}</>}
+      titleText={t("You don't have any VirtualMachines yet")}
     />
   );
 };

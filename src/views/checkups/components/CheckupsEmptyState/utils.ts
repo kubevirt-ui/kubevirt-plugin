@@ -8,10 +8,10 @@ import { getSelectProjectText } from '../../utils/utils';
 
 export const getTitleText = (checkupType: CheckupType, t: TFunction) => {
   if (checkupType === CHECKUP_URLS.STORAGE) {
-    return t('No storage checkups found');
+    return t("You don't have any storage checkups yet");
   }
   if (checkupType === CHECKUP_URLS.SELF_VALIDATION) {
-    return t('No self validation checkups found');
+    return t("You don't have any self validation checkups yet");
   }
 };
 

@@ -111,7 +111,9 @@ const UserProvidedInstanceTypesList: FC<UserProvidedInstanceTypesListProps> = ({
         </ActionList>
       )}
       {isEmpty(userProvidedInstanceTypes) || isEmpty(filteredItems) ? (
-        <UserProvidedInstanceTypesEmptyState />
+        <UserProvidedInstanceTypesEmptyState
+          isFilterEmpty={!isEmpty(userProvidedInstanceTypes) && isEmpty(filteredItems)}
+        />
       ) : (
         <Table variant={TableVariant.compact}>
           <Thead>

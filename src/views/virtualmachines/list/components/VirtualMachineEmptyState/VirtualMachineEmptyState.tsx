@@ -48,7 +48,7 @@ const VirtualMachineEmptyState: FC<VirtualMachineEmptyStateProps> = ({ namespace
         className="VirtualMachineEmptyState"
         headingLevel="h2"
         icon={VirtualMachineIcon}
-        titleText={t('No virtual machines yet')}
+        titleText={t("You don't have any VirtualMachines yet")}
         variant={EmptyStateVariant.lg}
       >
         <EmptyStateBody>
@@ -58,13 +58,12 @@ const VirtualMachineEmptyState: FC<VirtualMachineEmptyStateProps> = ({ namespace
             <>
               {canCreateVM ? (
                 <div>
-                  <Trans ns="plugin__kubevirt-plugin" t={t}>
-                    Click <b>Create VirtualMachine</b> to get started, or right-click a project in
-                    the left navigation tree.
-                  </Trans>
+                  {t(
+                    'To get started, create a VirtualMachine or view the Catalog tab to create a VirtualMachine from the available options.',
+                  )}
                 </div>
               ) : (
-                <div>{t('To create a virtual machine, contact an administrator.')}</div>
+                <div>{t('To create a VirtualMachine, contact an administrator.')}</div>
               )}
               {canCreateProject && (
                 <div className="pf-v6-u-mt-md">

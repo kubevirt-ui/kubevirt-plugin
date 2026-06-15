@@ -187,7 +187,7 @@ const QuotasList: FC = () => {
               getRowId={getQuotaRowId}
               loaded={isLoaded}
               loadError={loadError}
-              noDataMsg={t('No application-aware quotas found')}
+              noDataMsg={t("You don't have any application-aware quotas yet")}
               noFilteredDataMsg={t('No application-aware quotas found')}
               pagination={pagination}
               unfilteredData={unfilteredData}

@@ -136,7 +136,7 @@ const UserInstancetypeList: FC<UserInstancetypeListProps> = ({
         getRowId={getUserInstancetypeRowId}
         loaded={isLoaded}
         loadError={loadError}
-        noDataMsg={t('No VirtualMachineInstanceTypes found')}
+        noDataMsg={t("You don't have any VirtualMachineInstanceTypes yet")}
         pagination={pagination}
         unfilteredData={unfilteredData}
       />
