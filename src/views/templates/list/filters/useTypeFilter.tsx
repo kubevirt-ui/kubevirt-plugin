@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 
 import { ExtendedRowFilterItem } from '@kubevirt-utils/components/ListPageFilter/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import useVMTemplateFeatureFlag from '@kubevirt-utils/hooks/useVMTemplateFeatureFlag/useVMTemplateFeatureFlag';
+import useIsVMTemplateFeatureEnabled from '@kubevirt-utils/hooks/useVMTemplateFeatureFlag/useIsVMTemplateFeatureEnabled';
 import { isOpenShiftTemplate, TemplateOrRequest } from '@kubevirt-utils/resources/template';
 import {
   TemplateModelGroupVersionKind,
@@ -27,7 +27,7 @@ const getTemplateType = (obj: TemplateOrRequest): string => {
 
 const useTypeFilter = (): null | RowFilter<TemplateOrRequest> => {
   const { t } = useKubevirtTranslation();
-  const { featureEnabled: vmTemplatesEnabled } = useVMTemplateFeatureFlag();
+  const { featureEnabled: vmTemplatesEnabled } = useIsVMTemplateFeatureEnabled();
 
   return useMemo(() => {
     if (!vmTemplatesEnabled) return null;

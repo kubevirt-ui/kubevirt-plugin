@@ -10,7 +10,7 @@ import { getConsoleVirtctlCommand } from '@kubevirt-utils/components/SSHAccess/u
 import { CONFIRM_VM_ACTIONS, TREE_VIEW_FOLDERS } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import useVMTemplateFeatureFlag from '@kubevirt-utils/hooks/useVMTemplateFeatureFlag/useVMTemplateFeatureFlag';
+import useIsVMTemplateFeatureEnabled from '@kubevirt-utils/hooks/useVMTemplateFeatureFlag/useIsVMTemplateFeatureEnabled';
 import { VirtualMachineModelRef } from '@kubevirt-utils/models';
 import { vmimStatuses } from '@kubevirt-utils/resources/vmim/statuses';
 import { CROSS_CLUSTER_MIGRATION_ACTION_ID } from '@multicluster/constants';
@@ -53,7 +53,7 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (vm, 
 
   const { featureEnabled: treeViewFoldersEnabled } = useFeatures(TREE_VIEW_FOLDERS);
   const { featureEnabled: vmTemplatesEnabled, loading: vmTemplatesLoading } =
-    useVMTemplateFeatureFlag(effectiveCluster);
+    useIsVMTemplateFeatureEnabled(effectiveCluster);
 
   const VirtualMachineActionFactory = useMemo(() => createVirtualMachineActionFactory(t), [t]);
 
