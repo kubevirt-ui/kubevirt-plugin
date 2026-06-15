@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { scanForSuspiciousPatterns } from './checks.js';
+import { scanForSuspiciousPatterns } from './checks';
 
 describe('scanForSuspiciousPatterns', () => {
   it('flags Miasma-style attack patterns in added lines', () => {

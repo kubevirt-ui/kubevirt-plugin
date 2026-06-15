@@ -1,4 +1,4 @@
-import { getSensitivePaths } from './paths.js';
+import { getSensitivePaths } from './paths';
 
 export type SuspiciousPatternMatch = {
   file: string;

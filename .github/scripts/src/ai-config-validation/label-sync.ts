@@ -1,12 +1,12 @@
 import type { Octokit } from '@octokit/rest';
 
-import { addLabel, removeLabel, setCommitStatus } from '../github-comments.js';
+import { addLabel, removeLabel, setCommitStatus } from '../github-comments';
 import {
   AI_CONFIG_ALERT_LABEL,
   AI_CONFIG_BLOCK_LABEL,
   AI_CONFIG_STATUS_CONTEXT,
-} from '../types/index.js';
-import type { GitHubConfig } from '../types/index.js';
+} from '../types/index';
+import type { GitHubConfig } from '../types/index';
 
 const LABEL_META = {
   alert: { color: 'f59e0b', description: 'PR modifies AI/editor config or PR automation scripts' },

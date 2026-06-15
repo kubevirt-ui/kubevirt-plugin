@@ -1,6 +1,6 @@
 import { Octokit } from '@octokit/rest';
 
-import { BLOCK_LABEL, VALIDATION_COMMENT_MARKER } from './types/index.js';
+import { BLOCK_LABEL, VALIDATION_COMMENT_MARKER } from './types/index';
 
 /** Post or update an idempotent comment identified by a hidden HTML marker. */
 export const upsertComment = async (

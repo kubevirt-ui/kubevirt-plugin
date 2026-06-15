@@ -1,6 +1,6 @@
 import { Octokit } from '@octokit/rest';
 
-import type { GitHubConfig } from './types/index.js';
+import type { GitHubConfig } from './types/index';
 
 /** Create an authenticated Octokit instance. */
 export const createOctokit = (config: GitHubConfig): Octokit => new Octokit({ auth: config.token });

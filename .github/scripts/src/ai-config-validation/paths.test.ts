@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { getSensitivePaths, isSensitiveAiConfigPath } from './paths.js';
+import { getSensitivePaths, isSensitiveAiConfigPath } from './paths';
 
 describe('isSensitiveAiConfigPath', () => {
   it('matches AI assistant and editor dot folders', () => {

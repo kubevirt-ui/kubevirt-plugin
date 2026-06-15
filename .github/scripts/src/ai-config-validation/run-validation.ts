@@ -1,14 +1,14 @@
 import type { Octokit } from '@octokit/rest';
 
-import { scanForSuspiciousPatterns } from './checks.js';
-import { reportCommitStatus, syncAiConfigLabels } from './label-sync.js';
-import type { AiConfigValidationEvent } from './label-sync.js';
-import { getSensitivePaths } from './paths.js';
-import { buildStatusDescription } from './utils.js';
-import { getPrLabelNames, removeLabel } from '../github-comments.js';
-import { getPullRequestFiles } from '../github-repo.js';
-import { AI_CONFIG_REVIEWED_LABEL, AI_CONFIG_SKIP_LABEL } from '../types/index.js';
-import type { GitHubConfig } from '../types/index.js';
+import { scanForSuspiciousPatterns } from './checks';
+import { reportCommitStatus, syncAiConfigLabels } from './label-sync';
+import type { AiConfigValidationEvent } from './label-sync';
+import { getSensitivePaths } from './paths';
+import { buildStatusDescription } from './utils';
+import { getPrLabelNames, removeLabel } from '../github-comments';
+import { getPullRequestFiles } from '../github-repo';
+import { AI_CONFIG_REVIEWED_LABEL, AI_CONFIG_SKIP_LABEL } from '../types/index';
+import type { GitHubConfig } from '../types/index';
 
 export type { AiConfigValidationEvent };
 

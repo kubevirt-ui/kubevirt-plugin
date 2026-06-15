@@ -1,7 +1,6 @@
 {
   "private": true,
   "name": "kubevirt-plugin-gh-scripts",
-  "type": "module",
   "engines": {
     "node": ">=22.0.0"
   },

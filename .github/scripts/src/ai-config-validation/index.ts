@@ -1,9 +1,9 @@
-import { runAiConfigValidation } from './run-validation.js';
-import { createOctokit } from '../github-repo.js';
-import { setCommitStatus } from '../github-comments.js';
-import { AI_CONFIG_REVIEWED_LABEL, AI_CONFIG_STATUS_CONTEXT } from '../types/index.js';
-import type { GitHubConfig } from '../types/index.js';
-import { requireEnv, safeErrorMessage } from '../utils.js';
+import { runAiConfigValidation } from './run-validation';
+import { createOctokit } from '../github-repo';
+import { setCommitStatus } from '../github-comments';
+import { AI_CONFIG_REVIEWED_LABEL, AI_CONFIG_STATUS_CONTEXT } from '../types/index';
+import type { GitHubConfig } from '../types/index';
+import { requireEnv, safeErrorMessage } from '../utils';
 
 const loadContext = () => ({
   config: {

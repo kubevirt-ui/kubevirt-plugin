@@ -1,12 +1,12 @@
 /* eslint-disable no-nested-ternary */
-import { JiraClient } from '../jira-client.js';
+import { JiraClient } from '../jira-client';
 import {
   extractVersionNumber,
   fixVersionMatchesBranch,
   suggestBranchForFixVersion,
-} from '../version-utils.js';
-import { JIRA_BASE_URL, MIN_STORY_POINTS, REQUIRED_COMPONENT } from '../types/index.js';
-import type { JiraIssue, ValidationCheck } from '../types/index.js';
+} from '../version-utils';
+import { JIRA_BASE_URL, MIN_STORY_POINTS, REQUIRED_COMPONENT } from '../types/index';
+import type { JiraIssue, ValidationCheck } from '../types/index';
 
 /** Validate story points, fix version, component, and activity type on a Jira ticket. */
 export const validateTicket = async (
