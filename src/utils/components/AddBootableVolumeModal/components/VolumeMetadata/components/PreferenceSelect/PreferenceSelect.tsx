@@ -4,7 +4,7 @@ import usePreferenceSelectOptions from '@kubevirt-utils/components/AddBootableVo
 import {
   AddBootableVolumeState,
   SetBootableVolumeFieldType,
-} from '@kubevirt-utils/components/AddBootableVolumeModal/utils/constants';
+} from '@kubevirt-utils/components/AddBootableVolumeModal/types';
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import Loading from '@kubevirt-utils/components/Loading/Loading';

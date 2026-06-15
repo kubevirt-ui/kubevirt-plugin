@@ -4,7 +4,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { ANNOTATIONS } from '@kubevirt-utils/resources/template';
 import { FormGroup, TextInput } from '@patternfly/react-core';
 
-import { AddBootableVolumeState, SetBootableVolumeFieldType } from '../../utils/constants';
+import { AddBootableVolumeState, SetBootableVolumeFieldType } from '../../types';
 
 import ArchitectureSelect from './components/ArchitectureSelect/ArchitectureSelect';
 import { InstanceTypeDrilldownSelect } from './components/InstanceTypeDrilldownSelect/InstanceTypeDrilldownSelect';

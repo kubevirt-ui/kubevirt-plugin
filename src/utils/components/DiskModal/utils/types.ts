@@ -1,3 +1,5 @@
+import { TFunction } from 'i18next';
+
 import { V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import {
@@ -6,6 +8,7 @@ import {
   V1VirtualMachine,
   V1Volume,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { UploadDataProps } from '@kubevirt-utils/hooks/useCDIUpload/types';
 
 export type RegistryCredentials = { password: string; username: string };
 
@@ -75,4 +78,33 @@ export type V1SubDiskModalProps = V1DiskModalProps & {
   defaultFormValues?: DefaultFormValues;
   isCreated: boolean;
   pvc: IoK8sApiCoreV1PersistentVolumeClaim;
+};
+
+export type UploadDataVolumeOptions = {
+  abortTooltip?: string;
+  onCancelCleanup?: () => Promise<void>;
+};
+
+export type SubmitInput = {
+  data: V1DiskFormState;
+  editDiskName: string;
+  isHotpluggable?: boolean;
+  onSubmit: (
+    updatedVM: V1VirtualMachine,
+    diskFormState?: V1DiskFormState,
+  ) => Promise<V1VirtualMachine | void>;
+  pvc?: IoK8sApiCoreV1PersistentVolumeClaim;
+  vm: V1VirtualMachine;
+};
+
+export type SubmitCDROMInput = {
+  isHotPluggable: boolean;
+  onSubmit: V1DiskModalProps['onSubmit'];
+  onUploadedDataVolume?: V1DiskModalProps['onUploadedDataVolume'];
+  onUploadStarted?: V1DiskModalProps['onUploadStarted'];
+  selectedISO: string;
+  t: TFunction;
+  uploadData: ({ dataVolume, file }: UploadDataProps) => Promise<void>;
+  uploadEnabled: boolean;
+  vm: V1VirtualMachine;
 };

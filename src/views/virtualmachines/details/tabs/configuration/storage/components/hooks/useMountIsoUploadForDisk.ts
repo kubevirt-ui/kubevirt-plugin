@@ -1,11 +1,7 @@
-import { useCallback } from 'react';
-
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import {
-  getCdromUploadKeyFromVm,
-  UPLOAD_ALERT_STATUS,
-  useMountIsoUploadStore,
-} from '@kubevirt-utils/hooks/mountIsoUploadStore';
+import { useUploadProgressStore } from '@kubevirt-utils/hooks/useUploadProgressToast/uploadProgressStore';
+import { UPLOAD_PROGRESS_STATUS } from '@kubevirt-utils/hooks/useUploadProgressToast/utils/constants';
+import { getVmCdromUploadKeyFromVm } from '@kubevirt-utils/hooks/useUploadProgressToast/utils/uploadKeys';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 
 type UseMountIsoUploadForDiskResult = {
@@ -17,24 +13,16 @@ export const cancelMountIsoUpload = async (
   vm: V1VirtualMachine,
   cdromDiskName: string,
 ): Promise<boolean> => {
-  const uploadKey = getCdromUploadKeyFromVm(vm, cdromDiskName);
-  const { clearCancelUpload, clearUpload, getCancelUpload, getUpload } =
-    useMountIsoUploadStore.getState();
+  const uploadKey = getVmCdromUploadKeyFromVm(vm, cdromDiskName);
+  const { cancelTrackedUpload, getUpload } = useUploadProgressStore.getState();
   const upload = getUpload(uploadKey);
 
-  if (upload?.status !== UPLOAD_ALERT_STATUS.UPLOADING) {
-    return false;
-  }
-
-  const cancelFn = getCancelUpload(uploadKey);
-  if (!cancelFn) {
+  if (upload?.status !== UPLOAD_PROGRESS_STATUS.UPLOADING) {
     return false;
   }
 
   try {
-    await cancelFn();
-    clearUpload(uploadKey);
-    clearCancelUpload(uploadKey);
+    await cancelTrackedUpload(uploadKey);
     return true;
   } catch (error) {
     kubevirtConsole.error(error);
@@ -46,12 +34,12 @@ export const useMountIsoUploadForDisk = (
   vm: V1VirtualMachine,
   diskName: string,
 ): UseMountIsoUploadForDiskResult => {
-  const uploadKey = getCdromUploadKeyFromVm(vm, diskName);
-  const upload = useMountIsoUploadStore((state) => state.uploads[uploadKey]);
+  const uploadKey = getVmCdromUploadKeyFromVm(vm, diskName);
+  const upload = useUploadProgressStore((state) => state.uploads[uploadKey]);
 
-  const isUploadInProgress = upload?.status === UPLOAD_ALERT_STATUS.UPLOADING;
+  const isUploadInProgress = upload?.status === UPLOAD_PROGRESS_STATUS.UPLOADING;
 
-  const cancelUpload = useCallback(() => cancelMountIsoUpload(vm, diskName), [diskName, vm]);
+  const cancelUpload = () => cancelMountIsoUpload(vm, diskName);
 
   return { cancelUpload, isUploadInProgress };
 };

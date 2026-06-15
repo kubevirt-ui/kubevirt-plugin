@@ -8,7 +8,7 @@ import { getNoPermissionTooltipContent } from '@kubevirt-utils/utils/utils';
 import { Divider, FormGroup, SelectGroup } from '@patternfly/react-core';
 import { Select, SelectOption } from '@patternfly/react-core';
 
-import { DROPDOWN_FORM_SELECTION, optionsValueLabelMapper } from '../../utils/constants';
+import { DROPDOWN_FORM_SELECTION, optionsValueLabelMapper } from '../../consts';
 
 type SourceTypeSelectionProps = {
   formSelection: DROPDOWN_FORM_SELECTION;
@@ -45,7 +45,7 @@ const SourceTypeSelection: FC<SourceTypeSelectionProps> = ({
         resetDiskSize();
       }
     },
-    [setFormSelection, resetDiskSize],
+    [formSelection, setFormSelection, resetDiskSize],
   );
 
   useEffect(() => {

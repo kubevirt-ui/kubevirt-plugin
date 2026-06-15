@@ -9,7 +9,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { getName } from '@kubevirt-utils/resources/shared';
 import { Content, FormGroup } from '@patternfly/react-core';
 
-import { initialBootableVolumeState } from '../AddBootableVolumeModal/utils/constants';
+import { initialBootableVolumeState } from '../AddBootableVolumeModal/consts';
 import InlineFilterSelect from '../FilterSelect/InlineFilterSelect';
 import Loading from '../Loading/Loading';
 

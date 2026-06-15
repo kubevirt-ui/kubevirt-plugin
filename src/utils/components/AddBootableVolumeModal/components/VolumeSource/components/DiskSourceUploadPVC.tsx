@@ -1,6 +1,6 @@
 import React, { ChangeEvent, FC, useState } from 'react';
 
-import { DataUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
+import { DataUpload } from '@kubevirt-utils/hooks/useCDIUpload/types';
 import { isUploadingDisk } from '@kubevirt-utils/hooks/useCDIUpload/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { DropEvent, FileUpload, FormGroup } from '@patternfly/react-core';

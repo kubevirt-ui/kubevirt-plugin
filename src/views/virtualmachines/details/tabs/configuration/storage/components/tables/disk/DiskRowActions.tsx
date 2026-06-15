@@ -7,12 +7,12 @@ import {
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import DiskModal from '@kubevirt-utils/components/DiskModal/DiskModal';
 import {
-  ejectISOFromCDROM,
   isDeclarativeHotplugVolumesEnabled,
   produceVMDisks,
 } from '@kubevirt-utils/components/DiskModal/utils/helpers';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import KebabToggle from '@kubevirt-utils/components/toggles/KebabToggle';
+import { getCancelUploadLabel } from '@kubevirt-utils/hooks/useCDIUpload/utils';
 import useKubevirtHyperconvergeConfiguration from '@kubevirt-utils/hooks/useKubevirtHyperconvergeConfiguration';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName } from '@kubevirt-utils/resources/shared';
@@ -50,7 +50,6 @@ type DiskRowActionsProps = {
   customize?: boolean;
   obj: DiskRowDataLayout;
   onDiskUpdate?: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine>;
-  onUploadStarted?: (promise: Promise<unknown>, cdromDiskName?: string) => void;
   vm: V1VirtualMachine;
   vmi?: V1VirtualMachineInstance;
 };
@@ -59,7 +58,6 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({
   customize = false,
   obj,
   onDiskUpdate,
-  onUploadStarted,
   vm,
   vmi,
 }) => {
@@ -186,7 +184,6 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({
         onSubmit={onDiskUpdate || updateDisks}
         vm={vm}
         {...(isCDROMMountedState && { source: diskSource })}
-        {...(!isCDROMMountedState && { onUploadStarted })}
       />
     ));
   };
@@ -200,11 +197,7 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({
 
   const handleCancelMountIsoUpload = async () => {
     setIsDropdownOpen(false);
-    const wasCanceled = await cancelUpload();
-    if (wasCanceled) {
-      const ejectedVM = ejectISOFromCDROM(vm, diskName);
-      await (onDiskUpdate || updateDisks)(ejectedVM);
-    }
+    await cancelUpload();
   };
 
   const mountCdromItem = isUploadInProgress ? (
@@ -247,7 +240,7 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({
         {isCDROMOperationsEnabled && mountCdromItem}
         {isCDROMOperationsEnabled && isUploadInProgress && (
           <DropdownItem key="cdrom-cancel-upload" onClick={handleCancelMountIsoUpload}>
-            {t('Cancel upload')}
+            {getCancelUploadLabel(t)}
           </DropdownItem>
         )}
         <DropdownItem key="disk-delete" onClick={() => onModalOpen(createDeleteDiskModal)}>

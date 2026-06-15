@@ -1,7 +1,8 @@
 import React, { FC } from 'react';
 
-import { DataUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
+import { DataUpload } from '@kubevirt-utils/hooks/useCDIUpload/types';
 import {
+  getCancelUploadLabel,
   UPLOAD_STATUS,
   UPLOAD_STATUS_LABELS,
   uploadStatusToProgressVariant,
@@ -41,7 +42,7 @@ export const DiskSourceUploadPVCProgress: FC<{ upload: DataUpload }> = ({ upload
             onClick={() => upload?.cancelUpload()}
             variant={ButtonVariant.link}
           >
-            {t('Cancel upload')}
+            {getCancelUploadLabel(t)}
           </Button>
         </StackItem>
       </Stack>

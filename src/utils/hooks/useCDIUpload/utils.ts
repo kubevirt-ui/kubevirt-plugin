@@ -1,3 +1,4 @@
+import { TFunction } from 'i18next';
 import produce from 'immer';
 
 import { DataVolumeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -22,26 +23,16 @@ import { ProgressVariant } from '@patternfly/react-core';
 import { t } from '../useKubevirtTranslation';
 
 import { CDI_BIND_REQUESTED_ANNOTATION } from './consts';
+import { CDIConfig, UPLOAD_STATUS } from './types';
 
-export type CDIConfig = K8sResourceCommon & {
-  status: {
-    uploadProxyURL: string;
-  };
-};
+export type { CDIConfig } from './types';
+export { UPLOAD_STATUS } from './types';
 
 type UploadToken = K8sResourceCommon & {
   status: {
     token?: string;
   };
 };
-
-export enum UPLOAD_STATUS {
-  ALLOCATING = 'ALLOCATING',
-  CANCELED = 'CANCELED',
-  ERROR = 'ERROR',
-  SUCCESS = 'SUCCESS',
-  UPLOADING = 'UPLOADING',
-}
 
 export const UPLOAD_STATUS_LABELS = {
   [UPLOAD_STATUS.ALLOCATING]: t('Allocating resources, please wait for upload to start.'),
@@ -50,6 +41,8 @@ export const UPLOAD_STATUS_LABELS = {
   [UPLOAD_STATUS.SUCCESS]: t('Success'),
   [UPLOAD_STATUS.UPLOADING]: t('Uploading'),
 };
+
+export const getCancelUploadLabel = (tFunc: TFunction): string => tFunc('Cancel upload');
 
 export const uploadStatusToProgressVariant = {
   [UPLOAD_STATUS.CANCELED]: ProgressVariant.warning,
@@ -82,7 +75,7 @@ export const getUploadProxyURL = (config: CDIConfig) => config?.status?.uploadPr
 export const getUploadURL = (uploadProxyURL: string) =>
   `https://${uploadProxyURL}/v1beta1/upload-form-async`;
 
-export const killUploadPVC = async (name: string, namespace: string, cluster?: string) => {
+export const cancelUploadPVC = async (name: string, namespace: string, cluster?: string) => {
   return kubevirtK8sDelete({
     cluster,
     model: DataVolumeModel,

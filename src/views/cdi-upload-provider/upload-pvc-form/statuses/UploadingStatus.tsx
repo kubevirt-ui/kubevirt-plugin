@@ -1,5 +1,6 @@
 import React, { FC } from 'react';
 
+import { getCancelUploadLabel } from '@kubevirt-utils/hooks/useCDIUpload/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   Alert,
@@ -59,7 +60,7 @@ const UploadingStatus: FC<UploadingStatusProps> = ({ onCancelClick, onSuccessCli
       {onCancelClick && upload?.uploadStatus === UPLOAD_STATUS.UPLOADING && (
         <EmptyStateActions>
           <Button id="cdi-upload-cancel-btn" onClick={onCancelClick} variant={ButtonVariant.link}>
-            {t('Cancel upload')}
+            {getCancelUploadLabel(t)}
           </Button>
         </EmptyStateActions>
       )}

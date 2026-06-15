@@ -35,18 +35,11 @@ import './disklist.scss';
 type DiskListProps = {
   customize?: boolean;
   onDiskUpdate?: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine>;
-  onUploadStarted?: (uploadPromise: Promise<unknown>, cdromDiskName?: string) => void;
   vm: V1VirtualMachine;
   vmi?: V1VirtualMachineInstance;
 };
 
-const DiskList: FC<DiskListProps> = ({
-  customize = false,
-  onDiskUpdate,
-  onUploadStarted,
-  vm,
-  vmi,
-}) => {
+const DiskList: FC<DiskListProps> = ({ customize = false, onDiskUpdate, vm, vmi }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const isWindowsSupported = useIsWindowsSupportedArchitecture();
@@ -85,13 +78,12 @@ const DiskList: FC<DiskListProps> = ({
     () => ({
       customize,
       onSubmit,
-      onUploadStarted,
       provisioningPercentages,
       sourcesLoaded,
       vm,
       vmi,
     }),
-    [customize, onSubmit, onUploadStarted, provisioningPercentages, sourcesLoaded, vm, vmi],
+    [customize, onSubmit, provisioningPercentages, sourcesLoaded, vm, vmi],
   );
 
   return (
@@ -105,7 +97,6 @@ const DiskList: FC<DiskListProps> = ({
               isOpen={isOpen}
               onClose={onClose}
               onSubmit={onSubmit}
-              onUploadStarted={onUploadStarted}
               vm={vm}
             />
           ));

@@ -5,12 +5,8 @@ import { DEFAULT_PREFERENCE_LABEL } from '@kubevirt-utils/constants/instancetype
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { isValidCronExpression } from '@kubevirt-utils/utils/validation';
 
-import { AddBootableVolumeState, DROPDOWN_FORM_SELECTION } from '../utils/constants';
-
-type UseAddBootableVolumeFormValidationParams = {
-  bootableVolume: AddBootableVolumeState;
-  sourceType: DROPDOWN_FORM_SELECTION;
-};
+import { DROPDOWN_FORM_SELECTION } from '../consts';
+import { UseAddBootableVolumeFormValidationParams } from '../types';
 
 export const useAddBootableVolumeFormValidation = ({
   bootableVolume,

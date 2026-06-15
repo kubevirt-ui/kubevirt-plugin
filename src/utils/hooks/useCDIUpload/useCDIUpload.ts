@@ -3,22 +3,26 @@ import axios from 'axios';
 
 import { modelToGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { CDIConfigModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 
 import { useKubevirtTranslation } from '../useKubevirtTranslation';
+import {
+  registerCdiUpload,
+  syncCdiUploadProgressAndFailures,
+} from '../useUploadProgressToast/utils/cdiUploadTracking';
 
 import { CANCEL_ALLOCATION_MESSAGE, UploadCanceledError } from './errors';
 import {
   CDIConfig,
-  createUploadPVC,
-  getUploadProxyURL,
-  getUploadURL,
-  killUploadPVC,
+  DataUpload,
   UPLOAD_STATUS,
-} from './utils';
+  UploadDataProps,
+  UploadError,
+  UseCDIUploadValues,
+} from './types';
+import { cancelUploadPVC, createUploadPVC, getUploadProxyURL, getUploadURL } from './utils';
 
 export const useCDIUpload = (clusterInput?: string): UseCDIUploadValues => {
   const clusterParam = useClusterParam();
@@ -56,26 +60,44 @@ export const useCDIUpload = (clusterInput?: string): UseCDIUploadValues => {
     }
   }, [configError, configLoaded, uploadProxyURL, t]);
 
-  const uploadData = async ({ dataVolume, file }: UploadDataProps) => {
+  const uploadData = async ({
+    dataVolume,
+    file,
+    uploadKey,
+    uploadTrackMetadata,
+  }: UploadDataProps) => {
     const { CancelToken } = axios;
     const cancelSource = CancelToken.source();
     const noRouteFound = configError || !configLoaded || !uploadProxyURL;
     const namespace = getNamespace(dataVolume);
     const name = getName(dataVolume);
 
+    const syncStore = (
+      status: UPLOAD_STATUS,
+      progress?: number,
+      uploadError?: DataUpload['uploadError'],
+    ) => {
+      if (!uploadKey) {
+        return;
+      }
+
+      syncCdiUploadProgressAndFailures({ progress, uploadError, uploadKey, uploadStatus: status });
+    };
+
     const newUpload: DataUpload = {
       cancelUpload: () => {
         cancelSource.cancel();
         setUpload((prev) => ({ ...prev, uploadStatus: UPLOAD_STATUS.CANCELED }));
-        return killUploadPVC(name, namespace, cluster);
+        syncStore(UPLOAD_STATUS.CANCELED);
+        return cancelUploadPVC(name, namespace, cluster);
       },
       fileName: file?.name,
       namespace,
       progress: 0,
       pvcName: name,
-      uploadError: noRouteFound && {
-        message: t('No upload URL found {{configError}}', { configError }),
-      },
+      uploadError: noRouteFound
+        ? { message: t('No upload URL found {{configError}}', { configError }) }
+        : undefined,
       uploadStatus: noRouteFound ? UPLOAD_STATUS.ERROR : UPLOAD_STATUS.ALLOCATING,
     };
     // check for nullish values
@@ -91,6 +113,14 @@ export const useCDIUpload = (clusterInput?: string): UseCDIUploadValues => {
     }
 
     setUpload({ ...newUpload, uploadStatus: UPLOAD_STATUS.ALLOCATING });
+    if (uploadKey) {
+      registerCdiUpload({
+        cancelUpload: newUpload.cancelUpload,
+        fileName: file.name,
+        metadata: uploadTrackMetadata,
+        uploadKey,
+      });
+    }
 
     try {
       // check if CORS is permitting
@@ -107,6 +137,7 @@ export const useCDIUpload = (clusterInput?: string): UseCDIUploadValues => {
             uploadError: certificateError,
             uploadStatus: UPLOAD_STATUS.ERROR,
           }));
+          syncStore(UPLOAD_STATUS.ERROR, undefined, certificateError);
           return Promise.reject(certificateError);
         }
       }
@@ -132,6 +163,7 @@ export const useCDIUpload = (clusterInput?: string): UseCDIUploadValues => {
             progress,
             uploadStatus: UPLOAD_STATUS.UPLOADING,
           }));
+          syncStore(UPLOAD_STATUS.UPLOADING, progress);
         },
         url: getUploadURL(uploadProxyURL),
       });
@@ -146,11 +178,15 @@ export const useCDIUpload = (clusterInput?: string): UseCDIUploadValues => {
       // if cancelled, 'not found' is a case where the user clicked cancel while allocating
       const isCanceled = axios.isCancel(e) || e?.message?.includes(CANCEL_ALLOCATION_MESSAGE);
 
+      const uploadError: undefined | UploadError = isCanceled
+        ? undefined
+        : { message: e?.message || t('Upload failed') };
       setUpload((prev) => ({
         ...prev,
-        uploadError: !isCanceled && { message: `${e?.message}: ${e?.response?.data}` },
+        uploadError,
         uploadStatus: isCanceled ? UPLOAD_STATUS.CANCELED : UPLOAD_STATUS.ERROR,
       }));
+      syncStore(isCanceled ? UPLOAD_STATUS.CANCELED : UPLOAD_STATUS.ERROR, undefined, uploadError);
       if (isCanceled) {
         return Promise.reject(new UploadCanceledError());
       }
@@ -164,30 +200,4 @@ export const useCDIUpload = (clusterInput?: string): UseCDIUploadValues => {
     upload,
     uploadData,
   };
-};
-
-export type DataUpload = {
-  cancelUpload?: () => Promise<{
-    metadata: {
-      name: string;
-      namespace: string;
-    };
-  }>;
-  fileName?: string;
-  namespace: string;
-  progress?: number;
-  pvcName: string;
-  uploadError?: any;
-  uploadStatus?: UPLOAD_STATUS;
-};
-
-export type UseCDIUploadValues = {
-  checkUploadReady: () => Promise<void>;
-  upload: DataUpload;
-  uploadData: ({ dataVolume, file }: UploadDataProps) => Promise<void>;
-};
-
-export type UploadDataProps = {
-  dataVolume: V1beta1DataVolume;
-  file: File;
 };
