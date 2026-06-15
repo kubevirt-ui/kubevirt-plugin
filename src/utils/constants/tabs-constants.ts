@@ -41,7 +41,7 @@ export const getVirtualMachineDetailsTabLabel = (
   [VirtualMachineDetailsTab.Environment]: t('Environment'),
   [VirtualMachineDetailsTab.Events]: t('Events'),
   [VirtualMachineDetailsTab.InitialRun]: t('Initial run'),
-  [VirtualMachineDetailsTab.Metadata]: t('Metadata'),
+  [VirtualMachineDetailsTab.Metadata]: t('Labels and annotations'),
   [VirtualMachineDetailsTab.Metrics]: t('Metrics'),
   [VirtualMachineDetailsTab.Network]: t('Network'),
   [VirtualMachineDetailsTab.Overview]: t('Overview'),

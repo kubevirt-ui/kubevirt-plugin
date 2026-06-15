@@ -6,10 +6,10 @@ import {
   V1beta1DataImportCron,
   V1beta1DataSource,
 } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
-import { AnnotationsModal } from '@kubevirt-utils/components/AnnotationsModal/AnnotationsModal';
 import ExportModal from '@kubevirt-utils/components/ExportModal/ExportModal';
 import { LabelsModal } from '@kubevirt-utils/components/LabelsModal/LabelsModal';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
+import { KeyValueModal } from '@kubevirt-utils/components/MetadataModal/KeyValueModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { VolumeSnapshotKind } from '@kubevirt-utils/components/SelectSnapshot/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -88,7 +88,7 @@ export const useDataSourceActionsProvider: UseDataSourceActionsProvider = (
       {
         cta: () =>
           createModal(({ isOpen, onClose }) => (
-            <AnnotationsModal
+            <KeyValueModal
               onSubmit={(updatedAnnotations) =>
                 kubevirtK8sPatch({
                   data: [

@@ -1,7 +1,7 @@
 import React, { FC, ReactNode } from 'react';
 
-import { AnnotationsModal } from '@kubevirt-utils/components/AnnotationsModal/AnnotationsModal';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
+import { KeyValueModal } from '@kubevirt-utils/components/MetadataModal/KeyValueModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -18,6 +18,7 @@ type DescriptionItemAnnotationsProps = {
   label?: string;
   model: K8sModel;
   onAnnotationsSubmit?: (annotations: { [key: string]: string }) => Promise<any>;
+  onEditClick?: () => void;
   resource: K8sResourceCommon;
 };
 
@@ -28,6 +29,7 @@ const DescriptionItemAnnotations: FC<DescriptionItemAnnotationsProps> = ({
   label,
   model,
   onAnnotationsSubmit,
+  onEditClick: onEditClickOverride,
   resource,
 }) => {
   const { createModal } = useModal();
@@ -51,15 +53,17 @@ const DescriptionItemAnnotations: FC<DescriptionItemAnnotationsProps> = ({
       resource,
     });
 
-  const onEditClick = () =>
+  const onEditClickDefault = () =>
     createModal(({ isOpen, onClose }) => (
-      <AnnotationsModal
+      <KeyValueModal
         isOpen={isOpen}
         obj={resource}
         onClose={onClose}
         onSubmit={onAnnotationsSubmit ?? onAnnotationsSubmitInternal}
       />
     ));
+
+  const onEditClick = onEditClickOverride ?? onEditClickDefault;
 
   const annotationsHeader = t('Annotations');
   const descriptionHeader = descriptionHeaderWrapper?.(annotationsHeader) ?? annotationsHeader;
