@@ -3,7 +3,12 @@ import { useMemo } from 'react';
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { STATIC_SEARCH_FILTERS } from '@kubevirt-utils/components/ListPageFilter/constants';
 import useQuery from '@kubevirt-utils/hooks/useQuery';
-import { getLabel, getName, isFolderLabel } from '@kubevirt-utils/resources/shared';
+import {
+  getFolderNameFromLabel,
+  getLabel,
+  getName,
+  isFolderLabel,
+} from '@kubevirt-utils/resources/shared';
 import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
 
 type UseFolderFilterResult = {
@@ -15,11 +20,8 @@ const useFolderFilter = (vms: undefined | V1VirtualMachine[]): UseFolderFilterRe
   const queryParams = useQuery();
 
   const folderName = useMemo(() => {
-    const labelFilters = queryParams.getAll(STATIC_SEARCH_FILTERS.labels);
-    const folderLabel = labelFilters.find(isFolderLabel);
-    if (!folderLabel) return undefined;
-    const eqIdx = folderLabel.indexOf('=');
-    return eqIdx >= 0 ? folderLabel.slice(eqIdx + 1) : undefined;
+    const folderLabel = queryParams.getAll(STATIC_SEARCH_FILTERS.labels).find(isFolderLabel);
+    return folderLabel ? getFolderNameFromLabel(folderLabel) : undefined;
   }, [queryParams]);
 
   const filteredVMs = useMemo(() => {
