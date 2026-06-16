@@ -1,0 +1,50 @@
+import { useMemo } from 'react';
+
+import { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
+import { getUID } from '@kubevirt-utils/resources/shared';
+import { Template } from '@kubevirt-utils/resources/template';
+import { useSingleClusterAvailableSources } from '@kubevirt-utils/resources/template/hooks/useSingleClusterAvailableSources';
+import useAvailableTemplates from '@virtualmachines/creation-wizard-new/steps/TemplateStep/components/TemplatesCatalog/hooks/useTemplatesWithAvailableSource/useAvailableTemplates';
+import useTemplates from '@virtualmachines/creation-wizard-new/steps/TemplateStep/components/TemplatesCatalog/hooks/useTemplatesWithAvailableSource/useTemplates';
+
+type UseTemplatesWithAvailableSource = (args: { namespace?: string }) => {
+  availableDataSources: Record<string, V1beta1DataSource>;
+  availableTemplatesUID: Set<string>;
+  bootSourcesLoaded: boolean;
+  error: any;
+  loaded: boolean;
+  templates: Template[];
+};
+
+const useTemplatesWithAvailableSource: UseTemplatesWithAvailableSource = ({ namespace }) => {
+  const { allTemplates: templates, error: loadError, loaded } = useTemplates(namespace);
+
+  const {
+    availableDataSources,
+    availablePVCs,
+    loaded: bootSourcesLoaded,
+  } = useSingleClusterAvailableSources(templates, loaded);
+
+  const availableTemplates = useAvailableTemplates(
+    availableDataSources,
+    availablePVCs,
+    templates,
+    loaded,
+  );
+
+  const availableTemplatesUID = useMemo(
+    () => new Set(availableTemplates.map((template) => getUID(template))),
+    [availableTemplates],
+  );
+
+  return {
+    availableDataSources,
+    availableTemplatesUID,
+    bootSourcesLoaded,
+    error: loadError,
+    loaded,
+    templates,
+  };
+};
+
+export default useTemplatesWithAvailableSource;
