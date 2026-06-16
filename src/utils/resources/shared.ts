@@ -623,3 +623,8 @@ export const getResourceKey = (resource: K8sResourceCommon): string =>
 
 export const isFolderLabel = (label: string): boolean =>
   label?.startsWith(`${VM_FOLDER_LABEL}=`) ?? false;
+
+const VM_FOLDER_LABEL_PREFIX = `${VM_FOLDER_LABEL}=`;
+
+export const getFolderNameFromLabel = (label: string): string | undefined =>
+  isFolderLabel(label) ? label.slice(VM_FOLDER_LABEL_PREFIX.length) || undefined : undefined;

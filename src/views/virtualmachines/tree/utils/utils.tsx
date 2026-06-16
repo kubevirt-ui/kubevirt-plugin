@@ -3,11 +3,18 @@ import { isEmpty } from 'lodash';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { tourGuideVM } from '@kubevirt-utils/components/GuidedTour/utils/constants';
+import { STATIC_SEARCH_FILTERS } from '@kubevirt-utils/components/ListPageFilter/constants';
 import { ALL_NAMESPACES_SESSION_KEY, LOCAL_CLUSTER } from '@kubevirt-utils/hooks/constants';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { SINGLE_CLUSTER_KEY } from '@kubevirt-utils/resources/constants';
 import { isSystemNamespace } from '@kubevirt-utils/resources/namespace/helper';
-import { getLabel, getName, getNamespace } from '@kubevirt-utils/resources/shared';
+import {
+  getFolderNameFromLabel,
+  getLabel,
+  getName,
+  getNamespace,
+  isFolderLabel,
+} from '@kubevirt-utils/resources/shared';
 import { ROW_FILTERS_PREFIX } from '@kubevirt-utils/utils/constants';
 import { universalComparator } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
@@ -119,18 +126,47 @@ const buildProjectMap = (
   return projectMap;
 };
 
+const getFolderNameFromQueryParams = (queryParams?: string): string | undefined => {
+  const params = new URLSearchParams(queryParams?.replace(/^\?/, '') ?? '');
+  const folderLabel = params.getAll(STATIC_SEARCH_FILTERS.labels).find(isFolderLabel);
+
+  return folderLabel ? getFolderNameFromLabel(folderLabel) : undefined;
+};
+
+const isFolderExpanded = (
+  folder: string,
+  project: string,
+  vmItems: TreeViewDataItemWithHref[],
+  currentPageVMName: string | undefined,
+  currentPageNamespace: string,
+  currentFolderName: string | undefined,
+  clusterSelected = true,
+): boolean =>
+  !!(currentPageVMName && vmItems.some((item) => (item.name as string) === currentPageVMName)) ||
+  (clusterSelected && currentFolderName === folder && currentPageNamespace === project);
+
 const createFolderTreeItems = (
   folders: Record<string, TreeViewDataItemWithHref[]>,
   project: string,
   currentPageVMName: string,
+  currentPageNamespace: string,
+  currentFolderName: string | undefined,
   treeViewDataMap: Record<string, TreeViewDataItemWithHref>,
   queryParams?: string,
   cluster?: string,
+  clusterSelected = true,
 ): TreeViewDataItemWithHref[] =>
   Object.entries(folders).map(([folder, vmItems]) => {
     const folderTreeItemID = getFolderTreeViewItemID(cluster, project, folder);
-    const folderExpanded =
-      currentPageVMName && vmItems.some((item) => (item.name as string) === currentPageVMName);
+    const folderExpanded = isFolderExpanded(
+      folder,
+      project,
+      vmItems,
+      currentPageVMName,
+      currentPageNamespace,
+      currentFolderName,
+      clusterSelected,
+    );
 
     const folderTreeItem: TreeViewDataItemWithHref = {
       children: vmItems,
@@ -159,14 +195,18 @@ const createProjectTreeItem = (
   cluster?: string,
   clusterSelected = true,
   isTourRunning = false,
+  currentFolderName?: string,
 ): TreeViewDataItemWithHref => {
   const projectFolders = createFolderTreeItems(
     projectMap[project]?.folders || {},
     project,
     currentPageVMName,
+    currentPageNamespace,
+    currentFolderName,
     treeViewDataMap,
     queryParams,
     cluster,
+    clusterSelected,
   );
 
   const sortProjectFolders = projectFolders.sort((folderA, folderB) =>
@@ -249,6 +289,7 @@ export const createSingleClusterTreeViewData = (
   isTourRunning = false,
 ): TreeViewDataItem[] => {
   const { currentVMTab, vmName, vmNamespace } = getVMInfoFromPathname(pathname);
+  const currentFolderName = getFolderNameFromQueryParams(queryParams);
 
   const projectsToShow = isTourRunning ? [getNamespace(tourGuideVM)] : projectNames;
   const vmsToShow = isTourRunning ? [tourGuideVM] : vms;
@@ -274,6 +315,7 @@ export const createSingleClusterTreeViewData = (
       undefined,
       true,
       isTourRunning,
+      currentFolderName,
     ),
   );
 
@@ -312,6 +354,7 @@ export const createMultiClusterTreeViewData = (
   clusterNames?: string[],
 ): TreeViewDataItem[] => {
   const { currentVMTab, vmCluster, vmName, vmNamespace } = getVMInfoFromPathname(pathname);
+  const currentFolderName = getFolderNameFromQueryParams(queryParams);
 
   const vmsPerCluster = getVMsPerCluster(vms) ?? {};
 
@@ -346,6 +389,8 @@ export const createMultiClusterTreeViewData = (
           queryParams,
           clusterName,
           clusterSelected,
+          false,
+          currentFolderName,
         ),
       );
 
