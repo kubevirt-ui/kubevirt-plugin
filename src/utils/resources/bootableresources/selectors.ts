@@ -38,3 +38,9 @@ export const getDataVolumeStorageClassName = (dataVolume: V1beta1DataVolume) =>
 
 export const getPhase = (volume: IoK8sApiCoreV1PersistentVolumeClaim | V1beta1DataVolume) =>
   volume?.status?.phase;
+
+export const getDiskSize = (
+  dataVolume: V1beta1DataVolume,
+  pvc: IoK8sApiCoreV1PersistentVolumeClaim,
+  volumeSnapshot: VolumeSnapshotKind,
+) => getDataVolumeSize(dataVolume) || getPVCSize(pvc) || getVolumeSnapshotSize(volumeSnapshot);

@@ -1,17 +1,19 @@
 import React, { FC, useCallback, useMemo, useRef } from 'react';
 import { useWatch } from 'react-hook-form';
 
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { Wizard, WizardHeader, WizardStep, WizardStepType } from '@patternfly/react-core';
+import useCloseWizard from '@virtualmachines/creation-wizard-new/hooks/useCloseWizard';
+
+import TemplatesDrawerWrapper from './components/TemplatesDrawerWrapper';
+
 import {
   logVMCreationStarted,
   mapWizardStepToCreationMethodTelemetry,
 } from '@kubevirt-utils/extensions/telemetry';
-import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Wizard, WizardHeader, WizardStep, WizardStepType } from '@patternfly/react-core';
-import useCloseWizard from '@virtualmachines/creation-wizard-new/hooks/useCloseWizard';
 import { useSyncDeploymentDetails } from '@virtualmachines/creation-wizard-new/hooks/useSyncDeploymentDetails';
 import useWizardStepValidation from '@virtualmachines/creation-wizard-new/hooks/useWizardStepValidation';
 
-import TemplatesDrawerWrapper from './components/TemplatesDrawerWrapper';
 import useVMGenerationNavClick from './hooks/useVMGenerationNavClick';
 import { useVMWizard } from './state/vm-wizard-context/VMWizardContext';
 import {

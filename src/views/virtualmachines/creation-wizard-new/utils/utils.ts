@@ -1,15 +1,8 @@
 import { TFunction } from 'i18next';
 import { UseFormGetValues, UseFormSetValue } from 'react-hook-form';
 
-import { V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
-import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { getInstanceTypeFromVolume } from '@kubevirt-utils/components/AddBootableVolumeModal/utils';
-import { VolumeSnapshotKind } from '@kubevirt-utils/components/SelectSnapshot/types';
-import {
-  getDataVolumeSize,
-  getPVCSize,
-  getVolumeSnapshotSize,
-} from '@kubevirt-utils/resources/bootableresources/selectors';
+import { getDiskSize } from '@kubevirt-utils/resources/bootableresources/selectors';
 import CloneIcon from '@virtualmachines/creation-wizard-new/steps/DeploymentDetailsStep/components/CreationMethodTileGroup/components/CreationMethodTile/components/CloneIcon';
 import { InstanceTypeIcon } from '@virtualmachines/creation-wizard-new/steps/DeploymentDetailsStep/components/CreationMethodTileGroup/components/CreationMethodTile/components/InstanceTypeIcon';
 import TemplateIcon from '@virtualmachines/creation-wizard-new/steps/DeploymentDetailsStep/components/CreationMethodTileGroup/components/CreationMethodTile/components/TemplateIcon';
@@ -78,12 +71,6 @@ export const isTemplateCreationMethod = (creationMethod: VMCreationMethod) =>
   creationMethod === VMCreationMethod.TEMPLATE;
 export const isInstanceTypeCreationMethod = (creationMethod: VMCreationMethod) =>
   creationMethod === VMCreationMethod.INSTANCE_TYPE;
-
-export const getDiskSize = (
-  dataVolume: V1beta1DataVolume,
-  pvc: IoK8sApiCoreV1PersistentVolumeClaim,
-  volumeSnapshot: VolumeSnapshotKind,
-) => getDataVolumeSize(dataVolume) || getPVCSize(pvc) || getVolumeSnapshotSize(volumeSnapshot);
 
 export const applySelectedBootableVolumeToForm = ({
   dvSource,

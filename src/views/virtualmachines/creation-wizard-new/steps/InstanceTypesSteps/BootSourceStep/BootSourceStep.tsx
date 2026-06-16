@@ -1,12 +1,11 @@
-import React, { FC, useMemo } from 'react';
+import React, { FC } from 'react';
 import { useController, useWatch } from 'react-hook-form';
 
-import { ALL_PROJECTS } from '@kubevirt-utils/hooks/constants';
 import useInstanceTypesAndPreferences from '@kubevirt-utils/hooks/useInstanceTypesAndPreferences';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useBootableVolumes from '@kubevirt-utils/resources/bootableresources/hooks/useBootableVolumes';
-import { getValidNamespace, OS_IMAGES_NS } from '@kubevirt-utils/utils/utils';
+import { getValidNamespace } from '@kubevirt-utils/utils/utils';
 import {
   Radio,
   Split,
@@ -24,6 +23,7 @@ import {
 import BootableVolumeList from '@virtualmachines/creation-wizard-new/steps/InstanceTypesSteps/BootSourceStep/components/BootableVolumeList/BootableVolumeList';
 
 import AddBootableVolumeButton from './components/AddBootableVolumeButton';
+import { getEffectiveVolumeNamespace } from './components/BootableVolumeList/utils/utils';
 
 const BootSourceStep: FC = () => {
   const { t } = useKubevirtTranslation();
@@ -44,13 +44,7 @@ const BootSourceStep: FC = () => {
     getValidNamespace(project),
   );
 
-  // For non-admin users with no explicit selection, always scope to the OS images
-  // namespace — they cannot do cluster-wide watches. Respect any explicit selection.
-  const effectiveNamespace = useMemo(() => {
-    const isNamespaceUnset = !volumeListNamespace || volumeListNamespace === ALL_PROJECTS;
-
-    return !isAdmin && isNamespaceUnset ? OS_IMAGES_NS : volumeListNamespace;
-  }, [isAdmin, volumeListNamespace]);
+  const effectiveNamespace = getEffectiveVolumeNamespace(volumeListNamespace, isAdmin);
 
   const bootableVolumesData = useBootableVolumes(effectiveNamespace);
 

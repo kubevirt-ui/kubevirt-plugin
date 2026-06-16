@@ -17,7 +17,7 @@ const BootableVolumeListPagination: FC<BootableVolumeListPaginationProps> = ({
   pagination,
   setPagination,
 }) => {
-  const onPageChange = ({ endIndex, page, perPage, startIndex }) => {
+  const onPageChange = ({ endIndex, page, perPage, startIndex }: PaginationState) => {
     setPagination(() => ({
       endIndex,
       page,
