@@ -33,8 +33,6 @@ const FEATURES_ROLE_BINDING_NAME = 'kubevirt-ui-features-reader-binding';
 export const FEATURE_PERSISTENT_RESERVATION = 'persistentReservation';
 export const FEATURE_HCO_PERSISTENT_RESERVATION = 'persistentReservationHCO';
 
-export const UI_FEATURES = [CONFIRM_VM_ACTIONS, TREE_VIEW_FOLDERS];
-
 export const FEATURES_CONFIG_MAP_INITIAL_DATA: Record<string, string> = {
   [AUTOMATIC_SUBSCRIPTION_ACTIVATION_KEY]: '',
   [AUTOMATIC_SUBSCRIPTION_ORGANIZATION_ID]: '',
