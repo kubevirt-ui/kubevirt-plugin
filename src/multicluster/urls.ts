@@ -231,8 +231,8 @@ export const getFleetMigrationPoliciesListURL = (cluster?: string): string => {
 };
 
 export const isVMDetailsPage = (pathname: string): boolean =>
-  !!matchPath(`${FLEET_VIRTUAL_MACHINES_PATH}/cluster/:cluster/ns/:ns/:name`, pathname) ||
-  !!matchPath(`/k8s/ns/:ns/${VirtualMachineModelRef}/:name`, pathname);
+  !!matchPath(`${FLEET_VIRTUAL_MACHINES_PATH}/cluster/:cluster/ns/:ns/:name/*`, pathname) ||
+  !!matchPath(`/k8s/ns/:ns/${VirtualMachineModelRef}/:name/*`, pathname);
 
 /**
  * Extract the cluster param from a fleet-virtualization URL.
