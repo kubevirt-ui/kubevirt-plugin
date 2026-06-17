@@ -94,8 +94,8 @@ BRIDGE_PLUGINS="kubevirt-plugin=${PLUGIN_TRANSPORT}://host.docker.internal:${PLU
 # Resolve CONSOLE_IMAGE from the cluster's OpenShift version when not already set.
 # Falls back to :latest if resolution fails (e.g. non-OCP cluster, oc not logged in).
 eval "$(bash "${SCRIPT_DIR}/resolve-console-image.sh")" || true
-CONSOLE_IMAGE="${CONSOLE_IMAGE:-quay.io/openshift/origin-console:latest}"
 CONSOLE_PORT=${CONSOLE_PORT:-9000}
+: "${CONSOLE_IMAGE:?CONSOLE_IMAGE must be set or resolved before starting the console}"
 
 # ---------------------------------------------------------------------------
 # Job summary (no secrets)

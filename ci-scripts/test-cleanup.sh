@@ -2,7 +2,7 @@
 #
 # A copy of `../test-cleanup.sh` to use the correct namespace from the e2e run, and only delete resources in that namespace.
 #
-export TEST_NS=${CYPRESS_TEST_NS:-'auto-test-ns'}
+export TEST_NS=${TEST_NS:-${CYPRESS_TEST_NS:-'auto-test-ns'}}
 
 oc -n ${TEST_NS} delete vm --all --wait=false || true
 oc -n ${TEST_NS} delete template --all --wait=false || true

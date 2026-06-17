@@ -34,7 +34,7 @@ jobs:
         id: check_ci
         uses: actions/github-script@v8
         env:
-          INCLUDE_WORKFLOWS: '[".github/workflows/poc-e2e-ci-test.yml", ".github/workflows/poc-e2e-ci-test2.yml"]'
+          INCLUDE_WORKFLOWS: '[".github/workflows/hot-cluster-e2e.yml", ".github/workflows/hot-cluster-e2e-run.yml"]'
         with:
           script: |
             const INCLUDE_WORKFLOWS = JSON.parse(process.env.INCLUDE_WORKFLOWS);
@@ -86,7 +86,7 @@ jobs:
         uses: IBM/actions-ibmcloud-cli@v1
         if: steps.check_ci.outputs.active_jobs == 'false'
         with:
-          api_key: ${{ secrets.IBM_CLOUD_API_KEY }}
+          api_key: ${{ secrets.IC_KEY }}
           plugins: kubernetes-service
 
       - name: Check idle threshold

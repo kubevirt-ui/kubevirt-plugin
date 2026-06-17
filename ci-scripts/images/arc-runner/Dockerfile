@@ -1,6 +1,6 @@
 # Custom GitHub Actions runner image for kubevirt-plugin-ci CI.
 # Extends the official runner image with cli tools used in the CI pipeline (such as jq, curl,
-# envsubst, Node.js, oc, and virtctl) and support for running Cypress tests.
+# envsubst, Node.js, oc, and virtctl) and system dependencies for Playwright (Chromium).
 
 #
 # https://github.com/actions/runner/blob/main/images/Dockerfile: the base image
@@ -42,12 +42,7 @@ RUN apt-get update \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Cypress 14+ headless (bundled Electron) — Linux deps for Ubuntu 24.04+ (noble).
-# Official runner image is noble (see actions/runner images/Dockerfile: mcr.microsoft.com/dotnet/runtime-deps:8.0-noble).
-# Matches Cypress docs: https://docs.cypress.io/guides/getting-started/installing-cypress#Linux — Ubuntu >=24.04 list.
-# GitHub-hosted ubuntu-latest (runner-images Ubuntu2404) also includes xvfb, Chrome/Firefox, and extra fonts; for ARC we
-# install the minimum Electron stack plus common fonts so screenshots/video match hosted runners more closely.
-# unzip is already present in the upstream actions-runner image (needed for fast Cypress binary unpack).
+# Playwright / Chromium headless — Linux deps for Ubuntu 24.04+ (noble).
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         fontconfig \

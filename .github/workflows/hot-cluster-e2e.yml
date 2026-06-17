@@ -1,22 +1,31 @@
-name: POC Hot Cluster E2E CI Test
+name: Hot Cluster E2E
 
 on:
+  pull_request:
+    branches: [main]
   workflow_dispatch:
     inputs:
-      test_spec:
-        description: 'Cypress test spec to run (passed to POC E2E Test 2)'
+      test_project:
+        description: Playwright project to run (setup runs automatically as dependency)
         required: true
-        default: 'tests/gating.cy.ts'
-        type: string
+        default: gating
+        type: choice
+        options:
+          - gating
+          - features
       cluster_name:
-        description: 'Cluster name'
+        description: IBM Cloud cluster name
         required: true
-        default: 'kubevirt-plugin-ci'
+        default: kubevirt-plugin-ci
         type: string
 
 permissions:
   contents: read
   actions: read
+
+concurrency:
+  group: hot-cluster-e2e-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 env:
   CLUSTER_NAME: ${{ inputs.cluster_name || 'kubevirt-plugin-ci' }}
@@ -28,21 +37,19 @@ jobs:
     timeout-minutes: 10
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Setup IBM Cloud CLI
         uses: IBM/actions-ibmcloud-cli@v1
         with:
-          api_key: ${{ secrets.IBM_CLOUD_API_KEY }}
+          api_key: ${{ secrets.IC_KEY }}
           plugins: kubernetes-service
 
-      - name: Install oc client from cluster
+      - name: Install oc client
         run: |
-          INGRESS=$(ibmcloud oc cluster get --cluster "${CLUSTER_NAME}" --json | jq -r '.ingressHostname')
-          curl -kLo oc.tar "https://downloads-openshift-console.${INGRESS}/amd64/linux/oc.tar"
-          tar -xvf oc.tar
-          sudo mv oc /usr/local/bin/
-          echo "oc version: $(oc version --client)"
+          CLUSTER_JSON="$(ibmcloud oc cluster get --cluster "${CLUSTER_NAME}" --output json)"
+          export CLUSTER_JSON
+          bash ./ci-scripts/install-oc-client.sh
 
       - name: Configure kubeconfig
         run: |
@@ -51,8 +58,7 @@ jobs:
           oc get nodes -o wide
 
       - name: Run health checks
-        run: |
-          ./ci-scripts/check-cluster-health.sh
+        run: ./ci-scripts/check-cluster-health.sh
 
       - name: Health check summary
         if: always()
@@ -60,7 +66,7 @@ jobs:
           echo "## Cluster Health Check" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
           if [[ "${{ job.status }}" == "success" ]]; then
-            echo "All health checks **passed**. Invoking **POC Hot Cluster E2E CI Test 2** for Cypress." >> "$GITHUB_STEP_SUMMARY"
+            echo "All health checks **passed**. Invoking Playwright gating tests on the hot cluster." >> "$GITHUB_STEP_SUMMARY"
           else
             echo "Health checks **failed**. E2E workflow was not invoked." >> "$GITHUB_STEP_SUMMARY"
           fi
@@ -69,7 +75,7 @@ jobs:
     name: Run E2E Tests
     needs: cluster-health-check
     if: needs.cluster-health-check.result == 'success'
-    uses: ./.github/workflows/poc-e2e-ci-test2.yml
+    uses: ./.github/workflows/hot-cluster-e2e-run.yml
     with:
-      test_spec: ${{ inputs.test_spec }}
+      test_project: ${{ inputs.test_project || 'gating' }}
     secrets: inherit

@@ -1,33 +1,35 @@
-name: POC Hot Cluster E2E CI Test 2
+name: Hot Cluster E2E Run
 
 on:
   workflow_dispatch:
     inputs:
-      test_spec:
-        description: Cypress test spec to run
+      test_project:
+        description: Playwright project to run
         required: true
-        default: tests/poc-gating.cy.ts
-        type: string
+        default: gating
+        type: choice
+        options:
+          - gating
+          - features
   workflow_call:
     inputs:
-      test_spec:
-        description: Cypress test spec to run
+      test_project:
+        description: Playwright project to run
         type: string
         required: false
-        default: tests/poc-gating.cy.ts
+        default: gating
 
 permissions:
   contents: read
   actions: read
 
 env:
-  CYPRESS_CNV_NS: kubevirt-hyperconverged
-  CYPRESS_OS_IMAGES_NS: kubevirt-os-images
-  CYPRESS_TEST_NS: kubevirt-plugin-ci-test-${{ github.run_id }}
-  CYPRESS_TEST_SECRET_NAME: ci-test-secret
+  CNV_NS: kubevirt-hyperconverged
+  OS_IMAGES_NS: kubevirt-os-images
+  TEST_NS: kubevirt-plugin-ci-test-${{ github.run_id }}
+  TEST_SECRET_NAME: ci-test-secret
 
-  KUBEVIRT_PLUGIN_IMAGE: 'ttl.sh/kubevirt-plugin-ci-${{ github.run_id }}-${{ github.run_number }}:2h'
-  # KUBEVIRT_PLUGIN_IMAGE: ttl.sh/kubevirt-plugin-ci-1234:6h
+  KUBEVIRT_PLUGIN_IMAGE: 'ttl.sh/kubevirt-plugin-ci-${{ github.run_id }}-${{ github.run_attempt }}:2h'
 
   CI_ENV_NS: ci-env
   CI_ENV_CM: ci-env-${{ github.run_id }}
@@ -47,8 +49,7 @@ jobs:
             echo "| --- | --- |"
             for var in HOME USER RUNNER_NAME RUNNER_OS RUNNER_ARCH \
                        GITHUB_REPOSITORY GITHUB_REF GITHUB_SHA GITHUB_RUN_ID GITHUB_RUN_NUMBER \
-                       CYPRESS_CNV_NS CYPRESS_OS_IMAGES_NS \
-                       CYPRESS_TEST_NS KUBEVIRT_PLUGIN_IMAGE KUBEVIRT_UI_PLUGIN_RUNNER; do
+                       CNV_NS OS_IMAGES_NS TEST_NS KUBEVIRT_PLUGIN_IMAGE KUBEVIRT_UI_PLUGIN_RUNNER; do
               echo "| \`$var\` | \`${!var:-<unset>}\` |"
             done
             echo "</details>"
@@ -58,15 +59,21 @@ jobs:
             echo ""
             echo "| Tool | Available |"
             echo "| --- | --- |"
+            missing=0
             for cmd in jq yq envsubst curl kubectl oc virtctl helm npm node; do
               if command -v "$cmd" &>/dev/null; then
                 echo "| \`$cmd\` | ✅ |"
               else
                 echo "| \`$cmd\` | ❌ |"
+                missing=1
               fi
             done
             echo "</details>"
             echo ""
+            if [[ "${missing}" -ne 0 ]]; then
+              echo "::error::Required tools are missing on the ARC runner"
+              exit 1
+            fi
 
             echo "<details><summary>npm / Node Versions</summary>"
             echo ""
@@ -84,21 +91,29 @@ jobs:
             echo ""
             echo "| Tool | Client Version | Server Version |"
             echo "| --- | --- | --- |"
+            failed=0
             for cmd in oc virtctl; do
               if command -v "$cmd" &>/dev/null; then
-                client=""
-                server=""
-                version_output=$("$cmd" version 2>/dev/null || true)
+                if ! version_output=$("$cmd" version 2>/dev/null); then
+                  echo "| \`$cmd\` | ❌ version failed | ❌ |"
+                  failed=1
+                  continue
+                fi
                 client=$(echo "$version_output" | grep -i "client" | head -1 | sed 's/^[[:space:]]*//')
                 server=$(echo "$version_output" | grep -i "server" | head -1 | sed 's/^[[:space:]]*//')
                 echo "| \`$cmd\` | ${client:-N/A} | ${server:-N/A} |"
               else
                 echo "| \`$cmd\` | ❌ not found | — |"
+                failed=1
               fi
             done
             echo "</details>"
             echo ""
           } | tee -a "$GITHUB_STEP_SUMMARY"
+          if [[ "${failed}" -ne 0 ]]; then
+            echo "::error::Client/server version checks failed"
+            exit 1
+          fi
 
       - name: Log HCO and managed operator versions
         continue-on-error: true
@@ -110,7 +125,6 @@ jobs:
             if ! command -v oc &>/dev/null; then
               echo "> ⚠️ \`oc\` not found — skipping cluster version checks."
             else
-              # HCO itself is installed via OLM; its CSV is the authoritative version.
               echo "### HCO Version (OLM CSV)"
               echo ""
               echo "| Name | Version | Phase |"
@@ -214,6 +228,8 @@ jobs:
     timeout-minutes: 120
     env:
       PLUGIN_IMAGE: ${{ needs.build-kubevirt-plugin-image.outputs.kubevirt-plugin-image }}
+      HEADLESS: 'true'
+      RUN_FEATURE_TESTS: ${{ inputs.test_project == 'features' && 'true' || 'false' }}
 
     steps:
       - name: Checkout
@@ -224,80 +240,65 @@ jobs:
         uses: ./.github/actions/ci-env-request
         with:
           plugin-image: ${{ env.PLUGIN_IMAGE }}
-          test-namespace: ${{ env.CYPRESS_TEST_NS }}
+          test-namespace: ${{ env.TEST_NS }}
           configmap-name: ${{ env.CI_ENV_CM }}
           ci-env-namespace: ${{ env.CI_ENV_NS }}
 
       - name: Create test secret
         run: |
           yq e '
-            .metadata.name = strenv(CYPRESS_TEST_SECRET_NAME) |
-            .metadata.namespace = strenv(CYPRESS_TEST_NS)
-          ' cypress/fixtures/secret.yaml | oc apply -f -
+            .metadata.name = strenv(TEST_SECRET_NAME) |
+            .metadata.namespace = strenv(TEST_NS)
+          ' playwright/fixtures/secret.yaml | oc apply -f -
 
       - name: Seed kubevirt-user-settings ConfigMap
         run: |
-          # The ci-env-controller sets helm_release=cm_name when no override is
-          # provided, so CI_ENV_CM is always the Helm release name.
           SA_NAME="${CI_ENV_CM}-console"
 
-          # The plugin hook (useKubevirtUserSettings) keys settings by:
-          #   user?.metadata?.uid  OR  sanitized(user?.metadata?.name)
-          # In no-auth mode the SA bearer token is used for all k8s calls, so
-          # users/~ returns a virtual user for system:serviceaccount:<ns>:<sa>.
-          # We patch both the SA UID and the sanitized name so the hook always
-          # finds the right key regardless of whether OpenShift populates the UID.
-          SA_UID="$(oc get sa "${SA_NAME}" -n "${CYPRESS_TEST_NS}" \
+          SA_UID="$(oc get sa "${SA_NAME}" -n "${TEST_NS}" \
             -o jsonpath='{.metadata.uid}' 2>/dev/null || true)"
-          SANITIZED_NAME="system-serviceaccount-${CYPRESS_TEST_NS}-${SA_NAME}"
+          SANITIZED_NAME="system-serviceaccount-${TEST_NS}-${SA_NAME}"
 
-          USER_SETTINGS='{"quickStart":{"dontShowWelcomeModal":true},"onboardingPopoversHidden":{"vmsTab":true,"catalog":true,"createProject":true}}'
+          USER_SETTINGS='{"quickStart":{"dontShowWelcomeModal":true},"onboardingPopoversHidden":{"vmsTab":true,"catalog":true,"createProject":true,"navCollapse":true}}'
 
-          # Create the ConfigMap if HCO has not done so yet.
-          if ! oc get configmap kubevirt-user-settings -n "${CYPRESS_CNV_NS}" &>/dev/null; then
-            oc create configmap kubevirt-user-settings -n "${CYPRESS_CNV_NS}"
+          if ! oc get configmap kubevirt-user-settings -n "${CNV_NS}" &>/dev/null; then
+            oc create configmap kubevirt-user-settings -n "${CNV_NS}"
           fi
 
-          # Build a merge-patch that sets both possible user keys.
           PATCH=$(jq -cn \
             --arg sa_uid    "${SA_UID}" \
             --arg name_key  "${SANITIZED_NAME}" \
             --arg val       "${USER_SETTINGS}" \
             '{data: (if ($sa_uid | length) > 0 then {($sa_uid): $val, ($name_key): $val} else {($name_key): $val} end)}')
 
-          oc patch configmap kubevirt-user-settings -n "${CYPRESS_CNV_NS}" \
+          oc patch configmap kubevirt-user-settings -n "${CNV_NS}" \
             --type merge -p "${PATCH}"
 
-      # TODO: Add dependency caching (either use the setup-node action with caching, or add explicit caching)
+          oc patch configmap kubevirt-ui-features -n "${CNV_NS}" --type=merge \
+            --patch '{"data":{"advancedSearch":"true","treeViewFolders":"true"}}'
+
       - name: Install dependencies
         run: |
           npm ci --ignore-scripts --no-audit
-          npx cypress install
+          npm run playwright-install
 
-      - name: Run gating tests
-        uses: cypress-io/github-action@v7
+      - name: Run Playwright gating tests
         env:
           BRIDGE_BASE_ADDRESS: ${{ steps.ci-env.outputs.bridge-base-address }}
-        with:
-          summary-title: 'Cypress gating tests'
-          install: false
-          working-directory: ./cypress
-          env: openshift=true
-          spec: '${{ inputs.test_spec }}'
-
-      - name: Generate test report
-        if: always()
-        run: npm run cypress-postreport || true
+        run: |
+          if [[ "${{ inputs.test_project }}" == "features" ]]; then
+            npm run test-playwright-headless -- --project=features
+          else
+            npm run test-playwright-headless -- --project=gating
+          fi
 
       - name: Upload test artifacts
         if: always()
         uses: actions/upload-artifact@v6
         with:
-          name: cypress-results-${{ github.run_id }}
+          name: playwright-results-${{ github.run_id }}
           path: |
-            cypress/gui-test-screenshots/
-            cypress/videos/
-            cypress/results/
+            playwright/test-results/
           retention-days: 7
           if-no-files-found: ignore
 
@@ -310,9 +311,9 @@ jobs:
           HELM_RELEASE="$(oc get configmap "${CI_ENV_CM}" -n "${CI_ENV_NS}" \
             -o jsonpath='{.data.helm-release}' 2>/dev/null || echo "${CI_ENV_CM}")"
 
-          oc logs -n "${CYPRESS_TEST_NS}" -l "app=${HELM_RELEASE}-console" --tail=-1 \
+          oc logs -n "${TEST_NS}" -l "app=${HELM_RELEASE}-console" --tail=-1 \
             > "${TMP}/console.log" 2>&1 || true
-          oc logs -n "${CYPRESS_TEST_NS}" -l "app=${HELM_RELEASE}-plugin" --tail=-1 \
+          oc logs -n "${TEST_NS}" -l "app=${HELM_RELEASE}-plugin" --tail=-1 \
             > "${TMP}/kubevirt-plugin.log" 2>&1 || true
 
       - name: e2e CI diagnostics - Collect OpenShift cluster information
@@ -324,8 +325,8 @@ jobs:
           oc cluster-info dump > "${TMP}/cluster_info.json" 2>/dev/null || true
           oc get pods -n kubevirt-hyperconverged -o wide > "${TMP}/hco_pods.txt" 2>/dev/null || true
           oc get nodes -o wide > "${TMP}/nodes.txt" 2>/dev/null || true
-          oc get events -n "${CYPRESS_TEST_NS}" --sort-by='.lastTimestamp' > "${TMP}/test_ns_events.txt" 2>/dev/null || true
-          oc get pods -n "${CYPRESS_TEST_NS}" -o wide > "${TMP}/test_ns_pods.txt" 2>/dev/null || true
+          oc get events -n "${TEST_NS}" --sort-by='.lastTimestamp' > "${TMP}/test_ns_events.txt" 2>/dev/null || true
+          oc get pods -n "${TEST_NS}" -o wide > "${TMP}/test_ns_pods.txt" 2>/dev/null || true
 
       - name: e2e CI diagnostics - Upload artifacts
         if: always()
@@ -339,7 +340,7 @@ jobs:
       - name: Clean up test entities
         if: always()
         run: |
-          echo "Cleaning test entities in ${CYPRESS_TEST_NS}..."
+          echo "Cleaning test entities in ${TEST_NS}..."
           bash ci-scripts/test-cleanup.sh
 
       - name: Release CI test environment

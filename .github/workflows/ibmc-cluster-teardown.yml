@@ -16,7 +16,7 @@ on:
         default: 'kubevirt-plugin-ci'
         type: string
     secrets:
-      IBM_CLOUD_API_KEY:
+      IC_KEY:
         required: true
       BOT_PAT:
         required: false
@@ -36,7 +36,7 @@ jobs:
       - name: Setup IBM Cloud CLI
         uses: IBM/actions-ibmcloud-cli@v1
         with:
-          api_key: ${{ secrets.IBM_CLOUD_API_KEY }}
+          api_key: ${{ secrets.IC_KEY }}
           plugins: kubernetes-service
 
       - name: Check cluster exists

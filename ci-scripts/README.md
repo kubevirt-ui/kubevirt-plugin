@@ -1,5 +1,9 @@
 # Hot Cluster CI
 
+> **Continuation guide (CNV-74265):** [docs/HOT_CLUSTER_CI_CONTINUATION.md](../docs/HOT_CLUSTER_CI_CONTINUATION.md)  
+> **Future work backlog:** [docs/HOT_CLUSTER_FUTURE_WORK.md](../docs/HOT_CLUSTER_FUTURE_WORK.md)  
+> **Cluster lifecycle:** [docs/CLUSTER_LIFECYCLE.md](../docs/CLUSTER_LIFECYCLE.md)
+
 This directory contains scripts and documentation for the **IBM Cloud hot cluster** CI stack: an OpenShift (ROKS) cluster used for KubeVirt plugin integration testing, with **Hyperconverged Cluster Operator (HCO)** and **GitHub Actions Runner Controller (ARC)** so jobs can run on cluster-adjacent self-hosted runners (`kubevirt-plugin-ci`).
 
 Workers can be **bare metal** (real KVM) or **VPC / shared** flavors with **KVM emulation**; the setup workflow defaults favor VPC-style flavors and `kvm_emulation: true` unless you change inputs.
@@ -10,7 +14,7 @@ Workers can be **bare metal** (real KVM) or **VPC / shared** flavors with **KVM 
 | -------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Real KubeVirt / OpenShift behavior** | Tests run against a live cluster with HCO, virt stack, and storage—not mocks.                                                                                                                      |
 | **Console + plugin fidelity**          | Two POC paths: hit the **in-cluster** console URL, or run an **off-cluster** console container with the plugin served like the operator (TLS + nginx), matching how developers run bridge locally. |
-| **Long-running / privileged CI**       | GitHub-hosted runners are a poor fit for nested virt, heavy Cypress, and Docker-heavy flows; **ARC** on the cluster provides dind-capable runners with `oc` RBAC.                                  |
+| **Long-running / privileged CI**       | GitHub-hosted runners are a poor fit for nested virt, heavy Playwright, and Docker-heavy flows; **ARC** on the cluster provides dind-capable runners with `oc` RBAC.                               |
 | **Cost control**                       | Bare metal and large workers are expensive; **auto-teardown** after idle time limits runaway spend.                                                                                                |
 
 ## Architecture
@@ -25,23 +29,21 @@ GitHub Actions
   └── ibmc-cluster-auto-teardown.yml  → "IBM Cloud Hot Cluster Auto-Teardown" (cron + dispatch → teardown workflow)
 ```
 
-**POC E2E (two variants)**
+**Hot cluster E2E**
 
 ```
-poc-e2e-ci-test.yml   — "POC Hot Cluster E2E CI Test"
+hot-cluster-e2e.yml     — "Hot Cluster E2E" (PR + manual dispatch)
   ├── cluster-health-check (ubuntu-latest + IBM Cloud → kubeconfig)
   │     └── ci-scripts/check-cluster-health.sh
-  └── run-e2e-tests (workflow_call → poc-e2e-ci-test2.yml)
+  └── run-e2e-tests (workflow_call → hot-cluster-e2e-run.yml)
 
-poc-e2e-ci-test2.yml  — "POC Hot Cluster E2E CI Test 2"
-  ├── check-runner (optional diagnostics on ARC runner)
-  ├── build-kubevirt-plugin-image (ubuntu-latest, Docker; may skip if image exists in registry)
+hot-cluster-e2e-run.yml — "Hot Cluster E2E Run"
+  ├── check-runner (diagnostics on ARC runner)
+  ├── build-kubevirt-plugin-image (ubuntu-latest; podman build + push)
   └── run-gating-tests (runs-on: kubevirt-plugin-ci)
-        ├── ci-scripts/resolve-console-image.sh  → CONSOLE_IMAGE matches cluster OCP x.y
-        ├── ci-scripts/start-plugin-container.sh → plugin over HTTPS :9001 (dind/docker)
-        ├── ci-scripts/start-console.sh          → origin-console container, off-cluster mode
-        ├── BRIDGE_BASE_ADDRESS=http://localhost:9000
-        └── Cypress against local bridge + plugin proxy
+        ├── ci-env-request → ci-env-controller → ci-test-stack (console + plugin)
+        ├── BRIDGE_BASE_ADDRESS from test stack
+        └── Playwright gating (or features project)
 ```
 
 ## Required GitHub Secrets
@@ -50,9 +52,9 @@ These secrets must be configured in the repository settings before running the w
 
 ### IBM Cloud
 
-| Secret              | Description           | How to Obtain                                                 |
-| ------------------- | --------------------- | ------------------------------------------------------------- |
-| `IBM_CLOUD_API_KEY` | IBM Cloud IAM API key | IBM Cloud Console → Manage → Access (IAM) → API keys → Create |
+| Secret   | Description           | How to Obtain                   |
+| -------- | --------------------- | ------------------------------- |
+| `IC_KEY` | IBM Cloud IAM API key | Repository/org secret (Actions) |
 
 The API key must belong to a user or service ID with the following IAM permissions:
 
@@ -97,7 +99,7 @@ All workflows that need cluster access use the IBM Cloud CLI to pull a kubeconfi
 - name: Setup IBM Cloud CLI
   uses: IBM/actions-ibmcloud-cli@v1
   with:
-    api_key: ${{ secrets.IBM_CLOUD_API_KEY }}
+    api_key: ${{ secrets.IC_KEY }}
     plugins: kubernetes-service
 
 - name: Configure kubeconfig
@@ -106,7 +108,7 @@ All workflows that need cluster access use the IBM Cloud CLI to pull a kubeconfi
     oc cluster-info
 ```
 
-This avoids storing kubeconfig or credentials as GitHub secrets. Any workflow or job that needs `oc`/`kubectl` access simply repeats these two steps with the shared `IBM_CLOUD_API_KEY`.
+This avoids storing kubeconfig or credentials as GitHub secrets. Any workflow or job that needs `oc`/`kubectl` access simply repeats these two steps with the shared `IC_KEY` secret.
 
 ## Creating a GitHub App for ARC
 
@@ -190,8 +192,8 @@ To turn off dind (no Docker daemon in the pod): `export CONTAINER_MODE=none` and
 | `.github/workflows/ibmc-cluster-setup.yml`         | IBM Cloud Hot Cluster Setup                |
 | `.github/workflows/ibmc-cluster-teardown.yml`      | IBM Cloud Hot Cluster Teardown             |
 | `.github/workflows/ibmc-cluster-auto-teardown.yml` | IBM Cloud Hot Cluster Auto-Teardown        |
-| `.github/workflows/poc-e2e-ci-test.yml`            | POC Hot Cluster E2E CI Test                |
-| `.github/workflows/poc-e2e-ci-test2.yml`           | POC Hot Cluster E2E CI Test 2              |
+| `.github/workflows/hot-cluster-e2e.yml`            | Hot Cluster E2E                            |
+| `.github/workflows/hot-cluster-e2e-run.yml`        | Hot Cluster E2E Run                        |
 
 ### Setting up the hot cluster
 
@@ -201,28 +203,20 @@ To turn off dind (no Docker daemon in the pod): `export CONTAINER_MODE=none` and
 
 **Implementation notes:** Provisioning uses `ibmcloud oc cluster create classic` (not VPC workers in this workflow). Setup installs `oc` from the cluster downloads endpoint, runs `install-hco.sh`, then `arc/setup-dind-mirror.sh`, `arc/setup-runner-image.sh`, `install-arc-controller.sh`, and `install-runner-scale-set.sh`.
 
-### Running POC E2E tests
+### Running hot cluster E2E tests
 
-**Variant A — `poc-e2e-ci-test.yml` (IBM Cloud cluster health checks then run `poc-e2e-ci-test2.yml`)**
+1. Actions → **Hot Cluster E2E** (PR trigger or manual dispatch)
+2. Inputs: Playwright project (`gating` or `features`), cluster name (default `kubevirt-plugin-ci`)
+3. Health check on `ubuntu-latest`; on success calls **Hot Cluster E2E Run**
+4. Run workflow provisions a `ci-test-stack`, runs Playwright, uploads artifacts, releases the stack
 
-1. Actions → **POC Hot Cluster E2E CI Test**
-2. Inputs: Cypress spec (default `tests/gating.cy.ts`), cluster name
-3. Runs `check-cluster-health.sh` on `ubuntu-latest` with an IBM Cloud kubeconfig; fails fast if the cluster is unhealthy
-4. On success, calls `poc-e2e-ci-test2.yml` via `workflow_call` to run the tests
-
-**Variant B — `poc-e2e-ci-test2.yml` (off-cluster console + plugin containers)**
-
-1. Actions → **POC Hot Cluster E2E CI Test 2**
-2. Default spec: `tests/poc-gating.cy.ts` (narrower gating bundle than full `gating.cy.ts`)
-3. Build job pushes/pulls a **plugin image** from a registry (see **POC debt** below).
-4. The test job creates only the **test namespace + dummy secret** (not full `test-setup.sh`); modal handling and other prep lean on Cypress `beforeSpec` / shared helpers.
-5. Test job starts **plugin** then **console** via `ci-scripts/`, then Cypress with `BRIDGE_BASE_ADDRESS=http://localhost:9000`
+To run only the test jobs (cluster already verified): dispatch **Hot Cluster E2E Run** directly.
 
 ### Tearing down the cluster
 
 **Manual:** Actions → **IBM Cloud Hot Cluster Teardown**
 
-**Automatic:** **IBM Cloud Hot Cluster Auto-Teardown** runs on a schedule (`*/30 * * * *`), uses `GITHUB_TOKEN` with `actions: write` to dispatch **IBM Cloud Hot Cluster Teardown** when idle thresholds are met. Idle detection monitors only the two E2E test workflows (`poc-e2e-ci-test.yml` and `poc-e2e-ci-test2.yml`) for in-progress, queued, or recently completed runs (fallback: cluster creation time).
+**Automatic:** Idle detection monitors `hot-cluster-e2e.yml` and `hot-cluster-e2e-run.yml` for in-progress, queued, or recently completed runs.
 
 **Teardown implementation:** Uninstalls Helm releases `kubevirt-plugin-ci` (scale set) and `arc` (controller) when possible, deletes the ROKS cluster, then optionally removes offline GitHub runners labeled `kubevirt-plugin-ci` using `BOT_PAT`.
 
@@ -279,14 +273,16 @@ Key defaults:
 - `ARC_SCALE_SET_LABELS` (optional multilabel; requires matching `runs-on` array in workflows)
 - Additional scale sets: run only **`ci-scripts/arc/install-runner-scale-set.sh`** (skip **`ci-scripts/arc/install-arc-controller.sh`**)
 
-## POC: immediate next steps (toward stable green runs)
+## Follow-up work
 
-1. **Plugin image supply chain (`poc-e2e-ci-test2.yml`)** — Replace the hard-coded `KUBEVIRT_PLUGIN_IMAGE` (currently a fixed `ttl.sh/...` tag) with a per-run or per-SHA tag (e.g. uncomment the `github.run_id`-style pattern), or build on every run and push to a registry your cluster/runner can pull. Ensure the **skopeo inspect** skip path does not mask a broken or stale image.
-2. **Align Cypress coverage with stability** — `tests/poc-gating.cy.ts` is intentionally smaller than full `tests/gating.cy.ts`; expand only after the off-cluster stack is reliable. Fix flaky specs (VM start/status waits, tab navigation) using the same patterns as local CI.
-3. **Run variant A first for signal** — Use `poc-e2e-ci-test.yml` against a healthy cluster to separate **cluster/HCO** issues from **docker/console/plugin** issues in test2.
-4. **Fork / ARC** — Variant A (`poc-e2e-ci-test.yml`) runs the health check on `ubuntu-latest` and is fork-safe; variant B (`poc-e2e-ci-test2.yml`) still requires a runner labeled `kubevirt-plugin-ci` and cannot run on forks without ARC registered.
-5. **Workflow hygiene** — Add dependency caching to `poc-e2e-ci-test2.yml` (open TODO: use `actions/setup-node` with caching or an explicit cache step). Consider pinning `actions/checkout` major versions consistently across workflows.
-6. **Verify auto-teardown** — Confirm scheduled **IBM Cloud Hot Cluster Auto-Teardown** successfully dispatches **IBM Cloud Hot Cluster Teardown** (`workflow_id` must match `ibmc-cluster-teardown.yml`).
+See [docs/HOT_CLUSTER_FUTURE_WORK.md](../docs/HOT_CLUSTER_FUTURE_WORK.md) for RBAC hardening, FIPS, ci-env-controller setup gap, and workflow hygiene items.
+
+Quick checklist:
+
+1. **Health check first** — Run **Hot Cluster E2E** (or health-check job only) to isolate cluster/HCO issues from test-stack issues.
+2. **ci-env-controller** — Install once on the cluster if not already present (`./dev/ci-env.sh`).
+3. **ARC on org repo** — Runners must register to `kubevirt-ui/kubevirt-plugin`, not a fork.
+4. **Auto-teardown** — Confirm idle detection watches `hot-cluster-e2e.yml` and `hot-cluster-e2e-run.yml`.
 
 ## Production and hardening review (before treating POC patterns as prod)
 

@@ -85,8 +85,21 @@ spec:
       value: "${KVM_EMULATION}"
 EOF
 
-echo "Waiting 90s for install plan and pods to be created..."
-sleep 90
+echo "Waiting for Subscription to have an InstallPlan..."
+for i in $(seq 1 60); do
+  INSTALL_PLAN="$(oc get subscription hco-operatorhub -n kubevirt-hyperconverged \
+    -o jsonpath='{.status.installPlanRef.name}' 2>/dev/null || true)"
+  if [[ -n "${INSTALL_PLAN}" ]]; then
+    echo "InstallPlan found: ${INSTALL_PLAN}"
+    break
+  fi
+  if [[ "${i}" -eq 60 ]]; then
+    echo "ERROR: Timed out waiting for HCO InstallPlan"
+    exit 1
+  fi
+  echo "Waiting for InstallPlan... (${i}/60)"
+  sleep 5
+done
 
 # --- Wait for HCO deployments ---
 echo "Waiting for HCO deployments to become available..."
@@ -125,13 +138,11 @@ oc wait -n kubevirt-hyperconverged hyperconverged kubevirt-hyperconverged \
 if [[ "${SKIP_HPP}" != "true" ]]; then
   echo "Installing HostPath Provisioner..."
 
-  oc create -f \
-    "https://raw.githubusercontent.com/kubevirt/hostpath-provisioner-operator/${HPP_VERSION}/deploy/hostpathprovisioner_cr.yaml" \
-    || echo "HPP CR may already exist, continuing..."
+  oc apply -f \
+    "https://raw.githubusercontent.com/kubevirt/hostpath-provisioner-operator/${HPP_VERSION}/deploy/hostpathprovisioner_cr.yaml"
 
-  oc create -f \
-    "https://raw.githubusercontent.com/kubevirt/hostpath-provisioner-operator/${HPP_VERSION}/deploy/storageclass-wffc-csi.yaml" \
-    || echo "HPP StorageClass may already exist, continuing..."
+  oc apply -f \
+    "https://raw.githubusercontent.com/kubevirt/hostpath-provisioner-operator/${HPP_VERSION}/deploy/storageclass-wffc-csi.yaml"
 
   oc annotate storageclasses --all storageclass.kubernetes.io/is-default-class- || true
   oc annotate storageclass hostpath-csi storageclass.kubernetes.io/is-default-class='true'

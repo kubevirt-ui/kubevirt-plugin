@@ -52,7 +52,7 @@ jobs:
       - name: Setup IBM Cloud CLI
         uses: IBM/actions-ibmcloud-cli@v1
         with:
-          api_key: ${{ secrets.IBM_CLOUD_API_KEY }}
+          api_key: ${{ secrets.IC_KEY }}
           plugins: kubernetes-service, container-registry
 
       - name: Check for existing cluster
@@ -139,13 +139,11 @@ jobs:
         run: |
           ./ci-scripts/check-roks-cluster-state.sh
 
-      - name: Install oc client from cluster
+      - name: Install oc client from cluster version
         run: |
-          INGRESS=$(ibmcloud oc cluster get --cluster "${CLUSTER_NAME}" --json | jq -r '.ingressHostname')
-          curl -kLo oc.tar "https://downloads-openshift-console.${INGRESS}/amd64/linux/oc.tar"
-          tar -xvf oc.tar
-          sudo mv oc /usr/local/bin/
-          echo "oc version: $(oc version --client)"
+          CLUSTER_JSON="$(ibmcloud oc cluster get --cluster "${CLUSTER_NAME}" --output json)"
+          export CLUSTER_JSON
+          bash ./ci-scripts/install-oc-client.sh
 
       - name: Configure kubeconfig
         run: |
