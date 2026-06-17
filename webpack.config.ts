@@ -89,8 +89,9 @@ const config: Configuration = {
           {
             loader: 'sass-loader',
             options: {
+              api: 'modern',
               sassOptions: {
-                outputStyle: 'compressed',
+                style: isProd ? 'compressed' : 'expanded',
               },
               sourceMap: true,
             },
