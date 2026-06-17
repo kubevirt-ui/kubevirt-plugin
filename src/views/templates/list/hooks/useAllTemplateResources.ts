@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-import useVMTemplateFeatureFlag from '@kubevirt-utils/hooks/useVMTemplateFeatureFlag/useVMTemplateFeatureFlag';
+import useIsVMTemplateFeatureEnabled from '@kubevirt-utils/hooks/useVMTemplateFeatureFlag/useIsVMTemplateFeatureEnabled';
 import {
   sortTemplates,
   Template,
@@ -32,7 +32,7 @@ const useAllTemplateResources: UseAllTemplateResources = ({
   selector,
 }) => {
   const { featureEnabled: vmTemplatesEnabled, loading: vmTemplatesFeatureLoading } =
-    useVMTemplateFeatureFlag();
+    useIsVMTemplateFeatureEnabled();
 
   const {
     error: templatesError,
