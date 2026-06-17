@@ -5,11 +5,7 @@ import { operatorNamespaceSignal } from '@kubevirt-utils/store/operatorNamespace
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
 
-import {
-  FEATURES_CONFIG_MAP_INITIAL_DATA,
-  FEATURES_CONFIG_MAP_NAME,
-  UI_FEATURES,
-} from './constants';
+import { FEATURES_CONFIG_MAP_INITIAL_DATA, FEATURES_CONFIG_MAP_NAME } from './constants';
 import { applyMissingFeatures, createFeaturesConfigMap } from './createFeaturesConfigMap';
 import { UseFeaturesValues } from './types';
 import useFeaturesConfigMap from './useFeaturesConfigMap';
@@ -20,9 +16,8 @@ export const useFeatures: UseFeatures = (featureName, clusterOverride) => {
   const [createError, setCreateError] = useState(null);
   const [createInProgress, setCreateInProgress] = useState(false);
 
-  const isUIFeature = UI_FEATURES.includes(featureName);
   const clusterParam = useClusterParam();
-  const configMapCluster = clusterOverride ?? (isUIFeature ? null : clusterParam);
+  const configMapCluster = clusterOverride ?? clusterParam;
   const cluster = configMapCluster ?? undefined;
   const operatorNamespace = operatorNamespaceSignal.value;
 
