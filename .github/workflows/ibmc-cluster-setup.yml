@@ -53,6 +53,8 @@ jobs:
         uses: IBM/actions-ibmcloud-cli@v1
         with:
           api_key: ${{ secrets.IC_KEY }}
+          region: eu-de
+          group: cnv-ui
           plugins: kubernetes-service, container-registry
 
       - name: Check for existing cluster

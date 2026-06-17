@@ -87,6 +87,8 @@ jobs:
         if: steps.check_ci.outputs.active_jobs == 'false'
         with:
           api_key: ${{ secrets.IC_KEY }}
+          region: eu-de
+          group: cnv-ui
           plugins: kubernetes-service
 
       - name: Check idle threshold
