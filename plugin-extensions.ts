@@ -54,7 +54,6 @@ const extensions: EncodedExtension[] = [
   ...VirtualMachinesInstanceExtensions,
   ...YamlTemplatesExtensions,
   ...VMWizardExtensions,
-
   {
     properties: {
       flag: 'KUBEVIRT_CDI',
