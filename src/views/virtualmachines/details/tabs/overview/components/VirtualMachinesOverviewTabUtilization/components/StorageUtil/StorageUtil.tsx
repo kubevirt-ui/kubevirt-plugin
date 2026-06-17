@@ -6,9 +6,11 @@ import SubTitleChartLabel from '@kubevirt-utils/components/Charts/ChartLabels/Su
 import TitleChartLabel from '@kubevirt-utils/components/Charts/ChartLabels/TitleChartLabel';
 import ComponentReady from '@kubevirt-utils/components/Charts/ComponentReady/ComponentReady';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { useGuestOS } from '@kubevirt-utils/resources/vmi';
+import { useVMIFilesystems } from '@kubevirt-utils/resources/vmi';
 import { removeDuplicatesByName } from '@kubevirt-utils/utils/utils';
 import { ChartDonutUtilization } from '@patternfly/react-charts/victory';
+
+import { filterWritableFilesystems } from './utils';
 
 type StorageUtilProps = {
   vmi: V1VirtualMachineInstance;
@@ -17,10 +19,10 @@ type StorageUtilProps = {
 const StorageUtil: FC<StorageUtilProps> = ({ vmi }) => {
   const { t } = useKubevirtTranslation();
 
-  const [guestAgentData, loaded] = useGuestOS(vmi);
+  const [filesystems, loaded] = useVMIFilesystems(vmi);
 
   const { totalBytes = 0, usedBytes = 0 } =
-    removeDuplicatesByName(guestAgentData?.fsInfo?.disks, 'diskName')?.reduce(
+    filterWritableFilesystems(removeDuplicatesByName(filesystems, 'diskName'))?.reduce(
       (acc, data) => {
         acc.totalBytes += data?.totalBytes;
         acc.usedBytes += data?.usedBytes;
