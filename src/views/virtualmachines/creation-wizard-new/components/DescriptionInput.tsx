@@ -1,20 +1,23 @@
-import React, { FC, FormEvent } from 'react';
+import React, { FC } from 'react';
+import { Controller } from 'react-hook-form';
 
 import { Button, InputGroup, InputGroupItem, TextInput } from '@patternfly/react-core';
 import { SyncAltIcon } from '@patternfly/react-icons';
-import useVMWizardStore from '@virtualmachines/creation-wizard-new/state/vm-wizard-store/useVMWizardStore';
+
+import { useVMWizard } from '../state/vm-wizard-context/VMWizardContext';
 
 const DescriptionInput: FC = () => {
-  const { setVMDescription, vmDescription } = useVMWizardStore();
+  const { control } = useVMWizard();
 
   return (
     <InputGroup>
       <InputGroupItem isFill>
-        <TextInput
-          id="vm-description"
-          onChange={(_event: FormEvent<HTMLInputElement>, value: string) => setVMDescription(value)}
-          type="text"
-          value={vmDescription}
+        <Controller
+          render={({ field: { ref: _, ...field } }) => (
+            <TextInput id="vm-description" type="text" {...field} />
+          )}
+          control={control}
+          name="vmData.description"
         />
       </InputGroupItem>
       <InputGroupItem style={{ visibility: 'hidden' }}>

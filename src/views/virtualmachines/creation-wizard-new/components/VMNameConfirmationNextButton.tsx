@@ -1,10 +1,11 @@
 import React, { FC, ReactNode } from 'react';
+import { useWatch } from 'react-hook-form';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isDNS1123Label, isDNS1123LabelLenient } from '@kubevirt-utils/utils/validation';
 import { Button, Tooltip } from '@patternfly/react-core';
 
-import useVMWizardStore from '../state/vm-wizard-store/useVMWizardStore';
+import { useVMWizard } from '../state/vm-wizard-context/VMWizardContext';
 
 type VMNameConfirmationNextButtonProps = {
   children: ReactNode;
@@ -18,7 +19,12 @@ const VMNameConfirmationNextButton: FC<VMNameConfirmationNextButtonProps> = ({
   onClick,
 }) => {
   const { t } = useKubevirtTranslation();
-  const { setShouldCheckVMNameProperly, shouldCheckVMNameProperly, vmName } = useVMWizardStore();
+  const { control, setValue } = useVMWizard();
+  const vmName = useWatch({ control, name: 'vmData.name' });
+  const shouldCheckVMNameProperly = useWatch({
+    control,
+    name: 'uiState.shouldCheckVMNameProperly',
+  });
 
   const isVMNameValid = isDNS1123Label(vmName);
   const isVMNameAlmostValid = isDNS1123LabelLenient(vmName);
@@ -30,7 +36,7 @@ const VMNameConfirmationNextButton: FC<VMNameConfirmationNextButtonProps> = ({
       onClick();
       return;
     }
-    setShouldCheckVMNameProperly(true);
+    setValue('uiState.shouldCheckVMNameProperly', true);
   };
 
   const nextButton = (

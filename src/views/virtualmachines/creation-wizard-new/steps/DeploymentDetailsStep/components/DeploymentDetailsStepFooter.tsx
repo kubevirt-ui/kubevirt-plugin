@@ -1,4 +1,5 @@
 import React, { FC } from 'react';
+import { useWatch } from 'react-hook-form';
 import classnames from 'classnames';
 
 import { FLAG_LIGHTSPEED_PLUGIN } from '@kubevirt-utils/flags/consts';
@@ -14,13 +15,14 @@ import {
 } from '@patternfly/react-core';
 import VMNameConfirmationNextButton from '@virtualmachines/creation-wizard-new/components/VMNameConfirmationNextButton';
 import useCloseWizard from '@virtualmachines/creation-wizard-new/hooks/useCloseWizard';
-import useVMWizardStore from '@virtualmachines/creation-wizard-new/state/vm-wizard-store/useVMWizardStore';
+import { useVMWizard } from '@virtualmachines/creation-wizard-new/state/vm-wizard-context/VMWizardContext';
 import { isCloneCreationMethod } from '@virtualmachines/creation-wizard-new/utils/utils';
 
 const DeploymentDetailsStepFooter: FC = () => {
   const hasOLSConsole = useFlag(FLAG_LIGHTSPEED_PLUGIN);
   const { goToNextStep } = useWizardContext();
-  const { creationMethod } = useVMWizardStore();
+  const { control } = useVMWizard();
+  const creationMethod = useWatch({ control, name: 'vmData.creationMethod' });
   const isCloneMethod = isCloneCreationMethod(creationMethod);
   const closeWizard = useCloseWizard();
   const { backButtonText, cancelButtonText, nextButtonText } = useWizardFooterProps();

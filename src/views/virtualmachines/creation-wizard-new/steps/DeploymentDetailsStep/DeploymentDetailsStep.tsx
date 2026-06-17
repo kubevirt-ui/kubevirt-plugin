@@ -1,8 +1,9 @@
 import React, { FC, useState } from 'react';
+import { useWatch } from 'react-hook-form';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Stack, StackItem, Title, TitleSizes } from '@patternfly/react-core';
-import useVMWizardStore from '@virtualmachines/creation-wizard-new/state/vm-wizard-store/useVMWizardStore';
+import { useVMWizard } from '@virtualmachines/creation-wizard-new/state/vm-wizard-context/VMWizardContext';
 import CreationMethodTileGroup from '@virtualmachines/creation-wizard-new/steps/DeploymentDetailsStep/components/CreationMethodTileGroup/CreationMethodTileGroup';
 import NameAndDescriptionForm from '@virtualmachines/creation-wizard-new/steps/DeploymentDetailsStep/components/NameAndDescriptionForm/NameAndDescriptionForm';
 import VMCreationLocationDisplay from '@virtualmachines/creation-wizard-new/steps/DeploymentDetailsStep/components/VMCreationLocationDisplay';
@@ -11,7 +12,8 @@ import { isCloneCreationMethod } from '@virtualmachines/creation-wizard-new/util
 
 const DeploymentDetailsStep: FC = () => {
   const { t } = useKubevirtTranslation();
-  const { creationMethod } = useVMWizardStore();
+  const { control } = useVMWizard();
+  const creationMethod = useWatch({ control, name: 'vmData.creationMethod' });
   const [editCreationLocation, setEditCreationLocation] = useState(false);
 
   const isCloneMethod = isCloneCreationMethod(creationMethod);

@@ -18,7 +18,7 @@ export const VMWizardProvider: FC<VMWizardProviderProps> = ({ children }) => {
   const [activeNamespace] = useActiveNamespace();
   const namespace = getValidNamespace(activeNamespace);
   const methods = useForm<VMWizardFormValues>({
-    defaultValues: createInitialVMWizardFormValues({ cluster: clusterParam, namespace }),
+    defaultValues: createInitialVMWizardFormValues({ cluster: clusterParam ?? '', namespace }),
   });
 
   // TODO: check if this is needed
