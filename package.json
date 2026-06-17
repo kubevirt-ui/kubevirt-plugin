@@ -162,6 +162,8 @@
     "@types/react": "17.0.40",
     "dompurify": "^2.5.8",
     "@openshift-console/dynamic-plugin-sdk-internal/immutable": "^3.8.3",
-    "@openshift-console/dynamic-plugin-sdk/immutable": "^3.8.3"
+    "@openshift-console/dynamic-plugin-sdk/immutable": "^3.8.3",
+    "@openshift-console/dynamic-plugin-sdk/@patternfly/quickstarts/dompurify": "3.4.0",
+    "@openshift-console/dynamic-plugin-sdk-internal/@patternfly/quickstarts/dompurify": "3.4.0"
   }
 }
