@@ -54,7 +54,17 @@ const ActionItem: FC<ActionMenuItemProps & { isAllowed: boolean }> = ({
     ...(external ? { isExternalLink: external, to: href } : {}),
   };
 
-  return <MenuItem {...props}>{label}</MenuItem>;
+  const menuItem = <MenuItem {...props}>{label}</MenuItem>;
+
+  if (isDisabled && action.disabledTooltip && !action.tooltip) {
+    return (
+      <Tooltip content={action.disabledTooltip} position="left">
+        <div>{menuItem}</div>
+      </Tooltip>
+    );
+  }
+
+  return menuItem;
 };
 
 const AccessReviewActionItem = connect(impersonateStateToProps)(
@@ -81,13 +91,7 @@ const ActionMenuItem: FC<ActionMenuItemProps & { checkAccess: CheckAccess }> = (
     );
   }
 
-  return action.disabled && action.disabledTooltip ? (
-    <Tooltip content={action.disabledTooltip} position="left">
-      <div>{item}</div>
-    </Tooltip>
-  ) : (
-    item
-  );
+  return item;
 };
 
 export default ActionMenuItem;
