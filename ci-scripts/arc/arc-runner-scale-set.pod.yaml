@@ -1,0 +1,40 @@
+# gha-runner-scale-set Helm values fragment: runner pod template (OpenShift).
+# Used by ci-scripts/arc/install-runner-scale-set.sh.
+#
+# The CI test stack (console + plugin) runs as separate cluster pods via the
+# ci-test-stack Helm chart, so no Docker-in-Docker sidecar is needed.
+#
+# Default image is pinned upstream until ARC_RUNNER_IMAGE / --set overrides:
+#   --set template.spec.containers[0].image=<internal-registry>/...
+#
+# Ref: https://github.com/actions/actions-runner-controller/tree/master/charts/gha-runner-scale-set
+---
+template:
+  spec:
+    volumes:
+      - name: work
+        emptyDir: {}
+      - name: npm-cache
+        emptyDir: {}
+      - name: npm-tmp
+        emptyDir: {}
+    containers:
+      - name: runner
+        image: ghcr.io/actions/actions-runner:2.335.1
+        command:
+          - '/home/runner/run.sh'
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+              - ALL
+          runAsNonRoot: true
+          runAsUser: 1001
+          runAsGroup: 123
+        volumeMounts:
+          - name: work
+            mountPath: '/home/runner/_work'
+          - name: npm-cache
+            mountPath: '/home/runner/.npm'
+          - name: npm-tmp
+            mountPath: '/home/runner/.tmp'
