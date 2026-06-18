@@ -4,11 +4,11 @@ import {
   logVMCreationStarted,
   mapWizardStepToCreationMethodTelemetry,
 } from '@kubevirt-utils/extensions/telemetry/vm-creation';
+import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getValidNamespace } from '@kubevirt-utils/utils/utils';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
-import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
 import { Wizard, WizardHeader, WizardStep } from '@patternfly/react-core';
 import DefaultWizardFooter from '@virtualmachines/creation-wizard-new/components/DefaultWizardFooter';
 import useCloseWizard from '@virtualmachines/creation-wizard-new/hooks/useCloseWizard';
@@ -56,7 +56,7 @@ const VMCreationWizardContent: FC = () => {
   const hasLoggedCreationStarted = useRef(false);
   const closeWizard = useCloseWizard();
   const isAdmin = useIsAdmin();
-  const [activeNamespace] = useActiveNamespace();
+  const activeNamespace = useActiveNamespace();
   const namespace = getValidNamespace(activeNamespace);
 
   useEffect(() => {

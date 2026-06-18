@@ -1,10 +1,10 @@
 import React, { FC, ReactNode, useEffect } from 'react';
 import { FormProvider, useForm, useFormContext } from 'react-hook-form';
 
+import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
 import { clearCustomizeInstanceType } from '@kubevirt-utils/store/customizeInstanceType';
 import { getValidNamespace } from '@kubevirt-utils/utils/utils';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
-import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
 import useInstanceTypeVMStore from '@virtualmachines/creation-wizard-new/state/instance-type-vm-store/useInstanceTypeVMStore';
 import { createInitialVMWizardFormValues } from '@virtualmachines/creation-wizard-new/state/vm-wizard-form/initialValues';
 import { VMWizardFormValues } from '@virtualmachines/creation-wizard-new/state/vm-wizard-form/types';
@@ -15,7 +15,7 @@ type VMWizardProviderProps = {
 
 export const VMWizardProvider: FC<VMWizardProviderProps> = ({ children }) => {
   const clusterParam = useClusterParam();
-  const [activeNamespace] = useActiveNamespace();
+  const activeNamespace = useActiveNamespace();
   const namespace = getValidNamespace(activeNamespace);
   const methods = useForm<VMWizardFormValues>({
     defaultValues: createInitialVMWizardFormValues({ cluster: clusterParam ?? '', namespace }),
