@@ -1,5 +1,6 @@
 import React, { FC, useMemo, useState } from 'react';
 
+import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
@@ -8,7 +9,6 @@ import {
   getGroupVersionKindForResource,
   ResourceLink,
   Timestamp,
-  useActiveNamespace,
 } from '@openshift-console/dynamic-plugin-sdk';
 import {
   ActionList,
@@ -35,7 +35,7 @@ const UserProvidedInstanceTypesList: FC<UserProvidedInstanceTypesListProps> = ({
   userProvidedInstanceTypes,
 }) => {
   const { t } = useKubevirtTranslation();
-  const [activeNamespace] = useActiveNamespace();
+  const activeNamespace = useActiveNamespace();
   const { selectedInstanceType, setSelectedInstanceType } = useInstanceTypeVMStore();
 
   const [searchInput, setSearchInput] = useState('');

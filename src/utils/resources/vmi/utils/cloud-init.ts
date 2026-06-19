@@ -28,7 +28,7 @@ export const getCloudInitCredentials = (
         users: [
           {
             name: userDataObject?.user || CLOUD_INIT_MISSING_USERNAME,
-            password: userDataObject?.password.toString(),
+            password: userDataObject?.password?.toString(),
           },
         ],
       };
