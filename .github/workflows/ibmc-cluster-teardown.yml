@@ -18,8 +18,6 @@ on:
     secrets:
       IC_KEY:
         required: true
-      BOT_PAT:
-        required: false
 
 permissions:
   contents: read
@@ -60,6 +58,12 @@ jobs:
             exit 1
           fi
 
+      - name: Checkout
+        if: steps.check_cluster.outputs.exists == 'true'
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+        with:
+          persist-credentials: false
+
       - name: Setup Helm
         if: steps.check_cluster.outputs.exists == 'true'
         uses: azure/setup-helm@bf6a7d304bc2fdb57e0331155b7ebf2c504acf0a # v4
@@ -70,11 +74,7 @@ jobs:
         if: steps.check_cluster.outputs.exists == 'true'
         continue-on-error: true
         run: |
-          echo "Uninstalling ARC runner scale set..."
-          helm uninstall kubevirt-plugin-ci --namespace arc-runners --wait --timeout 5m 2>/dev/null || echo "Runner scale set not found or already removed"
-
-          echo "Uninstalling ARC controller..."
-          helm uninstall arc --namespace arc-systems --wait --timeout 5m 2>/dev/null || echo "ARC controller not found or already removed"
+          ./ci-scripts/arc/uninstall-arc.sh
 
       - name: Delete cluster
         if: steps.check_cluster.outputs.exists == 'true'
@@ -116,27 +116,6 @@ jobs:
             echo "ERROR: Failed to verify cluster deletion for '${CLUSTER_NAME}':"
             echo "${OUTPUT}"
             exit 1
-          fi
-
-      # TODO: Followup about how to manually delete "Runner scale sets" from ARC
-      - name: Clean up ghost runners
-        continue-on-error: true
-        env:
-          GH_TOKEN: ${{ secrets.BOT_PAT }}
-        run: |
-          echo "Checking for offline self-hosted runners..."
-          RUNNERS=$(gh api "/repos/${{ github.repository }}/actions/runners" \
-            --jq '.runners[] | select(.status == "offline") | select(.labels[].name == env.CLUSTER_NAME) | .id' \
-            2>/dev/null || true)
-
-          if [[ -z "${RUNNERS}" ]]; then
-            echo "No offline '${CLUSTER_NAME}' runners found"
-          else
-            for runner_id in ${RUNNERS}; do
-              echo "Deleting offline runner ${runner_id}..."
-              gh api -X DELETE "/repos/${{ github.repository }}/actions/runners/${runner_id}" || echo "Failed to delete runner ${runner_id}"
-            done
-            echo "Ghost runner cleanup complete"
           fi
 
       - name: Teardown summary

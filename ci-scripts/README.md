@@ -25,7 +25,8 @@ Workers can be **bare metal** (real KVM) or **VPC / shared** flavors with **KVM 
 GitHub Actions
   │
   ├── ibmc-cluster-setup.yml          → "IBM Cloud Hot Cluster Setup"
-  └── ibmc-cluster-teardown.yml       → "IBM Cloud Hot Cluster Teardown" (also workflow_call + ghost-runner cleanup)
+  ├── ibmc-cluster-teardown.yml       → "IBM Cloud Hot Cluster Teardown" (also workflow_call)
+  └── ibmc-cluster-auto-teardown.yml  → "IBM Cloud Hot Cluster Auto-Teardown" (daily cron safety net)
 ```
 
 **Hot cluster E2E** (added in PR #4099)
@@ -60,14 +61,6 @@ The API key must belong to a user or service ID with the following IAM permissio
 - **Kubernetes Service**: Administrator role (to create/delete ROKS clusters)
 - **VPC Infrastructure Services**: Editor role (if using VPC-based clusters)
 - **Classic Infrastructure**: Super User or equivalent (for bare metal provisioning)
-
-### Ghost Runner Cleanup (optional)
-
-| Secret    | Description               | How to Obtain                               |
-| --------- | ------------------------- | ------------------------------------------- |
-| `BOT_PAT` | PAT with repo admin scope | GitHub Settings → Developer Settings → PATs |
-
-The `BOT_PAT` is only needed if you want the teardown workflow to automatically delete offline "ghost" runners from GitHub. Deleting self-hosted runners requires repository admin access which `GITHUB_TOKEN` cannot provide. The PAT needs the `repo` scope (classic) or **Administration: Read and Write** (fine-grained). If not set, ghost runners can be cleaned up manually via Settings → Actions → Runners.
 
 ### ARC Authentication (choose one)
 
@@ -188,12 +181,13 @@ To turn off dind (no Docker daemon in the pod): `export CONTAINER_MODE=none` and
 
 ### Workflow file ↔ Actions UI name
 
-| File                                          | `name:` in workflow (shown in Actions tab) |
-| --------------------------------------------- | ------------------------------------------ |
-| `.github/workflows/ibmc-cluster-setup.yml`    | IBM Cloud Hot Cluster Setup                |
-| `.github/workflows/ibmc-cluster-teardown.yml` | IBM Cloud Hot Cluster Teardown             |
-| `.github/workflows/hot-cluster-e2e.yml`       | Hot Cluster E2E (PR #4099)                 |
-| `.github/workflows/hot-cluster-e2e-run.yml`   | Hot Cluster E2E Run (PR #4099)             |
+| File                                               | `name:` in workflow (shown in Actions tab) |
+| -------------------------------------------------- | ------------------------------------------ |
+| `.github/workflows/ibmc-cluster-setup.yml`         | IBM Cloud Hot Cluster Setup                |
+| `.github/workflows/ibmc-cluster-teardown.yml`      | IBM Cloud Hot Cluster Teardown             |
+| `.github/workflows/ibmc-cluster-auto-teardown.yml` | IBM Cloud Hot Cluster Auto-Teardown        |
+| `.github/workflows/hot-cluster-e2e.yml`            | Hot Cluster E2E (PR #4099)                 |
+| `.github/workflows/hot-cluster-e2e-run.yml`        | Hot Cluster E2E Run (PR #4099)             |
 
 ### Setting up the hot cluster
 
@@ -216,9 +210,9 @@ To run only the test jobs (cluster already verified): dispatch **Hot Cluster E2E
 
 **Manual:** Actions → **IBM Cloud Hot Cluster Teardown**
 
-**Teardown implementation:** Uninstalls Helm releases `kubevirt-plugin-ci` (scale set) and `arc` (controller) when possible, deletes the ROKS cluster, then optionally removes offline GitHub runners labeled with the workflow `cluster_name` input (`CLUSTER_NAME`, default `kubevirt-plugin-ci`) using `BOT_PAT`.
+**Teardown implementation:** Runs `ci-scripts/arc/uninstall-arc.sh` to cleanly deregister ARC runner scale set and controller via Helm, then deletes the ROKS cluster.
 
-> **Note:** Automatic idle teardown (`ibmc-cluster-auto-teardown.yml`) is planned in PR #4099, not in this bootstrap PR.
+**Automatic:** The `ibmc-cluster-auto-teardown.yml` workflow runs daily at 02:00 UTC as a safety net, calling the teardown workflow for the default cluster name.
 
 ## ARC on OpenShift vs [na-launch/github-arc](https://github.com/na-launch/github-arc/blob/main/README.md)
 
@@ -249,6 +243,7 @@ You do **not** need to re-apply `ci-scripts/arc/arc-openshift-scc.yaml`.
 | `images/setup-arc-runner-image.sh` | OpenShift binary build for custom ARC runner image                                |
 | `arc/install-arc-controller.sh`    | SCC + Helm `gha-runner-scale-set-controller` (once per cluster)                   |
 | `arc/install-runner-scale-set.sh`  | Helm `gha-runner-scale-set`, SCC bind, `arc-runner-rbac.yaml`                     |
+| `arc/uninstall-arc.sh`             | Reverse of install: Helm uninstall scale set + controller (same env vars)         |
 | `arc/README.md`                    | ARC on OpenShift setup guide                                                      |
 | `check-cluster-health.sh`          | Verifies cluster, HCO, ARC, storage, console; optional GitHub runner check        |
 | `check-roks-cluster-state.sh`      | Waits until ROKS cluster is usable (used by setup workflow)                       |
@@ -277,6 +272,9 @@ Key defaults:
 
 See [docs/HOT_CLUSTER_FUTURE_WORK.md](../docs/HOT_CLUSTER_FUTURE_WORK.md) for RBAC hardening, FIPS, ci-env-controller setup gap, and workflow hygiene items.
 
+- **Use `kubectl` + `_cluster-helpers.sh` to install `oc`** — Instead of downloading `oc` from `mirror.openshift.com` via `install-oc-client.sh`, use the `kubectl` binary already available on GitHub runners together with `_cluster-helpers.sh` `resolve_cli_downloads()` to fetch `oc` directly from the cluster's `ConsoleCLIDownload` resources. This avoids the external mirror dependency and ensures the binary matches the running cluster version exactly.
+- **Harden `check-cluster-health.sh`** — The health check script may need adjustments once runtime cluster configuration issues are discovered during real usage. Revisit checks and thresholds based on operational experience.
+
 Quick checklist:
 
 1. **Health check first** — Run **Hot Cluster E2E** (or health-check job only) to isolate cluster/HCO issues from test-stack issues.
@@ -294,7 +292,6 @@ Quick checklist:
 | **`ttl.sh` or ephemeral public registries**                  | Ephemeral tags, no provenance, rate/abuse limits                                                   | Internal registry + image signing, digest pinning                                     |
 | **Skip `npm audit` / `--ignore-scripts`**                    | Supply-chain and lifecycle scripts not run                                                         | Revisit for production pipelines; use lockfile + audited base images                  |
 | **Cluster-scoped mutations in `test-setup.sh`**              | Variant A may patch shared ConfigMaps                                                              | Prefer namespaced fixtures or dedicated test clusters                                 |
-| **Ghost runner cleanup via `BOT_PAT`**                       | PAT scope and rotation                                                                             | GitHub App or org-level runner management; least privilege                            |
 | **Auto-teardown idle heuristic**                             | Monitors only the two E2E test workflows; a cluster used by other workflows may be torn down early | Tie to runner job queue or explicit "last test" workflow                              |
 | **Classic ROKS only in setup workflow**                      | Not IBM Cloud VPC Gen2 path                                                                        | Add a parallel path or doc if prod standardizes on VPC                                |
 
@@ -342,7 +339,7 @@ Bare metal nodes on IBM Cloud are expensive. Tear down the cluster manually via 
 
 - Go to repository Settings → Actions → Runners
 - Manually delete any offline runners
-- Or run the teardown workflow again (it includes ghost runner cleanup)
+- Or run the teardown workflow again (Helm uninstall deregisters runners)
 
 ### ARC runner `oc` / `kubectl` permissions
 

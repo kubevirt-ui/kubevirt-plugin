@@ -61,6 +61,7 @@ You do **not** need to re-apply **`arc-openshift-scc.yaml`**.
 | `arc-runner-scale-set.pod.yaml` | Helm values fragment for the runner container (volumes, securityContext)                                                     |
 | `arc-helm-helpers.sh`           | Shared Helm/auth helpers                                                                                                     |
 | `arc-dind-post-render.sh`       | Helm post-renderer: OpenShift dind `vfs` storage driver; optional `docker:dind` swap via `../generated/arc-dind-replace.env` |
+| `uninstall-arc.sh`              | Helm uninstall of scale set + controller (reverse of install; same env vars)                                                 |
 | `runner-image/Dockerfile`       | Custom runner (Node, kubectl, oc, virtctl, jq)                                                                               |
 
 Generated **`ci-scripts/generated/arc-dind-replace.env`** is gitignored; it is produced by **`setup-dind-mirror.sh`** or by **`install-runner-scale-set.sh`** when **`ARC_DIND_INTERNAL_IMAGE`** is set.
