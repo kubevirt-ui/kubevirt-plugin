@@ -24,10 +24,13 @@ export const orderQuickStarts = (
 
   // Prioritize featured quick starts and keep specified order
   if (featured) {
-    const featuredQuickStartsByName = filteredQuickStarts.reduce((acc, q) => {
-      acc[q?.metadata?.name] = q;
-      return acc;
-    }, {} as Record<string, Merge<QuickStart, { metadata: ObjectMetadata }>>);
+    const featuredQuickStartsByName = filteredQuickStarts.reduce(
+      (acc, q) => {
+        acc[q?.metadata?.name] = q;
+        return acc;
+      },
+      {} as Record<string, Merge<QuickStart, { metadata: ObjectMetadata }>>,
+    );
     featured.forEach((quickStartName) => {
       if (
         featuredQuickStartsByName[quickStartName] &&

@@ -63,7 +63,7 @@ const VirtualMachineDiagnosticTab: FC<NavPageComponentProps> = ({ obj: vm }) => 
 
   const activeSeverity: DiagnosticSeverity | null =
     filters.conditions.size === 1 && filters.categories.size === 0
-      ? CONDITION_TO_SEVERITY[[...filters.conditions][0]] ?? null
+      ? (CONDITION_TO_SEVERITY[[...filters.conditions][0]] ?? null)
       : null;
 
   const handleCardClick = useCallback(

@@ -34,7 +34,7 @@ const NameCell: FC<NameCellProps> = ({ row }) => {
   return (
     <Stack data-test-id={`nic-${nicName}`}>
       <StackItem>
-        {!nicName && interfaceName ? <Label>{interfaceName}</Label> : nicName ?? NO_DATA_DASH}
+        {!nicName && interfaceName ? <Label>{interfaceName}</Label> : (nicName ?? NO_DATA_DASH)}
         {isPending && !isInterfaceEphemeral && <PendingBadge />}
         {isInterfaceEphemeral && <EphemeralBadge />}
       </StackItem>

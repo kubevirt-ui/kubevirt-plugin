@@ -4,11 +4,10 @@ import { MenuToggle, MenuToggleElement, MenuToggleProps } from '@patternfly/reac
 
 const DropdownToggle =
   ({ children, ...props }: MenuToggleProps) =>
-  (toggleRef: Ref<MenuToggleElement>) =>
-    (
-      <MenuToggle ref={toggleRef} {...props}>
-        {children}
-      </MenuToggle>
-    );
+  (toggleRef: Ref<MenuToggleElement>) => (
+    <MenuToggle ref={toggleRef} {...props}>
+      {children}
+    </MenuToggle>
+  );
 
 export default DropdownToggle;

@@ -47,33 +47,36 @@ export const filterTemplates = (templates: V1Template[]): TemplateItem[] => {
 
   const commonTemplateItems = templates
     .filter((t) => isCommonTemplate(t) && !isDeprecatedTemplate(t))
-    .reduce((acc, t) => {
-      const name = getTemplateName(t);
-      if (acc[name]) {
-        const isRecommended = t.metadata.labels?.[TEMPLATE_DEFAULT_VARIANT_LABEL] === 'true';
-        if (isRecommended) {
-          acc[name].metadata = {
-            name: t.metadata.name,
-            namespace: t.metadata.namespace,
-            uid: t.metadata.uid,
-          };
-          acc[name].variants.unshift(t);
+    .reduce(
+      (acc, t) => {
+        const name = getTemplateName(t);
+        if (acc[name]) {
+          const isRecommended = t.metadata.labels?.[TEMPLATE_DEFAULT_VARIANT_LABEL] === 'true';
+          if (isRecommended) {
+            acc[name].metadata = {
+              name: t.metadata.name,
+              namespace: t.metadata.namespace,
+              uid: t.metadata.uid,
+            };
+            acc[name].variants.unshift(t);
+          } else {
+            acc[name].variants.push(t);
+          }
         } else {
-          acc[name].variants.push(t);
+          acc[name] = {
+            isCommon: true,
+            metadata: {
+              name: t.metadata.name,
+              namespace: t.metadata.namespace,
+              uid: t.metadata.uid,
+            },
+            variants: [t],
+          };
         }
-      } else {
-        acc[name] = {
-          isCommon: true,
-          metadata: {
-            name: t.metadata.name,
-            namespace: t.metadata.namespace,
-            uid: t.metadata.uid,
-          },
-          variants: [t],
-        };
-      }
-      return acc;
-    }, {} as { [key: string]: TemplateItem });
+        return acc;
+      },
+      {} as { [key: string]: TemplateItem },
+    );
 
   Object.keys(commonTemplateItems).forEach((key) => {
     const recommendedProfile = getWorkloadProfile(commonTemplateItems[key].variants[0]);

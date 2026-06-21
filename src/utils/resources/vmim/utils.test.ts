@@ -6,7 +6,7 @@ import { getMigrationStatusCounts } from './utils';
 const vmimWithPhase = (phase: string): V1VirtualMachineInstanceMigration =>
   ({
     status: { phase },
-  } as V1VirtualMachineInstanceMigration);
+  }) as V1VirtualMachineInstanceMigration;
 
 describe('getMigrationStatusCounts', () => {
   it('counts Succeeded separately from other', () => {

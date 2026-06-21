@@ -122,15 +122,18 @@ export const getPackageUID = (pkg: PackageManifestKind) =>
   `${pkg.metadata.name}-${pkg.status.catalogSource}-${pkg.status.catalogSourceNamespace}`;
 
 export const groupOperatorItems = (items: VirtFeatureOperatorItem[]): VirtFeatureOperatorItemsMap =>
-  items.reduce((acc, item) => {
-    if (getPackageSource(item?.obj) !== 'Red Hat' && !isInstalled(item?.installState)) return acc;
+  items.reduce(
+    (acc, item) => {
+      if (getPackageSource(item?.obj) !== 'Red Hat' && !isInstalled(item?.installState)) return acc;
 
-    const operatorName = getName(item?.obj);
-    if (!acc?.[operatorName]) acc[operatorName] = [];
-    acc[operatorName].push(item);
+      const operatorName = getName(item?.obj);
+      if (!acc?.[operatorName]) acc[operatorName] = [];
+      acc[operatorName].push(item);
 
-    return acc;
-  }, {} as { [key in VirtualizationFeatureOperators]: VirtFeatureOperatorItem[] });
+      return acc;
+    },
+    {} as { [key in VirtualizationFeatureOperators]: VirtFeatureOperatorItem[] },
+  );
 
 const getOperatorHubURL = (uid: string, namespace: string) =>
   `/catalog/ns/${namespace || 'default'}?selectedId=${uid}`;

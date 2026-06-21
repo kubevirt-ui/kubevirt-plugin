@@ -89,7 +89,7 @@ export const getVMNetworkTypeLabel = (networkType: VMNetworkType, t: TFunction) 
     [VMNetworkType.PRIMARY_UDN]: t('Primary user-defined network'),
     [VMNetworkType.SECONDARY_LAYER2_OVERLAY]: t('Secondary layer2 overlay'),
     [VMNetworkType.SRIOV]: t('SR-IOV'),
-  }[networkType]);
+  })[networkType];
 
 export const hasUDNOwner = (nad: NetworkAttachmentDefinitionKind): boolean =>
   nad?.metadata?.ownerReferences?.some(

@@ -182,10 +182,13 @@ export const getMappedProjectsWithKeys = (
 ): { [namespace: string]: IoK8sApiCoreV1Secret[] } => {
   const sshKeySecrets = getAllSecretsFromSecretData(secretsData);
 
-  const sshData = sshKeySecrets.reduce((acc, secret) => {
-    acc[secret?.metadata?.namespace] = [...(acc?.[secret?.metadata?.namespace] || []), secret];
-    return acc;
-  }, {} as { [namespace: string]: IoK8sApiCoreV1Secret[] });
+  const sshData = sshKeySecrets.reduce(
+    (acc, secret) => {
+      acc[secret?.metadata?.namespace] = [...(acc?.[secret?.metadata?.namespace] || []), secret];
+      return acc;
+    },
+    {} as { [namespace: string]: IoK8sApiCoreV1Secret[] },
+  );
 
   return sshData;
 };

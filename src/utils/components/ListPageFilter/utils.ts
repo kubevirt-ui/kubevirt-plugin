@@ -50,11 +50,11 @@ export const generateRowFilters = (rowFilters: ExtendedRowFilter[], data: K8sRes
       ...item,
       count: (rowFilter as RowMatchFilter).isMatch
         ? data.filter((d) => (rowFilter as RowMatchFilter).isMatch(d, item.id)).length
-        : data.reduce((acc, current) => {
+        : (data.reduce((acc, current) => {
             const currentKey = (rowFilter as RowReducerFilter).reducer(current);
             acc[currentKey] ? acc[currentKey]++ : (acc[currentKey] = 1);
             return acc;
-          }, {})?.[item.id] ?? '0',
+          }, {})?.[item.id] ?? '0'),
     })),
   }));
 

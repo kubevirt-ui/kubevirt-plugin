@@ -16,7 +16,7 @@ const LINES_PER_DATUM = 3;
 const buildStyles = (text: string | string[], defaultColor: string) => {
   const lineCount = Array.isArray(text)
     ? text.reduce((sum, t) => sum + (t?.split?.('\n')?.length ?? 0), 0)
-    : text?.split?.('\n')?.length ?? LINES_PER_DATUM;
+    : (text?.split?.('\n')?.length ?? LINES_PER_DATUM);
 
   const datumCount = Math.max(1, Math.ceil(lineCount / LINES_PER_DATUM));
   const styles: Record<string, number | string>[] = [];

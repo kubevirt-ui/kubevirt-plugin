@@ -28,13 +28,16 @@ const MigrationsChartDonut: FC<MigrationsChartDonutProps> = ({ onFilterChange, v
 
   if (!vmims?.length) return null;
 
-  const vmimsStatusCountMap = vmims?.reduce((acc, vmim) => {
-    const vmimStatusKey = vmim?.status?.phase;
+  const vmimsStatusCountMap = vmims?.reduce(
+    (acc, vmim) => {
+      const vmimStatusKey = vmim?.status?.phase;
 
-    acc[vmimStatusKey] = acc?.[vmimStatusKey] + 1 || 1;
+      acc[vmimStatusKey] = acc?.[vmimStatusKey] + 1 || 1;
 
-    return acc;
-  }, {} as { [status: string]: number });
+      return acc;
+    },
+    {} as { [status: string]: number },
+  );
 
   const chartData: ChartDataItem[] = Object.entries(vmimsStatusCountMap)?.map(
     ([status, statusCount]) => ({

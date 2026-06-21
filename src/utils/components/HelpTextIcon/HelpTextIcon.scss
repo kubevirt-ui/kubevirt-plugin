@@ -1,8 +1,8 @@
 .help-icon {
   cursor: pointer;
   color: var(--pf-t--global--icon--color--subtle);
-
-  transition: color var(--pf-t--global--motion--duration--sm)
+  transition:
+    color var(--pf-t--global--motion--duration--sm)
       var(--pf-t--global--motion--timing-function--default),
     transform var(--pf-t--global--motion--duration--sm)
       var(--pf-t--global--motion--timing-function--default);

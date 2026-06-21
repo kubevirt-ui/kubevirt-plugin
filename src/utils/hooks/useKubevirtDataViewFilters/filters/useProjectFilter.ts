@@ -37,7 +37,7 @@ const useProjectFilter = (): KubevirtFilter => {
   );
 
   const projectNames = useMemo(
-    () => (isACMPage ? multiclusterNamespacesNames : projects ?? []),
+    () => (isACMPage ? multiclusterNamespacesNames : (projects ?? [])),
     [isACMPage, multiclusterNamespacesNames, projects],
   );
 

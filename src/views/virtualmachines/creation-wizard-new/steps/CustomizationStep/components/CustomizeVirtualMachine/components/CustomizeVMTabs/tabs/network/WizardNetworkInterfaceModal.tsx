@@ -27,14 +27,14 @@ const WizardNetworkInterfaceModal: FC<WizardNetworkInterfaceModalProps> = ({
 }) => {
   const onSubmit = useCallback(
     ({
-        interfaceLinkState,
-        interfaceMACAddress,
-        interfaceModel,
-        interfaceType,
-        isLegacyPasst,
-        networkName,
-        nicName,
-      }) =>
+      interfaceLinkState,
+      interfaceMACAddress,
+      interfaceModel,
+      interfaceType,
+      isLegacyPasst,
+      networkName,
+      nicName,
+    }) =>
       (currentVM: V1VirtualMachine) => {
         const resultNetwork = createNetwork(nicName, networkName);
         const resultInterface = createInterface({

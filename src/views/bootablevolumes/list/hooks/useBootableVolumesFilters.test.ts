@@ -61,7 +61,7 @@ const createMockBootableVolume = (
       name: overrides.name ?? 'test-volume',
       namespace: overrides.namespace ?? 'default',
     },
-  } as unknown as BootableVolume);
+  }) as unknown as BootableVolume;
 
 describe('useBootableVolumesFilters', () => {
   const sampleVolumes: BootableVolume[] = [

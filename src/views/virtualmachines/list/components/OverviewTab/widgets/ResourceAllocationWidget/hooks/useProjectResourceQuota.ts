@@ -42,7 +42,7 @@ export const getUnitLabel = (unit: string, t: TFunction): string => {
 };
 
 const parseQuantity = (value: string | undefined): number =>
-  value != null ? (convertToBaseValue(value) as number) ?? 0 : 0;
+  value != null ? ((convertToBaseValue(value) as number) ?? 0) : 0;
 
 const toGiB = (bytes: number): number => humanizeBinaryBytes(bytes, null, UNIT_GIB)?.value ?? 0;
 

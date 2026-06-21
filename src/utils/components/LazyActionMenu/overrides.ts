@@ -95,15 +95,18 @@ export const mergeOptions = (options: MenuOption[]): MenuOption[] =>
   // use array based dictionary to guarantee the order
   // first encountered is first in the results
   options
-    .reduce((acc, opt) => {
-      const existingIndex = acc.findIndex(({ id }) => id === opt.id);
-      if (existingIndex === -1) {
-        acc.push({ duplicates: [opt], id: opt.id });
-      } else {
-        acc[existingIndex].duplicates.push(opt);
-      }
-      return acc;
-    }, [] as { duplicates: MenuOption[]; id: string }[])
+    .reduce(
+      (acc, opt) => {
+        const existingIndex = acc.findIndex(({ id }) => id === opt.id);
+        if (existingIndex === -1) {
+          acc.push({ duplicates: [opt], id: opt.id });
+        } else {
+          acc[existingIndex].duplicates.push(opt);
+        }
+        return acc;
+      },
+      [] as { duplicates: MenuOption[]; id: string }[],
+    )
     .map(
       ({ duplicates }): MenuOption => ({
         // grouping is stable, take the props from the first defined option

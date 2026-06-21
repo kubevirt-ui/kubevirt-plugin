@@ -34,15 +34,15 @@ const VirtualMachinesEditNetworkInterfaceModal: FC<
 
   const onSubmit = useCallback(
     ({
-        interfaceLinkState,
-        interfaceMACAddress,
-        interfaceModel,
-        interfaceType,
-        isBootSource = false,
-        isLegacyPasst,
-        networkName,
-        nicName,
-      }) =>
+      interfaceLinkState,
+      interfaceMACAddress,
+      interfaceModel,
+      interfaceType,
+      isBootSource = false,
+      isLegacyPasst,
+      networkName,
+      nicName,
+    }) =>
       () => {
         const resultNetwork = createNetwork(nicName, networkName);
         const resultInterface = createInterface({

@@ -46,7 +46,7 @@ const ResourceAllocationWidget: FC<ResourceAllocationWidgetProps> = ({
 
   const rawData: MetricChartData = isMultiCluster
     ? toMetricChartData(clusterData)
-    : metricChartData ?? EMPTY_METRIC_DATA;
+    : (metricChartData ?? EMPTY_METRIC_DATA);
 
   const targetUnit = quotaData?.label;
 
