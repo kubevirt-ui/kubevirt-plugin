@@ -40,7 +40,7 @@ jobs:
             core.setOutput('head_sha', pr.head.sha);
 
       - name: Checkout base branch scripts
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           ref: ${{ github.event.pull_request.base.ref || steps.pr-info.outputs.base_ref }}
           sparse-checkout: .github/scripts
