@@ -43,7 +43,9 @@ import {
   ALL_CLUSTERS_ID,
   CLUSTER_SELECTOR_PREFIX,
   FOLDER_SELECTOR_PREFIX,
+  HIDE,
   PROJECT_SELECTOR_PREFIX,
+  SHOW,
   VM_FOLDER_LABEL,
 } from './constants';
 
@@ -470,6 +472,14 @@ export const filterItems = (item: TreeViewDataItem, input: string) => {
     );
   }
 };
+
+export const getEffectiveShowEmptyProjects = (
+  hasVMs: boolean,
+  showEmptyProjects: string,
+): string => (hasVMs ? showEmptyProjects : SHOW);
+
+export const isShowOnlyVMProjectsChecked = (hasVMs: boolean, showEmptyProjects: string): boolean =>
+  getEffectiveShowEmptyProjects(hasVMs, showEmptyProjects) === HIDE;
 
 // Show projects that have VMs all the time
 // Show / hide projects that have no VMs depending on showEmptyProjects flag

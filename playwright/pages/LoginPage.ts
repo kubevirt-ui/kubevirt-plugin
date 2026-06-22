@@ -1,4 +1,4 @@
-import { expect, Page } from '@playwright/test';
+import { expect, Locator, Page } from '@playwright/test';
 
 import { MINUTE } from '../utils/constants';
 import { env } from '../utils/env';
@@ -15,28 +15,58 @@ const SEL = {
 export class LoginPage {
   constructor(private readonly page: Page) {}
 
+  private async isOpenShiftOAuthLoginPage(): Promise<boolean> {
+    return this.page.getByRole('heading', { name: 'Log in to your account' }).isVisible();
+  }
+
+  private async loginViaOpenShiftOAuth(username: string, password: string) {
+    await this.page.getByRole('textbox', { name: 'Username' }).fill(username);
+    await this.page.getByRole('textbox', { name: 'Password' }).fill(password);
+    await this.page.getByRole('button', { name: 'Log in' }).click();
+  }
+
+  /** Wait until the console loads or a known login screen appears after redirect. */
+  private async waitForLoginOrConsole(userDropdown: Locator) {
+    const oauthLogin = this.page.getByRole('heading', { name: 'Log in to your account' });
+    const htpasswdLogin = this.page.locator(SEL.usernameInput);
+
+    await Promise.race([
+      userDropdown.waitFor({ state: 'visible', timeout: MINUTE }),
+      oauthLogin.waitFor({ state: 'visible', timeout: MINUTE }),
+      htpasswdLogin.waitFor({ state: 'visible', timeout: MINUTE }),
+    ]).catch(() => undefined);
+  }
+
   /** Log in with the given credentials. Skips login if auth is disabled. */
   async login(
     idp = env.kubeadminIdp,
     username = env.kubeadminUsername,
     password = env.kubeadminPassword,
   ) {
-    await this.page.goto('/');
-    await this.page.waitForLoadState('domcontentloaded');
+    const userDropdown = byTest(this.page, USER_DROPDOWN_TOGGLE);
 
-    // Skip login when the console runs with auth disabled
-    const authDisabled = await this.page.evaluate(
-      () =>
-        (window as Window & { SERVER_FLAGS?: { authDisabled?: boolean } }).SERVER_FLAGS
-          ?.authDisabled,
-    );
+    await this.page.goto('/');
+    await this.waitForLoginOrConsole(userDropdown);
+
+    if (await userDropdown.isVisible()) return;
+
+    const authDisabled = await this.page
+      .evaluate(
+        () =>
+          (window as Window & { SERVER_FLAGS?: { authDisabled?: boolean } }).SERVER_FLAGS
+            ?.authDisabled,
+      )
+      .catch(() => false);
 
     if (authDisabled) return;
 
-    // Already logged in
-    if (await byTest(this.page, USER_DROPDOWN_TOGGLE).isVisible()) return;
+    if (await this.isOpenShiftOAuthLoginPage()) {
+      await this.loginViaOpenShiftOAuth(username, password);
+      await expect(userDropdown).toBeVisible({ timeout: MINUTE });
+      return;
+    }
 
-    // IDP selection screen
+    // Console bridge htpasswd login with optional IDP picker
     const bodyText = await this.page.locator('body').innerText();
     if (bodyText.includes(idp)) {
       await this.page.getByText(idp).click();
@@ -46,7 +76,7 @@ export class LoginPage {
     await this.page.locator(SEL.passwordInput).fill(password);
     await this.page.locator(SEL.submitButton).click();
 
-    await expect(byTest(this.page, USER_DROPDOWN_TOGGLE)).toBeVisible({ timeout: MINUTE });
+    await expect(userDropdown).toBeVisible({ timeout: MINUTE });
   }
 
   /** Seed guided-tour completion into localStorage so tour banners never appear. */

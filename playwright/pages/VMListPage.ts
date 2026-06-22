@@ -3,12 +3,16 @@ import { expect, Locator, Page } from '@playwright/test';
 import { ITEM_CREATE, KEBAB_BUTTON, MINUTE, SECOND } from '../utils/constants';
 import { byTest, byTestId } from '../utils/locators';
 
+import { VMTreeViewPage } from './vm-tree';
+
 const VM_FILTER_NAME_INPUT = 'vm-filter-name-input';
-const VM_LIST_TAB = 'vm-list-tab';
-const VMS_TREEVIEW = 'vms-treeview';
 
 export class VMListPage {
-  constructor(private readonly page: Page) {}
+  readonly treeView: VMTreeViewPage;
+
+  constructor(private readonly page: Page) {
+    this.treeView = new VMTreeViewPage(page);
+  }
 
   // ── Navigation ──────────────────────────────────────────────────────────────
 
@@ -43,34 +47,22 @@ export class VMListPage {
     ).toBeVisible({ timeout });
   }
 
-  /** Assert the tree-view panel is rendered alongside the list. */
-  async expectTreeViewVisible() {
-    await expect(byTest(this.page, VMS_TREEVIEW)).toBeVisible();
-  }
-
   async filterByName(name: string) {
     await this.page.locator(`[data-test="${VM_FILTER_NAME_INPUT}"] input`).fill(name);
   }
 
-  // ── Filters ──────────────────────────────────────────────────────────────────
-
   /**
    * Navigate directly to the VM list for the given namespace (or all-namespaces).
-   * The page loads with the Overview tab selected by default, so we explicitly
-   * click the "VirtualMachines" tab (`data-test="vm-list-tab"`) to show the list.
+   * Opens the Virtual machines tab via the `tab=vms` query param.
    */
   async navigateToVMList(ns?: string) {
     const nsPath = ns ? `ns/${ns}` : 'all-namespaces';
-    await this.page.goto(`/k8s/${nsPath}/kubevirt.io~v1~VirtualMachine`);
+    await this.page.goto(`/k8s/${nsPath}/kubevirt.io~v1~VirtualMachine?tab=vms`);
     await this.page.waitForLoadState('domcontentloaded');
 
-    // Click the VirtualMachines tab to switch from the default Overview tab
-    const vmListTab = byTest(this.page, VM_LIST_TAB);
-    await expect(vmListTab).toBeVisible({ timeout: MINUTE });
-    await vmListTab.click();
-
-    // Confirm the tab is selected and the list body is shown
-    await expect(byTest(this.page, ITEM_CREATE)).toBeVisible({ timeout: MINUTE });
+    await expect(this.page.getByRole('tabpanel', { name: 'Virtual machines' })).toBeVisible({
+      timeout: MINUTE,
+    });
   }
 
   /** Click the row's kebab actions menu toggle. */
@@ -84,7 +76,7 @@ export class VMListPage {
     await byTestId(this.page, vmName).click();
   }
 
-  // ── Assertions ────────────────────────────────────────────────────────────────
+  // ── Filters ──────────────────────────────────────────────────────────────────
 
   /**
    * Returns the table row containing the given resource name.

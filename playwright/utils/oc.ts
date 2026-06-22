@@ -45,6 +45,24 @@ export function deleteResource(kind: string, name: string, ns?: string) {
   ocIgnore(`delete ${kind} ${name} ${nsFlag} --ignore-not-found --wait=false`);
 }
 
+/** Create an empty namespace, replacing any existing namespace with the same name. */
+export function createEmptyNamespace(name: string) {
+  ocIgnore(`delete namespace ${name} --ignore-not-found --wait=true`);
+  ocIgnore(`wait namespace/${name} --for=delete --timeout=60s`);
+  oc(`create namespace ${name}`);
+}
+
+/** Returns true when the cluster has at least one VirtualMachine. */
+export function clusterHasVMs(): boolean {
+  const out = ocIgnore('get vm -A --no-headers');
+  return out.trim().length > 0;
+}
+
+/** Delete a namespace, ignoring not-found errors. */
+export function deleteNamespace(name: string) {
+  ocIgnore(`delete namespace ${name} --ignore-not-found --wait=false`);
+}
+
 /** Patch a VirtualMachine's run strategy. */
 export function patchVMRunStrategy(name: string, ns: string, strategy: 'Always' | 'Halted') {
   oc(`patch vm ${name} -n ${ns} --type=merge -p '{"spec":{"runStrategy":"${strategy}"}}'`);

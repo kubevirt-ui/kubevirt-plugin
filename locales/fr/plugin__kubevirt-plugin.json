@@ -531,6 +531,7 @@
   "Create a new VM by selecting an operating system and the right performance for your workload.": "Créez une nouvelle machine virtuelle en sélectionnant un système d'exploitation et les performances adaptées à votre charge de travail.",
   "Create a pre-configured VM using standardized images. This option requires an existing template.": "Créez une machine virtuelle préconfigurée à l'aide d'images standardisées. Cette option nécessite un modèle existant.",
   "Create a VirtualMachine from a template": "Créer une VirtualMachine à partir d'un modèle",
+  "Create a VirtualMachine to enable this filter.": "Create a VirtualMachine to enable this filter.",
   "Create a VM": "Créer une machine virtuelle",
   "Create activation key": "Créer une clé d'activation",
   "Create application-aware quota": "Créer un quota prenant en compte les applications",

@@ -519,6 +519,7 @@
   "Create a new VM by selecting an operating system and the right performance for your workload.": "通过为您的工作负载选择操作系统和正确的性能来创建新的虚拟机。",
   "Create a pre-configured VM using standardized images. This option requires an existing template.": "使用标准化镜像创建一个预配置的虚拟机。此选项需要有一个现有的模板。",
   "Create a VirtualMachine from a template": "从模板创建 VirtualMachine",
+  "Create a VirtualMachine to enable this filter.": "Create a VirtualMachine to enable this filter.",
   "Create a VM": "创建虚拟机",
   "Create activation key": "创建激活码",
   "Create application-aware quota": "创建应用程序感知配额",

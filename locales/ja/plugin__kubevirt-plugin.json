@@ -519,6 +519,7 @@
   "Create a new VM by selecting an operating system and the right performance for your workload.": "オペレーティングシステムとワークロードに最適なパフォーマンスを選択して、新しい仮想マシンを作成します。",
   "Create a pre-configured VM using standardized images. This option requires an existing template.": "標準化されたイメージを使用して、事前設定済みの仮想マシンを作成します。このオプションを使用するには、既存のテンプレートが必要です。",
   "Create a VirtualMachine from a template": "テンプレートからVirtualMachineを作成",
+  "Create a VirtualMachine to enable this filter.": "Create a VirtualMachine to enable this filter.",
   "Create a VM": "仮想マシンの作成",
   "Create activation key": "アクティベーションキーの作成",
   "Create application-aware quota": "アプリケーション認識クォータの作成",
