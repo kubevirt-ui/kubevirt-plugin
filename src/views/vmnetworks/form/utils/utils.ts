@@ -72,24 +72,27 @@ export const getBridgeNames = (
 export const getNNCPSpecListForLocalnetObject = (
   policies: V1NodeNetworkConfigurationPolicy[],
 ): Record<string, V1NodeNetworkConfigurationPolicySpec[]> =>
-  policies?.reduce((result, policy) => {
-    const mappings = getBridgeMappings(policy.spec);
+  policies?.reduce(
+    (result, policy) => {
+      const mappings = getBridgeMappings(policy.spec);
 
-    return mappings.reduce((acc, mapping) => {
-      const localnet = mapping.localnet;
+      return mappings.reduce((acc, mapping) => {
+        const localnet = mapping.localnet;
 
-      if (!localnet.startsWith(PREFIX_PHYSNET)) {
-        if (!acc[localnet]) {
-          acc[localnet] = [];
+        if (!localnet.startsWith(PREFIX_PHYSNET)) {
+          if (!acc[localnet]) {
+            acc[localnet] = [];
+          }
+          if (!acc[localnet].includes(policy.spec)) {
+            acc[localnet].push(policy.spec);
+          }
         }
-        if (!acc[localnet].includes(policy.spec)) {
-          acc[localnet].push(policy.spec);
-        }
-      }
 
-      return acc;
-    }, result);
-  }, {} as Record<string, V1NodeNetworkConfigurationPolicySpec[]>) ?? {};
+        return acc;
+      }, result);
+    },
+    {} as Record<string, V1NodeNetworkConfigurationPolicySpec[]>,
+  ) ?? {};
 
 export const getMTUValidatedInfo = (mtu: number, maxMTUFromLocalnet: number, t: TFunction) => {
   if (mtu > MAX_MTU) {

@@ -19,7 +19,7 @@ const useAutoHideNavigation = (): boolean => {
   const [wasCollapsed, setWasCollapsed] = useState(false);
   const mountedRef = useRef(false);
 
-  const settingEnabled = loaded ? navigation?.autoHideNav ?? AUTO_HIDE_NAV_DEFAULT : false;
+  const settingEnabled = loaded ? (navigation?.autoHideNav ?? AUTO_HIDE_NAV_DEFAULT) : false;
   const userOverrode = userExpandedNavSignal.value;
 
   useEffect(() => {

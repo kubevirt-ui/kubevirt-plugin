@@ -52,7 +52,7 @@ export const getTemplateNetworkColumns = (
   },
   {
     getValue: (row) =>
-      isPodNetwork(row.network) ? POD_NETWORK_SORT_KEY : row.network?.multus?.networkName ?? '',
+      isPodNetwork(row.network) ? POD_NETWORK_SORT_KEY : (row.network?.multus?.networkName ?? ''),
     key: 'network',
     label: t('Network'),
     renderCell: (row) => <TemplateNetworkCell row={row} />,

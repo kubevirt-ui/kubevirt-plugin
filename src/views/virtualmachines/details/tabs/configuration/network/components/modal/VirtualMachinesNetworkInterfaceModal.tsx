@@ -46,15 +46,15 @@ const VirtualMachinesNetworkInterfaceModal: FC<VirtualMachinesNetworkInterfaceMo
 }) => {
   const onSubmit = useCallback(
     ({
-        interfaceLinkState,
-        interfaceMACAddress,
-        interfaceModel,
-        interfaceType,
-        isBootSource = false,
-        isLegacyPasst,
-        networkName,
-        nicName,
-      }) =>
+      interfaceLinkState,
+      interfaceMACAddress,
+      interfaceModel,
+      interfaceType,
+      isBootSource = false,
+      isLegacyPasst,
+      networkName,
+      nicName,
+    }) =>
       () => {
         const existingInterface = getInterface(vm, nicName);
         const existingNetwork = getNetworks(vm)?.find(({ name }) => name === nicName);

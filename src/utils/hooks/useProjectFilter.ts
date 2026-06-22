@@ -34,7 +34,7 @@ export const useProjectFilter = <R extends K8sResourceCommon>(): RowFilter<R> =>
   );
 
   const projectNames = useMemo(
-    () => (isACMPage ? multiclusterNamespacesNames : projects ?? []),
+    () => (isACMPage ? multiclusterNamespacesNames : (projects ?? [])),
     [isACMPage, multiclusterNamespacesNames, projects],
   );
 

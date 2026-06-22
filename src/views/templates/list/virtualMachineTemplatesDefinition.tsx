@@ -73,7 +73,7 @@ export const getTemplateColumns = (
   columns.push(
     {
       getValue: (row) =>
-        isVirtualMachineTemplateRequest(row) ? '' : t(getWorkloadProfile(row)) ?? '',
+        isVirtualMachineTemplateRequest(row) ? '' : (t(getWorkloadProfile(row)) ?? ''),
       key: TEMPLATE_COLUMN_KEYS.workload,
       label: t('Workload profile'),
       props: { className: 'pf-m-width-15' },

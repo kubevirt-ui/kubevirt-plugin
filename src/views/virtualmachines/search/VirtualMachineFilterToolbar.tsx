@@ -92,7 +92,7 @@ const VirtualMachineFilterToolbar: FC<VirtualMachineFilterToolbarProps> = ({
           <SelectFilterItem
             toggleTitle={
               useShortLabels
-                ? filterDef.categoryLabelShort ?? filterDef.categoryLabel
+                ? (filterDef.categoryLabelShort ?? filterDef.categoryLabel)
                 : filterDef.categoryLabel
             }
             filterDef={filterDef}

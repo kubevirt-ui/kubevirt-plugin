@@ -40,7 +40,7 @@ const baseVM = (): V1VirtualMachine =>
         },
       },
     },
-  } as V1VirtualMachine);
+  }) as V1VirtualMachine;
 
 const migPlanWithPVCs = (pvs: MigPlan['spec']['persistentVolumes']): MigPlan =>
   ({
@@ -51,7 +51,7 @@ const migPlanWithPVCs = (pvs: MigPlan['spec']['persistentVolumes']): MigPlan =>
       namespaces: ['ns-1'],
       persistentVolumes: pvs,
     },
-  } as MigPlan);
+  }) as MigPlan;
 
 const pvcVmARootNs1 = { name: 'pvc-vm-a-root', namespace: 'ns-1' };
 
@@ -132,7 +132,7 @@ const basePlan = (): MultiNamespaceVirtualMachineStorageMigrationPlan =>
         },
       ],
     },
-  } as MultiNamespaceVirtualMachineStorageMigrationPlan);
+  }) as MultiNamespaceVirtualMachineStorageMigrationPlan;
 
 const baseMigMigration = (overrides: Partial<MigMigration> = {}): MigMigration =>
   ({
@@ -140,7 +140,7 @@ const baseMigMigration = (overrides: Partial<MigMigration> = {}): MigMigration =
     spec: { migPlanRef: { name: 'plan-1' } },
     status: { conditions: [], phase: '' },
     ...overrides,
-  } as MigMigration);
+  }) as MigMigration;
 
 describe('pickLatestMigMigrationForPlan', () => {
   it('selects the newest MigMigration for a given plan', () => {

@@ -34,14 +34,14 @@ const TemplatesNetworkInterfaceModal: FC<TemplatesNetworkInterfaceModalProps> = 
 
   const onSubmit = useCallback(
     ({
-        interfaceLinkState,
-        interfaceMACAddress,
-        interfaceModel,
-        interfaceType,
-        isLegacyPasst,
-        networkName,
-        nicName,
-      }) =>
+      interfaceLinkState,
+      interfaceMACAddress,
+      interfaceModel,
+      interfaceType,
+      isLegacyPasst,
+      networkName,
+      nicName,
+    }) =>
       () => {
         const resultNetwork = createNetwork(nicName, networkName);
         const resultInterface = createInterface({

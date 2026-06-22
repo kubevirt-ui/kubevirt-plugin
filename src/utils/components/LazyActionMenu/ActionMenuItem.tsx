@@ -67,13 +67,13 @@ const ActionItem: FC<ActionMenuItemProps & { isAllowed: boolean }> = ({
   return menuItem;
 };
 
-const AccessReviewActionItem = connect(impersonateStateToProps)(
-  (props: ActionMenuItemProps & { checkAccess: CheckAccess; impersonate: ImpersonateKind }) => {
-    const { action, checkAccess, impersonate } = props;
-    const [isAllowed] = useCheckAccess(action.accessReview, impersonate, checkAccess);
-    return <ActionItem {...props} isAllowed={isAllowed} />;
-  },
-);
+const AccessReviewActionItem = connect(impersonateStateToProps)((
+  props: ActionMenuItemProps & { checkAccess: CheckAccess; impersonate: ImpersonateKind },
+) => {
+  const { action, checkAccess, impersonate } = props;
+  const [isAllowed] = useCheckAccess(action.accessReview, impersonate, checkAccess);
+  return <ActionItem {...props} isAllowed={isAllowed} />;
+});
 
 const ActionMenuItem: FC<ActionMenuItemProps & { checkAccess: CheckAccess }> = (props) => {
   const { action } = props;

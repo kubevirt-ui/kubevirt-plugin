@@ -32,15 +32,18 @@ const useMulticlusterNamespaces = (
 
   const namespacesByCluster = useMemo(
     () =>
-      namespaces?.reduce((acc, project) => {
-        const cluster = getCluster(project);
+      namespaces?.reduce(
+        (acc, project) => {
+          const cluster = getCluster(project);
 
-        if (!(cluster in acc)) acc[cluster] = [];
+          if (!(cluster in acc)) acc[cluster] = [];
 
-        acc[cluster].push(project);
+          acc[cluster].push(project);
 
-        return acc;
-      }, {} as Record<string, K8sResourceCommon[]>),
+          return acc;
+        },
+        {} as Record<string, K8sResourceCommon[]>,
+      ),
     [namespaces],
   );
 

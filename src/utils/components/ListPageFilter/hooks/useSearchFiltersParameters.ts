@@ -28,7 +28,7 @@ export const useSearchFiltersParameters = (searchFilters: RowFilter[]): TextFilt
 
   return useMemo(
     () =>
-      ({ labels: labelTextFilters, name: nameTextFilter, ...searchTextFilters } as TextFiltersType),
+      ({ labels: labelTextFilters, name: nameTextFilter, ...searchTextFilters }) as TextFiltersType,
     [labelTextFilters, nameTextFilter, searchTextFilters],
   );
 };

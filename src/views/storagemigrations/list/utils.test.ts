@@ -35,7 +35,7 @@ const makePlan = (
       ],
     },
     ...overrides,
-  } as MultiNamespaceVirtualMachineStorageMigrationPlan);
+  }) as MultiNamespaceVirtualMachineStorageMigrationPlan;
 
 describe('getStorageMigrationRowModel', () => {
   it('should return MultiNamespaceVirtualMachineStorageMigrationPlanModel for MultiNamespace kind', () => {

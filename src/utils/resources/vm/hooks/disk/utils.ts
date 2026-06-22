@@ -35,7 +35,7 @@ export const getPVCAndDVWatches = (vm: V1VirtualMachine) => {
       .filter((claimName) => Boolean(claimName))
       .map(
         (claimName) =>
-          ({ name: claimName, namespace: getNamespace(vm) } as V1beta1DataVolumeSourcePVC),
+          ({ name: claimName, namespace: getNamespace(vm) }) as V1beta1DataVolumeSourcePVC,
       ),
   );
 
@@ -81,11 +81,11 @@ export const getEjectedCDROMDrives = (diskDevices: DiskRawData[], vmDisks: V1Dis
 export const isStorageVolume = (volume: V1Volume) => {
   return Boolean(
     volume.dataVolume ||
-      volume.persistentVolumeClaim ||
-      volume.containerDisk ||
-      volume.emptyDisk ||
-      volume.cloudInitNoCloud ||
-      volume.cloudInitConfigDrive,
+    volume.persistentVolumeClaim ||
+    volume.containerDisk ||
+    volume.emptyDisk ||
+    volume.cloudInitNoCloud ||
+    volume.cloudInitConfigDrive,
   );
 };
 

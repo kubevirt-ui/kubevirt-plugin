@@ -65,7 +65,7 @@ const createMockVM = (overrides: {
       name: overrides.name ?? DEFAULT_VM_NAME,
       namespace: overrides.namespace ?? DEFAULT_NAMESPACE,
     },
-  } as V1VirtualMachine);
+  }) as V1VirtualMachine;
 
 const createMockPrometheusResponse = (
   results: Array<{ cluster?: string; name: string; namespace: string; value: number }>,

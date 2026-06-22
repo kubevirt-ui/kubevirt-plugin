@@ -61,7 +61,7 @@ const KubevirtTable = <TData, TCallbacks = undefined>(
   const isSelectable = props.selectable === true;
   const onSelect = isSelectable ? props.onSelect : undefined;
   const selectedItems = isSelectable ? props.selectedItems : [];
-  const showSelectAllCheckbox = isSelectable ? props.showSelectAllCheckbox ?? true : false;
+  const showSelectAllCheckbox = isSelectable ? (props.showSelectAllCheckbox ?? true) : false;
 
   const activeColumns = useMemo(
     () => getActiveColumns(columns, activeColumnKeys),
