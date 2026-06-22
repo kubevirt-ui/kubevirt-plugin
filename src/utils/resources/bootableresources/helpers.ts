@@ -32,10 +32,10 @@ import { isEmpty, kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sDelete } from '@multicluster/k8sRequests';
 
-import { SINGLE_CLUSTER_KEY } from '../constants';
 import { VirtualMachinePreference } from '../preference/types';
 import {
   ClusterNamespacedResourceMap,
+  getClusterKey,
   getLabel,
   getName,
   getNamespace,
@@ -64,7 +64,7 @@ export const getBootableVolumePVCSource = (
 
   return isBootableVolumePVCKind(bootableVolume)
     ? bootableVolume
-    : pvcSources?.[getCluster(bootableVolume) || SINGLE_CLUSTER_KEY]?.[
+    : pvcSources?.[getClusterKey(bootableVolume)]?.[
         getDataSourcePVCNamespace(bootableVolume as V1beta1DataSource)
       ]?.[getDataSourcePVCName(bootableVolume as V1beta1DataSource)];
 };
@@ -72,10 +72,7 @@ export const getBootableVolumePVCSource = (
 export const getDataVolumeForPVC = (
   pvc: IoK8sApiCoreV1PersistentVolumeClaim,
   dvSources: ClusterNamespacedResourceMap<V1beta1DataVolume>,
-) =>
-  pvc
-    ? dvSources?.[getCluster(pvc) || SINGLE_CLUSTER_KEY]?.[getNamespace(pvc)]?.[getName(pvc)]
-    : null;
+) => (pvc ? dvSources?.[getClusterKey(pvc)]?.[getNamespace(pvc)]?.[getName(pvc)] : null);
 
 export const getInstanceTypePrefix = (instanceTypeNamePrefix: string): string => {
   if (instanceTypeNamePrefix?.includes('.')) {

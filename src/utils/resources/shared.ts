@@ -502,7 +502,7 @@ export function convertResourceArrayToMapWithCluster<
 >(resources: A[], isNamespaced?: boolean): ClusterNamespacedResourceMap<A> | ClusterResourceMap<A> {
   return (resources || []).reduce(
     (map, resource) => {
-      const cluster = getCluster(resource) || SINGLE_CLUSTER_KEY;
+      const cluster = getClusterKey(resource);
       const { name, namespace } = resource?.metadata || {};
       if (!map[cluster]) map[cluster] = {};
 
@@ -628,3 +628,6 @@ const VM_FOLDER_LABEL_PREFIX = `${VM_FOLDER_LABEL}=`;
 
 export const getFolderNameFromLabel = (label: string): string | undefined =>
   isFolderLabel(label) ? label.slice(VM_FOLDER_LABEL_PREFIX.length) || undefined : undefined;
+
+export const getClusterKey = (resource: K8sResourceCommon): string =>
+  getCluster(resource) || SINGLE_CLUSTER_KEY;
