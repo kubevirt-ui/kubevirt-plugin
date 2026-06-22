@@ -15,18 +15,6 @@ abstract class TopConsumerScopeObjectEnum<T> extends DropdownEnum<T> {
 }
 
 export class TopConsumerScope extends TopConsumerScopeObjectEnum<string> {
-  static readonly NODE = new TopConsumerScope('NODE', {
-    dropdownLabel: 'Node',
-  });
-
-  static readonly PROJECT = new TopConsumerScope('PROJECT', {
-    dropdownLabel: 'Project',
-  });
-
-  static readonly VM = new TopConsumerScope('VM', {
-    dropdownLabel: 'VM',
-  });
-
   private static readonly all = Object.freeze(
     ObjectEnum.getAllClassEnumProperties<TopConsumerScope>(TopConsumerScope),
   );
@@ -51,6 +39,14 @@ export class TopConsumerScope extends TopConsumerScopeObjectEnum<string> {
     return [TopConsumerScope.VM, TopConsumerScope.NODE];
   };
 
+  static readonly NODE = new TopConsumerScope('NODE', {
+    dropdownLabel: 'Node',
+  });
+
+  static readonly PROJECT = new TopConsumerScope('PROJECT', {
+    dropdownLabel: 'Project',
+  });
+
   private static readonly stringMapper = TopConsumerScope.all.reduce(
     (accumulator, scope: TopConsumerScope) => ({
       ...accumulator,
@@ -58,4 +54,8 @@ export class TopConsumerScope extends TopConsumerScopeObjectEnum<string> {
     }),
     {},
   );
+
+  static readonly VM = new TopConsumerScope('VM', {
+    dropdownLabel: 'VM',
+  });
 }

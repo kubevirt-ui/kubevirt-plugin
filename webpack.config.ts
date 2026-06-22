@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-/* eslint-env node */
 import * as path from 'path';
 
 import { DefinePlugin } from 'webpack';

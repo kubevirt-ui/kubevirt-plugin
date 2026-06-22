@@ -1,4 +1,4 @@
-/* eslint-disable require-jsdoc */
+/* eslint-disable jsdoc/require-jsdoc */
 
 import AddCDROMModal from '../AddCDROMModal';
 import BlankDiskModal from '../BlankDiskModal';

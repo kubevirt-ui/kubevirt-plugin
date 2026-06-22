@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { JiraClient } from './jira-client.js';
 import { buildClonePayload } from './jira-clone-builder.js';
 import { jiraErrorMessage } from './utils.js';

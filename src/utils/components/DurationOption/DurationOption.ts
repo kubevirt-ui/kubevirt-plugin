@@ -1,3 +1,4 @@
+/* eslint-disable perfectionist/sort-classes */
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import DropdownEnum from '@kubevirt-utils/utils/dropdownEnum';
 import { ObjectEnum } from '@kubevirt-utils/utils/ObjectEnum';
@@ -29,7 +30,8 @@ const mapperDuration = {
   '6h': SIX_HOURS,
 };
 
-const getDurationMilliseconds = (duration) => mapperDuration?.[duration] || mapperDuration?.['5m'];
+const getDurationMilliseconds = (duration: string): number =>
+  mapperDuration?.[duration] ?? mapperDuration?.['5m'];
 
 class DurationOption extends DropdownEnum<string> {
   static readonly FIFTEEN_MIN = new DurationOption('15m', {
@@ -82,12 +84,13 @@ class DurationOption extends DropdownEnum<string> {
     }),
     {},
   );
-  static fromDropdownLabel = (dropdownLabel: string): DurationOption =>
+  static readonly fromDropdownLabel = (dropdownLabel: string): DurationOption | undefined =>
     DurationOption.dropdownLabelMapper[dropdownLabel];
 
-  static fromString = (source: string): DurationOption => DurationOption.stringMapper[source];
-  static getAll = () => DurationOption.all;
-  static getMilliseconds = (duration: string): number =>
+  static readonly fromString = (source: string): DurationOption | undefined =>
+    DurationOption.stringMapper[source];
+  static readonly getAll = (): readonly DurationOption[] => DurationOption.all;
+  static readonly getMilliseconds = (duration: string): number | undefined =>
     DurationOption.stringMapper?.[duration]?.millisecondsTime;
   private static readonly stringMapper = DurationOption.all.reduce(
     (accumulator, durationOption: DurationOption) => ({
@@ -97,7 +100,7 @@ class DurationOption extends DropdownEnum<string> {
     {},
   );
   protected readonly millisecondsTime: number;
-  constructor(value: string, { dropdownLabel }) {
+  constructor(value: string, { dropdownLabel }: { dropdownLabel: string }) {
     super(value, { dropdownLabel });
     this.millisecondsTime = getDurationMilliseconds(value);
   }

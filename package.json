@@ -69,6 +69,8 @@
     "zustand": "^4.3.7"
   },
   "devDependencies": {
+    "@commitlint/cli": "^21.0.2",
+    "@eslint-react/eslint-plugin": "^5.9.0",
     "@openshift-console/dynamic-plugin-sdk": "4.23.0-prerelease.2",
     "@openshift-console/dynamic-plugin-sdk-internal": "4.23.0-prerelease.1",
     "@openshift-console/dynamic-plugin-sdk-webpack": "4.23.0-prerelease.1",
@@ -80,24 +82,27 @@
     "@types/node": "^22.x",
     "@types/react": "^18.3.28",
     "@types/react-dom": "^18.3.7",
-    "@typescript-eslint/eslint-plugin": "^8.61.1",
-    "@typescript-eslint/parser": "^8.61.1",
     "copy-webpack-plugin": "^12.0.2",
     "css-loader": "^6.11.0",
     "esbuild": "^0.28.0",
     "esbuild-loader": "^4.4.3",
-    "eslint": "^8.57.1",
-    "eslint-config-prettier": "^10.1.8",
-    "eslint-import-resolver-typescript": "^3.10.1",
-    "eslint-plugin-import": "^2.32.0",
-    "eslint-plugin-jsdoc": "^48.5.0",
-    "eslint-plugin-perfectionist": "^1.5.1",
-    "eslint-plugin-prettier": "^5.5.6",
-    "eslint-plugin-react": "^7.29.3",
-    "eslint-plugin-react-hooks": "^4.3.0",
-    "eslint-plugin-simple-import-sort": "^7.0.0",
+    "eslint": "10.5.0",
+    "eslint-config-prettier": "10.1.8",
+    "eslint-import-resolver-typescript": "4.4.5",
+    "eslint-plugin-barrel-files": "^3.0.1",
+    "eslint-plugin-i18next": "^6.1.4",
+    "eslint-plugin-import-x": "4.16.2",
+    "eslint-plugin-jsdoc": "63.0.6",
+    "eslint-plugin-perfectionist": "5.9.1",
+    "eslint-plugin-prettier": "5.5.6",
+    "eslint-plugin-promise": "^7.3.0",
+    "eslint-plugin-react-hooks": "7.1.1",
+    "eslint-plugin-simple-import-sort": "13.0.0",
+    "eslint-plugin-sonarjs": "^4.1.0",
+    "eslint-plugin-testing-library": "^7.16.2",
+    "eslint-plugin-unicorn": "68.0.0",
     "fork-ts-checker-webpack-plugin": "^9.1.0",
-    "husky": "^8.0.0",
+    "husky": "^9.1.7",
     "i18next-conv": "^16.0.0",
     "i18next-parser": "^9.3.0",
     "jest": "^29.7.0",
@@ -111,10 +116,13 @@
     "sass": "~1.97.3",
     "sass-loader": "^16.0.8",
     "style-loader": "^3.2.1",
+    "stylelint": "^17.13.0",
+    "stylelint-config-standard-scss": "^17.0.0",
     "ts-jest": "^29.3.4",
     "ts-node": "^10.9.2",
     "tsconfig-paths-webpack-plugin": "^4.2.0",
     "typescript": "5.9.3",
+    "typescript-eslint": "8.61.1",
     "webpack": "^5.104.1",
     "webpack-cli": "^5.1.4",
     "webpack-dev-server": "^5.2.3"
@@ -128,9 +136,12 @@
       "npm run i18n"
     ],
     "*.{js,ts,tsx,jsx}": [
-      "eslint --fix"
+      "eslint --config eslintv10.config.js --fix"
     ],
-    "!(*.js|*.jsx|*.ts|*.tsx)": [
+    "*.scss": [
+      "stylelint --fix"
+    ],
+    "!(*.js|*.jsx|*.ts|*.tsx|*.scss)": [
       "prettier --write --ignore-unknown"
     ]
   },
@@ -140,7 +151,6 @@
       "@openshift-console/dynamic-plugin-sdk": "4.23.0-prerelease.2",
       "react-i18next": "~16.5.8"
     },
-    "eslint": "^8.57.1",
     "delaunator": "4.0.1"
   },
   "private": true,
@@ -164,7 +174,7 @@
     "oc-login-start-console": "./oc-login-start-console.sh",
     "po-to-i18n": "node ./i18n-scripts/po-to-i18n.js",
     "postinstall": "cp node_modules/@openshift-console/dynamic-plugin-sdk/docs/console-extensions.md .",
-    "prepare": "husky install",
+    "prepare": "husky",
     "start": "npm run ts-node -- node_modules/.bin/webpack serve",
     "start-console": "./start-console.sh",
     "start-console-with-monitoring": "./start-console.sh monitoring-plugin",

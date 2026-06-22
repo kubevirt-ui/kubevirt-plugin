@@ -14,7 +14,10 @@ export const upsertComment = async (
   const markedBody = `${marker}\n${body}`;
 
   const comments = await octokit.paginate(octokit.issues.listComments, {
-    owner, repo, issue_number: issueNumber, per_page: 100,
+    owner,
+    repo,
+    issue_number: issueNumber,
+    per_page: 100,
   });
 
   const existing = comments.find((c) => c.body?.includes(marker));
@@ -22,7 +25,12 @@ export const upsertComment = async (
   if (existing) {
     await octokit.issues.updateComment({ owner, repo, comment_id: existing.id, body: markedBody });
   } else {
-    await octokit.issues.createComment({ owner, repo, issue_number: issueNumber, body: markedBody });
+    await octokit.issues.createComment({
+      owner,
+      repo,
+      issue_number: issueNumber,
+      body: markedBody,
+    });
   }
 };
 
@@ -40,7 +48,10 @@ export const addLabel = async (
     const status = (err as { status?: number }).status;
     if (status === 404) {
       await octokit.issues.createLabel({
-        owner, repo, name: label, color: 'e11d48',
+        owner,
+        repo,
+        name: label,
+        color: 'e11d48',
         description: 'Automated label for Jira integration',
       });
     }
@@ -73,7 +84,10 @@ export const hasLabel = async (
   label: string,
 ): Promise<boolean> => {
   const { data: labels } = await octokit.issues.listLabelsOnIssue({
-    owner, repo, issue_number: issueNumber, per_page: 100,
+    owner,
+    repo,
+    issue_number: issueNumber,
+    per_page: 100,
   });
   return labels.some((l) => l.name === label);
 };
