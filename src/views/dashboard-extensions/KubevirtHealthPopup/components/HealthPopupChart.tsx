@@ -2,7 +2,7 @@ import React, { FC, useMemo } from 'react';
 
 import SubTitleChartLabel from '@kubevirt-utils/components/Charts/ChartLabels/SubTitleChartLabel';
 import TitleChartLabel from '@kubevirt-utils/components/Charts/ChartLabels/TitleChartLabel';
-import { AlertsByHealthImpact } from '@kubevirt-utils/hooks/useInfrastructureAlerts/useInfrastructureAlerts';
+import { AlertsBySeverity } from '@kubevirt-utils/hooks/useInfrastructureAlerts/useInfrastructureAlerts';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { ChartDonut } from '@patternfly/react-charts/victory';
@@ -12,7 +12,7 @@ import { alertTypeToColorMap } from '../utils/utils';
 import EmptyStateNoAlerts from './EmptyStateNoAlerts';
 
 type HealthPopupChartProps = {
-  alerts: AlertsByHealthImpact;
+  alerts: AlertsBySeverity;
   numberOfAlerts?: number;
 };
 
