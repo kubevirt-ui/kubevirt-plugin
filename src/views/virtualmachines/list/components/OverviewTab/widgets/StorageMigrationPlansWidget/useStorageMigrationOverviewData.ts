@@ -1,4 +1,7 @@
-import { modelToGroupVersionKind } from '@kubevirt-utils/models';
+import {
+  modelToGroupVersionKind,
+  VirtualMachineStorageMigrationPlanModel,
+} from '@kubevirt-utils/models';
 import { getStorageMigrationBackend } from '@kubevirt-utils/resources/migrations/backends';
 import {
   type StorageMigrationAPI,
@@ -7,6 +10,7 @@ import {
   STORAGE_MIGRATION_API,
   VirtualMachineStorageMigrationPlan,
 } from '@kubevirt-utils/resources/migrations/constants';
+import { normalizeSingleNsPlan } from '@kubevirt-utils/resources/migrations/singleNs/overview';
 import useK8sListData from '@multicluster/hooks/useK8sListData';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 import useClusterStorageMigrationApiProbe from '@virtualmachines/actions/hooks/storageMigrationApi/useClusterStorageMigrationApiProbe';
@@ -14,6 +18,7 @@ import useClusterStorageMigrationApiProbe from '@virtualmachines/actions/hooks/s
 import { useKubeVirtOverviewClusterCsv } from '../../context/KubeVirtOverviewClusterCsvContext';
 
 type UseStorageMigrationOverviewData = (cluster?: string) => {
+  csvVersion: string | undefined;
   loaded: boolean;
   loadError: unknown;
   storageMigAPI: StorageMigrationAPI;
@@ -27,6 +32,7 @@ type UseStorageMigrationOverviewData = (cluster?: string) => {
  */
 const useStorageMigrationOverviewData: UseStorageMigrationOverviewData = (cluster) => {
   const { installedCSV, loaded: csvLoaded } = useKubeVirtOverviewClusterCsv();
+  const csvVersion = installedCSV?.spec?.version;
   const storageMigAPI = useClusterStorageMigrationApiProbe(cluster, {
     installedCSV,
     loaded: csvLoaded,
@@ -34,10 +40,12 @@ const useStorageMigrationOverviewData: UseStorageMigrationOverviewData = (cluste
 
   const backend = getStorageMigrationBackend(storageMigAPI);
 
+  const isMultiNs = storageMigAPI === STORAGE_MIGRATION_API.MULTI_NS;
+
   const [multiNsPlans, multiNsLoaded, multiNsError] = useK8sWatchData<
     MultiNamespaceVirtualMachineStorageMigrationPlan[]
   >(
-    storageMigAPI === STORAGE_MIGRATION_API.MULTI_NS && backend
+    isMultiNs && backend
       ? {
           cluster,
           groupVersionKind: modelToGroupVersionKind(backend.planModel),
@@ -47,7 +55,20 @@ const useStorageMigrationOverviewData: UseStorageMigrationOverviewData = (cluste
       : null,
   );
 
-  const [singleNsPlans, singleNsLoaded, singleNsError] =
+  const [singleNsPlans, singleNsLoaded, singleNsError] = useK8sWatchData<
+    VirtualMachineStorageMigrationPlan[]
+  >(
+    isMultiNs
+      ? {
+          cluster,
+          groupVersionKind: modelToGroupVersionKind(VirtualMachineStorageMigrationPlanModel),
+          isList: true,
+          namespaced: false,
+        }
+      : null,
+  );
+
+  const [singleNsOnlyPlans, singleNsOnlyLoaded, singleNsOnlyError] =
     useK8sListData<VirtualMachineStorageMigrationPlan>(
       storageMigAPI === STORAGE_MIGRATION_API.SINGLE_NS && backend
         ? {
@@ -69,6 +90,7 @@ const useStorageMigrationOverviewData: UseStorageMigrationOverviewData = (cluste
 
   if (storageMigAPI === STORAGE_MIGRATION_API.LOADING) {
     return {
+      csvVersion,
       loaded: false,
       loadError: undefined,
       storageMigAPI: STORAGE_MIGRATION_API.LOADING,
@@ -78,6 +100,7 @@ const useStorageMigrationOverviewData: UseStorageMigrationOverviewData = (cluste
 
   if (storageMigAPI === STORAGE_MIGRATION_API.NONE) {
     return {
+      csvVersion,
       loaded: true,
       loadError: undefined,
       storageMigAPI: STORAGE_MIGRATION_API.NONE,
@@ -87,6 +110,7 @@ const useStorageMigrationOverviewData: UseStorageMigrationOverviewData = (cluste
 
   if (storageMigAPI === STORAGE_MIGRATION_API.MTC && backend) {
     return {
+      csvVersion,
       loaded: mtcLoaded,
       loadError: mtcError,
       storageMigAPI: STORAGE_MIGRATION_API.MTC,
@@ -98,22 +122,25 @@ const useStorageMigrationOverviewData: UseStorageMigrationOverviewData = (cluste
 
   if (storageMigAPI === STORAGE_MIGRATION_API.SINGLE_NS && backend) {
     return {
-      loaded: singleNsLoaded,
-      loadError: singleNsError,
+      csvVersion,
+      loaded: singleNsOnlyLoaded,
+      loadError: singleNsOnlyError,
       storageMigAPI: STORAGE_MIGRATION_API.SINGLE_NS,
-      storageMigPlans: (singleNsPlans ?? [])
+      storageMigPlans: (singleNsOnlyPlans ?? [])
         .map((p) => backend.normalizePlanForOverview(p))
         .filter(Boolean),
     };
   }
 
   return {
-    loaded: multiNsLoaded,
-    loadError: multiNsError,
+    csvVersion,
+    loaded: multiNsLoaded && singleNsLoaded,
+    loadError: multiNsError ?? singleNsError,
     storageMigAPI: STORAGE_MIGRATION_API.MULTI_NS,
-    storageMigPlans: (multiNsPlans ?? [])
-      .map((p) => backend?.normalizePlanForOverview(p))
-      .filter(Boolean),
+    storageMigPlans: [
+      ...(multiNsPlans ?? []).map((p) => backend?.normalizePlanForOverview(p)).filter(Boolean),
+      ...(singleNsPlans ?? []).map((p) => normalizeSingleNsPlan(p)).filter(Boolean),
+    ],
   };
 };
 

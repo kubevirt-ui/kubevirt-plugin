@@ -33,3 +33,17 @@ export const csvLoadedIndicatesMultiNsStorageMigrationApi = (
 ): boolean => csvLoaded && csvVersionMeetsMultiNsAssumeThreshold(csvVersion);
 
 export const STORAGE_MIGRATION_CSV_WAIT_AFTER_MULTI_NS_404_MS = 2500;
+
+/**
+ * OpenShift Virtualization 4.23+ → storage migrations list uses the custom route
+ * `/k8s/all-namespaces/storagemigrations` instead of the GVK resource URL.
+ * Spokes running < 4.23 do not register this custom route, so links from
+ * the hub overview to spoke consoles must fall back to the GVK resource URL.
+ */
+export const STORAGE_MIGRATION_CUSTOM_ROUTE_MIN_VERSION: VersionMajorMinor = {
+  major: 4,
+  minor: 23,
+};
+
+export const spokeSupportsCustomMigrationsRoute = (csvVersion: string | undefined): boolean =>
+  versionMeetsMajorMinorThreshold(csvVersion, STORAGE_MIGRATION_CUSTOM_ROUTE_MIN_VERSION);

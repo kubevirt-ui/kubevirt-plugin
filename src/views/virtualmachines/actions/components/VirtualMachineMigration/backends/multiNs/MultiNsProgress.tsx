@@ -1,5 +1,6 @@
 import React, { FC } from 'react';
 
+import { useKubevirtClusterServiceVersion } from '@kubevirt-utils/hooks/useKubevirtClusterServiceVersion';
 import {
   modelToGroupVersionKind,
   MultiNamespaceVirtualMachineStorageMigrationPlanModel,
@@ -15,7 +16,12 @@ import StorageMigrationProgress from '../../components/StorageMigrationProgress'
 
 const MultiNsProgress: FC<ProgressComponentProps> = (props) => {
   const { cluster, storageMigAPI, storageMigrationPlan } = props;
-  const { basePath, isExternal } = useStorageMigrationNavigation(cluster, storageMigAPI);
+  const { installedCSV } = useKubevirtClusterServiceVersion(cluster);
+  const { basePath, isExternal } = useStorageMigrationNavigation(
+    cluster,
+    storageMigAPI,
+    installedCSV?.spec?.version,
+  );
 
   const [multiNsWatchedPlan, , multiNsError] =
     useK8sWatchData<MultiNamespaceVirtualMachineStorageMigrationPlan>(

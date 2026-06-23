@@ -14,7 +14,6 @@ const normalizePlanForOverview = (
 
 export const multiNsBackend: StorageMigrationBackendDescriptor = {
   api: STORAGE_MIGRATION_API.MULTI_NS,
-  listConsolePathUsesResourceUrl: true,
   migrateVMs,
   normalizePlanForOverview,
   overviewUsesClusterScopedPlanWatch: true,

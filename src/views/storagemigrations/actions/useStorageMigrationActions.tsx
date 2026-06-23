@@ -4,10 +4,8 @@ import { useNavigate } from 'react-router';
 import DeleteModal from '@kubevirt-utils/components/DeleteModal/DeleteModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import {
-  modelToRef,
-  MultiNamespaceVirtualMachineStorageMigrationPlanModel,
-} from '@kubevirt-utils/models';
+import { modelToRef } from '@kubevirt-utils/models';
+import { getStorageMigrationPlanModelForKind } from '@kubevirt-utils/resources/migrations/backends';
 import { MultiNamespaceVirtualMachineStorageMigrationPlan } from '@kubevirt-utils/resources/migrations/constants';
 import { asAccessReview, getResourceUrl } from '@kubevirt-utils/resources/shared';
 import {
@@ -27,63 +25,46 @@ const useStorageMigrationActions: ExtensionHook<
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
 
-  const [, inFlight] = useK8sModel(
-    modelToRef(MultiNamespaceVirtualMachineStorageMigrationPlanModel),
-  );
+  const planModel = getStorageMigrationPlanModelForKind(migPlan?.kind);
+  const [, inFlight] = useK8sModel(modelToRef(planModel));
   const labelsModalLauncher = useLabelsModal(migPlan);
   const annotationsModalLauncher = useAnnotationsModal(migPlan);
   const actions = useMemo(
     () => [
       {
-        accessReview: asAccessReview(
-          MultiNamespaceVirtualMachineStorageMigrationPlanModel,
-          migPlan,
-          'patch',
-        ),
+        accessReview: asAccessReview(planModel, migPlan, 'patch'),
         cta: labelsModalLauncher,
         id: 'edit-migplan-labels',
         label: t('Edit labels'),
       },
       {
-        accessReview: asAccessReview(
-          MultiNamespaceVirtualMachineStorageMigrationPlanModel,
-          migPlan,
-          'patch',
-        ),
+        accessReview: asAccessReview(planModel, migPlan, 'patch'),
         cta: annotationsModalLauncher,
         id: 'edit-migplan-annotations',
         label: t('Edit annotations'),
       },
       {
-        accessReview: asAccessReview(
-          MultiNamespaceVirtualMachineStorageMigrationPlanModel,
-          migPlan,
-          'update',
-        ),
+        accessReview: asAccessReview(planModel, migPlan, 'update'),
         cta: () =>
           navigate(
             `${getResourceUrl({
-              model: MultiNamespaceVirtualMachineStorageMigrationPlanModel,
+              model: planModel,
               resource: migPlan,
             })}/yaml`,
           ),
         id: 'edit-migplan-resource',
         label: t('Edit {{kind}}', {
-          kind: MultiNamespaceVirtualMachineStorageMigrationPlanModel.kind,
+          kind: planModel.kind,
         }),
       },
       {
-        accessReview: asAccessReview(
-          MultiNamespaceVirtualMachineStorageMigrationPlanModel,
-          migPlan,
-          'delete',
-        ),
+        accessReview: asAccessReview(planModel, migPlan, 'delete'),
         cta: () =>
           createModal(({ isOpen, onClose }) => (
             <DeleteModal
               onDeleteSubmit={() =>
                 k8sDelete({
-                  model: MultiNamespaceVirtualMachineStorageMigrationPlanModel,
+                  model: planModel,
                   resource: migPlan,
                 })
               }
@@ -96,11 +77,20 @@ const useStorageMigrationActions: ExtensionHook<
         disabled: false,
         id: 'migplan-delete-action',
         label: t('Delete {{kind}}', {
-          kind: MultiNamespaceVirtualMachineStorageMigrationPlanModel.kind,
+          kind: planModel.kind,
         }),
       },
     ],
-    [annotationsModalLauncher, createModal, labelsModalLauncher, migPlan, navigate, t, inFlight],
+    [
+      annotationsModalLauncher,
+      createModal,
+      labelsModalLauncher,
+      migPlan,
+      navigate,
+      planModel,
+      t,
+      inFlight,
+    ],
   );
 
   return [actions, !inFlight, undefined];
