@@ -5,6 +5,7 @@ import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import StateHandler from '@kubevirt-utils/components/StateHandler/StateHandler';
 import useDefaultStorageClass from '@kubevirt-utils/hooks/useDefaultStorage/useDefaultStorageClass';
+import { getPreferredDefaultStorageClass } from '@kubevirt-utils/hooks/useDefaultStorage/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useReadyStorageClasses from '@kubevirt-utils/hooks/useReadyStorageClasses/useReadyStorageClasses';
 import { getPVCStorageClassName } from '@kubevirt-utils/resources/bootableresources/selectors';
@@ -67,14 +68,14 @@ const VirtualMachineMigrateModal: FC<VirtualMachineMigrateModalProps> = ({
     selectedMigrations,
   ]);
 
-  const [{ clusterDefaultStorageClass }, defaultSCLoaded] = useDefaultStorageClass(cluster);
+  const [defaultStorageClasses, defaultSCLoaded] = useDefaultStorageClass(cluster);
   const [{ sortedStorageClasses }, readySCLoaded] = useReadyStorageClasses(cluster);
 
   const scLoaded = defaultSCLoaded && readySCLoaded;
 
   const defaultStorageClassName = useMemo(
-    () => getName(clusterDefaultStorageClass),
-    [clusterDefaultStorageClass],
+    () => getName(getPreferredDefaultStorageClass(defaultStorageClasses)),
+    [defaultStorageClasses],
   );
 
   const destinationStorageClass = useMemo(
