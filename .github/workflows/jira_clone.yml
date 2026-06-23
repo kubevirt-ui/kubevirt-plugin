@@ -1,0 +1,76 @@
+name: Jira Clone & Cherry-Pick
+
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+concurrency:
+  group: jira-clone-${{ github.event.issue.number }}
+  cancel-in-progress: false
+
+jobs:
+  clone-and-cherry-pick:
+    if: |
+      github.event.issue.pull_request &&
+      contains(github.event.comment.body, '/clone') &&
+      (
+        github.event.comment.author_association == 'MEMBER' ||
+        github.event.comment.author_association == 'OWNER' ||
+        github.event.comment.author_association == 'COLLABORATOR'
+      )
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get PR details
+        id: pr
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const { data: pr } = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+            });
+            core.setOutput('title', pr.title);
+            core.setOutput('head_sha', pr.head.sha);
+            core.setOutput('merge_commit_sha', pr.merge_commit_sha || '');
+            core.setOutput('base_branch', pr.base.ref);
+
+      - name: Checkout full repo
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+
+      - name: Install script dependencies
+        working-directory: .github/scripts
+        run: npm ci
+
+      - name: Run clone and cherry-pick
+        working-directory: .github/scripts
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          JIRA_TOKEN: ${{ secrets.JIRA_TOKEN }}
+          PR_NUMBER: ${{ github.event.issue.number }}
+          PR_TITLE: ${{ steps.pr.outputs.title }}
+          HEAD_SHA: ${{ steps.pr.outputs.head_sha }}
+          MERGE_COMMIT_SHA: ${{ steps.pr.outputs.merge_commit_sha }}
+          COMMENT_BODY: ${{ github.event.comment.body }}
+          COMMENT_AUTHOR_ASSOCIATION: ${{ github.event.comment.author_association }}
+          REPO_OWNER: ${{ github.repository_owner }}
+          REPO_NAME: ${{ github.event.repository.name }}
+        run: npx tsx src/clone-pr.ts
