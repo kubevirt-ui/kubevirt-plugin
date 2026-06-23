@@ -70,11 +70,7 @@
     "@patternfly/react-icons": "^4.82.8",
     "@patternfly/react-table": "^4.100.8",
     "@types/byte-size": "^8.1.0",
-<<<<<<< HEAD
-    "axios": "1.15.2",
-=======
-    "axios": "^1.15.0",
->>>>>>> ec2e26246 ( Added ^ to axios version to make sure the codebase is using the patched version)
+    "axios": "1.16.0",
     "byte-size": "^8.1.0",
     "classnames": "^2.3.1",
     "date-fns": "^2.28.0",
