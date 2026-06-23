@@ -1,11 +1,18 @@
+import { useMemo } from 'react';
+
 import {
   ConfigMapModel,
   modelToGroupVersionKind,
   UserModel,
 } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { isConsoleUserSettingsLocalStorage } from '@kubevirt-utils/hooks/consoleUserSettings/utils';
+import { getName, getUID } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
+import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+
+import { hashUsernameForSettings } from './utils';
 
 const CONSOLE_USER_SETTINGS_NAMESPACE = 'openshift-console-user-settings';
 const CONSOLE_USER_SETTINGS_CONFIG_MAP_PREFIX = 'user-settings-';
@@ -28,17 +35,30 @@ type UseConsoleUserSettingsConfigMap = (cluster?: string) => {
  * @returns Object containing userConfigMap, loading states, errors, userName, and configMapName
  */
 const useConsoleUserSettingsConfigMap: UseConsoleUserSettingsConfigMap = (cluster) => {
-  const [user, loadedUser, errorUser] = useK8sWatchData<IoK8sApiCoreV1ConfigMap>({
+  const [user, loadedUser, errorUser] = useK8sWatchData<K8sResourceCommon>({
     cluster,
     groupVersionKind: modelToGroupVersionKind(UserModel),
     name: '~',
   });
 
-  const userName = user?.metadata?.uid || user?.metadata?.name?.replace(/[^-._a-zA-Z0-9]+/g, '-');
-  const configMapName = userName ? `${CONSOLE_USER_SETTINGS_CONFIG_MAP_PREFIX}${userName}` : null;
+  const username = getName(user);
+  const uid = getUID(user);
+
+  const userSettingsId = useMemo(
+    () => (loadedUser ? hashUsernameForSettings(username ?? '', uid) : null),
+    [loadedUser, uid, username],
+  );
+  const userSettingsIdLoaded = loadedUser;
+
+  const configMapName = userSettingsId
+    ? `${CONSOLE_USER_SETTINGS_CONFIG_MAP_PREFIX}${userSettingsId}`
+    : null;
+
+  const shouldWatchConfigMap =
+    !isConsoleUserSettingsLocalStorage() && userSettingsIdLoaded && !!configMapName;
 
   const [userConfigMap, loadedConfigMap, configMapError] = useK8sWatchData<IoK8sApiCoreV1ConfigMap>(
-    configMapName
+    shouldWatchConfigMap
       ? {
           cluster,
           groupVersionKind: modelToGroupVersionKind(ConfigMapModel),
@@ -52,10 +72,12 @@ const useConsoleUserSettingsConfigMap: UseConsoleUserSettingsConfigMap = (cluste
     configMapError,
     configMapName,
     errorUser,
-    loadedConfigMap: loadedConfigMap || !isEmpty(configMapError),
+    loadedConfigMap:
+      isConsoleUserSettingsLocalStorage() ||
+      ((loadedConfigMap || !isEmpty(configMapError)) && userSettingsIdLoaded),
     loadedUser: loadedUser || !isEmpty(errorUser),
     userConfigMap: isEmpty(userConfigMap) ? undefined : userConfigMap,
-    userName,
+    userName: userSettingsId ?? undefined,
   };
 };
 

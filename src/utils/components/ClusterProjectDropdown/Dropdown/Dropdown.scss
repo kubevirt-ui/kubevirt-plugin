@@ -54,4 +54,8 @@
   &__menu-content {
     max-height: 50vh;
   }
+
+  &__system-switch {
+    padding: var(--pf-t--global--spacer--sm) var(--pf-t--global--spacer--md);
+  }
 }

@@ -1,4 +1,4 @@
-import React, { FC, JSX, useMemo } from 'react';
+import React, { FC, JSX, useCallback, useMemo } from 'react';
 
 import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import Dropdown, {
@@ -6,12 +6,17 @@ import Dropdown, {
 } from '@kubevirt-utils/components/ClusterProjectDropdown/Dropdown/Dropdown';
 import { ALL_PROJECTS } from '@kubevirt-utils/hooks/constants';
 import useConsoleNamespaceBookmarks from '@kubevirt-utils/hooks/useConsoleNamespaceBookmarks/useConsoleNamespaceBookmarks';
+import useConsoleShowSystemNamespaces from '@kubevirt-utils/hooks/useConsoleShowSystemNamespaces/useConsoleShowSystemNamespaces';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { isSystemNamespace } from '@kubevirt-utils/resources/namespace/helper';
 import { getName } from '@kubevirt-utils/resources/shared';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
+import { extractName } from './utils';
+
 type NamespaceDropdownProps = {
+  bookmarkCluster?: string;
   cluster?: string;
   disabled?: boolean;
   disabledTooltip?: string;
@@ -21,6 +26,7 @@ type NamespaceDropdownProps = {
 };
 
 const NamespaceDropdown: FC<NamespaceDropdownProps> = ({
+  bookmarkCluster,
   cluster,
   disabled = false,
   disabledTooltip,
@@ -29,6 +35,7 @@ const NamespaceDropdown: FC<NamespaceDropdownProps> = ({
   selectedProject,
 }): JSX.Element => {
   const { t } = useKubevirtTranslation();
+  const settingsCluster = bookmarkCluster ?? cluster;
 
   const [projects, projectsLoaded] = useK8sWatchData<K8sResourceCommon[]>({
     cluster,
@@ -37,7 +44,15 @@ const NamespaceDropdown: FC<NamespaceDropdownProps> = ({
     namespaced: false,
   });
 
-  const [bookmarks, updateBookmarks, bookmarksLoaded] = useConsoleNamespaceBookmarks(cluster);
+  const [bookmarks, updateBookmarks, bookmarksLoaded] =
+    useConsoleNamespaceBookmarks(settingsCluster);
+  const [showSystemNamespaces, setShowSystemNamespaces, showSystemLoaded] =
+    useConsoleShowSystemNamespaces(settingsCluster);
+
+  const hasSystemNamespaces = useMemo(
+    () => (projects || []).some((project) => isSystemNamespace(getName(project))),
+    [projects],
+  );
 
   const config: DropdownConfig = useMemo(
     () => ({
@@ -52,33 +67,48 @@ const NamespaceDropdown: FC<NamespaceDropdownProps> = ({
     [t],
   );
 
-  const wrappedUpdateBookmarks = useMemo(
+  const bookmarksProp = useMemo(
+    () => ({
+      bookmarks: bookmarks || {},
+      bookmarksLoaded,
+      updateBookmarks: updateBookmarks ?? null,
+    }),
+    [bookmarks, bookmarksLoaded, updateBookmarks],
+  );
+
+  const onShowSystemNamespacesChange = useCallback(
+    (showSystem: boolean) => {
+      void setShowSystemNamespaces(showSystem);
+    },
+    [setShowSystemNamespaces],
+  );
+
+  const showSystemToggle = useMemo(
     () =>
-      updateBookmarks
-        ? async (newBookmarks: Record<string, boolean>): Promise<Record<string, boolean>> => {
-            return await updateBookmarks(newBookmarks);
+      showSystemLoaded
+        ? {
+            hasSystemItems: hasSystemNamespaces,
+            onChange: onShowSystemNamespacesChange,
+            show: showSystemNamespaces,
           }
-        : null,
-    [updateBookmarks],
+        : undefined,
+    [hasSystemNamespaces, onShowSystemNamespacesChange, showSystemLoaded, showSystemNamespaces],
   );
 
   return (
     <Dropdown<K8sResourceCommon>
-      bookmarks={{
-        bookmarks: bookmarks || {},
-        bookmarksLoaded,
-        updateBookmarks: wrappedUpdateBookmarks,
-      }}
+      bookmarks={bookmarksProp}
       config={config}
       disabled={disabled}
       disabledTooltip={disabledTooltip}
-      extractKey={(proj) => getName(proj)}
-      extractTitle={(proj) => getName(proj)}
+      extractKey={extractName}
+      extractTitle={extractName}
       includeAllItems={includeAllProjects}
       items={projects || null}
       itemsLoaded={projectsLoaded}
       onChange={onChange}
       selectedItem={selectedProject}
+      showSystemToggle={showSystemToggle}
     />
   );
 };

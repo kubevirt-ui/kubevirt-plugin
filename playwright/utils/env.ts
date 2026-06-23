@@ -1,3 +1,8 @@
+import {
+  KUBE_ADMIN_USERNAME,
+  KUBEADMIN_SETTINGS_ID,
+} from '../../src/utils/hooks/useConsoleUserSettingsConfigMap/consts';
+
 /** Environment variables consumed by Playwright tests. */
 export const env = {
   baseURL: (() => {
@@ -7,10 +12,10 @@ export const env = {
   })(),
 
   cnvNamespace: process.env.CNV_NS ?? 'openshift-cnv',
-  kubeadminIdp: process.env.BRIDGE_HTPASSWD_IDP ?? 'kube:admin',
+  kubeadminIdp: process.env.BRIDGE_HTPASSWD_IDP ?? KUBE_ADMIN_USERNAME,
   kubeadminPassword: process.env.BRIDGE_KUBEADMIN_PASSWORD ?? '',
 
-  kubeadminUsername: process.env.BRIDGE_HTPASSWD_USERNAME ?? 'kubeadmin',
+  kubeadminUsername: process.env.BRIDGE_HTPASSWD_USERNAME ?? KUBEADMIN_SETTINGS_ID,
   osImagesNamespace: process.env.OS_IMAGES_NS ?? 'openshift-virtualization-os-images',
   testNamespace: process.env.TEST_NS ?? '',
   testSecretName: process.env.TEST_SECRET_NAME ?? '',
