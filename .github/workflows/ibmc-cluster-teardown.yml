@@ -1,0 +1,130 @@
+name: IBM Cloud Hot Cluster Teardown
+
+on:
+  workflow_dispatch:
+    inputs:
+      cluster_name:
+        description: 'Cluster name to tear down'
+        required: true
+        default: 'kubevirt-plugin-ci'
+        type: string
+  workflow_call:
+    inputs:
+      cluster_name:
+        description: 'Cluster name to tear down'
+        required: false
+        default: 'kubevirt-plugin-ci'
+        type: string
+    secrets:
+      IC_KEY:
+        required: true
+
+permissions:
+  contents: read
+
+env:
+  CLUSTER_NAME: ${{ inputs.cluster_name || 'kubevirt-plugin-ci' }}
+
+jobs:
+  teardown:
+    name: Tear Down Hot Cluster
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    steps:
+      - name: Setup IBM Cloud CLI
+        uses: IBM/actions-ibmcloud-cli@953e229550655a880eda6ecfb01fbbdf12f119a5
+        with:
+          api_key: ${{ secrets.IC_KEY }}
+          region: eu-de
+          group: cnv-ui
+          plugins: kubernetes-service
+
+      - name: Check cluster exists
+        id: check_cluster
+        run: |
+          OUTPUT=$(ibmcloud oc cluster get --cluster "${CLUSTER_NAME}" --output json 2>&1) && EXIT=0 || EXIT=$?
+
+          if [[ ${EXIT} -eq 0 ]]; then
+            echo "Cluster '${CLUSTER_NAME}' found"
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+
+            ibmcloud oc cluster config --cluster "${CLUSTER_NAME}" --admin || true
+          elif grep -qE 'G0004|could not be found' <<< "${OUTPUT}"; then
+            echo "Cluster '${CLUSTER_NAME}' not found, nothing to tear down"
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "ERROR: Failed to check cluster '${CLUSTER_NAME}':"
+            echo "${OUTPUT}"
+            exit 1
+          fi
+
+      - name: Checkout
+        if: steps.check_cluster.outputs.exists == 'true'
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+        with:
+          persist-credentials: false
+
+      - name: Setup Helm
+        if: steps.check_cluster.outputs.exists == 'true'
+        uses: azure/setup-helm@bf6a7d304bc2fdb57e0331155b7ebf2c504acf0a # v4
+        with:
+          version: '3.19.0'
+
+      - name: Deregister ARC runners
+        if: steps.check_cluster.outputs.exists == 'true'
+        continue-on-error: true
+        run: |
+          ./ci-scripts/arc/uninstall-arc.sh
+
+      - name: Delete cluster
+        if: steps.check_cluster.outputs.exists == 'true'
+        run: |
+          echo "Deleting cluster '${CLUSTER_NAME}'..."
+          ibmcloud oc cluster rm --cluster "${CLUSTER_NAME}" -f --force-delete-storage
+          echo "Cluster deletion initiated"
+
+          echo "Waiting for cluster to be fully removed..."
+          MAX_WAIT=7200  # 2 hours
+          INTERVAL=30
+          ELAPSED=0
+
+          while [[ ${ELAPSED} -lt ${MAX_WAIT} ]]; do
+            OUTPUT=$(ibmcloud oc cluster get --cluster "${CLUSTER_NAME}" --output json 2>&1) && EXIT=0 || EXIT=$?
+
+            if [[ ${EXIT} -eq 0 ]]; then
+              echo "[$(date '+%H:%M:%S')] Cluster still being deleted... (${ELAPSED}s elapsed)"
+              sleep ${INTERVAL}
+              ELAPSED=$((ELAPSED + INTERVAL))
+            elif grep -qE 'G0004|could not be found' <<< "${OUTPUT}"; then
+              echo "Cluster has been removed"
+              break
+            else
+              echo "[$(date '+%H:%M:%S')] WARNING: Failed to check cluster status (will retry):"
+              echo "${OUTPUT}"
+              sleep ${INTERVAL}
+              ELAPSED=$((ELAPSED + INTERVAL))
+            fi
+          done
+
+          OUTPUT=$(ibmcloud oc cluster get --cluster "${CLUSTER_NAME}" --output json 2>&1) && EXIT=0 || EXIT=$?
+          if [[ ${EXIT} -eq 0 ]]; then
+            echo "::error::Timed out waiting for cluster deletion"
+            exit 1
+          elif grep -qE 'G0004|could not be found' <<< "${OUTPUT}"; then
+            echo "Cluster deletion confirmed"
+          else
+            echo "ERROR: Failed to verify cluster deletion for '${CLUSTER_NAME}':"
+            echo "${OUTPUT}"
+            exit 1
+          fi
+
+      - name: Teardown summary
+        if: always()
+        run: |
+          echo "## Hot Cluster Teardown Summary" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Parameter | Value |" >> "$GITHUB_STEP_SUMMARY"
+          echo "|-----------|-------|" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Cluster | \`${CLUSTER_NAME}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Cluster Found | \`${{ steps.check_cluster.outputs.exists }}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"

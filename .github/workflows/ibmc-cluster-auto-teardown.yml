@@ -1,0 +1,25 @@
+name: IBM Cloud Hot Cluster Auto-Teardown
+
+on:
+  schedule:
+    # Runs daily at 02:00 UTC (safety net for forgotten clusters)
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+    inputs:
+      cluster_name:
+        description: 'Cluster name to tear down'
+        required: true
+        default: 'kubevirt-plugin-ci'
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  auto-teardown:
+    name: Auto-Teardown Hot Cluster
+    uses: ./.github/workflows/ibmc-cluster-teardown.yml
+    with:
+      cluster_name: ${{ inputs.cluster_name || 'kubevirt-plugin-ci' }}
+    secrets:
+      IC_KEY: ${{ secrets.IC_KEY }}

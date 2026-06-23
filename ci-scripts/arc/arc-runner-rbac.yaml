@@ -1,0 +1,79 @@
+# Grant the ARC runner scale set ServiceAccount CI permissions.
+# gha-runner-scale-set creates: <RUNNER_SCALE_SET_NAME>-gha-rs-no-permission
+#   (default: kubevirt-plugin-ci-gha-rs-no-permission).
+#
+# Applied automatically by ci-scripts/arc/install-runner-scale-set.sh.
+# Subject name + namespace substituted for RUNNER_SCALE_SET_NAME / ARC_RUNNERS_NS.
+# Manual apply (defaults only):
+#   oc apply -f ci-scripts/arc/arc-runner-rbac.yaml
+#
+# To skip cluster RBAC (custom bindings): SKIP_ARC_RUNNER_RBAC=1
+#
+# If RUNNER_SCALE_SET_NAME differs from defaults and you apply this file by hand,
+# edit subjects or use:
+#   oc create clusterrolebinding arc-runner-ci-custom --clusterrole=arc-runner-ci \
+#     --serviceaccount=<ns>:<scale-set>-gha-rs-no-permission
+#
+# NOTE: The runner's ConfigMap access in the ci-env namespace is granted via a
+# namespaced RoleBinding created by ci-scripts/ci-env/install-ci-env-controller.sh,
+# not by this ClusterRole.
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: arc-runner-ci
+  labels:
+    app.kubernetes.io/component: arc-runner-rbac
+rules:
+  # --- Cluster reads (console URL, version logging) ---
+  - apiGroups: ['']
+    resources: ['nodes']
+    verbs: ['get', 'list']
+  - apiGroups: ['config.openshift.io']
+    resources: ['consoles', 'clusterversions', 'ingresses']
+    verbs: ['get', 'list']
+
+  # --- Diagnostics (pod logs, events in test namespaces) ---
+  - apiGroups: ['']
+    resources: ['pods', 'pods/log', 'events']
+    verbs: ['get', 'list']
+
+  # --- Cypress cy.exec runs: oc patch virtualmachine ---
+  - apiGroups: ['kubevirt.io']
+    resources: ['virtualmachines']
+    verbs: ['get', 'list', 'watch', 'patch']
+
+  # --- check-runner job: HCO / operator version logging ---
+  - apiGroups: ['operators.coreos.com']
+    resources: ['clusterserviceversions']
+    verbs: ['get', 'list']
+  - apiGroups: ['kubevirt.io']
+    resources: ['kubevirts']
+    verbs: ['get', 'list']
+  - apiGroups: ['cdi.kubevirt.io']
+    resources: ['cdis']
+    verbs: ['get', 'list']
+  - apiGroups: ['ssp.kubevirt.io']
+    resources: ['ssps']
+    verbs: ['get', 'list']
+  - apiGroups: ['networkaddonsoperator.network.kubevirt.io']
+    resources: ['networkaddonsconfigs']
+    verbs: ['get', 'list']
+  - apiGroups: ['hostpathprovisioner.kubevirt.io']
+    resources: ['hostpathprovisioners']
+    verbs: ['get', 'list']
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: arc-runner-ci
+  labels:
+    app.kubernetes.io/component: arc-runner-rbac
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: arc-runner-ci
+subjects:
+  - kind: ServiceAccount
+    name: kubevirt-plugin-ci-gha-rs-no-permission
+    namespace: arc-runners
