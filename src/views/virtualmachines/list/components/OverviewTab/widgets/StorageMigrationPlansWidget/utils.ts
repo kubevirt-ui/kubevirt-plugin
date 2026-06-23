@@ -29,12 +29,12 @@ export const getStorageMigrationStatusCounts = (
 
     if (hasFailed || hasInvalid) {
       other++;
+    } else if (completed) {
+      other++;
     } else if (hasInProgress) {
       running++;
-    } else if (!completed) {
-      pending++;
     } else {
-      other++;
+      pending++;
     }
   }
 

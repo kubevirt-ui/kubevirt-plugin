@@ -1,22 +1,29 @@
-import React, { FC } from 'react';
+import React, { ComponentClass, FC } from 'react';
 
 import { Button, ButtonVariant } from '@patternfly/react-core';
 import { getVMStatusIcon } from '@virtualmachines/utils';
 
 type StatusPopoverButtonProps = {
-  vmPrintableStatus: string;
+  displayLabel?: string;
+  statusIcon?: ComponentClass | FC;
+  vmPrintableStatus?: string;
 };
 
-const StatusPopoverButton: FC<StatusPopoverButtonProps> = ({ vmPrintableStatus }) => {
-  if (!vmPrintableStatus) return null;
+const StatusPopoverButton: FC<StatusPopoverButtonProps> = ({
+  displayLabel,
+  statusIcon,
+  vmPrintableStatus,
+}) => {
+  if (!vmPrintableStatus && !displayLabel) return null;
 
-  const Icon = getVMStatusIcon(vmPrintableStatus);
+  const Icon = statusIcon ?? getVMStatusIcon(vmPrintableStatus);
+  const label = displayLabel ?? vmPrintableStatus;
 
   return (
     <span>
       <Icon />{' '}
       <Button isInline variant={ButtonVariant.link}>
-        {vmPrintableStatus}
+        {label}
       </Button>
     </span>
   );

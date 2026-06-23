@@ -9,10 +9,12 @@ import { getPreferredDefaultStorageClass } from '@kubevirt-utils/hooks/useDefaul
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useReadyStorageClasses from '@kubevirt-utils/hooks/useReadyStorageClasses/useReadyStorageClasses';
 import { getPVCStorageClassName } from '@kubevirt-utils/resources/bootableresources/selectors';
+import type { StorageMigrationAPI } from '@kubevirt-utils/resources/migrations/constants';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { isDNS1123Label } from '@kubevirt-utils/utils/validation';
 import { getCluster } from '@multicluster/helpers/selectors';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { Modal, ModalBody, Wizard, WizardHeader, WizardStep } from '@patternfly/react-core';
 
 import useMigrationNamespacesPVCs from './hooks/useMigrationNamespacesPVCs';
@@ -21,7 +23,7 @@ import VirtualMachineMigrationDestinationTab from './tabs/VirtualMachineMigratio
 import VirtualMachineMigrationDetails from './tabs/VirtualMachineMigrationDetails';
 import VirtualMachineMigrationReviewTab from './tabs/VirtualMachineMigrationReviewTab';
 import { SelectedMigration } from './utils/constants';
-import { generateMigPlanName } from './utils/migrateVMs';
+import { generateMigPlanName } from './utils/shared';
 import { getAllSelectedMigrations } from './utils/utils';
 import VirtualMachineMigrationStatus from './VirtualMachineMigrationStatus';
 
@@ -30,17 +32,20 @@ import './virtual-machine-migration-modal.scss';
 export type VirtualMachineMigrateModalProps = {
   isOpen: boolean;
   onClose: () => Promise<void> | void;
+  storageMigAPI: StorageMigrationAPI;
   vms: V1VirtualMachine[];
 };
 
 const VirtualMachineMigrateModal: FC<VirtualMachineMigrateModalProps> = ({
   isOpen,
   onClose,
+  storageMigAPI,
   vms,
 }) => {
   const { t } = useKubevirtTranslation();
 
-  const cluster = getCluster(vms?.[0]);
+  const clusterParam = useClusterParam();
+  const cluster = getCluster(vms?.[0]) ?? clusterParam ?? undefined;
   const [selectedStorageClass, setSelectedStorageClass] = useState('');
   const [migrationPlanName, setMigrationPlanName] = useState(() => generateMigPlanName(vms));
   const [keepOriginalVolumes, setKeepOriginalVolumes] = useState(false);
@@ -89,6 +94,7 @@ const VirtualMachineMigrateModal: FC<VirtualMachineMigrateModalProps> = ({
       destinationStorageClass,
       migrationPlanName,
       keepOriginalVolumes,
+      storageMigAPI,
     );
 
   const nothingSelected = isEmpty(selectedPVCs);
@@ -131,7 +137,12 @@ const VirtualMachineMigrateModal: FC<VirtualMachineMigrateModalProps> = ({
           loaded={migrationNamespacesPVCsLoaded && selectedMigrations !== null}
         >
           {migrationStarted ? (
-            <VirtualMachineMigrationStatus onClose={onClose} storageMigrationPlan={migrationPlan} />
+            <VirtualMachineMigrationStatus
+              cluster={cluster}
+              onClose={onClose}
+              storageMigAPI={storageMigAPI}
+              storageMigrationPlan={migrationPlan}
+            />
           ) : (
             <Wizard
               header={
