@@ -4,6 +4,8 @@ import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchReso
 import useListClusters from '@kubevirt-utils/hooks/useListClusters';
 import { getGroupVersionKindForModel } from '@openshift-console/dynamic-plugin-sdk';
 
+import isResourceNotFoundError from './isResourceNotFoundError';
+
 type UseVirtualMachineTemplateRequests = (
   namespace?: string,
   enabled?: boolean,
@@ -34,9 +36,11 @@ const useVirtualMachineTemplateRequests: UseVirtualMachineTemplateRequests = (
       : null,
   );
 
+  const is404 = isResourceNotFoundError(loadError);
+
   return {
-    error: loadError,
-    loaded,
+    error: is404 ? undefined : loadError,
+    loaded: enabled ? loaded || !!loadError : true,
     vmTemplateRequests: vmTemplateRequests ?? [],
   };
 };
