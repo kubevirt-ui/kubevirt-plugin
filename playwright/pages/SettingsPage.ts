@@ -15,7 +15,9 @@ const MEMORY_DENSITY_DISABLE_CONFIRM_BUTTON = 'memory-density-disable-confirm-bu
 const MEMORY_DENSITY_MODIFY_BUTTON = 'memory-density-modify-button';
 const MEMORY_DENSITY_SAVE_BUTTON = 'memory-density-save-button';
 const MEMORY_DENSITY_SLIDER = 'memory-density-slider';
+const CLUSTER_TAB = 'Cluster';
 const PREVIEW_FEATURES_TAB = 'Preview features';
+const SETTINGS_HEADING = 'Settings';
 const SAVE_BUTTON = 'save-button';
 const SELECT_PROJECT_TOGGLE = 'select-project-toggle';
 const SELECT_SECRET = 'select-secret';
@@ -24,6 +26,16 @@ export class SettingsPage {
   constructor(private readonly page: Page) {}
 
   // ── SSH key configuration ─────────────────────────────────────────────────────
+
+  /** Wait for the settings shell — works regardless of which tab is active. */
+  private async expectSettingsPageLoaded() {
+    await expect(this.page.getByRole('heading', { level: 1, name: SETTINGS_HEADING })).toBeVisible({
+      timeout: NAV_TIMEOUT,
+    });
+    await expect(this.page.getByRole('tab', { exact: true, name: CLUSTER_TAB })).toBeVisible({
+      timeout: NAV_TIMEOUT,
+    });
+  }
 
   private async toggleVMActionsConfirmation(enable: boolean, retries: number) {
     for (let attempt = 1; attempt <= retries; attempt++) {
@@ -41,13 +53,12 @@ export class SettingsPage {
       } catch (err) {
         if (attempt === retries) throw err;
         await this.page.waitForLoadState('domcontentloaded');
-        await this.page
-          .getByText('Configure features')
-          .waitFor({ timeout: NAV_TIMEOUT })
-          .catch(() => {});
+        await this.expectSettingsPageLoaded().catch(() => {});
       }
     }
   }
+
+  // ── Section clicks ───────────────────────────────────────────────────────────
 
   async configureSSHSecret(ns: string, secretName: string) {
     await byTestId(this.page, SELECT_PROJECT_TOGGLE).click();
@@ -61,7 +72,7 @@ export class SettingsPage {
     await byTest(this.page, SAVE_BUTTON).click();
   }
 
-  // ── Section clicks ───────────────────────────────────────────────────────────
+  // ── VM Actions confirmation ───────────────────────────────────────────────────
 
   async disableMemoryDensity() {
     await this.openSection(GENERAL_SETTINGS_SECTION);
@@ -82,8 +93,6 @@ export class SettingsPage {
       timeout: NAV_TIMEOUT,
     });
   }
-
-  // ── VM Actions confirmation ───────────────────────────────────────────────────
 
   /** Disable VM actions confirmation, retrying if the page reloads during the click. */
   async disableVMActionsConfirmation(retries = DEFAULT_RETRIES) {
@@ -120,12 +129,12 @@ export class SettingsPage {
     }
   }
 
+  // ── Assertions ────────────────────────────────────────────────────────────────
+
   /** Enable VM actions confirmation, retrying if the page reloads during the click. */
   async enableVMActionsConfirmation(retries = DEFAULT_RETRIES) {
     await this.toggleVMActionsConfirmation(true, retries);
   }
-
-  // ── Assertions ────────────────────────────────────────────────────────────────
 
   async expectInstalledVersion(versionPrefix: string) {
     await expect(byTestId(this.page, GENERAL_INFORMATION_INSTALLED_VERSION)).toContainText(
@@ -149,17 +158,11 @@ export class SettingsPage {
     await this.page.goto(`/k8s/ns/${env.cnvNamespace}/virtualization-settings`, {
       waitUntil: 'domcontentloaded',
     });
-    await expect(this.page.locator('[data-test-id]').first()).toBeVisible({
-      timeout: NAV_TIMEOUT,
-    });
-    await this.page.getByText('Configure features').waitFor({ timeout: NAV_TIMEOUT });
+    await this.expectSettingsPageLoaded();
   }
 
   async navigateToSSHKeys() {
     await this.navigate();
-    await expect(byTestId(this.page, GENERAL_INFORMATION_INSTALLED_VERSION)).toBeVisible({
-      timeout: NAV_TIMEOUT,
-    });
     await this.page.getByRole('tab', { exact: true, name: 'User' }).click();
     // Wait for the URL hash to reflect the tab change before navigating to #ssh-keys
     await this.page.waitForURL(/user/, { timeout: SHORT_TIMEOUT }).catch(() => {});

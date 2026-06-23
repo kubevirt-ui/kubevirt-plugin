@@ -10,6 +10,7 @@ import {
 } from '../pages/ResourceListPage';
 import { SettingsPage } from '../pages/SettingsPage';
 import { TemplatesPage } from '../pages/TemplatesPage';
+import { VMTreeViewPage } from '../pages/vm-tree';
 import { VMDetailsPage } from '../pages/VMDetailsPage';
 import { VMListPage } from '../pages/VMListPage';
 
@@ -24,6 +25,7 @@ type KubevirtFixtures = {
   templatesPage: TemplatesPage;
   vmDetails: VMDetailsPage;
   vmList: VMListPage;
+  vmTreeView: VMTreeViewPage;
 };
 
 export const test = base.extend<KubevirtFixtures>({
@@ -67,6 +69,10 @@ export const test = base.extend<KubevirtFixtures>({
 
   vmList: async ({ page }, use) => {
     await use(new VMListPage(page));
+  },
+
+  vmTreeView: async ({ page }, use) => {
+    await use(new VMTreeViewPage(page));
   },
 });
 

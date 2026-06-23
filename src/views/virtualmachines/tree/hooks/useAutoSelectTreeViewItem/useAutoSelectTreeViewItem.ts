@@ -5,14 +5,21 @@ import { runningTourSignal } from '@kubevirt-utils/components/GuidedTour/utils/g
 import { ALL_NAMESPACES, ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import useLocalStorage from '@kubevirt-utils/hooks/useLocalStorage';
 import { SINGLE_CLUSTER_KEY } from '@kubevirt-utils/resources/constants';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { getVMListURL } from '@multicluster/urls';
 import useIsACMPage from '@multicluster/useIsACMPage';
 import { useLastNamespace } from '@openshift-console/dynamic-plugin-sdk-internal';
+import { useSignals } from '@preact/signals-react/runtime';
 import { TEXT_FILTER_LABELS_ID } from '@virtualmachines/list/hooks/constants';
 
 import { FOLDER_SELECTOR_PREFIX, HIDE, SHOW_EMPTY_PROJECTS_KEY } from '../../utils/constants';
-import { getVMInfoFromPathname, getVMTreeViewItemID } from '../../utils/utils';
+import { vmsSignal } from '../../utils/signals';
+import {
+  getEffectiveShowEmptyProjects,
+  getVMInfoFromPathname,
+  getVMTreeViewItemID,
+} from '../../utils/utils';
 import useTreeViewSelect from '../useTreeViewSelect';
 
 import {
@@ -23,6 +30,7 @@ import {
 } from './utils';
 
 const useAutoSelectTreeViewItem = ({ dataMap, loaded }: UseAutoSelectTreeViewItemProps) => {
+  useSignals();
   const [selected, onSelect, setSelected] = useTreeViewSelect();
 
   const [searchParams] = useSearchParams();
@@ -34,6 +42,8 @@ const useAutoSelectTreeViewItem = ({ dataMap, loaded }: UseAutoSelectTreeViewIte
   const cluster = useClusterParam();
   const { ns } = useParams<{ ns: string }>();
   const [showEmptyProjects] = useLocalStorage(SHOW_EMPTY_PROJECTS_KEY, HIDE);
+  const hasVMs = !isEmpty(vmsSignal.value);
+  const effectiveShowEmptyProjects = getEffectiveShowEmptyProjects(hasVMs, showEmptyProjects);
 
   // Select VM tree view item based on path
   useEffect(() => {
@@ -57,7 +67,7 @@ const useAutoSelectTreeViewItem = ({ dataMap, loaded }: UseAutoSelectTreeViewIte
 
       const projectTreeItem = getProjectTreeItem(dataMap, cluster, ns);
 
-      if (projectTreeItem && isProjectVisibleInTree(projectTreeItem, showEmptyProjects)) {
+      if (projectTreeItem && isProjectVisibleInTree(projectTreeItem, effectiveShowEmptyProjects)) {
         if (selected?.id !== projectTreeItem.id) {
           setSelected(projectTreeItem);
         }
@@ -80,6 +90,7 @@ const useAutoSelectTreeViewItem = ({ dataMap, loaded }: UseAutoSelectTreeViewIte
   }, [
     cluster,
     dataMap,
+    effectiveShowEmptyProjects,
     isACMPage,
     loaded,
     location.pathname,
@@ -88,7 +99,6 @@ const useAutoSelectTreeViewItem = ({ dataMap, loaded }: UseAutoSelectTreeViewIte
     searchParams,
     selected?.id,
     setSelected,
-    showEmptyProjects,
   ]);
 
   // Select namespace based on current URL and filter state
@@ -121,7 +131,10 @@ const useAutoSelectTreeViewItem = ({ dataMap, loaded }: UseAutoSelectTreeViewIte
       if (ns) {
         const projectTreeItem = getProjectTreeItem(dataMap, SINGLE_CLUSTER_KEY, ns);
 
-        if (projectTreeItem && isProjectVisibleInTree(projectTreeItem, showEmptyProjects)) {
+        if (
+          projectTreeItem &&
+          isProjectVisibleInTree(projectTreeItem, effectiveShowEmptyProjects)
+        ) {
           setSelected(projectTreeItem);
           return;
         }
@@ -142,7 +155,7 @@ const useAutoSelectTreeViewItem = ({ dataMap, loaded }: UseAutoSelectTreeViewIte
     if (ns) {
       const projectTreeItem = getProjectTreeItem(dataMap, SINGLE_CLUSTER_KEY, ns);
 
-      if (projectTreeItem && !isProjectVisibleInTree(projectTreeItem, showEmptyProjects)) {
+      if (projectTreeItem && !isProjectVisibleInTree(projectTreeItem, effectiveShowEmptyProjects)) {
         selectNamespaceOrFallback();
         return;
       }
@@ -154,6 +167,7 @@ const useAutoSelectTreeViewItem = ({ dataMap, loaded }: UseAutoSelectTreeViewIte
     }
   }, [
     dataMap,
+    effectiveShowEmptyProjects,
     isACMPage,
     loaded,
     location.pathname,
@@ -164,7 +178,6 @@ const useAutoSelectTreeViewItem = ({ dataMap, loaded }: UseAutoSelectTreeViewIte
     selected?.id,
     setLastNamespace,
     setSelected,
-    showEmptyProjects,
   ]);
 
   return {

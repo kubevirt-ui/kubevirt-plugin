@@ -520,6 +520,7 @@
   "Create a new VM by selecting an operating system and the right performance for your workload.": "Create a new VM by selecting an operating system and the right performance for your workload.",
   "Create a pre-configured VM using standardized images. This option requires an existing template.": "Create a pre-configured VM using standardized images. This option requires an existing template.",
   "Create a VirtualMachine from a template": "Create a VirtualMachine from a template",
+  "Create a VirtualMachine to enable this filter.": "Create a VirtualMachine to enable this filter.",
   "Create a VM": "Create a VM",
   "Create activation key": "Create activation key",
   "Create application-aware quota": "Create application-aware quota",

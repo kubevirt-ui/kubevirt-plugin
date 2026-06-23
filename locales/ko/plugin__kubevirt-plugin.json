@@ -519,6 +519,7 @@
   "Create a new VM by selecting an operating system and the right performance for your workload.": "운영 체제 및 워크로드에 적합한 성능을 선택하여 새 VM을 생성합니다.",
   "Create a pre-configured VM using standardized images. This option requires an existing template.": "표준화된 이미지를 사용하여 사전 구성된 VM을 생성합니다. 이 옵션에는 기존 템플릿이 필요합니다.",
   "Create a VirtualMachine from a template": "템플릿에서 VirtualMachine 생성",
+  "Create a VirtualMachine to enable this filter.": "Create a VirtualMachine to enable this filter.",
   "Create a VM": "VM 생성",
   "Create activation key": "활성화 키 생성",
   "Create application-aware quota": "애플리케이션 인식 할당량 생성",
