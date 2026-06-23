@@ -15,9 +15,10 @@ import { useAccessibleResources } from '@virtualmachines/search/hooks/useAccessi
 import { OBJECTS_FETCHING_LIMIT } from '@virtualmachines/utils';
 
 import OverviewAlerts from './components/OverviewAlerts';
+import { KubeVirtOverviewClusterCsvProvider } from './context/KubeVirtOverviewClusterCsvContext';
 import useFolderFilter from './hooks/useFolderFilter';
 import { determineOverviewLevel, getOverviewConfig } from './config';
-import { OverviewTabProps } from './types';
+import { OVERVIEW_LEVEL_PROJECT, OverviewTabProps } from './types';
 
 const OverviewTab: FC<OverviewTabProps> = ({ cluster, namespace }) => {
   useSignals();
@@ -133,9 +134,17 @@ const OverviewTab: FC<OverviewTabProps> = ({ cluster, namespace }) => {
           observabilityError={observabilityError}
           observabilityLoaded={observabilityLoaded}
         />
-        {config.sections.map(({ Component, id, subHeader, title }) => (
-          <Component key={id} {...sectionData} subHeader={subHeader} title={title} />
-        ))}
+        {overviewLevel === OVERVIEW_LEVEL_PROJECT ? (
+          config.sections.map(({ Component, id, subHeader, title }) => (
+            <Component key={id} {...sectionData} subHeader={subHeader} title={title} />
+          ))
+        ) : (
+          <KubeVirtOverviewClusterCsvProvider cluster={cluster}>
+            {config.sections.map(({ Component, id, subHeader, title }) => (
+              <Component key={id} {...sectionData} subHeader={subHeader} title={title} />
+            ))}
+          </KubeVirtOverviewClusterCsvProvider>
+        )}
       </Stack>
     </PageSection>
   );

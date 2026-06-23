@@ -1,6 +1,7 @@
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { ActionDropdownItemType } from '@kubevirt-utils/components/ActionsDropdown/constants';
 import { ModalComponent } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import type { StorageMigrationAPI } from '@kubevirt-utils/resources/migrations/constants';
 
 export type BulkVirtualMachineActionFactory = {
   controlActions: (controlActions: ActionDropdownItemType[]) => ActionDropdownItemType;
@@ -30,6 +31,7 @@ export type BulkVirtualMachineActionFactory = {
   migrateStorage: (
     vms: V1VirtualMachine[],
     createModal: (modal: ModalComponent) => void,
+    storageMigAPI?: StorageMigrationAPI,
   ) => ActionDropdownItemType;
   moveToFolder: (
     vms: V1VirtualMachine[],

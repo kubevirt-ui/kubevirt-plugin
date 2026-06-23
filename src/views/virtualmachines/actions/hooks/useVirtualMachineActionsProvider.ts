@@ -16,11 +16,13 @@ import { vmimStatuses } from '@kubevirt-utils/resources/vmim/statuses';
 import { CROSS_CLUSTER_MIGRATION_ACTION_ID } from '@multicluster/constants';
 import { getCluster } from '@multicluster/helpers/selectors';
 import useACMExtensionActions from '@multicluster/hooks/useACMExtensionActions/useACMExtensionActions';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { useK8sModel } from '@openshift-console/dynamic-plugin-sdk';
 
 import { printableVMStatus } from '../../utils';
 import { createVirtualMachineActionFactory } from '../VirtualMachineActionFactory';
 
+import useClusterStorageMigrationAPI from './storageMigrationApi/useClusterStorageMigrationAPI';
 import useActiveVMStorageMigrationPlan from './useActiveVMStorageMigrationPlan';
 import useIsMTVInstalled from './useIsMTVInstalled';
 
@@ -38,7 +40,12 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (vm, 
 
   const [mtvInstalled] = useIsMTVInstalled();
 
-  const activeStorageMigrationPlan = useActiveVMStorageMigrationPlan(vm);
+  const clusterParam = useClusterParam();
+  const effectiveCluster = getCluster(vm) ?? clusterParam ?? undefined;
+
+  const storageMigAPI = useClusterStorageMigrationAPI(effectiveCluster);
+
+  const activeStorageMigrationPlan = useActiveVMStorageMigrationPlan(vm, effectiveCluster);
 
   const acmActions = useACMExtensionActions(vm);
 
@@ -46,7 +53,7 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (vm, 
 
   const { featureEnabled: treeViewFoldersEnabled } = useFeatures(TREE_VIEW_FOLDERS);
   const { featureEnabled: vmTemplatesEnabled, loading: vmTemplatesLoading } =
-    useVMTemplateFeatureFlag(getCluster(vm));
+    useVMTemplateFeatureFlag(effectiveCluster);
 
   const VirtualMachineActionFactory = useMemo(() => createVirtualMachineActionFactory(t), [t]);
 
@@ -82,7 +89,11 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (vm, 
 
     const migrateCompute = VirtualMachineActionFactory.migrateCompute(vm, createModal);
 
-    const migrateStorage = VirtualMachineActionFactory.migrateStorage(vm, createModal);
+    const migrateStorage = VirtualMachineActionFactory.migrateStorage(
+      vm,
+      createModal,
+      storageMigAPI,
+    );
 
     const startMigrationActions = [migrateCompute, migrateStorage];
 
@@ -137,6 +148,7 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (vm, 
     treeViewFoldersEnabled,
     acmActions,
     mtvInstalled,
+    storageMigAPI,
     VirtualMachineActionFactory,
   ]);
 
