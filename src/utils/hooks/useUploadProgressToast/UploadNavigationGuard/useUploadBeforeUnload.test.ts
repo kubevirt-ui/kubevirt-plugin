@@ -1,7 +1,7 @@
 import { act, renderHook } from '@testing-library/react';
 
+import { UPLOAD_PROGRESS_STATUS } from '../constants';
 import { useUploadProgressStore } from '../uploadProgressStore';
-import { UPLOAD_PROGRESS_STATUS } from '../utils/constants';
 
 import useUploadBeforeUnload from './useUploadBeforeUnload';
 

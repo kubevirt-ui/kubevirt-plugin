@@ -4,10 +4,9 @@ import {
   UploadError,
 } from '@kubevirt-utils/hooks/useCDIUpload/types';
 
+import { isTerminalUploadStatus } from '../toast/uploadTitles';
+import { RegisterCdiUploadParams, SyncCdiUploadParams } from '../types';
 import { useUploadProgressStore } from '../uploadProgressStore';
-
-import { RegisterCdiUploadParams, SyncCdiUploadParams } from './types';
-import { isTerminalUploadStatus } from './uploadTitles';
 
 const applyCdiStatusToStore = (
   uploadKey: string,

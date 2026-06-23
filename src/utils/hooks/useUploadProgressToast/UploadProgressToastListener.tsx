@@ -1,9 +1,10 @@
-import { FC, useEffect } from 'react';
+import { FC, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router';
 
 import useKubevirtToast from '@kubevirt-utils/hooks/useKubevirtToast';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
+import { cleanupRemovedUploads } from './toast/cleanupRemovedUploads';
 import { useUploadProgressStore } from './uploadProgressStore';
 import { syncUploadToasts } from './uploadToastSync';
 
@@ -18,8 +19,17 @@ const UploadProgressToastListener: FC = () => {
   );
   const trySetToastId = useUploadProgressStore((state) => state.trySetToastId);
   const removeUpload = useUploadProgressStore((state) => state.removeUpload);
+  const prevUploadsRef = useRef(useUploadProgressStore.getState().uploads);
 
   useEffect(() => {
+    cleanupRemovedUploads({
+      addWarningToast,
+      currentUploads: uploads,
+      previousUploads: prevUploadsRef.current,
+      removeToast,
+      t,
+    });
+
     syncUploadToasts(uploads, {
       addDangerToast,
       addInfoToast,
@@ -32,6 +42,8 @@ const UploadProgressToastListener: FC = () => {
       tryMarkTerminalToastShown,
       trySetToastId,
     });
+
+    prevUploadsRef.current = uploads;
   }, [
     addDangerToast,
     addInfoToast,

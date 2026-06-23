@@ -13,11 +13,14 @@ import {
   V1Volume,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getVmDiskUploadSuccessLinks } from '@kubevirt-utils/hooks/useUploadProgressToast/completion/uploadLinks';
+import { CdiUploadTrackMetadata } from '@kubevirt-utils/hooks/useUploadProgressToast/types';
 import {
   buildOwnerReference,
   getAnnotation,
   getName,
   getNamespace,
+  getUID,
 } from '@kubevirt-utils/resources/shared';
 import { ANNOTATIONS } from '@kubevirt-utils/resources/template';
 import { getBootDisk, getDataVolumeTemplates, getVolumes } from '@kubevirt-utils/resources/vm';
@@ -30,7 +33,7 @@ import { addPersistentVolume, removeVolume } from '@virtualmachines/actions/acti
 import { updateDisks } from '@virtualmachines/details/tabs/configuration/details/utils/utils';
 
 import { HotPlugFeatures } from './constants';
-import { SourceTypes, V1DiskFormState } from './types';
+import { BuildUploadTrackMetadataParams, SourceTypes, V1DiskFormState } from './types';
 
 export const getEmptyVMDataVolumeResource = (
   vm: V1VirtualMachine,
@@ -472,3 +475,32 @@ export const convertDataVolumeToTemplate = (
     },
   },
 });
+
+export const buildUploadTrackMetadata = ({
+  abortTooltip,
+  data,
+  dataVolume,
+  file,
+  isCDROM,
+  onCancelCleanup,
+  t: translate,
+  uploadKey,
+  vm,
+}: BuildUploadTrackMetadataParams): CdiUploadTrackMetadata | undefined => {
+  if (!uploadKey || !file) return undefined;
+
+  const dvName = getName(dataVolume);
+  const diskName = data.disk?.name;
+
+  return {
+    abortTooltip,
+    contextLinks: getUID(vm)
+      ? getVmDiskUploadSuccessLinks(translate, vm, diskName, dvName, isCDROM)
+      : undefined,
+    dvCluster: getCluster(vm),
+    dvName,
+    dvNamespace: getNamespace(dataVolume),
+    onCancelCleanup,
+    resourceName: diskName,
+  };
+};

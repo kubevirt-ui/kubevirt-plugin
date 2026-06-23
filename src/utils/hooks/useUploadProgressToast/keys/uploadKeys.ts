@@ -45,8 +45,45 @@ export const getVmCdromUploadKey = (
     cdromDiskName,
   );
 
+export const getUploadClusterForVm = (vm: V1VirtualMachine): string => getCluster(vm) ?? '';
+
 export const getVmCdromUploadKeyFromVm = (vm: V1VirtualMachine, cdromDiskName: string): string =>
-  getVmCdromUploadKey(getCluster(vm), getNamespace(vm), getName(vm), cdromDiskName);
+  getVmCdromUploadKey(getUploadClusterForVm(vm), getNamespace(vm), getName(vm), cdromDiskName);
 
 export const getBootableVolumeUploadKey = (namespace: string, name: string): string =>
   buildScopedUploadKey(UPLOAD_KEY_PREFIX.bootableVolume, `${namespace}/${name}`);
+
+export const isVmScopedUploadKey = (
+  uploadKey: string,
+  cluster: string,
+  namespace: string,
+  vmName: string,
+): boolean => {
+  const vmKey = getVmResourceUploadKey(cluster, namespace, vmName);
+
+  return (
+    uploadKey.startsWith(`${UPLOAD_KEY_PREFIX.vmDisk}/${vmKey}/`) ||
+    uploadKey.startsWith(`${UPLOAD_KEY_PREFIX.vmCdrom}/${vmKey}/`)
+  );
+};
+
+export const collectVmScopedUploadKeys = (
+  uploads: Record<string, unknown>,
+  cluster: string,
+  namespace: string,
+  vmName: string,
+): string[] => {
+  // ACM draft VMs may register uploads before vm.cluster is set (empty cluster segment).
+  // When deleting a fleet VM with a cluster, also match those legacy keys.
+  const clustersToMatch = cluster ? [cluster, ''] : [''];
+
+  return Array.from(
+    new Set(
+      clustersToMatch.flatMap((clusterKey) =>
+        Object.keys(uploads).filter((key) =>
+          isVmScopedUploadKey(key, clusterKey, namespace, vmName),
+        ),
+      ),
+    ),
+  );
+};

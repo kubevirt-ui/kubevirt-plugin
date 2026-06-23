@@ -2,7 +2,7 @@ import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
-import { UploadEntry } from '../utils/types';
+import { UploadEntry } from '../types';
 
 import ToastLayout from './ToastLayout';
 import UploadProgressLinks from './UploadProgressLinks';

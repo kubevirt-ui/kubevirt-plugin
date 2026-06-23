@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 
+import { cancelAllWizardPendingUploads } from '@kubevirt-utils/hooks/useUploadProgressToast/cancel/cancelPendingVmUploads';
 import { Template } from '@kubevirt-utils/resources/template';
 import { clearCustomizeInstanceType } from '@kubevirt-utils/store/customizeInstanceType';
 import useInstanceTypeVMStore from '@virtualmachines/creation-wizard/state/instance-type-vm-store/useInstanceTypeVMStore';
@@ -40,6 +41,7 @@ const useVMWizardStore = create<VMWizardStore>()((set) => {
         return { visitedSteps: next };
       }),
     resetWizardState: () => {
+      cancelAllWizardPendingUploads();
       clearWizardRelatedStores();
       set({ ...initialVMWizardState, visitedSteps: new Set([VMWizardStep.DEPLOYMENT_DETAILS]) });
     },

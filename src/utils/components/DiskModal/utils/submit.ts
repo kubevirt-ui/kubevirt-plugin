@@ -1,4 +1,3 @@
-import { TFunction } from 'i18next';
 import produce from 'immer';
 
 import { V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
@@ -8,10 +7,8 @@ import {
   logVMDiskAttached,
   logVMDiskHotplug,
 } from '@kubevirt-utils/extensions/telemetry/vm-storage';
-import { UploadDataProps } from '@kubevirt-utils/hooks/useCDIUpload/types';
-import { getVmDiskUploadSuccessLinks } from '@kubevirt-utils/hooks/useUploadProgressToast/utils/uploadLinks';
 import { PersistentVolumeClaimModel } from '@kubevirt-utils/models';
-import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
+import { getName } from '@kubevirt-utils/resources/shared';
 import {
   getBootDisk,
   getDataVolumeTemplates,
@@ -28,22 +25,23 @@ import { getDataVolumeTemplateSize } from '../components/utils/selectors';
 import { reorderBootDisk } from './bootDiskUtils';
 import { DEFAULT_CDROM_DISK_SIZE, DEFAULT_DISK_SIZE, UPLOAD_SUFFIX } from './constants';
 import {
+  buildUploadTrackMetadata,
   createDataVolumeName,
   getEmptyVMDataVolumeResource,
   hotplugPromise,
   produceVMDisks,
 } from './helpers';
-import { SubmitInput, UploadDataVolumeOptions, V1DiskFormState } from './types';
+import { SubmitInput, UploadDataVolumeParams, V1DiskFormState } from './types';
 
-export const uploadDataVolume = async (
-  vm: V1VirtualMachine,
-  uploadData: ({ dataVolume, file }: UploadDataProps) => Promise<void>,
-  data: V1DiskFormState,
-  dvName?: string,
-  uploadKey?: string,
-  t?: TFunction,
-  options?: UploadDataVolumeOptions,
-): Promise<V1beta1DataVolume> => {
+export const uploadDataVolume = async ({
+  data,
+  dvName,
+  options,
+  t,
+  uploadData,
+  uploadKey,
+  vm,
+}: UploadDataVolumeParams): Promise<V1beta1DataVolume> => {
   const { abortTooltip, onCancelCleanup } = options ?? {};
   const dataVolume = getEmptyVMDataVolumeResource(vm);
   const file = data?.uploadFile?.file;
@@ -59,26 +57,17 @@ export const uploadDataVolume = async (
     dataVolume,
     file,
     uploadKey,
-    uploadTrackMetadata:
-      uploadKey && file
-        ? {
-            abortTooltip,
-            contextLinks: t
-              ? getVmDiskUploadSuccessLinks(
-                  t,
-                  vm,
-                  data.disk?.name,
-                  dataVolume.metadata.name,
-                  isCDROM,
-                )
-              : undefined,
-            dvCluster: getCluster(vm),
-            dvName: dataVolume.metadata.name,
-            dvNamespace: getNamespace(dataVolume),
-            onCancelCleanup,
-            resourceName: data.disk?.name,
-          }
-        : undefined,
+    uploadTrackMetadata: buildUploadTrackMetadata({
+      abortTooltip,
+      data,
+      dataVolume,
+      file,
+      isCDROM,
+      onCancelCleanup,
+      t,
+      uploadKey,
+      vm,
+    }),
   });
 
   if (data?.dataVolumeTemplate?.spec?.source?.upload) {

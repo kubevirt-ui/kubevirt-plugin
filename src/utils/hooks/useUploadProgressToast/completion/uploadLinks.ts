@@ -7,7 +7,7 @@ import { getName, getNamespace, getResourceUrl } from '@kubevirt-utils/resources
 import { getCluster } from '@multicluster/helpers/selectors';
 import { getVMURL } from '@multicluster/urls';
 
-import { UploadSuccessLink } from './types';
+import { UploadSuccessLink } from '../types';
 
 export const getVmStorageUrl = (vm: V1VirtualMachine): string => {
   const cluster = getCluster(vm);
