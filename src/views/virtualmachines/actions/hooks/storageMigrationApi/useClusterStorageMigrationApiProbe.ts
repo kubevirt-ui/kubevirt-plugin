@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import type { useKubevirtClusterServiceVersion } from '@kubevirt-utils/hooks/useKubevirtClusterServiceVersion';
 import {
@@ -11,8 +11,7 @@ import { useHubClusterName } from '@stolostron/multicluster-sdk';
 import {
   type StorageMigrationProbeFallbackPhase,
   csvLoadedIndicatesMultiNsStorageMigrationApi,
-  csvMinorMeetsMultiNsAssumeThreshold,
-  parseKubeVirtCsvMinorVersion,
+  csvVersionMeetsMultiNsAssumeThreshold,
   STORAGE_MIGRATION_CSV_WAIT_AFTER_MULTI_NS_404_MS,
   STORAGE_MIGRATION_PROBE_PHASE_IDLE,
   STORAGE_MIGRATION_PROBE_PHASE_WAITING_CSV_AFTER_MULTI_NS_404,
@@ -47,13 +46,10 @@ const useClusterStorageMigrationApiProbe = (
 
   const [, hubClusterLoaded, hubClusterError] = useHubClusterName();
   const { installedCSV, loaded: csvLoaded } = csv;
+  const csvVersion = installedCSV?.spec?.version;
 
   // Hub name must be ready before probing a named managed cluster on ACM; single-cluster skips probe.
   const probeAllowed = isACMPage && (!cluster || hubClusterLoaded || hubClusterError != null);
-  const csvMinor = useMemo(
-    () => parseKubeVirtCsvMinorVersion(installedCSV?.spec?.version),
-    [installedCSV?.spec?.version],
-  );
 
   useEffect(() => {
     phaseRef.current = STORAGE_MIGRATION_PROBE_PHASE_IDLE;
@@ -115,7 +111,7 @@ const useClusterStorageMigrationApiProbe = (
     ) {
       phaseRef.current = STORAGE_MIGRATION_PROBE_PHASE_IDLE;
       clearCsvWaitTimer();
-      if (csvMinorMeetsMultiNsAssumeThreshold(csvMinor)) {
+      if (csvVersionMeetsMultiNsAssumeThreshold(csvVersion)) {
         finish(STORAGE_MIGRATION_API.MULTI_NS);
       } else {
         probeMtcThenSingleNsOrNone(cluster, canceledFn, finish);
@@ -138,7 +134,7 @@ const useClusterStorageMigrationApiProbe = (
 
     // Fast-path: on 4.21+ the multi-namespace API is the canonical model —
     // resolve immediately without a LIST probe when CSV is already loaded.
-    if (csvLoadedIndicatesMultiNsStorageMigrationApi(csvLoaded, csvMinor)) {
+    if (csvLoadedIndicatesMultiNsStorageMigrationApi(csvLoaded, csvVersion)) {
       finish(STORAGE_MIGRATION_API.MULTI_NS);
       return () => {
         canceled = true;
@@ -153,7 +149,7 @@ const useClusterStorageMigrationApiProbe = (
         canceled: canceledFn,
         cluster,
         csvLoaded,
-        csvMinor,
+        csvVersion,
         finish,
         phaseRef,
         scheduleDelayedProbe: (run: () => void) => {
@@ -166,7 +162,7 @@ const useClusterStorageMigrationApiProbe = (
       canceled = true;
       clearCsvWaitTimer();
     };
-  }, [cluster, csvLoaded, csvMinor, probeAllowed]);
+  }, [cluster, csvLoaded, csvVersion, probeAllowed]);
 
   return result;
 };
