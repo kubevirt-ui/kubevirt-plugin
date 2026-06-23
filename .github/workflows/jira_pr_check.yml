@@ -1,0 +1,68 @@
+name: Jira PR Validation
+
+on:
+  pull_request_target:
+    types: [opened, edited, synchronize, reopened, labeled, unlabeled]
+  issue_comment:
+    types: [created]
+
+permissions:
+  pull-requests: write
+  issues: write
+  statuses: write
+
+jobs:
+  jira-validation:
+    name: jira-validation
+    runs-on: ubuntu-latest
+    concurrency:
+      group: jira-check-${{ github.event.pull_request.number || github.event.issue.number }}
+      cancel-in-progress: true
+    if: >
+      github.event_name == 'pull_request_target' ||
+      (github.event_name == 'issue_comment' &&
+       github.event.issue.pull_request != null &&
+       contains(github.event.comment.body, '/recheck-jira'))
+    steps:
+      - name: Get PR info (comment trigger)
+        if: github.event_name == 'issue_comment'
+        id: pr-info
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const { data: pr } = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+            });
+            core.setOutput('title', pr.title);
+            core.setOutput('base_ref', pr.base.ref);
+            core.setOutput('head_sha', pr.head.sha);
+
+      - name: Checkout base branch scripts
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.pull_request.base.ref || steps.pr-info.outputs.base_ref }}
+          sparse-checkout: .github/scripts
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+
+      - name: Install script dependencies
+        working-directory: .github/scripts
+        run: npm ci
+
+      - name: Run Jira PR validation
+        working-directory: .github/scripts
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          JIRA_TOKEN: ${{ secrets.JIRA_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number || github.event.issue.number }}
+          PR_TITLE: ${{ github.event.pull_request.title || steps.pr-info.outputs.title }}
+          BASE_BRANCH: ${{ github.event.pull_request.base.ref || steps.pr-info.outputs.base_ref }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha || steps.pr-info.outputs.head_sha }}
+          REPO_OWNER: ${{ github.repository_owner }}
+          REPO_NAME: ${{ github.event.repository.name }}
+        run: npx tsx src/validate-pr.ts
