@@ -1,8 +1,12 @@
+import * as path from 'path';
+
+import type { ReporterDescription } from '@playwright/test';
 import { defineConfig, devices } from '@playwright/test';
 
-import { env } from './playwright/utils/env';
+import 'dotenv/config';
 
-export const baseURL = env.baseURL;
+import { EnvVariables } from './playwright/src/utils/env-variables';
+import { getStorageStatePath } from './playwright/src/utils/storage-state';
 
 const chromeArgs = [
   '--ignore-certificate-errors',
@@ -22,88 +26,68 @@ const chromeArgs = [
   '--js-flags=--max-old-space-size=4096',
 ];
 
+function getReporterConfig(): ReporterDescription[] {
+  if (process.env.VERBOSE_REPORTER) return [['list', { printSteps: true }]];
+  return [['list']];
+}
+
+const sharedBrowserUse = {
+  ...devices['Desktop Chrome'],
+  launchOptions: {
+    args: chromeArgs,
+    headless: !EnvVariables.isDebugMode && !process.env.HEADED,
+  },
+  viewport: { height: 1080, width: 1920 } as const,
+};
+
+const testsDir = './playwright/tests';
+const storageState = getStorageStatePath(path.resolve(__dirname, 'playwright'), true) as string;
+
 export default defineConfig({
-  expect: { timeout: 60_000 },
+  expect: {
+    timeout: EnvVariables.isNonPrivUser ? 45_000 : 30_000,
+    toHaveScreenshot: {
+      animations: 'disabled',
+      maxDiffPixelRatio: 0.02,
+      threshold: 0.2,
+    },
+  },
   forbidOnly: !!process.env.CI,
   fullyParallel: false,
-  outputDir: './playwright/test-results/artifacts',
-  /**
-   * Projects run in dependency order:
-   *  1. setup  — logs in and saves auth state (single worker, must succeed before gating)
-   *  2. gating — all gating specs run in parallel after setup completes
-   */
+  globalSetup: path.resolve(__dirname, 'playwright', 'project-dependencies', 'global.setup.ts'),
+  globalTeardown: path.resolve(
+    __dirname,
+    'playwright',
+    'project-dependencies',
+    'global.teardown.ts',
+  ),
+  outputDir: process.env.ARTIFACT_DIR
+    ? `${process.env.ARTIFACT_DIR}/playwright-artifacts`
+    : './playwright/test-results/artifacts',
+
   projects: [
     {
-      fullyParallel: false,
-      name: 'setup',
-      testDir: './playwright/tests/setup',
-      use: {
-        ...devices['Desktop Chrome'],
-        launchOptions: {
-          args: chromeArgs,
-          headless: !process.env.DEBUG_MODE && !process.env.HEADED,
-        },
-        viewport: { height: 1080, width: 1920 },
-      },
+      fullyParallel: true,
+      name: 'Gating',
+      testDir: testsDir,
+      testMatch: '**/tests/gating/**/*.spec.ts',
+      use: { ...sharedBrowserUse, storageState },
     },
-    {
-      dependencies: ['setup'],
-      fullyParallel: false,
-      name: 'gating',
-      testDir: './playwright/tests/gating',
-      use: {
-        ...devices['Desktop Chrome'],
-        launchOptions: {
-          args: chromeArgs,
-          headless: !process.env.DEBUG_MODE && !process.env.HEADED,
-        },
-        storageState: 'playwright/.auth/session.json',
-        viewport: { height: 1080, width: 1920 },
-      },
-    },
-    ...(process.env.RUN_FEATURE_TESTS === 'true'
-      ? [
-          {
-            dependencies: ['setup'],
-            fullyParallel: false,
-            name: 'features',
-            retries: 2,
-            testDir: './playwright/tests/features',
-            use: {
-              ...devices['Desktop Chrome'],
-              launchOptions: {
-                args: chromeArgs,
-                headless: !process.env.DEBUG_MODE && !process.env.HEADED,
-              },
-              storageState: 'playwright/.auth/session.json',
-              viewport: { height: 1080, width: 1920 },
-            },
-          },
-        ]
-      : []),
   ],
-  reporter: [
-    ['list'],
-    ['junit', { outputFile: './playwright/test-results/results.xml' }],
-    ['html', { open: 'never', outputFolder: './playwright/test-results/html-report' }],
-  ],
-  retries: process.env.CI ? 1 : 0,
-  timeout: 480 * 1000,
+
+  reporter: getReporterConfig(),
+  retries: 0,
+  timeout: 480_000,
   use: {
     actionTimeout: 60_000,
-    baseURL,
+    baseURL: EnvVariables.webConsoleUrl,
     headless: process.env.HEADLESS !== 'false',
     ignoreHTTPSErrors: true,
     navigationTimeout: 120_000,
     screenshot: 'only-on-failure',
-    trace: 'retain-on-failure',
-    video: 'retain-on-failure',
+    trace: 'off',
+    video: 'off',
     viewport: { height: 1080, width: 1920 },
   },
-  /**
-   * Number of parallel workers. Setup runs a single file so it naturally uses one
-   * worker regardless of this value. Gating spec files run across all workers.
-   * Override with the WORKERS env var (e.g. WORKERS=2 for resource-constrained envs).
-   */
   workers: process.env.WORKERS ? parseInt(process.env.WORKERS, 10) : 4,
 });

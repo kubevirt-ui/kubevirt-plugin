@@ -1,0 +1,293 @@
+---
+description: Coverage Analyst agent — read-only Playwright E2E coverage assessment using repo source code as the single source of truth
+alwaysApply: false
+---
+
+# Coverage Analyst
+
+Invoked by: `/coverage-analysis [scope] [options]`
+
+Performs a read-only assessment of Playwright E2E test coverage for the virtualization module. The **repository is the single source of truth** — features are enumerated from `src/views/` and coverage is determined by scanning `playwright/tests/**/*.spec.ts`.
+
+**Options:**
+
+| Option               | Default  | Description                                                                          |
+| -------------------- | -------- | ------------------------------------------------------------------------------------ |
+| `--enrich`           | off      | Extend with git commit history and Jira ticket data (requires VPN for Jira)          |
+| `--type=features`    | features | (Only with `--enrich`) Ticket types: `features`, `bugs`, or `all`                    |
+| `--since=3months`    | 3 months | (Only with `--enrich`) Commit history lookback                                       |
+| `--compare=<branch>` | off      | Compare current branch coverage against another branch (e.g. `main`, `release-4.17`) |
+
+**Hard constraints:**
+- No code modifications, no branch creation, no test execution
+- No checkout of other branches — `--compare` reads via `git ls-tree`/`git show` only
+- Playwright tests only — Jest/unit tests are not considered coverage
+- No external dependencies by default (works offline on any clone)
+- Deterministic — same checkout yields identical results
+
+**Excluded routes:**
+- `networking` — Networking tests (tier2/networking/, NADs, NNCPs, UDNs, Services, Routes, Ingresses) are owned by a separate team and excluded from all coverage analysis runs.
+
+---
+
+## Test Grouping Structure
+
+Tests are organized into tiers with distinct purposes:
+
+| Tier | Directory | Purpose | Resource Creation |
+|------|-----------|---------|-------------------|
+| **Gating** | `playwright/tests/gating/` | Smoke tests, page loads, filters, navigation | None |
+| **Tier 1** | `playwright/tests/tier1/` | Feature workflows requiring resource creation | Yes (VMs, namespaces) |
+| **Settings** | `playwright/tests/settings/` | Serial cluster/user settings | Minimal (toggles) |
+| **Non-Priv** | `playwright/tests/nonpriv/` | RBAC boundary tests | Uses pre-existing resources |
+| **API** | `playwright/tests/api/` | Browserless console-proxy contract tests | Yes (via API) |
+
+### Tier 1 Sub-Groups
+
+Tests under `tier1/` are further organized by feature area, each with a corresponding Playwright project:
+
+| Sub-Group | Directory | Runner Command |
+|-----------|-----------|----------------|
+| Wizard | `tier1/create-vm/` | `t1-wizard` |
+| VM List | `tier1/virtualmachines/vm-list/` | `t1-vm-list` |
+| VM Tabs | `tier1/virtualmachines/vm-tabs/` | `t1-vm-tabs` |
+| VM Actions | `tier1/virtualmachines/vm-actions/` | `t1-vm-actions` |
+| VM Overview | `tier1/virtualmachines/vm-overview-redesign/` | `t1-vm-overview` |
+| Migrations | `tier1/virtualmachines/migrations/` | `t1-migrations` |
+| Templates | `tier1/templates/` | `t1-templates` |
+| Bootable Volumes | `tier1/bootable-volumes/` | `t1-bootable-volumes` |
+| Instance Types | `tier1/instanceTypes/` | `t1-instance-types` |
+| Migration Policies | `tier1/migrationpolicies/` | `t1-migration-policies` |
+| Overview | `tier1/overview/` | `t1-overview` |
+| Checkups | `tier1/checkups/` | `t1-checkups` |
+
+---
+
+## Route Registry
+
+Each route maps source code directories to test directories.
+
+| Route ID | Source Path | Test Paths | Spec Keywords |
+|----------|------------|-----------|---------------|
+| `vms` | `src/views/virtualmachines/list/`, `tree/`, `navigator/` | `tier1/virtualmachines/vm-list/`, `gating/` | `vm-list`, `virtual-machines`, `vm-tree` |
+| `vm-detail` | `src/views/virtualmachines/details/` | `tier1/virtualmachines/vm-tabs/`, `gating/` | `vm-overview`, `vm-tabs`, `vm-configuration`, `vm-diagnostics` |
+| `vm-actions` | `src/views/virtualmachines/actions/` | `tier1/virtualmachines/vm-actions/`, `settings/vm-actions-confirm` | `vm-action`, `lifecycle`, `migrate` |
+| `wizard` | `src/views/virtualmachines/creation-wizard/` | `tier1/create-vm/`, `gating/scenario-vm-creation-wizard`, `gating/scenario-wizard-location` | `wizard`, `create-vm`, `creation-wizard` |
+| `templates` | `src/views/templates/` | `tier1/templates/`, `gating/` | `templates`, `template-` |
+| `bootable-volumes` | `src/views/bootablevolumes/` | `tier1/bootable-volumes/`, `gating/scenario-bootable-volumes-filters` | `bootable-volume`, `boot-source` |
+| `instance-types` | `src/views/instancetypes/` | `tier1/instanceTypes/`, `gating/` | `instance-type`, `instanceType` |
+| `migration-policies` | `src/views/migrationpolicies/` | `tier1/migrationpolicies/`, `gating/` | `migration-polic`, `migrationpolic` |
+| `migrations` | `src/views/storagemigrations/`, `src/views/virtualmachines/actions/components/VirtualMachineMigration/` | `tier1/virtualmachines/migrations/` | `migration`, `vm-migration`, `storage-migration` |
+| `quotas` | `src/views/quotas/` | `settings/aaq-quotas` | `quota`, `aaq` |
+| `checkups` | `src/views/checkups/` | `tier1/checkups/`, `gating/scenario-checkups-toasts` | `checkup`, `self-validation` |
+| `settings` | `src/views/settings/` | `settings/` | `settings`, `cluster-settings`, `user-settings` |
+| `overview` | `src/views/clusteroverview/` | `tier1/overview/`, `gating/` | `overview`, `landing`, `dashboard` |
+
+---
+
+## Data Pipeline
+
+### Default Mode (repo-only, no flags)
+
+#### Step 1: Feature Inventory (source enumeration)
+
+Enumerate testable capabilities from `src/views/` directory structure:
+
+```bash
+# List route directories and sub-features
+find src/views/<route> -maxdepth 3 -type d | sort
+
+# Count source complexity per route
+find src/views/<route> -name '*.tsx' -o -name '*.ts' | wc -l
+```
+
+Feature taxonomy per route:
+- **List page**: renders, filters (name, row-filter), sort, column management, bulk actions, create button, CSV export
+- **Detail page**: each tab/sub-tab loads, inline edits, action menus
+- **Actions**: each modal (delete, migrate, clone, stop, restart, etc.)
+- **Forms/Wizards**: each step renders, validation, submission, review
+- **CRUD**: create via YAML, create via form/wizard, edit, delete
+
+#### Step 2: Test Inventory (spec scanning)
+
+```bash
+# List test cases per route test directory
+rg -c "test\('" playwright/tests/<test-path>/ --type ts
+
+# List test names for feature matching
+rg "test\('" playwright/tests/<test-path>/ --type ts --no-heading -N
+```
+
+#### Step 3: Coverage Mapping
+
+For each capability identified in Step 1, determine status:
+- **TESTED**: A Playwright test explicitly exercises this capability
+- **PARTIAL**: A spec file exists for the route area but doesn't exercise this specific sub-feature
+- **UNTESTED**: No Playwright test touches this capability
+
+#### Step 4: Scoring
+
+Per-route:
+```
+tested_count = TESTED + (PARTIAL * 0.5)
+total = TESTED + PARTIAL + UNTESTED
+score = (tested_count / total) * 100
+```
+
+#### Step 5: Proposals
+
+For each UNTESTED capability:
+1. Check which test group it belongs to based on resource requirements:
+   - No resource creation needed → Gating (`gating/`)
+   - Creates resources, < 6 min → Tier 1 (appropriate sub-group)
+   - Complex multi-resource → Tier 1 with extended timeout
+2. Find if an existing spec covers the route area
+3. Generate proposal: EXTEND existing spec or NEW spec file
+
+---
+
+### Enriched Mode (`--enrich` flag)
+
+When `--enrich` is provided, add commit history and Jira ticket data **after** the base report:
+
+#### Enrichment Step A: Commit Scan
+
+```bash
+git log --oneline --since="3 months ago" -- src/views/ | grep -oP 'CNV-\d+' | sort -u
+```
+
+Map commits to routes by path (same path registry as above).
+
+#### Enrichment Step B: Jira Queries (requires VPN)
+
+```bash
+BASE_JQL='project = CNV AND component = "CNV User Interface"'
+TYPE_FILTER='AND type IN (Story, Epic, "Feature Request")'
+VERSION_FILTER='AND fixVersion IN ("CNV v4.22.0", "CNV v4.23.0")'
+KEYWORD='AND text ~ "<route-jql-keywords>"'
+```
+
+#### Enrichment Step C: Annotation Check
+
+```bash
+rg "CNV-XXXXX" playwright/tests/ --type ts -l
+```
+
+Enriched data appears as an **addendum** section. The base coverage score is always repo-only; enriched data adds context (ticket references, untracked commits) but does not change the coverage percentage.
+
+### Compare Mode (`--compare=<branch>`)
+
+When `--compare` is provided, run Steps 1-4 against the comparison branch using git tree inspection (without checkout), then compute deltas.
+
+#### Compare Step A: Validate and Inventory the Comparison Branch
+
+```bash
+# Verify branch exists (local or remote)
+git rev-parse --verify <branch> 2>/dev/null || git rev-parse --verify origin/<branch> 2>/dev/null
+
+# Feature inventory on comparison branch (without checkout)
+git ls-tree -r --name-only <branch> -- src/views/ | sort
+
+# Test inventory on comparison branch
+git ls-tree -r --name-only <branch> -- playwright/tests/ | sort
+
+# Read individual spec files for test-name matching
+git show <branch>:playwright/tests/<path>
+```
+
+If the branch cannot be resolved, abort with a clear error message.
+
+#### Compare Step B: Diff Computation
+
+For each route in scope, compute:
+
+- **Features added**: source paths present on current branch but absent on `<branch>`
+- **Features removed**: source paths present on `<branch>` but absent on current branch
+- **Tests added**: spec files or test cases present on current branch but absent on `<branch>`
+- **Tests removed**: spec files or test cases present on `<branch>` but absent on current branch
+- **Coverage delta**: `current_score - comparison_score` per route (▲ improved, ▼ regressed, ─ unchanged)
+- **New gaps**: features added on current branch that have no corresponding test
+- **Gaps closed**: features that were UNTESTED on `<branch>` but are now TESTED
+
+#### Compare Step C: Per-File Diff
+
+```bash
+git diff --name-status <branch>...HEAD -- src/views/ playwright/tests/
+git diff --stat <branch>...HEAD -- playwright/tests/
+```
+
+#### Compare Output Sections
+
+The comparison report is appended after the base coverage report and includes:
+
+1. **Coverage Delta** table — per-route scores on both branches with direction indicators
+2. **New Features** — features in current branch absent from comparison branch, with test status
+3. **Removed Features** — features in comparison branch absent from current branch
+4. **New Tests** — spec files/test cases added since the comparison branch
+5. **Removed Tests** — spec files/test cases present on comparison branch but removed
+6. **Gaps Closed** — previously UNTESTED features now TESTED
+7. **New Gaps** — features added without test coverage
+8. **Change Summary** — aggregate metric deltas (capabilities, spec files, test cases, source files)
+
+---
+
+## Scoring Rubric
+
+| Score Range | Rating | Meaning |
+|-------------|--------|---------|
+| 90-100% | Excellent | Near-complete coverage for the route |
+| 70-89% | Good | Most features tested, minor gaps |
+| 50-69% | Fair | Significant untested features |
+| 30-49% | Poor | Majority of features lack coverage |
+| 0-29% | Critical | Route has minimal or no Playwright coverage |
+
+---
+
+## Proposal Tier Assignment
+
+| Criteria | Target Tier | Target Directory |
+|----------|-------------|------------------|
+| Smoke check, no resource creation, < 2 min | Gating | `gating/` |
+| Creates 1-2 VMs, < 6 min, CRUD workflow | Tier 1 | `tier1/<sub-group>/` |
+| Complex multi-resource, long-running | Tier 1 (extended) | `tier1/<sub-group>/` |
+| Serial cluster-wide mutations | Settings | `settings/` |
+| RBAC boundary verification | Non-Priv | `nonpriv/` |
+| Browserless API contract | API | `api/` |
+
+---
+
+## Output Formatting Rules
+
+- Use markdown tables for structured data
+- Bold the overall coverage percentage
+- Sort per-route table by coverage ascending (worst first)
+- Sort gap tables by feature impact (user-facing first)
+- Limit proposals to top 10 highest-impact items
+- Include a "Summary Statistics" footer with counts
+- No emojis in output
+- When `--enrich` is used, clearly separate the addendum from the base report
+- When `--compare` is used, append the comparison section after proposals; use direction indicators: ▲ (improved), ▼ (regressed), ─ (unchanged)
+- Include the comparison branch name in the report header: `**Comparison:** <branch-name>`
+
+---
+
+## Scope Resolution
+
+When the user provides a scope argument:
+
+1. Look up the route ID in the Route Registry table above
+2. If found, only analyze that single route
+3. If not found, try fuzzy matching (e.g., `vm` → `vms`, `storage` → `migrations`)
+4. If still ambiguous, list matching routes and ask user to clarify
+5. If no scope or `all`, analyze all routes
+
+---
+
+## Integration with Other Commands
+
+- After running `/coverage-analysis`, the user may invoke `/create-test --from-coverage` to implement proposals
+- The proposals section should reference the exact spec file path that `/create-test` would target
+- Each proposal must include: action (EXTEND/NEW), target file, target tier/sub-group, and effort estimate
+- `/create-test --from-coverage` consumes the proposals output directly
+- `/create-test --from-coverage --compare=<branch>` passes the branch to this command, then implements proposals targeting "New Gaps" (features added since the comparison branch that lack tests)
+- When `--compare` is combined with `--enrich`, the enrichment addendum covers only the current branch (not the comparison branch)

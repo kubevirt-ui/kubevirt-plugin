@@ -1,0 +1,48 @@
+import {
+  generateRandomCheckupName,
+  generateRandomConfigMapName,
+  generateRandomDataVolumeName,
+  generateRandomDiskName,
+  generateRandomFolderName,
+  generateRandomInstanceTypeName,
+  generateRandomLabelValue,
+  generateRandomMigrationPolicyName,
+  generateRandomNadName,
+  generateRandomName,
+  generateRandomPassword,
+  generateRandomPvcName,
+  generateRandomQuotaName,
+  generateRandomSecretName,
+  generateRandomSnapshotName,
+  generateRandomString,
+  generateRandomTemplateName,
+  generateRandomVmName,
+  generateTestNamespace,
+} from '@/utils/random-data-generator';
+import { createPwPrefixedName, createStagedVmName } from '@/utils/vm-actions-direct-k8s';
+
+export const generators = {
+  randomName: generateRandomName,
+  randomVmName: generateRandomVmName,
+  testNamespace: generateTestNamespace,
+  randomTemplateName: generateRandomTemplateName,
+  randomFolderName: generateRandomFolderName,
+  randomInstanceTypeName: generateRandomInstanceTypeName,
+  randomMigrationPolicyName: generateRandomMigrationPolicyName,
+  randomDataVolumeName: generateRandomDataVolumeName,
+  randomLabelValue: generateRandomLabelValue,
+  randomPassword: generateRandomPassword,
+  randomString: generateRandomString,
+  randomSnapshotName: generateRandomSnapshotName,
+  randomNadName: generateRandomNadName,
+  randomCheckupName: generateRandomCheckupName,
+  randomQuotaName: generateRandomQuotaName,
+  randomDiskName: generateRandomDiskName,
+  randomConfigMapName: generateRandomConfigMapName,
+  randomPvcName: generateRandomPvcName,
+  randomSecretName: generateRandomSecretName,
+  pwPrefixedName: createPwPrefixedName,
+  stagedVmName: createStagedVmName,
+};
+
+export type GeneratorsFixture = typeof generators;

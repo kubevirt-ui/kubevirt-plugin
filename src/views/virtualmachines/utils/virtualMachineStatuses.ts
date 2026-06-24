@@ -19,30 +19,31 @@ import {
   UnknownIcon,
 } from '@patternfly/react-icons';
 
+// Derived from the canonical VM_STATUS enum in @kubevirt-utils/resources/vm.
 // https://github.com/kubevirt/api/blob/9689e71fe2bed9e7da5f165760bbbf6981cc1087/core/v1/types.go#L1277
-export const printableVMStatus = {
-  Deleting: 'Deleting',
-  Migrating: 'Migrating',
-  Paused: 'Paused',
-  Provisioning: 'Provisioning',
-  Running: 'Running',
-  Starting: 'Starting',
-  Stopped: 'Stopped',
-  Stopping: 'Stopping',
-  Terminating: 'Terminating',
-  Unknown: 'Unknown',
-  WaitingForReceiver: 'WaitingForReceiver',
-  WaitingForVolumeBinding: 'WaitingForVolumeBinding',
+export const printableVMStatus: Record<string, string> = {
+  Deleting: VM_STATUS.Deleting,
+  Migrating: VM_STATUS.Migrating,
+  Paused: VM_STATUS.Paused,
+  Provisioning: VM_STATUS.Provisioning,
+  Running: VM_STATUS.Running,
+  Starting: VM_STATUS.Starting,
+  Stopped: VM_STATUS.Stopped,
+  Stopping: VM_STATUS.Stopping,
+  Terminating: VM_STATUS.Terminating,
+  Unknown: VM_STATUS.Unknown,
+  WaitingForReceiver: VM_STATUS.WaitingForReceiver,
+  WaitingForVolumeBinding: VM_STATUS.WaitingForVolumeBinding,
 };
 
-export const errorPrintableVMStatus = {
-  CrashLoopBackOff: 'CrashLoopBackOff',
-  DataVolumeError: 'DataVolumeError',
-  ErrImagePull: 'ErrImagePull',
-  ErrorDataVolumeNotFound: 'ErrorDataVolumeNotFound',
-  ErrorPvcNotFound: 'ErrorPvcNotFound',
-  ErrorUnschedulable: 'ErrorUnschedulable',
-  ImagePullBackOff: 'ImagePullBackOff',
+export const errorPrintableVMStatus: Record<string, string> = {
+  CrashLoopBackOff: VM_STATUS.CrashLoopBackOff,
+  DataVolumeError: VM_STATUS.DataVolumeError,
+  ErrImagePull: VM_STATUS.ErrImagePull,
+  ErrorDataVolumeNotFound: VM_STATUS.ErrorDataVolumeNotFound,
+  ErrorPvcNotFound: VM_STATUS.ErrorPvcNotFound,
+  ErrorUnschedulable: VM_STATUS.ErrorUnschedulable,
+  ImagePullBackOff: VM_STATUS.ImagePullBackOff,
 };
 
 export const isErrorPrintableStatus = (printableStatus: string) =>

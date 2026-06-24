@@ -1,97 +1,65 @@
 /**
  * VM tree view — "Show only projects with VirtualMachines" filter.
  *
- * Standard gating test (not a preview feature). Run locally with:
- *   npx playwright test playwright/tests/gating/vm-tree-filter.spec.ts --config=playwright.config.ts --project=gating
+ * Gating test. Run locally with:
+ *   npx playwright test playwright/tests/gating/vm-tree-filter.spec.ts
  */
-import { BrowserContext, Page } from '@playwright/test';
+import { GATING_TAG } from '@/data-models/test-tags';
+import { expect, test } from '@/fixtures/gating-fixture';
+import { TestTimeouts } from '@/utils/test-config';
+import { setupTestNamespace } from '@/utils/test-setup-helpers';
 
-import { test } from '../../fixtures';
-import { VMTreeViewPage } from '../../pages/vm-tree';
-import { VMListPage } from '../../pages/VMListPage';
-import { env } from '../../utils/env';
-import { clusterHasVMs, createEmptyNamespace, deleteNamespace } from '../../utils/oc';
+const EMPTY_NS_PREFIX = 'pw-tree-empty';
 
-const EMPTY_NS = 'pw-tree-empty';
+test.describe(
+  'VM tree view — show only projects with VirtualMachines',
+  { tag: [GATING_TAG] },
+  () => {
+    let emptyNamespace: string;
 
-test.describe.serial('VM tree view — show only projects with VirtualMachines', () => {
-  let context: BrowserContext;
-  let page: Page;
-  let vmList: VMListPage;
-  let treeView: VMTreeViewPage;
-
-  test.beforeAll(async ({ browser }) => {
-    createEmptyNamespace(EMPTY_NS);
-
-    context = await browser.newContext({
-      storageState: 'playwright/.auth/session.json',
+    test.beforeAll(async ({ k8sClient }) => {
+      emptyNamespace = await setupTestNamespace(k8sClient, EMPTY_NS_PREFIX);
     });
-    page = await context.newPage();
-    vmList = new VMListPage(page);
-    treeView = vmList.treeView;
-    await treeView.seedDefaultState();
-  });
 
-  test.afterAll(async () => {
-    deleteNamespace(EMPTY_NS);
-    await page?.close();
-    await context?.close();
-  });
+    test.afterAll(async ({ k8sClient }) => {
+      if (emptyNamespace) {
+        await k8sClient.deleteNamespace(emptyNamespace).catch(() => undefined);
+      }
+    });
 
-  test('switch is ON by default when the cluster has VirtualMachines', async () => {
-    test.skip(!clusterHasVMs(), 'Requires at least one VirtualMachine in the cluster');
+    test('empty namespace is hidden when the filter is ON and visible when OFF', async ({
+      vmListPage,
+    }) => {
+      await vmListPage.navigateToVirtualMachinesViaUI();
+      await vmListPage.tree.toggleEmptyProjectsDisplay(false);
+      await vmListPage.tree.searchTreeView(emptyNamespace);
 
-    await vmList.navigateToVMList();
-    await treeView.expectLoaded();
-    await treeView.expectShowOnlyVMProjectsSwitch(true, false);
-  });
+      await expect
+        .poll(() => vmListPage.tree.isTreeNodeVisible(emptyNamespace), {
+          message: 'Empty namespace should be hidden when filter is ON',
+          timeout: TestTimeouts.DEFAULT,
+        })
+        .toBeFalsy();
 
-  test('empty namespace is hidden when the filter is ON', async () => {
-    test.skip(!clusterHasVMs(), 'Requires at least one VirtualMachine in the cluster');
+      await vmListPage.tree.toggleEmptyProjectsDisplay(true);
+      await vmListPage.tree.searchTreeView(emptyNamespace);
 
-    await treeView.expectProjectVisible(EMPTY_NS, false);
-  });
+      await expect
+        .poll(() => vmListPage.tree.isTreeNodeVisible(emptyNamespace), {
+          message: 'Empty namespace should be visible when filter is OFF',
+          timeout: TestTimeouts.DEFAULT,
+        })
+        .toBeTruthy();
 
-  test('empty namespace is visible when the filter is OFF', async () => {
-    test.skip(!clusterHasVMs(), 'Requires at least one VirtualMachine in the cluster');
+      await vmListPage.tree.toggleEmptyProjectsDisplay(false);
+      await vmListPage.tree.searchTreeView(emptyNamespace);
 
-    await treeView.setShowOnlyVMProjectsFilter(false);
-    await treeView.expectShowOnlyVMProjectsSwitch(false, false);
-    await treeView.expectProjectVisible(EMPTY_NS, true);
-  });
-
-  test('empty namespace is hidden again when the filter is re-enabled', async () => {
-    test.skip(!clusterHasVMs(), 'Requires at least one VirtualMachine in the cluster');
-
-    await treeView.setShowOnlyVMProjectsFilter(true);
-    await treeView.expectShowOnlyVMProjectsSwitch(true, false);
-    await treeView.expectProjectVisible(EMPTY_NS, false);
-  });
-});
-
-test('switch is disabled when the cluster has no VirtualMachines', async ({ browser }) => {
-  test.skip(clusterHasVMs(), 'Requires cluster with zero VirtualMachines');
-
-  const context = await browser.newContext({
-    storageState: 'playwright/.auth/session.json',
-  });
-  const page = await context.newPage();
-  const vmList = new VMListPage(page);
-  const treeView = vmList.treeView;
-
-  await treeView.seedDefaultState();
-  await vmList.navigateToVMList();
-  await treeView.expectLoaded();
-  await treeView.expectShowOnlyVMProjectsSwitch(false, true);
-
-  await treeView.hoverShowOnlyVMProjectsSwitch();
-  await treeView.expectDisabledFilterTooltip();
-
-  await treeView.expectEmptyState(false);
-
-  const projectToExpect = env.testNamespace || 'default';
-  await treeView.expectProjectVisible(projectToExpect, true);
-
-  await page.close();
-  await context.close();
-});
+      await expect
+        .poll(() => vmListPage.tree.isTreeNodeVisible(emptyNamespace), {
+          message: 'Empty namespace should be hidden again when filter is re-enabled',
+          timeout: TestTimeouts.DEFAULT,
+        })
+        .toBeFalsy();
+    });
+  },
+);

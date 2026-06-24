@@ -1,11 +1,24 @@
 import { TFunction } from 'i18next';
 
 import { DataVolumeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { getAnnotation, getLabels, getName } from '@kubevirt-utils/resources/shared';
+import { MultiNamespaceVirtualMachineStorageMigrationPlanModel } from '@kubevirt-utils/models';
+import { getStorageMigrationBackend } from '@kubevirt-utils/resources/migrations/backends';
+import {
+  type StorageMigrationAPI,
+  STORAGE_MIGRATION_API,
+} from '@kubevirt-utils/resources/migrations/constants';
+import { getAnnotation, getLabels, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getDataVolumeTemplates, getVolumes } from '@kubevirt-utils/resources/vm';
-import { escapeJsonPointerToken, isEmpty } from '@kubevirt-utils/utils/utils';
+import {
+  escapeJsonPointerToken,
+  getNoPermissionTooltipContent,
+  isEmpty,
+} from '@kubevirt-utils/utils/utils';
+import { getCluster } from '@multicluster/helpers/selectors';
+import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
 import { k8sDelete, Patch } from '@openshift-console/dynamic-plugin-sdk';
 import { isDeletionProtectionEnabled } from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/utils/utils';
 import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
@@ -188,4 +201,51 @@ export const getBulkDeleteActionDescription = (
   }
 
   return undefined;
+};
+
+export const moveVMToFolder = (vm: V1VirtualMachine, folderName: string) => {
+  const labels = vm?.metadata?.labels || {};
+  labels[VM_FOLDER_LABEL] = folderName;
+  return kubevirtK8sPatch({
+    data: [
+      {
+        op: 'replace',
+        path: '/metadata/labels',
+        value: labels,
+      },
+    ],
+    model: VirtualMachineModel,
+    resource: vm,
+  });
+};
+
+export const getStorageMigrationConfig = (
+  storageMigAPI: StorageMigrationAPI,
+  referenceVM: V1VirtualMachine,
+  t: TFunction,
+) => {
+  const isLoading = storageMigAPI === STORAGE_MIGRATION_API.LOADING;
+  const isUnavailable = storageMigAPI === STORAGE_MIGRATION_API.NONE;
+  const backend = getStorageMigrationBackend(storageMigAPI);
+  const planModel = backend?.planModel ?? null;
+  const planNamespace = backend?.fixedPlanNamespace ?? getNamespace(referenceVM);
+  const accessReviewModel = planModel ?? MultiNamespaceVirtualMachineStorageMigrationPlanModel;
+
+  const disabledTooltip = () => {
+    if (isLoading) return t('Checking storage migration availability...');
+    if (isUnavailable) return t('Storage migration is not available on this cluster.');
+    return getNoPermissionTooltipContent(t);
+  };
+
+  return {
+    accessReview: {
+      cluster: getCluster(referenceVM),
+      group: accessReviewModel.apiGroup,
+      namespace: planModel ? planNamespace : getNamespace(referenceVM),
+      resource: accessReviewModel.plural,
+      verb: 'create' as const,
+    },
+    disabled: isLoading || isUnavailable || !planModel,
+    disabledTooltip: disabledTooltip(),
+  };
 };

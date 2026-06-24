@@ -24,14 +24,10 @@ import { logVMConsoleOpened } from '@kubevirt-utils/extensions/telemetry/dashboa
 import { TELEMETRY_CONSOLE_SESSION_TYPE } from '@kubevirt-utils/extensions/telemetry/utils/property-constants';
 import {
   MigPlanModel,
-  MultiNamespaceVirtualMachineStorageMigrationPlanModel,
   VirtualMachineInstanceSubresourcesModel,
   VirtualMachineSubresourcesModel,
 } from '@kubevirt-utils/models';
-import {
-  getStorageMigrationBackend,
-  getStorageMigrationPlanModelForKind,
-} from '@kubevirt-utils/resources/migrations/backends';
+import { getStorageMigrationPlanModelForKind } from '@kubevirt-utils/resources/migrations/backends';
 import {
   type StorageMigrationAPI,
   MultiNamespaceVirtualMachineStorageMigrationPlan,
@@ -44,8 +40,7 @@ import {
   isVMNotStopped,
 } from '@kubevirt-utils/resources/vm/utils/selectors';
 import { getMigratableVolumeSnapshotStatuses } from '@kubevirt-utils/resources/vm/utils/snapshotStatuses';
-import { getNoPermissionTooltipContent } from '@kubevirt-utils/utils/utils';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { getNoPermissionTooltipContent, isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
 import { getConsoleStandaloneURL } from '@multicluster/urls';
@@ -53,7 +48,6 @@ import { CopyIcon } from '@patternfly/react-icons';
 import ComputeMigrationModal from '@virtualmachines/actions/components/VirtualMachineComputeMigration/ComputeMigrationModal';
 import VirtualMachineMigrateModal from '@virtualmachines/actions/components/VirtualMachineMigration/VirtualMachineMigrationModal';
 import { isDeletionProtectionEnabled } from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/utils/utils';
-import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
 
 import MoveVMToFolderModal from '../../../utils/components/MoveVMToFolderModal/MoveVMToFolderModal';
 import {
@@ -78,6 +72,7 @@ import {
   stopVM,
   unpauseVM,
 } from './actions';
+import { getStorageMigrationConfig, moveVMToFolder } from './utils';
 
 const {
   Migrating,
@@ -293,35 +288,15 @@ export const createVirtualMachineActionFactory = (t: TFunction) => ({
     createModal: (modal: ModalComponent) => void,
     storageMigAPI: StorageMigrationAPI = STORAGE_MIGRATION_API.MULTI_NS,
   ): ActionDropdownItemType => {
-    const isLoading = storageMigAPI === STORAGE_MIGRATION_API.LOADING;
-    const isUnavailable = storageMigAPI === STORAGE_MIGRATION_API.NONE;
-    const backend = getStorageMigrationBackend(storageMigAPI);
-    const planModel = backend?.planModel ?? null;
-    const planNamespace = backend?.fixedPlanNamespace ?? getNamespace(vm);
-
-    const accessReviewModel = planModel ?? MultiNamespaceVirtualMachineStorageMigrationPlanModel;
-
-    const migrateStorageDisabledTooltip = () => {
-      if (isLoading) return t('Checking storage migration availability...');
-      if (isUnavailable) return t('Storage migration is not available on this cluster.');
-      return getNoPermissionTooltipContent(t);
-    };
+    const config = getStorageMigrationConfig(storageMigAPI, vm, t);
 
     return {
-      accessReview: {
-        cluster: getCluster(vm),
-        group: accessReviewModel.apiGroup,
-        namespace: planModel ? planNamespace : getNamespace(vm),
-        resource: accessReviewModel.plural,
-        verb: 'create',
-      },
+      ...config,
       cta: () =>
         createModal((props) => (
           <VirtualMachineMigrateModal storageMigAPI={storageMigAPI} vms={[vm]} {...props} />
         )),
       description: t('Migrate VirtualMachine storage to a different StorageClass'),
-      disabled: isLoading || isUnavailable || !planModel,
-      disabledTooltip: migrateStorageDisabledTooltip(),
       id: ACTIONS_ID.MIGRATE_STORAGE,
       label: t('Storage'),
     };
@@ -341,21 +316,7 @@ export const createVirtualMachineActionFactory = (t: TFunction) => ({
       cta: () =>
         createModal((props) => (
           <MoveVMToFolderModal
-            onSubmit={(folderName) => {
-              const labels = vm?.metadata?.labels || {};
-              labels[VM_FOLDER_LABEL] = folderName;
-              return kubevirtK8sPatch({
-                data: [
-                  {
-                    op: 'replace',
-                    path: '/metadata/labels',
-                    value: labels,
-                  },
-                ],
-                model: VirtualMachineModel,
-                resource: vm,
-              });
-            }}
+            onSubmit={(folderName) => moveVMToFolder(vm, folderName)}
             vm={vm}
             {...props}
           />

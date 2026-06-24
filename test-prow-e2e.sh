@@ -155,4 +155,4 @@ npm ci
 npm run playwright-install
 
 # Run tests (gating suite).
-npm run test-playwright-headless
+./playwright-runner.sh test-gating --workers=2

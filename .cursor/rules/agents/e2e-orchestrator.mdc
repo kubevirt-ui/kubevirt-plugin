@@ -1,0 +1,409 @@
+---
+description: E2E Test Orchestrator — coordinates QE automation for the ported kubevirt-ui Playwright suite
+alwaysApply: false
+---
+
+# E2E Test Orchestrator
+
+Coordinates QE automation for the Playwright E2E suite that lives under `playwright/` in this repo. Run via `./playwright-runner.sh`.
+
+## Intent Routing
+
+| Intent | Command / Rule |
+|--------|---------------|
+| Run tests, analyze failures, fix broken tests, re-run | `/test-fix` |
+| Implement E2E tests for Jira tickets | `/create-test` |
+| Assess coverage gaps and generate proposals | `/coverage-analysis` |
+| Compare coverage between branches (e.g. main vs release) | `/coverage-analysis --compare=<branch>` |
+| Analyze coverage then implement gaps on a single branch | `/create-test --from-coverage` |
+| Validate a ticket with recorded video evidence (requires playwright-cli) | `/test-and-record` |
+| Explore live UI to find bugs in test-covered workflows | `/bug-hunt` |
+| Write or review Playwright tests (general) | `playwright-testing.mdc` |
+| QA edge case analysis | `qe-agent.mdc` |
+
+## Ported Suite Architecture
+
+```
+Tests (.spec.ts) → import from per-folder fixture (e.g. vm-tabs-fixture.ts)
+ ↓
+PageObjects (playwright/src/page-objects/) → extend BasePage or PageCommons
+ ↓
+Clients (playwright/src/clients/) → KubernetesClient (facade), OcCliClient, VirtctlClient
+```
+
+### Test Organization
+
+| Tier | Path | Tag | Runner command |
+|------|------|-----|---------------|
+| Gating | `tests/gating/` | `@gating` | `./playwright-runner.sh test-gating` |
+| Tier 1 (umbrella) | `tests/tier1/` | `@tier1` | `./playwright-runner.sh test-tier1` |
+| Settings | `tests/settings/` | `@cnv-settings` | `./playwright-runner.sh test-settings` |
+| Migrations | `tests/migrations/` | — | `./playwright-runner.sh test-migrations` |
+| API | `tests/api/` | — | `./playwright-runner.sh test-api` |
+| Non-Priv | `tests/nonpriv/` | `@nonpriv` | `./playwright-runner.sh test-nonpriv` |
+
+### Tier 1 Sub-Projects (for targeted runs)
+
+The umbrella `Tier 1` project runs all tier1 tests. Use sub-projects to run a single module:
+
+| Sub-Project | Path | Runner command |
+|-------------|------|---------------|
+| `T1: Wizard` | `tier1/create-vm/` | `./playwright-runner.sh t1-wizard` |
+| `T1: VM List` | `tier1/virtualmachines/vm-list/` | `./playwright-runner.sh t1-vm-list` |
+| `T1: VM Configuration` | `tier1/virtualmachines/vm-tabs/vm-configuration-*`, `vm-console` | `./playwright-runner.sh t1-vm-config` |
+| `T1: VM Scenarios` | `tier1/virtualmachines/vm-tabs/scenario-*`, `vm-diagnostics`, `vm-snapshots`, `vm-metrics`, `vm-events` | `./playwright-runner.sh t1-vm-scenarios` |
+| `T1: VM Actions` | `tier1/virtualmachines/vm-actions/` | `./playwright-runner.sh t1-vm-actions` |
+| `T1: VM Overview` | `tier1/virtualmachines/vm-overview/` | `./playwright-runner.sh t1-vm-overview` |
+| `T1: Templates` | `tier1/templates/` | `./playwright-runner.sh t1-templates` |
+| `T1: Bootable Volumes` | `tier1/bootable-volumes/` | `./playwright-runner.sh t1-bootable-volumes` |
+| `T1: Instance Types` | `tier1/instanceTypes/` | `./playwright-runner.sh t1-instance-types` |
+| `T1: Migration Policies` | `tier1/migrationpolicies/` | `./playwright-runner.sh t1-migration-policies` |
+| `T1: Overview` | `tier1/overview/` | `./playwright-runner.sh t1-overview` |
+| `T1: Checkups` | `tier1/checkups/` | `./playwright-runner.sh t1-checkups` |
+
+Direct Playwright: `npx playwright test --project="T1: VM List"`
+
+### Key Components
+
+- **Per-folder fixtures** (`playwright/src/fixtures/`) — inject page objects and clients per test group
+- **Scenario test fixture** (`scenario-test-fixture.ts`) — base `test` object used by all fixtures
+- **Cleanup tracking** — `cleanup.trackVirtualMachine(name, ns)` etc.
+- **TestTimeouts** — always use `TestTimeouts.*` constants, never hardcode
+- **Allure constants** — `GATING`, `T1`, `GATING_TAG`, `T1_TAG` etc.
+- **STD documents** — `playwright/docs/` with per-tier subdirectories
+
+### Unified Test Suite
+
+All tests live under `playwright/tests/` and use the unified fixtures and page objects in `playwright/src/`.
+
+The suite runs under Playwright projects (`Gating`, `Tier 1`, `Migrations`, `CNV Settings`, `Non-Priv`, `API Tests`, `Non-Priv API`) plus 11 focused `T1: *` sub-projects for targeted tier1 runs. Use `playwright-runner.sh` for local runs.
+
+### No Direct `page` Usage in Specs
+
+Spec files must **never** use raw Playwright `page` methods. This includes:
+
+- `page.locator(...)`, `page.getByRole(...)`, `page.getByText(...)`
+- `page.goto(...)`, `page.reload(...)`
+- `page.waitForTimeout(...)`, `page.waitForResponse(...)`
+- `page.keyboard.press(...)`, `page.evaluate(...)`
+- Accessing `pageObject.page` to call any of the above
+
+All interaction flows through the page object layer:
+
+```
+spec.ts → pageObject.method() → pageObject uses this.locator(...) / this.page internally
+```
+
+**Rules:**
+
+1. **Selectors** belong in page objects (as `readonly` properties or inside methods)
+2. **Navigation** belongs in page object methods (e.g. `navigateToStorageClasses()`, not `page.goto('/k8s/cluster/...')`)
+3. **Interactions** (click, fill, wait, keyboard) belong in page object methods or page components
+4. **Waits and timeouts** belong in page object methods — never `page.waitForTimeout()` in specs
+5. **Assertions** on visibility/text may appear in specs but use PO-returned data (e.g. `await po.verifyRowExists(...)`)
+6. **Every test MUST contain `expect` or `expect.soft` assertions** — without them you have browser automation, not a test. Page object methods perform actions and return data; the spec validates outcomes with explicit assertions.
+
+If a needed method doesn't exist on the page object, **add it** rather than using `page` directly in the spec. When implementing a new test scenario:
+
+1. Check if the page object already has the method you need (`get_class_surface`, `search_methods`)
+2. If not, add the method to the appropriate page object or page component
+3. The spec file should read like a high-level scenario — only PO method calls, `test.step`, and assertions
+4. **Each `test.step` should end with at least one `expect.soft()`** — prefer soft expects so all validations in a step run even if one fails
+
+**No exceptions.** Helper functions at the top of spec files should also use page objects — not raw `page`.
+
+### Naming Convention: Page vs Component
+
+- **Page** (`*Page`): A standalone navigable page exposed directly via a Playwright fixture.
+  Tests destructure it from the fixture: `async ({ vmListPage, vmDetailPage }) => { ... }`
+- **Component** (`*Component`): A composed building block that is instantiated inside a Page Object
+  and exposed as a `readonly` property. Tests access it through the parent page:
+  `vmListPage.listActions.clickVmName(...)`, `vmDetailPage.scheduling.editRunStrategy(...)`
+
+Rules:
+1. If a class is exposed via a fixture file, it is a **Page** — file: `xxx-page.ts`
+2. If a class is ONLY instantiated inside another Page/Component constructor, it is a **Component** — file: `xxx-component.ts`
+3. File names must match: `xxx-page.ts` for Pages, `xxx-component.ts` for Components
+4. Never name a composed-only class with the `Page` suffix
+5. Components **always** extend `BaseComponent` — never `BasePage` or `PageCommons`
+6. Pages extend `BasePage` or `PageCommons`
+7. Components that need other components compose them locally (e.g. `readonly vmActions = new VmActionsComponent(this.page)`)
+
+### Folder Structure
+
+```
+playwright/src/
+├── components/          # All reusable UI components (BaseComponent subclasses)
+│   ├── shared/          # Cross-cutting: modal, navigation, perspective, yaml-editor, etc.
+│   ├── vm/             # VM list & detail components
+│   ├── create-vm/      # Bootable volumes, catalog, template components
+│   ├── overview/       # Overview dashboard, settings, migrations components
+│   └── vm-wizard/      # VM creation wizard step components
+├── page-objects/        # Navigable Page Objects only (exposed via fixtures)
+│   ├── vm/             # VirtualMachinesPage, VirtualMachineDetailPage, etc.
+│   ├── create-vm/      # CreateVmPage, BootableVolumesPage, etc.
+│   ├── overview/       # OverviewPage
+│   ├── settings/       # SettingsPage
+│   └── ...
+└── ...
+```
+
+- Components live in `@/components/<feature>/` — imported as `@/components/shared/modal-component`
+- Page Objects live in `@/page-objects/<feature>/` — imported as `@/page-objects/vm/virtual-machines-page`
+- Page Objects compose components via `readonly` properties
+- Test specs NEVER import from `@/components/` directly — they access components through Page Object properties
+
+## Debugging Flaky / Failing Tests
+
+Since the tests live in the same repo as the plugin source, always investigate **both sides** when diagnosing failures:
+
+### Step 1: Live UI Exploration (DEFAULT — always do this first)
+
+Before guessing at selectors or timing issues, navigate to the live page and inspect what's actually rendered:
+
+1. **Navigate** to the page under test
+2. **Take a snapshot** to see the exact DOM structure, headings, roles, and data-test attributes
+3. **Confirm selectors** — verify the exact text, aria-labels, and element refs that tests assert on
+4. **Check console errors** — catch runtime JS errors that affect rendering
+5. **Verify state** — confirm whether the page shows data, empty state, or error
+
+This ensures test assertions match reality. Never assume selectors from code alone.
+
+### Step 2: Inspect the Codebase
+
+With live findings in hand, cross-reference against the source:
+
+1. **Read the failing spec** — understand what the test asserts and what fixture/page object methods it calls
+2. **Read the page object** — check locators, waits, and interaction methods
+3. **Read the plugin source** (`src/`) — understand the component under test: what DOM it renders, what `data-test` attributes it uses, what network requests it makes
+4. **Check recent commits** — `git log --oneline -10 -- <relevant-src-path>` to see if the product code changed in a way that broke the test
+
+### Step 3: Apply Fixes Informed by Live Evidence
+
+Update test assertions and selectors to match what the live page actually renders. Always use exact headings, aria-labels, and data-test values confirmed via snapshot.
+
+## Browser Exploration Tool Hierarchy
+
+Use tools in this order of preference:
+
+### 1. Playwright CLI (preferred — if installed)
+
+```bash
+playwright-cli --version 2>/dev/null && echo "available" || echo "unavailable"
+```
+
+If available, this is **always** the primary tool. See `playwright/docs/playwright-cli-setup.md` for setup.
+
+**Session start:**
+```bash
+playwright-cli state-load playwright/mcp-validations/.auth/openshift-state.json
+playwright-cli resize 1920 1080
+playwright-cli goto <URL>
+playwright-cli snapshot
+```
+
+**Key capabilities:**
+- `snapshot` — accessibility tree (best for locator discovery)
+- `console error` / `console warning` — browser JS errors
+- `requests` / `request <n>` — network request inspection
+- `generate-locator <ref> --raw` — get Playwright locator strings
+- `video-start` / `video-stop` / `tracing-start` / `tracing-stop` — recording
+- `state-save` / `state-load` — auth persistence
+- `-s=name` — named parallel sessions
+
+### 2. Playwright MCP (fallback — if CLI not installed)
+
+If `playwright-cli` is not installed, use the `Playwright-browser_*` MCP tools:
+
+```
+Playwright-browser_navigate        → go to a URL
+Playwright-browser_snapshot        → accessibility tree (BEST for locator discovery)
+Playwright-browser_take_screenshot → visual capture
+Playwright-browser_click           → interact with elements
+Playwright-browser_type            → fill text inputs
+Playwright-browser_fill_form       → fill multiple form fields
+Playwright-browser_console_messages → console logs / errors
+Playwright-browser_network_requests → network activity
+Playwright-browser_wait_for        → wait for content or time
+Playwright-browser_run_code_unsafe → execute arbitrary Playwright code
+```
+
+**Session pattern:**
+```
+1. Navigate to console URL from .env (WEB_CONSOLE_URL)
+2. Login if needed (fill username/password form)
+3. Resize viewport: browser_resize 1920x1080
+4. Navigate to target page
+5. Take snapshot to inspect DOM
+6. Use run_code_unsafe for complex interactions (drawer dismissal, nav expansion)
+```
+
+### 3. Test Execution + Result Analysis (if neither CLI nor MCP available)
+
+When no browser exploration tool is available, run the failing test directly and analyze artifacts:
+
+```bash
+npx playwright test <spec-file> --grep "<test-name>" --workers=1 --retries=0
+```
+
+**Analysis flow:**
+1. Run the test and capture exit output (pass/fail, error messages)
+2. Read the error context: `playwright/test-results/artifacts/<test-folder>/error-context.md`
+3. Examine screenshots: view `test-failed-1.png` and `failure-screenshot-*.png`
+4. Review trace (if available): `npx playwright show-trace <trace.zip>`
+5. Cross-reference error messages against the spec and page object code
+6. Apply fixes based on the error type (selector mismatch, timing, strict mode, etc.)
+7. Re-run to verify
+
+**What to look for in results:**
+- `strict mode violation` → multiple elements matched; scope the selector or use `.first()`
+- `Timeout exceeded` → element not appearing; check navigation landed on the correct page
+- `locator resolved to hidden` → element exists but isn't visible; check tab state or panel expansion
+- `Target page, context or browser has been closed` → auth/session expired mid-test
+
+### 4. Raw Cluster Inspection (supplement)
+
+For backend-only debugging or when browser isn't needed:
+
+```bash
+oc get vm -n <namespace> -o json
+oc get events -n <namespace> --sort-by=.lastTimestamp
+oc logs -n openshift-cnv <pod> --tail=50
+```
+
+Use `rg` to search for selectors in page objects, and reference STD documents for expected UI behavior.
+
+## Cluster Consistency
+
+The `.env` file is the source of truth for cluster connection. Before any browser session:
+
+1. Read `.env` for `WEB_CONSOLE_URL` and `CLUSTER_URL`
+2. For playwright-cli: load auth state from `playwright/mcp-validations/.auth/openshift-state.json`
+3. For `oc` commands: ensure kubeconfig is authenticated against the `.env` cluster
+
+## Single-Process Execution Rule
+
+**Never run two concurrent `npx playwright test` commands.** Global setup creates shared auth files. Use `--workers=N` for parallelism within a single process.
+
+## Strict Implementation Rules
+
+These rules are **mandatory** for every test implementation. Violations must be fixed before considering a task complete.
+
+### 1. No Raw `page` in Spec Files
+
+Spec files must **never** import or use raw Playwright `page` methods. This includes `page.locator()`, `page.goto()`, `page.waitForTimeout()`, `page.evaluate()`, `page.keyboard`, and accessing `pageObject.page`. All interactions flow through page objects and components.
+
+### 2. No Data Setup in Spec Files
+
+Test data creation (VMs, templates, namespaces, DataVolumes, etc.) belongs in **data factories** or **K8s client methods** — never inline in the spec body. Specs call `k8sClient.vm.createFromTemplate(...)`, `k8sClient.dv.create(...)`, etc. If a factory method doesn't exist, **add it** to the appropriate client class rather than writing raw YAML or API calls in the spec.
+
+### 3. Composition Over Monolithic Page Objects
+
+- Page objects must stay focused — one navigable page per class.
+- Reusable UI sections (modals, toolbars, tabs, dropdowns) must be extracted into **Component** classes (`*-component.ts`) and composed via `readonly` properties.
+- A page object should not exceed **1000 lines of code**. If it does, extract components.
+- Spec files access composed components through the parent page: `vmDetailPage.scheduling.editRunStrategy()`.
+
+### 4. No Direct URL Navigation
+
+Always navigate through UI interactions (sidebar clicks, breadcrumbs, links) unless:
+- The page has no UI path (e.g. admin-only cluster settings)
+- A `beforeEach` needs to reset to a known page quickly after a previous test dirtied the state
+- The test explicitly validates deep-linking behavior
+
+When URL navigation is necessary, use page object methods (`goTo()`, `navigateTo*()`) — never `page.goto()` directly.
+
+### 5. No Hard Expects on Timing
+
+- **Never** use `page.waitForTimeout()` or raw `setTimeout` in specs or page objects for synchronization.
+- Use `expect.poll()` for values that stabilize over time.
+- Use `locator.waitFor({ state: 'visible' | 'hidden' })` for DOM presence.
+- Use `TestTimeouts.*` constants — never hardcode milliseconds.
+- The only acceptable use of `page.waitForTimeout()` is inside a page object/component method as a **settle delay** (e.g. 500ms after a checkbox click) where no better DOM signal exists. Always pair with a comment explaining why.
+
+### 6. Linter Compliance — Zero Warnings
+
+- All code must pass `npx eslint --fix` with **zero errors and zero warnings**.
+- All code must pass `npm run check-types:playwright` cleanly.
+- Run both checks after every implementation before marking a task complete.
+
+### 7. File Size Limits
+
+| File type | Max lines |
+|-----------|-----------|
+| Spec file (`.spec.ts`) | 300 |
+| Page object (`*-page.ts`) | 1000 |
+| Component (`*-component.ts`) | 500 |
+| Client / handler | 800 |
+| Utility module | 400 |
+
+If a file exceeds its limit, refactor: extract components, split specs into multiple files by feature area, or decompose utilities.
+
+### 8. Selector Strategy
+
+1. Prefer `[data-test="..."]` and `[data-test-id="..."]` attributes
+2. Fall back to `getByRole()` with accessible names
+3. Fall back to `getByText()` for user-visible content
+4. **Never** use fragile CSS class selectors (`.pf-v6-c-*`, `.co-*`) as primary locators
+5. All selectors belong in page objects or components — never in spec files
+
+### 9. Assertions Are Mandatory and Must Be Resilient
+
+- **Every test must contain explicit assertions** — a test without `expect` or `expect.soft` is browser automation, not a test.
+- **Prefer `expect.soft`** for non-fatal validations within `test.step` — reports all failures instead of stopping at the first.
+- **Always include a descriptive `message`** as the second argument: `expect.soft(value, 'VM name should be visible').toBe(true)`.
+- Use `expect.poll()` for any value that depends on async state (row counts, status text, API-driven content).
+- Hard `expect(value).toBe(...)` is only acceptable for synchronous, deterministic values (e.g. string formatting, computed constants).
+- Always provide a `timeout` from `TestTimeouts.*` to `expect.poll()`.
+
+**Anti-pattern** (no assertions — just automation):
+```typescript
+await vmDetailPage.navigateToOverview();
+await vmDetailPage.clickDisksTab();
+await vmDetailPage.verifyDisksTableLoaded(); // returns void — no assertion!
+```
+
+**Correct** (explicit validation):
+```typescript
+await vmDetailPage.navigateToOverview();
+await vmDetailPage.clickDisksTab();
+const diskCount = await vmDetailPage.getDiskCount();
+expect.soft(diskCount, 'VM should have at least one disk').toBeGreaterThan(0);
+```
+
+### 10. Cleanup Is Mandatory
+
+- Every resource created during a test **must** be registered with `cleanup.track*()` immediately after creation.
+- Use `cleanup.trackVirtualMachine()`, `cleanup.trackDataVolume()`, `cleanup.trackTemplate()`, etc.
+- Never rely on namespace deletion alone — explicit cleanup enables parallel test execution.
+
+### 11. Import Order
+
+Maintain consistent import ordering in all files:
+
+```
+1. Node built-ins (path, fs)
+2. External packages (@playwright/test)
+3. Allure / test constants (@/data-models/allure-constants)
+4. Fixtures (@/fixtures/*)
+5. Page objects (@/page-objects/*)
+6. Components (@/components/*)
+7. Clients (@/clients/*)
+8. Utilities (@/utils/*)
+9. Types (@/types/*)
+```
+
+### 12. Naming Conventions
+
+- Spec files: `kebab-case.spec.ts`
+- Page objects: `kebab-case-page.ts` → exports `PascalCasePage`
+- Components: `kebab-case-component.ts` → exports `PascalCaseComponent`
+- Test names: `ID(CNV-XXXXX) Descriptive sentence` (ticket annotation required)
+- Variables: `camelCase`; constants: `UPPER_SNAKE_CASE`
+
+## Branch Naming
+
+1. Resolve username: `git config user.email | cut -d@ -f1`
+2. Single ticket: `<username>/<jira-key-lowercase>-test`
+3. Multiple tickets: `<username>/test-automation-<first-jira-key-lowercase>`
+4. From coverage: `<username>/coverage-gaps-<YYYY-MM-DD>`

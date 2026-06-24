@@ -12,8 +12,6 @@ import RunStrategyModal from '@kubevirt-utils/components/RunStrategyModal/RunStr
 import { updateRunStrategy } from '@kubevirt-utils/components/RunStrategyModal/utils';
 import BulkSnapshotModal from '@kubevirt-utils/components/SnapshotModal/BulkSnapshotModal';
 import SnapshotModal from '@kubevirt-utils/components/SnapshotModal/SnapshotModal';
-import { MultiNamespaceVirtualMachineStorageMigrationPlanModel } from '@kubevirt-utils/models';
-import { getStorageMigrationBackend } from '@kubevirt-utils/resources/migrations/backends';
 import {
   type StorageMigrationAPI,
   STORAGE_MIGRATION_API,
@@ -34,7 +32,6 @@ import CrossClusterMigration from '@multicluster/components/CrossClusterMigratio
 import { CROSS_CLUSTER_MIGRATION_ACTION_ID } from '@multicluster/constants';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
-import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
 
 import { isLiveMigratable, isRunning, isStopped, printableVMStatus } from '../utils';
 
@@ -56,7 +53,9 @@ import {
   getBulkDeleteActionDescription,
   getCommonLabels,
   getLabelsDiffPatch,
+  getStorageMigrationConfig,
   isBulkDeleteActionDisabled,
+  moveVMToFolder,
 } from './utils';
 
 const { Paused, Stopped } = printableVMStatus;
@@ -238,35 +237,15 @@ export const createBulkVirtualMachineActionFactory = (
     createModal: (modal: ModalComponent) => void,
     storageMigAPI: StorageMigrationAPI = STORAGE_MIGRATION_API.MULTI_NS,
   ): ActionDropdownItemType => {
-    const isLoading = storageMigAPI === STORAGE_MIGRATION_API.LOADING;
-    const isUnavailable = storageMigAPI === STORAGE_MIGRATION_API.NONE;
-    const backend = getStorageMigrationBackend(storageMigAPI);
-    const planModel = backend?.planModel ?? null;
-    const planNamespace = backend?.fixedPlanNamespace ?? getNamespace(vms?.[0]);
-
-    const accessReviewModel = planModel ?? MultiNamespaceVirtualMachineStorageMigrationPlanModel;
-
-    const migrateStorageDisabledTooltip = () => {
-      if (isLoading) return t('Checking storage migration availability...');
-      if (isUnavailable) return t('Storage migration is not available on this cluster.');
-      return getNoPermissionTooltipContent(t);
-    };
+    const config = getStorageMigrationConfig(storageMigAPI, vms?.[0], t);
 
     return {
-      accessReview: {
-        cluster: getCluster(vms?.[0]),
-        group: accessReviewModel.apiGroup,
-        namespace: planModel ? planNamespace : getNamespace(vms?.[0]),
-        resource: accessReviewModel.plural,
-        verb: 'create',
-      },
+      ...config,
       cta: () =>
         createModal((props) => (
           <VirtualMachineMigrateModal storageMigAPI={storageMigAPI} vms={vms} {...props} />
         )),
       description: t('Migrate VirtualMachine storage to a different StorageClass'),
-      disabled: isLoading || isUnavailable || !planModel,
-      disabledTooltip: migrateStorageDisabledTooltip(),
       id: ACTIONS_ID.MIGRATE_STORAGE,
       label: t('Storage'),
     };
@@ -278,27 +257,9 @@ export const createBulkVirtualMachineActionFactory = (
     cta: () =>
       createModal(({ isOpen, onClose }) => (
         <MoveBulkVMToFolderModal
-          onSubmit={(folderName) => {
-            return Promise.all(
-              vms.map((vm) => {
-                const labels = vm?.metadata?.labels || {};
-                labels[VM_FOLDER_LABEL] = folderName;
-                return kubevirtK8sPatch<V1VirtualMachine>({
-                  data: [
-                    {
-                      op: 'replace',
-                      path: '/metadata/labels',
-                      value: labels,
-                    },
-                  ],
-                  model: VirtualMachineModel,
-                  resource: vm,
-                });
-              }),
-            );
-          }}
           isOpen={isOpen}
           onClose={onClose}
+          onSubmit={(folderName) => Promise.all(vms.map((vm) => moveVMToFolder(vm, folderName)))}
           vms={vms}
         />
       )),

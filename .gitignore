@@ -5,10 +5,40 @@ dist
 .env.local
 /coverage
 /gui-test-screenshots
-# Playwright - ignore all test results (artifacts, traces, reports)
+# Playwright — test results, reports, and runtime artifacts
 playwright/test-results/
 playwright/.auth/
-.playwright-mcp
+playwright/.cache/
+playwright/playwright-report/
+playwright-report/
+.playwright-mcp/
+.playwright-cli/
+.storage-states/
+.test-configs/
+.test-data/
+.test-config.json
+.pids/
+test-results/
+blob-report/
+
+# Test debugging artifacts
+debug-screenshots/
+retry-videos/
+*.webm
+
+# MCP validation output (transient evidence, not test code)
+playwright/mcp-validations/
+
+# Product analysis reports (local reading only)
+playwright/product-analysis/
+
+# Cluster logs for local debugging
+.cluster-logs/
+
+# Kubeconfig and auth state
+.kubeconfig
+.kubeconfigs/
+
 .DS_Store
 .devcontainer/dev.env
 console-extensions.md

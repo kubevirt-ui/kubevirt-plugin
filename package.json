@@ -68,6 +68,7 @@
     "zustand": "^4.3.7"
   },
   "devDependencies": {
+    "@kubernetes/client-node": "^1.4.0",
     "@openshift-console/dynamic-plugin-sdk": "4.23.0-prerelease.2",
     "@openshift-console/dynamic-plugin-sdk-internal": "4.23.0-prerelease.1",
     "@openshift-console/dynamic-plugin-sdk-webpack": "4.23.0-prerelease.1",
@@ -83,6 +84,7 @@
     "@typescript-eslint/parser": "^8.61.1",
     "copy-webpack-plugin": "^12.0.2",
     "css-loader": "^6.11.0",
+    "dotenv": "^17.4.2",
     "esbuild": "^0.28.0",
     "esbuild-loader": "^4.4.3",
     "eslint": "^8.57.1",
@@ -119,18 +121,18 @@
     "webpack-dev-server": "^5.2.3"
   },
   "engines": {
-    "npm": ">=10.9.0",
-    "node": ">=22.0.0"
+    "node": ">=22.0.0",
+    "npm": ">=10.9.0"
   },
   "lint-staged": {
-    "src/**/*.{js,ts,tsx,jsx,json}": [
-      "npm run i18n"
+    "!(*.js|*.jsx|*.ts|*.tsx)": [
+      "prettier --write --ignore-unknown"
     ],
     "*.{js,ts,tsx,jsx}": [
       "eslint --fix"
     ],
-    "!(*.js|*.jsx|*.ts|*.tsx)": [
-      "prettier --write --ignore-unknown"
+    "src/**/*.{js,ts,tsx,jsx,json}": [
+      "npm run i18n"
     ]
   },
   "name": "kubevirt-plugin",
@@ -139,36 +141,37 @@
       "@openshift-console/dynamic-plugin-sdk": "4.23.0-prerelease.2",
       "react-i18next": "~16.5.8"
     },
-    "eslint": "^8.57.1",
-    "delaunator": "4.0.1"
+    "delaunator": "4.0.1",
+    "eslint": "^8.57.1"
   },
   "private": true,
   "scripts": {
     "build": "npm run clean && NODE_ENV=production NODE_OPTIONS=--max-old-space-size=8192 npm run ts-node -- node_modules/.bin/webpack",
     "check-types": "tsc",
+    "check-types:playwright": "tsc --noEmit --project playwright/tsconfig.json",
     "clean": "rm -rf dist",
-    "playwright-install": "playwright install chromium",
-    "playwright-report": "playwright show-report ./playwright/test-results/html-report",
     "dev": "npm run clean && NODE_ENV=development NODE_OPTIONS=--max-old-space-size=8192 npm run ts-node -- node_modules/.bin/webpack serve --progress",
     "export-pos": "./i18n-scripts/export-pos.sh",
     "i18n": "i18next --silent && node ./i18n-scripts/set-english-defaults.js && ./i18n-scripts/replace-br.sh",
-    "i18n:verbose": "i18next && node ./i18n-scripts/set-english-defaults.js && ./i18n-scripts/replace-br.sh",
     "i18n-dummy-locale": "node ./i18n-scripts/dummy-locale.js",
     "i18n-to-po": "node ./i18n-scripts/i18n-to-po.js",
+    "i18n:verbose": "i18next && node ./i18n-scripts/set-english-defaults.js && ./i18n-scripts/replace-br.sh",
     "lint": "eslint . --color && prettier . --ignore-unknown --check --ignore-path .prettierignorecode",
-    "lint:fix": "eslint . --color --fix && prettier . --ignore-unknown --write --ignore-path .prettierignorecode",
     "lint-staged": "lint-staged",
+    "lint:fix": "eslint . --color --fix && prettier . --ignore-unknown --write --ignore-path .prettierignorecode",
     "memsource-download": "./i18n-scripts/memsource-download.sh",
     "memsource-upload": "./i18n-scripts/memsource-upload.sh",
     "oc-login-start-console": "./oc-login-start-console.sh",
+    "playwright-install": "playwright install chromium",
+    "playwright-report": "playwright show-report ./playwright/test-results/html-report",
     "po-to-i18n": "node ./i18n-scripts/po-to-i18n.js",
     "postinstall": "cp node_modules/@openshift-console/dynamic-plugin-sdk/docs/console-extensions.md .",
     "prepare": "husky install",
     "start": "npm run ts-node -- node_modules/.bin/webpack serve",
     "start-console": "./start-console.sh",
+    "start-console-with-lightspeed": "./start-console.sh lightspeed-console-plugin",
     "start-console-with-monitoring": "./start-console.sh monitoring-plugin",
     "start-console-with-networking": "./start-console.sh networking-console-plugin",
-    "start-console-with-lightspeed": "./start-console.sh lightspeed-console-plugin",
     "start-console-with-nmstate": "./start-console.sh nmstate-console-plugin",
     "test": "jest",
     "test-cov": "jest --coverage",
