@@ -16,7 +16,7 @@ export const storageclassMigrate = (destSC: string) => {
   cy.get(`button#select-inline-filter-${destSC}`).click();
   cy.get(nextBtn).click();
   cy.get(nextBtn).click();
-  cy.contains(modal, 'In progress').should('exist');
-  cy.contains(modal, 'Migration completed successfully', { timeout: 300000 }).should('exist');
+  cy.contains(modal, 'Migration in progress...').should('exist');
+  cy.contains(modal, 'Storage migration completed', { timeout: 300000 }).should('exist');
   cy.get(closeBtn).click();
 };

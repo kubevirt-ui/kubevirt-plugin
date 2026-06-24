@@ -7,20 +7,24 @@ import {
 import {
   MultiNamespaceVirtualMachineStorageMigration,
   MultiNamespaceVirtualMachineStorageMigrationPlan,
+  STORAGE_MIGRATION_PLAN_RETENTION_POLICY,
 } from '@kubevirt-utils/resources/migrations/constants';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getRandomChars } from '@kubevirt-utils/utils/utils';
 import { kubevirtK8sCreate } from '@multicluster/k8sRequests';
 
-import { SelectedMigration } from './constants';
+import { MIGPLAN_PREFIX, MIGRATION_PREFIX } from '../../utils/constants';
+import { truncateToK8sName } from '../../utils/shared';
+import type { MigrateVMsParams } from '../types';
 
 export const getEmptyMigPlan = (
   namespace: string,
+  planName?: string,
 ): MultiNamespaceVirtualMachineStorageMigrationPlan => ({
   apiVersion: `${MultiNamespaceVirtualMachineStorageMigrationPlanModel.apiGroup}/${MultiNamespaceVirtualMachineStorageMigrationPlanModel.apiVersion}`,
   kind: MultiNamespaceVirtualMachineStorageMigrationPlanModel.kind,
   metadata: {
-    name: `migplan-${getRandomChars()}`,
+    name: planName || `${MIGPLAN_PREFIX}-${getRandomChars()}`,
     namespace,
   },
   spec: {
@@ -34,7 +38,10 @@ export const getMigration = (
   apiVersion: `${MultiNamespaceVirtualMachineStorageMigrationModel.apiGroup}/${MultiNamespaceVirtualMachineStorageMigrationModel.apiVersion}`,
   kind: MultiNamespaceVirtualMachineStorageMigrationModel.kind,
   metadata: {
-    name: `migration-${getName(migrationPlan) || getRandomChars()}`,
+    name: truncateToK8sName(
+      `${MIGRATION_PREFIX}-${getName(migrationPlan) || getRandomChars()}`,
+      '',
+    ),
     namespace: getNamespace(migrationPlan),
   },
   spec: {
@@ -44,19 +51,31 @@ export const getMigration = (
   },
 });
 
-export const migrateVMs = async (
-  selectedMigrations: SelectedMigration[],
-  destinationStorageClass: string,
-  cluster: string,
-) => {
-  const migrationPlan = getEmptyMigPlan(getNamespace(selectedMigrations?.[0].pvc));
+export const migrateVMs = async ({
+  cluster,
+  destinationStorageClass,
+  keepOriginalVolumes,
+  migrationPlanName,
+  selectedMigrations,
+}: MigrateVMsParams) => {
+  const migrationPlan = getEmptyMigPlan(
+    getNamespace(selectedMigrations?.[0].pvc),
+    migrationPlanName,
+  );
 
   const migrationsPerNamespace = groupBy(selectedMigrations, 'vmNamespace');
 
   Object.entries(migrationsPerNamespace).forEach(([namespace, migrations]) => {
-    const namespaceMigrations = { name: namespace, virtualMachines: [] };
+    const namespaceMigrations = {
+      name: namespace,
+      retentionPolicy: keepOriginalVolumes
+        ? STORAGE_MIGRATION_PLAN_RETENTION_POLICY.KEEP_SOURCE
+        : STORAGE_MIGRATION_PLAN_RETENTION_POLICY.DELETE_SOURCE,
+      virtualMachines: [],
+    };
 
-    const migrationsPerVM = groupBy(migrations, 'vmName');
+    // TODO: properly type migrationsPerVM
+    const migrationsPerVM: Record<string, any[]> = groupBy(migrations, 'vmName');
 
     Object.entries(migrationsPerVM).forEach(([vmName, vmMigrations]) => {
       namespaceMigrations.virtualMachines.push({
@@ -82,7 +101,7 @@ export const migrateVMs = async (
 
   await kubevirtK8sCreate<MultiNamespaceVirtualMachineStorageMigration>({
     cluster,
-    data: getMigration(migrationPlan),
+    data: getMigration(createdMigrationPlan),
     model: MultiNamespaceVirtualMachineStorageMigrationModel,
   });
 

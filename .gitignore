@@ -2,10 +2,13 @@
 npm-debug.log
 dist
 **/.env
+.env.local
 /coverage
 /gui-test-screenshots
-cypress/gui-test-screenshots
-cypress/cypress-a11y-report.json
+# Playwright - ignore all test results (artifacts, traces, reports)
+playwright/test-results/
+playwright/.auth/
+.playwright-mcp
 .DS_Store
 .devcontainer/dev.env
 console-extensions.md
@@ -14,3 +17,9 @@ scripts/ca.crt
 scripts/console-client-secret
 *.json-*
 *.env
+ci-scripts/_
+ci-scripts/_ci_tools
+ci-scripts/generated/
+
+# Personal Cursor rules (not shared with team)
+.cursor/rules/personal-*.mdc

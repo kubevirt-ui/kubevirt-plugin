@@ -6,11 +6,11 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import {
   modelToGroupVersionKind,
   modelToRef,
-  MultiNamespaceVirtualMachineStorageMigrationPlanModel,
   NamespaceModel,
   StorageClassModel,
 } from '@kubevirt-utils/models';
 import { MultiNamespaceVirtualMachineStorageMigrationPlan } from '@kubevirt-utils/resources/migrations/constants';
+import { getStorageMigrationPlanSpecNamespaces } from '@kubevirt-utils/resources/migrations/selectors';
 import {
   getMigrationStartTimestamp,
   getVolumeCountFromMigPlan,
@@ -21,7 +21,7 @@ import { RowProps, TableData, Timestamp } from '@openshift-console/dynamic-plugi
 import { Progress } from '@patternfly/react-core';
 import { FleetResourceLink } from '@stolostron/multicluster-sdk';
 
-import { getStorageClassesFromMigPlan } from '../utils';
+import { getStorageClassesFromMigPlan, getStorageMigrationRowModel } from '../utils';
 
 import { getMigrationPercentage, getStatusMigration } from './utils';
 
@@ -35,6 +35,7 @@ const StorageMigrationRow: FC<StorageMigrationRowProps> = ({ activeColumnIDs, ob
   const targetStorageClasses = getStorageClassesFromMigPlan(obj);
 
   const migPlanName = getName(obj);
+  const planModel = getStorageMigrationRowModel(obj);
 
   const statusMigration = getStatusMigration(obj);
 
@@ -42,24 +43,22 @@ const StorageMigrationRow: FC<StorageMigrationRowProps> = ({ activeColumnIDs, ob
     <>
       <TableData activeColumnIDs={activeColumnIDs} className="pf-m-width-30" id="name">
         <FleetResourceLink
-          groupVersionKind={modelToGroupVersionKind(
-            MultiNamespaceVirtualMachineStorageMigrationPlanModel,
-          )}
           onClick={() =>
             navigate(
               getResourceUrl({
-                model: MultiNamespaceVirtualMachineStorageMigrationPlanModel,
+                model: planModel,
                 resource: obj,
               }),
             )
           }
           cluster={cluster}
+          groupVersionKind={modelToGroupVersionKind(planModel)}
           name={migPlanName}
           namespace={getNamespace(obj)}
         />
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="namespaces">
-        {obj?.spec?.namespaces?.map((namespace) => (
+        {getStorageMigrationPlanSpecNamespaces(obj).map((namespace) => (
           <FleetResourceLink
             cluster={cluster}
             groupVersionKind={modelToGroupVersionKind(NamespaceModel)}
@@ -97,9 +96,7 @@ const StorageMigrationRow: FC<StorageMigrationRowProps> = ({ activeColumnIDs, ob
         )}
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} className="pf-v6-c-table__action" id="">
-        <LazyActionMenu
-          context={{ [modelToRef(MultiNamespaceVirtualMachineStorageMigrationPlanModel)]: obj }}
-        />
+        <LazyActionMenu context={{ [modelToRef(planModel)]: obj }} />
       </TableData>
     </>
   );

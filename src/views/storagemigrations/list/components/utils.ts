@@ -1,31 +1,39 @@
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { MultiNamespaceVirtualMachineStorageMigrationPlan } from '@kubevirt-utils/resources/migrations/constants';
 import {
+  MultiNamespaceVirtualMachineStorageMigrationPlan,
+  STORAGE_MIGRATION_PHASE,
+} from '@kubevirt-utils/resources/migrations/constants';
+import { getStatusNamespaces } from '@kubevirt-utils/resources/migrations/selectors';
+import {
+  getCompletedVolumeCountFromMigPlan,
   getVolumeCountFromMigPlan,
   isMigrationCompleted,
 } from '@kubevirt-utils/resources/migrations/utils';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { ProgressVariant } from '@patternfly/react-core';
 
 export const getStatusMigration = (
   storageMigrationPlan: MultiNamespaceVirtualMachineStorageMigrationPlan,
 ): { title: string; variant?: ProgressVariant } => {
+  const namespaces = getStatusNamespaces(storageMigrationPlan);
+
   if (
-    storageMigrationPlan?.status?.namespaces?.some(
-      (namespace) => namespace?.failedMigrations?.length > 0,
+    namespaces?.some(
+      (namespace) =>
+        !isEmpty(namespace?.[STORAGE_MIGRATION_PHASE.FAILED]) ||
+        !isEmpty(namespace?.[STORAGE_MIGRATION_PHASE.INVALID]),
     )
-  )
+  ) {
     return { title: t('Failed'), variant: ProgressVariant.danger };
+  }
 
   if (isMigrationCompleted(storageMigrationPlan)) {
     return { title: t('Completed'), variant: ProgressVariant.success };
   }
 
-  if (
-    storageMigrationPlan?.status?.namespaces?.some(
-      (namespace) => namespace?.inProgressMigrations?.length > 0,
-    )
-  )
+  if (namespaces?.some((namespace) => !isEmpty(namespace?.[STORAGE_MIGRATION_PHASE.IN_PROGRESS]))) {
     return { title: t('Running'), variant: null };
+  }
 
   return { title: t('Pending'), variant: null };
 };
@@ -33,12 +41,7 @@ export const getStatusMigration = (
 export const getMigrationPercentage = (
   storageMigrationPlan: MultiNamespaceVirtualMachineStorageMigrationPlan,
 ) => {
-  const successfulLiveMigration =
-    storageMigrationPlan?.status?.namespaces?.reduce(
-      (acc, namespace) => acc + namespace?.completedMigrations?.length,
-      0,
-    ) || 0;
-
+  const successfulLiveMigration = getCompletedVolumeCountFromMigPlan(storageMigrationPlan);
   const totalMigrations = getVolumeCountFromMigPlan(storageMigrationPlan);
 
   if (totalMigrations === 0) return 0;

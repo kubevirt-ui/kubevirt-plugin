@@ -1,9 +1,17 @@
-import { EncodedExtension } from '@openshift/dynamic-plugin-sdk-webpack';
-import { FeatureFlagHookProvider, NavSection } from '@openshift-console/dynamic-plugin-sdk';
-import type { ConsolePluginBuildMetadata } from '@openshift-console/dynamic-plugin-sdk-webpack';
+import type {
+  FeatureFlagHookProvider,
+  HrefNavItem,
+  NavSection,
+  RoutePage,
+} from '@openshift-console/dynamic-plugin-sdk';
+import type {
+  ConsolePluginBuildMetadata,
+  EncodedExtension,
+} from '@openshift-console/dynamic-plugin-sdk-webpack';
 
 export const exposedModules: ConsolePluginBuildMetadata['exposedModules'] = {
   StorageMigrationList: './views/storagemigrations/list/StorageMigrationList.tsx',
+  StorageMigrationListRedirect: './views/storagemigrations/list/StorageMigrationListRedirect.tsx',
   useStorageMigrationActionsProvider:
     './views/storagemigrations/actions/useStorageMigrationActions.tsx',
 };
@@ -32,6 +40,13 @@ export const extensions: EncodedExtension[] = [
   {
     properties: {
       component: { $codeRef: 'StorageMigrationList' },
+      path: ['/k8s/ns/:ns/storagemigrations', '/k8s/all-namespaces/storagemigrations'],
+    },
+    type: 'console.page/route',
+  } as EncodedExtension<RoutePage>,
+  {
+    properties: {
+      component: { $codeRef: 'StorageMigrationListRedirect' },
       model: {
         group: 'migrations.kubevirt.io',
         kind: 'MultiNamespaceVirtualMachineStorageMigrationPlan',
@@ -42,28 +57,54 @@ export const extensions: EncodedExtension[] = [
     type: 'console.page/resource/list',
   },
   {
+    flags: {
+      required: ['SHOW_MIGRATION_SECTION'],
+    },
     properties: {
       dataAttributes: {
         'data-quickstart-id': 'qs-nav-storagemigrations',
         'data-test-id': 'storagemigrations-nav-item',
       },
+      href: 'storagemigrations',
       id: 'storagemigrations',
-      model: {
-        group: 'migrations.kubevirt.io',
-        kind: 'MultiNamespaceVirtualMachineStorageMigrationPlan',
-        version: 'v1alpha1',
-      },
       name: '%plugin__kubevirt-plugin~Storage migrations%',
+      prefixNamespaced: true,
       section: 'migration',
     },
-    type: 'console.navigation/resource-ns',
-  },
+    type: 'console.navigation/href',
+  } as EncodedExtension<HrefNavItem>,
 
   {
     properties: {
       model: {
         group: 'migrations.kubevirt.io',
         kind: 'MultiNamespaceVirtualMachineStorageMigrationPlan',
+        version: 'v1alpha1',
+      },
+      provider: {
+        $codeRef: 'useStorageMigrationActionsProvider',
+      },
+    },
+    type: 'console.action/resource-provider',
+  },
+  {
+    properties: {
+      model: {
+        group: 'migrations.kubevirt.io',
+        kind: 'VirtualMachineStorageMigrationPlan',
+        version: 'v1alpha1',
+      },
+      provider: {
+        $codeRef: 'useStorageMigrationActionsProvider',
+      },
+    },
+    type: 'console.action/resource-provider',
+  },
+  {
+    properties: {
+      model: {
+        group: 'migration.openshift.io',
+        kind: 'MigPlan',
         version: 'v1alpha1',
       },
       provider: {
