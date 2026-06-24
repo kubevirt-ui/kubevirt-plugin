@@ -31,3 +31,5 @@ export const VM_ERROR_STATUSES = [
   VM_STATUS.Unknown,
   VM_STATUS.WaitingForVolumeBinding,
 ];
+
+export const ERROR_STATUS = 'Error';

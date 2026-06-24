@@ -1,10 +1,16 @@
 import { useCallback, useMemo } from 'react';
-import { useLocation, useNavigate } from 'react-router';
+import { useLocation } from 'react-router';
 
+import { logVMSavedSearchApplied } from '@kubevirt-utils/extensions/telemetry/dashboard';
+import {
+  KubevirtFilterState,
+  OnSetFilters,
+} from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
 import { USER_SETTINGS_KEYS } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/const';
-import useVMSearchURL from '@multicluster/hooks/useVMSearchURL';
+import { updateFilterState } from '@search/searchLanguage/hooks/useOnCommitText/updateFilterState';
 import { validSearchQueryParams } from '@search/utils/constants';
+import { convertQueryToFilterState } from '@search/utils/query';
 
 type SavedSearchData = {
   description: string;
@@ -25,12 +31,15 @@ type SavedSearchDataResult = {
   urlSearchQuery: string;
 };
 
-type UseSavedSearchData = () => SavedSearchDataResult;
+type UseSavedSearchDataProps = {
+  filters: KubevirtFilterState;
+  onSetFilters: OnSetFilters;
+};
 
-export const useSavedSearchData: UseSavedSearchData = () => {
+type UseSavedSearchData = (props: UseSavedSearchDataProps) => SavedSearchDataResult;
+
+export const useSavedSearchData: UseSavedSearchData = ({ filters, onSetFilters }) => {
   const location = useLocation();
-  const navigate = useNavigate();
-  const searchPageURL = useVMSearchURL();
 
   const urlSearchQuery = useMemo(() => {
     const allParams = new URLSearchParams(location.search);
@@ -62,10 +71,12 @@ export const useSavedSearchData: UseSavedSearchData = () => {
       const query = savedSearches?.[name]?.query;
 
       if (query) {
-        navigate(`${searchPageURL}?${query}${location.hash}`, { replace: true });
+        const newFilters = convertQueryToFilterState(query);
+        updateFilterState(filters, newFilters, onSetFilters);
+        logVMSavedSearchApplied(query);
       }
     },
-    [savedSearches, navigate, searchPageURL, location.hash],
+    [savedSearches, filters, onSetFilters],
   );
 
   const deleteSearch = useCallback<SavedSearchDataResult['deleteSearch']>(
@@ -87,24 +98,13 @@ export const useSavedSearchData: UseSavedSearchData = () => {
     [setSavedSearches, savedSearches],
   );
 
-  return useMemo<SavedSearchDataResult>(
-    () => ({
-      applySearch,
-      deleteSearch,
-      saveSearch,
-      searches: searchEntries,
-      searchesLoaded,
-      searchesLoadError,
-      urlSearchQuery,
-    }),
-    [
-      applySearch,
-      saveSearch,
-      searchEntries,
-      searchesLoaded,
-      searchesLoadError,
-      urlSearchQuery,
-      deleteSearch,
-    ],
-  );
+  return {
+    applySearch,
+    deleteSearch,
+    saveSearch,
+    searches: searchEntries,
+    searchesLoaded,
+    searchesLoadError,
+    urlSearchQuery,
+  };
 };

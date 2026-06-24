@@ -1,5 +1,9 @@
 import React, { FC, useState } from 'react';
 
+import {
+  KubevirtFilterState,
+  OnSetFilters,
+} from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   Dropdown,
@@ -15,12 +19,17 @@ import { TrashIcon } from '@patternfly/react-icons';
 import { ExclamationCircleIcon } from '@patternfly/react-icons';
 import { useSavedSearchData } from '@search/hooks/useSavedSearchData';
 
-const SavedSearchesDropdown: FC = () => {
+type SavedSearchesDropdownProps = {
+  filters: KubevirtFilterState;
+  onSetFilters: OnSetFilters;
+};
+
+const SavedSearchesDropdown: FC<SavedSearchesDropdownProps> = ({ filters, onSetFilters }) => {
   const { t } = useKubevirtTranslation();
   const [open, setOpen] = useState(false);
 
   const { applySearch, deleteSearch, searches, searchesLoaded, searchesLoadError } =
-    useSavedSearchData();
+    useSavedSearchData({ filters, onSetFilters });
 
   const emptyStateWrapperClass =
     'pf-v6-u-mx-lg pf-v6-u-my-md pf-v6-u-text-color-subtle saved-searches-dropdown-menu';

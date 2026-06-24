@@ -29,6 +29,7 @@ import ClusterField from './formFields/ClusterField';
 import CPUField from './formFields/CPUField';
 import DateCreatedField from './formFields/DateCreatedField';
 import DescriptionField from './formFields/DescriptionField';
+import GuestAgentField from './formFields/GuestAgentField';
 import HardwareDevicesField from './formFields/HardwareDevicesField';
 import IPField from './formFields/IPField';
 import LabelsField from './formFields/LabelsField';
@@ -118,6 +119,7 @@ const AdvancedSearchModal: FC<AdvancedSearchModalProps> = ({
               <DateCreatedField />
               <LabelsField vms={vms} />
               <SchedulingField />
+              <GuestAgentField />
               <NodesField />
               <ArchitectureField vms={vms} />
             </Form>

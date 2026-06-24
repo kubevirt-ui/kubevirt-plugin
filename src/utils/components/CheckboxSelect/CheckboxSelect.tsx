@@ -6,6 +6,7 @@ import {
   Badge,
   MenuToggle,
   MenuToggleElement,
+  MenuToggleProps,
   Select,
   SelectList,
   SelectOption,
@@ -21,6 +22,7 @@ type CheckboxSelectProps = {
   options?: SelectOptionProps[];
   selectedValues: any[];
   showAllBadge?: boolean;
+  toggleSize?: MenuToggleProps['size'];
   toggleTitle?: ReactNode;
   tooltipContent?: ReactNode;
 };
@@ -32,6 +34,7 @@ const CheckboxSelect: FC<CheckboxSelectProps> = ({
   options,
   selectedValues,
   showAllBadge,
+  toggleSize,
   toggleTitle,
   tooltipContent,
 }) => {
@@ -56,6 +59,7 @@ const CheckboxSelect: FC<CheckboxSelectProps> = ({
         isExpanded={isOpen}
         onClick={onToggleClick}
         ref={toggleRef}
+        size={toggleSize}
       >
         {toggleTitle}
       </MenuToggle>

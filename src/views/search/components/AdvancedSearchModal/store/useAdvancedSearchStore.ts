@@ -7,6 +7,7 @@ import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 import { AdvancedSearchInputs, AdvancedSearchQueryInputs } from '../../../utils/types';
 import { DateSelectOption } from '../constants/dateSelect';
 import {
+  initialGuestAgent,
   initialHWDevices,
   initialMemory,
   initialScheduling,
@@ -43,6 +44,7 @@ const getInitialState = (prefillInputs: AdvancedSearchInputs = {}): AdvancedSear
     [VirtualMachineRowFilterType.DateCreatedFrom]: '',
     [VirtualMachineRowFilterType.DateCreatedTo]: '',
     [VirtualMachineRowFilterType.Description]: '',
+    [VirtualMachineRowFilterType.GuestAgent]: initialGuestAgent,
     [VirtualMachineRowFilterType.HWDevices]: initialHWDevices,
     [VirtualMachineRowFilterType.IP]: '',
     [VirtualMachineRowFilterType.Labels]: [],

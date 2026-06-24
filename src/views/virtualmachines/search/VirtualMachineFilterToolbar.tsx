@@ -4,6 +4,7 @@ import HiddenFilterChips from '@kubevirt-utils/components/KubevirtFilterToolbar/
 import SelectFilterItem from '@kubevirt-utils/components/KubevirtFilterToolbar/components/SelectFilterItem';
 import { logVMListFiltered } from '@kubevirt-utils/extensions/telemetry/dashboard';
 import { getLabelFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/filters/getLabelFilter';
+import { getNameFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/filters/getNameFilter';
 import {
   KubevirtFilter,
   KubevirtFilterLayout,
@@ -13,11 +14,8 @@ import {
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useIsACMPage from '@multicluster/useIsACMPage';
 import { Toolbar, ToolbarContent } from '@patternfly/react-core';
-import { ListPageBodySize } from '@virtualmachines/list/listPageBodySize';
 import { VirtualMachineRowFilterType } from '@virtualmachines/utils/constants';
 
-import NameFilter from './components/NameFilter';
-import useNameFilter from './hooks/useNameFilter';
 import { ACM_FILTERS_SHOWN_VM_LIST, FILTERS_SHOWN_VM_LIST } from './constants';
 
 type VirtualMachineFilterToolbarProps = {
@@ -25,8 +23,6 @@ type VirtualMachineFilterToolbarProps = {
   clearAllFilters: () => void;
   filterDefinitions: KubevirtFilter[];
   filters: KubevirtFilterState;
-  isSearchResultsPage?: boolean;
-  listPageBodySize?: ListPageBodySize;
   loaded?: boolean;
   onSetFilters: OnSetFilters;
 };
@@ -36,8 +32,6 @@ const VirtualMachineFilterToolbar: FC<VirtualMachineFilterToolbarProps> = ({
   clearAllFilters,
   filterDefinitions,
   filters,
-  isSearchResultsPage,
-  listPageBodySize,
   loaded,
   onSetFilters,
 }) => {
@@ -51,20 +45,28 @@ const VirtualMachineFilterToolbar: FC<VirtualMachineFilterToolbarProps> = ({
       filterDefinitions.filter(
         (f) =>
           f.filterLayout === KubevirtFilterLayout.SELECT &&
-          (isSearchResultsPage || filtersShown.includes(f.id as VirtualMachineRowFilterType)),
+          filtersShown.includes(f.id as VirtualMachineRowFilterType),
       ),
-    [filterDefinitions, isSearchResultsPage, filtersShown],
+    [filterDefinitions, filtersShown],
+  );
+
+  const chipOnlyFilters = useMemo(
+    () =>
+      filterDefinitions.filter(
+        (f) => f.filterLayout === KubevirtFilterLayout.SELECT && !selectFilters.includes(f),
+      ),
+    [filterDefinitions, selectFilters],
   );
 
   const hiddenFilters = useMemo(
     () => [
-      ...filterDefinitions.filter((f) => f.filterLayout === KubevirtFilterLayout.HIDDEN),
+      getNameFilter(t),
       getLabelFilter(t),
+      ...chipOnlyFilters,
+      ...filterDefinitions.filter((f) => f.filterLayout === KubevirtFilterLayout.HIDDEN),
     ],
-    [filterDefinitions, t],
+    [filterDefinitions, chipOnlyFilters, t],
   );
-
-  const useShortLabels = isSearchResultsPage && listPageBodySize !== ListPageBodySize.lg;
 
   const handleSetFilters: OnSetFilters = (newFilters) => {
     const filterType = Object.keys(newFilters)[0];
@@ -72,17 +74,12 @@ const VirtualMachineFilterToolbar: FC<VirtualMachineFilterToolbarProps> = ({
     onSetFilters(newFilters);
   };
 
-  const nameFilter = useNameFilter(filters, handleSetFilters);
-
   if (!loaded) return null;
 
   return (
     <Toolbar
-      clearAllFilters={() => {
-        nameFilter.resetInputText();
-        clearAllFilters();
-      }}
       className={className}
+      clearAllFilters={clearAllFilters}
       clearFiltersButtonText={t('Clear all filters')}
       data-test="filter-toolbar"
       id="filter-toolbar"
@@ -90,18 +87,13 @@ const VirtualMachineFilterToolbar: FC<VirtualMachineFilterToolbarProps> = ({
       <ToolbarContent>
         {selectFilters.map((filterDef) => (
           <SelectFilterItem
-            toggleTitle={
-              useShortLabels
-                ? (filterDef.categoryLabelShort ?? filterDef.categoryLabel)
-                : filterDef.categoryLabel
-            }
             filterDef={filterDef}
             filters={filters}
             key={filterDef.id}
             onSetFilters={handleSetFilters}
+            toggleTitle={filterDef.categoryLabel}
           />
         ))}
-        <NameFilter {...nameFilter} />
         <HiddenFilterChips
           filters={filters}
           hiddenFilters={hiddenFilters}

@@ -7,6 +7,7 @@ export type UserSettingsState = {
   navigation: NavigationUserSettings;
   onboardingPopoversHidden: OnboardingPopoversHidden;
   quickStart: QuickStartUserSettings;
+  recentSearches: string[];
   savedSearches: {
     [key: string]: any;
   };

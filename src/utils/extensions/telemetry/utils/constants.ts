@@ -83,7 +83,9 @@ export const VM_DISK_SUMMARY = 'VM Disk Summary';
 // Dashboard
 export const VM_DETAIL_TAB_VIEWED = 'VM Detail Tab Viewed';
 export const VM_LIST_FILTERED = 'VM List Filtered';
-export const VM_LIST_SEARCHED = 'VM List Searched';
+export const VM_ADVANCED_SEARCH_MODAL_USED = 'VM Advanced Search Modal Used';
+export const VM_SEARCH_LANGUAGE_USED = 'VM Search Language Used';
+export const VM_SAVED_SEARCH_APPLIED = 'VM Saved Search Applied';
 export const EXTERNAL_MONITORING_NAVIGATION = 'External Monitoring Navigation';
 export const VM_CONSOLE_OPENED = 'VM Console Opened';
 

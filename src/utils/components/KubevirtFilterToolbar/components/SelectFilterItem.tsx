@@ -6,6 +6,7 @@ import {
   KubevirtFilterState,
   OnSetFilters,
 } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
+import { MenuToggleSize } from '@patternfly/react-core';
 
 import { getOnSelect } from '../utils';
 
@@ -40,6 +41,7 @@ const SelectFilterItem: FC<SelectFilterItemProps> = ({
         onSelect={(_event, value: string) => onSelect(filterDef.id, value)}
         selectedValues={selected}
         showAllBadge={filterDef.showAllBadge}
+        toggleSize={MenuToggleSize.sm}
         toggleTitle={toggleTitle ?? filterDef.categoryLabel}
         tooltipContent={filterDef.disabledTooltip}
       />

@@ -26,7 +26,15 @@ import {
 } from '@openshift-console/dynamic-plugin-sdk/lib/api/internal-types';
 import { impersonateStateToProps } from '@openshift-console/dynamic-plugin-sdk/lib/app/core/reducers/coreSelectors';
 import { ImpersonateKind } from '@openshift-console/dynamic-plugin-sdk/lib/app/redux-types';
-import { Menu, MenuContent, MenuList, MenuToggle, Popper, Tooltip } from '@patternfly/react-core';
+import {
+  Menu,
+  MenuContent,
+  MenuList,
+  MenuToggle,
+  MenuToggleProps,
+  Popper,
+  Tooltip,
+} from '@patternfly/react-core';
 import { EllipsisVIcon } from '@patternfly/react-icons';
 
 import ActionMenuContent from './ActionMenuContent';
@@ -38,6 +46,7 @@ export type ExtendedLazyActionMenuProps = LazyActionMenuProps & {
   checkAccessDelegate?: CheckAccess;
   disabledTooltip?: string;
   localOptions?: MenuOption[];
+  toggleSize?: MenuToggleProps['size'];
 };
 
 type LazyFetchProps = {
@@ -96,6 +105,7 @@ const LazyActionMenu: FC<ExtendedLazyActionMenuProps> = ({
   isDisabled,
   label,
   localOptions = [],
+  toggleSize,
   variant = ActionMenuVariant.KEBAB,
 }) => {
   const { t } = useKubevirtTranslation();
@@ -132,6 +142,7 @@ const LazyActionMenu: FC<ExtendedLazyActionMenuProps> = ({
       onFocus={onToggleHover}
       onMouseOver={onToggleHover}
       ref={toggleRef}
+      size={toggleSize}
       variant={variant}
     >
       {isKebabVariant ? <EllipsisVIcon /> : toggleLabel}

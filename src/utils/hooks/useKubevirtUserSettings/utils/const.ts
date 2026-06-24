@@ -11,6 +11,7 @@ export const USER_SETTINGS_KEYS = {
   navigation: 'navigation',
   onboardingPopoversHidden: 'onboardingPopoversHidden',
   quickStart: 'quickStart',
+  recentSearches: 'recentSearches',
   savedSearches: 'savedSearches',
   ssh: 'ssh',
 } as const;
