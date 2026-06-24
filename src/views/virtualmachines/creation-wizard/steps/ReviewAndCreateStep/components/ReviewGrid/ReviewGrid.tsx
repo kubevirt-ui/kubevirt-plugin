@@ -9,10 +9,9 @@ const ReviewGrid: FC = () => {
   return (
     <Stack hasGutter>
       <Grid hasGutter>
-        <GridItem span={5}>
+        <GridItem span={6}>
           <ReviewGridLeftColumn />
         </GridItem>
-        <GridItem span={1} />
         <GridItem span={6}>
           <ReviewGridRightColumn />
         </GridItem>

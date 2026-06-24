@@ -12,10 +12,11 @@ import { Wizard, WizardHeader, WizardStep } from '@patternfly/react-core';
 import { useSignals } from '@preact/signals-react/runtime';
 import DefaultWizardFooter from '@virtualmachines/creation-wizard/components/DefaultWizardFooter';
 import useCloseWizard from '@virtualmachines/creation-wizard/hooks/useCloseWizard';
-import useInstanceTypeVMStore from '@virtualmachines/creation-wizard/state/instance-type-vm-store/useInstanceTypeVMStore';
+import useSyncDescription from '@virtualmachines/creation-wizard/hooks/useSyncDescription';
 import useVMWizardStore from '@virtualmachines/creation-wizard/state/vm-wizard-store/useVMWizardStore';
 import CloneSourceStep from '@virtualmachines/creation-wizard/steps/CloneSourceStep/CloneSourceStep';
 import CustomizationStep from '@virtualmachines/creation-wizard/steps/CustomizationStep/CustomizationStep';
+import DeploymentDetailsStepFooter from '@virtualmachines/creation-wizard/steps/DeploymentDetailsStep/components/DeploymentDetailsStepFooter';
 import BootSourceStep from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/BootSourceStep/BootSourceStep';
 import ComputeResourcesStepFooter from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/ComputeResourcesStep/components/ComputeResourcesStepFooter';
 import ComputeResourcesStep from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/ComputeResourcesStep/ComputeResourcesStep';
@@ -32,6 +33,7 @@ import {
 } from '@virtualmachines/creation-wizard/utils/utils';
 
 import TemplatesDrawerWrapper from './components/TemplatesDrawerWrapper';
+import useInstanceTypeVMStore from './state/instance-type-vm-store/useInstanceTypeVMStore';
 import DeploymentDetailsStep from './steps/DeploymentDetailsStep/DeploymentDetailsStep';
 
 const VMCreationWizard: FC = () => {
@@ -48,6 +50,7 @@ const VMCreationWizard: FC = () => {
   } = useVMWizardStore();
   const { operatingSystemType, preference, selectedBootableVolume, useBootSource } =
     useInstanceTypeVMStore();
+  const syncDescription = useSyncDescription();
   const clusterParam = useClusterParam();
   const hasInitialized = useRef(false);
   const closeWizard = useCloseWizard();
@@ -87,7 +90,8 @@ const VMCreationWizard: FC = () => {
   return (
     <TemplatesDrawerWrapper>
       <Wizard
-        onStepChange={(_, currentStep) => {
+        onStepChange={(_, currentStep, prevStep) => {
+          syncDescription(currentStep, prevStep);
           if (currentStep?.id !== VMWizardStep.TEMPLATE) setTemplatesDrawerIsOpen(false);
         }}
         className="vm-creation-wizard"
@@ -97,7 +101,7 @@ const VMCreationWizard: FC = () => {
         title={t('Create VirtualMachine')}
       >
         <WizardStep
-          footer={<DefaultWizardFooter />}
+          footer={<DeploymentDetailsStepFooter />}
           id={VMWizardStep.DEPLOYMENT_DETAILS}
           name={t('Deployment details')}
         >

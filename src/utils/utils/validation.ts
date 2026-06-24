@@ -31,4 +31,22 @@ export const getDNS1123LabelError = (value: string): ((t: TFunction) => string) 
   return undefined;
 };
 
+// Tolerates a trailing '-' since the user is likely still typing (e.g. "my-vm-").
+// A leading '-' is still rejected because it's never valid.
+export const getDNS1123LabelErrorLenient = (value: string): ((t: TFunction) => string) => {
+  const error = getDNS1123LabelError(value);
+  if (
+    error &&
+    !value?.startsWith('-') &&
+    value?.length <= DNS1123LabelMaxLength &&
+    value?.endsWith('-')
+  ) {
+    return undefined;
+  }
+  return error;
+};
+
+export const isDNS1123LabelLenient = (value: string): boolean =>
+  !getDNS1123LabelErrorLenient(value);
+
 export const isDigitsOnly = (value: string): boolean => /^\d+$/.test(value);

@@ -1,36 +1,36 @@
-import React, { Dispatch, FC, SetStateAction } from 'react';
-import { Trans } from 'react-i18next';
+import React, { FC, FormEvent } from 'react';
 
-import TabToConfirmTextInput from '@kubevirt-utils/components/TabToConfirmTextInput/TabToConfirmTextInput';
+import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getDNS1123LabelError } from '@kubevirt-utils/utils/validation';
+import { FormGroup, TextInput, ValidatedOptions } from '@patternfly/react-core';
 
 type NameInputProps = {
   autoFocus?: boolean;
+  errorText: string | undefined;
   name: string;
-  setIsValid: (valid: boolean) => void;
-  setName: Dispatch<SetStateAction<string>>;
+  setName: (value: string) => void;
+  validated: ValidatedOptions;
 };
 
-const NameInput: FC<NameInputProps> = ({ autoFocus, name, setIsValid, setName }) => {
+const NameInput: FC<NameInputProps> = ({ autoFocus, errorText, name, setName, validated }) => {
   const { t } = useKubevirtTranslation();
+
+  const handleChange = (_event: FormEvent<HTMLInputElement>, value: string) => {
+    setName(value);
+  };
+
   return (
-    <TabToConfirmTextInput
-      helperText={
-        <Trans t={t}>
-          Click <strong>Tab</strong> to accept the suggested name, or edit it to enable the{' '}
-          <strong>Clone</strong> button.
-        </Trans>
-      }
-      autoFocus={autoFocus}
-      fieldId="name"
-      isRequired
-      label={t('Name')}
-      onChange={setName}
-      setIsValid={setIsValid}
-      validator={getDNS1123LabelError}
-      value={name}
-    />
+    <FormGroup fieldId="clone-name" isRequired label={t('Name')}>
+      <TextInput
+        autoFocus={autoFocus}
+        id="clone-name"
+        onChange={handleChange}
+        type="text"
+        validated={validated}
+        value={name}
+      />
+      {errorText && <FormGroupHelperText validated={validated}>{errorText}</FormGroupHelperText>}
+    </FormGroup>
   );
 };
 

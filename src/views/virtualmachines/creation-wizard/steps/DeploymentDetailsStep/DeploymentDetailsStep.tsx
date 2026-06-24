@@ -2,13 +2,19 @@ import React, { FC, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Stack, StackItem, Title, TitleSizes } from '@patternfly/react-core';
+import useVMWizardStore from '@virtualmachines/creation-wizard/state/vm-wizard-store/useVMWizardStore';
 import CreationMethodTileGroup from '@virtualmachines/creation-wizard/steps/DeploymentDetailsStep/components/CreationMethodTileGroup/CreationMethodTileGroup';
+import NameAndDescriptionForm from '@virtualmachines/creation-wizard/steps/DeploymentDetailsStep/components/NameAndDescriptionForm/NameAndDescriptionForm';
 import VMCreationLocationDisplay from '@virtualmachines/creation-wizard/steps/DeploymentDetailsStep/components/VMCreationLocationDisplay';
 import VMCreationLocationForm from '@virtualmachines/creation-wizard/steps/DeploymentDetailsStep/components/VMCreationLocationForm';
+import { isCloneCreationMethod } from '@virtualmachines/creation-wizard/utils/utils';
 
 const DeploymentDetailsStep: FC = () => {
   const { t } = useKubevirtTranslation();
+  const { creationMethod } = useVMWizardStore();
   const [editCreationLocation, setEditCreationLocation] = useState(false);
+
+  const isCloneMethod = isCloneCreationMethod(creationMethod);
 
   return (
     <Stack hasGutter>
@@ -20,7 +26,19 @@ const DeploymentDetailsStep: FC = () => {
       <StackItem>
         <CreationMethodTileGroup />
       </StackItem>
-      <StackItem>
+      {!isCloneMethod && (
+        <>
+          <StackItem className="pf-v6-u-mt-md">
+            <Title headingLevel="h1" size={TitleSizes.lg}>
+              {t('General info')}
+            </Title>
+          </StackItem>
+          <StackItem>
+            <NameAndDescriptionForm />
+          </StackItem>
+        </>
+      )}
+      <StackItem className="pf-v6-u-mt-md">
         <Title headingLevel="h1" size={TitleSizes.lg}>
           {t('Location')}
         </Title>
