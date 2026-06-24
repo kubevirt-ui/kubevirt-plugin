@@ -1,3 +1,5 @@
+import type { ConsoleUserSettingsLocation } from '@kubevirt-utils/hooks/consoleUserSettings/useConsoleUserSettingLocalStorage/consts';
+
 import './i18next';
 import './react';
 
@@ -7,6 +9,7 @@ declare global {
       authDisabled: boolean;
       branding: string;
       nodeArchitectures?: string[];
+      userSettingsLocation?: ConsoleUserSettingsLocation;
     };
   }
 }

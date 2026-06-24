@@ -70,7 +70,7 @@ const ClusterProjectDropdown: FC<ClusterProjectDropdownProps> = memo(
 
         navigate(newPathname);
       },
-      [location.pathname, cluster, namespace, navigate],
+      [location.pathname, cluster, namespace, navigate, includeAllProjects],
     );
 
     const onProjectChange = useCallback(
@@ -144,6 +144,7 @@ const ClusterProjectDropdown: FC<ClusterProjectDropdownProps> = memo(
           <div className="cluster-project-dropdown__project">
             {t('Project')}:
             <NamespaceDropdown
+              bookmarkCluster={hubClusterName}
               cluster={cluster}
               disabled={!cluster || cluster === ALL_CLUSTERS_KEY}
               disabledTooltip={t('Project can be selected only at a cluster level')}

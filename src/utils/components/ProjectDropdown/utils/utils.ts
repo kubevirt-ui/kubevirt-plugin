@@ -2,25 +2,43 @@ import { MouseEvent } from 'react';
 
 import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { EnhancedSelectOptionProps } from '@kubevirt-utils/components/FilterSelect/utils/types';
+import { ConsoleBookmarks } from '@kubevirt-utils/hooks/consoleUserSettings/types';
 import { ALL_PROJECTS } from '@kubevirt-utils/hooks/constants';
+import { isSystemNamespace } from '@kubevirt-utils/resources/namespace/helper';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
-type ConsoleNamespaceBookmarks = Record<string, boolean>;
-type UpdateBookmarks = (bookmarks: ConsoleNamespaceBookmarks) => Promise<ConsoleNamespaceBookmarks>;
+type UpdateBookmarks = (bookmarks: ConsoleBookmarks) => Promise<ConsoleBookmarks>;
 
-export const getProjectOptions = (
-  includeAllProjects: boolean,
-  projects: K8sResourceCommon[],
-  bookmarks: ConsoleNamespaceBookmarks = {},
-  updateBookmarks?: UpdateBookmarks,
-): EnhancedSelectOptionProps[] => {
+export type GetProjectOptionsParams = {
+  bookmarks?: ConsoleBookmarks;
+  includeAllProjects: boolean;
+  projects: K8sResourceCommon[];
+  showSystemNamespaces?: boolean;
+  updateBookmarks?: UpdateBookmarks;
+};
+
+export const getProjectOptions = ({
+  bookmarks = {},
+  includeAllProjects,
+  projects,
+  showSystemNamespaces = true,
+  updateBookmarks,
+}: GetProjectOptionsParams): EnhancedSelectOptionProps[] => {
   const favoriteOptions: EnhancedSelectOptionProps[] = [];
   const regularOptions: EnhancedSelectOptionProps[] = [];
 
   projects.forEach((proj) => {
     const name = getName(proj);
+    if (!name) return;
+
     const isFavorite = Boolean(bookmarks[name]);
+    const isSystemProject = isSystemNamespace(name);
+
+    if (!showSystemNamespaces && isSystemProject && !isFavorite) {
+      return;
+    }
+
     const option: EnhancedSelectOptionProps = {
       children: name,
       group: isFavorite ? 'Favorites' : undefined,

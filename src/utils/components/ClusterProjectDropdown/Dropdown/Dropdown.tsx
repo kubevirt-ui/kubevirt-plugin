@@ -2,15 +2,23 @@ import React, { MouseEvent, useCallback, useEffect, useMemo, useRef, useState } 
 import fuzzysearch from 'fuzzysearch';
 
 import { useClickOutside } from '@kubevirt-utils/hooks/useClickOutside/useClickOutside';
+import { isSystemNamespace } from '@kubevirt-utils/resources/namespace/helper';
 import { Menu, MenuContent, Popper, Tooltip } from '@patternfly/react-core';
 
 import DropdownGroup from './DropdownGroup';
 import DropdownMenuToggle from './DropdownMenuToggle';
 import Filter from './Filter';
 import NoResults from './NoResults';
+import ShowSystemNamespacesSwitch from './ShowSystemNamespacesSwitch';
 import type { DropdownBookmarks, DropdownConfig, DropdownOption } from './types';
 export type { DropdownConfig };
 import './Dropdown.scss';
+
+type ShowSystemToggle = {
+  hasSystemItems: boolean;
+  onChange: (showSystem: boolean) => void;
+  show: boolean;
+};
 
 type DropdownBookmarksProps = {
   bookmarks: DropdownBookmarks;
@@ -34,6 +42,7 @@ type DropdownProps<T> = DropdownBookmarksProps &
     omittedItems?: string[];
     onChange: (item: string) => void;
     selectedItem: string;
+    showSystemToggle?: ShowSystemToggle;
   };
 
 const Dropdown = <T,>({
@@ -51,6 +60,7 @@ const Dropdown = <T,>({
   omittedItems,
   onChange,
   selectedItem,
+  showSystemToggle,
 }: DropdownProps<T>) => {
   const menuRef = useRef<HTMLDivElement>(null);
   const toggleRef = useRef<HTMLButtonElement>(null);
@@ -129,22 +139,31 @@ const Dropdown = <T,>({
   const { filteredFavorites, filteredOptions } = useMemo(() => {
     const favorites: DropdownOption[] = [];
     const regular: DropdownOption[] = [];
+    const showSystemNamespaces = showSystemToggle?.show ?? true;
 
     optionItems.forEach((option) => {
       const isFav = !!bookmarks.bookmarks?.[option.key];
       const matchesFilter = fuzzysearch(filterText.toLowerCase(), option.title.toLowerCase());
 
-      if (!matchesFilter) return;
+      if (!matchesFilter) {
+        return;
+      }
 
       if (isFav) {
         favorites.push(option);
-      } else {
-        regular.push(option);
+        return;
       }
+
+      const isSystemItem = showSystemToggle ? isSystemNamespace(option.key) : false;
+      if (!showSystemNamespaces && isSystemItem) {
+        return;
+      }
+
+      regular.push(option);
     });
 
     return { filteredFavorites: favorites, filteredOptions: regular };
-  }, [optionItems, filterText, bookmarks.bookmarks]);
+  }, [optionItems, filterText, bookmarks.bookmarks, showSystemToggle]);
 
   const onSetFavorite = useCallback(
     async (key: string, active: boolean) => {
@@ -159,7 +178,7 @@ const Dropdown = <T,>({
 
       try {
         await bookmarks.updateBookmarks(newBookmarks);
-      } catch (error) {
+      } catch {
         // Error handling is done in the hook
       }
     },
@@ -182,6 +201,19 @@ const Dropdown = <T,>({
       onSetFavorite(itemID, !isCurrentFavorite);
     },
     [bookmarks.bookmarks, onSetFavorite],
+  );
+
+  const onClearFilters = useCallback(
+    (event: MouseEvent<HTMLButtonElement>) => {
+      event.preventDefault();
+      event.stopPropagation();
+      setFilterText('');
+      if (showSystemToggle && !showSystemToggle.show) {
+        showSystemToggle.onChange(true);
+      }
+      filterRef.current?.focus();
+    },
+    [showSystemToggle],
   );
 
   const dropdown = (
@@ -213,10 +245,20 @@ const Dropdown = <T,>({
                 onFilterChange={setFilterText}
               />
             </div>
+            {showSystemToggle && (
+              <div role="none">
+                <ShowSystemNamespacesSwitch
+                  cssPrefix={config.cssPrefix}
+                  hasSystemNamespaces={showSystemToggle.hasSystemItems}
+                  isChecked={showSystemToggle.show}
+                  onChange={showSystemToggle.onChange}
+                />
+              </div>
+            )}
             <MenuContent className={`${config.cssPrefix}__menu-content`} maxMenuHeight="60vh">
               {filteredOptions.length === 0 &&
               (!bookmarks.bookmarksLoaded || filteredFavorites.length === 0) ? (
-                <NoResults noItemsFoundTitle={config.noItemsFoundTitle} />
+                <NoResults noItemsFoundTitle={config.noItemsFoundTitle} onClear={onClearFilters} />
               ) : null}
               {bookmarks.bookmarksLoaded && filteredFavorites.length > 0 && (
                 <DropdownGroup

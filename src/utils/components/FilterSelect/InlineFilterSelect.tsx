@@ -25,6 +25,7 @@ import './inline-filter-select.scss';
 type InlineFilterSelectProps = {
   className?: string;
   menuFooter?: ReactNode;
+  menuHeader?: ReactNode;
   optionLabelText?: string;
   options: EnhancedSelectOptionProps[];
   placeholder?: string;
@@ -40,6 +41,7 @@ type InlineFilterSelectProps = {
 const InlineFilterSelect: FC<InlineFilterSelectProps> = ({
   className,
   menuFooter,
+  menuHeader,
   options = [],
   placeholder,
   popperProps,
@@ -129,6 +131,7 @@ const InlineFilterSelect: FC<InlineFilterSelectProps> = ({
           <Divider />
         </>
       )}
+      {menuHeader}
       <SelectList id="select-inline-filter-listbox">
         <InlineFilterSelectOptions
           filterOptions={filterOptions}

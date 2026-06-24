@@ -10,6 +10,7 @@ import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useIsACMPage from '@multicluster/useIsACMPage';
 import { Form, FormGroup } from '@patternfly/react-core';
+import { useHubClusterName } from '@stolostron/multicluster-sdk';
 import useVMWizardStore from '@virtualmachines/creation-wizard/state/vm-wizard-store/useVMWizardStore';
 
 import './VMCreationLocationForm.scss';
@@ -17,6 +18,7 @@ import './VMCreationLocationForm.scss';
 const VMCreationLocationForm: FC = () => {
   const { t } = useKubevirtTranslation();
   const isACMPage = useIsACMPage();
+  const [hubClusterName] = useHubClusterName();
   const { featureEnabled: treeViewFoldersEnabled, loading: treeViewFoldersLoading } =
     useFeatures(TREE_VIEW_FOLDERS);
   const { cluster, folder, project, setCluster, setFolder, setProject } = useVMWizardStore();
@@ -32,6 +34,8 @@ const VMCreationLocationForm: FC = () => {
               setFolder('');
               if (selectedCluster !== cluster) setProject('');
             }}
+            bookmarkCluster={hubClusterName}
+            includeAllClusters={false}
             selectedCluster={cluster}
           />
         </FormGroup>
@@ -42,6 +46,7 @@ const VMCreationLocationForm: FC = () => {
             setProject(selectedProject);
             setFolder('');
           }}
+          bookmarkCluster={hubClusterName}
           cluster={cluster}
           includeAllProjects={false}
           selectedProject={project || DEFAULT_NAMESPACE}

@@ -8,6 +8,8 @@ import useConsoleClusterBookmarks from '@kubevirt-utils/hooks/useConsoleClusterB
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useFleetClusterNames } from '@stolostron/multicluster-sdk';
 
+import { identity } from './utils';
+
 type ClusterDropdownProps = {
   bookmarkCluster?: string;
   disabled?: boolean;
@@ -54,33 +56,38 @@ const ClusterDropdown: FC<ClusterDropdownProps> = ({
     [t],
   );
 
-  const wrappedUpdateBookmarks = useMemo(
-    () =>
-      updateBookmarks
-        ? async (newBookmarks: Record<string, boolean>): Promise<Record<string, boolean>> => {
-            return await updateBookmarks(newBookmarks);
-          }
-        : null,
-    [updateBookmarks],
+  const effectiveOmittedClusters = useMemo(() => {
+    if (includeAllClusters) {
+      return omittedClusters;
+    }
+
+    const omitted = new Set(omittedClusters ?? []);
+    omitted.add(ALL_CLUSTERS_KEY);
+    return Array.from(omitted);
+  }, [includeAllClusters, omittedClusters]);
+
+  const bookmarksProp = useMemo(
+    () => ({
+      bookmarks: bookmarks || {},
+      bookmarksLoaded,
+      updateBookmarks: updateBookmarks ?? null,
+    }),
+    [bookmarks, bookmarksLoaded, updateBookmarks],
   );
 
   return (
     <Dropdown
-      bookmarks={{
-        bookmarks: bookmarks || {},
-        bookmarksLoaded,
-        updateBookmarks: wrappedUpdateBookmarks,
-      }}
+      bookmarks={bookmarksProp}
       config={config}
       disabled={disabled}
       disabledItemTooltip={disabledItemTooltip}
-      extractKey={(name) => name}
-      extractTitle={(name) => name}
+      extractKey={identity}
+      extractTitle={identity}
       includeAllItems={includeAllClusters}
       isItemDisabled={isItemDisabled}
       items={clusterNames || null}
       itemsLoaded={clustersLoaded}
-      omittedItems={omittedClusters}
+      omittedItems={effectiveOmittedClusters}
       onChange={onChange}
       selectedItem={selectedCluster}
     />
