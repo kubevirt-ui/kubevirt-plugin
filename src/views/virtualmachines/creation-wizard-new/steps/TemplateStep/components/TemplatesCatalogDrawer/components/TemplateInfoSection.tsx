@@ -1,4 +1,5 @@
 import React, { FC, memo } from 'react';
+import { useWatch } from 'react-hook-form';
 
 import CPUDescription from '@kubevirt-utils/components/CPUDescription/CPUDescription';
 import CPUMemory from '@kubevirt-utils/components/CPUMemory/CPUMemory';
@@ -21,14 +22,16 @@ import { getOperatingSystemName } from '@kubevirt-utils/resources/vm/utils/opera
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { Alert, DescriptionList } from '@patternfly/react-core';
 import useWizardDisksTableData from '@virtualmachines/creation-wizard-new/components/DisksReviewTable/hooks/useWizardDisksTableData/useWizardDisksTableData';
-import useVMWizardStore from '@virtualmachines/creation-wizard-new/state/vm-wizard-store/useVMWizardStore';
+import { useVMWizard } from '@virtualmachines/creation-wizard-new/state/vm-wizard-context/VMWizardContext';
+import { CREATE_VM_FORM_FIELDS_VM_DATA } from '@virtualmachines/creation-wizard-new/state/vm-wizard-form/consts';
 import { useDrawerContext } from '@virtualmachines/creation-wizard-new/steps/TemplateStep/components/TemplatesCatalogDrawer/hooks/useDrawerContext';
 
 import TemplateExpandableDescription from './TemplateExpandableDescription';
 
 const TemplateInfoSection: FC = memo(() => {
   const { t } = useKubevirtTranslation();
-  const { cluster } = useVMWizardStore();
+  const { control } = useVMWizard();
+  const cluster = useWatch({ control, name: CREATE_VM_FORM_FIELDS_VM_DATA.CLUSTER });
   const isIPv6SingleStack = useIsIPv6SingleStackCluster(cluster);
   const { template, vm } = useDrawerContext();
   const [disks] = useWizardDisksTableData(vm);

@@ -6,13 +6,13 @@ import { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { Table, TableVariant, Tbody, Th, Thead, Tr } from '@patternfly/react-table';
-import useVMWizardStore from '@virtualmachines/creation-wizard-new/state/vm-wizard-store/useVMWizardStore';
 import { VMCallbacks } from '@virtualmachines/list/virtualMachinesDefinition';
 
 import VirtualMachineRow from './VirtualMachineRow';
 
 type VirtualMachineTableProps = {
   callbacks: VMCallbacks;
+  cluster: string;
   columns: ColumnConfig<V1VirtualMachine, VMCallbacks>[];
   data: V1VirtualMachine[];
   loaded: boolean;
@@ -22,6 +22,7 @@ type VirtualMachineTableProps = {
 
 const VirtualMachineTable: FC<VirtualMachineTableProps> = ({
   callbacks,
+  cluster,
   columns,
   data,
   loaded,
@@ -29,7 +30,6 @@ const VirtualMachineTable: FC<VirtualMachineTableProps> = ({
   selectedVMState,
 }) => {
   const { t } = useKubevirtTranslation();
-  const { cluster } = useVMWizardStore();
 
   if (loadError) {
     return (

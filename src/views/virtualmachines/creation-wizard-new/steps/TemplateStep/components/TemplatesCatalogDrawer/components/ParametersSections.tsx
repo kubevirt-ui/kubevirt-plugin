@@ -6,7 +6,8 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
 import { vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
 import { Button, ButtonVariant, Stack, StackItem } from '@patternfly/react-core';
-import useVMWizardStore from '@virtualmachines/creation-wizard-new/state/vm-wizard-store/useVMWizardStore';
+import { useVMWizard } from '@virtualmachines/creation-wizard-new/state/vm-wizard-context/VMWizardContext';
+import { CREATE_VM_FORM_FIELDS_VM_DATA } from '@virtualmachines/creation-wizard-new/state/vm-wizard-form/consts';
 import { useDrawerContext } from '@virtualmachines/creation-wizard-new/steps/TemplateStep/components/TemplatesCatalogDrawer/hooks/useDrawerContext';
 import { changeTemplateParameterValue } from '@virtualmachines/creation-wizard-new/steps/TemplateStep/components/TemplatesCatalogDrawer/utils/utils';
 
@@ -19,7 +20,7 @@ type ParametersSectionProps = {
 const ParametersSections: FC<ParametersSectionProps> = ({ requiredParameters }) => {
   const { t } = useKubevirtTranslation();
   const { setTemplate, template } = useDrawerContext();
-  const { setSelectedTemplate } = useVMWizardStore();
+  const { setValue } = useVMWizard();
   const [isEdit, setIsEdit] = useState<boolean>(false);
   const workingTemplate = cloneDeep(template);
 
@@ -32,7 +33,7 @@ const ParametersSections: FC<ParametersSectionProps> = ({ requiredParameters }) 
   const handleButtonClick = () => {
     if (isEdit) {
       setTemplate(workingTemplate);
-      setSelectedTemplate(workingTemplate);
+      setValue(CREATE_VM_FORM_FIELDS_VM_DATA.SELECTED_TEMPLATE, workingTemplate);
       vmSignal.value = getTemplateVirtualMachineObject(workingTemplate);
       setIsEdit(false);
       return;

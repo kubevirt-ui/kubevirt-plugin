@@ -6,6 +6,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
+import { useWatch } from 'react-hook-form';
 
 import {
   NodeModel,
@@ -38,7 +39,8 @@ import { K8sVerb, useListPageFilter } from '@openshift-console/dynamic-plugin-sd
 import { Label, Pagination, Split, SplitItem } from '@patternfly/react-core';
 import { useSignals } from '@preact/signals-react/runtime';
 import { useFleetAccessReview } from '@stolostron/multicluster-sdk';
-import useVMWizardStore from '@virtualmachines/creation-wizard-new/state/vm-wizard-store/useVMWizardStore';
+import { useVMWizard } from '@virtualmachines/creation-wizard-new/state/vm-wizard-context/VMWizardContext';
+import { CREATE_VM_FORM_FIELDS_VM_DATA } from '@virtualmachines/creation-wizard-new/state/vm-wizard-form/consts';
 import { useVirtualMachineInstanceMapper } from '@virtualmachines/list/hooks/useVirtualMachineInstanceMapper';
 import useVMMetrics from '@virtualmachines/list/hooks/useVMMetrics';
 import { getListPageBodySize, ListPageBodySize } from '@virtualmachines/list/listPageBodySize';
@@ -60,7 +62,11 @@ const VirtualMachinesList = forwardRef(({}, ref) => {
   const { t } = useKubevirtTranslation();
   useSignals();
   useVMMetrics();
-  const { cluster, project: targetNamespace, setVMDescription, setVMName } = useVMWizardStore();
+  const { control, setValue } = useVMWizard();
+  const [cluster, targetNamespace] = useWatch({
+    control,
+    name: [CREATE_VM_FORM_FIELDS_VM_DATA.CLUSTER, CREATE_VM_FORM_FIELDS_VM_DATA.PROJECT],
+  });
 
   const isAllClustersPage = useIsAllClustersPage();
   const { loading: loadingFeatureProxy } = useFeatures(KUBEVIRT_APISERVER_PROXY);
@@ -214,8 +220,8 @@ const VirtualMachinesList = forwardRef(({}, ref) => {
   const setVM = (vm: V1VirtualMachine) => {
     const sourceVMName = getName(vm);
     const name = truncateToK8sName(isVM(vm) ? `${sourceVMName}-clone` : sourceVMName);
-    setVMName(name);
-    setVMDescription(getDescription(vm));
+    setValue(CREATE_VM_FORM_FIELDS_VM_DATA.NAME, name);
+    setValue(CREATE_VM_FORM_FIELDS_VM_DATA.DESCRIPTION, getDescription(vm) ?? '');
     vmSignal.value = vm;
   };
 
@@ -265,6 +271,7 @@ const VirtualMachinesList = forwardRef(({}, ref) => {
       </Split>
       <VirtualMachineTable
         callbacks={callbacks}
+        cluster={cluster}
         columns={activeTableColumns}
         data={paginatedData}
         loaded={loaded}

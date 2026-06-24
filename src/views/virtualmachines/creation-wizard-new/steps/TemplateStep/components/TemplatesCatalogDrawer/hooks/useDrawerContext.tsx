@@ -1,11 +1,13 @@
 import React, { createContext, FC, ReactNode, useContext, useEffect, useMemo } from 'react';
+import { useWatch } from 'react-hook-form';
 import { Updater, useImmer } from 'use-immer';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getTemplateVirtualMachineObject, Template } from '@kubevirt-utils/resources/template';
 import { useVMTemplateSource } from '@kubevirt-utils/resources/template';
 import useVMTemplateGeneratedParams from '@kubevirt-utils/resources/template/hooks/useVMTemplateGeneratedParams';
-import useVMWizardStore from '@virtualmachines/creation-wizard-new/state/vm-wizard-store/useVMWizardStore';
+import { useVMWizard } from '@virtualmachines/creation-wizard-new/state/vm-wizard-context/VMWizardContext';
+import { CREATE_VM_FORM_FIELDS_VM_DATA } from '@virtualmachines/creation-wizard-new/state/vm-wizard-form/consts';
 
 export type DrawerContext = {
   setTemplate: Updater<Template>;
@@ -17,7 +19,8 @@ export type DrawerContext = {
 
 const useDrawer = (initialTemplate: Template) => {
   const [template, setTemplate] = useImmer(initialTemplate);
-  const { project } = useVMWizardStore();
+  const { control } = useVMWizard();
+  const project = useWatch({ control, name: CREATE_VM_FORM_FIELDS_VM_DATA.PROJECT });
   const [templateWithGeneratedParams, loading, error] = useVMTemplateGeneratedParams(
     initialTemplate,
     project || undefined,

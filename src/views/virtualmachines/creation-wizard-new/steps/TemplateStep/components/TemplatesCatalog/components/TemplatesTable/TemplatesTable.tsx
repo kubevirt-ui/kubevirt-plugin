@@ -1,4 +1,5 @@
 import React, { FC, useMemo } from 'react';
+import { useWatch } from 'react-hook-form';
 
 import { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -6,7 +7,8 @@ import { getUID } from '@kubevirt-utils/resources/shared';
 import { getTemplateName, Template } from '@kubevirt-utils/resources/template';
 import { ARCHITECTURE_ID, ARCHITECTURE_TITLE } from '@kubevirt-utils/utils/architecture';
 import { Table, TableVariant, Tbody, Th, Thead, Tr } from '@patternfly/react-table';
-import useVMWizardStore from '@virtualmachines/creation-wizard-new/state/vm-wizard-store/useVMWizardStore';
+import { useVMWizard } from '@virtualmachines/creation-wizard-new/state/vm-wizard-context/VMWizardContext';
+import { CREATE_VM_FORM_FIELDS_VM_DATA } from '@virtualmachines/creation-wizard-new/state/vm-wizard-form/consts';
 
 import TemplatesTableRow from './TemplatesTableRow';
 
@@ -28,7 +30,11 @@ const TemplatesTable: FC<TemplatesTableProps> = ({
   templates,
 }) => {
   const { t } = useKubevirtTranslation();
-  const { selectedTemplate } = useVMWizardStore();
+  const { control } = useVMWizard();
+  const selectedTemplate = useWatch({
+    control,
+    name: CREATE_VM_FORM_FIELDS_VM_DATA.SELECTED_TEMPLATE,
+  });
 
   const activeColumnIDs = useMemo(
     () => ['name', ARCHITECTURE_ID, 'workload', 'source', 'cpu-memory'],

@@ -16,14 +16,15 @@ import { RUNSTRATEGY_HALTED } from '@kubevirt-utils/resources/vm/utils/constants
 import { vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { getVMURL } from '@multicluster/urls';
-import useVMWizardStore from '@virtualmachines/creation-wizard-new/state/vm-wizard-store/useVMWizardStore';
+import { useVMWizard } from '@virtualmachines/creation-wizard-new/state/vm-wizard-context/VMWizardContext';
+import { CREATE_VM_FORM_FIELDS_VM_DATA } from '@virtualmachines/creation-wizard-new/state/vm-wizard-form/consts';
 
 type UseCloneVM = () => () => Promise<void>;
 
 const useCloneVM: UseCloneVM = () => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
-  const { cluster, project: targetNamespace, vmDescription, vmName } = useVMWizardStore();
+  const { getValues } = useVMWizard();
 
   const source = vmSignal.value;
 
@@ -36,13 +37,23 @@ const useCloneVM: UseCloneVM = () => {
   );
 
   useEffect(() => {
+    const { name: vmName, project: targetNamespace } = getValues(
+      CREATE_VM_FORM_FIELDS_VM_DATA.ROOT,
+    );
+
     if (cloneRequest?.status?.phase === CLONING_STATUSES.SUCCEEDED) {
       logVMCreated(TELEMETRY_VM_CREATION_METHOD.CLONE);
       navigate(getVMURL(cloneRequest?.cluster, targetNamespace, vmName));
     }
-  }, [cloneRequest, vmName, targetNamespace, navigate, source]);
+  }, [cloneRequest, navigate, source, getValues]);
 
   const sendCloneRequest = async () => {
+    const {
+      cluster,
+      description: vmDescription,
+      name: vmName,
+      project: targetNamespace,
+    } = getValues(CREATE_VM_FORM_FIELDS_VM_DATA.ROOT);
     try {
       const vmSameName = await vmExists(vmName, targetNamespace, getCluster(source) || cluster);
 

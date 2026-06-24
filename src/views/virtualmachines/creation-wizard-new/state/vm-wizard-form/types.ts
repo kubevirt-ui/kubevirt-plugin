@@ -29,3 +29,8 @@ export type VMWizardFormValues = {
   uiState: VMWizardUIState;
   vmData: VMWizardVirtualMachineData;
 };
+
+export type CreateInitialVMWizardFormValuesArgs = {
+  cluster: string;
+  namespace: string;
+};

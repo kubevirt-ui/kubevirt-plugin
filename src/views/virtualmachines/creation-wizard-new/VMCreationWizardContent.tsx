@@ -1,4 +1,5 @@
 import React, { FC, useEffect, useRef } from 'react';
+import { useWatch } from 'react-hook-form';
 
 import {
   logVMCreationStarted,
@@ -35,19 +36,21 @@ import {
 } from '@virtualmachines/creation-wizard-new/utils/utils';
 
 import TemplatesDrawerWrapper from './components/TemplatesDrawerWrapper';
+import { useVMWizard } from './state/vm-wizard-context/VMWizardContext';
+import {
+  CREATE_VM_FORM_FIELDS_UI_STATE,
+  CREATE_VM_FORM_FIELDS_VM_DATA,
+} from './state/vm-wizard-form/consts';
 import DeploymentDetailsStep from './steps/DeploymentDetailsStep/DeploymentDetailsStep';
 
 import './Wizard.scss';
 
 const VMCreationWizardContent: FC = () => {
   const { t } = useKubevirtTranslation();
-  const {
-    creationMethod,
-    initializeVMCreationWizardValues,
-    markStepVisited,
-    resetWizardState,
-    setTemplatesDrawerIsOpen,
-  } = useVMWizardStore();
+  // TODO: get data from vm creation form fields instead of using useVMWizardStore
+  const { markStepVisited, project, resetWizardState, setCluster, setProject } = useVMWizardStore();
+  const { control, setValue } = useVMWizard();
+  const creationMethod = useWatch({ control, name: CREATE_VM_FORM_FIELDS_VM_DATA.CREATION_METHOD });
   const syncDeploymentDetails = useSyncDeploymentDetails();
   const { isNextDisabledForStep, isStepDisabled } = useWizardStepValidation();
   const { navItemWithVMGeneration } = useVMGenerationNavItem(creationMethod);
@@ -59,22 +62,20 @@ const VMCreationWizardContent: FC = () => {
   const activeNamespace = useActiveNamespace();
   const namespace = getValidNamespace(activeNamespace);
 
+  // TODO: get rid of this useEffect and use the new form values instead
   useEffect(() => {
     if (!hasInitialized.current) {
-      setTemplatesDrawerIsOpen(false);
-      initializeVMCreationWizardValues({ cluster: clusterParam, isAdmin, namespace });
+      const currentProject = project;
+      resetWizardState();
+      setValue(CREATE_VM_FORM_FIELDS_UI_STATE.IS_TEMPLATES_DRAWER_OPEN, false);
+
+      setCluster(clusterParam);
+      setProject(!isAdmin ? namespace : currentProject || namespace);
       hasInitialized.current = true;
     }
 
     return () => resetWizardState();
-  }, [
-    clusterParam,
-    isAdmin,
-    namespace,
-    resetWizardState,
-    setTemplatesDrawerIsOpen,
-    initializeVMCreationWizardValues,
-  ]);
+  }, [clusterParam, isAdmin, namespace, resetWizardState, setCluster, setProject, setValue]);
 
   const isInstanceTypeMethod = isInstanceTypeCreationMethod(creationMethod);
   const isCloneMethod = isCloneCreationMethod(creationMethod);
@@ -85,7 +86,9 @@ const VMCreationWizardContent: FC = () => {
       <Wizard
         onStepChange={(_, currentStep, prevStep) => {
           syncDeploymentDetails(currentStep, prevStep);
-          if (currentStep?.id !== VMWizardStep.TEMPLATE) setTemplatesDrawerIsOpen(false);
+          if (currentStep?.id !== VMWizardStep.TEMPLATE) {
+            setValue(CREATE_VM_FORM_FIELDS_UI_STATE.IS_TEMPLATES_DRAWER_OPEN, false);
+          }
           if (currentStep?.id) markStepVisited(String(currentStep.id));
 
           const creationMethodTelemetry = mapWizardStepToCreationMethodTelemetry(

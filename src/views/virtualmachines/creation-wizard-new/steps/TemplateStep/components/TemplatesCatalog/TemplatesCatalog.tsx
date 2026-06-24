@@ -1,4 +1,5 @@
 import React, { FC, useMemo } from 'react';
+import { useWatch } from 'react-hook-form';
 
 import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { useApplyFiltersWithQuery } from '@kubevirt-utils/components/ListPageFilter/hooks/useApplyFiltersWithQuery';
@@ -14,7 +15,11 @@ import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { useListPageFilter } from '@openshift-console/dynamic-plugin-sdk';
 import { Card, Split, SplitItem } from '@patternfly/react-core';
 import useVirtualMachineTemplatesFilters from '@templates/list/filters/useVirtualMachineTemplatesFilters';
-import useVMWizardStore from '@virtualmachines/creation-wizard-new/state/vm-wizard-store/useVMWizardStore';
+import { useVMWizard } from '@virtualmachines/creation-wizard-new/state/vm-wizard-context/VMWizardContext';
+import {
+  CREATE_VM_FORM_FIELDS_UI_STATE,
+  CREATE_VM_FORM_FIELDS_VM_DATA,
+} from '@virtualmachines/creation-wizard-new/state/vm-wizard-form/consts';
 import TemplatesCatalogEmptyState from '@virtualmachines/creation-wizard-new/steps/TemplateStep/components/TemplatesCatalog/components/TemplatesCatalogEmptyState';
 import TemplatesCatalogItems from '@virtualmachines/creation-wizard-new/steps/TemplateStep/components/TemplatesCatalog/components/TemplatesCatalogItems/TemplatesCatalogItems';
 import CatalogSkeleton from '@virtualmachines/creation-wizard-new/steps/TemplateStep/components/TemplatesCatalog/components/TemplatesCatalogSkeleton';
@@ -26,7 +31,11 @@ import useCatalogUIState from './hooks/useCatalogUIState';
 import './TemplateCatalog.scss';
 
 const TemplatesCatalog: FC = () => {
-  const { selectedTemplate, setSelectedTemplate, setTemplatesDrawerIsOpen } = useVMWizardStore();
+  const { control, setValue } = useVMWizard();
+  const selectedTemplate = useWatch({
+    control,
+    name: CREATE_VM_FORM_FIELDS_VM_DATA.SELECTED_TEMPLATE,
+  });
   const { isList, namespace, setIsList, setNamespace } = useCatalogUIState();
 
   const { availableDataSources, availableTemplatesUID, bootSourcesLoaded, loaded, templates } =
@@ -53,9 +62,9 @@ const TemplatesCatalog: FC = () => {
   const applyFiltersWithQuery = useApplyFiltersWithQuery(onFilterChange);
 
   const handleTemplateSelect = (template: V1Template) => {
-    setSelectedTemplate(template);
+    setValue(CREATE_VM_FORM_FIELDS_VM_DATA.SELECTED_TEMPLATE, template);
     logTemplateFlowEvent(TEMPLATE_SELECTED, template);
-    setTemplatesDrawerIsOpen(true);
+    setValue(CREATE_VM_FORM_FIELDS_UI_STATE.IS_TEMPLATES_DRAWER_OPEN, true);
   };
 
   const clearAll = () => {
