@@ -27,6 +27,8 @@ import useArchitectureFilter from '../filters/useArchitectureFilter';
 import useNodeFilter from '../filters/useNodeFilter';
 import useStorageClassFilter from '../filters/useStorageClassFilter';
 
+import { useInstanceTypeMapper } from './useInstanceTypeMapper';
+
 const useVMListFilters = (
   vmiMapper: VMIMapper,
   pvcMapper: PVCMapper,
@@ -39,6 +41,7 @@ const useVMListFilters = (
   const { resources: vms } = useAccessibleResources<V1VirtualMachine>({
     groupVersionKind: VirtualMachineModelGroupVersionKind,
   });
+  const { instanceTypeMapper } = useInstanceTypeMapper();
 
   const clusterFilter = useClusterFilter();
   const projectFilter = useProjectFilter();
@@ -79,8 +82,8 @@ const useVMListFilters = (
       nodeFilter,
       getGuestAgentFilter(t),
       getDescriptionFilter(t),
-      getCPUFilter(t, vmiMapper),
-      getMemoryFilter(t, vmiMapper),
+      getCPUFilter(t, vmiMapper, instanceTypeMapper),
+      getMemoryFilter(t, vmiMapper, instanceTypeMapper),
       getDateFromFilter(t),
       getDateToFilter(t),
       architectureFilter,
@@ -99,6 +102,7 @@ const useVMListFilters = (
     storageClassFilter,
     nodeFilter,
     vmiMapper,
+    instanceTypeMapper,
     architectureFilter,
   ]);
 };

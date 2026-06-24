@@ -1,4 +1,5 @@
 import { V1CPU, V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { SINGLE_CLUSTER_KEY } from '@kubevirt-utils/resources/constants';
 import { PrometheusResponse } from '@openshift-console/dynamic-plugin-sdk';
 
 import {
@@ -29,6 +30,7 @@ const TWO_GIB_IN_BYTES = 2147483648;
 const ONE_MIB_IN_BYTES = 1048576;
 
 jest.mock('@kubevirt-utils/resources/shared', () => ({
+  getClusterKey: (obj: { cluster?: string }) => obj?.cluster || SINGLE_CLUSTER_KEY,
   getName: (obj: { metadata?: { name?: string } }) => obj?.metadata?.name,
   getNamespace: (obj: { metadata?: { namespace?: string } }) => obj?.metadata?.namespace,
 }));

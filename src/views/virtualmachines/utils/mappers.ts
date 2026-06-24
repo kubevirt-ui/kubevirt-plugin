@@ -4,11 +4,12 @@ import {
   V1VirtualMachineInstance,
   V1VirtualMachineInstanceMigration,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { VirtualMachineInstancetypeModel } from '@kubevirt-utils/models';
 import { SINGLE_CLUSTER_KEY } from '@kubevirt-utils/resources/constants';
-import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
-import { getVolumes } from '@kubevirt-utils/resources/vm';
+import { InstanceTypeUnion } from '@kubevirt-utils/resources/instancetype/types';
+import { getClusterKey, getName, getNamespace } from '@kubevirt-utils/resources/shared';
+import { getInstanceTypeMatcher, getVolumes } from '@kubevirt-utils/resources/vm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { getCluster } from '@multicluster/helpers/selectors';
 
 export type VMIMapper = {
   mapper: {
@@ -24,7 +25,7 @@ export type VMIMMapper = {
 };
 
 export const getVMIFromMapper = (VMIMapper: VMIMapper, vm: V1VirtualMachine) =>
-  VMIMapper?.mapper?.[getCluster(vm) || SINGLE_CLUSTER_KEY]?.[getNamespace(vm)]?.[getName(vm)];
+  VMIMapper?.mapper?.[getClusterKey(vm)]?.[getNamespace(vm)]?.[getName(vm)];
 
 export const getVMIMFromMapper = (
   VMIMMapper: VMIMMapper,
@@ -32,6 +33,30 @@ export const getVMIMFromMapper = (
   namespace: string,
   cluster?: string,
 ) => VMIMMapper?.[cluster || SINGLE_CLUSTER_KEY]?.[namespace]?.[name];
+
+export type InstanceTypeMapper = {
+  clusterInstanceTypes: {
+    [cluster: string]: { [name: string]: InstanceTypeUnion };
+  };
+  namespacedInstanceTypes: {
+    [cluster: string]: { [namespace: string]: { [name: string]: InstanceTypeUnion } };
+  };
+};
+
+export const getInstanceTypeFromMapper = (
+  mapper: InstanceTypeMapper,
+  vm: V1VirtualMachine,
+): InstanceTypeUnion | undefined => {
+  const matcher = getInstanceTypeMatcher(vm);
+  if (!mapper || !matcher?.name) return undefined;
+
+  const cluster = getClusterKey(vm);
+
+  if (matcher.kind === VirtualMachineInstancetypeModel.kind) {
+    return mapper.namespacedInstanceTypes?.[cluster]?.[getNamespace(vm)]?.[matcher.name];
+  }
+  return mapper.clusterInstanceTypes?.[cluster]?.[matcher.name];
+};
 
 export type PVCMapper = {
   [cluster in string]: {
@@ -41,7 +66,7 @@ export type PVCMapper = {
 
 export const convertIntoPVCMapper = (pvcs: IoK8sApiCoreV1PersistentVolumeClaim[]): PVCMapper => {
   return (pvcs || []).reduce((acc, pvc) => {
-    const cluster = getCluster(pvc) || SINGLE_CLUSTER_KEY;
+    const cluster = getClusterKey(pvc);
     const namespace = getNamespace(pvc);
 
     if (isEmpty(acc[cluster])) acc[cluster] = {};
@@ -54,7 +79,7 @@ export const convertIntoPVCMapper = (pvcs: IoK8sApiCoreV1PersistentVolumeClaim[]
 };
 
 export const getVirtualMachineStorageClasses = (vm: V1VirtualMachine, pvcMapper: PVCMapper) => {
-  const cluster = getCluster(vm) || SINGLE_CLUSTER_KEY;
+  const cluster = getClusterKey(vm);
   const storageClassesSet = (getVolumes(vm) || []).reduce((acc, volume) => {
     const volumePVC =
       pvcMapper?.[cluster]?.[getNamespace(vm)]?.[

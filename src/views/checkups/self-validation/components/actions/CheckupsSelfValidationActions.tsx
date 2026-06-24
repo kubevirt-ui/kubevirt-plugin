@@ -9,9 +9,7 @@ import ActionsDropdown from '@kubevirt-utils/components/ActionsDropdown/ActionsD
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import useKubevirtToast from '@kubevirt-utils/hooks/useKubevirtToast';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { SINGLE_CLUSTER_KEY } from '@kubevirt-utils/resources/constants';
-import { getName } from '@kubevirt-utils/resources/shared';
-import { getCluster } from '@multicluster/helpers/selectors';
+import { getClusterKey, getName } from '@kubevirt-utils/resources/shared';
 
 import { isJobRunning } from '../../utils';
 import { useAllRunningSelfValidationJobs } from '../hooks/useAllRunningSelfValidationJobs';
@@ -41,15 +39,14 @@ const CheckupsSelfValidationActions: FC<CheckupsSelfValidationActionsProps> = ({
   );
 
   const thisCheckupJobNames = useMemo(
-    () => new Set(jobs.map((job) => `${getCluster(job) || SINGLE_CLUSTER_KEY}-${getName(job)}`)),
+    () => new Set(jobs.map((job) => `${getClusterKey(job)}-${getName(job)}`)),
     [jobs],
   );
 
   const otherRunningJobs = useMemo(
     () =>
       (clusterRunningJobs || []).filter(
-        (job) =>
-          !thisCheckupJobNames.has(`${getCluster(job) || SINGLE_CLUSTER_KEY}-${getName(job)}`),
+        (job) => !thisCheckupJobNames.has(`${getClusterKey(job)}-${getName(job)}`),
       ),
     [clusterRunningJobs, thisCheckupJobNames],
   );

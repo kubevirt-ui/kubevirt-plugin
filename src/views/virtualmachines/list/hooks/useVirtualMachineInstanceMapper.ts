@@ -2,8 +2,7 @@ import { useMemo } from 'react';
 
 import { VirtualMachineInstanceModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { SINGLE_CLUSTER_KEY } from '@kubevirt-utils/resources/constants';
-import { getCluster } from '@multicluster/helpers/selectors';
+import { getClusterKey } from '@kubevirt-utils/resources/shared';
 import { useAccessibleResources } from '@virtualmachines/search/hooks/useAccessibleResources';
 import { VMIMapper } from '@virtualmachines/utils/mappers';
 
@@ -17,7 +16,7 @@ export const useVirtualMachineInstanceMapper = () => {
       (acc, vmi) => {
         const name = vmi?.metadata?.name;
         const namespace = vmi?.metadata?.namespace;
-        const cluster = getCluster(vmi) || SINGLE_CLUSTER_KEY;
+        const cluster = getClusterKey(vmi);
         if (!acc.mapper[cluster]) {
           acc.mapper[cluster] = {};
         }

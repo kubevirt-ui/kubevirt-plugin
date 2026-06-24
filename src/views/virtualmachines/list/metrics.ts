@@ -4,10 +4,9 @@ import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { V1CPU } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getMemorySize } from '@kubevirt-utils/components/CPUMemoryModal/utils/CpuMemoryUtils';
 import { SINGLE_CLUSTER_KEY } from '@kubevirt-utils/resources/constants';
-import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
+import { getClusterKey, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getVCPUCount } from '@kubevirt-utils/resources/vm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { getCluster } from '@multicluster/helpers/selectors';
 import { PrometheusResponse } from '@openshift-console/dynamic-plugin-sdk';
 import { signal } from '@preact/signals-core';
 
@@ -32,7 +31,7 @@ type MetricsType = {
 const vmsMetrics = signal<MetricsType>({});
 
 export const getVMMetrics = (vm: V1VirtualMachine) => {
-  const cluster = getCluster(vm) || SINGLE_CLUSTER_KEY;
+  const cluster = getClusterKey(vm);
   const namespace = getNamespace(vm);
   const name = getName(vm);
 
