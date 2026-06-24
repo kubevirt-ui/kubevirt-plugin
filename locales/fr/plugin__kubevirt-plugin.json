@@ -1596,6 +1596,7 @@
   "Project name to clone the template to": "Nom du projet vers lequel cloner le modèle",
   "Project root": "Racine du projet",
   "Project-scoped": "Sous le périmètre du projet",
+  "Project: {{project}}": "Project: {{project}}",
   "Projects": "Projets",
   "Provider": "Fournisseur",
   "Provisioning": "Provisionnement",

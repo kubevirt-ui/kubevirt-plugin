@@ -1,12 +1,12 @@
 import React, { FC } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import ListSkeleton from '@kubevirt-utils/components/StateHandler/ListSkeleton';
 import { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { Table, TableVariant, Tbody, Th, Thead, Tr } from '@patternfly/react-table';
 import useVMWizardStore from '@virtualmachines/creation-wizard/state/vm-wizard-store/useVMWizardStore';
-import LoadingSkeleton from '@virtualmachines/list/components/OverviewTab/widgets/ClusterStatusWidget/components/TwoColumnCard/LoadingSkeleton';
 import { VMCallbacks } from '@virtualmachines/list/virtualMachinesDefinition';
 
 import VirtualMachineRow from './VirtualMachineRow';
@@ -40,7 +40,7 @@ const VirtualMachineTable: FC<VirtualMachineTableProps> = ({
   }
 
   if (!loaded) {
-    return <LoadingSkeleton />;
+    return <ListSkeleton />;
   }
 
   if (!data || data.length === 0) {
@@ -50,9 +50,10 @@ const VirtualMachineTable: FC<VirtualMachineTableProps> = ({
   }
 
   return (
-    <Table className="VirtualMachineList-table" variant={TableVariant.compact}>
+    <Table variant={TableVariant.compact}>
       <Thead>
         <Tr>
+          <Th aria-label={t('Select')} />
           {columns.map((col) => (
             <Th id={col?.key} key={col?.key}>
               {col?.label}

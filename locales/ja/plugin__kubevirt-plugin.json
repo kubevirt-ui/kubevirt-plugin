@@ -1579,6 +1579,7 @@
   "Project name to clone the template to": "テンプレートのクローン作成先のプロジェクト名",
   "Project root": "プロジェクトのルート",
   "Project-scoped": "プロジェクトスコープの",
+  "Project: {{project}}": "Project: {{project}}",
   "Projects": "プロジェクト",
   "Provider": "プロバイダー",
   "Provisioning": "Provisioning",
