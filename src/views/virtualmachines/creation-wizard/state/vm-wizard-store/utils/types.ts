@@ -2,30 +2,30 @@ import { Template } from '@kubevirt-utils/resources/template';
 import { VMCreationMethod } from '@virtualmachines/creation-wizard/utils/constants';
 
 export type VMWizardState = {
-  cloneVMDescription: string;
-  cloneVMName: string;
   cluster: string;
   creationMethod: VMCreationMethod;
   folder: string;
-  isVMNameValid: boolean;
+  lastProcessedTemplateKey: string;
   project: string;
   selectedTemplate: Template;
+  shouldCheckVMNameProperly: boolean;
   templatesDrawerIsOpen: boolean;
-  vmNameInteracted: boolean;
+  vmDescription: string;
+  vmName: string | undefined;
 };
 
 export type VMWizardActions = {
   resetWizardState: () => void;
-  setCloneVMDescription: (cloneVMDescription: string) => void;
-  setCloneVMName: (cloneVMName: string) => void;
   setCluster: (cluster: string) => void;
   setCreationMethod: (creationMethod: VMCreationMethod) => void;
   setFolder: (folder: string) => void;
-  setIsVMNameValid: (isVMNameValid: boolean) => void;
+  setLastProcessedTemplateKey: (key: string) => void;
   setProject: (project: string) => void;
   setSelectedTemplate: (template: Template) => void;
+  setShouldCheckVMNameProperly: (shouldCheckVMNameProperly: boolean) => void;
   setTemplatesDrawerIsOpen: (templatesDrawerIsOpen: boolean) => void;
-  setVMNameInteracted: (vmNameInteracted: boolean) => void;
+  setVMDescription: (vmDescription: string) => void;
+  setVMName: (vmName: string) => void;
 };
 
 export type VMWizardStore = VMWizardState & VMWizardActions;

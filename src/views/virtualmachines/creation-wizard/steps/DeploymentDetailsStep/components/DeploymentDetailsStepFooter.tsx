@@ -2,7 +2,6 @@ import React, { FC } from 'react';
 import classnames from 'classnames';
 
 import { FLAG_LIGHTSPEED_PLUGIN } from '@kubevirt-utils/flags/consts';
-import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useWizardFooterProps from '@kubevirt-utils/hooks/useWizardFooterProps';
 import { useFlag } from '@openshift-console/dynamic-plugin-sdk';
 import {
@@ -15,34 +14,31 @@ import {
 } from '@patternfly/react-core';
 import VMNameConfirmationNextButton from '@virtualmachines/creation-wizard/components/VMNameConfirmationNextButton';
 import useCloseWizard from '@virtualmachines/creation-wizard/hooks/useCloseWizard';
-import useCreateVM from '@virtualmachines/creation-wizard/hooks/useCreateVM';
 import useVMWizardStore from '@virtualmachines/creation-wizard/state/vm-wizard-store/useVMWizardStore';
 import { isCloneCreationMethod } from '@virtualmachines/creation-wizard/utils/utils';
 
-const ReviewAndCreateStepFooter: FC = () => {
+const DeploymentDetailsStepFooter: FC = () => {
   const hasOLSConsole = useFlag(FLAG_LIGHTSPEED_PLUGIN);
-  const { goToPrevStep } = useWizardContext();
+  const { goToNextStep } = useWizardContext();
   const { creationMethod } = useVMWizardStore();
   const isCloneMethod = isCloneCreationMethod(creationMethod);
-  const createVM = useCreateVM();
   const closeWizard = useCloseWizard();
-  const { backButtonText, cancelButtonText } = useWizardFooterProps();
-
-  const createButtonText = isCloneMethod ? t('Clone VirtualMachine') : t('Create VirtualMachine');
+  const { cancelButtonText, nextButtonText } = useWizardFooterProps();
 
   return (
     <WizardFooterWrapper>
       <ActionList>
         <ActionListGroup>
           <ActionListItem>
-            <Button onClick={goToPrevStep} variant="secondary">
-              {backButtonText}
-            </Button>
-          </ActionListItem>
-          <ActionListItem>
-            <VMNameConfirmationNextButton onClick={createVM}>
-              {createButtonText}
-            </VMNameConfirmationNextButton>
+            {isCloneMethod ? (
+              <Button onClick={goToNextStep} variant="primary">
+                {nextButtonText}
+              </Button>
+            ) : (
+              <VMNameConfirmationNextButton onClick={goToNextStep}>
+                {nextButtonText}
+              </VMNameConfirmationNextButton>
+            )}
           </ActionListItem>
         </ActionListGroup>
         <ActionListGroup>
@@ -61,4 +57,4 @@ const ReviewAndCreateStepFooter: FC = () => {
   );
 };
 
-export default ReviewAndCreateStepFooter;
+export default DeploymentDetailsStepFooter;

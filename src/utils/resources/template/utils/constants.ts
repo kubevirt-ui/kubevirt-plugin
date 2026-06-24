@@ -138,3 +138,5 @@ export const GENERATE_VM_PRETTY_NAME_ANNOTATION =
 
 export const HIDE_DEPRECATED_TEMPLATES = 'hideDeprecatedTemplates';
 export const HIDE_DEPRECATED_TEMPLATES_KEY = 'hide-deprecated-templates';
+
+export const NAME_PARAMETER = 'NAME';
