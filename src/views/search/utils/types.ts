@@ -30,22 +30,6 @@ export type AdvancedSearchQueryInputs = Partial<{
   [VirtualMachineRowFilterType.StorageClass]: string[];
 }>;
 
-export type SearchSuggestResource = {
-  cluster?: string;
-  name: string;
-  namespace?: string;
-};
-
-export type SearchSuggestResult = {
-  resources: SearchSuggestResource[];
-  resourcesMatching: Record<
-    | VirtualMachineRowFilterType.Description
-    | VirtualMachineRowFilterType.IP
-    | VirtualMachineRowFilterType.Labels,
-    number
-  >;
-};
-
 export type GuestAgentValue = {
   [GuestAgentStatus.NOT_REPORTING]: boolean;
   [GuestAgentStatus.REPORTING]: boolean;

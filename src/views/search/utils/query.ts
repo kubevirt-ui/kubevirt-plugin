@@ -2,6 +2,7 @@ import { CAPACITY_UNITS } from '@kubevirt-utils/components/CapacityInput/utils';
 import { KubevirtFilterState } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { NumberOperator, ROW_FILTERS_PREFIX } from '@kubevirt-utils/utils/constants';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { filtersToSearchText } from '@search/searchLanguage/filtersToSearchText';
 import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
 import { skipRowFilterPrefix, validSearchQueryParams } from './constants';
@@ -86,6 +87,13 @@ export const convertQueryToFilterState = (query: string): Partial<KubevirtFilter
     if (validSearchQueryParams.includes(key)) {
       filterState[key] = params.getAll(key);
     }
+    // Handle legacy filter params
+    else if (key.startsWith(ROW_FILTERS_PREFIX)) {
+      const filterKey = key.slice(ROW_FILTERS_PREFIX.length);
+      if (validSearchQueryParams.includes(filterKey)) {
+        filterState[filterKey] = params.getAll(key).flatMap((v) => v.split(','));
+      }
+    }
   }
 
   return filterState;
@@ -100,13 +108,38 @@ export const getUrlSearchQuery = (search: string): string => {
   const allParams = new URLSearchParams(search);
   const searchParams = new URLSearchParams();
 
-  for (const key of allParams.keys()) {
+  for (const [key, value] of allParams.entries()) {
     if (validSearchQueryParams.includes(key)) {
-      searchParams.set(key, allParams.get(key));
+      searchParams.append(key, value);
     }
   }
 
   return searchParams.toString();
+};
+
+export const urlQueryToSearchLanguage = (urlSearchQuery: string): string => {
+  const filterState = convertQueryToFilterState(urlSearchQuery);
+  const tokenOrder = Object.keys(filterState);
+
+  return filtersToSearchText(filterState, tokenOrder);
+};
+
+export const areQueriesEqual = (queryA: string, queryB: string): boolean => {
+  const paramsA = new URLSearchParams(queryA);
+  const paramsB = new URLSearchParams(queryB);
+
+  const entriesA = [...paramsA.entries()];
+  const entriesB = [...paramsB.entries()];
+
+  if (entriesA.length !== entriesB.length) return false;
+
+  const sortEntry = ([kA, vA]: [string, string], [kB, vB]: [string, string]) =>
+    kA.localeCompare(kB) || vA.localeCompare(vB);
+
+  entriesA.sort(sortEntry);
+  entriesB.sort(sortEntry);
+
+  return entriesA.every(([key, value], i) => entriesB[i][0] === key && entriesB[i][1] === value);
 };
 
 export const buildContextSearchInputs = (

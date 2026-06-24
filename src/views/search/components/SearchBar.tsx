@@ -9,10 +9,9 @@ import { InputGroup, InputGroupItem } from '@patternfly/react-core';
 import useShowAdvancedSearchModal from '@search/hooks/useShowAdvancedSearchModal';
 import { useSearchLanguageInput } from '@search/searchLanguage/hooks/useSearchLanguageInput/useSearchLanguageInput';
 
+import SavedSearchesDropdown from './SavedSearchesDropdown/SavedSearchesDropdown';
 import useRecentSearches from './SearchDropdown/hooks/useRecentSearches';
 import SearchTipsPopover from './SearchTipsPopover/SearchTipsPopover';
-import SavedSearchesDropdown from './SavedSearchesDropdown';
-import SaveSearchButton from './SaveSearchButton';
 import SearchTextInput from './SearchTextInput';
 
 import './search-bar.scss';
@@ -67,9 +66,6 @@ const SearchBar: FC<SearchBarProps> = ({
       </InputGroupItem>
       <InputGroupItem>
         <SearchTipsPopover onSelectTip={onSelectQueryText} />
-      </InputGroupItem>
-      <InputGroupItem>
-        <SaveSearchButton filters={filters} onSetFilters={onSetFilters} />
       </InputGroupItem>
       <InputGroupItem>
         <SavedSearchesDropdown filters={filters} onSetFilters={onSetFilters} />

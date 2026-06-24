@@ -21,6 +21,7 @@ export type UseSearchLanguageInputProps = {
 
 export type UseSearchLanguageInputResult = {
   displayText: string;
+  isDraft: boolean;
   isDropdownOpen: boolean;
   onChange: (event: FormEvent<HTMLInputElement>, value: string) => void;
   onClear: () => void;
