@@ -1,6 +1,7 @@
 import React, { FC } from 'react';
 import classnames from 'classnames';
 
+import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import { FLAG_LIGHTSPEED_PLUGIN } from '@kubevirt-utils/flags/consts';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useWizardFooterProps from '@kubevirt-utils/hooks/useWizardFooterProps';
@@ -10,6 +11,7 @@ import {
   ActionListGroup,
   ActionListItem,
   Button,
+  Stack,
   useWizardContext,
   WizardFooterWrapper,
 } from '@patternfly/react-core';
@@ -24,7 +26,7 @@ const ReviewAndCreateStepFooter: FC = () => {
   const { goToPrevStep } = useWizardContext();
   const { creationMethod } = useVMWizardStore();
   const isCloneMethod = isCloneCreationMethod(creationMethod);
-  const createVM = useCreateVM();
+  const { createVM, error, isSubmitting } = useCreateVM();
   const closeWizard = useCloseWizard();
   const { backButtonText, cancelButtonText } = useWizardFooterProps();
 
@@ -32,31 +34,34 @@ const ReviewAndCreateStepFooter: FC = () => {
 
   return (
     <WizardFooterWrapper>
-      <ActionList>
-        <ActionListGroup>
-          <ActionListItem>
-            <Button onClick={goToPrevStep} variant="secondary">
-              {backButtonText}
-            </Button>
-          </ActionListItem>
-          <ActionListItem>
-            <VMNameConfirmationNextButton onClick={createVM}>
-              {createButtonText}
-            </VMNameConfirmationNextButton>
-          </ActionListItem>
-        </ActionListGroup>
-        <ActionListGroup>
-          <ActionListItem>
-            <Button
-              className={classnames({ 'pf-v6-u-mr-4xl': hasOLSConsole })}
-              onClick={closeWizard}
-              variant="link"
-            >
-              {cancelButtonText}
-            </Button>
-          </ActionListItem>
-        </ActionListGroup>
-      </ActionList>
+      <Stack hasGutter>
+        {error && <ErrorAlert error={error} />}
+        <ActionList>
+          <ActionListGroup>
+            <ActionListItem>
+              <Button onClick={goToPrevStep} variant="secondary">
+                {backButtonText}
+              </Button>
+            </ActionListItem>
+            <ActionListItem>
+              <VMNameConfirmationNextButton isSubmitting={isSubmitting} onClick={createVM}>
+                {createButtonText}
+              </VMNameConfirmationNextButton>
+            </ActionListItem>
+          </ActionListGroup>
+          <ActionListGroup>
+            <ActionListItem>
+              <Button
+                className={classnames({ 'pf-v6-u-mr-4xl': hasOLSConsole })}
+                onClick={closeWizard}
+                variant="link"
+              >
+                {cancelButtonText}
+              </Button>
+            </ActionListItem>
+          </ActionListGroup>
+        </ActionList>
+      </Stack>
     </WizardFooterWrapper>
   );
 };
