@@ -1,9 +1,8 @@
 import { KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { universalComparator } from '@kubevirt-utils/utils/utils';
 import { getFilterDefinition } from '@search/searchLanguage/utils';
-import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
+import { STATUS_VALUE_GROUPS, VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
-import { STATUS_VALUE_GROUPS } from './constants/statusGroups';
 import { SearchKeyBadge, ValueOption } from './types';
 
 export const toValueOptions = (

@@ -1,18 +1,15 @@
-import React, { FC, ReactNode, Ref, useState } from 'react';
+import React, { FC, ReactNode, useState } from 'react';
 
+import ToolbarFilterToggle from '@kubevirt-utils/components/toggles/ToolbarFilterToggle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
-  Badge,
-  MenuToggle,
-  MenuToggleElement,
   MenuToggleProps,
   Select,
   SelectList,
   SelectOption,
   SelectOptionProps,
   SelectProps,
-  Tooltip,
 } from '@patternfly/react-core';
 
 type CheckboxSelectProps = {
@@ -41,40 +38,17 @@ const CheckboxSelect: FC<CheckboxSelectProps> = ({
   const [isOpen, setIsOpen] = useState(false);
   const { t } = useKubevirtTranslation();
 
-  const onToggleClick = () => {
-    setIsOpen(!isOpen);
-  };
-
-  const hasSelectedValues = !isEmpty(selectedValues);
-
-  const toggle = (toggleRef: Ref<MenuToggleElement>) => {
-    const menuToggle = (
-      <MenuToggle
-        badge={
-          badgeNumber || hasSelectedValues || showAllBadge ? (
-            <Badge isRead>{badgeNumber || selectedValues.length || t('All')}</Badge>
-          ) : null
-        }
-        isDisabled={isToggleDisabled}
-        isExpanded={isOpen}
-        onClick={onToggleClick}
-        ref={toggleRef}
-        size={toggleSize}
-      >
-        {toggleTitle}
-      </MenuToggle>
-    );
-
-    if (isToggleDisabled && tooltipContent) {
-      return (
-        <Tooltip content={tooltipContent}>
-          <div>{menuToggle}</div>
-        </Tooltip>
-      );
-    }
-
-    return menuToggle;
-  };
+  const toggle = ToolbarFilterToggle({
+    badgeNumber,
+    isDisabled: isToggleDisabled,
+    isExpanded: isOpen,
+    onClick: () => setIsOpen((prev) => !prev),
+    selectedValues,
+    showAllBadge,
+    size: toggleSize,
+    title: toggleTitle,
+    tooltipContent,
+  });
 
   return (
     <Select

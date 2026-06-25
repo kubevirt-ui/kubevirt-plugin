@@ -3,9 +3,9 @@ import React, { FC, Fragment, useMemo } from 'react';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Divider, MenuGroup, MenuItem, MenuList } from '@patternfly/react-core';
+import { STATUS_VALUE_GROUPS } from '@virtualmachines/utils';
 import { VirtualMachineRowFilterType } from '@virtualmachines/utils/constants';
 
-import { STATUS_VALUE_GROUPS } from '../constants/statusGroups';
 import { ValueOption } from '../types';
 import { getFilteredOrderedOptions } from '../utils';
 
