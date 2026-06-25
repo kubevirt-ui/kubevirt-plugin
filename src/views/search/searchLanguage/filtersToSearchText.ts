@@ -46,7 +46,9 @@ const serializeFilterValues = (filterType: string, values: string[]): string[] =
   const included: string[] = [];
   const excluded: string[] = [];
 
-  for (const val of values) {
+  const deduplicatedValues = new Set(values);
+
+  for (const val of deduplicatedValues) {
     const isExcluded = isExcludedValue(val);
     const cleanVal = stripExclusionPrefix(val);
 
