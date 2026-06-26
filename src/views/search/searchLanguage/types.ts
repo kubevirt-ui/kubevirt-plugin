@@ -29,3 +29,9 @@ export type ValidationResult = {
   invalidValueErrors: InvalidValueError[];
   tokenOrder: string[];
 };
+
+export type TokenParts = {
+  prefix: string;
+  suffix: string;
+  token: string;
+};
