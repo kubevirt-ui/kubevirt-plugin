@@ -8,7 +8,8 @@ import {
   V1VirtualMachine,
   V1VirtualMachineInstanceMigration,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { MAX_K8S_NAME_LENGTH } from '@kubevirt-utils/utils/constants';
+import { getStorageMigrationPlanModelForKind } from '@kubevirt-utils/resources/migrations/backends';
+import { MultiNamespaceVirtualMachineStorageMigrationPlan } from '@kubevirt-utils/resources/migrations/constants';
 import { getRandomChars, kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import {
@@ -17,6 +18,7 @@ import {
   kubevirtK8sDelete,
 } from '@multicluster/k8sRequests';
 import { consoleFetch, K8sModel } from '@openshift-console/dynamic-plugin-sdk';
+import { truncateToK8sName } from '@virtualmachines/actions/components/VirtualMachineMigration/utils/shared';
 
 export enum VMActionType {
   AddVolume = 'addvolume',
@@ -84,14 +86,12 @@ export const removeVolume = async (vm: V1VirtualMachine, body: V1RemoveVolumeOpt
   VMActionRequest(vm, VMActionType.RemoveVolume, VirtualMachineModel, body);
 export const migrateVM = async (vm: V1VirtualMachine, node?: string) => {
   const { name, namespace } = vm?.metadata;
-  const suffix = `-mig-${getRandomChars(4)}`;
-  const truncatedName = name.substring(0, MAX_K8S_NAME_LENGTH - suffix.length);
 
   const migrationData: V1VirtualMachineInstanceMigration = {
     apiVersion: 'kubevirt.io/v1',
     kind: 'VirtualMachineInstanceMigration',
     metadata: {
-      name: `${truncatedName}${suffix}`,
+      name: truncateToK8sName(name, `mig-${getRandomChars(4)}`),
     },
     spec: {
       vmiName: name,
@@ -113,6 +113,19 @@ export const cancelMigration = async (vmim: V1VirtualMachineInstanceMigration) =
     cluster: vmim?.cluster,
     model: VirtualMachineInstanceMigrationModel,
     resource: vmim,
+  });
+};
+
+export const cancelStorageMigrationPlan = async (
+  vm: V1VirtualMachine,
+  plan: MultiNamespaceVirtualMachineStorageMigrationPlan,
+) => {
+  const model = getStorageMigrationPlanModelForKind(plan?.kind);
+
+  await kubevirtK8sDelete({
+    cluster: getCluster(plan) ?? getCluster(vm),
+    model,
+    resource: plan,
   });
 };
 

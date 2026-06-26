@@ -10,6 +10,12 @@ import MoveBulkVMToFolderModal from '@kubevirt-utils/components/MoveVMToFolderMo
 import BulkSnapshotModal from '@kubevirt-utils/components/SnapshotModal/BulkSnapshotModal';
 import SnapshotModal from '@kubevirt-utils/components/SnapshotModal/SnapshotModal';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { MultiNamespaceVirtualMachineStorageMigrationPlanModel } from '@kubevirt-utils/models';
+import { getStorageMigrationBackend } from '@kubevirt-utils/resources/migrations/backends';
+import {
+  type StorageMigrationAPI,
+  STORAGE_MIGRATION_API,
+} from '@kubevirt-utils/resources/migrations/constants';
 import {
   getLabels,
   getNamespace,
@@ -151,20 +157,41 @@ export const BulkVirtualMachineActionFactory = {
   migrateStorage: (
     vms: V1VirtualMachine[],
     createModal: (modal: ModalComponent) => void,
-  ): ActionDropdownItemType => ({
-    accessReview: {
-      group: VirtualMachineModel.apiGroup,
-      namespace: getNamespace(vms?.[0]),
-      resource: VirtualMachineModel.plural,
-      verb: 'patch',
-    },
-    cta: () => createModal((props) => <VirtualMachineMigrateModal vms={vms} {...props} />),
-    description: t('Migrate VirtualMachine storage to a different StorageClass'),
-    disabled: vms.some((vm) => !isRunning(vm)),
-    disabledTooltip: t('Storage migration is only available for running VirtualMachines'),
-    id: ACTIONS_ID.BULK_MIGRATE_STORAGE,
-    label: t('Storage'),
-  }),
+    storageMigAPI: StorageMigrationAPI = STORAGE_MIGRATION_API.MULTI_NS,
+  ): ActionDropdownItemType => {
+    const isLoading = storageMigAPI === STORAGE_MIGRATION_API.LOADING;
+    const isUnavailable = storageMigAPI === STORAGE_MIGRATION_API.NONE;
+    const backend = getStorageMigrationBackend(storageMigAPI);
+    const planModel = backend?.planModel ?? null;
+    const planNamespace = backend?.fixedPlanNamespace ?? getNamespace(vms?.[0]);
+
+    const accessReviewModel = planModel ?? MultiNamespaceVirtualMachineStorageMigrationPlanModel;
+
+    const migrateStorageDisabledTooltip = () => {
+      if (isLoading) return t('Checking storage migration availability...');
+      if (isUnavailable) return t('Storage migration is not available on this cluster.');
+      return t('Storage migration is only available for running VirtualMachines');
+    };
+
+    return {
+      accessReview: {
+        cluster: getCluster(vms?.[0]),
+        group: accessReviewModel.apiGroup,
+        namespace: planModel ? planNamespace : getNamespace(vms?.[0]),
+        resource: accessReviewModel.plural,
+        verb: 'create',
+      },
+      cta: () =>
+        createModal((props) => (
+          <VirtualMachineMigrateModal storageMigAPI={storageMigAPI} vms={vms} {...props} />
+        )),
+      description: t('Migrate VirtualMachine storage to a different StorageClass'),
+      disabled: isLoading || isUnavailable || vms.some((vm) => !isRunning(vm)),
+      disabledTooltip: migrateStorageDisabledTooltip(),
+      id: ACTIONS_ID.BULK_MIGRATE_STORAGE,
+      label: t('Storage'),
+    };
+  },
   moveToFolder: (
     vms: V1VirtualMachine[],
     createModal: (modal: ModalComponent) => void,

@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FC, ReactNode, useState } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -12,6 +12,7 @@ import { MAX_ROWS_VIEW_MORE } from './constants';
 import './selected-storage-tooltip.scss';
 
 type SelectedStorageTooltipProps = {
+  children?: ReactNode;
   vms: V1VirtualMachine[];
 };
 

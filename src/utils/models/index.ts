@@ -136,6 +136,30 @@ export const MultiNamespaceVirtualMachineStorageMigrationModel: K8sModel = {
   plural: 'multinamespacevirtualmachinestoragemigrations',
 };
 
+export const MigPlanModel: K8sModel = {
+  abbr: 'MP',
+  apiGroup: 'migration.openshift.io',
+  apiVersion: 'v1alpha1',
+  crd: true,
+  kind: 'MigPlan',
+  label: 'MigPlan',
+  labelPlural: 'MigPlans',
+  namespaced: true,
+  plural: 'migplans',
+};
+
+export const MigMigrationModel: K8sModel = {
+  abbr: 'MM',
+  apiGroup: 'migration.openshift.io',
+  apiVersion: 'v1alpha1',
+  crd: true,
+  kind: 'MigMigration',
+  label: 'MigMigration',
+  labelPlural: 'MigMigrations',
+  namespaced: true,
+  plural: 'migmigrations',
+};
+
 export const MultiClusterObservabilityModel: K8sModel = {
   abbr: 'MCO',
   apiGroup: 'observability.open-cluster-management.io',
@@ -146,4 +170,67 @@ export const MultiClusterObservabilityModel: K8sModel = {
   labelPlural: 'MultiClusterObservabilities',
   namespaced: false,
   plural: 'multiclusterobservabilities',
+};
+
+export const NodeNetworkConfigurationPolicyModel: K8sModel = {
+  abbr: 'NNCP',
+  apiGroup: 'nmstate.io',
+  apiVersion: 'v1',
+  crd: true,
+  id: 'NodeNetworkConfigurationPolicy',
+  kind: 'NodeNetworkConfigurationPolicy',
+  label: 'NodeNetworkConfigurationPolicy',
+  labelPlural: 'NodeNetworkConfigurationPolicies',
+  namespaced: false,
+  plural: 'nodenetworkconfigurationpolicies',
+};
+
+export const NodeNetworkConfigurationEnactmentModel: K8sModel = {
+  abbr: 'NNCE',
+  apiGroup: 'nmstate.io',
+  apiVersion: 'v1beta1',
+  crd: true,
+  id: 'NodeNetworkConfigurationEnactment',
+  kind: 'NodeNetworkConfigurationEnactment',
+  label: 'NodeNetworkConfigurationEnactment',
+  labelPlural: 'NodeNetworkConfigurationEnactments',
+  namespaced: false,
+  plural: 'nodenetworkconfigurationenactments',
+};
+
+export const NodeNetworkStateModel: K8sModel = {
+  abbr: 'NNS',
+  apiGroup: 'nmstate.io',
+  apiVersion: 'v1beta1',
+  crd: true,
+  id: 'NodeNetworkState',
+  kind: 'NodeNetworkState',
+  label: 'NodeNetworkState',
+  labelPlural: 'NodeNetworkStates',
+  namespaced: false,
+  plural: 'nodenetworkstates',
+};
+
+export const ApplicationAwareResourceQuotaModel: K8sModel = {
+  abbr: 'AAQ',
+  apiGroup: 'aaq.kubevirt.io',
+  apiVersion: 'v1alpha1',
+  crd: true,
+  kind: 'ApplicationAwareResourceQuota',
+  label: 'ApplicationAwareResourceQuota',
+  labelPlural: 'ApplicationAwareResourceQuotas',
+  namespaced: true,
+  plural: 'applicationawareresourcequotas',
+};
+
+export const ApplicationAwareClusterResourceQuotaModel: K8sModel = {
+  abbr: 'AACQ',
+  apiGroup: 'aaq.kubevirt.io',
+  apiVersion: 'v1alpha1',
+  crd: true,
+  kind: 'ApplicationAwareClusterResourceQuota',
+  label: 'ApplicationAwareClusterResourceQuota',
+  labelPlural: 'ApplicationAwareClusterResourceQuotas',
+  namespaced: false,
+  plural: 'applicationawareclusterresourcequotas',
 };

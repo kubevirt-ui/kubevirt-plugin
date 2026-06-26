@@ -15,12 +15,16 @@ import {
   CROSS_CLUSTER_MIGRATION_ACTION_ID,
   FEATURE_KUBEVIRT_CROSS_CLUSTER_MIGRATION,
 } from '@multicluster/constants';
+import { getCluster } from '@multicluster/helpers/selectors';
 import useACMExtensionActions from '@multicluster/hooks/useACMExtensionActions/useACMExtensionActions';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { useK8sModel } from '@openshift-console/dynamic-plugin-sdk';
 
 import { printableVMStatus } from '../../utils';
 import { VirtualMachineActionFactory } from '../VirtualMachineActionFactory';
 
+import useClusterStorageMigrationAPI from './storageMigrationApi/useClusterStorageMigrationAPI';
+import useActiveVMStorageMigrationPlan from './useActiveVMStorageMigrationPlan';
 import useIsMTVInstalled from './useIsMTVInstalled';
 
 type UseVirtualMachineActionsProvider = (
@@ -34,12 +38,18 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (vm, 
 
   const virtctlCommand = getConsoleVirtctlCommand(vm);
 
-  const mtvInstalled = useIsMTVInstalled();
+  const [mtvInstalled] = useIsMTVInstalled();
   const { featureEnabled: crossClusterMigrationFlagEnabled } = useFeatures(
     FEATURE_KUBEVIRT_CROSS_CLUSTER_MIGRATION,
   );
 
   const crossClusterMigrationEnabled = mtvInstalled && crossClusterMigrationFlagEnabled;
+
+  const clusterParam = useClusterParam();
+  const effectiveCluster = getCluster(vm) ?? clusterParam ?? undefined;
+
+  const storageMigAPI = useClusterStorageMigrationAPI(effectiveCluster);
+  const activeStorageMigrationPlan = useActiveVMStorageMigrationPlan(vm, effectiveCluster);
 
   const acmActions = useACMExtensionActions(vm);
 
@@ -63,7 +73,9 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (vm, 
     const currentMigrationExist =
       vmim && ![vmimStatuses.Failed, vmimStatuses.Succeeded].includes(vmim?.status?.phase);
 
-    const isComputeMigration = printableStatus === Migrating || currentMigrationExist;
+    const isStorageMigration = !!activeStorageMigrationPlan;
+    const isComputeMigration =
+      !isStorageMigration && (printableStatus === Migrating || !!currentMigrationExist);
 
     const startOrStop = ((printableStatusMachine) => {
       const map = {
@@ -77,7 +89,11 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (vm, 
 
     const migrateCompute = VirtualMachineActionFactory.migrateCompute(vm, createModal);
 
-    const migrateStorage = VirtualMachineActionFactory.migrateStorage(vm, createModal);
+    const migrateStorage = VirtualMachineActionFactory.migrateStorage(
+      vm,
+      createModal,
+      storageMigAPI,
+    );
 
     const startMigrationActions = [migrateCompute, migrateStorage];
 
@@ -85,9 +101,14 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (vm, 
       startMigrationActions.unshift(crossClusterMigration);
     }
 
-    const migrationActions = isComputeMigration
-      ? [VirtualMachineActionFactory.cancelComputeMigration(vm, vmim)]
-      : startMigrationActions;
+    let migrationActions = startMigrationActions;
+    if (isComputeMigration) {
+      migrationActions = [VirtualMachineActionFactory.cancelComputeMigration(vm, vmim)];
+    } else if (isStorageMigration) {
+      migrationActions = [
+        VirtualMachineActionFactory.cancelStorageMigration(vm, activeStorageMigrationPlan),
+      ];
+    }
 
     const pauseOrUnpause =
       printableStatus === Paused
@@ -115,6 +136,7 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (vm, 
   }, [
     vm,
     vmim,
+    activeStorageMigrationPlan,
     createModal,
     confirmVMActionsEnabled,
     virtctlCommand,
@@ -122,6 +144,7 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (vm, 
     acmActions,
     mtvInstalled,
     crossClusterMigrationEnabled,
+    storageMigAPI,
   ]);
 
   return useMemo(() => [actions, !inFlight, undefined], [actions, inFlight]);

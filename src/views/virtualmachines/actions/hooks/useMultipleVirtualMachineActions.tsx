@@ -11,6 +11,7 @@ import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useProviderByClusterName from '@multicluster/components/CrossClusterMigration/hooks/useProviderByClusterName';
 import { FEATURE_KUBEVIRT_CROSS_CLUSTER_MIGRATION } from '@multicluster/constants';
 import { getCluster } from '@multicluster/helpers/selectors';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { useHubClusterName } from '@stolostron/multicluster-sdk';
 import { isDeletionProtectionEnabled } from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/utils/utils';
 import { isLiveMigratable, isPaused, isRunning, isStopped } from '@virtualmachines/utils';
@@ -18,6 +19,7 @@ import { getVMIMFromMapper, VMIMMapper } from '@virtualmachines/utils/mappers';
 
 import { BulkVirtualMachineActionFactory } from '../BulkVirtualMachineActionFactory';
 
+import useClusterStorageMigrationAPI from './storageMigrationApi/useClusterStorageMigrationAPI';
 import useIsMTVInstalled from './useIsMTVInstalled';
 import useVirtualMachineActionsProvider from './useVirtualMachineActionsProvider';
 import { someVMIsMigrating } from './utils';
@@ -32,8 +34,12 @@ const useMultipleVirtualMachineActions: UseMultipleVirtualMachineActions = (vms,
   const { createModal } = useModal();
   const { featureEnabled: confirmVMActionsEnabled } = useFeatures(CONFIRM_VM_ACTIONS);
   const { featureEnabled: treeViewFoldersEnabled } = useFeatures(TREE_VIEW_FOLDERS);
-  const mtvInstalled = useIsMTVInstalled();
+  const [mtvInstalled] = useIsMTVInstalled();
   const [hubClusterName] = useHubClusterName();
+  const clusterParam = useClusterParam();
+  const effectiveCluster = getCluster(vms?.[0]) ?? clusterParam ?? undefined;
+
+  const storageMigAPI = useClusterStorageMigrationAPI(effectiveCluster);
 
   const { featureEnabled: crossClusterMigrationFlagEnabled } = useFeatures(
     FEATURE_KUBEVIRT_CROSS_CLUSTER_MIGRATION,
@@ -62,7 +68,11 @@ const useMultipleVirtualMachineActions: UseMultipleVirtualMachineActions = (vms,
       vms.filter(isLiveMigratable),
       createModal,
     );
-    const migrateStorage = BulkVirtualMachineActionFactory.migrateStorage(vms, createModal);
+    const migrateStorage = BulkVirtualMachineActionFactory.migrateStorage(
+      vms,
+      createModal,
+      storageMigAPI,
+    );
 
     const migrationActions =
       clusters.size === 1 ? [migrateCompute, migrateStorage] : [migrateCompute];
@@ -125,6 +135,7 @@ const useMultipleVirtualMachineActions: UseMultipleVirtualMachineActions = (vms,
     vms,
     vmimMapper,
     singleVMActions,
+    storageMigAPI,
   ]);
 };
 

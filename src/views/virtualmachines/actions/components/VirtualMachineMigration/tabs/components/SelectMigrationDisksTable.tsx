@@ -4,7 +4,8 @@ import { Updater } from 'use-immer';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getName, getNamespace, getUID } from '@kubevirt-utils/resources/shared';
-import { Table, Th, Thead, Tr } from '@patternfly/react-table';
+import { readableSizeUnit } from '@kubevirt-utils/utils/units';
+import { Table, Td, Th, Thead, Tr } from '@patternfly/react-table';
 
 import { SelectedMigration } from '../../utils/constants';
 import {
@@ -14,7 +15,6 @@ import {
 } from '../../utils/diskData';
 
 import { columnNames } from './constants';
-import SelectMigrationDisksTableRow from './SelectMigrationDisksTableRow';
 
 type SelectMigrationDisksTableProps = {
   pvcs: IoK8sApiCoreV1PersistentVolumeClaim[];
@@ -50,7 +50,6 @@ const SelectMigrationDisksTable: FC<SelectMigrationDisksTableProps> = ({
     <Table aria-label="Selectable table">
       <Thead>
         <Tr>
-          {!singleVMView && <Th aria-label="Expand" />}
           <Th
             select={{
               isSelected: selectedPVCs?.length === selectableData.length,
@@ -72,18 +71,27 @@ const SelectMigrationDisksTable: FC<SelectMigrationDisksTableProps> = ({
           <Th>{columnNames.name}</Th>
           <Th>{columnNames.drive}</Th>
           <Th>{columnNames.storageClass}</Th>
-          {singleVMView && <Th>{columnNames.size}</Th>}
+          <Th>{columnNames.size}</Th>
         </Tr>
       </Thead>
       {tableData.map((diskData, rowIndex) => (
-        <SelectMigrationDisksTableRow
-          diskData={diskData}
-          key={getName(diskData.pvc)}
-          rowIndex={rowIndex}
-          selectDiskData={selectDiskData}
-          selectedPVCs={selectedPVCs}
-          singleVMView={singleVMView}
-        />
+        <Tr key={getName(diskData.pvc)}>
+          <Td
+            select={{
+              isDisabled: !diskData.isSelectable,
+              isSelected: Boolean(
+                selectedPVCs.find((pvc) => getName(pvc) === getName(diskData.pvc)),
+              ),
+              onSelect: (_event, isSelecting) => selectDiskData(diskData, isSelecting),
+              rowIndex,
+            }}
+          />
+          {!singleVMView && <Td dataLabel={columnNames.vmName}>{getName(diskData.vm)}</Td>}
+          <Td dataLabel={columnNames.name}>{diskData.name}</Td>
+          <Td dataLabel={columnNames.drive}>{diskData.drive}</Td>
+          <Td dataLabel={columnNames.storageClass}>{diskData.storageClass}</Td>
+          <Td dataLabel={columnNames.size}>{readableSizeUnit(diskData?.size)}</Td>
+        </Tr>
       ))}
     </Table>
   );
