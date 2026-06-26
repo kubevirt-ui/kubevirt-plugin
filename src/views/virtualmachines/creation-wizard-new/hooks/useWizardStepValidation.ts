@@ -5,8 +5,6 @@ import { vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { isDNS1123Label } from '@kubevirt-utils/utils/validation';
 import { useSignals } from '@preact/signals-react/runtime';
-import useInstanceTypeVMStore from '@virtualmachines/creation-wizard-new/state/instance-type-vm-store/useInstanceTypeVMStore';
-import useVMWizardStore from '@virtualmachines/creation-wizard-new/state/vm-wizard-store/useVMWizardStore';
 import { VMWizardStep } from '@virtualmachines/creation-wizard-new/utils/constants';
 import {
   getActiveFlow,
@@ -14,7 +12,11 @@ import {
 } from '@virtualmachines/creation-wizard-new/utils/utils';
 
 import { useVMWizard } from '../state/vm-wizard-context/VMWizardContext';
-import { CREATE_VM_FORM_FIELDS_VM_DATA } from '../state/vm-wizard-form/consts';
+import {
+  CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA,
+  CREATE_VM_FORM_FIELDS_STEP_NAVIGATION,
+  CREATE_VM_FORM_FIELDS_VM_DATA,
+} from '../state/vm-wizard-form/consts';
 
 type WizardStepValidation = {
   isNextDisabledForStep: (stepId: VMWizardStep) => boolean;
@@ -23,36 +25,47 @@ type WizardStepValidation = {
 
 const useWizardStepValidation = (): WizardStepValidation => {
   useSignals();
-  const { visitedSteps } = useVMWizardStore();
-  const {
+  const { control } = useVMWizard();
+  const [
+    creationMethod,
+    name,
+    selectedTemplate,
+    visitedSteps,
     operatingSystemType,
     preference,
+    useBootSource,
     selectedBootableVolume,
     selectedInstanceType,
     selectedSeries,
     selectedSize,
-    useBootSource,
-  } = useInstanceTypeVMStore();
-  const { control } = useVMWizard();
-  const creationMethod = useWatch({ control, name: CREATE_VM_FORM_FIELDS_VM_DATA.CREATION_METHOD });
-  const name = useWatch({ control, name: CREATE_VM_FORM_FIELDS_VM_DATA.NAME });
-  const selectedTemplate = useWatch({
+  ] = useWatch({
     control,
-    name: CREATE_VM_FORM_FIELDS_VM_DATA.SELECTED_TEMPLATE,
+    name: [
+      CREATE_VM_FORM_FIELDS_VM_DATA.CREATION_METHOD,
+      CREATE_VM_FORM_FIELDS_VM_DATA.NAME,
+      CREATE_VM_FORM_FIELDS_VM_DATA.SELECTED_TEMPLATE,
+      CREATE_VM_FORM_FIELDS_STEP_NAVIGATION.VISITED_STEPS,
+      CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.ROOT,
+      CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.PREFERENCE,
+      CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.USE_BOOT_SOURCE,
+      CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.SELECTED_BOOTABLE_VOLUME,
+      CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.SELECTED_INSTANCE_TYPE,
+      CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.SELECTED_SERIES,
+      CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.SELECTED_SIZE,
+    ],
   });
-
-  const activeFlow = getActiveFlow(creationMethod);
-
-  const isRedHatProvided = Boolean(selectedSeries) && Boolean(selectedSize);
-  const isUserProvided =
-    Boolean(selectedInstanceType?.namespace) && Boolean(selectedInstanceType?.name);
 
   const currentVMSignalValue = vmSignal.value;
 
-  const isValidVMName = isCloneCreationMethod(creationMethod) || isDNS1123Label(name);
+  const activeFlow = useMemo(() => getActiveFlow(creationMethod), [creationMethod]);
 
-  const stepNextDisabled: Record<VMWizardStep, boolean> = useMemo(
-    () => ({
+  const stepNextDisabled: Record<VMWizardStep, boolean> = useMemo(() => {
+    const isRedHatProvided = Boolean(selectedSeries) && Boolean(selectedSize);
+    const isUserProvided =
+      Boolean(selectedInstanceType?.namespace) && Boolean(selectedInstanceType?.name);
+    const isValidVMName = isCloneCreationMethod(creationMethod) || isDNS1123Label(name);
+
+    return {
       [VMWizardStep.BOOT_SOURCE]: useBootSource && isEmpty(selectedBootableVolume),
       [VMWizardStep.CLONE]: isEmpty(currentVMSignalValue),
       [VMWizardStep.COMPUTE_RESOURCES]: !isRedHatProvided && !isUserProvided,
@@ -61,19 +74,20 @@ const useWizardStepValidation = (): WizardStepValidation => {
       [VMWizardStep.GUEST_OS]: !operatingSystemType || !preference,
       [VMWizardStep.REVIEW_AND_CREATE]: false,
       [VMWizardStep.TEMPLATE]: isEmpty(selectedTemplate),
-    }),
-    [
-      currentVMSignalValue,
-      isRedHatProvided,
-      isUserProvided,
-      operatingSystemType,
-      preference,
-      selectedBootableVolume,
-      selectedTemplate,
-      useBootSource,
-      isValidVMName,
-    ],
-  );
+    };
+  }, [
+    creationMethod,
+    currentVMSignalValue,
+    name,
+    operatingSystemType,
+    preference,
+    selectedBootableVolume,
+    selectedInstanceType,
+    selectedSeries,
+    selectedSize,
+    selectedTemplate,
+    useBootSource,
+  ]);
 
   const isStepDisabled = useCallback(
     (stepId: VMWizardStep): boolean => {

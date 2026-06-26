@@ -1,5 +1,5 @@
-import React, { FC } from 'react';
-import { useWatch } from 'react-hook-form';
+import React, { FC, useMemo } from 'react';
+import { useController, useWatch } from 'react-hook-form';
 
 import { ALL_PROJECTS } from '@kubevirt-utils/hooks/constants';
 import useInstanceTypesAndPreferences from '@kubevirt-utils/hooks/useInstanceTypesAndPreferences';
@@ -16,9 +16,11 @@ import {
   Title,
   TitleSizes,
 } from '@patternfly/react-core';
-import useInstanceTypeVMStore from '@virtualmachines/creation-wizard-new/state/instance-type-vm-store/useInstanceTypeVMStore';
 import { useVMWizard } from '@virtualmachines/creation-wizard-new/state/vm-wizard-context/VMWizardContext';
-import { CREATE_VM_FORM_FIELDS_VM_DATA } from '@virtualmachines/creation-wizard-new/state/vm-wizard-form/consts';
+import {
+  CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA,
+  CREATE_VM_FORM_FIELDS_VM_DATA,
+} from '@virtualmachines/creation-wizard-new/state/vm-wizard-form/consts';
 import BootableVolumeList from '@virtualmachines/creation-wizard-new/steps/InstanceTypesSteps/BootSourceStep/components/BootableVolumeList/BootableVolumeList';
 
 import AddBootableVolumeButton from './components/AddBootableVolumeButton';
@@ -26,19 +28,30 @@ import AddBootableVolumeButton from './components/AddBootableVolumeButton';
 const BootSourceStep: FC = () => {
   const { t } = useKubevirtTranslation();
   const isAdmin = useIsAdmin();
-  const { setUseBootSource, useBootSource, volumeListNamespace } = useInstanceTypeVMStore();
   const { control } = useVMWizard();
   const project = useWatch({ control, name: CREATE_VM_FORM_FIELDS_VM_DATA.PROJECT });
+  const volumeListNamespace = useWatch({
+    control,
+    name: CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.VOLUME_LIST_NAMESPACE,
+  });
+  const {
+    field: { onChange, value },
+  } = useController({
+    control,
+    name: CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.USE_BOOT_SOURCE,
+  });
   const instanceTypesAndPreferencesData = useInstanceTypesAndPreferences(
     getValidNamespace(project),
   );
 
   // For non-admin users with no explicit selection, always scope to the OS images
   // namespace — they cannot do cluster-wide watches. Respect any explicit selection.
-  const effectiveNamespace =
-    isAdmin || (volumeListNamespace && volumeListNamespace !== ALL_PROJECTS)
-      ? volumeListNamespace
-      : OS_IMAGES_NS;
+  const effectiveNamespace = useMemo(() => {
+    const isNamespaceUnset = !volumeListNamespace || volumeListNamespace === ALL_PROJECTS;
+
+    return !isAdmin && isNamespaceUnset ? OS_IMAGES_NS : volumeListNamespace;
+  }, [isAdmin, volumeListNamespace]);
+
   const bootableVolumesData = useBootableVolumes(effectiveNamespace);
 
   return (
@@ -55,10 +68,10 @@ const BootSourceStep: FC = () => {
             <Radio
               description={t('Create your VM from an existing boot source or add a new one.')}
               id="boot-volume-option"
-              isChecked={useBootSource}
+              isChecked={value}
               label={t('Boot volume')}
               name="boot-volume"
-              onChange={() => setUseBootSource(true)}
+              onChange={() => onChange(true)}
             />
           </SplitItem>
           <SplitItem isFilled />
@@ -67,7 +80,7 @@ const BootSourceStep: FC = () => {
           </SplitItem>
         </Split>
       </StackItem>
-      {useBootSource && (
+      {value && (
         <BootableVolumeList
           bootableVolumesData={bootableVolumesData}
           instanceTypesAndPreferencesData={instanceTypesAndPreferencesData}
@@ -77,10 +90,10 @@ const BootSourceStep: FC = () => {
         <Radio
           description={t('Assign a boot source for your VM during the customization step.')}
           id="no-boot-volume-option"
-          isChecked={!useBootSource}
+          isChecked={!value}
           label={t('No boot source')}
           name="boot-volume"
-          onChange={() => setUseBootSource(false)}
+          onChange={() => onChange(false)}
         />
       </StackItem>
     </Stack>

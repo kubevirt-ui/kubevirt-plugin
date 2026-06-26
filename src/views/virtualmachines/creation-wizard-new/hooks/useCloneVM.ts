@@ -37,25 +37,23 @@ const useCloneVM: UseCloneVM = () => {
   );
 
   useEffect(() => {
-    const { name: vmName, project: targetNamespace } = getValues(
-      CREATE_VM_FORM_FIELDS_VM_DATA.ROOT,
-    );
+    const { name, project: targetNamespace } = getValues(CREATE_VM_FORM_FIELDS_VM_DATA.ROOT);
 
     if (cloneRequest?.status?.phase === CLONING_STATUSES.SUCCEEDED) {
       logVMCreated(TELEMETRY_VM_CREATION_METHOD.CLONE);
-      navigate(getVMURL(cloneRequest?.cluster, targetNamespace, vmName));
+      navigate(getVMURL(cloneRequest?.cluster, targetNamespace, name));
     }
   }, [cloneRequest, navigate, source, getValues]);
 
   const sendCloneRequest = async () => {
     const {
       cluster,
-      description: vmDescription,
-      name: vmName,
+      description,
+      name,
       project: targetNamespace,
     } = getValues(CREATE_VM_FORM_FIELDS_VM_DATA.ROOT);
     try {
-      const vmSameName = await vmExists(vmName, targetNamespace, getCluster(source) || cluster);
+      const vmSameName = await vmExists(name, targetNamespace, getCluster(source) || cluster);
 
       if (vmSameName) {
         throw new Error(t('VirtualMachine with this name already exists'));
@@ -63,10 +61,10 @@ const useCloneVM: UseCloneVM = () => {
 
       const request = await cloneVM(
         source,
-        vmName,
+        name,
         targetNamespace,
         vmSignal.value?.spec?.runStrategy !== RUNSTRATEGY_HALTED,
-        vmDescription,
+        description,
       );
 
       setInitialCloneRequest(request);

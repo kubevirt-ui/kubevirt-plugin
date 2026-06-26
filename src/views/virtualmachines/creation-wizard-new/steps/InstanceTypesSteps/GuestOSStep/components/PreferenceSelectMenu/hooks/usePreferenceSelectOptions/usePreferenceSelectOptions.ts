@@ -1,9 +1,11 @@
 import { useEffect, useMemo } from 'react';
+import { useWatch } from 'react-hook-form';
 
 import useClusterPreferences from '@kubevirt-utils/hooks/useClusterPreferences';
 import useHcoWorkloadArchitectures from '@kubevirt-utils/hooks/useHcoWorkloadArchitectures';
 import useUserPreferences from '@kubevirt-utils/hooks/useUserPreferences';
-import useInstanceTypeVMStore from '@virtualmachines/creation-wizard-new/state/instance-type-vm-store/useInstanceTypeVMStore';
+import { useVMWizard } from '@virtualmachines/creation-wizard-new/state/vm-wizard-context/VMWizardContext';
+import { CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA } from '@virtualmachines/creation-wizard-new/state/vm-wizard-form/consts';
 import {
   getDefaultPreference,
   getPreferenceNamesFilteredByOSType,
@@ -24,7 +26,11 @@ const usePreferenceSelectOptions: UsePreferenceSelectOptions = (
   cluster,
   operatingSystemType,
 ) => {
-  const { preference, setPreference } = useInstanceTypeVMStore();
+  const { control, setValue } = useVMWizard();
+  const preference = useWatch({
+    control,
+    name: CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.PREFERENCE,
+  });
   const [architectures, architecturesLoaded] = useHcoWorkloadArchitectures(cluster);
   const [clusterPreferences, clusterPreferencesLoaded] = useClusterPreferences(null, null, cluster);
   const [userPreferences = [], userPreferencesLoaded] = useUserPreferences(
@@ -47,9 +53,9 @@ const usePreferenceSelectOptions: UsePreferenceSelectOptions = (
 
     const defaultPref = getDefaultPreference(preferences, operatingSystemType, architectures);
     if (!preference && defaultPref) {
-      setPreference(defaultPref);
+      setValue(CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.PREFERENCE, defaultPref);
     }
-  }, [architectures, loaded, operatingSystemType, preference, preferences, setPreference]);
+  }, [architectures, loaded, operatingSystemType, preference, preferences, setValue]);
 
   return {
     preferences,

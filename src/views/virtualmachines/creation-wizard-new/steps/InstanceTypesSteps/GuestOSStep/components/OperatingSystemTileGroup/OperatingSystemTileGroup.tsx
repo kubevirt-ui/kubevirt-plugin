@@ -1,14 +1,20 @@
 import React, { FC } from 'react';
+import { useWatch } from 'react-hook-form';
 
 import useIsWindowsSupportedArchitecture from '@kubevirt-utils/hooks/useIsWindowsSupportedArchitecture';
 import { Split, SplitItem } from '@patternfly/react-core';
-import useInstanceTypeVMStore from '@virtualmachines/creation-wizard-new/state/instance-type-vm-store/useInstanceTypeVMStore';
+import { useVMWizard } from '@virtualmachines/creation-wizard-new/state/vm-wizard-context/VMWizardContext';
+import { CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA } from '@virtualmachines/creation-wizard-new/state/vm-wizard-form/consts';
 import { OperatingSystemType } from '@virtualmachines/creation-wizard-new/steps/InstanceTypesSteps/GuestOSStep/utils/constants';
 
 import OperatingSystemTile from './components/OperatingSystemTile/OperatingSystemTile';
 
 const OperatingSystemTileGroup: FC = () => {
-  const { operatingSystemType, setOperatingSystemType } = useInstanceTypeVMStore();
+  const { control, setValue } = useVMWizard();
+  const operatingSystemType = useWatch({
+    control,
+    name: CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.OPERATING_SYSTEM_TYPE,
+  });
   const isWindowsSupported = useIsWindowsSupportedArchitecture();
 
   const osTypes = [
@@ -22,8 +28,11 @@ const OperatingSystemTileGroup: FC = () => {
       {osTypes.map((osType) => (
         <SplitItem key={osType}>
           <OperatingSystemTile
+            onClick={() => {
+              setValue(CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.OPERATING_SYSTEM_TYPE, osType);
+              setValue(CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.PREFERENCE, null);
+            }}
             isSelected={operatingSystemType === osType}
-            onClick={() => setOperatingSystemType(osType)}
             operatingSystem={osType}
           />
         </SplitItem>

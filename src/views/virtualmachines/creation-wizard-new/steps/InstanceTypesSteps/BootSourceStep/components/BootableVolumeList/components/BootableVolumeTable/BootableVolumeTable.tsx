@@ -16,7 +16,7 @@ import { getName, NamespacedResourceMap, ResourceMap } from '@kubevirt-utils/res
 import { TableColumn } from '@openshift-console/dynamic-plugin-sdk';
 import { Table, TableVariant, Tbody, Th, Thead, Tr } from '@patternfly/react-table';
 import { ThSortType } from '@patternfly/react-table/dist/esm/components/Table/base/types';
-import { InstanceTypeVMStore } from '@virtualmachines/creation-wizard-new/state/instance-type-vm-store/utils/types';
+import { OnSelectCreatedVolumeHandler } from '@virtualmachines/creation-wizard-new/hooks/useOnSelectCreatedVolume';
 import { UseBootableVolumesValues } from '@virtualmachines/creation-wizard-new/utils/types';
 
 import BootableVolumeRow from '../BootableVolumeRow/BootableVolumeRow';
@@ -26,9 +26,10 @@ type BootableVolumeTableProps = {
   bootableVolumesData: UseBootableVolumesValues;
   getSortType: (columnIndex: number) => ThSortType;
   preferencesMap: ResourceMap<V1beta1VirtualMachineClusterPreference>;
-  selectedBootableVolumeState?: [BootableVolume, InstanceTypeVMStore['onSelectCreatedVolume']];
+  selectedBootableVolumeState?: [BootableVolume, OnSelectCreatedVolumeHandler];
   sortedPaginatedData: BootableVolume[];
   userPreferencesMap: NamespacedResourceMap<V1beta1VirtualMachinePreference>;
+  volumeListNamespace: string;
 };
 
 const BootableVolumeTable: FC<BootableVolumeTableProps> = ({
@@ -39,6 +40,7 @@ const BootableVolumeTable: FC<BootableVolumeTableProps> = ({
   selectedBootableVolumeState,
   sortedPaginatedData,
   userPreferencesMap,
+  volumeListNamespace,
 }) => {
   const { dataImportCrons, dvSources, pvcSources, volumeSnapshotSources } = bootableVolumesData;
 
@@ -69,6 +71,7 @@ const BootableVolumeTable: FC<BootableVolumeTableProps> = ({
                 dvSource: getDataVolumeForPVC(pvcSource, dvSources),
                 preference: getPreference(bootSource, preferencesMap, userPreferencesMap),
                 pvcSource,
+                volumeListNamespace,
                 volumeSnapshotSource: volumeSnapshotSources?.[bootSourceName],
               }}
               activeColumnIDs={activeColumns?.map((col) => col?.id)}

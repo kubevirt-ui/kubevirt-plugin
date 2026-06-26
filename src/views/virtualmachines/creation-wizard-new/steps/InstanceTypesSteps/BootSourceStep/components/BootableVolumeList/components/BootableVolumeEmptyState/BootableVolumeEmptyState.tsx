@@ -1,11 +1,13 @@
 import React, { FC } from 'react';
+import { useWatch } from 'react-hook-form';
 import { Trans } from 'react-i18next';
 
 import useInstanceTypesAndPreferences from '@kubevirt-utils/hooks/useInstanceTypesAndPreferences';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { LINUX, OS_NAME_TYPES } from '@kubevirt-utils/resources/template';
 import { EmptyState, Title } from '@patternfly/react-core';
-import useInstanceTypeVMStore from '@virtualmachines/creation-wizard-new/state/instance-type-vm-store/useInstanceTypeVMStore';
+import { useVMWizard } from '@virtualmachines/creation-wizard-new/state/vm-wizard-context/VMWizardContext';
+import { CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA } from '@virtualmachines/creation-wizard-new/state/vm-wizard-form/consts';
 import AddBootableVolumeLink from '@virtualmachines/creation-wizard-new/steps/InstanceTypesSteps/BootSourceStep/components/BootableVolumeList/components/AddBootableVolumeLink/AddBootableVolumeLink';
 import BootableVolumeOSIcons from '@virtualmachines/creation-wizard-new/steps/InstanceTypesSteps/BootSourceStep/components/BootableVolumeList/components/BootableVolumeEmptyState/BootableVolumeOSIcons';
 
@@ -18,7 +20,11 @@ type BootableVolumeEmptyStateProps = {
 const BootableVolumeEmptyState: FC<BootableVolumeEmptyStateProps> = ({ isPreferenceFilter }) => {
   const { t } = useKubevirtTranslation();
   const { loadError } = useInstanceTypesAndPreferences();
-  const { preference } = useInstanceTypeVMStore();
+  const { control } = useVMWizard();
+  const preference = useWatch({
+    control,
+    name: CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.PREFERENCE,
+  });
 
   const osName = preference
     ? (() => {

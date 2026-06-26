@@ -1,4 +1,5 @@
 import React, { FC } from 'react';
+import { useWatch } from 'react-hook-form';
 
 import { useRunStrategyToggle } from '@kubevirt-utils/components/RunStrategyModal/useRunStrategyToggle';
 import {
@@ -9,13 +10,15 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { updateCustomizeInstanceType, vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
 import { Checkbox, Stack, StackItem, Title, TitleSizes } from '@patternfly/react-core';
 import { useSignals } from '@preact/signals-react/runtime';
-import useVMWizardStore from '@virtualmachines/creation-wizard-new/state/vm-wizard-store/useVMWizardStore';
+import { useVMWizard } from '@virtualmachines/creation-wizard-new/state/vm-wizard-context/VMWizardContext';
+import { CREATE_VM_FORM_FIELDS_VM_DATA } from '@virtualmachines/creation-wizard-new/state/vm-wizard-form/consts';
 import ReviewGrid from '@virtualmachines/creation-wizard-new/steps/ReviewAndCreateStep/components/ReviewGrid/ReviewGrid';
 import { isCloneCreationMethod } from '@virtualmachines/creation-wizard-new/utils/utils';
 
 const ReviewAndCreateStep: FC = () => {
   const { t } = useKubevirtTranslation();
-  const { creationMethod } = useVMWizardStore();
+  const { control } = useVMWizard();
+  const creationMethod = useWatch({ control, name: CREATE_VM_FORM_FIELDS_VM_DATA.CREATION_METHOD });
   const isCloneMethod = isCloneCreationMethod(creationMethod);
 
   useSignals();

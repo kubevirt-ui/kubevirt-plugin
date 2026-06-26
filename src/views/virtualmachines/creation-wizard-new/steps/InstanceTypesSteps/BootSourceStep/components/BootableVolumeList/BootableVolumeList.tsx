@@ -1,4 +1,5 @@
-import React, { FC } from 'react';
+import React, { FC, useMemo } from 'react';
+import { Controller, useWatch } from 'react-hook-form';
 
 import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
 import ProjectDropdown from '@kubevirt-utils/components/ProjectDropdown/ProjectDropdown';
@@ -8,7 +9,9 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import useHideDeprecatedBootableVolumes from '@kubevirt-utils/resources/bootableresources/hooks/useHideDeprecatedBootableVolumes';
 import { OS_IMAGES_NS } from '@kubevirt-utils/utils/utils';
 import { Card, FormGroup, Skeleton, Split, SplitItem } from '@patternfly/react-core';
-import useInstanceTypeVMStore from '@virtualmachines/creation-wizard-new/state/instance-type-vm-store/useInstanceTypeVMStore';
+import useOnSelectCreatedVolume from '@virtualmachines/creation-wizard-new/hooks/useOnSelectCreatedVolume';
+import { useVMWizard } from '@virtualmachines/creation-wizard-new/state/vm-wizard-context/VMWizardContext';
+import { CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA } from '@virtualmachines/creation-wizard-new/state/vm-wizard-form/consts';
 import usePreferencesData from '@virtualmachines/creation-wizard-new/steps/InstanceTypesSteps/BootSourceStep/components/BootableVolumeList/hooks/usePreferencesData';
 import {
   UseBootableVolumesValues,
@@ -33,18 +36,25 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const isAdmin = useIsAdmin();
-  const {
-    onSelectCreatedVolume,
-    selectedBootableVolume,
-    setVolumeListNamespace,
-    volumeListNamespace,
-  } = useInstanceTypeVMStore();
+  const { control } = useVMWizard();
+  const onSelectCreatedVolume = useOnSelectCreatedVolume();
+
+  const [volumeListNamespace, selectedBootableVolume] = useWatch({
+    control,
+    name: [
+      CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.VOLUME_LIST_NAMESPACE,
+      CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.SELECTED_BOOTABLE_VOLUME,
+    ],
+  });
 
   // Non-admin users cannot list across all projects — default to the OS images
   // namespace where system bootable volumes live. If they explicitly pick a
   // different project via the dropdown, respect that choice.
-  const isNamespaceUnset = !volumeListNamespace || volumeListNamespace === ALL_PROJECTS;
-  const effectiveNamespace = !isAdmin && isNamespaceUnset ? OS_IMAGES_NS : volumeListNamespace;
+  const effectiveNamespace = useMemo(() => {
+    const isNamespaceUnset = !volumeListNamespace || volumeListNamespace === ALL_PROJECTS;
+
+    return !isAdmin && isNamespaceUnset ? OS_IMAGES_NS : volumeListNamespace;
+  }, [isAdmin, volumeListNamespace]);
 
   const { preferences: preferencesData } = instanceTypesAndPreferencesData;
   const { preferencesMap, userPreferencesLoaded, userPreferencesMap } = usePreferencesData(
@@ -84,10 +94,16 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
               className="bootable-volume-list-bar__volume-namespace"
               label={t('Volumes project')}
             >
-              <ProjectDropdown
-                includeAllProjects={isAdmin}
-                onChange={setVolumeListNamespace}
-                selectedProject={effectiveNamespace}
+              <Controller
+                render={({ field: { onChange, ref: _ } }) => (
+                  <ProjectDropdown
+                    includeAllProjects={isAdmin}
+                    onChange={onChange}
+                    selectedProject={effectiveNamespace}
+                  />
+                )}
+                control={control}
+                name={CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.VOLUME_LIST_NAMESPACE}
               />
             </FormGroup>
           </SplitItem>
@@ -132,6 +148,7 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
             selectedBootableVolumeState={[selectedBootableVolume, onSelectCreatedVolume]}
             sortedPaginatedData={sortedPaginatedData}
             userPreferencesMap={userPreferencesMap}
+            volumeListNamespace={volumeListNamespace}
           />
         )}
         {isVolumesLoaded && isEmptyVolumes && <BootableVolumeEmptyState />}

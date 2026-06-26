@@ -1,4 +1,5 @@
 import React, { FC } from 'react';
+import { useWatch } from 'react-hook-form';
 
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -8,20 +9,22 @@ import {
   ActionListGroup,
   ActionListItem,
   Button,
+  Stack,
   useWizardContext,
   WizardFooterWrapper,
 } from '@patternfly/react-core';
-import { Stack } from '@patternfly/react-core';
 import VMNameConfirmationNextButton from '@virtualmachines/creation-wizard-new/components/VMNameConfirmationNextButton';
 import useCloseWizard from '@virtualmachines/creation-wizard-new/hooks/useCloseWizard';
 import useCreateVM from '@virtualmachines/creation-wizard-new/hooks/useCreateVM';
-import useVMWizardStore from '@virtualmachines/creation-wizard-new/state/vm-wizard-store/useVMWizardStore';
+import { useVMWizard } from '@virtualmachines/creation-wizard-new/state/vm-wizard-context/VMWizardContext';
+import { CREATE_VM_FORM_FIELDS_VM_DATA } from '@virtualmachines/creation-wizard-new/state/vm-wizard-form/consts';
 import { isCloneCreationMethod } from '@virtualmachines/creation-wizard-new/utils/utils';
 
 const ReviewAndCreateStepFooter: FC = () => {
   const { t } = useKubevirtTranslation();
   const { goToPrevStep } = useWizardContext();
-  const { creationMethod } = useVMWizardStore();
+  const { control } = useVMWizard();
+  const creationMethod = useWatch({ control, name: CREATE_VM_FORM_FIELDS_VM_DATA.CREATION_METHOD });
   const isCloneMethod = isCloneCreationMethod(creationMethod);
   const { createVM, error, isSubmitting } = useCreateVM();
   const closeWizard = useCloseWizard();
