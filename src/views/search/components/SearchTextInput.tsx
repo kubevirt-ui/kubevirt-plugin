@@ -25,8 +25,8 @@ import {
   Tooltip,
 } from '@patternfly/react-core';
 import { SearchIcon, TimesIcon } from '@patternfly/react-icons';
+import useCursorTracking from '@search/hooks/useCursorTracking';
 import { useSearchLanguageDropdown } from '@search/searchLanguage/hooks/useSearchLanguageDropdown/useSearchLanguageDropdown';
-import { getLastToken } from '@search/searchLanguage/utils';
 import { VM_SEARCH_INPUT_ID } from '@search/utils/constants';
 
 import { useAutocompleteMode } from './SearchDropdown/hooks/useAutocompleteMode/useAutocompleteMode';
@@ -80,15 +80,17 @@ const SearchTextInput: FC<SearchTextInputProps> = ({
   const [showAllExamples, setShowAllExamples] = useState(false);
   const onToggleShowAllExamples = useCallback(() => setShowAllExamples((prev) => !prev), []);
 
-  const lastToken = getLastToken(displayText);
-  const autocompleteMode = useAutocompleteMode(lastToken, filterDefinitions);
+  const { handleCursorChange, setDraftTextWithCursor, tokenParts, updateCursorPosition } =
+    useCursorTracking({ displayText, inputRef, setDraftText });
+
+  const autocompleteMode = useAutocompleteMode(tokenParts.token, filterDefinitions);
 
   const { onSelectKey, onSelectOperator, onSelectValue } = useSearchLanguageDropdown({
     autocompleteMode,
-    displayText,
     filters,
     onSetFilters,
-    setDraftText,
+    setDraftTextWithCursor,
+    tokenParts,
     trackKey,
   });
 
@@ -106,10 +108,11 @@ const SearchTextInput: FC<SearchTextInputProps> = ({
 
   const handleChange = useCallback(
     (event: FormEvent<HTMLInputElement>, value: string) => {
+      handleCursorChange(event);
       resetFocusedItem();
       onChange(event, value);
     },
-    [resetFocusedItem, onChange],
+    [handleCursorChange, resetFocusedItem, onChange],
   );
 
   useClickOutside([toggleRef, menuRef], onCloseDropdown);
@@ -120,8 +123,10 @@ const SearchTextInput: FC<SearchTextInputProps> = ({
         <TextInputGroupMain
           icon={<SearchIcon />}
           onChange={handleChange}
+          onClick={updateCursorPosition}
           onFocus={onOpenDropdown}
           onKeyDown={handleKeyDown}
+          onKeyUp={updateCursorPosition}
           placeholder={t('Search virtual machines...')}
           ref={inputRef}
           value={displayText}

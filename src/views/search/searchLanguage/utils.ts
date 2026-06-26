@@ -3,6 +3,7 @@ import { isEmpty } from '@kubevirt-utils/utils/utils';
 
 import { EXCLUSION_PREFIX } from './constants';
 import { parseSearchToken } from './parser';
+import { TokenParts } from './types';
 
 export const isExcludedToken = (input: string): boolean => input.startsWith(EXCLUSION_PREFIX);
 
@@ -25,6 +26,47 @@ export const splitAtLastToken = (text: string): { lastToken: string; prefix: str
 };
 
 export const getLastToken = (text: string): string => splitAtLastToken(text).lastToken;
+
+const getTokenAtCursor = (
+  text: string,
+  cursorPos: number,
+): {
+  token: string;
+  tokenEnd: number;
+  tokenStart: number;
+} => {
+  const trimmed = text.trimStart();
+  const offset = text.length - trimmed.length;
+  const pos = Math.min(Math.max(0, cursorPos - offset), trimmed.length);
+
+  const leftIsSpace = pos === 0 || trimmed[pos - 1] === ' ';
+  const rightIsSpace = pos >= trimmed.length || trimmed[pos] === ' ';
+
+  if (leftIsSpace && rightIsSpace) {
+    return { token: '', tokenEnd: cursorPos, tokenStart: cursorPos };
+  }
+
+  let start = pos;
+  while (start > 0 && trimmed[start - 1] !== ' ') start--;
+
+  let end = pos;
+  while (end < trimmed.length && trimmed[end] !== ' ') end++;
+
+  return {
+    token: trimmed.slice(start, end),
+    tokenEnd: end + offset,
+    tokenStart: start + offset,
+  };
+};
+
+export const splitAtCursorToken = (text: string, cursorPos: number): TokenParts => {
+  const { token, tokenEnd, tokenStart } = getTokenAtCursor(text, cursorPos);
+  return {
+    prefix: text.slice(0, tokenStart),
+    suffix: text.slice(tokenEnd),
+    token,
+  };
+};
 
 /**
  * Detects tokens where a valid key and operator/colon are present but no value

@@ -14,14 +14,16 @@ import {
   DropdownType,
   SearchKeyBadge,
 } from '@search/components/SearchDropdown/types';
-import { getExclusionPrefix, splitAtLastToken } from '@search/searchLanguage/utils';
+import { type SetDraftTextWithCursor } from '@search/hooks/useCursorTracking';
+import { TokenParts } from '@search/searchLanguage/types';
+import { getExclusionPrefix } from '@search/searchLanguage/utils';
 
 type UseSearchLanguageDropdownProps = {
   autocompleteMode: AutocompleteMode;
-  displayText: string;
   filters: KubevirtFilterState;
   onSetFilters: OnSetFilters;
-  setDraftText: (value: string) => void;
+  setDraftTextWithCursor: SetDraftTextWithCursor;
+  tokenParts: TokenParts;
   trackKey: (key: string) => void;
 };
 
@@ -33,23 +35,29 @@ type UseSearchLanguageDropdownResult = {
 
 export const useSearchLanguageDropdown = ({
   autocompleteMode,
-  displayText,
   filters,
   onSetFilters,
-  setDraftText,
+  setDraftTextWithCursor,
+  tokenParts,
   trackKey,
 }: UseSearchLanguageDropdownProps): UseSearchLanguageDropdownResult => {
-  const { exclusionPrefix, prefix } = useMemo(() => {
-    const { lastToken, prefix: p } = splitAtLastToken(displayText);
-    return { exclusionPrefix: getExclusionPrefix(lastToken), prefix: p };
-  }, [displayText]);
+  const { prefix, suffix, token } = tokenParts;
+  const exclusionPrefix = useMemo(() => getExclusionPrefix(token), [token]);
+
+  const updateDraftText = useCallback(
+    (newToken: string) => {
+      const newText = `${prefix}${exclusionPrefix}${newToken}${suffix}`;
+      setDraftTextWithCursor(newText, prefix.length + exclusionPrefix.length + newToken.length);
+    },
+    [prefix, exclusionPrefix, suffix, setDraftTextWithCursor],
+  );
 
   const onSelectKey = useCallback(
     (badge: SearchKeyBadge) => {
       const keyText = badge.usesColon === false ? badge.searchKey : `${badge.searchKey}:`;
-      setDraftText(`${prefix}${exclusionPrefix}${keyText}`);
+      updateDraftText(keyText);
     },
-    [prefix, exclusionPrefix, setDraftText],
+    [updateDraftText],
   );
 
   const onSelectValue = useCallback(
@@ -61,12 +69,12 @@ export const useSearchLanguageDropdown = ({
       const lowerValue = value.toLowerCase();
       const isAlreadySelected = selectedValues.some((v) => v.toLowerCase() === lowerValue);
 
-      const toggled = isAlreadySelected
+      const newSelectedValues = isAlreadySelected
         ? selectedValues.filter((v) => v.toLowerCase() !== lowerValue)
         : [...selectedValues, value];
 
       const isExcluded = !!exclusionPrefix;
-      const newFilterValues = toggled.map((v) => formatFilterValue(v, isExcluded));
+      const newFilterValues = newSelectedValues.map((v) => formatFilterValue(v, isExcluded));
 
       const currentValues = filters[filterType] ?? [];
       const oppositePolarity = currentValues.filter((v) => isExcludedValue(v) !== isExcluded);
@@ -74,10 +82,10 @@ export const useSearchLanguageDropdown = ({
       onSetFilters({ [filterType]: [...oppositePolarity, ...newFilterValues] });
       trackKey(filterType);
 
-      const valuesText = isEmpty(toggled) ? '' : `${toggled.join(',')},`;
-      setDraftText(`${prefix}${exclusionPrefix}${searchKey}:${valuesText}`);
+      const valuesText = isEmpty(newSelectedValues) ? '' : `${newSelectedValues.join(',')},`;
+      updateDraftText(`${searchKey}:${valuesText}`);
     },
-    [autocompleteMode, filters, prefix, exclusionPrefix, onSetFilters, setDraftText, trackKey],
+    [autocompleteMode, filters, updateDraftText, exclusionPrefix, onSetFilters, trackKey],
   );
 
   const onSelectOperator = useCallback(
@@ -85,9 +93,9 @@ export const useSearchLanguageDropdown = ({
       if (autocompleteMode.type !== DropdownType.OPERATORS) return;
 
       const { searchKey } = autocompleteMode;
-      setDraftText(`${prefix}${exclusionPrefix}${searchKey}${operator}`);
+      updateDraftText(`${searchKey}${operator}`);
     },
-    [autocompleteMode, prefix, exclusionPrefix, setDraftText],
+    [autocompleteMode, updateDraftText],
   );
 
   return {
