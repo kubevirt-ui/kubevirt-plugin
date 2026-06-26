@@ -14,22 +14,29 @@ import {
   initialVCPU,
 } from '../constants/initialValues';
 
-export type AdvancedSearchState = AdvancedSearchInputs & {
+type AdvancedSearchState = AdvancedSearchInputs & {
   dateOption?: DateSelectOption;
   isValidDate?: boolean;
 };
 
-export type SetAdvancedSearchField = <K extends keyof AdvancedSearchState>(
+type SetAdvancedSearchField = <K extends keyof AdvancedSearchState>(
   field: K,
 ) => (value: AdvancedSearchState[K]) => void;
 
 type AdvancedSearchStore = {
   actions: {
     getSearchQueryInputs: () => AdvancedSearchQueryInputs;
-    initializeWithPrefill: (prefillInputs: AdvancedSearchInputs) => void;
+    initialize: (
+      filterInputs: AdvancedSearchInputs,
+      contextInputs: Pick<
+        AdvancedSearchQueryInputs,
+        VirtualMachineRowFilterType.Cluster | VirtualMachineRowFilterType.Project
+      >,
+    ) => void;
     resetForm: () => void;
     setField: SetAdvancedSearchField;
   };
+  baseline: AdvancedSearchState;
   state: AdvancedSearchState;
 };
 
@@ -69,17 +76,15 @@ const getInitialState = (prefillInputs: AdvancedSearchInputs = {}): AdvancedSear
   return baseState;
 };
 
-const isStateEmpty = (state: AdvancedSearchState): boolean => {
-  const initialState = getInitialState();
-  const { dateOption, isValidDate, labelInputText, ...currentQueryInputs } = state;
-  const {
-    dateOption: dateOptionInit,
-    isValidDate: isValidDateInit,
-    labelInputText: labelInputTextInit,
-    ...initialQueryInputs
-  } = initialState;
-  return isEqual(currentQueryInputs, initialQueryInputs);
-};
+const stripUIFields = ({
+  dateOption: _dateOption,
+  isValidDate: _isValidDate,
+  labelInputText: _labelInputText,
+  ...queryInputs
+}: AdvancedSearchState) => queryInputs;
+
+const isStateEmpty = (state: AdvancedSearchState, baseline: AdvancedSearchState): boolean =>
+  isEqual(stripUIFields(state), stripUIFields(baseline));
 
 const useAdvancedSearchStore = create<AdvancedSearchStore>()((set, get) => ({
   actions: {
@@ -89,17 +94,18 @@ const useAdvancedSearchStore = create<AdvancedSearchStore>()((set, get) => ({
       return queryInputs;
     },
 
-    initializeWithPrefill: (prefillInputs) =>
+    initialize: (filterInputs, contextInputs) =>
       set(
         produce((draft) => {
-          draft.state = getInitialState(prefillInputs);
+          draft.baseline = getInitialState(contextInputs);
+          draft.state = getInitialState({ ...filterInputs, ...contextInputs });
         }),
       ),
 
     resetForm: () =>
       set(
         produce((draft) => {
-          draft.state = getInitialState();
+          draft.state = draft.baseline;
         }),
       ),
 
@@ -111,6 +117,7 @@ const useAdvancedSearchStore = create<AdvancedSearchStore>()((set, get) => ({
       ),
   },
 
+  baseline: getInitialState(),
   state: getInitialState(),
 }));
 
@@ -125,4 +132,6 @@ export const useAdvancedSearchField = <K extends keyof AdvancedSearchState>(fiel
   });
 
 export const useIsSearchDisabled = () =>
-  useAdvancedSearchStore((store) => !store.state.isValidDate || isStateEmpty(store.state));
+  useAdvancedSearchStore(
+    (store) => !store.state.isValidDate || isStateEmpty(store.state, store.baseline),
+  );
