@@ -1,77 +1,30 @@
 .VirtualMachinesOverviewTabUtilization--main {
-  .title {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+  .pf-v6-c-card__body {
+    padding-left: var(--pf-t--global--spacer--sm);
   }
+
+  .pf-v6-c-card__title {
+    padding-top: var(--pf-t--global--spacer--md);
+    padding-bottom: var(--pf-t--global--spacer--sm);
+  }
+
   .util {
     display: flex;
     flex-direction: column;
     height: 100%;
-    .util-upper {
-      padding-inline: var(--pf-t--global--spacer--lg);
-      .util-title {
-        height: var(--pf-t--global--spacer--2xl);
-        &__subtitle {
-          font-size: var(--pf-t--global--font--size--md);
-        }
-      }
-      .util-summary {
-        width: 100%;
-        height: var(--pf-t--global--spacer--2xl);
-        display: flex;
-        align-items: flex-end;
-        .util-summary-value {
-          width: 50%;
-          font-weight: var(--pf-t--global--font--weight--body--default);
-          font-size: var(--pf-t--global--font--size--xl);
-          line-height: normal;
-        }
-        .util-summary-text {
-          width: 50%;
-        }
-      }
-    }
+
     .util-chart {
-      max-width: 80%;
+      margin-top: auto;
+
       .pf-v6-c-chart {
-        height: auto;
-      }
-    }
-    &.network {
-      display: flex;
-      flex-direction: column;
-      height: 100%;
-    }
-    .network-metrics {
-      padding-inline: var(--pf-t--global--spacer--lg);
-      display: flex;
-      flex-direction: column;
-      flex-grow: 1;
-      justify-content: center;
-      .network-metrics--row {
-        display: flex;
-        &__sum,
-        &__title {
-          width: 50%;
-        }
-        &__title {
-          margin-left: var(--pf-t--global--spacer--sm);
-        }
+        max-height: 260px;
+        max-width: 260px;
       }
     }
   }
+
   .util-threshold-chart {
-    width: 100%;
-    height: 100px;
-  }
-  .duration-select {
-    display: flex;
-    .pf-v6-c-select {
-      flex-basis: content;
-    }
-  }
-  .pf-v6-c-description-list__text.pf-m-help-text {
-    text-underline-offset: 0.25rem;
+    height: 120px;
+    margin-top: -1.5rem;
   }
 }
