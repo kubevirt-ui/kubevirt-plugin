@@ -284,6 +284,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({
                 filters={filters}
                 loaded
                 onSetFilters={handleSetFilters}
+                vms={vmsToShow}
               />
               <div className="list-managment-group">
                 <VirtualMachineSelection pagination={pagination} vms={filteredVMs} />

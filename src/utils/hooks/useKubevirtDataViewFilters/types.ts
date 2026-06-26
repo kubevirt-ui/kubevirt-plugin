@@ -9,6 +9,11 @@ export enum KubevirtFilterLayout {
   SELECT = 'select',
 }
 
+export type KubevirtFilterOptionGroup = {
+  label?: string;
+  values: string[];
+};
+
 export type KubevirtFilter<TData extends K8sResourceCommon = K8sResourceCommon> = {
   applyWhenEmpty?: boolean;
   categoryLabel?: string;
@@ -21,6 +26,7 @@ export type KubevirtFilter<TData extends K8sResourceCommon = K8sResourceCommon> 
   hideCountBadge?: boolean;
   id: string;
   match: (obj: TData, selectedValues: string[]) => boolean;
+  optionGroups?: KubevirtFilterOptionGroup[];
   options?: DataViewFilterOption[];
   showAllBadge?: boolean;
   toggleBadgeNumber?: number;

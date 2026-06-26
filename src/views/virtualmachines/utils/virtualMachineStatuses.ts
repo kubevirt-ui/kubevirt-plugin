@@ -8,7 +8,7 @@ import {
   getVMSnapshottingStatus,
   getVMStatus,
 } from '@kubevirt-utils/resources/shared';
-import { VM_ERROR_STATUSES, VM_STATUS } from '@kubevirt-utils/resources/vm';
+import { ERROR_STATUS, VM_ERROR_STATUSES, VM_STATUS } from '@kubevirt-utils/resources/vm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   HourglassHalfIcon,
@@ -44,6 +44,24 @@ export const errorPrintableVMStatus = {
   ErrorUnschedulable: 'ErrorUnschedulable',
   ImagePullBackOff: 'ImagePullBackOff',
 };
+
+export const STATUS_VALUE_GROUPS: string[][] = [
+  [
+    printableVMStatus.Running,
+    printableVMStatus.Migrating,
+    printableVMStatus.Paused,
+    printableVMStatus.Stopped,
+    ERROR_STATUS,
+    printableVMStatus.Unknown,
+  ],
+  [
+    printableVMStatus.Starting,
+    printableVMStatus.Provisioning,
+    printableVMStatus.WaitingForVolumeBinding,
+    printableVMStatus.WaitingForReceiver,
+  ],
+  [printableVMStatus.Stopping, printableVMStatus.Deleting, printableVMStatus.Terminating],
+];
 
 export const isErrorPrintableStatus = (printableStatus: string) =>
   Object.values(VM_ERROR_STATUSES).includes(printableStatus as VM_STATUS);
