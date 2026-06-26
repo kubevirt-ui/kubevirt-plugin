@@ -2,10 +2,20 @@ import { CAPACITY_UNITS } from '@kubevirt-utils/components/CapacityInput/utils';
 import { KubevirtFilterState } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { NumberOperator, ROW_FILTERS_PREFIX } from '@kubevirt-utils/utils/constants';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
+import {
+  initialGuestAgent,
+  initialHWDevices,
+  initialScheduling,
+} from '@search/components/AdvancedSearchModal/constants/initialValues';
 import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
-import { skipRowFilterPrefix, validSearchQueryParams } from './constants';
-import { AdvancedSearchQueryInputs } from './types';
+import {
+  arrayFields,
+  singleStringFields,
+  skipRowFilterPrefix,
+  validSearchQueryParams,
+} from './constants';
+import { AdvancedSearchQueryInputs, CPUValue, MemoryValue } from './types';
 
 type AdvancedSearchQueryInputValue = AdvancedSearchQueryInputs[keyof AdvancedSearchQueryInputs];
 
@@ -107,6 +117,69 @@ export const getUrlSearchQuery = (search: string): string => {
   }
 
   return searchParams.toString();
+};
+
+const parseCPUValue = (values: string[]): CPUValue | undefined => {
+  const parts = values[0]?.split(' ');
+  if (parts?.length !== 2) return undefined;
+
+  const operator = Object.values(NumberOperator).find((op) => op === parts[0]);
+  const value = Number(parts[1]);
+
+  if (!operator || isNaN(value)) return undefined;
+  return { operator, value };
+};
+
+const parseMemoryValue = (values: string[]): MemoryValue | undefined => {
+  const parts = values[0]?.split(' ');
+  if (parts?.length !== 3) return undefined;
+
+  const operator = Object.values(NumberOperator).find((op) => op === parts[0]);
+  const value = Number(parts[1]);
+  const unit = Object.values(CAPACITY_UNITS).find((u) => u === parts[2]);
+
+  if (!operator || isNaN(value) || !unit) return undefined;
+  return { operator, unit, value };
+};
+
+const parseBooleanMap = <T extends Record<string, boolean>>(values: string[], initial: T): T => {
+  const result = { ...initial };
+  for (const key of values) {
+    if (key in result) {
+      (result as Record<string, boolean>)[key] = true;
+    }
+  }
+  return result;
+};
+
+export const convertFilterStateToModalInputs = (
+  filters: Partial<KubevirtFilterState>,
+): AdvancedSearchQueryInputs => {
+  const result: AdvancedSearchQueryInputs = {};
+
+  for (const [key, values] of Object.entries(filters)) {
+    if (!validSearchQueryParams.includes(key) || isEmpty(values)) continue;
+
+    if (singleStringFields.has(key as VirtualMachineRowFilterType)) {
+      result[key] = values[0] ?? '';
+    } else if (arrayFields.has(key as VirtualMachineRowFilterType)) {
+      result[key] = values;
+    } else if (key === VirtualMachineRowFilterType.CPU) {
+      const parsed = parseCPUValue(values);
+      if (parsed) result[key] = parsed;
+    } else if (key === VirtualMachineRowFilterType.Memory) {
+      const parsed = parseMemoryValue(values);
+      if (parsed) result[key] = parsed;
+    } else if (key === VirtualMachineRowFilterType.GuestAgent) {
+      result[key] = parseBooleanMap(values, initialGuestAgent);
+    } else if (key === VirtualMachineRowFilterType.HWDevices) {
+      result[key] = parseBooleanMap(values, initialHWDevices);
+    } else if (key === VirtualMachineRowFilterType.Scheduling) {
+      result[key] = parseBooleanMap(values, initialScheduling);
+    }
+  }
+
+  return result;
 };
 
 export const buildContextSearchInputs = (

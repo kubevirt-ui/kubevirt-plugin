@@ -63,34 +63,37 @@ const AdvancedSearchModal: FC<AdvancedSearchModalProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
 
+  const namespace = useNamespaceParam();
+  const cluster = useClusterParam();
+  const isACMPage = useIsACMPage();
+
   const { value: selectedClusters } = useAdvancedSearchField(VirtualMachineRowFilterType.Cluster);
 
   const { resources: vms } = useAccessibleResources<V1VirtualMachine>({
-    clusters: selectedClusters,
+    clusters: cluster ? [cluster] : selectedClusters,
     groupVersionKind: VirtualMachineModelGroupVersionKind,
+    namespace,
   });
-  const namespace = useNamespaceParam();
-  const cluster = useClusterParam();
-
-  const prefillInputsWithClusterAndNamespace = {
-    ...prefillInputs,
-    ...buildContextSearchInputs(cluster, namespace),
-  };
-
-  const isACMPage = useIsACMPage();
 
   const isSearchDisabled = useIsSearchDisabled();
-  const { getSearchQueryInputs, initializeWithPrefill, resetForm } = useAdvancedSearchActions();
+  const { getSearchQueryInputs, initialize, resetForm } = useAdvancedSearchActions();
 
   // Initialize store with prefill inputs when component mounts
   const hasInitialized = useRef(false);
   if (!hasInitialized.current) {
-    initializeWithPrefill(prefillInputsWithClusterAndNamespace);
+    const contextInputs = buildContextSearchInputs(cluster, namespace);
+
+    initialize(prefillInputs, contextInputs);
     hasInitialized.current = true;
   }
 
   const submitForm = () => {
-    onSubmit(getSearchQueryInputs());
+    const queryInputs = getSearchQueryInputs();
+
+    if (cluster) delete queryInputs[VirtualMachineRowFilterType.Cluster];
+    if (namespace) delete queryInputs[VirtualMachineRowFilterType.Project];
+
+    onSubmit(queryInputs);
   };
 
   return (
@@ -107,8 +110,8 @@ const AdvancedSearchModal: FC<AdvancedSearchModalProps> = ({
           <ModalExpandableSection title={t('Details')}>
             <Form isHorizontal>
               <NameField />
-              {isACMPage && <ClusterField />}
-              <ProjectField vms={vms} />
+              {isACMPage && <ClusterField isDisabled={!!cluster} />}
+              <ProjectField isDisabled={!!namespace} vms={vms} />
               <DescriptionField />
               <StatusField />
               <OperatingSystemField />
