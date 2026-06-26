@@ -58,11 +58,14 @@ export type V1DiskFormState = {
 
 export type DefaultFormValues = Partial<V1DiskFormState>;
 
+export type GetCurrentVM = () => V1VirtualMachine;
+
 export type V1DiskModalProps = {
   createDiskSource?: SourceTypes;
   createdPVCName?: string;
   defaultFormValues?: DefaultFormValues;
   editDiskName?: string;
+  getCurrentVM?: GetCurrentVM;
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (
@@ -98,6 +101,7 @@ export type SubmitInput = {
 };
 
 export type SubmitCDROMInput = {
+  getCurrentVM?: GetCurrentVM;
   isHotPluggable: boolean;
   onSubmit: V1DiskModalProps['onSubmit'];
   onUploadedDataVolume?: V1DiskModalProps['onUploadedDataVolume'];

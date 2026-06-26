@@ -11,6 +11,7 @@ import {
 } from '@kubevirt-utils/components/DiskModal/utils/constants';
 import {
   createEjectMountedDiskCancelCleanup,
+  ejectISOFromCDROM,
   isHotPluggableEnabled,
   mountISOToCDROM,
 } from '@kubevirt-utils/components/DiskModal/utils/helpers';
@@ -28,7 +29,7 @@ import {
   getDataVolumeName,
   getPVCClaimName,
 } from '@kubevirt-utils/resources/vm/utils/disk/selectors';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { isEmpty, kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { ButtonVariant, Stack } from '@patternfly/react-core';
 import { isRunning } from '@virtualmachines/utils';
@@ -39,6 +40,7 @@ import { buildDiskState, produceMountUploadVolumeState } from './utils';
 
 type MountCDROMModalProps = {
   cdromName: string;
+  getCurrentVM?: () => V1VirtualMachine;
   isOpen: boolean;
   onClose: () => void;
   onSubmit?: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine>;
@@ -47,6 +49,7 @@ type MountCDROMModalProps = {
 
 const MountCDROMModal: FC<MountCDROMModalProps> = ({
   cdromName,
+  getCurrentVM,
   isOpen,
   onClose,
   onSubmit,
@@ -124,11 +127,24 @@ const MountCDROMModal: FC<MountCDROMModalProps> = ({
         const submitResult = await onSubmit?.(vmWithMountedDv);
         const vmAfterMount = submitResult ?? vmWithMountedDv;
 
+        const onCancelCleanup = getCurrentVM
+          ? async () => {
+              const currentVM = getCurrentVM();
+              if (!currentVM) {
+                kubevirtConsole.warn(
+                  'Cancel cleanup skipped: VM no longer available in local state',
+                );
+                return;
+              }
+              await onSubmit?.(ejectISOFromCDROM(currentVM, cdromName));
+            }
+          : createEjectMountedDiskCancelCleanup(vmAfterMount, cdromName);
+
         void runVmCdromBackgroundUpload({
           diskState,
           dvName,
           isHotPluggable,
-          onCancelCleanup: createEjectMountedDiskCancelCleanup(vmAfterMount, cdromName),
+          onCancelCleanup,
           t,
           uploadData,
           uploadKey: cdromUploadKey,

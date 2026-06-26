@@ -34,12 +34,19 @@ import './disklist.scss';
 
 type DiskListProps = {
   customize?: boolean;
+  getCurrentVM?: () => V1VirtualMachine;
   onDiskUpdate?: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine>;
   vm: V1VirtualMachine;
   vmi?: V1VirtualMachineInstance;
 };
 
-const DiskList: FC<DiskListProps> = ({ customize = false, onDiskUpdate, vm, vmi }) => {
+const DiskList: FC<DiskListProps> = ({
+  customize = false,
+  getCurrentVM,
+  onDiskUpdate,
+  vm,
+  vmi,
+}) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const isWindowsSupported = useIsWindowsSupportedArchitecture();
@@ -77,13 +84,14 @@ const DiskList: FC<DiskListProps> = ({ customize = false, onDiskUpdate, vm, vmi 
   const callbacks: DiskListCallbacks = useMemo(
     () => ({
       customize,
+      getCurrentVM,
       onSubmit,
       provisioningPercentages,
       sourcesLoaded,
       vm,
       vmi,
     }),
-    [customize, onSubmit, provisioningPercentages, sourcesLoaded, vm, vmi],
+    [customize, getCurrentVM, onSubmit, provisioningPercentages, sourcesLoaded, vm, vmi],
   );
 
   return (
@@ -94,6 +102,7 @@ const DiskList: FC<DiskListProps> = ({ customize = false, onDiskUpdate, vm, vmi 
           return createModal(({ isOpen, onClose }) => (
             <DiskModal
               createDiskSource={diskSource}
+              getCurrentVM={getCurrentVM}
               isOpen={isOpen}
               onClose={onClose}
               onSubmit={onSubmit}
