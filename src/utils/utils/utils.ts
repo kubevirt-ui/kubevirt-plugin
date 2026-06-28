@@ -25,8 +25,9 @@ import { SortByDirection } from '@patternfly/react-table';
 
 import { IPAddress } from './types';
 
-// JSON Pointer (RFC 6901) requires `/` in keys to be escaped as `~1`
-export const escapeJsonPointerToken = (token: string): string => token.replace(/\//g, '~1');
+// JSON Pointer (RFC 6901): `~` must be escaped as `~0` before `/` is escaped as `~1`
+export const escapeJsonPointerToken = (token: string): string =>
+  token.replace(/~/g, '~0').replace(/\//g, '~1');
 
 export const kubevirtConsole = console;
 

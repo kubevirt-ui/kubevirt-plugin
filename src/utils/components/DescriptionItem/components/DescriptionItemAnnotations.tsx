@@ -1,7 +1,7 @@
 import React, { FC, ReactNode } from 'react';
 
-import { AnnotationsModal } from '@kubevirt-utils/components/AnnotationsModal/AnnotationsModal';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
+import { KeyValueModal } from '@kubevirt-utils/components/MetadataModal/KeyValueModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -9,7 +9,7 @@ import { getAnnotations } from '@kubevirt-utils/resources/shared';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
-import { K8sModel } from '@openshift-console/dynamic-plugin-sdk';
+import { K8sModel, K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
 type DescriptionItemAnnotationsProps = {
   className?: string;
@@ -18,6 +18,7 @@ type DescriptionItemAnnotationsProps = {
   label?: string;
   model: K8sModel;
   onAnnotationsSubmit?: (annotations: { [key: string]: string }) => Promise<any>;
+  onEditClick?: () => void;
   resource: K8sResourceCommon;
 };
 
@@ -28,45 +29,39 @@ const DescriptionItemAnnotations: FC<DescriptionItemAnnotationsProps> = ({
   label,
   model,
   onAnnotationsSubmit,
+  onEditClick,
   resource,
 }) => {
   const { createModal } = useModal();
   const { t } = useKubevirtTranslation();
   const annotationsCount = Object.keys(getAnnotations(resource, {})).length;
-  const annotationsText = t('{{annotationsCount}} Annotations', {
-    annotationsCount,
-  });
+  const annotationsText = t('{{annotationsCount}} Annotations', { annotationsCount });
 
-  const onAnnotationsSubmitInternal = (updatedAnnotations: { [key: string]: string }) =>
+  const defaultSubmit = (updatedAnnotations: { [key: string]: string }) =>
     kubevirtK8sPatch({
       cluster: getCluster(resource),
-      data: [
-        {
-          op: 'replace',
-          path: '/metadata/annotations',
-          value: updatedAnnotations,
-        },
-      ],
+      data: [{ op: 'replace', path: '/metadata/annotations', value: updatedAnnotations }],
       model,
       resource,
     });
 
-  const onEditClick = () =>
-    createModal(({ isOpen, onClose }) => (
-      <AnnotationsModal
-        isOpen={isOpen}
-        obj={resource}
-        onClose={onClose}
-        onSubmit={onAnnotationsSubmit ?? onAnnotationsSubmitInternal}
-      />
-    ));
+  const handleEditClick =
+    onEditClick ??
+    (() =>
+      createModal(({ isOpen, onClose }) => (
+        <KeyValueModal
+          isOpen={isOpen}
+          obj={resource}
+          onClose={onClose}
+          onSubmit={onAnnotationsSubmit ?? defaultSubmit}
+        />
+      )));
 
   const annotationsHeader = t('Annotations');
   const descriptionHeader = descriptionHeaderWrapper?.(annotationsHeader) ?? annotationsHeader;
 
   return (
     <DescriptionItem
-      // body-content text copied from: https://github.com/kubevirt-ui/kubevirt-api/blob/main/containerized-data-importer/models/V1ObjectMeta.ts#L32
       bodyContent={t(
         'Annotations is an unstructured key value map stored with a resource that may be set by external tools to store and retrieve arbitrary metadata. They are not queryable and should be preserved when modifying objects.',
       )}
@@ -77,7 +72,7 @@ const DescriptionItemAnnotations: FC<DescriptionItemAnnotationsProps> = ({
       isEdit={editable}
       isPopover
       moreInfoURL={documentationURL.ANNOTATIONS}
-      onEditClick={onEditClick}
+      onEditClick={handleEditClick}
       promptType={OLSPromptType.ANNOTATIONS}
     />
   );

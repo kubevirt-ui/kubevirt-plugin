@@ -5,7 +5,7 @@ import { VirtualMachineInstanceMigrationModel } from '@kubevirt-ui-ext/kubevirt-
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { ActionDropdownItemType } from '@kubevirt-utils/components/ActionsDropdown/constants';
-import { LabelsModal } from '@kubevirt-utils/components/LabelsModal/LabelsModal';
+import { EditLabelsModal } from '@kubevirt-utils/components/MetadataModal/EditLabelsModal';
 import { ModalComponent } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import MoveBulkVMToFolderModal from '@kubevirt-utils/components/MoveVMToFolderModal/MoveBulkVMsToFolderModal';
 import RunStrategyModal from '@kubevirt-utils/components/RunStrategyModal/RunStrategyModal';
@@ -121,7 +121,7 @@ export const createBulkVirtualMachineActionFactory = (
       const commonLabels = getCommonLabels(vms);
 
       createModal(({ isOpen, onClose }) => (
-        <LabelsModal
+        <EditLabelsModal
           onLabelsSubmit={(newLabels) => {
             return Promise.all(
               vms.map((vm) =>

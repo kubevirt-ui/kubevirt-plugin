@@ -7,10 +7,10 @@ import {
   V1beta1DataImportCron,
   V1beta1DataSource,
 } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
-import { AnnotationsModal } from '@kubevirt-utils/components/AnnotationsModal/AnnotationsModal';
 import DeleteModal from '@kubevirt-utils/components/DeleteModal/DeleteModal';
 import { LabelsModal } from '@kubevirt-utils/components/LabelsModal/LabelsModal';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
+import { EditAnnotationsModal } from '@kubevirt-utils/components/MetadataModal/EditAnnotationsModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { asAccessReview } from '@kubevirt-utils/resources/shared';
@@ -107,7 +107,7 @@ export const useDataImportCronActionsProvider: UseDataImportCronActionsProvider 
       {
         cta: () =>
           createModal(({ isOpen, onClose }) => (
-            <AnnotationsModal
+            <EditAnnotationsModal
               onSubmit={(updatedAnnotations) =>
                 k8sPatch({
                   data: [

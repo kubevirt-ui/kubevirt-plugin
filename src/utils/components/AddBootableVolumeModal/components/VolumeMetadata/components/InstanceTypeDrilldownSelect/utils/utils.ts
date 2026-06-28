@@ -24,7 +24,7 @@ const getRedHatInstanceTypeSeriesAndSize = (
 ): { redHatITSeries: RedHatInstanceTypeSeries; size: InstanceTypeSize } => {
   const [seriesName, sizeLabel] = getName(instanceType).split('.');
   const cpus = instanceType?.spec?.cpu?.guest;
-  const memory = readableSizeUnit(instanceType?.spec?.memory?.guest);
+  const memory = readableSizeUnit(instanceType?.spec?.memory?.guest?.toString());
   const classAnnotation = getAnnotation(instanceType, INSTANCETYPE_CLASS_ANNOTATION, seriesName);
 
   const size: InstanceTypeSize = {

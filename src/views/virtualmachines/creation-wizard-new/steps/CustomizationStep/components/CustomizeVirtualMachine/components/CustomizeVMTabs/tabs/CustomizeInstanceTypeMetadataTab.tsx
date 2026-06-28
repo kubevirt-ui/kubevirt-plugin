@@ -6,8 +6,7 @@ import DescriptionItemLabels from '@kubevirt-utils/components/DescriptionItem/co
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { updateCustomizeInstanceType } from '@kubevirt-utils/store/customizeInstanceType';
-import { vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
+import { updateCustomizeInstanceType, vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
 import { DescriptionList, Grid, PageSection, Title } from '@patternfly/react-core';
 
 const CustomizeInstanceTypeMetadataTab = () => {
@@ -18,16 +17,6 @@ const CustomizeInstanceTypeMetadataTab = () => {
     return <Loading />;
   }
 
-  const updateMetadata = (data: { [key: string]: string }, type: string) =>
-    Promise.resolve(
-      updateCustomizeInstanceType([
-        {
-          data,
-          path: `metadata.${type}`,
-        },
-      ]),
-    );
-
   return (
     <PageSection>
       <Title headingLevel="h2">
@@ -36,17 +25,25 @@ const CustomizeInstanceTypeMetadataTab = () => {
       <Grid span={6}>
         <DescriptionList>
           <DescriptionItemLabels
+            onLabelsSubmit={(labels) =>
+              Promise.resolve(
+                updateCustomizeInstanceType([{ data: labels, path: 'metadata.labels' }]),
+              )
+            }
             descriptionHeaderWrapper={(children) => <SearchItem id="labels">{children}</SearchItem>}
             model={VirtualMachineModel}
-            onLabelsSubmit={(labels) => updateMetadata(labels, 'labels')}
             resource={vm}
           />
           <DescriptionItemAnnotations
             descriptionHeaderWrapper={(children) => (
               <SearchItem id="annotations">{children}</SearchItem>
             )}
+            onAnnotationsSubmit={(annotations) =>
+              Promise.resolve(
+                updateCustomizeInstanceType([{ data: annotations, path: 'metadata.annotations' }]),
+              )
+            }
             model={VirtualMachineModel}
-            onAnnotationsSubmit={(annotations) => updateMetadata(annotations, 'annotations')}
             resource={vm}
           />
         </DescriptionList>
