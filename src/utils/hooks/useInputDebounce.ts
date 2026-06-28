@@ -28,7 +28,7 @@ export const useInputDebounce = ({
   const param = params.get(updateURLParam);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // eslint-disable-next-line require-jsdoc
+  // eslint-disable-next-line jsdoc/require-jsdoc
   const updateValue = (v: string) => {
     setValue(v || '');
     if (updateURLParam) {
@@ -39,7 +39,7 @@ export const useInputDebounce = ({
     }
   };
 
-  // eslint-disable-next-line require-jsdoc
+  // eslint-disable-next-line jsdoc/require-jsdoc
   const resetValue = () => {
     setValue('');
     if (inputRef?.current?.value) {

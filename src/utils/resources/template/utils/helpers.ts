@@ -35,7 +35,7 @@ import {
 import { getTemplatePVCName, getTemplateVirtualMachineObject } from './selectors';
 
 // Only used for replacing parameters in the template, do not use for anything else
-// eslint-disable-next-line require-jsdoc
+// eslint-disable-next-line jsdoc/require-jsdoc
 export const poorManProcess = (template: V1Template): V1Template => {
   if (!template) return null;
 

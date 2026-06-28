@@ -36,7 +36,7 @@ import UnsupportedCharModal from './UnsupportedCharModal';
 const canExecuteCommands = (rfb: RFB): boolean =>
   rfb._rfbConnectionState === 'connected' && !rfb._viewOnly;
 
-// eslint-disable-next-line require-jsdoc
+// eslint-disable-next-line jsdoc/require-jsdoc
 function sendCtrlAltPlusKey(rfb: RFB, keysym: number, code: ScanCodeName): void {
   if (!canExecuteCommands(rfb)) {
     return;
@@ -49,12 +49,12 @@ function sendCtrlAltPlusKey(rfb: RFB, keysym: number, code: ScanCodeName): void 
   rfb.sendKey(KeyTable.XK_Control_L, CONTROL_L, false);
 }
 
-// eslint-disable-next-line require-jsdoc
+// eslint-disable-next-line jsdoc/require-jsdoc
 export function sendCtrlAlt1() {
   sendCtrlAltPlusKey(this, KeyTable.XK_1, ONE);
 }
 
-// eslint-disable-next-line require-jsdoc
+// eslint-disable-next-line jsdoc/require-jsdoc
 export function sendCtrlAlt2() {
   sendCtrlAltPlusKey(this, KeyTable.XK_2, TWO);
 }
@@ -123,7 +123,7 @@ export async function sendPasteCMD(params?: PasteParams) {
   }
 }
 
-// eslint-disable-next-line require-jsdoc
+// eslint-disable-next-line jsdoc/require-jsdoc
 function createSendKeyFunction(keysym: number, scanCode: ScanCodeName) {
   return function () {
     if (!canExecuteCommands(this)) {

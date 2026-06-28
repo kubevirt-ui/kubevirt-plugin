@@ -1,4 +1,4 @@
-/* eslint-disable require-jsdoc */
+/* eslint-disable jsdoc/require-jsdoc */
 import { V1Interface, V1Network } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 
 import { BRIDGE, MASQUERADE, PASST_BINDING_NAME, SRIOV, UDN_BINDING_NAME } from '../constants';

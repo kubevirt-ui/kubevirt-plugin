@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /** Read a required environment variable or exit with an error. */
 export const requireEnv = (name: string): string => {
   const value = process.env[name];

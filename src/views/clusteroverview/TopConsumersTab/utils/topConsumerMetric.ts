@@ -1,3 +1,4 @@
+/* eslint-disable perfectionist/sort-classes */
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import DropdownEnum from '@kubevirt-utils/utils/dropdownEnum';
 import { ObjectEnum } from '@kubevirt-utils/utils/ObjectEnum';
@@ -73,12 +74,13 @@ export class TopConsumerMetric extends TopConsumerMetricObjectEnum<string> {
     {},
   );
 
-  static fromDropdownLabel = (dropdownLabel: string): TopConsumerMetric =>
+  static readonly fromDropdownLabel = (dropdownLabel: string): TopConsumerMetric =>
     TopConsumerMetric.dropdownLabelMapper[dropdownLabel];
 
-  static fromString = (source: string): TopConsumerMetric => TopConsumerMetric.stringMapper[source];
+  static readonly fromString = (source: string): TopConsumerMetric =>
+    TopConsumerMetric.stringMapper[source];
 
-  static getAll = () => TopConsumerMetric.all;
+  static readonly getAll = (): readonly TopConsumerMetric[] => TopConsumerMetric.all;
 
   private static readonly stringMapper = TopConsumerMetric.all.reduce(
     (accumulator, metric: TopConsumerMetric) => ({

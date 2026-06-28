@@ -95,7 +95,7 @@ export const getTemplateImportURLs = (template: V1Template): string[] | undefine
  * @param {Template} template - template
  */
 export const getTemplateFlavor = (template: Template): string => {
-  // eslint-disable-next-line require-jsdoc
+  // eslint-disable-next-line jsdoc/require-jsdoc
   const isFlavorExist = (flavor: string) =>
     getLabel(template, `${TEMPLATE_FLAVOR_LABEL}/${flavor}`) === 'true';
 
@@ -107,7 +107,7 @@ export const getTemplateFlavor = (template: Template): string => {
  * @param {Template} template - template
  */
 export const getTemplateWorkload = (template: Template): string => {
-  // eslint-disable-next-line require-jsdoc
+  // eslint-disable-next-line jsdoc/require-jsdoc
   const isWorkloadExist = (workload: string) =>
     getLabel(template, `${TEMPLATE_WORKLOAD_LABEL}/${workload}`) === 'true';
 

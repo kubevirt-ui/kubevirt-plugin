@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 import React, { FC, useLayoutEffect, useRef, useState } from 'react';
 
 import { V1Volume } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';

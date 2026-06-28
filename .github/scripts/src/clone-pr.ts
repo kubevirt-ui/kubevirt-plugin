@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { JiraClient } from './jira-client.js';
 import { createOctokit, branchExists } from './github-repo.js';
 import { upsertComment } from './github-comments.js';

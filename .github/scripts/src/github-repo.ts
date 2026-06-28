@@ -3,8 +3,7 @@ import { Octokit } from '@octokit/rest';
 import type { GitHubConfig } from './types/index.js';
 
 /** Create an authenticated Octokit instance. */
-export const createOctokit = (config: GitHubConfig): Octokit =>
-  new Octokit({ auth: config.token });
+export const createOctokit = (config: GitHubConfig): Octokit => new Octokit({ auth: config.token });
 
 /** Fetch all branch names matching "release-*" from the repo. */
 export const getReleaseBranches = async (

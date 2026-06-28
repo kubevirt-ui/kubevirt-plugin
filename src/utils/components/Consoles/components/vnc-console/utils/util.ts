@@ -11,7 +11,7 @@ import { ConsoleComponentState } from '../../utils/types';
 import { ALL_SESSIONS, KEYBOARD_DELAY, VNC_IN_USE_ERROR_TEXT, VNC_LOG_LEVELS } from './constants';
 import { RFB, RfbSession, VncLogLevel } from './VncConsoleTypes';
 
-// eslint-disable-next-line require-jsdoc
+// eslint-disable-next-line jsdoc/require-jsdoc
 export function isVncLogLevel(value: unknown): value is VncLogLevel {
   return value === false || (VNC_LOG_LEVELS as unknown as unknown[]).includes(value);
 }

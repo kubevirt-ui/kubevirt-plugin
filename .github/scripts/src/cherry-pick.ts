@@ -81,8 +81,14 @@ export const buildCherryPickPrBody = (params: {
   cherryPickClean: boolean;
   conflictDetails: string;
 }): string => {
-  const { originalPrNumber, targetBranch, matchedVersion, clonedTickets, cherryPickClean, conflictDetails } =
-    params;
+  const {
+    originalPrNumber,
+    targetBranch,
+    matchedVersion,
+    clonedTickets,
+    cherryPickClean,
+    conflictDetails,
+  } = params;
 
   const jiraLines = clonedTickets.map(
     (ct) => `- [${ct.clonedKey}](${JIRA_BASE_URL}/browse/${ct.clonedKey})`,
