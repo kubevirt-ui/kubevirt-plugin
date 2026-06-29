@@ -657,36 +657,6 @@ jobs:
         run: |
           ./ci-scripts/check-cluster-health.sh
 
-      - name: Create console admin user
-        if: false
-        env:
-          ADMIN_PASSWORD: ${{ secrets.CLUSTER_ADMIN_PASSWORD }}
-        run: |
-          echo "Creating htpasswd identity provider with admin user..."
-          HTPASSWD=$(htpasswd -nbB admin "${ADMIN_PASSWORD}")
-
-          oc create secret generic htpass-secret \
-            --from-literal=htpasswd="${HTPASSWD}" \
-            -n openshift-config --dry-run=client -o yaml | oc apply -f -
-
-          oc apply -f - <<'OAUTH_EOF'
-          apiVersion: config.openshift.io/v1
-          kind: OAuth
-          metadata:
-            name: cluster
-          spec:
-            identityProviders:
-            - name: htpasswd
-              mappingMethod: claim
-              type: HTPasswd
-              htpasswd:
-                fileData:
-                  name: htpass-secret
-          OAUTH_EOF
-
-          oc adm policy add-cluster-role-to-user cluster-admin admin 2>&1 || true
-          echo "Console admin user created. Login at the console URL with username 'admin'."
-
       - name: Delete ROKS cluster on failure
         if: always() && inputs.infrastructure_type != 'ipi' && job.status == 'failure' && steps.check_cluster.outputs.exists == 'false'
         run: |
