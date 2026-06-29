@@ -57,11 +57,6 @@ on:
         required: false
         default: 'candidate-v1.19'
         type: string
-      plugin_image:
-        description: 'Plugin image to deploy cluster-wide (e.g. quay.io/kubevirt-ui/kubevirt-plugin:latest). Leave empty to skip.'
-        required: false
-        default: ''
-        type: string
 
 permissions:
   contents: read
@@ -656,60 +651,6 @@ jobs:
         run: |
           ./ci-scripts/ci-env/install-ci-env-controller.sh
 
-      - name: Deploy kubevirt-plugin
-        if: inputs.plugin_image != ''
-        env:
-          PLUGIN_IMAGE: ${{ inputs.plugin_image }}
-        run: |
-          PLUGIN_NS="kubevirt-plugin"
-          PLUGIN_PORT=9080
-
-          echo "Deploying kubevirt-plugin from image: ${PLUGIN_IMAGE}"
-          oc create namespace "${PLUGIN_NS}" --dry-run=client -o yaml | oc apply -f -
-
-          API_SERVER=$(oc whoami --show-server)
-          helm upgrade kubevirt-plugin \
-            "${GITHUB_WORKSPACE}/ci-scripts/helm/ci-test-stack" \
-            --install \
-            --namespace "${PLUGIN_NS}" \
-            --set "plugin.image=${PLUGIN_IMAGE}" \
-            --set "plugin.port=${PLUGIN_PORT}" \
-            --set "console.replicas=0" \
-            --set "console.apiServer=${API_SERVER}" \
-            --wait --timeout 3m \
-            2>&1
-
-          PLUGIN_SVC_URL="http://kubevirt-plugin-plugin.${PLUGIN_NS}.svc.cluster.local:${PLUGIN_PORT}"
-          echo "Patching ConsolePlugin to point to ${PLUGIN_SVC_URL}..."
-          oc apply -f - <<EOF
-          apiVersion: console.openshift.io/v1
-          kind: ConsolePlugin
-          metadata:
-            name: kubevirt-plugin
-          spec:
-            displayName: KubeVirt Plugin
-            backend:
-              type: Service
-              service:
-                name: kubevirt-plugin-plugin
-                namespace: ${PLUGIN_NS}
-                port: $PLUGIN_PORT
-          EOF
-
-          echo "Enabling plugin in console operator..."
-          CURRENT=$(oc get console.operator.openshift.io cluster -o jsonpath='{.spec.plugins}' 2>/dev/null || echo "[]")
-          if echo "${CURRENT}" | grep -q "kubevirt-plugin"; then
-            echo "Plugin already enabled."
-          else
-            oc patch console.operator.openshift.io cluster --type=json \
-              -p='[{"op":"add","path":"/spec/plugins/-","value":"kubevirt-plugin"}]' 2>&1
-          fi
-
-          echo "Waiting for plugin deployment to be ready..."
-          oc rollout status deployment/kubevirt-plugin-plugin -n "${PLUGIN_NS}" --timeout=120s
-
-          echo "kubevirt-plugin deployed and enabled."
-
       - name: Verify cluster health
         env:
           GITHUB_REPOSITORY: ${{ github.repository }}
@@ -783,9 +724,6 @@ jobs:
           echo "| Workers | \`${{ inputs.worker_count }}\` |" >> "$GITHUB_STEP_SUMMARY"
           echo "| KVM Emulation | \`${{ inputs.kvm_emulation }}\` |" >> "$GITHUB_STEP_SUMMARY"
           echo "| HCO | \`${{ inputs.hco_version || '1.19.0-unstable' }}\` / \`${{ inputs.hco_channel || 'candidate-v1.19' }}\` |" >> "$GITHUB_STEP_SUMMARY"
-          if [[ -n "${{ inputs.plugin_image }}" ]]; then
-            echo "| Plugin Image | \`${{ inputs.plugin_image }}\` |" >> "$GITHUB_STEP_SUMMARY"
-          fi
           CONSOLE_URL=$(oc get consoles.config.openshift.io cluster -o jsonpath='{.status.consoleURL}' 2>/dev/null || echo "")
           if [[ -n "${CONSOLE_URL}" ]]; then
             echo "| Console | [${CONSOLE_URL}](${CONSOLE_URL}) |" >> "$GITHUB_STEP_SUMMARY"

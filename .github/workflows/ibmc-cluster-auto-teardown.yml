@@ -13,7 +13,7 @@ on:
       idle_threshold_minutes:
         description: 'Minutes of CI inactivity before teardown'
         required: true
-        default: '120'
+        default: '240'
         type: string
       check_frequency_minutes:
         description: 'How often to check (only affects manual runs; cron is fixed at 30 min)'
@@ -35,7 +35,7 @@ permissions:
 
 env:
   CLUSTER_NAME: ${{ inputs.cluster_name || 'kubevirt-plugin-ci' }}
-  IDLE_THRESHOLD_MINUTES: ${{ inputs.idle_threshold_minutes || '120' }}
+  IDLE_THRESHOLD_MINUTES: ${{ inputs.idle_threshold_minutes || '240' }}
   IBM_REGION: eu-de
   IBM_RESOURCE_GROUP: cnv-ui
   BASE_DOMAIN: cnv-ui.com
