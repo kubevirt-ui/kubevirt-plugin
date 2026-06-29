@@ -1,32 +1,34 @@
-import React, { FC, Fragment, useMemo, useState } from 'react';
+import React, { type FC, Fragment, type ReactNode, useMemo, useState } from 'react';
 
 import ToolbarFilterMultiChip from '@kubevirt-utils/components/KubevirtFilterToolbar/components/ToolbarFilter/ToolbarFilterMultiChip';
 import useItemCounts from '@kubevirt-utils/components/KubevirtFilterToolbar/hooks/useItemCounts';
 import { getOnSelect } from '@kubevirt-utils/components/KubevirtFilterToolbar/utils';
 import ToolbarFilterToggle from '@kubevirt-utils/components/toggles/ToolbarFilterToggle';
 import {
-  KubevirtFilter,
-  KubevirtFilterOptionGroup,
-  KubevirtFilterState,
-  OnSetFilters,
+  type KubevirtFilter,
+  type KubevirtFilterOptionGroup,
+  type KubevirtFilterState,
+  type OnSetFilters,
 } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import { type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Badge,
   Divider,
-  MenuToggleProps,
+  type MenuToggleProps,
   Select,
   SelectGroup,
   SelectList,
   SelectOption,
 } from '@patternfly/react-core';
+import { type DataViewFilterOption } from '@patternfly/react-data-view';
 
 type GroupedCheckboxSelectProps = {
   data: K8sResourceCommon[];
   filterDef: KubevirtFilter;
   filters: KubevirtFilterState;
+  isToggleVisible?: boolean;
   onSetFilters: OnSetFilters;
   toggleSize?: MenuToggleProps['size'];
 };
@@ -35,6 +37,7 @@ const GroupedCheckboxSelect: FC<GroupedCheckboxSelectProps> = ({
   data,
   filterDef,
   filters,
+  isToggleVisible = true,
   onSetFilters,
   toggleSize,
 }) => {
@@ -43,7 +46,7 @@ const GroupedCheckboxSelect: FC<GroupedCheckboxSelectProps> = ({
   const selectedValues = filters[filterDef.id] ?? [];
   const onSelect = getOnSelect(filters, onSetFilters);
 
-  const allCounts = useItemCounts([filterDef], data);
+  const allCounts = useItemCounts([filterDef], isToggleVisible ? data : undefined);
   const itemCounts = allCounts[filterDef.id] ?? {};
 
   const optionsMap = useMemo(
@@ -60,8 +63,10 @@ const GroupedCheckboxSelect: FC<GroupedCheckboxSelectProps> = ({
     title: filterDef.categoryLabel,
   });
 
-  const renderGroup = (group: KubevirtFilterOptionGroup, groupIdx: number) => {
-    const groupOptions = group.values.map((value) => optionsMap.get(value)).filter(Boolean);
+  const renderGroup = (group: KubevirtFilterOptionGroup, groupIdx: number): ReactNode => {
+    const groupOptions = group.values
+      .map((value) => optionsMap.get(value))
+      .filter((opt): opt is DataViewFilterOption => !!opt);
 
     if (isEmpty(groupOptions)) return null;
 
@@ -96,19 +101,21 @@ const GroupedCheckboxSelect: FC<GroupedCheckboxSelectProps> = ({
 
   return (
     <ToolbarFilterMultiChip filterDef={filterDef} filters={filters} onSetFilters={onSetFilters}>
-      <Select
-        onSelect={(_event, value: string) => {
-          onSelect(filterDef.id, value);
-        }}
-        isOpen={isOpen}
-        isScrollable
-        onOpenChange={setIsOpen}
-        role="menu"
-        selected={selectedValues}
-        toggle={toggle}
-      >
-        {filterDef.optionGroups?.map(renderGroup)}
-      </Select>
+      {isToggleVisible && (
+        <Select
+          isOpen={isOpen}
+          isScrollable
+          onOpenChange={setIsOpen}
+          onSelect={(_event, value: string) => {
+            onSelect(filterDef.id, value);
+          }}
+          role="menu"
+          selected={selectedValues}
+          toggle={toggle}
+        >
+          {filterDef.optionGroups?.map(renderGroup)}
+        </Select>
+      )}
     </ToolbarFilterMultiChip>
   );
 };

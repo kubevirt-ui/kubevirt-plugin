@@ -1,6 +1,6 @@
-import React, { FC, useMemo } from 'react';
+import React, { type FC, useMemo, useState } from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import GroupedCheckboxSelect from '@kubevirt-utils/components/GroupedCheckboxSelect/GroupedCheckboxSelect';
 import HiddenFilterChips from '@kubevirt-utils/components/KubevirtFilterToolbar/components/HiddenFilterChips';
 import SelectFilterItem from '@kubevirt-utils/components/KubevirtFilterToolbar/components/SelectFilterItem';
@@ -8,15 +8,23 @@ import { logVMListFiltered } from '@kubevirt-utils/extensions/telemetry/dashboar
 import { getLabelFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/filters/getLabelFilter';
 import { getNameFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/filters/getNameFilter';
 import {
-  KubevirtFilter,
+  type KubevirtFilter,
   KubevirtFilterLayout,
-  KubevirtFilterState,
-  OnSetFilters,
+  type KubevirtFilterState,
+  type OnSetFilters,
 } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useIsACMPage from '@multicluster/useIsACMPage';
-import { MenuToggleSize, Toolbar, ToolbarContent } from '@patternfly/react-core';
-import { VirtualMachineRowFilterType } from '@virtualmachines/utils/constants';
+import {
+  Button,
+  ButtonSize,
+  ButtonVariant,
+  MenuToggleSize,
+  Toolbar,
+  ToolbarContent,
+  ToolbarItem,
+} from '@patternfly/react-core';
+import { type VirtualMachineRowFilterType } from '@virtualmachines/utils/constants';
 
 import { ACM_FILTERS_SHOWN_VM_LIST, FILTERS_SHOWN_VM_LIST } from './constants';
 
@@ -41,35 +49,27 @@ const VirtualMachineFilterToolbar: FC<VirtualMachineFilterToolbarProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const isACMPage = useIsACMPage();
+  const [showMoreFilters, setShowMoreFilters] = useState(false);
 
   const filtersShown = isACMPage ? ACM_FILTERS_SHOWN_VM_LIST : FILTERS_SHOWN_VM_LIST;
 
   const selectFilters = useMemo(
     () =>
       filterDefinitions.filter(
-        (f) =>
-          f.filterLayout === KubevirtFilterLayout.SELECT &&
-          filtersShown.includes(f.id as VirtualMachineRowFilterType),
+        (filterDef) => filterDef.filterLayout === KubevirtFilterLayout.SELECT,
       ),
-    [filterDefinitions, filtersShown],
-  );
-
-  const chipOnlyFilters = useMemo(
-    () =>
-      filterDefinitions.filter(
-        (f) => f.filterLayout === KubevirtFilterLayout.SELECT && !selectFilters.includes(f),
-      ),
-    [filterDefinitions, selectFilters],
+    [filterDefinitions],
   );
 
   const hiddenFilters = useMemo(
     () => [
       getNameFilter(t),
       getLabelFilter(t),
-      ...chipOnlyFilters,
-      ...filterDefinitions.filter((f) => f.filterLayout === KubevirtFilterLayout.HIDDEN),
+      ...filterDefinitions.filter(
+        (filterDef) => filterDef.filterLayout === KubevirtFilterLayout.HIDDEN,
+      ),
     ],
-    [filterDefinitions, chipOnlyFilters, t],
+    [filterDefinitions, t],
   );
 
   const handleSetFilters: OnSetFilters = (newFilters) => {
@@ -89,26 +89,33 @@ const VirtualMachineFilterToolbar: FC<VirtualMachineFilterToolbarProps> = ({
       id="filter-toolbar"
     >
       <ToolbarContent>
-        {selectFilters.map((filterDef) =>
-          filterDef.optionGroups ? (
-            <GroupedCheckboxSelect
-              data={vms ?? []}
-              filterDef={filterDef}
-              filters={filters}
-              key={filterDef.id}
-              onSetFilters={handleSetFilters}
-              toggleSize={MenuToggleSize.sm}
-            />
+        {selectFilters.map((filterDef) => {
+          const sharedProps = {
+            filterDef,
+            filters,
+            isToggleVisible:
+              filtersShown.includes(filterDef.id as VirtualMachineRowFilterType) || showMoreFilters,
+            key: filterDef.id,
+            onSetFilters: handleSetFilters,
+            toggleSize: MenuToggleSize.sm,
+          };
+
+          return filterDef.optionGroups ? (
+            <GroupedCheckboxSelect {...sharedProps} data={vms ?? []} />
           ) : (
-            <SelectFilterItem
-              filterDef={filterDef}
-              filters={filters}
-              key={filterDef.id}
-              onSetFilters={handleSetFilters}
-              toggleSize={MenuToggleSize.sm}
-            />
-          ),
-        )}
+            <SelectFilterItem {...sharedProps} />
+          );
+        })}
+        <ToolbarItem>
+          <Button
+            data-test="toggle-more-filters"
+            onClick={() => setShowMoreFilters((prev) => !prev)}
+            size={ButtonSize.sm}
+            variant={ButtonVariant.link}
+          >
+            {showMoreFilters ? t('Show less filters') : t('Show more filters')}
+          </Button>
+        </ToolbarItem>
         <HiddenFilterChips
           filters={filters}
           hiddenFilters={hiddenFilters}
