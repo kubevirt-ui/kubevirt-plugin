@@ -15,6 +15,7 @@ import ToolbarFilterMultiChip from './ToolbarFilter/ToolbarFilterMultiChip';
 type SelectFilterItemProps = {
   filterDef: KubevirtFilter;
   filters: KubevirtFilterState;
+  isToggleVisible?: boolean;
   onSetFilters: OnSetFilters;
   toggleSize?: MenuToggleProps['size'];
   toggleTitle?: string;
@@ -23,6 +24,7 @@ type SelectFilterItemProps = {
 const SelectFilterItem: FC<SelectFilterItemProps> = ({
   filterDef,
   filters,
+  isToggleVisible = true,
   onSetFilters,
   toggleSize,
   toggleTitle,
@@ -32,21 +34,23 @@ const SelectFilterItem: FC<SelectFilterItemProps> = ({
 
   return (
     <ToolbarFilterMultiChip filterDef={filterDef} filters={filters} onSetFilters={onSetFilters}>
-      <CheckboxSelect
-        options={filterDef.options?.map(({ label, value }) => ({
-          children: label,
-          isSelected: selected.includes(value),
-          value,
-        }))}
-        badgeNumber={filterDef.toggleBadgeNumber}
-        isToggleDisabled={filterDef.disabled}
-        onSelect={(_event, value: string) => onSelect(filterDef.id, value)}
-        selectedValues={selected}
-        showAllBadge={filterDef.showAllBadge}
-        toggleSize={toggleSize}
-        toggleTitle={toggleTitle ?? filterDef.categoryLabel}
-        tooltipContent={filterDef.disabledTooltip}
-      />
+      {isToggleVisible && (
+        <CheckboxSelect
+          options={filterDef.options?.map(({ label, value }) => ({
+            children: label,
+            isSelected: selected.includes(value),
+            value,
+          }))}
+          badgeNumber={filterDef.toggleBadgeNumber}
+          isToggleDisabled={filterDef.disabled}
+          onSelect={(_event, value: string) => onSelect(filterDef.id, value)}
+          selectedValues={selected}
+          showAllBadge={filterDef.showAllBadge}
+          toggleSize={toggleSize}
+          toggleTitle={toggleTitle ?? filterDef.categoryLabel}
+          tooltipContent={filterDef.disabledTooltip}
+        />
+      )}
     </ToolbarFilterMultiChip>
   );
 };
