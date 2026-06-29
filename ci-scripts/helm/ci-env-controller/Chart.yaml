@@ -1,0 +1,9 @@
+apiVersion: v2
+name: ci-env-controller
+description: >-
+  Long-lived controller that watches labeled ConfigMaps in the ci-env namespace
+  and reconciles CI test environments (namespace, Helm chart) on demand.
+  Replaces the manual YAML + sed-substitution install workflow.
+version: 0.1.0
+appVersion: '1.0.0'
+type: application

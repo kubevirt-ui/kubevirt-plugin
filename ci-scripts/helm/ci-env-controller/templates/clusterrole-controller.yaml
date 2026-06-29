@@ -1,0 +1,233 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: ci-env-controller
+  labels:
+    {{- include "ci-env-controller.labels" . | nindent 4 }}
+rules:
+  # -----------------------------------------------------------------------
+  #  Cluster discovery (api-server, apps-domain, monitoring URLs, console image)
+  # -----------------------------------------------------------------------
+  - apiGroups: ['']
+    resources: ['nodes', 'namespaces']
+    verbs: ['get', 'list', 'watch', 'create', 'update', 'patch', 'delete']
+  - apiGroups: ['config.openshift.io']
+    resources: ['consoles', 'clusterversions', 'ingresses', 'infrastructures', 'dnses']
+    verbs: ['get', 'list', 'watch']
+  - apiGroups: ['storage.k8s.io']
+    resources: ['storageclasses']
+    verbs: ['get', 'list', 'watch', 'patch', 'update']
+
+  # -----------------------------------------------------------------------
+  #  Operator lifecycle (superset of ci-console)
+  # -----------------------------------------------------------------------
+  - apiGroups: ['operators.coreos.com']
+    resources: ['clusterserviceversions', 'subscriptions']
+    verbs: ['get', 'list', 'watch']
+  - apiGroups: ['packages.operators.coreos.com']
+    resources: ['packagemanifests']
+    verbs: ['get', 'list']
+  - apiGroups: ['operator.openshift.io']
+    resources: ['consoles']
+    verbs: ['get', 'list', 'watch']
+
+  # -----------------------------------------------------------------------
+  #  Console UI resources (superset of ci-console)
+  # -----------------------------------------------------------------------
+  - apiGroups: ['console.openshift.io']
+    resources:
+      - consoleplugins
+      - consolenotifications
+      - consolequickstarts
+      - consolelinks
+      - consoleyamlsamples
+    verbs: ['get', 'list', 'watch']
+
+  # -----------------------------------------------------------------------
+  #  User/project identity (superset of ci-console)
+  # -----------------------------------------------------------------------
+  - apiGroups: ['user.openshift.io']
+    resources: ['users']
+    verbs: ['get', 'list', 'watch']
+  - apiGroups: ['project.openshift.io']
+    resources: ['projects']
+    verbs: ['get', 'list', 'watch']
+
+  # -----------------------------------------------------------------------
+  #  Core namespaced resources (Helm chart + test fixtures)
+  # -----------------------------------------------------------------------
+  - apiGroups: ['']
+    resources:
+      - pods
+      - pods/log
+      - services
+      - secrets
+      - configmaps
+      - events
+      - serviceaccounts
+      - persistentvolumeclaims
+    verbs: ['get', 'list', 'watch', 'create', 'update', 'patch', 'delete']
+
+  # -----------------------------------------------------------------------
+  #  Helm chart resources (Deployments, ReplicaSets, Routes)
+  # -----------------------------------------------------------------------
+  - apiGroups: ['apps']
+    resources: ['deployments', 'replicasets']
+    verbs: ['get', 'list', 'watch', 'create', 'update', 'patch', 'delete']
+  - apiGroups: ['route.openshift.io']
+    resources: ['routes']
+    verbs: ['get', 'list', 'watch', 'create', 'update', 'patch', 'delete']
+  - apiGroups: ['route.openshift.io']
+    resources: ['routes/custom-host']
+    verbs: ['create', 'update']
+
+  # -----------------------------------------------------------------------
+  #  RBAC for console SA and runner SA RoleBindings in test namespaces
+  # -----------------------------------------------------------------------
+  - apiGroups: ['rbac.authorization.k8s.io']
+    resources: ['clusterrolebindings', 'rolebindings']
+    verbs: ['get', 'list', 'create', 'update', 'patch', 'delete']
+
+  # -----------------------------------------------------------------------
+  #  KubeVirt resources (superset of ci-console + cleanup)
+  # -----------------------------------------------------------------------
+  - apiGroups: ['kubevirt.io']
+    resources:
+      - kubevirts
+      - virtualmachines
+      - virtualmachineinstances
+      - virtualmachineinstancemigrations
+    verbs: ['get', 'list', 'watch', 'create', 'update', 'patch', 'delete']
+  - apiGroups: ['subresources.kubevirt.io']
+    resources:
+      - virtualmachines/start
+      - virtualmachines/stop
+      - virtualmachines/restart
+      - virtualmachines/migrate
+      - virtualmachineinstances/pause
+      - virtualmachineinstances/unpause
+      - virtualmachineinstances/console
+      - virtualmachineinstances/vnc
+      - virtualmachineinstances/portforward
+      - virtualmachineinstances/guestosinfo
+      - virtualmachineinstances/filesystemlist
+      - virtualmachineinstances/userlist
+    verbs: ['get', 'update']
+  - apiGroups: ['instancetype.kubevirt.io']
+    resources:
+      - virtualmachineclusterinstancetypes
+      - virtualmachineinstancetypes
+      - virtualmachineclusterpreferences
+      - virtualmachinepreferences
+    verbs: ['get', 'list', 'watch', 'create', 'update', 'patch', 'delete']
+  - apiGroups: ['snapshot.kubevirt.io']
+    resources: ['virtualmachinesnapshots']
+    verbs: ['get', 'list', 'watch', 'create', 'update', 'patch', 'delete']
+
+  # -----------------------------------------------------------------------
+  #  KubeVirt templates
+  # -----------------------------------------------------------------------
+  - apiGroups: ['template.kubevirt.io']
+    resources: ['virtualmachinetemplates', 'virtualmachinetemplaterequests']
+    verbs: ['get', 'list', 'watch', 'create', 'update', 'patch', 'delete']
+
+  # -----------------------------------------------------------------------
+  #  VM snapshots, backups, exports
+  # -----------------------------------------------------------------------
+  - apiGroups: ['snapshot.kubevirt.io']
+    resources: ['virtualmachinesnapshots', 'virtualmachinesnapshotcontents', 'virtualmachinerestores']
+    verbs: ['get', 'list', 'watch', 'create', 'update', 'patch', 'delete']
+  - apiGroups: ['backup.kubevirt.io']
+    resources: ['virtualmachinebackups']
+    verbs: ['get', 'list', 'watch']
+  - apiGroups: ['export.kubevirt.io']
+    resources: ['virtualmachineexports']
+    verbs: ['get', 'list', 'watch', 'create', 'delete']
+
+  # -----------------------------------------------------------------------
+  #  VM pools and instance presets
+  # -----------------------------------------------------------------------
+  - apiGroups: ['pool.kubevirt.io']
+    resources: ['virtualmachinepools']
+    verbs: ['get', 'list', 'watch', 'create', 'update', 'patch', 'delete']
+  - apiGroups: ['kubevirt.io']
+    resources: ['virtualmachineinstancepresets']
+    verbs: ['get', 'list', 'watch']
+
+  # -----------------------------------------------------------------------
+  #  Storage migrations
+  # -----------------------------------------------------------------------
+  - apiGroups: ['migrations.kubevirt.io']
+    resources: ['virtualmachinestoragemigrations']
+    verbs: ['get', 'list', 'watch', 'create', 'update', 'patch', 'delete']
+
+  # -----------------------------------------------------------------------
+  #  CDI resources (superset of ci-console + cleanup)
+  # -----------------------------------------------------------------------
+  - apiGroups: ['cdi.kubevirt.io']
+    resources: ['cdis', 'cdiconfigs', 'datavolumes', 'datasources', 'dataimportcrons']
+    verbs: ['get', 'list', 'watch', 'create', 'update', 'patch', 'delete']
+  - apiGroups: ['upload.cdi.kubevirt.io']
+    resources: ['uploadtokenrequests']
+    verbs: ['get', 'create']
+
+  # -----------------------------------------------------------------------
+  #  HCO (settings page feature gates, overview status)
+  # -----------------------------------------------------------------------
+  - apiGroups: ['hco.kubevirt.io']
+    resources: ['hyperconvergeds']
+    verbs: ['get', 'list', 'watch', 'patch']
+
+  # -----------------------------------------------------------------------
+  #  HCO operand reads
+  # -----------------------------------------------------------------------
+  - apiGroups: ['ssp.kubevirt.io']
+    resources: ['ssps']
+    verbs: ['get', 'list']
+  - apiGroups: ['networkaddonsoperator.network.kubevirt.io']
+    resources: ['networkaddonsconfigs']
+    verbs: ['get', 'list']
+  - apiGroups: ['hostpathprovisioner.kubevirt.io']
+    resources: ['hostpathprovisioners']
+    verbs: ['get', 'list']
+
+  # -----------------------------------------------------------------------
+  #  VM clones
+  # -----------------------------------------------------------------------
+  - apiGroups: ['clone.kubevirt.io']
+    resources: ['virtualmachineclones']
+    verbs: ['get', 'list', 'watch', 'create', 'update', 'patch', 'delete']
+
+  # -----------------------------------------------------------------------
+  #  Migration policies
+  # -----------------------------------------------------------------------
+  - apiGroups: ['migrations.kubevirt.io']
+    resources: ['migrationpolicies']
+    verbs: ['get', 'list', 'watch', 'create', 'update', 'patch', 'delete']
+
+  # -----------------------------------------------------------------------
+  #  Persistent volumes and storage profiles
+  # -----------------------------------------------------------------------
+  - apiGroups: ['']
+    resources: ['persistentvolumes']
+    verbs: ['get', 'list', 'watch']
+  - apiGroups: ['cdi.kubevirt.io']
+    resources: ['storageprofiles']
+    verbs: ['get', 'list', 'watch']
+
+  # -----------------------------------------------------------------------
+  #  Storage snapshots
+  # -----------------------------------------------------------------------
+  - apiGroups: ['snapshot.storage.k8s.io']
+    resources: ['volumesnapshots']
+    verbs: ['get', 'list', 'watch', 'create', 'update', 'patch', 'delete']
+
+  # -----------------------------------------------------------------------
+  #  Cleanup resources (test-cleanup.sh)
+  # -----------------------------------------------------------------------
+  - apiGroups: ['template.openshift.io']
+    resources: ['templates', 'processedtemplates']
+    verbs: ['get', 'list', 'watch', 'create', 'update', 'patch', 'delete']
+  - apiGroups: ['k8s.cni.cncf.io']
+    resources: ['network-attachment-definitions']
+    verbs: ['get', 'list', 'watch', 'delete']

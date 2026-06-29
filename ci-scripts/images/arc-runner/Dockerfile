@@ -7,7 +7,7 @@
 # The base image includes the docker CLI; with ARC containerMode.type=dind, jobs use the
 # docker:dind sidecar (DOCKER_HOST=unix:///var/run/docker.sock) for docker/container actions.
 #
-ARG RUNNER_BASE=ghcr.io/actions/actions-runner:2.335.1
+ARG RUNNER_BASE=ghcr.io/actions/actions-runner:latest
 FROM ${RUNNER_BASE}
 
 USER root

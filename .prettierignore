@@ -11,4 +11,3 @@ cypress/cypress-a11y-report.json
 
 # Helm templates contain Go template syntax that Prettier cannot parse
 ci-scripts/**/helm/**/templates/
-ci-scripts/images/**/helm/**/templates/

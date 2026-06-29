@@ -1,0 +1,277 @@
+name: IBM Cloud Cleanup All Resources
+
+on:
+  workflow_dispatch:
+    inputs:
+      cluster_name:
+        description: 'Cluster name prefix to clean (deletes ALL matching resources)'
+        required: true
+        default: 'kubevirt-plugin-ci'
+        type: string
+      dry_run:
+        description: 'Dry run (list resources without deleting)'
+        required: true
+        default: 'true'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
+      clean_vpc:
+        description: 'Also clean VPC, subnets, and gateways'
+        required: true
+        default: 'false'
+        type: choice
+        options:
+          - 'false'
+          - 'true'
+
+permissions:
+  contents: read
+
+env:
+  CLUSTER_NAME: ${{ inputs.cluster_name || 'kubevirt-plugin-ci' }}
+  DRY_RUN: ${{ inputs.dry_run || 'true' }}
+
+jobs:
+  cleanup:
+    name: Clean All IBM Cloud Resources
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Setup IBM Cloud CLI
+        uses: IBM/actions-ibmcloud-cli@v1
+        with:
+          api_key: ${{ secrets.IC_KEY }}
+          region: us-south
+          group: cnv-ui
+          plugins: kubernetes-service, vpc-infrastructure
+
+      - name: Install CIS plugin
+        run: ibmcloud plugin install cis -f 2>/dev/null || true
+
+      - name: Find and delete VMs
+        run: |
+          echo "=== Virtual Server Instances ==="
+          INSTANCES=$(ibmcloud is instances --output json 2>/dev/null \
+            | jq -r --arg cn "${CLUSTER_NAME}" '.[] | select(.name | startswith($cn)) | "\(.id)\t\(.name)\t\(.status)"' || true)
+
+          if [[ -z "${INSTANCES}" ]]; then
+            echo "No VMs found matching '${CLUSTER_NAME}*'"
+          else
+            echo "${INSTANCES}" | column -t
+            if [[ "${DRY_RUN}" == "false" ]]; then
+              echo "${INSTANCES}" | while IFS=$'\t' read -r id name status; do
+                echo "  Deleting: ${name} (${id})"
+                ibmcloud is instance-delete "${id}" -f 2>/dev/null || true
+              done
+              echo "Waiting for deletions..."
+              sleep 60
+            fi
+          fi
+
+      - name: Find and delete load balancers
+        run: |
+          echo "=== Load Balancers ==="
+          LBS=$(ibmcloud is lbs --output json 2>/dev/null \
+            | jq -r --arg cn "${CLUSTER_NAME}" '.[] | select(.name | startswith($cn)) | "\(.id)\t\(.name)\t\(.provisioning_status)"' || true)
+
+          if [[ -z "${LBS}" ]]; then
+            echo "No LBs found matching '${CLUSTER_NAME}*'"
+          else
+            echo "${LBS}" | column -t
+            if [[ "${DRY_RUN}" == "false" ]]; then
+              echo "${LBS}" | while IFS=$'\t' read -r id name status; do
+                echo "  Deleting: ${name} (${id})"
+                ibmcloud is load-balancer-delete "${id}" -f 2>/dev/null || true
+              done
+              sleep 30
+            fi
+          fi
+
+      - name: Wait for LB deletions
+        if: inputs.dry_run == 'false'
+        run: |
+          echo "=== Waiting for LB deletions to complete ==="
+          for i in $(seq 1 12); do
+            REMAINING=$(ibmcloud is lbs --output json 2>/dev/null \
+              | jq -r --arg cn "${CLUSTER_NAME}" '[.[] | select(.name | startswith($cn) or (.name | startswith("kube-" + $cn)))] | length')
+            if [[ "${REMAINING}" -eq 0 || "${REMAINING}" == "null" ]]; then
+              echo "  All LBs deleted."
+              break
+            fi
+            echo "  ${REMAINING} LB(s) still deleting... (${i}/12)"
+            sleep 30
+          done
+
+      - name: Detach gateways and delete subnets
+        run: |
+          echo "=== Detach gateways from subnets, then delete subnets ==="
+          SUBS=$(ibmcloud is subnets --output json 2>/dev/null \
+            | jq -r --arg cn "${CLUSTER_NAME}" '.[] | select(.name | startswith($cn)) | "\(.id)\t\(.name)\t\(.public_gateway.id // "none")"' || true)
+
+          if [[ -z "${SUBS}" ]]; then
+            echo "No subnets found matching '${CLUSTER_NAME}*'"
+          else
+            echo "${SUBS}" | column -t
+            if [[ "${DRY_RUN}" == "false" ]]; then
+              echo "${SUBS}" | while IFS=$'\t' read -r id name pgw; do
+                if [[ "${pgw}" != "none" ]]; then
+                  echo "  Detaching gateway from subnet: ${name}"
+                  ibmcloud is subnet-public-gateway-detach "${id}" -f 2>/dev/null || true
+                fi
+              done
+              sleep 10
+              echo "${SUBS}" | while IFS=$'\t' read -r id name pgw; do
+                echo "  Deleting subnet: ${name} (${id})"
+                ibmcloud is subnet-delete "${id}" -f 2>/dev/null || true
+              done
+              sleep 30
+            fi
+          fi
+
+      - name: Find and delete public gateways
+        run: |
+          echo "=== Public Gateways ==="
+          PGS=$(ibmcloud is public-gateways --output json 2>/dev/null \
+            | jq -r --arg cn "${CLUSTER_NAME}" '.[] | select(.name | startswith($cn)) | "\(.id)\t\(.name)\t\(.zone.name)"' || true)
+
+          if [[ -z "${PGS}" ]]; then
+            echo "No public gateways found matching '${CLUSTER_NAME}*'"
+          else
+            echo "${PGS}" | column -t
+            if [[ "${DRY_RUN}" == "false" ]]; then
+              echo "${PGS}" | while IFS=$'\t' read -r id name zone; do
+                echo "  Deleting: ${name} (${id})"
+                ibmcloud is public-gateway-delete "${id}" -f 2>/dev/null || true
+              done
+              sleep 10
+            fi
+          fi
+
+      - name: Find and delete floating IPs
+        run: |
+          echo "=== Floating IPs ==="
+          FIPS=$(ibmcloud is ips --output json 2>/dev/null \
+            | jq -r --arg cn "${CLUSTER_NAME}" '.[] | select(.name | startswith($cn)) | "\(.id)\t\(.name)\t\(.status)"' || true)
+
+          if [[ -z "${FIPS}" ]]; then
+            echo "No floating IPs found matching '${CLUSTER_NAME}*'"
+          else
+            echo "${FIPS}" | column -t
+            if [[ "${DRY_RUN}" == "false" ]]; then
+              echo "${FIPS}" | while IFS=$'\t' read -r id name status; do
+                echo "  Releasing: ${name} (${id})"
+                ibmcloud is floating-ip-release "${id}" -f 2>/dev/null || true
+              done
+            fi
+          fi
+
+      - name: Find and delete security groups
+        run: |
+          echo "=== Security Groups ==="
+          SGS=$(ibmcloud is sgs --output json 2>/dev/null \
+            | jq -r --arg cn "${CLUSTER_NAME}" '.[] | select(.name | startswith($cn)) | "\(.id)\t\(.name)"' || true)
+
+          if [[ -z "${SGS}" ]]; then
+            echo "No security groups found matching '${CLUSTER_NAME}*'"
+          else
+            echo "${SGS}" | column -t
+            if [[ "${DRY_RUN}" == "false" ]]; then
+              echo "${SGS}" | while IFS=$'\t' read -r id name; do
+                echo "  Deleting: ${name} (${id})"
+                ibmcloud is security-group-delete "${id}" -f 2>/dev/null || true
+              done
+            fi
+          fi
+
+      - name: Find and delete DNS records
+        run: |
+          echo "=== DNS Records ==="
+          CIS_ID=$(ibmcloud cis instances --output json 2>/dev/null | jq -r '.[0].crn // empty' || true)
+          if [[ -z "${CIS_ID}" ]]; then
+            echo "No CIS instance found."
+            exit 0
+          fi
+
+          ibmcloud cis instance-set "${CIS_ID}" 2>/dev/null || true
+          for zone_id in $(ibmcloud cis domains --output json 2>/dev/null | jq -r '.[].id' || true); do
+            RECORDS=$(ibmcloud cis dns-records "${zone_id}" --output json 2>/dev/null \
+              | jq -r --arg cn "${CLUSTER_NAME}" '.[] | select(.name | contains($cn)) | "\(.id)\t\(.name)\t\(.type)\t\(.content)"' || true)
+            if [[ -n "${RECORDS}" ]]; then
+              echo "${RECORDS}" | column -t
+              if [[ "${DRY_RUN}" == "false" ]]; then
+                echo "${RECORDS}" | while IFS=$'\t' read -r id name type content; do
+                  echo "  Deleting: ${name} (${id})"
+                  ibmcloud cis dns-record-delete "${zone_id}" "${id}" 2>/dev/null || true
+                done
+              fi
+            else
+              echo "No DNS records found matching '${CLUSTER_NAME}'."
+            fi
+          done
+
+      - name: Find and delete VPC resources
+        if: inputs.clean_vpc == 'true'
+        env:
+          VPC_NAME: ${{ inputs.cluster_name || 'kubevirt-plugin-ci' }}-vpc
+        run: |
+          echo "=== VPC Resources ==="
+          VPC_ID=$(ibmcloud is vpcs --output json 2>/dev/null \
+            | jq -r --arg n "${VPC_NAME}" '.[] | select(.name == $n) | .id // empty' || true)
+
+          if [[ -z "${VPC_ID}" ]]; then
+            echo "No VPC '${VPC_NAME}' found."
+            exit 0
+          fi
+
+          echo "VPC: ${VPC_NAME} (${VPC_ID})"
+
+          echo "Subnets:"
+          ibmcloud is subnets --output json 2>/dev/null \
+            | jq -r --arg vpc "${VPC_ID}" '.[] | select(.vpc.id == $vpc) | "  \(.id)\t\(.name)"' | column -t || true
+
+          echo "Public Gateways:"
+          ibmcloud is public-gateways --output json 2>/dev/null \
+            | jq -r --arg vpc "${VPC_ID}" '.[] | select(.vpc.id == $vpc) | "  \(.id)\t\(.name)"' | column -t || true
+
+          if [[ "${DRY_RUN}" == "false" ]]; then
+            echo "Deleting public gateways..."
+            for gw_id in $(ibmcloud is public-gateways --output json 2>/dev/null | jq -r --arg vpc "${VPC_ID}" '.[] | select(.vpc.id == $vpc) | .id' || true); do
+              for sub_id in $(ibmcloud is subnets --output json 2>/dev/null | jq -r --arg gw "${gw_id}" '.[] | select(.public_gateway.id == $gw) | .id' || true); do
+                ibmcloud is subnet-public-gateway-detach "${sub_id}" -f 2>/dev/null || true
+              done
+              ibmcloud is public-gateway-delete "${gw_id}" -f 2>/dev/null || true
+            done
+
+            echo "Deleting subnets..."
+            for sub_id in $(ibmcloud is subnets --output json 2>/dev/null | jq -r --arg vpc "${VPC_ID}" '.[] | select(.vpc.id == $vpc) | .id' || true); do
+              ibmcloud is subnet-delete "${sub_id}" -f 2>/dev/null || true
+            done
+
+            sleep 30
+
+            echo "Deleting VPC..."
+            ibmcloud is vpc-delete "${VPC_ID}" -f 2>/dev/null || true
+          fi
+
+      - name: Find ROKS clusters
+        run: |
+          echo "=== ROKS Clusters ==="
+          ibmcloud oc cluster ls 2>&1 | rg "${CLUSTER_NAME}" || echo "No ROKS clusters matching '${CLUSTER_NAME}'."
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "## IBM Cloud Resource Cleanup" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Setting | Value |" >> "$GITHUB_STEP_SUMMARY"
+          echo "|---------|-------|" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Cluster prefix | \`${CLUSTER_NAME}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Dry run | \`${DRY_RUN}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Clean VPC | \`${{ inputs.clean_vpc }}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          if [[ "${DRY_RUN}" == "true" ]]; then
+            echo "**Dry run** — no resources were deleted. Set dry_run to false to delete." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "Resources matching \`${CLUSTER_NAME}\` have been **deleted**." >> "$GITHUB_STEP_SUMMARY"
+          fi

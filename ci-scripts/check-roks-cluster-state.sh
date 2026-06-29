@@ -14,14 +14,6 @@ set -euo pipefail
 CLUSTER_NAME="${CLUSTER_NAME:?CLUSTER_NAME must be set}"
 MAX_WAIT="${MAX_WAIT:-7200}"
 INTERVAL="${INTERVAL:-60}"
-if ! [[ "${MAX_WAIT}" =~ ^[0-9]+$ && "${INTERVAL}" =~ ^[0-9]+$ ]]; then
-  echo "ERROR: MAX_WAIT and INTERVAL must be positive integers"
-  exit 1
-fi
-if (( MAX_WAIT <= 0 || INTERVAL <= 0 )); then
-  echo "ERROR: MAX_WAIT and INTERVAL must be greater than zero"
-  exit 1
-fi
 
 echo "Waiting for cluster '${CLUSTER_NAME}' to be fully available..."
 echo "  Ready when: state=normal, ingressStatus=healthy"
@@ -31,11 +23,7 @@ echo ""
 ELAPSED=0
 
 while [[ ${ELAPSED} -lt ${MAX_WAIT} ]]; do
-  if ! CLUSTER_JSON=$(ibmcloud oc cluster get --cluster "${CLUSTER_NAME}" --output json 2>&1); then
-    echo "ERROR: Failed to get cluster '${CLUSTER_NAME}':"
-    echo "${CLUSTER_JSON}"
-    exit 1
-  fi
+  CLUSTER_JSON=$(ibmcloud oc cluster get --cluster "${CLUSTER_NAME}" --output json 2>/dev/null || echo "{}")
 
   STATE=$(echo "${CLUSTER_JSON}" | jq -r '.state // "unknown"')
   MASTER_STATE=$(echo "${CLUSTER_JSON}" | jq -r '.masterState // "unknown"')
@@ -54,7 +42,7 @@ while [[ ${ELAPSED} -lt ${MAX_WAIT} ]]; do
     exit 0
   fi
 
-  sleep "${INTERVAL}"
+  sleep ${INTERVAL}
   ELAPSED=$((ELAPSED + INTERVAL))
 done
 

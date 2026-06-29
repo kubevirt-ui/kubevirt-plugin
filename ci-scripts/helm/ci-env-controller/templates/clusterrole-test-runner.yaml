@@ -1,0 +1,33 @@
+# ClusterRole bound (via RoleBinding) to the ARC runner SA in each test namespace.
+# The ci-env-controller creates RoleBindings for this role during provisioning.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: ci-env-test-runner
+  labels:
+    {{- include "ci-env-controller.labels" . | nindent 4 }}
+rules:
+  - apiGroups: ['']
+    resources: ['secrets']
+    verbs: ['get', 'list', 'create', 'update', 'patch', 'delete']
+  - apiGroups: ['']
+    resources: ['persistentvolumeclaims']
+    verbs: ['get', 'list', 'delete']
+  - apiGroups: ['kubevirt.io']
+    resources: ['virtualmachines']
+    verbs: ['get', 'list', 'watch', 'create', 'update', 'patch', 'delete']
+  - apiGroups: ['snapshot.kubevirt.io']
+    resources: ['virtualmachinesnapshots']
+    verbs: ['get', 'list', 'delete']
+  - apiGroups: ['cdi.kubevirt.io']
+    resources: ['datavolumes', 'datasources']
+    verbs: ['get', 'list', 'delete']
+  - apiGroups: ['template.openshift.io']
+    resources: ['templates']
+    verbs: ['get', 'list', 'delete']
+  - apiGroups: ['k8s.cni.cncf.io']
+    resources: ['network-attachment-definitions']
+    verbs: ['get', 'list', 'delete']
+  - apiGroups: ['instancetype.kubevirt.io']
+    resources: ['virtualmachineinstancetypes', 'virtualmachinepreferences']
+    verbs: ['get', 'list', 'delete']

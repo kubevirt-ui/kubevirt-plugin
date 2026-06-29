@@ -4,7 +4,7 @@
 # The CI test stack (console + plugin) runs as separate cluster pods via the
 # ci-test-stack Helm chart, so no Docker-in-Docker sidecar is needed.
 #
-# Default image is pinned upstream until ARC_RUNNER_IMAGE / --set overrides:
+# Default image is upstream until ARC_RUNNER_IMAGE / --set overrides:
 #   --set template.spec.containers[0].image=<internal-registry>/...
 #
 # Ref: https://github.com/actions/actions-runner-controller/tree/master/charts/gha-runner-scale-set
@@ -20,9 +20,15 @@ template:
         emptyDir: {}
     containers:
       - name: runner
-        image: ghcr.io/actions/actions-runner:2.335.1
+        image: ghcr.io/actions/actions-runner:latest
         command:
           - '/home/runner/run.sh'
+        env:
+          # Workaround for FIPS-enabled clusters (see docs/HOT_CLUSTER_FUTURE_WORK.md).
+          - name: OPENSSL_FORCE_FIPS_MODE
+            value: '0'
+          - name: GOLANG_FIPS
+            value: '0'
         securityContext:
           allowPrivilegeEscalation: false
           capabilities:

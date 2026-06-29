@@ -31,12 +31,11 @@ _route_url_to_internal() {
   [[ -z "${url}" ]] && return
   local host path route_info ns svc svc_port
   host=$(echo "${url}" | sed -E 's|https://([^/]+).*|\1|')
-  path=$(echo "${url}" | sed -E 's|https://[^/]+(/.*)?|\1|')
-  path="${path:-/}"
+  path=$(echo "${url}" | sed -E 's|https://[^/]+(/.*)?|\1|' || echo '/')
   route_info=$(echo "${_ALL_ROUTES_JSON}" \
     | jq -r --arg h "${host}" \
-        '.items[]? | select(.spec.host == $h) | "\(.metadata.namespace) \(.spec.to.name)"' \
-    | head -1) || true
+        '.items[] | select(.spec.host == $h) | "\(.metadata.namespace) \(.spec.to.name)"' \
+    | head -1)
   if [[ -n "${route_info}" ]]; then
     read -r ns svc <<< "${route_info}"
     svc_port=$(oc get service "${svc}" -n "${ns}" \
@@ -54,7 +53,7 @@ resolve_oc_version() {
     return
   fi
   OC_VERSION=$(oc version --output json 2>/dev/null \
-    | jq -r '.openshiftVersion | split(".") | .[0:2] | join(".") // empty') || true
+    | jq -r '.openshiftVersion // "" | if . == "" then "" else split(".") | .[0:2] | join(".") end') || true
   OC_VERSION="${OC_VERSION:-4.20}"
 }
 
@@ -62,8 +61,8 @@ resolve_oc_version() {
 # Sets INTERNAL_REGISTRY; defaults to the well-known service address if detection fails.
 resolve_internal_registry() {
   INTERNAL_REGISTRY="$(oc get image.config.openshift.io/cluster \
-    -o jsonpath='{.status.internalRegistryHostname}' 2>/dev/null || true)"
-  INTERNAL_REGISTRY="${INTERNAL_REGISTRY:-image-registry.openshift-image-registry.svc:5000}"
+    -o jsonpath='{.status.internalRegistryHostname}' 2>/dev/null \
+    || echo 'image-registry.openshift-image-registry.svc:5000')"
 }
 
 # Resolve binary download URLs from ConsoleCLIDownload resources.
@@ -86,7 +85,7 @@ resolve_cli_downloads() {
 
   OC_URL=$(echo "${cli_json}" \
     | jq -r '.items[].spec.links[] | select(.text | test("oc.*linux.*x86_64|oc.*linux.*amd64"; "i")) | .href' \
-    | head -1 || true)
+    | head -1)
   VIRTCTL_URL=$(echo "${cli_json}" \
     | jq -r '.items[].spec.links[] | select(.text | test("virtctl.*linux.*amd64|virtctl.*linux.*x86_64"; "i")) | .href' \
     | head -1 || true)

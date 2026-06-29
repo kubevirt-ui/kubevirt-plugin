@@ -29,6 +29,11 @@ rules:
   - apiGroups: ['']
     resources: ['nodes']
     verbs: ['get', 'list']
+
+  # --- Playwright test setup: create/delete temporary namespaces ---
+  - apiGroups: ['']
+    resources: ['namespaces']
+    verbs: ['get', 'list', 'create', 'delete']
   - apiGroups: ['config.openshift.io']
     resources: ['consoles', 'clusterversions', 'ingresses']
     verbs: ['get', 'list']
@@ -42,6 +47,11 @@ rules:
   - apiGroups: ['kubevirt.io']
     resources: ['virtualmachines']
     verbs: ['get', 'list', 'watch', 'patch']
+
+  # --- E2E test setup: user-settings and feature-flag configmaps in HCO namespace ---
+  - apiGroups: ['']
+    resources: ['configmaps']
+    verbs: ['get', 'list', 'create', 'patch']
 
   # --- check-runner job: HCO / operator version logging ---
   - apiGroups: ['operators.coreos.com']

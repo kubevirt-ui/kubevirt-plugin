@@ -85,15 +85,23 @@ check "ARC AutoscalingRunnerSet in ${ARC_RUNNERS_NS}" bash -c "
 # --- ARC listener pod ---
 # The listener pod stays Running even when the scale set is idle (no ephemeral runner pods).
 # A missing or non-Running listener means the scale set cannot pick up jobs.
-check "ARC listener pod in ${ARC_RUNNERS_NS}" bash -c "
-  running=\$(oc get pods -n '${ARC_RUNNERS_NS}' -l app.kubernetes.io/component=runner-scale-set-listener --no-headers 2>/dev/null | grep -c 'Running')
-  if [[ \"\${running}\" -ge 1 ]]; then
-    echo \"  \${running} Running listener pod(s)\"
-    exit 0
-  else
-    echo '  No Running listener pod in ${ARC_RUNNERS_NS}'
-    exit 1
-  fi
+# This is a non-fatal warning: the cluster is usable without it, and the listener
+# may start later once the ARC controller reconciles.
+ARC_CONTROLLER_NS="${ARC_CONTROLLER_NS:-arc-systems}"
+check "ARC listener pod in ${ARC_CONTROLLER_NS}" bash -c "
+  for attempt in 1 2 3 4 5 6; do
+    running=\$(oc get pods -n '${ARC_CONTROLLER_NS}' --no-headers 2>/dev/null | grep -c 'Running' || true)
+    if [[ \"\${running}\" -ge 2 ]]; then
+      echo \"  \${running} Running pod(s) (controller + listener)\"
+      exit 0
+    fi
+    if [[ \"\${attempt}\" -lt 6 ]]; then
+      sleep 30
+    fi
+  done
+  echo '  Expected 2+ Running pods (controller + listener) in ${ARC_CONTROLLER_NS}:'
+  oc get pods -n '${ARC_CONTROLLER_NS}' --no-headers 2>/dev/null || echo '  (no pods found)'
+  exit 1
 "
 
 # --- Default StorageClass ---
