@@ -106,12 +106,14 @@ export const useAccessibleResources = <T>({
     return vms || [];
   }, [allResources, allowedResources, loadPerNamespace]);
 
-  const loaded =
-    projectNamesLoaded &&
-    (loadPerNamespace
-      ? isEmpty(allowedResources) ||
-        Object.values(allowedResources).some((resource) => resource.loaded || resource.loadError)
-      : allResourcesLoaded);
+  const loaded = shouldFetchClusterWide
+    ? allResourcesLoaded
+    : projectNamesLoaded &&
+      (isEmpty(allowedResources) ||
+        Object.values(allowedResources).some((resource) => resource.loaded || resource.loadError));
 
-  return { loaded, loadError: projectNamesError, resources };
+  // Cluster-wide watches do not need OpenShift Project discovery.
+  const loadError = shouldFetchClusterWide ? undefined : projectNamesError;
+
+  return { loaded, loadError, resources };
 };
