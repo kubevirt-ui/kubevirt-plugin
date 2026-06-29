@@ -2,7 +2,7 @@
 #
 # Start the "off cluster" console.  Based on the `route-console.sh` and `start-console.sh` scripts.
 #
-set -euox pipefail
+set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 
