@@ -15,6 +15,8 @@ import { ChartDonutUtilization } from '@patternfly/react-charts/victory';
 import { useFleetPrometheusPoll } from '@stolostron/multicluster-sdk';
 import useDuration from '@virtualmachines/details/tabs/metrics/hooks/useDuration';
 
+import { UtilizationBlock } from '../UtilizationBlock';
+
 type CPUUtilProps = {
   vmi: V1VirtualMachineInstance;
 };
@@ -51,39 +53,31 @@ const CPUUtil: FC<CPUUtilProps> = ({ vmi }) => {
   const isReady = !Number.isNaN(cpuUsage) && !Number.isNaN(cpuRequested);
 
   return (
-    <div className="util">
-      <div className="util-upper">
-        <div className="util-title">{t('CPU')}</div>
-        <div className="util-summary" data-test-id="util-summary-cpu">
-          <div className="util-summary-value">{`${isReady ? cpuUsageHumanized?.string : 0}`}</div>
-          <div className="util-summary-text pf-v6-u-text-color-subtle">
-            <div>
-              {t('Requested of {{cpuRequested}}', {
-                cpuRequested: isReady ? cpuRequestedHumanized?.string : 0,
-              })}
-            </div>
-          </div>
-        </div>
-      </div>
-      <div className="util-chart">
-        <ComponentReady isReady={isReady}>
-          <ChartDonutUtilization
-            data={{
-              x: t('CPU used'),
-              y: (averageCPUUsage > 100 ? 100 : averageCPUUsage) || 0,
-            }}
-            animate
-            constrainToVisibleArea
-            labels={({ datum }) => (datum.x ? `${datum.x}: ${cpuUsageHumanized?.string}` : null)}
-            style={{ labels: { fontSize: 20 } }}
-            subTitle={t('Used')}
-            subTitleComponent={<SubTitleChartLabel y={135} />}
-            title={`${averageCPUUsageStr}%`}
-            titleComponent={<TitleChartLabel />}
-          />
-        </ComponentReady>
-      </div>
-    </div>
+    <UtilizationBlock
+      usedOfTotalText={t('Requested of {{cpuRequested}}', {
+        cpuRequested: isReady ? cpuRequestedHumanized?.string : 0,
+      })}
+      dataTestId="util-summary-cpu"
+      title={t('CPU')}
+      usageValue={`${isReady ? cpuUsageHumanized?.string : 0}`}
+    >
+      <ComponentReady isReady={isReady}>
+        <ChartDonutUtilization
+          data={{
+            x: t('CPU used'),
+            y: (averageCPUUsage > 100 ? 100 : averageCPUUsage) || 0,
+          }}
+          animate
+          constrainToVisibleArea
+          labels={({ datum }) => (datum.x ? `${datum.x}: ${cpuUsageHumanized?.string}` : null)}
+          style={{ labels: { fontSize: 20 } }}
+          subTitle={t('Used')}
+          subTitleComponent={<SubTitleChartLabel y={135} />}
+          title={`${averageCPUUsageStr}%`}
+          titleComponent={<TitleChartLabel />}
+        />
+      </ComponentReady>
+    </UtilizationBlock>
   );
 };
 

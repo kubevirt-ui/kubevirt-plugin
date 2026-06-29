@@ -1,19 +1,22 @@
-import React, { useMemo } from 'react';
-import { Link } from 'react-router-dom-v5-compat';
+import React from 'react';
 import xbytes from 'xbytes';
 
-import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import ComponentReady from '@kubevirt-utils/components/Charts/ComponentReady/ComponentReady';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useVMQueries from '@kubevirt-utils/hooks/useVMQueries';
-import { getNamespace, getResourceUrl } from '@kubevirt-utils/resources/shared';
+import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { PrometheusEndpoint } from '@openshift-console/dynamic-plugin-sdk';
-import { Button, ButtonVariant, Content, ContentVariants, Popover } from '@patternfly/react-core';
+import { Stack } from '@patternfly/react-core';
 import { useFleetPrometheusPoll } from '@stolostron/multicluster-sdk';
 import useDuration from '@virtualmachines/details/tabs/metrics/hooks/useDuration';
+
+import { UtilizationBlock } from '../UtilizationBlock';
+
+import NetworkBreakdownPopover from './NetworkBreakdownPopover';
+import NetworkMetricsRow from './NetworkMetricsRow';
 
 type NetworkUtilProps = {
   vmi: V1VirtualMachineInstance;
@@ -24,8 +27,6 @@ const NetworkUtil: React.FC<NetworkUtilProps> = ({ vmi }) => {
   const { currentTime } = useDuration();
 
   const queries = useVMQueries(vmi);
-
-  const interfacesNames = useMemo(() => vmi?.spec?.domain?.devices?.interfaces, [vmi]);
 
   const prometheusProps = {
     cluster: getCluster(vmi),
@@ -59,88 +60,27 @@ const NetworkUtil: React.FC<NetworkUtilProps> = ({ vmi }) => {
   const isReady = !isEmpty(networkInData) || !isEmpty(networkOutData);
 
   return (
-    <div className="util network">
-      <div className="util-upper">
-        <div className="util-title">
-          {t('Network transfer')}
-          <Popover
-            bodyContent={
-              <div>
-                <Content component={ContentVariants.h3}>{t('Network transfer breakdown')}</Content>
-                <Content component={ContentVariants.h6}>{t('Top consumer')}</Content>
-                {interfacesNames?.map((networkInterface) => (
-                  <div className="network-popover" key={networkInterface?.name}>
-                    <Link
-                      to={`${getResourceUrl({
-                        model: VirtualMachineModel,
-                        resource: vmi,
-                      })}/metrics?network=${networkInterface?.name}`}
-                    >
-                      {networkInterface?.name}
-                    </Link>
-                    {networkInterface?.name === networkInterfaceTotal ? (
-                      <div className="pf-v6-u-text-color-subtle">{`${networkInterfaceTotal} MBps`}</div>
-                    ) : (
-                      <div className="pf-v6-u-text-color-subtle">
-                        {networkTotal?.data?.result?.map(
-                          (name) =>
-                            name?.metric?.interface === networkInterface?.name &&
-                            `${Number(name?.value?.[1])?.toFixed(2)} MBps`,
-                        )}
-                      </div>
-                    )}
-                  </div>
-                ))}
-                {interfacesNames?.length > 5 && (
-                  <Link
-                    to={`${getResourceUrl({
-                      model: VirtualMachineModel,
-                      resource: vmi,
-                    })}/metrics?network`}
-                  >
-                    {t('View more')}
-                  </Link>
-                )}
-              </div>
-            }
-            position="bottom"
-          >
-            <div>
-              <Button isInline variant={ButtonVariant.link}>
-                {t('Breakdown by network')}
-              </Button>
-            </div>
-          </Popover>
-        </div>
-
-        <div className="util-summary" data-test-id="util-summary-network-transfer">
-          <div className="util-summary-value">{`${totalTransferred}ps`}</div>
-          <div className="util-summary-text pf-v6-u-text-color-subtle network-value">
-            <div>{t('Total')}</div>
+    <UtilizationBlock
+      dataTestId="util-summary-network-transfer"
+      isNetworkUtil
+      title={t('Network transfer')}
+      usageValue={`${totalTransferred}ps`}
+      usedOfTotalText={t('Total')}
+    >
+      <Stack className="pf-v6-u-pl-lg pf-v6-u-mt-xl" hasGutter>
+        <ComponentReady isReady={isReady}>
+          <div>
+            <NetworkMetricsRow label={t('In')} value={networkInData} />
+            <NetworkMetricsRow label={t('Out')} value={networkOutData} />
           </div>
-        </div>
-      </div>
-      <ComponentReady isReady={isReady}>
-        <div className="network-metrics">
-          <div className="network-metrics--row pf-v6-u-text-color-subtle">
-            <div className="network-metrics--row__sum">
-              {`${xbytes(networkInData || 0, {
-                fixed: 0,
-              })}s`}
-            </div>
-            <div className="network-metrics--row__title">{t('In')}</div>
-          </div>
-          <div className="network-metrics--row pf-v6-u-text-color-subtle">
-            <div className="network-metrics--row__sum">
-              {`${xbytes(networkOutData || 0, {
-                fixed: 0,
-              })}s`}
-            </div>
-            <div className="network-metrics--row__title">{t('Out')}</div>
-          </div>
-        </div>
-      </ComponentReady>
-    </div>
+        </ComponentReady>
+        <NetworkBreakdownPopover
+          networkInterfaceTotal={networkInterfaceTotal}
+          networkTotal={networkTotal}
+          vmi={vmi}
+        />
+      </Stack>
+    </UtilizationBlock>
   );
 };
 
