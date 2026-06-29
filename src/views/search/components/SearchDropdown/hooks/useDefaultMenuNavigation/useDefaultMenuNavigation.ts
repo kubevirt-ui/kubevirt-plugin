@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useCallback, useMemo } from 'react';
+import { Dispatch, KeyboardEvent, SetStateAction, useCallback, useMemo } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
@@ -7,6 +7,8 @@ import { AutocompleteMode, DropdownType, MainMenuItem, SearchKeyBadge } from '..
 import { hasActiveKeyFilter } from '../../utils';
 import { OptionalListNavigationResult, useListNavigation } from '../useListNavigation';
 import useSearchKeyBadges from '../useSearchKeyBadges';
+
+import { getNextGridIndex } from './utils';
 
 type UseDefaultMenuNavigationProps = {
   autocompleteMode: AutocompleteMode;
@@ -64,11 +66,32 @@ export const useDefaultMenuNavigation = ({
     [onSelectKey, onSelectQueryText],
   );
 
-  const { onArrowKey, onSelectHighlighted } = useListNavigation(
+  const { onSelectHighlighted } = useListNavigation(
     items,
     focusedItemIndex,
     setFocusedItemIndex,
     onSelect,
+  );
+
+  const keyCount = searchKeyBadges.length;
+  const midpoint = Math.ceil(keyCount / 2);
+
+  const onArrowKey = useCallback(
+    (event: KeyboardEvent<HTMLInputElement>): boolean => {
+      const nextIndex = getNextGridIndex(
+        event.key,
+        focusedItemIndex,
+        midpoint,
+        keyCount,
+        items.length,
+      );
+      if (nextIndex === null) return false;
+
+      event.preventDefault();
+      setFocusedItemIndex(nextIndex);
+      return true;
+    },
+    [focusedItemIndex, midpoint, keyCount, items.length, setFocusedItemIndex],
   );
 
   return {
