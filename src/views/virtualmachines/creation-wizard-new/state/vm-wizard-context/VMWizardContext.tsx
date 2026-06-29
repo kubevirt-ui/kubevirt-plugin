@@ -5,7 +5,6 @@ import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
 import { clearCustomizeInstanceType } from '@kubevirt-utils/store/customizeInstanceType';
 import { getValidNamespace } from '@kubevirt-utils/utils/utils';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
-import useInstanceTypeVMStore from '@virtualmachines/creation-wizard-new/state/instance-type-vm-store/useInstanceTypeVMStore';
 import { createInitialVMWizardFormValues } from '@virtualmachines/creation-wizard-new/state/vm-wizard-form/consts';
 import { VMWizardFormValues } from '@virtualmachines/creation-wizard-new/state/vm-wizard-form/types';
 
@@ -25,7 +24,6 @@ export const VMWizardProvider: FC<VMWizardProviderProps> = ({ children }) => {
   useEffect(
     () => () => {
       clearCustomizeInstanceType();
-      useInstanceTypeVMStore.getState().resetInstanceTypeVMState();
     },
     [],
   );

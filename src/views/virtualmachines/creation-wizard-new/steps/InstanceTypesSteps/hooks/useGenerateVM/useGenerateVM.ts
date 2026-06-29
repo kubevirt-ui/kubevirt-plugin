@@ -22,10 +22,10 @@ import {
   CREATE_VM_FORM_FIELDS_VM_DATA,
 } from '@virtualmachines/creation-wizard-new/state/vm-wizard-form/consts';
 import {
-  createPopulatedCloudInitYAML,
   generateVM,
-  useIsWindowsBootableVolume,
-} from '@virtualmachines/creation-wizard-new/steps/InstanceTypesSteps/hooks/useGenerateVM/utils';
+  isWindowBootableVolume,
+} from '@virtualmachines/creation-wizard-new/steps/InstanceTypesSteps/hooks/useGenerateVM/utils/generateVM';
+import { createPopulatedCloudInitYAML } from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/hooks/useGenerateVM/utils';
 
 export type UseGenerateVM = () => V1VirtualMachine;
 
@@ -101,12 +101,12 @@ const useGenerateVM: UseGenerateVM = () => {
   ]);
 
   const [driversImage] = useDriversImage();
-  const isWindowsOSVolume = useIsWindowsBootableVolume();
 
-  return useMemo(
-    () => (isWindowsOSVolume ? addWinDriverVolume(generatedVM, driversImage) : generatedVM),
-    [driversImage, generatedVM, isWindowsOSVolume],
-  );
+  return useMemo(() => {
+    const isWindowsOSVolume = isWindowBootableVolume(selectedBootableVolume);
+
+    return isWindowsOSVolume ? addWinDriverVolume(generatedVM, driversImage) : generatedVM;
+  }, [driversImage, generatedVM, selectedBootableVolume]);
 };
 
 export default useGenerateVM;

@@ -15,6 +15,7 @@ import {
 } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { buildColumnLayout } from '@kubevirt-utils/components/KubevirtTable/utils';
+import { getActiveColumns } from '@kubevirt-utils/components/KubevirtTable/utils/getActiveColumns';
 import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
 import useContainerWidth from '@kubevirt-utils/hooks/useContainerWidth';
 import { KUBEVIRT_APISERVER_PROXY } from '@kubevirt-utils/hooks/useFeatures/constants';
@@ -27,13 +28,10 @@ import {
   paginationInitialState,
 } from '@kubevirt-utils/hooks/usePagination/utils/constants';
 import { usePVCMapper } from '@kubevirt-utils/hooks/usePVCMapper';
-import { getDescription, getName, getNamespace } from '@kubevirt-utils/resources/shared';
+import { getDescription } from '@kubevirt-utils/resources/shared';
 import useVirtualMachineInstanceMigrationMapper from '@kubevirt-utils/resources/vmim/hooks/useVirtualMachineInstanceMigrationMapper';
 import useVirtualMachineInstanceMigrations from '@kubevirt-utils/resources/vmim/hooks/useVirtualMachineInstanceMigrations';
 import { clearCustomizeInstanceType, vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
-import { isVM } from '@kubevirt-utils/utils/typeGuards';
-import { truncateToK8sName } from '@kubevirt-utils/utils/utils';
-import { getCluster } from '@multicluster/helpers/selectors';
 import useIsAllClustersPage from '@multicluster/hooks/useIsAllClustersPage';
 import { K8sVerb, useListPageFilter } from '@openshift-console/dynamic-plugin-sdk';
 import { Label, Pagination, Split, SplitItem } from '@patternfly/react-core';
@@ -45,19 +43,23 @@ import { useVirtualMachineInstanceMapper } from '@virtualmachines/list/hooks/use
 import useVMMetrics from '@virtualmachines/list/hooks/useVMMetrics';
 import { getListPageBodySize, ListPageBodySize } from '@virtualmachines/list/listPageBodySize';
 import { VM_FILTER_OPTIONS } from '@virtualmachines/list/utils/constants';
-import {
-  getVMColumns,
-  VM_COLUMN_KEYS,
-  VMCallbacks,
-} from '@virtualmachines/list/virtualMachinesDefinition';
+import { getVMColumns, VM_COLUMN_KEYS } from '@virtualmachines/list/virtualMachinesDefinition';
 import { useAccessibleResources } from '@virtualmachines/search/hooks/useAccessibleResources';
 import useVMSearchQueries from '@virtualmachines/search/hooks/useVMSearchQueries';
 import { OBJECTS_FETCHING_LIMIT } from '@virtualmachines/utils';
-import { getVMIFromMapper, getVMIMFromMapper } from '@virtualmachines/utils/mappers';
 
 import VirtualMachineTable from './components/VirtualMachineTable';
 import { useCloneSourceVMFilters } from './hooks/useCloneSourceVMFilters';
+import {
+  getActiveColumnKeys,
+  getCloneSourceVMName,
+  getPaginatedVMs,
+  getPaginationFirstPageState,
+  getVMTableCallbacks,
+  resolveVMListSource,
+} from './utils';
 
+// TODO: refactor this component
 const VirtualMachinesList = forwardRef(({}, ref) => {
   const { t } = useKubevirtTranslation();
   useSignals();
@@ -99,9 +101,15 @@ const VirtualMachinesList = forwardRef(({}, ref) => {
     groupVersionKind: VirtualMachineModelGroupVersionKind,
   });
 
-  const vms = targetNamespace ? namespacedVMs : accessibleVMs;
-  const vmsLoaded = targetNamespace ? namespacedVMsLoaded : accessibleVMsLoaded;
-  const vmsLoadError = targetNamespace ? loadError : accessibleVMsError;
+  const {
+    loaded: vmsLoaded,
+    loadError: vmsLoadError,
+    vms,
+  } = resolveVMListSource(
+    targetNamespace,
+    { loaded: namespacedVMsLoaded, loadError, vms: namespacedVMs },
+    { loaded: accessibleVMsLoaded, loadError: accessibleVMsError, vms: accessibleVMs },
+  );
 
   const [vmims, vmimsLoaded] = useVirtualMachineInstanceMigrations(cluster, targetNamespace);
   const { vmiMapper, vmisLoaded } = useVirtualMachineInstanceMapper();
@@ -154,16 +162,16 @@ const VirtualMachinesList = forwardRef(({}, ref) => {
     [t, isAllClustersPage, canGetNode],
   );
 
-  // Filter out selection column
-  const columnsWithoutSelection = useMemo(
-    () => columns.filter((col) => col.key !== VM_COLUMN_KEYS.selection),
-    [columns],
-  );
-
-  const manageableColumns = useMemo(
-    () => columnsWithoutSelection.filter((col) => col.label),
-    [columnsWithoutSelection],
-  );
+  const { columnsWithoutSelection, manageableColumns } = useMemo(() => {
+    const filteredColumnsWithoutSelection = columns.filter(
+      (col) => col.key !== VM_COLUMN_KEYS.selection,
+    );
+    const filteredManageableColumns = filteredColumnsWithoutSelection.filter((col) => col.label);
+    return {
+      columnsWithoutSelection: filteredColumnsWithoutSelection,
+      manageableColumns: filteredManageableColumns,
+    };
+  }, [columns]);
 
   const [activeColumns, , loadedColumns] = useKubevirtUserSettingsTableColumns<V1VirtualMachine>({
     columnManagementID: VirtualMachineModelRef,
@@ -175,52 +183,33 @@ const VirtualMachinesList = forwardRef(({}, ref) => {
     })),
   });
 
-  const activeColumnKeys = useMemo(() => {
-    const managedKeys =
-      activeColumns?.map((col) => col?.id) ??
-      manageableColumns.filter((col) => !col.additional).map((col) => col.key);
+  const { activeTableColumns, columnLayout } = useMemo(() => {
+    const columnKeys = getActiveColumnKeys(
+      activeColumns,
+      columnsWithoutSelection,
+      manageableColumns,
+    );
 
-    const nonManageableKeys = columnsWithoutSelection
-      .filter((col) => !col.label)
-      .map((col) => col.key);
-
-    return Array.from(new Set([...nonManageableKeys, ...managedKeys]));
+    return {
+      activeTableColumns: getActiveColumns(columnsWithoutSelection, columnKeys),
+      columnLayout: buildColumnLayout(manageableColumns, columnKeys, VirtualMachineModelRef),
+    };
   }, [activeColumns, columnsWithoutSelection, manageableColumns]);
-
-  const columnLayout = useMemo(
-    () => buildColumnLayout(manageableColumns, activeColumnKeys, VirtualMachineModelRef),
-    [manageableColumns, activeColumnKeys],
-  );
 
   const loaded = vmsLoaded && vmisLoaded && vmimsLoaded && !loadingFeatureProxy && loadedColumns;
 
-  const callbacks: VMCallbacks = useMemo(
-    () => ({
-      getVmi: (vm: V1VirtualMachine) => getVMIFromMapper(vmiMapper, vm),
-      getVmim: (vm: V1VirtualMachine) =>
-        getVMIMFromMapper(vmimMapper, getName(vm), getNamespace(vm), getCluster(vm)),
-      pvcMapper,
-      vmiMapper,
-      vmimMapper,
-    }),
+  const callbacks = useMemo(
+    () => getVMTableCallbacks(vmiMapper, vmimMapper, pvcMapper),
     [vmiMapper, vmimMapper, pvcMapper],
   );
 
-  // Get active columns for table
-  const activeTableColumns = useMemo(() => {
-    return columnsWithoutSelection.filter((col) => activeColumnKeys.includes(col.key));
-  }, [columnsWithoutSelection, activeColumnKeys]);
-
-  // Pagination
-  const paginatedData = useMemo(() => {
-    const { endIndex, startIndex } = pagination;
-    return filteredVMs?.slice(startIndex, endIndex) || [];
-  }, [filteredVMs, pagination]);
+  const paginatedData = useMemo(
+    () => getPaginatedVMs(filteredVMs, pagination),
+    [filteredVMs, pagination],
+  );
 
   const setVM = (vm: V1VirtualMachine) => {
-    const sourceVMName = getName(vm);
-    const name = truncateToK8sName(isVM(vm) ? `${sourceVMName}-clone` : sourceVMName);
-    setValue(CREATE_VM_FORM_FIELDS_VM_DATA.NAME, name);
+    setValue(CREATE_VM_FORM_FIELDS_VM_DATA.NAME, getCloneSourceVMName(vm));
     setValue(CREATE_VM_FORM_FIELDS_VM_DATA.DESCRIPTION, getDescription(vm) ?? '');
     vmSignal.value = vm;
   };
@@ -237,12 +226,7 @@ const VirtualMachinesList = forwardRef(({}, ref) => {
           <ListPageFilter
             onFilterChange={(...args) => {
               onFilterChange(...args);
-              setPagination((prevPagination) => ({
-                ...prevPagination,
-                endIndex: prevPagination?.perPage,
-                page: 1,
-                startIndex: 0,
-              }));
+              setPagination((prevPagination) => getPaginationFirstPageState(prevPagination));
             }}
             columnLayout={columnLayout}
             data={unfilteredData}
