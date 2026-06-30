@@ -1,8 +1,9 @@
 name: Hot Cluster E2E
 
 on:
-  pull_request:
+  pull_request_target:
     branches: [main]
+    types: [opened, synchronize, labeled]
   workflow_dispatch:
     inputs:
       test_project:
@@ -49,20 +50,13 @@ env:
   BASE_DOMAIN: cnv-ui.com
 
 jobs:
-  fork-pr-notice:
-    name: Fork PR — secrets unavailable
-    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository
-    runs-on: ubuntu-latest
-    steps:
-      - name: Explain why Hot Cluster E2E cannot run
-        run: |
-          echo "::error::Hot Cluster E2E needs the IC_KEY secret, which GitHub does not pass to pull_request workflows from forks."
-          echo "Push your branch to kubevirt-ui/kubevirt-plugin and open a same-repo PR, or run this workflow manually (workflow_dispatch) from an upstream branch."
-          exit 1
-
   cluster-health-check:
     name: Cluster Health Check
-    if: github.event_name == 'workflow_dispatch'
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      github.event.pull_request.head.repo.full_name == github.repository ||
+      contains(fromJSON('["MEMBER","OWNER","COLLABORATOR"]'), github.event.pull_request.author_association) ||
+      (github.event.action == 'labeled' && contains(github.event.pull_request.labels.*.name, 'ok-to-test'))
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
