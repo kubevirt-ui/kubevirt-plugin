@@ -44,6 +44,12 @@ const CandidateRow: FC<{
     <div
       className="cluster-recommendation-panel__candidate"
       onClick={() => onSelect?.(candidate.cluster)}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onSelect?.(candidate.cluster);
+        }
+      }}
       role={onSelect ? 'button' : undefined}
       tabIndex={onSelect ? 0 : undefined}
     >

@@ -123,4 +123,43 @@ describe('ClusterRecommendationPanel', () => {
     );
     expect(screen.getByText('Top pick')).toBeInTheDocument();
   });
+
+  it('should render storage type for each candidate', () => {
+    render(
+      <ClusterRecommendationPanel data={mockData} error={null} loaded={true} loading={false} />,
+    );
+    expect(screen.getByText('cloud')).toBeInTheDocument();
+    expect(screen.getByText('local')).toBeInTheDocument();
+  });
+
+  it('should render matched storage class with singular label for one class', () => {
+    render(
+      <ClusterRecommendationPanel data={mockData} error={null} loaded={true} loading={false} />,
+    );
+    expect(screen.getByText('managed-csi')).toBeInTheDocument();
+    expect(screen.getByText('standard')).toBeInTheDocument();
+    expect(screen.getAllByText('Matched storage class')).toHaveLength(2);
+  });
+
+  it('should render matched storage classes with plural label for multiple classes', () => {
+    const multiClassData: MigrationTargetResponse = {
+      ...mockData,
+      candidates: [
+        {
+          ...mockData.candidates[0],
+          matchedStorageClasses: ['managed-csi', 'gp3-csi'],
+        },
+      ],
+    };
+    render(
+      <ClusterRecommendationPanel
+        data={multiClassData}
+        error={null}
+        loaded={true}
+        loading={false}
+      />,
+    );
+    expect(screen.getByText('Matched storage classes')).toBeInTheDocument();
+    expect(screen.getByText('managed-csi, gp3-csi')).toBeInTheDocument();
+  });
 });
