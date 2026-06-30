@@ -1,4 +1,4 @@
-import React, { FC, RefObject, useCallback } from 'react';
+import React, { FC, RefObject, useCallback, useMemo } from 'react';
 
 import {
   KubevirtFilter,
@@ -8,6 +8,7 @@ import {
 import { InputGroup, InputGroupItem } from '@patternfly/react-core';
 import useShowAdvancedSearchModal from '@search/hooks/useShowAdvancedSearchModal';
 import { useSearchLanguageInput } from '@search/searchLanguage/hooks/useSearchLanguageInput/useSearchLanguageInput';
+import { convertFilterStateToModalInputs } from '@search/utils/query';
 
 import useRecentSearches from './SearchDropdown/hooks/useRecentSearches';
 import SearchTipsPopover from './SearchTipsPopover/SearchTipsPopover';
@@ -33,6 +34,7 @@ const SearchBar: FC<SearchBarProps> = ({
   onSetFilters,
 }) => {
   const showSearchModal = useShowAdvancedSearchModal(onSetFilters, clearAllFilters);
+  const modalInputs = useMemo(() => convertFilterStateToModalInputs(filters), [filters]);
 
   const { addRecentSearch, recentSearches } = useRecentSearches();
 
@@ -58,7 +60,7 @@ const SearchBar: FC<SearchBarProps> = ({
           filterDefinitions={filterDefinitions}
           filters={filters}
           inputRef={inputRef}
-          onOpenAdvancedSearch={showSearchModal}
+          onOpenAdvancedSearch={() => showSearchModal(modalInputs)}
           onSelectQueryText={onSelectQueryText}
           onSetFilters={onSetFilters}
           recentSearches={recentSearches}
