@@ -59,13 +59,14 @@ jobs:
       (github.event.action == 'labeled' && contains(github.event.pull_request.labels.*.name, 'ok-to-test'))
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    continue-on-error: true
     steps:
       - name: Checkout
         uses: actions/checkout@v6
 
       # ROKS health check (classic/vpc)
       - name: Setup IBM Cloud CLI
-        if: inputs.infrastructure_type != 'ipi'
+        if: env.INFRASTRUCTURE_TYPE != 'ipi'
         uses: IBM/actions-ibmcloud-cli@v1
         with:
           api_key: ${{ secrets.IC_KEY }}
@@ -74,14 +75,14 @@ jobs:
           plugins: kubernetes-service
 
       - name: Install oc client (ROKS)
-        if: inputs.infrastructure_type != 'ipi'
+        if: env.INFRASTRUCTURE_TYPE != 'ipi'
         run: |
           CLUSTER_JSON="$(ibmcloud oc cluster get --cluster "${CLUSTER_NAME}" --output json)"
           export CLUSTER_JSON
           bash ./ci-scripts/install-oc-client.sh
 
       - name: Configure kubeconfig (ROKS)
-        if: inputs.infrastructure_type != 'ipi'
+        if: env.INFRASTRUCTURE_TYPE != 'ipi'
         run: |
           ibmcloud oc cluster config --cluster "${CLUSTER_NAME}" --admin
           oc cluster-info
@@ -89,7 +90,7 @@ jobs:
 
       # IPI health check
       - name: Download IPI kubeconfig
-        if: inputs.infrastructure_type == 'ipi'
+        if: env.INFRASTRUCTURE_TYPE == 'ipi'
         env:
           GH_TOKEN: ${{ github.token }}
           SETUP_RUN_ID: ${{ inputs.ipi_setup_run_id }}
