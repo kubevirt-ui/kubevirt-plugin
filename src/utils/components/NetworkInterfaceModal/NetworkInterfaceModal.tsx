@@ -134,6 +134,7 @@ const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
           setInterfaceModel={setInterfaceModel}
         />
         <NetworkInterfaceNetworkSelect
+          editInitValueNetworkName={getNetworkName(network) ?? undefined}
           isEditing={Boolean(network) && Boolean(iface)}
           namespace={namespace || getNamespace(vm)}
           networkName={networkName}

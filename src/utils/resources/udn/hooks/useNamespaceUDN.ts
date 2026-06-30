@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 
+import { parseNADConfig } from '@kubevirt-utils/components/NetworkInterfaceModal/utils/helpers';
 import { NetworkAttachmentDefinitionModelGroupVersionKind } from '@kubevirt-utils/models';
 import { UserDefinedNetworkRole } from '@kubevirt-utils/resources/udn/types';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -28,7 +29,7 @@ const useNamespaceUDN = (
   const udnNAD = useMemo(
     () =>
       nads?.find((nad) => {
-        const config = JSON.parse(nad?.spec?.config || '{}');
+        const config = parseNADConfig(nad);
 
         return (
           PrimaryTopologies.includes(config.topology) &&
@@ -41,7 +42,7 @@ const useNamespaceUDN = (
   const isNamespaceManagedByUDN = useMemo(() => !isEmpty(udnNAD), [udnNAD]);
 
   const vmsNotSupported = useMemo(() => {
-    const config = JSON.parse(udnNAD?.spec?.config || '{}');
+    const config = parseNADConfig(udnNAD);
     return config.topology === LAYER3_TOPOLOGY;
   }, [udnNAD]);
 

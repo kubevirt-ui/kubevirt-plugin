@@ -7,6 +7,11 @@ export const OPENSHIFT_OS_IMAGES_NS = 'openshift-virtualization-os-images';
 
 export const OPENSHIFT_SRIOV_NETWORK_OPERATOR_NS = 'openshift-sriov-network-operator';
 export const OPENSHIFT_MULTUS_NS = 'openshift-multus';
+export const GLOBAL_NAD_NAMESPACES = [
+  DEFAULT_NAMESPACE,
+  OPENSHIFT_MULTUS_NS,
+  OPENSHIFT_SRIOV_NETWORK_OPERATOR_NS,
+];
 
 export const VENDOR_LABEL = 'instancetype.kubevirt.io/vendor';
 

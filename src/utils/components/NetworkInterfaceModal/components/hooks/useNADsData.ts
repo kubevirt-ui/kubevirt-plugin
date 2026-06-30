@@ -6,8 +6,8 @@ import { useFetchNADs } from './useFetchNADs';
 const useNADsData: UseNADsData = (namespace, cluster) => {
   const [nads, loaded, loadError] = useFetchNADs(namespace, cluster);
 
-  const availableNADs = filterUDNNads(nads || []);
-  return { loaded, loadError, nads: availableNADs };
+  const { primary, regular: availableNADs } = filterUDNNads(nads || []);
+  return { loaded, loadError, nads: availableNADs, primaryNADs: primary };
 };
 
 export default useNADsData;
