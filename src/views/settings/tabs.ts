@@ -3,11 +3,13 @@ import { TFunction } from 'i18next';
 
 import ClusterTab from './tabs/ClusterTab/ClusterTab';
 import PreviewFeaturesTab from './tabs/PreviewFeaturesTab/PreviewFeaturesTab';
+import RecommendedCapabilitiesTab from './tabs/RecommendedCapabilitiesTab/RecommendedCapabilitiesTab';
 import UserTab from './tabs/UserTab/UserTab';
 
 export const SETTINGS_TABS = {
   CLUSTER: 'cluster',
   FEATURES: 'features',
+  RECOMMENDED: 'recommended',
   USER: 'user',
 } as const;
 
@@ -19,6 +21,7 @@ export type SettingsTabConfig = {
   Component: FC;
   dataTest: string;
   isEnabled: boolean;
+  isFullWidth?: boolean;
   name: SettingsTab;
   title: string;
 };
@@ -37,6 +40,14 @@ export const getTabs = (isAdmin: boolean, t: TFunction): SettingsTabConfig[] => 
     isEnabled: true,
     name: SETTINGS_TABS.USER,
     title: t('User'),
+  },
+  {
+    Component: RecommendedCapabilitiesTab,
+    dataTest: 'recommended-capabilities',
+    isEnabled: true,
+    isFullWidth: true,
+    name: SETTINGS_TABS.RECOMMENDED,
+    title: t('Recommended capabilities'),
   },
   {
     Component: PreviewFeaturesTab,

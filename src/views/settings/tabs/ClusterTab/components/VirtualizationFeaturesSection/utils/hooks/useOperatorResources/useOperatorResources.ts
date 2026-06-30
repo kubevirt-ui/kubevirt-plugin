@@ -13,7 +13,7 @@ import { operatorPackageNames } from '@settings/tabs/ClusterTab/components/Virtu
 import { OperatorResources } from '@settings/tabs/ClusterTab/components/VirtualizationFeaturesSection/utils/hooks/useOperatorResources/utils/types';
 import { getWatchedOperatorResources } from '@settings/tabs/ClusterTab/components/VirtualizationFeaturesSection/utils/hooks/useOperatorResources/utils/utils';
 
-type UseOperatorResources = () => {
+export type UseOperatorResourcesReturn = {
   clusterServiceVersions: ClusterServiceVersionKind[];
   filteredPackageManifests: PackageManifestKind[];
   operatorGroups: OperatorGroupKind[];
@@ -21,7 +21,9 @@ type UseOperatorResources = () => {
   subscriptions: SubscriptionKind[];
 };
 
-const useOperatorResources: UseOperatorResources = () => {
+const useOperatorResources = (
+  packageNames: readonly string[] = operatorPackageNames,
+): UseOperatorResourcesReturn => {
   const cluster = useSettingsCluster();
   const resources = useMemo(() => getWatchedOperatorResources(cluster), [cluster]);
   const data = useKubevirtWatchResources<OperatorResources>(resources);
@@ -34,7 +36,7 @@ const useOperatorResources: UseOperatorResources = () => {
 
   const allPackageManifests = [...packageManifests, ...marketplacePackageManifests];
   const filteredPackageManifests = allPackageManifests.filter((pkg) =>
-    operatorPackageNames.includes(getName(pkg)),
+    packageNames.includes(getName(pkg)),
   );
 
   const operatorResourcesLoaded =
