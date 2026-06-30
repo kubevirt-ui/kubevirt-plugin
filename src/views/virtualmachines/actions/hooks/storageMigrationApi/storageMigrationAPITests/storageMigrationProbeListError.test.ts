@@ -1,4 +1,4 @@
-import { handleStorageMigrationProbeListError } from './storageMigrationProbeListError';
+import { handleStorageMigrationProbeListError } from '../storageMigrationProbeListError';
 
 describe('handleStorageMigrationProbeListError', () => {
   it('invokes onNotFound when canceled is false and error is 404-shaped', () => {

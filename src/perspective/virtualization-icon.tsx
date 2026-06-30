@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { type JSX } from 'react';
 
-export default () => (
+export default (): JSX.Element => (
   <>
     <svg
       aria-hidden="true"
@@ -11,6 +11,7 @@ export default () => (
       width="1em"
       xmlns="http://www.w3.org/2000/svg"
     >
+      {/* eslint-disable-next-line i18next/no-literal-string */}
       <title>Red Hat OpenShift Virtualization icon</title>
       <desc>RHOCPV</desc>
       <path

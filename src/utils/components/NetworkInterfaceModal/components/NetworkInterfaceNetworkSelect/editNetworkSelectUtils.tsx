@@ -1,25 +1,19 @@
-import React from 'react';
-
-import { POD_NETWORK } from '@kubevirt-utils/resources/vm';
-import { interfaceTypesProxy } from '@kubevirt-utils/resources/vm/utils/network/constants';
-import { Label } from '@patternfly/react-core';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { getNamespace } from '@kubevirt-utils/resources/shared';
+import { getNetworks } from '@kubevirt-utils/resources/vm';
 
 import {
-  getNadType,
+  getNadFullName,
   isNadFullName,
   isNADUsedInVM,
   isOvnOverlayNad,
   isPodNetworkName,
 } from '../../utils/helpers';
-import { NetworkAttachmentDefinition } from '../hooks/types';
-
+import { type NetworkAttachmentDefinition } from '../hooks/types';
 import type {
-  BuildNetworkSelectOptionsArgs,
   FilterNADsForSelectArgs,
-  GetEditingNetworkOptionIfMissingArgs,
   GetSelectTypeaheadKeyArgs,
   GetShowPodNetworkingOptionArgs,
-  NetworkSelectTypeaheadOptionProps,
 } from './types';
 
 export const getNadOptionValue = (
@@ -66,17 +60,14 @@ export const getSelectNetworkName = (
   }
 
   if (isNadFullName(networkName)) {
-    const [ns, name] = networkName.split('/');
-    if (ns === vmiNamespace) {
+    const [nadNamespace, name] = networkName.split('/');
+    if (nadNamespace === vmiNamespace) {
       return name;
     }
   }
 
   return networkName;
 };
-
-const getNetworkOptionLabel = (networkName: string, vmiNamespace: string): string =>
-  isNadFullName(networkName) ? networkName : `${vmiNamespace}/${networkName}`;
 
 export const filterNADsForSelect = ({
   currentlyUsedNADFullNames,
@@ -120,106 +111,12 @@ export const getSelectTypeaheadKey = ({
     ? 'select-nad-with-preselect'
     : 'select-nad-without-preselect';
 
-export const getEditingNetworkOptionIfMissing = ({
-  editInitValueNetworkName,
-  isEditing,
-  options,
-  selectNetworkName,
-  vmiNamespace,
-}: GetEditingNetworkOptionIfMissingArgs): NetworkSelectTypeaheadOptionProps | undefined => {
-  if (
-    !isEditing ||
-    !editInitValueNetworkName ||
-    !selectNetworkName ||
-    isPodNetworkName(editInitValueNetworkName) ||
-    options.some((option) => option.value === selectNetworkName)
-  ) {
-    return undefined;
-  }
+export const getCurrentlyUsedNADFullNames = (vm: V1VirtualMachine): string[] =>
+  getNetworks(vm)
+    ?.map((network) => network?.multus?.networkName)
+    .filter((name): name is string => Boolean(name))
+    .map((name) =>
+      isNadFullName(name) ? name : getNadFullName({ name, namespace: getNamespace(vm) }),
+    ) ?? [];
 
-  const label = getNetworkOptionLabel(editInitValueNetworkName, vmiNamespace);
-
-  return {
-    label,
-    optionProps: {
-      children: (
-        <>
-          {label} <Label isCompact>{interfaceTypesProxy.bridge} Binding</Label>
-        </>
-      ),
-      key: selectNetworkName,
-    },
-    type: interfaceTypesProxy.bridge,
-    value: selectNetworkName,
-  };
-};
-
-export const buildNetworkSelectOptions = ({
-  createdNetworkOptions,
-  editInitValueNetworkName,
-  filteredNADs,
-  isEditing,
-  podNetworkingText,
-  podNetworkType,
-  selectNetworkName,
-  showPodNetworkingOption,
-  vmiNamespace,
-}: BuildNetworkSelectOptionsArgs): NetworkSelectTypeaheadOptionProps[] => {
-  const options: NetworkSelectTypeaheadOptionProps[] = filteredNADs.map((nad) => {
-    const { name, namespace: nadNamespace } = nad.metadata;
-    const type = getNadType(nad);
-    const displayedValue = `${nadNamespace}/${name}`;
-    const value = getNadOptionValue(nad, vmiNamespace);
-
-    return {
-      label: displayedValue,
-      optionProps: {
-        children: (
-          <>
-            {displayedValue} <Label isCompact>{getNadType(nad)} Binding</Label>
-          </>
-        ),
-        key: value,
-      },
-      type,
-      value,
-    };
-  });
-
-  options.sort((a, b) => a.label.localeCompare(b.label, undefined, { numeric: true }));
-
-  if (showPodNetworkingOption) {
-    options.unshift({
-      label: podNetworkingText,
-      optionProps: {
-        children: (
-          <>
-            {podNetworkingText} <Label isCompact>{podNetworkType} Binding</Label>
-          </>
-        ),
-        key: POD_NETWORK,
-      },
-      type: podNetworkType,
-      value: POD_NETWORK,
-    });
-  }
-
-  const editingNetworkOption = getEditingNetworkOptionIfMissing({
-    editInitValueNetworkName,
-    isEditing,
-    options,
-    selectNetworkName,
-    vmiNamespace,
-  });
-
-  if (editingNetworkOption) {
-    options.push(editingNetworkOption);
-  }
-
-  return [
-    ...options,
-    ...createdNetworkOptions.filter(({ value }) =>
-      options.every((option) => option.value !== value),
-    ),
-  ];
-};
+export { buildNetworkSelectOptions, getEditingNetworkOptionIfMissing } from './buildNetworkOptions';

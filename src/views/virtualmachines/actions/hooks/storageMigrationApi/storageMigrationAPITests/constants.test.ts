@@ -2,7 +2,7 @@ import {
   csvLoadedIndicatesMultiNsStorageMigrationApi,
   csvVersionMeetsMultiNsAssumeThreshold,
   STORAGE_MIGRATION_ASSUME_MULTI_NS_API_MIN_VERSION,
-} from './constants';
+} from '../constants';
 
 describe('STORAGE_MIGRATION_ASSUME_MULTI_NS_API_MIN_VERSION', () => {
   it('is 4.21 per storage migration API assumptions', () => {

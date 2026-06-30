@@ -138,7 +138,7 @@
       "npm run i18n"
     ],
     "*.{js,ts,tsx,jsx}": [
-      "eslint --config eslintv10.config.js --fix"
+      "eslint --config eslintv10.config.js --no-warn-ignored --fix"
     ],
     "*.scss": [
       "stylelint --fix"
