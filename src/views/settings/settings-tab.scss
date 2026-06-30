@@ -23,6 +23,10 @@
   &__content {
     max-width: 52.25rem;
     padding: var(--pf-t--global--spacer--lg);
+
+    &--full-width {
+      max-width: unset;
+    }
   }
 }
 

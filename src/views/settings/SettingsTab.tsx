@@ -26,9 +26,13 @@ const SettingsTab: FC = () => {
       </div>
       <div className="settings-tab__scrollable">
         <Card className="settings-tab__card">
-          {tabs.map(({ Component, dataTest, name }) =>
+          {tabs.map(({ Component, dataTest, isFullWidth, name }) =>
             activeTab === name ? (
-              <div className="settings-tab__content" data-test={dataTest} key={name}>
+              <div
+                className={`settings-tab__content${isFullWidth ? ' settings-tab__content--full-width' : ''}`}
+                data-test={dataTest}
+                key={name}
+              >
                 <Component />
               </div>
             ) : null,

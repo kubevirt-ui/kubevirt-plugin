@@ -10,6 +10,7 @@ import {
 import {
   CLUSTER_TAB_IDS,
   PREVIEW_FEATURES_TAB_IDS,
+  RECOMMENDED_TAB_IDS,
   SEARCH_ITEM_CHILDREN_TREE,
   USER_TAB_IDS,
 } from './constants';
@@ -47,6 +48,10 @@ const getUserTabIds = (t: TFunction): SearchItem[] => [
   { id: USER_TAB_IDS.guidedTour, title: t('Guided tour') },
 ];
 
+const getRecommendedTabIds = (t: TFunction): SearchItem[] => [
+  { id: RECOMMENDED_TAB_IDS.recommendedCapabilities, title: t('Recommended capabilities') },
+];
+
 const getPreviewFeaturesTabIds = (t: TFunction): SearchItem[] => [
   { id: PREVIEW_FEATURES_TAB_IDS.previewFeatures, title: t('Preview features') },
   {
@@ -67,6 +72,7 @@ export const getSearchItems = (t: TFunction): SearchItemWithTab[] => {
   const tabsIds: { [key: string]: SearchItem[] } = {
     cluster: getClusterTabIds(t),
     features: getPreviewFeaturesTabIds(t),
+    recommended: getRecommendedTabIds(t),
     user: getUserTabIds(t),
   };
 
