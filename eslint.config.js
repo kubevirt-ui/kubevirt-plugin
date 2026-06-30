@@ -1,8 +1,10 @@
+import i18next from 'eslint-plugin-i18next';
 import jsdoc from 'eslint-plugin-jsdoc';
 import perfectionist from 'eslint-plugin-perfectionist';
 import prettier from 'eslint-plugin-prettier/recommended';
 import reactHooks from 'eslint-plugin-react-hooks';
 import simpleImportSort from 'eslint-plugin-simple-import-sort';
+import testingLibrary from 'eslint-plugin-testing-library';
 import tseslint from 'typescript-eslint';
 
 const ignoresConfig = {
@@ -38,12 +40,14 @@ const baseConfig = {
     reportUnusedDisableDirectives: 'off',
   },
   plugins: {
+    i18next,
     jsdoc,
     perfectionist,
     'react-hooks': reactHooks,
     'simple-import-sort': simpleImportSort,
   },
   rules: {
+    'i18next/no-literal-string': 'error',
     'no-console': 'error',
     'no-nested-ternary': 'error',
     'perfectionist/sort-classes': [
@@ -90,6 +94,11 @@ const githubScriptsOverrides = {
   },
 };
 
+const testingLibraryConfig = {
+  ...testingLibrary.configs['flat/react'],
+  files: ['src/**/*.test.{ts,tsx}', 'src/**/*.spec.{ts,tsx}', 'src/**/__tests__/**/*.{ts,tsx}'],
+};
+
 export default [
   ignoresConfig,
   baseConfig,
@@ -97,4 +106,5 @@ export default [
   prettier,
   prettierOverrides,
   githubScriptsOverrides,
+  testingLibraryConfig,
 ];

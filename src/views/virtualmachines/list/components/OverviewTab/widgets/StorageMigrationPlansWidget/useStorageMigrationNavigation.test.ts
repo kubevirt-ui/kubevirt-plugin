@@ -1,6 +1,6 @@
 import { STORAGE_MIGRATION_API } from '@kubevirt-utils/resources/migrations/constants';
 import useManagedClusterConsoleURLs from '@multicluster/hooks/useManagedClusterConsoleURLs';
-import { cleanup, renderHook } from '@testing-library/react';
+import { renderHook } from '@testing-library/react';
 
 import useStorageMigrationNavigation from './useStorageMigrationNavigation';
 
@@ -29,7 +29,6 @@ jest.mock('@virtualmachines/actions/hooks/storageMigrationApi/constants', () => 
 const mockUseManagedClusterConsoleURLs = useManagedClusterConsoleURLs as jest.Mock;
 
 afterEach(() => {
-  cleanup();
   mockUseManagedClusterConsoleURLs.mockReset();
   mockUseManagedClusterConsoleURLs.mockReturnValue({ spokeConsoleURL: '' });
 });
@@ -38,7 +37,7 @@ describe('useStorageMigrationNavigation', () => {
   describe('when storageMigAPI is LOADING', () => {
     it('should return empty paths', () => {
       const { result } = renderHook(() =>
-        useStorageMigrationNavigation(undefined, STORAGE_MIGRATION_API.LOADING, undefined),
+        useStorageMigrationNavigation(undefined, STORAGE_MIGRATION_API.LOADING),
       );
 
       expect(result.current.basePath).toBe('');
@@ -51,7 +50,7 @@ describe('useStorageMigrationNavigation', () => {
   describe('when storageMigAPI is NONE', () => {
     it('should return empty paths', () => {
       const { result } = renderHook(() =>
-        useStorageMigrationNavigation(undefined, STORAGE_MIGRATION_API.NONE, undefined),
+        useStorageMigrationNavigation(undefined, STORAGE_MIGRATION_API.NONE),
       );
 
       expect(result.current.basePath).toBe('');
@@ -72,7 +71,7 @@ describe('useStorageMigrationNavigation', () => {
 
     it('should always use custom route even when CSV version is undefined', () => {
       const { result } = renderHook(() =>
-        useStorageMigrationNavigation(undefined, STORAGE_MIGRATION_API.MULTI_NS, undefined),
+        useStorageMigrationNavigation(undefined, STORAGE_MIGRATION_API.MULTI_NS),
       );
 
       expect(result.current.basePath).toBe('/k8s/all-namespaces/storagemigrations');
@@ -124,7 +123,7 @@ describe('useStorageMigrationNavigation', () => {
 
     it('should fall back to GVK resource URL when CSV version is undefined', () => {
       const { result } = renderHook(() =>
-        useStorageMigrationNavigation('spoke-cluster', STORAGE_MIGRATION_API.MULTI_NS, undefined),
+        useStorageMigrationNavigation('spoke-cluster', STORAGE_MIGRATION_API.MULTI_NS),
       );
 
       expect(result.current.basePath).toContain('https://spoke.example.com');
