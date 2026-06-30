@@ -81,7 +81,12 @@ export const useDropdownNavigation = ({
 
   const handleKeyDown = useCallback(
     (event: KeyboardEvent<HTMLInputElement>) => {
-      if (event.key === KeyTypes.ArrowDown || event.key === KeyTypes.ArrowUp) {
+      if (
+        event.key === KeyTypes.ArrowDown ||
+        event.key === KeyTypes.ArrowUp ||
+        event.key === KeyTypes.ArrowLeft ||
+        event.key === KeyTypes.ArrowRight
+      ) {
         if (onArrowKey?.(event)) return;
       }
 
