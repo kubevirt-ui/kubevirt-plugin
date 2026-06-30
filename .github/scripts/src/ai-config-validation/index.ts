@@ -1,7 +1,7 @@
 import { runAiConfigValidation } from './run-validation';
 import { createOctokit } from '../github-repo';
 import { setCommitStatus } from '../github-comments';
-import { AI_CONFIG_REVIEWED_LABEL, AI_CONFIG_STATUS_CONTEXT } from '../types/index';
+import { AI_CONFIG } from './constants';
 import type { GitHubConfig } from '../types/index';
 import { requireEnv, safeErrorMessage } from '../utils';
 
@@ -38,7 +38,7 @@ const main = async (): Promise<void> => {
 
   if (outcome.kind === 'failed') {
     console.error(
-      `AI configuration validation failed. Add "${AI_CONFIG_REVIEWED_LABEL}" label after security review.`,
+      `AI configuration validation failed. Add "${AI_CONFIG.LABELS.REVIEWED}" label after security review.`,
     );
     process.exit(1);
   }
@@ -66,7 +66,7 @@ main().catch(async (err) => {
       headSha,
       'error',
       'AI configuration validation encountered an unexpected error',
-      AI_CONFIG_STATUS_CONTEXT,
+      AI_CONFIG.STATUS_CONTEXT,
     );
   } catch {
     // best-effort

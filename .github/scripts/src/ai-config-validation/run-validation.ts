@@ -7,7 +7,7 @@ import { getSensitivePaths } from './paths';
 import { buildStatusDescription } from './utils';
 import { getPrLabelNames, removeLabel } from '../github-comments';
 import { getPullRequestFiles } from '../github-repo';
-import { AI_CONFIG_REVIEWED_LABEL, AI_CONFIG_SKIP_LABEL } from '../types/index';
+import { AI_CONFIG } from './constants';
 import type { GitHubConfig } from '../types/index';
 
 export type { AiConfigValidationEvent };
@@ -65,7 +65,7 @@ export const runAiConfigValidation = async (
     ctx.prNumber,
   );
 
-  if (hasSensitiveChanges && prLabels.has(AI_CONFIG_SKIP_LABEL)) {
+  if (hasSensitiveChanges && prLabels.has(AI_CONFIG.LABELS.SKIP)) {
     await reportCommitStatus(
       labelCtx,
       'success',
@@ -77,19 +77,19 @@ export const runAiConfigValidation = async (
   if (
     hasSensitiveChanges &&
     ctx.event.action === 'synchronize' &&
-    prLabels.has(AI_CONFIG_REVIEWED_LABEL)
+    prLabels.has(AI_CONFIG.LABELS.REVIEWED)
   ) {
     await removeLabel(
       ctx.octokit,
       ctx.config.owner,
       ctx.config.repo,
       ctx.prNumber,
-      AI_CONFIG_REVIEWED_LABEL,
+      AI_CONFIG.LABELS.REVIEWED,
     );
-    prLabels.delete(AI_CONFIG_REVIEWED_LABEL);
+    prLabels.delete(AI_CONFIG.LABELS.REVIEWED);
   }
 
-  const reviewed = prLabels.has(AI_CONFIG_REVIEWED_LABEL);
+  const reviewed = prLabels.has(AI_CONFIG.LABELS.REVIEWED);
   const passed = !hasSensitiveChanges || reviewed;
 
   await syncAiConfigLabels(labelCtx, passed, hasSensitiveChanges);

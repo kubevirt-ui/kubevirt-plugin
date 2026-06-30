@@ -1,11 +1,7 @@
 import type { Octokit } from '@octokit/rest';
 
 import { addLabel, removeLabel, setCommitStatus } from '../github-comments';
-import {
-  AI_CONFIG_ALERT_LABEL,
-  AI_CONFIG_BLOCK_LABEL,
-  AI_CONFIG_STATUS_CONTEXT,
-} from '../types/index';
+import { AI_CONFIG } from './constants';
 import type { GitHubConfig } from '../types/index';
 
 const LABEL_META = {
@@ -38,7 +34,7 @@ export const reportCommitStatus = async (
     ctx.headSha,
     state,
     description,
-    AI_CONFIG_STATUS_CONTEXT,
+    AI_CONFIG.STATUS_CONTEXT,
   );
 };
 
@@ -50,8 +46,8 @@ export const syncAiConfigLabels = async (
   const { octokit, config, prNumber } = ctx;
 
   if (!hasSensitiveChanges) {
-    await removeLabel(octokit, config.owner, config.repo, prNumber, AI_CONFIG_ALERT_LABEL);
-    await removeLabel(octokit, config.owner, config.repo, prNumber, AI_CONFIG_BLOCK_LABEL);
+    await removeLabel(octokit, config.owner, config.repo, prNumber, AI_CONFIG.LABELS.ALERT);
+    await removeLabel(octokit, config.owner, config.repo, prNumber, AI_CONFIG.LABELS.BLOCK);
     return;
   }
 
@@ -60,12 +56,12 @@ export const syncAiConfigLabels = async (
     config.owner,
     config.repo,
     prNumber,
-    AI_CONFIG_ALERT_LABEL,
+    AI_CONFIG.LABELS.ALERT,
     LABEL_META.alert,
   );
 
   if (passed) {
-    await removeLabel(octokit, config.owner, config.repo, prNumber, AI_CONFIG_BLOCK_LABEL);
+    await removeLabel(octokit, config.owner, config.repo, prNumber, AI_CONFIG.LABELS.BLOCK);
     return;
   }
 
@@ -74,7 +70,7 @@ export const syncAiConfigLabels = async (
     config.owner,
     config.repo,
     prNumber,
-    AI_CONFIG_BLOCK_LABEL,
+    AI_CONFIG.LABELS.BLOCK,
     LABEL_META.block,
   );
 };
