@@ -52,14 +52,9 @@ env:
 jobs:
   cluster-health-check:
     name: Cluster Health Check
-    if: >-
-      github.event_name == 'workflow_dispatch' ||
-      github.event.pull_request.head.repo.full_name == github.repository ||
-      contains(fromJSON('["MEMBER","OWNER","COLLABORATOR"]'), github.event.pull_request.author_association) ||
-      (github.event.action == 'labeled' && contains(github.event.pull_request.labels.*.name, 'ok-to-test'))
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    continue-on-error: true
     steps:
       - name: Checkout
         uses: actions/checkout@v6
