@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useEffect } from 'react';
+import React, { FC, useCallback, useEffect, useMemo } from 'react';
 import { Updater } from 'use-immer';
 
 import { V1beta1Plan } from '@kubev2v/types';
@@ -16,6 +16,8 @@ import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import {
   Bullseye,
+  Button,
+  ButtonVariant,
   Form,
   FormGroup,
   Spinner,
@@ -23,11 +25,15 @@ import {
   SplitItem,
   Title,
 } from '@patternfly/react-core';
-import { ArrowRightIcon } from '@patternfly/react-icons';
+import { ArrowRightIcon, WrenchIcon } from '@patternfly/react-icons';
 import { useHubClusterName } from '@stolostron/multicluster-sdk';
 
+import useAdvisorRouteURL from '../hooks/useAdvisorRouteURL';
+import useClusterRecommendation from '../hooks/useClusterRecommendation';
 import useClustersAndProjects from '../hooks/useClustersAndProjects';
 import { getClusterFromProvider } from '../utils';
+
+import ClusterRecommendationPanel from './ClusterRecommendationPanel';
 
 import './TargetStep.scss';
 
@@ -42,6 +48,23 @@ const TargetStep: FC<TargetStepProps> = ({ migrationPlan, setMigrationPlan, vms 
   const [hubClusterName] = useHubClusterName();
   const sourceCluster = getCluster(vms?.[0]) ?? hubClusterName;
   const sourceNamespace = getNamespace(vms?.[0]);
+
+  const [advisorBaseURL] = useAdvisorRouteURL();
+  const vmQueryParams = useMemo(
+    () => ({
+      cluster: sourceCluster,
+      vmName: getName(vms?.[0]),
+      vmNamespace: sourceNamespace,
+    }),
+    [sourceCluster, vms, sourceNamespace],
+  );
+  const {
+    data: recData,
+    error: recError,
+    fetchRecommendation,
+    loaded: recLoaded,
+    loading: recLoading,
+  } = useClusterRecommendation(advisorBaseURL, vmQueryParams);
 
   const selectedProviderTarget = getTargetProviderName(migrationPlan);
   const selectedClusterTarget = getClusterFromProvider(selectedProviderTarget);
@@ -99,6 +122,13 @@ const TargetStep: FC<TargetStepProps> = ({ migrationPlan, setMigrationPlan, vms 
       });
     },
     [setMigrationPlan],
+  );
+
+  const onRecommendationSelect = useCallback(
+    (clusterName: string) => {
+      onClusterChange(clusterName);
+    },
+    [onClusterChange],
   );
 
   return (
@@ -168,6 +198,23 @@ const TargetStep: FC<TargetStepProps> = ({ migrationPlan, setMigrationPlan, vms 
             )}
           </SplitItem>
         </Split>
+        {advisorBaseURL && (
+          <Button
+            icon={<WrenchIcon />}
+            isDisabled={recLoading}
+            onClick={fetchRecommendation}
+            variant={ButtonVariant.secondary}
+          >
+            {t('Get cluster recommendation')}
+          </Button>
+        )}
+        <ClusterRecommendationPanel
+          data={recData}
+          error={recError}
+          loaded={recLoaded}
+          loading={recLoading}
+          onSelectCluster={onRecommendationSelect}
+        />
       </Form>
     </StateHandler>
   );
