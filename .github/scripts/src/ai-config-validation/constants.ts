@@ -12,14 +12,7 @@ export const AI_CONFIG = {
     REVIEWED: 'ai-config-reviewed',
     SKIP: 'skip-ai-config-check',
   },
-  PATH_PREFIXES: [
-    '.cursor/',
-    '.claude/',
-    '.codex/',
-    '.windsurf/',
-    '.gemini/',
-    '.vscode/',
-  ] as const,
+  PATH_PREFIXES: ['.cursor/', '.claude/', '.codex/', '.windsurf/', '.gemini/', '.vscode/'] as const,
   RELATED_AUTOMATION_PATHS: [
     '.github/workflows/jira_pr_check.yml',
     '.github/workflows/ai_config_pr_check.yml',
