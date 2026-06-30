@@ -74,7 +74,11 @@ export const runAiConfigValidation = async (
     return { kind: 'skipped' };
   }
 
-  if (hasSensitiveChanges && ctx.event.action === 'synchronize' && prLabels.has(AI_CONFIG_REVIEWED_LABEL)) {
+  if (
+    hasSensitiveChanges &&
+    ctx.event.action === 'synchronize' &&
+    prLabels.has(AI_CONFIG_REVIEWED_LABEL)
+  ) {
     await removeLabel(
       ctx.octokit,
       ctx.config.owner,

@@ -11,12 +11,18 @@ describe('isSensitiveAiConfigPath', () => {
   });
 
   it('matches PR automation scripts', () => {
-    assert.equal(isSensitiveAiConfigPath('.github/scripts/src/ai-config-validation/index.ts'), true);
+    assert.equal(
+      isSensitiveAiConfigPath('.github/scripts/src/ai-config-validation/index.ts'),
+      true,
+    );
     assert.equal(isSensitiveAiConfigPath('.github/workflows/ai_config_pr_check.yml'), true);
   });
 
   it('ignores regular application code', () => {
-    assert.equal(isSensitiveAiConfigPath('src/views/virtualmachines/list/VirtualMachinesList.tsx'), false);
+    assert.equal(
+      isSensitiveAiConfigPath('src/views/virtualmachines/list/VirtualMachinesList.tsx'),
+      false,
+    );
     assert.equal(isSensitiveAiConfigPath('.github/workflows/ci_checks.yml'), false);
   });
 });

@@ -17,9 +17,7 @@ export const AI_CONFIG_EXACT_PATHS = [
 ] as const;
 
 /** PR review automation — changes here can weaken or bypass merge gates. */
-export const AI_RELATED_AUTOMATION_PREFIXES = [
-  '.github/scripts/',
-] as const;
+export const AI_RELATED_AUTOMATION_PREFIXES = ['.github/scripts/'] as const;
 
 export const AI_RELATED_AUTOMATION_PATHS = [
   '.github/workflows/jira_pr_check.yml',

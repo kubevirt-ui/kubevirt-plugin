@@ -84,7 +84,10 @@ export const getPrLabelNames = async (
   issueNumber: number,
 ): Promise<Set<string>> => {
   const { data: labels } = await octokit.issues.listLabelsOnIssue({
-    owner, repo, issue_number: issueNumber, per_page: 100,
+    owner,
+    repo,
+    issue_number: issueNumber,
+    per_page: 100,
   });
   return new Set(labels.map((label) => label.name));
 };

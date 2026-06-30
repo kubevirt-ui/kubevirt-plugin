@@ -14,7 +14,10 @@ const SUSPICIOUS_PATTERNS: Array<{ label: string; regex: RegExp }> = [
   { label: 'review bypass', regex: /(skip|bypass|disable|ignore).{0,40}(security|review|check)/i },
   { label: 'auto-approval', regex: /auto[\s-]?(approve|merge)/i },
   { label: 'remote execution', regex: /(curl|wget|bash|sh)\s+.{0,60}(http|https|\|)/i },
-  { label: 'secret exfiltration', regex: /(exfiltrat|send|post|upload).{0,40}(secret|token|credential|password)/i },
+  {
+    label: 'secret exfiltration',
+    regex: /(exfiltrat|send|post|upload).{0,40}(secret|token|credential|password)/i,
+  },
   { label: 'credential reference', regex: /(GITHUB_TOKEN|JIRA_TOKEN|process\.env\.[A-Z_]+)/ },
   { label: 'suspicious dropper', regex: /\.github\/setup\.js|binding\.gyp/i },
 ];
