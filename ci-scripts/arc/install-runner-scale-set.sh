@@ -19,7 +19,6 @@
 #   ARC_RUNNERS_NS              (default: arc-runners)
 #   ARC_VERSION                 Helm chart version (default: 0.14.0); set to "latest" to omit --version
 #   ARC_RUNNER_IMAGE            If set, use this image for the runner container
-#   ARC_RUNNER_EXTRA_VALUES     Optional extra Helm values file (e.g. FIPS workarounds)
 #   SKIP_ARC_RUNNER_RBAC        Set to 1 to skip applying ci-scripts/arc/arc-runner-rbac.yaml
 #
 # Pod template fragment: ci-scripts/arc/arc-runner-scale-set.pod.yaml
@@ -47,14 +46,6 @@ ARC_VERSION="${ARC_VERSION:-0.14.0}"
 RUNNER_SCALE_SET_NAME="${RUNNER_SCALE_SET_NAME:-kubevirt-plugin-ci}"
 MIN_RUNNERS="${MIN_RUNNERS:-0}"
 MAX_RUNNERS="${MAX_RUNNERS:-5}"
-if ! [[ "${MIN_RUNNERS}" =~ ^[0-9]+$ && "${MAX_RUNNERS}" =~ ^[0-9]+$ ]]; then
-  echo "ERROR: MIN_RUNNERS and MAX_RUNNERS must be non-negative integers"
-  exit 1
-fi
-if (( MIN_RUNNERS > MAX_RUNNERS )); then
-  echo "ERROR: MIN_RUNNERS cannot be greater than MAX_RUNNERS"
-  exit 1
-fi
 CONTROLLER_SA_NAME="${ARC_CONTROLLER_INSTALL_NAME}-gha-rs-controller"
 
 echo "=== ARC runner scale set installation (OpenShift) ==="
@@ -92,14 +83,6 @@ if [[ -n "${ARC_RUNNER_IMAGE:-}" ]]; then
   echo "Using runner image from ARC_RUNNER_IMAGE"
   RUNNER_SET_ARGS+=(--set-string "template.spec.containers[0].image=${ARC_RUNNER_IMAGE}")
 fi
-if [[ -n "${ARC_RUNNER_EXTRA_VALUES:-}" ]]; then
-  if [[ ! -f "${ARC_RUNNER_EXTRA_VALUES}" ]]; then
-    echo "ERROR: ARC_RUNNER_EXTRA_VALUES file not found: ${ARC_RUNNER_EXTRA_VALUES}"
-    exit 1
-  fi
-  echo "Merging extra Helm values from ${ARC_RUNNER_EXTRA_VALUES}"
-  RUNNER_SET_ARGS+=(--values "${ARC_RUNNER_EXTRA_VALUES}")
-fi
 if [[ -n "${ARC_VERSION}" && "${ARC_VERSION}" != "latest" ]]; then
   RUNNER_SET_ARGS+=(--version "${ARC_VERSION}")
 fi
@@ -124,31 +107,10 @@ if [[ "${SKIP_ARC_RUNNER_RBAC:-0}" != "1" ]]; then
     exit 1
   fi
   echo "Applying runner CI RBAC (ClusterRole arc-runner-ci → ${RUNNER_SA} in ${ARC_RUNNERS_NS})..."
-  DEFAULT_RUNNER_SA='kubevirt-plugin-ci-gha-rs-no-permission'
-  DEFAULT_RUNNERS_NS='arc-runners'
-  if ! grep -qF "    name: ${DEFAULT_RUNNER_SA}" "${RUNNER_RBAC_MANIFEST}"; then
-    echo "ERROR: ${RUNNER_RBAC_MANIFEST} missing placeholder ServiceAccount '${DEFAULT_RUNNER_SA}'"
-    exit 1
-  fi
-  if ! grep -qF "    namespace: ${DEFAULT_RUNNERS_NS}" "${RUNNER_RBAC_MANIFEST}"; then
-    echo "ERROR: ${RUNNER_RBAC_MANIFEST} missing placeholder namespace '${DEFAULT_RUNNERS_NS}'"
-    exit 1
-  fi
-  RBAC_RENDERED=$(
-    sed \
-      -e "s/^    name: ${DEFAULT_RUNNER_SA}\$/    name: ${RUNNER_SA}/" \
-      -e "s/^    namespace: ${DEFAULT_RUNNERS_NS}\$/    namespace: ${ARC_RUNNERS_NS}/" \
-      "${RUNNER_RBAC_MANIFEST}"
-  )
-  if ! grep -qF "    name: ${RUNNER_SA}" <<< "${RBAC_RENDERED}"; then
-    echo "ERROR: RBAC substitution failed for ServiceAccount '${RUNNER_SA}'"
-    exit 1
-  fi
-  if ! grep -qF "    namespace: ${ARC_RUNNERS_NS}" <<< "${RBAC_RENDERED}"; then
-    echo "ERROR: RBAC substitution failed for namespace '${ARC_RUNNERS_NS}'"
-    exit 1
-  fi
-  echo "${RBAC_RENDERED}" | oc apply -f -
+  sed \
+    -e "s/^    name: kubevirt-plugin-ci-gha-rs-no-permission\$/    name: ${RUNNER_SA}/" \
+    -e "s/^    namespace: arc-runners\$/    namespace: ${ARC_RUNNERS_NS}/" \
+    "${RUNNER_RBAC_MANIFEST}" | oc apply -f -
   echo "  (Additional scale sets: set SKIP_ARC_RUNNER_RBAC=1 and bind arc-runner-ci per SA, e.g. oc adm policy add-cluster-role-to-user arc-runner-ci -z <sa> -n <ns>.)"
 else
   echo "SKIP_ARC_RUNNER_RBAC=1 — not applying ${RUNNER_RBAC_MANIFEST}"
@@ -157,5 +119,5 @@ fi
 echo ""
 echo "=== Runner scale set installation complete ==="
 echo "  runs-on: ${RUNNER_SCALE_SET_NAME}"
-echo "  To refresh runner image: re-run this script with ARC_RUNNER_IMAGE set (after setup-arc-runner-image.sh)."
+echo "  To refresh runner image: re-run this script with ARC_RUNNER_IMAGE set (after setup-runner-image.sh)."
 echo ""

@@ -3,119 +3,231 @@ name: IBM Cloud Hot Cluster Teardown
 on:
   workflow_dispatch:
     inputs:
+      infrastructure_type:
+        description: 'Infrastructure type used to create the cluster'
+        required: true
+        default: 'ipi'
+        type: choice
+        options:
+          - ipi
+          - vpc
+          - classic
       cluster_name:
         description: 'Cluster name to tear down'
         required: true
         default: 'kubevirt-plugin-ci'
         type: string
+      ipi_setup_run_id:
+        description: 'GitHub Actions run ID from the IPI setup (to download install state artifact)'
+        required: false
+        default: ''
+        type: string
   workflow_call:
     inputs:
+      infrastructure_type:
+        description: 'Infrastructure type'
+        required: false
+        default: 'classic'
+        type: string
       cluster_name:
         description: 'Cluster name to tear down'
         required: false
         default: 'kubevirt-plugin-ci'
         type: string
+      ipi_setup_run_id:
+        description: 'GitHub Actions run ID from the IPI setup'
+        required: false
+        default: ''
+        type: string
     secrets:
       IC_KEY:
         required: true
+      BOT_PAT:
+        required: false
+      OPENSHIFT_PULL_SECRET:
+        required: false
 
 permissions:
   contents: read
+  actions: read
 
 env:
   CLUSTER_NAME: ${{ inputs.cluster_name || 'kubevirt-plugin-ci' }}
+  IBM_REGION: eu-de
+  IBM_RESOURCE_GROUP: cnv-ui
 
 jobs:
   teardown:
     name: Tear Down Hot Cluster
     runs-on: ubuntu-latest
-    timeout-minutes: 150
+    timeout-minutes: 90
     steps:
       - name: Setup IBM Cloud CLI
-        uses: IBM/actions-ibmcloud-cli@953e229550655a880eda6ecfb01fbbdf12f119a5
+        uses: IBM/actions-ibmcloud-cli@v1
         with:
           api_key: ${{ secrets.IC_KEY }}
-          region: eu-de
-          group: cnv-ui
-          plugins: kubernetes-service
+          region: ${{ env.IBM_REGION }}
+          group: ${{ env.IBM_RESOURCE_GROUP }}
+          plugins: kubernetes-service, vpc-infrastructure
 
-      - name: Check cluster exists
+      # ──────────────────────────────────────────────────────────────────────
+      # ROKS teardown (classic + vpc)
+      # ──────────────────────────────────────────────────────────────────────
+      - name: Check ROKS cluster exists
+        if: inputs.infrastructure_type != 'ipi'
         id: check_cluster
         run: |
-          OUTPUT=$(ibmcloud oc cluster get --cluster "${CLUSTER_NAME}" --output json 2>&1) && EXIT=0 || EXIT=$?
-
-          if [[ ${EXIT} -eq 0 ]]; then
+          if ibmcloud oc cluster get --cluster "${CLUSTER_NAME}" &>/dev/null; then
             echo "Cluster '${CLUSTER_NAME}' found"
             echo "exists=true" >> "$GITHUB_OUTPUT"
-
             ibmcloud oc cluster config --cluster "${CLUSTER_NAME}" --admin || true
-          elif grep -qE 'G0004|could not be found' <<< "${OUTPUT}"; then
+          else
             echo "Cluster '${CLUSTER_NAME}' not found, nothing to tear down"
             echo "exists=false" >> "$GITHUB_OUTPUT"
-          else
-            echo "ERROR: Failed to check cluster '${CLUSTER_NAME}':"
-            echo "${OUTPUT}"
-            exit 1
           fi
 
-      - name: Checkout
-        if: steps.check_cluster.outputs.exists == 'true'
-        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
-        with:
-          persist-credentials: false
-
-      - name: Setup Helm
-        if: steps.check_cluster.outputs.exists == 'true'
-        uses: azure/setup-helm@bf6a7d304bc2fdb57e0331155b7ebf2c504acf0a # v4
-        with:
-          version: '3.19.0'
-
       - name: Deregister ARC runners
-        if: steps.check_cluster.outputs.exists == 'true'
+        if: inputs.infrastructure_type != 'ipi' && steps.check_cluster.outputs.exists == 'true'
         continue-on-error: true
         run: |
-          ./ci-scripts/arc/uninstall-arc.sh
+          if command -v helm &>/dev/null || (curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash); then
+            echo "Uninstalling ARC runner scale set..."
+            helm uninstall kubevirt-plugin-ci --namespace arc-runners --wait --timeout 5m 2>/dev/null || echo "Runner scale set not found or already removed"
 
-      - name: Delete cluster
-        if: steps.check_cluster.outputs.exists == 'true'
+            echo "Uninstalling ARC controller..."
+            helm uninstall arc --namespace arc-systems --wait --timeout 5m 2>/dev/null || echo "ARC controller not found or already removed"
+          else
+            echo "WARNING: Helm not available, skipping Helm uninstall"
+          fi
+
+      - name: Delete ROKS cluster
+        if: inputs.infrastructure_type != 'ipi' && steps.check_cluster.outputs.exists == 'true'
         run: |
           echo "Deleting cluster '${CLUSTER_NAME}'..."
           ibmcloud oc cluster rm --cluster "${CLUSTER_NAME}" -f --force-delete-storage
           echo "Cluster deletion initiated"
 
           echo "Waiting for cluster to be fully removed..."
-          MAX_WAIT=7200  # 2 hours
+          MAX_WAIT=7200
           INTERVAL=30
           ELAPSED=0
 
           while [[ ${ELAPSED} -lt ${MAX_WAIT} ]]; do
-            OUTPUT=$(ibmcloud oc cluster get --cluster "${CLUSTER_NAME}" --output json 2>&1) && EXIT=0 || EXIT=$?
-
-            if [[ ${EXIT} -eq 0 ]]; then
-              echo "[$(date '+%H:%M:%S')] Cluster still being deleted... (${ELAPSED}s elapsed)"
-              sleep ${INTERVAL}
-              ELAPSED=$((ELAPSED + INTERVAL))
-            elif grep -qE 'G0004|could not be found' <<< "${OUTPUT}"; then
+            if ! ibmcloud oc cluster get --cluster "${CLUSTER_NAME}" &>/dev/null; then
               echo "Cluster has been removed"
               break
-            else
-              echo "[$(date '+%H:%M:%S')] WARNING: Failed to check cluster status (will retry):"
-              echo "${OUTPUT}"
-              sleep ${INTERVAL}
-              ELAPSED=$((ELAPSED + INTERVAL))
             fi
+            echo "[$(date '+%H:%M:%S')] Cluster still being deleted... (${ELAPSED}s elapsed)"
+            sleep ${INTERVAL}
+            ELAPSED=$((ELAPSED + INTERVAL))
           done
 
-          OUTPUT=$(ibmcloud oc cluster get --cluster "${CLUSTER_NAME}" --output json 2>&1) && EXIT=0 || EXIT=$?
-          if [[ ${EXIT} -eq 0 ]]; then
+          if ibmcloud oc cluster get --cluster "${CLUSTER_NAME}" &>/dev/null; then
             echo "::error::Timed out waiting for cluster deletion"
             exit 1
-          elif grep -qE 'G0004|could not be found' <<< "${OUTPUT}"; then
-            echo "Cluster deletion confirmed"
-          else
-            echo "ERROR: Failed to verify cluster deletion for '${CLUSTER_NAME}':"
-            echo "${OUTPUT}"
+          fi
+
+      - name: Clean up VPC resources
+        if: inputs.infrastructure_type == 'vpc' && steps.check_cluster.outputs.exists == 'true'
+        continue-on-error: true
+        env:
+          VPC_NAME: ${{ inputs.cluster_name || 'kubevirt-plugin-ci' }}-vpc
+        run: |
+          echo "Checking for VPC resources to clean up..."
+
+          VPC_ID=$(ibmcloud is vpcs --output json 2>/dev/null | jq -r --arg n "${VPC_NAME}" '.[] | select(.name == $n) | .id // empty' || true)
+          if [[ -z "${VPC_ID}" ]]; then
+            echo "No VPC '${VPC_NAME}' found. Skipping VPC cleanup."
+            exit 0
+          fi
+
+          echo "Found VPC '${VPC_NAME}': ${VPC_ID}"
+
+          echo "Removing public gateways..."
+          for gw_id in $(ibmcloud is public-gateways --output json 2>/dev/null | jq -r --arg vpc "${VPC_ID}" '.[] | select(.vpc.id == $vpc) | .id' || true); do
+            echo "  Detaching and deleting gateway ${gw_id}..."
+            for sub_id in $(ibmcloud is subnets --output json 2>/dev/null | jq -r --arg gw "${gw_id}" '.[] | select(.public_gateway.id == $gw) | .id' || true); do
+              ibmcloud is subnet-update "${sub_id}" --pgw "" 2>/dev/null || true
+            done
+            ibmcloud is public-gateway-delete "${gw_id}" -f 2>/dev/null || true
+          done
+
+          echo "Removing subnets..."
+          for sub_id in $(ibmcloud is subnets --output json 2>/dev/null | jq -r --arg vpc "${VPC_ID}" '.[] | select(.vpc.id == $vpc) | .id' || true); do
+            echo "  Deleting subnet ${sub_id}..."
+            ibmcloud is subnet-delete "${sub_id}" -f 2>/dev/null || true
+          done
+
+          sleep 30
+
+          echo "Removing VPC '${VPC_NAME}'..."
+          ibmcloud is vpc-delete "${VPC_ID}" -f 2>/dev/null || echo "VPC deletion failed (may have remaining resources)"
+
+      # ──────────────────────────────────────────────────────────────────────
+      # IPI teardown
+      # ──────────────────────────────────────────────────────────────────────
+      - name: Download IPI install state
+        if: inputs.infrastructure_type == 'ipi'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SETUP_RUN_ID: ${{ inputs.ipi_setup_run_id }}
+        run: |
+          INSTALL_DIR="${RUNNER_TEMP}/ipi-install"
+          mkdir -p "${INSTALL_DIR}"
+
+          if [[ -z "${SETUP_RUN_ID}" ]]; then
+            echo "::error::ipi_setup_run_id is required for IPI teardown. Provide the run ID from the setup workflow that created the cluster."
             exit 1
+          fi
+
+          echo "Downloading IPI install state from run ${SETUP_RUN_ID}..."
+          gh run download "${SETUP_RUN_ID}" --repo "${{ github.repository }}" \
+            --name "ipi-install-state-${SETUP_RUN_ID}" \
+            --dir "${INSTALL_DIR}"
+
+          echo "Downloaded files:"
+          ls -la "${INSTALL_DIR}/"
+          echo "install_dir=${INSTALL_DIR}" >> "$GITHUB_OUTPUT"
+
+      - name: Destroy IPI cluster
+        if: inputs.infrastructure_type == 'ipi'
+        env:
+          IC_API_KEY: ${{ secrets.IC_KEY }}
+          INSTALL_DIR: ${{ runner.temp }}/ipi-install
+        run: |
+          export IC_API_KEY
+
+          echo "Downloading openshift-install (latest stable)..."
+          curl -sL "https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/stable/openshift-install-linux.tar.gz" \
+            | tar -xz -C /usr/local/bin openshift-install
+
+          if [[ ! -f "${INSTALL_DIR}/metadata.json" ]]; then
+            echo "::error::metadata.json not found in install state. Cannot destroy IPI cluster."
+            exit 1
+          fi
+
+          echo "Destroying IPI cluster..."
+          openshift-install destroy cluster --dir="${INSTALL_DIR}" --log-level=info 2>&1 | tail -80
+
+      # ──────────────────────────────────────────────────────────────────────
+      # Common cleanup
+      # ──────────────────────────────────────────────────────────────────────
+      - name: Clean up ghost runners
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.BOT_PAT }}
+        run: |
+          echo "Checking for offline self-hosted runners..."
+          RUNNERS=$(gh api "/repos/${{ github.repository }}/actions/runners" --jq '.runners[] | select(.status == "offline") | select(.labels[].name == "kubevirt-plugin-ci") | .id' 2>/dev/null || true)
+
+          if [[ -z "${RUNNERS}" ]]; then
+            echo "No offline 'kubevirt-plugin-ci' runners found"
+          else
+            for runner_id in ${RUNNERS}; do
+              echo "Deleting offline runner ${runner_id}..."
+              gh api -X DELETE "/repos/${{ github.repository }}/actions/runners/${runner_id}" || echo "Failed to delete runner ${runner_id}"
+            done
+            echo "Ghost runner cleanup complete"
           fi
 
       - name: Teardown summary
@@ -125,6 +237,7 @@ jobs:
           echo "" >> "$GITHUB_STEP_SUMMARY"
           echo "| Parameter | Value |" >> "$GITHUB_STEP_SUMMARY"
           echo "|-----------|-------|" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Infrastructure | \`${{ inputs.infrastructure_type || 'classic' }}\` |" >> "$GITHUB_STEP_SUMMARY"
           echo "| Cluster | \`${CLUSTER_NAME}\` |" >> "$GITHUB_STEP_SUMMARY"
-          echo "| Cluster Found | \`${{ steps.check_cluster.outputs.exists }}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Cluster Found | \`${{ steps.check_cluster.outputs.exists || 'N/A (IPI)' }}\` |" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"

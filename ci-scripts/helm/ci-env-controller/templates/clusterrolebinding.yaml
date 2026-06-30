@@ -1,0 +1,14 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: ci-env-controller
+  labels:
+    {{- include "ci-env-controller.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: ci-env-controller
+subjects:
+  - kind: ServiceAccount
+    name: ci-env-controller
+    namespace: {{ .Values.namespace }}

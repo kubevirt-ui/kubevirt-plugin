@@ -1,4 +1,7 @@
 **/node_modules
+.npm-cache
+.tmp
+.tmp-plugin-cert.*/
 npm-debug.log
 dist
 **/.env

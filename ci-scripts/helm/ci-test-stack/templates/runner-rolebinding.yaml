@@ -1,0 +1,19 @@
+# Grants the ARC runner SA namespace-scoped permissions so Cypress tests can
+# manage resources inside the test namespace. The subjects come from values so
+# the same chart works for any runner SA / namespace combination.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ci-env-test-runner
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "ci-test-stack.labels" . | nindent 4 }}
+    app.kubernetes.io/component: ci-env-controller
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ .Values.rbac.testRunnerClusterRole }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ .Values.runner.saName }}
+    namespace: {{ .Values.runner.saNamespace }}

@@ -1,315 +1,168 @@
 # Hot Cluster CI
 
-> **Continuation guide (CNV-74265):** [docs/HOT_CLUSTER_CI_CONTINUATION.md](../docs/HOT_CLUSTER_CI_CONTINUATION.md)  
-> **Future work backlog:** [docs/HOT_CLUSTER_FUTURE_WORK.md](../docs/HOT_CLUSTER_FUTURE_WORK.md)  
-> **Cluster lifecycle:** [docs/CLUSTER_LIFECYCLE.md](../docs/CLUSTER_LIFECYCLE.md)
+This directory contains scripts and documentation for the **IBM Cloud hot cluster** CI stack: an OpenShift cluster used for KubeVirt plugin E2E testing, with **Hyperconverged Cluster Operator (HCO)** and **GitHub Actions Runner Controller (ARC)** for self-hosted runners (`kubevirt-plugin-ci`).
 
-This directory contains scripts and documentation for the **IBM Cloud hot cluster** CI stack: an OpenShift (ROKS) cluster used for KubeVirt plugin integration testing, with **Hyperconverged Cluster Operator (HCO)** and **GitHub Actions Runner Controller (ARC)** so jobs can run on cluster-adjacent self-hosted runners (`kubevirt-plugin-ci`).
-
-Workers can be **bare metal** (real KVM) or **VPC / shared** flavors with **KVM emulation**; the setup workflow defaults favor VPC-style flavors and `kvm_emulation: true` unless you change inputs.
-
-## Why this stack (motivation)
-
-| Goal                                   | Approach                                                                                                                                                                                           |
-| -------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Real KubeVirt / OpenShift behavior** | Tests run against a live cluster with HCO, virt stack, and storage—not mocks.                                                                                                                      |
-| **Console + plugin fidelity**          | Two POC paths: hit the **in-cluster** console URL, or run an **off-cluster** console container with the plugin served like the operator (TLS + nginx), matching how developers run bridge locally. |
-| **Long-running / privileged CI**       | GitHub-hosted runners are a poor fit for nested virt, heavy Playwright, and Docker-heavy flows; **ARC** on the cluster provides dind-capable runners with `oc` RBAC.                               |
-| **Cost control**                       | Bare metal and large workers are expensive; manual teardown via **IBM Cloud Hot Cluster Teardown** (auto-teardown in PR #4099).                                                                    |
+Three infrastructure types are supported: **Classic ROKS**, **VPC ROKS** (recommended), and **IPI** (self-managed OpenShift).
 
 ## Architecture
 
-**Lifecycle (IBM Cloud)**
+**Cluster lifecycle**
 
-```text
+```
 GitHub Actions
-  │
-  ├── ibmc-cluster-setup.yml          → "IBM Cloud Hot Cluster Setup"
-  ├── ibmc-cluster-teardown.yml       → "IBM Cloud Hot Cluster Teardown" (also workflow_call)
-  └── ibmc-cluster-auto-teardown.yml  → "IBM Cloud Hot Cluster Auto-Teardown" (daily cron safety net)
+  ├── ibmc-cluster-setup.yml          → "IBM Cloud Hot Cluster Setup" (classic / vpc / ipi)
+  ├── ibmc-cluster-teardown.yml       → "IBM Cloud Hot Cluster Teardown"
+  └── ibmc-cluster-auto-teardown.yml  → "IBM Cloud Hot Cluster Auto-Teardown" (cron, 2h idle)
 ```
 
-**Hot cluster E2E** (added in PR #4099)
+**E2E testing**
 
-```text
-hot-cluster-e2e.yml     — "Hot Cluster E2E" (PR + manual dispatch)
-  ├── cluster-health-check (ubuntu-latest + IBM Cloud → kubeconfig)
-  │     └── ci-scripts/check-cluster-health.sh
+```
+hot-cluster-e2e.yml     → "Hot Cluster E2E" (PR trigger + manual dispatch)
+  ├── cluster-health-check (ubuntu-latest)
   └── run-e2e-tests (workflow_call → hot-cluster-e2e-run.yml)
 
-hot-cluster-e2e-run.yml — "Hot Cluster E2E Run"
-  ├── check-runner (diagnostics on ARC runner)
-  ├── build-kubevirt-plugin-image (ubuntu-latest; podman build + push)
+hot-cluster-e2e-run.yml → "Hot Cluster E2E Run"
+  ├── check-runner (ARC runner diagnostics)
+  ├── build-kubevirt-plugin-image (podman build + push to ttl.sh)
   └── run-gating-tests (runs-on: kubevirt-plugin-ci)
-        ├── ci-env-request → ci-env-controller → ci-test-stack (console + plugin)
+        ├── ci-env-request → ci-env-controller → ci-test-stack
         ├── BRIDGE_BASE_ADDRESS from test stack
         └── Playwright gating (or features project)
 ```
 
-## Required GitHub Secrets
+## Infrastructure Types
 
-These secrets must be configured in the repository settings before running the workflows.
+| Type | Description | IAM needed | Cluster management |
+|------|------------|------------|-------------------|
+| **classic** | IBM-managed ROKS on classic infrastructure | K8s Admin + Classic Super User | IBM manages control plane |
+| **vpc** | IBM-managed ROKS on VPC Gen2 | K8s Admin + VPC Admin + COS auth | IBM manages control plane |
+| **ipi** | Self-managed OpenShift via `openshift-install` | VPC Admin + COS Manager + DNS + IAM Identity | You manage everything |
+
+### VPC ROKS (recommended)
+
+Uses standard IBM Cloud IAM (no SoftLayer/classic permissions). VPC, subnet, public gateway, and COS instance are auto-created and reused across runs.
+
+- **Zone format**: `us-south-1`, `eu-de-1`
+- **Flavor**: `bx2.8x32`, `cx2.4x8` (list with `ibmcloud oc flavors --zone <zone> --provider vpc-gen2`)
+- **Required**: COS service-to-service authorization (`ibmcloud iam authorization-policy-create containers-kubernetes cloud-object-storage Reader`)
+
+### Classic ROKS
+
+Uses SoftLayer/classic infrastructure. VLANs are auto-discovered or created.
+
+- **Zone format**: `wdc04`, `fra02`, `dal10`
+- **Flavor**: `m3c.8x64`, `mb4c.4x32`
+- **Required**: Classic Infrastructure Super User
+
+### IPI (self-managed)
+
+Uses `openshift-install` to create a fully self-managed OpenShift cluster on IBM Cloud VPC. No ROKS management fee; you own the control plane.
+
+- **Zone format**: `us-south-1`, `eu-de-1`
+- **Flavor**: `bx2-8x32` (hyphen format, auto-converted from dot format)
+- **Base domain**: `cnv-ui.com` (registered in IBM Cloud CIS)
+- **Required**: VPC Admin, COS Manager, DNS/CIS access, IAM Identity Admin, `OPENSHIFT_PULL_SECRET` GitHub secret
+
+## Required GitHub Secrets
 
 ### IBM Cloud
 
-| Secret   | Description           | How to Obtain                   |
-| -------- | --------------------- | ------------------------------- |
-| `IC_KEY` | IBM Cloud IAM API key | Repository/org secret (Actions) |
-
-The API key must belong to a user or service ID with the following IAM permissions:
-
-- **Kubernetes Service**: Administrator role (to create/delete ROKS clusters)
-- **VPC Infrastructure Services**: Editor role (if using VPC-based clusters)
-- **Classic Infrastructure**: Super User or equivalent (for bare metal provisioning)
+| Secret | Description | Required for |
+|--------|-------------|-------------|
+| `IC_KEY` | IBM Cloud IAM API key | All paths |
+| `OPENSHIFT_PULL_SECRET` | Red Hat pull secret (from console.redhat.com) | IPI only |
 
 ### ARC Authentication (choose one)
 
-#### Option A: GitHub App (recommended for production)
+| Secret | Description |
+|--------|-------------|
+| `ARC_GITHUB_APP_ID` + `ARC_GITHUB_APP_INSTALL_ID` + `ARC_GITHUB_APP_PRIVATE_KEY` | GitHub App (recommended) |
+| `ARC_GITHUB_PAT` | Fine-grained PAT (simpler, less secure) |
 
-| Secret                       | Description           | How to Obtain                     |
-| ---------------------------- | --------------------- | --------------------------------- |
-| `ARC_GITHUB_APP_ID`          | GitHub App ID         | See "Creating a GitHub App" below |
-| `ARC_GITHUB_APP_INSTALL_ID`  | App installation ID   | See "Creating a GitHub App" below |
-| `ARC_GITHUB_APP_PRIVATE_KEY` | App private key (PEM) | See "Creating a GitHub App" below |
+### Optional
 
-#### Option B: Personal Access Token (simpler, less secure)
+| Secret | Description |
+|--------|-------------|
+| `BOT_PAT` | PAT with repo admin scope for ghost runner cleanup |
 
-| Secret           | Description      | How to Obtain                                              |
-| ---------------- | ---------------- | ---------------------------------------------------------- |
-| `ARC_GITHUB_PAT` | Fine-grained PAT | GitHub Settings → Developer Settings → Fine-grained tokens |
+## Setting Up the Hot Cluster
 
-The PAT requires these permissions on the target repository:
+1. Go to Actions → **IBM Cloud Hot Cluster Setup** → Run workflow
+2. Select infrastructure type, zone, flavor, worker count
+3. Wait for completion (30-60 min depending on infrastructure type)
 
-- **Administration**: Read and Write
-- **Metadata**: Read-only
+All paths converge after cluster creation: the workflow installs HCO, builds the ARC runner image, installs ARC controller + scale set, deploys the ci-env-controller, and runs health checks.
 
-## Cluster Authentication
+## Running E2E Tests
 
-All workflows that need cluster access use the IBM Cloud CLI to pull a kubeconfig on-demand:
+1. Actions → **Hot Cluster E2E** → Run workflow (or triggered on PR)
+2. Health check verifies cluster is reachable
+3. Plugin image is built and pushed to `ttl.sh` (2h TTL)
+4. Test environment is provisioned via ci-env-controller (ConfigMap-driven)
+5. Playwright gating tests run against the in-cluster console
+6. Artifacts are uploaded, test environment is released
 
-```yaml
-- name: Setup IBM Cloud CLI
-  uses: IBM/actions-ibmcloud-cli@953e229550655a880eda6ecfb01fbbdf12f119a5 # v1
-  with:
-    api_key: ${{ secrets.IC_KEY }}
-    region: eu-de
-    group: cnv-ui
-    plugins: kubernetes-service
+## Teardown
 
-- name: Configure kubeconfig
-  run: |
-    ibmcloud oc cluster config --cluster "${CLUSTER_NAME}" --admin
-    oc cluster-info
-```
+**Manual:** Actions → **IBM Cloud Hot Cluster Teardown** (select infrastructure type)
 
-This avoids storing kubeconfig or credentials as GitHub secrets. Any workflow or job that needs `oc`/`kubectl` access simply repeats these two steps with the shared `IC_KEY` secret.
+**Automatic:** The auto-teardown workflow runs every 30 minutes and tears down the cluster after 2 hours of CI inactivity. It detects both ROKS clusters (via `ibmcloud oc`) and IPI clusters (via DNS probe).
 
-## Creating a GitHub App for ARC
-
-1. Go to your organization settings (or personal settings) → Developer settings → GitHub Apps → New GitHub App
-2. Configure the app:
-   - **Name**: `kubevirt-plugin-arc` (or any name)
-   - **Homepage URL**: Your repository URL
-   - **Webhook**: Uncheck "Active" (not needed)
-   - **Permissions**:
-     - Repository permissions → Administration: Read and Write
-     - Organization permissions → Self-hosted runners: Read and Write
-3. Create the app and note the **App ID**
-4. Generate a **Private Key** (downloads a `.pem` file)
-5. Install the app on your organization/repository and note the **Installation ID**
-   - Find it in the URL: `https://github.com/settings/installations/<INSTALL_ID>`
-6. Store the three values as GitHub secrets:
-   - `ARC_GITHUB_APP_ID` = App ID
-   - `ARC_GITHUB_APP_INSTALL_ID` = Installation ID
-   - `ARC_GITHUB_APP_PRIVATE_KEY` = Contents of the `.pem` file
-
-## Usage
-
-### ARC install scripts (OpenShift)
-
-All ARC automation lives under **`ci-scripts/arc/`**. See **[`ci-scripts/arc/README.md`](arc/README.md)** for the full walkthrough.
-
-| Script                                            | Role                                                                                                                                                                                                                                                                                                                                                                              |
-| ------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **`ci-scripts/arc/setup-dind-mirror.sh`**         | Mirror **`docker:dind`** to the internal registry, write **`ci-scripts/generated/arc-dind-replace.env`** for Helm post-rendering (standard path; `SKIP_DIND_MIRROR=1` only if dind is provided another way).                                                                                                                                                                      |
-| **`ci-scripts/images/setup-arc-runner-image.sh`** | Build custom runner image (BuildConfig + `images/arc-runner/Dockerfile`); prints **`IMAGE_REF=`**.                                                                                                                                                                                                                                                                                |
-| **`ci-scripts/arc/install-arc-controller.sh`**    | Once per cluster: `arc-systems`, **`ci-scripts/arc/arc-openshift-scc.yaml`**, Helm **`gha-runner-scale-set-controller`**.                                                                                                                                                                                                                                                         |
-| **`ci-scripts/arc/install-runner-scale-set.sh`**  | Per scale set: Helm **`gha-runner-scale-set`**, optional **`ARC_RUNNER_IMAGE`**, dind post-render (**`--storage-driver=vfs`** always; optional **`docker:dind`** mirror via env file or **`ARC_DIND_INTERNAL_IMAGE`**), SCC bind, **`arc-runner-rbac.yaml`** (unless `SKIP_ARC_RUNNER_RBAC=1`). Requires **`ARC_CONFIG_URL`** + GitHub auth. Run **after** the controller script. |
-
-Hot Cluster Setup runs **`ci-scripts/images/setup-arc-runner-image.sh`**, then **`ci-scripts/arc/install-arc-controller.sh`** and **`ci-scripts/arc/install-runner-scale-set.sh`** (same env for the install steps).
-
-### Custom runner image
-
-The setup workflow builds a **custom runner image** on the cluster. The image extends the official GitHub Actions runner with Node.js 22, kubectl, oc, virtctl, and jq. Container workflows use **Docker** via the ARC **dind** sidecar (`DOCKER_HOST`).
-
-- **Dockerfile**: `ci-scripts/images/arc-runner/Dockerfile`
-- **Runner pod Helm fragment**: `ci-scripts/arc/arc-runner-scale-set.pod.yaml` — used by **`ci-scripts/arc/install-runner-scale-set.sh`**.
-- **Dind post-render**: **`ci-scripts/arc/install-runner-scale-set.sh`** always runs Helm with **`--post-renderer ci-scripts/arc/arc-dind-post-render.sh`** for **`CONTAINER_MODE=dind`** (injects **`--storage-driver=vfs`** so nested overlay does not fail on OpenShift). **`ci-scripts/arc/setup-dind-mirror.sh`** writes **`ci-scripts/generated/arc-dind-replace.env`** so the post-renderer also swaps **`docker:dind`** for the internal registry; you can set **`ARC_DIND_INTERNAL_IMAGE`** at install time instead (writes the same env file for that run).
-- **Refresh runner image only**: re-run **`ci-scripts/images/setup-arc-runner-image.sh`**, then **`ci-scripts/arc/install-runner-scale-set.sh`** with **`ARC_RUNNER_IMAGE`** set to the new ref (and the same auth env vars).
-
-Optional: `OC_VERSION`, `VIRTCTL_VERSION`, `ARC_RUNNERS_NS`, `CONTAINER_MODE` (default **dind**), `ARC_VERSION`, `ARC_SCALE_SET_LABELS`, `SKIP_ARC_RUNNER_RBAC=1`.
-
-#### ARC 0.14.0+ ([changelog](https://github.blog/changelog/2026-03-19-actions-runner-controller-release-0-14-0/))
-
-**`ci-scripts/arc/install-arc-controller.sh`** and **`ci-scripts/arc/install-runner-scale-set.sh`** use Helm chart **`0.14.0`** by default so controller and scale-set versions stay aligned and reproducible.
-
-| Feature                               | How we use it                                                                                                                                                                                                                                                                                                                                            |
-| ------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Multilabel scale sets**             | Optional env **`ARC_SCALE_SET_LABELS=kubevirt-plugin-ci,linux`** (comma-separated). Jobs must target **every** label, e.g. `runs-on: [kubevirt-plugin-ci, linux]`. Omit the variable to keep the previous single-label behavior (default `runs-on: kubevirt-plugin-ci`).                                                                                 |
-| **Listener on Linux nodes**           | Upstream defaults the listener pod to **`kubernetes.io/os: linux`** — helpful on mixed OS clusters without extra config.                                                                                                                                                                                                                                 |
-| **`resourceMeta` labels/annotations** | Optional: merge **`ci-scripts/examples/arc-0.14-extra-values.yaml`** (commented patterns) via **`ARC_RUNNER_EXTRA_VALUES`**.                                                                                                                                                                                                                             |
-| **Experimental charts**               | **`gha-runner-scale-set-experimental`** exposes **`runner.dind.container.image`**, so you could point dind at your internal mirror **without** the Helm post-renderer — values shape differs (`scaleset`, `auth`, …); treat as a larger migration. OCI path: `oci://ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set-experimental`. |
-
-The **stable** chart still hardcodes **`docker:dind`** in templates; this repo keeps **`ci-scripts/arc/setup-dind-mirror.sh`** + **`ci-scripts/arc/arc-dind-post-render.sh`** unless you adopt the experimental chart or cluster mirroring.
-
-#### Dind image source
-
-The stable chart embeds **`docker:dind`** (Docker Hub). This repo **mirrors by default** that image into the OpenShift internal registry via **`ci-scripts/arc/setup-dind-mirror.sh`** and rewrites rendered manifests with the Helm post-renderer so runner pods pull **arc-docker-dind** from the cluster registry (skippable via **`SKIP_DIND_MIRROR=1`** or **`ARC_DIND_INTERNAL_IMAGE`**). The approach avoids Docker Hub pull throttling / rate limiting.
-
-### Docker-in-Docker (default)
-
-**`ci-scripts/arc/install-runner-scale-set.sh`** defaults **`CONTAINER_MODE=dind`**. The ARC chart adds a privileged **`docker:dind`** sidecar and wires the main runner container with `DOCKER_HOST=unix:///var/run/docker.sock` so workflows can run:
-
-- `docker build` / `docker run` in steps
-- `container:` jobs and container actions that need a Docker daemon
-
-The custom runner image is still the **main** `runner` container; the chart merges your `template.spec.containers[runner]` with dind-specific env and volume mounts (see upstream `gha-runner-scale-set` `_helpers.tpl`).
-
-**OpenShift:** the `github-arc` SCC in `ci-scripts/arc/arc-openshift-scc.yaml` allows **privileged** containers and **RunAsAny** for UIDs so the `docker:dind` sidecar can run as root while the runner container stays at 1001/123 via Helm. This is broader than a “restricted-only” SCC; scope runner namespaces and RBAC accordingly.
-
-To turn off dind (no Docker daemon in the pod): `export CONTAINER_MODE=none` and re-run **`ci-scripts/arc/install-runner-scale-set.sh`**.
-
-### Workflow file ↔ Actions UI name
-
-| File                                               | `name:` in workflow (shown in Actions tab) |
-| -------------------------------------------------- | ------------------------------------------ |
-| `.github/workflows/ibmc-cluster-setup.yml`         | IBM Cloud Hot Cluster Setup                |
-| `.github/workflows/ibmc-cluster-teardown.yml`      | IBM Cloud Hot Cluster Teardown             |
-| `.github/workflows/ibmc-cluster-auto-teardown.yml` | IBM Cloud Hot Cluster Auto-Teardown        |
-| `.github/workflows/hot-cluster-e2e.yml`            | Hot Cluster E2E (PR #4099)                 |
-| `.github/workflows/hot-cluster-e2e-run.yml`        | Hot Cluster E2E Run (PR #4099)             |
-
-### Setting up the hot cluster
-
-1. Actions → **IBM Cloud Hot Cluster Setup** → Run workflow
-2. Inputs: cluster name, **classic** zone (e.g. `wdc04`), OpenShift version, worker flavor/count, **KVM emulation** (`true` for VPC-style workers, `false` for bare metal with hardware KVM)
-3. Wait for completion (provisioning time depends on flavor; setup includes HCO, custom runner image build, ARC controller + scale set, `check-cluster-health.sh`)
-
-**Implementation notes:** Provisioning uses `ibmcloud oc cluster create classic` (not VPC workers in this workflow). Setup installs `oc` from the cluster downloads endpoint, runs `install-hco.sh`, then `images/setup-arc-runner-image.sh`, `install-arc-controller.sh`, and `install-runner-scale-set.sh`.
-
-### Running hot cluster E2E tests
-
-1. Actions → **Hot Cluster E2E** (PR trigger or manual dispatch)
-2. Inputs: Playwright project (`gating` or `features`), cluster name (default `kubevirt-plugin-ci`)
-3. Health check on `ubuntu-latest`; on success calls **Hot Cluster E2E Run**
-4. Run workflow provisions a `ci-test-stack`, runs Playwright, uploads artifacts, releases the stack
-
-To run only the test jobs (cluster already verified): dispatch **Hot Cluster E2E Run** directly.
-
-### Tearing down the cluster
-
-**Manual:** Actions → **IBM Cloud Hot Cluster Teardown**
-
-**Teardown implementation:** Runs `ci-scripts/arc/uninstall-arc.sh` to cleanly deregister ARC runner scale set and controller via Helm, then deletes the ROKS cluster.
-
-**Automatic:** The `ibmc-cluster-auto-teardown.yml` workflow runs daily at 02:00 UTC as a safety net, calling the teardown workflow for the default cluster name.
-
-## ARC on OpenShift vs [na-launch/github-arc](https://github.com/na-launch/github-arc/blob/main/README.md)
-
-The [na-launch/github-arc](https://github.com/na-launch/github-arc/blob/main/README.md) README is a concise Helm + OpenShift recipe: fixed env vars for namespaces and installation names, explicit `serviceAccount.name=<install>-gha-rs-controller` on the controller chart, matching `controllerServiceAccount` on the scale set, apply SCC + ClusterRole, then `oc policy add-role-to-user system:openshift:scc:github-arc -z <runner-install>-gha-rs-no-permission`.
-
-| Topic                   | na-launch/github-arc                                               | This repo (`ci-scripts/arc/*`)                                                                                  |
-| ----------------------- | ------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------- |
-| Controller SA name      | `${GITHUB_ARC_SYSTEM_INSTALLATION_NAME}-gha-rs-controller`         | `${ARC_CONTROLLER_INSTALL_NAME}-gha-rs-controller` (default install name `arc`)                                 |
-| Scale set → controller  | `controllerServiceAccount.name` + `.namespace`                     | Same when OpenShift is detected                                                                                 |
-| SCC + `use` ClusterRole | Separate `manifests/scc.yaml` + `cluster-role.yaml`                | Single `ci-scripts/arc/arc-openshift-scc.yaml` (equivalent)                                                     |
-| Runner policy           | `oc policy add-role-to-user ... -z <install>-gha-rs-no-permission` | Same pattern                                                                                                    |
-| Auth                    | PAT in `--set`                                                     | **GitHub App** (recommended) or PAT; App IDs forced to strings to avoid Helm float bugs                         |
-| Runner pod template     | Checked-in `values.yaml`                                           | `ci-scripts/arc/arc-runner-scale-set.pod.yaml` + optional `ARC_RUNNER_EXTRA_VALUES`                             |
-| Container jobs          | Not emphasized                                                     | **Default `CONTAINER_MODE=dind`** (privileged `docker:dind`); SCC allows privileged / RunAsAny for that sidecar |
-
-**Additional runner scale sets (same as na-launch):** Keep `ARC_CONTROLLER_NS` and `ARC_CONTROLLER_INSTALL_NAME` unchanged. **Do not** re-run **`ci-scripts/arc/install-arc-controller.sh`**. Set `ARC_RUNNERS_NS`, `RUNNER_SCALE_SET_NAME`, and `ARC_CONFIG_URL` (and auth). Run **`SKIP_ARC_RUNNER_RBAC=1` `./ci-scripts/arc/install-runner-scale-set.sh`** so the shared `ClusterRoleBinding` **arc-runner-ci** is not overwritten (it only lists one ServiceAccount). The scale-set script still binds SCC **github-arc** to the new runner SA; add **ClusterRole** access for CI:
-
-`oc adm policy add-cluster-role-to-user arc-runner-ci -z <new-RUNNER_SCALE_SET_NAME>-gha-rs-no-permission -n <new-ARC_RUNNERS_NS>`
-
-You do **not** need to re-apply `ci-scripts/arc/arc-openshift-scc.yaml`.
+For IPI teardown, provide the `ipi_setup_run_id` (the GitHub Actions run ID from the setup workflow) so the teardown can download the install state artifacts needed by `openshift-install destroy cluster`.
 
 ## Scripts
 
-| Script                             | Purpose                                                                           |
-| ---------------------------------- | --------------------------------------------------------------------------------- |
-| `install-hco.sh`                   | Installs HCO operator, HPP storage, and virtctl                                   |
-| `arc/setup-dind-mirror.sh`         | Mirror `docker:dind` to internal registry; write `generated/arc-dind-replace.env` |
-| `images/setup-arc-runner-image.sh` | OpenShift binary build for custom ARC runner image                                |
-| `arc/install-arc-controller.sh`    | SCC + Helm `gha-runner-scale-set-controller` (once per cluster)                   |
-| `arc/install-runner-scale-set.sh`  | Helm `gha-runner-scale-set`, SCC bind, `arc-runner-rbac.yaml`                     |
-| `arc/uninstall-arc.sh`             | Reverse of install: Helm uninstall scale set + controller (same env vars)         |
-| `arc/README.md`                    | ARC on OpenShift setup guide                                                      |
-| `check-cluster-health.sh`          | Verifies cluster, HCO, ARC, storage, console; optional GitHub runner check        |
-| `check-roks-cluster-state.sh`      | Waits until ROKS cluster is usable (used by setup workflow)                       |
-| `resolve-console-image.sh`         | Emits `CONSOLE_IMAGE` tag **x.y** from `ClusterVersion` for off-cluster console   |
-| `start-plugin-container.sh`        | Runs plugin image with TLS + `nginx-9443.conf` (Docker dind–safe cert paths)      |
-| `start-console.sh`                 | Runs `origin-console` off-cluster; `BRIDGE_PLUGIN_PROXY` + kubevirt API route     |
-| `nginx-9443.conf`                  | Nginx config for plugin HTTPS (mounted into plugin container in POC test2)        |
+| Script | Purpose |
+|--------|---------|
+| `install-hco.sh` | Installs HCO operator, HPP storage, and virtctl |
+| `check-cluster-health.sh` | Verifies cluster, HCO, ARC, storage, console |
+| `check-roks-cluster-state.sh` | Polls until ROKS cluster is ready |
+| `log-ibmcloud-iam-diagnostics.sh` | Logs IAM permissions for debugging (classic, VPC, and IPI) |
+| `arc/install-arc-controller.sh` | Installs ARC controller (once per cluster) |
+| `arc/install-runner-scale-set.sh` | Installs ARC runner scale set |
+| `arc/setup-dind-mirror.sh` | Mirrors `docker:dind` to internal registry |
+| `ci-env/install-ci-env-controller.sh` | Installs the ConfigMap-driven CI environment controller |
 
-### Script Configuration
+See [`arc/README.md`](arc/README.md) for ARC-specific details and [`ci-env/README.md`](ci-env/README.md) for the ci-env-controller.
+
+## Script Configuration
 
 All scripts accept configuration via environment variables. See the header comments in each script for details.
 
 Key defaults:
 
-- `KVM_EMULATION=false` (bare metal has real KVM)
+- `KVM_EMULATION=false` (bare metal has real KVM; set `true` for VPC/shared)
 - `RUNNER_SCALE_SET_NAME=kubevirt-plugin-ci` (the `runs-on:` label)
-- `ARC_CONTROLLER_INSTALL_NAME=arc` (Helm release for controller; OpenShift SA `arc-gha-rs-controller`)
-- `MIN_RUNNERS=0`
-- `MAX_RUNNERS=5`
-- `CONTAINER_MODE=dind` (Docker-in-Docker for container jobs / `docker` in workflows)
-- `ARC_VERSION=0.14.0` (default pinned chart; `ARC_VERSION=latest` floats OCI default tag)
-- `ARC_SCALE_SET_LABELS` (optional multilabel; requires matching `runs-on` array in workflows)
-- Additional scale sets: run only **`ci-scripts/arc/install-runner-scale-set.sh`** (skip **`ci-scripts/arc/install-arc-controller.sh`**)
-
-## Follow-up work
-
-See [docs/HOT_CLUSTER_FUTURE_WORK.md](../docs/HOT_CLUSTER_FUTURE_WORK.md) for RBAC hardening, FIPS, ci-env-controller setup gap, and workflow hygiene items.
-
-- **Use `kubectl` + `_cluster-helpers.sh` to install `oc`** — Instead of downloading `oc` from `mirror.openshift.com` via `install-oc-client.sh`, use the `kubectl` binary already available on GitHub runners together with `_cluster-helpers.sh` `resolve_cli_downloads()` to fetch `oc` directly from the cluster's `ConsoleCLIDownload` resources. This avoids the external mirror dependency and ensures the binary matches the running cluster version exactly.
-- **Harden `check-cluster-health.sh`** — The health check script may need adjustments once runtime cluster configuration issues are discovered during real usage. Revisit checks and thresholds based on operational experience.
-
-Quick checklist:
-
-1. **Health check first** — Run **Hot Cluster E2E** (or health-check job only) to isolate cluster/HCO issues from test-stack issues.
-2. **ci-env-controller** — Install once on the cluster if not already present (`./dev/ci-env.sh`).
-3. **ARC on org repo** — Runners must register to `kubevirt-ui/kubevirt-plugin`, not a fork.
-4. **Auto-teardown** — Confirm idle detection watches `hot-cluster-e2e.yml` and `hot-cluster-e2e-run.yml`.
-
-## Production and hardening review (before treating POC patterns as prod)
-
-| Technique / choice                                           | Risk or limitation                                                                                 | Hardening direction                                                                   |
-| ------------------------------------------------------------ | -------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
-| **Privileged dind + broad SCC (`github-arc`)**               | High blast radius on the node; runner compromise ≈ strong cluster access                           | Narrow SCC, dedicated nodes, separate scale sets per trust zone, audit images         |
-| **`oc whoami --show-token` in `start-console.sh`**           | Long-lived bearer token injected into console container env                                        | Short-lived tokens, dedicated read-only SA, rotate; never log unmasked                |
-| **Self-signed TLS for plugin (`start-plugin-container.sh`)** | MITM within pod network if mis-scoped                                                              | Match operator-style serving certs; trust only where `InsecureSkipVerify` is explicit |
-| **`ttl.sh` or ephemeral public registries**                  | Ephemeral tags, no provenance, rate/abuse limits                                                   | Internal registry + image signing, digest pinning                                     |
-| **Skip `npm audit` / `--ignore-scripts`**                    | Supply-chain and lifecycle scripts not run                                                         | Revisit for production pipelines; use lockfile + audited base images                  |
-| **Cluster-scoped mutations in `test-setup.sh`**              | Variant A may patch shared ConfigMaps                                                              | Prefer namespaced fixtures or dedicated test clusters                                 |
-| **Auto-teardown idle heuristic**                             | Monitors only the two E2E test workflows; a cluster used by other workflows may be torn down early | Tie to runner job queue or explicit "last test" workflow                              |
-| **Classic ROKS only in setup workflow**                      | Not IBM Cloud VPC Gen2 path                                                                        | Add a parallel path or doc if prod standardizes on VPC                                |
-
-## POC completion score
-
-**~55%** — **Infrastructure path is largely in place** (IBM Cloud provisioning, HCO, ARC 0.14, dind mirror, health checks, two E2E workflows, diagnostics artifacts). **Productization is incomplete**: test2 still carries registry/image shortcuts, TODOs, and a narrower Cypress entrypoint; **end-to-end “green main”** on real clusters is not yet documented as achieved. Raising the score to **~80%** means repeatable green runs on both POC variants with pinned images, no hard-coded TTL tags, and either stable full gating or an agreed minimal gate with flake budget.
+- `ARC_CONTROLLER_INSTALL_NAME=arc` (Helm release for controller)
+- `CONTAINER_MODE=dind` (Docker-in-Docker for container jobs)
+- `ARC_VERSION=0.14.0` (pinned Helm chart version)
 
 ## Cost Control
 
-Bare metal nodes on IBM Cloud are expensive. Tear down the cluster manually via **IBM Cloud Hot Cluster Teardown** when testing is complete. Automatic idle teardown is planned in PR #4099.
+The auto-teardown workflow provides automatic cost control:
+
+- Runs every 30 minutes via cron
+- Checks if any E2E jobs are in-progress or queued
+- If idle for more than 2 hours, triggers the teardown workflow
+- Worst case: an idle cluster runs ~2.5 hours before teardown
+
+Always verify the cluster has been torn down when done testing. The auto-teardown is a safety net, not a substitute for manual cleanup.
+
+## Known Limitations
+
+- **Privileged dind + broad SCC**: The `github-arc` SCC allows privileged containers for the Docker-in-Docker sidecar. Scope runner namespaces and RBAC accordingly.
+- **`ttl.sh` for plugin images**: Plugin images use ephemeral `ttl.sh` tags with 2h TTL per CI run. Suitable for CI but not for long-term storage.
+- **Ghost runner cleanup**: Requires `BOT_PAT` with repo admin scope. Without it, offline runners must be cleaned up manually.
 
 ## Troubleshooting
 
-### Cluster setup fails during provisioning
+### Cluster setup fails
 
 - Check IBM Cloud status page for outages
-- Verify the API key has sufficient permissions
-- Bare metal availability varies by region; try a different zone
+- Verify the API key has sufficient permissions (expand the **IAM diagnostics** step log or download the artifact)
+- For classic: check `ibmcloud ks infra-permissions get --region <region>`
+- For VPC/IPI: check VPC Infrastructure permissions
 
 ### ARC runners not registering
 
@@ -323,36 +176,14 @@ Bare metal nodes on IBM Cloud are expensive. Tear down the cluster manually via 
 - Check individual component status: `oc get pods -n kubevirt-hyperconverged`
 - Verify storage: `oc get storageclass`
 
-### `npm ci` fails in kubevirt-plugin-ci job
+### Auto-teardown not triggering
 
-- **"package-lock.json is out of sync"**: Run `npm install` locally and commit the updated `package-lock.json`.
-- **Node/npm version**: The workflow uses Node 22; the runner image must provide a compatible Node (or use `actions/setup-node`). Check the "Install dependencies" step log for `node -v` and `npm -v`.
-- **Network**: The runner must reach the npm registry. If the cluster restricts egress, allow `registry.npmjs.org` (and any private registries).
-- **RW Access**: The runner must have writable volumes for npm global configuration and package caching
+- The scheduled job needs `permissions: actions: write` to dispatch teardown
+- `workflow_id` in the dispatch step must match the teardown workflow filename on the default branch
+- For IPI clusters: auto-teardown detects them via DNS probe (`api.<cluster>.cnv-ui.com`)
 
-### Auto-teardown never triggers teardown
+### `npm ci` fails on ARC runner
 
-- The scheduled job needs **`permissions: actions: write`** to dispatch the teardown workflow; confirm it is not overridden by org policy.
-- **`workflow_id`** in the dispatch step must match the teardown workflow filename on the default branch (**`ibmc-cluster-teardown.yml`**). A mismatch silently prevents teardown from running.
-
-### Ghost runners after failed teardown
-
-- Go to repository Settings → Actions → Runners
-- Manually delete any offline runners
-- Or run the teardown workflow again (Helm uninstall deregisters runners)
-
-### ARC runner `oc` / `kubectl` permissions
-
-Jobs on `kubevirt-plugin-ci` use the ARC scale set ServiceAccount **`kubevirt-plugin-ci-gha-rs-no-permission`** in `arc-runners`, not `default`. Without RBAC, `oc` steps fail with Forbidden.
-
-**Default:** **`ci-scripts/arc/install-runner-scale-set.sh`** applies **`ci-scripts/arc/arc-runner-rbac.yaml`** after the scale set install (ClusterRole **`arc-runner-ci`** bound to **`${RUNNER_SCALE_SET_NAME}-gha-rs-no-permission`** in **`${ARC_RUNNERS_NS}`**). Set **`SKIP_ARC_RUNNER_RBAC=1`** if you manage bindings yourself.
-
-**Manual apply** (defaults only, or after skipping):
-
-```bash
-oc apply -f ci-scripts/arc/arc-runner-rbac.yaml
-```
-
-If `RUNNER_SCALE_SET_NAME` or `ARC_RUNNERS_NS` differ from defaults, edit the `subjects` block or rely on **`ci-scripts/arc/install-runner-scale-set.sh`** substitution.
-
-For a disposable or single-tenant cluster you can instead grant full cluster-admin by using the alternative ClusterRoleBinding described in the comments at the top of `ci-scripts/arc/arc-runner-rbac.yaml`.
+- Run `npm install` locally and commit the updated `package-lock.json`
+- Check Node/npm version compatibility (runner image provides Node 22)
+- Verify the runner can reach `registry.npmjs.org`

@@ -1,0 +1,36 @@
+CI Environment Controller deployed.
+
+Controller namespace: {{ .Values.namespace }}
+Runner SA binding:    {{ .Values.runner.saNamespace }}/{{ .Values.runner.saName }}
+Trigger selector:     {{ .Values.label }}
+
+Manually request a test stack for a plugin image:
+  export CONFIGMAP_NAME=ci-env-test-1234
+  export PLUGIN_IMAGE=ttl.sh/custom-plugin-image-1234:1h
+  export TEST_NAMESPACE=ci-env-test-ns-12324
+
+  oc create -f - <<EOF
+  apiVersion: v1
+  kind: ConfigMap
+  metadata:
+    name: ${CONFIGMAP_NAME}
+    namespace: {{ .Values.namespace }}
+    labels:
+      ci.kubevirt-plugin/type: test-environment
+  data:
+    desired-state: "present"
+    plugin-image: "${PLUGIN_IMAGE}"
+    test-namespace: "${TEST_NAMESPACE}"
+  EOF
+
+Check test stack status:
+  oc get configmap -n {{ .Values.namespace }} ${CONFIGMAP_NAME} -o jsonpath='{.data}'
+
+View the test stack controller logs:
+  oc logs -n {{ .Values.namespace }} deployment/ci-env-controller --follow
+
+Release the test stack:
+  oc patch configmap -n {{ .Values.namespace }} ${CONFIGMAP_NAME} \
+    --type merge -p '{"data":{"desired-state":"absent"}}'
+
+  oc delete configmap -n {{ .Values.namespace }} ${CONFIGMAP_NAME}

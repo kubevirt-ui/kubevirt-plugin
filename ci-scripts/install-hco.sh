@@ -8,7 +8,7 @@
 #   HCO_IMAGE_VER          - HCO catalog image version
 #   HCO_SUBSCRIPTION_CHANNEL - OLM subscription channel
 #   HPP_VERSION            - HostPath Provisioner release branch
-#   HCO_CR_PATH            - Path to HCO CR yaml (default: cypress/fixtures/hco.yaml)
+#   HCO_CR_PATH            - Path to HCO CR yaml (default: playwright/fixtures/hco.yaml)
 #   SKIP_HPP               - Set to "true" to skip HPP installation
 #
 set -euo pipefail
@@ -20,10 +20,10 @@ set -euo pipefail
 #
 
 export KVM_EMULATION="${KVM_EMULATION:-true}"
-export HCO_IMAGE_VER="${HCO_IMAGE_VER:-1.14.0-unstable}"
-export HCO_SUBSCRIPTION_CHANNEL="${HCO_SUBSCRIPTION_CHANNEL:-candidate-v1.14}"
+export HCO_IMAGE_VER="${HCO_IMAGE_VER:-1.19.0-unstable}"
+export HCO_SUBSCRIPTION_CHANNEL="${HCO_SUBSCRIPTION_CHANNEL:-candidate-v1.19}"
 export HPP_VERSION="${HPP_VERSION:-release-v0.21}"
-HCO_CR_PATH="${HCO_CR_PATH:-cypress/fixtures/hco.yaml}"
+HCO_CR_PATH="${HCO_CR_PATH:-playwright/fixtures/hco.yaml}"
 SKIP_HPP="${SKIP_HPP:-false}"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -85,15 +85,27 @@ spec:
       value: "${KVM_EMULATION}"
 EOF
 
-echo "Waiting for Subscription to have an InstallPlan..."
+echo "Waiting for CatalogSource to be ready..."
 for i in $(seq 1 60); do
+  CS_STATE=$(oc get catalogsource hco-unstable-catalog-source -n openshift-marketplace \
+    -o jsonpath='{.status.connectionState.lastObservedState}' 2>/dev/null || echo "")
+  if [[ "${CS_STATE}" == "READY" ]]; then
+    echo "CatalogSource is ready"
+    break
+  fi
+  echo "CatalogSource state: ${CS_STATE:-pending} (${i}/60)"
+  sleep 10
+done
+
+echo "Waiting for Subscription to have an InstallPlan..."
+for i in $(seq 1 120); do
   INSTALL_PLAN="$(oc get subscription hco-operatorhub -n kubevirt-hyperconverged \
     -o jsonpath='{.status.installPlanRef.name}' 2>/dev/null || true)"
   if [[ -n "${INSTALL_PLAN}" ]]; then
     echo "InstallPlan found: ${INSTALL_PLAN}"
     break
   fi
-  if [[ "${i}" -eq 60 ]]; then
+  if [[ "${i}" -eq 120 ]]; then
     echo "ERROR: Timed out waiting for HCO InstallPlan"
     exit 1
   fi
@@ -101,13 +113,30 @@ for i in $(seq 1 60); do
   sleep 5
 done
 
-# --- Wait for HCO deployments ---
+# --- Wait for HCO deployments to appear ---
+echo "Waiting for HCO operator deployment to be created..."
+for i in $(seq 1 60); do
+  DEPLOY_COUNT=$(oc get deployments -n kubevirt-hyperconverged \
+    --selector="operators.coreos.com/community-kubevirt-hyperconverged.kubevirt-hyperconverged" \
+    --no-headers 2>/dev/null | wc -l)
+  if [[ "${DEPLOY_COUNT}" -gt 0 ]]; then
+    echo "HCO deployment found (${DEPLOY_COUNT} deployment(s))"
+    break
+  fi
+  if [[ "${i}" -eq 60 ]]; then
+    echo "ERROR: Timed out waiting for HCO deployment to be created"
+    exit 1
+  fi
+  echo "Waiting for HCO deployment... (${i}/60)"
+  sleep 10
+done
+
 echo "Waiting for HCO deployments to become available..."
 oc wait deployments \
   --selector="operators.coreos.com/community-kubevirt-hyperconverged.kubevirt-hyperconverged" \
   --namespace=kubevirt-hyperconverged \
   --for=condition=Available \
-  --timeout=10m
+  --timeout=15m
 
 # --- Apply HCO CR with retries ---
 echo "Creating HCO CR..."
@@ -138,14 +167,23 @@ oc wait -n kubevirt-hyperconverged hyperconverged kubevirt-hyperconverged \
 if [[ "${SKIP_HPP}" != "true" ]]; then
   echo "Installing HostPath Provisioner..."
 
-  oc apply -f \
-    "https://raw.githubusercontent.com/kubevirt/hostpath-provisioner-operator/${HPP_VERSION}/deploy/hostpathprovisioner_cr.yaml"
+  HPP_BASE="https://raw.githubusercontent.com/kubevirt/hostpath-provisioner-operator/${HPP_VERSION}/deploy"
+  for manifest in hostpathprovisioner_cr.yaml storageclass-wffc-csi.yaml; do
+    for attempt in 1 2 3; do
+      if oc apply -f "${HPP_BASE}/${manifest}"; then
+        break
+      fi
+      echo "  Retry ${attempt}/3 for ${manifest} (GitHub raw CDN may be flaky)..."
+      sleep 10
+    done
+  done
 
-  oc apply -f \
-    "https://raw.githubusercontent.com/kubevirt/hostpath-provisioner-operator/${HPP_VERSION}/deploy/storageclass-wffc-csi.yaml"
-
-  oc annotate storageclasses --all storageclass.kubernetes.io/is-default-class- || true
-  oc annotate storageclass hostpath-csi storageclass.kubernetes.io/is-default-class='true'
+  for sc in $(oc get storageclasses -o jsonpath='{.items[*].metadata.name}'); do
+    if [[ "${sc}" != "hostpath-csi" ]]; then
+      oc annotate storageclass "${sc}" storageclass.kubernetes.io/is-default-class='false' --overwrite || true
+    fi
+  done
+  oc annotate storageclass hostpath-csi storageclass.kubernetes.io/is-default-class='true' --overwrite
 
   echo "HPP installation complete"
 else

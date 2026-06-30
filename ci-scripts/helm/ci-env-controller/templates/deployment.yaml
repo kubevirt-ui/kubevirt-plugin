@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ci-env-controller
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "ci-env-controller.labels" . | nindent 4 }}
+    app: ci-env-controller
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ci-env-controller
+  template:
+    metadata:
+      labels:
+        app: ci-env-controller
+        {{- include "ci-env-controller.labels" . | nindent 8 }}
+      annotations:
+        # Triggers a rolling restart whenever the controller script changes.
+        checksum/script: {{ .Files.Get "scripts/ci-env-controller.sh" | sha256sum }}
+    spec:
+      serviceAccountName: ci-env-controller
+      containers:
+        - name: controller
+          image: {{ required "image is required" .Values.image }}
+          command: ['/bin/bash', '/opt/ci-env/controller/ci-env-controller.sh']
+          env:
+            - name: CI_ENV_NS
+              value: {{ .Values.namespace | quote }}
+            - name: CI_ENV_TTL_SECONDS
+              value: {{ .Values.ttlSeconds | quote }}
+            - name: CI_ENV_LABEL
+              value: {{ .Values.label | quote }}
+            - name: HELM_CHART_PATH
+              value: {{ .Values.helmChartPath | quote }}
+            - name: RUNNER_SA_NAME
+              value: {{ .Values.runner.saName | quote }}
+            - name: RUNNER_SA_NS
+              value: {{ .Values.runner.saNamespace | quote }}
+            - name: CONSOLE_IMAGE_REGISTRY
+              value: {{ .Values.consoleImageRegistry | quote }}
+          volumeMounts:
+            - name: controller-script
+              mountPath: /opt/ci-env/controller
+              readOnly: true
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
+            capabilities:
+              drop: ['ALL']
+      volumes:
+        - name: controller-script
+          configMap:
+            name: ci-env-controller-script
+            defaultMode: 0555

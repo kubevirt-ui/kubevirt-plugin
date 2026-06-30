@@ -3,25 +3,34 @@ name: IBM Cloud Hot Cluster Setup
 on:
   workflow_dispatch:
     inputs:
+      infrastructure_type:
+        description: 'Infrastructure type'
+        required: true
+        default: 'ipi'
+        type: choice
+        options:
+          - ipi
+          - vpc
+          - classic
       cluster_name:
         description: 'Cluster name'
         required: true
         default: 'kubevirt-plugin-ci'
         type: string
       zone:
-        description: 'IBM Cloud classic infrastructure zone (e.g., dal10, wdc04, fra02)'
+        description: 'Zone (classic: wdc04, fra02; vpc/ipi: us-south-1, eu-de-1)'
         required: true
-        default: 'wdc04'
+        default: 'us-south-1'
         type: string
       openshift_version:
-        description: 'OpenShift version'
+        description: 'OpenShift version (e.g. 4.22_openshift)'
         required: true
-        default: '4.20_openshift'
+        default: '4.22_openshift'
         type: string
       worker_flavor:
-        description: 'Worker node flavor (bare metal: mb4c.4x32, mb4c.20x64; vpc: m3c.4x16, m3c.8x64)'
+        description: 'Worker node flavor (classic: mb4c.4x32; vpc/ipi: bx2.8x32)'
         required: true
-        default: 'm3c.8x64'
+        default: 'bx2.8x32'
         type: string
       worker_count:
         description: 'Number of worker nodes (at least 2 so ingress is happy)'
@@ -29,16 +38,38 @@ on:
         default: '2'
         type: string
       kvm_emulation:
-        description: 'KVM emulation (true for vpc, false for bare metal)'
+        description: 'KVM emulation (true for vpc/shared, false for bare metal)'
         required: true
         default: true
         type: boolean
+      cos_instance_crn:
+        description: 'COS instance CRN for VPC internal registry (auto-created if empty)'
+        required: false
+        default: ''
+        type: string
+      hco_version:
+        description: 'HCO catalog image version (e.g. 1.19.0-unstable, 1.20.0-unstable)'
+        required: false
+        default: '1.19.0-unstable'
+        type: string
+      hco_channel:
+        description: 'HCO OLM subscription channel (e.g. candidate-v1.19, candidate-v1.20)'
+        required: false
+        default: 'candidate-v1.19'
+        type: string
 
 permissions:
   contents: read
 
 env:
   CLUSTER_NAME: ${{ inputs.cluster_name || 'kubevirt-plugin-ci' }}
+  INFRASTRUCTURE_TYPE: ${{ inputs.infrastructure_type || 'ipi' }}
+  # IBM_REGION is the account/API targeting region (not where resources are created).
+  # VPC/IPI steps target the deployment region dynamically from the zone input.
+  IBM_REGION: eu-de
+  IBM_RESOURCE_GROUP: cnv-ui
+  BASE_DOMAIN: cnv-ui.com
+  CONTROL_PLANE_FLAVOR: bx2-4x16
 
 jobs:
   provision-cluster:
@@ -47,19 +78,120 @@ jobs:
     timeout-minutes: 360
     steps:
       - name: Checkout
-        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
-        with:
-          persist-credentials: false
+        uses: actions/checkout@v6
 
       - name: Setup IBM Cloud CLI
-        uses: IBM/actions-ibmcloud-cli@953e229550655a880eda6ecfb01fbbdf12f119a5
+        uses: IBM/actions-ibmcloud-cli@v1
         with:
           api_key: ${{ secrets.IC_KEY }}
-          region: eu-de
-          group: cnv-ui
-          plugins: kubernetes-service, container-registry
+          region: ${{ env.IBM_REGION }}
+          group: ${{ env.IBM_RESOURCE_GROUP }}
+          plugins: kubernetes-service, container-registry, vpc-infrastructure
 
-      - name: Check for existing cluster
+      - name: Log IBM Cloud IAM diagnostics
+        id: iam_diagnostics
+        continue-on-error: true
+        env:
+          WORKER_ZONE: ${{ inputs.zone }}
+          INFRASTRUCTURE_TYPE: ${{ inputs.infrastructure_type || 'ipi' }}
+        run: bash ./ci-scripts/log-ibmcloud-iam-diagnostics.sh
+
+      - name: Upload IAM diagnostics log
+        if: always() && steps.iam_diagnostics.outcome != 'skipped'
+        continue-on-error: true
+        uses: actions/upload-artifact@v6
+        with:
+          name: ibmcloud-iam-diagnostics-${{ github.run_id }}
+          path: ${{ runner.temp }}/ibmcloud-iam-diagnostics.txt
+          retention-days: 14
+          if-no-files-found: warn
+
+      - name: Clean up stale IPI resources for this cluster name
+        if: inputs.infrastructure_type == 'ipi'
+        env:
+          IC_API_KEY: ${{ secrets.IC_KEY }}
+        continue-on-error: true
+        run: |
+          export IC_API_KEY
+          ZONE="${{ inputs.zone }}"
+          VPC_REGION="${ZONE%-*}"
+          ibmcloud target -r "${VPC_REGION}" 2>/dev/null || true
+
+          echo "=== Cleaning stale IPI resources for '${CLUSTER_NAME}' ==="
+
+          echo "1. Deleting stale DNS records (must be first — installer refuses to start if records exist)..."
+          ibmcloud plugin install cis -f 2>&1 | tail -1 || true
+          CIS_ID=$(ibmcloud cis instances --output json 2>/dev/null | jq -r '.[0].crn // empty' || true)
+          if [[ -n "${CIS_ID}" ]]; then
+            ibmcloud cis instance-set "${CIS_ID}" 2>&1 || true
+            for zone_id in $(ibmcloud cis domains --output json 2>/dev/null | jq -r '.[].id' || true); do
+              ibmcloud cis dns-records "${zone_id}" --output json 2>/dev/null \
+                | jq -r --arg cn "${CLUSTER_NAME}" '.[] | select(.name | contains($cn)) | .id' \
+                | while read -r id; do echo "  Deleting DNS ${id}"; ibmcloud cis dns-record-delete "${zone_id}" "${id}" 2>&1 || echo "  WARNING: failed to delete DNS ${id}"; done
+            done
+          fi
+
+          echo "2. Deleting stale VMs..."
+          ibmcloud is instances --output json 2>&1 \
+            | jq -r --arg cn "${CLUSTER_NAME}" '.[] | select(.name | startswith($cn)) | .id' \
+            | while read -r id; do echo "  Deleting VM ${id}"; ibmcloud is instance-delete "${id}" -f 2>&1 || echo "  WARNING: failed to delete VM ${id}"; done
+          sleep 60
+
+          echo "3. Deleting stale load balancers..."
+          ibmcloud is lbs --output json 2>&1 \
+            | jq -r --arg cn "${CLUSTER_NAME}" '.[] | select(.name | startswith($cn)) | .id' \
+            | while read -r id; do echo "  Deleting LB ${id}"; ibmcloud is load-balancer-delete "${id}" -f 2>&1 || echo "  WARNING: failed to delete LB ${id}"; done
+          sleep 60
+
+          echo "4. Waiting for LB deletions to complete..."
+          for i in $(seq 1 12); do
+            REMAINING=$(ibmcloud is lbs --output json 2>/dev/null \
+              | jq -r --arg cn "${CLUSTER_NAME}" \
+                'if type == "array" then [.[] | select(.name | startswith($cn) or (.name | startswith("kube-" + $cn)))] | length else 0 end' 2>/dev/null || echo "0")
+            if [[ "${REMAINING}" -eq 0 || -z "${REMAINING}" ]]; then
+              echo "  All LBs deleted."
+              break
+            fi
+            echo "  ${REMAINING} LB(s) still deleting... (${i}/12)"
+            sleep 30
+          done
+
+          echo "5. Detaching public gateways from subnets..."
+          ibmcloud is subnets --output json 2>/dev/null \
+            | jq -r --arg cn "${CLUSTER_NAME}" '.[] | select(.name | startswith($cn)) | select(.public_gateway != null) | .id' \
+            | while read -r id; do echo "  Detaching gateway from subnet ${id}"; ibmcloud is subnet-public-gateway-detach "${id}" -f 2>&1 || echo "  WARNING: failed to detach gateway from subnet ${id}"; done
+          sleep 10
+
+          echo "6. Deleting stale subnets..."
+          ibmcloud is subnets --output json 2>&1 \
+            | jq -r --arg cn "${CLUSTER_NAME}" '.[] | select(.name | startswith($cn)) | .id' \
+            | while read -r id; do echo "  Deleting subnet ${id}"; ibmcloud is subnet-delete "${id}" -f 2>&1 || echo "  WARNING: failed to delete subnet ${id}"; done
+          sleep 30
+
+          echo "7. Deleting stale public gateways..."
+          ibmcloud is public-gateways --output json 2>&1 \
+            | jq -r --arg cn "${CLUSTER_NAME}" '.[] | select(.name | startswith($cn)) | .id' \
+            | while read -r id; do echo "  Deleting gateway ${id}"; ibmcloud is public-gateway-delete "${id}" -f 2>&1 || echo "  WARNING: failed to delete gateway ${id}"; done
+
+          echo "8. Deleting stale floating IPs..."
+          ibmcloud is ips --output json 2>&1 \
+            | jq -r --arg cn "${CLUSTER_NAME}" '.[] | select(.name | startswith($cn)) | .id' \
+            | while read -r id; do echo "  Releasing IP ${id}"; ibmcloud is floating-ip-release "${id}" -f 2>&1 || echo "  WARNING: failed to release IP ${id}"; done
+
+          echo "9. Deleting stale security groups..."
+          ibmcloud is security-groups --output json 2>&1 \
+            | jq -r --arg cn "${CLUSTER_NAME}" '.[] | select(.name | startswith($cn)) | .id' \
+            | while read -r id; do echo "  Deleting SG ${id}"; ibmcloud is security-group-delete "${id}" -f 2>&1 || echo "  WARNING: failed to delete SG ${id}"; done
+
+          echo "10. Deleting stale VPCs..."
+          ibmcloud is vpcs --output json 2>&1 \
+            | jq -r --arg cn "${CLUSTER_NAME}" '.[] | select(.name | startswith($cn)) | .id' \
+            | while read -r id; do echo "  Deleting VPC ${id}"; ibmcloud is vpc-delete "${id}" -f 2>&1 || echo "  WARNING: failed to delete VPC ${id}"; done
+
+          echo "=== Stale resource cleanup complete ==="
+
+      - name: Check for existing ROKS cluster
+        if: inputs.infrastructure_type != 'ipi'
         id: check_cluster
         run: |
           if ibmcloud oc cluster get --cluster "${CLUSTER_NAME}" &>/dev/null; then
@@ -70,8 +202,11 @@ jobs:
             echo "exists=false" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Verify zone and flavor
-        if: steps.check_cluster.outputs.exists == 'false'
+      # ──────────────────────────────────────────────────────────────────────
+      # Classic infrastructure path
+      # ──────────────────────────────────────────────────────────────────────
+      - name: Verify zone and flavor (classic)
+        if: steps.check_cluster.outputs.exists == 'false' && inputs.infrastructure_type == 'classic'
         env:
           ZONE: ${{ inputs.zone }}
           FLAVOR: ${{ inputs.worker_flavor }}
@@ -107,18 +242,15 @@ jobs:
             echo "ERROR: Flavor '${FLAVOR}' is not available in zone '${ZONE}'."
             echo ""
             echo "Available flavors in '${ZONE}':"
-            echo "${LOCATIONS_JSON}" | jq -r --arg z "${ZONE}" '.[] | select(.id == $z) | .flavors | split(",")[]' | sort
+            echo "${LOCATIONS_JSON}" | jq -r --arg z "${ZONE}" '.[] | select(.id == $z) | .flavors[]? | .id' | sort
             exit 2
           fi
           echo "Flavor '${FLAVOR}' is available in zone '${ZONE}'"
 
-      - name: Create ROKS cluster
-        if: steps.check_cluster.outputs.exists == 'false'
+      - name: Create ROKS cluster (classic)
+        if: steps.check_cluster.outputs.exists == 'false' && inputs.infrastructure_type == 'classic'
         env:
           ZONE: ${{ inputs.zone }}
-          OPENSHIFT_VERSION: ${{ inputs.openshift_version }}
-          WORKER_FLAVOR: ${{ inputs.worker_flavor }}
-          WORKER_COUNT: ${{ inputs.worker_count }}
         run: |
           echo "Looking up existing VLANs in zone '${ZONE}'..."
           VLAN_JSON=$(ibmcloud oc vlan ls --zone "${ZONE}" --output json 2>/dev/null || echo "[]")
@@ -132,43 +264,353 @@ jobs:
             echo "No existing VLANs in zone, new VLANs will be created"
           fi
 
-          echo "Creating cluster '${CLUSTER_NAME}' with ${WORKER_COUNT}x ${WORKER_FLAVOR} workers in zone ${ZONE}..."
-          VLAN_ARGS=()
-          if [[ -n "${PRIVATE_VLAN}" ]]; then
-            VLAN_ARGS+=(--private-vlan "${PRIVATE_VLAN}")
-          fi
-          if [[ -n "${PUBLIC_VLAN}" ]]; then
-            VLAN_ARGS+=(--public-vlan "${PUBLIC_VLAN}")
-          fi
+          echo "Creating cluster '${CLUSTER_NAME}' with ${{ inputs.worker_count }}x ${{ inputs.worker_flavor }} workers in zone ${ZONE}..."
           ibmcloud oc cluster create classic \
             --name "${CLUSTER_NAME}" \
-            --version "${OPENSHIFT_VERSION}" \
-            --flavor "${WORKER_FLAVOR}" \
-            --workers "${WORKER_COUNT}" \
+            --version "${{ inputs.openshift_version }}" \
+            --flavor "${{ inputs.worker_flavor }}" \
+            --workers "${{ inputs.worker_count }}" \
             --zone "${ZONE}" \
-            "${VLAN_ARGS[@]}"
+            --private-vlan "${PRIVATE_VLAN}" \
+            --public-vlan "${PUBLIC_VLAN}"
 
-      - name: Wait for cluster to be ready to use
+      # ──────────────────────────────────────────────────────────────────────
+      # VPC Gen2 infrastructure path
+      # ──────────────────────────────────────────────────────────────────────
+      - name: Provision VPC resources
+        if: steps.check_cluster.outputs.exists == 'false' && inputs.infrastructure_type == 'vpc'
+        id: vpc_resources
+        env:
+          ZONE: ${{ inputs.zone }}
+          VPC_NAME: ${{ inputs.cluster_name || 'kubevirt-plugin-ci' }}-vpc
+        run: |
+          echo "=== VPC Gen2 provisioning ==="
+
+          VPC_REGION="${ZONE%-*}"
+          echo "VPC region: ${VPC_REGION}, zone: ${ZONE}"
+          ibmcloud target -r "${VPC_REGION}"
+
+          VPC_ID=$(ibmcloud is vpcs --output json 2>/dev/null | jq -r --arg n "${VPC_NAME}" '.[] | select(.name == $n) | .id // empty')
+          if [[ -z "${VPC_ID}" ]]; then
+            echo "Creating VPC '${VPC_NAME}'..."
+            VPC_ID=$(ibmcloud is vpc-create "${VPC_NAME}" --output json | jq -r '.id')
+            echo "Created VPC: ${VPC_ID}"
+          else
+            echo "Reusing existing VPC '${VPC_NAME}': ${VPC_ID}"
+          fi
+
+          SUBNET_NAME="${VPC_NAME}-subnet-${ZONE}"
+          SUBNET_ID=$(ibmcloud is subnets --output json 2>/dev/null | jq -r --arg n "${SUBNET_NAME}" '.[] | select(.name == $n) | .id // empty')
+          if [[ -z "${SUBNET_ID}" ]]; then
+            echo "Creating subnet '${SUBNET_NAME}' in zone '${ZONE}'..."
+            SUBNET_ID=$(ibmcloud is subnet-create "${SUBNET_NAME}" "${VPC_ID}" --zone "${ZONE}" --ipv4-address-count 256 --output json | jq -r '.id')
+            echo "Created subnet: ${SUBNET_ID}"
+          else
+            echo "Reusing existing subnet '${SUBNET_NAME}': ${SUBNET_ID}"
+          fi
+
+          GW_NAME="${VPC_NAME}-gw-${ZONE}"
+          GW_ID=$(ibmcloud is public-gateways --output json 2>/dev/null | jq -r --arg n "${GW_NAME}" '.[] | select(.name == $n) | .id // empty')
+          if [[ -z "${GW_ID}" ]]; then
+            echo "Creating public gateway '${GW_NAME}'..."
+            GW_ID=$(ibmcloud is public-gateway-create "${GW_NAME}" "${VPC_ID}" "${ZONE}" --output json | jq -r '.id')
+            echo "Created public gateway: ${GW_ID}"
+          else
+            echo "Reusing existing public gateway '${GW_NAME}': ${GW_ID}"
+          fi
+
+          echo "Attaching public gateway to subnet..."
+          ibmcloud is subnet-update "${SUBNET_ID}" --pgw "${GW_ID}" 2>/dev/null || true
+
+          echo "vpc_id=${VPC_ID}" >> "$GITHUB_OUTPUT"
+          echo "subnet_id=${SUBNET_ID}" >> "$GITHUB_OUTPUT"
+          echo "vpc_region=${VPC_REGION}" >> "$GITHUB_OUTPUT"
+
+      - name: Create ROKS cluster (vpc)
+        if: steps.check_cluster.outputs.exists == 'false' && inputs.infrastructure_type == 'vpc'
+        env:
+          ZONE: ${{ inputs.zone }}
+          VPC_ID: ${{ steps.vpc_resources.outputs.vpc_id }}
+          SUBNET_ID: ${{ steps.vpc_resources.outputs.subnet_id }}
+          COS_CRN: ${{ inputs.cos_instance_crn }}
+          COS_INSTANCE_NAME: ${{ inputs.cluster_name || 'kubevirt-plugin-ci' }}-cos
+        run: |
+          if [[ -z "${COS_CRN}" ]]; then
+            echo "No COS CRN provided — looking for existing COS instance '${COS_INSTANCE_NAME}'..."
+            COS_CRN=$(ibmcloud resource service-instances --service-name cloud-object-storage --output json 2>/dev/null \
+              | jq -r --arg n "${COS_INSTANCE_NAME}" '.[] | select(.name == $n) | .crn // empty' || true)
+
+            if [[ -z "${COS_CRN}" ]]; then
+              echo "Creating COS instance '${COS_INSTANCE_NAME}'..."
+              # COS standard plan ID (look up with: ibmcloud catalog service cloud-object-storage)
+              # Using plan ID + deployment name to avoid interactive prompts
+              ibmcloud resource service-instance-create "${COS_INSTANCE_NAME}" cloud-object-storage \
+                744bfc56-d12c-4866-88d5-dac9139e0e5d global \
+                -d premium-global-deployment
+              COS_CRN=$(ibmcloud resource service-instances --service-name cloud-object-storage --output json \
+                | jq -r --arg n "${COS_INSTANCE_NAME}" '.[] | select(.name == $n) | .crn')
+              echo "Created COS instance: ${COS_CRN}"
+            else
+              echo "Reusing existing COS instance: ${COS_CRN}"
+            fi
+          fi
+
+          echo "Creating VPC cluster '${CLUSTER_NAME}' with ${{ inputs.worker_count }}x ${{ inputs.worker_flavor }} workers in zone ${ZONE}..."
+          ibmcloud oc cluster create vpc-gen2 \
+            --name "${CLUSTER_NAME}" \
+            --version "${{ inputs.openshift_version }}" \
+            --flavor "${{ inputs.worker_flavor }}" \
+            --workers "${{ inputs.worker_count }}" \
+            --zone "${ZONE}" \
+            --vpc-id "${VPC_ID}" \
+            --subnet-id "${SUBNET_ID}" \
+            --cos-instance "${COS_CRN}" \
+            --disable-outbound-traffic-protection
+
+      # ──────────────────────────────────────────────────────────────────────
+      # IPI (self-managed OpenShift) path
+      # ──────────────────────────────────────────────────────────────────────
+      - name: Install openshift-install, oc, and ccoctl
+        if: inputs.infrastructure_type == 'ipi'
+        id: ipi_tools
+        env:
+          OC_VERSION_INPUT: ${{ inputs.openshift_version }}
+        run: |
+          OCP_CHANNEL="stable-${OC_VERSION_INPUT%%_*}"
+          echo "Resolving ${OCP_CHANNEL} to latest patch version..."
+          MIRROR="https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/${OCP_CHANNEL}"
+
+          echo "Downloading openshift-install..."
+          curl -sL "${MIRROR}/openshift-install-linux.tar.gz" | tar -xz -C /usr/local/bin openshift-install
+          openshift-install version
+
+          echo "Downloading oc + kubectl..."
+          curl -sL "${MIRROR}/openshift-client-linux.tar.gz" | tar -xz -C /usr/local/bin oc kubectl
+          oc version --client
+
+          echo "Downloading ccoctl..."
+          curl -sL "${MIRROR}/ccoctl-linux.tar.gz" | tar -xz -C /usr/local/bin ccoctl 2>/dev/null || echo "ccoctl not available for this version"
+
+          RESOLVED_VERSION=$(openshift-install version | head -1 | awk '{print $2}')
+          echo "ocp_channel=${OCP_CHANNEL}" >> "$GITHUB_OUTPUT"
+          echo "ocp_version=${RESOLVED_VERSION}" >> "$GITHUB_OUTPUT"
+
+      - name: Generate IPI install-config
+        if: inputs.infrastructure_type == 'ipi'
+        env:
+          ZONE: ${{ inputs.zone }}
+          PULL_SECRET: ${{ secrets.OPENSHIFT_PULL_SECRET }}
+          WORKER_FLAVOR: ${{ inputs.worker_flavor }}
+          WORKER_COUNT: ${{ inputs.worker_count }}
+        run: |
+          VPC_REGION="${ZONE%-*}"
+          INSTALL_DIR="${RUNNER_TEMP}/ipi-install"
+          mkdir -p "${INSTALL_DIR}"
+
+          ssh-keygen -t ed25519 -f "${INSTALL_DIR}/ssh-key" -N "" -q
+          SSH_PUB=$(cat "${INSTALL_DIR}/ssh-key.pub")
+
+          IPI_WORKER_FLAVOR=$(echo "${WORKER_FLAVOR}" | sed 's/\./-/g')
+
+          export VPC_REGION IPI_WORKER_FLAVOR SSH_PUB BASE_DOMAIN IBM_RESOURCE_GROUP CONTROL_PLANE_FLAVOR
+          envsubst < "${GITHUB_WORKSPACE}/ci-scripts/ipi-install-config.yaml.tpl" \
+            > "${INSTALL_DIR}/install-config.yaml"
+
+          echo "install-config.yaml generated at ${INSTALL_DIR}"
+
+          echo "::group::install-config.yaml (redacted)"
+          sed 's/pullSecret:.*/pullSecret: REDACTED/' "${INSTALL_DIR}/install-config.yaml"
+          echo "::endgroup::"
+
+      - name: Generate CCO credential secrets
+        if: inputs.infrastructure_type == 'ipi'
+        env:
+          IC_API_KEY: ${{ secrets.IC_KEY }}
+          INSTALL_DIR: ${{ runner.temp }}/ipi-install
+        run: |
+          openshift-install create manifests --dir="${INSTALL_DIR}"
+          bash ./ci-scripts/create-ibmcloud-cco-secrets.sh
+
+      - name: Create IPI cluster
+        id: ipi_create
+        if: inputs.infrastructure_type == 'ipi'
+        env:
+          IC_API_KEY: ${{ secrets.IC_KEY }}
+          INSTALL_DIR: ${{ runner.temp }}/ipi-install
+        run: |
+          export IC_API_KEY
+          echo "Running openshift-install create cluster..."
+          INSTALL_EXIT=0
+          openshift-install create cluster --dir="${INSTALL_DIR}" --log-level=info 2>&1 | tee "${INSTALL_DIR}/install.log" || INSTALL_EXIT=$?
+
+          if [[ "${INSTALL_EXIT}" -ne 0 ]]; then
+            echo "::warning::openshift-install exited ${INSTALL_EXIT} — checking if cluster is usable..."
+            KUBECONFIG="${INSTALL_DIR}/auth/kubeconfig"
+            export KUBECONFIG
+            if oc cluster-info &>/dev/null && oc get nodes --no-headers 2>/dev/null | grep -q " Ready"; then
+              echo "API is up and nodes are Ready. Continuing despite installer timeout."
+              echo "installer_partial=true" >> "$GITHUB_OUTPUT"
+            else
+              echo "::error::Cluster is not reachable after installer failure."
+              exit 1
+            fi
+          fi
+
+      - name: Upload IPI install artifacts
+        if: inputs.infrastructure_type == 'ipi' && always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: ipi-install-state-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/ipi-install/metadata.json
+            ${{ runner.temp }}/ipi-install/auth/kubeconfig
+            ${{ runner.temp }}/ipi-install/.openshift_install.log
+          retention-days: 7
+          if-no-files-found: ignore
+
+      # ──────────────────────────────────────────────────────────────────────
+      # Common bootstrap steps (all paths converge here)
+      # ──────────────────────────────────────────────────────────────────────
+      - name: Wait for ROKS cluster ready
+        if: inputs.infrastructure_type != 'ipi'
         run: |
           ./ci-scripts/check-roks-cluster-state.sh
 
-      - name: Install oc client from cluster version
+      - name: Install oc client
+        if: inputs.infrastructure_type != 'ipi'
         run: |
           CLUSTER_JSON="$(ibmcloud oc cluster get --cluster "${CLUSTER_NAME}" --output json)"
           export CLUSTER_JSON
           bash ./ci-scripts/install-oc-client.sh
 
       - name: Configure kubeconfig
+        env:
+          OCP_CHANNEL: ${{ steps.ipi_tools.outputs.ocp_channel }}
         run: |
-          ibmcloud oc cluster config --cluster "${CLUSTER_NAME}" --admin
+          if [[ "${{ inputs.infrastructure_type }}" == "ipi" ]]; then
+            INSTALL_DIR="${RUNNER_TEMP}/ipi-install"
+            KUBECONFIG_PATH="${INSTALL_DIR}/auth/kubeconfig"
+
+            echo "Looking for kubeconfig at ${KUBECONFIG_PATH}..."
+            ls -la "${INSTALL_DIR}/auth/" 2>/dev/null || echo "auth dir not found"
+
+            if [[ ! -f "${KUBECONFIG_PATH}" ]]; then
+              echo "::error::kubeconfig not found at ${KUBECONFIG_PATH}"
+              exit 1
+            fi
+
+            export KUBECONFIG="${KUBECONFIG_PATH}"
+            echo "KUBECONFIG=${KUBECONFIG_PATH}" >> "$GITHUB_ENV"
+          else
+            ibmcloud oc cluster config --cluster "${CLUSTER_NAME}" --admin
+          fi
           oc cluster-info
           oc get nodes -o wide
 
+      - name: Open ingress LB security group for public access
+        if: inputs.infrastructure_type == 'ipi'
+        env:
+          INSTALL_DIR: ${{ runner.temp }}/ipi-install
+        run: |
+          ZONE="${{ inputs.zone }}"
+          VPC_REGION="${ZONE%-*}"
+          ibmcloud target -r "${VPC_REGION}" 2>/dev/null || true
+
+          INFRA_ID=$(jq -r '.infraID' "${INSTALL_DIR}/metadata.json" 2>/dev/null || echo "${CLUSTER_NAME}")
+          echo "Infra ID: ${INFRA_ID}"
+
+          INGRESS_LB_ID=$(ibmcloud is lbs --output json 2>/dev/null \
+            | jq -r --arg id "${INFRA_ID}" \
+              '.[] | select(.name | contains($id)) | select(.name | startswith("kube-")) | .id // empty' | head -1)
+
+          if [[ -z "${INGRESS_LB_ID}" ]]; then
+            echo "::warning::Could not find ingress LB for cluster '${CLUSTER_NAME}'"
+          else
+            SG_ID=$(ibmcloud is lb "${INGRESS_LB_ID}" --output json 2>/dev/null \
+              | jq -r '.security_groups[0].id // empty')
+            if [[ -n "${SG_ID}" ]]; then
+              echo "Adding inbound HTTPS (443) and HTTP (80) rules to SG ${SG_ID}..."
+              ibmcloud is security-group-rule-add "${SG_ID}" inbound tcp \
+                --port-min 443 --port-max 443 --remote "0.0.0.0/0" 2>&1 || echo "  (rule may already exist)"
+              ibmcloud is security-group-rule-add "${SG_ID}" inbound tcp \
+                --port-min 80 --port-max 80 --remote "0.0.0.0/0" 2>&1 || echo "  (rule may already exist)"
+              echo "Ingress LB security group updated for public access."
+            else
+              echo "::warning::Could not find security group for ingress LB"
+            fi
+          fi
+
+      - name: Detect KVM support
+        id: kvm_check
+        run: |
+          echo "Checking for /dev/kvm on worker nodes..."
+          WORKER_NODE=$(oc get nodes --no-headers -l node-role.kubernetes.io/worker 2>/dev/null | head -1 | awk '{print $1}')
+          if [[ -z "${WORKER_NODE}" ]]; then
+            echo "No worker nodes found, checking control plane nodes..."
+            WORKER_NODE=$(oc get nodes --no-headers 2>/dev/null | head -1 | awk '{print $1}')
+          fi
+
+          if [[ -z "${WORKER_NODE}" ]]; then
+            echo "::warning::No nodes available to check KVM. Using input kvm_emulation=${{ inputs.kvm_emulation }}"
+            echo "kvm_emulation=${{ inputs.kvm_emulation }}" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "Checking /dev/kvm on node ${WORKER_NODE} (60s timeout)..."
+          if timeout 60 oc debug "node/${WORKER_NODE}" -- cat /proc/cpuinfo 2>&1 | grep -q "vmx\|svm"; then
+            echo "/dev/kvm support detected (CPU has vmx/svm flags)"
+            echo "kvm_emulation=false" >> "$GITHUB_OUTPUT"
+          elif timeout 30 oc debug "node/${WORKER_NODE}" -- ls -la /dev/kvm 2>&1 | grep -q kvm; then
+            echo "/dev/kvm device found"
+            echo "kvm_emulation=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "::warning::/dev/kvm not detected or check timed out. Falling back to input: kvm_emulation=${{ inputs.kvm_emulation }}"
+            echo "kvm_emulation=${{ inputs.kvm_emulation }}" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Install HCO
         env:
-          KVM_EMULATION: ${{ inputs.kvm_emulation }}
+          KVM_EMULATION: ${{ steps.kvm_check.outputs.kvm_emulation || inputs.kvm_emulation }}
+          HCO_IMAGE_VER: ${{ inputs.hco_version || '1.19.0-unstable' }}
+          HCO_SUBSCRIPTION_CHANNEL: ${{ inputs.hco_channel || 'candidate-v1.19' }}
         run: |
+          echo "KVM_EMULATION=${KVM_EMULATION} (auto-detected)"
+          echo "HCO_IMAGE_VER=${HCO_IMAGE_VER}"
+          echo "HCO_SUBSCRIPTION_CHANNEL=${HCO_SUBSCRIPTION_CHANNEL}"
           ./ci-scripts/install-hco.sh
+
+      - name: Configure internal image registry
+        run: |
+          echo "Ensuring internal image registry is available for in-cluster builds..."
+          REGISTRY_MGMT=$(oc get configs.imageregistry.operator.openshift.io cluster -o jsonpath='{.spec.managementState}' 2>/dev/null || echo "unknown")
+          if [[ "${REGISTRY_MGMT}" == "Removed" ]]; then
+            echo "Image registry is Removed — setting to Managed with emptyDir storage..."
+            oc patch configs.imageregistry.operator.openshift.io cluster \
+              --type merge -p '{"spec":{"managementState":"Managed","storage":{"emptyDir":{}}}}'
+          elif [[ "${REGISTRY_MGMT}" == "Managed" ]]; then
+            STORAGE=$(oc get configs.imageregistry.operator.openshift.io cluster -o jsonpath='{.spec.storage}' 2>/dev/null)
+            if [[ -z "${STORAGE}" || "${STORAGE}" == "{}" ]]; then
+              echo "Image registry has no storage — configuring emptyDir..."
+              oc patch configs.imageregistry.operator.openshift.io cluster \
+                --type merge -p '{"spec":{"storage":{"emptyDir":{}}}}'
+            else
+              echo "Image registry is Managed with storage configured."
+            fi
+          else
+            echo "Image registry managementState: ${REGISTRY_MGMT}"
+          fi
+          echo "Waiting for image-registry operator to be available..."
+          for i in $(seq 1 30); do
+            if oc get co image-registry -o jsonpath='{.status.conditions[?(@.type=="Available")].status}' 2>/dev/null | grep -q "True"; then
+              echo "Image registry is Available."
+              break
+            fi
+            echo "Waiting for image-registry... (${i}/30)"
+            sleep 20
+          done
+          oc get co image-registry 2>&1
+          echo "Verifying registry pods are running..."
+          oc get pods -n openshift-image-registry --no-headers 2>&1 | head -5 || true
 
       - name: Verify ARC secrets
         run: |
@@ -184,11 +626,11 @@ jobs:
           fi
           echo "ARC secrets are present."
 
-      - name: Setup ARC runner image
+      - name: Build ARC runner image
         id: build_runner
-        env:
-          OC_VERSION: '4.20'
         run: |
+          OC_VERSION="${{ inputs.openshift_version || '4.22_openshift' }}"
+          export OC_VERSION="${OC_VERSION%%_*}"
           IMAGE_REF=$(./ci-scripts/images/setup-arc-runner-image.sh | grep '^IMAGE_REF=' | cut -d= -f2-)
           echo "image_ref=${IMAGE_REF}" >> "$GITHUB_OUTPUT"
 
@@ -200,11 +642,14 @@ jobs:
           ARC_APP_PRIVATE_KEY: ${{ secrets.ARC_GITHUB_APP_PRIVATE_KEY }}
           ARC_PAT: ${{ secrets.ARC_GITHUB_PAT }}
           ARC_RUNNER_IMAGE: ${{ steps.build_runner.outputs.image_ref }}
-          # Pin with script default (0.14.0); set to "latest" in the workflow to float OCI tags.
           ARC_VERSION: '0.14.0'
         run: |
           ./ci-scripts/arc/install-arc-controller.sh
           ./ci-scripts/arc/install-runner-scale-set.sh
+
+      - name: Install CI environment controller
+        run: |
+          ./ci-scripts/ci-env/install-ci-env-controller.sh
 
       - name: Verify cluster health
         env:
@@ -212,28 +657,50 @@ jobs:
         run: |
           ./ci-scripts/check-cluster-health.sh
 
+      - name: Delete ROKS cluster on failure
+        if: always() && inputs.infrastructure_type != 'ipi' && job.status == 'failure' && steps.check_cluster.outputs.exists == 'false'
+        run: |
+          echo "Job failed — deleting ROKS cluster '${CLUSTER_NAME}'..."
+          ibmcloud oc cluster rm --cluster "${CLUSTER_NAME}" -f --force-delete-storage 2>&1 || echo "WARNING: cluster deletion failed or cluster not found"
+
+      - name: Destroy IPI cluster on failure
+        if: always() && inputs.infrastructure_type == 'ipi' && job.status == 'failure'
+        env:
+          IC_API_KEY: ${{ secrets.IC_KEY }}
+          INSTALL_DIR: ${{ runner.temp }}/ipi-install
+        run: |
+          export IC_API_KEY
+          if [[ -f "${INSTALL_DIR}/metadata.json" ]]; then
+            INFRA_ID=$(jq -r '.infraID' "${INSTALL_DIR}/metadata.json")
+            echo "Job failed — destroying IPI cluster '${INFRA_ID}'..."
+            openshift-install destroy cluster --dir="${INSTALL_DIR}" --log-level=info 2>&1 | tail -50 || true
+            echo "IPI cluster destroyed."
+          else
+            echo "No metadata.json found — no IPI resources to clean up."
+          fi
+
       - name: Setup summary
         if: always()
-        env:
-          INPUT_ZONE: ${{ inputs.zone }}
-          INPUT_VERSION: ${{ inputs.openshift_version }}
-          INPUT_FLAVOR: ${{ inputs.worker_flavor }}
-          INPUT_WORKERS: ${{ inputs.worker_count }}
-          INPUT_KVM: ${{ inputs.kvm_emulation }}
         run: |
           echo "## Hot Cluster Setup Summary" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
           echo "| Parameter | Value |" >> "$GITHUB_STEP_SUMMARY"
           echo "|-----------|-------|" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Infrastructure | \`${{ inputs.infrastructure_type || 'ipi' }}\` |" >> "$GITHUB_STEP_SUMMARY"
           echo "| Cluster | \`${CLUSTER_NAME}\` |" >> "$GITHUB_STEP_SUMMARY"
-          echo "| Zone | \`${INPUT_ZONE}\` |" >> "$GITHUB_STEP_SUMMARY"
-          echo "| OpenShift | \`${INPUT_VERSION}\` |" >> "$GITHUB_STEP_SUMMARY"
-          echo "| Worker Flavor | \`${INPUT_FLAVOR}\` |" >> "$GITHUB_STEP_SUMMARY"
-          echo "| Workers | \`${INPUT_WORKERS}\` |" >> "$GITHUB_STEP_SUMMARY"
-          echo "| KVM Emulation | \`${INPUT_KVM}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Zone | \`${{ inputs.zone }}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| OpenShift | \`${{ inputs.openshift_version }}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Worker Flavor | \`${{ inputs.worker_flavor }}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Workers | \`${{ inputs.worker_count }}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| KVM Emulation | \`${{ inputs.kvm_emulation }}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| HCO | \`${{ inputs.hco_version || '1.19.0-unstable' }}\` / \`${{ inputs.hco_channel || 'candidate-v1.19' }}\` |" >> "$GITHUB_STEP_SUMMARY"
+          CONSOLE_URL=$(oc get consoles.config.openshift.io cluster -o jsonpath='{.status.consoleURL}' 2>/dev/null || echo "")
+          if [[ -n "${CONSOLE_URL}" ]]; then
+            echo "| Console | [${CONSOLE_URL}](${CONSOLE_URL}) |" >> "$GITHUB_STEP_SUMMARY"
+          fi
           echo "" >> "$GITHUB_STEP_SUMMARY"
           if oc cluster-info &>/dev/null; then
             echo "Cluster is **healthy** and ready for CI." >> "$GITHUB_STEP_SUMMARY"
           else
-            echo "Cluster setup **may have issues**. Check the logs." >> "$GITHUB_STEP_SUMMARY"
+            echo "Cluster setup **may have issues**. Check the logs and the IAM diagnostics artifact." >> "$GITHUB_STEP_SUMMARY"
           fi

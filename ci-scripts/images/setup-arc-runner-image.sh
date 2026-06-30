@@ -1,12 +1,12 @@
 #!/bin/bash
 #
 # OpenShift only: create ImageStream + BuildConfig and run a binary Docker build for the
-# custom ARC runner image (ci-scripts/images/arc-runner/Dockerfile).
+# custom ARC runner image (ci-scripts/arc/runner-image/Dockerfile).
 #
 # Output: prints IMAGE_REF= to stdout (and to ARC_RUNNER_IMAGE_FILE if set).
 #
 # Optional environment variables:
-#   NS               Namespace for the runner (default: arc-runners)
+#   NS               Namespace for the runner (default: ci-env-images)
 #   OC_VERSION       OpenShift client version build-arg (default: detect or 4.20)
 #   HELM_VERSION     Helm version build-arg (default: 3.19.0)
 #   VIRTCTL_VERSION  (default: v1.4.0)
@@ -105,10 +105,32 @@ spec:
   runPolicy: Serial
 EOF
 
+echo "Waiting for ImageStream to be resolvable..."
+for i in $(seq 1 12); do
+  REPO=$(oc get imagestream "${IMAGE_NAME}" -n "${NS}" -o jsonpath='{.status.dockerImageRepository}' 2>/dev/null)
+  if [[ -n "${REPO}" ]]; then
+    echo "  ImageStream ready: ${REPO}"
+    break
+  fi
+  echo "  Waiting... (${i}/12)"
+  sleep 5
+done
+
 echo "Starting binary build from ${IMAGE_DIR}..."
-oc start-build -n "${NS}" "${IMAGE_NAME}-build" \
-  --from-dir="${IMAGE_DIR}" \
-  --follow
+for attempt in 1 2 3; do
+  if oc start-build -n "${NS}" "${IMAGE_NAME}-build" \
+       --from-dir="${IMAGE_DIR}" \
+       --follow; then
+    break
+  fi
+  if [[ "${attempt}" -lt 3 ]]; then
+    echo "  Build attempt ${attempt}/3 failed, retrying in 15s..."
+    sleep 15
+  else
+    echo "  Build failed after 3 attempts"
+    exit 1
+  fi
+done
 
 resolve_internal_registry
 IMAGE_REF="${INTERNAL_REGISTRY}/${NS}/${IMAGE_NAME}:latest"
@@ -116,9 +138,11 @@ IMAGE_REF="${INTERNAL_REGISTRY}/${NS}/${IMAGE_NAME}:latest"
 echo ""
 echo "=== Build complete ==="
 echo "Image: ${IMAGE_REF}"
-echo "IMAGE_REF=${IMAGE_REF}"
+echo ""
 
+# TODO: Better handling of passing the fqdn image name to the caller
 if [[ -n "${ARC_RUNNER_IMAGE_FILE:-}" ]]; then
   printf '%s\n' "${IMAGE_REF}" > "${ARC_RUNNER_IMAGE_FILE}"
   echo "Wrote ${ARC_RUNNER_IMAGE_FILE}"
 fi
+echo "IMAGE_REF=${IMAGE_REF}"
