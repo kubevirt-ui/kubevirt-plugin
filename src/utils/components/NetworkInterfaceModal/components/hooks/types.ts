@@ -21,4 +21,5 @@ export type UseNADsData = (
   loaded: boolean;
   loadError: string;
   nads: NetworkAttachmentDefinition[];
+  primaryNADs: NetworkAttachmentDefinition[];
 };

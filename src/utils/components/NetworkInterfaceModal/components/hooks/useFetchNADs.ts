@@ -1,10 +1,6 @@
 import { useMemo } from 'react';
 
-import {
-  DEFAULT_NAMESPACE,
-  OPENSHIFT_MULTUS_NS,
-  OPENSHIFT_SRIOV_NETWORK_OPERATOR_NS,
-} from '@kubevirt-utils/constants/constants';
+import { GLOBAL_NAD_NAMESPACES } from '@kubevirt-utils/constants/constants';
 import { NetworkAttachmentDefinitionModelGroupVersionKind } from '@kubevirt-utils/models';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 
@@ -26,9 +22,7 @@ export const useFetchNADs = (
         isList: true,
         namespace: namespace,
       },
-      ![DEFAULT_NAMESPACE, OPENSHIFT_MULTUS_NS, OPENSHIFT_SRIOV_NETWORK_OPERATOR_NS].includes(
-        namespace,
-      ),
+      !GLOBAL_NAD_NAMESPACES.includes(namespace),
       cluster,
     ),
   );
