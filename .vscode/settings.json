@@ -4,7 +4,8 @@
     "package-lock.json": true
   },
   "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": "always"
+    "source.fixAll.eslint": "always",
+    "source.organizeImports": "always"
   },
   "eslint.validate": ["javascript", "typescript"],
   "cSpell.words": ["hyperconverged", "kubevirt"],

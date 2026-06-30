@@ -1,14 +1,10 @@
 import React, { FC } from 'react';
-import { useWatch } from 'react-hook-form';
 
 import AddBootableVolumeModal from '@kubevirt-utils/components/AddBootableVolumeModal/AddBootableVolumeModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import useCanCreateBootableVolume from '@kubevirt-utils/resources/bootableresources/hooks/useCanCreateBootableVolume';
 import { Button, ButtonVariant } from '@patternfly/react-core';
-import { useVMWizard } from '@virtualmachines/creation-wizard-new/state/vm-wizard-context/VMWizardContext';
-import { CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA } from '@virtualmachines/creation-wizard-new/state/vm-wizard-form/consts';
-import { applySelectedBootableVolumeToForm } from '@virtualmachines/creation-wizard-new/utils/utils';
+import useAddBootableVolume from '@virtualmachines/creation-wizard-new/steps/InstanceTypesSteps/BootSourceStep/hooks/useAddBootableVolume';
 
 import './AddBootableVolumeLink.scss';
 
@@ -25,38 +21,24 @@ const AddBootableVolumeLink: FC<AddBootableVolumeLinkProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
-  const { control, getValues, setValue } = useVMWizard();
-  const [volumeListNamespace, preference] = useWatch({
-    control,
-    name: [
-      CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.VOLUME_LIST_NAMESPACE,
-      CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.PREFERENCE,
-    ],
-  });
+  const { canCreate, lockedPreference, onCreateVolume } = useAddBootableVolume();
 
-  const { canCreateDS, canCreatePVC } = useCanCreateBootableVolume(volumeListNamespace);
-  const canCreate = canCreateDS || canCreatePVC;
+  const openAddBootableVolumeModal = () => {
+    createModal((props) => (
+      <AddBootableVolumeModal
+        {...props}
+        lockedPreference={lockedPreference}
+        onClose={props.onClose}
+        onCreateVolume={onCreateVolume}
+      />
+    ));
+  };
 
   return (
     <Button
       onClick={() => {
         hidePopover?.();
-        createModal((props) => (
-          <AddBootableVolumeModal
-            onCreateVolume={(volume) =>
-              applySelectedBootableVolumeToForm({
-                dvSource: null,
-                getValues,
-                pvcSource: null,
-                selectedVolume: volume,
-                setValue,
-                volumeSnapshotSource: null,
-              })
-            }
-            lockedPreference={preference ?? undefined}
-            {...props}
-          />
-        ));
+        openAddBootableVolumeModal();
       }}
       className="add-bootable-volume-link__inline-text"
       data-test-id="add-volume-button-under-list"

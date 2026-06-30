@@ -1,14 +1,10 @@
-import React, { FC, useMemo } from 'react';
-import { Controller, useWatch } from 'react-hook-form';
+import React, { FC } from 'react';
+import { useWatch } from 'react-hook-form';
 
-import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
-import ProjectDropdown from '@kubevirt-utils/components/ProjectDropdown/ProjectDropdown';
-import { ALL_PROJECTS } from '@kubevirt-utils/hooks/constants';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
-import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useHideDeprecatedBootableVolumes from '@kubevirt-utils/resources/bootableresources/hooks/useHideDeprecatedBootableVolumes';
-import { OS_IMAGES_NS } from '@kubevirt-utils/utils/utils';
-import { Card, FormGroup, Skeleton, Split, SplitItem } from '@patternfly/react-core';
+import { OnFilterChange } from '@openshift-console/dynamic-plugin-sdk';
+import { Card, Skeleton } from '@patternfly/react-core';
 import { useVMWizard } from '@virtualmachines/creation-wizard-new/state/vm-wizard-context/VMWizardContext';
 import { CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA } from '@virtualmachines/creation-wizard-new/state/vm-wizard-form/consts';
 import usePreferencesData from '@virtualmachines/creation-wizard-new/steps/InstanceTypesSteps/BootSourceStep/components/BootableVolumeList/hooks/usePreferencesData';
@@ -16,12 +12,12 @@ import {
   UseBootableVolumesValues,
   UseInstanceTypeAndPreferencesValues,
 } from '@virtualmachines/creation-wizard-new/utils/types';
-import { applySelectedBootableVolumeToForm } from '@virtualmachines/creation-wizard-new/utils/utils';
 
 import BootableVolumeEmptyState from './components/BootableVolumeEmptyState/BootableVolumeEmptyState';
-import BootableVolumeListPagination from './components/BootableVolumeListPagination/BootableVolumeListPagination';
+import BootableVolumeListToolbar from './components/BootableVolumeListToolbar/BootableVolumeListToolbar';
 import BootableVolumeTable from './components/BootableVolumeTable/BootableVolumeTable';
 import useBootableVolumesTableData from './hooks/useBootableVolumesTableData';
+import { getEffectiveVolumeNamespace } from './utils/utils';
 
 import './BootableVolumeList.scss';
 
@@ -34,26 +30,16 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
   bootableVolumesData,
   instanceTypesAndPreferencesData,
 }) => {
-  const { t } = useKubevirtTranslation();
-  const isAdmin = useIsAdmin();
   const { control } = useVMWizard();
 
-  const [volumeListNamespace, selectedBootableVolume] = useWatch({
+  const volumeListNamespace = useWatch({
     control,
-    name: [
-      CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.VOLUME_LIST_NAMESPACE,
-      CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.SELECTED_BOOTABLE_VOLUME,
-    ],
+    name: CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.VOLUME_LIST_NAMESPACE,
   });
 
-  // Non-admin users cannot list across all projects — default to the OS images
-  // namespace where system bootable volumes live. If they explicitly pick a
-  // different project via the dropdown, respect that choice.
-  const effectiveNamespace = useMemo(() => {
-    const isNamespaceUnset = !volumeListNamespace || volumeListNamespace === ALL_PROJECTS;
+  const isAdmin = useIsAdmin();
 
-    return !isAdmin && isNamespaceUnset ? OS_IMAGES_NS : volumeListNamespace;
-  }, [isAdmin, volumeListNamespace]);
+  const effectiveNamespace = getEffectiveVolumeNamespace(volumeListNamespace, isAdmin);
 
   const { preferences: preferencesData } = instanceTypesAndPreferencesData;
   const { preferencesMap, userPreferencesLoaded, userPreferencesMap } = usePreferencesData(
@@ -77,7 +63,22 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
     setPagination,
     sortedPaginatedData,
     unfilteredData,
-  } = useBootableVolumesTableData(effectiveNamespace, preferencesMap, userPreferencesMap);
+  } = useBootableVolumesTableData(
+    effectiveNamespace,
+    bootableVolumesData,
+    preferencesMap,
+    userPreferencesMap,
+  );
+
+  const handleFilterChange: OnFilterChange = (...args: Parameters<OnFilterChange>) => {
+    onFilterChange(...args);
+    setPagination((prevPagination) => ({
+      ...prevPagination,
+      endIndex: prevPagination.perPage,
+      page: 1,
+      startIndex: 0,
+    }));
+  };
 
   useHideDeprecatedBootableVolumes(onFilterChange);
 
@@ -87,63 +88,21 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
   return (
     <Card className="bootable-volume-list pf-v6-u-p-lg">
       <div className="bootable-volume-list__container">
-        <Split hasGutter>
-          <SplitItem>
-            <FormGroup
-              className="bootable-volume-list-bar__volume-namespace"
-              label={t('Volumes project')}
-            >
-              <Controller
-                render={({ field: { onChange, ref: _ } }) => (
-                  <ProjectDropdown
-                    includeAllProjects={isAdmin}
-                    onChange={onChange}
-                    selectedProject={effectiveNamespace}
-                  />
-                )}
-                control={control}
-                name={CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.VOLUME_LIST_NAMESPACE}
-              />
-            </FormGroup>
-          </SplitItem>
-
-          {displayVolumes && (
-            <>
-              <SplitItem className="bootable-volume-list-bar__filter">
-                <ListPageFilter
-                  onFilterChange={(...args) => {
-                    onFilterChange(...args);
-                    setPagination((prevPagination) => ({
-                      ...prevPagination,
-                      endIndex: prevPagination?.perPage,
-                      page: 1,
-                      startIndex: 0,
-                    }));
-                  }}
-                  columnLayout={columnLayout}
-                  data={unfilteredData}
-                  hideLabelFilter
-                  loaded={loaded && loadedColumns}
-                  rowFilters={filters}
-                />
-              </SplitItem>
-              <SplitItem isFilled />
-              <SplitItem className="bootable-volume-list-bar__pagination">
-                <BootableVolumeListPagination
-                  data={data}
-                  pagination={pagination}
-                  setPagination={setPagination}
-                />
-              </SplitItem>
-            </>
-          )}
-        </Split>
+        <BootableVolumeListToolbar
+          columnLayout={columnLayout}
+          data={data}
+          displayVolumes={displayVolumes}
+          effectiveNamespace={effectiveNamespace}
+          filters={filters}
+          loaded={loaded}
+          loadedColumns={loadedColumns}
+          onFilterChange={handleFilterChange}
+          pagination={pagination}
+          setPagination={setPagination}
+          unfilteredData={unfilteredData}
+        />
         {displayVolumes && (
           <BootableVolumeTable
-            selectedBootableVolumeState={[
-              selectedBootableVolume,
-              applySelectedBootableVolumeToForm,
-            ]}
             activeColumns={activeColumns}
             bootableVolumesData={bootableVolumesData}
             getSortType={getSortType}

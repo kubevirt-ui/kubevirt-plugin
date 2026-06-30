@@ -6,6 +6,7 @@ import {
   DEFAULT_PREFERENCE_LABEL,
   PREFERENCE_DISPLAY_NAME_KEY,
 } from '@kubevirt-utils/constants/instancetypes-and-preferences';
+import { ALL_PROJECTS } from '@kubevirt-utils/hooks/constants';
 import { PaginationState } from '@kubevirt-utils/hooks/usePagination/utils/types';
 import { getPreference } from '@kubevirt-utils/resources/bootableresources/helpers';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
@@ -15,7 +16,8 @@ import {
   NamespacedResourceMap,
   ResourceMap,
 } from '@kubevirt-utils/resources/shared';
-import { OS_NAME_TYPES } from '@kubevirt-utils/resources/template';
+import { LINUX, OS_NAME_TYPES } from '@kubevirt-utils/resources/template';
+import { OS_IMAGES_NS } from '@kubevirt-utils/utils/utils';
 
 export const isLinuxGenericPreference = (preference: string): boolean =>
   preference === 'linux' || preference.startsWith('linux.') || preference.startsWith('linux-');
@@ -45,7 +47,7 @@ export const filterBootableVolumesByPreference = (
 };
 
 export const getBootVolumeOS = (bootVolume: BootableVolume): OS_NAME_TYPES => {
-  const bootVolumePreference = bootVolume?.metadata?.labels?.[DEFAULT_PREFERENCE_LABEL];
+  const bootVolumePreference = getLabel(bootVolume, DEFAULT_PREFERENCE_LABEL);
   return (
     Object.values(OS_NAME_TYPES).find((osName) => bootVolumePreference?.includes(osName)) ??
     OS_NAME_TYPES.other
@@ -72,6 +74,19 @@ export const getPaginationFromVolumeIndex =
     };
   };
 
+export const getOsNameFromPreference = (preferenceName?: string): string | undefined => {
+  if (!preferenceName) {
+    return undefined;
+  }
+
+  const base = preferenceName.split('.')[0].split('-')[0];
+  const isRhelPreference = base === OS_NAME_TYPES.rhel;
+  const isWindowsPreference = base === OS_NAME_TYPES.windows;
+  const isRhelOrWindowsPreference = isRhelPreference || isWindowsPreference;
+
+  return isRhelOrWindowsPreference ? base : LINUX;
+};
+
 export const getOSFromDefaultPreference = (
   bootableVolume: BootableVolume,
   preferencesMap: ResourceMap<V1beta1VirtualMachineClusterPreference>,
@@ -85,4 +100,15 @@ export const getOSFromDefaultPreference = (
     '',
   );
   return defaultPreferenceDisplayName;
+};
+
+// For non-admin users with no explicit selection, always scope to the OS images
+// namespace — they cannot do cluster-wide watches. Respect any explicit selection.
+export const getEffectiveVolumeNamespace = (
+  volumeListNamespace: string,
+  isAdmin: boolean,
+): string => {
+  const isNamespaceUnset = !volumeListNamespace || volumeListNamespace === ALL_PROJECTS;
+
+  return !isAdmin && isNamespaceUnset ? OS_IMAGES_NS : volumeListNamespace;
 };
