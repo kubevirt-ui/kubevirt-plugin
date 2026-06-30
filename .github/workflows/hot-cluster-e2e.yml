@@ -29,7 +29,7 @@ on:
           - vpc
           - classic
       ipi_setup_run_id:
-        description: Setup workflow run ID (required for IPI to download kubeconfig)
+        description: Setup workflow run ID (required for IPI to download install state)
         required: false
         default: ''
         type: string

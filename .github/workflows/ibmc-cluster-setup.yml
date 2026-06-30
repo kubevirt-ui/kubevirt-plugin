@@ -463,7 +463,6 @@ jobs:
           name: ipi-install-state-${{ github.run_id }}
           path: |
             ${{ runner.temp }}/ipi-install/metadata.json
-            ${{ runner.temp }}/ipi-install/auth/kubeconfig
             ${{ runner.temp }}/ipi-install/.openshift_install.log
           retention-days: 7
           if-no-files-found: ignore
