@@ -1,82 +1,42 @@
 import { useCallback, useMemo } from 'react';
 import { useLocation } from 'react-router';
 
-import { logVMSavedSearchApplied } from '@kubevirt-utils/extensions/telemetry/dashboard';
-import {
-  KubevirtFilterState,
-  OnSetFilters,
-} from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
 import { USER_SETTINGS_KEYS } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/const';
-import { updateFilterState } from '@search/searchLanguage/hooks/useOnCommitText/updateFilterState';
-import { validSearchQueryParams } from '@search/utils/constants';
-import { convertQueryToFilterState } from '@search/utils/query';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { getUrlSearchQuery } from '@search/utils/query';
 
-type SavedSearchData = {
-  description: string;
-  query: string;
-};
-
-type SavedSearchEntry = SavedSearchData & {
-  name: string;
-};
+import { SavedSearchData, SavedSearchEntry } from '../savedSearches/types';
 
 type SavedSearchDataResult = {
-  applySearch: (name: string) => void;
   deleteSearch: (name: string) => void;
   saveSearch: (name: string, data: SavedSearchData) => void;
   searches: SavedSearchEntry[];
-  searchesLoaded: boolean;
+  searchesInitiallyLoaded: boolean;
   searchesLoadError: Error;
+  toggleFavorite: (name: string) => void;
   urlSearchQuery: string;
 };
 
-type UseSavedSearchDataProps = {
-  filters: KubevirtFilterState;
-  onSetFilters: OnSetFilters;
-};
-
-type UseSavedSearchData = (props: UseSavedSearchDataProps) => SavedSearchDataResult;
-
-export const useSavedSearchData: UseSavedSearchData = ({ filters, onSetFilters }) => {
+export const useSavedSearchData = (): SavedSearchDataResult => {
   const location = useLocation();
 
-  const urlSearchQuery = useMemo(() => {
-    const allParams = new URLSearchParams(location.search);
-    const searchParams = new URLSearchParams();
-
-    for (const key of allParams.keys()) {
-      if (validSearchQueryParams.includes(key)) {
-        searchParams.set(key, allParams.get(key));
-      }
-    }
-
-    return searchParams.toString();
-  }, [location.search]);
+  const urlSearchQuery = useMemo(() => getUrlSearchQuery(location.search), [location.search]);
 
   const [savedSearches, setSavedSearches, searchesLoaded, searchesLoadError] =
     useKubevirtUserSettings(USER_SETTINGS_KEYS.savedSearches);
 
   const searchEntries = useMemo(
     () =>
-      Object.entries<SavedSearchData>(savedSearches ?? {}).reduce<SavedSearchEntry[]>(
-        (acc, [name, data]) => [...acc, { description: data.description, name, query: data.query }],
-        [],
+      Object.entries<SavedSearchData>(savedSearches ?? {}).map<SavedSearchEntry>(
+        ([name, { description, isFavorited, query }]) => ({
+          description,
+          isFavorited: isFavorited ?? false,
+          name,
+          query,
+        }),
       ),
     [savedSearches],
-  );
-
-  const applySearch = useCallback<SavedSearchDataResult['applySearch']>(
-    (name) => {
-      const query = savedSearches?.[name]?.query;
-
-      if (query) {
-        const newFilters = convertQueryToFilterState(query);
-        updateFilterState(filters, newFilters, onSetFilters);
-        logVMSavedSearchApplied(query);
-      }
-    },
-    [savedSearches, filters, onSetFilters],
   );
 
   const deleteSearch = useCallback<SavedSearchDataResult['deleteSearch']>(
@@ -98,13 +58,26 @@ export const useSavedSearchData: UseSavedSearchData = ({ filters, onSetFilters }
     [setSavedSearches, savedSearches],
   );
 
+  const toggleFavorite = useCallback<SavedSearchDataResult['toggleFavorite']>(
+    (name) => {
+      const entry = savedSearches?.[name];
+      if (!entry) return;
+
+      setSavedSearches?.({
+        ...savedSearches,
+        [name]: { ...entry, isFavorited: !entry.isFavorited },
+      });
+    },
+    [setSavedSearches, savedSearches],
+  );
+
   return {
-    applySearch,
     deleteSearch,
     saveSearch,
     searches: searchEntries,
-    searchesLoaded,
+    searchesInitiallyLoaded: searchesLoaded || !isEmpty(searchEntries),
     searchesLoadError,
+    toggleFavorite,
     urlSearchQuery,
   };
 };

@@ -1,7 +1,6 @@
 import { FormEvent, KeyboardEvent, useCallback, useMemo, useState } from 'react';
 
 import { logVMSearchLanguageUsed } from '@kubevirt-utils/extensions/telemetry/dashboard';
-import { KubevirtFilterState } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { KeyTypes } from '@patternfly/react-core';
 import { filtersToSearchText } from '@search/searchLanguage/filtersToSearchText';
@@ -31,7 +30,7 @@ export const useSearchLanguageInput = ({
     () => filtersToSearchText(filters, tokenOrder),
     [filters, tokenOrder],
   );
-  const { displayText, exitDraft, setDraftText } = useDraftInput(committedText);
+  const { displayText, exitDraft, isDraft, setDraftText } = useDraftInput(committedText);
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const onOpenDropdown = useCallback(() => setIsDropdownOpen(true), []);
@@ -77,7 +76,7 @@ export const useSearchLanguageInput = ({
 
       setTokenOrder(newTokenOrder);
 
-      const serialized = filtersToSearchText(newFilters as KubevirtFilterState, newTokenOrder);
+      const serialized = filtersToSearchText(newFilters, newTokenOrder);
       if (serialized) {
         addRecentSearch?.(serialized);
       }
@@ -137,6 +136,7 @@ export const useSearchLanguageInput = ({
 
   return {
     displayText,
+    isDraft,
     isDropdownOpen,
     onChange,
     onClear,

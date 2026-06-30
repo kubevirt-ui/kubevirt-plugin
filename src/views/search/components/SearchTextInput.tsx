@@ -18,6 +18,8 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import {
   Button,
   ButtonVariant,
+  Divider,
+  Flex,
   Popper,
   TextInputGroup,
   TextInputGroupMain,
@@ -34,12 +36,14 @@ import { useDropdownNavigation } from './SearchDropdown/hooks/useDropdownNavigat
 import SearchDropdown from './SearchDropdown/SearchDropdown';
 import { DropdownType } from './SearchDropdown/types';
 import AdvancedSearchIcon from './AdvancedSearchIcon';
+import SaveSearchButton from './SaveSearchButton';
 
 type SearchTextInputProps = {
   displayText: string;
   filterDefinitions: KubevirtFilter[];
   filters: KubevirtFilterState;
   inputRef: RefObject<HTMLInputElement>;
+  isDraft: boolean;
   isDropdownOpen: boolean;
   onChange: (event: FormEvent<HTMLInputElement>, value: string) => void;
   onClear: () => void;
@@ -59,6 +63,7 @@ const SearchTextInput: FC<SearchTextInputProps> = ({
   filterDefinitions,
   filters,
   inputRef,
+  isDraft,
   isDropdownOpen,
   onChange,
   onClear,
@@ -132,26 +137,30 @@ const SearchTextInput: FC<SearchTextInputProps> = ({
           value={displayText}
         />
         <TextInputGroupUtilities>
-          {displayText && (
-            <Button
-              aria-label={t('Clear search')}
-              icon={<TimesIcon />}
-              onClick={onClear}
-              variant={ButtonVariant.plain}
-            />
-          )}
-          <Tooltip content={t('Advanced search')}>
-            <Button
-              onClick={() => {
-                onCloseDropdown();
-                onOpenAdvancedSearch();
-              }}
-              aria-label={t('Advanced search')}
-              data-test="vm-advanced-search-button"
-              icon={<AdvancedSearchIcon isLarge />}
-              variant={ButtonVariant.plain}
-            />
-          </Tooltip>
+          <Flex gap={{ default: 'gapSm' }}>
+            {displayText && (
+              <Button
+                aria-label={t('Clear search')}
+                icon={<TimesIcon />}
+                onClick={onClear}
+                variant={ButtonVariant.plain}
+              />
+            )}
+            <Divider className="pf-v6-u-py-sm" orientation={{ default: 'vertical' }} />
+            <SaveSearchButton isDraft={isDraft} />
+            <Tooltip content={t('Advanced search')}>
+              <Button
+                onClick={() => {
+                  onCloseDropdown();
+                  onOpenAdvancedSearch();
+                }}
+                aria-label={t('Advanced search')}
+                data-test="vm-advanced-search-button"
+                icon={<AdvancedSearchIcon isLarge />}
+                variant={ButtonVariant.plain}
+              />
+            </Tooltip>
+          </Flex>
         </TextInputGroupUtilities>
       </TextInputGroup>
     </div>

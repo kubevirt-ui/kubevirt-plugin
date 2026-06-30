@@ -71,7 +71,10 @@ const serializeFilterValues = (filterType: string, values: string[]): string[] =
   return tokens;
 };
 
-export const filtersToSearchText = (filters: KubevirtFilterState, tokenOrder: string[]): string => {
+export const filtersToSearchText = (
+  filters: Partial<KubevirtFilterState>,
+  tokenOrder: string[],
+): string => {
   const orderedKeys = [
     ...tokenOrder.filter((key) => !isEmpty(filters[key])),
     ...Object.keys(filters).filter((key) => !isEmpty(filters[key]) && !tokenOrder.includes(key)),
