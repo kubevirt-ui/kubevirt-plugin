@@ -1,5 +1,5 @@
-import React, { FC, useState } from 'react';
 import { cloneDeep } from 'lodash';
+import React, { FC, useState } from 'react';
 
 import { TemplateParameter } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';

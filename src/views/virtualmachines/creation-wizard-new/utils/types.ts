@@ -1,6 +1,7 @@
-import { ReactNode } from 'react';
-import { UseFormGetValues, UseFormSetValue } from 'react-hook-form';
 import { TFunction } from 'i18next';
+import { FC, ReactNode } from 'react';
+import { UseFormGetValues, UseFormSetValue } from 'react-hook-form';
+import { NavigateFunction } from 'react-router';
 
 import {
   V1beta1DataImportCron,
@@ -8,6 +9,7 @@ import {
 } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import {
+  V1beta1VirtualMachineClone,
   V1beta1VirtualMachineClusterInstancetype,
   V1beta1VirtualMachineClusterPreference,
   V1beta1VirtualMachineInstancetype,
@@ -15,18 +17,31 @@ import {
 import { VolumeSnapshotKind } from '@kubevirt-utils/components/SelectSnapshot/types';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { ClusterNamespacedResourceMap } from '@kubevirt-utils/resources/shared';
-import { WizardStepProps } from '@patternfly/react-core';
+import { WizardStepProps, WizardStepType } from '@patternfly/react-core';
 import { VMWizardStep } from '@virtualmachines/creation-wizard-new/utils/constants';
 
 import { VMWizardFormValues } from '../state/vm-wizard-form/types';
 
-export type VMWizardStepDisplay = WizardStepProps & { children: ReactNode; displayIndex: number };
+export type VMGenerationNavItemClickHandler = (
+  step: WizardStepType,
+  activeStep: WizardStepType,
+  goToStepByIndex: (index: number) => void,
+) => Promise<void> | void;
+
+export type WizardStepNavItemConfig = {
+  handleNavItemClick: VMGenerationNavItemClickHandler;
+  isGeneratingVM: boolean;
+};
+
+export type VMWizardStepDisplay = WizardStepProps & {
+  children: ReactNode;
+  displayIndex: number;
+};
 
 export type GetStepsToDisplayByCreationMethodArgs = {
-  customizationStep: VMWizardStepDisplay;
   isNextDisabledForStep: (stepId: VMWizardStep) => boolean;
   isStepDisabled: (stepId: VMWizardStep) => boolean;
-  reviewAndCreateStep: VMWizardStepDisplay;
+  navItemConfig: WizardStepNavItemConfig;
   t: TFunction;
 };
 
@@ -60,4 +75,33 @@ export type ApplySelectedBootableVolumeToForm = {
   selectedVolume: BootableVolume;
   setValue: UseFormSetValue<VMWizardFormValues>;
   volumeSnapshotSource: null | VolumeSnapshotKind;
+};
+
+export type VMCreationMethodCardDetails = {
+  description: string;
+  IconComponent: FC;
+  label: string;
+};
+
+export type VMCreationMethodConfig = {
+  activeFlow: VMWizardStep[];
+  cardDetails: (t: TFunction) => VMCreationMethodCardDetails;
+};
+
+export type HandleWizardStepClick = {
+  currentStep: WizardStepType;
+  getValues: UseFormGetValues<VMWizardFormValues>;
+  hasLoggedCreationStarted: { current: boolean };
+  setValue: UseFormSetValue<VMWizardFormValues>;
+};
+
+export type HandleCloneRequestPhaseChangeParams = {
+  cloneRequest: undefined | V1beta1VirtualMachineClone;
+  formValues: VMWizardFormValues['vmData'];
+  navigate: NavigateFunction;
+  setError: (error: unknown) => void;
+  setIsSubmitting: (isSubmitting: boolean) => void;
+  submittedCloneRequest: undefined | V1beta1VirtualMachineClone;
+  setSubmittedCloneRequest: (cloneRequest: undefined | V1beta1VirtualMachineClone) => void;
+  t: TFunction;
 };

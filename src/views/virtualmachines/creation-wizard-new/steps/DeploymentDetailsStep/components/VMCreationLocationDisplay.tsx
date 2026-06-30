@@ -1,6 +1,6 @@
+import classNames from 'classnames';
 import React, { FC } from 'react';
 import { useWatch } from 'react-hook-form';
-import classNames from 'classnames';
 
 import EditButton from '@kubevirt-utils/components/EditButton/EditButton';
 import { TREE_VIEW_FOLDERS } from '@kubevirt-utils/hooks/useFeatures/constants';

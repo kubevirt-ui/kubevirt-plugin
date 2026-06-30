@@ -3,8 +3,11 @@ import { useWatch } from 'react-hook-form';
 import { Updater, useImmer } from 'use-immer';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { getTemplateVirtualMachineObject, Template } from '@kubevirt-utils/resources/template';
-import { useVMTemplateSource } from '@kubevirt-utils/resources/template';
+import {
+  getTemplateVirtualMachineObject,
+  Template,
+  useVMTemplateSource,
+} from '@kubevirt-utils/resources/template';
 import useVMTemplateGeneratedParams from '@kubevirt-utils/resources/template/hooks/useVMTemplateGeneratedParams';
 import { useVMWizard } from '@virtualmachines/creation-wizard-new/state/vm-wizard-context/VMWizardContext';
 import { CREATE_VM_FORM_FIELDS_VM_DATA } from '@virtualmachines/creation-wizard-new/state/vm-wizard-form/consts';

@@ -1,6 +1,6 @@
+import classnames from 'classnames';
 import React, { FC } from 'react';
 import { useWatch } from 'react-hook-form';
-import classnames from 'classnames';
 
 import { FLAG_LIGHTSPEED_PLUGIN } from '@kubevirt-utils/flags/consts';
 import useWizardFooterProps from '@kubevirt-utils/hooks/useWizardFooterProps';
