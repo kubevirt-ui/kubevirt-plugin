@@ -82,20 +82,23 @@ const TargetStep: FC<TargetStepProps> = ({ migrationPlan, setMigrationPlan, vms 
   } = useClustersAndProjects(sourceCluster, selectedClusterTarget);
 
   useEffect(() => {
-    if (clustersOptions?.length && !selectedProviderTarget) {
-      setMigrationPlan((plan) => {
+    if (!clustersOptions?.length || selectedProviderTarget) return;
+
+    setMigrationPlan((plan) => {
+      const sourceProvider = getProviderFromClusterName(sourceCluster);
+      plan.spec.provider.source.name = getName(sourceProvider);
+      plan.spec.provider.source.uid = getUID(sourceProvider);
+      plan.spec.provider.source.namespace = getNamespace(sourceProvider);
+
+      if (!advisorBaseURL) {
         const selectedProvider = getProviderFromClusterName(clustersOptions?.[0]?.value);
         plan.spec.provider.destination.name = getName(selectedProvider);
         plan.spec.provider.destination.uid = getUID(selectedProvider);
         plan.spec.provider.destination.namespace = getNamespace(selectedProvider);
-
-        const sourceProvider = getProviderFromClusterName(sourceCluster);
-        plan.spec.provider.source.name = getName(sourceProvider);
-        plan.spec.provider.source.uid = getUID(sourceProvider);
-        plan.spec.provider.source.namespace = getNamespace(sourceProvider);
-      });
-    }
+      }
+    });
   }, [
+    advisorBaseURL,
     clustersOptions,
     setMigrationPlan,
     selectedProviderTarget,
