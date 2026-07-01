@@ -27,14 +27,14 @@ import { Pagination, Stack, StackItem } from '@patternfly/react-core';
 
 import { BootableResource } from '../utils/types';
 
-import BootableVolumeAddButton from './components/BootableVolumeAddButton';
-import BootableVolumesEmptyState from './components/BootableVolumesEmptyState';
-import useBootableVolumesFilters from './hooks/useBootableVolumesFilters';
 import {
   BootableVolumeCallbacks,
   getBootableVolumeColumns,
   getBootableVolumeRowId,
 } from './bootableVolumesDefinition';
+import BootableVolumeAddButton from './components/BootableVolumeAddButton';
+import BootableVolumesEmptyState from './components/BootableVolumesEmptyState';
+import useBootableVolumesFilters from './hooks/useBootableVolumesFilters';
 
 import '@kubevirt-utils/styles/list-managment-group.scss';
 
@@ -54,9 +54,12 @@ const BootableVolumesList: FC = () => {
     filterDefinitions,
   });
 
-  const { handlePerPageSelect, handleSetPage, pagination } = usePaginationWithFilters(
-    filteredData?.length ?? 0,
-  );
+  const {
+    handlePerPageSelect,
+    handleSetPage,
+    pagination,
+    handleFilterChange: handleSetFilters,
+  } = usePaginationWithFilters(filteredData?.length ?? 0, onSetFilters);
 
   const columns = useMemo(
     () =>
@@ -131,7 +134,7 @@ const BootableVolumesList: FC = () => {
               filterDefinitions={filterDefinitions}
               filters={filters}
               loaded={isLoaded}
-              onSetFilters={onSetFilters}
+              onSetFilters={handleSetFilters}
               toolbarEndContent={toolbarEndContent}
             />
             {!isEmpty(filteredData) && isLoaded && (
