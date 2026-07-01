@@ -99,7 +99,7 @@ jobs:
       - name: Upload IAM diagnostics log
         if: always() && steps.iam_diagnostics.outcome != 'skipped'
         continue-on-error: true
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: ibmcloud-iam-diagnostics-${{ github.run_id }}
           path: ${{ runner.temp }}/ibmcloud-iam-diagnostics.txt
@@ -458,7 +458,7 @@ jobs:
 
       - name: Upload IPI install artifacts
         if: inputs.infrastructure_type == 'ipi' && always()
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: ipi-install-state-${{ github.run_id }}
           path: |
