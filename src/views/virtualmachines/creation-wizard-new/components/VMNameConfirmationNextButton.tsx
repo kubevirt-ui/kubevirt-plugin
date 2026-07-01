@@ -53,7 +53,7 @@ const VMNameConfirmationNextButton: FC<VMNameConfirmationNextButtonProps> = ({
     </Button>
   );
 
-  if (isDisabled) {
+  if (isDisabled && !isSubmitting) {
     return (
       <Tooltip content={!vmName ? t('VM name is required') : t('VM name is not valid')}>
         {nextButton}

@@ -7,3 +7,9 @@ export type DiskDevice = {
   pvc: IoK8sApiCoreV1PersistentVolumeClaim;
   volume: V1Volume;
 };
+
+export type SourceNameByPriority = {
+  sourceNamePriority: number;
+  isDeviceElementExists: boolean;
+  source: () => string;
+};

@@ -30,13 +30,31 @@ import { createPopulatedCloudInitYAML } from '@virtualmachines/creation-wizard/s
 export type UseGenerateVM = () => V1VirtualMachine;
 
 const useGenerateVM: UseGenerateVM = () => {
-  const { control, getValues } = useVMWizard();
-  const [cluster, namespace, selectedBootableVolume] = useWatch({
+  const { control } = useVMWizard();
+  const [
+    cluster,
+    namespace,
+    selectedBootableVolume,
+    vmDescription,
+    folder,
+    vmName,
+    customDiskSize,
+    dvSource,
+    pvcSource,
+    selectedInstanceType,
+  ] = useWatch({
     control,
     name: [
       CREATE_VM_FORM_FIELDS_VM_DATA.CLUSTER,
       CREATE_VM_FORM_FIELDS_VM_DATA.PROJECT,
       CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.SELECTED_BOOTABLE_VOLUME,
+      CREATE_VM_FORM_FIELDS_VM_DATA.DESCRIPTION,
+      CREATE_VM_FORM_FIELDS_VM_DATA.FOLDER,
+      CREATE_VM_FORM_FIELDS_VM_DATA.NAME,
+      CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.CUSTOM_DISK_SIZE,
+      CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.DV_SOURCE,
+      CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.PVC_SOURCE,
+      CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.SELECTED_INSTANCE_TYPE,
     ],
   });
   const { featureEnabled: autoUpdateEnabled } = useFeatures(AUTOMATIC_UPDATE_FEATURE_NAME);
@@ -64,14 +82,6 @@ const useGenerateVM: UseGenerateVM = () => {
   const generatedVMName = useMemo(() => generatePrettyName(osLabel), [osLabel]);
 
   const generatedVM = useMemo(() => {
-    const {
-      description: vmDescription,
-      folder,
-      name: vmName,
-    } = getValues(CREATE_VM_FORM_FIELDS_VM_DATA.ROOT);
-    const { customDiskSize, dvSource, pvcSource, selectedInstanceType } = getValues(
-      CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.ROOT,
-    );
     return generateVM({
       cluster,
       customDiskSize,
@@ -90,14 +100,20 @@ const useGenerateVM: UseGenerateVM = () => {
     });
   }, [
     cluster,
+    customDiskSize,
+    dvSource,
     enableMultiArchBootImageImport,
-    generatedVMName,
-    getValues,
+    folder,
     isIPv6SingleStack,
     isUDNManagedNamespace,
-    namespace,
     populatedCloudInitYAML,
+    pvcSource,
     selectedBootableVolume,
+    selectedInstanceType,
+    namespace,
+    vmDescription,
+    vmName,
+    generatedVMName,
   ]);
 
   const [driversImage] = useDriversImage();

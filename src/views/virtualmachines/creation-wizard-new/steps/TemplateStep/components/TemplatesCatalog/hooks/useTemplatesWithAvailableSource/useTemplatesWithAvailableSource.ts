@@ -4,8 +4,9 @@ import { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-d
 import { getUID } from '@kubevirt-utils/resources/shared';
 import { Template } from '@kubevirt-utils/resources/template';
 import { useSingleClusterAvailableSources } from '@kubevirt-utils/resources/template/hooks/useSingleClusterAvailableSources';
-import useAvailableTemplates from '@virtualmachines/creation-wizard-new/steps/TemplateStep/components/TemplatesCatalog/hooks/useTemplatesWithAvailableSource/useAvailableTemplates';
-import useTemplates from '@virtualmachines/creation-wizard-new/steps/TemplateStep/components/TemplatesCatalog/hooks/useTemplatesWithAvailableSource/useTemplates';
+import { getAvailableTemplates } from '@virtualmachines/creation-wizard-new/steps/TemplateStep/components/TemplatesCatalog/utils/getAvailableTemplates';
+
+import useTemplates from './useTemplates';
 
 type UseTemplatesWithAvailableSource = (args: { namespace?: string }) => {
   availableDataSources: Record<string, V1beta1DataSource>;
@@ -25,17 +26,15 @@ const useTemplatesWithAvailableSource: UseTemplatesWithAvailableSource = ({ name
     loaded: bootSourcesLoaded,
   } = useSingleClusterAvailableSources(templates, loaded);
 
-  const availableTemplates = useAvailableTemplates(
-    availableDataSources,
-    availablePVCs,
-    templates,
-    loaded,
-  );
-
-  const availableTemplatesUID = useMemo(
-    () => new Set(availableTemplates.map((template) => getUID(template))),
-    [availableTemplates],
-  );
+  const availableTemplatesUID = useMemo(() => {
+    const availableTemplates = getAvailableTemplates(
+      availableDataSources,
+      availablePVCs,
+      templates,
+      loaded,
+    );
+    return new Set(availableTemplates.map((template) => getUID(template)));
+  }, [availableDataSources, availablePVCs, templates, loaded]);
 
   return {
     availableDataSources,

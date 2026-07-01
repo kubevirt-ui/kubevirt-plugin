@@ -20,7 +20,6 @@ import {
   CREATE_VM_FORM_FIELDS_STEP_NAVIGATION,
 } from '../state/vm-wizard-form/consts';
 import { VMWizardFormValues } from '../state/vm-wizard-form/types';
-
 import {
   ApplySelectedBootableVolumeToForm,
   VMCreationMethodCardDetails,

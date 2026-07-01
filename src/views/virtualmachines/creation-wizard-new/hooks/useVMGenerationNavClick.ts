@@ -30,7 +30,6 @@ const useVMGenerationNavClick = (creationMethod: VMCreationMethod): WizardStepNa
       try {
         if (isInstanceTypeCreationMethod(creationMethod)) {
           setVMSignal(generatedVM);
-          return;
         }
         if (isTemplateCreationMethod(creationMethod)) await createVMFromTemplate();
       } finally {

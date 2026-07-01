@@ -1,20 +1,12 @@
-import React, { FC, useMemo } from 'react';
+import React, { FC, useCallback } from 'react';
 import { useWatch } from 'react-hook-form';
 
-import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { useApplyFiltersWithQuery } from '@kubevirt-utils/components/ListPageFilter/hooks/useApplyFiltersWithQuery';
 import TemplatesFilter from '@kubevirt-utils/components/TemplatesFilter/TemplatesFilter';
 import { TemplatesFilterVariant } from '@kubevirt-utils/components/TemplatesFilter/types';
-import { logTemplateFlowEvent } from '@kubevirt-utils/extensions/telemetry/telemetry';
-import { TEMPLATE_SELECTED } from '@kubevirt-utils/extensions/telemetry/utils/constants';
-import useFiltersFromURL from '@kubevirt-utils/hooks/useFiltersFromURL';
-import useIsWindowsSupportedArchitecture from '@kubevirt-utils/hooks/useIsWindowsSupportedArchitecture';
-import { OS_NAME_TYPES } from '@kubevirt-utils/resources/template';
-import { getTemplateOS } from '@kubevirt-utils/resources/template/utils/selectors';
+import { logTemplateFlowEvent, TEMPLATE_SELECTED } from '@kubevirt-utils/extensions/telemetry';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { useListPageFilter } from '@openshift-console/dynamic-plugin-sdk';
 import { Card, Split, SplitItem } from '@patternfly/react-core';
-import useVirtualMachineTemplatesFilters from '@templates/list/filters/useVirtualMachineTemplatesFilters';
+import { Template } from '@kubevirt-utils/resources/template';
 import { useVMWizard } from '@virtualmachines/creation-wizard-new/state/vm-wizard-context/VMWizardContext';
 import {
   CREATE_VM_FORM_FIELDS_UI_STATE,
@@ -24,57 +16,47 @@ import TemplatesCatalogEmptyState from '@virtualmachines/creation-wizard-new/ste
 import TemplatesCatalogItems from '@virtualmachines/creation-wizard-new/steps/TemplateStep/components/TemplatesCatalog/components/TemplatesCatalogItems/TemplatesCatalogItems';
 import CatalogSkeleton from '@virtualmachines/creation-wizard-new/steps/TemplateStep/components/TemplatesCatalog/components/TemplatesCatalogSkeleton';
 import TemplatesToolbar from '@virtualmachines/creation-wizard-new/steps/TemplateStep/components/TemplatesCatalog/components/TemplatesToolbar/TemplatesToolbar';
-import useTemplatesWithAvailableSource from '@virtualmachines/creation-wizard-new/steps/TemplateStep/components/TemplatesCatalog/hooks/useTemplatesWithAvailableSource/useTemplatesWithAvailableSource';
 
-import useCatalogUIState from './hooks/useCatalogUIState';
+import useTemplatesCatalog from './hooks/useTemplatesCatalog';
 
 import './TemplateCatalog.scss';
 
 const TemplatesCatalog: FC = () => {
+  const {
+    availableDataSources,
+    availableTemplatesUID,
+    bootSourcesLoaded,
+    clearAll,
+    filteredTemplates,
+    filters,
+    isList,
+    loaded,
+    namespace,
+    onFilterChange,
+    setIsList,
+    setNamespace,
+  } = useTemplatesCatalog();
+
   const { control, setValue } = useVMWizard();
   const selectedTemplate = useWatch({
     control,
     name: CREATE_VM_FORM_FIELDS_VM_DATA.SELECTED_TEMPLATE,
   });
-  const { isList, namespace, setIsList, setNamespace } = useCatalogUIState();
 
-  const { availableDataSources, availableTemplatesUID, bootSourcesLoaded, loaded, templates } =
-    useTemplatesWithAvailableSource({ namespace });
-
-  const isWindowsSupported = useIsWindowsSupportedArchitecture();
-
-  const supportedTemplates = useMemo(
-    () =>
-      isWindowsSupported
-        ? templates
-        : templates.filter((t) => getTemplateOS(t) !== OS_NAME_TYPES.windows),
-    [templates, isWindowsSupported],
+  const handleTemplateSelect = useCallback(
+    (template: Template) => {
+      setValue(CREATE_VM_FORM_FIELDS_VM_DATA.SELECTED_TEMPLATE, template);
+      logTemplateFlowEvent(TEMPLATE_SELECTED, template);
+      setValue(CREATE_VM_FORM_FIELDS_UI_STATE.IS_TEMPLATES_DRAWER_OPEN, true);
+    },
+    [setValue],
   );
 
-  const { filters } = useVirtualMachineTemplatesFilters(supportedTemplates);
-  const filtersFromURL = useFiltersFromURL(filters);
-  const [, filteredTemplates, onFilterChange] = useListPageFilter(
-    supportedTemplates,
-    filters,
-    filtersFromURL,
-  );
+  if (!loaded) {
+    return <CatalogSkeleton />;
+  }
 
-  const applyFiltersWithQuery = useApplyFiltersWithQuery(onFilterChange);
-
-  const handleTemplateSelect = (template: V1Template) => {
-    setValue(CREATE_VM_FORM_FIELDS_VM_DATA.SELECTED_TEMPLATE, template);
-    logTemplateFlowEvent(TEMPLATE_SELECTED, template);
-    setValue(CREATE_VM_FORM_FIELDS_UI_STATE.IS_TEMPLATES_DRAWER_OPEN, true);
-  };
-
-  const clearAll = () => {
-    filters.forEach((rf) => {
-      applyFiltersWithQuery(rf.type, []);
-    });
-    applyFiltersWithQuery('name', []);
-  };
-
-  return loaded ? (
+  return (
     <Card className="vm-catalog">
       <TemplatesToolbar
         isList={isList}
@@ -112,8 +94,6 @@ const TemplatesCatalog: FC = () => {
         </SplitItem>
       </Split>
     </Card>
-  ) : (
-    <CatalogSkeleton />
   );
 };
 
