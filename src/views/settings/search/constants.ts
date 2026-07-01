@@ -28,6 +28,10 @@ export const USER_TAB_IDS = {
   welcomeInformation: 'welcome-information',
 };
 
+export const RECOMMENDED_TAB_IDS = {
+  recommendedCapabilities: 'recommended-capabilities',
+};
+
 export const PREVIEW_FEATURES_TAB_IDS = {
   passtUDNNetwork: 'passt-udn-network',
   previewFeatures: 'preview-features',
