@@ -30,6 +30,12 @@ export const NUMERIC_FILTER_KEYS = new Set<string>([
   VirtualMachineRowFilterType.Memory,
 ]);
 
+export const DATE_CREATED_FILTER_KEYS = new Set<string>([
+  VirtualMachineRowFilterType.DateCreated,
+  VirtualMachineRowFilterType.DateCreatedFrom,
+  VirtualMachineRowFilterType.DateCreatedTo,
+]);
+
 export const NUMERIC_OPERATOR_REGEX = /^([a-zA-Z]+):?(>=|<=|>|<|=)(.*)$/;
 
 export const MEMORY_VALUE_REGEX = /^(\d+(?:\.\d+)?)\s*([A-Za-z]+)$/;

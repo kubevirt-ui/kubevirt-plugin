@@ -15,6 +15,7 @@ export enum VirtualMachineRowFilterType {
   Architecture = 'architecture',
   Cluster = CLUSTER_LIST_FILTER_TYPE,
   CPU = 'cpu',
+  DateCreated = 'dateCreated',
   DateCreatedFrom = 'dateCreatedFrom',
   DateCreatedTo = 'dateCreatedTo',
   Description = 'description',

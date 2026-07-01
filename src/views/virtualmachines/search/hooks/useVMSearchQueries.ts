@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { useSearchParams } from 'react-router';
 
 import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { resolveDateCreatedValue } from '@search/utils/dateCreatedValues';
 import { getRowFilterQueryKey } from '@search/utils/query';
 import { AdvancedSearchFilter } from '@stolostron/multicluster-sdk';
 import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
@@ -26,6 +27,7 @@ const useVMSearchQueries = (): VMSearchQueries => {
 
   const vmName = getParam(VirtualMachineRowFilterType.Name);
   const ip = getParam(VirtualMachineRowFilterType.IP);
+  const dateCreated = getParam(VirtualMachineRowFilterType.DateCreated);
   const createdFrom = getParam(VirtualMachineRowFilterType.DateCreatedFrom);
   const createdTo = getParam(VirtualMachineRowFilterType.DateCreatedTo);
 
@@ -38,11 +40,26 @@ const useVMSearchQueries = (): VMSearchQueries => {
       vmQueries: [],
     };
 
-    if (createdFrom) {
-      queries.vmQueries.push({ property: 'created', values: [`>=${createdFrom}`] });
-    }
-    if (createdTo) {
-      queries.vmQueries.push({ property: 'created', values: [`<=${createdTo}`] });
+    const pushDateFrom = (value: string) =>
+      queries.vmQueries.push({ property: 'created', values: [`>=${value}`] });
+    const pushDateTo = (value: string) =>
+      queries.vmQueries.push({ property: 'created', values: [`<=${value}`] });
+
+    if (dateCreated) {
+      const resolved = resolveDateCreatedValue(dateCreated);
+      if (resolved) {
+        pushDateFrom(resolved.from);
+        if (resolved.to) {
+          pushDateTo(resolved.to);
+        }
+      }
+    } else {
+      if (createdFrom) {
+        pushDateFrom(createdFrom);
+      }
+      if (createdTo) {
+        pushDateTo(createdTo);
+      }
     }
 
     if (!isEmpty(clusters)) {
@@ -63,7 +80,7 @@ const useVMSearchQueries = (): VMSearchQueries => {
     }
 
     return queries;
-  }, [createdFrom, createdTo, vmName, ip, projects, clusters]);
+  }, [dateCreated, createdFrom, createdTo, vmName, ip, projects, clusters]);
 };
 
 export default useVMSearchQueries;

@@ -13,7 +13,7 @@ import { useAccessibleResources } from '@virtualmachines/search/hooks/useAccessi
 import { PVCMapper, VMIMapper } from '@virtualmachines/utils/mappers';
 
 import { getCPUFilter } from '../filters/getCPUFilter';
-import { getDateFromFilter, getDateToFilter } from '../filters/getDateFilter';
+import { getDateCreatedFilter, getDateFromFilter, getDateToFilter } from '../filters/getDateFilter';
 import { getDescriptionFilter } from '../filters/getDescriptionFilter';
 import { getGuestAgentFilter } from '../filters/getGuestAgentFilter';
 import { getHWDevicesFilter } from '../filters/getHWDevicesFilter';
@@ -84,6 +84,7 @@ const useVMListFilters = (
       getDescriptionFilter(t),
       getCPUFilter(t, vmiMapper, instanceTypeMapper),
       getMemoryFilter(t, vmiMapper, instanceTypeMapper),
+      getDateCreatedFilter(t),
       getDateFromFilter(t),
       getDateToFilter(t),
       architectureFilter,

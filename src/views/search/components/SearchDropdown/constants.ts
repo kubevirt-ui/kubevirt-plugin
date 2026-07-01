@@ -5,100 +5,122 @@ import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
 import { SearchExample, SearchKeyBadge, ValueOption } from './types';
 
+export const SEARCH_KEYS = {
+  NAME: 'name',
+  PROJECT: 'project',
+  STATUS: 'status',
+  CPU: 'vcpu',
+  STORAGE_CLASS: 'storage',
+  DATE_CREATED: 'created',
+  SCHEDULING: 'scheduling',
+  DESCRIPTION: 'description',
+  OS: 'os',
+  ARCHITECTURE: 'arch',
+  MEMORY: 'memory',
+  HAS: 'has',
+  LABELS: 'label',
+  NODE: 'node',
+  GUEST_AGENT: 'guestagent',
+  IP: 'ip',
+  NETWORK: 'network',
+  CLUSTER: 'cluster',
+} as const;
+
 const BASE_SEARCH_KEY_BADGES: SearchKeyBadge[] = [
   {
     filterType: VirtualMachineRowFilterType.Name,
     getDescription: (t) => t('VM name - contains match (or just type free text)'),
-    searchKey: 'name',
+    searchKey: SEARCH_KEYS.NAME,
   },
   {
     filterType: VirtualMachineRowFilterType.Project,
     getDescription: (t) => t('Namespace / project e.g. project:default,openshift'),
-    searchKey: 'project',
+    searchKey: SEARCH_KEYS.PROJECT,
   },
   {
     filterType: VirtualMachineRowFilterType.Status,
     getDescription: (t) => t('VM status e.g. status:running,error'),
-    searchKey: 'status',
+    searchKey: SEARCH_KEYS.STATUS,
   },
   {
     filterType: VirtualMachineRowFilterType.CPU,
     getDescription: (t) => t('vCPU count e.g. vcpu >2 vcpu>4 (also supports > =)'),
-    searchKey: 'vcpu',
+    searchKey: SEARCH_KEYS.CPU,
     usesColon: false,
   },
   {
     filterType: VirtualMachineRowFilterType.StorageClass,
     getDescription: (t) => t('Storage class e.g. storage:gold,silver'),
-    searchKey: 'storage',
+    searchKey: SEARCH_KEYS.STORAGE_CLASS,
   },
   {
-    filterType: VirtualMachineRowFilterType.DateCreatedFrom,
-    getDescription: (t) => t('Creation date e.g. created:today created:last-7-days'),
-    searchKey: 'created',
+    filterType: VirtualMachineRowFilterType.DateCreated,
+    getDescription: (t) =>
+      t('Creation date e.g. created:today created:last-7-days created:from-2026-01-25'),
+    searchKey: SEARCH_KEYS.DATE_CREATED,
   },
   {
     filterType: VirtualMachineRowFilterType.Scheduling,
     getDescription: (t) => t('Scheduling constraints e.g. scheduling:nodeSelector,affinityRules'),
-    searchKey: 'scheduling',
+    searchKey: SEARCH_KEYS.SCHEDULING,
   },
   {
     filterType: VirtualMachineRowFilterType.Description,
     getDescription: (t) => t('Free-text match in VM description e.g. description:database'),
-    searchKey: 'description',
+    searchKey: SEARCH_KEYS.DESCRIPTION,
   },
   {
     filterType: VirtualMachineRowFilterType.OS,
     getDescription: (t) => t('Operating system e.g. os:CentOS,Fedora'),
-    searchKey: 'os',
+    searchKey: SEARCH_KEYS.OS,
   },
   {
     filterType: VirtualMachineRowFilterType.Architecture,
     getDescription: (t) => t('CPU architecture e.g. arch:amd64,arm64'),
-    searchKey: 'arch',
+    searchKey: SEARCH_KEYS.ARCHITECTURE,
   },
   {
     filterType: VirtualMachineRowFilterType.Memory,
     getDescription: (t) => t('RAM e.g. memory>4GiB or memory>=8GiB'),
-    searchKey: 'memory',
+    searchKey: SEARCH_KEYS.MEMORY,
     usesColon: false,
   },
   {
     filterType: VirtualMachineRowFilterType.HWDevices,
     getDescription: (t) => t('Hardware capability e.g. has:gpu,host'),
-    searchKey: 'has',
+    searchKey: SEARCH_KEYS.HAS,
   },
   {
     filterType: VirtualMachineRowFilterType.Labels,
     getDescription: (t) => t('Metadata label e.g. label:app=database,app=frontend'),
-    searchKey: 'label',
+    searchKey: SEARCH_KEYS.LABELS,
   },
   {
     filterType: VirtualMachineRowFilterType.Node,
     getDescription: (t) => t('Scheduled node e.g. node:worker-01,worker-02'),
-    searchKey: 'node',
+    searchKey: SEARCH_KEYS.NODE,
   },
   {
     filterType: VirtualMachineRowFilterType.GuestAgent,
     getDescription: (t) => t('Guest agent status e.g. guestagent:reporting,notReporting'),
-    searchKey: 'guestagent',
+    searchKey: SEARCH_KEYS.GUEST_AGENT,
   },
   {
     filterType: VirtualMachineRowFilterType.IP,
     getDescription: (t) => t('IP address e.g. ip:10.0.0.1'),
-    searchKey: 'ip',
+    searchKey: SEARCH_KEYS.IP,
   },
   {
     filterType: VirtualMachineRowFilterType.NAD,
     getDescription: (t) => t('Network attachment definition e.g. network:default/my-network'),
-    searchKey: 'network',
+    searchKey: SEARCH_KEYS.NETWORK,
   },
 ];
 
 const CLUSTER_BADGE: SearchKeyBadge = {
   filterType: VirtualMachineRowFilterType.Cluster,
   getDescription: (t) => t('Cluster name e.g. cluster:production,local-cluster'),
-  searchKey: 'cluster',
+  searchKey: SEARCH_KEYS.CLUSTER,
 };
 
 export const ALL_SEARCH_KEY_BADGES = [CLUSTER_BADGE, ...BASE_SEARCH_KEY_BADGES];

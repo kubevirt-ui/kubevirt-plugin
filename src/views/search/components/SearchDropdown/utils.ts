@@ -1,6 +1,7 @@
 import { KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { universalComparator } from '@kubevirt-utils/utils/utils';
 import { getFilterDefinition } from '@search/searchLanguage/utils';
+import { FROM_PREFIX, isFromValue, isToValue, TO_PREFIX } from '@search/utils/dateCreatedValues';
 import { STATUS_VALUE_GROUPS, VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
 import { SearchKeyBadge, ValueOption } from './types';
@@ -42,6 +43,18 @@ export const getFilteredOrderedOptions = (
       }
     }
     return ordered;
+  }
+
+  if (filterType === VirtualMachineRowFilterType.DateCreated) {
+    const hasFrom = selectedValues.some((v) => isFromValue(v.toLowerCase()));
+    const hasTo = selectedValues.some((v) => isToValue(v.toLowerCase()));
+
+    if (hasFrom || hasTo) {
+      const complementValue = hasFrom ? TO_PREFIX : FROM_PREFIX;
+      return options.filter((opt) => opt.value === complementValue);
+    }
+
+    return filtered;
   }
 
   return [...filtered].sort((a, b) => universalComparator(a.label, b.label));

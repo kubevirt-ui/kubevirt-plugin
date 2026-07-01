@@ -1,18 +1,20 @@
-import { CAPACITY_UNITS } from '@kubevirt-utils/components/CapacityInput/utils';
 import {
   KubevirtFilter,
   KubevirtFilterState,
 } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { formatFilterValue } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/utils';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { createCPUQueryValue, createMemoryQueryValue } from '@search/utils/query';
 import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
-import { buildOptionsLookup, normalizeValue } from './hooks/useOnCommitText/utils';
-import { MEMORY_VALUE_REGEX, NUMERIC_FILTER_KEYS, SIGN_TO_OPERATOR } from './constants';
-import { parseSearchToken } from './parser';
-import { InvalidKeyError, InvalidValueError, OptionsLookup, ValidationResult } from './types';
-import { getSanitizedInput } from './utils';
+import { NUMERIC_FILTER_KEYS } from '../constants';
+import { buildOptionsLookup, normalizeValue } from '../hooks/useOnCommitText/utils';
+import { parseSearchToken } from '../parser';
+import { InvalidKeyError, InvalidValueError, OptionsLookup, ValidationResult } from '../types';
+import { getSanitizedInput } from '../utils';
+
+import { validateDateCreatedValues } from './dateCreatedUtils';
+import { formatNumericValue } from './numericUtils';
+import { setFilter } from './utils';
 
 const validateTokenValues = (
   rawValues: string[],
@@ -34,32 +36,6 @@ const validateTokenValues = (
   }
 
   return { invalidValues, validValues };
-};
-
-const normalizeMemoryUnit = (unit: string): CAPACITY_UNITS | undefined => {
-  const lower = unit.toLowerCase();
-  return Object.values(CAPACITY_UNITS).find((u) => u.toLowerCase() === lower);
-};
-
-const formatNumericValue = (key: string, operatorSign: string, rawValue: string): null | string => {
-  const operatorEnum = SIGN_TO_OPERATOR[operatorSign];
-  if (!operatorEnum) return null;
-
-  if (key === VirtualMachineRowFilterType.Memory) {
-    const match = rawValue.match(MEMORY_VALUE_REGEX);
-    if (!match) return null;
-
-    const [, numStr, unit] = match;
-    const normalizedUnit = normalizeMemoryUnit(unit);
-    if (!normalizedUnit) return null;
-
-    return createMemoryQueryValue(operatorEnum, Number(numStr), normalizedUnit);
-  }
-
-  const num = Number(rawValue);
-  if (isNaN(num)) return null;
-
-  return createCPUQueryValue(operatorEnum, num);
 };
 
 export const validateAndBuildFilterState = (
@@ -88,10 +64,7 @@ export const validateAndBuildFilterState = (
       }
 
       const finalValue = formatFilterValue(values[0], exclude);
-      filterState[VirtualMachineRowFilterType.Name] = [finalValue];
-      if (!tokenOrder.includes(VirtualMachineRowFilterType.Name)) {
-        tokenOrder.push(VirtualMachineRowFilterType.Name);
-      }
+      setFilter(filterState, tokenOrder, VirtualMachineRowFilterType.Name, finalValue);
       continue;
     }
 
@@ -110,8 +83,20 @@ export const validateAndBuildFilterState = (
       }
 
       const finalValue = formatFilterValue(numericValue, exclude);
-      filterState[filterType] = [finalValue];
-      if (!tokenOrder.includes(filterType)) tokenOrder.push(filterType);
+      setFilter(filterState, tokenOrder, filterType, finalValue);
+      continue;
+    }
+
+    if (filterType === VirtualMachineRowFilterType.DateCreated) {
+      const invalidDates = validateDateCreatedValues(values, filterState, tokenOrder);
+      if (!isEmpty(invalidDates)) {
+        invalidValueErrors.push({
+          filterType,
+          invalidValues: invalidDates,
+          searchKey,
+          validValues: [],
+        });
+      }
       continue;
     }
 

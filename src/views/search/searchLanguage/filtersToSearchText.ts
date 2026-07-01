@@ -4,10 +4,13 @@ import {
   stripExclusionPrefix,
 } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/utils';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { FROM_PREFIX, TO_PREFIX } from '@search/utils/dateCreatedValues';
 import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
+import { SEARCH_KEYS } from '@search/components/SearchDropdown/constants';
 import {
   CPU_NUMERIC_REGEX,
+  DATE_CREATED_FILTER_KEYS,
   FILTER_TYPE_TO_SEARCH_KEY,
   MEMORY_UNIT_REGEX,
   NUMERIC_FILTER_KEYS,
@@ -73,6 +76,21 @@ const serializeFilterValues = (filterType: string, values: string[]): string[] =
   return tokens;
 };
 
+const serializeDateCreatedFilters = (filters: Partial<KubevirtFilterState>): string | null => {
+  const dateCreated = filters[VirtualMachineRowFilterType.DateCreated]?.[0];
+  const dateFrom = filters[VirtualMachineRowFilterType.DateCreatedFrom]?.[0];
+  const dateTo = filters[VirtualMachineRowFilterType.DateCreatedTo]?.[0];
+
+  if (dateCreated) return `${SEARCH_KEYS.DATE_CREATED}:${dateCreated}`;
+
+  const parts: string[] = [];
+  if (dateFrom) parts.push(`${FROM_PREFIX}${dateFrom}`);
+  if (dateTo) parts.push(`${TO_PREFIX}${dateTo}`);
+
+  if (isEmpty(parts)) return null;
+  return `${SEARCH_KEYS.DATE_CREATED}:${parts.join(',')}`;
+};
+
 export const filtersToSearchText = (
   filters: Partial<KubevirtFilterState>,
   tokenOrder: string[],
@@ -84,6 +102,7 @@ export const filtersToSearchText = (
 
   const seen = new Set<string>();
   const tokens: string[] = [];
+  let dateCreatedSerialized = false;
 
   for (const key of orderedKeys) {
     if (seen.has(key)) continue;
@@ -91,6 +110,15 @@ export const filtersToSearchText = (
 
     const values = filters[key];
     if (isEmpty(values)) continue;
+
+    if (DATE_CREATED_FILTER_KEYS.has(key)) {
+      if (!dateCreatedSerialized) {
+        const dateToken = serializeDateCreatedFilters(filters);
+        if (dateToken) tokens.push(dateToken);
+        dateCreatedSerialized = true;
+      }
+      continue;
+    }
 
     tokens.push(...serializeFilterValues(key, values));
   }

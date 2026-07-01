@@ -41,6 +41,7 @@ const getInitialState = (prefillInputs: AdvancedSearchInputs = {}): AdvancedSear
     [VirtualMachineRowFilterType.Architecture]: [],
     [VirtualMachineRowFilterType.Cluster]: [],
     [VirtualMachineRowFilterType.CPU]: initialVCPU,
+    [VirtualMachineRowFilterType.DateCreated]: '',
     [VirtualMachineRowFilterType.DateCreatedFrom]: '',
     [VirtualMachineRowFilterType.DateCreatedTo]: '',
     [VirtualMachineRowFilterType.Description]: '',
