@@ -1,4 +1,11 @@
 import { TFunction } from 'i18next';
+import { LabelProps } from '@patternfly/react-core';
+
+export const getScoreColor = (score: number): LabelProps['color'] => {
+  if (score >= 70) return 'green';
+  if (score >= 40) return 'yellow';
+  return 'red';
+};
 
 export const getSubtitleChecks = (t: TFunction, checks: boolean[], checksLoaded: boolean[]) => {
   const subtitle = [];
