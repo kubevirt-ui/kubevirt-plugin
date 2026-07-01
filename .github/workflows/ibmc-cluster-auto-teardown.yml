@@ -125,7 +125,7 @@ jobs:
           fi
 
       - name: Setup IBM Cloud CLI
-        uses: IBM/actions-ibmcloud-cli@v1
+        uses: IBM/actions-ibmcloud-cli@v2
         if: steps.check_ci.outputs.active_jobs == 'false' && steps.check_hours.outputs.skip != 'true'
         with:
           api_key: ${{ secrets.IC_KEY }}
