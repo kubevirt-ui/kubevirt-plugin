@@ -5,7 +5,7 @@ import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { KeyTypes } from '@patternfly/react-core';
 import { filtersToSearchText } from '@search/searchLanguage/filtersToSearchText';
 import { getLastToken, isIncompleteToken } from '@search/searchLanguage/utils';
-import { validateAndBuildFilterState } from '@search/searchLanguage/validateAndBuildFilterState';
+import { validateAndBuildFilterState } from '@search/searchLanguage/validateAndBuildFilterState/validateAndBuildFilterState';
 
 import { updateFilterState } from '../useOnCommitText/updateFilterState';
 import useSearchValidationToast from '../useSearchValidationToast/useSearchValidationToast';

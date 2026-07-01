@@ -11,6 +11,9 @@ import { useAdvancedSearchField } from '../store/useAdvancedSearchStore';
 
 const DateCreatedField: FC = () => {
   const { t } = useKubevirtTranslation();
+  const { setValue: setDateCreated, value: dateCreated } = useAdvancedSearchField(
+    VirtualMachineRowFilterType.DateCreated,
+  );
   const { setValue: setDateFromString, value: dateFromString } = useAdvancedSearchField(
     VirtualMachineRowFilterType.DateCreatedFrom,
   );
@@ -19,16 +22,19 @@ const DateCreatedField: FC = () => {
   );
   const { setValue: setDateOption, value: dateOption } = useAdvancedSearchField('dateOption');
 
+  const effectiveDateOption = dateOption || (dateCreated as DateSelectOption);
+
   return (
     <FormGroup label={t('Date created')}>
       <DateSelect
         data-test="adv-search-date-select"
         onSelect={(option) => setDateOption(option)}
-        selected={dateOption}
+        selected={effectiveDateOption}
+        setDateCreated={setDateCreated}
         setDateFromString={setDateFromString}
         setDateToString={setDateToString}
       />
-      {dateOption === DateSelectOption.Custom && (
+      {effectiveDateOption === DateSelectOption.Custom && (
         <div className="pf-v6-u-mt-sm">
           <DateFromToPicker
             data-test="adv-search-date"
