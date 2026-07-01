@@ -1,26 +1,21 @@
-import React, { FC, useMemo } from 'react';
+import React, { type FC, useMemo } from 'react';
 
-import { V1alpha1MigrationPolicy } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import KubevirtFilterToolbar from '@kubevirt-utils/components/KubevirtFilterToolbar/KubevirtFilterToolbar';
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
 import { buildColumnLayout } from '@kubevirt-utils/components/KubevirtTable/utils';
-import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
+import useKubevirtDataViewFilters from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/useKubevirtDataViewFilters';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtTableColumns';
 import useMigrationPolicies from '@kubevirt-utils/hooks/useMigrationPolicies';
 import useSelectedRowFilterClusters from '@kubevirt-utils/hooks/useSelectedRowFilterClusters';
 import { EXPORT_TABLE_KEYS, KubevirtTableExport } from '@kubevirt-utils/hooks/useTableExport';
-import { ListPageProps } from '@kubevirt-utils/utils/types';
+import { type ListPageProps } from '@kubevirt-utils/utils/types';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useIsAllClustersPage from '@multicluster/hooks/useIsAllClustersPage';
 import useIsACMPage from '@multicluster/useIsACMPage';
-import {
-  ListPageBody,
-  ListPageHeader,
-  useListPageFilter,
-} from '@openshift-console/dynamic-plugin-sdk';
+import { ListPageBody, ListPageHeader } from '@openshift-console/dynamic-plugin-sdk';
 
 import { COLUMN_MANAGEMENT_ID_MIGRATION_POLICIES } from '../utils/constants';
-
 import MigrationPoliciesCreateButton from './components/MigrationPoliciesCreateButton/MigrationPoliciesCreateButton';
 import MigrationPoliciesEmptyState from './components/MigrationPoliciesEmptyState/MigrationPoliciesEmptyState';
 import useMigrationPoliciesFilters from './hooks/useMigrationPoliciesFilters';
@@ -32,9 +27,6 @@ import {
 const MigrationPoliciesList: FC<ListPageProps> = ({
   fieldSelector,
   hideColumnManagement,
-  hideNameLabelFilters,
-  hideTextFilter,
-  nameFilter,
   selector,
   showTitle = true,
 }) => {
@@ -57,13 +49,10 @@ const MigrationPoliciesList: FC<ListPageProps> = ({
     columns,
   });
 
-  const filters = useMigrationPoliciesFilters();
-
-  const [unfilteredData, data, onFilterChange] = useListPageFilter<
-    V1alpha1MigrationPolicy,
-    V1alpha1MigrationPolicy
-  >(mps, filters, {
-    name: { selected: [nameFilter] },
+  const filterDefinitions = useMigrationPoliciesFilters();
+  const { clearAllFilters, filteredData, filters, onSetFilters } = useKubevirtDataViewFilters({
+    data: mps ?? [],
+    filterDefinitions,
   });
 
   const columnLayout = useMemo(
@@ -79,7 +68,7 @@ const MigrationPoliciesList: FC<ListPageProps> = ({
 
   const isLoaded = loaded && loadedColumns;
 
-  if (isLoaded && !loadError && isEmpty(unfilteredData) && isEmpty(filteredClusters)) {
+  if (isLoaded && !loadError && isEmpty(mps) && isEmpty(filteredClusters)) {
     return <MigrationPoliciesEmptyState />;
   }
 
@@ -90,37 +79,36 @@ const MigrationPoliciesList: FC<ListPageProps> = ({
       </ListPageHeader>
 
       <ListPageBody>
-        <ListPageFilter
+        <KubevirtFilterToolbar
+          clearAllFilters={clearAllFilters}
+          columnLayout={columnLayout}
+          data={mps}
+          filterDefinitions={filterDefinitions}
+          filters={filters}
+          hideColumnManagement={hideColumnManagement}
+          loaded={isLoaded}
+          onSetFilters={onSetFilters}
           toolbarEndContent={
             <KubevirtTableExport
               activeColumnKeys={activeColumnKeys}
-              asToolbarItem
               columns={columns}
-              data={data ?? []}
+              data={filteredData ?? []}
               exportKey={EXPORT_TABLE_KEYS.MIGRATION_POLICIES}
               loaded={isLoaded}
             />
           }
-          columnLayout={columnLayout}
-          data={unfilteredData}
-          filtersWithSelect={filters}
-          hideColumnManagement={hideColumnManagement}
-          hideLabelFilter={hideTextFilter}
-          hideNameLabelFilters={hideNameLabelFilters}
-          loaded={isLoaded}
-          onFilterChange={onFilterChange}
         />
         <KubevirtTable
           activeColumnKeys={activeColumnKeys}
           ariaLabel={t('MigrationPolicies table')}
           columns={columns}
-          data={data ?? []}
+          data={filteredData ?? []}
           dataTest="migration-policies-list"
           getRowId={getMigrationPoliciesRowId}
           loaded={isLoaded}
           loadError={loadError}
           noDataMsg={t("You don't have any MigrationPolicies yet")}
-          unfilteredData={unfilteredData}
+          unfilteredData={mps}
         />
       </ListPageBody>
     </>
