@@ -2,6 +2,7 @@ import React, { FC } from 'react';
 import { useWatch } from 'react-hook-form';
 
 import { Flex, FlexItem } from '@patternfly/react-core';
+
 import { useVMWizard } from '@virtualmachines/creation-wizard-new/state/vm-wizard-context/VMWizardContext';
 import { CREATE_VM_FORM_FIELDS_VM_DATA } from '@virtualmachines/creation-wizard-new/state/vm-wizard-form/consts';
 import { VMCreationMethod } from '@virtualmachines/creation-wizard-new/utils/constants';

@@ -1,6 +1,7 @@
 import { useEffect, useMemo } from 'react';
 import { useWatch } from 'react-hook-form';
 
+import { PreferenceOption } from '@kubevirt-utils/components/AddBootableVolumeModal/types';
 import useClusterPreferences from '@kubevirt-utils/hooks/useClusterPreferences';
 import useHcoWorkloadArchitectures from '@kubevirt-utils/hooks/useHcoWorkloadArchitectures';
 import useUserPreferences from '@kubevirt-utils/hooks/useUserPreferences';
@@ -8,7 +9,7 @@ import { useVMWizard } from '@virtualmachines/creation-wizard-new/state/vm-wizar
 import { CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA } from '@virtualmachines/creation-wizard-new/state/vm-wizard-form/consts';
 import {
   getDefaultPreference,
-  getPreferenceNamesFilteredByOSType,
+  getSortedPreferencesByOSType,
 } from '@virtualmachines/creation-wizard-new/steps/InstanceTypesSteps/GuestOSStep/components/PreferenceSelectMenu/hooks/usePreferenceSelectOptions/utils/utils';
 import { OperatingSystemType } from '@virtualmachines/creation-wizard-new/steps/InstanceTypesSteps/GuestOSStep/utils/constants';
 
@@ -17,8 +18,8 @@ type UsePreferenceSelectOptions = (
   cluster: string,
   operatingSystemType: OperatingSystemType,
 ) => {
-  preferences: { kind: string; name: string }[];
-  preferencesLoaded: boolean;
+  isPreferencesLoaded: boolean;
+  preferences: PreferenceOption[];
 };
 
 const usePreferenceSelectOptions: UsePreferenceSelectOptions = (
@@ -40,26 +41,26 @@ const usePreferenceSelectOptions: UsePreferenceSelectOptions = (
     cluster,
   );
 
-  const preferencesLoaded = clusterPreferencesLoaded && userPreferencesLoaded;
-  const loaded = preferencesLoaded && architecturesLoaded;
+  const isClusterAndUserPreferencesLoaded = clusterPreferencesLoaded && userPreferencesLoaded;
+  const isPreferencesLoaded = isClusterAndUserPreferencesLoaded && architecturesLoaded;
 
   const preferences = useMemo(() => {
     const allPreferences = [...(clusterPreferences || []), ...(userPreferences || [])];
-    return getPreferenceNamesFilteredByOSType(allPreferences, operatingSystemType);
+    return getSortedPreferencesByOSType(allPreferences, operatingSystemType);
   }, [clusterPreferences, userPreferences, operatingSystemType]);
 
   useEffect(() => {
-    if (!loaded) return;
+    if (!isPreferencesLoaded) return;
 
     const defaultPref = getDefaultPreference(preferences, operatingSystemType, architectures);
     if (!preference && defaultPref) {
       setValue(CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.PREFERENCE, defaultPref);
     }
-  }, [architectures, loaded, operatingSystemType, preference, preferences, setValue]);
+  }, [architectures, isPreferencesLoaded, operatingSystemType, preference, preferences, setValue]);
 
   return {
+    isPreferencesLoaded,
     preferences,
-    preferencesLoaded: loaded,
   };
 };
 

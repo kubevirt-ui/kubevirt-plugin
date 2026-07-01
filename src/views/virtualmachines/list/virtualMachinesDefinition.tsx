@@ -1,5 +1,5 @@
-import React from 'react';
 import { TFunction } from 'i18next';
+import React from 'react';
 
 import {
   V1VirtualMachine,
@@ -77,159 +77,152 @@ export const getVMColumns = (
   namespace: string,
   isAllClustersPage: boolean,
   canGetNode: boolean,
-): ColumnConfig<V1VirtualMachine, VMCallbacks>[] => {
-  const columns: ColumnConfig<V1VirtualMachine, VMCallbacks>[] = [
-    {
-      getValue: () => '',
-      key: VM_COLUMN_KEYS.selection,
-      label: '',
-      props: { className: 'pf-v6-c-table__check' },
-      renderCell: (row) => <VMSelectionCell row={row} />,
+): ColumnConfig<V1VirtualMachine, VMCallbacks>[] => [
+  {
+    getValue: () => '',
+    key: VM_COLUMN_KEYS.selection,
+    label: '',
+    props: { className: 'pf-v6-c-table__check' },
+    renderCell: (row) => <VMSelectionCell row={row} />,
+  },
+  {
+    getValue: (row) => getName(row) ?? '',
+    key: VM_COLUMN_KEYS.name,
+    label: t('Name'),
+    props: { className: 'pf-m-width-20' },
+    renderCell: (row) => <VMNameCell row={row} />,
+    sortable: true,
+  },
+  ...(isAllClustersPage
+    ? [
+        {
+          getValue: (row) => getCluster(row) ?? '',
+          key: VM_COLUMN_KEYS.cluster,
+          label: t('Cluster'),
+          renderCell: (row) => <VMClusterCell row={row} />,
+          sortable: true,
+        },
+      ]
+    : []),
+  ...(!namespace
+    ? [
+        {
+          getValue: (row) => getNamespace(row) ?? '',
+          key: VM_COLUMN_KEYS.namespace,
+          label: t('Namespace'),
+          renderCell: (row) => <VMNamespaceCell row={row} />,
+          sortable: true,
+        },
+      ]
+    : []),
+  {
+    getValue: (row) => row?.status?.printableStatus ?? '',
+    key: VM_COLUMN_KEYS.status,
+    label: t('Status'),
+    renderCell: (row, callbacks) => <VMStatusCell callbacks={callbacks} row={row} />,
+    sortable: true,
+  },
+  {
+    getValue: (row) => {
+      const types = filterConditions(row)
+        ?.map((condition) => condition?.type)
+        .filter(Boolean);
+      return !isEmpty(types) ? types.join(', ') : NO_DATA_DASH;
     },
-    {
-      getValue: (row) => getName(row) ?? '',
-      key: VM_COLUMN_KEYS.name,
-      label: t('Name'),
-      props: { className: 'pf-m-width-20' },
-      renderCell: (row) => <VMNameCell row={row} />,
-      sortable: true,
+    key: VM_COLUMN_KEYS.conditions,
+    label: t('Conditions'),
+    renderCell: (row) => <VMStatusConditionLabelList conditions={filterConditions(row)} />,
+  },
+  ...(canGetNode
+    ? [
+        {
+          getValue: (row, callbacks) => getVMINodeName(callbacks?.getVmi(row)) ?? NO_DATA_DASH,
+          key: VM_COLUMN_KEYS.node,
+          label: t('Node'),
+          renderCell: (row, callbacks) => <VMNodeCell callbacks={callbacks} row={row} />,
+          sort: sortByNode,
+          sortable: true,
+        },
+      ]
+    : []),
+  {
+    additional: true,
+    getValue: (row) => row?.metadata?.creationTimestamp ?? '',
+    key: VM_COLUMN_KEYS.created,
+    label: t('Created'),
+    renderCell: (row) => <Timestamp timestamp={row?.metadata?.creationTimestamp} />,
+    sortable: true,
+  },
+  {
+    getValue: (row, callbacks) => {
+      const vmi = callbacks?.getVmi(row);
+      if (!vmi) {
+        return NO_DATA_DASH;
+      }
+      const ips = getVMIIPAddresses(vmi);
+      return !isEmpty(ips) ? ips.join(', ') : NO_DATA_DASH;
     },
-  ];
-
-  if (isAllClustersPage) {
-    columns.push({
-      getValue: (row) => getCluster(row) ?? '',
-      key: VM_COLUMN_KEYS.cluster,
-      label: t('Cluster'),
-      renderCell: (row) => <VMClusterCell row={row} />,
-      sortable: true,
-    });
-  }
-
-  if (!namespace) {
-    columns.push({
-      getValue: (row) => getNamespace(row) ?? '',
-      key: VM_COLUMN_KEYS.namespace,
-      label: t('Namespace'),
-      renderCell: (row) => <VMNamespaceCell row={row} />,
-      sortable: true,
-    });
-  }
-
-  columns.push(
-    {
-      getValue: (row) => row?.status?.printableStatus ?? '',
-      key: VM_COLUMN_KEYS.status,
-      label: t('Status'),
-      renderCell: (row, callbacks) => <VMStatusCell callbacks={callbacks} row={row} />,
-      sortable: true,
+    key: VM_COLUMN_KEYS.ipAddress,
+    label: t('IP address'),
+    renderCell: (row, callbacks) => <VMIPCell callbacks={callbacks} row={row} />,
+  },
+  {
+    additional: true,
+    key: VM_COLUMN_KEYS.memoryUsage,
+    label: t('Memory'),
+    renderCell: (row, callbacks) => (
+      <MemoryPercentage vm={row} vmiMemory={getMemory(callbacks.getVmi(row))} />
+    ),
+    sort: sortByMemoryUsage,
+    sortable: true,
+  },
+  {
+    additional: true,
+    key: VM_COLUMN_KEYS.cpuUsage,
+    label: t('CPU'),
+    renderCell: (row, callbacks) => (
+      <CPUPercentage vm={row} vmiCPU={getCPU(callbacks.getVmi(row))} />
+    ),
+    sort: sortByCPUUsage,
+    sortable: true,
+  },
+  {
+    additional: true,
+    key: VM_COLUMN_KEYS.networkUsage,
+    label: t('Network'),
+    renderCell: (row) => <NetworkUsage vm={row} />,
+    sort: sortByNetworkUsage,
+    sortable: true,
+  },
+  {
+    additional: true,
+    getValue: (row) => getDeletionProtectionPrintableStatus(row),
+    key: VM_COLUMN_KEYS.deletionProtection,
+    label: t('Deletion protection'),
+    renderCell: (row) => <>{getDeletionProtectionPrintableStatus(row)}</>,
+    sortable: true,
+  },
+  {
+    additional: true,
+    getValue: (row, callbacks) => {
+      const storageClasses = callbacks?.pvcMapper
+        ? getVirtualMachineStorageClasses(row, callbacks.pvcMapper)
+        : [];
+      return !isEmpty(storageClasses) ? storageClasses.join(', ') : NO_DATA_DASH;
     },
-    {
-      getValue: (row) => {
-        const types = filterConditions(row)
-          ?.map((condition) => condition?.type)
-          .filter(Boolean);
-        return !isEmpty(types) ? types.join(', ') : NO_DATA_DASH;
-      },
-      key: VM_COLUMN_KEYS.conditions,
-      label: t('Conditions'),
-      renderCell: (row) => <VMStatusConditionLabelList conditions={filterConditions(row)} />,
-    },
-  );
-
-  if (canGetNode) {
-    columns.push({
-      getValue: (row, callbacks) => getVMINodeName(callbacks?.getVmi(row)) ?? NO_DATA_DASH,
-      key: VM_COLUMN_KEYS.node,
-      label: t('Node'),
-      renderCell: (row, callbacks) => <VMNodeCell callbacks={callbacks} row={row} />,
-      sort: sortByNode,
-      sortable: true,
-    });
-  }
-
-  columns.push(
-    {
-      additional: true,
-      getValue: (row) => row?.metadata?.creationTimestamp ?? '',
-      key: VM_COLUMN_KEYS.created,
-      label: t('Created'),
-      renderCell: (row) => <Timestamp timestamp={row?.metadata?.creationTimestamp} />,
-      sortable: true,
-    },
-    {
-      getValue: (row, callbacks) => {
-        const vmi = callbacks?.getVmi(row);
-        if (!vmi) {
-          return NO_DATA_DASH;
-        }
-        const ips = getVMIIPAddresses(vmi);
-        return !isEmpty(ips) ? ips.join(', ') : NO_DATA_DASH;
-      },
-      key: VM_COLUMN_KEYS.ipAddress,
-      label: t('IP address'),
-      renderCell: (row, callbacks) => <VMIPCell callbacks={callbacks} row={row} />,
-    },
-    {
-      additional: true,
-      key: VM_COLUMN_KEYS.memoryUsage,
-      label: t('Memory'),
-      renderCell: (row, callbacks) => (
-        <MemoryPercentage vm={row} vmiMemory={getMemory(callbacks.getVmi(row))} />
-      ),
-      sort: sortByMemoryUsage,
-      sortable: true,
-    },
-    {
-      additional: true,
-      key: VM_COLUMN_KEYS.cpuUsage,
-      label: t('CPU'),
-      renderCell: (row, callbacks) => (
-        <CPUPercentage vm={row} vmiCPU={getCPU(callbacks.getVmi(row))} />
-      ),
-      sort: sortByCPUUsage,
-      sortable: true,
-    },
-    {
-      additional: true,
-      key: VM_COLUMN_KEYS.networkUsage,
-      label: t('Network'),
-      renderCell: (row) => <NetworkUsage vm={row} />,
-      sort: sortByNetworkUsage,
-      sortable: true,
-    },
-    {
-      additional: true,
-      getValue: (row) => getDeletionProtectionPrintableStatus(row),
-      key: VM_COLUMN_KEYS.deletionProtection,
-      label: t('Deletion protection'),
-      renderCell: (row) => <>{getDeletionProtectionPrintableStatus(row)}</>,
-      sortable: true,
-    },
-    {
-      additional: true,
-      getValue: (row, callbacks) => {
-        const storageClasses = callbacks?.pvcMapper
-          ? getVirtualMachineStorageClasses(row, callbacks.pvcMapper)
-          : [];
-        return !isEmpty(storageClasses) ? storageClasses.join(', ') : NO_DATA_DASH;
-      },
-      key: VM_COLUMN_KEYS.storageclassname,
-      label: t('Storage class'),
-      renderCell: (row, callbacks) => <VMStorageClassCell callbacks={callbacks} row={row} />,
-      sort: sortByStorageClass,
-      sortable: true,
-    },
-    {
-      key: VM_COLUMN_KEYS.actions,
-      label: '',
-      props: { className: 'pf-v6-c-table__action' },
-      renderCell: (row, callbacks) => <VMActionsCell callbacks={callbacks} row={row} />,
-    },
-  );
-
-  return columns;
-};
+    key: VM_COLUMN_KEYS.storageclassname,
+    label: t('Storage class'),
+    renderCell: (row, callbacks) => <VMStorageClassCell callbacks={callbacks} row={row} />,
+    sort: sortByStorageClass,
+    sortable: true,
+  },
+  {
+    key: VM_COLUMN_KEYS.actions,
+    label: '',
+    props: { className: 'pf-v6-c-table__action' },
+    renderCell: (row, callbacks) => <VMActionsCell callbacks={callbacks} row={row} />,
+  },
+];
 
 export const getVMRowId = (vm: V1VirtualMachine, index: number): string =>
   getK8sRowId(vm, index, 'vm');
