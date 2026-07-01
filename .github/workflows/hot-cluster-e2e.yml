@@ -57,7 +57,7 @@ jobs:
     timeout-minutes: 10
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       # ROKS health check (classic/vpc)
       - name: Setup IBM Cloud CLI
