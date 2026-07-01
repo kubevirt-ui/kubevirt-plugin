@@ -99,3 +99,34 @@ jobs:
       - name: Run workflow script tests
         working-directory: .github/scripts
         run: npm test
+
+  hermetic-build:
+    name: hermetic-build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Prefetch npm dependencies with Hermeto
+        run: |
+          HERMETO_OUTPUT="${{ github.workspace }}/hermeto-output"
+          docker run --rm \
+            -v "${{ github.workspace }}:${{ github.workspace }}" \
+            -w "${{ github.workspace }}" \
+            ghcr.io/hermetoproject/hermeto:latest \
+            fetch-deps --source "${{ github.workspace }}" --output "$HERMETO_OUTPUT" npm
+          docker run --rm \
+            -v "${{ github.workspace }}:${{ github.workspace }}" \
+            -w "${{ github.workspace }}" \
+            ghcr.io/hermetoproject/hermeto:latest \
+            inject-files "$HERMETO_OUTPUT" --for-output-dir "$HERMETO_OUTPUT"
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+
+      - name: Install dependencies offline
+        run: |
+          rm -rf node_modules
+          HUSKY=0 npm ci --offline --ignore-scripts --no-audit
