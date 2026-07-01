@@ -3,6 +3,7 @@ import {
   OS_TEMPLATE_LABEL,
   VM_OS_ANNOTATION,
 } from '@kubevirt-utils/resources/vm';
+import { OS_NAME_LABELS } from '@kubevirt-utils/resources/template';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
 /**
@@ -97,3 +98,16 @@ export const OS_WINDOWS_PREFIX = 'win';
 
 export const isWindows = (obj: K8sResourceCommon): boolean =>
   (getOperatingSystem(obj) || '')?.startsWith(OS_WINDOWS_PREFIX);
+
+/**
+ * Match one or more raw OS terms (annotation value, label, preference name)
+ * against OS_NAME_LABELS. Returns the matching label (e.g. "RHEL", "Windows")
+ * or undefined when no known OS matches.
+ *
+ * Handles the special case where Windows annotations use the "win" prefix.
+ */
+export const matchOSName = (...terms: (string | undefined)[]): string | undefined =>
+  Object.values(OS_NAME_LABELS).find((osNameLabel) => {
+    const prefix = osNameLabel === OS_NAME_LABELS.windows ? OS_WINDOWS_PREFIX : osNameLabel;
+    return terms.some((term) => term?.toLowerCase()?.startsWith(prefix.toLowerCase()));
+  });

@@ -2,21 +2,18 @@ import React, { FC, useMemo } from 'react';
 
 import { VirtualMachineInstanceModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import KubevirtFilterToolbar from '@kubevirt-utils/components/KubevirtFilterToolbar/KubevirtFilterToolbar';
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
+import useKubevirtDataViewFilters from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/useKubevirtDataViewFilters';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 import { getVMWizardURL } from '@multicluster/urls';
-import {
-  ListPageBody,
-  ListPageFilter,
-  ListPageHeader,
-  useListPageFilter,
-} from '@openshift-console/dynamic-plugin-sdk';
+import { ListPageBody, ListPageHeader } from '@openshift-console/dynamic-plugin-sdk';
 
 import VirtualMachineInstanceEmptyState from './components/VirtualMachineInstanceEmptyState/VirtualMachineInstanceEmptyState';
-import { filters } from './utils';
+import useVMIListFilters from './hooks/useVMIListFilters';
 import { getVMIColumns, getVMIRowId, VMI_COLUMN_KEYS } from './virtualMachinesInstancesDefinition';
 
 type VirtualMachinesInstancesListProps = {
@@ -35,7 +32,11 @@ const VirtualMachinesInstancesList: FC<VirtualMachinesInstancesListProps> = ({ n
     namespace,
   });
 
-  const [unfilteredData, filteredData, onFilterChange] = useListPageFilter(vmis, filters);
+  const filterDefinitions = useVMIListFilters();
+  const { clearAllFilters, filteredData, filters, onSetFilters } = useKubevirtDataViewFilters({
+    data: vmis ?? [],
+    filterDefinitions,
+  });
 
   const columns = useMemo(() => getVMIColumns(t, namespace), [t, namespace]);
 
@@ -43,11 +44,13 @@ const VirtualMachinesInstancesList: FC<VirtualMachinesInstancesListProps> = ({ n
     <>
       <ListPageHeader title={t('VirtualMachineInstances')} />
       <ListPageBody>
-        <ListPageFilter
-          data={unfilteredData}
+        <KubevirtFilterToolbar
+          clearAllFilters={clearAllFilters}
+          data={vmis}
+          filterDefinitions={filterDefinitions}
+          filters={filters}
           loaded={loaded}
-          onFilterChange={onFilterChange}
-          rowFilters={filters}
+          onSetFilters={onSetFilters}
         />
         <KubevirtTable<V1VirtualMachineInstance>
           ariaLabel={t('VirtualMachineInstances table')}
@@ -58,7 +61,7 @@ const VirtualMachinesInstancesList: FC<VirtualMachinesInstancesListProps> = ({ n
           loaded={loaded}
           loadError={loadError}
           noDataMsg={<VirtualMachineInstanceEmptyState wizardURL={wizardURL} />}
-          unfilteredData={unfilteredData}
+          unfilteredData={vmis}
         />
       </ListPageBody>
     </>
