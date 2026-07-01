@@ -71,6 +71,7 @@
   "devDependencies": {
     "@commitlint/cli": "^21.0.2",
     "@eslint-react/eslint-plugin": "^5.9.0",
+    "@kubernetes/client-node": "^1.4.0",
     "@openshift-console/dynamic-plugin-sdk": "4.23.0-prerelease.2",
     "@openshift-console/dynamic-plugin-sdk-internal": "4.23.0-prerelease.1",
     "@openshift-console/dynamic-plugin-sdk-webpack": "4.23.0-prerelease.1",
@@ -84,6 +85,7 @@
     "@types/react-dom": "^18.3.7",
     "copy-webpack-plugin": "^12.0.2",
     "css-loader": "^6.11.0",
+    "dotenv": "^17.4.2",
     "esbuild": "^0.28.0",
     "esbuild-loader": "^4.4.3",
     "eslint": "10.5.0",
@@ -157,6 +159,7 @@
   "scripts": {
     "build": "npm run clean && NODE_ENV=production NODE_OPTIONS=--max-old-space-size=8192 npm run ts-node -- node_modules/.bin/webpack",
     "check-types": "tsc",
+    "check-types:playwright": "tsc --noEmit --project playwright/tsconfig.json",
     "clean": "rm -rf dist",
     "playwright-install": "playwright install chromium",
     "playwright-report": "playwright show-report ./playwright/test-results/html-report",

@@ -1,6 +1,6 @@
 ---
-description: Testing patterns for Jest unit tests and Cypress E2E
-globs: "**/*.test.ts,**/*.test.tsx,**/*.spec.ts,cypress/**/*.ts"
+description: Testing patterns for Jest unit tests, Playwright E2E, and Cypress E2E
+globs: "**/*.test.ts,**/*.test.tsx,**/*.spec.ts,cypress/**/*.ts,playwright/**/*.ts"
 alwaysApply: false
 ---
 
@@ -15,7 +15,8 @@ Testing patterns, conventions, and best practices for this project.
 ### Test Pyramid
 - **Unit Tests** (Jest): Hooks, utilities, pure functions
 - **Component Tests** (Jest + RTL): React components
-- **E2E Tests** (Cypress): Critical user flows
+- **E2E Tests** (Playwright): Critical user flows — new tests in `playwright/tests/scenario/`
+- **E2E Tests** (Cypress): Legacy E2E tests
 
 ### What to Test
 - New features and functionality

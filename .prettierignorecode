@@ -12,6 +12,10 @@ cypress/cypress-a11y-report.json
 # Helm templates contain Go template syntax that Prettier cannot parse
 ci-scripts/helm/**/templates/
 
+# Playwright artifacts
+.playwright-mcp/
+test-results/
+
 # Ignore anything that eslint will look at since eslint also applies prettier.
 #
 **/*.js

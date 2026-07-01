@@ -26,6 +26,14 @@ export default defineConfig({
   expect: { timeout: 60_000 },
   forbidOnly: !!process.env.CI,
   fullyParallel: false,
+  globalSetup:
+    process.env.USE_SCENARIO_INFRA === 'true'
+      ? './playwright/project-dependencies/global.setup.ts'
+      : undefined,
+  globalTeardown:
+    process.env.USE_SCENARIO_INFRA === 'true'
+      ? './playwright/project-dependencies/global.teardown.ts'
+      : undefined,
   outputDir: './playwright/test-results/artifacts',
   /**
    * Projects run in dependency order:
@@ -76,6 +84,23 @@ export default defineConfig({
                 headless: !process.env.DEBUG_MODE && !process.env.HEADED,
               },
               storageState: 'playwright/.auth/session.json',
+              viewport: { height: 1080, width: 1920 },
+            },
+          },
+        ]
+      : []),
+    ...(process.env.USE_SCENARIO_INFRA === 'true'
+      ? [
+          {
+            fullyParallel: false,
+            name: 'scenario',
+            testDir: './playwright/tests/scenario',
+            use: {
+              ...devices['Desktop Chrome'],
+              launchOptions: {
+                args: chromeArgs,
+                headless: !process.env.DEBUG_MODE && !process.env.HEADED,
+              },
               viewport: { height: 1080, width: 1920 },
             },
           },

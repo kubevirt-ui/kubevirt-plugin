@@ -38,12 +38,19 @@ This workflow uses the Playwright MCP server for interactive browser testing and
 - Or a deployed environment URL
 
 ### Basic Navigation
+
+On localhost, `/virtualization/vms` and similar plugin routes are **not directly navigable** — those routes only exist after the Virtualization perspective is active. Instead:
+
+1. Navigate to `http://localhost:9000/`
+2. Open the perspective switcher (`[data-test-id="perspective-switcher-toggle"]`)
+3. Select "Virtualization" — the console lands on `/k8s/all-namespaces/kubevirt.io~v1~VirtualMachine`
+
 ```
-"Navigate to http://localhost:9000/virtualization/vms"
+"Navigate to http://localhost:9000/ and switch to the Virtualization perspective"
 "Open the VM list page"
 "Go to the VM creation wizard"
 ```
-→ Uses `browser_navigate`
+→ Uses `browser_navigate`, then `browser_click` on perspective switcher
 
 ### Taking Snapshots
 ```
@@ -295,10 +302,16 @@ When clicking or interacting, describe elements clearly:
 ```
 http://localhost:9000                     # Console UI (npm run start-console)
 http://localhost:9001                     # Plugin dev server (npm run dev)
-http://localhost:9000/virtualization     # Virtualization overview
-http://localhost:9000/virtualization/vms # VM list
 http://localhost:9000/catalog            # VM catalog
 ```
+
+> **Important:** `/virtualization/vms` and `/virtualization/*` paths are **not valid on localhost**. The plugin registers routes under the Virtualization perspective, which must be activated first. After switching perspective, the console uses K8s-style routes like `/k8s/all-namespaces/kubevirt.io~v1~VirtualMachine`.
+
+### How to Reach Virtualization Pages
+1. Navigate to `http://localhost:9000/`
+2. Open the perspective switcher (`[data-test-id="perspective-switcher-toggle"]`)
+3. Wait for the "Virtualization" option to appear (plugin load delay)
+4. Click "Virtualization" — the console navigates to the VM list at `/k8s/all-namespaces/kubevirt.io~v1~VirtualMachine`
 
 ### Adjust for Your Environment
 Replace `localhost:9000` with your actual console URL if using a remote cluster.

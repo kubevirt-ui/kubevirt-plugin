@@ -25,13 +25,13 @@ test.describe('Set default StorageClass', () => {
       (sc) => sc.metadata?.annotations?.['storageclass.kubernetes.io/is-default-class'] === 'true',
     );
     expect(currentDefault, 'Expected a default StorageClass to exist in the cluster').toBeDefined();
-    const defaultScName = currentDefault.metadata.name;
+    const defaultScName = currentDefault!.metadata.name;
 
     const nonDefault = items.find(
       (sc) => sc.metadata?.annotations?.['storageclass.kubernetes.io/is-default-class'] !== 'true',
     );
     expect(nonDefault, 'Expected at least one non-default StorageClass').toBeDefined();
-    const nonDefaultScName = nonDefault.metadata.name;
+    const nonDefaultScName = nonDefault!.metadata.name;
 
     // wait as the page reloads
     await page.waitForTimeout(10 * SECOND);
