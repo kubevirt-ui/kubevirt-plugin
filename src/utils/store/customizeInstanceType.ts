@@ -1,10 +1,8 @@
 import produce from 'immer';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { ensurePath } from '@kubevirt-utils/utils/utils';
+import { ensurePath, isEmpty } from '@kubevirt-utils/utils/utils';
 import { effect, signal } from '@preact/signals-react';
-
-import { isEmpty } from '../utils/utils';
 
 import {
   getCustomizeInstanceTypeSessionStorage,
@@ -14,6 +12,7 @@ import {
 
 export const vmSignal = signal<V1VirtualMachine>(null);
 
+// TODO: check if we use session storage
 effect(() => {
   if (!isEmpty(vmSignal.value)) {
     saveCustomizeInstanceTypeSessionStorage(vmSignal.value);

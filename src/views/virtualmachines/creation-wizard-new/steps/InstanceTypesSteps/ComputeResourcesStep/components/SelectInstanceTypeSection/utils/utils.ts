@@ -1,6 +1,9 @@
+import { InstanceTypesMenuItemsData } from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/utils/types';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { CubesIcon, PuzzlePieceIcon, ServerGroupIcon, StarIcon } from '@patternfly/react-icons';
+import { SelectedInstanceType } from '@virtualmachines/creation-wizard-new/state/vm-wizard-form/types';
 
+import { TabKey } from './constants';
 import { CategoryDetailsMap, InstanceTypeCategory } from './types';
 
 export const categoryDetailsMap: CategoryDetailsMap = {
@@ -166,4 +169,16 @@ export const categoryDetailsMap: CategoryDetailsMap = {
     seriesLabel: t('M Series'),
     title: t('Memory-intensive applications'),
   },
+};
+
+export const getActiveTabKey = (
+  selectedInstanceType: SelectedInstanceType,
+  menuItems: InstanceTypesMenuItemsData,
+) => {
+  const isUserProvidedSelection =
+    Boolean(selectedInstanceType?.namespace) ||
+    (!selectedInstanceType?.namespace &&
+      menuItems.userProvided.items.includes(selectedInstanceType?.name));
+
+  return isUserProvidedSelection ? TabKey.Users : TabKey.RedHat;
 };

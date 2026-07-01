@@ -15,6 +15,7 @@ import {
 } from '@patternfly/react-core';
 import VMNameConfirmationNextButton from '@virtualmachines/creation-wizard-new/components/VMNameConfirmationNextButton';
 import useCloseWizard from '@virtualmachines/creation-wizard-new/hooks/useCloseWizard';
+
 import { useVMWizard } from '@virtualmachines/creation-wizard-new/state/vm-wizard-context/VMWizardContext';
 import { CREATE_VM_FORM_FIELDS_VM_DATA } from '@virtualmachines/creation-wizard-new/state/vm-wizard-form/consts';
 import { isCloneCreationMethod } from '@virtualmachines/creation-wizard-new/utils/utils';

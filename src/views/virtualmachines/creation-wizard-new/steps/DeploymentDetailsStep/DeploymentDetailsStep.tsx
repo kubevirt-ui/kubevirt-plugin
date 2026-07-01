@@ -3,6 +3,7 @@ import { useWatch } from 'react-hook-form';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Stack, StackItem, Title, TitleSizes } from '@patternfly/react-core';
+
 import { useVMWizard } from '@virtualmachines/creation-wizard-new/state/vm-wizard-context/VMWizardContext';
 import { CREATE_VM_FORM_FIELDS_VM_DATA } from '@virtualmachines/creation-wizard-new/state/vm-wizard-form/consts';
 import CreationMethodTileGroup from '@virtualmachines/creation-wizard-new/steps/DeploymentDetailsStep/components/CreationMethodTileGroup/CreationMethodTileGroup';
