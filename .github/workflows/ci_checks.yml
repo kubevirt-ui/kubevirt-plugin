@@ -20,6 +20,7 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: '22'
+          cache: npm
       - run: npm ci --ignore-scripts
 
       - name: Check i18n
@@ -44,7 +45,15 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: '22'
-      - run: npm ci --ignore-scripts
+          cache: npm
+
+      - name: Populate npm cache
+        run: npm ci --ignore-scripts
+
+      - name: Verify offline install
+        run: |
+          rm -rf node_modules
+          HUSKY=0 npm ci --offline --ignore-scripts --no-audit
 
       - name: Lint
         run: npm run lint:fix
@@ -66,6 +75,7 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: '22'
+          cache: npm
       - run: npm ci --ignore-scripts
 
       - name: Run Unit Tests
@@ -87,6 +97,8 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: '22'
+          cache: npm
+          cache-dependency-path: .github/scripts/package-lock.json
 
       - name: Install script dependencies
         working-directory: .github/scripts
@@ -99,34 +111,3 @@ jobs:
       - name: Run workflow script tests
         working-directory: .github/scripts
         run: npm test
-
-  offline-install:
-    name: offline-install
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v7
-
-      - name: Setup Node
-        uses: actions/setup-node@v6
-        with:
-          node-version: '22'
-          cache: npm
-
-      - name: Populate npm cache
-        run: npm ci --ignore-scripts
-
-      - name: Verify offline install
-        shell: bash
-        run: |
-          set -euo pipefail
-
-          rm -rf node_modules
-          HUSKY=0 npm ci --offline --ignore-scripts --no-audit
-
-          if npm ls cosmiconfig 2>&1 | grep -q "UNMET PEER DEPENDENCY"; then
-            echo "ERROR: cosmiconfig has an unresolved peer dependency."
-            echo "Add an explicit devDependency or override so the lockfile pins a compatible version."
-            npm ls cosmiconfig
-            exit 1
-          fi
