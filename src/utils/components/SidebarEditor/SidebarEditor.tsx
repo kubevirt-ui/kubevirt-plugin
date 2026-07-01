@@ -1,8 +1,10 @@
-import React, { ReactNode, Suspense, useContext, useMemo, useState } from 'react';
+import React, { type ReactNode, Suspense, useContext, useMemo, useState } from 'react';
 import { dump } from 'js-yaml';
 
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { PATHS_TO_HIGHLIGHT } from '@kubevirt-utils/resources/vm/utils/constants';
-import { K8sResourceCommon, YAMLEditor } from '@openshift-console/dynamic-plugin-sdk';
+// eslint-disable-next-line
+import { type K8sResourceCommon, YAMLEditor } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Alert,
   AlertActionCloseButton,
@@ -19,7 +21,6 @@ import {
 } from '@patternfly/react-core';
 
 import Loading from '../Loading/Loading';
-
 import { SidebarEditorContext } from './SidebarEditorContext';
 import { useEditorHighlighter } from './useEditorHighlighter';
 import { safeLoad } from './utils';
@@ -40,48 +41,55 @@ const SidebarEditor = <Resource extends K8sResourceCommon>({
   onResourceUpdate,
   pathsToHighlight = PATHS_TO_HIGHLIGHT.DEFAULT,
   resource,
-}: SidebarEditorProps<Resource>): JSX.Element => {
-  const [editableYAML, setEditableYAML] = useState('');
+}: SidebarEditorProps<Resource>): React.JSX.Element => {
+  const { t } = useKubevirtTranslation();
+  const resourceYAML = useMemo(
+    () => dump(resource, { forceQuotes: true, skipInvalid: true }),
+    [resource],
+  );
+
+  const [editableYAML, setEditableYAML] = useState(resourceYAML);
+  const [prevResourceYAML, setPrevResourceYAML] = useState(resourceYAML);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
 
-  const resourceYAML = useMemo(() => {
-    const yaml = dump(resource, { forceQuotes: true, skipInvalid: true });
-    setEditableYAML(yaml);
-    return yaml;
-  }, [resource]);
+  if (prevResourceYAML !== resourceYAML) {
+    setPrevResourceYAML(resourceYAML);
+    setEditableYAML(resourceYAML);
+  }
 
   const { isEditable, showEditor } = useContext(SidebarEditorContext);
   const editedResource = safeLoad<Resource>(editableYAML);
   const editorRef = useEditorHighlighter(editableYAML, pathsToHighlight, showEditor);
 
-  const changeResource = (newValue: string) => {
+  const changeResource = (newValue: string): Record<string, never> => {
     setEditableYAML(newValue);
 
     if (onChange) onChange(safeLoad<Resource>(newValue));
     return {};
   };
 
-  const onUpdate = (newResource: Resource) => {
+  const onUpdate = (newResource: Resource): void => {
     if (!onResourceUpdate) return;
 
     setSuccess(false);
     setError(null);
     setLoading(true);
-    return onResourceUpdate(newResource)
+    void onResourceUpdate(newResource)
       .then(() => setSuccess(true))
       .catch(setError)
       .finally(() => setLoading(false));
   };
 
-  const onReload = () => {
+  const onReload = (): void => {
     setSuccess(false);
     setError(null);
     setEditableYAML(resourceYAML);
   };
 
-  const childrenComponent = useMemo(() => {
+  // eslint-disable-next-line
+  const childrenComponent = useMemo((): ReactNode => {
     if (children instanceof Function) return children(editedResource ?? resource);
     return children;
   }, [children, editedResource, resource]);
@@ -96,6 +104,7 @@ const SidebarEditor = <Resource extends K8sResourceCommon>({
         >
           <Stack hasGutter>
             <Suspense fallback={<Loading />}>
+              {/* eslint-disable-next-line */}
               <YAMLEditor
                 minHeight="300px"
                 onChange={changeResource}
@@ -131,7 +140,7 @@ const SidebarEditor = <Resource extends K8sResourceCommon>({
                       onClick={() => onUpdate(editedResource)}
                       variant={ButtonVariant.primary}
                     >
-                      Save
+                      {t('Save')}
                     </Button>
                   </FlexItem>
                   <FlexItem>
@@ -140,7 +149,7 @@ const SidebarEditor = <Resource extends K8sResourceCommon>({
                       onClick={onReload}
                       variant={ButtonVariant.secondary}
                     >
-                      Reload
+                      {t('Reload')}
                     </Button>
                   </FlexItem>
                 </Flex>

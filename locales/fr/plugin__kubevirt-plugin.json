@@ -736,7 +736,7 @@
   "Domain": "Domaine",
   "Down": "Vers le bas",
   "Download results": "Résultats du téléchargement",
-  "Download the MSI from ": "Téléchargez le MSI depuis ",
+  "Download the MSI from <2>virt-manager.org</2>": "Download the MSI from <2>virt-manager.org</2>",
   "Download URL is not needed when an existing Windows DataSource is selected.": "Download URL is not needed when an existing Windows DataSource is selected.",
   "Drag and drop a certificate file or paste PEM content": "Glissez-déposez un fichier de certificat ou collez du contenu PEM.",
   "Drag and drop an image or upload one": "Faites glisser et déposez une image ou téléchargez-en une",

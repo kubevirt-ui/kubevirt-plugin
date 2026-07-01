@@ -1,0 +1,11 @@
+branch=$(git branch --show-current)
+if [ "$branch" = "main" ]; then
+  exit 0
+fi
+
+base=$(git rev-parse --verify "@{push}" 2>/dev/null)
+if [ -n "$base" ]; then
+  npx commitlint --from "$base" --to HEAD
+else
+  npx commitlint --last
+fi

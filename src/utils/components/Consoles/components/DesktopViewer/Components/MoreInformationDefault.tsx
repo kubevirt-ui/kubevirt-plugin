@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 import { Trans } from 'react-i18next';
 
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
@@ -6,15 +6,14 @@ import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Content, DescriptionList } from '@patternfly/react-core';
 
-import { MoreInformationDefaultProps } from '../utils/types';
-
+import { type MoreInformationDefaultProps } from '../utils/types';
 import Detail from './Detail';
 
 const MoreInformationDefault: FC<MoreInformationDefaultProps> = ({ textMoreInfoContent }) => {
   const { t } = useKubevirtTranslation();
   return (
     <>
-      {textMoreInfoContent || (
+      {textMoreInfoContent ?? (
         <Content>
           <Trans ns="plugin__kubevirt-plugin" t={t}>
             <p>
@@ -34,8 +33,8 @@ const MoreInformationDefault: FC<MoreInformationDefaultProps> = ({ textMoreInfoC
         <Detail title={'Ubuntu, Debian'} value={'sudo apt-get install virt-viewer'} />
         <DescriptionItem
           descriptionData={
-            <div>
-              {t('Download the MSI from ')}
+            <Trans ns="plugin__kubevirt-plugin" t={t}>
+              Download the MSI from{' '}
               <a
                 href={documentationURL.VIRT_MANAGER_DOWNLOAD}
                 rel="noopener noreferrer"
@@ -43,7 +42,7 @@ const MoreInformationDefault: FC<MoreInformationDefaultProps> = ({ textMoreInfoC
               >
                 virt-manager.org
               </a>
-            </div>
+            </Trans>
           }
           descriptionHeader={t('Windows')}
         />
