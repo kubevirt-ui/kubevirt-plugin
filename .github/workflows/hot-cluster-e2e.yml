@@ -36,7 +36,7 @@ on:
 
 permissions:
   contents: read
-  actions: read
+  actions: write
 
 concurrency:
   group: hot-cluster-e2e-${{ github.event.pull_request.number || github.ref }}
@@ -50,6 +50,16 @@ env:
   BASE_DOMAIN: cnv-ui.com
 
 jobs:
+  cluster-check:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      contains(github.event.pull_request.labels.*.name, 'ok-to-test') ||
+      github.event.pull_request.author_association == 'MEMBER' ||
+      github.event.pull_request.author_association == 'OWNER' ||
+      github.event.pull_request.author_association == 'COLLABORATOR'
+    uses: ./.github/workflows/hot-cluster-check.yml
+    secrets: inherit
+
   cluster-health-check:
     name: Cluster Health Check
     if: github.event_name == 'workflow_dispatch'
@@ -149,8 +159,12 @@ jobs:
 
   run-e2e-tests:
     name: Run E2E Tests
-    needs: cluster-health-check
-    if: needs.cluster-health-check.result == 'success'
+    needs: [cluster-check, cluster-health-check]
+    if: |
+      always() && (
+        needs.cluster-check.result == 'success' ||
+        needs.cluster-health-check.result == 'success'
+      )
     uses: ./.github/workflows/hot-cluster-e2e-run.yml
     with:
       test_project: ${{ inputs.test_project || 'gating' }}
