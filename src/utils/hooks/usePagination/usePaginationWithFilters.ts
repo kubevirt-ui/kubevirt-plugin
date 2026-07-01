@@ -1,7 +1,7 @@
 import { useCallback, useEffect } from 'react';
 
-import { PaginationState } from './utils/types';
 import usePagination from './usePagination';
+import { PaginationState } from './utils/types';
 
 type OnFilterChange = (...args: unknown[]) => void;
 
@@ -31,17 +31,21 @@ const usePaginationWithFilters = (
 ): UsePaginationWithFiltersResult => {
   const { onPaginationChange, pagination } = usePagination();
 
+  const resetPagination = useCallback(() => {
+    onPaginationChange({
+      endIndex: pagination?.perPage,
+      page: 1,
+      perPage: pagination?.perPage,
+      startIndex: 0,
+    });
+  }, [onPaginationChange, pagination?.perPage]);
+
   const handleFilterChange = useCallback(
     (...args: Parameters<OnFilterChange>) => {
       onFilterChange?.(...args);
-      onPaginationChange({
-        endIndex: pagination?.perPage,
-        page: 1,
-        perPage: pagination?.perPage,
-        startIndex: 0,
-      });
+      resetPagination();
     },
-    [onFilterChange, onPaginationChange, pagination?.perPage],
+    [onFilterChange, resetPagination],
   );
 
   const handlePerPageSelect = useCallback(
@@ -58,14 +62,9 @@ const usePaginationWithFilters = (
 
   useEffect(() => {
     if (filteredDataLength > 0 && pagination?.startIndex >= filteredDataLength) {
-      onPaginationChange({
-        endIndex: pagination?.perPage,
-        page: 1,
-        perPage: pagination?.perPage,
-        startIndex: 0,
-      });
+      resetPagination();
     }
-  }, [filteredDataLength, pagination?.startIndex, pagination?.perPage, onPaginationChange]);
+  }, [filteredDataLength, pagination?.startIndex, resetPagination]);
 
   return {
     ...(onFilterChange && { handleFilterChange }),
