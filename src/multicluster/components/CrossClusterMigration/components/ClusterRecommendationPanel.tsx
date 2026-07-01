@@ -1,22 +1,19 @@
-import React, { FC } from 'react';
+import React, { FC, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { humanizeBinaryBytes } from '@kubevirt-utils/utils/humanize.js';
 import {
   Alert,
-  DescriptionList,
-  DescriptionListDescription,
-  DescriptionListGroup,
-  DescriptionListTerm,
-  Label,
+  Flex,
+  FlexItem,
   Spinner,
+  Stack,
+  StackItem,
   Title,
 } from '@patternfly/react-core';
-import { CheckCircleIcon } from '@patternfly/react-icons';
 
-import { CandidateCluster, MigrationTargetResponse } from '../hooks/useClusterRecommendationTypes';
+import { MigrationTargetResponse } from '../hooks/useClusterRecommendationTypes';
 
-import './ClusterRecommendationPanel.scss';
+import CandidateRow from './CandidateRow';
 
 type ClusterRecommendationPanelProps = {
   data: MigrationTargetResponse | null;
@@ -24,94 +21,6 @@ type ClusterRecommendationPanelProps = {
   loaded: boolean;
   loading: boolean;
   onSelectCluster?: (clusterName: string) => void;
-};
-
-const ScoreBadge: FC<{ score: number }> = ({ score }) => {
-  let color: 'green' | 'red' | 'yellow' = 'red';
-  if (score >= 70) color = 'green';
-  else if (score >= 40) color = 'yellow';
-  return <Label color={color}>{score.toFixed(0)}</Label>;
-};
-
-const CandidateRow: FC<{
-  candidate: CandidateCluster;
-  isRecommended: boolean;
-  onSelect?: (clusterName: string) => void;
-}> = ({ candidate, isRecommended, onSelect }) => {
-  const { t } = useKubevirtTranslation();
-
-  return (
-    <div
-      className="cluster-recommendation-panel__candidate"
-      onClick={() => onSelect?.(candidate.cluster)}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          onSelect?.(candidate.cluster);
-        }
-      }}
-      role={onSelect ? 'button' : undefined}
-      tabIndex={onSelect ? 0 : undefined}
-    >
-      <DescriptionList isHorizontal>
-        <DescriptionListGroup>
-          <DescriptionListTerm>
-            {candidate.cluster}
-            {isRecommended && (
-              <Label
-                className="cluster-recommendation-panel__top-label"
-                color="green"
-                icon={<CheckCircleIcon />}
-              >
-                {t('Top pick')}
-              </Label>
-            )}
-          </DescriptionListTerm>
-          <DescriptionListDescription>
-            <span className="cluster-recommendation-panel__scores">
-              <span>
-                {t('Score:')} <ScoreBadge score={candidate.totalScore} />
-              </span>
-              <span>
-                {t('CPU:')} <ScoreBadge score={candidate.cpuScore} />
-              </span>
-              <span>
-                {t('Memory:')} <ScoreBadge score={candidate.memoryScore} />
-              </span>
-              <span>
-                {t('Storage:')} <ScoreBadge score={candidate.storageScore} />
-              </span>
-            </span>
-          </DescriptionListDescription>
-        </DescriptionListGroup>
-        <DescriptionListGroup>
-          <DescriptionListTerm>{t('Available resources')}</DescriptionListTerm>
-          <DescriptionListDescription>
-            {t('{{cpu}} CPUs, {{memory}} memory', {
-              cpu: candidate.availableCPUCores.toFixed(1),
-              memory: humanizeBinaryBytes(candidate.availableMemoryBytes).string,
-            })}
-          </DescriptionListDescription>
-        </DescriptionListGroup>
-        <DescriptionListGroup>
-          <DescriptionListTerm>{t('Storage type')}</DescriptionListTerm>
-          <DescriptionListDescription>{candidate.storageType}</DescriptionListDescription>
-        </DescriptionListGroup>
-        {candidate.matchedStorageClasses?.length > 0 && (
-          <DescriptionListGroup>
-            <DescriptionListTerm>
-              {candidate.matchedStorageClasses.length === 1
-                ? t('Matched storage class')
-                : t('Matched storage classes')}
-            </DescriptionListTerm>
-            <DescriptionListDescription>
-              {candidate.matchedStorageClasses.join(', ')}
-            </DescriptionListDescription>
-          </DescriptionListGroup>
-        )}
-      </DescriptionList>
-    </div>
-  );
 };
 
 const ClusterRecommendationPanel: FC<ClusterRecommendationPanelProps> = ({
@@ -122,13 +31,20 @@ const ClusterRecommendationPanel: FC<ClusterRecommendationPanelProps> = ({
   onSelectCluster,
 }) => {
   const { t } = useKubevirtTranslation();
+  const [selectedCluster, setSelectedCluster] = useState<null | string>(null);
 
   if (loading) {
     return (
-      <div className="cluster-recommendation-panel cluster-recommendation-panel--loading">
-        <Spinner size="md" />
-        <span>{t('Analyzing clusters...')}</span>
-      </div>
+      <Flex
+        alignItems={{ default: 'alignItemsCenter' }}
+        className="pf-v6-u-mt-md"
+        spaceItems={{ default: 'spaceItemsSm' }}
+      >
+        <FlexItem>
+          <Spinner size="md" />
+        </FlexItem>
+        <FlexItem>{t('Analyzing clusters...')}</FlexItem>
+      </Flex>
     );
   }
 
@@ -152,34 +68,52 @@ const ClusterRecommendationPanel: FC<ClusterRecommendationPanelProps> = ({
 
   const recommendedCluster = data.recommendation?.cluster;
 
+  const handleSelect = (clusterName: string) => {
+    setSelectedCluster(clusterName);
+    onSelectCluster?.(clusterName);
+  };
+
   return (
-    <div className="cluster-recommendation-panel">
-      <Title headingLevel="h6">{t('Cluster recommendations')}</Title>
-      <div className="cluster-recommendation-panel__list">
-        {data.candidates.map((candidate) => (
-          <CandidateRow
-            candidate={candidate}
-            isRecommended={candidate.cluster === recommendedCluster}
-            key={candidate.cluster}
-            onSelect={onSelectCluster}
-          />
-        ))}
-      </div>
-      {data.excludedClusters?.length > 0 && (
-        <Alert
-          isInline
-          isPlain
-          title={t('{{count}} clusters excluded', { count: data.excludedClusters.length })}
-          variant="info"
-        >
-          {data.excludedClusters.map((ec) => (
-            <div key={ec.cluster}>
-              <strong>{ec.cluster}</strong>: {ec.reasons?.join(', ')}
-            </div>
+    <Stack className="pf-v6-u-mt-md" hasGutter>
+      <StackItem>
+        <Title headingLevel="h6">{t('Cluster recommendation')}</Title>
+        <div className="pf-v6-u-color-200 pf-v6-u-mt-xs pf-v6-u-font-size-sm">
+          {t('Click the cluster to select it as the migration target.')}
+        </div>
+      </StackItem>
+      <StackItem>
+        <Stack hasGutter>
+          {data.candidates.map((candidate) => (
+            <StackItem key={candidate.cluster}>
+              <CandidateRow
+                candidate={candidate}
+                isRecommended={candidate.cluster === recommendedCluster}
+                isSelected={selectedCluster === candidate.cluster}
+                onSelect={handleSelect}
+              />
+            </StackItem>
           ))}
-        </Alert>
+        </Stack>
+      </StackItem>
+      {data.excludedClusters?.length > 0 && (
+        <StackItem>
+          <Alert
+            isInline
+            isPlain
+            title={t('{{clusterCount}} clusters excluded', {
+              clusterCount: data.excludedClusters.length,
+            })}
+            variant="info"
+          >
+            {data.excludedClusters.map((ec) => (
+              <div key={ec.cluster}>
+                <strong>{ec.cluster}</strong>: {ec.reasons?.join(', ')}
+              </div>
+            ))}
+          </Alert>
+        </StackItem>
       )}
-    </div>
+    </Stack>
   );
 };
 
