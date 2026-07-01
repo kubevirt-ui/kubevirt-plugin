@@ -14,6 +14,7 @@ import { FilterIcon } from '@patternfly/react-icons';
 
 import ListPageFilterToolbarActions from '../ListPageFilter/components/ListPageFilterToolbarActions';
 
+import { EMPTY_FILTERS } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/constants';
 import GroupedFilterDropdown from './components/GroupedFilterDropdown';
 import HiddenFilterChips from './components/HiddenFilterChips';
 import SelectFilterItem from './components/SelectFilterItem';
@@ -23,7 +24,7 @@ type KubevirtFilterToolbarProps = {
   clearAllFilters: () => void;
   columnLayout?: ColumnLayout;
   data?: K8sResourceCommon[];
-  filterDefinitions: KubevirtFilter[];
+  filterDefinitions?: KubevirtFilter[];
   filters: KubevirtFilterState;
   hideColumnManagement?: boolean;
   loaded?: boolean;
@@ -35,7 +36,7 @@ const KubevirtFilterToolbar: FC<KubevirtFilterToolbarProps> = ({
   clearAllFilters,
   columnLayout,
   data,
-  filterDefinitions,
+  filterDefinitions = EMPTY_FILTERS,
   filters,
   hideColumnManagement,
   loaded,

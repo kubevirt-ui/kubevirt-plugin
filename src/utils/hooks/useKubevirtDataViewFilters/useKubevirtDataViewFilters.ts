@@ -6,6 +6,7 @@ import { useDataViewFilters } from '@patternfly/react-data-view';
 
 import { useKubevirtTranslation } from '../useKubevirtTranslation';
 
+import { EMPTY_FILTERS } from './constants';
 import { getLabelFilter } from './filters/getLabelFilter';
 import { getNameFilter } from './filters/getNameFilter';
 import useMigratedSearchParams from './hooks/useMigratedSearchParams';
@@ -15,7 +16,7 @@ import { matchesWithExclusion } from './utils';
 
 type UseKubevirtDataViewFiltersArgs<T extends K8sResourceCommon> = {
   data: T[];
-  filterDefinitions: KubevirtFilter<T>[];
+  filterDefinitions?: KubevirtFilter<T>[];
 };
 
 type UseKubevirtDataViewFiltersResult<T extends K8sResourceCommon> = {
@@ -27,7 +28,7 @@ type UseKubevirtDataViewFiltersResult<T extends K8sResourceCommon> = {
 
 const useKubevirtDataViewFilters = <T extends K8sResourceCommon>({
   data,
-  filterDefinitions: filterDefinitionsProp,
+  filterDefinitions: filterDefinitionsProp = EMPTY_FILTERS,
 }: UseKubevirtDataViewFiltersArgs<T>): UseKubevirtDataViewFiltersResult<T> => {
   const { t } = useKubevirtTranslation();
   const [searchParams, setSearchParams] = useMigratedSearchParams();
