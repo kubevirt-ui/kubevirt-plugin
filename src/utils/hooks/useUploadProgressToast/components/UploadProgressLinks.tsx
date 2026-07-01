@@ -2,7 +2,7 @@ import React, { FC } from 'react';
 
 import { Button, ButtonVariant } from '@patternfly/react-core';
 
-import { UploadSuccessLink } from '../utils/types';
+import { UploadSuccessLink } from '../types';
 
 type UploadProgressLinksProps = {
   links?: UploadSuccessLink[];

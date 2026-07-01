@@ -67,7 +67,9 @@ export type RegisterCdiUploadParams = {
 };
 
 export type UploadProgressStoreState = {
+  cancelAllPendingUploads: () => Promise<void>;
   cancelTrackedUpload: (uploadKey: string) => Promise<void>;
+  cancelUploadsForVm: (cluster: string, namespace: string, vmName: string) => Promise<void>;
   completeUpload: (uploadKey: string, options?: CompleteUploadOptions) => void;
   failUpload: (uploadKey: string, errorMessage: string) => void;
   getUpload: (uploadKey: string) => undefined | UploadEntry;

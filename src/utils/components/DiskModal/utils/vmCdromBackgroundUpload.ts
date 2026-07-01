@@ -3,8 +3,8 @@ import { TFunction } from 'i18next';
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { isUploadCanceledError } from '@kubevirt-utils/hooks/useCDIUpload/errors';
 import { UploadDataProps } from '@kubevirt-utils/hooks/useCDIUpload/types';
+import { completeVmCdromUpload } from '@kubevirt-utils/hooks/useUploadProgressToast/completion/uploadCompletion';
 import { useUploadProgressStore } from '@kubevirt-utils/hooks/useUploadProgressToast/uploadProgressStore';
-import { completeVmCdromUpload } from '@kubevirt-utils/hooks/useUploadProgressToast/utils/uploadCompletion';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 
 import { uploadDataVolume } from './submit';
@@ -45,9 +45,17 @@ export const runVmCdromBackgroundUpload = async ({
   vm,
 }: RunVmCdromBackgroundUploadParams): Promise<void> => {
   try {
-    const uploaded = await uploadDataVolume(vm, uploadData, diskState, dvName, uploadKey, t, {
-      abortTooltip: getVmCdromAbortTooltip(isHotPluggable, t),
-      onCancelCleanup,
+    const uploaded = await uploadDataVolume({
+      data: diskState,
+      dvName,
+      options: {
+        abortTooltip: getVmCdromAbortTooltip(isHotPluggable, t),
+        onCancelCleanup,
+      },
+      t,
+      uploadData,
+      uploadKey,
+      vm,
     });
 
     onUploadedDataVolume?.(uploaded);

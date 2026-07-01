@@ -1,9 +1,9 @@
 import { UPLOAD_STATUS } from '@kubevirt-utils/hooks/useCDIUpload/types';
 
+import { UPLOAD_PROGRESS_STATUS } from '../constants';
 import { useUploadProgressStore } from '../uploadProgressStore';
 
 import { registerCdiUpload, syncCdiUploadProgressAndFailures } from './cdiUploadTracking';
-import { UPLOAD_PROGRESS_STATUS } from './constants';
 
 const UPLOAD_KEY = 'test-upload-key';
 const FILE_IMAGE_ISO = 'image.iso';

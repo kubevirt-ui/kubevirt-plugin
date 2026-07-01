@@ -6,7 +6,9 @@ import {
   V1beta1VirtualMachineSnapshot,
   V1VirtualMachine,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { cancelPendingVmUploads } from '@kubevirt-utils/hooks/useUploadProgressToast/cancel/cancelPendingVmUploads';
 import { buildOwnerReference } from '@kubevirt-utils/resources/shared';
+import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sDelete } from '@multicluster/k8sRequests';
 
@@ -32,6 +34,12 @@ export const deleteVMWithResources = async ({
   vm,
   volumesToSave,
 }: DeleteVMParams) => {
+  try {
+    await cancelPendingVmUploads(vm);
+  } catch (error) {
+    kubevirtConsole.error('Failed to cancel pending uploads for VM before deletion:', error);
+  }
+
   const vmOwnerRef = buildOwnerReference(vm);
   const dvToSave = volumesToSave.filter(
     (v) => v.kind === DataVolumeModel.kind,

@@ -3,7 +3,7 @@ import React, { FC } from 'react';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FlexItem } from '@patternfly/react-core';
 
-import { UploadEntry } from '../utils/types';
+import { UploadEntry } from '../types';
 
 import ToastLayout from './ToastLayout';
 

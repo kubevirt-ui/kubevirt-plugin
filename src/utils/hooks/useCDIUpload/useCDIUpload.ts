@@ -11,7 +11,7 @@ import { useKubevirtTranslation } from '../useKubevirtTranslation';
 import {
   registerCdiUpload,
   syncCdiUploadProgressAndFailures,
-} from '../useUploadProgressToast/utils/cdiUploadTracking';
+} from '../useUploadProgressToast/cdi/cdiUploadTracking';
 
 import { CANCEL_ALLOCATION_MESSAGE, UploadCanceledError } from './errors';
 import {

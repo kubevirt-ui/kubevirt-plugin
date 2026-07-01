@@ -1,7 +1,7 @@
 import produce from 'immer';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { getVmCdromUploadKeyFromVm } from '@kubevirt-utils/hooks/useUploadProgressToast/utils/uploadKeys';
+import { getVmCdromUploadKeyFromVm } from '@kubevirt-utils/hooks/useUploadProgressToast/keys/uploadKeys';
 import { generateUploadDiskName } from '@kubevirt-utils/utils/utils';
 import { isRunning } from '@virtualmachines/utils';
 

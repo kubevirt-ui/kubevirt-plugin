@@ -3,7 +3,7 @@ import React, { FC } from 'react';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Flex, FlexItem } from '@patternfly/react-core';
 
-import { UploadEntry } from '../utils/types';
+import { UploadEntry } from '../types';
 
 import UploadProgressAbortButton from './UploadProgressAbortButton';
 import UploadProgressBar from './UploadProgressBar';

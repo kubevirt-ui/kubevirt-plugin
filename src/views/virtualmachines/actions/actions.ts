@@ -10,6 +10,7 @@ import {
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { TELEMETRY_VM_ACTION, VMActionTelemetry } from '@kubevirt-utils/extensions/telemetry';
 import { logVMActionPerformed } from '@kubevirt-utils/extensions/telemetry/vm-actions';
+import { cancelPendingVmUploads } from '@kubevirt-utils/hooks/useUploadProgressToast/cancel/cancelPendingVmUploads';
 import { getStorageMigrationPlanModelForKind } from '@kubevirt-utils/resources/migrations/backends';
 import { MultiNamespaceVirtualMachineStorageMigrationPlan } from '@kubevirt-utils/resources/migrations/constants';
 import { getRandomChars, kubevirtConsole, truncateToK8sName } from '@kubevirt-utils/utils/utils';
@@ -149,6 +150,12 @@ export const cancelStorageMigrationPlan = async (
 };
 
 export const deleteVM = async (vm: V1VirtualMachine) => {
+  try {
+    await cancelPendingVmUploads(vm);
+  } catch (error) {
+    kubevirtConsole.error('Failed to cancel pending uploads for VM before deletion:', error);
+  }
+
   await kubevirtK8sDelete({
     cluster: getCluster(vm),
     model: VirtualMachineModel,

@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 
+import { UPLOAD_PROGRESS_STATUS } from '../constants';
 import { useUploadProgressStore } from '../uploadProgressStore';
-import { UPLOAD_PROGRESS_STATUS } from '../utils/constants';
 
 import UploadProgressCanceledToast from './UploadProgressCanceledToast';
 import UploadProgressErrorToast from './UploadProgressErrorToast';

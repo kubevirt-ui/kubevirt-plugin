@@ -4,7 +4,7 @@ import { DataSourceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { appendBootableVolumeContext } from '@kubevirt-utils/resources/bootableresources/constants';
-import { getName, getResourceUrl } from '@kubevirt-utils/resources/shared';
+import { getName, getResourceUrl, getUID } from '@kubevirt-utils/resources/shared';
 
 import { useUploadProgressStore } from '../uploadProgressStore';
 
@@ -35,7 +35,9 @@ export const completeVmDiskUpload = ({
 }: CompleteVmDiskUploadParams): void => {
   useUploadProgressStore.getState().completeUpload(uploadKey, {
     resourceName: diskName,
-    successLinks: getVmDiskUploadSuccessLinks(t, vm, diskName, dataVolumeName),
+    successLinks: getUID(vm)
+      ? getVmDiskUploadSuccessLinks(t, vm, diskName, dataVolumeName)
+      : undefined,
   });
 };
 
@@ -48,7 +50,9 @@ export const completeVmCdromUpload = ({
 }: CompleteVmCdromUploadParams): void => {
   useUploadProgressStore.getState().completeUpload(uploadKey, {
     resourceName: diskName,
-    successLinks: getVmDiskUploadSuccessLinks(t, vm, diskName, dataVolumeName, true),
+    successLinks: getUID(vm)
+      ? getVmDiskUploadSuccessLinks(t, vm, diskName, dataVolumeName, true)
+      : undefined,
   });
 };
 

@@ -4,9 +4,9 @@ import { TFunction } from 'i18next';
 import useKubevirtToast from '@kubevirt-utils/hooks/useKubevirtToast';
 
 import UploadProgressToastContent from './components/UploadProgressToastContent';
-import { UPLOAD_PROGRESS_STATUS } from './utils/constants';
-import { UploadEntry } from './utils/types';
-import { getUploadTitle, isTerminalUploadStatus } from './utils/uploadTitles';
+import { getUploadTitle, isTerminalUploadStatus } from './toast/uploadTitles';
+import { UPLOAD_PROGRESS_STATUS } from './constants';
+import { UploadEntry } from './types';
 
 type ToastActions = ReturnType<typeof useKubevirtToast>;
 
