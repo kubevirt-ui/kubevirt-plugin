@@ -18,7 +18,7 @@ jobs:
       cancel-in-progress: true
     steps:
       - name: Checkout base branch scripts
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           ref: ${{ github.event.pull_request.base.ref }}
           sparse-checkout: .github/scripts
