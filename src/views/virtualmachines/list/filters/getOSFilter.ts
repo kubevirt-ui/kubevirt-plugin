@@ -11,7 +11,7 @@ import { getPreferenceMatcher } from '@kubevirt-utils/resources/vm';
 import {
   getOperatingSystem,
   getOperatingSystemName,
-  OS_WINDOWS_PREFIX,
+  matchOSName,
 } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
 import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
@@ -20,17 +20,7 @@ const getOSName = (obj: V1VirtualMachine) => {
   const osLabel = getOperatingSystemName(obj) || getOperatingSystem(obj);
   const osPreference = getPreferenceMatcher(obj)?.name;
 
-  const termStartsWithOSName = (os: string, term?: string) =>
-    term?.toLowerCase()?.startsWith(os.toLowerCase());
-
-  return Object.values(OS_NAME_LABELS).find((osNameLabel) => {
-    const osName = osNameLabel === OS_NAME_LABELS.windows ? OS_WINDOWS_PREFIX : osNameLabel;
-    return (
-      termStartsWithOSName(osName, osAnnotation) ||
-      termStartsWithOSName(osName, osLabel) ||
-      termStartsWithOSName(osName, osPreference)
-    );
-  });
+  return matchOSName(osAnnotation, osLabel, osPreference);
 };
 
 export const getOSFilter = (t: TFunction): KubevirtFilter<V1VirtualMachine> => ({
