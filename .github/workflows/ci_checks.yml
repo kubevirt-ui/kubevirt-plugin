@@ -75,3 +75,27 @@ jobs:
         uses: codecov/codecov-action@v7
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
+
+  workflow-scripts-test:
+    name: workflow-scripts-test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+
+      - name: Install script dependencies
+        working-directory: .github/scripts
+        run: npm ci
+
+      - name: Check types
+        working-directory: .github/scripts
+        run: npm run check-types
+
+      - name: Run workflow script tests
+        working-directory: .github/scripts
+        run: npm test
