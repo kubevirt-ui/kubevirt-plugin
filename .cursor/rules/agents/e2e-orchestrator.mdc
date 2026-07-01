@@ -1,0 +1,199 @@
+---
+description: E2E Test Orchestrator — coordinates QE automation for the Playwright test suite
+alwaysApply: false
+---
+
+# E2E Test Orchestrator
+
+Coordinates QE automation for the Playwright test suite that lives under `playwright/` in this repo.
+
+## Intent Routing
+
+| Intent | Command / Rule |
+|--------|---------------|
+| Run tests, analyze failures, fix broken tests, re-run | `/test-fix` |
+| Implement E2E tests for Jira tickets | `/create-test` |
+| Migrate legacy gating tests to scenario infrastructure | `/migrate-test` |
+| Assess coverage gaps and generate proposals | `/coverage-analysis` |
+| Compare coverage between branches (e.g. main vs release) | `/coverage-analysis --compare=<branch>` |
+| Validate a ticket with recorded video evidence (requires Playwright MCP) | `/test-and-record` |
+| Explore live UI to find bugs in test-covered workflows | `/bug-hunt` |
+| Write or review Playwright tests (general) | `playwright-testing.mdc` |
+| QA edge case analysis | `qe-agent.mdc` |
+
+## Two Test Infrastructures
+
+This project has two test infrastructures. **New tests MUST use the scenario infrastructure.**
+
+| Aspect | Legacy (gating) | Scenario (new) |
+|--------|----------------|----------------|
+| Directory | `tests/gating/` | `tests/scenario/` |
+| Fixture | `gatingTest` from `scenario-test-fixture` | `scenarioTest` from `@/fixtures/scenario-fixture` |
+| K8s client | Handler sub-objects: `k8sClient.vm.*`, `k8sClient.namespace.*` | Flat API: `k8sClient.setupTestNamespace()`, `k8sClient.createContainerDiskVm()` |
+| UI layer | Page objects (extend `PageCommons` → `BasePage`) | Raw `page` locators (`page.goto()`, `page.locator()`, `page.getByText()`) |
+| Project | `gating` (always active) | `scenario` (enabled via `USE_SCENARIO_INFRA=true`) |
+| Global setup | Login via `playwright/tests/setup/` | Rule engine: `playwright/project-dependencies/global.setup.ts` |
+| Run command | `npm run test-playwright -- --project=Gating` | `USE_SCENARIO_INFRA=true npm run test-playwright -- --project=scenario` |
+
+## Scenario Architecture (New Tests)
+
+```
+Tests (.spec.ts) → import scenarioTest from @/fixtures/scenario-fixture
+  ↓
+Page objects (playwright/src/page-objects/) → injected via fixture
+  ↓
+KubernetesClient (playwright/src/clients/kubernetes-client.ts) → flat K8s API
+```
+
+### Key Components
+
+- **Fixture** (`scenario-fixture.ts`) — `scenarioTest` injects `k8sClient` and page objects
+- **Page objects** (`page-objects/`) — standalone classes, constructor takes `Page`, expose `Locator` properties
+- **KubernetesClient** (`kubernetes-client.ts`) — flat K8s client, extend with new methods as needed
+- **Rule engine** — global setup/teardown via `project-dependencies/`
+
+### Folder Structure
+
+```
+playwright/
+├── tests/
+│   ├── scenario/              # New scenario specs (scenarioTest fixture)
+│   └── gating/                # Legacy gating specs (frozen — no new tests)
+├── src/
+│   ├── page-objects/          # Page objects (one per UI page, injected via fixture)
+│   ├── clients/
+│   │   ├── kubernetes-client.ts  # Flat K8s client for scenario tests
+│   │   └── kubernetes-auth.ts    # OAuth/kubeconfig auth helpers
+│   ├── fixtures/              # scenario-fixture.ts (injects page objects + k8sClient)
+│   ├── data-models/           # TypeScript types for K8s resources
+│   └── utils/                 # Test config, env variables, random names
+├── project-dependencies/      # Global setup/teardown + rule engine
+└── playwright.config.ts
+```
+
+## Scenario Test Patterns
+
+### Spec File Structure
+
+```typescript
+import { scenarioTest as test, expect } from '@/fixtures/scenario-fixture';
+import { generateRandomName } from '@/utils/random-data-generator';
+
+const NS = generateRandomName('feature');
+const VM_NAME = generateRandomName('vm');
+
+test.describe('Feature', () => {
+  test.describe.configure({ mode: 'serial' });
+
+  test.beforeAll(async ({ k8sClient }) => {
+    await k8sClient.setupTestNamespace(NS);
+    await k8sClient.createContainerDiskVm(VM_NAME, NS);
+    await k8sClient.waitForVmRunning(VM_NAME, NS, 5 * 60_000);
+  });
+
+  test.afterAll(async ({ k8sClient }) => {
+    await k8sClient.cleanupTestNamespace(NS).catch(() => {});
+  });
+
+  test('Virtualization perspective loads', async ({ overviewPage }) => {
+    await overviewPage.switchToVirtualization();
+    await expect(overviewPage.heading).toBeVisible({ timeout: 30_000 });
+  });
+
+  test('VM appears in list', async ({ virtualMachinesPage }) => {
+    await virtualMachinesPage.waitForLoaded();
+    await expect(virtualMachinesPage.getVmRow(VM_NAME)).toBeVisible({ timeout: 30_000 });
+  });
+});
+```
+
+### K8s Client Usage
+
+```typescript
+// Flat API — no handler sub-objects
+await k8sClient.setupTestNamespace(NS);
+await k8sClient.createContainerDiskVm(VM_NAME, NS);
+await k8sClient.waitForVmRunning(VM_NAME, NS, 5 * 60_000);
+await k8sClient.cleanupTestNamespace(NS);
+
+// If a method doesn't exist, add it to kubernetes-client.ts
+```
+
+### Assertions
+
+- Use `expect()` against page object locators with explicit timeouts
+- Use `expect.poll()` for async state changes
+- Page object properties are `Locator` instances — pass them directly to `expect()`
+
+## Implementation Rules
+
+### 1. New Tests Use Scenario Infrastructure
+
+All new tests go in `playwright/tests/scenario/` using `scenarioTest` fixture with page objects injected. Never add new tests to `playwright/tests/gating/`.
+
+### 2. Page Objects Are Injected Via Fixture
+
+Tests destructure page objects — they never instantiate them. Page objects are standalone classes (no base class hierarchy), constructor takes `Page`, and expose key locators as `readonly` properties.
+
+If a page object is missing, create it in `playwright/src/page-objects/` and wire it into `scenario-fixture.ts`.
+
+### 3. No Raw `page` in Specs
+
+All UI interactions go through page objects. If a needed method doesn't exist, add it to the page object.
+
+### 4. Extend KubernetesClient for K8s Gaps
+
+If a test needs a K8s operation not in `KubernetesClient`, add it directly to `kubernetes-client.ts`:
+- Core resources → `this.coreApi` (CoreV1Api)
+- Custom resources → `this.coApi` (CustomObjectsApi)
+
+### 5. Each File Owns Its Namespace
+
+Use `generateRandomName('prefix')` at module scope. Never hardcode or share namespaces.
+
+### 6. Serial Mode for Shared Resources
+
+Tests sharing VMs use `test.describe.configure({ mode: 'serial' })`.
+
+### 7. Selector Strategy
+
+1. Prefer `[data-test="..."]` and `[data-test-id="..."]` attributes
+2. Fall back to `getByRole()` with accessible names
+3. Fall back to `getByText()` for user-visible content
+
+### 8. File Size Limits
+
+| File type | Max lines |
+|-----------|-----------|
+| Spec file (`.spec.ts`) | 300 |
+| Page object (`*-page.ts`) | 500 |
+| Client (`kubernetes-client.ts`) | 800 |
+| Utility module | 400 |
+
+## Debugging Flaky / Failing Tests
+
+### Step 1: Live UI Exploration (always do first)
+
+Use Playwright MCP tools:
+
+```
+Playwright-browser_navigate → go to the page under test
+Playwright-browser_snapshot → accessibility tree (locator discovery)
+Playwright-browser_take_screenshot → visual state
+Playwright-browser_console_messages → JS errors
+Playwright-browser_network_requests → API calls
+```
+
+### Step 2: Inspect the Codebase
+
+1. Read the failing spec
+2. Read the plugin source (`src/`) for the component under test
+3. Check `data-test` attributes in the DOM vs what the test expects
+
+### Step 3: Apply Fixes
+
+Update spec locators or KubernetesClient methods. Verify with `npm run check-types:playwright` and a test run.
+
+## Single-Process Execution Rule
+
+**Never run two concurrent `npx playwright test` commands.** Global setup creates shared auth files. Use `--workers=N` for parallelism within a single process.

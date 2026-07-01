@@ -1,0 +1,219 @@
+---
+description: Coverage Analyst agent — read-only Playwright E2E coverage assessment using repo source code as the single source of truth
+alwaysApply: false
+---
+
+# Coverage Analyst
+
+Invoked by: `/coverage-analysis [scope] [options]`
+
+Performs a read-only assessment of Playwright E2E test coverage for the virtualization module. The **repository is the single source of truth** — features are enumerated from `src/views/` and coverage is determined by scanning `playwright/tests/**/*.spec.ts`.
+
+**Options:**
+
+| Option               | Default  | Description                                                                          |
+| -------------------- | -------- | ------------------------------------------------------------------------------------ |
+| `--enrich`           | off      | Extend with git commit history and Jira ticket data (requires VPN for Jira)          |
+| `--type=features`    | features | (Only with `--enrich`) Ticket types: `features`, `bugs`, or `all`                    |
+| `--since=3months`    | 3 months | (Only with `--enrich`) Commit history lookback                                       |
+| `--compare=<branch>` | off      | Compare current branch coverage against another branch (e.g. `main`, `release-4.17`) |
+
+**Hard constraints:**
+- No code modifications, no branch creation, no test execution
+- No checkout of other branches — `--compare` reads via `git ls-tree`/`git show` only
+- Playwright tests only — Jest/unit tests are not considered coverage
+- No external dependencies by default (works offline on any clone)
+- Deterministic — same checkout yields identical results
+
+**Excluded routes:**
+- `networking` — Networking tests are owned by a separate team and excluded from all coverage analysis runs.
+
+---
+
+## Test Structure
+
+This project has two test infrastructures. Coverage analysis scans **both** directories.
+
+| Infrastructure | Directory | Fixture | Status |
+|---|---|---|---|
+| **Scenario** (new) | `playwright/tests/scenario/` | `scenarioTest` from `@/fixtures/scenario-fixture` | Active — new tests go here |
+| **Gating** (legacy) | `playwright/tests/gating/` | `gatingTest` from `scenario-test-fixture` | Frozen — no new tests added |
+
+Proposals for new coverage always target `playwright/tests/scenario/` using the scenario infrastructure.
+
+---
+
+## Route Registry
+
+Each route maps source code directories to test directories.
+
+| Route ID | Source Path | Test Paths | Spec Keywords |
+|----------|------------|-----------|---------------|
+| `vms` | `src/views/virtualmachines/list/`, `tree/`, `navigator/` | `tests/scenario/`, `tests/gating/` | `vm-list`, `virtual-machines`, `vm-tree` |
+| `vm-detail` | `src/views/virtualmachines/details/` | `tests/scenario/`, `tests/gating/` | `vm-overview`, `vm-tabs`, `vm-configuration` |
+| `vm-actions` | `src/views/virtualmachines/actions/` | `tests/scenario/`, `tests/gating/` | `vm-action`, `lifecycle`, `migrate` |
+| `wizard` | `src/views/virtualmachines/creation-wizard/` | `tests/scenario/`, `tests/gating/` | `wizard`, `create-vm`, `creation-wizard` |
+| `templates` | `src/views/templates/` | `tests/scenario/`, `tests/gating/` | `templates`, `template-` |
+| `bootable-volumes` | `src/views/bootablevolumes/` | `tests/scenario/`, `tests/gating/` | `bootable-volume`, `boot-source` |
+| `instance-types` | `src/views/instancetypes/` | `tests/scenario/`, `tests/gating/` | `instance-type`, `instanceType` |
+| `migration-policies` | `src/views/migrationpolicies/` | `tests/scenario/`, `tests/gating/` | `migration-polic`, `migrationpolic` |
+| `migrations` | `src/views/storagemigrations/` | `tests/scenario/`, `tests/gating/` | `migration`, `vm-migration`, `storage-migration` |
+| `checkups` | `src/views/checkups/` | `tests/scenario/`, `tests/gating/` | `checkup`, `self-validation` |
+| `settings` | `src/views/settings/` | `tests/scenario/`, `tests/gating/` | `settings`, `cluster-settings` |
+| `overview` | `src/views/clusteroverview/` | `tests/scenario/`, `tests/gating/` | `overview`, `landing`, `dashboard` |
+
+---
+
+## Data Pipeline
+
+### Default Mode (repo-only, no flags)
+
+#### Step 1: Feature Inventory (source enumeration)
+
+Enumerate testable capabilities from `src/views/` directory structure:
+
+```bash
+find src/views/<route> -maxdepth 3 -type d | sort
+find src/views/<route> -name '*.tsx' -o -name '*.ts' | wc -l
+```
+
+Feature taxonomy per route:
+- **List page**: renders, filters (name, row-filter), sort, column management, bulk actions, create button
+- **Detail page**: each tab/sub-tab loads, inline edits, action menus
+- **Actions**: each modal (delete, migrate, clone, stop, restart, etc.)
+- **Forms/Wizards**: each step renders, validation, submission, review
+- **CRUD**: create via YAML, create via form/wizard, edit, delete
+
+#### Step 2: Test Inventory (spec scanning)
+
+Scan **both** test directories:
+
+```bash
+rg -c "test\('" playwright/tests/scenario/ --type ts
+rg -c "test\('" playwright/tests/gating/ --type ts
+rg "test\('" playwright/tests/scenario/ playwright/tests/gating/ --type ts --no-heading -N
+```
+
+#### Step 3: Coverage Mapping
+
+For each capability identified in Step 1, determine status:
+- **TESTED**: A Playwright test explicitly exercises this capability
+- **PARTIAL**: A spec file exists for the route area but doesn't exercise this specific sub-feature
+- **UNTESTED**: No Playwright test touches this capability
+
+#### Step 4: Scoring
+
+Per-route:
+```
+tested_count = TESTED + (PARTIAL * 0.5)
+total = TESTED + PARTIAL + UNTESTED
+score = (tested_count / total) * 100
+```
+
+#### Step 5: Proposals
+
+For each UNTESTED capability:
+1. Find if an existing scenario spec covers the route area
+2. Generate proposal: EXTEND existing scenario spec or NEW scenario spec file
+3. All proposals target `playwright/tests/scenario/` using `scenarioTest` fixture
+
+---
+
+### Enriched Mode (`--enrich` flag)
+
+When `--enrich` is provided, add commit history and Jira ticket data **after** the base report:
+
+#### Enrichment Step A: Commit Scan
+
+```bash
+git log --oneline --since="3 months ago" -- src/views/ | grep -oP 'CNV-\d+' | sort -u
+```
+
+Map commits to routes by path (same path registry as above).
+
+#### Enrichment Step B: Jira Queries (requires VPN)
+
+```bash
+BASE_JQL='project = CNV AND component = "CNV User Interface"'
+TYPE_FILTER='AND type IN (Story, Epic, "Feature Request")'
+VERSION_FILTER='AND fixVersion IN ("CNV v4.22.0", "CNV v4.23.0")'
+KEYWORD='AND text ~ "<route-jql-keywords>"'
+```
+
+#### Enrichment Step C: Annotation Check
+
+```bash
+rg "CNV-XXXXX" playwright/tests/ --type ts -l
+```
+
+Enriched data appears as an **addendum** section. The base coverage score is always repo-only.
+
+### Compare Mode (`--compare=<branch>`)
+
+When `--compare` is provided, run Steps 1-4 against the comparison branch using git tree inspection (without checkout), then compute deltas.
+
+```bash
+git rev-parse --verify <branch> 2>/dev/null || git rev-parse --verify origin/<branch> 2>/dev/null
+git ls-tree -r --name-only <branch> -- src/views/ | sort
+git ls-tree -r --name-only <branch> -- playwright/tests/ | sort
+git show <branch>:playwright/tests/<path>
+```
+
+---
+
+## Scoring Rubric
+
+| Score Range | Rating | Meaning |
+|-------------|--------|---------|
+| 90-100% | Excellent | Near-complete coverage for the route |
+| 70-89% | Good | Most features tested, minor gaps |
+| 50-69% | Fair | Significant untested features |
+| 30-49% | Poor | Majority of features lack coverage |
+| 0-29% | Critical | Route has minimal or no Playwright coverage |
+
+---
+
+## Proposal Tier Assignment
+
+All proposals target `playwright/tests/scenario/` using the scenario infrastructure:
+
+| Criteria | Placement |
+|----------|-----------|
+| Smoke check, no resource creation | Lightweight scenario spec |
+| Creates VMs, CRUD workflow | Scenario spec with `beforeAll` setup |
+| Complex multi-resource | Scenario spec with extended timeouts |
+
+---
+
+## Output Formatting Rules
+
+- Use markdown tables for structured data
+- Bold the overall coverage percentage
+- Sort per-route table by coverage ascending (worst first)
+- Sort gap tables by feature impact (user-facing first)
+- Limit proposals to top 10 highest-impact items
+- Include a "Summary Statistics" footer with counts
+- No emojis in output
+- When `--enrich` is used, clearly separate the addendum from the base report
+- When `--compare` is used, append the comparison section after proposals
+
+---
+
+## Scope Resolution
+
+When the user provides a scope argument:
+
+1. Look up the route ID in the Route Registry table above
+2. If found, only analyze that single route
+3. If not found, try fuzzy matching (e.g., `vm` → `vms`, `storage` → `migrations`)
+4. If still ambiguous, list matching routes and ask user to clarify
+5. If no scope or `all`, analyze all routes
+
+---
+
+## Integration with Other Commands
+
+- After running `/coverage-analysis`, the user may invoke `/create-test` to implement proposals
+- The proposals section should reference the exact spec file path that `/create-test` would target
+- Each proposal must include: action (EXTEND/NEW), target file, and effort estimate
+- All proposals target `playwright/tests/scenario/` using `scenarioTest` fixture and `KubernetesClient`

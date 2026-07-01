@@ -71,7 +71,15 @@ npm test -- --watch                  # Watch mode
 npm test -- --testNamePattern="VM"   # Run tests matching pattern
 ```
 
-### E2E Tests (Cypress)
+### E2E Tests (Playwright — new)
+```bash
+USE_SCENARIO_INFRA=true npm run test-playwright -- --project=scenario  # Scenario tests
+npm run test-playwright -- --project=setup --project=Gating            # Gating tests
+npm run test-playwright -- <path>                                      # Specific spec file
+npm run check-types:playwright          # Type-check Playwright code
+```
+
+### E2E Tests (Cypress — legacy)
 ```bash
 npm run test-cypress            # Open Cypress interactive UI
 npm run test-cypress-headless   # Run headless (CI)
