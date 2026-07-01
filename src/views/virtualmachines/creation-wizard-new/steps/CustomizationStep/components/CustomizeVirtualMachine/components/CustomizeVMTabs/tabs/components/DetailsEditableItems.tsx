@@ -10,7 +10,10 @@ import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getAnnotation, getLabel, getName } from '@kubevirt-utils/resources/shared';
 import { DESCRIPTION_ANNOTATION, getHostname } from '@kubevirt-utils/resources/vm';
-import { updateCustomizeInstanceType, vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
+import {
+  patchCustomizeWizardVMSignal,
+  vmSignal,
+} from '@kubevirt-utils/store/customizeInstanceType';
 import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
 
 type DetailsEditableItemsProps = {
@@ -35,7 +38,7 @@ const DetailsEditableItems: FC<DetailsEditableItemsProps> = ({ treeViewFoldersEn
             <DescriptionModal
               onSubmit={(description) =>
                 Promise.resolve(
-                  updateCustomizeInstanceType([
+                  patchCustomizeWizardVMSignal([
                     { data: description, path: `metadata.annotations.${DESCRIPTION_ANNOTATION}` },
                   ]),
                 )
@@ -57,7 +60,7 @@ const DetailsEditableItems: FC<DetailsEditableItemsProps> = ({ treeViewFoldersEn
               <MoveVMToFolderModal
                 onSubmit={(folderName) =>
                   Promise.resolve(
-                    updateCustomizeInstanceType([
+                    patchCustomizeWizardVMSignal([
                       { data: folderName, path: ['metadata', 'labels', VM_FOLDER_LABEL] },
                     ]),
                   )
@@ -80,7 +83,7 @@ const DetailsEditableItems: FC<DetailsEditableItemsProps> = ({ treeViewFoldersEn
             <HostnameModal
               onSubmit={(updatedVM) =>
                 Promise.resolve(
-                  updateCustomizeInstanceType([
+                  patchCustomizeWizardVMSignal([
                     { data: getHostname(updatedVM), path: `spec.template.spec.hostname` },
                   ]),
                 )

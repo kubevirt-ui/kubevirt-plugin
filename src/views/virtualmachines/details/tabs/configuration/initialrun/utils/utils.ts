@@ -1,5 +1,4 @@
-import { ConfigMapModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { ConfigMapModel, VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { SYSPREP } from '@kubevirt-utils/components/SysprepModal/consts';
@@ -12,7 +11,7 @@ import {
 } from '@kubevirt-utils/components/SysprepModal/sysprep-utils';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { getDisks, getVolumes } from '@kubevirt-utils/resources/vm';
-import { UpdateCustomizeInstanceType } from '@kubevirt-utils/store/customizeInstanceType';
+import { PatchCustomizeWizardVMSignal } from '@kubevirt-utils/store/customizeInstanceType';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sCreate, kubevirtK8sPatch } from '@multicluster/k8sRequests';
@@ -20,7 +19,7 @@ import { kubevirtK8sCreate, kubevirtK8sPatch } from '@multicluster/k8sRequests';
 export const patchVMWithExistingSysprepConfigMap = async (
   name: string,
   vm: V1VirtualMachine,
-  onSubmit?: UpdateCustomizeInstanceType,
+  onSubmit?: PatchCustomizeWizardVMSignal,
 ): Promise<void> => {
   const vmVolumes = getVolumes(vm);
   const vmDisks = getDisks(vm);
@@ -72,7 +71,7 @@ export const createSysprepConfigMap = async (
   autounattend: string,
   externalSysprepConfig: IoK8sApiCoreV1ConfigMap,
   vm: V1VirtualMachine,
-  onSubmit?: UpdateCustomizeInstanceType,
+  onSubmit?: PatchCustomizeWizardVMSignal,
 ): Promise<void> => {
   const vmVolumes = getVolumes(vm);
   const vmDisks = getDisks(vm);

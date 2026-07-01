@@ -4,7 +4,10 @@ import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { BootMode } from '@kubevirt-utils/components/FirmwareBootloaderModal/utils/constants';
 import { HARDWARE_DEVICE_TYPE } from '@kubevirt-utils/components/HardwareDevices/utils/constants';
 import { getDevices } from '@kubevirt-utils/resources/vm';
-import { updateCustomizeInstanceType, vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
+import {
+  patchCustomizeWizardVMSignal,
+  vmSignal,
+} from '@kubevirt-utils/store/customizeInstanceType';
 import { DescriptionList, GridItem } from '@patternfly/react-core';
 import DetailsSectionBoot from '@virtualmachines/details/tabs/configuration/details/components/DetailsSectionBoot';
 import DetailsSectionHardware from '@virtualmachines/details/tabs/configuration/details/components/DetailsSectionHardware';
@@ -22,7 +25,7 @@ const DetailsRightColumn: FC<DetailsRightColumnProps> = ({ canUpdateVM, preferre
         <DetailsSectionHardware
           onSubmit={(type: HARDWARE_DEVICE_TYPE, updatedVM: V1VirtualMachine) =>
             Promise.resolve(
-              updateCustomizeInstanceType([
+              patchCustomizeWizardVMSignal([
                 {
                   data: getDevices(updatedVM)?.[type],
                   path: `spec.template.spec.domain.devices.${type}`,

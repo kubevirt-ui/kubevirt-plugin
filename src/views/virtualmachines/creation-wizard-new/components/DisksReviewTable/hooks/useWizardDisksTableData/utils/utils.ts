@@ -1,3 +1,5 @@
+import { TFunction } from 'i18next';
+
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import {
   V1DataVolumeTemplateSpec,
@@ -36,7 +38,6 @@ import {
   getPVCClaimName,
 } from '@kubevirt-utils/resources/vm/utils/disk/selectors';
 import { getHumanizedSize } from '@kubevirt-utils/utils/units';
-import { TFunction } from 'i18next';
 import { DiskDevice, SourceNameByPriority } from './types';
 
 const findVolumeForDisk = (disk: V1Disk, volumes: V1Volume[]): undefined | V1Volume =>

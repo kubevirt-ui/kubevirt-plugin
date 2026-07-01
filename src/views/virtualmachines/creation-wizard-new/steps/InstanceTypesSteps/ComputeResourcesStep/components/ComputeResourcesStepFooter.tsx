@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 
-import { setVMSignal } from '@kubevirt-utils/store/customizeInstanceType';
+import { setCustomizeWizardVMSignal } from '@kubevirt-utils/store/customizeInstanceType';
 import { useWizardContext, WizardFooter } from '@patternfly/react-core';
 import useCloseWizard from '@virtualmachines/creation-wizard-new/hooks/useCloseWizard';
 import useWizardStepValidation from '@virtualmachines/creation-wizard-new/hooks/useWizardStepValidation';
@@ -14,7 +14,7 @@ const ComputeResourcesStepFooter: FC = () => {
   const { isNextDisabledForStep } = useWizardStepValidation();
 
   const handleGoToNextStep = () => {
-    setVMSignal(generatedVM);
+    setCustomizeWizardVMSignal(generatedVM);
     goToNextStep();
   };
 

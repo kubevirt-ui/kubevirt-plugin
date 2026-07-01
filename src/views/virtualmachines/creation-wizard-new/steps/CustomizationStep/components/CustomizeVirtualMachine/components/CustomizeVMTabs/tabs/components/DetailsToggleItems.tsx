@@ -6,7 +6,10 @@ import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName } from '@kubevirt-utils/resources/shared';
-import { updateCustomizeInstanceType, vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
+import {
+  patchCustomizeWizardVMSignal,
+  vmSignal,
+} from '@kubevirt-utils/store/customizeInstanceType';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { Switch } from '@patternfly/react-core';
 import DeletionProtectionModal from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/DeletionProtectionModal';
@@ -42,7 +45,7 @@ const DetailsToggleItems: FC<DetailsToggleItemsProps> = ({
           <HeadlessMode
             updateHeadlessMode={(checked) =>
               Promise.resolve(
-                updateCustomizeInstanceType([
+                patchCustomizeWizardVMSignal([
                   {
                     data: checked ? false : null,
                     path: `spec.template.spec.domain.devices.autoattachGraphicsDevice`,
@@ -68,7 +71,7 @@ const DetailsToggleItems: FC<DetailsToggleItemsProps> = ({
           <Switch
             onChange={(_event, checked) => {
               setIsCheckedGuestSystemAccessLog(checked);
-              updateCustomizeInstanceType([
+              patchCustomizeWizardVMSignal([
                 { data: checked, path: `spec.template.spec.domain.devices.logSerialConsole` },
               ]);
             }}
@@ -100,7 +103,7 @@ const DetailsToggleItems: FC<DetailsToggleItemsProps> = ({
                       : VMDeletionProtectionOptions.DISABLE
                   }
                   onConfirm={(enableDeletionProtection) => {
-                    updateCustomizeInstanceType([
+                    patchCustomizeWizardVMSignal([
                       {
                         data: enableDeletionProtection ? 'true' : 'false',
                         path: ['metadata', 'labels', VM_DELETION_PROTECTION_LABEL],

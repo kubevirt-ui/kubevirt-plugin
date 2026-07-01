@@ -7,7 +7,7 @@ import useIsIPv6SingleStackCluster from '@kubevirt-utils/hooks/useIPStackType/us
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName } from '@kubevirt-utils/resources/shared';
 import useNamespaceUDN from '@kubevirt-utils/resources/udn/hooks/useNamespaceUDN';
-import { clearCustomizeInstanceType, vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
+import { vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
 import { getErrorMessage, kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { kubevirtK8sCreate } from '@multicluster/k8sRequests';
@@ -71,7 +71,6 @@ const useCreateCustomizedVM: UseCreateCustomizedVM = () => {
       });
 
       logSuccessfulVMCreation(createdVM, creationMethod, selectedTemplate);
-      clearCustomizeInstanceType();
 
       if (!isUDNManagedNamespace) {
         await createHeadlessServiceSafely(createdVM, t);

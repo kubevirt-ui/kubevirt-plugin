@@ -5,10 +5,10 @@ import EnvironmentForm from '@kubevirt-utils/components/EnvironmentEditor/Enviro
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { getDataVolumeTemplates, getDisks, getVolumes } from '@kubevirt-utils/resources/vm';
 import {
-  updateCustomizeInstanceType,
+  patchCustomizeWizardVMSignal,
   updateVMCustomizeIT,
+  vmSignal,
 } from '@kubevirt-utils/store/customizeInstanceType';
-import { vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
 import { Divider, Grid, GridItem, PageSection } from '@patternfly/react-core';
 import { useSignals } from '@preact/signals-react/runtime';
 import DiskList from '@virtualmachines/details/tabs/configuration/storage/components/tables/disk/DiskList';
@@ -27,7 +27,7 @@ const CustomizeInstanceTypeStorageTab = () => {
         <PageSection>
           <DiskList
             onDiskUpdate={(updatedVM: V1VirtualMachine) => {
-              const vmModified = updateCustomizeInstanceType([
+              const vmModified = patchCustomizeWizardVMSignal([
                 {
                   data: getDisks(updatedVM),
                   path: `spec.template.spec.domain.devices.disks`,

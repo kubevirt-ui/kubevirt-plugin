@@ -7,7 +7,10 @@ import {
   START_AFTER_CREATION_CHECKBOX_ID,
 } from '@kubevirt-utils/components/RunStrategyModal/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { updateCustomizeInstanceType, vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
+import {
+  patchCustomizeWizardVMSignal,
+  vmSignal,
+} from '@kubevirt-utils/store/customizeInstanceType';
 import { Checkbox, Stack, StackItem, Title, TitleSizes } from '@patternfly/react-core';
 import { useSignals } from '@preact/signals-react/runtime';
 import { useVMWizard } from '@virtualmachines/creation-wizard-new/state/vm-wizard-context/VMWizardContext';
@@ -45,7 +48,7 @@ const ReviewAndCreateStep: FC = () => {
         <Checkbox
           onChange={(_, checked: boolean) => {
             const { newStrategy } = onToggle(checked);
-            updateCustomizeInstanceType([{ data: newStrategy, path: 'spec.runStrategy' }]);
+            patchCustomizeWizardVMSignal([{ data: newStrategy, path: 'spec.runStrategy' }]);
           }}
           id={START_AFTER_CREATION_CHECKBOX_ID}
           isChecked={isStartChecked}

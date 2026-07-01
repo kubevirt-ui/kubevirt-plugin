@@ -1,115 +1,101 @@
 import produce from 'immer';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { ensurePath, isEmpty } from '@kubevirt-utils/utils/utils';
-import { effect, signal } from '@preact/signals-react';
+import { ensurePath } from '@kubevirt-utils/utils/utils';
+import { signal } from '@preact/signals-react';
 
 import {
-  getCustomizeInstanceTypeSessionStorage,
   mergeData,
   saveCustomizeInstanceTypeSessionStorage,
 } from './customizeInstanceType/utils/utils';
 
 export const vmSignal = signal<V1VirtualMachine>(null);
 
-// TODO: check if we use session storage
-effect(() => {
-  if (!isEmpty(vmSignal.value)) {
-    saveCustomizeInstanceTypeSessionStorage(vmSignal.value);
-    return;
-  }
-  const vmSessionStorage = getCustomizeInstanceTypeSessionStorage();
-  vmSignal.value = vmSessionStorage;
-});
-
-type UpdateCustomizeInstanceTypeArgs = {
-  data: any;
-  merge?: boolean;
-  path?: string | string[];
-}[];
-
 // ensurePath joins array segments with "." and re-splits, which breaks keys that
 // contain dots (e.g. label "vm.openshift.io/folder") into nested objects.
 const ensurePathParts = (obj: object, pathParts: string[]): void => {
-  let current = obj;
-
-  for (let index = 0; index < pathParts.length - 1; index++) {
-    const part = pathParts[index];
-
+  pathParts.slice(0, -1).reduce((current, part) => {
     if (!current[part]) {
       current[part] = {};
     }
-
-    current = current[part];
-  }
+    return current[part];
+  }, obj);
 };
-
-export type UpdateCustomizeInstanceType = (
-  args: UpdateCustomizeInstanceTypeArgs,
-) => V1VirtualMachine;
 
 export const clearCustomizeInstanceType = () => {
   vmSignal.value = null;
   saveCustomizeInstanceTypeSessionStorage(null);
 };
 
-export const updateCustomizeInstanceType: UpdateCustomizeInstanceType = (
-  updateValues,
+const parsePath = (path: string | string[]): string[] =>
+  (typeof path === 'string' ? path.split('.') : path).filter(Boolean);
+
+const ensureNestedStructure = (draft: object, path: string | string[], pathParts: string[]) => {
+  if (typeof path === 'string') {
+    return ensurePath(draft, pathParts.join('.'));
+  }
+
+  return ensurePathParts(draft, pathParts);
+};
+
+const setValueAtPath = (draft: object, pathParts: string[], data: any, merge: boolean): void => {
+  const parentPath = pathParts.slice(0, -1);
+  const targetKey = pathParts.at(-1);
+  const parentObject = parentPath.reduce((current, segment) => current[segment], draft as any);
+
+  parentObject[targetKey] = merge ? mergeData(parentObject[targetKey], data) : data;
+};
+
+const applyVMUpdate = (
+  currentVM: V1VirtualMachine,
+  data: any,
+  merge: boolean,
+  path: string | string[],
 ): V1VirtualMachine => {
-  // Handle null/undefined signal value
+  const pathParts = parsePath(path);
+
+  if (pathParts.length === 0) return currentVM;
+
+  const updatedVM = produce(currentVM, (draft) => {
+    ensureNestedStructure(draft, path, pathParts);
+    setValueAtPath(draft, pathParts, data, merge);
+  });
+
+  return updatedVM;
+};
+
+type PatchCustomizeWizardVMSignalArgs = {
+  data: any;
+  merge?: boolean;
+  path?: string | string[];
+}[];
+
+export type PatchCustomizeWizardVMSignal = (
+  vmElementsToUpdate: PatchCustomizeWizardVMSignalArgs,
+) => V1VirtualMachine;
+
+export const patchCustomizeWizardVMSignal: PatchCustomizeWizardVMSignal = (vmElementsToUpdate) => {
   if (!vmSignal.value) {
     return undefined;
   }
 
-  // Create a deep copy for each update to prevent reference mutation
-  let vm = produce(vmSignal.value, (draft) => draft);
+  const initialVM = produce(vmSignal.value, (draft) => draft);
 
-  updateValues.forEach(({ data, merge = false, path }) => {
-    // Replace complete vm obj when path is undefined (no path property)
-    if (path === undefined) {
-      vm = data;
-      return;
-    }
+  const updatedVM = vmElementsToUpdate.reduce((currentVM, { data, merge = false, path }) => {
+    if (path === undefined) return data;
+    if (path === '') return currentVM;
 
-    // Skip update when path is empty string
-    if (path === '') {
-      return;
-    }
+    return applyVMUpdate(currentVM, data, merge, path);
+  }, initialVM);
 
-    vm = produce(vm, (vmDraft) => {
-      const pathParts = typeof path === 'string' ? path.split('.') : path;
-      // Filter out empty strings to prevent corruption
-      const validPathParts = pathParts.filter((part) => part !== '');
-
-      if (validPathParts.length === 0) {
-        return;
-      }
-
-      if (typeof path === 'string') {
-        ensurePath(vmDraft, validPathParts.join('.'));
-      } else {
-        ensurePathParts(vmDraft, validPathParts);
-      }
-
-      let obj = vmDraft;
-      validPathParts.forEach((part, index) => {
-        if (index < validPathParts.length - 1) {
-          obj = obj[part];
-        } else {
-          obj[part] = merge ? mergeData(obj[part], data) : data;
-        }
-      });
-    });
-  });
-
-  vmSignal.value = vm;
+  vmSignal.value = updatedVM;
 
   return vmSignal.value;
 };
 
 export const updateVMCustomizeIT = (vm: V1VirtualMachine) =>
-  Promise.resolve(updateCustomizeInstanceType([{ data: vm }]));
+  Promise.resolve(patchCustomizeWizardVMSignal([{ data: vm }]));
 
-export const setVMSignal = (vm: V1VirtualMachine) => {
+export const setCustomizeWizardVMSignal = (vm: V1VirtualMachine | null) => {
   vmSignal.value = vm;
 };

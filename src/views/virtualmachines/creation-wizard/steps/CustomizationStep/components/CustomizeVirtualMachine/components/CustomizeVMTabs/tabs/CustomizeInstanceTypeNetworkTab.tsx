@@ -9,8 +9,10 @@ import {
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { updateCustomizeInstanceType } from '@kubevirt-utils/store/customizeInstanceType';
-import { vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
+import {
+  patchCustomizeWizardVMSignal,
+  vmSignal,
+} from '@kubevirt-utils/store/customizeInstanceType';
 import { PageSection, Title } from '@patternfly/react-core';
 import NetworkInterfaceList from '@virtualmachines/creation-wizard/steps/CustomizationStep/components/CustomizeVirtualMachine/components/CustomizeVMTabs/tabs/network/NetworkInterfaceList';
 import AddNetworkInterfaceButton from '@virtualmachines/details/tabs/configuration/network/components/AddNetworkInterfaceButton';
@@ -28,18 +30,18 @@ const CustomizeInstanceTypeNetworkTab = () => {
     updatedInterfaces: V1Interface[],
     updatedDisks?: V1Disk[],
   ) => {
-    const updates: Parameters<typeof updateCustomizeInstanceType>[0] = [
+    const updates: Parameters<typeof patchCustomizeWizardVMSignal>[0] = [
       { data: updatedNetworks, path: 'spec.template.spec.networks' },
       { data: updatedInterfaces, path: 'spec.template.spec.domain.devices.interfaces' },
     ];
     if (updatedDisks) {
       updates.push({ data: updatedDisks, path: 'spec.template.spec.domain.devices.disks' });
     }
-    return Promise.resolve(updateCustomizeInstanceType(updates));
+    return Promise.resolve(patchCustomizeWizardVMSignal(updates));
   };
 
   const onUpdateVM = (updatedVM: V1VirtualMachine) => {
-    updateCustomizeInstanceType([{ data: updatedVM }]);
+    patchCustomizeWizardVMSignal([{ data: updatedVM }]);
     return Promise.resolve();
   };
 

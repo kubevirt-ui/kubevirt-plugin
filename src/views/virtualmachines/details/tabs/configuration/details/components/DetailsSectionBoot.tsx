@@ -1,6 +1,6 @@
+import classNames from 'classnames';
 import React, { FC, useEffect, useState } from 'react';
 import { useLocation } from 'react-router';
-import classNames from 'classnames';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import BootOrderSummary from '@kubevirt-utils/components/BootOrder/BootOrderSummary';
@@ -19,7 +19,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { useToggle } from '@kubevirt-utils/hooks/useToggle';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { getDisks, getInterfaces } from '@kubevirt-utils/resources/vm';
-import { updateCustomizeInstanceType } from '@kubevirt-utils/store/customizeInstanceType';
+import { patchCustomizeWizardVMSignal } from '@kubevirt-utils/store/customizeInstanceType';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { ExpandableSection, Switch } from '@patternfly/react-core';
@@ -81,7 +81,7 @@ const DetailsSectionBoot: FC<DetailsSectionBootProps> = ({
             <FirmwareBootloaderModal
               onSubmit={(updatedVM) =>
                 isCustomizeInstanceType
-                  ? Promise.resolve(updateCustomizeInstanceType([{ data: updatedVM }]))
+                  ? Promise.resolve(patchCustomizeWizardVMSignal([{ data: updatedVM }]))
                   : updateBootLoader(updatedVM, vm)
               }
               isOpen={isOpen}
@@ -105,7 +105,7 @@ const DetailsSectionBoot: FC<DetailsSectionBootProps> = ({
               onSubmit={(updatedVM: V1VirtualMachine) =>
                 isCustomizeInstanceType
                   ? Promise.resolve(
-                      updateCustomizeInstanceType([
+                      patchCustomizeWizardVMSignal([
                         {
                           data: getDisks(updatedVM),
                           path: `spec.template.spec.domain.devices.disks`,
@@ -140,7 +140,7 @@ const DetailsSectionBoot: FC<DetailsSectionBootProps> = ({
               setIsChecked(checked);
               isCustomizeInstanceType
                 ? Promise.resolve(
-                    updateCustomizeInstanceType([
+                    patchCustomizeWizardVMSignal([
                       {
                         data: checked ? printableVMStatus.Paused : null,
                         path: `spec.template.spec.startStrategy`,

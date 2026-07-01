@@ -6,7 +6,7 @@ import DescriptionItemLabels from '@kubevirt-utils/components/DescriptionItem/co
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { updateCustomizeInstanceType } from '@kubevirt-utils/store/customizeInstanceType';
+import { patchCustomizeWizardVMSignal } from '@kubevirt-utils/store/customizeInstanceType';
 import { vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
 import { DescriptionList, Grid, PageSection, Title } from '@patternfly/react-core';
 
@@ -20,7 +20,7 @@ const CustomizeInstanceTypeMetadataTab = () => {
 
   const updateMetadata = (data: { [key: string]: string }, type: string) =>
     Promise.resolve(
-      updateCustomizeInstanceType([
+      patchCustomizeWizardVMSignal([
         {
           data,
           path: `metadata.${type}`,

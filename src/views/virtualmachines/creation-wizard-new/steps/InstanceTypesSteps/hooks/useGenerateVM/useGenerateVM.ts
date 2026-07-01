@@ -25,7 +25,7 @@ import {
   generateVM,
   isWindowBootableVolume,
 } from '@virtualmachines/creation-wizard-new/steps/InstanceTypesSteps/hooks/useGenerateVM/utils/generateVM';
-import { createPopulatedCloudInitYAML } from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/hooks/useGenerateVM/utils';
+import { createPopulatedCloudInitYAML } from './utils/generateVM';
 
 export type UseGenerateVM = () => V1VirtualMachine;
 
@@ -104,6 +104,7 @@ const useGenerateVM: UseGenerateVM = () => {
     dvSource,
     enableMultiArchBootImageImport,
     folder,
+    generatedVMName,
     isIPv6SingleStack,
     isUDNManagedNamespace,
     populatedCloudInitYAML,
@@ -113,7 +114,6 @@ const useGenerateVM: UseGenerateVM = () => {
     namespace,
     vmDescription,
     vmName,
-    generatedVMName,
   ]);
 
   const [driversImage] = useDriversImage();
