@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-import { IoK8sApiCoreV1Pod } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type IoK8sApiCoreV1Pod } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import {
   getClusterNamespaceNameKey,
   getName,
@@ -12,6 +12,7 @@ export type ExportUploadState = {
   namespace: string;
   podName: string;
   pvcName: string;
+  secretName: string;
 };
 
 type ExportUploadStore = {
@@ -21,18 +22,19 @@ type ExportUploadStore = {
   uploads: Record<string, ExportUploadState>;
 };
 
-const uploadKey = (cluster: string, namespace: string, pvcName: string) =>
+const uploadKey = (cluster: string, namespace: string, pvcName: string): string =>
   getClusterNamespaceNameKey(cluster, namespace, pvcName);
 
 export const useExportUploadStore = create<ExportUploadStore>((set, get) => ({
-  clearUpload: (cluster, namespace, pvcName) =>
+  clearUpload: (cluster, namespace, pvcName): void =>
     set((state) => {
       const nextUploads = { ...state.uploads };
       delete nextUploads[uploadKey(cluster, namespace, pvcName)];
       return { uploads: nextUploads };
     }),
-  getUpload: (cluster, namespace, pvcName) => get().uploads[uploadKey(cluster, namespace, pvcName)],
-  setUpload: (uploadState) =>
+  getUpload: (cluster, namespace, pvcName): ExportUploadState | undefined =>
+    get().uploads[uploadKey(cluster, namespace, pvcName)],
+  setUpload: (uploadState): void =>
     set((state) => ({
       uploads: {
         ...state.uploads,
@@ -46,6 +48,7 @@ export const persistExportPod = (
   pod: IoK8sApiCoreV1Pod,
   cluster: string,
   pvcName: string,
+  secretName: string,
 ): void => {
   const namespace = getNamespace(pod);
   const podName = getName(pod);
@@ -58,5 +61,6 @@ export const persistExportPod = (
     namespace,
     podName,
     pvcName,
+    secretName,
   });
 };

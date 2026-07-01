@@ -1,4 +1,4 @@
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import {
   getClusterNamespaceNameKey,
   getName,
@@ -8,6 +8,7 @@ import { getCluster } from '@multicluster/helpers/selectors';
 
 export const UPLOAD_KEY_PREFIX = {
   bootableVolume: 'bootable-volume',
+  exportDisk: 'export-disk',
   vmCdrom: 'vm-cdrom',
   vmDisk: 'vm-disk',
 } as const;
@@ -52,6 +53,16 @@ export const getVmCdromUploadKeyFromVm = (vm: V1VirtualMachine, cdromDiskName: s
 
 export const getBootableVolumeUploadKey = (namespace: string, name: string): string =>
   buildScopedUploadKey(UPLOAD_KEY_PREFIX.bootableVolume, `${namespace}/${name}`);
+
+export const getExportDiskUploadKey = (
+  cluster: string,
+  namespace: string,
+  pvcName: string,
+): string =>
+  buildScopedUploadKey(
+    UPLOAD_KEY_PREFIX.exportDisk,
+    getClusterNamespaceNameKey(cluster, namespace, pvcName),
+  );
 
 export const isVmScopedUploadKey = (
   uploadKey: string,

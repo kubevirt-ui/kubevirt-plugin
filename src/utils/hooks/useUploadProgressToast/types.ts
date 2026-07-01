@@ -14,6 +14,7 @@ export type UploadSuccessLink = {
 
 export type UploadEntry = {
   abortTooltip?: string;
+  blockNavigation?: boolean;
   cancelUpload?: () => Promise<unknown> | void;
   contextLinks?: UploadSuccessLink[];
   dvCluster?: string;
