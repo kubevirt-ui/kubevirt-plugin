@@ -82,9 +82,10 @@ Uses `openshift-install` to create a fully self-managed OpenShift cluster on IBM
 
 ### Optional
 
-| Secret    | Description                                        |
-| --------- | -------------------------------------------------- |
-| `BOT_PAT` | PAT with repo admin scope for ghost runner cleanup |
+| Secret              | Description                                                                 |
+| ------------------- | --------------------------------------------------------------------------- |
+| `BOT_PAT`           | PAT with repo admin scope for ghost runner cleanup                          |
+| `SLACK_WEBHOOK_URL` | Slack Incoming Webhook URL for credential notifications on cluster creation |
 
 ## Setting Up the Hot Cluster
 
@@ -160,6 +161,7 @@ Always verify the cluster has been torn down when done testing. The auto-teardow
 - **Privileged dind + broad SCC**: The `github-arc` SCC allows privileged containers for the Docker-in-Docker sidecar. Scope runner namespaces and RBAC accordingly.
 - **`ttl.sh` for plugin images**: Plugin images use ephemeral `ttl.sh` tags with 2h TTL per CI run. Suitable for CI but not for long-term storage.
 - **Ghost runner cleanup**: Requires `BOT_PAT` with repo admin scope. Without it, offline runners must be cleaned up manually.
+- **IBM Cloud VPC hairpin NAT**: VPC load balancers don't support hairpin NAT. On IPI clusters, ingress canary checks fail and the authentication operator may report Degraded. This is cosmetic -- the console works fine for browser access from outside the cluster, and CI tests are unaffected (they use internal service URLs).
 
 ## Troubleshooting
 
