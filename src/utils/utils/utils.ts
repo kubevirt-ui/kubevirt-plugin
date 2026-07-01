@@ -2,7 +2,15 @@ import { TFunction } from 'i18next';
 import * as ipaddr from 'ipaddr.js';
 import { animals, colors, NumberDictionary, uniqueNamesGenerator } from 'unique-names-generator';
 
-import { IoK8sApiCoreV1Service } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { SecretModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import {
+  type IoK8sApiCoreV1Pod,
+  IoK8sApiCoreV1Service,
+} from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { PodModel } from '@kubevirt-utils/models';
+import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
+import { getCluster } from '@multicluster/helpers/selectors';
+import { kubevirtK8sDelete } from '@multicluster/k8sRequests';
 import {
   DEFAULT_NAMESPACE,
   KUBEVIRT_HYPERCONVERGED,
@@ -302,3 +310,34 @@ export const getNoDataAvailableMessage = (t: TFunction): string => t('No data av
 
 export const getErrorMessage = (error: any) =>
   error instanceof Error ? error.message : String(error);
+
+const ALREADY_CREATED_ERROR_CODE = 409;
+
+export const createIfNotExists = async (request: Promise<unknown>): Promise<void> => {
+  try {
+    await request;
+  } catch (error) {
+    if (error.code !== ALREADY_CREATED_ERROR_CODE) throw error;
+  }
+};
+
+export const deleteExportResources = (
+  pod: IoK8sApiCoreV1Pod,
+  secretName: string,
+): Promise<unknown[]> => {
+  const podCluster = getCluster(pod);
+  const podNamespace = getNamespace(pod);
+
+  return Promise.allSettled([
+    kubevirtK8sDelete({
+      cluster: podCluster,
+      model: PodModel,
+      resource: { metadata: { name: getName(pod), namespace: podNamespace } },
+    }),
+    kubevirtK8sDelete({
+      cluster: podCluster,
+      model: SecretModel,
+      resource: { metadata: { name: secretName, namespace: podNamespace } },
+    }),
+  ]);
+};
