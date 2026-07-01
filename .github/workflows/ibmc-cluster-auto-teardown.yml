@@ -48,7 +48,7 @@ jobs:
     steps:
       - name: Check CI jobs
         id: check_ci
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         env:
           INCLUDE_WORKFLOWS: '[".github/workflows/hot-cluster-e2e.yml", ".github/workflows/hot-cluster-e2e-run.yml"]'
         with:
@@ -136,7 +136,7 @@ jobs:
       - name: Check idle threshold
         id: check_idle
         if: steps.check_ci.outputs.active_jobs == 'false' && steps.check_hours.outputs.skip != 'true'
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         env:
           LAST_RUN_TIME: ${{ steps.check_ci.outputs.last_run_time }}
           IDLE_THRESHOLD_MINUTES: ${{ env.IDLE_THRESHOLD_MINUTES }}
@@ -217,7 +217,7 @@ jobs:
 
       - name: Trigger teardown
         if: steps.check_idle.outputs.recent_activity == 'false' && steps.check_cluster.outputs.exists == 'true'
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             const infraType = '${{ steps.check_cluster.outputs.infra_type }}' || 'classic';
