@@ -3,15 +3,24 @@ import { useMemo } from 'react';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useIsACMPage from '@multicluster/useIsACMPage';
 import { enrichFleetData } from '@multicluster/utils';
-import { useK8sWatchResource, WatchK8sResult } from '@openshift-console/dynamic-plugin-sdk';
+import { useK8sWatchResource, type WatchK8sResult } from '@openshift-console/dynamic-plugin-sdk';
 import {
-  FleetWatchK8sResource,
+  type FleetWatchK8sResource,
+  type FleetWatchK8sResult,
   useFleetK8sWatchResource,
   useHubClusterName,
 } from '@stolostron/multicluster-sdk';
 
-const useK8sWatchData = <T>(resource: FleetWatchK8sResource | null): WatchK8sResult<T> => {
-  const [hubClusterName, hubClusterNameLoaded, hubClusterError] = useHubClusterName();
+type ReplaceLastAny<T extends readonly unknown[], L> = T extends readonly [...infer Rest, unknown]
+  ? [...Rest, L]
+  : never;
+
+type WatchK8sResultWithError<T> = ReplaceLastAny<WatchK8sResult<T>, Error>;
+type FleetWatchK8sResultWithError<T> = ReplaceLastAny<FleetWatchK8sResult<T>, Error>;
+
+const useK8sWatchData = <T>(resource: FleetWatchK8sResource | null): WatchK8sResultWithError<T> => {
+  const [hubClusterName, hubClusterNameLoaded, hubClusterError] =
+    useHubClusterName() as WatchK8sResultWithError<string>;
   const isACMPage = useIsACMPage();
 
   // multicluster sdk doesn't support limit as console sdk does
@@ -23,7 +32,7 @@ const useK8sWatchData = <T>(resource: FleetWatchK8sResource | null): WatchK8sRes
 
   const [fleetData, fleetLoaded, fleetError] = useFleetK8sWatchResource<T>(
     useFleet && !waitingForHubName ? requestWithNoLimit : null,
-  );
+  ) as FleetWatchK8sResultWithError<T>;
 
   const normalizedFleetData = useMemo(
     () => enrichFleetData(fleetData, resource?.groupVersionKind),
@@ -32,7 +41,7 @@ const useK8sWatchData = <T>(resource: FleetWatchK8sResource | null): WatchK8sRes
 
   const [k8sWatchData, k8sWatchLoaded, k8sWatchError] = useK8sWatchResource<T>(
     !useFleet ? resource : null,
-  );
+  ) as WatchK8sResultWithError<T>;
 
   const defaultData: T = useMemo(
     () => (resource?.isList ? ([] as T) : undefined),
