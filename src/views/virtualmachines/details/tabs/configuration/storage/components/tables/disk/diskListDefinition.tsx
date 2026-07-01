@@ -16,6 +16,7 @@ import '../tables.scss';
 
 export type DiskListCallbacks = {
   customize?: boolean;
+  getCurrentVM?: () => V1VirtualMachine;
   onSubmit?: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine>;
   provisioningPercentages: NameWithPercentages;
   sourcesLoaded?: boolean;
@@ -24,9 +25,16 @@ export type DiskListCallbacks = {
 };
 
 const renderActionsCell = (row: DiskRowDataLayout, callbacks: DiskListCallbacks): ReactNode => {
-  const { customize, onSubmit, vm, vmi } = callbacks;
+  const { customize, getCurrentVM, onSubmit, vm, vmi } = callbacks;
   return (
-    <DiskRowActions customize={customize} obj={row} onDiskUpdate={onSubmit} vm={vm} vmi={vmi} />
+    <DiskRowActions
+      customize={customize}
+      getCurrentVM={getCurrentVM}
+      obj={row}
+      onDiskUpdate={onSubmit}
+      vm={vm}
+      vmi={vmi}
+    />
   );
 };
 

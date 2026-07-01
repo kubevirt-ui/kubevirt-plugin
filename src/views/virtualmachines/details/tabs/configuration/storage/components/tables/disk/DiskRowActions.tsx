@@ -25,6 +25,7 @@ import {
   isCDROMDisk,
 } from '@kubevirt-utils/resources/vm/utils/disk/selectors';
 import { isEmptyContainerDiskImage } from '@kubevirt-utils/resources/vm/utils/disk/utils';
+import { getVMIVolumes } from '@kubevirt-utils/resources/vmi';
 import { getContentScrollableElement } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import {
@@ -49,6 +50,7 @@ import { isHotplugVolume, isPVCSource } from './utils/helpers';
 
 type DiskRowActionsProps = {
   customize?: boolean;
+  getCurrentVM?: () => V1VirtualMachine;
   obj: DiskRowDataLayout;
   onDiskUpdate?: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine>;
   vm: V1VirtualMachine;
@@ -57,6 +59,7 @@ type DiskRowActionsProps = {
 
 const DiskRowActions: FC<DiskRowActionsProps> = ({
   customize = false,
+  getCurrentVM,
   obj,
   onDiskUpdate,
   vm,
@@ -80,7 +83,7 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({
   );
 
   const { isCDROMMountedState, volume } = useMemo(() => {
-    const vols = isVMRunning && !isCDROM ? vmi?.spec?.volumes : getVolumes(vm);
+    const vols = isVMRunning && !isCDROM ? getVMIVolumes(vmi) : getVolumes(vm);
     const vol = vols?.find(({ name }) => name === diskName);
 
     const isMountedVolume = (targetVolume: undefined | V1Volume): boolean => {
@@ -133,6 +136,7 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({
       <DiskModal
         createdPVCName={isPVCSource(obj) ? obj?.source : null}
         editDiskName={diskName}
+        getCurrentVM={getCurrentVM}
         isOpen={isOpen}
         onClose={onClose}
         onSubmit={onDiskUpdate || updateDisks}
@@ -180,6 +184,7 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({
     return createModal(({ isOpen, onClose }) => (
       <Component
         cdromName={diskName}
+        getCurrentVM={getCurrentVM}
         isOpen={isOpen}
         onClose={onClose}
         onSubmit={onDiskUpdate || updateDisks}

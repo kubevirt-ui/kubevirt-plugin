@@ -11,6 +11,7 @@ import { updateDisks } from '../../../details/utils/utils';
 
 type EjectCDROMModalProps = {
   cdromName: string;
+  getCurrentVM?: () => V1VirtualMachine;
   isOpen: boolean;
   onClose: () => void;
   onSubmit?: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine>;
@@ -20,6 +21,7 @@ type EjectCDROMModalProps = {
 
 const EjectCDROMModal: FC<EjectCDROMModalProps> = ({
   cdromName,
+  getCurrentVM,
   isOpen,
   onClose,
   onSubmit,
@@ -29,7 +31,8 @@ const EjectCDROMModal: FC<EjectCDROMModalProps> = ({
   const { t } = useKubevirtTranslation();
 
   const handleEject = () => {
-    const updatedVM = ejectISOFromCDROM(vm, cdromName);
+    const currentVM = getCurrentVM?.() ?? vm;
+    const updatedVM = ejectISOFromCDROM(currentVM, cdromName);
 
     if (onSubmit) {
       return onSubmit(updatedVM);

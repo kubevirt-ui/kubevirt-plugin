@@ -14,6 +14,8 @@ import {
 
 export const vmSignal = signal<V1VirtualMachine>(null);
 
+export const getSignalVM = () => vmSignal.value;
+
 effect(() => {
   if (!isEmpty(vmSignal.value)) {
     saveCustomizeInstanceTypeSessionStorage(vmSignal.value);
