@@ -85,13 +85,13 @@ export const convertQueryToFilterState = (query: string): Partial<KubevirtFilter
 
   for (const key of params.keys()) {
     if (validSearchQueryParams.includes(key)) {
-      filterState[key] = params.getAll(key);
+      filterState[key] = [...new Set(params.getAll(key))];
     }
     // Handle legacy filter params
     else if (key.startsWith(ROW_FILTERS_PREFIX)) {
       const filterKey = key.slice(ROW_FILTERS_PREFIX.length);
       if (validSearchQueryParams.includes(filterKey)) {
-        filterState[filterKey] = params.getAll(key).flatMap((v) => v.split(','));
+        filterState[filterKey] = [...new Set(params.getAll(key).flatMap((v) => v.split(',')))];
       }
     }
   }
