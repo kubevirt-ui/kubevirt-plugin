@@ -92,6 +92,9 @@ export const clusterServiceVersionFor = (
 ): ClusterServiceVersionKind =>
   clusterServiceVersions?.find((csv) => csv.metadata.name === csvName);
 
+export const getSubscriptionInstalledCSV = (subscription: SubscriptionKind): string =>
+  subscription?.status?.installedCSV;
+
 export const defaultPackageSourceMap = {
   [DefaultCatalogSource.CertifiedOperators]: PackageSource.CertifiedOperators,
   [DefaultCatalogSource.CommunityOperators]: PackageSource.CommunityOperators,
@@ -135,7 +138,7 @@ export const groupOperatorItems = (items: VirtFeatureOperatorItem[]): VirtFeatur
     {} as { [key in VirtualizationFeatureOperators]: VirtFeatureOperatorItem[] },
   );
 
-const getOperatorHubURL = (uid: string, namespace: string) =>
+export const getOperatorHubURL = (uid: string, namespace: string) =>
   `/catalog/ns/${namespace || 'default'}?selectedId=${uid}`;
 
 export const computeInstallState = (

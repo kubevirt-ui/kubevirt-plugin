@@ -6,6 +6,7 @@ import { useSettingsTabs } from './hooks/useSettingsTabs';
 
 import './settings-tab.scss';
 import '@kubevirt-utils/styles/cursor.scss';
+import classNames from 'classnames';
 
 const SettingsTab: FC = () => {
   const { activeTab, redirectTab, tabs } = useSettingsTabs();
@@ -26,9 +27,15 @@ const SettingsTab: FC = () => {
       </div>
       <div className="settings-tab__scrollable">
         <Card className="settings-tab__card">
-          {tabs.map(({ Component, dataTest, name }) =>
+          {tabs.map(({ Component, dataTest, isFullWidth, name }) =>
             activeTab === name ? (
-              <div className="settings-tab__content" data-test={dataTest} key={name}>
+              <div
+                className={classNames('settings-tab__content', {
+                  'settings-tab__content--full-width': isFullWidth,
+                })}
+                data-test={dataTest}
+                key={name}
+              >
                 <Component />
               </div>
             ) : null,
