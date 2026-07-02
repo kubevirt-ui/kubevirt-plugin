@@ -81,7 +81,7 @@ jobs:
         uses: actions/checkout@v7
 
       - name: Setup IBM Cloud CLI
-        uses: IBM/actions-ibmcloud-cli@v1
+        uses: IBM/actions-ibmcloud-cli@v2
         with:
           api_key: ${{ secrets.IC_KEY }}
           region: ${{ env.IBM_REGION }}
