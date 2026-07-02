@@ -1,10 +1,10 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-yarn lint-staged
+npm run lint-staged
 
 translation_file_diff=$(git diff --name-only locales/en/plugin__kubevirt-plugin.json)
 
 if [ -n "$translation_file_diff" ]; then
-    git add $translation_file_diff
+    git add locales/*/plugin__kubevirt-plugin.json
 fi
