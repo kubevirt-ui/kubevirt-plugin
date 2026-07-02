@@ -1,12 +1,12 @@
 import React, { FC, useMemo } from 'react';
 
 import { VirtualMachinePreferenceModelRef } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1beta1VirtualMachinePreference } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import KubevirtFilterToolbar from '@kubevirt-utils/components/KubevirtFilterToolbar/KubevirtFilterToolbar';
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
 import { buildColumnLayout } from '@kubevirt-utils/components/KubevirtTable/utils';
-import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
+import useKubevirtDataViewFilters from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/useKubevirtDataViewFilters';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtTableColumns';
 import usePaginationWithFilters from '@kubevirt-utils/hooks/usePagination/usePaginationWithFilters';
@@ -14,7 +14,7 @@ import { paginationDefaultValues } from '@kubevirt-utils/hooks/usePagination/uti
 import useUserPreferences from '@kubevirt-utils/hooks/useUserPreferences';
 import { ListPageProps } from '@kubevirt-utils/utils/types';
 import { isAllNamespaces, isEmpty } from '@kubevirt-utils/utils/utils';
-import { ListPageBody, useListPageFilter } from '@openshift-console/dynamic-plugin-sdk';
+import { ListPageBody } from '@openshift-console/dynamic-plugin-sdk';
 import { Pagination } from '@patternfly/react-core';
 
 import UserPreferencesEmptyState from './components/UserPreferencesEmptyState';
@@ -23,9 +23,6 @@ import { getUserPreferenceColumns, getUserPreferenceRowId } from './userPreferen
 const UserPreferenceList: FC<ListPageProps> = ({
   fieldSelector,
   hideColumnManagement,
-  hideNameLabelFilters,
-  hideTextFilter,
-  nameFilter,
   namespace,
   selector,
 }) => {
@@ -41,15 +38,16 @@ const UserPreferenceList: FC<ListPageProps> = ({
     selector,
   );
 
-  const [unfilteredData, filteredData, onFilterChange] = useListPageFilter<
-    V1beta1VirtualMachinePreference,
-    V1beta1VirtualMachinePreference
-  >(preferences, null, {
-    name: { selected: [nameFilter] },
+  const { clearAllFilters, filteredData, filters, onSetFilters } = useKubevirtDataViewFilters({
+    data: preferences ?? [],
   });
 
-  const { handleFilterChange, handlePerPageSelect, handleSetPage, pagination } =
-    usePaginationWithFilters(filteredData?.length ?? 0, onFilterChange);
+  const {
+    handleFilterChange: handleSetFilters,
+    handlePerPageSelect,
+    handleSetPage,
+    pagination,
+  } = usePaginationWithFilters(filteredData?.length ?? 0, onSetFilters);
 
   const columns = useMemo(
     () => getUserPreferenceColumns(t, showNamespaceColumn),
@@ -68,21 +66,21 @@ const UserPreferenceList: FC<ListPageProps> = ({
 
   const isLoaded = loaded && loadedColumns;
 
-  if (isLoaded && !loadError && isEmpty(unfilteredData)) {
+  if (isLoaded && !loadError && isEmpty(preferences)) {
     return <UserPreferencesEmptyState namespace={effectiveNamespace} />;
   }
 
   return (
     <ListPageBody>
       <div className="list-managment-group">
-        <ListPageFilter
+        <KubevirtFilterToolbar
+          clearAllFilters={clearAllFilters}
           columnLayout={columnLayout}
-          data={unfilteredData}
+          data={preferences}
+          filters={filters}
           hideColumnManagement={hideColumnManagement}
-          hideLabelFilter={hideTextFilter}
-          hideNameLabelFilters={hideNameLabelFilters}
           loaded={isLoaded}
-          onFilterChange={handleFilterChange}
+          onSetFilters={handleSetFilters}
         />
         {!isEmpty(filteredData) && isLoaded && (
           <Pagination
@@ -108,7 +106,7 @@ const UserPreferenceList: FC<ListPageProps> = ({
         loadError={loadError}
         noDataMsg={t("You don't have any VirtualMachinePreferences yet")}
         pagination={pagination}
-        unfilteredData={unfilteredData}
+        unfilteredData={preferences}
       />
     </ListPageBody>
   );

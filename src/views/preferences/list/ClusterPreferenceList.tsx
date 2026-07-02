@@ -1,9 +1,10 @@
 import React, { FC, useMemo } from 'react';
 
+import KubevirtFilterToolbar from '@kubevirt-utils/components/KubevirtFilterToolbar/KubevirtFilterToolbar';
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
 import { buildColumnLayout } from '@kubevirt-utils/components/KubevirtTable/utils';
-import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
 import useClusterPreferences from '@kubevirt-utils/hooks/useClusterPreferences';
+import useKubevirtDataViewFilters from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/useKubevirtDataViewFilters';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtTableColumns';
 import usePaginationWithFilters from '@kubevirt-utils/hooks/usePagination/usePaginationWithFilters';
@@ -11,7 +12,7 @@ import { paginationDefaultValues } from '@kubevirt-utils/hooks/usePagination/uti
 import { VirtualMachineClusterPreferenceModelRef } from '@kubevirt-utils/models';
 import { ListPageProps } from '@kubevirt-utils/utils/types';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { ListPageBody, useListPageFilter } from '@openshift-console/dynamic-plugin-sdk';
+import { ListPageBody } from '@openshift-console/dynamic-plugin-sdk';
 import { Pagination } from '@patternfly/react-core';
 
 import {
@@ -24,20 +25,21 @@ import '@kubevirt-utils/styles/list-managment-group.scss';
 const ClusterPreferenceList: FC<ListPageProps> = ({
   fieldSelector,
   hideColumnManagement,
-  hideNameLabelFilters,
-  hideTextFilter,
-  nameFilter,
   selector,
 }) => {
   const { t } = useKubevirtTranslation();
   const [preferences, loaded, loadError] = useClusterPreferences(fieldSelector, selector);
 
-  const [unfilteredData, filteredData, onFilterChange] = useListPageFilter(preferences, null, {
-    name: { selected: [nameFilter] },
+  const { clearAllFilters, filteredData, filters, onSetFilters } = useKubevirtDataViewFilters({
+    data: preferences ?? [],
   });
 
-  const { handleFilterChange, handlePerPageSelect, handleSetPage, pagination } =
-    usePaginationWithFilters(filteredData?.length ?? 0, onFilterChange);
+  const {
+    handleFilterChange: handleSetFilters,
+    handlePerPageSelect,
+    handleSetPage,
+    pagination,
+  } = usePaginationWithFilters(filteredData?.length ?? 0, onSetFilters);
 
   const columns = useMemo(() => getClusterPreferenceColumns(t), [t]);
 
@@ -56,14 +58,14 @@ const ClusterPreferenceList: FC<ListPageProps> = ({
   return (
     <ListPageBody>
       <div className="list-managment-group">
-        <ListPageFilter
+        <KubevirtFilterToolbar
+          clearAllFilters={clearAllFilters}
           columnLayout={columnLayout}
-          data={unfilteredData}
+          data={preferences}
+          filters={filters}
           hideColumnManagement={hideColumnManagement}
-          hideLabelFilter={hideTextFilter}
-          hideNameLabelFilters={hideNameLabelFilters}
           loaded={isLoaded}
-          onFilterChange={handleFilterChange}
+          onSetFilters={handleSetFilters}
         />
         {!isEmpty(filteredData) && isLoaded && (
           <Pagination
@@ -89,7 +91,7 @@ const ClusterPreferenceList: FC<ListPageProps> = ({
         loadError={loadError}
         noDataMsg={t('No preferences found')}
         pagination={pagination}
-        unfilteredData={unfilteredData}
+        unfilteredData={preferences}
       />
     </ListPageBody>
   );
