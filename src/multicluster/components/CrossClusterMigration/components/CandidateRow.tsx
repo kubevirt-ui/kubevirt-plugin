@@ -36,22 +36,24 @@ const CandidateRow: FC<CandidateRowProps> = ({
 
   return (
     <Card
-      onClick={() => onSelect?.(candidate.cluster)}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
           onSelect?.(candidate.cluster);
         }
       }}
+      style={
+        {
+          '--pf-v6-c-card--BackgroundColor': 'rgba(6, 108, 196, 0.15)',
+          border: '1px solid var(--pf-t--global--color--nonstatus--blue--default, #06c)',
+        } as React.CSSProperties
+      }
       isClickable={!!onSelect}
       isCompact
       isSelectable={!!onSelect}
       isSelected={isSelected}
+      onClick={() => onSelect?.(candidate.cluster)}
       role={onSelect ? 'button' : undefined}
-      style={{
-        '--pf-v6-c-card--BackgroundColor': 'rgba(6, 108, 196, 0.15)',
-        border: '1px solid var(--pf-t--global--color--nonstatus--blue--default, #06c)',
-      } as React.CSSProperties}
       tabIndex={onSelect ? 0 : undefined}
     >
       <CardBody>
@@ -60,11 +62,7 @@ const CandidateRow: FC<CandidateRowProps> = ({
             <DescriptionListTerm>
               {candidate.cluster}
               {isRecommended && (
-                <Label
-                  className="pf-v6-u-ml-sm"
-                  color="green"
-                  icon={<CheckCircleIcon />}
-                >
+                <Label className="pf-v6-u-ml-sm" color="green" icon={<CheckCircleIcon />}>
                   {t('Top pick')}
                 </Label>
               )}

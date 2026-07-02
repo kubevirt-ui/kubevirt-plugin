@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 
-import { consoleFetch } from '@openshift-console/dynamic-plugin-sdk';
+import useConsoleFetch from '@kubevirt-utils/hooks/useConsoleFetch';
 
 import { MigrationTargetResponse } from './useClusterRecommendationTypes';
 
@@ -31,36 +31,16 @@ const useClusterRecommendation = (
   advisorBaseURL: null | string,
   params: VMQueryParams,
 ): UseClusterRecommendation => {
-  const [data, setData] = useState<MigrationTargetResponse | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [loaded, setLoaded] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
+  const [fetchURL, setFetchURL] = useState<null | string>(null);
 
-  const fetchRecommendation = useCallback(async () => {
-    if (!advisorBaseURL) {
-      setError(new Error('Advisor service is not available'));
-      return;
-    }
+  const { data, error, loaded, loading } = useConsoleFetch<MigrationTargetResponse>(fetchURL);
 
-    setLoading(true);
-    setError(null);
-    setLoaded(false);
-
-    try {
-      const url = buildURL(advisorBaseURL, params);
-      const response = await consoleFetch(url);
-      const json = await response.json();
-      setData(json);
-      setLoaded(true);
-    } catch (e) {
-      setError(e instanceof Error ? e : new Error(String(e)));
-      setLoaded(true);
-    } finally {
-      setLoading(false);
-    }
+  const fetchRecommendation = useCallback(() => {
+    if (!advisorBaseURL) return;
+    setFetchURL(buildURL(advisorBaseURL, params));
   }, [advisorBaseURL, params]);
 
-  return { data, error, fetchRecommendation, loaded, loading };
+  return { data: data ?? null, error, fetchRecommendation, loaded, loading };
 };
 
 export default useClusterRecommendation;

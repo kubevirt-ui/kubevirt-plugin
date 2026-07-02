@@ -1,15 +1,7 @@
 import React, { FC, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import {
-  Alert,
-  Flex,
-  FlexItem,
-  Spinner,
-  Stack,
-  StackItem,
-  Title,
-} from '@patternfly/react-core';
+import { Alert, Flex, FlexItem, Spinner, Stack, StackItem, Title } from '@patternfly/react-core';
 
 import { MigrationTargetResponse } from '../hooks/useClusterRecommendationTypes';
 
@@ -98,11 +90,11 @@ const ClusterRecommendationPanel: FC<ClusterRecommendationPanelProps> = ({
       {data.excludedClusters?.length > 0 && (
         <StackItem>
           <Alert
-            isInline
-            isPlain
             title={t('{{clusterCount}} clusters excluded', {
               clusterCount: data.excludedClusters.length,
             })}
+            isInline
+            isPlain
             variant="info"
           >
             {data.excludedClusters.map((ec) => (

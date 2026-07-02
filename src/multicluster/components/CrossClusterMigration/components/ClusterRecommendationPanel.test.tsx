@@ -112,7 +112,7 @@ describe('ClusterRecommendationPanel', () => {
     render(
       <ClusterRecommendationPanel data={mockData} error={null} loaded={true} loading={false} />,
     );
-    expect(screen.getByText('Cluster recommendations')).toBeInTheDocument();
+    expect(screen.getByText('Cluster recommendation')).toBeInTheDocument();
     expect(screen.getByText('cluster-a')).toBeInTheDocument();
     expect(screen.getByText('cluster-b')).toBeInTheDocument();
   });
