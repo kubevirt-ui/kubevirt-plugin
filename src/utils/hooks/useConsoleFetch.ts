@@ -6,7 +6,6 @@ export type ConsoleFetchResponse<R> = {
   data: R;
   error: Error | null;
   loaded: boolean;
-  loading: boolean;
 };
 
 const useConsoleFetch = <R>(
@@ -16,32 +15,27 @@ const useConsoleFetch = <R>(
 ): ConsoleFetchResponse<R> => {
   const [data, setData] = useState<R | undefined>(initialValue);
   const [loaded, setLoaded] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
     if (!url) return;
     if (loaded) return;
 
-    setLoading(true);
-    setError(null);
-
     const fetchData = async () => {
       try {
         const response = await consoleFetch(url, initialValue, timeout);
         setData(await response.json());
       } catch (e) {
-        setError(e instanceof Error ? e : new Error(String(e)));
+        setError(e);
       } finally {
         setLoaded(true);
-        setLoading(false);
       }
     };
 
     fetchData();
   }, [loaded, url]);
 
-  return { data, error, loaded, loading };
+  return { data, error, loaded };
 };
 
 export default useConsoleFetch;

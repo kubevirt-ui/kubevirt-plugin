@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import useConsoleFetch from '@kubevirt-utils/hooks/useConsoleFetch';
 
@@ -31,16 +31,18 @@ const useClusterRecommendation = (
   advisorBaseURL: null | string,
   params: VMQueryParams,
 ): UseClusterRecommendation => {
-  const [fetchURL, setFetchURL] = useState<null | string>(null);
+  const [triggered, setTriggered] = useState(false);
 
-  const { data, error, loaded, loading } = useConsoleFetch<MigrationTargetResponse>(fetchURL);
+  const url = useMemo(
+    () => (advisorBaseURL ? buildURL(advisorBaseURL, params) : null),
+    [advisorBaseURL, params],
+  );
 
-  const fetchRecommendation = useCallback(() => {
-    if (!advisorBaseURL) return;
-    setFetchURL(buildURL(advisorBaseURL, params));
-  }, [advisorBaseURL, params]);
+  const { data, error, loaded } = useConsoleFetch<MigrationTargetResponse>(triggered ? url : null);
 
-  return { data: data ?? null, error, fetchRecommendation, loaded, loading };
+  const fetchRecommendation = () => setTriggered(true);
+
+  return { data: data ?? null, error, fetchRecommendation, loaded, loading: triggered && !loaded };
 };
 
 export default useClusterRecommendation;
