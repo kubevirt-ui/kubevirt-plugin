@@ -3,20 +3,17 @@
 set -x
 set +e
 
-# export namespace for downstream
+# Export namespace for downstream
 export CYPRESS_CNV_NS='openshift-cnv';
 export CYPRESS_OS_IMAGES_NS='openshift-virtualization-os-images';
 
-# setup cluster
+# Setup cluster
 bash test-cleanup.sh
 bash test-setup.sh
 bash test-setup-downstream.sh
 
 # Install dependencies.
-yarn install --frozen-lockfile
-
-# Add mochawesome-report-generator
-yarn add global mochawesome-report-generator --ignore-engines
+npm ci
 
 while getopts g:s: flag
 do
@@ -27,18 +24,20 @@ do
 done
 
 # Run tests.
-yarn_script="test-cypress-headless"
+npm_script_args=""
 
 if [ -n "${gui-}" ]; then
-  yarn_script="test-cypress"
+  npm_script_args="test-cypress"
 fi
 
 if [ -n "${spec-}" ]; then
-  yarn_script="$yarn_script --spec '$spec'"
+  npm_script_args="$npm_script_args --spec '$spec'"
 fi
 
-yarn run $yarn_script
+npm run test-cypress-headless -- $npm_script_args
 
 # Generate Cypress report.
-yarn run cypress-postreport
+npm run cypress-postreport
+
+# Clean up
 bash test-cleanup.sh

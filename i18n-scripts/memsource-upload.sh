@@ -20,7 +20,7 @@ echo "Creating project with title \"[CNV $VERSION] UI Localization - Sprint $SPR
 
 
 echo "Exporting PO files"
-yarn export-pos
+npm run export-pos
 echo "Exported all PO files"
 
 
