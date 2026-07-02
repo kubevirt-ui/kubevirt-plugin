@@ -84,6 +84,7 @@ export const useUploadProgressStore = create<UploadProgressStoreState>((set, get
       uploads: {
         ...state.uploads,
         [uploadKey]: {
+          blockNavigation: true,
           ...entry,
           progress: 0,
           status: UPLOAD_PROGRESS_STATUS.UPLOADING,

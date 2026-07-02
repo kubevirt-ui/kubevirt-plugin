@@ -1,3 +1,4 @@
+// eslint-disable-next-line
 import { Buffer } from 'buffer';
 
 import { SecretModel } from '@kubevirt-ui-ext/kubevirt-api/console';

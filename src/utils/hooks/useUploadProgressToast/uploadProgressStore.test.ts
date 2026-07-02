@@ -56,6 +56,7 @@ describe('useUploadProgressStore', () => {
       const upload = useUploadProgressStore.getState().getUpload(UPLOAD_KEY);
 
       expect(upload).toEqual({
+        blockNavigation: true,
         fileName: FILE_IMAGE_ISO,
         progress: 0,
         status: UPLOAD_PROGRESS_STATUS.UPLOADING,
