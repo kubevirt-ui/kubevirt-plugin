@@ -1,4 +1,5 @@
 # Ignore artifacts:
 dist/
 node_modules/
+package-lock.json
 i18n-scripts/
