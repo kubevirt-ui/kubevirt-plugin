@@ -45,22 +45,22 @@ check "node readiness" bash -c '
 
 # --- HCO Available ---
 check "HCO Available condition" \
-  oc wait -n kubevirt-hyperconverged hyperconverged kubevirt-hyperconverged \
+  oc wait -n openshift-cnv hyperconverged kubevirt-hyperconverged \
     --for=condition=Available --timeout=60s
 
 # --- Key KubeVirt pods ---
 check "virt-api pods" bash -c '
-  running=$(oc get pods -n kubevirt-hyperconverged -l kubevirt.io=virt-api --no-headers 2>/dev/null | grep -c "Running")
+  running=$(oc get pods -n openshift-cnv -l kubevirt.io=virt-api --no-headers 2>/dev/null | grep -c "Running")
   [[ "${running}" -ge 1 ]]
 '
 
 check "virt-controller pods" bash -c '
-  running=$(oc get pods -n kubevirt-hyperconverged -l kubevirt.io=virt-controller --no-headers 2>/dev/null | grep -c "Running")
+  running=$(oc get pods -n openshift-cnv -l kubevirt.io=virt-controller --no-headers 2>/dev/null | grep -c "Running")
   [[ "${running}" -ge 1 ]]
 '
 
 check "virt-handler pods" bash -c '
-  running=$(oc get pods -n kubevirt-hyperconverged -l kubevirt.io=virt-handler --no-headers 2>/dev/null | grep -c "Running")
+  running=$(oc get pods -n openshift-cnv -l kubevirt.io=virt-handler --no-headers 2>/dev/null | grep -c "Running")
   [[ "${running}" -ge 1 ]]
 '
 

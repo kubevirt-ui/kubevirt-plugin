@@ -177,7 +177,7 @@ rules:
   # Network attachment definitions (VM networking)
   - apiGroups: ['k8s.cni.cncf.io']
     resources: ['network-attachment-definitions']
-    verbs: ['get', 'list', 'watch']
+    verbs: ['get', 'list', 'watch', 'create', 'update', 'patch', 'delete']
 
   # Persistent volumes (storage overview)
   - apiGroups: ['']
