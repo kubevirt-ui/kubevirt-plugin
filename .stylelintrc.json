@@ -8,7 +8,8 @@
     "no-descending-specificity": null,
     "scss/no-global-function-names": null,
     "declaration-no-important": true,
-    "max-nesting-depth": 3
+    "max-nesting-depth": 3,
+    "custom-property-pattern": null
   },
   "ignoreFiles": ["dist/**", "node_modules/**", "coverage/**"]
 }

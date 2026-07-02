@@ -6,7 +6,7 @@ RUN update-crypto-policies --set DEFAULT:PQ
 #       the `:latest` is updated.
 #
 # Image info: https://catalog.redhat.com/en/software/containers/ubi9/nodejs-22/66431d1785c5c3a31edd24f1
-FROM registry.access.redhat.com/ubi9/nodejs-22:1782348700 AS builder
+FROM registry.access.redhat.com/ubi9/nodejs-22:1782911329 AS builder
 USER root
 
 COPY . /opt/app-root/src
@@ -18,7 +18,7 @@ RUN npm config set fetch-timeout 1200000 && \
     npm run build
 
 # Image info: https://catalog.redhat.com/en/software/containers/ubi9/nginx-124/657b066b6c1bc124a1d7ff39
-FROM registry.access.redhat.com/ubi9/nginx-124:1782349425
+FROM registry.access.redhat.com/ubi9/nginx-124:1782911075
 
 COPY --from=policy /etc/crypto-policies /etc/crypto-policies
 COPY --from=builder /opt/app-root/src/dist /usr/share/nginx/html

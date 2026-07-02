@@ -85,7 +85,8 @@ RUN if [ -n "${OC_URL}" ]; then \
     else \
       wget2 -qO- "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable-${OC_VERSION}/openshift-client-linux.tar.gz" \
            | tar -xzf - -C /usr/local/bin; \
-    fi
+    fi \
+    && [ -f /usr/local/bin/kubectl ] || ln -s oc /usr/local/bin/kubectl
 
 # virtctl (KubeVirt CLI) — use console download URL if resolved, else GitHub releases.
 # Console route serves a .tar.gz; fallback uses wget2 (GnuTLS) for the external HTTPS download.

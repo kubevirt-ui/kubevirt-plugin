@@ -170,6 +170,23 @@ describe('validateAndBuildFilterState', () => {
     });
   });
 
+  describe('duplicate values', () => {
+    it('should deduplicate values within a single token', () => {
+      const result = validateAndBuildFilterState('status:Running,Running', mockFilterDefinitions);
+      expect(result.filterState.status).toEqual(['Running']);
+    });
+
+    it('should deduplicate values across multiple tokens for the same filter', () => {
+      const result = validateAndBuildFilterState('os:RHEL os:RHEL,Fedora', mockFilterDefinitions);
+      expect(result.filterState.os).toEqual(['RHEL', 'Fedora']);
+    });
+
+    it('should deduplicate multiple repeated values', () => {
+      const result = validateAndBuildFilterState('os:Fedora,Fedora,Fedora', mockFilterDefinitions);
+      expect(result.filterState.os).toEqual(['Fedora']);
+    });
+  });
+
   describe('empty input', () => {
     it('should return empty state for empty text', () => {
       const result = validateAndBuildFilterState('', mockFilterDefinitions);

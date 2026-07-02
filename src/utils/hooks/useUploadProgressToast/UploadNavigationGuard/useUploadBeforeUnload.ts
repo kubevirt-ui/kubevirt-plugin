@@ -1,11 +1,14 @@
 import { useEffect } from 'react';
 
+import { UPLOAD_PROGRESS_STATUS } from '../constants';
 import { useUploadProgressStore } from '../uploadProgressStore';
-import { UPLOAD_PROGRESS_STATUS } from '../utils/constants';
 
 const useUploadBeforeUnload = (): void => {
   const hasActiveUploads = useUploadProgressStore((state) =>
-    Object.values(state.uploads).some((entry) => entry.status === UPLOAD_PROGRESS_STATUS.UPLOADING),
+    Object.values(state.uploads).some(
+      (entry) =>
+        entry.status === UPLOAD_PROGRESS_STATUS.UPLOADING && entry.blockNavigation !== false,
+    ),
   );
 
   useEffect(() => {

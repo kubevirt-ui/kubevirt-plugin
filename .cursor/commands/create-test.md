@@ -1,165 +1,276 @@
-# Jira Task: End-to-End Test Implementation
+# Create Test
 
-Orchestrate the full test implementation workflow for one or more Jira tasks — from exploration through implementation — stopping before commit and PR creation. All work is done on a new branch.
+Create a new Playwright test from a Jira ticket or feature description using the **scenario infrastructure**.
 
 ## Input
 
-The user provides one or more Jira task IDs after the `/create-test` command.
+```
+/create-test <TICKET-ID or feature description>
+```
 
-- **Single ticket**: `/create-test TICKET-12345`
-- **Multiple tickets** (comma-separated): `/create-test TICKET-12345, TICKET-67890`
-- **Multiple tickets** (space-separated): `/create-test TICKET-12345 TICKET-67890`
+- **Jira ticket**: `/create-test CNV-12345`
+- **Feature description**: `/create-test "bootable volumes sort by name"`
 
-All Jira keys provided are parsed and processed together in a single workflow.
+## Architecture: Two Test Infrastructures
+
+This project has two test infrastructures. **New tests MUST use the scenario infrastructure.**
+
+| Aspect | Legacy (gating) | Scenario (new) |
+|---|---|---|
+| Directory | `playwright/tests/gating/` | `playwright/tests/scenario/` |
+| Fixture | `gatingTest` from `scenario-test-fixture.ts` | `scenarioTest` from `@/fixtures/scenario-fixture` |
+| K8s client | `k8sClient.vm.*`, `k8sClient.namespace.*` (handler pattern) | `k8sClient.setupTestNamespace()`, `k8sClient.createContainerDiskVm()` (flat API) |
+| UI layer | Page objects instantiated manually | **Page objects injected via fixture** |
+| Project | `gating` (always active) | `scenario` (enabled via `USE_SCENARIO_INFRA=true`) |
+| Run command | `npm run test-playwright -- --project=Gating` | `USE_SCENARIO_INFRA=true npm run test-playwright -- --project=scenario` |
 
 ## Workflow
 
-Execute these phases sequentially, operating as each agent role per the orchestrator rules.
+### Phase 1: Exploration & Scenario Design
 
----
-
-### Phase 1: Business Analyst — Exploration & Scenario Design
-
-Follow `business-analyst.mdc` rules.
-
-**For each Jira ticket** provided in the input:
-
-1. **Fetch the Jira ticket** via the Atlassian MCP (MANDATORY — never skip, never rely on cached summaries).
-2. **Extract key fields**: summary, type, status, labels, components, description, parent, subtasks. Fetch each subtask too.
-3. **Explore linked PRs** — find implementation PRs via remote links, read their changed files to identify new `data-test` / `data-test-id` selectors, routes, and components.
-4. **Search for existing Playwright tests**:
+1. **If Jira ticket provided** — fetch ticket details via MCP or search:
    ```bash
-   rg "TICKET-XXXXX" playwright/tests/
-   rg "<feature-keyword>" playwright/tests/ --type ts -l
+   rg "CNV-XXXXX" playwright/tests/
    ```
-5. **Design test scenarios** — map steps to existing page-object methods; determine tier placement (gating / tier1 / tier2).
-
-**Output**: A consolidated scenario document with proposed test cases, steps, assertions, tags, and cleanup — grouped by ticket.
-
----
-
-### Phase 1.5: Routing Decision — Expand vs. New
-
-Before proceeding to Phase 2, classify each proposed test case from Phase 1:
-
-1. **Query existing coverage**:
+2. **Check existing coverage** — determine if the feature is already tested:
    ```bash
-   rg "TICKET-XXXXX" playwright/tests/ playwright/docs/
-   rg "<feature-keyword>" playwright/tests/ --type ts -l
+   rg "<feature-keyword>" playwright/tests/scenario/ --type ts -l
+   rg "<feature-keyword>" playwright/tests/gating/ --type ts -l
    ```
-   - **Decision tree** (apply in order):
-     1. If existing tests reference the ticket ID → use the returned spec files as expansion targets → **Expand**
-     2. If existing tests cover the feature area → use those spec files as expansion targets → **Expand**
-     3. If no existing tests cover the feature area → **New**
-2. **For each proposed test case**, determine:
+3. **Design test scenarios** — map steps to existing page object methods and `KubernetesClient` methods; identify what's missing.
 
-| Condition                                                                                            | Action                                                                                                                      |
-| ---------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| An existing `test()` in the same spec file covers the same feature and can absorb the new validation | **Expand** — follow the `/expand-tests` workflow: add `test.step()` blocks to the existing test, append to the existing STD |
-| An existing spec file covers the same feature area but no single test fits                           | **Expand** — add a new `test()` inside the existing `test.describe`, append to the existing STD                             |
-| No existing spec file or test covers this feature area                                               | **New** — create a new spec file and a new STD document (Phase 2 + Phase 3 below)                                           |
+**Decision**:
 
-3. **For test cases routed to Expand**: follow the `/expand-tests` workflow (Phases 2–6 of `expand-tests.md`) — add validations to existing tests, update existing STDs, validate with MCP, run and verify.
-4. **For test cases routed to New**: continue to Phase 2 below.
-5. **Mixed scenarios are expected** — some test cases from a ticket may expand existing tests while others require new spec files. Both paths can run in the same workflow.
+- If an existing scenario spec covers this area → **expand** it (add a new `test()` block)
+- If no existing scenario spec → **create** a new spec file in `playwright/tests/scenario/`
+- **Never add new tests to `playwright/tests/gating/`** — those are legacy
 
----
+### Phase 2: Framework Gap Analysis
 
-### Phase 2: QA Architect — Framework Gap Analysis
-
-Follow `qa-architect.mdc` rules. This phase applies only to test cases routed as **New** in Phase 1.5 (expand-routed cases are handled by the expand-tests workflow).
-
-1. **Evaluate each scenario** from Phase 1 against existing framework components
-2. **Identify reusable components**: existing StepDriver methods, PageObject methods, data factories
-3. **Identify gaps**: missing page object methods (with suggested locators), missing step driver wrappers, missing data factories
-4. **Validate locators via MCP** (Playwright browser) when possible — navigate to the relevant pages and inspect element structure
-5. **Confirm tier placement** based on technical constraints (duration, parallelism, CI budget)
-6. **Output**: Framework gap report with reusable components, missing components, and new component designs
-
----
-
-### Phase 3: Automation Implementer — Implementation
-
-Follow `automation-implementer.mdc` rules. This phase applies only to test cases routed as **New** in Phase 1.5.
-
-1. **Implement framework gaps** identified in Phase 2:
-   - New page object methods (inline locators for single-use, class properties for 2+ use)
-   - New step driver wrappers (context-aware params, auto-store on create)
-   - New data factories (if needed)
-   - When creating new files, copy from existing files as boilerplate — then customize.
-2. **Create new STD documents** (only for test cases that don't fit any existing STD):
-   - Copy the STD template from `playwright/docs/STD-TEMPLATE.md`
-   - Gating tests → `playwright/docs/gating/<feature>.md`
-   - Tier 1 tests → `playwright/docs/tier1/<feature>.md`
-   - Update `playwright/docs/README.md` index when new documents are created
-3. **Implement test spec files**:
-   - Follow naming conventions: `ID(TICKET-XXXXX) Descriptive name`
-   - Use `withAllure({ suite: '...', feature: 'Gating'|'Tier 1', tags: [...] })`
-   - Consolidate related validations into a single `test()` with `test.step()` blocks
-   - Register cleanup with appropriate teardown hooks
-   - Add `test.skip()` guards for optional prerequisites
-4. **Run lint and type checks**:
+1. **Check existing page objects** — does one already cover the page under test?
    ```bash
-   npx eslint --fix <new-files>
-   npx tsc --project playwright/tsconfig.json --noEmit
+   rg "class " playwright/src/page-objects/ --type ts
    ```
-5. **Run the new tests** to verify they pass:
+2. **Check KubernetesClient** — does it have the K8s methods needed?
    ```bash
-   PLAYWRIGHT_RETRIES=0 npm run test-playwright -- --grep "TICKET-XXXXX" --workers=1
+   rg "async " playwright/src/clients/kubernetes-client.ts
    ```
-6. **Fix any failures** — iterate until tests pass or document functional blockers
-7. **Post-implementation verification**:
+3. **If a page object is missing** — create it in `playwright/src/page-objects/` and wire it into the fixture
+4. **If KubernetesClient lacks a method** — add it directly to `kubernetes-client.ts`
+5. **Validate locators via Playwright MCP** — navigate to relevant pages and inspect elements:
+   ```
+   Playwright-browser_navigate → <page-URL>
+   Playwright-browser_snapshot → find data-test attributes
+   ```
+
+### Phase 3: Implementation
+
+#### Page objects (core pattern)
+
+Page objects are **injected via the `scenarioTest` fixture**. Tests destructure them — they never instantiate page objects directly.
+
+**Creating a page object** in `playwright/src/page-objects/<name>-page.ts`:
+
+```typescript
+import type { Locator, Page } from '@playwright/test';
+
+export class BootableVolumesPage {
+  readonly heading: Locator;
+  readonly createBtn: Locator;
+  readonly nameFilter: Locator;
+
+  constructor(private readonly page: Page) {
+    this.heading = page.getByRole('heading', { name: /bootablevolumes/i }).first();
+    this.createBtn = page.locator('[data-test="item-create"]');
+    this.nameFilter = page.locator('[data-test="name-filter-input"]');
+  }
+
+  async waitForLoaded(timeout = 30_000): Promise<void> {
+    await this.heading.waitFor({ state: 'visible', timeout });
+  }
+
+  async filterByName(name: string): Promise<void> {
+    await this.nameFilter.fill(name);
+    await this.nameFilter.press('Enter');
+  }
+}
+```
+
+Key rules:
+- Constructor takes `Page` and sets up `Locator` properties
+- Expose key locators as `readonly` properties for assertion in tests
+- **No `navigate()` methods with direct URLs** — page objects don't navigate via `page.goto('/virtualization/...')` because those routes aren't available until the Virtualization perspective is active. Use `overviewPage.switchToVirtualization()` to activate the perspective first, then interact with the target page
+- Interaction methods are `async`
+- No base class inheritance — each page object is a standalone class
+- Use `data-test` attributes, `getByRole()`, and `getByText()` for locators
+
+**Wiring into the fixture** in `playwright/src/fixtures/scenario-fixture.ts`:
+
+```typescript
+import { BootableVolumesPage } from '@/page-objects/bootable-volumes-page';
+
+// Add to the ScenarioFixtures interface:
+interface ScenarioFixtures {
+  // ...existing fixtures...
+  bootableVolumesPage: BootableVolumesPage;
+}
+
+// Add to the fixture extension:
+bootableVolumesPage: async ({ page }, use) => {
+  await use(new BootableVolumesPage(page));
+},
+```
+
+#### Extending KubernetesClient (if needed)
+
+Add methods directly to `playwright/src/clients/kubernetes-client.ts`:
+
+```typescript
+async patchConfigMap(name: string, namespace: string, data: Record<string, string>): Promise<void> {
+  await this.coreApi.patchNamespacedConfigMap({
+    name,
+    namespace,
+    body: { data },
+    contentType: 'application/merge-patch+json',
+  });
+}
+```
+
+#### Creating the spec file
+
+- Place in `playwright/tests/scenario/`
+- Name: `<feature-name>.spec.ts` (kebab-case)
+- Import from `@/fixtures/scenario-fixture`
+- Destructure page objects from fixture — **never use raw `page`**
+
+```typescript
+import { scenarioTest as test, expect } from '@/fixtures/scenario-fixture';
+import { generateRandomName } from '@/utils/random-data-generator';
+
+const NS = generateRandomName('feature-name');
+const VM_NAME = generateRandomName('my-vm');
+
+test.describe('Feature Name', () => {
+  test.describe.configure({ mode: 'serial' });
+
+  test.beforeAll(async ({ k8sClient }) => {
+    await k8sClient.setupTestNamespace(NS);
+    await k8sClient.createContainerDiskVm(VM_NAME, NS);
+    await k8sClient.waitForVmRunning(VM_NAME, NS, 5 * 60_000);
+  });
+
+  test.afterAll(async ({ k8sClient }) => {
+    await k8sClient.cleanupTestNamespace(NS).catch(() => {});
+  });
+
+  test('Virtualization perspective loads', async ({ overviewPage }) => {
+    await overviewPage.switchToVirtualization();
+    await expect(overviewPage.heading).toBeVisible({ timeout: 30_000 });
+  });
+
+  test('VM list shows created VM', async ({ virtualMachinesPage }) => {
+    await virtualMachinesPage.waitForLoaded();
+    await expect(virtualMachinesPage.getVmRow(VM_NAME)).toBeVisible({ timeout: 30_000 });
+  });
+});
+```
+
+#### Resource isolation & parallel safety
+
+1. **Each test file gets its own namespace** — use `generateRandomName('prefix')` at module scope
+2. **Tests that share state belong in the same file** — use `test.describe.configure({ mode: 'serial' })`
+3. **Name test resources with `generateRandomName()`** — avoids collisions
+
+#### Assertions
+
+- Use `expect()` against page object locators with explicit timeouts
+- Use `expect.poll()` for waiting on async state changes
+- Page object properties are `Locator` instances — pass them directly to `expect()`
+
+```typescript
+// Assert against page object locators
+await expect(overviewPage.heading).toBeVisible({ timeout: 30_000 });
+await expect(virtualMachinesPage.createBtn).toBeEnabled({ timeout: 10_000 });
+
+// Poll-based assertion
+await expect.poll(
+  async () => (await virtualMachinesPage.getVmRow(VM_NAME).count()) > 0,
+  { message: 'VM should appear in list', timeout: 60_000 },
+).toBe(true);
+```
+
+#### Cleanup & lifecycle
+
+- Use `k8sClient.setupTestNamespace(NS)` in `test.beforeAll`
+- Use `k8sClient.cleanupTestNamespace(NS).catch(() => {})` in `test.afterAll`
+- Always `.catch(() => {})` on cleanup calls — teardown must not throw
+
+### Phase 4: Validation
+
+1. **Type check**:
    ```bash
-   rg "ID(TICKET-XXXXX)" playwright/tests/ --type ts
+   npm run check-types:playwright
    ```
-   Verify each ticket's `ID()` annotation is present in the test files.
-
----
-
-### Phase 4: Code Reviewer — Final Review
-
-Follow `code-reviewer.mdc` rules.
-
-1. **Review all changes** for compliance with architectural rules:
-   - Page encapsulation (no `page` in specs or step drivers)
-   - UI-first navigation (no direct URLs in specs)
-   - Context-aware step driver params
-   - Proper cleanup tracking
-   - Locator strategy (inline vs class property)
-2. **Verify STD documents** match the implemented tests
-3. **Report any issues** and fix them
-
----
+2. **Lint**:
+   ```bash
+   npx eslint --fix --no-warn-ignored playwright/tests/scenario/<spec>.spec.ts playwright/src/page-objects/<page>.ts
+   ```
+3. **List tests** to verify project membership:
+   ```bash
+   USE_SCENARIO_INFRA=true npx playwright test --list --project=scenario
+   ```
+4. **Run the test**:
+   ```bash
+   USE_SCENARIO_INFRA=true npm run test-playwright -- --project=scenario --workers=1
+   ```
+5. **Fix failures** — iterate until passing or document blockers.
 
 ### Phase 5: Summary
 
-Output a final summary table (one row per Jira ticket when multiple are provided):
+| Item | Details |
+|---|---|
+| **Feature** | Description |
+| **Spec file** | Path to new/modified spec |
+| **Tests added** | Count and names |
+| **Page objects** | New or modified page objects |
+| **KubernetesClient changes** | New methods added (if any) |
+| **Fixture changes** | New page objects wired in |
+| **Test results** | Pass / Fail / Blocked |
 
-| Item                  | Details                                                                               |
-| --------------------- | ------------------------------------------------------------------------------------- |
-| **Jira Key(s)**       | TICKET-XXXXX, TICKET-YYYYY                                                            |
-| **Branch**            | `<git-user>/ticket-xxxxx-test` or `<git-user>/test-automation-ticket-xxxxx`           |
-| **Tests Expanded**    | Count and list — existing tests that received new `test.step()` blocks or validations |
-| **Tests Created**     | Count and list — new tests in new or existing spec files                              |
-| **Tier**              | Gating / Tier1 / Tier2                                                                |
-| **STD Updated**       | File paths (existing STDs that were appended to)                                      |
-| **STD Created**       | File paths (new STDs, only when no existing STD fit)                                  |
-| **Framework Changes** | New PO methods, SD methods, factories                                                 |
-| **Test Results**      | Pass / Fail / Skipped                                                                 |
-| **Known Issues**      | Any blockers or TODOs                                                                 |
+## Project Structure
 
-Inform the user that all changes are ready on the branch and they can review, commit, and create a PR when satisfied.
+```
+playwright/tests/scenario/              # Scenario spec files go here
+playwright/tests/gating/                # Legacy gating specs (do not add new tests)
+playwright/src/page-objects/            # Page objects (one per UI page)
+playwright/src/fixtures/scenario-fixture.ts  # Fixture — injects page objects + k8sClient
+playwright/src/clients/kubernetes-client.ts  # Flat K8s client (extend when needed)
+playwright/src/clients/kubernetes-auth.ts    # OAuth/kubeconfig auth helpers
+playwright/src/utils/                   # Env vars, test config, random names, file utils
+playwright/src/data-models/             # K8s type definitions
+playwright/project-dependencies/        # Global setup/teardown + rule engine
+```
 
----
+## Key Fixtures (from scenario-fixture.ts)
 
-## Important Rules
+| Fixture | Provides |
+|---|---|
+| `k8sClient` | `KubernetesClient` instance — flat K8s API |
+| `overviewPage` | `OverviewPage` — virtualization dashboard |
+| `virtualMachinesPage` | `VirtualMachinesPage` — VM list page |
 
-- **ALWAYS fetch ticket data from the Jira REST API** — never rely on user-provided summaries, cached descriptions, or assumptions about ticket content. The API call is mandatory for every ticket.
-- **DO NOT commit or push** — the user will handle git operations separately
-- **DO NOT create a PR** — stop after implementation and review
-- Always check existing implementations before creating new components
-- Use MCP (Playwright browser) for locator validation when dealing with UI elements
-- If the Jira ticket has subtasks, only implement tests for subtasks that are marked as done or in progress
-- If a test cannot be implemented due to missing cluster features, create the STD entry and mark it as `TODO`
-- When multiple tickets are provided, process all tickets in a single branch and workflow — consolidate tests into existing spec files where possible
-- **Expand before create** — always check if an existing test or STD can absorb the new validation before creating new spec files or STD documents. When existing coverage fits, fall back to the `/expand-tests` workflow (add `test.step()` blocks, append to existing STDs). Only create new files when no existing test or STD covers the feature area.
+New page objects are added to the fixture as the test suite grows.
+
+## Rules
+
+- **Page objects are injected via fixture** — never instantiate page objects in tests
+- **No raw `page` in specs** — destructure page objects from the fixture instead
+- **New tests go in `playwright/tests/scenario/`** — never in `playwright/tests/gating/`
+- **Use `scenarioTest` fixture** — never the legacy `gatingTest`
+- **Page objects are standalone classes** — no base class hierarchy, constructor takes `Page`
+- **Expose locators as `readonly` properties** — tests assert against them with `expect()`
+- **Extend `KubernetesClient` for K8s gaps** — add methods directly to the class
+- **Each file owns its namespace** — use `generateRandomName()`, never hardcode
+- **Never hardcode `openshift-cnv`** — use `EnvVariables.cnvNamespace`
+- **Always check existing coverage first** — expand existing specs when possible
+- **DO NOT commit or push** — the user handles git operations

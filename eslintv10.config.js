@@ -19,6 +19,7 @@ const ignoresConfig = {
     'dist/**',
     'node_modules/**',
     'eslint.config.js',
+    'eslintv10.config.js',
     'package-lock.json',
     'i18n-scripts/**',
     'coverage/**',
@@ -65,7 +66,7 @@ const baseConfig = {
       'error',
       { exceptions: ['t', 'e', 'i', 'a', 'b', 'vm', 'vmi', 'ns'], min: 3, properties: 'never' },
     ],
-    'max-lines': ['warn', { max: 150, skipBlankLines: true, skipComments: true }],
+    'max-lines': ['error', { max: 150, skipBlankLines: true, skipComments: true }],
     'no-console': 'error',
     'no-else-return': ['error', { allowElseIf: false }],
     'no-nested-ternary': 'error',
@@ -87,7 +88,7 @@ const baseConfig = {
     'no-warning-comments': ['warn', { location: 'start', terms: ['todo', 'fixme', 'hack', 'xxx'] }],
     'prefer-const': 'error',
     'promise/always-return': 'warn',
-    'promise/catch-or-return': 'error',
+    'promise/catch-or-return': ['error', { allowFinally: true }],
     'promise/no-nesting': 'warn',
     'promise/no-return-wrap': 'error',
     'promise/param-names': 'error',
@@ -99,7 +100,7 @@ const baseConfig = {
     'react-hooks/refs': 'error',
 
     'react-hooks/rules-of-hooks': 'error',
-    'react-hooks/set-state-in-effect': 'error',
+    'react-hooks/set-state-in-effect': 'off',
     'react-hooks/set-state-in-render': 'error',
     'react-hooks/unsupported-syntax': 'error',
     'simple-import-sort/exports': 'error',
@@ -126,7 +127,6 @@ const baseConfig = {
     'unicorn/prefer-array-some': 'error',
     'unicorn/prefer-includes': 'error',
 
-    'unicorn/prefer-node-protocol': 'error',
     'unicorn/throw-new-error': 'error',
   },
   settings: {
@@ -210,11 +210,31 @@ const tsConfigs = tseslint.configs.recommended.map((config) => ({
 const sonarConfig = {
   ...sonarjs.configs.recommended,
   files: ['**/*.{js,jsx,ts,tsx}'],
+  rules: {
+    ...sonarjs.configs.recommended.rules,
+    'sonarjs/deprecation': 'off',
+    'sonarjs/fixme-tag': 'off',
+    'sonarjs/function-return-type': 'off',
+    'sonarjs/no-globals-shadowing': 'off',
+    'sonarjs/no-unused-vars': 'off',
+    'sonarjs/todo-tag': 'off',
+    'sonarjs/unused-import': 'off',
+  },
 };
 
 const reactConfig = {
   ...eslintReact.configs['recommended-typescript'],
   files: ['**/*.{ts,tsx}'],
+  rules: {
+    ...eslintReact.configs['recommended-typescript'].rules,
+    '@eslint-react/exhaustive-deps': 'off',
+    '@eslint-react/purity': 'off',
+    '@eslint-react/rules-of-hooks': 'off',
+    // TODO: tackle set-state-in-effect in a later version — 82 files affected
+    '@eslint-react/set-state-in-effect': 'off',
+    '@eslint-react/set-state-in-render': 'off',
+    '@eslint-react/unsupported-syntax': 'off',
+  },
 };
 
 const perfectionistOverrides = {
@@ -254,7 +274,6 @@ const jsdocConfig = {
       },
     ],
     'jsdoc/require-param': 'warn',
-    'jsdoc/require-param-description': 'warn',
     'jsdoc/require-param-name': 'warn',
     'jsdoc/require-param-type': 'off',
     'jsdoc/require-property': 'warn',

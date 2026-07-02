@@ -6,8 +6,8 @@ import {
   V1beta1VirtualMachinePreference,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { ALL_PROJECTS } from '@kubevirt-utils/hooks/constants';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { PaginationState } from '@kubevirt-utils/hooks/usePagination/utils/types';
-import useBootableVolumes from '@kubevirt-utils/resources/bootableresources/hooks/useBootableVolumes';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { NamespacedResourceMap, ResourceMap } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -15,27 +15,22 @@ import {
   ColumnLayout,
   OnFilterChange,
   RowFilter,
-  TableColumn,
   useListPageFilter,
 } from '@openshift-console/dynamic-plugin-sdk';
 import { ThSortType } from '@patternfly/react-table/dist/esm/components/Table/base/types';
 import { useVMWizard } from '@virtualmachines/creation-wizard-new/state/vm-wizard-context/VMWizardContext';
 import { CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA } from '@virtualmachines/creation-wizard-new/state/vm-wizard-form/consts';
 import useBootVolumeColumns from '@virtualmachines/creation-wizard-new/steps/InstanceTypesSteps/BootSourceStep/components/BootableVolumeList/hooks/useBootVolumeColumns';
-import useBootVolumeFilters from '@virtualmachines/creation-wizard-new/steps/InstanceTypesSteps/BootSourceStep/components/BootableVolumeList/hooks/useBootVolumeFilters';
 import useBootVolumeSortColumns from '@virtualmachines/creation-wizard-new/steps/InstanceTypesSteps/BootSourceStep/components/BootableVolumeList/hooks/useBootVolumeSortColumns';
 import { paginationInitialStateForm } from '@virtualmachines/creation-wizard-new/steps/InstanceTypesSteps/BootSourceStep/components/BootableVolumeList/utils/constants';
-import {
-  filterBootableVolumesByPreference,
-  isLinuxGenericPreference,
-} from '@virtualmachines/creation-wizard-new/steps/InstanceTypesSteps/BootSourceStep/components/BootableVolumeList/utils/utils';
+import { getBootVolumeTableFilters } from '@virtualmachines/creation-wizard-new/steps/InstanceTypesSteps/BootSourceStep/components/BootableVolumeList/utils/getBootVolumeFilters';
+import { filterBootableVolumesByPreference } from '@virtualmachines/creation-wizard-new/steps/InstanceTypesSteps/BootSourceStep/components/BootableVolumeList/utils/utils';
+import { UseBootableVolumesValues } from '@virtualmachines/creation-wizard-new/utils/types';
 
-type UseBootableVolumesTableData = (
-  volumeListNamespace: string,
-  preferencesMap: ResourceMap<V1beta1VirtualMachineClusterPreference>,
-  userPreferencesMap: NamespacedResourceMap<V1beta1VirtualMachinePreference>,
-) => {
-  activeColumns: TableColumn<BootableVolume>[];
+import { TableColumnWithOptionalIndex } from '../../../types';
+
+type BootableVolumesTableData = {
+  activeColumns: TableColumnWithOptionalIndex<BootableVolume>[];
   columnLayout: ColumnLayout;
   data: BootableVolume[];
   filters: RowFilter<BootableVolume>[];
@@ -53,34 +48,40 @@ type UseBootableVolumesTableData = (
   unfilteredData: BootableVolume[];
 };
 
+type UseBootableVolumesTableData = (
+  volumeListNamespace: string,
+  bootableVolumesData: UseBootableVolumesValues,
+  preferencesMap: ResourceMap<V1beta1VirtualMachineClusterPreference>,
+  userPreferencesMap: NamespacedResourceMap<V1beta1VirtualMachinePreference>,
+) => BootableVolumesTableData;
+
 const useBootableVolumesTableData: UseBootableVolumesTableData = (
   volumeListNamespace,
+  bootableVolumesData,
   preferencesMap,
   userPreferencesMap,
 ) => {
   const { control } = useVMWizard();
+  const { t } = useKubevirtTranslation();
   const preference = useWatch({
     control,
     name: CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.PREFERENCE,
   });
+  const preferenceName = preference?.name;
 
-  const bootableVolumesData = useBootableVolumes(volumeListNamespace);
   const { bootableVolumes, dvSources, pvcSources, volumeSnapshotSources } = bootableVolumesData;
 
+  const { activeColumns, columnLayout, loadedColumns } = useBootVolumeColumns(volumeListNamespace);
+
   const preferenceFilteredVolumes = useMemo(
-    () => filterBootableVolumesByPreference(bootableVolumes, preference?.name),
-    [bootableVolumes, preference],
+    () => filterBootableVolumesByPreference(bootableVolumes, preferenceName),
+    [bootableVolumes, preferenceName],
   );
 
-  const isPreferenceFilterEmpty =
-    !!preference?.name && !isEmpty(bootableVolumes) && isEmpty(preferenceFilteredVolumes);
-
-  const allFilters = useBootVolumeFilters(preferenceFilteredVolumes);
-
-  const filters = useMemo(() => {
-    if (!preference?.name || isLinuxGenericPreference(preference?.name)) return allFilters;
-    return allFilters.filter((f) => f.type !== 'osName');
-  }, [allFilters, preference]);
+  const filters = useMemo(
+    () => getBootVolumeTableFilters(preferenceFilteredVolumes, preferenceName, t),
+    [preferenceFilteredVolumes, preferenceName, t],
+  );
 
   const [unfilteredData, data, onFilterChange] = useListPageFilter(
     preferenceFilteredVolumes,
@@ -91,7 +92,7 @@ const useBootableVolumesTableData: UseBootableVolumesTableData = (
 
   useEffect(() => {
     setPagination(paginationInitialStateForm);
-  }, [preference]);
+  }, [preferenceName]);
 
   const { getSortType, sortedData, sortedPaginatedData } = useBootVolumeSortColumns(
     data,
@@ -104,7 +105,8 @@ const useBootableVolumesTableData: UseBootableVolumesTableData = (
     dvSources,
   );
 
-  const { activeColumns, columnLayout, loadedColumns } = useBootVolumeColumns(volumeListNamespace);
+  const isPreferenceFilterEmpty =
+    !!preferenceName && !isEmpty(bootableVolumes) && isEmpty(preferenceFilteredVolumes);
 
   return {
     activeColumns,

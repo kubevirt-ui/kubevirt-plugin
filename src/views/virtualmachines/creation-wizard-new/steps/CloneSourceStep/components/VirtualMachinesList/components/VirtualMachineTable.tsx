@@ -5,6 +5,7 @@ import ListSkeleton from '@kubevirt-utils/components/StateHandler/ListSkeleton';
 import { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Table, TableVariant, Tbody, Th, Thead, Tr } from '@patternfly/react-table';
 import { VMCallbacks } from '@virtualmachines/list/virtualMachinesDefinition';
 
@@ -14,20 +15,18 @@ type VirtualMachineTableProps = {
   callbacks: VMCallbacks;
   cluster: string;
   columns: ColumnConfig<V1VirtualMachine, VMCallbacks>[];
-  data: V1VirtualMachine[];
   loaded: boolean;
   loadError: Error;
-  selectedVMState: [V1VirtualMachine, (vm: V1VirtualMachine) => void];
+  vmsData: V1VirtualMachine[];
 };
 
 const VirtualMachineTable: FC<VirtualMachineTableProps> = ({
   callbacks,
   cluster,
   columns,
-  data,
   loaded,
   loadError,
-  selectedVMState,
+  vmsData,
 }) => {
   const { t } = useKubevirtTranslation();
 
@@ -43,7 +42,7 @@ const VirtualMachineTable: FC<VirtualMachineTableProps> = ({
     return <ListSkeleton />;
   }
 
-  if (!data || data.length === 0) {
+  if (isEmpty(vmsData)) {
     return (
       <div className="pf-v6-u-text-align-center pf-v6-u-py-lg">{t('No VirtualMachines found')}</div>
     );
@@ -62,12 +61,11 @@ const VirtualMachineTable: FC<VirtualMachineTableProps> = ({
         </Tr>
       </Thead>
       <Tbody>
-        {data.map((vm) => (
+        {vmsData.map((vm) => (
           <VirtualMachineRow
             callbacks={callbacks}
             columns={columns}
             key={`${cluster}-${getNamespace(vm)}-${getName(vm)}`}
-            selectedVMState={selectedVMState}
             vm={vm}
           />
         ))}

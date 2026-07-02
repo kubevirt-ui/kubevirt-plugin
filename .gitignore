@@ -12,6 +12,10 @@ dist
 playwright/test-results/
 playwright/.auth/
 .playwright-mcp
+.kubeconfigs/
+.storage-states/
+.test-configs/
+.test-data/
 .DS_Store
 .devcontainer/dev.env
 console-extensions.md

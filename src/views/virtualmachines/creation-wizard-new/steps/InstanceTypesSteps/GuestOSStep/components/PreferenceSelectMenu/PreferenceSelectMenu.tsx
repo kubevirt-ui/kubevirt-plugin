@@ -28,7 +28,7 @@ const PreferenceSelectMenu: FC = () => {
     ],
   });
 
-  const { preferences, preferencesLoaded } = usePreferenceSelectOptions(
+  const { isPreferencesLoaded, preferences } = usePreferenceSelectOptions(
     project,
     cluster,
     operatingSystemType,
@@ -50,7 +50,7 @@ const PreferenceSelectMenu: FC = () => {
       fieldId="preference-select"
       label={t('Guest operating system type')}
     >
-      {!preferencesLoaded ? (
+      {!isPreferencesLoaded ? (
         <Loading />
       ) : (
         <Controller

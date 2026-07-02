@@ -132,7 +132,7 @@ export const validateAndBuildFilterState = (
       );
 
       const existing = filterState[filterType] ?? [];
-      filterState[filterType] = [...existing, ...finalValues];
+      filterState[filterType] = [...new Set([...existing, ...finalValues])];
 
       if (!tokenOrder.includes(filterType)) tokenOrder.push(filterType);
     }

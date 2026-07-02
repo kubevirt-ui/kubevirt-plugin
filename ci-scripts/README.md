@@ -33,11 +33,11 @@ hot-cluster-e2e-run.yml → "Hot Cluster E2E Run"
 
 ## Infrastructure Types
 
-| Type | Description | IAM needed | Cluster management |
-|------|------------|------------|-------------------|
-| **classic** | IBM-managed ROKS on classic infrastructure | K8s Admin + Classic Super User | IBM manages control plane |
-| **vpc** | IBM-managed ROKS on VPC Gen2 | K8s Admin + VPC Admin + COS auth | IBM manages control plane |
-| **ipi** | Self-managed OpenShift via `openshift-install` | VPC Admin + COS Manager + DNS + IAM Identity | You manage everything |
+| Type        | Description                                    | IAM needed                                   | Cluster management        |
+| ----------- | ---------------------------------------------- | -------------------------------------------- | ------------------------- |
+| **classic** | IBM-managed ROKS on classic infrastructure     | K8s Admin + Classic Super User               | IBM manages control plane |
+| **vpc**     | IBM-managed ROKS on VPC Gen2                   | K8s Admin + VPC Admin + COS auth             | IBM manages control plane |
+| **ipi**     | Self-managed OpenShift via `openshift-install` | VPC Admin + COS Manager + DNS + IAM Identity | You manage everything     |
 
 ### VPC ROKS (recommended)
 
@@ -68,23 +68,24 @@ Uses `openshift-install` to create a fully self-managed OpenShift cluster on IBM
 
 ### IBM Cloud
 
-| Secret | Description | Required for |
-|--------|-------------|-------------|
-| `IC_KEY` | IBM Cloud IAM API key | All paths |
-| `OPENSHIFT_PULL_SECRET` | Red Hat pull secret (from console.redhat.com) | IPI only |
+| Secret                  | Description                                   | Required for |
+| ----------------------- | --------------------------------------------- | ------------ |
+| `IC_KEY`                | IBM Cloud IAM API key                         | All paths    |
+| `OPENSHIFT_PULL_SECRET` | Red Hat pull secret (from console.redhat.com) | IPI only     |
 
 ### ARC Authentication (choose one)
 
-| Secret | Description |
-|--------|-------------|
-| `ARC_GITHUB_APP_ID` + `ARC_GITHUB_APP_INSTALL_ID` + `ARC_GITHUB_APP_PRIVATE_KEY` | GitHub App (recommended) |
-| `ARC_GITHUB_PAT` | Fine-grained PAT (simpler, less secure) |
+| Secret                                                                           | Description                             |
+| -------------------------------------------------------------------------------- | --------------------------------------- |
+| `ARC_GITHUB_APP_ID` + `ARC_GITHUB_APP_INSTALL_ID` + `ARC_GITHUB_APP_PRIVATE_KEY` | GitHub App (recommended)                |
+| `ARC_GITHUB_PAT`                                                                 | Fine-grained PAT (simpler, less secure) |
 
 ### Optional
 
-| Secret | Description |
-|--------|-------------|
-| `BOT_PAT` | PAT with repo admin scope for ghost runner cleanup |
+| Secret              | Description                                                                 |
+| ------------------- | --------------------------------------------------------------------------- |
+| `BOT_PAT`           | PAT with repo admin scope for ghost runner cleanup                          |
+| `SLACK_WEBHOOK_URL` | Slack Incoming Webhook URL for credential notifications on cluster creation |
 
 ## Setting Up the Hot Cluster
 
@@ -109,20 +110,26 @@ All paths converge after cluster creation: the workflow installs HCO, builds the
 
 **Automatic:** The auto-teardown workflow runs every 30 minutes and tears down the cluster after 2 hours of CI inactivity. It detects both ROKS clusters (via `ibmcloud oc`) and IPI clusters (via DNS probe).
 
-For IPI teardown, provide the `ipi_setup_run_id` (the GitHub Actions run ID from the setup workflow) so the teardown can download the install state artifacts needed by `openshift-install destroy cluster`.
+For IPI teardown, the workflow auto-discovers the latest successful setup run to download the install state (`metadata.json`) needed by `openshift-install destroy cluster`. You can also provide `ipi_setup_run_id` manually to target a specific setup run.
+
+## Security
+
+- The kubeconfig is **not** uploaded as a workflow artifact (the repo is public and artifacts are downloadable by anyone).
+- CI runners (ARC) access the cluster via their in-cluster service account.
+- Manual cluster access: use the `ibmcloud` CLI with the `IC_KEY` API key, or use the kubeadmin credentials sent to Slack on cluster creation (see CNV-91497).
 
 ## Scripts
 
-| Script | Purpose |
-|--------|---------|
-| `install-hco.sh` | Installs HCO operator, HPP storage, and virtctl |
-| `check-cluster-health.sh` | Verifies cluster, HCO, ARC, storage, console |
-| `check-roks-cluster-state.sh` | Polls until ROKS cluster is ready |
-| `log-ibmcloud-iam-diagnostics.sh` | Logs IAM permissions for debugging (classic, VPC, and IPI) |
-| `arc/install-arc-controller.sh` | Installs ARC controller (once per cluster) |
-| `arc/install-runner-scale-set.sh` | Installs ARC runner scale set |
-| `arc/setup-dind-mirror.sh` | Mirrors `docker:dind` to internal registry |
-| `ci-env/install-ci-env-controller.sh` | Installs the ConfigMap-driven CI environment controller |
+| Script                                | Purpose                                                    |
+| ------------------------------------- | ---------------------------------------------------------- |
+| `install-hco.sh`                      | Installs HCO operator, HPP storage, and virtctl            |
+| `check-cluster-health.sh`             | Verifies cluster, HCO, ARC, storage, console               |
+| `check-roks-cluster-state.sh`         | Polls until ROKS cluster is ready                          |
+| `log-ibmcloud-iam-diagnostics.sh`     | Logs IAM permissions for debugging (classic, VPC, and IPI) |
+| `arc/install-arc-controller.sh`       | Installs ARC controller (once per cluster)                 |
+| `arc/install-runner-scale-set.sh`     | Installs ARC runner scale set                              |
+| `arc/setup-dind-mirror.sh`            | Mirrors `docker:dind` to internal registry                 |
+| `ci-env/install-ci-env-controller.sh` | Installs the ConfigMap-driven CI environment controller    |
 
 See [`arc/README.md`](arc/README.md) for ARC-specific details and [`ci-env/README.md`](ci-env/README.md) for the ci-env-controller.
 
@@ -154,6 +161,7 @@ Always verify the cluster has been torn down when done testing. The auto-teardow
 - **Privileged dind + broad SCC**: The `github-arc` SCC allows privileged containers for the Docker-in-Docker sidecar. Scope runner namespaces and RBAC accordingly.
 - **`ttl.sh` for plugin images**: Plugin images use ephemeral `ttl.sh` tags with 2h TTL per CI run. Suitable for CI but not for long-term storage.
 - **Ghost runner cleanup**: Requires `BOT_PAT` with repo admin scope. Without it, offline runners must be cleaned up manually.
+- **IBM Cloud VPC hairpin NAT**: VPC load balancers don't support hairpin NAT. On IPI clusters, ingress canary checks fail and the authentication operator may report Degraded. This is cosmetic -- the console works fine for browser access from outside the cluster, and CI tests are unaffected (they use internal service URLs).
 
 ## Troubleshooting
 

@@ -15,8 +15,9 @@ import UserProvidedInstanceTypesList from '@virtualmachines/creation-wizard-new/
 import { getUserProvidedInstanceTypes } from '@virtualmachines/creation-wizard-new/steps/InstanceTypesSteps/ComputeResourcesStep/components/SelectInstanceTypeSection/components/UserProvidedInstanceTypeList/utils/utils';
 
 import { TabKey } from './utils/constants';
+import { getActiveTabKey } from './utils/utils';
 
-const SelectInstanceTypeSection: FC = ({}) => {
+const SelectInstanceTypeSection: FC = () => {
   const [activeTabKey, setActiveTabKey] = useState<TabKey>(TabKey.RedHat);
 
   const { control } = useVMWizard();
@@ -33,14 +34,9 @@ const SelectInstanceTypeSection: FC = ({}) => {
   const menuItems = useMemo(() => getInstanceTypeMenuItems(allInstanceTypes), [allInstanceTypes]);
 
   useEffect(() => {
-    const isUserProvidedSelection =
-      Boolean(selectedInstanceType?.namespace) ||
-      (!selectedInstanceType?.namespace &&
-        menuItems.userProvided.items.includes(selectedInstanceType?.name));
-
-    const tabToSwitch = isUserProvidedSelection ? TabKey.Users : TabKey.RedHat;
+    const tabToSwitch = getActiveTabKey(selectedInstanceType, menuItems);
     setActiveTabKey(tabToSwitch);
-  }, [menuItems.userProvided.items, selectedInstanceType]);
+  }, [menuItems, selectedInstanceType]);
 
   if (!loaded) return <Loading />;
 

@@ -302,3 +302,13 @@ export const getNoDataAvailableMessage = (t: TFunction): string => t('No data av
 
 export const getErrorMessage = (error: any) =>
   error instanceof Error ? error.message : String(error);
+
+const ALREADY_CREATED_ERROR_CODE = 409;
+
+export const createIfNotExists = async (request: Promise<unknown>): Promise<void> => {
+  try {
+    await request;
+  } catch (error) {
+    if (error.code !== ALREADY_CREATED_ERROR_CODE) throw error;
+  }
+};

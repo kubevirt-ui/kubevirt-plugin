@@ -1,0 +1,6 @@
+branch=$(git branch --show-current)
+if [ "$branch" = "main" ]; then
+  exit 0
+fi
+
+npx commitlint --from "$(git merge-base HEAD upstream/main)" --to HEAD

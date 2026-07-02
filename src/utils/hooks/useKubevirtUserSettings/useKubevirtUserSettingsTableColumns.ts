@@ -1,14 +1,14 @@
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { TableColumn } from '@openshift-console/dynamic-plugin-sdk';
+import { TableColumnWithOptionalIndex } from '@virtualmachines/creation-wizard-new/steps/InstanceTypesSteps/BootSourceStep/types';
 
-import { USER_SETTINGS_KEYS } from './utils/const';
 import useKubevirtUserSettings from './useKubevirtUserSettings';
+import { USER_SETTINGS_KEYS } from './utils/const';
 
 type UseKubevirtUserSettingsTableColumnsType = <T>(input: {
   columnManagementID: string;
-  columns: TableColumn<T>[];
+  columns: TableColumnWithOptionalIndex<T>[];
 }) => [
-  activeColumns: TableColumn<T>[],
+  activeColumns: TableColumnWithOptionalIndex<T>[],
   setActiveColumns: (val: any) => void,
   loaded: boolean,
   error: Error,

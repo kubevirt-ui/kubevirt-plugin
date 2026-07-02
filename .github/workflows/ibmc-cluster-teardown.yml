@@ -63,7 +63,7 @@ jobs:
     timeout-minutes: 90
     steps:
       - name: Setup IBM Cloud CLI
-        uses: IBM/actions-ibmcloud-cli@v1
+        uses: IBM/actions-ibmcloud-cli@v2
         with:
           api_key: ${{ secrets.IC_KEY }}
           region: ${{ env.IBM_REGION }}
@@ -176,8 +176,15 @@ jobs:
           mkdir -p "${INSTALL_DIR}"
 
           if [[ -z "${SETUP_RUN_ID}" ]]; then
-            echo "::error::ipi_setup_run_id is required for IPI teardown. Provide the run ID from the setup workflow that created the cluster."
-            exit 1
+            echo "No setup run ID provided. Looking up latest successful setup run..."
+            SETUP_RUN_ID=$(gh run list --repo "${{ github.repository }}" \
+              --workflow="IBM Cloud Hot Cluster Setup" --status=success --limit=1 \
+              --json databaseId -q '.[0].databaseId' 2>/dev/null || true)
+            if [[ -z "${SETUP_RUN_ID}" ]]; then
+              echo "::error::No successful IPI setup run found and no ipi_setup_run_id provided."
+              exit 1
+            fi
+            echo "Using latest successful setup run: ${SETUP_RUN_ID}"
           fi
 
           echo "Downloading IPI install state from run ${SETUP_RUN_ID}..."

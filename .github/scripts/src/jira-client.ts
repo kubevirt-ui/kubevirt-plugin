@@ -5,7 +5,7 @@ import type {
   JiraFieldMeta,
   JiraIssue,
   JiraVersion,
-} from './types/index.js';
+} from './types/index';
 
 type RequestOptions = {
   method?: string;

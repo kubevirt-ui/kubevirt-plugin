@@ -85,6 +85,28 @@ export type UploadDataVolumeOptions = {
   onCancelCleanup?: () => Promise<void>;
 };
 
+export type UploadDataVolumeParams = {
+  data: V1DiskFormState;
+  dvName?: string;
+  options?: UploadDataVolumeOptions;
+  t: TFunction;
+  uploadData: ({ dataVolume, file }: UploadDataProps) => Promise<void>;
+  uploadKey?: string;
+  vm: V1VirtualMachine;
+};
+
+export type BuildUploadTrackMetadataParams = {
+  abortTooltip: UploadDataVolumeOptions['abortTooltip'];
+  data: V1DiskFormState;
+  dataVolume: V1beta1DataVolume;
+  file: File;
+  isCDROM: boolean;
+  onCancelCleanup: UploadDataVolumeOptions['onCancelCleanup'];
+  t: TFunction;
+  uploadKey: string | undefined;
+  vm: V1VirtualMachine;
+};
+
 export type SubmitInput = {
   data: V1DiskFormState;
   editDiskName: string;

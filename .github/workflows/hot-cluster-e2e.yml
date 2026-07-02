@@ -29,14 +29,14 @@ on:
           - vpc
           - classic
       ipi_setup_run_id:
-        description: Setup workflow run ID (required for IPI to download kubeconfig)
+        description: Setup workflow run ID (required for IPI to download install state)
         required: false
         default: ''
         type: string
 
 permissions:
   contents: read
-  actions: read
+  actions: write
 
 concurrency:
   group: hot-cluster-e2e-${{ github.event.pull_request.number || github.ref }}
@@ -50,23 +50,29 @@ env:
   BASE_DOMAIN: cnv-ui.com
 
 jobs:
-  cluster-health-check:
-    name: Cluster Health Check
+  cluster-check:
     if: >-
       github.event_name == 'workflow_dispatch' ||
-      github.event.pull_request.head.repo.full_name == github.repository ||
-      contains(fromJSON('["MEMBER","OWNER","COLLABORATOR"]'), github.event.pull_request.author_association) ||
-      (github.event.action == 'labeled' && contains(github.event.pull_request.labels.*.name, 'ok-to-test'))
+      contains(github.event.pull_request.labels.*.name, 'ok-to-test') ||
+      github.event.pull_request.author_association == 'MEMBER' ||
+      github.event.pull_request.author_association == 'OWNER' ||
+      github.event.pull_request.author_association == 'COLLABORATOR'
+    uses: ./.github/workflows/hot-cluster-check.yml
+    secrets: inherit
+
+  cluster-health-check:
+    name: Cluster Health Check
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       # ROKS health check (classic/vpc)
       - name: Setup IBM Cloud CLI
-        if: inputs.infrastructure_type != 'ipi'
-        uses: IBM/actions-ibmcloud-cli@v1
+        if: env.INFRASTRUCTURE_TYPE != 'ipi'
+        uses: IBM/actions-ibmcloud-cli@v2
         with:
           api_key: ${{ secrets.IC_KEY }}
           region: ${{ env.IBM_REGION }}
@@ -74,14 +80,14 @@ jobs:
           plugins: kubernetes-service
 
       - name: Install oc client (ROKS)
-        if: inputs.infrastructure_type != 'ipi'
+        if: env.INFRASTRUCTURE_TYPE != 'ipi'
         run: |
           CLUSTER_JSON="$(ibmcloud oc cluster get --cluster "${CLUSTER_NAME}" --output json)"
           export CLUSTER_JSON
           bash ./ci-scripts/install-oc-client.sh
 
       - name: Configure kubeconfig (ROKS)
-        if: inputs.infrastructure_type != 'ipi'
+        if: env.INFRASTRUCTURE_TYPE != 'ipi'
         run: |
           ibmcloud oc cluster config --cluster "${CLUSTER_NAME}" --admin
           oc cluster-info
@@ -89,7 +95,7 @@ jobs:
 
       # IPI health check
       - name: Download IPI kubeconfig
-        if: inputs.infrastructure_type == 'ipi'
+        if: env.INFRASTRUCTURE_TYPE == 'ipi'
         env:
           GH_TOKEN: ${{ github.token }}
           SETUP_RUN_ID: ${{ inputs.ipi_setup_run_id }}
@@ -153,8 +159,12 @@ jobs:
 
   run-e2e-tests:
     name: Run E2E Tests
-    needs: cluster-health-check
-    if: needs.cluster-health-check.result == 'success'
+    needs: [cluster-check, cluster-health-check]
+    if: |
+      always() && (
+        needs.cluster-check.result == 'success' ||
+        needs.cluster-health-check.result == 'success'
+      )
     uses: ./.github/workflows/hot-cluster-e2e-run.yml
     with:
       test_project: ${{ inputs.test_project || 'gating' }}

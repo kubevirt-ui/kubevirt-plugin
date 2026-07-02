@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 
+import { UPLOAD_PROGRESS_STATUS } from '../constants';
 import { useUploadProgressStore } from '../uploadProgressStore';
-import { UPLOAD_PROGRESS_STATUS } from '../utils/constants';
 
 import UploadProgressCanceledToast from './UploadProgressCanceledToast';
 import UploadProgressErrorToast from './UploadProgressErrorToast';
@@ -27,7 +27,7 @@ const UploadProgressToastContent: FC<UploadProgressToastContentProps> = ({
     case UPLOAD_PROGRESS_STATUS.SUCCESS:
       return <UploadProgressSuccessToast navigate={navigate} upload={upload} />;
     case UPLOAD_PROGRESS_STATUS.ERROR:
-      return <UploadProgressErrorToast upload={upload} />;
+      return <UploadProgressErrorToast navigate={navigate} upload={upload} />;
     case UPLOAD_PROGRESS_STATUS.CANCELED:
       return <UploadProgressCanceledToast navigate={navigate} upload={upload} />;
     default:

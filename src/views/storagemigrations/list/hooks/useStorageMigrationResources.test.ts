@@ -1,16 +1,14 @@
-import {
-  modelToGroupVersionKind,
-  MultiNamespaceVirtualMachineStorageMigrationPlanModel,
-  VirtualMachineStorageMigrationPlanModel,
-} from '@kubevirt-utils/models';
-import {
-  MultiNamespaceVirtualMachineStorageMigrationPlan,
-  VirtualMachineStorageMigrationPlan,
-} from '@kubevirt-utils/resources/migrations/constants';
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
-import { cleanup, renderHook } from '@testing-library/react';
+import { renderHook } from '@testing-library/react';
 
 import useStorageMigrationResources from './useStorageMigrationResources';
+import {
+  multiNsGVK,
+  multiNsPlan,
+  singleNsGVK,
+  singleNsPlan,
+} from './useStorageMigrationResources.test.mocks';
 
 jest.mock('@kubevirt-utils/hooks/useNamespaceParam', () => ({
   __esModule: true,
@@ -22,34 +20,7 @@ jest.mock('@multicluster/hooks/useK8sWatchData', () => ({
   default: jest.fn(() => [[], true, undefined]),
 }));
 
-const multiNsGVK = modelToGroupVersionKind(MultiNamespaceVirtualMachineStorageMigrationPlanModel);
-const singleNsGVK = modelToGroupVersionKind(VirtualMachineStorageMigrationPlanModel);
-
-const multiNsPlan: MultiNamespaceVirtualMachineStorageMigrationPlan = {
-  apiVersion: 'migrations.kubevirt.io/v1alpha1',
-  kind: 'MultiNamespaceVirtualMachineStorageMigrationPlan',
-  metadata: { name: 'multi-plan-1', namespace: 'test-ns' },
-  spec: {
-    namespaces: [
-      {
-        name: 'test-ns',
-        virtualMachines: [{ name: 'vm-a', targetMigrationPVCs: [{ volumeName: 'disk0' }] }],
-      },
-    ],
-  },
-} as MultiNamespaceVirtualMachineStorageMigrationPlan;
-
-const singleNsPlan: VirtualMachineStorageMigrationPlan = {
-  apiVersion: 'migrations.kubevirt.io/v1alpha1',
-  kind: 'VirtualMachineStorageMigrationPlan',
-  metadata: { name: 'single-plan-1', namespace: 'test-ns' },
-  spec: {
-    virtualMachines: [{ name: 'vm-b', targetMigrationPVCs: [{ volumeName: 'disk1' }] }],
-  },
-} as VirtualMachineStorageMigrationPlan;
-
 afterEach(() => {
-  cleanup();
   (useK8sWatchData as jest.Mock).mockReset();
 });
 
@@ -73,7 +44,7 @@ describe('useStorageMigrationResources', () => {
     expect(result.current.loadError).toBeUndefined();
     expect(result.current.storageMigPlans).toHaveLength(2);
 
-    const names = result.current.storageMigPlans.map((p) => p.metadata.name);
+    const names = result.current.storageMigPlans.map((plan) => plan.metadata.name);
     expect(names).toContain('multi-plan-1');
     expect(names).toContain('single-plan-1');
   });

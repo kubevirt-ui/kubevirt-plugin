@@ -9,6 +9,7 @@ import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { TREE_VIEW_FOLDERS } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { setVMSignal } from '@kubevirt-utils/store/customizeInstanceType';
 import useIsACMPage from '@multicluster/useIsACMPage';
 import { Form, FormGroup } from '@patternfly/react-core';
 import { useHubClusterName } from '@stolostron/multicluster-sdk';
@@ -48,6 +49,7 @@ const VMCreationLocationForm: FC = () => {
                   setValue(CREATE_VM_FORM_FIELDS_VM_DATA.FOLDER, '');
                   if (selectedCluster !== cluster)
                     setValue(CREATE_VM_FORM_FIELDS_VM_DATA.PROJECT, '');
+                  setVMSignal(null);
                 }}
                 bookmarkCluster={hubClusterName}
                 includeAllClusters={false}
@@ -67,6 +69,7 @@ const VMCreationLocationForm: FC = () => {
               onChange={(selectedProject) => {
                 field.onChange(selectedProject);
                 setValue(CREATE_VM_FORM_FIELDS_VM_DATA.FOLDER, '');
+                setVMSignal(null);
               }}
               bookmarkCluster={hubClusterName}
               cluster={cluster}

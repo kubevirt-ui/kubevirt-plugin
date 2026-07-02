@@ -4,9 +4,12 @@ import { FormProvider, useForm } from 'react-hook-form';
 import { isUploadCanceledError } from '@kubevirt-utils/hooks/useCDIUpload/errors';
 import { useCDIUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { cancelTrackedUploadOnModalClose } from '@kubevirt-utils/hooks/useUploadProgressToast/utils/modalUploadCancel';
-import { completeVmDiskUpload } from '@kubevirt-utils/hooks/useUploadProgressToast/utils/uploadCompletion';
-import { getVmDiskUploadKey } from '@kubevirt-utils/hooks/useUploadProgressToast/utils/uploadKeys';
+import { cancelTrackedUploadOnModalClose } from '@kubevirt-utils/hooks/useUploadProgressToast/cancel/modalUploadCancel';
+import { completeVmDiskUpload } from '@kubevirt-utils/hooks/useUploadProgressToast/completion/uploadCompletion';
+import {
+  getUploadClusterForVm,
+  getVmDiskUploadKey,
+} from '@kubevirt-utils/hooks/useUploadProgressToast/keys/uploadKeys';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { isRunning } from '@virtualmachines/utils';
@@ -57,7 +60,7 @@ const UploadDiskModal: FC<V1SubDiskModalProps> = ({
         onClose={() => {
           const diskName = getValues('disk.name');
           const uploadKey = diskName
-            ? getVmDiskUploadKey(getCluster(vm), getNamespace(vm), getName(vm), diskName)
+            ? getVmDiskUploadKey(getUploadClusterForVm(vm), getNamespace(vm), getName(vm), diskName)
             : undefined;
 
           cancelTrackedUploadOnModalClose({ upload, uploadKey });
@@ -66,7 +69,7 @@ const UploadDiskModal: FC<V1SubDiskModalProps> = ({
         onSubmit={() =>
           handleSubmit(async (data) => {
             const uploadKey = getVmDiskUploadKey(
-              getCluster(vm),
+              getUploadClusterForVm(vm),
               getNamespace(vm),
               getName(vm),
               data.disk.name,
@@ -74,14 +77,13 @@ const UploadDiskModal: FC<V1SubDiskModalProps> = ({
             let uploadedDataVolume;
 
             try {
-              uploadedDataVolume = await uploadDataVolume(
-                vm,
-                uploadData,
+              uploadedDataVolume = await uploadDataVolume({
                 data,
-                undefined,
-                uploadKey,
                 t,
-              );
+                uploadData,
+                uploadKey,
+                vm,
+              });
             } catch (error) {
               if (isUploadCanceledError(error)) {
                 return;

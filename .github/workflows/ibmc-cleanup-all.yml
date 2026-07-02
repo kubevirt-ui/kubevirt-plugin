@@ -39,7 +39,7 @@ jobs:
     timeout-minutes: 30
     steps:
       - name: Setup IBM Cloud CLI
-        uses: IBM/actions-ibmcloud-cli@v1
+        uses: IBM/actions-ibmcloud-cli@v2
         with:
           api_key: ${{ secrets.IC_KEY }}
           region: us-south

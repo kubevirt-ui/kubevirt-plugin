@@ -1,0 +1,207 @@
+name: Hot Cluster Availability Check
+
+on:
+  workflow_call:
+    inputs:
+      cluster_name:
+        description: Cluster name to check
+        type: string
+        required: false
+        default: kubevirt-plugin-ci
+      base_domain:
+        description: Base domain for IPI cluster DNS
+        type: string
+        required: false
+        default: cnv-ui.com
+      infrastructure_type:
+        description: Infrastructure type for provisioning
+        type: string
+        required: false
+        default: ipi
+      zone:
+        description: Zone for cluster provisioning
+        type: string
+        required: false
+        default: us-south-1
+      openshift_version:
+        description: OpenShift version
+        type: string
+        required: false
+        default: '4.22_openshift'
+      worker_flavor:
+        description: Worker node flavor
+        type: string
+        required: false
+        default: bx2.8x32
+      worker_count:
+        description: Number of worker nodes
+        type: string
+        required: false
+        default: '2'
+      kvm_emulation:
+        description: KVM emulation
+        type: string
+        required: false
+        default: 'true'
+    outputs:
+      cluster_ready:
+        description: Whether the cluster is ready (true/false)
+        value: ${{ jobs.check-and-provision.outputs.cluster_ready }}
+
+permissions:
+  actions: write
+  contents: read
+
+jobs:
+  check-and-provision:
+    name: Check & Provision
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    concurrency:
+      group: hot-cluster-provision-${{ inputs.cluster_name }}
+      cancel-in-progress: false
+    outputs:
+      cluster_ready: ${{ steps.probe.outputs.cluster_ready || steps.wait_setup.outputs.cluster_ready }}
+    steps:
+      - name: Probe for cluster
+        id: probe
+        env:
+          CLUSTER_NAME: ${{ inputs.cluster_name }}
+          BASE_DOMAIN: ${{ inputs.base_domain }}
+        run: |
+          API_HOST="api.${CLUSTER_NAME}.${BASE_DOMAIN}"
+
+          echo "Checking if cluster exists via DNS (${API_HOST})..."
+          if dig +short "${API_HOST}" 2>/dev/null | grep -q .; then
+            echo "Cluster '${CLUSTER_NAME}' is reachable (${API_HOST} resolves)"
+            echo "cluster_ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Cluster '${CLUSTER_NAME}' not found (${API_HOST} does not resolve)"
+            echo "cluster_ready=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Auto-provision cluster
+        id: dispatch_setup
+        if: steps.probe.outputs.cluster_ready == 'false'
+        uses: actions/github-script@v9
+        with:
+          script: |
+            core.info('No cluster found — dispatching IBM Cloud Hot Cluster Setup...');
+
+            await github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'ibmc-cluster-setup.yml',
+              ref: context.ref,
+              inputs: {
+                infrastructure_type: '${{ inputs.infrastructure_type }}',
+                cluster_name: '${{ inputs.cluster_name }}',
+                zone: '${{ inputs.zone }}',
+                openshift_version: '${{ inputs.openshift_version }}',
+                worker_flavor: '${{ inputs.worker_flavor }}',
+                worker_count: '${{ inputs.worker_count }}',
+                kvm_emulation: '${{ inputs.kvm_emulation }}',
+              },
+            });
+
+            core.info('Setup workflow dispatched. Waiting for run to appear...');
+
+            let setupRunId = null;
+            const startTime = Date.now();
+            for (let i = 0; i < 12; i++) {
+              await new Promise(r => setTimeout(r, 5000));
+              const runs = await github.rest.actions.listWorkflowRuns({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                workflow_id: 'ibmc-cluster-setup.yml',
+                status: 'in_progress',
+                per_page: 5,
+              });
+              const recent = runs.data.workflow_runs.find(
+                r => new Date(r.created_at).getTime() > startTime - 30000
+              );
+              if (recent) {
+                setupRunId = recent.id;
+                break;
+              }
+            }
+
+            if (!setupRunId) {
+              const queued = await github.rest.actions.listWorkflowRuns({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                workflow_id: 'ibmc-cluster-setup.yml',
+                per_page: 1,
+              });
+              if (queued.data.workflow_runs.length > 0) {
+                setupRunId = queued.data.workflow_runs[0].id;
+              }
+            }
+
+            if (!setupRunId) {
+              core.setFailed('Setup workflow was dispatched but no run was found.');
+              return;
+            }
+
+            core.info(`Setup run started: ${setupRunId}`);
+            core.setOutput('setup_run_id', setupRunId);
+
+      - name: Wait for cluster setup
+        id: wait_setup
+        if: steps.dispatch_setup.outputs.setup_run_id != ''
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const runId = parseInt('${{ steps.dispatch_setup.outputs.setup_run_id }}', 10);
+            const maxWaitMs = 170 * 60 * 1000; // ~2h 50m
+            const pollIntervalMs = 120 * 1000;  // 2 min
+            const startTime = Date.now();
+
+            const runUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${runId}`;
+            core.info(`Polling setup run ${runId} (every 2 min, up to ~2h 50m)...`);
+            core.info(`Setup run: ${runUrl}`);
+
+            while (Date.now() - startTime < maxWaitMs) {
+              await new Promise(r => setTimeout(r, pollIntervalMs));
+
+              const run = await github.rest.actions.getWorkflowRun({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                run_id: runId,
+              });
+
+              const status = run.data.status;
+              const conclusion = run.data.conclusion;
+              const elapsed = Math.floor((Date.now() - startTime) / 60000);
+              core.info(`[${elapsed}m] Status: ${status}, Conclusion: ${conclusion || 'pending'}`);
+
+              if (status === 'completed') {
+                if (conclusion === 'success') {
+                  core.info('Cluster setup completed successfully.');
+                  core.setOutput('cluster_ready', 'true');
+                  return;
+                } else {
+                  core.setFailed(`Cluster setup failed (conclusion: ${conclusion}). See: ${runUrl}`);
+                  return;
+                }
+              }
+            }
+
+            core.setFailed(`Cluster setup timed out after ~2h 50m. See: ${runUrl}`);
+
+      - name: Summary
+        if: always()
+        env:
+          CLUSTER_NAME: ${{ inputs.cluster_name }}
+          CLUSTER_READY: ${{ steps.probe.outputs.cluster_ready }}
+          SETUP_RUN_ID: ${{ steps.dispatch_setup.outputs.setup_run_id }}
+        run: |
+          echo "## Cluster Availability Check" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Check | Result |" >> "$GITHUB_STEP_SUMMARY"
+          echo "|-------|--------|" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Cluster | \`${CLUSTER_NAME}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| DNS Probe | \`${CLUSTER_READY}\` |" >> "$GITHUB_STEP_SUMMARY"
+          if [[ -n "${SETUP_RUN_ID}" ]]; then
+            echo "| Setup Run | [${SETUP_RUN_ID}](https://github.com/${{ github.repository }}/actions/runs/${SETUP_RUN_ID}) |" >> "$GITHUB_STEP_SUMMARY"
+          fi

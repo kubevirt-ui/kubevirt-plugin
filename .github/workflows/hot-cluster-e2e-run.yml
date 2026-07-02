@@ -173,7 +173,7 @@ jobs:
       kubevirt-plugin-image: ${{ env.KUBEVIRT_PLUGIN_IMAGE }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           ref: ${{ github.event.pull_request.head.sha || github.ref }}
 
@@ -235,7 +235,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           ref: ${{ github.event.pull_request.head.sha || github.ref }}
 
@@ -298,7 +298,7 @@ jobs:
 
       - name: Upload test artifacts
         if: always()
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: playwright-results-${{ github.run_id }}
           path: |
@@ -334,7 +334,7 @@ jobs:
 
       - name: e2e CI diagnostics - Upload artifacts
         if: always()
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: e2e-ci-diagnostics-${{ github.run_id }}
           path: /tmp/e2e-ci-diagnostics/

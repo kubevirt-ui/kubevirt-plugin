@@ -97,7 +97,6 @@ for arg in "$@"; do
 done
 
 eval "$(bash ./ci-scripts/resolve-console-image.sh)" || true
-CONSOLE_IMAGE="${CONSOLE_IMAGE:-quay.io/openshift/origin-console:latest}"
 CONSOLE_PORT=${CONSOLE_PORT:-9000}
 
 echo "Starting local OpenShift console..."

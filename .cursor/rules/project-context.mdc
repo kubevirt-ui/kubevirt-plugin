@@ -24,7 +24,8 @@ This is the OpenShift Console dynamic plugin for KubeVirt virtualization managem
 - **Zustand** - Lightweight state management
 - **Webpack 5** - Module bundler
 - **Jest** - Unit testing
-- **Cypress** - E2E testing
+- **Playwright** - E2E testing (scenario infrastructure)
+- **Cypress** - E2E testing (legacy)
 
 ### Plugin Architecture
 - Dynamic plugin loaded at runtime by OpenShift Console
@@ -92,7 +93,13 @@ kubevirt-plugin/
 │   ├── templates/                # VM template definitions
 │   ├── perspective/              # Virtualization perspective
 │   └── extensions/               # Console extension definitions
-├── cypress/                      # E2E tests
+├── playwright/                   # Playwright E2E tests
+│   ├── tests/scenario/           # Scenario specs (new — scenarioTest fixture)
+│   ├── tests/gating/             # Legacy gating specs (frozen)
+│   ├── src/clients/              # KubernetesClient for test setup
+│   ├── src/fixtures/             # Test fixtures (scenario-fixture.ts)
+│   └── project-dependencies/     # Global setup/teardown + rule engine
+├── cypress/                      # Cypress E2E tests (legacy)
 │   ├── tests/                    # Test files
 │   ├── views/                    # Page object selectors
 │   └── support/                  # Test utilities
@@ -170,8 +177,10 @@ npm run lint                   # Lint check
 ### Testing
 ```bash
 npm test                       # Unit tests
-npm run test-cypress           # E2E tests (interactive)
-npm run test-cypress-headless  # E2E tests (CI)
+npm run test-cypress           # Cypress E2E tests (interactive)
+npm run test-cypress-headless  # Cypress E2E tests (CI)
+USE_SCENARIO_INFRA=true npm run test-playwright -- --project=scenario  # Scenario tests
+npm run test-playwright -- --project=setup --project=Gating            # Gating tests
 ```
 
 ---
@@ -221,5 +230,6 @@ import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
 
 ### Testing
 - Unit tests for hooks and utilities
-- E2E tests for critical user flows
+- Playwright E2E tests for critical user flows (new tests in `playwright/tests/scenario/`)
+- Cypress E2E tests (legacy)
 - Use `data-test` attributes for selectors

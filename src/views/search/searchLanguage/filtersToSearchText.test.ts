@@ -93,6 +93,20 @@ describe('filtersToSearchText', () => {
     });
   });
 
+  describe('duplicate values', () => {
+    it('should deduplicate values when serializing', () => {
+      expect(filtersToSearchText(f({ os: ['RHEL', 'RHEL', 'Fedora'] }), ['os'])).toBe(
+        'os:RHEL,Fedora',
+      );
+    });
+
+    it('should deduplicate excluded values when serializing', () => {
+      expect(filtersToSearchText(f({ status: ['!Running', '!Running'] }), ['status'])).toBe(
+        '-status:Running',
+      );
+    });
+  });
+
   describe('token ordering', () => {
     it('should follow tokenOrder for output sequence', () => {
       expect(

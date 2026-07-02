@@ -1,7 +1,7 @@
 import { act, renderHook } from '@testing-library/react';
 
+import { UPLOAD_PROGRESS_STATUS } from '../constants';
 import { useUploadProgressStore } from '../uploadProgressStore';
-import { UPLOAD_PROGRESS_STATUS } from '../utils/constants';
 
 import useUploadBeforeUnload from './useUploadBeforeUnload';
 
@@ -105,6 +105,19 @@ describe('useUploadBeforeUnload', () => {
     });
 
     renderHook(() => useUploadBeforeUnload());
+
+    expect(addEventListenerSpy).not.toHaveBeenCalledWith('beforeunload', expect.any(Function));
+  });
+
+  it('should not register listener when blockNavigation is false', () => {
+    const { rerender } = renderHook(() => useUploadBeforeUnload());
+
+    act(() => {
+      useUploadProgressStore
+        .getState()
+        .startUpload(UPLOAD_KEY, { blockNavigation: false, fileName: FILE_IMAGE_ISO });
+    });
+    rerender();
 
     expect(addEventListenerSpy).not.toHaveBeenCalledWith('beforeunload', expect.any(Function));
   });

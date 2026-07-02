@@ -1,19 +1,16 @@
 import React, { FC } from 'react';
-import { useWatch } from 'react-hook-form';
 
 import AddBootableVolumeModal from '@kubevirt-utils/components/AddBootableVolumeModal/AddBootableVolumeModal';
 import { runningTourSignal } from '@kubevirt-utils/components/GuidedTour/utils/guidedTourSignals';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import useCanCreateBootableVolume from '@kubevirt-utils/resources/bootableresources/hooks/useCanCreateBootableVolume';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Button, ButtonVariant } from '@patternfly/react-core';
 import { useSignals } from '@preact/signals-react/runtime';
-import { useVMWizard } from '@virtualmachines/creation-wizard-new/state/vm-wizard-context/VMWizardContext';
-import { CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA } from '@virtualmachines/creation-wizard-new/state/vm-wizard-form/consts';
-import { applySelectedBootableVolumeToForm } from '@virtualmachines/creation-wizard-new/utils/utils';
 
-export type AddBootableVolumeButtonProps = {
+import useAddBootableVolume from '../hooks/useAddBootableVolume';
+
+type AddBootableVolumeButtonProps = {
   loadError: Error;
 };
 
@@ -21,43 +18,26 @@ const AddBootableVolumeButton: FC<AddBootableVolumeButtonProps> = ({ loadError }
   const { t } = useKubevirtTranslation();
   useSignals();
   const { createModal } = useModal();
-  const { control, getValues, setValue } = useVMWizard();
-
-  const [volumeListNamespace, preference] = useWatch({
-    control,
-    name: [
-      CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.VOLUME_LIST_NAMESPACE,
-      CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.PREFERENCE,
-    ],
-  });
-
-  const { canCreateDS, canCreatePVC } = useCanCreateBootableVolume(volumeListNamespace);
-  const canCreate = canCreateDS || canCreatePVC;
+  const { canCreate, lockedPreference, onCreateVolume } = useAddBootableVolume();
 
   const isEnabled = runningTourSignal.value || (isEmpty(loadError) && canCreate);
 
+  const openAddBootableVolumeModal = () => {
+    createModal((props) => (
+      <AddBootableVolumeModal
+        {...props}
+        lockedPreference={lockedPreference}
+        onClose={props.onClose}
+        onCreateVolume={onCreateVolume}
+      />
+    ));
+  };
+
   return (
     <Button
-      onClick={() =>
-        createModal((props) => (
-          <AddBootableVolumeModal
-            onCreateVolume={(volume) =>
-              applySelectedBootableVolumeToForm({
-                dvSource: null,
-                getValues,
-                pvcSource: null,
-                selectedVolume: volume,
-                setValue,
-                volumeSnapshotSource: null,
-              })
-            }
-            lockedPreference={preference ?? undefined}
-            {...props}
-          />
-        ))
-      }
       id="tour-step-add-volume"
       isDisabled={!isEnabled}
+      onClick={openAddBootableVolumeModal}
       variant={ButtonVariant.secondary}
     >
       {t('Add volume')}

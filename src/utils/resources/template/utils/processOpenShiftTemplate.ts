@@ -37,5 +37,11 @@ export const processOpenShiftTemplate = async (
     },
   });
 
-  return getTemplateVirtualMachineObject(processedTemplate);
+  const virtualMachine = getTemplateVirtualMachineObject(processedTemplate);
+
+  if (cluster) {
+    virtualMachine.cluster = cluster;
+  }
+
+  return virtualMachine;
 };

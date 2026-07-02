@@ -16,8 +16,8 @@ import { UploadDataProps } from '@kubevirt-utils/hooks/useCDIUpload/types';
 import {
   completeBootableVolumeUpload,
   failBootableVolumeUpload,
-} from '@kubevirt-utils/hooks/useUploadProgressToast/utils/uploadCompletion';
-import { getBootableVolumeUploadKey } from '@kubevirt-utils/hooks/useUploadProgressToast/utils/uploadKeys';
+} from '@kubevirt-utils/hooks/useUploadProgressToast/completion/uploadCompletion';
+import { getBootableVolumeUploadKey } from '@kubevirt-utils/hooks/useUploadProgressToast/keys/uploadKeys';
 import { KUBEVIRT_ISO_LABEL } from '@kubevirt-utils/resources/bootableresources/constants';
 import { createUserPasswordSecret } from '@kubevirt-utils/resources/secret/utils';
 import { buildOwnerReference, getName, getNamespace } from '@kubevirt-utils/resources/shared';
