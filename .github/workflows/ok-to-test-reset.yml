@@ -1,0 +1,26 @@
+name: Reset ok-to-test on push
+
+on:
+  pull_request_target:
+    branches: [main]
+    types: [synchronize]
+
+permissions:
+  pull-requests: write
+
+jobs:
+  remove-label:
+    name: Remove ok-to-test label
+    if: contains(github.event.pull_request.labels.*.name, 'ok-to-test')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Remove ok-to-test label
+        uses: actions/github-script@v9
+        with:
+          script: |
+            await github.rest.issues.removeLabel({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.pull_request.number,
+              name: 'ok-to-test',
+            }).catch(() => {});
