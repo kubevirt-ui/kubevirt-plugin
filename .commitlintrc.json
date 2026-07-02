@@ -1,7 +1,7 @@
 {
   "parserPreset": {
     "parserOpts": {
-      "headerPattern": "^([A-Z]+-\\d+)\\s(.+)$",
+      "headerPattern": "^([A-Z]+-\\d+):?\\s(.+)$",
       "headerCorrespondence": ["type", "subject"]
     }
   },

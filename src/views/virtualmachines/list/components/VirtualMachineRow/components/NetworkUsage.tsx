@@ -1,7 +1,7 @@
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 import xbytes from 'xbytes';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getNetworkUsagePercentage } from '@virtualmachines/list/metrics';
@@ -12,14 +12,16 @@ type NetworkUsageProps = {
 };
 
 const NetworkUsage: FC<NetworkUsageProps> = ({ vm }) => {
-  const totalTransferred = getNetworkUsagePercentage(vm);
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  const totalTransferred: number | undefined = getNetworkUsagePercentage(vm);
 
   if (isEmpty(totalTransferred) || !isRunning(vm)) return <>{NO_DATA_DASH}</>;
 
-  const formattedUsage = xbytes(totalTransferred || 0, {
+  const formattedUsage = xbytes(totalTransferred ?? 0, {
     fixed: 0,
     iec: true,
   });
+  // eslint-disable-next-line i18next/no-literal-string
   return <div>{formattedUsage}ps</div>;
 };
 
