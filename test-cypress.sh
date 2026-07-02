@@ -10,10 +10,10 @@ cleanup
 health_check
 
 # Install dependencies.
-yarn install --ignore-engines
+npm ci
 
 # Add mochawesome-report-generator
-yarn add global mochawesome-report-generator --ignore-engines
+npm install -g mochawesome-report-generator --force
 
 while getopts g:s: flag
 do
@@ -24,18 +24,18 @@ do
 done
 
 # Run tests.
-yarn_script="test-cypress-headless"
+npm_script="test-cypress-headless"
 
 if [ -n "${gui-}" ]; then
-  yarn_script="test-cypress"
+  npm_script="test-cypress"
 fi
 
 if [ -n "${spec-}" ]; then
-  yarn_script="$yarn_script --spec '$spec'"
+  npm_script="$npm_script --spec '$spec'"
 fi
 
-yarn run $yarn_script
+npm run $npm_script
 
 
 # Generate Cypress report.
-yarn run cypress-postreport
+npm run cypress-postreport
