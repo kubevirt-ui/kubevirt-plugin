@@ -7,6 +7,8 @@ approvers:
   - vojtechszocs
   - glekner
   - pcbailey
+  - adamviktora
+  - galkremer1
 reviewers:
   - tnisan
   - yaacov
@@ -17,3 +19,4 @@ reviewers:
   - vojtechszocs
   - hstastna
   - upalatucci
+  - adamviktora
