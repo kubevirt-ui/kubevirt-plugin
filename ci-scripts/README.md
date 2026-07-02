@@ -181,7 +181,7 @@ Always verify the cluster has been torn down when done testing. The auto-teardow
 ### Health check fails
 
 - Run `ci-scripts/check-cluster-health.sh` manually with `oc` configured
-- Check individual component status: `oc get pods -n kubevirt-hyperconverged`
+- Check individual component status: `oc get pods -n openshift-cnv`
 - Verify storage: `oc get storageclass`
 
 ### Auto-teardown not triggering
