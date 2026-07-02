@@ -3,10 +3,7 @@
 set -eExuo pipefail
 
 # Install dependencies.
-yarn install --ignore-engines
-
-# Add mochawesome-report-generator
-yarn add global mochawesome-report-generator --ignore-engines
+npm ci
 
 while getopts g:s: flag
 do
@@ -17,18 +14,17 @@ do
 done
 
 # Run tests.
-yarn_script="test-cypress-headless"
+npm_script="test-cypress-headless"
 
 if [ -n "${gui-}" ]; then
-  yarn_script="test-cypress"
+  npm_script="test-cypress"
 fi
 
 if [ -n "${spec-}" ]; then
-  yarn_script="$yarn_script --spec '$spec'"
+  npm run "$npm_script" -- --spec "$spec"
+else
+  npm run "$npm_script"
 fi
 
-yarn run $yarn_script
-
-
 # Generate Cypress report.
-yarn run cypress-postreport
+npm run cypress-postreport
