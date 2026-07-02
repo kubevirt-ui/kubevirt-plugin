@@ -21,13 +21,13 @@ for arg in $@; do
     fi
 
     git pull
-    yarn
+    npm ci
 
     if [ "$(lsof -t -i:$INITIAL_PORT)" != "" ]; then
         kill -9 $(lsof -t -i:$INITIAL_PORT)
     fi
 
-    yarn start --port=$INITIAL_PORT &
+    npm run start --port=$INITIAL_PORT &
 
     runningPlugins["podman-linux"]+=",${arg}=http://localhost:${INITIAL_PORT}"
     runningPlugins["podman"]+=",${arg}=http://host.containers.internal:${INITIAL_PORT}"
