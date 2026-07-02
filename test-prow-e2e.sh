@@ -150,13 +150,10 @@ export CYPRESS_OS_IMAGES_NS='kubevirt-os-images';
 bash test-setup.sh
 
 # Install dependencies.
-yarn install --frozen-lockfile
-
-# Add mochawesome-report-generator
-yarn add global mochawesome-report-generator --ignore-engines
+npm ci
 
 # Run tests.
-yarn run test-cypress-headless --spec="tests/gating.cy.ts"
+npm run test-cypress-headless -- --spec="tests/gating.cy.ts"
 
 # Generate Cypress report.
-yarn run cypress-postreport
+npm run cypress-postreport

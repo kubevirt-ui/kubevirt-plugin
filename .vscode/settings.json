@@ -1,8 +1,7 @@
 {
   "search.exclude": {
     "**/node_modules": true,
-    "**/.yarn": true,
-    "yarn.lock": true
+    "package-lock.json": true
   },
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "always"

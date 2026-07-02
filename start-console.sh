@@ -48,11 +48,11 @@ for arg in "$@"; do
 
     if [ "$arg" = "monitoring-plugin" ]; then
         cd web
-        npm install
-        PORT=$INITIAL_PORT npm start --port=$INITIAL_PORT &
+        npm ci
+        PORT=$INITIAL_PORT npm run start -- --port=$INITIAL_PORT &
     else
-        yarn
-        PORT=$INITIAL_PORT yarn start --port="$INITIAL_PORT" &
+        npm ci
+        PORT=$INITIAL_PORT npm run start -- --port="$INITIAL_PORT" &
     fi
 
 
@@ -88,7 +88,7 @@ echo "Console URL: http://localhost:${CONSOLE_PORT}"
 env_args=""
 for var in $(set | grep '^BRIDGE_' | cut -d= -f1); do
     eval val=\$$var
-    env_args="$env_args --env $var=$val"
+    env_args="$env_args --env $var='$val'"
 done
 
 # Prefer podman
