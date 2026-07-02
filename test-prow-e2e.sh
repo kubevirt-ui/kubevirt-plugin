@@ -131,13 +131,10 @@ export BRIDGE_BASE_ADDRESS
 export NO_COLOR=1
 
 # Install dependencies.
-yarn install --ignore-engines
-
-# Add mochawesome-report-generator
-yarn add global mochawesome-report-generator --ignore-engines
+npm ci --ignore-scripts
 
 # Run tests.
-yarn run test-cypress-headless
+npm run test-cypress-headless
 
 # Generate Cypress report.
-yarn run cypress-postreport
+npm run cypress-postreport
