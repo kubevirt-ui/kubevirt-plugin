@@ -14,19 +14,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
-      - name: Setup Yarn
-        uses: actions/setup-node@v4
+      - name: Setup Node
+        uses: actions/setup-node@v6
         with:
           node-version: '16'
-          cache: 'yarn'
-      - run: yarn install
+      - run: npm ci --ignore-scripts
 
       - name: Check i18n
         shell: bash
         run: |
-          yarn i18n
+          npm run i18n
           GIT_STATUS="$(git status --short --untracked-files locales)"
           if [ -n "$GIT_STATUS" ]; then
             echo "i18n files are not up to date. Commit them to fix."
@@ -39,37 +38,35 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
-      - name: Setup Yarn
-        uses: actions/setup-node@v4
+      - name: Setup Node
+        uses: actions/setup-node@v6
         with:
           node-version: '16'
-          cache: 'yarn'
-      - run: yarn install
+      - run: npm ci --ignore-scripts
 
       - name: Lint
-        run: yarn lint
+        run: npm run lint
 
       - name: Build
-        run: yarn build
+        run: npm run build
 
   unit-test:
     name: unit-test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
-      - name: Setup Yarn
-        uses: actions/setup-node@v4
+      - name: Setup Node
+        uses: actions/setup-node@v6
         with:
           node-version: '16'
-          cache: 'yarn'
-      - run: yarn install
+      - run: npm ci --ignore-scripts
 
       - name: Run Unit Tests
-        run: yarn test-cov
+        run: npm run test-cov
 
       - name: Coverage Upload
         uses: codecov/codecov-action@v2
