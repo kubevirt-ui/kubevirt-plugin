@@ -8,7 +8,7 @@ source ./i18n-scripts/languages.sh
 for f in locales/en/* ; do
   for i in "${LANGUAGES[@]}"
   do
-  yarn i18n-to-po -f "$(basename "$f" .json)" -l "$i"
+  npm run i18n-to-po -- -f "$(basename "$f" .json)" -l "$i"
 
 
   case $i in
