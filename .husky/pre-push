@@ -3,4 +3,17 @@ if [ "$branch" = "main" ]; then
   exit 0
 fi
 
-npx commitlint --from "$(git merge-base HEAD upstream/main)" --to HEAD
+merge_base=""
+for remote in upstream origin; do
+  if git rev-parse --verify "$remote/main" >/dev/null 2>&1; then
+    merge_base=$(git merge-base HEAD "$remote/main")
+    break
+  fi
+done
+
+if [ -z "$merge_base" ]; then
+  echo "Warning: could not find upstream/main or origin/main — skipping commitlint"
+  exit 0
+fi
+
+npx commitlint --from "$merge_base" --to HEAD
