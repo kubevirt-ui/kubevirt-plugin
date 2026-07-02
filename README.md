@@ -28,12 +28,12 @@ OC_PASS=<password>
 ```
 
 2. `(Ctrl+Shift+P) => Remote Containers: Open Folder in Container...`
-3. `yarn dev`
+3. `npm run dev`
 4. Navigate to <http://localhost:9000>
 
 #### Cypress Testing inside the container
 
-1. `yarn test-cypress-docker`
+1. `npm run test-cypress-docker`
 2. Navigate to <http://localhost:10000>
 3. login with password `kubevirt` (no need for username)
 
@@ -41,7 +41,7 @@ OC_PASS=<password>
 
 1. Set up [Console](https://github.com/openshift/console) and See the plugin development section in [Console Dynamic Plugins README](https://github.com/openshift/console/blob/master/frontend/packages/console-dynamic-plugin-sdk/README.md) for details on how to run OpenShift console using local plugins.
 2. Run bridge with `-plugins kubevirt-plugin=http://localhost:9001`
-3. Run `yarn dev` inside the plugin.
+3. Run `npm run dev` inside the plugin.
 
 ---
 
@@ -80,7 +80,7 @@ add the message from `console-extensions.json` to your message catalog as follow
 // t('plugin__kubevirt-plugin~VirtualMachines')
 ```
 
-Run `yarn i18n` to update the JSON files in the `locales` folder of the
+Run `npm run i18n` to update the JSON files in the `locales` folder of the
 dynamic plugin when adding or changing messages.
 
 ## Docker image
