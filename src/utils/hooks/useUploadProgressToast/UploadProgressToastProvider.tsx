@@ -1,4 +1,6 @@
-import React, { FC, ReactNode } from 'react';
+import React, { type FC, type ReactNode } from 'react';
+
+import ExportUploadToastWatcher from '@kubevirt-utils/components/ExportModal/ExportUploadToastWatcher';
 
 import useUploadBeforeUnload from './UploadNavigationGuard/useUploadBeforeUnload';
 import UploadProgressToastListener from './UploadProgressToastListener';
@@ -12,6 +14,7 @@ const UploadProgressToastProvider: FC<UploadProgressToastProviderProps> = ({ chi
 
   return (
     <>
+      <ExportUploadToastWatcher />
       <UploadProgressToastListener />
       {children}
     </>

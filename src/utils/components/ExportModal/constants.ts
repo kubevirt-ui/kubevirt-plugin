@@ -1,10 +1,9 @@
 import {
-  IoK8sApiCoreV1ServiceAccount,
-  IoK8sApiRbacV1Role,
-  IoK8sApiRbacV1RoleBinding,
+  type IoK8sApiCoreV1ServiceAccount,
+  type IoK8sApiRbacV1Role,
+  type IoK8sApiRbacV1RoleBinding,
 } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { RoleBindingModel, RoleModel, ServiceAccountModel } from '@kubevirt-utils/models';
-import { ProgressStepVariant } from '@patternfly/react-core';
 
 const UPLOADER_SERVICE_ACCOUNT_NAME = 'kubevirt-disk-uploader';
 const UPLOADER_ROLE_NAME = 'kubevirt-disk-uploader';
@@ -56,7 +55,7 @@ export const role: IoK8sApiRbacV1Role = {
     },
     {
       apiGroups: [''],
-      resources: ['pods'],
+      resources: ['pods', 'pods/log'],
       verbs: ['get'],
     },
     {
@@ -72,24 +71,20 @@ export const role: IoK8sApiRbacV1Role = {
   ],
 };
 
-export enum UPLOAD_STATUSES {
-  FAILED = 'Failed',
+export enum UploadStatuses {
+  Failed = 'Failed',
   Pending = 'Pending',
   Running = 'Running',
-  SUCCEEDED = 'Succeeded',
-  UNKNOWN = 'Unknown',
+  Succeeded = 'Succeeded',
+  Unknown = 'Unknown',
 }
 
-export const STATUS_TO_PROGRESS_VARIANT = {
-  Failed: ProgressStepVariant.danger,
-  Pending: ProgressStepVariant.info,
-  Running: ProgressStepVariant.info,
-  Succeeded: ProgressStepVariant.success,
-  Unknown: ProgressStepVariant.danger,
-};
+export const UPLOADER_CONTAINER_NAME = 'kubevirt-disk-uploader';
 
 export const ALREADY_CREATED_ERROR_CODE = 409;
 
-export const UPSTREAM_UPLOADER_IMAGE = 'quay.io/kubevirt/tekton-tasks:v0.24.0';
+export const UPSTREAM_UPLOADER_IMAGE = 'quay.io/kubevirt/tekton-tasks:v0.26.0';
+// Update to latest version once available (CNV-91818)
 export const DOWNSTREAM_UPLOADER_IMAGE =
-  'registry.redhat.io/container-native-virtualization/kubevirt-tekton-tasks-create-datavolume-rhel9:v4.18';
+  UPSTREAM_UPLOADER_IMAGE ||
+  'registry.redhat.io/container-native-virtualization/kubevirt-tekton-tasks-create-datavolume-rhel9:v4.22';
