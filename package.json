@@ -21,6 +21,7 @@
     "file-saver": "^2.0.5",
     "fuzzysearch": "^1.0.3",
     "global": "^4.4.0",
+    "htmlparser2": "^8.0.2",
     "immer": "^9.0.12",
     "js-abbreviation-number": "^1.4.0",
     "js-yaml": "^4.1.0",
@@ -51,7 +52,7 @@
   },
   "devDependencies": {
     "@cypress/webpack-preprocessor": "^6.0.2",
-    "@kubevirt-ui/kubevirt-api": "^1.3.6",
+    "@kubevirt-ui/kubevirt-api": "1.3.6",
     "@openshift-console/dynamic-plugin-sdk": "4.18.0",
     "@openshift-console/dynamic-plugin-sdk-internal": "4.18.0",
     "@openshift-console/dynamic-plugin-sdk-webpack": "4.18.1",
@@ -67,6 +68,7 @@
     "@types/react-dom": "^17.0.0",
     "@typescript-eslint/eslint-plugin": "^5.14.0",
     "@typescript-eslint/parser": "^5.14.0",
+    "ajv": "^8.20.0",
     "copy-webpack-plugin": "^11.0.0",
     "css-loader": "^6.11.0",
     "cypress": "^13.17.0",
@@ -108,46 +110,64 @@
     "typescript": "^4.5.5",
     "webpack": "5.96.1",
     "webpack-cli": "5.1.4",
-    "webpack-dev-server": "^5.1.0",
-    "yarn": "^1.22.18"
+    "webpack-dev-server": "^5.1.0"
+  },
+  "engines": {
+    "npm": ">=10.9.0",
+    "node": ">=18.0.0"
   },
   "lint-staged": {
-    "*.{js,ts,tsx,jsx,json}": [
-      "eslint . --fix",
-      "prettier --write .",
-      "yarn i18n"
+    "src/**/*.{js,ts,tsx,jsx,json}": [
+      "npm run i18n"
+    ],
+    "*.{js,ts,tsx,jsx}": [
+      "eslint --fix"
+    ],
+    "*.{json,scss,css,html,md,yaml}": [
+      "prettier --write"
     ]
   },
   "name": "kubevirt-plugin",
-  "private": true,
-  "resolutions": {
-    "@openshift-console/dynamic-plugin-sdk-internal/immutable": "^3.8.3",
-    "@openshift-console/dynamic-plugin-sdk/immutable": "^3.8.3",
+  "overrides": {
+    "@openshift-console/dynamic-plugin-sdk-internal": {
+      "immutable": "^3.8.3"
+    },
+    "@openshift-console/dynamic-plugin-sdk": {
+      "immutable": "^3.8.3"
+    },
     "@types/d3-dispatch": "3.0.6",
     "@types/react": "^17.0.40",
     "@types/react-dom": "^17.0.0",
     "dompurify": "^3.4.0",
-    "shell-quote": "^1.8.4"
+    "shell-quote": "^1.8.4",
+    "htmlparser2": "^8.0.2",
+    "entities": "^4.5.0",
+    "cheerio": "1.0.0-rc.12",
+    "ajv-keywords@5.1.0": {
+      "ajv": "^8.17.1"
+    }
   },
+  "private": true,
   "scripts": {
-    "build": "yarn clean && NODE_ENV=production NODE_OPTIONS=--max-old-space-size=8192 yarn ts-node node_modules/.bin/webpack",
+    "build": "npm run clean && NODE_ENV=production NODE_OPTIONS=--max-old-space-size=8192 npm run ts-node -- node_modules/.bin/webpack",
     "check-types": "tsc",
     "clean": "rm -rf dist",
     "cypress-generate": "cd cypress && marge -o ./gui-test-screenshots/ -f cypress-report -t 'Kubevirt Cypress Test Results' -p 'Kubevirt Test Results' --showPassed false --assetsDir ./gui-test-screenshots/cypress/assets ./gui-test-screenshots/cypress.json",
     "cypress-merge": "cd cypress && mochawesome-merge ./gui-test-screenshots/cypress_report*.json > ./gui-test-screenshots/cypress.json",
-    "cypress-postreport": "yarn cypress-merge && yarn cypress-generate",
-    "dev": "yarn clean && NODE_ENV=development NODE_OPTIONS=--max-old-space-size=8192 yarn ts-node node_modules/.bin/webpack serve --progress",
+    "cypress-postreport": "npm run cypress-merge && npm run cypress-generate",
+    "dev": "npm run clean && NODE_ENV=development NODE_OPTIONS=--max-old-space-size=8192 npm run ts-node -- node_modules/.bin/webpack serve --progress",
     "export-pos": "./i18n-scripts/export-pos.sh",
     "i18n": "i18next && node ./i18n-scripts/set-english-defaults.js && ./i18n-scripts/replace-br.sh",
     "i18n-to-po": "node ./i18n-scripts/i18n-to-po.js",
     "lint": "eslint src cypress --color",
-    "lint:fix": "yarn lint --fix",
+    "lint-staged": "lint-staged",
+    "lint:fix": "npm run lint -- --fix",
     "memsource-download": "./i18n-scripts/memsource-download.sh",
     "memsource-upload": "./i18n-scripts/memsource-upload.sh",
     "po-to-i18n": "node ./i18n-scripts/po-to-i18n.js",
     "postinstall": "cp node_modules/@openshift-console/dynamic-plugin-sdk/docs/console-extensions.md .",
     "prepare": "husky install",
-    "start": "yarn ts-node node_modules/.bin/webpack serve",
+    "start": "npm run ts-node -- node_modules/.bin/webpack serve",
     "start-console": "./start-console.sh",
     "start-console-with-monitoring": "./start-console.sh monitoring-plugin",
     "start-console-with-networking": "./start-console.sh networking-console-plugin",
