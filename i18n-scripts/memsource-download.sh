@@ -46,9 +46,9 @@ do
   # We don't treat zh-cn as a dialect in i18next right now, so we need to alter it to zh
   if [ "$i" == 'zh-cn' ]
   then
-    yarn po-to-i18n -d "$DOWNLOAD_PATH/$i" -l 'zh'
+    npm run po-to-i18n -- -d "$DOWNLOAD_PATH/$i" -l 'zh'
   else
-    yarn po-to-i18n -d "$DOWNLOAD_PATH/$i" -l "$i"
+    npm run po-to-i18n -- -d "$DOWNLOAD_PATH/$i" -l "$i"
   fi
 done
 
