@@ -1,4 +1,5 @@
 import { TFunction } from 'i18next';
+import { FC } from 'react';
 
 import { VirtualMachineDetailsTab } from '@kubevirt-utils/constants/tabs-constants';
 import CustomizeInstanceTypeDetailsTab from '@virtualmachines/creation-wizard-new/steps/CustomizationStep/components/CustomizeVirtualMachine/components/CustomizeVMTabs/tabs/CustomizeInstanceTypeDetailsTab';
@@ -9,6 +10,12 @@ import CustomizeInstanceTypeSchedulingTab from '@virtualmachines/creation-wizard
 import CustomizeInstanceTypeSSHTab from '@virtualmachines/creation-wizard-new/steps/CustomizationStep/components/CustomizeVirtualMachine/components/CustomizeVMTabs/tabs/CustomizeInstanceTypeSSHTab';
 import CustomizeInstanceTypeStorageTab from '@virtualmachines/creation-wizard-new/steps/CustomizationStep/components/CustomizeVirtualMachine/components/CustomizeVMTabs/tabs/CustomizeInstanceTypeStorageTab';
 import { getTabNameAndTitle } from '@virtualmachines/details/utils/utils';
+
+export type TabConfig = {
+  Component: FC;
+  name: string;
+  title: string;
+};
 
 export const getTabs = (t: TFunction) => [
   {

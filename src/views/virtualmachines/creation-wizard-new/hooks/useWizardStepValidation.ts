@@ -56,6 +56,7 @@ const useWizardStepValidation = (): WizardStepValidation => {
   });
 
   const activeFlow = useMemo(() => getActiveFlow(creationMethod), [creationMethod]);
+  const currentVMSignalValue = vmSignal.value;
 
   const stepNextDisabled: Record<VMWizardStep, boolean> = useMemo(() => {
     const isRedHatProvided = Boolean(selectedSeries) && Boolean(selectedSize);
@@ -65,7 +66,7 @@ const useWizardStepValidation = (): WizardStepValidation => {
 
     return {
       [VMWizardStep.BOOT_SOURCE]: useBootSource && isEmpty(selectedBootableVolume),
-      [VMWizardStep.CLONE]: isEmpty(vmSignal.value),
+      [VMWizardStep.CLONE]: isEmpty(currentVMSignalValue),
       [VMWizardStep.COMPUTE_RESOURCES]: !isRedHatProvided && !isUserProvided,
       [VMWizardStep.CUSTOMIZATION]: false,
       [VMWizardStep.DEPLOYMENT_DETAILS]: !isValidVMName,
@@ -75,6 +76,7 @@ const useWizardStepValidation = (): WizardStepValidation => {
     };
   }, [
     creationMethod,
+    currentVMSignalValue,
     name,
     operatingSystemType,
     preference,

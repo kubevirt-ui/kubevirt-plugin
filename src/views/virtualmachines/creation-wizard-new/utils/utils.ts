@@ -2,6 +2,7 @@ import { TFunction } from 'i18next';
 import { UseFormGetValues, UseFormSetValue } from 'react-hook-form';
 
 import { getInstanceTypeFromVolume } from '@kubevirt-utils/components/AddBootableVolumeModal/utils';
+
 import { getDiskSize } from '@kubevirt-utils/resources/bootableresources/selectors';
 import CloneIcon from '@virtualmachines/creation-wizard-new/steps/DeploymentDetailsStep/components/CreationMethodTileGroup/components/CreationMethodTile/components/CloneIcon';
 import { InstanceTypeIcon } from '@virtualmachines/creation-wizard-new/steps/DeploymentDetailsStep/components/CreationMethodTileGroup/components/CreationMethodTile/components/InstanceTypeIcon';

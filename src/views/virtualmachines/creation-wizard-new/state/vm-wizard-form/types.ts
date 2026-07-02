@@ -7,6 +7,8 @@ import { Template } from '@kubevirt-utils/resources/template';
 import { OperatingSystemType } from '@virtualmachines/creation-wizard-new/steps/InstanceTypesSteps/GuestOSStep/utils/constants';
 import { VMCreationMethod } from '@virtualmachines/creation-wizard-new/utils/constants';
 
+export type SelectedInstanceType = { name: string; namespace: null | string };
+
 /** VM identity, placement, and provisioning choices collected across wizard steps. */
 type VMWizardVirtualMachineData = {
   cluster: string;

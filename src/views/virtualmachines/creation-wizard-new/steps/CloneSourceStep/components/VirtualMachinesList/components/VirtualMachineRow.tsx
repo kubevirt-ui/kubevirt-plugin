@@ -2,53 +2,41 @@ import React, { FC } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
-import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
-import { getCluster } from '@multicluster/helpers/selectors';
+import { getDescription } from '@kubevirt-utils/resources/shared';
+import { vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
 import { Radio } from '@patternfly/react-core';
 import { Td, Tr } from '@patternfly/react-table';
+import { useVMWizard } from '@virtualmachines/creation-wizard-new/state/vm-wizard-context/VMWizardContext';
+import { CREATE_VM_FORM_FIELDS_VM_DATA } from '@virtualmachines/creation-wizard-new/state/vm-wizard-form/consts';
 import { VMCallbacks } from '@virtualmachines/list/virtualMachinesDefinition';
+
+import { getCloneSourceVMName, getVMConfiguration } from '../utils/utils';
 
 type VirtualMachineRowProps = {
   callbacks: VMCallbacks;
   columns: ColumnConfig<V1VirtualMachine, VMCallbacks>[];
-  selectedVMState: [V1VirtualMachine, (vm: V1VirtualMachine) => void];
   vm: V1VirtualMachine;
 };
 
-const VirtualMachineRow: FC<VirtualMachineRowProps> = ({
-  callbacks,
-  columns,
-  selectedVMState,
-  vm,
-}) => {
-  const [selectedVM, setSelectedVM] = selectedVMState;
+const VirtualMachineRow: FC<VirtualMachineRowProps> = ({ callbacks, columns, vm }) => {
+  const { setValue } = useVMWizard();
 
-  const vmName = getName(vm);
-  const vmNamespace = getNamespace(vm);
-  const vmCluster = getCluster(vm);
+  const { isRowSelected, rowId } = getVMConfiguration(vm);
 
-  const selectedVMName = getName(selectedVM);
-  const selectedVMNamespace = getNamespace(selectedVM);
-  const selectedVMCluster = getCluster(selectedVM);
-
-  const isRowSelected =
-    vmName === selectedVMName &&
-    vmNamespace === selectedVMNamespace &&
-    vmCluster === selectedVMCluster;
-
-  const handleOnClick = () => {
-    setSelectedVM(vm);
+  const handleClick = () => {
+    setValue(CREATE_VM_FORM_FIELDS_VM_DATA.NAME, getCloneSourceVMName(vm));
+    setValue(CREATE_VM_FORM_FIELDS_VM_DATA.DESCRIPTION, getDescription(vm) ?? '');
+    vmSignal.value = vm;
   };
-  const rowId = `${vmCluster}-${vmNamespace}-${vmName}`;
 
   return (
-    <Tr isRowSelected={isRowSelected} onClick={handleOnClick}>
+    <Tr isRowSelected={isRowSelected} onClick={handleClick}>
       <Td className="pf-v6-u-pl-sm">
         <Radio
           id={`select-vm-${rowId}`}
           isChecked={isRowSelected}
           name="clone-source-vm"
-          onChange={handleOnClick}
+          onChange={handleClick}
         />
       </Td>
       {columns.map((col) => (
