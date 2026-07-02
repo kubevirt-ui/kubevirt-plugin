@@ -1,9 +1,6 @@
 name: Hot Cluster E2E
 
 on:
-  pull_request_target:
-    branches: [main]
-    types: [opened, synchronize, labeled]
   workflow_dispatch:
     inputs:
       test_project:

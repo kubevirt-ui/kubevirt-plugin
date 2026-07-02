@@ -47,15 +47,10 @@ on:
         required: false
         default: ''
         type: string
-      hco_version:
-        description: 'HCO catalog image version (e.g. 1.19.0-unstable, 1.20.0-unstable)'
+      cnv_channel:
+        description: 'CNV OLM subscription channel (e.g. stable, stable-4.17)'
         required: false
-        default: '1.19.0-unstable'
-        type: string
-      hco_channel:
-        description: 'HCO OLM subscription channel (e.g. candidate-v1.19, candidate-v1.20)'
-        required: false
-        default: 'candidate-v1.19'
+        default: 'stable'
         type: string
 
 permissions:
@@ -567,15 +562,13 @@ jobs:
             echo "kvm_emulation=${{ inputs.kvm_emulation }}" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Install HCO
+      - name: Install OpenShift Virtualization (CNV)
         env:
           KVM_EMULATION: ${{ steps.kvm_check.outputs.kvm_emulation || inputs.kvm_emulation }}
-          HCO_IMAGE_VER: ${{ inputs.hco_version || '1.19.0-unstable' }}
-          HCO_SUBSCRIPTION_CHANNEL: ${{ inputs.hco_channel || 'candidate-v1.19' }}
+          CNV_CHANNEL: ${{ inputs.cnv_channel || 'stable' }}
         run: |
           echo "KVM_EMULATION=${KVM_EMULATION} (auto-detected)"
-          echo "HCO_IMAGE_VER=${HCO_IMAGE_VER}"
-          echo "HCO_SUBSCRIPTION_CHANNEL=${HCO_SUBSCRIPTION_CHANNEL}"
+          echo "CNV_CHANNEL=${CNV_CHANNEL}"
           ./ci-scripts/install-hco.sh
 
       - name: Configure internal image registry
@@ -767,7 +760,7 @@ jobs:
           echo "| Worker Flavor | \`${{ inputs.worker_flavor }}\` |" >> "$GITHUB_STEP_SUMMARY"
           echo "| Workers | \`${{ inputs.worker_count }}\` |" >> "$GITHUB_STEP_SUMMARY"
           echo "| KVM Emulation | \`${{ inputs.kvm_emulation }}\` |" >> "$GITHUB_STEP_SUMMARY"
-          echo "| HCO | \`${{ inputs.hco_version || '1.19.0-unstable' }}\` / \`${{ inputs.hco_channel || 'candidate-v1.19' }}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| CNV Channel | \`${{ inputs.cnv_channel || 'stable' }}\` |" >> "$GITHUB_STEP_SUMMARY"
           CONSOLE_URL=$(oc get consoles.config.openshift.io cluster -o jsonpath='{.status.consoleURL}' 2>/dev/null || echo "")
           if [[ -n "${CONSOLE_URL}" ]]; then
             echo "| Console | [${CONSOLE_URL}](${CONSOLE_URL}) |" >> "$GITHUB_STEP_SUMMARY"
