@@ -656,6 +656,81 @@ jobs:
         run: |
           ./ci-scripts/check-cluster-health.sh
 
+      # Optional: create an htpasswd admin user for ROKS clusters (no kubeadmin).
+      # Set CLUSTER_ADMIN_PASSWORD secret to enable. Not needed for IPI.
+      - name: Create console admin user (ROKS)
+        if: inputs.infrastructure_type != 'ipi' && env.ADMIN_PASSWORD != ''
+        env:
+          ADMIN_PASSWORD: ${{ secrets.CLUSTER_ADMIN_PASSWORD }}
+        run: |
+          if ! command -v htpasswd &>/dev/null; then
+            sudo apt-get update -qq && sudo apt-get install -y -qq apache2-utils
+          fi
+
+          echo "::add-mask::${ADMIN_PASSWORD}"
+          echo "Creating htpasswd identity provider with admin user..."
+          HTPASSWD=$(htpasswd -nbB admin "${ADMIN_PASSWORD}")
+
+          oc create secret generic htpass-secret \
+            --from-literal=htpasswd="${HTPASSWD}" \
+            -n openshift-config --dry-run=client -o yaml | oc apply -f -
+
+          oc apply -f - <<'OAUTH_EOF'
+          apiVersion: config.openshift.io/v1
+          kind: OAuth
+          metadata:
+            name: cluster
+          spec:
+            identityProviders:
+            - name: htpasswd
+              mappingMethod: claim
+              type: HTPasswd
+              htpasswd:
+                fileData:
+                  name: htpass-secret
+          OAUTH_EOF
+
+          oc adm policy add-cluster-role-to-user cluster-admin admin 2>&1 || true
+
+          echo "Waiting for OAuth pods to roll out..."
+          oc rollout status deployment/oauth-openshift -n openshift-authentication --timeout=120s 2>&1 || echo "::warning::OAuth rollout did not complete within 120s"
+          echo "Console admin user created. Login with username 'admin'."
+
+      - name: Send credentials to Slack
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          ADMIN_PASSWORD: ${{ secrets.CLUSTER_ADMIN_PASSWORD }}
+          INSTALL_DIR: ${{ runner.temp }}/ipi-install
+        run: |
+          CONSOLE_URL=$(oc get consoles.config.openshift.io cluster -o jsonpath='{.status.consoleURL}' 2>/dev/null || echo "unknown")
+
+          CREDS=""
+          if [[ -f "${INSTALL_DIR}/auth/kubeadmin-password" ]]; then
+            KUBEADMIN_PW=$(cat "${INSTALL_DIR}/auth/kubeadmin-password")
+            echo "::add-mask::${KUBEADMIN_PW}"
+            CREDS="\n*kubeadmin:* \`${KUBEADMIN_PW}\`"
+          elif [[ -n "${ADMIN_PASSWORD}" ]]; then
+            echo "::add-mask::${ADMIN_PASSWORD}"
+            CREDS="\n*admin:* \`${ADMIN_PASSWORD}\`"
+          fi
+
+          if [[ -z "${SLACK_WEBHOOK_URL}" ]]; then
+            echo "::warning::SLACK_WEBHOOK_URL not set — skipping Slack notification"
+            exit 0
+          fi
+
+          if [[ -z "${CREDS}" ]]; then
+            echo "::warning::No credentials available to send"
+            exit 0
+          fi
+
+          PAYLOAD=$(jq -n \
+            --arg text ":white_check_mark: *Hot cluster ready*\n*Console:* <${CONSOLE_URL}>${CREDS}" \
+            '{text: $text}')
+
+          curl -sS -X POST -H 'Content-Type: application/json' -d "${PAYLOAD}" "${SLACK_WEBHOOK_URL}"
+          echo "Slack notification sent."
+
       - name: Delete ROKS cluster on failure
         if: always() && inputs.infrastructure_type != 'ipi' && job.status == 'failure' && steps.check_cluster.outputs.exists == 'false'
         run: |
