@@ -74,7 +74,7 @@
     "eslint-config-prettier": "^8.5.0",
     "eslint-import-resolver-typescript": "^2.5.0",
     "eslint-plugin-chai-friendly": "^0.7.2",
-    "eslint-plugin-cypress": "^2.12.1",
+    "eslint-plugin-cypress": "2.12.1",
     "eslint-plugin-import": "^2.25.4",
     "eslint-plugin-jsdoc": "^37.9.7",
     "eslint-plugin-perfectionist": "^1.1.2",
@@ -107,38 +107,53 @@
     "typescript": "^4.5.5",
     "webpack": "5.75.0",
     "webpack-cli": "4.10.x",
-    "webpack-dev-server": "^4.7.4",
-    "yarn": "^1.22.18"
+    "webpack-dev-server": "^4.7.4"
   },
   "lint-staged": {
-    "*.{js,ts,tsx,jsx,json}": [
-      "eslint . --fix",
-      "prettier --write .",
-      "yarn i18n"
+    "src/**/*.{js,ts,tsx,jsx,json}": [
+      "npm run i18n"
+    ],
+    "*.{js,ts,tsx,jsx}": [
+      "eslint --fix"
+    ],
+    "!(*.js|*.jsx|*.ts|*.tsx)": [
+      "prettier --write --ignore-unknown"
     ]
   },
   "name": "kubevirt-plugin",
-  "private": true,
-  "resolutions": {
-    "@openshift-console/dynamic-plugin-sdk-internal/immutable": "^3.8.3",
-    "@openshift-console/dynamic-plugin-sdk/immutable": "^3.8.3",
+  "overrides": {
+    "@openshift-console/dynamic-plugin-sdk-internal": {
+      "immutable": "^3.8.3"
+    },
+    "@openshift-console/dynamic-plugin-sdk": {
+      "immutable": "^3.8.3"
+    },
     "@types/react": "^17.0.40",
     "@types/react-dom": "^17.0.0",
-    "dompurify": "^3.4.0"
+    "cheerio": "1.0.0-rc.12",
+    "dompurify": "^3.4.0",
+    "i18next": "23.8.2",
+    "react": "17.0.2",
+    "react-dom": "17.0.2",
+    "react-tagsinput": {
+      "react": "17.0.2"
+    }
   },
+  "private": true,
   "scripts": {
-    "build": "yarn clean && NODE_ENV=production NODE_OPTIONS=--max-old-space-size=8192 yarn ts-node node_modules/.bin/webpack",
+    "build": "npm run clean && NODE_ENV=production NODE_OPTIONS=--max-old-space-size=8192 npm run ts-node -- node_modules/.bin/webpack",
     "check-types": "tsc",
     "clean": "rm -rf dist",
     "cypress-generate": "cd cypress && marge -o ./gui-test-screenshots/ -f cypress-report -t 'Kubevirt Cypress Test Results' -p 'Kubevirt Test Results' --showPassed false --assetsDir ./gui-test-screenshots/cypress/assets ./gui-test-screenshots/cypress.json",
     "cypress-merge": "cd cypress && mochawesome-merge ./gui-test-screenshots/cypress_report*.json > ./gui-test-screenshots/cypress.json",
-    "cypress-postreport": "yarn cypress-merge && yarn cypress-generate",
-    "dev": "yarn clean && NODE_ENV=development NODE_OPTIONS=--max-old-space-size=8192 yarn ts-node node_modules/.bin/webpack serve --progress",
+    "cypress-postreport": "npm run cypress-merge && npm run cypress-generate",
+    "dev": "npm run clean && NODE_ENV=development NODE_OPTIONS=--max-old-space-size=8192 npm run ts-node -- node_modules/.bin/webpack serve --progress",
     "export-pos": "./i18n-scripts/export-pos.sh",
     "i18n": "i18next && node ./i18n-scripts/set-english-defaults.js && ./i18n-scripts/replace-br.sh",
     "i18n-to-po": "node ./i18n-scripts/i18n-to-po.js",
     "lint": "eslint src cypress --color",
-    "lint:fix": "yarn lint --fix",
+    "lint:fix": "npm run lint -- --fix",
+    "lint-staged": "lint-staged",
     "memsource-download": "./i18n-scripts/memsource-download.sh",
     "memsource-upload": "./i18n-scripts/memsource-upload.sh",
     "po-to-i18n": "node ./i18n-scripts/po-to-i18n.js",
