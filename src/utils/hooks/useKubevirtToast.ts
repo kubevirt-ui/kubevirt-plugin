@@ -24,7 +24,7 @@ type UseKubevirtToastResult = ToastActions & {
   addToast: AddToast;
 };
 
-const noopAddToast = () => '';
+const noopAddToast = () => 'noop';
 const noopRemoveToast = () => undefined;
 const noopResult = { addToast: noopAddToast, removeToast: noopRemoveToast };
 
