@@ -1,140 +1,110 @@
 #!/bin/bash
 #
-# Install HCO (HyperConverged Cluster Operator) and dependencies to the current oc
-# logged in cluster.  Based on the `deploy-kubevirt-gating.sh` script.
+# Install OpenShift Virtualization (CNV) — the productized operator from Red Hat's
+# catalog.  This replaces the previous community HCO installation and uses the
+# standard `openshift-cnv` namespace, `redhat-operators` CatalogSource, and
+# includes nmstate as a bundled operand.
 #
 # Environment variables (all have defaults):
-#   KVM_EMULATION          - "true" or "false" (default: "true", only bare metal compute nodes have real KVM)
-#   HCO_IMAGE_VER          - HCO catalog image version
-#   HCO_SUBSCRIPTION_CHANNEL - OLM subscription channel
-#   HPP_VERSION            - HostPath Provisioner release branch
+#   KVM_EMULATION          - "true" or "false" (default: "true", only bare metal nodes have real KVM)
+#   CNV_CHANNEL            - OLM subscription channel (default: "stable")
 #   HCO_CR_PATH            - Path to HCO CR yaml (default: playwright/fixtures/hco.yaml)
 #   SKIP_HPP               - Set to "true" to skip HPP installation
+#   HPP_VERSION            - HostPath Provisioner release branch
 #
 set -euo pipefail
 
-#
-# TODO: We can query details about the cluster and use that to determine the HCO version,
-#       KVM_EMULATION, and HPP_VERSION to use for the installation.  For now, we're using
-#       defaults from the prow ci configuration.
-#
-
 export KVM_EMULATION="${KVM_EMULATION:-true}"
-export HCO_IMAGE_VER="${HCO_IMAGE_VER:-1.19.0-unstable}"
-export HCO_SUBSCRIPTION_CHANNEL="${HCO_SUBSCRIPTION_CHANNEL:-candidate-v1.19}"
-export HPP_VERSION="${HPP_VERSION:-release-v0.21}"
+export CNV_CHANNEL="${CNV_CHANNEL:-stable}"
 HCO_CR_PATH="${HCO_CR_PATH:-playwright/fixtures/hco.yaml}"
 SKIP_HPP="${SKIP_HPP:-false}"
+HPP_VERSION="${HPP_VERSION:-release-v0.21}"
+
+CNV_NS="openshift-cnv"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 
-echo "=== HCO Installation ==="
-echo "  KVM_EMULATION:            ${KVM_EMULATION}"
-echo "  HCO_IMAGE_VER:            ${HCO_IMAGE_VER}"
-echo "  HCO_SUBSCRIPTION_CHANNEL: ${HCO_SUBSCRIPTION_CHANNEL}"
-echo "  HPP_VERSION:              ${HPP_VERSION}"
-echo "  SKIP_HPP:                 ${SKIP_HPP}"
+echo "=== OpenShift Virtualization (CNV) Installation ==="
+echo "  KVM_EMULATION: ${KVM_EMULATION}"
+echo "  CNV_CHANNEL:   ${CNV_CHANNEL}"
+echo "  CNV_NS:        ${CNV_NS}"
+echo "  SKIP_HPP:      ${SKIP_HPP}"
 echo ""
 
-# --- CatalogSource ---
-echo "Creating HCO CatalogSource..."
-oc apply -f - <<EOF
-apiVersion: operators.coreos.com/v1alpha1
-kind: CatalogSource
-metadata:
-  name: hco-unstable-catalog-source
-  namespace: openshift-marketplace
-spec:
-  sourceType: grpc
-  image: quay.io/kubevirt/hyperconverged-cluster-index:${HCO_IMAGE_VER}
-  displayName: Kubevirt Hyperconverged Cluster Operator
-  publisher: Kubevirt Project
-EOF
-
-# --- Namespace, OperatorGroup, Subscription ---
-echo "Creating HCO Namespace, OperatorGroup, and Subscription..."
+# --- Namespace + OperatorGroup + Subscription ---
+echo "Creating CNV Namespace, OperatorGroup, and Subscription..."
 oc apply -f - <<EOF
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: kubevirt-hyperconverged
+  name: ${CNV_NS}
 ---
 apiVersion: operators.coreos.com/v1
 kind: OperatorGroup
 metadata:
   name: kubevirt-hyperconverged-group
-  namespace: kubevirt-hyperconverged
+  namespace: ${CNV_NS}
+spec:
+  targetNamespaces:
+    - ${CNV_NS}
 ---
 apiVersion: operators.coreos.com/v1alpha1
 kind: Subscription
 metadata:
   name: hco-operatorhub
-  namespace: kubevirt-hyperconverged
+  namespace: ${CNV_NS}
 spec:
-  source: hco-unstable-catalog-source
+  source: redhat-operators
   sourceNamespace: openshift-marketplace
-  name: community-kubevirt-hyperconverged
-  channel: "${HCO_SUBSCRIPTION_CHANNEL}"
+  name: kubevirt-hyperconverged
+  channel: "${CNV_CHANNEL}"
+  installPlanApproval: Automatic
   config:
-    selector:
-      matchLabels:
-        name: hyperconverged-cluster-operator
     env:
     - name: KVM_EMULATION
       value: "${KVM_EMULATION}"
 EOF
 
-echo "Waiting for CatalogSource to be ready..."
-for i in $(seq 1 60); do
-  CS_STATE=$(oc get catalogsource hco-unstable-catalog-source -n openshift-marketplace \
-    -o jsonpath='{.status.connectionState.lastObservedState}' 2>/dev/null || echo "")
-  if [[ "${CS_STATE}" == "READY" ]]; then
-    echo "CatalogSource is ready"
-    break
-  fi
-  echo "CatalogSource state: ${CS_STATE:-pending} (${i}/60)"
-  sleep 10
-done
-
 echo "Waiting for Subscription to have an InstallPlan..."
 for i in $(seq 1 120); do
-  INSTALL_PLAN="$(oc get subscription hco-operatorhub -n kubevirt-hyperconverged \
+  INSTALL_PLAN="$(oc get subscription hco-operatorhub -n ${CNV_NS} \
     -o jsonpath='{.status.installPlanRef.name}' 2>/dev/null || true)"
   if [[ -n "${INSTALL_PLAN}" ]]; then
     echo "InstallPlan found: ${INSTALL_PLAN}"
     break
   fi
   if [[ "${i}" -eq 120 ]]; then
-    echo "ERROR: Timed out waiting for HCO InstallPlan"
+    echo "ERROR: Timed out waiting for CNV InstallPlan"
     exit 1
   fi
-  echo "Waiting for InstallPlan... (${i}/60)"
+  echo "Waiting for InstallPlan... (${i}/120)"
   sleep 5
 done
 
-# --- Wait for HCO deployments to appear ---
+# --- Wait for HCO operator deployment ---
 echo "Waiting for HCO operator deployment to be created..."
 for i in $(seq 1 60); do
-  DEPLOY_COUNT=$(oc get deployments -n kubevirt-hyperconverged \
-    --selector="operators.coreos.com/community-kubevirt-hyperconverged.kubevirt-hyperconverged" \
-    --no-headers 2>/dev/null | wc -l)
-  if [[ "${DEPLOY_COUNT}" -gt 0 ]]; then
-    echo "HCO deployment found (${DEPLOY_COUNT} deployment(s))"
+  DEPLOY_COUNT=$(oc get deployments -n ${CNV_NS} \
+    -l "app.kubernetes.io/component=deployment,app.kubernetes.io/managed-by=hco-operator" \
+    --no-headers 2>/dev/null | wc -l || echo "0")
+  # Also check the operator deployment itself
+  HCO_DEPLOY=$(oc get deployment hco-operator -n ${CNV_NS} --no-headers 2>/dev/null | wc -l || echo "0")
+  if [[ "${HCO_DEPLOY}" -gt 0 ]]; then
+    echo "HCO operator deployment found"
     break
   fi
   if [[ "${i}" -eq 60 ]]; then
-    echo "ERROR: Timed out waiting for HCO deployment to be created"
+    echo "ERROR: Timed out waiting for HCO operator deployment"
     exit 1
   fi
-  echo "Waiting for HCO deployment... (${i}/60)"
+  echo "Waiting for HCO operator deployment... (${i}/60)"
   sleep 10
 done
 
-echo "Waiting for HCO deployments to become available..."
-oc wait deployments \
-  --selector="operators.coreos.com/community-kubevirt-hyperconverged.kubevirt-hyperconverged" \
-  --namespace=kubevirt-hyperconverged \
+echo "Waiting for HCO operator to become available..."
+oc wait deployment hco-operator \
+  --namespace=${CNV_NS} \
   --for=condition=Available \
   --timeout=15m
 
@@ -144,7 +114,7 @@ hco_cr_is_created="false"
 
 for i in $(seq 1 20); do
   echo "Attempt ${i}/20"
-  if oc apply -f "${REPO_ROOT}/${HCO_CR_PATH}"; then
+  if oc apply -f "${REPO_ROOT}/${HCO_CR_PATH}" -n ${CNV_NS}; then
     echo "HCO CR created successfully"
     hco_cr_is_created="true"
     break
@@ -159,9 +129,55 @@ fi
 
 # --- Wait for HCO to be available ---
 echo "Waiting for HCO to report Available..."
-oc wait -n kubevirt-hyperconverged hyperconverged kubevirt-hyperconverged \
+oc wait -n ${CNV_NS} hyperconverged kubevirt-hyperconverged \
   --for=condition=Available \
   --timeout=15m
+
+# --- Wait for operands to be fully ready ---
+echo "Waiting for CNV operands to finish deploying..."
+
+echo "  Waiting for SSP to be available..."
+oc wait ssp -n ${CNV_NS} --all --for=condition=Available --timeout=10m
+
+echo "  Waiting for NetworkAttachmentDefinition CRD (nmstate)..."
+for i in $(seq 1 60); do
+  if oc get crd networkattachmentdefinitions.k8s.cni.cncf.io &>/dev/null; then
+    echo "  NAD CRD is registered"
+    break
+  fi
+  if [[ "${i}" -eq 60 ]]; then
+    echo "  WARNING: NAD CRD not found after 10 minutes (nmstate may not be installed)"
+  fi
+  sleep 10
+done
+
+echo "  Waiting for common templates to be created..."
+for i in $(seq 1 60); do
+  TPL_COUNT=$(oc get templates -n openshift --no-headers 2>/dev/null | wc -l | tr -d ' ')
+  if [[ "${TPL_COUNT}" -gt 0 ]]; then
+    echo "  Found ${TPL_COUNT} common templates"
+    break
+  fi
+  if [[ "${i}" -eq 60 ]]; then
+    echo "  WARNING: No common templates found after 10 minutes"
+  fi
+  sleep 10
+done
+
+echo "  Waiting for DataSources in os-images namespace..."
+for i in $(seq 1 90); do
+  DS_COUNT=$(oc get datasource -n openshift-virtualization-os-images --no-headers 2>/dev/null | wc -l | tr -d ' ')
+  if [[ "${DS_COUNT}" -gt 0 ]]; then
+    echo "  Found ${DS_COUNT} DataSources in openshift-virtualization-os-images"
+    break
+  fi
+  if [[ "${i}" -eq 90 ]]; then
+    echo "  WARNING: No DataSources found after 15 minutes (DataImportCrons may still be importing)"
+  fi
+  sleep 10
+done
+
+echo "CNV operands are ready."
 
 # --- HPP (optional) ---
 if [[ "${SKIP_HPP}" != "true" ]]; then
@@ -191,4 +207,7 @@ else
 fi
 
 echo ""
-echo "=== HCO Installation Complete ==="
+echo "=== OpenShift Virtualization Installation Complete ==="
+echo "  Namespace: ${CNV_NS}"
+echo "  Channel:   ${CNV_CHANNEL}"
+echo "  nmstate:   bundled (installed as CNV operand)"

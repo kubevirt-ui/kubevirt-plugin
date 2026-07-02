@@ -24,8 +24,8 @@ permissions:
   actions: read
 
 env:
-  CNV_NS: kubevirt-hyperconverged
-  OS_IMAGES_NS: kubevirt-os-images
+  CNV_NS: openshift-cnv
+  OS_IMAGES_NS: openshift-virtualization-os-images
   TEST_NS: kubevirt-plugin-ci-test-${{ github.run_id }}
   TEST_SECRET_NAME: ci-test-secret
 
@@ -129,7 +129,7 @@ jobs:
               echo ""
               echo "| Name | Version | Phase |"
               echo "| --- | --- | --- |"
-              oc get csv -n kubevirt-hyperconverged --no-headers 2>/dev/null \
+              oc get csv -n openshift-cnv --no-headers 2>/dev/null \
                 | grep -i hyperconverged \
                 | awk '{ print "| `" $1 "` | `" $2 "` | " $NF " |" }' \
                 || echo "| — | HCO CSV not found | — |"
@@ -327,7 +327,7 @@ jobs:
           mkdir -p "${TMP}"
 
           oc cluster-info dump > "${TMP}/cluster_info.json" 2>/dev/null || true
-          oc get pods -n kubevirt-hyperconverged -o wide > "${TMP}/hco_pods.txt" 2>/dev/null || true
+          oc get pods -n openshift-cnv -o wide > "${TMP}/hco_pods.txt" 2>/dev/null || true
           oc get nodes -o wide > "${TMP}/nodes.txt" 2>/dev/null || true
           oc get events -n "${TEST_NS}" --sort-by='.lastTimestamp' > "${TMP}/test_ns_events.txt" 2>/dev/null || true
           oc get pods -n "${TEST_NS}" -o wide > "${TMP}/test_ns_pods.txt" 2>/dev/null || true

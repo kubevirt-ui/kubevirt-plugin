@@ -9,6 +9,7 @@ import { CONFIRM_ACTION, KEBAB_BUTTON, SAVE_CHANGES, SECOND } from '../../utils/
 import { env } from '../../utils/env';
 import { byTest, byTestId } from '../../utils/locators';
 import { goto } from '../../utils/nav';
+import { deleteResource } from '../../utils/oc';
 
 const NS = env.testNamespace;
 
@@ -88,33 +89,67 @@ async function createNAD(
   page: Page,
   nad: typeof NAD_BRIDGE | typeof NAD_LOCALNET | typeof NAD_OVN,
 ) {
-  // Navigate directly to the namespace-scoped create form
-  await page.goto(`/k8s/ns/${NS}/k8s.cni.cncf.io~v1~NetworkAttachmentDefinition/~new`);
-  await page.waitForLoadState('domcontentloaded');
+  const createUrl = `/k8s/ns/${NS}/k8s.cni.cncf.io~v1~NetworkAttachmentDefinition/~new`;
+  const editor = page.locator('[role="textbox"][aria-multiline="true"]');
+  const notFound = page.getByRole('heading', { name: 'Page Not Found' });
 
-  // Wait for the editor to be ready before filling
-  await expect(page.locator('[role="textbox"][aria-multiline="true"]')).toBeVisible({
-    timeout: 15 * SECOND,
-  });
+  // Navigate to the create form; retry if the console shows a 404
+  // (the console bridge can briefly lose CRD context between rapid navigations)
+  for (let attempt = 0; attempt < 3; attempt++) {
+    await page.goto(createUrl);
+    await Promise.race([
+      editor.waitFor({ state: 'visible', timeout: 15 * SECOND }),
+      notFound.waitFor({ state: 'visible', timeout: 15 * SECOND }),
+    ]).catch(() => undefined);
+
+    if (await editor.isVisible()) break;
+
+    await page.waitForTimeout(3 * SECOND);
+  }
+
+  await expect(editor).toBeVisible({ timeout: 15 * SECOND });
 
   await fillYamlEditor(page, buildNADYaml(nad));
 
   await byTest(page, SAVE_CHANGES).click();
+
+  // Wait for navigation to the detail page after successful creation
+  await page.waitForURL(
+    `**/k8s/ns/${NS}/k8s.cni.cncf.io~v1~NetworkAttachmentDefinition/${nad.name}`,
+    { timeout: 30 * SECOND },
+  );
 }
 
 async function deleteNAD(page: Page, nadName: string) {
   const row = page.getByRole('row').filter({ hasText: nadName });
-  // Row kebab button uses data-test-id="kebab-button" (standard console pattern)
+  await expect(row).toBeVisible({ timeout: 10 * SECOND });
   await row.locator(`[data-test-id="${KEBAB_BUTTON}"]`).click();
-  // Menu item role is "menuitem"; text matches the full console label
   await page.getByRole('menuitem', { name: 'Delete NetworkAttachmentDefinition' }).click();
   await byTest(page, CONFIRM_ACTION).click();
   await expect(byTestId(page, nadName)).toHaveCount(0);
 }
 
-test.describe.skip('Network Attachment Definitions', () => {
+test.describe('Network Attachment Definitions', () => {
+  test.beforeAll(() => {
+    deleteResource('net-attach-def', NAD_BRIDGE.name, NS);
+    deleteResource('net-attach-def', NAD_LOCALNET.name, NS);
+    deleteResource('net-attach-def', NAD_OVN.name, NS);
+  });
+
   test.beforeEach(async ({ page }) => {
-    await goto.networking(page, NS);
+    const listHeading = page.getByRole('heading', { name: 'NetworkAttachmentDefinitions' });
+    const notFound = page.getByRole('heading', { name: 'Page Not Found' });
+
+    for (let attempt = 0; attempt < 3; attempt++) {
+      await goto.networking(page, NS);
+      await Promise.race([
+        listHeading.waitFor({ state: 'visible', timeout: 15 * SECOND }),
+        notFound.waitFor({ state: 'visible', timeout: 15 * SECOND }),
+      ]).catch(() => undefined);
+
+      if (await listHeading.isVisible()) break;
+      await page.waitForTimeout(3 * SECOND);
+    }
   });
 
   test('create NAD with MAC Spoof checked', async ({ page }) => {
