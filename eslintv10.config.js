@@ -61,7 +61,10 @@ const baseConfig = {
     curly: ['error', 'all'],
     eqeqeq: ['error', 'always'],
     'i18next/no-literal-string': 'error',
-    'id-length': ['error', { exceptions: ['t', 'e', 'i', 'a', 'b'], min: 3, properties: 'never' }],
+    'id-length': [
+      'error',
+      { exceptions: ['t', 'e', 'i', 'a', 'b', 'vm', 'vmi', 'ns'], min: 3, properties: 'never' },
+    ],
     'max-lines': ['warn', { max: 150, skipBlankLines: true, skipComments: true }],
     'no-console': 'error',
     'no-else-return': ['error', { allowElseIf: false }],

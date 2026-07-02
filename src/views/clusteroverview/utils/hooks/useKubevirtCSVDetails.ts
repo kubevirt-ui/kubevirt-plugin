@@ -6,7 +6,11 @@ import { useKubevirtClusterServiceVersion } from '@kubevirt-utils/hooks/useKubev
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 
 import { OPENSHIFT_OPERATOR_LIFECYCLE_MANAGER_NAMESPACE, PACKAGESERVER } from '../constants';
-import { CatalogSourceKind, ClusterServiceVersionKind, SubscriptionKind } from '../types';
+import {
+  type CatalogSourceKind,
+  type ClusterServiceVersionKind,
+  type SubscriptionKind,
+} from '../types';
 
 import { buildUrlForCSVSubscription } from './../utils';
 
@@ -40,7 +44,7 @@ export const useKubevirtCSVDetails = (cluster?: string): UseKubevirtCSVDetails =
     },
   );
 
-  const loadErrors = loadSourceError || loadCSVError;
+  const loadErrors = [loadSourceError, loadCSVError].filter(Boolean);
 
   const loaded = loadedCSV && loadedSource;
 

@@ -1,6 +1,6 @@
 import { modelToGroupVersionKind, ServiceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { IoK8sApiCoreV1Service } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type IoK8sApiCoreV1Service } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { useVMIAndPodsForVM } from '@kubevirt-utils/resources/vm';
 import { getServicesForVmi } from '@kubevirt-utils/resources/vmi';
@@ -10,7 +10,11 @@ import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 
 import { SSH_PORT } from './constants';
 
-export type UseSSHServiceReturnType = [service: IoK8sApiCoreV1Service, loaded: boolean];
+export type UseSSHServiceReturnType = [
+  service: IoK8sApiCoreV1Service,
+  loaded: boolean,
+  error: Error,
+];
 
 const useSSHService = (vm: V1VirtualMachine): UseSSHServiceReturnType => {
   const watchServiceResources = {
@@ -30,7 +34,7 @@ const useSSHService = (vm: V1VirtualMachine): UseSSHServiceReturnType => {
     vm ? getCluster(vm) : undefined,
   );
 
-  if (!vm) return [undefined, false];
+  if (!vm) return [undefined, false, undefined];
 
   const pod = getVMIPod(vmi, pods);
   const vmiServices = getServicesForVmi(services, pod, vm, vmi);
@@ -39,7 +43,7 @@ const useSSHService = (vm: V1VirtualMachine): UseSSHServiceReturnType => {
     service?.spec?.ports?.find((port) => parseInt(port.targetPort, 10) === SSH_PORT),
   );
 
-  return [sshVMIService, servicesLoaded || servicesError];
+  return [sshVMIService, servicesLoaded, servicesError];
 };
 
 export default useSSHService;
