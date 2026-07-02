@@ -98,13 +98,14 @@ export const useUploadProgressStore = create<UploadProgressStoreState>((set, get
     }
 
     set((state) => {
-      if (!state.uploads[uploadKey]) {
+      const entry = state.uploads[uploadKey];
+      if (!entry || entry.terminalToastShown) {
         return state;
       }
       return {
         uploads: {
           ...state.uploads,
-          [uploadKey]: { ...state.uploads[uploadKey], terminalToastShown: true },
+          [uploadKey]: { ...entry, terminalToastShown: true },
         },
       };
     });
@@ -117,13 +118,14 @@ export const useUploadProgressStore = create<UploadProgressStoreState>((set, get
     }
 
     set((state) => {
-      if (!state.uploads[uploadKey]) {
+      const entry = state.uploads[uploadKey];
+      if (!entry || entry.toastId) {
         return state;
       }
       return {
         uploads: {
           ...state.uploads,
-          [uploadKey]: { ...state.uploads[uploadKey], toastId },
+          [uploadKey]: { ...entry, toastId },
         },
       };
     });

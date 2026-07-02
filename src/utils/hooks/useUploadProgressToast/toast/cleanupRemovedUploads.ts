@@ -10,6 +10,7 @@ type CleanupRemovedUploadsParams = {
   addWarningToast: ToastActions['addWarningToast'];
   currentUploads: Record<string, UploadEntry>;
   previousUploads: Record<string, UploadEntry>;
+  processedToasts: Set<string>;
   removeToast: ToastActions['removeToast'];
   t: TFunction;
 };
@@ -18,6 +19,7 @@ export const cleanupRemovedUploads = ({
   addWarningToast,
   currentUploads,
   previousUploads,
+  processedToasts,
   removeToast,
   t,
 }: CleanupRemovedUploadsParams): void => {
@@ -25,6 +27,7 @@ export const cleanupRemovedUploads = ({
 
   Object.entries(previousUploads).forEach(([uploadKey, upload]) => {
     if (!currentUploads[uploadKey]) {
+      processedToasts.delete(uploadKey);
       if (upload.toastId) {
         removeToast(upload.toastId);
       }

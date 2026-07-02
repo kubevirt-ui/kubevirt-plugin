@@ -20,28 +20,34 @@ const UploadProgressToastListener: FC = () => {
   const trySetToastId = useUploadProgressStore((state) => state.trySetToastId);
   const removeUpload = useUploadProgressStore((state) => state.removeUpload);
   const prevUploadsRef = useRef(useUploadProgressStore.getState().uploads);
+  const processedToastsRef = useRef<Set<string>>(new Set());
 
   useEffect(() => {
     cleanupRemovedUploads({
       addWarningToast,
       currentUploads: uploads,
       previousUploads: prevUploadsRef.current,
+      processedToasts: processedToastsRef.current,
       removeToast,
       t,
     });
 
-    syncUploadToasts(uploads, {
-      addDangerToast,
-      addInfoToast,
-      addSuccessToast,
-      addWarningToast,
-      navigate,
-      removeToast,
-      removeUpload,
-      t,
-      tryMarkTerminalToastShown,
-      trySetToastId,
-    });
+    syncUploadToasts(
+      uploads,
+      {
+        addDangerToast,
+        addInfoToast,
+        addSuccessToast,
+        addWarningToast,
+        navigate,
+        removeToast,
+        removeUpload,
+        t,
+        tryMarkTerminalToastShown,
+        trySetToastId,
+      },
+      processedToastsRef.current,
+    );
 
     prevUploadsRef.current = uploads;
   }, [

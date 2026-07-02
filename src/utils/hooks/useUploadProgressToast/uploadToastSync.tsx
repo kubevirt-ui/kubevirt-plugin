@@ -27,10 +27,13 @@ export const showInProgressUploadToast = (
   uploadKey: string,
   upload: UploadEntry,
   context: UploadToastContext,
+  processedToasts: Set<string>,
 ): void => {
-  if (upload.toastId) {
+  if (upload.toastId || processedToasts.has(uploadKey)) {
     return;
   }
+
+  processedToasts.add(uploadKey);
 
   const toastId = context.addInfoToast({
     content: <UploadProgressToastContent navigate={context.navigate} uploadKey={uploadKey} />,
@@ -41,6 +44,7 @@ export const showInProgressUploadToast = (
 
   if (!context.trySetToastId(uploadKey, toastId)) {
     context.removeToast(toastId);
+    processedToasts.delete(uploadKey);
   }
 };
 
@@ -81,13 +85,15 @@ export const replaceWithTerminalUploadToast = (
 export const syncUploadToasts = (
   uploads: Record<string, UploadEntry>,
   context: UploadToastContext,
+  processedToasts: Set<string>,
 ): void => {
   Object.entries(uploads).forEach(([uploadKey, upload]) => {
     if (upload.status === UPLOAD_PROGRESS_STATUS.UPLOADING) {
-      showInProgressUploadToast(uploadKey, upload, context);
+      showInProgressUploadToast(uploadKey, upload, context, processedToasts);
       return;
     }
 
+    processedToasts.delete(uploadKey);
     replaceWithTerminalUploadToast(uploadKey, upload, context);
   });
 };
