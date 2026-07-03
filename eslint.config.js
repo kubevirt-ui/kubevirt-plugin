@@ -99,6 +99,13 @@ const testingLibraryConfig = {
   files: ['src/**/*.test.{ts,tsx}', 'src/**/*.spec.{ts,tsx}', 'src/**/__tests__/**/*.{ts,tsx}'],
 };
 
+const testFilesOverrides = {
+  files: ['**/*.test.{ts,tsx}', '**/*.spec.{ts,tsx}', '**/__tests__/**/*.{ts,tsx}'],
+  rules: {
+    'i18next/no-literal-string': 'off',
+  },
+};
+
 export default [
   ignoresConfig,
   baseConfig,
@@ -107,4 +114,5 @@ export default [
   prettierOverrides,
   githubScriptsOverrides,
   testingLibraryConfig,
+  testFilesOverrides,
 ];

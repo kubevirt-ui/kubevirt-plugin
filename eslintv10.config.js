@@ -251,6 +251,13 @@ const testingLibraryConfig = {
   files: ['**/*.test.{ts,tsx}', '**/*.spec.{ts,tsx}', '**/__tests__/**/*.{ts,tsx}'],
 };
 
+const testFilesOverrides = {
+  files: ['**/*.test.{ts,tsx}', '**/*.spec.{ts,tsx}', '**/__tests__/**/*.{ts,tsx}'],
+  rules: {
+    'i18next/no-literal-string': 'off',
+  },
+};
+
 const prettierOverrides = {
   rules: {
     'prettier/prettier': ['error', { endOfLine: 'auto' }],
@@ -296,6 +303,7 @@ export default [
   perfectionist.configs['recommended-alphabetical'],
   perfectionistOverrides,
   testingLibraryConfig,
+  testFilesOverrides,
   prettier,
   prettierOverrides,
   jsdocConfig,
