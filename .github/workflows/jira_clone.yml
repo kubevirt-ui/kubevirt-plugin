@@ -73,4 +73,4 @@ jobs:
           COMMENT_AUTHOR_ASSOCIATION: ${{ github.event.comment.author_association }}
           REPO_OWNER: ${{ github.repository_owner }}
           REPO_NAME: ${{ github.event.repository.name }}
-        run: npx tsx src/clone-pr.ts
+        run: npx tsx src/clone/index.ts

@@ -1,6 +1,6 @@
 import { Octokit } from '@octokit/rest';
 
-import { BLOCK_LABEL, VALIDATION_COMMENT_MARKER } from './types/index.js';
+import { BLOCK_LABEL, VALIDATION_COMMENT_MARKER } from './types/index';
 
 /** Post or update an idempotent comment identified by a hidden HTML marker. */
 export const upsertComment = async (
@@ -14,7 +14,10 @@ export const upsertComment = async (
   const markedBody = `${marker}\n${body}`;
 
   const comments = await octokit.paginate(octokit.issues.listComments, {
-    owner, repo, issue_number: issueNumber, per_page: 100,
+    owner,
+    repo,
+    issue_number: issueNumber,
+    per_page: 100,
   });
 
   const existing = comments.find((c) => c.body?.includes(marker));
@@ -22,7 +25,12 @@ export const upsertComment = async (
   if (existing) {
     await octokit.issues.updateComment({ owner, repo, comment_id: existing.id, body: markedBody });
   } else {
-    await octokit.issues.createComment({ owner, repo, issue_number: issueNumber, body: markedBody });
+    await octokit.issues.createComment({
+      owner,
+      repo,
+      issue_number: issueNumber,
+      body: markedBody,
+    });
   }
 };
 
@@ -33,6 +41,7 @@ export const addLabel = async (
   repo: string,
   issueNumber: number,
   label: string,
+  labelMeta?: { color: string; description: string },
 ): Promise<void> => {
   try {
     await octokit.issues.getLabel({ owner, repo, name: label });
@@ -40,8 +49,11 @@ export const addLabel = async (
     const status = (err as { status?: number }).status;
     if (status === 404) {
       await octokit.issues.createLabel({
-        owner, repo, name: label, color: 'e11d48',
-        description: 'Automated label for Jira integration',
+        owner,
+        repo,
+        name: label,
+        color: labelMeta?.color ?? 'e11d48',
+        description: labelMeta?.description ?? 'Automated label for repository integration',
       });
     }
   }
@@ -64,6 +76,22 @@ export const removeLabel = async (
   }
 };
 
+/** Fetch all label names currently applied to a PR. */
+export const getPrLabelNames = async (
+  octokit: Octokit,
+  owner: string,
+  repo: string,
+  issueNumber: number,
+): Promise<Set<string>> => {
+  const { data: labels } = await octokit.issues.listLabelsOnIssue({
+    owner,
+    repo,
+    issue_number: issueNumber,
+    per_page: 100,
+  });
+  return new Set(labels.map((label) => label.name));
+};
+
 /** Check whether a specific label is present on a PR. */
 export const hasLabel = async (
   octokit: Octokit,
@@ -72,13 +100,11 @@ export const hasLabel = async (
   issueNumber: number,
   label: string,
 ): Promise<boolean> => {
-  const { data: labels } = await octokit.issues.listLabelsOnIssue({
-    owner, repo, issue_number: issueNumber, per_page: 100,
-  });
-  return labels.some((l) => l.name === label);
+  const labels = await getPrLabelNames(octokit, owner, repo, issueNumber);
+  return labels.has(label);
 };
 
-/** Create or update a GitHub commit status for the jira-validation check. */
+/** Create or update a GitHub commit status check. */
 export const setCommitStatus = async (
   octokit: Octokit,
   owner: string,
@@ -86,13 +112,14 @@ export const setCommitStatus = async (
   sha: string,
   state: 'pending' | 'success' | 'failure' | 'error',
   description: string,
+  context = 'jira-validation',
 ): Promise<void> => {
   await octokit.repos.createCommitStatus({
     owner,
     repo,
     sha,
     state,
-    context: 'jira-validation',
+    context,
     description: description.slice(0, 140),
   });
 };

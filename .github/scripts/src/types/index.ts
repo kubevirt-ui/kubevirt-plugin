@@ -1,2 +1,2 @@
-export * from './jira.js';
-export * from './config.js';
+export * from './jira';
+export * from './config';

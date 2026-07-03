@@ -1,7 +1,8 @@
-import { JiraClient } from './jira-client.js';
-import { buildClonePayload } from './jira-clone-builder.js';
-import { jiraErrorMessage } from './utils.js';
-import type { ClonedTicket, JiraCreateIssuePayload, JiraIssue } from './types/index.js';
+/* eslint-disable no-console */
+import { JiraClient } from '../jira-client';
+import { buildClonePayload } from './clone-builder';
+import { jiraErrorMessage } from '../utils';
+import type { ClonedTicket, JiraCreateIssuePayload, JiraIssue } from '../types/index';
 
 /** Clone all Jira tickets for a release branch, linking and commenting on each original. */
 export const cloneAllTickets = async (
