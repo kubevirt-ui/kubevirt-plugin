@@ -1,11 +1,11 @@
 import { execFileSync } from 'node:child_process';
 import { Octokit } from '@octokit/rest';
 
-import { addLabel } from './github-comments.js';
-import { createPullRequest } from './github-repo.js';
-import { rewriteJiraKeysInText, stripOriginalJiraKeys } from './version-utils.js';
-import { CONFLICT_LABEL, JIRA_BASE_URL } from './types/index.js';
-import type { CherryPickResult, ClonedTicket, JiraVersion } from './types/index.js';
+import { addLabel } from '../github-comments';
+import { createPullRequest } from '../github-repo';
+import { rewriteJiraKeysInText, stripOriginalJiraKeys } from '../version-utils';
+import { CONFLICT_LABEL, JIRA_BASE_URL } from '../types/index';
+import type { CherryPickResult, ClonedTicket, JiraVersion } from '../types/index';
 
 /** Run a git command via execFileSync, returning trimmed stdout. */
 const git = (...args: string[]): string =>
@@ -81,8 +81,14 @@ export const buildCherryPickPrBody = (params: {
   cherryPickClean: boolean;
   conflictDetails: string;
 }): string => {
-  const { originalPrNumber, targetBranch, matchedVersion, clonedTickets, cherryPickClean, conflictDetails } =
-    params;
+  const {
+    originalPrNumber,
+    targetBranch,
+    matchedVersion,
+    clonedTickets,
+    cherryPickClean,
+    conflictDetails,
+  } = params;
 
   const jiraLines = clonedTickets.map(
     (ct) => `- [${ct.clonedKey}](${JIRA_BASE_URL}/browse/${ct.clonedKey})`,

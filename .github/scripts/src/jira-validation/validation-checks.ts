@@ -1,11 +1,12 @@
-import { JiraClient } from './jira-client.js';
+/* eslint-disable no-nested-ternary */
+import { JiraClient } from '../jira-client';
 import {
   extractVersionNumber,
   fixVersionMatchesBranch,
   suggestBranchForFixVersion,
-} from './version-utils.js';
-import { JIRA_BASE_URL, MIN_STORY_POINTS, REQUIRED_COMPONENT } from './types/index.js';
-import type { JiraIssue, ValidationCheck } from './types/index.js';
+} from '../version-utils';
+import { JIRA_BASE_URL, MIN_STORY_POINTS, REQUIRED_COMPONENT } from '../types/index';
+import type { JiraIssue, ValidationCheck } from '../types/index';
 
 /** Validate story points, fix version, component, and activity type on a Jira ticket. */
 export const validateTicket = async (
@@ -36,27 +37,38 @@ export const validateTicket = async (
 
   const fixVersions = issue.fields.fixVersions;
   if (fixVersions.length === 0) {
-    checks.push({ name: 'Fix Version', passed: false, message: 'No fix version is set on the ticket' });
+    checks.push({
+      name: 'Fix Version',
+      passed: false,
+      message: 'No fix version is set on the ticket',
+    });
   } else if (expectedVersion) {
     const hasMatch = fixVersions.some((fv) => fixVersionMatchesBranch(fv, expectedVersion));
     if (hasMatch) {
       checks.push({
-        name: 'Fix Version', passed: true,
+        name: 'Fix Version',
+        passed: true,
         message: `Fix version matches target branch \`${baseBranch}\` (expected: ${expectedVersion})`,
       });
     } else {
       const fvNames = fixVersions.map((fv) => fv.name).join(', ');
       const fvVersion = extractVersionNumber(fixVersions[0]!.name);
-      const suggestedBranch = fixVersions[0] ? suggestBranchForFixVersion(fixVersions[0].name) : null;
-      const suggestion = suggestedBranch ? `. Did you mean to target \`${suggestedBranch}\` instead?` : '';
+      const suggestedBranch = fixVersions[0]
+        ? suggestBranchForFixVersion(fixVersions[0].name)
+        : null;
+      const suggestion = suggestedBranch
+        ? `. Did you mean to target \`${suggestedBranch}\` instead?`
+        : '';
       checks.push({
-        name: 'Fix Version', passed: false,
+        name: 'Fix Version',
+        passed: false,
         message: `Fix version "${fvNames}" (version ${fvVersion}) does not match PR target branch \`${baseBranch}\` (expected: ${expectedVersion})${suggestion}`,
       });
     }
   } else {
     checks.push({
-      name: 'Fix Version', passed: true,
+      name: 'Fix Version',
+      passed: true,
       message: `Fix version set: ${fixVersions.map((fv) => fv.name).join(', ')} (branch alignment check skipped for \`${baseBranch}\`)`,
     });
   }
@@ -65,7 +77,8 @@ export const validateTicket = async (
     (c) => c.name.toLowerCase() === REQUIRED_COMPONENT.toLowerCase(),
   );
   checks.push({
-    name: 'Component', passed: hasComponent,
+    name: 'Component',
+    passed: hasComponent,
     message: hasComponent
       ? `Component "${REQUIRED_COMPONENT}" is set`
       : `Component "${REQUIRED_COMPONENT}" is not set (found: ${issue.fields.components.map((c) => c.name).join(', ') || 'none'})`,
@@ -78,10 +91,13 @@ export const validateTicket = async (
     activityTypeSet = raw != null && raw !== '';
   }
   checks.push({
-    name: 'Activity Type', passed: activityTypeSet,
+    name: 'Activity Type',
+    passed: activityTypeSet,
     message: activityTypeSet
       ? 'Activity Type is set'
-      : atFieldId ? 'Activity Type is not set on the ticket' : 'Could not discover "Activity Type" custom field',
+      : atFieldId
+        ? 'Activity Type is not set on the ticket'
+        : 'Could not discover "Activity Type" custom field',
   });
 
   return checks;
@@ -94,7 +110,9 @@ export const formatValidationComment = (
   allPassed: boolean,
 ): string => {
   const icon = allPassed ? ':white_check_mark:' : ':x:';
-  const title = allPassed ? `${icon} **Jira Validation Passed**` : `${icon} **Jira Validation Failed**`;
+  const title = allPassed
+    ? `${icon} **Jira Validation Passed**`
+    : `${icon} **Jira Validation Failed**`;
   const lines: string[] = [title, ''];
 
   for (const [ticketKey, checks] of allChecks) {
@@ -109,7 +127,9 @@ export const formatValidationComment = (
 
   if (!allPassed) {
     lines.push('---');
-    lines.push('> Fix the issues above in Jira, then push a new commit or re-edit the PR title to re-run validation.');
+    lines.push(
+      '> Fix the issues above in Jira, then push a new commit or re-edit the PR title to re-run validation.',
+    );
   }
 
   return lines.join('\n');

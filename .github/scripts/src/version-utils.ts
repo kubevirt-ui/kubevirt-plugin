@@ -1,5 +1,5 @@
-import { JIRA_BASE_URL } from './types/index.js';
-import type { ClonedTicket, JiraVersion } from './types/index.js';
+import { JIRA_BASE_URL } from './types/index';
+import type { ClonedTicket, JiraVersion } from './types/index';
 
 const RELEASE_BRANCH_REGEX = /^release-(\d+\.\d+)$/;
 const VERSION_NUMBER_REGEX = /(\d+\.\d+)/;

@@ -5,7 +5,7 @@ import type {
   JiraFieldMeta,
   JiraIssue,
   JiraVersion,
-} from './types/index.js';
+} from './types/index';
 
 type RequestOptions = {
   method?: string;
@@ -15,14 +15,9 @@ type RequestOptions = {
 
 /** Typed Jira Cloud REST API client with Basic auth. */
 export class JiraClient {
-  private baseUrl: string;
   private authHeader: string;
+  private baseUrl: string;
   private fieldCache: DiscoveredFields | null = null;
-
-  constructor(config: JiraConfig) {
-    this.baseUrl = config.baseUrl.replace(/\/$/, '');
-    this.authHeader = `Basic ${config.token}`;
-  }
 
   private request = async <T>(path: string, options: RequestOptions = {}): Promise<T> => {
     const { method = 'GET', body, params } = options;
@@ -45,10 +40,9 @@ export class JiraClient {
 
     if (!response.ok) {
       const text = await response.text().catch(() => '');
-      throw new Error(
-        `Jira API ${method} ${path} failed with status ${response.status}`,
-        { cause: text },
-      );
+      throw new Error(`Jira API ${method} ${path} failed with status ${response.status}`, {
+        cause: text,
+      });
     }
 
     if (response.status === 204 || response.headers.get('content-length') === '0') {
@@ -58,16 +52,39 @@ export class JiraClient {
     return response.json() as Promise<T>;
   };
 
-  /** Fetch a single Jira issue by key. */
-  getIssue = async (issueKey: string): Promise<JiraIssue> =>
-    this.request<JiraIssue>(`/issue/${issueKey}`);
+  /** Add a text comment to a Jira issue using ADF format. */
+  addComment = async (issueKey: string, bodyText: string): Promise<void> => {
+    await this.request<unknown>(`/issue/${issueKey}/comment`, {
+      method: 'POST',
+      body: {
+        body: {
+          type: 'doc',
+          version: 1,
+          content: [{ type: 'paragraph', content: [{ type: 'text', text: bodyText }] }],
+        },
+      },
+    });
+  };
 
-  /** Fetch all versions (fix versions) for a Jira project. */
-  getProjectVersions = async (projectKey: string): Promise<JiraVersion[]> =>
-    this.request<JiraVersion[]>(`/project/${projectKey}/versions`);
+  /** Create a new Jira issue. */
+  createIssue = async (payload: JiraCreateIssuePayload): Promise<JiraIssue> =>
+    this.request<JiraIssue>('/issue', { method: 'POST', body: payload });
 
-  getAllFields = async (): Promise<JiraFieldMeta[]> =>
-    this.request<JiraFieldMeta[]>('/field');
+  /** Link two issues (e.g., "Cloners" link type). */
+  createIssueLink = async (
+    inwardIssueKey: string,
+    outwardIssueKey: string,
+    linkTypeName: string = 'Cloners',
+  ): Promise<void> => {
+    await this.request<void>('/issueLink', {
+      method: 'POST',
+      body: {
+        type: { name: linkTypeName },
+        inwardIssue: { key: inwardIssueKey },
+        outwardIssue: { key: outwardIssueKey },
+      },
+    });
+  };
 
   /** Auto-discover custom field IDs for "Story Points" and "Activity Type" (cached). */
   discoverCustomFields = async (): Promise<DiscoveredFields> => {
@@ -92,39 +109,18 @@ export class JiraClient {
     return this.fieldCache;
   };
 
-  /** Create a new Jira issue. */
-  createIssue = async (payload: JiraCreateIssuePayload): Promise<JiraIssue> =>
-    this.request<JiraIssue>('/issue', { method: 'POST', body: payload });
+  getAllFields = async (): Promise<JiraFieldMeta[]> => this.request<JiraFieldMeta[]>('/field');
 
-  /** Link two issues (e.g., "Cloners" link type). */
-  createIssueLink = async (
-    inwardIssueKey: string,
-    outwardIssueKey: string,
-    linkTypeName: string = 'Cloners',
-  ): Promise<void> => {
-    await this.request<void>('/issueLink', {
-      method: 'POST',
-      body: {
-        type: { name: linkTypeName },
-        inwardIssue: { key: inwardIssueKey },
-        outwardIssue: { key: outwardIssueKey },
-      },
-    });
-  };
+  /** Fetch a single Jira issue by key. */
+  getIssue = async (issueKey: string): Promise<JiraIssue> =>
+    this.request<JiraIssue>(`/issue/${issueKey}`);
 
-  /** Add a text comment to a Jira issue using ADF format. */
-  addComment = async (issueKey: string, bodyText: string): Promise<void> => {
-    await this.request<unknown>(`/issue/${issueKey}/comment`, {
-      method: 'POST',
-      body: {
-        body: {
-          type: 'doc',
-          version: 1,
-          content: [
-            { type: 'paragraph', content: [{ type: 'text', text: bodyText }] },
-          ],
-        },
-      },
-    });
-  };
+  /** Fetch all versions (fix versions) for a Jira project. */
+  getProjectVersions = async (projectKey: string): Promise<JiraVersion[]> =>
+    this.request<JiraVersion[]>(`/project/${projectKey}/versions`);
+
+  constructor(config: JiraConfig) {
+    this.baseUrl = config.baseUrl.replace(/\/$/, '');
+    this.authHeader = `Basic ${config.token}`;
+  }
 }
