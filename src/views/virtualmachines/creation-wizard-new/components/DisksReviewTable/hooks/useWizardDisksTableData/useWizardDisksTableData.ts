@@ -7,32 +7,11 @@ import {
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import {
-  getPVCSize,
-  getPVCStorageClassName,
-} from '@kubevirt-utils/resources/bootableresources/selectors';
-import {
-  getBootDisk,
-  getDataVolumeTemplates,
-  getDisks,
-  getVolumes,
-} from '@kubevirt-utils/resources/vm';
-import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
-import {
-  getDataVolumePVCStorageClassName,
-  getDataVolumePVCStorageRequest,
-  getDataVolumeStorageClassName,
-  getDataVolumeStorageRequest,
-} from '@kubevirt-utils/resources/vm/utils/dataVolumeTemplate/selectors';
 import { DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
-import {
-  getPrintableDiskDrive,
-  getPrintableDiskInterface,
-} from '@kubevirt-utils/resources/vm/utils/disk/selectors';
-import { getHumanizedSize } from '@kubevirt-utils/utils/units';
 import { getCluster } from '@multicluster/helpers/selectors';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
-import { getSource } from '@virtualmachines/creation-wizard-new/components/DisksReviewTable/hooks/useWizardDisksTableData/utils';
+
+import { mapDiskDevicesToRows, resolveDiskDevices } from './utils/utils';
 
 type UseDisksTableDisks = (
   vm: V1VirtualMachine,
@@ -47,9 +26,6 @@ type UseDisksTableDisks = (
  */
 const useWizardDisksTableData: UseDisksTableDisks = (vm, pvcNamespace) => {
   const { t } = useKubevirtTranslation();
-  const vmDisks = getDisks(vm);
-  const vmVolumes = getVolumes(vm);
-  const vmDataVolumeTemplates = getDataVolumeTemplates(vm);
 
   const [pvcs, loaded, loadingError] = useK8sWatchData<IoK8sApiCoreV1PersistentVolumeClaim[]>({
     cluster: getCluster(vm),
@@ -60,47 +36,11 @@ const useWizardDisksTableData: UseDisksTableDisks = (vm, pvcNamespace) => {
   });
 
   const disks = useMemo(() => {
-    const diskDevices = vmDisks?.map((disk) => {
-      const volume = vmVolumes?.find(({ name }) => name === disk?.name);
-      const pvcClaimName = volume?.persistentVolumeClaim?.claimName || volume?.dataVolume?.name;
-      const pvc = pvcs?.find(({ metadata }) => metadata?.name === pvcClaimName);
-      const dataVolumeTemplate = vmDataVolumeTemplates?.find(
-        ({ metadata }) => metadata?.name === volume?.dataVolume?.name,
-      );
-      return { dataVolumeTemplate, disk, pvc, volume };
-    });
+    const diskDevices = resolveDiskDevices(vm, pvcs);
+    return mapDiskDevicesToRows(diskDevices, vm, t);
+  }, [pvcs, t, vm]);
 
-    return (diskDevices || []).map((device) => {
-      const size =
-        getDataVolumeStorageRequest(device?.dataVolumeTemplate) ||
-        getDataVolumePVCStorageRequest(device?.dataVolumeTemplate) ||
-        getPVCSize(device?.pvc);
-
-      const storageClass =
-        getDataVolumeStorageClassName(device?.dataVolumeTemplate) ||
-        getDataVolumePVCStorageClassName(device?.dataVolumeTemplate) ||
-        getPVCStorageClassName(device?.pvc) ||
-        NO_DATA_DASH;
-
-      return {
-        drive: getPrintableDiskDrive(device?.disk),
-        interface: getPrintableDiskInterface(device?.disk),
-        isBootDisk: device?.disk?.name === getBootDisk(vm)?.name,
-        isEnvDisk:
-          !!device?.volume?.configMap ||
-          !!device?.volume?.secret ||
-          !!device?.volume?.serviceAccount,
-        metadata: { name: device?.disk?.name },
-        name: device?.disk?.name,
-        namespace: device?.pvc?.metadata?.namespace,
-        size: size ? getHumanizedSize(size).string : NO_DATA_DASH,
-        source: getSource(device, t),
-        storageClass,
-      };
-    });
-  }, [pvcs, t, vm, vmDataVolumeTemplates, vmDisks, vmVolumes]);
-
-  return [disks || [], loaded, loadingError];
+  return [disks, loaded, loadingError];
 };
 
 export default useWizardDisksTableData;

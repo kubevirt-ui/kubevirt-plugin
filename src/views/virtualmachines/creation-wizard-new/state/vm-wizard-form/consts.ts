@@ -75,8 +75,11 @@ export const CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA: Record<
   string,
   FieldPath<VMWizardFormValues>
 > = {
+  CUSTOM_DISK_SIZE: 'instanceTypeData.customDiskSize',
+  DV_SOURCE: 'instanceTypeData.dvSource',
   OPERATING_SYSTEM_TYPE: 'instanceTypeData.operatingSystemType',
   PREFERENCE: 'instanceTypeData.preference',
+  PVC_SOURCE: 'instanceTypeData.pvcSource',
   ROOT: 'instanceTypeData',
   SELECTED_BOOTABLE_VOLUME: 'instanceTypeData.selectedBootableVolume',
   SELECTED_INSTANCE_TYPE: 'instanceTypeData.selectedInstanceType',

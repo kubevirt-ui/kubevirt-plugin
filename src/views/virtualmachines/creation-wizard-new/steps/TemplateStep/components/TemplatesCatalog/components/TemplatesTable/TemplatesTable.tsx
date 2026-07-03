@@ -41,10 +41,6 @@ const TemplatesTable: FC<TemplatesTableProps> = ({
     [],
   );
 
-  const handleSelectTemplate = (template: Template) => {
-    onTemplateClick(template);
-  };
-
   if (!loaded || !bootSourcesLoaded) {
     return null;
   }
@@ -75,7 +71,7 @@ const TemplatesTable: FC<TemplatesTableProps> = ({
             availableDatasources={availableDatasources}
             availableTemplatesUID={availableTemplatesUID}
             key={getUID(template) ?? getTemplateName(template) ?? `template-${idx}`}
-            onSelectTemplate={handleSelectTemplate}
+            onSelectTemplate={onTemplateClick}
             selectedTemplate={selectedTemplate}
             template={template}
           />
