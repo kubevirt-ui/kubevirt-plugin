@@ -52,6 +52,16 @@ on:
         required: false
         default: 'stable'
         type: string
+      deploy_plugin:
+        description: 'Build and deploy kubevirt-plugin from the current branch (overrides CNV-bundled plugin)'
+        required: false
+        default: false
+        type: boolean
+      plugin_image:
+        description: 'Explicit plugin image override (skip build, deploy this image directly)'
+        required: false
+        default: ''
+        type: string
 
 permissions:
   contents: read
@@ -127,61 +137,121 @@ jobs:
           fi
 
           echo "2. Deleting stale VMs..."
-          ibmcloud is instances --output json 2>&1 \
-            | jq -r --arg cn "${CLUSTER_NAME}" '.[] | select(.name | startswith($cn)) | .id' \
+          ibmcloud is instances --output json 2>/dev/null \
+            | jq -r --arg cn "${CLUSTER_NAME}" 'if type == "array" then .[] | select(.name | startswith($cn)) | .id else empty end' \
             | while read -r id; do echo "  Deleting VM ${id}"; ibmcloud is instance-delete "${id}" -f 2>&1 || echo "  WARNING: failed to delete VM ${id}"; done
           sleep 60
 
-          echo "3. Deleting stale load balancers..."
-          ibmcloud is lbs --output json 2>&1 \
-            | jq -r --arg cn "${CLUSTER_NAME}" '.[] | select(.name | startswith($cn)) | .id' \
-            | while read -r id; do echo "  Deleting LB ${id}"; ibmcloud is load-balancer-delete "${id}" -f 2>&1 || echo "  WARNING: failed to delete LB ${id}"; done
+          echo "3. Collecting stale subnet IDs..."
+          STALE_SUBNET_IDS=$(ibmcloud is subnets --output json 2>/dev/null \
+            | jq -r --arg cn "${CLUSTER_NAME}" 'if type == "array" then [.[] | select(.name | startswith($cn)) | .id] else [] end | join("\n")' 2>/dev/null || true)
+          echo "  Found $(echo "${STALE_SUBNET_IDS}" | grep -c . 2>/dev/null || echo 0) stale subnet(s)"
+
+          echo "4. Deleting load balancers in stale subnets + by name..."
+          ALL_LBS=$(ibmcloud is lbs --output json 2>/dev/null || echo '[]')
+          if [[ -n "${STALE_SUBNET_IDS}" ]]; then
+            SUBNET_FILTER=$(echo "${STALE_SUBNET_IDS}" | jq -R -s 'split("\n") | map(select(length > 0))')
+            echo "${ALL_LBS}" \
+              | jq -r --argjson sids "${SUBNET_FILTER}" \
+                'if type == "array" then .[] | select([.subnets[]?.id] | any(. as $s | $sids | any(. == $s))) | .id else empty end' \
+              | sort -u \
+              | while read -r id; do echo "  Deleting LB ${id} (in stale subnet)"; ibmcloud is load-balancer-delete "${id}" -f 2>&1 || echo "  WARNING: failed to delete LB ${id}"; done
+          fi
+          echo "${ALL_LBS}" \
+            | jq -r --arg cn "${CLUSTER_NAME}" 'if type == "array" then .[] | select(.name | startswith($cn) or (.name | startswith("kube-" + $cn))) | .id else empty end' \
+            | while read -r id; do echo "  Deleting LB ${id} (by name)"; ibmcloud is load-balancer-delete "${id}" -f 2>&1 || echo "  WARNING: failed to delete LB ${id}"; done
           sleep 60
 
-          echo "4. Waiting for LB deletions to complete..."
-          for i in $(seq 1 12); do
-            REMAINING=$(ibmcloud is lbs --output json 2>/dev/null \
+          echo "5. Waiting for LB deletions to complete..."
+          for i in $(seq 1 24); do
+            CURRENT_LBS=$(ibmcloud is lbs --output json 2>/dev/null || echo '[]')
+            REMAINING=0
+            if [[ -n "${STALE_SUBNET_IDS}" ]]; then
+              SUBNET_FILTER=$(echo "${STALE_SUBNET_IDS}" | jq -R -s 'split("\n") | map(select(length > 0))')
+              BY_SUBNET=$(echo "${CURRENT_LBS}" \
+                | jq -r --argjson sids "${SUBNET_FILTER}" \
+                  'if type == "array" then [.[] | select([.subnets[]?.id] | any(. as $s | $sids | any(. == $s)))] | length else 0 end' 2>/dev/null || echo "0")
+              REMAINING=$((REMAINING + BY_SUBNET))
+            fi
+            BY_NAME=$(echo "${CURRENT_LBS}" \
               | jq -r --arg cn "${CLUSTER_NAME}" \
                 'if type == "array" then [.[] | select(.name | startswith($cn) or (.name | startswith("kube-" + $cn)))] | length else 0 end' 2>/dev/null || echo "0")
-            if [[ "${REMAINING}" -eq 0 || -z "${REMAINING}" ]]; then
+            REMAINING=$((REMAINING > BY_NAME ? REMAINING : REMAINING + BY_NAME))
+            if [[ "${REMAINING}" -eq 0 ]]; then
               echo "  All LBs deleted."
               break
             fi
-            echo "  ${REMAINING} LB(s) still deleting... (${i}/12)"
+            echo "  ${REMAINING} LB(s) still deleting... (${i}/24)"
             sleep 30
           done
 
-          echo "5. Detaching public gateways from subnets..."
+          echo "6. Detaching public gateways from subnets..."
           ibmcloud is subnets --output json 2>/dev/null \
             | jq -r --arg cn "${CLUSTER_NAME}" '.[] | select(.name | startswith($cn)) | select(.public_gateway != null) | .id' \
             | while read -r id; do echo "  Detaching gateway from subnet ${id}"; ibmcloud is subnet-public-gateway-detach "${id}" -f 2>&1 || echo "  WARNING: failed to detach gateway from subnet ${id}"; done
           sleep 10
 
-          echo "6. Deleting stale subnets..."
-          ibmcloud is subnets --output json 2>&1 \
-            | jq -r --arg cn "${CLUSTER_NAME}" '.[] | select(.name | startswith($cn)) | .id' \
+          echo "7. Deleting stale subnets..."
+          ibmcloud is subnets --output json 2>/dev/null \
+            | jq -r --arg cn "${CLUSTER_NAME}" 'if type == "array" then .[] | select(.name | startswith($cn)) | .id else empty end' \
             | while read -r id; do echo "  Deleting subnet ${id}"; ibmcloud is subnet-delete "${id}" -f 2>&1 || echo "  WARNING: failed to delete subnet ${id}"; done
           sleep 30
 
-          echo "7. Deleting stale public gateways..."
-          ibmcloud is public-gateways --output json 2>&1 \
-            | jq -r --arg cn "${CLUSTER_NAME}" '.[] | select(.name | startswith($cn)) | .id' \
+          echo "8. Deleting stale public gateways..."
+          ibmcloud is public-gateways --output json 2>/dev/null \
+            | jq -r --arg cn "${CLUSTER_NAME}" 'if type == "array" then .[] | select(.name | startswith($cn)) | .id else empty end' \
             | while read -r id; do echo "  Deleting gateway ${id}"; ibmcloud is public-gateway-delete "${id}" -f 2>&1 || echo "  WARNING: failed to delete gateway ${id}"; done
 
-          echo "8. Deleting stale floating IPs..."
-          ibmcloud is ips --output json 2>&1 \
-            | jq -r --arg cn "${CLUSTER_NAME}" '.[] | select(.name | startswith($cn)) | .id' \
+          echo "9. Deleting stale floating IPs..."
+          ibmcloud is ips --output json 2>/dev/null \
+            | jq -r --arg cn "${CLUSTER_NAME}" 'if type == "array" then .[] | select(.name | startswith($cn)) | .id else empty end' \
             | while read -r id; do echo "  Releasing IP ${id}"; ibmcloud is floating-ip-release "${id}" -f 2>&1 || echo "  WARNING: failed to release IP ${id}"; done
 
-          echo "9. Deleting stale security groups..."
-          ibmcloud is security-groups --output json 2>&1 \
-            | jq -r --arg cn "${CLUSTER_NAME}" '.[] | select(.name | startswith($cn)) | .id' \
-            | while read -r id; do echo "  Deleting SG ${id}"; ibmcloud is security-group-delete "${id}" -f 2>&1 || echo "  WARNING: failed to delete SG ${id}"; done
+          echo "10. Stripping security group rules (breaks circular references)..."
+          ibmcloud is security-groups --output json 2>/dev/null \
+            | jq -r --arg cn "${CLUSTER_NAME}" 'if type == "array" then .[] | select(.name | startswith($cn)) | .id else empty end' \
+            | while read -r sg_id; do
+                ibmcloud is security-group-rules "${sg_id}" --output json 2>/dev/null \
+                  | jq -r '.[] | .id' \
+                  | while read -r rule_id; do
+                      ibmcloud is security-group-rule-delete "${sg_id}" "${rule_id}" -f 2>&1 || true
+                    done
+              done
 
-          echo "10. Deleting stale VPCs..."
-          ibmcloud is vpcs --output json 2>&1 \
-            | jq -r --arg cn "${CLUSTER_NAME}" '.[] | select(.name | startswith($cn)) | .id' \
+          echo "11. Deleting stale security groups..."
+          for pass in 1 2 3; do
+            REMAINING_SGS=$(ibmcloud is security-groups --output json 2>/dev/null \
+              | jq -r --arg cn "${CLUSTER_NAME}" '[.[] | select(.name | startswith($cn))] | length' 2>/dev/null || echo "0")
+            if [[ "${REMAINING_SGS}" -eq 0 || -z "${REMAINING_SGS}" ]]; then
+              break
+            fi
+            echo "  Pass ${pass}: ${REMAINING_SGS} security group(s) remaining..."
+            ibmcloud is security-groups --output json 2>/dev/null \
+              | jq -r --arg cn "${CLUSTER_NAME}" 'if type == "array" then .[] | select(.name | startswith($cn)) | .id else empty end' \
+              | while read -r id; do ibmcloud is security-group-delete "${id}" -f 2>&1 || true; done
+            sleep 10
+          done
+
+          echo "12. Retrying stale subnets (after LBs fully removed)..."
+          ibmcloud is subnets --output json 2>/dev/null \
+            | jq -r --arg cn "${CLUSTER_NAME}" 'if type == "array" then .[] | select(.name | startswith($cn)) | .id else empty end' \
+            | while read -r id; do ibmcloud is subnet-delete "${id}" -f 2>&1 || echo "  WARNING: subnet ${id} still in use"; done
+          sleep 10
+
+          echo "13. Deleting stale VPCs..."
+          ibmcloud is vpcs --output json 2>/dev/null \
+            | jq -r --arg cn "${CLUSTER_NAME}" 'if type == "array" then .[] | select(.name | startswith($cn)) | .id else empty end' \
             | while read -r id; do echo "  Deleting VPC ${id}"; ibmcloud is vpc-delete "${id}" -f 2>&1 || echo "  WARNING: failed to delete VPC ${id}"; done
+
+          echo "14. Deleting orphaned custom images (RHCOS)..."
+          ibmcloud is images --visibility private --output json 2>/dev/null \
+            | jq -r --arg cn "${CLUSTER_NAME}" 'if type == "array" then .[] | select(.name | startswith($cn)) | .id else empty end' \
+            | while read -r id; do echo "  Deleting image ${id}"; ibmcloud is image-delete "${id}" -f 2>&1 || echo "  WARNING: failed to delete image ${id}"; done
+
+          echo "15. Deleting orphaned COS instances..."
+          ibmcloud resource service-instances --service-name cloud-object-storage --output json 2>/dev/null \
+            | jq -r --arg cn "${CLUSTER_NAME}" '.[] | select(.name | startswith($cn)) | .id' \
+            | while read -r id; do echo "  Deleting COS ${id}"; ibmcloud resource service-instance-delete "${id}" -f --recursive 2>&1 || echo "  WARNING: failed to delete COS ${id}"; done
 
           echo "=== Stale resource cleanup complete ==="
 
@@ -371,9 +441,16 @@ jobs:
         env:
           OC_VERSION_INPUT: ${{ inputs.openshift_version }}
         run: |
-          OCP_CHANNEL="stable-${OC_VERSION_INPUT%%_*}"
-          echo "Resolving ${OCP_CHANNEL} to latest patch version..."
-          MIRROR="https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/${OCP_CHANNEL}"
+          OCP_BASE="${OC_VERSION_INPUT%%_*}"
+
+          if [[ "${OCP_BASE}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Using pinned OCP version: ${OCP_BASE}"
+            MIRROR="https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/${OCP_BASE}"
+          else
+            OCP_CHANNEL="stable-${OCP_BASE}"
+            echo "Resolving ${OCP_CHANNEL} to latest patch version..."
+            MIRROR="https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/${OCP_CHANNEL}"
+          fi
 
           echo "Downloading openshift-install..."
           curl -sL "${MIRROR}/openshift-install-linux.tar.gz" | tar -xz -C /usr/local/bin openshift-install
@@ -451,6 +528,32 @@ jobs:
             fi
           fi
 
+      - name: IPI post-install DNS diagnostics
+        if: inputs.infrastructure_type == 'ipi' && always()
+        continue-on-error: true
+        env:
+          INSTALL_DIR: ${{ runner.temp }}/ipi-install
+        run: |
+          echo "=== IPI DNS Diagnostics ==="
+          INFRA_ID=$(jq -r '.infraID // "unknown"' "${INSTALL_DIR}/metadata.json" 2>/dev/null || echo "unknown")
+          echo "  Infra ID: ${INFRA_ID}"
+
+          echo "Checking CIS DNS records..."
+          ibmcloud cis instance-set "$(ibmcloud cis instances --output json 2>/dev/null | jq -r '.[0].crn // empty')" 2>/dev/null || true
+          ZONE_ID=$(ibmcloud cis domains --output json 2>/dev/null | jq -r '.[0].id // empty' || true)
+          if [[ -n "${ZONE_ID}" ]]; then
+            ibmcloud cis dns-records "${ZONE_ID}" --output json 2>/dev/null \
+              | jq -r '.[] | "\(.type) \(.name) -> \(.content)"' || echo "  No DNS records found"
+          else
+            echo "  WARNING: Could not find CIS zone"
+          fi
+
+          echo "Checking DNS resolution from runner..."
+          for host in "api.${CLUSTER_NAME}.${BASE_DOMAIN}" "*.apps.${CLUSTER_NAME}.${BASE_DOMAIN}"; do
+            echo -n "  ${host}: "
+            dig +short "${host}" 2>/dev/null || echo "FAILED"
+          done
+
       - name: Upload IPI install artifacts
         if: inputs.infrastructure_type == 'ipi' && always()
         uses: actions/upload-artifact@v7
@@ -495,10 +598,39 @@ jobs:
 
             export KUBECONFIG="${KUBECONFIG_PATH}"
             echo "KUBECONFIG=${KUBECONFIG_PATH}" >> "$GITHUB_ENV"
+
+            echo "Waiting for API DNS to resolve (up to 10 minutes)..."
+            API_HOST="api.${CLUSTER_NAME}.${BASE_DOMAIN}"
+            for i in $(seq 1 20); do
+              if dig +short "${API_HOST}" 2>/dev/null | grep -q .; then
+                echo "  DNS resolved for ${API_HOST}"
+                break
+              fi
+              if [[ "${i}" -eq 20 ]]; then
+                echo "::error::DNS for ${API_HOST} did not resolve within 10 minutes"
+                dig "${API_HOST}" 2>/dev/null || true
+                exit 1
+              fi
+              echo "  Waiting for DNS resolution... (${i}/20)"
+              sleep 30
+            done
           else
             ibmcloud oc cluster config --cluster "${CLUSTER_NAME}" --admin
           fi
-          oc cluster-info
+
+          echo "Verifying cluster connectivity..."
+          for i in $(seq 1 6); do
+            if oc cluster-info 2>/dev/null; then
+              break
+            fi
+            if [[ "${i}" -eq 6 ]]; then
+              echo "::error::Could not connect to cluster after DNS resolved"
+              oc cluster-info 2>&1 || true
+              exit 1
+            fi
+            echo "  Retrying cluster connection... (${i}/6)"
+            sleep 10
+          done
           oc get nodes -o wide
 
       - name: Open ingress LB security group for public access
@@ -649,6 +781,25 @@ jobs:
         run: |
           ./ci-scripts/check-cluster-health.sh
 
+      - name: Build kubevirt-plugin image
+        if: inputs.deploy_plugin && inputs.plugin_image == ''
+        id: build_plugin
+        run: |
+          PLUGIN_IMAGE_REF=$(./ci-scripts/images/setup-plugin-image.sh \
+            | grep '^IMAGE_REF=' | cut -d= -f2-)
+          echo "plugin_image=${PLUGIN_IMAGE_REF}" >> "$GITHUB_OUTPUT"
+
+      - name: Deploy kubevirt-plugin override
+        if: inputs.deploy_plugin && (inputs.plugin_image != '' || steps.build_plugin.outputs.plugin_image != '')
+        env:
+          PLUGIN_IMAGE: ${{ inputs.plugin_image || steps.build_plugin.outputs.plugin_image }}
+        run: |
+          if [[ -z "${PLUGIN_IMAGE}" ]]; then
+            echo "::error::PLUGIN_IMAGE is empty — build likely failed"
+            exit 1
+          fi
+          ./ci-scripts/deploy-plugin-override.sh
+
       # Optional: create an htpasswd admin user for ROKS clusters (no kubeadmin).
       # Set CLUSTER_ADMIN_PASSWORD secret to enable. Not needed for IPI.
       - name: Create console admin user (ROKS)
@@ -748,6 +899,8 @@ jobs:
 
       - name: Setup summary
         if: always()
+        env:
+          PLUGIN_IMG_OVERRIDE: ${{ inputs.plugin_image || steps.build_plugin.outputs.plugin_image }}
         run: |
           echo "## Hot Cluster Setup Summary" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
@@ -761,6 +914,12 @@ jobs:
           echo "| Workers | \`${{ inputs.worker_count }}\` |" >> "$GITHUB_STEP_SUMMARY"
           echo "| KVM Emulation | \`${{ inputs.kvm_emulation }}\` |" >> "$GITHUB_STEP_SUMMARY"
           echo "| CNV Channel | \`${{ inputs.cnv_channel || 'stable' }}\` |" >> "$GITHUB_STEP_SUMMARY"
+          if [[ "${{ inputs.deploy_plugin }}" == "true" ]]; then
+            PLUGIN_IMG="${PLUGIN_IMG_OVERRIDE:-build failed}"
+            echo "| Plugin Override | \`${PLUGIN_IMG}\` |" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "| Plugin Override | \`disabled (CNV-bundled)\` |" >> "$GITHUB_STEP_SUMMARY"
+          fi
           CONSOLE_URL=$(oc get consoles.config.openshift.io cluster -o jsonpath='{.status.consoleURL}' 2>/dev/null || echo "")
           if [[ -n "${CONSOLE_URL}" ]]; then
             echo "| Console | [${CONSOLE_URL}](${CONSOLE_URL}) |" >> "$GITHUB_STEP_SUMMARY"

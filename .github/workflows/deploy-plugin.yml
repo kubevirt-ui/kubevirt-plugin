@@ -1,0 +1,126 @@
+name: Deploy Plugin to Hot Cluster
+
+on:
+  workflow_dispatch:
+    inputs:
+      plugin_image:
+        description: 'Explicit plugin image (skip build, deploy directly). Leave empty to build from current branch.'
+        required: false
+        default: ''
+        type: string
+      cluster_name:
+        description: 'Cluster name'
+        required: true
+        default: 'kubevirt-plugin-ci'
+        type: string
+      infrastructure_type:
+        description: 'Infrastructure type used for the cluster (IPI not supported — use ibmc-cluster-setup.yml with deploy_plugin: true)'
+        required: true
+        default: 'vpc'
+        type: choice
+        options:
+          - vpc
+          - classic
+          - ipi
+
+permissions:
+  contents: read
+
+env:
+  CLUSTER_NAME: ${{ inputs.cluster_name || 'kubevirt-plugin-ci' }}
+  INFRASTRUCTURE_TYPE: ${{ inputs.infrastructure_type || 'vpc' }}
+  IBM_REGION: eu-de
+  IBM_RESOURCE_GROUP: cnv-ui
+
+jobs:
+  deploy-plugin:
+    name: Build & Deploy Plugin
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Validate plugin_image format
+        if: inputs.plugin_image != ''
+        env:
+          PLUGIN_IMAGE: ${{ inputs.plugin_image }}
+        run: |
+          if ! echo "${PLUGIN_IMAGE}" | grep -qE '^[a-zA-Z0-9][a-zA-Z0-9._:/@-]+$'; then
+            echo "::error::PLUGIN_IMAGE contains invalid characters: ${PLUGIN_IMAGE}"
+            exit 1
+          fi
+
+      # --- Cluster access (ROKS) ---
+      - name: Setup IBM Cloud CLI
+        if: env.INFRASTRUCTURE_TYPE != 'ipi'
+        uses: IBM/actions-ibmcloud-cli@v2
+        with:
+          api_key: ${{ secrets.IC_KEY }}
+          region: ${{ env.IBM_REGION }}
+          group: ${{ env.IBM_RESOURCE_GROUP }}
+          plugins: kubernetes-service
+
+      - name: Install oc client (ROKS)
+        if: env.INFRASTRUCTURE_TYPE != 'ipi'
+        run: |
+          CLUSTER_JSON="$(ibmcloud oc cluster get --cluster "${CLUSTER_NAME}" --output json)"
+          export CLUSTER_JSON
+          bash ./ci-scripts/install-oc-client.sh
+
+      - name: Configure kubeconfig (ROKS)
+        if: env.INFRASTRUCTURE_TYPE != 'ipi'
+        run: |
+          ibmcloud oc cluster config --cluster "${CLUSTER_NAME}" --admin
+          oc cluster-info
+
+      # --- Cluster access (IPI) ---
+      - name: IPI not supported (use ibmc-cluster-setup.yml)
+        if: env.INFRASTRUCTURE_TYPE == 'ipi'
+        run: |
+          echo "::error::IPI clusters are not supported by this standalone workflow."
+          echo "The IPI kubeconfig is not stored in CI artifacts for security reasons."
+          echo ""
+          echo "To deploy the plugin to an IPI cluster, use the 'IBM Cloud Hot Cluster Setup'"
+          echo "workflow with 'deploy_plugin: true' instead — it has direct access to the"
+          echo "kubeconfig during the same run."
+          exit 1
+
+      # --- Build & Deploy ---
+      - name: Build kubevirt-plugin image
+        if: inputs.plugin_image == ''
+        id: build_plugin
+        run: |
+          PLUGIN_IMAGE_REF=$(./ci-scripts/images/setup-plugin-image.sh \
+            | grep '^IMAGE_REF=' | cut -d= -f2-)
+          echo "plugin_image=${PLUGIN_IMAGE_REF}" >> "$GITHUB_OUTPUT"
+
+      - name: Deploy kubevirt-plugin override
+        if: inputs.plugin_image != '' || steps.build_plugin.outputs.plugin_image != ''
+        env:
+          PLUGIN_IMAGE: ${{ inputs.plugin_image || steps.build_plugin.outputs.plugin_image }}
+        run: |
+          if [[ -z "${PLUGIN_IMAGE}" ]]; then
+            echo "::error::PLUGIN_IMAGE is empty — build likely failed"
+            exit 1
+          fi
+          ./ci-scripts/deploy-plugin-override.sh
+
+      - name: Deployment summary
+        if: always()
+        env:
+          PLUGIN_IMG: ${{ inputs.plugin_image || steps.build_plugin.outputs.plugin_image || 'build failed' }}
+          BRANCH: ${{ github.ref_name }}
+        run: |
+          CONSOLE_URL=$(oc get consoles.config.openshift.io cluster -o jsonpath='{.status.consoleURL}' 2>/dev/null || echo "unknown")
+
+          {
+            echo "## Plugin Deployment Summary"
+            echo ""
+            echo "| Parameter | Value |"
+            echo "|-----------|-------|"
+            echo "| Branch | \`${BRANCH}\` |"
+            echo "| Plugin Image | \`${PLUGIN_IMG}\` |"
+            echo "| Cluster | \`${CLUSTER_NAME}\` |"
+            echo "| Console | [${CONSOLE_URL}](${CONSOLE_URL}) |"
+          } >> "$GITHUB_STEP_SUMMARY"
