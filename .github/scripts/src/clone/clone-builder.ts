@@ -1,11 +1,11 @@
-import { sanitizeDescriptionForClone } from './jira-adf-utils.js';
-import { buildClonedIssueSummary } from './version-utils.js';
+import { sanitizeDescriptionForClone } from './adf-utils';
+import { buildClonedIssueSummary } from '../version-utils';
 import type {
   DiscoveredFields,
   JiraCreateIssuePayload,
   JiraIssue,
   JiraVersion,
-} from './types/index.js';
+} from '../types/index';
 
 const isCustomFieldOption = (value: unknown): value is { id: string } =>
   typeof value === 'object' &&

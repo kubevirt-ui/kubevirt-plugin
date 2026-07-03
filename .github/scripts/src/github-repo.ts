@@ -1,10 +1,9 @@
 import { Octokit } from '@octokit/rest';
 
-import type { GitHubConfig } from './types/index.js';
+import type { GitHubConfig } from './types/index';
 
 /** Create an authenticated Octokit instance. */
-export const createOctokit = (config: GitHubConfig): Octokit =>
-  new Octokit({ auth: config.token });
+export const createOctokit = (config: GitHubConfig): Octokit => new Octokit({ auth: config.token });
 
 /** Fetch all branch names matching "release-*" from the repo. */
 export const getReleaseBranches = async (
@@ -47,6 +46,20 @@ export const branchExists = async (
     return false;
   }
 };
+
+/** List all file paths changed in a pull request. */
+export const getPullRequestFiles = async (
+  octokit: Octokit,
+  owner: string,
+  repo: string,
+  pullNumber: number,
+): Promise<Array<{ filename: string; patch?: string }>> =>
+  octokit.paginate(octokit.pulls.listFiles, {
+    owner,
+    repo,
+    pull_number: pullNumber,
+    per_page: 100,
+  });
 
 /** Create a pull request and return its number and URL. */
 export const createPullRequest = async (

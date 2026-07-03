@@ -1,11 +1,12 @@
-import { JiraClient } from './jira-client.js';
-import { createOctokit, getReleaseBranches } from './github-repo.js';
-import { hasLabel, reportValidation, setCommitStatus } from './github-comments.js';
-import { extractTicketIds, getExpectedVersionForBranch } from './version-utils.js';
-import { validateTicket, formatValidationComment } from './validation-checks.js';
-import { requireEnv, safeErrorMessage } from './utils.js';
-import { JIRA_BASE_URL, SKIP_LABEL } from './types/index.js';
-import type { GitHubConfig, JiraIssue, ValidationCheck } from './types/index.js';
+/* eslint-disable no-console */
+import { JiraClient } from '../jira-client';
+import { createOctokit, getReleaseBranches } from '../github-repo';
+import { hasLabel, reportValidation, setCommitStatus } from '../github-comments';
+import { extractTicketIds, getExpectedVersionForBranch } from '../version-utils';
+import { validateTicket, formatValidationComment } from './validation-checks';
+import { requireEnv, safeErrorMessage } from '../utils';
+import { JIRA_BASE_URL, SKIP_LABEL } from '../types/index';
+import type { GitHubConfig, JiraIssue, ValidationCheck } from '../types/index';
 
 /** Entrypoint: extract ticket IDs from PR title and validate each against Jira. */
 const main = async (): Promise<void> => {
@@ -22,18 +23,36 @@ const main = async (): Promise<void> => {
   const octokit = createOctokit(ghConfig);
 
   if (headSha) {
-    await setCommitStatus(octokit, ghConfig.owner, ghConfig.repo, headSha, 'pending', 'Jira validation in progress…');
+    await setCommitStatus(
+      octokit,
+      ghConfig.owner,
+      ghConfig.repo,
+      headSha,
+      'pending',
+      'Jira validation in progress…',
+    );
   }
 
   const shouldSkip = await hasLabel(octokit, ghConfig.owner, ghConfig.repo, prNumber, SKIP_LABEL);
   if (shouldSkip) {
     console.log(`Label "${SKIP_LABEL}" found, skipping Jira validation.`);
     await reportValidation(
-      octokit, ghConfig.owner, ghConfig.repo, prNumber, true,
+      octokit,
+      ghConfig.owner,
+      ghConfig.repo,
+      prNumber,
+      true,
       `:white_check_mark: **Jira Validation Skipped** — \`${SKIP_LABEL}\` label is present.`,
     );
     if (headSha) {
-      await setCommitStatus(octokit, ghConfig.owner, ghConfig.repo, headSha, 'success', 'Jira validation skipped');
+      await setCommitStatus(
+        octokit,
+        ghConfig.owner,
+        ghConfig.repo,
+        headSha,
+        'success',
+        'Jira validation skipped',
+      );
     }
     return;
   }
@@ -50,7 +69,14 @@ const main = async (): Promise<void> => {
 
     await reportValidation(octokit, ghConfig.owner, ghConfig.repo, prNumber, false, msg);
     if (headSha) {
-      await setCommitStatus(octokit, ghConfig.owner, ghConfig.repo, headSha, 'failure', 'No CNV ticket ID found in PR title');
+      await setCommitStatus(
+        octokit,
+        ghConfig.owner,
+        ghConfig.repo,
+        headSha,
+        'failure',
+        'No CNV ticket ID found in PR title',
+      );
     }
     process.exit(1);
   }
@@ -73,7 +99,11 @@ const main = async (): Promise<void> => {
       issue = await jira.getIssue(ticketKey);
     } catch (err) {
       allChecks.set(ticketKey, [
-        { name: 'Ticket Exists', passed: false, message: `Could not fetch ticket: ${safeErrorMessage(err)}` },
+        {
+          name: 'Ticket Exists',
+          passed: false,
+          message: `Could not fetch ticket: ${safeErrorMessage(err)}`,
+        },
       ]);
       allPassed = false;
       continue;
@@ -92,7 +122,10 @@ const main = async (): Promise<void> => {
 
   if (headSha) {
     await setCommitStatus(
-      octokit, ghConfig.owner, ghConfig.repo, headSha,
+      octokit,
+      ghConfig.owner,
+      ghConfig.repo,
+      headSha,
       allPassed ? 'success' : 'failure',
       allPassed ? 'All Jira checks passed' : 'One or more Jira checks failed',
     );
@@ -117,7 +150,14 @@ main().catch(async (err) => {
         repo: process.env.REPO_NAME ?? '',
       };
       const octokit = createOctokit(ghConfig);
-      await setCommitStatus(octokit, ghConfig.owner, ghConfig.repo, headSha, 'error', 'Jira validation encountered an unexpected error');
+      await setCommitStatus(
+        octokit,
+        ghConfig.owner,
+        ghConfig.repo,
+        headSha,
+        'error',
+        'Jira validation encountered an unexpected error',
+      );
     } catch {
       // best-effort
     }
