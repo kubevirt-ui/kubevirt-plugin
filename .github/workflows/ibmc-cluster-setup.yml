@@ -494,16 +494,9 @@ jobs:
           sed 's/pullSecret:.*/pullSecret: REDACTED/' "${INSTALL_DIR}/install-config.yaml"
           echo "::endgroup::"
 
-      - name: Generate CCO credential secrets
-        if: inputs.infrastructure_type == 'ipi'
-        env:
-          IC_API_KEY: ${{ secrets.IC_KEY }}
-          INSTALL_DIR: ${{ runner.temp }}/ipi-install
-        run: |
-          openshift-install create manifests --dir="${INSTALL_DIR}"
-          bash ./ci-scripts/create-ibmcloud-cco-secrets.sh
+          cp "${INSTALL_DIR}/install-config.yaml" "${INSTALL_DIR}/install-config.yaml.bak"
 
-      - name: Create IPI cluster
+      - name: Create IPI cluster (with retry)
         id: ipi_create
         if: inputs.infrastructure_type == 'ipi'
         env:
@@ -511,22 +504,75 @@ jobs:
           INSTALL_DIR: ${{ runner.temp }}/ipi-install
         run: |
           export IC_API_KEY
-          echo "Running openshift-install create cluster..."
-          INSTALL_EXIT=0
-          openshift-install create cluster --dir="${INSTALL_DIR}" --log-level=info 2>&1 | tee "${INSTALL_DIR}/install.log" || INSTALL_EXIT=$?
+          MAX_ATTEMPTS=3
 
-          if [[ "${INSTALL_EXIT}" -ne 0 ]]; then
-            echo "::warning::openshift-install exited ${INSTALL_EXIT} — checking if cluster is usable..."
+          for attempt in $(seq 1 "${MAX_ATTEMPTS}"); do
+            echo ""
+            echo "=========================================="
+            echo "  IPI install attempt ${attempt}/${MAX_ATTEMPTS}"
+            echo "=========================================="
+
+            if [[ "${attempt}" -gt 1 ]]; then
+              echo "Preparing fresh install directory for retry..."
+              rm -rf "${INSTALL_DIR}/manifests" "${INSTALL_DIR}/openshift" "${INSTALL_DIR}/.openshift_install"* "${INSTALL_DIR}/auth" "${INSTALL_DIR}/metadata.json" "${INSTALL_DIR}/install.log" "${INSTALL_DIR}/terraform"*
+              cp "${INSTALL_DIR}/install-config.yaml.bak" "${INSTALL_DIR}/install-config.yaml"
+
+              echo "Regenerating manifests and CCO secrets..."
+              openshift-install create manifests --dir="${INSTALL_DIR}"
+              bash ./ci-scripts/create-ibmcloud-cco-secrets.sh
+            else
+              openshift-install create manifests --dir="${INSTALL_DIR}"
+              bash ./ci-scripts/create-ibmcloud-cco-secrets.sh
+            fi
+
+            echo "Running openshift-install create cluster..."
+            INSTALL_EXIT=0
+            openshift-install create cluster --dir="${INSTALL_DIR}" --log-level=info 2>&1 | tee "${INSTALL_DIR}/install.log" || INSTALL_EXIT=$?
+
+            if [[ "${INSTALL_EXIT}" -eq 0 ]]; then
+              KUBECONFIG="${INSTALL_DIR}/auth/kubeconfig"
+              export KUBECONFIG
+              if oc cluster-info &>/dev/null; then
+                echo "Cluster created successfully on attempt ${attempt}."
+                break
+              fi
+            fi
+
+            echo "::warning::openshift-install failed on attempt ${attempt}/${MAX_ATTEMPTS}"
+
             KUBECONFIG="${INSTALL_DIR}/auth/kubeconfig"
             export KUBECONFIG
             if oc cluster-info &>/dev/null && oc get nodes --no-headers 2>/dev/null | grep -q " Ready"; then
-              echo "API is up and nodes are Ready. Continuing despite installer timeout."
+              echo "API is up and nodes are Ready. Continuing despite installer errors."
               echo "installer_partial=true" >> "$GITHUB_OUTPUT"
-            else
-              echo "::error::Cluster is not reachable after installer failure."
+              break
+            fi
+
+            if [[ "${attempt}" -eq "${MAX_ATTEMPTS}" ]]; then
+              echo "::error::All ${MAX_ATTEMPTS} install attempts failed."
+              if [[ -f "${INSTALL_DIR}/metadata.json" ]]; then
+                echo "Destroying failed cluster resources..."
+                openshift-install destroy cluster --dir="${INSTALL_DIR}" --log-level=info 2>&1 | tail -30 || true
+              fi
               exit 1
             fi
-          fi
+
+            echo "Destroying failed cluster before retry..."
+            if [[ -f "${INSTALL_DIR}/metadata.json" ]]; then
+              openshift-install destroy cluster --dir="${INSTALL_DIR}" --log-level=info 2>&1 | tail -30 || true
+            fi
+
+            echo "Cleaning orphaned COS instances and custom images..."
+            ibmcloud resource service-instances --service-name cloud-object-storage --output json 2>/dev/null \
+              | jq -r --arg cn "${CLUSTER_NAME}" '.[] | select(.name | startswith($cn)) | .id' \
+              | while read -r id; do ibmcloud resource service-instance-delete "${id}" -f --recursive 2>&1 || true; done
+            ibmcloud is images --visibility private --output json 2>/dev/null \
+              | jq -r --arg cn "${CLUSTER_NAME}" 'if type == "array" then .[] | select(.name | startswith($cn)) | .id else empty end' \
+              | while read -r id; do ibmcloud is image-delete "${id}" -f 2>&1 || true; done
+
+            echo "Waiting 60s before retry..."
+            sleep 60
+          done
 
       - name: IPI post-install DNS diagnostics
         if: inputs.infrastructure_type == 'ipi' && always()
