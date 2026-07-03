@@ -1,24 +1,25 @@
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 import { useParams } from 'react-router';
 
-import { V1VirtualMachine } from '@kubev2v/types';
-import { VirtualMachineModelGroupVersionKind } from '@kubevirt-utils/models';
+import { type V1VirtualMachine } from '@kubev2v/types';
+import { getResourceDetailsTitle } from '@kubevirt-utils/constants/page-constants';
+import { VirtualMachineModel, VirtualMachineModelGroupVersionKind } from '@kubevirt-utils/models';
 import { getLabel } from '@kubevirt-utils/resources/shared';
 import { isHeadlessMode } from '@kubevirt-utils/resources/vm';
 import useVMI from '@kubevirt-utils/resources/vm/hooks/useVMI';
 import { isWindows } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
 import useK8sBaseAPIPath from '@multicluster/hooks/useK8sBaseAPIPath';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
+import { DocumentTitle } from '@openshift-console/dynamic-plugin-sdk';
 import { Bullseye, Spinner } from '@patternfly/react-core';
 import { useIsFleetAvailable } from '@stolostron/multicluster-sdk';
 
 import ErrorAlert from '../ErrorAlert/ErrorAlert';
 import { ModalProvider, useModalValue } from '../ModalProvider/ModalProvider';
-
 import { KUBEVIRT_UI_VNC_LOG_LEVEL_LABEL } from './components/vnc-console/utils/constants';
 import { isVncLogLevel } from './components/vnc-console/utils/util';
-import { getConsoleBasePath } from './utils/utils';
 import Consoles from './Consoles';
+import { getConsoleBasePath } from './utils/utils';
 
 const ConsoleStandAlone: FC = () => {
   const { cluster, name, ns } = useParams<{ cluster?: string; name: string; ns: string }>();
@@ -50,6 +51,7 @@ const ConsoleStandAlone: FC = () => {
   const logLevelLabel = vm && getLabel(vm, KUBEVIRT_UI_VNC_LOG_LEVEL_LABEL);
   return (
     <ModalProvider value={value}>
+      <DocumentTitle>{getResourceDetailsTitle(name, VirtualMachineModel.kind)}</DocumentTitle>
       <Consoles
         consoleContainerClass="console-container-stand-alone"
         isHeadlessMode={isHeadlessMode(vmi)}
