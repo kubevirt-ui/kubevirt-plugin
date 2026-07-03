@@ -116,18 +116,6 @@ const VirtualMachinesList = forwardRef(({}, ref) => {
     clearCustomizeInstanceType();
   }, [cluster, targetNamespace]);
 
-  useEffect(() => {
-    const filteredDataLength = filteredVMs?.length ?? 0;
-    if (filteredDataLength > 0 && pagination.startIndex >= filteredDataLength) {
-      setPagination((prevPagination) => ({
-        ...prevPagination,
-        endIndex: prevPagination.perPage,
-        page: 1,
-        startIndex: 0,
-      }));
-    }
-  }, [filteredVMs?.length, pagination.startIndex, pagination.perPage]);
-
   useImperativeHandle(
     ref,
     () => ({
