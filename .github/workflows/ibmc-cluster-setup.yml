@@ -525,9 +525,9 @@ jobs:
               bash ./ci-scripts/create-ibmcloud-cco-secrets.sh
             fi
 
-            echo "Running openshift-install create cluster..."
+            echo "Running openshift-install create cluster (90m timeout)..."
             INSTALL_EXIT=0
-            openshift-install create cluster --dir="${INSTALL_DIR}" --log-level=info 2>&1 | tee "${INSTALL_DIR}/install.log" || INSTALL_EXIT=$?
+            timeout 90m openshift-install create cluster --dir="${INSTALL_DIR}" --log-level=info 2>&1 | tee "${INSTALL_DIR}/install.log" || INSTALL_EXIT=$?
 
             if [[ "${INSTALL_EXIT}" -eq 0 ]]; then
               KUBECONFIG="${INSTALL_DIR}/auth/kubeconfig"
@@ -898,10 +898,10 @@ jobs:
           if [[ -f "${INSTALL_DIR}/auth/kubeadmin-password" ]]; then
             KUBEADMIN_PW=$(cat "${INSTALL_DIR}/auth/kubeadmin-password")
             echo "::add-mask::${KUBEADMIN_PW}"
-            CREDS="\n*kubeadmin:* \`${KUBEADMIN_PW}\`"
+            CREDS=$'\n'"*kubeadmin:* \`${KUBEADMIN_PW}\`"
           elif [[ -n "${ADMIN_PASSWORD}" ]]; then
             echo "::add-mask::${ADMIN_PASSWORD}"
-            CREDS="\n*admin:* \`${ADMIN_PASSWORD}\`"
+            CREDS=$'\n'"*admin:* \`${ADMIN_PASSWORD}\`"
           fi
 
           if [[ -z "${SLACK_WEBHOOK_URL}" ]]; then
@@ -914,9 +914,10 @@ jobs:
             exit 0
           fi
 
-          PAYLOAD=$(jq -n \
-            --arg text ":white_check_mark: *Hot cluster ready*\n*Console:* <${CONSOLE_URL}>${CREDS}" \
-            '{text: $text}')
+          TEXT=":white_check_mark: *Hot cluster ready*"
+          TEXT+=$'\n'"*Console:* <${CONSOLE_URL}>"
+          TEXT+="${CREDS}"
+          PAYLOAD=$(jq -n --arg text "${TEXT}" '{text: $text}')
 
           curl -sS -X POST -H 'Content-Type: application/json' -d "${PAYLOAD}" "${SLACK_WEBHOOK_URL}"
           echo "Slack notification sent."
