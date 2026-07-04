@@ -67,13 +67,14 @@ echo "  Found plugin deployment: ${PLUGIN_DEPLOY}"
 echo ""
 echo "Pausing operator reconciliation..."
 
-HCO_NAME=$(oc get hyperconverged -n "${CNV_NS}" -o jsonpath='{.items[0].metadata.name}' 2>/dev/null || true)
-if [[ -n "${HCO_NAME}" ]]; then
-  oc annotate hyperconverged "${HCO_NAME}" -n "${CNV_NS}" \
-    hco.kubevirt.io/paused="true" --overwrite
-  echo "  Paused HCO reconciliation (hco.kubevirt.io/paused=true)"
+HCO_DEPLOY=$(oc get deployment -n "${CNV_NS}" -o name 2>/dev/null \
+  | grep hco-operator | head -1 | sed 's|deployment.apps/||' || true)
+
+if [[ -n "${HCO_DEPLOY}" ]]; then
+  oc scale deployment "${HCO_DEPLOY}" -n "${CNV_NS}" --replicas=0
+  echo "  Scaled ${HCO_DEPLOY} to 0 replicas"
 else
-  echo "  WARNING: HyperConverged CR not found, skipping HCO pause"
+  echo "  WARNING: hco-operator deployment not found, skipping scale-down"
 fi
 
 SSP_DEPLOY=$(oc get deployment -n "${CNV_NS}" -o name 2>/dev/null \
