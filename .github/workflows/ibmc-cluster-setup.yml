@@ -504,7 +504,7 @@ jobs:
           INSTALL_DIR: ${{ runner.temp }}/ipi-install
         run: |
           export IC_API_KEY
-          MAX_ATTEMPTS=3
+          MAX_ATTEMPTS=5
 
           for attempt in $(seq 1 "${MAX_ATTEMPTS}"); do
             echo ""
