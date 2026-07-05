@@ -66,6 +66,10 @@ const getPreviewFeaturesTabIds = (t: TFunction): SearchItem[] => [
     id: PREVIEW_FEATURES_TAB_IDS.vmTemplates,
     title: t('Enable native VirtualMachine templates'),
   },
+  {
+    id: PREVIEW_FEATURES_TAB_IDS.vsockEnabled,
+    title: t('Enable VSOCK'),
+  },
 ];
 
 export const getSearchItems = (t: TFunction): SearchItemWithTab[] => {

@@ -58,6 +58,7 @@ import {
   getChangedGuestSystemAccessLog,
   getChangedHeadlessMode,
   getChangedHostDevices,
+  getChangedVSOCK,
   getChangedHostname,
   getChangedNICs,
   getChangedNodeSelector,
@@ -131,6 +132,7 @@ export const usePendingChanges = (
 
   const modifiedVolumesHotplug = getChangedVolumesHotplug(vm, vmi);
   const modifiedHeadlessMode = getChangedHeadlessMode(vm, vmi);
+  const modifiedVSOCK = getChangedVSOCK(vm, vmi);
   const modifiedGuestSystemAccessLog = getChangedGuestSystemAccessLog(vm, vmi);
 
   const onSubmit = (updatedVM: V1VirtualMachine) =>
@@ -430,6 +432,11 @@ export const usePendingChanges = (
       ),
       hasPendingChange: modifiedHeadlessMode,
       label: t('Headless mode'),
+    },
+    {
+      ...createProps(VirtualMachineDetailsTab.Details),
+      hasPendingChange: modifiedVSOCK,
+      label: t('Enable VSOCK'),
     },
     {
       ...createProps(VirtualMachineDetailsTab.Details),

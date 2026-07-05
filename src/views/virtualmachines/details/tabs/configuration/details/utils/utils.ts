@@ -252,6 +252,20 @@ export const updateHeadlessMode = (updatedVM: V1VirtualMachine, checked: boolean
     resource: updatedVM,
   });
 
+export const updateVSOCK = (updatedVM: V1VirtualMachine, checked: boolean) =>
+  kubevirtK8sPatch({
+    cluster: getCluster(updatedVM),
+    data: [
+      {
+        op: 'replace',
+        path: `/spec/template/spec/domain/devices/autoattachVSOCK`,
+        value: checked || null,
+      },
+    ],
+    model: VirtualMachineModel,
+    resource: updatedVM,
+  });
+
 export const updateDisks = (updatedVM: V1VirtualMachine) =>
   kubevirtK8sPatch({
     cluster: getCluster(updatedVM),

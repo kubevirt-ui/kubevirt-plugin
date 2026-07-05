@@ -35,6 +35,7 @@ export enum OLSPromptType {
   ENABLE_PASST_BINDING = 'ENABLE_PASST_BINDING',
   ENABLE_PERSISTENT_RESERVATION = 'ENABLE_PERSISTENT_RESERVATION',
   ENABLE_PREALLOCATION = 'ENABLE_PREALLOCATION',
+  ENABLE_VSOCK = 'ENABLE_VSOCK',
   ENVIRONMENT_VARS = 'ENVIRONMENT_VARS',
   FENCE_AGENTS_REMEDIATION_OPERATOR_ALTERNATIVES = 'FENCE_AGENTS_REMEDIATION_OPERATOR_ALTERNATIVES',
   FILE_SYSTEMS = 'FILE_SYSTEMS',
@@ -102,7 +103,7 @@ export const getOLSPrompt = (promptType: OLSPromptType, data?: PromptData): stri
   const vmPrintableStatus = getVMStatus(vm);
   const isErrorStatus = isErrorPrintableStatus(vmPrintableStatus);
 
-  const olsPrompts = {
+  const olsPrompts: Record<OLSPromptType, string> = {
     [OLSPromptType.AAQ_QUOTA_CALCULATION_METHOD]:
       'Provide a detailed explanation of the quota calculation method for AAQ in OpenShift Virtualization.',
     [OLSPromptType.ACCESS_MODE]:
@@ -279,6 +280,8 @@ export const getOLSPrompt = (promptType: OLSPromptType, data?: PromptData): stri
       'Provide a detailed explanation of volume modes in the context of OpenShift Virtualization storage.',
     [OLSPromptType.VOLUME_SNAPSHOT_STATUS]:
       'Provide a detailed explanation of volume snapshot status in the context of OpenShift Virtualization storage.',
+    [OLSPromptType.ENABLE_VSOCK]:
+      'Provide a detailed explanation of VSOCK (VM Sockets) in the context of OpenShift Virtualization. Explain how enabling autoattachVSOCK provides fast guest-host communication without requiring a network interface, its use cases such as virtctl guest commands, and the requirement for the VSOCK feature gate to be enabled at the cluster level.',
   };
 
   return olsPrompts[promptType];
