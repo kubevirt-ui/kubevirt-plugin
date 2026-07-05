@@ -53,7 +53,7 @@ on:
         default: 'stable'
         type: string
       deploy_plugin:
-        description: 'Build and deploy kubevirt-plugin from the current branch (overrides CNV-bundled plugin)'
+        description: 'Build and deploy kubevirt-plugin from the current branch (standalone console for manual testing)'
         required: false
         default: false
         type: boolean
@@ -835,8 +835,9 @@ jobs:
             | grep '^IMAGE_REF=' | cut -d= -f2-)
           echo "plugin_image=${PLUGIN_IMAGE_REF}" >> "$GITHUB_OUTPUT"
 
-      - name: Deploy kubevirt-plugin override
+      - name: Deploy standalone console with custom plugin
         if: inputs.deploy_plugin && (inputs.plugin_image != '' || steps.build_plugin.outputs.plugin_image != '')
+        id: manual_console
         env:
           PLUGIN_IMAGE: ${{ inputs.plugin_image || steps.build_plugin.outputs.plugin_image }}
         run: |
@@ -844,7 +845,38 @@ jobs:
             echo "::error::PLUGIN_IMAGE is empty — build likely failed"
             exit 1
           fi
-          ./ci-scripts/deploy-plugin-override.sh
+
+          MANUAL_NS="manual-console"
+          RELEASE_NAME="manual"
+          API_SERVER=$(oc whoami --show-server)
+          CONSOLE_IMAGE=$(oc get deployment console -n openshift-console -o jsonpath='{.spec.template.spec.containers[0].image}' 2>/dev/null || echo "quay.io/openshift/origin-console:latest")
+          ROUTE_HOST="manual-console.apps.${CLUSTER_NAME}.${BASE_DOMAIN}"
+
+          echo "=== Deploying standalone console for manual testing ==="
+          echo "  Plugin image:  ${PLUGIN_IMAGE}"
+          echo "  Console image: ${CONSOLE_IMAGE}"
+          echo "  API server:    ${API_SERVER}"
+          echo "  Route host:    ${ROUTE_HOST}"
+          echo "  Namespace:     ${MANUAL_NS}"
+
+          oc create namespace "${MANUAL_NS}" --dry-run=client -o yaml | oc apply -f -
+
+          helm upgrade --install "${RELEASE_NAME}" \
+            "${GITHUB_WORKSPACE}/ci-scripts/helm/ci-test-stack" \
+            --namespace "${MANUAL_NS}" \
+            --set "plugin.image=${PLUGIN_IMAGE}" \
+            --set "console.image=${CONSOLE_IMAGE}" \
+            --set "console.apiServer=${API_SERVER}" \
+            --set "console.route.host=${ROUTE_HOST}" \
+            --wait --timeout 5m
+
+          CONSOLE_URL="https://${ROUTE_HOST}"
+          echo "console_url=${CONSOLE_URL}" >> "$GITHUB_OUTPUT"
+
+          echo ""
+          echo "=== Standalone console deployed ==="
+          echo "  URL: ${CONSOLE_URL}"
+          echo "  Login with the cluster credentials (kubeadmin)"
 
       # Optional: create an htpasswd admin user for ROKS clusters (no kubeadmin).
       # Set CLUSTER_ADMIN_PASSWORD secret to enable. Not needed for IPI.
@@ -917,6 +949,12 @@ jobs:
           TEXT=":white_check_mark: *Hot cluster ready*"
           TEXT+=$'\n'"*Console:* <${CONSOLE_URL}>"
           TEXT+="${CREDS}"
+
+          MANUAL_CONSOLE_URL="${{ steps.manual_console.outputs.console_url }}"
+          if [[ -n "${MANUAL_CONSOLE_URL}" ]]; then
+            TEXT+=$'\n'"*Manual testing console:* <${MANUAL_CONSOLE_URL}>"
+          fi
+
           PAYLOAD=$(jq -n --arg text "${TEXT}" '{text: $text}')
 
           curl -sS -X POST -H 'Content-Type: application/json' -d "${PAYLOAD}" "${SLACK_WEBHOOK_URL}"
@@ -963,13 +1001,15 @@ jobs:
           echo "| CNV Channel | \`${{ inputs.cnv_channel || 'stable' }}\` |" >> "$GITHUB_STEP_SUMMARY"
           if [[ "${{ inputs.deploy_plugin }}" == "true" ]]; then
             PLUGIN_IMG="${PLUGIN_IMG_OVERRIDE:-build failed}"
-            echo "| Plugin Override | \`${PLUGIN_IMG}\` |" >> "$GITHUB_STEP_SUMMARY"
-          else
-            echo "| Plugin Override | \`disabled (CNV-bundled)\` |" >> "$GITHUB_STEP_SUMMARY"
+            echo "| Plugin Image | \`${PLUGIN_IMG}\` |" >> "$GITHUB_STEP_SUMMARY"
           fi
           CONSOLE_URL=$(oc get consoles.config.openshift.io cluster -o jsonpath='{.status.consoleURL}' 2>/dev/null || echo "")
           if [[ -n "${CONSOLE_URL}" ]]; then
             echo "| Console | [${CONSOLE_URL}](${CONSOLE_URL}) |" >> "$GITHUB_STEP_SUMMARY"
+          fi
+          MANUAL_CONSOLE_URL="${{ steps.manual_console.outputs.console_url }}"
+          if [[ -n "${MANUAL_CONSOLE_URL}" ]]; then
+            echo "| Manual Testing Console | [${MANUAL_CONSOLE_URL}](${MANUAL_CONSOLE_URL}) |" >> "$GITHUB_STEP_SUMMARY"
           fi
           echo "" >> "$GITHUB_STEP_SUMMARY"
           if oc cluster-info &>/dev/null; then

@@ -31,6 +31,7 @@ env:
   INFRASTRUCTURE_TYPE: ${{ inputs.infrastructure_type || 'vpc' }}
   IBM_REGION: eu-de
   IBM_RESOURCE_GROUP: cnv-ui
+  BASE_DOMAIN: cnv-ui.com
 
 jobs:
   deploy-plugin:
@@ -95,8 +96,9 @@ jobs:
             | grep '^IMAGE_REF=' | cut -d= -f2-)
           echo "plugin_image=${PLUGIN_IMAGE_REF}" >> "$GITHUB_OUTPUT"
 
-      - name: Deploy kubevirt-plugin override
+      - name: Deploy standalone console with custom plugin
         if: inputs.plugin_image != '' || steps.build_plugin.outputs.plugin_image != ''
+        id: manual_console
         env:
           PLUGIN_IMAGE: ${{ inputs.plugin_image || steps.build_plugin.outputs.plugin_image }}
         run: |
@@ -104,7 +106,38 @@ jobs:
             echo "::error::PLUGIN_IMAGE is empty — build likely failed"
             exit 1
           fi
-          ./ci-scripts/deploy-plugin-override.sh
+
+          MANUAL_NS="manual-console"
+          RELEASE_NAME="manual"
+          API_SERVER=$(oc whoami --show-server)
+          CONSOLE_IMAGE=$(oc get deployment console -n openshift-console -o jsonpath='{.spec.template.spec.containers[0].image}' 2>/dev/null || echo "quay.io/openshift/origin-console:latest")
+          ROUTE_HOST="manual-console.apps.${CLUSTER_NAME}.${BASE_DOMAIN}"
+
+          echo "=== Deploying standalone console for manual testing ==="
+          echo "  Plugin image:  ${PLUGIN_IMAGE}"
+          echo "  Console image: ${CONSOLE_IMAGE}"
+          echo "  API server:    ${API_SERVER}"
+          echo "  Route host:    ${ROUTE_HOST}"
+          echo "  Namespace:     ${MANUAL_NS}"
+
+          oc create namespace "${MANUAL_NS}" --dry-run=client -o yaml | oc apply -f -
+
+          helm upgrade --install "${RELEASE_NAME}" \
+            "${GITHUB_WORKSPACE}/ci-scripts/helm/ci-test-stack" \
+            --namespace "${MANUAL_NS}" \
+            --set "plugin.image=${PLUGIN_IMAGE}" \
+            --set "console.image=${CONSOLE_IMAGE}" \
+            --set "console.apiServer=${API_SERVER}" \
+            --set "console.route.host=${ROUTE_HOST}" \
+            --wait --timeout 5m
+
+          CONSOLE_URL="https://${ROUTE_HOST}"
+          echo "console_url=${CONSOLE_URL}" >> "$GITHUB_OUTPUT"
+
+          echo ""
+          echo "=== Standalone console deployed ==="
+          echo "  URL: ${CONSOLE_URL}"
+          echo "  Login with the cluster credentials (kubeadmin)"
 
       - name: Deployment summary
         if: always()
@@ -113,6 +146,7 @@ jobs:
           BRANCH: ${{ github.ref_name }}
         run: |
           CONSOLE_URL=$(oc get consoles.config.openshift.io cluster -o jsonpath='{.status.consoleURL}' 2>/dev/null || echo "unknown")
+          MANUAL_URL="${{ steps.manual_console.outputs.console_url }}"
 
           {
             echo "## Plugin Deployment Summary"
@@ -122,5 +156,8 @@ jobs:
             echo "| Branch | \`${BRANCH}\` |"
             echo "| Plugin Image | \`${PLUGIN_IMG}\` |"
             echo "| Cluster | \`${CLUSTER_NAME}\` |"
-            echo "| Console | [${CONSOLE_URL}](${CONSOLE_URL}) |"
+            echo "| Built-in Console | [${CONSOLE_URL}](${CONSOLE_URL}) |"
+            if [[ -n "${MANUAL_URL}" ]]; then
+              echo "| **Manual Testing Console** | [${MANUAL_URL}](${MANUAL_URL}) |"
+            fi
           } >> "$GITHUB_STEP_SUMMARY"

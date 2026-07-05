@@ -28,8 +28,10 @@ echo ""
 
 oc create namespace "${NS}" --dry-run=client -o yaml | oc apply -f -
 
-echo "Granting image pull access to openshift-cnv namespace..."
-oc policy add-role-to-group system:image-puller system:serviceaccounts:openshift-cnv -n "${NS}" --rolebinding-name=cnv-image-pullers 2>/dev/null || true
+echo "Granting cross-namespace image pull access..."
+for pull_ns in openshift-cnv manual-console; do
+  oc policy add-role-to-group system:image-puller "system:serviceaccounts:${pull_ns}" -n "${NS}" --rolebinding-name="${pull_ns}-image-pullers" 2>/dev/null || true
+done
 
 oc apply -f - <<EOF
 apiVersion: image.openshift.io/v1
