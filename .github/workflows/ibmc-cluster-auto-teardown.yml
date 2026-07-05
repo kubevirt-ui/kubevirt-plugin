@@ -50,7 +50,7 @@ jobs:
         id: check_ci
         uses: actions/github-script@v9
         env:
-          INCLUDE_WORKFLOWS: '[".github/workflows/hot-cluster-e2e.yml", ".github/workflows/hot-cluster-e2e-run.yml"]'
+          INCLUDE_WORKFLOWS: '[".github/workflows/hot-cluster-e2e.yml", ".github/workflows/hot-cluster-e2e-run.yml", ".github/workflows/ibmc-cluster-setup.yml"]'
         with:
           script: |
             const INCLUDE_WORKFLOWS = JSON.parse(process.env.INCLUDE_WORKFLOWS);
