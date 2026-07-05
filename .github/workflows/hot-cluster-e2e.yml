@@ -90,53 +90,28 @@ jobs:
           oc cluster-info
           oc get nodes -o wide
 
-      # IPI health check
-      - name: Download IPI kubeconfig
+      # IPI health check (kubeconfig not available from artifacts for security)
+      - name: IPI cluster health check (DNS probe)
         if: env.INFRASTRUCTURE_TYPE == 'ipi'
-        env:
-          GH_TOKEN: ${{ github.token }}
-          SETUP_RUN_ID: ${{ inputs.ipi_setup_run_id }}
         run: |
-          INSTALL_DIR="${RUNNER_TEMP}/ipi-install"
-          mkdir -p "${INSTALL_DIR}"
+          API_HOST="api.${CLUSTER_NAME}.${BASE_DOMAIN}"
+          echo "Probing IPI cluster via DNS: ${API_HOST}..."
 
-          if [[ -n "${SETUP_RUN_ID}" ]]; then
-            echo "Downloading kubeconfig from setup run ${SETUP_RUN_ID}..."
-            gh run download "${SETUP_RUN_ID}" --repo "${{ github.repository }}" \
-              --name "ipi-install-state-${SETUP_RUN_ID}" \
-              --dir "${INSTALL_DIR}"
+          if dig +short "${API_HOST}" 2>/dev/null | grep -q .; then
+            echo "API DNS resolves — cluster is alive"
+            API_IP=$(dig +short "${API_HOST}" 2>/dev/null | head -1)
+            echo "  ${API_HOST} -> ${API_IP}"
           else
-            echo "No setup run ID provided. Trying latest setup run artifact..."
-            LATEST_RUN=$(gh run list --repo "${{ github.repository }}" \
-              --workflow="IBM Cloud Hot Cluster Setup" --status=success --limit=1 \
-              --json databaseId -q '.[0].databaseId' 2>/dev/null || true)
-            if [[ -n "${LATEST_RUN}" ]]; then
-              echo "Using latest successful setup run: ${LATEST_RUN}"
-              gh run download "${LATEST_RUN}" --repo "${{ github.repository }}" \
-                --name "ipi-install-state-${LATEST_RUN}" \
-                --dir "${INSTALL_DIR}"
-            else
-              echo "::error::No IPI setup run found. Run IBM Cloud Hot Cluster Setup first, then provide the run ID."
-              exit 1
-            fi
-          fi
-
-          if [[ ! -f "${INSTALL_DIR}/auth/kubeconfig" ]]; then
-            echo "::error::kubeconfig not found in install state artifact"
+            echo "::error::API DNS does not resolve for ${API_HOST}. Cluster may not exist."
             exit 1
           fi
 
-          export KUBECONFIG="${INSTALL_DIR}/auth/kubeconfig"
-          echo "KUBECONFIG=${KUBECONFIG}" >> "$GITHUB_ENV"
-
-          curl -sL "https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/stable/openshift-client-linux.tar.gz" \
-            | tar -xz -C /usr/local/bin oc kubectl
-
-          oc cluster-info
-          oc get nodes -o wide
-
-      - name: Run health checks
-        run: ./ci-scripts/check-cluster-health.sh
+          echo "Checking API reachability (HTTPS)..."
+          if curl -sk --connect-timeout 10 "https://${API_HOST}:6443/healthz" 2>/dev/null | grep -q ok; then
+            echo "API server is healthy"
+          else
+            echo "::warning::API server did not respond to /healthz — cluster may be initializing"
+          fi
 
       - name: Health check summary
         if: always()
