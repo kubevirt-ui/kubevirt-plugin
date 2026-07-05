@@ -309,7 +309,7 @@ export class TestResourceTracker {
           let timer: ReturnType<typeof setTimeout> | undefined;
           try {
             const deletePromise = deleteCallback(resource);
-            const timeoutPromise = new Promise<boolean>((_, reject) => {
+            const timeoutPromise = new Promise<boolean>((_resolve, reject) => {
               timer = setTimeout(
                 () => reject(new Error(`Timeout after ${timeoutPerResource}ms`)),
                 timeoutPerResource,

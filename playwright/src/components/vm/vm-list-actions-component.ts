@@ -398,7 +398,7 @@ export default class VmListActionsComponent extends BaseComponent {
 
   async clickVmStatusAndVerifyLearnMoreInDialog(vmName: string): Promise<boolean> {
     await this.clickVmStatusButton(vmName);
-    await new Promise((r) => setTimeout(r, 1500));
+    await new Promise((resolve) => setTimeout(resolve, 1500));
 
     const dialogSelectors = [
       '.pf-v6-c-popover__content',
@@ -652,7 +652,7 @@ export default class VmListActionsComponent extends BaseComponent {
       .or(this.locator(`tr:has-text("${vmName}")`))
       .first();
     await vmRow.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
-    await new Promise((r) => setTimeout(r, 500));
+    await new Promise((resolve) => setTimeout(resolve, 500));
 
     const learnMoreInRow = vmRow.getByText('Learn more', { exact: false });
     if (
@@ -1053,7 +1053,7 @@ export default class VmListActionsComponent extends BaseComponent {
         }
       }
 
-      await new Promise((r) => setTimeout(r, TestTimeouts.POLLING_INTERVAL));
+      await new Promise((resolve) => setTimeout(resolve, TestTimeouts.POLLING_INTERVAL));
     }
 
     const finalStatus = await this.getVmStatus(vmName, TestTimeouts.SHORT_WAIT);

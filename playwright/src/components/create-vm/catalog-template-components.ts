@@ -534,17 +534,20 @@ export class TemplateDetailComponent extends BaseComponent {
     const activeTab = this.testId('horizontal-link-Parameters').and(
       this.locator('[aria-selected="true"]').or(this.locator('.pf-m-current')),
     );
-    return activeTab
-      .first()
-      .waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY })
-      .then(() => true)
-      .catch(async () => {
+    try {
+      await activeTab
+        .first()
+        .waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+      return true;
+    } catch {
+      try {
         const tab = this.testId('horizontal-link-Parameters');
-        return tab
-          .waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY })
-          .then(() => true)
-          .catch(() => false);
-      });
+        await tab.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+        return true;
+      } catch {
+        return false;
+      }
+    }
   }
 
   async isTemplateNameVisible(

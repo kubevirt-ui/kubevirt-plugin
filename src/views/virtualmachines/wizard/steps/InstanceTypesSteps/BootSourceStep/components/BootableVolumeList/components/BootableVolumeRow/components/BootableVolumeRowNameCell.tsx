@@ -8,7 +8,7 @@ import DeprecatedBadge from '@kubevirt-utils/components/badges/DeprecatedBadge/D
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isDeprecated } from '@kubevirt-utils/resources/bootableresources/helpers';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
-import { isDataImportCronProgressing } from '@kubevirt-utils/resources/shared';
+import { isDataImportCronProgressing } from '@kubevirt-utils/resources/datasourceHelpers';
 import {
   isDataSourceCloning,
   isDataSourceUploading,

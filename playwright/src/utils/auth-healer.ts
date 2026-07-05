@@ -60,7 +60,7 @@ export async function detectAuthExpired(page: Page): Promise<boolean> {
  */
 export async function healBrowserAuth(page: Page, context: BrowserContext): Promise<boolean> {
   if (RE_LOGIN_LOCK.inProgress) {
-    await new Promise((r) => setTimeout(r, TestTimeouts.SHORT_WAIT));
+    await new Promise((resolve) => setTimeout(resolve, TestTimeouts.SHORT_WAIT));
     return !isOnLoginPage(page);
   }
 

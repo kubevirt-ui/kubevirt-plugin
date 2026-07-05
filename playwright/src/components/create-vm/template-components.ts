@@ -429,11 +429,17 @@ export class TemplateCustomizeWizardComponent extends BaseComponent {
     await saveButton.click();
 
     const dialog = this.page.locator('#tab-modal, .pf-v6-c-modal-box').last();
-    await dialog.waitFor({ state: 'hidden', timeout: 60000 }).catch(async (e) => {
+    try {
+      await dialog.waitFor({ state: 'hidden', timeout: 60000 });
+    } catch (e) {
       const errorAlert = dialog.locator('.pf-v6-c-alert.pf-m-danger, .pf-c-alert.pf-m-danger');
       let errorText = 'None';
       if (await errorAlert.isVisible()) {
-        errorText = (await errorAlert.textContent().catch(() => 'None')) || 'None';
+        try {
+          errorText = (await errorAlert.textContent()) || 'None';
+        } catch {
+          errorText = 'None';
+        }
       }
 
       const cancelButton = this.locator('#tab-modal')
@@ -444,9 +450,9 @@ export class TemplateCustomizeWizardComponent extends BaseComponent {
         await cancelButton.click({ force: true });
       }
       throw new Error(
-        `CD-ROM modal failed to close in wizard. Error: ${errorText}. Original error: ${e.message}`,
+        `CD-ROM modal failed to close in wizard. Error: ${errorText}. Original error: ${(e as Error).message}`,
       );
-    });
+    }
 
     return true;
   }

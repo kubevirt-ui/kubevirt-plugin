@@ -1,10 +1,10 @@
-import React, { ComponentType, FormEvent, memo, ReactNode, useState } from 'react';
+import React, { type ComponentType, type FormEvent, memo, type ReactNode, useState } from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
-import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
-import { ButtonVariant, Modal, ModalHeader, ModalVariant } from '@patternfly/react-core';
+import { type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import { type ButtonVariant, Modal, ModalHeader, ModalVariant } from '@patternfly/react-core';
 
 import TabModalBody from './components/TabModalBody';
 import TabModalFooter from './components/TabModalFooter';
@@ -42,7 +42,13 @@ export type TabModalProps<T extends K8sResourceCommon = K8sResourceCommon> = {
   shouldWrapInForm?: boolean;
   submitBtnText?: string;
   submitBtnVariant?: ButtonVariant;
-  titleIconVariant?: 'custom' | 'danger' | 'info' | 'success' | 'warning' | ComponentType<any>;
+  titleIconVariant?:
+    | 'custom'
+    | 'danger'
+    | 'info'
+    | 'success'
+    | 'warning'
+    | ComponentType<Record<string, unknown>>;
 };
 
 export type TabModalFC = <T extends K8sResourceCommon = K8sResourceCommon>(
@@ -81,7 +87,7 @@ const TabModal: TabModalFC = memo(
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [apiError, setApiError] = useState<Error>(undefined);
 
-    const executeSubmit = () => {
+    const executeSubmit = (): void => {
       setIsSubmitting(true);
       setApiError(undefined);
 
@@ -99,7 +105,7 @@ const TabModal: TabModalFC = memo(
         .finally(() => setIsSubmitting(false));
     };
 
-    const closeModal = () => {
+    const closeModal = (): void => {
       setApiError(undefined);
       setIsSubmitting(false);
 
@@ -108,7 +114,7 @@ const TabModal: TabModalFC = memo(
       if (promise) promise?.catch(setApiError);
     };
 
-    const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    const handleSubmit = (e: FormEvent<HTMLFormElement>): void => {
       e.preventDefault();
       executeSubmit();
     };
@@ -148,7 +154,7 @@ const TabModal: TabModalFC = memo(
           onCancel={onCancel}
           onClose={closeModal}
           shouldWrapInForm={shouldWrapInForm}
-          submitBtnText={submitBtnText || t('Save')}
+          submitBtnText={submitBtnText ?? t('Save')}
           submitBtnVariant={submitBtnVariant}
         />
       </Modal>

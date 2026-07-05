@@ -714,26 +714,30 @@ export class VmStorageAddDiskComponent extends BaseComponent {
 
     await this.clickDialogSaveButton();
 
-    await this._tabModal
-      .waitFor({ state: 'hidden', timeout: TestTimeouts.ELEMENT_WAIT })
-      .catch(async (e) => {
-        const errorAlert = this._tabModal.locator(
-          '.pf-v6-c-alert.pf-m-danger, .pf-c-alert.pf-m-danger',
-        );
-        let errorText = 'None';
-        if (await errorAlert.isVisible()) {
-          errorText = (await errorAlert.textContent().catch(() => 'None')) || 'None';
+    try {
+      await this._tabModal.waitFor({ state: 'hidden', timeout: TestTimeouts.ELEMENT_WAIT });
+    } catch (e) {
+      const errorAlert = this._tabModal.locator(
+        '.pf-v6-c-alert.pf-m-danger, .pf-c-alert.pf-m-danger',
+      );
+      let errorText = 'None';
+      if (await errorAlert.isVisible()) {
+        try {
+          errorText = (await errorAlert.textContent()) || 'None';
+        } catch {
+          errorText = 'None';
         }
-        const cancelButton = this._tabModal
-          .locator('[data-test="cancel-button"]')
-          .or(this._tabModal.locator('button:has-text("Cancel")'));
-        if (await cancelButton.isVisible()) {
-          await cancelButton.click({ force: true });
-        }
-        throw new Error(
-          `Modal failed to close after clicking Save. Error: ${errorText}. Original error: ${e.message}`,
-        );
-      });
+      }
+      const cancelButton = this._tabModal
+        .locator('[data-test="cancel-button"]')
+        .or(this._tabModal.locator('button:has-text("Cancel")'));
+      if (await cancelButton.isVisible()) {
+        await cancelButton.click({ force: true });
+      }
+      throw new Error(
+        `Modal failed to close after clicking Save. Error: ${errorText}. Original error: ${(e as Error).message}`,
+      );
+    }
 
     const successAlert = this.page
       .locator('.pf-v6-c-alert.pf-m-success, .pf-c-alert.pf-m-success')

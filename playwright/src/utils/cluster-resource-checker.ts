@@ -245,6 +245,7 @@ export class ClusterResourceChecker {
                   `[ResourceCheck] Background cleanup completed: ${cleaned.length} resource(s) cleaned`,
                 );
               }
+              return undefined;
             });
           } else {
             cleanedUpResources = await this.cleanupStaleResources(staleResources, verbose);

@@ -1,5 +1,3 @@
-/* eslint-disable jsdoc/require-jsdoc */
-
 import AddCDROMModal from '../AddCDROMModal';
 import BlankDiskModal from '../BlankDiskModal';
 import ClonePVCDiskModal from '../ClonePVCDiskModal';

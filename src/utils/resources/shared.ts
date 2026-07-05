@@ -1,8 +1,4 @@
 import { modelToGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
-import {
-  V1beta1DataImportCron,
-  V1beta1DataSource,
-} from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import { V1beta1Condition, V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { TemplateModel } from '@kubevirt-utils/models';
 import { getCluster } from '@multicluster/helpers/selectors';
@@ -19,20 +15,13 @@ import {
 import { FleetAccessReviewResourceAttributes } from '@stolostron/multicluster-sdk';
 import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
 
-import { isDataSourceReady } from '../../views/datasources/utils';
-
 import { getNamespacePathSegment, isEmpty } from './../utils/utils';
-import { getDataImportCronFromDataSource } from './bootableresources/helpers';
 import { SINGLE_CLUSTER_KEY } from './constants';
 import type {
   MultiNamespaceVirtualMachineStorageMigrationPlan,
   StorageMigrationPlanNamespaceStatus,
 } from './migrations/constants';
 import { ANNOTATIONS, TEMPLATE_TYPE_LABEL } from './template';
-import {
-  isDataSourceCloning,
-  isDataSourceUploading,
-} from './template/hooks/useVmTemplateSource/utils';
 
 /**
  * A selector for a resource's description
@@ -528,39 +517,6 @@ export const getResourceFromClusterMap = <A extends K8sResourceCommon = K8sResou
 ): A => {
   return clusterMap?.[cluster || SINGLE_CLUSTER_KEY]?.[namespace]?.[name];
 };
-
-/**
- * function to get all V1beta1DataSource objects with condition type 'Ready'and status to be 'True'
- * @param {V1beta1DataSource[]} dataSources list of DataSources to be filtered
- * @returns list of available/ready DataSources
- */
-export const getAvailableDataSources = (dataSources: V1beta1DataSource[]): V1beta1DataSource[] =>
-  dataSources?.filter((dataSource) => isDataSourceReady(dataSource));
-
-export const isDataImportCronProgressing = (dataImportCron: V1beta1DataImportCron): boolean =>
-  getStatusConditionReason(dataImportCron, 'UpToDate') === 'ImportProgressing';
-
-/**
- * function to get all V1beta1DataSource objects with condition type 'Ready'and status 'True'
- * and/or also those with 'False' status but only 'CloneScheduled' or 'CloneInProgress' reason (cloning of the DS in progress)
- * @param {V1beta1DataSource[]} dataSources list of DataSources to be filtered
- * @param {V1beta1DataImportCron[]} dataImportCrons list of DataImportCrons related to DataSources
- * @returns list of available/ready/cloning DataSources
- */
-export const getReadyOrCloningOrUploadingDataSources = (
-  dataSources: V1beta1DataSource[],
-  dataImportCrons: V1beta1DataImportCron[],
-): V1beta1DataSource[] =>
-  dataSources?.filter((dataSource) => {
-    const dataImportCron = getDataImportCronFromDataSource(dataImportCrons, dataSource);
-
-    return (
-      isDataSourceReady(dataSource) ||
-      isDataSourceCloning(dataSource) ||
-      isDataSourceUploading(dataSource) ||
-      isDataImportCronProgressing(dataImportCron)
-    );
-  });
 
 /**
  *  A selector for the entity's status phase

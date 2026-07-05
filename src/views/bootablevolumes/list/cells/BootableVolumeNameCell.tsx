@@ -15,8 +15,8 @@ import {
   getNamespace,
   getResourceFromClusterMap,
   getResourceUrl,
-  isDataImportCronProgressing,
 } from '@kubevirt-utils/resources/shared';
+import { isDataImportCronProgressing } from '@kubevirt-utils/resources/datasourceHelpers';
 import {
   isDataSourceCloning,
   isDataSourceReady,

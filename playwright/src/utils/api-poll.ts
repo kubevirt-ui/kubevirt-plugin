@@ -42,7 +42,7 @@ async function pollUntil(
     } catch (e: unknown) {
       if (!isTransientError(e)) throw e;
     }
-    await new Promise((r) => setTimeout(r, POLL_INTERVAL_MS));
+    await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL_MS));
   }
   throw new Error(`${label}: condition not met within ${timeoutMs}ms`);
 }
@@ -63,7 +63,7 @@ export async function pollUntilVmiGone(
     try {
       const result = await apiClient.getVirtualMachineInstance(namespace, vmName);
       if (result == null) return;
-      await new Promise((r) => setTimeout(r, POLL_INTERVAL_MS));
+      await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL_MS));
     } catch (e: unknown) {
       if (is404(e)) return;
       if (!isTransientError(e)) throw e;
@@ -187,7 +187,7 @@ export async function pollUntilSnapshotDeleted(
     try {
       const result = await apiClient.getVirtualMachineSnapshot(namespace, snapshotName);
       if (result == null) return;
-      await new Promise((r) => setTimeout(r, POLL_INTERVAL_MS));
+      await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL_MS));
     } catch (e: unknown) {
       if (is404(e)) return;
       if (!isTransientError(e)) throw e;
@@ -210,7 +210,7 @@ export async function pollUntilRestoreDeleted(
     try {
       const result = await apiClient.getVirtualMachineRestore(namespace, restoreName);
       if (result == null) return;
-      await new Promise((r) => setTimeout(r, POLL_INTERVAL_MS));
+      await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL_MS));
     } catch (e: unknown) {
       if (is404(e)) return;
       if (!isTransientError(e)) throw e;

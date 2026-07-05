@@ -490,7 +490,7 @@ export class VirtualMachineProxyHandler {
       } catch {
         // not found yet
       }
-      await new Promise((r) => setTimeout(r, 3000));
+      await new Promise((resolve) => setTimeout(resolve, 3000));
     }
     return { exists: false };
   }
@@ -504,7 +504,7 @@ export class VirtualMachineProxyHandler {
       } catch {
         return true;
       }
-      await new Promise((r) => setTimeout(r, 3000));
+      await new Promise((resolve) => setTimeout(resolve, 3000));
     }
     return false;
   }
@@ -531,7 +531,7 @@ export class VirtualMachineProxyHandler {
       } catch {
         // not found yet
       }
-      await new Promise((r) => setTimeout(r, 3000));
+      await new Promise((resolve) => setTimeout(resolve, 3000));
     }
     return false;
   }
@@ -545,7 +545,7 @@ export class VirtualMachineProxyHandler {
       } catch {
         // not found yet
       }
-      await new Promise((r) => setTimeout(r, 3000));
+      await new Promise((resolve) => setTimeout(resolve, 3000));
     }
     return false;
   }
@@ -566,7 +566,7 @@ export class VirtualMachineProxyHandler {
       } catch {
         // VMI not yet available
       }
-      await new Promise((r) => setTimeout(r, 5000));
+      await new Promise((resolve) => setTimeout(resolve, 5000));
     }
     return false;
   }

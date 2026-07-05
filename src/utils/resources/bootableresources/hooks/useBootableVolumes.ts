@@ -20,11 +20,11 @@ import { ALL_PROJECTS } from '@kubevirt-utils/hooks/constants';
 import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
 import useListMulticlusterFilters from '@kubevirt-utils/hooks/useListMulticlusterFilters';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
+import { getReadyOrCloningOrUploadingDataSources } from '@kubevirt-utils/resources/datasourceHelpers';
 import {
   convertResourceArrayToMapWithCluster,
   getName,
   getNamespace,
-  getReadyOrCloningOrUploadingDataSources,
 } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useClusterParam from '@multicluster/hooks/useClusterParam';

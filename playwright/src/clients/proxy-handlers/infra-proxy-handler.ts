@@ -177,7 +177,7 @@ export class InfraProxyHandler {
         if (!result) throw new Error('listResources returned falsy');
         return true;
       } catch {
-        if (attempt === 0) await new Promise((r) => setTimeout(r, 2_000));
+        if (attempt === 0) await new Promise((resolve) => setTimeout(resolve, 2_000));
       }
     }
     return false;
@@ -341,7 +341,7 @@ export class InfraProxyHandler {
     const end = Date.now() + timeoutMs;
     while (Date.now() < end) {
       if (await this.migrationPolicyExists(name)) return true;
-      await new Promise((r) => setTimeout(r, interval));
+      await new Promise((resolve) => setTimeout(resolve, interval));
     }
     return false;
   }

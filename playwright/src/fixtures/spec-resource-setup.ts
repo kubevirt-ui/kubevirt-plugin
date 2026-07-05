@@ -269,7 +269,7 @@ export class SpecResourceSetup {
     while (Date.now() < deadline) {
       try {
         await client.getResourceByKind(kind, name, namespace);
-        await new Promise((r) => setTimeout(r, TestTimeouts.RETRY_DELAY));
+        await new Promise((resolve) => setTimeout(resolve, TestTimeouts.RETRY_DELAY));
       } catch {
         return;
       }
@@ -288,10 +288,10 @@ export class SpecResourceSetup {
         const status = nsResource?.status as Record<string, unknown> | undefined;
         const phase = status?.phase;
         if (phase === 'Terminating') {
-          await new Promise((r) => setTimeout(r, TestTimeouts.UI_DELAY_EXTRA));
+          await new Promise((resolve) => setTimeout(resolve, TestTimeouts.UI_DELAY_EXTRA));
           continue;
         }
-        await new Promise((r) => setTimeout(r, TestTimeouts.RETRY_DELAY));
+        await new Promise((resolve) => setTimeout(resolve, TestTimeouts.RETRY_DELAY));
       } catch {
         return;
       }
@@ -378,7 +378,7 @@ export class SpecResourceSetup {
           ref.namespace,
           'merge',
         );
-        await new Promise((r) => setTimeout(r, TestTimeouts.UI_ANIMATION_DELAY));
+        await new Promise((resolve) => setTimeout(resolve, TestTimeouts.UI_ANIMATION_DELAY));
       } catch {
         // protection may not be set
       }

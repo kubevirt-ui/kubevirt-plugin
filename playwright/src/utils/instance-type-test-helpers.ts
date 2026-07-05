@@ -65,7 +65,7 @@ export async function verifyInstanceTypeDeletedCluster(
       .getResourceByKind('virtualmachineclusterinstancetype', name)
       .catch(() => null);
     if (resource === null) return { deleted: true };
-    await new Promise((r) => setTimeout(r, TestTimeouts.SHORT_WAIT));
+    await new Promise((resolve) => setTimeout(resolve, TestTimeouts.SHORT_WAIT));
   }
   return { deleted: false };
 }

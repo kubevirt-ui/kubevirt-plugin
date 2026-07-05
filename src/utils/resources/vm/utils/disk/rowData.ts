@@ -39,7 +39,6 @@ export const getDiskRowDataLayout = (
 ): DiskRowDataLayout[] => {
   return disks?.map((device) => {
     const { dataVolume, dataVolumeTemplate, disk, pvc, volume } = device;
-    // eslint-disable-next-line jsdoc/require-jsdoc
     const volumeSource = Object.keys(volume).find((key) => key !== 'name');
 
     const isDiskConfigured = disk && (disk.disk || disk.cdrom || disk.lun);

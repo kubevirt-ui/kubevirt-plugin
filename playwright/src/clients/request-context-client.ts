@@ -1066,7 +1066,7 @@ export default class RequestContextClient extends BaseClient implements ProxyApi
       } catch {
         // not yet
       }
-      await new Promise((r) => setTimeout(r, 2_000));
+      await new Promise((resolve) => setTimeout(resolve, 2_000));
     }
     return { exists: false };
   }
@@ -1092,7 +1092,7 @@ export default class RequestContextClient extends BaseClient implements ProxyApi
       } catch {
         // not ready yet
       }
-      await new Promise((r) => setTimeout(r, 3000));
+      await new Promise((resolve) => setTimeout(resolve, 3000));
     }
     return false;
   }
@@ -1114,7 +1114,7 @@ export default class RequestContextClient extends BaseClient implements ProxyApi
       } catch {
         // not ready yet
       }
-      await new Promise((r) => setTimeout(r, 3000));
+      await new Promise((resolve) => setTimeout(resolve, 3000));
     }
     return false;
   }

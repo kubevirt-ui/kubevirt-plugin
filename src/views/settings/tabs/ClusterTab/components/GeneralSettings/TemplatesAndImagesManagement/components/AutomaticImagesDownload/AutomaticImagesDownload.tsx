@@ -1,8 +1,8 @@
-import React, { FC, useCallback, useState } from 'react';
+import React, { type FC, useCallback, useState } from 'react';
 
 import { HyperConvergedV1Beta1Model as HyperConvergedModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import SectionWithSwitch from '@kubevirt-utils/components/SectionWithSwitch/SectionWithSwitch';
-import { HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
+import { type HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName } from '@kubevirt-utils/resources/shared';
@@ -16,7 +16,7 @@ import { CLUSTER_TAB_IDS } from '@settings/search/constants';
 import { AUTOMATIC_IMAGE_DOWNLOAD_ANNOTATION } from './utils/consts';
 
 type AutomaticImagesDownloadProps = {
-  hyperConvergeConfiguration: [hyperConvergeConfig: HyperConverged, loaded: boolean, error: any];
+  hyperConvergeConfiguration: [hyperConvergeConfig: HyperConverged, loaded: boolean, error: Error];
   newBadge: boolean;
 };
 
@@ -32,9 +32,7 @@ const AutomaticImagesDownload: FC<AutomaticImagesDownloadProps> = ({
 
   const [hyperConverged, loaded] = hyperConvergeConfiguration;
   const isEnabledAutomaticImagesDownload =
-    hyperConverged?.spec?.enableCommonBootImageImport !== undefined
-      ? hyperConverged?.spec?.enableCommonBootImageImport
-      : true;
+    hyperConverged?.spec?.enableCommonBootImageImport ?? true;
 
   const bootSources =
     hyperConverged?.spec?.dataImportCronTemplates ||
@@ -118,15 +116,15 @@ const AutomaticImagesDownload: FC<AutomaticImagesDownloadProps> = ({
               const name = getName(bootSource);
               return (
                 <SectionWithSwitch
-                  switchIsOn={
-                    bootSource.metadata.annotations[AUTOMATIC_IMAGE_DOWNLOAD_ANNOTATION] !== 'false'
-                  }
                   dataTestID={`${name}-auto-image-download-switch`}
                   id={`${name}-auto-image-download-switch`}
                   inlineCheckbox
                   isLoading={index === imageLoadingIndex}
                   key={name}
                   newBadge={newBadge}
+                  switchIsOn={
+                    bootSource.metadata.annotations[AUTOMATIC_IMAGE_DOWNLOAD_ANNOTATION] !== 'false'
+                  }
                   title={name}
                   turnOnSwitch={(checked) => onChangeDataImportCronTemplate(checked, index)}
                 />

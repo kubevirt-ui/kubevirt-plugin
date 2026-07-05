@@ -1,14 +1,14 @@
 import produce from 'immer';
 
-import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { type V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { DataSourceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { DataVolumeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
-  V1beta1DataSource,
-  V1beta1DataVolume,
-  V1beta1DataVolumeSpec,
+  type V1beta1DataSource,
+  type V1beta1DataVolume,
+  type V1beta1DataVolumeSpec,
 } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
-import { V1DataVolumeTemplateSpec } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1DataVolumeTemplateSpec } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -80,7 +80,7 @@ export const getBootDataSource = async (
   )
     return await getDataSource(
       dataVolume?.spec?.sourceRef?.name,
-      dataVolume?.spec?.sourceRef?.namespace || dataVolume.metadata.namespace || DEFAULT_NAMESPACE,
+      dataVolume?.spec?.sourceRef?.namespace ?? dataVolume.metadata.namespace ?? DEFAULT_NAMESPACE,
     );
 };
 
@@ -127,7 +127,7 @@ const waitPVCGetDeleted = (name: string, namespace: string): Promise<void> => {
 export const editBootSource = async (
   dataSource: V1beta1DataSource,
   bootSource: V1beta1DataVolumeSpec,
-) => {
+): Promise<void> => {
   const dataSourcePVCName = dataSource?.spec?.source?.pvc?.name;
   const dataSourcePVCNamespace = dataSource?.spec?.source?.pvc?.namespace;
 
@@ -151,7 +151,7 @@ export const editBootSource = async (
 export const getEditBootSourceRefDescription = (
   dataSource: V1beta1DataSource,
   canEditBootSource: boolean,
-) => {
+): string | undefined => {
   if (!canEditBootSource) return t('This user is not allowed to edit this boot source');
   if (!dataSource) return t('Template does not use boot source reference');
   if (!hasEditableBootSource(dataSource)) return t('Boot source reference cannot be edited');

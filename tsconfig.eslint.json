@@ -1,5 +1,13 @@
 {
   "extends": "./tsconfig.json",
+  "include": [
+    "src/**/*",
+    "images/**/*",
+    "plugin-metadata.ts",
+    "plugin-extensions.ts",
+    "@types/**/*",
+    "playwright/**/*"
+  ],
   "compilerOptions": {
     "exactOptionalPropertyTypes": true,
     "forceConsistentCasingInFileNames": true,

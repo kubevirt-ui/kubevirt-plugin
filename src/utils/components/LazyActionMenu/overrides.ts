@@ -2,25 +2,24 @@ import { useEffect, useState } from 'react';
 
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import {
-  AccessReviewResourceAttributes,
-  Action,
+  type AccessReviewResourceAttributes,
+  type Action,
   checkAccess,
-  GroupedMenuOption,
-  K8sVerb,
-  MenuOption,
-  SelfSubjectAccessReviewKind,
+  type GroupedMenuOption,
+  type K8sVerb,
+  type MenuOption,
+  type SelfSubjectAccessReviewKind,
 } from '@openshift-console/dynamic-plugin-sdk';
-import { ImpersonateKind } from '@openshift-console/dynamic-plugin-sdk/lib/app/redux-types';
-import { FleetAccessReviewResourceAttributes } from '@stolostron/multicluster-sdk';
+import { type ImpersonateKind } from '@openshift-console/dynamic-plugin-sdk/lib/app/redux-types';
+import { type FleetAccessReviewResourceAttributes } from '@stolostron/multicluster-sdk';
 import { checkAccess as fleetCheckAccess } from '@stolostron/multicluster-sdk/lib/internal/checkAccess';
 
-import { ActionDropdownItemType } from '../ActionsDropdown/constants';
-
-import { CheckAccess } from './LazyActionMenu';
+import { type ActionDropdownItemType } from '../ActionsDropdown/constants';
+import { type CheckAccess } from './LazyActionMenu';
 
 export const checkAccessForFleet = (
   accessReview: AccessReviewResourceAttributes | FleetAccessReviewResourceAttributes,
-) => {
+): Promise<SelfSubjectAccessReviewKind> => {
   const {
     cluster = '',
     group = '',
@@ -51,19 +50,19 @@ export const useCheckAccess = (
   checkAccessDelegate: CheckAccess = checkAccess,
 ): [boolean, boolean] => {
   const [loading, setLoading] = useState(true);
-  const [isAllowed, setAllowed] = useState(false);
+  const [isAllowed, setIsAllowed] = useState(false);
 
   useEffect(() => {
     checkAccessDelegate(resourceAttributes, impersonate)
       .then((result: SelfSubjectAccessReviewKind) => {
-        setAllowed(Boolean(result?.status?.allowed));
+        setIsAllowed(Boolean(result?.status?.allowed));
       })
       .catch((e) => {
         kubevirtConsole.warn('SelfSubjectAccessReview failed', e);
         // Default to enabling the action if the access review fails so that we
         // don't incorrectly block users from actions they can perform. The server
         // still enforces access control.
-        setAllowed(true);
+        setIsAllowed(true);
       })
       .finally(() => setLoading(false));
   }, [resourceAttributes, impersonate, checkAccessDelegate]);

@@ -1,8 +1,8 @@
-import { V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
-import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import { type V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
+import { type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
-import { CdiUploadTrackMetadata } from '../useUploadProgressToast/types';
-
+import { type CdiUploadTrackMetadata } from '../useUploadProgressToast/types';
+// eslint-disable-next-line @typescript-eslint/naming-convention -- Will be removed in later PR
 export enum UPLOAD_STATUS {
   ALLOCATING = 'ALLOCATING',
   CANCELED = 'CANCELED',
@@ -26,12 +26,7 @@ export const getUploadErrorMessage = (uploadError?: UploadError): string =>
   uploadError?.message ?? '';
 
 export type DataUpload = {
-  cancelUpload?: () => Promise<{
-    metadata: {
-      name: string;
-      namespace: string;
-    };
-  }>;
+  cancelUpload?: () => Promise<K8sResourceCommon>;
   fileName?: string;
   namespace: string;
   progress?: number;

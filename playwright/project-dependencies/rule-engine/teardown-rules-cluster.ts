@@ -415,6 +415,7 @@ export function getClusterTeardownRules(): TeardownRule[] {
               .deleteProject(name)
               .then(() => {
                 logger.info(`✓ Deleted test namespace: ${name}`);
+                return undefined;
               })
               .catch((error: unknown) => {
                 const err = error as { statusCode?: number; message?: string };

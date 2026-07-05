@@ -22,7 +22,7 @@ export async function waitForVirtualMachineReady(
     } catch {
       /* continue polling */
     }
-    await new Promise((r) => setTimeout(r, TestTimeouts.SHORT_WAIT));
+    await new Promise((resolve) => setTimeout(resolve, TestTimeouts.SHORT_WAIT));
   }
   throw new Error(`VM ${vmName} did not become ready within ${timeoutMs}ms`);
 }
@@ -49,7 +49,7 @@ export async function waitForVirtualMachineStopped(
     } catch {
       return;
     }
-    await new Promise((r) => setTimeout(r, TestTimeouts.SHORT_WAIT));
+    await new Promise((resolve) => setTimeout(resolve, TestTimeouts.SHORT_WAIT));
   }
   throw new Error(`VM ${vmName} did not stop within ${timeoutMs}ms`);
 }
@@ -70,7 +70,7 @@ export async function waitForVirtualMachinePaused(
         status?: { conditions?: Array<{ type?: string; status?: string }> };
       } | null;
       if (!vmi) {
-        await new Promise((r) => setTimeout(r, TestTimeouts.SHORT_WAIT));
+        await new Promise((resolve) => setTimeout(resolve, TestTimeouts.SHORT_WAIT));
         continue;
       }
       const conditions = vmi.status?.conditions || [];
@@ -81,7 +81,7 @@ export async function waitForVirtualMachinePaused(
     } catch {
       /* continue */
     }
-    await new Promise((r) => setTimeout(r, TestTimeouts.SHORT_WAIT));
+    await new Promise((resolve) => setTimeout(resolve, TestTimeouts.SHORT_WAIT));
   }
   throw new Error(`VM ${vmName} did not become paused within ${timeoutMs}ms`);
 }

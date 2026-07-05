@@ -160,7 +160,7 @@ export default class VmDetailComponent extends PageCommons {
       timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
     });
     await this.robustClick(this._vmOverviewDetailsStatus);
-    await new Promise((r) => setTimeout(r, 1500));
+    await new Promise((resolve) => setTimeout(resolve, 1500));
 
     const dialogSelectors = [
       '.pf-v6-c-popover__content',
