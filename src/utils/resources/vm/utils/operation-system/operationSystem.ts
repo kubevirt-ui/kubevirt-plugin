@@ -1,10 +1,10 @@
+import { OS_NAME_LABELS } from '@kubevirt-utils/resources/template';
 import {
   NAME_OS_TEMPLATE_ANNOTATION,
   OS_TEMPLATE_LABEL,
   VM_OS_ANNOTATION,
 } from '@kubevirt-utils/resources/vm';
-import { OS_NAME_LABELS } from '@kubevirt-utils/resources/template';
-import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import { type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
 /**
  * @date 3/16/2022 - 10:08:55 AM
@@ -22,7 +22,7 @@ type LabelsOrAnnotationsMap = {
  * @param {string} keyPrefix - prefix to search
  * @returns {*}
  */
-const getPrefixedKey = (obj: LabelsOrAnnotationsMap, keyPrefix: string) =>
+const getPrefixedKey = (obj: LabelsOrAnnotationsMap, keyPrefix: string): null | string =>
   obj ? Object.keys(obj).find((key) => key.startsWith(keyPrefix)) : null;
 
 /**
@@ -31,7 +31,7 @@ const getPrefixedKey = (obj: LabelsOrAnnotationsMap, keyPrefix: string) =>
  * @param {string} key - key to search
  * @returns {*}
  */
-const getSuffixValue = (key: string) => {
+const getSuffixValue = (key: string): null | string => {
   const index = key ? key.lastIndexOf('/') : -1;
   return index > 0 ? key.substring(index + 1) : null;
 };
@@ -43,7 +43,7 @@ const getSuffixValue = (key: string) => {
  * @param {string} keyPrefix - prefix to search
  * @returns {*}
  */
-export const findKeySuffixValue = (obj: LabelsOrAnnotationsMap, keyPrefix: string) =>
+export const findKeySuffixValue = (obj: LabelsOrAnnotationsMap, keyPrefix: string): null | string =>
   getSuffixValue(getPrefixedKey(obj, keyPrefix));
 
 /**
@@ -65,7 +65,7 @@ export const getValueByPrefix = (obj: LabelsOrAnnotationsMap, keyPrefix: string)
  * @returns {string}
  */
 export const getOperatingSystem = (obj: K8sResourceCommon): string =>
-  findKeySuffixValue(obj?.metadata?.labels, OS_TEMPLATE_LABEL) ||
+  findKeySuffixValue(obj?.metadata?.labels, OS_TEMPLATE_LABEL) ??
   obj?.metadata?.annotations?.[VM_OS_ANNOTATION];
 
 /**
@@ -105,6 +105,7 @@ export const isWindows = (obj: K8sResourceCommon): boolean =>
  * or undefined when no known OS matches.
  *
  * Handles the special case where Windows annotations use the "win" prefix.
+ * @param {...any} terms
  */
 export const matchOSName = (...terms: (string | undefined)[]): string | undefined =>
   Object.values(OS_NAME_LABELS).find((osNameLabel) => {

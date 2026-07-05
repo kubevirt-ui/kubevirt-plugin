@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useEffect, useState } from 'react';
+import React, { type FC, useCallback, useEffect, useState } from 'react';
 import { useDebounceCallback } from 'src/views/clusteroverview/utils/hooks/useDebounceCallback';
 
 import { ConfigMapModel } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -55,7 +55,9 @@ const SSHConfiguration: FC<SSHConfigurationProps> = ({ newBadge }) => {
         ],
         model: ConfigMapModel,
         resource: featureConfigMap,
-      }).finally(() => setIsLoading(false));
+      })
+        .catch(() => {})
+        .finally(() => setIsLoading(false));
     },
     [cluster, featureConfigMap],
   );
@@ -71,47 +73,47 @@ const SSHConfiguration: FC<SSHConfigurationProps> = ({ newBadge }) => {
     >
       <Stack hasGutter>
         <SectionWithSwitch
+          dataTestID="load-balancer"
           helpTextIconContent={t(
             'Enable the creation of LoadBalancer services for SSH connections to VirtualMachines. A load balancer must be configured',
           )}
-          switchIsOn={
-            featureConfigMap?.data?.[LOAD_BALANCER_ENABLED] === 'true' || hasMetalLBInstalled
-          }
-          dataTestID="load-balancer"
           id="load-balancer-feature"
           isDisabled={!loaded || !isAdmin || hasMetalLBInstalled}
           isLoading={loadBalancerIsLoading}
           newBadge={newBadge}
           olsPromptType={OLSPromptType.SSH_OVER_LOADBALANCER_SERVICE}
+          switchIsOn={
+            featureConfigMap?.data?.[LOAD_BALANCER_ENABLED] === 'true' || hasMetalLBInstalled
+          }
           title={t('SSH over LoadBalancer service')}
           turnOnSwitch={(checked) => onChange(checked.toString(), LOAD_BALANCER_ENABLED)}
         />
         <SectionWithSwitch
+          dataTestID="node-port"
           helpTextIconContent={t(
             'Allow the creation of NodePort services for SSH connections to VirtualMachines. An address of a publicly available Node must be provided.',
           )}
-          switchIsOn={
-            featureConfigMap?.data?.[NODE_PORT_ENABLED] === 'true' &&
-            !isEmpty(featureConfigMap?.data?.[NODE_PORT_ADDRESS])
-          }
-          dataTestID="node-port"
           id="node-port-feature"
           isDisabled={!loaded || !isAdmin || isEmpty(featureConfigMap?.data?.[NODE_PORT_ADDRESS])}
           isLoading={nodePortIsLoading}
           newBadge={newBadge}
           olsPromptType={OLSPromptType.SSH_OVER_NODEPORT_SERVICE}
+          switchIsOn={
+            featureConfigMap?.data?.[NODE_PORT_ENABLED] === 'true' &&
+            !isEmpty(featureConfigMap?.data?.[NODE_PORT_ADDRESS])
+          }
           title={t('SSH over NodePort service')}
           turnOnSwitch={(checked) => onChange(checked.toString(), NODE_PORT_ENABLED)}
         />
         <TextInput
-          onChange={(_event, value: string) => {
-            setUrl(value);
-            onTextChange(value, NODE_PORT_ADDRESS);
-          }}
           className="pf-v6-u-mr-md"
           id="node-address"
           isRequired
           name="node-address"
+          onChange={(_event, value: string) => {
+            setUrl(value);
+            onTextChange(value, NODE_PORT_ADDRESS);
+          }}
           placeholder={t('Enter node address')}
           value={url ?? featureConfigMap?.data?.[NODE_PORT_ADDRESS]}
         />

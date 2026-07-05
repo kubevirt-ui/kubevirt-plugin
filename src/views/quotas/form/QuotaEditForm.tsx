@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 import { useParams } from 'react-router';
 
 import StateHandler from '@kubevirt-utils/components/StateHandler/StateHandler';
@@ -8,7 +8,7 @@ import {
   ApplicationAwareResourceQuotaModel,
   modelToGroupVersionKind,
 } from '@kubevirt-utils/models';
-import { ApplicationAwareQuota } from '@kubevirt-utils/resources/quotas/types';
+import { type ApplicationAwareQuota } from '@kubevirt-utils/resources/quotas/types';
 
 import QuotaFormTitle from './components/QuotaFormTitle';
 import QuotaFormEditor from './QuotaFormEditor';
@@ -28,10 +28,10 @@ const QuotaEditForm: FC = () => {
       <QuotaFormTitle isEdit />
       <SyncedEditor
         displayConversionError
-        FormEditor={QuotaFormEditor}
+        formEditor={QuotaFormEditor}
         initialData={quota}
         isEdit
-        YAMLEditor={QuotaYAMLEditor}
+        yamlEditor={QuotaYAMLEditor}
       />
     </StateHandler>
   );

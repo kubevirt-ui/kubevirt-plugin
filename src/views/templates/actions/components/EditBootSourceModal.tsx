@@ -1,18 +1,18 @@
-import React, { FC, useEffect, useRef, useState } from 'react';
+import React, { type FC, useEffect, useRef, useState } from 'react';
 import { Trans } from 'react-i18next';
 
 import {
   modelToGroupVersionKind,
   TemplateModel,
-  V1Template,
+  type V1Template,
 } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
-  V1beta1DataSource,
-  V1beta1DataVolumeSpec,
+  type V1beta1DataSource,
+  type V1beta1DataVolumeSpec,
 } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { K8sResourceCommon, ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
+import { type K8sResourceCommon, ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Alert,
   AlertVariant,
@@ -23,9 +23,9 @@ import {
   Popover,
 } from '@patternfly/react-core';
 
-import { SOURCE_TYPES } from '../../utils/constants';
 import { editBootSource } from '../editBootSource';
 
+import { SOURCE_TYPES } from '../../utils/constants';
 import useBootSourceEditAffectedTemplates from './hooks/useBootSourceEditAffectedTemplates';
 import { SelectSource } from './SelectSource';
 import SelectSourceSkeleton from './SelectSourceSkeleton';
@@ -54,12 +54,13 @@ const EditBootSourceModal: FC<EditBootSourceModalProps> = ({
     setLoading(true);
     getDataVolumeSpec(dataSource)
       .then(setBootSource)
+      .catch(() => {})
       .finally(() => setLoading(false));
   }, [dataSource]);
 
   const affectedTemplates = useBootSourceEditAffectedTemplates(obj);
 
-  const onSubmit = async () => {
+  const onSubmit = async (): Promise<void> => {
     await editBootSource(dataSource, bootSource);
   };
 
@@ -107,14 +108,14 @@ const EditBootSourceModal: FC<EditBootSourceModalProps> = ({
             <SelectSourceSkeleton />
           ) : (
             <SelectSource
+              onSourceChange={setBootSource}
+              source={bootSource}
+              sourceLabel={t('Boot source type')}
               sourceOptions={[
                 SOURCE_TYPES.pvcSource,
                 SOURCE_TYPES.registrySource,
                 SOURCE_TYPES.httpSource,
               ]}
-              onSourceChange={setBootSource}
-              source={bootSource}
-              sourceLabel={t('Boot source type')}
               withSize
             />
           )}

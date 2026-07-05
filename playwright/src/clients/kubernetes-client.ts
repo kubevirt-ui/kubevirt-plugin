@@ -1,4 +1,4 @@
-import * as fs from 'fs';
+import { existsSync } from 'fs';
 
 import * as k8s from '@kubernetes/client-node';
 
@@ -8,43 +8,39 @@ import {
   getOAuthToken,
   getProxyUrl,
 } from './kubernetes-auth';
+import { buildContainerDiskVmResource } from './vm-resources';
 
 const POLL_INTERVAL = 2000;
 
-/**
- * Kubernetes client for scenario E2E tests.
- * Wraps @kubernetes/client-node directly — extend with new methods as tests require them.
- */
+/** Kubernetes client for scenario E2E tests. */
 export class KubernetesClient {
   static readonly generateKubeconfig = generateKubeconfig;
   static readonly getOAuthToken = getOAuthToken;
 
   private readonly coApi: k8s.CustomObjectsApi;
   private readonly coreApi: k8s.CoreV1Api;
-  private readonly kc: k8s.KubeConfig;
+  private readonly kubeConfig: k8s.KubeConfig;
 
   constructor(kubeConfigPath: string) {
-    this.kc = new k8s.KubeConfig();
-
-    if (!fs.existsSync(kubeConfigPath)) {
+    this.kubeConfig = new k8s.KubeConfig();
+    if (!existsSync(kubeConfigPath)) {
       throw new Error(`Kubeconfig not found: ${kubeConfigPath}`);
     }
-
-    this.kc.loadFromFile(kubeConfigPath);
+    this.kubeConfig.loadFromFile(kubeConfigPath);
 
     const proxyUrl = getProxyUrl();
     const origCreateAgent = (
-      this.kc as unknown as {
+      this.kubeConfig as unknown as {
         createAgent: (c: unknown, o: Record<string, unknown>) => unknown;
       }
-    ).createAgent.bind(this.kc);
+    ).createAgent.bind(this.kubeConfig);
 
     let sharedAgent: unknown = null;
     (
-      this.kc as unknown as {
+      this.kubeConfig as unknown as {
         createAgent: (c: unknown, o: unknown) => unknown;
       }
-    ).createAgent = (cluster: unknown, agentOptions: unknown) => {
+    ).createAgent = (cluster: unknown, agentOptions: unknown): unknown => {
       if (!sharedAgent) {
         const baseOpts =
           typeof agentOptions === 'object' && agentOptions !== null
@@ -62,8 +58,8 @@ export class KubernetesClient {
       return sharedAgent;
     };
 
-    this.coreApi = this.kc.makeApiClient(k8s.CoreV1Api);
-    this.coApi = this.kc.makeApiClient(k8s.CustomObjectsApi);
+    this.coreApi = this.kubeConfig.makeApiClient(k8s.CoreV1Api);
+    this.coApi = this.kubeConfig.makeApiClient(k8s.CustomObjectsApi);
   }
 
   private async waitForNamespaceActive(name: string, timeoutMs = 30_000): Promise<void> {
@@ -75,7 +71,7 @@ export class KubernetesClient {
       } catch {
         // Not ready yet
       }
-      await new Promise((r) => setTimeout(r, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
     }
     throw new Error(`Timeout: Namespace ${name} did not become Active in ${timeoutMs}ms`);
   }
@@ -84,52 +80,18 @@ export class KubernetesClient {
     try {
       await this.coreApi.deleteNamespace({ name });
     } catch {
-      // Ignore — namespace may already be gone
+      /* Ignore — namespace may already be gone */
     }
   }
 
   async createContainerDiskVm(vmName: string, namespace: string): Promise<void> {
-    const vmResource = {
-      apiVersion: 'kubevirt.io/v1',
-      kind: 'VirtualMachine',
-      metadata: {
-        name: vmName,
-        namespace,
-        labels: { app: vmName, 'test-framework': 'playwright' },
-      },
-      spec: {
-        runStrategy: 'Always',
-        template: {
-          metadata: { labels: { 'kubevirt.io/domain': vmName } },
-          spec: {
-            domain: {
-              cpu: { cores: 1, sockets: 1, threads: 1 },
-              memory: { guest: '128Mi' },
-              devices: {
-                disks: [{ disk: { bus: 'virtio' }, name: 'containerdisk' }],
-                rng: {},
-              },
-            },
-            volumes: [
-              {
-                name: 'containerdisk',
-                containerDisk: {
-                  image: 'quay.io/kubevirt/cirros-container-disk-demo:latest',
-                },
-              },
-            ],
-          },
-        },
-      },
-    };
-
     try {
       await this.coApi.createNamespacedCustomObject({
+        body: buildContainerDiskVmResource(vmName, namespace),
         group: 'kubevirt.io',
-        version: 'v1',
         namespace,
         plural: 'virtualmachines',
-        body: vmResource,
+        version: 'v1',
       });
     } catch (error: unknown) {
       const msg = error instanceof Error ? error.message : String(error);
@@ -140,7 +102,7 @@ export class KubernetesClient {
 
   getCurrentUserToken(): string | undefined {
     try {
-      return this.kc.getCurrentUser()?.token;
+      return this.kubeConfig.getCurrentUser()?.token;
     } catch {
       return undefined;
     }
@@ -154,20 +116,13 @@ export class KubernetesClient {
         return;
       }
     } catch {
-      // Namespace doesn't exist — create it
+      /* Namespace doesn't exist — create it */
     }
-
     await this.coreApi.createNamespace({
       body: {
         apiVersion: 'v1',
         kind: 'Namespace',
-        metadata: {
-          name,
-          labels: {
-            'test-framework': 'playwright',
-            'e2e-test': 'true',
-          },
-        },
+        metadata: { labels: { 'e2e-test': 'true', 'test-framework': 'playwright' }, name },
       },
     });
     await this.waitForNamespaceActive(name);
@@ -182,21 +137,19 @@ export class KubernetesClient {
     const start = Date.now();
     while (Date.now() - start < timeoutMs) {
       try {
-        const vm = await this.coApi.getNamespacedCustomObject({
+        const vm = (await this.coApi.getNamespacedCustomObject({
           group: 'kubevirt.io',
-          version: 'v1',
+          name: vmName,
           namespace,
           plural: 'virtualmachines',
-          name: vmName,
-        });
-        const status = (vm as Record<string, unknown>).status as
-          | { printableStatus?: string }
-          | undefined;
+          version: 'v1',
+        })) as Record<string, unknown>;
+        const status = vm.status as { printableStatus?: string } | undefined;
         if (status?.printableStatus === 'Running') return;
       } catch {
         // VM may not exist yet — keep polling
       }
-      await new Promise((r) => setTimeout(r, POLL_INTERVAL));
+      await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL));
     }
     throw new Error(`Timeout: VM ${vmName} did not reach Running in ${timeoutMs}ms`);
   }

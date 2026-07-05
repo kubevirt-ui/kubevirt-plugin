@@ -1,38 +1,23 @@
-import { TFunction } from 'i18next';
-import produce from 'immer';
+import { type TFunction } from 'i18next';
 
 import { DataVolumeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { PersistentVolumeClaimModel, UploadTokenRequestModel } from '@kubevirt-utils/models';
-import {
-  buildOwnerReference,
-  getAPIVersionForModel,
-  getName,
-  getNamespace,
-} from '@kubevirt-utils/resources/shared';
-import {
-  getDataVolume,
-  getPVC,
-} from '@kubevirt-utils/resources/template/hooks/useVmTemplateSource/utils';
+import { type V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { PersistentVolumeClaimModel } from '@kubevirt-utils/models';
+import { buildOwnerReference, getName, getNamespace } from '@kubevirt-utils/resources/shared';
+import { getPVC } from '@kubevirt-utils/resources/template/hooks/useVmTemplateSource/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
-import { kubevirtK8sCreate, kubevirtK8sDelete, kubevirtK8sPatch } from '@multicluster/k8sRequests';
-import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import { kubevirtK8sDelete, kubevirtK8sPatch } from '@multicluster/k8sRequests';
+import { type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { ProgressVariant } from '@patternfly/react-core';
 
 import { t } from '../useKubevirtTranslation';
 
-import { CDI_BIND_REQUESTED_ANNOTATION } from './consts';
-import { CDIConfig, UPLOAD_STATUS } from './types';
+import { type CDIConfig, UPLOAD_STATUS } from './types';
 
+export { createUploadPVC, delay, PVCInitError } from './createUploadHelpers';
 export type { CDIConfig } from './types';
 export { UPLOAD_STATUS } from './types';
-
-type UploadToken = K8sResourceCommon & {
-  status: {
-    token?: string;
-  };
-};
 
 export const UPLOAD_STATUS_LABELS = {
   [UPLOAD_STATUS.ALLOCATING]: t('Allocating resources, please wait for upload to start.'),
@@ -50,113 +35,21 @@ export const uploadStatusToProgressVariant = {
   [UPLOAD_STATUS.SUCCESS]: ProgressVariant.success,
 };
 
-const WAIT_FOR_UPLOAD_READY = {
-  COUNT: 150,
-  INTERVAL_MS: 2 * 1000,
-};
+export const getUploadProxyURL = (config: CDIConfig): string => config?.status?.uploadProxyURL;
 
-const DV_UPLOAD_STATES = {
-  READY: 'UploadReady',
-  SCHEDULED: 'UploadScheduled',
-};
-
-export class PVCInitError extends Error {
-  constructor() {
-    // t('DataVolume failed to initiate upload.')
-    super('DataVolume failed to initiate upload.');
-  }
-}
-
-export const delay = (ms: number): Promise<void> =>
-  new Promise((resolve) => setTimeout(resolve, ms));
-
-export const getUploadProxyURL = (config: CDIConfig) => config?.status?.uploadProxyURL;
-
-export const getUploadURL = (uploadProxyURL: string) =>
+export const getUploadURL = (uploadProxyURL: string): string =>
   `https://${uploadProxyURL}/v1beta1/upload-form-async`;
 
-export const cancelUploadPVC = async (name: string, namespace: string, cluster?: string) => {
+export const cancelUploadPVC = async (
+  name: string,
+  namespace: string,
+  cluster?: string,
+): Promise<K8sResourceCommon> => {
   return kubevirtK8sDelete({
     cluster,
     model: DataVolumeModel,
     resource: { metadata: { name, namespace } },
   });
-};
-
-const waitForUploadReady = async (dataVolume: V1beta1DataVolume) => {
-  let dv = dataVolume;
-  const dvName = getName(dataVolume);
-  const dvNamespace = getNamespace(dataVolume);
-  const dvCluster = getCluster(dataVolume);
-
-  for (let i = 0; i < WAIT_FOR_UPLOAD_READY.COUNT; i++) {
-    if (dv?.status?.phase === DV_UPLOAD_STATES.READY) {
-      return true;
-    }
-    await delay(WAIT_FOR_UPLOAD_READY.INTERVAL_MS);
-    dv = await getDataVolume(dvName, dvNamespace, dvCluster);
-  }
-
-  throw new PVCInitError();
-};
-
-const createUploadToken = async (
-  pvcName: string,
-  namespace: string,
-  cluster?: string,
-): Promise<string> => {
-  const tokenRequest = {
-    apiVersion: getAPIVersionForModel(UploadTokenRequestModel),
-    kind: UploadTokenRequestModel.kind,
-    metadata: {
-      name: pvcName,
-      namespace,
-    },
-    spec: {
-      pvcName,
-    },
-    status: {},
-  };
-
-  try {
-    const resource = await kubevirtK8sCreate<UploadToken>({
-      cluster,
-      data: tokenRequest,
-      model: UploadTokenRequestModel,
-    });
-    return resource?.status?.token;
-  } catch (error) {
-    throw new Error(error.message);
-  }
-};
-
-export const createUploadPVC = async (dataVolume: V1beta1DataVolume) => {
-  const dvName = getName(dataVolume);
-  const namespace = getNamespace(dataVolume);
-  const cluster = getCluster(dataVolume);
-
-  const updatedDataVolume = produce(dataVolume, (dvDraft) => {
-    dvDraft.metadata.annotations = {
-      ...(dvDraft.metadata.annotations || {}),
-      [CDI_BIND_REQUESTED_ANNOTATION]: 'true',
-    };
-  });
-
-  try {
-    const dv = await kubevirtK8sCreate({
-      cluster,
-      data: updatedDataVolume,
-      model: DataVolumeModel,
-    });
-    await waitForUploadReady(dv);
-    const token = await createUploadToken(dvName, namespace, cluster);
-    return { token };
-  } catch (error) {
-    if (error instanceof PVCInitError) {
-      throw new PVCInitError();
-    }
-    throw new Error(error.message);
-  }
 };
 
 /**
@@ -168,7 +61,7 @@ export const createUploadPVC = async (dataVolume: V1beta1DataVolume) => {
 export const addUploadDataVolumeOwnerReference = (
   vm: V1VirtualMachine,
   dataVolume: V1beta1DataVolume,
-) => {
+): Promise<K8sResourceCommon | undefined> => {
   const cluster = getCluster(dataVolume);
   // Since DV is GC we want underlying PVC to get ownerReference and to be associated with VM parent
   return getPVC(getName(dataVolume), getNamespace(dataVolume), cluster)
@@ -180,7 +73,7 @@ export const addUploadDataVolumeOwnerReference = (
             op: 'replace',
             path: '/metadata/ownerReferences',
             value: [
-              ...(pvc?.metadata?.ownerReferences || []),
+              ...(pvc?.metadata?.ownerReferences ?? []),
               buildOwnerReference(vm, { blockOwnerDeletion: false }),
             ],
           },
@@ -189,12 +82,12 @@ export const addUploadDataVolumeOwnerReference = (
         resource: pvc,
       }),
     )
-    .catch(() => Promise.resolve());
+    .catch(() => undefined);
 };
 
 export const isUploadingDisk = (uploadStatus?: UPLOAD_STATUS): boolean => {
   return (
-    uploadStatus != null &&
+    uploadStatus !== undefined &&
     [UPLOAD_STATUS.ALLOCATING, UPLOAD_STATUS.UPLOADING].includes(uploadStatus)
   );
 };

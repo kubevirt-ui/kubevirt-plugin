@@ -1,30 +1,20 @@
-import { SetStateAction } from 'react';
 import produce from 'immer';
 
 import {
-  ProcessedTemplatesModel,
-  TemplateModel,
-  TemplateParameter,
-  V1Template,
-  VirtualMachineTemplateModel,
-  VirtualMachineTemplateRequestModel,
+  type TemplateParameter,
+  type V1Template,
+  VirtualMachineModel,
 } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { V1alpha1VirtualMachineTemplateSpecParameters } from '@kubevirt-ui-ext/kubevirt-api/virt-template';
-import { logTemplateEdited } from '@kubevirt-utils/extensions/telemetry/templates';
-import { getAnnotation, getLabels, getName, getNamespace } from '@kubevirt-utils/resources/shared';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { getAnnotation, getLabels } from '@kubevirt-utils/resources/shared';
 import {
   getParameters,
-  isOpenShiftTemplate,
   isVirtualMachineTemplate,
-  Template,
+  type Template,
 } from '@kubevirt-utils/resources/template';
 import { vmBootDiskSourceIsRegistry } from '@kubevirt-utils/resources/vm/utils/source';
 import { generatePrettyName } from '@kubevirt-utils/utils/utils';
-import { getCluster } from '@multicluster/helpers/selectors';
-import { kubevirtK8sCreate, kubevirtK8sUpdate } from '@multicluster/k8sRequests';
-import { K8sModel } from '@openshift-console/dynamic-plugin-sdk';
+import { type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
 import { ANNOTATIONS } from './annotations';
 import {
@@ -34,18 +24,25 @@ import {
 } from './constants';
 import { getTemplatePVCName, getTemplateVirtualMachineObject } from './selectors';
 
+export {
+  createProcessedTemplate,
+  createTemplateDraft,
+  getTemplateModel,
+  replaceTemplateParameters,
+  updateTemplate,
+} from './templateOperations';
+
 // Only used for replacing parameters in the template, do not use for anything else
-// eslint-disable-next-line jsdoc/require-jsdoc
+
 export const poorManProcess = (template: V1Template): V1Template => {
   if (!template) return null;
 
   let templateString = JSON.stringify(template);
 
-  template?.parameters
-    ?.filter((p) => p.value)
-    ?.forEach((p) => {
-      templateString = templateString.replaceAll(`\${${p?.name}}`, p?.value);
-    });
+  const params = template?.parameters?.filter((param) => param.value) ?? [];
+  for (const param of params) {
+    templateString = templateString.replaceAll(`\${${param?.name}}`, param?.value);
+  }
 
   return JSON.parse(templateString);
 };
@@ -82,49 +79,27 @@ export const generateVMName = (template: Template): string => {
   return generatePrettyName(getTemplatePVCName(template) || template?.metadata?.name);
 };
 
-export const generateVMNamePrettyParam = (template: Template): TemplateParameter => {
+export const generateVMNamePrettyParam = (template: Template): TemplateParameter | undefined => {
   if (getAnnotation(template, GENERATE_VM_PRETTY_NAME_ANNOTATION)) {
     return { description: 'VM name', name: 'NAME', value: generateVMName(template) };
   }
 };
 
-export const generateParamsWithPrettyName = (template: Template) => {
+export const generateParamsWithPrettyName = (template: Template): TemplateParameter[] => {
   const parameters = getParameters(template);
   if (parameters) {
-    const [nameParam, ...restParams] = parameters?.reduce(
-      (acc: TemplateParameter[], param) =>
-        (param?.name === 'NAME' ? acc.unshift(param) : acc.push(param)) && acc,
+    const templateParams = parameters as TemplateParameter[];
+    const sorted: TemplateParameter[] = templateParams.reduce<TemplateParameter[]>(
+      (acc, param) => (param?.name === 'NAME' ? acc.unshift(param) : acc.push(param)) && acc,
       [],
     );
+    const [nameParam, ...restParams] = sorted;
     return [...restParams, generateVMNamePrettyParam(template) ?? nameParam];
   }
   return [];
 };
 
-export const replaceTemplateParameters = (
-  template: Template,
-  parameters: TemplateParameter[] | V1alpha1VirtualMachineTemplateSpecParameters[],
-) =>
-  produce(template, (draftTemplate) => {
-    if (isOpenShiftTemplate(draftTemplate)) draftTemplate.parameters = parameters;
-    if (isVirtualMachineTemplate(draftTemplate))
-      draftTemplate.spec.parameters = parameters as V1alpha1VirtualMachineTemplateSpecParameters[];
-  });
-
-export const createTemplateDraft = (
-  template: Template,
-  namespace: string,
-  parameters: TemplateParameter[] | V1alpha1VirtualMachineTemplateSpecParameters[],
-) =>
-  produce(template, (draftTemplate) => {
-    if (isOpenShiftTemplate(draftTemplate)) draftTemplate.parameters = parameters;
-    if (isVirtualMachineTemplate(draftTemplate))
-      draftTemplate.spec.parameters = parameters as V1alpha1VirtualMachineTemplateSpecParameters[];
-
-    draftTemplate.metadata = { ...draftTemplate.metadata, namespace };
-  });
-
-export const bootDiskSourceIsRegistry = (template: V1Template) => {
+export const bootDiskSourceIsRegistry = (template: V1Template): boolean => {
   const vmObject: V1VirtualMachine = getTemplateVirtualMachineObject(template);
   return vmBootDiskSourceIsRegistry(vmObject);
 };
@@ -161,54 +136,4 @@ export const isValidTemplateIconUrl = (url: string): boolean => {
   }
 
   return false;
-};
-
-export const getTemplateModel = (template: Template): K8sModel =>
-  isVirtualMachineTemplate(template) ? VirtualMachineTemplateModel : TemplateModel;
-
-export const updateTemplate = async (template: Template) => {
-  const model = getTemplateModel(template);
-  const result = await kubevirtK8sUpdate({
-    cluster: getCluster(template),
-    data: template,
-    model,
-    name: getName(template),
-    ns: getNamespace(template),
-  });
-  logTemplateEdited(template);
-  return result;
-};
-
-export const createProcessedTemplate = <T extends Template>(
-  template: T,
-  cluster: string,
-  namespace: string,
-  excludedParameters: TemplateParameter[],
-  setTemplateWithGeneratedValues: (value: SetStateAction<Template>) => void,
-  setError: (value: SetStateAction<Error>) => void,
-  setLoading: (value: SetStateAction<boolean>) => void,
-) => {
-  kubevirtK8sCreate<T>({
-    cluster,
-    data: template,
-    model: isOpenShiftTemplate(template)
-      ? ProcessedTemplatesModel
-      : VirtualMachineTemplateRequestModel,
-    ns: namespace,
-    queryParams: {
-      dryRun: 'All',
-    },
-  })
-    .then((processedTemplate) => {
-      const mergedParameters = [...(getParameters(processedTemplate) ?? []), ...excludedParameters];
-
-      setTemplateWithGeneratedValues(replaceTemplateParameters(template, mergedParameters));
-      setError(null);
-      setLoading(false);
-    })
-    .catch((apiError) => {
-      setTemplateWithGeneratedValues(template);
-      setError(apiError);
-      setLoading(false);
-    });
 };

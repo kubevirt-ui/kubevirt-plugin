@@ -2,7 +2,11 @@ import { useEffect, useState } from 'react';
 
 import useDeepCompareMemoize from '@kubevirt-utils/hooks/useDeepCompareMemoize/useDeepCompareMemoize';
 import { kubevirtK8sListItems } from '@multicluster/k8sRequests';
-import { K8sModel, K8sResourceCommon, WatchK8sResult } from '@openshift-console/dynamic-plugin-sdk';
+import {
+  type K8sModel,
+  type K8sResourceCommon,
+  type WatchK8sResult,
+} from '@openshift-console/dynamic-plugin-sdk';
 
 type K8sListDataOptions = {
   cluster?: string;
@@ -58,7 +62,7 @@ const useK8sListData = <T extends K8sResourceCommon>(
         }
       });
 
-    return () => {
+    return (): void => {
       canceled = true;
     };
   }, [memoizedOptions]);

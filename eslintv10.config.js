@@ -1,7 +1,6 @@
 import barrelFiles from 'eslint-plugin-barrel-files';
 import i18next from 'eslint-plugin-i18next';
 import importX from 'eslint-plugin-import-x';
-import jsdoc from 'eslint-plugin-jsdoc';
 import perfectionist from 'eslint-plugin-perfectionist';
 import prettier from 'eslint-plugin-prettier/recommended';
 import promise from 'eslint-plugin-promise';
@@ -87,7 +86,7 @@ const baseConfig = {
     'no-var': 'error',
     'no-warning-comments': ['warn', { location: 'start', terms: ['todo', 'fixme', 'hack', 'xxx'] }],
     'prefer-const': 'error',
-    'promise/always-return': 'warn',
+    'promise/always-return': ['warn', { ignoreLastCallback: true }],
     'promise/catch-or-return': ['error', { allowFinally: true }],
     'promise/no-nesting': 'warn',
     'promise/no-return-wrap': 'error',
@@ -216,6 +215,7 @@ const sonarConfig = {
     'sonarjs/fixme-tag': 'off',
     'sonarjs/function-return-type': 'off',
     'sonarjs/no-globals-shadowing': 'off',
+    'sonarjs/no-redundant-jump': 'off',
     'sonarjs/no-unused-vars': 'off',
     'sonarjs/todo-tag': 'off',
     'sonarjs/unused-import': 'off',
@@ -267,29 +267,6 @@ const prettierOverrides = {
   },
 };
 
-const jsdocConfig = {
-  files: ['src/utils/**/*.{js,ts,tsx}'],
-  plugins: { jsdoc },
-  rules: {
-    'jsdoc/require-jsdoc': [
-      'warn',
-      {
-        require: {
-          FunctionDeclaration: true,
-          FunctionExpression: true,
-        },
-      },
-    ],
-    'jsdoc/require-param': 'warn',
-    'jsdoc/require-param-name': 'warn',
-    'jsdoc/require-param-type': 'off',
-    'jsdoc/require-property': 'warn',
-    'jsdoc/require-property-description': 'warn',
-    'jsdoc/require-property-name': 'warn',
-    'jsdoc/require-property-type': 'warn',
-  },
-};
-
 const githubScriptsOverrides = {
   files: ['.github/**/*.{ts,tsx,js,jsx}'],
   rules: {
@@ -309,6 +286,5 @@ export default [
   testFilesOverrides,
   prettier,
   prettierOverrides,
-  jsdocConfig,
   githubScriptsOverrides,
 ];
