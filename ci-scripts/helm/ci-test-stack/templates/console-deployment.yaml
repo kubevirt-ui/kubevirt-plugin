@@ -51,7 +51,7 @@ spec:
 
             # Branding and docs settings
             - name: BRIDGE_BRANDING
-              value: "okd"
+              value: "ocp"
 
             # Customization settings
             - name: BRIDGE_USER_SETTINGS_LOCATION
