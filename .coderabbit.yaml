@@ -9,15 +9,6 @@ reviews:
   poem: false
   path_filters:
     - '!locales/**'
-    # Force-review dot-folders and automation scripts (often skipped by default filters)
-    - '.cursor/**'
-    - '.claude/**'
-    - '.codex/**'
-    - '.windsurf/**'
-    - '.gemini/**'
-    - '.vscode/**'
-    - '.github/scripts/**'
-    - '.coderabbit.yaml'
   collapse_walkthrough: true
   path_instructions:
     - path: '.cursor/**'
@@ -82,7 +73,6 @@ reviews:
       instructions: |
         SECURITY: Changes here affect review strictness for the entire repo.
         Flag removal or weakening of `path_instructions` for `.cursor/`, `.claude/`, `.vscode/`, or `.github/scripts/`.
-        Flag path_filters that stop reviewing AI configuration directories.
 
 knowledge_base:
   code_guidelines:
