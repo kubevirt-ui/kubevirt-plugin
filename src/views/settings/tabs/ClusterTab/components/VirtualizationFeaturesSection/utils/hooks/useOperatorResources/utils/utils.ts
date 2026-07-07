@@ -4,37 +4,23 @@ import {
   PackageManifestModel,
   SubscriptionModel,
 } from '@kubevirt-utils/models';
-import { getGroupVersionKindForModel, Operator } from '@openshift-console/dynamic-plugin-sdk';
+import { getGroupVersionKindForModel } from '@openshift-console/dynamic-plugin-sdk';
 
 export const getWatchedOperatorResources = (cluster?: string) => ({
+  allPackageManifests: {
+    cluster,
+    groupVersionKind: getGroupVersionKindForModel(PackageManifestModel),
+    isList: true,
+  },
   clusterServiceVersions: {
     cluster,
     groupVersionKind: getGroupVersionKindForModel(ClusterServiceVersionModel),
-    isList: true,
-  },
-  marketplacePackageManifests: {
-    cluster,
-    groupVersionKind: getGroupVersionKindForModel(PackageManifestModel),
     isList: true,
   },
   operatorGroups: {
     cluster,
     groupVersionKind: getGroupVersionKindForModel(OperatorGroupModel),
     isList: true,
-  },
-  packageManifests: {
-    cluster,
-    groupVersionKind: getGroupVersionKindForModel(PackageManifestModel),
-    isList: true,
-    selector: {
-      matchExpressions: [
-        {
-          key: 'opsrc-owner-name',
-          operator: Operator.DoesNotExist,
-        },
-        { key: 'csc-owner-name', operator: Operator.DoesNotExist },
-      ],
-    },
   },
   subscriptions: {
     cluster,

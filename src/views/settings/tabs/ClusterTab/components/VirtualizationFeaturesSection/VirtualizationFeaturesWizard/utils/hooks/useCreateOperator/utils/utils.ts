@@ -122,7 +122,7 @@ export const getOperatorGroup = (
   apiVersion: getAPIVersionForModel(OperatorGroupModel) as OperatorGroupKind['apiVersion'],
   kind: 'OperatorGroup',
   metadata: {
-    generateName: `${namespace}-`,
+    name: namespace,
     namespace: namespace,
   },
   ...(installMode === InstallModeType.InstallModeTypeAllNamespaces

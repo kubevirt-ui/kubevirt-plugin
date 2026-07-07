@@ -13,6 +13,7 @@ import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { kubevirtK8sCreate, kubevirtK8sPatch } from '@multicluster/k8sRequests';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import {
+  InstallModeType,
   InstallPlanApproval,
   K8sResourceKind,
   OperatorGroupKind,
@@ -21,7 +22,10 @@ import {
 import { VirtFeatureOperatorItem } from '@settings/tabs/ClusterTab/components/VirtualizationFeaturesSection/utils/VirtualizationFeaturesContext/utils/types';
 import {
   CLUSTER_MONITORING_ANNOTATION_KEY,
+  HTTP_CONFLICT_CODE,
+  K8S_ALREADY_EXISTS_REASON,
   OPENSHIFT_CLUSTER_MONITORING_ANNOTATION_KEY,
+  OPENSHIFT_OPERATORS_NAMESPACE,
   OPERATOR_MONITORING_DEFAULT_ANNOTATION_KEY,
   RED_HAT,
   SUGGESTED_NAMESPACE_ANNOTATION_KEY,
@@ -69,10 +73,16 @@ export const createOperator = async (
       onError: () => kubevirtConsole.error('Could not parse JSON annotation.'),
     }) ?? {};
   const suggestedNamespaceTemplateName = getName(suggestedNamespaceTemplate);
-  const targetNamespace = suggestedNamespaceTemplateName || suggestedNamespace;
 
   const approval = InstallPlanApproval.Automatic;
   const selectedInstallMode = getDefaultInstallMode(packageManifest, updateChannelName);
+
+  const targetNamespace =
+    suggestedNamespaceTemplateName ||
+    suggestedNamespace ||
+    (selectedInstallMode === InstallModeType.InstallModeTypeAllNamespaces
+      ? OPENSHIFT_OPERATORS_NAMESPACE
+      : undefined);
 
   const defaultNS: K8sResourceCommon = {
     metadata: {
@@ -114,6 +124,7 @@ export const createOperator = async (
   try {
     if (!namespaceExists) {
       await kubevirtK8sCreate({ cluster, data: ns, model: NamespaceModel }).catch((err) => {
+        if (err?.code === HTTP_CONFLICT_CODE || err?.reason === K8S_ALREADY_EXISTS_REASON) return;
         kubevirtConsole.error('Error creating namespace: ', err);
         throw err;
       });
@@ -127,6 +138,7 @@ export const createOperator = async (
     if (!operatorGroupExists) {
       await kubevirtK8sCreate({ cluster, data: operatorGroup, model: OperatorGroupModel }).catch(
         (err) => {
+          if (err?.code === HTTP_CONFLICT_CODE || err?.reason === K8S_ALREADY_EXISTS_REASON) return;
           kubevirtConsole.error('Error creating operator group: ', err);
           throw err;
         },
@@ -136,6 +148,7 @@ export const createOperator = async (
     if (!subscriptionExists) {
       await kubevirtK8sCreate({ cluster, data: subscription, model: SubscriptionModel }).catch(
         (err) => {
+          if (err?.code === HTTP_CONFLICT_CODE || err?.reason === K8S_ALREADY_EXISTS_REASON) return;
           kubevirtConsole.error('Error creating subscription: ', err);
           throw err;
         },
@@ -163,5 +176,6 @@ export const createOperator = async (
     }
   } catch (err) {
     kubevirtConsole.error('*Error: ', err);
+    throw err;
   }
 };

@@ -8,3 +8,8 @@ export const RED_HAT = 'Red Hat';
 export const RED_HAT_CATALOG_SOURCE = 'redhat-operators';
 
 export const CONSOLE_OPERATOR_CONFIG_NAME = 'cluster';
+
+export const OPENSHIFT_OPERATORS_NAMESPACE = 'openshift-operators';
+
+export const HTTP_CONFLICT_CODE = 409;
+export const K8S_ALREADY_EXISTS_REASON = 'AlreadyExists';

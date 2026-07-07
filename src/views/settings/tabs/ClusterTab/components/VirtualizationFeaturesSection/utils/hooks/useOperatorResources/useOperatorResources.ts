@@ -16,6 +16,7 @@ import { getWatchedOperatorResources } from '@settings/tabs/ClusterTab/component
 export type UseOperatorResourcesReturn = {
   clusterServiceVersions: ClusterServiceVersionKind[];
   filteredPackageManifests: PackageManifestKind[];
+  loadErrors: unknown[];
   operatorGroups: OperatorGroupKind[];
   operatorResourcesLoaded: boolean;
   subscriptions: SubscriptionKind[];
@@ -30,25 +31,29 @@ const useOperatorResources = (
 
   const clusterServiceVersions = data?.clusterServiceVersions?.data ?? [];
   const operatorGroups = data?.operatorGroups?.data ?? [];
-  const marketplacePackageManifests = data?.marketplacePackageManifests?.data ?? [];
-  const packageManifests = data?.packageManifests?.data ?? [];
   const subscriptions = data?.subscriptions?.data ?? [];
 
-  const allPackageManifests = [...packageManifests, ...marketplacePackageManifests];
-  const filteredPackageManifests = allPackageManifests.filter((pkg) =>
+  const filteredPackageManifests = (data?.allPackageManifests?.data ?? []).filter((pkg) =>
     packageNames.includes(getName(pkg)),
   );
 
   const operatorResourcesLoaded =
+    data?.allPackageManifests?.loaded &&
     data?.clusterServiceVersions?.loaded &&
-    data?.packageManifests?.loaded &&
-    data?.marketplacePackageManifests?.loaded &&
     data?.operatorGroups?.loaded &&
     data?.subscriptions?.loaded;
+
+  const loadErrors = [
+    data?.allPackageManifests?.loadError,
+    data?.clusterServiceVersions?.loadError,
+    data?.operatorGroups?.loadError,
+    data?.subscriptions?.loadError,
+  ].filter(Boolean);
 
   return {
     clusterServiceVersions,
     filteredPackageManifests,
+    loadErrors,
     operatorGroups,
     operatorResourcesLoaded,
     subscriptions,
