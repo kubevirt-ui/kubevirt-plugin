@@ -60,6 +60,7 @@ jobs:
     concurrency:
       group: hot-cluster-provision-${{ inputs.cluster_name }}
       cancel-in-progress: false
+      queue: max
     outputs:
       cluster_ready: ${{ steps.probe.outputs.cluster_ready || steps.wait_setup.outputs.cluster_ready }}
     steps:
