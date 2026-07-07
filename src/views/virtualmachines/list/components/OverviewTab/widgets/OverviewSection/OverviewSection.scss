@@ -1,3 +1,5 @@
+@use '../../overview-variables' as *;
+
 .overview-section {
   &__toggle-header {
     display: flex;
@@ -5,6 +7,12 @@
     justify-content: space-between;
     color: var(--pf-t--global--text--color--regular);
     width: 100%;
+
+    @media (max-width: $overview-breakpoint--wide) {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--pf-t--global--spacer--xs);
+    }
   }
 
   &__toggle-title {
@@ -60,16 +68,32 @@
       }
     }
 
-    @media (max-width: 100rem) {
+    @media (max-width: $overview-breakpoint--medium) {
       grid-template-columns: 1fr 1fr;
     }
 
-    @media (max-width: 48rem) {
+    @media (max-width: $overview-breakpoint--narrow) {
       grid-template-columns: 1fr;
     }
 
     &--single-column-wide {
-      @media (max-width: 100rem) {
+      @media (max-width: $overview-breakpoint--medium) {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    &--single-column-medium {
+      @media (max-width: $overview-breakpoint--medium-narrow) {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    &--two-columns-wide {
+      @media (max-width: $overview-breakpoint--wide) {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      @media (max-width: $overview-breakpoint--narrow) {
         grid-template-columns: 1fr;
       }
     }

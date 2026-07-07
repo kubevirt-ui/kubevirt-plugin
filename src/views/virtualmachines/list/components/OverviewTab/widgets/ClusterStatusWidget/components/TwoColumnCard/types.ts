@@ -21,6 +21,7 @@ export type TwoColumnCardBodyProps = {
   scoreHeader: string;
   severityCounts?: SeverityCount[];
   severityItemLabel?: string;
+  stackable?: boolean;
   style?: CSSProperties;
 };
 
@@ -53,6 +54,8 @@ export type TwoColumnCardProps = {
   severityCounts?: SeverityCount[];
   /** Label for severity count items (defaults to "clusters") */
   severityItemLabel?: string;
+  /** Whether the inner columns should stack vertically at medium breakpoint */
+  stackable?: boolean;
   /** Card title */
   title: string;
 };

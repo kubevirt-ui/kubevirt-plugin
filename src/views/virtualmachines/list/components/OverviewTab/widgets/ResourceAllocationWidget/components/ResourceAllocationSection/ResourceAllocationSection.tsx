@@ -122,7 +122,10 @@ const ResourceAllocationSection: FC<OverviewSectionData> = ({
 
   return (
     <OverviewSection dataTestId="resource-allocation-section" subHeader={subHeader} title={title}>
-      <OverviewSectionRow gridColumns={GRID_FOUR_EQUAL}>
+      <OverviewSectionRow
+        className="overview-section__row--two-columns-wide"
+        gridColumns={GRID_FOUR_EQUAL}
+      >
         {widgetConfigs.map(({ graphTitle, metric, subtitle, title: widgetTitle }) => {
           const { clusterData, metricChartData, quotaData } = dataMap[metric];
           return (

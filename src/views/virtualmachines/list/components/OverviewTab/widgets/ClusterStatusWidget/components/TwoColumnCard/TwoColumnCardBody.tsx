@@ -1,4 +1,5 @@
 import React, { FC } from 'react';
+import classNames from 'classnames';
 
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import { Bullseye } from '@patternfly/react-core';
@@ -20,6 +21,7 @@ const TwoColumnCardBody: FC<TwoColumnCardBodyProps> = ({
   scoreHeader,
   severityCounts,
   severityItemLabel,
+  stackable,
   style,
 }) => {
   if (noDataMessage) {
@@ -35,7 +37,12 @@ const TwoColumnCardBody: FC<TwoColumnCardBodyProps> = ({
   }
 
   return (
-    <div className="two-column-card__layout" style={style}>
+    <div
+      className={classNames('two-column-card__layout', {
+        'two-column-card__layout--stackable': stackable,
+      })}
+      style={style}
+    >
       <div className="two-column-card__left">
         {leftContent ?? (
           <SeverityCountList itemLabel={severityItemLabel} severityCounts={severityCounts ?? []} />

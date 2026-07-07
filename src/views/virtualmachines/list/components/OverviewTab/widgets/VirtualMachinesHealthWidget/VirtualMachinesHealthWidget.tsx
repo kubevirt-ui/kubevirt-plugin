@@ -24,7 +24,10 @@ const VirtualMachinesHealthWidget: FC<OverviewSectionData> = ({
 
   return (
     <OverviewSection dataTestId="vm-health-widget" title={title}>
-      <OverviewSectionRow gridColumns={GRID_VM_HEALTH}>
+      <OverviewSectionRow
+        className="overview-section__row--single-column-medium"
+        gridColumns={GRID_VM_HEALTH}
+      >
         {metricsUnavailable ? (
           <VMAlertsCard alertsBaseHref={alertsBaseHref} alertsBasePath={alertsBasePath} />
         ) : (

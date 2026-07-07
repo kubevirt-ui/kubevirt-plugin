@@ -24,6 +24,7 @@ const TwoColumnCard: FC<TwoColumnCardProps> = ({
   scoreHeader,
   severityCounts,
   severityItemLabel,
+  stackable,
   title,
 }) => {
   const style = gridColumns
@@ -73,6 +74,7 @@ const TwoColumnCard: FC<TwoColumnCardProps> = ({
           scoreHeader={scoreHeader}
           severityCounts={severityCounts}
           severityItemLabel={severityItemLabel}
+          stackable={stackable}
           style={style}
         />
       </CardBody>
