@@ -11,6 +11,6 @@
   "cSpell.words": ["hyperconverged", "kubevirt"],
   "yaml.validate": true,
   "files.associations": {
-    "ci-scripts/helm/**/templates/*.yaml": "helm"
+    "ci-scripts/hot-cluster/helm/**/templates/*.yaml": "helm"
   }
 }

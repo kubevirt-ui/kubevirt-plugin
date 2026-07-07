@@ -19,9 +19,9 @@
 #   ARC_RUNNERS_NS              (default: arc-runners)
 #   ARC_VERSION                 Helm chart version (default: 0.14.0); set to "latest" to omit --version
 #   ARC_RUNNER_IMAGE            If set, use this image for the runner container
-#   SKIP_ARC_RUNNER_RBAC        Set to 1 to skip applying ci-scripts/arc/arc-runner-rbac.yaml
+#   SKIP_ARC_RUNNER_RBAC        Set to 1 to skip applying ci-scripts/hot-cluster/arc/arc-runner-rbac.yaml
 #
-# Pod template fragment: ci-scripts/arc/arc-runner-scale-set.pod.yaml
+# Pod template fragment: ci-scripts/hot-cluster/arc/arc-runner-scale-set.pod.yaml
 
 set -euo pipefail
 ARC_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

@@ -82,7 +82,7 @@ jobs:
         run: |
           CLUSTER_JSON="$(ibmcloud oc cluster get --cluster "${CLUSTER_NAME}" --output json)"
           export CLUSTER_JSON
-          bash ./ci-scripts/install-oc-client.sh
+          bash ./ci-scripts/hot-cluster/install-oc-client.sh
 
       - name: Configure kubeconfig (ROKS)
         if: env.INFRASTRUCTURE_TYPE != 'ipi'
