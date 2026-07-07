@@ -6,10 +6,22 @@ import { CapabilityInstallState } from './types';
 
 export const OLM_PROCESSING_DELAY_MS = 30_000;
 
-export enum CapabilitiesView {
-  Bundle = 'bundle',
-  Custom = 'custom',
-}
+import { CapabilitiesView, type SelectionCardConfig } from './types';
+
+export const getSelectionCardConfigs = (t: TFunction): SelectionCardConfig[] => [
+  {
+    description: t('Install the Virtualization bundle in one step.'),
+    id: CapabilitiesView.Bundle,
+    label: t('Virtualization bundle'),
+    showRecommendedBadge: true,
+  },
+  {
+    description: t('Pick individual capabilities and operators to install.'),
+    id: CapabilitiesView.Custom,
+    label: t('Custom selection'),
+    showRecommendedBadge: false,
+  },
+];
 
 export const CAPABILITY_INSTALL_STATE_CONFIG: Record<
   CapabilityInstallState,

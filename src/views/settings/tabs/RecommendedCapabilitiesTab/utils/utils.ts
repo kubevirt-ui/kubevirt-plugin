@@ -5,9 +5,9 @@ import { InstallState } from '@settings/tabs/ClusterTab/components/Virtualizatio
 import { isInstalled } from '@settings/tabs/ClusterTab/components/VirtualizationFeaturesSection/utils/utils';
 import { VirtFeatureOperatorItem } from '@settings/tabs/ClusterTab/components/VirtualizationFeaturesSection/utils/VirtualizationFeaturesContext/utils/types';
 import { getPackageUID } from '@settings/tabs/ClusterTab/components/VirtualizationFeaturesSection/utils/VirtualizationFeaturesContext/utils/utils';
+import { RED_HAT } from '@settings/tabs/ClusterTab/components/VirtualizationFeaturesSection/VirtualizationFeaturesWizard/utils/hooks/useCreateOperator/utils/constants';
 
 import {
-  type AlternativeStateMap,
   type CapabilityFeature,
   CapabilityInstallState,
   type RecommendedCapabilityDetailsMap,
@@ -18,14 +18,13 @@ export const isBundleFeature = ({ isDefaultBundle }: CapabilityFeature): boolean
 export const computeCapabilityInstallState = (
   feature: CapabilityFeature,
   detailsMap: RecommendedCapabilityDetailsMap,
-  alternativeState: AlternativeStateMap,
 ): CapabilityInstallState => {
   if (isEmpty(detailsMap)) return CapabilityInstallState.NotInstalled;
 
-  const satisfiedCount = feature.operators.filter(
-    ({ packageName }) =>
-      isInstalled(detailsMap[packageName]?.installState) || alternativeState[packageName],
-  ).length;
+  const satisfiedCount = feature.operators.filter(({ packageName }) => {
+    const details = detailsMap[packageName];
+    return details?.isRedHatProvided && isInstalled(details.installState);
+  }).length;
 
   if (satisfiedCount === feature.operators.length) return CapabilityInstallState.Installed;
   if (satisfiedCount > 0) return CapabilityInstallState.PartiallyInstalled;
@@ -35,14 +34,12 @@ export const computeCapabilityInstallState = (
 export const countInstalledBundleCapabilities = (
   features: CapabilityFeature[],
   detailsMap: RecommendedCapabilityDetailsMap,
-  alternativeState: AlternativeStateMap,
 ): number =>
   features
     .filter(isBundleFeature)
     .filter(
       (feature) =>
-        computeCapabilityInstallState(feature, detailsMap, alternativeState) ===
-        CapabilityInstallState.Installed,
+        computeCapabilityInstallState(feature, detailsMap) === CapabilityInstallState.Installed,
     ).length;
 
 export const getNonInstalledBundleManifests = (
@@ -62,6 +59,7 @@ export const getNonInstalledBundleManifests = (
     const name = getName(pkg);
     if (!defaultBundlePackageNames.has(name)) return false;
     if (detailsMap[name]?.installState !== InstallState.NOT_INSTALLED) return false;
+    if (!pkg.status?.provider?.name?.includes(RED_HAT)) return false;
     return seen.has(name) ? false : (seen.add(name), true);
   });
 };

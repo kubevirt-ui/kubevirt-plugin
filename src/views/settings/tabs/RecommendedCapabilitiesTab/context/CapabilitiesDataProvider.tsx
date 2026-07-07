@@ -7,13 +7,13 @@ import useOperatorResources from '@settings/tabs/ClusterTab/components/Virtualiz
 
 import useInstallBundle from '../hooks/useInstallBundle';
 import { getRecommendedCapabilityFeatures } from '../utils/capabilityFeatures';
+import { buildRecommendedDetailsMap } from '../utils/detailsMap';
 import { RECOMMENDED_OPERATOR_PACKAGE_NAMES } from '../utils/operatorNames';
 import {
   type AlternativeStateMap,
   type CapabilityFeature,
   type RecommendedCapabilityDetailsMap,
 } from '../utils/types';
-import { buildRecommendedDetailsMap } from '../utils/detailsMap';
 import { computeCapabilityInstallState } from '../utils/utils';
 import {
   CapabilitiesActionsContext,
@@ -64,9 +64,8 @@ export const CapabilitiesDataProvider: FC<{ children?: ReactNode }> = ({ childre
   );
 
   const getCapabilityInstallState = useCallback(
-    (feature: CapabilityFeature) =>
-      computeCapabilityInstallState(feature, detailsMap, alternativeState),
-    [alternativeState, detailsMap],
+    (feature: CapabilityFeature) => computeCapabilityInstallState(feature, detailsMap),
+    [detailsMap],
   );
 
   const { installBundle, installResourcesLoaded, isInstalling } = useInstallBundle({

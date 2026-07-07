@@ -9,6 +9,7 @@ import {
   getPackageUID,
   getSubscriptionInstalledCSV,
 } from '@settings/tabs/ClusterTab/components/VirtualizationFeaturesSection/utils/VirtualizationFeaturesContext/utils/utils';
+import { RED_HAT } from '@settings/tabs/ClusterTab/components/VirtualizationFeaturesSection/VirtualizationFeaturesWizard/utils/hooks/useCreateOperator/utils/constants';
 
 import { RECOMMENDED_OPERATOR_PACKAGE_NAMES } from './operatorNames';
 import {
@@ -47,8 +48,10 @@ export const buildRecommendedDetailsMap = (
     (map, pkg) => {
       const packageName = getName(pkg);
       if (packageName in map) return map;
+
       map[packageName] = {
         installState: resolveInstallState(packageName),
+        isRedHatProvided: pkg.status?.provider?.name?.includes(RED_HAT) ?? false,
         operatorHubURL: getOperatorHubURL(getPackageUID(pkg), namespace),
       };
       return map;
@@ -63,6 +66,7 @@ export const buildRecommendedDetailsMap = (
       name,
       {
         installState: resolveInstallState(name),
+        isRedHatProvided: false,
         operatorHubURL: undefined,
       } as RecommendedCapabilityOperatorDetails,
     ]),

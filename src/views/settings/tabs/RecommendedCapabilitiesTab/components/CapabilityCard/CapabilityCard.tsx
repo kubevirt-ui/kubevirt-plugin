@@ -2,10 +2,10 @@ import React, { FC } from 'react';
 
 import { Card, CardBody, CardHeader, CardTitle, Skeleton } from '@patternfly/react-core';
 
+import { useCapabilitiesData } from '../../context/useCapabilitiesData';
 import { CapabilityFeature } from '../../utils/types';
 
 import CapabilityCardActions from './CapabilityCardActions';
-import { useCapabilitiesData } from '../../context/useCapabilitiesData';
 
 type CapabilityCardProps = {
   feature: CapabilityFeature;
