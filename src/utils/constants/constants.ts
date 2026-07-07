@@ -24,6 +24,7 @@ export const KUBEVIRT_HYPERCONVERGED = 'kubevirt-hyperconverged';
 export const OPENSHIFT_CNV = 'openshift-cnv';
 export const CNV_OBSERVABILITY = 'cnv-observability';
 
+export const ENTER_KEY = 'Enter';
 export const NONE = 'none';
 export const SPACE_SYMBOL = ' ';
 export const YAML = 'yaml';

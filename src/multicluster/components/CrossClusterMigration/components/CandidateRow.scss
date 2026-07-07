@@ -1,0 +1,10 @@
+.candidate-row {
+  border: var(--pf-t--global--border--width--regular) solid
+    var(--pf-t--global--border--color--default);
+
+  &--selected {
+    --pf-v6-c-card--BackgroundColor: rgba(6, 108, 196, 0.15);
+
+    border-color: var(--pf-t--global--color--nonstatus--blue--default, #06c);
+  }
+}

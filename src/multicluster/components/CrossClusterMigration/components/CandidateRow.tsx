@@ -1,5 +1,6 @@
-import React, { FC } from 'react';
+import React, { FC, useCallback } from 'react';
 
+import { ENTER_KEY, SPACE_SYMBOL } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { humanizeBinaryBytes } from '@kubevirt-utils/utils/humanize.js';
 import {
@@ -19,6 +20,8 @@ import { CandidateCluster } from '../hooks/useClusterRecommendationTypes';
 
 import ScoreBadge from './ScoreBadge';
 
+import './CandidateRow.scss';
+
 type CandidateRowProps = {
   candidate: CandidateCluster;
   isRecommended: boolean;
@@ -34,25 +37,25 @@ const CandidateRow: FC<CandidateRowProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
 
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === ENTER_KEY || e.key === SPACE_SYMBOL) {
+        e.preventDefault();
+        onSelect?.(candidate.cluster);
+      }
+    },
+    [onSelect, candidate.cluster],
+  );
+
   return (
     <Card
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          onSelect?.(candidate.cluster);
-        }
-      }}
-      style={
-        {
-          '--pf-v6-c-card--BackgroundColor': 'rgba(6, 108, 196, 0.15)',
-          border: '1px solid var(--pf-t--global--color--nonstatus--blue--default, #06c)',
-        } as React.CSSProperties
-      }
+      className={`candidate-row${isSelected ? ' candidate-row--selected' : ''}`}
       isClickable={!!onSelect}
       isCompact
       isSelectable={!!onSelect}
       isSelected={isSelected}
       onClick={() => onSelect?.(candidate.cluster)}
+      onKeyDown={handleKeyDown}
       role={onSelect ? 'button' : undefined}
       tabIndex={onSelect ? 0 : undefined}
     >
