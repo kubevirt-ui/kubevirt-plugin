@@ -79,7 +79,7 @@ describe('ClusterRecommendationPanel', () => {
     const { container } = render(
       <ClusterRecommendationPanel data={null} error={null} loaded={false} loading={false} />,
     );
-    expect(container.firstChild).toBeNull();
+    expect(container).toBeEmptyDOMElement();
   });
 
   it('should show spinner when loading', () => {
