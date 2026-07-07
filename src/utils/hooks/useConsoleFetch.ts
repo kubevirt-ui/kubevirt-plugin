@@ -9,8 +9,8 @@ export type ConsoleFetchResponse<R> = {
 };
 
 const useConsoleFetch = <R>(
-  url: string,
-  timeout: number,
+  url: null | string,
+  timeout?: number,
   initialValue?: R,
 ): ConsoleFetchResponse<R> => {
   const [data, setData] = useState<R | undefined>(initialValue);
@@ -18,6 +18,7 @@ const useConsoleFetch = <R>(
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
+    if (!url) return;
     if (loaded) return;
 
     const fetchData = async () => {
