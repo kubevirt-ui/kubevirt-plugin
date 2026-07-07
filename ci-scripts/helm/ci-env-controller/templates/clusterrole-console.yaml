@@ -23,11 +23,16 @@ rules:
     verbs: ['get', 'list', 'watch']
   - apiGroups: ['storage.k8s.io']
     resources: ['storageclasses']
-    verbs: ['get', 'list', 'watch', 'patch', 'update']
+    verbs: ['get', 'list', 'watch', 'create', 'patch', 'update', 'delete']
+
+  # RBAC self-checks (console checks permissions to decide which UI buttons to show)
+  - apiGroups: ['authorization.k8s.io']
+    resources: ['selfsubjectaccessreviews', 'selfsubjectrulesreviews']
+    verbs: ['create']
 
   # Operator lifecycle (HCO subscription/CSV status, console watches these via WebSocket)
   - apiGroups: ['operators.coreos.com']
-    resources: ['clusterserviceversions', 'subscriptions']
+    resources: ['clusterserviceversions', 'subscriptions', 'operatorgroups']
     verbs: ['get', 'list', 'watch']
   - apiGroups: ['packages.operators.coreos.com']
     resources: ['packagemanifests']

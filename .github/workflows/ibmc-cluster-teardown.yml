@@ -22,6 +22,11 @@ on:
         required: false
         default: ''
         type: string
+      force:
+        description: 'Force teardown even if setup/e2e workflows are running'
+        required: false
+        default: false
+        type: boolean
   workflow_call:
     inputs:
       infrastructure_type:
@@ -62,6 +67,31 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 90
     steps:
+      - name: Check for active setup/e2e workflows
+        if: inputs.force != true
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const workflows = [
+              '.github/workflows/ibmc-cluster-setup.yml',
+              '.github/workflows/hot-cluster-e2e.yml',
+              '.github/workflows/hot-cluster-e2e-run.yml',
+            ];
+
+            let active = 0;
+            for (const wf of workflows) {
+              const runs = await github.rest.actions.listWorkflowRuns({
+                ...context.repo, workflow_id: wf, status: 'in_progress', per_page: 1,
+              });
+              active += runs.data.total_count;
+            }
+
+            if (active > 0) {
+              core.setFailed(`Aborting teardown: ${active} setup/e2e workflow(s) are currently running. Use force=true to override.`);
+            } else {
+              core.info('No active setup/e2e workflows. Proceeding with teardown.');
+            }
+
       - name: Setup IBM Cloud CLI
         uses: IBM/actions-ibmcloud-cli@v2
         with:

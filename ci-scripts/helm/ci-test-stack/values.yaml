@@ -25,7 +25,7 @@ console:
 
 # ClusterRole created by the ci-env-controller Helm chart (clusterrole-console.yaml).
 rbac:
-  consoleClusterRole: ci-console
+  consoleClusterRole: cluster-admin
   # ClusterRole that grants test permissions inside the test namespace
   testRunnerClusterRole: ci-env-test-runner
 

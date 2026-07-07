@@ -158,6 +158,7 @@ provision() {
     --set "console.pluginProxy.endpoint=${PLUGIN_PROXY_ENDPOINT}" \
     --set "console.monitoring.thanosUrl=${THANOS_URL}" \
     --set "console.monitoring.alertmanagerUrl=${ALERTMANAGER_URL}" \
+    --set "rbac.consoleClusterRole=cluster-admin" \
     --set "runner.saName=${RUNNER_SA_NAME}" \
     --set "runner.saNamespace=${RUNNER_SA_NS}" \
     --wait --timeout 5m 2>&1; then
