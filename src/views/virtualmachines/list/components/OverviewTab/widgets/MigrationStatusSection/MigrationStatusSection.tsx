@@ -12,7 +12,7 @@ import useMigrationCardDataAndFilters from '@overview/MigrationsTab/hooks/useMig
 
 import { determineOverviewLevel } from '../../config';
 import {
-  GRID_THREE_EQUAL,
+  GRID_CLUSTER_MIGRATION_STATUS,
   OVERVIEW_LEVEL_CLUSTER,
   OVERVIEW_LEVEL_MULTICLUSTER,
   OverviewSectionData,
@@ -88,7 +88,10 @@ const MigrationStatusSection: FC<OverviewSectionData> = ({
 
   return (
     <OverviewSection dataTestId="migration-status-section" title={title}>
-      <OverviewSectionRow gridColumns={isClusterLevel ? GRID_THREE_EQUAL : undefined}>
+      <OverviewSectionRow
+        className="overview-section__row--single-column-wide"
+        gridColumns={GRID_CLUSTER_MIGRATION_STATUS}
+      >
         <MigrationsWidget
           cardTitle={t('Compute migrations')}
           isLoading={!migrationsLoaded || !clusterVersionLoaded}

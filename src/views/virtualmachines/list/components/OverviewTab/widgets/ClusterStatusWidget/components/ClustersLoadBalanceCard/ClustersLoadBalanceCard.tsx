@@ -32,6 +32,7 @@ const ClustersLoadBalanceCard: FC<ClustersLoadBalanceCardProps> = ({ metricsUnav
       rightTitle={rightTitle}
       scoreHeader={t('Score')}
       severityCounts={severityCounts}
+      stackable
       title={t('Clusters load balance')}
     />
   );

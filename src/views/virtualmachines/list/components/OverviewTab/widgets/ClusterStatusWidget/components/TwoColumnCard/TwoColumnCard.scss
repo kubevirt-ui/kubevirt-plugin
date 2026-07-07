@@ -1,3 +1,5 @@
+@use '../../../../overview-variables' as *;
+
 .two-column-card {
   &__title {
     display: flex;
@@ -9,6 +11,24 @@
     display: grid;
     grid-template-columns: var(--two-column-card--columns, 2fr 3fr);
     min-height: 12.5rem;
+
+    &--stackable {
+      @media (max-width: $overview-breakpoint--medium) {
+        grid-template-columns: 1fr;
+
+        .two-column-card__left {
+          border-right: none;
+          padding-right: 0;
+          border-bottom: 1px solid var(--pf-t--global--border--color--default);
+          padding-bottom: var(--pf-t--global--spacer--lg);
+        }
+
+        .two-column-card__right {
+          padding-left: 0;
+          padding-top: var(--pf-t--global--spacer--lg);
+        }
+      }
+    }
   }
 
   &__left {

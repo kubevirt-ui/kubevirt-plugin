@@ -27,7 +27,7 @@ const MultiClusterMigrationStatusSection: FC<MultiClusterMigrationStatusSectionP
 
   return (
     <OverviewSection dataTestId="migration-status-section" title={title}>
-      <OverviewSectionRow>
+      <OverviewSectionRow className="overview-section__row--single-column-wide">
         {!isMTVInstalled && <MTVNotInstalledCard />}
         {isMTVInstalled && loadError && <ErrorAlert error={loadError} />}
         {isMTVInstalled && !loadError && (
