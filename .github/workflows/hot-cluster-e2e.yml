@@ -1,6 +1,8 @@
 name: Hot Cluster E2E
 
 on:
+  pull_request_target:
+    types: [opened, synchronize, reopened, labeled]
   workflow_dispatch:
     inputs:
       test_project:
@@ -50,16 +52,15 @@ jobs:
   cluster-check:
     if: >-
       github.event_name == 'workflow_dispatch' ||
-      contains(github.event.pull_request.labels.*.name, 'ok-to-test') ||
-      github.event.pull_request.author_association == 'MEMBER' ||
-      github.event.pull_request.author_association == 'OWNER' ||
-      github.event.pull_request.author_association == 'COLLABORATOR'
+      github.event.pull_request.head.repo.full_name == github.repository ||
+      contains(fromJSON('["MEMBER","OWNER","COLLABORATOR"]'), github.event.pull_request.author_association) ||
+      (github.event.action == 'labeled' && contains(github.event.pull_request.labels.*.name, 'ok-to-test'))
     uses: ./.github/workflows/hot-cluster-check.yml
     secrets: inherit
 
   cluster-health-check:
     name: Cluster Health Check
-    if: github.event_name == 'workflow_dispatch'
+    if: github.event_name == 'workflow_dispatch' && inputs.ipi_setup_run_id != ''
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
