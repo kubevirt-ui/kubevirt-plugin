@@ -6,9 +6,8 @@ import {
 } from '@overview/utils/types';
 
 export type OperatorResources = {
+  allPackageManifests: PackageManifestKind[];
   clusterServiceVersions: ClusterServiceVersionKind[];
-  marketplacePackageManifests: PackageManifestKind[];
   operatorGroups: OperatorGroupKind[];
-  packageManifests: PackageManifestKind[];
   subscriptions: SubscriptionKind[];
 };

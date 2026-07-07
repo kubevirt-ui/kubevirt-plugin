@@ -154,6 +154,7 @@ export const computeInstallState = (
   if (installPhase === ClusterServiceVersionPhase.CSVPhaseSucceeded) return InstallState.INSTALLED;
   if (installPhase === ClusterServiceVersionPhase.CSVPhaseFailed) return InstallState.FAILED;
   if (installInProgress) return InstallState.INSTALLING;
+  if (subscription?.status?.installedCSV) return InstallState.INSTALLED;
   return InstallState.NOT_INSTALLED;
 };
 
