@@ -176,6 +176,7 @@ jobs:
         uses: actions/checkout@v7
         with:
           ref: ${{ github.event.pull_request.head.sha || github.ref }}
+          allow-unsafe-pr-checkout: true
 
       - name: Check if kubevirt-plugin image exists in registry
         id: check_image
@@ -238,6 +239,7 @@ jobs:
         uses: actions/checkout@v7
         with:
           ref: ${{ github.event.pull_request.head.sha || github.ref }}
+          allow-unsafe-pr-checkout: true
 
       - name: Provision CI test environment
         id: ci-env
