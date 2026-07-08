@@ -6,7 +6,8 @@ import {
 /** Environment variables consumed by Playwright tests. */
 export const env = {
   baseURL: (() => {
-    const addr = process.env.BRIDGE_BASE_ADDRESS ?? 'http://localhost:9000';
+    const addr =
+      process.env.WEB_CONSOLE_URL || process.env.BRIDGE_BASE_ADDRESS || 'http://localhost:9000';
     const path = process.env.BRIDGE_BASE_PATH ?? '/';
     return `${addr}${path}`.replace(/\/$/, '');
   })(),
