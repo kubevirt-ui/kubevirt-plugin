@@ -1,4 +1,5 @@
 name: IBM Cloud Hot Cluster Setup
+run-name: "Hot Cluster Setup [${{ inputs.cluster_name || 'kubevirt-plugin-ci' }}]"
 
 on:
   workflow_dispatch:
@@ -481,11 +482,14 @@ jobs:
           ARC_PAT: ${{ secrets.ARC_GITHUB_PAT }}
           ARC_RUNNER_IMAGE: ${{ steps.build_runner.outputs.image_ref }}
           ARC_VERSION: '0.14.0'
+          RUNNER_SCALE_SET_NAME: ${{ env.CLUSTER_NAME }}
         run: |
           ./ci-scripts/hot-cluster/arc/install-arc-controller.sh
           ./ci-scripts/hot-cluster/arc/install-runner-scale-set.sh
 
       - name: Install CI environment controller
+        env:
+          RUNNER_SCALE_SET_NAME: ${{ env.CLUSTER_NAME }}
         run: |
           ./ci-scripts/hot-cluster/ci-env/install-ci-env-controller.sh
 

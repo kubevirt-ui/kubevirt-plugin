@@ -1,4 +1,5 @@
 name: Hot Cluster E2E
+run-name: "Hot Cluster E2E [${{ inputs.cluster_name || 'kubevirt-plugin-ci' }}]"
 
 on:
   pull_request_target:
@@ -27,10 +28,15 @@ on:
           - ipi
           - vpc
           - classic
-      ipi_setup_run_id:
-        description: Setup workflow run ID (required for IPI to download install state)
+      runner_label:
+        description: ARC runner label (defaults to cluster_name)
         required: false
         default: ''
+        type: string
+      openshift_version:
+        description: 'OpenShift version (e.g. 4.22_openshift)'
+        required: false
+        default: '4.22_openshift'
         type: string
 
 permissions:
@@ -38,7 +44,7 @@ permissions:
   actions: write
 
 concurrency:
-  group: hot-cluster-e2e-${{ github.event.pull_request.number || github.ref }}
+  group: hot-cluster-e2e-${{ github.event.pull_request.number || format('{0}-{1}', github.ref, inputs.cluster_name || 'kubevirt-plugin-ci') }}
   cancel-in-progress: true
 
 env:
@@ -49,21 +55,68 @@ env:
   BASE_DOMAIN: cnv-ui.com
 
 jobs:
+  check-trust:
+    name: Check Trusted Author
+    if: github.event_name == 'pull_request_target'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      trusted: ${{ steps.check.outputs.trusted }}
+    steps:
+      # author_association only reflects PUBLICLY visible org membership. Members
+      # with private membership (Settings > Organizations > "Publicize") are
+      # misreported as CONTRIBUTOR, so fall back to an explicit org membership
+      # check via the API before requiring the 'ok-to-test' label.
+      - name: Determine if PR author is a trusted org member
+        id: check
+        uses: actions/github-script@v9
+        with:
+          github-token: ${{ secrets.BOT_PAT || secrets.GITHUB_TOKEN }}
+          script: |
+            const association = context.payload.pull_request.author_association;
+            const trustedAssociations = ['MEMBER', 'OWNER', 'COLLABORATOR'];
+            const author = context.payload.pull_request.user.login;
+
+            if (trustedAssociations.includes(association)) {
+              core.info(`${author} has author_association=${association} — trusted.`);
+              core.setOutput('trusted', 'true');
+              return;
+            }
+
+            try {
+              await github.rest.orgs.checkMembershipForUser({
+                org: context.repo.owner,
+                username: author,
+              });
+              core.info(`${author} is a member of ${context.repo.owner} (author_association was '${association}', likely private membership) — trusted.`);
+              core.setOutput('trusted', 'true');
+            } catch (err) {
+              core.info(`${author} is not a member of ${context.repo.owner} (author_association='${association}') — untrusted.`);
+              core.setOutput('trusted', 'false');
+            }
+
   cluster-check:
-    if: >-
+    needs: check-trust
+    if: |
+      always() &&
       (github.event.action != 'labeled' || github.event.label.name == 'ok-to-test') &&
       (
         github.event_name == 'workflow_dispatch' ||
         github.event.pull_request.head.repo.full_name == github.repository ||
-        contains(fromJSON('["MEMBER","OWNER","COLLABORATOR"]'), github.event.pull_request.author_association) ||
+        needs.check-trust.outputs.trusted == 'true' ||
         (github.event.action == 'labeled' && github.event.label.name == 'ok-to-test')
       )
     uses: ./.github/workflows/hot-cluster-check.yml
+    with:
+      cluster_name: ${{ inputs.cluster_name || 'kubevirt-plugin-ci' }}
+      infrastructure_type: ${{ inputs.infrastructure_type || 'ipi' }}
+      openshift_version: ${{ inputs.openshift_version || '4.22_openshift' }}
     secrets: inherit
 
   cluster-health-check:
     name: Cluster Health Check
-    if: github.event_name == 'workflow_dispatch' && inputs.ipi_setup_run_id != ''
+    needs: cluster-check
+    if: github.event_name == 'workflow_dispatch' && needs.cluster-check.result == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -144,4 +197,6 @@ jobs:
     uses: ./.github/workflows/hot-cluster-e2e-run.yml
     with:
       test_project: ${{ inputs.test_project || 'gating' }}
+      runner_label: ${{ inputs.runner_label || inputs.cluster_name || 'kubevirt-plugin-ci' }}
+      cluster_name: ${{ inputs.cluster_name || 'kubevirt-plugin-ci' }}
     secrets: inherit

@@ -1,4 +1,5 @@
 name: Hot Cluster E2E Run
+run-name: "Hot Cluster E2E Run [${{ inputs.cluster_name || inputs.runner_label || 'kubevirt-plugin-ci' }}]"
 
 on:
   workflow_dispatch:
@@ -11,6 +12,16 @@ on:
         options:
           - gating
           - features
+      runner_label:
+        description: ARC runner label (defaults to kubevirt-plugin-ci)
+        required: false
+        default: ''
+        type: string
+      cluster_name:
+        description: Cluster name for run tagging (defaults to runner_label)
+        required: false
+        default: ''
+        type: string
   workflow_call:
     inputs:
       test_project:
@@ -18,6 +29,16 @@ on:
         type: string
         required: false
         default: gating
+      runner_label:
+        description: ARC runner label (defaults to kubevirt-plugin-ci)
+        type: string
+        required: false
+        default: ''
+      cluster_name:
+        description: Cluster name for run tagging (defaults to runner_label)
+        type: string
+        required: false
+        default: ''
 
 permissions:
   contents: read
@@ -37,7 +58,7 @@ env:
 jobs:
   check-runner:
     name: Check Runner Image
-    runs-on: kubevirt-plugin-ci
+    runs-on: ${{ inputs.runner_label || 'kubevirt-plugin-ci' }}
     timeout-minutes: 15
     steps:
       - name: Log environment summary
@@ -227,7 +248,7 @@ jobs:
   run-gating-tests:
     name: Run Gating Tests
     needs: [check-runner, build-kubevirt-plugin-image]
-    runs-on: kubevirt-plugin-ci
+    runs-on: ${{ inputs.runner_label || 'kubevirt-plugin-ci' }}
     timeout-minutes: 120
     env:
       PLUGIN_IMAGE: ${{ needs.build-kubevirt-plugin-image.outputs.kubevirt-plugin-image }}

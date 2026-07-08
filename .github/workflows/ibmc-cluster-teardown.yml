@@ -66,7 +66,17 @@ jobs:
     name: Tear Down Hot Cluster
     runs-on: ubuntu-latest
     timeout-minutes: 90
+    concurrency:
+      group: hot-cluster-teardown-${{ inputs.cluster_name || 'kubevirt-plugin-ci' }}
+      cancel-in-progress: false
     steps:
+      - name: Validate cluster_name format
+        run: |
+          if [[ ! "${CLUSTER_NAME}" =~ ^[a-zA-Z0-9][a-zA-Z0-9._-]*$ ]]; then
+            echo "::error::Invalid cluster_name: '${CLUSTER_NAME}'. Must match [a-zA-Z0-9][a-zA-Z0-9._-]*"
+            exit 1
+          fi
+
       - name: Check for active setup/e2e workflows
         if: inputs.force != true
         uses: actions/github-script@v9
@@ -121,8 +131,8 @@ jobs:
         continue-on-error: true
         run: |
           if command -v helm &>/dev/null || (curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash); then
-            echo "Uninstalling ARC runner scale set..."
-            helm uninstall kubevirt-plugin-ci --namespace arc-runners --wait --timeout 5m 2>/dev/null || echo "Runner scale set not found or already removed"
+            echo "Uninstalling ARC runner scale set '${CLUSTER_NAME}'..."
+            helm uninstall "${CLUSTER_NAME}" --namespace arc-runners --wait --timeout 5m 2>/dev/null || echo "Runner scale set not found or already removed"
 
             echo "Uninstalling ARC controller..."
             helm uninstall arc --namespace arc-systems --wait --timeout 5m 2>/dev/null || echo "ARC controller not found or already removed"
@@ -206,15 +216,17 @@ jobs:
           mkdir -p "${INSTALL_DIR}"
 
           if [[ -z "${SETUP_RUN_ID}" ]]; then
-            echo "No setup run ID provided. Looking up latest successful setup run..."
+            echo "No setup run ID provided. Looking up latest successful setup run for cluster '${CLUSTER_NAME}'..."
             SETUP_RUN_ID=$(gh run list --repo "${{ github.repository }}" \
-              --workflow="IBM Cloud Hot Cluster Setup" --status=success --limit=1 \
-              --json databaseId -q '.[0].databaseId' 2>/dev/null || true)
+              --workflow="IBM Cloud Hot Cluster Setup" --status=success --limit=20 \
+              --json databaseId,displayTitle 2>/dev/null \
+              | jq -r --arg tag "[${CLUSTER_NAME}]" '.[] | select(.displayTitle | contains($tag)) | .databaseId' \
+              | head -1 || true)
             if [[ -z "${SETUP_RUN_ID}" ]]; then
-              echo "::error::No successful IPI setup run found and no ipi_setup_run_id provided."
+              echo "::error::No successful IPI setup run found for cluster '${CLUSTER_NAME}' and no ipi_setup_run_id provided."
               exit 1
             fi
-            echo "Using latest successful setup run: ${SETUP_RUN_ID}"
+            echo "Using latest successful setup run for '${CLUSTER_NAME}': ${SETUP_RUN_ID}"
           fi
 
           echo "Downloading IPI install state from run ${SETUP_RUN_ID}..."
@@ -254,11 +266,11 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.BOT_PAT }}
         run: |
-          echo "Checking for offline self-hosted runners..."
-          RUNNERS=$(gh api "/repos/${{ github.repository }}/actions/runners" --jq '.runners[] | select(.status == "offline") | select(.labels[].name == "kubevirt-plugin-ci") | .id' 2>/dev/null || true)
+          echo "Checking for offline self-hosted runners with label '${CLUSTER_NAME}'..."
+          RUNNERS=$(gh api "/repos/${{ github.repository }}/actions/runners" --jq --arg label "${CLUSTER_NAME}" '.runners[] | select(.status == "offline") | select(.labels[].name == $label) | .id' 2>/dev/null || true)
 
           if [[ -z "${RUNNERS}" ]]; then
-            echo "No offline 'kubevirt-plugin-ci' runners found"
+            echo "No offline '${CLUSTER_NAME}' runners found"
           else
             for runner_id in ${RUNNERS}; do
               echo "Deleting offline runner ${runner_id}..."
