@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-import useVMTemplateFeatureFlag from '@kubevirt-utils/hooks/useVMTemplateFeatureFlag/useVMTemplateFeatureFlag';
+import useIsVMTemplateFeatureEnabled from '@kubevirt-utils/hooks/useVMTemplateFeatureFlag/useIsVMTemplateFeatureEnabled';
 import { Template } from '@kubevirt-utils/resources/template';
 import { useOpenShiftTemplates } from '@templates/list/hooks/useOpenShiftTemplates';
 import useVirtualMachineTemplates from '@templates/list/hooks/useVirtualMachineTemplates';
@@ -13,7 +13,7 @@ type UseTemplates = (namespace?: string) => {
 
 const useTemplates: UseTemplates = (namespace) => {
   const { featureEnabled: vmTemplatesEnabled, loading: vmTemplatesFeatureLoading } =
-    useVMTemplateFeatureFlag();
+    useIsVMTemplateFeatureEnabled();
 
   const {
     error: templatesError,
