@@ -19,6 +19,7 @@ import useCreateVM from '@virtualmachines/creation-wizard-new/hooks/useCreateVM'
 import { useVMWizard } from '@virtualmachines/creation-wizard-new/state/vm-wizard-context/VMWizardContext';
 import { CREATE_VM_FORM_FIELDS_VM_DATA } from '@virtualmachines/creation-wizard-new/state/vm-wizard-form/consts';
 import { isCloneCreationMethod } from '@virtualmachines/creation-wizard-new/utils/utils';
+import { getCreateButtonText } from '../utils/utils';
 
 const ReviewAndCreateStepFooter: FC = () => {
   const { t } = useKubevirtTranslation();
@@ -30,7 +31,7 @@ const ReviewAndCreateStepFooter: FC = () => {
   const closeWizard = useCloseWizard();
   const { backButtonText, cancelButtonText } = useWizardFooterProps();
 
-  const createButtonText = isCloneMethod ? t('Clone VirtualMachine') : t('Create VirtualMachine');
+  const createButtonText = getCreateButtonText(isCloneMethod, isSubmitting, t);
 
   return (
     <WizardFooterWrapper>
