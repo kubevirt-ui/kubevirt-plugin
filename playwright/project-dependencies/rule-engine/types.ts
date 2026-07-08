@@ -1,34 +1,41 @@
 import type { KubernetesClient } from '@/clients/kubernetes-client';
+import type { ClusterJanitor } from '@/utils/cluster-janitor';
 
 export enum SetupPhase {
   AUTH = 'AUTH',
   CLUSTER = 'CLUSTER',
   BROWSER = 'BROWSER',
+  REPORTING = 'REPORTING',
 }
 
 export enum TeardownScope {
   NAMESPACE = 'NAMESPACE',
+  CLUSTER = 'CLUSTER',
   FILES = 'FILES',
 }
 
 export interface SetupContext {
-  authToken?: string;
-  cnvNamespace: string;
-  effectiveKubeConfigPath?: string;
-  k8sClient?: KubernetesClient;
   kubeConfigPath: string;
   storageStatePath: string;
   testNamespace: string;
+  cnvNamespace: string;
+  k8sClient?: KubernetesClient;
+  effectiveKubeConfigPath?: string;
+  authToken?: string;
+  projectRoot: string;
   nonPrivUsername?: string;
+  clusterJanitor?: ClusterJanitor;
 }
 
 export interface TeardownContext {
-  k8sClient?: KubernetesClient;
   testNamespace: string;
-  cnvNamespace: string;
-  kubeConfigPath: string;
+  k8sClient?: KubernetesClient;
+  kubeConfigPath?: string;
   shouldCleanupClusterResources: boolean;
 }
+
+export type SetupOnError = 'throw' | 'warn' | 'skip';
+export type TeardownOnError = 'warn' | 'skip';
 
 export interface SetupRule {
   id: string;
@@ -36,7 +43,7 @@ export interface SetupRule {
   phase: SetupPhase;
   run: (ctx: SetupContext) => Promise<void>;
   guard?: (ctx: SetupContext) => boolean;
-  onError: 'throw' | 'warn' | 'skip';
+  onError: SetupOnError;
 }
 
 export interface TeardownRule {
@@ -45,5 +52,5 @@ export interface TeardownRule {
   scope: TeardownScope;
   run: (ctx: TeardownContext) => Promise<void>;
   guard?: (ctx: TeardownContext) => boolean;
-  onError: 'throw' | 'warn' | 'skip';
+  onError: TeardownOnError;
 }
