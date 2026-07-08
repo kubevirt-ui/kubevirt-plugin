@@ -69,7 +69,7 @@ const VirtualMachinesCreateButton: FC<VirtualMachinesCreateButtonProps> = ({
           logVMCreationStarted(TELEMETRY_VM_CREATION_METHOD.SCRATCH);
           return navigate(yamlURL);
         default:
-          return navigate(vmWizardURL);
+          return navigate(vmWizardURL, { state: { namespace } });
       }
     },
     [navigate, vmWizardURL, yamlURL],
@@ -94,7 +94,7 @@ const VirtualMachinesCreateButton: FC<VirtualMachinesCreateButtonProps> = ({
               <MenuToggleAction
                 aria-label={t('Create VirtualMachine')}
                 key="create-vm"
-                onClick={() => navigate(vmWizardURL)}
+                onClick={() => navigate(vmWizardURL, { state: { namespace } })}
               >
                 {t('Create')}
               </MenuToggleAction>,
