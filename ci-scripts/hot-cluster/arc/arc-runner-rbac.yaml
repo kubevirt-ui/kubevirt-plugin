@@ -44,9 +44,10 @@ rules:
     verbs: ['get', 'list']
 
   # --- Cypress cy.exec runs: oc patch virtualmachine ---
+  # --- Playwright scenario tests: KubernetesClient.createContainerDiskVm/cleanup ---
   - apiGroups: ['kubevirt.io']
     resources: ['virtualmachines']
-    verbs: ['get', 'list', 'watch', 'patch']
+    verbs: ['get', 'list', 'watch', 'patch', 'create', 'delete']
 
   # --- E2E test setup: user-settings and feature-flag configmaps in HCO namespace ---
   - apiGroups: ['']
