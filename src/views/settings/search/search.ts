@@ -19,7 +19,7 @@ export const getClusterTabIds = (t: TFunction): SearchItem[] => [
   { id: CLUSTER_TAB_IDS.virtualizationFeatures, title: t('Virtualization features') },
   { id: CLUSTER_TAB_IDS.generalSettings, title: t('General settings') },
   { id: CLUSTER_TAB_IDS.liveMigration, title: t('Live migration') },
-  { id: CLUSTER_TAB_IDS.memoryDensity, title: t('Memory density') },
+  { id: CLUSTER_TAB_IDS.memoryDensity, title: t('Memory request ratio') },
   { id: CLUSTER_TAB_IDS.sshConfiguration, title: t('SSH configuration') },
   { id: CLUSTER_TAB_IDS.templatesManagement, title: t('Templates and images management') },
   { id: CLUSTER_TAB_IDS.automaticImagesDownload, title: t('Automatic images download') },

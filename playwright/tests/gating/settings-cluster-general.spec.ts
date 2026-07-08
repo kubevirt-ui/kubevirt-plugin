@@ -8,7 +8,7 @@ import { env } from '../../utils/env';
 import { waitForJsonpath } from '../../utils/oc';
 
 const CNV_NS = env.cnvNamespace;
-const MEMORY_DENSITY_VALUE = '400';
+const MEMORY_REQUEST_RATIO_VALUE = '80';
 const KUBEVIRT_CR = 'kubevirt/kubevirt-kubevirt-hyperconverged';
 const MIGRATIONS_PATH = '.spec.configuration.migrations';
 
@@ -36,12 +36,11 @@ test.describe('Cluster General settings', () => {
     );
   });
 
-  test('set memory density', async ({ settingsPage }) => {
-    await settingsPage.enableMemoryDensity();
-    await settingsPage.setMemoryDensityValue(MEMORY_DENSITY_VALUE);
+  test('set memory request ratio', async ({ settingsPage }) => {
+    await settingsPage.setMemoryRequestRatioValue(MEMORY_REQUEST_RATIO_VALUE);
   });
 
-  test('disable memory density', async ({ settingsPage }) => {
-    await settingsPage.disableMemoryDensity();
+  test('restore memory request ratio default', async ({ settingsPage }) => {
+    await settingsPage.restoreMemoryRequestRatioDefault();
   });
 });
