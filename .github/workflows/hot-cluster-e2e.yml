@@ -15,7 +15,7 @@ on:
           - gating
           - features
       cluster_name:
-        description: Cluster name
+        description: 'Cluster name (max 21 chars — IBM Cloud IPI limit, longer names get silently truncated)'
         required: true
         default: kubevirt-plugin-ci
         type: string

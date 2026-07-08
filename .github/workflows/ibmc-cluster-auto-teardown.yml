@@ -108,8 +108,8 @@ jobs:
         env:
           INPUT_CLUSTER_NAME: ${{ inputs.cluster_name }}
         run: |
-          if [[ ! "${INPUT_CLUSTER_NAME}" =~ ^[a-zA-Z0-9][a-zA-Z0-9._-]*$ ]]; then
-            echo "::error::Invalid cluster_name: '${INPUT_CLUSTER_NAME}'. Must match [a-zA-Z0-9][a-zA-Z0-9._-]*"
+          if [[ ! "${INPUT_CLUSTER_NAME}" =~ ^[a-zA-Z0-9][a-zA-Z0-9._-]{0,20}$ ]]; then
+            echo "::error::Invalid cluster_name: '${INPUT_CLUSTER_NAME}'. Must match [a-zA-Z0-9][a-zA-Z0-9._-]* and be at most 21 characters."
             exit 1
           fi
           echo "matrix=[\"${INPUT_CLUSTER_NAME}\"]" >> "$GITHUB_OUTPUT"

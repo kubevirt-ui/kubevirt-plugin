@@ -14,7 +14,7 @@ on:
           - vpc
           - classic
       cluster_name:
-        description: 'Cluster name'
+        description: 'Cluster name (max 21 chars — IBM Cloud IPI limit, longer names get silently truncated)'
         required: true
         default: 'kubevirt-plugin-ci'
         type: string
@@ -73,6 +73,13 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 360
     steps:
+      - name: Validate cluster_name format
+        run: |
+          if [[ ! "${CLUSTER_NAME}" =~ ^[a-zA-Z0-9][a-zA-Z0-9._-]{0,20}$ ]]; then
+            echo "::error::Invalid cluster_name: '${CLUSTER_NAME}'. Must match [a-zA-Z0-9][a-zA-Z0-9._-]* and be at most 21 characters (IBM Cloud IPI cluster name limit — longer names are silently truncated, which breaks health checks, teardown, and auto-teardown discovery)."
+            exit 1
+          fi
+
       - name: Checkout
         uses: actions/checkout@v7
 
