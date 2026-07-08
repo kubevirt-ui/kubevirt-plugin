@@ -72,7 +72,7 @@ const DetailsToggleItems: FC<DetailsToggleItemsProps> = ({
           <EnableVSOCK
             updateVSOCK={(checked) =>
               Promise.resolve(
-                updateCustomizeInstanceType([
+                patchCustomizeWizardVMSignal([
                   {
                     data: checked,
                     path: `spec.template.spec.domain.devices.autoattachVSOCK`,

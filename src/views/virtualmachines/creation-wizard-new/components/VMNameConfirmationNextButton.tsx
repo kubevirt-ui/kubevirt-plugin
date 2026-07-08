@@ -46,6 +46,7 @@ const VMNameConfirmationNextButton: FC<VMNameConfirmationNextButtonProps> = ({
   const nextButton = (
     <Button
       isAriaDisabled={isDisabled}
+      isLoading={isSubmitting}
       onClick={isDisabled ? undefined : handleClick}
       variant="primary"
     >
