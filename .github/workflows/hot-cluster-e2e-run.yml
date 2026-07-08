@@ -347,7 +347,7 @@ jobs:
         if: always()
         run: |
           echo "Cleaning test entities in ${TEST_NS}..."
-          bash ci-scripts/test-cleanup.sh
+          bash ci-scripts/hot-cluster/test-cleanup.sh
 
       - name: Release CI test environment
         if: always()

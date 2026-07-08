@@ -76,25 +76,25 @@ Prerequisites: `oc` logged in to OpenShift with cluster-admin, `helm` available.
 
 ```bash
 # Install the controller (builds image, installs chart)
-./ci-scripts/ci-env/install-ci-env-controller.sh
+./ci-scripts/hot-cluster/ci-env/install-ci-env-controller.sh
 
 # Or with a pre-built image:
 CI_ENV_CONTROLLER_IMAGE=quay.io/myorg/ci-env-controller:latest \
-  ./ci-scripts/ci-env/install-ci-env-controller.sh
+  ./ci-scripts/hot-cluster/ci-env/install-ci-env-controller.sh
 ```
 
 The install script resolves the controller image (building it if needed) then
 runs a single `helm upgrade --install` against the `ci-env-controller` chart.
 
 To update the controller script without rebuilding the image, edit
-`ci-scripts/helm/ci-env-controller/scripts/ci-env-controller.sh` and re-run
+`ci-scripts/hot-cluster/helm/ci-env-controller/scripts/ci-env-controller.sh` and re-run
 the install script (or `helm upgrade --install` directly). The chart checksum
 annotation on the Deployment triggers an automatic rolling restart.
 
 ## Chart Layout
 
 All Kubernetes manifests live in the Helm chart under
-`ci-scripts/helm/ci-env-controller/`:
+`ci-scripts/hot-cluster/helm/ci-env-controller/`:
 
 ```
 ci-env-controller/

@@ -96,7 +96,7 @@ for arg in "$@"; do
     cd "$BASE_DIR"
 done
 
-eval "$(bash ./ci-scripts/resolve-console-image.sh)" || true
+eval "$(bash ./ci-scripts/hot-cluster/resolve-console-image.sh)" || true
 CONSOLE_PORT=${CONSOLE_PORT:-9000}
 
 echo "Starting local OpenShift console..."

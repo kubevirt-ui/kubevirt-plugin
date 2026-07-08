@@ -2,10 +2,10 @@
 # gha-runner-scale-set creates: <RUNNER_SCALE_SET_NAME>-gha-rs-no-permission
 #   (default: kubevirt-plugin-ci-gha-rs-no-permission).
 #
-# Applied automatically by ci-scripts/arc/install-runner-scale-set.sh.
+# Applied automatically by ci-scripts/hot-cluster/arc/install-runner-scale-set.sh.
 # Subject name + namespace substituted for RUNNER_SCALE_SET_NAME / ARC_RUNNERS_NS.
 # Manual apply (defaults only):
-#   oc apply -f ci-scripts/arc/arc-runner-rbac.yaml
+#   oc apply -f ci-scripts/hot-cluster/arc/arc-runner-rbac.yaml
 #
 # To skip cluster RBAC (custom bindings): SKIP_ARC_RUNNER_RBAC=1
 #
@@ -15,7 +15,7 @@
 #     --serviceaccount=<ns>:<scale-set>-gha-rs-no-permission
 #
 # NOTE: The runner's ConfigMap access in the ci-env namespace is granted via a
-# namespaced RoleBinding created by ci-scripts/ci-env/install-ci-env-controller.sh,
+# namespaced RoleBinding created by ci-scripts/hot-cluster/ci-env/install-ci-env-controller.sh,
 # not by this ClusterRole.
 ---
 apiVersion: rbac.authorization.k8s.io/v1

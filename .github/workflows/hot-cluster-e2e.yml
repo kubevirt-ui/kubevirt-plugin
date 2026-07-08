@@ -51,10 +51,13 @@ env:
 jobs:
   cluster-check:
     if: >-
-      github.event_name == 'workflow_dispatch' ||
-      github.event.pull_request.head.repo.full_name == github.repository ||
-      contains(fromJSON('["MEMBER","OWNER","COLLABORATOR"]'), github.event.pull_request.author_association) ||
-      (github.event.action == 'labeled' && contains(github.event.pull_request.labels.*.name, 'ok-to-test'))
+      (github.event.action != 'labeled' || github.event.label.name == 'ok-to-test') &&
+      (
+        github.event_name == 'workflow_dispatch' ||
+        github.event.pull_request.head.repo.full_name == github.repository ||
+        contains(fromJSON('["MEMBER","OWNER","COLLABORATOR"]'), github.event.pull_request.author_association) ||
+        (github.event.action == 'labeled' && github.event.label.name == 'ok-to-test')
+      )
     uses: ./.github/workflows/hot-cluster-check.yml
     secrets: inherit
 
@@ -82,7 +85,7 @@ jobs:
         run: |
           CLUSTER_JSON="$(ibmcloud oc cluster get --cluster "${CLUSTER_NAME}" --output json)"
           export CLUSTER_JSON
-          bash ./ci-scripts/install-oc-client.sh
+          bash ./ci-scripts/hot-cluster/install-oc-client.sh
 
       - name: Configure kubeconfig (ROKS)
         if: env.INFRASTRUCTURE_TYPE != 'ipi'

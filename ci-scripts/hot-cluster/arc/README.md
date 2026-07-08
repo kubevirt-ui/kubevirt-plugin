@@ -8,7 +8,7 @@ All scripts expect **`oc login`** to an OpenShift cluster with permissions to cr
 
 Run from the **repository root** (paths below assume that).
 
-1. **`setup-dind-mirror.sh`** — `oc import-image` **`docker:dind`** → `image-registry.../arc-runners/arc-docker-dind:dind` and write **`ci-scripts/generated/arc-dind-replace.env`**. Use `SKIP_DIND_MIRROR=1` only if dind is provided via **`ImageContentSourcePolicy`** or another cluster mirror (no import from Docker Hub).
+1. **`setup-dind-mirror.sh`** — `oc import-image` **`docker:dind`** → `image-registry.../arc-runners/arc-docker-dind:dind` and write **`ci-scripts/hot-cluster/generated/arc-dind-replace.env`**. Use `SKIP_DIND_MIRROR=1` only if dind is provided via **`ImageContentSourcePolicy`** or another cluster mirror (no import from Docker Hub).
 2. **`setup-runner-image.sh`** — OpenShift `BuildConfig` binary build from [`runner-image/Dockerfile`](runner-image/Dockerfile) → `arc-runner-custom:latest` in the internal registry. Prints **`IMAGE_REF=...`** for automation.
 3. **`install-arc-controller.sh`** — Once per cluster: namespace `arc-systems`, apply **`arc-openshift-scc.yaml`**, Helm **`gha-runner-scale-set-controller`**.
 4. **`install-runner-scale-set.sh`** — Per scale set: namespace `arc-runners`, Helm **`gha-runner-scale-set`** with GitHub auth, optional **`ARC_RUNNER_IMAGE`**, Helm **post-renderer** (always for dind: injects **`--storage-driver=vfs`** for OpenShift; optional **`docker:dind` → mirror** when `arc-dind-replace.env` exists or **`ARC_DIND_INTERNAL_IMAGE`** is set), **`oc policy add-role-to-user system:openshift:scc:github-arc`** on the runner SA, apply **`arc-runner-rbac.yaml`** (unless `SKIP_ARC_RUNNER_RBAC=1`).
@@ -18,12 +18,12 @@ export ARC_CONFIG_URL="https://github.com/org/repo"
 export ARC_APP_ID="..." ARC_APP_INSTALL_ID="..." ARC_APP_PRIVATE_KEY="$(cat app.pem)"
 # optional: export ARC_RUNNER_IMAGE after setup-runner-image prints IMAGE_REF=
 
-./ci-scripts/arc/setup-dind-mirror.sh
-IMAGE_REF=$(./ci-scripts/arc/setup-runner-image.sh | grep '^IMAGE_REF=' | cut -d= -f2-)
+./ci-scripts/hot-cluster/arc/setup-dind-mirror.sh
+IMAGE_REF=$(./ci-scripts/hot-cluster/arc/setup-runner-image.sh | grep '^IMAGE_REF=' | cut -d= -f2-)
 export ARC_RUNNER_IMAGE="${IMAGE_REF}"
 
-./ci-scripts/arc/install-arc-controller.sh
-./ci-scripts/arc/install-runner-scale-set.sh
+./ci-scripts/hot-cluster/arc/install-arc-controller.sh
+./ci-scripts/hot-cluster/arc/install-runner-scale-set.sh
 ```
 
 ## Environment variables (summary)
@@ -63,7 +63,7 @@ You do **not** need to re-apply **`arc-openshift-scc.yaml`**.
 | `arc-dind-post-render.sh`       | Helm post-renderer: OpenShift dind `vfs` storage driver; optional `docker:dind` swap via `../generated/arc-dind-replace.env` |
 | `runner-image/Dockerfile`       | Custom runner (Node, kubectl, oc, virtctl, jq)                                                                               |
 
-Generated **`ci-scripts/generated/arc-dind-replace.env`** is gitignored; it is produced by **`setup-dind-mirror.sh`** or by **`install-runner-scale-set.sh`** when **`ARC_DIND_INTERNAL_IMAGE`** is set.
+Generated **`ci-scripts/hot-cluster/generated/arc-dind-replace.env`** is gitignored; it is produced by **`setup-dind-mirror.sh`** or by **`install-runner-scale-set.sh`** when **`ARC_DIND_INTERNAL_IMAGE`** is set.
 
 ## Further reading
 

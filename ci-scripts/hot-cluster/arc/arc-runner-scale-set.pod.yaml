@@ -1,5 +1,5 @@
 # gha-runner-scale-set Helm values fragment: runner pod template (OpenShift).
-# Used by ci-scripts/arc/install-runner-scale-set.sh.
+# Used by ci-scripts/hot-cluster/arc/install-runner-scale-set.sh.
 #
 # The CI test stack (console + plugin) runs as separate cluster pods via the
 # ci-test-stack Helm chart, so no Docker-in-Docker sidecar is needed.

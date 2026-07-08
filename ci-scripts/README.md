@@ -118,20 +118,51 @@ For IPI teardown, the workflow auto-discovers the latest successful setup run to
 - CI runners (ARC) access the cluster via their in-cluster service account.
 - Manual cluster access: use the `ibmcloud` CLI with the `IC_KEY` API key, or use the kubeadmin credentials sent to Slack on cluster creation (see CNV-91497).
 
+## Directory Structure
+
+```
+ci-scripts/
+  _cluster-helpers.sh              (shared utility sourced by image build scripts)
+  README.md
+  hot-cluster/
+    check-cluster-health.sh
+    check-roks-cluster-state.sh
+    cleanup-ipi-resources.sh
+    configure-image-registry.sh
+    configure-kubeconfig.sh
+    create-ibmcloud-cco-secrets.sh
+    create-ipi-cluster.sh
+    install-hco.sh
+    install-oc-client.sh
+    ipi-install-config.yaml.tpl
+    log-ibmcloud-iam-diagnostics.sh
+    provision-vpc-resources.sh
+    resolve-console-image.sh
+    test-cleanup.sh
+    arc/
+    ci-env/
+    helm/
+    images/
+```
+
 ## Scripts
 
-| Script                                | Purpose                                                    |
-| ------------------------------------- | ---------------------------------------------------------- |
-| `install-hco.sh`                      | Installs HCO operator, HPP storage, and virtctl            |
-| `check-cluster-health.sh`             | Verifies cluster, HCO, ARC, storage, console               |
-| `check-roks-cluster-state.sh`         | Polls until ROKS cluster is ready                          |
-| `log-ibmcloud-iam-diagnostics.sh`     | Logs IAM permissions for debugging (classic, VPC, and IPI) |
-| `arc/install-arc-controller.sh`       | Installs ARC controller (once per cluster)                 |
-| `arc/install-runner-scale-set.sh`     | Installs ARC runner scale set                              |
-| `arc/setup-dind-mirror.sh`            | Mirrors `docker:dind` to internal registry                 |
-| `ci-env/install-ci-env-controller.sh` | Installs the ConfigMap-driven CI environment controller    |
+| Script                                           | Purpose                                                    |
+| ------------------------------------------------ | ---------------------------------------------------------- |
+| `hot-cluster/install-hco.sh`                     | Installs HCO operator, HPP storage, and virtctl            |
+| `hot-cluster/check-cluster-health.sh`            | Verifies cluster, HCO, ARC, storage, console               |
+| `hot-cluster/check-roks-cluster-state.sh`        | Polls until ROKS cluster is ready                          |
+| `hot-cluster/log-ibmcloud-iam-diagnostics.sh`    | Logs IAM permissions for debugging (classic, VPC, and IPI) |
+| `hot-cluster/cleanup-ipi-resources.sh`           | Cleans stale IPI resources before provisioning             |
+| `hot-cluster/create-ipi-cluster.sh`              | Creates IPI cluster with retry logic                       |
+| `hot-cluster/configure-kubeconfig.sh`            | Configures kubeconfig with DNS retry                       |
+| `hot-cluster/provision-vpc-resources.sh`         | Provisions VPC, subnet, and public gateway                 |
+| `hot-cluster/configure-image-registry.sh`        | Configures the internal image registry                     |
+| `hot-cluster/arc/install-arc-controller.sh`      | Installs ARC controller (once per cluster)                 |
+| `hot-cluster/arc/install-runner-scale-set.sh`    | Installs ARC runner scale set                              |
+| `hot-cluster/ci-env/install-ci-env-controller.sh`| Installs the ConfigMap-driven CI environment controller    |
 
-See [`arc/README.md`](arc/README.md) for ARC-specific details and [`ci-env/README.md`](ci-env/README.md) for the ci-env-controller.
+See [`hot-cluster/arc/README.md`](hot-cluster/arc/README.md) for ARC-specific details and [`hot-cluster/ci-env/README.md`](hot-cluster/ci-env/README.md) for the ci-env-controller.
 
 ## Script Configuration
 
@@ -180,7 +211,7 @@ Always verify the cluster has been torn down when done testing. The auto-teardow
 
 ### Health check fails
 
-- Run `ci-scripts/check-cluster-health.sh` manually with `oc` configured
+- Run `ci-scripts/hot-cluster/check-cluster-health.sh` manually with `oc` configured
 - Check individual component status: `oc get pods -n openshift-cnv`
 - Verify storage: `oc get storageclass`
 
