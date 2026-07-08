@@ -26,6 +26,7 @@ import {
   getStatusConditionsByType as getResourceStatusConditionsByType,
 } from '@kubevirt-utils/resources/shared';
 import { WORKLOADS } from '@kubevirt-utils/resources/template';
+import { getVMIDevices } from '@kubevirt-utils/resources/vmi/utils/selectors';
 import { isVM } from '@kubevirt-utils/utils/typeGuards';
 import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
 
@@ -402,7 +403,7 @@ export const isVMNotStopped = (vm: V1VirtualMachine): boolean =>
   Boolean(vm?.status?.printableStatus) && vm.status.printableStatus !== VM_STATUS.Stopped;
 
 export const isHeadlessMode = (vm: V1VirtualMachine | V1VirtualMachineInstance) => {
-  const devices = isVM(vm) ? vm?.spec?.template?.spec?.domain?.devices : vm?.spec?.domain?.devices;
+  const devices = isVM(vm) ? getDevices(vm) : getVMIDevices(vm);
   return devices?.autoattachGraphicsDevice === false;
 };
 
@@ -416,3 +417,8 @@ export const getArchitecture = (vm: V1VirtualMachine): string =>
  */
 export const getVMTemplateAnnotations = (vm: V1VirtualMachine): { [key: string]: string } =>
   vm?.spec?.template?.metadata?.annotations;
+
+export const isVSOCKEnabled = (vm: V1VirtualMachine | V1VirtualMachineInstance) => {
+  const devices = isVM(vm) ? getDevices(vm) : getVMIDevices(vm);
+  return Boolean(devices?.autoattachVSOCK);
+};

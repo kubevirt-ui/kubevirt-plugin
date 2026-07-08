@@ -65,6 +65,7 @@ import {
   getBootloader,
   getDisks,
   isHeadlessMode,
+  isVSOCKEnabled,
 } from '../../../resources/vm/utils/selectors';
 
 import { PendingChange } from './types';
@@ -438,6 +439,14 @@ export const getChangedHeadlessMode = (
   }
 
   return isHeadlessMode(vm) !== isHeadlessMode(vmi);
+};
+
+export const getChangedVSOCK = (vm: V1VirtualMachine, vmi: V1VirtualMachineInstance): boolean => {
+  if (isEmpty(vm) || isEmpty(vmi)) {
+    return false;
+  }
+
+  return isVSOCKEnabled(vm) !== isVSOCKEnabled(vmi);
 };
 
 export const getTabURL = (vm: V1VirtualMachine, tab: VirtualMachineDetailsTab) => {

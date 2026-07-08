@@ -37,6 +37,7 @@ export const PREVIEW_FEATURES_TAB_IDS = {
   previewFeatures: 'preview-features',
   treeViewFolders: 'tree-view-folders',
   vmTemplates: 'vm-templates',
+  vsockEnabled: 'vsock-enabled',
 };
 
 export const SEARCH_ITEM_CHILDREN_TREE = {
@@ -60,6 +61,7 @@ export const SEARCH_ITEM_CHILDREN_TREE = {
     PREVIEW_FEATURES_TAB_IDS.treeViewFolders,
     PREVIEW_FEATURES_TAB_IDS.passtUDNNetwork,
     PREVIEW_FEATURES_TAB_IDS.vmTemplates,
+    PREVIEW_FEATURES_TAB_IDS.vsockEnabled,
   ],
   [USER_TAB_IDS.general]: [USER_TAB_IDS.autoHideNav],
   [USER_TAB_IDS.gettingStarted]: [USER_TAB_IDS.welcomeInformation, USER_TAB_IDS.guidedTour],

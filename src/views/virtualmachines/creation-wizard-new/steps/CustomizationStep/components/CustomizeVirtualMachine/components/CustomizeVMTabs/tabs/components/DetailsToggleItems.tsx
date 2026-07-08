@@ -1,6 +1,7 @@
 import React, { Dispatch, FC, SetStateAction } from 'react';
 
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
+import EnableVSOCK from '@kubevirt-utils/components/EnableVSOCK/EnableVSOCK';
 import HeadlessMode from '@kubevirt-utils/components/HeadlessMode/HeadlessMode';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
@@ -59,6 +60,32 @@ const DetailsToggleItems: FC<DetailsToggleItemsProps> = ({
         isPopover
         olsObj={vm}
         promptType={OLSPromptType.HEADLESS_MODE}
+      />
+      <DescriptionItem
+        bodyContent={t(
+          'Attaches a virtio-vsock device for direct communication between the guest and the host without a network interface.',
+        )}
+        descriptionData={
+          <EnableVSOCK
+            updateVSOCK={(checked) =>
+              Promise.resolve(
+                updateCustomizeInstanceType([
+                  {
+                    data: checked,
+                    path: `spec.template.spec.domain.devices.autoattachVSOCK`,
+                  },
+                ]),
+              )
+            }
+            vm={vm}
+          />
+        }
+        breadcrumb="VirtualMachine.spec.template.devices.autoattachVSOCK"
+        data-test-id={`${vmName}-enable-vsock`}
+        descriptionHeader={<SearchItem id="enable-vsock">{t('Enable VSOCK')}</SearchItem>}
+        isPopover
+        olsObj={vm}
+        promptType={OLSPromptType.ENABLE_VSOCK}
       />
       <DescriptionItem
         bodyContent={t(
