@@ -16,7 +16,7 @@ export const NODE_MAINTENANCE_OPERATOR_NAME = 'node-maintenance-operator';
 export const MULTICLUSTER_ENGINE_OPERATOR_NAME = 'multicluster-engine';
 export const LOCAL_STORAGE_OPERATOR_NAME = 'local-storage-operator';
 export const NUMA_RESOURCES_OPERATOR_NAME = 'numaresources-operator';
-export const NODE_FEATURE_DISCOVERY_OPERATOR_NAME = 'node-feature-discovery';
+export const NODE_FEATURE_DISCOVERY_OPERATOR_NAME = 'nfd';
 export const OADP_OPERATOR_NAME = 'oadp-operator';
 
 export const RECOMMENDED_OPERATOR_PACKAGE_NAMES: readonly string[] = [
