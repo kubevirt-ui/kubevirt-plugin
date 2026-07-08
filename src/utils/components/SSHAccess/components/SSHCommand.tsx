@@ -2,7 +2,7 @@ import React, { FC, useEffect, useState } from 'react';
 
 import { IoK8sApiCoreV1Service } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import Loading from '@kubevirt-utils/components/Loading/Loading';
+import StateHandler from '@kubevirt-utils/components/StateHandler/StateHandler';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { useVMIAndPodsForVM } from '@kubevirt-utils/resources/vm';
@@ -31,12 +31,14 @@ import SSHServiceStateIcon from './SSHServiceState';
 
 type SSHCommandProps = {
   sshService: IoK8sApiCoreV1Service;
+  sshServiceError?: Error;
   sshServiceLoaded?: boolean;
   vm: V1VirtualMachine;
 };
 
 const SSHCommand: FC<SSHCommandProps> = ({
   sshService: initialSSHService,
+  sshServiceError,
   sshServiceLoaded,
   vm,
 }) => {
@@ -47,10 +49,12 @@ const SSHCommand: FC<SSHCommandProps> = ({
   const [error, setError] = useState<Error>();
 
   const {
+    error: vmiAndPodsError,
     loaded: vmiAndPodsLoaded,
     pods,
     vmi,
   } = useVMIAndPodsForVM(getName(vm), getNamespace(vm), getCluster(vm));
+  const loadError = sshServiceError || vmiAndPodsError;
   const pod = getVMIPod(vmi, pods);
 
   const onSSHChange = async (newServiceType: SERVICE_TYPES) => {
@@ -84,6 +88,8 @@ const SSHCommand: FC<SSHCommandProps> = ({
   const showBondingWarning =
     sshService?.spec?.type === SERVICE_TYPES.LOAD_BALANCER && !isLoadBalancerBonded(sshService);
 
+  const isLoaded = sshServiceLoaded && vmiAndPodsLoaded && !loading;
+
   return (
     <DescriptionListGroup>
       <DescriptionListTerm className="pf-v6-u-font-size-xs">
@@ -92,41 +98,34 @@ const SSHCommand: FC<SSHCommandProps> = ({
 
       <DescriptionListDescription>
         <Stack hasGutter>
-          {sshServiceLoaded && vmiAndPodsLoaded && !loading ? (
-            <>
-              <StackItem>
-                <Flex direction={{ default: 'row' }}>
-                  <FlexItem flex={{ default: 'flex_1' }}>
-                    <SSHServiceSelect
-                      onSSHChange={onSSHChange}
-                      sshService={sshService}
-                      sshServiceLoaded={sshServiceLoaded}
-                    />
-                  </FlexItem>
-
-                  <SSHServiceStateIcon
+          <StateHandler error={loadError} hasData={false} loaded={isLoaded}>
+            <StackItem>
+              <Flex direction={{ default: 'row' }}>
+                <FlexItem flex={{ default: 'flex_1' }}>
+                  <SSHServiceSelect
+                    onSSHChange={onSSHChange}
                     sshService={sshService}
                     sshServiceLoaded={sshServiceLoaded}
                   />
-                </Flex>
-              </StackItem>
+                </FlexItem>
 
-              {sshServiceRunning && !showBondingWarning && (
-                <StackItem>
-                  <ClipboardCopy
-                    clickTip={t('Copied')}
-                    data-test="ssh-command-copy"
-                    hoverTip={t('Copy to clipboard')}
-                    isReadOnly
-                  >
-                    {command}
-                  </ClipboardCopy>
-                </StackItem>
-              )}
-            </>
-          ) : (
-            <Loading />
-          )}
+                <SSHServiceStateIcon sshService={sshService} sshServiceLoaded={sshServiceLoaded} />
+              </Flex>
+            </StackItem>
+
+            {sshServiceRunning && !showBondingWarning && (
+              <StackItem>
+                <ClipboardCopy
+                  clickTip={t('Copied')}
+                  data-test="ssh-command-copy"
+                  hoverTip={t('Copy to clipboard')}
+                  isReadOnly
+                >
+                  {command}
+                </ClipboardCopy>
+              </StackItem>
+            )}
+          </StateHandler>
           {error && (
             <StackItem>
               <Alert isInline title={t('Error')} variant={AlertVariant.danger}>

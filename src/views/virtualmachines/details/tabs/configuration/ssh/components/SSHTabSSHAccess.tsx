@@ -14,7 +14,7 @@ type SSHTabSSHAccessProps = {
 
 const SSHTabSSHAccess: FC<SSHTabSSHAccessProps> = ({ isCustomizeInstanceType, vm }) => {
   const { t } = useKubevirtTranslation();
-  const [sshService, sshServiceLoaded] = useSSHService(vm);
+  const [sshService, sshServiceLoaded, sshServiceError] = useSSHService(vm);
 
   return (
     <DescriptionItem
@@ -22,6 +22,7 @@ const SSHTabSSHAccess: FC<SSHTabSSHAccessProps> = ({ isCustomizeInstanceType, vm
         <SSHAccess
           isCustomizeInstanceType={isCustomizeInstanceType}
           sshService={sshService}
+          sshServiceError={sshServiceError}
           sshServiceLoaded={sshServiceLoaded}
           vm={vm}
         />

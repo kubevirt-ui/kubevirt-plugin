@@ -52,7 +52,7 @@ const Details: FC<DetailsProps> = ({ pathname, vmi }) => {
     name: getName(vmi),
     namespace: getNamespace(vmi),
   });
-  const [sshService, sshServiceLoaded] = useSSHService(vm);
+  const [sshService, sshServiceLoaded, sshServiceError] = useSSHService(vm);
 
   return (
     <div>
@@ -129,7 +129,12 @@ const Details: FC<DetailsProps> = ({ pathname, vmi }) => {
             />
             <DescriptionItem
               descriptionData={
-                <SSHAccess sshService={sshService} sshServiceLoaded={sshServiceLoaded} vm={vm} />
+                <SSHAccess
+                  sshService={sshService}
+                  sshServiceError={sshServiceError}
+                  sshServiceLoaded={sshServiceLoaded}
+                  vm={vm}
+                />
               }
               descriptionHeader={t('SSH access')}
             />

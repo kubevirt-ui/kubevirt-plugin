@@ -10,6 +10,7 @@ import SSHCommand from './components/SSHCommand';
 type SSHAccessProps = {
   isCustomizeInstanceType?: boolean;
   sshService: IoK8sApiCoreV1Service;
+  sshServiceError?: Error;
   sshServiceLoaded?: boolean;
   vm: V1VirtualMachine;
 };
@@ -17,13 +18,19 @@ type SSHAccessProps = {
 const SSHAccess: FC<SSHAccessProps> = ({
   isCustomizeInstanceType,
   sshService,
+  sshServiceError,
   sshServiceLoaded,
   vm,
 }) => {
   return (
     <DescriptionList>
       {!isCustomizeInstanceType && (
-        <SSHCommand sshService={sshService} sshServiceLoaded={sshServiceLoaded} vm={vm} />
+        <SSHCommand
+          sshService={sshService}
+          sshServiceError={sshServiceError}
+          sshServiceLoaded={sshServiceLoaded}
+          vm={vm}
+        />
       )}
       <ConsoleOverVirtctl vm={vm} />
     </DescriptionList>

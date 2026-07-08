@@ -13,7 +13,7 @@ import { SSH_PORT } from './constants';
 export type UseSSHServiceReturnType = [
   service: IoK8sApiCoreV1Service,
   loaded: boolean,
-  error: Error,
+  error: Error | undefined,
 ];
 
 const useSSHService = (vm: V1VirtualMachine): UseSSHServiceReturnType => {
