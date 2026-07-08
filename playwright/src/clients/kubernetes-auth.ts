@@ -186,6 +186,74 @@ export async function getOAuthToken(
   });
 }
 
+const SERVICE_ACCOUNT_DIR = '/var/run/secrets/kubernetes.io/serviceaccount';
+const SERVICE_ACCOUNT_TOKEN_PATH = `${SERVICE_ACCOUNT_DIR}/token`;
+const SERVICE_ACCOUNT_CA_PATH = `${SERVICE_ACCOUNT_DIR}/ca.crt`;
+
+/**
+ * True when running inside a pod with a mounted ServiceAccount token — i.e. the
+ * standard in-cluster auth mechanism is available without needing kubeadmin
+ * (or any other) credentials.
+ */
+export function isInClusterEnvironment(): boolean {
+  return (
+    !!process.env.KUBERNETES_SERVICE_HOST &&
+    fs.existsSync(SERVICE_ACCOUNT_TOKEN_PATH) &&
+    fs.existsSync(SERVICE_ACCOUNT_CA_PATH)
+  );
+}
+
+/**
+ * Generate a kubeconfig from the pod's mounted ServiceAccount token, avoiding
+ * any need for a static admin username/password. The token is short-lived and
+ * scoped by RBAC to the ServiceAccount's identity, and the real cluster CA
+ * cert is used instead of skipping TLS verification.
+ */
+export function generateInClusterKubeconfig(outputPath: string): string {
+  if (!isInClusterEnvironment()) {
+    throw new Error(
+      'Not running in-cluster: KUBERNETES_SERVICE_HOST or the ServiceAccount token/CA files are missing.',
+    );
+  }
+
+  const host = process.env.KUBERNETES_SERVICE_HOST;
+  const port =
+    process.env.KUBERNETES_SERVICE_PORT_HTTPS || process.env.KUBERNETES_SERVICE_PORT || '443';
+  // IPv6 literals must be bracketed in a URL (e.g. https://[::1]:443); IPv4
+  // addresses and hostnames contain no colons and pass through unchanged.
+  const formattedHost = host?.includes(':') && !host.startsWith('[') ? `[${host}]` : host;
+  const server = `https://${formattedHost}:${port}`;
+  const token = fs.readFileSync(SERVICE_ACCOUNT_TOKEN_PATH, 'utf8').trim();
+
+  const kubeconfigYaml = `apiVersion: v1
+kind: Config
+clusters:
+  - name: cluster
+    cluster:
+      server: ${server}
+      certificate-authority: ${SERVICE_ACCOUNT_CA_PATH}
+contexts:
+  - name: context
+    context:
+      cluster: cluster
+      user: user
+current-context: context
+users:
+  - name: user
+    user:
+      token: ${token}
+`;
+
+  const dir = path.dirname(outputPath);
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
+
+  fs.writeFileSync(outputPath, kubeconfigYaml, { encoding: 'utf8', mode: 0o600 });
+  fs.chmodSync(outputPath, 0o600);
+  return outputPath;
+}
+
 export async function generateKubeconfig(
   clusterUrl: string,
   username: string,

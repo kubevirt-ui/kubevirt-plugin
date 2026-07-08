@@ -4,9 +4,11 @@ import * as k8s from '@kubernetes/client-node';
 
 import {
   createProxyAgent,
+  generateInClusterKubeconfig,
   generateKubeconfig,
   getOAuthToken,
   getProxyUrl,
+  isInClusterEnvironment,
 } from './kubernetes-auth';
 
 const POLL_INTERVAL = 2000;
@@ -16,8 +18,10 @@ const POLL_INTERVAL = 2000;
  * Wraps @kubernetes/client-node directly — extend with new methods as tests require them.
  */
 export class KubernetesClient {
+  static readonly generateInClusterKubeconfig = generateInClusterKubeconfig;
   static readonly generateKubeconfig = generateKubeconfig;
   static readonly getOAuthToken = getOAuthToken;
+  static readonly isInClusterEnvironment = isInClusterEnvironment;
 
   private readonly coApi: k8s.CustomObjectsApi;
   private readonly coreApi: k8s.CoreV1Api;

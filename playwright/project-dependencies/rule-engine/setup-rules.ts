@@ -43,6 +43,20 @@ export function getSetupRules(): SetupRule[] {
     },
     {
       guard: (ctx) => !ctx.effectiveKubeConfigPath,
+      id: 'in-cluster-service-account',
+      name: 'Generate kubeconfig via in-cluster ServiceAccount',
+      onError: 'warn',
+      phase: SetupPhase.AUTH,
+      run: async (ctx) => {
+        if (!KubernetesClient.isInClusterEnvironment()) return;
+        logger.info('🔐 Authenticating via in-cluster ServiceAccount token...');
+        KubernetesClient.generateInClusterKubeconfig(ctx.kubeConfigPath);
+        ctx.effectiveKubeConfigPath = ctx.kubeConfigPath;
+        logger.success('✓ Kubeconfig generated from in-cluster ServiceAccount');
+      },
+    },
+    {
+      guard: (ctx) => !ctx.effectiveKubeConfigPath,
       id: 'oc-login',
       name: 'Generate kubeconfig via oc login',
       onError: 'warn',
