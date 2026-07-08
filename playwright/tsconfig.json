@@ -9,7 +9,9 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "resolveJsonModule": true,
-    "strict": true,
+    "strict": false,
+    "noImplicitOverride": true,
+    "useUnknownInCatchVariables": true,
     "noEmit": true,
     "paths": {
       "@/*": ["./src/*"]

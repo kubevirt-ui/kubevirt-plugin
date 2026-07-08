@@ -1,13 +1,10 @@
-import { execSync } from 'child_process';
+import { execFileSync, execSync } from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
 
 import { KubernetesClient } from '@/clients/kubernetes-client';
-import LoginPage from '@/page-objects/cluster/login-page';
-import { ClusterJanitor } from '@/utils/cluster-janitor';
 import { EnvVariables } from '@/utils/env-variables';
 import { logger } from '@/utils/logger';
-import { NONPRIV_IDP_NAME, waitForOAuthRollout } from '@/utils/nonpriv-utils';
 import { type SharedTestConfig, MINUTE, SECOND, TestConfigManager } from '@/utils/test-config';
 import { type Browser, type BrowserContext, type Page, chromium } from '@playwright/test';
 
@@ -16,45 +13,31 @@ import { SetupPhase } from './types';
 
 const TMP_KUBECONFIG_PATH = '/tmp/kubeconfig';
 
-/**
- * Returns ordered global setup rules (AUTH -> CLUSTER -> BROWSER -> REPORTING).
- * Browser-phase rules share `browserState` created during browser login / console prep.
- *
- * Ported from kubevirt-ui; excludes sharding and s390x auto-detection.
- */
 export function getSetupRules(): SetupRule[] {
   let browserState: { browser: Browser; context: BrowserContext; page: Page } | null = null;
 
   return [
+    // ── AUTH phase ─────────────────────────────────────────────────────
     {
+      guard: (ctx) => !ctx.effectiveKubeConfigPath,
       id: 'copy-ci-kubeconfig',
       name: 'Copy CI kubeconfig from /tmp/kubeconfig',
-      phase: SetupPhase.AUTH,
-      guard: (ctx) => !ctx.effectiveKubeConfigPath,
       onError: 'warn',
+      phase: SetupPhase.AUTH,
       run: async (ctx) => {
-        if (!fs.existsSync(TMP_KUBECONFIG_PATH)) {
-          return;
-        }
-        logger.info(
-          `📋 Found kubeconfig at ${TMP_KUBECONFIG_PATH} (containerized environment), validating...`,
-        );
+        if (!fs.existsSync(TMP_KUBECONFIG_PATH)) return;
+        logger.info(`📋 Found kubeconfig at ${TMP_KUBECONFIG_PATH}, validating...`);
         const kubeConfigDir = path.dirname(ctx.kubeConfigPath);
-        if (!fs.existsSync(kubeConfigDir)) {
-          fs.mkdirSync(kubeConfigDir, { recursive: true });
-        }
+        if (!fs.existsSync(kubeConfigDir)) fs.mkdirSync(kubeConfigDir, { recursive: true });
         const content = fs.readFileSync(TMP_KUBECONFIG_PATH, 'utf8').trim();
         if (
-          content.length > 0 &&
-          (content.startsWith('{') ||
-            content.includes('apiVersion') ||
-            content.includes('clusters:'))
+          content.includes('apiVersion') ||
+          content.includes('clusters:') ||
+          content.startsWith('{')
         ) {
           fs.copyFileSync(TMP_KUBECONFIG_PATH, ctx.kubeConfigPath);
           ctx.effectiveKubeConfigPath = ctx.kubeConfigPath;
-          logger.success(
-            `✓ Kubeconfig copied from ${TMP_KUBECONFIG_PATH} to ${ctx.kubeConfigPath}`,
-          );
+          logger.success(`✓ Kubeconfig copied to ${ctx.kubeConfigPath}`);
         }
       },
     },
@@ -76,346 +59,109 @@ export function getSetupRules(): SetupRule[] {
       guard: (ctx) => !ctx.effectiveKubeConfigPath,
       id: 'oc-login',
       name: 'Generate kubeconfig via oc login',
-      phase: SetupPhase.AUTH,
-      guard: (ctx) => !ctx.effectiveKubeConfigPath,
       onError: 'warn',
+      phase: SetupPhase.AUTH,
       run: async (ctx) => {
         const clusterUrl = EnvVariables.clusterUrl;
         if (!clusterUrl || clusterUrl === 'undefined') {
-          throw new Error(
-            'No cluster URL configured. Please set CLUSTER_URL or OPENSHIFT_CLUSTER_URL environment variable.',
-          );
+          throw new Error('No cluster URL configured.');
         }
         const kubeConfigDir = path.dirname(ctx.kubeConfigPath);
-        if (!fs.existsSync(kubeConfigDir)) {
-          fs.mkdirSync(kubeConfigDir, { recursive: true });
-        }
+        if (!fs.existsSync(kubeConfigDir)) fs.mkdirSync(kubeConfigDir, { recursive: true });
         logger.info(`🔐 Authenticating to cluster: ${clusterUrl}`);
-        logger.info(` Username: ${EnvVariables.username}`);
-        execSync(
-          `oc login "${clusterUrl}" -u "${EnvVariables.username}" -p "${EnvVariables.password}" --insecure-skip-tls-verify --kubeconfig="${ctx.kubeConfigPath}"`,
-          { encoding: 'utf8', timeout: MINUTE, stdio: 'pipe' },
+        execFileSync(
+          'oc',
+          [
+            'login',
+            clusterUrl,
+            '-u',
+            EnvVariables.username,
+            '-p',
+            EnvVariables.password,
+            '--insecure-skip-tls-verify',
+            `--kubeconfig=${ctx.kubeConfigPath}`,
+          ],
+          { encoding: 'utf8', stdio: 'pipe', timeout: MINUTE },
         );
         ctx.effectiveKubeConfigPath = ctx.kubeConfigPath;
         logger.success('✓ Kubeconfig generated via oc login');
       },
     },
     {
+      guard: (ctx) => !ctx.effectiveKubeConfigPath,
       id: 'oauth-login',
       name: 'Generate kubeconfig via OAuth',
-      phase: SetupPhase.AUTH,
-      guard: (ctx) => !ctx.effectiveKubeConfigPath,
       onError: 'throw',
+      phase: SetupPhase.AUTH,
       run: async (ctx) => {
-        try {
-          ctx.effectiveKubeConfigPath = await KubernetesClient.generateKubeconfig(
-            EnvVariables.clusterUrl,
-            EnvVariables.username,
-            EnvVariables.password,
-            ctx.kubeConfigPath,
-          );
-          logger.success('✓ Kubeconfig generated via OAuth authentication');
-        } catch (authError: unknown) {
-          const msg = authError instanceof Error ? authError.message : String(authError);
-          throw new Error(
-            `Failed to authenticate to cluster ${EnvVariables.clusterUrl}: ${msg}. ` +
-              `Please verify CLUSTER_URL, OPENSHIFT_USERNAME, and OPENSHIFT_PASSWORD are correct.`,
-          );
-        }
+        ctx.effectiveKubeConfigPath = await KubernetesClient.generateKubeconfig(
+          EnvVariables.clusterUrl,
+          EnvVariables.username,
+          EnvVariables.password,
+          ctx.kubeConfigPath,
+        );
+        logger.success('✓ Kubeconfig generated via OAuth');
       },
     },
     {
       id: 'init-k8s-client',
-      name: 'Initialize Kubernetes client and verify authentication',
-      phase: SetupPhase.AUTH,
+      name: 'Initialize Kubernetes client',
       onError: 'throw',
+      phase: SetupPhase.AUTH,
       run: async (ctx) => {
         if (!ctx.effectiveKubeConfigPath) {
-          throw new Error('No authentication method succeeded. Cannot initialize K8s client.');
+          throw new Error('No authentication method succeeded.');
         }
         process.env.KUBECONFIG = ctx.effectiveKubeConfigPath;
-        logger.info(`🔑 Using kubeconfig: ${ctx.effectiveKubeConfigPath}`);
-        const k8sClient = new KubernetesClient(ctx.effectiveKubeConfigPath);
-        logger.info('🔐 Verifying cluster authentication...');
-        await k8sClient.verifyAuthentication();
+        const client = new KubernetesClient(ctx.effectiveKubeConfigPath);
+        await client.verifyAuthentication();
         logger.success('✓ Cluster authentication verified');
-        let token = k8sClient.getCurrentUserToken();
-        if (!token) {
-          logger.info('⚠️ Token not found in kubeconfig user object, trying oc whoami...');
-          try {
-            token = execSync(
-              `oc whoami --show-token --kubeconfig="${ctx.effectiveKubeConfigPath}"`,
-              { encoding: 'utf8', timeout: 30 * SECOND, stdio: 'pipe' },
-            ).trim();
-          } catch {
-            logger.warn('⚠️ oc whoami --show-token failed');
-          }
-        }
-        if (!token) {
-          logger.info('⚠️ Falling back to OAuth token request...');
-          try {
-            token = await KubernetesClient.getOAuthToken(
-              EnvVariables.clusterUrl,
-              EnvVariables.username,
-              EnvVariables.password,
-            );
-          } catch {
-            logger.warn('⚠️ OAuth token request failed');
-          }
-        }
-        if (token) {
-          ctx.authToken = token;
-          logger.success('✓ Authentication token extracted');
-        } else {
-          logger.warn('⚠️ Could not extract authentication token from any source');
-        }
-        ctx.k8sClient = k8sClient;
+        const token = client.getCurrentUserToken();
+        if (token) ctx.authToken = token;
+        ctx.k8sClient = client;
       },
     },
-    {
-      id: 'start-cluster-janitor',
-      name: 'Start native ClusterJanitor background sweep',
-      phase: SetupPhase.CLUSTER,
-      guard: () => EnvVariables.isClusterJanitorEnabled,
-      onError: 'warn',
-      run: async (ctx) => {
-        if (!ctx.k8sClient) {
-          throw new Error('Kubernetes client not initialized for ClusterJanitor');
-        }
-        const janitor = new ClusterJanitor(ctx.k8sClient, {
-          staleAgeMs: EnvVariables.clusterJanitorStaleAgeMs,
-          excludeNamespaces: [ctx.testNamespace],
-        });
-        janitor.startInterval(EnvVariables.clusterJanitorIntervalMs);
-        ctx.clusterJanitor = janitor;
-        logger.success('✓ ClusterJanitor background sweep started');
-      },
-    },
-    {
-      id: 'ensure-nonpriv-user',
-      name: 'Ensure non-priv test user exists in htpasswd IDP',
-      phase: SetupPhase.CLUSTER,
-      guard: () => EnvVariables.isNonPrivUser,
-      onError: 'warn',
-      run: async (ctx) => {
-        const k8sClient = ctx.k8sClient;
-        if (!k8sClient) {
-          throw new Error('Kubernetes client not initialized');
-        }
-        const username = EnvVariables.testUsername;
-        const password = EnvVariables.testUserPassword;
-        logger.info(`👤 Ensuring non-priv test user "${username}" exists in htpasswd IDP...`);
-        const wasCreated = await k8sClient.ensureNonPrivUserExists(username, password);
-        logger.success(`✓ Non-priv test user "${username}" is available in the cluster IDP`);
-        if (wasCreated) {
-          await waitForOAuthRollout(k8sClient);
-        }
-      },
-    },
+
+    // ── CLUSTER phase ─────────────────────────────────────────────────
     {
       id: 'setup-test-namespace',
       name: 'Set up test namespace',
-      phase: SetupPhase.CLUSTER,
       onError: 'throw',
-      run: async (ctx) => {
-        const k8sClient = ctx.k8sClient;
-        if (!k8sClient) {
-          throw new Error('Kubernetes client not initialized');
-        }
-        logger.info(`📦 Setting up test namespace: ${ctx.testNamespace}...`);
-        await k8sClient.setupTestNamespace(ctx.testNamespace);
-        logger.success(`✓ Test namespace setup complete: ${ctx.testNamespace}`);
-      },
-    },
-    {
-      id: 'enable-vm-folders',
-      name: 'Ensure VM folders (tree view) enabled',
       phase: SetupPhase.CLUSTER,
-      onError: 'warn',
       run: async (ctx) => {
-        const k8sClient = ctx.k8sClient;
-        if (!k8sClient) {
-          throw new Error('Kubernetes client not initialized');
-        }
-        const cm = await k8sClient.ensureVmFoldersEnabled(ctx.cnvNamespace);
-        const cmData = cm?.data as Record<string, string> | undefined;
-        if (cmData?.treeViewFolders === 'true') {
-          logger.success(
-            '✓ VM folders (treeViewFolders) enabled in kubevirt-ui-features ConfigMap',
-          );
-        } else if (cm === null) {
-          logger.warn(
-            '⚠️ Could not ensure VM folders: kubevirt-ui-features ConfigMap not found or no permissions',
-          );
-        }
-      },
-    },
-    {
-      id: 'enable-native-vm-templates',
-      name: 'Enable native VM template feature gate on HCO',
-      phase: SetupPhase.CLUSTER,
-      guard: () => !EnvVariables.isNonPrivUser,
-      onError: 'warn',
-      run: async (ctx) => {
-        const k8sClient = ctx.k8sClient;
-        if (!k8sClient) {
-          throw new Error('Kubernetes client not initialized');
-        }
-        const alreadyEnabled = await k8sClient.isNativeVmTemplateFeatureGateEnabled();
-        if (alreadyEnabled) {
-          logger.success('✓ Native VM template feature gate already enabled');
-          return;
-        }
-        await k8sClient.enableNativeVmTemplateFeatureGate();
-        logger.success('✓ Native VM template feature gate enabled on HCO');
-      },
-    },
-    {
-      id: 'set-default-storage-class',
-      name: 'Set default StorageClass for VirtualMachines',
-      phase: SetupPhase.CLUSTER,
-      guard: () => !EnvVariables.isNonPrivUser,
-      onError: 'warn',
-      run: async (ctx) => {
-        const k8sClient = ctx.k8sClient;
-        if (!k8sClient) {
-          throw new Error('Kubernetes client not initialized');
-        }
-        const defaultVmStorageClass = EnvVariables.storageClass;
-        logger.info(
-          `📦 Setting default StorageClass for VirtualMachines: ${defaultVmStorageClass}...`,
-        );
-        await k8sClient.setDefaultStorageClassForVirtualMachines(defaultVmStorageClass);
-        logger.success(`✓ Default for VirtualMachines set to ${defaultVmStorageClass}`);
+        if (!ctx.k8sClient) throw new Error('Kubernetes client not initialized');
+        logger.info(`📦 Setting up namespace: ${ctx.testNamespace}...`);
+        await ctx.k8sClient.setupTestNamespace(ctx.testNamespace);
+        logger.success(`✓ Namespace ready: ${ctx.testNamespace}`);
       },
     },
     {
       id: 'save-config',
       name: 'Persist shared test configuration',
-      phase: SetupPhase.CLUSTER,
       onError: 'throw',
+      phase: SetupPhase.CLUSTER,
       run: async (ctx) => {
         const setupConfig = {
           authToken: ctx.authToken,
+          clusterUrl: EnvVariables.clusterUrl,
           cnvNamespace: ctx.cnvNamespace,
           kubeConfigPath: ctx.kubeConfigPath,
           projectName: ctx.testNamespace,
           secretName: EnvVariables.secretName,
           testNamespace: ctx.testNamespace,
           webConsoleUrl: EnvVariables.webConsoleUrl,
-          clusterUrl: EnvVariables.clusterUrl,
         } as SharedTestConfig;
         TestConfigManager.saveConfig(setupConfig);
-        logger.info(
-          `✓ Saved test configuration (including kubeconfig path: ${setupConfig.kubeConfigPath})`,
-        );
-        logger.info(`   - Web Console URL: ${setupConfig.webConsoleUrl}`);
-        logger.info(`   - Cluster API URL: ${setupConfig.clusterUrl}`);
+        logger.info(`✓ Saved test configuration`);
       },
     },
-    {
-      id: 'disable-sidebar-autohide',
-      name: 'Disable sidebar auto-hide and welcome modals in console user settings',
-      phase: SetupPhase.CLUSTER,
-      onError: 'warn',
-      run: async (ctx) => {
-        const k8sClient = ctx.k8sClient;
-        if (!k8sClient) {
-          throw new Error('Kubernetes client not initialized');
-        }
 
-        const consoleUsername = EnvVariables.isNonPrivUser
-          ? EnvVariables.testUsername
-          : 'kubeadmin';
-        const settingsKey = consoleUsername === 'kubeadmin' ? 'kube-admin' : consoleUsername;
-        const configMapName = `user-settings-${settingsKey}`;
-        const namespace = 'openshift-console-user-settings';
-
-        const userPreferences = JSON.stringify({
-          guidedTour: false,
-          navigation: { autoHideNav: false },
-          onboardingPopoversHidden: { catalog: true, createProject: true, vmsTab: true },
-          quickStart: { activeQuickStartID: '', dontShowWelcomeModal: true },
-        });
-
-        try {
-          await k8sClient.patchConfigMap(configMapName, namespace, {
-            [settingsKey]: userPreferences,
-          });
-          logger.success(`✓ Sidebar auto-hide disabled for '${settingsKey}'`);
-        } catch {
-          logger.info(
-            `ℹ ConfigMap ${configMapName} not found — sidebar settings will be applied on first console login`,
-          );
-        }
-      },
-    },
-    {
-      id: 'disable-welcome-modals',
-      name: 'Disable welcome modals via K8s API (core + virtualization)',
-      phase: SetupPhase.CLUSTER,
-      onError: 'warn',
-      run: async (ctx) => {
-        const k8sClient = ctx.k8sClient;
-        if (!k8sClient) {
-          throw new Error('Kubernetes client not initialized');
-        }
-
-        const virtUsername = EnvVariables.isNonPrivUser ? EnvVariables.testUsername : 'kube-admin';
-
-        let userUid: string | undefined;
-        if (EnvVariables.isNonPrivUser) {
-          userUid = await k8sClient.getUserUid(virtUsername);
-          if (userUid) {
-            logger.info(`Resolved '${virtUsername}' UID: ${userUid}`);
-          } else {
-            logger.warn(`⚠️ Could not resolve UID for '${virtUsername}', patching by name only`);
-          }
-        }
-
-        const virtResult = await k8sClient.disableVirtualizationWelcomeSettings(
-          ctx.cnvNamespace,
-          virtUsername,
-          userUid,
-        );
-        if (virtResult) {
-          logger.success(
-            `✓ Virtualization welcome settings disabled for '${virtUsername}'${
-              userUid ? ` (UID: ${userUid})` : ''
-            } in ${ctx.cnvNamespace}`,
-          );
-        } else {
-          logger.warn(
-            `⚠️ Could not disable virtualization welcome settings (ConfigMap may not exist yet)`,
-          );
-        }
-
-        const consoleUsername = EnvVariables.isNonPrivUser
-          ? EnvVariables.testUsername
-          : EnvVariables.username;
-        const coreResult = await k8sClient.setupConsoleUserSettings(
-          consoleUsername,
-          undefined,
-          EnvVariables.isNonPrivUser ? 1 : 5,
-        );
-        if (coreResult) {
-          logger.success(`✓ Core console guided tours marked completed for '${consoleUsername}'`);
-        } else if (EnvVariables.isNonPrivUser) {
-          logger.info(
-            `ℹ️ Console user-settings ConfigMap not yet available for '${consoleUsername}' (first login)`,
-          );
-        } else {
-          logger.warn(
-            `⚠️ Could not disable core welcome modal (ConfigMap may not exist for '${consoleUsername}')`,
-          );
-        }
-      },
-    },
+    // ── BROWSER phase ─────────────────────────────────────────────────
     {
       id: 'browser-login',
       name: 'Launch browser and perform console login',
-      phase: SetupPhase.BROWSER,
       onError: 'throw',
+      phase: SetupPhase.BROWSER,
       run: async (ctx) => {
         const baseUrl = EnvVariables.webConsoleUrl;
         logger.info('🌐 Setting up browser state...');
@@ -430,183 +176,70 @@ export function getSetupRules(): SetupRule[] {
         const context = await browser.newContext({
           baseURL: baseUrl,
           ignoreHTTPSErrors: true,
-          viewport: { width: 1920, height: 1080 },
+          viewport: { height: 1080, width: 1920 },
         });
         const page = await context.newPage();
         browserState = { browser, context, page };
 
         if (!EnvVariables.isLocalhost) {
-          const loginPage = new LoginPage(page);
-          logger.info('🔄 Navigating to login page...');
-          await loginPage.navigateToLogin(baseUrl);
+          await page.goto(`${baseUrl}/auth/login`, { timeout: MINUTE, waitUntil: 'load' });
           await page.waitForLoadState('load');
-          logger.info(`Current URL: ${page.url()}`);
 
-          let uiUsername = EnvVariables.uiLoginUsername;
-          let uiPassword = EnvVariables.uiLoginPassword;
-          if (!EnvVariables.isNonPrivUser) {
-            const kubeAdminButtonVisible = await loginPage.isKubeAdminButtonVisible({
-              timeout: 10 * SECOND,
-            });
-            if (kubeAdminButtonVisible) {
-              logger.info('Clicking kube:admin login button...');
-              await page.waitForTimeout(SECOND);
-              await loginPage.clickKubeAdminLogin();
-            }
+          // Click kube:admin IDP button if visible
+          const kubeAdminBtn = page.locator(
+            '[title="Log in with kube:admin"], a[href*="idp=kube%3Aadmin"]',
+          );
+          const kubeAdminVisible = await kubeAdminBtn
+            .waitFor({ state: 'visible', timeout: 10 * SECOND })
+            .then(() => true)
+            .catch(() => false);
+          if (kubeAdminVisible) {
+            await page.waitForTimeout(SECOND);
+            await kubeAdminBtn.click();
+          }
+
+          // Fill login form
+          await page.locator('#inputUsername').fill(EnvVariables.uiLoginUsername);
+          await page.locator('#inputPassword').fill(EnvVariables.uiLoginPassword);
+          const coLoginBtn = page.locator('#co-login-button');
+          const submitBtn = page.locator('button[type="submit"]');
+          const useCoLogin = await coLoginBtn.isVisible({ timeout: 5000 }).catch(() => false);
+          if (useCoLogin) {
+            await coLoginBtn.click();
           } else {
-            logger.info('Logging in as non-privileged user (NON_PRIV=1)');
-            logger.info(
-              `Waiting for "${NONPRIV_IDP_NAME}" IDP button (retrying with reloads if needed)...`,
-            );
-            const testButtonVisible = await loginPage.waitForTestButtonWithReload(baseUrl, {
-              maxAttempts: 10,
-              retryIntervalMs: 5 * SECOND,
-              perAttemptTimeoutMs: 3 * SECOND,
-              idpName: NONPRIV_IDP_NAME,
-            });
-            if (testButtonVisible) {
-              logger.info(`Clicking "${NONPRIV_IDP_NAME}" IDP button...`);
-              ctx.nonPrivUsername = NONPRIV_IDP_NAME;
-              await page.waitForTimeout(SECOND);
-              await loginPage.clickTestLogin(NONPRIV_IDP_NAME);
-            }
-            uiUsername = EnvVariables.testUsername;
-            uiPassword = EnvVariables.testUserPassword;
+            await submitBtn.click();
           }
 
-          const maxLoginAttempts = EnvVariables.isNonPrivUser ? 5 : 1;
-          for (let attempt = 1; attempt <= maxLoginAttempts; attempt++) {
-            logger.info(
-              maxLoginAttempts > 1
-                ? `Filling login form (attempt ${attempt}/${maxLoginAttempts})...`
-                : 'Filling login form...',
-            );
-            await loginPage.fillAndSubmitLoginForm(uiUsername, uiPassword);
-
-            logger.info('Waiting for login to complete...');
-            await page.waitForURL((url) => !url.pathname.includes('/auth/login'), {
-              timeout: 2 * MINUTE,
-            });
-            await page.waitForLoadState('load');
-
-            const postLoginUrl = new URL(page.url());
-            if (postLoginUrl.searchParams.get('reason') !== 'access_denied') {
-              logger.success(`✓ Login complete, redirected to: ${page.url()}`);
-              break;
-            }
-
-            if (attempt === maxLoginAttempts) {
-              throw new Error(
-                `Login rejected by OAuth server (access_denied) after ${maxLoginAttempts} attempt(s). ` +
-                  `The user credentials may be invalid or the htpasswd IDP has not fully propagated. ` +
-                  `URL: ${page.url()}`,
-              );
-            }
-
-            logger.warn(
-              `⚠️ Login attempt ${attempt} got access_denied — ` +
-                `htpasswd IDP may still be propagating, retrying in 10s...`,
-            );
-            await page.waitForTimeout(10 * SECOND);
-            await loginPage.navigateToLogin(baseUrl);
-            await page.waitForLoadState('load');
-
-            if (EnvVariables.isNonPrivUser) {
-              const testButtonVisible = await loginPage.isTestButtonVisible({
-                timeout: 5 * SECOND,
-                idpName: NONPRIV_IDP_NAME,
-              });
-              if (testButtonVisible) {
-                await loginPage.clickTestLogin(NONPRIV_IDP_NAME);
-              }
-            }
-          }
+          // Wait for redirect past login
+          await page.waitForURL((url) => !url.pathname.includes('/auth/login'), {
+            timeout: 2 * MINUTE,
+          });
+          await page.waitForLoadState('load');
+          logger.success(`Login complete, redirected to: ${page.url()}`);
 
           await context.storageState({ path: ctx.storageStatePath });
-          logger.success(`✓ Saved authenticated storage state to ${ctx.storageStatePath}`);
+          logger.success(`Saved storage state to ${ctx.storageStatePath}`);
         } else {
-          logger.info('🏠 Localhost detected, skipping login...');
+          logger.info('Localhost detected, skipping login...');
         }
-
-        try {
-          await page.waitForLoadState('domcontentloaded');
-        } catch {
-          // Non-fatal — storage state is already saved after login
-        }
-      },
-    },
-    {
-      id: 'grant-kubevirt-access',
-      name: 'Grant test user KubeVirt access in test namespace',
-      phase: SetupPhase.BROWSER,
-      guard: () => EnvVariables.isNonPrivUser,
-      onError: 'warn',
-      run: async (ctx) => {
-        const k8sClient = ctx.k8sClient;
-        if (!k8sClient) {
-          throw new Error('Kubernetes client not initialized');
-        }
-        const username = EnvVariables.testUsername;
-
-        logger.info(
-          `📦 Ensuring test namespace ${ctx.testNamespace} is ready before granting RBAC...`,
-        );
-        await k8sClient.setupTestNamespace(ctx.testNamespace);
-
-        logger.info(
-          `📦 Granting test user "${username}" KubeVirt access in ${ctx.testNamespace}...`,
-        );
-        await k8sClient.grantUserKubevirtAccessToNamespace(ctx.testNamespace, username);
-        logger.success(`✓ Test user can list/manage VirtualMachines in ${ctx.testNamespace}`);
-
-        logger.info(
-          `📦 Granting test user view access in ${ctx.cnvNamespace} (HCO + KubeVirt read)...`,
-        );
-        await k8sClient.grantUserViewAccessToNamespace(ctx.cnvNamespace, username);
-        logger.success(`✓ Test user can read HCO/KubeVirt resources in ${ctx.cnvNamespace}`);
-
-        logger.info(
-          `📦 Granting test user cluster-level view access (catalog, templates, wizard)...`,
-        );
-        await k8sClient.grantUserClusterViewAccess(username);
-        logger.success(`✓ Test user has cluster-level view access`);
-
-        logger.info(
-          `📦 Granting test user cluster-level CDI read access (bootable volumes, datasources)...`,
-        );
-        await k8sClient.grantUserCdiClusterReadAccess(username);
-        logger.success(`✓ Test user can list/read CDI DataSources and DataVolumes cluster-wide`);
-      },
-    },
-    {
-      id: 'patch-nonpriv-config',
-      name: 'Persist discovered non-priv username to test config',
-      phase: SetupPhase.BROWSER,
-      guard: () => EnvVariables.isNonPrivUser,
-      onError: 'warn',
-      run: async (ctx) => {
-        if (!ctx.nonPrivUsername) return;
-        const existing = TestConfigManager.getConfig();
-        TestConfigManager.saveConfig({ ...existing, nonPrivUsername: ctx.nonPrivUsername });
-        logger.info(`✓ Persisted nonPrivUsername "${ctx.nonPrivUsername}" to test config`);
       },
     },
     {
       id: 'save-storage-state',
-      name: 'Save Playwright storage state and close browser',
-      phase: SetupPhase.BROWSER,
+      name: 'Save storage state and close browser',
       onError: 'warn',
+      phase: SetupPhase.BROWSER,
       run: async (ctx) => {
         if (browserState) {
           try {
             await browserState.context.storageState({ path: ctx.storageStatePath });
           } catch {
-            // Non-fatal; state may already be saved after login
+            // State may already be saved
           }
           await browserState.context.close();
           await browserState.browser.close();
           browserState = null;
-          logger.success(`✓ Saved storage state to ${ctx.storageStatePath}`);
+          logger.success(`✓ Browser closed`);
         }
       },
     },
