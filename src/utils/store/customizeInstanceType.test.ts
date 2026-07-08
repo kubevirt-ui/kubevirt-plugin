@@ -2,7 +2,7 @@ import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 
 import {
   clearCustomizeInstanceType,
-  updateCustomizeInstanceType,
+  patchCustomizeWizardVMSignal,
   updateVMCustomizeIT,
   vmSignal,
 } from './customizeInstanceType';
@@ -61,12 +61,12 @@ describe('customizeInstanceType', () => {
     jest.clearAllMocks();
   });
 
-  describe('updateCustomizeInstanceType', () => {
+  describe('patchVMSignal', () => {
     it('should replace the entire VM object when path is empty', () => {
       vmSignal.value = mockVM;
       const newVM = { ...mockVM, metadata: { ...mockVM.metadata, name: 'new-vm' } };
 
-      const result = updateCustomizeInstanceType([{ data: newVM }]);
+      const result = patchCustomizeWizardVMSignal([{ data: newVM }]);
 
       expect(result).toEqual(newVM);
       expect(vmSignal.value).toEqual(newVM);
@@ -75,7 +75,7 @@ describe('customizeInstanceType', () => {
     it('should update a simple property using string path', () => {
       vmSignal.value = mockVM;
 
-      const result = updateCustomizeInstanceType([{ data: 'new-name', path: 'metadata.name' }]);
+      const result = patchCustomizeWizardVMSignal([{ data: 'new-name', path: 'metadata.name' }]);
 
       expect(result.metadata.name).toBe('new-name');
       expect(result.spec).toEqual(mockVM.spec);
@@ -84,7 +84,7 @@ describe('customizeInstanceType', () => {
     it('should update a nested property using string path', () => {
       vmSignal.value = mockVM;
 
-      const result = updateCustomizeInstanceType([
+      const result = patchCustomizeWizardVMSignal([
         { data: 'sata', path: 'spec.template.spec.domain.devices.disks.0.disk.bus' },
       ]);
 
@@ -94,7 +94,7 @@ describe('customizeInstanceType', () => {
     it('should update a property using array path', () => {
       vmSignal.value = mockVM;
 
-      const result = updateCustomizeInstanceType([
+      const result = patchCustomizeWizardVMSignal([
         { data: 'new-namespace', path: ['metadata', 'namespace'] },
       ]);
 
@@ -118,7 +118,7 @@ describe('customizeInstanceType', () => {
         },
       };
 
-      const result = updateCustomizeInstanceType([
+      const result = patchCustomizeWizardVMSignal([
         { data: 'virtio', path: 'spec.template.spec.domain.devices.disks.0.disk.bus' },
       ]);
 
@@ -128,7 +128,7 @@ describe('customizeInstanceType', () => {
     it('should merge data when merge is true', () => {
       vmSignal.value = mockVM;
 
-      const result = updateCustomizeInstanceType([
+      const result = patchCustomizeWizardVMSignal([
         {
           data: { newLabel: 'new-value' },
           merge: true,
@@ -145,7 +145,7 @@ describe('customizeInstanceType', () => {
     it('should handle multiple updates in sequence', () => {
       vmSignal.value = mockVM;
 
-      const result = updateCustomizeInstanceType([
+      const result = patchCustomizeWizardVMSignal([
         { data: 'updated-name', path: 'metadata.name' },
         { data: 'updated-namespace', path: 'metadata.namespace' },
         { data: 'virtio', path: 'spec.template.spec.domain.devices.disks.0.disk.bus' },
@@ -159,7 +159,7 @@ describe('customizeInstanceType', () => {
     it('should filter out empty string parts from path', () => {
       vmSignal.value = mockVM;
 
-      const result = updateCustomizeInstanceType([
+      const result = patchCustomizeWizardVMSignal([
         { data: 'updated-name', path: 'metadata..name' },
       ]);
 
@@ -170,7 +170,7 @@ describe('customizeInstanceType', () => {
       vmSignal.value = mockVM;
       const originalVM = { ...mockVM };
 
-      const result = updateCustomizeInstanceType([{ data: 'should-not-change', path: '' }]);
+      const result = patchCustomizeWizardVMSignal([{ data: 'should-not-change', path: '' }]);
 
       expect(result).toEqual(originalVM);
     });
@@ -179,7 +179,7 @@ describe('customizeInstanceType', () => {
       vmSignal.value = mockVM;
       const originalVM = { ...mockVM };
 
-      const result = updateCustomizeInstanceType([
+      const result = patchCustomizeWizardVMSignal([
         { data: 'should-not-change', path: ['', '', ''] },
       ]);
 
@@ -194,7 +194,7 @@ describe('customizeInstanceType', () => {
         { disk: { bus: 'sata' }, name: 'disk2' },
       ];
 
-      const result = updateCustomizeInstanceType([
+      const result = patchCustomizeWizardVMSignal([
         { data: newDisks, path: 'spec.template.spec.domain.devices.disks' },
       ]);
 
@@ -205,7 +205,7 @@ describe('customizeInstanceType', () => {
       vmSignal.value = mockVM;
       const originalSignalValue = vmSignal.value;
 
-      updateCustomizeInstanceType([{ data: 'updated-name', path: 'metadata.name' }]);
+      patchCustomizeWizardVMSignal([{ data: 'updated-name', path: 'metadata.name' }]);
 
       // The original signal value should be unchanged
       expect(originalSignalValue.metadata.name).toBe('test-vm');
@@ -222,7 +222,7 @@ describe('customizeInstanceType', () => {
         name: 'new-interface',
       };
 
-      const result = updateCustomizeInstanceType([
+      const result = patchCustomizeWizardVMSignal([
         { data: newInterface, path: 'spec.template.spec.domain.devices.interfaces.1' },
       ]);
 
@@ -259,7 +259,7 @@ describe('customizeInstanceType', () => {
     it('should handle null/undefined signal value', () => {
       vmSignal.value = null;
 
-      const result = updateCustomizeInstanceType([{ data: 'test', path: 'metadata.name' }]);
+      const result = patchCustomizeWizardVMSignal([{ data: 'test', path: 'metadata.name' }]);
 
       expect(result).toBeUndefined();
     });
@@ -267,7 +267,7 @@ describe('customizeInstanceType', () => {
     it('should handle undefined data', () => {
       vmSignal.value = mockVM;
 
-      const result = updateCustomizeInstanceType([{ data: undefined, path: 'metadata.name' }]);
+      const result = patchCustomizeWizardVMSignal([{ data: undefined, path: 'metadata.name' }]);
 
       expect(result.metadata.name).toBeUndefined();
     });
@@ -275,7 +275,7 @@ describe('customizeInstanceType', () => {
     it('should handle null data', () => {
       vmSignal.value = mockVM;
 
-      const result = updateCustomizeInstanceType([{ data: null, path: 'metadata.name' }]);
+      const result = patchCustomizeWizardVMSignal([{ data: null, path: 'metadata.name' }]);
 
       expect(result.metadata.name).toBeNull();
     });
@@ -284,7 +284,7 @@ describe('customizeInstanceType', () => {
       vmSignal.value = mockVM;
       const originalVM = { ...mockVM };
 
-      const result = updateCustomizeInstanceType([]);
+      const result = patchCustomizeWizardVMSignal([]);
 
       expect(result).toEqual(originalVM);
     });
@@ -292,7 +292,7 @@ describe('customizeInstanceType', () => {
     it('should handle deeply nested paths', () => {
       vmSignal.value = mockVM;
 
-      const result = updateCustomizeInstanceType([
+      const result = patchCustomizeWizardVMSignal([
         {
           data: 'deep-value',
           path: 'spec.template.spec.domain.devices.disks.0.disk.bus',
@@ -305,7 +305,7 @@ describe('customizeInstanceType', () => {
     it('should handle array index paths', () => {
       vmSignal.value = mockVM;
 
-      const result = updateCustomizeInstanceType([
+      const result = patchCustomizeWizardVMSignal([
         { data: 'new-interface', path: 'spec.template.spec.domain.devices.interfaces.0.name' },
       ]);
 
@@ -317,7 +317,7 @@ describe('customizeInstanceType', () => {
     it('should not create empty string keys', () => {
       vmSignal.value = mockVM;
 
-      const result = updateCustomizeInstanceType([
+      const result = patchCustomizeWizardVMSignal([
         { data: 'test', path: 'metadata.name' },
         { data: 'test2', path: '' }, // This should be ignored
         { data: 'test3', path: 'metadata.namespace' },
@@ -331,7 +331,7 @@ describe('customizeInstanceType', () => {
     it('should not create corrupted nested structures', () => {
       vmSignal.value = mockVM;
 
-      const result = updateCustomizeInstanceType([
+      const result = patchCustomizeWizardVMSignal([
         { data: 'test', path: 'spec.template.spec.domain.devices.disks.0.name' },
         { data: 'test2', path: 'spec.template.spec.domain.devices.disks.0.disk.bus' },
       ]);
@@ -344,7 +344,7 @@ describe('customizeInstanceType', () => {
     it('should maintain object structure integrity with multiple updates', () => {
       vmSignal.value = mockVM;
 
-      const result = updateCustomizeInstanceType([
+      const result = patchCustomizeWizardVMSignal([
         { data: 'updated-vm', path: 'metadata.name' },
         { data: 'updated-ns', path: 'metadata.namespace' },
         { data: 'virtio', path: 'spec.template.spec.domain.devices.disks.0.disk.bus' },

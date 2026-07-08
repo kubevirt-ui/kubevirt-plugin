@@ -4,10 +4,10 @@ import Loading from '@kubevirt-utils/components/Loading/Loading';
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
-  updateCustomizeInstanceType,
+  patchCustomizeWizardVMSignal,
   updateVMCustomizeIT,
+  vmSignal,
 } from '@kubevirt-utils/store/customizeInstanceType';
-import { vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
 import { DescriptionList, Divider, PageSection, Title } from '@patternfly/react-core';
 import InitialRunTabCloudinit from '@virtualmachines/details/tabs/configuration/initialrun/components/InitialRunTabCloudinit';
 import InitialRunTabSysprep from '@virtualmachines/details/tabs/configuration/initialrun/components/InitialRunTabSysprep';
@@ -28,7 +28,7 @@ const CustomizeInstanceTypeInitialRunTab = () => {
       <DescriptionList>
         <InitialRunTabCloudinit canUpdateVM onSubmit={updateVMCustomizeIT} vm={vm} />
         <Divider />
-        <InitialRunTabSysprep canUpdateVM onSubmit={updateCustomizeInstanceType} vm={vm} />
+        <InitialRunTabSysprep canUpdateVM onSubmit={patchCustomizeWizardVMSignal} vm={vm} />
       </DescriptionList>
     </PageSection>
   );

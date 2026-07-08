@@ -15,6 +15,8 @@ import {
   VMWizardStep,
 } from '@virtualmachines/creation-wizard-new/utils/constants';
 
+import { cancelAllWizardPendingUploads } from '@kubevirt-utils/hooks/useUploadProgressToast';
+import { setCustomizeWizardVMSignal } from '@kubevirt-utils/store/customizeInstanceType';
 import {
   CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA,
   CREATE_VM_FORM_FIELDS_STEP_NAVIGATION,
@@ -112,4 +114,9 @@ export const markStepVisited = (
   const nextVisitedSteps = new Set(visitedSteps);
   nextVisitedSteps.add(stepId);
   setValue(CREATE_VM_FORM_FIELDS_STEP_NAVIGATION.VISITED_STEPS, nextVisitedSteps);
+};
+
+export const clearVMPendingUploadsAndSignal = () => {
+  setCustomizeWizardVMSignal(null);
+  cancelAllWizardPendingUploads();
 };

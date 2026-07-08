@@ -16,7 +16,7 @@ import { SysprepDescription } from '@kubevirt-utils/components/SysprepModal/Sysp
 import { SysprepModal } from '@kubevirt-utils/components/SysprepModal/SysprepModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getVolumes } from '@kubevirt-utils/resources/vm';
-import { UpdateCustomizeInstanceType } from '@kubevirt-utils/store/customizeInstanceType';
+import { PatchCustomizeWizardVMSignal } from '@kubevirt-utils/store/customizeInstanceType';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
@@ -25,7 +25,7 @@ import { createSysprepConfigMap, patchVMWithExistingSysprepConfigMap } from '../
 
 type InitialRunTabSysprepProps = {
   canUpdateVM: boolean;
-  onSubmit?: UpdateCustomizeInstanceType;
+  onSubmit?: PatchCustomizeWizardVMSignal;
   vm: V1VirtualMachine;
 };
 const InitialRunTabSysprep: FC<InitialRunTabSysprepProps> = ({ canUpdateVM, onSubmit, vm }) => {

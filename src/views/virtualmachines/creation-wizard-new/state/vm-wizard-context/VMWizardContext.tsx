@@ -1,12 +1,11 @@
 import React, { FC, ReactNode, useEffect } from 'react';
 import { FormProvider, useForm, useFormContext } from 'react-hook-form';
 
-import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
-import { clearCustomizeInstanceType } from '@kubevirt-utils/store/customizeInstanceType';
-import { getValidNamespace } from '@kubevirt-utils/utils/utils';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
+import useInitialNamespace from '@virtualmachines/creation-wizard-new/hooks/useInitialNamespace';
 import { createInitialVMWizardFormValues } from '@virtualmachines/creation-wizard-new/state/vm-wizard-form/consts';
 import { VMWizardFormValues } from '@virtualmachines/creation-wizard-new/state/vm-wizard-form/types';
+import { clearVMPendingUploadsAndSignal } from '@virtualmachines/creation-wizard-new/utils/utils';
 
 type VMWizardProviderProps = {
   children?: ReactNode;
@@ -14,19 +13,12 @@ type VMWizardProviderProps = {
 
 export const VMWizardProvider: FC<VMWizardProviderProps> = ({ children }) => {
   const clusterParam = useClusterParam();
-  const activeNamespace = useActiveNamespace();
-  const namespace = getValidNamespace(activeNamespace);
+  const namespace = useInitialNamespace();
   const methods = useForm<VMWizardFormValues>({
     defaultValues: createInitialVMWizardFormValues({ cluster: clusterParam ?? '', namespace }),
   });
 
-  // TODO: delete useEffect after migration to form is completed
-  useEffect(
-    () => () => {
-      clearCustomizeInstanceType();
-    },
-    [],
-  );
+  useEffect(() => () => clearVMPendingUploadsAndSignal(), []);
 
   return <FormProvider {...methods}>{children}</FormProvider>;
 };

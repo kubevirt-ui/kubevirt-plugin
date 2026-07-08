@@ -1,5 +1,5 @@
-import { NavigateFunction } from 'react-router';
 import { TFunction } from 'i18next';
+import { NavigateFunction } from 'react-router';
 
 import { ActionDropdownItemType } from '@kubevirt-utils/components/ActionsDropdown/constants';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
@@ -23,13 +23,11 @@ export const getCreateVMAction = (
   t: TFunction,
   navigate: NavigateFunction,
   namespace: string,
-  setProject: (project: string) => void,
   cluster?: string,
 ): ActionDropdownItemType => {
   return {
     cta: () => {
-      setProject(namespace);
-      navigate(getVMWizardURL(cluster, namespace));
+      navigate(getVMWizardURL(cluster, namespace), { state: { namespace } });
     },
     id: 'create-vm',
     label: t('Create VirtualMachine'),

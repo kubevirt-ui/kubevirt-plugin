@@ -21,8 +21,10 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { getPreferredBootmode } from '@kubevirt-utils/resources/preference/helper';
 import { asAccessReview, getAnnotation, getLabel, getName } from '@kubevirt-utils/resources/shared';
 import { DESCRIPTION_ANNOTATION, getDevices, getHostname } from '@kubevirt-utils/resources/vm';
-import { updateCustomizeInstanceType } from '@kubevirt-utils/store/customizeInstanceType';
-import { vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
+import {
+  patchCustomizeWizardVMSignal,
+  vmSignal,
+} from '@kubevirt-utils/store/customizeInstanceType';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { K8sVerb, useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
 import { DescriptionList, Grid, GridItem, Switch } from '@patternfly/react-core';
@@ -83,7 +85,7 @@ const CustomizeInstanceTypeDetailsTab = () => {
                 <DescriptionModal
                   onSubmit={(description) =>
                     Promise.resolve(
-                      updateCustomizeInstanceType([
+                      patchCustomizeWizardVMSignal([
                         {
                           data: description,
                           path: `metadata.annotations.${DESCRIPTION_ANNOTATION}`,
@@ -108,7 +110,7 @@ const CustomizeInstanceTypeDetailsTab = () => {
                   <MoveVMToFolderModal
                     onSubmit={(folderName) =>
                       Promise.resolve(
-                        updateCustomizeInstanceType([
+                        patchCustomizeWizardVMSignal([
                           {
                             data: folderName,
                             path: ['metadata', 'labels', VM_FOLDER_LABEL],
@@ -134,7 +136,7 @@ const CustomizeInstanceTypeDetailsTab = () => {
                 <HostnameModal
                   onSubmit={(updatedVM) =>
                     Promise.resolve(
-                      updateCustomizeInstanceType([
+                      patchCustomizeWizardVMSignal([
                         {
                           data: getHostname(updatedVM),
                           path: `spec.template.spec.hostname`,
@@ -161,7 +163,7 @@ const CustomizeInstanceTypeDetailsTab = () => {
               <HeadlessMode
                 updateHeadlessMode={(checked) => {
                   return Promise.resolve(
-                    updateCustomizeInstanceType([
+                    patchCustomizeWizardVMSignal([
                       {
                         data: checked ? false : null,
                         path: `spec.template.spec.domain.devices.autoattachGraphicsDevice`,
@@ -187,7 +189,7 @@ const CustomizeInstanceTypeDetailsTab = () => {
               <Switch
                 onChange={(_event, checked) => {
                   setIsCheckedGuestSystemAccessLog(checked);
-                  updateCustomizeInstanceType([
+                  patchCustomizeWizardVMSignal([
                     {
                       data: checked,
                       path: `spec.template.spec.domain.devices.logSerialConsole`,
@@ -222,7 +224,7 @@ const CustomizeInstanceTypeDetailsTab = () => {
                           : VMDeletionProtectionOptions.DISABLE
                       }
                       onConfirm={(enableDeletionProtection) => {
-                        updateCustomizeInstanceType([
+                        patchCustomizeWizardVMSignal([
                           {
                             data: enableDeletionProtection ? 'true' : 'false',
                             path: ['metadata', 'labels', VM_DELETION_PROTECTION_LABEL],
@@ -255,7 +257,7 @@ const CustomizeInstanceTypeDetailsTab = () => {
           <DetailsSectionHardware
             onSubmit={(type: HARDWARE_DEVICE_TYPE, updatedVM: V1VirtualMachine) =>
               Promise.resolve(
-                updateCustomizeInstanceType([
+                patchCustomizeWizardVMSignal([
                   {
                     data: getDevices(updatedVM)?.[type],
                     path: `spec.template.spec.domain.devices.${type}`,

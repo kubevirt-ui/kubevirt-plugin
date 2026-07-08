@@ -1,6 +1,9 @@
 import { getAnnotation } from '@kubevirt-utils/resources/shared';
 import { DESCRIPTION_ANNOTATION, getFolder } from '@kubevirt-utils/resources/vm';
-import { updateCustomizeInstanceType, vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
+import {
+  patchCustomizeWizardVMSignal,
+  vmSignal,
+} from '@kubevirt-utils/store/customizeInstanceType';
 import type { WizardStepType } from '@patternfly/react-core';
 import { useVMWizard } from '@virtualmachines/creation-wizard-new/state/vm-wizard-context/VMWizardContext';
 import { CREATE_VM_FORM_FIELDS_VM_DATA } from '@virtualmachines/creation-wizard-new/state/vm-wizard-form/consts';
@@ -28,7 +31,7 @@ export const useSyncDeploymentDetails: UseSyncDeploymentDetails = () => {
     if (prevStep?.id === VMWizardStep.DEPLOYMENT_DETAILS) {
       const description = getValues(CREATE_VM_FORM_FIELDS_VM_DATA.DESCRIPTION);
       const folder = getValues(CREATE_VM_FORM_FIELDS_VM_DATA.FOLDER);
-      updateCustomizeInstanceType([
+      patchCustomizeWizardVMSignal([
         {
           data: description || undefined,
           path: `metadata.annotations.${DESCRIPTION_ANNOTATION}`,

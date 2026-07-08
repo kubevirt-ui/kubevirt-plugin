@@ -2,7 +2,10 @@ import { useCallback } from 'react';
 
 import { getAnnotation } from '@kubevirt-utils/resources/shared';
 import { DESCRIPTION_ANNOTATION, getFolder } from '@kubevirt-utils/resources/vm';
-import { updateCustomizeInstanceType, vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
+import {
+  patchCustomizeWizardVMSignal,
+  vmSignal,
+} from '@kubevirt-utils/store/customizeInstanceType';
 import type { WizardStepType } from '@patternfly/react-core';
 import useVMWizardStore from '@virtualmachines/creation-wizard/state/vm-wizard-store/useVMWizardStore';
 import { VMWizardStep } from '@virtualmachines/creation-wizard/utils/constants';
@@ -28,7 +31,7 @@ export const useSyncDeploymentDetails: UseSyncDeploymentDetails = () => {
       }
 
       if (prevStep?.id === VMWizardStep.DEPLOYMENT_DETAILS) {
-        updateCustomizeInstanceType([
+        patchCustomizeWizardVMSignal([
           {
             data: vmDescription || undefined,
             path: `metadata.annotations.${DESCRIPTION_ANNOTATION}`,

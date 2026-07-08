@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { setVMSignal } from '@kubevirt-utils/store/customizeInstanceType';
+import { setCustomizeWizardVMSignal } from '@kubevirt-utils/store/customizeInstanceType';
 import { WizardStepType } from '@patternfly/react-core';
 import useCreateVMFromTemplate from '@virtualmachines/creation-wizard-new/steps/TemplateStep/hooks/useCreateVMFromTemplate';
 import {
@@ -29,7 +29,7 @@ const useVMGenerationNavClick = (creationMethod: VMCreationMethod): WizardStepNa
       setIsGeneratingVM(true);
       try {
         if (isInstanceTypeCreationMethod(creationMethod)) {
-          setVMSignal(generatedVM);
+          setCustomizeWizardVMSignal(generatedVM);
         }
         if (isTemplateCreationMethod(creationMethod)) await createVMFromTemplate();
       } finally {

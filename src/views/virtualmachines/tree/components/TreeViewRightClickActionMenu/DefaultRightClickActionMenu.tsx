@@ -6,7 +6,6 @@ import useVirtualMachineInstanceMigrationMapper from '@kubevirt-utils/resources/
 import useVirtualMachineInstanceMigrations from '@kubevirt-utils/resources/vmim/hooks/useVirtualMachineInstanceMigrations';
 import useIsACMPage from '@multicluster/useIsACMPage';
 import useMultipleVirtualMachineActions from '@virtualmachines/actions/hooks/useMultipleVirtualMachineActions';
-import useVMWizardStore from '@virtualmachines/creation-wizard/state/vm-wizard-store/useVMWizardStore';
 import {
   FOLDER_SELECTOR_PREFIX,
   PROJECT_SELECTOR_PREFIX,
@@ -32,15 +31,14 @@ const DefaultRightClickActionMenu: FC<DefaultRightClickActionMenuProps> = ({
   const [vmims] = useVirtualMachineInstanceMigrations(cluster, namespace);
   const vmimMapper = useVirtualMachineInstanceMigrationMapper(vmims);
   const baseActions = useMultipleVirtualMachineActions(vms, vmimMapper, true);
-  const { setProject } = useVMWizardStore();
 
   const navigate = useNavigate();
 
   const createVMAction = useMemo(() => {
     return prefix === PROJECT_SELECTOR_PREFIX
-      ? getCreateVMAction(t, navigate, namespace, setProject, isACMPage ? cluster : '')
+      ? getCreateVMAction(t, navigate, namespace, isACMPage ? cluster : '')
       : undefined;
-  }, [cluster, isACMPage, namespace, navigate, prefix, setProject, t]);
+  }, [cluster, isACMPage, namespace, navigate, prefix, t]);
 
   const getNestedLevel = () => {
     if (prefix === FOLDER_SELECTOR_PREFIX) {
