@@ -1,7 +1,7 @@
 {
   "dependencies": {
-    "@kubev2v/types": "^0.0.22",
-    "@kubevirt-ui-ext/kubevirt-api": "2.0.0",
+    "@forklift-ui/types": "^1.2.1",
+    "@kubevirt-ui-ext/kubevirt-api": "2.1.1",
     "@kubevirt-ui-ext/vnc-keymaps": "1.0.4",
     "@novnc/novnc": "1.5.0",
     "@patternfly/quickstarts": "~6.5.0",
@@ -72,9 +72,9 @@
     "@commitlint/cli": "^21.0.2",
     "@eslint-react/eslint-plugin": "^5.9.0",
     "@kubernetes/client-node": "^1.4.0",
-    "@openshift-console/dynamic-plugin-sdk": "4.23.0-prerelease.2",
+    "@openshift-console/dynamic-plugin-sdk": "4.23.0-prerelease.3",
     "@openshift-console/dynamic-plugin-sdk-internal": "4.23.0-prerelease.1",
-    "@openshift-console/dynamic-plugin-sdk-webpack": "4.23.0-prerelease.1",
+    "@openshift-console/dynamic-plugin-sdk-webpack": "4.23.0-prerelease.3",
     "@playwright/test": "^1.59.1",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^16.3.2",
@@ -151,7 +151,7 @@
   "name": "kubevirt-plugin",
   "overrides": {
     "@stolostron/multicluster-sdk": {
-      "@openshift-console/dynamic-plugin-sdk": "4.23.0-prerelease.2",
+      "@openshift-console/dynamic-plugin-sdk": "4.23.0-prerelease.3",
       "react-i18next": "~16.5.8"
     },
     "delaunator": "4.0.1"

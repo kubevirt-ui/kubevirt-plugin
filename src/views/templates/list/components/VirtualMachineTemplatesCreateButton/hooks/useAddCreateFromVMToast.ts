@@ -10,6 +10,7 @@ const useAddCreateFromVMToast = (): (() => string) => {
   const addCreateFromVMToast = useCallback(
     () =>
       addInfoToast({
+        persistInDrawer: false,
         title: t(
           'To create a template from a VM, select a VM and choose "Save as template" from the Actions menu.',
         ),

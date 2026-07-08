@@ -49,6 +49,7 @@ export const createCheckupRerunHandler = ({
       kubevirtConsole.error('Failed to rerun checkup:', error);
       toast.addDangerToast({
         content: error instanceof Error ? error.message : t('An unknown error occurred'),
+        persistInDrawer: false,
         title: t('Failed to rerun checkup'),
       });
     }

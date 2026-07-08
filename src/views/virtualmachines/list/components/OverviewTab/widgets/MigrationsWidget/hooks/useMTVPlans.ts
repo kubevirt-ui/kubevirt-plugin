@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 
-import { PlanModel, V1beta1Plan } from '@kubev2v/types';
+import { PlanModel, V1beta1Plan } from '@forklift-ui/types';
 import { logMTVDetected } from '@kubevirt-utils/extensions/telemetry/mtv';
 import { modelToGroupVersionKind } from '@kubevirt-utils/models';
 import { MTV_MIGRATION_NAMESPACE } from '@multicluster/components/CrossClusterMigration/constants';

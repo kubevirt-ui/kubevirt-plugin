@@ -1,4 +1,4 @@
-import { V1beta1Plan } from '@kubev2v/types';
+import { V1beta1Plan } from '@forklift-ui/types';
 
 import { buildFilterPath } from '../../shared/urlUtils';
 

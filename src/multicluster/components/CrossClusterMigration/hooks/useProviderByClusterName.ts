@@ -1,4 +1,4 @@
-import { V1beta1Provider } from '@kubev2v/types';
+import { V1beta1Provider } from '@forklift-ui/types';
 
 import { getProviderByClusterName } from '../utils';
 

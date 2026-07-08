@@ -9,7 +9,7 @@ import {
   V1beta1NetworkMap,
   V1beta1Plan,
   V1beta1StorageMap,
-} from '@kubev2v/types';
+} from '@forklift-ui/types';
 import { logMigrationPlanCreated } from '@kubevirt-utils/extensions/telemetry/mtv';
 import { getMtvSourceTelemetry } from '@kubevirt-utils/extensions/telemetry/utils/mtv-provider';
 import { getSourceProviderName } from '@kubevirt-utils/resources/plan/selectors';

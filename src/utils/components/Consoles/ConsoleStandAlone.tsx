@@ -1,7 +1,7 @@
 import React, { type FC } from 'react';
 import { useParams } from 'react-router';
 
-import { type V1VirtualMachine } from '@kubev2v/types';
+import { type V1VirtualMachine } from '@forklift-ui/types';
 import { getResourceDetailsTitle } from '@kubevirt-utils/constants/page-constants';
 import { VirtualMachineModel, VirtualMachineModelGroupVersionKind } from '@kubevirt-utils/models';
 import { getLabel } from '@kubevirt-utils/resources/shared';

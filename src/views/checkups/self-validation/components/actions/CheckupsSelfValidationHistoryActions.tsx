@@ -72,6 +72,7 @@ const CheckupsSelfValidationHistoryActions: FC<CheckupsSelfValidationHistoryActi
       } else {
         addDangerToast({
           content: result.error.message || getDefaultErrorMessage(t),
+          persistInDrawer: false,
           title: t('Could not download results file'),
         });
       }

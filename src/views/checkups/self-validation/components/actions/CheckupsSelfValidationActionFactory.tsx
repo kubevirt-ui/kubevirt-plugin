@@ -58,6 +58,7 @@ export const createCheckupsSelfValidationActionFactory = (
       await deleteSelfValidationCheckup(configMap, jobs);
 
       toast.addSuccessToast({
+        persistInDrawer: false,
         title: t('Checkup {{name}} deleted successfully', { name: checkupName }),
       });
 

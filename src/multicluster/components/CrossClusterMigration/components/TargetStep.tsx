@@ -1,7 +1,7 @@
 import React, { FC, useCallback, useEffect, useMemo } from 'react';
 import { Updater } from 'use-immer';
 
-import { V1beta1Plan } from '@kubev2v/types';
+import { V1beta1Plan } from '@forklift-ui/types';
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import StateHandler from '@kubevirt-utils/components/StateHandler/StateHandler';
@@ -10,8 +10,7 @@ import {
   getTargetNamespace,
   getTargetProviderName,
 } from '@kubevirt-utils/resources/plan/selectors';
-import { getNamespace, getUID } from '@kubevirt-utils/resources/shared';
-import { getName } from '@kubevirt-utils/resources/shared';
+import { getName, getNamespace, getUID } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import {

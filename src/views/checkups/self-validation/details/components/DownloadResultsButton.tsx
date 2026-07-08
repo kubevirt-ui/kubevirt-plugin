@@ -53,6 +53,7 @@ const DownloadResultsButton: FC<DownloadResultsButtonProps> = ({ configMap, job 
       } else {
         addDangerToast({
           content: result.error.message || getDefaultErrorMessage(t),
+          persistInDrawer: false,
           title: t('Could not download results file'),
         });
       }
