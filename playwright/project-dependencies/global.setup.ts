@@ -1,5 +1,9 @@
 import * as path from 'path';
 
+import * as dotenv from 'dotenv';
+
+dotenv.config({ path: path.resolve(__dirname, '..', '..', '.env') });
+
 import { EnvVariables } from '@/utils/env-variables';
 import { getStorageStatePath, logger } from '@/utils/file-utils';
 
@@ -12,11 +16,11 @@ async function globalSetup(): Promise<void> {
 
   const projectRoot = path.resolve(__dirname, '..', '..');
   const kubeConfigPath = path.join(projectRoot, '.kubeconfigs', 'test-config');
-  const storageStateDir = path.join(projectRoot, '.storage-states');
   const testNamespace = `pw-scenario-${Date.now().toString(36)}`;
 
+  const derivedStorageStateDir = path.resolve(kubeConfigPath, '..', '.storage-states');
   const storageStatePath =
-    getStorageStatePath(kubeConfigPath) || path.join(storageStateDir, 'test-state.json');
+    getStorageStatePath(kubeConfigPath) || path.join(derivedStorageStateDir, 'test-state.json');
 
   const ctx: SetupContext = {
     cnvNamespace: EnvVariables.cnvNamespace,
