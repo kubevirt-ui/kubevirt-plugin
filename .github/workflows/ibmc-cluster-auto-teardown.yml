@@ -164,17 +164,30 @@ jobs:
             let queued = 0;
             let lastRunTime = null;
 
+            // Bound the "completed" lookup to recent history so pagination stays
+            // fast — idle thresholds top out at a few hours, so a few days of
+            // lookback is ample and avoids paging through a workflow's full run history.
+            const lookbackDate = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString();
+
             try {
               for (const workflow of INCLUDE_WORKFLOWS) {
                 for (const status of ['in_progress', 'queued', 'completed']) {
-                  const runs = await github.rest.actions.listWorkflowRuns({
+                  const params = {
                     ...context.repo,
                     workflow_id: workflow,
                     status,
-                    per_page: 10,
-                  });
+                    per_page: 100,
+                  };
+                  if (status === 'completed') {
+                    params.created = `>=${lookbackDate}`;
+                  }
 
-                  const matching = runs.data.workflow_runs.filter(
+                  // Paginate fully before filtering — with multiple concurrent
+                  // clusters, a specific cluster's tagged run can easily fall
+                  // outside the first page.
+                  const runs = await github.paginate(github.rest.actions.listWorkflowRuns, params);
+
+                  const matching = runs.filter(
                     r => r.display_title && r.display_title.includes(clusterTag)
                   );
 

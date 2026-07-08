@@ -267,7 +267,10 @@ jobs:
           GH_TOKEN: ${{ secrets.BOT_PAT }}
         run: |
           echo "Checking for offline self-hosted runners with label '${CLUSTER_NAME}'..."
-          RUNNERS=$(gh api "/repos/${{ github.repository }}/actions/runners" --jq --arg label "${CLUSTER_NAME}" '.runners[] | select(.status == "offline") | select(.labels[].name == $label) | .id' 2>/dev/null || true)
+          # gh api's --jq only accepts a single jq-expression string (no --arg
+          # support for variable binding), so interpolate CLUSTER_NAME directly.
+          # Safe here since it was already regex-validated earlier in this job.
+          RUNNERS=$(gh api "/repos/${{ github.repository }}/actions/runners" --jq ".runners[] | select(.status == \"offline\") | select(.labels[].name == \"${CLUSTER_NAME}\") | .id" 2>/dev/null || true)
 
           if [[ -z "${RUNNERS}" ]]; then
             echo "No offline '${CLUSTER_NAME}' runners found"

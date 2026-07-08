@@ -75,8 +75,8 @@ jobs:
     steps:
       - name: Validate cluster_name format
         run: |
-          if [[ ! "${CLUSTER_NAME}" =~ ^[a-zA-Z0-9][a-zA-Z0-9._-]{0,20}$ ]]; then
-            echo "::error::Invalid cluster_name: '${CLUSTER_NAME}'. Must match [a-zA-Z0-9][a-zA-Z0-9._-]* and be at most 21 characters (IBM Cloud IPI cluster name limit — longer names are silently truncated, which breaks health checks, teardown, and auto-teardown discovery)."
+          if [[ ! "${CLUSTER_NAME}" =~ ^[a-z0-9]([a-z0-9-]{0,19}[a-z0-9])?$ ]]; then
+            echo "::error::Invalid cluster_name: '${CLUSTER_NAME}'. Must be a lower-case RFC 1123 DNS label (start/end with alphanumeric, only lower-case letters/digits/hyphens in between — no uppercase, underscores, or dots) and at most 21 characters (IBM Cloud IPI cluster name limit — longer names are silently truncated, which breaks health checks, teardown, and auto-teardown discovery). This name is also used as-is for the ARC Helm release and the api.\${CLUSTER_NAME}.\${BASE_DOMAIN} hostname, both of which require RFC 1123-safe values."
             exit 1
           fi
 
