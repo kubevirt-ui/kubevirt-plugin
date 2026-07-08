@@ -23,58 +23,85 @@ const tryValidateDate = (
   return true;
 };
 
-export const validateDateCreatedValues = (
+const validateFromToDateValue = (
+  value: string,
+  fromVal: string | undefined,
+  toVal: string | undefined,
+  filterState: Partial<KubevirtFilterState>,
+  tokenOrder: string[],
+): boolean => {
+  if (value === fromVal) {
+    return tryValidateDate(
+      value,
+      stripFromPrefix,
+      filterState,
+      tokenOrder,
+      VirtualMachineRowFilterType.DateCreatedFrom,
+    );
+  }
+
+  if (value === toVal) {
+    return tryValidateDate(
+      value,
+      stripToPrefix,
+      filterState,
+      tokenOrder,
+      VirtualMachineRowFilterType.DateCreatedTo,
+    );
+  }
+
+  return false;
+};
+
+const validateFromToMode = (
   values: string[],
   filterState: Partial<KubevirtFilterState>,
   tokenOrder: string[],
 ): string[] => {
+  const fromVal = values.find(isFromValue);
+  const toVal = values.find(isToValue);
   const invalid: string[] = [];
-  const fromVal = values.find((v) => isFromValue(v));
-  const toVal = values.find((v) => isToValue(v));
-  const isFromToMode = !!fromVal || !!toVal;
 
-  if (isFromToMode) {
-    for (const val of values) {
-      if (val === fromVal) {
-        if (
-          !tryValidateDate(
-            val,
-            stripFromPrefix,
-            filterState,
-            tokenOrder,
-            VirtualMachineRowFilterType.DateCreatedFrom,
-          )
-        )
-          invalid.push(val);
-      } else if (val === toVal) {
-        if (
-          !tryValidateDate(
-            val,
-            stripToPrefix,
-            filterState,
-            tokenOrder,
-            VirtualMachineRowFilterType.DateCreatedTo,
-          )
-        )
-          invalid.push(val);
-      } else {
-        invalid.push(val);
-      }
-    }
-  } else {
-    const [first, ...rest] = values;
-    invalid.push(...rest);
-    if (first && isDateCreatedQuickValue(first)) {
-      setFilter(
-        filterState,
-        tokenOrder,
-        VirtualMachineRowFilterType.DateCreated,
-        first.toLowerCase(),
-      );
-    } else if (first) {
-      invalid.push(first);
-    }
+  for (const value of values) {
+    const isValid = validateFromToDateValue(value, fromVal, toVal, filterState, tokenOrder);
+    if (!isValid) invalid.push(value);
   }
 
   return invalid;
 };
+
+const validateQuickValueMode = (
+  values: string[],
+  filterState: Partial<KubevirtFilterState>,
+  tokenOrder: string[],
+): string[] => {
+  const [first, ...rest] = values;
+  const invalid = [...rest];
+
+  if (!first) return invalid;
+
+  if (isDateCreatedQuickValue(first)) {
+    setFilter(
+      filterState,
+      tokenOrder,
+      VirtualMachineRowFilterType.DateCreated,
+      first.toLowerCase(),
+    );
+    return invalid;
+  }
+
+  invalid.push(first);
+  return invalid;
+};
+
+const isFromToMode = (values: string[]): boolean =>
+  values.some(isFromValue) || values.some(isToValue);
+
+export const validateDateCreatedValues = (
+  values: string[],
+  filterState: Partial<KubevirtFilterState>,
+  tokenOrder: string[],
+): string[] =>
+  isFromToMode(values)
+    ? validateFromToMode(values, filterState, tokenOrder)
+    : validateQuickValueMode(values, filterState, tokenOrder);

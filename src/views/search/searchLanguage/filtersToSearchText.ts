@@ -76,7 +76,7 @@ const serializeFilterValues = (filterType: string, values: string[]): string[] =
   return tokens;
 };
 
-const serializeDateCreatedFilters = (filters: Partial<KubevirtFilterState>): string | null => {
+const serializeDateCreatedFilters = (filters: Partial<KubevirtFilterState>): null | string => {
   const dateCreated = filters[VirtualMachineRowFilterType.DateCreated]?.[0];
   const dateFrom = filters[VirtualMachineRowFilterType.DateCreatedFrom]?.[0];
   const dateTo = filters[VirtualMachineRowFilterType.DateCreatedTo]?.[0];
@@ -91,25 +91,17 @@ const serializeDateCreatedFilters = (filters: Partial<KubevirtFilterState>): str
   return `${SEARCH_KEYS.DATE_CREATED}:${parts.join(',')}`;
 };
 
-export const filtersToSearchText = (
+const serializeOrderedFilterTokens = (
   filters: Partial<KubevirtFilterState>,
-  tokenOrder: string[],
-): string => {
-  const orderedKeys = [
-    ...tokenOrder.filter((key) => !isEmpty(filters[key])),
-    ...Object.keys(filters).filter((key) => !isEmpty(filters[key]) && !tokenOrder.includes(key)),
-  ];
-
-  const seen = new Set<string>();
+  orderedKeys: string[],
+): string[] => {
   const tokens: string[] = [];
+  const seen = new Set<string>();
   let dateCreatedSerialized = false;
 
   for (const key of orderedKeys) {
     if (seen.has(key)) continue;
     seen.add(key);
-
-    const values = filters[key];
-    if (isEmpty(values)) continue;
 
     if (DATE_CREATED_FILTER_KEYS.has(key)) {
       if (!dateCreatedSerialized) {
@@ -120,8 +112,23 @@ export const filtersToSearchText = (
       continue;
     }
 
+    const values = filters[key];
+    if (isEmpty(values)) continue;
+
     tokens.push(...serializeFilterValues(key, values));
   }
 
-  return tokens.join(' ');
+  return tokens;
+};
+
+export const filtersToSearchText = (
+  filters: Partial<KubevirtFilterState>,
+  tokenOrder: string[],
+): string => {
+  const orderedKeys = [
+    ...tokenOrder.filter((key) => !isEmpty(filters[key])),
+    ...Object.keys(filters).filter((key) => !isEmpty(filters[key]) && !tokenOrder.includes(key)),
+  ];
+
+  return serializeOrderedFilterTokens(filters, orderedKeys).join(' ');
 };

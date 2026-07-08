@@ -2,9 +2,9 @@ import { useMemo } from 'react';
 import { useSearchParams } from 'react-router';
 
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { resolveDateCreatedValue } from '@search/utils/dateCreatedValues';
 import { getRowFilterQueryKey } from '@search/utils/query';
 import { AdvancedSearchFilter } from '@stolostron/multicluster-sdk';
+import { appendDateCreatedSearchQueries } from '@virtualmachines/search/utils';
 import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
 type VMSearchQueries = {
@@ -16,7 +16,7 @@ const useVMSearchQueries = (): VMSearchQueries => {
   const [searchParams] = useSearchParams();
 
   const getParam = (filterType: VirtualMachineRowFilterType): string =>
-    searchParams.get(filterType) || searchParams.get(getRowFilterQueryKey(filterType));
+    searchParams.get(filterType) ?? searchParams.get(getRowFilterQueryKey(filterType)) ?? '';
 
   const getMultipleParams = (filterType: VirtualMachineRowFilterType): string[] => {
     const values = searchParams.getAll(filterType);
@@ -26,7 +26,7 @@ const useVMSearchQueries = (): VMSearchQueries => {
   };
 
   const vmName = getParam(VirtualMachineRowFilterType.Name);
-  const ip = getParam(VirtualMachineRowFilterType.IP);
+  const ipAddress = getParam(VirtualMachineRowFilterType.IP);
   const dateCreated = getParam(VirtualMachineRowFilterType.DateCreated);
   const createdFrom = getParam(VirtualMachineRowFilterType.DateCreatedFrom);
   const createdTo = getParam(VirtualMachineRowFilterType.DateCreatedTo);
@@ -40,27 +40,11 @@ const useVMSearchQueries = (): VMSearchQueries => {
       vmQueries: [],
     };
 
-    const pushDateFrom = (value: string) =>
-      queries.vmQueries.push({ property: 'created', values: [`>=${value}`] });
-    const pushDateTo = (value: string) =>
-      queries.vmQueries.push({ property: 'created', values: [`<=${value}`] });
-
-    if (dateCreated) {
-      const resolved = resolveDateCreatedValue(dateCreated);
-      if (resolved) {
-        pushDateFrom(resolved.from);
-        if (resolved.to) {
-          pushDateTo(resolved.to);
-        }
-      }
-    } else {
-      if (createdFrom) {
-        pushDateFrom(createdFrom);
-      }
-      if (createdTo) {
-        pushDateTo(createdTo);
-      }
-    }
+    appendDateCreatedSearchQueries(queries.vmQueries, {
+      createdFrom,
+      createdTo,
+      dateCreated,
+    });
 
     if (!isEmpty(clusters)) {
       queries.vmQueries.push({ property: 'cluster', values: clusters });
@@ -72,7 +56,9 @@ const useVMSearchQueries = (): VMSearchQueries => {
       queries.vmiQueries.push({ property: 'name', values: [`*${vmName}*`] });
     }
 
-    if (ip) queries.vmiQueries.push({ property: 'ipaddress', values: [`*${ip}*`] });
+    if (ipAddress) {
+      queries.vmiQueries.push({ property: 'ipaddress', values: [`*${ipAddress}*`] });
+    }
 
     if (!isEmpty(projects)) {
       queries.vmQueries.push({ property: 'namespace', values: projects });
@@ -80,7 +66,7 @@ const useVMSearchQueries = (): VMSearchQueries => {
     }
 
     return queries;
-  }, [dateCreated, createdFrom, createdTo, vmName, ip, projects, clusters]);
+  }, [dateCreated, createdFrom, createdTo, vmName, ipAddress, projects, clusters]);
 };
 
 export default useVMSearchQueries;
