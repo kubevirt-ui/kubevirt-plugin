@@ -12,7 +12,7 @@
 
 set -euo pipefail
 ARC_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-CI_SCRIPTS_DIR="$(cd "${ARC_DIR}/.." && pwd)"
+CI_SCRIPTS_DIR="$(cd "${ARC_DIR}/../.." && pwd)"
 source "${CI_SCRIPTS_DIR}/_cluster-helpers.sh"
 verify_oc
 

@@ -18,8 +18,13 @@
 set -euo pipefail
 
 CI_ENV_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# NOTE: despite the name, this is ci-scripts/hot-cluster (not ci-scripts/) —
+# it's what the other paths below (CHART_DIR, setup-ci-env-runner-image.sh)
+# actually need, since those live under hot-cluster/. _cluster-helpers.sh is
+# the one file that stayed at the top-level ci-scripts/, hence the separate var.
 CI_SCRIPTS_DIR="$(cd "${CI_ENV_DIR}/.." && pwd)"
-source "${CI_SCRIPTS_DIR}/_cluster-helpers.sh"
+REPO_CI_SCRIPTS_DIR="$(cd "${CI_ENV_DIR}/../.." && pwd)"
+source "${REPO_CI_SCRIPTS_DIR}/_cluster-helpers.sh"
 verify_oc
 
 CHART_DIR="${CI_SCRIPTS_DIR}/helm/ci-env-controller"
