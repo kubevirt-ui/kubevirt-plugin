@@ -17,6 +17,8 @@ import {
 import { type SetDraftTextWithCursor } from '@search/hooks/useCursorTracking';
 import { TokenParts } from '@search/searchLanguage/types';
 import { getExclusionPrefix } from '@search/searchLanguage/utils';
+import { isFromValue, isToValue } from '@search/utils/dateCreatedValues';
+import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
 type UseSearchLanguageDropdownProps = {
   autocompleteMode: AutocompleteMode;
@@ -65,6 +67,26 @@ export const useSearchLanguageDropdown = ({
       if (autocompleteMode.type !== DropdownType.VALUES) return;
 
       const { filterType, searchKey, selectedValues = [] } = autocompleteMode;
+
+      if (filterType === VirtualMachineRowFilterType.DateCreated) {
+        if (isFromValue(value) || isToValue(value)) {
+          const currentPrefix = isEmpty(selectedValues) ? '' : `${selectedValues[0]},`;
+          updateDraftText(`${searchKey}:${currentPrefix}${value}`);
+          return;
+        }
+
+        const isExcluded = !!exclusionPrefix;
+        const finalValue = formatFilterValue(value, isExcluded);
+
+        onSetFilters({
+          [VirtualMachineRowFilterType.DateCreated]: [finalValue],
+          [VirtualMachineRowFilterType.DateCreatedFrom]: [],
+          [VirtualMachineRowFilterType.DateCreatedTo]: [],
+        });
+        trackKey(filterType);
+        updateDraftText(`${searchKey}:${value}`);
+        return;
+      }
 
       const lowerValue = value.toLowerCase();
       const isAlreadySelected = selectedValues.some((v) => v.toLowerCase() === lowerValue);

@@ -3,6 +3,8 @@ import { useMemo } from 'react';
 import { KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { EXCLUSION_PREFIX, NUMERIC_FILTER_KEYS } from '@search/searchLanguage/constants';
 import { getSanitizedInput } from '@search/searchLanguage/utils';
+import { isFromValue, isToValue } from '@search/utils/dateCreatedValues';
+import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
 import { AutocompleteMode, DropdownType } from '../../types';
 import useSearchKeyBadges from '../useSearchKeyBadges';
@@ -46,6 +48,24 @@ export const useAutocompleteMode = (
     if (!hasOptions(filterType, filterDefinitions)) return { type: DropdownType.HIDDEN };
 
     const { activeSegment, selectedValues } = getValuesPart(sanitizedInput, colonIndex);
+
+    if (filterType === VirtualMachineRowFilterType.DateCreated) {
+      const segment = activeSegment.toLowerCase();
+
+      if (isFromValue(segment) || isToValue(segment)) {
+        return { type: DropdownType.HIDDEN };
+      }
+
+      const hasFrom = selectedValues.some((v) => isFromValue(v.toLowerCase()));
+      const hasTo = selectedValues.some((v) => isToValue(v.toLowerCase()));
+      const hasQuickValue = selectedValues.some(
+        (v) => !isFromValue(v.toLowerCase()) && !isToValue(v.toLowerCase()),
+      );
+
+      if (hasQuickValue || (hasFrom && hasTo)) {
+        return { type: DropdownType.HIDDEN };
+      }
+    }
 
     return {
       activeSegment,

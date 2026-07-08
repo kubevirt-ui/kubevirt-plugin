@@ -1,12 +1,12 @@
-import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { TFunction } from 'i18next';
 
 export enum DateSelectOption {
-  Custom = 'Custom',
-  Last30Days = 'Last30Days',
-  Last7Days = 'Last7Days',
-  Last90Days = 'Last90Days',
-  Today = 'Today',
-  Yesterday = 'Yesterday',
+  Custom = 'custom',
+  Last30Days = 'last-30-days',
+  Last7Days = 'last-7-days',
+  Last90Days = 'last-90-days',
+  Today = 'today',
+  Yesterday = 'yesterday',
 }
 
 export const dateSelectOptions = [
@@ -18,28 +18,11 @@ export const dateSelectOptions = [
   DateSelectOption.Custom,
 ];
 
-export const dateSelectOptionsInfo = {
-  [DateSelectOption.Custom]: {
-    label: t('Custom...'),
-  },
-  [DateSelectOption.Last30Days]: {
-    daysBack: 30,
-    label: t('Last 30 days'),
-  },
-  [DateSelectOption.Last7Days]: {
-    daysBack: 7,
-    label: t('Last 7 days'),
-  },
-  [DateSelectOption.Last90Days]: {
-    daysBack: 90,
-    label: t('Last 90 days'),
-  },
-  [DateSelectOption.Today]: {
-    daysBack: 0,
-    label: t('Today'),
-  },
-  [DateSelectOption.Yesterday]: {
-    daysBack: 1,
-    label: t('Yesterday'),
-  },
-};
+export const getDateSelectLabels = (t: TFunction): Record<DateSelectOption, string> => ({
+  [DateSelectOption.Custom]: t('Custom...'),
+  [DateSelectOption.Last30Days]: t('Last 30 days'),
+  [DateSelectOption.Last7Days]: t('Last 7 days'),
+  [DateSelectOption.Last90Days]: t('Last 90 days'),
+  [DateSelectOption.Today]: t('Today'),
+  [DateSelectOption.Yesterday]: t('Yesterday'),
+});

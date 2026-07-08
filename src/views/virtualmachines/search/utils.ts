@@ -1,10 +1,14 @@
 import { TFunction } from 'i18next';
 
 import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { resolveDateCreatedValue } from '@search/utils/dateCreatedValues';
 import { AdvancedSearchFilter } from '@stolostron/multicluster-sdk';
 import { VirtualMachineRowFilterType } from '@virtualmachines/utils/constants';
 
-export const getTooltipContent = (filterType: VirtualMachineRowFilterType, t: TFunction) => {
+export const getTooltipContent = (
+  filterType: VirtualMachineRowFilterType,
+  t: TFunction,
+): string | null => {
   if (filterType === VirtualMachineRowFilterType.Cluster) {
     return t(
       'Cluster is already selected. To update filters, choose another project or cluster in the tree view.',
@@ -18,6 +22,55 @@ export const getTooltipContent = (filterType: VirtualMachineRowFilterType, t: TF
   return null;
 };
 
+type DateCreatedSearchParams = {
+  createdFrom: string | null;
+  createdTo: string | null;
+  dateCreated: string | null;
+};
+
+const appendCreatedQuery = (
+  vmQueries: AdvancedSearchFilter,
+  operator: '>=' | '<=',
+  value: string,
+): void => {
+  vmQueries.push({ property: 'created', values: [`${operator}${value}`] });
+};
+
+const appendResolvedDateCreated = (vmQueries: AdvancedSearchFilter, dateCreated: string): void => {
+  const resolved = resolveDateCreatedValue(dateCreated);
+  if (!resolved) return;
+
+  appendCreatedQuery(vmQueries, '>=', resolved.from);
+  if (resolved.to) {
+    appendCreatedQuery(vmQueries, '<=', resolved.to);
+  }
+};
+
+const appendCustomDateRange = (
+  vmQueries: AdvancedSearchFilter,
+  createdFrom: string | null,
+  createdTo: string | null,
+): void => {
+  if (createdFrom) {
+    appendCreatedQuery(vmQueries, '>=', createdFrom);
+  }
+  if (createdTo) {
+    appendCreatedQuery(vmQueries, '<=', createdTo);
+  }
+};
+
+export const appendDateCreatedSearchQueries = (
+  vmQueries: AdvancedSearchFilter,
+  { dateCreated, createdFrom, createdTo }: DateCreatedSearchParams,
+): void => {
+  if (dateCreated) {
+    appendResolvedDateCreated(vmQueries, dateCreated);
+    return;
+  }
+
+  appendCustomDateRange(vmQueries, createdFrom, createdTo);
+};
+
 export const getSearchQueries = (
   searchQueries: AdvancedSearchFilter,
   clusters: string[],
@@ -29,7 +82,7 @@ export const getSearchQueries = (
       query.property === 'cluster' &&
       Array.isArray(query.values) &&
       query.values.length === clusters?.length &&
-      query.values.every((v) => clusters.includes(v)),
+      query.values.every((clusterValue) => clusters.includes(clusterValue)),
   );
 
   if (!searchQueriesExist && !clustersExist) return null;

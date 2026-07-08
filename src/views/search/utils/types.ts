@@ -12,6 +12,7 @@ export type AdvancedSearchQueryInputs = Partial<{
   [VirtualMachineRowFilterType.Architecture]: string[];
   [VirtualMachineRowFilterType.Cluster]: string[];
   [VirtualMachineRowFilterType.CPU]: CPUValue;
+  [VirtualMachineRowFilterType.DateCreated]: string;
   [VirtualMachineRowFilterType.DateCreatedFrom]: string;
   [VirtualMachineRowFilterType.DateCreatedTo]: string;
   [VirtualMachineRowFilterType.Description]: string;
