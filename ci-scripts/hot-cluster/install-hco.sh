@@ -23,7 +23,7 @@ HPP_VERSION="${HPP_VERSION:-release-v0.21}"
 CNV_NS="openshift-cnv"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 
 echo "=== OpenShift Virtualization (CNV) Installation ==="
 echo "  KVM_EMULATION: ${KVM_EMULATION}"
