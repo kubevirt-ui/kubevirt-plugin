@@ -8,6 +8,10 @@ on:
     branches:
       - main
 
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   i18n:
     name: i18n
@@ -16,14 +20,32 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
+      - name: Detect i18n-related changes
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            i18n:
+              - 'src/**'
+              - 'locales/**'
+              - 'i18n-scripts/**'
+              - 'i18next-parser.config.js'
+
+      - name: Skip i18n check
+        if: github.event_name != 'push' && steps.filter.outputs.i18n != 'true'
+        run: echo "No i18n-related changes detected, skipping."
+
       - name: Setup Node
+        if: github.event_name == 'push' || steps.filter.outputs.i18n == 'true'
         uses: actions/setup-node@v6
         with:
           node-version: '22'
           cache: npm
-      - run: npm ci --ignore-scripts
+      - if: github.event_name == 'push' || steps.filter.outputs.i18n == 'true'
+        run: npm ci --ignore-scripts
 
       - name: Check i18n
+        if: github.event_name == 'push' || steps.filter.outputs.i18n == 'true'
         shell: bash
         run: |
           npm run i18n
@@ -54,20 +76,42 @@ jobs:
             package-lock:
               - package-lock.json
 
+      - name: Detect build-related changes
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            build:
+              - '**'
+              - '!.github/**'
+              - '!.cursor/**'
+              - '!.husky/**'
+              - '!.vscode/**'
+              - '!playwright/**'
+              - '!ci-scripts/**'
+              - '!i18n-scripts/**'
+              - '!locales/**'
+              - '!scripts/**'
+
+      - name: Skip build
+        if: github.event_name != 'push' && steps.filter.outputs.build != 'true'
+        run: echo "No build-related changes detected, skipping."
+
       - name: Setup Node
+        if: github.event_name == 'push' || steps.filter.outputs.build == 'true'
         uses: actions/setup-node@v6
         with:
           node-version: '22'
           cache: npm
-      - run: npm ci --ignore-scripts
+      - if: github.event_name == 'push' || steps.filter.outputs.build == 'true'
+        run: npm ci --ignore-scripts
 
       - name: Lint
-        run: npm run lint:fix
-
-      - name: Check File Changes
-        run: git diff --name-only --exit-code && echo "No changes after linting."
+        if: github.event_name == 'push' || steps.filter.outputs.build == 'true'
+        run: npm run lint
 
       - name: Build
+        if: github.event_name == 'push' || steps.filter.outputs.build == 'true'
         run: npm run build
 
       - name: Prefetch npm dependencies with Hermeto
@@ -99,11 +143,20 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
+      - name: Detect workflow script changes
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            scripts:
+              - '.github/scripts/**'
+
       - name: Setup Node
         uses: actions/setup-node@v6
         with:
           node-version: '22'
           cache: npm
+          cache-dependency-path: package-lock.json
       - run: npm ci --ignore-scripts
 
       - name: Run unit tests
@@ -114,14 +167,29 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
 
+      - name: Setup Node for workflow scripts
+        if: github.event_name == 'push' || steps.filter.outputs.scripts == 'true'
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: .github/scripts/package-lock.json
+
       - name: Install workflow script dependencies
+        if: github.event_name == 'push' || steps.filter.outputs.scripts == 'true'
         working-directory: .github/scripts
         run: npm ci
 
       - name: Check workflow script types
+        if: github.event_name == 'push' || steps.filter.outputs.scripts == 'true'
         working-directory: .github/scripts
         run: npm run check-types
 
       - name: Run workflow script tests
+        if: github.event_name == 'push' || steps.filter.outputs.scripts == 'true'
         working-directory: .github/scripts
         run: npm test
+
+      - name: Skip workflow script tests
+        if: github.event_name != 'push' && steps.filter.outputs.scripts != 'true'
+        run: echo "No workflow script changes detected, skipping."
