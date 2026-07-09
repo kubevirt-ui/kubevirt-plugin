@@ -29,7 +29,7 @@ import {
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { Operator } from '@openshift-console/dynamic-plugin-sdk';
-import { UseBootableVolumesValues } from '@virtualmachines/creation-wizard/utils/types';
+import { UseBootableVolumesValues } from '@virtualmachines/creation-wizard-new/utils/types';
 
 type UseBootableVolumes = (namespace?: string) => UseBootableVolumesValues;
 

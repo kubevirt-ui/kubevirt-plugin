@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 import useClusterInstanceTypes from '@kubevirt-utils/hooks/useClusterInstanceTypes';
 import useClusterPreferences from '@kubevirt-utils/hooks/useClusterPreferences';
 import useVirtualMachineInstanceTypes from '@kubevirt-utils/hooks/useVirtualMachineInstanceTypes';
-import { UseInstanceTypeAndPreferencesValues } from '@virtualmachines/creation-wizard/utils/types';
+import { UseInstanceTypeAndPreferencesValues } from '@virtualmachines/creation-wizard-new/utils/types';
 
 type UseInstanceTypeAndPreferences = (
   namespace?: string,

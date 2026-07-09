@@ -1,7 +1,7 @@
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { isUpstream } from '@kubevirt-utils/utils/utils';
-import { generateCloudInitPassword } from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/hooks/useGenerateVM/utils';
+import { generateCloudInitPassword } from '@virtualmachines/creation-wizard-new/steps/InstanceTypesSteps/hooks/useGenerateVM/utils/generateVM';
 
 const osType = isUpstream ? 'fedora' : 'rhel10';
 const image = isUpstream
