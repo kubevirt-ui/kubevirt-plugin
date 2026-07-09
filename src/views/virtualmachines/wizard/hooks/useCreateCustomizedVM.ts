@@ -7,7 +7,7 @@ import useIsIPv6SingleStackCluster from '@kubevirt-utils/hooks/useIPStackType/us
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName } from '@kubevirt-utils/resources/shared';
 import useNamespaceUDN from '@kubevirt-utils/resources/udn/hooks/useNamespaceUDN';
-import { vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
+import { customizeWizardVMSignal } from '@kubevirt-utils/signals/customizeWizardVMSignal';
 import { getErrorMessage, kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { kubevirtK8sCreate } from '@multicluster/k8sRequests';
@@ -49,7 +49,7 @@ const useCreateCustomizedVM: UseCreateCustomizedVM = () => {
       name: vmName,
       selectedTemplate,
     } = getValues(CREATE_VM_FORM_FIELDS_VM_DATA.ROOT);
-    const storeVM = vmSignal.value;
+    const storeVM = customizeWizardVMSignal.value;
 
     if (!storeVM) {
       const emptyPayloadError = new Error(t('Cannot create VM: customized VM payload is empty'));

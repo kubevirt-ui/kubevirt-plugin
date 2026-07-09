@@ -1,12 +1,15 @@
 import React from 'react';
 
 import Loading from '@kubevirt-utils/components/Loading/Loading';
-import { updateVMCustomizeIT, vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
+import {
+  customizeWizardVMSignal,
+  updateVMCustomizeIT,
+} from '@kubevirt-utils/signals/customizeWizardVMSignal';
 import { PageSection } from '@patternfly/react-core';
 import SchedulingSection from '@virtualmachines/details/tabs/configuration/scheduling/components/SchedulingSection';
 
 const CustomizeInstanceTypeSchedulingTab = () => {
-  const vm = vmSignal.value;
+  const vm = customizeWizardVMSignal.value;
 
   if (!vm) {
     return <Loading />;

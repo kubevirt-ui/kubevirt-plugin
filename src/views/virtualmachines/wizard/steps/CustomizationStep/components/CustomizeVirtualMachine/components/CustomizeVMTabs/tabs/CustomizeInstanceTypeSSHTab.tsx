@@ -3,14 +3,17 @@ import React from 'react';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { updateVMCustomizeIT, vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
+import {
+  customizeWizardVMSignal,
+  updateVMCustomizeIT,
+} from '@kubevirt-utils/signals/customizeWizardVMSignal';
 import { Grid, GridItem, PageSection, Stack, Title } from '@patternfly/react-core';
 import SSHTabAuthorizedSSHKey from '@virtualmachines/details/tabs/configuration/ssh/components/SSHTabAuthorizedSSHKey';
 import SSHTabSSHAccess from '@virtualmachines/details/tabs/configuration/ssh/components/SSHTabSSHAccess';
 
 const CustomizeInstanceTypeSSHTab = () => {
   const { t } = useKubevirtTranslation();
-  const vm = vmSignal.value;
+  const vm = customizeWizardVMSignal.value;
 
   if (!vm) {
     return <Loading />;

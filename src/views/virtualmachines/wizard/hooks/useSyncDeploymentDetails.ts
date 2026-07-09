@@ -1,9 +1,9 @@
 import { getAnnotation } from '@kubevirt-utils/resources/shared';
 import { DESCRIPTION_ANNOTATION, getFolder } from '@kubevirt-utils/resources/vm';
 import {
+  customizeWizardVMSignal,
   patchCustomizeWizardVMSignal,
-  vmSignal,
-} from '@kubevirt-utils/store/customizeInstanceType';
+} from '@kubevirt-utils/signals/customizeWizardVMSignal';
 import type { WizardStepType } from '@patternfly/react-core';
 import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
@@ -24,7 +24,7 @@ export const useSyncDeploymentDetails: UseSyncDeploymentDetails = () => {
   const { getValues, setValue } = useVMWizard();
 
   return (currentStep: WizardStepType, prevStep: WizardStepType) => {
-    if (!vmSignal.value) {
+    if (!customizeWizardVMSignal.value) {
       return;
     }
 
@@ -46,9 +46,12 @@ export const useSyncDeploymentDetails: UseSyncDeploymentDetails = () => {
     if (currentStep?.id === VMWizardStep.DEPLOYMENT_DETAILS) {
       setValue(
         CREATE_VM_FORM_FIELDS_VM_DATA.DESCRIPTION,
-        getAnnotation(vmSignal.value, DESCRIPTION_ANNOTATION, ''),
+        getAnnotation(customizeWizardVMSignal.value, DESCRIPTION_ANNOTATION, ''),
       );
-      setValue(CREATE_VM_FORM_FIELDS_VM_DATA.FOLDER, getFolder(vmSignal.value) || '');
+      setValue(
+        CREATE_VM_FORM_FIELDS_VM_DATA.FOLDER,
+        getFolder(customizeWizardVMSignal.value) || '',
+      );
     }
   };
 };

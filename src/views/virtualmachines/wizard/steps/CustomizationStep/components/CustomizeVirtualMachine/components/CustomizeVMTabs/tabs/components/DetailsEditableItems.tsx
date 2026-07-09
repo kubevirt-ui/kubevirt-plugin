@@ -11,9 +11,9 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { getAnnotation, getLabel, getName } from '@kubevirt-utils/resources/shared';
 import { DESCRIPTION_ANNOTATION, getHostname } from '@kubevirt-utils/resources/vm';
 import {
+  customizeWizardVMSignal,
   patchCustomizeWizardVMSignal,
-  vmSignal,
-} from '@kubevirt-utils/store/customizeInstanceType';
+} from '@kubevirt-utils/signals/customizeWizardVMSignal';
 import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
 
 type DetailsEditableItemsProps = {
@@ -24,7 +24,7 @@ const DetailsEditableItems: FC<DetailsEditableItemsProps> = ({ treeViewFoldersEn
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
 
-  const vm = vmSignal.value;
+  const vm = customizeWizardVMSignal.value;
   const vmName = getName(vm);
 
   return (

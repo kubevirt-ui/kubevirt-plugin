@@ -7,7 +7,7 @@ import {
 } from '@kubevirt-utils/extensions/telemetry/utils/constants';
 import { logVMCreationFailedFromTemplate } from '@kubevirt-utils/extensions/telemetry/vm-creation';
 import { getResourceKey } from '@kubevirt-utils/resources/shared';
-import { vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
+import { customizeWizardVMSignal } from '@kubevirt-utils/signals/customizeWizardVMSignal';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
 import {
   CREATE_VM_FORM_FIELDS_UI_STATE,
@@ -49,7 +49,7 @@ const useCreateVMFromTemplate: UseCreateVMFromTemplate = () => {
     try {
       const vm = await resolveVMFromTemplate(selectedTemplate, namespace, cluster, vmName);
 
-      vmSignal.value = getVMObjectFromTemplate({
+      customizeWizardVMSignal.value = getVMObjectFromTemplate({
         description,
         folder,
         namespace,

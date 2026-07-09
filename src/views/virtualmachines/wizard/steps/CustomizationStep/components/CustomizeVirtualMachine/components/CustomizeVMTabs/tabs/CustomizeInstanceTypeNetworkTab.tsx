@@ -10,16 +10,16 @@ import Loading from '@kubevirt-utils/components/Loading/Loading';
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
+  customizeWizardVMSignal,
   patchCustomizeWizardVMSignal,
-  vmSignal,
-} from '@kubevirt-utils/store/customizeInstanceType';
+} from '@kubevirt-utils/signals/customizeWizardVMSignal';
 import { PageSection, Title } from '@patternfly/react-core';
 import AddNetworkInterfaceButton from '@virtualmachines/details/tabs/configuration/network/components/AddNetworkInterfaceButton';
 import NetworkInterfaceList from '@virtualmachines/wizard/steps/CustomizationStep/components/CustomizeVirtualMachine/components/CustomizeVMTabs/tabs/network/NetworkInterfaceList';
 
 const CustomizeInstanceTypeNetworkTab = () => {
   const { t } = useKubevirtTranslation();
-  const vm = vmSignal.value;
+  const vm = customizeWizardVMSignal.value;
 
   if (!vm) {
     return <Loading />;

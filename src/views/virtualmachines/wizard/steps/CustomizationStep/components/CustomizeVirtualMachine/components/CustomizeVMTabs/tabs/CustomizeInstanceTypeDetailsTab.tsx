@@ -10,7 +10,7 @@ import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { getPreferredBootmode } from '@kubevirt-utils/resources/preference/helper';
 import { asAccessReview } from '@kubevirt-utils/resources/shared';
 import { getDevices } from '@kubevirt-utils/resources/vm';
-import { vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
+import { customizeWizardVMSignal } from '@kubevirt-utils/signals/customizeWizardVMSignal';
 import { K8sVerb, useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
 import { Grid } from '@patternfly/react-core';
 import { isDeletionProtectionEnabled } from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/utils/utils';
@@ -21,7 +21,7 @@ import DetailsLeftColumn from './components/DetailsLeftColumn';
 import DetailsRightColumn from './components/DetailsRightColumn';
 
 const CustomizeInstanceTypeDetailsTab = () => {
-  const vm = vmSignal.value;
+  const vm = customizeWizardVMSignal.value;
 
   const [preference, preferenceLoading] = usePreference(vm);
 

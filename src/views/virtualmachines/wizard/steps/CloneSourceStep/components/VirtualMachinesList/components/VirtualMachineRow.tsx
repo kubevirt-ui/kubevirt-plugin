@@ -3,7 +3,7 @@ import React, { FC } from 'react';
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { getDescription } from '@kubevirt-utils/resources/shared';
-import { vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
+import { customizeWizardVMSignal } from '@kubevirt-utils/signals/customizeWizardVMSignal';
 import { Radio } from '@patternfly/react-core';
 import { Td, Tr } from '@patternfly/react-table';
 import { VMCallbacks } from '@virtualmachines/list/virtualMachinesDefinition';
@@ -26,7 +26,7 @@ const VirtualMachineRow: FC<VirtualMachineRowProps> = ({ callbacks, columns, vm 
   const handleClick = () => {
     setValue(CREATE_VM_FORM_FIELDS_VM_DATA.NAME, getCloneSourceVMName(vm));
     setValue(CREATE_VM_FORM_FIELDS_VM_DATA.DESCRIPTION, getDescription(vm) ?? '');
-    vmSignal.value = vm;
+    customizeWizardVMSignal.value = vm;
   };
 
   return (

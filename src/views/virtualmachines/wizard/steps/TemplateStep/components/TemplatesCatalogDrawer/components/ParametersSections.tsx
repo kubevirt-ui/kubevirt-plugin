@@ -4,7 +4,7 @@ import React, { FC, useState } from 'react';
 import { TemplateParameter } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
-import { vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
+import { customizeWizardVMSignal } from '@kubevirt-utils/signals/customizeWizardVMSignal';
 import { Button, ButtonVariant, Stack, StackItem } from '@patternfly/react-core';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
 import { CREATE_VM_FORM_FIELDS_VM_DATA } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
@@ -34,7 +34,7 @@ const ParametersSections: FC<ParametersSectionProps> = ({ requiredParameters }) 
     if (isEdit) {
       setTemplate(workingTemplate);
       setValue(CREATE_VM_FORM_FIELDS_VM_DATA.SELECTED_TEMPLATE, workingTemplate);
-      vmSignal.value = getTemplateVirtualMachineObject(workingTemplate);
+      customizeWizardVMSignal.value = getTemplateVirtualMachineObject(workingTemplate);
       setIsEdit(false);
       return;
     }

@@ -8,9 +8,9 @@ import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName } from '@kubevirt-utils/resources/shared';
 import {
+  customizeWizardVMSignal,
   patchCustomizeWizardVMSignal,
-  vmSignal,
-} from '@kubevirt-utils/store/customizeInstanceType';
+} from '@kubevirt-utils/signals/customizeWizardVMSignal';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { Switch } from '@patternfly/react-core';
 import DeletionProtectionModal from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/DeletionProtectionModal';
@@ -33,7 +33,7 @@ const DetailsToggleItems: FC<DetailsToggleItemsProps> = ({
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
 
-  const vm = vmSignal.value;
+  const vm = customizeWizardVMSignal.value;
   const vmName = getName(vm);
 
   return (

@@ -2,7 +2,7 @@ import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { PaginationState } from '@kubevirt-utils/hooks/usePagination/utils/types';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
-import { vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
+import { customizeWizardVMSignal } from '@kubevirt-utils/signals/customizeWizardVMSignal';
 import { isVM } from '@kubevirt-utils/utils/typeGuards';
 import { isEmpty, truncateToK8sName } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
@@ -90,7 +90,7 @@ export const resolveVMListSource = (
 ): VMListSource => (targetNamespace ? namespacedSource : accessibleSource);
 
 export const getVMConfiguration = (currentVM: V1VirtualMachine) => {
-  const selectedVM = vmSignal.value;
+  const selectedVM = customizeWizardVMSignal.value;
 
   const currentVMName = getName(currentVM);
   const currentVMNamespace = getNamespace(currentVM);

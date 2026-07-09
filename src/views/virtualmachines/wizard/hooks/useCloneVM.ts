@@ -12,7 +12,7 @@ import { logVMCreationFailed } from '@kubevirt-utils/extensions/telemetry/vm-cre
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { RUNSTRATEGY_HALTED } from '@kubevirt-utils/resources/vm';
-import { vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
+import { customizeWizardVMSignal } from '@kubevirt-utils/signals/customizeWizardVMSignal';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
 import { CREATE_VM_FORM_FIELDS_VM_DATA } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
@@ -58,7 +58,7 @@ const useCloneVM: UseCloneVM = () => {
       return;
     }
 
-    const source = vmSignal.value;
+    const source = customizeWizardVMSignal.value;
     const {
       cluster,
       description,

@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 
-import { setCustomizeWizardVMSignal } from '@kubevirt-utils/store/customizeInstanceType';
+import { setCustomizeWizardVMSignal } from '@kubevirt-utils/signals/customizeWizardVMSignal';
 import { useWizardContext, WizardFooter } from '@patternfly/react-core';
 import useCloseWizard from '@virtualmachines/wizard/hooks/useCloseWizard';
 import useWizardStepValidation from '@virtualmachines/wizard/hooks/useWizardStepValidation';

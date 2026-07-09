@@ -7,7 +7,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { getNetworks } from '@kubevirt-utils/resources/vm';
 import { isPodNetwork } from '@kubevirt-utils/resources/vm/utils/network/selectors';
 import { removePodNetworkFromVM } from '@kubevirt-utils/resources/vm/utils/network/utils';
-import { vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
+import { customizeWizardVMSignal } from '@kubevirt-utils/signals/customizeWizardVMSignal';
 import { Stack, StackItem, Title, TitleSizes } from '@patternfly/react-core';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
 import { CREATE_VM_FORM_FIELDS_VM_DATA } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
@@ -18,11 +18,11 @@ const CustomizationStep: FC = () => {
   const { control } = useVMWizard();
   const cluster = useWatch({ control, name: CREATE_VM_FORM_FIELDS_VM_DATA.CLUSTER });
   const isIPv6SingleStack = useIsIPv6SingleStackCluster(cluster);
-  const vm = vmSignal.value;
+  const vm = customizeWizardVMSignal.value;
 
   useEffect(() => {
     if (isIPv6SingleStack && vm && getNetworks(vm)?.some(isPodNetwork)) {
-      vmSignal.value = produce(vm, (draft) => {
+      customizeWizardVMSignal.value = produce(vm, (draft) => {
         removePodNetworkFromVM(draft);
       });
     }

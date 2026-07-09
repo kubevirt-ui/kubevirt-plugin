@@ -8,9 +8,9 @@ import {
 } from '@kubevirt-utils/components/RunStrategyModal/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
+  customizeWizardVMSignal,
   patchCustomizeWizardVMSignal,
-  vmSignal,
-} from '@kubevirt-utils/store/customizeInstanceType';
+} from '@kubevirt-utils/signals/customizeWizardVMSignal';
 import { Checkbox, Stack, StackItem, Title, TitleSizes } from '@patternfly/react-core';
 import { useSignals } from '@preact/signals-react/runtime';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
@@ -25,7 +25,9 @@ const ReviewAndCreateStep: FC = () => {
   const isCloneMethod = isCloneCreationMethod(creationMethod);
 
   useSignals();
-  const { isStartChecked, onToggle } = useRunStrategyToggle(vmSignal.value ?? undefined);
+  const { isStartChecked, onToggle } = useRunStrategyToggle(
+    customizeWizardVMSignal.value ?? undefined,
+  );
   return (
     <Stack hasGutter>
       <StackItem>

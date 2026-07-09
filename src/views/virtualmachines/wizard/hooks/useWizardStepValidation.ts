@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from 'react';
 import { useWatch } from 'react-hook-form';
 
-import { vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
+import { customizeWizardVMSignal } from '@kubevirt-utils/signals/customizeWizardVMSignal';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { isDNS1123Label } from '@kubevirt-utils/utils/validation';
 import { useSignals } from '@preact/signals-react/runtime';
@@ -53,7 +53,7 @@ const useWizardStepValidation = (): WizardStepValidation => {
   });
 
   const activeFlow = useMemo(() => getActiveFlow(creationMethod), [creationMethod]);
-  const currentVMSignalValue = vmSignal.value;
+  const currentVMSignalValue = customizeWizardVMSignal.value;
 
   const stepNextDisabled: Record<VMWizardStep, boolean> = useMemo(() => {
     const isRedHatProvided = Boolean(selectedSeries) && Boolean(selectedSize);

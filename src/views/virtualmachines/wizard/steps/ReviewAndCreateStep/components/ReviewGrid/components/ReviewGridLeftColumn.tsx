@@ -5,7 +5,7 @@ import { TREE_VIEW_FOLDERS } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getFolder, NO_DATA_DASH } from '@kubevirt-utils/resources/vm';
-import { vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
+import { customizeWizardVMSignal } from '@kubevirt-utils/signals/customizeWizardVMSignal';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { DescriptionList, ExpandableSection } from '@patternfly/react-core';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
@@ -17,7 +17,7 @@ import CloneNameInput from './CloneNameInput';
 
 const ReviewGridLeftColumn: FC = () => {
   const { t } = useKubevirtTranslation();
-  const vm = vmSignal.value;
+  const vm = customizeWizardVMSignal.value;
 
   const { featureEnabled: treeViewFoldersEnabled, loading: treeViewFoldersLoading } =
     useFeatures(TREE_VIEW_FOLDERS);

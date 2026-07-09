@@ -4,17 +4,17 @@ import Loading from '@kubevirt-utils/components/Loading/Loading';
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
+  customizeWizardVMSignal,
   patchCustomizeWizardVMSignal,
   updateVMCustomizeIT,
-  vmSignal,
-} from '@kubevirt-utils/store/customizeInstanceType';
+} from '@kubevirt-utils/signals/customizeWizardVMSignal';
 import { DescriptionList, Divider, PageSection, Title } from '@patternfly/react-core';
 import InitialRunTabCloudinit from '@virtualmachines/details/tabs/configuration/initialrun/components/InitialRunTabCloudinit';
 import InitialRunTabSysprep from '@virtualmachines/details/tabs/configuration/initialrun/components/InitialRunTabSysprep';
 
 const CustomizeInstanceTypeInitialRunTab = () => {
   const { t } = useKubevirtTranslation();
-  const vm = vmSignal.value;
+  const vm = customizeWizardVMSignal.value;
 
   if (!vm) {
     return <Loading />;

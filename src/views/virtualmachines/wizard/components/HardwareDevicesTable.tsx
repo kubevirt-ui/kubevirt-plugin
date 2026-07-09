@@ -3,12 +3,12 @@ import React, { FC } from 'react';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getGPUDevices, getHostDevices } from '@kubevirt-utils/resources/vm';
-import { vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
+import { customizeWizardVMSignal } from '@kubevirt-utils/signals/customizeWizardVMSignal';
 import { DescriptionList, Stack, StackItem } from '@patternfly/react-core';
 
 const HardwareDevicesTable: FC = () => {
   const { t } = useKubevirtTranslation();
-  const vm = vmSignal.value;
+  const vm = customizeWizardVMSignal.value;
   const hostDevices = getHostDevices(vm);
   const gpuDevices = getGPUDevices(vm);
   const devices = [...hostDevices, ...gpuDevices];

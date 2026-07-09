@@ -16,7 +16,7 @@ import {
 } from '@virtualmachines/wizard/utils/constants';
 
 import { cancelAllWizardPendingUploads } from '@kubevirt-utils/hooks/useUploadProgressToast';
-import { setCustomizeWizardVMSignal } from '@kubevirt-utils/store/customizeInstanceType';
+import { setCustomizeWizardVMSignal } from '@kubevirt-utils/signals/customizeWizardVMSignal';
 import {
   CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA,
   CREATE_VM_FORM_FIELDS_STEP_NAVIGATION,

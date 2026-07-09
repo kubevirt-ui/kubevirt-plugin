@@ -19,7 +19,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { useToggle } from '@kubevirt-utils/hooks/useToggle';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { getDisks, getInterfaces } from '@kubevirt-utils/resources/vm';
-import { patchCustomizeWizardVMSignal } from '@kubevirt-utils/store/customizeInstanceType';
+import { patchCustomizeWizardVMSignal } from '@kubevirt-utils/signals/customizeWizardVMSignal';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { ExpandableSection, Switch } from '@patternfly/react-core';
