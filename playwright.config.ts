@@ -41,8 +41,14 @@ export default defineConfig({
   expect: { timeout: 60_000 },
   forbidOnly: !!process.env.CI,
   fullyParallel: false,
-  globalSetup: './playwright/project-dependencies/global.setup.ts',
-  globalTeardown: './playwright/project-dependencies/global.teardown.ts',
+  globalSetup:
+    process.env.USE_SCENARIO_INFRA === 'true'
+      ? './playwright/project-dependencies/global.setup.ts'
+      : undefined,
+  globalTeardown:
+    process.env.USE_SCENARIO_INFRA === 'true'
+      ? './playwright/project-dependencies/global.teardown.ts'
+      : undefined,
   outputDir: './playwright/test-results/artifacts',
   projects: [
     // ── Legacy projects (setup → gating → features) ──────────────────

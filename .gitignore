@@ -30,3 +30,4 @@ ci-scripts/generated/
 
 # Personal Cursor rules (not shared with team)
 .cursor/rules/personal-*.mdc
+test-results/
