@@ -63,37 +63,34 @@ jobs:
     outputs:
       trusted: ${{ steps.check.outputs.trusted }}
     steps:
-      # author_association only reflects PUBLICLY visible org membership. Members
-      # with private membership (Settings > Organizations > "Publicize") are
-      # misreported as CONTRIBUTOR, so fall back to an explicit org membership
-      # check via the API before requiring the 'ok-to-test' label.
-      - name: Determine if PR author is a trusted org member
+      # No ref override: for pull_request_target this checks out the base branch,
+      # so a PR can't add itself to OWNERS to self-approve trust.
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      # OWNERS (approvers/reviewers) is the single source of truth for trust —
+      # the same source Prow uses for /lgtm, /approve. author_association and
+      # org membership are unreliable proxies (misreport private membership,
+      # need extra token scope), so we don't use them here.
+      - name: Determine if PR author is a trusted repo owner
         id: check
         uses: actions/github-script@v9
         with:
           github-token: ${{ secrets.BOT_PAT || secrets.GITHUB_TOKEN }}
           script: |
-            const association = context.payload.pull_request.author_association;
-            const trustedAssociations = ['MEMBER', 'OWNER', 'COLLABORATOR'];
+            const fs = require('fs');
             const author = context.payload.pull_request.user.login;
 
-            if (trustedAssociations.includes(association)) {
-              core.info(`${author} has author_association=${association} — trusted.`);
-              core.setOutput('trusted', 'true');
-              return;
+            let trusted = false;
+            try {
+              const owners = fs.readFileSync('OWNERS', 'utf8');
+              trusted = new RegExp(`^\\s*-\\s*${author}\\s*$`, 'm').test(owners);
+            } catch (err) {
+              core.warning(`Could not read OWNERS file: ${err.message}`);
             }
 
-            try {
-              await github.rest.orgs.checkMembershipForUser({
-                org: context.repo.owner,
-                username: author,
-              });
-              core.info(`${author} is a member of ${context.repo.owner} (author_association was '${association}', likely private membership) — trusted.`);
-              core.setOutput('trusted', 'true');
-            } catch (err) {
-              core.info(`${author} is not a member of ${context.repo.owner} (author_association='${association}') — untrusted.`);
-              core.setOutput('trusted', 'false');
-            }
+            core.info(`${author} is ${trusted ? '' : 'not '}listed in OWNERS (approvers/reviewers) — ${trusted ? 'trusted' : 'untrusted'}.`);
+            core.setOutput('trusted', trusted ? 'true' : 'false');
 
   cluster-check:
     needs: check-trust

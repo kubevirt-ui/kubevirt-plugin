@@ -17,28 +17,32 @@ jobs:
       github.event.issue.pull_request != null &&
       contains(github.event.comment.body, '/retest-e2e')
     steps:
+      # No ref override: reads OWNERS from the default branch, not whatever the
+      # commenter's PR branch might contain.
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      # OWNERS (approvers/reviewers) is the single source of truth for trust —
+      # the same source Prow uses for /lgtm, /approve. author_association and
+      # org membership are unreliable proxies (misreport private membership,
+      # need extra token scope), so we don't use them here.
       - name: Check trusted author and re-run E2E workflow
         uses: actions/github-script@v9
         with:
           github-token: ${{ secrets.BOT_PAT || secrets.GITHUB_TOKEN }}
           script: |
+            const fs = require('fs');
             const author = context.payload.comment.user.login;
-            const association = context.payload.comment.author_association;
-            const trustedAssociations = ['MEMBER', 'OWNER', 'COLLABORATOR'];
-            let trusted = trustedAssociations.includes(association);
 
-            if (!trusted) {
-              try {
-                await github.rest.orgs.checkMembershipForUser({
-                  org: context.repo.owner,
-                  username: author,
-                });
-                core.info(`${author} is a member of ${context.repo.owner} (author_association was '${association}', likely private membership) — trusted.`);
-                trusted = true;
-              } catch {
-                core.info(`${author} is not a trusted member (author_association='${association}') — ignoring /retest-e2e.`);
-              }
+            let trusted = false;
+            try {
+              const owners = fs.readFileSync('OWNERS', 'utf8');
+              trusted = new RegExp(`^\\s*-\\s*${author}\\s*$`, 'm').test(owners);
+            } catch (err) {
+              core.warning(`Could not read OWNERS file: ${err.message}`);
             }
+
+            core.info(`${author} is ${trusted ? '' : 'not '}listed in OWNERS (approvers/reviewers) — ${trusted ? 'trusted' : 'untrusted, ignoring /retest-e2e'}.`);
 
             if (!trusted) {
               await github.rest.reactions.createForIssueComment({
