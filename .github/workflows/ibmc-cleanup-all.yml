@@ -161,7 +161,7 @@ jobs:
         run: |
           echo "=== Virtual Server Instances ==="
           INSTANCES=$(ibmcloud is instances --output json 2>/dev/null \
-            | jq -r --arg cn "${CLUSTER_NAME}" '.[] | select(.name | startswith($cn)) | "\(.id)\t\(.name)\t\(.status)"' || true)
+            | jq -r --arg cn "${CLUSTER_NAME}" 'if type == "array" then .[] | select(type == "object") | select(.name | startswith($cn)) | "\(.id)\t\(.name)\t\(.status)" else empty end' || true)
 
           if [[ -z "${INSTANCES}" ]]; then
             echo "No VMs found matching '${CLUSTER_NAME}*'"
@@ -181,7 +181,7 @@ jobs:
         run: |
           echo "=== Load Balancers ==="
           LBS=$(ibmcloud is lbs --output json 2>/dev/null \
-            | jq -r --arg cn "${CLUSTER_NAME}" '.[] | select(.name | startswith($cn)) | "\(.id)\t\(.name)\t\(.provisioning_status)"' || true)
+            | jq -r --arg cn "${CLUSTER_NAME}" 'if type == "array" then .[] | select(type == "object") | select(.name | startswith($cn)) | "\(.id)\t\(.name)\t\(.provisioning_status)" else empty end' || true)
 
           if [[ -z "${LBS}" ]]; then
             echo "No LBs found matching '${CLUSTER_NAME}*'"
@@ -202,7 +202,7 @@ jobs:
           echo "=== Waiting for LB deletions to complete ==="
           for i in $(seq 1 12); do
             REMAINING=$(ibmcloud is lbs --output json 2>/dev/null \
-              | jq -r --arg cn "${CLUSTER_NAME}" '[.[] | select(.name | startswith($cn) or (.name | startswith("kube-" + $cn)))] | length')
+              | jq -r --arg cn "${CLUSTER_NAME}" 'if type == "array" then [.[] | select(type == "object") | select((.name | startswith($cn)) or (.name | startswith("kube-" + $cn)))] | length else 0 end' 2>/dev/null || echo 0)
             if [[ "${REMAINING}" -eq 0 || "${REMAINING}" == "null" ]]; then
               echo "  All LBs deleted."
               break
@@ -215,7 +215,7 @@ jobs:
         run: |
           echo "=== Detach gateways from subnets, then delete subnets ==="
           SUBS=$(ibmcloud is subnets --output json 2>/dev/null \
-            | jq -r --arg cn "${CLUSTER_NAME}" '.[] | select(.name | startswith($cn)) | "\(.id)\t\(.name)\t\(.public_gateway.id // "none")"' || true)
+            | jq -r --arg cn "${CLUSTER_NAME}" 'if type == "array" then .[] | select(type == "object") | select(.name | startswith($cn)) | "\(.id)\t\(.name)\t\(.public_gateway.id // "none")" else empty end' || true)
 
           if [[ -z "${SUBS}" ]]; then
             echo "No subnets found matching '${CLUSTER_NAME}*'"
@@ -241,7 +241,7 @@ jobs:
         run: |
           echo "=== Public Gateways ==="
           PGS=$(ibmcloud is public-gateways --output json 2>/dev/null \
-            | jq -r --arg cn "${CLUSTER_NAME}" '.[] | select(.name | startswith($cn)) | "\(.id)\t\(.name)\t\(.zone.name)"' || true)
+            | jq -r --arg cn "${CLUSTER_NAME}" 'if type == "array" then .[] | select(type == "object") | select(.name | startswith($cn)) | "\(.id)\t\(.name)\t\(.zone.name)" else empty end' || true)
 
           if [[ -z "${PGS}" ]]; then
             echo "No public gateways found matching '${CLUSTER_NAME}*'"
@@ -260,7 +260,7 @@ jobs:
         run: |
           echo "=== Floating IPs ==="
           FIPS=$(ibmcloud is ips --output json 2>/dev/null \
-            | jq -r --arg cn "${CLUSTER_NAME}" '.[] | select(.name | startswith($cn)) | "\(.id)\t\(.name)\t\(.status)"' || true)
+            | jq -r --arg cn "${CLUSTER_NAME}" 'if type == "array" then .[] | select(type == "object") | select(.name | startswith($cn)) | "\(.id)\t\(.name)\t\(.status)" else empty end' || true)
 
           if [[ -z "${FIPS}" ]]; then
             echo "No floating IPs found matching '${CLUSTER_NAME}*'"
@@ -278,7 +278,7 @@ jobs:
         run: |
           echo "=== Security Groups ==="
           SGS=$(ibmcloud is sgs --output json 2>/dev/null \
-            | jq -r --arg cn "${CLUSTER_NAME}" '.[] | select(.name | startswith($cn)) | "\(.id)\t\(.name)"' || true)
+            | jq -r --arg cn "${CLUSTER_NAME}" 'if type == "array" then .[] | select(type == "object") | select(.name | startswith($cn)) | "\(.id)\t\(.name)" else empty end' || true)
 
           if [[ -z "${SGS}" ]]; then
             echo "No security groups found matching '${CLUSTER_NAME}*'"
@@ -304,7 +304,7 @@ jobs:
           ibmcloud cis instance-set "${CIS_ID}" 2>/dev/null || true
           for zone_id in $(ibmcloud cis domains --output json 2>/dev/null | jq -r '.[].id' || true); do
             RECORDS=$(ibmcloud cis dns-records "${zone_id}" --output json 2>/dev/null \
-              | jq -r --arg cn "${CLUSTER_NAME}" '.[] | select(.name | contains($cn)) | "\(.id)\t\(.name)\t\(.type)\t\(.content)"' || true)
+              | jq -r --arg cn "${CLUSTER_NAME}" 'if type == "array" then .[] | select(type == "object") | select(.name | contains($cn)) | "\(.id)\t\(.name)\t\(.type)\t\(.content)" else empty end' || true)
             if [[ -n "${RECORDS}" ]]; then
               echo "${RECORDS}" | column -t
               if [[ "${DRY_RUN}" == "false" ]]; then
@@ -325,7 +325,7 @@ jobs:
         run: |
           echo "=== VPC Resources ==="
           VPC_ID=$(ibmcloud is vpcs --output json 2>/dev/null \
-            | jq -r --arg n "${VPC_NAME}" '.[] | select(.name == $n) | .id // empty' || true)
+            | jq -r --arg n "${VPC_NAME}" 'if type == "array" then .[] | select(type == "object") | select(.name == $n) | .id // empty else empty end' || true)
 
           if [[ -z "${VPC_ID}" ]]; then
             echo "No VPC '${VPC_NAME}' found."
@@ -336,23 +336,23 @@ jobs:
 
           echo "Subnets:"
           ibmcloud is subnets --output json 2>/dev/null \
-            | jq -r --arg vpc "${VPC_ID}" '.[] | select(.vpc.id == $vpc) | "  \(.id)\t\(.name)"' | column -t || true
+            | jq -r --arg vpc "${VPC_ID}" 'if type == "array" then .[] | select(type == "object") | select(.vpc.id == $vpc) | "  \(.id)\t\(.name)" else empty end' | column -t || true
 
           echo "Public Gateways:"
           ibmcloud is public-gateways --output json 2>/dev/null \
-            | jq -r --arg vpc "${VPC_ID}" '.[] | select(.vpc.id == $vpc) | "  \(.id)\t\(.name)"' | column -t || true
+            | jq -r --arg vpc "${VPC_ID}" 'if type == "array" then .[] | select(type == "object") | select(.vpc.id == $vpc) | "  \(.id)\t\(.name)" else empty end' | column -t || true
 
           if [[ "${DRY_RUN}" == "false" ]]; then
             echo "Deleting public gateways..."
-            for gw_id in $(ibmcloud is public-gateways --output json 2>/dev/null | jq -r --arg vpc "${VPC_ID}" '.[] | select(.vpc.id == $vpc) | .id' || true); do
-              for sub_id in $(ibmcloud is subnets --output json 2>/dev/null | jq -r --arg gw "${gw_id}" '.[] | select(.public_gateway.id == $gw) | .id' || true); do
+            for gw_id in $(ibmcloud is public-gateways --output json 2>/dev/null | jq -r --arg vpc "${VPC_ID}" 'if type == "array" then .[] | select(type == "object") | select(.vpc.id == $vpc) | .id else empty end' || true); do
+              for sub_id in $(ibmcloud is subnets --output json 2>/dev/null | jq -r --arg gw "${gw_id}" 'if type == "array" then .[] | select(type == "object") | select(.public_gateway.id == $gw) | .id else empty end' || true); do
                 ibmcloud is subnet-public-gateway-detach "${sub_id}" -f 2>/dev/null || true
               done
               ibmcloud is public-gateway-delete "${gw_id}" -f 2>/dev/null || true
             done
 
             echo "Deleting subnets..."
-            for sub_id in $(ibmcloud is subnets --output json 2>/dev/null | jq -r --arg vpc "${VPC_ID}" '.[] | select(.vpc.id == $vpc) | .id' || true); do
+            for sub_id in $(ibmcloud is subnets --output json 2>/dev/null | jq -r --arg vpc "${VPC_ID}" 'if type == "array" then .[] | select(type == "object") | select(.vpc.id == $vpc) | .id else empty end' || true); do
               ibmcloud is subnet-delete "${sub_id}" -f 2>/dev/null || true
             done
 

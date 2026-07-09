@@ -41,7 +41,7 @@ if [[ -n "${STALE_SUBNET_IDS}" ]]; then
     | while read -r id; do echo "  Deleting LB ${id} (in stale subnet)"; ibmcloud is load-balancer-delete "${id}" -f 2>&1 || echo "  WARNING: failed to delete LB ${id}"; done
 fi
 echo "${ALL_LBS}" \
-  | jq -r --arg cn "${CLUSTER_NAME}" 'if type == "array" then .[] | select(.name | startswith($cn) or (.name | startswith("kube-" + $cn))) | .id else empty end' \
+  | jq -r --arg cn "${CLUSTER_NAME}" 'if type == "array" then .[] | select((.name | startswith($cn)) or (.name | startswith("kube-" + $cn))) | .id else empty end' \
   | while read -r id; do echo "  Deleting LB ${id} (by name)"; ibmcloud is load-balancer-delete "${id}" -f 2>&1 || echo "  WARNING: failed to delete LB ${id}"; done
 sleep 60
 
@@ -58,7 +58,7 @@ for i in $(seq 1 24); do
   fi
   BY_NAME=$(echo "${CURRENT_LBS}" \
     | jq -r --arg cn "${CLUSTER_NAME}" \
-      'if type == "array" then [.[] | select(.name | startswith($cn) or (.name | startswith("kube-" + $cn)))] | length else 0 end' 2>/dev/null || echo "0")
+      'if type == "array" then [.[] | select((.name | startswith($cn)) or (.name | startswith("kube-" + $cn)))] | length else 0 end' 2>/dev/null || echo "0")
   REMAINING=$((REMAINING > BY_NAME ? REMAINING : REMAINING + BY_NAME))
   if [[ "${REMAINING}" -eq 0 ]]; then
     echo "  All LBs deleted."
