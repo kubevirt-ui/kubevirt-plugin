@@ -24,8 +24,19 @@ on:
         options:
           - 'false'
           - 'true'
+      expected_cluster_count:
+        description: >-
+          Safety gate (destructive runs only): cluster_name is a PREFIX match, and
+          with multiple concurrent hot clusters (e.g. kubevirt-plugin-ci-91 also
+          starts with kubevirt-plugin-ci) it can silently match more than one
+          cluster. Set this to how many distinct clusters you expect to match; the
+          run fails before deleting anything if the actual count differs.
+        required: true
+        default: '1'
+        type: string
 
 permissions:
+  actions: read
   contents: read
 
 env:
@@ -38,6 +49,13 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
+      - name: Validate cluster_name format
+        run: |
+          if [[ ! "${CLUSTER_NAME}" =~ ^[a-z0-9][a-z0-9-]*$ ]]; then
+            echo "::error::Invalid cluster_name: '${CLUSTER_NAME}'. Must start with a lower-case letter/digit and contain only lower-case letters, digits, and hyphens (matches real cluster naming). No length cap here since it's used as a prefix filter, not a single cluster's literal name."
+            exit 1
+          fi
+
       - name: Setup IBM Cloud CLI
         uses: IBM/actions-ibmcloud-cli@v2
         with:
@@ -48,6 +66,96 @@ jobs:
 
       - name: Install CIS plugin
         run: ibmcloud plugin install cis -f 2>/dev/null || true
+
+      - name: Detect distinct clusters matching prefix
+        id: detect_clusters
+        run: |
+          CIS_ID=$(ibmcloud cis instances --output json 2>/dev/null | jq -r '.[0].crn // empty' || true)
+
+          DNS_CLUSTERS="[]"
+          if [[ -n "${CIS_ID}" ]]; then
+            ibmcloud cis instance-set "${CIS_ID}" 2>/dev/null || true
+            for zone_id in $(ibmcloud cis domains --output json 2>/dev/null | jq -r '.[].id' || true); do
+              ZONE_CLUSTERS=$(ibmcloud cis dns-records "${zone_id}" --output json 2>/dev/null \
+                | jq -c --arg cn "${CLUSTER_NAME}" \
+                  '[.[] | select(.type == "A" or .type == "CNAME") | .name
+                    | capture("^api\\.(?<name>[^.]+)\\.") | .name
+                    | select(startswith($cn))] | unique' \
+                2>/dev/null || echo "[]")
+              DNS_CLUSTERS=$(echo "${DNS_CLUSTERS}" | jq -c --argjson z "${ZONE_CLUSTERS}" '. + $z | unique' 2>/dev/null || echo "${DNS_CLUSTERS}")
+            done
+          fi
+
+          ROKS_CLUSTERS=$(ibmcloud oc cluster ls --output json 2>/dev/null \
+            | jq -c --arg cn "${CLUSTER_NAME}" '[.[] | select(.name | startswith($cn)) | .name] // []' \
+            || echo "[]")
+
+          ALL_CLUSTERS=$(jq -cn --argjson a "${DNS_CLUSTERS}" --argjson b "${ROKS_CLUSTERS}" '($a + $b) | unique')
+          COUNT=$(echo "${ALL_CLUSTERS}" | jq 'length')
+          DETECTION_AVAILABLE="true"
+          if [[ -z "${CIS_ID}" ]]; then
+            echo "::warning::No CIS instance found — IPI cluster detection via DNS is unavailable (ROKS-only detection still applied). Safety gate will be skipped; proceed carefully."
+            if [[ "${COUNT}" -eq 0 ]]; then
+              DETECTION_AVAILABLE="false"
+            fi
+          fi
+
+          echo "Distinct clusters matching prefix '${CLUSTER_NAME}': ${ALL_CLUSTERS}"
+          echo "clusters=$(echo "${ALL_CLUSTERS}" | jq -c .)" >> "$GITHUB_OUTPUT"
+          echo "count=${COUNT}" >> "$GITHUB_OUTPUT"
+          echo "detection_available=${DETECTION_AVAILABLE}" >> "$GITHUB_OUTPUT"
+
+      - name: Enforce expected cluster count
+        if: env.DRY_RUN == 'false' && steps.detect_clusters.outputs.detection_available == 'true'
+        env:
+          EXPECTED_COUNT: ${{ inputs.expected_cluster_count || '1' }}
+          ACTUAL_COUNT: ${{ steps.detect_clusters.outputs.count }}
+          MATCHED_CLUSTERS: ${{ steps.detect_clusters.outputs.clusters }}
+        run: |
+          if [[ "${ACTUAL_COUNT}" != "${EXPECTED_COUNT}" ]]; then
+            echo "::error::cluster_name '${CLUSTER_NAME}' matches ${ACTUAL_COUNT} distinct cluster(s): ${MATCHED_CLUSTERS} — but expected_cluster_count=${EXPECTED_COUNT}."
+            echo "::error::Narrow cluster_name to target one cluster precisely, or set expected_cluster_count=${ACTUAL_COUNT} to confirm you intend to sweep all of them."
+            exit 1
+          fi
+          echo "Confirmed: cluster_name matches exactly ${ACTUAL_COUNT} distinct cluster(s), as expected."
+
+      - name: Check for active CI jobs on matched clusters
+        if: env.DRY_RUN == 'false' && steps.detect_clusters.outputs.detection_available == 'true'
+        uses: actions/github-script@v9
+        env:
+          MATCHED_CLUSTERS: ${{ steps.detect_clusters.outputs.clusters }}
+        with:
+          script: |
+            const clusters = JSON.parse(process.env.MATCHED_CLUSTERS || '[]');
+            const workflows = [
+              '.github/workflows/hot-cluster-e2e.yml',
+              '.github/workflows/hot-cluster-e2e-run.yml',
+              '.github/workflows/ibmc-cluster-setup.yml',
+            ];
+            const busy = new Set();
+
+            for (const clusterName of clusters) {
+              const tag = `[${clusterName}]`;
+              for (const workflow of workflows) {
+                for (const status of ['in_progress', 'queued']) {
+                  const runs = await github.paginate(github.rest.actions.listWorkflowRuns, {
+                    ...context.repo,
+                    workflow_id: workflow,
+                    status,
+                    per_page: 100,
+                  });
+                  if (runs.some(r => r.display_title && r.display_title.includes(tag))) {
+                    busy.add(clusterName);
+                  }
+                }
+              }
+            }
+
+            if (busy.size > 0) {
+              core.setFailed(`Refusing to clean up — these matched clusters have active CI jobs: ${[...busy].join(', ')}. Wait for them to finish, or narrow cluster_name to exclude them.`);
+            } else {
+              core.info('No active CI jobs found on any matched cluster — safe to proceed.');
+            }
 
       - name: Find and delete VMs
         run: |
@@ -259,8 +367,42 @@ jobs:
           echo "=== ROKS Clusters ==="
           ibmcloud oc cluster ls 2>&1 | rg "${CLUSTER_NAME}" || echo "No ROKS clusters matching '${CLUSTER_NAME}'."
 
+      - name: Clean up ghost runners for matched clusters
+        if: env.DRY_RUN == 'false'
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.BOT_PAT }}
+          MATCHED_CLUSTERS: ${{ steps.detect_clusters.outputs.clusters }}
+        run: |
+          echo "=== Offline Self-Hosted Runners ==="
+          CLUSTERS_JSON="${MATCHED_CLUSTERS:-[]}"
+          # Fall back to the raw prefix if detection found nothing (e.g. no CIS
+          # instance / non-IPI cluster), so ghost-runner cleanup still runs.
+          if [[ "${CLUSTERS_JSON}" == "[]" || -z "${CLUSTERS_JSON}" ]]; then
+            CLUSTERS_JSON=$(jq -cn --arg cn "${CLUSTER_NAME}" '[$cn]')
+          fi
+
+          echo "${CLUSTERS_JSON}" | jq -r '.[]' | while read -r name; do
+            echo "Checking for offline self-hosted runners with label '${name}'..."
+            # gh api's --jq only accepts a single jq-expression string (no --arg
+            # support), so interpolate the already-validated/detected name directly.
+            RUNNERS=$(gh api "/repos/${{ github.repository }}/actions/runners" --jq ".runners[] | select(.status == \"offline\") | select(.labels[].name == \"${name}\") | .id" 2>/dev/null || true)
+            if [[ -z "${RUNNERS}" ]]; then
+              echo "  No offline '${name}' runners found"
+            else
+              for runner_id in ${RUNNERS}; do
+                echo "  Deleting offline runner ${runner_id} (label: ${name})..."
+                gh api -X DELETE "/repos/${{ github.repository }}/actions/runners/${runner_id}" || echo "  Failed to delete runner ${runner_id}"
+              done
+            fi
+          done
+
       - name: Summary
         if: always()
+        env:
+          MATCHED_CLUSTERS: ${{ steps.detect_clusters.outputs.clusters }}
+          MATCHED_COUNT: ${{ steps.detect_clusters.outputs.count }}
+          DETECTION_AVAILABLE: ${{ steps.detect_clusters.outputs.detection_available }}
         run: |
           echo "## IBM Cloud Resource Cleanup" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
@@ -269,7 +411,12 @@ jobs:
           echo "| Cluster prefix | \`${CLUSTER_NAME}\` |" >> "$GITHUB_STEP_SUMMARY"
           echo "| Dry run | \`${DRY_RUN}\` |" >> "$GITHUB_STEP_SUMMARY"
           echo "| Clean VPC | \`${{ inputs.clean_vpc }}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Detected distinct clusters | \`${MATCHED_COUNT:-N/A} (${MATCHED_CLUSTERS:-unavailable})\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Expected cluster count | \`${{ inputs.expected_cluster_count }}\` |" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
+          if [[ "${DETECTION_AVAILABLE}" != "true" ]]; then
+            echo "⚠️ Cluster-count/active-job safety checks were **skipped** (detection unavailable — no CIS instance and no matching ROKS clusters found)." >> "$GITHUB_STEP_SUMMARY"
+          fi
           if [[ "${DRY_RUN}" == "true" ]]; then
             echo "**Dry run** — no resources were deleted. Set dry_run to false to delete." >> "$GITHUB_STEP_SUMMARY"
           else

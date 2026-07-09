@@ -23,7 +23,7 @@ HPP_VERSION="${HPP_VERSION:-release-v0.21}"
 CNV_NS="openshift-cnv"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 
 echo "=== OpenShift Virtualization (CNV) Installation ==="
 echo "  KVM_EMULATION: ${KVM_EMULATION}"
@@ -85,11 +85,12 @@ done
 # --- Wait for HCO operator deployment ---
 echo "Waiting for HCO operator deployment to be created..."
 for i in $(seq 1 60); do
-  DEPLOY_COUNT=$(oc get deployments -n ${CNV_NS} \
-    -l "app.kubernetes.io/component=deployment,app.kubernetes.io/managed-by=hco-operator" \
-    --no-headers 2>/dev/null | wc -l || echo "0")
-  # Also check the operator deployment itself
-  HCO_DEPLOY=$(oc get deployment hco-operator -n ${CNV_NS} --no-headers 2>/dev/null | wc -l || echo "0")
+  # Note: `|| true` (not `|| echo "0"`) — with `pipefail`, a failing `oc get`
+  # (e.g. resource not found, which is expected while polling) makes the
+  # pipeline's exit status non-zero even though `wc -l` already succeeded and
+  # printed "0"; `|| echo "0"` would then append a second "0" line, breaking
+  # the numeric comparison below.
+  HCO_DEPLOY=$(oc get deployment hco-operator -n ${CNV_NS} --no-headers 2>/dev/null | wc -l || true)
   if [[ "${HCO_DEPLOY}" -gt 0 ]]; then
     echo "HCO operator deployment found"
     break

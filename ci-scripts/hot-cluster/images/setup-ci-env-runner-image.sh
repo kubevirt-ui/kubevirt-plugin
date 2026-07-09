@@ -21,8 +21,8 @@
 # can be pulled.
 #
 set -euo pipefail
-SCRIPT_DIR="$(dirname "${BASH_SOURCE[0]}")"
-REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "${SCRIPT_DIR}/../../.." && pwd)"
 
 source "${REPO_ROOT}/ci-scripts/_cluster-helpers.sh"
 verify_oc
