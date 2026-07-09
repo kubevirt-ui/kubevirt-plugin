@@ -1,0 +1,53 @@
+# Grants the ARC runner ServiceAccount just enough permission to build the
+# kubevirt-plugin image in-cluster (CNV-92150), scoped to the manual-console
+# namespace only. arc-runner-rbac.yaml intentionally does NOT grant
+# ImageStream/BuildConfig access cluster-wide (or even namespace-scoped) to
+# keep the E2E path's RBAC surface minimal; this file is additive and only
+# takes effect inside the manual-console namespace.
+#
+# Idempotent, one-time bootstrap per cluster (namespace must already exist,
+# or be created first -- see below). Apply manually:
+#   oc create namespace manual-console --dry-run=client -o yaml | oc apply -f -
+#   oc apply -f ci-scripts/manual-console/manual-console-rbac.yaml
+#
+# If RUNNER_SCALE_SET_NAME / ARC_RUNNERS_NS differ from defaults, edit the
+# subject below (see arc-runner-rbac.yaml for the same caveat).
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: manual-console-image-build
+  namespace: manual-console
+  labels:
+    app.kubernetes.io/component: manual-console-rbac
+rules:
+  - apiGroups: ['image.openshift.io']
+    resources: ['imagestreams', 'imagestreams/layers', 'imagestreamtags']
+    verbs: ['get', 'list', 'watch', 'create', 'update', 'patch']
+  - apiGroups: ['build.openshift.io']
+    resources: ['buildconfigs']
+    verbs: ['get', 'list', 'watch', 'create', 'update', 'patch']
+  - apiGroups: ['build.openshift.io']
+    resources: ['buildconfigs/instantiatebinary']
+    verbs: ['create']
+  - apiGroups: ['build.openshift.io']
+    resources: ['builds']
+    verbs: ['get', 'list', 'watch']
+  - apiGroups: ['build.openshift.io']
+    resources: ['builds/log']
+    verbs: ['get']
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: manual-console-image-build
+  namespace: manual-console
+  labels:
+    app.kubernetes.io/component: manual-console-rbac
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: manual-console-image-build
+subjects:
+  - kind: ServiceAccount
+    name: kubevirt-plugin-ci-gha-rs-no-permission
+    namespace: arc-runners
