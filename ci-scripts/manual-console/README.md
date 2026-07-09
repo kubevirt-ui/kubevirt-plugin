@@ -14,12 +14,12 @@ CI run, and runs with `BRIDGE_USER_AUTH=disabled` (a bearer token, no login
 wall) -- suitable for automated Playwright tests, not for a human to browse.
 Manual-console is the same underlying stack with three differences:
 
-| | E2E | Manual console |
-| - | --- | --------------- |
-| Namespace | Ephemeral `kubevirt-plugin-ci-test-<run_id>` | Persistent `manual-console` |
-| Lifecycle | Torn down after the test run; 2h TTL reaper | Persists until the next deploy; **not** TTL-reaped |
-| Auth | `BRIDGE_USER_AUTH=disabled` (bearer token) | `BRIDGE_USER_AUTH=openshift` (OAuth login) |
-| Plugin image | Built on `ubuntu-latest`, pushed to `ttl.sh` | Built in-cluster via an OpenShift BuildConfig |
+|              | E2E                                          | Manual console                                     |
+| ------------ | -------------------------------------------- | -------------------------------------------------- |
+| Namespace    | Ephemeral `kubevirt-plugin-ci-test-<run_id>` | Persistent `manual-console`                        |
+| Lifecycle    | Torn down after the test run; 2h TTL reaper  | Persists until the next deploy; **not** TTL-reaped |
+| Auth         | `BRIDGE_USER_AUTH=disabled` (bearer token)   | `BRIDGE_USER_AUTH=openshift` (OAuth login)         |
+| Plugin image | Built on `ubuntu-latest`, pushed to `ttl.sh` | Built in-cluster via an OpenShift BuildConfig      |
 
 ## Prerequisites
 
@@ -27,6 +27,23 @@ The target cluster must already be provisioned via **IBM Cloud Hot Cluster
 Setup** ([`ibmc-cluster-setup.yml`](../../.github/workflows/ibmc-cluster-setup.yml)),
 which installs the ARC runner scale set and `ci-env-controller` this
 workflow depends on.
+
+The ARC runner's ServiceAccount also needs permission to manage
+ImageStreams/BuildConfigs inside the `manual-console` namespace so it can
+build the plugin image (see "How it works" below). This is a one-time,
+per-cluster bootstrap -- `arc-runner-rbac.yaml` intentionally keeps that
+permission out of the cluster-wide E2E RBAC, so it's granted separately and
+scoped to just this namespace:
+
+```bash
+oc create namespace manual-console --dry-run=client -o yaml | oc apply -f -
+oc apply -f ci-scripts/manual-console/manual-console-rbac.yaml
+```
+
+If your cluster uses a custom `RUNNER_SCALE_SET_NAME` or `ARC_RUNNERS_NS` (see
+[`arc/README.md`](../hot-cluster/arc/README.md)), edit the `ServiceAccount`
+subject in `manual-console-rbac.yaml` first -- it hardcodes the default
+`kubevirt-plugin-ci-gha-rs-no-permission` / `arc-runners`.
 
 ## Deploying
 
@@ -97,10 +114,10 @@ ConfigMap that omits them (i.e. every existing one) behaves exactly as
 before. See [`ci-env/README.md`](../hot-cluster/ci-env/README.md) for the
 base contract.
 
-| Field | Description |
-| ----- | ------------ |
-| `auth-mode` | `openshift` to enable OAuth login; omitted/anything else keeps the default disabled (bearer-token) behavior |
-| `htpasswd-user` | Username to upsert into the cluster's htpasswd identity provider (required when `auth-mode=openshift`) |
+| Field                  | Description                                                                                                    |
+| ---------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `auth-mode`            | `openshift` to enable OAuth login; omitted/anything else keeps the default disabled (bearer-token) behavior    |
+| `htpasswd-user`        | Username to upsert into the cluster's htpasswd identity provider (required when `auth-mode=openshift`)         |
 | `htpasswd-secret-name` | Name of a Secret (in the same `ci-env-namespace`) with key `password`; read once and deleted by the controller |
 
 The manual-console ConfigMap also uses the label
@@ -118,10 +135,11 @@ TTL reaper** that force-cleans stale E2E environments.
 
 ## Files
 
-| File | Purpose |
-| ---- | ------- |
-| `images/setup-plugin-image.sh` | Builds the kubevirt-plugin image in-cluster via an OpenShift BuildConfig |
-| `ensure-manual-console-user.sh` | Upserts the htpasswd user + extracts the cluster CA bundle; invoked by `ci-env-controller` (embedded into its image -- see below) |
+| File                            | Purpose                                                                                                                                         |
+| ------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| `images/setup-plugin-image.sh`  | Builds the kubevirt-plugin image in-cluster via an OpenShift BuildConfig                                                                        |
+| `ensure-manual-console-user.sh` | Upserts the htpasswd user + extracts the cluster CA bundle; invoked by `ci-env-controller` (embedded into its image -- see below)               |
+| `manual-console-rbac.yaml`      | One-time, per-cluster Role/RoleBinding granting the ARC runner SA ImageStream/BuildConfig access, scoped to the `manual-console` namespace only |
 
 `ensure-manual-console-user.sh` is embedded into the `ci-env-runner` image at
 build time (via a symlink in

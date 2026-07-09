@@ -48,6 +48,11 @@ spec:
               value: "openshift"
             - name: BRIDGE_CA_FILE
               value: "/etc/console-auth/ca.crt"
+            # Required so bridge builds an absolute redirect_uri (matching the
+            # OAuthClient's registered redirectURIs) instead of a relative
+            # "/auth/callback", which the OAuth server rejects as invalid_request.
+            - name: BRIDGE_BASE_ADDRESS
+              value: {{ printf "https://%s" (required "console.route.host is required for auth.mode=openshift" .Values.console.route.host) | quote }}
             - name: BRIDGE_USER_AUTH_OIDC_CLIENT_ID
               value: {{ include "ci-test-stack.oauthClientName" . | quote }}
             - name: BRIDGE_USER_AUTH_OIDC_CLIENT_SECRET_FILE
