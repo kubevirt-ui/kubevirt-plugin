@@ -221,7 +221,7 @@ export const CLUSTER_INSTANCE_TYPE_CREATION_FIXTURES: InstanceTypeTestCaseParams
 export const INSTANCE_TYPE_SMOKE_TEST_FIXTURE: InstanceTypeTestCaseParams = {
   expectedBehavior: {
     shouldCreate: true,
-    timeout: 15000,
+    timeout: INSTANCE_TYPE_LIST_TIMEOUT_MS,
   },
   instanceTypeConfig: {
     cpuGuest: 2,

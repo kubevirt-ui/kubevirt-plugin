@@ -1,5 +1,7 @@
 import type { VirtualMachineConfig } from '@/data-factories/virtual-machine-factory';
 
+const TEMPLATE_VM_TIMEOUT_MS = 30000;
+
 /**
  * Template selector configuration for VM creation
  */
@@ -37,7 +39,7 @@ export const TEMPLATE_VM_CREATION_FIXTURES: TemplateVmTestCaseParams[] = [
   {
     expectedBehavior: {
       shouldCreate: true,
-      timeout: 30000,
+      timeout: TEMPLATE_VM_TIMEOUT_MS,
     },
     testCaseName: 'CentOS Stream 9 VM from template',
     templateConfig: {
@@ -57,7 +59,7 @@ export const TEMPLATE_VM_CREATION_FIXTURES: TemplateVmTestCaseParams[] = [
   {
     expectedBehavior: {
       shouldCreate: true,
-      timeout: 30000,
+      timeout: TEMPLATE_VM_TIMEOUT_MS,
     },
     testCaseName: 'Fedora VM from template (not started)',
     templateConfig: {
@@ -77,7 +79,7 @@ export const TEMPLATE_VM_CREATION_FIXTURES: TemplateVmTestCaseParams[] = [
   {
     expectedBehavior: {
       shouldCreate: true,
-      timeout: 30000,
+      timeout: TEMPLATE_VM_TIMEOUT_MS,
     },
     testCaseName: 'Red Hat Enterprise Linux 8 VM from template',
     templateConfig: {
@@ -97,7 +99,7 @@ export const TEMPLATE_VM_CREATION_FIXTURES: TemplateVmTestCaseParams[] = [
   {
     expectedBehavior: {
       shouldCreate: true,
-      timeout: 30000,
+      timeout: TEMPLATE_VM_TIMEOUT_MS,
     },
     testCaseName: 'Red Hat Enterprise Linux 9 VM from template (not started)',
     templateConfig: {
@@ -123,7 +125,7 @@ export const TEMPLATE_VM_OS_FIXTURES: TemplateVmTestCaseParams[] = [
   {
     expectedBehavior: {
       shouldCreate: true,
-      timeout: 30000,
+      timeout: TEMPLATE_VM_TIMEOUT_MS,
     },
     testCaseName: 'RHEL8 template VM with custom resources',
     templateConfig: {
@@ -143,7 +145,7 @@ export const TEMPLATE_VM_OS_FIXTURES: TemplateVmTestCaseParams[] = [
   {
     expectedBehavior: {
       shouldCreate: true,
-      timeout: 30000,
+      timeout: TEMPLATE_VM_TIMEOUT_MS,
     },
     testCaseName: 'RHEL9 template VM with high resources',
     templateConfig: {
@@ -169,7 +171,7 @@ export const TEMPLATE_VM_WORKLOAD_FIXTURES: TemplateVmTestCaseParams[] = [
   {
     expectedBehavior: {
       shouldCreate: true,
-      timeout: 30000,
+      timeout: TEMPLATE_VM_TIMEOUT_MS,
     },
     testCaseName: 'Server workload template VM',
     templateConfig: {
@@ -189,7 +191,7 @@ export const TEMPLATE_VM_WORKLOAD_FIXTURES: TemplateVmTestCaseParams[] = [
   {
     expectedBehavior: {
       shouldCreate: true,
-      timeout: 30000,
+      timeout: TEMPLATE_VM_TIMEOUT_MS,
     },
     testCaseName: 'CentOS Stream9 workload template VM (not started)',
     templateConfig: {
@@ -214,7 +216,7 @@ export const TEMPLATE_VM_WORKLOAD_FIXTURES: TemplateVmTestCaseParams[] = [
 export const TEMPLATE_VM_SMOKE_TEST_FIXTURE: TemplateVmTestCaseParams = {
   expectedBehavior: {
     shouldCreate: true,
-    timeout: 30000,
+    timeout: TEMPLATE_VM_TIMEOUT_MS,
   },
   testCaseName: 'standard template VM for smoke testing',
   templateConfig: {

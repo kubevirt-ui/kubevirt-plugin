@@ -245,6 +245,7 @@ export class EnvVariables {
     if (value === '0' || value === 'false') {
       return false;
     }
+    // Enabled by default when resource check is enabled
     return true;
   }
 

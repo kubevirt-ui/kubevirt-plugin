@@ -1,16 +1,19 @@
 import type { VirtualMachineConfig } from '@/data-factories/virtual-machine-factory';
 
+const VM_CREATION_TIMEOUT_MS = 30000;
+const VM_CREATION_LARGE_TIMEOUT_MS = 45000;
+
 /**
- * Base interface for VM test case parameters
+ * Base type for VM test case parameters
  */
-export interface VmTestCaseParams {
+export type VmTestCaseParams = {
   expectedBehavior?: {
     shouldCreate: boolean;
     timeout?: number;
   };
   testCaseName: string;
   vmConfig: Partial<VirtualMachineConfig>;
-}
+};
 
 /**
  * VM creation test fixtures - different VM configurations to test
@@ -19,7 +22,7 @@ export const VM_CREATION_FIXTURES: VmTestCaseParams[] = [
   {
     expectedBehavior: {
       shouldCreate: true,
-      timeout: 30000,
+      timeout: VM_CREATION_TIMEOUT_MS,
     },
     testCaseName: 'basic VM with minimal resources',
     vmConfig: {
@@ -31,7 +34,7 @@ export const VM_CREATION_FIXTURES: VmTestCaseParams[] = [
   {
     expectedBehavior: {
       shouldCreate: true,
-      timeout: 30000,
+      timeout: VM_CREATION_TIMEOUT_MS,
     },
     testCaseName: 'VM with standard resources',
     vmConfig: {
@@ -43,7 +46,7 @@ export const VM_CREATION_FIXTURES: VmTestCaseParams[] = [
   {
     expectedBehavior: {
       shouldCreate: true,
-      timeout: 45000,
+      timeout: VM_CREATION_LARGE_TIMEOUT_MS,
     },
     testCaseName: 'VM with high resources',
     vmConfig: {
@@ -59,7 +62,7 @@ export const VM_CREATION_FIXTURES: VmTestCaseParams[] = [
   {
     expectedBehavior: {
       shouldCreate: true,
-      timeout: 30000,
+      timeout: VM_CREATION_TIMEOUT_MS,
     },
     testCaseName: 'VM with Manual run strategy',
     vmConfig: {
@@ -71,7 +74,7 @@ export const VM_CREATION_FIXTURES: VmTestCaseParams[] = [
   {
     expectedBehavior: {
       shouldCreate: true,
-      timeout: 30000,
+      timeout: VM_CREATION_TIMEOUT_MS,
     },
     testCaseName: 'VM with RerunOnFailure strategy',
     vmConfig: {
@@ -83,7 +86,7 @@ export const VM_CREATION_FIXTURES: VmTestCaseParams[] = [
   {
     expectedBehavior: {
       shouldCreate: true,
-      timeout: 30000,
+      timeout: VM_CREATION_TIMEOUT_MS,
     },
     testCaseName: 'VM with BIOS boot mode',
     vmConfig: {
@@ -96,7 +99,7 @@ export const VM_CREATION_FIXTURES: VmTestCaseParams[] = [
   {
     expectedBehavior: {
       shouldCreate: true,
-      timeout: 30000,
+      timeout: VM_CREATION_TIMEOUT_MS,
     },
     testCaseName: 'VM with UEFI boot mode',
     vmConfig: {
@@ -109,7 +112,7 @@ export const VM_CREATION_FIXTURES: VmTestCaseParams[] = [
   {
     expectedBehavior: {
       shouldCreate: true,
-      timeout: 30000,
+      timeout: VM_CREATION_TIMEOUT_MS,
     },
     testCaseName: 'VM with UEFI Secure Boot mode',
     vmConfig: {
@@ -128,7 +131,7 @@ export const VM_OS_FIXTURES: VmTestCaseParams[] = [
   {
     expectedBehavior: {
       shouldCreate: true,
-      timeout: 30000,
+      timeout: VM_CREATION_TIMEOUT_MS,
     },
     testCaseName: 'Fedora server VM',
     vmConfig: {
@@ -144,7 +147,7 @@ export const VM_OS_FIXTURES: VmTestCaseParams[] = [
   {
     expectedBehavior: {
       shouldCreate: true,
-      timeout: 30000,
+      timeout: VM_CREATION_TIMEOUT_MS,
     },
     testCaseName: 'Ubuntu server VM',
     vmConfig: {
@@ -160,7 +163,7 @@ export const VM_OS_FIXTURES: VmTestCaseParams[] = [
   {
     expectedBehavior: {
       shouldCreate: true,
-      timeout: 30000,
+      timeout: VM_CREATION_TIMEOUT_MS,
     },
     testCaseName: 'RHEL server VM',
     vmConfig: {
@@ -182,7 +185,7 @@ export const VM_WORKLOAD_FIXTURES: VmTestCaseParams[] = [
   {
     expectedBehavior: {
       shouldCreate: true,
-      timeout: 30000,
+      timeout: VM_CREATION_TIMEOUT_MS,
     },
     testCaseName: 'desktop workload VM',
     vmConfig: {
@@ -195,7 +198,7 @@ export const VM_WORKLOAD_FIXTURES: VmTestCaseParams[] = [
   {
     expectedBehavior: {
       shouldCreate: true,
-      timeout: 30000,
+      timeout: VM_CREATION_TIMEOUT_MS,
     },
     testCaseName: 'server workload VM',
     vmConfig: {
@@ -208,7 +211,7 @@ export const VM_WORKLOAD_FIXTURES: VmTestCaseParams[] = [
   {
     expectedBehavior: {
       shouldCreate: true,
-      timeout: 45000,
+      timeout: VM_CREATION_LARGE_TIMEOUT_MS,
     },
     testCaseName: 'high-performance workload VM',
     vmConfig: {
@@ -229,7 +232,7 @@ export const VM_NETWORK_FIXTURES: VmTestCaseParams[] = [
   {
     expectedBehavior: {
       shouldCreate: true,
-      timeout: 30000,
+      timeout: VM_CREATION_TIMEOUT_MS,
     },
     testCaseName: 'VM with virtio network interface',
     vmConfig: {
@@ -242,7 +245,7 @@ export const VM_NETWORK_FIXTURES: VmTestCaseParams[] = [
   {
     expectedBehavior: {
       shouldCreate: true,
-      timeout: 30000,
+      timeout: VM_CREATION_TIMEOUT_MS,
     },
     testCaseName: 'VM with e1000 network interface',
     vmConfig: {
@@ -260,7 +263,7 @@ export const VM_NETWORK_FIXTURES: VmTestCaseParams[] = [
 export const VM_SMOKE_TEST_FIXTURE: VmTestCaseParams = {
   expectedBehavior: {
     shouldCreate: true,
-    timeout: 30000,
+    timeout: VM_CREATION_TIMEOUT_MS,
   },
   testCaseName: 'standard VM for smoke testing',
   vmConfig: {

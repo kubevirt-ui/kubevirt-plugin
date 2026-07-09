@@ -1,9 +1,12 @@
 import { InstanceTypeSeries, InstanceTypeSize, OperatingSystem } from '@/data-factories';
 
+const CREATE_VM_TIMEOUT_MS = 60000;
+const CREATE_VM_LARGE_TIMEOUT_MS = 90000;
+
 /**
- * Interface for catalog VM creation test case parameters
+ * Catalog VM creation test case parameters
  */
-export interface CreateVmTestScenario {
+export type CreateVmTestScenario = {
   description: string;
   os: OperatingSystem;
   series: InstanceTypeSeries;
@@ -14,7 +17,7 @@ export interface CreateVmTestScenario {
     shouldCreate: boolean;
     timeout?: number;
   };
-}
+};
 
 /**
  * Catalog VM creation test fixtures - different VM configurations using Instance Types
@@ -35,7 +38,7 @@ export const CREATE_VM_CREATION_SCENARIOS: CreateVmTestScenario[] = [
     startAfterCreation: false,
     expectedBehavior: {
       shouldCreate: true,
-      timeout: 60000,
+      timeout: CREATE_VM_TIMEOUT_MS,
     },
   },
   {
@@ -47,7 +50,7 @@ export const CREATE_VM_CREATION_SCENARIOS: CreateVmTestScenario[] = [
     startAfterCreation: false,
     expectedBehavior: {
       shouldCreate: true,
-      timeout: 60000,
+      timeout: CREATE_VM_TIMEOUT_MS,
     },
   },
   {
@@ -59,7 +62,7 @@ export const CREATE_VM_CREATION_SCENARIOS: CreateVmTestScenario[] = [
     startAfterCreation: true,
     expectedBehavior: {
       shouldCreate: true,
-      timeout: 60000,
+      timeout: CREATE_VM_TIMEOUT_MS,
     },
   },
   {
@@ -71,7 +74,7 @@ export const CREATE_VM_CREATION_SCENARIOS: CreateVmTestScenario[] = [
     startAfterCreation: false,
     expectedBehavior: {
       shouldCreate: true,
-      timeout: 60000,
+      timeout: CREATE_VM_TIMEOUT_MS,
     },
   },
   {
@@ -83,7 +86,7 @@ export const CREATE_VM_CREATION_SCENARIOS: CreateVmTestScenario[] = [
     startAfterCreation: true,
     expectedBehavior: {
       shouldCreate: true,
-      timeout: 60000,
+      timeout: CREATE_VM_TIMEOUT_MS,
     },
   },
   {
@@ -95,7 +98,7 @@ export const CREATE_VM_CREATION_SCENARIOS: CreateVmTestScenario[] = [
     startAfterCreation: false,
     expectedBehavior: {
       shouldCreate: true,
-      timeout: 60000,
+      timeout: CREATE_VM_TIMEOUT_MS,
     },
   },
 ];
@@ -114,7 +117,7 @@ export const CREATE_VM_SMOKE_SCENARIOS: CreateVmTestScenario[] = [
     startAfterCreation: false,
     expectedBehavior: {
       shouldCreate: true,
-      timeout: 60000,
+      timeout: CREATE_VM_TIMEOUT_MS,
     },
   },
   {
@@ -126,7 +129,7 @@ export const CREATE_VM_SMOKE_SCENARIOS: CreateVmTestScenario[] = [
     startAfterCreation: true,
     expectedBehavior: {
       shouldCreate: true,
-      timeout: 60000,
+      timeout: CREATE_VM_TIMEOUT_MS,
     },
   },
 ];
@@ -145,7 +148,7 @@ export const CREATE_VM_EXTENDED_SCENARIOS: CreateVmTestScenario[] = [
     startAfterCreation: false,
     expectedBehavior: {
       shouldCreate: true,
-      timeout: 60000,
+      timeout: CREATE_VM_TIMEOUT_MS,
     },
   },
   {
@@ -157,7 +160,7 @@ export const CREATE_VM_EXTENDED_SCENARIOS: CreateVmTestScenario[] = [
     startAfterCreation: false,
     expectedBehavior: {
       shouldCreate: true,
-      timeout: 90000,
+      timeout: CREATE_VM_LARGE_TIMEOUT_MS,
     },
   },
   {
@@ -169,7 +172,7 @@ export const CREATE_VM_EXTENDED_SCENARIOS: CreateVmTestScenario[] = [
     startAfterCreation: true,
     expectedBehavior: {
       shouldCreate: true,
-      timeout: 90000,
+      timeout: CREATE_VM_LARGE_TIMEOUT_MS,
     },
   },
   {
@@ -181,7 +184,7 @@ export const CREATE_VM_EXTENDED_SCENARIOS: CreateVmTestScenario[] = [
     startAfterCreation: false,
     expectedBehavior: {
       shouldCreate: true,
-      timeout: 90000,
+      timeout: CREATE_VM_LARGE_TIMEOUT_MS,
     },
   },
 ];
