@@ -1,4 +1,4 @@
-name: Jira PR Validation
+name: PR Validation
 
 on:
   pull_request_target:
@@ -12,11 +12,11 @@ permissions:
   statuses: write
 
 jobs:
-  jira-validation:
-    name: jira-validation
+  pr-validation:
+    name: pr-validation
     runs-on: ubuntu-latest
     concurrency:
-      group: jira-check-${{ github.event.pull_request.number || github.event.issue.number }}
+      group: pr-validation-${{ github.event.pull_request.number || github.event.issue.number }}
       cancel-in-progress: true
     if: >
       github.event_name == 'pull_request_target' ||
@@ -53,6 +53,18 @@ jobs:
       - name: Install script dependencies
         working-directory: .github/scripts
         run: npm ci
+
+      - name: Run AI configuration PR validation
+        if: github.event_name == 'pull_request_target'
+        working-directory: .github/scripts
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          GITHUB_EVENT_ACTION: ${{ github.event.action }}
+          REPO_OWNER: ${{ github.repository_owner }}
+          REPO_NAME: ${{ github.event.repository.name }}
+        run: npx tsx src/ai-config-validation/index.ts
 
       - name: Run Jira PR validation
         working-directory: .github/scripts

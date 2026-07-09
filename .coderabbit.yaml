@@ -61,14 +61,11 @@ reviews:
         - Changes to `jira-validation/` or `ai-config-validation/` that allow unreviewed AI config merges
         - Missing error handling that fails open (allows merge on API errors)
         Require tests for any validation logic changes.
-    - path: '.github/workflows/jira_pr_check.yml'
+    - path: '.github/workflows/pr_validation.yml'
       instructions: |
-        SECURITY: Ensure Jira PR validation cannot be disabled or bypassed without maintainer review.
+        SECURITY: Ensure Jira and AI config PR validation cannot be disabled or bypassed without maintainer review.
         Flag permission reductions, trigger removals, or switch from `pull_request_target` safety patterns.
-    - path: '.github/workflows/ai_config_pr_check.yml'
-      instructions: |
-        SECURITY: Ensure AI config validation cannot be disabled or bypassed without maintainer review.
-        Flag permission reductions, trigger removals, or changes that skip sensitive path detection.
+        Flag changes that skip sensitive path detection or weaken validation checks.
     - path: '.coderabbit.yaml'
       instructions: |
         SECURITY: Changes here affect review strictness for the entire repo.

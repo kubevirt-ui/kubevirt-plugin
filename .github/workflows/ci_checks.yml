@@ -92,8 +92,8 @@ jobs:
         run: |
           HUSKY=0 npm ci --offline --ignore-scripts --no-audit
 
-  unit-test:
-    name: unit-test
+  test:
+    name: test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -106,33 +106,19 @@ jobs:
           cache: npm
       - run: npm ci --ignore-scripts
 
-      - name: Run Unit Tests
+      - name: Run unit tests
         run: npm run test-cov
 
-      - name: Coverage Upload
+      - name: Coverage upload
         uses: codecov/codecov-action@v7
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
 
-  workflow-scripts-test:
-    name: workflow-scripts-test
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v7
-
-      - name: Setup Node
-        uses: actions/setup-node@v6
-        with:
-          node-version: '22'
-          cache: npm
-          cache-dependency-path: .github/scripts/package-lock.json
-
-      - name: Install script dependencies
+      - name: Install workflow script dependencies
         working-directory: .github/scripts
         run: npm ci
 
-      - name: Check types
+      - name: Check workflow script types
         working-directory: .github/scripts
         run: npm run check-types
 

@@ -15,7 +15,7 @@ describe('isSensitiveAiConfigPath', () => {
       isSensitiveAiConfigPath('.github/scripts/src/ai-config-validation/index.ts'),
       true,
     );
-    assert.equal(isSensitiveAiConfigPath('.github/workflows/ai_config_pr_check.yml'), true);
+    assert.equal(isSensitiveAiConfigPath('.github/workflows/pr_validation.yml'), true);
   });
 
   it('ignores regular application code', () => {
