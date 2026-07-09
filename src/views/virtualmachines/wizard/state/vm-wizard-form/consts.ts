@@ -5,10 +5,7 @@ import {
   VMWizardFormValues,
 } from '@virtualmachines/wizard/state/vm-wizard-form/types';
 import { OperatingSystemType } from '@virtualmachines/wizard/steps/InstanceTypesSteps/GuestOSStep/utils/constants';
-import {
-  VMCreationMethod,
-  VMWizardStep,
-} from '@virtualmachines/wizard/utils/constants';
+import { VMCreationMethod, VMWizardStep } from '@virtualmachines/wizard/utils/constants';
 
 export const createInitialVMWizardFormValues = ({
   cluster,
