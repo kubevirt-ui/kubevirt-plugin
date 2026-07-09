@@ -56,6 +56,9 @@ jobs:
           group: ${{ env.IBM_RESOURCE_GROUP }}
           plugins: kubernetes-service
 
+      - name: Install CIS plugin
+        run: ibmcloud plugin install cis -f 2>/dev/null || true
+
       - name: Discover active clusters
         id: discover
         run: |

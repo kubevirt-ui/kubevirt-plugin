@@ -99,7 +99,6 @@ jobs:
     needs: check-trust
     if: |
       always() &&
-      (github.event.action != 'labeled' || github.event.label.name == 'ok-to-test') &&
       (
         github.event_name == 'workflow_dispatch' ||
         github.event.pull_request.head.repo.full_name == github.repository ||
