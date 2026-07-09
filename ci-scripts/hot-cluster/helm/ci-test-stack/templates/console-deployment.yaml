@@ -41,6 +41,20 @@ spec:
             {{- end }}
 
             # User auth settings
+            {{- if eq .Values.console.auth.mode "openshift" }}
+            - name: BRIDGE_USER_AUTH
+              value: "openshift"
+            - name: BRIDGE_K8S_AUTH
+              value: "openshift"
+            - name: BRIDGE_CA_FILE
+              value: "/etc/console-auth/ca.crt"
+            - name: BRIDGE_USER_AUTH_OIDC_CLIENT_ID
+              value: {{ include "ci-test-stack.oauthClientName" . | quote }}
+            - name: BRIDGE_USER_AUTH_OIDC_CLIENT_SECRET_FILE
+              value: "/etc/console-auth/client-secret"
+            - name: BRIDGE_USER_AUTH_OIDC_CA_FILE
+              value: "/etc/console-auth/ca.crt"
+            {{- else }}
             - name: BRIDGE_USER_AUTH
               value: "disabled"
             - name: BRIDGE_K8S_AUTH_BEARER_TOKEN
@@ -48,6 +62,7 @@ spec:
                 secretKeyRef:
                   name: {{ include "ci-test-stack.consoleName" . }}-token
                   key: token
+            {{- end }}
 
             # Branding and docs settings
             - name: BRIDGE_BRANDING
@@ -89,3 +104,13 @@ spec:
               port: {{ .Values.console.port }}
             initialDelaySeconds: 15
             periodSeconds: 30
+          {{- if eq .Values.console.auth.mode "openshift" }}
+          volumeMounts:
+            - name: console-auth
+              mountPath: /etc/console-auth
+              readOnly: true
+      volumes:
+        - name: console-auth
+          secret:
+            secretName: {{ include "ci-test-stack.consoleName" . }}-oauth
+          {{- end }}

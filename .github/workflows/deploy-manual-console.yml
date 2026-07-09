@@ -1,0 +1,184 @@
+name: Deploy Manual Console
+run-name: 'Deploy Manual Console [${{ inputs.cluster_name }}] @ ${{ inputs.branch }}'
+
+# Deploys a standalone, OAuth-protected console + kubevirt-plugin stack to an
+# existing hot cluster for manual UI testing (CNV-92150). Entirely separate
+# from the E2E path (hot-cluster-e2e*.yml, ci-env-request): it builds its own
+# in-cluster plugin image, uses its own trigger ConfigMap/action, and does
+# not touch the CNV-managed console, HCO, or SSP.
+#
+# Prerequisites: the target cluster must already be provisioned via
+# "IBM Cloud Hot Cluster Setup" (ibmc-cluster-setup.yml), which installs the
+# ARC runner scale set and the ci-env-controller this workflow depends on.
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: Git branch or ref to build the kubevirt-plugin image from
+        required: true
+        default: main
+        type: string
+      cluster_name:
+        description: ARC runner label / hot cluster name (must already be provisioned)
+        required: true
+        default: kubevirt-plugin-ci
+        type: string
+      infrastructure_type:
+        description: Infrastructure type of the target cluster (informational only)
+        required: false
+        default: ipi
+        type: choice
+        options:
+          - ipi
+          - vpc
+          - classic
+
+permissions:
+  contents: read
+
+# Persistent environment: never cancel an in-flight deploy for the same
+# cluster, since that could leave the manual console mid-provision.
+concurrency:
+  group: deploy-manual-console-${{ inputs.cluster_name }}
+  cancel-in-progress: false
+
+env:
+  CI_ENV_NS: ci-env
+  MANUAL_CONSOLE_CM: manual-console
+  MANUAL_CONSOLE_NS: manual-console
+  MANUAL_CONSOLE_USER: manual-console
+
+jobs:
+  deploy:
+    name: Deploy Manual Console
+    runs-on: ${{ inputs.cluster_name }}
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.branch }}
+          persist-credentials: false
+
+      - name: Log environment summary
+        env:
+          BRANCH: ${{ inputs.branch }}
+          CLUSTER_NAME: ${{ inputs.cluster_name }}
+        run: |
+          {
+            echo "## Manual Console Deploy"
+            echo ""
+            echo "| Field | Value |"
+            echo "|---|---|"
+            echo "| Branch | \`${BRANCH}\` |"
+            echo "| Cluster | \`${CLUSTER_NAME}\` |"
+            echo "| Infrastructure | \`${{ inputs.infrastructure_type }}\` |"
+            echo "| Triggered by | @${{ github.actor }} |"
+          } | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - name: Build kubevirt-plugin image in-cluster
+        id: build
+        run: |
+          NS="${MANUAL_CONSOLE_NS}"
+          export NS
+          OUTPUT_FILE="$(mktemp)"
+          bash ci-scripts/manual-console/images/setup-plugin-image.sh | tee "${OUTPUT_FILE}"
+          IMAGE_REF="$(grep '^IMAGE_REF=' "${OUTPUT_FILE}" | cut -d= -f2-)"
+          rm -f "${OUTPUT_FILE}"
+          if [[ -z "${IMAGE_REF}" ]]; then
+            echo "::error::setup-plugin-image.sh did not output IMAGE_REF="
+            exit 1
+          fi
+          echo "image=${IMAGE_REF}" >> "${GITHUB_OUTPUT}"
+
+      - name: Generate manual console password
+        id: creds
+        run: |
+          PASSWORD="$(openssl rand -base64 24)"
+          echo "::add-mask::${PASSWORD}"
+          echo "password=${PASSWORD}" >> "${GITHUB_OUTPUT}"
+
+      - name: Create short-lived credentials Secret
+        id: secret
+        env:
+          MANUAL_CONSOLE_PASSWORD: ${{ steps.creds.outputs.password }}
+        run: |
+          SECRET_NAME="manual-console-creds-${{ github.run_id }}"
+          oc create secret generic "${SECRET_NAME}" \
+            --namespace="${CI_ENV_NS}" \
+            --from-literal=password="${MANUAL_CONSOLE_PASSWORD}" \
+            --dry-run=client -o yaml | oc apply -f -
+          echo "name=${SECRET_NAME}" >> "${GITHUB_OUTPUT}"
+
+      - name: Provision manual console
+        id: deploy
+        uses: ./.github/actions/manual-console-request
+        with:
+          plugin-image: ${{ steps.build.outputs.image }}
+          test-namespace: ${{ env.MANUAL_CONSOLE_NS }}
+          configmap-name: ${{ env.MANUAL_CONSOLE_CM }}
+          ci-env-namespace: ${{ env.CI_ENV_NS }}
+          htpasswd-user: ${{ env.MANUAL_CONSOLE_USER }}
+          htpasswd-secret-name: ${{ steps.secret.outputs.name }}
+
+      - name: Send manual console credentials to Slack
+        if: always() && steps.deploy.outcome == 'success'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          CONSOLE_URL: ${{ steps.deploy.outputs.console-route }}
+          MANUAL_CONSOLE_PASSWORD: ${{ steps.creds.outputs.password }}
+          ACTOR: ${{ github.actor }}
+          BRANCH: ${{ inputs.branch }}
+        run: |
+          if [[ -z "${SLACK_WEBHOOK_URL}" ]]; then
+            echo "::warning::SLACK_WEBHOOK_URL not set — skipping Slack notification"
+            exit 0
+          fi
+
+          echo "::add-mask::${MANUAL_CONSOLE_PASSWORD}"
+
+          TEXT=":rocket: *Manual console ready*"
+          TEXT+=$'\n'"*Triggered by:* @${ACTOR}"
+          TEXT+=$'\n'"*URL:* <${CONSOLE_URL}>"
+          TEXT+=$'\n'"*User:* \`${MANUAL_CONSOLE_USER}\`"
+          TEXT+=$'\n'"*Password:* \`${MANUAL_CONSOLE_PASSWORD}\`"
+          TEXT+=$'\n'"*Branch:* \`${BRANCH}\`"
+          TEXT+=$'\n'"*Run:* <https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}>"
+
+          PAYLOAD=$(jq -n --arg text "${TEXT}" '{text: $text}')
+
+          curl -sS -X POST -H 'Content-Type: application/json' -d "${PAYLOAD}" "${SLACK_WEBHOOK_URL}"
+          echo "Slack notification sent."
+
+      - name: Write final job summary
+        if: always()
+        env:
+          CONSOLE_URL: ${{ steps.deploy.outputs.console-route }}
+        run: |
+          {
+            echo ""
+            echo "### Result"
+            echo ""
+            if [[ -n "${CONSOLE_URL}" ]]; then
+              echo "Console URL: ${CONSOLE_URL}"
+              echo ""
+              echo "Login credentials were sent to Slack (if \`SLACK_WEBHOOK_URL\` is configured)."
+            else
+              echo ":x: Deploy did not complete successfully — see logs above."
+            fi
+          } | tee -a "$GITHUB_STEP_SUMMARY"
+
+      # Defense-in-depth: ci-env-controller already deletes this Secret once
+      # it reads the password during provisioning, but only if it gets that
+      # far (e.g. not if cluster discovery or the htpasswd upsert fails
+      # first, or the controller pod is unavailable). Without this, a failed
+      # or timed-out provisioning run would leave a Secret with a plaintext
+      # password behind indefinitely. if: always() guarantees this runs on
+      # every exit path, including job failure; --ignore-not-found makes it
+      # a no-op on the normal path where the controller already deleted it.
+      - name: Clean up credentials Secret
+        if: always()
+        run: |
+          SECRET_NAME="manual-console-creds-${{ github.run_id }}"
+          oc delete secret "${SECRET_NAME}" --namespace="${CI_ENV_NS}" --ignore-not-found

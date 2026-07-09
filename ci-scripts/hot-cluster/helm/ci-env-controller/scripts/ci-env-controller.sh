@@ -8,15 +8,25 @@
 # Environment variables (set on the Deployment):
 #   CI_ENV_NS              Namespace where trigger ConfigMaps live (default: ci-env)
 #   CI_ENV_TTL_SECONDS     Force-clean environments older than this (default: 7200 = 2h)
-#   CI_ENV_LABEL           Label selector for trigger ConfigMaps
+#   CI_ENV_LABEL           Label selector for E2E trigger ConfigMaps (TTL-reaped)
+#   CI_ENV_MANUAL_LABEL    Label selector for persistent manual-console ConfigMaps
+#                          (CNV-92150; reconciled like CI_ENV_LABEL but never
+#                          reaped -- see reap_stale, which only scans CI_ENV_LABEL)
 #   HELM_CHART_PATH        Path to the ci-test-stack Helm chart inside the container
+#   ENSURE_MANUAL_CONSOLE_USER_SCRIPT
+#                          Path to ensure-manual-console-user.sh inside the
+#                          container; only invoked when a ConfigMap sets
+#                          auth-mode=openshift (default:
+#                          /opt/ci-env/manual-console/ensure-manual-console-user.sh)
 
 set -uo pipefail
 
 CI_ENV_NS="${CI_ENV_NS:-ci-env}"
 CI_ENV_TTL_SECONDS="${CI_ENV_TTL_SECONDS:-7200}"
 CI_ENV_LABEL="${CI_ENV_LABEL:-ci.kubevirt-plugin/type=test-environment}"
+CI_ENV_MANUAL_LABEL="${CI_ENV_MANUAL_LABEL:-ci.kubevirt-plugin/type=manual-console}"
 HELM_CHART_PATH="${HELM_CHART_PATH:-/opt/ci-env/helm/ci-test-stack}"
+ENSURE_MANUAL_CONSOLE_USER_SCRIPT="${ENSURE_MANUAL_CONSOLE_USER_SCRIPT:-/opt/ci-env/manual-console/ensure-manual-console-user.sh}"
 
 RUNNER_SA_NAME="${RUNNER_SA_NAME:-kubevirt-plugin-ci-gha-rs-no-permission}"
 RUNNER_SA_NS="${RUNNER_SA_NS:-arc-runners}"
@@ -119,6 +129,56 @@ patch_cm() {
 }
 
 # --------------------------------------------------------------------------- #
+#  Ensure an htpasswd user for OAuth-mode deploys (manual-console; CNV-92150)
+#
+#  Reads the plaintext password from a short-lived Secret named by
+#  htpasswd_secret_name (in CI_ENV_NS), deletes that Secret immediately
+#  (best-effort, regardless of outcome below), then delegates to
+#  ensure-manual-console-user.sh to upsert the htpasswd user and extract the
+#  cluster CA bundle. Sets MANUAL_AUTH_CA_CERT_FILE on success.
+# --------------------------------------------------------------------------- #
+ensure_manual_console_auth() {
+  local htpasswd_user="$1"
+  local htpasswd_secret_name="$2"
+
+  if [[ -z "${htpasswd_user}" || -z "${htpasswd_secret_name}" ]]; then
+    log "ERROR: auth-mode=openshift requires htpasswd-user and htpasswd-secret-name"
+    return 1
+  fi
+
+  local htpasswd_password
+  htpasswd_password="$(oc get secret "${htpasswd_secret_name}" -n "${CI_ENV_NS}" \
+    -o jsonpath='{.data.password}' 2>/dev/null | base64 -d || true)"
+
+  # The password must never outlive this single reconciliation: delete the
+  # Secret now regardless of whether reading it succeeded.
+  oc delete secret "${htpasswd_secret_name}" -n "${CI_ENV_NS}" --ignore-not-found 2>/dev/null || true
+
+  if [[ -z "${htpasswd_password}" ]]; then
+    log "ERROR: could not read password from Secret ${htpasswd_secret_name}"
+    return 1
+  fi
+
+  log "Ensuring htpasswd user ${htpasswd_user} via ${ENSURE_MANUAL_CONSOLE_USER_SCRIPT}..."
+  local ensure_output
+  # Password goes over stdin, never argv: CLI args are visible to any
+  # co-located process for the child's whole lifetime via `ps`/
+  # `/proc/<pid>/cmdline`, unlike a pipe that only exists transiently.
+  if ! ensure_output="$(printf '%s' "${htpasswd_password}" \
+    | bash "${ENSURE_MANUAL_CONSOLE_USER_SCRIPT}" "${htpasswd_user}" 2>&1)"; then
+    log "ERROR: ensure-manual-console-user.sh failed: ${ensure_output}"
+    return 1
+  fi
+  log "${ensure_output}"
+
+  MANUAL_AUTH_CA_CERT_FILE="$(echo "${ensure_output}" | grep '^CA_CERT_FILE=' | cut -d= -f2-)"
+  if [[ -z "${MANUAL_AUTH_CA_CERT_FILE}" || ! -f "${MANUAL_AUTH_CA_CERT_FILE}" ]]; then
+    log "ERROR: ensure-manual-console-user.sh did not produce a CA_CERT_FILE"
+    return 1
+  fi
+}
+
+# --------------------------------------------------------------------------- #
 #  Provision a test environment
 # --------------------------------------------------------------------------- #
 provision() {
@@ -127,10 +187,13 @@ provision() {
   local test_ns="$3"
   local console_image_override="${4:-}"
   local helm_release_override="${5:-}"
+  local auth_mode="${6:-disabled}"
+  local htpasswd_user="${7:-}"
+  local htpasswd_secret_name="${8:-}"
 
   local helm_release="${helm_release_override:-${cm_name}}"
 
-  log "Provisioning: cm=${cm_name} ns=${test_ns} release=${helm_release}"
+  log "Provisioning: cm=${cm_name} ns=${test_ns} release=${helm_release} auth-mode=${auth_mode}"
   patch_cm "${cm_name}" '{"data":{"status":"provisioning"}}'
 
   discover_cluster || {
@@ -147,6 +210,19 @@ provision() {
   log "Creating namespace ${test_ns}..."
   oc create namespace "${test_ns}" --dry-run=client -o yaml | oc apply -f - || true
 
+  # Opt-in only: unset/disabled auth-mode (the default for every existing E2E
+  # ConfigMap) skips this block entirely and behaves exactly as before.
+  local extra_helm_args=()
+  local MANUAL_AUTH_CA_CERT_FILE=""
+  if [[ "${auth_mode}" == "openshift" ]]; then
+    if ! ensure_manual_console_auth "${htpasswd_user}" "${htpasswd_secret_name}"; then
+      patch_cm "${cm_name}" '{"data":{"status":"error","error-message":"failed to provision htpasswd user"}}'
+      return 1
+    fi
+    extra_helm_args+=(--set "console.auth.mode=openshift")
+    extra_helm_args+=(--set-file "console.auth.caCert=${MANUAL_AUTH_CA_CERT_FILE}")
+  fi
+
   log "Running helm upgrade --install ${helm_release}..."
   if ! helm upgrade --install "${helm_release}" \
     "${HELM_CHART_PATH}" \
@@ -161,13 +237,16 @@ provision() {
     --set "rbac.consoleClusterRole=cluster-admin" \
     --set "runner.saName=${RUNNER_SA_NAME}" \
     --set "runner.saNamespace=${RUNNER_SA_NS}" \
+    "${extra_helm_args[@]}" \
     --wait --timeout 5m 2>&1; then
 
     local err="helm install failed"
     log "ERROR: ${err}"
     patch_cm "${cm_name}" "{\"data\":{\"status\":\"error\",\"error-message\":\"${err}\"}}"
+    [[ -n "${MANUAL_AUTH_CA_CERT_FILE}" ]] && rm -f "${MANUAL_AUTH_CA_CERT_FILE}"
     return 1
   fi
+  [[ -n "${MANUAL_AUTH_CA_CERT_FILE}" ]] && rm -f "${MANUAL_AUTH_CA_CERT_FILE}"
 
   local bridge_base="http://${helm_release}-console.${test_ns}.svc.cluster.local:9000"
   log "Waiting for console at ${bridge_base}..."
@@ -218,6 +297,7 @@ reconcile_one() {
   local cm_json="$1"
 
   local cm_name desired status plugin_image test_ns console_image helm_release
+  local auth_mode htpasswd_user htpasswd_secret_name
   cm_name="$(echo "${cm_json}" | jq -r '.metadata.name')"
   desired="$(echo "${cm_json}" | jq -r '.data["desired-state"] // "unknown"')"
   status="$(echo "${cm_json}" | jq -r '.data["status"] // ""')"
@@ -225,6 +305,11 @@ reconcile_one() {
   test_ns="$(echo "${cm_json}" | jq -r '.data["test-namespace"] // ""')"
   console_image="$(echo "${cm_json}" | jq -r '.data["console-image"] // ""')"
   helm_release="$(echo "${cm_json}" | jq -r '.data["helm-release"] // ""')"
+  # Manual-console-only fields (CNV-92150); empty for every existing E2E
+  # ConfigMap, which keeps provision() on its original disabled-auth path.
+  auth_mode="$(echo "${cm_json}" | jq -r '.data["auth-mode"] // "disabled"')"
+  htpasswd_user="$(echo "${cm_json}" | jq -r '.data["htpasswd-user"] // ""')"
+  htpasswd_secret_name="$(echo "${cm_json}" | jq -r '.data["htpasswd-secret-name"] // ""')"
 
   if [[ "${desired}" == "present" && "${status}" != "ready" && "${status}" != "provisioning" ]]; then
     if [[ -z "${plugin_image}" || -z "${test_ns}" ]]; then
@@ -232,7 +317,8 @@ reconcile_one() {
       patch_cm "${cm_name}" '{"data":{"status":"error","error-message":"missing required fields: plugin-image and test-namespace"}}'
       return
     fi
-    if ! provision "${cm_name}" "${plugin_image}" "${test_ns}" "${console_image}" "${helm_release}"; then
+    if ! provision "${cm_name}" "${plugin_image}" "${test_ns}" "${console_image}" "${helm_release}" \
+      "${auth_mode}" "${htpasswd_user}" "${htpasswd_secret_name}"; then
       log "ERROR: provision failed for ${cm_name}, ensuring status=error"
       local cur_status
       cur_status="$(oc get configmap "${cm_name}" -n "${CI_ENV_NS}" -o jsonpath='{.data.status}' 2>/dev/null || echo "")"
@@ -296,6 +382,7 @@ main() {
   log "  CI_ENV_NS=${CI_ENV_NS}"
   log "  CI_ENV_TTL_SECONDS=${CI_ENV_TTL_SECONDS}"
   log "  CI_ENV_LABEL=${CI_ENV_LABEL}"
+  log "  CI_ENV_MANUAL_LABEL=${CI_ENV_MANUAL_LABEL}"
   log "  HELM_CHART_PATH=${HELM_CHART_PATH}"
 
   local reap_interval=300
@@ -305,14 +392,21 @@ main() {
     local now
     now="$(date +%s)"
     if (( now - last_reap > reap_interval )); then
+      # Only ever scans CI_ENV_LABEL (E2E), so manual-console ConfigMaps
+      # (CI_ENV_MANUAL_LABEL) are never force-cleaned by the TTL reaper.
       reap_stale
       last_reap="${now}"
     fi
 
-    local cms
+    # Reconcile both the ephemeral E2E stream and the persistent
+    # manual-console stream (CNV-92150) in the same pass; they're
+    # independent ConfigMaps distinguished only by label value.
+    local cms manual_cms combined
     cms="$(oc get configmap -n "${CI_ENV_NS}" -l "${CI_ENV_LABEL}" -o json 2>/dev/null || echo '{"items":[]}')"
+    manual_cms="$(oc get configmap -n "${CI_ENV_NS}" -l "${CI_ENV_MANUAL_LABEL}" -o json 2>/dev/null || echo '{"items":[]}')"
+    combined="$(jq -n --argjson a "${cms}" --argjson b "${manual_cms}" '{items: ($a.items + $b.items)}' 2>/dev/null || echo '{"items":[]}')"
 
-    echo "${cms}" | jq -c '.items[]' 2>/dev/null | while IFS= read -r cm; do
+    echo "${combined}" | jq -c '.items[]' 2>/dev/null | while IFS= read -r cm; do
       reconcile_one "${cm}"
     done
 

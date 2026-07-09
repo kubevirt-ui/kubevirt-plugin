@@ -1,0 +1,150 @@
+name: Deploy Plugin (Manual Console Quick Redeploy)
+run-name: 'Deploy Plugin [${{ inputs.cluster_name }}] @ ${{ inputs.branch }}'
+
+# Lightweight companion to deploy-manual-console.yml (CNV-92150) for quickly
+# iterating on UI changes against an already-deployed manual console: builds
+# a fresh plugin image and re-provisions the same "manual-console" release,
+# without repeating the full job summary / Slack notification of the main
+# workflow. Use deploy-manual-console.yml for the first deploy, or whenever
+# you need a fresh URL/credentials reminder.
+#
+# Prerequisites: same as deploy-manual-console.yml -- the target cluster must
+# already be provisioned, and a manual console should already exist (though
+# this workflow works standalone too, it will just deploy fresh).
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: Git branch or ref to build the kubevirt-plugin image from
+        required: true
+        default: main
+        type: string
+      cluster_name:
+        description: ARC runner label / hot cluster name (must already be provisioned)
+        required: true
+        default: kubevirt-plugin-ci
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-manual-console-${{ inputs.cluster_name }}
+  cancel-in-progress: false
+
+env:
+  CI_ENV_NS: ci-env
+  MANUAL_CONSOLE_CM: manual-console
+  MANUAL_CONSOLE_NS: manual-console
+  MANUAL_CONSOLE_USER: manual-console
+
+jobs:
+  redeploy:
+    name: Redeploy Plugin
+    runs-on: ${{ inputs.cluster_name }}
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.branch }}
+          persist-credentials: false
+
+      - name: Build kubevirt-plugin image in-cluster
+        id: build
+        run: |
+          NS="${MANUAL_CONSOLE_NS}"
+          export NS
+          OUTPUT_FILE="$(mktemp)"
+          bash ci-scripts/manual-console/images/setup-plugin-image.sh | tee "${OUTPUT_FILE}"
+          IMAGE_REF="$(grep '^IMAGE_REF=' "${OUTPUT_FILE}" | cut -d= -f2-)"
+          rm -f "${OUTPUT_FILE}"
+          if [[ -z "${IMAGE_REF}" ]]; then
+            echo "::error::setup-plugin-image.sh did not output IMAGE_REF="
+            exit 1
+          fi
+          echo "image=${IMAGE_REF}" >> "${GITHUB_OUTPUT}"
+
+      # provision() always re-runs the htpasswd/OAuth ensure step regardless
+      # of whether credentials changed, so a fresh Secret is still required
+      # here -- this keeps ci-env-controller's logic simple (one code path)
+      # at the cost of a new (unused, if unchanged) password each redeploy.
+      - name: Generate manual console password
+        id: creds
+        run: |
+          PASSWORD="$(openssl rand -base64 24)"
+          echo "::add-mask::${PASSWORD}"
+          echo "password=${PASSWORD}" >> "${GITHUB_OUTPUT}"
+
+      - name: Create short-lived credentials Secret
+        id: secret
+        env:
+          MANUAL_CONSOLE_PASSWORD: ${{ steps.creds.outputs.password }}
+        run: |
+          SECRET_NAME="manual-console-creds-${{ github.run_id }}"
+          oc create secret generic "${SECRET_NAME}" \
+            --namespace="${CI_ENV_NS}" \
+            --from-literal=password="${MANUAL_CONSOLE_PASSWORD}" \
+            --dry-run=client -o yaml | oc apply -f -
+          echo "name=${SECRET_NAME}" >> "${GITHUB_OUTPUT}"
+
+      - name: Redeploy manual console
+        id: deploy
+        uses: ./.github/actions/manual-console-request
+        with:
+          plugin-image: ${{ steps.build.outputs.image }}
+          test-namespace: ${{ env.MANUAL_CONSOLE_NS }}
+          configmap-name: ${{ env.MANUAL_CONSOLE_CM }}
+          ci-env-namespace: ${{ env.CI_ENV_NS }}
+          htpasswd-user: ${{ env.MANUAL_CONSOLE_USER }}
+          htpasswd-secret-name: ${{ steps.secret.outputs.name }}
+
+      # ci-env-controller re-applies the htpasswd user on every provision, so
+      # the previous login password is no longer valid after this step --
+      # a fresh reminder must be sent, otherwise the user is silently locked
+      # out with no way to discover the new password.
+      - name: Send updated credentials to Slack
+        if: always() && steps.deploy.outcome == 'success'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          CONSOLE_URL: ${{ steps.deploy.outputs.console-route }}
+          MANUAL_CONSOLE_PASSWORD: ${{ steps.creds.outputs.password }}
+          ACTOR: ${{ github.actor }}
+          BRANCH: ${{ inputs.branch }}
+        run: |
+          if [[ -z "${SLACK_WEBHOOK_URL}" ]]; then
+            echo "::warning::SLACK_WEBHOOK_URL not set — skipping Slack notification"
+            exit 0
+          fi
+
+          echo "::add-mask::${MANUAL_CONSOLE_PASSWORD}"
+
+          TEXT=":arrows_counterclockwise: *Manual console plugin redeployed*"
+          TEXT+=$'\n'"*Triggered by:* @${ACTOR}"
+          TEXT+=$'\n'"*URL:* <${CONSOLE_URL}>"
+          TEXT+=$'\n'"*User:* \`${MANUAL_CONSOLE_USER}\`"
+          TEXT+=$'\n'"*Password (rotated):* \`${MANUAL_CONSOLE_PASSWORD}\`"
+          TEXT+=$'\n'"*Branch:* \`${BRANCH}\`"
+
+          PAYLOAD=$(jq -n --arg text "${TEXT}" '{text: $text}')
+
+          curl -sS -X POST -H 'Content-Type: application/json' -d "${PAYLOAD}" "${SLACK_WEBHOOK_URL}"
+          echo "Slack notification sent."
+
+      - name: Write job summary
+        if: always()
+        env:
+          CONSOLE_URL: ${{ steps.deploy.outputs.console-route }}
+        run: |
+          {
+            echo "## Plugin Redeployed"
+            echo ""
+            if [[ -n "${CONSOLE_URL}" ]]; then
+              echo "Console URL: ${CONSOLE_URL}"
+              echo ""
+              echo "Login password was rotated and sent to Slack (if \`SLACK_WEBHOOK_URL\` is configured)."
+            else
+              echo ":x: Redeploy did not complete successfully — see logs above."
+            fi
+          } | tee -a "$GITHUB_STEP_SUMMARY"

@@ -23,6 +23,19 @@ console:
     thanosUrl: ''
     alertmanagerUrl: ''
 
+  # User authentication mode.
+  #   disabled:  bearer-token auth via the console ServiceAccount (E2E default,
+  #              set by ci-env-controller for ephemeral test environments).
+  #   openshift: OAuth login via an htpasswd identity provider (used by the
+  #              persistent manual-console deploy path). Requires
+  #              console.route.host and auth.caCert to be set.
+  auth:
+    mode: disabled
+    redirectPath: /auth/callback
+    # PEM CA bundle used to verify the OAuth server. Only consumed when
+    # auth.mode=openshift; ci-env-controller passes this via --set-file.
+    caCert: ''
+
 # ClusterRole created by the ci-env-controller Helm chart (clusterrole-console.yaml).
 rbac:
   consoleClusterRole: cluster-admin

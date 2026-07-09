@@ -105,6 +105,17 @@ All paths converge after cluster creation: the workflow installs HCO, builds the
 5. Playwright gating tests run against the in-cluster console
 6. Artifacts are uploaded, test environment is released
 
+## Manual UI Testing
+
+Actions → **Deploy Manual Console** deploys a persistent, OAuth-protected
+console + kubevirt-plugin stack on an already-provisioned hot cluster, for
+browsing branch UI code as a human instead of running automated tests. It
+reuses `ci-env-controller` and the `ci-test-stack` Helm chart through a
+separate, opt-in path (own trigger label, own namespace) with zero effect on
+E2E behavior. See [`manual-console/README.md`](manual-console/README.md)
+for the full architecture, credential model, and ConfigMap contract
+additions.
+
 ## Teardown
 
 **Manual:** Actions → **IBM Cloud Hot Cluster Teardown** (select infrastructure type)
@@ -145,6 +156,10 @@ ci-scripts/
     ci-env/
     helm/
     images/
+  manual-console/                  (manual UI testing; CNV-92150 -- see manual-console/README.md)
+    ensure-manual-console-user.sh
+    images/
+      setup-plugin-image.sh
 ```
 
 ## Scripts
