@@ -1,108 +1,12 @@
 /**
- * Test configuration, constants, and regex utilities for the Playwright test suite.
- * Provides file-based storage for auth tokens, namespaces, test-specific settings,
- * template metadata names, OS filter values, and regex helpers.
+ * Test configuration management for sharing config between global setup and test workers.
+ * Provides file-based storage for auth tokens, namespaces, and test-specific settings.
  */
 
 import * as fs from 'fs';
 import * as path from 'path';
 
 import { EnvVariables } from './env-variables';
-
-// ---------------------------------------------------------------------------
-// Regex utilities
-// ---------------------------------------------------------------------------
-
-/** Characters that have special meaning in regex and must be escaped for literal use. */
-const REGEX_SPECIAL_CHARS = /[.*+?^${}()|[\]\\]/g;
-
-/**
- * Escapes special regex characters in a string so it can be used literally inside a RegExp.
- * Use when building a pattern from user input or dynamic text (e.g. labels, search terms).
- *
- * @example
- * escapeForRegExp('foo (bar)')  // => 'foo \\(bar\\)'
- * new RegExp(escapeForRegExp(label) + '.*')  // literal label then any chars
- */
-export function escapeForRegExp(str: string): string {
-  return str.replace(REGEX_SPECIAL_CHARS, '\\$&');
-}
-
-export interface RegexFromLiteralOptions {
-  /** RegExp flags (e.g. 'i' for case-insensitive, 'g' for global). Defaults to 'i'. */
-  flags?: string;
-}
-
-/**
- * Creates a RegExp from a literal string by escaping special characters.
- * Handles dynamic text safely (labels, names, etc.) with optional flags.
- *
- * @example
- * regexFromLiteral('Virtualization optimized')           // case-insensitive (default)
- * regexFromLiteral('foo', { flags: '' })               // case-sensitive
- * regexFromLiteral('bar', { flags: 'gi' })             // global, case-insensitive
- */
-export function regexFromLiteral(
-  literal: string,
-  options: RegexFromLiteralOptions | string = 'i',
-): RegExp {
-  const flags = typeof options === 'string' ? options : (options.flags ?? 'i');
-  return new RegExp(escapeForRegExp(literal), flags);
-}
-
-// ---------------------------------------------------------------------------
-// Template constants
-// ---------------------------------------------------------------------------
-
-export function getTemplateMetadataName(baseName: string, architecture?: string): string {
-  const arch = architecture || process.env.ARCH;
-
-  if (arch === 's390x' || (!arch && EnvVariables.isS390x)) {
-    return `${baseName}-s390x`;
-  }
-
-  return baseName;
-}
-
-export const TEMPLATE_METADATA_NAMES = {
-  // RHEL templates
-  RHEL7: getTemplateMetadataName('rhel7-server-small'),
-  RHEL8: getTemplateMetadataName('rhel8-server-small'),
-  RHEL9: getTemplateMetadataName('rhel9-server-small'),
-
-  // CentOS templates
-  CENTOS7: getTemplateMetadataName('centos7-server-small'),
-  CENTOSSTREAM8: getTemplateMetadataName('centos-stream8-server-small'),
-  CENTOSSTREAM9: getTemplateMetadataName('centos-stream9-server-small'),
-
-  // Fedora templates
-  FEDORA: getTemplateMetadataName('fedora-server-small'),
-
-  // Windows templates (no architecture suffix)
-  WIN10: 'windows10-desktop-medium',
-  WIN11: 'windows11-desktop-medium',
-  WIN2K12R2: 'windows2k12r2-server-medium',
-  WIN2K16: 'windows2k16-server-medium',
-  WIN2K19: 'windows2k19-server-medium',
-  WIN2K22: 'windows2k22-server-medium',
-
-  // Default template
-  YAML: 'example',
-} as const;
-
-export const ALL_PROJECTS_NS = 'All Projects';
-
-export const OS_FILTER_VALUES = {
-  CENTOS: 'CentOS',
-  FEDORA: 'Fedora',
-  OTHER: 'Other',
-  RHEL: 'RHEL',
-  WINDOWS: 'Windows',
-} as const;
-
-// ---------------------------------------------------------------------------
-// Shared test config
-// ---------------------------------------------------------------------------
 
 export interface SharedTestConfig {
   authToken?: string; // OC authentication token for Kubernetes API calls
@@ -185,8 +89,8 @@ export const TestTimeouts = {
   /** Extended timeout for catalog VM with maximum resources (30 seconds) */
   CREATE_VM_EXTENDED: 30 * SECOND,
 
-  /** Timeout for UI element visibility checks (30 seconds) */
-  UI_ELEMENT_VISIBILITY: 30 * SECOND,
+  /** Timeout for UI element visibility checks (3 minutes) */
+  UI_ELEMENT_VISIBILITY: 3 * MINUTE,
 
   /** Timeout for status validation checks (60 seconds) */
   STATUS_VALIDATION: MINUTE,
@@ -229,9 +133,6 @@ export const TestTimeouts = {
 
   /** Timeout for VM to reach Running state (5 minutes) */
   VM_RUNNING: 5 * MINUTE,
-
-  /** Extended VM running timeout for parallel runs or heavy clusters (7 minutes) */
-  VM_RUNNING_EXTENDED: 7 * MINUTE,
 
   /** Timeout for namespace to become ready (30 seconds) */
   NAMESPACE_READY: 30 * SECOND,
@@ -296,21 +197,6 @@ export const TestTimeouts = {
   /** Quick visibility timeout for elements expected to appear fast (5 seconds) */
   UI_VISIBILITY_QUICK: 5 * SECOND,
 
-  /** Short assertion timeout for quick UI elements like labels, buttons (10 seconds) */
-  ASSERT_SHORT: 10 * SECOND,
-
-  /** Medium assertion timeout for modals, confirmations (15 seconds) */
-  ASSERT_MEDIUM: 15 * SECOND,
-
-  /** Long assertion timeout for heavy content like YAML editors (60 seconds) */
-  ASSERT_LONG: MINUTE,
-
-  /** Extra long assertion timeout for backend-dependent content like guest credentials (2 minutes) */
-  ASSERT_EXTRA_LONG: 2 * MINUTE,
-
-  /** Poll timeout for eventual consistency checks (60 seconds) */
-  POLL_TIMEOUT: MINUTE,
-
   /** Time for UI to stabilize after complex operations (2 seconds) */
   UI_STABILIZE: 2 * SECOND,
 
@@ -351,8 +237,8 @@ export class TestConfigManager {
           fs.rmdirSync(configDir);
         }
       }
-    } catch (_error) {
-      // Ignore errors when cleaning up directory
+    } catch (error) {
+      // Ignore errors when cleaning up directory (other shards may still be using it)
     }
 
     this.clearCache();
@@ -372,18 +258,29 @@ export class TestConfigManager {
         const content = fs.readFileSync(configFile, 'utf-8');
         this.cachedConfig = JSON.parse(content) as SharedTestConfig;
         return this.cachedConfig;
-      } catch (_error) {
+      } catch (error) {
         // Failed to read config, will use defaults
       }
     }
 
-    const testNamespace = EnvVariables.testNamespace;
+    // Fallback to environment variables if file doesn't exist
+    const shardIndex = EnvVariables.shardIndex;
+    const testNamespace =
+      EnvVariables.isSharded && shardIndex
+        ? `${EnvVariables.testNamespace}-${shardIndex}`
+        : EnvVariables.testNamespace;
 
+    // Determine kubeconfig path (try environment variable first, then construct path)
     let kubeConfigPath = EnvVariables.kubeConfigPath;
     if (!kubeConfigPath) {
-      const candidate = path.join(process.cwd(), '.kubeconfigs', 'test-config');
-      if (fs.existsSync(candidate)) {
-        kubeConfigPath = candidate;
+      const kubeConfigDir = path.join(process.cwd(), '.kubeconfigs');
+      const kubeConfigFileName =
+        EnvVariables.isSharded && shardIndex ? `shard-${shardIndex}-config` : 'test-config';
+      kubeConfigPath = path.join(kubeConfigDir, kubeConfigFileName);
+
+      // Only use it if the file actually exists
+      if (!fs.existsSync(kubeConfigPath)) {
+        kubeConfigPath = undefined;
       }
     }
 
@@ -399,13 +296,20 @@ export class TestConfigManager {
   }
 
   private static getConfigFilePath(): string {
+    const shardIndex = EnvVariables.shardIndex;
+
+    // Create config directory path
     const configDir = path.join(process.cwd(), '.test-configs');
 
+    // Ensure directory exists
     if (!fs.existsSync(configDir)) {
       fs.mkdirSync(configDir, { recursive: true });
     }
 
-    return path.join(configDir, 'test-config.json');
+    const filename =
+      EnvVariables.isSharded && shardIndex ? `shard-${shardIndex}-config.json` : 'test-config.json';
+
+    return path.join(configDir, filename);
   }
 
   static getConfigValue<K extends keyof SharedTestConfig>(key: K): SharedTestConfig[K] {
