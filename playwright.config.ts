@@ -3,7 +3,7 @@ import * as path from 'path';
 import { defineConfig, devices } from '@playwright/test';
 import * as dotenv from 'dotenv';
 
-dotenv.config({ path: path.resolve(__dirname, '.env') });
+dotenv.config({ path: path.resolve(__dirname, '.env'), quiet: true });
 
 import { env } from './playwright/utils/env';
 
@@ -25,27 +25,27 @@ const chromeArgs = [
   '--disable-translate',
   '--no-first-run',
   '--js-flags=--max-old-space-size=4096',
+  ...(process.env.DIAGNOSE_FAILURES === '1' ? ['--remote-debugging-port=0'] : []),
 ];
+
+const migrationUse = {
+  ...devices['Desktop Chrome'],
+  launchOptions: {
+    args: chromeArgs,
+    headless: !process.env.DEBUG_MODE && !process.env.HEADED,
+  },
+  viewport: { height: 1080, width: 1920 },
+};
 
 export default defineConfig({
   expect: { timeout: 60_000 },
   forbidOnly: !!process.env.CI,
   fullyParallel: false,
-  globalSetup:
-    process.env.USE_SCENARIO_INFRA === 'true'
-      ? './playwright/project-dependencies/global.setup.ts'
-      : undefined,
-  globalTeardown:
-    process.env.USE_SCENARIO_INFRA === 'true'
-      ? './playwright/project-dependencies/global.teardown.ts'
-      : undefined,
+  globalSetup: './playwright/project-dependencies/global.setup.ts',
+  globalTeardown: './playwright/project-dependencies/global.teardown.ts',
   outputDir: './playwright/test-results/artifacts',
-  /**
-   * Projects run in dependency order:
-   *  1. setup  — logs in and saves auth state (single worker, must succeed before gating)
-   *  2. gating — all gating specs run in parallel after setup completes
-   */
   projects: [
+    // ── Legacy projects (setup → gating → features) ──────────────────
     {
       fullyParallel: false,
       name: 'setup',
@@ -94,23 +94,50 @@ export default defineConfig({
           },
         ]
       : []),
-    ...(process.env.USE_SCENARIO_INFRA === 'true'
-      ? [
-          {
-            fullyParallel: false,
-            name: 'scenario',
-            testDir: './playwright/tests/scenario',
-            use: {
-              ...devices['Desktop Chrome'],
-              launchOptions: {
-                args: chromeArgs,
-                headless: !process.env.DEBUG_MODE && !process.env.HEADED,
-              },
-              viewport: { height: 1080, width: 1920 },
-            },
-          },
-        ]
-      : []),
+
+    // ── Migration projects (use global setup/teardown) ───────────────
+    {
+      fullyParallel: true,
+      name: 'migration-gating',
+      retries: 0,
+      testDir: './playwright/tests/migration-gating',
+      use: migrationUse,
+    },
+    {
+      fullyParallel: true,
+      name: 'migration-tier1',
+      retries: 0,
+      testDir: './playwright/tests/migration-tier1',
+      use: migrationUse,
+    },
+    {
+      fullyParallel: true,
+      name: 'migration-tier2',
+      retries: 0,
+      testDir: './playwright/tests/migration-tier2',
+      use: migrationUse,
+    },
+    {
+      fullyParallel: true,
+      name: 'migration-nonpriv',
+      retries: 0,
+      testDir: './playwright/tests/migration-nonpriv',
+      use: migrationUse,
+    },
+    {
+      fullyParallel: true,
+      name: 'migration-migrations',
+      retries: 0,
+      testDir: './playwright/tests/migration-migrations',
+      use: migrationUse,
+    },
+    {
+      fullyParallel: true,
+      name: 'migration-settings',
+      retries: 0,
+      testDir: './playwright/tests/migration-settings',
+      use: migrationUse,
+    },
   ],
   reporter: [
     ['list'],
@@ -130,10 +157,5 @@ export default defineConfig({
     video: 'retain-on-failure',
     viewport: { height: 1080, width: 1920 },
   },
-  /**
-   * Number of parallel workers. Setup runs a single file so it naturally uses one
-   * worker regardless of this value. Gating spec files run across all workers.
-   * Override with the WORKERS env var (e.g. WORKERS=2 for resource-constrained envs).
-   */
   workers: process.env.WORKERS ? parseInt(process.env.WORKERS, 10) : 4,
 });

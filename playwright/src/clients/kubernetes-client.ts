@@ -17,6 +17,9 @@ const POLL_INTERVAL = 2000;
  * Kubernetes client for scenario E2E tests.
  * Wraps @kubernetes/client-node directly — extend with new methods as tests require them.
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type K8sResource = Record<string, any>;
+
 export class KubernetesClient {
   static readonly generateInClusterKubeconfig = generateInClusterKubeconfig;
   static readonly generateKubeconfig = generateKubeconfig;
@@ -26,6 +29,7 @@ export class KubernetesClient {
   private readonly coApi: k8s.CustomObjectsApi;
   private readonly coreApi: k8s.CoreV1Api;
   private readonly kc: k8s.KubeConfig;
+  private rbacApi?: k8s.RbacAuthorizationV1Api;
 
   constructor(kubeConfigPath: string) {
     this.kc = new k8s.KubeConfig();
@@ -142,11 +146,349 @@ export class KubernetesClient {
     }
   }
 
+  async deleteClusterCustomResource(
+    group: string,
+    version: string,
+    plural: string,
+    name: string,
+  ): Promise<void> {
+    await this.coApi.deleteClusterCustomObject({ group, version, plural, name });
+  }
+
+  async deleteCustomResource(
+    group: string,
+    version: string,
+    namespace: string,
+    plural: string,
+    name: string,
+  ): Promise<void> {
+    await this.coApi.deleteNamespacedCustomObject({ group, version, namespace, plural, name });
+  }
+
+  async disableNativeVmTemplateFeatureGate(
+    name = 'kubevirt-hyperconverged',
+    namespace = 'openshift-cnv',
+  ): Promise<void> {
+    await this.patchHyperConverged(name, namespace, [
+      { op: 'remove', path: '/spec/featureGates/withHostPassthroughCPU' },
+    ]);
+  }
+
+  // ── Public API accessors ─────────────────────────────────────────────
+
+  async disableVirtualizationWelcomeSettings(
+    cnvNamespace: string,
+    username: string,
+    _userUid?: string,
+  ): Promise<boolean> {
+    try {
+      const cmName = `kubevirt-ui-settings-${username}`;
+      await this.patchConfigMap(cmName, cnvNamespace, {
+        quickStart: JSON.stringify({ dontShowWelcomeModal: true }),
+      });
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  async enableNativeVmTemplateFeatureGate(
+    name = 'kubevirt-hyperconverged',
+    namespace = 'openshift-cnv',
+  ): Promise<void> {
+    await this.patchHyperConverged(name, namespace, [
+      { op: 'add', path: '/spec/featureGates', value: { withHostPassthroughCPU: true } },
+    ]);
+  }
+
+  // ── Generic custom resource operations ──────────────────────────────
+
+  async ensureNonPrivUserExists(username: string, password: string): Promise<boolean> {
+    try {
+      const secret = await this.coreApi.readNamespacedSecret({
+        name: 'htpass-secret',
+        namespace: 'openshift-config',
+      });
+      const currentData = secret?.data?.htpasswd
+        ? Buffer.from(secret.data.htpasswd, 'base64').toString('utf-8')
+        : '';
+
+      if (currentData.includes(`${username}:`)) {
+        return false;
+      }
+
+      const { execSync } = await import('child_process');
+      const hash = execSync(`htpasswd -nbB "${username}" "${password}"`, {
+        encoding: 'utf8',
+        timeout: 10_000,
+      }).trim();
+
+      const updated = currentData.endsWith('\n')
+        ? `${currentData}${hash}\n`
+        : `${currentData}\n${hash}\n`;
+
+      await this.coreApi.patchNamespacedSecret({
+        name: 'htpass-secret',
+        namespace: 'openshift-config',
+        body: { data: { htpasswd: Buffer.from(updated).toString('base64') } },
+      });
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  async ensureVmFoldersEnabled(cnvNamespace: string): Promise<K8sResource | null> {
+    try {
+      await this.patchConfigMap('kubevirt-ui-features', cnvNamespace, {
+        treeViewFolders: 'true',
+      });
+      return { data: { treeViewFolders: 'true' } };
+    } catch {
+      return null;
+    }
+  }
+
+  getCoreV1Api(): k8s.CoreV1Api {
+    return this.coreApi;
+  }
+
   getCurrentUserToken(): string | undefined {
     try {
       return this.kc.getCurrentUser()?.token;
     } catch {
       return undefined;
+    }
+  }
+
+  // ── VM operations ───────────────────────────────────────────────────
+
+  async getHyperConverged(
+    name = 'kubevirt-hyperconverged',
+    namespace = 'openshift-cnv',
+  ): Promise<K8sResource> {
+    return (await this.coApi.getNamespacedCustomObject({
+      group: 'hco.kubevirt.io',
+      version: 'v1beta1',
+      namespace,
+      plural: 'hyperconvergeds',
+      name,
+    })) as K8sResource;
+  }
+
+  // ── HyperConverged operations ───────────────────────────────────────
+
+  getRbacApi(): k8s.RbacAuthorizationV1Api {
+    if (!this.rbacApi) {
+      this.rbacApi = this.kc.makeApiClient(k8s.RbacAuthorizationV1Api);
+    }
+    return this.rbacApi;
+  }
+
+  async getUserUid(username: string): Promise<string | undefined> {
+    try {
+      const result = await this.coApi.getClusterCustomObject({
+        group: 'user.openshift.io',
+        version: 'v1',
+        plural: 'users',
+        name: username,
+      });
+      return (result as K8sResource)?.metadata?.uid;
+    } catch {
+      return undefined;
+    }
+  }
+
+  async grantUserCdiClusterReadAccess(username: string): Promise<void> {
+    const rbac = this.getRbacApi();
+    const name = `${username}-cdi-cluster-read`;
+    try {
+      await rbac.createClusterRoleBinding({
+        body: {
+          metadata: { name },
+          roleRef: {
+            apiGroup: 'rbac.authorization.k8s.io',
+            kind: 'ClusterRole',
+            name: 'cdi.kubevirt.io:config-reader',
+          },
+          subjects: [{ apiGroup: 'rbac.authorization.k8s.io', kind: 'User', name: username }],
+        },
+      });
+    } catch (e: unknown) {
+      const msg = (e as Error).message || '';
+      if (!msg.includes('409') && !msg.includes('AlreadyExists')) throw e;
+    }
+  }
+
+  async grantUserClusterViewAccess(username: string): Promise<void> {
+    const rbac = this.getRbacApi();
+    const name = `${username}-cluster-view`;
+    try {
+      await rbac.createClusterRoleBinding({
+        body: {
+          metadata: { name },
+          roleRef: {
+            apiGroup: 'rbac.authorization.k8s.io',
+            kind: 'ClusterRole',
+            name: 'cluster-reader',
+          },
+          subjects: [{ apiGroup: 'rbac.authorization.k8s.io', kind: 'User', name: username }],
+        },
+      });
+    } catch (e: unknown) {
+      const msg = (e as Error).message || '';
+      if (!msg.includes('409') && !msg.includes('AlreadyExists')) throw e;
+    }
+  }
+
+  async grantUserKubevirtAccessToNamespace(namespace: string, username: string): Promise<void> {
+    const rbac = this.getRbacApi();
+    const bindingName = `${username}-kubevirt-${namespace}`;
+    try {
+      await rbac.createNamespacedRoleBinding({
+        namespace,
+        body: {
+          metadata: { name: bindingName, namespace },
+          roleRef: { apiGroup: 'rbac.authorization.k8s.io', kind: 'ClusterRole', name: 'admin' },
+          subjects: [{ apiGroup: 'rbac.authorization.k8s.io', kind: 'User', name: username }],
+        },
+      });
+    } catch (e: unknown) {
+      const msg = (e as Error).message || '';
+      if (!msg.includes('409') && !msg.includes('AlreadyExists')) throw e;
+    }
+  }
+
+  // ── ConfigMap operations ────────────────────────────────────────────
+
+  async grantUserViewAccessToNamespace(namespace: string, username: string): Promise<void> {
+    const rbac = this.getRbacApi();
+    const bindingName = `${username}-view-${namespace}`;
+    try {
+      await rbac.createNamespacedRoleBinding({
+        namespace,
+        body: {
+          metadata: { name: bindingName, namespace },
+          roleRef: { apiGroup: 'rbac.authorization.k8s.io', kind: 'ClusterRole', name: 'view' },
+          subjects: [{ apiGroup: 'rbac.authorization.k8s.io', kind: 'User', name: username }],
+        },
+      });
+    } catch (e: unknown) {
+      const msg = (e as Error).message || '';
+      if (!msg.includes('409') && !msg.includes('AlreadyExists')) throw e;
+    }
+  }
+
+  async isNativeVmTemplateFeatureGateEnabled(
+    name = 'kubevirt-hyperconverged',
+    namespace = 'openshift-cnv',
+  ): Promise<boolean> {
+    try {
+      const hco = await this.getHyperConverged(name, namespace);
+      const featureGates = (hco?.spec as K8sResource)?.featureGates as K8sResource | undefined;
+      return featureGates?.withHostPassthroughCPU === true;
+    } catch {
+      return false;
+    }
+  }
+
+  async listClusterCustomResources(
+    group: string,
+    version: string,
+    plural: string,
+  ): Promise<K8sResource[]> {
+    const result = await this.coApi.listClusterCustomObject({ group, version, plural });
+    return ((result as K8sResource).items as K8sResource[]) || [];
+  }
+
+  async listCustomResources(
+    group: string,
+    version: string,
+    namespace: string,
+    plural: string,
+  ): Promise<K8sResource[]> {
+    const result = await this.coApi.listNamespacedCustomObject({
+      group,
+      version,
+      namespace,
+      plural,
+    });
+    return ((result as K8sResource).items as K8sResource[]) || [];
+  }
+
+  async patchConfigMap(
+    name: string,
+    namespace: string,
+    data: Record<string, string>,
+  ): Promise<void> {
+    await this.coreApi.patchNamespacedConfigMap({
+      name,
+      namespace,
+      body: { data },
+    });
+  }
+
+  // ── StorageClass operations ─────────────────────────────────────────
+
+  async patchHyperConverged(
+    name: string,
+    namespace: string,
+    patchOps: Array<{ op: string; path: string; value?: unknown }>,
+  ): Promise<void> {
+    await this.coApi.patchNamespacedCustomObject({
+      group: 'hco.kubevirt.io',
+      version: 'v1beta1',
+      namespace,
+      plural: 'hyperconvergeds',
+      name,
+      body: patchOps,
+    });
+  }
+
+  // ── Non-priv user operations ────────────────────────────────────────
+
+  async removeVmDeleteProtection(vmName: string, namespace: string): Promise<void> {
+    await this.coApi.patchNamespacedCustomObject({
+      group: 'kubevirt.io',
+      version: 'v1',
+      namespace,
+      plural: 'virtualmachines',
+      name: vmName,
+      body: [{ op: 'remove', path: '/metadata/labels/kubevirt.io~1vm-delete-protection' }],
+    });
+  }
+
+  // ── RBAC operations ─────────────────────────────────────────────────
+
+  async setDefaultStorageClassForVirtualMachines(storageClassName: string): Promise<void> {
+    const storageApi = this.kc.makeApiClient(k8s.StorageV1Api);
+    await storageApi.patchStorageClass({
+      name: storageClassName,
+      body: {
+        metadata: {
+          annotations: {
+            'storageclass.kubevirt.io/is-default-virt-class': 'true',
+          },
+        },
+      },
+    });
+  }
+
+  async setupConsoleUserSettings(
+    username: string,
+    _namespace?: string,
+    _maxRetries = 5,
+  ): Promise<boolean> {
+    try {
+      const settingsKey = username === 'kubeadmin' ? 'kube-admin' : username;
+      const cmName = `user-settings-${settingsKey}`;
+      const ns = 'openshift-console-user-settings';
+      await this.patchConfigMap(cmName, ns, {
+        [settingsKey]: JSON.stringify({ guidedTour: { status: 'complete' } }),
+      });
+      return true;
+    } catch {
+      return false;
     }
   }
 
