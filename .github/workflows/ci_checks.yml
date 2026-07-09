@@ -65,11 +65,23 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v6
         with:
-          node-version: '18'
+          node-version: '22'
       - run: npm ci --ignore-scripts
 
       - name: Run Unit Tests
         run: npm run test-cov
+
+      - name: Install script dependencies
+        working-directory: .github/scripts
+        run: npm ci
+
+      - name: Check workflow script types
+        working-directory: .github/scripts
+        run: npm run check-types
+
+      - name: Run workflow script tests
+        working-directory: .github/scripts
+        run: npm test
 
       - name: Coverage Upload
         uses: codecov/codecov-action@v2

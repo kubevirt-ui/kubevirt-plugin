@@ -31,7 +31,11 @@ const config: Config.InitialOptions = {
   testEnvironmentOptions: {
     url: 'http://localhost/',
   },
-  testPathIgnorePatterns: ['<rootDir>/node_modules/', '<rootDir>/dist/'],
+  testPathIgnorePatterns: [
+    '<rootDir>/node_modules/',
+    '<rootDir>/dist/',
+    '<rootDir>/.github/scripts/',
+  ],
   testRegex: '.*\\.test\\.(ts|tsx|js|jsx)$',
   transform: {
     '^.+\\.[t|j]sx?$': ['ts-jest', tsJestOptions],
