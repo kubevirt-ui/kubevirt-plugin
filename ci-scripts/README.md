@@ -84,8 +84,9 @@ Uses `openshift-install` to create a fully self-managed OpenShift cluster on IBM
 
 | Secret              | Description                                                                 |
 | ------------------- | --------------------------------------------------------------------------- |
-| `BOT_PAT`           | PAT with repo admin scope for ghost runner cleanup                          |
 | `SLACK_WEBHOOK_URL` | Slack Incoming Webhook URL for credential notifications on cluster creation |
+
+Ghost runner cleanup reuses the ARC Authentication GitHub App credentials above (`ARC_GITHUB_APP_ID` + `ARC_GITHUB_APP_PRIVATE_KEY`) — no separate secret needed, since that app is already scoped to `administration: write`, exactly what deregistering offline runners requires.
 
 ## Setting Up the Hot Cluster
 
@@ -174,7 +175,6 @@ Key defaults:
 - `KVM_EMULATION=false` (bare metal has real KVM; set `true` for VPC/shared)
 - `RUNNER_SCALE_SET_NAME=kubevirt-plugin-ci` (the `runs-on:` label)
 - `ARC_CONTROLLER_INSTALL_NAME=arc` (Helm release for controller)
-- `CONTAINER_MODE=dind` (Docker-in-Docker for container jobs)
 - `ARC_VERSION=0.14.0` (pinned Helm chart version)
 
 ## Cost Control
@@ -190,9 +190,8 @@ Always verify the cluster has been torn down when done testing. The auto-teardow
 
 ## Known Limitations
 
-- **Privileged dind + broad SCC**: The `github-arc` SCC allows privileged containers for the Docker-in-Docker sidecar. Scope runner namespaces and RBAC accordingly.
 - **`ttl.sh` for plugin images**: Plugin images use ephemeral `ttl.sh` tags with 2h TTL per CI run. Suitable for CI but not for long-term storage.
-- **Ghost runner cleanup**: Requires `BOT_PAT` with repo admin scope. Without it, offline runners must be cleaned up manually.
+- **Ghost runner cleanup**: Requires the ARC GitHub App credentials (`ARC_GITHUB_APP_ID` + `ARC_GITHUB_APP_PRIVATE_KEY`). If ARC auth is instead configured via `ARC_GITHUB_PAT`, offline runners must be cleaned up manually.
 - **IBM Cloud VPC hairpin NAT**: VPC load balancers don't support hairpin NAT. On IPI clusters, ingress canary checks fail and the authentication operator may report Degraded. This is cosmetic -- the console works fine for browser access from outside the cluster, and CI tests are unaffected (they use internal service URLs).
 
 ## Troubleshooting

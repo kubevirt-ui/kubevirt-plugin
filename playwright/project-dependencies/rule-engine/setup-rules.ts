@@ -1,5 +1,7 @@
 import { execFileSync, execSync } from 'child_process';
 import * as fs from 'fs';
+import * as http from 'http';
+import * as https from 'https';
 import * as path from 'path';
 
 import { KubernetesClient } from '@/clients/kubernetes-client';
@@ -153,6 +155,65 @@ export function getSetupRules(): SetupRule[] {
         } as SharedTestConfig;
         TestConfigManager.saveConfig(setupConfig);
         logger.info(`✓ Saved test configuration`);
+      },
+    },
+    {
+      id: 'wait-for-console-ready',
+      name: 'Wait for console web endpoint to become reachable',
+      phase: SetupPhase.CLUSTER,
+      guard: () => !EnvVariables.isLocalhost,
+      onError: 'throw',
+      run: async () => {
+        const baseUrl = EnvVariables.webConsoleUrl;
+        const timeoutMs = 2 * MINUTE;
+        const pollIntervalMs = 5 * SECOND;
+        logger.info(`⏳ Waiting for console to become reachable at ${baseUrl}...`);
+
+        // Plain http/https.get instead of fetch(): fetch performs strict TLS
+        // validation and rejects the self-signed/cluster-CA certs OpenShift
+        // console routes commonly use, which would time this probe out even
+        // when browser-login (Chromium with --ignore-certificate-errors)
+        // would connect just fine. rejectUnauthorized: false mirrors that
+        // same TLS-relaxed behavior here.
+        const probe = (): Promise<number> =>
+          new Promise<number>((resolve, reject) => {
+            const client = baseUrl.startsWith('https:') ? https : http;
+            const req = client.get(
+              baseUrl,
+              { rejectUnauthorized: false, timeout: 10 * SECOND },
+              (res) => {
+                res.resume(); // drain the response body to free the socket
+                resolve(res.statusCode ?? 0);
+              },
+            );
+            req.on('timeout', () => req.destroy(new Error('Probe request timed out')));
+            req.on('error', reject);
+          });
+
+        const start = Date.now();
+        let lastError: unknown;
+        while (Date.now() - start < timeoutMs) {
+          try {
+            // Any HTTP response (even a redirect/4xx) means the service is
+            // accepting connections — that's all browser-login needs. A
+            // connection error means the connection itself was refused/reset,
+            // typically because the per-run console Helm release is still
+            // rolling out.
+            const status = await probe();
+            logger.success(
+              `✓ Console responded with HTTP ${status} after ${Math.round((Date.now() - start) / 1000)}s`,
+            );
+            return;
+          } catch (err) {
+            lastError = err;
+            await new Promise((resolve) => setTimeout(resolve, pollIntervalMs));
+          }
+        }
+
+        const msg = lastError instanceof Error ? lastError.message : String(lastError);
+        throw new Error(
+          `Console at ${baseUrl} did not become reachable within ${timeoutMs / 1000}s: ${msg}`,
+        );
       },
     },
 

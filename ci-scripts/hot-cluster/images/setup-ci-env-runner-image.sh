@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # OpenShift only: create ImageStream + BuildConfig and run a binary Docker build for the
-# ci-env-controller image (ci-scripts/hot-cluster/ci-env/controller-image/Dockerfile).
+# ci-env-controller image (ci-scripts/hot-cluster/images/ci-env-runner/Dockerfile).
 #
 # Output: prints IMAGE_REF= to stdout (and to CI_ENV_CONTROLLER_IMAGE_FILE if set).
 #
@@ -109,7 +109,7 @@ for i in $(seq 1 12); do
   sleep 5
 done
 
-# The controller-image/ directory contains a symlink to the Helm chart.
+# The ci-env-runner/ directory contains a symlink to the Helm chart.
 # Use tar -ch to dereference symlinks so the build pod receives the actual
 # chart files (including templates/ subdirectory), then pipe to --from-archive.
 echo "Starting binary build from ${IMAGE_DIR} (dereferencing symlinks)..."

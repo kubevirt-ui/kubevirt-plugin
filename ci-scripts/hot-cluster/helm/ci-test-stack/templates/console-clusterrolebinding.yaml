@@ -1,6 +1,7 @@
-# Binds the console SA to the ci-console ClusterRole that was pre-created at
-# ARC install time. The ClusterRoleBinding is cluster-scoped so it must be
-# explicitly deleted on cleanup (helm uninstall handles this).
+# Binds the console SA to the ci-console ClusterRole created by the
+# ci-env-controller Helm chart (independent of the ARC install). The
+# ClusterRoleBinding is cluster-scoped so it must be explicitly deleted on
+# cleanup (helm uninstall handles this).
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:

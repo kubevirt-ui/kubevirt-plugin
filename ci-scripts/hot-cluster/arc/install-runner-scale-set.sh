@@ -119,5 +119,5 @@ fi
 echo ""
 echo "=== Runner scale set installation complete ==="
 echo "  runs-on: ${RUNNER_SCALE_SET_NAME}"
-echo "  To refresh runner image: re-run this script with ARC_RUNNER_IMAGE set (after setup-runner-image.sh)."
+echo "  To refresh runner image: re-run this script with ARC_RUNNER_IMAGE set (after ../images/setup-arc-runner-image.sh)."
 echo ""

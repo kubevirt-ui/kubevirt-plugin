@@ -5,7 +5,7 @@
 # Using UBI9 avoids FIPS/OpenSSL DSO issues on hardened OpenShift clusters
 # (the Ubuntu-based ARC runner image fails OpenSSL loads on FIPS nodes).
 #
-# The Helm chart is staged into the build context by setup-controller-image.sh
+# The Helm chart is staged into the build context by setup-ci-env-runner-image.sh
 # and COPY'd into the image, avoiding the ConfigMap flat-key limitation that
 # drops subdirectories (templates/).
 
@@ -51,7 +51,7 @@ RUN curl -sL -o /usr/local/bin/yq \
     && chmod +x /usr/local/bin/yq
 
 # Embed the Helm chart into the image. The chart is staged into the build
-# context by setup-controller-image.sh via a symlink dereferenced by tar -ch.
+# context by setup-ci-env-runner-image.sh via a symlink dereferenced by tar -ch.
 COPY helm/ci-test-stack/ /opt/ci-env/helm/ci-test-stack/
 
 RUN useradd -r -u 1001 -g 0 -d /home/controller -s /sbin/nologin controller \
