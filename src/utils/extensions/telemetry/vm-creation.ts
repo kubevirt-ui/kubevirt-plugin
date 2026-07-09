@@ -1,6 +1,11 @@
 import { isCommonTemplate, Template } from '@kubevirt-utils/resources/template';
-import { VMCreationMethod, VMWizardStep } from '@virtualmachines/creation-wizard/utils/constants';
+import {
+  VMCreationMethod,
+  VMWizardStep,
+} from '@virtualmachines/creation-wizard-new/utils/constants';
 
+import { logTaskErrorLogged, logTaskProficiencyMeasured } from './learning';
+import { eventMonitor, getTelemetryErrorMessage } from './telemetry';
 import { VM_CREATED, VM_CREATION_FAILED, VM_CREATION_STARTED } from './utils/constants';
 import {
   TELEMETRY_TASK_ERROR_TYPE,
@@ -9,8 +14,6 @@ import {
   TELEMETRY_VM_CREATION_METHOD,
 } from './utils/property-constants';
 import { TemplateTypeTelemetry, VMCreationMethodTelemetry } from './utils/types';
-import { logTaskErrorLogged, logTaskProficiencyMeasured } from './learning';
-import { eventMonitor, getTelemetryErrorMessage } from './telemetry';
 
 export const mapCreationMethodToTelemetry = (
   method: VMCreationMethod,

@@ -9,7 +9,7 @@ import { getName } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { ResourceIcon } from '@openshift-console/dynamic-plugin-sdk';
 import { MenuItem, MenuSearch, MenuSearchInput, SearchInput } from '@patternfly/react-core';
-import { InstanceTypes } from '@virtualmachines/creation-wizard/utils/types';
+import { InstanceTypes } from '@virtualmachines/creation-wizard-new/utils/types';
 
 type UserInstanceTypeMenuProps = {
   allInstanceTypes: InstanceTypes;
