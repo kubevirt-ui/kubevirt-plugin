@@ -1,11 +1,5 @@
 name: PR Validation
 
-# Optional repository variables (Settings → Secrets and variables → Actions → Variables):
-# - PR_VALIDATION_LIFECYCLE_ACTIONS
-# - PR_VALIDATION_LABEL_ACTIONS
-# - AI_CONFIG_VALIDATION_LABELS  (sync with .github/scripts/src/ai-config-validation/constants.ts)
-# - JIRA_VALIDATION_LABELS       (sync with .github/scripts/src/types/config.ts)
-
 on:
   pull_request_target:
     types: [opened, synchronize, reopened, labeled, unlabeled]
@@ -20,27 +14,42 @@ permissions:
 jobs:
   ai-config-validation:
     name: ai-config-validation
+    if: github.event_name == 'pull_request_target'
     runs-on: ubuntu-latest
-    if: >
-      github.event_name == 'pull_request_target' &&
-      (
-        contains(fromJSON(vars.PR_VALIDATION_LIFECYCLE_ACTIONS || '["opened","synchronize","reopened"]'), github.event.action) ||
-        (
-          contains(fromJSON(vars.PR_VALIDATION_LABEL_ACTIONS || '["labeled","unlabeled"]'), github.event.action) &&
-          contains(fromJSON(vars.AI_CONFIG_VALIDATION_LABELS || '["ai-config-changed","do-not-merge/ai-config-review","ai-config-reviewed","skip-ai-config-check"]'), github.event.label.name)
-        )
-      )
     concurrency:
       group: ai-config-check-${{ github.event.pull_request.number }}
       cancel-in-progress: true
     steps:
+      - name: Should run
+        id: trigger
+        run: |
+          should_run=false
+
+          case "${{ github.event.action }}" in
+            opened|synchronize|reopened)
+              should_run=true
+              ;;
+            labeled|unlabeled)
+              case "${{ github.event.label.name }}" in
+                # Sync with .github/scripts/src/ai-config-validation/constants.ts
+                ai-config-changed|do-not-merge/ai-config-review|ai-config-reviewed|skip-ai-config-check)
+                  should_run=true
+                  ;;
+              esac
+              ;;
+          esac
+
+          echo "should-run=$should_run" >> "$GITHUB_OUTPUT"
+
       - name: Checkout base branch scripts
+        if: steps.trigger.outputs.should-run == 'true'
         uses: actions/checkout@v7
         with:
           ref: ${{ github.event.pull_request.base.ref }}
           sparse-checkout: .github/scripts
 
       - name: Setup Node
+        if: steps.trigger.outputs.should-run == 'true'
         uses: actions/setup-node@v6
         with:
           node-version: '22'
@@ -48,10 +57,12 @@ jobs:
           cache-dependency-path: .github/scripts/package-lock.json
 
       - name: Install script dependencies
+        if: steps.trigger.outputs.should-run == 'true'
         working-directory: .github/scripts
         run: npm ci
 
       - name: Run AI configuration PR validation
+        if: steps.trigger.outputs.should-run == 'true'
         working-directory: .github/scripts
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -64,29 +75,44 @@ jobs:
 
   jira-validation:
     name: jira-validation
+    if: github.event_name == 'pull_request_target' || github.event_name == 'issue_comment'
     runs-on: ubuntu-latest
     concurrency:
       group: jira-check-${{ github.event.pull_request.number || github.event.issue.number }}
       cancel-in-progress: true
-    if: >
-      (
-        github.event_name == 'pull_request_target' &&
-        (
-          contains(fromJSON(vars.PR_VALIDATION_LIFECYCLE_ACTIONS || '["opened","synchronize","reopened"]'), github.event.action) ||
-          (
-            contains(fromJSON(vars.PR_VALIDATION_LABEL_ACTIONS || '["labeled","unlabeled"]'), github.event.action) &&
-            contains(fromJSON(vars.JIRA_VALIDATION_LABELS || '["skip-jira-check","do-not-merge/jira-invalid"]'), github.event.label.name)
-          )
-        )
-      ) ||
-      (
-        github.event_name == 'issue_comment' &&
-        github.event.issue.pull_request != null &&
-        contains(github.event.comment.body, '/recheck-jira')
-      )
     steps:
+      - name: Should run
+        id: trigger
+        env:
+          COMMENT_BODY: ${{ github.event.comment.body }}
+          IS_PULL_REQUEST: ${{ github.event.issue.pull_request != null }}
+        run: |
+          should_run=false
+
+          if [ "${{ github.event_name }}" = "issue_comment" ]; then
+            if [ "$IS_PULL_REQUEST" = "true" ] && [[ "$COMMENT_BODY" == *"/recheck-jira"* ]]; then
+              should_run=true
+            fi
+          else
+            case "${{ github.event.action }}" in
+              opened|synchronize|reopened)
+                should_run=true
+                ;;
+              labeled|unlabeled)
+                case "${{ github.event.label.name }}" in
+                  # Sync with .github/scripts/src/types/config.ts
+                  skip-jira-check|do-not-merge/jira-invalid)
+                    should_run=true
+                    ;;
+                esac
+                ;;
+            esac
+          fi
+
+          echo "should-run=$should_run" >> "$GITHUB_OUTPUT"
+
       - name: Get PR info (comment trigger)
-        if: github.event_name == 'issue_comment'
+        if: steps.trigger.outputs.should-run == 'true' && github.event_name == 'issue_comment'
         id: pr-info
         uses: actions/github-script@v9
         with:
@@ -101,12 +127,14 @@ jobs:
             core.setOutput('head_sha', pr.head.sha);
 
       - name: Checkout base branch scripts
+        if: steps.trigger.outputs.should-run == 'true'
         uses: actions/checkout@v7
         with:
           ref: ${{ github.event.pull_request.base.ref || steps.pr-info.outputs.base_ref }}
           sparse-checkout: .github/scripts
 
       - name: Setup Node
+        if: steps.trigger.outputs.should-run == 'true'
         uses: actions/setup-node@v6
         with:
           node-version: '22'
@@ -114,10 +142,12 @@ jobs:
           cache-dependency-path: .github/scripts/package-lock.json
 
       - name: Install script dependencies
+        if: steps.trigger.outputs.should-run == 'true'
         working-directory: .github/scripts
         run: npm ci
 
       - name: Run Jira PR validation
+        if: steps.trigger.outputs.should-run == 'true'
         working-directory: .github/scripts
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
