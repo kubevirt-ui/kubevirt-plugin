@@ -4,21 +4,21 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { Gallery } from '@patternfly/react-core';
 
 import CapabilityCard from './components/CapabilityCard/CapabilityCard';
-import { RecommendedCapabilitiesContextProvider } from './context/RecommendedCapabilitiesContext';
-import { getRecommendedCapabilityFeatures } from './utils/constants';
+import { CapabilitiesDataProvider } from './context/CapabilitiesDataProvider';
+import { getRecommendedCapabilityFeatures } from './utils/capabilityFeatures';
 
 const RecommendedCapabilitiesTab: FC = () => {
   const { t } = useKubevirtTranslation();
   const features = useMemo(() => getRecommendedCapabilityFeatures(t), [t]);
 
   return (
-    <RecommendedCapabilitiesContextProvider>
-      <Gallery hasGutter minWidths={{ default: '280px' }}>
+    <CapabilitiesDataProvider>
+      <Gallery hasGutter minWidths={{ default: '17.5rem' }}>
         {features.map((feature) => (
           <CapabilityCard key={feature.id} feature={feature} />
         ))}
       </Gallery>
-    </RecommendedCapabilitiesContextProvider>
+    </CapabilitiesDataProvider>
   );
 };
 

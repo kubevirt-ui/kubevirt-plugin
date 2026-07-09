@@ -2,17 +2,17 @@ import React, { FC } from 'react';
 
 import { Card, CardBody, CardHeader, CardTitle, Skeleton } from '@patternfly/react-core';
 
-import { useRecommendedCapabilitiesContext } from '../../context/RecommendedCapabilitiesContext';
 import { CapabilityFeature } from '../../utils/types';
 
 import CapabilityCardActions from './CapabilityCardActions';
+import { useCapabilitiesData } from '../../context/useCapabilitiesData';
 
 type CapabilityCardProps = {
   feature: CapabilityFeature;
 };
 
 const CapabilityCard: FC<CapabilityCardProps> = ({ feature }) => {
-  const { getCapabilityInstallState, resourcesLoaded } = useRecommendedCapabilitiesContext();
+  const { getCapabilityInstallState, resourcesLoaded } = useCapabilitiesData();
   const installState = getCapabilityInstallState(feature);
 
   return (
