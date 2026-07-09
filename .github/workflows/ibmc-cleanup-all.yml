@@ -367,11 +367,24 @@ jobs:
           echo "=== ROKS Clusters ==="
           ibmcloud oc cluster ls 2>&1 | rg "${CLUSTER_NAME}" || echo "No ROKS clusters matching '${CLUSTER_NAME}'."
 
+      # Reuses the existing kubevirt-plugin-arc GitHub App (already scoped to
+      # exactly `administration: write`, the permission runner
+      # registration/deregistration needs).
+      - name: Generate ARC app token for ghost-runner cleanup
+        id: arc-app-token
+        if: env.DRY_RUN == 'false'
+        continue-on-error: true
+        uses: actions/create-github-app-token@v3
+        with:
+          app-id: ${{ secrets.ARC_GITHUB_APP_ID }}
+          private-key: ${{ secrets.ARC_GITHUB_APP_PRIVATE_KEY }}
+          permission-administration: write
+
       - name: Clean up ghost runners for matched clusters
         if: env.DRY_RUN == 'false'
         continue-on-error: true
         env:
-          GH_TOKEN: ${{ secrets.BOT_PAT }}
+          GH_TOKEN: ${{ steps.arc-app-token.outputs.token }}
           MATCHED_CLUSTERS: ${{ steps.detect_clusters.outputs.clusters }}
         run: |
           echo "=== Offline Self-Hosted Runners ==="

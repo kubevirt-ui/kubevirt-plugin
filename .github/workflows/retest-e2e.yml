@@ -6,6 +6,7 @@ on:
 
 permissions:
   actions: write
+  issues: write
   pull-requests: write
 
 jobs:
@@ -22,83 +23,154 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
+      # Short-lived installation token from the kubevirt-plugin-bot GitHub
+      # App (Pull requests: Read, Actions: Read and write).
+      #
+      # continue-on-error: if BOT_APP_ID/BOT_APP_PRIVATE_KEY themselves ever
+      # go bad, this must not skip the retest step below — an empty token
+      # input still lets that step run, fail its first API call, and get
+      # caught by its own try/catch, which is what actually drives the PR
+      # comment in the reporting step further down. Without this, a broken
+      # app credential would reproduce the exact silent-failure bug we're
+      # fixing here, just one level up.
+      - name: Generate bot token
+        id: bot-token
+        continue-on-error: true
+        uses: actions/create-github-app-token@v3
+        with:
+          app-id: ${{ secrets.BOT_APP_ID }}
+          private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
+
       # OWNERS (approvers/reviewers) is the single source of truth for trust —
       # the same source Prow uses for /lgtm, /approve. author_association and
       # org membership are unreliable proxies (misreport private membership,
       # need extra token scope), so we don't use them here.
+      #
+      # continue-on-error: an unforeseen failure here must not fail silently —
+      # steps.retest.outcome still reports 'failure' for the final step below,
+      # while the reporting step in between uses the default GITHUB_TOKEN
+      # (independent of the bot token) to explain what went wrong on the PR
+      # itself.
       - name: Check trusted author and re-run E2E workflow
+        id: retest
+        continue-on-error: true
         uses: actions/github-script@v9
         with:
-          github-token: ${{ secrets.BOT_PAT || secrets.GITHUB_TOKEN }}
+          github-token: ${{ steps.bot-token.outputs.token }}
           script: |
             const fs = require('fs');
             const author = context.payload.comment.user.login;
 
-            let trusted = false;
+            // kubevirt-plugin-bot deliberately doesn't have `issues: write`
+            // (PR comments are "issue comments" under the hood, so reacting
+            // to one needs that permission, not `pull-requests`). Reactions
+            // are cosmetic feedback on the /retest-e2e comment — a missing
+            // reaction must never be mistaken for the retest itself failing.
+            const react = async (content) => {
+              try {
+                await github.rest.reactions.createForIssueComment({
+                  ...context.repo,
+                  comment_id: context.payload.comment.id,
+                  content,
+                });
+              } catch (err) {
+                core.warning(`Could not react to comment with "${content}": ${err.message || err}`);
+              }
+            };
+
             try {
-              const owners = fs.readFileSync('OWNERS', 'utf8');
-              trusted = new RegExp(`^\\s*-\\s*${author}\\s*$`, 'm').test(owners);
+              let trusted = false;
+              try {
+                const owners = fs.readFileSync('OWNERS', 'utf8');
+                trusted = new RegExp(`^\\s*-\\s*${author}\\s*$`, 'm').test(owners);
+              } catch (err) {
+                core.warning(`Could not read OWNERS file: ${err.message}`);
+              }
+
+              core.info(`${author} is ${trusted ? '' : 'not '}listed in OWNERS (approvers/reviewers) — ${trusted ? 'trusted' : 'untrusted, ignoring /retest-e2e'}.`);
+
+              if (!trusted) {
+                await react('-1');
+                core.setFailed(`${author} is not authorized to use /retest-e2e`);
+                return;
+              }
+
+              const prNumber = context.issue.number;
+              const pr = await github.rest.pulls.get({
+                ...context.repo,
+                pull_number: prNumber,
+              });
+              const headSha = pr.data.head.sha;
+
+              core.info(`/retest-e2e requested by ${author} on PR #${prNumber} (HEAD: ${headSha})`);
+
+              const runs = await github.rest.actions.listWorkflowRuns({
+                ...context.repo,
+                workflow_id: 'hot-cluster-e2e.yml',
+                event: 'pull_request_target',
+                per_page: 10,
+              });
+
+              const prRun = runs.data.workflow_runs.find(r => {
+                const prMatch = r.pull_requests?.some(p => p.number === prNumber);
+                const shaMatch = r.head_sha === headSha;
+                return prMatch || shaMatch;
+              });
+
+              if (!prRun) {
+                const msg = `No Hot Cluster E2E workflow run found for PR #${prNumber}. ` +
+                  `Push a commit to trigger the initial run.`;
+                core.warning(msg);
+                await react('confused');
+                return;
+              }
+
+              core.info(`Re-running workflow run ${prRun.id} (attempt ${prRun.run_attempt})...`);
+
+              await react('rocket');
+
+              await github.rest.actions.reRunWorkflow({
+                ...context.repo,
+                run_id: prRun.id,
+              });
+
+              core.info(`Re-run triggered: https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${prRun.id}`);
             } catch (err) {
-              core.warning(`Could not read OWNERS file: ${err.message}`);
+              // Distinct from the expected "not authorized" rejection above:
+              // this is an unforeseen failure (bad bot token, API outage,
+              // ...) that the PR author has no way to diagnose from a
+              // missing reaction alone.
+              core.setOutput('unexpected_error', 'true');
+              core.setOutput('error_message', err.message || String(err));
+              core.setFailed(`Unexpected error while processing /retest-e2e: ${err.message || err}`);
             }
 
-            core.info(`${author} is ${trusted ? '' : 'not '}listed in OWNERS (approvers/reviewers) — ${trusted ? 'trusted' : 'untrusted, ignoring /retest-e2e'}.`);
-
-            if (!trusted) {
-              await github.rest.reactions.createForIssueComment({
-                ...context.repo,
-                comment_id: context.payload.comment.id,
-                content: '-1',
-              });
-              core.setFailed(`${author} is not authorized to use /retest-e2e`);
-              return;
-            }
-
-            const prNumber = context.issue.number;
-            const pr = await github.rest.pulls.get({
+      - name: Report unexpected retest failure on the PR
+        if: steps.retest.outputs.unexpected_error == 'true'
+        uses: actions/github-script@v9
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const errorMessage = ${{ toJSON(steps.retest.outputs.error_message) }};
+            await github.rest.issues.createComment({
               ...context.repo,
-              pull_number: prNumber,
-            });
-            const headSha = pr.data.head.sha;
-
-            core.info(`/retest-e2e requested by ${author} on PR #${prNumber} (HEAD: ${headSha})`);
-
-            const runs = await github.rest.actions.listWorkflowRuns({
-              ...context.repo,
-              workflow_id: 'hot-cluster-e2e.yml',
-              event: 'pull_request_target',
-              per_page: 10,
-            });
-
-            const prRun = runs.data.workflow_runs.find(r => {
-              const prMatch = r.pull_requests?.some(p => p.number === prNumber);
-              const shaMatch = r.head_sha === headSha;
-              return prMatch || shaMatch;
+              issue_number: context.issue.number,
+              body: [
+                '⚠️ `/retest-e2e` hit an unexpected error and did not re-run the Hot Cluster E2E workflow:',
+                '',
+                '```',
+                errorMessage,
+                '```',
+                '',
+                'This usually means the `kubevirt-plugin-bot` GitHub App token (BOT_APP_ID / BOT_APP_PRIVATE_KEY) is misconfigured or the app was uninstalled — a maintainer should check it. ' +
+                  'In the meantime, re-run the failed workflow manually from the Actions tab.',
+              ].join('\n'),
             });
 
-            if (!prRun) {
-              const msg = `No Hot Cluster E2E workflow run found for PR #${prNumber}. ` +
-                `Push a commit to trigger the initial run.`;
-              core.warning(msg);
-              await github.rest.reactions.createForIssueComment({
-                ...context.repo,
-                comment_id: context.payload.comment.id,
-                content: 'confused',
-              });
-              return;
-            }
-
-            core.info(`Re-running workflow run ${prRun.id} (attempt ${prRun.run_attempt})...`);
-
-            await github.rest.reactions.createForIssueComment({
-              ...context.repo,
-              comment_id: context.payload.comment.id,
-              content: 'rocket',
-            });
-
-            await github.rest.actions.reRunWorkflow({
-              ...context.repo,
-              run_id: prRun.id,
-            });
-
-            core.info(`Re-run triggered: https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${prRun.id}`);
+      # Re-fail the job for both the "not authorized" and "unexpected error"
+      # cases above: continue-on-error on the retest step only exists so the
+      # reporting step can run afterwards, not to hide a genuine failure from
+      # the job's overall status.
+      - name: Fail job if retest did not succeed
+        if: steps.retest.outcome == 'failure'
+        run: exit 1

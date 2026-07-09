@@ -1,12 +1,12 @@
 #!/bin/bash
 #
 # OpenShift only: create ImageStream + BuildConfig and run a binary Docker build for the
-# custom ARC runner image (ci-scripts/hot-cluster/arc/runner-image/Dockerfile).
+# custom ARC runner image (ci-scripts/hot-cluster/images/arc-runner/Dockerfile).
 #
 # Output: prints IMAGE_REF= to stdout (and to ARC_RUNNER_IMAGE_FILE if set).
 #
 # Optional environment variables:
-#   NS               Namespace for the runner (default: ci-env-images)
+#   NS               Namespace for the runner (default: arc-runners)
 #   OC_VERSION       OpenShift client version build-arg (default: detect or 4.20)
 #   HELM_VERSION     Helm version build-arg (default: 3.19.0)
 #   VIRTCTL_VERSION  (default: v1.4.0)

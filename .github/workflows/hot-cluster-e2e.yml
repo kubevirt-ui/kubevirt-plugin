@@ -1,5 +1,5 @@
 name: Hot Cluster E2E
-run-name: "Hot Cluster E2E [${{ inputs.cluster_name || github.base_ref || 'kubevirt-plugin-ci' }}]"
+run-name: "Hot Cluster E2E [${{ inputs.cluster_name || github.head_ref || github.base_ref || 'kubevirt-plugin-ci' }}]"
 
 on:
   pull_request_target:
@@ -44,11 +44,19 @@ permissions:
   actions: write
 
 concurrency:
-  group: hot-cluster-e2e-${{ github.event.pull_request.number || format('{0}-{1}', github.ref, inputs.cluster_name || 'kubevirt-plugin-ci') }}
-  # Only cancel a real in-progress run for events that actually warrant one
-  # (push/reopen, or an ok-to-test labeling). Routine bot-added labels (lgtm,
-  # approved, jira/valid-reference, ...) must not cancel a genuine run.
-  cancel-in-progress: ${{ github.event.action != 'labeled' || github.event.label.name == 'ok-to-test' }}
+  # Irrelevant label events (lgtm, approved, jira/valid-reference, ...) get
+  # their own run-id-unique group instead of sharing the real per-PR group.
+  # Sharing the group with cancel-in-progress: false (an earlier attempt at
+  # this) queues them behind a real in-progress run instead of cancelling
+  # it — which is an improvement, but means the queued run only evaluates
+  # (and skips) its jobs *after* the real run finishes, so its "skipped"
+  # Run Gating Tests can complete with a later timestamp than the real
+  # run's genuine success/failure, making GitHub treat the harmless skip as
+  # the latest, authoritative result. A fully isolated group avoids this
+  # entirely: the irrelevant-label run never shares a queue slot with the
+  # real one, so it always executes (and skips) immediately.
+  group: ${{ (github.event.action != 'labeled' || github.event.label.name == 'ok-to-test') && format('hot-cluster-e2e-{0}', github.event.pull_request.number || format('{0}-{1}', github.ref, inputs.cluster_name || 'kubevirt-plugin-ci')) || format('hot-cluster-e2e-noop-{0}', github.run_id) }}
+  cancel-in-progress: true
 
 env:
   INFRASTRUCTURE_TYPE: ${{ inputs.infrastructure_type || 'ipi' }}
@@ -100,11 +108,15 @@ jobs:
       # the same source Prow uses for /lgtm, /approve. author_association and
       # org membership are unreliable proxies (misreport private membership,
       # need extra token scope), so we don't use them here.
+      #
+      # No elevated token needed: this script only reads the local OWNERS
+      # file, it never calls the GitHub API, so the default GITHUB_TOKEN is
+      # sufficient (a bot/app token would be unused dead weight here).
       - name: Determine if PR author is a trusted repo owner
         id: check
         uses: actions/github-script@v9
         with:
-          github-token: ${{ secrets.BOT_PAT || secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const fs = require('fs');
             const author = context.payload.pull_request.user.login;
@@ -139,7 +151,7 @@ jobs:
     secrets: inherit
 
   cluster-health-check:
-    name: Cluster Health Check
+    name: Manual Cluster Health Check
     needs: [cluster-check, resolve-cluster-config]
     if: github.event_name == 'workflow_dispatch' && needs.cluster-check.result == 'success'
     runs-on: ubuntu-latest
@@ -200,7 +212,7 @@ jobs:
       - name: Health check summary
         if: always()
         run: |
-          echo "## Cluster Health Check" >> "$GITHUB_STEP_SUMMARY"
+          echo "## Manual Cluster Health Check" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
           echo "| Parameter | Value |" >> "$GITHUB_STEP_SUMMARY"
           echo "|-----------|-------|" >> "$GITHUB_STEP_SUMMARY"

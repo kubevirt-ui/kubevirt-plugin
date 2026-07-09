@@ -47,7 +47,9 @@ on:
     secrets:
       IC_KEY:
         required: true
-      BOT_PAT:
+      ARC_GITHUB_APP_ID:
+        required: false
+      ARC_GITHUB_APP_PRIVATE_KEY:
         required: false
       OPENSHIFT_PULL_SECRET:
         required: false
@@ -261,10 +263,24 @@ jobs:
       # ──────────────────────────────────────────────────────────────────────
       # Common cleanup
       # ──────────────────────────────────────────────────────────────────────
+      # Reuses the existing kubevirt-plugin-arc GitHub App (already scoped to
+      # exactly `administration: write`, the permission runner
+      # registration/deregistration needs).
+      - name: Generate ARC app token for ghost-runner cleanup
+        id: arc-app-token
+        if: always()
+        continue-on-error: true
+        uses: actions/create-github-app-token@v3
+        with:
+          app-id: ${{ secrets.ARC_GITHUB_APP_ID }}
+          private-key: ${{ secrets.ARC_GITHUB_APP_PRIVATE_KEY }}
+          permission-administration: write
+
       - name: Clean up ghost runners
+        if: always()
         continue-on-error: true
         env:
-          GH_TOKEN: ${{ secrets.BOT_PAT }}
+          GH_TOKEN: ${{ steps.arc-app-token.outputs.token }}
         run: |
           echo "Checking for offline self-hosted runners with label '${CLUSTER_NAME}'..."
           # gh api's --jq only accepts a single jq-expression string (no --arg
