@@ -21,7 +21,9 @@ test.describe('Template list page', () => {
   test('filter template by name', async ({ templatesPage }) => {
     await templatesPage.filterByName(CENTOSSTREAM9);
     await templatesPage.expectTemplateVisible(CENTOSSTREAM9);
-    await templatesPage.expectTemplateNotVisible(CENTOSSTREAM10);
+    // TEMPORARY: intentional failure to verify the "Run Gating Tests" required
+    // check actually blocks merging (CNV-92582). Revert this line before merging.
+    await templatesPage.expectTemplateVisible(CENTOSSTREAM10);
   });
 
   test('filter by template type', async ({ templatesPage }) => {
