@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 
-import { PlanModel } from '@kubev2v/types';
+import { PlanModel } from '@forklift-ui/types';
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import { getResourceUrl } from '@kubevirt-utils/resources/shared';
 import { MTV_MIGRATION_NAMESPACE } from '@multicluster/components/CrossClusterMigration/constants';

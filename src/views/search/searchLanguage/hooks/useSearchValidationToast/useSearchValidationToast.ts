@@ -58,6 +58,7 @@ const useSearchValidationToast = () => {
 
       addWarningToast({
         content: messages.join('\n'),
+        persistInDrawer: false,
         timeout: true,
         title,
       });

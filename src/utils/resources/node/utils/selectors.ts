@@ -1,4 +1,4 @@
-import { IoK8sApiCoreV1NodeCondition } from '@kubev2v/types';
+import { IoK8sApiCoreV1NodeCondition } from '@forklift-ui/types';
 import { IoK8sApiCoreV1Node } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { ARCHITECTURES } from '@kubevirt-utils/constants/constants';
 

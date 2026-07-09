@@ -61,7 +61,7 @@ declare module '@kubevirt-ui-ext/kubevirt-api/kubernetes' {
   }
 }
 
-declare module '@kubev2v/types' {
+declare module '@forklift-ui/types' {
   interface V1beta1Plan extends mtvTypes.V1beta1Plan {
     cluster?: string;
   }

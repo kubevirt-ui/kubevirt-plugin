@@ -1,6 +1,6 @@
 import { useCallback, useMemo } from 'react';
 
-import { V1beta1Provider } from '@kubev2v/types';
+import { V1beta1Provider } from '@forklift-ui/types';
 import { EnhancedSelectOptionProps } from '@kubevirt-utils/components/FilterSelect/utils/types';
 import useProjects from '@kubevirt-utils/hooks/useProjects';
 import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-utils/models';

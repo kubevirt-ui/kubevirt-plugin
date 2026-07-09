@@ -97,7 +97,8 @@ const CheckupsSelfValidationFormActions: FC<CheckupsSelfValidationFormActionsPro
         isDryRun,
         name,
         namespace,
-        onWarning: () => addWarningToast({ title: t('PVC may need manual cleanup') }),
+        onWarning: () =>
+          addWarningToast({ persistInDrawer: false, title: t('PVC may need manual cleanup') }),
         pvcSize,
         selectedTestSuites,
         storageCapabilities,

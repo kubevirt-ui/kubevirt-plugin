@@ -70,12 +70,14 @@ const CheckupsStorageActions = ({
     try {
       await deleteStorageCheckup(configMap, jobs);
       toast.addSuccessToast({
+        persistInDrawer: false,
         title: t('Checkup {{name}} deleted successfully', { name: checkupName }),
       });
       navigate(`/k8s/ns/${getNamespace(configMap)}/checkups/${CHECKUP_URLS.STORAGE}`);
     } catch (error) {
       toast.addDangerToast({
         content: error instanceof Error ? error.message : t('An unknown error occurred'),
+        persistInDrawer: false,
         title: t('Failed to delete checkup'),
       });
     }

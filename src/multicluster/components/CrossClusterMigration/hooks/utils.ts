@@ -6,7 +6,7 @@ import {
   V1beta1NetworkMap,
   V1beta1Plan,
   V1beta1StorageMap,
-} from '@kubev2v/types';
+} from '@forklift-ui/types';
 import { modelToGroupVersionKind } from '@kubevirt-utils/models';
 import { getName, getNamespace, getUID } from '@kubevirt-utils/resources/shared';
 import { getRandomChars, isEmpty, kubevirtConsole } from '@kubevirt-utils/utils/utils';

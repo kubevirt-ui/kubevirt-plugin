@@ -1,12 +1,11 @@
 import React, { FC, useMemo } from 'react';
 
-import { V1beta1StorageMap } from '@kubev2v/types';
+import { V1beta1StorageMap } from '@forklift-ui/types';
 import { IoK8sApiStorageV1StorageClass } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import { EnhancedSelectOptionProps } from '@kubevirt-utils/components/FilterSelect/utils/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { modelToGroupVersionKind } from '@kubevirt-utils/models';
-import { StorageClassModel } from '@kubevirt-utils/models';
+import { modelToGroupVersionKind, StorageClassModel } from '@kubevirt-utils/models';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { FormGroup, Split, SplitItem, TextInput, Title } from '@patternfly/react-core';
 

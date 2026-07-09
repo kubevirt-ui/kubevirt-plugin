@@ -62,7 +62,10 @@ export const createRerunAction = ({
       }
 
       await rerunSelfValidationCheckup(configMap, jobs, () =>
-        toast.addWarningToast({ title: t('PVC may need manual cleanup') }),
+        toast.addWarningToast({
+          persistInDrawer: false,
+          title: t('PVC may need manual cleanup'),
+        }),
       );
     },
     runningJobWarningMessage: t(

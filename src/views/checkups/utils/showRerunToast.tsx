@@ -1,5 +1,5 @@
-import React from 'react';
 import { TFunction } from 'i18next';
+import React from 'react';
 
 import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { ToastActions } from '@kubevirt-utils/hooks/useKubevirtToast';
@@ -29,6 +29,7 @@ export const showRerunToast = ({ configMap, getUrl, navigate, t, toast }: ShowRe
         url={url}
       />
     ),
+    persistInDrawer: false,
     title: t('Checkup {{name}} is rerunning', { name }),
   });
 };

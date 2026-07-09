@@ -9,7 +9,7 @@ import {
   V1beta1Provider,
   V1beta1StorageMap,
   V1beta1StorageMapSpecMap,
-} from '@kubev2v/types';
+} from '@forklift-ui/types';
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { NetworkAttachmentDefinition } from '@kubevirt-utils/components/NetworkInterfaceModal/components/hooks/types';
 import { getName, getNamespace, getUID } from '@kubevirt-utils/resources/shared';
