@@ -40,7 +40,6 @@ function useEventListener<
     }
 
     // Create event listener that calls handler function stored in ref
-    // eslint-disable-next-line jsdoc/require-jsdoc
     const eventListener: typeof handler = (event) => {
       if (savedHandler?.current) {
         savedHandler.current(event);

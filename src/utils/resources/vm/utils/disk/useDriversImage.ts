@@ -17,6 +17,7 @@ export const useDriversImage = (): [string, boolean] => {
         driverImage.value = image;
         setDriverImageValue(image);
       })
+      .catch(() => {})
       .finally(() => {
         loadingDriver.value = false;
         setLoadingDriverValue(false);
