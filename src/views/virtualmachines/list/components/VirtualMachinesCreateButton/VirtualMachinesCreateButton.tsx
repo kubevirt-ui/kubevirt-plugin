@@ -8,7 +8,7 @@ import { logVMCreationStarted } from '@kubevirt-utils/extensions/telemetry/vm-cr
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getVMListPath } from '@kubevirt-utils/resources/vm';
 import useCluster from '@multicluster/hooks/useCluster';
-import { getACMVMListURL, getVMWizardURL } from '@multicluster/urls';
+import { getACMVMListURL, navigateToVMWizard } from '@multicluster/urls';
 import useIsACMPage from '@multicluster/useIsACMPage';
 import {
   Button,
@@ -48,10 +48,7 @@ const VirtualMachinesCreateButton: FC<VirtualMachinesCreateButtonProps> = ({
     verb: 'create',
   });
 
-  const vmWizardURL = useMemo(
-    () => getVMWizardURL(isACMPage ? cluster || '' : '', namespace),
-    [isACMPage, cluster, namespace],
-  );
+  const wizardCluster = useMemo(() => (isACMPage ? cluster || '' : ''), [isACMPage, cluster]);
 
   const yamlURL = useMemo(
     () =>
@@ -69,17 +66,21 @@ const VirtualMachinesCreateButton: FC<VirtualMachinesCreateButtonProps> = ({
           logVMCreationStarted(TELEMETRY_VM_CREATION_METHOD.SCRATCH);
           return navigate(yamlURL);
         default:
-          return navigate(vmWizardURL, { state: { namespace } });
+          return navigateToVMWizard({ cluster: wizardCluster, namespace, navigate });
       }
     },
-    [navigate, vmWizardURL, yamlURL],
+    [navigate, wizardCluster, namespace, yamlURL],
   );
 
   if (!canCreateVM) return null;
 
   if (!showDropdown) {
     return (
-      <Button data-test="item-create" onClick={() => navigate(vmWizardURL)} variant="primary">
+      <Button
+        data-test="item-create"
+        onClick={() => navigateToVMWizard({ cluster: wizardCluster, namespace, navigate })}
+        variant="primary"
+      >
         {buttonText ?? t('Create VirtualMachine')}
       </Button>
     );
@@ -94,7 +95,7 @@ const VirtualMachinesCreateButton: FC<VirtualMachinesCreateButtonProps> = ({
               <MenuToggleAction
                 aria-label={t('Create VirtualMachine')}
                 key="create-vm"
-                onClick={() => navigate(vmWizardURL, { state: { namespace } })}
+                onClick={() => navigateToVMWizard({ cluster: wizardCluster, namespace, navigate })}
               >
                 {t('Create')}
               </MenuToggleAction>,

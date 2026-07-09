@@ -3,14 +3,17 @@ import { useNavigate } from 'react-router';
 
 import ListEmptyState from '@kubevirt-utils/components/ListEmptyState/ListEmptyState';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { navigateToVMWizard } from '@multicluster/urls';
 import { Button, ButtonVariant } from '@patternfly/react-core';
 import { RocketIcon, VirtualMachineIcon } from '@patternfly/react-icons';
 
 type VirtualMachineInstanceEmptyStateProps = {
-  wizardURL: string;
+  cluster: string;
+  namespace: string;
 };
 const VirtualMachineInstanceEmptyState: FC<VirtualMachineInstanceEmptyStateProps> = ({
-  wizardURL,
+  cluster,
+  namespace,
 }) => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
@@ -18,7 +21,10 @@ const VirtualMachineInstanceEmptyState: FC<VirtualMachineInstanceEmptyStateProps
   return (
     <ListEmptyState
       buttonAction={
-        <Button onClick={() => navigate(wizardURL)} variant={ButtonVariant.primary}>
+        <Button
+          onClick={() => navigateToVMWizard({ cluster, namespace, navigate })}
+          variant={ButtonVariant.primary}
+        >
           {t('Create VirtualMachine')}
         </Button>
       }

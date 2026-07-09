@@ -9,7 +9,6 @@ import useKubevirtDataViewFilters from '@kubevirt-utils/hooks/useKubevirtDataVie
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
-import { getVMWizardURL } from '@multicluster/urls';
 import { ListPageBody, ListPageHeader } from '@openshift-console/dynamic-plugin-sdk';
 
 import VirtualMachineInstanceEmptyState from './components/VirtualMachineInstanceEmptyState/VirtualMachineInstanceEmptyState';
@@ -23,7 +22,6 @@ type VirtualMachinesInstancesListProps = {
 const VirtualMachinesInstancesList: FC<VirtualMachinesInstancesListProps> = ({ namespace }) => {
   const { t } = useKubevirtTranslation();
   const cluster = useClusterParam();
-  const wizardURL = getVMWizardURL(cluster, namespace || DEFAULT_NAMESPACE);
 
   const [vmis, loaded, loadError] = useK8sWatchData<V1VirtualMachineInstance[]>({
     cluster,
@@ -60,7 +58,12 @@ const VirtualMachinesInstancesList: FC<VirtualMachinesInstancesListProps> = ({ n
           initialSortKey={VMI_COLUMN_KEYS.name}
           loaded={loaded}
           loadError={loadError}
-          noDataMsg={<VirtualMachineInstanceEmptyState wizardURL={wizardURL} />}
+          noDataMsg={
+            <VirtualMachineInstanceEmptyState
+              cluster={cluster}
+              namespace={namespace || DEFAULT_NAMESPACE}
+            />
+          }
           unfilteredData={vmis}
         />
       </ListPageBody>
