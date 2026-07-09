@@ -1,0 +1,68 @@
+import { cloneDeep } from 'lodash';
+import React, { FC, useState } from 'react';
+
+import { TemplateParameter } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
+import { vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
+import { Button, ButtonVariant, Stack, StackItem } from '@patternfly/react-core';
+import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
+import { CREATE_VM_FORM_FIELDS_VM_DATA } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
+import { useDrawerContext } from '@virtualmachines/wizard/steps/TemplateStep/components/TemplatesCatalogDrawer/hooks/useDrawerContext';
+import { changeTemplateParameterValue } from '@virtualmachines/wizard/steps/TemplateStep/components/TemplatesCatalogDrawer/utils/utils';
+
+import FieldGroup from './FieldGroup';
+
+type ParametersSectionProps = {
+  requiredParameters: TemplateParameter[];
+};
+
+const ParametersSections: FC<ParametersSectionProps> = ({ requiredParameters }) => {
+  const { t } = useKubevirtTranslation();
+  const { setTemplate, template } = useDrawerContext();
+  const { setValue } = useVMWizard();
+  const [isEdit, setIsEdit] = useState<boolean>(false);
+  const workingTemplate = cloneDeep(template);
+
+  const onFieldValueChange = (name: string, value: string) => {
+    setTemplate((draft) => {
+      changeTemplateParameterValue(draft, name, value);
+    });
+  };
+
+  const handleButtonClick = () => {
+    if (isEdit) {
+      setTemplate(workingTemplate);
+      setValue(CREATE_VM_FORM_FIELDS_VM_DATA.SELECTED_TEMPLATE, workingTemplate);
+      vmSignal.value = getTemplateVirtualMachineObject(workingTemplate);
+      setIsEdit(false);
+      return;
+    }
+
+    setIsEdit(true);
+    return;
+  };
+
+  return (
+    <Stack className="pf-v6-u-mt-lg" hasGutter>
+      <StackItem>
+        {requiredParameters.map((param) => (
+          <FieldGroup
+            field={param}
+            isDisabled={!isEdit}
+            key={param.name}
+            onChange={onFieldValueChange}
+          />
+        ))}
+      </StackItem>
+      <StackItem isFilled />
+      <StackItem>
+        <Button onClick={handleButtonClick} size="sm" variant={ButtonVariant.primary}>
+          {isEdit ? t('Save') : t('Edit parameters')}
+        </Button>
+      </StackItem>
+    </Stack>
+  );
+};
+
+export default ParametersSections;

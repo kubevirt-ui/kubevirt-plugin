@@ -1,7 +1,7 @@
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { getTemplateVirtualMachineObject, Template } from '@kubevirt-utils/resources/template';
 import { DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
-import useWizardDisksTableData from '@virtualmachines/creation-wizard-new/components/DisksReviewTable/hooks/useWizardDisksTableData/useWizardDisksTableData';
+import useWizardDisksTableData from '@virtualmachines/wizard/components/DisksReviewTable/hooks/useWizardDisksTableData/useWizardDisksTableData';
 
 type UseDisksTableDisks = (template: Template) => [DiskRowDataLayout[], boolean, Error | null];
 
