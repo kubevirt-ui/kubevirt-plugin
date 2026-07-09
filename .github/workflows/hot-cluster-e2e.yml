@@ -196,3 +196,36 @@ jobs:
       runner_label: ${{ inputs.runner_label || inputs.cluster_name || 'kubevirt-plugin-ci' }}
       cluster_name: ${{ inputs.cluster_name || 'kubevirt-plugin-ci' }}
     secrets: inherit
+
+  # Single source of truth for the "Run Gating Tests" required status check.
+  # A top-level job (unlike run-e2e-tests, which is a `uses:` reusable-workflow
+  # call) posts its check-run under its own bare name — no composite prefix —
+  # so this is the job branch protection can actually match. if: always()
+  # guarantees it reports a real success/failure for every push, even when
+  # upstream jobs are skipped (e.g. untrusted author, no ok-to-test label),
+  # so Tide can never merge on a silently-vanished check again.
+  verify-gating-tests:
+    name: Run Gating Tests
+    needs: [check-trust, cluster-check, cluster-health-check, run-e2e-tests]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Verify hot cluster E2E ran and passed
+        env:
+          TRUSTED: ${{ needs.check-trust.outputs.trusted }}
+          E2E_RESULT: ${{ needs.run-e2e-tests.result }}
+        run: |
+          echo "run-e2e-tests result: ${E2E_RESULT}"
+
+          if [[ "${E2E_RESULT}" == "success" ]]; then
+            echo "Hot cluster gating tests passed."
+            exit 0
+          fi
+
+          if [[ "${{ github.event_name }}" == "pull_request_target" && "${TRUSTED}" != "true" ]]; then
+            echo "::error::Hot cluster E2E has not run for this PR because the author is not listed in OWNERS. A maintainer must add the 'ok-to-test' label to trigger it (it is removed again on each new push)."
+          else
+            echo "::error::Hot cluster gating tests did not pass (run-e2e-tests result: '${E2E_RESULT}'). See the 'Run E2E Tests' job for details, or use /retest-e2e once fixed."
+          fi
+          exit 1
