@@ -246,7 +246,7 @@ jobs:
           podman push ${KUBEVIRT_PLUGIN_IMAGE}
 
   run-gating-tests:
-    name: Run Gating Tests
+    name: Playwright Gating Tests
     needs: [check-runner, build-kubevirt-plugin-image]
     runs-on: ${{ inputs.runner_label || 'kubevirt-plugin-ci' }}
     timeout-minutes: 120
