@@ -1,0 +1,58 @@
+{{- if eq .Values.console.auth.mode "openshift" }}
+{{- /*
+Compute the OAuth client secret ONCE per render and reuse it for both
+resources below. `lookup` is safe to call from a helper (idempotent within a
+single render, since it just reads live cluster state), but `randAlphaNum`
+is NOT: each `include`/template invocation re-executes the template body
+from scratch, so a helper that falls back to `randAlphaNum` would render a
+DIFFERENT random value when called from two separate files, silently
+breaking OAuth login on every fresh install (OAuthClient.secret would never
+match the Secret's client-secret). Computing it once as a local variable
+here and emitting both resources via `---` in this single file is the only
+way to guarantee they render the identical value when neither the
+OAuthClient nor the Secret already exists on the cluster.
+
+Lookup order: reuse the existing OAuthClient's secret first (the value
+actually in use), then the existing Secret's (covers the unlikely case one
+was deleted without the other), and only generate a fresh random secret if
+neither exists yet -- i.e. a genuinely first-time install.
+*/}}
+{{- $existingClient := lookup "oauth.openshift.io/v1" "OAuthClient" "" (include "ci-test-stack.oauthClientName" .) }}
+{{- $existingSecret := lookup "v1" "Secret" .Release.Namespace (printf "%s-oauth" (include "ci-test-stack.consoleName" .)) }}
+{{- $clientSecret := "" }}
+{{- if $existingClient }}
+{{- $clientSecret = $existingClient.secret }}
+{{- else if $existingSecret }}
+{{- $clientSecret = (index $existingSecret.data "client-secret" | b64dec) }}
+{{- else }}
+{{- $clientSecret = randAlphaNum 40 }}
+{{- end }}
+---
+# Cluster-scoped OAuthClient used by the console for the OAuth login flow.
+apiVersion: oauth.openshift.io/v1
+kind: OAuthClient
+metadata:
+  name: {{ include "ci-test-stack.oauthClientName" . }}
+  labels:
+    {{- include "ci-test-stack.labels" . | nindent 4 }}
+    app.kubernetes.io/component: console
+grantMethod: auto
+secret: {{ $clientSecret | quote }}
+redirectURIs:
+  - https://{{ required "console.route.host is required for auth.mode=openshift" .Values.console.route.host }}{{ .Values.console.auth.redirectPath }}
+---
+# Holds the OAuth client secret (identical to the OAuthClient's `secret`
+# field above) and the cluster CA bundle needed to verify the OAuth server.
+# Mounted into the console Deployment at /etc/console-auth.
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ include "ci-test-stack.consoleName" . }}-oauth
+  labels:
+    {{- include "ci-test-stack.labels" . | nindent 4 }}
+    app.kubernetes.io/component: console
+type: Opaque
+stringData:
+  client-secret: {{ $clientSecret | quote }}
+  ca.crt: {{ required "console.auth.caCert is required for auth.mode=openshift" .Values.console.auth.caCert | quote }}
+{{- end }}

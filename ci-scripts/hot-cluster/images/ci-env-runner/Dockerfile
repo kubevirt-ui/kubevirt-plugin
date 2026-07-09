@@ -1,13 +1,13 @@
 # CI Environment Controller image.
 # Lightweight UBI9 image with only the CLI tools needed by ci-env-controller.sh:
-#   oc, helm, jq, yq, curl
+#   oc, helm, jq, yq, curl, htpasswd (manual-console auth mode; CNV-92150)
 #
 # Using UBI9 avoids FIPS/OpenSSL DSO issues on hardened OpenShift clusters
 # (the Ubuntu-based ARC runner image fails OpenSSL loads on FIPS nodes).
 #
-# The Helm chart is staged into the build context by setup-ci-env-runner-image.sh
-# and COPY'd into the image, avoiding the ConfigMap flat-key limitation that
-# drops subdirectories (templates/).
+# The Helm chart and the manual-console scripts are staged into the build
+# context by setup-ci-env-runner-image.sh and COPY'd into the image, avoiding
+# the ConfigMap flat-key limitation that drops subdirectories (templates/).
 
 FROM registry.access.redhat.com/ubi9/ubi:latest
 
@@ -19,6 +19,7 @@ ARG YQ_VERSION=v4.52.5
 
 RUN dnf install -y --nodocs \
       jq \
+      httpd-tools \
     && dnf clean all
 
 # oc (OpenShift CLI) -- prefer cluster-resolved URL if provided.
@@ -50,9 +51,14 @@ RUN curl -sL -o /usr/local/bin/yq \
       "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_linux_amd64" \
     && chmod +x /usr/local/bin/yq
 
-# Embed the Helm chart into the image. The chart is staged into the build
-# context by setup-ci-env-runner-image.sh via a symlink dereferenced by tar -ch.
+# Embed the Helm chart and ensure-manual-console-user.sh into the image. Both
+# are staged into the build context by setup-ci-env-runner-image.sh via
+# symlinks dereferenced by tar -ch. Only the single script the controller
+# invokes is copied (not the sibling images/ dir, which is unused here).
 COPY helm/ci-test-stack/ /opt/ci-env/helm/ci-test-stack/
+COPY manual-console/ensure-manual-console-user.sh /opt/ci-env/manual-console/ensure-manual-console-user.sh
+
+RUN chmod +x /opt/ci-env/manual-console/ensure-manual-console-user.sh
 
 RUN useradd -r -u 1001 -g 0 -d /home/controller -s /sbin/nologin controller \
     && mkdir -p /home/controller \

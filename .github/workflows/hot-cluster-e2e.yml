@@ -246,12 +246,25 @@ jobs:
   # so this is the job branch protection can actually match. if: always()
   # guarantees it reports a real success/failure for every meaningful push,
   # even when upstream jobs are skipped (e.g. untrusted author, no ok-to-test
-  # label), so Tide can never merge on a silently-vanished check again. The
-  # event-relevance guard below stops it from also running on irrelevant
-  # label events (lgtm, approved, ...), which would otherwise overwrite a
-  # prior passing result for the same commit SHA with a bogus failure.
+  # label), so Tide can never merge on a silently-vanished check again.
+  #
+  # IMPORTANT: an `if:` guard alone does NOT stop this job from posting a
+  # check-run under its `name` — GitHub still reports skipped jobs as
+  # `<name>: skipped` for the commit SHA. Two separate workflow runs (the
+  # real one, and a noop run from an irrelevant label like jira/valid-
+  # reference) both create a "Run Gating Tests" check-run for the same SHA;
+  # GitHub's merge box always shows whichever reported most recently,
+  # regardless of Actions concurrency grouping (that only prevents execution
+  # contention, not duplicate check-run names). Since the noop run finishes
+  # in seconds while the real run takes 15-20+ minutes, its "skipped" result
+  # is misleadingly the only thing visible for most of the real run's
+  # lifetime. The conditional `name:` below fixes this at the source: only
+  # the relevant-event path ever reports under the literal "Run Gating
+  # Tests" context that branch protection/Tide requires, so an irrelevant
+  # label event doesn't touch that check at all (leaving it correctly
+  # `expected`/pending until the real run reports).
   verify-gating-tests:
-    name: Run Gating Tests
+    name: ${{ (github.event.action != 'labeled' || github.event.label.name == 'ok-to-test') && 'Run Gating Tests' || 'Run Gating Tests (skipped - irrelevant label event)' }}
     needs: [check-trust, cluster-check, cluster-health-check, run-e2e-tests]
     if: |
       always() &&
