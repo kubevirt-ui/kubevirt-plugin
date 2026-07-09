@@ -45,7 +45,10 @@ permissions:
 
 concurrency:
   group: hot-cluster-e2e-${{ github.event.pull_request.number || format('{0}-{1}', github.ref, inputs.cluster_name || 'kubevirt-plugin-ci') }}
-  cancel-in-progress: true
+  # Only cancel a real in-progress run for events that actually warrant one
+  # (push/reopen, or an ok-to-test labeling). Routine bot-added labels (lgtm,
+  # approved, jira/valid-reference, ...) must not cancel a genuine run.
+  cancel-in-progress: ${{ github.event.action != 'labeled' || github.event.label.name == 'ok-to-test' }}
 
 env:
   CLUSTER_NAME: ${{ inputs.cluster_name || 'kubevirt-plugin-ci' }}
@@ -96,6 +99,7 @@ jobs:
     needs: check-trust
     if: |
       always() &&
+      (github.event.action != 'labeled' || github.event.label.name == 'ok-to-test') &&
       (
         github.event_name == 'workflow_dispatch' ||
         github.event.pull_request.head.repo.full_name == github.repository ||
@@ -201,13 +205,18 @@ jobs:
   # A top-level job (unlike run-e2e-tests, which is a `uses:` reusable-workflow
   # call) posts its check-run under its own bare name — no composite prefix —
   # so this is the job branch protection can actually match. if: always()
-  # guarantees it reports a real success/failure for every push, even when
-  # upstream jobs are skipped (e.g. untrusted author, no ok-to-test label),
-  # so Tide can never merge on a silently-vanished check again.
+  # guarantees it reports a real success/failure for every meaningful push,
+  # even when upstream jobs are skipped (e.g. untrusted author, no ok-to-test
+  # label), so Tide can never merge on a silently-vanished check again. The
+  # event-relevance guard below stops it from also running on irrelevant
+  # label events (lgtm, approved, ...), which would otherwise overwrite a
+  # prior passing result for the same commit SHA with a bogus failure.
   verify-gating-tests:
     name: Run Gating Tests
     needs: [check-trust, cluster-check, cluster-health-check, run-e2e-tests]
-    if: always()
+    if: |
+      always() &&
+      (github.event.action != 'labeled' || github.event.label.name == 'ok-to-test')
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
