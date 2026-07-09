@@ -7,7 +7,7 @@ import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useProjects from '@kubevirt-utils/hooks/useProjects';
 import { getName } from '@kubevirt-utils/resources/shared';
-import { getVMWizardURL } from '@multicluster/urls';
+import { navigateToVMWizard } from '@multicluster/urls';
 import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
 import { Button, ButtonVariant, Split, SplitItem } from '@patternfly/react-core';
 
@@ -26,7 +26,7 @@ const WelcomeButtons: FC<WelcomeButtonsProps> = ({ onClose }) => {
   const hasNoProjects = projectsLoaded && !projectsError && (!projects || projects.length === 0);
 
   const onCreateVM = () => {
-    navigate(getVMWizardURL(''));
+    navigateToVMWizard({ cluster: '', navigate });
     onClose();
   };
 

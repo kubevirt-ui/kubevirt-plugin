@@ -53,7 +53,9 @@ const NoVMsAlert: FC<NoVMsAlertProps> = ({ namespace }) => {
           {alertMessage}
           {canCreateVM && (
             <div className="pf-v6-u-mt-sm">
-              <Link to={vmWizardURL}>{t('Create VM')}</Link>
+              <Link state={{ namespace }} to={vmWizardURL}>
+                {t('Create VM')}
+              </Link>
             </div>
           )}
         </>

@@ -6,7 +6,7 @@ import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { SINGLE_CLUSTER_KEY } from '@kubevirt-utils/resources/constants';
 import { getLabel, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getCluster } from '@multicluster/helpers/selectors';
-import { getVMWizardURL } from '@multicluster/urls';
+import { navigateToVMWizard } from '@multicluster/urls';
 import {
   CLUSTER_SELECTOR_PREFIX,
   FOLDER_SELECTOR_PREFIX,
@@ -27,7 +27,7 @@ export const getCreateVMAction = (
 ): ActionDropdownItemType => {
   return {
     cta: () => {
-      navigate(getVMWizardURL(cluster, namespace), { state: { namespace } });
+      navigateToVMWizard({ cluster, namespace, navigate });
     },
     id: 'create-vm',
     label: t('Create VirtualMachine'),

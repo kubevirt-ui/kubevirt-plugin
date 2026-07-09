@@ -1,4 +1,4 @@
-import { matchPath } from 'react-router';
+import { matchPath, NavigateFunction } from 'react-router';
 
 import {
   TemplateModel,
@@ -77,6 +77,20 @@ export const getVMWizardURL = (cluster: string, namespace?: string): string => {
   return cluster === ALL_CLUSTERS_KEY
     ? `${FLEET_WIZARD_PATH}/${ALL_CLUSTERS_KEY}/${ALL_NAMESPACES}`
     : `${FLEET_WIZARD_PATH}/cluster/${cluster}/${namespacePath}`;
+};
+
+type NavigateToVMWizardParams = {
+  cluster: string;
+  namespace?: string;
+  navigate: NavigateFunction;
+};
+
+export const navigateToVMWizard = ({
+  cluster,
+  namespace,
+  navigate,
+}: NavigateToVMWizardParams): void => {
+  navigate(getVMWizardURL(cluster, namespace), { state: { namespace } });
 };
 
 export const getConsoleStandaloneURL = (
