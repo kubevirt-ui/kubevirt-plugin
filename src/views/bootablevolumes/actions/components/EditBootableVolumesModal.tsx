@@ -29,8 +29,8 @@ import {
 import {
   CategoryDetails,
   InstanceTypeCategory,
-} from '@virtualmachines/creation-wizard-new/steps/InstanceTypesSteps/ComputeResourcesStep/components/SelectInstanceTypeSection/utils/types';
-import { categoryDetailsMap } from '@virtualmachines/creation-wizard-new/steps/InstanceTypesSteps/ComputeResourcesStep/components/SelectInstanceTypeSection/utils/utils';
+} from '@virtualmachines/wizard/steps/InstanceTypesSteps/ComputeResourcesStep/components/SelectInstanceTypeSection/utils/types';
+import { categoryDetailsMap } from '@virtualmachines/wizard/steps/InstanceTypesSteps/ComputeResourcesStep/components/SelectInstanceTypeSection/utils/utils';
 
 import { BootableResource, BootableVolumeMetadata } from '../../utils/types';
 import { changeBootableVolumeMetadata } from '../../utils/utils';

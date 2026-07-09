@@ -1,12 +1,12 @@
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
-import { vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
+import { customizeWizardVMSignal } from '@kubevirt-utils/signals/customizeWizardVMSignal';
 
 import { getUploadClusterForVm } from '../keys/uploadKeys';
 import { useUploadProgressStore } from '../uploadProgressStore';
 
 export const cancelPendingVmUploads = (vm?: V1VirtualMachine): Promise<void> => {
-  const target = vm ?? vmSignal.value;
+  const target = vm ?? customizeWizardVMSignal.value;
   const namespace = getNamespace(target);
   const name = getName(target);
 

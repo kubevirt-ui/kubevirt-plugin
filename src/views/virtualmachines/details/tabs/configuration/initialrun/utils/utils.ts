@@ -11,7 +11,7 @@ import {
 } from '@kubevirt-utils/components/SysprepModal/sysprep-utils';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { getDisks, getVolumes } from '@kubevirt-utils/resources/vm';
-import { PatchCustomizeWizardVMSignal } from '@kubevirt-utils/store/customizeInstanceType';
+import { PatchCustomizeWizardVMSignal } from '@kubevirt-utils/signals/customizeWizardVMSignal';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sCreate, kubevirtK8sPatch } from '@multicluster/k8sRequests';

@@ -1,5 +1,5 @@
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { TableColumnWithOptionalIndex } from '@virtualmachines/creation-wizard-new/steps/InstanceTypesSteps/BootSourceStep/types';
+import { TableColumnWithOptionalIndex } from '@virtualmachines/wizard/steps/InstanceTypesSteps/BootSourceStep/types';
 
 import useKubevirtUserSettings from './useKubevirtUserSettings';
 import { USER_SETTINGS_KEYS } from './utils/const';
