@@ -1,0 +1,9 @@
+export { default as CheckupsPage } from './checkups-page';
+export { default as ConsoleStandalonePage } from './console-standalone-page';
+export { default as DataVolumeDetailPage } from './data-volume-detail-page';
+export { default as DataVolumesPage } from './data-volumes-page';
+export { default as LoginPage } from './login-page';
+export { default as MigrationPoliciesPage } from './migration-policies-page';
+export { default as QuotasPage } from './quotas-page';
+export { default as VirtualizationOverviewPage } from './virtualization-overview-page';
+export { default as WorkloadsSecretsPage } from './workloads-secrets-page';
