@@ -1,5 +1,7 @@
 import type { RequestContextTemplateConfig } from '@/data-factories';
 
+const REQUEST_CONTEXT_TIMEOUT_MS = 30000;
+
 /**
  * Base type for RequestContext Template API test case parameters
  */
@@ -19,7 +21,7 @@ export const REQUEST_CONTEXT_TEMPLATE_FIXTURES: RequestContextTemplateTestCasePa
   {
     expectedBehavior: {
       shouldCreate: true,
-      timeout: 30000,
+      timeout: REQUEST_CONTEXT_TIMEOUT_MS,
     },
     templateConfig: {
       cpuCores: 1,
@@ -39,7 +41,7 @@ export const REQUEST_CONTEXT_TEMPLATE_FIXTURES: RequestContextTemplateTestCasePa
 export const REQUEST_CONTEXT_TEMPLATE_SMOKE_TEST_FIXTURE: RequestContextTemplateTestCaseParams = {
   expectedBehavior: {
     shouldCreate: true,
-    timeout: 30000,
+    timeout: REQUEST_CONTEXT_TIMEOUT_MS,
   },
   templateConfig: {
     cpuCores: 2,

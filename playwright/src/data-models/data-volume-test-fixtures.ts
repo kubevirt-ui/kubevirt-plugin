@@ -13,17 +13,20 @@
 
 import type { DataVolumeConfig } from '@/data-factories/data-volume-factory';
 
+const DATA_VOLUME_TIMEOUT_MS = 60000;
+const DATA_VOLUME_HTTP_TIMEOUT_MS = 90000;
+
 /**
- * Base interface for DataVolume test case parameters
+ * Base type for DataVolume test case parameters
  */
-export interface DataVolumeTestCaseParams {
+export type DataVolumeTestCaseParams = {
   dataVolumeConfig: Partial<DataVolumeConfig>;
   expectedBehavior?: {
     shouldCreate: boolean;
-    timeout?: number; // Time to wait for DataVolume to appear
+    timeout?: number;
   };
   testCaseName: string;
-}
+};
 
 /**
  * DataVolume creation test fixtures
@@ -49,7 +52,7 @@ export const DATA_VOLUME_CREATION_FIXTURES: DataVolumeTestCaseParams[] = [
     },
     expectedBehavior: {
       shouldCreate: true,
-      timeout: 60000,
+      timeout: DATA_VOLUME_TIMEOUT_MS,
     },
     testCaseName: 'DataVolume with Fedora from registry',
   },
@@ -70,7 +73,7 @@ export const DATA_VOLUME_CREATION_FIXTURES: DataVolumeTestCaseParams[] = [
     },
     expectedBehavior: {
       shouldCreate: true,
-      timeout: 60000,
+      timeout: DATA_VOLUME_TIMEOUT_MS,
     },
     testCaseName: 'DataVolume with CentOS Stream from registry',
   },
@@ -91,7 +94,7 @@ export const DATA_VOLUME_CREATION_FIXTURES: DataVolumeTestCaseParams[] = [
     },
     expectedBehavior: {
       shouldCreate: true,
-      timeout: 60000,
+      timeout: DATA_VOLUME_TIMEOUT_MS,
     },
     testCaseName: 'DataVolume with CentOS from registry',
   },
@@ -112,7 +115,7 @@ export const DATA_VOLUME_CREATION_FIXTURES: DataVolumeTestCaseParams[] = [
     },
     expectedBehavior: {
       shouldCreate: true,
-      timeout: 60000,
+      timeout: DATA_VOLUME_TIMEOUT_MS,
     },
     testCaseName: 'DataVolume with custom storage size',
   },
@@ -133,7 +136,7 @@ export const DATA_VOLUME_CREATION_FIXTURES: DataVolumeTestCaseParams[] = [
     },
     expectedBehavior: {
       shouldCreate: true,
-      timeout: 60000,
+      timeout: DATA_VOLUME_TIMEOUT_MS,
     },
     testCaseName: 'DataVolume with custom instance type',
   },
@@ -160,7 +163,7 @@ export const DATA_VOLUME_SMOKE_TEST_FIXTURE: DataVolumeTestCaseParams = {
   },
   expectedBehavior: {
     shouldCreate: true,
-    timeout: 60000,
+    timeout: DATA_VOLUME_TIMEOUT_MS,
   },
   testCaseName: 'smoke test: standard Fedora DataVolume',
 };
@@ -186,7 +189,7 @@ export const DATA_VOLUME_EDGE_CASE_FIXTURES: DataVolumeTestCaseParams[] = [
     },
     expectedBehavior: {
       shouldCreate: true,
-      timeout: 60000,
+      timeout: DATA_VOLUME_TIMEOUT_MS,
     },
     testCaseName: 'DataVolume with minimal storage (10Gi)',
   },
@@ -207,7 +210,7 @@ export const DATA_VOLUME_EDGE_CASE_FIXTURES: DataVolumeTestCaseParams[] = [
     },
     expectedBehavior: {
       shouldCreate: true,
-      timeout: 90000,
+      timeout: DATA_VOLUME_HTTP_TIMEOUT_MS,
     },
     testCaseName: 'DataVolume with large storage (100Gi)',
   },
@@ -229,7 +232,7 @@ export const DATA_VOLUME_EDGE_CASE_FIXTURES: DataVolumeTestCaseParams[] = [
     },
     expectedBehavior: {
       shouldCreate: true,
-      timeout: 60000,
+      timeout: DATA_VOLUME_TIMEOUT_MS,
     },
     testCaseName: 'DataVolume without bind immediately annotation',
   },
@@ -254,7 +257,7 @@ export const DATA_VOLUME_EDGE_CASE_FIXTURES: DataVolumeTestCaseParams[] = [
     },
     expectedBehavior: {
       shouldCreate: true,
-      timeout: 60000,
+      timeout: DATA_VOLUME_TIMEOUT_MS,
     },
     testCaseName: 'DataVolume with custom labels',
   },
@@ -279,7 +282,7 @@ export const DATA_VOLUME_EDGE_CASE_FIXTURES: DataVolumeTestCaseParams[] = [
     },
     expectedBehavior: {
       shouldCreate: true,
-      timeout: 60000,
+      timeout: DATA_VOLUME_TIMEOUT_MS,
     },
     testCaseName: 'DataVolume with custom annotations',
   },
@@ -300,7 +303,7 @@ export const DATA_VOLUME_EDGE_CASE_FIXTURES: DataVolumeTestCaseParams[] = [
     },
     expectedBehavior: {
       shouldCreate: true,
-      timeout: 90000, // HTTP downloads may take longer
+      timeout: DATA_VOLUME_HTTP_TIMEOUT_MS, // HTTP downloads may take longer
     },
     testCaseName: 'DataVolume from HTTP source',
   },
@@ -336,7 +339,7 @@ export const DATA_VOLUME_COMPREHENSIVE_FIXTURES: DataVolumeTestCaseParams[] = [
     },
     expectedBehavior: {
       shouldCreate: true,
-      timeout: 60000,
+      timeout: DATA_VOLUME_TIMEOUT_MS,
     },
     testCaseName: 'DataVolume with all metadata options',
   },

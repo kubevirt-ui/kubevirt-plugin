@@ -186,7 +186,7 @@ export const MIGRATION_POLICY_CREATION_FIXTURES: MigrationPolicyTestCaseParams[]
 export const MIGRATION_POLICY_SMOKE_TEST_FIXTURE: MigrationPolicyTestCaseParams = {
   expectedBehavior: {
     shouldCreate: true,
-    timeout: 30000,
+    timeout: MIGRATION_POLICY_TIMEOUT_MS,
   },
   migrationPolicyConfig: {
     allowAutoConverge: true,
@@ -386,7 +386,7 @@ export const MIGRATION_POLICY_FORM_FIXTURES: MigrationPolicyTestCaseParams[] = [
 export const MIGRATION_POLICY_FORM_SMOKE_TEST_FIXTURE: MigrationPolicyTestCaseParams = {
   expectedBehavior: {
     shouldCreate: true,
-    timeout: 30000,
+    timeout: MIGRATION_POLICY_TIMEOUT_MS,
   },
   migrationPolicyConfig: {
     allowAutoConverge: true,

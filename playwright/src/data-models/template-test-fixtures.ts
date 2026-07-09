@@ -1,5 +1,8 @@
 import type { TemplateConfig } from '@/data-factories/template-factory';
 
+const TEMPLATE_TIMEOUT_MS = 30000;
+const TEMPLATE_LARGE_TIMEOUT_MS = 45000;
+
 /**
  * Base type for Template test case parameters
  */
@@ -19,7 +22,7 @@ export const TEMPLATE_CREATION_FIXTURES: TemplateTestCaseParams[] = [
   {
     expectedBehavior: {
       shouldCreate: true,
-      timeout: 30000,
+      timeout: TEMPLATE_TIMEOUT_MS,
     },
     templateConfig: {
       cpuCores: 1,
@@ -34,7 +37,7 @@ export const TEMPLATE_CREATION_FIXTURES: TemplateTestCaseParams[] = [
   {
     expectedBehavior: {
       shouldCreate: true,
-      timeout: 30000,
+      timeout: TEMPLATE_TIMEOUT_MS,
     },
     templateConfig: {
       cpuCores: 2,
@@ -48,7 +51,7 @@ export const TEMPLATE_CREATION_FIXTURES: TemplateTestCaseParams[] = [
   {
     expectedBehavior: {
       shouldCreate: true,
-      timeout: 45000,
+      timeout: TEMPLATE_LARGE_TIMEOUT_MS,
     },
     templateConfig: {
       cpuCores: 4,
@@ -70,7 +73,7 @@ export const TEMPLATE_OS_FIXTURES: TemplateTestCaseParams[] = [
   {
     expectedBehavior: {
       shouldCreate: true,
-      timeout: 30000,
+      timeout: TEMPLATE_TIMEOUT_MS,
     },
     templateConfig: {
       cloudInitUser: 'fedora',
@@ -88,7 +91,7 @@ export const TEMPLATE_OS_FIXTURES: TemplateTestCaseParams[] = [
   {
     expectedBehavior: {
       shouldCreate: true,
-      timeout: 30000,
+      timeout: TEMPLATE_TIMEOUT_MS,
     },
     templateConfig: {
       cloudInitUser: 'ubuntu',
@@ -107,7 +110,7 @@ export const TEMPLATE_OS_FIXTURES: TemplateTestCaseParams[] = [
   {
     expectedBehavior: {
       shouldCreate: true,
-      timeout: 30000,
+      timeout: TEMPLATE_TIMEOUT_MS,
     },
     templateConfig: {
       cloudInitUser: 'cloud-user',
@@ -132,7 +135,7 @@ export const TEMPLATE_WORKLOAD_FIXTURES: TemplateTestCaseParams[] = [
   {
     expectedBehavior: {
       shouldCreate: true,
-      timeout: 30000,
+      timeout: TEMPLATE_TIMEOUT_MS,
     },
     templateConfig: {
       cpuCores: 2,
@@ -146,7 +149,7 @@ export const TEMPLATE_WORKLOAD_FIXTURES: TemplateTestCaseParams[] = [
   {
     expectedBehavior: {
       shouldCreate: true,
-      timeout: 30000,
+      timeout: TEMPLATE_TIMEOUT_MS,
     },
     templateConfig: {
       cpuCores: 2,
@@ -160,7 +163,7 @@ export const TEMPLATE_WORKLOAD_FIXTURES: TemplateTestCaseParams[] = [
   {
     expectedBehavior: {
       shouldCreate: true,
-      timeout: 45000,
+      timeout: TEMPLATE_LARGE_TIMEOUT_MS,
     },
     templateConfig: {
       cpuCores: 4,
@@ -181,7 +184,7 @@ export const TEMPLATE_WORKLOAD_FIXTURES: TemplateTestCaseParams[] = [
 export const TEMPLATE_SMOKE_TEST_FIXTURE: TemplateTestCaseParams = {
   expectedBehavior: {
     shouldCreate: true,
-    timeout: 30000,
+    timeout: TEMPLATE_TIMEOUT_MS,
   },
   templateConfig: {
     cpuCores: 2,
