@@ -1,5 +1,5 @@
 name: Hot Cluster E2E
-run-name: "Hot Cluster E2E [${{ inputs.cluster_name || 'kubevirt-plugin-ci' }}]"
+run-name: "Hot Cluster E2E [${{ inputs.cluster_name || github.base_ref || 'kubevirt-plugin-ci' }}]"
 
 on:
   pull_request_target:
@@ -51,13 +51,38 @@ concurrency:
   cancel-in-progress: ${{ github.event.action != 'labeled' || github.event.label.name == 'ok-to-test' }}
 
 env:
-  CLUSTER_NAME: ${{ inputs.cluster_name || 'kubevirt-plugin-ci' }}
   INFRASTRUCTURE_TYPE: ${{ inputs.infrastructure_type || 'ipi' }}
   IBM_REGION: eu-de
   IBM_RESOURCE_GROUP: cnv-ui
   BASE_DOMAIN: cnv-ui.com
 
 jobs:
+  # Resolves cluster_name/openshift_version for this run. workflow_dispatch
+  # always uses its own inputs unchanged. Automatic pull_request_target runs
+  # against a release-4.X branch get a dedicated, version-matched cluster
+  # (kubevirt-plugin-<major><minor>) instead of silently colliding with
+  # main's kubevirt-plugin-ci cluster; any other base branch falls back to
+  # the same default as today.
+  resolve-cluster-config:
+    name: Resolve Cluster Config
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    outputs:
+      cluster_name: ${{ steps.resolve.outputs.cluster_name }}
+      openshift_version: ${{ steps.resolve.outputs.openshift_version }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Resolve cluster_name/openshift_version for this branch
+        id: resolve
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_REF: ${{ github.base_ref }}
+          INPUT_CLUSTER_NAME: ${{ inputs.cluster_name }}
+          INPUT_OPENSHIFT_VERSION: ${{ inputs.openshift_version }}
+        run: ./ci-scripts/hot-cluster/resolve-cluster-config.sh >> "$GITHUB_OUTPUT"
+
   check-trust:
     name: Check Trusted Author
     if: github.event_name == 'pull_request_target'
@@ -96,7 +121,7 @@ jobs:
             core.setOutput('trusted', trusted ? 'true' : 'false');
 
   cluster-check:
-    needs: check-trust
+    needs: [check-trust, resolve-cluster-config]
     if: |
       always() &&
       (github.event.action != 'labeled' || github.event.label.name == 'ok-to-test') &&
@@ -108,17 +133,19 @@ jobs:
       )
     uses: ./.github/workflows/hot-cluster-check.yml
     with:
-      cluster_name: ${{ inputs.cluster_name || 'kubevirt-plugin-ci' }}
+      cluster_name: ${{ needs.resolve-cluster-config.outputs.cluster_name }}
       infrastructure_type: ${{ inputs.infrastructure_type || 'ipi' }}
-      openshift_version: ${{ inputs.openshift_version || '4.22_openshift' }}
+      openshift_version: ${{ needs.resolve-cluster-config.outputs.openshift_version }}
     secrets: inherit
 
   cluster-health-check:
     name: Cluster Health Check
-    needs: cluster-check
+    needs: [cluster-check, resolve-cluster-config]
     if: github.event_name == 'workflow_dispatch' && needs.cluster-check.result == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    env:
+      CLUSTER_NAME: ${{ needs.resolve-cluster-config.outputs.cluster_name }}
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -188,7 +215,7 @@ jobs:
 
   run-e2e-tests:
     name: Run E2E Tests
-    needs: [cluster-check, cluster-health-check]
+    needs: [cluster-check, cluster-health-check, resolve-cluster-config]
     if: |
       always() && (
         needs.cluster-check.result == 'success' ||
@@ -197,8 +224,8 @@ jobs:
     uses: ./.github/workflows/hot-cluster-e2e-run.yml
     with:
       test_project: ${{ inputs.test_project || 'gating' }}
-      runner_label: ${{ inputs.runner_label || inputs.cluster_name || 'kubevirt-plugin-ci' }}
-      cluster_name: ${{ inputs.cluster_name || 'kubevirt-plugin-ci' }}
+      runner_label: ${{ inputs.runner_label || needs.resolve-cluster-config.outputs.cluster_name }}
+      cluster_name: ${{ needs.resolve-cluster-config.outputs.cluster_name }}
     secrets: inherit
 
   # Single source of truth for the "Run Gating Tests" required status check.
