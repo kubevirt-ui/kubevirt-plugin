@@ -42,6 +42,8 @@ const CloneVMModal: FC<CloneVMModalProps> = ({ headerText, isOpen, onClose, sour
     `${name}${isVM(source) ? '-clone-' : '-'}${getRandomChars()}`.substring(0, MAX_K8S_NAME_LENGTH),
   );
 
+  const [isVMNameValid, setIsVMNameValid] = useState(false);
+
   const [startCloneVM, setStartCloneVM] = useState(false);
 
   const [initialCloneRequest, setInitialCloneRequest] = useState<V1beta1VirtualMachineClone>();
@@ -75,7 +77,7 @@ const CloneVMModal: FC<CloneVMModalProps> = ({ headerText, isOpen, onClose, sour
     <TabModal
       closeOnSubmit={false}
       headerText={headerText ?? t('Clone {{sourceKind}}', { sourceKind: source.kind })}
-      isDisabled={Boolean(initialCloneRequest)}
+      isDisabled={Boolean(initialCloneRequest) || !isVMNameValid}
       isLoading={Boolean(initialCloneRequest)}
       isOpen={isOpen}
       modalVariant={ModalVariant.large}
@@ -85,7 +87,7 @@ const CloneVMModal: FC<CloneVMModalProps> = ({ headerText, isOpen, onClose, sour
       submitBtnText={isVM(source) ? t('Clone') : t('Create')}
     >
       <Form className="pf-v6-u-w-75-on-md pf-v6-u-w-66-on-lg pf-v6-u-m-auto" isHorizontal>
-        <NameInput name={cloneName} setName={setCloneName} />
+        <NameInput name={cloneName} setIsValid={setIsVMNameValid} setName={setCloneName} />
         <StartClonedVMCheckbox setStartCloneVM={setStartCloneVM} startCloneVM={startCloneVM} />
         {isVM(source) ? (
           <ConfigurationSummary vm={source} />
