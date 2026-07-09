@@ -1,0 +1,17 @@
+export { default as BootableVolumeDetailPage } from './bootable-volume-detail-page';
+export { default as BootableVolumesCreatePage } from './bootable-volumes-create-page';
+export { default as BootableVolumesListPage } from './bootable-volumes-list-page';
+export { default as BootableVolumesPage } from './bootable-volumes-page';
+export { default as CreateVmCreatePage } from './create-vm-create-page';
+export { default as CreateVmInstanceTypesPage } from './create-vm-instance-types-page';
+export { default as CreateVmPage } from './create-vm-page';
+export { default as CreateVmTemplateCatalogPage } from './create-vm-template-catalog-page';
+export { default as CreateVmTemplatesPage } from './create-vm-templates-page';
+export { default as CreateVmWizardDisksPage } from './create-vm-wizard-disks-page';
+export { default as CreateVmWizardPage } from './create-vm-wizard-page';
+export { default as CreateVmWizardTabsPage } from './create-vm-wizard-tabs-page';
+export { default as InstanceTypeCustomizeWizardPage } from './instance-type-customize-wizard-page';
+export { default as InstanceTypesPage } from './instance-types-page';
+export { default as TemplateCustomizeWizardPage } from './template-customize-wizard-page';
+export { default as TemplateDetailPage } from './template-detail-page';
+export { default as TemplatesPage } from './templates-page';
