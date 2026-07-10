@@ -1,5 +1,5 @@
 name: Hot Cluster E2E
-run-name: "Hot Cluster E2E [${{ inputs.cluster_name || github.base_ref || 'kubevirt-plugin-ci' }}]"
+run-name: "Hot Cluster E2E [${{ inputs.cluster_name || github.base_ref || 'kubevirt-plugin-ci' }}] @ ${{ github.head_ref || github.ref_name }}"
 
 on:
   pull_request_target:

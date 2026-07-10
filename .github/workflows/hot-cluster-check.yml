@@ -46,23 +46,18 @@ on:
     outputs:
       cluster_ready:
         description: Whether the cluster is ready (true/false)
-        value: ${{ jobs.check-and-provision.outputs.cluster_ready }}
+        value: ${{ jobs.result.outputs.cluster_ready }}
 
 permissions:
-  actions: write
   contents: read
 
 jobs:
-  check-and-provision:
-    name: Check & Provision
+  probe:
+    name: Probe for Cluster
     runs-on: ubuntu-latest
-    timeout-minutes: 180
-    concurrency:
-      group: hot-cluster-provision-${{ inputs.cluster_name }}
-      cancel-in-progress: false
-      queue: max
+    timeout-minutes: 2
     outputs:
-      cluster_ready: ${{ steps.probe.outputs.cluster_ready || steps.wait_setup.outputs.cluster_ready }}
+      cluster_ready: ${{ steps.probe.outputs.cluster_ready }}
     steps:
       - name: Probe for cluster
         id: probe
@@ -81,128 +76,85 @@ jobs:
             echo "cluster_ready=false" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Auto-provision cluster
-        id: dispatch_setup
-        if: steps.probe.outputs.cluster_ready == 'false'
-        uses: actions/github-script@v9
-        with:
-          script: |
-            core.info('No cluster found — dispatching IBM Cloud Hot Cluster Setup...');
+  # Native reusable-workflow call (instead of the old createWorkflowDispatch
+  # + poll pattern) so the actual cluster build shows up as a real, nested,
+  # expandable job in the Checks tab of every PR that runs cluster-check --
+  # including PRs queued behind an in-progress build via the concurrency
+  # lock below, once their turn comes. ibmc-cluster-setup.yml's own
+  # `precheck` job re-probes DNS right after this lock is acquired, so a PR
+  # that was queued behind an already-finished build skips straight through
+  # instead of racing into a duplicate one.
+  provision:
+    name: Provision Cluster
+    needs: probe
+    if: needs.probe.outputs.cluster_ready == 'false'
+    concurrency:
+      group: hot-cluster-provision-${{ inputs.cluster_name }}
+      cancel-in-progress: false
+      queue: max
+    uses: ./.github/workflows/ibmc-cluster-setup.yml
+    with:
+      infrastructure_type: ${{ inputs.infrastructure_type }}
+      cluster_name: ${{ inputs.cluster_name }}
+      zone: ${{ inputs.zone }}
+      openshift_version: ${{ inputs.openshift_version }}
+      worker_flavor: ${{ inputs.worker_flavor }}
+      worker_count: ${{ inputs.worker_count }}
+      # kvm_emulation is declared as a string here (matching workflow_call's
+      # own quirky type rules for workflow_dispatch-style default inputs)
+      # but as an actual boolean on ibmc-cluster-setup.yml's workflow_call
+      # input. Passing the raw string through fails GitHub Actions' strict
+      # workflow_call type validation ("string cannot be cast to boolean") --
+      # only surfaces once this job actually runs (cold cluster / default
+      # path), not at YAML-parse time. Comparing to produce a real boolean
+      # expression result avoids that.
+      kvm_emulation: ${{ inputs.kvm_emulation == 'true' }}
+    secrets: inherit
 
-            await github.rest.actions.createWorkflowDispatch({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              workflow_id: 'ibmc-cluster-setup.yml',
-              ref: context.ref,
-              inputs: {
-                infrastructure_type: '${{ inputs.infrastructure_type }}',
-                cluster_name: '${{ inputs.cluster_name }}',
-                zone: '${{ inputs.zone }}',
-                openshift_version: '${{ inputs.openshift_version }}',
-                worker_flavor: '${{ inputs.worker_flavor }}',
-                worker_count: '${{ inputs.worker_count }}',
-                kvm_emulation: '${{ inputs.kvm_emulation }}',
-              },
-            });
-
-            core.info('Setup workflow dispatched. Waiting for run to appear...');
-
-            let setupRunId = null;
-            const startTime = Date.now();
-            for (let i = 0; i < 12; i++) {
-              await new Promise(r => setTimeout(r, 5000));
-              const runs = await github.rest.actions.listWorkflowRuns({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                workflow_id: 'ibmc-cluster-setup.yml',
-                status: 'in_progress',
-                per_page: 5,
-              });
-              const recent = runs.data.workflow_runs.find(
-                r => new Date(r.created_at).getTime() > startTime - 30000
-              );
-              if (recent) {
-                setupRunId = recent.id;
-                break;
-              }
-            }
-
-            if (!setupRunId) {
-              const queued = await github.rest.actions.listWorkflowRuns({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                workflow_id: 'ibmc-cluster-setup.yml',
-                per_page: 1,
-              });
-              if (queued.data.workflow_runs.length > 0) {
-                setupRunId = queued.data.workflow_runs[0].id;
-              }
-            }
-
-            if (!setupRunId) {
-              core.setFailed('Setup workflow was dispatched but no run was found.');
-              return;
-            }
-
-            core.info(`Setup run started: ${setupRunId}`);
-            core.setOutput('setup_run_id', setupRunId);
-
-      - name: Wait for cluster setup
-        id: wait_setup
-        if: steps.dispatch_setup.outputs.setup_run_id != ''
-        uses: actions/github-script@v9
-        with:
-          script: |
-            const runId = parseInt('${{ steps.dispatch_setup.outputs.setup_run_id }}', 10);
-            const maxWaitMs = 170 * 60 * 1000; // ~2h 50m
-            const pollIntervalMs = 120 * 1000;  // 2 min
-            const startTime = Date.now();
-
-            const runUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${runId}`;
-            core.info(`Polling setup run ${runId} (every 2 min, up to ~2h 50m)...`);
-            core.info(`Setup run: ${runUrl}`);
-
-            while (Date.now() - startTime < maxWaitMs) {
-              await new Promise(r => setTimeout(r, pollIntervalMs));
-
-              const run = await github.rest.actions.getWorkflowRun({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                run_id: runId,
-              });
-
-              const status = run.data.status;
-              const conclusion = run.data.conclusion;
-              const elapsed = Math.floor((Date.now() - startTime) / 60000);
-              core.info(`[${elapsed}m] Status: ${status}, Conclusion: ${conclusion || 'pending'}`);
-
-              if (status === 'completed') {
-                if (conclusion === 'success') {
-                  core.info('Cluster setup completed successfully.');
-                  core.setOutput('cluster_ready', 'true');
-                  return;
-                } else {
-                  core.setFailed(`Cluster setup failed (conclusion: ${conclusion}). See: ${runUrl}`);
-                  return;
-                }
-              }
-            }
-
-            core.setFailed(`Cluster setup timed out after ~2h 50m. See: ${runUrl}`);
+  result:
+    name: Availability Result
+    needs: [probe, provision]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    outputs:
+      cluster_ready: ${{ steps.compute.outputs.cluster_ready }}
+    steps:
+      - name: Compute final readiness
+        id: compute
+        env:
+          PROBE_READY: ${{ needs.probe.outputs.cluster_ready }}
+          PROVISION_RESULT: ${{ needs.provision.result }}
+        run: |
+          if [[ "${PROBE_READY}" == "true" || "${PROVISION_RESULT}" == "success" ]]; then
+            echo "cluster_ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "cluster_ready=false" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Summary
         if: always()
         env:
           CLUSTER_NAME: ${{ inputs.cluster_name }}
-          CLUSTER_READY: ${{ steps.probe.outputs.cluster_ready }}
-          SETUP_RUN_ID: ${{ steps.dispatch_setup.outputs.setup_run_id }}
+          PROBE_READY: ${{ needs.probe.outputs.cluster_ready }}
+          PROVISION_RESULT: ${{ needs.provision.result }}
         run: |
           echo "## Cluster Availability Check" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
           echo "| Check | Result |" >> "$GITHUB_STEP_SUMMARY"
           echo "|-------|--------|" >> "$GITHUB_STEP_SUMMARY"
           echo "| Cluster | \`${CLUSTER_NAME}\` |" >> "$GITHUB_STEP_SUMMARY"
-          echo "| DNS Probe | \`${CLUSTER_READY}\` |" >> "$GITHUB_STEP_SUMMARY"
-          if [[ -n "${SETUP_RUN_ID}" ]]; then
-            echo "| Setup Run | [${SETUP_RUN_ID}](https://github.com/${{ github.repository }}/actions/runs/${SETUP_RUN_ID}) |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| DNS Probe | \`${PROBE_READY}\` |" >> "$GITHUB_STEP_SUMMARY"
+          if [[ "${PROVISION_RESULT}" != "skipped" ]]; then
+            echo "| Provision Job | \`${PROVISION_RESULT}\` |" >> "$GITHUB_STEP_SUMMARY"
           fi
+
+      - name: Fail if cluster is not ready
+        if: steps.compute.outputs.cluster_ready != 'true'
+        env:
+          CLUSTER_NAME: ${{ inputs.cluster_name }}
+          PROBE_READY: ${{ needs.probe.outputs.cluster_ready }}
+          PROVISION_RESULT: ${{ needs.provision.result }}
+        run: |
+          echo "::error::Cluster '${CLUSTER_NAME}' is not ready (probe=${PROBE_READY}, provision=${PROVISION_RESULT})."
+          exit 1
