@@ -8,6 +8,6 @@ export default {
   },
   ignoreUnresolved: ['./react', './i18next', String.raw`^<rootDir>/`],
   jest: true,
-  project: ['src/**/*.{ts,tsx}', 'plugin-extensions.ts', 'plugin-metadata.ts', 'webpack.config.ts'],
+  project: ['src/**/*.{ts,tsx}', 'webpack.config.ts'],
   treatConfigHintsAsErrors: false,
 };
