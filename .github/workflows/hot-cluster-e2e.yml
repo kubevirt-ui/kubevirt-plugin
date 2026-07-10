@@ -132,28 +132,115 @@ jobs:
             core.info(`${author} is ${trusted ? '' : 'not '}listed in OWNERS (approvers/reviewers) — ${trusted ? 'trusted' : 'untrusted'}.`);
             core.setOutput('trusted', trusted ? 'true' : 'false');
 
+  # Creates a single, always-present, non-required "Hot Cluster E2E Progress"
+  # check-run that's explicitly rewritten as the pipeline advances through
+  # phases -- unlike a regular job's name/status, which is computed once and
+  # never rewritten afterwards. This is purely informational and never a
+  # substitute for the "Run Gating Tests" required check (verify-gating-
+  # tests below), which branch protection/Tide actually key off.
+  progress-check-start:
+    name: Start Progress Check
+    needs: [check-trust, resolve-cluster-config]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    # Scoped here (rather than at the workflow level) because this is the
+    # only job needing checks.create -- for the "Hot Cluster E2E Progress"
+    # check-run, a non-required, informational check separate from "Run
+    # Gating Tests" that narrates pipeline phase. No new privilege exposure:
+    # pull_request_target already grants base-repo write-level permissions
+    # via GITHUB_TOKEN.
+    permissions:
+      checks: write
+    outputs:
+      check_run_id: ${{ steps.create.outputs.check_run_id }}
+    steps:
+      # Best-effort: a Checks API failure here must never block or fail the
+      # pipeline itself -- this check is purely informational.
+      - name: Create progress check-run
+        id: create
+        continue-on-error: true
+        uses: actions/github-script@v9
+        with:
+          script: |
+            // pull_request_target's github.sha/context.sha is the BASE
+            // branch's commit, not the PR head -- posting the check-run
+            // there would make it silently never appear in the PR's own
+            // Checks tab.
+            const headSha = context.eventName === 'pull_request_target'
+              ? context.payload.pull_request.head.sha
+              : context.sha;
+
+            const isIrrelevantLabel = context.payload.action === 'labeled'
+              && context.payload.label?.name !== 'ok-to-test';
+
+            // A distinct name for no-op runs prevents them from creating a
+            // same-named, same-SHA check-run that could collide with (and,
+            // per GitHub's "most recent wins" display behavior, obscure) an
+            // active real run's own "Hot Cluster E2E Progress" check --
+            // mirroring the same duplicate-name pitfall called out for
+            // "Run Gating Tests" on verify-gating-tests below.
+            const params = {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              name: isIrrelevantLabel
+                ? 'Hot Cluster E2E Progress (skipped - irrelevant label event)'
+                : 'Hot Cluster E2E Progress',
+              head_sha: headSha,
+              output: {
+                title: isIrrelevantLabel
+                  ? 'Skipped (irrelevant label event)'
+                  : 'Waiting for cluster to be built',
+                summary: isIrrelevantLabel
+                  ? `Label '${context.payload.label?.name}' does not trigger gating tests -- this run is a no-op.`
+                  : 'The hot cluster E2E pipeline has started.',
+              },
+            };
+
+            if (isIrrelevantLabel) {
+              params.status = 'completed';
+              params.conclusion = 'neutral';
+            } else {
+              params.status = 'in_progress';
+            }
+
+            const { data: check } = await github.rest.checks.create(params);
+            core.setOutput('check_run_id', check.id);
+
+  # if: always() unconditionally -- this job is a `uses:` reusable-workflow
+  # call, so GitHub reports its sub-jobs as compound-named check contexts
+  # (`cluster-check / probe`, `cluster-check / result`, ...) only while it
+  # actually runs; a job-level `if:` skip instead reports a single bare
+  # `cluster-check` context. Alternating between the two across different
+  # trigger events (e.g. irrelevant label vs. real push) fragments what
+  # should be one logical check into unrelated, inconsistently-named ones
+  # that can't be unified by renaming alone. Always invoking the reusable
+  # workflow and pushing the actual gating decision down into its
+  # `should_run` input (which its always-running `probe`/`result` jobs
+  # already handle) keeps the check names stable across every event type.
   cluster-check:
     needs: [check-trust, resolve-cluster-config]
-    if: |
-      always() &&
-      (github.event.action != 'labeled' || github.event.label.name == 'ok-to-test') &&
-      (
-        github.event_name == 'workflow_dispatch' ||
-        github.event.pull_request.head.repo.full_name == github.repository ||
-        needs.check-trust.outputs.trusted == 'true' ||
-        (github.event.action == 'labeled' && github.event.label.name == 'ok-to-test')
-      )
+    if: always()
     uses: ./.github/workflows/hot-cluster-check.yml
     with:
       cluster_name: ${{ needs.resolve-cluster-config.outputs.cluster_name }}
       infrastructure_type: ${{ inputs.infrastructure_type || 'ipi' }}
       openshift_version: ${{ needs.resolve-cluster-config.outputs.openshift_version }}
+      # Single-line plain scalar (same well-precedented `${{ ... }}` pattern
+      # used for run-name/other with: values throughout this file) rather
+      # than a multi-line expression wrapped in a literal block scalar --
+      # the latter has no local test coverage for how GitHub Actions'
+      # expression engine handles embedded newlines before a real PR run.
+      should_run: ${{ (github.event.action != 'labeled' || github.event.label.name == 'ok-to-test') && (github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository || needs.check-trust.outputs.trusted == 'true' || (github.event.action == 'labeled' && github.event.label.name == 'ok-to-test')) }}
     secrets: inherit
 
   cluster-health-check:
     name: Manual Cluster Health Check
     needs: [cluster-check, resolve-cluster-config]
-    if: github.event_name == 'workflow_dispatch' && needs.cluster-check.result == 'success'
+    # cluster-check now always runs (see comment above it) and quickly
+    # reports 'success' even as a no-op, so gate on the actual readiness
+    # output rather than the job result.
+    if: github.event_name == 'workflow_dispatch' && needs.cluster-check.outputs.cluster_ready == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     env:
@@ -225,13 +312,88 @@ jobs:
             echo "Health checks **failed**. E2E workflow was not invoked." >> "$GITHUB_STEP_SUMMARY"
           fi
 
+  # Advances the progress check-run to its second phase once the cluster is
+  # confirmed ready (mirrors the condition run-e2e-tests itself uses below),
+  # or completes it as a failure now if the cluster never became ready --
+  # narrating the same outcome run-e2e-tests's own skip would otherwise
+  # leave unexplained on this check.
+  progress-check-running-tests:
+    name: Update Progress Check
+    needs: [progress-check-start, cluster-check, cluster-health-check]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    # Scoped here (rather than at the workflow level) -- see
+    # progress-check-start above.
+    permissions:
+      checks: write
+    steps:
+      # Best-effort, same as progress-check-start above.
+      - name: Update progress check-run
+        continue-on-error: true
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const isIrrelevantLabel = context.payload.action === 'labeled'
+              && context.payload.label?.name !== 'ok-to-test';
+            if (isIrrelevantLabel) {
+              core.info('Irrelevant label event — progress check already completed as a no-op.');
+              return;
+            }
+
+            const checkRunId = parseInt('${{ needs.progress-check-start.outputs.check_run_id }}', 10);
+            if (!checkRunId) {
+              core.warning('No progress check-run id — skipping update.');
+              return;
+            }
+
+            // cluster-health-check only ever runs for workflow_dispatch (its
+            // own `if:` skips it otherwise) -- branch on event type here,
+            // rather than a plain `||` of the two, so a manual run whose
+            // health check failed isn't reported as ready just because
+            // cluster_ready == 'true'. See run-e2e-tests below for the same
+            // fix applied to its own `if:` condition.
+            const clusterReady = context.eventName === 'workflow_dispatch'
+              ? '${{ needs.cluster-health-check.result }}' === 'success'
+              : '${{ needs.cluster-check.outputs.cluster_ready }}' === 'true';
+
+            const params = {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              check_run_id: checkRunId,
+            };
+
+            if (clusterReady) {
+              params.status = 'in_progress';
+              params.output = {
+                title: 'Running gating tests',
+                summary: 'The hot cluster is ready; Playwright gating tests are starting.',
+              };
+            } else {
+              params.status = 'completed';
+              params.conclusion = 'failure';
+              params.output = {
+                title: 'Cluster not ready — gating tests not run',
+                summary: 'The hot cluster could not be provisioned or verified healthy; gating tests were not started.',
+              };
+            }
+
+            await github.rest.checks.update(params);
+
   run-e2e-tests:
     name: Run E2E Tests
     needs: [cluster-check, cluster-health-check, resolve-cluster-config]
+    # See cluster-health-check above: key off cluster-check's cluster_ready
+    # output, not its job result, now that a no-op event still reports
+    # 'success' for cluster-check. cluster-health-check only ever runs for
+    # workflow_dispatch (its own `if:` skips it otherwise), so branching on
+    # event type here -- rather than a plain `||` of the two -- is required:
+    # an unconditional `||` would let a manual run with cluster_ready ==
+    # 'true' proceed even if its own health check subsequently failed.
     if: |
       always() && (
-        needs.cluster-check.result == 'success' ||
-        needs.cluster-health-check.result == 'success'
+        (github.event_name == 'workflow_dispatch' && needs.cluster-health-check.result == 'success') ||
+        (github.event_name != 'workflow_dispatch' && needs.cluster-check.outputs.cluster_ready == 'true')
       )
     uses: ./.github/workflows/hot-cluster-e2e-run.yml
     with:
@@ -263,20 +425,56 @@ jobs:
   # Tests" context that branch protection/Tide requires, so an irrelevant
   # label event doesn't touch that check at all (leaving it correctly
   # `expected`/pending until the real run reports).
+  #
+  # if: is unconditional `always()` — the irrelevant-label short-circuit is
+  # handled inside the step below, not via a job-level `if:` — because
+  # GitHub Actions only evaluates a dynamic `name:` expression on the runner
+  # as the job starts. A job skipped via `if:` never dispatches to a runner,
+  # so GitHub falls back to displaying the raw, unevaluated name expression
+  # instead of either ternary branch (see
+  # https://github.com/actions/runner/issues/1215, closed as won't-fix).
+  # Always running the job guarantees the name always renders correctly.
+  # needs: includes progress-check-running-tests (not just progress-check-
+  # start) so this job's own terminal checks.update call is guaranteed to
+  # happen *after* progress-check-running-tests's -- without that edge,
+  # GitHub Actions gives no ordering guarantee between the two, and a fast
+  # run-e2e-tests failure (racing against progress-check-running-tests's own
+  # in_progress update, which only needs cluster-check/cluster-health-check)
+  # could post the terminal completed/failure update first, only for the
+  # in_progress update to land afterwards and permanently strand the
+  # progress check-run as "in progress" on an already-finished run.
   verify-gating-tests:
     name: ${{ (github.event.action != 'labeled' || github.event.label.name == 'ok-to-test') && 'Run Gating Tests' || 'Run Gating Tests (skipped - irrelevant label event)' }}
-    needs: [check-trust, cluster-check, cluster-health-check, run-e2e-tests]
-    if: |
-      always() &&
-      (github.event.action != 'labeled' || github.event.label.name == 'ok-to-test')
+    needs:
+      [
+        check-trust,
+        cluster-check,
+        cluster-health-check,
+        run-e2e-tests,
+        progress-check-start,
+        progress-check-running-tests,
+      ]
+    if: always()
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    # Scoped here (rather than at the workflow level) -- needed by the
+    # "Complete progress check-run" step's checks.update call below. See
+    # progress-check-start above.
+    permissions:
+      checks: write
     steps:
       - name: Verify hot cluster E2E ran and passed
         env:
           TRUSTED: ${{ needs.check-trust.outputs.trusted }}
           E2E_RESULT: ${{ needs.run-e2e-tests.result }}
+          IS_IRRELEVANT_LABEL: ${{ github.event.action == 'labeled' && github.event.label.name != 'ok-to-test' }}
+          LABEL_NAME: ${{ github.event.label.name }}
         run: |
+          if [[ "${IS_IRRELEVANT_LABEL}" == "true" ]]; then
+            echo "Irrelevant label event ('${LABEL_NAME}') — this run does not represent a real gating-test outcome."
+            exit 0
+          fi
+
           echo "run-e2e-tests result: ${E2E_RESULT}"
 
           if [[ "${E2E_RESULT}" == "success" ]]; then
@@ -290,3 +488,44 @@ jobs:
             echo "::error::Hot cluster gating tests did not pass (run-e2e-tests result: '${E2E_RESULT}'). See the 'Run E2E Tests' job for details, or use /retest-e2e once fixed."
           fi
           exit 1
+
+      # if: always() so this still runs and reports the failure even when
+      # the step above exits 1 (steps default to skipping after a prior
+      # failure otherwise). continue-on-error: true so a transient Checks
+      # API failure here (e.g. a network blip) can never flip this job's --
+      # this is the required "Run Gating Tests" check -- own conclusion;
+      # the informational progress check is best-effort only.
+      - name: Complete progress check-run
+        if: always()
+        continue-on-error: true
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const isIrrelevantLabel = context.payload.action === 'labeled'
+              && context.payload.label?.name !== 'ok-to-test';
+            if (isIrrelevantLabel) {
+              core.info('Irrelevant label event — progress check already completed as a no-op.');
+              return;
+            }
+
+            const checkRunId = parseInt('${{ needs.progress-check-start.outputs.check_run_id }}', 10);
+            if (!checkRunId) {
+              core.warning('No progress check-run id — skipping update.');
+              return;
+            }
+
+            const passed = '${{ job.status }}' === 'success';
+
+            await github.rest.checks.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              check_run_id: checkRunId,
+              status: 'completed',
+              conclusion: passed ? 'success' : 'failure',
+              output: {
+                title: passed ? 'Passed' : 'Failed',
+                summary: passed
+                  ? 'Hot cluster gating tests passed.'
+                  : 'Hot cluster gating tests did not pass. See the "Run Gating Tests" check for details.',
+              },
+            });

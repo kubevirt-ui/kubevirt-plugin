@@ -663,6 +663,12 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
           ADMIN_PASSWORD: ${{ secrets.CLUSTER_ADMIN_PASSWORD }}
           INSTALL_DIR: ${{ runner.temp }}/ipi-install
+          # github.head_ref is only set for pull_request*/pull_request_target
+          # events (the PR's source branch); github.ref_name would otherwise
+          # resolve to the *base* branch for pull_request_target (e.g. this
+          # workflow reached via hot-cluster-e2e.yml's auto-provision chain),
+          # misreporting the branch in the Slack message below.
+          BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
         run: |
           CONSOLE_URL=$(oc get consoles.config.openshift.io cluster -o jsonpath='{.status.consoleURL}' 2>/dev/null || echo "unknown")
 
@@ -686,7 +692,7 @@ jobs:
             exit 0
           fi
 
-          TEXT=":white_check_mark: *Hot cluster ready*"
+          TEXT=":white_check_mark: *Hot cluster ready [${BRANCH_NAME}]*"
           TEXT+=$'\n'"*Console:* <${CONSOLE_URL}>"
           TEXT+="${CREDS}"
 
