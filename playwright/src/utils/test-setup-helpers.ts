@@ -11,14 +11,14 @@ import {
 } from '@/utils/random-data-generator';
 import { TestTimeouts } from '@/utils/test-config';
 
-export interface AdvancedSearchVmNames {
+export type AdvancedSearchVmNames = {
   defaultVm: string;
   templateVm: string;
   instanceTypeVm: string;
   searchTerm: string;
-}
+};
 
-interface CreateAdvancedSearchTestVmsOptions {
+type CreateAdvancedSearchTestVmsOptions = {
   testPrefix?: string;
   startVms?: boolean;
   templateName?: string;
@@ -29,7 +29,7 @@ interface CreateAdvancedSearchTestVmsOptions {
    * Use for tests that filter by memory (e.g. CNV-11958).
    */
   memorySearch?: boolean;
-}
+};
 
 function generateUniqueSuffix(): string {
   return generateRandomString(6, 'alphanumeric').toLowerCase();

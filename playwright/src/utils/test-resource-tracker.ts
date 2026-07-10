@@ -23,7 +23,7 @@ export type TrackedResourceType =
   | 'VirtualMachineSnapshot'
   | 'VirtualMachineTemplate';
 
-export interface TrackedResource {
+export type TrackedResource = {
   name: string;
   namespace?: string;
   type: TrackedResourceType;
@@ -33,7 +33,7 @@ export interface TrackedResource {
   isClusterScoped: boolean;
   trackedAt?: Date;
   metadata?: Record<string, unknown>;
-}
+};
 
 /**
  * Resource type definitions with API details
@@ -170,28 +170,28 @@ const RESOURCE_TYPE_DEFINITIONS: Record<
   },
 };
 
-export interface CleanupResult {
+export type CleanupResult = {
   resource: TrackedResource;
   success: boolean;
   error?: string;
   duration?: number;
-}
+};
 
-export interface CleanupSummary {
+export type CleanupSummary = {
   totalResources: number;
   successCount: number;
   failureCount: number;
   results: CleanupResult[];
   duration: number;
-}
+};
 
-export interface CleanupOptions {
+export type CleanupOptions = {
   continueOnError?: boolean;
   timeoutPerResource?: number;
   verbose?: boolean;
   resourceTypes?: TrackedResourceType[];
   skip?: boolean;
-}
+};
 
 export type CleanupCallback = (resource: TrackedResource) => Promise<boolean>;
 
@@ -297,15 +297,15 @@ export class TestResourceTracker {
         group.resources.map(async (resource) => {
           const resourceStartTime = Date.now();
 
+          let timer: ReturnType<typeof setTimeout> | undefined;
           try {
-            // Create a timeout wrapper
             const deletePromise = deleteCallback(resource);
-            const timeoutPromise = new Promise<boolean>((_, reject) =>
-              setTimeout(
+            const timeoutPromise = new Promise<boolean>((_, reject) => {
+              timer = setTimeout(
                 () => reject(new Error(`Timeout after ${timeoutPerResource}ms`)),
                 timeoutPerResource,
-              ),
-            );
+              );
+            });
 
             const success = await Promise.race([deletePromise, timeoutPromise]);
             const duration = Date.now() - resourceStartTime;
@@ -329,18 +329,20 @@ export class TestResourceTracker {
               error: errorMessage,
               duration,
             };
+          } finally {
+            if (timer) clearTimeout(timer);
           }
         }),
       );
 
       // Collect results
-      for (const settledResult of groupResults) {
+      for (let i = 0; i < groupResults.length; i++) {
+        const settledResult = groupResults[i];
         if (settledResult.status === 'fulfilled') {
           results.push(settledResult.value);
         } else {
-          // This shouldn't happen with continueOnError=true, but handle it
           results.push({
-            resource: group.resources[0], // Best effort
+            resource: group.resources[i],
             success: false,
             error: settledResult.reason?.message || 'Unknown error',
           });

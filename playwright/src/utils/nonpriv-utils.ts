@@ -140,8 +140,13 @@ const IDP_NAME = NONPRIV_IDP_NAME;
 
 /** Silently swallow 404 errors — the resource is already gone. */
 function ignore404(err: unknown): void {
-  const e = err as { statusCode?: number; response?: { statusCode?: number } };
-  const code = e.statusCode ?? e.response?.statusCode;
+  const e = err as {
+    body?: { code?: number };
+    code?: number;
+    response?: { statusCode?: number };
+    statusCode?: number;
+  };
+  const code = e.statusCode ?? e.response?.statusCode ?? e.code ?? e.body?.code;
   if (code === 404) return;
   throw err;
 }

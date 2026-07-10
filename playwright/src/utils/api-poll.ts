@@ -1,9 +1,23 @@
 const POLL_INTERVAL_MS = 3000;
 
+const TRANSIENT_STATUS_CODES = new Set([404, 503]);
+
+function isTransientError(error: unknown): boolean {
+  const msg = error instanceof Error ? error.message : String(error);
+  if (/\b(404|503)\b/.test(msg)) return true;
+  if (/not found/i.test(msg)) return true;
+  if (/service unavailable/i.test(msg)) return true;
+  const statusCode =
+    (error as { statusCode?: number })?.statusCode ??
+    (error as { response?: { statusCode?: number } })?.response?.statusCode ??
+    (error as { code?: number })?.code;
+  return typeof statusCode === 'number' && TRANSIENT_STATUS_CODES.has(statusCode);
+}
+
 /**
  * Generic polling loop. Calls `condition` every POLL_INTERVAL_MS until it returns true
- * or `timeoutMs` elapses. Errors thrown by `condition` are silently swallowed so that
- * transient 404s during resource deletion are treated as "not yet gone" rather than failures.
+ * or `timeoutMs` elapses. Transient errors (404, 503) are suppressed; persistent errors
+ * (400, 401, 403, etc.) are immediately rethrown.
  */
 async function pollUntil(
   condition: () => Promise<boolean>,
@@ -14,8 +28,8 @@ async function pollUntil(
   while (Date.now() < deadline) {
     try {
       if (await condition()) return;
-    } catch {
-      // swallow — resource may not exist yet or may be in transition
+    } catch (e: unknown) {
+      if (!isTransientError(e)) throw e;
     }
     await new Promise((r) => setTimeout(r, POLL_INTERVAL_MS));
   }
@@ -39,7 +53,7 @@ export async function pollUntilVmiGone(
       await apiClient.getVirtualMachineInstance(namespace, vmName);
       await new Promise((r) => setTimeout(r, POLL_INTERVAL_MS));
     } catch (e: unknown) {
-      const msg = (e as Error).message ?? '';
+      const msg = e instanceof Error ? e.message : String(e);
       if (msg.includes('404') || msg.toLowerCase().includes('not found')) return;
       throw e;
     }

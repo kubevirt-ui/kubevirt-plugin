@@ -112,13 +112,7 @@ export async function waitForAllElementsVisible(
   locators: Locator[],
   timeout: number = TestTimeouts.UI_ELEMENT_VISIBILITY,
 ): Promise<void> {
-  await Promise.all(
-    locators.map((locator) =>
-      locator.waitFor({ state: 'visible', timeout }).catch(() => {
-        // Ignore individual failures, will be caught by Promise.all
-      }),
-    ),
-  );
+  await Promise.all(locators.map((locator) => locator.waitFor({ state: 'visible', timeout })));
 }
 
 export async function waitForNavigationComplete(

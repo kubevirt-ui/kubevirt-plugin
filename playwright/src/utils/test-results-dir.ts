@@ -42,7 +42,10 @@ export function getTestResultsDir(repoRoot: string): string {
     const dir = process.env.PLAYWRIGHT_OUTPUT_DIR;
     return path.isAbsolute(dir) ? dir : path.resolve(process.cwd(), dir);
   }
-  if (process.env.ARTIFACTS_DIR || EnvVariables.useAllure) {
+  if (process.env.ARTIFACTS_DIR) {
+    ensurePipelineArtifactDirs(repoRoot);
+  }
+  if (EnvVariables.useAllure) {
     ensurePipelineArtifactDirs(repoRoot);
     return path.join(repoRoot, 'allure-results');
   }
