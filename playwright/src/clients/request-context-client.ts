@@ -213,6 +213,12 @@ export default class RequestContextClient extends BaseClient implements ProxyApi
     return this._parseResponse(response);
   }
 
+  // ---------------------------------------------------------------------------
+  // Plugin health check
+  // Uses a direct HTTP GET rather than _request because the health endpoint
+  // returns a plain-text body (not JSON), so _parseResponse would throw.
+  // ---------------------------------------------------------------------------
+
   async checkPluginHealth(): Promise<boolean> {
     const url = this.buildConsoleApiUrl(
       '/proxy/plugin/kubevirt-plugin/kubevirt-apiserver-proxy/health',
@@ -252,11 +258,6 @@ export default class RequestContextClient extends BaseClient implements ProxyApi
     return this.infra.createMultiNsStorageMigrationPlan(spec, namespace);
   }
 
-  // ---------------------------------------------------------------------------
-  // project.openshift.io — Project patch
-  // (Uses a non-standard /k8s/cluster/... URL, not delegated to a handler)
-  // ---------------------------------------------------------------------------
-
   async createResource(
     group: string,
     version: string,
@@ -270,12 +271,6 @@ export default class RequestContextClient extends BaseClient implements ProxyApi
     const nsSegment = namespace ? `/namespaces/${namespace}` : '';
     return this._request('post', `${apiSegment}${nsSegment}/${plural}`, { data: spec });
   }
-
-  // ---------------------------------------------------------------------------
-  // Plugin health check
-  // Uses a direct HTTP GET rather than _request because the health endpoint
-  // returns a plain-text body (not JSON), so _parseResponse would throw.
-  // ---------------------------------------------------------------------------
 
   createStorageMigrationPlan(spec: KubernetesResource, namespace: string) {
     return this.infra.createStorageMigrationPlan(spec, namespace);
@@ -565,6 +560,11 @@ export default class RequestContextClient extends BaseClient implements ProxyApi
   patchMigrationPolicy(name: string, patch: JsonPatchOp[]) {
     return this.infra.patchMigrationPolicy(name, patch);
   }
+  // ---------------------------------------------------------------------------
+  // project.openshift.io — Project patch
+  // (Uses a non-standard /k8s/cluster/... URL, not delegated to a handler)
+  // ---------------------------------------------------------------------------
+
   async patchProject(projectName: string, patchPayload: JsonPatchOp[]): Promise<void> {
     const base = this.baseUrl.endsWith('/') ? this.baseUrl.slice(0, -1) : this.baseUrl;
     const url = `${base}/k8s/cluster/project.openshift.io~v1~Project/${projectName}`;

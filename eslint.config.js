@@ -106,6 +106,13 @@ const testFilesOverrides = {
   },
 };
 
+const playwrightOverrides = {
+  files: ['playwright/**/*.{ts,tsx}'],
+  rules: {
+    'no-console': 'off',
+  },
+};
+
 export default [
   ignoresConfig,
   baseConfig,
@@ -115,4 +122,5 @@ export default [
   githubScriptsOverrides,
   testingLibraryConfig,
   testFilesOverrides,
+  playwrightOverrides,
 ];
