@@ -74,7 +74,7 @@ export function generateRandomSecretName(prefix = 'secret'): string {
 
 export function generateRandomString(
   length = 8,
-  charset: 'alphabetic' | 'alphanumeric' | 'hex' | 'numeric' = 'alphanumeric',
+  charset: 'alphanumeric' | 'alphabetic' | 'numeric' | 'hex' = 'alphanumeric',
 ): string {
   let chars: string;
 
