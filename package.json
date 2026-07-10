@@ -87,7 +87,7 @@
     "css-loader": "^6.11.0",
     "dotenv": "^17.4.2",
     "esbuild": "^0.28.0",
-    "esbuild-loader": "^4.4.3",
+    "esbuild-loader": "^4.5.0",
     "eslint": "10.5.0",
     "eslint-config-prettier": "10.1.8",
     "eslint-import-resolver-typescript": "4.4.5",
@@ -153,10 +153,7 @@
       "@openshift-console/dynamic-plugin-sdk": "4.23.0-prerelease.3",
       "react-i18next": "~16.5.8"
     },
-    "delaunator": "4.0.1",
-    "esbuild-loader": {
-      "esbuild": "^0.28.1"
-    }
+    "delaunator": "4.0.1"
   },
   "private": true,
   "scripts": {
