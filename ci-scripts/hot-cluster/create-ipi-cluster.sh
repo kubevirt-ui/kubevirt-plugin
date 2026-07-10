@@ -12,7 +12,11 @@ for attempt in $(seq 1 "${MAX_ATTEMPTS}"); do
 
   if [[ "${attempt}" -gt 1 ]]; then
     echo "Preparing fresh install directory for retry..."
-    rm -rf "${INSTALL_DIR}/manifests" "${INSTALL_DIR}/openshift" "${INSTALL_DIR}/.openshift_install"* "${INSTALL_DIR}/auth" "${INSTALL_DIR}/metadata.json" "${INSTALL_DIR}/install.log" "${INSTALL_DIR}/terraform"*
+    # .clusterapi_output holds the local envtest control-plane datastore --
+    # without wiping it, a failed attempt's Cluster/Machine objects (created
+    # locally before any real cloud infra existed) persist alongside the next
+    # attempt's fresh ones, piling up stale entries across retries.
+    rm -rf "${INSTALL_DIR}/manifests" "${INSTALL_DIR}/openshift" "${INSTALL_DIR}/.openshift_install"* "${INSTALL_DIR}/auth" "${INSTALL_DIR}/metadata.json" "${INSTALL_DIR}/install.log" "${INSTALL_DIR}/terraform"* "${INSTALL_DIR}/.clusterapi_output"
     cp "${INSTALL_DIR}/install-config.yaml.bak" "${INSTALL_DIR}/install-config.yaml"
 
     echo "Regenerating manifests and CCO secrets..."

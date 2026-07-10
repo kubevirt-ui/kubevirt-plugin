@@ -1,5 +1,5 @@
 name: IBM Cloud Hot Cluster Setup
-run-name: "Hot Cluster Setup [${{ inputs.cluster_name || 'kubevirt-plugin-ci' }}]"
+run-name: "Hot Cluster Setup [${{ inputs.cluster_name || 'kubevirt-plugin-ci' }}] @ ${{ github.ref_name }}"
 
 on:
   workflow_dispatch:
@@ -53,6 +53,70 @@ on:
         required: false
         default: 'stable'
         type: string
+  workflow_call:
+    inputs:
+      infrastructure_type:
+        description: 'Infrastructure type'
+        required: false
+        default: 'ipi'
+        type: string
+      cluster_name:
+        description: 'Cluster name (max 21 chars — IBM Cloud IPI limit, longer names get silently truncated)'
+        required: false
+        default: 'kubevirt-plugin-ci'
+        type: string
+      zone:
+        description: 'Zone (classic: wdc04, fra02; vpc/ipi: us-south-1, eu-de-1)'
+        required: false
+        default: 'us-south-1'
+        type: string
+      openshift_version:
+        description: 'OpenShift version (e.g. 4.22_openshift)'
+        required: false
+        default: '4.22_openshift'
+        type: string
+      worker_flavor:
+        description: 'Worker node flavor (classic: mb4c.4x32; vpc/ipi: bx2.8x32)'
+        required: false
+        default: 'bx2.8x32'
+        type: string
+      worker_count:
+        description: 'Number of worker nodes (at least 2 so ingress is happy)'
+        required: false
+        default: '2'
+        type: string
+      kvm_emulation:
+        description: 'KVM emulation (true for vpc/shared, false for bare metal)'
+        required: false
+        default: true
+        type: boolean
+      cos_instance_crn:
+        description: 'COS instance CRN for VPC internal registry (auto-created if empty)'
+        required: false
+        default: ''
+        type: string
+      cnv_channel:
+        description: 'CNV OLM subscription channel (e.g. stable, stable-4.17)'
+        required: false
+        default: 'stable'
+        type: string
+    secrets:
+      IC_KEY:
+        required: true
+      OPENSHIFT_PULL_SECRET:
+        required: false
+      ARC_GITHUB_APP_ID:
+        required: false
+      ARC_GITHUB_APP_INSTALL_ID:
+        required: false
+      ARC_GITHUB_APP_PRIVATE_KEY:
+        required: false
+      ARC_GITHUB_PAT:
+        required: false
+      CLUSTER_ADMIN_PASSWORD:
+        required: false
+      SLACK_WEBHOOK_URL:
+        required: false
 
 permissions:
   contents: read
@@ -68,8 +132,48 @@ env:
   CONTROL_PLANE_FLAVOR: bx2-4x16
 
 jobs:
+  # Re-probes cluster existence after any concurrency lock a caller might
+  # hold is acquired (e.g. hot-cluster-check.yml's provision job), so that if
+  # another caller already finished building the same cluster_name while
+  # this one was queued, provision-cluster skips instead of racing into a
+  # duplicate build. Also protects plain workflow_dispatch runs, which have
+  # no concurrency/existence-check of their own today.
+  precheck:
+    name: Check if Cluster Already Exists
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    outputs:
+      already_ready: ${{ steps.probe.outputs.already_ready }}
+    steps:
+      - name: Probe for cluster
+        id: probe
+        env:
+          CLUSTER_NAME: ${{ inputs.cluster_name || 'kubevirt-plugin-ci' }}
+          INFRASTRUCTURE_TYPE: ${{ inputs.infrastructure_type || 'ipi' }}
+        run: |
+          # The api.<cluster>.<base_domain> DNS hostname is an IPI-only
+          # construct (see configure-kubeconfig.sh) -- ROKS-based vpc/classic
+          # clusters are accessed via `ibmcloud oc cluster config`/`get`
+          # instead, never that hostname. Their existence check already
+          # happens directly inside provision-cluster's own "Check for
+          # existing ROKS cluster" step, so just pass through here.
+          if [[ "${INFRASTRUCTURE_TYPE}" != "ipi" ]]; then
+            echo "already_ready=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          API_HOST="api.${CLUSTER_NAME}.${BASE_DOMAIN}"
+          if dig +short "${API_HOST}" 2>/dev/null | grep -q .; then
+            echo "Cluster '${CLUSTER_NAME}' is already reachable (${API_HOST} resolves) — skipping provisioning."
+            echo "already_ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "already_ready=false" >> "$GITHUB_OUTPUT"
+          fi
+
   provision-cluster:
     name: Provision OpenShift Cluster
+    needs: precheck
+    if: needs.precheck.outputs.already_ready != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 360
     steps:
