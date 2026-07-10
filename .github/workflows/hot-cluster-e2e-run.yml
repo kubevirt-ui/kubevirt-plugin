@@ -22,6 +22,16 @@ on:
         required: false
         default: ''
         type: string
+      checkout_ref:
+        description: |
+          Ref/SHA to check out for the code under test. Leave empty for the
+          default (PR head SHA, or the triggering ref for a plain manual
+          run). Set to refs/pull/<N>/merge to test a PR merged with the
+          current base tip instead of the PR's head commit in isolation
+          (used by hot-cluster-e2e.yml's pr_number retest path).
+        required: false
+        default: ''
+        type: string
   workflow_call:
     inputs:
       test_project:
@@ -36,6 +46,16 @@ on:
         default: ''
       cluster_name:
         description: Cluster name for run tagging (defaults to runner_label)
+        type: string
+        required: false
+        default: ''
+      checkout_ref:
+        description: |
+          Ref/SHA to check out for the code under test. Leave empty for the
+          default (PR head SHA, or the triggering ref for a plain manual
+          run). Set to refs/pull/<N>/merge to test a PR merged with the
+          current base tip instead of the PR's head commit in isolation
+          (used by hot-cluster-e2e.yml's pr_number retest path).
         type: string
         required: false
         default: ''
@@ -193,10 +213,14 @@ jobs:
     outputs:
       kubevirt-plugin-image: ${{ env.KUBEVIRT_PLUGIN_IMAGE }}
     steps:
+      # inputs.checkout_ref (set to refs/pull/<N>/merge for the main-push
+      # retest path in hot-cluster-e2e.yml) takes priority over the PR's own
+      # head SHA -- see the checkout_ref input above for why: testing the
+      # merge with the current base tip, not the PR's isolated head commit.
       - name: Checkout
         uses: actions/checkout@v7
         with:
-          ref: ${{ github.event.pull_request.head.sha || github.ref }}
+          ref: ${{ inputs.checkout_ref || github.event.pull_request.head.sha || github.ref }}
           allow-unsafe-pr-checkout: true
 
       - name: Check if kubevirt-plugin image exists in registry
@@ -256,10 +280,13 @@ jobs:
       RUN_FEATURE_TESTS: ${{ inputs.test_project == 'features' && 'true' || 'false' }}
 
     steps:
+      # See the build-kubevirt-plugin-image job's Checkout step above --
+      # same checkout_ref precedence, so the image build and the test run
+      # always test the identical tree.
       - name: Checkout
         uses: actions/checkout@v7
         with:
-          ref: ${{ github.event.pull_request.head.sha || github.ref }}
+          ref: ${{ inputs.checkout_ref || github.event.pull_request.head.sha || github.ref }}
           allow-unsafe-pr-checkout: true
 
       - name: Provision CI test environment
