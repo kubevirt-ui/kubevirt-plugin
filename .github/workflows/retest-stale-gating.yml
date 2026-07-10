@@ -1,0 +1,213 @@
+name: Retest Stale Gating Checks
+
+# Tide-equivalent staleness guard (CNV-92616): when main advances, any open
+# PR's already-completed "Run Gating Tests" check was validated against a
+# base branch tip that no longer exists. Prow's Tide used to re-test every
+# merge-pool PR against the latest base commit before merge; that guarantee
+# doesn't exist for this repo's externally-triggered hot-cluster workflow,
+# since it only reacts to the PR's own push/relabel/comment events (see
+# hot-cluster-e2e.yml) and branch protection has strict: false.
+#
+# Two tiers, bounded for cost on the single shared hot cluster:
+#   - Cheap pass (every open PR targeting main): mark the existing "Run
+#     Gating Tests" check as stale/queued -- a plain Checks API call, no
+#     cluster time spent.
+#   - Real retest (merge-pool PRs only -- lgtm + approved, no hold/do-not-
+#     merge): dispatch hot-cluster-e2e.yml's pr_number path, which tests the
+#     PR merged with the new main tip (not a no-op re-run of the old
+#     head-only commit) and publishes the result onto the same check.
+#     Pool membership is re-verified fresh inside that dispatched run
+#     (resolve-pr-context) rather than trusted from this workflow's earlier
+#     snapshot -- see is-merge-pool-pr.cjs for why.
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  pull-requests: read
+  checks: write
+  actions: write
+
+jobs:
+  list-open-prs:
+    name: List Open PRs Targeting main
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    outputs:
+      pool_pr_numbers: ${{ steps.list.outputs.pool_pr_numbers }}
+      all_pr_numbers: ${{ steps.list.outputs.all_pr_numbers }}
+    steps:
+      # Needed to require() the shared is-merge-pool-pr.cjs predicate below.
+      # persist-credentials: false -- read-only usage, never pushes.
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: List open PRs and classify merge-pool membership
+        id: list
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const { isMergePoolPr } = require('./ci-scripts/hot-cluster/is-merge-pool-pr.cjs');
+
+            const prs = await github.paginate(github.rest.pulls.list, {
+              ...context.repo,
+              state: 'open',
+              base: 'main',
+              per_page: 100,
+            });
+
+            const all = prs.map((pr) => pr.number);
+            const pool = prs.filter((pr) => isMergePoolPr(pr.labels)).map((pr) => pr.number);
+
+            core.info(`Open PRs targeting main: ${all.length} total, ${pool.length} in the merge pool.`);
+            core.info(`Pool PRs: ${pool.join(', ') || '(none)'}`);
+
+            core.setOutput('all_pr_numbers', JSON.stringify(all));
+            core.setOutput('pool_pr_numbers', JSON.stringify(pool));
+
+  # Marks every open PR's "Run Gating Tests" check as stale by creating a
+  # fresh queued check-run, instead of leaving a now-invalid "success"
+  # visible as the most recent (and thus authoritative -- GitHub's merge
+  # box shows whichever check-run reported most recently for a given name)
+  # result on that SHA.
+  #
+  # One matrix job per PR (rather than one job looping over all PRs in a
+  # single script) so the shared publish-gating-check composite action can
+  # be invoked as a normal step, and so one PR's failure (e.g. a deleted
+  # fork branch) shows up as its own isolated, individually-visible job
+  # instead of a swallowed try/catch inside a bigger loop.
+  mark-stale:
+    name: Mark Stale (PR #${{ matrix.pr_number }})
+    needs: list-open-prs
+    if: needs.list-open-prs.outputs.all_pr_numbers != '[]'
+    strategy:
+      fail-fast: false
+      matrix:
+        pr_number: ${{ fromJson(needs.list-open-prs.outputs.all_pr_numbers) }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      # Needed to reference the local ./.github/actions/publish-gating-check
+      # composite action below. persist-credentials: false -- never pushes.
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      # Skips PRs whose most recent check-run is still in flight from a
+      # genuine run (status other than 'completed', and not one of our own
+      # prior stale markers -- identified by STALE_MARKER_TITLE below).
+      # Refreshes our own prior stale marker (rather than leaving it frozen
+      # on the first-ever push that made it stale) so its "main advanced
+      # to <SHA>" text reflects the current tip on every subsequent push
+      # too, as long as the PR still hasn't gotten a fresh real result.
+      - name: Determine whether to (re-)mark this PR stale
+        id: check
+        uses: actions/github-script@v9
+        env:
+          PR_NUMBER: ${{ matrix.pr_number }}
+          POOL_PR_NUMBERS: ${{ needs.list-open-prs.outputs.pool_pr_numbers }}
+          STALE_MARKER_TITLE: 'Stale -- main has advanced since this ran'
+        with:
+          script: |
+            const prNumber = Number(process.env.PR_NUMBER);
+            const { data: pr } = await github.rest.pulls.get({ ...context.repo, pull_number: prNumber });
+            core.setOutput('head_sha', pr.head.sha);
+
+            const inPool = JSON.parse(process.env.POOL_PR_NUMBERS).includes(prNumber);
+            core.setOutput('summary', [
+              `\`main\` advanced to ${context.sha} since this check last completed.`,
+              inPool
+                ? 'This PR is in the merge pool -- a real retest against the new base tip has been dispatched separately.'
+                : "This PR is not currently in the merge pool (needs both 'lgtm' and 'approved', no hold) -- push a commit, relabel, or comment `/retest-e2e` for a fresh result before merging.",
+            ].join('\n\n'));
+
+            const { data: existing } = await github.rest.checks.listForRef({
+              ...context.repo,
+              ref: pr.head.sha,
+              check_name: 'Run Gating Tests',
+            });
+            const [latest] = existing.check_runs.sort(
+              (a, b) => new Date(b.started_at) - new Date(a.started_at),
+            );
+
+            if (!latest) {
+              core.info(`PR #${prNumber}: no existing "Run Gating Tests" check-run yet, nothing to mark stale.`);
+              core.setOutput('should_mark', 'false');
+              return;
+            }
+
+            const isOwnStaleMarker = latest.output?.title === process.env.STALE_MARKER_TITLE;
+            if (latest.status !== 'completed' && !isOwnStaleMarker) {
+              core.info(`PR #${prNumber}: check-run ${latest.id} is ${latest.status} from a real run -- leaving it alone.`);
+              core.setOutput('should_mark', 'false');
+              return;
+            }
+
+            core.info(`PR #${prNumber}: marking stale (superseding check-run ${latest.id}, isOwnStaleMarker=${isOwnStaleMarker}).`);
+            core.setOutput('should_mark', 'true');
+
+      - name: Mark check stale
+        if: steps.check.outputs.should_mark == 'true'
+        uses: ./.github/actions/publish-gating-check
+        with:
+          head-sha: ${{ steps.check.outputs.head_sha }}
+          status: queued
+          title: 'Stale -- main has advanced since this ran'
+          summary: ${{ steps.check.outputs.summary }}
+
+  # Real retest, merge-pool PRs only. Dispatches hot-cluster-e2e.yml's
+  # pr_number path (against main, so it always uses the just-pushed
+  # workflow definition) rather than reusing /retest-e2e's plain
+  # reRunWorkflow -- a re-run reuses the original cached event payload
+  # (same head SHA, no merge with the new base), so it would silently
+  # re-test the exact same commit and never actually validate the pool PR
+  # against whatever just merged. See hot-cluster-e2e.yml's checkout_ref /
+  # resolve-pr-context for how the fresh dispatch tests the PR merged with
+  # the new main tip instead.
+  #
+  # needs: mark-stale (not just list-open-prs) so every stale marker is
+  # fully created before any retest is dispatched -- otherwise, if
+  # mark-stale were ever delayed past a fast real retest completing, its
+  # "queued" marker could land *after* the real result and mask it as the
+  # most-recently-reported (and thus displayed) entry.
+  #
+  # if: always() is deliberate -- it's needed so one PR's stale-marking
+  # failure in the mark-stale matrix doesn't block retesting the other,
+  # unrelated pool PRs. But always() also disables GitHub's normal implicit
+  # `success()` wrapping entirely (it's not added unless the expression
+  # omits all status-check functions), so list-open-prs's own success is no
+  # longer required either -- explicitly checking its result here closes
+  # that gap: if list-open-prs itself failed, pool_pr_numbers is unset, and
+  # `!= '[]'` on an empty/undefined output would otherwise still read as
+  # "not empty", feeding invalid JSON into the matrix's fromJson() below.
+  retest-pool-prs:
+    name: Retest Merge-Pool PRs (PR #${{ matrix.pr_number }})
+    needs: [list-open-prs, mark-stale]
+    if: |
+      always() &&
+      needs.list-open-prs.result == 'success' &&
+      needs.list-open-prs.outputs.pool_pr_numbers != '[]'
+    strategy:
+      fail-fast: false
+      matrix:
+        pr_number: ${{ fromJson(needs.list-open-prs.outputs.pool_pr_numbers) }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Dispatch hot-cluster-e2e.yml retest
+        uses: actions/github-script@v9
+        env:
+          PR_NUMBER: ${{ matrix.pr_number }}
+        with:
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+              ...context.repo,
+              workflow_id: 'hot-cluster-e2e.yml',
+              ref: 'main',
+              inputs: { pr_number: process.env.PR_NUMBER },
+            });
+            core.info(`PR #${process.env.PR_NUMBER}: dispatched a real retest against the new main tip.`);

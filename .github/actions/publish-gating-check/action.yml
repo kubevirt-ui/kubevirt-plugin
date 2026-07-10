@@ -1,0 +1,75 @@
+name: Publish Run Gating Tests Check
+description: |
+  Creates a fresh "Run Gating Tests" check-run for a given SHA. Always
+  creates a new entry rather than updating an existing one -- GitHub removed
+  the ability to modify the status/conclusion of an Actions check-run via
+  the GITHUB_TOKEN from a workflow run
+  (https://github.blog/changelog/2025-02-12-notice-of-upcoming-deprecations-and-breaking-changes-for-github-actions/,
+  "Changes to check run status modification"), so a checks.update call would
+  fail regardless of which run originally created the target check-run. A
+  second "Run Gating Tests" entry for the same SHA is the normal,
+  GitHub-native way to represent a new check attempt -- the merge box shows
+  whichever check-run reported most recently for a given name.
+
+  Single source of truth for the check's name/shape, used by both
+  retest-stale-gating.yml's per-PR stale-marking and hot-cluster-e2e.yml's
+  retest-result publishing, so the two can't drift out of sync.
+
+inputs:
+  head-sha:
+    description: SHA to attach the check-run to
+    required: true
+  status:
+    description: queued | in_progress | completed
+    required: true
+  conclusion:
+    description: Required when status is completed (success | failure | neutral | ...)
+    required: false
+    default: ''
+  title:
+    description: Short check-run title shown on the PR
+    required: true
+  summary:
+    description: Longer check-run summary (markdown) shown on the PR
+    required: true
+  details-url:
+    description: Optional link to the workflow run for more detail
+    required: false
+    default: ''
+
+runs:
+  using: composite
+  steps:
+    - name: Create check-run
+      uses: actions/github-script@v9
+      env:
+        CHECK_HEAD_SHA: ${{ inputs['head-sha'] }}
+        CHECK_STATUS: ${{ inputs.status }}
+        CHECK_CONCLUSION: ${{ inputs.conclusion }}
+        CHECK_TITLE: ${{ inputs.title }}
+        CHECK_SUMMARY: ${{ inputs.summary }}
+        CHECK_DETAILS_URL: ${{ inputs['details-url'] }}
+      with:
+        script: |
+          const payload = {
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            name: 'Run Gating Tests',
+            head_sha: process.env.CHECK_HEAD_SHA,
+            status: process.env.CHECK_STATUS,
+            output: {
+              title: process.env.CHECK_TITLE,
+              summary: process.env.CHECK_SUMMARY,
+            },
+          };
+
+          if (process.env.CHECK_STATUS === 'completed') {
+            payload.conclusion = process.env.CHECK_CONCLUSION;
+            payload.completed_at = new Date().toISOString();
+          }
+          if (process.env.CHECK_DETAILS_URL) {
+            payload.details_url = process.env.CHECK_DETAILS_URL;
+          }
+
+          const { data } = await github.rest.checks.create(payload);
+          core.info(`Created check-run ${data.id} ("${payload.status}") for ${payload.head_sha}.`);

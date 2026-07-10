@@ -1,5 +1,5 @@
 name: Hot Cluster E2E
-run-name: "Hot Cluster E2E [${{ inputs.cluster_name || github.base_ref || 'kubevirt-plugin-ci' }}] @ ${{ github.head_ref || github.ref_name }}"
+run-name: "Hot Cluster E2E [${{ inputs.cluster_name || github.base_ref || 'kubevirt-plugin-ci' }}] @ ${{ inputs.pr_number != '' && format('PR#{0} retest', inputs.pr_number) || github.head_ref || github.ref_name }}"
 
 on:
   pull_request_target:
@@ -37,6 +37,16 @@ on:
         description: 'OpenShift version (e.g. 4.22_openshift)'
         required: false
         default: '4.22_openshift'
+        type: string
+      pr_number:
+        description: |
+          PR number to retest merged with the current base branch tip,
+          instead of a plain manual run. Used by retest-stale-gating.yml to
+          re-validate merge-pool PRs after main advances (the Tide-equivalent
+          staleness guard -- see CNV-92616). Leave empty for a normal manual
+          dispatch.
+        required: false
+        default: ''
         type: string
 
 permissions:
@@ -90,6 +100,120 @@ jobs:
           INPUT_CLUSTER_NAME: ${{ inputs.cluster_name }}
           INPUT_OPENSHIFT_VERSION: ${{ inputs.openshift_version }}
         run: ./ci-scripts/hot-cluster/resolve-cluster-config.sh >> "$GITHUB_OUTPUT"
+
+  # Resolves the PR being retested when this run was dispatched with
+  # pr_number (the merge-pool "real retest" path from retest-stale-gating.yml
+  # after main advances). Looked up fresh via the API rather than trusted
+  # from any caller-supplied SHA, so the checkout ref and the SHA that
+  # ultimately receives the "Run Gating Tests" result are always the PR's
+  # actual current state at run time, not whatever the caller observed
+  # earlier.
+  #
+  # Trust IS re-checked here, freshly -- the lgtm+approved+no-hold labels
+  # retest-stale-gating.yml saw when it decided to dispatch are only a
+  # snapshot from *before* this run was queued, and lgtm/approved are Tide's
+  # merge-readiness signal, not a CI-trust signal: they say nothing about
+  # whether this specific author/commit was ever cleared to run privileged
+  # CI (secrets: inherit, cloud credentials) on a fork's code. Unlike the
+  # normal pull_request_target path, this workflow_dispatch retest path has
+  # no pull_request payload for cluster-check's own should_run expression to
+  # gate on (github.event_name == 'workflow_dispatch' short-circuits that
+  # expression to true unconditionally) -- so this job is the only place
+  # that can re-verify actual CI trust before run-e2e-tests spends real
+  # cluster time. still_in_pool (merge-pool membership) is a separate check
+  # below.
+  #
+  # OWNERS (the approvers/reviewers list) is the single source of truth for
+  # trust here, exactly like check-trust above -- never author_association
+  # or collaborator/contributor/member status, which are unreliable proxies
+  # (can misreport private org membership, and don't reflect this repo's
+  # actual OWNERS-based review process). same-repo branches and a
+  # currently-present ok-to-test label are the same two supplementary
+  # trust signals cluster-check's own should_run already accepts for the
+  # normal path -- kept consistent here rather than inventing a stricter or
+  # looser bar for the retest path specifically.
+  resolve-pr-context:
+    name: Resolve PR Context
+    if: github.event_name == 'workflow_dispatch' && inputs.pr_number != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    permissions:
+      pull-requests: read
+    outputs:
+      head_sha: ${{ steps.resolve.outputs.head_sha }}
+      mergeable: ${{ steps.resolve.outputs.mergeable }}
+      still_in_pool: ${{ steps.resolve.outputs.still_in_pool }}
+      trusted: ${{ steps.resolve.outputs.trusted }}
+    steps:
+      # No ref override: defaults to checking out the ref this run was
+      # dispatched against (main, per retest-stale-gating.yml), never the
+      # PR's own branch -- same reasoning as check-trust above, so a PR
+      # can't add itself to OWNERS to self-approve trust. Also needed to
+      # require() the shared is-merge-pool-pr.cjs predicate below.
+      #
+      # persist-credentials: false -- this job only reads files (OWNERS,
+      # the shared module), it never pushes, so there's no reason to leave
+      # GITHUB_TOKEN sitting in .git/config for the rest of the job.
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Look up PR head SHA, mergeability, trust, and pool membership
+        id: resolve
+        uses: actions/github-script@v9
+        # inputs.pr_number is spliced as a literal into the script source if
+        # interpolated directly via ${{ }} -- passing it through env/
+        # process.env instead avoids arbitrary-code injection via a crafted
+        # workflow_dispatch input.
+        env:
+          PR_NUMBER: ${{ inputs.pr_number }}
+        with:
+          script: |
+            const fs = require('fs');
+            const { isMergePoolPr } = require('./ci-scripts/hot-cluster/is-merge-pool-pr.cjs');
+            const prNumber = Number(process.env.PR_NUMBER);
+
+            // mergeable/mergeable_state are computed asynchronously by
+            // GitHub and can be null right after main moves -- retry
+            // briefly rather than mistaking "not computed yet" for a real
+            // conflict.
+            let pr;
+            for (let attempt = 0; attempt < 5; attempt++) {
+              const { data } = await github.rest.pulls.get({ ...context.repo, pull_number: prNumber });
+              pr = data;
+              if (pr.mergeable !== null) break;
+              core.info(`PR #${prNumber} mergeable state not yet computed, retrying...`);
+              await new Promise(r => setTimeout(r, 3000));
+            }
+
+            // Same OWNERS-based check as check-trust above, verbatim --
+            // deliberately not author_association/collaborator status. See
+            // this job's own header comment for why.
+            const author = pr.user.login;
+            let ownedByAuthor = false;
+            try {
+              const owners = fs.readFileSync('OWNERS', 'utf8');
+              ownedByAuthor = new RegExp(`^\\s*-\\s*${author}\\s*$`, 'm').test(owners);
+            } catch (err) {
+              core.warning(`Could not read OWNERS file: ${err.message}`);
+            }
+
+            const sameRepo = pr.head.repo?.full_name === pr.base.repo.full_name;
+            const hasOkToTest = pr.labels.some((label) => label.name === 'ok-to-test');
+            const trusted = ownedByAuthor || sameRepo || hasOkToTest;
+
+            const stillInPool = isMergePoolPr(pr.labels);
+            core.info(`PR #${prNumber}: head=${pr.head.sha}, mergeable=${pr.mergeable}, mergeable_state=${pr.mergeable_state}, still_in_pool=${stillInPool}`);
+            core.info(`PR #${prNumber}: author=${author}, ownedByAuthor=${ownedByAuthor}, sameRepo=${sameRepo}, hasOkToTest=${hasOkToTest}, trusted=${trusted}`);
+
+            core.setOutput('head_sha', pr.head.sha);
+            // Treat still-unknown (null) as mergeable rather than failing
+            // the retest on GitHub's own computation lag -- only an
+            // explicit `false` should block the run below.
+            core.setOutput('mergeable', pr.mergeable === false ? 'false' : 'true');
+            core.setOutput('still_in_pool', stillInPool ? 'true' : 'false');
+            core.setOutput('trusted', trusted ? 'true' : 'false');
 
   check-trust:
     name: Check Trusted Author
@@ -145,7 +269,7 @@ jobs:
   # own bare context name.
   progress-check-start:
     name: Start Progress Check
-    needs: [check-trust, resolve-cluster-config]
+    needs: [check-trust, resolve-cluster-config, resolve-pr-context]
     if: always()
     runs-on: ubuntu-latest
     timeout-minutes: 2
@@ -163,15 +287,21 @@ jobs:
       - name: Post progress status
         continue-on-error: true
         uses: actions/github-script@v9
+        env:
+          RESOLVED_HEAD_SHA: ${{ needs.resolve-pr-context.outputs.head_sha }}
         with:
           script: |
             // pull_request_target's github.sha/context.sha is the BASE
             // branch's commit, not the PR head -- posting the status
             // there would make it silently never appear in the PR's own
-            // Checks tab.
+            // Checks tab. The pr_number retest path (workflow_dispatch, no
+            // associated pull_request payload) has the same problem for a
+            // different reason: context.sha there is whatever ref the
+            // dispatch used (main's tip), not the PR being retested -- use
+            // resolve-pr-context's freshly-looked-up head SHA instead.
             const headSha = context.eventName === 'pull_request_target'
               ? context.payload.pull_request.head.sha
-              : context.sha;
+              : (process.env.RESOLVED_HEAD_SHA || context.sha);
 
             const isIrrelevantLabel = context.payload.action === 'labeled'
               && context.payload.label?.name !== 'ok-to-test';
@@ -311,7 +441,7 @@ jobs:
   # this posts a commit status rather than updating a check-run.
   progress-check-running-tests:
     name: Update Progress Check
-    needs: [progress-check-start, cluster-check, cluster-health-check]
+    needs: [progress-check-start, cluster-check, cluster-health-check, resolve-pr-context]
     if: always()
     runs-on: ubuntu-latest
     timeout-minutes: 2
@@ -324,6 +454,8 @@ jobs:
       - name: Post progress status
         continue-on-error: true
         uses: actions/github-script@v9
+        env:
+          RESOLVED_HEAD_SHA: ${{ needs.resolve-pr-context.outputs.head_sha }}
         with:
           script: |
             const isIrrelevantLabel = context.payload.action === 'labeled'
@@ -333,9 +465,11 @@ jobs:
               return;
             }
 
+            // See progress-check-start above for why the pr_number retest
+            // path also needs resolve-pr-context's head SHA here.
             const headSha = context.eventName === 'pull_request_target'
               ? context.payload.pull_request.head.sha
-              : context.sha;
+              : (process.env.RESOLVED_HEAD_SHA || context.sha);
 
             // cluster-health-check only ever runs for workflow_dispatch (its
             // own `if:` skips it otherwise) -- branch on event type here,
@@ -361,7 +495,7 @@ jobs:
 
   run-e2e-tests:
     name: Run E2E Tests
-    needs: [cluster-check, cluster-health-check, resolve-cluster-config]
+    needs: [cluster-check, cluster-health-check, resolve-cluster-config, resolve-pr-context]
     # See cluster-health-check above: key off cluster-check's cluster_ready
     # output, not its job result, now that a no-op event still reports
     # 'success' for cluster-check. cluster-health-check only ever runs for
@@ -369,16 +503,52 @@ jobs:
     # event type here -- rather than a plain `||` of the two -- is required:
     # an unconditional `||` would let a manual run with cluster_ready ==
     # 'true' proceed even if its own health check subsequently failed.
+    #
+    # The trailing mergeable/still_in_pool/trusted checks only ever block
+    # the pr_number retest path -- resolve-pr-context is skipped (empty
+    # outputs) for every other trigger, and empty != 'false'. A real
+    # conflict with the current base tip, labels no longer qualifying for
+    # the merge pool, or the author/commit no longer being CI-trusted (all
+    # re-checked fresh in resolve-pr-context, not trusted from
+    # retest-stale-gating.yml's earlier snapshot -- see that job's comments
+    # for why) must surface as a clear failure below, not a silently
+    # skipped run. `trusted` matters here specifically because this
+    # workflow_dispatch path bypasses cluster-check's own should_run trust
+    # gate entirely (see resolve-pr-context's header comment).
+    #
+    # resolve-pr-context.result not in [failure, cancelled] guards against
+    # the case where that job itself errors out or gets cancelled/times out
+    # (API outage, deleted PR, run cancellation, ...) rather than cleanly
+    # resolving mergeable/still_in_pool/trusted to 'false' -- without this,
+    # an empty output would read as "not false" and let a real cluster run
+    # proceed with no way to ever report its result (no head SHA to
+    # publish the check-run against), burning cluster time for a run whose
+    # outcome nobody can see. 'skipped' (the normal, expected result for
+    # every non-retest trigger, since resolve-pr-context's own `if:` is
+    # false then) is deliberately left out of this list -- it must keep
+    # reading as "proceed" for those paths. See verify-gating-tests below
+    # for the visible-failure fallback when resolve-pr-context ends in
+    # either of these states.
     if: |
       always() && (
         (github.event_name == 'workflow_dispatch' && needs.cluster-health-check.result == 'success') ||
         (github.event_name != 'workflow_dispatch' && needs.cluster-check.outputs.cluster_ready == 'true')
-      )
+      ) &&
+      needs.resolve-pr-context.result != 'failure' &&
+      needs.resolve-pr-context.result != 'cancelled' &&
+      needs.resolve-pr-context.outputs.mergeable != 'false' &&
+      needs.resolve-pr-context.outputs.still_in_pool != 'false' &&
+      needs.resolve-pr-context.outputs.trusted != 'false'
     uses: ./.github/workflows/hot-cluster-e2e-run.yml
     with:
       test_project: ${{ inputs.test_project || 'gating' }}
       runner_label: ${{ inputs.runner_label || needs.resolve-cluster-config.outputs.cluster_name }}
       cluster_name: ${{ needs.resolve-cluster-config.outputs.cluster_name }}
+      # Merge the PR with the current base tip instead of testing its head
+      # commit in isolation -- see hot-cluster-e2e-run.yml's checkout_ref
+      # input for why this matters (a plain workflow re-run would otherwise
+      # keep re-testing the same stale commit forever).
+      checkout_ref: ${{ inputs.pr_number != '' && format('refs/pull/{0}/merge', inputs.pr_number) || '' }}
     secrets: inherit
 
   # Single source of truth for the "Run Gating Tests" required status check.
@@ -432,39 +602,83 @@ jobs:
         run-e2e-tests,
         progress-check-start,
         progress-check-running-tests,
+        resolve-pr-context,
       ]
     if: always()
     runs-on: ubuntu-latest
     timeout-minutes: 5
-    # Scoped here (rather than at the workflow level) -- needed by the
-    # "Complete progress status" step's createCommitStatus call below. See
-    # progress-check-start above.
+    # Scoped here (rather than at the workflow level) -- statuses: write is
+    # needed by the "Complete progress status" step's createCommitStatus
+    # call below (see progress-check-start above). checks: write is needed
+    # by "Publish result for retested PR" below -- the pr_number retest path
+    # has no pull_request payload for GitHub Actions to auto-associate this
+    # job's own check-run with, so that step manually posts/updates the
+    # "Run Gating Tests" check-run on the PR's real head SHA instead.
+    # issues: write is needed by "Report unresolvable PR context on the PR"
+    # -- PR comments are issue comments under the hood.
     permissions:
       statuses: write
+      checks: write
+      issues: write
     steps:
+      # id: verify -- its `reason` output drives both the PR-facing check
+      # summary below (so *why* a retest didn't pass reaches the PR, not
+      # just this job's own logs) and the resolve-context-failed fallback
+      # comment further down.
       - name: Verify hot cluster E2E ran and passed
+        id: verify
         env:
           TRUSTED: ${{ needs.check-trust.outputs.trusted }}
           E2E_RESULT: ${{ needs.run-e2e-tests.result }}
+          RESOLVE_PR_CONTEXT_RESULT: ${{ needs.resolve-pr-context.result }}
           IS_IRRELEVANT_LABEL: ${{ github.event.action == 'labeled' && github.event.label.name != 'ok-to-test' }}
           LABEL_NAME: ${{ github.event.label.name }}
+          IS_RETEST: ${{ inputs.pr_number != '' }}
+          PR_NUMBER: ${{ inputs.pr_number }}
+          MERGEABLE: ${{ needs.resolve-pr-context.outputs.mergeable }}
+          STILL_IN_POOL: ${{ needs.resolve-pr-context.outputs.still_in_pool }}
+          RETEST_TRUSTED: ${{ needs.resolve-pr-context.outputs.trusted }}
         run: |
           if [[ "${IS_IRRELEVANT_LABEL}" == "true" ]]; then
             echo "Irrelevant label event ('${LABEL_NAME}') — this run does not represent a real gating-test outcome."
+            echo "reason=irrelevant-label" >> "$GITHUB_OUTPUT"
             exit 0
+          fi
+
+          # resolve-pr-context erroring out or getting cancelled/timing out
+          # (not just resolving mergeable/still_in_pool to false) leaves no
+          # head SHA to publish a check-run against -- see the fallback PR
+          # comment step below, which is the only visible signal possible
+          # in either case.
+          if [[ "${IS_RETEST}" == "true" && ( "${RESOLVE_PR_CONTEXT_RESULT}" == "failure" || "${RESOLVE_PR_CONTEXT_RESULT}" == "cancelled" ) ]]; then
+            echo "::error::Could not resolve PR #${PR_NUMBER}'s context (head SHA / labels / mergeability) -- resolve-pr-context ended in '${RESOLVE_PR_CONTEXT_RESULT}'. See the 'Resolve PR Context' job for details."
+            echo "reason=resolve-context-failed" >> "$GITHUB_OUTPUT"
+            exit 1
           fi
 
           echo "run-e2e-tests result: ${E2E_RESULT}"
 
           if [[ "${E2E_RESULT}" == "success" ]]; then
             echo "Hot cluster gating tests passed."
+            echo "reason=passed" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
-          if [[ "${{ github.event_name }}" == "pull_request_target" && "${TRUSTED}" != "true" ]]; then
+          if [[ "${IS_RETEST}" == "true" && "${MERGEABLE}" == "false" ]]; then
+            echo "::error::PR #${PR_NUMBER} no longer merges cleanly with the current base branch tip -- resolve the conflict and push an update (this will trigger a normal gating run)."
+            echo "reason=merge-conflict" >> "$GITHUB_OUTPUT"
+          elif [[ "${IS_RETEST}" == "true" && "${STILL_IN_POOL}" == "false" ]]; then
+            echo "::error::PR #${PR_NUMBER} no longer carries the lgtm+approved (no hold) labels required for the merge pool, re-checked fresh at run time -- skipping the retest."
+            echo "reason=left-pool" >> "$GITHUB_OUTPUT"
+          elif [[ "${IS_RETEST}" == "true" && "${RETEST_TRUSTED}" == "false" ]]; then
+            echo "::error::PR #${PR_NUMBER} is not from OWNERS, not from a same-repo branch, and does not currently carry the 'ok-to-test' label -- skipping the retest (re-checked fresh at run time)."
+            echo "reason=untrusted-retest" >> "$GITHUB_OUTPUT"
+          elif [[ "${{ github.event_name }}" == "pull_request_target" && "${TRUSTED}" != "true" ]]; then
             echo "::error::Hot cluster E2E has not run for this PR because the author is not listed in OWNERS. A maintainer must add the 'ok-to-test' label to trigger it (it is removed again on each new push)."
+            echo "reason=untrusted" >> "$GITHUB_OUTPUT"
           else
             echo "::error::Hot cluster gating tests did not pass (run-e2e-tests result: '${E2E_RESULT}'). See the 'Run E2E Tests' job for details, or use /retest-e2e once fixed."
+            echo "reason=test-failed" >> "$GITHUB_OUTPUT"
           fi
           exit 1
 
@@ -478,6 +692,9 @@ jobs:
         if: always()
         continue-on-error: true
         uses: actions/github-script@v9
+        env:
+          RESOLVED_HEAD_SHA: ${{ needs.resolve-pr-context.outputs.head_sha }}
+          JOB_STATUS: ${{ job.status }}
         with:
           script: |
             const isIrrelevantLabel = context.payload.action === 'labeled'
@@ -487,11 +704,13 @@ jobs:
               return;
             }
 
+            // See progress-check-start above for why the pr_number retest
+            // path also needs resolve-pr-context's head SHA here.
             const headSha = context.eventName === 'pull_request_target'
               ? context.payload.pull_request.head.sha
-              : context.sha;
+              : (process.env.RESOLVED_HEAD_SHA || context.sha);
 
-            const passed = '${{ job.status }}' === 'success';
+            const passed = process.env.JOB_STATUS === 'success';
 
             await github.rest.repos.createCommitStatus({
               owner: context.repo.owner,
@@ -503,4 +722,112 @@ jobs:
                 ? 'Hot cluster gating tests passed'
                 : 'Hot cluster gating tests did not pass',
               target_url: `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
+            });
+
+      # Maps verify's `reason` output to a PR-facing title/summary so
+      # *why* a retest didn't pass reaches the check-run's own output, not
+      # just this job's Actions log (a generic "did not pass" doesn't tell
+      # a PR author whether they have a merge conflict, dropped out of the
+      # pool, or the tests genuinely failed).
+      - name: Determine retest result details
+        id: result-details
+        if: always() && inputs.pr_number != '' && needs.resolve-pr-context.outputs.head_sha != ''
+        env:
+          REASON: ${{ steps.verify.outputs.reason }}
+          PR_NUMBER: ${{ inputs.pr_number }}
+          MAIN_SHA: ${{ github.sha }}
+        run: |
+          case "${REASON}" in
+            passed)
+              echo "conclusion=success" >> "$GITHUB_OUTPUT"
+              echo "title=Hot cluster gating tests passed (retest after main advanced)" >> "$GITHUB_OUTPUT"
+              echo "summary=Re-validated PR #${PR_NUMBER} merged with the current main tip (${MAIN_SHA}) after main advanced (see CNV-92616)." >> "$GITHUB_OUTPUT"
+              ;;
+            merge-conflict)
+              echo "conclusion=failure" >> "$GITHUB_OUTPUT"
+              echo "title=PR no longer merges cleanly with main (retest after main advanced)" >> "$GITHUB_OUTPUT"
+              echo "summary=PR #${PR_NUMBER} no longer merges cleanly with the current main tip (${MAIN_SHA}) -- resolve the conflict and push an update, which will trigger a normal gating run." >> "$GITHUB_OUTPUT"
+              ;;
+            left-pool)
+              echo "conclusion=failure" >> "$GITHUB_OUTPUT"
+              echo "title=No longer in the merge pool (retest after main advanced)" >> "$GITHUB_OUTPUT"
+              echo "summary=PR #${PR_NUMBER} no longer carries the lgtm+approved (no hold) labels required for the merge pool, re-checked fresh when this retest ran against main tip ${MAIN_SHA} -- the cluster run was skipped." >> "$GITHUB_OUTPUT"
+              ;;
+            untrusted-retest)
+              echo "conclusion=failure" >> "$GITHUB_OUTPUT"
+              echo "title=Not CI-trusted for a retest (retest after main advanced)" >> "$GITHUB_OUTPUT"
+              echo "summary=PR #${PR_NUMBER} is not from OWNERS, not from a same-repo branch, and does not currently carry 'ok-to-test' (re-checked fresh when this retest ran against main tip ${MAIN_SHA}) -- the cluster run was skipped. A maintainer can add 'ok-to-test' to allow it." >> "$GITHUB_OUTPUT"
+              ;;
+            *)
+              echo "conclusion=failure" >> "$GITHUB_OUTPUT"
+              echo "title=Hot cluster gating tests did not pass (retest after main advanced)" >> "$GITHUB_OUTPUT"
+              echo "summary=Re-validated PR #${PR_NUMBER} merged with the current main tip (${MAIN_SHA}) after main advanced (see CNV-92616) -- tests did not pass. See the workflow run for details." >> "$GITHUB_OUTPUT"
+              ;;
+          esac
+
+      # The pr_number retest path (workflow_dispatch, dispatched against
+      # main's own tip -- see run-e2e-tests's checkout_ref above) has no
+      # pull_request payload, so unlike the normal pull_request_target
+      # path, GitHub Actions has nothing to auto-associate this job's own
+      # check-run with the PR being retested -- it would otherwise land on
+      # main's tip commit and never show up on the PR at all. This step
+      # manually publishes the "Run Gating Tests" result onto the PR's real
+      # head SHA instead (via the shared publish-gating-check composite
+      # action -- see that action for why it always creates a fresh
+      # check-run rather than updating an existing one).
+      # persist-credentials: false -- this checkout exists solely so the
+      # local ./.github/actions/publish-gating-check composite action below
+      # is available on disk; it never pushes, so GITHUB_TOKEN doesn't need
+      # to persist in .git/config afterwards.
+      - name: Checkout
+        if: always() && inputs.pr_number != '' && needs.resolve-pr-context.outputs.head_sha != ''
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Publish result for retested PR
+        if: always() && inputs.pr_number != '' && needs.resolve-pr-context.outputs.head_sha != ''
+        continue-on-error: true
+        uses: ./.github/actions/publish-gating-check
+        with:
+          head-sha: ${{ needs.resolve-pr-context.outputs.head_sha }}
+          status: completed
+          conclusion: ${{ steps.result-details.outputs.conclusion }}
+          title: ${{ steps.result-details.outputs.title }}
+          summary: ${{ steps.result-details.outputs.summary }}
+          details-url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+      # resolve-pr-context erroring out or getting cancelled/timing out (as
+      # opposed to cleanly resolving mergeable/still_in_pool to false)
+      # leaves no head SHA at all, so the step above can't publish
+      # anything -- without this, the guard would silently do nothing
+      # visible on the PR while still having burned (or skipped, per
+      # run-e2e-tests's guard) cluster time. A PR comment only needs the PR
+      # number, not a head SHA, so it's the one channel still available
+      # here for either outcome.
+      - name: Report unresolvable PR context on the PR
+        if: |
+          always() && inputs.pr_number != '' && (
+            needs.resolve-pr-context.result == 'failure' ||
+            needs.resolve-pr-context.result == 'cancelled'
+          )
+        continue-on-error: true
+        uses: actions/github-script@v9
+        env:
+          PR_NUMBER: ${{ inputs.pr_number }}
+        with:
+          script: |
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: Number(process.env.PR_NUMBER),
+              body: [
+                '⚠️ The automatic retest triggered after `main` advanced could not resolve this PR\'s context ' +
+                  '(head SHA / labels / mergeability) and did not run.',
+                '',
+                'The existing "Run Gating Tests" result may be stale -- please comment `/retest-e2e` for a fresh result before merging.',
+                '',
+                `See the failed run for details: ${runUrl}`,
+              ].join('\n'),
             });
