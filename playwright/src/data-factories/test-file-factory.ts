@@ -63,9 +63,8 @@ export class TestFileFactory {
       const file = fs.createWriteStream(filePath);
       const protocol = cirrosUrl.startsWith('https') ? https : http;
 
-      protocol
+      const req = protocol
         .get(cirrosUrl, (response) => {
-          // Handle redirects
           if (
             response.statusCode === 301 ||
             response.statusCode === 302 ||
@@ -75,7 +74,6 @@ export class TestFileFactory {
             if (response.headers.location) {
               file.close();
               fs.unlinkSync(filePath);
-              // Follow redirect with the new URL
               const redirectUrl = response.headers.location.startsWith('http')
                 ? response.headers.location
                 : new URL(response.headers.location, cirrosUrl).toString();
@@ -108,6 +106,12 @@ export class TestFileFactory {
           }
           reject(err);
         });
+      req.setTimeout(30_000, () => {
+        req.destroy();
+        file.close();
+        if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+        reject(new Error('CirrOS image download timed out after 30 seconds'));
+      });
     });
   }
 
@@ -142,9 +146,8 @@ export class TestFileFactory {
       const file = fs.createWriteStream(filePath);
       const protocol = isoUrl.startsWith('https') ? https : http;
 
-      protocol
+      const req = protocol
         .get(isoUrl, (response) => {
-          // Handle redirects
           if (
             response.statusCode === 301 ||
             response.statusCode === 302 ||
@@ -154,7 +157,6 @@ export class TestFileFactory {
             if (response.headers.location) {
               file.close();
               fs.unlinkSync(filePath);
-              // Follow redirect with the new URL
               const redirectUrl = response.headers.location.startsWith('http')
                 ? response.headers.location
                 : new URL(response.headers.location, isoUrl).toString();
@@ -187,6 +189,12 @@ export class TestFileFactory {
           }
           reject(err);
         });
+      req.setTimeout(30_000, () => {
+        req.destroy();
+        file.close();
+        if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+        reject(new Error('ISO file download timed out after 30 seconds'));
+      });
     });
   }
 

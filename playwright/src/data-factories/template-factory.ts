@@ -210,7 +210,7 @@ export class TemplateFactory extends BaseDataFactory {
         paramsYaml += `    from: '${param.from}'\n`;
       }
       if (param.value) {
-        paramsYaml += `    value: ${param.value}\n`;
+        paramsYaml += `    value: '${param.value}'\n`;
       }
     });
 

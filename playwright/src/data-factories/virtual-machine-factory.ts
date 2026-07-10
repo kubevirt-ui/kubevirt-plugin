@@ -46,7 +46,6 @@ export interface VirtualMachineConfig extends BaseResourceConfig {
 export class VirtualMachineFactory extends BaseDataFactory {
   private static defaultConfig: VirtualMachineConfig = {
     cloudInitDiskName: 'cloudinitdisk',
-    cloudInitPassword: generateRandomPassword(),
     cloudInitUser: 'fedora',
     cpuCores: 1,
     cpuSockets: 1,
@@ -76,7 +75,10 @@ export class VirtualMachineFactory extends BaseDataFactory {
    * @returns YAML string representation of the VirtualMachine
    */
   static create(config: Partial<VirtualMachineConfig> = {}): string {
-    const vm = this.mergeConfig(this.defaultConfig, config);
+    const vm = this.mergeConfig(this.defaultConfig, {
+      cloudInitPassword: config.cloudInitPassword ?? generateRandomPassword(),
+      ...config,
+    });
 
     // Build custom labels and annotations using base class utilities
     const customLabels = this.buildLabelsSection(vm.customLabels);

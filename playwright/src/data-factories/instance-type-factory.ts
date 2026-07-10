@@ -91,6 +91,7 @@ spec:
   static createExtraLarge(name: string, namespace?: string): string {
     return this.create({
       cpuGuest: 8,
+      ...(namespace ? { isClusterScoped: false } : {}),
       memoryGuest: '16Gi',
       name,
       namespace,
@@ -103,6 +104,7 @@ spec:
   static createLarge(name: string, namespace?: string): string {
     return this.create({
       cpuGuest: 4,
+      ...(namespace ? { isClusterScoped: false } : {}),
       memoryGuest: '8Gi',
       name,
       namespace,
@@ -115,6 +117,7 @@ spec:
   static createMedium(name: string, namespace?: string): string {
     return this.create({
       cpuGuest: 2,
+      ...(namespace ? { isClusterScoped: false } : {}),
       memoryGuest: '4Gi',
       name,
       namespace,
@@ -156,6 +159,7 @@ spec:
   static createSmall(name: string, namespace?: string): string {
     return this.create({
       cpuGuest: 1,
+      ...(namespace ? { isClusterScoped: false } : {}),
       memoryGuest: '2Gi',
       name,
       namespace,

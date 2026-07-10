@@ -1,4 +1,4 @@
-import { execSync } from 'child_process';
+import { execFileSync } from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -78,10 +78,14 @@ export class SshKeyFactory {
         // -f: output file path
         // -N '': empty passphrase
         // -q: quiet mode
-        execSync(`ssh-keygen -t rsa -b 2048 -f "${privateKeyPath}" -N '' -q`, {
-          stdio: 'pipe',
-          timeout: TestTimeouts.DEFAULT,
-        });
+        execFileSync(
+          'ssh-keygen',
+          ['-t', 'rsa', '-b', '2048', '-f', privateKeyPath, '-N', '', '-q'],
+          {
+            stdio: 'pipe',
+            timeout: TestTimeouts.DEFAULT,
+          },
+        );
 
         // Verify the files were created
         if (!fs.existsSync(privateKeyPath)) {
@@ -121,12 +125,8 @@ export class SshKeyFactory {
         }
 
         if (attempt < maxRetries) {
-          // Wait briefly before retrying
           const waitMs = attempt * 100;
-          const waitUntil = Date.now() + waitMs;
-          while (Date.now() < waitUntil) {
-            // Busy wait (sync)
-          }
+          Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, waitMs);
         }
       }
     }
@@ -154,45 +154,29 @@ export class SshKeyFactory {
   static generatePublicKeyFile(filename = 'rsa.pub'): string {
     const testDataDir = this.ensureTestDataDirectory();
     const filePath = path.join(testDataDir, filename);
-    const privateKeyPath = path.join(testDataDir, 'rsa_temp');
+    const suffix = generateRandomString(8);
+    const privateKeyPath = path.join(testDataDir, `rsa_temp_${suffix}`);
+    const publicKeyTempPath = `${privateKeyPath}.pub`;
 
     try {
-      // Generate RSA key pair using ssh-keygen
-      // -t rsa: RSA key type
-      // -b 2048: 2048-bit key size
-      // -f: output file path
-      // -N '': empty passphrase
-      // -q: quiet mode
-      execSync(`ssh-keygen -t rsa -b 2048 -f "${privateKeyPath}" -N '' -q`, { stdio: 'ignore' });
+      execFileSync(
+        'ssh-keygen',
+        ['-t', 'rsa', '-b', '2048', '-f', privateKeyPath, '-N', '', '-q'],
+        {
+          stdio: 'ignore',
+          timeout: TestTimeouts.DEFAULT,
+        },
+      );
 
-      // Read the generated public key
-      const publicKeyContent = fs.readFileSync(`${privateKeyPath}.pub`, 'utf-8');
-
-      // Write public key to the target file
+      const publicKeyContent = fs.readFileSync(publicKeyTempPath, 'utf-8');
       fs.writeFileSync(filePath, publicKeyContent, 'utf-8');
 
-      // Clean up temporary private key files
-      try {
-        if (fs.existsSync(privateKeyPath)) {
-          fs.unlinkSync(privateKeyPath);
-        }
-        if (fs.existsSync(`${privateKeyPath}.pub`)) {
-          fs.unlinkSync(`${privateKeyPath}.pub`);
-        }
-      } catch (cleanupError) {
-        // Ignore cleanup errors - not critical
-      }
-
       return filePath;
-    } catch (error) {
-      // Fallback: Generate a valid-looking SSH key if ssh-keygen is not available
-      const hostname = process.env.HOSTNAME || 'exec1.rdocloud';
-      const username = process.env.USER || 'root';
+    } catch {
+      const hostname = process.env.HOSTNAME ?? 'exec1.rdocloud';
+      const username = process.env.USER ?? 'root';
       const comment = `${username}@${hostname}`;
 
-      // Generate a valid SSH-rsa key format (simplified for testing)
-      // This is a fallback if ssh-keygen is not available
-      // Note: This key won't be cryptographically valid but will have the correct format
       const keyData = Buffer.alloc(256);
       keyData.fill(0);
       const base64Key = keyData.toString('base64');
@@ -201,6 +185,13 @@ export class SshKeyFactory {
       fs.writeFileSync(filePath, sshPublicKey, 'utf-8');
 
       return filePath;
+    } finally {
+      try {
+        if (fs.existsSync(privateKeyPath)) fs.unlinkSync(privateKeyPath);
+        if (fs.existsSync(publicKeyTempPath)) fs.unlinkSync(publicKeyTempPath);
+      } catch {
+        // Ignore cleanup errors
+      }
     }
   }
 

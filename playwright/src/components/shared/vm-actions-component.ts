@@ -129,6 +129,8 @@ export default class VmActionsComponent extends BaseComponent {
       | 'snapshot'
       | 'migrate'
       | 'migrate-storage'
+      | 'move-to-folder'
+      | 'edit-labels'
       | 'save-as-template',
   ): Promise<void> {
     await this.openVmActionsDropdown();

@@ -137,7 +137,7 @@ export default class OcCliClient extends BaseClient {
           ? String((error as { stderr?: unknown }).stderr ?? '')
           : '';
       const sanitized = command
-        .replace(/--(?:password|token)=\S+/g, '--$1=***')
+        .replace(/--(password|token)=\S+/g, '--$1=***')
         .replace(/-p\s+\S+/g, '-p ***');
       throw new Error(
         `OC command failed: ${sanitized}\nError: ${getErrorMessage(error)}\nStderr: ${stderr}`,
@@ -752,8 +752,11 @@ export default class OcCliClient extends BaseClient {
           typeof error === 'object' && error !== null && 'stderr' in error
             ? String((error as { stderr?: unknown }).stderr ?? '')
             : '';
+        const sanitizedFull = fullCommand
+          .replace(/--(password|token)=\S+/g, '--$1=***')
+          .replace(/-p\s+\S+/g, '-p ***');
         throw new Error(
-          `OC command failed: ${fullCommand}\nError: ${getErrorMessage(error)}\nStderr: ${stderr}`,
+          `OC command failed: ${sanitizedFull}\nError: ${getErrorMessage(error)}\nStderr: ${stderr}`,
         );
       }
     }

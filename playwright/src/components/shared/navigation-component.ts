@@ -235,9 +235,8 @@ export default class NavigationComponent extends BaseComponent {
 
   async isSidebarItemVisible(itemText: string): Promise<boolean> {
     try {
-      const item = this.locator(
-        `[data-quickstart-id="qs-nav-sec-virtualization"] a:has-text("${itemText}")`,
-      );
+      const section = this.locator('[data-quickstart-id="qs-nav-sec-virtualization"]');
+      const item = section.locator('a').filter({ hasText: itemText });
       return await item.isVisible();
     } catch {
       return false;

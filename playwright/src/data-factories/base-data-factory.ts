@@ -27,7 +27,7 @@ export class BaseDataFactory {
 
     const spaces = ' '.repeat(indent);
     return Object.entries(annotations)
-      .map(([key, value]) => `${spaces}${key}: ${value}`)
+      .map(([key, value]) => `${spaces}${key}: '${value}'`)
       .join('\n');
   }
 

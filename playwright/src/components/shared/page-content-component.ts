@@ -77,7 +77,7 @@ export default class PageContentComponent extends BaseComponent {
   }
 
   override async clickSaveChanges(): Promise<void> {
-    await this._saveChangesButton.click();
+    await this.robustClick(this._saveChangesButton);
   }
 
   async delayMs(ms: number): Promise<void> {
@@ -129,7 +129,9 @@ export default class PageContentComponent extends BaseComponent {
     } catch {
       // reload may time out on slow clusters; continue
     }
-    await this.page.waitForLoadState('networkidle');
+    await this.page.waitForLoadState('networkidle', { timeout }).catch(() => {
+      // networkidle may not be reached with persistent connections; continue
+    });
   }
 
   async selectFromFormOption(): Promise<void> {

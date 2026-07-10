@@ -184,7 +184,7 @@ export default class BaseComponent {
 
   async clickSaveChanges(): Promise<void> {
     const saveChangesButton = this.locator('[data-test="save-changes"]');
-    await saveChangesButton.click();
+    await this.robustClick(saveChangesButton);
   }
 
   async clickTemplateByTestId(templateTestId: string, templateSelector?: string): Promise<void> {
@@ -415,13 +415,7 @@ export default class BaseComponent {
           return true;
         }
 
-        const containerLocator = this.page.locator(
-          `[data-test]:has-text("${text}"), [data-test-id]:has-text("${text}"), ` +
-            `[role="cell"]:has-text("${text}"), [role="row"]:has-text("${text}"), ` +
-            `dd:has-text("${text}"), dt:has-text("${text}"), ` +
-            `h1:has-text("${text}"), h2:has-text("${text}"), h3:has-text("${text}"), ` +
-            `p:has-text("${text}"), span:has-text("${text}"), div:has-text("${text}")`,
-        );
+        const containerLocator = this.page.getByText(text);
 
         const containerVisible = await containerLocator
           .first()
