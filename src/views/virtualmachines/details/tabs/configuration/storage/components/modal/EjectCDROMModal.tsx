@@ -3,6 +3,7 @@ import { Trans } from 'react-i18next';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { ejectISOFromCDROM } from '@kubevirt-utils/components/DiskModal/utils/helpers';
+import { GetCurrentVM } from '@kubevirt-utils/components/DiskModal/utils/types';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ButtonVariant } from '@patternfly/react-core';
@@ -11,6 +12,7 @@ import { updateDisks } from '../../../details/utils/utils';
 
 type EjectCDROMModalProps = {
   cdromName: string;
+  getCurrentVM?: GetCurrentVM;
   isOpen: boolean;
   onClose: () => void;
   onSubmit?: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine>;
@@ -20,6 +22,7 @@ type EjectCDROMModalProps = {
 
 const EjectCDROMModal: FC<EjectCDROMModalProps> = ({
   cdromName,
+  getCurrentVM,
   isOpen,
   onClose,
   onSubmit,
@@ -29,7 +32,8 @@ const EjectCDROMModal: FC<EjectCDROMModalProps> = ({
   const { t } = useKubevirtTranslation();
 
   const handleEject = () => {
-    const updatedVM = ejectISOFromCDROM(vm, cdromName);
+    const currentVM = getCurrentVM?.() ?? vm;
+    const updatedVM = ejectISOFromCDROM(currentVM, cdromName);
 
     if (onSubmit) {
       return onSubmit(updatedVM);

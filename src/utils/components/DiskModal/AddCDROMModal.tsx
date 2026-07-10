@@ -30,6 +30,7 @@ import { submitCDROM } from './utils/submitCDROM';
 import { SourceTypes, V1DiskFormState, V1SubDiskModalProps } from './utils/types';
 
 const AddCDROMModal: FC<V1SubDiskModalProps> = ({
+  getCurrentVM,
   isOpen,
   onClose,
   onSubmit,
@@ -103,6 +104,7 @@ const AddCDROMModal: FC<V1SubDiskModalProps> = ({
       }
 
       const result = await submitCDROM(getValues(), {
+        getCurrentVM,
         isHotPluggable,
         onSubmit,
         onUploadedDataVolume,

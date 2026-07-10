@@ -21,6 +21,7 @@ import { logBackgroundUploadError, runVmCdromBackgroundUpload } from './vmCdromB
 export const submitCDROM = async (
   data: V1DiskFormState,
   {
+    getCurrentVM,
     isHotPluggable,
     onSubmit,
     onUploadedDataVolume,
@@ -55,9 +56,12 @@ export const submitCDROM = async (
     const diskName = data.disk.name;
     const file = data?.uploadFile?.file;
     const uploadKey = getVmCdromUploadKeyFromVm(vm, diskName);
+
     const createCancelCleanup = isHotPluggable
       ? createEjectMountedDiskCancelCleanup
       : createDetachDiskCancelCleanup;
+    const buildCancelCleanup = (vmForCleanup: V1VirtualMachine, name: string) =>
+      createCancelCleanup(vmForCleanup, name, getCurrentVM, onSubmit);
 
     const mutableData = {
       ...createMutableUploadData(data),
@@ -87,13 +91,14 @@ export const submitCDROM = async (
             delete draft.dataVolumeTemplate;
           });
 
-          const mountedVm = await mountISOToCDROM(vmAfterEmptyAdd, dataWithVolume, isHotPluggable);
+          const vmForMount = getCurrentVM?.() ?? vmAfterEmptyAdd;
+          const mountedVm = await mountISOToCDROM(vmForMount, dataWithVolume, isHotPluggable);
           await onSubmit(mountedVm);
         },
         diskState: mutableData,
         dvName,
         isHotPluggable,
-        onCancelCleanup: createCancelCleanup(vmAfterEmptyAdd, diskName),
+        onCancelCleanup: buildCancelCleanup(vmAfterEmptyAdd, diskName),
         onUploadedDataVolume,
         t,
         uploadData,
@@ -110,7 +115,7 @@ export const submitCDROM = async (
       diskState: mutableData,
       dvName,
       isHotPluggable,
-      onCancelCleanup: createCancelCleanup(vm, diskName),
+      onCancelCleanup: buildCancelCleanup(vm, diskName),
       onUploadedDataVolume,
       t,
       uploadData,

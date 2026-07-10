@@ -2,6 +2,7 @@ import React, { ReactNode } from 'react';
 import { TFunction } from 'i18next';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { GetCurrentVM } from '@kubevirt-utils/components/DiskModal/utils/types';
 import { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { NameWithPercentages } from '@kubevirt-utils/resources/vm/hooks/types';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
@@ -16,6 +17,7 @@ import '../tables.scss';
 
 export type DiskListCallbacks = {
   customize?: boolean;
+  getCurrentVM?: GetCurrentVM;
   onSubmit?: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine>;
   provisioningPercentages: NameWithPercentages;
   sourcesLoaded?: boolean;
@@ -24,9 +26,16 @@ export type DiskListCallbacks = {
 };
 
 const renderActionsCell = (row: DiskRowDataLayout, callbacks: DiskListCallbacks): ReactNode => {
-  const { customize, onSubmit, vm, vmi } = callbacks;
+  const { customize, getCurrentVM, onSubmit, vm, vmi } = callbacks;
   return (
-    <DiskRowActions customize={customize} obj={row} onDiskUpdate={onSubmit} vm={vm} vmi={vmi} />
+    <DiskRowActions
+      customize={customize}
+      getCurrentVM={getCurrentVM}
+      obj={row}
+      onDiskUpdate={onSubmit}
+      vm={vm}
+      vmi={vmi}
+    />
   );
 };
 

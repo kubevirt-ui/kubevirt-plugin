@@ -15,6 +15,7 @@ const DiskModal: FC<V1DiskModalProps> = ({
   createdPVCName,
   defaultFormValues,
   editDiskName,
+  getCurrentVM,
   isOpen,
   onClose,
   onSubmit,
@@ -39,6 +40,7 @@ const DiskModal: FC<V1DiskModalProps> = ({
       createDiskSource={createDiskSource}
       defaultFormValues={defaultFormValues}
       editDiskName={editDiskName}
+      getCurrentVM={getCurrentVM}
       isCreated={!isEmpty(createdPVCName)}
       isOpen={isOpen}
       onClose={onClose}
