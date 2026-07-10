@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 import { matchPath, useLocation, useParams } from 'react-router';
 
 import GuidedTour from '@kubevirt-utils/components/GuidedTour/GuidedTour';
@@ -14,6 +14,7 @@ import { useSignals } from '@preact/signals-react/runtime';
 import { SettingsClusterProvider } from '@settings/context/SettingsClusterContext';
 import { VirtualizationFeaturesContextProvider } from '@settings/tabs/ClusterTab/components/VirtualizationFeaturesSection/utils/VirtualizationFeaturesContext/VirtualizationFeaturesContext';
 import VirtualMachineNavPage from '@virtualmachines/details/VirtualMachineNavPage';
+import VirtualMachinesCreateButton from '@virtualmachines/list/components/VirtualMachinesCreateButton/VirtualMachinesCreateButton';
 import VirtualMachinesListPageHeader from '@virtualmachines/list/components/VirtualMachinesListPageHeader';
 import VirtualMachinesList from '@virtualmachines/list/VirtualMachinesList';
 import { useTreeViewData } from '@virtualmachines/tree/hooks/useTreeViewData';
@@ -22,7 +23,6 @@ import VirtualMachineTreeView from '@virtualmachines/tree/VirtualMachineTreeView
 import WelcomeModal from '../../welcome/WelcomeModal';
 import useAutoHideNavigation from '../hooks/useAutoHideNavigation/useAutoHideNavigation';
 import OverviewTab from '../list/components/OverviewTab/OverviewTab';
-
 import { OVERVIEW_TAB_INDEX, VM_LIST_TAB_INDEX } from './constants';
 import useNavigatorTabs from './useNavigatorTabs';
 import VirtualMachineYAMLCreatePage from './VirtualMachineYAMLCreatePage';
@@ -39,13 +39,14 @@ const VirtualMachineNavigator: FC = () => {
   const isFleetPage = isACMPath(location.pathname);
 
   const isACMVMListPage =
-    matchPath(`${FLEET_VIRTUAL_MACHINES_PATH}/all-clusters/all-namespaces`, location.pathname) ||
-    matchPath(`${FLEET_VIRTUAL_MACHINES_PATH}/all-clusters/ns/:ns`, location.pathname) ||
+    matchPath(`${FLEET_VIRTUAL_MACHINES_PATH}/all-clusters/all-namespaces`, location.pathname) !==
+      null ||
+    matchPath(`${FLEET_VIRTUAL_MACHINES_PATH}/all-clusters/ns/:ns`, location.pathname) !== null ||
     matchPath(
       `${FLEET_VIRTUAL_MACHINES_PATH}/cluster/:cluster/all-namespaces`,
       location.pathname,
-    ) ||
-    matchPath(`${FLEET_VIRTUAL_MACHINES_PATH}/cluster/:cluster/ns/:ns`, location.pathname);
+    ) !== null ||
+    matchPath(`${FLEET_VIRTUAL_MACHINES_PATH}/cluster/:cluster/ns/:ns`, location.pathname) !== null;
 
   const isVirtualMachineListPage =
     isACMVMListPage ||
@@ -62,7 +63,9 @@ const VirtualMachineNavigator: FC = () => {
 
   return (
     <>
-      <VirtualMachinesListPageHeader namespace={namespace} />
+      <VirtualMachinesListPageHeader>
+        <VirtualMachinesCreateButton namespace={namespace} />
+      </VirtualMachinesListPageHeader>
       <Divider />
       <SettingsClusterProvider cluster={cluster}>
         <VirtualizationFeaturesContextProvider>
@@ -87,10 +90,10 @@ const VirtualMachineNavigator: FC = () => {
                   <OverviewTab cluster={cluster} key="overview" namespace={namespace} />
                 </Tab>
                 <Tab
+                  eventKey={VM_LIST_TAB_INDEX}
                   title={
                     <TabTitleText data-test="vm-list-tab">{t('Virtual machines')}</TabTitleText>
                   }
-                  eventKey={VM_LIST_TAB_INDEX}
                 >
                   <VirtualMachinesList
                     allVMsLoaded={treeProps.loaded}
