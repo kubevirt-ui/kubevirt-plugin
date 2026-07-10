@@ -38,6 +38,7 @@
     "images/**/*",
     "plugin-metadata.ts",
     "plugin-extensions.ts",
+    "knip.ts",
     "@types/**/*"
   ]
 }
