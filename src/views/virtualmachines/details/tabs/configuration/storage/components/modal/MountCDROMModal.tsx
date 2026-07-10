@@ -14,6 +14,7 @@ import {
   isHotPluggableEnabled,
   mountISOToCDROM,
 } from '@kubevirt-utils/components/DiskModal/utils/helpers';
+import { GetCurrentVM } from '@kubevirt-utils/components/DiskModal/utils/types';
 import {
   logBackgroundUploadError,
   runVmCdromBackgroundUpload,
@@ -39,6 +40,7 @@ import { buildDiskState, produceMountUploadVolumeState } from './utils';
 
 type MountCDROMModalProps = {
   cdromName: string;
+  getCurrentVM?: GetCurrentVM;
   isOpen: boolean;
   onClose: () => void;
   onSubmit?: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine>;
@@ -47,6 +49,7 @@ type MountCDROMModalProps = {
 
 const MountCDROMModal: FC<MountCDROMModalProps> = ({
   cdromName,
+  getCurrentVM,
   isOpen,
   onClose,
   onSubmit,
@@ -128,7 +131,12 @@ const MountCDROMModal: FC<MountCDROMModalProps> = ({
           diskState,
           dvName,
           isHotPluggable,
-          onCancelCleanup: createEjectMountedDiskCancelCleanup(vmAfterMount, cdromName),
+          onCancelCleanup: createEjectMountedDiskCancelCleanup(
+            vmAfterMount,
+            cdromName,
+            getCurrentVM,
+            onSubmit,
+          ),
           t,
           uploadData,
           uploadKey: cdromUploadKey,

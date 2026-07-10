@@ -6,6 +6,7 @@ import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { getDataVolumeTemplates, getDisks, getVolumes } from '@kubevirt-utils/resources/vm';
 import {
   customizeWizardVMSignal,
+  getCustomizeWizardVM,
   patchCustomizeWizardVMSignal,
   updateVMCustomizeIT,
 } from '@kubevirt-utils/signals/customizeWizardVMSignal';
@@ -45,6 +46,7 @@ const CustomizeInstanceTypeStorageTab = () => {
               return Promise.resolve(vmModified ?? updatedVM);
             }}
             customize
+            getCurrentVM={getCustomizeWizardVM}
             vm={vm}
           />
         </PageSection>

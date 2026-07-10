@@ -6,6 +6,8 @@ import { signal } from '@preact/signals-react';
 
 export const customizeWizardVMSignal = signal<V1VirtualMachine>(null);
 
+export const getCustomizeWizardVM = (): V1VirtualMachine | null => customizeWizardVMSignal.value;
+
 export const mergeVMData = (currentData: any, updateData: any) => {
   // Handle null/undefined cases
   if (currentData == null && updateData == null) {

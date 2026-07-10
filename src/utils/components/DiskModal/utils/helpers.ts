@@ -25,7 +25,7 @@ import {
 import { ANNOTATIONS } from '@kubevirt-utils/resources/template';
 import { getBootDisk, getDataVolumeTemplates, getVolumes } from '@kubevirt-utils/resources/vm';
 import { getOperatingSystem } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
-import { ensurePath, getRandomChars, isEmpty } from '@kubevirt-utils/utils/utils';
+import { ensurePath, getRandomChars, isEmpty, kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { isDNS1123Label } from '@kubevirt-utils/utils/validation';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sCreate, kubevirtK8sGet } from '@multicluster/k8sRequests';
@@ -33,7 +33,12 @@ import { addPersistentVolume, removeVolume } from '@virtualmachines/actions/acti
 import { updateDisks } from '@virtualmachines/details/tabs/configuration/details/utils/utils';
 
 import { HotPlugFeatures } from './constants';
-import { BuildUploadTrackMetadataParams, SourceTypes, V1DiskFormState } from './types';
+import {
+  BuildUploadTrackMetadataParams,
+  GetCurrentVM,
+  SourceTypes,
+  V1DiskFormState,
+} from './types';
 
 export const getEmptyVMDataVolumeResource = (
   vm: V1VirtualMachine,
@@ -415,15 +420,43 @@ const createDiskCancelCleanup =
     await updateDisks(transform(freshVM, diskName));
   };
 
+// For in-memory VMs (the creation wizard): read the VM back via getCurrentVM instead of
+// re-fetching from the cluster. Skips silently if it's gone (e.g. wizard was aborted).
+const createSignalBackedDiskCancelCleanup =
+  (
+    getCurrentVM: GetCurrentVM,
+    diskName: string,
+    transform: (vm: V1VirtualMachine, name: string) => V1VirtualMachine,
+    onSubmit: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine | void>,
+  ): (() => Promise<void>) =>
+  async () => {
+    const currentVM = getCurrentVM();
+    if (!currentVM) {
+      kubevirtConsole.warn('Cancel cleanup skipped: VM no longer available in local state');
+      return;
+    }
+    await onSubmit(transform(currentVM, diskName));
+  };
+
 export const createEjectMountedDiskCancelCleanup = (
   vm: V1VirtualMachine,
   diskName: string,
-): (() => Promise<void>) => createDiskCancelCleanup(vm, diskName, ejectISOFromCDROM);
+  getCurrentVM?: GetCurrentVM,
+  onSubmit?: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine | void>,
+): (() => Promise<void>) =>
+  getCurrentVM
+    ? createSignalBackedDiskCancelCleanup(getCurrentVM, diskName, ejectISOFromCDROM, onSubmit)
+    : createDiskCancelCleanup(vm, diskName, ejectISOFromCDROM);
 
 export const createDetachDiskCancelCleanup = (
   vm: V1VirtualMachine,
   diskName: string,
-): (() => Promise<void>) => createDiskCancelCleanup(vm, diskName, detachDiskFromVM);
+  getCurrentVM?: GetCurrentVM,
+  onSubmit?: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine | void>,
+): (() => Promise<void>) =>
+  getCurrentVM
+    ? createSignalBackedDiskCancelCleanup(getCurrentVM, diskName, detachDiskFromVM, onSubmit)
+    : createDiskCancelCleanup(vm, diskName, detachDiskFromVM);
 
 /**
  * Creates a shallow copy of the form data with a mutable dataVolumeTemplate.spec.source.
