@@ -1,0 +1,13 @@
+self-hosted-runner:
+  labels: []
+
+config-variables: null
+
+paths:
+  .github/workflows/**/*.yml:
+    ignore:
+      # queue: max is a real, valid `concurrency` option (GitHub Actions
+      # changelog, May 2026: larger concurrency-group queues) that
+      # actionlint v1.7.12's schema doesn't recognize yet -- not a bug in
+      # our workflows. Safe to drop once actionlint's schema catches up.
+      - 'unexpected key "queue" for "concurrency" section'

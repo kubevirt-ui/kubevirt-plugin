@@ -1,5 +1,5 @@
 name: Deploy Manual Console
-run-name: 'Deploy Manual Console [${{ inputs.cluster_name }}] @ ${{ inputs.branch }}'
+run-name: "Deploy Manual Console [${{ inputs.cluster_name }}] @ ${{ inputs.pr_number && format('PR#{0}', inputs.pr_number) || inputs.branch }}"
 
 # Deploys a standalone, OAuth-protected console + kubevirt-plugin stack to an
 # existing hot cluster for manual UI testing (CNV-92150). Entirely separate
@@ -15,9 +15,14 @@ on:
   workflow_dispatch:
     inputs:
       branch:
-        description: Git branch or ref to build the kubevirt-plugin image from
+        description: Git branch or ref to build the kubevirt-plugin image from. Ignored when pr_number is set.
         required: true
         default: main
+        type: string
+      pr_number:
+        description: 'PR number to deploy instead (works with PRs from forks -- the OWNERS-listed author check below still applies). Takes precedence over "branch" when set.'
+        required: false
+        default: ''
         type: string
       cluster_name:
         description: ARC runner label / hot cluster name (must already be provisioned)
@@ -36,6 +41,7 @@ on:
 
 permissions:
   contents: read
+  pull-requests: read
 
 # Persistent environment: never cancel an in-flight deploy for the same
 # cluster, since that could leave the manual console mid-provision.
@@ -50,20 +56,113 @@ env:
   MANUAL_CONSOLE_USER: manual-console
 
 jobs:
-  deploy:
-    name: Deploy Manual Console
-    runs-on: ${{ inputs.cluster_name }}
-    timeout-minutes: 30
+  # Only runs when pr_number is set (deploying a PR, possibly from a fork,
+  # instead of a same-repo branch). This is workflow_dispatch-only, so
+  # triggering it at all already requires write access to this repo -- but
+  # per CNV team decision, that boundary alone isn't treated as sufficient
+  # for a PR whose actual code lives in someone else's fork. This mirrors
+  # hot-cluster-e2e.yml's check-trust: only PR authors listed in OWNERS
+  # (approvers/reviewers) can have their PR deployed here. Unlike e2e, there
+  # is no "ok-to-test"-label escape hatch for untrusted authors -- if you
+  # need to deploy an untrusted PR's changes anyway, push its branch to this
+  # repository directly and use the "branch" input instead.
+  resolve-pr:
+    name: Resolve PR
+    if: inputs.pr_number != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      head_sha: ${{ steps.resolve.outputs.head_sha }}
+      head_repo: ${{ steps.resolve.outputs.head_repo }}
     steps:
+      # Pinned to the default branch explicitly: without a ref:, checkout
+      # falls back to github.ref, which for workflow_dispatch is whatever
+      # branch was selected in the dispatch UI -- not necessarily the
+      # default branch. Reading OWNERS from an unpinned, dispatcher-chosen
+      # branch would let a modified OWNERS file on that branch self-approve
+      # trust for a fork PR.
       - name: Checkout
         uses: actions/checkout@v7
         with:
-          ref: ${{ inputs.branch }}
+          ref: ${{ github.event.repository.default_branch }}
+          persist-credentials: false
+
+      - name: Resolve PR and verify author is a trusted repo owner
+        id: resolve
+        uses: actions/github-script@v9
+        env:
+          # Passed via env, not interpolated into the script string below:
+          # inputs.pr_number is a raw, unvalidated workflow_dispatch string
+          # input, and substituting it directly into the JS source would let
+          # a crafted value break out of the string literal and inject
+          # arbitrary script.
+          PR_NUMBER: ${{ inputs.pr_number }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+
+            const prNumber = parseInt(process.env.PR_NUMBER, 10);
+            const { data: pr } = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: prNumber,
+            });
+
+            const author = pr.user.login;
+            const headSha = pr.head.sha;
+            const headRepo = pr.head.repo ? pr.head.repo.full_name : '(source repository deleted)';
+            core.info(`PR #${prNumber}: author=${author}, head=${headRepo}@${headSha}`);
+
+            let trusted = false;
+            try {
+              const owners = fs.readFileSync('OWNERS', 'utf8');
+              trusted = new RegExp(`^\\s*-\\s*${author}\\s*$`, 'm').test(owners);
+            } catch (err) {
+              core.warning(`Could not read OWNERS file: ${err.message}`);
+            }
+
+            core.info(`${author} is ${trusted ? '' : 'not '}listed in OWNERS (approvers/reviewers) — ${trusted ? 'trusted' : 'untrusted'}.`);
+            core.setOutput('head_sha', headSha);
+            core.setOutput('head_repo', headRepo);
+
+            if (!trusted) {
+              core.setFailed(`PR #${prNumber}'s author '${author}' is not listed in OWNERS (approvers/reviewers). Only PRs from trusted repo owners can be deployed via this workflow. To deploy this PR's changes anyway, push its branch to this repository directly and use the "branch" input instead.`);
+            }
+
+  # if: always() so this still runs when resolve-pr was skipped (no
+  # pr_number given -- the plain "branch" input path), but not when
+  # resolve-pr ran and failed the trust check.
+  deploy:
+    name: Deploy Manual Console
+    needs: resolve-pr
+    if: always() && needs.resolve-pr.result != 'failure'
+    runs-on: ${{ inputs.cluster_name }}
+    timeout-minutes: 30
+    steps:
+      # allow-unsafe-pr-checkout is not needed here: actions/checkout only
+      # enforces that guard for pull_request_target/workflow_run triggers,
+      # not workflow_dispatch. The OWNERS check above (resolve-pr) is this
+      # workflow's actual trust gate for fork PRs.
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          # Falls back to the default repository (github.repository, actions/
+          # checkout's own default) both for the plain "branch" input path
+          # and if the PR's source repo was deleted -- head_sha in that case
+          # is a fork commit unreachable from this repo anyway, so checkout
+          # would fail regardless, but this at least avoids literally passing
+          # the '(source repository deleted)' sentinel as a repository name.
+          repository: ${{ (needs.resolve-pr.outputs.head_repo != '' && needs.resolve-pr.outputs.head_repo != '(source repository deleted)') && needs.resolve-pr.outputs.head_repo || github.repository }}
+          ref: ${{ needs.resolve-pr.outputs.head_sha || inputs.branch }}
           persist-credentials: false
 
       - name: Log environment summary
         env:
           BRANCH: ${{ inputs.branch }}
+          PR_NUMBER: ${{ inputs.pr_number }}
+          HEAD_REPO: ${{ needs.resolve-pr.outputs.head_repo }}
+          HEAD_SHA: ${{ needs.resolve-pr.outputs.head_sha }}
           CLUSTER_NAME: ${{ inputs.cluster_name }}
         run: |
           {
@@ -71,7 +170,11 @@ jobs:
             echo ""
             echo "| Field | Value |"
             echo "|---|---|"
-            echo "| Branch | \`${BRANCH}\` |"
+            if [[ -n "${PR_NUMBER}" ]]; then
+              echo "| PR | #${PR_NUMBER} (\`${HEAD_REPO}@${HEAD_SHA}\`) |"
+            else
+              echo "| Branch | \`${BRANCH}\` |"
+            fi
             echo "| Cluster | \`${CLUSTER_NAME}\` |"
             echo "| Infrastructure | \`${{ inputs.infrastructure_type }}\` |"
             echo "| Triggered by | @${{ github.actor }} |"
@@ -130,6 +233,8 @@ jobs:
           MANUAL_CONSOLE_PASSWORD: ${{ steps.creds.outputs.password }}
           ACTOR: ${{ github.actor }}
           BRANCH: ${{ inputs.branch }}
+          PR_NUMBER: ${{ inputs.pr_number }}
+          HEAD_REPO: ${{ needs.resolve-pr.outputs.head_repo }}
         run: |
           if [[ -z "${SLACK_WEBHOOK_URL}" ]]; then
             echo "::warning::SLACK_WEBHOOK_URL not set — skipping Slack notification"
@@ -138,12 +243,18 @@ jobs:
 
           echo "::add-mask::${MANUAL_CONSOLE_PASSWORD}"
 
+          if [[ -n "${PR_NUMBER}" ]]; then
+            SOURCE_LINE="*PR:* <https://github.com/${{ github.repository }}/pull/${PR_NUMBER}|#${PR_NUMBER}> (\`${HEAD_REPO}\`)"
+          else
+            SOURCE_LINE="*Branch:* \`${BRANCH}\`"
+          fi
+
           TEXT=":rocket: *Manual console ready*"
           TEXT+=$'\n'"*Triggered by:* @${ACTOR}"
           TEXT+=$'\n'"*URL:* <${CONSOLE_URL}>"
           TEXT+=$'\n'"*User:* \`${MANUAL_CONSOLE_USER}\`"
           TEXT+=$'\n'"*Password:* \`${MANUAL_CONSOLE_PASSWORD}\`"
-          TEXT+=$'\n'"*Branch:* \`${BRANCH}\`"
+          TEXT+=$'\n'"${SOURCE_LINE}"
           TEXT+=$'\n'"*Run:* <https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}>"
 
           PAYLOAD=$(jq -n --arg text "${TEXT}" '{text: $text}')

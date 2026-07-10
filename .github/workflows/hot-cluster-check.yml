@@ -43,6 +43,17 @@ on:
         type: string
         required: false
         default: 'true'
+      should_run:
+        description: |
+          Whether this check should actually probe/provision. Set to false
+          for no-op/irrelevant trigger events so the caller can invoke this
+          workflow unconditionally (avoiding the bare-skipped-vs-compound-
+          nested-job-names fragmentation a caller-side `if:` would cause)
+          while still getting a fast, correctly-named success and a
+          cluster_ready output that's reliably 'false'.
+        type: boolean
+        required: false
+        default: true
     outputs:
       cluster_ready:
         description: Whether the cluster is ready (true/false)
@@ -59,8 +70,14 @@ jobs:
     outputs:
       cluster_ready: ${{ steps.probe.outputs.cluster_ready }}
     steps:
+      # if: inputs.should_run -- skip the live DNS lookup entirely for a
+      # no-op/irrelevant event; result's compute step already forces
+      # cluster_ready=false whenever should_run is false regardless of this
+      # step's (skipped, empty) output, so there's nothing to gain from
+      # actually probing.
       - name: Probe for cluster
         id: probe
+        if: inputs.should_run
         env:
           CLUSTER_NAME: ${{ inputs.cluster_name }}
           BASE_DOMAIN: ${{ inputs.base_domain }}
@@ -87,7 +104,7 @@ jobs:
   provision:
     name: Provision Cluster
     needs: probe
-    if: needs.probe.outputs.cluster_ready == 'false'
+    if: inputs.should_run && needs.probe.outputs.cluster_ready == 'false'
     concurrency:
       group: hot-cluster-provision-${{ inputs.cluster_name }}
       cancel-in-progress: false
@@ -123,10 +140,15 @@ jobs:
       - name: Compute final readiness
         id: compute
         env:
+          SHOULD_RUN: ${{ inputs.should_run }}
           PROBE_READY: ${{ needs.probe.outputs.cluster_ready }}
           PROVISION_RESULT: ${{ needs.provision.result }}
         run: |
-          if [[ "${PROBE_READY}" == "true" || "${PROVISION_RESULT}" == "success" ]]; then
+          # A no-op caller (should_run=false) always reports cluster_ready=false,
+          # regardless of the real probe result -- downstream jobs must never
+          # treat a no-op/irrelevant-event run as a green light to proceed,
+          # even if the cluster happens to genuinely be ready.
+          if [[ "${SHOULD_RUN}" == "true" && ( "${PROBE_READY}" == "true" || "${PROVISION_RESULT}" == "success" ) ]]; then
             echo "cluster_ready=true" >> "$GITHUB_OUTPUT"
           else
             echo "cluster_ready=false" >> "$GITHUB_OUTPUT"
@@ -150,7 +172,7 @@ jobs:
           fi
 
       - name: Fail if cluster is not ready
-        if: steps.compute.outputs.cluster_ready != 'true'
+        if: inputs.should_run && steps.compute.outputs.cluster_ready != 'true'
         env:
           CLUSTER_NAME: ${{ inputs.cluster_name }}
           PROBE_READY: ${{ needs.probe.outputs.cluster_ready }}
