@@ -36,9 +36,22 @@ jobs:
   build:
     name: build
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Detect package-lock.json changes
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            package-lock:
+              - package-lock.json
 
       - name: Setup Node
         uses: actions/setup-node@v6
@@ -54,6 +67,28 @@ jobs:
 
       - name: Build
         run: npm run build
+
+      - name: Prefetch npm dependencies with Hermeto
+        if: steps.filter.outputs.package-lock == 'true'
+        run: |
+          git checkout -- package.json package-lock.json
+          rm -rf node_modules hermeto-output
+          HERMETO_OUTPUT="${{ github.workspace }}/hermeto-output"
+          docker run --rm \
+            -v "${{ github.workspace }}:${{ github.workspace }}" \
+            -w "${{ github.workspace }}" \
+            ghcr.io/hermetoproject/hermeto:latest \
+            fetch-deps --source "${{ github.workspace }}" --output "$HERMETO_OUTPUT" npm
+          docker run --rm \
+            -v "${{ github.workspace }}:${{ github.workspace }}" \
+            -w "${{ github.workspace }}" \
+            ghcr.io/hermetoproject/hermeto:latest \
+            inject-files "$HERMETO_OUTPUT" --for-output-dir "$HERMETO_OUTPUT"
+
+      - name: Verify offline install
+        if: steps.filter.outputs.package-lock == 'true'
+        run: |
+          HUSKY=0 npm ci --offline --ignore-scripts --no-audit
 
   unit-test:
     name: unit-test
