@@ -139,7 +139,7 @@ ci-scripts/
   hot-cluster/
     check-cluster-health.sh
     check-roks-cluster-state.sh
-    cleanup-ipi-resources.sh
+    cleanup-vpc-resources.sh
     configure-image-registry.sh
     configure-kubeconfig.sh
     create-ibmcloud-cco-secrets.sh
@@ -164,20 +164,20 @@ ci-scripts/
 
 ## Scripts
 
-| Script                                            | Purpose                                                    |
-| ------------------------------------------------- | ---------------------------------------------------------- |
-| `hot-cluster/install-hco.sh`                      | Installs HCO operator, HPP storage, and virtctl            |
-| `hot-cluster/check-cluster-health.sh`             | Verifies cluster, HCO, ARC, storage, console               |
-| `hot-cluster/check-roks-cluster-state.sh`         | Polls until ROKS cluster is ready                          |
-| `hot-cluster/log-ibmcloud-iam-diagnostics.sh`     | Logs IAM permissions for debugging (classic, VPC, and IPI) |
-| `hot-cluster/cleanup-ipi-resources.sh`            | Cleans stale IPI resources before provisioning             |
-| `hot-cluster/create-ipi-cluster.sh`               | Creates IPI cluster with retry logic                       |
-| `hot-cluster/configure-kubeconfig.sh`             | Configures kubeconfig with DNS retry                       |
-| `hot-cluster/provision-vpc-resources.sh`          | Provisions VPC, subnet, and public gateway                 |
-| `hot-cluster/configure-image-registry.sh`         | Configures the internal image registry                     |
-| `hot-cluster/arc/install-arc-controller.sh`       | Installs ARC controller (once per cluster)                 |
-| `hot-cluster/arc/install-runner-scale-set.sh`     | Installs ARC runner scale set                              |
-| `hot-cluster/ci-env/install-ci-env-controller.sh` | Installs the ConfigMap-driven CI environment controller    |
+| Script                                            | Purpose                                                                                                        |
+| ------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `hot-cluster/install-hco.sh`                      | Installs HCO operator, HPP storage, and virtctl                                                                |
+| `hot-cluster/check-cluster-health.sh`             | Verifies cluster, HCO, ARC, storage, console                                                                   |
+| `hot-cluster/check-roks-cluster-state.sh`         | Polls until ROKS cluster is ready                                                                              |
+| `hot-cluster/log-ibmcloud-iam-diagnostics.sh`     | Logs IAM permissions for debugging (classic, VPC, and IPI)                                                     |
+| `hot-cluster/cleanup-vpc-resources.sh`            | Single source of truth for VPC-resource cleanup by cluster-name prefix (setup, retries, teardown, cleanup-all) |
+| `hot-cluster/create-ipi-cluster.sh`               | Creates IPI cluster with retry logic                                                                           |
+| `hot-cluster/configure-kubeconfig.sh`             | Configures kubeconfig with DNS retry                                                                           |
+| `hot-cluster/provision-vpc-resources.sh`          | Provisions VPC, subnet, and public gateway                                                                     |
+| `hot-cluster/configure-image-registry.sh`         | Configures the internal image registry                                                                         |
+| `hot-cluster/arc/install-arc-controller.sh`       | Installs ARC controller (once per cluster)                                                                     |
+| `hot-cluster/arc/install-runner-scale-set.sh`     | Installs ARC runner scale set                                                                                  |
+| `hot-cluster/ci-env/install-ci-env-controller.sh` | Installs the ConfigMap-driven CI environment controller                                                        |
 
 See [`hot-cluster/arc/README.md`](hot-cluster/arc/README.md) for ARC-specific details and [`hot-cluster/ci-env/README.md`](hot-cluster/ci-env/README.md) for the ci-env-controller.
 

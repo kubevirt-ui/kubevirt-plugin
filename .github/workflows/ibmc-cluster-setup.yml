@@ -115,7 +115,7 @@ jobs:
           IC_API_KEY: ${{ secrets.IC_KEY }}
           ZONE: ${{ inputs.zone }}
         continue-on-error: true
-        run: bash ./ci-scripts/hot-cluster/cleanup-ipi-resources.sh
+        run: bash ./ci-scripts/hot-cluster/cleanup-vpc-resources.sh
 
       - name: Check for existing ROKS cluster
         if: inputs.infrastructure_type != 'ipi'
@@ -325,6 +325,14 @@ jobs:
           INSTALL_DIR: ${{ runner.temp }}/ipi-install
           WORKER_COUNT: ${{ inputs.worker_count }}
           WORKER_FLAVOR: ${{ inputs.worker_flavor }}
+          # Needed by the retry-sweep call to cleanup-vpc-resources.sh inside
+          # create-ipi-cluster.sh (see comment there) -- without it, the
+          # script has no way to re-target the CLI off the eu-de account
+          # region set by "Setup IBM Cloud CLI", and would otherwise only
+          # happen to work by relying on the earlier "Clean up stale IPI
+          # resources" step's side effect of leaving the CLI targeted at the
+          # right VPC region.
+          ZONE: ${{ inputs.zone }}
         run: bash ./ci-scripts/hot-cluster/create-ipi-cluster.sh
 
       - name: IPI post-install DNS diagnostics
@@ -602,8 +610,21 @@ jobs:
             openshift-install destroy cluster --dir="${INSTALL_DIR}" --log-level=info 2>&1 | tail -50 || true
             echo "IPI cluster destroyed."
           else
-            echo "No metadata.json found — no IPI resources to clean up."
+            echo "No metadata.json found — no IPI resources to clean up via openshift-install."
           fi
+
+      # openshift-install destroy only runs above if metadata.json exists,
+      # and even then isn't guaranteed to fully clean up (tag-based discovery
+      # can still miss resources, e.g. if Terraform failed partway through
+      # writing state). Run unconditionally as a guaranteed backstop sweep,
+      # regardless of whether the step above found anything to destroy.
+      - name: Sweep any remaining VPC resources on failure
+        if: always() && inputs.infrastructure_type == 'ipi' && job.status == 'failure'
+        env:
+          IC_API_KEY: ${{ secrets.IC_KEY }}
+          ZONE: ${{ inputs.zone }}
+        continue-on-error: true
+        run: bash ./ci-scripts/hot-cluster/cleanup-vpc-resources.sh
 
       - name: Setup summary
         if: always()

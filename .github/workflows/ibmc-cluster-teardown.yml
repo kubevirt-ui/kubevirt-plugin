@@ -17,6 +17,11 @@ on:
         required: true
         default: 'kubevirt-plugin-ci'
         type: string
+      zone:
+        description: "Zone the cluster's VPC resources live in (vpc/ipi only; used to target the right region for cleanup-vpc-resources.sh)"
+        required: false
+        default: 'us-south-1'
+        type: string
       ipi_setup_run_id:
         description: 'GitHub Actions run ID from the IPI setup (to download install state artifact)'
         required: false
@@ -38,6 +43,11 @@ on:
         description: 'Cluster name to tear down'
         required: false
         default: 'kubevirt-plugin-ci'
+        type: string
+      zone:
+        description: "Zone the cluster's VPC resources live in (vpc/ipi only)"
+        required: false
+        default: 'us-south-1'
         type: string
       ipi_setup_run_id:
         description: 'GitHub Actions run ID from the IPI setup'
@@ -72,6 +82,13 @@ jobs:
       group: hot-cluster-teardown-${{ inputs.cluster_name || 'kubevirt-plugin-ci' }}
       cancel-in-progress: false
     steps:
+      # Needed to call the shared ci-scripts/hot-cluster/cleanup-vpc-resources.sh
+      # script below; nothing earlier in this workflow required repo files.
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
       - name: Validate cluster_name format
         run: |
           if [[ ! "${CLUSTER_NAME}" =~ ^[a-zA-Z0-9][a-zA-Z0-9._-]{0,20}$ ]]; then
@@ -173,43 +190,24 @@ jobs:
         if: inputs.infrastructure_type == 'vpc' && steps.check_cluster.outputs.exists == 'true'
         continue-on-error: true
         env:
-          VPC_NAME: ${{ inputs.cluster_name || 'kubevirt-plugin-ci' }}-vpc
-        run: |
-          echo "Checking for VPC resources to clean up..."
-
-          VPC_ID=$(ibmcloud is vpcs --output json 2>/dev/null | jq -r --arg n "${VPC_NAME}" '.[] | select(.name == $n) | .id // empty' || true)
-          if [[ -z "${VPC_ID}" ]]; then
-            echo "No VPC '${VPC_NAME}' found. Skipping VPC cleanup."
-            exit 0
-          fi
-
-          echo "Found VPC '${VPC_NAME}': ${VPC_ID}"
-
-          echo "Removing public gateways..."
-          for gw_id in $(ibmcloud is public-gateways --output json 2>/dev/null | jq -r --arg vpc "${VPC_ID}" '.[] | select(.vpc.id == $vpc) | .id' || true); do
-            echo "  Detaching and deleting gateway ${gw_id}..."
-            for sub_id in $(ibmcloud is subnets --output json 2>/dev/null | jq -r --arg gw "${gw_id}" '.[] | select(.public_gateway.id == $gw) | .id' || true); do
-              ibmcloud is subnet-update "${sub_id}" --pgw "" 2>/dev/null || true
-            done
-            ibmcloud is public-gateway-delete "${gw_id}" -f 2>/dev/null || true
-          done
-
-          echo "Removing subnets..."
-          for sub_id in $(ibmcloud is subnets --output json 2>/dev/null | jq -r --arg vpc "${VPC_ID}" '.[] | select(.vpc.id == $vpc) | .id' || true); do
-            echo "  Deleting subnet ${sub_id}..."
-            ibmcloud is subnet-delete "${sub_id}" -f 2>/dev/null || true
-          done
-
-          sleep 30
-
-          echo "Removing VPC '${VPC_NAME}'..."
-          ibmcloud is vpc-delete "${VPC_ID}" -f 2>/dev/null || echo "VPC deletion failed (may have remaining resources)"
+          IC_API_KEY: ${{ secrets.IC_KEY }}
+          ZONE: ${{ inputs.zone }}
+        run: bash ./ci-scripts/hot-cluster/cleanup-vpc-resources.sh
 
       # ──────────────────────────────────────────────────────────────────────
       # IPI teardown
       # ──────────────────────────────────────────────────────────────────────
+      # openshift-install destroy (tag-based) is the most thorough mechanism
+      # when it's reachable, but it depends on a still-available
+      # ipi-install-state-* artifact from a successful setup run -- which
+      # doesn't exist for cluster generations whose setup run failed, or
+      # whose artifact has expired (7-day retention). Both of the next two
+      # steps are best-effort (continue-on-error) precisely so that gap
+      # doesn't block the guaranteed name-prefix sweep that always runs
+      # afterward, regardless of whether install state could be found.
       - name: Download IPI install state
         if: inputs.infrastructure_type == 'ipi'
+        continue-on-error: true
         env:
           GH_TOKEN: ${{ github.token }}
           SETUP_RUN_ID: ${{ inputs.ipi_setup_run_id }}
@@ -225,7 +223,7 @@ jobs:
               | jq -r --arg tag "[${CLUSTER_NAME}]" '.[] | select(.displayTitle | contains($tag)) | .databaseId' \
               | head -1 || true)
             if [[ -z "${SETUP_RUN_ID}" ]]; then
-              echo "::error::No successful IPI setup run found for cluster '${CLUSTER_NAME}' and no ipi_setup_run_id provided."
+              echo "::warning::No successful IPI setup run found for cluster '${CLUSTER_NAME}' and no ipi_setup_run_id provided. openshift-install destroy will be skipped; the VPC-resource sweep step will still run."
               exit 1
             fi
             echo "Using latest successful setup run for '${CLUSTER_NAME}': ${SETUP_RUN_ID}"
@@ -242,23 +240,38 @@ jobs:
 
       - name: Destroy IPI cluster
         if: inputs.infrastructure_type == 'ipi'
+        continue-on-error: true
         env:
           IC_API_KEY: ${{ secrets.IC_KEY }}
           INSTALL_DIR: ${{ runner.temp }}/ipi-install
         run: |
           export IC_API_KEY
 
+          if [[ ! -f "${INSTALL_DIR}/metadata.json" ]]; then
+            echo "::warning::metadata.json not found in install state. Skipping openshift-install destroy; the VPC-resource sweep step will still run."
+            exit 1
+          fi
+
           echo "Downloading openshift-install (latest stable)..."
           curl -sL "https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/stable/openshift-install-linux.tar.gz" \
             | tar -xz -C /usr/local/bin openshift-install
 
-          if [[ ! -f "${INSTALL_DIR}/metadata.json" ]]; then
-            echo "::error::metadata.json not found in install state. Cannot destroy IPI cluster."
-            exit 1
-          fi
-
           echo "Destroying IPI cluster..."
           openshift-install destroy cluster --dir="${INSTALL_DIR}" --log-level=info 2>&1 | tail -80
+
+      # Guaranteed backstop regardless of whether the two steps above found
+      # install state or successfully ran openshift-install destroy --
+      # sweeps by name prefix so a missing/expired artifact no longer means
+      # "nothing gets cleaned up" (the exact gap that left orphaned VPCs,
+      # subnets, security groups, custom images, and COS instances behind
+      # from failed setup attempts).
+      - name: Sweep any remaining VPC resources
+        if: inputs.infrastructure_type == 'ipi'
+        continue-on-error: true
+        env:
+          IC_API_KEY: ${{ secrets.IC_KEY }}
+          ZONE: ${{ inputs.zone }}
+        run: bash ./ci-scripts/hot-cluster/cleanup-vpc-resources.sh
 
       # ──────────────────────────────────────────────────────────────────────
       # Common cleanup
