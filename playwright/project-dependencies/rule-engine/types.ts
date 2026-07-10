@@ -1,4 +1,4 @@
-import type { KubernetesClient } from '@/clients/kubernetes-client';
+import type KubernetesClient from '@/clients/kubernetes-client';
 import type { ClusterJanitor } from '@/utils/cluster-janitor';
 
 export enum SetupPhase {

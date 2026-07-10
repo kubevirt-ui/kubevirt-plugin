@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 
-import { KubernetesClient } from '@/clients/kubernetes-client';
+import KubernetesClient from '@/clients/kubernetes-client';
 import { EnvVariables } from '@/utils/env-variables';
 import { logger } from '@/utils/logger';
 import { TestConfigManager } from '@/utils/test-config';
@@ -46,7 +46,7 @@ async function globalTeardown(_config: FullConfig) {
         username: EnvVariables.username,
         password: EnvVariables.password,
       },
-      kubeConfigPath!,
+      kubeConfigPath,
     );
 
     try {

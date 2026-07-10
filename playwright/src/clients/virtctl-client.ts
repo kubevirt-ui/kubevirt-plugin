@@ -1,4 +1,4 @@
-import { exec } from 'child_process';
+import { execFile } from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
 import { promisify } from 'util';
@@ -9,7 +9,9 @@ import type { Page } from '@playwright/test';
 import type { ClusterAuthConfig } from './base-client';
 import BaseClient from './base-client';
 
-const execAsync = promisify(exec);
+const VIRTCTL_TIMEOUT_MS = 120_000;
+const SSH_KEYGEN_TIMEOUT_MS = 30_000;
+const execFileAsync = promisify(execFile);
 
 /**
  * Virtctl CLI client for executing virtctl commands and managing KubeVirt resources.
@@ -93,12 +95,15 @@ export default class VirtctlClient extends BaseClient {
     args: string[],
     options?: { ignoreError?: boolean },
   ): Promise<string> {
-    const kubeConfigFlag = this.kubeConfigPath ? `--kubeconfig=${this.kubeConfigPath}` : '';
-    const command = `${this.virtctlPath} ${kubeConfigFlag} ${args.join(' ')}`.trim();
+    const allArgs = [
+      ...(this.kubeConfigPath ? [`--kubeconfig=${this.kubeConfigPath}`] : []),
+      ...args,
+    ];
 
     try {
-      const { stderr: _stderr, stdout } = await execAsync(command, {
-        maxBuffer: 10 * 1024 * 1024, // 10MB buffer
+      const { stderr: _stderr, stdout } = await execFileAsync(this.virtctlPath, allArgs, {
+        maxBuffer: 10 * 1024 * 1024,
+        timeout: VIRTCTL_TIMEOUT_MS,
       });
 
       return stdout.trim();
@@ -114,6 +119,7 @@ export default class VirtctlClient extends BaseClient {
         typeof error === 'object' && error !== null && 'stderr' in error
           ? String((error as { stderr?: unknown }).stderr ?? '')
           : '';
+      const command = `${this.virtctlPath} ${allArgs.join(' ')}`;
       throw new Error(
         `Virtctl command failed: ${command}\nError: ${getErrorMessage(error)}\nStderr: ${stderr}`,
       );
@@ -182,9 +188,14 @@ export default class VirtctlClient extends BaseClient {
     }
 
     try {
-      await execAsync(`ssh-keygen -t rsa -b 4096 -f "${privateKeyPath}" -N "" -q`, {
-        maxBuffer: 10 * 1024 * 1024,
-      });
+      await execFileAsync(
+        'ssh-keygen',
+        ['-t', 'rsa', '-b', '4096', '-f', privateKeyPath, '-N', '', '-q'],
+        {
+          maxBuffer: 10 * 1024 * 1024,
+          timeout: SSH_KEYGEN_TIMEOUT_MS,
+        },
+      );
 
       fs.chmodSync(privateKeyPath, 0o600);
 
@@ -233,8 +244,8 @@ export default class VirtctlClient extends BaseClient {
       username?: string;
     },
   ): Promise<string> {
-    const sshKeyPath = options?.sshKeyPath || 'fixtures/cnv.key';
-    const username = options?.username || 'cloud-user';
+    const sshKeyPath = options?.sshKeyPath ?? 'fixtures/cnv.key';
+    const username = options?.username ?? 'cloud-user';
 
     const args = ['ssh', '-i', sshKeyPath, `${username}@${vmName}`, '-n', namespace, '-c', command];
 
@@ -350,7 +361,7 @@ export default class VirtctlClient extends BaseClient {
         return false;
       }
 
-      const threshold = options?.rebootThresholdSeconds || 30;
+      const threshold = options?.rebootThresholdSeconds ?? 30;
       return uptimeSeconds < threshold;
     } catch {
       return false;
@@ -442,9 +453,9 @@ export default class VirtctlClient extends BaseClient {
       outputDir?: string;
     },
   ): Promise<{ privateKeyPath: string; publicKeyPath: string; output: string }> {
-    const keyName = options?.keyName || `ssh-key-${vmName}`;
-    const username = options?.username || 'cloud-user';
-    const outputDir = options?.outputDir || '.test-data';
+    const keyName = options?.keyName ?? `ssh-key-${vmName}`;
+    const username = options?.username ?? 'cloud-user';
+    const outputDir = options?.outputDir ?? '.test-data';
 
     const { privateKeyPath, publicKeyPath } = await this.createSSHKeyPair(keyName, outputDir);
 

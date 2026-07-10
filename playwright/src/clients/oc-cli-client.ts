@@ -136,8 +136,11 @@ export default class OcCliClient extends BaseClient {
         typeof error === 'object' && error !== null && 'stderr' in error
           ? String((error as { stderr?: unknown }).stderr ?? '')
           : '';
+      const sanitized = command
+        .replace(/--(?:password|token)=\S+/g, '--$1=***')
+        .replace(/-p\s+\S+/g, '-p ***');
       throw new Error(
-        `OC command failed: ${command}\nError: ${getErrorMessage(error)}\nStderr: ${stderr}`,
+        `OC command failed: ${sanitized}\nError: ${getErrorMessage(error)}\nStderr: ${stderr}`,
       );
     }
   }
