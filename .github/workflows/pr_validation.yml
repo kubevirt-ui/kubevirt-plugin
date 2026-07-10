@@ -47,6 +47,7 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.base.ref }}
           sparse-checkout: .github/scripts
+          persist-credentials: false
 
       - name: Setup Node
         if: steps.trigger.outputs.should-run == 'true'
@@ -132,6 +133,7 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.base.ref || steps.pr-info.outputs.base_ref }}
           sparse-checkout: .github/scripts
+          persist-credentials: false
 
       - name: Setup Node
         if: steps.trigger.outputs.should-run == 'true'
