@@ -60,13 +60,13 @@ for attempt in $(seq 1 "${MAX_ATTEMPTS}"); do
     openshift-install destroy cluster --dir="${INSTALL_DIR}" --log-level=info 2>&1 | tail -30 || true
   fi
 
-  echo "Cleaning orphaned COS instances and custom images..."
-  ibmcloud resource service-instances --service-name cloud-object-storage --output json 2>/dev/null \
-    | jq -r --arg cn "${CLUSTER_NAME}" '.[] | select(.name | startswith($cn)) | .id' \
-    | while read -r id; do ibmcloud resource service-instance-delete "${id}" -f --recursive 2>&1 || true; done
-  ibmcloud is images --visibility private --output json 2>/dev/null \
-    | jq -r --arg cn "${CLUSTER_NAME}" 'if type == "array" then .[] | select(.name | startswith($cn)) | .id else empty end' \
-    | while read -r id; do ibmcloud is image-delete "${id}" -f 2>&1 || true; done
+  # openshift-install destroy is tag-based and usually sufficient, but a
+  # failure before Terraform ever writes metadata.json (or a partial destroy)
+  # can still leave VPC/subnet/SG/LB/image/COS resources behind for this
+  # attempt's generation. Sweep everything matching CLUSTER_NAME as a
+  # guaranteed backstop before the next attempt creates fresh resources.
+  echo "Sweeping any remaining VPC resources for '${CLUSTER_NAME}' before retry..."
+  bash ./ci-scripts/hot-cluster/cleanup-vpc-resources.sh
 
   echo "Waiting 60s before retry..."
   sleep 60
