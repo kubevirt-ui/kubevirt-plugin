@@ -6,8 +6,9 @@ import { logger } from '@/utils/logger';
 import { TestConfigManager } from '@/utils/test-config';
 import type { FullConfig } from '@playwright/test';
 
-import type { TeardownContext } from './rule-engine';
-import { getTeardownRules, RuleEngine } from './rule-engine';
+import { RuleEngine } from './rule-engine';
+import type { TeardownContext } from './rule-engine/types';
+import { getTeardownRules } from './rule-engine/teardown-rules';
 
 async function globalTeardown(_config: FullConfig) {
   if (process.env.SKIP_GLOBAL_TEARDOWN === 'true') {
@@ -38,7 +39,15 @@ async function globalTeardown(_config: FullConfig) {
       logger.warn('⚠️ Kubeconfig from setup is missing — cleanup operations may fail');
     }
 
-    k8sClient = new KubernetesClient(kubeConfigPath!);
+    k8sClient = new KubernetesClient(
+      undefined,
+      {
+        baseUrl: EnvVariables.clusterUrl,
+        username: EnvVariables.username,
+        password: EnvVariables.password,
+      },
+      kubeConfigPath!,
+    );
 
     try {
       await k8sClient.verifyAuthentication();
@@ -59,8 +68,8 @@ async function globalTeardown(_config: FullConfig) {
     shouldCleanupClusterResources,
   };
 
-  const engine = new RuleEngine();
   const rules = getTeardownRules();
+  const engine = new RuleEngine();
   await engine.runTeardown(rules, ctx);
 
   logger.info('🏁 Global teardown complete');
