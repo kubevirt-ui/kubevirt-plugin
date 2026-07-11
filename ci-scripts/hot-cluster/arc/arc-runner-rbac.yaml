@@ -54,6 +54,12 @@ rules:
     resources: ['configmaps']
     verbs: ['get', 'list', 'create', 'patch']
 
+  # --- Cypress settings tests: cy.exec('oc get hyperconverged ...') reads
+  # HCO's spec directly (e.g. liveMigrationConfig, higherWorkloadDensity) ---
+  - apiGroups: ['hco.kubevirt.io']
+    resources: ['hyperconvergeds']
+    verbs: ['get', 'list']
+
   # --- check-runner job: HCO / operator version logging ---
   - apiGroups: ['operators.coreos.com']
     resources: ['clusterserviceversions']
