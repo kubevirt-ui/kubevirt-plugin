@@ -53,6 +53,14 @@ on:
         required: false
         default: 'stable'
         type: string
+      branch_name:
+        description: |
+          Branch identity to report in the "Hot cluster ready" Slack
+          notification. Leave empty for a direct manual dispatch -- falls
+          back to github.ref_name (the branch this run itself is on).
+        required: false
+        default: ''
+        type: string
   workflow_call:
     inputs:
       infrastructure_type:
@@ -99,6 +107,14 @@ on:
         description: 'CNV OLM subscription channel (e.g. stable, stable-4.17)'
         required: false
         default: 'stable'
+        type: string
+      branch_name:
+        description: |
+          Branch identity to report in the "Hot cluster ready" Slack
+          notification (main/release-4.X, or a plain branch name). Falls
+          back to github.ref_name when left empty.
+        required: false
+        default: ''
         type: string
     secrets:
       IC_KEY:
@@ -663,12 +679,15 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
           ADMIN_PASSWORD: ${{ secrets.CLUSTER_ADMIN_PASSWORD }}
           INSTALL_DIR: ${{ runner.temp }}/ipi-install
-          # github.head_ref is only set for pull_request*/pull_request_target
-          # events (the PR's source branch); github.ref_name would otherwise
-          # resolve to the *base* branch for pull_request_target (e.g. this
-          # workflow reached via hot-cluster-e2e.yml's auto-provision chain),
-          # misreporting the branch in the Slack message below.
-          BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
+          # inputs.branch_name is threaded down from hot-cluster-e2e.yml's
+          # resolve-cluster-config job (main/release-4.X for the
+          # auto-provision chain, or that job's own ref_name fallback for a
+          # plain workflow_dispatch with no PR context) -- see its
+          # branch_name output for the full resolution logic. Falls back to
+          # this run's own ref_name for a direct dispatch of just this
+          # workflow (skipping the chain above entirely, so inputs.branch_name
+          # is left at its default empty string).
+          BRANCH_NAME: ${{ inputs.branch_name || github.ref_name }}
         run: |
           CONSOLE_URL=$(oc get consoles.config.openshift.io cluster -o jsonpath='{.status.consoleURL}' 2>/dev/null || echo "unknown")
 

@@ -5,13 +5,26 @@ on:
   workflow_dispatch:
     inputs:
       test_project:
-        description: Playwright project to run
+        description: Test project/suite to run (gating, or the features/tier1 equivalent)
         required: true
         default: gating
         type: choice
         options:
           - gating
           - features
+      test_engine:
+        description: |
+          E2E test engine to run against the checked-out code. Defaults to
+          playwright -- there's no base branch to auto-detect from outside
+          hot-cluster-e2e.yml's pull_request_target path, so set this
+          explicitly to cypress when manually testing a release-4.22-or-
+          earlier ref.
+        required: false
+        default: playwright
+        type: choice
+        options:
+          - playwright
+          - cypress
       runner_label:
         description: ARC runner label (defaults to kubevirt-plugin-ci)
         required: false
@@ -35,10 +48,18 @@ on:
   workflow_call:
     inputs:
       test_project:
-        description: Playwright project to run
+        description: Test project/suite to run (gating, or the features/tier1 equivalent)
         type: string
         required: false
         default: gating
+      test_engine:
+        description: |
+          E2E test engine to run against the checked-out code (playwright or
+          cypress). See hot-cluster-e2e.yml's resolve-cluster-config job for
+          how this is auto-detected from the target branch.
+        type: string
+        required: false
+        default: playwright
       runner_label:
         description: ARC runner label (defaults to kubevirt-plugin-ci)
         type: string
@@ -270,7 +291,7 @@ jobs:
           podman push ${KUBEVIRT_PLUGIN_IMAGE}
 
   run-gating-tests:
-    name: Playwright Gating Tests
+    name: Run Gating Tests
     needs: [check-runner, build-kubevirt-plugin-image]
     runs-on: ${{ inputs.runner_label || 'kubevirt-plugin-ci' }}
     timeout-minutes: 120
@@ -278,6 +299,9 @@ jobs:
       PLUGIN_IMAGE: ${{ needs.build-kubevirt-plugin-image.outputs.kubevirt-plugin-image }}
       HEADLESS: 'true'
       RUN_FEATURE_TESTS: ${{ inputs.test_project == 'features' && 'true' || 'false' }}
+      # Both playwright/fixtures/ and cypress/fixtures/ have a matching
+      # layout, so the engine name doubles as the fixtures directory name.
+      TEST_ENGINE: ${{ inputs.test_engine || 'playwright' }}
 
     steps:
       # See the build-kubevirt-plugin-image job's Checkout step above --
@@ -289,9 +313,17 @@ jobs:
           ref: ${{ inputs.checkout_ref || github.event.pull_request.head.sha || github.ref }}
           allow-unsafe-pr-checkout: true
 
+      # Referenced by owner/repo/path@main rather than the local ./ path --
+      # checkout_ref can point at a release branch that predates this CI
+      # infra entirely (e.g. release-4.22 and earlier, before hot-cluster
+      # CI existed), so the composite action wouldn't exist in the checked-
+      # out tree. Both ci-env-request and ci-env-release are self-contained
+      # (pure oc/kubectl commands against the already-running ci-env-
+      # controller, no other local file references), so pinning to main
+      # here is safe regardless of what's checked out above.
       - name: Provision CI test environment
         id: ci-env
-        uses: ./.github/actions/ci-env-request
+        uses: kubevirt-ui/kubevirt-plugin/.github/actions/ci-env-request@main
         with:
           plugin-image: ${{ env.PLUGIN_IMAGE }}
           test-namespace: ${{ env.TEST_NS }}
@@ -303,7 +335,7 @@ jobs:
           yq e '
             .metadata.name = strenv(TEST_SECRET_NAME) |
             .metadata.namespace = strenv(TEST_NS)
-          ' playwright/fixtures/secret.yaml | oc apply -f -
+          ' "${TEST_ENGINE}/fixtures/secret.yaml" | oc apply -f -
 
       - name: Seed kubevirt-user-settings ConfigMap
         run: |
@@ -334,25 +366,51 @@ jobs:
       - name: Install dependencies
         run: |
           npm ci --ignore-scripts --no-audit
-          npm run playwright-install
 
-      - name: Run Playwright gating tests
+          if [[ "${TEST_ENGINE}" == "cypress" ]]; then
+            # --ignore-scripts above skips Cypress's normal postinstall
+            # binary download, so fetch it explicitly.
+            npx cypress install
+          else
+            npm run playwright-install
+          fi
+
+      - name: Run gating tests
         env:
           BRIDGE_BASE_ADDRESS: ${{ steps.ci-env.outputs.bridge-base-address }}
+          TEST_PROJECT: ${{ inputs.test_project }}
         run: |
-          if [[ "${{ inputs.test_project }}" == "features" ]]; then
-            npm run test-playwright-headless -- --project=features
+          if [[ "${TEST_ENGINE}" == "cypress" ]]; then
+            # Cypress only auto-exposes env vars to Cypress.env(...) when
+            # they carry the CYPRESS_ prefix (or via an explicit --env
+            # flag) -- the plain TEST_NS/OS_IMAGES_NS/CNV_NS/
+            # TEST_SECRET_NAME already set at the job level (used by
+            # Playwright and the oc/bash steps directly) are invisible to
+            # the test code's Cypress.env('TEST_NS') etc. otherwise.
+            export CYPRESS_TEST_NS="${TEST_NS}"
+            export CYPRESS_OS_IMAGES_NS="${OS_IMAGES_NS}"
+            export CYPRESS_CNV_NS="${CNV_NS}"
+            export CYPRESS_TEST_SECRET_NAME="${TEST_SECRET_NAME}"
+            if [[ "${TEST_PROJECT}" == "features" ]]; then
+              npm run test-cypress-headless -- --spec tests/tier1.cy.ts
+            else
+              npm run test-cypress-headless -- --spec tests/gating.cy.ts
+            fi
           else
-            npm run test-playwright-headless -- --project=gating
+            if [[ "${TEST_PROJECT}" == "features" ]]; then
+              npm run test-playwright-headless -- --project=features
+            else
+              npm run test-playwright-headless -- --project=gating
+            fi
           fi
 
       - name: Upload test artifacts
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: playwright-results-${{ github.run_id }}
+          name: ${{ env.TEST_ENGINE }}-results-${{ github.run_id }}
           path: |
-            playwright/test-results/
+            ${{ env.TEST_ENGINE == 'cypress' && 'cypress/gui-test-screenshots/' || 'playwright/test-results/' }}
           retention-days: 7
           if-no-files-found: ignore
 
@@ -395,11 +453,15 @@ jobs:
         if: always()
         run: |
           echo "Cleaning test entities in ${TEST_NS}..."
-          bash ci-scripts/hot-cluster/test-cleanup.sh
+          # Fetched from main rather than run from the checked-out tree --
+          # same reasoning as the ci-env-request/ci-env-release uses:
+          # below, this script may not exist on whatever checkout_ref was
+          # used (e.g. a pre-hot-cluster-CI release branch).
+          curl -sL "https://raw.githubusercontent.com/kubevirt-ui/kubevirt-plugin/main/ci-scripts/hot-cluster/test-cleanup.sh" | bash
 
       - name: Release CI test environment
         if: always()
-        uses: ./.github/actions/ci-env-release
+        uses: kubevirt-ui/kubevirt-plugin/.github/actions/ci-env-release@main
         with:
           configmap-name: ${{ env.CI_ENV_CM }}
           ci-env-namespace: ${{ env.CI_ENV_NS }}

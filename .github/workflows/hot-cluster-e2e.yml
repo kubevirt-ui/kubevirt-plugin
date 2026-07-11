@@ -38,6 +38,22 @@ on:
         required: false
         default: '4.22_openshift'
         type: string
+      test_engine:
+        description: |
+          E2E test engine to run. 'auto' detects from the base branch
+          (release-4.22 and earlier use Cypress, everything else uses
+          Playwright) for pull_request_target and for workflow_dispatch
+          when base_ref is provided (e.g. /retest-e2e fallback); for a
+          plain workflow_dispatch with no base_ref, 'auto' defaults to
+          Playwright, so override this explicitly when manually testing a
+          Cypress-era release branch.
+        required: false
+        default: auto
+        type: choice
+        options:
+          - auto
+          - playwright
+          - cypress
       pr_number:
         description: |
           PR number to retest merged with the current base branch tip,
@@ -48,6 +64,28 @@ on:
         required: false
         default: ''
         type: string
+      base_ref:
+        description: |
+          PR base branch to use for cluster/test_engine auto-selection on
+          workflow_dispatch (e.g. release-4.20). Forwarded by retest-e2e.yml's
+          /retest-e2e fallback so release-4.22-and-earlier PRs get Cypress
+          and a version-matched cluster instead of defaulting to Playwright
+          on kubevirt-plugin-ci. Leave empty for a plain manual dispatch.
+        required: false
+        default: ''
+        type: string
+      skip_pool_check:
+        description: |
+          Skip the lgtm+approved (no hold) merge-pool requirement for a
+          pr_number retest. Used by retest-e2e.yml's /retest-e2e fallback
+          dispatch, which retests on demand for any PR regardless of review
+          state -- unlike retest-stale-gating.yml's dispatch, which only
+          ever retests merge-pool PRs and always leaves this false so that
+          check keeps meaning what it says. mergeable/trusted are still
+          re-checked either way.
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   contents: read
@@ -75,12 +113,16 @@ env:
   BASE_DOMAIN: cnv-ui.com
 
 jobs:
-  # Resolves cluster_name/openshift_version for this run. workflow_dispatch
-  # always uses its own inputs unchanged. Automatic pull_request_target runs
-  # against a release-4.X branch get a dedicated, version-matched cluster
-  # (kubevirt-plugin-<major><minor>) instead of silently colliding with
-  # main's kubevirt-plugin-ci cluster; any other base branch falls back to
-  # the same default as today.
+  # Resolves cluster_name/openshift_version/test_engine for this run.
+  # Automatic pull_request_target runs (and workflow_dispatch retests that
+  # forward base_ref) against a release-4.X branch get a dedicated,
+  # version-matched cluster (kubevirt-plugin-<major><minor>) instead of
+  # silently colliding with main's kubevirt-plugin-ci cluster; any other
+  # base branch, and plain workflow_dispatch without base_ref, falls back
+  # to the provided inputs / defaults. test_engine follows the same
+  # release-branch detection -- release-4.22 and earlier predate the
+  # Cypress → Playwright migration on main, so PRs targeting them run the
+  # Cypress suite that still lives on those branches instead.
   resolve-cluster-config:
     name: Resolve Cluster Config
     runs-on: ubuntu-latest
@@ -88,17 +130,27 @@ jobs:
     outputs:
       cluster_name: ${{ steps.resolve.outputs.cluster_name }}
       openshift_version: ${{ steps.resolve.outputs.openshift_version }}
+      test_engine: ${{ steps.resolve.outputs.test_engine }}
+      branch_name: ${{ steps.resolve.outputs.branch_name }}
     steps:
+      # persist-credentials: false -- this job only reads files to resolve
+      # cluster config, it never pushes, so there's no reason to leave
+      # GITHUB_TOKEN sitting in .git/config for the rest of the job.
       - name: Checkout
         uses: actions/checkout@v7
+        with:
+          persist-credentials: false
 
-      - name: Resolve cluster_name/openshift_version for this branch
+      - name: Resolve cluster_name/openshift_version/test_engine for this branch
         id: resolve
         env:
-          EVENT_NAME: ${{ github.event_name }}
-          BASE_REF: ${{ github.base_ref }}
+          # workflow_dispatch has no github.base_ref -- retest-e2e.yml
+          # forwards the PR's base via inputs.base_ref so auto-selection
+          # still works for release-branch /retest-e2e fallbacks.
+          BASE_REF: ${{ inputs.base_ref || github.base_ref }}
           INPUT_CLUSTER_NAME: ${{ inputs.cluster_name }}
           INPUT_OPENSHIFT_VERSION: ${{ inputs.openshift_version }}
+          INPUT_TEST_ENGINE: ${{ inputs.test_engine }}
         run: ./ci-scripts/hot-cluster/resolve-cluster-config.sh >> "$GITHUB_OUTPUT"
 
   # Resolves the PR being retested when this run was dispatched with
@@ -168,11 +220,13 @@ jobs:
         # workflow_dispatch input.
         env:
           PR_NUMBER: ${{ inputs.pr_number }}
+          SKIP_POOL_CHECK: ${{ inputs.skip_pool_check }}
         with:
           script: |
             const fs = require('fs');
             const { isMergePoolPr } = require('./ci-scripts/hot-cluster/is-merge-pool-pr.cjs');
             const prNumber = Number(process.env.PR_NUMBER);
+            const skipPoolCheck = process.env.SKIP_POOL_CHECK === 'true';
 
             // mergeable/mergeable_state are computed asynchronously by
             // GitHub and can be null right after main moves -- retry
@@ -203,8 +257,8 @@ jobs:
             const hasOkToTest = pr.labels.some((label) => label.name === 'ok-to-test');
             const trusted = ownedByAuthor || sameRepo || hasOkToTest;
 
-            const stillInPool = isMergePoolPr(pr.labels);
-            core.info(`PR #${prNumber}: head=${pr.head.sha}, mergeable=${pr.mergeable}, mergeable_state=${pr.mergeable_state}, still_in_pool=${stillInPool}`);
+            const stillInPool = skipPoolCheck || isMergePoolPr(pr.labels);
+            core.info(`PR #${prNumber}: head=${pr.head.sha}, mergeable=${pr.mergeable}, mergeable_state=${pr.mergeable_state}, still_in_pool=${stillInPool}${skipPoolCheck ? ' (pool check skipped)' : ''}`);
             core.info(`PR #${prNumber}: author=${author}, ownedByAuthor=${ownedByAuthor}, sameRepo=${sameRepo}, hasOkToTest=${hasOkToTest}, trusted=${trusted}`);
 
             core.setOutput('head_sha', pr.head.sha);
@@ -347,6 +401,13 @@ jobs:
       cluster_name: ${{ needs.resolve-cluster-config.outputs.cluster_name }}
       infrastructure_type: ${{ inputs.infrastructure_type || 'ipi' }}
       openshift_version: ${{ needs.resolve-cluster-config.outputs.openshift_version }}
+      # The resolved base branch (main/release-4.X) for pull_request_target
+      # and /retest-e2e's forwarded base_ref; falls back to whatever ref
+      # this run itself is on for a plain workflow_dispatch with no PR
+      # context (e.g. a manual test dispatched from a feature branch) --
+      # both feed the "Hot cluster ready [...]" Slack notification further
+      # down the provisioning chain.
+      branch_name: ${{ needs.resolve-cluster-config.outputs.branch_name || github.ref_name }}
       # Single-line plain scalar (same well-precedented `${{ ... }}` pattern
       # used for run-name/other with: values throughout this file) rather
       # than a multi-line expression wrapped in a literal block scalar --
@@ -542,6 +603,7 @@ jobs:
     uses: ./.github/workflows/hot-cluster-e2e-run.yml
     with:
       test_project: ${{ inputs.test_project || 'gating' }}
+      test_engine: ${{ needs.resolve-cluster-config.outputs.test_engine }}
       runner_label: ${{ inputs.runner_label || needs.resolve-cluster-config.outputs.cluster_name }}
       cluster_name: ${{ needs.resolve-cluster-config.outputs.cluster_name }}
       # Merge the PR with the current base tip instead of testing its head
