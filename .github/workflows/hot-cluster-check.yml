@@ -38,6 +38,15 @@ on:
         type: string
         required: false
         default: ''
+      cnv_channel:
+        description: |
+          CNV OLM subscription channel to install if provisioning happens.
+          Defaults to the catalog's unversioned 'stable' channel
+          (redhat-operators has no stable-4.X for kubevirt-hyperconverged).
+          Forwarded as-is to ibmc-cluster-setup.yml.
+        type: string
+        required: false
+        default: 'stable'
       worker_flavor:
         description: Worker node flavor
         type: string
@@ -126,6 +135,7 @@ jobs:
       zone: ${{ inputs.zone }}
       openshift_version: ${{ inputs.openshift_version }}
       branch_name: ${{ inputs.branch_name }}
+      cnv_channel: ${{ inputs.cnv_channel }}
       worker_flavor: ${{ inputs.worker_flavor }}
       worker_count: ${{ inputs.worker_count }}
       # kvm_emulation is declared as a string here (matching workflow_call's
