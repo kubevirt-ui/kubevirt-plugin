@@ -80,6 +80,20 @@ on:
         type: string
         required: false
         default: ''
+      is_reusable_call:
+        description: |
+          Internal marker set only by hot-cluster-e2e.yml's own `uses:` call
+          -- never available on the workflow_dispatch trigger, so it's
+          reliably false for a standalone dispatch. Distinguishes that case
+          (whose "Run Gating Tests" job would otherwise be a top-level,
+          bare-named check-run that can collide with an unrelated open PR
+          sharing the same SHA -- confirmed live on CNV-92682/PR #4293) from
+          being called via `uses:` (where GitHub already composite-prefixes
+          the check name, e.g. "Run E2E Tests / Run Gating Tests", so no
+          collision is possible regardless of this flag).
+        type: boolean
+        required: false
+        default: false
 
 permissions:
   contents: read
@@ -291,7 +305,10 @@ jobs:
           podman push ${KUBEVIRT_PLUGIN_IMAGE}
 
   run-gating-tests:
-    name: Run Gating Tests
+    # inputs.is_reusable_call is only ever true when hot-cluster-e2e.yml
+    # calls this workflow via `uses:` -- see that input's own description
+    # for why a standalone dispatch needs a distinctly-named check here.
+    name: ${{ inputs.is_reusable_call && 'Run Gating Tests' || 'Run Gating Tests (standalone dispatch)' }}
     needs: [check-runner, build-kubevirt-plugin-image]
     runs-on: ${{ inputs.runner_label || 'kubevirt-plugin-ci' }}
     timeout-minutes: 120

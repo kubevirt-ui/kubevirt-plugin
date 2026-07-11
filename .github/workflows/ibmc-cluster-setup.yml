@@ -53,6 +53,17 @@ on:
         required: false
         default: 'stable'
         type: string
+      cnv_pin_version:
+        description: |
+          "<major>.<minor>" to pin CNV to the newest matching CSV within
+          cnv_channel via startingCSV. Leave empty to install whatever
+          cnv_channel currently resolves to. If set and no matching CSV is
+          found in the channel's entries, install-hco.sh fails the build
+          rather than silently falling back to an unpinned/newer install --
+          pass an explicit cnv_channel instead to opt into that.
+        required: false
+        default: ''
+        type: string
       branch_name:
         description: |
           Branch identity to report in the "Hot cluster ready" Slack
@@ -107,6 +118,17 @@ on:
         description: 'CNV OLM subscription channel (e.g. stable, stable-4.17)'
         required: false
         default: 'stable'
+        type: string
+      cnv_pin_version:
+        description: |
+          "<major>.<minor>" to pin CNV to the newest matching CSV within
+          cnv_channel via startingCSV. Leave empty to install whatever
+          cnv_channel currently resolves to. If set and no matching CSV is
+          found in the channel's entries, install-hco.sh fails the build
+          rather than silently falling back to an unpinned/newer install --
+          pass an explicit cnv_channel instead to opt into that.
+        required: false
+        default: ''
         type: string
       branch_name:
         description: |
@@ -575,12 +597,15 @@ jobs:
           fi
 
       - name: Install OpenShift Virtualization (CNV)
+        id: install_cnv
         env:
           KVM_EMULATION: ${{ steps.kvm_check.outputs.kvm_emulation || inputs.kvm_emulation }}
           CNV_CHANNEL: ${{ inputs.cnv_channel || 'stable' }}
+          CNV_PIN_VERSION: ${{ inputs.cnv_pin_version }}
         run: |
           echo "KVM_EMULATION=${KVM_EMULATION} (auto-detected)"
           echo "CNV_CHANNEL=${CNV_CHANNEL}"
+          echo "CNV_PIN_VERSION=${CNV_PIN_VERSION:-<none, unpinned>}"
           ./ci-scripts/hot-cluster/install-hco.sh
 
       - name: Configure internal image registry
@@ -757,6 +782,15 @@ jobs:
 
       - name: Setup summary
         if: always()
+        env:
+          CNV_PIN_VERSION_REQUESTED: ${{ inputs.cnv_pin_version || 'unpinned' }}
+          # Resolved from the live PackageManifest by install-hco.sh -- distinct
+          # from the requested pin above so this can never look "pinned" when
+          # the pin actually failed. Genuinely unpinned (no pin requested) and
+          # "pin requested but install-hco.sh failed before resolving it" both
+          # show this same empty fallback -- always check job status/logs for
+          # the latter, never infer success from this table alone.
+          CNV_INSTALLED_CSV: ${{ steps.install_cnv.outputs.starting_csv || 'unpinned, or pin failed -- check job status' }}
         run: |
           echo "## Hot Cluster Setup Summary" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
@@ -770,6 +804,8 @@ jobs:
           echo "| Workers | \`${{ inputs.worker_count }}\` |" >> "$GITHUB_STEP_SUMMARY"
           echo "| KVM Emulation | \`${{ inputs.kvm_emulation }}\` |" >> "$GITHUB_STEP_SUMMARY"
           echo "| CNV Channel | \`${{ inputs.cnv_channel || 'stable' }}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| CNV Pin Version (requested) | \`${CNV_PIN_VERSION_REQUESTED}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| CNV Installed CSV | \`${CNV_INSTALLED_CSV}\` |" >> "$GITHUB_STEP_SUMMARY"
           CONSOLE_URL=$(oc get consoles.config.openshift.io cluster -o jsonpath='{.status.consoleURL}' 2>/dev/null || echo "")
           if [[ -n "${CONSOLE_URL}" ]]; then
             echo "| Console | [${CONSOLE_URL}](${CONSOLE_URL}) |" >> "$GITHUB_STEP_SUMMARY"
