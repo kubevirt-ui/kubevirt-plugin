@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Emits cluster_name=..., openshift_version=..., and test_engine=... for
-# GITHUB_OUTPUT.
+# Emits cluster_name=..., openshift_version=..., test_engine=..., and
+# branch_name=... for GITHUB_OUTPUT.
 #
 # Runs against a release-<major>.<minor> base branch get a dedicated,
 # version-matched cluster (kubevirt-plugin-<major><minor>) instead of
@@ -72,3 +72,9 @@ fi
 echo "cluster_name=${CLUSTER_NAME}"
 echo "openshift_version=${OPENSHIFT_VERSION}"
 echo "test_engine=${TEST_ENGINE}"
+# Raw resolved base branch (e.g. "main", "release-4.20"), or empty when
+# there's none (plain workflow_dispatch with no PR context) -- callers
+# combine this with a ref_name fallback for display purposes (e.g. the
+# "Hot cluster ready [...]" Slack notification), since resolving that
+# fallback needs the github context, not available inside this script.
+echo "branch_name=${BASE_REF}"

@@ -28,6 +28,16 @@ on:
         type: string
         required: false
         default: '4.22_openshift'
+      branch_name:
+        description: |
+          Branch identity to report in the "Hot cluster ready" Slack
+          notification if provisioning happens (main/release-4.X, or a
+          plain branch name for ad-hoc dispatches). Forwarded as-is to
+          ibmc-cluster-setup.yml -- see its own branch_name input for the
+          fallback used when this is left empty.
+        type: string
+        required: false
+        default: ''
       worker_flavor:
         description: Worker node flavor
         type: string
@@ -115,6 +125,7 @@ jobs:
       cluster_name: ${{ inputs.cluster_name }}
       zone: ${{ inputs.zone }}
       openshift_version: ${{ inputs.openshift_version }}
+      branch_name: ${{ inputs.branch_name }}
       worker_flavor: ${{ inputs.worker_flavor }}
       worker_count: ${{ inputs.worker_count }}
       # kvm_emulation is declared as a string here (matching workflow_call's

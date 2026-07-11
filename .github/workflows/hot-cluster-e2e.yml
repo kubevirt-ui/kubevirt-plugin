@@ -131,6 +131,7 @@ jobs:
       cluster_name: ${{ steps.resolve.outputs.cluster_name }}
       openshift_version: ${{ steps.resolve.outputs.openshift_version }}
       test_engine: ${{ steps.resolve.outputs.test_engine }}
+      branch_name: ${{ steps.resolve.outputs.branch_name }}
     steps:
       # persist-credentials: false -- this job only reads files to resolve
       # cluster config, it never pushes, so there's no reason to leave
@@ -400,6 +401,13 @@ jobs:
       cluster_name: ${{ needs.resolve-cluster-config.outputs.cluster_name }}
       infrastructure_type: ${{ inputs.infrastructure_type || 'ipi' }}
       openshift_version: ${{ needs.resolve-cluster-config.outputs.openshift_version }}
+      # The resolved base branch (main/release-4.X) for pull_request_target
+      # and /retest-e2e's forwarded base_ref; falls back to whatever ref
+      # this run itself is on for a plain workflow_dispatch with no PR
+      # context (e.g. a manual test dispatched from a feature branch) --
+      # both feed the "Hot cluster ready [...]" Slack notification further
+      # down the provisioning chain.
+      branch_name: ${{ needs.resolve-cluster-config.outputs.branch_name || github.ref_name }}
       # Single-line plain scalar (same well-precedented `${{ ... }}` pattern
       # used for run-name/other with: values throughout this file) rather
       # than a multi-line expression wrapped in a literal block scalar --
