@@ -38,6 +38,11 @@ jobs:
         continue-on-error: true
         uses: actions/create-github-app-token@v3
         with:
+          # app-id is deprecated in favor of client-id (the action now warns
+          # about it at runtime), but actionlint pins its bundled action
+          # metadata to v1.7.12 here, which predates that input -- switching
+          # would fail the actionlint CI check over a harmless warning. Revisit
+          # once actionlint's metadata (or this repo's pinned version) catches up.
           app-id: ${{ secrets.BOT_APP_ID }}
           private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
 
@@ -104,37 +109,79 @@ jobs:
 
               core.info(`/retest-e2e requested by ${author} on PR #${prNumber} (HEAD: ${headSha})`);
 
-              const runs = await github.rest.actions.listWorkflowRuns({
+              // A flat per_page: 10 (the original approach here) only looks
+              // at the 10 most recent pull_request_target runs of
+              // hot-cluster-e2e.yml *repo-wide* -- on an active repo, other
+              // PRs' pushes/labels routinely push this PR's own run out of
+              // that window within the hour (confirmed on PR #4143: its run
+              // had fallen to position 12 by the time /retest-e2e ran).
+              // Paginate further, bounded by a recent lookback window so
+              // this stays cheap -- if the PR's own run is older than that,
+              // the fallback dispatch below still guarantees correctness.
+              const lookbackDate = new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString();
+              const runs = await github.paginate(github.rest.actions.listWorkflowRuns, {
                 ...context.repo,
                 workflow_id: 'hot-cluster-e2e.yml',
                 event: 'pull_request_target',
-                per_page: 10,
+                created: `>=${lookbackDate}`,
+                per_page: 100,
               });
 
-              const prRun = runs.data.workflow_runs.find(r => {
+              const prRun = runs.find(r => {
                 const prMatch = r.pull_requests?.some(p => p.number === prNumber);
                 const shaMatch = r.head_sha === headSha;
-                return prMatch || shaMatch;
+                // Branch name alone isn't unique across forks -- a same-named
+                // branch in a different fork must not be mistaken for this
+                // PR's run, so also require the run's head repo to match.
+                const branchMatch = r.head_branch === pr.data.head.ref &&
+                  r.head_repository?.id === pr.data.head.repo?.id;
+                return prMatch || shaMatch || branchMatch;
               });
 
-              if (!prRun) {
-                const msg = `No Hot Cluster E2E workflow run found for PR #${prNumber}. ` +
-                  `Push a commit to trigger the initial run.`;
-                core.warning(msg);
-                await react('confused');
+              if (prRun) {
+                core.info(`Re-running workflow run ${prRun.id} (attempt ${prRun.run_attempt})...`);
+
+                await react('rocket');
+
+                await github.rest.actions.reRunWorkflow({
+                  ...context.repo,
+                  run_id: prRun.id,
+                });
+
+                core.info(`Re-run triggered: https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${prRun.id}`);
                 return;
               }
 
-              core.info(`Re-running workflow run ${prRun.id} (attempt ${prRun.run_attempt})...`);
-
+              // No existing run to re-run within the lookback window --
+              // rather than silently giving up (the original behavior:
+              // just a job log warning and a best-effort reaction, which
+              // itself silently fails since this bot lacks issues: write --
+              // see react() above), dispatch a fresh run instead. This is
+              // the same workflow_dispatch + pr_number mechanism
+              // retest-stale-gating.yml already uses for merge-pool PRs,
+              // which already provisions the cluster if it's down or queues
+              // behind an in-progress provision (ibmc-cluster-setup.yml's
+              // hot-cluster-provision-<cluster_name> concurrency group) --
+              // no new queueing logic needed here. skip_pool_check: true
+              // because /retest-e2e must work for any PR on demand,
+              // regardless of lgtm/approved review state -- unlike
+              // retest-stale-gating.yml's dispatch, which intentionally
+              // only retests merge-pool PRs.
+              core.warning(`No recent Hot Cluster E2E workflow run found for PR #${prNumber}. Dispatching a fresh run instead.`);
               await react('rocket');
 
-              await github.rest.actions.reRunWorkflow({
+              await github.rest.actions.createWorkflowDispatch({
                 ...context.repo,
-                run_id: prRun.id,
+                workflow_id: 'hot-cluster-e2e.yml',
+                ref: 'main',
+                inputs: {
+                  pr_number: String(prNumber),
+                  skip_pool_check: 'true',
+                },
               });
 
-              core.info(`Re-run triggered: https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${prRun.id}`);
+              core.info(`Fresh run dispatched for PR #${prNumber}.`);
+              core.setOutput('fallback_dispatched', 'true');
             } catch (err) {
               // Distinct from the expected "not authorized" rejection above:
               // this is an unforeseen failure (bad bot token, API outage,
@@ -144,6 +191,27 @@ jobs:
               core.setOutput('error_message', err.message || String(err));
               core.setFailed(`Unexpected error while processing /retest-e2e: ${err.message || err}`);
             }
+
+      # Reactions on this bot's token silently fail (see react() above), so
+      # a fallback dispatch needs its own visible confirmation on the PR --
+      # otherwise the author sees no difference between "a fresh run was
+      # just dispatched" and "nothing happened at all".
+      - name: Report fallback retest dispatch on the PR
+        if: steps.retest.outputs.fallback_dispatched == 'true'
+        uses: actions/github-script@v9
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            await github.rest.issues.createComment({
+              ...context.repo,
+              issue_number: context.issue.number,
+              body: [
+                '🚀 No recent Hot Cluster E2E run was found to re-run, so `/retest-e2e` dispatched a fresh one instead ' +
+                  '(this also re-provisions the cluster automatically if it was torn down).',
+                '',
+                `See the [Actions tab](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/workflows/hot-cluster-e2e.yml) for progress.`,
+              ].join('\n'),
+            });
 
       - name: Report unexpected retest failure on the PR
         if: steps.retest.outputs.unexpected_error == 'true'

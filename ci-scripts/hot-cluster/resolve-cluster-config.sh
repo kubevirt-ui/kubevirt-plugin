@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Emits cluster_name=... and openshift_version=... for GITHUB_OUTPUT.
+# Emits cluster_name=..., openshift_version=..., and test_engine=... for
+# GITHUB_OUTPUT.
 #
 # Automatic pull_request_target runs against a release-<major>.<minor>
 # branch get a dedicated, version-matched cluster (kubevirt-plugin-<major><minor>)
@@ -9,22 +10,36 @@ set -euo pipefail
 # other base branch, and every workflow_dispatch run, falls back to the
 # provided input (or the repo's long-standing default).
 #
+# test_engine follows the same release-branch detection: release-4.22 and
+# earlier predate the Cypress → Playwright migration on main (see
+# 9d7fe93c6), so they still carry a cypress/ suite instead of playwright/.
+# Everything else (main, any future release-4.23+, non-release bases) is
+# Playwright-only.
+#
 # Env:
 #   EVENT_NAME              - github.event_name (e.g. pull_request_target, workflow_dispatch)
 #   BASE_REF                - github.base_ref (PR target branch, e.g. release-4.20)
 #   INPUT_CLUSTER_NAME       - workflow_dispatch inputs.cluster_name, if set
 #   INPUT_OPENSHIFT_VERSION  - workflow_dispatch inputs.openshift_version, if set
+#   INPUT_TEST_ENGINE        - workflow_dispatch inputs.test_engine ('auto'/'playwright'/'cypress'), if set
 #
 # Usage (from a workflow step):
 #   ./ci-scripts/hot-cluster/resolve-cluster-config.sh >> "$GITHUB_OUTPUT"
 
 DEFAULT_CLUSTER_NAME="kubevirt-plugin-ci"
 DEFAULT_OPENSHIFT_VERSION="4.22_openshift"
+DEFAULT_TEST_ENGINE="playwright"
+
+# Last release branch still on the pre-migration Cypress suite. Any branch
+# release-<major>.<minor> with major.minor <= this threshold uses Cypress.
+LAST_CYPRESS_MAJOR=4
+LAST_CYPRESS_MINOR=22
 
 EVENT_NAME="${EVENT_NAME:-}"
 BASE_REF="${BASE_REF:-}"
 INPUT_CLUSTER_NAME="${INPUT_CLUSTER_NAME:-}"
 INPUT_OPENSHIFT_VERSION="${INPUT_OPENSHIFT_VERSION:-}"
+INPUT_TEST_ENGINE="${INPUT_TEST_ENGINE:-}"
 
 if [[ "${EVENT_NAME}" == "pull_request_target" && "${BASE_REF}" =~ ^release-([0-9]+)\.([0-9]+)$ ]]; then
   MAJOR="${BASH_REMATCH[1]}"
@@ -32,11 +47,27 @@ if [[ "${EVENT_NAME}" == "pull_request_target" && "${BASE_REF}" =~ ^release-([0-
   CLUSTER_NAME="kubevirt-plugin-${MAJOR}${MINOR}"
   OPENSHIFT_VERSION="${MAJOR}.${MINOR}_openshift"
   echo "Base branch '${BASE_REF}' is a release branch → cluster '${CLUSTER_NAME}' (${OPENSHIFT_VERSION})" >&2
+
+  if (( MAJOR * 1000 + MINOR <= LAST_CYPRESS_MAJOR * 1000 + LAST_CYPRESS_MINOR )); then
+    TEST_ENGINE="cypress"
+  else
+    TEST_ENGINE="playwright"
+  fi
+  echo "Base branch '${BASE_REF}' → test engine '${TEST_ENGINE}'" >&2
 else
   CLUSTER_NAME="${INPUT_CLUSTER_NAME:-${DEFAULT_CLUSTER_NAME}}"
   OPENSHIFT_VERSION="${INPUT_OPENSHIFT_VERSION:-${DEFAULT_OPENSHIFT_VERSION}}"
   echo "Using default/workflow_dispatch cluster config: '${CLUSTER_NAME}' (${OPENSHIFT_VERSION})" >&2
+  TEST_ENGINE="${DEFAULT_TEST_ENGINE}"
+fi
+
+# An explicit, non-'auto' workflow_dispatch override always wins -- there's
+# no reliable base_ref to detect from outside pull_request_target.
+if [[ -n "${INPUT_TEST_ENGINE}" && "${INPUT_TEST_ENGINE}" != "auto" ]]; then
+  TEST_ENGINE="${INPUT_TEST_ENGINE}"
+  echo "Overriding test engine from input: '${TEST_ENGINE}'" >&2
 fi
 
 echo "cluster_name=${CLUSTER_NAME}"
 echo "openshift_version=${OPENSHIFT_VERSION}"
+echo "test_engine=${TEST_ENGINE}"
