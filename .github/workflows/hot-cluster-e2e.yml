@@ -42,10 +42,11 @@ on:
         description: |
           E2E test engine to run. 'auto' detects from the base branch
           (release-4.22 and earlier use Cypress, everything else uses
-          Playwright) for pull_request_target; for a plain workflow_dispatch
-          (no base branch to detect from) 'auto' defaults to Playwright, so
-          override this explicitly when manually testing a Cypress-era
-          release branch.
+          Playwright) for pull_request_target and for workflow_dispatch
+          when base_ref is provided (e.g. /retest-e2e fallback); for a
+          plain workflow_dispatch with no base_ref, 'auto' defaults to
+          Playwright, so override this explicitly when manually testing a
+          Cypress-era release branch.
         required: false
         default: auto
         type: choice
@@ -60,6 +61,16 @@ on:
           re-validate merge-pool PRs after main advances (the Tide-equivalent
           staleness guard -- see CNV-92616). Leave empty for a normal manual
           dispatch.
+        required: false
+        default: ''
+        type: string
+      base_ref:
+        description: |
+          PR base branch to use for cluster/test_engine auto-selection on
+          workflow_dispatch (e.g. release-4.20). Forwarded by retest-e2e.yml's
+          /retest-e2e fallback so release-4.22-and-earlier PRs get Cypress
+          and a version-matched cluster instead of defaulting to Playwright
+          on kubevirt-plugin-ci. Leave empty for a plain manual dispatch.
         required: false
         default: ''
         type: string
@@ -103,14 +114,15 @@ env:
 
 jobs:
   # Resolves cluster_name/openshift_version/test_engine for this run.
-  # workflow_dispatch always uses its own inputs unchanged. Automatic
-  # pull_request_target runs against a release-4.X branch get a dedicated,
+  # Automatic pull_request_target runs (and workflow_dispatch retests that
+  # forward base_ref) against a release-4.X branch get a dedicated,
   # version-matched cluster (kubevirt-plugin-<major><minor>) instead of
   # silently colliding with main's kubevirt-plugin-ci cluster; any other
-  # base branch falls back to the same default as today. test_engine
-  # follows the same release-branch detection -- release-4.22 and earlier
-  # predate the Cypress → Playwright migration on main, so PRs targeting
-  # them run the Cypress suite that still lives on those branches instead.
+  # base branch, and plain workflow_dispatch without base_ref, falls back
+  # to the provided inputs / defaults. test_engine follows the same
+  # release-branch detection -- release-4.22 and earlier predate the
+  # Cypress → Playwright migration on main, so PRs targeting them run the
+  # Cypress suite that still lives on those branches instead.
   resolve-cluster-config:
     name: Resolve Cluster Config
     runs-on: ubuntu-latest
@@ -131,8 +143,10 @@ jobs:
       - name: Resolve cluster_name/openshift_version/test_engine for this branch
         id: resolve
         env:
-          EVENT_NAME: ${{ github.event_name }}
-          BASE_REF: ${{ github.base_ref }}
+          # workflow_dispatch has no github.base_ref -- retest-e2e.yml
+          # forwards the PR's base via inputs.base_ref so auto-selection
+          # still works for release-branch /retest-e2e fallbacks.
+          BASE_REF: ${{ inputs.base_ref || github.base_ref }}
           INPUT_CLUSTER_NAME: ${{ inputs.cluster_name }}
           INPUT_OPENSHIFT_VERSION: ${{ inputs.openshift_version }}
           INPUT_TEST_ENGINE: ${{ inputs.test_engine }}

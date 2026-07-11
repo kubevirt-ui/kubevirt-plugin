@@ -313,9 +313,17 @@ jobs:
           ref: ${{ inputs.checkout_ref || github.event.pull_request.head.sha || github.ref }}
           allow-unsafe-pr-checkout: true
 
+      # Referenced by owner/repo/path@main rather than the local ./ path --
+      # checkout_ref can point at a release branch that predates this CI
+      # infra entirely (e.g. release-4.22 and earlier, before hot-cluster
+      # CI existed), so the composite action wouldn't exist in the checked-
+      # out tree. Both ci-env-request and ci-env-release are self-contained
+      # (pure oc/kubectl commands against the already-running ci-env-
+      # controller, no other local file references), so pinning to main
+      # here is safe regardless of what's checked out above.
       - name: Provision CI test environment
         id: ci-env
-        uses: ./.github/actions/ci-env-request
+        uses: kubevirt-ui/kubevirt-plugin/.github/actions/ci-env-request@main
         with:
           plugin-image: ${{ env.PLUGIN_IMAGE }}
           test-namespace: ${{ env.TEST_NS }}
@@ -373,6 +381,16 @@ jobs:
           TEST_PROJECT: ${{ inputs.test_project }}
         run: |
           if [[ "${TEST_ENGINE}" == "cypress" ]]; then
+            # Cypress only auto-exposes env vars to Cypress.env(...) when
+            # they carry the CYPRESS_ prefix (or via an explicit --env
+            # flag) -- the plain TEST_NS/OS_IMAGES_NS/CNV_NS/
+            # TEST_SECRET_NAME already set at the job level (used by
+            # Playwright and the oc/bash steps directly) are invisible to
+            # the test code's Cypress.env('TEST_NS') etc. otherwise.
+            export CYPRESS_TEST_NS="${TEST_NS}"
+            export CYPRESS_OS_IMAGES_NS="${OS_IMAGES_NS}"
+            export CYPRESS_CNV_NS="${CNV_NS}"
+            export CYPRESS_TEST_SECRET_NAME="${TEST_SECRET_NAME}"
             if [[ "${TEST_PROJECT}" == "features" ]]; then
               npm run test-cypress-headless -- --spec tests/tier1.cy.ts
             else
@@ -435,11 +453,15 @@ jobs:
         if: always()
         run: |
           echo "Cleaning test entities in ${TEST_NS}..."
-          bash ci-scripts/hot-cluster/test-cleanup.sh
+          # Fetched from main rather than run from the checked-out tree --
+          # same reasoning as the ci-env-request/ci-env-release uses:
+          # below, this script may not exist on whatever checkout_ref was
+          # used (e.g. a pre-hot-cluster-CI release branch).
+          curl -sL "https://raw.githubusercontent.com/kubevirt-ui/kubevirt-plugin/main/ci-scripts/hot-cluster/test-cleanup.sh" | bash
 
       - name: Release CI test environment
         if: always()
-        uses: ./.github/actions/ci-env-release
+        uses: kubevirt-ui/kubevirt-plugin/.github/actions/ci-env-release@main
         with:
           configmap-name: ${{ env.CI_ENV_CM }}
           ci-env-namespace: ${{ env.CI_ENV_NS }}

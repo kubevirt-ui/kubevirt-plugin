@@ -166,8 +166,12 @@ jobs:
               // because /retest-e2e must work for any PR on demand,
               // regardless of lgtm/approved review state -- unlike
               // retest-stale-gating.yml's dispatch, which intentionally
-              // only retests merge-pool PRs.
-              core.warning(`No recent Hot Cluster E2E workflow run found for PR #${prNumber}. Dispatching a fresh run instead.`);
+              // only retests merge-pool PRs. base_ref is required so
+              // resolve-cluster-config can auto-select Cypress + a
+              // version-matched cluster for release-4.22-and-earlier PRs
+              // (workflow_dispatch has no github.base_ref of its own).
+              const baseRef = pr.data.base.ref;
+              core.warning(`No recent Hot Cluster E2E workflow run found for PR #${prNumber} (base: ${baseRef}). Dispatching a fresh run instead.`);
               await react('rocket');
 
               await github.rest.actions.createWorkflowDispatch({
@@ -176,11 +180,12 @@ jobs:
                 ref: 'main',
                 inputs: {
                   pr_number: String(prNumber),
+                  base_ref: baseRef,
                   skip_pool_check: 'true',
                 },
               });
 
-              core.info(`Fresh run dispatched for PR #${prNumber}.`);
+              core.info(`Fresh run dispatched for PR #${prNumber} (base_ref=${baseRef}).`);
               core.setOutput('fallback_dispatched', 'true');
             } catch (err) {
               // Distinct from the expected "not authorized" rejection above:

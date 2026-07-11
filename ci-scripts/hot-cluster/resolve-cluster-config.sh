@@ -4,11 +4,13 @@ set -euo pipefail
 # Emits cluster_name=..., openshift_version=..., and test_engine=... for
 # GITHUB_OUTPUT.
 #
-# Automatic pull_request_target runs against a release-<major>.<minor>
-# branch get a dedicated, version-matched cluster (kubevirt-plugin-<major><minor>)
-# instead of silently colliding with main's kubevirt-plugin-ci cluster. Any
-# other base branch, and every workflow_dispatch run, falls back to the
-# provided input (or the repo's long-standing default).
+# Runs against a release-<major>.<minor> base branch get a dedicated,
+# version-matched cluster (kubevirt-plugin-<major><minor>) instead of
+# silently colliding with main's kubevirt-plugin-ci cluster. BASE_REF comes
+# from github.base_ref on pull_request_target, or from the workflow_dispatch
+# base_ref input (forwarded by /retest-e2e for PR retests). Any other base
+# branch, and every workflow_dispatch without a release base_ref, falls
+# back to the provided input (or the repo's long-standing default).
 #
 # test_engine follows the same release-branch detection: release-4.22 and
 # earlier predate the Cypress → Playwright migration on main (see
@@ -17,8 +19,8 @@ set -euo pipefail
 # Playwright-only.
 #
 # Env:
-#   EVENT_NAME              - github.event_name (e.g. pull_request_target, workflow_dispatch)
-#   BASE_REF                - github.base_ref (PR target branch, e.g. release-4.20)
+#   BASE_REF                - PR target branch (e.g. release-4.20), from
+#                             github.base_ref or workflow_dispatch inputs.base_ref
 #   INPUT_CLUSTER_NAME       - workflow_dispatch inputs.cluster_name, if set
 #   INPUT_OPENSHIFT_VERSION  - workflow_dispatch inputs.openshift_version, if set
 #   INPUT_TEST_ENGINE        - workflow_dispatch inputs.test_engine ('auto'/'playwright'/'cypress'), if set
@@ -35,13 +37,12 @@ DEFAULT_TEST_ENGINE="playwright"
 LAST_CYPRESS_MAJOR=4
 LAST_CYPRESS_MINOR=22
 
-EVENT_NAME="${EVENT_NAME:-}"
 BASE_REF="${BASE_REF:-}"
 INPUT_CLUSTER_NAME="${INPUT_CLUSTER_NAME:-}"
 INPUT_OPENSHIFT_VERSION="${INPUT_OPENSHIFT_VERSION:-}"
 INPUT_TEST_ENGINE="${INPUT_TEST_ENGINE:-}"
 
-if [[ "${EVENT_NAME}" == "pull_request_target" && "${BASE_REF}" =~ ^release-([0-9]+)\.([0-9]+)$ ]]; then
+if [[ "${BASE_REF}" =~ ^release-([0-9]+)\.([0-9]+)$ ]]; then
   MAJOR="${BASH_REMATCH[1]}"
   MINOR="${BASH_REMATCH[2]}"
   CLUSTER_NAME="kubevirt-plugin-${MAJOR}${MINOR}"
@@ -61,8 +62,8 @@ else
   TEST_ENGINE="${DEFAULT_TEST_ENGINE}"
 fi
 
-# An explicit, non-'auto' workflow_dispatch override always wins -- there's
-# no reliable base_ref to detect from outside pull_request_target.
+# An explicit, non-'auto' workflow_dispatch override always wins over
+# base_ref auto-detection.
 if [[ -n "${INPUT_TEST_ENGINE}" && "${INPUT_TEST_ENGINE}" != "auto" ]]; then
   TEST_ENGINE="${INPUT_TEST_ENGINE}"
   echo "Overriding test engine from input: '${TEST_ENGINE}'" >&2
