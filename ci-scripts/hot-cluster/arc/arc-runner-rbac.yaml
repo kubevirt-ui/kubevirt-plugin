@@ -60,6 +60,20 @@ rules:
     resources: ['hyperconvergeds']
     verbs: ['get', 'list']
 
+  # --- test-cleanup.sh: delete cluster-scoped test leftovers created under
+  # a fixed "example" name by the Cypress suite's YAML-creation tests.
+  # ci-env-test-runner (bound per-run via a namespaced RoleBinding, see
+  # helm/ci-env-controller/templates/clusterrole-test-runner.yaml) only
+  # covers the namespaced virtualmachineinstancetypes/virtualmachine
+  # preferences kinds -- cluster-scoped resources need a real
+  # ClusterRoleBinding, which only this role has. ---
+  - apiGroups: ['instancetype.kubevirt.io']
+    resources: ['virtualmachineclusterinstancetypes', 'virtualmachineclusterpreferences']
+    verbs: ['get', 'list', 'delete']
+  - apiGroups: ['migrations.kubevirt.io']
+    resources: ['migrationpolicies']
+    verbs: ['get', 'list', 'delete']
+
   # --- check-runner job: HCO / operator version logging ---
   - apiGroups: ['operators.coreos.com']
     resources: ['clusterserviceversions']
