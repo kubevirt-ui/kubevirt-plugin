@@ -458,8 +458,20 @@ jobs:
     needs: [cluster-check, resolve-cluster-config]
     # cluster-check now always runs (see comment above it) and quickly
     # reports 'success' even as a no-op, so gate on the actual readiness
-    # output rather than the job result.
-    if: github.event_name == 'workflow_dispatch' && needs.cluster-check.outputs.cluster_ready == 'true'
+    # output rather than the job result. always() is required despite that:
+    # a job's own custom `if:` is implicitly ANDed with success() unless it
+    # already includes a status-check function (documented GitHub Actions
+    # behavior, see actions/runner#491) -- and success() here needs
+    # cluster-check's own aggregate status, which reads as non-'success'
+    # whenever its internal provision job was skipped (cluster already
+    # existed), even though cluster-check's own cluster_ready OUTPUT is
+    # correctly 'true' in that exact case. Without always(), this job (and
+    # everything that needs it, i.e. run-e2e-tests) silently skips even
+    # though the cluster is genuinely ready -- confirmed live: dispatching
+    # against an existing cluster from hot-cluster-e2e.yml's own
+    # workflow_dispatch (CNV-92682 follow-up). run-e2e-tests below already
+    # guards against this same gotcha with its own always().
+    if: always() && github.event_name == 'workflow_dispatch' && needs.cluster-check.outputs.cluster_ready == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     env:

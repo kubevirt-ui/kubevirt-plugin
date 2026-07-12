@@ -647,6 +647,17 @@ jobs:
           ./ci-scripts/hot-cluster/arc/install-arc-controller.sh
           ./ci-scripts/hot-cluster/arc/install-runner-scale-set.sh
 
+      - name: Bootstrap manual-console RBAC
+        # Optional feature (CNV-92150) -- unlike ARC/ci-env-controller above,
+        # E2E does not depend on this. continue-on-error so a hiccup here
+        # never fails the (multi-hour) cluster provisioning job; GitHub
+        # Actions still surfaces a warning annotation on failure.
+        continue-on-error: true
+        env:
+          RUNNER_SCALE_SET_NAME: ${{ env.CLUSTER_NAME }}
+        run: |
+          ./ci-scripts/manual-console/install-manual-console-rbac.sh
+
       - name: Install CI environment controller
         env:
           RUNNER_SCALE_SET_NAME: ${{ env.CLUSTER_NAME }}
