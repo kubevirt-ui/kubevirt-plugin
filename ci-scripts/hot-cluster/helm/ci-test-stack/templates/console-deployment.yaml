@@ -75,7 +75,7 @@ spec:
 
             # Customization settings
             - name: BRIDGE_USER_SETTINGS_LOCATION
-              value: "localstorage"
+              value: {{ .Values.console.userSettingsLocation | default "localstorage" | quote }}
 
             # Plugins
             - name: BRIDGE_PLUGINS

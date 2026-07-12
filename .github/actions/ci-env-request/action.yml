@@ -19,6 +19,17 @@ inputs:
   timeout:
     description: Max seconds to wait for environment to become ready
     default: '360'
+  user-settings-location:
+    description: |
+      Optional override for the console's BRIDGE_USER_SETTINGS_LOCATION
+      ("configmap" or "localstorage"). Leave empty (default) to keep the
+      ci-test-stack chart's own default (localstorage) -- e.g. Playwright's
+      seedGuidedTourState() relies on that default and would silently stop
+      working if this were changed globally. Only set to "configmap" for
+      callers (e.g. Cypress) that need CI to seed user-settings server-side
+      before the browser ever loads the console.
+    required: false
+    default: ''
 
 outputs:
   bridge-base-address:
@@ -46,6 +57,7 @@ runs:
           desired-state: "present"
           plugin-image: "${{ inputs.plugin-image }}"
           test-namespace: "${{ inputs.test-namespace }}"
+          user-settings-location: "${{ inputs.user-settings-location }}"
         EOF
         echo "Created trigger ConfigMap ${{ inputs.configmap-name }} in ${{ inputs.ci-env-namespace }}"
 

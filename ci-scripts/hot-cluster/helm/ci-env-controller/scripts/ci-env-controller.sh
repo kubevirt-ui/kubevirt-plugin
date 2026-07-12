@@ -18,6 +18,14 @@
 #                          container; only invoked when a ConfigMap sets
 #                          auth-mode=openshift (default:
 #                          /opt/ci-env/manual-console/ensure-manual-console-user.sh)
+#
+# Trigger ConfigMap data field (per-request, optional):
+#   user-settings-location  Overrides the console's BRIDGE_USER_SETTINGS_LOCATION
+#                            ("configmap" or "localstorage"). Empty (every
+#                            existing caller except Cypress E2E) keeps the
+#                            ci-test-stack chart's own default -- see
+#                            provision()'s own comment for why this must
+#                            stay opt-in.
 
 set -uo pipefail
 
@@ -190,6 +198,7 @@ provision() {
   local auth_mode="${6:-disabled}"
   local htpasswd_user="${7:-}"
   local htpasswd_secret_name="${8:-}"
+  local user_settings_location="${9:-}"
 
   local helm_release="${helm_release_override:-${cm_name}}"
 
@@ -221,6 +230,27 @@ provision() {
     fi
     extra_helm_args+=(--set "console.auth.mode=openshift")
     extra_helm_args+=(--set-file "console.auth.caCert=${MANUAL_AUTH_CA_CERT_FILE}")
+  fi
+
+  # Opt-in only: empty (every existing caller except Cypress E2E) means
+  # "don't override" -- the chart's own default (localstorage) applies, so
+  # this never changes behavior for callers that don't explicitly ask for
+  # it. Playwright's seedGuidedTourState() (browser localStorage) and
+  # manual-console both rely on that default; only flip this to "configmap"
+  # for a caller that also seeds server-side user-settings state to match
+  # (see hot-cluster-e2e-run.yml's "Seed kubevirt-user-settings ConfigMap"
+  # step) -- confirmed live: release-4.20 Cypress's before-all hook blocked
+  # on OpenShift Console's own "Welcome to the new OpenShift experience"
+  # guided-tour modal, which only browser-side localStorage seeding (not
+  # available to a GitHub Actions step) can normally suppress.
+  if [[ -n "${user_settings_location}" ]]; then
+    if [[ "${user_settings_location}" != "configmap" && "${user_settings_location}" != "localstorage" ]]; then
+      local err="invalid user-settings-location '${user_settings_location}' (must be 'configmap' or 'localstorage')"
+      log "ERROR: ${err}"
+      patch_cm "${cm_name}" "{\"data\":{\"status\":\"error\",\"error-message\":\"${err}\"}}"
+      return 1
+    fi
+    extra_helm_args+=(--set "console.userSettingsLocation=${user_settings_location}")
   fi
 
   log "Running helm upgrade --install ${helm_release}..."
@@ -281,7 +311,14 @@ provision() {
   log "Waiting for plugin bundle at ${plugin_base}..."
   local plugin_ready=false
   for i in $(seq 1 60); do
-    if curl -s "${plugin_base}/plugin-manifest.json" 2>/dev/null | grep -q '"name"'; then
+    # --max-time bounds each individual attempt so a hung connection can't
+    # stall past the 5-minute retry budget below; --fail rejects HTTP error
+    # responses (e.g. a 503 from a not-yet-ready backend) instead of
+    # treating any response body as success. jq validates the body is
+    # actually the plugin manifest (a non-empty "name" field), not just any
+    # JSON-ish text that happens to contain the substring "name".
+    if curl -s --max-time 5 --fail "${plugin_base}/plugin-manifest.json" 2>/dev/null \
+      | jq -e '(.name // "") | length > 0' &>/dev/null; then
       plugin_ready=true
       break
     fi
@@ -326,7 +363,7 @@ reconcile_one() {
   local cm_json="$1"
 
   local cm_name desired status plugin_image test_ns console_image helm_release
-  local auth_mode htpasswd_user htpasswd_secret_name
+  local auth_mode htpasswd_user htpasswd_secret_name user_settings_location
   cm_name="$(echo "${cm_json}" | jq -r '.metadata.name')"
   desired="$(echo "${cm_json}" | jq -r '.data["desired-state"] // "unknown"')"
   status="$(echo "${cm_json}" | jq -r '.data["status"] // ""')"
@@ -339,6 +376,10 @@ reconcile_one() {
   auth_mode="$(echo "${cm_json}" | jq -r '.data["auth-mode"] // "disabled"')"
   htpasswd_user="$(echo "${cm_json}" | jq -r '.data["htpasswd-user"] // ""')"
   htpasswd_secret_name="$(echo "${cm_json}" | jq -r '.data["htpasswd-secret-name"] // ""')"
+  # Opt-in override (empty for every existing caller, which keeps
+  # provision() on the chart's own default -- see provision()'s own comment
+  # for why this must never change unconditionally for every caller.
+  user_settings_location="$(echo "${cm_json}" | jq -r '.data["user-settings-location"] // ""')"
 
   if [[ "${desired}" == "present" && "${status}" != "ready" && "${status}" != "provisioning" ]]; then
     if [[ -z "${plugin_image}" || -z "${test_ns}" ]]; then
@@ -347,7 +388,7 @@ reconcile_one() {
       return
     fi
     if ! provision "${cm_name}" "${plugin_image}" "${test_ns}" "${console_image}" "${helm_release}" \
-      "${auth_mode}" "${htpasswd_user}" "${htpasswd_secret_name}"; then
+      "${auth_mode}" "${htpasswd_user}" "${htpasswd_secret_name}" "${user_settings_location}"; then
       log "ERROR: provision failed for ${cm_name}, ensuring status=error"
       local cur_status
       cur_status="$(oc get configmap "${cm_name}" -n "${CI_ENV_NS}" -o jsonpath='{.data.status}' 2>/dev/null || echo "")"
