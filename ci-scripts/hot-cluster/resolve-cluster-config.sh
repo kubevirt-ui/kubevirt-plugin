@@ -2,7 +2,8 @@
 set -euo pipefail
 
 # Emits cluster_name=..., openshift_version=..., test_engine=...,
-# branch_name=..., and cnv_channel=... for GITHUB_OUTPUT.
+# branch_name=..., cnv_channel=..., and cnv_pin_version=... for
+# GITHUB_OUTPUT.
 #
 # Runs against a release-<major>.<minor> base branch get a dedicated,
 # version-matched cluster (kubevirt-plugin-<major><minor>) instead of
@@ -26,9 +27,23 @@ set -euo pipefail
 # could never resolve an InstallPlan for (confirmed live: cluster
 # provisioning hung for 10+ minutes then failed outright). Actually
 # version-pinning old CNV releases would need startingCSV + Manual
-# approval on the Subscription, not a differently-named channel -- out of
-# scope here; INPUT_CNV_CHANNEL below remains available as an explicit
-# override for anyone who wants to try that separately.
+# approval on the Subscription, not a differently-named channel --
+# INPUT_CNV_CHANNEL below remains available as an explicit override for
+# anyone who wants to try a different channel directly.
+#
+# cnv_pin_version carries that startingCSV pinning: for a release branch,
+# it resolves to "<major>.<minor>" (e.g. "4.20") -- install-hco.sh queries
+# the live PackageManifest for the 'stable' channel's newest CSV whose
+# version starts with that prefix, and pins the Subscription to it via
+# startingCSV + installPlanApproval: Manual. If that version can't be
+# found (e.g. pruned from the channel's entry graph), install-hco.sh fails
+# the build rather than silently falling back to the latest 'stable' head
+# -- installing an unexpectedly newer CNV than requested could make a
+# release branch's CI pass against the wrong product version unnoticed.
+# INPUT_CNV_CHANNEL below remains the explicit escape hatch for anyone who
+# wants to deliberately install unpinned instead. Left empty for
+# main/default/workflow_dispatch, which keep installing whatever 'stable'
+# currently resolves to, same as before.
 #
 # Env:
 #   BASE_REF                - PR target branch (e.g. release-4.20), from
@@ -63,7 +78,8 @@ if [[ "${BASE_REF}" =~ ^release-([0-9]+)\.([0-9]+)$ ]]; then
   CLUSTER_NAME="kubevirt-plugin-${MAJOR}${MINOR}"
   OPENSHIFT_VERSION="${MAJOR}.${MINOR}_openshift"
   CNV_CHANNEL="${DEFAULT_CNV_CHANNEL}"
-  echo "Base branch '${BASE_REF}' is a release branch → cluster '${CLUSTER_NAME}' (${OPENSHIFT_VERSION}, CNV channel '${CNV_CHANNEL}')" >&2
+  CNV_PIN_VERSION="${MAJOR}.${MINOR}"
+  echo "Base branch '${BASE_REF}' is a release branch → cluster '${CLUSTER_NAME}' (${OPENSHIFT_VERSION}, CNV channel '${CNV_CHANNEL}', pinned to CNV ${CNV_PIN_VERSION}.x)" >&2
 
   if (( MAJOR * 1000 + MINOR <= LAST_CYPRESS_MAJOR * 1000 + LAST_CYPRESS_MINOR )); then
     TEST_ENGINE="cypress"
@@ -75,6 +91,7 @@ else
   CLUSTER_NAME="${INPUT_CLUSTER_NAME:-${DEFAULT_CLUSTER_NAME}}"
   OPENSHIFT_VERSION="${INPUT_OPENSHIFT_VERSION:-${DEFAULT_OPENSHIFT_VERSION}}"
   CNV_CHANNEL="${DEFAULT_CNV_CHANNEL}"
+  CNV_PIN_VERSION=""
   echo "Using default/workflow_dispatch cluster config: '${CLUSTER_NAME}' (${OPENSHIFT_VERSION}, CNV channel '${CNV_CHANNEL}')" >&2
   TEST_ENGINE="${DEFAULT_TEST_ENGINE}"
 fi
@@ -91,13 +108,15 @@ fi
 # Manual approval for an older CSV -- not versioned channel names).
 if [[ -n "${INPUT_CNV_CHANNEL}" ]]; then
   CNV_CHANNEL="${INPUT_CNV_CHANNEL}"
-  echo "Overriding CNV channel from input: '${CNV_CHANNEL}'" >&2
+  CNV_PIN_VERSION=""
+  echo "Overriding CNV channel from input: '${CNV_CHANNEL}' (clearing auto-pinned CNV version -- an explicit channel override takes full manual control)" >&2
 fi
 
 echo "cluster_name=${CLUSTER_NAME}"
 echo "openshift_version=${OPENSHIFT_VERSION}"
 echo "test_engine=${TEST_ENGINE}"
 echo "cnv_channel=${CNV_CHANNEL}"
+echo "cnv_pin_version=${CNV_PIN_VERSION}"
 # Raw resolved base branch (e.g. "main", "release-4.20"), or empty when
 # there's none (plain workflow_dispatch with no PR context) -- callers
 # combine this with a ref_name fallback for display purposes (e.g. the

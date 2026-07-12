@@ -47,6 +47,19 @@ on:
         type: string
         required: false
         default: 'stable'
+      cnv_pin_version:
+        description: |
+          "<major>.<minor>" to pin CNV to the newest matching CSV within
+          cnv_channel via startingCSV (e.g. for a release branch under
+          test); empty installs whatever cnv_channel currently resolves to.
+          If provisioning happens and no matching CSV can be found for this
+          version, the build fails rather than silently installing an
+          unpinned/newer CNV -- pass an explicit cnv_channel instead to
+          install unpinned deliberately. Forwarded as-is to
+          ibmc-cluster-setup.yml.
+        type: string
+        required: false
+        default: ''
       worker_flavor:
         description: Worker node flavor
         type: string
@@ -136,6 +149,7 @@ jobs:
       openshift_version: ${{ inputs.openshift_version }}
       branch_name: ${{ inputs.branch_name }}
       cnv_channel: ${{ inputs.cnv_channel }}
+      cnv_pin_version: ${{ inputs.cnv_pin_version }}
       worker_flavor: ${{ inputs.worker_flavor }}
       worker_count: ${{ inputs.worker_count }}
       # kvm_emulation is declared as a string here (matching workflow_call's

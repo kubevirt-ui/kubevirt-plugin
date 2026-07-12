@@ -1,5 +1,5 @@
 name: Hot Cluster E2E
-run-name: "Hot Cluster E2E [${{ inputs.cluster_name || github.base_ref || 'kubevirt-plugin-ci' }}] @ ${{ inputs.pr_number != '' && format('PR#{0} retest', inputs.pr_number) || github.head_ref || github.ref_name }}"
+run-name: "Hot Cluster E2E [${{ inputs.base_ref || inputs.cluster_name || github.base_ref || 'kubevirt-plugin-ci' }}] @ ${{ inputs.pr_number != '' && format('PR#{0} retest', inputs.pr_number) || github.head_ref || github.ref_name }}"
 
 on:
   pull_request_target:
@@ -58,7 +58,11 @@ on:
         description: |
           Explicit CNV OLM subscription channel override for provisioning.
           Leave empty to use the resolver default (catalog unversioned
-          'stable'). There is no automatic per-branch channel selection.
+          'stable'). There is no automatic per-branch channel selection --
+          but a release branch DOES get an automatic per-branch startingCSV
+          pin within that channel (see resolve-cluster-config.sh). Setting
+          this to any explicit value (even 'stable') clears that pin, e.g.
+          to deliberately install unpinned if the pin can't be resolved.
         required: false
         default: ''
         type: string
@@ -141,6 +145,7 @@ jobs:
       test_engine: ${{ steps.resolve.outputs.test_engine }}
       branch_name: ${{ steps.resolve.outputs.branch_name }}
       cnv_channel: ${{ steps.resolve.outputs.cnv_channel }}
+      cnv_pin_version: ${{ steps.resolve.outputs.cnv_pin_version }}
     steps:
       # persist-credentials: false -- this job only reads files to resolve
       # cluster config, it never pushes, so there's no reason to leave
@@ -353,6 +358,7 @@ jobs:
         uses: actions/github-script@v9
         env:
           RESOLVED_HEAD_SHA: ${{ needs.resolve-pr-context.outputs.head_sha }}
+          PR_NUMBER: ${{ inputs.pr_number }}
         with:
           script: |
             // pull_request_target's github.sha/context.sha is the BASE
@@ -370,6 +376,16 @@ jobs:
             const isIrrelevantLabel = context.payload.action === 'labeled'
               && context.payload.label?.name !== 'ok-to-test';
 
+            // A bare workflow_dispatch with no pr_number doesn't represent
+            // any specific PR -- if dispatched against a branch/SHA that
+            // happens to also have an open PR (e.g. ad-hoc manual testing
+            // on a feature branch, confirmed live on CNV-92682/PR #4293),
+            // posting under the same context as the real PR-driven status
+            // would collide with (and, per GitHub's "most recent wins"
+            // display behavior, obscure) that PR's own genuine result --
+            // same reasoning as isIrrelevantLabel below.
+            const isAdHocDispatch = context.eventName === 'workflow_dispatch' && !process.env.PR_NUMBER;
+
             // A distinct context for no-op runs prevents them from posting
             // a same-context, same-SHA status that could collide with (and,
             // per GitHub's "most recent wins" display behavior, obscure) an
@@ -378,7 +394,9 @@ jobs:
             // "Run Gating Tests" on verify-gating-tests below.
             const statusContext = isIrrelevantLabel
               ? 'Hot Cluster E2E Progress (skipped - irrelevant label event)'
-              : 'Hot Cluster E2E Progress';
+              : isAdHocDispatch
+                ? 'Hot Cluster E2E Progress (manual dispatch)'
+                : 'Hot Cluster E2E Progress';
 
             await github.rest.repos.createCommitStatus({
               owner: context.repo.owner,
@@ -416,6 +434,10 @@ jobs:
       # Optional workflow_dispatch cnv_channel overrides that default.
       # See resolve-cluster-config.sh for the full rationale.
       cnv_channel: ${{ needs.resolve-cluster-config.outputs.cnv_channel }}
+      # Empty for main/default; "<major>.<minor>" for a release branch --
+      # ibmc-cluster-setup.yml resolves this to a pinned startingCSV within
+      # cnv_channel. See resolve-cluster-config.sh for the full rationale.
+      cnv_pin_version: ${{ needs.resolve-cluster-config.outputs.cnv_pin_version }}
       # The resolved base branch (main/release-4.X) for pull_request_target
       # and /retest-e2e's forwarded base_ref; falls back to whatever ref
       # this run itself is on for a plain workflow_dispatch with no PR
@@ -436,8 +458,20 @@ jobs:
     needs: [cluster-check, resolve-cluster-config]
     # cluster-check now always runs (see comment above it) and quickly
     # reports 'success' even as a no-op, so gate on the actual readiness
-    # output rather than the job result.
-    if: github.event_name == 'workflow_dispatch' && needs.cluster-check.outputs.cluster_ready == 'true'
+    # output rather than the job result. always() is required despite that:
+    # a job's own custom `if:` is implicitly ANDed with success() unless it
+    # already includes a status-check function (documented GitHub Actions
+    # behavior, see actions/runner#491) -- and success() here needs
+    # cluster-check's own aggregate status, which reads as non-'success'
+    # whenever its internal provision job was skipped (cluster already
+    # existed), even though cluster-check's own cluster_ready OUTPUT is
+    # correctly 'true' in that exact case. Without always(), this job (and
+    # everything that needs it, i.e. run-e2e-tests) silently skips even
+    # though the cluster is genuinely ready -- confirmed live: dispatching
+    # against an existing cluster from hot-cluster-e2e.yml's own
+    # workflow_dispatch (CNV-92682 follow-up). run-e2e-tests below already
+    # guards against this same gotcha with its own always().
+    if: always() && github.event_name == 'workflow_dispatch' && needs.cluster-check.outputs.cluster_ready == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     env:
@@ -532,6 +566,7 @@ jobs:
         uses: actions/github-script@v9
         env:
           RESOLVED_HEAD_SHA: ${{ needs.resolve-pr-context.outputs.head_sha }}
+          PR_NUMBER: ${{ inputs.pr_number }}
         with:
           script: |
             const isIrrelevantLabel = context.payload.action === 'labeled'
@@ -542,10 +577,16 @@ jobs:
             }
 
             // See progress-check-start above for why the pr_number retest
-            // path also needs resolve-pr-context's head SHA here.
+            // path also needs resolve-pr-context's head SHA here, and for
+            // why a bare ad-hoc dispatch needs its own distinct context.
             const headSha = context.eventName === 'pull_request_target'
               ? context.payload.pull_request.head.sha
               : (process.env.RESOLVED_HEAD_SHA || context.sha);
+
+            const isAdHocDispatch = context.eventName === 'workflow_dispatch' && !process.env.PR_NUMBER;
+            const statusContext = isAdHocDispatch
+              ? 'Hot Cluster E2E Progress (manual dispatch)'
+              : 'Hot Cluster E2E Progress';
 
             // cluster-health-check only ever runs for workflow_dispatch (its
             // own `if:` skips it otherwise) -- branch on event type here,
@@ -561,7 +602,7 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               sha: headSha,
-              context: 'Hot Cluster E2E Progress',
+              context: statusContext,
               state: clusterReady ? 'pending' : 'failure',
               description: clusterReady
                 ? 'Running gating tests'
@@ -621,11 +662,33 @@ jobs:
       test_engine: ${{ needs.resolve-cluster-config.outputs.test_engine }}
       runner_label: ${{ inputs.runner_label || needs.resolve-cluster-config.outputs.cluster_name }}
       cluster_name: ${{ needs.resolve-cluster-config.outputs.cluster_name }}
-      # Merge the PR with the current base tip instead of testing its head
-      # commit in isolation -- see hot-cluster-e2e-run.yml's checkout_ref
-      # input for why this matters (a plain workflow re-run would otherwise
-      # keep re-testing the same stale commit forever).
-      checkout_ref: ${{ inputs.pr_number != '' && format('refs/pull/{0}/merge', inputs.pr_number) || '' }}
+      # Three cases, in priority order:
+      #   1. pr_number set (merge-pool retest path): merge the PR with the
+      #      current base tip instead of testing its head commit in
+      #      isolation -- see hot-cluster-e2e-run.yml's checkout_ref input
+      #      for why this matters (a plain workflow re-run would otherwise
+      #      keep re-testing the same stale commit forever).
+      #   2. inputs.base_ref set, no pr_number (manual/ /retest-e2e
+      #      release-branch dispatch): build and test that release branch
+      #      itself. Without this, only cluster/engine/CNV-pin selection
+      #      followed base_ref (via resolve-cluster-config's own BASE_REF
+      #      env, fed by this same input) while the actual plugin image and
+      #      test checkout silently fell through to github.ref -- i.e. this
+      #      workflow's own ref (often main) -- so a "release-4.20" dispatch
+      #      could build main's plugin and run Playwright against a
+      #      Cypress-era release cluster/console. Confirmed live: CNV-92682
+      #      follow-up. Deliberately reads inputs.base_ref directly rather
+      #      than resolve-cluster-config's branch_name output -- branch_name
+      #      also carries github.base_ref for ordinary pull_request_target
+      #      runs, where this checkout_ref must stay empty (PR head, not the
+      #      PR's base branch). inputs.base_ref is only ever populated on
+      #      workflow_dispatch, so this case can never fire for a PR event.
+      #   3. Neither set (plain PR / bare dispatch): empty, falls through to
+      #      hot-cluster-e2e-run.yml's own PR-head/github.ref default.
+      checkout_ref: ${{ inputs.pr_number != '' && format('refs/pull/{0}/merge', inputs.pr_number) || inputs.base_ref || '' }}
+      # Always true for this `uses:` call -- see hot-cluster-e2e-run.yml's
+      # is_reusable_call input for why.
+      is_reusable_call: true
     secrets: inherit
 
   # Single source of truth for the "Run Gating Tests" required status check.
@@ -670,7 +733,13 @@ jobs:
   # pending update to land afterwards and permanently strand the progress
   # status as "pending" on an already-finished run.
   verify-gating-tests:
-    name: ${{ (github.event.action != 'labeled' || github.event.label.name == 'ok-to-test') && 'Run Gating Tests' || 'Run Gating Tests (skipped - irrelevant label event)' }}
+    # Bare workflow_dispatch (no pr_number) doesn't represent any specific
+    # PR -- naming it distinctly here (mirroring the irrelevant-label case
+    # below) stops it from colliding with, and obscuring, a real PR's own
+    # "Run Gating Tests" required check for the same SHA when someone
+    # ad-hoc-dispatches this workflow against a branch that also has an
+    # open PR (confirmed live on CNV-92682/PR #4293).
+    name: ${{ (github.event.action != 'labeled' || github.event.label.name == 'ok-to-test') && ((github.event_name == 'workflow_dispatch' && inputs.pr_number == '' && 'Run Gating Tests (manual dispatch)') || 'Run Gating Tests') || 'Run Gating Tests (skipped - irrelevant label event)' }}
     needs:
       [
         check-trust,
@@ -772,6 +841,7 @@ jobs:
         env:
           RESOLVED_HEAD_SHA: ${{ needs.resolve-pr-context.outputs.head_sha }}
           JOB_STATUS: ${{ job.status }}
+          PR_NUMBER: ${{ inputs.pr_number }}
         with:
           script: |
             const isIrrelevantLabel = context.payload.action === 'labeled'
@@ -782,10 +852,16 @@ jobs:
             }
 
             // See progress-check-start above for why the pr_number retest
-            // path also needs resolve-pr-context's head SHA here.
+            // path also needs resolve-pr-context's head SHA here, and for
+            // why a bare ad-hoc dispatch needs its own distinct context.
             const headSha = context.eventName === 'pull_request_target'
               ? context.payload.pull_request.head.sha
               : (process.env.RESOLVED_HEAD_SHA || context.sha);
+
+            const isAdHocDispatch = context.eventName === 'workflow_dispatch' && !process.env.PR_NUMBER;
+            const statusContext = isAdHocDispatch
+              ? 'Hot Cluster E2E Progress (manual dispatch)'
+              : 'Hot Cluster E2E Progress';
 
             const passed = process.env.JOB_STATUS === 'success';
 
@@ -793,7 +869,7 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               sha: headSha,
-              context: 'Hot Cluster E2E Progress',
+              context: statusContext,
               state: passed ? 'success' : 'failure',
               description: passed
                 ? 'Hot cluster gating tests passed'

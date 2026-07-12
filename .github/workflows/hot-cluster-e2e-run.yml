@@ -80,6 +80,20 @@ on:
         type: string
         required: false
         default: ''
+      is_reusable_call:
+        description: |
+          Internal marker set only by hot-cluster-e2e.yml's own `uses:` call
+          -- never available on the workflow_dispatch trigger, so it's
+          reliably false for a standalone dispatch. Distinguishes that case
+          (whose "Run Gating Tests" job would otherwise be a top-level,
+          bare-named check-run that can collide with an unrelated open PR
+          sharing the same SHA -- confirmed live on CNV-92682/PR #4293) from
+          being called via `uses:` (where GitHub already composite-prefixes
+          the check name, e.g. "Run E2E Tests / Run Gating Tests", so no
+          collision is possible regardless of this flag).
+        type: boolean
+        required: false
+        default: false
 
 permissions:
   contents: read
@@ -291,7 +305,10 @@ jobs:
           podman push ${KUBEVIRT_PLUGIN_IMAGE}
 
   run-gating-tests:
-    name: Run Gating Tests
+    # inputs.is_reusable_call is only ever true when hot-cluster-e2e.yml
+    # calls this workflow via `uses:` -- see that input's own description
+    # for why a standalone dispatch needs a distinctly-named check here.
+    name: ${{ inputs.is_reusable_call && 'Run Gating Tests' || 'Run Gating Tests (standalone dispatch)' }}
     needs: [check-runner, build-kubevirt-plugin-image]
     runs-on: ${{ inputs.runner_label || 'kubevirt-plugin-ci' }}
     timeout-minutes: 120
@@ -329,6 +346,16 @@ jobs:
           test-namespace: ${{ env.TEST_NS }}
           configmap-name: ${{ env.CI_ENV_CM }}
           ci-env-namespace: ${{ env.CI_ENV_NS }}
+          # configmap only for Cypress: its before-all hook has no way to
+          # dismiss OpenShift Console's own "Welcome to the new OpenShift
+          # experience" guided-tour modal (unlike Playwright, which already
+          # seeds tour-completion into browser localStorage via
+          # seedGuidedTourState() -- see playwright/pages/LoginPage.ts).
+          # Left empty for Playwright so its console keeps the chart's
+          # default (localstorage) and that existing seeding keeps working
+          # unchanged. See the "Seed kubevirt-user-settings ConfigMap" step
+          # below for the matching server-side seed.
+          user-settings-location: ${{ env.TEST_ENGINE == 'cypress' && 'configmap' || '' }}
 
       - name: Create test secret
         run: |
@@ -362,6 +389,32 @@ jobs:
 
           oc patch configmap kubevirt-ui-features -n "${CNV_NS}" --type=merge \
             --patch '{"data":{"advancedSearch":"true","treeViewFolders":"true"}}'
+
+          # Only meaningful when TEST_ENGINE=cypress (see "Provision CI test
+          # environment" step above, which only sets user-settings-location=
+          # configmap for that engine) -- Playwright's console stays on
+          # localstorage and keeps working via its own browser-side
+          # seedGuidedTourState(), so this ConfigMap wouldn't even be read
+          # for a Playwright run. Seeds core OpenShift Console's own
+          # guided-tour completion state so the "Welcome to the new
+          # OpenShift experience" intro modal (a core console feature, not
+          # kubevirt-plugin's own onboarding above) never blocks the very
+          # first Cypress test. Mirrors playwright/pages/LoginPage.ts's
+          # seedGuidedTourState(), adapted for configmap instead of
+          # localStorage. ConfigMap name convention (user-settings-<uid>)
+          # per openshift/console's getConfigMapName() -- verify live if
+          # this ever silently stops working, since the naming convention
+          # has evolved across console versions.
+          if [[ "${TEST_ENGINE}" == "cypress" && -n "${SA_UID}" ]]; then
+            GUIDED_TOUR='{"admin":{"completed":true},"dev":{"completed":true},"virtualization-perspective":{"completed":true}}'
+            CONSOLE_CM_NAME="user-settings-${SA_UID}"
+
+            if ! oc get configmap "${CONSOLE_CM_NAME}" -n openshift-console-user-settings &>/dev/null; then
+              oc create configmap "${CONSOLE_CM_NAME}" -n openshift-console-user-settings
+            fi
+            oc patch configmap "${CONSOLE_CM_NAME}" -n openshift-console-user-settings \
+              --type merge -p "$(jq -cn --arg v "${GUIDED_TOUR}" '{data: {"console.guidedTour": $v}}')"
+          fi
 
       - name: Install dependencies
         run: |

@@ -11,12 +11,21 @@ run-name: 'Deploy Plugin [${{ inputs.cluster_name }}] @ ${{ inputs.branch }}'
 # Prerequisites: same as deploy-manual-console.yml -- the target cluster must
 # already be provisioned, and a manual console should already exist (though
 # this workflow works standalone too, it will just deploy fresh).
+#
+# Dispatch ref matters, same as deploy-manual-console.yml: dispatch this
+# workflow itself from main (or another ref carrying current
+# ci-scripts/manual-console/) even when "branch" below points at an old
+# release branch -- the "Checkout workflow scripts" step has no ref:
+# override, so it always uses whatever ref you pick in the dispatch UI.
 
 on:
   workflow_dispatch:
     inputs:
       branch:
-        description: Git branch or ref to build the kubevirt-plugin image from
+        description: >-
+          Git branch or ref to build the kubevirt-plugin image from (can be
+          an old release branch). Dispatch this workflow itself from
+          main/current -- see the header comment.
         required: true
         default: main
         type: string
@@ -45,10 +54,26 @@ jobs:
     runs-on: ${{ inputs.cluster_name }}
     timeout-minutes: 20
     steps:
-      - name: Checkout
+      # Two checkouts, deliberately kept separate -- see
+      # deploy-manual-console.yml's equivalent checkout steps for the full
+      # rationale (CNV-92682 follow-up: building main's plugin against an
+      # older release branch's console caused "Failed to load scripts of
+      # plugin kubevirt-plugin" in the browser).
+      #   1. This repo's own dispatch ref into $GITHUB_WORKSPACE, for CI
+      #      scripts (e.g. setup-plugin-image.sh) that may not exist on
+      #      inputs.branch.
+      #   2. inputs.branch itself into plugin-src/, used only as
+      #      setup-plugin-image.sh's BUILD_DIR below.
+      - name: Checkout workflow scripts
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Checkout plugin source
         uses: actions/checkout@v7
         with:
           ref: ${{ inputs.branch }}
+          path: plugin-src
           persist-credentials: false
 
       - name: Build kubevirt-plugin image in-cluster
@@ -56,6 +81,10 @@ jobs:
         run: |
           NS="${MANUAL_CONSOLE_NS}"
           export NS
+          # BUILD_DIR points at the plugin-src/ checkout above, not the
+          # workflow-scripts checkout at $GITHUB_WORKSPACE.
+          BUILD_DIR="${GITHUB_WORKSPACE}/plugin-src"
+          export BUILD_DIR
           OUTPUT_FILE="$(mktemp)"
           bash ci-scripts/manual-console/images/setup-plugin-image.sh | tee "${OUTPUT_FILE}"
           IMAGE_REF="$(grep '^IMAGE_REF=' "${OUTPUT_FILE}" | cut -d= -f2-)"
