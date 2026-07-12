@@ -37,6 +37,19 @@ rules:
     resources: ['namespaces']
     verbs: ['get', 'list', 'create', 'delete']
 
+  # --- hot-cluster-e2e-run.yml's "Seed kubevirt-user-settings ConfigMap"
+  # step: `oc get sa <test-env-console-sa> -n <test-ns> -o jsonpath=
+  # '{.metadata.uid}'` to key console/plugin onboarding-suppression
+  # ConfigMaps by that SA's UID. Read-only (get/list; not secrets --
+  # ServiceAccount objects don't carry their own token, so this doesn't
+  # expose credentials) -- without it, that lookup 403's, is silently
+  # swallowed by the script's `2>/dev/null || true` fallback, and SA_UID
+  # is always empty (confirmed live: every dispatch to date fell back to
+  # the sanitized-name key only, never the UID key -- CNV-92682 follow-up).
+  - apiGroups: ['']
+    resources: ['serviceaccounts']
+    verbs: ['get', 'list']
+
   # --- deploy-manual-console.yml's setup-plugin-image.sh: idempotent re-apply
   # of its one long-lived "manual-console" namespace. Only the very first
   # run hits the create path above; every later run needs to patch the
