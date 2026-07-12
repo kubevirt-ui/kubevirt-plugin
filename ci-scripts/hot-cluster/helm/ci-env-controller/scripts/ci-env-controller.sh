@@ -266,6 +266,35 @@ provision() {
     return 1
   fi
 
+  # The console backend answering HTTP only proves the bridge process is up
+  # -- it says nothing about whether the plugin's own bundle (served by its
+  # own Deployment/Service, per ci-test-stack's plugin.port) is actually
+  # fetchable yet. Every E2E run gets a brand-new plugin pod scoped to this
+  # run's ID, so this is a cold start every single time regardless of how
+  # long the underlying cluster has existed -- without this check, tests can
+  # start clicking around the console while it's still showing a loading
+  # overlay for the not-yet-servable Virtualization perspective, which
+  # cascades into a total suite failure on suites without per-test isolation
+  # (confirmed live: release-4.20 Cypress, 0/37 passing, root cause traced to
+  # exactly this race).
+  local plugin_base="http://${helm_release}-plugin.${test_ns}.svc.cluster.local:9080"
+  log "Waiting for plugin bundle at ${plugin_base}..."
+  local plugin_ready=false
+  for i in $(seq 1 60); do
+    if curl -s "${plugin_base}/plugin-manifest.json" 2>/dev/null | grep -q '"name"'; then
+      plugin_ready=true
+      break
+    fi
+    sleep 5
+  done
+
+  if [[ "${plugin_ready}" != "true" ]]; then
+    local err="plugin bundle did not become ready within 5 minutes"
+    log "ERROR: ${err}"
+    patch_cm "${cm_name}" "{\"data\":{\"status\":\"error\",\"error-message\":\"${err}\"}}"
+    return 1
+  fi
+
   local console_route="https://${route_host}"
   log "Environment ready: bridge=${bridge_base} route=${console_route}"
   patch_cm "${cm_name}" "{\"data\":{\"status\":\"ready\",\"bridge-base-address\":\"${bridge_base}\",\"console-route\":\"${console_route}\"}}"
