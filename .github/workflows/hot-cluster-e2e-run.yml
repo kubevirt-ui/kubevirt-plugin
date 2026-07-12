@@ -462,6 +462,19 @@ jobs:
             export CYPRESS_OS_IMAGES_NS="${OS_IMAGES_NS}"
             export CYPRESS_CNV_NS="${CNV_NS}"
             export CYPRESS_TEST_SECRET_NAME="${TEST_SECRET_NAME}"
+
+            # release-4.20/4.21's cy.patchVM/cy.stopVM (support/
+            # commands.ts) run `oc patch virtualmachine <name>` with no
+            # -n flag at all, relying on the runner's current oc context
+            # namespace (release-4.22 passes -n explicitly, so this is a
+            # no-op there). That context otherwise points wherever the
+            # runner's kubeconfig happens to default (not TEST_NS), so
+            # those bare oc calls 404 even though the VM exists --
+            # confirmed live: the "Create customized VMs..." suite's
+            # `after` hook failed with `virtualmachines.kubevirt.io
+            # "vm-it-custom" not found` (CNV-92682 follow-up). Point the
+            # runner's current project at TEST_NS so they resolve.
+            oc project "${TEST_NS}"
             if [[ "${TEST_PROJECT}" == "features" ]]; then
               npm run test-cypress-headless -- --spec tests/tier1.cy.ts
             else
