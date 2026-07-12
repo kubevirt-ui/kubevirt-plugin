@@ -320,14 +320,23 @@ jobs:
       # layout, so the engine name doubles as the fixtures directory name.
       TEST_ENGINE: ${{ inputs.test_engine || 'playwright' }}
       # Cypress's frozen release-branch test content (predates the
-      # Playwright migration, e.g. cypress/utils/const/index.ts on
-      # release-4.20/release-4.22) hardcodes the test project/namespace
-      # name as the literal string 'auto-test-ns' -- it has no mechanism
-      # to read the dynamic per-run TEST_NS below (CYPRESS_TEST_NS is
-      # exported for it but never consumed). Override TEST_NS to match
-      # for Cypress runs; Playwright keeps the dynamic per-run namespace
-      # from the workflow-level env: above.
+      # Playwright migration) hardcodes fixed resource names that the
+      # dynamic per-run values below can't reach on every branch:
+      #   - release-4.20's cypress/utils/const/index.ts hardcodes
+      #     TEST_NS = 'auto-test-ns' as a literal string -- no mechanism
+      #     to read Cypress.env('TEST_NS') at all (release-4.21/4.22
+      #     already read it dynamically, so this is a no-op override
+      #     for them, not a fix).
+      #   - release-4.20's TEST_SECRET_NAME is likewise hardcoded to
+      #     'auto-test-secret', matching cypress/fixtures/secret.yaml's
+      #     own hardcoded metadata.name (release-4.21/4.22 already read
+      #     Cypress.env('TEST_SECRET_NAME') dynamically).
+      # CYPRESS_TEST_NS/CYPRESS_TEST_SECRET_NAME are exported from these
+      # further down but were never consumed by release-4.20's frozen
+      # code -- override both here to match instead. Playwright keeps
+      # the dynamic per-run values from the workflow-level env: above.
       TEST_NS: ${{ (inputs.test_engine || 'playwright') == 'cypress' && 'auto-test-ns' || format('kubevirt-plugin-ci-test-{0}', github.run_id) }}
+      TEST_SECRET_NAME: ${{ (inputs.test_engine || 'playwright') == 'cypress' && 'auto-test-secret' || 'ci-test-secret' }}
 
     steps:
       # See the build-kubevirt-plugin-image job's Checkout step above --
