@@ -10,12 +10,24 @@ run-name: "Deploy Manual Console [${{ inputs.cluster_name }}] @ ${{ inputs.pr_nu
 # Prerequisites: the target cluster must already be provisioned via
 # "IBM Cloud Hot Cluster Setup" (ibmc-cluster-setup.yml), which installs the
 # ARC runner scale set and the ci-env-controller this workflow depends on.
+#
+# Dispatch ref matters: whichever branch/ref you pick in the "Use workflow
+# from" dropdown (github.ref) is what gets checked out for CI scripts (the
+# "Checkout workflow scripts" step below has no ref: override), separately
+# from "branch"/pr_number below, which only selects the plugin source to
+# build. Dispatch from main (or another branch that carries current
+# ci-scripts/manual-console/) even when deploying an old release branch's
+# plugin -- dispatching from a ref that itself lacks those scripts will fail
+# the same way "branch" pointing at one would.
 
 on:
   workflow_dispatch:
     inputs:
       branch:
-        description: Git branch or ref to build the kubevirt-plugin image from. Ignored when pr_number is set.
+        description: >-
+          Git branch or ref to build the kubevirt-plugin image from (can be
+          an old release branch). Ignored when pr_number is set. Dispatch
+          this workflow itself from main/current -- see the header comment.
         required: true
         default: main
         type: string
@@ -140,11 +152,31 @@ jobs:
     runs-on: ${{ inputs.cluster_name }}
     timeout-minutes: 30
     steps:
-      # allow-unsafe-pr-checkout is not needed here: actions/checkout only
-      # enforces that guard for pull_request_target/workflow_run triggers,
-      # not workflow_dispatch. The OWNERS check above (resolve-pr) is this
-      # workflow's actual trust gate for fork PRs.
-      - name: Checkout
+      # Two checkouts, deliberately kept separate:
+      #   1. This repo's own dispatch ref (default actions/checkout behavior
+      #      with no ref: -- github.ref, i.e. whatever branch was selected
+      #      in the workflow_dispatch UI) into $GITHUB_WORKSPACE, so CI
+      #      scripts here (e.g. ci-scripts/manual-console/images/
+      #      setup-plugin-image.sh, added on main and not present on older
+      #      release branches) always match the workflow YAML that's
+      #      actually running.
+      #   2. The plugin source to actually build -- PR head, or inputs.branch
+      #      (which may be an old release branch lacking those same CI
+      #      scripts) -- into plugin-src/, used only as setup-plugin-
+      #      image.sh's BUILD_DIR below. Building main's plugin against a
+      #      release branch's console previously produced "Failed to load
+      #      scripts of plugin kubevirt-plugin" in the browser (SDK/
+      #      PatternFly version skew) -- confirmed live, CNV-92682 follow-up.
+      # allow-unsafe-pr-checkout is not needed for either: actions/checkout
+      # only enforces that guard for pull_request_target/workflow_run
+      # triggers, not workflow_dispatch. The OWNERS check above (resolve-pr)
+      # is this workflow's actual trust gate for fork PRs.
+      - name: Checkout workflow scripts
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Checkout plugin source
         uses: actions/checkout@v7
         with:
           # Falls back to the default repository (github.repository, actions/
@@ -155,6 +187,7 @@ jobs:
           # the '(source repository deleted)' sentinel as a repository name.
           repository: ${{ (needs.resolve-pr.outputs.head_repo != '' && needs.resolve-pr.outputs.head_repo != '(source repository deleted)') && needs.resolve-pr.outputs.head_repo || github.repository }}
           ref: ${{ needs.resolve-pr.outputs.head_sha || inputs.branch }}
+          path: plugin-src
           persist-credentials: false
 
       - name: Log environment summary
@@ -185,6 +218,11 @@ jobs:
         run: |
           NS="${MANUAL_CONSOLE_NS}"
           export NS
+          # BUILD_DIR points at the plugin-src/ checkout above, not the
+          # workflow-scripts checkout at $GITHUB_WORKSPACE -- see that
+          # checkout step's comment for why these must stay separate.
+          BUILD_DIR="${GITHUB_WORKSPACE}/plugin-src"
+          export BUILD_DIR
           OUTPUT_FILE="$(mktemp)"
           bash ci-scripts/manual-console/images/setup-plugin-image.sh | tee "${OUTPUT_FILE}"
           IMAGE_REF="$(grep '^IMAGE_REF=' "${OUTPUT_FILE}" | cut -d= -f2-)"

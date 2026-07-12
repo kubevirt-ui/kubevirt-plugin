@@ -36,14 +36,17 @@ permission out of the cluster-wide E2E RBAC, so it's granted separately and
 scoped to just this namespace:
 
 ```bash
-oc create namespace manual-console --dry-run=client -o yaml | oc apply -f -
-oc apply -f ci-scripts/manual-console/manual-console-rbac.yaml
+./ci-scripts/manual-console/install-manual-console-rbac.sh
 ```
 
-If your cluster uses a custom `RUNNER_SCALE_SET_NAME` or `ARC_RUNNERS_NS` (see
-[`arc/README.md`](../hot-cluster/arc/README.md)), edit the `ServiceAccount`
-subject in `manual-console-rbac.yaml` first -- it hardcodes the default
-`kubevirt-plugin-ci-gha-rs-no-permission` / `arc-runners`.
+Set `RUNNER_SCALE_SET_NAME` / `ARC_RUNNERS_NS` first if your cluster uses a
+custom runner scale set name (see [`arc/README.md`](../hot-cluster/arc/README.md))
+-- the script substitutes the `ServiceAccount` subject in
+`manual-console-rbac.yaml` for you (default `kubevirt-plugin-ci`, e.g.
+`RUNNER_SCALE_SET_NAME=kubevirt-plugin-420` for that release cluster). Do
+not `oc apply -f manual-console-rbac.yaml` directly unless your runner
+scale set is actually named `kubevirt-plugin-ci` -- the raw manifest's
+subject never matches a release cluster's runner SA.
 
 ## Deploying
 
@@ -135,11 +138,12 @@ TTL reaper** that force-cleans stale E2E environments.
 
 ## Files
 
-| File                            | Purpose                                                                                                                                         |
-| ------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| `images/setup-plugin-image.sh`  | Builds the kubevirt-plugin image in-cluster via an OpenShift BuildConfig                                                                        |
-| `ensure-manual-console-user.sh` | Upserts the htpasswd user + extracts the cluster CA bundle; invoked by `ci-env-controller` (embedded into its image -- see below)               |
-| `manual-console-rbac.yaml`      | One-time, per-cluster Role/RoleBinding granting the ARC runner SA ImageStream/BuildConfig access, scoped to the `manual-console` namespace only |
+| File                             | Purpose                                                                                                                                         |
+| -------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| `images/setup-plugin-image.sh`   | Builds the kubevirt-plugin image in-cluster via an OpenShift BuildConfig                                                                        |
+| `ensure-manual-console-user.sh`  | Upserts the htpasswd user + extracts the cluster CA bundle; invoked by `ci-env-controller` (embedded into its image -- see below)               |
+| `manual-console-rbac.yaml`       | One-time, per-cluster Role/RoleBinding granting the ARC runner SA ImageStream/BuildConfig access, scoped to the `manual-console` namespace only |
+| `install-manual-console-rbac.sh` | Applies `manual-console-rbac.yaml` with the ServiceAccount subject substituted for the cluster's actual runner scale set name                   |
 
 `ensure-manual-console-user.sh` is embedded into the `ci-env-runner` image at
 build time (via a symlink in

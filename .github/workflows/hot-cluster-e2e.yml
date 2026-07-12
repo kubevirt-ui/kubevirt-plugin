@@ -650,11 +650,30 @@ jobs:
       test_engine: ${{ needs.resolve-cluster-config.outputs.test_engine }}
       runner_label: ${{ inputs.runner_label || needs.resolve-cluster-config.outputs.cluster_name }}
       cluster_name: ${{ needs.resolve-cluster-config.outputs.cluster_name }}
-      # Merge the PR with the current base tip instead of testing its head
-      # commit in isolation -- see hot-cluster-e2e-run.yml's checkout_ref
-      # input for why this matters (a plain workflow re-run would otherwise
-      # keep re-testing the same stale commit forever).
-      checkout_ref: ${{ inputs.pr_number != '' && format('refs/pull/{0}/merge', inputs.pr_number) || '' }}
+      # Three cases, in priority order:
+      #   1. pr_number set (merge-pool retest path): merge the PR with the
+      #      current base tip instead of testing its head commit in
+      #      isolation -- see hot-cluster-e2e-run.yml's checkout_ref input
+      #      for why this matters (a plain workflow re-run would otherwise
+      #      keep re-testing the same stale commit forever).
+      #   2. inputs.base_ref set, no pr_number (manual/ /retest-e2e
+      #      release-branch dispatch): build and test that release branch
+      #      itself. Without this, only cluster/engine/CNV-pin selection
+      #      followed base_ref (via resolve-cluster-config's own BASE_REF
+      #      env, fed by this same input) while the actual plugin image and
+      #      test checkout silently fell through to github.ref -- i.e. this
+      #      workflow's own ref (often main) -- so a "release-4.20" dispatch
+      #      could build main's plugin and run Playwright against a
+      #      Cypress-era release cluster/console. Confirmed live: CNV-92682
+      #      follow-up. Deliberately reads inputs.base_ref directly rather
+      #      than resolve-cluster-config's branch_name output -- branch_name
+      #      also carries github.base_ref for ordinary pull_request_target
+      #      runs, where this checkout_ref must stay empty (PR head, not the
+      #      PR's base branch). inputs.base_ref is only ever populated on
+      #      workflow_dispatch, so this case can never fire for a PR event.
+      #   3. Neither set (plain PR / bare dispatch): empty, falls through to
+      #      hot-cluster-e2e-run.yml's own PR-head/github.ref default.
+      checkout_ref: ${{ inputs.pr_number != '' && format('refs/pull/{0}/merge', inputs.pr_number) || inputs.base_ref || '' }}
       # Always true for this `uses:` call -- see hot-cluster-e2e-run.yml's
       # is_reusable_call input for why.
       is_reusable_call: true

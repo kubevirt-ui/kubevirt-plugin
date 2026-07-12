@@ -31,9 +31,28 @@ rules:
     verbs: ['get', 'list']
 
   # --- Playwright test setup: create/delete temporary namespaces ---
+  # Unrestricted (no resourceNames) because these dynamically-named test
+  # namespaces aren't known ahead of time.
   - apiGroups: ['']
     resources: ['namespaces']
     verbs: ['get', 'list', 'create', 'delete']
+
+  # --- deploy-manual-console.yml's setup-plugin-image.sh: idempotent re-apply
+  # of its one long-lived "manual-console" namespace. Only the very first
+  # run hits the create path above; every later run needs to patch the
+  # already-existing object instead (confirmed live: cluster provisioning
+  # succeeded, but a second manual-console deploy 403'd on "cannot patch
+  # resource namespaces" once the object existed -- CNV-92682 follow-up).
+  # This is deliberately its own rule with resourceNames, NOT folded into
+  # the unrestricted rule above -- this ClusterRole is bound cluster-wide
+  # via ClusterRoleBinding below, so an unscoped patch/update on namespaces
+  # would let the runner SA mutate ANY namespace (labels, annotations,
+  # finalizers), including openshift-*. `update` (full PUT) is omitted --
+  # `oc apply`'s 3-way merge only ever issues a PATCH, never a PUT.
+  - apiGroups: ['']
+    resources: ['namespaces']
+    verbs: ['patch']
+    resourceNames: ['manual-console']
   - apiGroups: ['config.openshift.io']
     resources: ['consoles', 'clusterversions', 'ingresses']
     verbs: ['get', 'list']
