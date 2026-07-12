@@ -101,6 +101,26 @@ export default defineConfig({
         ]
       : []),
 
+    // ── Scenario project (new tests, uses global setup/teardown) ─────
+    ...(process.env.USE_SCENARIO_INFRA === 'true'
+      ? [
+          {
+            fullyParallel: false,
+            name: 'scenario',
+            retries: 0,
+            testDir: './playwright/tests/scenario',
+            use: {
+              ...devices['Desktop Chrome'],
+              launchOptions: {
+                args: chromeArgs,
+                headless: !process.env.DEBUG_MODE && !process.env.HEADED,
+              },
+              viewport: { height: 1080, width: 1920 },
+            },
+          },
+        ]
+      : []),
+
     // ── Migration projects (use global setup/teardown) ───────────────
     {
       fullyParallel: true,
