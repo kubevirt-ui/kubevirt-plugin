@@ -69,9 +69,10 @@ const NetworkThresholdSingleSourceChart: FC<NetworkThresholdSingleSourceChartPro
               <CursorVoronoiContainer
                 labelComponent={
                   <ChartLegendTooltip
-                    title={(datum) =>
-                      datum?.x?.getHours() + ':' + String(datum?.x?.getMinutes())?.padStart(2, '0')
-                    }
+                    title={(datum) => {
+                      const x = new Date(datum?.x);
+                      return `${x.getHours()}:${String(x.getMinutes()).padStart(2, '0')}`;
+                    }}
                     legendData={legendData}
                   />
                 }
