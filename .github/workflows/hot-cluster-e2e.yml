@@ -115,7 +115,19 @@ concurrency:
   # the latest, authoritative result. A fully isolated group avoids this
   # entirely: the irrelevant-label run never shares a queue slot with the
   # real one, so it always executes (and skips) immediately.
-  group: ${{ (github.event.action != 'labeled' || github.event.label.name == 'ok-to-test') && format('hot-cluster-e2e-{0}', github.event.pull_request.number || format('{0}-{1}', github.ref, inputs.cluster_name || 'kubevirt-plugin-ci')) || format('hot-cluster-e2e-noop-{0}', github.run_id) }}
+  #
+  # inputs.pr_number (checked before the ref+cluster_name fallback) covers
+  # /retest-e2e and retest-stale-gating.yml's workflow_dispatch retests --
+  # neither passes cluster_name, and workflow_dispatch events never
+  # populate github.event.pull_request.number, so without this every
+  # retest dispatch fell through to the exact same default group
+  # regardless of which PR or cluster it actually targeted. Confirmed
+  # live: PR #4294's retest (main/kubevirt-plugin-ci) was cancelled by an
+  # unrelated PR #4278's retest (release-4.22/kubevirt-plugin-422) landing
+  # in that same shared group minutes later (CNV-92722 follow-up). The two
+  # inputs can never both be set (pull_request_target never carries
+  # workflow_dispatch inputs, and vice versa), so there's no ambiguity.
+  group: ${{ (github.event.action != 'labeled' || github.event.label.name == 'ok-to-test') && format('hot-cluster-e2e-{0}', github.event.pull_request.number || inputs.pr_number || format('{0}-{1}', github.ref, inputs.cluster_name || 'kubevirt-plugin-ci')) || format('hot-cluster-e2e-noop-{0}', github.run_id) }}
   cancel-in-progress: true
 
 env:
