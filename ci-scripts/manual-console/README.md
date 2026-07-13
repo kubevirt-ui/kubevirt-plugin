@@ -1,4 +1,4 @@
-# Manual Console (CNV-92150)
+# Manual Console
 
 Deploys a standalone, OAuth-protected OpenShift console + kubevirt-plugin
 stack on an existing hot cluster, for manually testing branch UI code

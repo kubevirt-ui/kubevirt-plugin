@@ -1,16 +1,11 @@
 name: Post Hot Cluster E2E Progress Status
 description: |
-  Posts (or rewrites) the "Hot Cluster E2E Progress" commit status --
-  the single, always-present, non-required check that narrates which
-  phase the hot-cluster pipeline is currently in. Purely informational,
-  never a substitute for the "Run Gating Tests" required check.
-
-  Uses the Commit Statuses API, not the Checks API: a check-run created
-  via checks.create with the default GITHUB_TOKEN can get auto-assigned to
-  another workflow's check-suite for this SHA (e.g. rendering as
-  "PR Validation / Hot Cluster E2E Progress"), with no way to pin which
-  suite. Commit statuses have no such grouping -- they render under their
-  own bare context name.
+  Posts (or rewrites) the "Hot Cluster E2E Progress" commit status -- the
+  always-present, non-required check narrating pipeline phase. Never a
+  substitute for the "Run Gating Tests" required check. Uses the Commit
+  Statuses API (not Checks API): a Checks-API check-run can get
+  auto-assigned to another workflow's check-suite with no way to pin it;
+  commit statuses always render under their own bare context name.
 
 inputs:
   head-sha:

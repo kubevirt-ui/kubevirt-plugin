@@ -170,12 +170,9 @@ env:
   CONTROL_PLANE_FLAVOR: bx2-4x16
 
 jobs:
-  # Re-probes cluster existence after any concurrency lock a caller might
-  # hold is acquired (e.g. hot-cluster-check.yml's provision job), so that if
-  # another caller already finished building the same cluster_name while
-  # this one was queued, provision-cluster skips instead of racing into a
-  # duplicate build. Also protects plain workflow_dispatch runs, which have
-  # no concurrency/existence-check of their own today.
+  # Re-probes cluster existence after any caller's concurrency lock is
+  # acquired, so a PR queued behind an already-finished build skips
+  # instead of racing into a duplicate one.
   precheck:
     name: Check if Cluster Already Exists
     runs-on: ubuntu-latest
@@ -189,12 +186,8 @@ jobs:
           CLUSTER_NAME: ${{ inputs.cluster_name || 'kubevirt-plugin-ci' }}
           INFRASTRUCTURE_TYPE: ${{ inputs.infrastructure_type || 'ipi' }}
         run: |
-          # The api.<cluster>.<base_domain> DNS hostname is an IPI-only
-          # construct (see configure-kubeconfig.sh) -- ROKS-based vpc/classic
-          # clusters are accessed via `ibmcloud oc cluster config`/`get`
-          # instead, never that hostname. Their existence check already
-          # happens directly inside provision-cluster's own "Check for
-          # existing ROKS cluster" step, so just pass through here.
+          # The api.<cluster>.<base_domain> hostname is IPI-only -- ROKS
+          # existence is checked separately in provision-cluster.
           if [[ "${INFRASTRUCTURE_TYPE}" != "ipi" ]]; then
             echo "already_ready=false" >> "$GITHUB_OUTPUT"
             exit 0
@@ -467,13 +460,8 @@ jobs:
           INSTALL_DIR: ${{ runner.temp }}/ipi-install
           WORKER_COUNT: ${{ inputs.worker_count }}
           WORKER_FLAVOR: ${{ inputs.worker_flavor }}
-          # Needed by the retry-sweep call to cleanup-vpc-resources.sh inside
-          # create-ipi-cluster.sh (see comment there) -- without it, the
-          # script has no way to re-target the CLI off the eu-de account
-          # region set by "Setup IBM Cloud CLI", and would otherwise only
-          # happen to work by relying on the earlier "Clean up stale IPI
-          # resources" step's side effect of leaving the CLI targeted at the
-          # right VPC region.
+          # Needed so create-ipi-cluster.sh's retry-sweep can re-target the
+          # CLI to the right VPC region (not the eu-de account region).
           ZONE: ${{ inputs.zone }}
         run: bash ./ci-scripts/hot-cluster/create-ipi-cluster.sh
 
@@ -648,10 +636,8 @@ jobs:
           ./ci-scripts/hot-cluster/arc/install-runner-scale-set.sh
 
       - name: Bootstrap manual-console RBAC
-        # Optional feature (CNV-92150) -- unlike ARC/ci-env-controller above,
-        # E2E does not depend on this. continue-on-error so a hiccup here
-        # never fails the (multi-hour) cluster provisioning job; GitHub
-        # Actions still surfaces a warning annotation on failure.
+        # Optional feature; E2E does not depend on it. continue-on-error so
+        # a hiccup here never fails the multi-hour provisioning job.
         continue-on-error: true
         env:
           RUNNER_SCALE_SET_NAME: ${{ env.CLUSTER_NAME }}
@@ -716,13 +702,8 @@ jobs:
           ADMIN_PASSWORD: ${{ secrets.CLUSTER_ADMIN_PASSWORD }}
           INSTALL_DIR: ${{ runner.temp }}/ipi-install
           # inputs.branch_name is threaded down from hot-cluster-e2e.yml's
-          # resolve-cluster-config job (main/release-4.X for the
-          # auto-provision chain, or that job's own ref_name fallback for a
-          # plain workflow_dispatch with no PR context) -- see its
-          # branch_name output for the full resolution logic. Falls back to
-          # this run's own ref_name for a direct dispatch of just this
-          # workflow (skipping the chain above entirely, so inputs.branch_name
-          # is left at its default empty string).
+          # prepare job; falls back to this run's own ref_name for a direct
+          # dispatch of just this workflow.
           BRANCH_NAME: ${{ inputs.branch_name || github.ref_name }}
         run: |
           CONSOLE_URL=$(oc get consoles.config.openshift.io cluster -o jsonpath='{.status.consoleURL}' 2>/dev/null || echo "unknown")
@@ -778,11 +759,8 @@ jobs:
             echo "No metadata.json found — no IPI resources to clean up via openshift-install."
           fi
 
-      # openshift-install destroy only runs above if metadata.json exists,
-      # and even then isn't guaranteed to fully clean up (tag-based discovery
-      # can still miss resources, e.g. if Terraform failed partway through
-      # writing state). Run unconditionally as a guaranteed backstop sweep,
-      # regardless of whether the step above found anything to destroy.
+      # Backstop sweep: openshift-install destroy above isn't guaranteed to
+      # fully clean up, so run this unconditionally regardless of it.
       - name: Sweep any remaining VPC resources on failure
         if: always() && inputs.infrastructure_type == 'ipi' && job.status == 'failure'
         env:
@@ -795,12 +773,9 @@ jobs:
         if: always()
         env:
           CNV_PIN_VERSION_REQUESTED: ${{ inputs.cnv_pin_version || 'unpinned' }}
-          # Resolved from the live PackageManifest by install-hco.sh -- distinct
-          # from the requested pin above so this can never look "pinned" when
-          # the pin actually failed. Genuinely unpinned (no pin requested) and
-          # "pin requested but install-hco.sh failed before resolving it" both
-          # show this same empty fallback -- always check job status/logs for
-          # the latter, never infer success from this table alone.
+          # Resolved live by install-hco.sh; distinct from the requested pin
+          # above so a failed pin never looks "pinned" -- check job status
+          # if this shows the fallback text.
           CNV_INSTALLED_CSV: ${{ steps.install_cnv.outputs.starting_csv || 'unpinned, or pin failed -- check job status' }}
         run: |
           echo "## Hot Cluster Setup Summary" >> "$GITHUB_STEP_SUMMARY"

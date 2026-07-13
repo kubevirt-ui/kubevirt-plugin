@@ -2,9 +2,9 @@
 #
 # OpenShift only: create ImageStream + BuildConfig and run a binary Docker build
 # for the kubevirt-plugin image (repo root Dockerfile), for the manual-console
-# deploy path (CNV-92150). This mirrors the ci-env-runner/arc-runner image
-# build scripts but builds the actual plugin from the checked-out branch,
-# instead of a static tool image, so no image tag/registry push is required.
+# deploy path. This mirrors the ci-env-runner/arc-runner image build scripts
+# but builds the actual plugin from the checked-out branch, instead of a
+# static tool image, so no image tag/registry push is required.
 #
 # Output: prints IMAGE_REF= to stdout (and to PLUGIN_IMAGE_FILE if set).
 #

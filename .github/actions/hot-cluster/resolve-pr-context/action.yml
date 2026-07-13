@@ -2,24 +2,12 @@ name: Resolve Hot Cluster PR Context
 description: |
   Looks up a PR's current head SHA, mergeability, merge-pool membership,
   and CI trust, fresh at execution time -- used by the pr_number retest
-  path (merge-pool "real retest" dispatched by retest-stale-gating.yml
-  after main advances, or /retest-e2e's fallback dispatch). Trust IS
-  re-checked here even though the caller may have already checked labels
-  earlier: lgtm/approved are Tide's merge-readiness signal, not a
-  CI-trust signal, and this workflow_dispatch retest path has no
-  pull_request payload for the normal pull_request_target trust gate to
-  apply to.
-
-  Extracted out of hot-cluster-e2e.yml's own former resolve-pr-context job
-  (a job on its own purely because every top-level job becomes its own PR
-  merge-box check-run, always showing as "skipped" for every trigger other
-  than a pr_number retest) so the same lookup can be folded into a single
-  `prepare` job as a conditional step instead. Assumes the caller has
-  already checked out the base branch (so OWNERS reflects the base
-  branch's approvers, not the PR's own branch -- a PR can't add itself to
-  OWNERS to self-approve trust) and that the shared is-merge-pool-pr.cjs
-  module is present on disk. This action does not check out anything
-  itself.
+  path (dispatched by retest-stale-gating.yml after main advances, or
+  /retest-e2e's fallback dispatch). Trust is re-checked here since
+  lgtm/approved are Tide's merge-readiness signal, not a CI-trust signal,
+  and this workflow_dispatch path has no pull_request payload for the
+  normal trust gate. Assumes the caller has already checked out the base
+  branch and that is-merge-pool-pr.cjs is present on disk.
 
 inputs:
   pr-number:

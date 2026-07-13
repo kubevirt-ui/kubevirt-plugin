@@ -1,21 +1,17 @@
 # Grants the ARC runner ServiceAccount just enough permission to build the
-# kubevirt-plugin image in-cluster (CNV-92150), scoped to the manual-console
-# namespace only. arc-runner-rbac.yaml intentionally does NOT grant
-# ImageStream/BuildConfig access cluster-wide (or even namespace-scoped) to
-# keep the E2E path's RBAC surface minimal; this file is additive and only
-# takes effect inside the manual-console namespace.
+# kubevirt-plugin image in-cluster, scoped to the manual-console namespace
+# only. arc-runner-rbac.yaml intentionally does NOT grant this cluster-wide,
+# to keep the E2E path's RBAC surface minimal.
 #
 # Idempotent, one-time bootstrap per cluster. Apply via:
 #   ./ci-scripts/manual-console/install-manual-console-rbac.sh
 #
 # That script substitutes the ServiceAccount subject below from
-# RUNNER_SCALE_SET_NAME / ARC_RUNNERS_NS (same convention as
-# arc-runner-rbac.yaml / install-runner-scale-set.sh) -- do not apply this
-# file directly with `oc apply -f` unless your cluster's runner scale set
-# is actually named "kubevirt-plugin-ci" (the default). A release cluster's
-# runner is named "<RUNNER_SCALE_SET_NAME>-gha-rs-no-permission" (e.g.
-# "kubevirt-plugin-420-gha-rs-no-permission"), which the raw subject below
-# never matches -- confirmed live, CNV-92682 follow-up.
+# RUNNER_SCALE_SET_NAME / ARC_RUNNERS_NS -- do not apply this file directly
+# with `oc apply -f` unless your runner scale set is actually named
+# "kubevirt-plugin-ci" (the default); a release cluster's runner is named
+# "<RUNNER_SCALE_SET_NAME>-gha-rs-no-permission", which the raw subject
+# below never matches.
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:

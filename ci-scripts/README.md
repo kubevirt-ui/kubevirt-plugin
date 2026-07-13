@@ -132,7 +132,7 @@ For IPI teardown, the workflow auto-discovers the latest successful setup run to
 
 - The kubeconfig is **not** uploaded as a workflow artifact (the repo is public and artifacts are downloadable by anyone).
 - CI runners (ARC) access the cluster via their in-cluster service account.
-- Manual cluster access: use the `ibmcloud` CLI with the `IC_KEY` API key, or use the kubeadmin credentials sent to Slack on cluster creation (see CNV-91497).
+- Manual cluster access: use the `ibmcloud` CLI with the `IC_KEY` API key, or use the kubeadmin credentials sent to Slack on cluster creation.
 
 ## Directory Structure
 
@@ -160,7 +160,7 @@ ci-scripts/
     ci-env/
     helm/
     images/
-  manual-console/                  (manual UI testing; CNV-92150 -- see manual-console/README.md)
+  manual-console/                  (manual UI testing -- see manual-console/README.md)
     ensure-manual-console-user.sh
     images/
       setup-plugin-image.sh
@@ -184,6 +184,22 @@ ci-scripts/
 | `hot-cluster/ci-env/install-ci-env-controller.sh` | Installs the ConfigMap-driven CI environment controller                                                        |
 
 See [`hot-cluster/arc/README.md`](hot-cluster/arc/README.md) for ARC-specific details and [`hot-cluster/ci-env/README.md`](hot-cluster/ci-env/README.md) for the ci-env-controller.
+
+## Cluster & Test-Engine Resolution
+
+`resolve-cluster-config.sh` picks the cluster name, OpenShift version, test engine, and CNV channel/pin for a run, from the PR's base branch (or `workflow_dispatch` overrides):
+
+- **Release branches** (`release-<major>.<minor>`) get a dedicated cluster (`kubevirt-plugin-<major><minor>`) instead of sharing `kubevirt-plugin-ci`, and a CNV `startingCSV` pin to that major.minor -- `install-hco.sh` fails the build if no matching CSV exists, rather than silently installing a newer one.
+- **Test engine**: `release-4.22` and earlier predate the Cypress-to-Playwright migration and still carry a `cypress/` suite; everything else (main, future releases, non-release bases) uses Playwright. An explicit `workflow_dispatch` override always wins over this auto-detection.
+- **CNV channel**: always resolves to the catalog's real `stable` channel (there is no per-version `stable-4.X` channel); version pinning happens via `startingCSV`, not a different channel name.
+
+## Check-Run & Retest Model
+
+The hot-cluster pipeline manages its own required check ("Run Gating Tests") and an informational "Hot Cluster E2E Progress" status across several workflows (`hot-cluster-e2e.yml`, `retest-e2e.yml`, `retest-stale-gating.yml`, `publish-gating-check`). Two GitHub behaviors drive the design:
+
+- **Most-recent-wins**: GitHub's merge box shows whichever check-run with a given name reported most recently for a SHA, regardless of which run created it. A check-run's status can never be updated after creation by a different workflow run, so "retrying" always means creating a fresh check-run, never patching the old one.
+- **Bot-label no-ops**: labels like `lgtm`/`approved`/`jira/valid-reference` re-trigger `hot-cluster-e2e.yml` without representing a real code change. Those runs report `Run Gating Tests (skipped - irrelevant label event)` -- a distinct name from the real check -- so they never overwrite a genuine result, and `/retest-e2e` explicitly skips them when picking which run to re-run.
+- **Stale-after-main-advances**: `retest-stale-gating.yml` marks every open PR's check `neutral`/stale on every push to `main` (Tide's old re-test-before-merge guarantee, which the hot cluster doesn't get natively), then dispatches a real retest for merge-pool PRs only, using `hot-cluster-e2e.yml`'s `pr_number` input to test the PR merged with the new `main` tip.
 
 ## Script Configuration
 

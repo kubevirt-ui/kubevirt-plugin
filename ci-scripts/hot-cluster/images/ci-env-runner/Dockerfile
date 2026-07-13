@@ -1,6 +1,6 @@
 # CI Environment Controller image.
 # Lightweight UBI9 image with only the CLI tools needed by ci-env-controller.sh:
-#   oc, helm, jq, yq, curl, htpasswd (manual-console auth mode; CNV-92150)
+#   oc, helm, jq, yq, curl, htpasswd (manual-console auth mode)
 #
 # Using UBI9 avoids FIPS/OpenSSL DSO issues on hardened OpenShift clusters
 # (the Ubuntu-based ARC runner image fails OpenSSL loads on FIPS nodes).

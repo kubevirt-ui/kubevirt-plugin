@@ -1,21 +1,15 @@
 name: Publish Run Gating Tests Check
 description: |
   Creates a fresh "Run Gating Tests" check-run for a given SHA. Always
-  creates a new entry rather than updating an existing one -- GitHub removed
-  the ability to modify the status/conclusion of an Actions check-run via
-  the GITHUB_TOKEN from a workflow run
-  (https://github.blog/changelog/2025-02-12-notice-of-upcoming-deprecations-and-breaking-changes-for-github-actions/,
-  "Changes to check run status modification"), so a checks.update call would
-  fail regardless of which run originally created the target check-run. A
-  second "Run Gating Tests" entry for the same SHA is the normal,
-  GitHub-native way to represent a new check attempt -- the merge box shows
-  whichever check-run reported most recently for a given name.
+  creates a new entry rather than updating an existing one -- GitHub no
+  longer allows modifying a check-run's status/conclusion via GITHUB_TOKEN
+  from a different workflow run, so a second entry for the same SHA is
+  the normal way to represent a new attempt; the merge box shows
+  whichever reported most recently.
 
   Single source of truth for the check's name/shape, used by
-  retest-stale-gating.yml's per-PR stale-marking, hot-cluster-e2e.yml's
-  prepare job (superseding a stale prior result the moment a fresh run
-  starts) and its pr_number retest-result publishing, so all three can't
-  drift out of sync.
+  retest-stale-gating.yml, and by hot-cluster-e2e.yml's prepare job and
+  its pr_number retest-result publishing.
 
 inputs:
   head-sha:

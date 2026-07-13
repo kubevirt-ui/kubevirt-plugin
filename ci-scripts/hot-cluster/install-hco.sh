@@ -1,39 +1,17 @@
 #!/bin/bash
 #
-# Install OpenShift Virtualization (CNV) — the productized operator from Red Hat's
-# catalog.  This replaces the previous community HCO installation and uses the
-# standard `openshift-cnv` namespace, `redhat-operators` CatalogSource, and
-# includes nmstate as a bundled operand.
+# Installs OpenShift Virtualization (CNV) from Red Hat's redhat-operators
+# catalog into openshift-cnv, with nmstate bundled as an operand.
 #
 # Environment variables (all have defaults):
-#   KVM_EMULATION          - "true" or "false" (default: "true", only bare metal nodes have real KVM)
+#   KVM_EMULATION          - "true" or "false" (only bare metal nodes have real KVM)
 #   CNV_CHANNEL            - OLM subscription channel (default: "stable")
 #   CNV_PIN_VERSION        - "<major>.<minor>" to pin CNV to the newest matching CSV
-#                            within CNV_CHANNEL via startingCSV, instead of installing
-#                            whatever the channel head currently resolves to (default:
-#                            empty/unpinned). Resolved dynamically against the live
-#                            PackageManifest at install time -- if no CSV matching this
-#                            version prefix is found (e.g. pruned from the channel's
-#                            entry graph), this is a hard failure (exit 1), NOT a
-#                            silent fallback to the latest channel head: installing an
-#                            unexpectedly newer CNV than the pin requested is a worse
-#                            outcome than failing the build, since it can make release
-#                            CI pass against the wrong product version without anyone
-#                            noticing. To deliberately install unpinned, override
-#                            cnv_channel explicitly on the workflow dispatch instead
-#                            (any explicit cnv_channel override clears the pin -- see
-#                            resolve-cluster-config.sh). Pinning also switches
-#                            installPlanApproval to Manual and approves only the
-#                            initial InstallPlan (after verifying it actually targets
-#                            STARTING_CSV -- guards against re-running this script
-#                            against an already-provisioned Subscription that has
-#                            since advanced to a later upgrade InstallPlan), so later
-#                            channel upgrades don't silently move the cluster off the
-#                            pinned version. Pinning only takes effect at Subscription
-#                            creation time -- it cannot re-pin or downgrade a cluster
-#                            that already has CNV installed (this script only ever
-#                            runs once per cluster's lifetime; see hot-cluster-check.yml
-#                            and ibmc-cluster-setup.yml's precheck job).
+#                            within CNV_CHANNEL via startingCSV (default: unpinned).
+#                            Resolved dynamically against the live PackageManifest;
+#                            no matching CSV is a hard failure, not a silent fallback
+#                            to the channel head. Only takes effect at Subscription
+#                            creation time -- can't re-pin an already-installed cluster.
 #   HCO_CR_PATH            - Path to HCO CR yaml (default: playwright/fixtures/hco.yaml)
 #   SKIP_HPP               - Set to "true" to skip HPP installation
 #   HPP_VERSION            - HostPath Provisioner release branch
@@ -79,38 +57,20 @@ spec:
 EOF
 
 # --- Resolve a pinned startingCSV, if requested ---
-# Only the channel head can be selected by name -- version-matching an old
-# release branch's CNV needs a specific CSV pinned via startingCSV, looked
-# up dynamically against the live catalog (no static version table to
-# maintain, and it naturally tracks z-stream bumps).
 STARTING_CSV=""
 INSTALL_PLAN_APPROVAL="Automatic"
 
 if [[ -n "${CNV_PIN_VERSION}" ]]; then
-  # Validate defensively -- a malformed value (bad override, upstream bug)
-  # must fail loudly here, not silently produce a meaningless jq/sort -V
-  # comparison below that could match nothing (or, worse, everything).
   if [[ ! "${CNV_PIN_VERSION}" =~ ^[0-9]+\.[0-9]+$ ]]; then
     echo "ERROR: CNV_PIN_VERSION='${CNV_PIN_VERSION}' is not a valid \"<major>.<minor>\" version (e.g. \"4.20\")."
     exit 1
   fi
 
   echo "Resolving pinned CSV for CNV_PIN_VERSION=${CNV_PIN_VERSION} from channel '${CNV_CHANNEL}'..."
-  # Query the full list (not `oc get packagemanifest kubevirt-hyperconverged`
-  # by name) and filter by catalogSource explicitly -- a PackageManifest's
-  # .metadata.name isn't guaranteed unique across catalog sources, so
-  # fetching by name alone risks an ambiguous/wrong match if another source
-  # happens to expose a same-named package. Matching catalogSource ==
-  # redhat-operators keeps this in lockstep with the Subscription below,
-  # which pins to that exact source.
-  #
-  # Retried like the HPP/HCO CR applies below -- with `pipefail` active, a
-  # transient `oc get` failure (plausible right after cluster creation,
-  # while the API/catalog operator may still be stabilizing) would
-  # otherwise trip `set -e` and abort the whole script immediately, instead
-  # of just this one lookup. A genuine "no match" result still exits 0 (jq/
-  # sort/tail/awk all succeed on empty input), so this only retries real
-  # command failures -- the empty-result handling below is unaffected.
+  # Filters by catalogSource explicitly since PackageManifest names aren't
+  # guaranteed unique across sources. Retried since a transient `oc get`
+  # failure would otherwise trip `set -e`; a genuine "no match" still
+  # exits 0, so this only retries real command failures.
   for attempt in 1 2 3; do
     if STARTING_CSV="$(oc get packagemanifest -n openshift-marketplace -o json 2>/dev/null \
       | jq -r --arg ch "${CNV_CHANNEL}" --arg ver "${CNV_PIN_VERSION}." \
@@ -124,9 +84,7 @@ if [[ -n "${CNV_PIN_VERSION}" ]]; then
 
   if [[ -z "${STARTING_CSV}" ]]; then
     echo "ERROR: No CSV matching version prefix '${CNV_PIN_VERSION}.' found in channel '${CNV_CHANNEL}' (redhat-operators)."
-    echo "This branch's CNV version may have aged out of the channel's retained entry graph, or something else is wrong -- investigate before proceeding."
-    echo "This is a hard failure rather than a silent fallback to the latest '${CNV_CHANNEL}' head: installing an unexpectedly newer CNV than requested could make this branch's CI pass against the wrong product version without anyone noticing."
-    echo "To deliberately install unpinned, override cnv_channel explicitly on the workflow dispatch (any explicit cnv_channel override clears the pin)."
+    echo "This is a hard failure rather than a silent fallback to the latest channel head. To deliberately install unpinned, override cnv_channel explicitly on the workflow dispatch."
     exit 1
   fi
 
@@ -135,10 +93,8 @@ if [[ -n "${CNV_PIN_VERSION}" ]]; then
 fi
 
 # --- Subscription ---
-# installPlanApproval stays Manual (never re-approved beyond the one plan
-# below) when pinned, so a later upgrade InstallPlan the channel generates
-# is intentionally left pending instead of silently moving the cluster off
-# STARTING_CSV.
+# installPlanApproval stays Manual when pinned, so a later upgrade
+# InstallPlan is left pending instead of moving the cluster off STARTING_CSV.
 SUBSCRIPTION_YAML="apiVersion: operators.coreos.com/v1alpha1
 kind: Subscription
 metadata:
@@ -185,20 +141,16 @@ done
 
 if [[ "${INSTALL_PLAN_APPROVAL}" == "Manual" ]]; then
   # Guard against approving the wrong plan if this script is ever re-run
-  # against an already-provisioned Subscription (e.g. a retry after a
-  # transient failure earlier in this same job, before the cluster's own
-  # DNS/API is up) -- installPlanRef can have moved on to a later upgrade
-  # InstallPlan by then, and blindly approving it would silently unpin the
-  # cluster to whatever the channel head is at that point.
+  # against an already-provisioned Subscription that has since advanced to
+  # a later upgrade InstallPlan.
   PLAN_CSVS="$(oc get installplan "${INSTALL_PLAN}" -n ${CNV_NS} -o jsonpath='{.spec.clusterServiceVersionNames[*]}' 2>/dev/null || true)"
   if [[ " ${PLAN_CSVS} " != *" ${STARTING_CSV} "* ]]; then
     echo "ERROR: InstallPlan ${INSTALL_PLAN} does not target the pinned CSV ${STARTING_CSV} (it targets: ${PLAN_CSVS:-<none>})."
-    echo "Refusing to approve it -- this would silently move the cluster off the pinned version. Investigate manually (a stale Subscription from a prior run is the most likely cause)."
+    echo "Refusing to approve it -- investigate manually (a stale Subscription from a prior run is the most likely cause)."
     exit 1
   fi
 
   echo "Approving the initial InstallPlan (${INSTALL_PLAN}) for pinned CSV ${STARTING_CSV}..."
-  echo "This is the only InstallPlan this script will ever approve -- installPlanApproval stays Manual, so any later upgrade InstallPlan the channel generates is intentionally left pending (harmless -- it never installs without a further explicit approval this script never gives), keeping CNV pinned at this version."
   oc patch installplan "${INSTALL_PLAN}" -n ${CNV_NS} --type merge -p '{"spec":{"approved":true}}'
 fi
 
@@ -209,11 +161,8 @@ fi
 # --- Wait for HCO operator deployment ---
 echo "Waiting for HCO operator deployment to be created..."
 for i in $(seq 1 60); do
-  # Note: `|| true` (not `|| echo "0"`) — with `pipefail`, a failing `oc get`
-  # (e.g. resource not found, which is expected while polling) makes the
-  # pipeline's exit status non-zero even though `wc -l` already succeeded and
-  # printed "0"; `|| echo "0"` would then append a second "0" line, breaking
-  # the numeric comparison below.
+  # `|| true` (not `|| echo "0"`): with pipefail, a failing `oc get` makes
+  # the pipeline exit non-zero even though `wc -l` already printed "0".
   HCO_DEPLOY=$(oc get deployment hco-operator -n ${CNV_NS} --no-headers 2>/dev/null | wc -l || true)
   if [[ "${HCO_DEPLOY}" -gt 0 ]]; then
     echo "HCO operator deployment found"
@@ -259,12 +208,7 @@ oc wait -n ${CNV_NS} hyperconverged kubevirt-hyperconverged \
   --timeout=15m
 
 # --- Confirm the installed CSV actually matches the pin, if requested ---
-# Belt-and-suspenders check: the InstallPlan-targeting guard above should
-# already guarantee this, but confirming what's actually running (not just
-# what was approved) catches anything unexpected between approval and now.
-# Hard failure, not a warning -- same fail-closed reasoning as the
-# resolution step above: letting the build succeed while quietly running an
-# unexpected CNV version is worse than failing it outright.
+# Belt-and-suspenders: confirms what's actually running, not just approved.
 if [[ -n "${STARTING_CSV}" ]]; then
   ACTUAL_CSV="$(oc get subscription hco-operatorhub -n ${CNV_NS} -o jsonpath='{.status.currentCSV}' 2>/dev/null || true)"
   if [[ "${ACTUAL_CSV}" != "${STARTING_CSV}" ]]; then

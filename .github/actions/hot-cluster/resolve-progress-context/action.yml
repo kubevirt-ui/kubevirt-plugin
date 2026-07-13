@@ -1,19 +1,13 @@
 name: Resolve Hot Cluster Progress Status Context
 description: |
   Computes the head SHA and commit-status context name that every "Hot
-  Cluster E2E Progress" status posting in this pipeline must agree on, so
-  the three separate phase updates (waiting / building / running / done)
-  land on the same commit-status entry instead of fragmenting into
-  several different ones. Single source of truth for this resolution --
-  previously duplicated verbatim across hot-cluster-e2e.yml's three
-  former progress-check-* jobs.
-
-  Also reports whether this event is an irrelevant-label no-op (a bot
-  label like lgtm/approved/jira/valid-reference that doesn't represent a
-  real code change) or an ad-hoc dispatch (a bare workflow_dispatch with
-  no pr_number, not representing any specific PR) -- callers use these to
-  decide whether to post at all, and under which distinct context, without
-  re-deriving the same event-shape logic themselves.
+  Cluster E2E Progress" posting in this pipeline must agree on, so all
+  phase updates (waiting / building / running / done) land on the same
+  commit-status entry. Also reports whether this event is an
+  irrelevant-label no-op (a bot label like lgtm/approved that doesn't
+  represent a real code change) or an ad-hoc dispatch (bare
+  workflow_dispatch, no pr_number) -- callers use these to decide whether
+  to post at all, and under which distinct context.
 
 inputs:
   resolved-head-sha:
@@ -55,14 +49,9 @@ runs:
         PR_NUMBER: ${{ inputs.pr-number }}
       with:
         script: |
-          // pull_request_target's github.sha/context.sha is the BASE
-          // branch's commit, not the PR head -- posting the status there
-          // would make it silently never appear in the PR's own Checks
-          // tab. The pr_number retest path (workflow_dispatch, no
-          // associated pull_request payload) has the same problem for a
-          // different reason: context.sha there is whatever ref the
-          // dispatch used (main's tip), not the PR being retested -- use
-          // the freshly-looked-up head SHA instead.
+          // context.sha is the base branch's commit for pull_request_target
+          // (not the PR head) and main's tip for a pr_number retest
+          // dispatch (not the PR being retested) -- use the real head SHA.
           const headSha = context.eventName === 'pull_request_target'
             ? context.payload.pull_request.head.sha
             : (process.env.RESOLVED_HEAD_SHA || context.sha);
@@ -70,19 +59,11 @@ runs:
           const isIrrelevantLabel = context.payload.action === 'labeled'
             && context.payload.label?.name !== 'ok-to-test';
 
-          // A bare workflow_dispatch with no pr_number doesn't represent
-          // any specific PR -- if dispatched against a branch/SHA that
-          // happens to also have an open PR (e.g. ad-hoc manual testing
-          // on a feature branch, confirmed live on CNV-92682/PR #4293),
-          // posting under the same context as the real PR-driven status
-          // would collide with (and, per GitHub's "most recent wins"
-          // display behavior, obscure) that PR's own genuine result.
+          // An ad-hoc dispatch doesn't represent any specific PR -- give it
+          // a distinct context so it can't collide with (and obscure, per
+          // GitHub's "most recent wins" display) a real PR's own status.
           const isAdHocDispatch = context.eventName === 'workflow_dispatch' && !process.env.PR_NUMBER;
 
-          // A distinct context for no-op runs prevents them from posting
-          // a same-context, same-SHA status that could collide with (and
-          // obscure) an active real run's own status -- mirroring the
-          // same duplicate-name pitfall documented for "Run Gating Tests".
           const statusContext = isIrrelevantLabel
             ? 'Hot Cluster E2E Progress (skipped - irrelevant label event)'
             : isAdHocDispatch

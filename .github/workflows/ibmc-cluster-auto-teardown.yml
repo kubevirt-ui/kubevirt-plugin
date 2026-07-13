@@ -151,12 +151,9 @@ jobs:
             echo "Release-branch cluster: 120 minutes (2h)"
           fi
 
-      # Listing self-hosted runners requires admin access to the repo, which
-      # GITHUB_TOKEN can never have regardless of the `permissions:` block
-      # above (there is no "administration" key for GITHUB_TOKEN) -- calling
-      # listSelfHostedRunnersForRepo with it always 403s. Reuse the existing
-      # kubevirt-plugin-arc GitHub App (see ibmc-cluster-teardown.yml) to mint
-      # a short-lived, read-only admin-scoped token instead.
+      # Listing self-hosted runners needs admin access, which GITHUB_TOKEN
+      # can never have -- mint a short-lived admin-scoped token from the
+      # existing kubevirt-plugin-arc GitHub App instead.
       - name: Generate ARC app token for runner-busy check
         id: arc-app-token
         continue-on-error: true
@@ -179,25 +176,14 @@ jobs:
             const clusterName = process.env.CLUSTER_NAME;
             const clusterTag = `[${clusterName}]`;
 
-            // Authoritative, title-independent "is this cluster in use right
-            // now" signal: each cluster's ARC runner scale set Helm release
-            // is named after cluster_name (RUNNER_SCALE_SET_NAME in
-            // install-runner-scale-set.sh), and runs-on: <cluster_name>
-            // routes jobs to it -- so a registered self-hosted runner
-            // carrying that name as a label, with busy: true, means a job
-            // is actively executing against this cluster this very moment.
-            // Unlike the run-title matching below (which can only prove
-            // "was active as of its last recorded timestamp"), this can't
-            // be fooled by a run that hasn't reported/updated its title yet,
-            // is between steps, or any other title-matching edge case --
-            // it's checked first and short-circuits the rest of this step
-            // when true.
-            //
-            // This listing endpoint requires an admin-scoped token (the
-            // default GITHUB_TOKEN is rejected outright), so a dedicated
-            // Octokit client authenticated with the ARC app token from the
-            // previous step is used here instead of the ambient `github`
-            // client.
+            // A registered self-hosted runner labeled with this cluster
+            // name and busy: true means a job is actively executing right
+            // now -- an authoritative signal that title-matching below
+            // can't provide (a run between steps or not yet reporting its
+            // title could otherwise look idle). Checked first and
+            // short-circuits the rest of this step when true. Needs the
+            // ARC app token from the previous step since this endpoint
+            // rejects the default GITHUB_TOKEN.
             let runnerBusy = false;
             try {
               if (!process.env.RUNNER_ADMIN_TOKEN) {
@@ -227,37 +213,24 @@ jobs:
               return;
             }
 
-            // hot-cluster-e2e.yml's run-name falls back to the raw PR base
-            // branch (github.base_ref, e.g. "main"/"release-4.20") for
-            // automatic pull_request_target runs, since inputs.cluster_name
-            // is unset for that event -- it never shows the actually-
-            // resolved cluster name that resolve-cluster-config.sh computes.
-            // A naive substring match against clusterTag therefore silently
-            // never matches these runs (the overwhelming majority of real
-            // usage), making this checker blind to recent activity and
-            // causing premature teardown of clusters that are still warm
-            // (see the incident this comment was added for: a cluster
-            // finished a real gating run ~1h earlier but was reported as
-            // idle for 662 minutes). Re-derive the resolved cluster name
-            // from the bracketed token using the same release-branch
-            // mapping rule instead of trusting the token itself. The other
-            // two workflows never have this problem -- hot-cluster-e2e-
-            // run.yml and ibmc-cluster-setup.yml's run-names only ever use
-            // an explicit or defaulted cluster_name/runner_label input, no
-            // base_ref fallback -- so they keep the plain substring match.
+            // hot-cluster-e2e.yml's run-name shows the raw PR base branch
+            // (e.g. "release-4.20"), not the resolved cluster name, for
+            // automatic pull_request_target runs -- a naive substring
+            // match against clusterTag would miss these entirely and
+            // report the cluster as idle when it isn't. Re-derive the
+            // resolved name from the bracketed token using the same
+            // release-branch mapping rule. The other two workflows always
+            // show the resolved name directly, so they keep the plain
+            // substring match.
             function runMatchesCluster(run, workflow) {
               const title = run.display_title || '';
               if (workflow === '.github/workflows/hot-cluster-e2e.yml') {
                 const bracketed = title.match(/^Hot Cluster E2E \[([^\]]+)\]/);
                 if (!bracketed) return false;
                 const token = bracketed[1];
-                // The bracketed token is inputs.cluster_name || github.base_ref
-                // || 'kubevirt-plugin-ci' (see hot-cluster-e2e.yml's run-name).
-                // An explicit cluster_name input is already the resolved
-                // cluster name -- resolve-cluster-config.sh only remaps
-                // release-X.Y base_ref tokens (automatic pull_request_target
-                // runs with no cluster_name input); anything else falls back
-                // to the default cluster.
+                // Token is inputs.cluster_name || github.base_ref ||
+                // 'kubevirt-plugin-ci'. An explicit cluster_name is already
+                // resolved; only release-X.Y base_ref tokens get remapped.
                 let resolved;
                 if (token.startsWith('kubevirt-plugin-')) {
                   resolved = token;
@@ -274,9 +247,8 @@ jobs:
             let queued = 0;
             let lastRunTime = null;
 
-            // Bound the "completed" lookup to recent history so pagination stays
-            // fast — idle thresholds top out at a few hours, so a few days of
-            // lookback is ample and avoids paging through a workflow's full run history.
+            // Bound the "completed" lookup to recent history so pagination
+            // stays fast -- idle thresholds top out at a few hours.
             const lookbackDate = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString();
 
             try {
@@ -292,9 +264,8 @@ jobs:
                     params.created = `>=${lookbackDate}`;
                   }
 
-                  // Paginate fully before filtering — with multiple concurrent
-                  // clusters, a specific cluster's tagged run can easily fall
-                  // outside the first page.
+                  // Paginate fully before filtering -- a specific cluster's
+                  // tagged run can easily fall outside the first page.
                   const runs = await github.paginate(github.rest.actions.listWorkflowRuns, params);
 
                   const matching = runs.filter(r => runMatchesCluster(r, workflow));

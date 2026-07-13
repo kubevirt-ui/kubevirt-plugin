@@ -2,12 +2,8 @@ name: Resolve Hot Cluster Config
 description: |
   Thin wrapper around ci-scripts/hot-cluster/resolve-cluster-config.sh --
   resolves cluster_name/openshift_version/test_engine/branch_name/
-  cnv_channel/cnv_pin_version for this run. Extracted out of
-  hot-cluster-e2e.yml's own former resolve-cluster-config job (a job on
-  its own purely because every top-level job becomes its own PR merge-box
-  check-run) so the same logic can be folded into a single `prepare` job
-  as a step instead. Assumes the caller has already checked out the repo
-  -- this action does not check out anything itself.
+  cnv_channel/cnv_pin_version for this run. Assumes the caller has
+  already checked out the repo.
 
 inputs:
   base-ref:

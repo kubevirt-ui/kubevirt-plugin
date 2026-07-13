@@ -2,9 +2,9 @@
 #
 # Ensure an htpasswd identity provider exists on the cluster, upsert a user +
 # password into it, grant that user cluster-admin, and extract the cluster CA
-# bundle for OIDC verification. Used by the manual-console deploy path
-# (CNV-92150) so a fresh, dedicated login can be generated on every deploy --
-# no CLUSTER_ADMIN_PASSWORD secret or kubeadmin dependency required.
+# bundle for OIDC verification. Used by the manual-console deploy path so a
+# fresh, dedicated login can be generated on every deploy -- no
+# CLUSTER_ADMIN_PASSWORD secret or kubeadmin dependency required.
 #
 # Invoked by ci-env-controller.sh (in-cluster, cluster-admin ServiceAccount)
 # only when a ConfigMap's auth-mode=openshift; never touched by the default
@@ -104,16 +104,9 @@ echo "Granting cluster-admin to ${USERNAME}..."
 oc adm policy add-cluster-role-to-user cluster-admin "${USERNAME}" 2>&1 || true
 
 # Extract the cluster CA bundle so the console pod can verify the OAuth
-# server when running in off-cluster mode. Kubernetes 1.24+ no longer
-# auto-provisions a `type: kubernetes.io/service-account-token` Secret per
-# ServiceAccount, so indexing `.items[0]` on that list can silently hit an
-# empty array on newer clusters and produce a garbage CA file (jq returns
-# null for an out-of-range index rather than erroring, and `base64 -d` then
-# "decodes" that into junk bytes instead of failing loudly). kube-root-ca.crt
-# is a ConfigMap Kubernetes auto-creates in every namespace since 1.20
-# specifically to publish this CA bundle, independent of that SA-secret
-# auto-provisioning behavior -- and ConfigMap data is plain text, so no
-# base64 decoding step is needed either.
+# server in off-cluster mode. Uses kube-root-ca.crt (a ConfigMap Kubernetes
+# auto-creates in every namespace) rather than an auto-provisioned
+# SA-token Secret, which Kubernetes 1.24+ no longer guarantees exists.
 CA_CERT_FILE="$(mktemp)"
 oc get configmap kube-root-ca.crt -n default -o jsonpath='{.data.ca\.crt}' > "${CA_CERT_FILE}"
 if [[ ! -s "${CA_CERT_FILE}" ]]; then

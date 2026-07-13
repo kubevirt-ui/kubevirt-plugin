@@ -79,10 +79,8 @@ on:
         description: |
           Whether this check should actually probe/provision. Set to false
           for no-op/irrelevant trigger events so the caller can invoke this
-          workflow unconditionally (avoiding the bare-skipped-vs-compound-
-          nested-job-names fragmentation a caller-side `if:` would cause)
-          while still getting a fast, correctly-named success and a
-          cluster_ready output that's reliably 'false'.
+          workflow unconditionally (keeping check names stable) while
+          still getting a fast success and cluster_ready: 'false'.
         type: boolean
         required: false
         default: true
@@ -102,11 +100,8 @@ jobs:
     outputs:
       cluster_ready: ${{ steps.probe.outputs.cluster_ready }}
     steps:
-      # if: inputs.should_run -- skip the live DNS lookup entirely for a
-      # no-op/irrelevant event; result's compute step already forces
-      # cluster_ready=false whenever should_run is false regardless of this
-      # step's (skipped, empty) output, so there's nothing to gain from
-      # actually probing.
+      # Skipped for a no-op/irrelevant event -- result's compute step
+      # already forces cluster_ready=false when should_run is false.
       - name: Probe for cluster
         id: probe
         if: inputs.should_run
@@ -125,14 +120,10 @@ jobs:
             echo "cluster_ready=false" >> "$GITHUB_OUTPUT"
           fi
 
-  # Native reusable-workflow call (instead of the old createWorkflowDispatch
-  # + poll pattern) so the actual cluster build shows up as a real, nested,
-  # expandable job in the Checks tab of every PR that runs cluster-check --
-  # including PRs queued behind an in-progress build via the concurrency
-  # lock below, once their turn comes. ibmc-cluster-setup.yml's own
-  # `precheck` job re-probes DNS right after this lock is acquired, so a PR
-  # that was queued behind an already-finished build skips straight through
-  # instead of racing into a duplicate one.
+  # Native reusable-workflow call so the cluster build shows up as a real,
+  # nested job in the Checks tab. ibmc-cluster-setup.yml's own `precheck`
+  # job re-probes DNS right after the concurrency lock below is acquired,
+  # so a PR queued behind an already-finished build skips straight through.
   provision:
     name: Provision Cluster
     needs: probe
@@ -152,14 +143,9 @@ jobs:
       cnv_pin_version: ${{ inputs.cnv_pin_version }}
       worker_flavor: ${{ inputs.worker_flavor }}
       worker_count: ${{ inputs.worker_count }}
-      # kvm_emulation is declared as a string here (matching workflow_call's
-      # own quirky type rules for workflow_dispatch-style default inputs)
-      # but as an actual boolean on ibmc-cluster-setup.yml's workflow_call
-      # input. Passing the raw string through fails GitHub Actions' strict
-      # workflow_call type validation ("string cannot be cast to boolean") --
-      # only surfaces once this job actually runs (cold cluster / default
-      # path), not at YAML-parse time. Comparing to produce a real boolean
-      # expression result avoids that.
+      # Declared as a string here but boolean on the callee's workflow_call
+      # input -- compare to produce a real boolean instead of passing the
+      # raw string through, which fails Actions' strict type validation.
       kvm_emulation: ${{ inputs.kvm_emulation == 'true' }}
     secrets: inherit
 
@@ -179,10 +165,7 @@ jobs:
           PROBE_READY: ${{ needs.probe.outputs.cluster_ready }}
           PROVISION_RESULT: ${{ needs.provision.result }}
         run: |
-          # A no-op caller (should_run=false) always reports cluster_ready=false,
-          # regardless of the real probe result -- downstream jobs must never
-          # treat a no-op/irrelevant-event run as a green light to proceed,
-          # even if the cluster happens to genuinely be ready.
+          # A no-op caller (should_run=false) always reports cluster_ready=false.
           if [[ "${SHOULD_RUN}" == "true" && ( "${PROBE_READY}" == "true" || "${PROVISION_RESULT}" == "success" ) ]]; then
             echo "cluster_ready=true" >> "$GITHUB_OUTPUT"
           else

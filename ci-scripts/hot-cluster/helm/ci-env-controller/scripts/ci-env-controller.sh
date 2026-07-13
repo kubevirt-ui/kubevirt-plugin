@@ -9,9 +9,9 @@
 #   CI_ENV_NS              Namespace where trigger ConfigMaps live (default: ci-env)
 #   CI_ENV_TTL_SECONDS     Force-clean environments older than this (default: 7200 = 2h)
 #   CI_ENV_LABEL           Label selector for E2E trigger ConfigMaps (TTL-reaped)
-#   CI_ENV_MANUAL_LABEL    Label selector for persistent manual-console ConfigMaps
-#                          (CNV-92150; reconciled like CI_ENV_LABEL but never
-#                          reaped -- see reap_stale, which only scans CI_ENV_LABEL)
+#   CI_ENV_MANUAL_LABEL    Label selector for persistent manual-console
+#                          ConfigMaps; reconciled like CI_ENV_LABEL but
+#                          never reaped (see reap_stale)
 #   HELM_CHART_PATH        Path to the ci-test-stack Helm chart inside the container
 #   ENSURE_MANUAL_CONSOLE_USER_SCRIPT
 #                          Path to ensure-manual-console-user.sh inside the
@@ -21,11 +21,8 @@
 #
 # Trigger ConfigMap data field (per-request, optional):
 #   user-settings-location  Overrides the console's BRIDGE_USER_SETTINGS_LOCATION
-#                            ("configmap" or "localstorage"). Empty (every
-#                            existing caller except Cypress E2E) keeps the
-#                            ci-test-stack chart's own default -- see
-#                            provision()'s own comment for why this must
-#                            stay opt-in.
+#                            ("configmap" or "localstorage"). Empty keeps
+#                            the ci-test-stack chart's own default.
 
 set -uo pipefail
 
@@ -137,7 +134,7 @@ patch_cm() {
 }
 
 # --------------------------------------------------------------------------- #
-#  Ensure an htpasswd user for OAuth-mode deploys (manual-console; CNV-92150)
+#  Ensure an htpasswd user for OAuth-mode deploys (manual-console)
 #
 #  Reads the plaintext password from a short-lived Secret named by
 #  htpasswd_secret_name (in CI_ENV_NS), deletes that Secret immediately
@@ -219,23 +216,12 @@ provision() {
   log "Creating namespace ${test_ns}..."
   oc create namespace "${test_ns}" --dry-run=client -o yaml | oc apply -f - || true
 
-  # Namespace-scoped (NOT cluster-wide) fallback so test-cleanup.sh's secret
-  # delete can't be Forbidden in the one namespace that isn't torn down and
-  # recreated by a fresh per-run Helm release each time: the fixed
-  # 'auto-test-ns' Cypress namespace (release-4.20/unknown pin/bare
-  # dispatch -- see hot-cluster-e2e-run.yml's TEST_SECRET_NAME). Applied
-  # directly here (not via the ci-test-stack Helm chart) so it's idempotent
-  # and unowned by any one run's Helm release -- since `oc create namespace`
-  # above recreates this namespace from scratch on every run (deleting
-  # anything that was in it, including these two objects), this step
-  # re-applies them fresh immediately afterward on every single run, rather
-  # than depending on Helm's release-ownership semantics (see
-  # arc-runner-rbac.yaml for the full rationale on why a ClusterRole grant
-  # was rejected in favor of this). Every other test namespace (all
-  # dynamically named, one per run) already gets equivalent secret access
-  # from its own live ci-env-test-runner RoleBinding below, so this is
-  # deliberately scoped to just this one fixed name, not applied
-  # unconditionally.
+  # Namespace-scoped (not cluster-wide, see arc-runner-rbac.yaml) fallback
+  # so test-cleanup.sh's secret delete works in the one namespace that
+  # isn't torn down and recreated by a fresh Helm release each run: the
+  # fixed 'auto-test-ns' Cypress namespace. Applied directly here (not via
+  # the Helm chart) so it's re-applied fresh on every run, since `oc
+  # create namespace` above wipes anything that was in it.
   if [[ "${test_ns}" == "auto-test-ns" ]]; then
     log "Ensuring auto-test-ns secret-cleanup RBAC..."
     local secret_rbac_applied="false"
@@ -273,11 +259,8 @@ EOF
       log "  Retry ${attempt}/3 for auto-test-ns secret-cleanup RBAC apply (API may be transiently unavailable)..."
       sleep 5
     done
-    # Not `|| true`: silently swallowing this would let a run's own
-    # test-cleanup.sh Forbidden-fail on the exact secret this exists for,
-    # with nothing surfacing why -- fail the run visibly instead so a
-    # persistent (not transient) problem gets noticed and fixed, rather than
-    # rediscovered live the way the original CNV-92722 finding 7 was.
+    # Not `|| true`: fail the run visibly rather than let test-cleanup.sh
+    # silently Forbidden-fail later on the secret this RBAC exists for.
     if [[ "${secret_rbac_applied}" != "true" ]]; then
       local err="failed to apply auto-test-ns secret-cleanup RBAC after 3 attempts"
       log "ERROR: ${err}"
@@ -299,17 +282,10 @@ EOF
     extra_helm_args+=(--set-file "console.auth.caCert=${MANUAL_AUTH_CA_CERT_FILE}")
   fi
 
-  # Opt-in only: empty (every existing caller except Cypress E2E) means
-  # "don't override" -- the chart's own default (localstorage) applies, so
-  # this never changes behavior for callers that don't explicitly ask for
-  # it. Playwright's seedGuidedTourState() (browser localStorage) and
-  # manual-console both rely on that default; only flip this to "configmap"
-  # for a caller that also seeds server-side user-settings state to match
-  # (see hot-cluster-e2e-run.yml's "Seed kubevirt-user-settings ConfigMap"
-  # step) -- confirmed live: release-4.20 Cypress's before-all hook blocked
-  # on OpenShift Console's own "Welcome to the new OpenShift experience"
-  # guided-tour modal, which only browser-side localStorage seeding (not
-  # available to a GitHub Actions step) can normally suppress.
+  # Opt-in only: empty means "don't override" -- the chart's own default
+  # (localstorage) applies. Cypress flips this to "configmap" since its
+  # before-all hook can't otherwise dismiss the console's welcome modal
+  # (see hot-cluster-e2e-run.yml's "Seed kubevirt-user-settings ConfigMap").
   if [[ -n "${user_settings_location}" ]]; then
     if [[ "${user_settings_location}" != "configmap" && "${user_settings_location}" != "localstorage" ]]; then
       local err="invalid user-settings-location '${user_settings_location}' (must be 'configmap' or 'localstorage')"
@@ -363,27 +339,16 @@ EOF
     return 1
   fi
 
-  # The console backend answering HTTP only proves the bridge process is up
-  # -- it says nothing about whether the plugin's own bundle (served by its
-  # own Deployment/Service, per ci-test-stack's plugin.port) is actually
-  # fetchable yet. Every E2E run gets a brand-new plugin pod scoped to this
-  # run's ID, so this is a cold start every single time regardless of how
-  # long the underlying cluster has existed -- without this check, tests can
-  # start clicking around the console while it's still showing a loading
-  # overlay for the not-yet-servable Virtualization perspective, which
-  # cascades into a total suite failure on suites without per-test isolation
-  # (confirmed live: release-4.20 Cypress, 0/37 passing, root cause traced to
-  # exactly this race).
+  # The console answering HTTP only proves the bridge is up, not that the
+  # plugin's own bundle (a fresh pod every run) is fetchable yet -- without
+  # this check, tests can start clicking around a console still showing a
+  # loading overlay for the not-yet-servable Virtualization perspective.
   local plugin_base="http://${helm_release}-plugin.${test_ns}.svc.cluster.local:9080"
   log "Waiting for plugin bundle at ${plugin_base}..."
   local plugin_ready=false
   for i in $(seq 1 60); do
-    # --max-time bounds each individual attempt so a hung connection can't
-    # stall past the 5-minute retry budget below; --fail rejects HTTP error
-    # responses (e.g. a 503 from a not-yet-ready backend) instead of
-    # treating any response body as success. jq validates the body is
-    # actually the plugin manifest (a non-empty "name" field), not just any
-    # JSON-ish text that happens to contain the substring "name".
+    # jq validates the body is the plugin manifest (non-empty "name"), not
+    # just any response.
     if curl -s --max-time 5 --fail "${plugin_base}/plugin-manifest.json" 2>/dev/null \
       | jq -e '(.name // "") | length > 0' &>/dev/null; then
       plugin_ready=true
@@ -438,14 +403,11 @@ reconcile_one() {
   test_ns="$(echo "${cm_json}" | jq -r '.data["test-namespace"] // ""')"
   console_image="$(echo "${cm_json}" | jq -r '.data["console-image"] // ""')"
   helm_release="$(echo "${cm_json}" | jq -r '.data["helm-release"] // ""')"
-  # Manual-console-only fields (CNV-92150); empty for every existing E2E
-  # ConfigMap, which keeps provision() on its original disabled-auth path.
+  # Manual-console-only fields; empty for every E2E ConfigMap, which keeps
+  # provision() on its original disabled-auth path.
   auth_mode="$(echo "${cm_json}" | jq -r '.data["auth-mode"] // "disabled"')"
   htpasswd_user="$(echo "${cm_json}" | jq -r '.data["htpasswd-user"] // ""')"
   htpasswd_secret_name="$(echo "${cm_json}" | jq -r '.data["htpasswd-secret-name"] // ""')"
-  # Opt-in override (empty for every existing caller, which keeps
-  # provision() on the chart's own default -- see provision()'s own comment
-  # for why this must never change unconditionally for every caller.
   user_settings_location="$(echo "${cm_json}" | jq -r '.data["user-settings-location"] // ""')"
 
   if [[ "${desired}" == "present" && "${status}" != "ready" && "${status}" != "provisioning" ]]; then
@@ -529,15 +491,14 @@ main() {
     local now
     now="$(date +%s)"
     if (( now - last_reap > reap_interval )); then
-      # Only ever scans CI_ENV_LABEL (E2E), so manual-console ConfigMaps
-      # (CI_ENV_MANUAL_LABEL) are never force-cleaned by the TTL reaper.
+      # Only scans CI_ENV_LABEL (E2E) -- manual-console ConfigMaps are
+      # never force-cleaned by the TTL reaper.
       reap_stale
       last_reap="${now}"
     fi
 
     # Reconcile both the ephemeral E2E stream and the persistent
-    # manual-console stream (CNV-92150) in the same pass; they're
-    # independent ConfigMaps distinguished only by label value.
+    # manual-console stream in the same pass.
     local cms manual_cms combined
     cms="$(oc get configmap -n "${CI_ENV_NS}" -l "${CI_ENV_LABEL}" -o json 2>/dev/null || echo '{"items":[]}')"
     manual_cms="$(oc get configmap -n "${CI_ENV_NS}" -l "${CI_ENV_MANUAL_LABEL}" -o json 2>/dev/null || echo '{"items":[]}')"

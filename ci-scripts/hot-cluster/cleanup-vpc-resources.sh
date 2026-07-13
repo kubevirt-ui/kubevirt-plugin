@@ -2,25 +2,16 @@
 set -euo pipefail
 
 # Single source of truth for "delete every IBM Cloud VPC-infrastructure
-# resource whose name starts with CLUSTER_NAME". Despite the historical name
-# (cleanup-ipi-resources.sh), this is infra-type-agnostic -- it's called from:
-#   - ibmc-cluster-setup.yml, proactively, before creating a new IPI cluster
-#   - create-ipi-cluster.sh, between retry attempts in the same job
-#   - ibmc-cluster-setup.yml, as a guaranteed fallback sweep on failure
-#   - ibmc-cluster-teardown.yml, for both the "vpc" infra type's VPC cleanup
-#     and as a backstop sweep after "openshift-install destroy cluster" (ipi)
-#   - ibmc-cleanup-all.yml, the manual multi-generation cleanup sweep
+# resource whose name starts with CLUSTER_NAME". Infra-type-agnostic --
+# shared by ibmc-cluster-setup.yml, create-ipi-cluster.sh's retry loop,
+# ibmc-cluster-teardown.yml, and ibmc-cleanup-all.yml.
 #
 # Required env: CLUSTER_NAME, IC_API_KEY
 # Optional env:
-#   ZONE       - if set, re-targets the CLI to this zone's region first
-#                (needed when the caller hasn't already targeted the right
-#                region itself, e.g. ibmc-cluster-setup.yml's IBM_REGION is
-#                the account-level API endpoint, not the VPC region).
-#   DRY_RUN    - "true" to only list matching resources, without deleting
-#                anything (default: "false").
-#   CLEAN_VPC  - "false" to skip deleting the VPC itself (step 13), while
-#                still cleaning everything inside it (default: "true").
+#   ZONE       - if set, re-targets the CLI to this zone's region first.
+#   DRY_RUN    - "true" to only list matching resources (default: "false").
+#   CLEAN_VPC  - "false" to skip deleting the VPC itself, while still
+#                cleaning everything inside it (default: "true").
 
 export IC_API_KEY
 DRY_RUN="${DRY_RUN:-false}"
@@ -31,9 +22,8 @@ if [[ -n "${ZONE:-}" ]]; then
   ibmcloud target -r "${VPC_REGION}" 2>/dev/null || true
 fi
 
-# Wraps a mutating ibmcloud call: prints what would happen and skips it under
-# DRY_RUN, otherwise runs it for real (still tolerating failure -- callers of
-# this script rely on best-effort semantics throughout).
+# Wraps a mutating ibmcloud call: prints what would happen under DRY_RUN,
+# otherwise runs it for real, tolerating failure (best-effort throughout).
 run_or_dry() {
   if [[ "${DRY_RUN}" == "true" ]]; then
     echo "  [dry-run] would run: $*"
@@ -77,10 +67,8 @@ if [[ -n "${STALE_SUBNET_IDS}" ]]; then
     | sort -u \
     | while read -r id; do echo "  Deleting LB ${id} (in stale subnet)"; run_or_dry ibmcloud is load-balancer-delete "${id}" -f; done
 fi
-# LBs created by the cloud-provider-ibm controller are always named
-# kube-<cluster-name>-<hash>, never <cluster-name>-*, regardless of
-# cluster_name -- a plain startswith($cn) never matches those, leaving them
-# (and the subnets/security groups they occupy) behind.
+# LBs from the cloud-provider-ibm controller are named kube-<cluster>-<hash>,
+# not <cluster>-*, so a plain startswith($cn) alone would miss them.
 echo "${ALL_LBS}" \
   | jq -r --arg cn "${CLUSTER_NAME}" 'if type == "array" then .[] | select((.name | startswith($cn)) or (.name | startswith("kube-" + $cn))) | .id else empty end' \
   | while read -r id; do echo "  Deleting LB ${id} (by name)"; run_or_dry ibmcloud is load-balancer-delete "${id}" -f; done
