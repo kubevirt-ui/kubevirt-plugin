@@ -313,7 +313,7 @@ export default class VirtualMachineDetailPage extends PageCommons {
     return this.scheduling.editRunStrategyViaActionsMenu(strategy);
   }
 
-  async ejectCdrom(diskName?: string): Promise<boolean> {
+  async ejectCdrom(diskName: string): Promise<boolean> {
     return this.disks.ejectCdrom(diskName);
   }
 
