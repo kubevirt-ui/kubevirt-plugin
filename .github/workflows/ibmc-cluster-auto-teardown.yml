@@ -199,7 +199,19 @@ jobs:
               );
               core.info(`Runner pool for '${clusterName}': ${runnerBusy ? 'busy' : 'idle'} (${runners.length} total runners checked).`);
             } catch (err) {
-              core.warning(`Failed to query self-hosted runners: ${err.message}`);
+              // Fail closed: this check exists specifically to catch a job
+              // running right now that title-matching below can't see --
+              // if we can't ask, assume busy rather than silently losing
+              // that protection against tearing down an active cluster.
+              core.warning(`Failed to query self-hosted runners: ${err.message} -- failing closed (treating as busy).`);
+              core.setOutput('active_jobs', 'true');
+              core.setOutput('last_run_time', '');
+              core.summary.addList([
+                `Cluster: ${clusterName}`,
+                `Runner query failed: ${err.message} (failing closed -- skipping teardown for safety)`,
+              ]);
+              await core.summary.write();
+              return;
             }
 
             if (runnerBusy) {
@@ -229,10 +241,17 @@ jobs:
                 if (!bracketed) return false;
                 const token = bracketed[1];
                 // Token is inputs.cluster_name || github.base_ref ||
-                // 'kubevirt-plugin-ci'. An explicit cluster_name is already
-                // resolved; only release-X.Y base_ref tokens get remapped.
+                // 'kubevirt-plugin-ci'. workflow_dispatch always supplies
+                // cluster_name (its own default if not explicitly
+                // overridden) -- already resolved, so use it as-is rather
+                // than remapping a manually-chosen name that happens not to
+                // match the known patterns down to 'kubevirt-plugin-ci'.
+                // Only a pull_request_target run's base_ref token needs the
+                // release-X.Y remapping below.
                 let resolved;
-                if (token.startsWith('kubevirt-plugin-')) {
+                if (run.event === 'workflow_dispatch') {
+                  resolved = token;
+                } else if (token.startsWith('kubevirt-plugin-')) {
                   resolved = token;
                 } else {
                   const release = token.match(/^release-(\d+)\.(\d+)$/);

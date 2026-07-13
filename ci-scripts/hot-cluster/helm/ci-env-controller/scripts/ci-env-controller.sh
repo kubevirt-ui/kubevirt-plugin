@@ -220,8 +220,9 @@ provision() {
   # so test-cleanup.sh's secret delete works in the one namespace that
   # isn't torn down and recreated by a fresh Helm release each run: the
   # fixed 'auto-test-ns' Cypress namespace. Applied directly here (not via
-  # the Helm chart) so it's re-applied fresh on every run, since `oc
-  # create namespace` above wipes anything that was in it.
+  # the Helm chart) rather than once at bootstrap, so the Role/RoleBinding
+  # are reconciled fresh on every provisioning run regardless of any
+  # earlier drift.
   if [[ "${test_ns}" == "auto-test-ns" ]]; then
     log "Ensuring auto-test-ns secret-cleanup RBAC..."
     local secret_rbac_applied="false"

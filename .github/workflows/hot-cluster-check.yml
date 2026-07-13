@@ -200,6 +200,8 @@ jobs:
       - name: Checkout (manual health check)
         if: inputs.run_health_check && steps.compute.outputs.cluster_ready == 'true'
         uses: actions/checkout@v7
+        with:
+          persist-credentials: false
 
       - name: Setup IBM Cloud CLI (manual health check)
         if: |

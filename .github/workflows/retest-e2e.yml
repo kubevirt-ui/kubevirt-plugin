@@ -21,10 +21,23 @@ jobs:
       # No ref override: reads OWNERS from the default branch, not the commenter's PR.
       - name: Checkout
         uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      # OWNERS is the single source of truth for trust, same as Prow's
+      # /lgtm and /approve.
+      - name: Check trusted author
+        id: check-trust
+        uses: ./.github/actions/hot-cluster/check-trust
+        with:
+          author: ${{ github.event.comment.user.login }}
 
       # continue-on-error: a bad app credential must still let the retest
       # step run, fail its first API call, and get reported below -- not
-      # skip silently.
+      # skip silently. Scoped to just what the script below needs: reading
+      # the PR (pull-requests: read) and re-running/dispatching the E2E
+      # workflow (actions: write). issues: write is deliberately omitted --
+      # the bot app doesn't have it, so reactions below stay best-effort.
       - name: Generate bot token
         id: bot-token
         continue-on-error: true
@@ -32,17 +45,18 @@ jobs:
         with:
           app-id: ${{ secrets.BOT_APP_ID }}
           private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
+          permission-pull-requests: read
+          permission-actions: write
 
-      # OWNERS is the single source of truth for trust, same as Prow's
-      # /lgtm and /approve.
-      - name: Check trusted author and re-run E2E workflow
+      - name: Re-run E2E workflow
         id: retest
         continue-on-error: true
         uses: actions/github-script@v9
+        env:
+          TRUSTED: ${{ steps.check-trust.outputs.trusted }}
         with:
           github-token: ${{ steps.bot-token.outputs.token }}
           script: |
-            const fs = require('fs');
             const author = context.payload.comment.user.login;
 
             // kubevirt-plugin-bot has no `issues: write`, so reactions are
@@ -60,14 +74,7 @@ jobs:
             };
 
             try {
-              let trusted = false;
-              try {
-                const owners = fs.readFileSync('OWNERS', 'utf8');
-                trusted = new RegExp(`^\\s*-\\s*${author}\\s*$`, 'm').test(owners);
-              } catch (err) {
-                core.warning(`Could not read OWNERS file: ${err.message}`);
-              }
-
+              const trusted = process.env.TRUSTED === 'true';
               core.info(`${author} is ${trusted ? '' : 'not '}listed in OWNERS (approvers/reviewers) — ${trusted ? 'trusted' : 'untrusted, ignoring /retest-e2e'}.`);
 
               if (!trusted) {
