@@ -1,0 +1,95 @@
+name: Resolve Hot Cluster Progress Status Context
+description: |
+  Computes the head SHA and commit-status context name that every "Hot
+  Cluster E2E Progress" status posting in this pipeline must agree on, so
+  the three separate phase updates (waiting / building / running / done)
+  land on the same commit-status entry instead of fragmenting into
+  several different ones. Single source of truth for this resolution --
+  previously duplicated verbatim across hot-cluster-e2e.yml's three
+  former progress-check-* jobs.
+
+  Also reports whether this event is an irrelevant-label no-op (a bot
+  label like lgtm/approved/jira/valid-reference that doesn't represent a
+  real code change) or an ad-hoc dispatch (a bare workflow_dispatch with
+  no pr_number, not representing any specific PR) -- callers use these to
+  decide whether to post at all, and under which distinct context, without
+  re-deriving the same event-shape logic themselves.
+
+inputs:
+  resolved-head-sha:
+    description: |
+      Freshly-resolved PR head SHA from the resolve-pr-context composite
+      (only meaningful for the pr_number retest path). Falls back to
+      context.sha when empty.
+    required: false
+    default: ''
+  pr-number:
+    description: |
+      inputs.pr_number from the calling workflow_dispatch, if any. Empty
+      for a bare ad-hoc dispatch or a normal pull_request_target event.
+    required: false
+    default: ''
+
+outputs:
+  head-sha:
+    description: Resolved commit SHA to post the progress status against
+    value: ${{ steps.resolve.outputs.head_sha }}
+  status-context:
+    description: Commit-status context name to post under
+    value: ${{ steps.resolve.outputs.status_context }}
+  is-irrelevant-label:
+    description: "'true' if this run was triggered by a bot label that doesn't represent a real gating-test outcome"
+    value: ${{ steps.resolve.outputs.is_irrelevant_label }}
+  is-adhoc-dispatch:
+    description: "'true' if this is a bare workflow_dispatch with no pr_number"
+    value: ${{ steps.resolve.outputs.is_adhoc_dispatch }}
+
+runs:
+  using: composite
+  steps:
+    - name: Resolve progress status head SHA and context name
+      id: resolve
+      uses: actions/github-script@v9
+      env:
+        RESOLVED_HEAD_SHA: ${{ inputs.resolved-head-sha }}
+        PR_NUMBER: ${{ inputs.pr-number }}
+      with:
+        script: |
+          // pull_request_target's github.sha/context.sha is the BASE
+          // branch's commit, not the PR head -- posting the status there
+          // would make it silently never appear in the PR's own Checks
+          // tab. The pr_number retest path (workflow_dispatch, no
+          // associated pull_request payload) has the same problem for a
+          // different reason: context.sha there is whatever ref the
+          // dispatch used (main's tip), not the PR being retested -- use
+          // the freshly-looked-up head SHA instead.
+          const headSha = context.eventName === 'pull_request_target'
+            ? context.payload.pull_request.head.sha
+            : (process.env.RESOLVED_HEAD_SHA || context.sha);
+
+          const isIrrelevantLabel = context.payload.action === 'labeled'
+            && context.payload.label?.name !== 'ok-to-test';
+
+          // A bare workflow_dispatch with no pr_number doesn't represent
+          // any specific PR -- if dispatched against a branch/SHA that
+          // happens to also have an open PR (e.g. ad-hoc manual testing
+          // on a feature branch, confirmed live on CNV-92682/PR #4293),
+          // posting under the same context as the real PR-driven status
+          // would collide with (and, per GitHub's "most recent wins"
+          // display behavior, obscure) that PR's own genuine result.
+          const isAdHocDispatch = context.eventName === 'workflow_dispatch' && !process.env.PR_NUMBER;
+
+          // A distinct context for no-op runs prevents them from posting
+          // a same-context, same-SHA status that could collide with (and
+          // obscure) an active real run's own status -- mirroring the
+          // same duplicate-name pitfall documented for "Run Gating Tests".
+          const statusContext = isIrrelevantLabel
+            ? 'Hot Cluster E2E Progress (skipped - irrelevant label event)'
+            : isAdHocDispatch
+              ? 'Hot Cluster E2E Progress (manual dispatch)'
+              : 'Hot Cluster E2E Progress';
+
+          core.setOutput('head_sha', headSha);
+          core.setOutput('status_context', statusContext);
+          core.setOutput('is_irrelevant_label', isIrrelevantLabel ? 'true' : 'false');
+          core.setOutput('is_adhoc_dispatch', isAdHocDispatch ? 'true' : 'false');

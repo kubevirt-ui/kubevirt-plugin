@@ -1,0 +1,107 @@
+name: Resolve Hot Cluster PR Context
+description: |
+  Looks up a PR's current head SHA, mergeability, merge-pool membership,
+  and CI trust, fresh at execution time -- used by the pr_number retest
+  path (merge-pool "real retest" dispatched by retest-stale-gating.yml
+  after main advances, or /retest-e2e's fallback dispatch). Trust IS
+  re-checked here even though the caller may have already checked labels
+  earlier: lgtm/approved are Tide's merge-readiness signal, not a
+  CI-trust signal, and this workflow_dispatch retest path has no
+  pull_request payload for the normal pull_request_target trust gate to
+  apply to.
+
+  Extracted out of hot-cluster-e2e.yml's own former resolve-pr-context job
+  (a job on its own purely because every top-level job becomes its own PR
+  merge-box check-run, always showing as "skipped" for every trigger other
+  than a pr_number retest) so the same lookup can be folded into a single
+  `prepare` job as a conditional step instead. Assumes the caller has
+  already checked out the base branch (so OWNERS reflects the base
+  branch's approvers, not the PR's own branch -- a PR can't add itself to
+  OWNERS to self-approve trust) and that the shared is-merge-pool-pr.cjs
+  module is present on disk. This action does not check out anything
+  itself.
+
+inputs:
+  pr-number:
+    description: PR number to resolve context for
+    required: true
+  skip-pool-check:
+    description: |
+      Skip the lgtm+approved (no hold) merge-pool requirement for this
+      retest. Used by /retest-e2e's fallback dispatch, which retests on
+      demand for any PR regardless of review state -- unlike a
+      stale-pool retest dispatch, which only ever retests merge-pool PRs
+      and always leaves this false so that check keeps meaning what it
+      says. mergeable/trusted are still re-checked either way.
+    required: false
+    default: 'false'
+
+outputs:
+  head-sha:
+    description: PR's current head SHA
+    value: ${{ steps.resolve.outputs.head_sha }}
+  mergeable:
+    description: "'false' only on a confirmed merge conflict with the base tip, else 'true'"
+    value: ${{ steps.resolve.outputs.mergeable }}
+  still-in-pool:
+    description: "'true' if the PR still carries lgtm+approved (no hold), or skip-pool-check was set"
+    value: ${{ steps.resolve.outputs.still_in_pool }}
+  trusted:
+    description: "'true' if the PR author/branch/label combination is CI-trusted"
+    value: ${{ steps.resolve.outputs.trusted }}
+
+runs:
+  using: composite
+  steps:
+    - name: Look up PR head SHA, mergeability, trust, and pool membership
+      id: resolve
+      uses: actions/github-script@v9
+      env:
+        PR_NUMBER: ${{ inputs.pr-number }}
+        SKIP_POOL_CHECK: ${{ inputs.skip-pool-check }}
+      with:
+        script: |
+          const fs = require('fs');
+          const { isMergePoolPr } = require('./ci-scripts/hot-cluster/is-merge-pool-pr.cjs');
+          const prNumber = Number(process.env.PR_NUMBER);
+          const skipPoolCheck = process.env.SKIP_POOL_CHECK === 'true';
+
+          // mergeable/mergeable_state are computed asynchronously by
+          // GitHub and can be null right after main moves -- retry
+          // briefly rather than mistaking "not computed yet" for a real
+          // conflict.
+          let pr;
+          for (let attempt = 0; attempt < 5; attempt++) {
+            const { data } = await github.rest.pulls.get({ ...context.repo, pull_number: prNumber });
+            pr = data;
+            if (pr.mergeable !== null) break;
+            core.info(`PR #${prNumber} mergeable state not yet computed, retrying...`);
+            await new Promise(r => setTimeout(r, 3000));
+          }
+
+          // Same OWNERS-based check used everywhere else in this pipeline
+          // -- deliberately not author_association/collaborator status.
+          const author = pr.user.login;
+          let ownedByAuthor = false;
+          try {
+            const owners = fs.readFileSync('OWNERS', 'utf8');
+            ownedByAuthor = new RegExp(`^\\s*-\\s*${author}\\s*$`, 'm').test(owners);
+          } catch (err) {
+            core.warning(`Could not read OWNERS file: ${err.message}`);
+          }
+
+          const sameRepo = pr.head.repo?.full_name === pr.base.repo.full_name;
+          const hasOkToTest = pr.labels.some((label) => label.name === 'ok-to-test');
+          const trusted = ownedByAuthor || sameRepo || hasOkToTest;
+
+          const stillInPool = skipPoolCheck || isMergePoolPr(pr.labels);
+          core.info(`PR #${prNumber}: head=${pr.head.sha}, mergeable=${pr.mergeable}, mergeable_state=${pr.mergeable_state}, still_in_pool=${stillInPool}${skipPoolCheck ? ' (pool check skipped)' : ''}`);
+          core.info(`PR #${prNumber}: author=${author}, ownedByAuthor=${ownedByAuthor}, sameRepo=${sameRepo}, hasOkToTest=${hasOkToTest}, trusted=${trusted}`);
+
+          core.setOutput('head_sha', pr.head.sha);
+          // Treat still-unknown (null) as mergeable rather than failing
+          // the retest on GitHub's own computation lag -- only an
+          // explicit `false` should block the run below.
+          core.setOutput('mergeable', pr.mergeable === false ? 'false' : 'true');
+          core.setOutput('still_in_pool', stillInPool ? 'true' : 'false');
+          core.setOutput('trusted', trusted ? 'true' : 'false');

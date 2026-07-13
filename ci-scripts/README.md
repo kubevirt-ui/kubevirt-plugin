@@ -19,13 +19,17 @@ GitHub Actions
 
 ```
 hot-cluster-e2e.yml     → "Hot Cluster E2E" (PR trigger + manual dispatch)
-  ├── cluster-health-check (ubuntu-latest)
-  └── run-e2e-tests (workflow_call → hot-cluster-e2e-run.yml)
+  ├── prepare (resolve cluster config, trust, PR context, initial progress status)
+  ├── cluster-check (workflow_call → hot-cluster-check.yml)
+  ├── cluster-health-check (ubuntu-latest, manual dispatch only)
+  ├── progress-check-running-tests (advance progress status once cluster is ready)
+  ├── run-e2e-tests (workflow_call → hot-cluster-e2e-run.yml)
+  └── verify-gating-tests (sole required "Run Gating Tests" check)
 
 hot-cluster-e2e-run.yml → "Hot Cluster E2E Run"
-  ├── check-runner (ARC runner diagnostics)
   ├── build-kubevirt-plugin-image (podman build + push to ttl.sh)
-  └── run-gating-tests (runs-on: kubevirt-plugin-ci)
+  └── run-gating-tests (runs-on: kubevirt-plugin-ci) -- displays as "Execute tests"
+        ├── ARC runner diagnostics (folded in, formerly a separate check-runner job)
         ├── ci-env-request → ci-env-controller → ci-test-stack
         ├── BRIDGE_BASE_ADDRESS from test stack
         └── Playwright gating (or features project)

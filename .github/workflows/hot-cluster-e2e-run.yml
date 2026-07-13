@@ -38,11 +38,11 @@ on:
       cnv_pin_version:
         description: |
           CNV version pinned for this cluster (e.g. 4.20, 4.21, 4.22), as
-          resolved by hot-cluster-e2e.yml's resolve-cluster-config job.
-          Only affects Cypress's TEST_NS/TEST_SECRET_NAME -- see this
-          workflow's TEST_NS/TEST_SECRET_NAME env for why. Leave empty for a
-          standalone dispatch (falls back to the fixed release-4.20-era
-          naming).
+          resolved by hot-cluster-e2e.yml's prepare job (resolve-config
+          step). Only affects Cypress's TEST_NS/TEST_SECRET_NAME -- see
+          this workflow's TEST_NS/TEST_SECRET_NAME env for why. Leave
+          empty for a standalone dispatch (falls back to the fixed
+          release-4.20-era naming).
         required: false
         default: ''
         type: string
@@ -84,8 +84,8 @@ on:
       test_engine:
         description: |
           E2E test engine to run against the checked-out code (playwright or
-          cypress). See hot-cluster-e2e.yml's resolve-cluster-config job for
-          how this is auto-detected from the target branch.
+          cypress). See hot-cluster-e2e.yml's prepare job (resolve-config
+          step) for how this is auto-detected from the target branch.
         type: string
         required: false
         default: playwright
@@ -102,11 +102,11 @@ on:
       cnv_pin_version:
         description: |
           CNV version pinned for this cluster (e.g. 4.20, 4.21, 4.22), as
-          resolved by hot-cluster-e2e.yml's resolve-cluster-config job.
-          Only affects Cypress's TEST_NS/TEST_SECRET_NAME -- see this
-          workflow's TEST_NS/TEST_SECRET_NAME env for why. Leave empty for a
-          standalone dispatch (falls back to the fixed release-4.20-era
-          naming).
+          resolved by hot-cluster-e2e.yml's prepare job (resolve-config
+          step). Only affects Cypress's TEST_NS/TEST_SECRET_NAME -- see
+          this workflow's TEST_NS/TEST_SECRET_NAME env for why. Leave
+          empty for a standalone dispatch (falls back to the fixed
+          release-4.20-era naming).
         type: string
         required: false
         default: ''
@@ -125,12 +125,16 @@ on:
           Internal marker set only by hot-cluster-e2e.yml's own `uses:` call
           -- never available on the workflow_dispatch trigger, so it's
           reliably false for a standalone dispatch. Distinguishes that case
-          (whose "Run Gating Tests" job would otherwise be a top-level,
+          (whose test-execution job would otherwise be a top-level,
           bare-named check-run that can collide with an unrelated open PR
           sharing the same SHA -- confirmed live on CNV-92682/PR #4293) from
           being called via `uses:` (where GitHub already composite-prefixes
-          the check name, e.g. "Run E2E Tests / Run Gating Tests", so no
-          collision is possible regardless of this flag).
+          the check name, e.g. "Run E2E Tests / Execute tests", so no
+          collision is possible regardless of this flag). Named "Execute
+          tests" (not "Run Gating Tests") specifically so it can never
+          collide with the top-level "Run Gating Tests" required check
+          owned solely by hot-cluster-e2e.yml's own verify-gating-tests job
+          -- see CNV-92582, which documented this exact naming trap.
         type: boolean
         required: false
         default: false
@@ -170,11 +174,174 @@ env:
   CI_ENV_CM: ci-env-${{ github.run_id }}
 
 jobs:
-  check-runner:
-    name: Check Runner Image
-    runs-on: ${{ inputs.runner_label || 'kubevirt-plugin-ci' }}
-    timeout-minutes: 15
+  build-kubevirt-plugin-image:
+    name: Build Kubevirt Plugin Image
+    runs-on: ubuntu-latest
+    outputs:
+      kubevirt-plugin-image: ${{ env.KUBEVIRT_PLUGIN_IMAGE }}
     steps:
+      # inputs.checkout_ref (set to refs/pull/<N>/merge for the main-push
+      # retest path in hot-cluster-e2e.yml) takes priority over the PR's own
+      # head SHA -- see the checkout_ref input above for why: testing the
+      # merge with the current base tip, not the PR's isolated head commit.
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.checkout_ref || github.event.pull_request.head.sha || github.ref }}
+          allow-unsafe-pr-checkout: true
+          # This job's token now carries statuses: write (see
+          # hot-cluster-e2e.yml's run-e2e-tests job) -- persisting it to
+          # .git/config would let PR-controlled code checked out below
+          # (e.g. a malicious test-suite change) read it straight off
+          # disk and post arbitrary commit statuses repo-wide. Checkout
+          # itself doesn't need the credential to persist afterward (no
+          # further git operations happen in this job).
+          persist-credentials: false
+
+      - name: Check if kubevirt-plugin image exists in registry
+        id: check_image
+        run: |
+          if skopeo inspect docker://${KUBEVIRT_PLUGIN_IMAGE} &>/dev/null; then
+            echo "IMAGE_EXISTS=true" >> $GITHUB_OUTPUT
+          else
+            echo "IMAGE_EXISTS=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Generate tags for the kubevirt-plugin image
+        id: meta
+        if: steps.check_image.outputs.IMAGE_EXISTS == 'false'
+        uses: docker/metadata-action@v6
+        env:
+          DOCKER_METADATA_SET_OUTPUT_ENV: false
+        with:
+          images: ${{ env.KUBEVIRT_PLUGIN_IMAGE }}
+          tags: |
+            type=schedule
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+            type=sha
+
+      - name: Build and push
+        if: steps.check_image.outputs.IMAGE_EXISTS == 'false'
+        env:
+          LABELS: ${{ steps.meta.outputs.labels }}
+        run: |
+          {
+            echo "## Labels"
+            echo "\`\`\`"
+            echo "${LABELS}"
+            echo "\`\`\`"
+          } | tee -a "$GITHUB_STEP_SUMMARY"
+
+          LABEL_ARGS=()
+          while IFS= read -r line; do
+            [ -n "$line" ] && LABEL_ARGS+=(--label "$line")
+          done <<< "$LABELS"
+
+          podman build "${LABEL_ARGS[@]}" -t ${KUBEVIRT_PLUGIN_IMAGE} -f Dockerfile .
+          podman push ${KUBEVIRT_PLUGIN_IMAGE}
+
+  run-gating-tests:
+    # inputs.is_reusable_call is only ever true when hot-cluster-e2e.yml
+    # calls this workflow via `uses:` -- see that input's own description
+    # for why a standalone dispatch needs a distinctly-named check here.
+    # Deliberately NOT named "Run Gating Tests" -- that name is reserved
+    # exclusively for hot-cluster-e2e.yml's own top-level verify-gating-
+    # tests job (the sole required check). See is_reusable_call above.
+    name: ${{ inputs.is_reusable_call && 'Execute tests' || 'Execute tests (standalone dispatch)' }}
+    needs: [build-kubevirt-plugin-image]
+    runs-on: ${{ inputs.runner_label || 'kubevirt-plugin-ci' }}
+    timeout-minutes: 120
+    # Only the fixed-namespace Cypress case (see TEST_NS/TEST_SECRET_NAME
+    # below -- release-4.20, any future/unknown cnv_pin_version, or a bare
+    # standalone dispatch) still shares auto-test-ns/auto-test-secret across
+    # runs, so serialize same-cluster runs of that case rather than let them
+    # clobber each other's namespace mid-run (CNV-92722 finding 6, part B).
+    # release-4.21/4.22 already got a genuine per-run namespace above, so
+    # they fall into the no-op `no-lock-<run_id>` group instead -- a group
+    # that's unique to this run and therefore never queues against anything.
+    # cancel-in-progress: false is deliberate: unlike the PR-vs-PR retest
+    # concurrency group in hot-cluster-e2e.yml (where cancelling a superseded
+    # run is correct), two different PRs sharing a fixed namespace must be
+    # queued one after another, not have one silently killed mid-run.
+    # queue: max is required for that "queued one after another" intent to
+    # actually hold: GitHub's default (queue: single) keeps only a single
+    # pending run per group and CANCELS an older pending run outright the
+    # moment a third one arrives in the same group -- silently defeating
+    # this lock for a 3rd/4th concurrent PR without it (confirmed via
+    # GitHub's own concurrency docs).
+    # inputs.cluster_name falls back to inputs.runner_label, matching
+    # run-gating-tests' own runs-on: above and this workflow's run-name --
+    # a bare cluster_name (e.g. a standalone dispatch that only set
+    # runner_label) must still land in the same group as an automated run
+    # targeting that same physical cluster, or this lock silently no-ops
+    # for exactly the case it's meant to protect.
+    concurrency:
+      group: >-
+        ${{
+          ((inputs.test_engine || 'playwright') == 'cypress' && inputs.cnv_pin_version != '4.21' && inputs.cnv_pin_version != '4.22') &&
+          format('cypress-fixed-ns-{0}', inputs.cluster_name || inputs.runner_label || 'kubevirt-plugin-ci') ||
+          format('no-lock-{0}', github.run_id)
+        }}
+      cancel-in-progress: false
+      queue: max
+    env:
+      PLUGIN_IMAGE: ${{ needs.build-kubevirt-plugin-image.outputs.kubevirt-plugin-image }}
+      HEADLESS: 'true'
+      RUN_FEATURE_TESTS: ${{ inputs.test_project == 'features' && 'true' || 'false' }}
+      # Both playwright/fixtures/ and cypress/fixtures/ have a matching
+      # layout, so the engine name doubles as the fixtures directory name.
+      TEST_ENGINE: ${{ inputs.test_engine || 'playwright' }}
+      # Cypress's frozen release-branch test content (predates the
+      # Playwright migration) hardcodes fixed resource names that the
+      # dynamic per-run values below can't reach on every branch:
+      #   - release-4.20's cypress/utils/const/index.ts hardcodes
+      #     TEST_NS = 'auto-test-ns' as a literal string -- no mechanism
+      #     to read Cypress.env('TEST_NS') at all.
+      #   - release-4.20's TEST_SECRET_NAME is likewise hardcoded to
+      #     'auto-test-secret', matching cypress/fixtures/secret.yaml's
+      #     own hardcoded metadata.name.
+      #   - release-4.21/4.22, by contrast, already read both dynamically
+      #     via Cypress.env(...) -- confirmed live during CNV-92722
+      #     validation -- so they get a genuine per-run name below
+      #     instead of the fixed one, removing the cross-PR namespace-
+      #     collision risk entirely for those two (CNV-92722 finding 6):
+      #     two concurrent same-branch PRs on the same cluster no longer
+      #     share auto-test-ns/auto-test-secret and can't clobber each
+      #     other's console mid-run. release-4.20 (and any future/unknown
+      #     pin, including a bare standalone dispatch with no
+      #     cnv_pin_version at all) keeps the fixed fallback name -- see
+      #     the run-gating-tests job-level concurrency block below for
+      #     how that fixed-namespace case is instead serialized rather
+      #     than made collision-proof.
+      # CYPRESS_TEST_NS/CYPRESS_TEST_SECRET_NAME are exported from these
+      # further down but were never consumed by release-4.20's frozen
+      # code -- override both here to match instead. Playwright keeps
+      # the dynamic per-run values from the workflow-level env: above.
+      TEST_NS: >-
+        ${{
+          (inputs.test_engine || 'playwright') != 'cypress' && format('kubevirt-plugin-ci-test-{0}', github.run_id) ||
+          (inputs.cnv_pin_version == '4.21' || inputs.cnv_pin_version == '4.22') && format('auto-test-ns-{0}', github.run_id) ||
+          'auto-test-ns'
+        }}
+      TEST_SECRET_NAME: >-
+        ${{
+          (inputs.test_engine || 'playwright') != 'cypress' && 'ci-test-secret' ||
+          (inputs.cnv_pin_version == '4.21' || inputs.cnv_pin_version == '4.22') && format('auto-test-secret-{0}', github.run_id) ||
+          'auto-test-secret'
+        }}
+
+    steps:
+      # Folded in from the former standalone "Check Runner Image" job
+      # (same ${{ inputs.runner_label || 'kubevirt-plugin-ci' }} runner
+      # this job already runs on) -- merging it into this job's own steps
+      # drops one more row from the PR merge box without losing the
+      # diagnostics themselves. Failing fast here (before Checkout/image
+      # provisioning) still catches a broken ARC runner image before any
+      # real test-environment cost is spent.
       - name: Log environment summary
         run: |
           {
@@ -301,164 +468,6 @@ jobs:
             echo ""
           } | tee -a "$GITHUB_STEP_SUMMARY"
 
-  build-kubevirt-plugin-image:
-    name: Build Kubevirt Plugin Image
-    runs-on: ubuntu-latest
-    outputs:
-      kubevirt-plugin-image: ${{ env.KUBEVIRT_PLUGIN_IMAGE }}
-    steps:
-      # inputs.checkout_ref (set to refs/pull/<N>/merge for the main-push
-      # retest path in hot-cluster-e2e.yml) takes priority over the PR's own
-      # head SHA -- see the checkout_ref input above for why: testing the
-      # merge with the current base tip, not the PR's isolated head commit.
-      - name: Checkout
-        uses: actions/checkout@v7
-        with:
-          ref: ${{ inputs.checkout_ref || github.event.pull_request.head.sha || github.ref }}
-          allow-unsafe-pr-checkout: true
-          # This job's token now carries statuses: write (see
-          # hot-cluster-e2e.yml's run-e2e-tests job) -- persisting it to
-          # .git/config would let PR-controlled code checked out below
-          # (e.g. a malicious test-suite change) read it straight off
-          # disk and post arbitrary commit statuses repo-wide. Checkout
-          # itself doesn't need the credential to persist afterward (no
-          # further git operations happen in this job).
-          persist-credentials: false
-
-      - name: Check if kubevirt-plugin image exists in registry
-        id: check_image
-        run: |
-          if skopeo inspect docker://${KUBEVIRT_PLUGIN_IMAGE} &>/dev/null; then
-            echo "IMAGE_EXISTS=true" >> $GITHUB_OUTPUT
-          else
-            echo "IMAGE_EXISTS=false" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Generate tags for the kubevirt-plugin image
-        id: meta
-        if: steps.check_image.outputs.IMAGE_EXISTS == 'false'
-        uses: docker/metadata-action@v6
-        env:
-          DOCKER_METADATA_SET_OUTPUT_ENV: false
-        with:
-          images: ${{ env.KUBEVIRT_PLUGIN_IMAGE }}
-          tags: |
-            type=schedule
-            type=ref,event=branch
-            type=ref,event=pr
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=semver,pattern={{major}}
-            type=sha
-
-      - name: Build and push
-        if: steps.check_image.outputs.IMAGE_EXISTS == 'false'
-        env:
-          LABELS: ${{ steps.meta.outputs.labels }}
-        run: |
-          {
-            echo "## Labels"
-            echo "\`\`\`"
-            echo "${LABELS}"
-            echo "\`\`\`"
-          } | tee -a "$GITHUB_STEP_SUMMARY"
-
-          LABEL_ARGS=()
-          while IFS= read -r line; do
-            [ -n "$line" ] && LABEL_ARGS+=(--label "$line")
-          done <<< "$LABELS"
-
-          podman build "${LABEL_ARGS[@]}" -t ${KUBEVIRT_PLUGIN_IMAGE} -f Dockerfile .
-          podman push ${KUBEVIRT_PLUGIN_IMAGE}
-
-  run-gating-tests:
-    # inputs.is_reusable_call is only ever true when hot-cluster-e2e.yml
-    # calls this workflow via `uses:` -- see that input's own description
-    # for why a standalone dispatch needs a distinctly-named check here.
-    name: ${{ inputs.is_reusable_call && 'Run Gating Tests' || 'Run Gating Tests (standalone dispatch)' }}
-    needs: [check-runner, build-kubevirt-plugin-image]
-    runs-on: ${{ inputs.runner_label || 'kubevirt-plugin-ci' }}
-    timeout-minutes: 120
-    # Only the fixed-namespace Cypress case (see TEST_NS/TEST_SECRET_NAME
-    # below -- release-4.20, any future/unknown cnv_pin_version, or a bare
-    # standalone dispatch) still shares auto-test-ns/auto-test-secret across
-    # runs, so serialize same-cluster runs of that case rather than let them
-    # clobber each other's namespace mid-run (CNV-92722 finding 6, part B).
-    # release-4.21/4.22 already got a genuine per-run namespace above, so
-    # they fall into the no-op `no-lock-<run_id>` group instead -- a group
-    # that's unique to this run and therefore never queues against anything.
-    # cancel-in-progress: false is deliberate: unlike the PR-vs-PR retest
-    # concurrency group in hot-cluster-e2e.yml (where cancelling a superseded
-    # run is correct), two different PRs sharing a fixed namespace must be
-    # queued one after another, not have one silently killed mid-run.
-    # queue: max is required for that "queued one after another" intent to
-    # actually hold: GitHub's default (queue: single) keeps only a single
-    # pending run per group and CANCELS an older pending run outright the
-    # moment a third one arrives in the same group -- silently defeating
-    # this lock for a 3rd/4th concurrent PR without it (confirmed via
-    # GitHub's own concurrency docs).
-    # inputs.cluster_name falls back to inputs.runner_label, matching
-    # run-gating-tests' own runs-on: above and this workflow's run-name --
-    # a bare cluster_name (e.g. a standalone dispatch that only set
-    # runner_label) must still land in the same group as an automated run
-    # targeting that same physical cluster, or this lock silently no-ops
-    # for exactly the case it's meant to protect.
-    concurrency:
-      group: >-
-        ${{
-          ((inputs.test_engine || 'playwright') == 'cypress' && inputs.cnv_pin_version != '4.21' && inputs.cnv_pin_version != '4.22') &&
-          format('cypress-fixed-ns-{0}', inputs.cluster_name || inputs.runner_label || 'kubevirt-plugin-ci') ||
-          format('no-lock-{0}', github.run_id)
-        }}
-      cancel-in-progress: false
-      queue: max
-    env:
-      PLUGIN_IMAGE: ${{ needs.build-kubevirt-plugin-image.outputs.kubevirt-plugin-image }}
-      HEADLESS: 'true'
-      RUN_FEATURE_TESTS: ${{ inputs.test_project == 'features' && 'true' || 'false' }}
-      # Both playwright/fixtures/ and cypress/fixtures/ have a matching
-      # layout, so the engine name doubles as the fixtures directory name.
-      TEST_ENGINE: ${{ inputs.test_engine || 'playwright' }}
-      # Cypress's frozen release-branch test content (predates the
-      # Playwright migration) hardcodes fixed resource names that the
-      # dynamic per-run values below can't reach on every branch:
-      #   - release-4.20's cypress/utils/const/index.ts hardcodes
-      #     TEST_NS = 'auto-test-ns' as a literal string -- no mechanism
-      #     to read Cypress.env('TEST_NS') at all.
-      #   - release-4.20's TEST_SECRET_NAME is likewise hardcoded to
-      #     'auto-test-secret', matching cypress/fixtures/secret.yaml's
-      #     own hardcoded metadata.name.
-      #   - release-4.21/4.22, by contrast, already read both dynamically
-      #     via Cypress.env(...) -- confirmed live during CNV-92722
-      #     validation -- so they get a genuine per-run name below
-      #     instead of the fixed one, removing the cross-PR namespace-
-      #     collision risk entirely for those two (CNV-92722 finding 6):
-      #     two concurrent same-branch PRs on the same cluster no longer
-      #     share auto-test-ns/auto-test-secret and can't clobber each
-      #     other's console mid-run. release-4.20 (and any future/unknown
-      #     pin, including a bare standalone dispatch with no
-      #     cnv_pin_version at all) keeps the fixed fallback name -- see
-      #     the run-gating-tests job-level concurrency block below for
-      #     how that fixed-namespace case is instead serialized rather
-      #     than made collision-proof.
-      # CYPRESS_TEST_NS/CYPRESS_TEST_SECRET_NAME are exported from these
-      # further down but were never consumed by release-4.20's frozen
-      # code -- override both here to match instead. Playwright keeps
-      # the dynamic per-run values from the workflow-level env: above.
-      TEST_NS: >-
-        ${{
-          (inputs.test_engine || 'playwright') != 'cypress' && format('kubevirt-plugin-ci-test-{0}', github.run_id) ||
-          (inputs.cnv_pin_version == '4.21' || inputs.cnv_pin_version == '4.22') && format('auto-test-ns-{0}', github.run_id) ||
-          'auto-test-ns'
-        }}
-      TEST_SECRET_NAME: >-
-        ${{
-          (inputs.test_engine || 'playwright') != 'cypress' && 'ci-test-secret' ||
-          (inputs.cnv_pin_version == '4.21' || inputs.cnv_pin_version == '4.22') && format('auto-test-secret-{0}', github.run_id) ||
-          'auto-test-secret'
-        }}
-
-    steps:
       # See the build-kubevirt-plugin-image job's Checkout step above --
       # same checkout_ref precedence, so the image build and the test run
       # always test the identical tree.
@@ -577,11 +586,11 @@ jobs:
       # Best-effort follow-up to hot-cluster-e2e.yml's own progress-check-
       # running-tests job, which already posted "Building plugin image"
       # against the same SHA/context before this reusable workflow even
-      # started (that checkpoint covers check-runner + build-kubevirt-
-      # plugin-image + everything up to here). Only hot-cluster-e2e.yml's
-      # `uses:` call ever sets progress_status_sha -- a standalone
-      # workflow_dispatch of this file alone leaves it empty, so this is
-      # a no-op then.
+      # started (that checkpoint covers this job's own runner-diagnostics
+      # steps above + build-kubevirt-plugin-image + everything up to here).
+      # Only hot-cluster-e2e.yml's `uses:` call ever sets progress_status_sha
+      # -- a standalone workflow_dispatch of this file alone leaves it empty,
+      # so this is a no-op then.
       - name: Update progress status
         if: inputs.progress_status_sha != '' && inputs.progress_status_context != ''
         continue-on-error: true

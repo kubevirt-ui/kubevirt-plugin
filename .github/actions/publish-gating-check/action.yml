@@ -11,9 +11,11 @@ description: |
   GitHub-native way to represent a new check attempt -- the merge box shows
   whichever check-run reported most recently for a given name.
 
-  Single source of truth for the check's name/shape, used by both
-  retest-stale-gating.yml's per-PR stale-marking and hot-cluster-e2e.yml's
-  retest-result publishing, so the two can't drift out of sync.
+  Single source of truth for the check's name/shape, used by
+  retest-stale-gating.yml's per-PR stale-marking, hot-cluster-e2e.yml's
+  prepare job (superseding a stale prior result the moment a fresh run
+  starts) and its pr_number retest-result publishing, so all three can't
+  drift out of sync.
 
 inputs:
   head-sha:

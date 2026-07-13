@@ -158,7 +158,9 @@ rules:
     resources: ['migrationpolicies']
     verbs: ['get', 'list', 'delete']
 
-  # --- check-runner job: HCO / operator version logging ---
+  # --- run-gating-tests job's runner-diagnostics steps: HCO / operator
+  # version logging (folded in from the former standalone check-runner
+  # job) ---
   - apiGroups: ['operators.coreos.com']
     resources: ['clusterserviceversions']
     verbs: ['get', 'list']
