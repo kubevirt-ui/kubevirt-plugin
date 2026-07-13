@@ -95,14 +95,11 @@ permissions:
   contents: read
   actions: write
 
-concurrency:
-  # Irrelevant label events get their own run-id-unique group so they can't
-  # delay/mask the real per-PR result. pr_number is checked before the
-  # ref+cluster_name fallback so pr_number dispatches (no pull_request
-  # payload) still group by the PR they target.
-  group: ${{ (github.event.action != 'labeled' || github.event.label.name == 'ok-to-test') && format('hot-cluster-e2e-{0}', github.event.pull_request.number || inputs.pr_number || format('{0}-{1}', github.ref, inputs.cluster_name || 'kubevirt-plugin-ci')) || format('hot-cluster-e2e-noop-{0}', github.run_id) }}
-  cancel-in-progress: true
-
+# No workflow-level concurrency here on purpose -- it would hold an entire
+# new run pending until the old one fully finishes, since a uses: job's
+# cancellation never actually lands (see cluster-check/run-e2e-tests'
+# concurrency below). Cancellation instead lives per-job, only on the two
+# jobs that cost real cluster time; cheap jobs run freely every trigger.
 env:
   INFRASTRUCTURE_TYPE: ${{ inputs.infrastructure_type || 'ipi' }}
   IBM_REGION: eu-de
@@ -111,12 +108,13 @@ env:
 
 jobs:
   # Resolves cluster config, CI trust, PR context, and progress status as
-  # steps of one job (not four) since every top-level job is its own
-  # merge-box row. Each step after Checkout has its own always() +
-  # continue-on-error so one failure can't skip the others.
+  # steps of one job (not four) to keep the merge box small. Each step
+  # after Checkout has its own always() + continue-on-error so one
+  # failure can't skip the others. Skipped for an irrelevant-label
+  # no-op, like every job below.
   prepare:
     name: Prepare
-    if: always()
+    if: always() && !(github.event.action == 'labeled' && github.event.label.name != 'ok-to-test')
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
@@ -143,7 +141,6 @@ jobs:
       # Single source of truth for "Hot Cluster E2E Progress" postings this run.
       progress_head_sha: ${{ steps.resolve-progress.outputs.head-sha }}
       progress_status_context: ${{ steps.resolve-progress.outputs.status-context }}
-      is_irrelevant_label: ${{ steps.resolve-progress.outputs.is-irrelevant-label }}
     steps:
       # No ref override -- checks out the base branch so a PR can't
       # self-approve OWNERS trust.
@@ -194,11 +191,10 @@ jobs:
           resolved-head-sha: ${{ steps.resolve-pr-context.outputs.head-sha }}
           pr-number: ${{ inputs.pr_number }}
 
-      # No posting for the irrelevant-label no-op -- the status simply
-      # keeps its last real state; a differently-named entry here would
-      # just add a permanent extra row to nearly every PR.
+      # Irrelevant-label events never reach this job at all (see if: above)
+      # -- no separate check needed here.
       - name: Post initial progress status (waiting for cluster)
-        if: always() && steps.resolve-progress.outputs.is-irrelevant-label != 'true'
+        if: always()
         uses: ./.github/actions/hot-cluster/post-progress-status
         with:
           head-sha: ${{ steps.resolve-progress.outputs.head-sha }}
@@ -215,7 +211,6 @@ jobs:
       - name: Supersede stale "Run Gating Tests" check for this run
         if: |
           always() &&
-          steps.resolve-progress.outputs.is-irrelevant-label != 'true' &&
           steps.resolve-progress.outputs.head-sha != '' &&
           !(github.event_name == 'workflow_dispatch' && inputs.pr_number == '') &&
           steps.resolve-pr-context.outcome != 'failure' &&
@@ -238,6 +233,13 @@ jobs:
   cluster-check:
     needs: [prepare]
     if: always() && !(github.event.action == 'labeled' && github.event.label.name != 'ok-to-test')
+    # Only real per-job concurrency in this workflow (see the top-level
+    # comment on why there's no workflow-level group) -- this is what
+    # actually cancels a same-PR push/retest's stale cluster check. No
+    # irrelevant-label carve-out needed -- if: above already excludes it.
+    concurrency:
+      group: hot-cluster-check-${{ github.event.pull_request.number || inputs.pr_number || format('{0}-{1}', github.ref, inputs.cluster_name || 'kubevirt-plugin-ci') }}
+      cancel-in-progress: true
     uses: ./.github/workflows/hot-cluster-check.yml
     with:
       cluster_name: ${{ needs.prepare.outputs.cluster_name }}
@@ -257,11 +259,14 @@ jobs:
 
   # Advances progress once the cluster is ready, or fails it otherwise.
   # Skipped for an irrelevant-label no-op (same as cluster-check above),
-  # else it'd show as "successful" having done nothing.
+  # else it'd show as "successful" having done nothing. Also skipped if
+  # cluster-check was cancelled (a newer same-PR trigger superseded it via
+  # its job-level concurrency group) -- otherwise this would post a
+  # misleading "Cluster not ready" failure for what's really a supersession.
   progress-check-running-tests:
     name: Update Progress Check
     needs: [prepare, cluster-check]
-    if: always() && !(github.event.action == 'labeled' && github.event.label.name != 'ok-to-test')
+    if: always() && !(github.event.action == 'labeled' && github.event.label.name != 'ok-to-test') && needs.cluster-check.result != 'cancelled'
     runs-on: ubuntu-latest
     timeout-minutes: 2
     permissions:
@@ -279,14 +284,8 @@ jobs:
         env:
           HEAD_SHA: ${{ needs.prepare.outputs.progress_head_sha }}
           STATUS_CONTEXT: ${{ needs.prepare.outputs.progress_status_context }}
-          IS_IRRELEVANT_LABEL: ${{ needs.prepare.outputs.is_irrelevant_label }}
         with:
           script: |
-            if (process.env.IS_IRRELEVANT_LABEL === 'true') {
-              core.info('Irrelevant label event — progress status already completed as a no-op.');
-              return;
-            }
-
             const headSha = process.env.HEAD_SHA;
             const statusContext = process.env.STATUS_CONTEXT;
 
@@ -337,6 +336,11 @@ jobs:
       needs.prepare.outputs.pr_mergeable != 'false' &&
       needs.prepare.outputs.pr_still_in_pool != 'false' &&
       needs.prepare.outputs.pr_trusted != 'false'
+    # See cluster-check's concurrency comment -- same reasoning, own group
+    # so this job's cancellation doesn't race with cluster-check's.
+    concurrency:
+      group: hot-cluster-run-e2e-${{ github.event.pull_request.number || inputs.pr_number || format('{0}-{1}', github.ref, inputs.cluster_name || 'kubevirt-plugin-ci') }}
+      cancel-in-progress: true
     uses: ./.github/workflows/hot-cluster-e2e-run.yml
     with:
       test_project: ${{ inputs.test_project || 'gating' }}
@@ -365,10 +369,18 @@ jobs:
   # name: is static, not dynamic -- GitHub never evaluates a job's name:
   # expression when skipped (actions/runner#1215), so a ternary here would
   # render as raw unevaluated text on every irrelevant-label no-op.
+  #
+  # Also skipped if cluster-check or run-e2e-tests was cancelled (a newer
+  # same-PR trigger superseded it via a job-level concurrency group) --
+  # otherwise E2E_RESULT below would be 'skipped'/'cancelled', not
+  # 'success', and this would publish a misleading test-failed result for
+  # what's really a supersession. The superseding run publishes its own.
   verify-gating-tests:
     name: Verify Gating Tests
     needs: [prepare, cluster-check, run-e2e-tests, progress-check-running-tests]
-    if: always() && !(github.event.action == 'labeled' && github.event.label.name != 'ok-to-test')
+    if: |
+      always() && !(github.event.action == 'labeled' && github.event.label.name != 'ok-to-test') &&
+      needs.cluster-check.result != 'cancelled' && needs.run-e2e-tests.result != 'cancelled'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:

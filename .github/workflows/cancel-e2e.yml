@@ -1,0 +1,213 @@
+name: Cancel E2E
+
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: read
+  actions: read
+  pull-requests: read
+  issues: write
+  statuses: write
+
+jobs:
+  # Only decides trust and whether anything looks in-progress (for the
+  # report comment's wording) -- it doesn't cancel anything itself. Plain
+  # cancelWorkflowRun() doesn't actually stop a uses: job (proven this
+  # session), so real cancellation happens below via the two jobs entering
+  # hot-cluster-e2e.yml's own job-level concurrency groups instead.
+  check:
+    name: Check Cancel Request
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    if: >
+      github.event.issue.pull_request != null &&
+      contains(github.event.comment.body, '/cancel-e2e')
+    outputs:
+      trusted: ${{ steps.check-trust.outputs.trusted }}
+      was-running: ${{ steps.detect.outputs.was_running }}
+      head-sha: ${{ steps.detect.outputs.head_sha }}
+    steps:
+      # No ref override: reads OWNERS from the default branch, not the commenter's PR.
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      # OWNERS is the single source of truth for trust, same as /retest-e2e.
+      - name: Check trusted author
+        id: check-trust
+        uses: ./.github/actions/hot-cluster/check-trust
+        with:
+          author: ${{ github.event.comment.user.login }}
+
+      - name: Detect in-progress runs and react
+        id: detect
+        uses: actions/github-script@v9
+        env:
+          TRUSTED: ${{ steps.check-trust.outputs.trusted }}
+        with:
+          script: |
+            const author = context.payload.comment.user.login;
+
+            const react = async (content) => {
+              try {
+                await github.rest.reactions.createForIssueComment({
+                  ...context.repo,
+                  comment_id: context.payload.comment.id,
+                  content,
+                });
+              } catch (err) {
+                core.warning(`Could not react to comment with "${content}": ${err.message || err}`);
+              }
+            };
+
+            const trusted = process.env.TRUSTED === 'true';
+            core.info(`${author} is ${trusted ? '' : 'not '}listed in OWNERS (approvers/reviewers) — ${trusted ? 'trusted' : 'untrusted, ignoring /cancel-e2e'}.`);
+
+            if (!trusted) {
+              await react('-1');
+              core.setFailed(`${author} is not authorized to use /cancel-e2e`);
+              return;
+            }
+
+            const prNumber = context.issue.number;
+            const pr = await github.rest.pulls.get({
+              ...context.repo,
+              pull_number: prNumber,
+            });
+            const headSha = pr.data.head.sha;
+
+            core.info(`/cancel-e2e requested by ${author} on PR #${prNumber} (HEAD: ${headSha})`);
+
+            // Queried by status directly (not a created: lookback window
+            // like /retest-e2e uses) -- a run stuck for longer than any
+            // bounded window would otherwise be invisible here, which is
+            // exactly the case /cancel-e2e most needs to catch.
+            const [inProgressRuns, queuedRuns] = await Promise.all([
+              github.paginate(github.rest.actions.listWorkflowRuns, {
+                ...context.repo,
+                workflow_id: 'hot-cluster-e2e.yml',
+                status: 'in_progress',
+                per_page: 100,
+              }),
+              github.paginate(github.rest.actions.listWorkflowRuns, {
+                ...context.repo,
+                workflow_id: 'hot-cluster-e2e.yml',
+                status: 'queued',
+                per_page: 100,
+              }),
+            ]);
+            const activeRuns = [...inProgressRuns, ...queuedRuns];
+
+            // Bot-label no-ops never enter cluster-check/run-e2e-tests'
+            // concurrency groups (both skip via if: for that case), so
+            // counting one here would misreport "cancelled" for a run that
+            // was never really occupying anything, and would wrongly
+            // overwrite the progress status below.
+            const isIrrelevantLabelNoop = (run) =>
+              run.display_title?.includes('(skipped: irrelevant label)');
+
+            // Same identity matching as /retest-e2e -- a pr_number dispatch
+            // runs against ref: main with no PR association, so it's
+            // matched via the PR#<number> retest token in run-name: instead.
+            const runningCandidates = activeRuns.filter(r => {
+              if (isIrrelevantLabelNoop(r)) return false;
+              if (r.event === 'workflow_dispatch') {
+                return r.display_title?.includes(`@ PR#${prNumber} retest`);
+              }
+              const prMatch = r.pull_requests?.some(p => p.number === prNumber);
+              const shaMatch = r.head_sha === headSha;
+              const branchMatch = r.head_branch === pr.data.head.ref &&
+                r.head_repository?.id === pr.data.head.repo?.id;
+              return prMatch || shaMatch || branchMatch;
+            });
+            const wasRunning = runningCandidates.length > 0;
+
+            core.info(wasRunning
+              ? `Found ${runningCandidates.length} in-progress/queued run(s) for PR #${prNumber}: ${runningCandidates.map(r => r.id).join(', ')}`
+              : `No in-progress/queued Hot Cluster E2E run found for PR #${prNumber}.`);
+
+            await react('eyes');
+
+            core.setOutput('was_running', wasRunning ? 'true' : 'false');
+            core.setOutput('head_sha', headSha);
+
+  # Entering this same group is what actually cancels a same-PR cluster-check
+  # in progress -- see hot-cluster-e2e.yml's own concurrency on that job.
+  cancel-cluster-check:
+    name: Cancel Cluster Check
+    needs: [check]
+    if: needs.check.outputs.trusted == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    concurrency:
+      group: hot-cluster-check-${{ github.event.issue.number }}
+      cancel-in-progress: true
+    steps:
+      - run: echo "Entered the cluster-check concurrency group for PR ${{ github.event.issue.number }} -- cancels any in-progress instance."
+
+  # Same as above, for run-e2e-tests -- the job that actually costs real
+  # cluster/test time.
+  cancel-run-e2e-tests:
+    name: Cancel Run E2E Tests
+    needs: [check]
+    if: needs.check.outputs.trusted == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    concurrency:
+      group: hot-cluster-run-e2e-${{ github.event.issue.number }}
+      cancel-in-progress: true
+    steps:
+      - run: echo "Entered the run-e2e-tests concurrency group for PR ${{ github.event.issue.number }} -- cancels any in-progress instance."
+
+  report:
+    name: Report Cancellation
+    needs: [check, cancel-cluster-check, cancel-run-e2e-tests]
+    if: always() && needs.check.outputs.trusted == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Comment outcome on the PR
+        uses: actions/github-script@v9
+        env:
+          WAS_RUNNING: ${{ needs.check.outputs.was-running }}
+        with:
+          script: |
+            const wasRunning = process.env.WAS_RUNNING === 'true';
+            const body = wasRunning
+              ? '🛑 Cancelled the in-progress Hot Cluster E2E run for this PR -- comment `/retest-e2e` for a fresh result.'
+              : 'ℹ️ No Hot Cluster E2E run was in progress for this PR -- nothing to cancel.';
+            await github.rest.issues.createComment({
+              ...context.repo,
+              issue_number: context.issue.number,
+              body,
+            });
+
+      # Only touches the informational progress status, never "Run Gating
+      # Tests" -- a cancellation isn't a test result. cluster-check/
+      # run-e2e-tests' own "!= cancelled" guards in hot-cluster-e2e.yml
+      # already stop the cancelled run's own jobs from posting a misleading
+      # failure, so there's nothing else to reconcile here.
+      - name: Checkout
+        if: needs.check.outputs.was-running == 'true'
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Update stale progress status
+        if: needs.check.outputs.was-running == 'true'
+        uses: ./.github/actions/hot-cluster/resolve-progress-context
+        id: resolve-progress
+        with:
+          resolved-head-sha: ${{ needs.check.outputs.head-sha }}
+
+      - name: Post cancelled progress status
+        if: needs.check.outputs.was-running == 'true'
+        uses: ./.github/actions/hot-cluster/post-progress-status
+        with:
+          head-sha: ${{ steps.resolve-progress.outputs.head-sha }}
+          status-context: ${{ steps.resolve-progress.outputs.status-context }}
+          state: failure
+          description: Cancelled via /cancel-e2e by ${{ github.event.comment.user.login }} -- comment /retest-e2e for a fresh result
