@@ -559,9 +559,20 @@ jobs:
     # progress-check-start above.
     permissions:
       statuses: write
+    outputs:
+      # Threaded into run-e2e-tests below (and from there, into
+      # hot-cluster-e2e-run.yml) so it can post its own follow-up
+      # "Running gating tests" progress update once the actual test
+      # command starts, reusing this job's already-resolved SHA/context
+      # rather than recomputing the same logic a third time. Empty for
+      # an irrelevant-label event (the script returns before setting
+      # them), but run-e2e-tests never runs in that case anyway.
+      head-sha: ${{ steps.post-status.outputs.head-sha }}
+      status-context: ${{ steps.post-status.outputs.status-context }}
     steps:
       # Best-effort, same as progress-check-start above.
       - name: Post progress status
+        id: post-status
         continue-on-error: true
         uses: actions/github-script@v9
         env:
@@ -598,6 +609,28 @@ jobs:
               ? '${{ needs.cluster-health-check.result }}' === 'success'
               : '${{ needs.cluster-check.outputs.cluster_ready }}' === 'true';
 
+            // Set before the API call below (not after) -- if
+            // createCommitStatus throws (transient API error), this step's
+            // continue-on-error keeps the job "successful" but the script
+            // stops here, and outputs already set survive that. Setting
+            // them after the call would instead leave run-e2e-tests with
+            // an empty head-sha/status-context on any such failure, so its
+            // own follow-up "Running gating tests" post inside
+            // hot-cluster-e2e-run.yml would silently never fire, stranding
+            // the status on whatever progress-check-start posted earlier
+            // ("Waiting for cluster to be built") until the terminal
+            // update.
+            if (clusterReady) {
+              core.setOutput('head-sha', headSha);
+              core.setOutput('status-context', statusContext);
+            }
+
+            // "Running gating tests" is posted later, from within
+            // hot-cluster-e2e-run.yml itself once the actual test command
+            // is about to run (see its "Update progress status" step) --
+            // this checkpoint only covers up to the point where that
+            // reusable workflow starts, whose first real jobs are
+            // check-runner + build-kubevirt-plugin-image.
             await github.rest.repos.createCommitStatus({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -605,14 +638,43 @@ jobs:
               context: statusContext,
               state: clusterReady ? 'pending' : 'failure',
               description: clusterReady
-                ? 'Running gating tests'
+                ? 'Building plugin image'
                 : 'Cluster not ready -- gating tests not run',
               target_url: `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
             });
 
   run-e2e-tests:
     name: Run E2E Tests
-    needs: [cluster-check, cluster-health-check, resolve-cluster-config, resolve-pr-context]
+    # progress-check-running-tests added solely so its head-sha/status-
+    # context outputs (below) are available here -- it doesn't gate
+    # whether this job runs (the explicit `if: always() && (...)` below
+    # already bypasses the implicit "all needs succeeded" default).
+    needs:
+      [
+        cluster-check,
+        cluster-health-check,
+        resolve-cluster-config,
+        resolve-pr-context,
+        progress-check-running-tests,
+      ]
+    # Job-level permissions here OVERRIDE (not add to) the workflow-level
+    # defaults for this specific job, and also become the ceiling for
+    # whatever the called reusable workflow's own jobs can use -- so this
+    # must keep everything the workflow-level block already granted
+    # (contents: read, actions: write) rather than just adding the new
+    # statuses: write on its own, which would otherwise silently strip
+    # the other two from this job and everything it calls into (e.g.
+    # hot-cluster-e2e-run.yml's own actions/checkout steps need
+    # contents: read). statuses: write is threaded into
+    # hot-cluster-e2e-run.yml so it can post its own follow-up "Running
+    # gating tests" progress update once the actual test command starts
+    # -- see progress-check-running-tests above for where these are
+    # computed, and that reusable workflow's own "Update progress
+    # status" step for where they're consumed.
+    permissions:
+      contents: read
+      actions: write
+      statuses: write
     # See cluster-health-check above: key off cluster-check's cluster_ready
     # output, not its job result, now that a no-op event still reports
     # 'success' for cluster-check. cluster-health-check only ever runs for
@@ -689,6 +751,11 @@ jobs:
       # Always true for this `uses:` call -- see hot-cluster-e2e-run.yml's
       # is_reusable_call input for why.
       is_reusable_call: true
+      # Empty when progress-check-running-tests didn't run/set them (e.g.
+      # an irrelevant-label event) -- hot-cluster-e2e-run.yml's own
+      # "Update progress status" step already no-ops on an empty SHA.
+      progress_status_sha: ${{ needs.progress-check-running-tests.outputs.head-sha }}
+      progress_status_context: ${{ needs.progress-check-running-tests.outputs.status-context }}
     secrets: inherit
 
   # Single source of truth for the "Run Gating Tests" required status check.
@@ -739,6 +806,11 @@ jobs:
     # "Run Gating Tests" required check for the same SHA when someone
     # ad-hoc-dispatches this workflow against a branch that also has an
     # open PR (confirmed live on CNV-92682/PR #4293).
+    #
+    # The literal 'skipped - irrelevant label event' suffix below is a
+    # string contract with retest-e2e.yml, which greps every candidate
+    # run's job names for that exact substring to tell a real run apart
+    # from a bot-label no-op -- keep both in sync if this naming changes.
     name: ${{ (github.event.action != 'labeled' || github.event.label.name == 'ok-to-test') && ((github.event_name == 'workflow_dispatch' && inputs.pr_number == '' && 'Run Gating Tests (manual dispatch)') || 'Run Gating Tests') || 'Run Gating Tests (skipped - irrelevant label event)' }}
     needs:
       [

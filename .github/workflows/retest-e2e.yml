@@ -127,7 +127,7 @@ jobs:
                 per_page: 100,
               });
 
-              const prRun = runs.find(r => {
+              const candidates = runs.filter(r => {
                 const prMatch = r.pull_requests?.some(p => p.number === prNumber);
                 const shaMatch = r.head_sha === headSha;
                 // Branch name alone isn't unique across forks -- a same-named
@@ -137,6 +137,48 @@ jobs:
                   r.head_repository?.id === pr.data.head.repo?.id;
                 return prMatch || shaMatch || branchMatch;
               });
+
+              // Bot labels (jira/valid-reference, approved, lgtm, ...) land
+              // on a PR seconds after it's opened, and each one triggers its
+              // own hot-cluster-e2e.yml run that internally no-ops as
+              // "Run Gating Tests (skipped - irrelevant label event)" since
+              // it doesn't represent a real code change. A bot can only
+              // react to a PR that already exists, so these no-op runs are
+              // always *newer* than the real "opened"-triggered run --
+              // picking the newest match alone (the original approach here)
+              // would almost always grab the no-op instead of the real run.
+              // Confirmed live on PR #4298: /retest-e2e re-ran the
+              // "approved"-label no-op run while the genuinely-failed real
+              // run sat untouched, with no visible sign anything was wrong.
+              // Walk newest-to-oldest (still preferring the most recent
+              // match when there's a genuine tie) and skip any candidate
+              // whose jobs show that no-op marker.
+              //
+              // 'skipped - irrelevant label event' is a string contract
+              // with hot-cluster-e2e.yml's verify-gating-tests job, whose
+              // dynamic `name:` is the only place that exact suffix comes
+              // from -- if that naming ever changes, this check must
+              // change with it (and vice versa).
+              let prRun = null;
+              for (const candidate of candidates) {
+                // A single run realistically has on the order of ~10-15
+                // jobs here (well under the API's default page size), but
+                // paginate defensively rather than assume that holds
+                // forever -- a truncated jobs list could otherwise miss
+                // the no-op marker and misclassify a skip run as real.
+                const jobs = await github.paginate(github.rest.actions.listJobsForWorkflowRun, {
+                  ...context.repo,
+                  run_id: candidate.id,
+                  per_page: 100,
+                });
+                const isIrrelevantLabelNoop = jobs.some(
+                  j => j.name.includes('skipped - irrelevant label event'),
+                );
+                if (!isIrrelevantLabelNoop) {
+                  prRun = candidate;
+                  break;
+                }
+              }
 
               if (prRun) {
                 core.info(`Re-running workflow run ${prRun.id} (attempt ${prRun.run_attempt})...`);
@@ -171,7 +213,7 @@ jobs:
               // version-matched cluster for release-4.22-and-earlier PRs
               // (workflow_dispatch has no github.base_ref of its own).
               const baseRef = pr.data.base.ref;
-              core.warning(`No recent Hot Cluster E2E workflow run found for PR #${prNumber} (base: ${baseRef}). Dispatching a fresh run instead.`);
+              core.warning(`No recent Hot Cluster E2E workflow run with real gating-test results found for PR #${prNumber} (base: ${baseRef}) -- only irrelevant-label no-ops, if anything, matched. Dispatching a fresh run instead.`);
               await react('rocket');
 
               await github.rest.actions.createWorkflowDispatch({
@@ -211,7 +253,7 @@ jobs:
               ...context.repo,
               issue_number: context.issue.number,
               body: [
-                '🚀 No recent Hot Cluster E2E run was found to re-run, so `/retest-e2e` dispatched a fresh one instead ' +
+                '🚀 No recent Hot Cluster E2E run with real gating-test results was found to re-run (bot-label events don\'t count), so `/retest-e2e` dispatched a fresh one instead ' +
                   '(this also re-provisions the cluster automatically if it was torn down).',
                 '',
                 `See the [Actions tab](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/workflows/hot-cluster-e2e.yml) for progress.`,

@@ -45,6 +45,24 @@ on:
         required: false
         default: ''
         type: string
+      progress_status_sha:
+        description: |
+          Commit SHA to post the "Running gating tests" progress status
+          against once the actual test command starts (passed by
+          hot-cluster-e2e.yml). Leave empty to skip -- e.g. a standalone
+          workflow_dispatch test run of this file alone.
+        required: false
+        default: ''
+        type: string
+      progress_status_context:
+        description: |
+          Commit-status context name to post the above under. Must match
+          hot-cluster-e2e.yml's "Hot Cluster E2E Progress" naming
+          convention (including its manual-dispatch variant) -- see that
+          workflow's progress-check-running-tests job.
+        required: false
+        default: ''
+        type: string
   workflow_call:
     inputs:
       test_project:
@@ -94,10 +112,29 @@ on:
         type: boolean
         required: false
         default: false
+      progress_status_sha:
+        description: |
+          Commit SHA to post the "Running gating tests" progress status
+          against once the actual test command starts (passed by
+          hot-cluster-e2e.yml). Leave empty to skip -- e.g. a standalone
+          workflow_dispatch test run of this file alone.
+        type: string
+        required: false
+        default: ''
+      progress_status_context:
+        description: |
+          Commit-status context name to post the above under. Must match
+          hot-cluster-e2e.yml's "Hot Cluster E2E Progress" naming
+          convention (including its manual-dispatch variant) -- see that
+          workflow's progress-check-running-tests job.
+        type: string
+        required: false
+        default: ''
 
 permissions:
   contents: read
   actions: read
+  statuses: write
 
 env:
   CNV_NS: openshift-cnv
@@ -257,6 +294,14 @@ jobs:
         with:
           ref: ${{ inputs.checkout_ref || github.event.pull_request.head.sha || github.ref }}
           allow-unsafe-pr-checkout: true
+          # This job's token now carries statuses: write (see
+          # hot-cluster-e2e.yml's run-e2e-tests job) -- persisting it to
+          # .git/config would let PR-controlled code checked out below
+          # (e.g. a malicious test-suite change) read it straight off
+          # disk and post arbitrary commit statuses repo-wide. Checkout
+          # itself doesn't need the credential to persist afterward (no
+          # further git operations happen in this job).
+          persist-credentials: false
 
       - name: Check if kubevirt-plugin image exists in registry
         id: check_image
@@ -347,6 +392,14 @@ jobs:
         with:
           ref: ${{ inputs.checkout_ref || github.event.pull_request.head.sha || github.ref }}
           allow-unsafe-pr-checkout: true
+          # This job's token now carries statuses: write (see
+          # hot-cluster-e2e.yml's run-e2e-tests job) -- persisting it to
+          # .git/config would let PR-controlled code checked out below
+          # (e.g. a malicious test-suite change) read it straight off
+          # disk and post arbitrary commit statuses repo-wide. Checkout
+          # itself doesn't need the credential to persist afterward (no
+          # further git operations happen in this job).
+          persist-credentials: false
 
       # Referenced by owner/repo/path@main rather than the local ./ path --
       # checkout_ref can point at a release branch that predates this CI
@@ -445,6 +498,33 @@ jobs:
           else
             npm run playwright-install
           fi
+
+      # Best-effort follow-up to hot-cluster-e2e.yml's own progress-check-
+      # running-tests job, which already posted "Building plugin image"
+      # against the same SHA/context before this reusable workflow even
+      # started (that checkpoint covers check-runner + build-kubevirt-
+      # plugin-image + everything up to here). Only hot-cluster-e2e.yml's
+      # `uses:` call ever sets progress_status_sha -- a standalone
+      # workflow_dispatch of this file alone leaves it empty, so this is
+      # a no-op then.
+      - name: Update progress status
+        if: inputs.progress_status_sha != '' && inputs.progress_status_context != ''
+        continue-on-error: true
+        uses: actions/github-script@v9
+        env:
+          STATUS_SHA: ${{ inputs.progress_status_sha }}
+          STATUS_CONTEXT: ${{ inputs.progress_status_context }}
+        with:
+          script: |
+            await github.rest.repos.createCommitStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              sha: process.env.STATUS_SHA,
+              context: process.env.STATUS_CONTEXT,
+              state: 'pending',
+              description: 'Running gating tests',
+              target_url: `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
+            });
 
       - name: Run gating tests
         env:
