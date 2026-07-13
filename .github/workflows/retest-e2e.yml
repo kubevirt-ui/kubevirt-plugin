@@ -18,59 +18,45 @@ jobs:
       github.event.issue.pull_request != null &&
       contains(github.event.comment.body, '/retest-e2e')
     steps:
-      # No ref override: reads OWNERS from the default branch, not whatever the
-      # commenter's PR branch might contain.
+      # No ref override: reads OWNERS from the default branch, not the commenter's PR.
       - name: Checkout
         uses: actions/checkout@v7
+        with:
+          persist-credentials: false
 
-      # Short-lived installation token from the kubevirt-plugin-bot GitHub
-      # App (Pull requests: Read, Actions: Read and write).
-      #
-      # continue-on-error: if BOT_APP_ID/BOT_APP_PRIVATE_KEY themselves ever
-      # go bad, this must not skip the retest step below — an empty token
-      # input still lets that step run, fail its first API call, and get
-      # caught by its own try/catch, which is what actually drives the PR
-      # comment in the reporting step further down. Without this, a broken
-      # app credential would reproduce the exact silent-failure bug we're
-      # fixing here, just one level up.
+      # OWNERS is the single source of truth for trust, same as Prow's
+      # /lgtm and /approve.
+      - name: Check trusted author
+        id: check-trust
+        uses: ./.github/actions/hot-cluster/check-trust
+        with:
+          author: ${{ github.event.comment.user.login }}
+
+      # continue-on-error: a bad credential must still let the retest step
+      # run and report the failure below, not skip silently. Scoped to just
+      # what's needed; issues: write omitted -- reactions stay best-effort.
       - name: Generate bot token
         id: bot-token
         continue-on-error: true
         uses: actions/create-github-app-token@v3
         with:
-          # app-id is deprecated in favor of client-id (the action now warns
-          # about it at runtime), but actionlint pins its bundled action
-          # metadata to v1.7.12 here, which predates that input -- switching
-          # would fail the actionlint CI check over a harmless warning. Revisit
-          # once actionlint's metadata (or this repo's pinned version) catches up.
           app-id: ${{ secrets.BOT_APP_ID }}
           private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
+          permission-pull-requests: read
+          permission-actions: write
 
-      # OWNERS (approvers/reviewers) is the single source of truth for trust —
-      # the same source Prow uses for /lgtm, /approve. author_association and
-      # org membership are unreliable proxies (misreport private membership,
-      # need extra token scope), so we don't use them here.
-      #
-      # continue-on-error: an unforeseen failure here must not fail silently —
-      # steps.retest.outcome still reports 'failure' for the final step below,
-      # while the reporting step in between uses the default GITHUB_TOKEN
-      # (independent of the bot token) to explain what went wrong on the PR
-      # itself.
-      - name: Check trusted author and re-run E2E workflow
+      - name: Re-run E2E workflow
         id: retest
         continue-on-error: true
         uses: actions/github-script@v9
+        env:
+          TRUSTED: ${{ steps.check-trust.outputs.trusted }}
         with:
           github-token: ${{ steps.bot-token.outputs.token }}
           script: |
-            const fs = require('fs');
             const author = context.payload.comment.user.login;
 
-            // kubevirt-plugin-bot deliberately doesn't have `issues: write`
-            // (PR comments are "issue comments" under the hood, so reacting
-            // to one needs that permission, not `pull-requests`). Reactions
-            // are cosmetic feedback on the /retest-e2e comment — a missing
-            // reaction must never be mistaken for the retest itself failing.
+            // No issues: write on the bot app, so reactions are best-effort.
             const react = async (content) => {
               try {
                 await github.rest.reactions.createForIssueComment({
@@ -84,14 +70,7 @@ jobs:
             };
 
             try {
-              let trusted = false;
-              try {
-                const owners = fs.readFileSync('OWNERS', 'utf8');
-                trusted = new RegExp(`^\\s*-\\s*${author}\\s*$`, 'm').test(owners);
-              } catch (err) {
-                core.warning(`Could not read OWNERS file: ${err.message}`);
-              }
-
+              const trusted = process.env.TRUSTED === 'true';
               core.info(`${author} is ${trusted ? '' : 'not '}listed in OWNERS (approvers/reviewers) — ${trusted ? 'trusted' : 'untrusted, ignoring /retest-e2e'}.`);
 
               if (!trusted) {
@@ -109,76 +88,38 @@ jobs:
 
               core.info(`/retest-e2e requested by ${author} on PR #${prNumber} (HEAD: ${headSha})`);
 
-              // A flat per_page: 10 (the original approach here) only looks
-              // at the 10 most recent pull_request_target runs of
-              // hot-cluster-e2e.yml *repo-wide* -- on an active repo, other
-              // PRs' pushes/labels routinely push this PR's own run out of
-              // that window within the hour (confirmed on PR #4143: its run
-              // had fallen to position 12 by the time /retest-e2e ran).
-              // Paginate further, bounded by a recent lookback window so
-              // this stays cheap -- if the PR's own run is older than that,
-              // the fallback dispatch below still guarantees correctness.
+              // Bounded lookback, not a flat per_page:10 -- other PRs'
+              // activity pushes this PR's run down the list fast. No
+              // `event:` filter: a pr_number retest dispatch (below, or
+              // retest-stale-gating.yml's) is itself workflow_dispatch and
+              // would otherwise be invisible to a later /retest-e2e.
               const lookbackDate = new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString();
               const runs = await github.paginate(github.rest.actions.listWorkflowRuns, {
                 ...context.repo,
                 workflow_id: 'hot-cluster-e2e.yml',
-                event: 'pull_request_target',
                 created: `>=${lookbackDate}`,
                 per_page: 100,
               });
 
               const candidates = runs.filter(r => {
+                if (r.event === 'workflow_dispatch') {
+                  // Runs against ref: main -- none of the PR/SHA/branch
+                  // signals below apply. Match via run-name instead.
+                  return r.display_title?.includes(`@ PR#${prNumber} retest`);
+                }
                 const prMatch = r.pull_requests?.some(p => p.number === prNumber);
                 const shaMatch = r.head_sha === headSha;
-                // Branch name alone isn't unique across forks -- a same-named
-                // branch in a different fork must not be mistaken for this
-                // PR's run, so also require the run's head repo to match.
+                // Branch name alone isn't unique across forks.
                 const branchMatch = r.head_branch === pr.data.head.ref &&
                   r.head_repository?.id === pr.data.head.repo?.id;
                 return prMatch || shaMatch || branchMatch;
               });
 
-              // Bot labels (jira/valid-reference, approved, lgtm, ...) land
-              // on a PR seconds after it's opened, and each one triggers its
-              // own hot-cluster-e2e.yml run that internally no-ops as
-              // "Run Gating Tests (skipped - irrelevant label event)" since
-              // it doesn't represent a real code change. A bot can only
-              // react to a PR that already exists, so these no-op runs are
-              // always *newer* than the real "opened"-triggered run --
-              // picking the newest match alone (the original approach here)
-              // would almost always grab the no-op instead of the real run.
-              // Confirmed live on PR #4298: /retest-e2e re-ran the
-              // "approved"-label no-op run while the genuinely-failed real
-              // run sat untouched, with no visible sign anything was wrong.
-              // Walk newest-to-oldest (still preferring the most recent
-              // match when there's a genuine tie) and skip any candidate
-              // whose jobs show that no-op marker.
-              //
-              // 'skipped - irrelevant label event' is a string contract
-              // with hot-cluster-e2e.yml's verify-gating-tests job, whose
-              // dynamic `name:` is the only place that exact suffix comes
-              // from -- if that naming ever changes, this check must
-              // change with it (and vice versa).
-              let prRun = null;
-              for (const candidate of candidates) {
-                // A single run realistically has on the order of ~10-15
-                // jobs here (well under the API's default page size), but
-                // paginate defensively rather than assume that holds
-                // forever -- a truncated jobs list could otherwise miss
-                // the no-op marker and misclassify a skip run as real.
-                const jobs = await github.paginate(github.rest.actions.listJobsForWorkflowRun, {
-                  ...context.repo,
-                  run_id: candidate.id,
-                  per_page: 100,
-                });
-                const isIrrelevantLabelNoop = jobs.some(
-                  j => j.name.includes('skipped - irrelevant label event'),
-                );
-                if (!isIrrelevantLabelNoop) {
-                  prRun = candidate;
-                  break;
-                }
-              }
+              // Bot-label no-ops are always newer than the real run --
+              // walk newest-to-oldest and skip them.
+              const isIrrelevantLabelNoop = (run) =>
+                run.display_title?.includes('(skipped: irrelevant label)');
+              const prRun = candidates.find(candidate => !isIrrelevantLabelNoop(candidate)) ?? null;
 
               if (prRun) {
                 core.info(`Re-running workflow run ${prRun.id} (attempt ${prRun.run_attempt})...`);
@@ -194,24 +135,9 @@ jobs:
                 return;
               }
 
-              // No existing run to re-run within the lookback window --
-              // rather than silently giving up (the original behavior:
-              // just a job log warning and a best-effort reaction, which
-              // itself silently fails since this bot lacks issues: write --
-              // see react() above), dispatch a fresh run instead. This is
-              // the same workflow_dispatch + pr_number mechanism
-              // retest-stale-gating.yml already uses for merge-pool PRs,
-              // which already provisions the cluster if it's down or queues
-              // behind an in-progress provision (ibmc-cluster-setup.yml's
-              // hot-cluster-provision-<cluster_name> concurrency group) --
-              // no new queueing logic needed here. skip_pool_check: true
-              // because /retest-e2e must work for any PR on demand,
-              // regardless of lgtm/approved review state -- unlike
-              // retest-stale-gating.yml's dispatch, which intentionally
-              // only retests merge-pool PRs. base_ref is required so
-              // resolve-cluster-config can auto-select Cypress + a
-              // version-matched cluster for release-4.22-and-earlier PRs
-              // (workflow_dispatch has no github.base_ref of its own).
+              // Nothing to re-run -- dispatch fresh via the same pr_number
+              // mechanism retest-stale-gating.yml uses. skip_pool_check:
+              // /retest-e2e must work regardless of review state.
               const baseRef = pr.data.base.ref;
               core.warning(`No recent Hot Cluster E2E workflow run with real gating-test results found for PR #${prNumber} (base: ${baseRef}) -- only irrelevant-label no-ops, if anything, matched. Dispatching a fresh run instead.`);
               await react('rocket');
@@ -230,19 +156,11 @@ jobs:
               core.info(`Fresh run dispatched for PR #${prNumber} (base_ref=${baseRef}).`);
               core.setOutput('fallback_dispatched', 'true');
             } catch (err) {
-              // Distinct from the expected "not authorized" rejection above:
-              // this is an unforeseen failure (bad bot token, API outage,
-              // ...) that the PR author has no way to diagnose from a
-              // missing reaction alone.
               core.setOutput('unexpected_error', 'true');
               core.setOutput('error_message', err.message || String(err));
               core.setFailed(`Unexpected error while processing /retest-e2e: ${err.message || err}`);
             }
 
-      # Reactions on this bot's token silently fail (see react() above), so
-      # a fallback dispatch needs its own visible confirmation on the PR --
-      # otherwise the author sees no difference between "a fresh run was
-      # just dispatched" and "nothing happened at all".
       - name: Report fallback retest dispatch on the PR
         if: steps.retest.outputs.fallback_dispatched == 'true'
         uses: actions/github-script@v9
@@ -282,10 +200,6 @@ jobs:
               ].join('\n'),
             });
 
-      # Re-fail the job for both the "not authorized" and "unexpected error"
-      # cases above: continue-on-error on the retest step only exists so the
-      # reporting step can run afterwards, not to hide a genuine failure from
-      # the job's overall status.
       - name: Fail job if retest did not succeed
         if: steps.retest.outcome == 'failure'
         run: exit 1

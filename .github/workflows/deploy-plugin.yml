@@ -1,7 +1,7 @@
 name: Deploy Plugin (Manual Console Quick Redeploy)
 run-name: 'Deploy Plugin [${{ inputs.cluster_name }}] @ ${{ inputs.branch }}'
 
-# Lightweight companion to deploy-manual-console.yml (CNV-92150) for quickly
+# Lightweight companion to deploy-manual-console.yml for quickly
 # iterating on UI changes against an already-deployed manual console: builds
 # a fresh plugin image and re-provisions the same "manual-console" release,
 # without repeating the full job summary / Slack notification of the main
@@ -55,10 +55,7 @@ jobs:
     timeout-minutes: 20
     steps:
       # Two checkouts, deliberately kept separate -- see
-      # deploy-manual-console.yml's equivalent checkout steps for the full
-      # rationale (CNV-92682 follow-up: building main's plugin against an
-      # older release branch's console caused "Failed to load scripts of
-      # plugin kubevirt-plugin" in the browser).
+      # deploy-manual-console.yml's equivalent checkout steps for why.
       #   1. This repo's own dispatch ref into $GITHUB_WORKSPACE, for CI
       #      scripts (e.g. setup-plugin-image.sh) that may not exist on
       #      inputs.branch.

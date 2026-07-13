@@ -15,10 +15,9 @@ on:
       test_engine:
         description: |
           E2E test engine to run against the checked-out code. Defaults to
-          playwright -- there's no base branch to auto-detect from outside
-          hot-cluster-e2e.yml's pull_request_target path, so set this
-          explicitly to cypress when manually testing a release-4.22-or-
-          earlier ref.
+          playwright; set explicitly to cypress when manually testing a
+          release-4.22-or-earlier ref (there's no base branch to
+          auto-detect from outside hot-cluster-e2e.yml's own trigger).
         required: false
         default: playwright
         type: choice
@@ -38,39 +37,32 @@ on:
       cnv_pin_version:
         description: |
           CNV version pinned for this cluster (e.g. 4.20, 4.21, 4.22), as
-          resolved by hot-cluster-e2e.yml's resolve-cluster-config job.
-          Only affects Cypress's TEST_NS/TEST_SECRET_NAME -- see this
-          workflow's TEST_NS/TEST_SECRET_NAME env for why. Leave empty for a
-          standalone dispatch (falls back to the fixed release-4.20-era
-          naming).
+          resolved by hot-cluster-e2e.yml's prepare job. Only affects
+          Cypress's TEST_NS/TEST_SECRET_NAME (see that env below). Leave
+          empty for a standalone dispatch.
         required: false
         default: ''
         type: string
       checkout_ref:
         description: |
-          Ref/SHA to check out for the code under test. Leave empty for the
-          default (PR head SHA, or the triggering ref for a plain manual
-          run). Set to refs/pull/<N>/merge to test a PR merged with the
-          current base tip instead of the PR's head commit in isolation
-          (used by hot-cluster-e2e.yml's pr_number retest path).
+          Ref/SHA to check out for the code under test. Leave empty for
+          the default (PR head SHA, or the triggering ref). Set to
+          refs/pull/<N>/merge to test a PR merged with the current base
+          tip (used by hot-cluster-e2e.yml's pr_number retest path).
         required: false
         default: ''
         type: string
       progress_status_sha:
         description: |
           Commit SHA to post the "Running gating tests" progress status
-          against once the actual test command starts (passed by
-          hot-cluster-e2e.yml). Leave empty to skip -- e.g. a standalone
-          workflow_dispatch test run of this file alone.
+          against (passed by hot-cluster-e2e.yml). Leave empty to skip.
         required: false
         default: ''
         type: string
       progress_status_context:
         description: |
           Commit-status context name to post the above under. Must match
-          hot-cluster-e2e.yml's "Hot Cluster E2E Progress" naming
-          convention (including its manual-dispatch variant) -- see that
-          workflow's progress-check-running-tests job.
+          hot-cluster-e2e.yml's "Hot Cluster E2E Progress" naming.
         required: false
         default: ''
         type: string
@@ -82,10 +74,7 @@ on:
         required: false
         default: gating
       test_engine:
-        description: |
-          E2E test engine to run against the checked-out code (playwright or
-          cypress). See hot-cluster-e2e.yml's resolve-cluster-config job for
-          how this is auto-detected from the target branch.
+        description: E2E test engine to run (playwright or cypress); see hot-cluster-e2e.yml's prepare job for auto-detection.
         type: string
         required: false
         default: playwright
@@ -102,53 +91,44 @@ on:
       cnv_pin_version:
         description: |
           CNV version pinned for this cluster (e.g. 4.20, 4.21, 4.22), as
-          resolved by hot-cluster-e2e.yml's resolve-cluster-config job.
-          Only affects Cypress's TEST_NS/TEST_SECRET_NAME -- see this
-          workflow's TEST_NS/TEST_SECRET_NAME env for why. Leave empty for a
-          standalone dispatch (falls back to the fixed release-4.20-era
-          naming).
+          resolved by hot-cluster-e2e.yml's prepare job. Only affects
+          Cypress's TEST_NS/TEST_SECRET_NAME (see that env below). Leave
+          empty for a standalone dispatch.
         type: string
         required: false
         default: ''
       checkout_ref:
         description: |
-          Ref/SHA to check out for the code under test. Leave empty for the
-          default (PR head SHA, or the triggering ref for a plain manual
-          run). Set to refs/pull/<N>/merge to test a PR merged with the
-          current base tip instead of the PR's head commit in isolation
-          (used by hot-cluster-e2e.yml's pr_number retest path).
+          Ref/SHA to check out for the code under test. Leave empty for
+          the default (PR head SHA, or the triggering ref). Set to
+          refs/pull/<N>/merge to test a PR merged with the current base
+          tip (used by hot-cluster-e2e.yml's pr_number retest path).
         type: string
         required: false
         default: ''
       is_reusable_call:
         description: |
-          Internal marker set only by hot-cluster-e2e.yml's own `uses:` call
-          -- never available on the workflow_dispatch trigger, so it's
-          reliably false for a standalone dispatch. Distinguishes that case
-          (whose "Run Gating Tests" job would otherwise be a top-level,
-          bare-named check-run that can collide with an unrelated open PR
-          sharing the same SHA -- confirmed live on CNV-92682/PR #4293) from
-          being called via `uses:` (where GitHub already composite-prefixes
-          the check name, e.g. "Run E2E Tests / Run Gating Tests", so no
-          collision is possible regardless of this flag).
+          Internal marker, true only when hot-cluster-e2e.yml calls this
+          workflow via `uses:`. Distinguishes a standalone dispatch (whose
+          test-execution job needs a distinctly-named check to avoid
+          colliding with an unrelated PR on the same SHA) from a nested
+          call (already composite-prefixed by GitHub). Named "Execute
+          tests" (not "Run Gating Tests") so it never collides with the
+          top-level required check owned by verify-gating-tests.
         type: boolean
         required: false
         default: false
       progress_status_sha:
         description: |
           Commit SHA to post the "Running gating tests" progress status
-          against once the actual test command starts (passed by
-          hot-cluster-e2e.yml). Leave empty to skip -- e.g. a standalone
-          workflow_dispatch test run of this file alone.
+          against (passed by hot-cluster-e2e.yml). Leave empty to skip.
         type: string
         required: false
         default: ''
       progress_status_context:
         description: |
           Commit-status context name to post the above under. Must match
-          hot-cluster-e2e.yml's "Hot Cluster E2E Progress" naming
-          convention (including its manual-dispatch variant) -- see that
-          workflow's progress-check-running-tests job.
+          hot-cluster-e2e.yml's "Hot Cluster E2E Progress" naming.
         type: string
         required: false
         default: ''
@@ -170,11 +150,115 @@ env:
   CI_ENV_CM: ci-env-${{ github.run_id }}
 
 jobs:
-  check-runner:
-    name: Check Runner Image
-    runs-on: ${{ inputs.runner_label || 'kubevirt-plugin-ci' }}
-    timeout-minutes: 15
+  build-kubevirt-plugin-image:
+    name: Build Kubevirt Plugin Image
+    runs-on: ubuntu-latest
+    outputs:
+      kubevirt-plugin-image: ${{ env.KUBEVIRT_PLUGIN_IMAGE }}
     steps:
+      # checkout_ref (set to refs/pull/<N>/merge for a main-push retest)
+      # takes priority over the PR's own head SHA.
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.checkout_ref || github.event.pull_request.head.sha || github.ref }}
+          allow-unsafe-pr-checkout: true
+          persist-credentials: false
+
+      - name: Check if kubevirt-plugin image exists in registry
+        id: check_image
+        run: |
+          if skopeo inspect docker://${KUBEVIRT_PLUGIN_IMAGE} &>/dev/null; then
+            echo "IMAGE_EXISTS=true" >> $GITHUB_OUTPUT
+          else
+            echo "IMAGE_EXISTS=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Generate tags for the kubevirt-plugin image
+        id: meta
+        if: steps.check_image.outputs.IMAGE_EXISTS == 'false'
+        uses: docker/metadata-action@v6
+        env:
+          DOCKER_METADATA_SET_OUTPUT_ENV: false
+        with:
+          images: ${{ env.KUBEVIRT_PLUGIN_IMAGE }}
+          tags: |
+            type=schedule
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+            type=sha
+
+      - name: Build and push
+        if: steps.check_image.outputs.IMAGE_EXISTS == 'false'
+        env:
+          LABELS: ${{ steps.meta.outputs.labels }}
+        run: |
+          {
+            echo "## Labels"
+            echo "\`\`\`"
+            echo "${LABELS}"
+            echo "\`\`\`"
+          } | tee -a "$GITHUB_STEP_SUMMARY"
+
+          LABEL_ARGS=()
+          while IFS= read -r line; do
+            [ -n "$line" ] && LABEL_ARGS+=(--label "$line")
+          done <<< "$LABELS"
+
+          podman build "${LABEL_ARGS[@]}" -t ${KUBEVIRT_PLUGIN_IMAGE} -f Dockerfile .
+          podman push ${KUBEVIRT_PLUGIN_IMAGE}
+
+  run-gating-tests:
+    name: ${{ inputs.is_reusable_call && 'Execute tests' || 'Execute tests (standalone dispatch)' }}
+    needs: [build-kubevirt-plugin-image]
+    runs-on: ${{ inputs.runner_label || 'kubevirt-plugin-ci' }}
+    timeout-minutes: 120
+    # Cypress on release-4.20 (or any unknown cnv_pin_version) still
+    # hardcodes a fixed auto-test-ns/auto-test-secret name, so same-cluster
+    # runs of that case are serialized here instead of made namespace-safe.
+    # release-4.21/4.22 get a genuine per-run namespace (see TEST_NS below)
+    # and fall into the unique no-lock-<run_id> group instead.
+    # cancel-in-progress: false + queue: max queue same-namespace runs one
+    # after another rather than cancelling or dropping a pending one.
+    concurrency:
+      group: >-
+        ${{
+          ((inputs.test_engine || 'playwright') == 'cypress' && inputs.cnv_pin_version != '4.21' && inputs.cnv_pin_version != '4.22') &&
+          format('cypress-fixed-ns-{0}', inputs.cluster_name || inputs.runner_label || 'kubevirt-plugin-ci') ||
+          format('no-lock-{0}', github.run_id)
+        }}
+      cancel-in-progress: false
+      queue: max
+    env:
+      PLUGIN_IMAGE: ${{ needs.build-kubevirt-plugin-image.outputs.kubevirt-plugin-image }}
+      HEADLESS: 'true'
+      RUN_FEATURE_TESTS: ${{ inputs.test_project == 'features' && 'true' || 'false' }}
+      TEST_ENGINE: ${{ inputs.test_engine || 'playwright' }}
+      # release-4.20's Cypress content hardcodes TEST_NS=auto-test-ns and
+      # TEST_SECRET_NAME=auto-test-secret; release-4.21/4.22 read both
+      # dynamically, so they get a genuine per-run name instead (avoiding
+      # cross-PR collisions on a shared cluster). Playwright always gets a
+      # per-run name.
+      TEST_NS: >-
+        ${{
+          (inputs.test_engine || 'playwright') != 'cypress' && format('kubevirt-plugin-ci-test-{0}', github.run_id) ||
+          (inputs.cnv_pin_version == '4.21' || inputs.cnv_pin_version == '4.22') && format('auto-test-ns-{0}', github.run_id) ||
+          'auto-test-ns'
+        }}
+      TEST_SECRET_NAME: >-
+        ${{
+          (inputs.test_engine || 'playwright') != 'cypress' && 'ci-test-secret' ||
+          (inputs.cnv_pin_version == '4.21' || inputs.cnv_pin_version == '4.22') && format('auto-test-secret-{0}', github.run_id) ||
+          'auto-test-secret'
+        }}
+
+    steps:
+      # Folded in from a former standalone "Check Runner Image" job (same
+      # runner) to drop a merge-box row; also fails fast before spending
+      # any real test-environment cost.
       - name: Log environment summary
         run: |
           {
@@ -301,189 +385,16 @@ jobs:
             echo ""
           } | tee -a "$GITHUB_STEP_SUMMARY"
 
-  build-kubevirt-plugin-image:
-    name: Build Kubevirt Plugin Image
-    runs-on: ubuntu-latest
-    outputs:
-      kubevirt-plugin-image: ${{ env.KUBEVIRT_PLUGIN_IMAGE }}
-    steps:
-      # inputs.checkout_ref (set to refs/pull/<N>/merge for the main-push
-      # retest path in hot-cluster-e2e.yml) takes priority over the PR's own
-      # head SHA -- see the checkout_ref input above for why: testing the
-      # merge with the current base tip, not the PR's isolated head commit.
       - name: Checkout
         uses: actions/checkout@v7
         with:
           ref: ${{ inputs.checkout_ref || github.event.pull_request.head.sha || github.ref }}
           allow-unsafe-pr-checkout: true
-          # This job's token now carries statuses: write (see
-          # hot-cluster-e2e.yml's run-e2e-tests job) -- persisting it to
-          # .git/config would let PR-controlled code checked out below
-          # (e.g. a malicious test-suite change) read it straight off
-          # disk and post arbitrary commit statuses repo-wide. Checkout
-          # itself doesn't need the credential to persist afterward (no
-          # further git operations happen in this job).
           persist-credentials: false
 
-      - name: Check if kubevirt-plugin image exists in registry
-        id: check_image
-        run: |
-          if skopeo inspect docker://${KUBEVIRT_PLUGIN_IMAGE} &>/dev/null; then
-            echo "IMAGE_EXISTS=true" >> $GITHUB_OUTPUT
-          else
-            echo "IMAGE_EXISTS=false" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Generate tags for the kubevirt-plugin image
-        id: meta
-        if: steps.check_image.outputs.IMAGE_EXISTS == 'false'
-        uses: docker/metadata-action@v6
-        env:
-          DOCKER_METADATA_SET_OUTPUT_ENV: false
-        with:
-          images: ${{ env.KUBEVIRT_PLUGIN_IMAGE }}
-          tags: |
-            type=schedule
-            type=ref,event=branch
-            type=ref,event=pr
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=semver,pattern={{major}}
-            type=sha
-
-      - name: Build and push
-        if: steps.check_image.outputs.IMAGE_EXISTS == 'false'
-        env:
-          LABELS: ${{ steps.meta.outputs.labels }}
-        run: |
-          {
-            echo "## Labels"
-            echo "\`\`\`"
-            echo "${LABELS}"
-            echo "\`\`\`"
-          } | tee -a "$GITHUB_STEP_SUMMARY"
-
-          LABEL_ARGS=()
-          while IFS= read -r line; do
-            [ -n "$line" ] && LABEL_ARGS+=(--label "$line")
-          done <<< "$LABELS"
-
-          podman build "${LABEL_ARGS[@]}" -t ${KUBEVIRT_PLUGIN_IMAGE} -f Dockerfile .
-          podman push ${KUBEVIRT_PLUGIN_IMAGE}
-
-  run-gating-tests:
-    # inputs.is_reusable_call is only ever true when hot-cluster-e2e.yml
-    # calls this workflow via `uses:` -- see that input's own description
-    # for why a standalone dispatch needs a distinctly-named check here.
-    name: ${{ inputs.is_reusable_call && 'Run Gating Tests' || 'Run Gating Tests (standalone dispatch)' }}
-    needs: [check-runner, build-kubevirt-plugin-image]
-    runs-on: ${{ inputs.runner_label || 'kubevirt-plugin-ci' }}
-    timeout-minutes: 120
-    # Only the fixed-namespace Cypress case (see TEST_NS/TEST_SECRET_NAME
-    # below -- release-4.20, any future/unknown cnv_pin_version, or a bare
-    # standalone dispatch) still shares auto-test-ns/auto-test-secret across
-    # runs, so serialize same-cluster runs of that case rather than let them
-    # clobber each other's namespace mid-run (CNV-92722 finding 6, part B).
-    # release-4.21/4.22 already got a genuine per-run namespace above, so
-    # they fall into the no-op `no-lock-<run_id>` group instead -- a group
-    # that's unique to this run and therefore never queues against anything.
-    # cancel-in-progress: false is deliberate: unlike the PR-vs-PR retest
-    # concurrency group in hot-cluster-e2e.yml (where cancelling a superseded
-    # run is correct), two different PRs sharing a fixed namespace must be
-    # queued one after another, not have one silently killed mid-run.
-    # queue: max is required for that "queued one after another" intent to
-    # actually hold: GitHub's default (queue: single) keeps only a single
-    # pending run per group and CANCELS an older pending run outright the
-    # moment a third one arrives in the same group -- silently defeating
-    # this lock for a 3rd/4th concurrent PR without it (confirmed via
-    # GitHub's own concurrency docs).
-    # inputs.cluster_name falls back to inputs.runner_label, matching
-    # run-gating-tests' own runs-on: above and this workflow's run-name --
-    # a bare cluster_name (e.g. a standalone dispatch that only set
-    # runner_label) must still land in the same group as an automated run
-    # targeting that same physical cluster, or this lock silently no-ops
-    # for exactly the case it's meant to protect.
-    concurrency:
-      group: >-
-        ${{
-          ((inputs.test_engine || 'playwright') == 'cypress' && inputs.cnv_pin_version != '4.21' && inputs.cnv_pin_version != '4.22') &&
-          format('cypress-fixed-ns-{0}', inputs.cluster_name || inputs.runner_label || 'kubevirt-plugin-ci') ||
-          format('no-lock-{0}', github.run_id)
-        }}
-      cancel-in-progress: false
-      queue: max
-    env:
-      PLUGIN_IMAGE: ${{ needs.build-kubevirt-plugin-image.outputs.kubevirt-plugin-image }}
-      HEADLESS: 'true'
-      RUN_FEATURE_TESTS: ${{ inputs.test_project == 'features' && 'true' || 'false' }}
-      # Both playwright/fixtures/ and cypress/fixtures/ have a matching
-      # layout, so the engine name doubles as the fixtures directory name.
-      TEST_ENGINE: ${{ inputs.test_engine || 'playwright' }}
-      # Cypress's frozen release-branch test content (predates the
-      # Playwright migration) hardcodes fixed resource names that the
-      # dynamic per-run values below can't reach on every branch:
-      #   - release-4.20's cypress/utils/const/index.ts hardcodes
-      #     TEST_NS = 'auto-test-ns' as a literal string -- no mechanism
-      #     to read Cypress.env('TEST_NS') at all.
-      #   - release-4.20's TEST_SECRET_NAME is likewise hardcoded to
-      #     'auto-test-secret', matching cypress/fixtures/secret.yaml's
-      #     own hardcoded metadata.name.
-      #   - release-4.21/4.22, by contrast, already read both dynamically
-      #     via Cypress.env(...) -- confirmed live during CNV-92722
-      #     validation -- so they get a genuine per-run name below
-      #     instead of the fixed one, removing the cross-PR namespace-
-      #     collision risk entirely for those two (CNV-92722 finding 6):
-      #     two concurrent same-branch PRs on the same cluster no longer
-      #     share auto-test-ns/auto-test-secret and can't clobber each
-      #     other's console mid-run. release-4.20 (and any future/unknown
-      #     pin, including a bare standalone dispatch with no
-      #     cnv_pin_version at all) keeps the fixed fallback name -- see
-      #     the run-gating-tests job-level concurrency block below for
-      #     how that fixed-namespace case is instead serialized rather
-      #     than made collision-proof.
-      # CYPRESS_TEST_NS/CYPRESS_TEST_SECRET_NAME are exported from these
-      # further down but were never consumed by release-4.20's frozen
-      # code -- override both here to match instead. Playwright keeps
-      # the dynamic per-run values from the workflow-level env: above.
-      TEST_NS: >-
-        ${{
-          (inputs.test_engine || 'playwright') != 'cypress' && format('kubevirt-plugin-ci-test-{0}', github.run_id) ||
-          (inputs.cnv_pin_version == '4.21' || inputs.cnv_pin_version == '4.22') && format('auto-test-ns-{0}', github.run_id) ||
-          'auto-test-ns'
-        }}
-      TEST_SECRET_NAME: >-
-        ${{
-          (inputs.test_engine || 'playwright') != 'cypress' && 'ci-test-secret' ||
-          (inputs.cnv_pin_version == '4.21' || inputs.cnv_pin_version == '4.22') && format('auto-test-secret-{0}', github.run_id) ||
-          'auto-test-secret'
-        }}
-
-    steps:
-      # See the build-kubevirt-plugin-image job's Checkout step above --
-      # same checkout_ref precedence, so the image build and the test run
-      # always test the identical tree.
-      - name: Checkout
-        uses: actions/checkout@v7
-        with:
-          ref: ${{ inputs.checkout_ref || github.event.pull_request.head.sha || github.ref }}
-          allow-unsafe-pr-checkout: true
-          # This job's token now carries statuses: write (see
-          # hot-cluster-e2e.yml's run-e2e-tests job) -- persisting it to
-          # .git/config would let PR-controlled code checked out below
-          # (e.g. a malicious test-suite change) read it straight off
-          # disk and post arbitrary commit statuses repo-wide. Checkout
-          # itself doesn't need the credential to persist afterward (no
-          # further git operations happen in this job).
-          persist-credentials: false
-
-      # Referenced by owner/repo/path@main rather than the local ./ path --
-      # checkout_ref can point at a release branch that predates this CI
-      # infra entirely (e.g. release-4.22 and earlier, before hot-cluster
-      # CI existed), so the composite action wouldn't exist in the checked-
-      # out tree. Both ci-env-request and ci-env-release are self-contained
-      # (pure oc/kubectl commands against the already-running ci-env-
-      # controller, no other local file references), so pinning to main
-      # here is safe regardless of what's checked out above.
+      # Pinned to @main (not local ./) since checkout_ref can point at a
+      # release branch predating this CI infra. Both actions are
+      # self-contained, so pinning to main is safe either way.
       - name: Provision CI test environment
         id: ci-env
         uses: kubevirt-ui/kubevirt-plugin/.github/actions/ci-env-request@main
@@ -492,15 +403,8 @@ jobs:
           test-namespace: ${{ env.TEST_NS }}
           configmap-name: ${{ env.CI_ENV_CM }}
           ci-env-namespace: ${{ env.CI_ENV_NS }}
-          # configmap only for Cypress: its before-all hook has no way to
-          # dismiss OpenShift Console's own "Welcome to the new OpenShift
-          # experience" guided-tour modal (unlike Playwright, which already
-          # seeds tour-completion into browser localStorage via
-          # seedGuidedTourState() -- see playwright/pages/LoginPage.ts).
-          # Left empty for Playwright so its console keeps the chart's
-          # default (localstorage) and that existing seeding keeps working
-          # unchanged. See the "Seed kubevirt-user-settings ConfigMap" step
-          # below for the matching server-side seed.
+          # Cypress needs the console's welcome-modal dismissed server-side
+          # (configmap); Playwright already seeds this client-side.
           user-settings-location: ${{ env.TEST_ENGINE == 'cypress' && 'configmap' || '' }}
 
       - name: Create test secret
@@ -536,21 +440,9 @@ jobs:
           oc patch configmap kubevirt-ui-features -n "${CNV_NS}" --type=merge \
             --patch '{"data":{"advancedSearch":"true","treeViewFolders":"true"}}'
 
-          # Only meaningful when TEST_ENGINE=cypress (see "Provision CI test
-          # environment" step above, which only sets user-settings-location=
-          # configmap for that engine) -- Playwright's console stays on
-          # localstorage and keeps working via its own browser-side
-          # seedGuidedTourState(), so this ConfigMap wouldn't even be read
-          # for a Playwright run. Seeds core OpenShift Console's own
-          # guided-tour completion state so the "Welcome to the new
-          # OpenShift experience" intro modal (a core console feature, not
-          # kubevirt-plugin's own onboarding above) never blocks the very
-          # first Cypress test. Mirrors playwright/pages/LoginPage.ts's
-          # seedGuidedTourState(), adapted for configmap instead of
-          # localStorage. ConfigMap name convention (user-settings-<uid>)
-          # per openshift/console's getConfigMapName() -- verify live if
-          # this ever silently stops working, since the naming convention
-          # has evolved across console versions.
+          # Cypress-only: seeds console's own guided-tour completion so the
+          # welcome modal never blocks the first test. Mirrors
+          # playwright/pages/LoginPage.ts's browser-side seeding.
           if [[ "${TEST_ENGINE}" == "cypress" && -n "${SA_UID}" ]]; then
             GUIDED_TOUR='{"admin":{"completed":true},"dev":{"completed":true},"virtualization-perspective":{"completed":true}}'
             CONSOLE_CM_NAME="user-settings-${SA_UID}"
@@ -567,21 +459,13 @@ jobs:
           npm ci --ignore-scripts --no-audit
 
           if [[ "${TEST_ENGINE}" == "cypress" ]]; then
-            # --ignore-scripts above skips Cypress's normal postinstall
-            # binary download, so fetch it explicitly.
             npx cypress install
           else
             npm run playwright-install
           fi
 
-      # Best-effort follow-up to hot-cluster-e2e.yml's own progress-check-
-      # running-tests job, which already posted "Building plugin image"
-      # against the same SHA/context before this reusable workflow even
-      # started (that checkpoint covers check-runner + build-kubevirt-
-      # plugin-image + everything up to here). Only hot-cluster-e2e.yml's
-      # `uses:` call ever sets progress_status_sha -- a standalone
-      # workflow_dispatch of this file alone leaves it empty, so this is
-      # a no-op then.
+      # Best-effort follow-up to hot-cluster-e2e.yml's own progress update;
+      # no-ops for a standalone dispatch (empty inputs).
       - name: Update progress status
         if: inputs.progress_status_sha != '' && inputs.progress_status_context != ''
         continue-on-error: true
@@ -607,28 +491,14 @@ jobs:
           TEST_PROJECT: ${{ inputs.test_project }}
         run: |
           if [[ "${TEST_ENGINE}" == "cypress" ]]; then
-            # Cypress only auto-exposes env vars to Cypress.env(...) when
-            # they carry the CYPRESS_ prefix (or via an explicit --env
-            # flag) -- the plain TEST_NS/OS_IMAGES_NS/CNV_NS/
-            # TEST_SECRET_NAME already set at the job level (used by
-            # Playwright and the oc/bash steps directly) are invisible to
-            # the test code's Cypress.env('TEST_NS') etc. otherwise.
+            # Cypress only exposes CYPRESS_-prefixed env vars to Cypress.env(...).
             export CYPRESS_TEST_NS="${TEST_NS}"
             export CYPRESS_OS_IMAGES_NS="${OS_IMAGES_NS}"
             export CYPRESS_CNV_NS="${CNV_NS}"
             export CYPRESS_TEST_SECRET_NAME="${TEST_SECRET_NAME}"
 
-            # release-4.20/4.21's cy.patchVM/cy.stopVM (support/
-            # commands.ts) run `oc patch virtualmachine <name>` with no
-            # -n flag at all, relying on the runner's current oc context
-            # namespace (release-4.22 passes -n explicitly, so this is a
-            # no-op there). That context otherwise points wherever the
-            # runner's kubeconfig happens to default (not TEST_NS), so
-            # those bare oc calls 404 even though the VM exists --
-            # confirmed live: the "Create customized VMs..." suite's
-            # `after` hook failed with `virtualmachines.kubevirt.io
-            # "vm-it-custom" not found` (CNV-92682 follow-up). Point the
-            # runner's current project at TEST_NS so they resolve.
+            # release-4.20/4.21's VM patch/stop commands rely on the
+            # runner's current oc project, not an explicit -n flag.
             oc project "${TEST_NS}"
             if [[ "${TEST_PROJECT}" == "features" ]]; then
               npm run test-cypress-headless -- --spec tests/tier1.cy.ts
@@ -661,14 +531,8 @@ jobs:
 
           HELM_RELEASE="$(oc get configmap "${CI_ENV_CM}" -n "${CI_ENV_NS}" \
             -o jsonpath='{.data.helm-release}' 2>/dev/null || true)"
-          # The lookup above only falls back on a hard command failure (get
-          # 403/404) -- an empty-but-present helm-release field (observed
-          # live during PR #4298 attempt 3) succeeds with an empty string,
-          # silently turning the selector below into the invalid literal
-          # "app=-console" and returning zero logs with no error (CNV-92722
-          # finding 8). CI_ENV_CM (the trigger ConfigMap name) is always
-          # populated, so fall back to it explicitly whenever HELM_RELEASE
-          # comes back empty for either reason.
+          # Falls back to CI_ENV_CM if the field lookup returns empty for
+          # any reason, to avoid an invalid "app=-console" selector.
           HELM_RELEASE="${HELM_RELEASE:-${CI_ENV_CM}}"
 
           oc logs -n "${TEST_NS}" -l "app=${HELM_RELEASE}-console" --tail=-1 \
@@ -701,10 +565,7 @@ jobs:
         if: always()
         run: |
           echo "Cleaning test entities in ${TEST_NS}..."
-          # Fetched from main rather than run from the checked-out tree --
-          # same reasoning as the ci-env-request/ci-env-release uses:
-          # below, this script may not exist on whatever checkout_ref was
-          # used (e.g. a pre-hot-cluster-CI release branch).
+          # Fetched from main (not the checked-out tree), which may predate this script.
           curl -sL "https://raw.githubusercontent.com/kubevirt-ui/kubevirt-plugin/main/ci-scripts/hot-cluster/test-cleanup.sh" | bash
 
       - name: Release CI test environment

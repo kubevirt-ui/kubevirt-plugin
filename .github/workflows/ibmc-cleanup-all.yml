@@ -49,8 +49,6 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
-      # Needed to call the shared ci-scripts/hot-cluster/cleanup-vpc-resources.sh
-      # script below; nothing earlier in this workflow required repo files.
       - name: Checkout
         uses: actions/checkout@v7
         with:
@@ -165,11 +163,9 @@ jobs:
             }
 
       # Delegates to the same shared script used by ibmc-cluster-setup.yml
-      # (proactive cleanup + on-failure sweep) and ibmc-cluster-teardown.yml,
-      # so all four cleanup call sites stay in sync instead of drifting
-      # (which is exactly how VPCs/subnets/SGs/images/COS instances ended up
-      # orphaned in the first place). No ZONE passed -- "Setup IBM Cloud CLI"
-      # above already targets us-south directly for this workflow.
+      # and ibmc-cluster-teardown.yml so all cleanup call sites stay in
+      # sync. No ZONE passed -- "Setup IBM Cloud CLI" above already
+      # targets us-south directly for this workflow.
       - name: Clean up VPC resources for matching prefix
         continue-on-error: true
         env:

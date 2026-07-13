@@ -1,0 +1,45 @@
+name: Post Hot Cluster E2E Progress Status
+description: |
+  Posts (or rewrites) the "Hot Cluster E2E Progress" commit status -- the
+  always-present, non-required check narrating pipeline phase. Never a
+  substitute for the "Run Gating Tests" required check. Uses the Commit
+  Statuses API (not Checks API): a Checks-API check-run can get
+  auto-assigned to another workflow's check-suite with no way to pin it;
+  commit statuses always render under their own bare context name.
+
+inputs:
+  head-sha:
+    description: Commit SHA to post the status against (from resolve-progress-context)
+    required: true
+  status-context:
+    description: Commit-status context name (from resolve-progress-context)
+    required: true
+  state:
+    description: pending | success | failure
+    required: true
+  description:
+    description: Short human-readable phase description shown on the PR
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Post progress status
+      continue-on-error: true
+      uses: actions/github-script@v9
+      env:
+        STATUS_HEAD_SHA: ${{ inputs.head-sha }}
+        STATUS_CONTEXT: ${{ inputs.status-context }}
+        STATUS_STATE: ${{ inputs.state }}
+        STATUS_DESCRIPTION: ${{ inputs.description }}
+      with:
+        script: |
+          await github.rest.repos.createCommitStatus({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            sha: process.env.STATUS_HEAD_SHA,
+            context: process.env.STATUS_CONTEXT,
+            state: process.env.STATUS_STATE,
+            description: process.env.STATUS_DESCRIPTION,
+            target_url: `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
+          });

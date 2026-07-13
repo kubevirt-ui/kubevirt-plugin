@@ -1,9 +1,9 @@
 name: Request Manual Console Environment
 description: >
   Create (or update) a trigger ConfigMap for the ci-env-controller to
-  provision the persistent, OAuth-protected manual-console environment
-  (CNV-92150), and wait until it is ready. Separate from ci-env-request
-  (used by E2E) so E2E behavior is unaffected -- distinguished by the
+  provision the persistent, OAuth-protected manual-console environment,
+  and wait until it is ready. Separate from ci-env-request (used by E2E)
+  so E2E behavior is unaffected -- distinguished by the
   "ci.kubevirt-plugin/type: manual-console" label instead of
   "test-environment", which also exempts it from the controller's TTL
   reaper.
@@ -46,19 +46,12 @@ outputs:
 runs:
   using: composite
   steps:
-    # Uses `apply` (not `create`, unlike ci-env-request) because the
-    # manual-console ConfigMap is a single, reused name across deploys
-    # rather than one unique name per run.
-    #
-    # IMPORTANT: `kubectl apply`'s 3-way merge does NOT reset `data.status`.
-    # It only patches fields that changed between the previous and new
-    # *applied* manifest -- since this manifest never included `status`
-    # (the controller sets it separately via `oc patch`), apply has no record
-    # of ever owning that field and leaves the live value (e.g. "ready" from
-    # the last deploy) untouched. Without an explicit reset, reconcile_one()
-    # would see status=ready and skip provisioning entirely on every
-    # redeploy. The follow-up `oc patch` below forces status back to
-    # "pending" unconditionally so the controller always re-provisions.
+    # Uses `apply` (not `create`) since this ConfigMap is a single, reused
+    # name across deploys. `apply`'s 3-way merge never touches `status`
+    # (this manifest doesn't set it, the controller does via `oc patch`),
+    # so the follow-up patch below forces it back to "pending" explicitly
+    # -- otherwise a leftover "ready" from the last deploy would make the
+    # controller skip provisioning entirely.
     - name: Create or update trigger ConfigMap
       shell: bash
       run: |

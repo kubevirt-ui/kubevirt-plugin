@@ -1,22 +1,11 @@
-# Grant the ARC runner scale set ServiceAccount CI permissions.
-# gha-runner-scale-set creates: <RUNNER_SCALE_SET_NAME>-gha-rs-no-permission
-#   (default: kubevirt-plugin-ci-gha-rs-no-permission).
+# Grants the ARC runner ServiceAccount CI permissions. Applied automatically
+# by install-runner-scale-set.sh (subject substituted for
+# RUNNER_SCALE_SET_NAME/ARC_RUNNERS_NS). Skip with SKIP_ARC_RUNNER_RBAC=1.
 #
-# Applied automatically by ci-scripts/hot-cluster/arc/install-runner-scale-set.sh.
-# Subject name + namespace substituted for RUNNER_SCALE_SET_NAME / ARC_RUNNERS_NS.
-# Manual apply (defaults only):
-#   oc apply -f ci-scripts/hot-cluster/arc/arc-runner-rbac.yaml
+# Manual apply (defaults only): oc apply -f ci-scripts/hot-cluster/arc/arc-runner-rbac.yaml
 #
-# To skip cluster RBAC (custom bindings): SKIP_ARC_RUNNER_RBAC=1
-#
-# If RUNNER_SCALE_SET_NAME differs from defaults and you apply this file by hand,
-# edit subjects or use:
-#   oc create clusterrolebinding arc-runner-ci-custom --clusterrole=arc-runner-ci \
-#     --serviceaccount=<ns>:<scale-set>-gha-rs-no-permission
-#
-# NOTE: The runner's ConfigMap access in the ci-env namespace is granted via a
-# namespaced RoleBinding created by ci-scripts/hot-cluster/ci-env/install-ci-env-controller.sh,
-# not by this ClusterRole.
+# ConfigMap access in ci-env is granted separately by a namespaced RoleBinding
+# from install-ci-env-controller.sh, not by this ClusterRole.
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -30,38 +19,19 @@ rules:
     resources: ['nodes']
     verbs: ['get', 'list']
 
-  # --- Playwright test setup: create/delete temporary namespaces ---
-  # Unrestricted (no resourceNames) because these dynamically-named test
-  # namespaces aren't known ahead of time.
+  # --- Test namespaces: unrestricted, names are dynamic ---
   - apiGroups: ['']
     resources: ['namespaces']
     verbs: ['get', 'list', 'create', 'delete']
 
-  # --- hot-cluster-e2e-run.yml's "Seed kubevirt-user-settings ConfigMap"
-  # step: `oc get sa <test-env-console-sa> -n <test-ns> -o jsonpath=
-  # '{.metadata.uid}'` to key console/plugin onboarding-suppression
-  # ConfigMaps by that SA's UID. Read-only (get/list; not secrets --
-  # ServiceAccount objects don't carry their own token, so this doesn't
-  # expose credentials) -- without it, that lookup 403's, is silently
-  # swallowed by the script's `2>/dev/null || true` fallback, and SA_UID
-  # is always empty (confirmed live: every dispatch to date fell back to
-  # the sanitized-name key only, never the UID key -- CNV-92682 follow-up).
+  # --- Test-env console SA UID, for onboarding-suppression ConfigMaps ---
   - apiGroups: ['']
     resources: ['serviceaccounts']
     verbs: ['get', 'list']
 
-  # --- deploy-manual-console.yml's setup-plugin-image.sh: idempotent re-apply
-  # of its one long-lived "manual-console" namespace. Only the very first
-  # run hits the create path above; every later run needs to patch the
-  # already-existing object instead (confirmed live: cluster provisioning
-  # succeeded, but a second manual-console deploy 403'd on "cannot patch
-  # resource namespaces" once the object existed -- CNV-92682 follow-up).
-  # This is deliberately its own rule with resourceNames, NOT folded into
-  # the unrestricted rule above -- this ClusterRole is bound cluster-wide
-  # via ClusterRoleBinding below, so an unscoped patch/update on namespaces
-  # would let the runner SA mutate ANY namespace (labels, annotations,
-  # finalizers), including openshift-*. `update` (full PUT) is omitted --
-  # `oc apply`'s 3-way merge only ever issues a PATCH, never a PUT.
+  # --- Re-apply of the long-lived "manual-console" namespace (create is
+  # covered by the unrestricted rule above). resourceName-scoped so an
+  # unscoped patch can't touch openshift-* namespaces. ---
   - apiGroups: ['']
     resources: ['namespaces']
     verbs: ['patch']
@@ -75,82 +45,33 @@ rules:
     resources: ['pods', 'pods/log', 'events']
     verbs: ['get', 'list']
 
-  # --- Cypress cy.exec runs: oc patch virtualmachine ---
-  # --- Playwright scenario tests: KubernetesClient.createContainerDiskVm/cleanup ---
+  # --- Cypress cy.exec runs / Playwright scenario tests: VM create/patch/delete ---
   - apiGroups: ['kubevirt.io']
     resources: ['virtualmachines']
     verbs: ['get', 'list', 'watch', 'patch', 'create', 'delete']
 
-  # NOTE on secrets: test-cleanup.sh's `oc delete secret "${TEST_SECRET_NAME}"`
-  # is deliberately NOT granted here as a ClusterRole rule, even a
-  # resourceNames-restricted one -- a get/list/delete on a named secret is
-  # still a credential-exposure risk if it applies cluster-wide (every
-  # namespace has its own 'ci-test-secret'/'auto-test-secret'-named objects
-  # for entirely unrelated purposes). For the one case that genuinely needs
-  # a persistent, non-per-run grant -- the fixed 'auto-test-ns' Cypress
-  # namespace (release-4.20/unknown pin/bare dispatch) -- ci-env-controller.sh's
-  # provision() applies a namespace-scoped Role+RoleBinding directly into
-  # that one namespace instead (see its "Ensure auto-test-ns secret-cleanup
-  # RBAC" step), re-applied fresh on every single run immediately after that
-  # namespace is (re)created, rather than relying on anything from a prior
-  # run surviving. Scoped to just 'auto-test-secret' -- Playwright's
-  # 'ci-test-secret' needs no equivalent here at all: it only ever runs in a
-  # fresh per-run dynamic namespace that already gets its own live
-  # ci-env-test-runner RoleBinding (see below).
+  # NOTE: secrets delete is deliberately NOT granted here -- cluster-wide
+  # access would be a credential-exposure risk. auto-test-ns (the one
+  # namespace that needs it) gets a namespace-scoped Role instead, from
+  # ci-env-controller.sh's provision().
 
-  # NOTE on PVCs/VirtualMachineSnapshots/DataVolumes/DataSources/Templates/
-  # net-attach-defs/VM instancetypes&preferences: test-cleanup.sh's delete
-  # calls for these rely ENTIRELY on the per-run, namespace-scoped
-  # ci-env-test-runner RoleBinding (helm/ci-env-controller/templates/
-  # clusterrole-test-runner.yaml, applied per-run by the ci-test-stack Helm
-  # release into the run's own ${TEST_NS}) -- deliberately NOT duplicated
-  # here as an unrestricted cluster-wide ClusterRole grant. An earlier
-  # version of this file added exactly that as a fallback after seeing
-  # Forbidden errors during cleanup live (CNV-92722 finding 7), but the
-  # actual root cause was two concurrent runs sharing the same *fixed*
-  # 'auto-test-ns' namespace (release-4.20's Cypress content still hardcodes
-  # that name) racing each other's Helm install/uninstall of that
-  # RoleBinding -- not a fundamentally missing permission. That race is now
-  # closed by CNV-92722 finding 6's job-level `concurrency:` lock on
-  # run-gating-tests (hot-cluster-e2e-run.yml), which serializes every run
-  # sharing a fixed-namespace cluster end-to-end (provision through
-  # cleanup through release), so a run's own RoleBinding can no longer be
-  # torn down mid-flight by a competing run. Granting this cluster-wide
-  # instead would let the runner SA -- exposed to PR-triggered job steps --
-  # delete these kinds in ANY namespace on the cluster (including shared
-  # golden-image DataSources/Templates), a real blast-radius regression for
-  # an availability-only benefit that the concurrency fix already provides.
-  # If this RoleBinding is ever legitimately unavailable for some other
-  # reason, test-cleanup.sh's `|| true` on every line degrades that specific
-  # delete to a no-op rather than failing the run -- but that's not truly
-  # "harmless": the un-deleted resource is left behind in ${TEST_NS} for
-  # whatever's left of this run (only reclaimed once the namespace itself is
-  # later deleted), and the underlying permissions gap producing the
-  # Forbidden goes unnoticed rather than surfacing anywhere. Unlike the
-  # dedicated auto-test-ns secret-cleanup RBAC above (which retries and
-  # fails provisioning outright rather than silently degrading), there's no
-  # equivalent hard-failure guard for this RoleBinding today -- a genuine,
-  # persistent gap here would need to be diagnosed from leftover test
-  # resources piling up in a run's namespace, not from an explicit error.
+  # NOTE: PVCs/Snapshots/DataVolumes/DataSources/Templates/net-attach-defs/
+  # instancetypes&preferences deletes use the namespace-scoped
+  # ci-env-test-runner RoleBinding instead -- a cluster-wide grant here
+  # would risk shared golden-image resources.
 
   # --- E2E test setup: user-settings and feature-flag configmaps in HCO namespace ---
   - apiGroups: ['']
     resources: ['configmaps']
     verbs: ['get', 'list', 'create', 'patch']
 
-  # --- Cypress settings tests: cy.exec('oc get hyperconverged ...') reads
-  # HCO's spec directly (e.g. liveMigrationConfig, higherWorkloadDensity) ---
+  # --- Cypress settings tests: reads HCO's spec directly ---
   - apiGroups: ['hco.kubevirt.io']
     resources: ['hyperconvergeds']
     verbs: ['get', 'list']
 
-  # --- test-cleanup.sh: delete cluster-scoped test leftovers created under
-  # a fixed "example" name by the Cypress suite's YAML-creation tests.
-  # ci-env-test-runner (bound per-run via a namespaced RoleBinding, see
-  # helm/ci-env-controller/templates/clusterrole-test-runner.yaml) only
-  # covers the namespaced virtualmachineinstancetypes/virtualmachine
-  # preferences kinds -- cluster-scoped resources need a real
-  # ClusterRoleBinding, which only this role has. ---
+  # --- Cluster-scoped test leftovers (fixed "example" name) -- not
+  # covered by the namespaced RoleBinding above ---
   - apiGroups: ['instancetype.kubevirt.io']
     resources: ['virtualmachineclusterinstancetypes', 'virtualmachineclusterpreferences']
     verbs: ['get', 'list', 'delete']
@@ -158,7 +79,7 @@ rules:
     resources: ['migrationpolicies']
     verbs: ['get', 'list', 'delete']
 
-  # --- check-runner job: HCO / operator version logging ---
+  # --- Runner-diagnostics steps: HCO / operator version logging ---
   - apiGroups: ['operators.coreos.com']
     resources: ['clusterserviceversions']
     verbs: ['get', 'list']

@@ -12,10 +12,9 @@ rules:
   - apiGroups: ['']
     resources: ['configmaps']
     verbs: ['get', 'list', 'watch', 'create', 'update', 'patch', 'delete']
-  # Additive (CNV-92150): lets the runner hand off a generated htpasswd
-  # password to the controller via a short-lived Secret instead of the
-  # ConfigMap, without needing cluster-admin. Only used by the manual-console
-  # deploy path -- E2E never creates Secrets here.
+  # Lets the runner hand off a generated htpasswd password to the
+  # controller via a short-lived Secret instead of the ConfigMap. Only
+  # used by the manual-console deploy path -- E2E never creates Secrets here.
   - apiGroups: ['']
     resources: ['secrets']
     verbs: ['create', 'get', 'delete']

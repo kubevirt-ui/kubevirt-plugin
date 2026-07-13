@@ -1,0 +1,65 @@
+name: Resolve Hot Cluster Config
+description: |
+  Thin wrapper around ci-scripts/hot-cluster/resolve-cluster-config.sh --
+  resolves cluster_name/openshift_version/test_engine/branch_name/
+  cnv_channel/cnv_pin_version for this run. Assumes the caller has
+  already checked out the repo.
+
+inputs:
+  base-ref:
+    description: |
+      PR base branch to resolve against (github.base_ref for
+      pull_request_target, or the forwarded base_ref for a
+      workflow_dispatch retest). Empty for a plain manual dispatch.
+    required: false
+    default: ''
+  cluster-name:
+    description: workflow_dispatch inputs.cluster_name override, if set
+    required: false
+    default: ''
+  openshift-version:
+    description: workflow_dispatch inputs.openshift_version override, if set
+    required: false
+    default: ''
+  test-engine:
+    description: workflow_dispatch inputs.test_engine override ('auto'/'playwright'/'cypress'), if set
+    required: false
+    default: ''
+  cnv-channel:
+    description: workflow_dispatch inputs.cnv_channel override, if set
+    required: false
+    default: ''
+
+outputs:
+  cluster-name:
+    description: Resolved cluster name
+    value: ${{ steps.resolve.outputs.cluster_name }}
+  openshift-version:
+    description: Resolved OpenShift version
+    value: ${{ steps.resolve.outputs.openshift_version }}
+  test-engine:
+    description: Resolved E2E test engine (playwright or cypress)
+    value: ${{ steps.resolve.outputs.test_engine }}
+  branch-name:
+    description: Resolved base branch name (may be empty)
+    value: ${{ steps.resolve.outputs.branch_name }}
+  cnv-channel:
+    description: Resolved CNV OLM subscription channel
+    value: ${{ steps.resolve.outputs.cnv_channel }}
+  cnv-pin-version:
+    description: Resolved CNV startingCSV pin ("<major>.<minor>", or empty)
+    value: ${{ steps.resolve.outputs.cnv_pin_version }}
+
+runs:
+  using: composite
+  steps:
+    - name: Resolve cluster_name/openshift_version/test_engine for this branch
+      id: resolve
+      shell: bash
+      env:
+        BASE_REF: ${{ inputs.base-ref }}
+        INPUT_CLUSTER_NAME: ${{ inputs.cluster-name }}
+        INPUT_OPENSHIFT_VERSION: ${{ inputs.openshift-version }}
+        INPUT_TEST_ENGINE: ${{ inputs.test-engine }}
+        INPUT_CNV_CHANNEL: ${{ inputs.cnv-channel }}
+      run: ./ci-scripts/hot-cluster/resolve-cluster-config.sh >> "$GITHUB_OUTPUT"

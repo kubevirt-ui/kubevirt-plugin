@@ -109,20 +109,11 @@ for i in $(seq 1 12); do
   sleep 5
 done
 
-# The ci-env-runner/ directory contains symlinks to the Helm chart and the
-# manual-console scripts. Use tar -ch to dereference symlinks so the build
-# pod receives the actual files (including subdirectories), then pipe to
-# --from-archive.
-#
-# --format=ustar (not the default archive format): macOS's bundled bsdtar
-# writes PAX extended headers by default, which OpenShift's build-source
-# extractor rejects outright ("unable to extract binary build input, must
-# be a zip, tar, or gzipped tar"), silently leaving the old image in place.
-# ustar is the oldest, most universally-interoperable tar format and is
-# supported identically by GNU tar (`--format=ustar`) and bsdtar/libarchive
-# -- forcing it produces the same practical archive content on both,
-# since none of this build context's paths approach ustar's ~100-255 byte
-# name-length limit.
+# tar -ch dereferences the ci-env-runner/ directory's symlinks (Helm chart,
+# manual-console scripts) so the build pod gets actual files.
+# --format=ustar: macOS's bundled bsdtar writes PAX headers by default,
+# which OpenShift's build-source extractor rejects outright. ustar is
+# supported identically by GNU tar and bsdtar.
 echo "Starting binary build from ${IMAGE_DIR} (dereferencing symlinks)..."
 for attempt in 1 2 3; do
   if tar --format=ustar -ch -C "${IMAGE_DIR}" . \
@@ -130,14 +121,8 @@ for attempt in 1 2 3; do
            --from-archive=- \
            --follow; then
     # `oc start-build --follow` can return exit 0 even when the build
-    # actually failed (confirmed: a source-extraction failure reports
-    # success at the CLI level). Don't trust the exit code alone --
-    # verify the build's real phase via the API before treating it as a
-    # successful attempt. The build controller updates .status.phase to
-    # "Complete" a few seconds AFTER the pushed-image log line appears
-    # (confirmed by testing), so poll briefly rather than checking once
-    # immediately -- a single immediate check reliably false-negatives on
-    # a build that actually succeeded, wasting two unnecessary rebuilds.
+    # actually failed -- verify the real phase via the API. Poll briefly
+    # since .status.phase updates a few seconds after the log line appears.
     BUILD_NAME="$(oc get builds -n "${NS}" -l "buildconfig=${IMAGE_NAME}-build" \
       --sort-by=.metadata.creationTimestamp -o jsonpath='{.items[-1:].metadata.name}' 2>/dev/null)"
     BUILD_PHASE="Unknown"

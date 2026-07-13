@@ -82,8 +82,6 @@ jobs:
       group: hot-cluster-teardown-${{ inputs.cluster_name || 'kubevirt-plugin-ci' }}
       cancel-in-progress: false
     steps:
-      # Needed to call the shared ci-scripts/hot-cluster/cleanup-vpc-resources.sh
-      # script below; nothing earlier in this workflow required repo files.
       - name: Checkout
         uses: actions/checkout@v7
         with:
@@ -197,14 +195,9 @@ jobs:
       # ──────────────────────────────────────────────────────────────────────
       # IPI teardown
       # ──────────────────────────────────────────────────────────────────────
-      # openshift-install destroy (tag-based) is the most thorough mechanism
-      # when it's reachable, but it depends on a still-available
-      # ipi-install-state-* artifact from a successful setup run -- which
-      # doesn't exist for cluster generations whose setup run failed, or
-      # whose artifact has expired (7-day retention). Both of the next two
-      # steps are best-effort (continue-on-error) precisely so that gap
-      # doesn't block the guaranteed name-prefix sweep that always runs
-      # afterward, regardless of whether install state could be found.
+      # The next two steps are best-effort: the install-state artifact may
+      # be missing or expired, but the name-prefix sweep below always runs
+      # regardless.
       - name: Download IPI install state
         if: inputs.infrastructure_type == 'ipi'
         continue-on-error: true
@@ -259,12 +252,8 @@ jobs:
           echo "Destroying IPI cluster..."
           openshift-install destroy cluster --dir="${INSTALL_DIR}" --log-level=info 2>&1 | tail -80
 
-      # Guaranteed backstop regardless of whether the two steps above found
-      # install state or successfully ran openshift-install destroy --
-      # sweeps by name prefix so a missing/expired artifact no longer means
-      # "nothing gets cleaned up" (the exact gap that left orphaned VPCs,
-      # subnets, security groups, custom images, and COS instances behind
-      # from failed setup attempts).
+      # Guaranteed backstop: sweeps by name prefix regardless of whether the
+      # steps above found install state or ran openshift-install destroy.
       - name: Sweep any remaining VPC resources
         if: inputs.infrastructure_type == 'ipi'
         continue-on-error: true

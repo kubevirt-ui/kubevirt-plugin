@@ -1,0 +1,42 @@
+name: Check Hot Cluster CI Trust
+description: |
+  Determines whether a given GitHub username is listed in OWNERS
+  (approvers/reviewers) -- the single source of truth for hot-cluster CI
+  trust, same as Prow's /lgtm and /approve. Never uses author_association
+  or org membership (unreliable proxies). Assumes the caller has already
+  checked out the base branch (not a PR's own branch, so a PR can't
+  self-approve trust).
+
+inputs:
+  author:
+    description: GitHub username to check against OWNERS
+    required: true
+
+outputs:
+  trusted:
+    description: "'true' if author is listed in OWNERS, else 'false'"
+    value: ${{ steps.check.outputs.trusted }}
+
+runs:
+  using: composite
+  steps:
+    - name: Determine if author is a trusted repo owner
+      id: check
+      uses: actions/github-script@v9
+      env:
+        CHECK_AUTHOR: ${{ inputs.author }}
+      with:
+        script: |
+          const fs = require('fs');
+          const author = process.env.CHECK_AUTHOR;
+
+          let trusted = false;
+          try {
+            const owners = fs.readFileSync('OWNERS', 'utf8');
+            trusted = new RegExp(`^\\s*-\\s*${author}\\s*$`, 'm').test(owners);
+          } catch (err) {
+            core.warning(`Could not read OWNERS file: ${err.message}`);
+          }
+
+          core.info(`${author} is ${trusted ? '' : 'not '}listed in OWNERS (approvers/reviewers) — ${trusted ? 'trusted' : 'untrusted'}.`);
+          core.setOutput('trusted', trusted ? 'true' : 'false');

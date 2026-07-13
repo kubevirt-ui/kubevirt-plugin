@@ -1,14 +1,11 @@
 #!/bin/bash
 #
 # One-time, per-cluster bootstrap of the ARC runner ServiceAccount's
-# ImageStream/BuildConfig RBAC inside the manual-console namespace
-# (CNV-92150). Creates the namespace if needed, then applies
-# manual-console-rbac.yaml with its ServiceAccount subject substituted for
-# the cluster's actual runner scale set name -- mirrors
-# ../hot-cluster/arc/install-runner-scale-set.sh's own substitution of
-# arc-runner-rbac.yaml, for the same reason: the raw manifest hardcodes the
-# "kubevirt-plugin-ci" default, which never matches a release cluster's
-# runner SA (e.g. "kubevirt-plugin-420-gha-rs-no-permission").
+# ImageStream/BuildConfig RBAC inside the manual-console namespace.
+# Creates the namespace if needed, then applies manual-console-rbac.yaml
+# with its ServiceAccount subject substituted for the cluster's actual
+# runner scale set name (mirrors install-runner-scale-set.sh's own
+# substitution of arc-runner-rbac.yaml).
 #
 # Optional environment variables:
 #   RUNNER_SCALE_SET_NAME (default: kubevirt-plugin-ci)
@@ -52,11 +49,8 @@ RENDERED="$(sed \
   -e "s/^    namespace: arc-runners\$/    namespace: ${ARC_RUNNERS_NS}/" \
   "${RBAC_MANIFEST}")"
 
-# Guard against a silent no-op sed: if manual-console-rbac.yaml's indentation
-# or literal text ever drifts from what these patterns match, sed exits 0
-# but leaves the defaults untouched -- applying RBAC for the wrong SA/
-# namespace without any error (exactly the class of bug this script exists
-# to fix elsewhere). Fail loudly instead.
+# Guard against a silent no-op sed: if the substitution patterns stop
+# matching, sed exits 0 but leaves the wrong SA/namespace applied.
 if ! grep -q "name: ${RUNNER_SA}\$" <<<"${RENDERED}" || ! grep -q "namespace: ${ARC_RUNNERS_NS}\$" <<<"${RENDERED}"; then
   echo "ERROR: sed substitution did not produce the expected ServiceAccount subject" >&2
   echo "  (expected 'name: ${RUNNER_SA}' and 'namespace: ${ARC_RUNNERS_NS}' in the rendered manifest)." >&2

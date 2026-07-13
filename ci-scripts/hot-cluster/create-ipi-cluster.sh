@@ -12,10 +12,8 @@ for attempt in $(seq 1 "${MAX_ATTEMPTS}"); do
 
   if [[ "${attempt}" -gt 1 ]]; then
     echo "Preparing fresh install directory for retry..."
-    # .clusterapi_output holds the local envtest control-plane datastore --
-    # without wiping it, a failed attempt's Cluster/Machine objects (created
-    # locally before any real cloud infra existed) persist alongside the next
-    # attempt's fresh ones, piling up stale entries across retries.
+    # .clusterapi_output holds the local envtest datastore -- wipe it too,
+    # or a failed attempt's Cluster/Machine objects persist into the retry.
     rm -rf "${INSTALL_DIR}/manifests" "${INSTALL_DIR}/openshift" "${INSTALL_DIR}/.openshift_install"* "${INSTALL_DIR}/auth" "${INSTALL_DIR}/metadata.json" "${INSTALL_DIR}/install.log" "${INSTALL_DIR}/terraform"* "${INSTALL_DIR}/.clusterapi_output"
     cp "${INSTALL_DIR}/install-config.yaml.bak" "${INSTALL_DIR}/install-config.yaml"
 
@@ -64,11 +62,8 @@ for attempt in $(seq 1 "${MAX_ATTEMPTS}"); do
     openshift-install destroy cluster --dir="${INSTALL_DIR}" --log-level=info 2>&1 | tail -30 || true
   fi
 
-  # openshift-install destroy is tag-based and usually sufficient, but a
-  # failure before Terraform ever writes metadata.json (or a partial destroy)
-  # can still leave VPC/subnet/SG/LB/image/COS resources behind for this
-  # attempt's generation. Sweep everything matching CLUSTER_NAME as a
-  # guaranteed backstop before the next attempt creates fresh resources.
+  # Guaranteed backstop: openshift-install destroy alone may leave
+  # resources behind if it failed before metadata.json was even written.
   echo "Sweeping any remaining VPC resources for '${CLUSTER_NAME}' before retry..."
   bash ./ci-scripts/hot-cluster/cleanup-vpc-resources.sh
 

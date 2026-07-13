@@ -37,13 +37,9 @@ console:
     caCert: ''
 
   # BRIDGE_USER_SETTINGS_LOCATION. "localstorage" (default) keeps user
-  # settings (guided-tour completion, quickstart dismissal, column prefs,
-  # ...) purely in the browser -- what Playwright's seedGuidedTourState()
-  # relies on. ci-env-controller only ever overrides this to "configmap" for
-  # a caller that also seeds the equivalent server-side ConfigMap itself
-  # (Cypress E2E, via hot-cluster-e2e-run.yml's "Seed kubevirt-user-settings
-  # ConfigMap" step) -- never change this default unconditionally, or
-  # Playwright's browser-side seeding silently stops having any effect.
+  # settings purely in the browser, which Playwright's seedGuidedTourState()
+  # relies on. Only Cypress overrides this to "configmap" (it also seeds
+  # the matching server-side ConfigMap -- see hot-cluster-e2e-run.yml).
   userSettingsLocation: localstorage
 
 # ClusterRole created by the ci-env-controller Helm chart (clusterrole-console.yaml).

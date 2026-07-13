@@ -2,23 +2,18 @@ name: Deploy Manual Console
 run-name: "Deploy Manual Console [${{ inputs.cluster_name }}] @ ${{ inputs.pr_number && format('PR#{0}', inputs.pr_number) || inputs.branch }}"
 
 # Deploys a standalone, OAuth-protected console + kubevirt-plugin stack to an
-# existing hot cluster for manual UI testing (CNV-92150). Entirely separate
-# from the E2E path (hot-cluster-e2e*.yml, ci-env-request): it builds its own
-# in-cluster plugin image, uses its own trigger ConfigMap/action, and does
-# not touch the CNV-managed console, HCO, or SSP.
+# existing hot cluster for manual UI testing. Entirely separate from the E2E
+# path: it builds its own in-cluster plugin image, uses its own trigger
+# ConfigMap/action, and does not touch the CNV-managed console, HCO, or SSP.
 #
 # Prerequisites: the target cluster must already be provisioned via
-# "IBM Cloud Hot Cluster Setup" (ibmc-cluster-setup.yml), which installs the
-# ARC runner scale set and the ci-env-controller this workflow depends on.
+# "IBM Cloud Hot Cluster Setup" (ibmc-cluster-setup.yml).
 #
-# Dispatch ref matters: whichever branch/ref you pick in the "Use workflow
-# from" dropdown (github.ref) is what gets checked out for CI scripts (the
-# "Checkout workflow scripts" step below has no ref: override), separately
-# from "branch"/pr_number below, which only selects the plugin source to
-# build. Dispatch from main (or another branch that carries current
-# ci-scripts/manual-console/) even when deploying an old release branch's
-# plugin -- dispatching from a ref that itself lacks those scripts will fail
-# the same way "branch" pointing at one would.
+# Dispatch ref matters: the dispatch branch/ref (github.ref) is what gets
+# checked out for CI scripts, separately from "branch"/pr_number below,
+# which only selects the plugin source to build. Dispatch from main (or
+# another branch carrying current ci-scripts/manual-console/) even when
+# deploying an old release branch's plugin.
 
 on:
   workflow_dispatch:
@@ -68,16 +63,10 @@ env:
   MANUAL_CONSOLE_USER: manual-console
 
 jobs:
-  # Only runs when pr_number is set (deploying a PR, possibly from a fork,
-  # instead of a same-repo branch). This is workflow_dispatch-only, so
-  # triggering it at all already requires write access to this repo -- but
-  # per CNV team decision, that boundary alone isn't treated as sufficient
-  # for a PR whose actual code lives in someone else's fork. This mirrors
-  # hot-cluster-e2e.yml's check-trust: only PR authors listed in OWNERS
-  # (approvers/reviewers) can have their PR deployed here. Unlike e2e, there
-  # is no "ok-to-test"-label escape hatch for untrusted authors -- if you
-  # need to deploy an untrusted PR's changes anyway, push its branch to this
-  # repository directly and use the "branch" input instead.
+  # Only runs when pr_number is set (deploying a PR, possibly from a fork).
+  # Mirrors hot-cluster-e2e.yml's check-trust: only PR authors listed in
+  # OWNERS can have their PR deployed here, with no "ok-to-test" escape
+  # hatch -- push the branch directly and use "branch" instead if needed.
   resolve-pr:
     name: Resolve PR
     if: inputs.pr_number != ''
@@ -152,21 +141,11 @@ jobs:
     runs-on: ${{ inputs.cluster_name }}
     timeout-minutes: 30
     steps:
-      # Two checkouts, deliberately kept separate:
-      #   1. This repo's own dispatch ref (default actions/checkout behavior
-      #      with no ref: -- github.ref, i.e. whatever branch was selected
-      #      in the workflow_dispatch UI) into $GITHUB_WORKSPACE, so CI
-      #      scripts here (e.g. ci-scripts/manual-console/images/
-      #      setup-plugin-image.sh, added on main and not present on older
-      #      release branches) always match the workflow YAML that's
-      #      actually running.
-      #   2. The plugin source to actually build -- PR head, or inputs.branch
-      #      (which may be an old release branch lacking those same CI
-      #      scripts) -- into plugin-src/, used only as setup-plugin-
-      #      image.sh's BUILD_DIR below. Building main's plugin against a
-      #      release branch's console previously produced "Failed to load
-      #      scripts of plugin kubevirt-plugin" in the browser (SDK/
-      #      PatternFly version skew) -- confirmed live, CNV-92682 follow-up.
+      # Two checkouts, deliberately kept separate: (1) this repo's own
+      # dispatch ref into $GITHUB_WORKSPACE, so CI scripts here always
+      # match the workflow YAML that's actually running; (2) the plugin
+      # source to actually build -- PR head, or inputs.branch -- into
+      # plugin-src/, used only as setup-plugin-image.sh's BUILD_DIR below.
       # allow-unsafe-pr-checkout is not needed for either: actions/checkout
       # only enforces that guard for pull_request_target/workflow_run
       # triggers, not workflow_dispatch. The OWNERS check above (resolve-pr)
