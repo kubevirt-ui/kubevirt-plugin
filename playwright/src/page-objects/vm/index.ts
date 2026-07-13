@@ -1,0 +1,14 @@
+export { default as VirtualMachineDetailPage } from './virtual-machine-detail-page';
+export { default as VirtualMachineSnapshotDetailPage } from './virtual-machine-snapshot-detail-page';
+export { default as VirtualMachinesPage } from './virtual-machines-page';
+export { default as VmActionsPage } from './vm-actions-page';
+export { default as VmConfigurationPage } from './vm-configuration-page';
+export { default as VmConsolePage } from './vm-console-page';
+export { default as VmDetailPage } from './vm-detail-page';
+export { default as VmListPage } from './vm-list-page';
+export { default as VmOverviewTabPage } from './vm-overview-tab-page';
+export { default as VmSchedulingMetricsPage } from './vm-scheduling-metrics-page';
+export { default as VmSearchPage } from './vm-search-page';
+export { default as VmSnapshotsPage } from './vm-snapshots-page';
+export { default as VmStoragePage } from './vm-storage-page';
+export { default as VmTreePage } from './vm-tree-page';
