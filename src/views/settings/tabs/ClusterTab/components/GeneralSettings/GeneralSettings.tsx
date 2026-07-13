@@ -12,6 +12,7 @@ import AdvancedCDROMFeatures from './AdvancedCDROMFeatures/AdvancedCDROMFeatures
 import HideYamlTab from './HideYamlTab/HideYamlTab';
 import LiveMigrationSection from './LiveMigrationSection/LiveMigrationSection';
 import MemoryDensity from './MemoryDensity/MemoryDensity';
+import KernelSamepageMerging from './MemoryDensity/components/KernelSamepageMerging/KernelSamepageMerging';
 import SSHConfiguration from './SSHConfiguration/SSHConfiguration';
 
 type GeneralSettingsProps = {
@@ -32,7 +33,10 @@ const GeneralSettings: FC<GeneralSettingsProps> = ({ hyperConvergeConfiguration,
           <LiveMigrationSection hyperConvergeConfiguration={hyperConvergeConfiguration} />
         </StackItem>
         <StackItem isFilled>
-          <MemoryDensity
+          <MemoryDensity hyperConvergeConfiguration={hyperConvergeConfiguration} />
+        </StackItem>
+        <StackItem isFilled>
+          <KernelSamepageMerging
             hyperConvergeConfiguration={hyperConvergeConfiguration}
             newBadge={newBadge}
           />

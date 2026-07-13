@@ -1,14 +1,22 @@
-.memory-density-slider {
-  .pf-v6-c-slider__value .pf-v6-c-form-control {
-    width: 70px;
-    min-width: 70px;
-    max-width: 70px;
+.memory-density {
+  &__ratio-level-row {
+    align-items: flex-start;
+    display: flex;
+    gap: var(--pf-t--global--spacer--sm);
   }
 
-  .pf-v6-c-slider__value input[type='number'] {
-    width: 100%;
-    min-width: 100%;
-    max-width: 100%;
-    box-sizing: border-box;
+  &__ratio-level-dot {
+    border-radius: 50%;
+    display: inline-block;
+    flex-shrink: 0;
+    height: 12px;
+    margin-top: 3px;
+    width: 12px;
+  }
+
+  &__ratio-level-indicator {
+    align-items: center;
+    display: flex;
+    gap: var(--pf-t--global--spacer--xs);
   }
 }

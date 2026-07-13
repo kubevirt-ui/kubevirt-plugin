@@ -10,11 +10,9 @@ const CLUSTER_SETTINGS = 'cluster-settings';
 const GENERAL_INFORMATION_INSTALLED_VERSION = 'general-information-installed-version';
 const GENERAL_INFORMATION_UPDATE_STATUS = 'general-information-update-status';
 const GENERAL_SETTINGS_SECTION = 'General settings';
-const MEMORY_DENSITY = 'memory-density';
-const MEMORY_DENSITY_DISABLE_CONFIRM_BUTTON = 'memory-density-disable-confirm-button';
-const MEMORY_DENSITY_MODIFY_BUTTON = 'memory-density-modify-button';
-const MEMORY_DENSITY_SAVE_BUTTON = 'memory-density-save-button';
-const MEMORY_DENSITY_SLIDER = 'memory-density-slider';
+const MEMORY_REQUEST_RATIO_INPUT = 'memory-request-ratio-input';
+const MEMORY_REQUEST_RATIO_SAVE_BUTTON = 'memory-request-ratio-save';
+const MEMORY_REQUEST_RATIO_RESTORE_BUTTON = 'memory-request-ratio-restore';
 const CLUSTER_TAB = 'Cluster';
 const PREVIEW_FEATURES_TAB = 'Preview features';
 const SETTINGS_HEADING = 'Settings';
@@ -74,43 +72,9 @@ export class SettingsPage {
 
   // ── VM Actions confirmation ───────────────────────────────────────────────────
 
-  async disableMemoryDensity() {
-    await this.openSection(GENERAL_SETTINGS_SECTION);
-    await this.openSection('Memory density');
-    // Wait for the switch to be rendered inside the expanded section
-    const switchInput = byTestId(this.page, MEMORY_DENSITY);
-    await expect(switchInput).toBeVisible({ timeout: SHORT_TIMEOUT });
-    const isOn = await switchInput.evaluate((el) => (el as HTMLInputElement).checked);
-    if (isOn) {
-      await switchInput.locator('..').click();
-    }
-    await expect(byTestId(this.page, MEMORY_DENSITY_DISABLE_CONFIRM_BUTTON)).toBeVisible({
-      timeout: NAV_TIMEOUT,
-    });
-    await byTestId(this.page, MEMORY_DENSITY_DISABLE_CONFIRM_BUTTON).click();
-    // Wait for the confirm button to disappear (confirms HCO reconciliation started)
-    await expect(byTestId(this.page, MEMORY_DENSITY_DISABLE_CONFIRM_BUTTON)).toBeHidden({
-      timeout: NAV_TIMEOUT,
-    });
-  }
-
   /** Disable VM actions confirmation, retrying if the page reloads during the click. */
   async disableVMActionsConfirmation(retries = DEFAULT_RETRIES) {
     await this.toggleVMActionsConfirmation(false, retries);
-  }
-
-  async enableMemoryDensity() {
-    await this.openSection(GENERAL_SETTINGS_SECTION);
-    await this.openSection('Memory density');
-    const switchInput = byTestId(this.page, MEMORY_DENSITY);
-    await expect(switchInput).toBeVisible({ timeout: SHORT_TIMEOUT });
-    await switchInput.check({ force: true });
-    // The slider lives inside "Current memory density" ExpandableSection, which starts
-    // collapsed. Waiting for the expandable container is sufficient to confirm the switch
-    // took effect; setMemoryDensityValue() will expand it when needed.
-    await expect(byTestId(this.page, MEMORY_DENSITY_MODIFY_BUTTON)).toBeVisible({
-      timeout: 15 * SECOND,
-    });
   }
 
   /** Enable a preview feature toggle if it is not already on. */
@@ -129,8 +93,6 @@ export class SettingsPage {
     }
   }
 
-  // ── Assertions ────────────────────────────────────────────────────────────────
-
   /** Enable VM actions confirmation, retrying if the page reloads during the click. */
   async enableVMActionsConfirmation(retries = DEFAULT_RETRIES) {
     await this.toggleVMActionsConfirmation(true, retries);
@@ -141,6 +103,8 @@ export class SettingsPage {
       versionPrefix,
     );
   }
+
+  // ── Assertions ────────────────────────────────────────────────────────────────
 
   async expectSSHSecretConfigured(secretName: string) {
     await expect(this.page.getByRole('button', { name: secretName })).toBeVisible();
@@ -171,6 +135,14 @@ export class SettingsPage {
     await expect(this.page.getByText('Public SSH key')).toBeVisible({ timeout: NAV_TIMEOUT });
   }
 
+  async openMemoryRequestRatioSection() {
+    await this.openSection(GENERAL_SETTINGS_SECTION);
+    await this.openSection('Memory request ratio');
+    await expect(byTestId(this.page, MEMORY_REQUEST_RATIO_INPUT)).toBeVisible({
+      timeout: 15 * SECOND,
+    });
+  }
+
   /**
    * Expand a settings accordion section only if it is currently collapsed.
    * Waits for aria-expanded="true" before returning so that child elements
@@ -184,6 +156,19 @@ export class SettingsPage {
     if (!expanded) {
       await toggle.click();
       await expect(toggle).toHaveAttribute('aria-expanded', 'true', { timeout: SHORT_TIMEOUT });
+    }
+  }
+
+  async restoreMemoryRequestRatioDefault() {
+    await this.openSection(GENERAL_SETTINGS_SECTION);
+    await this.openSection('Memory request ratio');
+    const restoreButton = byTestId(this.page, MEMORY_REQUEST_RATIO_RESTORE_BUTTON);
+    if (await restoreButton.isVisible()) {
+      await restoreButton.click();
+      await byTestId(this.page, MEMORY_REQUEST_RATIO_SAVE_BUTTON).click({ force: true });
+      await expect(byTestId(this.page, MEMORY_REQUEST_RATIO_SAVE_BUTTON)).toBeHidden({
+        timeout: NAV_TIMEOUT,
+      });
     }
   }
 
@@ -202,15 +187,16 @@ export class SettingsPage {
     await this.page.getByText('Set live migration network').click();
   }
 
-  async setMemoryDensityValue(value: string) {
-    // Wait for "Current memory density" to be clickable after enableMemoryDensity
-    await this.page.getByText('Current memory density').click();
-    const input = byTestId(this.page, MEMORY_DENSITY_SLIDER).locator('input[type="number"]');
+  async setMemoryRequestRatioValue(value: string) {
+    await this.openMemoryRequestRatioSection();
+    const input = byTestId(this.page, MEMORY_REQUEST_RATIO_INPUT).locator('input[type="number"]');
     await expect(input).toBeVisible({ timeout: SHORT_TIMEOUT });
     await input.dblclick();
     await input.fill(value);
-    await this.page.getByText('Requested memory density').click();
-    await byTestId(this.page, MEMORY_DENSITY_SAVE_BUTTON).click({ force: true });
+    await byTestId(this.page, MEMORY_REQUEST_RATIO_SAVE_BUTTON).click({ force: true });
+    await expect(byTestId(this.page, MEMORY_REQUEST_RATIO_SAVE_BUTTON)).toBeHidden({
+      timeout: NAV_TIMEOUT,
+    });
   }
 
   async sshSectionText(sectionTestId: string): Promise<string> {
