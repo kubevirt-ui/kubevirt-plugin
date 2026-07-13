@@ -1,7 +1,5 @@
 import { TFunction } from 'i18next';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { TabBadge } from '@kubevirt-utils/components/HorizontalNavbar/utils/utils';
 import { VirtualMachineDetailsTab } from '@kubevirt-utils/constants/tabs-constants';
 import { LabelProps } from '@patternfly/react-core';
 
@@ -52,24 +50,6 @@ export const getDVSeverity = (phase: string): DiagnosticSeverity => {
 
 export const getSnapshotSeverity = (enabled: boolean): DiagnosticSeverity =>
   enabled ? 'healthy' : 'warning';
-
-export const getDiagnosticBadge = (vm: V1VirtualMachine): TabBadge | undefined => {
-  const conditions = vm?.status?.conditions ?? [];
-  const volumeSnapshotStatuses = vm?.status?.volumeSnapshotStatuses ?? [];
-
-  const conditionSeverities = conditions.map((c) => getConditionSeverity(c.status, c.type));
-  const critical = conditionSeverities.filter((s) => s === 'critical').length;
-  const conditionWarnings = conditionSeverities.filter((s) => s === 'warning').length;
-  const snapshotWarnings = volumeSnapshotStatuses.filter((v) => !v.enabled).length;
-
-  const totalIssues = critical + conditionWarnings + snapshotWarnings;
-  if (totalIssues === 0) return undefined;
-
-  return {
-    color: critical > 0 ? 'red' : 'yellow',
-    count: totalIssues,
-  };
-};
 
 type StatusLabel = { color: LabelProps['color']; text: string };
 
