@@ -1,15 +1,10 @@
-# Single source of truth for the hot-cluster pipeline. pull_request_target
-# and workflow_dispatch share every job here rather than being split into
-# separate files, to avoid duplicating the core job graph (prepare,
-# cluster-check, progress updates, run-e2e-tests, verify) -- a shared
-# reusable pipeline wouldn't avoid that duplication either, since a
-# workflow_dispatch-only job (e.g. the manual health check, folded into
-# cluster-check's own result job below) would still render as a
-# permanently-skipped row for pull_request_target callers regardless of
-# which file defines it. `uses:` composes the reusable pieces that don't
-# need trigger-specific job graphs: hot-cluster-check.yml,
+# Single source of truth for the hot-cluster pipeline -- pull_request_target
+# and workflow_dispatch share the same job graph rather than splitting into
+# separate files (a workflow_dispatch-only job would still show as
+# permanently-skipped for PR callers either way). `uses:` composes the
+# pieces that don't need trigger-specific logic: hot-cluster-check.yml,
 # hot-cluster-e2e-run.yml, and the composite actions under
-# .github/actions/hot-cluster/ (steps, not jobs).
+# .github/actions/hot-cluster/.
 name: Hot Cluster E2E
 run-name: "Hot Cluster E2E [${{ inputs.base_ref || inputs.cluster_name || github.base_ref || 'kubevirt-plugin-ci' }}] @ ${{ inputs.pr_number != '' && format('PR#{0} retest', inputs.pr_number) || github.head_ref || github.ref_name }}${{ (github.event.action == 'labeled' && github.event.label.name != 'ok-to-test') && ' (skipped: irrelevant label)' || '' }}"
 
@@ -101,12 +96,10 @@ permissions:
   actions: write
 
 concurrency:
-  # Irrelevant label events (lgtm, approved, jira/valid-reference, ...) get
-  # their own run-id-unique group so they can't be mistaken for -- or
-  # delay -- the real per-PR group's result. inputs.pr_number is checked
-  # before the ref+cluster_name fallback so /retest-e2e and
-  # retest-stale-gating.yml dispatches (which carry no
-  # github.event.pull_request.number) still group by the PR they target.
+  # Irrelevant label events get their own run-id-unique group so they can't
+  # delay/mask the real per-PR result. pr_number is checked before the
+  # ref+cluster_name fallback so pr_number dispatches (no pull_request
+  # payload) still group by the PR they target.
   group: ${{ (github.event.action != 'labeled' || github.event.label.name == 'ok-to-test') && format('hot-cluster-e2e-{0}', github.event.pull_request.number || inputs.pr_number || format('{0}-{1}', github.ref, inputs.cluster_name || 'kubevirt-plugin-ci')) || format('hot-cluster-e2e-noop-{0}', github.run_id) }}
   cancel-in-progress: true
 
@@ -117,13 +110,10 @@ env:
   BASE_DOMAIN: cnv-ui.com
 
 jobs:
-  # Resolves cluster config, hot-cluster CI trust, and (for a pr_number
-  # retest) the PR's current context, then posts the first "Hot Cluster
-  # E2E Progress" update -- as steps of one job rather than four separate
-  # ones, since every top-level job is its own PR merge-box row. See the
-  # composite actions under .github/actions/hot-cluster/ for per-step
-  # detail. Every step after Checkout carries its own `always()` guard
-  # plus continue-on-error so one concern failing can't skip the others.
+  # Resolves cluster config, CI trust, PR context, and progress status as
+  # steps of one job (not four) since every top-level job is its own
+  # merge-box row. Each step after Checkout has its own always() +
+  # continue-on-error so one failure can't skip the others.
   prepare:
     name: Prepare
     if: always()
@@ -132,6 +122,7 @@ jobs:
     permissions:
       statuses: write
       pull-requests: read
+      checks: write
     outputs:
       cluster_name: ${{ steps.resolve-config.outputs.cluster-name }}
       openshift_version: ${{ steps.resolve-config.outputs.openshift-version }}
@@ -139,26 +130,23 @@ jobs:
       branch_name: ${{ steps.resolve-config.outputs.branch-name }}
       cnv_channel: ${{ steps.resolve-config.outputs.cnv-channel }}
       cnv_pin_version: ${{ steps.resolve-config.outputs.cnv-pin-version }}
-      # Empty unless pull_request_target. Feeds cluster-check's should_run
-      # and verify-gating-tests' TRUSTED check below.
+      # Empty unless pull_request_target; feeds should_run and TRUSTED below.
       trusted: ${{ steps.check-trust.outputs.trusted }}
-      # Empty unless dispatched with pr_number set. Feed run-e2e-tests'
-      # guard and verify-gating-tests' retest-result reporting below.
+      # Empty unless dispatched with pr_number; feeds run-e2e-tests' guard
+      # and retest-result reporting below.
       pr_head_sha: ${{ steps.resolve-pr-context.outputs.head-sha }}
       pr_mergeable: ${{ steps.resolve-pr-context.outputs.mergeable }}
       pr_still_in_pool: ${{ steps.resolve-pr-context.outputs.still-in-pool }}
       pr_trusted: ${{ steps.resolve-pr-context.outputs.trusted }}
-      # success/failure/skipped/cancelled outcome of Resolve PR context --
-      # lets verify-gating-tests distinguish "ran and failed" from "never ran".
+      # Outcome of Resolve PR context -- distinguishes "ran and failed" from "never ran".
       pr_context_outcome: ${{ steps.resolve-pr-context.outcome }}
-      # Single source of truth for every "Hot Cluster E2E Progress" posting
-      # in this run -- see resolve-progress-context.
+      # Single source of truth for "Hot Cluster E2E Progress" postings this run.
       progress_head_sha: ${{ steps.resolve-progress.outputs.head-sha }}
       progress_status_context: ${{ steps.resolve-progress.outputs.status-context }}
       is_irrelevant_label: ${{ steps.resolve-progress.outputs.is-irrelevant-label }}
     steps:
-      # No ref override: pull_request_target checks out the base branch
-      # (never the PR's own code), so a PR can't self-approve OWNERS trust.
+      # No ref override -- checks out the base branch so a PR can't
+      # self-approve OWNERS trust.
       - name: Checkout
         uses: actions/checkout@v7
         with:
@@ -176,8 +164,7 @@ jobs:
           test-engine: ${{ inputs.test_engine }}
           cnv-channel: ${{ inputs.cnv_channel }}
 
-      # OWNERS (approvers/reviewers) is the single source of truth for
-      # trust, same as Prow's /lgtm and /approve.
+      # OWNERS is the source of truth for trust, same as Prow's /lgtm and /approve.
       - name: Check trusted author
         id: check-trust
         if: always() && github.event_name == 'pull_request_target'
@@ -186,11 +173,10 @@ jobs:
         with:
           author: ${{ github.event.pull_request.user.login }}
 
-      # Looked up fresh via the API (not trusted from any caller-supplied
-      # SHA) so checkout and the eventual "Run Gating Tests" result always
-      # reflect the PR's actual current state. Trust is re-checked here too
-      # since this workflow_dispatch path has no pull_request payload for
-      # cluster-check's own should_run trust gate to use.
+      # Looked up fresh via the API (never trusted from caller input) so
+      # the result always reflects the PR's current state. Trust is
+      # re-checked here too, since this path has no pull_request payload
+      # for should_run.
       - name: Resolve PR context
         id: resolve-pr-context
         if: always() && github.event_name == 'workflow_dispatch' && inputs.pr_number != ''
@@ -208,11 +194,9 @@ jobs:
           resolved-head-sha: ${{ steps.resolve-pr-context.outputs.head-sha }}
           pr-number: ${{ inputs.pr_number }}
 
-      # No posting for the irrelevant-label no-op path -- "Hot Cluster E2E
-      # Progress" is a plain commit status, so the last real state (pending
-      # or a completed result) simply stands untouched; posting a
-      # differently-named entry here would just add a permanent extra row
-      # to nearly every PR (bots label PRs almost immediately).
+      # No posting for the irrelevant-label no-op -- the status simply
+      # keeps its last real state; a differently-named entry here would
+      # just add a permanent extra row to nearly every PR.
       - name: Post initial progress status (waiting for cluster)
         if: always() && steps.resolve-progress.outputs.is-irrelevant-label != 'true'
         uses: ./.github/actions/hot-cluster/post-progress-status
@@ -222,14 +206,12 @@ jobs:
           state: pending
           description: Waiting for cluster to be built
 
-      # GitHub shows whichever "Run Gating Tests" check-run reported most
-      # recently for this SHA (see ci-scripts/README.md, "Check-Run & Retest
-      # Model") -- if an older run already failed for this SHA, that stays
-      # the "current" result while this fresh run is still in progress.
-      # Superseding it immediately closes that window; verify-gating-tests'
-      # own check-run naturally supersedes this one again once it completes.
-      # Skipped for a bare ad-hoc dispatch (posts under a different name)
-      # and if Resolve PR context failed (its head-sha would be wrong).
+      # An older failed run for this SHA would otherwise stay "current"
+      # while this fresh run is in progress (see README, "Check-Run &
+      # Retest Model") -- superseding it here closes that window;
+      # verify-gating-tests supersedes it again on completion. Skipped for
+      # a bare ad-hoc dispatch and if Resolve PR context failed (head-sha
+      # would be wrong).
       - name: Supersede stale "Run Gating Tests" check for this run
         if: |
           always() &&
@@ -247,17 +229,15 @@ jobs:
           summary: A fresh Hot Cluster E2E run has started for this commit -- see the "Hot Cluster E2E Progress" check for live status.
           details-url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
-  # if: always() unconditionally -- a job-level `if:` skip reports a bare
-  # `cluster-check` context instead of the nested `cluster-check / probe`
-  # etc. this always-run path gives every event, so the check name stays
-  # stable regardless of trigger. The actual gating decision lives in
-  # should_run instead. run_health_check only applies to workflow_dispatch
-  # -- folded into hot-cluster-check.yml's own `result` job (rather than a
-  # separate top-level job here) so pull_request_target runs never show a
+  # Skipped entirely for an irrelevant-label no-op (collapses to one bare
+  # skipped row instead of running Probe/Availability Result for nothing)
+  # -- should_run still handles the other no-op case, an untrusted real
+  # trigger. run_health_check (workflow_dispatch only) is folded into
+  # hot-cluster-check.yml's own result job so PR runs never show a
   # permanently-skipped "Manual Cluster Health Check" row.
   cluster-check:
     needs: [prepare]
-    if: always()
+    if: always() && !(github.event.action == 'labeled' && github.event.label.name != 'ok-to-test')
     uses: ./.github/workflows/hot-cluster-check.yml
     with:
       cluster_name: ${{ needs.prepare.outputs.cluster_name }}
@@ -266,27 +246,29 @@ jobs:
       cnv_channel: ${{ needs.prepare.outputs.cnv_channel }}
       cnv_pin_version: ${{ needs.prepare.outputs.cnv_pin_version }}
       branch_name: ${{ needs.prepare.outputs.branch_name || github.ref_name }}
-      should_run: ${{ (github.event.action != 'labeled' || github.event.label.name == 'ok-to-test') && (github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository || needs.prepare.outputs.trusted == 'true' || (github.event.action == 'labeled' && github.event.label.name == 'ok-to-test')) }}
+      # Irrelevant-label case already excluded by this job's if: above --
+      # should_run only needs to gate an untrusted real trigger now.
+      should_run: ${{ github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository || needs.prepare.outputs.trusted == 'true' || (github.event.action == 'labeled' && github.event.label.name == 'ok-to-test') }}
       run_health_check: ${{ github.event_name == 'workflow_dispatch' }}
-      # ibm_region/ibm_resource_group/base_domain aren't passed explicitly --
-      # the `env` context isn't available in a `uses:` job's `with:` block,
-      # so this relies on hot-cluster-check.yml's own input defaults
-      # matching the env block above (same pattern base_domain already used).
+      # ibm_region/ibm_resource_group/base_domain rely on hot-cluster-check.yml's
+      # own defaults matching the env block above -- env context isn't
+      # available in a uses: job's with: block.
     secrets: inherit
 
-  # Advances progress to its second phase once the cluster is confirmed
-  # ready, or completes it as a failure if it never became ready.
+  # Advances progress once the cluster is ready, or fails it otherwise.
+  # Skipped for an irrelevant-label no-op (same as cluster-check above),
+  # else it'd show as "successful" having done nothing.
   progress-check-running-tests:
     name: Update Progress Check
     needs: [prepare, cluster-check]
-    if: always()
+    if: always() && !(github.event.action == 'labeled' && github.event.label.name != 'ok-to-test')
     runs-on: ubuntu-latest
     timeout-minutes: 2
     permissions:
       statuses: write
     outputs:
-      # Threaded into run-e2e-tests below (and from there into
-      # hot-cluster-e2e-run.yml) for its own "Running gating tests" update.
+      # Threaded into run-e2e-tests (then hot-cluster-e2e-run.yml) for its
+      # own "Running gating tests" update.
       head-sha: ${{ steps.post-status.outputs.head-sha }}
       status-context: ${{ steps.post-status.outputs.status-context }}
     steps:
@@ -308,11 +290,9 @@ jobs:
             const headSha = process.env.HEAD_SHA;
             const statusContext = process.env.STATUS_CONTEXT;
 
-            // The manual health check only runs for workflow_dispatch (folded
-            // into cluster-check's own `result` job), so a failed health check
-            // fails that job overall -- checking both the output and the
-            // job's own result catches that in addition to a plain
-            // not-ready cluster.
+            // Manual health check (workflow_dispatch only) fails
+            // cluster-check's job overall on failure -- check both the
+            // output and job result.
             const clusterReady = context.eventName === 'workflow_dispatch'
               ? '${{ needs.cluster-check.outputs.cluster_ready }}' === 'true' && '${{ needs.cluster-check.result }}' === 'success'
               : '${{ needs.cluster-check.outputs.cluster_ready }}' === 'true';
@@ -337,17 +317,16 @@ jobs:
   run-e2e-tests:
     name: Run E2E Tests
     needs: [prepare, cluster-check, progress-check-running-tests]
-    # Job-level permissions OVERRIDE the workflow-level defaults, so this
-    # keeps contents/actions plus the new statuses: write (needed by
-    # hot-cluster-e2e-run.yml's own progress update).
+    # Job-level permissions override workflow defaults -- keeps
+    # contents/actions plus statuses: write for hot-cluster-e2e-run.yml's
+    # progress update.
     permissions:
       contents: read
       actions: write
       statuses: write
     # mergeable/still_in_pool/trusted only ever block the pr_number retest
-    # path (prepare's Resolve PR Context step is empty, not 'false', for
-    # every other trigger). pr_context_outcome guards against that step
-    # itself erroring/cancelling rather than cleanly resolving to false.
+    # path (empty, not 'false', for every other trigger). pr_context_outcome
+    # guards against that step itself erroring rather than resolving false.
     if: |
       always() && (
         (github.event_name == 'workflow_dispatch' && needs.cluster-check.result == 'success' && needs.cluster-check.outputs.cluster_ready == 'true') ||
@@ -365,9 +344,8 @@ jobs:
       runner_label: ${{ inputs.runner_label || needs.prepare.outputs.cluster_name }}
       cluster_name: ${{ needs.prepare.outputs.cluster_name }}
       cnv_pin_version: ${{ needs.prepare.outputs.cnv_pin_version }}
-      # Priority: pr_number retest merges with the current base tip;
-      # base_ref alone (release-branch dispatch) builds/tests that branch;
-      # otherwise empty, falling through to the PR head / github.ref default.
+      # Priority: pr_number merges with current base tip; base_ref alone
+      # tests that branch; else empty (falls through to PR head/github.ref).
       checkout_ref: ${{ inputs.pr_number != '' && format('refs/pull/{0}/merge', inputs.pr_number) || inputs.base_ref || '' }}
       is_reusable_call: true
       progress_status_sha: ${{ needs.progress-check-running-tests.outputs.head-sha }}
@@ -375,19 +353,20 @@ jobs:
     secrets: inherit
 
   # Single source of truth for the gating-test outcome. if: excludes the
-  # irrelevant-label no-op path entirely (rather than just naming around
-  # it) so it collapses into the merge box's unobtrusive "N skipped" bucket
-  # instead of persisting as a distinctly-named, confusing "successful"
-  # row -- see retest-e2e.yml's run-name-based no-op detection, which
-  # replaces the old job-name-substring contract this used to require.
+  # irrelevant-label no-op entirely so it collapses into the merge box's
+  # "N skipped" bucket instead of a confusing "successful" row (see
+  # retest-e2e.yml's run-name-based no-op detection).
   #
-  # This job's own native check-run is informational only (name below is
-  # deliberately never the literal "Run Gating Tests" string) -- the actual
-  # required branch-protection check is published explicitly below via
-  # publish-gating-check, which persists correctly across re-triggers
-  # regardless of what any single run's job names are.
+  # This job's own check-run is informational only -- never named the
+  # literal "Run Gating Tests" string, since the required check is
+  # published explicitly below via publish-gating-check instead (persists
+  # correctly across re-triggers regardless of job names).
+  #
+  # name: is static, not dynamic -- GitHub never evaluates a job's name:
+  # expression when skipped (actions/runner#1215), so a ternary here would
+  # render as raw unevaluated text on every irrelevant-label no-op.
   verify-gating-tests:
-    name: ${{ (github.event_name == 'workflow_dispatch' && inputs.pr_number == '') && 'Verify Gating Tests (manual dispatch)' || 'Verify Gating Tests' }}
+    name: Verify Gating Tests
     needs: [prepare, cluster-check, run-e2e-tests, progress-check-running-tests]
     if: always() && !(github.event.action == 'labeled' && github.event.label.name != 'ok-to-test')
     runs-on: ubuntu-latest
@@ -465,8 +444,7 @@ jobs:
               target_url: `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
             });
 
-      # Maps verify's `reason` output to a PR-facing title/summary so a
-      # retest failure explains why (merge conflict, left pool, etc.).
+      # Maps verify's reason output to a PR-facing title/summary explaining why.
       - name: Determine retest result details
         id: result-details
         if: always() && inputs.pr_number != '' && needs.prepare.outputs.pr_head_sha != ''
@@ -503,11 +481,14 @@ jobs:
               ;;
           esac
 
-      # The pr_number retest path has no pull_request payload, so GitHub
-      # can't auto-associate this job's own check-run with the PR being
-      # retested -- publish it manually onto the PR's real head SHA.
+      # Needed by both publish steps below -- they use a local action
+      # reference (./.github/actions/publish-gating-check), which requires
+      # the repo checked out on disk or the runner can't resolve it (fails
+      # silently under continue-on-error otherwise). Runs for every path
+      # that publishes a result; skipped only for a bare ad-hoc dispatch,
+      # which publishes nothing.
       - name: Checkout
-        if: always() && inputs.pr_number != '' && needs.prepare.outputs.pr_head_sha != ''
+        if: always() && !(github.event_name == 'workflow_dispatch' && inputs.pr_number == '')
         uses: actions/checkout@v7
         with:
           persist-credentials: false
@@ -524,11 +505,10 @@ jobs:
           summary: ${{ steps.result-details.outputs.summary }}
           details-url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
-      # The literal "Run Gating Tests" required check, for the normal PR
-      # trigger path -- published explicitly rather than relying on this
-      # job's own native check-run (see the header comment above).
-      # github.event.pull_request.head.sha (not github.sha, which is the
-      # base branch tip under pull_request_target) is the PR's real commit.
+      # The literal "Run Gating Tests" required check for the normal PR
+      # path (see header comment above). Uses
+      # github.event.pull_request.head.sha, not github.sha (the base
+      # branch tip under pull_request_target).
       - name: Publish result for PR
         if: always() && github.event_name == 'pull_request_target'
         continue-on-error: true
@@ -543,9 +523,8 @@ jobs:
               format('Hot cluster gating tests did not pass (reason: `{0}`). See the Run E2E Tests job for details, or comment /retest-e2e once fixed.', steps.verify.outputs.reason) }}
           details-url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
-      # Resolve PR Context erroring/cancelling (not just resolving to
-      # false) leaves no head SHA to publish against -- a PR comment is
-      # the only channel still available for that case.
+      # Resolve PR Context erroring/cancelling leaves no head SHA to
+      # publish against -- a PR comment is the only channel left for that case.
       - name: Report unresolvable PR context on the PR
         if: |
           always() && inputs.pr_number != '' && (
