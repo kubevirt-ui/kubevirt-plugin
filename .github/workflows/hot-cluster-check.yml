@@ -84,6 +84,27 @@ on:
         type: boolean
         required: false
         default: true
+      run_health_check:
+        description: |
+          Run the deeper manual health check (DNS/API probe for IPI, or
+          IBM Cloud CLI + oc for ROKS) as extra steps of the `result` job
+          once the cluster is confirmed ready. Only meaningful for
+          workflow_dispatch -- folded in here (instead of a separate
+          top-level job in the caller) so pull_request_target runs never
+          show a permanently-skipped health-check row.
+        type: boolean
+        required: false
+        default: false
+      ibm_region:
+        description: IBM Cloud region, for the health check's IBM Cloud CLI setup (ROKS only)
+        type: string
+        required: false
+        default: eu-de
+      ibm_resource_group:
+        description: IBM Cloud resource group, for the health check's IBM Cloud CLI setup (ROKS only)
+        type: string
+        required: false
+        default: cnv-ui
     outputs:
       cluster_ready:
         description: Whether the cluster is ready (true/false)
@@ -154,7 +175,7 @@ jobs:
     needs: [probe, provision]
     if: always()
     runs-on: ubuntu-latest
-    timeout-minutes: 2
+    timeout-minutes: 10
     outputs:
       cluster_ready: ${{ steps.compute.outputs.cluster_ready }}
     steps:
@@ -170,6 +191,94 @@ jobs:
             echo "cluster_ready=true" >> "$GITHUB_OUTPUT"
           else
             echo "cluster_ready=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      # The manual health check's own extra steps below fail this job
+      # directly (a failed command/exit 1, same as before it was folded in
+      # from a separate top-level job) -- no separate output needed, the
+      # caller reads this job's own result alongside cluster_ready.
+      - name: Checkout (manual health check)
+        if: inputs.run_health_check && steps.compute.outputs.cluster_ready == 'true'
+        uses: actions/checkout@v7
+
+      - name: Setup IBM Cloud CLI (manual health check)
+        if: |
+          inputs.run_health_check && steps.compute.outputs.cluster_ready == 'true' &&
+          inputs.infrastructure_type != 'ipi'
+        uses: IBM/actions-ibmcloud-cli@v2
+        with:
+          api_key: ${{ secrets.IC_KEY }}
+          region: ${{ inputs.ibm_region }}
+          group: ${{ inputs.ibm_resource_group }}
+          plugins: kubernetes-service
+
+      - name: Install oc client (manual health check, ROKS)
+        if: |
+          inputs.run_health_check && steps.compute.outputs.cluster_ready == 'true' &&
+          inputs.infrastructure_type != 'ipi'
+        env:
+          CLUSTER_NAME: ${{ inputs.cluster_name }}
+        run: |
+          CLUSTER_JSON="$(ibmcloud oc cluster get --cluster "${CLUSTER_NAME}" --output json)"
+          export CLUSTER_JSON
+          bash ./ci-scripts/hot-cluster/install-oc-client.sh
+
+      - name: Configure kubeconfig (manual health check, ROKS)
+        if: |
+          inputs.run_health_check && steps.compute.outputs.cluster_ready == 'true' &&
+          inputs.infrastructure_type != 'ipi'
+        env:
+          CLUSTER_NAME: ${{ inputs.cluster_name }}
+        run: |
+          ibmcloud oc cluster config --cluster "${CLUSTER_NAME}" --admin
+          oc cluster-info
+          oc get nodes -o wide
+
+      - name: Manual health check (IPI, DNS probe)
+        if: |
+          inputs.run_health_check && steps.compute.outputs.cluster_ready == 'true' &&
+          inputs.infrastructure_type == 'ipi'
+        env:
+          CLUSTER_NAME: ${{ inputs.cluster_name }}
+          BASE_DOMAIN: ${{ inputs.base_domain }}
+        run: |
+          API_HOST="api.${CLUSTER_NAME}.${BASE_DOMAIN}"
+          echo "Probing IPI cluster via DNS: ${API_HOST}..."
+
+          if dig +short "${API_HOST}" 2>/dev/null | grep -q .; then
+            echo "API DNS resolves — cluster is alive"
+            API_IP=$(dig +short "${API_HOST}" 2>/dev/null | head -1)
+            echo "  ${API_HOST} -> ${API_IP}"
+          else
+            echo "::error::API DNS does not resolve for ${API_HOST}. Cluster may not exist."
+            exit 1
+          fi
+
+          echo "Checking API reachability (HTTPS)..."
+          if curl -sk --connect-timeout 10 "https://${API_HOST}:6443/healthz" 2>/dev/null | grep -q ok; then
+            echo "API server is healthy"
+          else
+            echo "::warning::API server did not respond to /healthz — cluster may be initializing"
+          fi
+
+      - name: Manual health check summary
+        if: always() && inputs.run_health_check
+        env:
+          CLUSTER_NAME: ${{ inputs.cluster_name }}
+          INFRASTRUCTURE_TYPE: ${{ inputs.infrastructure_type }}
+          JOB_STATUS: ${{ job.status }}
+        run: |
+          echo "## Manual Cluster Health Check" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Parameter | Value |" >> "$GITHUB_STEP_SUMMARY"
+          echo "|-----------|-------|" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Infrastructure | \`${INFRASTRUCTURE_TYPE}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Cluster | \`${CLUSTER_NAME}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          if [[ "${JOB_STATUS}" == "success" ]]; then
+            echo "All health checks **passed**. Invoking Playwright gating tests on the hot cluster." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "Health checks **failed**. E2E workflow was not invoked." >> "$GITHUB_STEP_SUMMARY"
           fi
 
       - name: Summary

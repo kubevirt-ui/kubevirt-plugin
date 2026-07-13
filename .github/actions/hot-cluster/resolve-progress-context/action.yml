@@ -6,8 +6,10 @@ description: |
   commit-status entry. Also reports whether this event is an
   irrelevant-label no-op (a bot label like lgtm/approved that doesn't
   represent a real code change) or an ad-hoc dispatch (bare
-  workflow_dispatch, no pr_number) -- callers use these to decide whether
-  to post at all, and under which distinct context.
+  workflow_dispatch, no pr_number) -- callers use is-irrelevant-label to
+  skip posting entirely (the real context's last state stands untouched)
+  and is-adhoc-dispatch to post under a distinct context so it can't
+  collide with a real PR's own status.
 
 inputs:
   resolved-head-sha:
@@ -62,13 +64,14 @@ runs:
           // An ad-hoc dispatch doesn't represent any specific PR -- give it
           // a distinct context so it can't collide with (and obscure, per
           // GitHub's "most recent wins" display) a real PR's own status.
+          // isIrrelevantLabel doesn't need its own context: callers skip
+          // posting entirely for that case, so the real context (below)
+          // simply keeps its last real state.
           const isAdHocDispatch = context.eventName === 'workflow_dispatch' && !process.env.PR_NUMBER;
 
-          const statusContext = isIrrelevantLabel
-            ? 'Hot Cluster E2E Progress (skipped - irrelevant label event)'
-            : isAdHocDispatch
-              ? 'Hot Cluster E2E Progress (manual dispatch)'
-              : 'Hot Cluster E2E Progress';
+          const statusContext = isAdHocDispatch
+            ? 'Hot Cluster E2E Progress (manual dispatch)'
+            : 'Hot Cluster E2E Progress';
 
           core.setOutput('head_sha', headSha);
           core.setOutput('status_context', statusContext);

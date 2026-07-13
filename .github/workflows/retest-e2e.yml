@@ -107,26 +107,14 @@ jobs:
               });
 
               // Bot labels (lgtm, approved, ...) each trigger their own
-              // no-op run that reports "skipped - irrelevant label event",
-              // and are always newer than the real run -- walk
-              // newest-to-oldest and skip those so a genuine result isn't
-              // re-run over. That suffix is a string contract with
-              // hot-cluster-e2e.yml's verify-gating-tests `name:`.
-              let prRun = null;
-              for (const candidate of candidates) {
-                const jobs = await github.paginate(github.rest.actions.listJobsForWorkflowRun, {
-                  ...context.repo,
-                  run_id: candidate.id,
-                  per_page: 100,
-                });
-                const isIrrelevantLabelNoop = jobs.some(
-                  j => j.name.includes('skipped - irrelevant label event'),
-                );
-                if (!isIrrelevantLabelNoop) {
-                  prRun = candidate;
-                  break;
-                }
-              }
+              // no-op run marked via run-name (display_title), and are
+              // always newer than the real run -- walk newest-to-oldest and
+              // skip those so a genuine result isn't re-run over. That
+              // marker is a string contract with hot-cluster-e2e.yml's
+              // `run-name:`.
+              const isIrrelevantLabelNoop = (run) =>
+                run.display_title?.includes('(skipped: irrelevant label)');
+              const prRun = candidates.find(candidate => !isIrrelevantLabelNoop(candidate)) ?? null;
 
               if (prRun) {
                 core.info(`Re-running workflow run ${prRun.id} (attempt ${prRun.run_attempt})...`);
