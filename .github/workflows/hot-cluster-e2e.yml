@@ -113,10 +113,15 @@ jobs:
   # Resolves cluster config, CI trust, PR context, and progress status as
   # steps of one job (not four) since every top-level job is its own
   # merge-box row. Each step after Checkout has its own always() +
-  # continue-on-error so one failure can't skip the others.
+  # continue-on-error so one failure can't skip the others. Skipped
+  # entirely for an irrelevant-label no-op, same as every job below --
+  # "is this irrelevant" is computable directly from github.event.* here,
+  # without needing anything this job itself would resolve, so there's no
+  # chicken-and-egg problem gating it at this level too. Turns the last
+  # remaining "successful but did nothing" row into a skip as well.
   prepare:
     name: Prepare
-    if: always()
+    if: always() && !(github.event.action == 'labeled' && github.event.label.name != 'ok-to-test')
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
@@ -143,7 +148,6 @@ jobs:
       # Single source of truth for "Hot Cluster E2E Progress" postings this run.
       progress_head_sha: ${{ steps.resolve-progress.outputs.head-sha }}
       progress_status_context: ${{ steps.resolve-progress.outputs.status-context }}
-      is_irrelevant_label: ${{ steps.resolve-progress.outputs.is-irrelevant-label }}
     steps:
       # No ref override -- checks out the base branch so a PR can't
       # self-approve OWNERS trust.
@@ -194,11 +198,10 @@ jobs:
           resolved-head-sha: ${{ steps.resolve-pr-context.outputs.head-sha }}
           pr-number: ${{ inputs.pr_number }}
 
-      # No posting for the irrelevant-label no-op -- the status simply
-      # keeps its last real state; a differently-named entry here would
-      # just add a permanent extra row to nearly every PR.
+      # Irrelevant-label events never reach this job at all (see if: above)
+      # -- no separate check needed here.
       - name: Post initial progress status (waiting for cluster)
-        if: always() && steps.resolve-progress.outputs.is-irrelevant-label != 'true'
+        if: always()
         uses: ./.github/actions/hot-cluster/post-progress-status
         with:
           head-sha: ${{ steps.resolve-progress.outputs.head-sha }}
@@ -215,7 +218,6 @@ jobs:
       - name: Supersede stale "Run Gating Tests" check for this run
         if: |
           always() &&
-          steps.resolve-progress.outputs.is-irrelevant-label != 'true' &&
           steps.resolve-progress.outputs.head-sha != '' &&
           !(github.event_name == 'workflow_dispatch' && inputs.pr_number == '') &&
           steps.resolve-pr-context.outcome != 'failure' &&
@@ -279,14 +281,8 @@ jobs:
         env:
           HEAD_SHA: ${{ needs.prepare.outputs.progress_head_sha }}
           STATUS_CONTEXT: ${{ needs.prepare.outputs.progress_status_context }}
-          IS_IRRELEVANT_LABEL: ${{ needs.prepare.outputs.is_irrelevant_label }}
         with:
           script: |
-            if (process.env.IS_IRRELEVANT_LABEL === 'true') {
-              core.info('Irrelevant label event — progress status already completed as a no-op.');
-              return;
-            }
-
             const headSha = process.env.HEAD_SHA;
             const statusContext = process.env.STATUS_CONTEXT;
 
