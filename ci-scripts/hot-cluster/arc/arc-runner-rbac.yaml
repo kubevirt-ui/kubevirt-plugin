@@ -81,6 +81,58 @@ rules:
     resources: ['virtualmachines']
     verbs: ['get', 'list', 'watch', 'patch', 'create', 'delete']
 
+  # NOTE on secrets: test-cleanup.sh's `oc delete secret "${TEST_SECRET_NAME}"`
+  # is deliberately NOT granted here as a ClusterRole rule, even a
+  # resourceNames-restricted one -- a get/list/delete on a named secret is
+  # still a credential-exposure risk if it applies cluster-wide (every
+  # namespace has its own 'ci-test-secret'/'auto-test-secret'-named objects
+  # for entirely unrelated purposes). For the one case that genuinely needs
+  # a persistent, non-per-run grant -- the fixed 'auto-test-ns' Cypress
+  # namespace (release-4.20/unknown pin/bare dispatch) -- ci-env-controller.sh's
+  # provision() applies a namespace-scoped Role+RoleBinding directly into
+  # that one namespace instead (see its "Ensure auto-test-ns secret-cleanup
+  # RBAC" step), re-applied fresh on every single run immediately after that
+  # namespace is (re)created, rather than relying on anything from a prior
+  # run surviving. Scoped to just 'auto-test-secret' -- Playwright's
+  # 'ci-test-secret' needs no equivalent here at all: it only ever runs in a
+  # fresh per-run dynamic namespace that already gets its own live
+  # ci-env-test-runner RoleBinding (see below).
+
+  # NOTE on PVCs/VirtualMachineSnapshots/DataVolumes/DataSources/Templates/
+  # net-attach-defs/VM instancetypes&preferences: test-cleanup.sh's delete
+  # calls for these rely ENTIRELY on the per-run, namespace-scoped
+  # ci-env-test-runner RoleBinding (helm/ci-env-controller/templates/
+  # clusterrole-test-runner.yaml, applied per-run by the ci-test-stack Helm
+  # release into the run's own ${TEST_NS}) -- deliberately NOT duplicated
+  # here as an unrestricted cluster-wide ClusterRole grant. An earlier
+  # version of this file added exactly that as a fallback after seeing
+  # Forbidden errors during cleanup live (CNV-92722 finding 7), but the
+  # actual root cause was two concurrent runs sharing the same *fixed*
+  # 'auto-test-ns' namespace (release-4.20's Cypress content still hardcodes
+  # that name) racing each other's Helm install/uninstall of that
+  # RoleBinding -- not a fundamentally missing permission. That race is now
+  # closed by CNV-92722 finding 6's job-level `concurrency:` lock on
+  # run-gating-tests (hot-cluster-e2e-run.yml), which serializes every run
+  # sharing a fixed-namespace cluster end-to-end (provision through
+  # cleanup through release), so a run's own RoleBinding can no longer be
+  # torn down mid-flight by a competing run. Granting this cluster-wide
+  # instead would let the runner SA -- exposed to PR-triggered job steps --
+  # delete these kinds in ANY namespace on the cluster (including shared
+  # golden-image DataSources/Templates), a real blast-radius regression for
+  # an availability-only benefit that the concurrency fix already provides.
+  # If this RoleBinding is ever legitimately unavailable for some other
+  # reason, test-cleanup.sh's `|| true` on every line degrades that specific
+  # delete to a no-op rather than failing the run -- but that's not truly
+  # "harmless": the un-deleted resource is left behind in ${TEST_NS} for
+  # whatever's left of this run (only reclaimed once the namespace itself is
+  # later deleted), and the underlying permissions gap producing the
+  # Forbidden goes unnoticed rather than surfacing anywhere. Unlike the
+  # dedicated auto-test-ns secret-cleanup RBAC above (which retries and
+  # fails provisioning outright rather than silently degrading), there's no
+  # equivalent hard-failure guard for this RoleBinding today -- a genuine,
+  # persistent gap here would need to be diagnosed from leftover test
+  # resources piling up in a run's namespace, not from an explicit error.
+
   # --- E2E test setup: user-settings and feature-flag configmaps in HCO namespace ---
   - apiGroups: ['']
     resources: ['configmaps']
