@@ -10,6 +10,7 @@ dist
 /gui-test-screenshots
 # Playwright - ignore all test results (artifacts, traces, reports)
 playwright/test-results/
+allure-results/
 playwright/.auth/
 .playwright-mcp
 .kubeconfigs/
