@@ -1,0 +1,99 @@
+name: Retest On Pool Entry
+
+# retest-stale-gating.yml only re-evaluates merge-pool membership on a push
+# to main. A PR that gains lgtm+approved (or loses hold) afterward, while
+# its "Run Gating Tests" check is still that push's stale marker, gets no
+# further trigger until main next advances or someone manually intervenes.
+# This closes that gap for the pool-entry transition itself. See
+# ci-scripts/README.md ("Check-Run & Retest Model").
+on:
+  pull_request_target:
+    types: [labeled, unlabeled]
+
+permissions:
+  contents: read
+  pull-requests: read
+  checks: read
+  actions: write
+
+jobs:
+  retest-if-newly-pooled-and-stale:
+    name: Retest if Newly Pool-Eligible and Stale
+    if: |
+      (github.event.action == 'labeled' && (github.event.label.name == 'lgtm' || github.event.label.name == 'approved')) ||
+      (github.event.action == 'unlabeled' && (github.event.label.name == 'hold' || startsWith(github.event.label.name, 'do-not-merge/')))
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      # No ref override: reads the merge-pool helper from the base branch,
+      # same as every other hot-cluster pull_request_target job.
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Dispatch retest if now pool-eligible and check is stale
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const fs = require('fs');
+            const { isMergePoolPr } = require('./ci-scripts/hot-cluster/is-merge-pool-pr.cjs');
+
+            const pr = context.payload.pull_request;
+            const prNumber = pr.number;
+
+            // labels here already reflect the post-event state.
+            if (!isMergePoolPr(pr.labels)) {
+              core.info(`PR #${prNumber} is not merge-pool eligible yet (needs lgtm+approved, no hold) -- nothing to do.`);
+              return;
+            }
+
+            // lgtm+approved is Tide's merge-readiness signal, not a CI-trust
+            // one -- same distinction and same three signals resolve-pr-context
+            // re-checks fresh right before the credentialed run. Checking here
+            // too just avoids a dispatch that would only fail on this same
+            // check downstream.
+            const author = pr.user.login;
+            let ownedByAuthor = false;
+            try {
+              const owners = fs.readFileSync('OWNERS', 'utf8');
+              ownedByAuthor = new RegExp(`^\\s*-\\s*${author}\\s*$`, 'm').test(owners);
+            } catch (err) {
+              core.warning(`Could not read OWNERS file: ${err.message}`);
+            }
+            const sameRepo = pr.head.repo?.full_name === pr.base.repo.full_name;
+            const hasOkToTest = pr.labels.some((label) => label.name === 'ok-to-test');
+            const trusted = ownedByAuthor || sameRepo || hasOkToTest;
+
+            if (!trusted) {
+              core.info(`PR #${prNumber} is merge-pool eligible but not CI-trusted (author not in OWNERS, not a same-repo branch, no 'ok-to-test') -- skipping the dispatch rather than sending one that would only fail this same check downstream.`);
+              return;
+            }
+
+            const { data: existing } = await github.rest.checks.listForRef({
+              ...context.repo,
+              ref: pr.head.sha,
+              check_name: 'Run Gating Tests',
+            });
+            const [latest] = existing.check_runs.sort(
+              (a, b) => new Date(b.started_at) - new Date(a.started_at),
+            );
+
+            const staleTitles = [
+              'Hot Cluster E2E: stale -- main has advanced since this ran',
+              'Stale -- main has advanced since this ran',
+            ];
+            const isStale = latest?.status === 'completed' && staleTitles.includes(latest.output?.title);
+
+            if (!isStale) {
+              core.info(`PR #${prNumber}: current "Run Gating Tests" check (${latest?.output?.title ?? 'none'}) isn't the stale marker -- nothing to do.`);
+              return;
+            }
+
+            core.info(`PR #${prNumber} just became merge-pool eligible while its check was stale -- dispatching a fresh retest against main.`);
+            await github.rest.actions.createWorkflowDispatch({
+              ...context.repo,
+              workflow_id: 'hot-cluster-e2e.yml',
+              ref: 'main',
+              inputs: { pr_number: String(prNumber) },
+            });

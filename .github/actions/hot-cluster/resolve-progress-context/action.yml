@@ -3,13 +3,10 @@ description: |
   Computes the head SHA and commit-status context name that every "Hot
   Cluster E2E Progress" posting in this pipeline must agree on, so all
   phase updates (waiting / building / running / done) land on the same
-  commit-status entry. Also reports whether this event is an
-  irrelevant-label no-op (a bot label like lgtm/approved that doesn't
-  represent a real code change) or an ad-hoc dispatch (bare
-  workflow_dispatch, no pr_number) -- callers use is-irrelevant-label to
-  skip posting entirely (the real context's last state stands untouched)
-  and is-adhoc-dispatch to post under a distinct context so it can't
-  collide with a real PR's own status.
+  commit-status entry. Also reports whether this is an ad-hoc dispatch
+  (bare workflow_dispatch, no pr_number) -- callers use is-adhoc-dispatch
+  to post under a distinct context so it can't collide with a real PR's
+  own status.
 
 inputs:
   resolved-head-sha:
@@ -33,9 +30,6 @@ outputs:
   status-context:
     description: Commit-status context name to post under
     value: ${{ steps.resolve.outputs.status_context }}
-  is-irrelevant-label:
-    description: "'true' if this run was triggered by a bot label that doesn't represent a real gating-test outcome"
-    value: ${{ steps.resolve.outputs.is_irrelevant_label }}
   is-adhoc-dispatch:
     description: "'true' if this is a bare workflow_dispatch with no pr_number"
     value: ${{ steps.resolve.outputs.is_adhoc_dispatch }}
@@ -58,15 +52,9 @@ runs:
             ? context.payload.pull_request.head.sha
             : (process.env.RESOLVED_HEAD_SHA || context.sha);
 
-          const isIrrelevantLabel = context.payload.action === 'labeled'
-            && context.payload.label?.name !== 'ok-to-test';
-
           // An ad-hoc dispatch doesn't represent any specific PR -- give it
           // a distinct context so it can't collide with (and obscure, per
           // GitHub's "most recent wins" display) a real PR's own status.
-          // isIrrelevantLabel doesn't need its own context: callers skip
-          // posting entirely for that case, so the real context (below)
-          // simply keeps its last real state.
           const isAdHocDispatch = context.eventName === 'workflow_dispatch' && !process.env.PR_NUMBER;
 
           const statusContext = isAdHocDispatch
@@ -75,5 +63,4 @@ runs:
 
           core.setOutput('head_sha', headSha);
           core.setOutput('status_context', statusContext);
-          core.setOutput('is_irrelevant_label', isIrrelevantLabel ? 'true' : 'false');
           core.setOutput('is_adhoc_dispatch', isAdHocDispatch ? 'true' : 'false');

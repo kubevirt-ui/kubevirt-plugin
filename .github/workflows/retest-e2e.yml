@@ -119,7 +119,15 @@ jobs:
               // walk newest-to-oldest and skip them.
               const isIrrelevantLabelNoop = (run) =>
                 run.display_title?.includes('(skipped: irrelevant label)');
-              const prRun = candidates.find(candidate => !isIrrelevantLabelNoop(candidate)) ?? null;
+              const realCandidates = candidates.filter(candidate => !isIrrelevantLabelNoop(candidate));
+              // reRunWorkflow only works on a completed run -- a still
+              // in-progress/queued match must go through the fresh-dispatch
+              // path below instead, which cancels it via the job-level
+              // concurrency groups in hot-cluster-e2e.yml rather than
+              // erroring out trying to "re-run" something that hasn't
+              // finished.
+              const prRun = realCandidates.find(candidate => candidate.status === 'completed') ?? null;
+              const runningCandidate = prRun ? null : realCandidates.find(candidate => candidate.status !== 'completed') ?? null;
 
               if (prRun) {
                 core.info(`Re-running workflow run ${prRun.id} (attempt ${prRun.run_attempt})...`);
@@ -137,9 +145,15 @@ jobs:
 
               // Nothing to re-run -- dispatch fresh via the same pr_number
               // mechanism retest-stale-gating.yml uses. skip_pool_check:
-              // /retest-e2e must work regardless of review state.
+              // /retest-e2e must work regardless of review state. The fresh
+              // dispatch shares hot-cluster-e2e.yml's concurrency groups, so
+              // if runningCandidate is still executing, this cancels it.
               const baseRef = pr.data.base.ref;
-              core.warning(`No recent Hot Cluster E2E workflow run with real gating-test results found for PR #${prNumber} (base: ${baseRef}) -- only irrelevant-label no-ops, if anything, matched. Dispatching a fresh run instead.`);
+              if (runningCandidate) {
+                core.warning(`Run ${runningCandidate.id} for PR #${prNumber} is still ${runningCandidate.status} -- cancelling it and dispatching a fresh run instead.`);
+              } else {
+                core.warning(`No recent Hot Cluster E2E workflow run with real gating-test results found for PR #${prNumber} (base: ${baseRef}) -- only irrelevant-label no-ops, if anything, matched. Dispatching a fresh run instead.`);
+              }
               await react('rocket');
 
               await github.rest.actions.createWorkflowDispatch({
@@ -155,6 +169,7 @@ jobs:
 
               core.info(`Fresh run dispatched for PR #${prNumber} (base_ref=${baseRef}).`);
               core.setOutput('fallback_dispatched', 'true');
+              core.setOutput('fallback_was_running', runningCandidate ? 'true' : 'false');
             } catch (err) {
               core.setOutput('unexpected_error', 'true');
               core.setOutput('error_message', err.message || String(err));
@@ -167,12 +182,15 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
+            const wasRunning = ${{ steps.retest.outputs.fallback_was_running == 'true' }};
+            const reason = wasRunning
+              ? 'A Hot Cluster E2E run was already in progress for this PR, so `/retest-e2e` cancelled it and dispatched a fresh one instead'
+              : 'No recent Hot Cluster E2E run with real gating-test results was found to re-run (bot-label events don\'t count), so `/retest-e2e` dispatched a fresh one instead';
             await github.rest.issues.createComment({
               ...context.repo,
               issue_number: context.issue.number,
               body: [
-                '🚀 No recent Hot Cluster E2E run with real gating-test results was found to re-run (bot-label events don\'t count), so `/retest-e2e` dispatched a fresh one instead ' +
-                  '(this also re-provisions the cluster automatically if it was torn down).',
+                `🚀 ${reason} (this also re-provisions the cluster automatically if it was torn down).`,
                 '',
                 `See the [Actions tab](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/workflows/hot-cluster-e2e.yml) for progress.`,
               ].join('\n'),
