@@ -26,7 +26,7 @@ export type TabBadge = {
 };
 
 export type NavPageKubevirt = Omit<NavPage, 'component'> & {
-  badge?: TabBadge;
+  badges?: TabBadge[];
   component: ComponentType<PropsWithChildren<NavPageComponentProps>>;
   isHidden?: boolean;
 };

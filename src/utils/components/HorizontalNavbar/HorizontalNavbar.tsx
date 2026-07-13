@@ -113,12 +113,16 @@ const HorizontalNavbar: FC<HorizontalNavbarProps> = ({
                   id={`horizontal-pageHeader-${item.name}`}
                 >
                   {item.name}
-                  {item.badge?.count > 0 && (
-                    <Badge
-                      className={`horizontal-navbar__badge horizontal-navbar__badge--${item.badge.color}`}
-                    >
-                      {item.badge.count}
-                    </Badge>
+                  {item.badges?.map(
+                    (badge) =>
+                      badge.count > 0 && (
+                        <Badge
+                          className={`horizontal-navbar__badge horizontal-navbar__badge--${badge.color}`}
+                          key={badge.color}
+                        >
+                          {badge.count}
+                        </Badge>
+                      ),
                   )}
                 </NavLink>
               </li>
