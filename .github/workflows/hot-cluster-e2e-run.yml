@@ -35,6 +35,17 @@ on:
         required: false
         default: ''
         type: string
+      cnv_pin_version:
+        description: |
+          CNV version pinned for this cluster (e.g. 4.20, 4.21, 4.22), as
+          resolved by hot-cluster-e2e.yml's resolve-cluster-config job.
+          Only affects Cypress's TEST_NS/TEST_SECRET_NAME -- see this
+          workflow's TEST_NS/TEST_SECRET_NAME env for why. Leave empty for a
+          standalone dispatch (falls back to the fixed release-4.20-era
+          naming).
+        required: false
+        default: ''
+        type: string
       checkout_ref:
         description: |
           Ref/SHA to check out for the code under test. Leave empty for the
@@ -85,6 +96,17 @@ on:
         default: ''
       cluster_name:
         description: Cluster name for run tagging (defaults to runner_label)
+        type: string
+        required: false
+        default: ''
+      cnv_pin_version:
+        description: |
+          CNV version pinned for this cluster (e.g. 4.20, 4.21, 4.22), as
+          resolved by hot-cluster-e2e.yml's resolve-cluster-config job.
+          Only affects Cypress's TEST_NS/TEST_SECRET_NAME -- see this
+          workflow's TEST_NS/TEST_SECRET_NAME env for why. Leave empty for a
+          standalone dispatch (falls back to the fixed release-4.20-era
+          naming).
         type: string
         required: false
         default: ''
@@ -357,6 +379,39 @@ jobs:
     needs: [check-runner, build-kubevirt-plugin-image]
     runs-on: ${{ inputs.runner_label || 'kubevirt-plugin-ci' }}
     timeout-minutes: 120
+    # Only the fixed-namespace Cypress case (see TEST_NS/TEST_SECRET_NAME
+    # below -- release-4.20, any future/unknown cnv_pin_version, or a bare
+    # standalone dispatch) still shares auto-test-ns/auto-test-secret across
+    # runs, so serialize same-cluster runs of that case rather than let them
+    # clobber each other's namespace mid-run (CNV-92722 finding 6, part B).
+    # release-4.21/4.22 already got a genuine per-run namespace above, so
+    # they fall into the no-op `no-lock-<run_id>` group instead -- a group
+    # that's unique to this run and therefore never queues against anything.
+    # cancel-in-progress: false is deliberate: unlike the PR-vs-PR retest
+    # concurrency group in hot-cluster-e2e.yml (where cancelling a superseded
+    # run is correct), two different PRs sharing a fixed namespace must be
+    # queued one after another, not have one silently killed mid-run.
+    # queue: max is required for that "queued one after another" intent to
+    # actually hold: GitHub's default (queue: single) keeps only a single
+    # pending run per group and CANCELS an older pending run outright the
+    # moment a third one arrives in the same group -- silently defeating
+    # this lock for a 3rd/4th concurrent PR without it (confirmed via
+    # GitHub's own concurrency docs).
+    # inputs.cluster_name falls back to inputs.runner_label, matching
+    # run-gating-tests' own runs-on: above and this workflow's run-name --
+    # a bare cluster_name (e.g. a standalone dispatch that only set
+    # runner_label) must still land in the same group as an automated run
+    # targeting that same physical cluster, or this lock silently no-ops
+    # for exactly the case it's meant to protect.
+    concurrency:
+      group: >-
+        ${{
+          ((inputs.test_engine || 'playwright') == 'cypress' && inputs.cnv_pin_version != '4.21' && inputs.cnv_pin_version != '4.22') &&
+          format('cypress-fixed-ns-{0}', inputs.cluster_name || inputs.runner_label || 'kubevirt-plugin-ci') ||
+          format('no-lock-{0}', github.run_id)
+        }}
+      cancel-in-progress: false
+      queue: max
     env:
       PLUGIN_IMAGE: ${{ needs.build-kubevirt-plugin-image.outputs.kubevirt-plugin-image }}
       HEADLESS: 'true'
@@ -369,19 +424,39 @@ jobs:
       # dynamic per-run values below can't reach on every branch:
       #   - release-4.20's cypress/utils/const/index.ts hardcodes
       #     TEST_NS = 'auto-test-ns' as a literal string -- no mechanism
-      #     to read Cypress.env('TEST_NS') at all (release-4.21/4.22
-      #     already read it dynamically, so this is a no-op override
-      #     for them, not a fix).
+      #     to read Cypress.env('TEST_NS') at all.
       #   - release-4.20's TEST_SECRET_NAME is likewise hardcoded to
       #     'auto-test-secret', matching cypress/fixtures/secret.yaml's
-      #     own hardcoded metadata.name (release-4.21/4.22 already read
-      #     Cypress.env('TEST_SECRET_NAME') dynamically).
+      #     own hardcoded metadata.name.
+      #   - release-4.21/4.22, by contrast, already read both dynamically
+      #     via Cypress.env(...) -- confirmed live during CNV-92722
+      #     validation -- so they get a genuine per-run name below
+      #     instead of the fixed one, removing the cross-PR namespace-
+      #     collision risk entirely for those two (CNV-92722 finding 6):
+      #     two concurrent same-branch PRs on the same cluster no longer
+      #     share auto-test-ns/auto-test-secret and can't clobber each
+      #     other's console mid-run. release-4.20 (and any future/unknown
+      #     pin, including a bare standalone dispatch with no
+      #     cnv_pin_version at all) keeps the fixed fallback name -- see
+      #     the run-gating-tests job-level concurrency block below for
+      #     how that fixed-namespace case is instead serialized rather
+      #     than made collision-proof.
       # CYPRESS_TEST_NS/CYPRESS_TEST_SECRET_NAME are exported from these
       # further down but were never consumed by release-4.20's frozen
       # code -- override both here to match instead. Playwright keeps
       # the dynamic per-run values from the workflow-level env: above.
-      TEST_NS: ${{ (inputs.test_engine || 'playwright') == 'cypress' && 'auto-test-ns' || format('kubevirt-plugin-ci-test-{0}', github.run_id) }}
-      TEST_SECRET_NAME: ${{ (inputs.test_engine || 'playwright') == 'cypress' && 'auto-test-secret' || 'ci-test-secret' }}
+      TEST_NS: >-
+        ${{
+          (inputs.test_engine || 'playwright') != 'cypress' && format('kubevirt-plugin-ci-test-{0}', github.run_id) ||
+          (inputs.cnv_pin_version == '4.21' || inputs.cnv_pin_version == '4.22') && format('auto-test-ns-{0}', github.run_id) ||
+          'auto-test-ns'
+        }}
+      TEST_SECRET_NAME: >-
+        ${{
+          (inputs.test_engine || 'playwright') != 'cypress' && 'ci-test-secret' ||
+          (inputs.cnv_pin_version == '4.21' || inputs.cnv_pin_version == '4.22') && format('auto-test-secret-{0}', github.run_id) ||
+          'auto-test-secret'
+        }}
 
     steps:
       # See the build-kubevirt-plugin-image job's Checkout step above --
@@ -585,7 +660,16 @@ jobs:
           mkdir -p "${TMP}"
 
           HELM_RELEASE="$(oc get configmap "${CI_ENV_CM}" -n "${CI_ENV_NS}" \
-            -o jsonpath='{.data.helm-release}' 2>/dev/null || echo "${CI_ENV_CM}")"
+            -o jsonpath='{.data.helm-release}' 2>/dev/null || true)"
+          # The lookup above only falls back on a hard command failure (get
+          # 403/404) -- an empty-but-present helm-release field (observed
+          # live during PR #4298 attempt 3) succeeds with an empty string,
+          # silently turning the selector below into the invalid literal
+          # "app=-console" and returning zero logs with no error (CNV-92722
+          # finding 8). CI_ENV_CM (the trigger ConfigMap name) is always
+          # populated, so fall back to it explicitly whenever HELM_RELEASE
+          # comes back empty for either reason.
+          HELM_RELEASE="${HELM_RELEASE:-${CI_ENV_CM}}"
 
           oc logs -n "${TEST_NS}" -l "app=${HELM_RELEASE}-console" --tail=-1 \
             > "${TMP}/console.log" 2>&1 || true

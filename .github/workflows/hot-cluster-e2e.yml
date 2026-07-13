@@ -736,6 +736,12 @@ jobs:
       test_engine: ${{ needs.resolve-cluster-config.outputs.test_engine }}
       runner_label: ${{ inputs.runner_label || needs.resolve-cluster-config.outputs.cluster_name }}
       cluster_name: ${{ needs.resolve-cluster-config.outputs.cluster_name }}
+      # Fed through to hot-cluster-e2e-run.yml so it can tell whether the
+      # Cypress content it's about to run reads TEST_NS/TEST_SECRET_NAME
+      # dynamically (release-4.21/4.22) or still hardcodes them
+      # (release-4.20) -- see that workflow's TEST_NS/TEST_SECRET_NAME env
+      # for the full rationale (CNV-92722 finding 6).
+      cnv_pin_version: ${{ needs.resolve-cluster-config.outputs.cnv_pin_version }}
       # Three cases, in priority order:
       #   1. pr_number set (merge-pool retest path): merge the PR with the
       #      current base tip instead of testing its head commit in
@@ -977,27 +983,27 @@ jobs:
           case "${REASON}" in
             passed)
               echo "conclusion=success" >> "$GITHUB_OUTPUT"
-              echo "title=Hot cluster gating tests passed (retest after main advanced)" >> "$GITHUB_OUTPUT"
+              echo "title=Hot Cluster E2E: gating tests passed (retest after main advanced)" >> "$GITHUB_OUTPUT"
               echo "summary=Re-validated PR #${PR_NUMBER} merged with the current main tip (${MAIN_SHA}) after main advanced (see CNV-92616)." >> "$GITHUB_OUTPUT"
               ;;
             merge-conflict)
               echo "conclusion=failure" >> "$GITHUB_OUTPUT"
-              echo "title=PR no longer merges cleanly with main (retest after main advanced)" >> "$GITHUB_OUTPUT"
+              echo "title=Hot Cluster E2E: PR no longer merges cleanly with main (retest after main advanced)" >> "$GITHUB_OUTPUT"
               echo "summary=PR #${PR_NUMBER} no longer merges cleanly with the current main tip (${MAIN_SHA}) -- resolve the conflict and push an update, which will trigger a normal gating run." >> "$GITHUB_OUTPUT"
               ;;
             left-pool)
               echo "conclusion=failure" >> "$GITHUB_OUTPUT"
-              echo "title=No longer in the merge pool (retest after main advanced)" >> "$GITHUB_OUTPUT"
+              echo "title=Hot Cluster E2E: no longer in the merge pool (retest after main advanced)" >> "$GITHUB_OUTPUT"
               echo "summary=PR #${PR_NUMBER} no longer carries the lgtm+approved (no hold) labels required for the merge pool, re-checked fresh when this retest ran against main tip ${MAIN_SHA} -- the cluster run was skipped." >> "$GITHUB_OUTPUT"
               ;;
             untrusted-retest)
               echo "conclusion=failure" >> "$GITHUB_OUTPUT"
-              echo "title=Not CI-trusted for a retest (retest after main advanced)" >> "$GITHUB_OUTPUT"
+              echo "title=Hot Cluster E2E: not CI-trusted for a retest (retest after main advanced)" >> "$GITHUB_OUTPUT"
               echo "summary=PR #${PR_NUMBER} is not from OWNERS, not from a same-repo branch, and does not currently carry 'ok-to-test' (re-checked fresh when this retest ran against main tip ${MAIN_SHA}) -- the cluster run was skipped. A maintainer can add 'ok-to-test' to allow it." >> "$GITHUB_OUTPUT"
               ;;
             *)
               echo "conclusion=failure" >> "$GITHUB_OUTPUT"
-              echo "title=Hot cluster gating tests did not pass (retest after main advanced)" >> "$GITHUB_OUTPUT"
+              echo "title=Hot Cluster E2E: gating tests did not pass (retest after main advanced)" >> "$GITHUB_OUTPUT"
               echo "summary=Re-validated PR #${PR_NUMBER} merged with the current main tip (${MAIN_SHA}) after main advanced (see CNV-92616) -- tests did not pass. See the workflow run for details." >> "$GITHUB_OUTPUT"
               ;;
           esac

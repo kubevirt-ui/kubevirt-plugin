@@ -219,6 +219,73 @@ provision() {
   log "Creating namespace ${test_ns}..."
   oc create namespace "${test_ns}" --dry-run=client -o yaml | oc apply -f - || true
 
+  # Namespace-scoped (NOT cluster-wide) fallback so test-cleanup.sh's secret
+  # delete can't be Forbidden in the one namespace that isn't torn down and
+  # recreated by a fresh per-run Helm release each time: the fixed
+  # 'auto-test-ns' Cypress namespace (release-4.20/unknown pin/bare
+  # dispatch -- see hot-cluster-e2e-run.yml's TEST_SECRET_NAME). Applied
+  # directly here (not via the ci-test-stack Helm chart) so it's idempotent
+  # and unowned by any one run's Helm release -- since `oc create namespace`
+  # above recreates this namespace from scratch on every run (deleting
+  # anything that was in it, including these two objects), this step
+  # re-applies them fresh immediately afterward on every single run, rather
+  # than depending on Helm's release-ownership semantics (see
+  # arc-runner-rbac.yaml for the full rationale on why a ClusterRole grant
+  # was rejected in favor of this). Every other test namespace (all
+  # dynamically named, one per run) already gets equivalent secret access
+  # from its own live ci-env-test-runner RoleBinding below, so this is
+  # deliberately scoped to just this one fixed name, not applied
+  # unconditionally.
+  if [[ "${test_ns}" == "auto-test-ns" ]]; then
+    log "Ensuring auto-test-ns secret-cleanup RBAC..."
+    local secret_rbac_applied="false"
+    for attempt in 1 2 3; do
+      if cat <<EOF | oc apply -f -
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: ci-env-secret-cleanup
+  namespace: ${test_ns}
+rules:
+  - apiGroups: ['']
+    resources: ['secrets']
+    verbs: ['get', 'list', 'delete']
+    resourceNames: ['auto-test-secret']
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ci-env-secret-cleanup
+  namespace: ${test_ns}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: ci-env-secret-cleanup
+subjects:
+  - kind: ServiceAccount
+    name: ${RUNNER_SA_NAME}
+    namespace: ${RUNNER_SA_NS}
+EOF
+      then
+        secret_rbac_applied="true"
+        break
+      fi
+      log "  Retry ${attempt}/3 for auto-test-ns secret-cleanup RBAC apply (API may be transiently unavailable)..."
+      sleep 5
+    done
+    # Not `|| true`: silently swallowing this would let a run's own
+    # test-cleanup.sh Forbidden-fail on the exact secret this exists for,
+    # with nothing surfacing why -- fail the run visibly instead so a
+    # persistent (not transient) problem gets noticed and fixed, rather than
+    # rediscovered live the way the original CNV-92722 finding 7 was.
+    if [[ "${secret_rbac_applied}" != "true" ]]; then
+      local err="failed to apply auto-test-ns secret-cleanup RBAC after 3 attempts"
+      log "ERROR: ${err}"
+      patch_cm "${cm_name}" "{\"data\":{\"status\":\"error\",\"error-message\":\"${err}\"}}"
+      return 1
+    fi
+  fi
+
   # Opt-in only: unset/disabled auth-mode (the default for every existing E2E
   # ConfigMap) skips this block entirely and behaves exactly as before.
   local extra_helm_args=()
