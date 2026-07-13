@@ -207,6 +207,23 @@ The hot-cluster pipeline manages its own required check ("Run Gating Tests") and
 - **`/cancel-e2e` cancels by entering the same job-level concurrency groups, not by calling the cancel API.** `cancel-e2e.yml` doesn't call `cancelWorkflowRun()` -- that only cancels a superseded run's own bookkeeping, the same limitation described above. Its `cancel-cluster-check` and `cancel-run-e2e-tests` jobs instead just enter `hot-cluster-check-<PR#>` / `hot-cluster-run-e2e-<PR#>` directly (identical group keys, no dispatch indirection needed since concurrency groups are keyed by a plain string across the whole repository) and immediately no-op, which is what actually terminates whatever currently holds those groups. It never touches "Run Gating Tests" -- only the informational progress status -- since a cancellation isn't a test result.
 - **Real cancellation has to live at the job level, not the workflow level.** `hot-cluster-e2e.yml` deliberately has no workflow-level `concurrency:` block. A workflow-level group with `cancel-in-progress: true` holds an _entire new run_ at pending (zero jobs, not even `Prepare`) until the older run in the same group reaches a terminal state -- and a `uses:` job (a job that calls a reusable workflow, like `cluster-check` or `run-e2e-tests`) never actually gets killed by that cancellation, so the older run's self-hosted E2E job keeps running to completion untouched and the group never frees. The new run would then never start at all, let alone cancel anything. Instead, `cluster-check` and `run-e2e-tests` each carry their own job-level `concurrency:` group (PR-scoped, own suffix so they don't cancel each other): cheap jobs (`Prepare`, progress/verify) run immediately on every trigger with no gating, and only the two jobs that cost real cluster time enforce "one at a time per PR" -- which GitHub does properly honor for job-level groups, including ones backed by a reusable workflow. Any brief overlap in the cheap jobs' postings is harmless given "most-recent-wins" above. `/retest-e2e` relies on the same job-level groups: if the run it matches for a PR is still in progress (not `completed`), it dispatches a fresh run instead of calling `reRunWorkflow` (which only works on a completed run) -- the fresh dispatch's `cluster-check`/`run-e2e-tests` jobs cancel the still-running ones via these groups rather than erroring out or racing them.
 
+## Tide Required-Context Gotcha (Prow Migrations)
+
+If your required check is published by a GitHub Action (`checks.create()`) rather than a native Prow presubmit, don't rely on Tide's `context_options.from-branch-protection: true` default to treat it as merge-blocking -- it silently didn't for this repo ([PR #4225](https://github.com/kubevirt-ui/kubevirt-plugin/pull/4225) merged while "Run Gating Tests" had never run). Add an explicit override instead, in `openshift/release`'s `core-services/prow/02_config/<org>/<repo>/_prowconfig.yaml`:
+
+```yaml
+tide:
+  context_options:
+    orgs:
+      <org>:
+        repos:
+          <repo>:
+            required-contexts:
+              - "<your required check's exact context name>"
+```
+
+See [openshift/release#81840](https://github.com/openshift/release/pull/81840) for the fix applied here.
+
 ## Script Configuration
 
 All scripts accept configuration via environment variables. See the header comments in each script for details.
