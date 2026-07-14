@@ -35,7 +35,7 @@ runs:
             inputs.pr-number != '' && (inputs.checkout-ref || github.sha) ||
             inputs.checkout-ref || github.event.pull_request.head.sha || github.ref
           }}
-        fetch-depth: ${{ inputs.pr-number != '' && 0 || 1 }}
+        fetch-depth: ${{ inputs.pr-number != '' && '0' || '1' }}
         allow-unsafe-pr-checkout: true
         persist-credentials: false
 
