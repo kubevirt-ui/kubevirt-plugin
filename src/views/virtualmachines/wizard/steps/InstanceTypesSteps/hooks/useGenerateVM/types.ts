@@ -16,6 +16,7 @@ type GenerateVMArgs = {
   pvcSource: IoK8sApiCoreV1PersistentVolumeClaim;
   selectedBootableVolume: BootableVolume;
   selectedInstanceType: { name: string; namespace: string };
+  sshSecretName?: string;
   targetNamespace: string;
   vmDescription?: string;
   vmName?: string;
