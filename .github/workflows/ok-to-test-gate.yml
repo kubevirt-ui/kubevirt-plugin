@@ -1,0 +1,44 @@
+name: OK to Test Gate
+
+# hot-cluster-e2e.yml used to listen for labeled directly, so every bot
+# label (lgtm, approved, jira/valid-reference, ...) re-triggered its full
+# 5-job graph just to skip all 5 -- 5 "Skipped" rows in the merge box per
+# irrelevant label. ok-to-test is the only label that needs to trigger a
+# real run, so this one-job gatekeeper is now the only thing listening for
+# labeled at all, dispatching the real workflow only when it matters. See
+# ci-scripts/README.md ("Check-Run & Retest Model").
+on:
+  pull_request_target:
+    types: [labeled]
+
+permissions:
+  contents: read
+  actions: write
+
+jobs:
+  dispatch-if-ok-to-test:
+    name: Dispatch Hot Cluster E2E if ok-to-test
+    if: github.event.label.name == 'ok-to-test'
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Dispatch hot-cluster-e2e.yml
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+
+            // skip_pool_check: ok-to-test is a CI-trust signal, not a
+            // review-readiness one, so this must run regardless of
+            // lgtm/approved. base_ref: the PR's real base branch, so a
+            // release-branch retest merges against the right tip.
+            await github.rest.actions.createWorkflowDispatch({
+              ...context.repo,
+              workflow_id: 'hot-cluster-e2e.yml',
+              ref: 'main',
+              inputs: {
+                pr_number: String(pr.number),
+                base_ref: pr.base.ref,
+                skip_pool_check: 'true',
+              },
+            });
