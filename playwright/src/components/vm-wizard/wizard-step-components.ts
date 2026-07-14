@@ -475,6 +475,24 @@ export class VmCreationWizardBootSourceComponent extends BaseComponent {
     }
   }
 
+  async selectFirstAvailableBootVolume(): Promise<void> {
+    const bootVolumeRadio = this.page.getByRole('radio', { name: /boot volume/i });
+    if (
+      (await bootVolumeRadio.isVisible().catch(() => false)) &&
+      !(await bootVolumeRadio.isChecked().catch(() => true))
+    ) {
+      await bootVolumeRadio.click();
+      await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
+    }
+
+    const table = this.locator('.pf-v6-c-wizard table, .pf-v6-c-wizard [role="grid"]');
+    await table.first().waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+
+    const nameCell = this._pfV6CWizardTableTbodyTr.first().locator('td[id="name"]');
+    await nameCell.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+    await this.robustClick(nameCell);
+  }
+
   async selectNoBootSource(): Promise<void> {
     const radio = this.locator('input[type="radio"][value="no-boot-source"]').or(
       this._noBootSource.locator('..').locator('input[type="radio"]'),

@@ -525,6 +525,34 @@ export class TemplateDetailComponent extends BaseComponent {
     }
   }
 
+  async isCloudInitSectionVisible(): Promise<boolean> {
+    const section = this.locator(
+      '.pf-v6-c-description-list__group:has-text("Cloud-init"), [class*="description-list"]:has-text("Cloud-init")',
+    );
+    return section
+      .first()
+      .waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY })
+      .then(() => true)
+      .catch(() => false);
+  }
+
+  async isParametersTabActive(): Promise<boolean> {
+    const activeTab = this.locator(
+      '[data-test-id="horizontal-link-Parameters"][aria-selected="true"], [data-test-id="horizontal-link-Parameters"].pf-m-current',
+    );
+    return activeTab
+      .first()
+      .waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY })
+      .then(() => true)
+      .catch(async () => {
+        const tab = this.locator('[data-test-id="horizontal-link-Parameters"]');
+        return tab
+          .waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY })
+          .then(() => true)
+          .catch(() => false);
+      });
+  }
+
   async isTemplateNameVisible(
     templateName: string,
     timeout: number = TestTimeouts.UI_ELEMENT_VISIBILITY,

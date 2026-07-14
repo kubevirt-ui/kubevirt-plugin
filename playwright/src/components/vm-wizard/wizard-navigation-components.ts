@@ -24,6 +24,7 @@ export class VmCreationWizardNavigationComponent extends BaseComponent {
   }
 
   async clickNext(): Promise<void> {
+    await this.collapseSidebarIfExpanded();
     const nextButton = this._pfV6CWizardButtonpfV6CButtonpfMPrimary;
     await nextButton.first().waitFor({
       state: 'visible',

@@ -520,11 +520,9 @@ jobs:
               npm run test-cypress-headless -- --spec tests/gating.cy.ts
             fi
           else
-            if [[ "${TEST_PROJECT}" == "features" ]]; then
-              npm run test-playwright-headless -- --project=features
-            else
-              npm run test-playwright-headless -- --project=gating
-            fi
+            # Scenario-based Gating project (HC_E2E auth via playwright-runner-hc-e2e.sh).
+            # features is Cypress-only on release branches; Playwright on main has no features project.
+            ./playwright-runner-hc-e2e.sh Gating
           fi
 
       - name: Upload test artifacts

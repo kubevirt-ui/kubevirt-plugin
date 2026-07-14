@@ -163,6 +163,14 @@ export class EnvVariables {
     return process.env.DEVELOP === '1' || process.env.DEVELOP === 'true';
   }
 
+  static get isHcE2e(): boolean {
+    return (
+      process.env.HC_E2E === 'true' ||
+      process.env.HC_E2E === '1' ||
+      !!process.env.KUBERNETES_SERVICE_HOST
+    );
+  }
+
   static get isLocalhost(): boolean {
     const url = this.webConsoleUrl;
     return /localhost|127\.0\.0\.1/.test(url);
@@ -215,10 +223,12 @@ export class EnvVariables {
   }
 
   /**
-   * True when the console URL does not require OAuth login — either localhost,
-   * or an HTTP (non-TLS) in-cluster console service that has no OAuth proxy.
+   * True when the console URL does not require OAuth login — HC_E2E mode
+   * (ServiceAccount auth), localhost, or an HTTP (non-TLS) in-cluster console
+   * service that has no OAuth proxy.
    */
   static get isSkipBrowserLogin(): boolean {
+    if (this.isHcE2e) return true;
     if (this.isLocalhost) return true;
     const url = this.webConsoleUrl;
     return url.startsWith('http://');

@@ -41,65 +41,18 @@ export default defineConfig({
   expect: { timeout: 60_000 },
   forbidOnly: !!process.env.CI,
   fullyParallel: false,
-  globalSetup:
-    process.env.USE_SCENARIO_INFRA === 'true'
-      ? './playwright/project-dependencies/global.setup.ts'
-      : undefined,
-  globalTeardown:
-    process.env.USE_SCENARIO_INFRA === 'true'
-      ? './playwright/project-dependencies/global.teardown.ts'
-      : undefined,
+  globalSetup: './playwright/project-dependencies/global.setup.ts',
+  globalTeardown: './playwright/project-dependencies/global.teardown.ts',
   outputDir: './playwright/test-results/artifacts',
   projects: [
-    // ── Legacy projects (setup → gating → features) ──────────────────
+    // ── Gating project (scenario infrastructure) ─────────────────────
     {
-      fullyParallel: false,
-      name: 'setup',
-      testDir: './playwright/tests/setup',
-      use: {
-        ...devices['Desktop Chrome'],
-        launchOptions: {
-          args: chromeArgs,
-          headless: !process.env.DEBUG_MODE && !process.env.HEADED,
-        },
-        viewport: { height: 1080, width: 1920 },
-      },
-    },
-    {
-      dependencies: ['setup'],
-      fullyParallel: false,
-      name: 'gating',
+      fullyParallel: true,
+      name: 'Gating',
+      retries: 0,
       testDir: './playwright/tests/gating',
-      use: {
-        ...devices['Desktop Chrome'],
-        launchOptions: {
-          args: chromeArgs,
-          headless: !process.env.DEBUG_MODE && !process.env.HEADED,
-        },
-        storageState: 'playwright/.auth/session.json',
-        viewport: { height: 1080, width: 1920 },
-      },
+      use: migrationUse,
     },
-    ...(process.env.RUN_FEATURE_TESTS === 'true'
-      ? [
-          {
-            dependencies: ['setup'],
-            fullyParallel: false,
-            name: 'features',
-            retries: 2,
-            testDir: './playwright/tests/features',
-            use: {
-              ...devices['Desktop Chrome'],
-              launchOptions: {
-                args: chromeArgs,
-                headless: !process.env.DEBUG_MODE && !process.env.HEADED,
-              },
-              storageState: 'playwright/.auth/session.json',
-              viewport: { height: 1080, width: 1920 },
-            },
-          },
-        ]
-      : []),
 
     // ── Migration projects (use global setup/teardown) ───────────────
     {
@@ -159,8 +112,8 @@ export default defineConfig({
     ignoreHTTPSErrors: true,
     navigationTimeout: 120_000,
     screenshot: 'only-on-failure',
-    trace: 'retain-on-failure',
-    video: 'retain-on-failure',
+    trace: 'off',
+    video: 'off',
     viewport: { height: 1080, width: 1920 },
   },
   workers: process.env.WORKERS ? parseInt(process.env.WORKERS, 10) : 4,

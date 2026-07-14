@@ -1,14 +1,16 @@
-import { KubernetesClient } from '@/clients/kubernetes-client';
+/**
+ * @deprecated Legacy scenario fixture — kept only for migration-gating compat.
+ * New tests should use gating-fixture.ts or scenario-test-fixture.ts.
+ */
+
 import { CheckupsPage } from '@/page-objects/checkups-page';
 import { OverviewPage } from '@/page-objects/overview-page';
 import { VirtualMachinesPage } from '@/page-objects/virtual-machines-page';
 import { getStorageStatePath } from '@/utils/file-utils';
-import { TestConfigManager } from '@/utils/test-config';
 import { test as base, expect } from '@playwright/test';
 
 interface ScenarioFixtures {
   checkupsPage: CheckupsPage;
-  k8sClient: KubernetesClient;
   overviewPage: OverviewPage;
   virtualMachinesPage: VirtualMachinesPage;
 }
@@ -21,14 +23,6 @@ export const scenarioTest = base.extend<ScenarioFixtures>({
 
   checkupsPage: async ({ page }, use) => {
     await use(new CheckupsPage(page));
-  },
-
-  k8sClient: async ({}, use) => {
-    const config = TestConfigManager.getConfig();
-    const kubeConfigPath =
-      config.kubeConfigPath || process.env.KUBECONFIG || '.kubeconfigs/test-config';
-    const client = new KubernetesClient(kubeConfigPath);
-    await use(client);
   },
 
   overviewPage: async ({ page }, use) => {

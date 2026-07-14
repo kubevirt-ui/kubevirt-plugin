@@ -1333,6 +1333,19 @@ users:
     return this.hco.isNativeVmTemplateFeatureGateEnabled(name, namespace);
   }
 
+  async isStorageMigrationAvailable(): Promise<boolean> {
+    try {
+      const result = await this.listClusterCustomResources(
+        'migrations.kubevirt.io',
+        'v1alpha1',
+        'multinamespacevirtualmachinestoragemigrationplans',
+      );
+      return result != null && typeof result === 'object';
+    } catch {
+      return false;
+    }
+  }
+
   async isVmDiskPersistent(vmName: string, namespace: string, diskName: string): Promise<boolean> {
     return this.vm.isVmDiskPersistent(vmName, namespace, diskName);
   }

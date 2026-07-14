@@ -16,6 +16,25 @@ import type { VirtualMachineInstanceTypeConfig } from '@/data-factories/instance
 
 const INSTANCE_TYPE_LIST_TIMEOUT_MS = 15000;
 
+export const INSTANCE_TYPE_CRD_RESOURCES = [
+  {
+    name: 'VirtualMachineClusterInstancetype',
+    plural: 'instancetype.kubevirt.io~v1beta1~VirtualMachineClusterInstancetype',
+  },
+  {
+    name: 'VirtualMachineInstancetype',
+    plural: 'instancetype.kubevirt.io~v1beta1~VirtualMachineInstancetype',
+  },
+  {
+    name: 'VirtualMachineClusterPreference',
+    plural: 'instancetype.kubevirt.io~v1beta1~VirtualMachineClusterPreference',
+  },
+  {
+    name: 'VirtualMachinePreference',
+    plural: 'instancetype.kubevirt.io~v1beta1~VirtualMachinePreference',
+  },
+] as const;
+
 /**
  * Base type for InstanceType test case parameters
  */

@@ -43,7 +43,10 @@ export function getNamespaceTeardownRules(): TeardownRule[] {
           ];
 
           const vms = await k8sClient.listCustomResources(group, version, testNamespace, plural);
-          if (vms.length === 0) return;
+
+          if (vms.length === 0) {
+            return;
+          }
 
           const matchingVMs = vms.filter(
             (vm: { metadata?: { name?: string; labels?: Record<string, string> } }) => {
@@ -51,7 +54,10 @@ export function getNamespaceTeardownRules(): TeardownRule[] {
               return name && testPrefixes.some((prefix) => name.startsWith(prefix));
             },
           );
-          if (matchingVMs.length === 0) return;
+
+          if (matchingVMs.length === 0) {
+            return;
+          }
 
           logger.info(`Cleaning up ${matchingVMs.length} test VM(s) in ${testNamespace}...`);
 
@@ -63,6 +69,12 @@ export function getNamespaceTeardownRules(): TeardownRule[] {
               const deleteProtectionLabel = labels['kubevirt.io/vm-delete-protection'];
               const hasDeleteProtection =
                 deleteProtectionLabel === 'enabled' || deleteProtectionLabel === 'true';
+
+              logger.info(
+                `  Processing VM: ${name} (delete-protection: ${
+                  deleteProtectionLabel || 'not set'
+                })`,
+              );
 
               if (hasDeleteProtection) {
                 logger.info(`⚠️ VM ${name} has delete protection - removing label...`);
@@ -79,7 +91,14 @@ export function getNamespaceTeardownRules(): TeardownRule[] {
               logger.info(`✓ Deleted VM: ${name}`);
             } catch (error: unknown) {
               const errorMessage = error instanceof Error ? error.message : String(error);
-              if (errorMessage.includes('404') || errorMessage.includes('not found')) {
+              if (
+                errorMessage.includes('forbidden') ||
+                errorMessage.includes('delete-protection')
+              ) {
+                logger.error(
+                  `❌ VM ${name} still has delete protection enabled - manual cleanup required`,
+                );
+              } else if (errorMessage.includes('404') || errorMessage.includes('not found')) {
                 logger.info(`✓ VM ${name} already deleted`);
               } else {
                 logger.warn(`⚠️ Failed to delete VM ${name}: ${errorMessage}`);
@@ -99,9 +118,14 @@ export function getNamespaceTeardownRules(): TeardownRule[] {
       onError: 'warn',
       run: async (ctx) => {
         try {
-          if (!ctx.k8sClient) return;
+          if (!ctx.k8sClient) {
+            logger.warn('⚠️ No Kubernetes client — skipping namespaced template cleanup');
+            return;
+          }
           const k8sClient = ctx.k8sClient;
           const testNamespace = ctx.testNamespace;
+          const group = 'template.openshift.io';
+          const version = 'v1';
 
           const namespacedTestPrefixes = [
             'pw-default-template-',
@@ -113,18 +137,26 @@ export function getNamespaceTeardownRules(): TeardownRule[] {
           ];
 
           const namespacedTemplates = await k8sClient.listCustomResources(
-            'template.openshift.io',
-            'v1',
+            group,
+            version,
             testNamespace,
             'templates',
           );
-          if (namespacedTemplates.length === 0) return;
+
+          if (namespacedTemplates.length === 0) {
+            logger.info(`No namespaced templates found in ${testNamespace}`);
+            return;
+          }
 
           const matchingTemplates = namespacedTemplates.filter((template) => {
             const name = template.metadata?.name;
             return name && namespacedTestPrefixes.some((prefix) => name.startsWith(prefix));
           });
-          if (matchingTemplates.length === 0) return;
+
+          if (matchingTemplates.length === 0) {
+            logger.info(`No test templates to clean up in ${testNamespace}`);
+            return;
+          }
 
           logger.info(`Cleaning up ${matchingTemplates.length} template(s) in ${testNamespace}...`);
 
@@ -132,11 +164,12 @@ export function getNamespaceTeardownRules(): TeardownRule[] {
             const name = template.metadata?.name;
             if (!name) return Promise.resolve();
             return k8sClient
-              .deleteCustomResource('template.openshift.io', 'v1', testNamespace, 'templates', name)
+              .deleteCustomResource(group, version, testNamespace, 'templates', name)
               .catch((error: unknown) => {
                 safeWarn(`⚠️ Failed to delete template ${name}`, error);
               });
           });
+
           await Promise.allSettled(deletionPromises);
           logger.success(`Completed template cleanup in ${testNamespace}`);
         } catch (error: unknown) {
@@ -151,7 +184,10 @@ export function getNamespaceTeardownRules(): TeardownRule[] {
       onError: 'warn',
       run: async (ctx) => {
         try {
-          if (!ctx.k8sClient) return;
+          if (!ctx.k8sClient) {
+            logger.warn('⚠️ No Kubernetes client — skipping namespaced instance type cleanup');
+            return;
+          }
           const k8sClient = ctx.k8sClient;
           const testNamespace = ctx.testNamespace;
           const group = 'instancetype.kubevirt.io';
@@ -166,42 +202,205 @@ export function getNamespaceTeardownRules(): TeardownRule[] {
             'pw-db-instancetype-',
             'pw-mi-instancetype-',
             'pw-test-instancetype-',
+            'user-instancetype-',
+            'smoke-instancetype-',
+            'minimal-instancetype-',
+            'max-instancetype-',
+            'db-instancetype-',
+            'mi-instancetype-',
+            'test-instancetype-',
           ];
 
-          const items = await k8sClient.listCustomResources(
+          const namespacedInstanceTypes = await k8sClient.listCustomResources(
             group,
             version,
             testNamespace,
             'virtualmachineinstancetypes',
           );
-          if (items.length === 0) return;
 
-          const matching = items.filter((it) => {
-            const name = it.metadata?.name;
+          if (namespacedInstanceTypes.length === 0) {
+            logger.info(`No namespaced instance types found in ${testNamespace}`);
+            return;
+          }
+
+          const matchingInstanceTypes = namespacedInstanceTypes.filter((instanceType) => {
+            const name = instanceType.metadata?.name;
             return name && namespacedTestPrefixes.some((prefix) => name.startsWith(prefix));
           });
-          if (matching.length === 0) return;
 
-          logger.info(`Cleaning up ${matching.length} instance type(s) in ${testNamespace}...`);
+          if (matchingInstanceTypes.length === 0) {
+            logger.info(`No test instance types to clean up in ${testNamespace}`);
+            return;
+          }
 
-          await Promise.allSettled(
-            matching.map((it) => {
-              const name = it.metadata?.name;
-              if (!name) return Promise.resolve();
-              return k8sClient
-                .deleteCustomResource(
-                  group,
-                  version,
-                  testNamespace,
-                  'virtualmachineinstancetypes',
-                  name,
-                )
-                .catch((e: unknown) => safeWarn(`⚠️ Failed to delete instance type ${name}`, e));
-            }),
+          logger.info(
+            `Cleaning up ${matchingInstanceTypes.length} instance type(s) in ${testNamespace}...`,
           );
+
+          const deletionPromises = matchingInstanceTypes.map((instanceType) => {
+            const name = instanceType.metadata?.name;
+            if (!name) return Promise.resolve();
+            return k8sClient
+              .deleteCustomResource(
+                group,
+                version,
+                testNamespace,
+                'virtualmachineinstancetypes',
+                name,
+              )
+              .then(() => {
+                logger.info(`✓ Deleted instance type: ${name}`);
+              })
+              .catch((error: unknown) => {
+                safeWarn(`⚠️ Failed to delete instance type ${name}`, error);
+              });
+          });
+
+          await Promise.allSettled(deletionPromises);
           logger.success(`Completed instance type cleanup in ${testNamespace}`);
         } catch (error: unknown) {
           safeWarn(`Failed to list instance types in ${ctx.testNamespace}`, error);
+        }
+      },
+    },
+    {
+      id: 'cleanup-migration-plans',
+      name: 'Clean up migration plans',
+      scope: TeardownScope.NAMESPACE,
+      onError: 'warn',
+      run: async (ctx) => {
+        try {
+          if (!ctx.k8sClient) {
+            logger.warn('⚠️ No Kubernetes client — skipping migration plan cleanup');
+            return;
+          }
+          const k8sClient = ctx.k8sClient;
+          const testNamespace = ctx.testNamespace;
+          const group = 'migration.openshift.io';
+          const version = 'v1alpha1';
+          const plural = 'migplans';
+          const namespacesToClean = [testNamespace, 'openshift-migration'];
+          const testPrefixes = ['migplan-'];
+
+          for (const namespace of namespacesToClean) {
+            try {
+              const migrationPlans = await k8sClient.listCustomResources(
+                group,
+                version,
+                namespace,
+                plural,
+              );
+
+              if (migrationPlans.length === 0) {
+                continue;
+              }
+
+              const matchingPlans = migrationPlans.filter((plan) => {
+                const name = plan.metadata?.name;
+                return name && testPrefixes.some((prefix) => name.startsWith(prefix));
+              });
+
+              if (matchingPlans.length === 0) {
+                continue;
+              }
+
+              logger.info(
+                `Cleaning up ${matchingPlans.length} migration plan(s) in ${namespace}...`,
+              );
+
+              const deletionPromises = matchingPlans.map((plan) => {
+                const name = plan.metadata?.name;
+                if (!name) return Promise.resolve();
+                return k8sClient
+                  .deleteCustomResource(group, version, namespace, plural, name)
+                  .then(() => {
+                    logger.info(`✓ Deleted migration plan: ${name}`);
+                  })
+                  .catch((error: unknown) => {
+                    safeWarn(`⚠️ Failed to delete migration plan ${name}`, error);
+                  });
+              });
+
+              await Promise.allSettled(deletionPromises);
+              logger.success(`Completed migration plan cleanup in ${namespace}`);
+            } catch (error: unknown) {
+              const message = error instanceof Error ? error.message : String(error);
+              if (message.includes('404')) {
+                logger.info(
+                  'MigPlan CRD not found. Assuming MTC is not installed. Skipping cleanup.',
+                );
+                return;
+              }
+            }
+          }
+        } catch (error: unknown) {
+          safeWarn('Migration plan cleanup failed', error);
+        }
+      },
+    },
+    {
+      id: 'cleanup-network-checkups',
+      name: 'Clean up network checkup ConfigMaps',
+      scope: TeardownScope.NAMESPACE,
+      onError: 'warn',
+      run: async (ctx) => {
+        try {
+          if (!ctx.k8sClient) {
+            logger.warn('⚠️ No Kubernetes client — skipping network checkup cleanup');
+            return;
+          }
+          const k8sClient = ctx.k8sClient;
+          const testNamespace = ctx.testNamespace;
+
+          const checkupPrefixes = [
+            'network-latency-',
+            'kubevirt-vm-latency-checkup',
+            'storage-checkup-',
+            'kubevirt-storage-checkup',
+          ];
+
+          const configMaps = await k8sClient.getCoreV1Api().listNamespacedConfigMap({
+            namespace: testNamespace,
+          });
+
+          if (!configMaps.items || configMaps.items.length === 0) {
+            return;
+          }
+
+          const matchingConfigMaps = configMaps.items.filter((cm) => {
+            const name = cm.metadata?.name;
+            return name && checkupPrefixes.some((prefix) => name.startsWith(prefix));
+          });
+
+          if (matchingConfigMaps.length === 0) {
+            return;
+          }
+
+          logger.info(
+            `Cleaning up ${matchingConfigMaps.length} network checkup(s) in ${testNamespace}...`,
+          );
+
+          const deletionPromises = matchingConfigMaps.map((cm) => {
+            const name = cm.metadata?.name;
+            if (!name) return Promise.resolve();
+            return k8sClient
+              .getCoreV1Api()
+              .deleteNamespacedConfigMap({
+                name,
+                namespace: testNamespace,
+              })
+              .then(() => {
+                logger.info(`✓ Deleted network checkup: ${name}`);
+              })
+              .catch((error: unknown) => {
+                safeWarn(`⚠️ Failed to delete network checkup ${name}`, error);
+              });
+          });
+
+          await Promise.allSettled(deletionPromises);
+          logger.success(`Completed network checkup cleanup in ${testNamespace}`);
+        } catch (error: unknown) {
+          safeWarn(`Failed to list ConfigMaps in ${ctx.testNamespace}`, error);
         }
       },
     },
@@ -212,7 +411,10 @@ export function getNamespaceTeardownRules(): TeardownRule[] {
       onError: 'warn',
       run: async (ctx) => {
         try {
-          if (!ctx.k8sClient) return;
+          if (!ctx.k8sClient) {
+            logger.warn('⚠️ No Kubernetes client — skipping bootable volume cleanup');
+            return;
+          }
           const k8sClient = ctx.k8sClient;
           const testNamespace = ctx.testNamespace;
           const group = 'cdi.kubevirt.io';
@@ -237,25 +439,45 @@ export function getNamespaceTeardownRules(): TeardownRule[] {
             testNamespace,
             plural,
           );
-          if (dataSources.length === 0) return;
 
-          const matching = dataSources.filter((ds: { metadata?: { name?: string } }) => {
+          if (dataSources.length === 0) {
+            return;
+          }
+
+          const matchingDataSources = dataSources.filter((ds: { metadata?: { name?: string } }) => {
             const name = ds.metadata?.name;
             return name && testPrefixes.some((prefix) => name.startsWith(prefix));
           });
-          if (matching.length === 0) return;
 
-          logger.info(`Cleaning up ${matching.length} bootable volume(s) in ${testNamespace}...`);
+          if (matchingDataSources.length === 0) {
+            return;
+          }
 
-          await Promise.allSettled(
-            matching.map((ds: { metadata?: { name?: string } }) => {
+          logger.info(
+            `Cleaning up ${matchingDataSources.length} bootable volume(s) in ${testNamespace}...`,
+          );
+
+          const deletionPromises = matchingDataSources.map(
+            (ds: { metadata?: { name?: string } }) => {
               const name = ds.metadata?.name;
               if (!name) return Promise.resolve();
               return k8sClient
                 .deleteCustomResource(group, version, testNamespace, plural, name)
-                .catch((e: unknown) => safeWarn(`⚠️ Failed to delete bootable volume ${name}`, e));
-            }),
+                .then(() => {
+                  logger.info(`✓ Deleted bootable volume: ${name}`);
+                })
+                .catch((error: { statusCode?: number; message?: string } | unknown) => {
+                  const err = error as { statusCode?: number; message?: string };
+                  if (err.statusCode === 404) {
+                    logger.info(`✓ Bootable volume ${name} already deleted`);
+                  } else {
+                    safeWarn(`⚠️ Failed to delete bootable volume ${name}`, error);
+                  }
+                });
+            },
           );
+
+          await Promise.allSettled(deletionPromises);
           logger.success(`Completed bootable volume cleanup in ${testNamespace}`);
         } catch (error: unknown) {
           safeWarn(`Failed to list bootable volumes in ${ctx.testNamespace}`, error);
@@ -269,7 +491,10 @@ export function getNamespaceTeardownRules(): TeardownRule[] {
       onError: 'warn',
       run: async (ctx) => {
         try {
-          if (!ctx.k8sClient) return;
+          if (!ctx.k8sClient) {
+            logger.warn('⚠️ No Kubernetes client — skipping namespace resource cleanup');
+            return;
+          }
           await ctx.k8sClient.cleanupTestNamespace(ctx.testNamespace);
         } catch (error: unknown) {
           safeWarn(`cleanupTestNamespace failed for ${ctx.testNamespace}`, error);

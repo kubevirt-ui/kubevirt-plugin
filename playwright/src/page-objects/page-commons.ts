@@ -484,6 +484,10 @@ export default class PageCommons extends BasePage {
     return this.modal.isWelcomeModalVisible();
   }
 
+  async navigateBack(): Promise<void> {
+    await this.page.goBack({ waitUntil: 'domcontentloaded' });
+  }
+
   async navigateToRoot() {
     await this.pageContent.navigateToRoot();
   }

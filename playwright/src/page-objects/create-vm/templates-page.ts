@@ -249,6 +249,10 @@ export default class TemplatesPage extends PageCommons {
     await this.robustClick(cloneBtn);
   }
 
+  async closeDialog(): Promise<void> {
+    await this.page.keyboard.press('Escape');
+  }
+
   async closeFilterLabelGroup(): Promise<void> {
     await this._closeFilterLabelGroup.waitFor({
       state: 'visible',
@@ -795,6 +799,32 @@ export default class TemplatesPage extends PageCommons {
     await this.page.waitForTimeout(TestTimeouts.UI_DELAY_EXTRA);
   }
 
+  async verifyCloneDialogOpen(): Promise<{
+    dialogVisible: boolean;
+    cloneEnabled: boolean;
+    hasSourceProjectSelector: boolean;
+    templateNameValue: string;
+  }> {
+    const dialog = this.page.getByRole('dialog');
+    const dialogVisible = await dialog
+      .waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY })
+      .then(() => true)
+      .catch(() => false);
+
+    const hasSourceProjectSelector = await this.page
+      .getByText('Source template project')
+      .isVisible()
+      .catch(() => false);
+
+    const templateNameInput = dialog.getByRole('textbox', { name: 'Template name' });
+    const templateNameValue = await templateNameInput.inputValue().catch(() => '');
+
+    const cloneButton = dialog.locator('footer button').filter({ hasText: 'Clone' });
+    const cloneEnabled = await cloneButton.isEnabled().catch(() => false);
+
+    return { dialogVisible, cloneEnabled, hasSourceProjectSelector, templateNameValue };
+  }
+
   /**
    * Verifies the filter toolbar contains Cluster and Project filter buttons (Fleet ACM).
    */
@@ -812,6 +842,17 @@ export default class TemplatesPage extends PageCommons {
         (await this._filterToolbarClusterButton.isVisible()) &&
         (await this._filterToolbarProjectButton.isVisible())
       );
+    } catch {
+      return false;
+    }
+  }
+
+  async verifyNavigatedToVmsPage(): Promise<boolean> {
+    try {
+      await this.page.waitForURL(/VirtualMachine/, {
+        timeout: TestTimeouts.UI_ACTION_COMPLETE,
+      });
+      return this.page.url().includes('tab=vms');
     } catch {
       return false;
     }
@@ -925,6 +966,14 @@ export default class TemplatesPage extends PageCommons {
     } catch {
       return false;
     }
+  }
+
+  async verifyYamlEditorOpen(): Promise<boolean> {
+    return this.page
+      .locator('.monaco-editor')
+      .waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY })
+      .then(() => true)
+      .catch(() => false);
   }
 
   async waitForClusterFilterApplied(): Promise<void> {
