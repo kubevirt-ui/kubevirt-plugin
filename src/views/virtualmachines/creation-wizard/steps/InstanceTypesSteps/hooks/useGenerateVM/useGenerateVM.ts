@@ -8,6 +8,7 @@ import {
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import useHyperConvergeConfiguration from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import useIsIPv6SingleStackCluster from '@kubevirt-utils/hooks/useIPStackType/useIsIPv6SingleStackCluster';
+import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
 import useRHELAutomaticSubscription from '@kubevirt-utils/hooks/useRHELAutomaticSubscription/useRHELAutomaticSubscription';
 import { getLabel } from '@kubevirt-utils/resources/shared';
 import useNamespaceUDN from '@kubevirt-utils/resources/udn/hooks/useNamespaceUDN';
@@ -34,6 +35,8 @@ const useGenerateVM: UseGenerateVM = () => {
   const { customDiskSize, dvSource, pvcSource, selectedBootableVolume, selectedInstanceType } =
     store;
 
+  const [authorizedSSHKeys] = useKubevirtUserSettings('ssh', cluster);
+
   const [isUDNManagedNamespace] = useNamespaceUDN(getValidNamespace(namespace));
   const isIPv6SingleStack = useIsIPv6SingleStackCluster(cluster);
   const [hyperConverge] = useHyperConvergeConfiguration();
@@ -54,6 +57,8 @@ const useGenerateVM: UseGenerateVM = () => {
   );
   const generatedVMName = useMemo(() => generatePrettyName(osLabel), [osLabel]);
 
+  const sshSecretName = authorizedSSHKeys?.[namespace];
+
   const generatedVM = useMemo(
     () =>
       generateVM({
@@ -68,6 +73,7 @@ const useGenerateVM: UseGenerateVM = () => {
         pvcSource,
         selectedBootableVolume,
         selectedInstanceType,
+        sshSecretName,
         targetNamespace: namespace,
         vmDescription,
         vmName: vmName || generatedVMName,
@@ -86,6 +92,7 @@ const useGenerateVM: UseGenerateVM = () => {
       pvcSource,
       selectedBootableVolume,
       selectedInstanceType,
+      sshSecretName,
       vmDescription,
       vmName,
     ],

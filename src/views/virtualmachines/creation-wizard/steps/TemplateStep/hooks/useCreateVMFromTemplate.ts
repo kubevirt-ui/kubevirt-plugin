@@ -1,11 +1,14 @@
 import { useState } from 'react';
 
+import { DYNAMIC_CREDENTIALS_SUPPORT } from '@kubevirt-utils/components/DynamicSSHKeyInjection/constants/constants';
+import { addSecretToVM } from '@kubevirt-utils/components/SSHSecretModal/utils/utils';
 import { logTemplateFlowEvent } from '@kubevirt-utils/extensions/telemetry/telemetry';
 import {
   CUSTOMIZE_VM_BUTTON_CLICKED,
   CUSTOMIZE_VM_FAILED,
 } from '@kubevirt-utils/extensions/telemetry/utils/constants';
-import { getLabels, getResourceKey } from '@kubevirt-utils/resources/shared';
+import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
+import { getLabel, getLabels, getResourceKey } from '@kubevirt-utils/resources/shared';
 import {
   LABEL_USED_TEMPLATE_NAME,
   LABEL_USED_TEMPLATE_NAMESPACE,
@@ -33,6 +36,7 @@ const useCreateVMFromTemplate: UseCreateVMFromTemplate = () => {
     vmDescription,
     vmName,
   } = useVMWizardStore();
+  const [authorizedSSHKeys] = useKubevirtUserSettings('ssh', cluster);
 
   const createVMFromTemplate = async () => {
     setCreateError(undefined);
@@ -60,7 +64,13 @@ const useCreateVMFromTemplate: UseCreateVMFromTemplate = () => {
       }
       vmObject.spec.runStrategy = getDefaultRunningStrategy();
 
-      vmSignal.value = vmObject;
+      const sshSecretName = authorizedSSHKeys?.[namespace];
+      if (sshSecretName) {
+        const isDynamic = getLabel(vmObject, DYNAMIC_CREDENTIALS_SUPPORT) === 'true';
+        vmSignal.value = addSecretToVM(vmObject, sshSecretName, isDynamic);
+      } else {
+        vmSignal.value = vmObject;
+      }
       setLastProcessedTemplateKey(selectedKey);
     } catch (error) {
       setCreateError(error);
