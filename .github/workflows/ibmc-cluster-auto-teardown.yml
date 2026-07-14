@@ -151,9 +151,7 @@ jobs:
             echo "Release-branch cluster: 120 minutes (2h)"
           fi
 
-      # Listing self-hosted runners needs admin access, which GITHUB_TOKEN
-      # can never have -- mint a short-lived admin-scoped token from the
-      # existing kubevirt-plugin-arc GitHub App instead.
+      # Admin API needs a token GITHUB_TOKEN can't provide -- mint one from the ARC GitHub App.
       - name: Generate ARC app token for runner-busy check
         id: arc-app-token
         continue-on-error: true
@@ -163,56 +161,47 @@ jobs:
           private-key: ${{ secrets.ARC_GITHUB_APP_PRIVATE_KEY }}
           permission-administration: read
 
+      # Plain gh api, not actions/github-script -- @actions/github isn't requireable in that sandbox.
+      - name: Check runner-busy status for this cluster
+        id: runner_busy
+        env:
+          GH_TOKEN: ${{ steps.arc-app-token.outputs.token }}
+          CLUSTER_NAME: ${{ matrix.cluster_name }}
+        run: |
+          if [[ -z "${GH_TOKEN}" ]]; then
+            echo "::warning::ARC app token unavailable (see previous step) -- failing closed (treating as busy)."
+            echo "busy=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if ! RUNNERS_JSON=$(gh api "repos/${GITHUB_REPOSITORY}/actions/runners?per_page=100" 2>&1); then
+            echo "::warning::Failed to query self-hosted runners: ${RUNNERS_JSON} -- failing closed (treating as busy)."
+            echo "busy=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # busy:true + matching label means a job is actively running right now.
+          BUSY=$(echo "${RUNNERS_JSON}" | jq --arg name "${CLUSTER_NAME}" \
+            '[.runners[] | select(.busy == true and ((.labels // []) | any(.name == $name)))] | length > 0')
+          TOTAL=$(echo "${RUNNERS_JSON}" | jq '.total_count')
+          echo "Runner pool for '${CLUSTER_NAME}': $([ "${BUSY}" == "true" ] && echo busy || echo idle) (${TOTAL} total runners checked)."
+          echo "busy=${BUSY}" >> "$GITHUB_OUTPUT"
+
       - name: Check CI jobs for this cluster
         id: check_ci
         uses: actions/github-script@v9
         env:
           INCLUDE_WORKFLOWS: '[".github/workflows/hot-cluster-e2e.yml", ".github/workflows/hot-cluster-e2e-run.yml", ".github/workflows/ibmc-cluster-setup.yml"]'
           CLUSTER_NAME: ${{ matrix.cluster_name }}
-          RUNNER_ADMIN_TOKEN: ${{ steps.arc-app-token.outputs.token }}
+          RUNNER_BUSY: ${{ steps.runner_busy.outputs.busy }}
         with:
           script: |
             const INCLUDE_WORKFLOWS = JSON.parse(process.env.INCLUDE_WORKFLOWS);
             const clusterName = process.env.CLUSTER_NAME;
             const clusterTag = `[${clusterName}]`;
 
-            // A registered self-hosted runner labeled with this cluster
-            // name and busy: true means a job is actively executing right
-            // now -- an authoritative signal that title-matching below
-            // can't provide (a run between steps or not yet reporting its
-            // title could otherwise look idle). Checked first and
-            // short-circuits the rest of this step when true. Needs the
-            // ARC app token from the previous step since this endpoint
-            // rejects the default GITHUB_TOKEN.
-            let runnerBusy = false;
-            try {
-              if (!process.env.RUNNER_ADMIN_TOKEN) {
-                throw new Error('ARC app token unavailable (see previous step)');
-              }
-              const runnerOctokit = require('@actions/github').getOctokit(process.env.RUNNER_ADMIN_TOKEN);
-              const runners = await runnerOctokit.paginate(runnerOctokit.rest.actions.listSelfHostedRunnersForRepo, {
-                ...context.repo,
-                per_page: 100,
-              });
-              runnerBusy = runners.some(
-                r => r.busy && r.labels?.some(l => l.name === clusterName)
-              );
-              core.info(`Runner pool for '${clusterName}': ${runnerBusy ? 'busy' : 'idle'} (${runners.length} total runners checked).`);
-            } catch (err) {
-              // Fail closed: this check exists specifically to catch a job
-              // running right now that title-matching below can't see --
-              // if we can't ask, assume busy rather than silently losing
-              // that protection against tearing down an active cluster.
-              core.warning(`Failed to query self-hosted runners: ${err.message} -- failing closed (treating as busy).`);
-              core.setOutput('active_jobs', 'true');
-              core.setOutput('last_run_time', '');
-              core.summary.addList([
-                `Cluster: ${clusterName}`,
-                `Runner query failed: ${err.message} (failing closed -- skipping teardown for safety)`,
-              ]);
-              await core.summary.write();
-              return;
-            }
+            // From the runner-busy step above; fails closed if that query failed.
+            const runnerBusy = process.env.RUNNER_BUSY === 'true';
 
             if (runnerBusy) {
               core.setOutput('active_jobs', 'true');
@@ -225,29 +214,19 @@ jobs:
               return;
             }
 
-            // hot-cluster-e2e.yml's run-name shows the raw PR base branch
-            // (e.g. "release-4.20"), not the resolved cluster name, for
-            // automatic pull_request_target runs -- a naive substring
-            // match against clusterTag would miss these entirely and
-            // report the cluster as idle when it isn't. Re-derive the
-            // resolved name from the bracketed token using the same
-            // release-branch mapping rule. The other two workflows always
-            // show the resolved name directly, so they keep the plain
-            // substring match.
+            // hot-cluster-e2e.yml's run-name shows the raw base branch
+            // (e.g. "release-4.20") for automatic runs, not the resolved
+            // cluster name -- remap it below. The other workflows already
+            // show the resolved name, so they keep a plain substring match.
             function runMatchesCluster(run, workflow) {
               const title = run.display_title || '';
               if (workflow === '.github/workflows/hot-cluster-e2e.yml') {
                 const bracketed = title.match(/^Hot Cluster E2E \[([^\]]+)\]/);
                 if (!bracketed) return false;
                 const token = bracketed[1];
-                // Token is inputs.cluster_name || github.base_ref ||
-                // 'kubevirt-plugin-ci'. workflow_dispatch always supplies
-                // cluster_name (its own default if not explicitly
-                // overridden) -- already resolved, so use it as-is rather
-                // than remapping a manually-chosen name that happens not to
-                // match the known patterns down to 'kubevirt-plugin-ci'.
-                // Only a pull_request_target run's base_ref token needs the
-                // release-X.Y remapping below.
+                // workflow_dispatch already supplies a resolved
+                // cluster_name; only a pull_request_target run's base_ref
+                // token needs remapping.
                 let resolved;
                 if (run.event === 'workflow_dispatch') {
                   resolved = token;
@@ -266,8 +245,7 @@ jobs:
             let queued = 0;
             let lastRunTime = null;
 
-            // Bound the "completed" lookup to recent history so pagination
-            // stays fast -- idle thresholds top out at a few hours.
+            // Bound "completed" lookup to recent history -- idle thresholds top out at a few hours.
             const lookbackDate = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString();
 
             try {
@@ -283,8 +261,7 @@ jobs:
                     params.created = `>=${lookbackDate}`;
                   }
 
-                  // Paginate fully before filtering -- a specific cluster's
-                  // tagged run can easily fall outside the first page.
+                  // Paginate fully before filtering -- a match can fall outside page 1.
                   const runs = await github.paginate(github.rest.actions.listWorkflowRuns, params);
 
                   const matching = runs.filter(r => runMatchesCluster(r, workflow));
