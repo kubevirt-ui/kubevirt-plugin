@@ -1,52 +1,75 @@
 name: Checkout for Hot Cluster E2E
 description: |
-  Checks out the code under test. For a plain dispatch, behaves like a
-  normal checkout (checkout-ref, PR head, or the triggering ref). For a
-  pr_number retest, checks out the PR's actual base branch tip -- from
-  checkout-ref (base_ref) when the PR doesn't target main, else
-  github.sha, since hot-cluster-e2e.yml's pr_number dispatches always
-  run against ref: main -- and merges the PR's actual head on top via a
-  local git merge, deliberately bypassing GitHub's own
-  refs/pull/<N>/merge ref, which is only recomputed reactively and can
-  go stale for an idle PR while the base branch advances.
+  Checks out the code under test. Plain non-PR dispatch: normal checkout
+  (checkout-ref, or the triggering ref). Any PR context (live
+  pull_request_target trigger or explicit pr_number retest): checks out a
+  fresh base branch tip and merges the PR head on top via local git merge,
+  bypassing GitHub's own refs/pull/<N>/merge ref (which can go stale).
+  Keeps every PR run testing what would actually land after merge.
 
 inputs:
   checkout-ref:
     description: |
-      Ref/SHA to check out. For a pr_number retest, this must be the
-      PR's own base branch (e.g. release-4.22) when it isn't main --
-      github.sha is only correct for a main-targeting PR, since that's
-      the only ref hot-cluster-e2e.yml ever dispatches pr_number against.
+      Base branch ref/SHA for a pr_number retest (e.g. release-4.22; only
+      github.sha is correct for main). Ignored for a live
+      pull_request_target trigger (base branch read from the event
+      payload instead). Leave empty for a plain non-PR dispatch.
     required: false
     default: ''
   pr-number:
-    description: PR number to merge fresh on top of the checked-out base tip.
+    description: |
+      PR number to merge fresh on top of the checked-out base tip. Leave
+      empty for a live pull_request_target trigger (read from the event
+      payload automatically) or a plain non-PR dispatch.
     required: false
     default: ''
 
 runs:
   using: composite
   steps:
+    # A live pull_request_target trigger (pr-number input empty) is
+    # treated the same as an explicit retest from here on.
+    - name: Resolve effective PR number and base ref
+      id: resolve
+      shell: bash
+      env:
+        INPUT_PR_NUMBER: ${{ inputs.pr-number }}
+        INPUT_CHECKOUT_REF: ${{ inputs.checkout-ref }}
+        EVENT_NAME: ${{ github.event_name }}
+        EVENT_PR_NUMBER: ${{ github.event.pull_request.number }}
+        EVENT_PR_BASE_REF: ${{ github.event.pull_request.base.ref }}
+        FALLBACK_SHA: ${{ github.sha }}
+        FALLBACK_REF: ${{ github.ref }}
+      run: |
+        if [[ -n "${INPUT_PR_NUMBER}" ]]; then
+          echo "pr-number=${INPUT_PR_NUMBER}" >> "$GITHUB_OUTPUT"
+          echo "base-ref=${INPUT_CHECKOUT_REF:-${FALLBACK_SHA}}" >> "$GITHUB_OUTPUT"
+        elif [[ "${EVENT_NAME}" == "pull_request_target" ]]; then
+          echo "pr-number=${EVENT_PR_NUMBER}" >> "$GITHUB_OUTPUT"
+          echo "base-ref=${EVENT_PR_BASE_REF}" >> "$GITHUB_OUTPUT"
+        else
+          echo "pr-number=" >> "$GITHUB_OUTPUT"
+          echo "base-ref=${INPUT_CHECKOUT_REF:-${FALLBACK_REF}}" >> "$GITHUB_OUTPUT"
+        fi
+
     - name: Checkout
       uses: actions/checkout@v7
       with:
-        ref: >-
-          ${{
-            inputs.pr-number != '' && (inputs.checkout-ref || github.sha) ||
-            inputs.checkout-ref || github.event.pull_request.head.sha || github.ref
-          }}
-        fetch-depth: ${{ inputs.pr-number != '' && '0' || '1' }}
+        ref: ${{ steps.resolve.outputs.base-ref }}
+        fetch-depth: ${{ steps.resolve.outputs.pr-number != '' && '0' || '1' }}
         allow-unsafe-pr-checkout: true
         persist-credentials: false
 
     - name: Merge PR head fresh
-      if: inputs.pr-number != ''
+      if: steps.resolve.outputs.pr-number != ''
       shell: bash
+      env:
+        PR_NUMBER: ${{ steps.resolve.outputs.pr-number }}
       run: |
         git config user.email "ci@kubevirt-plugin.local"
         git config user.name "kubevirt-plugin CI"
-        git fetch origin "refs/pull/${{ inputs.pr-number }}/head"
+        git fetch origin "refs/pull/${PR_NUMBER}/head"
         if ! git merge --no-edit FETCH_HEAD; then
-          echo "::error::PR #${{ inputs.pr-number }} does not merge cleanly with the current base tip -- resolve the conflict and push an update."
+          echo "::error::PR #${PR_NUMBER} does not merge cleanly with the current base tip -- resolve the conflict and push an update."
           exit 1
         fi
