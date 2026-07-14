@@ -1,0 +1,42 @@
+name: Checkout for Hot Cluster E2E
+description: |
+  Checks out the code under test. For a plain dispatch, behaves like a
+  normal checkout (checkout-ref, PR head, or the triggering ref). For a
+  pr_number retest, checks out the current base tip (always fresh --
+  see hot-cluster-e2e.yml) and merges the PR's actual head on top via a
+  local git merge, deliberately bypassing GitHub's own
+  refs/pull/<N>/merge ref, which is only recomputed reactively and can
+  go stale for an idle PR while main advances.
+
+inputs:
+  checkout-ref:
+    description: Ref/SHA to check out when not doing a pr_number retest.
+    required: false
+    default: ''
+  pr-number:
+    description: PR number to merge fresh on top of the current base tip.
+    required: false
+    default: ''
+
+runs:
+  using: composite
+  steps:
+    - name: Checkout
+      uses: actions/checkout@v7
+      with:
+        ref: ${{ inputs.pr-number == '' && (inputs.checkout-ref || github.event.pull_request.head.sha || github.ref) || github.sha }}
+        fetch-depth: ${{ inputs.pr-number != '' && 0 || 1 }}
+        allow-unsafe-pr-checkout: true
+        persist-credentials: false
+
+    - name: Merge PR head fresh
+      if: inputs.pr-number != ''
+      shell: bash
+      run: |
+        git config user.email "ci@kubevirt-plugin.local"
+        git config user.name "kubevirt-plugin CI"
+        git fetch origin "refs/pull/${{ inputs.pr-number }}/head"
+        if ! git merge --no-edit FETCH_HEAD; then
+          echo "::error::PR #${{ inputs.pr-number }} does not merge cleanly with the current base tip -- resolve the conflict and push an update."
+          exit 1
+        fi
