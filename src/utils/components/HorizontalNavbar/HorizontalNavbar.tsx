@@ -115,7 +115,7 @@ const HorizontalNavbar: FC<HorizontalNavbarProps> = ({
                   {item.name}
                   {item.badges?.map(
                     (badge) =>
-                      badge.count > 0 && (
+                      !isEmpty(badge.count) && (
                         <Badge
                           className={`horizontal-navbar__badge horizontal-navbar__badge--${badge.color}`}
                           key={badge.color}

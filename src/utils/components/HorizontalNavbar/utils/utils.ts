@@ -25,6 +25,9 @@ export type TabBadge = {
   count: number;
 };
 
+export const TAB_BADGE_COLOR_RED: TabBadge['color'] = 'red';
+export const TAB_BADGE_COLOR_YELLOW: TabBadge['color'] = 'yellow';
+
 export type NavPageKubevirt = Omit<NavPage, 'component'> & {
   badges?: TabBadge[];
   component: ComponentType<PropsWithChildren<NavPageComponentProps>>;
