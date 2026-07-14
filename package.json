@@ -93,7 +93,7 @@
     "global": "^4.4.0",
     "immer": "^9.0.12",
     "js-abbreviation-number": "^1.4.0",
-    "js-yaml": "^4.1.0",
+    "js-yaml": "^4.3.0",
     "lodash.clonedeepwith": "^4.5.0",
     "lodash.shuffle": "^4.2.0",
     "mochawesome-report-generator": "^6.0.1",
@@ -190,6 +190,7 @@
       "@patternfly/quickstarts": {
         "dompurify": "3.4.0"
       }
-    }
+    },
+    "js-yaml": "^4.3.0"
   }
 }
