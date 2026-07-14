@@ -1,0 +1,49 @@
+name: Resolve Cypress Env Vars
+description: |
+  Thin wrapper around ci-scripts/hot-cluster/resolve-cypress-env-vars.sh --
+  resolves the Cypress TEST_NS/TEST_SECRET_NAME (and whether same-cluster
+  runs must be serialized), whether a test secret fixture exists, and which
+  --spec to run, for a CNV pin version. Assumes the caller has already
+  checked out the repo.
+
+inputs:
+  cnv-pin-version:
+    description: CNV version pinned for this cluster (e.g. 4.20, 4.21, 4.22), empty for unpinned
+    required: false
+    default: ''
+  run-id:
+    description: Unique run identifier used to build a genuinely unique namespace/secret name
+    required: true
+  test-project:
+    description: "'gating' or 'features' -- only affects spec selection on release-4.20 and later"
+    required: false
+    default: 'gating'
+
+outputs:
+  test-ns:
+    description: Resolved Cypress TEST_NS for this run
+    value: ${{ steps.resolve.outputs.test_ns }}
+  test-secret-name:
+    description: Resolved Cypress TEST_SECRET_NAME for this run
+    value: ${{ steps.resolve.outputs.test_secret_name }}
+  needs-lock:
+    description: "'true' if same-cluster Cypress runs of this CNV pin must be serialized (fixed namespace)"
+    value: ${{ steps.resolve.outputs.needs_lock }}
+  needs-secret:
+    description: "'true' if this CNV pin's checked-out content has a cypress/fixtures/secret.yaml to create"
+    value: ${{ steps.resolve.outputs.needs_secret }}
+  spec:
+    description: Resolved --spec value for this CNV pin's checked-out test layout (empty to omit the flag)
+    value: ${{ steps.resolve.outputs.spec }}
+
+runs:
+  using: composite
+  steps:
+    - name: Resolve TEST_NS/TEST_SECRET_NAME/needs-lock/needs-secret/spec for this CNV pin
+      id: resolve
+      shell: bash
+      env:
+        CNV_PIN_VERSION: ${{ inputs.cnv-pin-version }}
+        RUN_ID: ${{ inputs.run-id }}
+        TEST_PROJECT: ${{ inputs.test-project }}
+      run: ./ci-scripts/hot-cluster/resolve-cypress-env-vars.sh >> "$GITHUB_OUTPUT"

@@ -37,9 +37,9 @@ on:
       cnv_pin_version:
         description: |
           CNV version pinned for this cluster (e.g. 4.20, 4.21, 4.22), as
-          resolved by hot-cluster-e2e.yml's prepare job. Only affects
-          Cypress's TEST_NS/TEST_SECRET_NAME (see that env below). Leave
-          empty for a standalone dispatch.
+          resolved by hot-cluster-e2e.yml's prepare job. Fed into the
+          resolve-cypress-env-vars job below. Leave empty for a
+          standalone dispatch.
         required: false
         default: ''
         type: string
@@ -91,9 +91,9 @@ on:
       cnv_pin_version:
         description: |
           CNV version pinned for this cluster (e.g. 4.20, 4.21, 4.22), as
-          resolved by hot-cluster-e2e.yml's prepare job. Only affects
-          Cypress's TEST_NS/TEST_SECRET_NAME (see that env below). Leave
-          empty for a standalone dispatch.
+          resolved by hot-cluster-e2e.yml's prepare job. Fed into the
+          resolve-cypress-env-vars job below. Leave empty for a
+          standalone dispatch.
         type: string
         required: false
         default: ''
@@ -150,6 +150,36 @@ env:
   CI_ENV_CM: ci-env-${{ github.run_id }}
 
 jobs:
+  # Resolves Cypress's TEST_NS/TEST_SECRET_NAME/lock-need for this CNV pin
+  # via a dedicated script (see ci-scripts/hot-cluster/resolve-cypress-
+  # env-vars.sh) instead of inlining version checks directly in
+  # run-gating-tests below. A separate job (not a step of that job) since
+  # concurrency: is evaluated before any step runs and can only read
+  # needs.*.outputs, not step outputs from within the same job.
+  resolve-cypress-env-vars:
+    name: Resolve Cypress Env Vars
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      test_ns: ${{ steps.resolve.outputs.test-ns }}
+      test_secret_name: ${{ steps.resolve.outputs.test-secret-name }}
+      needs_lock: ${{ steps.resolve.outputs.needs-lock }}
+      needs_secret: ${{ steps.resolve.outputs.needs-secret }}
+      spec: ${{ steps.resolve.outputs.spec }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Resolve TEST_NS/TEST_SECRET_NAME/needs-lock/needs-secret/spec for this CNV pin
+        id: resolve
+        uses: ./.github/actions/hot-cluster/resolve-cypress-env-vars
+        with:
+          cnv-pin-version: ${{ inputs.cnv_pin_version }}
+          run-id: ${{ github.run_id }}
+          test-project: ${{ inputs.test_project || 'gating' }}
+
   build-kubevirt-plugin-image:
     name: Build Kubevirt Plugin Image
     runs-on: ubuntu-latest
@@ -213,20 +243,21 @@ jobs:
 
   run-gating-tests:
     name: ${{ inputs.is_reusable_call && 'Execute tests' || 'Execute tests (standalone dispatch)' }}
-    needs: [build-kubevirt-plugin-image]
+    needs: [build-kubevirt-plugin-image, resolve-cypress-env-vars]
     runs-on: ${{ inputs.runner_label || 'kubevirt-plugin-ci' }}
     timeout-minutes: 120
-    # Cypress on release-4.20 (or any unknown cnv_pin_version) still
-    # hardcodes a fixed auto-test-ns/auto-test-secret name, so same-cluster
-    # runs of that case are serialized here instead of made namespace-safe.
-    # release-4.21/4.22 get a genuine per-run namespace (see TEST_NS below)
-    # and fall into the unique no-lock-<run_id> group instead.
-    # cancel-in-progress: false + queue: max queue same-namespace runs one
-    # after another rather than cancelling or dropping a pending one.
+    # Cypress runs whose CNV pin's checked-out content still hardcodes a
+    # fixed auto-test-ns/auto-test-secret name (see resolve-cypress-
+    # env-vars job -- needs_lock) are serialized here instead of made
+    # namespace-safe. Every other run (Playwright, or a CNV pin whose
+    # content reads namespaces dynamically) gets the unique
+    # no-lock-<run_id> group instead. cancel-in-progress: false +
+    # queue: max queue same-namespace runs one after another rather than
+    # cancelling or dropping a pending one.
     concurrency:
       group: >-
         ${{
-          ((inputs.test_engine || 'playwright') == 'cypress' && inputs.cnv_pin_version != '4.21' && inputs.cnv_pin_version != '4.22') &&
+          ((inputs.test_engine || 'playwright') == 'cypress' && needs.resolve-cypress-env-vars.outputs.needs_lock == 'true') &&
           format('cypress-fixed-ns-{0}', inputs.cluster_name || inputs.runner_label || 'kubevirt-plugin-ci') ||
           format('no-lock-{0}', github.run_id)
         }}
@@ -237,22 +268,19 @@ jobs:
       HEADLESS: 'true'
       RUN_FEATURE_TESTS: ${{ inputs.test_project == 'features' && 'true' || 'false' }}
       TEST_ENGINE: ${{ inputs.test_engine || 'playwright' }}
-      # release-4.20's Cypress content hardcodes TEST_NS=auto-test-ns and
-      # TEST_SECRET_NAME=auto-test-secret; release-4.21/4.22 read both
-      # dynamically, so they get a genuine per-run name instead (avoiding
-      # cross-PR collisions on a shared cluster). Playwright always gets a
-      # per-run name.
+      # Cypress's TEST_NS/TEST_SECRET_NAME come from resolve-cypress-
+      # env-vars (see ci-scripts/hot-cluster/resolve-cypress-env-vars.sh
+      # for the fixed-vs-dynamic-per-CNV-pin rule). Playwright always
+      # gets a per-run name.
       TEST_NS: >-
         ${{
           (inputs.test_engine || 'playwright') != 'cypress' && format('kubevirt-plugin-ci-test-{0}', github.run_id) ||
-          (inputs.cnv_pin_version == '4.21' || inputs.cnv_pin_version == '4.22') && format('auto-test-ns-{0}', github.run_id) ||
-          'auto-test-ns'
+          needs.resolve-cypress-env-vars.outputs.test_ns
         }}
       TEST_SECRET_NAME: >-
         ${{
           (inputs.test_engine || 'playwright') != 'cypress' && 'ci-test-secret' ||
-          (inputs.cnv_pin_version == '4.21' || inputs.cnv_pin_version == '4.22') && format('auto-test-secret-{0}', github.run_id) ||
-          'auto-test-secret'
+          needs.resolve-cypress-env-vars.outputs.test_secret_name
         }}
 
     steps:
@@ -407,7 +435,14 @@ jobs:
           # (configmap); Playwright already seeds this client-side.
           user-settings-location: ${{ env.TEST_ENGINE == 'cypress' && 'configmap' || '' }}
 
+      # Playwright always has playwright/fixtures/secret.yaml; Cypress only
+      # has cypress/fixtures/secret.yaml from release-4.19 onward (see
+      # resolve-cypress-env-vars job -- needs_secret). Earlier branches have
+      # no secret fixture or concept in their checked-out Cypress content.
       - name: Create test secret
+        if: |
+          (inputs.test_engine || 'playwright') != 'cypress' ||
+          needs.resolve-cypress-env-vars.outputs.needs_secret == 'true'
         run: |
           yq e '
             .metadata.name = strenv(TEST_SECRET_NAME) |
@@ -489,6 +524,7 @@ jobs:
         env:
           BRIDGE_BASE_ADDRESS: ${{ steps.ci-env.outputs.bridge-base-address }}
           TEST_PROJECT: ${{ inputs.test_project }}
+          CYPRESS_SPEC: ${{ needs.resolve-cypress-env-vars.outputs.spec }}
         run: |
           if [[ "${TEST_ENGINE}" == "cypress" ]]; then
             # Cypress only exposes CYPRESS_-prefixed env vars to Cypress.env(...).
@@ -500,10 +536,14 @@ jobs:
             # release-4.20/4.21's VM patch/stop commands rely on the
             # runner's current oc project, not an explicit -n flag.
             oc project "${TEST_NS}"
-            if [[ "${TEST_PROJECT}" == "features" ]]; then
-              npm run test-cypress-headless -- --spec tests/tier1.cy.ts
+            # CYPRESS_SPEC is resolved per CNV pin (see resolve-cypress-env-
+            # vars job) -- empty on release-4.11-4.17, which have no single
+            # aggregator spec file; omit --spec there and let cypress.json's
+            # default pick up all specs.
+            if [[ -n "${CYPRESS_SPEC}" ]]; then
+              npm run test-cypress-headless -- --spec "${CYPRESS_SPEC}"
             else
-              npm run test-cypress-headless -- --spec tests/gating.cy.ts
+              npm run test-cypress-headless
             fi
           else
             if [[ "${TEST_PROJECT}" == "features" ]]; then

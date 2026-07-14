@@ -193,6 +193,14 @@ See [`hot-cluster/arc/README.md`](hot-cluster/arc/README.md) for ARC-specific de
 - **Test engine**: `release-4.22` and earlier predate the Cypress-to-Playwright migration and still carry a `cypress/` suite; everything else (main, future releases, non-release bases) uses Playwright. An explicit `workflow_dispatch` override always wins over this auto-detection.
 - **CNV channel**: always resolves to the catalog's real `stable` channel (there is no per-version `stable-4.X` channel); version pinning happens via `startingCSV`, not a different channel name.
 
+Separately, `resolve-cypress-env-vars.sh` resolves everything `hot-cluster-e2e-run.yml`'s `run-gating-tests` job needs to run Cypress against a given `cnv_pin_version`'s actual checked-out content, since the `cypress/` layout has changed several times across release branches:
+
+- **Namespace**: CNV pins at or before 4.20 (or unpinned) hardcode `auto-test-ns`/`auto-test-secret` as literal constants rather than reading `Cypress.env(...)`, so those runs get the fixed name and are serialized via a concurrency lock (`needs_lock=true`); 4.21 and later read both dynamically and get a genuine per-run name instead (`needs_lock=false`).
+- **Secret fixture**: `cypress/fixtures/secret.yaml` only exists from 4.19 onward; earlier branches have no secret concept in their Cypress content at all (`needs_secret=false` -- the caller skips creating one).
+- **Spec entrypoint**: the aggregator file differs by era -- 4.11-4.17 have no aggregator (omit `--spec`, let `cypress.json`'s default pick up all `.spec.ts` files), 4.18 has `tests/all.cy.ts`, 4.19 has `tests/gating.cy.ts` with no tier1 split, and 4.20+ have both `tests/gating.cy.ts` and `tests/tier1.cy.ts` (selected via `test_project`).
+
+This mirrors `resolve-cluster-config.sh`'s pattern (script + thin composite-action wrapper) rather than inlining version checks directly in the workflow YAML. Named generically (env vars, not namespace) so another repo with similar per-branch Cypress quirks can adopt the same script/action pattern for whatever env vars it needs to resolve.
+
 ## Check-Run & Retest Model
 
 The hot-cluster pipeline manages its own required check ("Run Gating Tests") and an informational "Hot Cluster E2E Progress" status across several workflows (`hot-cluster-e2e.yml`, `retest-e2e.yml`, `cancel-e2e.yml`, `retest-stale-gating.yml`, `retest-on-pool-entry.yml`) and the `publish-gating-check` action. A few GitHub behaviors drive the design:
