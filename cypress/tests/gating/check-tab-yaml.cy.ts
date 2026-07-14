@@ -218,10 +218,9 @@ describe('Check all virtualization pages can be loaded', () => {
     });
 
     it('create bootable volume from YAML', () => {
-      cy.switchProject(TEST_NS);
-      cy.wait(3000);
-      cy.get(sel.itemCreateBtn).click();
-      cy.byButtonText(YAML).click();
+      // Avoid the flaky Add volume dropdown (MenuToggle remounts on empty-state
+      // permission/project updates and detaches menu items). Go straight to YAML.
+      cy.visit(`/k8s/ns/${TEST_NS}/bootablevolumes/~new`);
       cy.contains('name: example', { timeout: 30000 }).should('be.visible');
       cy.get(sel.saveBtn).click();
       cy.byLegacyTestID(Example).should('exist');
