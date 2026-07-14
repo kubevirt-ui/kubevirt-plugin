@@ -14,6 +14,8 @@ import {
 } from '@kubevirt-utils/components/CloudinitModal/utils/cloudinit-utils';
 import { DEFAULT_DISK_SIZE } from '@kubevirt-utils/components/DiskModal/utils/constants';
 import { InterfaceTypes } from '@kubevirt-utils/components/DiskModal/utils/types';
+import { DYNAMIC_CREDENTIALS_SUPPORT } from '@kubevirt-utils/components/DynamicSSHKeyInjection/constants/constants';
+import { addSecretToVM } from '@kubevirt-utils/components/SSHSecretModal/utils/utils';
 import { sysprepDisk, sysprepVolume } from '@kubevirt-utils/components/SysprepModal/sysprep-utils';
 import { CLOUDINITDISK, ROOTDISK } from '@kubevirt-utils/constants/constants';
 import {
@@ -226,6 +228,7 @@ export const generateVM: GenerateVMCallback = ({
   pvcSource,
   selectedBootableVolume,
   selectedInstanceType,
+  sshSecretName,
   targetNamespace,
   vmDescription,
   vmName,
@@ -358,6 +361,11 @@ export const generateVM: GenerateVMCallback = ({
   }
 
   emptyVM = addRootDiskToVM(emptyVM);
+
+  if (sshSecretName) {
+    const isDynamic = getLabel(selectedBootableVolume, DYNAMIC_CREDENTIALS_SUPPORT) === 'true';
+    return addSecretToVM(emptyVM, sshSecretName, isDynamic);
+  }
 
   return emptyVM;
 };
