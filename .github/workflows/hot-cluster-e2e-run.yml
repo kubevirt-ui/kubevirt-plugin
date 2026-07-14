@@ -170,9 +170,10 @@ jobs:
     outputs:
       kubevirt-plugin-image: ${{ env.KUBEVIRT_PLUGIN_IMAGE }}
     steps:
-      # pr_number (set for a main-push retest) merges the PR's actual head
-      # fresh onto the current base tip -- see the action's own comment for
-      # why this can't just be checkout_ref: refs/pull/<N>/merge.
+      # A live PR trigger and an explicit pr_number retest (e.g. a
+      # main-push retest) both merge the PR's actual head fresh onto the
+      # current base tip -- see the action's own comment for why this
+      # can't just be checkout_ref: refs/pull/<N>/merge.
       - name: Checkout
         uses: kubevirt-ui/kubevirt-plugin/.github/actions/hot-cluster/checkout-for-retest@main
         with:
