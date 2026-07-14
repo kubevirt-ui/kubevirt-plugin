@@ -6,48 +6,75 @@ import {
 } from '../../utils/const/index';
 import { authSSHKey } from '../../utils/const/string';
 import { mastheadLogo } from '../../views/selector';
-import { useExisting } from '../../views/selector-catalog';
-import { selectSecret } from '../../views/selector-instance';
 
-const SSH_SECTION = 'settings-user-ssh-key';
+/**
+ * Configure the public SSH key via ConfigMap instead of the Settings UI.
+ * The project dropdown runs checkAccess for every namespace and is flaky on
+ * large CI clusters (option never appears / menu remounts while access
+ * reviews are in flight). Setup only needs the mapping to exist.
+ *
+ * User-settings keys are either the user UID or a sanitized username
+ * (e.g. kube:admin → kube-admin). We update every existing entry and ensure
+ * the current console user key exists.
+ */
+function configureSSHSecretViaOc() {
+  const scriptPath = '/tmp/kubevirt-configure-ssh-settings.py';
+  const script = `
+import json, re, subprocess, sys
 
-function clearStaleSSHSettings() {
-  cy.exec(
-    `oc get configmap kubevirt-user-settings -n openshift-cnv -o json 2>/dev/null | ` +
-      `python3 -c "` +
-      `import json,sys; ` +
-      `cm=json.load(sys.stdin); ` +
-      `[cm['data'].__setitem__(k, json.dumps({**json.loads(v), 'ssh': {}})) ` +
-      `for k,v in cm['data'].items() if 'ssh' in json.loads(v)]; ` +
-      `print(json.dumps(cm))" | oc apply -f - 2>/dev/null`,
-    { failOnNonZeroExit: false },
-  ).then((result) => {
-    if (result.code !== 0) {
-      cy.log(`clearStaleSSHSettings failed (code ${result.code}): ${result.stderr}`);
-    }
-  });
-}
+ns = ${JSON.stringify(TEST_NS)}
+secret = ${JSON.stringify(TEST_SECRET_NAME)}
+ssh = {ns: secret}
 
-function isSSHKeyConfiguredForTestNS($section: JQuery): boolean {
-  const text = $section.text();
-  return text.includes(TEST_NS) && text.includes(TEST_SECRET_NAME);
-}
+try:
+    user = json.loads(
+        subprocess.check_output(["oc", "get", "user", "~", "-o", "json"], text=True)
+    )
+except Exception:
+    user = {}
 
-function configureSSHSecret() {
-  cy.byLegacyTestID(SSH_SECTION).then(($section) => {
-    if ($section.find('[data-test-id="select-project-toggle"]').length === 0) {
-      cy.contains('button', 'Add public SSH key to project').click();
-    }
-  });
+meta = user.get("metadata") or {}
+user_key = meta.get("uid") or re.sub(r"[^-._a-zA-Z0-9]+", "-", meta.get("name") or "")
 
-  cy.get('[data-test-id="select-project-toggle"]', { timeout: 30000 }).click();
-  cy.get(`[data-test-id="select-option-${TEST_NS}"]`, { timeout: 60000 }).click({ force: true });
+cm = json.loads(
+    subprocess.check_output(
+        [
+            "oc",
+            "get",
+            "configmap",
+            "kubevirt-user-settings",
+            "-n",
+            "openshift-cnv",
+            "-o",
+            "json",
+        ],
+        text=True,
+    )
+)
+data = cm.setdefault("data", {})
+keys = set(data)
+if user_key:
+    keys.add(user_key)
 
-  cy.contains('button.project-ssh-row__secret-name', 'Not configured', { timeout: 10000 }).click();
-  cy.get(useExisting).click();
-  cy.get(selectSecret).click();
-  cy.byButtonText(TEST_SECRET_NAME).click();
-  cy.clickSaveBtn();
+for key in keys:
+    try:
+        settings = json.loads(data.get(key) or "{}")
+    except Exception:
+        settings = {}
+    settings["ssh"] = ssh
+    data[key] = json.dumps(settings)
+
+subprocess.run(
+    ["oc", "apply", "-f", "-"],
+    input=json.dumps(cm),
+    text=True,
+    check=True,
+)
+print(f"configured ssh for keys={sorted(keys)} -> {ssh}", file=sys.stderr)
+`;
+
+  cy.writeFile(scriptPath, script);
+  cy.exec(`python3 ${scriptPath}`);
 }
 
 describe('Cluster Test Preparation', () => {
@@ -59,26 +86,30 @@ describe('Cluster Test Preparation', () => {
   });
 
   it('configure public ssh key', () => {
-    clearStaleSSHSettings();
-    cy.visitSettingsVirt();
-    cy.byButtonText('User').click();
+    cy.exec(`oc get secret ${TEST_SECRET_NAME} -n ${TEST_NS}`, { failOnNonZeroExit: false }).then(
+      (result) => {
+        if (result.code !== 0) {
+          cy.exec(
+            `oc create secret generic ${TEST_SECRET_NAME} -n ${TEST_NS} ` +
+              `--from-file=key=./fixtures/rsa.pub`,
+          );
+        }
+      },
+    );
+
+    configureSSHSecretViaOc();
+
+    // Visit Settings to verify the mapping is reflected in the UI.
+    cy.visit('/k8s/all-namespaces/virtualization-settings/user');
     cy.url().then((currentUrl) => {
       const baseUrl = currentUrl.split('#')[0];
       cy.visit(`${baseUrl}#ssh-keys`);
     });
 
-    cy.contains(authSSHKey, { timeout: 30000 }).should('be.visible');
-    cy.byLegacyTestID(SSH_SECTION).should('be.visible');
-
-    cy.byLegacyTestID(SSH_SECTION).then(($section) => {
-      if (isSSHKeyConfiguredForTestNS($section)) {
-        cy.task('log', `SSH secret already configured for ${TEST_NS}`);
-      } else {
-        configureSSHSecret();
-      }
-    });
-
-    cy.contains('button.project-ssh-row__secret-name', TEST_SECRET_NAME).should('exist');
+    cy.contains(authSSHKey, { timeout: 60000 }).should('be.visible');
+    cy.contains('button.project-ssh-row__secret-name', TEST_SECRET_NAME, {
+      timeout: 60000,
+    }).should('exist');
   });
 
   it('create example VM', () => {

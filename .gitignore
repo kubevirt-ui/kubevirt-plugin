@@ -2,10 +2,15 @@
 npm-debug.log
 dist
 **/.env
+.env.local
 /coverage
 /gui-test-screenshots
 cypress/gui-test-screenshots
 cypress/cypress-a11y-report.json
+# Playwright - ignore all test results (artifacts, traces, reports)
+playwright/test-results/
+playwright/.auth/
+.playwright-mcp
 .DS_Store
 .devcontainer/dev.env
 console-extensions.md

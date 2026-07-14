@@ -28,9 +28,10 @@ describe('Test Cluster General settings', () => {
     });
 
     it('verify live migration limits in HCO', () => {
-      const maxPerCluster = '.spec.liveMigrationConfig.parallelMigrationsPerCluster';
-      const maxPerNode = '.spec.liveMigrationConfig.parallelOutboundMigrationsPerNode';
-      const spec = '.spec.liveMigrationConfig';
+      const maxPerCluster = '.spec.virtualization.liveMigrationConfig.parallelMigrationsPerCluster';
+      const maxPerNode =
+        '.spec.virtualization.liveMigrationConfig.parallelOutboundMigrationsPerNode';
+      const spec = '.spec.virtualization.liveMigrationConfig';
       const cmd = `oc get -n ${CNV_NS} hyperconverged kubevirt-hyperconverged -o jsonpath='{${spec}}'`;
       cy.exec(cmd).then((res) => {
         cy.task('log', res.stdout);
@@ -44,9 +45,15 @@ describe('Test Cluster General settings', () => {
     it('set memory density', () => {
       cy.contains('Memory density').click();
       cy.wait(3 * SECOND);
-      cy.get('[data-test-id="memory-density"]').check({ force: true });
-      cy.wait(10 * SECOND);
-      cy.contains('Current memory density').click();
+      // Click the visible PF Switch (not the hidden input) so React onChange fires in CI.
+      cy.get('#memory-density-feature')
+        .find('input.pf-v6-c-switch__input')
+        .then(($input) => {
+          if (!$input.is(':checked')) {
+            cy.get('#memory-density-feature').find('.pf-v6-c-switch').click();
+          }
+        });
+      cy.contains('Current memory density', { timeout: 30000 }).should('be.visible').click();
       cy.wait(SECOND);
       cy.get('[data-test-id="memory-density-slider"]')
         .find('input[type="number"]')
@@ -55,15 +62,28 @@ describe('Test Cluster General settings', () => {
         .type(MEMORY_DENSITY_VALUE);
       cy.contains('Requested memory density').click();
       cy.get('[data-test-id="memory-density-save-button"]').click({ force: true });
+      cy.contains(`Current memory density: ${MEMORY_DENSITY_VALUE}%`, {
+        timeout: 30000,
+      }).should('be.visible');
     });
 
     it('verify higherWorkloadDensity in HCO', () => {
-      const percentage = '.spec.higherWorkloadDensity.memoryOvercommitPercentage';
+      const percentage = '.spec.virtualization.higherWorkloadDensity.memoryOvercommitPercentage';
       cy.checkHCOSpec(percentage, MEMORY_DENSITY_VALUE, true);
     });
 
     it('disable memory density', () => {
-      cy.get('[data-test-id="memory-density"]').uncheck({ force: true });
+      // Wait until UI reflects HCO value > 100% so the confirm modal path is taken.
+      cy.contains(`Current memory density: ${MEMORY_DENSITY_VALUE}%`, {
+        timeout: 30000,
+      }).should('be.visible');
+      // Switch sits above the slider; after scrolling to density controls it is often
+      // clipped by ExpandableSection overflow, so scroll back and force-click.
+      cy.get('#memory-density-feature').scrollIntoView();
+      cy.get('#memory-density-feature')
+        .find('.pf-v6-c-switch')
+        .scrollIntoView()
+        .click({ force: true });
       cy.get('[data-test-id="memory-density-disable-confirm-button"]', { timeout: 30000 })
         .should('be.visible')
         .click();
@@ -71,7 +91,7 @@ describe('Test Cluster General settings', () => {
     });
 
     it('verify higherWorkloadDensity in HCO', () => {
-      const percentage = '.spec.higherWorkloadDensity.memoryOvercommitPercentage';
+      const percentage = '.spec.virtualization.higherWorkloadDensity.memoryOvercommitPercentage';
       cy.checkHCOSpec(percentage, '100', true);
     });
   });
