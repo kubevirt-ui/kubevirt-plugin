@@ -49,8 +49,9 @@ if [[ -z "${PROJECT}" ]]; then
   echo ""
   echo "Available projects:"
   echo "  Gating                 Gating specs (scenario infrastructure)"
+  echo "  Tier1                  Tier 1 specs (scenario infrastructure)"
   echo "  migration-gating       Migration gating specs"
-  echo "  migration-tier1        Tier 1 specs"
+  echo "  migration-tier1        Migration tier 1 specs"
   echo "  migration-tier2        Tier 2 specs"
   echo "  migration-nonpriv      Non-privileged user specs"
   echo "  migration-migrations   Migration specs"
@@ -74,6 +75,7 @@ EXTRA_ARGS=("$@")
 if [[ "${PROJECT}" == "all" ]]; then
   PROJECTS=(
     Gating
+    Tier1
     migration-gating
     migration-tier1
     migration-tier2

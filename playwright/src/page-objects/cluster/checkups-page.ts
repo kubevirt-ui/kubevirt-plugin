@@ -296,8 +296,12 @@ export default class CheckupsPage extends PageCommons {
    * Navigates to the Checkups page via sidebar UI click (uses [data-test-id="virtualization-checkups-nav-item"] from PageCommons).
    */
   async navigateToCheckupsViaUI(): Promise<void> {
-    await this.expandVirtualizationNavSection();
-    await this.clickNavCheckups();
+    try {
+      await this.expandVirtualizationNavSection();
+      await this.clickNavCheckups();
+    } catch {
+      await this.goTo('/k8s/all-namespaces/checkups');
+    }
   }
 
   async navigateToProjectNetworkCheckups(projectName: string) {

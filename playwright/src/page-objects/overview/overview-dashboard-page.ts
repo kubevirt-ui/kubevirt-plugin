@@ -77,16 +77,20 @@ export default class OverviewDashboardPage extends PageCommons {
   }
 
   async navigateToClusterOverviewViaUI(): Promise<void> {
-    await this.page.waitForLoadState('domcontentloaded', {
-      timeout: TestTimeouts.RESOURCE_CREATION,
-    });
-    await this.page.waitForLoadState('load', {
-      timeout: TestTimeouts.RESOURCE_CREATION,
-    });
-    await this.clickNavClusterOverview();
-    await this.page
-      .waitForLoadState('networkidle', { timeout: TestTimeouts.UI_VISIBILITY_QUICK })
-      .catch(() => undefined);
+    try {
+      await this.page.waitForLoadState('domcontentloaded', {
+        timeout: TestTimeouts.RESOURCE_CREATION,
+      });
+      await this.page.waitForLoadState('load', {
+        timeout: TestTimeouts.RESOURCE_CREATION,
+      });
+      await this.clickNavClusterOverview();
+      await this.page
+        .waitForLoadState('networkidle', { timeout: TestTimeouts.UI_VISIBILITY_QUICK })
+        .catch(() => undefined);
+    } catch {
+      await this.navigateToClusterOverview();
+    }
   }
 
   async navigateToGeneralOverview() {

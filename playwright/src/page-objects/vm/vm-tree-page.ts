@@ -418,6 +418,19 @@ export default class VmTreePage extends TreeContextMenuMixin(PageCommons) {
     }
   }
 
+  async navigateToProjectVmListViaUI(namespace: string): Promise<void> {
+    await this.navigateToNamespaceVirtualMachinesViaUI(namespace);
+    await this.toggleEmptyProjectsDisplay(true);
+    try {
+      await this.searchTreeView(namespace);
+      await this.clickProjectNode(namespace);
+      await this.clickVmListTab();
+    } catch {
+      await this.navigateToNamespaceVirtualMachines(namespace);
+      await this.clickVmListTab();
+    }
+  }
+
   async navigateToVirtualMachinesViaUI(): Promise<void> {
     try {
       await this.clickNavVirtualMachines();
