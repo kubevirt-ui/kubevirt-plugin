@@ -162,13 +162,24 @@ export class SettingsPage {
   async restoreMemoryRequestRatioDefault() {
     await this.openSection(GENERAL_SETTINGS_SECTION);
     await this.openSection('Memory request ratio');
+
     const restoreButton = byTestId(this.page, MEMORY_REQUEST_RATIO_RESTORE_BUTTON);
-    if (await restoreButton.isVisible()) {
-      await restoreButton.click();
-      await byTestId(this.page, MEMORY_REQUEST_RATIO_SAVE_BUTTON).click({ force: true });
-      await expect(byTestId(this.page, MEMORY_REQUEST_RATIO_SAVE_BUTTON)).toBeHidden({
-        timeout: NAV_TIMEOUT,
+    const saveButton = byTestId(this.page, MEMORY_REQUEST_RATIO_SAVE_BUTTON);
+
+    if (!(await restoreButton.isVisible())) {
+      const minusButton = byTestId(this.page, MEMORY_REQUEST_RATIO_INPUT).getByRole('button', {
+        name: 'Decrease ratio',
       });
+      await expect(minusButton).toBeVisible({ timeout: SHORT_TIMEOUT });
+      await minusButton.click();
+    }
+
+    await expect(restoreButton).toBeVisible({ timeout: SHORT_TIMEOUT });
+    await restoreButton.click();
+
+    if (await saveButton.isVisible()) {
+      await saveButton.click();
+      await expect(saveButton).toBeHidden({ timeout: NAV_TIMEOUT });
     }
   }
 
@@ -191,12 +202,32 @@ export class SettingsPage {
     await this.openMemoryRequestRatioSection();
     const input = byTestId(this.page, MEMORY_REQUEST_RATIO_INPUT).locator('input[type="number"]');
     await expect(input).toBeVisible({ timeout: SHORT_TIMEOUT });
-    await input.dblclick();
-    await input.fill(value);
-    await byTestId(this.page, MEMORY_REQUEST_RATIO_SAVE_BUTTON).click({ force: true });
-    await expect(byTestId(this.page, MEMORY_REQUEST_RATIO_SAVE_BUTTON)).toBeHidden({
-      timeout: NAV_TIMEOUT,
-    });
+
+    const currentValue = parseInt(await input.inputValue(), 10);
+    const targetValue = parseInt(value, 10);
+    const diff = targetValue - currentValue;
+
+    if (diff === 0) {
+      return;
+    }
+
+    const button =
+      diff > 0
+        ? byTestId(this.page, MEMORY_REQUEST_RATIO_INPUT).getByRole('button', {
+            name: 'Increase ratio',
+          })
+        : byTestId(this.page, MEMORY_REQUEST_RATIO_INPUT).getByRole('button', {
+            name: 'Decrease ratio',
+          });
+    for (let i = 0; i < Math.abs(diff); i++) {
+      await button.click();
+    }
+    await expect(input).toHaveValue(value, { timeout: SHORT_TIMEOUT });
+
+    const saveButton = byTestId(this.page, MEMORY_REQUEST_RATIO_SAVE_BUTTON);
+    await expect(saveButton).toBeVisible({ timeout: SHORT_TIMEOUT });
+    await saveButton.click();
+    await expect(saveButton).toBeHidden({ timeout: NAV_TIMEOUT });
   }
 
   async sshSectionText(sectionTestId: string): Promise<string> {
