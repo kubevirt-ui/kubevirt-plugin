@@ -1,0 +1,29 @@
+name: Setup GitHub Scripts
+description: Checkout PR validation scripts and install npm dependencies
+
+inputs:
+  ref:
+    description: Git ref to checkout scripts from (typically the PR base branch)
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Checkout scripts
+      uses: actions/checkout@v7
+      with:
+        ref: ${{ inputs.ref }}
+        sparse-checkout: .github/scripts
+        persist-credentials: false
+
+    - name: Setup Node
+      uses: actions/setup-node@v6
+      with:
+        node-version: '22'
+        cache: npm
+        cache-dependency-path: .github/scripts/package-lock.json
+
+    - name: Install script dependencies
+      shell: bash
+      working-directory: .github/scripts
+      run: npm ci

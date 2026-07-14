@@ -128,7 +128,7 @@ export const formatValidationComment = (
   if (!allPassed) {
     lines.push('---');
     lines.push(
-      '> Fix the issues above in Jira, then push a new commit or re-edit the PR title to re-run validation.',
+      '> Fix the issues above in Jira, then push a new commit or comment `/recheck-jira` on this PR.',
     );
   }
 
