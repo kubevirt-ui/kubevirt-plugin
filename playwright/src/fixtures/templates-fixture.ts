@@ -8,8 +8,10 @@
  */
 
 import { withSafeActions } from '@/page-objects/base-page';
+import CreateVmPage from '@/page-objects/create-vm/create-vm-page';
 import TemplateDetailPage from '@/page-objects/create-vm/template-detail-page';
 import TemplatesPage from '@/page-objects/create-vm/templates-page';
+import OverviewPage from '@/page-objects/overview/overview-page';
 import PageCommons from '@/page-objects/page-commons';
 import VirtualMachineDetailPage from '@/page-objects/vm/virtual-machine-detail-page';
 import VirtualMachinesPage from '@/page-objects/vm/virtual-machines-page';
@@ -20,6 +22,8 @@ import VmWizardNavigationPage from '@/page-objects/vm-wizard/vm-wizard-navigatio
 import { baseTest, expect } from './scenario-test-fixture';
 
 interface TemplatesFixtures {
+  createVmPage: CreateVmPage;
+  overviewPage: OverviewPage;
   templatesPage: TemplatesPage;
   templateDetailPage: TemplateDetailPage;
   vmTreePage: VmTreePage;
@@ -31,6 +35,12 @@ interface TemplatesFixtures {
 }
 
 const test = baseTest.extend<TemplatesFixtures>({
+  createVmPage: async ({ page }, use) => {
+    await use(withSafeActions(new CreateVmPage(page)));
+  },
+  overviewPage: async ({ page }, use) => {
+    await use(withSafeActions(new OverviewPage(page)));
+  },
   templatesPage: async ({ page }, use) => {
     await use(withSafeActions(new TemplatesPage(page)));
   },

@@ -109,6 +109,11 @@ const _test = base.extend<TestFixtures, WorkerFixtures>({
   // eslint-disable-next-line no-empty-pattern
   _autoResourceCheck: [
     async ({}, use) => {
+      if (EnvVariables.isHcE2e) {
+        await use();
+        return;
+      }
+
       await waitForNamespaceReady(undefined, TestTimeouts.DEFAULT, EnvVariables.isDebugMode);
 
       if (EnvVariables.isResourceCheckEnabled) {
@@ -135,6 +140,15 @@ const _test = base.extend<TestFixtures, WorkerFixtures>({
 
   _autoVirtNavigation: [
     async ({ page }, use) => {
+      if (EnvVariables.isHcE2e) {
+        await page.goto(EnvVariables.webConsoleUrl, {
+          waitUntil: 'domcontentloaded',
+          timeout: TestTimeouts.NAVIGATION,
+        });
+        await use();
+        return;
+      }
+
       const baseUrl = EnvVariables.webConsoleUrl;
       const maxRetries = 2;
       const consoleStabilizationMs = 2500;

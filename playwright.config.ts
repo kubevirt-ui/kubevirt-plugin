@@ -5,9 +5,12 @@ import * as dotenv from 'dotenv';
 
 dotenv.config({ path: path.resolve(__dirname, '.env'), quiet: true });
 
-import { env } from './playwright/utils/env';
-
-export const baseURL = env.baseURL;
+export const baseURL = (() => {
+  const addr =
+    process.env.WEB_CONSOLE_URL || process.env.BRIDGE_BASE_ADDRESS || 'http://localhost:9000';
+  const basePath = process.env.BRIDGE_BASE_PATH ?? '/';
+  return `${addr}${basePath}`.replace(/\/$/, '');
+})();
 
 const chromeArgs = [
   '--ignore-certificate-errors',
@@ -51,6 +54,15 @@ export default defineConfig({
       name: 'Gating',
       retries: 0,
       testDir: './playwright/tests/gating',
+      use: migrationUse,
+    },
+
+    // ── Tier1 project (scenario infrastructure) ────────────────────
+    {
+      fullyParallel: false,
+      name: 'Tier1',
+      retries: 0,
+      testDir: './playwright/tests/tier1',
       use: migrationUse,
     },
 

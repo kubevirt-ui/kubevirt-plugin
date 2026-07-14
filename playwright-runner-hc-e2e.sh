@@ -6,7 +6,7 @@
 # Differences from playwright-runner.sh:
 #   • Exports HC_E2E=true so global setup uses the in-cluster / SA-token auth
 #     flow and skips browser OAuth login.
-#   • Includes the Gating project (scenario infrastructure).
+#   • Includes the Gating and Tier1 projects (scenario infrastructure).
 #   • Supports IS_LOCAL=1 for localhost development (oc login + localhost:9000).
 #
 # Usage:
@@ -83,8 +83,9 @@ if [[ -z "${PROJECT}" ]]; then
   echo ""
   echo "Available projects:"
   echo "  Gating                 Gating specs (scenario infrastructure)"
+  echo "  Tier1                  Tier 1 specs (scenario infrastructure)"
   echo "  migration-gating       Migration gating specs"
-  echo "  migration-tier1        Tier 1 specs"
+  echo "  migration-tier1        Migration tier 1 specs"
   echo "  migration-tier2        Tier 2 specs"
   echo "  migration-nonpriv      Non-privileged user specs"
   echo "  migration-migrations   Migration specs"
@@ -116,6 +117,7 @@ EXTRA_ARGS=("$@")
 if [[ "${PROJECT}" == "all" ]]; then
   PROJECTS=(
     Gating
+    Tier1
     migration-gating
     migration-tier1
     migration-tier2
