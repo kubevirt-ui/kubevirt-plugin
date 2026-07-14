@@ -3,6 +3,7 @@ import { JiraClient } from '../jira-client';
 import {
   extractVersionNumber,
   fixVersionMatchesBranch,
+  parseVersionToNumber,
   suggestBranchForFixVersion,
 } from '../version-utils';
 import { JIRA_BASE_URL, MIN_STORY_POINTS, REQUIRED_COMPONENT } from '../types/index';
@@ -36,6 +37,14 @@ export const validateTicket = async (
   });
 
   const fixVersions = issue.fields.fixVersions;
+  if (fixVersions.length > 1) {
+    checks.push({
+      name: 'Fix Version Count',
+      passed: false,
+      message: `Ticket has ${fixVersions.length} fix versions (${fixVersions.map((fv) => fv.name).join(', ')}). Only 1 fix version is allowed per ticket.`,
+    });
+  }
+
   if (fixVersions.length === 0) {
     checks.push({
       name: 'Fix Version',
@@ -43,12 +52,20 @@ export const validateTicket = async (
       message: 'No fix version is set on the ticket',
     });
   } else if (expectedVersion) {
-    const hasMatch = fixVersions.some((fv) => fixVersionMatchesBranch(fv, expectedVersion));
+    const isMain = baseBranch === 'main';
+    const hasMatch = fixVersions.some((fv) => {
+      if (!isMain) return fixVersionMatchesBranch(fv, expectedVersion);
+      const fvVersion = extractVersionNumber(fv.name);
+      if (!fvVersion) return false;
+      return parseVersionToNumber(fvVersion) >= parseVersionToNumber(expectedVersion);
+    });
     if (hasMatch) {
       checks.push({
         name: 'Fix Version',
         passed: true,
-        message: `Fix version matches target branch \`${baseBranch}\` (expected: ${expectedVersion})`,
+        message: isMain
+          ? `Fix version is valid for \`main\` (>= ${expectedVersion})`
+          : `Fix version matches target branch \`${baseBranch}\` (expected: ${expectedVersion})`,
       });
     } else {
       const fvNames = fixVersions.map((fv) => fv.name).join(', ');
@@ -62,7 +79,9 @@ export const validateTicket = async (
       checks.push({
         name: 'Fix Version',
         passed: false,
-        message: `Fix version "${fvNames}" (version ${fvVersion}) does not match PR target branch \`${baseBranch}\` (expected: ${expectedVersion})${suggestion}`,
+        message: isMain
+          ? `Fix version "${fvNames}" (version ${fvVersion}) is below the minimum for \`main\` (>= ${expectedVersion})${suggestion}`
+          : `Fix version "${fvNames}" (version ${fvVersion}) does not match PR target branch \`${baseBranch}\` (expected: ${expectedVersion})${suggestion}`,
       });
     }
   } else {

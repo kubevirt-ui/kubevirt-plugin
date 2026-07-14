@@ -17,7 +17,7 @@ export const extractVersionNumber = (text: string): string | null => {
 };
 
 /** Convert "4.21" to a comparable integer for sorting. */
-const parseVersionToNumber = (version: string): number => {
+export const parseVersionToNumber = (version: string): number => {
   const [major, minor] = version.split('.').map(Number);
   return (major ?? 0) * 100000 + (minor ?? 0);
 };
