@@ -346,11 +346,9 @@ jobs:
       runner_label: ${{ inputs.runner_label || needs.prepare.outputs.cluster_name }}
       cluster_name: ${{ needs.prepare.outputs.cluster_name }}
       cnv_pin_version: ${{ needs.prepare.outputs.cnv_pin_version }}
-      # pr_number takes priority inside hot-cluster-e2e-run.yml itself (it
-      # merges the PR's head fresh onto the current base tip there); else
-      # base_ref tests that branch, or empty falls through to PR head/github.ref.
-      checkout_ref: ${{ inputs.base_ref || '' }}
-      pr_number: ${{ inputs.pr_number }}
+      # Priority: pr_number merges with current base tip; base_ref alone
+      # tests that branch; else empty (falls through to PR head/github.ref).
+      checkout_ref: ${{ inputs.pr_number != '' && format('refs/pull/{0}/merge', inputs.pr_number) || inputs.base_ref || '' }}
       is_reusable_call: true
       progress_status_sha: ${{ needs.progress-check-running-tests.outputs.head-sha }}
       progress_status_context: ${{ needs.progress-check-running-tests.outputs.status-context }}

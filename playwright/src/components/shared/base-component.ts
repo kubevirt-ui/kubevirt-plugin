@@ -193,6 +193,17 @@ export default class BaseComponent {
     await this.robustClick(templateCard, { waitForState: 'attached' });
   }
 
+  async collapseSidebarIfExpanded(): Promise<void> {
+    const expanded = this.page.locator('#page-sidebar:not(.pf-m-collapsed)');
+    if (await expanded.count().catch(() => 0)) {
+      await this.page
+        .getByRole('button', { name: 'Side navigation toggle' })
+        .click({ timeout: 3000 })
+        .catch(() => {});
+      await this.page.waitForTimeout(300);
+    }
+  }
+
   protected async goTo(url: string) {
     await this.page.goto(url, { timeout: TestTimeouts.NAVIGATION });
     await this.waitForLoadingComplete(TestTimeouts.UI_DELAY_MEDIUM);

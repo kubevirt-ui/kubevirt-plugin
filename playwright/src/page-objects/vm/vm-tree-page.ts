@@ -407,12 +407,28 @@ export default class VmTreePage extends TreeContextMenuMixin(PageCommons) {
     await this.goTo(`/k8s/ns/${projectName}/kubevirt.io~v1~VirtualMachine`);
   }
 
+  async navigateToProjectVmList(namespace: string): Promise<void> {
+    try {
+      await this.searchTreeView(namespace);
+      await this.clickProjectNode(namespace);
+      await this.clickVmListTab();
+    } catch {
+      await this.navigateToNamespaceVirtualMachines(namespace);
+      await this.clickVmListTab();
+    }
+  }
+
   async navigateToVirtualMachinesViaUI(): Promise<void> {
     try {
       await this.clickNavVirtualMachines();
     } catch {
       await this.navigateToAllNamespacesVirtualMachines();
     }
+  }
+
+  async navigateToVmsWithEmptyProjects(namespace: string): Promise<void> {
+    await this.navigateToNamespaceVirtualMachinesViaUI(namespace);
+    await this.toggleEmptyProjectsDisplay(true);
   }
 
   async navigateToVmViaTreeView(namespace: string, vmName: string): Promise<void> {

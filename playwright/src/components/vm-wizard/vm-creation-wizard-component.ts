@@ -466,13 +466,13 @@ export default class VmCreationWizardComponent extends BaseComponent {
     return this.clone.selectCloneSourceVm(vmName);
   }
 
-  // ============================================================================
-  // Step 8 — Review and Create
-  // ============================================================================
-
   async selectComputeSize(sizeName: string): Promise<void> {
     return this.compute.selectComputeSize(sizeName);
   }
+
+  // ============================================================================
+  // Step 8 — Review and Create
+  // ============================================================================
 
   async selectComputeTab(tab: 'redhat' | 'user'): Promise<void> {
     return this.compute.selectComputeTab(tab);
@@ -487,6 +487,10 @@ export default class VmCreationWizardComponent extends BaseComponent {
   ): Promise<void> {
     const tab = this.locator(`button[role="tab"]:has-text("${tabName}")`);
     await this.robustClick(tab.first());
+  }
+
+  async selectFirstAvailableBootVolume(): Promise<void> {
+    return this.bootSource.selectFirstAvailableBootVolume();
   }
 
   async selectInstanceTypeSeries(series: 'cx' | 'd' | 'u' | 'm' | 'n' | 'o' | 'rt'): Promise<void> {

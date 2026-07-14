@@ -46,16 +46,9 @@ on:
       checkout_ref:
         description: |
           Ref/SHA to check out for the code under test. Leave empty for
-          the default (PR head SHA, or the triggering ref). Ignored when
-          pr_number is set.
-        required: false
-        default: ''
-        type: string
-      pr_number:
-        description: |
-          PR number to merge fresh on top of the current base tip (used
-          by hot-cluster-e2e.yml's pr_number retest path). Leave empty
-          for a plain checkout_ref/PR-head dispatch.
+          the default (PR head SHA, or the triggering ref). Set to
+          refs/pull/<N>/merge to test a PR merged with the current base
+          tip (used by hot-cluster-e2e.yml's pr_number retest path).
         required: false
         default: ''
         type: string
@@ -107,16 +100,9 @@ on:
       checkout_ref:
         description: |
           Ref/SHA to check out for the code under test. Leave empty for
-          the default (PR head SHA, or the triggering ref). Ignored when
-          pr_number is set.
-        type: string
-        required: false
-        default: ''
-      pr_number:
-        description: |
-          PR number to merge fresh on top of the current base tip (used
-          by hot-cluster-e2e.yml's pr_number retest path). Leave empty
-          for a plain checkout_ref/PR-head dispatch.
+          the default (PR head SHA, or the triggering ref). Set to
+          refs/pull/<N>/merge to test a PR merged with the current base
+          tip (used by hot-cluster-e2e.yml's pr_number retest path).
         type: string
         required: false
         default: ''
@@ -170,14 +156,14 @@ jobs:
     outputs:
       kubevirt-plugin-image: ${{ env.KUBEVIRT_PLUGIN_IMAGE }}
     steps:
-      # pr_number (set for a main-push retest) merges the PR's actual head
-      # fresh onto the current base tip -- see the action's own comment for
-      # why this can't just be checkout_ref: refs/pull/<N>/merge.
+      # checkout_ref (set to refs/pull/<N>/merge for a main-push retest)
+      # takes priority over the PR's own head SHA.
       - name: Checkout
-        uses: kubevirt-ui/kubevirt-plugin/.github/actions/hot-cluster/checkout-for-retest@main
+        uses: actions/checkout@v7
         with:
-          checkout-ref: ${{ inputs.checkout_ref }}
-          pr-number: ${{ inputs.pr_number }}
+          ref: ${{ inputs.checkout_ref || github.event.pull_request.head.sha || github.ref }}
+          allow-unsafe-pr-checkout: true
+          persist-credentials: false
 
       - name: Check if kubevirt-plugin image exists in registry
         id: check_image
@@ -399,16 +385,16 @@ jobs:
             echo ""
           } | tee -a "$GITHUB_STEP_SUMMARY"
 
-      # Pinned to @main (not local ./) since checkout_ref can point at a
-      # release branch predating this CI infra, or nothing may be checked
-      # out yet. Both this and the actions below it are self-contained, so
-      # pinning to main is safe either way.
       - name: Checkout
-        uses: kubevirt-ui/kubevirt-plugin/.github/actions/hot-cluster/checkout-for-retest@main
+        uses: actions/checkout@v7
         with:
-          checkout-ref: ${{ inputs.checkout_ref }}
-          pr-number: ${{ inputs.pr_number }}
+          ref: ${{ inputs.checkout_ref || github.event.pull_request.head.sha || github.ref }}
+          allow-unsafe-pr-checkout: true
+          persist-credentials: false
 
+      # Pinned to @main (not local ./) since checkout_ref can point at a
+      # release branch predating this CI infra. Both actions are
+      # self-contained, so pinning to main is safe either way.
       - name: Provision CI test environment
         id: ci-env
         uses: kubevirt-ui/kubevirt-plugin/.github/actions/ci-env-request@main
@@ -520,11 +506,7 @@ jobs:
               npm run test-cypress-headless -- --spec tests/gating.cy.ts
             fi
           else
-            if [[ "${TEST_PROJECT}" == "features" ]]; then
-              npm run test-playwright-headless -- --project=features
-            else
-              npm run test-playwright-headless -- --project=gating
-            fi
+            ./playwright-runner-hc-e2e.sh Gating
           fi
 
       - name: Upload test artifacts

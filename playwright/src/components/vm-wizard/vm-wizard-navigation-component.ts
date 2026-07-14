@@ -97,6 +97,7 @@ export default class VmWizardNavigationComponent extends BaseComponent {
   }
 
   async clickCreateVm(): Promise<void> {
+    await this.collapseSidebarIfExpanded();
     const createBtn = this._pfV6CWizardButtonpfV6CButtonpfMPrimary;
     await createBtn.first().waitFor({
       state: 'visible',
@@ -116,6 +117,7 @@ export default class VmWizardNavigationComponent extends BaseComponent {
   }
 
   async clickNext(): Promise<void> {
+    await this.collapseSidebarIfExpanded();
     const nextButton = this._pfV6CWizardButtonpfV6CButtonpfMPrimary;
     await nextButton.first().waitFor({
       state: 'visible',
@@ -346,6 +348,7 @@ export default class VmWizardNavigationComponent extends BaseComponent {
   }
 
   async openWizardFromCreateDropdown(): Promise<void> {
+    await this.collapseSidebarIfExpanded();
     const welcomeModal = this.page
       .getByRole('dialog', { name: /Welcome/i })
       .or(this.locator('#guided-tour-modal'));

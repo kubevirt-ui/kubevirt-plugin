@@ -21,7 +21,10 @@ export function getClusterTeardownRules(): TeardownRule[] {
       guard: (ctx) => ctx.shouldCleanupClusterResources,
       run: async (ctx) => {
         try {
-          if (!ctx.k8sClient) return;
+          if (!ctx.k8sClient) {
+            logger.warn('⚠️ No Kubernetes client — skipping migration policy cleanup');
+            return;
+          }
           const k8sClient = ctx.k8sClient;
           const group = 'migrations.kubevirt.io';
           const version = 'v1alpha1';
@@ -44,26 +47,123 @@ export function getClusterTeardownRules(): TeardownRule[] {
             'pw-form-existence-check-',
             'pw-policy-yaml-',
             'pw-policy-form-',
+            'test-migration-policy-',
+            'smoke-migration-policy-',
+            'minimal-migration-policy-',
+            'auto-converge-policy-',
+            'bandwidth-policy-',
+            'selector-policy-',
+            'edge-case-policy-',
+            'existence-check-policy-',
+            'complex-config-policy-',
+            'test-form-policy-',
+            'smoke-form-policy-',
+            'edge-case-form-policy-',
+            'minimal-form-policy-',
+            'form-existence-check-',
           ];
 
-          const items = await k8sClient.listClusterCustomResources(group, version, plural);
-
-          await Promise.allSettled(
-            items
-              .filter((p) => {
-                const name = p.metadata?.name;
-                return name && testPrefixes.some((pfx) => name.startsWith(pfx));
-              })
-              .map((p) => {
-                const name = p.metadata?.name;
-                if (!name) return Promise.resolve();
-                return k8sClient
-                  .deleteClusterCustomResource(group, version, plural, name)
-                  .catch(() => {});
-              }),
+          const migrationPolicies = await k8sClient.listClusterCustomResources(
+            group,
+            version,
+            plural,
           );
+
+          const deletionPromises = migrationPolicies
+            .filter((policy) => {
+              const name = policy.metadata?.name;
+              return name && testPrefixes.some((prefix) => name.startsWith(prefix));
+            })
+            .map((policy) => {
+              const name = policy.metadata?.name;
+              if (!name) return Promise.resolve();
+              return k8sClient
+                .deleteClusterCustomResource(group, version, plural, name)
+                .catch(() => {
+                  // Ignore deletion errors silently
+                });
+            });
+
+          await Promise.allSettled(deletionPromises);
         } catch {
-          // Ignore list/cleanup errors
+          // Ignore list/cleanup errors silently
+        }
+      },
+    },
+    {
+      id: 'cleanup-nncp',
+      name: 'Clean up NodeNetworkConfigurationPolicies',
+      scope: TeardownScope.CLUSTER,
+      onError: 'warn',
+      guard: (ctx) => ctx.shouldCleanupClusterResources,
+      run: async (ctx) => {
+        try {
+          if (!ctx.k8sClient) {
+            logger.warn('⚠️ No Kubernetes client — skipping NNCP cleanup');
+            return;
+          }
+          const k8sClient = ctx.k8sClient;
+          const group = 'nmstate.io';
+          const version = 'v1';
+          const plural = 'nodenetworkconfigurationpolicies';
+
+          const testPrefixes = [
+            'auto-test-',
+            'test-yaml-',
+            'physical-network-',
+            'pw-nncp-',
+            'pw-test-nncp-',
+            'pw-form-nncp-',
+            'pw-yaml-nncp-',
+          ];
+          try {
+            const nncps = await k8sClient.listClusterCustomResources(group, version, plural);
+
+            const matchingNNCPs = nncps.filter((nncp) => {
+              const name = nncp.metadata?.name;
+              if (!name) return false;
+              return testPrefixes.some((prefix) => name.startsWith(prefix));
+            });
+
+            if (matchingNNCPs.length === 0) {
+              logger.info('No test NNCPs to clean up');
+              return;
+            }
+
+            logger.info(`Cleaning up ${matchingNNCPs.length} NNCP(s)...`);
+
+            const deletionPromises = matchingNNCPs.map((nncp) => {
+              const name = nncp.metadata?.name;
+              if (!name) return Promise.resolve();
+              return k8sClient
+                .deleteClusterCustomResource(group, version, plural, name)
+                .then(() => {
+                  logger.info(`✓ Deleted NNCP: ${name}`);
+                })
+                .catch((error: unknown) => {
+                  const err = error as { statusCode?: number; message?: string };
+                  if (err.statusCode === 404) {
+                    logger.info(`✓ NNCP ${name} already deleted`);
+                  } else {
+                    safeWarn(`⚠️ Failed to delete NNCP ${name}`, error);
+                  }
+                });
+            });
+
+            await Promise.allSettled(deletionPromises);
+            logger.success('Completed NNCP cleanup');
+          } catch (error: unknown) {
+            const err = error as { statusCode?: number; message?: string };
+            if (err.statusCode === 404 || err.message?.includes('404')) {
+              logger.info(
+                'NodeNetworkConfigurationPolicy CRD not found - nmstate may not be installed. Skipping cleanup.',
+              );
+              return;
+            }
+            safeWarn('Failed to list NNCPs', error);
+          }
+        } catch (error: unknown) {
+          safeWarn('NNCP cleanup failed', error);
         }
       },
     },
@@ -75,7 +175,10 @@ export function getClusterTeardownRules(): TeardownRule[] {
       guard: (ctx) => ctx.shouldCleanupClusterResources,
       run: async (ctx) => {
         try {
-          if (!ctx.k8sClient) return;
+          if (!ctx.k8sClient) {
+            logger.warn('⚠️ No Kubernetes client — skipping cluster instance type cleanup');
+            return;
+          }
           const k8sClient = ctx.k8sClient;
           const group = 'instancetype.kubevirt.io';
           const version = 'v1beta1';
@@ -85,33 +188,39 @@ export function getClusterTeardownRules(): TeardownRule[] {
             'pw-standard-cluster-it-',
             'pw-high-perf-cluster-it-',
             'pw-test-cluster-instancetype-',
+            'cluster-instancetype-',
+            'standard-cluster-it-',
+            'high-perf-cluster-it-',
+            'test-cluster-instancetype-',
           ];
 
-          const items = await k8sClient.listClusterCustomResources(
+          const clusterInstanceTypes = await k8sClient.listClusterCustomResources(
             group,
             version,
             'virtualmachineclusterinstancetypes',
           );
 
-          await Promise.allSettled(
-            items
-              .filter((it) => {
-                const name = it.metadata?.name;
-                return name && clusterTestPrefixes.some((pfx) => name.startsWith(pfx));
-              })
-              .map((it) => {
-                const name = it.metadata?.name;
-                if (!name) return Promise.resolve();
-                return k8sClient
-                  .deleteClusterCustomResource(
-                    group,
-                    version,
-                    'virtualmachineclusterinstancetypes',
-                    name,
-                  )
-                  .catch(() => {});
-              }),
-          );
+          const deletionPromises = clusterInstanceTypes
+            .filter((instanceType) => {
+              const name = instanceType.metadata?.name;
+              return name && clusterTestPrefixes.some((prefix) => name.startsWith(prefix));
+            })
+            .map((instanceType) => {
+              const name = instanceType.metadata?.name;
+              if (!name) return Promise.resolve();
+              return k8sClient
+                .deleteClusterCustomResource(
+                  group,
+                  version,
+                  'virtualmachineclusterinstancetypes',
+                  name,
+                )
+                .catch(() => {
+                  // Ignore deletion errors
+                });
+            });
+
+          await Promise.allSettled(deletionPromises);
         } catch {
           // Ignore list errors
         }
@@ -122,10 +231,13 @@ export function getClusterTeardownRules(): TeardownRule[] {
       name: 'Restore HyperConverged settings',
       scope: TeardownScope.CLUSTER,
       onError: 'warn',
-      guard: (ctx) => ctx.shouldCleanupClusterResources,
+      guard: (ctx) => ctx.shouldCleanupClusterResources && !EnvVariables.isHcE2e,
       run: async (ctx) => {
         try {
-          if (!ctx.k8sClient) return;
+          if (!ctx.k8sClient) {
+            logger.warn('⚠️ No Kubernetes client — skipping HCO restore');
+            return;
+          }
           const k8sClient = ctx.k8sClient;
           const namespace = 'openshift-cnv';
           const hcoName = 'kubevirt-hyperconverged';
@@ -136,40 +248,57 @@ export function getClusterTeardownRules(): TeardownRule[] {
           } catch (getError: unknown) {
             const err = getError as { statusCode?: number; message?: string };
             if (err.statusCode === 404 || err.message?.includes('404')) {
-              logger.info('HCO CRD not found — CNV may not be installed. Skipping restoration.');
+              logger.info(
+                'HyperConverged CRD not found - CNV may not be installed. Skipping restoration.',
+              );
               return;
             }
             throw getError;
           }
 
-          if (!hco?.spec) return;
+          if (!hco || !hco.spec) {
+            logger.info('HCO resource not found or has no spec - skipping restoration');
+            return;
+          }
 
           const patchOps: Array<{ op: string; path: string; value?: unknown }> = [];
-          const spec = hco.spec as Record<string, unknown>;
 
-          if (
-            (spec.permittedHostDevices as Record<string, unknown>)?.passt &&
-            (
-              (spec.permittedHostDevices as Record<string, unknown>).passt as Record<
-                string,
-                unknown
-              >
-            )?.enabled === true
-          ) {
+          const spec = hco.spec as {
+            permittedHostDevices?: { passt?: { enabled?: boolean }; scsi?: { enabled?: boolean } };
+            ksmConfiguration?: unknown;
+          };
+
+          if (spec.permittedHostDevices?.passt?.enabled === true) {
             patchOps.push({
               op: 'replace',
               path: '/spec/permittedHostDevices/passt/enabled',
               value: false,
             });
+            logger.info('Restoring Passt binding setting to disabled');
+          }
+
+          if (spec.permittedHostDevices?.scsi?.enabled === true) {
+            patchOps.push({
+              op: 'replace',
+              path: '/spec/permittedHostDevices/scsi/enabled',
+              value: false,
+            });
+            logger.info('Restoring SCSI persistent reservation setting to disabled');
           }
 
           if (spec.ksmConfiguration) {
-            patchOps.push({ op: 'remove', path: '/spec/ksmConfiguration' });
+            patchOps.push({
+              op: 'remove',
+              path: '/spec/ksmConfiguration',
+            });
+            logger.info('Restoring KSM configuration (removing ksmConfiguration)');
           }
 
           if (patchOps.length > 0) {
             await k8sClient.patchHyperConverged(hcoName, namespace, patchOps);
             logger.success('✓ Restored hyperconverged settings to default state');
+          } else {
+            logger.info('No hyperconverged settings to restore');
           }
 
           if (await k8sClient.isNativeVmTemplateFeatureGateEnabled(hcoName, namespace)) {
@@ -178,7 +307,10 @@ export function getClusterTeardownRules(): TeardownRule[] {
           }
         } catch (error: unknown) {
           const err = error as { statusCode?: number; message?: string };
-          if (err.statusCode === 404 || err.message?.includes('404')) return;
+          if (err.statusCode === 404 || err.message?.includes('404')) {
+            logger.info('HyperConverged resource not available - skipping restoration.');
+            return;
+          }
           safeWarn('Failed to restore hyperconverged settings', error);
         }
       },
@@ -188,13 +320,17 @@ export function getClusterTeardownRules(): TeardownRule[] {
       name: 'Restore CNV global settings to defaults',
       scope: TeardownScope.CLUSTER,
       onError: 'warn',
-      guard: (ctx) => ctx.shouldCleanupClusterResources,
+      guard: (ctx) => ctx.shouldCleanupClusterResources && !EnvVariables.isHcE2e,
       run: async (ctx) => {
-        if (!ctx.k8sClient) return;
+        if (!ctx.k8sClient) {
+          logger.warn('⚠️ No Kubernetes client — skipping CNV settings restore');
+          return;
+        }
         const k8sClient = ctx.k8sClient;
         const hcoName = 'kubevirt-hyperconverged';
         const hcoNamespace = 'openshift-cnv';
 
+        // ── HCO: live migration limits and memory density ─────────────────────
         try {
           const hco = await k8sClient
             .getHyperConverged(hcoName, hcoNamespace)
@@ -210,19 +346,24 @@ export function getClusterTeardownRules(): TeardownRule[] {
 
             if (spec['liveMigrationConfig']) {
               patchOps.push({ op: 'remove', path: '/spec/liveMigrationConfig' });
+              logger.info('Restoring liveMigrationConfig to cluster default');
             }
+
             if (spec['higherWorkloadDensity']) {
               patchOps.push({ op: 'remove', path: '/spec/higherWorkloadDensity' });
+              logger.info('Restoring higherWorkloadDensity (memory density) to cluster default');
             }
+
             if (patchOps.length > 0) {
               await k8sClient.patchHyperConverged(hcoName, hcoNamespace, patchOps);
               logger.success('✓ Restored HCO live migration and memory density settings');
             }
           }
         } catch (error: unknown) {
-          safeWarn('Failed to restore HCO settings', error);
+          safeWarn('Failed to restore HCO live migration / memory density settings', error);
         }
 
+        // ── kubevirt-ui-features ConfigMap: all settings-test-modified keys ─────
         try {
           await k8sClient.patchConfigMap('kubevirt-ui-features', hcoNamespace, {
             hideYamlTab: 'false',
@@ -230,10 +371,14 @@ export function getClusterTeardownRules(): TeardownRule[] {
             hideCredentialsNonPrivileged: 'false',
             confirmVMActions: 'false',
           });
-          logger.success('✓ Restored kubevirt-ui-features ConfigMap to defaults');
+          logger.success(
+            '✓ Restored kubevirt-ui-features ConfigMap (hideYamlTab, guestSystemLog, hideCredentials, confirmVMActions → defaults)',
+          );
         } catch (error: unknown) {
           const err = error as { statusCode?: number };
-          if (err.statusCode !== 404) {
+          if (err.statusCode === 404) {
+            logger.info('kubevirt-ui-features ConfigMap not found — skipping');
+          } else {
             safeWarn('Failed to restore kubevirt-ui-features ConfigMap', error);
           }
         }
@@ -247,27 +392,52 @@ export function getClusterTeardownRules(): TeardownRule[] {
       guard: (ctx) => ctx.shouldCleanupClusterResources,
       run: async (ctx) => {
         try {
-          if (!ctx.k8sClient) return;
-          const coreApi = ctx.k8sClient.getCoreV1Api();
-          const namespaces = await coreApi.listNamespace();
-          if (!namespaces.items?.length) return;
+          if (!ctx.k8sClient) {
+            logger.warn('⚠️ No Kubernetes client — skipping test namespace deletion');
+            return;
+          }
+          const k8sClient = ctx.k8sClient;
 
-          const matching = namespaces.items.filter((ns) => {
+          const namespaces = await k8sClient.getCoreV1Api().listNamespace();
+
+          if (!namespaces.items || namespaces.items.length === 0) {
+            return;
+          }
+
+          const basePrefix = EnvVariables.testNamespace;
+          const matchingNamespaces = namespaces.items.filter((ns) => {
             const name = ns.metadata?.name;
-            return name && name.startsWith('pw-') && name !== ctx.testNamespace;
+            if (!name || name === ctx.testNamespace) return false;
+            return name === basePrefix || name.startsWith(`${basePrefix}-`);
           });
-          if (matching.length === 0) return;
 
-          logger.info(`Cleaning up ${matching.length} test namespace(s)...`);
-          await Promise.allSettled(
-            matching.map((ns) => {
-              const name = ns.metadata?.name;
-              if (!name) return Promise.resolve();
-              return coreApi
-                .deleteNamespace({ name })
-                .catch((e: unknown) => safeWarn(`⚠️ Failed to delete namespace ${name}`, e));
-            }),
-          );
+          if (matchingNamespaces.length === 0) {
+            logger.info('No test namespaces to clean up');
+            return;
+          }
+
+          logger.info(`Cleaning up ${matchingNamespaces.length} test namespace(s)...`);
+
+          const deletionPromises = matchingNamespaces.map((ns) => {
+            const name = ns.metadata?.name;
+            if (!name) return Promise.resolve();
+            return k8sClient
+              .getCoreV1Api()
+              .deleteNamespace({ name })
+              .then(() => {
+                logger.info(`✓ Deleted test namespace: ${name}`);
+              })
+              .catch((error: unknown) => {
+                const err = error as { statusCode?: number; message?: string };
+                if (err.statusCode === 404) {
+                  logger.info(`✓ Namespace ${name} already deleted`);
+                } else {
+                  safeWarn(`⚠️ Failed to delete namespace ${name}`, error);
+                }
+              });
+          });
+
+          await Promise.allSettled(deletionPromises);
           logger.success('Completed test namespace cleanup');
         } catch (error: unknown) {
           safeWarn('Failed to list namespaces', error);
@@ -281,7 +451,10 @@ export function getClusterTeardownRules(): TeardownRule[] {
       onError: 'warn',
       guard: () => EnvVariables.isNonPrivUser,
       run: async (ctx) => {
-        if (!ctx.k8sClient) return;
+        if (!ctx.k8sClient) {
+          logger.warn('⚠️ No Kubernetes client — skipping non-priv user cleanup');
+          return;
+        }
         const username = EnvVariables.testUsername;
         logger.info(`🧹 Removing non-priv user "${username}" and all associated resources...`);
         await removeNonPrivUser(
@@ -300,7 +473,10 @@ export function getClusterTeardownRules(): TeardownRule[] {
       onError: 'skip',
       guard: (ctx) => EnvVariables.isClusterJanitorEnabled && ctx.shouldCleanupClusterResources,
       run: async (ctx) => {
-        if (!ctx.k8sClient) return;
+        if (!ctx.k8sClient) {
+          logger.warn('⚠️ No Kubernetes client — skipping ClusterJanitor teardown sweep');
+          return;
+        }
         try {
           const janitor = new ClusterJanitor(ctx.k8sClient, {
             staleAgeMs: 0,

@@ -359,6 +359,7 @@ export default class BootableVolumesPage extends PageCommons {
   async navigateToBootableVolumesViaUI(): Promise<void> {
     await this.switchToVirtualizationPerspective();
     await this.clickNavBootableVolumes();
+    await this.page.waitForLoadState('domcontentloaded');
   }
   async navigateToBootableVolumesWithParams(params: string): Promise<void> {
     const basePath = '/k8s/all-namespaces/bootablevolumes';

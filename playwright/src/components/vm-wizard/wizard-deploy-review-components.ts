@@ -24,6 +24,7 @@ export class VmCreationWizardReviewComponent extends BaseComponent {
   }
 
   async clickCreateVm(): Promise<void> {
+    await this.collapseSidebarIfExpanded();
     const createBtn = this._pfV6CWizardButtonpfV6CButtonpfMPrimary;
     await createBtn.first().waitFor({
       state: 'visible',
@@ -298,6 +299,7 @@ export class VmCreationWizardDeploymentComponent extends BaseComponent {
   }
 
   async openWizardFromCreateDropdown(): Promise<void> {
+    await this.collapseSidebarIfExpanded();
     const createButton = this.locator(
       'button[aria-label="Create VirtualMachine"], [data-test="item-create"].pf-m-primary, .pf-m-primary > [data-test="item-create"], [data-test="vms-treeview"] [data-test="item-create"]',
     ).first();

@@ -583,8 +583,21 @@ export default class VirtualMachinesPage extends TreeContextMenuMixin(PageCommon
     return this.overviewWidgets.getVmTableMetricValues();
   }
 
+  async hasErrorBoundary(): Promise<boolean> {
+    return this.page
+      .locator(
+        '[data-test="error-boundary"], .pf-v6-c-empty-state--xs h4:has-text("Something went wrong")',
+      )
+      .isVisible()
+      .catch(() => false);
+  }
+
   async hasStatusButtonWithText(statusText: string, timeout?: number): Promise<boolean> {
     return this.listActions.hasStatusButtonWithText(statusText, timeout);
+  }
+
+  async hasTableRows(): Promise<boolean> {
+    return (await this.page.locator('tbody tr').count()) > 0;
   }
 
   override async hoverOverControlMenu(): Promise<void> {
@@ -757,6 +770,15 @@ export default class VirtualMachinesPage extends TreeContextMenuMixin(PageCommon
 
   async isTreeviewVisible(): Promise<boolean> {
     return this.tree.isTreeviewVisible();
+  }
+
+  async isVmListContentVisible(timeout?: number): Promise<boolean> {
+    return this.page
+      .locator('table tbody, [data-test="empty-state"], .pf-v6-c-empty-state')
+      .first()
+      .waitFor({ state: 'visible', timeout: timeout ?? TestTimeouts.UI_ELEMENT_VISIBILITY })
+      .then(() => true)
+      .catch(() => false);
   }
 
   async isVmNameHidden(vmName: string, timeout?: number): Promise<boolean> {

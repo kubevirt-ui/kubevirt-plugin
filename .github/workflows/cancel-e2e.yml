@@ -179,17 +179,11 @@ jobs:
             const body = wasRunning
               ? '🛑 Cancelled the in-progress Hot Cluster E2E run for this PR -- comment `/retest-e2e` for a fresh result.'
               : 'ℹ️ No Hot Cluster E2E run was in progress for this PR -- nothing to cancel.';
-            // Wrapped like react() above -- a transient comment-post failure shouldn't
-            // hard-fail this step and skip the progress-status update that follows.
-            try {
-              await github.rest.issues.createComment({
-                ...context.repo,
-                issue_number: context.issue.number,
-                body,
-              });
-            } catch (err) {
-              core.warning(`Could not comment cancellation outcome: ${err.message || err}`);
-            }
+            await github.rest.issues.createComment({
+              ...context.repo,
+              issue_number: context.issue.number,
+              body,
+            });
 
       # Only touches the informational progress status, never "Run Gating
       # Tests" -- a cancellation isn't a test result. cluster-check/
