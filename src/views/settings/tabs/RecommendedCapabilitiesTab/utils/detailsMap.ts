@@ -1,6 +1,6 @@
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { type OperatorGroupKind, type SubscriptionKind } from '@overview/utils/types';
-import { type UseOperatorResourcesReturn } from '@settings/tabs/ClusterTab/components/VirtualizationFeaturesSection/utils/hooks/useOperatorResources/useOperatorResources';
+import { type UseOperatorResourcesReturn } from '@settings/tabs/ClusterTab/components/VirtualizationFeaturesSection/utils/hooks/useOperatorResources/utils/types';
 import { InstallState } from '@settings/tabs/ClusterTab/components/VirtualizationFeaturesSection/utils/types';
 import {
   clusterServiceVersionFor,

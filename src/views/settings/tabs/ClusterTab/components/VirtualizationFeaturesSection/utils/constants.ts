@@ -1,11 +1,14 @@
+import { DESCHEDULER_OPERATOR_NAME } from '@kubevirt-utils/resources/descheduler/constants';
+
 export const NMSTATE_OPERATOR_NAME = 'kubernetes-nmstate-operator';
 export const NETOBSERV_OPERATOR_NAME = 'netobserv-operator';
 export const NODE_HEALTH_OPERATOR_NAME = 'node-healthcheck-operator';
 export const FENCE_AGENTS_OPERATOR_NAME = 'fence-agents-remediation';
-export const DESCHEDULER_OPERATOR_NAME = 'cluster-kube-descheduler-operator';
 export const CLUSTER_OBSERVABILITY_OPERATOR_NAME = 'cluster-observability-operator';
 
 export const OPERATOR_HUB_PATH = '/operatorhub';
+
+export const OPENSHIFT_MARKETPLACE_NAMESPACE = 'openshift-marketplace';
 
 export const operatorPackageNames = [
   NMSTATE_OPERATOR_NAME,

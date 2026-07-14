@@ -6,7 +6,7 @@ import { DESCHEDULER_OPERATORS_URL } from '@kubevirt-utils/resources/descheduler
 import { Split, SplitItem } from '@patternfly/react-core';
 import SettingsLink from '@settings/context/SettingsLink';
 import { CLUSTER_TAB_IDS } from '@settings/search/constants';
-import { DESCHEDULER_OPERATOR_NAME } from '@settings/tabs/ClusterTab/components/VirtualizationFeaturesSection/utils/constants';
+import { DESCHEDULER_OPERATOR_NAME } from '@kubevirt-utils/resources/descheduler/constants';
 import {
   getInstallStateIcon,
   isInstalled,

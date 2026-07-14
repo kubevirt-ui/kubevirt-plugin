@@ -1,9 +1,9 @@
 import { type TFunction } from 'i18next';
 
 import { OLSPromptType } from '@lightspeed/utils/prompts';
+import { DESCHEDULER_OPERATOR_NAME } from '@kubevirt-utils/resources/descheduler/constants';
 import {
   CLUSTER_OBSERVABILITY_OPERATOR_NAME,
-  DESCHEDULER_OPERATOR_NAME,
   FENCE_AGENTS_OPERATOR_NAME,
   NETOBSERV_OPERATOR_NAME,
   NMSTATE_OPERATOR_NAME,
