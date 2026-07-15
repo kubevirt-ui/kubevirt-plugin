@@ -13,7 +13,14 @@ export const AI_CONFIG = {
     SKIP: 'skip-ai-config-check',
   },
   PATH_PREFIXES: ['.cursor/', '.claude/', '.codex/', '.windsurf/', '.gemini/', '.vscode/'] as const,
-  RELATED_AUTOMATION_PATHS: ['.github/workflows/pr_validation.yml'] as const,
+  RELATED_AUTOMATION_PATHS: [
+    '.github/workflows/pr_validation.yml',
+    '.github/workflows/pr_validation_commands.yml',
+    '.github/actions/setup-gh-scripts/action.yml',
+  ] as const,
   RELATED_AUTOMATION_PREFIXES: ['.github/scripts/'] as const,
   STATUS_CONTEXT: 'ai-config-validation',
+  EVENT_ACTIONS: {
+    AI_APPROVED: 'ai-approved',
+  },
 } as const;

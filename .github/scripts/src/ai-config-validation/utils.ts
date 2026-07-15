@@ -1,6 +1,6 @@
 export const buildStatusDescription = (passed: boolean, hasSensitiveChanges: boolean): string => {
   if (!passed) {
-    return 'Add ai-config-reviewed label after security review';
+    return 'Comment /ai-approved after security review (OWNERS only)';
   }
   if (!hasSensitiveChanges) {
     return 'No AI configuration changes detected';

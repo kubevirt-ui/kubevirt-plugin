@@ -1,0 +1,57 @@
+name: PR Validation Commands
+
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  command:
+    name: pr-validation-command
+    if: >-
+      github.event.issue.pull_request != null &&
+      (contains(github.event.comment.body, '/recheck-jira') ||
+       contains(github.event.comment.body, '/ai-approved'))
+    permissions:
+      pull-requests: write
+      issues: write
+      statuses: write
+    runs-on: ubuntu-latest
+    concurrency:
+      group: pr-validation-cmd-${{ github.event.issue.number }}
+      cancel-in-progress: true
+    steps:
+      - name: Resolve PR context
+        id: pr
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const { data: pr } = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+            });
+            core.setOutput('number', String(pr.number));
+            core.setOutput('title', pr.title);
+            core.setOutput('base_ref', pr.base.ref);
+            core.setOutput('head_sha', pr.head.sha);
+
+      - name: Setup validation scripts
+        uses: ./.github/actions/setup-gh-scripts
+        with:
+          ref: ${{ steps.pr.outputs.base_ref }}
+
+      - name: Run validation command
+        working-directory: .github/scripts
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          JIRA_TOKEN: ${{ secrets.JIRA_TOKEN }}
+          COMMENT_BODY: ${{ github.event.comment.body }}
+          COMMENT_AUTHOR: ${{ github.event.comment.user.login }}
+          COMMENT_ID: ${{ github.event.comment.id }}
+          PR_NUMBER: ${{ steps.pr.outputs.number }}
+          PR_TITLE: ${{ steps.pr.outputs.title }}
+          BASE_BRANCH: ${{ steps.pr.outputs.base_ref }}
+          PR_HEAD_SHA: ${{ steps.pr.outputs.head_sha }}
+          REPO_OWNER: ${{ github.repository_owner }}
+          REPO_NAME: ${{ github.event.repository.name }}
+        run: npx tsx src/commands/index.ts
