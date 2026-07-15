@@ -12,7 +12,6 @@ import { isACMPath } from '@multicluster/urls';
 import { Divider, Tab, Tabs, TabTitleText } from '@patternfly/react-core';
 import { useSignals } from '@preact/signals-react/runtime';
 import { SettingsClusterProvider } from '@settings/context/SettingsClusterContext';
-import { VirtualizationFeaturesContextProvider } from '@settings/tabs/ClusterTab/components/VirtualizationFeaturesSection/utils/VirtualizationFeaturesContext/VirtualizationFeaturesContext';
 import VirtualMachineNavPage from '@virtualmachines/details/VirtualMachineNavPage';
 import VirtualMachinesCreateButton from '@virtualmachines/list/components/VirtualMachinesCreateButton/VirtualMachinesCreateButton';
 import VirtualMachinesListPageHeader from '@virtualmachines/list/components/VirtualMachinesListPageHeader';
@@ -68,46 +67,43 @@ const VirtualMachineNavigator: FC = () => {
       </VirtualMachinesListPageHeader>
       <Divider />
       <SettingsClusterProvider cluster={cluster}>
-        <VirtualizationFeaturesContextProvider>
-          <VirtualMachineTreeView {...treeProps}>
-            {!isFleetPage && <GuidedTour />}
-            {!isFleetPage && <WelcomeModal />}
-            <CatalogOnboardingPopover />
-            <NavCollapseOnboardingPopover isNavCollapsed={isNavCollapsed} />
-            <VMsTabOnboardingPopover />
-            {isVirtualMachineListPage ? (
-              <Tabs
-                activeKey={activeTabKey}
-                aria-label={t('Virtual machines tabs')}
-                className="co-horizontal-nav vm-navigator-tabs"
-                onSelect={handleTabSelect}
-                usePageInsets
+        <VirtualMachineTreeView {...treeProps}>
+          {!isFleetPage && <GuidedTour />}
+          {!isFleetPage && <WelcomeModal />}
+          <CatalogOnboardingPopover />
+          <NavCollapseOnboardingPopover isNavCollapsed={isNavCollapsed} />
+          <VMsTabOnboardingPopover />
+          {isVirtualMachineListPage ? (
+            <Tabs
+              activeKey={activeTabKey}
+              aria-label={t('Virtual machines tabs')}
+              className="co-horizontal-nav vm-navigator-tabs"
+              mountOnEnter
+              onSelect={handleTabSelect}
+              unmountOnExit
+              usePageInsets
+            >
+              <Tab
+                eventKey={OVERVIEW_TAB_INDEX}
+                title={<TabTitleText data-test="overview-tab">{t('Overview')}</TabTitleText>}
               >
-                <Tab
-                  eventKey={OVERVIEW_TAB_INDEX}
-                  title={<TabTitleText data-test="overview-tab">{t('Overview')}</TabTitleText>}
-                >
-                  <OverviewTab cluster={cluster} key="overview" namespace={namespace} />
-                </Tab>
-                <Tab
-                  eventKey={VM_LIST_TAB_INDEX}
-                  title={
-                    <TabTitleText data-test="vm-list-tab">{t('Virtual machines')}</TabTitleText>
-                  }
-                >
-                  <VirtualMachinesList
-                    allVMsLoaded={treeProps.loaded}
-                    cluster={cluster}
-                    key={`vms-${activeTabKey}`}
-                    namespace={namespace}
-                  />
-                </Tab>
-              </Tabs>
-            ) : (
-              <VirtualMachineNavPage />
-            )}
-          </VirtualMachineTreeView>
-        </VirtualizationFeaturesContextProvider>
+                <OverviewTab cluster={cluster} key="overview" namespace={namespace} />
+              </Tab>
+              <Tab
+                eventKey={VM_LIST_TAB_INDEX}
+                title={<TabTitleText data-test="vm-list-tab">{t('Virtual machines')}</TabTitleText>}
+              >
+                <VirtualMachinesList
+                  allVMsLoaded={treeProps.loaded}
+                  cluster={cluster}
+                  namespace={namespace}
+                />
+              </Tab>
+            </Tabs>
+          ) : (
+            <VirtualMachineNavPage />
+          )}
+        </VirtualMachineTreeView>
       </SettingsClusterProvider>
     </>
   );

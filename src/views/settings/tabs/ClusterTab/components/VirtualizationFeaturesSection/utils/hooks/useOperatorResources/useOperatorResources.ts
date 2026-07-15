@@ -1,54 +1,88 @@
 import { useMemo } from 'react';
 
-import { getName } from '@kubevirt-utils/resources/shared';
+import useDeepCompareMemoize from '@kubevirt-utils/hooks/useDeepCompareMemoize/useDeepCompareMemoize';
 import useKubevirtWatchResources from '@multicluster/hooks/useKubevirtWatchResources';
-import {
-  ClusterServiceVersionKind,
-  OperatorGroupKind,
-  PackageManifestKind,
-  SubscriptionKind,
-} from '@overview/utils/types';
 import { useSettingsCluster } from '@settings/context/SettingsClusterContext';
 import { operatorPackageNames } from '@settings/tabs/ClusterTab/components/VirtualizationFeaturesSection/utils/constants';
-import { OperatorResources } from '@settings/tabs/ClusterTab/components/VirtualizationFeaturesSection/utils/hooks/useOperatorResources/utils/types';
-import { getWatchedOperatorResources } from '@settings/tabs/ClusterTab/components/VirtualizationFeaturesSection/utils/hooks/useOperatorResources/utils/utils';
+import {
+  EMPTY_OPERATOR_GROUPS,
+  EMPTY_SUBSCRIPTIONS,
+} from '@settings/tabs/ClusterTab/components/VirtualizationFeaturesSection/utils/hooks/useOperatorResources/utils/constants';
+import {
+  type BaseOperatorWatchResources,
+  type UseOperatorResourcesReturn,
+} from '@settings/tabs/ClusterTab/components/VirtualizationFeaturesSection/utils/hooks/useOperatorResources/utils/types';
+import { getBaseOperatorWatchResources } from '@settings/tabs/ClusterTab/components/VirtualizationFeaturesSection/utils/hooks/useOperatorResources/utils/utils';
 
-export type UseOperatorResourcesReturn = {
-  clusterServiceVersions: ClusterServiceVersionKind[];
-  filteredPackageManifests: PackageManifestKind[];
-  loadErrors: unknown[];
-  operatorGroups: OperatorGroupKind[];
-  operatorResourcesLoaded: boolean;
-  subscriptions: SubscriptionKind[];
-};
+import useOperatorCsvs from './useOperatorCsvs';
+import usePackageManifests from './usePackageManifests';
 
 const useOperatorResources = (
   packageNames: readonly string[] = operatorPackageNames,
 ): UseOperatorResourcesReturn => {
   const cluster = useSettingsCluster();
-  const resources = useMemo(() => getWatchedOperatorResources(cluster), [cluster]);
-  const data = useKubevirtWatchResources<OperatorResources>(resources);
+  const memoizedPackageNames = useDeepCompareMemoize(packageNames);
 
-  const clusterServiceVersions = data?.clusterServiceVersions?.data ?? [];
-  const operatorGroups = data?.operatorGroups?.data ?? [];
-  const subscriptions = data?.subscriptions?.data ?? [];
+  const {
+    loadErrors: packageManifestLoadErrors,
+    loaded: packageManifestsLoaded,
+    packageManifests: filteredPackageManifests,
+  } = usePackageManifests({ cluster, packageNames: memoizedPackageNames });
 
-  const filteredPackageManifests = (data?.allPackageManifests?.data ?? []).filter((pkg) =>
-    packageNames.includes(getName(pkg)),
+  const baseResources = useMemo(() => getBaseOperatorWatchResources(cluster), [cluster]);
+  const baseData = useKubevirtWatchResources<BaseOperatorWatchResources>(baseResources);
+
+  const { operatorGroups: operatorGroupsWatch, subscriptions: subscriptionsWatch } = baseData ?? {};
+
+  const operatorGroups = useMemo(
+    () => operatorGroupsWatch?.data ?? EMPTY_OPERATOR_GROUPS,
+    [operatorGroupsWatch?.data],
   );
 
-  const operatorResourcesLoaded =
-    data?.allPackageManifests?.loaded &&
-    data?.clusterServiceVersions?.loaded &&
-    data?.operatorGroups?.loaded &&
-    data?.subscriptions?.loaded;
+  const subscriptions = useMemo(
+    () => subscriptionsWatch?.data ?? EMPTY_SUBSCRIPTIONS,
+    [subscriptionsWatch?.data],
+  );
 
-  const loadErrors = [
-    data?.allPackageManifests?.loadError,
-    data?.clusterServiceVersions?.loadError,
-    data?.operatorGroups?.loadError,
-    data?.subscriptions?.loadError,
-  ].filter(Boolean);
+  const baseResourcesLoaded = useMemo(
+    () => packageManifestsLoaded && operatorGroupsWatch?.loaded && subscriptionsWatch?.loaded,
+    [operatorGroupsWatch?.loaded, packageManifestsLoaded, subscriptionsWatch?.loaded],
+  );
+
+  const {
+    clusterServiceVersions,
+    loadErrors: csvLoadErrors,
+    loaded: csvResourcesLoaded,
+  } = useOperatorCsvs({
+    cluster,
+    enabled: baseResourcesLoaded,
+    operatorGroups,
+    packageManifests: filteredPackageManifests,
+    subscriptions,
+  });
+
+  const operatorResourcesLoaded = baseResourcesLoaded && csvResourcesLoaded;
+
+  const loadErrors = useMemo(
+    () =>
+      [
+        ...packageManifestLoadErrors,
+        operatorGroupsWatch?.loadError,
+        subscriptionsWatch?.loadError,
+        ...csvLoadErrors,
+      ].filter(Boolean),
+    [
+      csvLoadErrors,
+      operatorGroupsWatch?.loadError,
+      packageManifestLoadErrors,
+      subscriptionsWatch?.loadError,
+
+      csvLoadErrors,
+      operatorGroupsWatch?.loadError,
+      packageManifestLoadErrors,
+      subscriptionsWatch?.loadError,
+    ],
+  );
 
   return {
     clusterServiceVersions,

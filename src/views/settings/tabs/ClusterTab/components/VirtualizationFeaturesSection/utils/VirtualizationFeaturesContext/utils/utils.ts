@@ -10,9 +10,9 @@ import {
   PackageManifestKind,
   SubscriptionKind,
 } from '@overview/utils/types';
+import { DESCHEDULER_OPERATOR_NAME } from '@kubevirt-utils/resources/descheduler/constants';
 import {
   CLUSTER_OBSERVABILITY_OPERATOR_NAME,
-  DESCHEDULER_OPERATOR_NAME,
   FENCE_AGENTS_OPERATOR_NAME,
   NETOBSERV_OPERATOR_NAME,
   NMSTATE_OPERATOR_NAME,
@@ -81,7 +81,6 @@ export const subscriptionFor = (
     .filter(
       (sub) =>
         sub.spec.name === pkg.status.packageName &&
-        sub.spec.source === pkg.status.catalogSource &&
         sub.spec.sourceNamespace === pkg.status.catalogSourceNamespace,
     )
     .find((sub) => allGroups.some((og) => og.metadata.namespace === sub.metadata.namespace));
@@ -90,10 +89,10 @@ export const clusterServiceVersionFor = (
   clusterServiceVersions: ClusterServiceVersionKind[],
   csvName: string,
 ): ClusterServiceVersionKind =>
-  clusterServiceVersions?.find((csv) => csv.metadata.name === csvName);
+  clusterServiceVersions?.find((csv) => csv && getName(csv) === csvName);
 
-export const getSubscriptionInstalledCSV = (subscription: SubscriptionKind): string =>
-  subscription?.status?.installedCSV;
+export const getSubscriptionInstalledCSV = (subscription: SubscriptionKind): string | undefined =>
+  subscription?.status?.installedCSV ?? subscription?.status?.currentCSV;
 
 export const defaultPackageSourceMap = {
   [DefaultCatalogSource.CertifiedOperators]: PackageSource.CertifiedOperators,

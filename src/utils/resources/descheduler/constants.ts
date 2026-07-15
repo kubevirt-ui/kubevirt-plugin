@@ -4,6 +4,7 @@ import { modelToRef } from '@kubevirt-utils/models';
 
 export const KUBE_DESCHEDULER_NAMESPACE = 'openshift-kube-descheduler-operator';
 export const KUBE_DESCHEDULER_NAME = 'cluster';
+export const DESCHEDULER_OPERATOR_NAME = 'cluster-kube-descheduler-operator';
 
 export const KUBE_DESCHEDULER_URL = `/k8s/ns/${KUBE_DESCHEDULER_NAMESPACE}/${modelToRef(
   KubeDeschedulerModel,

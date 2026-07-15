@@ -15,11 +15,7 @@ import { GreenCheckCircleIcon } from '@openshift-console/dynamic-plugin-sdk';
 import { BlueInfoCircleIcon } from '@openshift-console/dynamic-plugin-sdk/lib/app/components/status/icons';
 import { Button, ButtonVariant, Popover } from '@patternfly/react-core';
 import { UnknownIcon } from '@patternfly/react-icons';
-import {
-  DESCHEDULER_OPERATOR_NAME,
-  OPERATOR_HUB_PATH,
-} from '@settings/tabs/ClusterTab/components/VirtualizationFeaturesSection/utils/constants';
-import { useVirtualizationFeaturesContext } from '@settings/tabs/ClusterTab/components/VirtualizationFeaturesSection/utils/VirtualizationFeaturesContext/VirtualizationFeaturesContext';
+import { OPERATOR_HUB_PATH } from '@settings/tabs/ClusterTab/components/VirtualizationFeaturesSection/utils/constants';
 
 type DeschedulerStatusDisplay = { icon: ReactNode; label: string };
 
@@ -27,14 +23,11 @@ const useDeschedulerDisplay = (status: DeschedulerStatus): DeschedulerStatusDisp
   const { t } = useKubevirtTranslation();
   const cluster = useClusterParam();
   const { getConsoleURL } = useManagedClusterConsoleURLs();
-  const { operatorDetailsMap } = useVirtualizationFeaturesContext();
 
-  const spokeConsoleURL = getConsoleURL(cluster);
-  const hubOperatorHubURL =
-    operatorDetailsMap?.[DESCHEDULER_OPERATOR_NAME]?.operatorHubURL ?? OPERATOR_HUB_PATH;
+  const spokeConsoleURL = cluster ? getConsoleURL(cluster) : undefined;
   const operatorHubURL = spokeConsoleURL
-    ? `${spokeConsoleURL}${hubOperatorHubURL}`
-    : hubOperatorHubURL;
+    ? `${spokeConsoleURL}${OPERATOR_HUB_PATH}`
+    : OPERATOR_HUB_PATH;
 
   return useMemo(() => {
     switch (status) {
