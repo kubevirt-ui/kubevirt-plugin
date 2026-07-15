@@ -92,36 +92,6 @@ export function getSetupRules(): SetupRule[] {
           logger.success(`✓ Kubeconfig validated and copied from ${candidate}`);
           return;
         }
-        // Prefer oc's existing session (e.g. admin already logged in on CI)
-        // over the SA token, which may lack the RBAC permissions tests need.
-        try {
-          const ocUser = execFileSync('oc', ['whoami'], {
-            encoding: 'utf8',
-            timeout: 15 * SECOND,
-            stdio: 'pipe',
-          }).trim();
-          if (ocUser) {
-            logger.info(
-              `📋 oc session detected (${ocUser}), extracting kubeconfig via oc config view...`,
-            );
-            const ocKubeconfig = execFileSync('oc', ['config', 'view', '--raw', '--flatten'], {
-              encoding: 'utf8',
-              timeout: 15 * SECOND,
-              stdio: 'pipe',
-            });
-            const kubeConfigDir = path.dirname(ctx.kubeConfigPath);
-            if (!fs.existsSync(kubeConfigDir)) {
-              fs.mkdirSync(kubeConfigDir, { recursive: true });
-            }
-            fs.writeFileSync(ctx.kubeConfigPath, ocKubeconfig, 'utf8');
-            ctx.effectiveKubeConfigPath = ctx.kubeConfigPath;
-            logger.success(`✓ Kubeconfig extracted from oc session (user: ${ocUser})`);
-            return;
-          }
-        } catch {
-          logger.info('⏭️ oc whoami failed — no existing oc session');
-        }
-
         const saTokenPath = '/var/run/secrets/kubernetes.io/serviceaccount/token';
         const saCaPath = '/var/run/secrets/kubernetes.io/serviceaccount/ca.crt';
         if (fs.existsSync(saTokenPath)) {
@@ -288,6 +258,60 @@ export function getSetupRules(): SetupRule[] {
           logger.warn('⚠️ Could not extract authentication token from any source');
         }
         ctx.k8sClient = k8sClient;
+      },
+    },
+    {
+      id: 'verify-k8s-client-health',
+      name: 'Verify K8s client can perform admin operations',
+      phase: SetupPhase.AUTH,
+      onError: 'throw',
+      run: async (ctx) => {
+        const k8sClient = ctx.k8sClient;
+        if (!k8sClient) {
+          throw new Error('Kubernetes client not initialized');
+        }
+
+        const checks: Array<{ label: string; fn: () => Promise<unknown> }> = [
+          {
+            label: 'List namespaces',
+            fn: () => k8sClient.makeProxyRequest('GET', '/api/v1/namespaces?limit=1'),
+          },
+          {
+            label: 'Read HCO namespace',
+            fn: () => k8sClient.getNamespaceByName(ctx.cnvNamespace),
+          },
+          {
+            label: 'List VirtualMachines CRD',
+            fn: () =>
+              k8sClient.makeProxyRequest(
+                'GET',
+                '/apis/kubevirt.io/v1/namespaces/default/virtualmachines?limit=1',
+              ),
+          },
+        ];
+
+        const failures: string[] = [];
+        for (const check of checks) {
+          try {
+            await check.fn();
+            logger.info(`   ✓ ${check.label}`);
+          } catch (err) {
+            const msg = err instanceof Error ? err.message : String(err);
+            failures.push(`${check.label}: ${msg}`);
+            logger.warn(`   ✗ ${check.label}: ${msg}`);
+          }
+        }
+
+        if (failures.length > 0) {
+          throw new Error(
+            `K8s client health check failed (${failures.length}/${checks.length}):\n` +
+              failures.map((f) => `  - ${f}`).join('\n') +
+              '\nThe kubeconfig may lack admin-level RBAC. On CI, ensure the ' +
+              'admin kubeconfig is exported to /tmp/kubeconfig before tests run.',
+          );
+        }
+
+        logger.success('✓ K8s client health check passed');
       },
     },
     {

@@ -500,6 +500,12 @@ jobs:
               target_url: `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
             });
 
+      - name: Export admin kubeconfig for Playwright
+        if: env.TEST_ENGINE == 'playwright'
+        run: |
+          oc config view --raw --minify --flatten > /tmp/kubeconfig
+          echo "✓ Saved admin kubeconfig to /tmp/kubeconfig ($(oc whoami))"
+
       - name: Run gating tests
         env:
           BRIDGE_BASE_ADDRESS: ${{ steps.ci-env.outputs.bridge-base-address }}
