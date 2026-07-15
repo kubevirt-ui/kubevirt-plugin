@@ -36,6 +36,16 @@ export default class OverviewVirtualizationFeaturesComponent extends BaseCompone
     '[data-test-id="memory-density-save-button"]',
   );
   private readonly _memoryDensityToggle = this.locator('#memory-density-feature input');
+  private readonly _memoryRequestRatioBtn = this.locator('button:has-text("Memory request ratio")');
+  private readonly _memoryRequestRatioDecreaseBtn = this.locator(
+    'button[aria-label="Decrease ratio"]',
+  );
+  private readonly _memoryRequestRatioIncreaseBtn = this.locator(
+    'button[aria-label="Increase ratio"]',
+  );
+  private readonly _memoryRequestRatioInput = this.locator(
+    'input[aria-label="Memory request ratio percentage"]',
+  );
 
   private readonly _permissionsBtn = this.locator('button:has-text("Permissions")');
   private readonly _persistentReservationCheckbox = this.locator(
@@ -60,6 +70,28 @@ export default class OverviewVirtualizationFeaturesComponent extends BaseCompone
     super(page);
   }
 
+  async adjustMemoryRequestRatio(steps: number): Promise<boolean> {
+    try {
+      const btn =
+        steps < 0 ? this._memoryRequestRatioDecreaseBtn : this._memoryRequestRatioIncreaseBtn;
+      await btn.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+      const count = Math.abs(steps);
+      for (let i = 0; i < count; i++) {
+        if (await btn.isDisabled()) break;
+        const before = await this._memoryRequestRatioInput.inputValue();
+        await this.robustClick(btn);
+        await waitForCondition(
+          async () => (await this._memoryRequestRatioInput.inputValue()) !== before,
+          TestTimeouts.UI_ACTION_COMPLETE,
+          TestTimeouts.POLLING_INTERVAL,
+        );
+      }
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
   async clickHighAvailabilitySummarySectionToggle(): Promise<void> {
     await this._highAvailabilitySummarySectionToggle.waitFor({
       state: 'visible',
@@ -78,6 +110,18 @@ export default class OverviewVirtualizationFeaturesComponent extends BaseCompone
     await this.robustClick(
       this.locator('.virtualization-features-configuration-wizard button[type="submit"]'),
     );
+  }
+
+  async disableAaq(): Promise<boolean> {
+    try {
+      const alreadyDisabled = !(await this.isAaqEnabled());
+      if (alreadyDisabled) return true;
+      await this._aaqSwitch.first().click({ force: true });
+      await this.page.waitForTimeout(TestTimeouts.CLUSTER_STATE_PROPAGATION);
+      return !(await this.isAaqEnabled());
+    } catch {
+      return false;
+    }
   }
 
   async disableMemoryDensity(): Promise<boolean> {
@@ -301,6 +345,18 @@ export default class OverviewVirtualizationFeaturesComponent extends BaseCompone
     }
   }
 
+  async getMemoryRequestRatioValue(): Promise<string | null> {
+    try {
+      await this._memoryRequestRatioInput.waitFor({
+        state: 'visible',
+        timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+      });
+      return await this._memoryRequestRatioInput.inputValue();
+    } catch {
+      return null;
+    }
+  }
+
   async getVirtualizationFeatureItems(): Promise<string[]> {
     const knownFeatures = [
       'Cluster observability',
@@ -436,6 +492,19 @@ export default class OverviewVirtualizationFeaturesComponent extends BaseCompone
         timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
       });
       await this.robustClick(this._memoryDensityBtn);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  async openMemoryRequestRatioSettings(): Promise<boolean> {
+    try {
+      await this._memoryRequestRatioBtn.waitFor({
+        state: 'visible',
+        timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+      });
+      await this.robustClick(this._memoryRequestRatioBtn);
       return true;
     } catch {
       return false;
@@ -728,27 +797,12 @@ export default class OverviewVirtualizationFeaturesComponent extends BaseCompone
 
   async verifyVirtualizationFeatures(): Promise<boolean> {
     try {
-      const [networkObsExists, hostNetExists, haExists] = await Promise.all([
-        this.locator(
-          'button:has-text("Network observability"), a:has-text("Network observability"), :text("Network observability")',
-        )
-          .first()
-          .isVisible()
-          .catch(() => false),
-        this.locator(
-          'button:has-text("Host network management"), a:has-text("Host network management"), :text("Host network management")',
-        )
-          .first()
-          .isVisible()
-          .catch(() => false),
-        this.locator(
-          'button:has-text("High availability"), a:has-text("High availability"), :text("High availability")',
-        )
-          .first()
-          .isVisible()
-          .catch(() => false),
-      ]);
-      return networkObsExists && hostNetExists && haExists;
+      const features = ['Network observability', 'Host network management', 'High availability'];
+      for (const feature of features) {
+        const item = this.locator(`text=${feature}`).first();
+        await item.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+      }
+      return true;
     } catch {
       return false;
     }

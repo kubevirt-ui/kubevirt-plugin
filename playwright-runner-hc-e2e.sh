@@ -85,6 +85,7 @@ if [[ -z "${PROJECT}" ]]; then
   echo "  Gating                 Gating specs (scenario infrastructure)"
   echo "  Tier1                  Tier 1 specs (scenario infrastructure)"
   echo "  Tier2                  Tier 2 specs (scenario infrastructure)"
+  echo "  Settings               Settings specs (scenario infrastructure)"
   echo "  migration-gating       Migration gating specs"
   echo "  migration-tier1        Migration tier 1 specs"
   echo "  migration-tier2        Tier 2 specs"
@@ -120,6 +121,7 @@ if [[ "${PROJECT}" == "all" ]]; then
     Gating
     Tier1
     Tier2
+    Settings
     migration-gating
     migration-tier1
     migration-tier2

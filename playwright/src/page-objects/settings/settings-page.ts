@@ -32,16 +32,36 @@ export default class SettingsPage extends BasePage {
 
   // ── Navigation ──────────────────────────────────────────────────────────────
 
+  adjustMemoryRequestRatio(
+    ...args: Parameters<OverviewVirtualizationFeaturesPage['adjustMemoryRequestRatio']>
+  ): ReturnType<OverviewVirtualizationFeaturesPage['adjustMemoryRequestRatio']> {
+    return this._features.adjustMemoryRequestRatio(...args);
+  }
+
+  disableAaq(
+    ...args: Parameters<OverviewVirtualizationFeaturesPage['disableAaq']>
+  ): ReturnType<OverviewVirtualizationFeaturesPage['disableAaq']> {
+    return this._features.disableAaq(...args);
+  }
+
   disableAdvancedCdromFeatures(
     ...args: Parameters<OverviewSettingsPage['disableAdvancedCdromFeatures']>
   ): ReturnType<OverviewSettingsPage['disableAdvancedCdromFeatures']> {
     return this._settings.disableAdvancedCdromFeatures(...args);
   }
 
+  // ── Cluster tab — top-level ──────────────────────────────────────────────────
+
   disableCentosStream9ImageCron(
     ...args: Parameters<OverviewSettingsPage['disableCentosStream9ImageCron']>
   ): ReturnType<OverviewSettingsPage['disableCentosStream9ImageCron']> {
     return this._settings.disableCentosStream9ImageCron(...args);
+  }
+
+  disableGuidedTour(
+    ...args: Parameters<OverviewSettingsPage['disableGuidedTour']>
+  ): ReturnType<OverviewSettingsPage['disableGuidedTour']> {
+    return this._settings.disableGuidedTour(...args);
   }
 
   disableMemoryDensity(
@@ -50,12 +70,16 @@ export default class SettingsPage extends BasePage {
     return this._migrations.disableMemoryDensity(...args);
   }
 
-  // ── Cluster tab — top-level ──────────────────────────────────────────────────
-
   disableVmTemplatesPreviewFeature(
     ...args: Parameters<OverviewSettingsPage['disableVmTemplatesPreviewFeature']>
   ): ReturnType<OverviewSettingsPage['disableVmTemplatesPreviewFeature']> {
     return this._settings.disableVmTemplatesPreviewFeature(...args);
+  }
+
+  disableWelcomeInformation(
+    ...args: Parameters<OverviewSettingsPage['disableWelcomeInformation']>
+  ): ReturnType<OverviewSettingsPage['disableWelcomeInformation']> {
+    return this._settings.disableWelcomeInformation(...args);
   }
 
   enableAaq(
@@ -63,6 +87,8 @@ export default class SettingsPage extends BasePage {
   ): ReturnType<OverviewVirtualizationFeaturesPage['enableAaq']> {
     return this._features.enableAaq(...args);
   }
+
+  // ── Cluster tab — Virtualization features section ────────────────────────────
 
   enableAdvancedCdromFeatures(
     ...args: Parameters<OverviewSettingsPage['enableAdvancedCdromFeatures']>
@@ -81,8 +107,6 @@ export default class SettingsPage extends BasePage {
   ): ReturnType<OverviewSettingsPage['enableGuidedTour']> {
     return this._settings.enableGuidedTour(...args);
   }
-
-  // ── Cluster tab — Virtualization features section ────────────────────────────
 
   enableKSM(
     ...args: Parameters<OverviewVirtualizationFeaturesPage['enableKSM']>
@@ -108,14 +132,14 @@ export default class SettingsPage extends BasePage {
     return this._settings.enableSSHOverNodePort(...args);
   }
 
+  // ── Cluster tab — General settings section ───────────────────────────────────
+
   // SSH configurations
   enableSSHUsingLoadBalancer(
     ...args: Parameters<OverviewSettingsPage['enableSSHUsingLoadBalancer']>
   ): ReturnType<OverviewSettingsPage['enableSSHUsingLoadBalancer']> {
     return this._settings.enableSSHUsingLoadBalancer(...args);
   }
-
-  // ── Cluster tab — General settings section ───────────────────────────────────
 
   enableVmTemplatesPreviewFeature(
     ...args: Parameters<OverviewSettingsPage['enableVmTemplatesPreviewFeature']>
@@ -157,6 +181,12 @@ export default class SettingsPage extends BasePage {
     ...args: Parameters<OverviewMigrationsPage['getMemoryDensityToggleState']>
   ): ReturnType<OverviewMigrationsPage['getMemoryDensityToggleState']> {
     return this._migrations.getMemoryDensityToggleState(...args);
+  }
+
+  getMemoryRequestRatioValue(
+    ...args: Parameters<OverviewVirtualizationFeaturesPage['getMemoryRequestRatioValue']>
+  ): ReturnType<OverviewVirtualizationFeaturesPage['getMemoryRequestRatioValue']> {
+    return this._features.getMemoryRequestRatioValue(...args);
   }
 
   getPreviewFeatureLabels(
@@ -214,6 +244,18 @@ export default class SettingsPage extends BasePage {
     return this._features.isConfigureFeaturesButtonVisible(...args);
   }
 
+  isGuestSystemLogEnabled(
+    ...args: Parameters<OverviewSettingsPage['isGuestSystemLogEnabled']>
+  ): ReturnType<OverviewSettingsPage['isGuestSystemLogEnabled']> {
+    return this._settings.isGuestSystemLogEnabled(...args);
+  }
+
+  isHideGuestCredentialsEnabled(
+    ...args: Parameters<OverviewSettingsPage['isHideGuestCredentialsEnabled']>
+  ): ReturnType<OverviewSettingsPage['isHideGuestCredentialsEnabled']> {
+    return this._settings.isHideGuestCredentialsEnabled(...args);
+  }
+
   isKsmControlVisible(
     ...args: Parameters<OverviewVirtualizationFeaturesPage['isKsmControlVisible']>
   ): ReturnType<OverviewVirtualizationFeaturesPage['isKsmControlVisible']> {
@@ -244,6 +286,8 @@ export default class SettingsPage extends BasePage {
     return this._settings.navigateToAutomaticSubscription(...args);
   }
 
+  // ── Cluster tab — Guest management section ───────────────────────────────────
+
   navigateToGeneralSettings(
     ...args: Parameters<OverviewSettingsPage['navigateToGeneralSettings']>
   ): ReturnType<OverviewSettingsPage['navigateToGeneralSettings']> {
@@ -255,8 +299,6 @@ export default class SettingsPage extends BasePage {
   ): ReturnType<OverviewSettingsPage['navigateToGettingStartedResources']> {
     return this._settings.navigateToGettingStartedResources(...args);
   }
-
-  // ── Cluster tab — Guest management section ───────────────────────────────────
 
   navigateToGuestManagement(
     ...args: Parameters<OverviewSettingsPage['navigateToGuestManagement']>
@@ -276,6 +318,8 @@ export default class SettingsPage extends BasePage {
     return this._settings.navigateToPreviewFeatures(...args);
   }
 
+  // ── Cluster tab — Resource management section ────────────────────────────────
+
   navigateToResourceManagement(
     ...args: Parameters<OverviewVirtualizationFeaturesPage['navigateToResourceManagement']>
   ): ReturnType<OverviewVirtualizationFeaturesPage['navigateToResourceManagement']> {
@@ -287,8 +331,6 @@ export default class SettingsPage extends BasePage {
   ): ReturnType<OverviewSettingsPage['navigateToSettings']> {
     return this._settings.navigateToSettings(...args);
   }
-
-  // ── Cluster tab — Resource management section ────────────────────────────────
 
   navigateToSettingsViaSidebar(
     ...args: Parameters<OverviewSettingsPage['navigateToSettingsViaSidebar']>
@@ -333,6 +375,13 @@ export default class SettingsPage extends BasePage {
     ...args: Parameters<OverviewMigrationsPage['openMemoryDensitySettings']>
   ): ReturnType<OverviewMigrationsPage['openMemoryDensitySettings']> {
     return this._migrations.openMemoryDensitySettings(...args);
+  }
+
+  // Memory request ratio
+  openMemoryRequestRatioSettings(
+    ...args: Parameters<OverviewVirtualizationFeaturesPage['openMemoryRequestRatioSettings']>
+  ): ReturnType<OverviewVirtualizationFeaturesPage['openMemoryRequestRatioSettings']> {
+    return this._features.openMemoryRequestRatioSettings(...args);
   }
 
   saveSSHKey(

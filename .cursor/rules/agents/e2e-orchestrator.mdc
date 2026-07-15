@@ -13,43 +13,45 @@ Coordinates QE automation for the Playwright test suite that lives under `playwr
 |--------|---------------|
 | Run tests, analyze failures, fix broken tests, re-run | `/test-fix` |
 | Implement E2E tests for Jira tickets | `/create-test` |
-| Migrate legacy gating tests to scenario infrastructure | `/migrate-test` |
 | Assess coverage gaps and generate proposals | `/coverage-analysis` |
-| Compare coverage between branches (e.g. main vs release) | `/coverage-analysis --compare=<branch>` |
 | Validate a ticket with recorded video evidence (requires Playwright MCP) | `/test-and-record` |
 | Explore live UI to find bugs in test-covered workflows | `/bug-hunt` |
 | Write or review Playwright tests (general) | `playwright-testing.mdc` |
 | QA edge case analysis | `qe-agent.mdc` |
 
-## Two Test Infrastructures
+## Test Structure
 
-This project has two test infrastructures. **New tests MUST use the scenario infrastructure.**
+Tests are organized by tiers. Each tier maps to a Playwright project and has its own test directory.
 
-| Aspect | Legacy (gating) | Scenario (new) |
-|--------|----------------|----------------|
-| Directory | `tests/gating/` | `tests/scenario/` |
-| Fixture | `gatingTest` from `scenario-test-fixture` | `scenarioTest` from `@/fixtures/scenario-fixture` |
-| K8s client | Handler sub-objects: `k8sClient.vm.*`, `k8sClient.namespace.*` | Flat API: `k8sClient.setupTestNamespace()`, `k8sClient.createContainerDiskVm()` |
-| UI layer | Page objects (extend `PageCommons` → `BasePage`) | Raw `page` locators (`page.goto()`, `page.locator()`, `page.getByText()`) |
-| Project | `gating` (always active) | `scenario` (enabled via `USE_SCENARIO_INFRA=true`) |
-| Global setup | Login via `playwright/tests/setup/` | Rule engine: `playwright/project-dependencies/global.setup.ts` |
-| Run command | `npm run test-playwright -- --project=Gating` | `USE_SCENARIO_INFRA=true npm run test-playwright -- --project=scenario` |
+| Tier | Directory | Fixture | Project | Tags |
+|------|-----------|---------|---------|------|
+| Gating | `tests/gating/` | `gating-fixture` | `Gating` | `@gating` |
+| Tier 1 | `tests/tier1/<feature>/` | Per-feature fixture | `Tier1` | `@tier1` |
+| Tier 2 | `tests/tier2/<feature>/` | Per-feature fixture | `Tier2` | `@tier2` |
+| Settings | `tests/settings/` | `settings-fixture` | `Settings` | `@cnv-settings` |
 
-## Scenario Architecture (New Tests)
+### Architecture
 
 ```
-Tests (.spec.ts) → import scenarioTest from @/fixtures/scenario-fixture
+Spec (.spec.ts) → imports { test, expect } from feature fixture
   ↓
-Page objects (playwright/src/page-objects/) → injected via fixture
+Feature fixture → extends baseTest, wraps page objects with withSafeActions()
   ↓
-KubernetesClient (playwright/src/clients/kubernetes-client.ts) → flat K8s API
+Page objects (page-objects/) → extend BasePage/PageCommons, compose components
+  ↓
+Components (components/) → extend BaseComponent, contain locators + interactions
+  ↓
+KubernetesClient (clients/kubernetes-client.ts) → K8s API for setup/teardown/verification
 ```
 
 ### Key Components
 
-- **Fixture** (`scenario-fixture.ts`) — `scenarioTest` injects `k8sClient` and page objects
-- **Page objects** (`page-objects/`) — standalone classes, constructor takes `Page`, expose `Locator` properties
-- **KubernetesClient** (`kubernetes-client.ts`) — flat K8s client, extend with new methods as needed
+- **`baseTest`** (`scenario-test-fixture.ts`) — root fixture providing `k8sClient`, `utils`, `testConfig`, auto-fixtures, cleanup
+- **Per-feature fixtures** (`fixtures/<feature>-fixture.ts`) — extend `baseTest`, add page objects wrapped with `withSafeActions()`
+- **Page objects** (`page-objects/`) — extend `BasePage` or `PageCommons`, compose components, expose high-level methods
+- **Components** (`components/`) — extend `BaseComponent`, contain locators and interaction methods for UI sections
+- **KubernetesClient** (`clients/kubernetes-client.ts`) — flat K8s API, extend with new methods as needed
+- **Allure constants** (`data-models/allure-constants.ts`) — suite/feature/tag constants for reporting
 - **Rule engine** — global setup/teardown via `project-dependencies/`
 
 ### Folder Structure
@@ -57,118 +59,154 @@ KubernetesClient (playwright/src/clients/kubernetes-client.ts) → flat K8s API
 ```
 playwright/
 ├── tests/
-│   ├── scenario/              # New scenario specs (scenarioTest fixture)
-│   └── gating/                # Legacy gating specs (frozen — no new tests)
+│   ├── gating/                    # Gating specs
+│   ├── tier1/<feature>/           # Tier 1 specs (grouped by feature)
+│   ├── tier2/<feature>/           # Tier 2 specs (grouped by feature)
+│   └── settings/                  # Settings specs
 ├── src/
-│   ├── page-objects/          # Page objects (one per UI page, injected via fixture)
-│   ├── clients/
-│   │   ├── kubernetes-client.ts  # Flat K8s client for scenario tests
-│   │   └── kubernetes-auth.ts    # OAuth/kubeconfig auth helpers
-│   ├── fixtures/              # scenario-fixture.ts (injects page objects + k8sClient)
-│   ├── data-models/           # TypeScript types for K8s resources
-│   └── utils/                 # Test config, env variables, random names
-├── project-dependencies/      # Global setup/teardown + rule engine
-└── playwright.config.ts
+│   ├── components/                # UI components (extend BaseComponent)
+│   │   ├── shared/                # Base classes
+│   │   ├── overview/              # Overview area
+│   │   ├── vm/                    # VM detail area
+│   │   └── ...
+│   ├── page-objects/              # Page objects (extend BasePage/PageCommons)
+│   │   ├── vm/                    # VM pages
+│   │   ├── overview/              # Overview pages
+│   │   ├── settings/              # Settings pages
+│   │   ├── cluster/               # Cluster-level pages
+│   │   └── ...
+│   ├── fixtures/                  # Per-feature test fixtures
+│   │   ├── scenario-test-fixture.ts  # Base fixture (baseTest)
+│   │   ├── gating-fixture.ts
+│   │   ├── checkups-fixture.ts
+│   │   ├── vm-tabs-fixture.ts
+│   │   ├── settings-fixture.ts
+│   │   └── ...
+│   ├── clients/                   # K8s clients
+│   │   ├── kubernetes-client.ts   # Main K8s client
+│   │   ├── handlers/              # Handler classes
+│   │   ├── virtctl-client.ts      # virtctl CLI wrapper
+│   │   └── oc-cli-client.ts       # oc CLI wrapper
+│   ├── data-models/               # Constants, types, allure metadata
+│   ├── data-factories/            # Test data generators
+│   └── utils/                     # Env vars, test config, random names
+├── project-dependencies/          # Global setup/teardown + rule engine
+├── playwright.config.ts           # Projects: Gating, Tier1, Tier2, Settings
+├── playwright-runner.sh           # Local runner script
+└── playwright-runner-hc-e2e.sh    # CI runner script
 ```
 
-## Scenario Test Patterns
+## Spec File Patterns
 
-### Spec File Structure
+### Required Structure
 
 ```typescript
-import { scenarioTest as test, expect } from '@/fixtures/scenario-fixture';
-import { generateRandomName } from '@/utils/random-data-generator';
+import { ADMIN_ONLY_TAG, T1, T1_TAG } from '@/data-models/allure-constants';
+import { expect, test } from '@/fixtures/<feature>-fixture';
 
-const NS = generateRandomName('feature');
-const VM_NAME = generateRandomName('vm');
+const SUITE = 'Feature Name';
 
-test.describe('Feature', () => {
-  test.describe.configure({ mode: 'serial' });
-
-  test.beforeAll(async ({ k8sClient }) => {
-    await k8sClient.setupTestNamespace(NS);
-    await k8sClient.createContainerDiskVm(VM_NAME, NS);
-    await k8sClient.waitForVmRunning(VM_NAME, NS, 5 * 60_000);
+test.describe(SUITE, { tag: [T1_TAG, '@tier1-feature-area'] }, () => {
+  test.beforeEach(async ({ somePage }) => {
+    await somePage.navigateToFeatureViaUI();
   });
 
-  test.afterAll(async ({ k8sClient }) => {
-    await k8sClient.cleanupTestNamespace(NS).catch(() => {});
-  });
+  test('does something expected', async ({ somePage, k8sClient, utils }) => {
+    await utils.withAllure({
+      suite: SUITE,
+      feature: T1,
+      tags: [T1_TAG, ADMIN_ONLY_TAG],
+    });
 
-  test('Virtualization perspective loads', async ({ overviewPage }) => {
-    await overviewPage.switchToVirtualization();
-    await expect(overviewPage.heading).toBeVisible({ timeout: 30_000 });
-  });
-
-  test('VM appears in list', async ({ virtualMachinesPage }) => {
-    await virtualMachinesPage.waitForLoaded();
-    await expect(virtualMachinesPage.getVmRow(VM_NAME)).toBeVisible({ timeout: 30_000 });
+    const result = await somePage.doSomething();
+    expect(result, 'descriptive assertion message').toBe(true);
   });
 });
 ```
 
+### Requirements
+
+- Import `test` and `expect` from the feature fixture — never from `@playwright/test`
+- Define `const SUITE` at module scope for allure reporting
+- Tag `test.describe` with tier tag + feature-area tag (from allure-constants)
+- Every `test()` calls `utils.withAllure(...)` first
+- Every `expect()` has a descriptive message string
+- Use `TestTimeouts.*` constants — never inline timeout numbers
+- All UI interactions through page objects — no raw `page` in specs
+- Track created resources: `k8sClient.trackResource(kind, name, namespace)`
+- Setup failures must fail the suite — no `setupError` + `test.skip` patterns
+
 ### K8s Client Usage
 
 ```typescript
-// Flat API — no handler sub-objects
-await k8sClient.setupTestNamespace(NS);
-await k8sClient.createContainerDiskVm(VM_NAME, NS);
-await k8sClient.waitForVmRunning(VM_NAME, NS, 5 * 60_000);
-await k8sClient.cleanupTestNamespace(NS);
+// Setup
+await k8sClient.setupTestNamespace(namespace);
+await k8sClient.createContainerDiskVm(vmName, namespace);
+await k8sClient.waitForVmRunning(vmName, namespace, TestTimeouts.TEST_VM_CREATION);
 
-// If a method doesn't exist, add it to kubernetes-client.ts
+// Track for cleanup
+k8sClient.trackResource('VirtualMachine', vmName, namespace);
+
+// Teardown
+await k8sClient.cleanupTestNamespace(namespace).catch(() => {});
 ```
 
 ### Assertions
 
-- Use `expect()` against page object locators with explicit timeouts
+- Use `expect()` with page object return values and locators
 - Use `expect.poll()` for async state changes
-- Page object properties are `Locator` instances — pass them directly to `expect()`
+- Always include descriptive messages
+- Use `expect.soft()` for non-critical checks that shouldn't abort the test
 
 ## Implementation Rules
 
-### 1. New Tests Use Scenario Infrastructure
+### 1. Fixture Hierarchy
 
-All new tests go in `playwright/tests/scenario/` using `scenarioTest` fixture with page objects injected. Never add new tests to `playwright/tests/gating/`.
+All fixtures extend `baseTest`. Create per-feature fixtures for each test area:
 
-### 2. Page Objects Are Injected Via Fixture
+```typescript
+const test = baseTest.extend<FeatureFixtures>({
+  featurePage: async ({ page }, use) => {
+    await use(withSafeActions(new FeaturePage(page)));
+  },
+});
+```
 
-Tests destructure page objects — they never instantiate them. Page objects are standalone classes (no base class hierarchy), constructor takes `Page`, and expose key locators as `readonly` properties.
+### 2. Component / Page Object Separation
 
-If a page object is missing, create it in `playwright/src/page-objects/` and wire it into `scenario-fixture.ts`.
+- **Components** (`src/components/`) — low-level, per-section UI interactions
+- **Page objects** (`src/page-objects/`) — high-level, per-page methods that compose components
+- Page objects delegate to components via composition, not inheritance
 
-### 3. No Raw `page` in Specs
-
-All UI interactions go through page objects. If a needed method doesn't exist, add it to the page object.
-
-### 4. Extend KubernetesClient for K8s Gaps
-
-If a test needs a K8s operation not in `KubernetesClient`, add it directly to `kubernetes-client.ts`:
-- Core resources → `this.coreApi` (CoreV1Api)
-- Custom resources → `this.coApi` (CustomObjectsApi)
-
-### 5. Each File Owns Its Namespace
-
-Use `generateRandomName('prefix')` at module scope. Never hardcode or share namespaces.
-
-### 6. Serial Mode for Shared Resources
-
-Tests sharing VMs use `test.describe.configure({ mode: 'serial' })`.
-
-### 7. Selector Strategy
+### 3. Selector Strategy
 
 1. Prefer `[data-test="..."]` and `[data-test-id="..."]` attributes
 2. Fall back to `getByRole()` with accessible names
 3. Fall back to `getByText()` for user-visible content
 
-### 8. File Size Limits
+### 4. File Size Limits
 
 | File type | Max lines |
 |-----------|-----------|
 | Spec file (`.spec.ts`) | 300 |
 | Page object (`*-page.ts`) | 500 |
+| Component (`*-component.ts`) | 400 |
+| Fixture (`*-fixture.ts`) | 150 |
 | Client (`kubernetes-client.ts`) | 800 |
 | Utility module | 400 |
+
+### 5. What Belongs Where
+
+| Content | Location | NOT in spec files |
+|---------|----------|-------------------|
+| Test definitions, assertions | Spec files | |
+| UI interactions, locators | Components / Page objects | |
+| K8s API operations | KubernetesClient / handlers | |
+| Test data generation | `data-factories/` | |
+| Helper functions, shared logic | `utils/` | |
+| Type definitions | `data-models/` | |
+| Allure/tag constants | `data-models/allure-constants.ts` | |
+| Resource setup orchestration | `utils/test-setup-helpers.ts` | |
 
 ## Debugging Flaky / Failing Tests
 
@@ -187,12 +225,13 @@ Playwright-browser_network_requests → API calls
 ### Step 2: Inspect the Codebase
 
 1. Read the failing spec
-2. Read the plugin source (`src/`) for the component under test
-3. Check `data-test` attributes in the DOM vs what the test expects
+2. Read the component/page object with the broken locator
+3. Read the plugin source (`src/`) for the component under test
+4. Check `data-test` attributes in the DOM vs what the test expects
 
 ### Step 3: Apply Fixes
 
-Update spec locators or KubernetesClient methods. Verify with `npm run check-types:playwright` and a test run.
+Update locators in components/page objects — not in spec files. Verify with `npm run check-types:playwright` and a test run.
 
 ## Single-Process Execution Rule
 

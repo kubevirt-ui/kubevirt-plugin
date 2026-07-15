@@ -75,6 +75,15 @@ export default defineConfig({
       use: migrationUse,
     },
 
+    // ── Settings project (scenario infrastructure) ────────────────────
+    {
+      fullyParallel: false,
+      name: 'Settings',
+      retries: 0,
+      testDir: './playwright/tests/settings',
+      use: migrationUse,
+    },
+
     // ── Migration projects (use global setup/teardown) ───────────────
     {
       fullyParallel: true,

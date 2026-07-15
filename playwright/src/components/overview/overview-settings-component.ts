@@ -147,6 +147,21 @@ export default class OverviewSettingsComponent extends BaseComponent {
     }
   }
 
+  async disableGuidedTour(): Promise<boolean> {
+    try {
+      const guidedTourSwitch = this.locator('[data-test-id="guided-tour"]');
+      await guidedTourSwitch.waitFor({
+        state: 'visible',
+        timeout: TestTimeouts.DEFAULT,
+      });
+      await guidedTourSwitch.uncheck({ force: true });
+      await this.page.waitForTimeout(TestTimeouts.UI_STABILIZE);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
   async disableVmTemplatesPreviewFeature(): Promise<boolean> {
     try {
       const toggle = this._vmTemplates;
@@ -170,6 +185,21 @@ export default class OverviewSettingsComponent extends BaseComponent {
 
       await this.page.waitForTimeout(TestTimeouts.UI_DELAY_MEDIUM);
       return !(await toggle.isChecked().catch(() => true));
+    } catch {
+      return false;
+    }
+  }
+
+  async disableWelcomeInformation(): Promise<boolean> {
+    try {
+      const welcomeInfoSwitch = this.locator('[data-test-id="welcome-information"]');
+      await welcomeInfoSwitch.waitFor({
+        state: 'visible',
+        timeout: TestTimeouts.DEFAULT,
+      });
+      await welcomeInfoSwitch.uncheck({ force: true });
+      await this.page.waitForTimeout(TestTimeouts.UI_STABILIZE);
+      return true;
     } catch {
       return false;
     }
@@ -217,14 +247,13 @@ export default class OverviewSettingsComponent extends BaseComponent {
 
   async enableGuidedTour(): Promise<boolean> {
     try {
-      const guidedTourSwitch = this.locator(
-        ':has(:text("Guided tour")) :is(input[type="checkbox"], input[role="switch"], .pf-v6-c-switch__input)',
-      );
-      await guidedTourSwitch.first().waitFor({
+      const guidedTourSwitch = this.locator('[data-test-id="guided-tour"]');
+      await guidedTourSwitch.waitFor({
         state: 'visible',
         timeout: TestTimeouts.DEFAULT,
       });
-      await guidedTourSwitch.first().click({ force: true });
+      await guidedTourSwitch.check({ force: true });
+      await this.page.waitForTimeout(TestTimeouts.UI_STABILIZE);
       return true;
     } catch {
       return false;
@@ -316,14 +345,12 @@ export default class OverviewSettingsComponent extends BaseComponent {
 
   async enableWelcomeInformation(): Promise<boolean> {
     try {
-      const welcomeInfoSwitch = this.locator(
-        ':has(:text("Welcome information")) :is(input[type="checkbox"], input[role="switch"], .pf-v6-c-switch__input)',
-      );
-      await welcomeInfoSwitch.first().waitFor({
+      const welcomeInfoSwitch = this.locator('[data-test-id="welcome-information"]');
+      await welcomeInfoSwitch.waitFor({
         state: 'visible',
         timeout: TestTimeouts.DEFAULT,
       });
-      await welcomeInfoSwitch.first().check({ force: true });
+      await welcomeInfoSwitch.check({ force: true });
       await this.page.waitForTimeout(TestTimeouts.UI_STABILIZE);
       return true;
     } catch {
@@ -420,7 +447,7 @@ export default class OverviewSettingsComponent extends BaseComponent {
   async getGeneralSettingsSubSections(): Promise<string[]> {
     const knownSubSections = [
       'Live migration',
-      'Memory density',
+      'Memory request ratio',
       'SSH configurations',
       'Templates and images management',
       'VirtualMachine actions confirmation',
@@ -576,6 +603,30 @@ export default class OverviewSettingsComponent extends BaseComponent {
     }
   }
 
+  async isGuestSystemLogEnabled(): Promise<boolean> {
+    try {
+      await this._guestSystemLog.waitFor({
+        state: 'visible',
+        timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+      });
+      return await this._guestSystemLog.isChecked();
+    } catch {
+      return false;
+    }
+  }
+
+  async isHideGuestCredentialsEnabled(): Promise<boolean> {
+    try {
+      await this._hideCredentials.waitFor({
+        state: 'visible',
+        timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+      });
+      return await this._hideCredentials.isChecked();
+    } catch {
+      return false;
+    }
+  }
+
   async isPasstBindingChecked(): Promise<boolean> {
     try {
       await this._passtUDNNetworkCheckbox.waitFor({
@@ -629,10 +680,17 @@ export default class OverviewSettingsComponent extends BaseComponent {
 
   async navigateToAutomaticSubscription(): Promise<boolean> {
     try {
-      await this.navigateToGuestManagement();
+      const guestMgmtOk = await this.navigateToGuestManagement();
+      if (!guestMgmtOk) {
+        await this._guestManagementButton.waitFor({
+          state: 'visible',
+          timeout: TestTimeouts.DEFAULT,
+        });
+        await this.robustClick(this._guestManagementButton);
+      }
       await this._automaticSubscriptionBtn.waitFor({
         state: 'visible',
-        timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+        timeout: TestTimeouts.DEFAULT,
       });
       await this.robustClick(this._automaticSubscriptionBtn);
       return true;

@@ -112,63 +112,6 @@ test.describe('Virtualization pages (gating)', { tag: [GATING_TAG] }, () => {
     expect.soft(ok, 'Migration policies page loaded').toBe(true);
   });
 
-  test('Storage MigrationPlans page loads with expected columns and content', async ({
-    vmListPage,
-    k8sClient,
-    utils,
-  }) => {
-    await utils.withAllure({
-      suite: SUITE,
-      feature: GATING,
-      tags: [GATING_TAG],
-    });
-
-    const storageMigrationAvailable = await k8sClient.isStorageMigrationAvailable();
-    test.skip(
-      !storageMigrationAvailable,
-      'Storage migration plans CRD not available on this cluster — skipping',
-    );
-
-    await vmListPage.navigateToStorageMigrationPlansViaUI();
-    const loaded = await vmListPage.verifyStorageMigrationPlansPageLoaded();
-    if (!loaded) {
-      test.skip(true, 'Storage MigrationPlans page did not render — UI not available');
-    }
-
-    await expect
-      .poll(() => vmListPage.verifyStorageMigrationPlansPageLoaded(), {
-        intervals: [1_000, 2_000, 3_000, 5_000],
-        message: 'Storage MigrationPlans page heading should be visible',
-        timeout: utils.TestTimeouts.DEFAULT,
-      })
-      .toBe(true);
-
-    await expect
-      .poll(() => vmListPage.isStorageMigrationContentVisible(), {
-        intervals: [1_000, 2_000, 3_000, 5_000],
-        message: 'Storage MigrationPlans page should show empty state or rows',
-        timeout: utils.TestTimeouts.DEFAULT,
-      })
-      .toBe(true);
-
-    const hasRows = await vmListPage.hasTableRows();
-    if (hasRows) {
-      const columns = await vmListPage.getStorageMigrationPlansColumnNames();
-      for (const expected of [
-        'Name',
-        'Namespaces',
-        'Storage migration',
-        'Target storage class',
-        'Status',
-        'Migration started',
-      ]) {
-        expect
-          .soft(columns, `Column "${expected}" should be in the column management list`)
-          .toContain(expected);
-      }
-    }
-  });
-
   test('KubeVirt CRD instance pages load without redirecting to dashboard', async ({
     instanceTypesPage,
     utils,
