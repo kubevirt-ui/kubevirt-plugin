@@ -1,7 +1,9 @@
 import { produce } from 'immer';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { getName } from '@kubevirt-utils/resources/shared';
+import { DYNAMIC_CREDENTIALS_SUPPORT } from '@kubevirt-utils/components/DynamicSSHKeyInjection/constants/constants';
+import { addSecretToVM } from '@kubevirt-utils/components/SSHSecretModal/utils/utils';
+import { getLabel, getName } from '@kubevirt-utils/resources/shared';
 import {
   isVirtualMachineTemplate,
   LABEL_USED_TEMPLATE_NAME,
@@ -49,6 +51,7 @@ export const getVMObjectFromTemplate = ({
   folder,
   namespace,
   selectedTemplate,
+  sshSecretName,
   vm,
   vmName,
 }: {
@@ -56,10 +59,11 @@ export const getVMObjectFromTemplate = ({
   folder: string;
   namespace: string;
   selectedTemplate: null | Template;
+  sshSecretName?: string;
   vm: V1VirtualMachine;
   vmName?: string;
-}) =>
-  produce(vm, (draftVM) => {
+}) => {
+  const generatedVM = produce(vm, (draftVM) => {
     if (!isEmpty(description)) {
       draftVM.metadata.annotations.description = description;
     }
@@ -75,3 +79,11 @@ export const getVMObjectFromTemplate = ({
     draftVM.metadata.namespace = namespace;
     draftVM.spec.runStrategy = getDefaultRunningStrategy();
   });
+
+  if (sshSecretName) {
+    const isDynamic = getLabel(generatedVM, DYNAMIC_CREDENTIALS_SUPPORT) === 'true';
+    return addSecretToVM(generatedVM, sshSecretName, isDynamic);
+  }
+
+  return generatedVM;
+};

@@ -1,5 +1,7 @@
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { DYNAMIC_CREDENTIALS_SUPPORT } from '@kubevirt-utils/components/DynamicSSHKeyInjection/constants/constants';
+import { addSecretToVM } from '@kubevirt-utils/components/SSHSecretModal/utils/utils';
 import { DEFAULT_PREFERENCE_LABEL } from '@kubevirt-utils/constants/instancetypes-and-preferences';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { getLabel } from '@kubevirt-utils/resources/shared';
@@ -31,6 +33,7 @@ export const generateVM: GenerateVMCallback = ({
   pvcSource,
   selectedBootableVolume,
   selectedInstanceType,
+  sshSecretName,
   targetNamespace,
   vmDescription,
   vmName,
@@ -58,6 +61,11 @@ export const generateVM: GenerateVMCallback = ({
       isUDNManagedNamespace,
     }),
   };
+
+  if (sshSecretName) {
+    const isDynamic = getLabel(selectedBootableVolume, DYNAMIC_CREDENTIALS_SUPPORT) === 'true';
+    return addSecretToVM(generatedVM, sshSecretName, isDynamic);
+  }
 
   return generatedVM;
 };

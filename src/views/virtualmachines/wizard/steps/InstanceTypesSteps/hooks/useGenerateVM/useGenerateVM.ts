@@ -9,6 +9,8 @@ import {
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import useHyperConvergeConfiguration from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import useIsIPv6SingleStackCluster from '@kubevirt-utils/hooks/useIPStackType/useIsIPv6SingleStackCluster';
+import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
+import { USER_SETTINGS_KEYS } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/const';
 import useRHELAutomaticSubscription from '@kubevirt-utils/hooks/useRHELAutomaticSubscription/useRHELAutomaticSubscription';
 import { getLabel } from '@kubevirt-utils/resources/shared';
 import useNamespaceUDN from '@kubevirt-utils/resources/udn/hooks/useNamespaceUDN';
@@ -81,6 +83,10 @@ const useGenerateVM: UseGenerateVM = () => {
   );
   const generatedVMName = useMemo(() => generatePrettyName(osLabel), [osLabel]);
 
+  const [driversImage] = useDriversImage();
+  const [authorizedSSHKeys] = useKubevirtUserSettings(USER_SETTINGS_KEYS.ssh, cluster);
+  const defaultSSHSecretName = authorizedSSHKeys?.[namespace];
+
   const generatedVM = useMemo(() => {
     return generateVM({
       cluster,
@@ -94,6 +100,7 @@ const useGenerateVM: UseGenerateVM = () => {
       pvcSource,
       selectedBootableVolume,
       selectedInstanceType,
+      sshSecretName: defaultSSHSecretName,
       targetNamespace: namespace,
       vmDescription,
       vmName: vmName || generatedVMName,
@@ -101,6 +108,7 @@ const useGenerateVM: UseGenerateVM = () => {
   }, [
     cluster,
     customDiskSize,
+    defaultSSHSecretName,
     dvSource,
     enableMultiArchBootImageImport,
     folder,
@@ -116,11 +124,8 @@ const useGenerateVM: UseGenerateVM = () => {
     vmName,
   ]);
 
-  const [driversImage] = useDriversImage();
-
   return useMemo(() => {
     const isWindowsOSVolume = isWindowBootableVolume(selectedBootableVolume);
-
     return isWindowsOSVolume ? addWinDriverVolume(generatedVM, driversImage) : generatedVM;
   }, [driversImage, generatedVM, selectedBootableVolume]);
 };
