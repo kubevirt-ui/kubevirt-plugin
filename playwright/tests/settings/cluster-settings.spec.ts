@@ -285,11 +285,17 @@ test.describe('Cluster Settings', { tag: [CNV_SETTINGS_TAG, '@adminOnly'] }, () 
 
     await settingsPage.navigateToGuestManagement();
 
-    const enabled = await settingsPage.setGuestSystemLog(true);
-    expect(enabled, 'Guest system log should be enabled successfully').toBe(true);
+    const initial = await settingsPage.isGuestSystemLogEnabled();
 
-    const disabled = await settingsPage.setGuestSystemLog(false);
-    expect(disabled, 'Guest system log should be disabled successfully').toBe(true);
+    try {
+      const toggled = await settingsPage.setGuestSystemLog(!initial);
+      expect(toggled, 'Guest system log toggle should respond to change').toBe(true);
+
+      const restored = await settingsPage.setGuestSystemLog(initial);
+      expect(restored, 'Guest system log should be restored to original state').toBe(true);
+    } finally {
+      await settingsPage.setGuestSystemLog(initial);
+    }
   });
 
   test('Automatic subscription of new RHEL VirtualMachines section is accessible', async ({
@@ -314,14 +320,16 @@ test.describe('Cluster Settings', { tag: [CNV_SETTINGS_TAG, '@adminOnly'] }, () 
 
     await settingsPage.navigateToGuestManagement();
 
-    const initial = await settingsPage.hideGuestCredentials(true);
-    expect(initial, 'Hide guest credentials toggle should be enabled').toBe(true);
+    const initial = await settingsPage.isHideGuestCredentialsEnabled();
 
     try {
-      const restored = await settingsPage.hideGuestCredentials(false);
-      expect(restored, 'Hide guest credentials toggle should be restored to disabled').toBe(true);
-    } catch {
-      // best-effort restore
+      const toggled = await settingsPage.hideGuestCredentials(!initial);
+      expect(toggled, 'Hide guest credentials toggle should respond to change').toBe(true);
+
+      const restored = await settingsPage.hideGuestCredentials(initial);
+      expect(restored, 'Hide guest credentials should be restored to original state').toBe(true);
+    } finally {
+      await settingsPage.hideGuestCredentials(initial);
     }
   });
 
@@ -343,9 +351,11 @@ test.describe('Cluster Settings', { tag: [CNV_SETTINGS_TAG, '@adminOnly'] }, () 
   test('SCSI persistent reservation section is accessible', async ({ settingsPage, utils }) => {
     utils.withAllure({ suite: SUITE, feature: CNV_SETTINGS_FEATURE, tags: [CNV_SETTINGS_TAG] });
 
-    await settingsPage.navigateToVirtualizationFeatures();
-    const loaded = await settingsPage.verifySettingsTabLoaded();
-    expect(loaded, 'Settings tab should be loaded for SCSI inspection').toBe(true);
+    const sections = await settingsPage.getClusterSettingsSectionNames();
+    expect(
+      sections.some((s) => s.includes('SCSI persistent reservation')),
+      `"SCSI persistent reservation" should be listed (found: ${sections.join(', ')})`,
+    ).toBe(true);
   });
 
   // ── Preview features tab ────────────────────────────────────────────────────────

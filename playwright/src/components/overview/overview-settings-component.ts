@@ -147,6 +147,21 @@ export default class OverviewSettingsComponent extends BaseComponent {
     }
   }
 
+  async disableGuidedTour(): Promise<boolean> {
+    try {
+      const guidedTourSwitch = this.locator('[data-test-id="guided-tour"]');
+      await guidedTourSwitch.waitFor({
+        state: 'visible',
+        timeout: TestTimeouts.DEFAULT,
+      });
+      await guidedTourSwitch.uncheck({ force: true });
+      await this.page.waitForTimeout(TestTimeouts.UI_STABILIZE);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
   async disableVmTemplatesPreviewFeature(): Promise<boolean> {
     try {
       const toggle = this._vmTemplates;
@@ -170,6 +185,21 @@ export default class OverviewSettingsComponent extends BaseComponent {
 
       await this.page.waitForTimeout(TestTimeouts.UI_DELAY_MEDIUM);
       return !(await toggle.isChecked().catch(() => true));
+    } catch {
+      return false;
+    }
+  }
+
+  async disableWelcomeInformation(): Promise<boolean> {
+    try {
+      const welcomeInfoSwitch = this.locator('[data-test-id="welcome-information"]');
+      await welcomeInfoSwitch.waitFor({
+        state: 'visible',
+        timeout: TestTimeouts.DEFAULT,
+      });
+      await welcomeInfoSwitch.uncheck({ force: true });
+      await this.page.waitForTimeout(TestTimeouts.UI_STABILIZE);
+      return true;
     } catch {
       return false;
     }
@@ -568,6 +598,30 @@ export default class OverviewSettingsComponent extends BaseComponent {
   async isAdvancedCdromFeaturesEnabled(): Promise<boolean> {
     try {
       return await this._advancedCdromFeaturesToggle.isChecked().catch(() => false);
+    } catch {
+      return false;
+    }
+  }
+
+  async isGuestSystemLogEnabled(): Promise<boolean> {
+    try {
+      await this._guestSystemLog.waitFor({
+        state: 'visible',
+        timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+      });
+      return await this._guestSystemLog.isChecked();
+    } catch {
+      return false;
+    }
+  }
+
+  async isHideGuestCredentialsEnabled(): Promise<boolean> {
+    try {
+      await this._hideCredentials.waitFor({
+        state: 'visible',
+        timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+      });
+      return await this._hideCredentials.isChecked();
     } catch {
       return false;
     }

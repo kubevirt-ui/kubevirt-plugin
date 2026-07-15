@@ -86,10 +86,15 @@ test.describe('Settings User Tests', { tag: [CNV_SETTINGS_TAG] }, () => {
 
     await settingsPage.navigateToGettingStartedResources();
 
-    const welcomeEnabled = await settingsPage.enableWelcomeInformation();
-    expect.soft(welcomeEnabled, 'Welcome information toggle should respond').toBe(true);
+    try {
+      const welcomeEnabled = await settingsPage.enableWelcomeInformation();
+      expect.soft(welcomeEnabled, 'Welcome information toggle should respond').toBe(true);
 
-    const guidedTourEnabled = await settingsPage.enableGuidedTour();
-    expect.soft(guidedTourEnabled, 'Guided tour toggle should respond').toBe(true);
+      const guidedTourEnabled = await settingsPage.enableGuidedTour();
+      expect.soft(guidedTourEnabled, 'Guided tour toggle should respond').toBe(true);
+    } finally {
+      await settingsPage.disableWelcomeInformation();
+      await settingsPage.disableGuidedTour();
+    }
   });
 });

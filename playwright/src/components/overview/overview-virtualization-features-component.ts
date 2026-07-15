@@ -77,8 +77,14 @@ export default class OverviewVirtualizationFeaturesComponent extends BaseCompone
       await btn.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
       const count = Math.abs(steps);
       for (let i = 0; i < count; i++) {
+        if (await btn.isDisabled()) break;
+        const before = await this._memoryRequestRatioInput.inputValue();
         await this.robustClick(btn);
-        await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
+        await waitForCondition(
+          async () => (await this._memoryRequestRatioInput.inputValue()) !== before,
+          TestTimeouts.UI_ACTION_COMPLETE,
+          TestTimeouts.POLLING_INTERVAL,
+        );
       }
       return true;
     } catch {
@@ -104,6 +110,18 @@ export default class OverviewVirtualizationFeaturesComponent extends BaseCompone
     await this.robustClick(
       this.locator('.virtualization-features-configuration-wizard button[type="submit"]'),
     );
+  }
+
+  async disableAaq(): Promise<boolean> {
+    try {
+      const alreadyDisabled = !(await this.isAaqEnabled());
+      if (alreadyDisabled) return true;
+      await this._aaqSwitch.first().click({ force: true });
+      await this.page.waitForTimeout(TestTimeouts.CLUSTER_STATE_PROPAGATION);
+      return !(await this.isAaqEnabled());
+    } catch {
+      return false;
+    }
   }
 
   async disableMemoryDensity(): Promise<boolean> {

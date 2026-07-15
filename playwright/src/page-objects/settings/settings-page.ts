@@ -38,11 +38,19 @@ export default class SettingsPage extends BasePage {
     return this._features.adjustMemoryRequestRatio(...args);
   }
 
+  disableAaq(
+    ...args: Parameters<OverviewVirtualizationFeaturesPage['disableAaq']>
+  ): ReturnType<OverviewVirtualizationFeaturesPage['disableAaq']> {
+    return this._features.disableAaq(...args);
+  }
+
   disableAdvancedCdromFeatures(
     ...args: Parameters<OverviewSettingsPage['disableAdvancedCdromFeatures']>
   ): ReturnType<OverviewSettingsPage['disableAdvancedCdromFeatures']> {
     return this._settings.disableAdvancedCdromFeatures(...args);
   }
+
+  // ── Cluster tab — top-level ──────────────────────────────────────────────────
 
   disableCentosStream9ImageCron(
     ...args: Parameters<OverviewSettingsPage['disableCentosStream9ImageCron']>
@@ -50,7 +58,11 @@ export default class SettingsPage extends BasePage {
     return this._settings.disableCentosStream9ImageCron(...args);
   }
 
-  // ── Cluster tab — top-level ──────────────────────────────────────────────────
+  disableGuidedTour(
+    ...args: Parameters<OverviewSettingsPage['disableGuidedTour']>
+  ): ReturnType<OverviewSettingsPage['disableGuidedTour']> {
+    return this._settings.disableGuidedTour(...args);
+  }
 
   disableMemoryDensity(
     ...args: Parameters<OverviewMigrationsPage['disableMemoryDensity']>
@@ -64,11 +76,19 @@ export default class SettingsPage extends BasePage {
     return this._settings.disableVmTemplatesPreviewFeature(...args);
   }
 
+  disableWelcomeInformation(
+    ...args: Parameters<OverviewSettingsPage['disableWelcomeInformation']>
+  ): ReturnType<OverviewSettingsPage['disableWelcomeInformation']> {
+    return this._settings.disableWelcomeInformation(...args);
+  }
+
   enableAaq(
     ...args: Parameters<OverviewVirtualizationFeaturesPage['enableAaq']>
   ): ReturnType<OverviewVirtualizationFeaturesPage['enableAaq']> {
     return this._features.enableAaq(...args);
   }
+
+  // ── Cluster tab — Virtualization features section ────────────────────────────
 
   enableAdvancedCdromFeatures(
     ...args: Parameters<OverviewSettingsPage['enableAdvancedCdromFeatures']>
@@ -81,8 +101,6 @@ export default class SettingsPage extends BasePage {
   ): ReturnType<OverviewSettingsPage['enableCentosStream9ImageCron']> {
     return this._settings.enableCentosStream9ImageCron(...args);
   }
-
-  // ── Cluster tab — Virtualization features section ────────────────────────────
 
   enableGuidedTour(
     ...args: Parameters<OverviewSettingsPage['enableGuidedTour']>
@@ -224,6 +242,18 @@ export default class SettingsPage extends BasePage {
     ...args: Parameters<OverviewVirtualizationFeaturesPage['isConfigureFeaturesButtonVisible']>
   ): ReturnType<OverviewVirtualizationFeaturesPage['isConfigureFeaturesButtonVisible']> {
     return this._features.isConfigureFeaturesButtonVisible(...args);
+  }
+
+  isGuestSystemLogEnabled(
+    ...args: Parameters<OverviewSettingsPage['isGuestSystemLogEnabled']>
+  ): ReturnType<OverviewSettingsPage['isGuestSystemLogEnabled']> {
+    return this._settings.isGuestSystemLogEnabled(...args);
+  }
+
+  isHideGuestCredentialsEnabled(
+    ...args: Parameters<OverviewSettingsPage['isHideGuestCredentialsEnabled']>
+  ): ReturnType<OverviewSettingsPage['isHideGuestCredentialsEnabled']> {
+    return this._settings.isHideGuestCredentialsEnabled(...args);
   }
 
   isKsmControlVisible(

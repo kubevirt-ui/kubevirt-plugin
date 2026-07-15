@@ -74,16 +74,41 @@ export function getSetupRules(): SetupRule[] {
         }
 
         try {
-          const kubeconfig = execFileSync(
-            'oc',
-            ['config', 'view', '--raw', '--minify', '--flatten'],
-            { encoding: 'utf8', timeout: 30 * SECOND, stdio: 'pipe' },
-          );
+          const server = execFileSync('oc', ['whoami', '--show-server'], {
+            encoding: 'utf8',
+            timeout: 10 * SECOND,
+            stdio: 'pipe',
+          }).trim();
+          const token = execFileSync('oc', ['whoami', '--show-token'], {
+            encoding: 'utf8',
+            timeout: 10 * SECOND,
+            stdio: 'pipe',
+          }).trim();
 
-          if (!kubeconfig.includes('current-context')) {
-            logger.warn('⚠️ oc config view output missing current-context — skipping');
+          if (!server || !token) {
+            logger.warn('⚠️ oc whoami returned empty server or token — skipping');
             return;
           }
+
+          const kubeconfig = [
+            'apiVersion: v1',
+            'kind: Config',
+            'clusters:',
+            '- cluster:',
+            '    insecure-skip-tls-verify: true',
+            `    server: ${server}`,
+            '  name: oc-session',
+            'contexts:',
+            '- context:',
+            '    cluster: oc-session',
+            '    user: oc-session',
+            '  name: oc-session',
+            'current-context: oc-session',
+            'users:',
+            '- name: oc-session',
+            '  user:',
+            `    token: ${token}`,
+          ].join('\n');
 
           fs.writeFileSync('/tmp/kubeconfig', kubeconfig, 'utf8');
           const user = execFileSync('oc', ['whoami'], {
