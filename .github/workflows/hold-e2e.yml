@@ -59,7 +59,10 @@ jobs:
         with:
           app-id: ${{ secrets.BOT_APP_ID }}
           private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
-          permission-pull-requests: read
+          # pull-requests: write, not read -- reacting to a PR-associated
+          # comment needs it even though the endpoint path is /issues/...
+          # (see ci-scripts/README.md).
+          permission-pull-requests: write
           permission-issues: write
 
       - name: Resolve PR head and react
@@ -107,6 +110,9 @@ jobs:
         with:
           app-id: ${{ secrets.BOT_APP_ID }}
           private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
+          # pull-requests: write is what addLabels below actually needs
+          # (the PR, not the repo-level label list) -- see ci-scripts/README.md.
+          permission-pull-requests: write
           permission-issues: write
 
       # addLabels doesn't create a missing label (404s instead) -- check-then-
@@ -146,7 +152,7 @@ jobs:
                 labels: ['e2e-hold'],
               });
             } catch (err) {
-              core.warning(`Could not apply the e2e-hold label -- check that the kubevirt-plugin-bot GitHub App has "Issues: write" granted and the installation is approved: ${err.message || err}`);
+              core.warning(`Could not apply the e2e-hold label -- check that the kubevirt-plugin-bot GitHub App has "Issues: write" and "Pull requests: write" granted and the installation is approved: ${err.message || err}`);
               core.setFailed('Failed to apply e2e-hold label -- see warning above.');
             }
 
@@ -230,6 +236,8 @@ jobs:
         with:
           app-id: ${{ secrets.BOT_APP_ID }}
           private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
+          # pull-requests: write -- createComment targets the PR (see ci-scripts/README.md).
+          permission-pull-requests: write
           permission-issues: write
 
       # always() runs this even on partial failure -- branch the wording
@@ -272,6 +280,6 @@ jobs:
                 body,
               });
             } catch (err) {
-              core.warning(`Could not comment on the PR -- check that the kubevirt-plugin-bot GitHub App has "Issues: write" granted and the installation is approved: ${err.message || err}`);
+              core.warning(`Could not comment on the PR -- check that the kubevirt-plugin-bot GitHub App has "Issues: write" and "Pull requests: write" granted and the installation is approved: ${err.message || err}`);
               core.setFailed('Failed to comment on the PR -- see warning above. The hold itself (the "Run Gating Tests" check-run) is unaffected.');
             }
