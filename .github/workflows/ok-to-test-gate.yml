@@ -18,7 +18,9 @@ permissions:
 jobs:
   dispatch-if-ok-to-test:
     name: Dispatch Hot Cluster E2E if ok-to-test
-    if: github.event.label.name == 'ok-to-test'
+    # Also skipped while /hold-e2e is active -- see hot-cluster-e2e-pr-gate.yml's
+    # identical guard for why.
+    if: github.event.label.name == 'ok-to-test' && !contains(github.event.pull_request.labels.*.name, 'e2e-hold')
     runs-on: ubuntu-latest
     timeout-minutes: 2
     steps:

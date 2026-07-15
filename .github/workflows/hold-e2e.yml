@@ -1,0 +1,260 @@
+name: Hold E2E
+
+# Lets an OWNERS-listed maintainer comment /hold-e2e on a PR to pause Hot
+# Cluster E2E testing: no new run is auto-dispatched (pushes, ok-to-test, or
+# main advancing for a merge-pool PR) and the required "Run Gating Tests"
+# check is marked non-passing, until /retest-e2e explicitly lifts the hold.
+# See ci-scripts/README.md ("Check-Run & Retest Model").
+
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  # issues: write (reactions) added here, not at the workflow level -- a
+  # job-level permissions block fully replaces the workflow-level one for
+  # that job, so contents/pull-requests are restated too (both used below).
+  check:
+    name: Check Hold Request
+    permissions:
+      contents: read
+      pull-requests: read
+      issues: write
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    if: >
+      github.event.issue.pull_request != null &&
+      contains(github.event.comment.body, '/hold-e2e')
+    outputs:
+      trusted: ${{ steps.check-trust.outputs.trusted }}
+      head-sha: ${{ steps.resolve.outputs.head_sha }}
+    steps:
+      # No ref override: reads OWNERS from the default branch, not the commenter's PR.
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      # OWNERS is the single source of truth for trust, same as /retest-e2e
+      # and /cancel-e2e -- a hold can block merging just as effectively as a
+      # bad result, so it gets the same trust bar.
+      - name: Check trusted author
+        id: check-trust
+        uses: ./.github/actions/hot-cluster/check-trust
+        with:
+          author: ${{ github.event.comment.user.login }}
+
+      - name: Resolve PR head and react
+        id: resolve
+        uses: actions/github-script@v9
+        env:
+          TRUSTED: ${{ steps.check-trust.outputs.trusted }}
+        with:
+          script: |
+            const author = context.payload.comment.user.login;
+
+            const react = async (content) => {
+              try {
+                await github.rest.reactions.createForIssueComment({
+                  ...context.repo,
+                  comment_id: context.payload.comment.id,
+                  content,
+                });
+              } catch (err) {
+                core.warning(`Could not react to comment with "${content}": ${err.message || err}`);
+              }
+            };
+
+            const trusted = process.env.TRUSTED === 'true';
+            core.info(`${author} is ${trusted ? '' : 'not '}listed in OWNERS (approvers/reviewers) — ${trusted ? 'trusted' : 'untrusted, ignoring /hold-e2e'}.`);
+
+            if (!trusted) {
+              await react('-1');
+              core.setFailed(`${author} is not authorized to use /hold-e2e`);
+              return;
+            }
+
+            const prNumber = context.issue.number;
+            const pr = await github.rest.pulls.get({
+              ...context.repo,
+              pull_number: prNumber,
+            });
+
+            core.info(`/hold-e2e requested by ${author} on PR #${prNumber} (HEAD: ${pr.data.head.sha})`);
+
+            await react('eyes');
+            core.setOutput('head_sha', pr.data.head.sha);
+
+  # The durable signal that survives future pushes -- hot-cluster-e2e-pr-gate.yml
+  # and ok-to-test-gate.yml both skip their dispatch while this is present, and
+  # is-merge-pool-pr.cjs excludes it from the merge pool too.
+  apply-hold-label:
+    name: Apply Hold Label
+    # issues: write covers label read/create/add -- no contents/checkout needed.
+    permissions:
+      issues: write
+    needs: [check]
+    if: needs.check.result == 'success' && needs.check.outputs.trusted == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      # addLabels does NOT create a missing label (it 404s) -- this repo's
+      # first-ever /hold-e2e would otherwise fail here before the label ever
+      # sticks. Same check-then-create pattern as addLabel() in
+      # .github/scripts/src/github-comments.ts, inlined since that helper
+      # isn't reachable from a plain actions/github-script step.
+      - name: Add e2e-hold label
+        uses: actions/github-script@v9
+        with:
+          script: |
+            try {
+              await github.rest.issues.getLabel({ ...context.repo, name: 'e2e-hold' });
+            } catch (err) {
+              if (err.status !== 404) throw err;
+              core.info('e2e-hold label does not exist yet -- creating it.');
+              await github.rest.issues.createLabel({
+                ...context.repo,
+                name: 'e2e-hold',
+                color: 'b60205',
+                description: 'Hot Cluster E2E is on hold for this PR -- comment /retest-e2e to lift it',
+              });
+            }
+
+            await github.rest.issues.addLabels({
+              ...context.repo,
+              issue_number: context.issue.number,
+              labels: ['e2e-hold'],
+            });
+
+  # Entering this same group is what actually cancels a same-PR cluster-check
+  # in progress -- see hot-cluster-e2e.yml's own concurrency on that job, and
+  # /cancel-e2e's identical pair of jobs. Without this, a run already
+  # in-flight when /hold-e2e is commented could still post a passing result
+  # after the hold below.
+  cancel-cluster-check:
+    name: Cancel Cluster Check
+    # Entering the concurrency group below is the only thing this job does
+    # -- no API calls, so no permissions at all.
+    permissions: {}
+    needs: [check]
+    if: needs.check.result == 'success' && needs.check.outputs.trusted == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    concurrency:
+      group: hot-cluster-check-${{ github.event.issue.number }}
+      cancel-in-progress: true
+    steps:
+      - run: echo "Entered the cluster-check concurrency group for PR ${{ github.event.issue.number }} -- cancels any in-progress instance."
+
+  # Same as above, for run-e2e-tests -- the job that actually costs real
+  # cluster/test time.
+  cancel-run-e2e-tests:
+    name: Cancel Run E2E Tests
+    # Same as cancel-cluster-check -- no API calls, no permissions needed.
+    permissions: {}
+    needs: [check]
+    if: needs.check.result == 'success' && needs.check.outputs.trusted == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    concurrency:
+      group: hot-cluster-run-e2e-${{ github.event.issue.number }}
+      cancel-in-progress: true
+    steps:
+      - run: echo "Entered the run-e2e-tests concurrency group for PR ${{ github.event.issue.number }} -- cancels any in-progress instance."
+
+  # Non-passing without a stuck-pending entry -- same completed/neutral
+  # pattern retest-stale-gating.yml's stale-marker already uses (see that
+  # workflow's own comment for why queued/in_progress would be wrong here).
+  # A cancelled in-flight run (above) closes its own check-run to
+  # neutral/"superseded" via hot-cluster-e2e.yml's close-gating-check-on-cancel
+  # job, within that same run -- this creates a separate, fresh entry rather
+  # than racing to update it. Sequenced after the two cancel jobs (not just
+  # needing check) so this marker is never published before the cancellation
+  # is even attempted -- doesn't eliminate the race against a run whose
+  # cluster-check/run-e2e-tests already finished before this comment landed
+  # (verify-gating-tests re-checks the hold itself for that case), but keeps
+  # the common case ordered correctly.
+  mark-held:
+    name: Mark Run Gating Tests Held
+    # checks: write for publish-gating-check (checks.create/update); contents:
+    # read since checkout is needed to resolve that local composite action.
+    permissions:
+      contents: read
+      checks: write
+    needs: [check, cancel-cluster-check, cancel-run-e2e-tests]
+    if: needs.check.result == 'success' && needs.check.outputs.trusted == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      # Needed to resolve the local publish-gating-check action below.
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Publish held marker
+        uses: ./.github/actions/publish-gating-check
+        with:
+          head-sha: ${{ needs.check.outputs.head-sha }}
+          status: completed
+          conclusion: neutral
+          title: 'Hot Cluster E2E: held via /hold-e2e'
+          summary: |
+            Required check not satisfied -- hold active. Testing is on hold for this PR (requested by @${{ github.event.comment.user.login }}).
+
+            No new run will be dispatched automatically -- neither by a push, the `ok-to-test` label, nor `main` advancing -- while this hold is active. Comment `/retest-e2e` to lift the hold and get a fresh result.
+
+            Removing the `e2e-hold` label directly (e.g. from the UI) does **not** lift the hold or refresh this result -- only `/retest-e2e` does both.
+
+  report:
+    name: Report Hold
+    # issues: write for the PR comment -- no checks calls in this job.
+    permissions:
+      issues: write
+    needs: [check, apply-hold-label, cancel-cluster-check, cancel-run-e2e-tests, mark-held]
+    if: always() && needs.check.result == 'success' && needs.check.outputs.trusted == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      # always() above means this still runs (to report what happened) even
+      # if apply-hold-label or mark-held failed -- branch the wording rather
+      # than unconditionally claiming the hold succeeded. The label and the
+      # check-run marker are the two things that actually enforce a hold;
+      # the cancel jobs are best-effort and don't affect whether it "took".
+      - name: Comment outcome on the PR
+        uses: actions/github-script@v9
+        env:
+          LABEL_OK: ${{ needs.apply-hold-label.result == 'success' }}
+          MARKER_OK: ${{ needs.mark-held.result == 'success' }}
+        with:
+          script: |
+            const labelOk = process.env.LABEL_OK === 'true';
+            const markerOk = process.env.MARKER_OK === 'true';
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/workflows/hold-e2e.yml`;
+
+            const body = (labelOk && markerOk)
+              ? [
+                  '🔒 Hot Cluster E2E is now on hold for this PR.',
+                  '',
+                  'No new run will be triggered automatically (pushes, `ok-to-test`, or `main` advancing) while this hold is active, and the PR cannot merge until it is lifted.',
+                  '',
+                  'Removing the `e2e-hold` label directly does not lift the hold or refresh the result -- comment `/retest-e2e` when ready to lift it and get a fresh result.',
+                ].join('\n')
+              : [
+                  '⚠️ `/hold-e2e` only partially applied for this PR:',
+                  '',
+                  `- \`e2e-hold\` label applied: ${labelOk ? 'yes' : 'no'}`,
+                  `- "Run Gating Tests" marked held: ${markerOk ? 'yes' : 'no'}`,
+                  '',
+                  `See the [Actions tab](${runUrl}) for details, and consider re-running \`/hold-e2e\`.`,
+                ].join('\n');
+
+            await github.rest.issues.createComment({
+              ...context.repo,
+              issue_number: context.issue.number,
+              body,
+            });

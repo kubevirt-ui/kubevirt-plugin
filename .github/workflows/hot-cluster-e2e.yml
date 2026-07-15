@@ -349,6 +349,7 @@ jobs:
       statuses: write
       checks: write
       issues: write
+      pull-requests: read
     steps:
       - name: Verify hot cluster E2E ran and passed
         id: verify
@@ -414,6 +415,28 @@ jobs:
               target_url: `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
             });
 
+      # Fresh, live check right before publishing any real result. Closes a
+      # race /hold-e2e's own cancellation can't: if cluster-check/run-e2e-tests
+      # already finished by the time a hold lands, there's nothing left in
+      # their concurrency groups to cancel, and this job would otherwise
+      # publish a real pass/fail over top of /hold-e2e's neutral marker.
+      # continue-on-error + defaulting to "not held" on failure: an API
+      # hiccup here must never block a normal, unheld run from publishing.
+      - name: Check for active /hold-e2e hold
+        id: check-hold
+        if: always() && inputs.pr_number != ''
+        continue-on-error: true
+        uses: actions/github-script@v9
+        env:
+          PR_NUMBER: ${{ inputs.pr_number }}
+        with:
+          script: |
+            const prNumber = Number(process.env.PR_NUMBER);
+            const { data: pr } = await github.rest.pulls.get({ ...context.repo, pull_number: prNumber });
+            const held = (pr.labels || []).some((label) => label.name === 'e2e-hold');
+            core.info(`PR #${prNumber} e2e-hold label present: ${held}`);
+            core.setOutput('held', held ? 'true' : 'false');
+
       # Maps verify's reason to a PR-facing title/summary. is_pool_retest picks
       # "(retest after main advanced)" wording; every other dispatch gets plain PR wording.
       - name: Determine retest result details
@@ -424,7 +447,22 @@ jobs:
           PR_NUMBER: ${{ inputs.pr_number }}
           MAIN_SHA: ${{ github.sha }}
           IS_POOL_RETEST: ${{ inputs.is_pool_retest }}
+          HELD: ${{ steps.check-hold.outputs.held }}
         run: |
+          # Held wins over any real result -- re-checked live here rather
+          # than trusted from earlier in this run, since the hold may have
+          # landed after cluster-check/run-e2e-tests already started.
+          if [[ "${HELD}" == "true" ]]; then
+            echo "conclusion=neutral" >> "$GITHUB_OUTPUT"
+            if [[ "${IS_POOL_RETEST}" == "true" ]]; then
+              echo "title=Hot Cluster E2E: held via /hold-e2e (retest after main advanced)" >> "$GITHUB_OUTPUT"
+            else
+              echo "title=Hot Cluster E2E: held via /hold-e2e" >> "$GITHUB_OUTPUT"
+            fi
+            echo "summary=PR #${PR_NUMBER} is on hold via /hold-e2e (re-checked fresh as this run finished) -- its real result is suppressed so it can't re-green the required check out from under the hold. Comment /retest-e2e to lift the hold and get a fresh result." >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
           case "${REASON}" in
             passed)
               echo "conclusion=success" >> "$GITHUB_OUTPUT"

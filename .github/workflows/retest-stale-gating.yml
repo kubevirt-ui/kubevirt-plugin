@@ -98,6 +98,18 @@ jobs:
             const { data: pr } = await github.rest.pulls.get({ ...context.repo, pull_number: prNumber });
             core.setOutput('head_sha', pr.head.sha);
 
+            // /hold-e2e's own marker is more specific than the generic
+            // stale one below -- leave it alone so the PR still points at
+            // "comment /retest-e2e to lift the hold" rather than the
+            // stale-after-main-advanced wording. It's already a completed/
+            // neutral terminal state, so merge stays blocked either way.
+            const isHeld = (pr.labels || []).some((label) => label.name === 'e2e-hold');
+            if (isHeld) {
+              core.info(`PR #${prNumber} is held via /hold-e2e -- leaving its check-run alone.`);
+              core.setOutput('should_mark', 'false');
+              return;
+            }
+
             const inPool = JSON.parse(process.env.POOL_PR_NUMBERS).includes(prNumber);
             core.setOutput('summary', [
               `\`main\` advanced to ${context.sha} since this check last completed.`,

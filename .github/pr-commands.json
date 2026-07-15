@@ -14,6 +14,12 @@
       "workflow": ".github/workflows/cancel-e2e.yml"
     },
     {
+      "command": "/hold-e2e",
+      "description": "Pause Hot Cluster E2E for this PR -- no new run is dispatched and the PR cannot merge until /retest-e2e lifts the hold.",
+      "trust": "owners",
+      "workflow": ".github/workflows/hold-e2e.yml"
+    },
+    {
       "command": "/deploy-manual-console",
       "description": "Deploy a manual console + kubevirt-plugin instance for this PR. Cluster name/infra type are auto-resolved from the PR's base branch; the cluster is provisioned automatically if not already up. Credentials are sent to Slack.",
       "trust": "owners",
