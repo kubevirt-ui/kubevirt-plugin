@@ -17,7 +17,7 @@ permissions:
   contents: read
   actions: write
   issues: write
-  pull-requests: read
+  pull-requests: write
 
 concurrency:
   group: deploy-manual-console-cmd-${{ github.event.issue.number }}
