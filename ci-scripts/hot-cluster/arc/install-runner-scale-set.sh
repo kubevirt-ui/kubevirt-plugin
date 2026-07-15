@@ -13,7 +13,9 @@
 #
 # Optional environment variables:
 #   RUNNER_SCALE_SET_NAME       (default: kubevirt-plugin-ci)
-#   MIN_RUNNERS / MAX_RUNNERS   (default: 0 / 5)
+#   MIN_RUNNERS / MAX_RUNNERS   (default: 0 / 2) -- MAX_RUNNERS caps how many
+#                               jobs (E2E + manual-console) can run at once
+#                               against this cluster; queues the rest.
 #   ARC_CONTROLLER_NS           (default: arc-systems) — must match controller install
 #   ARC_CONTROLLER_INSTALL_NAME (default: arc)
 #   ARC_RUNNERS_NS              (default: arc-runners)
@@ -45,7 +47,7 @@ ARC_HELM_REPO="oci://ghcr.io/actions/actions-runner-controller-charts"
 ARC_VERSION="${ARC_VERSION:-0.14.0}"
 RUNNER_SCALE_SET_NAME="${RUNNER_SCALE_SET_NAME:-kubevirt-plugin-ci}"
 MIN_RUNNERS="${MIN_RUNNERS:-0}"
-MAX_RUNNERS="${MAX_RUNNERS:-5}"
+MAX_RUNNERS="${MAX_RUNNERS:-2}"
 CONTROLLER_SA_NAME="${ARC_CONTROLLER_INSTALL_NAME}-gha-rs-controller"
 
 echo "=== ARC runner scale set installation (OpenShift) ==="
