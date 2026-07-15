@@ -13,17 +13,12 @@ on:
 permissions:
   contents: read
   pull-requests: read
+  issues: write
+  checks: write
 
 jobs:
-  # issues: write (reactions) added here, not at the workflow level -- a
-  # job-level permissions block fully replaces the workflow-level one for
-  # that job, so contents/pull-requests are restated too (both used below).
   check:
     name: Check Hold Request
-    permissions:
-      contents: read
-      pull-requests: read
-      issues: write
     runs-on: ubuntu-latest
     timeout-minutes: 5
     if: >
@@ -94,9 +89,6 @@ jobs:
   # is-merge-pool-pr.cjs excludes it from the merge pool too.
   apply-hold-label:
     name: Apply Hold Label
-    # issues: write covers label read/create/add -- no contents/checkout needed.
-    permissions:
-      issues: write
     needs: [check]
     if: needs.check.result == 'success' && needs.check.outputs.trusted == 'true'
     runs-on: ubuntu-latest
@@ -137,9 +129,6 @@ jobs:
   # after the hold below.
   cancel-cluster-check:
     name: Cancel Cluster Check
-    # Entering the concurrency group below is the only thing this job does
-    # -- no API calls, so no permissions at all.
-    permissions: {}
     needs: [check]
     if: needs.check.result == 'success' && needs.check.outputs.trusted == 'true'
     runs-on: ubuntu-latest
@@ -154,8 +143,6 @@ jobs:
   # cluster/test time.
   cancel-run-e2e-tests:
     name: Cancel Run E2E Tests
-    # Same as cancel-cluster-check -- no API calls, no permissions needed.
-    permissions: {}
     needs: [check]
     if: needs.check.result == 'success' && needs.check.outputs.trusted == 'true'
     runs-on: ubuntu-latest
@@ -180,11 +167,6 @@ jobs:
   # the common case ordered correctly.
   mark-held:
     name: Mark Run Gating Tests Held
-    # checks: write for publish-gating-check (checks.create/update); contents:
-    # read since checkout is needed to resolve that local composite action.
-    permissions:
-      contents: read
-      checks: write
     needs: [check, cancel-cluster-check, cancel-run-e2e-tests]
     if: needs.check.result == 'success' && needs.check.outputs.trusted == 'true'
     runs-on: ubuntu-latest
@@ -212,9 +194,6 @@ jobs:
 
   report:
     name: Report Hold
-    # issues: write for the PR comment -- no checks calls in this job.
-    permissions:
-      issues: write
     needs: [check, apply-hold-label, cancel-cluster-check, cancel-run-e2e-tests, mark-held]
     if: always() && needs.check.result == 'success' && needs.check.outputs.trusted == 'true'
     runs-on: ubuntu-latest
