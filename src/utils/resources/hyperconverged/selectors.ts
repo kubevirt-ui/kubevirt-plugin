@@ -14,3 +14,7 @@ export const getHyperconvergedConfiguration = (
 export const getHyperconvergedRoleAggregationStrategy = (
   hc: KubevirtHyperconverged | undefined,
 ): string | undefined => getHyperconvergedConfiguration(hc)?.roleAggregationStrategy;
+
+export const getHCORoleAggregationStrategy = (
+  hyperConverge: HyperConverged | undefined,
+): string | undefined => hyperConverge?.spec?.roleAggregationStrategy;

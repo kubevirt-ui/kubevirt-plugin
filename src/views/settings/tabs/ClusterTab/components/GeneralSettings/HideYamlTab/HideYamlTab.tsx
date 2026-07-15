@@ -10,6 +10,8 @@ import { useSettingsCluster } from '@settings/context/SettingsClusterContext';
 import ExpandSection from '@settings/ExpandSection/ExpandSection';
 import { CLUSTER_TAB_IDS } from '@settings/search/constants';
 
+import { getGeneralSettingsLabels } from '../consts/consts';
+
 type HideYamlTabProps = {
   newBadge?: boolean;
 };
@@ -27,7 +29,10 @@ const HideYamlTab: FC<HideYamlTabProps> = ({ newBadge = false }) => {
   };
 
   return (
-    <ExpandSection searchItemId={CLUSTER_TAB_IDS.hideYamlTab} toggleText={t('YAML tab visibility')}>
+    <ExpandSection
+      searchItemId={CLUSTER_TAB_IDS.hideYamlTab}
+      toggleText={getGeneralSettingsLabels(t).yamlTabVisibility}
+    >
       <SectionWithSwitch
         helpTextIconContent={t(
           'Controls whether non-admin users can access YAML configurations for virtualization objects in the UI (VirtualMachines, VirtualMachineInstances, Templates, DataSources, DataImportCrons, MigrationPolicies, Checkups, and VM Networks).',

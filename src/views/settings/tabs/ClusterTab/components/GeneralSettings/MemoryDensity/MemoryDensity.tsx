@@ -9,6 +9,7 @@ import { Skeleton, Stack, StackItem } from '@patternfly/react-core';
 import { useSettingsCluster } from '@settings/context/SettingsClusterContext';
 import { CLUSTER_TAB_IDS } from '@settings/search/constants';
 
+import { getGeneralSettingsLabels } from '../consts/consts';
 import GeneralSettingsError from '../shared/GeneralSettingsError';
 
 import ActiveRatio from './components/ActiveRatio';
@@ -55,7 +56,7 @@ const MemoryDensity: FC<MemoryDensityProps> = ({ hyperConvergeConfiguration }) =
       isIndented
       searchItemId={CLUSTER_TAB_IDS.memoryDensity}
       toggleClassname="ExpandSection"
-      toggleContent={t('Memory request ratio')}
+      toggleContent={getGeneralSettingsLabels(t).memoryRequestRatio}
     >
       <Stack hasGutter>
         <StackItem>

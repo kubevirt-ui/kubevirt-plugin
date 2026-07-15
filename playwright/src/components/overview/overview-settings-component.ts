@@ -1,7 +1,15 @@
 import BaseComponent from '@/components/shared/base-component';
 import NavigationComponent from '@/components/shared/navigation-component';
 import { TestTimeouts } from '@/utils/test-config';
-import type { Page } from '@playwright/test';
+import { expect, type Page } from '@playwright/test';
+
+const KUBEVIRT_UI_FEATURES_RESOURCE = 'kubevirt-ui-features';
+
+const isSuccessResponse = (resp: { status: () => number }): boolean =>
+  resp.status() >= 200 && resp.status() < 300;
+
+const isPatchOrPutRequest = (resp: { request: () => { method: () => string } }) =>
+  resp.request().method() === 'PATCH' || resp.request().method() === 'PUT';
 
 export default class OverviewSettingsComponent extends BaseComponent {
   private readonly _advancedCDROMFeaturesBtn = this.locator(
@@ -12,6 +20,12 @@ export default class OverviewSettingsComponent extends BaseComponent {
     'input[data-test-id="advanced-cdrom-features"]',
   );
   private readonly _ariaWelcomeModal = this.locator('[aria-label="Welcome modal"]');
+  private readonly _automaticGrantVirtualizationRoles = this.locator(
+    '[data-test-id="automatic-grant-virtualization-roles"]',
+  );
+  private readonly _automaticGrantVirtualizationRolesSection = this.locator(
+    'button:has-text("Automatically grant Virtualization roles")',
+  );
   private readonly _automaticImagesDownloadBtn = this.locator(
     'button:has-text("Automatic images download")',
   );
@@ -23,6 +37,9 @@ export default class OverviewSettingsComponent extends BaseComponent {
   );
   private readonly _centosStream9ImageCronSwitch = this.locator(
     '[data-test-id="centos-stream9-image-cron-auto-image-download-switch"]',
+  );
+  private readonly _controlDefaultVirtualizationPermissions = this.locator(
+    '[data-test-id="controlDefaultVirtualizationPermissions"]',
   );
   private readonly _divIdAutoUpdateRhelVmsInputpfV6CSwitchInput = this.locator(
     'div[id="auto-update-rhel-vms"] input.pf-v6-c-switch__input',
@@ -46,12 +63,12 @@ export default class OverviewSettingsComponent extends BaseComponent {
     '#node-port-feature input[type="checkbox"]',
   );
   private readonly _passtUDNNetworkCheckbox = this.locator('[data-test-id="passtUDNNetwork"]');
+
   private readonly _pfV6CFormGroupsubscriptionLabel = this.locator(
     '.pf-v6-c-form__group.subscription-label',
   );
   private readonly _roleListbox = this.locator('[role="listbox"]');
   private readonly _sshConfigurationsButton = this.locator('button:has-text("SSH configurations")');
-
   private readonly _templatesAndImagesManagementBtn = this.locator(
     'button:has-text("Templates and images management")',
   );
@@ -147,6 +164,31 @@ export default class OverviewSettingsComponent extends BaseComponent {
     }
   }
 
+  async disableControlDefaultVirtualizationPermissions(): Promise<boolean> {
+    try {
+      const toggle = this._controlDefaultVirtualizationPermissions;
+      await toggle.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+
+      if (!(await toggle.isChecked())) {
+        return true;
+      }
+
+      const patchPromise = this.page.waitForResponse(
+        (resp) =>
+          resp.url().includes(KUBEVIRT_UI_FEATURES_RESOURCE) &&
+          isPatchOrPutRequest(resp) &&
+          isSuccessResponse(resp),
+        { timeout: TestTimeouts.DEFAULT },
+      );
+      await toggle.click({ force: true });
+      await patchPromise.catch(() => void 0);
+      await this.page.waitForTimeout(TestTimeouts.UI_DELAY_MEDIUM);
+      return !(await toggle.isChecked().catch(() => true));
+    } catch {
+      return false;
+    }
+  }
+
   async disableGuidedTour(): Promise<boolean> {
     try {
       const guidedTourSwitch = this.locator('[data-test-id="guided-tour"]');
@@ -173,11 +215,10 @@ export default class OverviewSettingsComponent extends BaseComponent {
 
       const patchPromise = this.page.waitForResponse(
         (resp) =>
-          (resp.url().includes('kubevirt-ui-features') ||
+          (resp.url().includes(KUBEVIRT_UI_FEATURES_RESOURCE) ||
             resp.url().includes('kubevirt-user-settings')) &&
-          (resp.request().method() === 'PATCH' || resp.request().method() === 'PUT') &&
-          resp.status() >= 200 &&
-          resp.status() < 300,
+          isPatchOrPutRequest(resp) &&
+          isSuccessResponse(resp),
         { timeout: TestTimeouts.DEFAULT },
       );
       await toggle.click({ force: true });
@@ -239,6 +280,33 @@ export default class OverviewSettingsComponent extends BaseComponent {
       if (!isEnabled) {
         await this._centosStream9ImageCronSwitch.click({ force: true });
       }
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  /** Assumes Preview features tab is already open. */
+  async enableControlDefaultVirtualizationPermissions(): Promise<boolean> {
+    try {
+      const toggle = this._controlDefaultVirtualizationPermissions;
+      await expect(toggle).toBeVisible({ timeout: TestTimeouts.ELEMENT_WAIT });
+
+      if (await toggle.isChecked()) {
+        return true;
+      }
+
+      const patchPromise = this.page.waitForResponse(
+        (resp) =>
+          resp.url().includes(KUBEVIRT_UI_FEATURES_RESOURCE) &&
+          isPatchOrPutRequest(resp) &&
+          isSuccessResponse(resp),
+        { timeout: TestTimeouts.DEFAULT },
+      );
+      await toggle.click({ force: true });
+      await patchPromise.catch(() => void 0);
+
+      await expect(toggle).toBeChecked({ timeout: TestTimeouts.DEFAULT });
       return true;
     } catch {
       return false;
@@ -319,11 +387,10 @@ export default class OverviewSettingsComponent extends BaseComponent {
 
       const patchPromise = this.page.waitForResponse(
         (resp) =>
-          (resp.url().includes('kubevirt-ui-features') ||
+          (resp.url().includes(KUBEVIRT_UI_FEATURES_RESOURCE) ||
             resp.url().includes('kubevirt-user-settings')) &&
-          (resp.request().method() === 'PATCH' || resp.request().method() === 'PUT') &&
-          resp.status() >= 200 &&
-          resp.status() < 300,
+          isPatchOrPutRequest(resp) &&
+          isSuccessResponse(resp),
         { timeout: TestTimeouts.DEFAULT },
       );
       await toggle.click({ force: true });
@@ -603,6 +670,27 @@ export default class OverviewSettingsComponent extends BaseComponent {
     }
   }
 
+  /** Assumes Automatically grant section is open and the switch is enabled. */
+  async isAutomaticGrantVirtualizationRolesChecked(): Promise<boolean> {
+    try {
+      const toggle = this._automaticGrantVirtualizationRoles;
+      await toggle.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+      return await toggle.isChecked();
+    } catch {
+      return false;
+    }
+  }
+
+  async isAutomaticGrantVirtualizationRolesEnabled(): Promise<boolean> {
+    try {
+      const toggle = this._automaticGrantVirtualizationRoles;
+      await toggle.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+      return await toggle.isEnabled();
+    } catch {
+      return false;
+    }
+  }
+
   async isGuestSystemLogEnabled(): Promise<boolean> {
     try {
       await this._guestSystemLog.waitFor({
@@ -693,6 +781,18 @@ export default class OverviewSettingsComponent extends BaseComponent {
         timeout: TestTimeouts.DEFAULT,
       });
       await this.robustClick(this._automaticSubscriptionBtn);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  async navigateToClusterTab(): Promise<boolean> {
+    try {
+      const clusterTab = this.locator('[role="tab"]:has-text("Cluster")');
+      await clusterTab.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+      await this.robustClick(clusterTab);
+      await this.page.waitForLoadState('domcontentloaded');
       return true;
     } catch {
       return false;
@@ -812,6 +912,58 @@ export default class OverviewSettingsComponent extends BaseComponent {
     }
   }
 
+  /** Assumes Cluster tab is open. Expands General settings → Automatically grant section. */
+  async openAutomaticGrantVirtualizationRolesSection(): Promise<boolean> {
+    try {
+      await this.navigateToGeneralSettings();
+
+      const section = this._automaticGrantVirtualizationRolesSection;
+      await section.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+      if ((await section.getAttribute('aria-expanded')) !== 'true') {
+        await this.robustClick(section);
+      }
+
+      await this._automaticGrantVirtualizationRoles.waitFor({
+        state: 'visible',
+        timeout: TestTimeouts.ELEMENT_WAIT,
+      });
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Assumes Automatically grant section is open and the switch is enabled.
+   * ON → AggregateToDefault; OFF → Manual.
+   */
+  async setAutomaticGrantVirtualizationRoles(enable: boolean): Promise<boolean> {
+    try {
+      const toggle = this._automaticGrantVirtualizationRoles;
+      await expect(toggle).toBeVisible({ timeout: TestTimeouts.ELEMENT_WAIT });
+      await expect(toggle).toBeEnabled({ timeout: TestTimeouts.ELEMENT_WAIT });
+
+      if ((await toggle.isChecked()) === enable) {
+        return true;
+      }
+
+      const patchPromise = this.page.waitForResponse(
+        (resp) =>
+          resp.url().includes('hyperconverged') &&
+          isPatchOrPutRequest(resp) &&
+          isSuccessResponse(resp),
+        { timeout: TestTimeouts.DEFAULT },
+      );
+      await toggle.click({ force: true });
+      await patchPromise.catch(() => void 0);
+
+      await expect(toggle).toBeChecked({ checked: enable, timeout: TestTimeouts.DEFAULT });
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
   async setGuestSystemLog(enabled: boolean): Promise<boolean> {
     try {
       const isCheckboxVisible = await this._guestSystemLog
@@ -869,10 +1021,9 @@ export default class OverviewSettingsComponent extends BaseComponent {
       if (isCurrentlyEnabled !== enabled) {
         const patchPromise = this.page.waitForResponse(
           (resp) =>
-            resp.url().includes('kubevirt-ui-features') &&
-            (resp.request().method() === 'PATCH' || resp.request().method() === 'PUT') &&
-            resp.status() >= 200 &&
-            resp.status() < 300,
+            resp.url().includes(KUBEVIRT_UI_FEATURES_RESOURCE) &&
+            isPatchOrPutRequest(resp) &&
+            isSuccessResponse(resp),
           { timeout: TestTimeouts.DEFAULT },
         );
         await toggleLocator.click({ force: true });

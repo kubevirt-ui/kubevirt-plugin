@@ -10,6 +10,8 @@ import { useSettingsCluster } from '@settings/context/SettingsClusterContext';
 import ExpandSection from '@settings/ExpandSection/ExpandSection';
 import { CLUSTER_TAB_IDS } from '@settings/search/constants';
 
+import { getGeneralSettingsLabels } from '../consts/consts';
+
 type VMActionsConfirmationProps = {
   newBadge: boolean;
 };
@@ -27,7 +29,7 @@ const VMActionsConfirmation: FC<VMActionsConfirmationProps> = ({ newBadge }) => 
   return (
     <ExpandSection
       searchItemId={CLUSTER_TAB_IDS.vmActionsConfirmation}
-      toggleText={t('VirtualMachine actions confirmation')}
+      toggleText={getGeneralSettingsLabels(t).virtualMachineActionsConfirmation}
     >
       <SectionWithSwitch
         dataTestID="confirm-vm-actions"

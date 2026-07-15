@@ -2,6 +2,7 @@ import React, { ReactNode } from 'react';
 
 import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import {
+  CONTROL_DEFAULT_VIRTUALIZATION_PERMISSIONS,
   PASST_UDN_NETWORK,
   TREE_VIEW_FOLDERS,
   VM_TEMPLATES,
@@ -42,6 +43,10 @@ const usePreviewFeaturesData: UsePreviewFeaturesData = (cluster) => {
   const treeViewFoldersFeature = useFeatures(TREE_VIEW_FOLDERS, cluster);
   const passtFeatureFlag = usePasstFeatureFlag(cluster);
   const templateFeatureFlag = useVMTemplateFeatureFlag(cluster);
+  const controlDefaultVirtualizationPermissionsFeature = useFeatures(
+    CONTROL_DEFAULT_VIRTUALIZATION_PERMISSIONS,
+    cluster,
+  );
 
   const features = [
     {
@@ -66,6 +71,17 @@ const usePreviewFeaturesData: UsePreviewFeaturesData = (cluster) => {
       label: t('Enable native VirtualMachine templates'),
       searchItemId: PREVIEW_FEATURES_TAB_IDS.vmTemplates,
       ...templateFeatureFlag,
+    },
+
+    {
+      externalLink: null,
+      helpPopoverContent: t(
+        'Allows admins to choose whether Virtualization permissions are granted automatically',
+      ),
+      id: CONTROL_DEFAULT_VIRTUALIZATION_PERMISSIONS,
+      label: t('Control default Virtualization permissions'),
+      searchItemId: PREVIEW_FEATURES_TAB_IDS.controlDefaultVirtualizationPermissions,
+      ...controlDefaultVirtualizationPermissionsFeature,
     },
   ];
 

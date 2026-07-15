@@ -13,6 +13,8 @@ import AutomaticImagesDownload from '@settings/tabs/ClusterTab/components/Genera
 import BootableVolumeProjectSection from '@settings/tabs/ClusterTab/components/GeneralSettings/TemplatesAndImagesManagement/components/BootableVolumeProjectSection/BootableVolumeProjectSection';
 import TemplatesProjectSection from '@settings/tabs/ClusterTab/components/GeneralSettings/TemplatesAndImagesManagement/components/TemplatesProjectSection/TemplatesProjectSection';
 
+import { getGeneralSettingsLabels } from '../consts/consts';
+
 type TemplatesAndImagesManagementProps = {
   hyperConvergeConfiguration: [hyperConvergeConfig: HyperConverged, loaded: boolean, error: any];
   newBadge?: boolean;
@@ -33,7 +35,7 @@ const TemplatesAndImagesManagement: FC<TemplatesAndImagesManagementProps> = ({
   return (
     <ExpandSection
       searchItemId={CLUSTER_TAB_IDS.templatesManagement}
-      toggleText={t('Templates and images management')}
+      toggleText={getGeneralSettingsLabels(t).templatesAndImagesManagement}
     >
       <Stack hasGutter>
         <StackItem>

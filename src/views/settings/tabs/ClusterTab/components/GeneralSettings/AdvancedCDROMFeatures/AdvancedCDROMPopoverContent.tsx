@@ -6,12 +6,16 @@ import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Content, ContentVariants } from '@patternfly/react-core';
 
+import { getGeneralSettingsLabels } from '../consts/consts';
+
 const AdvancedCDROMPopoverContent: FC = () => {
   const { t } = useKubevirtTranslation();
 
   return (
     <div>
-      <Content component={ContentVariants.h6}>{t('Advanced CD-ROM features')}</Content>
+      <Content component={ContentVariants.h6}>
+        {getGeneralSettingsLabels(t).advancedCDROMFeatures}
+      </Content>
       <Content component={ContentVariants.p}>
         <Trans t={t}>
           <div>

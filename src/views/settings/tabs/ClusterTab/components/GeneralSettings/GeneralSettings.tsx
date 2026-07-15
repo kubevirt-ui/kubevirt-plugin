@@ -5,15 +5,8 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { Stack, StackItem } from '@patternfly/react-core';
 import ExpandSection from '@settings/ExpandSection/ExpandSection';
 import { CLUSTER_TAB_IDS } from '@settings/search/constants';
-import TemplatesAndImagesManagement from '@settings/tabs/ClusterTab/components/GeneralSettings/TemplatesAndImagesManagement/TemplatesAndImagesManagement';
-import VMActionsConfirmation from '@settings/tabs/ClusterTab/components/GeneralSettings/VMActionsConfirmation/VMActionsConfirmation';
 
-import AdvancedCDROMFeatures from './AdvancedCDROMFeatures/AdvancedCDROMFeatures';
-import HideYamlTab from './HideYamlTab/HideYamlTab';
-import LiveMigrationSection from './LiveMigrationSection/LiveMigrationSection';
-import MemoryDensity from './MemoryDensity/MemoryDensity';
-import KernelSamepageMerging from './MemoryDensity/components/KernelSamepageMerging/KernelSamepageMerging';
-import SSHConfiguration from './SSHConfiguration/SSHConfiguration';
+import { getGeneralSettingsSections } from './consts/consts';
 
 type GeneralSettingsProps = {
   hyperConvergeConfiguration: [hyperConvergeConfig: HyperConverged, loaded: boolean, error: any];
@@ -29,36 +22,14 @@ const GeneralSettings: FC<GeneralSettingsProps> = ({ hyperConvergeConfiguration,
       toggleText={t('General settings')}
     >
       <Stack hasGutter>
-        <StackItem isFilled>
-          <LiveMigrationSection hyperConvergeConfiguration={hyperConvergeConfiguration} />
-        </StackItem>
-        <StackItem isFilled>
-          <MemoryDensity hyperConvergeConfiguration={hyperConvergeConfiguration} />
-        </StackItem>
-        <StackItem isFilled>
-          <KernelSamepageMerging
-            hyperConvergeConfiguration={hyperConvergeConfiguration}
-            newBadge={newBadge}
-          />
-        </StackItem>
-        <StackItem isFilled>
-          <SSHConfiguration newBadge={newBadge} />
-        </StackItem>
-        <StackItem isFilled>
-          <TemplatesAndImagesManagement
-            hyperConvergeConfiguration={hyperConvergeConfiguration}
-            newBadge={newBadge}
-          />
-        </StackItem>
-        <StackItem isFilled>
-          <VMActionsConfirmation newBadge={newBadge} />
-        </StackItem>
-        <StackItem isFilled>
-          <HideYamlTab newBadge={newBadge} />
-        </StackItem>
-        <StackItem isFilled>
-          <AdvancedCDROMFeatures newBadge={newBadge} />
-        </StackItem>
+        {getGeneralSettingsSections(t).map(({ Component, label }) => (
+          <StackItem key={label} isFilled>
+            <Component
+              hyperConvergeConfiguration={hyperConvergeConfiguration}
+              newBadge={newBadge}
+            />
+          </StackItem>
+        ))}
       </Stack>
     </ExpandSection>
   );

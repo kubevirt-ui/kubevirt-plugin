@@ -5,6 +5,8 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import ExpandSection from '@settings/ExpandSection/ExpandSection';
 import { CLUSTER_TAB_IDS } from '@settings/search/constants';
 
+import { getGeneralSettingsLabels } from '../consts/consts';
+
 import Limits from './Limits/Limits';
 import Network from './Network/Network';
 
@@ -22,7 +24,7 @@ const LiveMigrationSection: FC<LiveMigrationSectionProps> = ({ hyperConvergeConf
     <ExpandSection
       className="live-migration-tab"
       searchItemId={CLUSTER_TAB_IDS.liveMigration}
-      toggleText={t('Live migration')}
+      toggleText={getGeneralSettingsLabels(t).liveMigration}
     >
       <Limits hyperConverge={hyperConverge} />
       <Network hyperConverge={hyperConverge} />

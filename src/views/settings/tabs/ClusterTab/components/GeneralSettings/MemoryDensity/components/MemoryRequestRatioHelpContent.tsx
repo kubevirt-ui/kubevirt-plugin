@@ -6,6 +6,7 @@ import PopoverSectionExpandable from '@kubevirt-utils/components/PopoverSectionE
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Content, Stack, StackItem } from '@patternfly/react-core';
 
+import { getGeneralSettingsLabels } from '../../consts/consts';
 import { getRatioLevelConfig } from '../utils/utils';
 
 import '../memory-density.scss';
@@ -18,7 +19,7 @@ const MemoryRequestRatioHelpContent: FC = () => {
   return (
     <Content>
       <p className="pf-v6-u-mb-sm">
-        <strong>{t('Memory request ratio')}</strong>
+        <strong>{getGeneralSettingsLabels(t).memoryRequestRatio}</strong>
       </p>
       <p className="pf-v6-u-mb-sm">
         {t("The percentage of each VM's configured memory that is requested on the cluster.")}
