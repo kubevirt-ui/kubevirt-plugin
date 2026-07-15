@@ -4,11 +4,15 @@ on:
   issue_comment:
     types: [created]
 
+# actions/pull-requests/issues all dropped -- nothing reads the ambient
+# GITHUB_TOKEN for those scopes anymore, every such call explicitly uses the
+# bot app token instead (see each job's "Generate bot token" step), since
+# GITHUB_TOKEN's issues scope is forced read-only for a PR from a fork.
+# statuses: write is the one still genuinely needed via the ambient token,
+# for report's "Post cancelled progress status" step (post-progress-status
+# composite action, no github-token override).
 permissions:
   contents: read
-  actions: read
-  pull-requests: read
-  issues: write
   statuses: write
 
 jobs:
@@ -42,35 +46,34 @@ jobs:
         with:
           author: ${{ github.event.comment.user.login }}
 
+      # See ci-scripts/README.md ("Check-Run & Retest Model") for why this
+      # needs the bot app, not GITHUB_TOKEN. continue-on-error: a bad
+      # credential must still let the step below run and report what it can.
+      - name: Generate bot token
+        id: bot-token
+        continue-on-error: true
+        uses: actions/create-github-app-token@v3
+        with:
+          app-id: ${{ secrets.BOT_APP_ID }}
+          private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
+          permission-pull-requests: read
+          permission-actions: read
+          permission-issues: write
+
       - name: Detect in-progress runs and react
         id: detect
         uses: actions/github-script@v9
         env:
           TRUSTED: ${{ steps.check-trust.outputs.trusted }}
         with:
+          github-token: ${{ steps.bot-token.outputs.token }}
           script: |
+            const { reactToComment, enforceCommentTrust } = require('./ci-scripts/hot-cluster/pr-command-helpers.cjs');
             const author = context.payload.comment.user.login;
-
-            const react = async (content) => {
-              try {
-                await github.rest.reactions.createForIssueComment({
-                  ...context.repo,
-                  comment_id: context.payload.comment.id,
-                  content,
-                });
-              } catch (err) {
-                core.warning(`Could not react to comment with "${content}": ${err.message || err}`);
-              }
-            };
+            const react = (content) => reactToComment(github, context, core, content);
 
             const trusted = process.env.TRUSTED === 'true';
-            core.info(`${author} is ${trusted ? '' : 'not '}listed in OWNERS (approvers/reviewers) — ${trusted ? 'trusted' : 'untrusted, ignoring /cancel-e2e'}.`);
-
-            if (!trusted) {
-              await react('-1');
-              core.setFailed(`${author} is not authorized to use /cancel-e2e`);
-              return;
-            }
+            if (!(await enforceCommentTrust(core, react, author, trusted, '/cancel-e2e'))) return;
 
             const prNumber = context.issue.number;
             const pr = await github.rest.pulls.get({
@@ -169,11 +172,23 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
+      # See check job's own "Generate bot token" step for why -- this job
+      # needs its own token, since jobs don't share step outputs.
+      - name: Generate bot token
+        id: bot-token
+        continue-on-error: true
+        uses: actions/create-github-app-token@v3
+        with:
+          app-id: ${{ secrets.BOT_APP_ID }}
+          private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
+          permission-issues: write
+
       - name: Comment outcome on the PR
         uses: actions/github-script@v9
         env:
           WAS_RUNNING: ${{ needs.check.outputs.was-running }}
         with:
+          github-token: ${{ steps.bot-token.outputs.token }}
           script: |
             const wasRunning = process.env.WAS_RUNNING === 'true';
             const body = wasRunning

@@ -4,10 +4,14 @@ on:
   issue_comment:
     types: [created]
 
+# Nothing in this workflow actually reads the ambient GITHUB_TOKEN for any
+# scope anymore -- every API call explicitly uses the bot app token (see
+# "Generate bot token" below) instead, since GITHUB_TOKEN's issues/actions
+# scopes are forced read-only for a PR from a fork. contents: read is kept
+# only for actions/checkout's own sake (harmless even though this repo is
+# public and checkout works without it).
 permissions:
-  actions: write
-  issues: write
-  pull-requests: write
+  contents: read
 
 jobs:
   retest:
@@ -32,9 +36,10 @@ jobs:
         with:
           author: ${{ github.event.comment.user.login }}
 
-      # continue-on-error: a bad credential must still let the retest step
-      # run and report the failure below, not skip silently. Scoped to just
-      # what's needed; issues: write omitted -- reactions stay best-effort.
+      # See ci-scripts/README.md ("Check-Run & Retest Model") for why this
+      # needs the bot app, not GITHUB_TOKEN. continue-on-error: a bad
+      # credential must still let the retest step run and report the
+      # failure below, not skip silently.
       - name: Generate bot token
         id: bot-token
         continue-on-error: true
@@ -44,6 +49,7 @@ jobs:
           private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
           permission-pull-requests: read
           permission-actions: write
+          permission-issues: write
 
       - name: Re-run E2E workflow
         id: retest
@@ -54,30 +60,13 @@ jobs:
         with:
           github-token: ${{ steps.bot-token.outputs.token }}
           script: |
+            const { reactToComment, enforceCommentTrust } = require('./ci-scripts/hot-cluster/pr-command-helpers.cjs');
             const author = context.payload.comment.user.login;
-
-            // No issues: write on the bot app, so reactions are best-effort.
-            const react = async (content) => {
-              try {
-                await github.rest.reactions.createForIssueComment({
-                  ...context.repo,
-                  comment_id: context.payload.comment.id,
-                  content,
-                });
-              } catch (err) {
-                core.warning(`Could not react to comment with "${content}": ${err.message || err}`);
-              }
-            };
+            const react = (content) => reactToComment(github, context, core, content);
 
             try {
               const trusted = process.env.TRUSTED === 'true';
-              core.info(`${author} is ${trusted ? '' : 'not '}listed in OWNERS (approvers/reviewers) — ${trusted ? 'trusted' : 'untrusted, ignoring /retest-e2e'}.`);
-
-              if (!trusted) {
-                await react('-1');
-                core.setFailed(`${author} is not authorized to use /retest-e2e`);
-                return;
-              }
+              if (!(await enforceCommentTrust(core, react, author, trusted, '/retest-e2e'))) return;
 
               const prNumber = context.issue.number;
               const pr = await github.rest.pulls.get({
@@ -163,22 +152,19 @@ jobs:
               core.setFailed(`Unexpected error while processing /retest-e2e: ${err.message || err}`);
             }
 
-      # /retest-e2e is the only way to lift a /hold-e2e hold. Removing the
-      # label (not just dispatching above) is what stops future pushes from
-      # silently re-holding via hot-cluster-e2e-pr-gate.yml/ok-to-test-gate.yml.
-      # Gated on dispatched == 'true' so a failed dispatch leaves the hold in
-      # place. Default GITHUB_TOKEN, not the bot app token above: the bot
-      # app has no issues: write, so it can't remove labels (same reason its
-      # reactions are best-effort). continue-on-error + setFailed on a
-      # non-404 error: fails this step's own outcome (queryable below)
-      # without failing the job, and removal_failed lets the report step
-      # avoid claiming a stuck label was lifted.
+      # /retest-e2e is the only way to lift a /hold-e2e hold -- removing the
+      # label (not just dispatching above) stops future pushes from silently
+      # re-holding. Gated on dispatched == 'true' so a failed dispatch leaves
+      # the hold in place. continue-on-error + setFailed on a non-404 error:
+      # fails this step's outcome (queryable below) without failing the job;
+      # removal_failed lets report avoid claiming a stuck label was lifted.
       - name: Lift any /hold-e2e hold
         id: lift-hold
         if: steps.check-trust.outputs.trusted == 'true' && steps.retest.outputs.dispatched == 'true'
         continue-on-error: true
         uses: actions/github-script@v9
         with:
+          github-token: ${{ steps.bot-token.outputs.token }}
           script: |
             try {
               await github.rest.issues.removeLabel({
@@ -197,11 +183,13 @@ jobs:
               core.setFailed(`Could not remove e2e-hold label: ${err.message || err}`);
             }
 
+      # Bot app token, not secrets.GITHUB_TOKEN: the latter's issues scope
+      # is forced read-only for a fork PR regardless of declared permissions.
       - name: Report retest dispatch on the PR
         if: steps.retest.outputs.dispatched == 'true'
         uses: actions/github-script@v9
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ steps.bot-token.outputs.token }}
           script: |
             // wasRunning wording/behavior is unchanged from before this
             // step always fresh-dispatched (see PR #4294) -- only the
@@ -220,10 +208,8 @@ jobs:
               '',
               `See the [Actions tab](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/workflows/hot-cluster-e2e.yml) for progress.`,
             ];
-            // Don't let a stuck e2e-hold label look silently lifted: this
-            // fresh run's own verify-gating-tests step re-checks the label
-            // live and will keep publishing a held/neutral result, not the
-            // real one, for as long as it's still present.
+            // A stuck label isn't silently masked: verify-gating-tests
+            // re-checks it live and keeps publishing held/neutral instead.
             if (holdLiftFailed) {
               body.push(
                 '',
@@ -240,7 +226,7 @@ jobs:
         if: steps.retest.outputs.unexpected_error == 'true'
         uses: actions/github-script@v9
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ steps.bot-token.outputs.token }}
           script: |
             const errorMessage = ${{ toJSON(steps.retest.outputs.error_message) }};
             await github.rest.issues.createComment({

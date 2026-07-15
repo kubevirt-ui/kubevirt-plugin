@@ -10,10 +10,16 @@ on:
   issue_comment:
     types: [created]
 
+# pull-requests/issues dropped -- nothing reads the ambient GITHUB_TOKEN for
+# those scopes anymore, every such call explicitly uses the bot app token
+# instead (see each job's "Generate bot token" step), since GITHUB_TOKEN's
+# issues scope is forced read-only for a PR from a fork. checks: write is
+# the one still genuinely needed via the ambient token, for mark-held's
+# "Publish held marker" step (publish-gating-check composite action, no
+# github-token override) -- checks: write already works fine on a fork PR,
+# so there's no reason to route it through the bot too.
 permissions:
   contents: read
-  pull-requests: read
-  issues: write
   checks: write
 
 jobs:
@@ -43,35 +49,33 @@ jobs:
         with:
           author: ${{ github.event.comment.user.login }}
 
+      # See ci-scripts/README.md ("Check-Run & Retest Model") for why this
+      # needs the bot app, not GITHUB_TOKEN. continue-on-error: a bad
+      # credential must still let the step below run and report what it can.
+      - name: Generate bot token
+        id: bot-token
+        continue-on-error: true
+        uses: actions/create-github-app-token@v3
+        with:
+          app-id: ${{ secrets.BOT_APP_ID }}
+          private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
+          permission-pull-requests: read
+          permission-issues: write
+
       - name: Resolve PR head and react
         id: resolve
         uses: actions/github-script@v9
         env:
           TRUSTED: ${{ steps.check-trust.outputs.trusted }}
         with:
+          github-token: ${{ steps.bot-token.outputs.token }}
           script: |
+            const { reactToComment, enforceCommentTrust } = require('./ci-scripts/hot-cluster/pr-command-helpers.cjs');
             const author = context.payload.comment.user.login;
-
-            const react = async (content) => {
-              try {
-                await github.rest.reactions.createForIssueComment({
-                  ...context.repo,
-                  comment_id: context.payload.comment.id,
-                  content,
-                });
-              } catch (err) {
-                core.warning(`Could not react to comment with "${content}": ${err.message || err}`);
-              }
-            };
+            const react = (content) => reactToComment(github, context, core, content);
 
             const trusted = process.env.TRUSTED === 'true';
-            core.info(`${author} is ${trusted ? '' : 'not '}listed in OWNERS (approvers/reviewers) — ${trusted ? 'trusted' : 'untrusted, ignoring /hold-e2e'}.`);
-
-            if (!trusted) {
-              await react('-1');
-              core.setFailed(`${author} is not authorized to use /hold-e2e`);
-              return;
-            }
+            if (!(await enforceCommentTrust(core, react, author, trusted, '/hold-e2e'))) return;
 
             const prNumber = context.issue.number;
             const pr = await github.rest.pulls.get({
@@ -94,33 +98,57 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 2
     steps:
-      # addLabels does NOT create a missing label (it 404s) -- this repo's
-      # first-ever /hold-e2e would otherwise fail here before the label ever
-      # sticks. Same check-then-create pattern as addLabel() in
-      # .github/scripts/src/github-comments.ts, inlined since that helper
-      # isn't reachable from a plain actions/github-script step.
+      # See check job's own "Generate bot token" step for why -- this job
+      # needs its own token, since jobs don't share step outputs.
+      - name: Generate bot token
+        id: bot-token
+        continue-on-error: true
+        uses: actions/create-github-app-token@v3
+        with:
+          app-id: ${{ secrets.BOT_APP_ID }}
+          private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
+          permission-issues: write
+
+      # addLabels doesn't create a missing label (404s instead) -- check-then-
+      # create first, same pattern as addLabel() in github-comments.ts
+      # (inlined; not require()-able from a github-script step). Outer
+      # try/catch is defense-in-depth -- report's labelOk/markerOk branching
+      # already degrades gracefully if this fails.
       - name: Add e2e-hold label
         uses: actions/github-script@v9
         with:
+          github-token: ${{ steps.bot-token.outputs.token }}
           script: |
             try {
-              await github.rest.issues.getLabel({ ...context.repo, name: 'e2e-hold' });
-            } catch (err) {
-              if (err.status !== 404) throw err;
-              core.info('e2e-hold label does not exist yet -- creating it.');
-              await github.rest.issues.createLabel({
-                ...context.repo,
-                name: 'e2e-hold',
-                color: 'b60205',
-                description: 'Hot Cluster E2E is on hold for this PR -- comment /retest-e2e to lift it',
-              });
-            }
+              try {
+                await github.rest.issues.getLabel({ ...context.repo, name: 'e2e-hold' });
+              } catch (err) {
+                if (err.status !== 404) throw err;
+                core.info('e2e-hold label does not exist yet -- creating it.');
+                try {
+                  await github.rest.issues.createLabel({
+                    ...context.repo,
+                    name: 'e2e-hold',
+                    color: 'b60205',
+                    description: 'Hot Cluster E2E is on hold for this PR -- comment /retest-e2e to lift it',
+                  });
+                } catch (createErr) {
+                  // 422 already_exists: a concurrent /hold-e2e run created it first --
+                  // re-fetch to confirm, then fall through to addLabels below.
+                  if (createErr.status !== 422) throw createErr;
+                  await github.rest.issues.getLabel({ ...context.repo, name: 'e2e-hold' });
+                }
+              }
 
-            await github.rest.issues.addLabels({
-              ...context.repo,
-              issue_number: context.issue.number,
-              labels: ['e2e-hold'],
-            });
+              await github.rest.issues.addLabels({
+                ...context.repo,
+                issue_number: context.issue.number,
+                labels: ['e2e-hold'],
+              });
+            } catch (err) {
+              core.warning(`Could not apply the e2e-hold label -- check that the kubevirt-plugin-bot GitHub App has "Issues: write" granted and the installation is approved: ${err.message || err}`);
+              core.setFailed('Failed to apply e2e-hold label -- see warning above.');
+            }
 
   # Entering this same group is what actually cancels a same-PR cluster-check
   # in progress -- see hot-cluster-e2e.yml's own concurrency on that job, and
@@ -153,18 +181,12 @@ jobs:
     steps:
       - run: echo "Entered the run-e2e-tests concurrency group for PR ${{ github.event.issue.number }} -- cancels any in-progress instance."
 
-  # Non-passing without a stuck-pending entry -- same completed/neutral
-  # pattern retest-stale-gating.yml's stale-marker already uses (see that
-  # workflow's own comment for why queued/in_progress would be wrong here).
-  # A cancelled in-flight run (above) closes its own check-run to
-  # neutral/"superseded" via hot-cluster-e2e.yml's close-gating-check-on-cancel
-  # job, within that same run -- this creates a separate, fresh entry rather
-  # than racing to update it. Sequenced after the two cancel jobs (not just
-  # needing check) so this marker is never published before the cancellation
-  # is even attempted -- doesn't eliminate the race against a run whose
-  # cluster-check/run-e2e-tests already finished before this comment landed
-  # (verify-gating-tests re-checks the hold itself for that case), but keeps
-  # the common case ordered correctly.
+  # completed/neutral, not queued -- same non-passing-without-stuck-pending
+  # pattern as retest-stale-gating.yml's stale-marker (see its own comment
+  # for why). Sequenced after the two cancel jobs so this is never published
+  # before cancellation is even attempted; verify-gating-tests re-checks the
+  # hold itself to cover the remaining race (a run whose cluster-check/
+  # run-e2e-tests already finished before this comment landed).
   mark-held:
     name: Mark Run Gating Tests Held
     needs: [check, cancel-cluster-check, cancel-run-e2e-tests]
@@ -199,17 +221,26 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      # always() above means this still runs (to report what happened) even
-      # if apply-hold-label or mark-held failed -- branch the wording rather
-      # than unconditionally claiming the hold succeeded. The label and the
-      # check-run marker are the two things that actually enforce a hold;
-      # the cancel jobs are best-effort and don't affect whether it "took".
+      # See check job's own "Generate bot token" step for why -- this job
+      # needs its own token, since jobs don't share step outputs.
+      - name: Generate bot token
+        id: bot-token
+        continue-on-error: true
+        uses: actions/create-github-app-token@v3
+        with:
+          app-id: ${{ secrets.BOT_APP_ID }}
+          private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
+          permission-issues: write
+
+      # always() runs this even on partial failure -- branch the wording
+      # rather than unconditionally claiming success.
       - name: Comment outcome on the PR
         uses: actions/github-script@v9
         env:
           LABEL_OK: ${{ needs.apply-hold-label.result == 'success' }}
           MARKER_OK: ${{ needs.mark-held.result == 'success' }}
         with:
+          github-token: ${{ steps.bot-token.outputs.token }}
           script: |
             const labelOk = process.env.LABEL_OK === 'true';
             const markerOk = process.env.MARKER_OK === 'true';
@@ -232,8 +263,15 @@ jobs:
                   `See the [Actions tab](${runUrl}) for details, and consider re-running \`/hold-e2e\`.`,
                 ].join('\n');
 
-            await github.rest.issues.createComment({
-              ...context.repo,
-              issue_number: context.issue.number,
-              body,
-            });
+            // Purely informational -- mark-held's check-run marker already
+            // enforces the hold regardless of whether this comment posts.
+            try {
+              await github.rest.issues.createComment({
+                ...context.repo,
+                issue_number: context.issue.number,
+                body,
+              });
+            } catch (err) {
+              core.warning(`Could not comment on the PR -- check that the kubevirt-plugin-bot GitHub App has "Issues: write" granted and the installation is approved: ${err.message || err}`);
+              core.setFailed('Failed to comment on the PR -- see warning above. The hold itself (the "Run Gating Tests" check-run) is unaffected.');
+            }
