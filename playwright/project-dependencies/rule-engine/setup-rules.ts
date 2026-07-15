@@ -261,6 +261,65 @@ export function getSetupRules(): SetupRule[] {
       },
     },
     {
+      id: 'verify-oc-permissions',
+      name: 'Verify oc CLI permissions for cluster operations',
+      phase: SetupPhase.CLUSTER,
+      onError: 'warn',
+      run: async (ctx) => {
+        const kubeconfigArgs = ctx.effectiveKubeConfigPath
+          ? [`--kubeconfig=${ctx.effectiveKubeConfigPath}`]
+          : [];
+
+        const checks = [
+          { key: 'get-namespaces', args: ['auth', 'can-i', 'get', 'namespaces'] },
+          { key: 'create-namespaces', args: ['auth', 'can-i', 'create', 'namespaces'] },
+          {
+            key: 'patch-configmaps-cnv',
+            args: ['auth', 'can-i', 'patch', 'configmaps', '-n', ctx.cnvNamespace],
+          },
+          {
+            key: 'patch-hco',
+            args: [
+              'auth',
+              'can-i',
+              'patch',
+              'hyperconvergeds.hco.kubevirt.io',
+              '-n',
+              ctx.cnvNamespace,
+            ],
+          },
+          { key: 'patch-storageclasses', args: ['auth', 'can-i', 'patch', 'storageclasses'] },
+          { key: 'get-vms', args: ['auth', 'can-i', 'get', 'virtualmachines.kubevirt.io'] },
+        ];
+
+        const results: Record<string, boolean> = {};
+        for (const check of checks) {
+          try {
+            const output = execFileSync('oc', [...kubeconfigArgs, ...check.args], {
+              encoding: 'utf8',
+              timeout: 10 * SECOND,
+              stdio: 'pipe',
+            }).trim();
+            results[check.key] = output === 'yes';
+            logger.info(`   ${results[check.key] ? '✓' : '✗'} ${check.key}: ${output}`);
+          } catch {
+            results[check.key] = false;
+            logger.info(`   ✗ ${check.key}: denied`);
+          }
+        }
+
+        ctx.ocPermissions = results;
+        const denied = Object.entries(results).filter(([, allowed]) => !allowed);
+        if (denied.length > 0) {
+          logger.warn(
+            `⚠️ Limited RBAC — ${denied.length} operation(s) denied: ${denied.map(([k]) => k).join(', ')}`,
+          );
+        } else {
+          logger.success('✓ All required oc permissions verified');
+        }
+      },
+    },
+    {
       id: 'start-cluster-janitor',
       name: 'Start native ClusterJanitor background sweep',
       phase: SetupPhase.CLUSTER,
@@ -343,29 +402,77 @@ export function getSetupRules(): SetupRule[] {
     },
     {
       id: 'enable-native-vm-templates',
-      name: 'Enable native VM template feature gate on HCO',
+      name: 'Enable native VM template feature gate on HCO via oc',
       phase: SetupPhase.CLUSTER,
-      guard: () => !EnvVariables.isNonPrivUser,
+      guard: (ctx) => !EnvVariables.isNonPrivUser && ctx.ocPermissions?.['patch-hco'] !== false,
       onError: 'warn',
       run: async (ctx) => {
-        const k8sClient = ctx.k8sClient;
-        if (!k8sClient) {
-          throw new Error('Kubernetes client not initialized');
+        const ANNOTATION_KEY = 'kubevirt.kubevirt.io/jsonpatch';
+        const kubeconfigArgs = ctx.effectiveKubeConfigPath
+          ? [`--kubeconfig=${ctx.effectiveKubeConfigPath}`]
+          : [];
+
+        const hcoJson = execFileSync(
+          'oc',
+          [
+            ...kubeconfigArgs,
+            'get',
+            'hyperconverged',
+            'kubevirt-hyperconverged',
+            '-n',
+            ctx.cnvNamespace,
+            '-o',
+            'json',
+          ],
+          { encoding: 'utf8', timeout: 30 * SECOND, stdio: 'pipe' },
+        );
+        const hco = JSON.parse(hcoJson);
+        const annotation: string = hco?.metadata?.annotations?.[ANNOTATION_KEY] ?? '';
+        if (annotation) {
+          const ops = JSON.parse(annotation) as Array<{ value?: string }>;
+          if (ops.some((op) => op.value === 'Template')) {
+            logger.success('✓ Native VM template feature gate already enabled');
+            return;
+          }
         }
-        const alreadyEnabled = await k8sClient.isNativeVmTemplateFeatureGateEnabled();
-        if (alreadyEnabled) {
-          logger.success('✓ Native VM template feature gate already enabled');
-          return;
-        }
-        await k8sClient.enableNativeVmTemplateFeatureGate();
-        logger.success('✓ Native VM template feature gate enabled on HCO');
+
+        const patchBody = JSON.stringify({
+          metadata: {
+            annotations: {
+              [ANNOTATION_KEY]: JSON.stringify([
+                {
+                  op: 'add',
+                  path: '/spec/configuration/developerConfiguration/featureGates/-',
+                  value: 'Template',
+                },
+              ]),
+            },
+          },
+        });
+        execFileSync(
+          'oc',
+          [
+            ...kubeconfigArgs,
+            'patch',
+            'hyperconverged',
+            'kubevirt-hyperconverged',
+            '-n',
+            ctx.cnvNamespace,
+            '--type=merge',
+            '-p',
+            patchBody,
+          ],
+          { encoding: 'utf8', timeout: 30 * SECOND, stdio: 'pipe' },
+        );
+        logger.success('✓ Native VM template feature gate enabled on HCO via oc');
       },
     },
     {
       id: 'set-default-storage-class',
       name: 'Set default StorageClass for VirtualMachines',
       phase: SetupPhase.CLUSTER,
-      guard: () => !EnvVariables.isHcE2e && !EnvVariables.isNonPrivUser,
+      guard: (ctx) =>
+        !EnvVariables.isNonPrivUser && ctx.ocPermissions?.['patch-storageclasses'] !== false,
       onError: 'warn',
       run: async (ctx) => {
         const defaultVmStorageClass = EnvVariables.storageClass;

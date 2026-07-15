@@ -47,6 +47,8 @@ export interface SetupContext {
   nonPrivUsername?: string;
   /** Native cluster janitor instance (set when ENABLE_CLUSTER_JANITOR=1). */
   clusterJanitor?: ClusterJanitor;
+  /** Results of `oc auth can-i` checks — true means the operation is allowed. */
+  ocPermissions?: Record<string, boolean>;
 }
 
 /** Context passed through teardown rules. */
