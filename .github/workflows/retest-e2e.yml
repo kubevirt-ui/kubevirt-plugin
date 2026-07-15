@@ -47,7 +47,10 @@ jobs:
         with:
           app-id: ${{ secrets.BOT_APP_ID }}
           private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
-          permission-pull-requests: read
+          # pull-requests: write, not read -- reacting, commenting, and
+          # removing e2e-hold all target the PR, even though those endpoint
+          # paths are /issues/... (see ci-scripts/README.md).
+          permission-pull-requests: write
           permission-actions: write
           permission-issues: write
 
