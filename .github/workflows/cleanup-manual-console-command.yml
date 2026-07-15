@@ -1,0 +1,148 @@
+name: Cleanup Manual Console Command
+run-name: 'Cleanup Manual Console Command @ PR#${{ github.event.issue.number }}'
+
+# Lets an OWNERS-listed maintainer comment /cleanup-manual-console on a PR
+# to tear down its manual console (Helm release, trigger ConfigMap, OAuth
+# user). Resolves the cluster the same way deploy-manual-console-command.yml
+# does, then dispatches deploy-manual-console.yml with action: teardown.
+# issue_comment only, so this never becomes a PR check.
+
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: read
+  actions: write
+  issues: write
+  pull-requests: read
+
+concurrency:
+  group: cleanup-manual-console-cmd-${{ github.event.issue.number }}
+  cancel-in-progress: false
+
+jobs:
+  dispatch:
+    name: Dispatch Cleanup Manual Console
+    if: >
+      github.event.issue.pull_request != null &&
+      contains(github.event.comment.body, '/cleanup-manual-console')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      # No ref override: reads OWNERS from the default branch, not the commenter's PR.
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      # The job-level if: above is just a cheap substring prefilter -- it
+      # would still fire for e.g. "I ran /cleanup-manual-console yesterday".
+      # This step re-checks with a word-boundary match; every step below
+      # requires it, so mentioning the command in passing is a silent no-op.
+      - name: Match exact command
+        id: match
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const body = context.payload.comment.body || '';
+            const matched = /(^|\s)\/cleanup-manual-console(\s|$)/.test(body);
+            core.setOutput('matched', matched ? 'true' : 'false');
+
+      # OWNERS is the trust source, same as /deploy-manual-console -- no
+      # ok-to-test escape hatch. This is the only trust gate for teardown:
+      # deploy-manual-console.yml's own resolve-pr check doesn't run for it.
+      - name: Check trusted commenter
+        id: check-trust
+        if: steps.match.outputs.matched == 'true'
+        uses: ./.github/actions/hot-cluster/check-trust
+        with:
+          author: ${{ github.event.comment.user.login }}
+
+      - name: Reject untrusted commenter
+        if: steps.match.outputs.matched == 'true' && steps.check-trust.outputs.trusted != 'true'
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const author = context.payload.comment.user.login;
+            await github.rest.reactions.createForIssueComment({
+              ...context.repo,
+              comment_id: context.payload.comment.id,
+              content: '-1',
+            }).catch((err) => core.warning(`Could not react: ${err.message || err}`));
+            core.setFailed(`${author} is not authorized to use /cleanup-manual-console`);
+
+      - name: Resolve PR context
+        id: pr
+        if: steps.match.outputs.matched == 'true' && steps.check-trust.outputs.trusted == 'true'
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const { data: pr } = await github.rest.pulls.get({
+              ...context.repo,
+              pull_number: context.issue.number,
+            });
+            core.setOutput('number', String(pr.number));
+            core.setOutput('base_ref', pr.base.ref);
+
+      # Same resolution deploy-manual-console-command.yml uses, so teardown
+      # targets the same cluster a prior /deploy-manual-console would have.
+      - name: Resolve cluster config
+        id: resolve-config
+        if: steps.match.outputs.matched == 'true' && steps.check-trust.outputs.trusted == 'true'
+        uses: ./.github/actions/hot-cluster/resolve-cluster-config
+        with:
+          base-ref: ${{ steps.pr.outputs.base_ref }}
+
+      - name: Dispatch deploy-manual-console.yml (teardown)
+        id: dispatch
+        if: steps.match.outputs.matched == 'true' && steps.check-trust.outputs.trusted == 'true'
+        uses: actions/github-script@v9
+        env:
+          PR_NUMBER: ${{ steps.pr.outputs.number }}
+          BASE_REF: ${{ steps.pr.outputs.base_ref }}
+          CLUSTER_NAME: ${{ steps.resolve-config.outputs.cluster-name }}
+        with:
+          script: |
+            const clusterName = process.env.CLUSTER_NAME;
+
+            await github.rest.actions.createWorkflowDispatch({
+              ...context.repo,
+              workflow_id: 'deploy-manual-console.yml',
+              ref: context.payload.repository.default_branch,
+              inputs: {
+                action: 'teardown',
+                pr_number: process.env.PR_NUMBER,
+                // Ignored by teardown logic -- kept so the required
+                // "branch" input is non-empty.
+                branch: process.env.BASE_REF,
+                cluster_name: clusterName,
+              },
+            });
+
+            core.info(`Dispatched deploy-manual-console.yml teardown for PR #${process.env.PR_NUMBER} (cluster=${clusterName}).`);
+            core.setOutput('cluster_name', clusterName);
+
+      - name: React and comment on the PR
+        if: steps.match.outputs.matched == 'true' && steps.check-trust.outputs.trusted == 'true' && steps.dispatch.outcome == 'success'
+        uses: actions/github-script@v9
+        env:
+          CLUSTER_NAME: ${{ steps.dispatch.outputs.cluster_name }}
+        with:
+          script: |
+            await github.rest.reactions.createForIssueComment({
+              ...context.repo,
+              comment_id: context.payload.comment.id,
+              content: 'rocket',
+            }).catch((err) => core.warning(`Could not react: ${err.message || err}`));
+
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/workflows/deploy-manual-console.yml`;
+            await github.rest.issues.createComment({
+              ...context.repo,
+              issue_number: context.issue.number,
+              body: [
+                `🧹 Dispatched a manual console teardown for this PR (cluster \`${process.env.CLUSTER_NAME}\`).`,
+                '',
+                `If no manual console exists for this PR, the teardown run is a harmless no-op -- check the [Actions tab](${runUrl}) for progress.`,
+              ].join('\n'),
+            });

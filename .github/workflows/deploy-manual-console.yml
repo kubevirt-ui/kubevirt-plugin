@@ -1,5 +1,5 @@
 name: Deploy Manual Console
-run-name: "Deploy Manual Console [${{ inputs.cluster_name }}] @ ${{ inputs.pr_number && format('PR#{0}', inputs.pr_number) || inputs.branch }}"
+run-name: "${{ inputs.action == 'teardown' && 'Teardown' || 'Deploy' }} Manual Console [${{ inputs.cluster_name }}] @ ${{ inputs.pr_number && format('PR#{0}', inputs.pr_number) || inputs.branch }}"
 
 # Deploys a standalone, OAuth-protected console + kubevirt-plugin stack to an
 # existing hot cluster for manual UI testing. Entirely separate from the E2E
@@ -21,6 +21,18 @@ run-name: "Deploy Manual Console [${{ inputs.cluster_name }}] @ ${{ inputs.pr_nu
 on:
   workflow_dispatch:
     inputs:
+      action:
+        description: >-
+          "deploy" provisions a new instance for the given PR/branch;
+          "teardown" removes an existing one. For teardown, only
+          pr_number/branch and cluster_name matter -- other inputs are
+          ignored.
+        required: false
+        default: deploy
+        type: choice
+        options:
+          - deploy
+          - teardown
       branch:
         description: >-
           Git branch or ref to build the kubevirt-plugin image from (can be
@@ -71,86 +83,88 @@ permissions:
   contents: read
   pull-requests: read
 
-# Persistent environment: never cancel an in-flight deploy for the same
-# cluster, since that could leave the manual console mid-provision.
+# Persistent environment: never cancel an in-flight run, since that could
+# leave the manual console mid-operation. Scoped by pr_number/branch (not
+# just cluster_name) -- each PR gets its own instance now, so distinct PRs
+# no longer queue behind each other.
 concurrency:
-  group: deploy-manual-console-${{ inputs.cluster_name }}
+  group: deploy-manual-console-${{ inputs.cluster_name }}-${{ inputs.pr_number || inputs.branch }}
   cancel-in-progress: false
 
 env:
   CI_ENV_NS: ci-env
-  MANUAL_CONSOLE_CM: manual-console
   MANUAL_CONSOLE_NS: manual-console
-  MANUAL_CONSOLE_USER: manual-console
 
 jobs:
-  # Only runs when pr_number is set (deploying a PR, possibly from a fork).
-  # Mirrors hot-cluster-e2e.yml's check-trust: only PR authors listed in
-  # OWNERS can have their PR deployed here, with no "ok-to-test" escape
-  # hatch -- push the branch directly and use "branch" instead if needed.
+  # Shared by deploy and teardown so both address the same instance:
+  # pr-<number> when pr_number is set, otherwise a sanitized/truncated
+  # branch name (DNS-safe once "manual-console-" is prefixed).
+  instance-key:
+    name: Compute Instance Key
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    outputs:
+      key: ${{ steps.compute.outputs.key }}
+    steps:
+      - name: Compute instance key
+        id: compute
+        env:
+          PR_NUMBER: ${{ inputs.pr_number }}
+          BRANCH: ${{ inputs.branch }}
+        run: |
+          if [[ -n "${PR_NUMBER}" ]]; then
+            if [[ ! "${PR_NUMBER}" =~ ^[0-9]+$ ]]; then
+              echo "::error::pr_number must be numeric, got '${PR_NUMBER}'"
+              exit 1
+            fi
+            KEY="pr-${PR_NUMBER}"
+          else
+            # Budget: this becomes "console-manual-console-<key>", the first
+            # label of the console Route host, which must stay <=63 chars
+            # (DNS-1123) -- 24 of those are already spent on that fixed
+            # prefix. Truncating the sanitized branch name alone isn't
+            # collision-safe (two different branches sharing the same first
+            # 11 chars would silently overwrite each other's instance), so
+            # pair a short prefix with an 8-hex-char hash of the *full*
+            # branch name -- deterministic (same branch always yields the
+            # same key, for Deploy Plugin redeploys) and distinct whenever
+            # the full names differ, even beyond the truncated prefix.
+            PREFIX="$(echo -n "${BRANCH}" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9]+/-/g' | cut -c1-11 | sed -E 's/^-+//; s/-+$//')"
+            HASH="$(echo -n "${BRANCH}" | sha256sum | cut -c1-8)"
+            KEY="${PREFIX:-branch}-${HASH}"
+          fi
+          echo "key=${KEY}" >> "${GITHUB_OUTPUT}"
+          echo "Computed instance key: ${KEY}"
+
+  # Only runs for the "deploy" action when pr_number is set (deploying a PR,
+  # possibly from a fork). Mirrors hot-cluster-e2e.yml's check-trust: only PR
+  # authors listed in OWNERS can have their PR deployed here, with no
+  # "ok-to-test" escape hatch -- push the branch directly and use "branch"
+  # instead if needed. Teardown skips this: it doesn't build the PR's code,
+  # and /cleanup-manual-console already gates who can trigger it.
   resolve-pr:
     name: Resolve PR
-    if: inputs.pr_number != ''
+    if: inputs.pr_number != '' && inputs.action != 'teardown'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     outputs:
-      head_sha: ${{ steps.resolve.outputs.head_sha }}
-      head_repo: ${{ steps.resolve.outputs.head_repo }}
+      head_sha: ${{ steps.resolve.outputs.head-sha }}
+      head_repo: ${{ steps.resolve.outputs.head-repo }}
     steps:
-      # Pinned to the default branch explicitly: without a ref:, checkout
-      # falls back to github.ref, which for workflow_dispatch is whatever
-      # branch was selected in the dispatch UI -- not necessarily the
-      # default branch. Reading OWNERS from an unpinned, dispatcher-chosen
-      # branch would let a modified OWNERS file on that branch self-approve
-      # trust for a fork PR.
+      # Needed to resolve the local composite action below -- its own
+      # internal checkout (pinned to the default branch) is what actually
+      # matters for reading OWNERS safely.
       - name: Checkout
         uses: actions/checkout@v7
         with:
-          ref: ${{ github.event.repository.default_branch }}
           persist-credentials: false
 
       - name: Resolve PR and verify author is a trusted repo owner
         id: resolve
-        uses: actions/github-script@v9
-        env:
-          # Passed via env, not interpolated into the script string below:
-          # inputs.pr_number is a raw, unvalidated workflow_dispatch string
-          # input, and substituting it directly into the JS source would let
-          # a crafted value break out of the string literal and inject
-          # arbitrary script.
-          PR_NUMBER: ${{ inputs.pr_number }}
+        uses: ./.github/actions/hot-cluster/resolve-trusted-pr
         with:
+          pr-number: ${{ inputs.pr_number }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const fs = require('fs');
-
-            const prNumber = parseInt(process.env.PR_NUMBER, 10);
-            const { data: pr } = await github.rest.pulls.get({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              pull_number: prNumber,
-            });
-
-            const author = pr.user.login;
-            const headSha = pr.head.sha;
-            const headRepo = pr.head.repo ? pr.head.repo.full_name : '(source repository deleted)';
-            core.info(`PR #${prNumber}: author=${author}, head=${headRepo}@${headSha}`);
-
-            let trusted = false;
-            try {
-              const owners = fs.readFileSync('OWNERS', 'utf8');
-              trusted = new RegExp(`^\\s*-\\s*${author}\\s*$`, 'm').test(owners);
-            } catch (err) {
-              core.warning(`Could not read OWNERS file: ${err.message}`);
-            }
-
-            core.info(`${author} is ${trusted ? '' : 'not '}listed in OWNERS (approvers/reviewers) — ${trusted ? 'trusted' : 'untrusted'}.`);
-            core.setOutput('head_sha', headSha);
-            core.setOutput('head_repo', headRepo);
-
-            if (!trusted) {
-              core.setFailed(`PR #${prNumber}'s author '${author}' is not listed in OWNERS (approvers/reviewers). Only PRs from trusted repo owners can be deployed via this workflow. To deploy this PR's changes anyway, push its branch to this repository directly and use the "branch" input instead.`);
-            }
 
   # Probes the target cluster and provisions it if it isn't up yet -- same
   # reusable workflow hot-cluster-e2e.yml already uses for this. Gated on
@@ -162,7 +176,7 @@ jobs:
   cluster-check:
     name: Cluster Check
     needs: resolve-pr
-    if: always() && needs.resolve-pr.result != 'failure'
+    if: always() && needs.resolve-pr.result != 'failure' && inputs.action != 'teardown'
     uses: ./.github/workflows/hot-cluster-check.yml
     with:
       cluster_name: ${{ inputs.cluster_name }}
@@ -181,9 +195,11 @@ jobs:
   # case).
   deploy:
     name: Deploy Manual Console
-    needs: [resolve-pr, cluster-check]
+    needs: [instance-key, resolve-pr, cluster-check]
     if: |
-      always() && needs.resolve-pr.result != 'failure' &&
+      always() && inputs.action != 'teardown' &&
+      needs.instance-key.result == 'success' &&
+      needs.resolve-pr.result != 'failure' &&
       needs.cluster-check.outputs.cluster_ready == 'true'
     runs-on: ${{ inputs.cluster_name }}
     timeout-minutes: 30
@@ -223,6 +239,7 @@ jobs:
           HEAD_REPO: ${{ needs.resolve-pr.outputs.head_repo }}
           HEAD_SHA: ${{ needs.resolve-pr.outputs.head_sha }}
           CLUSTER_NAME: ${{ inputs.cluster_name }}
+          INSTANCE_KEY: ${{ needs.instance-key.outputs.key }}
         run: |
           {
             echo "## Manual Console Deploy"
@@ -235,15 +252,24 @@ jobs:
               echo "| Branch | \`${BRANCH}\` |"
             fi
             echo "| Cluster | \`${CLUSTER_NAME}\` |"
+            echo "| Instance key | \`${INSTANCE_KEY}\` |"
             echo "| Infrastructure | \`${{ inputs.infrastructure_type }}\` |"
             echo "| Triggered by | @${{ github.actor }} |"
           } | tee -a "$GITHUB_STEP_SUMMARY"
 
       - name: Build kubevirt-plugin image in-cluster
         id: build
+        env:
+          INSTANCE_KEY: ${{ needs.instance-key.outputs.key }}
         run: |
           NS="${MANUAL_CONSOLE_NS}"
           export NS
+          # Per-instance ImageStream/BuildConfig name: the default
+          # "kubevirt-plugin" is shared across the whole namespace, so two
+          # PRs building concurrently would race on the same BuildConfig and
+          # stomp each other's ":latest" ImageStreamTag.
+          IMAGE_NAME="kubevirt-plugin-${INSTANCE_KEY}"
+          export IMAGE_NAME
           # BUILD_DIR points at the plugin-src/ checkout above, not the
           # workflow-scripts checkout at $GITHUB_WORKSPACE -- see that
           # checkout step's comment for why these must stay separate.
@@ -284,9 +310,10 @@ jobs:
         with:
           plugin-image: ${{ steps.build.outputs.image }}
           test-namespace: ${{ env.MANUAL_CONSOLE_NS }}
-          configmap-name: ${{ env.MANUAL_CONSOLE_CM }}
+          configmap-name: manual-console-${{ needs.instance-key.outputs.key }}
+          helm-release: manual-console-${{ needs.instance-key.outputs.key }}
           ci-env-namespace: ${{ env.CI_ENV_NS }}
-          htpasswd-user: ${{ env.MANUAL_CONSOLE_USER }}
+          htpasswd-user: manual-console-${{ needs.instance-key.outputs.key }}
           htpasswd-secret-name: ${{ steps.secret.outputs.name }}
 
       - name: Send manual console credentials to Slack
@@ -295,6 +322,7 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
           CONSOLE_URL: ${{ steps.deploy.outputs.console-route }}
           MANUAL_CONSOLE_PASSWORD: ${{ steps.creds.outputs.password }}
+          MANUAL_CONSOLE_USER: manual-console-${{ needs.instance-key.outputs.key }}
           ACTOR: ${{ github.actor }}
           BRANCH: ${{ inputs.branch }}
           PR_NUMBER: ${{ inputs.pr_number }}
@@ -309,8 +337,10 @@ jobs:
 
           if [[ -n "${PR_NUMBER}" ]]; then
             SOURCE_LINE="*PR:* <https://github.com/${{ github.repository }}/pull/${PR_NUMBER}|#${PR_NUMBER}> (\`${HEAD_REPO}\`)"
+            CLEANUP_LINE=$'\n'"Done with it? Comment \`/cleanup-manual-console\` on the PR."
           else
             SOURCE_LINE="*Branch:* \`${BRANCH}\`"
+            CLEANUP_LINE=""
           fi
 
           TEXT=":rocket: *Manual console ready*"
@@ -320,6 +350,7 @@ jobs:
           TEXT+=$'\n'"*Password:* \`${MANUAL_CONSOLE_PASSWORD}\`"
           TEXT+=$'\n'"${SOURCE_LINE}"
           TEXT+=$'\n'"*Run:* <https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}>"
+          TEXT+="${CLEANUP_LINE}"
 
           PAYLOAD=$(jq -n --arg text "${TEXT}" '{text: $text}')
 
@@ -357,3 +388,61 @@ jobs:
         run: |
           SECRET_NAME="manual-console-creds-${{ github.run_id }}"
           oc delete secret "${SECRET_NAME}" --namespace="${CI_ENV_NS}" --ignore-not-found
+
+  # Triggered by /cleanup-manual-console. Runs on the target cluster's own
+  # runner (same as deploy) and just flips the trigger ConfigMap's
+  # desired-state to "absent" -- ci-env-controller's existing reconciliation
+  # loop (also used by the TTL reaper) does the actual cleanup from there.
+  teardown:
+    name: Teardown Manual Console
+    needs: instance-key
+    if: inputs.action == 'teardown' && needs.instance-key.result == 'success'
+    runs-on: ${{ inputs.cluster_name }}
+    timeout-minutes: 10
+    env:
+      CLUSTER_NAME: ${{ inputs.cluster_name }}
+    steps:
+      - name: Mark manual console for teardown
+        id: teardown
+        env:
+          CM_NAME: manual-console-${{ needs.instance-key.outputs.key }}
+        run: |
+          # --ignore-not-found: absent ConfigMap → exit 0 + empty output
+          # (treat as nothing to tear down). Auth/RBAC/API failures still
+          # exit non-zero so we fail instead of silently skipping cleanup.
+          CM_REF="$(oc get configmap "${CM_NAME}" -n "${CI_ENV_NS}" --ignore-not-found -o name)"
+          if [[ -z "${CM_REF}" ]]; then
+            echo "::warning::No manual console ConfigMap ${CI_ENV_NS}/${CM_NAME} found on ${CLUSTER_NAME} -- nothing to tear down."
+            echo "found=false" >> "${GITHUB_OUTPUT}"
+            exit 0
+          fi
+
+          oc patch configmap "${CM_NAME}" -n "${CI_ENV_NS}" \
+            --type merge -p '{"data":{"desired-state":"absent"}}'
+          echo "found=true" >> "${GITHUB_OUTPUT}"
+          echo "Marked ${CI_ENV_NS}/${CM_NAME} for teardown (desired-state=absent); ci-env-controller will remove its Helm release, namespace resources, and OAuth user shortly."
+
+      - name: Write job summary
+        if: always()
+        env:
+          FOUND: ${{ steps.teardown.outputs.found }}
+          INSTANCE_KEY: ${{ needs.instance-key.outputs.key }}
+        run: |
+          {
+            echo "## Manual Console Teardown"
+            echo ""
+            echo "| Field | Value |"
+            echo "|---|---|"
+            echo "| Instance key | \`${INSTANCE_KEY}\` |"
+            echo "| ConfigMap | \`${CI_ENV_NS}/manual-console-${INSTANCE_KEY}\` |"
+            echo "| Cluster | \`${CLUSTER_NAME}\` |"
+            echo "| Triggered by | @${{ github.actor }} |"
+            echo ""
+            if [[ "${FOUND}" == "true" ]]; then
+              echo "Teardown requested; ci-env-controller reconciles this asynchronously."
+            elif [[ "${FOUND}" == "false" ]]; then
+              echo "No matching manual console was found -- nothing to tear down."
+            else
+              echo ":x: Teardown request failed -- see logs above."
+            fi
+          } | tee -a "$GITHUB_STEP_SUMMARY"

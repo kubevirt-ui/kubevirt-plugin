@@ -20,6 +20,12 @@
       "workflow": ".github/workflows/deploy-manual-console-command.yml"
     },
     {
+      "command": "/cleanup-manual-console",
+      "description": "Tear down this PR's manual console + kubevirt-plugin instance (Helm release, trigger ConfigMap, and OAuth user).",
+      "trust": "owners",
+      "workflow": ".github/workflows/cleanup-manual-console-command.yml"
+    },
+    {
       "command": "/recheck-jira",
       "description": "Re-run Jira ticket validation for this PR.",
       "trust": "none",

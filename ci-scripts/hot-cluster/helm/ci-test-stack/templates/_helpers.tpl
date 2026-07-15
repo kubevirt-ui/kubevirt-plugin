@@ -38,6 +38,15 @@ collisions between manual-console and any concurrent E2E test releases).
 {{- end }}
 
 {{/*
+Test-runner RoleBinding name (namespace-scoped, so it's release-namespaced
+to avoid a Helm ownership conflict between concurrent releases sharing one
+namespace, e.g. multiple manual-console instances).
+*/}}
+{{- define "ci-test-stack.testRunnerRoleBindingName" -}}
+{{ .Release.Name }}-ci-env-test-runner
+{{- end }}
+
+{{/*
 NOTE: there is deliberately no "oauthClientSecret" helper here. A helper
 that falls back to a random value (e.g. randAlphaNum) when no existing
 OAuthClient/Secret is found would re-evaluate that randomness independently

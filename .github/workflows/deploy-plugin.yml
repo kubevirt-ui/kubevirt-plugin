@@ -1,16 +1,17 @@
 name: Deploy Plugin (Manual Console Quick Redeploy)
-run-name: 'Deploy Plugin [${{ inputs.cluster_name }}] @ ${{ inputs.branch }}'
+run-name: "Deploy Plugin [${{ inputs.cluster_name }}] @ ${{ inputs.pr_number && format('PR#{0}', inputs.pr_number) || inputs.branch }}"
 
 # Lightweight companion to deploy-manual-console.yml for quickly
 # iterating on UI changes against an already-deployed manual console: builds
-# a fresh plugin image and re-provisions the same "manual-console" release,
+# a fresh plugin image and re-provisions the same per-instance release,
 # without repeating the full job summary / Slack notification of the main
 # workflow. Use deploy-manual-console.yml for the first deploy, or whenever
 # you need a fresh URL/credentials reminder.
 #
 # Prerequisites: same as deploy-manual-console.yml -- the target cluster must
-# already be provisioned, and a manual console should already exist (though
-# this workflow works standalone too, it will just deploy fresh).
+# already be provisioned, and a manual console for this pr_number/branch
+# should already exist (though this workflow works standalone too, it will
+# just deploy a fresh instance under the same instance-key naming).
 #
 # Dispatch ref matters, same as deploy-manual-console.yml: dispatch this
 # workflow itself from main (or another ref carrying current
@@ -24,10 +25,18 @@ on:
       branch:
         description: >-
           Git branch or ref to build the kubevirt-plugin image from (can be
-          an old release branch). Dispatch this workflow itself from
-          main/current -- see the header comment.
+          an old release branch). Ignored when pr_number is set.
         required: true
         default: main
+        type: string
+      pr_number:
+        description: >-
+          PR number to redeploy instead (works with PRs from forks -- the
+          OWNERS-listed author check below still applies). Takes precedence
+          over "branch" when set. Must match the pr_number the console was
+          originally deployed with, or this targets a different instance.
+        required: false
+        default: ''
         type: string
       cluster_name:
         description: ARC runner label / hot cluster name (must already be provisioned)
@@ -37,20 +46,81 @@ on:
 
 permissions:
   contents: read
+  pull-requests: read
 
 concurrency:
-  group: deploy-manual-console-${{ inputs.cluster_name }}
+  group: deploy-manual-console-${{ inputs.cluster_name }}-${{ inputs.pr_number || inputs.branch }}
   cancel-in-progress: false
 
 env:
   CI_ENV_NS: ci-env
-  MANUAL_CONSOLE_CM: manual-console
   MANUAL_CONSOLE_NS: manual-console
-  MANUAL_CONSOLE_USER: manual-console
 
 jobs:
+  # Mirrors deploy-manual-console.yml's instance-key job -- keep both in
+  # sync. Kept inline here (not factored into a reusable workflow) since
+  # this is meant to stay a small, single-purpose quick-redeploy path.
+  instance-key:
+    name: Compute Instance Key
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    outputs:
+      key: ${{ steps.compute.outputs.key }}
+    steps:
+      - name: Compute instance key
+        id: compute
+        env:
+          PR_NUMBER: ${{ inputs.pr_number }}
+          BRANCH: ${{ inputs.branch }}
+        run: |
+          if [[ -n "${PR_NUMBER}" ]]; then
+            if [[ ! "${PR_NUMBER}" =~ ^[0-9]+$ ]]; then
+              echo "::error::pr_number must be numeric, got '${PR_NUMBER}'"
+              exit 1
+            fi
+            KEY="pr-${PR_NUMBER}"
+          else
+            # Mirrors deploy-manual-console.yml's instance-key job exactly --
+            # same prefix+hash scheme, so the same branch always resolves to
+            # the same key on both sides. See that job's comment for the
+            # DNS-1123 budget and collision-resistance rationale.
+            PREFIX="$(echo -n "${BRANCH}" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9]+/-/g' | cut -c1-11 | sed -E 's/^-+//; s/-+$//')"
+            HASH="$(echo -n "${BRANCH}" | sha256sum | cut -c1-8)"
+            KEY="${PREFIX:-branch}-${HASH}"
+          fi
+          echo "key=${KEY}" >> "${GITHUB_OUTPUT}"
+          echo "Computed instance key: ${KEY}"
+
+  # Same OWNERS trust gate deploy-manual-console.yml uses -- required here
+  # too, since this job builds arbitrary PR source on a self-hosted runner.
+  resolve-pr:
+    name: Resolve PR
+    if: inputs.pr_number != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      head_sha: ${{ steps.resolve.outputs.head-sha }}
+      head_repo: ${{ steps.resolve.outputs.head-repo }}
+    steps:
+      # Needed to resolve the local composite action below -- its own
+      # internal checkout (pinned to the default branch) is what actually
+      # matters for reading OWNERS safely.
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Resolve PR and verify author is a trusted repo owner
+        id: resolve
+        uses: ./.github/actions/hot-cluster/resolve-trusted-pr
+        with:
+          pr-number: ${{ inputs.pr_number }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
   redeploy:
     name: Redeploy Plugin
+    needs: [instance-key, resolve-pr]
+    if: always() && needs.instance-key.result == 'success' && needs.resolve-pr.result != 'failure'
     runs-on: ${{ inputs.cluster_name }}
     timeout-minutes: 20
     steps:
@@ -59,7 +129,8 @@ jobs:
       #   1. This repo's own dispatch ref into $GITHUB_WORKSPACE, for CI
       #      scripts (e.g. setup-plugin-image.sh) that may not exist on
       #      inputs.branch.
-      #   2. inputs.branch itself into plugin-src/, used only as
+      #   2. The plugin source to actually build -- PR head, or
+      #      inputs.branch -- into plugin-src/, used only as
       #      setup-plugin-image.sh's BUILD_DIR below.
       - name: Checkout workflow scripts
         uses: actions/checkout@v7
@@ -69,15 +140,24 @@ jobs:
       - name: Checkout plugin source
         uses: actions/checkout@v7
         with:
-          ref: ${{ inputs.branch }}
+          repository: ${{ (needs.resolve-pr.outputs.head_repo != '' && needs.resolve-pr.outputs.head_repo != '(source repository deleted)') && needs.resolve-pr.outputs.head_repo || github.repository }}
+          ref: ${{ needs.resolve-pr.outputs.head_sha || inputs.branch }}
           path: plugin-src
           persist-credentials: false
 
       - name: Build kubevirt-plugin image in-cluster
         id: build
+        env:
+          INSTANCE_KEY: ${{ needs.instance-key.outputs.key }}
         run: |
           NS="${MANUAL_CONSOLE_NS}"
           export NS
+          # Per-instance name, matching deploy-manual-console.yml -- the
+          # default "kubevirt-plugin" is shared across the whole namespace,
+          # so redeploying one instance would race any other instance's
+          # concurrent build on the same BuildConfig/ImageStreamTag.
+          IMAGE_NAME="kubevirt-plugin-${INSTANCE_KEY}"
+          export IMAGE_NAME
           # BUILD_DIR points at the plugin-src/ checkout above, not the
           # workflow-scripts checkout at $GITHUB_WORKSPACE.
           BUILD_DIR="${GITHUB_WORKSPACE}/plugin-src"
@@ -121,9 +201,10 @@ jobs:
         with:
           plugin-image: ${{ steps.build.outputs.image }}
           test-namespace: ${{ env.MANUAL_CONSOLE_NS }}
-          configmap-name: ${{ env.MANUAL_CONSOLE_CM }}
+          configmap-name: manual-console-${{ needs.instance-key.outputs.key }}
+          helm-release: manual-console-${{ needs.instance-key.outputs.key }}
           ci-env-namespace: ${{ env.CI_ENV_NS }}
-          htpasswd-user: ${{ env.MANUAL_CONSOLE_USER }}
+          htpasswd-user: manual-console-${{ needs.instance-key.outputs.key }}
           htpasswd-secret-name: ${{ steps.secret.outputs.name }}
 
       # ci-env-controller re-applies the htpasswd user on every provision, so
@@ -136,8 +217,10 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
           CONSOLE_URL: ${{ steps.deploy.outputs.console-route }}
           MANUAL_CONSOLE_PASSWORD: ${{ steps.creds.outputs.password }}
+          MANUAL_CONSOLE_USER: manual-console-${{ needs.instance-key.outputs.key }}
           ACTOR: ${{ github.actor }}
           BRANCH: ${{ inputs.branch }}
+          PR_NUMBER: ${{ inputs.pr_number }}
         run: |
           if [[ -z "${SLACK_WEBHOOK_URL}" ]]; then
             echo "::warning::SLACK_WEBHOOK_URL not set — skipping Slack notification"
@@ -146,12 +229,18 @@ jobs:
 
           echo "::add-mask::${MANUAL_CONSOLE_PASSWORD}"
 
+          if [[ -n "${PR_NUMBER}" ]]; then
+            SOURCE_LINE="*PR:* <https://github.com/${{ github.repository }}/pull/${PR_NUMBER}|#${PR_NUMBER}>"
+          else
+            SOURCE_LINE="*Branch:* \`${BRANCH}\`"
+          fi
+
           TEXT=":arrows_counterclockwise: *Manual console plugin redeployed*"
           TEXT+=$'\n'"*Triggered by:* @${ACTOR}"
           TEXT+=$'\n'"*URL:* <${CONSOLE_URL}>"
           TEXT+=$'\n'"*User:* \`${MANUAL_CONSOLE_USER}\`"
           TEXT+=$'\n'"*Password (rotated):* \`${MANUAL_CONSOLE_PASSWORD}\`"
-          TEXT+=$'\n'"*Branch:* \`${BRANCH}\`"
+          TEXT+=$'\n'"${SOURCE_LINE}"
 
           PAYLOAD=$(jq -n --arg text "${TEXT}" '{text: $text}')
 
