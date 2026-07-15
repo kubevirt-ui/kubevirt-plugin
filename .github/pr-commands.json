@@ -1,0 +1,47 @@
+{
+  "_note": "Single source of truth for every PR-comment slash command in this repo, read by pr_help_command.yml (/help). Add an entry here whenever a new PR command is added -- same manual-sync convention as RELATED_AUTOMATION_PATHS in .github/scripts/src/ai-config-validation/constants.ts. trust values: 'owners' = root OWNERS approvers/reviewers; 'ai-config-owners' = the narrower .github/OWNERS (kept in sync with .cursor/OWNERS) approvers gating /ai-approved; 'member-or-owner' = GitHub author_association; 'none' = no trust gate.",
+  "commands": [
+    {
+      "command": "/retest-e2e",
+      "description": "Retest Hot Cluster E2E for this PR, merged with the current base branch tip. Cancels an in-progress run for this PR first, if any.",
+      "trust": "owners",
+      "workflow": ".github/workflows/retest-e2e.yml"
+    },
+    {
+      "command": "/cancel-e2e",
+      "description": "Cancel an in-progress Hot Cluster E2E run for this PR.",
+      "trust": "owners",
+      "workflow": ".github/workflows/cancel-e2e.yml"
+    },
+    {
+      "command": "/deploy-manual-console",
+      "description": "Deploy a manual console + kubevirt-plugin instance for this PR. Cluster name/infra type are auto-resolved from the PR's base branch; the cluster is provisioned automatically if not already up. Credentials are sent to Slack.",
+      "trust": "owners",
+      "workflow": ".github/workflows/deploy-manual-console-command.yml"
+    },
+    {
+      "command": "/recheck-jira",
+      "description": "Re-run Jira ticket validation for this PR.",
+      "trust": "none",
+      "workflow": ".github/workflows/pr_validation_commands.yml"
+    },
+    {
+      "command": "/ai-approved",
+      "description": "Mark AI/editor configuration changes on this PR as security-reviewed.",
+      "trust": "ai-config-owners",
+      "workflow": ".github/workflows/pr_validation_commands.yml"
+    },
+    {
+      "command": "/clone",
+      "description": "Cherry-pick this PR to another release branch once merged.",
+      "trust": "member-or-owner",
+      "workflow": ".github/workflows/jira_clone.yml"
+    },
+    {
+      "command": "/help",
+      "description": "List all available PR commands.",
+      "trust": "none",
+      "workflow": ".github/workflows/pr_help_command.yml"
+    }
+  ]
+}

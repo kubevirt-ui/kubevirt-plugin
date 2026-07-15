@@ -1,0 +1,82 @@
+name: Detect Hot Cluster Infrastructure Type
+description: |
+  Best-effort detection of whether a named hot cluster already exists, and
+  if so, its infrastructure type (ipi/vpc/classic) -- adapted from the
+  detection already proven in ibmc-cluster-auto-teardown.yml's own "Check
+  if cluster exists" step. ROKS clusters (vpc/classic) are checked via the
+  IBM Cloud CLI; IPI clusters have no IBM Cloud CLI concept of their own,
+  so they're detected via DNS instead. Used only to pick informational/
+  provisioning defaults -- never a substitute for hot-cluster-check.yml's
+  own readiness probe.
+
+inputs:
+  cluster-name:
+    description: Cluster name to probe
+    required: true
+  ic-api-key:
+    description: |
+      IBM Cloud API key for the ROKS (vpc/classic) check. Composite actions
+      can't read the secrets context directly, so the caller must pass
+      secrets.IC_KEY explicitly (same as IBM/actions-ibmcloud-cli's own
+      api_key: input).
+    required: true
+  ibm-region:
+    description: IBM Cloud region for the CLI setup
+    required: false
+    default: eu-de
+  ibm-resource-group:
+    description: IBM Cloud resource group for the CLI setup
+    required: false
+    default: cnv-ui
+  base-domain:
+    description: Base domain for IPI cluster DNS
+    required: false
+    default: cnv-ui.com
+
+outputs:
+  exists:
+    description: "'true' if a cluster with this name was found (ROKS or IPI)"
+    value: ${{ steps.detect.outputs.exists }}
+  infrastructure-type:
+    description: "'ipi' | 'vpc' | 'classic', empty when exists is 'false'"
+    value: ${{ steps.detect.outputs.infrastructure_type }}
+
+runs:
+  using: composite
+  steps:
+    - name: Setup IBM Cloud CLI
+      uses: IBM/actions-ibmcloud-cli@v2
+      with:
+        api_key: ${{ inputs.ic-api-key }}
+        region: ${{ inputs.ibm-region }}
+        group: ${{ inputs.ibm-resource-group }}
+        plugins: kubernetes-service
+
+    - name: Detect cluster existence and infrastructure type
+      id: detect
+      shell: bash
+      env:
+        CLUSTER_NAME: ${{ inputs.cluster-name }}
+        BASE_DOMAIN: ${{ inputs.base-domain }}
+      run: |
+        INFRA_TYPE=""
+
+        if ibmcloud oc cluster get --cluster "${CLUSTER_NAME}" &>/dev/null; then
+          PROVIDER=$(ibmcloud oc cluster get --cluster "${CLUSTER_NAME}" --output json 2>/dev/null | jq -r '.provider // "classic"')
+          echo "ROKS cluster '${CLUSTER_NAME}' exists (provider: ${PROVIDER})"
+          echo "exists=true" >> "$GITHUB_OUTPUT"
+          if [[ "${PROVIDER}" == "vpc-gen2" ]]; then
+            INFRA_TYPE="vpc"
+          else
+            INFRA_TYPE="classic"
+          fi
+        elif dig +short "api.${CLUSTER_NAME}.${BASE_DOMAIN}" 2>/dev/null | grep -q .; then
+          echo "IPI cluster detected via DNS (api.${CLUSTER_NAME}.${BASE_DOMAIN} resolves)"
+          echo "exists=true" >> "$GITHUB_OUTPUT"
+          INFRA_TYPE="ipi"
+        else
+          echo "No cluster '${CLUSTER_NAME}' found (ROKS or IPI)"
+          echo "exists=false" >> "$GITHUB_OUTPUT"
+        fi
+
+        echo "infrastructure_type=${INFRA_TYPE}" >> "$GITHUB_OUTPUT"

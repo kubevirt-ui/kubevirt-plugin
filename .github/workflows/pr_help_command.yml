@@ -1,0 +1,78 @@
+name: PR Help Command
+run-name: 'PR Help Command @ PR#${{ github.event.issue.number }}'
+
+# Lets anyone comment /help on a PR to list every available PR-comment
+# command, read from the single-source-of-truth registry at
+# .github/pr-commands.json. Purely informational -- no trust gate, matching
+# /recheck-jira's existing precedent for a read-only command.
+
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: pr-help-cmd-${{ github.event.issue.number }}
+  cancel-in-progress: true
+
+jobs:
+  help:
+    name: Post Command List
+    if: >
+      github.event.issue.pull_request != null &&
+      contains(github.event.comment.body, '/help')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      # The job-level if: above is a cheap substring prefilter only -- it
+      # would still fire for e.g. a comment linking "docs.foo.com/help/".
+      # Re-check with a word-boundary match before posting anything.
+      - name: Match exact command
+        id: match
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const body = context.payload.comment.body || '';
+            const matched = /(^|\s)\/help(\s|$)/.test(body);
+            core.setOutput('matched', matched ? 'true' : 'false');
+
+      - name: Post available commands
+        if: steps.match.outputs.matched == 'true'
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const fs = require('fs');
+            const { commands } = JSON.parse(fs.readFileSync('.github/pr-commands.json', 'utf8'));
+
+            const trustLabel = {
+              owners: 'OWNERS only',
+              'ai-config-owners': 'AI-config OWNERS only (.github/OWNERS)',
+              'member-or-owner': 'Member/owner/collaborator',
+              none: 'Anyone',
+            };
+
+            const rows = commands.map(
+              (c) => `| \`${c.command}\` | ${c.description} | ${trustLabel[c.trust] ?? c.trust} |`,
+            );
+
+            const body = [
+              '### Available PR commands',
+              '',
+              '| Command | Description | Who can use it |',
+              '|---|---|---|',
+              ...rows,
+            ].join('\n');
+
+            await github.rest.issues.createComment({
+              ...context.repo,
+              issue_number: context.issue.number,
+              body,
+            });

@@ -6,8 +6,11 @@ run-name: "Deploy Manual Console [${{ inputs.cluster_name }}] @ ${{ inputs.pr_nu
 # path: it builds its own in-cluster plugin image, uses its own trigger
 # ConfigMap/action, and does not touch the CNV-managed console, HCO, or SSP.
 #
-# Prerequisites: the target cluster must already be provisioned via
-# "IBM Cloud Hot Cluster Setup" (ibmc-cluster-setup.yml).
+# cluster-check below provisions the target cluster via "IBM Cloud Hot
+# Cluster Setup" (ibmc-cluster-setup.yml) if it isn't already up -- without
+# that, dispatching against a cluster with no matching ARC runner would
+# leave the deploy job hanging until its own timeout instead of failing
+# fast or self-provisioning.
 #
 # Dispatch ref matters: the dispatch branch/ref (github.ref) is what gets
 # checked out for CI scripts, separately from "branch"/pr_number below,
@@ -32,12 +35,12 @@ on:
         default: ''
         type: string
       cluster_name:
-        description: ARC runner label / hot cluster name (must already be provisioned)
+        description: ARC runner label / hot cluster name (provisioned automatically if not already up)
         required: true
         default: kubevirt-plugin-ci
         type: string
       infrastructure_type:
-        description: Infrastructure type of the target cluster (informational only)
+        description: Infrastructure type of the target cluster (used to provision if not already up)
         required: false
         default: ipi
         type: choice
@@ -45,6 +48,24 @@ on:
           - ipi
           - vpc
           - classic
+      openshift_version:
+        description: 'OpenShift version to provision if the cluster is not already up (e.g. 4.22_openshift)'
+        required: false
+        default: '4.22_openshift'
+        type: string
+      cnv_channel:
+        description: CNV OLM subscription channel to install if the cluster is not already up
+        required: false
+        default: stable
+        type: string
+      cnv_pin_version:
+        description: |
+          "<major>.<minor>" to pin CNV to if the cluster is not already up
+          (e.g. for a release branch under test). Leave empty to install
+          whatever cnv_channel currently resolves to.
+        required: false
+        default: ''
+        type: string
 
 permissions:
   contents: read
@@ -131,13 +152,39 @@ jobs:
               core.setFailed(`PR #${prNumber}'s author '${author}' is not listed in OWNERS (approvers/reviewers). Only PRs from trusted repo owners can be deployed via this workflow. To deploy this PR's changes anyway, push its branch to this repository directly and use the "branch" input instead.`);
             }
 
-  # if: always() so this still runs when resolve-pr was skipped (no
-  # pr_number given -- the plain "branch" input path), but not when
-  # resolve-pr ran and failed the trust check.
-  deploy:
-    name: Deploy Manual Console
+  # Probes the target cluster and provisions it if it isn't up yet -- same
+  # reusable workflow hot-cluster-e2e.yml already uses for this. Gated on
+  # resolve-pr the same way deploy is below -- an untrusted PR author must
+  # not be able to trigger real cluster provisioning (secrets: inherit)
+  # just because deploy itself will later be skipped; skipped resolve-pr
+  # (the plain "branch" input path, no pr_number) still runs this normally.
+  # run_health_check stays false -- this isn't an E2E gating context.
+  cluster-check:
+    name: Cluster Check
     needs: resolve-pr
     if: always() && needs.resolve-pr.result != 'failure'
+    uses: ./.github/workflows/hot-cluster-check.yml
+    with:
+      cluster_name: ${{ inputs.cluster_name }}
+      infrastructure_type: ${{ inputs.infrastructure_type }}
+      openshift_version: ${{ inputs.openshift_version }}
+      cnv_channel: ${{ inputs.cnv_channel }}
+      cnv_pin_version: ${{ inputs.cnv_pin_version }}
+      branch_name: ${{ inputs.branch }}
+    secrets: inherit
+
+  # if: always() so this still runs when resolve-pr was skipped (no
+  # pr_number given -- the plain "branch" input path), but not when
+  # resolve-pr ran and failed the trust check, or the cluster never became
+  # ready (cluster-check provisions it if needed; a cluster already up
+  # returns ready almost immediately, so this adds no delay for the common
+  # case).
+  deploy:
+    name: Deploy Manual Console
+    needs: [resolve-pr, cluster-check]
+    if: |
+      always() && needs.resolve-pr.result != 'failure' &&
+      needs.cluster-check.outputs.cluster_ready == 'true'
     runs-on: ${{ inputs.cluster_name }}
     timeout-minutes: 30
     steps:
