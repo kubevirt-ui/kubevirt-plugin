@@ -13,7 +13,9 @@ runs:
       uses: actions/checkout@v7
       with:
         ref: ${{ inputs.ref }}
-        sparse-checkout: .github/scripts
+        sparse-checkout: |
+          .github/scripts
+          .github/actions/setup-gh-scripts
         persist-credentials: false
 
     - name: Setup Node

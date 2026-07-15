@@ -5,7 +5,7 @@ import { AI_CONFIG } from '../ai-config-validation/constants';
 import { addLabel, setCommitStatus } from '../github-comments';
 import { createOctokit } from '../github-repo';
 import { executeJiraValidation } from '../jira-validation/execute';
-import { isListedInOwners } from './owners';
+import { isListedInAiConfigOwners } from './owners';
 import { parseCommand } from './parse-command';
 import { requireEnv, safeErrorMessage } from '../utils';
 import type { GitHubConfig } from '../types/index';
@@ -37,10 +37,16 @@ const approveAiConfig = async (
   commentId: number,
 ): Promise<void> => {
   const octokit = createOctokit(config);
-  const trusted = await isListedInOwners(octokit, config.owner, config.repo, baseBranch, author);
+  const trusted = await isListedInAiConfigOwners(
+    octokit,
+    config.owner,
+    config.repo,
+    baseBranch,
+    author,
+  );
 
   console.log(
-    `${author} is ${trusted ? '' : 'not '}listed in OWNERS — ${trusted ? 'trusted' : 'untrusted, ignoring /ai-approved'}.`,
+    `${author} is ${trusted ? '' : 'not '}listed in .github/OWNERS (AI-config approvers) — ${trusted ? 'trusted' : 'untrusted, ignoring /ai-approved'}.`,
   );
 
   if (!trusted) {
