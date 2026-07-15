@@ -47,7 +47,7 @@ const usePreviewFeaturesData: UsePreviewFeaturesData = (cluster) => {
     {
       externalLink: null,
       id: TREE_VIEW_FOLDERS,
-      label: t('Enable folders in VirtualMachines tree view'),
+      label: t('Enable groups in VirtualMachines tree view'),
       searchItemId: PREVIEW_FEATURES_TAB_IDS.treeViewFolders,
       ...treeViewFoldersFeature,
     },

@@ -10,7 +10,7 @@ export default class VmActionsComponent extends PageCommons {
   private readonly _dialogModal = this.locator('[data-test="dialog-modal"]');
   private readonly _inputIdName = this.locator('input[id="name"]');
   private readonly _inputPlaceholderSearchFolder = this.locator(
-    'input[placeholder="Search folder"]',
+    'input[placeholder="Search group"]',
   );
   private readonly _kebabButton = this.locator('[data-test="kebab-button"]');
   private readonly _migrateStorageAction = this.locator(
@@ -171,7 +171,7 @@ export default class VmActionsComponent extends PageCommons {
     if (exists) {
       await this.robustClick(existingFolderOption);
     } else {
-      const createFolderOption = this.page.getByText(`Create folder "${folderName}"`);
+      const createFolderOption = this.page.getByText(`Create group "${folderName}"`);
       await this.robustClick(createFolderOption);
     }
   }

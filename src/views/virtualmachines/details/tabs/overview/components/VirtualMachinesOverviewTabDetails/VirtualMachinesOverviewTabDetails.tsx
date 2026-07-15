@@ -136,7 +136,7 @@ const VirtualMachinesOverviewTabDetails: FC<VirtualMachinesOverviewTabDetailsPro
                   <DescriptionItem
                     data-test-id="virtual-machine-overview-details-folder"
                     descriptionData={getLabel(vm, VM_FOLDER_LABEL) || NO_DATA_DASH}
-                    descriptionHeader={t('Folder')}
+                    descriptionHeader={t('Group')}
                   />
                 )}
                 <DescriptionItem

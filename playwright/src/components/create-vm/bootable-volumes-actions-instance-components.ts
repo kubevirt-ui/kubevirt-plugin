@@ -232,7 +232,7 @@ export class CreateVmInstanceTypesComponent extends BaseComponent {
   private readonly _addVolumeButton = this.locator('#tour-step-add-volume');
   private readonly _bootableVolumeTableBody = this.locator('table.BootableVolumeList-table tbody');
   private readonly _buttonSortFavorites = this.locator('button[aria-label="Sort favorites"]');
-  private readonly _createFolderButton = this.locator('button:has-text("Create folder")');
+  private readonly _createFolderButton = this.locator('button:has-text("Create group")');
   private readonly _createVirtualMachineButton = this.locator('button', {
     hasText: 'Create VirtualMachine',
   });
@@ -255,7 +255,7 @@ export class CreateVmInstanceTypesComponent extends BaseComponent {
     '.instancetypes-vm-details-section',
   );
   private readonly _instancetypesVmDetailsSectionPlaceholderSearchFolder = this.locator(
-    '.instancetypes-vm-details-section [placeholder="Search folder"]',
+    '.instancetypes-vm-details-section [placeholder="Search group"]',
   );
   private readonly _nameFilterInput = this.locator('[data-test="name-filter-input"]');
   private readonly _nameVmname = this.locator('[name="vmname"]');

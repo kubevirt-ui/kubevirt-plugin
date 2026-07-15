@@ -26,7 +26,7 @@ export const getCreationNotAllowedMessage = (filterValue: string) => {
   if (!startsCorrectlyRegex.test(filterValue)) {
     return (
       <>
-        {t("Folder name can't start with")} {filterValue[0]}
+        {t("Group name can't start with")} {filterValue[0]}
       </>
     );
   }
@@ -34,7 +34,7 @@ export const getCreationNotAllowedMessage = (filterValue: string) => {
   if (!isValidFolderNameRegex.test(filterValue)) {
     return (
       <>
-        {t("Folder name can't end with")} {filterValue[filterValue.length - 1]}
+        {t("Group name can't end with")} {filterValue[filterValue.length - 1]}
       </>
     );
   }

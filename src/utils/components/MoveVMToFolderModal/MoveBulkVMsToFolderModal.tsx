@@ -38,7 +38,7 @@ const MoveBulkVMToFolderModal: FC<MoveBulkVMToFolderModalProps> = ({
         removeFolderQuery?.(folderName);
         return onSubmit(folderName);
       }}
-      headerText={t('Move to folder')}
+      headerText={t('Move to group')}
       isOpen={isOpen}
       onClose={onClose}
     >

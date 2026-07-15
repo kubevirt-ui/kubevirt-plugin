@@ -11,7 +11,7 @@ export default class CreateVmCreateComponent extends BaseComponent {
     'button[placeholder="Select TLS certificate"]',
   );
   private readonly _cdBootSource = this.locator('[data-test-id="cd-boot-source"]');
-  private readonly _createFolderButton = this.locator('button:has-text("Create folder")');
+  private readonly _createFolderButton = this.locator('button:has-text("Create group")');
   private readonly _customizeVirtualMachineFooterButton = this.locator(
     '.create-vm-instance-type-footer button',
     { hasText: 'Customize VirtualMachine' },
@@ -25,7 +25,7 @@ export default class CreateVmCreateComponent extends BaseComponent {
     '[data-test-id="disk-boot-source-http-source-input"]',
   );
   private readonly _idQuickCreateFormPlaceholderSearchFolder = this.locator(
-    '[id="quick-create-form"] [placeholder="Search folder"]',
+    '[id="quick-create-form"] [placeholder="Search group"]',
   );
   private readonly _quickCreateVmBtn = this.locator('[data-test-id="quick-create-vm-btn"]');
   private readonly _startAfterCreationCheckbox = this.locator(

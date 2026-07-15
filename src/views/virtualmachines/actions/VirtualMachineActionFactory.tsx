@@ -361,7 +361,7 @@ export const createVirtualMachineActionFactory = (t: TFunction) => ({
           />
         )),
       id: ACTIONS_ID.MOVE_TO_FOLDER,
-      label: t('Move to folder'),
+      label: t('Move to group'),
     };
   },
   openConsole: (vm: V1VirtualMachine): ActionDropdownItemType => {
