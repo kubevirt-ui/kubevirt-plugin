@@ -214,23 +214,25 @@ jobs:
               return;
             }
 
-            // hot-cluster-e2e.yml's run-name shows the raw base branch
-            // (e.g. "release-4.20") for automatic runs, not the resolved
-            // cluster name -- remap it below. The other workflows already
-            // show the resolved name, so they keep a plain substring match.
+            // hot-cluster-e2e.yml's run-name bracket token can be either an
+            // already-resolved cluster_name (a bare ad-hoc dispatch with no
+            // pr_number) or a raw base branch like "release-4.20" (every
+            // PR-related dispatch -- PR gate, ok-to-test, pool/pool-entry
+            // retest, /retest-e2e -- passes base_ref, and hot-cluster-e2e.yml
+            // no longer has a pull_request_target trigger to fall back to).
+            // event type alone can't distinguish these two cases anymore, so
+            // always try the same resolution: pass through an already-
+            // resolved name, remap a release branch, or default to the
+            // shared cluster. The other workflows already show the resolved
+            // name in their own run-name, so they keep a plain substring match.
             function runMatchesCluster(run, workflow) {
               const title = run.display_title || '';
               if (workflow === '.github/workflows/hot-cluster-e2e.yml') {
                 const bracketed = title.match(/^Hot Cluster E2E \[([^\]]+)\]/);
                 if (!bracketed) return false;
                 const token = bracketed[1];
-                // workflow_dispatch already supplies a resolved
-                // cluster_name; only a pull_request_target run's base_ref
-                // token needs remapping.
                 let resolved;
-                if (run.event === 'workflow_dispatch') {
-                  resolved = token;
-                } else if (token.startsWith('kubevirt-plugin-')) {
+                if (token.startsWith('kubevirt-plugin-')) {
                   resolved = token;
                 } else {
                   const release = token.match(/^release-(\d+)\.(\d+)$/);
