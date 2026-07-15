@@ -52,12 +52,36 @@ subject never matches a release cluster's runner SA.
 
 Actions -> **Deploy Manual Console** -> Run workflow, with:
 
-- `branch` -- the branch to build the plugin image from
+- `branch` -- the branch to build the plugin image from (ignored if `pr_number` is set)
+- `pr_number` -- deploy a PR instead, or comment `/deploy-manual-console` on it
 - `cluster_name` -- the ARC runner label / hot cluster name (default `kubevirt-plugin-ci`)
 - `infrastructure_type` -- informational only, no kubeconfig is downloaded
 
-For UI-only iteration afterwards, **Deploy Plugin** rebuilds and
-redeploys just the plugin image against the same release.
+For UI-only iteration afterwards, **Deploy Plugin** rebuilds and redeploys
+just the plugin image against the same instance -- it takes the same
+`branch`/`pr_number` inputs and must be given the same one used for the
+original deploy, or it targets a different (and possibly nonexistent)
+instance.
+
+Every deploy is scoped to an **instance key** -- `pr-<number>` when
+`pr_number` is set, otherwise a truncated, normalized `branch` prefix plus
+an 8-character hash of the full branch name (so two branches that happen to
+share the same prefix still get distinct keys) -- so different PRs (or
+branches) on the same cluster each get their own trigger ConfigMap, Helm
+release, OAuth user, and console route (`console-manual-console-<key>.<apps
+domain>`) instead of overwriting each other. The namespace
+(`manual-console`) stays shared across all of them.
+
+## Tearing down
+
+Manual-console ConfigMaps are exempt from the TTL reaper, so nothing removes
+a deployed instance automatically. Once done with it, either comment
+`/cleanup-manual-console` on the PR, or run **Deploy Manual Console** with
+`action: teardown` and the same `pr_number`/`branch` + `cluster_name` used to
+deploy it. This flips the trigger ConfigMap's `desired-state` to `absent`;
+`ci-env-controller` then removes that instance's Helm release and htpasswd
+user asynchronously. The shared `manual-console` namespace itself is only
+deleted once no other instance's Helm release remains in it.
 
 ## How it works
 
@@ -95,15 +119,19 @@ required beyond `SLACK_WEBHOOK_URL`:
 2. It writes that password into a short-lived Kubernetes `Secret` in the
    `ci-env` namespace (never into the trigger ConfigMap).
 3. `ci-env-controller` reads the Secret, upserts an htpasswd identity
-   provider user named `manual-console` with that password, grants it
-   `cluster-admin`, and **deletes the Secret immediately** -- the password
-   never persists in the cluster.
+   provider user named after that deploy's instance key (e.g.
+   `manual-console-pr-1234`) with that password, grants it `cluster-admin`,
+   and **deletes the Secret immediately** -- the password never persists in
+   the cluster.
 4. The workflow posts the console URL, username, and password to Slack
    (`SLACK_WEBHOOK_URL`), along with the GitHub user who triggered the
    deploy and a link to the run.
 
 Redeploying (either workflow) rotates the password; the previous one stops
 working. **Deploy Plugin** sends its own Slack reminder for this reason.
+
+Tearing down an instance (see above) removes that htpasswd user and revokes
+its `cluster-admin` grant, in addition to uninstalling its Helm release.
 
 If `SLACK_WEBHOOK_URL` isn't configured, the workflow logs a warning and
 skips notification -- the deploy still succeeds, but credentials must be

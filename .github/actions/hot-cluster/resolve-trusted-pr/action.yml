@@ -1,0 +1,87 @@
+name: Resolve Trusted PR
+description: >
+  Resolve a PR's head SHA/repo and verify its author is listed in OWNERS
+  before any in-cluster build touches their code. Shared by every
+  manual-console workflow that builds + runs arbitrary PR source on a
+  self-hosted runner, so this security-sensitive check can't drift between
+  callers.
+
+inputs:
+  pr-number:
+    description: PR number to resolve and check
+    required: true
+  github-token:
+    description: Token for the GitHub API call
+    required: true
+
+outputs:
+  head-sha:
+    description: PR head commit SHA
+    value: ${{ steps.resolve.outputs.head_sha }}
+  head-repo:
+    description: >
+      PR head repository full_name, or the literal string
+      "(source repository deleted)" if the fork no longer exists
+    value: ${{ steps.resolve.outputs.head_repo }}
+
+runs:
+  using: composite
+  steps:
+    # Pinned to the default branch explicitly: without a ref:, checkout
+    # falls back to github.ref, which for workflow_dispatch is whatever
+    # branch was selected in the dispatch UI -- not necessarily the default
+    # branch. Reading OWNERS from an unpinned, dispatcher-chosen branch
+    # would let a modified OWNERS file on that branch self-approve trust for
+    # a fork PR.
+    - name: Checkout default branch
+      uses: actions/checkout@v7
+      with:
+        ref: ${{ github.event.repository.default_branch }}
+        persist-credentials: false
+
+    - name: Resolve PR and verify author is a trusted repo owner
+      id: resolve
+      uses: actions/github-script@v9
+      env:
+        # Passed via env, not interpolated into the script string below:
+        # pr-number is a raw, unvalidated caller-supplied string, and
+        # substituting it directly into the JS source would let a crafted
+        # value break out of the string literal and inject arbitrary script.
+        PR_NUMBER: ${{ inputs.pr-number }}
+      with:
+        github-token: ${{ inputs.github-token }}
+        script: |
+          const fs = require('fs');
+
+          const prNumber = parseInt(process.env.PR_NUMBER, 10);
+          if (!Number.isInteger(prNumber) || prNumber <= 0) {
+            core.setFailed(`pr-number must be a positive integer, got '${process.env.PR_NUMBER}'`);
+            return;
+          }
+
+          const { data: pr } = await github.rest.pulls.get({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            pull_number: prNumber,
+          });
+
+          const author = pr.user.login;
+          const headSha = pr.head.sha;
+          const headRepo = pr.head.repo ? pr.head.repo.full_name : '(source repository deleted)';
+          core.info(`PR #${prNumber}: author=${author}, head=${headRepo}@${headSha}`);
+
+          let trusted = false;
+          try {
+            const owners = fs.readFileSync('OWNERS', 'utf8');
+            trusted = new RegExp(`^\\s*-\\s*${author}\\s*$`, 'm').test(owners);
+          } catch (err) {
+            core.warning(`Could not read OWNERS file: ${err.message}`);
+          }
+
+          core.info(`${author} is ${trusted ? '' : 'not '}listed in OWNERS (approvers/reviewers) — ${trusted ? 'trusted' : 'untrusted'}.`);
+          core.setOutput('head_sha', headSha);
+          core.setOutput('head_repo', headRepo);
+
+          if (!trusted) {
+            core.setFailed(`PR #${prNumber}'s author '${author}' is not listed in OWNERS (approvers/reviewers). Only PRs from trusted repo owners can be built on a self-hosted runner via this workflow. To use this PR's changes anyway, push its branch to this repository directly and use the "branch" input instead.`);
+          }

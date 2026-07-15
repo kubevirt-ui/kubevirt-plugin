@@ -18,6 +18,11 @@ inputs:
   configmap-name:
     description: Name of the trigger ConfigMap
     default: manual-console
+  helm-release:
+    description: >
+      Helm release name. Defaults to configmap-name (this action's
+      historical behavior) when left empty.
+    default: ''
   ci-env-namespace:
     description: Namespace where ci-env-controller runs
     default: ci-env
@@ -67,7 +72,7 @@ runs:
           desired-state: "present"
           plugin-image: "${{ inputs.plugin-image }}"
           test-namespace: "${{ inputs.test-namespace }}"
-          helm-release: "manual-console"
+          helm-release: "${{ inputs.helm-release || inputs.configmap-name }}"
           auth-mode: "openshift"
           htpasswd-user: "${{ inputs.htpasswd-user }}"
           htpasswd-secret-name: "${{ inputs.htpasswd-secret-name }}"
@@ -130,6 +135,7 @@ runs:
       env:
         CM_NAME: ${{ inputs.configmap-name }}
         CM_NS: ${{ inputs.ci-env-namespace }}
+        HELM_RELEASE: ${{ inputs.helm-release || inputs.configmap-name }}
         PLUGIN_IMAGE: ${{ inputs.plugin-image }}
         TEST_NS: ${{ inputs.test-namespace }}
         HTPASSWD_USER: ${{ inputs.htpasswd-user }}
@@ -141,6 +147,7 @@ runs:
           echo "| Input Parameter | Value |"
           echo "|------|-------|"
           echo "| ConfigMap | \`${CM_NS}/${CM_NAME}\` |"
+          echo "| Helm release | \`${HELM_RELEASE}\` |"
           echo "| Plugin image | \`${PLUGIN_IMAGE}\` |"
           echo "| Namespace | \`${TEST_NS}\` |"
           echo "| Login username | \`${HTPASSWD_USER}\` |"

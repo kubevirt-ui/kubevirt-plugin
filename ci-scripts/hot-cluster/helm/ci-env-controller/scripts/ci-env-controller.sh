@@ -15,9 +15,9 @@
 #   HELM_CHART_PATH        Path to the ci-test-stack Helm chart inside the container
 #   ENSURE_MANUAL_CONSOLE_USER_SCRIPT
 #                          Path to ensure-manual-console-user.sh inside the
-#                          container; only invoked when a ConfigMap sets
-#                          auth-mode=openshift (default:
-#                          /opt/ci-env/manual-console/ensure-manual-console-user.sh)
+#                          container; only invoked (to add or, on teardown,
+#                          --remove) when a ConfigMap sets auth-mode=openshift
+#                          (default: /opt/ci-env/manual-console/ensure-manual-console-user.sh)
 #
 # Trigger ConfigMap data field (per-request, optional):
 #   user-settings-location  Overrides the console's BRIDGE_USER_SETTINGS_LOCATION
@@ -181,6 +181,21 @@ ensure_manual_console_auth() {
     log "ERROR: ensure-manual-console-user.sh did not produce a CA_CERT_FILE"
     return 1
   fi
+}
+
+# --------------------------------------------------------------------------- #
+#  Remove an htpasswd user provisioned for a manual-console instance
+# --------------------------------------------------------------------------- #
+remove_manual_console_auth() {
+  local htpasswd_user="$1"
+
+  log "Removing htpasswd user ${htpasswd_user} via ${ENSURE_MANUAL_CONSOLE_USER_SCRIPT}..."
+  local remove_output
+  if ! remove_output="$(bash "${ENSURE_MANUAL_CONSOLE_USER_SCRIPT}" --remove "${htpasswd_user}" 2>&1)"; then
+    log "ERROR: failed to remove htpasswd user ${htpasswd_user}: ${remove_output}"
+    return 1
+  fi
+  log "${remove_output}"
 }
 
 # --------------------------------------------------------------------------- #
@@ -377,13 +392,50 @@ teardown() {
   local cm_name="$1"
   local test_ns="$2"
   local helm_release="${3:-${cm_name}}"
+  local auth_mode="${4:-disabled}"
+  local htpasswd_user="${5:-}"
 
   log "Tearing down: cm=${cm_name} ns=${test_ns} release=${helm_release}"
   patch_cm "${cm_name}" '{"data":{"status":"cleaning"}}'
 
   helm uninstall "${helm_release}" -n "${test_ns}" --wait 2>/dev/null || true
 
-  oc delete namespace "${test_ns}" --wait=false 2>/dev/null || true
+  # A failure here must not be silently swallowed into "cleaned": that
+  # status stops reconcile_one from ever retrying (see its absent-branch
+  # check), which would leave a cluster-admin htpasswd user stranded
+  # indefinitely. Setting status=error instead keeps this CM eligible for
+  # another teardown attempt next reconciliation cycle.
+  if [[ "${auth_mode}" == "openshift" && -n "${htpasswd_user}" ]]; then
+    if ! remove_manual_console_auth "${htpasswd_user}"; then
+      local err="failed to remove htpasswd user ${htpasswd_user}; will retry"
+      log "ERROR: ${err}"
+      patch_cm "${cm_name}" "{\"data\":{\"status\":\"error\",\"error-message\":\"${err}\"}}"
+      return 1
+    fi
+  fi
+
+  # auth-mode=openshift is the manual-console signal (never set for E2E --
+  # see provision()'s comment above). Its namespace is declared-shared by
+  # design: concurrent instances from distinct Helm releases, plus a
+  # one-time RBAC bootstrap (install-manual-console-rbac.sh) that must
+  # survive between deploys. Never auto-delete it here based on a
+  # point-in-time `helm list` snapshot -- that's both racy (a concurrent
+  # provision() elsewhere in the same reconciliation pass may not have
+  # registered its release yet) and wrong even when accurate (it would
+  # destroy the RBAC bootstrap too). Every namespace on the E2E path is
+  # either exclusively per-run/ephemeral or GitHub Actions-concurrency-
+  # serialized, so deleting it once its own release is gone stays safe.
+  if [[ "${auth_mode}" == "openshift" ]]; then
+    log "${test_ns} is a manual-console namespace; not auto-deleting it"
+  else
+    local remaining
+    remaining="$(helm list -n "${test_ns}" -q 2>/dev/null | wc -l | tr -d ' ')"
+    if [[ "${remaining}" == "0" ]]; then
+      oc delete namespace "${test_ns}" --wait=false 2>/dev/null || true
+    else
+      log "${remaining} other Helm release(s) still in ${test_ns}; leaving namespace in place"
+    fi
+  fi
 
   log "Teardown complete for ${cm_name}"
   patch_cm "${cm_name}" '{"data":{"status":"cleaned"}}'
@@ -433,7 +485,7 @@ reconcile_one() {
       patch_cm "${cm_name}" '{"data":{"status":"cleaned"}}'
       return
     fi
-    teardown "${cm_name}" "${test_ns}" "${helm_release}" || \
+    teardown "${cm_name}" "${test_ns}" "${helm_release}" "${auth_mode}" "${htpasswd_user}" || \
       log "WARN: teardown encountered errors for ${cm_name} (non-fatal)"
   fi
 }

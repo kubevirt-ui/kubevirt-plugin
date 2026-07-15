@@ -10,7 +10,9 @@
 # only when a ConfigMap's auth-mode=openshift; never touched by the default
 # E2E provisioning path.
 #
-# Usage: echo <password> | ensure-manual-console-user.sh <username>
+# Usage:
+#   echo <password> | ensure-manual-console-user.sh <username>   # add/update
+#   ensure-manual-console-user.sh --remove <username>             # remove
 #
 # The password is read from stdin, not argv -- CLI arguments persist for the
 # process's whole lifetime and are visible to any co-located process via
@@ -20,14 +22,46 @@
 # username replaces that user's password hash; other users already present
 # in the htpasswd secret (e.g. cluster setup's "admin") are preserved.
 #
-# Output (stdout): CA_CERT_FILE=<path to a temp file with the PEM CA bundle>
-#   Caller is responsible for deleting this file after use.
+# Output (stdout, add/update mode only): CA_CERT_FILE=<path to a temp file
+#   with the PEM CA bundle>. Caller is responsible for deleting this file
+#   after use.
 #
 # Requires: oc logged in with cluster-admin (or equivalent) permissions to
 # manage openshift-config secrets, the cluster OAuth config, and
 # cluster-admin ClusterRoleBindings. Also requires the `htpasswd` CLI
 # (httpd-tools / apache2-utils).
 set -euo pipefail
+
+if [[ "${1:-}" == "--remove" ]]; then
+  USERNAME="${2:?Usage: ensure-manual-console-user.sh --remove <username>}"
+
+  echo "Removing htpasswd user '${USERNAME}'..."
+
+  if oc get secret htpass-secret -n openshift-config &>/dev/null; then
+    EXISTING_HTPASSWD="$(oc get secret htpass-secret -n openshift-config \
+      -o jsonpath='{.data.htpasswd}' | base64 -d)"
+    # Same literal (not regex) field match as the add/update path below.
+    UPDATED_HTPASSWD="$(printf '%s\n' "${EXISTING_HTPASSWD}" \
+      | awk -F: -v u="${USERNAME}" '$1 != u && NF')"
+    oc create secret generic htpass-secret \
+      --from-literal=htpasswd="${UPDATED_HTPASSWD}" \
+      -n openshift-config --dry-run=client -o yaml | oc apply -f -
+  else
+    echo "htpass-secret not found; nothing to remove from it."
+  fi
+
+  # Not `|| true`: a real failure here (permissions, API hiccup, etc.) must
+  # be visible so ci-env-controller can retry instead of marking teardown
+  # "cleaned". This command is already a no-op (exits 0) when the user
+  # isn't currently bound, so it only ever fails on a genuine error.
+  if ! oc adm policy remove-cluster-role-from-user cluster-admin "${USERNAME}"; then
+    echo "ERROR: failed to revoke cluster-admin from ${USERNAME}" >&2
+    exit 1
+  fi
+
+  echo "User '${USERNAME}' removed."
+  exit 0
+fi
 
 USERNAME="${1:?Usage: ensure-manual-console-user.sh <username> (password via stdin)}"
 

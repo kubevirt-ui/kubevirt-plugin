@@ -4,7 +4,7 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: ci-env-test-runner
+  name: {{ include "ci-test-stack.testRunnerRoleBindingName" . }}
   namespace: {{ .Release.Namespace }}
   labels:
     {{- include "ci-test-stack.labels" . | nindent 4 }}
