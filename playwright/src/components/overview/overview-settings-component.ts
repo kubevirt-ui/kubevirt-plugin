@@ -217,14 +217,13 @@ export default class OverviewSettingsComponent extends BaseComponent {
 
   async enableGuidedTour(): Promise<boolean> {
     try {
-      const guidedTourSwitch = this.locator(
-        ':has(:text("Guided tour")) :is(input[type="checkbox"], input[role="switch"], .pf-v6-c-switch__input)',
-      );
-      await guidedTourSwitch.first().waitFor({
+      const guidedTourSwitch = this.locator('[data-test-id="guided-tour"]');
+      await guidedTourSwitch.waitFor({
         state: 'visible',
         timeout: TestTimeouts.DEFAULT,
       });
-      await guidedTourSwitch.first().click({ force: true });
+      await guidedTourSwitch.check({ force: true });
+      await this.page.waitForTimeout(TestTimeouts.UI_STABILIZE);
       return true;
     } catch {
       return false;
@@ -316,14 +315,12 @@ export default class OverviewSettingsComponent extends BaseComponent {
 
   async enableWelcomeInformation(): Promise<boolean> {
     try {
-      const welcomeInfoSwitch = this.locator(
-        ':has(:text("Welcome information")) :is(input[type="checkbox"], input[role="switch"], .pf-v6-c-switch__input)',
-      );
-      await welcomeInfoSwitch.first().waitFor({
+      const welcomeInfoSwitch = this.locator('[data-test-id="welcome-information"]');
+      await welcomeInfoSwitch.waitFor({
         state: 'visible',
         timeout: TestTimeouts.DEFAULT,
       });
-      await welcomeInfoSwitch.first().check({ force: true });
+      await welcomeInfoSwitch.check({ force: true });
       await this.page.waitForTimeout(TestTimeouts.UI_STABILIZE);
       return true;
     } catch {
