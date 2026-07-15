@@ -35,6 +35,15 @@ jobs:
             core.setOutput('base_ref', pr.base.ref);
             core.setOutput('head_sha', pr.head.sha);
 
+      # Required to resolve the local setup-gh-scripts action below -- a
+      # uses: ./path reference can't be resolved until the repo is checked
+      # out. No ref override: issue_comment reads this workflow from the
+      # default branch, so the default checkout matches.
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
       - name: Setup validation scripts
         uses: ./.github/actions/setup-gh-scripts
         with:
