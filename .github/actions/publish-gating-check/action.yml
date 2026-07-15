@@ -1,20 +1,31 @@
 name: Publish Run Gating Tests Check
 description: |
-  Creates a fresh "Run Gating Tests" check-run for a given SHA. Always
-  creates a new entry rather than updating an existing one -- GitHub no
-  longer allows modifying a check-run's status/conclusion via GITHUB_TOKEN
-  from a different workflow run, so a second entry for the same SHA is
-  the normal way to represent a new attempt; the merge box shows
-  whichever reported most recently.
+  Creates or updates the "Run Gating Tests" check-run for a given SHA.
+  Pass check-run-id (from a prior call's output, within the same
+  workflow run) to update that same check-run to its next status instead
+  of creating a new one -- GitHub allows a check-run to be updated by
+  GITHUB_TOKEN from a later job of the *same* workflow run, but not from
+  a different workflow run, so cross-run "retries" (a fresh pr_number
+  dispatch, /retest-e2e, a stale-marker) must still create a fresh
+  check-run; the merge box shows whichever reported most recently.
 
   Single source of truth for the check's name/shape, used by
-  retest-stale-gating.yml, and by hot-cluster-e2e.yml's prepare job and
-  its pr_number retest-result publishing.
+  retest-stale-gating.yml, and by hot-cluster-e2e.yml's prepare job
+  (creates the initial in_progress check-run) and its verify-gating-tests
+  job (updates that same check-run to its final completed result).
 
 inputs:
   head-sha:
-    description: SHA to attach the check-run to
-    required: true
+    description: SHA to attach the check-run to (ignored when check-run-id is set)
+    required: false
+    default: ''
+  check-run-id:
+    description: |
+      Existing check-run id to update in place (from a prior call's
+      check-run-id output, earlier in the same workflow run). Leave
+      empty to create a fresh check-run instead.
+    required: false
+    default: ''
   status:
     description: queued | in_progress | completed
     required: true
@@ -33,13 +44,20 @@ inputs:
     required: false
     default: ''
 
+outputs:
+  check-run-id:
+    description: id of the created or updated check-run, for a later call in the same run to update
+    value: ${{ steps.publish.outputs.check_run_id }}
+
 runs:
   using: composite
   steps:
-    - name: Create check-run
+    - name: Create or update check-run
+      id: publish
       uses: actions/github-script@v9
       env:
         CHECK_HEAD_SHA: ${{ inputs['head-sha'] }}
+        CHECK_RUN_ID: ${{ inputs['check-run-id'] }}
         CHECK_STATUS: ${{ inputs.status }}
         CHECK_CONCLUSION: ${{ inputs.conclusion }}
         CHECK_TITLE: ${{ inputs.title }}
@@ -47,16 +65,16 @@ runs:
         CHECK_DETAILS_URL: ${{ inputs['details-url'] }}
       with:
         script: |
+          const output = {
+            title: process.env.CHECK_TITLE,
+            summary: process.env.CHECK_SUMMARY,
+          };
+
           const payload = {
             owner: context.repo.owner,
             repo: context.repo.repo,
-            name: 'Run Gating Tests',
-            head_sha: process.env.CHECK_HEAD_SHA,
             status: process.env.CHECK_STATUS,
-            output: {
-              title: process.env.CHECK_TITLE,
-              summary: process.env.CHECK_SUMMARY,
-            },
+            output,
           };
 
           if (process.env.CHECK_STATUS === 'completed') {
@@ -67,5 +85,36 @@ runs:
             payload.details_url = process.env.CHECK_DETAILS_URL;
           }
 
-          const { data } = await github.rest.checks.create(payload);
-          core.info(`Created check-run ${data.id} ("${payload.status}") for ${payload.head_sha}.`);
+          const existingCheckRunId = process.env.CHECK_RUN_ID;
+          const headSha = process.env.CHECK_HEAD_SHA;
+
+          // Fail fast with a clear message instead of letting checks.create()
+          // reject an undefined head_sha with an opaque 422 -- callers must
+          // supply exactly one of these two ways to target a check-run.
+          if (!existingCheckRunId && !headSha) {
+            core.setFailed('publish-gating-check requires either check-run-id (to update an existing check-run) or head-sha (to create a new one) -- both were empty.');
+            return;
+          }
+
+          let data;
+          if (existingCheckRunId) {
+            const checkRunId = Number(existingCheckRunId);
+            if (!Number.isInteger(checkRunId) || checkRunId <= 0) {
+              core.setFailed(`publish-gating-check received an invalid check-run-id: "${existingCheckRunId}".`);
+              return;
+            }
+            ({ data } = await github.rest.checks.update({
+              ...payload,
+              check_run_id: checkRunId,
+            }));
+            core.info(`Updated check-run ${data.id} to "${payload.status}".`);
+          } else {
+            ({ data } = await github.rest.checks.create({
+              ...payload,
+              name: 'Run Gating Tests',
+              head_sha: headSha,
+            }));
+            core.info(`Created check-run ${data.id} ("${payload.status}") for ${headSha}.`);
+          }
+
+          core.setOutput('check_run_id', String(data.id));

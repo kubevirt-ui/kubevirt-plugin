@@ -85,15 +85,29 @@ jobs:
                 pull_number: prNumber,
               });
               const headSha = pr.data.head.sha;
+              const baseRef = pr.data.base.ref;
 
-              core.info(`/retest-e2e requested by ${author} on PR #${prNumber} (HEAD: ${headSha})`);
+              core.info(`/retest-e2e requested by ${author} on PR #${prNumber} (HEAD: ${headSha}, base: ${baseRef})`);
 
-              // Bounded lookback, not a flat per_page:10 -- other PRs'
-              // activity pushes this PR's run down the list fast. No
-              // `event:` filter: a pr_number retest dispatch (below, or
-              // retest-stale-gating.yml's) is itself workflow_dispatch and
-              // would otherwise be invisible to a later /retest-e2e.
-              const lookbackDate = new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString();
+              // /retest-e2e always dispatches a fresh run below -- never
+              // reRunWorkflow, which reuses the original dispatch's cached
+              // base SHA instead of merging with the current base tip (the
+              // same reason retest-stale-gating.yml always dispatches fresh
+              // rather than re-running). This scan only detects whether a
+              // run is still in-progress/queued for this PR, so the PR
+              // comment can say so and explain the concurrency-group
+              // cancellation that's about to happen below.
+              //
+              // Lookback covers the longest a real run can stay
+              // non-terminal (cluster-check + run-e2e-tests' 120m timeout),
+              // plus buffer for queueing -- not a search for *any* past
+              // run, so it doesn't need to look back further than that. A
+              // shorter, fixed 3h window here previously caused a live,
+              // still-running match to go undetected once a run happened
+              // to start more than 3h before the lookback recomputed at
+              // comment time, but that only affected the *comment wording*
+              // -- the fresh dispatch below always ran regardless.
+              const lookbackDate = new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString();
               const runs = await github.paginate(github.rest.actions.listWorkflowRuns, {
                 ...context.repo,
                 workflow_id: 'hot-cluster-e2e.yml',
@@ -115,47 +129,20 @@ jobs:
                 return prMatch || shaMatch || branchMatch;
               });
 
-              // Bot-label no-ops are always newer than the real run --
-              // walk newest-to-oldest and skip them.
-              const isIrrelevantLabelNoop = (run) =>
-                run.display_title?.includes('(skipped: irrelevant label)');
-              const realCandidates = candidates.filter(candidate => !isIrrelevantLabelNoop(candidate));
-              // reRunWorkflow only works on a completed run -- a still
-              // in-progress/queued match must go through the fresh-dispatch
-              // path below instead, which cancels it via the job-level
-              // concurrency groups in hot-cluster-e2e.yml rather than
-              // erroring out trying to "re-run" something that hasn't
-              // finished.
-              const prRun = realCandidates.find(candidate => candidate.status === 'completed') ?? null;
-              const runningCandidate = prRun ? null : realCandidates.find(candidate => candidate.status !== 'completed') ?? null;
+              const runningCandidate = candidates.find(candidate => candidate.status !== 'completed') ?? null;
 
-              if (prRun) {
-                core.info(`Re-running workflow run ${prRun.id} (attempt ${prRun.run_attempt})...`);
-
-                await react('rocket');
-
-                await github.rest.actions.reRunWorkflow({
-                  ...context.repo,
-                  run_id: prRun.id,
-                });
-
-                core.info(`Re-run triggered: https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${prRun.id}`);
-                return;
-              }
-
-              // Nothing to re-run -- dispatch fresh via the same pr_number
-              // mechanism retest-stale-gating.yml uses. skip_pool_check:
-              // /retest-e2e must work regardless of review state. The fresh
-              // dispatch shares hot-cluster-e2e.yml's concurrency groups, so
-              // if runningCandidate is still executing, this cancels it.
-              const baseRef = pr.data.base.ref;
               if (runningCandidate) {
                 core.warning(`Run ${runningCandidate.id} for PR #${prNumber} is still ${runningCandidate.status} -- cancelling it and dispatching a fresh run instead.`);
               } else {
-                core.warning(`No recent Hot Cluster E2E workflow run with real gating-test results found for PR #${prNumber} (base: ${baseRef}) -- only irrelevant-label no-ops, if anything, matched. Dispatching a fresh run instead.`);
+                core.info(`No in-progress Hot Cluster E2E run found for PR #${prNumber} (base: ${baseRef}) -- dispatching a fresh run.`);
               }
+
               await react('rocket');
 
+              // skip_pool_check: /retest-e2e must work regardless of review
+              // state. Shares hot-cluster-e2e.yml's concurrency groups, so
+              // if runningCandidate is still executing, this dispatch
+              // cancels it rather than racing it.
               await github.rest.actions.createWorkflowDispatch({
                 ...context.repo,
                 workflow_id: 'hot-cluster-e2e.yml',
@@ -168,24 +155,29 @@ jobs:
               });
 
               core.info(`Fresh run dispatched for PR #${prNumber} (base_ref=${baseRef}).`);
-              core.setOutput('fallback_dispatched', 'true');
-              core.setOutput('fallback_was_running', runningCandidate ? 'true' : 'false');
+              core.setOutput('dispatched', 'true');
+              core.setOutput('was_running', runningCandidate ? 'true' : 'false');
             } catch (err) {
               core.setOutput('unexpected_error', 'true');
               core.setOutput('error_message', err.message || String(err));
               core.setFailed(`Unexpected error while processing /retest-e2e: ${err.message || err}`);
             }
 
-      - name: Report fallback retest dispatch on the PR
-        if: steps.retest.outputs.fallback_dispatched == 'true'
+      - name: Report retest dispatch on the PR
+        if: steps.retest.outputs.dispatched == 'true'
         uses: actions/github-script@v9
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const wasRunning = ${{ steps.retest.outputs.fallback_was_running == 'true' }};
+            // wasRunning wording/behavior is unchanged from before this
+            // step always fresh-dispatched (see PR #4294) -- only the
+            // "nothing was running" branch's wording changed, since /retest-e2e
+            // now always dispatches fresh rather than only falling back to
+            // it when no completed run could be found.
+            const wasRunning = ${{ steps.retest.outputs.was_running == 'true' }};
             const reason = wasRunning
               ? 'A Hot Cluster E2E run was already in progress for this PR, so `/retest-e2e` cancelled it and dispatched a fresh one instead'
-              : 'No recent Hot Cluster E2E run with real gating-test results was found to re-run (bot-label events don\'t count), so `/retest-e2e` dispatched a fresh one instead';
+              : '`/retest-e2e` dispatched a fresh Hot Cluster E2E run for this PR, merged with the current base branch tip';
             await github.rest.issues.createComment({
               ...context.repo,
               issue_number: context.issue.number,
