@@ -10,10 +10,12 @@ Run Playwright tests, analyze failures, fix test code issues, and re-run until s
 
 | Scope         | What runs                                                             |
 | ------------- | --------------------------------------------------------------------- |
-| _(none)_      | Scenario tests (`USE_SCENARIO_INFRA=true npm run test-playwright -- --project=scenario`) |
-| `scenario`    | Scenario tests (`USE_SCENARIO_INFRA=true npm run test-playwright -- --project=scenario`) |
-| `gating`      | Legacy gating tests (`npm run test-playwright -- --project=Gating`)                      |
-| `<file-path>` | Specific spec file (`npm run test-playwright -- <path>`)                                 |
+| _(none)_      | All active projects (`./playwright-runner.sh all`)                    |
+| `gating`      | Gating tests (`npx playwright test --project=Gating`)                 |
+| `tier1`       | Tier 1 tests (`npx playwright test --project=Tier1`)                  |
+| `tier2`       | Tier 2 tests (`npx playwright test --project=Tier2`)                  |
+| `settings`    | Settings tests (`npx playwright test --project=Settings`)             |
+| `<file-path>` | Specific spec file (`npx playwright test <path>`)                     |
 | `<test-name>` | Specific test by name (`npx playwright test -g "<name>" --workers=1`) |
 
 ## Workflow
@@ -36,19 +38,21 @@ Run Playwright tests, analyze failures, fix test code issues, and re-run until s
 
 ### Phase 1: Run Tests
 
-For scenario tests (default):
+Use the runner script or `npx playwright test` with the appropriate project:
+
 ```bash
-PLAYWRIGHT_RETRIES=0 USE_SCENARIO_INFRA=true npx playwright test --project=scenario --workers=1
+# Via runner script (recommended)
+./playwright-runner.sh <project>
+
+# Or directly
+PLAYWRIGHT_RETRIES=0 npx playwright test --project=<Tier1|Tier2|Gating|Settings> --workers=1
 ```
 
-For legacy gating tests:
-```bash
-PLAYWRIGHT_RETRIES=0 npx playwright test --project=setup --project=Gating --workers=4
-```
+For single-file or single-test runs:
 
-For single-file runs:
 ```bash
 PLAYWRIGHT_RETRIES=0 npx playwright test <spec-path> --workers=1
+PLAYWRIGHT_RETRIES=0 npx playwright test -g "<test name>" --workers=1
 ```
 
 ### Phase 2: Analyze Failures
@@ -83,27 +87,45 @@ oc get events -n <test-namespace> --sort-by=.lastTimestamp | tail -20
 
 ### Phase 4: Fix Test Code Issues
 
-For `test_bug` classified failures, fix depending on which infrastructure the test uses:
+For `test_bug` classified failures:
 
-#### Scenario tests (`playwright/tests/scenario/`)
+#### Where to fix
 
-- Uses `scenarioTest` fixture from `@/fixtures/scenario-fixture`
-- Page objects injected via fixture — fix locators in `playwright/src/page-objects/`
-- K8s setup via `KubernetesClient` flat methods: `k8sClient.setupTestNamespace()`, `k8sClient.createContainerDiskVm()`, etc.
-- If a page object is missing, create it and wire into the fixture
-- If `KubernetesClient` lacks a needed method, add it to `kubernetes-client.ts`
+| Layer       | Location                                       | When to touch                                        |
+| ----------- | ---------------------------------------------- | ---------------------------------------------------- |
+| Spec file   | `playwright/tests/<tier>/<feature>/`           | Wrong assertions, missing waits, wrong test logic    |
+| Fixture     | `playwright/src/fixtures/<feature>-fixture.ts` | Missing page object in fixture, fixture setup issues |
+| Page object | `playwright/src/page-objects/<area>/`          | High-level method broken, incorrect delegation       |
+| Component   | `playwright/src/components/<area>/`            | Locator broken, interaction method failing           |
+| K8s client  | `playwright/src/clients/kubernetes-client.ts`  | API setup/teardown issue                             |
+| Utilities   | `playwright/src/utils/`                        | Helper functions, data generators, timeout constants |
 
-#### Legacy gating tests (`playwright/tests/gating/`)
+#### Architecture constraints
 
-- Uses page objects and handler-based `k8sClient`
-- Fix locators inline in page object methods
-- Use `k8sClient.vm.*`, `k8sClient.storageClass.*`, etc.
+- All fixtures extend `baseTest` from `scenario-test-fixture.ts`
+- Page objects are wrapped with `withSafeActions()` in fixtures
+- Page objects extend `BasePage` or `PageCommons`
+- Components extend `BaseComponent` and are composed by page objects
+- Specs import `test` and `expect` from their feature fixture — never from `@playwright/test`
+- Use `TestTimeouts.*` constants from `@/utils/test-config` — never inline timeout numbers
+- Every `test()` must call `utils.withAllure(...)` with suite, feature, and tags
+- Use allure constants from `@/data-models/allure-constants`
 
-#### Both
+#### Locator strategy
 
-- Prefer `[data-test="..."]` / `[data-test-id="..."]` selectors
-- Use `getByRole('menuitem', { name, exact: true })` for kebab menu actions
-- Use explicit timeouts on all assertions
+1. Prefer `[data-test="..."]` and `[data-test-id="..."]` attributes
+2. Fall back to `getByRole()` with accessible names
+3. Fall back to `getByText()` for user-visible content
+4. Use `getByRole('menuitem', { name, exact: true })` for kebab menu actions
+5. Use explicit timeouts on all assertions
+
+#### Common fixes
+
+- **Stale locator**: Update the selector in the component or page object, not in the spec
+- **Timing issue**: Add `waitFor()` in the page object method or use `expect.poll()`
+- **Setup failure masking tests**: Remove `setupError` + `test.skip` patterns — let setup failures fail the suite
+- **Missing cleanup**: Add `k8sClient.trackResource()` after resource creation
+- **`withSafeActions` silent skip**: If a test appears skipped but should fail, check if `withSafeActions` is swallowing a timeout — the fix belongs in the page object method
 
 ### Phase 5: Re-run Fixed Tests
 
@@ -115,16 +137,12 @@ Repeat Phases 3-5 until all `test_bug` failures are resolved.
 
 ### Phase 6: Final Validation
 
-Run the full suite with default retries:
-
-```bash
-USE_SCENARIO_INFRA=true npx playwright test --project=scenario
-```
-
-Or for gating:
-```bash
-npx playwright test --project=setup --project=Gating --workers=4
-```
+1. **Type check**: `npm run check-types:playwright`
+2. **Lint**: `npx eslint --fix --no-warn-ignored <changed-files>`
+3. **Run the full project suite**:
+   ```bash
+   ./playwright-runner.sh <project>
+   ```
 
 Report final results:
 
@@ -136,49 +154,60 @@ Remaining failures: <list with classification>
 
 ## Common Failure Patterns
 
-| Symptom                        | Likely Cause              | Fix Location                    |
-| ------------------------------ | ------------------------- | ------------------------------- |
-| `Timeout waiting for selector` | Selector changed          | Spec file or KubernetesClient          |
-| `locator.click: Target closed` | Page navigated mid-action | Add wait before action          |
-| `expect.toBe: false`           | Assertion timing          | Add waitFor / retry             |
-| `strict mode violation`        | Multiple matches          | Refine locator                  |
-| `net::ERR_CONNECTION_REFUSED`  | Cluster down              | Environment issue               |
-| `401 Unauthorized`             | Token expired             | Re-run global setup             |
+| Symptom                        | Likely Cause                       | Fix Location                      |
+| ------------------------------ | ---------------------------------- | --------------------------------- |
+| `Timeout waiting for selector` | Selector changed                   | Component or page object          |
+| `locator.click: Target closed` | Page navigated mid-action          | Add wait in page object method    |
+| `expect.toBe: false`           | Assertion timing                   | Use `waitFor()` / `expect.poll()` |
+| `strict mode violation`        | Multiple matches                   | Refine locator in component       |
+| `net::ERR_CONNECTION_REFUSED`  | Cluster down                       | Environment issue                 |
+| `401 Unauthorized`             | Token expired                      | Re-run global setup               |
+| `test.skip` but should fail    | `withSafeActions` swallowing error | Fix timeout in page object        |
+| `setupError` skip cascade      | Catch-and-skip in beforeAll        | Remove pattern, let it fail       |
 
 ## Environment Variables
 
-| Variable                    | Purpose                            |
-| --------------------------- | ---------------------------------- |
-| `PLAYWRIGHT_RETRIES=0`      | Disable retries (development mode) |
-| `USE_SCENARIO_INFRA=true`   | Enable scenario project + global setup/teardown |
-| `DEBUG=1`                   | Headed browser + list reporter     |
-| `WORKERS=N`                 | Override worker count              |
+| Variable               | Purpose                            |
+| ---------------------- | ---------------------------------- |
+| `PLAYWRIGHT_RETRIES=0` | Disable retries (development mode) |
+| `DEBUG=1`              | Headed browser + list reporter     |
+| `WORKERS=N`            | Override worker count              |
+| `HC_E2E=1`             | Hot cluster mode (namespace reuse) |
+| `IS_LOCAL=true`        | Local development mode             |
 
 ## Project Structure Reference
 
 ```
 playwright/
 ├── tests/
-│   ├── scenario/          # New scenario specs (scenarioTest fixture)
-│   └── gating/            # Legacy gating specs (page objects + handlers)
+│   ├── gating/                    # Gating specs (gating-fixture)
+│   ├── tier1/<feature>/           # Tier 1 specs (per-feature fixtures)
+│   ├── tier2/<feature>/           # Tier 2 specs (per-feature fixtures)
+│   └── settings/                  # Settings specs (settings-fixture)
 ├── src/
-│   ├── page-objects/      # Page objects (one per UI page, injected via fixture)
-│   ├── clients/
-│   │   ├── kubernetes-client.ts  # Flat K8s client for scenario tests
-│   │   └── kubernetes-auth.ts  # Auth helpers
-│   ├── fixtures/          # scenario-fixture.ts (injects page objects + k8sClient)
-│   ├── data-models/       # K8s types
-│   └── utils/             # Env vars, test config, random names
-├── project-dependencies/  # Global setup/teardown + rule engine
-└── playwright.config.ts
+│   ├── components/                # UI components (extend BaseComponent)
+│   ├── page-objects/              # Page objects (extend BasePage/PageCommons)
+│   ├── fixtures/                  # Per-feature fixtures (extend baseTest)
+│   │   └── scenario-test-fixture.ts  # Base fixture — k8sClient, utils, auto-fixtures
+│   ├── clients/                   # K8s client + handlers
+│   ├── data-models/               # Constants, types, allure metadata
+│   ├── data-factories/            # Test data generators
+│   └── utils/                     # Env vars, test config, random names
+├── project-dependencies/          # Global setup/teardown + rule engine
+├── playwright.config.ts           # Projects: Gating, Tier1, Tier2, Settings
+├── playwright-runner.sh           # Local runner script
+└── playwright-runner-hc-e2e.sh    # CI/hot-cluster runner script
 ```
 
 ## Rules
 
-- **New tests use scenario infrastructure** — `scenarioTest` fixture, page objects injected via fixture, `KubernetesClient`
-- **Legacy gating tests use their own infrastructure** — page objects, handler-based client
-- **No inline timeout numbers** — define constants or use well-known values (30_000, 60_000)
-- **Verify actions via API** — use `KubernetesClient` to check K8s state after UI actions
+- **Fix locators in components/page objects** — not in spec files
+- **Specs import from feature fixtures** — never from `@playwright/test` directly
+- **Page objects extend `BasePage` / `PageCommons`** — use `withSafeActions()` in fixtures
+- **Use `TestTimeouts.*` constants** — never inline timeout numbers
+- **Use allure constants** from `@/data-models/allure-constants` — never raw strings
+- **Verify via API** — use `KubernetesClient` to check K8s state after UI actions
 - **Single process only** — use `--workers=N`, never concurrent test invocations
 - Report `product_bug` findings without modifying the test — the test is correct, the app is wrong
 - Always run `npm run check-types:playwright` after changes
+- **DO NOT commit or push** — the user handles git operations

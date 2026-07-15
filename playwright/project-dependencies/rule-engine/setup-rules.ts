@@ -52,6 +52,53 @@ export function getSetupRules(): SetupRule[] {
 
   return [
     {
+      id: 'export-oc-kubeconfig',
+      name: 'Export admin kubeconfig from active oc session',
+      phase: SetupPhase.AUTH,
+      onError: 'warn',
+      run: async () => {
+        try {
+          execFileSync('oc', ['whoami'], {
+            encoding: 'utf8',
+            timeout: 10 * SECOND,
+            stdio: 'pipe',
+          });
+        } catch {
+          logger.info('⏭️ No active oc session found — skipping oc kubeconfig export');
+          return;
+        }
+
+        if (fs.existsSync('/tmp/kubeconfig')) {
+          logger.info('⏭️ /tmp/kubeconfig already exists — skipping oc export');
+          return;
+        }
+
+        try {
+          const kubeconfig = execFileSync(
+            'oc',
+            ['config', 'view', '--raw', '--minify', '--flatten'],
+            { encoding: 'utf8', timeout: 30 * SECOND, stdio: 'pipe' },
+          );
+
+          if (!kubeconfig.includes('current-context')) {
+            logger.warn('⚠️ oc config view output missing current-context — skipping');
+            return;
+          }
+
+          fs.writeFileSync('/tmp/kubeconfig', kubeconfig, 'utf8');
+          const user = execFileSync('oc', ['whoami'], {
+            encoding: 'utf8',
+            timeout: 10 * SECOND,
+            stdio: 'pipe',
+          }).trim();
+          logger.success(`✓ Exported admin kubeconfig to /tmp/kubeconfig (${user})`);
+        } catch (err) {
+          const msg = err instanceof Error ? err.message : String(err);
+          logger.warn(`⚠️ Failed to export oc kubeconfig: ${msg}`);
+        }
+      },
+    },
+    {
       id: 'detect-existing-kubeconfig',
       name: 'Detect existing kubeconfig (KUBECONFIG / /tmp/kubeconfig / ~/.kube/config)',
       phase: SetupPhase.AUTH,
