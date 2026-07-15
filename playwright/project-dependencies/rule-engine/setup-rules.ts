@@ -52,80 +52,6 @@ export function getSetupRules(): SetupRule[] {
 
   return [
     {
-      id: 'export-oc-kubeconfig',
-      name: 'Export admin kubeconfig from active oc session',
-      phase: SetupPhase.AUTH,
-      guard: (ctx) => !ctx.effectiveKubeConfigPath,
-      onError: 'warn',
-      run: async (ctx) => {
-        try {
-          execFileSync('oc', ['whoami'], {
-            encoding: 'utf8',
-            timeout: 10 * SECOND,
-            stdio: 'pipe',
-          });
-        } catch {
-          logger.info('⏭️ No active oc session found — skipping oc kubeconfig export');
-          return;
-        }
-
-        try {
-          const server = execFileSync('oc', ['whoami', '--show-server'], {
-            encoding: 'utf8',
-            timeout: 10 * SECOND,
-            stdio: 'pipe',
-          }).trim();
-          const token = execFileSync('oc', ['whoami', '--show-token'], {
-            encoding: 'utf8',
-            timeout: 10 * SECOND,
-            stdio: 'pipe',
-          }).trim();
-
-          if (!server || !token) {
-            logger.warn('⚠️ oc whoami returned empty server or token — skipping');
-            return;
-          }
-
-          const kubeConfigDir = path.dirname(ctx.kubeConfigPath);
-          if (!fs.existsSync(kubeConfigDir)) {
-            fs.mkdirSync(kubeConfigDir, { recursive: true });
-          }
-
-          const kubeconfig = [
-            'apiVersion: v1',
-            'kind: Config',
-            'clusters:',
-            '- cluster:',
-            '    insecure-skip-tls-verify: true',
-            `    server: ${server}`,
-            '  name: oc-session',
-            'contexts:',
-            '- context:',
-            '    cluster: oc-session',
-            '    user: oc-session',
-            '  name: oc-session',
-            'current-context: oc-session',
-            'users:',
-            '- name: oc-session',
-            '  user:',
-            `    token: ${token}`,
-          ].join('\n');
-
-          fs.writeFileSync(ctx.kubeConfigPath, kubeconfig, 'utf8');
-          ctx.effectiveKubeConfigPath = ctx.kubeConfigPath;
-          const user = execFileSync('oc', ['whoami'], {
-            encoding: 'utf8',
-            timeout: 10 * SECOND,
-            stdio: 'pipe',
-          }).trim();
-          logger.success(`✓ Exported admin kubeconfig to ${ctx.kubeConfigPath} (${user})`);
-        } catch (err) {
-          const msg = err instanceof Error ? err.message : String(err);
-          logger.warn(`⚠️ Failed to export oc kubeconfig: ${msg}`);
-        }
-      },
-    },
-    {
       id: 'detect-existing-kubeconfig',
       name: 'Detect existing kubeconfig (KUBECONFIG / /tmp/kubeconfig / ~/.kube/config)',
       phase: SetupPhase.AUTH,
@@ -335,77 +261,6 @@ export function getSetupRules(): SetupRule[] {
       },
     },
     {
-      id: 'verify-k8s-client-health',
-      name: 'Verify K8s client can perform admin operations',
-      phase: SetupPhase.AUTH,
-      onError: 'throw',
-      run: async (ctx) => {
-        const k8sClient = ctx.k8sClient;
-        if (!k8sClient) {
-          throw new Error('Kubernetes client not initialized');
-        }
-
-        const defaultVmStorageClass = EnvVariables.storageClass;
-
-        const checks: Array<{ label: string; fn: () => Promise<unknown> }> = [
-          {
-            label: 'List namespaces',
-            fn: () => k8sClient.getNamespaceCount(),
-          },
-          {
-            label: `Read CNV namespace (${ctx.cnvNamespace})`,
-            fn: () => k8sClient.namespaceExists(ctx.cnvNamespace),
-          },
-          {
-            label: 'Read ConfigMap (kubevirt-ui-features)',
-            fn: () => k8sClient.getConfigMap('kubevirt-ui-features', ctx.cnvNamespace),
-          },
-          {
-            label: 'List VirtualMachines CRD',
-            fn: () =>
-              k8sClient.listCustomResources('kubevirt.io', 'v1', 'default', 'virtualmachines'),
-          },
-          {
-            label: 'Read HyperConverged CR',
-            fn: () => k8sClient.isNativeVmTemplateFeatureGateEnabled(),
-          },
-        ];
-
-        const failures: string[] = [];
-        for (const check of checks) {
-          try {
-            await check.fn();
-            logger.info(`   ✓ ${check.label}`);
-          } catch (err) {
-            const msg = err instanceof Error ? err.message : String(err);
-            failures.push(`${check.label}: ${msg}`);
-            logger.warn(`   ✗ ${check.label}: ${msg}`);
-          }
-        }
-
-        if (failures.length > 0) {
-          throw new Error(
-            `K8s client health check failed (${failures.length}/${checks.length}):\n` +
-              failures.map((f) => `  - ${f}`).join('\n') +
-              '\nThe kubeconfig may lack admin-level RBAC.',
-          );
-        }
-
-        try {
-          logger.info(
-            `📦 Setting default StorageClass for VirtualMachines: ${defaultVmStorageClass}...`,
-          );
-          await k8sClient.setDefaultStorageClassForVirtualMachines(defaultVmStorageClass);
-          logger.success(`✓ Default StorageClass for VirtualMachines set to ${defaultVmStorageClass}`);
-        } catch (err) {
-          const msg = err instanceof Error ? err.message : String(err);
-          logger.warn(`⚠️ Failed to set default StorageClass: ${msg}`);
-        }
-
-        logger.success('✓ K8s client health check passed');
-      },
-    },
-    {
       id: 'start-cluster-janitor',
       name: 'Start native ClusterJanitor background sweep',
       phase: SetupPhase.CLUSTER,
@@ -513,15 +368,26 @@ export function getSetupRules(): SetupRule[] {
       guard: () => !EnvVariables.isHcE2e && !EnvVariables.isNonPrivUser,
       onError: 'warn',
       run: async (ctx) => {
-        const k8sClient = ctx.k8sClient;
-        if (!k8sClient) {
-          throw new Error('Kubernetes client not initialized');
-        }
         const defaultVmStorageClass = EnvVariables.storageClass;
         logger.info(
           `📦 Setting default StorageClass for VirtualMachines: ${defaultVmStorageClass}...`,
         );
-        await k8sClient.setDefaultStorageClassForVirtualMachines(defaultVmStorageClass);
+        const kubeconfigArgs = ctx.effectiveKubeConfigPath
+          ? [`--kubeconfig=${ctx.effectiveKubeConfigPath}`]
+          : [];
+        execFileSync(
+          'oc',
+          [
+            ...kubeconfigArgs,
+            'patch',
+            'storageclass',
+            defaultVmStorageClass,
+            '--type=merge',
+            '-p',
+            '{"metadata":{"annotations":{"storageclass.kubevirt.io/is-default-virt-class":"true"}}}',
+          ],
+          { encoding: 'utf8', timeout: 30 * SECOND, stdio: 'pipe' },
+        );
         logger.success(`✓ Default for VirtualMachines set to ${defaultVmStorageClass}`);
       },
     },
