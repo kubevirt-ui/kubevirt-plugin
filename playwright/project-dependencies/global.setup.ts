@@ -38,11 +38,24 @@ async function globalSetup(_config: FullConfig) {
   }
 
   const projectRoot = path.resolve(__dirname, '..', '..');
+  const isHotCluster = EnvVariables.isHcE2e;
 
-  const kubeConfigDir = path.resolve(projectRoot, '.kubeconfigs');
-  const kubeConfigFileName =
-    useSharding && shardIndex ? `shard-${shardIndex}-config` : 'test-config';
-  const kubeConfigPath = path.join(kubeConfigDir, kubeConfigFileName);
+  let kubeConfigPath: string;
+  if (isHotCluster) {
+    kubeConfigPath = '';
+    logger.info(
+      '🔥 Hot cluster mode — skipping kubeconfig file management, using oc session as-is',
+    );
+  } else {
+    const kubeConfigDir = path.resolve(projectRoot, '.kubeconfigs');
+    const kubeConfigFileName =
+      useSharding && shardIndex ? `shard-${shardIndex}-config` : 'test-config';
+    kubeConfigPath = path.join(kubeConfigDir, kubeConfigFileName);
+    if (!fs.existsSync(kubeConfigDir)) {
+      fs.mkdirSync(kubeConfigDir, { recursive: true });
+      logger.info(`📁 Created directory: ${kubeConfigDir}`);
+    }
+  }
 
   const storageStateDir = path.resolve(projectRoot, '.storage-states');
   let storageStateFileName: string;
@@ -55,11 +68,9 @@ async function globalSetup(_config: FullConfig) {
   }
   const storageStatePath = path.join(storageStateDir, storageStateFileName);
 
-  for (const dir of [kubeConfigDir, storageStateDir]) {
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
-      logger.info(`📁 Created directory: ${dir}`);
-    }
+  if (!fs.existsSync(storageStateDir)) {
+    fs.mkdirSync(storageStateDir, { recursive: true });
+    logger.info(`📁 Created directory: ${storageStateDir}`);
   }
 
   const ctx: SetupContext = {
