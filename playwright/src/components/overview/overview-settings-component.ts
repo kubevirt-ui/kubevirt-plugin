@@ -417,7 +417,7 @@ export default class OverviewSettingsComponent extends BaseComponent {
   async getGeneralSettingsSubSections(): Promise<string[]> {
     const knownSubSections = [
       'Live migration',
-      'Memory density',
+      'Memory request ratio',
       'SSH configurations',
       'Templates and images management',
       'VirtualMachine actions confirmation',
@@ -626,10 +626,17 @@ export default class OverviewSettingsComponent extends BaseComponent {
 
   async navigateToAutomaticSubscription(): Promise<boolean> {
     try {
-      await this.navigateToGuestManagement();
+      const guestMgmtOk = await this.navigateToGuestManagement();
+      if (!guestMgmtOk) {
+        await this._guestManagementButton.waitFor({
+          state: 'visible',
+          timeout: TestTimeouts.DEFAULT,
+        });
+        await this.robustClick(this._guestManagementButton);
+      }
       await this._automaticSubscriptionBtn.waitFor({
         state: 'visible',
-        timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+        timeout: TestTimeouts.DEFAULT,
       });
       await this.robustClick(this._automaticSubscriptionBtn);
       return true;

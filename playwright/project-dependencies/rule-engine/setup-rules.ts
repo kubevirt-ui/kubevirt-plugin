@@ -92,6 +92,36 @@ export function getSetupRules(): SetupRule[] {
           logger.success(`✓ Kubeconfig validated and copied from ${candidate}`);
           return;
         }
+        // Prefer oc's existing session (e.g. admin already logged in on CI)
+        // over the SA token, which may lack the RBAC permissions tests need.
+        try {
+          const ocUser = execFileSync('oc', ['whoami'], {
+            encoding: 'utf8',
+            timeout: 15 * SECOND,
+            stdio: 'pipe',
+          }).trim();
+          if (ocUser) {
+            logger.info(
+              `📋 oc session detected (${ocUser}), extracting kubeconfig via oc config view...`,
+            );
+            const ocKubeconfig = execFileSync('oc', ['config', 'view', '--raw', '--flatten'], {
+              encoding: 'utf8',
+              timeout: 15 * SECOND,
+              stdio: 'pipe',
+            });
+            const kubeConfigDir = path.dirname(ctx.kubeConfigPath);
+            if (!fs.existsSync(kubeConfigDir)) {
+              fs.mkdirSync(kubeConfigDir, { recursive: true });
+            }
+            fs.writeFileSync(ctx.kubeConfigPath, ocKubeconfig, 'utf8');
+            ctx.effectiveKubeConfigPath = ctx.kubeConfigPath;
+            logger.success(`✓ Kubeconfig extracted from oc session (user: ${ocUser})`);
+            return;
+          }
+        } catch {
+          logger.info('⏭️ oc whoami failed — no existing oc session');
+        }
+
         const saTokenPath = '/var/run/secrets/kubernetes.io/serviceaccount/token';
         const saCaPath = '/var/run/secrets/kubernetes.io/serviceaccount/ca.crt';
         if (fs.existsSync(saTokenPath)) {
