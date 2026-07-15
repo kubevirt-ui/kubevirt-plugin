@@ -240,6 +240,7 @@ Key defaults:
 - `RUNNER_SCALE_SET_NAME=kubevirt-plugin-ci` (the `runs-on:` label)
 - `ARC_CONTROLLER_INSTALL_NAME=arc` (Helm release for controller)
 - `ARC_VERSION=0.14.0` (pinned Helm chart version)
+- `MAX_RUNNERS=2` (max concurrent ARC runner pods per cluster -- caps concurrent E2E + manual-console jobs against that cluster; extra jobs queue for a free runner rather than overloading it. Independent per cluster, since each has its own scale set. Override via `ibmc-cluster-setup.yml`'s `max_runners` input, or re-provision to apply a changed default)
 
 ## Cost Control
 

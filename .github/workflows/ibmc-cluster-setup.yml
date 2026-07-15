@@ -38,6 +38,11 @@ on:
         required: true
         default: '2'
         type: string
+      max_runners:
+        description: 'Max concurrent ARC runner pods for this cluster (caps concurrent E2E + manual-console jobs; extra jobs queue)'
+        required: true
+        default: '2'
+        type: string
       kvm_emulation:
         description: 'KVM emulation (true for vpc/shared, false for bare metal)'
         required: true
@@ -101,6 +106,11 @@ on:
         type: string
       worker_count:
         description: 'Number of worker nodes (at least 2 so ingress is happy)'
+        required: false
+        default: '2'
+        type: string
+      max_runners:
+        description: 'Max concurrent ARC runner pods for this cluster (caps concurrent E2E + manual-console jobs; extra jobs queue)'
         required: false
         default: '2'
         type: string
@@ -631,6 +641,7 @@ jobs:
           ARC_RUNNER_IMAGE: ${{ steps.build_runner.outputs.image_ref }}
           ARC_VERSION: '0.14.0'
           RUNNER_SCALE_SET_NAME: ${{ env.CLUSTER_NAME }}
+          MAX_RUNNERS: ${{ inputs.max_runners }}
         run: |
           ./ci-scripts/hot-cluster/arc/install-arc-controller.sh
           ./ci-scripts/hot-cluster/arc/install-runner-scale-set.sh
