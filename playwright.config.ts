@@ -66,6 +66,15 @@ export default defineConfig({
       use: migrationUse,
     },
 
+    // ── Tier2 project (scenario infrastructure) ────────────────────
+    {
+      fullyParallel: false,
+      name: 'Tier2',
+      retries: 0,
+      testDir: './playwright/tests/tier2',
+      use: migrationUse,
+    },
+
     // ── Migration projects (use global setup/teardown) ───────────────
     {
       fullyParallel: true,

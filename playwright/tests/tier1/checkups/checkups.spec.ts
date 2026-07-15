@@ -36,9 +36,10 @@ test.describe(SUITE, { tag: [T1_TAG, '@tier1-pages-checkups'] }, () => {
       await checkupsPage.installPermissionsIfNeeded();
 
       const runClickable = await checkupsPage.isRunCheckupButtonClickable();
-      if (!runClickable) {
-        return;
-      }
+      test.skip(
+        !runClickable,
+        'Run checkup button is not clickable — checkup operator may not be ready',
+      );
 
       await checkupsPage.clickRunCheckup();
 
@@ -95,9 +96,10 @@ test.describe(SUITE, { tag: [T1_TAG, '@tier1-pages-checkups'] }, () => {
       await checkupsPage.installPermissionsIfNeeded();
 
       const runClickable = await checkupsPage.isRunCheckupButtonClickable();
-      if (!runClickable) {
-        return;
-      }
+      test.skip(
+        !runClickable,
+        'Run checkup button is not clickable — checkup operator may not be ready',
+      );
 
       await checkupsPage.clickRunCheckup();
 
