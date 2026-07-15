@@ -178,10 +178,23 @@ jobs:
           PR_NUMBER: ${{ matrix.pr_number }}
         with:
           script: |
+            const prNumber = Number(process.env.PR_NUMBER);
+
+            // base_ref is required, not just an optimization: without it,
+            // checkout-for-retest falls back to github.sha (main's tip) and
+            // would merge a release-branch PR onto main instead of its own
+            // base -- resolve-cluster-config.sh also needs it to pick the
+            // right cluster/test-engine for a release PR.
+            const { data: pr } = await github.rest.pulls.get({ ...context.repo, pull_number: prNumber });
+
             await github.rest.actions.createWorkflowDispatch({
               ...context.repo,
               workflow_id: 'hot-cluster-e2e.yml',
               ref: 'main',
-              inputs: { pr_number: process.env.PR_NUMBER },
+              inputs: {
+                pr_number: String(prNumber),
+                base_ref: pr.base.ref,
+                is_pool_retest: 'true',
+              },
             });
-            core.info(`PR #${process.env.PR_NUMBER}: dispatched a real retest against the new main tip.`);
+            core.info(`PR #${prNumber}: dispatched a real retest against the new main tip (base_ref=${pr.base.ref}).`);

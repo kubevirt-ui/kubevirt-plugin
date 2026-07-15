@@ -1,0 +1,47 @@
+name: Hot Cluster E2E PR Gate
+
+# hot-cluster-e2e.yml used to listen for pull_request_target directly on
+# opened/synchronize/reopened, so every PR push landed the full multi-job
+# graph (Prepare, cluster-check, Run E2E, Verify, and every nested job from
+# their `uses:` reusable workflows) natively on the PR -- GitHub creates a
+# check-run per job the moment the workflow triggers, with no way to hide or
+# nest them under "Hot Cluster E2E Progress". This one-job gatekeeper is now
+# the only thing listening for those PR events, dispatching the real
+# workflow via workflow_dispatch instead so only its own row (plus the
+# API-posted Progress/Run Gating Tests checks) lands in the merge box. See
+# ci-scripts/README.md ("Check-Run & Retest Model").
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  actions: write
+
+jobs:
+  dispatch:
+    name: Dispatch Hot Cluster E2E
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Dispatch hot-cluster-e2e.yml
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+
+            // skip_pool_check: a plain PR open/sync/reopen isn't a
+            // merge-readiness signal, so gating must run regardless of
+            // lgtm/approved. base_ref: the PR's real base branch, so a
+            // release-branch PR resolves cluster/test-engine and merges
+            // against the right tip.
+            await github.rest.actions.createWorkflowDispatch({
+              ...context.repo,
+              workflow_id: 'hot-cluster-e2e.yml',
+              ref: 'main',
+              inputs: {
+                pr_number: String(pr.number),
+                base_ref: pr.base.ref,
+                skip_pool_check: 'true',
+              },
+            });
