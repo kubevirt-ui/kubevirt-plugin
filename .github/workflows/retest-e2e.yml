@@ -163,6 +163,40 @@ jobs:
               core.setFailed(`Unexpected error while processing /retest-e2e: ${err.message || err}`);
             }
 
+      # /retest-e2e is the only way to lift a /hold-e2e hold. Removing the
+      # label (not just dispatching above) is what stops future pushes from
+      # silently re-holding via hot-cluster-e2e-pr-gate.yml/ok-to-test-gate.yml.
+      # Gated on dispatched == 'true' so a failed dispatch leaves the hold in
+      # place. Default GITHUB_TOKEN, not the bot app token above: the bot
+      # app has no issues: write, so it can't remove labels (same reason its
+      # reactions are best-effort). continue-on-error + setFailed on a
+      # non-404 error: fails this step's own outcome (queryable below)
+      # without failing the job, and removal_failed lets the report step
+      # avoid claiming a stuck label was lifted.
+      - name: Lift any /hold-e2e hold
+        id: lift-hold
+        if: steps.check-trust.outputs.trusted == 'true' && steps.retest.outputs.dispatched == 'true'
+        continue-on-error: true
+        uses: actions/github-script@v9
+        with:
+          script: |
+            try {
+              await github.rest.issues.removeLabel({
+                ...context.repo,
+                issue_number: context.issue.number,
+                name: 'e2e-hold',
+              });
+              core.info('Removed e2e-hold label -- /retest-e2e lifts any prior /hold-e2e.');
+              core.setOutput('was_held', 'true');
+            } catch (err) {
+              if (err.status === 404) {
+                core.setOutput('was_held', 'false');
+                return;
+              }
+              core.setOutput('removal_failed', 'true');
+              core.setFailed(`Could not remove e2e-hold label: ${err.message || err}`);
+            }
+
       - name: Report retest dispatch on the PR
         if: steps.retest.outputs.dispatched == 'true'
         uses: actions/github-script@v9
@@ -175,17 +209,31 @@ jobs:
             // now always dispatches fresh rather than only falling back to
             // it when no completed run could be found.
             const wasRunning = ${{ steps.retest.outputs.was_running == 'true' }};
+            const wasHeld = ${{ steps.lift-hold.outputs.was_held == 'true' }};
+            const holdLiftFailed = ${{ steps.lift-hold.outputs.removal_failed == 'true' }};
             const reason = wasRunning
               ? 'A Hot Cluster E2E run was already in progress for this PR, so `/retest-e2e` cancelled it and dispatched a fresh one instead'
               : '`/retest-e2e` dispatched a fresh Hot Cluster E2E run for this PR, merged with the current base branch tip';
+            const heldNote = wasHeld ? ' This also lifts the `/hold-e2e` hold that was active on this PR.' : '';
+            const body = [
+              `🚀 ${reason} (this also re-provisions the cluster automatically if it was torn down).${heldNote}`,
+              '',
+              `See the [Actions tab](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/workflows/hot-cluster-e2e.yml) for progress.`,
+            ];
+            // Don't let a stuck e2e-hold label look silently lifted: this
+            // fresh run's own verify-gating-tests step re-checks the label
+            // live and will keep publishing a held/neutral result, not the
+            // real one, for as long as it's still present.
+            if (holdLiftFailed) {
+              body.push(
+                '',
+                '⚠️ Could not remove the `e2e-hold` label -- this PR may still report as held (`Run Gating Tests` will keep publishing a held/neutral result even after this run finishes) until the label is removed. Remove it manually, or comment `/retest-e2e` again.',
+              );
+            }
             await github.rest.issues.createComment({
               ...context.repo,
               issue_number: context.issue.number,
-              body: [
-                `🚀 ${reason} (this also re-provisions the cluster automatically if it was torn down).`,
-                '',
-                `See the [Actions tab](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/workflows/hot-cluster-e2e.yml) for progress.`,
-              ].join('\n'),
+              body: body.join('\n'),
             });
 
       - name: Report unexpected retest failure on the PR

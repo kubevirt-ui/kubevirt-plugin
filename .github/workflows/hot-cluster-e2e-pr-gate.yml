@@ -21,6 +21,10 @@ permissions:
 jobs:
   dispatch:
     name: Dispatch Hot Cluster E2E
+    # Skipped while /hold-e2e is active -- e2e-hold is a durable label so
+    # this holds across every future push too, not just the current one.
+    # Only /retest-e2e removes it (see retest-e2e.yml).
+    if: "!contains(github.event.pull_request.labels.*.name, 'e2e-hold')"
     runs-on: ubuntu-latest
     timeout-minutes: 2
     steps:
