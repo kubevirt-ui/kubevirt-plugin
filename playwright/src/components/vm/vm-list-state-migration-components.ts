@@ -529,13 +529,14 @@ export class VmListTreeComponent extends BaseComponent {
 
 /** List-page storage and compute migration wizard flows (VirtualMachines list). */
 export class VmListMigrationComponent extends BaseComponent {
-  private readonly _btnPlaceholderSelectStorageClass = this.locator(
-    'button[placeholder="Select StorageClass"]',
+  private readonly _migrationModal = this.locator('#virtual-machine-migration-modal');
+  private readonly _btnSelectStorageClass = this._migrationModal.locator(
+    'button.pf-v6-c-menu-toggle.pf-m-full-width',
   );
-  private readonly _buttonpfV6CButtonpfMPrimary = this.locator(
+  private readonly _buttonpfV6CButtonpfMPrimary = this._migrationModal.locator(
     'button.pf-v6-c-button.pf-m-primary',
   );
-  private readonly _buttonpfV6CButtonpfMSecondary = this.locator(
+  private readonly _buttonpfV6CButtonpfMSecondary = this._migrationModal.locator(
     'button.pf-v6-c-button.pf-m-secondary',
   );
   private readonly _inputIdSelectedVolumes = this.locator('input[id="selected-volumes"]');
@@ -543,13 +544,14 @@ export class VmListMigrationComponent extends BaseComponent {
     '[data-test-id="vm-action-migrate-storage"]',
   );
   private readonly _migrateVirtualMachineBtn = this.locator(
-    'button:has-text("Migrate VirtualMachine")',
+    '#tab-modal button:has-text("Migrate VirtualMachine")',
   );
   private readonly _migrationMenuItem = this.locator('[data-test-id="migration-menu"]');
-  private readonly _migrationModal = this.locator('#virtual-machine-migration-modal');
-  private readonly _nodeSearchInput = this.locator('input[placeholder="Search node"]');
-  private readonly _selectAllRows = this.locator('[aria-label="Select all rows"]');
-  private readonly _specificNodeCheckbox = this.locator('#manual-migration-option-selection');
+  private readonly _nodeSearchInput = this.locator('#tab-modal input[placeholder="Search node"]');
+  private readonly _selectAllRows = this._migrationModal.locator('[aria-label="Select all rows"]');
+  private readonly _specificNodeCheckbox = this.locator(
+    '#tab-modal #manual-migration-option-selection',
+  );
   private readonly _vmActionMigrateCompute = this.locator(
     '[data-test-id="vm-action-migrate-compute"]',
   );
@@ -585,23 +587,24 @@ export class VmListMigrationComponent extends BaseComponent {
     keepOriginalVolumes = false,
   ): Promise<boolean> {
     try {
-      const migrationModal = this.locator('#virtual-machine-migration-modal');
       const nextButton = this._buttonpfV6CButtonpfMPrimary;
 
       await nextButton.click();
       await this.page.waitForTimeout(TestTimeouts.UI_STABILIZE);
 
-      const selectSCButton = this._btnPlaceholderSelectStorageClass;
+      const selectSCButton = this._btnSelectStorageClass;
       await selectSCButton.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
       await this.robustClick(selectSCButton);
       await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
 
-      const scOption = this.locator(`button#select-inline-filter-${destinationStorageClass}`);
+      const scOption = this._migrationModal.locator(
+        `button#select-inline-filter-${destinationStorageClass}`,
+      );
       await scOption.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
       await this.robustClick(scOption);
       await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
 
-      const keepVolumesCheckbox = migrationModal.locator('#keep-original-volumes');
+      const keepVolumesCheckbox = this._migrationModal.locator('#keep-original-volumes');
       const isChecked = await keepVolumesCheckbox.isChecked();
       if (keepOriginalVolumes !== isChecked) {
         await keepVolumesCheckbox.click({ force: true });
@@ -613,20 +616,18 @@ export class VmListMigrationComponent extends BaseComponent {
 
       await nextButton.click();
 
-      const inProgress = migrationModal.locator('text=In progress').first();
+      const inProgress = this._migrationModal.locator('text=In progress').first();
       await inProgress.waitFor({ state: 'visible', timeout: TestTimeouts.BULK_VM_OPERATION });
 
-      const completed = migrationModal.locator('text=Storage migration completed').first();
+      const completed = this._migrationModal.locator('text=Storage migration completed').first();
       await completed.waitFor({ state: 'visible', timeout: migrationCompletionTimeoutMs });
 
-      const closeButton = this.locator('[id="virtual-machine-migration-modal"] button', {
-        hasText: 'Close',
-      });
+      const closeButton = this._migrationModal.locator('button', { hasText: 'Close' });
       await closeButton.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
       await this.robustClick(closeButton);
 
       return true;
-    } catch {
+    } catch (error) {
       try {
         const cancelOrClose = this.locator(
           '#virtual-machine-migration-modal button:has-text("Cancel"), #virtual-machine-migration-modal button:has-text("Close"), .pf-v6-c-wizard__close',
@@ -640,7 +641,9 @@ export class VmListMigrationComponent extends BaseComponent {
       } catch {
         /* best-effort modal cleanup */
       }
-      return false;
+      throw new Error(
+        `completeMigrationWizardWithStorageClass failed: ${error instanceof Error ? error.message : String(error)}`,
+      );
     }
   }
 
@@ -661,7 +664,8 @@ export class VmListMigrationComponent extends BaseComponent {
     });
     await this.robustClick(this._vmActionMigrateCompute);
 
-    await this._migrationModal.waitFor({
+    const computeModal = this.locator('#tab-modal');
+    await computeModal.waitFor({
       state: 'visible',
       timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
     });
@@ -678,7 +682,7 @@ export class VmListMigrationComponent extends BaseComponent {
     });
     await this.page.waitForTimeout(TestTimeouts.UI_STABILIZE);
 
-    const nodeOptionButtons = this.locator('#virtual-machine-migration-modal [id^="select-"]');
+    const nodeOptionButtons = computeModal.locator('[id^="select-"]');
     const count = await nodeOptionButtons.count();
     const nodeNames: string[] = [];
     for (let i = 0; i < count; i++) {
@@ -688,7 +692,7 @@ export class VmListMigrationComponent extends BaseComponent {
       }
     }
 
-    const closeButton = this.locator('#virtual-machine-migration-modal .pf-v6-c-wizard__close');
+    const closeButton = computeModal.locator('button[aria-label="Close"]');
     await closeButton.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
     await this.robustClick(closeButton);
 
@@ -739,12 +743,17 @@ export class VmListMigrationComponent extends BaseComponent {
     try {
       await this.openVmRowActions(vmName);
 
-      const migrationMenuItem = this.locator('button:has-text("Migration")');
-      await migrationMenuItem.click();
-      await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
+      await this._migrationMenuItem.waitFor({
+        state: 'visible',
+        timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+      });
+      await this._migrationMenuItem.hover();
 
-      const migrateCompute = this.locator('[data-test-id="vm-action-migrate"]');
-      await migrateCompute.click();
+      await this._vmActionMigrateCompute.waitFor({
+        state: 'visible',
+        timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+      });
+      await this._vmActionMigrateCompute.click();
       await this.page.waitForTimeout(TestTimeouts.UI_STABILIZE);
 
       const migrateButton = this._migrateVirtualMachineBtn;
@@ -784,9 +793,15 @@ export class VmListMigrationComponent extends BaseComponent {
         state: 'visible',
         timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
       });
-      await this._nodeSearchInput.fill(nodeName || '');
 
-      const nodeSelectButton = this.locator(`[id="select-${nodeName}"]`);
+      if (nodeName) {
+        await this._nodeSearchInput.fill(nodeName);
+      }
+
+      const nodeSelector = nodeName
+        ? `#tab-modal [id="select-${nodeName}"]`
+        : '#tab-modal [id^="select-"]';
+      const nodeSelectButton = this.locator(nodeSelector).first();
       await nodeSelectButton.waitFor({
         state: 'visible',
         timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
@@ -842,7 +857,7 @@ export class VmListMigrationComponent extends BaseComponent {
       await nextButton.click();
       await this.page.waitForTimeout(TestTimeouts.UI_STABILIZE);
 
-      const selectSCButton = this._btnPlaceholderSelectStorageClass;
+      const selectSCButton = this._btnSelectStorageClass;
       await selectSCButton.click();
       await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
 
@@ -888,8 +903,7 @@ export class VmListMigrationComponent extends BaseComponent {
       await migrateStorage.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
       await this.robustClick(migrateStorage);
 
-      const migrationModal = this.locator('#virtual-machine-migration-modal');
-      await migrationModal.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+      await this._migrationModal.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
 
       if (selectedVolumes) {
         const selectedVolumesOption = this._inputIdSelectedVolumes;
@@ -906,27 +920,15 @@ export class VmListMigrationComponent extends BaseComponent {
         await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
       }
 
-      const nextButton = this._buttonpfV6CButtonpfMPrimary;
-      await nextButton.click();
-      await this.page.waitForTimeout(TestTimeouts.UI_STABILIZE);
-
-      const backButton = this._buttonpfV6CButtonpfMSecondary;
-      await backButton.click();
-      await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
-
-      await nextButton.click();
-      await this.page.waitForTimeout(TestTimeouts.UI_STABILIZE);
-
-      await backButton.click();
-      await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
-
       return await this.completeMigrationWizardWithStorageClass(
         destinationStorageClass,
         migrationCompletionTimeoutMs,
         keepOriginalVolumes,
       );
-    } catch {
-      return false;
+    } catch (error) {
+      throw new Error(
+        `performStorageClassMigration failed for VM "${vmName}": ${error instanceof Error ? error.message : String(error)}`,
+      );
     }
   }
 

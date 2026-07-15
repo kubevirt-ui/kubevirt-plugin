@@ -1,0 +1,34 @@
+{
+  "browser": {
+    "browserName": "chromium",
+    "launchOptions": {
+      "channel": "chrome",
+      "args": [
+        "--ignore-certificate-errors",
+        "--start-maximized",
+        "--window-size=1920,1080",
+        "--disable-dev-shm-usage",
+        "--no-sandbox",
+        "--disable-setuid-sandbox",
+        "--disable-background-networking",
+        "--disable-client-side-phishing-detection",
+        "--disable-default-apps",
+        "--disable-extensions",
+        "--disable-popup-blocking",
+        "--disable-sync",
+        "--disable-translate",
+        "--no-first-run",
+        "--js-flags=--max-old-space-size=4096"
+      ]
+    },
+    "contextOptions": {
+      "viewport": { "width": 1920, "height": 1080 },
+      "ignoreHTTPSErrors": true
+    }
+  },
+  "timeouts": {
+    "action": 60000,
+    "navigation": 90000
+  },
+  "testIdAttribute": "data-test"
+}
