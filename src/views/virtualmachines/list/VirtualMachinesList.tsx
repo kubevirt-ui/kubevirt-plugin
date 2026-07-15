@@ -1,39 +1,34 @@
-import React, { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+/* eslint-disable max-lines */
+import React, { type FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import {
   NodeModel,
   VirtualMachineModelGroupVersionKind,
   VirtualMachineModelRef,
 } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import ColumnManagement from '@kubevirt-utils/components/ColumnManagementModal/ColumnManagement';
 import { tourGuideVM } from '@kubevirt-utils/components/GuidedTour/utils/constants';
 import { runningTourSignal } from '@kubevirt-utils/components/GuidedTour/utils/guidedTourSignals';
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
-import { buildColumnLayout } from '@kubevirt-utils/components/KubevirtTable/utils';
 import { TableToolbarActionsFlex } from '@kubevirt-utils/components/TableToolbarActions/TableToolbarActionsFlex';
 import { PageTitles } from '@kubevirt-utils/constants/page-constants';
 import { KUBEVIRT_APISERVER_PROXY } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
-import { KubevirtFilterState } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
+import { type KubevirtFilterState } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import useKubevirtDataViewFilters from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/useKubevirtDataViewFilters';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import useKubevirtUserSettingsTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettingsTableColumns';
 import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
 import {
   paginationDefaultValues,
   paginationInitialState,
 } from '@kubevirt-utils/hooks/usePagination/utils/constants';
-import { usePVCMapper } from '@kubevirt-utils/hooks/usePVCMapper';
+import { type PaginationState } from '@kubevirt-utils/hooks/usePagination/utils/types';
 import useQuery from '@kubevirt-utils/hooks/useQuery';
 import { EXPORT_TABLE_KEYS, KubevirtTableExport } from '@kubevirt-utils/hooks/useTableExport';
-import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
-import useVirtualMachineInstanceMigrationMapper from '@kubevirt-utils/resources/vmim/hooks/useVirtualMachineInstanceMigrationMapper';
-import useVirtualMachineInstanceMigrations from '@kubevirt-utils/resources/vmim/hooks/useVirtualMachineInstanceMigrations';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { getCluster } from '@multicluster/helpers/selectors';
 import useIsAllClustersPage from '@multicluster/hooks/useIsAllClustersPage';
-import { DocumentTitle, K8sVerb, ListPageBody } from '@openshift-console/dynamic-plugin-sdk';
+import { DocumentTitle, type K8sVerb, ListPageBody } from '@openshift-console/dynamic-plugin-sdk';
 import { Flex, Pagination } from '@patternfly/react-core';
 import { useSignals } from '@preact/signals-react/runtime';
 import SearchBar from '@search/components/SearchBar';
@@ -43,21 +38,21 @@ import useVMSearchQueries from '@virtualmachines/search/hooks/useVMSearchQueries
 import VirtualMachineFilterToolbar from '@virtualmachines/search/VirtualMachineFilterToolbar';
 import { vmsSignal } from '@virtualmachines/tree/utils/signals';
 import { OBJECTS_FETCHING_LIMIT } from '@virtualmachines/utils';
-import { getVMIFromMapper, getVMIMFromMapper } from '@virtualmachines/utils/mappers';
 
 import VirtualMachineBulkActionButton from './components/VirtualMachineBulkActionButton';
 import VirtualMachineEmptyState from './components/VirtualMachineEmptyState/VirtualMachineEmptyState';
 import VirtualMachineFilteredEmptyState from './components/VirtualMachineFilteredEmptyState/VirtualMachineFilteredEmptyState';
 import VirtualMachineSelection from './components/VirtualMachineSelection/VirtualMachineSelection';
 import useClearFiltersOnClusterNamespaceChange from './hooks/useClearFiltersOnClusterNamespaceChange';
-import { useVirtualMachineInstanceMapper } from './hooks/useVirtualMachineInstanceMapper';
+import useVirtualMachineListColumnUtils from './hooks/useVirtualMachineListColumnUtils';
+import useVirtualMachineListColumns from './hooks/useVirtualMachinesListColumns';
 import useVMListFilters from './hooks/useVMListFilters';
 import useVMListTelemetry from './hooks/useVMListTelemetry';
 import useVMMetrics from './hooks/useVMMetrics';
+import { deselectAllVMs } from './selectedVMs';
 import { VM_FILTER_OPTIONS } from './utils/constants';
 import { filterVMsByClusterAndNamespace } from './utils/utils';
-import { deselectAllVMs } from './selectedVMs';
-import { getVMColumns, getVMRowId, VM_COLUMN_KEYS, VMCallbacks } from './virtualMachinesDefinition';
+import { getVMRowId, VM_COLUMN_KEYS, type VMCallbacks } from './virtualMachinesDefinition';
 
 import '@kubevirt-utils/styles/list-managment-group.scss';
 import './VirtualMachinesList.scss';
@@ -103,14 +98,12 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({
     searchQueries?.vmQueries,
   );
 
-  const {
-    loaded: accessibleVMsLoaded,
-    loadError: accessibleVMsError,
-    resources: accessibleVMs,
-  } = useAccessibleResources<V1VirtualMachine>({
+  const accessibleVMsResults = useAccessibleResources<V1VirtualMachine>({
     filterOptions: VM_FILTER_OPTIONS,
     groupVersionKind: VirtualMachineModelGroupVersionKind,
   });
+  const { loaded: accessibleVMsLoaded, resources: accessibleVMs } = accessibleVMsResults;
+  const accessibleVMsError = accessibleVMsResults.loadError as Error;
 
   const vms = namespace ? namespacedVMs : accessibleVMs;
   const vmsLoaded = namespace ? namespacedVMsLoaded : accessibleVMsLoaded;
@@ -118,12 +111,13 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({
 
   const vmsToShow = useMemo(() => (runningTourSignal.value ? [tourGuideVM] : vms), [vms]);
 
-  const [vmims, vmimsLoaded] = useVirtualMachineInstanceMigrations(cluster, namespace);
-
-  const { vmiMapper, vmisLoaded } = useVirtualMachineInstanceMapper();
-
-  const vmimMapper = useVirtualMachineInstanceMigrationMapper(vmims);
-  const pvcMapper = usePVCMapper(namespace, cluster);
+  const {
+    callbacks,
+    loaded: columnUtilsLoaded,
+    pvcMapper,
+    vmiMapper,
+    vmimMapper,
+  } = useVirtualMachineListColumnUtils(cluster, namespace);
 
   const filterDefinitions = useVMListFilters(vmiMapper, pvcMapper);
   const {
@@ -170,7 +164,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({
 
   const searchInputRef = useRef<HTMLInputElement>(null);
 
-  const onPageChange = ({ endIndex, page, perPage, startIndex }) => {
+  const onPageChange = ({ endIndex, page, perPage, startIndex }: PaginationState): void => {
     setPagination(() => ({
       endIndex,
       page,
@@ -186,61 +180,24 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({
     verb: 'get' as K8sVerb,
   });
 
-  const columns = useMemo(
-    () => getVMColumns(t, namespace, isAllClustersPage, canGetNode),
-    [t, namespace, isAllClustersPage, canGetNode],
+  const { activeColumnKeys, columnLayout, columns, loadedColumns } = useVirtualMachineListColumns(
+    VirtualMachineModelRef,
+    namespace,
+    isAllClustersPage,
+    canGetNode,
   );
 
-  const manageableColumns = useMemo(() => columns.filter((col) => col.label), [columns]);
-
-  const [activeColumns, , loadedColumns] = useKubevirtUserSettingsTableColumns<V1VirtualMachine>({
-    columnManagementID: VirtualMachineModelRef,
-    columns: manageableColumns.map((col) => ({
-      additional: col.additional,
-      id: col.key,
-      props: col.props,
-      title: col.label,
-    })),
-  });
-
-  const activeColumnKeys = useMemo(() => {
-    const managedKeys =
-      activeColumns?.map((col) => col?.id) ??
-      manageableColumns.filter((col) => !col.additional).map((col) => col.key);
-
-    // Always include non-manageable (unlabeled) columns such as the selection column
-    const nonManageableKeys = columns.filter((col) => !col.label).map((col) => col.key);
-
-    return Array.from(new Set([...nonManageableKeys, ...managedKeys]));
-  }, [activeColumns, columns, manageableColumns]);
-
-  const columnLayout = useMemo(
-    () => buildColumnLayout(manageableColumns, activeColumnKeys, VirtualMachineModelRef),
-    [manageableColumns, activeColumnKeys],
-  );
-
-  const loaded = vmsLoaded && vmisLoaded && vmimsLoaded && !loadingFeatureProxy && loadedColumns;
+  const loaded = vmsLoaded && columnUtilsLoaded && !loadingFeatureProxy && loadedColumns;
 
   useVMListTelemetry({ loaded });
 
   const allVMsInNamespace = useMemo(
     () => filterVMsByClusterAndNamespace(vmsSignal.value, namespace, cluster),
+    /* eslint-disable-next-line react-hooks/exhaustive-deps */
     [vmsSignal.value, namespace, cluster],
   );
 
   const hasNoVMs = useMemo(() => isEmpty(allVMsInNamespace), [allVMsInNamespace]);
-
-  const callbacks: VMCallbacks = useMemo(
-    () => ({
-      getVmi: (vm: V1VirtualMachine) => getVMIFromMapper(vmiMapper, vm),
-      getVmim: (vm: V1VirtualMachine) =>
-        getVMIMFromMapper(vmimMapper, getName(vm), getNamespace(vm), getCluster(vm)),
-      pvcMapper,
-      vmiMapper,
-      vmimMapper,
-    }),
-    [vmiMapper, vmimMapper, pvcMapper],
-  );
 
   const clearAllFiltersWithReset = useCallback(() => {
     deselectAllVMs();
@@ -295,16 +252,16 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({
                     <ColumnManagement columnLayout={columnLayout} />
                   </TableToolbarActionsFlex>
                   <Pagination
-                    onPerPageSelect={(_e, perPage, page, startIndex, endIndex) =>
-                      onPageChange({ endIndex, page, perPage, startIndex })
-                    }
-                    onSetPage={(_e, page, perPage, startIndex, endIndex) =>
-                      onPageChange({ endIndex, page, perPage, startIndex })
-                    }
                     className="list-managment-group__pagination"
                     isCompact
                     isLastFullPageShown
                     itemCount={filteredVMs?.length}
+                    onPerPageSelect={(_event, perPage, page, startIndex, endIndex) =>
+                      onPageChange({ endIndex, page, perPage, startIndex })
+                    }
+                    onSetPage={(_event, page, perPage, startIndex, endIndex) =>
+                      onPageChange({ endIndex, page, perPage, startIndex })
+                    }
                     page={pagination?.page}
                     perPage={pagination?.perPage}
                     perPageOptions={paginationDefaultValues}
@@ -312,13 +269,6 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({
                 </Flex>
               </div>
               <KubevirtTable<V1VirtualMachine, VMCallbacks>
-                noFilteredDataMsg={
-                  <VirtualMachineFilteredEmptyState
-                    clearAllFilters={clearAllFiltersWithReset}
-                    filters={filters}
-                    searchInputRef={searchInputRef}
-                  />
-                }
                 activeColumnKeys={activeColumnKeys}
                 ariaLabel={t('VirtualMachines table')}
                 callbacks={callbacks}
@@ -328,6 +278,13 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({
                 initialSortKey={VM_COLUMN_KEYS.name}
                 loaded={loaded}
                 loadError={vmsLoadError}
+                noFilteredDataMsg={
+                  <VirtualMachineFilteredEmptyState
+                    clearAllFilters={clearAllFiltersWithReset}
+                    filters={filters}
+                    searchInputRef={searchInputRef}
+                  />
+                }
                 pagination={pagination}
                 unfilteredData={allVMsInNamespace}
               />
