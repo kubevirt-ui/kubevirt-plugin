@@ -4,7 +4,7 @@ import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ListPageBody } from '@openshift-console/dynamic-plugin-sdk';
-import { SearchInput } from '@patternfly/react-core';
+import { HelperText, HelperTextItem, SearchInput, Stack, StackItem } from '@patternfly/react-core';
 
 import useNodesData from '../../utils/hooks/useNodesData';
 
@@ -20,8 +20,8 @@ type NodesTableProps = {
 
 const NodesTable: FC<NodesTableProps> = ({ handleNodeSelection, selectedNode, vm }) => {
   const { t } = useKubevirtTranslation();
+  const { nodesData, nodesDataLoaded, vmArch } = useNodesData(vm);
   const columns = useMemo(() => getNodesTableColumns(t), [t]);
-  const { nodesData, nodesDataLoaded } = useNodesData(vm);
   const [searchValue, setSearchValue] = useState<string>('');
 
   const filteredData = useMemo(
@@ -35,32 +35,51 @@ const NodesTable: FC<NodesTableProps> = ({ handleNodeSelection, selectedNode, vm
   );
 
   return (
-    <>
-      <SearchInput
-        aria-label={t('Search node')}
-        className="nodes-table-search-bar"
-        onChange={(_event, value) => setSearchValue(value)}
-        onClear={() => setSearchValue('')}
-        placeholder={t('Search node')}
-        value={searchValue}
-      />
-      <ListPageBody>
-        <KubevirtTable
-          ariaLabel={t('Nodes table')}
-          callbacks={callbacks}
-          columns={columns}
-          data={filteredData}
-          dataTest="nodes-table"
-          fixedLayout
-          getRowId={getNodeRowId}
-          initialSortKey="name"
-          loaded={nodesDataLoaded}
-          noDataMsg={t('No nodes found')}
-          noFilteredDataMsg={t('No nodes match the search criteria')}
-          unfilteredData={nodesData}
+    <Stack hasGutter>
+      <StackItem>
+        <SearchInput
+          aria-label={t('Search node')}
+          className="nodes-table-search-bar"
+          onChange={(_event, value) => setSearchValue(value)}
+          onClear={() => setSearchValue('')}
+          placeholder={t('Search node')}
+          value={searchValue}
         />
-      </ListPageBody>
-    </>
+      </StackItem>
+      {vmArch && nodesData.length > 0 && (
+        <StackItem>
+          <HelperText>
+            <HelperTextItem>
+              {t('Showing only nodes with {{arch}} architecture, matching this VirtualMachine.', {
+                arch: vmArch,
+              })}
+            </HelperTextItem>
+          </HelperText>
+        </StackItem>
+      )}
+      <StackItem>
+        <ListPageBody>
+          <KubevirtTable
+            noDataMsg={
+              vmArch
+                ? t('No nodes with {{arch}} architecture found', { arch: vmArch })
+                : t('No nodes found')
+            }
+            ariaLabel={t('Nodes table')}
+            callbacks={callbacks}
+            columns={columns}
+            data={filteredData}
+            dataTest="nodes-table"
+            fixedLayout
+            getRowId={getNodeRowId}
+            initialSortKey="name"
+            loaded={nodesDataLoaded}
+            noFilteredDataMsg={t('No nodes match the search criteria')}
+            unfilteredData={nodesData}
+          />
+        </ListPageBody>
+      </StackItem>
+    </Stack>
   );
 };
 
