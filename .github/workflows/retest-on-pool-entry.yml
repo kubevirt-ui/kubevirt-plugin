@@ -1,11 +1,9 @@
 name: Retest On Pool Entry
 
-# retest-stale-gating.yml only re-evaluates merge-pool membership on a push
-# to main. A PR that gains lgtm+approved (or loses hold) afterward, while
-# its "Run Gating Tests" check is still that push's stale marker, gets no
-# further trigger until main next advances or someone manually intervenes.
-# This closes that gap for the pool-entry transition itself. See
-# ci-scripts/README.md ("Check-Run & Retest Model").
+# retest-stale-gating.yml only re-evaluates the merge pool on main pushes.
+# This covers the gap when a PR becomes pool-eligible (lgtm+approved, or
+# hold removed) while its "Run Gating Tests" check is still the stale
+# marker. See ci-scripts/README.md ("Check-Run & Retest Model").
 on:
   pull_request_target:
     types: [labeled, unlabeled]
@@ -25,12 +23,13 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 2
     steps:
-      # No ref override: reads the merge-pool helper from the base branch,
-      # same as every other hot-cluster pull_request_target job.
+      # Pin to default branch: pull_request_target checks out the PR base,
+      # which may lack ci-scripts/hot-cluster/ on older release branches.
       - name: Checkout
         uses: actions/checkout@v7
         with:
           persist-credentials: false
+          ref: ${{ github.event.repository.default_branch }}
 
       - name: Dispatch retest if now pool-eligible and check is stale
         uses: actions/github-script@v9
@@ -42,17 +41,14 @@ jobs:
             const pr = context.payload.pull_request;
             const prNumber = pr.number;
 
-            // labels here already reflect the post-event state.
+            // labels already reflect the post-event state.
             if (!isMergePoolPr(pr.labels)) {
               core.info(`PR #${prNumber} is not merge-pool eligible yet (needs lgtm+approved, no hold) -- nothing to do.`);
               return;
             }
 
-            // lgtm+approved is Tide's merge-readiness signal, not a CI-trust
-            // one -- same distinction and same three signals resolve-pr-context
-            // re-checks fresh right before the credentialed run. Checking here
-            // too just avoids a dispatch that would only fail on this same
-            // check downstream.
+            // Pre-check CI trust (OWNERS / same-repo / ok-to-test) to avoid
+            // a dispatch that would only fail the same check downstream.
             const author = pr.user.login;
             let ownedByAuthor = false;
             try {
@@ -91,10 +87,7 @@ jobs:
             }
 
             core.info(`PR #${prNumber} just became merge-pool eligible while its check was stale -- dispatching a fresh retest against main.`);
-            // base_ref required for the same reason as retest-stale-gating.yml's
-            // dispatch -- without it a release-branch PR's retest would
-            // resolve the wrong cluster/test-engine and merge onto main
-            // instead of its own base tip.
+            // base_ref so release-branch retests resolve the right tip.
             await github.rest.actions.createWorkflowDispatch({
               ...context.repo,
               workflow_id: 'hot-cluster-e2e.yml',
