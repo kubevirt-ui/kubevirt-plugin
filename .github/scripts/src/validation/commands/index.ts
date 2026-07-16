@@ -1,9 +1,12 @@
 /* eslint-disable no-console */
-import { approveAiConfig, approveCiScripts } from './approve';
+import { applyApprove, approveAiConfig, approveCiScripts, cancelApprove } from './approve';
 import type { ApprovalContext } from './approve';
 import { AI_CONFIG_EVENT_ACTIONS } from '../ai-config-validation/constants';
+import { applyHold, cancelHold } from './hold';
 import { createOctokit, createStatusOctokit } from '../../github-repo';
 import { executeJiraValidation } from '../jira-validation/execute';
+import { applyLgtm, cancelLgtm } from './lgtm';
+import type { ReviewContext } from './lgtm';
 import { parseCommand } from './parse-command';
 import {
   executeAiConfigValidation,
@@ -30,6 +33,7 @@ const main = async (): Promise<void> => {
   const headSha = process.env.PR_HEAD_SHA;
   const author = requireEnv('COMMENT_AUTHOR');
   const commentId = parseInt(requireEnv('COMMENT_ID'), 10);
+  const prAuthor = requireEnv('PR_AUTHOR');
 
   const approvalCtx: ApprovalContext = {
     octokit: createOctokit(config),
@@ -40,7 +44,9 @@ const main = async (): Promise<void> => {
     baseBranch,
     author,
     commentId,
+    prAuthor,
   };
+  const reviewCtx: ReviewContext = approvalCtx;
 
   const handlers: CommandHandlers = {
     'ai-approved': async () => {
@@ -66,6 +72,12 @@ const main = async (): Promise<void> => {
     'recheck-jira': async () => {
       await executeJiraValidation({ baseBranch, config, headSha, prNumber, prTitle });
     },
+    lgtm: async () => applyLgtm(reviewCtx),
+    'lgtm-cancel': async () => cancelLgtm(reviewCtx),
+    approve: async () => applyApprove(approvalCtx),
+    'approve-cancel': async () => cancelApprove(approvalCtx),
+    hold: async () => applyHold(approvalCtx),
+    'hold-cancel': async () => cancelHold(approvalCtx),
   };
 
   // A comment can contain more than one command (e.g. "/ai-approved

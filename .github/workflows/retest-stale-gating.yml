@@ -43,7 +43,7 @@ jobs:
         uses: actions/github-script@v9
         with:
           script: |
-            const { isMergePoolPr } = require('./ci-scripts/hot-cluster/is-merge-pool-pr.cjs');
+            const { isMergePoolPr } = require('./ci-scripts/hot-cluster/js/is-merge-pool-pr.cjs');
 
             const prs = await github.paginate(github.rest.pulls.list, {
               ...context.repo,

@@ -7,7 +7,7 @@ description: |
   lgtm/approved are Tide's merge-readiness signal, not a CI-trust signal,
   and this workflow_dispatch path has no pull_request payload for the
   normal trust gate. Assumes the caller has already checked out the base
-  branch and that is-merge-pool-pr.cjs is present on disk.
+  branch and that hot-cluster/js/is-merge-pool-pr.cjs is present on disk.
 
 inputs:
   pr-number:
@@ -50,7 +50,7 @@ runs:
       with:
         script: |
           const fs = require('fs');
-          const { isMergePoolPr } = require('./ci-scripts/hot-cluster/is-merge-pool-pr.cjs');
+          const { isMergePoolPr } = require('./ci-scripts/hot-cluster/js/is-merge-pool-pr.cjs');
           const prNumber = Number(process.env.PR_NUMBER);
           const skipPoolCheck = process.env.SKIP_POOL_CHECK === 'true';
 

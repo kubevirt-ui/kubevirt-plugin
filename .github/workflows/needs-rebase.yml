@@ -1,0 +1,135 @@
+name: Needs Rebase
+
+# Applies/removes the needs-rebase label based on GitHub's own computed
+# mergeability, so isMergePoolPr can block merge on a real conflict.
+# See ci-scripts/README.md.
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  # Direct PR events -- covers the common case of the PR itself changing.
+  sync-for-pr:
+    name: Sync Needs-Rebase Label
+    if: github.event_name == 'pull_request_target'
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    concurrency:
+      group: needs-rebase-${{ github.event.pull_request.number }}
+      cancel-in-progress: false
+    steps:
+      # Pin to default branch: pull_request_target checks out the PR base,
+      # which may lack ci-scripts/hot-cluster/ on older release branches.
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+          ref: ${{ github.event.repository.default_branch }}
+
+      # Label/comment writes need the bot App (not GITHUB_TOKEN) -- same
+      # reason as hold-e2e.yml / e2e-passed sync. See ci-scripts/README.md.
+      - name: Generate bot token
+        id: bot-token
+        continue-on-error: true
+        uses: actions/create-github-app-token@v3
+        with:
+          app-id: ${{ secrets.BOT_APP_ID }}
+          private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
+          permission-pull-requests: write
+          permission-issues: write
+
+      - name: Sync label from mergeable state
+        uses: actions/github-script@v9
+        with:
+          github-token: ${{ steps.bot-token.outputs.token || github.token }}
+          script: |
+            const { syncNeedsRebaseLabel } = require('./ci-scripts/hot-cluster/js/sync-needs-rebase-label.cjs');
+            await syncNeedsRebaseLabel({
+              github,
+              core,
+              context,
+              prNumber: context.payload.pull_request.number,
+            });
+
+  # main advanced -- a PR's own events can't catch a conflict that only
+  # appears because the base moved, so re-check every open PR targeting it.
+  # Same list-open-prs -> per-PR matrix pattern as retest-stale-gating.yml.
+  list-open-prs:
+    name: List Open PRs Targeting main
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    outputs:
+      pr_numbers: ${{ steps.list.outputs.pr_numbers }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: List open PRs targeting main
+        id: list
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const prs = await github.paginate(github.rest.pulls.list, {
+              ...context.repo,
+              state: 'open',
+              base: 'main',
+              per_page: 100,
+            });
+            core.info(`Open PRs targeting main: ${prs.length}.`);
+            core.setOutput('pr_numbers', JSON.stringify(prs.map((pr) => pr.number)));
+
+  # One matrix job per PR (rather than one job looping over all PRs) so one
+  # PR's failure (e.g. a deleted fork branch) is isolated and visible on its
+  # own, same rationale as retest-stale-gating.yml's mark-stale job.
+  sync-for-main-push:
+    name: Sync Needs-Rebase Label (PR #${{ matrix.pr_number }})
+    needs: list-open-prs
+    if: github.event_name == 'push' && needs.list-open-prs.outputs.pr_numbers != '[]'
+    strategy:
+      fail-fast: false
+      matrix:
+        pr_number: ${{ fromJson(needs.list-open-prs.outputs.pr_numbers) }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    concurrency:
+      group: needs-rebase-${{ matrix.pr_number }}
+      cancel-in-progress: false
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Generate bot token
+        id: bot-token
+        continue-on-error: true
+        uses: actions/create-github-app-token@v3
+        with:
+          app-id: ${{ secrets.BOT_APP_ID }}
+          private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
+          permission-pull-requests: write
+          permission-issues: write
+
+      - name: Sync label from mergeable state
+        uses: actions/github-script@v9
+        env:
+          PR_NUMBER: ${{ matrix.pr_number }}
+        with:
+          github-token: ${{ steps.bot-token.outputs.token || github.token }}
+          script: |
+            const { syncNeedsRebaseLabel } = require('./ci-scripts/hot-cluster/js/sync-needs-rebase-label.cjs');
+            await syncNeedsRebaseLabel({
+              github,
+              core,
+              context,
+              prNumber: Number(process.env.PR_NUMBER),
+            });

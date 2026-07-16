@@ -3,9 +3,9 @@ import { describe, it } from 'node:test';
 
 import type { Octokit } from '@octokit/rest';
 
-import { approveAiConfig, approveCiScripts } from './approve';
-import type { ApprovalContext } from './approve';
 import { CI_SCRIPTS_CONFIG } from '../ci-scripts-validation/constants';
+import type { ApprovalContext } from './approve';
+import { applyApprove, approveAiConfig, approveCiScripts, cancelApprove } from './approve';
 
 const OWNERS_CONTENT = ['approvers:', '  - alice-approver'].join('\n');
 
@@ -28,6 +28,12 @@ const fakeOctokit = (ownersContent: string | null, calls: Call[]): Octokit =>
       addLabels: async (args: unknown) => {
         calls.push({ method: 'addLabels', args });
       },
+      removeLabel: async (args: unknown) => {
+        calls.push({ method: 'removeLabel', args });
+      },
+      createComment: async (args: unknown) => {
+        calls.push({ method: 'createComment', args });
+      },
     },
     reactions: {
       createForIssueComment: async (args: unknown) => {
@@ -36,7 +42,12 @@ const fakeOctokit = (ownersContent: string | null, calls: Call[]): Octokit =>
     },
   }) as unknown as Octokit;
 
-const baseCtx = (octokit: Octokit, contentsOctokit: Octokit, author: string): ApprovalContext => ({
+const baseCtx = (
+  octokit: Octokit,
+  contentsOctokit: Octokit,
+  author: string,
+  prAuthor = 'pr-author',
+): ApprovalContext => ({
   octokit,
   contentsOctokit,
   owner: 'kubevirt-ui',
@@ -45,6 +56,7 @@ const baseCtx = (octokit: Octokit, contentsOctokit: Octokit, author: string): Ap
   baseBranch: 'main',
   author,
   commentId: 123,
+  prAuthor,
 });
 
 describe('approveAiConfig', () => {
@@ -143,6 +155,132 @@ describe('approveCiScripts', () => {
     assert.deepEqual((addLabels.args as { labels: string[] }).labels, [
       CI_SCRIPTS_CONFIG.labels.reviewed,
     ]);
+    const reaction = botCalls.find((c) => c.method === 'createForIssueComment');
+    assert.equal((reaction?.args as { content: string }).content, '+1');
+  });
+});
+
+describe('applyApprove', () => {
+  it('rejects the PR author approving their own PR: reacts -1, adds no label, throws', async () => {
+    const botCalls: Call[] = [];
+    const contentsCalls: Call[] = [];
+    const octokit = fakeOctokit(OWNERS_CONTENT, botCalls);
+    const contentsOctokit = fakeOctokit(OWNERS_CONTENT, contentsCalls);
+
+    await assert.rejects(
+      () => applyApprove(baseCtx(octokit, contentsOctokit, 'alice-approver', 'alice-approver')),
+      /not authorized to use \/approve/,
+    );
+
+    assert.equal(
+      botCalls.some((c) => c.method === 'addLabels'),
+      false,
+    );
+    assert.equal(
+      botCalls.some((c) => c.method === 'createComment'),
+      true,
+    );
+    const reaction = botCalls.find((c) => c.method === 'createForIssueComment');
+    assert.equal((reaction?.args as { content: string }).content, '-1');
+  });
+
+  it('rejects self-approval when author and prAuthor differ only by case', async () => {
+    const botCalls: Call[] = [];
+    const contentsCalls: Call[] = [];
+    const octokit = fakeOctokit(OWNERS_CONTENT, botCalls);
+    const contentsOctokit = fakeOctokit(OWNERS_CONTENT, contentsCalls);
+
+    await assert.rejects(
+      () => applyApprove(baseCtx(octokit, contentsOctokit, 'Alice-Approver', 'alice-approver')),
+      /not authorized to use \/approve/,
+    );
+
+    assert.equal(
+      botCalls.some((c) => c.method === 'addLabels'),
+      false,
+    );
+    assert.equal(
+      botCalls.some((c) => c.method === 'createComment'),
+      true,
+    );
+    const reaction = botCalls.find((c) => c.method === 'createForIssueComment');
+    assert.equal((reaction?.args as { content: string }).content, '-1');
+  });
+
+  it('rejects a non-OWNERS-approver: reacts -1, adds no label, throws', async () => {
+    const botCalls: Call[] = [];
+    const contentsCalls: Call[] = [];
+    const octokit = fakeOctokit(OWNERS_CONTENT, botCalls);
+    const contentsOctokit = fakeOctokit(OWNERS_CONTENT, contentsCalls);
+
+    await assert.rejects(
+      () => applyApprove(baseCtx(octokit, contentsOctokit, 'random-contributor')),
+      /not authorized to use \/approve/,
+    );
+
+    assert.equal(
+      botCalls.some((c) => c.method === 'addLabels'),
+      false,
+    );
+    const reaction = botCalls.find((c) => c.method === 'createForIssueComment');
+    assert.equal((reaction?.args as { content: string }).content, '-1');
+  });
+
+  it('approves a root-OWNERS approver: adds the approved label, reacts +1', async () => {
+    const botCalls: Call[] = [];
+    const contentsCalls: Call[] = [];
+    const octokit = fakeOctokit(OWNERS_CONTENT, botCalls);
+    const contentsOctokit = fakeOctokit(OWNERS_CONTENT, contentsCalls);
+
+    await applyApprove(baseCtx(octokit, contentsOctokit, 'alice-approver'));
+
+    const addLabels = botCalls.find((c) => c.method === 'addLabels');
+    assert.deepEqual((addLabels?.args as { labels: string[] }).labels, ['approved']);
+    const reaction = botCalls.find((c) => c.method === 'createForIssueComment');
+    assert.equal((reaction?.args as { content: string }).content, '+1');
+  });
+
+  it('reads the root OWNERS file, not .github/OWNERS', async () => {
+    const botCalls: Call[] = [];
+    const contentsCalls: Call[] = [];
+    const octokit = fakeOctokit(OWNERS_CONTENT, botCalls);
+    const contentsOctokit = fakeOctokit(OWNERS_CONTENT, contentsCalls);
+
+    await applyApprove(baseCtx(octokit, contentsOctokit, 'alice-approver'));
+
+    const getContentCall = contentsCalls.find((c) => c.method === 'getContent');
+    assert.equal((getContentCall?.args as { path: string }).path, 'OWNERS');
+  });
+});
+
+describe('cancelApprove', () => {
+  it('rejects a non-OWNERS-approver: reacts -1, removes no label, throws', async () => {
+    const botCalls: Call[] = [];
+    const contentsCalls: Call[] = [];
+    const octokit = fakeOctokit(OWNERS_CONTENT, botCalls);
+    const contentsOctokit = fakeOctokit(OWNERS_CONTENT, contentsCalls);
+
+    await assert.rejects(
+      () => cancelApprove(baseCtx(octokit, contentsOctokit, 'random-contributor')),
+      /not authorized to use \/approve cancel/,
+    );
+
+    assert.equal(
+      botCalls.some((c) => c.method === 'removeLabel'),
+      false,
+    );
+  });
+
+  it('removes the approved label for a root-OWNERS approver', async () => {
+    const botCalls: Call[] = [];
+    const contentsCalls: Call[] = [];
+    const octokit = fakeOctokit(OWNERS_CONTENT, botCalls);
+    const contentsOctokit = fakeOctokit(OWNERS_CONTENT, contentsCalls);
+
+    await cancelApprove(baseCtx(octokit, contentsOctokit, 'alice-approver'));
+
+    const removeLabel = botCalls.find((c) => c.method === 'removeLabel');
+    assert.equal((removeLabel?.args as { name: string }).name, 'approved');
     const reaction = botCalls.find((c) => c.method === 'createForIssueComment');
     assert.equal((reaction?.args as { content: string }).content, '+1');
   });

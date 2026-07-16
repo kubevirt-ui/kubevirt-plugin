@@ -348,7 +348,9 @@ jobs:
     permissions:
       statuses: write
       checks: write
-      issues: write
+      # Label sync and the unresolvable-context comment below use the
+      # kubevirt-plugin-bot App token (issues + pull-requests write), not
+      # GITHUB_TOKEN. pull-requests: read is enough for check-hold's pulls.get.
       pull-requests: read
     steps:
       - name: Verify hot cluster E2E ran and passed
@@ -543,6 +545,72 @@ jobs:
           summary: ${{ steps.result-details.outputs.summary }}
           details-url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
+      # Informational, PR-list-visible mirror of the real result above --
+      # not a merge gate (isMergePoolPr doesn't read these). Skipped on a
+      # neutral/held/stale conclusion so it doesn't clobber the last real result.
+      # Bot token (not GITHUB_TOKEN): labeling a PR needs pull-requests: write
+      # on an App installation; GITHUB_TOKEN is also forced read-only for
+      # issues on fork PRs. Same pattern as hold-e2e.yml's e2e-hold.
+      - name: Generate bot token for e2e result labels
+        id: e2e-label-bot-token
+        if: |
+          always() && inputs.pr_number != '' && needs.prepare.outputs.pr_head_sha != '' &&
+          (steps.result-details.outputs.conclusion == 'success' || steps.result-details.outputs.conclusion == 'failure')
+        uses: ./.github/actions/create-bot-token
+        with:
+          app-id: ${{ secrets.BOT_APP_ID }}
+          private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
+
+      - name: Sync e2e-passed/e2e-failed labels
+        if: |
+          always() && inputs.pr_number != '' && needs.prepare.outputs.pr_head_sha != '' &&
+          (steps.result-details.outputs.conclusion == 'success' || steps.result-details.outputs.conclusion == 'failure')
+        continue-on-error: true
+        uses: actions/github-script@v9
+        env:
+          PR_NUMBER: ${{ inputs.pr_number }}
+          CONCLUSION: ${{ steps.result-details.outputs.conclusion }}
+        with:
+          github-token: ${{ steps.e2e-label-bot-token.outputs.token || github.token }}
+          script: |
+            const prNumber = Number(process.env.PR_NUMBER);
+            const passed = process.env.CONCLUSION === 'success';
+            const toAdd = passed ? 'e2e-passed' : 'e2e-failed';
+            const toRemove = passed ? 'e2e-failed' : 'e2e-passed';
+
+            const labelMeta = {
+              'e2e-passed': { color: '2ea44f', description: 'Hot Cluster E2E passed at the latest real result' },
+              'e2e-failed': { color: 'd73a4a', description: 'Hot Cluster E2E failed at the latest real result' },
+            };
+
+            // addLabels doesn't create a missing label (404s instead) --
+            // check-then-create first, same pattern as hold-e2e.yml's e2e-hold.
+            try {
+              try {
+                await github.rest.issues.getLabel({ ...context.repo, name: toAdd });
+              } catch (err) {
+                if (err.status !== 404) throw err;
+                try {
+                  await github.rest.issues.createLabel({ ...context.repo, name: toAdd, ...labelMeta[toAdd] });
+                } catch (createErr) {
+                  if (createErr.status !== 422) throw createErr;
+                }
+              }
+              await github.rest.issues.addLabels({ ...context.repo, issue_number: prNumber, labels: [toAdd] });
+            } catch (err) {
+              core.warning(
+                `Could not add the ${toAdd} label to PR #${prNumber} -- check that the kubevirt-plugin-bot GitHub App has "Issues: write" and "Pull requests: write" granted and the installation is approved: ${err.message || err}`,
+              );
+            }
+
+            try {
+              await github.rest.issues.removeLabel({ ...context.repo, issue_number: prNumber, name: toRemove });
+            } catch (err) {
+              if (err.status !== 404) {
+                core.warning(`Could not remove the ${toRemove} label from PR #${prNumber}: ${err.message || err}`);
+              }
+            }
+
       # Best-effort, cross-run safety net for a "Run Gating Tests" check-run left
       # open by a genuinely different, older run (e.g. one that crashed before
       # reaching this step -- close-gating-check-on-cancel handles the cancelled
@@ -599,7 +667,20 @@ jobs:
             }
 
       # No head SHA to publish against if Resolve PR Context failed -- a
-      # PR comment is the only channel left.
+      # PR comment is the only channel left. Bot token required for
+      # createComment on a PR (same reason as e2e result labels above).
+      - name: Generate bot token for unresolvable-context comment
+        id: context-comment-bot-token
+        if: |
+          always() && inputs.pr_number != '' && (
+            needs.prepare.outputs.pr_context_outcome == 'failure' ||
+            needs.prepare.outputs.pr_context_outcome == 'cancelled'
+          )
+        uses: ./.github/actions/create-bot-token
+        with:
+          app-id: ${{ secrets.BOT_APP_ID }}
+          private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
+
       - name: Report unresolvable PR context on the PR
         if: |
           always() && inputs.pr_number != '' && (
@@ -612,6 +693,7 @@ jobs:
           PR_NUMBER: ${{ inputs.pr_number }}
           IS_POOL_RETEST: ${{ inputs.is_pool_retest }}
         with:
+          github-token: ${{ steps.context-comment-bot-token.outputs.token || github.token }}
           script: |
             const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
             const trigger = process.env.IS_POOL_RETEST === 'true'

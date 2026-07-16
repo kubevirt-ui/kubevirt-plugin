@@ -10,10 +10,10 @@ on:
   issue_comment:
     types: [created]
 
+# Comment posts go through kubevirt-plugin-bot -- GITHUB_TOKEN's issues
+# scope is read-only on fork PRs. See ci-scripts/README.md.
 permissions:
   contents: read
-  issues: write
-  pull-requests: write
 
 concurrency:
   group: pr-help-cmd-${{ github.event.issue.number }}
@@ -45,10 +45,22 @@ jobs:
             const matched = /(^|\s)\/help(\s|$)/.test(body);
             core.setOutput('matched', matched ? 'true' : 'false');
 
+      - name: Generate bot token
+        id: bot-token
+        if: steps.match.outputs.matched == 'true'
+        continue-on-error: true
+        uses: actions/create-github-app-token@v3
+        with:
+          app-id: ${{ secrets.BOT_APP_ID }}
+          private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
+          permission-pull-requests: write
+          permission-issues: write
+
       - name: Post available commands
         if: steps.match.outputs.matched == 'true'
         uses: actions/github-script@v9
         with:
+          github-token: ${{ steps.bot-token.outputs.token || github.token }}
           script: |
             const fs = require('fs');
             const { commands } = JSON.parse(fs.readFileSync('.github/pr-commands.json', 'utf8'));
@@ -56,6 +68,7 @@ jobs:
             const trustLabel = {
               owners: 'OWNERS only',
               'github-owners': '.github/OWNERS only',
+              collaborator: 'Any collaborator (write access)',
               'member-or-owner': 'Member/owner/collaborator',
               none: 'Anyone',
             };
