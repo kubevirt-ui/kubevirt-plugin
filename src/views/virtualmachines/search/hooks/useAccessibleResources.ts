@@ -10,6 +10,7 @@ import useClusterParam from '@multicluster/hooks/useClusterParam';
 import useIsACMPage from '@multicluster/useIsACMPage';
 import {
   K8sGroupVersionKind,
+  K8sResourceCommon,
   Selector,
   useK8sWatchResources,
 } from '@openshift-console/dynamic-plugin-sdk';
@@ -29,15 +30,13 @@ type UseAccessibleResourcesArgs = {
   watchNamespaces?: string[];
 };
 
-type UseAccessibleResources = <T extends K8sResourceCommon>(
-  args: UseAccessibleResourcesArgs,
-) => {
+type UseAccessibleResourcesReturn<T> = {
   loaded: boolean;
   loadError?: any;
   resources: T[];
 };
 
-export const useAccessibleResources: UseAccessibleResources = <T>({
+export const useAccessibleResources = <T extends K8sResourceCommon>({
   clusters,
   fieldSelector,
   filterOptions,
@@ -47,11 +46,16 @@ export const useAccessibleResources: UseAccessibleResources = <T>({
   searchQueries,
   selector,
   watchNamespaces,
-}) => {
+}: UseAccessibleResourcesArgs): UseAccessibleResourcesReturn<T> => {
   const isAdmin = useIsAdmin();
   const isACMPage = useIsACMPage();
   const cluster = useClusterParam();
   const [projectNames, projectNamesLoaded, projectNamesError] = useProjects();
+
+  const clusterToWatch = useMemo(() => {
+    if (clusters?.length === 1) return clusters[0];
+    return clusters ? undefined : cluster;
+  }, [clusters, cluster]);
 
   const namespacesToWatch = useMemo(() => {
     if (watchNamespaces) return watchNamespaces;
@@ -65,7 +69,7 @@ export const useAccessibleResources: UseAccessibleResources = <T>({
   const [allResources, allResourcesLoaded] = useKubevirtWatchResource<T[]>(
     shouldFetchClusterWide
       ? {
-          cluster: clusters ? undefined : cluster,
+          cluster: clusterToWatch,
           fieldSelector,
           groupVersionKind,
           isList: true,
