@@ -16,6 +16,7 @@ runs:
         sparse-checkout: |
           .github/scripts
           .github/actions/setup-gh-scripts
+          ci-scripts/hot-cluster/js
         persist-credentials: false
 
     - name: Setup Node
