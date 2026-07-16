@@ -18,6 +18,7 @@ jobs:
     permissions:
       contents: read
       statuses: write
+      checks: write
     runs-on: ubuntu-latest
     concurrency:
       group: pr-validation-cmd-${{ github.event.issue.number }}

@@ -43,6 +43,10 @@ inputs:
     description: Optional link to the workflow run for more detail
     required: false
     default: ''
+  name:
+    description: Check-run name (only used when creating a fresh check-run)
+    required: false
+    default: 'Run Gating Tests'
 
 outputs:
   check-run-id:
@@ -63,6 +67,7 @@ runs:
         CHECK_TITLE: ${{ inputs.title }}
         CHECK_SUMMARY: ${{ inputs.summary }}
         CHECK_DETAILS_URL: ${{ inputs['details-url'] }}
+        CHECK_NAME: ${{ inputs.name }}
       with:
         script: |
           const output = {
@@ -111,7 +116,7 @@ runs:
           } else {
             ({ data } = await github.rest.checks.create({
               ...payload,
-              name: 'Run Gating Tests',
+              name: process.env.CHECK_NAME,
               head_sha: headSha,
             }));
             core.info(`Created check-run ${data.id} ("${payload.status}") for ${headSha}.`);

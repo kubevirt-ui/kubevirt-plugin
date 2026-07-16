@@ -1,0 +1,165 @@
+name: Auto Merge
+
+# Toggles GitHub's native auto-merge instead of merging PRs ourselves --
+# GitHub then merges automatically once branch protection's required checks
+# pass and there are no conflicts. See ci-scripts/README.md ("Tide Removal &
+# Native Auto-Merge").
+#
+# The GraphQL enable/disable calls are convenience only, not the actual
+# enforcement -- if either silently fails, a held/ineligible PR must still
+# be blocked. The "Merge Gate" check-run below is the real backstop: it's a
+# required status check (like Run Gating Tests), so branch protection alone
+# keeps blocking merge regardless of whether the auto-merge toggle succeeds.
+on:
+  pull_request_target:
+    types: [labeled, unlabeled, reopened, synchronize]
+
+permissions:
+  contents: read
+  pull-requests: write
+  checks: write
+
+jobs:
+  sync-auto-merge:
+    name: Sync Auto-Merge State
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    # Serialize per PR so out-of-order concurrent label events can't leave
+    # auto-merge/the merge gate reflecting a stale label state.
+    concurrency:
+      group: auto-merge-${{ github.event.pull_request.number }}
+    steps:
+      # Pin to default branch: pull_request_target checks out the PR base,
+      # which may lack ci-scripts/hot-cluster/ on older release branches.
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+          ref: ${{ github.event.repository.default_branch }}
+
+      - name: Determine merge-pool eligibility
+        id: eligibility
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const { isMergePoolPr } = require('./ci-scripts/hot-cluster/is-merge-pool-pr.cjs');
+
+            // Re-read labels fresh instead of trusting the event payload --
+            // closes the race where a queued run's payload could be stale
+            // by the time it's this run's turn.
+            let eligible;
+            let headSha;
+            let nodeId = '';
+            let determined = true;
+            const prNumber = context.payload.pull_request.number;
+
+            try {
+              const pr = await github.rest.pulls.get({ ...context.repo, pull_number: prNumber });
+              eligible = isMergePoolPr(pr.data.labels);
+              headSha = pr.data.head.sha;
+              nodeId = pr.data.node_id;
+              core.info(
+                `PR #${prNumber} labels: [${pr.data.labels.map((l) => l.name).join(', ')}] -- merge-pool eligible: ${eligible}`,
+              );
+            } catch (err) {
+              // Fail closed: publish a failing Merge Gate for this event's
+              // head SHA rather than silently leaving a possibly-stale
+              // check in place, or guessing at eligibility.
+              determined = false;
+              eligible = false;
+              headSha = context.payload.pull_request.head.sha;
+              core.warning(
+                `Could not determine merge-pool eligibility for PR #${prNumber}: ${err.message} -- failing the Merge Gate check closed.`,
+              );
+            }
+
+            core.setOutput('determined', String(determined));
+            core.setOutput('eligible', String(eligible));
+            core.setOutput('node_id', nodeId);
+            core.setOutput('number', String(prNumber));
+            core.setOutput('head_sha', headSha);
+            core.setOutput('conclusion', eligible ? 'success' : 'failure');
+            core.setOutput(
+              'title',
+              !determined
+                ? 'Could not determine eligibility'
+                : eligible
+                  ? 'Merge-pool eligible'
+                  : 'Not merge-pool eligible',
+            );
+            core.setOutput(
+              'summary',
+              !determined
+                ? 'Failed to read current PR labels -- failing closed until a later event retries.'
+                : eligible
+                  ? 'PR carries lgtm+approved with no hold/do-not-merge label.'
+                  : 'PR is missing lgtm/approved, or carries a hold/do-not-merge label. This check blocks merge independently of auto-merge state.',
+            );
+
+      # The actual merge gate: a required check, independent of whether the
+      # GraphQL toggle below succeeds. Not eligible -> failure, which alone
+      # is enough for branch protection to keep blocking merge.
+      - name: Publish merge gate check
+        uses: ./.github/actions/publish-gating-check
+        with:
+          name: 'Merge Gate'
+          head-sha: ${{ steps.eligibility.outputs.head_sha }}
+          status: completed
+          conclusion: ${{ steps.eligibility.outputs.conclusion }}
+          title: ${{ steps.eligibility.outputs.title }}
+          summary: ${{ steps.eligibility.outputs.summary }}
+
+      - name: Enable or disable native auto-merge
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const determined = '${{ steps.eligibility.outputs.determined }}' === 'true';
+            const prNumber = '${{ steps.eligibility.outputs.number }}';
+
+            if (!determined) {
+              // Eligibility is unknown -- the Merge Gate check above
+              // already failed closed. Don't guess by toggling auto-merge
+              // either way; a later event will retry this.
+              core.info(`Skipping auto-merge toggle for PR #${prNumber} -- eligibility could not be determined this run.`);
+              return;
+            }
+
+            const eligible = '${{ steps.eligibility.outputs.eligible }}' === 'true';
+            const nodeId = '${{ steps.eligibility.outputs.node_id }}';
+
+            if (eligible) {
+              try {
+                await github.graphql(
+                  `mutation($id: ID!) {
+                    enablePullRequestAutoMerge(input: { pullRequestId: $id, mergeMethod: MERGE }) {
+                      pullRequest { autoMergeRequest { enabledAt } }
+                    }
+                  }`,
+                  { id: nodeId },
+                );
+                core.info(`Enabled auto-merge for PR #${prNumber}.`);
+              } catch (err) {
+                // Draft/already-merged PRs and similar edge cases surface
+                // as GraphQL errors here -- the Merge Gate check already
+                // reflects eligibility regardless, so this is UX only.
+                core.warning(`Could not enable auto-merge for PR #${prNumber}: ${err.message}`);
+              }
+              return;
+            }
+
+            try {
+              await github.graphql(
+                `mutation($id: ID!) {
+                  disablePullRequestAutoMerge(input: { pullRequestId: $id }) {
+                    pullRequest { autoMergeRequest { enabledAt } }
+                  }
+                }`,
+                { id: nodeId },
+              );
+              core.info(`Disabled auto-merge for PR #${prNumber} (not merge-pool eligible).`);
+            } catch (err) {
+              // Most common case: auto-merge was never enabled to begin
+              // with. Either way, the failing Merge Gate check published
+              // above is what actually blocks merge here, not this call.
+              core.info(`No auto-merge to disable for PR #${prNumber} (${err.message}).`);
+            }
