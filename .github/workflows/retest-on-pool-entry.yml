@@ -1,9 +1,9 @@
 name: Retest On Pool Entry
 
 # retest-stale-gating.yml only re-evaluates the merge pool on main pushes.
-# This covers the gap when a PR becomes pool-eligible (lgtm+approved, or
-# hold removed) while its "Run Gating Tests" check is still the stale
-# marker. See ci-scripts/README.md ("Check-Run & Retest Model").
+# This covers the gap when a PR becomes pool-eligible (lgtm+approved, or a
+# blocking label removed) while its "Run Gating Tests" check is still the
+# stale marker. See ci-scripts/README.md ("Check-Run & Retest Model").
 on:
   pull_request_target:
     types: [labeled, unlabeled]
@@ -19,7 +19,11 @@ jobs:
     name: Retest if Newly Pool-Eligible and Stale
     if: |
       (github.event.action == 'labeled' && (github.event.label.name == 'lgtm' || github.event.label.name == 'approved')) ||
-      (github.event.action == 'unlabeled' && (github.event.label.name == 'hold' || startsWith(github.event.label.name, 'do-not-merge/')))
+      (github.event.action == 'unlabeled' && (
+        github.event.label.name == 'hold' ||
+        github.event.label.name == 'needs-rebase' ||
+        startsWith(github.event.label.name, 'do-not-merge/')
+      ))
     runs-on: ubuntu-latest
     timeout-minutes: 2
     steps:
@@ -36,7 +40,7 @@ jobs:
         with:
           script: |
             const fs = require('fs');
-            const { isMergePoolPr } = require('./ci-scripts/hot-cluster/is-merge-pool-pr.cjs');
+            const { isMergePoolPr } = require('./ci-scripts/hot-cluster/js/is-merge-pool-pr.cjs');
 
             const pr = context.payload.pull_request;
             const prNumber = pr.number;

@@ -1,0 +1,38 @@
+name: Create Bot Token
+description: >
+  Mint a kubevirt-plugin-bot App installation token for PR label/comment writes.
+  continue-on-error so a bad credential still lets callers fall back to github.token.
+
+inputs:
+  app-id:
+    description: GitHub App ID (BOT_APP_ID secret)
+    required: true
+  private-key:
+    description: GitHub App private key (BOT_APP_PRIVATE_KEY secret)
+    required: true
+  permission-issues:
+    description: Issues permission for the token (omit with empty string)
+    required: false
+    default: write
+  permission-pull-requests:
+    description: Pull requests permission for the token (omit with empty string)
+    required: false
+    default: write
+
+outputs:
+  token:
+    description: Installation access token (empty when generation failed)
+    value: ${{ steps.bot-token.outputs.token }}
+
+runs:
+  using: composite
+  steps:
+    - name: Generate bot token
+      id: bot-token
+      continue-on-error: true
+      uses: actions/create-github-app-token@v3
+      with:
+        app-id: ${{ inputs.app-id }}
+        private-key: ${{ inputs.private-key }}
+        permission-issues: ${{ inputs.permission-issues }}
+        permission-pull-requests: ${{ inputs.permission-pull-requests }}

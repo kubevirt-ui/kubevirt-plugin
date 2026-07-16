@@ -73,9 +73,9 @@ jobs:
         env:
           TRUSTED: ${{ steps.check-trust.outputs.trusted }}
         with:
-          github-token: ${{ steps.bot-token.outputs.token }}
+          github-token: ${{ steps.bot-token.outputs.token || github.token }}
           script: |
-            const { reactToComment, enforceCommentTrust } = require('./ci-scripts/hot-cluster/pr-command-helpers.cjs');
+            const { reactToComment, enforceCommentTrust } = require('./ci-scripts/hot-cluster/js/pr-command-helpers.cjs');
             const author = context.payload.comment.user.login;
             const react = (content) => reactToComment(github, context, core, content);
 

@@ -1,0 +1,60 @@
+name: Verify Merge Pool Labels
+
+# isMergePoolPr trusts label presence, not how the label got there -- anyone
+# with triage/write could add lgtm/approved/do-not-merge/hold via the UI and
+# bypass /lgtm /approve /hold trust checks. Same thin-gate pattern as
+# verify-review-labels.yml: on labeled, strip if the applier wouldn't have
+# been allowed to add it via the matching slash command (bot exempt). On
+# unlabeled do-not-merge/hold, restore unless the remover is the bot or a
+# write collaborator (same gate as /hold cancel).
+on:
+  pull_request_target:
+    types: [labeled, unlabeled]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  verify:
+    name: verify-merge-pool-labels
+    if: >-
+      (github.event.action == 'labeled' &&
+        contains(
+          fromJSON('["lgtm","approved","do-not-merge/hold"]'),
+          github.event.label.name
+        )) ||
+      (github.event.action == 'unlabeled' && github.event.label.name == 'do-not-merge/hold')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    # No cancel-in-progress: a second watched label added while the first
+    # verification is running must not abort enforcement of the first.
+    # verifyMergePoolLabel also reconciles every watched label on the PR.
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+          ref: ${{ github.event.repository.default_branch }}
+
+      - name: Setup validation scripts
+        uses: ./.github/actions/setup-gh-scripts
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+
+      # pull_request_target already gets a writable base-repo token
+      # regardless of fork origin -- same as verify-review-labels.yml.
+      - name: Verify label author matches slash-command trust
+        working-directory: .github/scripts
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          EVENT_ACTION: ${{ github.event.action }}
+          LABEL_NAME: ${{ github.event.label.name }}
+          SENDER: ${{ github.event.sender.login }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+          BASE_BRANCH: ${{ github.event.pull_request.base.ref }}
+          REPO_OWNER: ${{ github.repository_owner }}
+          REPO_NAME: ${{ github.event.repository.name }}
+        run: npx tsx src/validation/verify-merge-pool-labels/index.ts

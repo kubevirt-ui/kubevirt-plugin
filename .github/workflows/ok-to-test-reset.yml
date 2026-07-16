@@ -6,7 +6,8 @@ on:
     types: [synchronize]
 
 permissions:
-  pull-requests: write
+  contents: read
+  pull-requests: read
 
 jobs:
   remove-label:
@@ -14,9 +15,22 @@ jobs:
     if: contains(github.event.pull_request.labels.*.name, 'ok-to-test')
     runs-on: ubuntu-latest
     steps:
+      # Label writes need the bot App (not GITHUB_TOKEN) -- same reason as
+      # hold-e2e.yml / needs-rebase.yml. See ci-scripts/README.md.
+      - name: Generate bot token
+        id: bot-token
+        continue-on-error: true
+        uses: actions/create-github-app-token@v3
+        with:
+          app-id: ${{ secrets.BOT_APP_ID }}
+          private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
+          permission-pull-requests: write
+          permission-issues: write
+
       - name: Remove ok-to-test label
         uses: actions/github-script@v9
         with:
+          github-token: ${{ steps.bot-token.outputs.token || github.token }}
           script: |
             await github.rest.issues.removeLabel({
               owner: context.repo.owner,

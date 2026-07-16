@@ -19,6 +19,10 @@ export const safeErrorMessage = (err: unknown): string => {
   return 'Unknown error';
 };
 
+/** GitHub logins are case-insensitive -- compare them the same way. */
+export const sameGitHubLogin = (a: string, b: string): boolean =>
+  a.toLowerCase() === b.toLowerCase();
+
 /** Format a Jira API error, including the response body when present. */
 export const jiraErrorMessage = (err: unknown): string => {
   if (!(err instanceof Error)) {

@@ -6,10 +6,24 @@ import type { CommandHandlers } from './process';
 import { HandledValidationError } from '../pr-path-validation/errors';
 import type { GitHubConfig } from '../../types/index';
 
+// CommandHandlers is an exhaustive Record -- unused here, but every fixture needs a stub.
+const NOOP_NEW_HANDLERS: Pick<
+  CommandHandlers,
+  'lgtm' | 'lgtm-cancel' | 'approve' | 'approve-cancel' | 'hold' | 'hold-cancel'
+> = {
+  lgtm: async () => {},
+  'lgtm-cancel': async () => {},
+  approve: async () => {},
+  'approve-cancel': async () => {},
+  hold: async () => {},
+  'hold-cancel': async () => {},
+};
+
 describe('processCommands', () => {
   it('isolates a failing recheck-jira -- both approval commands still run and report success', async () => {
     const ran: string[] = [];
     const handlers: CommandHandlers = {
+      ...NOOP_NEW_HANDLERS,
       'ai-approved': async () => {
         ran.push('ai-approved');
       },
@@ -40,6 +54,7 @@ describe('processCommands', () => {
 
   it('runs every command even when more than one fails', async () => {
     const handlers: CommandHandlers = {
+      ...NOOP_NEW_HANDLERS,
       'ai-approved': async () => {
         throw new Error('not authorized to use /ai-approved');
       },
@@ -60,6 +75,7 @@ describe('processCommands', () => {
 
   it('returns no failures when every command succeeds', async () => {
     const handlers: CommandHandlers = {
+      ...NOOP_NEW_HANDLERS,
       'ai-approved': async () => {},
       'ci-approved': async () => {},
       'recheck-jira': async () => {},

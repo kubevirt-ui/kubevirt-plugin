@@ -2,8 +2,7 @@ name: Auto Merge
 
 # Toggles GitHub's native auto-merge instead of merging PRs ourselves --
 # GitHub then merges automatically once branch protection's required checks
-# pass and there are no conflicts. See ci-scripts/README.md ("Tide Removal &
-# Native Auto-Merge").
+# pass and there are no conflicts. See ci-scripts/README.md.
 #
 # The GraphQL enable/disable calls are convenience only, not the actual
 # enforcement -- if either silently fails, a held/ineligible PR must still
@@ -45,7 +44,7 @@ jobs:
         uses: actions/github-script@v9
         with:
           script: |
-            const { isMergePoolPr } = require('./ci-scripts/hot-cluster/is-merge-pool-pr.cjs');
+            const { isMergePoolPr } = require('./ci-scripts/hot-cluster/js/is-merge-pool-pr.cjs');
 
             // Re-read labels fresh instead of trusting the event payload --
             // closes the race where a queued run's payload could be stale
@@ -112,9 +111,24 @@ jobs:
           title: ${{ steps.eligibility.outputs.title }}
           summary: ${{ steps.eligibility.outputs.summary }}
 
+      # enablePullRequestAutoMerge/disablePullRequestAutoMerge reject the
+      # default GITHUB_TOKEN with "Resource not accessible by integration"
+      # regardless of permissions: -- use the same bot App token other
+      # workflows (hold-e2e.yml, retest-e2e.yml) already generate for this.
+      - name: Generate bot token
+        id: bot-token
+        continue-on-error: true
+        uses: actions/create-github-app-token@v3
+        with:
+          app-id: ${{ secrets.BOT_APP_ID }}
+          private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
+          permission-pull-requests: write
+
       - name: Enable or disable native auto-merge
         uses: actions/github-script@v9
         with:
+          # Falls back to the default token if bot-token generation failed above.
+          github-token: ${{ steps.bot-token.outputs.token || github.token }}
           script: |
             const determined = '${{ steps.eligibility.outputs.determined }}' === 'true';
             const prNumber = '${{ steps.eligibility.outputs.number }}';

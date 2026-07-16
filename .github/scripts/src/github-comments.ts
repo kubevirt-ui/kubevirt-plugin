@@ -71,8 +71,10 @@ export const removeLabel = async (
 ): Promise<void> => {
   try {
     await octokit.issues.removeLabel({ owner, repo, issue_number: issueNumber, name: label });
-  } catch {
-    // Label not present
+  } catch (err: unknown) {
+    // Only a missing label is a no-op -- other failures (auth, network) must
+    // propagate so callers can't treat a failed revoke as success.
+    if ((err as { status?: number }).status !== 404) throw err;
   }
 };
 

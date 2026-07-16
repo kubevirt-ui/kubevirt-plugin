@@ -14,15 +14,23 @@ jobs:
       !endsWith(github.event.comment.user.login, '[bot]') &&
       (contains(github.event.comment.body, '/recheck-jira') ||
        contains(github.event.comment.body, '/ai-approved') ||
-       contains(github.event.comment.body, '/ci-approved'))
+       contains(github.event.comment.body, '/ci-approved') ||
+       contains(github.event.comment.body, '/lgtm') ||
+       contains(github.event.comment.body, '/approve') ||
+       contains(github.event.comment.body, '/hold cancel') ||
+       contains(github.event.comment.body, '/hold ') ||
+       endsWith(github.event.comment.body, '/hold') ||
+       (contains(github.event.comment.body, '/hold') && !contains(github.event.comment.body, '/hold-e2e')))
     permissions:
       contents: read
       statuses: write
       checks: write
     runs-on: ubuntu-latest
+    # Not cancel-in-progress: rapid successive commands (e.g. /lgtm then
+    # /approve) must both finish applying labels, not race/clobber each other.
     concurrency:
       group: pr-validation-cmd-${{ github.event.issue.number }}
-      cancel-in-progress: true
+      cancel-in-progress: false
     steps:
       - name: Resolve PR context
         id: pr
@@ -38,6 +46,7 @@ jobs:
             core.setOutput('title', pr.title);
             core.setOutput('base_ref', pr.base.ref);
             core.setOutput('head_sha', pr.head.sha);
+            core.setOutput('author', pr.user.login);
 
       # Needed so the local setup-gh-scripts action can resolve. issue_comment
       # already loads this workflow from the default branch.
@@ -80,6 +89,7 @@ jobs:
           PR_TITLE: ${{ steps.pr.outputs.title }}
           BASE_BRANCH: ${{ steps.pr.outputs.base_ref }}
           PR_HEAD_SHA: ${{ steps.pr.outputs.head_sha }}
+          PR_AUTHOR: ${{ steps.pr.outputs.author }}
           REPO_OWNER: ${{ github.repository_owner }}
           REPO_NAME: ${{ github.event.repository.name }}
         run: npx tsx src/validation/commands/index.ts
