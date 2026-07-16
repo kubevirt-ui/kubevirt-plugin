@@ -418,8 +418,7 @@ export const getArchitecture = (vm: V1VirtualMachine): string =>
 export const getVMTemplateAnnotations = (vm: V1VirtualMachine): { [key: string]: string } =>
   vm?.spec?.template?.metadata?.annotations;
 
-export const isVSOCKEnabled = (vm: V1VirtualMachine | V1VirtualMachineInstance | undefined) => {
-  if (!vm) return false;
+export const isVSOCKEnabled = (vm: V1VirtualMachine | V1VirtualMachineInstance) => {
   const devices = isVM(vm) ? getDevices(vm) : getVMIDevices(vm);
   return Boolean(devices?.autoattachVSOCK);
 };

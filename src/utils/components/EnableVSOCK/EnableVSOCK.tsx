@@ -1,7 +1,6 @@
 import React, { FC, useMemo, useState } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useIsVSOCKFeatureEnabled from '@kubevirt-utils/hooks/useVSOCKFeatureFlag/useIsVSOCKFeatureEnabled';
 import { isVSOCKEnabled } from '@kubevirt-utils/resources/vm';
 import { Switch } from '@patternfly/react-core';
@@ -12,7 +11,6 @@ type EnableVSOCKProps = {
 };
 
 const EnableVSOCK: FC<EnableVSOCKProps> = ({ updateVSOCK, vm }) => {
-  const { t } = useKubevirtTranslation();
   const [isChecked, setIsChecked] = useState<boolean>(isVSOCKEnabled(vm));
 
   const { featureEnabled: isVSOCKFeatureGateEnabled, isLoading } = useIsVSOCKFeatureEnabled();
@@ -28,7 +26,6 @@ const EnableVSOCK: FC<EnableVSOCKProps> = ({ updateVSOCK, vm }) => {
         setIsChecked(checked);
         updateVSOCK(checked);
       }}
-      aria-label={t('Enable VSOCK')}
       checked={isChecked}
       id="enable-vsock"
       isDisabled={isDisabled}
