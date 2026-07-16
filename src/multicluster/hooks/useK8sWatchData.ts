@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useIsACMPage from '@multicluster/useIsACMPage';
+import { enrichFleetData } from '@multicluster/utils';
 import { useK8sWatchResource, WatchK8sResult } from '@openshift-console/dynamic-plugin-sdk';
 import {
   FleetWatchK8sResource,
@@ -24,6 +25,11 @@ const useK8sWatchData = <T>(resource: FleetWatchK8sResource | null): WatchK8sRes
     useFleet && !waitingForHubName ? requestWithNoLimit : null,
   );
 
+  const normalizedFleetData = useMemo(
+    () => enrichFleetData(fleetData, resource?.groupVersionKind),
+    [fleetData, resource?.groupVersionKind],
+  );
+
   const [k8sWatchData, k8sWatchLoaded, k8sWatchError] = useK8sWatchResource<T>(
     !useFleet ? resource : null,
   );
@@ -39,7 +45,7 @@ const useK8sWatchData = <T>(resource: FleetWatchK8sResource | null): WatchK8sRes
   if (waitingForHubName) return [defaultData, false, undefined];
 
   return useFleet
-    ? [isEmpty(fleetData) ? defaultData : fleetData, fleetLoaded, fleetError]
+    ? [isEmpty(normalizedFleetData) ? defaultData : normalizedFleetData, fleetLoaded, fleetError]
     : [isEmpty(k8sWatchData) ? defaultData : k8sWatchData, k8sWatchLoaded, k8sWatchError];
 };
 
