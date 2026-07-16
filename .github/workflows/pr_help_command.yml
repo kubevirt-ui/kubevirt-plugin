@@ -55,7 +55,7 @@ jobs:
 
             const trustLabel = {
               owners: 'OWNERS only',
-              'ai-config-owners': 'AI-config OWNERS only (.github/OWNERS)',
+              'github-owners': '.github/OWNERS only',
               'member-or-owner': 'Member/owner/collaborator',
               none: 'Anyone',
             };

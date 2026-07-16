@@ -5,6 +5,10 @@ import type { GitHubConfig } from './types/index';
 /** Create an authenticated Octokit instance. */
 export const createOctokit = (config: GitHubConfig): Octokit => new Octokit({ auth: config.token });
 
+/** Create an Octokit instance scoped to config.statusToken (falls back to config.token) -- for calls a bot app token lacks the scope for, e.g. commit statuses or reading repo contents. */
+export const createStatusOctokit = (config: GitHubConfig): Octokit =>
+  new Octokit({ auth: config.statusToken ?? config.token });
+
 /** Fetch all branch names matching "release-*" from the repo. */
 export const getReleaseBranches = async (
   octokit: Octokit,

@@ -27,9 +27,13 @@ jobs:
     name: Check Hold Request
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    # !endsWith(...'[bot]') -- report comments mention sibling commands as
+    # guidance text (e.g. "comment /retest-e2e"), which could otherwise
+    # re-trigger those workflows against the bot's own comments.
     if: >
       github.event.issue.pull_request != null &&
-      contains(github.event.comment.body, '/hold-e2e')
+      contains(github.event.comment.body, '/hold-e2e') &&
+      !endsWith(github.event.comment.user.login, '[bot]')
     outputs:
       trusted: ${{ steps.check-trust.outputs.trusted }}
       head-sha: ${{ steps.resolve.outputs.head_sha }}

@@ -1,0 +1,66 @@
+name: Verify Review Labels
+
+# ai-config-validation/ci-scripts-validation trust a label's presence, not
+# how it got there -- anyone with triage/write access could add it via the
+# UI and bypass the /ai-approved or /ci-approved OWNERS gate. Only listens
+# for these 4 label names (thin-gate pattern, like ok-to-test-gate.yml):
+# strips the label if the applier isn't in .github/OWNERS, then re-runs
+# validation so the status/other labels reflect the corrected state.
+on:
+  pull_request_target:
+    types: [labeled]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+  statuses: write
+
+jobs:
+  verify:
+    name: verify-review-labels
+    if: >-
+      contains(
+        fromJSON('["ai-config-reviewed","ci-scripts-reviewed","skip-ai-config-check","skip-ci-scripts-check"]'),
+        github.event.label.name
+      )
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    # No cancel-in-progress concurrency: a second watched label added while
+    # the first verification is running must not abort enforcement of the first.
+    # verifyReviewLabel also reconciles every watched label currently on the PR.
+    steps:
+      # This is a trust-enforcement mechanism -- the *code* it runs (including
+      # the setup-gh-scripts action definition itself, resolved from whatever
+      # this checkout puts on disk) must come from the default branch, not
+      # whatever the PR's own (possibly release-branch) base.ref happens to
+      # contain. Without pinning here too, a weaker release branch could
+      # smuggle in a modified action.yml that ignores/subverts the ref input
+      # below entirely -- pinning only that input isn't enough.
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+          ref: ${{ github.event.repository.default_branch }}
+
+      - name: Setup validation scripts
+        uses: ./.github/actions/setup-gh-scripts
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+
+      # pull_request_target already gets a writable base-repo token
+      # regardless of fork origin -- no bot token needed here.
+      - name: Verify label author is OWNERS-listed
+        working-directory: .github/scripts
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          LABEL_NAME: ${{ github.event.label.name }}
+          SENDER: ${{ github.event.sender.login }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          # Still the PR's actual base ref -- OWNERS is read at the PR's real
+          # target branch, unrelated to which code version runs the check.
+          BASE_BRANCH: ${{ github.event.pull_request.base.ref }}
+          REPO_OWNER: ${{ github.repository_owner }}
+          REPO_NAME: ${{ github.event.repository.name }}
+        run: npx tsx src/validation/verify-review-labels/index.ts

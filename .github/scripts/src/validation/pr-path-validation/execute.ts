@@ -1,0 +1,144 @@
+/* eslint-disable no-console */
+import { runPathValidation } from './run-validation';
+import type { BuildStatusDescription, PathValidationOutcome } from './run-validation';
+import { HandledValidationError } from './errors';
+import { scanForSuspiciousPatterns } from '../ai-config-validation/checks';
+import { AI_CONFIG } from '../ai-config-validation/constants';
+import { buildStatusDescription as buildAiConfigStatusDescription } from '../ai-config-validation/utils';
+import { CI_SCRIPTS_CONFIG } from '../ci-scripts-validation/constants';
+import { buildStatusDescription as buildCiScriptsStatusDescription } from '../ci-scripts-validation/utils';
+import { createOctokit, createStatusOctokit } from '../../github-repo';
+import { setCommitStatus } from '../../github-comments';
+import { safeErrorMessage } from '../../utils';
+import type { GitHubConfig } from '../../types/index';
+import type { PathValidationConfig } from './types';
+
+export type PathValidationInput = {
+  config: GitHubConfig;
+  eventAction?: string;
+  headSha?: string;
+  prNumber: number;
+  /** The PR's actual base branch -- used only to verify the skip label's applier against OWNERS at that ref. */
+  baseBranch: string;
+  /** Pre-fetched changed files -- lets a caller running multiple path validations for the same PR share one fetch instead of each doing its own. */
+  files?: Array<{ filename: string; patch?: string }>;
+};
+
+/** Run path-based validation; throws HandledValidationError on failure (already reported via label/status). */
+export const executePathValidation = async (
+  input: PathValidationInput,
+  pathConfig: PathValidationConfig,
+  buildStatusDescription: BuildStatusDescription,
+  onFilesFetched?: (files: Array<{ filename: string; patch?: string }>) => void,
+): Promise<PathValidationOutcome> => {
+  const { config, prNumber, headSha, eventAction, baseBranch, files } = input;
+  const octokit = createOctokit(config);
+  const statusOctokit = createStatusOctokit(config);
+
+  const outcome = await runPathValidation(
+    {
+      baseBranch,
+      config,
+      event: { action: eventAction },
+      files,
+      headSha,
+      octokit,
+      prNumber,
+      statusOctokit,
+    },
+    pathConfig,
+    buildStatusDescription,
+    onFilesFetched,
+  );
+
+  if (outcome.kind === 'failed') {
+    throw new HandledValidationError(
+      `${pathConfig.displayName} failed. An OWNERS reviewer can comment ${pathConfig.commandName} after security review to re-run validation.`,
+    );
+  }
+
+  return outcome;
+};
+
+/** Best-effort "something broke" handler -- posts an error commit status, never throws. */
+export const reportPathValidationError = async (
+  config: GitHubConfig,
+  headSha: string | undefined,
+  pathConfig: Pick<PathValidationConfig, 'statusContext' | 'displayName'>,
+  err: unknown,
+): Promise<void> => {
+  console.error('Unexpected error:', safeErrorMessage(err));
+  if (!headSha) {
+    return;
+  }
+
+  try {
+    const statusOctokit = createStatusOctokit(config);
+    await setCommitStatus(
+      statusOctokit,
+      config.owner,
+      config.repo,
+      headSha,
+      'error',
+      `${pathConfig.displayName} encountered an unexpected error`,
+      pathConfig.statusContext,
+    );
+  } catch {
+    // best-effort
+  }
+};
+
+const logSuspiciousMatches = (files: Array<{ filename: string; patch?: string }>): void => {
+  const matches = scanForSuspiciousPatterns(files);
+  if (matches.length === 0) return;
+
+  console.warn('Suspicious patterns detected in AI/editor config diff:');
+  for (const match of matches) {
+    console.warn(`- [${match.pattern}] ${match.file}`);
+  }
+};
+
+/** Run AI/editor configuration validation for a pull request. */
+export const executeAiConfigValidation = async (input: PathValidationInput): Promise<void> => {
+  const outcome = await executePathValidation(
+    input,
+    AI_CONFIG,
+    buildAiConfigStatusDescription,
+    logSuspiciousMatches,
+  );
+
+  if (outcome.kind === 'skipped') {
+    console.log('Skipped: skip-ai-config-check label present.');
+    return;
+  }
+
+  console.log('AI configuration validation passed.');
+};
+
+export const reportAiConfigError = (
+  config: GitHubConfig,
+  headSha: string | undefined,
+  err: unknown,
+): Promise<void> => reportPathValidationError(config, headSha, AI_CONFIG, err);
+
+/** Run CI configuration validation for a pull request. */
+export const executeCiScriptsValidation = async (input: PathValidationInput): Promise<void> => {
+  const outcome = await executePathValidation(
+    input,
+    CI_SCRIPTS_CONFIG,
+    buildCiScriptsStatusDescription,
+  );
+
+  if (outcome.kind === 'skipped') {
+    console.log('Skipped: skip-ci-scripts-check label present.');
+    return;
+  }
+
+  console.log('CI configuration validation passed.');
+};
+
+export const reportCiScriptsError = (
+  config: GitHubConfig,
+  headSha: string | undefined,
+  err: unknown,
+): Promise<void> => reportPathValidationError(config, headSha, CI_SCRIPTS_CONFIG, err);
