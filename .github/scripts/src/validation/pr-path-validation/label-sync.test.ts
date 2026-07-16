@@ -103,7 +103,7 @@ describe('reportCommitStatus', () => {
     assert.equal(calls.length, 0);
   });
 
-  it('publishes only a commit status, not a check-run -- an API-created check-run isn\'t attached to the calling workflow run and gets parked under an unrelated check suite in the merge box', async () => {
+  it("publishes only a commit status, not a check-run -- an API-created check-run isn't attached to the calling workflow run and gets parked under an unrelated check suite in the merge box", async () => {
     const calls: Call[] = [];
     const octokit = fakeOctokit(calls, 'main');
     await reportCommitStatus(baseCtx(octokit), TEST_CONFIG, 'pending', 'in progress');
