@@ -24,32 +24,14 @@ const buildStatusDescription = (): string => 'unused';
 
 type Call = { method: string; args: unknown };
 
-let nextCheckRunId = 2000;
-
 type FakeOptions = {
   /** Reject createCommitStatus starting from this call number onward (1-indexed). Ignored when unset. */
   rejectCommitStatusFromCall?: number;
 };
 
-/** issues.listLabelsOnIssue throws -- simulating a genuinely unexpected failure after runPathValidation has already published its pending check-run. */
-const fakeOctokitThrowingAfterPending = (
-  calls: Call[],
-  createdIds: number[],
-  options: FakeOptions = {},
-): Octokit =>
+/** issues.listLabelsOnIssue throws -- simulating a genuinely unexpected failure after runPathValidation has already published its pending status. */
+const fakeOctokitThrowingAfterPending = (calls: Call[], options: FakeOptions = {}): Octokit =>
   ({
-    checks: {
-      create: async (args: unknown) => {
-        const id = nextCheckRunId++;
-        createdIds.push(id);
-        calls.push({ method: 'checks.create', args });
-        return { data: { id } };
-      },
-      update: async (args: unknown) => {
-        calls.push({ method: 'checks.update', args });
-        return { data: { id: (args as { check_run_id: number }).check_run_id } };
-      },
-    },
     issues: {
       listLabelsOnIssue: async () => {
         calls.push({ method: 'issues.listLabelsOnIssue', args: {} });
@@ -71,10 +53,9 @@ const fakeOctokitThrowingAfterPending = (
   }) as unknown as Octokit;
 
 describe('executePathValidation', () => {
-  it('finalizes the same check-run (update, not a second create) when an unexpected error occurs after the pending check-run is published', async () => {
+  it('reports a final "error" status when an unexpected error occurs after the pending status is published', async () => {
     const calls: Call[] = [];
-    const createdIds: number[] = [];
-    const octokit = fakeOctokitThrowingAfterPending(calls, createdIds);
+    const octokit = fakeOctokitThrowingAfterPending(calls);
 
     await assert.rejects(
       executePathValidation(
@@ -92,17 +73,6 @@ describe('executePathValidation', () => {
       ),
       HandledValidationError,
     );
-
-    const created = calls.filter((c) => c.method === 'checks.create');
-    const updated = calls.filter((c) => c.method === 'checks.update');
-    assert.equal(created.length, 1, 'exactly one check-run should be created (the pending one)');
-    assert.equal(
-      updated.length,
-      1,
-      'the error path must update that same check-run, not create a second one',
-    );
-    assert.equal((updated[0].args as { check_run_id: number }).check_run_id, createdIds[0]);
-    assert.equal((updated[0].args as { conclusion: string }).conclusion, 'failure');
 
     const statuses = calls
       .filter((c) => c.method === 'createCommitStatus')
@@ -110,16 +80,11 @@ describe('executePathValidation', () => {
     assert.equal(statuses.at(-1)?.state, 'error');
   });
 
-  it('still finalizes the check-run and rethrows HandledValidationError even when the status publish itself rejects', async () => {
+  it('still rethrows HandledValidationError even when the error status publish itself rejects', async () => {
     const calls: Call[] = [];
-    const createdIds: number[] = [];
-    // The first (pending) status call must succeed so a check-run actually
-    // exists before the error path's own status publish is the one that
-    // rejects -- this is what distinguishes "update the existing check-run"
-    // from "nothing existed yet, so create one" (already covered above).
-    const octokit = fakeOctokitThrowingAfterPending(calls, createdIds, {
-      rejectCommitStatusFromCall: 2,
-    });
+    // The first (pending) status call must succeed -- this covers the
+    // error path's own status publish being the one that rejects.
+    const octokit = fakeOctokitThrowingAfterPending(calls, { rejectCommitStatusFromCall: 2 });
 
     await assert.rejects(
       executePathValidation(
@@ -137,24 +102,13 @@ describe('executePathValidation', () => {
       ),
       HandledValidationError,
     );
-
-    const updated = calls.filter((c) => c.method === 'checks.update');
-    assert.equal(
-      updated.length,
-      1,
-      'the check-run must still be finalized even though the status publish rejected',
-    );
-    assert.equal((updated[0].args as { conclusion: string }).conclusion, 'failure');
   });
 });
 
 describe('reportPathValidationError', () => {
-  it('still publishes the check-run when the status publish rejects', async () => {
+  it('does not throw even when the status publish rejects', async () => {
     const calls: Call[] = [];
-    const createdIds: number[] = [];
-    const octokit = fakeOctokitThrowingAfterPending(calls, createdIds, {
-      rejectCommitStatusFromCall: 1,
-    });
+    const octokit = fakeOctokitThrowingAfterPending(calls, { rejectCommitStatusFromCall: 1 });
 
     await assert.doesNotReject(
       reportPathValidationError(
@@ -166,11 +120,6 @@ describe('reportPathValidationError', () => {
       ),
     );
 
-    assert.equal(
-      calls.some((c) => c.method === 'checks.create'),
-      true,
-      'a check-run must still be published even though the status publish rejected',
-    );
     assert.equal(
       calls.some((c) => c.method === 'createCommitStatus'),
       true,

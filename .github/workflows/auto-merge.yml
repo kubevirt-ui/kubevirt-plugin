@@ -4,17 +4,14 @@ name: Auto Merge
 # GitHub then merges automatically once branch protection's required checks
 # pass and there are no conflicts. See ci-scripts/README.md.
 #
-# The GraphQL enable/disable calls are convenience only, not the actual
-# enforcement -- if either silently fails, a held/ineligible PR must still
-# be blocked. The required "Merge Gate" check is this job's own native
-# check-run (job name below), so branch protection alone keeps blocking
-# merge regardless of whether the auto-merge toggle succeeds. Deliberately
-# NOT published via publish-gating-check/checks.create() -- an API-created
-# check-run isn't attached to this workflow run, so GitHub parks it under
-# whichever other check suite happens to exist for the SHA (often "Needs
-# Rebase"), showing the confusing "Needs Rebase / Merge Gate" in the merge
-# box. The native job check-run is always correctly attributed to "Auto
-# Merge / Merge Gate" instead.
+# The GraphQL enable/disable calls are convenience only; the real backstop
+# is this job's own native check-run, named "Merge Gate" below, which is a
+# required check. Deliberately not published via checks.create() (e.g.
+# publish-gating-check) -- an API-created check-run isn't attached to this
+# workflow run, so GitHub parks it under an unrelated check suite for the
+# SHA (often "Needs Rebase"), which used to render as the confusing
+# "Needs Rebase / Merge Gate" in the merge box instead of "Auto Merge /
+# Merge Gate".
 on:
   pull_request_target:
     # opened -- so a brand-new PR gets an immediate, explicit "Merge Gate:
@@ -69,9 +66,7 @@ jobs:
                 `PR #${prNumber} labels: [${pr.data.labels.map((l) => l.name).join(', ')}] -- merge-pool eligible: ${eligible}`,
               );
             } catch (err) {
-              // Fail closed: fail this job for this event's head SHA
-              // rather than silently leaving a possibly-stale Merge Gate
-              // conclusion in place, or guessing at eligibility.
+              // Fail closed rather than guess or leave a stale conclusion.
               determined = false;
               eligible = false;
               headSha = context.payload.pull_request.head.sha;
@@ -107,6 +102,11 @@ jobs:
       # default GITHUB_TOKEN with "Resource not accessible by integration"
       # regardless of permissions: -- use the same bot App token other
       # workflows (hold-e2e.yml, retest-e2e.yml) already generate for this.
+      # Needs contents:write too, not just pull-requests:write -- these two
+      # mutations are fundamentally a merge-capability check, and
+      # create-github-app-token@v3's permission-* inputs narrow the token
+      # to exactly what's requested here, regardless of what the App's own
+      # installation permissions allow.
       - name: Generate bot token
         id: bot-token
         continue-on-error: true
@@ -114,6 +114,7 @@ jobs:
         with:
           app-id: ${{ secrets.BOT_APP_ID }}
           private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
+          permission-contents: write
           permission-pull-requests: write
 
       - name: Enable or disable native auto-merge
@@ -126,9 +127,8 @@ jobs:
             const prNumber = '${{ steps.eligibility.outputs.number }}';
 
             if (!determined) {
-              // Eligibility is unknown -- this job will fail closed below
-              // regardless. Don't guess by toggling auto-merge either way;
-              // a later event will retry this.
+              // This job fails closed below regardless -- don't guess by
+              // toggling auto-merge; a later event will retry.
               core.info(`Skipping auto-merge toggle for PR #${prNumber} -- eligibility could not be determined this run.`);
               return;
             }
@@ -148,10 +148,9 @@ jobs:
                 );
                 core.info(`Enabled auto-merge for PR #${prNumber}.`);
               } catch (err) {
-                // Draft/already-merged PRs and similar edge cases surface
-                // as GraphQL errors here -- this job's own Merge Gate
-                // conclusion already reflects eligibility regardless, so
-                // this is UX only.
+                // Draft/already-merged PRs surface as GraphQL errors here --
+                // this job's own conclusion reflects eligibility regardless,
+                // so this is UX only.
                 core.warning(`Could not enable auto-merge for PR #${prNumber}: ${err.message}`);
               }
               return;
@@ -168,17 +167,13 @@ jobs:
               );
               core.info(`Disabled auto-merge for PR #${prNumber} (not merge-pool eligible).`);
             } catch (err) {
-              // Most common case: auto-merge was never enabled to begin
-              // with. Either way, this job's own failing conclusion (next
-              // step) is what actually blocks merge here, not this call.
+              // Most likely auto-merge was never enabled -- either way,
+              // this job's own failing conclusion (next step) is the real
+              // merge block, not this call.
               core.info(`No auto-merge to disable for PR #${prNumber} (${err.message}).`);
             }
 
-      # Runs after the auto-merge toggle above so a disable still happens
-      # for an ineligible PR before the job fails. Failing this job (rather
-      # than an API-created check-run) is what makes "Merge Gate" a native,
-      # correctly-attributed check-run under this workflow -- see the
-      # top-of-file comment for why that matters.
+      # Runs last so a disable above still happens before the job fails.
       - name: Fail if not merge-pool eligible
         if: steps.eligibility.outputs.conclusion == 'failure'
         run: |
