@@ -74,6 +74,12 @@ export const getSSHTabIds: SearchItemGetter = () => [
   { id: 'public-ssh-key', title: t('Public SSH key') },
 ];
 
+export const getMetadataTabIds: SearchItemGetter = () => [
+  { id: 'metadata', title: t('Labels and annotations') },
+  { id: 'labels', title: t('Labels') },
+  { id: 'annotations', title: t('Annotations') },
+];
+
 export const getInitialRunTabIds: SearchItemGetter = () => [
   { id: 'sysprep', title: t('Sysprep') },
   { id: 'cloud-init', title: t('Cloud-init') },
@@ -87,6 +93,7 @@ const getTabsIds = (vm: V1VirtualMachine): { [key: string]: SearchItem[] } => ({
     ...getDetailsTabMainIds(vm),
   ],
   initial: getInitialRunTabIds(vm),
+  metadata: getMetadataTabIds(vm),
   network: getNetworkTabIds(vm),
   scheduling: getSchedulingTabIds(vm),
   ssh: getSSHTabIds(vm),
