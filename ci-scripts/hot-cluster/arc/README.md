@@ -37,7 +37,7 @@ Details are in each script’s header comments.
 ## GitHub configuration
 
 - **GitHub App** (recommended): repository **Administration: Read and write**, organization **Self-hosted runners: Read and write**. Install the app on the target repo/org; use App ID, installation ID, and private key PEM.
-- **PAT**: fine-grained or classic with sufficient repo + runner permissions (see [HOT_CLUSTER_CI.md](../HOT_CLUSTER_CI.md)).
+- **PAT**: fine-grained or classic with sufficient repo + runner permissions (see [ci-scripts/README.md](../../README.md) Required GitHub Secrets).
 
 Workflows must use `runs-on:` labels that match **`RUNNER_SCALE_SET_NAME`** (default **`kubevirt-plugin-ci`**).
 
@@ -62,6 +62,6 @@ The custom runner image and its `Dockerfile` live in [`../images/`](../images/) 
 
 ## Further reading
 
-- [ci-scripts/README.md](../README.md) — secrets, multilabel, experimental chart notes.
+- [ci-scripts/README.md](../../README.md) — secrets, E2E check-run model, Prow→GHA migration.
 - [Red Hat: ARC on OpenShift](https://developers.redhat.com/articles/2025/02/17/how-securely-deploy-github-arc-openshift)
 - Upstream chart: `oci://ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set`

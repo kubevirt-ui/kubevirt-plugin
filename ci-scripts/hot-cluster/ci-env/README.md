@@ -31,7 +31,7 @@ ARC Runner                ci-env namespace              Test namespace
 2. The **controller** discovers cluster endpoints, resolves the console image,
    creates the test namespace, deploys the Helm chart, and waits for readiness.
 3. The controller patches the ConfigMap with `status: ready` and the
-   `bridge-base-address` the runner needs for Cypress.
+   `bridge-base-address` the runner needs for Playwright (or Cypress on older release branches).
 4. After tests, the runner sets `desired-state: absent` and the controller
    tears down the environment.
 
@@ -52,12 +52,14 @@ ARC Runner                ci-env namespace              Test namespace
 | `console-image` | Override console image (auto-resolved from cluster version if empty) |
 | `helm-release`  | Override Helm release name (defaults to ConfigMap name)              |
 
+Manual-console deploys (label `ci.kubevirt-plugin/type: manual-console`) also pass optional OAuth fields (`auth-mode`, `htpasswd-user`, `htpasswd-secret-name`) and are exempt from the TTL reaper. See [`manual-console/README.md`](../../manual-console/README.md).
+
 ### Controller populates (read-only for runner)
 
 | Field                 | Description                                                             |
 | --------------------- | ----------------------------------------------------------------------- |
 | `status`              | `pending` / `provisioning` / `ready` / `error` / `cleaning` / `cleaned` |
-| `bridge-base-address` | In-cluster console URL for Cypress                                      |
+| `bridge-base-address` | In-cluster console URL for Playwright / Cypress E2E                     |
 | `console-route`       | External Route URL for debugging                                        |
 | `error-message`       | Error details (only when `status=error`)                                |
 
@@ -149,9 +151,10 @@ The `ci-console` ClusterRole (required by the ci-test-stack chart) is also
 owned by this chart, so the ci-env-controller must be installed before any
 test runs.
 
-## Future Work
+## Related
 
-- **Authenticated console mode**: Return a login Secret in the ConfigMap so the
-  console can run with `BRIDGE_USER_AUTH` enabled for production-like testing.
-- **CRD evolution**: Replace ConfigMaps with a proper `CITestEnvironment` CRD
-  for structured status and validation webhooks.
+- **Authenticated (OAuth) console for humans**: implemented by
+  [manual-console](../../manual-console/README.md) (`auth-mode=openshift`), not
+  by the E2E path (`BRIDGE_USER_AUTH=disabled`).
+- **CRD evolution** (future): Replace ConfigMaps with a proper
+  `CITestEnvironment` CRD for structured status and validation webhooks.
