@@ -264,9 +264,16 @@ export default class MigrationPoliciesPage extends PageCommons {
    */
   async isPolicyVisible(policyName: string): Promise<boolean> {
     try {
-      const policyLocator = this.locator(`[data-test="policy-${policyName}"]`);
-      return await policyLocator
-        .isVisible({ timeout: TestTimeouts.UI_ELEMENT_VISIBILITY })
+      const byDataTest = this.locator(`[data-test="policy-${policyName}"]`);
+      const byDataTestVisible = await byDataTest
+        .isVisible({ timeout: TestTimeouts.UI_VISIBILITY_QUICK })
+        .catch(() => false);
+      if (byDataTestVisible) return true;
+
+      const byText = this.locator(`table a`, { hasText: policyName });
+      return await byText
+        .first()
+        .isVisible({ timeout: TestTimeouts.UI_VISIBILITY_QUICK })
         .catch(() => false);
     } catch {
       return false;

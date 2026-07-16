@@ -11,7 +11,7 @@ test.describe('Settings User Tests', { tag: [CNV_SETTINGS_TAG] }, () => {
   // ── User tab — Manage SSH keys section ───────────────────────────────────────
 
   test('SSH key management allows saving a public key to a project namespace', async ({
-    k8sClient,
+    apiClient,
     settingsPage,
     pageCommons,
     testConfig,
@@ -38,7 +38,7 @@ test.describe('Settings User Tests', { tag: [CNV_SETTINGS_TAG] }, () => {
     const secretName = utils.generateRandomName('ssh-key');
     const sshKeySaved = await settingsPage.saveSSHKey(secretName, publicKeyPath);
     if (sshKeySaved) {
-      k8sClient.trackResource('Secret', secretName, testNamespace);
+      apiClient.trackResource('Secret', secretName, testNamespace);
     }
     expect.soft(sshKeySaved, 'SSH key saved successfully').toBe(true);
   });

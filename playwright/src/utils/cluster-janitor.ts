@@ -62,6 +62,7 @@ const NAMESPACED_RESOURCE_KINDS: readonly NamespacedResourceKind[] = [
   { kind: 'vmim' },
   { kind: 'datavolume' },
   { kind: 'datasource' },
+  { kind: 'dataimportcron' },
   { kind: 'VirtualMachineSnapshot' },
   { kind: 'VirtualMachineClone' },
   { kind: 'VirtualMachineInstancetype' },
@@ -71,6 +72,10 @@ const NAMESPACED_RESOURCE_KINDS: readonly NamespacedResourceKind[] = [
   { kind: 'template' },
   { kind: 'VirtualMachineTemplate' },
   { kind: 'VirtualMachineStorageMigrationPlan' },
+  { kind: 'secret' },
+  { kind: 'configmap' },
+  { kind: 'pvc' },
+  { kind: 'service' },
 ];
 
 const CLUSTER_RESOURCE_KINDS: readonly ClusterResourceKind[] = [

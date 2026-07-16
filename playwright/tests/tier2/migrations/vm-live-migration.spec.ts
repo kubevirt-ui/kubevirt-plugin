@@ -9,7 +9,7 @@ test.describe(
   { tag: [T2_TAG, '@tier2-migration', ADMIN_ONLY_TAG] },
   () => {
     test('Live migrate a running VM to another node via the VM list kebab action', async ({
-      k8sClient,
+      apiClient,
       vmTreePage,
       vmListPage,
       utils,
@@ -21,20 +21,20 @@ test.describe(
         tags: [T2_TAG, VM_TABS_TAG],
       });
 
-      const ns = await setupTestNamespace(k8sClient, 'live-mig');
+      const ns = await setupTestNamespace(apiClient, 'live-mig');
       const vmName = utils.generateRandomVmName('live-mig');
 
-      await k8sClient.createVmFromTemplate(
+      await apiClient.createVmFromTemplate(
         utils.TEMPLATE_METADATA_NAMES.RHEL9,
         vmName,
         ns,
         'openshift',
         true,
       );
-      k8sClient.trackResource('VirtualMachine', vmName, ns);
-      await utils.waitForVirtualMachineReady(k8sClient, vmName, ns, utils.TestTimeouts.VM_BOOTUP);
+      apiClient.trackResource('VirtualMachine', vmName, ns);
+      await utils.waitForVirtualMachineReady(apiClient, vmName, ns, utils.TestTimeouts.VM_BOOTUP);
 
-      const originalNode = await k8sClient.getVmNodeName(vmName, ns);
+      const originalNode = await apiClient.getVmNodeName(vmName, ns);
 
       await vmTreePage.navigateToProjectViaTreeView(ns);
       await vmListPage.clickVmListTab();
@@ -47,12 +47,12 @@ test.describe(
       });
 
       await test.step('VM returns to Running state after migration', async () => {
-        await utils.waitForVirtualMachineReady(k8sClient, vmName, ns, utils.TestTimeouts.VM_BOOTUP);
+        await utils.waitForVirtualMachineReady(apiClient, vmName, ns, utils.TestTimeouts.VM_BOOTUP);
         await vmListPage.waitForVmStatus(vmName, 'Running');
       });
 
       await test.step('VM node changed after migration (multi-node clusters)', async () => {
-        const newNode = await k8sClient.getVmNodeName(vmName, ns);
+        const newNode = await apiClient.getVmNodeName(vmName, ns);
         test.info().annotations.push({
           type: 'migration-node-check',
           description:
@@ -64,7 +64,7 @@ test.describe(
     });
 
     test('Migrate a running VM to a specific node', async ({
-      k8sClient,
+      apiClient,
       vmTreePage,
       vmListPage,
       utils,
@@ -76,18 +76,18 @@ test.describe(
         tags: [T2_TAG, VM_TABS_TAG],
       });
 
-      const ns = await setupTestNamespace(k8sClient, 'mig-node');
+      const ns = await setupTestNamespace(apiClient, 'mig-node');
       const vmName = utils.generateRandomVmName('mig-node');
 
-      await k8sClient.createVmFromTemplate(
+      await apiClient.createVmFromTemplate(
         utils.TEMPLATE_METADATA_NAMES.FEDORA,
         vmName,
         ns,
         'openshift',
         true,
       );
-      k8sClient.trackResource('VirtualMachine', vmName, ns);
-      await utils.waitForVirtualMachineReady(k8sClient, vmName, ns, utils.TestTimeouts.VM_BOOTUP);
+      apiClient.trackResource('VirtualMachine', vmName, ns);
+      await utils.waitForVirtualMachineReady(apiClient, vmName, ns, utils.TestTimeouts.VM_BOOTUP);
 
       await vmTreePage.navigateToProjectViaTreeView(ns);
       await vmListPage.clickVmListTab();
@@ -97,7 +97,7 @@ test.describe(
       const migrated = await vmListPage.migrateVmToSpecificNode(vmName);
       expect(migrated, 'Migration to specific node should be triggered').toBe(true);
 
-      await utils.waitForVirtualMachineReady(k8sClient, vmName, ns, utils.TestTimeouts.VM_BOOTUP);
+      await utils.waitForVirtualMachineReady(apiClient, vmName, ns, utils.TestTimeouts.VM_BOOTUP);
       await vmListPage.waitForVmStatus(vmName, 'Running');
     });
   },

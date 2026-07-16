@@ -52,7 +52,7 @@ export async function createApiClientFromToken(token?: string): Promise<RequestC
   const { getStorageStatePath } = await import('@/utils/storage-state');
   const testConfig = TestConfigManager.getConfig();
   const effectiveToken = token || testConfig.authToken || '';
-  const playwrightDir = path.resolve(__dirname, '..');
+  const playwrightDir = path.resolve(__dirname, '..', '..');
   const storageStatePath = getStorageStatePath(playwrightDir);
 
   const apiContext = await request.newContext({

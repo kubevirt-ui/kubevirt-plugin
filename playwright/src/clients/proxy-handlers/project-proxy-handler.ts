@@ -28,10 +28,7 @@ export class ProjectProxyHandler {
 
   async deleteProject(name: string): Promise<KubernetesResource | null> {
     try {
-      return await this.ctx._request(
-        'delete',
-        `/kubernetes/apis/project.openshift.io/v1/projects/${name}`,
-      );
+      return await this.ctx._request('delete', `/kubernetes/api/v1/namespaces/${name}`);
     } catch (error: unknown) {
       const msg = error instanceof Error ? error.message : String(error);
       if (msg.includes('404') || msg.includes('not found') || msg.includes('NotFound')) {

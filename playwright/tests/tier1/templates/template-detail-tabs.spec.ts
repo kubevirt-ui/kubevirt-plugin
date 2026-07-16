@@ -16,7 +16,7 @@ test.describe(SUITE, { tag: [T1_TAG, '@tier1-templates'] }, () => {
       vmListPage,
       vmWizardNavigationPage,
       templatesPage,
-      k8sClient,
+      apiClient,
       testConfig,
       utils,
     }) => {
@@ -37,7 +37,7 @@ test.describe(SUITE, { tag: [T1_TAG, '@tier1-templates'] }, () => {
       await templatesPage.clickCreateTemplate();
       await templatesPage.setCreateTemplateExampleNameInYamlEditor(exampleTemplateName);
       await templatesPage.clickCreateButtonInModal();
-      k8sClient.trackResource('Template', exampleTemplateName, namespace);
+      apiClient.trackResource('Template', exampleTemplateName, namespace);
 
       const templateNameUser = utils.generateRandomTemplateName('user-template');
       const templateDisplayNameUser = `user-template ${utils.generateRandomString(
@@ -50,14 +50,14 @@ test.describe(SUITE, { tag: [T1_TAG, '@tier1-templates'] }, () => {
         name: templateNameUser,
         namespace,
       });
-      await k8sClient.createCustomResource(
+      await apiClient.createCustomResource(
         'template.openshift.io',
         'v1',
         namespace,
         'templates',
         userTplResource,
       );
-      k8sClient.trackResource('Template', templateNameUser, namespace);
+      apiClient.trackResource('Template', templateNameUser, namespace);
 
       const templateNameProject = utils.generateRandomTemplateName('default-template');
       const templateDisplayNameProject = `default-template ${utils.generateRandomString(
@@ -71,14 +71,14 @@ test.describe(SUITE, { tag: [T1_TAG, '@tier1-templates'] }, () => {
         namespace,
       });
       const parsedProjectTpl = yamlLoad(templateYaml) as Record<string, unknown>;
-      await k8sClient.createCustomResource(
+      await apiClient.createCustomResource(
         'template.openshift.io',
         'v1',
         namespace,
         'templates',
         parsedProjectTpl,
       );
-      k8sClient.trackResource('Template', templateNameProject, namespace);
+      apiClient.trackResource('Template', templateNameProject, namespace);
 
       await test.step('Create template from example', async () => {
         const isCreated = await templatesPage.verifyTemplateCreationFromExample('Template details');
@@ -97,7 +97,7 @@ test.describe(SUITE, { tag: [T1_TAG, '@tier1-templates'] }, () => {
       await vmWizardNavigationPage.clickNext();
 
       await test.step('User template visible in catalog', async () => {
-        const verifyResult = await k8sClient.verifyTemplateCreated(templateNameUser, namespace);
+        const verifyResult = await apiClient.verifyTemplateCreated(templateNameUser, namespace);
         expect.soft(verifyResult.exists, `Template ${templateNameUser} created`).toBe(true);
 
         await createVmPage.clickUserProvidedTab();
@@ -106,7 +106,7 @@ test.describe(SUITE, { tag: [T1_TAG, '@tier1-templates'] }, () => {
       });
 
       await test.step('Template visible per project', async () => {
-        const verifyResult = await k8sClient.verifyTemplateCreated(templateNameProject, namespace);
+        const verifyResult = await apiClient.verifyTemplateCreated(templateNameProject, namespace);
         expect.soft(verifyResult.exists, `Template ${templateNameProject} exists`).toBe(true);
 
         await createVmPage.selectProjectFromCatalog(namespace);
@@ -118,7 +118,7 @@ test.describe(SUITE, { tag: [T1_TAG, '@tier1-templates'] }, () => {
   );
 
   test('Custom template detail page shows all tabs with expected content', async ({
-    k8sClient,
+    apiClient,
     overviewPage,
     templatesPage,
     templateDetailPage,
@@ -131,19 +131,19 @@ test.describe(SUITE, { tag: [T1_TAG, '@tier1-templates'] }, () => {
       tags: [T1_TAG, 'template-tabs'],
     });
 
-    const namespace = await setupTestNamespace(k8sClient, 't1-tpl-detail');
+    const namespace = await setupTestNamespace(apiClient, 't1-tpl-detail');
     const templateName = utils.generateRandomTemplateName('t1-tpl-tabs');
 
     const templateResource = buildTemplateDetailResource(templateName, namespace);
 
-    await k8sClient.createCustomResource(
+    await apiClient.createCustomResource(
       'template.openshift.io',
       'v1',
       namespace,
       'templates',
       templateResource,
     );
-    k8sClient.trackResource('Template', templateName, namespace);
+    apiClient.trackResource('Template', templateName, namespace);
 
     await overviewPage.navigateToVirtualizationOverviewViaUI();
     await templatesPage.navigateToTemplatesViaUI();
@@ -155,6 +155,12 @@ test.describe(SUITE, { tag: [T1_TAG, '@tier1-templates'] }, () => {
     await templatesPage.filterTemplatesByName(templateName);
     await templatesPage.clickTemplateByTestId(templateName);
 
+    expect
+      .soft(
+        await templateDetailPage.isTemplateNameVisible(templateName),
+        'Template name should be visible on the detail page',
+      )
+      .toBe(true);
     expect.soft(await templateDetailPage.verifyDisplayName(), 'Display name visible').toBe(true);
 
     await templateDetailPage.navigateToYAML();
@@ -178,5 +184,17 @@ test.describe(SUITE, { tag: [T1_TAG, '@tier1-templates'] }, () => {
     expect
       .soft(await templateDetailPage.verifyCloudUserPassword(), 'CLOUD_USER_PASSWORD visible')
       .toBe(true);
+
+    await templateDetailPage.clickActionsDropdown();
+
+    const cloneItem = templateDetailPage.page.getByRole('menuitem', { name: 'Clone' });
+    const deleteItem = templateDetailPage.page.getByRole('menuitem', { name: 'Delete' });
+
+    await expect.soft(cloneItem, 'Clone action should be visible for user templates').toBeVisible();
+    await expect
+      .soft(deleteItem, 'Delete action should be visible for user templates')
+      .toBeVisible();
+
+    await templateDetailPage.page.keyboard.press('Escape');
   });
 });

@@ -331,11 +331,10 @@ export function getClusterTeardownRules(): TeardownRule[] {
             return;
           }
 
-          const basePrefix = EnvVariables.testNamespace;
           const matchingNamespaces = namespaceItems.filter((ns) => {
             const name = ns.metadata?.name;
             if (!name || name === ctx.testNamespace) return false;
-            return name === basePrefix || name.startsWith(`${basePrefix}-`);
+            return name.startsWith('pw-');
           });
 
           if (matchingNamespaces.length === 0) {

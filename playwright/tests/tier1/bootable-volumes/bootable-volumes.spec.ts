@@ -13,15 +13,15 @@ test.describe('Tier1 Virtualization Bootable Volumes Page Tests', { tag: [T1_TAG
   test(
     'Bootable volume created with architecture annotation shows correct architecture in list column',
     { tag: ['@nonpriv'] },
-    async ({ bootableVolumesPage, k8sClient, utils }) => {
+    async ({ bootableVolumesPage, apiClient, utils }) => {
       await utils.withAllure({ suite: SUITE, feature: T1, tags: [T1_TAG] });
 
-      const ns = await setupTestNamespace(k8sClient, 'bv-arch-annotation');
+      const ns = await setupTestNamespace(apiClient, 'bv-arch-annotation');
       await bootableVolumesPage.navigateToNamespaceBootableVolumesViaUI(ns);
 
       const { dataVolumeName } = await createDataVolumeWithYamlViaUi(
         bootableVolumesPage,
-        k8sClient,
+        apiClient,
         ns,
         'bv-arch',
         utils,
@@ -62,16 +62,16 @@ test.describe('Tier1 Bootable Volumes - Manage source row action', { tag: [T1_TA
   test(
     'Manage source row action opens the modal and allows editing the source configuration',
     { tag: ['@nonpriv'] },
-    async ({ k8sClient, bootableVolumesPage, utils }) => {
+    async ({ apiClient, bootableVolumesPage, utils }) => {
       await utils.withAllure({
         suite: SUITE,
         feature: T1,
         tags: [T1_TAG],
       });
       const ns = utils.generateTestNamespace('bv-manage-source');
-      await k8sClient.createNamespace(ns);
-      await k8sClient.waitForNamespaceReady(ns);
-      k8sClient.trackResource('Namespace', ns);
+      await apiClient.createNamespace(ns);
+      await apiClient.waitForNamespaceReady(ns);
+      apiClient.trackResource('Namespace', ns);
 
       const dvName = utils.generateRandomDataVolumeName('bv-manage-src');
 
@@ -79,7 +79,7 @@ test.describe('Tier1 Bootable Volumes - Manage source row action', { tag: [T1_TA
       // CDI automatically creates the managed DataSource (with the cdi.kubevirt.io/dataImportCron
       // label) when a DataImportCron is created, making the row appear in the BV list with
       // the "Manage source" action enabled.
-      await k8sClient.createCustomResource('cdi.kubevirt.io', 'v1beta1', ns, 'dataimportcrons', {
+      await apiClient.createCustomResource('cdi.kubevirt.io', 'v1beta1', ns, 'dataimportcrons', {
         apiVersion: 'cdi.kubevirt.io/v1beta1',
         kind: 'DataImportCron',
         metadata: {
@@ -114,14 +114,14 @@ test.describe('Tier1 Bootable Volumes - Manage source row action', { tag: [T1_TA
           },
         },
       });
-      // DataImportCron cleanup is handled by namespace deletion (namespace is tracked above)
+      apiClient.trackResource('DataImportCron', dvName, ns);
 
       // CDI auto-creates the DataSource; wait for it to appear in the API
       await expect
         .poll(
           () =>
-            k8sClient
-              .getCustomResource('cdi.kubevirt.io', 'v1beta1', ns, 'datasources', dvName)
+            apiClient
+              .getResourceByKind('datasource', dvName, ns)
               .then(() => true)
               .catch(() => false),
           { timeout: utils.TestTimeouts.DEFAULT, intervals: [1000, 2000, 3000] },

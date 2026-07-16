@@ -24,8 +24,7 @@ Run Playwright tests, analyze failures, fix test code issues, and re-run until s
 
 1. Verify the environment is configured:
    ```bash
-   source .env 2>/dev/null
-   echo "Console URL: ${WEB_CONSOLE_URL:-not set}"
+   echo "Console URL: $(grep -m1 '^WEB_CONSOLE_URL=' .env 2>/dev/null | cut -d= -f2- || echo 'not set')"
    ```
 2. Check for stale test namespaces (if `oc` is available):
    ```bash
@@ -108,6 +107,13 @@ For `test_bug` classified failures:
 - Every `test()` must call `utils.withAllure(...)` with suite, feature, and tags
 - Use allure constants from `@/data-models/allure-constants`
 
+#### Navigation rules
+
+- **No direct URL navigation** — never use `page.goto()` or `goTo()` in specs
+- Tests must navigate via the **Virtualization perspective switcher** and then use the **sidebar** for module-specific navigation
+- Use page object methods like `navigateToProjectViaTreeView()`, `navigateToVmViaTreeView()`, `clickNavBootableVolumes()`, etc.
+- The `_autoVirtNavigation` auto-fixture handles initial console load and perspective switching
+
 #### Locator strategy
 
 1. Prefer `[data-test="..."]` and `[data-test-id="..."]` attributes
@@ -172,6 +178,43 @@ Remaining failures: <list with classification>
 | `HC_E2E=1`             | Hot cluster mode (namespace reuse) |
 | `IS_LOCAL=true`        | Local development mode             |
 
+## Test Tier Definitions
+
+| Tier     | Scope                                                                                                             | Where to add new tests   |
+| -------- | ----------------------------------------------------------------------------------------------------------------- | ------------------------ |
+| Gating   | Basic navigation + page load verification for each major route; resource creation (form + YAML) per module        | `tests/gating/`          |
+| Tier 1   | Single-resource CRUD lifecycle for each module; VM tab configuration; does NOT overlap gating                     | `tests/tier1/<feature>/` |
+| Tier 2   | Cross-module integration (e.g. BV → VM wizard, snapshot → clone); VM live/storage migration; multi-step workflows | `tests/tier2/<feature>/` |
+| Settings | Cluster and user settings                                                                                         | `tests/settings/`        |
+
+### Current test file map
+
+```
+tests/
+├── gating/
+│   ├── scenario-virtualization-pages.spec.ts   # Page load + navigation verification
+│   └── scenario-resource-creation.spec.ts      # VM, template, BV creation (form + YAML)
+├── tier1/
+│   ├── bootable-volumes/                       # BV list, create, delete
+│   ├── checkups/                               # Network/storage checkup lifecycle
+│   ├── create-vm/                              # VM wizard (template, custom config)
+│   ├── instanceTypes/                          # Instance type CRUD
+│   ├── migrationpolicies/                      # Migration policy CRUD
+│   ├── templates/                              # Template creation, detail tabs, lifecycle
+│   └── virtualmachines/
+│       ├── vm-actions/                         # VM lifecycle actions, delete
+│       └── vm-tabs/                            # Configuration, diagnostics, disks, overview
+├── tier2/
+│   ├── bootable-volumes/                       # BV cross-module (API → UI list → cleanup)
+│   ├── create-vm/                              # Clone wizard (clone existing VM)
+│   ├── migrations/                             # Live migration, storage migration
+│   └── virtualmachines/                        # Snapshots (take/restore/clone), VM clone
+└── settings/
+    ├── aaq-quotas.spec.ts                      # AAQ quota settings
+    ├── cluster-settings.spec.ts                # Cluster-level settings
+    └── user-settings.spec.ts                   # User preferences
+```
+
 ## Project Structure Reference
 
 ```
@@ -204,7 +247,8 @@ playwright/
 - **Use `TestTimeouts.*` constants** — never inline timeout numbers
 - **Use allure constants** from `@/data-models/allure-constants` — never raw strings
 - **Verify via API** — use `apiClient` (`RequestContextClient`) to check K8s state after UI actions
-- **All API calls go through the console proxy** — `RequestContextClient` routes all requests through the console proxy with the authenticated user's permissions. No `oc` CLI or `@kubernetes/client-node` is used.
+- **All API calls go through the console proxy** — `RequestContextClient` routes all requests through the console proxy with the authenticated user's permissions. Never use `oc` CLI, `@kubernetes/client-node`, or direct cluster access in tests.
+- **No direct URL navigation** — never use `page.goto()` or `goTo()` in specs; always navigate through the Virtualization perspective switcher and sidebar
 - **Single process only** — use `--workers=N`, never concurrent test invocations
 - Report `product_bug` findings without modifying the test — the test is correct, the app is wrong
 - Always run `npm run check-types:playwright` after changes

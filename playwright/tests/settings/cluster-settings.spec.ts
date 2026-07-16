@@ -120,7 +120,7 @@ test.describe('Cluster Settings', { tag: [CNV_SETTINGS_TAG, '@adminOnly'] }, () 
 
   test('Live migration limits can be set via UI and are reflected in the cluster', async ({
     settingsPage,
-    k8sClient,
+    apiClient,
     utils,
   }) => {
     utils.withAllure({ suite: SUITE, feature: CNV_SETTINGS_FEATURE, tags: [CNV_SETTINGS_TAG] });
@@ -131,20 +131,16 @@ test.describe('Cluster Settings', { tag: [CNV_SETTINGS_TAG, '@adminOnly'] }, () 
     );
 
     await expect(async () => {
-      const limits = await k8sClient.verifyLiveMigrationLimits(
-        utils.MIGRATION_CONFIG.PARALLEL_PER_CLUSTER,
-        utils.MIGRATION_CONFIG.PARALLEL_PER_NODE,
+      const limits = await apiClient.verifyLiveMigrationLimits(
+        Number(utils.MIGRATION_CONFIG.PARALLEL_PER_CLUSTER),
+        Number(utils.MIGRATION_CONFIG.PARALLEL_PER_NODE),
       );
       expect
         .soft(
-          limits.parallelMigrationsPerCluster,
-          `Cluster limit should be ${utils.MIGRATION_CONFIG.PARALLEL_PER_CLUSTER}, got ${limits.actualParallelMigrationsPerCluster}`,
+          limits.allMatch,
+          `Cluster limit should be ${utils.MIGRATION_CONFIG.PARALLEL_PER_CLUSTER}, got ${limits.actualParallelMigrations}`,
         )
         .toBe(true);
-      expect(
-        limits.parallelOutboundMigrationsPerNode,
-        `Node limit should be ${utils.MIGRATION_CONFIG.PARALLEL_PER_NODE}, got ${limits.actualParallelOutboundMigrationsPerNode}`,
-      ).toBe(true);
     }).toPass({ intervals: [2_000, 3_000, 5_000], timeout: 20_000 });
   });
 
@@ -202,7 +198,7 @@ test.describe('Cluster Settings', { tag: [CNV_SETTINGS_TAG, '@adminOnly'] }, () 
 
   test('Hide YAML tab toggle persists after enabling and can be restored via API', async ({
     settingsPage,
-    k8sClient,
+    apiClient,
     utils,
   }) => {
     utils.withAllure({
@@ -211,9 +207,16 @@ test.describe('Cluster Settings', { tag: [CNV_SETTINGS_TAG, '@adminOnly'] }, () 
       tags: [CNV_SETTINGS_TAG, 'settings', 'hide-yaml-tab'],
     });
 
-    await k8sClient.patchConfigMap('kubevirt-ui-features', utils.EnvVariables.cnvNamespace, {
-      hideYamlTab: 'false',
-    });
+    await apiClient.mergePatchResource(
+      '',
+      'v1',
+      'configmaps',
+      'kubevirt-ui-features',
+      {
+        data: { hideYamlTab: 'false' },
+      },
+      utils.EnvVariables.cnvNamespace,
+    );
 
     await settingsPage.navigateToGeneralSettings();
 
@@ -222,7 +225,7 @@ test.describe('Cluster Settings', { tag: [CNV_SETTINGS_TAG, '@adminOnly'] }, () 
       expect.soft(toggledOn, 'hideYamlTab toggle should succeed').toBe(true);
 
       await expect(async () => {
-        const cm = await k8sClient.getConfigMap(
+        const cm = await apiClient.getConfigMap(
           'kubevirt-ui-features',
           utils.EnvVariables.cnvNamespace,
         );
@@ -235,7 +238,7 @@ test.describe('Cluster Settings', { tag: [CNV_SETTINGS_TAG, '@adminOnly'] }, () 
       expect.soft(toggledOff, 'hideYamlTab toggle off should succeed').toBe(true);
 
       await expect(async () => {
-        const cm = await k8sClient.getConfigMap(
+        const cm = await apiClient.getConfigMap(
           'kubevirt-ui-features',
           utils.EnvVariables.cnvNamespace,
         );
@@ -244,9 +247,16 @@ test.describe('Cluster Settings', { tag: [CNV_SETTINGS_TAG, '@adminOnly'] }, () 
         expect(cmValue, 'hideYamlTab should be "false" in configmap').toBe('false');
       }).toPass({ intervals: [1_000, 2_000, 3_000], timeout: 15_000 });
     } finally {
-      await k8sClient.patchConfigMap('kubevirt-ui-features', utils.EnvVariables.cnvNamespace, {
-        hideYamlTab: 'false',
-      });
+      await apiClient.mergePatchResource(
+        '',
+        'v1',
+        'configmaps',
+        'kubevirt-ui-features',
+        {
+          data: { hideYamlTab: 'false' },
+        },
+        utils.EnvVariables.cnvNamespace,
+      );
     }
   });
 

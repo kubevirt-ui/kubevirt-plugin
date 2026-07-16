@@ -20,6 +20,7 @@ import LoginPage from '@/page-objects/cluster/login-page';
 import { EnvVariables } from '@/utils/env-variables';
 import { FileUtils } from '@/utils/file-utils';
 import { logger } from '@/utils/logger';
+import { fetchOAuthToken } from '@/utils/oauth-token';
 import { getStorageStatePath } from '@/utils/storage-state';
 import { TestConfigManager, TestTimeouts } from '@/utils/test-config';
 import type { BrowserContext, Page } from '@playwright/test';
@@ -143,7 +144,6 @@ export async function refreshApiToken(): Promise<boolean> {
   }
 
   try {
-    const { fetchOAuthToken } = await import('@/utils/oauth-token');
     const token = await fetchOAuthToken(clusterUrl, username, password);
     if (!token) return false;
 

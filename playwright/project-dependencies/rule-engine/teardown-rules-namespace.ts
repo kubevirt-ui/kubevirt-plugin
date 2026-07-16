@@ -41,10 +41,20 @@ export function getNamespaceTeardownRules(): TeardownRule[] {
                 'vm',
                 name,
                 {
-                  metadata: { labels: { 'kubevirt.io/delete-protection': null } },
+                  metadata: {
+                    labels: {
+                      'kubevirt.io/vm-delete-protection': null,
+                      'kubevirt.io/delete-protection': null,
+                    },
+                  },
                   spec: {
                     template: {
-                      metadata: { labels: { 'kubevirt.io/delete-protection': null } },
+                      metadata: {
+                        labels: {
+                          'kubevirt.io/vm-delete-protection': null,
+                          'kubevirt.io/delete-protection': null,
+                        },
+                      },
                     },
                   },
                 },

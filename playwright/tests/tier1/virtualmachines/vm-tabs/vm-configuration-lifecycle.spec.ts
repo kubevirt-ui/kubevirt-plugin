@@ -1,16 +1,16 @@
-import { T2, T2_TAG, VM_TABS_TAG } from '@/data-models/allure-constants';
+import { T1, T1_TAG, VM_TABS_TAG } from '@/data-models/allure-constants';
 import { expect, test } from '@/fixtures/vm-tabs-fixture';
 
-test.describe('VM full lifecycle: start, pause, unpause, restart, stop', { tag: [T2_TAG] }, () => {
+test.describe('VM full lifecycle: start, pause, unpause, restart, stop', { tag: [T1_TAG] }, () => {
   test(
     'VM lifecycle transitions through all states via actions dropdown',
     { tag: ['@nonpriv'] },
-    async ({ k8sClient, vmListPage, vmDetailPage, pageCommons, utils, testConfig }) => {
+    async ({ apiClient, vmListPage, vmDetailPage, pageCommons, utils, testConfig }) => {
       test.setTimeout(utils.TestTimeouts.TEST_EXTENDED);
       await utils.withAllure({
         suite: 'VM lifecycle actions',
-        feature: T2,
-        tags: [T2_TAG, VM_TABS_TAG, '@nonpriv'],
+        feature: T1,
+        tags: [T1_TAG, VM_TABS_TAG, '@nonpriv'],
       });
 
       const namespace = utils.EnvVariables.isNonPrivUser
@@ -18,35 +18,35 @@ test.describe('VM full lifecycle: start, pause, unpause, restart, stop', { tag: 
         : utils.generateTestNamespace('vm-lifecycle');
       const vmName = utils.generateRandomVmName('vm-lifecycle');
       if (!utils.EnvVariables.isNonPrivUser) {
-        await k8sClient.createNamespace(namespace);
-        await k8sClient.waitForNamespaceReady(namespace);
-        k8sClient.trackResource('Namespace', namespace);
+        await apiClient.createNamespace(namespace);
+        await apiClient.waitForNamespaceReady(namespace);
+        apiClient.trackResource('Namespace', namespace);
       }
 
-      await k8sClient.createVmFromTemplate(
+      await apiClient.createVmFromTemplate(
         utils.TEMPLATE_METADATA_NAMES.FEDORA,
         vmName,
         namespace,
         'openshift',
         true,
       );
-      k8sClient.trackResource('VirtualMachine', vmName, namespace);
+      apiClient.trackResource('VirtualMachine', vmName, namespace);
       await utils.waitForVirtualMachineReady(
-        k8sClient,
+        apiClient,
         vmName,
         namespace,
         utils.TestTimeouts.VM_BOOTUP,
       );
 
-      await k8sClient.stopVm(vmName, namespace);
+      await apiClient.stopVm(namespace, vmName);
       await utils.waitForVirtualMachineStopped(
-        k8sClient,
+        apiClient,
         vmName,
         namespace,
         utils.TestTimeouts.VM_BOOTUP,
       );
 
-      await vmListPage.navigateToAllNamespacesVirtualMachines();
+      await vmListPage.navigateToVirtualMachinesViaUI();
       await vmListPage.tryCloseWelcomeModal();
       await vmListPage.toggleEmptyProjectsDisplay(true);
       await vmListPage.searchTreeView(namespace);
@@ -59,7 +59,7 @@ test.describe('VM full lifecycle: start, pause, unpause, restart, stop', { tag: 
 
       await vmDetailPage.startVmFromActionsDropdown();
       await utils.waitForVirtualMachineReady(
-        k8sClient,
+        apiClient,
         vmName,
         namespace,
         utils.TestTimeouts.VM_BOOTUP,
@@ -70,7 +70,7 @@ test.describe('VM full lifecycle: start, pause, unpause, restart, stop', { tag: 
 
       await vmDetailPage.pauseVmFromActionsDropdown();
       await utils.waitForVirtualMachinePaused(
-        k8sClient,
+        apiClient,
         vmName,
         namespace,
         utils.TestTimeouts.VM_BOOTUP,
@@ -81,7 +81,7 @@ test.describe('VM full lifecycle: start, pause, unpause, restart, stop', { tag: 
 
       await vmDetailPage.unpauseVmFromActionsDropdown();
       await utils.waitForVirtualMachineReady(
-        k8sClient,
+        apiClient,
         vmName,
         namespace,
         utils.TestTimeouts.VM_BOOTUP,
@@ -92,7 +92,7 @@ test.describe('VM full lifecycle: start, pause, unpause, restart, stop', { tag: 
 
       await vmDetailPage.restartVmFromActionsDropdown();
       await utils.waitForVirtualMachineReady(
-        k8sClient,
+        apiClient,
         vmName,
         namespace,
         utils.TestTimeouts.VM_BOOTUP,
@@ -103,7 +103,7 @@ test.describe('VM full lifecycle: start, pause, unpause, restart, stop', { tag: 
 
       await vmDetailPage.stopVmFromActionsDropdown();
       await utils.waitForVirtualMachineStopped(
-        k8sClient,
+        apiClient,
         vmName,
         namespace,
         utils.TestTimeouts.VM_BOOTUP,
@@ -115,16 +115,16 @@ test.describe('VM full lifecycle: start, pause, unpause, restart, stop', { tag: 
   );
 });
 
-test.describe('VM Configuration — startInPause and CPU/memory lifecycle', { tag: [T2_TAG] }, () => {
+test.describe('VM Configuration — startInPause and CPU/memory lifecycle', { tag: [T1_TAG] }, () => {
   test(
     'Headless mode toggle and startInPause on Fedora VM',
     { tag: ['@nonpriv'] },
-    async ({ k8sClient, vmTreePage, vmDetailPage, pageCommons, utils, testConfig }) => {
+    async ({ apiClient, vmTreePage, vmDetailPage, pageCommons, utils, testConfig }) => {
       test.setTimeout(utils.TestTimeouts.TEST_EXTENDED);
       await utils.withAllure({
         suite: 'VM Configuration lifecycle',
-        feature: T2,
-        tags: [T2_TAG, VM_TABS_TAG],
+        feature: T1,
+        tags: [T1_TAG, VM_TABS_TAG],
       });
 
       const namespace = utils.EnvVariables.isNonPrivUser
@@ -133,21 +133,21 @@ test.describe('VM Configuration — startInPause and CPU/memory lifecycle', { ta
       const vmName = utils.generateRandomVmName('vm-cfg-fedora');
 
       if (!utils.EnvVariables.isNonPrivUser) {
-        await k8sClient.createNamespace(namespace);
-        await k8sClient.waitForNamespaceReady(namespace);
-        k8sClient.trackResource('Namespace', namespace);
+        await apiClient.createNamespace(namespace);
+        await apiClient.waitForNamespaceReady(namespace);
+        apiClient.trackResource('Namespace', namespace);
       }
 
-      await k8sClient.createVmFromTemplate(
+      await apiClient.createVmFromTemplate(
         utils.TEMPLATE_METADATA_NAMES.FEDORA,
         vmName,
         namespace,
         'openshift',
         true,
       );
-      k8sClient.trackResource('VirtualMachine', vmName, namespace);
+      apiClient.trackResource('VirtualMachine', vmName, namespace);
       await utils.waitForVirtualMachineReady(
-        k8sClient,
+        apiClient,
         vmName,
         namespace,
         utils.TestTimeouts.VM_BOOTUP,
@@ -174,7 +174,7 @@ test.describe('VM Configuration — startInPause and CPU/memory lifecycle', { ta
       await vmTreePage.clickTreeNodeAndEnsureExpanded(namespace, vmName, namespace);
       await vmTreePage.clickVmInTreeView(vmName, namespace);
       await utils.waitForVirtualMachinePaused(
-        k8sClient,
+        apiClient,
         vmName,
         namespace,
         utils.TestTimeouts.VM_BOOTUP,
@@ -190,12 +190,12 @@ test.describe('VM Configuration — startInPause and CPU/memory lifecycle', { ta
   test(
     'Increase CPU and memory, restart VM, and verify VMI reflects changes',
     { tag: ['@nonpriv'] },
-    async ({ k8sClient, vmTreePage, vmDetailPage, utils, testConfig }) => {
+    async ({ apiClient, vmTreePage, vmDetailPage, utils, testConfig }) => {
       test.setTimeout(utils.TestTimeouts.TEST_EXTENDED);
       await utils.withAllure({
         suite: 'VM Configuration lifecycle',
-        feature: T2,
-        tags: [T2_TAG, VM_TABS_TAG],
+        feature: T1,
+        tags: [T1_TAG, VM_TABS_TAG],
       });
 
       const namespace = utils.EnvVariables.isNonPrivUser
@@ -204,21 +204,21 @@ test.describe('VM Configuration — startInPause and CPU/memory lifecycle', { ta
       const vmName = utils.generateRandomVmName('vm-cfg-cpu');
 
       if (!utils.EnvVariables.isNonPrivUser) {
-        await k8sClient.createNamespace(namespace);
-        await k8sClient.waitForNamespaceReady(namespace);
-        k8sClient.trackResource('Namespace', namespace);
+        await apiClient.createNamespace(namespace);
+        await apiClient.waitForNamespaceReady(namespace);
+        apiClient.trackResource('Namespace', namespace);
       }
 
-      await k8sClient.createVmFromTemplate(
+      await apiClient.createVmFromTemplate(
         utils.TEMPLATE_METADATA_NAMES.RHEL9,
         vmName,
         namespace,
         'openshift',
         true,
       );
-      k8sClient.trackResource('VirtualMachine', vmName, namespace);
+      apiClient.trackResource('VirtualMachine', vmName, namespace);
       await utils.waitForVirtualMachineReady(
-        k8sClient,
+        apiClient,
         vmName,
         namespace,
         utils.TestTimeouts.VM_BOOTUP,
@@ -228,26 +228,26 @@ test.describe('VM Configuration — startInPause and CPU/memory lifecycle', { ta
       await vmDetailPage.navigateToConfigurationDetails();
       await vmDetailPage.increaseCpuAndMemory();
 
-      await k8sClient.stopVm(vmName, namespace);
+      await apiClient.stopVm(namespace, vmName);
       await utils.waitForVirtualMachineStopped(
-        k8sClient,
+        apiClient,
         vmName,
         namespace,
         utils.TestTimeouts.VM_RUNNING,
       );
-      await k8sClient.startVm(vmName, namespace);
+      await apiClient.startVm(namespace, vmName);
       await utils.waitForVirtualMachineReady(
-        k8sClient,
+        apiClient,
         vmName,
         namespace,
         utils.TestTimeouts.VM_RUNNING,
       );
 
-      const cpuSockets = await k8sClient.getVmiCpuSockets(vmName, namespace);
-      expect.soft(cpuSockets, 'VMI CPU sockets should be 2').toBe('2');
+      const cpuSockets = await apiClient.getVmiCpuSockets(vmName, namespace);
+      expect.soft(Number(cpuSockets), 'VMI CPU sockets should be 2').toBe(2);
 
-      const memoryGuest = await k8sClient.getVmiMemoryGuest(vmName, namespace);
-      expect.soft(memoryGuest, 'VMI memory guest should contain 3Gi').toContain('3Gi');
+      const memoryGuest = await apiClient.getVmiMemoryGuest(vmName, namespace);
+      expect.soft(String(memoryGuest), 'VMI memory guest should contain 3Gi').toContain('3Gi');
     },
   );
 });

@@ -8,8 +8,8 @@ test.describe(
   'VM storage migration wizard',
   { tag: [T2_TAG, '@tier2-storage-migration', ADMIN_ONLY_TAG] },
   () => {
-    test.beforeEach(async ({ k8sClient, utils }) => {
-      const storageMigrationAvailable = await k8sClient.isStorageMigrationAvailable();
+    test.beforeEach(async ({ apiClient, utils }) => {
+      const storageMigrationAvailable = await apiClient.isStorageMigrationAvailable();
       test.skip(!storageMigrationAvailable, 'Storage migration CRD not available on this cluster');
       await utils.withAllure({
         suite: SUITE,
@@ -19,25 +19,25 @@ test.describe(
     });
 
     test('Open storage migration modal, verify wizard steps, and close', async ({
-      k8sClient,
+      apiClient,
       vmTreePage,
       vmListPage,
       utils,
     }) => {
       test.setTimeout(utils.TestTimeouts.TEST_EXTENDED);
 
-      const ns = await setupTestNamespace(k8sClient, 'stor-mig-modal');
+      const ns = await setupTestNamespace(apiClient, 'stor-mig-modal');
       const vmName = utils.generateRandomVmName('stor-mig');
 
-      await k8sClient.createVmFromTemplate(
+      await apiClient.createVmFromTemplate(
         utils.TEMPLATE_METADATA_NAMES.RHEL9,
         vmName,
         ns,
         'openshift',
         true,
       );
-      k8sClient.trackResource('VirtualMachine', vmName, ns);
-      await utils.waitForVirtualMachineReady(k8sClient, vmName, ns, utils.TestTimeouts.VM_BOOTUP);
+      apiClient.trackResource('VirtualMachine', vmName, ns);
+      await utils.waitForVirtualMachineReady(apiClient, vmName, ns, utils.TestTimeouts.VM_BOOTUP);
 
       await vmTreePage.navigateToProjectViaTreeView(ns);
       await vmListPage.clickVmListTab();
@@ -67,29 +67,25 @@ test.describe(
     });
 
     test('Perform full storage class migration and verify completion', async ({
-      k8sClient,
+      apiClient,
       vmTreePage,
       vmListPage,
       utils,
     }) => {
       test.setTimeout(utils.TestTimeouts.TEST_EXTENDED);
 
-      const ns = await setupTestNamespace(k8sClient, 'stor-mig-full');
+      const ns = await setupTestNamespace(apiClient, 'stor-mig-full');
       const vmName = utils.generateRandomVmName('stor-mig-full');
 
-      await k8sClient.createVmFromTemplate(
+      await apiClient.createVmFromTemplate(
         utils.TEMPLATE_METADATA_NAMES.RHEL9,
         vmName,
         ns,
         'openshift',
         true,
-        undefined,
-        undefined,
-        undefined,
-        utils.STORAGE_CLASSES.OCS_STORAGECLUSTER_CEPH_RBD_VIRTUALIZATION,
       );
-      k8sClient.trackResource('VirtualMachine', vmName, ns);
-      await utils.waitForVirtualMachineReady(k8sClient, vmName, ns, utils.TestTimeouts.VM_BOOTUP);
+      apiClient.trackResource('VirtualMachine', vmName, ns);
+      await utils.waitForVirtualMachineReady(apiClient, vmName, ns, utils.TestTimeouts.VM_BOOTUP);
 
       await vmTreePage.navigateToProjectViaTreeView(ns);
       await vmListPage.clickVmListTab();
@@ -98,25 +94,25 @@ test.describe(
     });
 
     test('Start storage migration and cancel while in progress', async ({
-      k8sClient,
+      apiClient,
       vmTreePage,
       vmListPage,
       utils,
     }) => {
       test.setTimeout(utils.TestTimeouts.TEST_EXTENDED);
 
-      const ns = await setupTestNamespace(k8sClient, 'stor-mig-cancel');
+      const ns = await setupTestNamespace(apiClient, 'stor-mig-cancel');
       const vmName = utils.generateRandomVmName('stor-mig-cancel');
 
-      await k8sClient.createVmFromTemplate(
+      await apiClient.createVmFromTemplate(
         utils.TEMPLATE_METADATA_NAMES.RHEL9,
         vmName,
         ns,
         'openshift',
         true,
       );
-      k8sClient.trackResource('VirtualMachine', vmName, ns);
-      await utils.waitForVirtualMachineReady(k8sClient, vmName, ns, utils.TestTimeouts.VM_BOOTUP);
+      apiClient.trackResource('VirtualMachine', vmName, ns);
+      await utils.waitForVirtualMachineReady(apiClient, vmName, ns, utils.TestTimeouts.VM_BOOTUP);
 
       await vmTreePage.navigateToProjectViaTreeView(ns);
       await vmListPage.clickVmListTab();
@@ -124,7 +120,7 @@ test.describe(
       await vmListPage.startStorageMigrationAndCancelWhileInProgress(vmName);
 
       await test.step('VM remains Running after cancelled migration', async () => {
-        await utils.waitForVirtualMachineReady(k8sClient, vmName, ns, utils.TestTimeouts.VM_BOOTUP);
+        await utils.waitForVirtualMachineReady(apiClient, vmName, ns, utils.TestTimeouts.VM_BOOTUP);
         await vmListPage.waitForVmStatus(vmName, 'Running');
       });
     });

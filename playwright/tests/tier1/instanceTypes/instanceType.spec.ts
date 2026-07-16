@@ -18,7 +18,7 @@ test.describe(SUITE, { tag: [T1_TAG, '@tier1-pages-it'] }, () => {
   });
 
   test('Cluster instance type supports create and deletion', async ({
-    k8sClient,
+    apiClient,
     instanceTypesPage,
     utils,
   }) => {
@@ -30,7 +30,7 @@ test.describe(SUITE, { tag: [T1_TAG, '@tier1-pages-it'] }, () => {
     test.setTimeout(utils.TestTimeouts.TEST_SHORT);
 
     const itName = generateRandomInstanceTypeName('cluster-it');
-    await createClusterInstanceTypeApi(k8sClient, itName, 2, '2Gi');
+    await createClusterInstanceTypeApi(apiClient, itName, 2, '2Gi');
 
     await test.step('Created instance type is visible in the list', async () => {
       await instanceTypesPage.filterByName(itName);
@@ -39,19 +39,19 @@ test.describe(SUITE, { tag: [T1_TAG, '@tier1-pages-it'] }, () => {
     });
 
     await test.step('Delete via API and verify removal from cluster', async () => {
-      await k8sClient.deleteClusterCustomResource(
+      await apiClient.deleteClusterCustomResource(
         IT_GROUP,
         IT_VERSION,
         'virtualmachineclusterinstancetypes',
         itName,
       );
-      const deleted = await verifyInstanceTypeDeletedCluster(k8sClient, itName);
+      const deleted = await verifyInstanceTypeDeletedCluster(apiClient, itName);
       expect(deleted.deleted, `${itName} should be deleted from cluster`).toBe(true);
     });
   });
 
   test('User InstanceTypes tab shows user-created instance types and supports name filter', async ({
-    k8sClient,
+    apiClient,
     instanceTypesPage,
     utils,
   }) => {
@@ -63,24 +63,34 @@ test.describe(SUITE, { tag: [T1_TAG, '@tier1-pages-it'] }, () => {
     test.setTimeout(utils.TestTimeouts.TEST_SHORT);
 
     const ns = utils.generateTestNamespace('user-it');
-    await k8sClient.createNamespace(ns);
-    await k8sClient.waitForNamespaceReady(ns);
-    k8sClient.trackResource('Namespace', ns);
+    await apiClient.createNamespace(ns);
+    await apiClient.waitForNamespaceReady(ns);
+    apiClient.trackResource('Namespace', ns);
 
     const itName = generateRandomInstanceTypeName('user-it');
-    await createNamespacedInstanceTypeApi(k8sClient, itName, ns);
+    await createNamespacedInstanceTypeApi(apiClient, itName, ns);
 
-    await instanceTypesPage.clickUserInstanceTypesTab();
-    await instanceTypesPage.waitForInstanceTypesListReady();
-    await instanceTypesPage.navigateToUserInstanceTypesProject(ns);
-    await instanceTypesPage.filterByNameInUserTab(itName);
-
-    const exists = await instanceTypesPage.verifyInstanceTypeExists(itName);
-    expect.soft(exists, `User instance type ${itName} should appear in User tab`).toBe(true);
+    await expect
+      .poll(
+        async () => {
+          await instanceTypesPage.navigateToInstanceTypesViaUI();
+          await instanceTypesPage.clickUserInstanceTypesTab();
+          await instanceTypesPage.waitForInstanceTypesListReady();
+          await instanceTypesPage.navigateToUserInstanceTypesProject(ns);
+          await instanceTypesPage.filterByNameInUserTab(itName);
+          return instanceTypesPage.verifyInstanceTypeExists(itName);
+        },
+        {
+          message: `User instance type ${itName} should appear in User tab`,
+          timeout: utils.TestTimeouts.DEFAULT,
+          intervals: [2000, 3000, 5000],
+        },
+      )
+      .toBe(true);
   });
 
   test('Cluster instance type detail page shows Details and YAML tabs with metadata', async ({
-    k8sClient,
+    apiClient,
     instanceTypesPage,
     utils,
   }) => {
@@ -92,7 +102,7 @@ test.describe(SUITE, { tag: [T1_TAG, '@tier1-pages-it'] }, () => {
     test.setTimeout(utils.TestTimeouts.TEST_SHORT);
 
     const itName = generateRandomInstanceTypeName('cluster-it-detail');
-    await createClusterInstanceTypeApi(k8sClient, itName, 2, '2Gi');
+    await createClusterInstanceTypeApi(apiClient, itName, 2, '2Gi');
 
     await instanceTypesPage.filterByName(itName);
     const exists = await instanceTypesPage.verifyInstanceTypeExists(itName);
@@ -100,10 +110,7 @@ test.describe(SUITE, { tag: [T1_TAG, '@tier1-pages-it'] }, () => {
       .soft(exists, `${itName} should appear in the list before navigating to detail`)
       .toBe(true);
 
-    const detailUrl = `/k8s/cluster/instancetype.kubevirt.io~v1beta1~VirtualMachineClusterInstancetype/${itName}`;
-    await instanceTypesPage.page.goto(
-      `${instanceTypesPage.page.url().split('/k8s')[0]}${detailUrl}`,
-    );
+    await instanceTypesPage.clickInstanceTypeByTestId(itName);
 
     await test.step('Details tab is visible', async () => {
       const detailsTab = instanceTypesPage.page.locator('[data-test-id="horizontal-link-Details"]');
@@ -134,7 +141,7 @@ test.describe(SUITE, { tag: [T1_TAG, '@tier1-pages-it'] }, () => {
   });
 
   test('User instance type can be deleted from its detail page', async ({
-    k8sClient,
+    apiClient,
     instanceTypesPage,
     testConfig,
     utils,
@@ -147,9 +154,10 @@ test.describe(SUITE, { tag: [T1_TAG, '@tier1-pages-it'] }, () => {
     test.setTimeout(utils.TestTimeouts.TEST_SHORT);
 
     const itName = generateRandomInstanceTypeName('user-it-del');
-    await createNamespacedInstanceTypeApi(k8sClient, itName, testConfig.testNamespace);
+    await createNamespacedInstanceTypeApi(apiClient, itName, testConfig.testNamespace);
 
     await test.step('Navigate to user instance type detail page', async () => {
+      // TODO: replace with UI navigation
       await instanceTypesPage.navigateToUserInstanceTypeDetail(testConfig.testNamespace, itName);
     });
 
@@ -159,7 +167,7 @@ test.describe(SUITE, { tag: [T1_TAG, '@tier1-pages-it'] }, () => {
 
     await test.step('Resource no longer exists on the cluster', async () => {
       const stillExists = await namespacedInstanceTypeExists(
-        k8sClient,
+        apiClient,
         testConfig.testNamespace,
         itName,
       );
@@ -179,7 +187,7 @@ test.describe(
     });
 
     test('Cluster InstanceTypes name filter restores full list after clearing', async ({
-      k8sClient,
+      apiClient,
       instanceTypesPage,
       cleanup,
       utils,
@@ -193,8 +201,8 @@ test.describe(
 
       const itNameA = generateRandomInstanceTypeName('filter-reg-a');
       const itNameB = generateRandomInstanceTypeName('filter-reg-b');
-      await createClusterInstanceTypeApi(k8sClient, itNameA, 1, '1Gi');
-      await createClusterInstanceTypeApi(k8sClient, itNameB, 1, '512Mi');
+      await createClusterInstanceTypeApi(apiClient, itNameA, 1, '1Gi');
+      await createClusterInstanceTypeApi(apiClient, itNameB, 1, '512Mi');
       cleanup.trackClusterInstanceType(itNameA);
       cleanup.trackClusterInstanceType(itNameB);
 

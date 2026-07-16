@@ -15,7 +15,7 @@ export async function waitForVirtualMachineReady(
     try {
       const vm = (await client.getVirtualMachine(namespace, vmName)) as {
         status?: { ready?: boolean };
-      };
+      } | null;
       if (vm?.status?.ready === true) {
         return;
       }
@@ -28,7 +28,7 @@ export async function waitForVirtualMachineReady(
 }
 
 /**
- * Poll until the VM is stopped.
+ * Poll until the VM is stopped (VMI no longer exists).
  */
 export async function waitForVirtualMachineStopped(
   client: RequestContextClient,
@@ -41,13 +41,10 @@ export async function waitForVirtualMachineStopped(
     try {
       const vm = (await client.getVirtualMachine(namespace, vmName)) as {
         status?: { ready?: boolean };
-      };
-      if (!vm.status?.ready) {
-        try {
-          await client.getVirtualMachineInstance(namespace, vmName);
-        } catch {
-          return;
-        }
+      } | null;
+      if (!vm || !vm.status?.ready) {
+        const vmi = await client.getVirtualMachineInstance(namespace, vmName);
+        if (!vmi) return;
       }
     } catch {
       return;
@@ -71,7 +68,11 @@ export async function waitForVirtualMachinePaused(
     try {
       const vmi = (await client.getVirtualMachineInstance(namespace, vmName)) as {
         status?: { conditions?: Array<{ type?: string; status?: string }> };
-      };
+      } | null;
+      if (!vmi) {
+        await new Promise((r) => setTimeout(r, TestTimeouts.SHORT_WAIT));
+        continue;
+      }
       const conditions = vmi.status?.conditions || [];
       const paused = conditions.find((c) => c.type === 'Paused' && c.status === 'True');
       if (paused) {
@@ -86,24 +87,13 @@ export async function waitForVirtualMachinePaused(
 }
 
 /**
- * True if VirtualMachineSnapshot GET returns 404 / not found.
+ * True if VirtualMachineSnapshot no longer exists (GET returns null).
  */
 export async function verifyVirtualMachineSnapshotDeleted(
   client: RequestContextClient,
   snapshotName: string,
   namespace: string,
 ): Promise<boolean> {
-  try {
-    await client.getVirtualMachineSnapshot(namespace, snapshotName);
-    return false;
-  } catch (error: unknown) {
-    const msg = error instanceof Error ? error.message : String(error);
-    const statusCode = (error as { statusCode?: number })?.statusCode;
-    return (
-      statusCode === 404 ||
-      msg.includes('404') ||
-      msg.includes('not found') ||
-      msg.includes('NotFound')
-    );
-  }
+  const snapshot = await client.getVirtualMachineSnapshot(namespace, snapshotName);
+  return !snapshot;
 }

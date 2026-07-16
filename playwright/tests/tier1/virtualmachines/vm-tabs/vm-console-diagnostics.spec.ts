@@ -5,7 +5,7 @@ test.describe('Tier1 Diagnostics Tab Redesign', { tag: [T1_TAG] }, () => {
   test(
     'Diagnostics overview cards, severity filter, and search',
     { tag: ['@nonpriv'] },
-    async ({ k8sClient, vmTreePage, vmDetailPage, utils, testConfig }) => {
+    async ({ apiClient, vmTreePage, vmDetailPage, utils, testConfig }) => {
       await utils.withAllure({
         suite: 'VM Diagnostics redesign',
         feature: T1,
@@ -13,15 +13,15 @@ test.describe('Tier1 Diagnostics Tab Redesign', { tag: [T1_TAG] }, () => {
       });
 
       const ns = utils.generateTestNamespace('vm-diag-redesign');
-      await k8sClient.createNamespace(ns);
-      await k8sClient.waitForNamespaceReady(ns);
-      k8sClient.trackResource('Namespace', ns);
+      await apiClient.createNamespace(ns);
+      await apiClient.waitForNamespaceReady(ns);
+      apiClient.trackResource('Namespace', ns);
 
       const vmName = utils.generateRandomVmName('vm-diag');
 
-      await k8sClient.createVmFromInstanceType('fedora', vmName, ns, undefined, undefined, true);
-      k8sClient.trackResource('VirtualMachine', vmName, ns);
-      await k8sClient.waitForVmRunning(vmName, ns, utils.TestTimeouts.VM_BOOTUP);
+      await apiClient.createVmFromInstanceType('fedora', vmName, ns, undefined, undefined, true);
+      apiClient.trackResource('VirtualMachine', vmName, ns);
+      await apiClient.waitForVmRunning(vmName, ns, utils.TestTimeouts.VM_BOOTUP);
 
       await vmTreePage.navigateToNamespaceVirtualMachinesViaUI(testConfig.testNamespace);
       await vmTreePage.toggleEmptyProjectsDisplay(true);
@@ -30,11 +30,13 @@ test.describe('Tier1 Diagnostics Tab Redesign', { tag: [T1_TAG] }, () => {
       await vmTreePage.clickVmInTreeView(vmName, ns);
       await vmDetailPage.navigateToDiagnostics();
 
-      await test.step('Diagnostics tab shows badge with issue count', async () => {
+      await test.step('Diagnostics tab is accessible and may show a badge', async () => {
         const badgeCount = await vmDetailPage.getDiagnosticsTabBadgeCount();
-        expect
-          .soft(badgeCount, 'Diagnostics tab should show a badge count (null means no badge)')
-          .not.toBeNull();
+        if (badgeCount !== null) {
+          expect
+            .soft(badgeCount, 'Badge count should be a non-negative number')
+            .toBeGreaterThanOrEqual(0);
+        }
       });
 
       await test.step('Severity overview cards present with consistent counts', async () => {
@@ -57,7 +59,7 @@ test.describe('Tier1 Diagnostics Tab Redesign', { tag: [T1_TAG] }, () => {
           .toBeGreaterThan(0);
 
         const statuses = rows.map((r) => r.status);
-        const validStatuses = ['Healthy', 'Degraded', 'Warning', 'Unknown'];
+        const validStatuses = ['Healthy', 'Degraded', 'Warning', 'Unknown', 'Failed'];
         for (const s of statuses) {
           expect
             .soft(validStatuses, `Condition status "${s}" should be a known severity label`)

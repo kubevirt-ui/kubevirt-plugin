@@ -33,11 +33,8 @@ export async function verifyTemplateDeletedFromCluster(
 ): Promise<{ deleted: boolean; error?: string }> {
   const startTime = Date.now();
   while (Date.now() - startTime < timeoutMs) {
-    try {
-      await client.getTemplate(namespace, templateName);
-    } catch {
-      return { deleted: true };
-    }
+    const tpl = await client.getTemplate(namespace, templateName);
+    if (!tpl) return { deleted: true };
     await new Promise((resolve) => setTimeout(resolve, utils.TestTimeouts.POLLING_INTERVAL));
   }
   return {

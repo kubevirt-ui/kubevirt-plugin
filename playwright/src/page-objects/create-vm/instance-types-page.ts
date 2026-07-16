@@ -51,6 +51,12 @@ export default class InstanceTypesPage extends PageCommons {
     await this.robustClick(detailsActions);
   }
 
+  async clickInstanceTypeByTestId(name: string): Promise<void> {
+    const row = this.locator(`[data-test-id="${name}"]`).first();
+    await row.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+    await this.robustClick(row);
+  }
+
   override async clickSaveChanges() {
     await this._saveChangesButton.waitFor({
       state: 'visible',

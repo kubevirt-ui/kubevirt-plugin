@@ -27,12 +27,48 @@ Without `--local`, locator discovery relies on the live UI via Playwright MCP (`
 
 ### Test Tiers and Directories
 
-| Tier     | Directory                | Fixture source                | Project name | Tags            |
-| -------- | ------------------------ | ----------------------------- | ------------ | --------------- |
-| Gating   | `tests/gating/`          | `@/fixtures/gating-fixture`   | `Gating`     | `@gating`       |
-| Tier 1   | `tests/tier1/<feature>/` | Per-feature fixture           | `Tier1`      | `@tier1`        |
-| Tier 2   | `tests/tier2/<feature>/` | Per-feature fixture           | `Tier2`      | `@tier2`        |
-| Settings | `tests/settings/`        | `@/fixtures/settings-fixture` | `Settings`   | `@cnv-settings` |
+| Tier     | Directory                | Fixture source                | Project name | Tags            | Scope                                                                                                    |
+| -------- | ------------------------ | ----------------------------- | ------------ | --------------- | -------------------------------------------------------------------------------------------------------- |
+| Gating   | `tests/gating/`          | `@/fixtures/gating-fixture`   | `Gating`     | `@gating`       | Page load verification per major route; resource creation (form + YAML) per module                       |
+| Tier 1   | `tests/tier1/<feature>/` | Per-feature fixture           | `Tier1`      | `@tier1`        | Single-resource CRUD lifecycle per module; VM tab configuration; must NOT overlap gating                 |
+| Tier 2   | `tests/tier2/<feature>/` | Per-feature fixture           | `Tier2`      | `@tier2`        | Cross-module integration (BV→VM wizard, snapshot→clone); VM live/storage migration; multi-step workflows |
+| Settings | `tests/settings/`        | `@/fixtures/settings-fixture` | `Settings`   | `@cnv-settings` | Cluster and user settings pages                                                                          |
+
+### Where to place a new test
+
+1. **Does it verify a page loads and shows expected content?** → **Gating** (add to existing `scenario-virtualization-pages.spec.ts`)
+2. **Does it create a resource via form or YAML?** → Check if gating already has it; if not, add to gating's `scenario-resource-creation.spec.ts`. If it's a full CRUD lifecycle, add to **Tier 1**.
+3. **Does it test a single resource's lifecycle (create → configure → verify → delete)?** → **Tier 1** under `tests/tier1/<feature>/`
+4. **Does it test cross-module integration, multi-resource workflows, or migration?** → **Tier 2** under `tests/tier2/<feature>/`
+5. **Does it test cluster or user settings?** → **Settings** under `tests/settings/`
+
+### Current test file map
+
+```
+tests/
+├── gating/
+│   ├── scenario-virtualization-pages.spec.ts   # Page load + navigation verification
+│   └── scenario-resource-creation.spec.ts      # VM, template, BV creation (form + YAML)
+├── tier1/
+│   ├── bootable-volumes/                       # BV list, create, delete
+│   ├── checkups/                               # Network/storage checkup lifecycle
+│   ├── create-vm/                              # VM wizard (template, custom config)
+│   ├── instanceTypes/                          # Instance type CRUD
+│   ├── migrationpolicies/                      # Migration policy CRUD
+│   ├── templates/                              # Template creation, detail tabs, lifecycle
+│   └── virtualmachines/
+│       ├── vm-actions/                         # VM lifecycle actions, delete
+│       └── vm-tabs/                            # Configuration, diagnostics, disks, overview
+├── tier2/
+│   ├── bootable-volumes/                       # BV cross-module (API → UI list → cleanup)
+│   ├── create-vm/                              # Clone wizard (clone existing VM)
+│   ├── migrations/                             # Live migration, storage migration
+│   └── virtualmachines/                        # Snapshots (take/restore/clone), VM clone
+└── settings/
+    ├── aaq-quotas.spec.ts                      # AAQ quota settings
+    ├── cluster-settings.spec.ts                # Cluster-level settings
+    └── user-settings.spec.ts                   # User preferences
+```
 
 ### Fixture Pattern
 
@@ -83,7 +119,6 @@ test.describe(SUITE, { tag: [T1_TAG, '@tier1-feature-area'] }, () => {
       tags: [T1_TAG, ADMIN_ONLY_TAG],
     });
 
-    // Test body using page object methods
     const result = await somePage.doSomething();
     expect(result, 'descriptive assertion message').toBe(true);
   });
@@ -127,7 +162,7 @@ This avoids requiring a running console for test creation and ensures locators m
 
 - If an existing spec covers this area → **expand it** (add a new `test()` block)
 - If no existing spec → **create** a new spec file in the appropriate tier directory
-- Determine which tier: gating (critical path), tier1 (core features), tier2 (extended scenarios), settings
+- Determine which tier using the placement guide above
 
 ### Phase 2: Framework Gap Analysis
 
@@ -225,6 +260,7 @@ export default class FeatureComponent extends BaseComponent {
 - Tag `test.describe` with tier tag + feature-area tag
 - Every `test()` must call `utils.withAllure(...)` first
 - Use descriptive assertion messages on every `expect`
+- **Never put `ID(CNV-XXXXX)` in test names or step names** — use only in allure tags
 
 #### 4. Allure metadata
 
@@ -240,13 +276,13 @@ await utils.withAllure({
 
 #### 5. API setup in tests
 
-Use `apiClient` (`RequestContextClient`) for Kubernetes operations. All API calls go through the console proxy with the authenticated user's permissions. Use helpers from `@/utils/` for common patterns:
+Use `apiClient` (`RequestContextClient`) for Kubernetes operations. All API calls go through the console proxy with the authenticated user's permissions:
 
 ```typescript
 import { setupTestNamespace } from '@/utils/test-setup-helpers';
 
 // In beforeAll or test body:
-const { ns, vmName } = await setupTestNamespace(apiClient, utils);
+const ns = await setupTestNamespace(apiClient, 'my-feature');
 ```
 
 Track created resources for cleanup:
@@ -254,6 +290,15 @@ Track created resources for cleanup:
 ```typescript
 apiClient.trackResource('VirtualMachine', vmName, namespace);
 ```
+
+#### 6. Navigation
+
+**All navigation must go through the UI** — never use `page.goto()` or `goTo()` in specs:
+
+- The `_autoVirtNavigation` auto-fixture handles initial console load and perspective switching
+- Use sidebar navigation methods: `clickNavBootableVolumes()`, `clickNavMigrationPolicies()`, etc.
+- Use tree view for VMs: `navigateToVmViaTreeView(vmName)`, `navigateToProjectViaTreeView(ns)`
+- Use page object navigation methods: `navigateToNamespaceBootableVolumesViaUI(ns)`, etc.
 
 ### Phase 4: Validation
 
@@ -333,4 +378,7 @@ playwright/
 - **Each test file owns its namespace** — use `generateRandomName()`, never hardcode
 - **Never hardcode `openshift-cnv`** — use `EnvVariables.cnvNamespace` or `utils.EnvVariables.cnvNamespace`
 - **Always check existing coverage first** — expand existing specs when possible
+- **All API calls go through the console proxy** — `RequestContextClient` routes all requests through the console proxy with the authenticated user's permissions. Never use `oc` CLI, `@kubernetes/client-node`, or direct cluster access.
+- **No direct URL navigation** — never use `page.goto()` or `goTo()` in specs; always navigate through the Virtualization perspective switcher and sidebar
+- **Never put `ID(CNV-XXXXX)` in test names or step names** — use only in allure tags
 - **DO NOT commit or push** — the user handles git operations

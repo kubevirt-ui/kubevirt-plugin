@@ -13,9 +13,9 @@ import { EnvVariables } from './env-variables';
  *   NON_PRIV=1   → nonpriv-state.json   (non-privileged session)
  *   default      → test-state.json      (kubeadmin session)
  */
-export function getStorageStatePath(configDirname: string): string | undefined {
+export function getStorageStatePath(_configDirname?: string): string | undefined {
   const shardIndex = EnvVariables.shardIndex;
-  const storageStateDir = path.resolve(configDirname, '..', '.storage-states');
+  const storageStateDir = path.resolve(process.cwd(), '.storage-states');
 
   let storageStateFileName: string;
   if (EnvVariables.isSharded && shardIndex) {
