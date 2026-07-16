@@ -10,6 +10,7 @@ import {
   DESCHEDULER_OPERATOR_NAME,
   KUBE_DESCHEDULER_NAMESPACE,
 } from '@kubevirt-utils/resources/descheduler/constants';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 import { SubscriptionKind } from '@overview/utils/types';
@@ -29,7 +30,7 @@ export const useDeschedulerStatus = (cluster?: string): UseDeschedulerStatusResu
   const resolvedCluster = cluster ?? clusterParam;
 
   const { isDeschedulerInstalled, loaded: crLoaded } = useDeschedulerInstalled(resolvedCluster);
-  const [subscription, subscriptionLoaded] = useK8sWatchData<SubscriptionKind>({
+  const [subscription, subscriptionLoaded, subscriptionError] = useK8sWatchData<SubscriptionKind>({
     cluster: resolvedCluster,
     groupVersionKind: SubscriptionModelGroupVersionKind,
     isList: false,
@@ -37,7 +38,8 @@ export const useDeschedulerStatus = (cluster?: string): UseDeschedulerStatusResu
     namespace: KUBE_DESCHEDULER_NAMESPACE,
   });
 
-  const loaded = crLoaded && subscriptionLoaded;
+  const subscriptionResolved = subscriptionLoaded || !isEmpty(subscriptionError);
+  const loaded = crLoaded && subscriptionResolved;
   const status = useMemo(
     () =>
       getDeschedulerStatus({
