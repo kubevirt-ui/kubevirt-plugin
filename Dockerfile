@@ -18,7 +18,7 @@ RUN npm config set fetch-timeout 1200000 && \
     npm run build
 
 # Image info: https://catalog.redhat.com/en/software/containers/ubi9/nginx-124/657b066b6c1bc124a1d7ff39
-FROM registry.access.redhat.com/ubi9/nginx-124:1782911075
+FROM registry.access.redhat.com/ubi9/nginx-124:1784149393
 
 COPY --from=policy /etc/crypto-policies /etc/crypto-policies
 COPY --from=builder /opt/app-root/src/dist /usr/share/nginx/html
