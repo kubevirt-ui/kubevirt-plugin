@@ -2,11 +2,13 @@ import React, { FC } from 'react';
 
 import ExpandSectionWithCustomToggle from '@kubevirt-utils/components/ExpandSectionWithCustomToggle/ExpandSectionWithCustomToggle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { DESCHEDULER_OPERATORS_URL } from '@kubevirt-utils/resources/descheduler/constants';
+import {
+  DESCHEDULER_OPERATOR_NAME,
+  DESCHEDULER_OPERATORS_URL,
+} from '@kubevirt-utils/resources/descheduler/constants';
 import { Split, SplitItem } from '@patternfly/react-core';
 import SettingsLink from '@settings/context/SettingsLink';
 import { CLUSTER_TAB_IDS } from '@settings/search/constants';
-import { DESCHEDULER_OPERATOR_NAME } from '@settings/tabs/ClusterTab/components/VirtualizationFeaturesSection/utils/constants';
 import {
   getInstallStateIcon,
   isInstalled,

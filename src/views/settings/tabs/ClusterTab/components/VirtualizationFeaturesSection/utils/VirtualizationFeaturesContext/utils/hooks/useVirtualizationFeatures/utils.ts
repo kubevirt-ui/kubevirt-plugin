@@ -17,6 +17,7 @@ import {
   computeInstallState,
   getPackageSource,
   getPackageUID,
+  getSubscriptionInstalledCSV,
   subscriptionFor,
 } from '@settings/tabs/ClusterTab/components/VirtualizationFeaturesSection/utils/VirtualizationFeaturesContext/utils/utils';
 
@@ -59,9 +60,9 @@ export const getVirtualizationFeatureItems = (
     .map((pkg) => {
       const subscription =
         operatorResourcesLoaded && subscriptionFor(subscriptions, operatorGroups, pkg);
+      const csvName = getSubscriptionInstalledCSV(subscription);
       const clusterServiceVersion =
-        operatorResourcesLoaded &&
-        clusterServiceVersionFor(clusterServiceVersions, subscription?.status?.installedCSV);
+        operatorResourcesLoaded && clusterServiceVersionFor(clusterServiceVersions, csvName);
       const { channels, defaultChannel } = pkg.status ?? {};
       const { currentCSVDesc } = (channels || []).find(({ name }) => name === defaultChannel);
 
