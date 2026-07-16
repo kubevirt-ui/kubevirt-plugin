@@ -1,12 +1,11 @@
-import type KubernetesClient from '@/clients/kubernetes-client';
-import type { ClusterJanitor } from '@/utils/cluster-janitor';
+import type RequestContextClient from '@/clients/request-context-client';
 import { logger } from '@/utils/logger';
 
 /** Ordered phases for global setup execution. */
 export enum SetupPhase {
+  BROWSER = 'BROWSER',
   AUTH = 'AUTH',
   CLUSTER = 'CLUSTER',
-  BROWSER = 'BROWSER',
   REPORTING = 'REPORTING',
 }
 
@@ -18,9 +17,9 @@ export enum TeardownScope {
 }
 
 const SETUP_PHASE_ORDER: SetupPhase[] = [
+  SetupPhase.BROWSER,
   SetupPhase.AUTH,
   SetupPhase.CLUSTER,
-  SetupPhase.BROWSER,
   SetupPhase.REPORTING,
 ];
 
@@ -32,28 +31,22 @@ const TEARDOWN_SCOPE_ORDER: TeardownScope[] = [
 
 /** Mutable context passed through setup rules. */
 export interface SetupContext {
-  kubeConfigPath: string;
   storageStatePath: string;
   testNamespace: string;
   cnvNamespace: string;
-  k8sClient?: KubernetesClient;
-  effectiveKubeConfigPath?: string;
+  apiClient?: RequestContextClient;
   authToken?: string;
   projectRoot: string;
   useSharding: boolean;
   shardIndex?: string;
-  nncpNic?: string;
   /** Actual IDP username discovered from the login page UI (non-priv mode only). */
   nonPrivUsername?: string;
-  /** Native cluster janitor instance (set when ENABLE_CLUSTER_JANITOR=1). */
-  clusterJanitor?: ClusterJanitor;
 }
 
 /** Context passed through teardown rules. */
 export interface TeardownContext {
   testNamespace: string;
-  k8sClient?: KubernetesClient;
-  kubeConfigPath?: string;
+  apiClient?: RequestContextClient;
   useSharding: boolean;
   shardIndex?: string;
   shouldCleanupClusterResources: boolean;

@@ -7,7 +7,6 @@
  *   import { test, expect } from '@/fixtures/vm-tabs-fixture';
  */
 
-import VirtctlClient from '@/clients/virtctl-client';
 import { withSafeActions } from '@/page-objects/base-page';
 import ConsoleStandalonePage from '@/page-objects/cluster/console-standalone-page';
 import CreateVmCreatePage from '@/page-objects/create-vm/create-vm-create-page';
@@ -19,7 +18,6 @@ import VirtualMachineDetailPage from '@/page-objects/vm/virtual-machine-detail-p
 import VirtualMachineSnapshotDetailPage from '@/page-objects/vm/virtual-machine-snapshot-detail-page';
 import VirtualMachinesPage from '@/page-objects/vm/virtual-machines-page';
 import VmTreePage from '@/page-objects/vm/vm-tree-page';
-import { EnvVariables } from '@/utils/env-variables';
 
 import { baseTest, expect } from './scenario-test-fixture';
 
@@ -34,7 +32,6 @@ interface VmTabsFixtures {
   createVmPage: CreateVmPage;
   createVmCreatePage: CreateVmCreatePage;
   createVmTemplatesPage: CreateVmTemplatesPage;
-  virtctlClient: VirtctlClient;
 }
 
 const test = baseTest.extend<VmTabsFixtures>({
@@ -67,15 +64,6 @@ const test = baseTest.extend<VmTabsFixtures>({
   },
   createVmTemplatesPage: async ({ page }, use) => {
     await use(withSafeActions(new CreateVmTemplatesPage(page)));
-  },
-  virtctlClient: async ({ page, testConfig }, use) => {
-    const authConfig = {
-      baseUrl: EnvVariables.clusterUrl,
-      username: EnvVariables.username,
-      password: EnvVariables.password,
-      ...(testConfig?.authToken ? { token: testConfig.authToken } : {}),
-    };
-    await use(new VirtctlClient(page, authConfig, 'virtctl', testConfig?.kubeConfigPath));
   },
 });
 

@@ -148,11 +148,12 @@ export default class InstanceTypesPage extends PageCommons {
   }
 
   async navigateToInstanceTypesViaUI(): Promise<void> {
-    try {
-      await this.clickNavInstanceTypes();
-    } catch {
-      await this.navigateToClusterInstanceTypes();
-    }
+    await this.clickNavInstanceTypes();
+  }
+
+  async navigateToNamespaceInstanceTypesViaUI(namespace: string): Promise<void> {
+    await this.clickNavInstanceTypes();
+    await this.switchProject(namespace);
   }
 
   async navigateToProjectInstanceTypes() {

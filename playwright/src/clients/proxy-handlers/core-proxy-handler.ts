@@ -1,3 +1,6 @@
+import * as fs from 'fs';
+
+import { SshKeyFactory } from '@/data-factories/ssh-key-factory';
 import type {
   JsonPatchOp,
   KubernetesListResource,
@@ -41,8 +44,68 @@ export class CoreProxyHandler {
     ]);
   }
 
+  createConfigMap(
+    namespace: string,
+    name: string,
+    data: Record<string, string>,
+  ): Promise<KubernetesResource | null> {
+    const spec: KubernetesResource = {
+      apiVersion: 'v1',
+      kind: 'ConfigMap',
+      metadata: { name, namespace },
+      data,
+    };
+    return this.ctx.createResource('', 'v1', 'configmaps', spec, namespace);
+  }
+
+  createSecret(
+    namespace: string,
+    name: string,
+    data: Record<string, string>,
+    type = 'Opaque',
+  ): Promise<KubernetesResource | null> {
+    const encodedData: Record<string, string> = {};
+    for (const [k, v] of Object.entries(data)) {
+      encodedData[k] = Buffer.from(v).toString('base64');
+    }
+    const spec: KubernetesResource = {
+      apiVersion: 'v1',
+      kind: 'Secret',
+      metadata: { name, namespace },
+      data: encodedData,
+      type,
+    };
+    return this.ctx.createResource('', 'v1', 'secrets', spec, namespace);
+  }
+
+  createSSHKeySecret(
+    namespace: string,
+    name: string,
+    sshPublicKey?: string,
+  ): Promise<KubernetesResource | null> {
+    const pubKey =
+      sshPublicKey ?? fs.readFileSync(SshKeyFactory.generatePublicKeyFile(), 'utf-8').trim();
+    return this.createSecret(namespace, name, { key: pubKey });
+  }
+
+  deleteSecret(namespace: string, name: string): Promise<KubernetesResource | null> {
+    return this.ctx.deleteResource('', 'v1', 'secrets', name, namespace);
+  }
+
+  getClusterVersion(): Promise<KubernetesResource | null> {
+    return this.ctx.getResource('config.openshift.io', 'v1', 'clusterversions', 'version');
+  }
+
   getConfigMap(namespace: string, name: string): Promise<KubernetesResource | null> {
     return this.ctx.getResource('', 'v1', 'configmaps', name, namespace);
+  }
+
+  getNodes(): Promise<KubernetesListResource> {
+    return this.ctx.listResources('', 'v1', 'nodes');
+  }
+
+  getStorageClasses(): Promise<KubernetesListResource> {
+    return this.ctx.listResources('storage.k8s.io', 'v1', 'storageclasses');
   }
 
   // Named helpers for well-known ConfigMaps
@@ -85,6 +148,15 @@ export class CoreProxyHandler {
         headers: { 'Content-Type': 'application/json-patch+json' },
       },
     );
+  }
+
+  async secretExists(namespace: string, name: string): Promise<boolean> {
+    try {
+      const secret = await this.ctx.getResource('', 'v1', 'secrets', name, namespace);
+      return secret !== null;
+    } catch {
+      return false;
+    }
   }
 
   // ---------------------------------------------------------------------------

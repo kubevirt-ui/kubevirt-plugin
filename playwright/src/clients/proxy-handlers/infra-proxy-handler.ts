@@ -84,10 +84,6 @@ export class InfraProxyHandler {
     );
   }
 
-  // ---------------------------------------------------------------------------
-  // Storage Migration Plans (migrations.kubevirt.io/v1alpha1)
-  // ---------------------------------------------------------------------------
-
   deleteStorageMigrationPlan(name: string, namespace: string): Promise<KubernetesResource | null> {
     return this.ctx.deleteResource(
       InfraProxyHandler._MIGRATION_GROUP,
@@ -97,17 +93,38 @@ export class InfraProxyHandler {
       namespace,
     );
   }
+
   getHyperConverged(
     namespace = 'openshift-cnv',
     name = 'kubevirt-hyperconverged',
   ): Promise<KubernetesResource | null> {
     return this.ctx.getResource('hco.kubevirt.io', 'v1beta1', 'hyperconvergeds', name, namespace);
   }
+
   getKubeVirt(
     namespace = 'openshift-cnv',
     name = 'kubevirt-kubevirt-hyperconverged',
   ): Promise<KubernetesResource | null> {
     return this.ctx.getResource('kubevirt.io', 'v1', 'kubevirts', name, namespace);
+  }
+
+  // ---------------------------------------------------------------------------
+  // Storage Migration Plans (migrations.kubevirt.io/v1alpha1)
+  // ---------------------------------------------------------------------------
+
+  async getKubevirtPluginVersion(): Promise<string | undefined> {
+    try {
+      const plugin = await this.ctx.getResource(
+        'console.openshift.io',
+        'v1',
+        'consoleplugins',
+        'kubevirt-plugin',
+      );
+      const labels = plugin?.metadata?.labels as Record<string, string> | undefined;
+      return labels?.['app.kubernetes.io/version'];
+    } catch {
+      return undefined;
+    }
   }
   getMultiNsStorageMigrationPlan(
     name: string,
@@ -121,6 +138,23 @@ export class InfraProxyHandler {
       namespace,
     );
   }
+  async getNodeOsImage(): Promise<string | undefined> {
+    const nodes = await this.ctx.listResources('', 'v1', 'nodes');
+    const first = nodes?.items?.[0];
+    const nodeInfo = (first?.status as Record<string, unknown>)?.nodeInfo as
+      | Record<string, string>
+      | undefined;
+    return nodeInfo?.osImage;
+  }
+  async getReadyNodes(): Promise<KubernetesResource[]> {
+    const nodes = await this.ctx.listResources('', 'v1', 'nodes');
+    return (nodes?.items ?? []).filter((node) => {
+      const conditions = (node.status as Record<string, unknown>)?.conditions as
+        | Array<{ type: string; status: string }>
+        | undefined;
+      return conditions?.some((c) => c.type === 'Ready' && c.status === 'True');
+    });
+  }
 
   getStorageMigrationPlan(name: string, namespace: string): Promise<KubernetesResource | null> {
     return this.ctx.getResource(
@@ -130,6 +164,32 @@ export class InfraProxyHandler {
       name,
       namespace,
     );
+  }
+
+  async isNativeVmTemplateFeatureGateEnabled(
+    namespace = 'openshift-cnv',
+    kubevirtName = 'kubevirt-kubevirt-hyperconverged',
+  ): Promise<boolean> {
+    const kv = await this.getKubeVirt(namespace, kubevirtName);
+    const spec = kv?.spec as Record<string, unknown> | undefined;
+    const config = spec?.configuration as Record<string, unknown> | undefined;
+    const devConfig = config?.developerConfiguration as Record<string, unknown> | undefined;
+    const featureGates = (devConfig?.featureGates as string[]) ?? [];
+    const disabledFeatureGates = (devConfig?.disabledFeatureGates as string[]) ?? [];
+    return featureGates.includes('Template') && !disabledFeatureGates.includes('Template');
+  }
+
+  async isStorageMigrationAvailable(): Promise<boolean> {
+    try {
+      await this.ctx.listResources(
+        InfraProxyHandler._MIGRATION_GROUP,
+        InfraProxyHandler._MIGRATION_VERSION,
+        InfraProxyHandler._MIGRATION_PLAN_PLURAL,
+      );
+      return true;
+    } catch {
+      return false;
+    }
   }
 
   listHyperConvergeds(namespace = 'openshift-cnv'): Promise<KubernetesListResource> {
@@ -195,6 +255,20 @@ export class InfraProxyHandler {
     );
   }
 
+  async migrationPolicyExists(name: string): Promise<boolean> {
+    try {
+      const policy = await this.ctx.getResource(
+        'migrations.kubevirt.io',
+        'v1alpha1',
+        'migrationpolicies',
+        name,
+      );
+      return policy !== null;
+    } catch {
+      return false;
+    }
+  }
+
   patchHyperConverged(
     namespace = 'openshift-cnv',
     name = 'kubevirt-hyperconverged',
@@ -217,10 +291,6 @@ export class InfraProxyHandler {
     );
   }
 
-  // ---------------------------------------------------------------------------
-  // Network Attachment Definitions (k8s.cni.cncf.io/v1)
-  // ---------------------------------------------------------------------------
-
   setMemoryDensity(
     memoryOvercommitPercentage: number,
     namespace = 'openshift-cnv',
@@ -234,5 +304,55 @@ export class InfraProxyHandler {
       { spec: { higherWorkloadDensity: { memoryOvercommitPercentage } } },
       namespace,
     );
+  }
+
+  async verifyAuthentication(): Promise<boolean> {
+    try {
+      await this.ctx.listResources('', 'v1', 'nodes');
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  async verifyLiveMigrationLimits(
+    expectedParallelMigrations: number,
+    expectedPerCluster: number,
+    namespace = 'openshift-cnv',
+    kubevirtName = 'kubevirt-kubevirt-hyperconverged',
+  ): Promise<{
+    allMatch: boolean;
+    actualParallelMigrations: number | null;
+    actualPerCluster: number | null;
+  }> {
+    const kv = await this.getKubeVirt(namespace, kubevirtName);
+    const spec = kv?.spec as Record<string, unknown> | undefined;
+    const virt = spec?.virtualization as Record<string, unknown> | undefined;
+    const config = virt?.liveMigrationConfig as Record<string, unknown> | undefined;
+    const actualParallelMigrations: number | null =
+      (config?.parallelMigrationsPerCluster as number) ?? null;
+    const actualPerCluster: number | null =
+      (config?.parallelOutboundMigrationsPerNode as number) ?? null;
+    return {
+      allMatch:
+        actualParallelMigrations === expectedParallelMigrations &&
+        actualPerCluster === expectedPerCluster,
+      actualParallelMigrations,
+      actualPerCluster,
+    };
+  }
+
+  // ---------------------------------------------------------------------------
+  // Network Attachment Definitions (k8s.cni.cncf.io/v1)
+  // ---------------------------------------------------------------------------
+
+  async verifyMigrationPolicyCreated(name: string, timeoutMs = 30000): Promise<boolean> {
+    const interval = 2000;
+    const end = Date.now() + timeoutMs;
+    while (Date.now() < end) {
+      if (await this.migrationPolicyExists(name)) return true;
+      await new Promise((r) => setTimeout(r, interval));
+    }
+    return false;
   }
 }

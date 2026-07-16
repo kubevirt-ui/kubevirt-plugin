@@ -4,7 +4,7 @@
  * Provides API-level resource creation for test files, designed to be used
  * in `test.beforeAll()` to create shared resources once per spec file.
  *
- * Uses the KubernetesClient singleton directly (no browser/page needed),
+ * Uses the RequestContextClient singleton directly (no browser/page needed),
  * making it suitable for worker-scoped or beforeAll setup.
  *
  * Resource data (names, namespaces) is automatically pushed into the
@@ -43,10 +43,11 @@
  * ```
  */
 
-import type KubernetesClient from '@/clients/kubernetes-client';
-import { getKubernetesClient } from '@/clients/kubernetes-client-singleton';
+import type RequestContextClient from '@/clients/request-context-client';
+import { getApiClient } from '@/clients/rcc-singleton';
 import { ContextKey } from '@/context-managers/context-keys';
 import ScenarioContextManager from '@/context-managers/scenario-context-manager';
+import type { KubernetesCondition, KubernetesResource } from '@/data-models/kubernetes-types';
 import { ensureApiAuth } from '@/utils/auth-healer';
 import { EnvVariables } from '@/utils/env-variables';
 import { logger } from '@/utils/logger';
@@ -120,7 +121,7 @@ export interface ResourceRef {
 
 export class SpecResourceSetup {
   private _cleaned = false;
-  private _client: KubernetesClient | null = null;
+  private _client: RequestContextClient | null = null;
   private defaultNamespace: string;
   private namespacesToCleanup: string[] = [];
 
@@ -132,12 +133,47 @@ export class SpecResourceSetup {
       defaultNamespace || testConfig.testNamespace || EnvVariables.testNamespace;
   }
 
-  private get client(): KubernetesClient {
+  /**
+   * Extract the boot DataSource reference from a template's first DataVolume.
+   * Pure parsing — no API calls.
+   */
+  static getTemplateBootDataSourceRef(
+    template: KubernetesResource,
+    defaultDataSourceNamespace = 'openshift-virtualization-os-images',
+  ): { name: string; namespace: string } | null {
+    const objects = (template as Record<string, unknown>).objects as
+      | KubernetesResource[]
+      | undefined;
+    if (!objects) return null;
+
+    const vm = objects.find((obj) => obj.kind === 'VirtualMachine');
+    if (!vm) return null;
+
+    const spec = vm.spec as Record<string, unknown> | undefined;
+    const dataVolumeTemplates = spec?.dataVolumeTemplates as
+      | Array<Record<string, unknown>>
+      | undefined;
+    if (!dataVolumeTemplates?.length) return null;
+
+    const dvSpec = dataVolumeTemplates[0].spec as Record<string, unknown> | undefined;
+    const sourceRef = dvSpec?.sourceRef as Record<string, unknown> | undefined;
+    if (!sourceRef || sourceRef.kind !== 'DataSource') return null;
+
+    const name = sourceRef.name as string | undefined;
+    if (!name) return null;
+
+    return {
+      name,
+      namespace: (sourceRef.namespace as string) || defaultDataSourceNamespace,
+    };
+  }
+
+  private get client(): RequestContextClient {
     if (!this._client) {
-      this._client = getKubernetesClient();
+      this._client = getApiClient();
     }
     if (!this._client) {
-      throw new Error('KubernetesClient not available — auth token missing');
+      throw new Error('RequestContextClient not available — auth token missing');
     }
     return this._client;
   }
@@ -147,7 +183,7 @@ export class SpecResourceSetup {
   }
 
   private async deleteByType(
-    client: KubernetesClient,
+    client: RequestContextClient,
     refs: ResourceRef[],
     type: ResourceRef['type'],
     deleteFn: (ref: ResourceRef) => Promise<void>,
@@ -160,6 +196,21 @@ export class SpecResourceSetup {
           console.warn(`[SpecResourceSetup] Failed to delete ${type} ${ref.name}: ${e}`);
         }
       }
+    }
+  }
+
+  private async isDataSourceReady(
+    client: RequestContextClient,
+    name: string,
+    namespace: string,
+  ): Promise<boolean> {
+    try {
+      const ds = await client.getResourceByKind('datasource', name, namespace);
+      const conditions = (ds as KubernetesResource)?.status?.conditions;
+      const list = Array.isArray(conditions) ? conditions : [];
+      return list.some((c: KubernetesCondition) => c.type === 'Ready' && c.status === 'True');
+    } catch {
+      return false;
     }
   }
 
@@ -208,18 +259,16 @@ export class SpecResourceSetup {
   }
 
   private async waitForDeletion(
-    client: KubernetesClient,
-    apiGroup: string,
-    apiVersion: string,
-    namespace: string,
-    plural: string,
+    client: RequestContextClient,
+    kind: string,
     name: string,
+    namespace: string | undefined,
     timeout: number,
   ): Promise<void> {
     const deadline = Date.now() + timeout;
     while (Date.now() < deadline) {
       try {
-        await client.getCustomResource(apiGroup, apiVersion, namespace, plural, name);
+        await client.getResourceByKind(kind, name, namespace);
         await new Promise((r) => setTimeout(r, TestTimeouts.RETRY_DELAY));
       } catch {
         return;
@@ -228,14 +277,14 @@ export class SpecResourceSetup {
   }
 
   private async waitForNamespaceGone(
-    client: KubernetesClient,
+    client: RequestContextClient,
     name: string,
     timeout: number,
   ): Promise<void> {
     const deadline = Date.now() + timeout;
     while (Date.now() < deadline) {
       try {
-        const nsResource = await client.getCoreV1Api().readNamespace({ name });
+        const nsResource = await client.getResourceByKind('namespace', name, undefined);
         const status = nsResource?.status as Record<string, unknown> | undefined;
         const phase = status?.phase;
         if (phase === 'Terminating') {
@@ -291,39 +340,38 @@ export class SpecResourceSetup {
     }
     this._client = null;
 
-    const client = getKubernetesClient();
+    const client = getApiClient();
     if (!client) return;
 
     const refs = Array.from(this.resources.values());
 
     // Phase 1: Snapshots (must be deleted before VMs)
     await this.deleteByType(client, refs, 'VirtualMachineSnapshot', async (ref) => {
-      await client.deleteCustomResource(
-        'snapshot.kubevirt.io',
-        'v1beta1',
-        ref.namespace,
-        'virtualmachinesnapshots',
-        ref.name,
-      );
+      await client.deleteResourceByKind('virtualmachinesnapshot', ref.name, ref.namespace);
     });
 
     // Phase 2: VMs (disable delete-protection first, then delete and wait for removal)
     const vmRefs = refs.filter((r) => r.type === 'VirtualMachine');
     for (const ref of vmRefs) {
       try {
-        await client.disableDeleteProtection(ref.name, ref.namespace);
+        await client.patchResourceByKind(
+          'vm',
+          ref.name,
+          {
+            metadata: { labels: { 'kubevirt.io/delete-protection': null } },
+            spec: {
+              template: { metadata: { labels: { 'kubevirt.io/delete-protection': null } } },
+            },
+          },
+          ref.namespace,
+          'merge',
+        );
         await new Promise((r) => setTimeout(r, TestTimeouts.UI_ANIMATION_DELAY));
       } catch {
         // protection may not be set
       }
       try {
-        await client.deleteCustomResource(
-          'kubevirt.io',
-          'v1',
-          ref.namespace,
-          'virtualmachines',
-          ref.name,
-        );
+        await client.deleteResourceByKind('vm', ref.name, ref.namespace);
       } catch (e: unknown) {
         if (!this.isNotFound(e)) {
           console.warn(`[SpecResourceSetup] Failed to delete VM ${ref.name}: ${e}`);
@@ -333,77 +381,41 @@ export class SpecResourceSetup {
 
     // Wait for VMs to be fully removed (prevents namespace finalizer deadlock)
     for (const ref of vmRefs) {
-      await this.waitForDeletion(
-        client,
-        'kubevirt.io',
-        'v1',
-        ref.namespace,
-        'virtualmachines',
-        ref.name,
-        TestTimeouts.ELEMENT_WAIT,
-      );
+      await this.waitForDeletion(client, 'vm', ref.name, ref.namespace, TestTimeouts.ELEMENT_WAIT);
     }
 
     // Phase 3: Templates
     await this.deleteByType(client, refs, 'Template', async (ref) => {
-      await client.deleteCustomResource(
-        'template.openshift.io',
-        'v1',
-        ref.namespace,
-        'templates',
-        ref.name,
-      );
+      await client.deleteResourceByKind('template', ref.name, ref.namespace);
     });
 
     // Phase 4: DataVolumes
     await this.deleteByType(client, refs, 'DataVolume', async (ref) => {
-      await client.deleteCustomResource(
-        'cdi.kubevirt.io',
-        'v1beta1',
-        ref.namespace,
-        'datavolumes',
-        ref.name,
-      );
+      await client.deleteResourceByKind('datavolume', ref.name, ref.namespace);
     });
 
     // Phase 5: Cluster-scoped resources
     await this.deleteByType(client, refs, 'MigrationPolicy', async (ref) => {
-      await client.deleteClusterCustomResource(
-        'migrations.kubevirt.io',
-        'v1alpha1',
-        'migrationpolicies',
-        ref.name,
-      );
+      await client.deleteResourceByKind('migrationpolicy', ref.name, undefined);
     });
 
     await this.deleteByType(client, refs, 'ClusterInstanceType', async (ref) => {
-      await client.deleteClusterCustomResource(
-        'instancetype.kubevirt.io',
-        'v1beta1',
-        'virtualmachineclusterinstancetypes',
-        ref.name,
-      );
+      await client.deleteResourceByKind('virtualmachineclusterinstancetype', ref.name, undefined);
     });
 
     // Phase 6: Secrets and ConfigMaps
     await this.deleteByType(client, refs, 'Secret', async (ref) => {
-      await client.getCoreV1Api().deleteNamespacedSecret({
-        name: ref.name,
-        namespace: ref.namespace,
-      });
+      await client.deleteResourceByKind('secret', ref.name, ref.namespace);
     });
 
     await this.deleteByType(client, refs, 'ConfigMap', async (ref) => {
-      await client.getCoreV1Api().deleteNamespacedConfigMap({
-        name: ref.name,
-        namespace: ref.namespace,
-      });
+      await client.deleteResourceByKind('configmap', ref.name, ref.namespace);
     });
 
     // Phase 7: Namespaces (cascade-deletes remaining resources)
     for (const ns of this.namespacesToCleanup) {
       try {
-        await client.getCoreV1Api().deleteNamespace({ name: ns });
+        await client.deleteProject(ns);
       } catch (e: unknown) {
         if (!this.isNotFound(e)) {
           console.warn(`[SpecResourceSetup] Failed to delete namespace ${ns}: ${e}`);
@@ -422,15 +434,23 @@ export class SpecResourceSetup {
 
   async createNamespace(prefix: string): Promise<string> {
     const name = `pw-${prefix}-${generateRandomString(8, 'alphanumeric').toLowerCase()}`;
-    const created = await this.client.createNamespace(name);
-    if (!created) {
-      throw new Error(`Failed to create namespace ${name}`);
-    }
-    await this.client.waitForNamespaceReady(name, TestTimeouts.DEFAULT);
+    await this.client.createProject(name);
 
     if (EnvVariables.isNonPrivUser) {
       try {
-        await this.client.grantUserAccessToNamespace(name, EnvVariables.username);
+        await this.client.createResourceByKind(
+          'rolebinding',
+          {
+            apiVersion: 'rbac.authorization.k8s.io/v1',
+            kind: 'RoleBinding',
+            metadata: { name: `${EnvVariables.username}-admin`, namespace: name },
+            roleRef: { apiGroup: 'rbac.authorization.k8s.io', kind: 'ClusterRole', name: 'admin' },
+            subjects: [
+              { apiGroup: 'rbac.authorization.k8s.io', kind: 'User', name: EnvVariables.username },
+            ],
+          },
+          name,
+        );
       } catch {
         // best-effort
       }
@@ -511,16 +531,10 @@ export class SpecResourceSetup {
     };
 
     try {
-      await this.client.createCustomResource(
-        'template.openshift.io',
-        'v1',
-        ns,
-        'templates',
-        templateResource,
-      );
+      await this.client.createTemplate(ns, templateResource as KubernetesResource);
     } catch (error: unknown) {
       const msg = error instanceof Error ? error.message : String(error);
-      if (!msg.includes('AlreadyExists')) throw error;
+      if (!msg.includes('AlreadyExists') && !msg.includes('409')) throw error;
       // Template already exists (leftover from previous run) — reuse it
     }
 
@@ -537,22 +551,29 @@ export class SpecResourceSetup {
     const templateProvider = config.templateProvider || 'openshift';
     const startAfterCreation = config.startAfterCreation ?? running;
 
-    await this.client.createVmFromTemplate(
+    let cloudInit: { userData?: string; networkData?: string } | undefined;
+    if (config.cloudInitConfig?.username || config.cloudInitConfig?.password) {
+      const lines = ['#cloud-config'];
+      lines.push(`user: ${config.cloudInitConfig.username || 'cloud-user'}`);
+      if (config.cloudInitConfig.password) {
+        lines.push(`password: ${config.cloudInitConfig.password}`);
+        lines.push('chpasswd:');
+        lines.push('  expire: false');
+      }
+      cloudInit = { userData: lines.join('\n') };
+    }
+
+    await this.client.vm.createVmFromTemplate(
       config.templateName,
       vmName,
       ns,
       templateProvider,
       startAfterCreation,
-      config.sysprepConfigMapName,
-      config.cloudInitConfig,
-      config.vmCustomization,
-      config.storageClassName,
-      config.folderName,
     );
 
-    const verified = await this.client.verifyVmCreated(
-      vmName,
+    const verified = await this.client.vm.verifyVmCreated(
       ns,
+      vmName,
       config.waitTimeout || TestTimeouts.VM_BOOTUP,
     );
     if (!verified.exists) {
@@ -560,12 +581,16 @@ export class SpecResourceSetup {
     }
 
     if (running && config.waitReady !== false) {
-      await this.client.waitForVmRunning(vmName, ns, config.waitTimeout || TestTimeouts.VM_BOOTUP);
+      await this.client.vm.waitForVmRunning(
+        ns,
+        vmName,
+        config.waitTimeout || TestTimeouts.VM_BOOTUP,
+      );
 
       // Populate STATE_VM_POD_NAME so tests relying on pod name context have it
       try {
-        const pods = await this.client.getPods(ns);
-        const vmPod = pods?.find((pod) =>
+        const podList = await this.client.project.getPods(ns);
+        const vmPod = (podList.items ?? []).find((pod) =>
           pod.metadata?.ownerReferences?.some(
             (ref) => ref.kind === 'VirtualMachineInstance' && ref.name === vmName,
           ),
@@ -597,8 +622,9 @@ export class SpecResourceSetup {
    */
   async discoverAvailableTemplates(ns = 'openshift'): Promise<string[]> {
     try {
-      const templates = await this.client.listTemplates(ns);
-      if (!Array.isArray(templates) || templates.length === 0) return [];
+      const templateList = await this.client.template.list(ns);
+      const templates = templateList.items ?? [];
+      if (templates.length === 0) return [];
 
       const available: string[] = [];
 
@@ -609,11 +635,11 @@ export class SpecResourceSetup {
         const labels = tpl.metadata?.labels || {};
         if (labels['template.kubevirt.io/type'] !== 'base') continue;
 
-        const ref = this.client.getTemplateBootDataSourceRef(tpl);
+        const ref = SpecResourceSetup.getTemplateBootDataSourceRef(tpl);
         if (!ref) continue;
 
         try {
-          if (await this.client.isDataSourceReady(ref.name, ref.namespace)) {
+          if (await this.isDataSourceReady(this.client, ref.name, ref.namespace)) {
             available.push(name);
           }
         } catch {
@@ -651,7 +677,7 @@ export class SpecResourceSetup {
    */
   async ensureAuth(): Promise<void> {
     await ensureApiAuth();
-    this._client = null; // force re-acquire from refreshed singleton
+    this._client = null;
   }
 
   // ---------------------------------------------------------------------------
@@ -704,7 +730,7 @@ export class SpecResourceSetup {
   async resolvePreferredTemplateByExistence(ns = 'openshift'): Promise<string | null> {
     for (const name of DEFAULT_TEMPLATE_PREFERENCE) {
       try {
-        await this.client.getTemplate(name, ns);
+        await this.client.template.get(ns, name);
         return name;
       } catch {
         // not found — try next
@@ -721,7 +747,7 @@ export class SpecResourceSetup {
   async resolveTemplate(candidates: readonly string[], ns = 'openshift'): Promise<string | null> {
     for (const name of candidates) {
       try {
-        await this.client.getTemplate(name, ns);
+        await this.client.template.get(ns, name);
         return name;
       } catch {
         // template doesn't exist — try next
@@ -745,9 +771,10 @@ export class SpecResourceSetup {
   ): Promise<string | null> {
     for (const name of candidates) {
       try {
-        const tpl = await this.client.getTemplate(name, ns);
-        const ref = this.client.getTemplateBootDataSourceRef(tpl);
-        if (ref && (await this.client.isDataSourceReady(ref.name, ref.namespace))) {
+        const tpl = await this.client.template.get(ns, name);
+        if (!tpl) continue;
+        const ref = SpecResourceSetup.getTemplateBootDataSourceRef(tpl);
+        if (ref && (await this.isDataSourceReady(this.client, ref.name, ref.namespace))) {
           return name;
         }
       } catch {

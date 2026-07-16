@@ -1,10 +1,10 @@
-import type KubernetesClient from '@/clients/kubernetes-client';
+import type RequestContextClient from '@/clients/request-context-client';
 import type { TemplateConfig } from '@/data-factories/template-factory';
 import type { TestUtilsType } from '@/fixtures/test-utils';
 import { TestTimeouts } from '@/utils/test-config';
 
 export async function setupTemplateFromResource(
-  k8sClient: KubernetesClient,
+  client: RequestContextClient,
   prefix: string,
   config: Omit<Partial<TemplateConfig>, 'namespace'> & { targetNamespace: string; name?: string },
   utils: TestUtilsType,
@@ -19,19 +19,13 @@ export async function setupTemplateFromResource(
     namespace: targetNamespace,
     displayName: templateDisplayName,
   });
-  await k8sClient.createCustomResource(
-    'template.openshift.io',
-    'v1',
-    targetNamespace,
-    'templates',
-    templateResource,
-  );
-  k8sClient.trackResource('Template', templateName, targetNamespace);
+  await client.createTemplate(targetNamespace, templateResource);
+  client.trackResource('Template', templateName, targetNamespace);
   return { templateName, templateDisplayName };
 }
 
 export async function verifyTemplateDeletedFromCluster(
-  k8sClient: KubernetesClient,
+  client: RequestContextClient,
   templateName: string,
   namespace: string,
   utils: TestUtilsType,
@@ -39,12 +33,9 @@ export async function verifyTemplateDeletedFromCluster(
 ): Promise<{ deleted: boolean; error?: string }> {
   const startTime = Date.now();
   while (Date.now() - startTime < timeoutMs) {
-    const result = await k8sClient.verifyTemplateCreated(
-      templateName,
-      namespace,
-      utils.TestTimeouts.POLLING_INTERVAL,
-    );
-    if (!result.exists) {
+    try {
+      await client.getTemplate(namespace, templateName);
+    } catch {
       return { deleted: true };
     }
     await new Promise((resolve) => setTimeout(resolve, utils.TestTimeouts.POLLING_INTERVAL));

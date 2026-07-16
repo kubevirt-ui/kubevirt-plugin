@@ -121,15 +121,11 @@ export default class QuotasPage extends BasePage {
   }
 
   async navigateToQuotasViaUI(): Promise<void> {
-    try {
-      const quotasNav = this.locator('nav a[href*="/quotas"]');
-      await quotasNav.first().waitFor({ state: 'visible', timeout: TestTimeouts.DEFAULT });
-      await this.robustClick(quotasNav.first());
-      await this.page.waitForLoadState('domcontentloaded');
-      await this.page.waitForTimeout(2000);
-    } catch {
-      await this.goTo('/k8s/all-namespaces/quotas');
-    }
+    const quotasNav = this.locator('nav a[href*="/quotas"]');
+    await quotasNav.first().waitFor({ state: 'visible', timeout: TestTimeouts.DEFAULT });
+    await this.robustClick(quotasNav.first());
+    await this.page.waitForLoadState('domcontentloaded');
+    await this.page.waitForTimeout(2000);
   }
 
   async submitCreateQuota(): Promise<void> {

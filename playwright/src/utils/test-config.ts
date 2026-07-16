@@ -9,9 +9,8 @@ import * as path from 'path';
 import { EnvVariables } from './env-variables';
 
 export interface SharedTestConfig {
-  authToken?: string; // OC authentication token for Kubernetes API calls
+  authToken?: string;
   cnvNamespace: string;
-  kubeConfigPath?: string; // Path to kubeconfig file for OC CLI authentication
   projectName: string;
   secretName: string;
   testNamespace: string;
@@ -95,8 +94,8 @@ export const TestTimeouts = {
   /** Timeout for status validation checks (60 seconds) */
   STATUS_VALIDATION: MINUTE,
 
-  /** Timeout for VM bootup and full initialization (3 minutes) */
-  VM_BOOTUP: 3 * MINUTE,
+  /** Timeout for VM bootup and full initialization (4 minutes) */
+  VM_BOOTUP: 4 * MINUTE,
 
   /** Timeout for OLM operator install (e.g. COO); generous but under default test timeout (6 min) */
   OPERATOR_INSTALL: 5 * MINUTE,
@@ -270,23 +269,8 @@ export class TestConfigManager {
         ? `${EnvVariables.testNamespace}-${shardIndex}`
         : EnvVariables.testNamespace;
 
-    // Determine kubeconfig path (try environment variable first, then construct path)
-    let kubeConfigPath = EnvVariables.kubeConfigPath;
-    if (!kubeConfigPath) {
-      const kubeConfigDir = path.join(process.cwd(), '.kubeconfigs');
-      const kubeConfigFileName =
-        EnvVariables.isSharded && shardIndex ? `shard-${shardIndex}-config` : 'test-config';
-      kubeConfigPath = path.join(kubeConfigDir, kubeConfigFileName);
-
-      // Only use it if the file actually exists
-      if (!fs.existsSync(kubeConfigPath)) {
-        kubeConfigPath = undefined;
-      }
-    }
-
     this.cachedConfig = {
       cnvNamespace: EnvVariables.cnvNamespace,
-      kubeConfigPath: kubeConfigPath,
       projectName: testNamespace,
       secretName: EnvVariables.secretName,
       testNamespace: testNamespace,

@@ -7,12 +7,14 @@ import type { APIRequestContext, APIResponse, Page } from '@playwright/test';
 
 import type { ClusterAuthConfig } from './base-client';
 import BaseClient from './base-client';
+import { resolveKind } from './kind-resolver';
 import type { ProxyApiContext } from './proxy-handlers';
 import {
   CdiProxyHandler,
   CoreProxyHandler,
   InfraProxyHandler,
   InstanceTypeProxyHandler,
+  ProjectProxyHandler,
   SnapshotProxyHandler,
   TemplateProxyHandler,
   VirtualMachineProxyHandler,
@@ -63,6 +65,7 @@ export default class RequestContextClient extends BaseClient implements ProxyApi
   readonly core: CoreProxyHandler;
   readonly infra: InfraProxyHandler;
   readonly instanceType: InstanceTypeProxyHandler;
+  readonly project: ProjectProxyHandler;
   readonly snapshot: SnapshotProxyHandler;
   readonly template: TemplateProxyHandler;
   readonly vm: VirtualMachineProxyHandler;
@@ -81,6 +84,7 @@ export default class RequestContextClient extends BaseClient implements ProxyApi
     this.cdi = new CdiProxyHandler(this);
     this.infra = new InfraProxyHandler(this);
     this.core = new CoreProxyHandler(this);
+    this.project = new ProjectProxyHandler(this);
   }
 
   // ---------------------------------------------------------------------------
@@ -147,6 +151,7 @@ export default class RequestContextClient extends BaseClient implements ProxyApi
 
   private async _parseResponse(response: APIResponse): Promise<KubernetesResource | null> {
     const body = await response.text();
+    if (response.status() === 404) return null;
     if (!response.ok()) {
       throw new Error(`HTTP ${response.status()} ${response.statusText()} — ${body}`);
     }
@@ -228,6 +233,65 @@ export default class RequestContextClient extends BaseClient implements ProxyApi
     return response.ok();
   }
 
+  async cleanupClusterResources(): Promise<void> {
+    const deleteByKind = async (kind: string, name: string): Promise<void> => {
+      try {
+        await this.deleteResourceByKind(kind, name);
+      } catch {
+        // ignore
+      }
+    };
+
+    await deleteByKind('VirtualMachineClusterInstancetype', 'example');
+    await deleteByKind('VirtualMachineClusterPreference', 'example');
+    await deleteByKind('MigrationPolicy', 'example');
+  }
+
+  async cleanupTestNamespace(namespace: string): Promise<void> {
+    const deleteAll = async (
+      group: string,
+      version: string,
+      plural: string,
+      ns: string,
+    ): Promise<void> => {
+      try {
+        const list = await this.listResources(group, version, plural, ns);
+        await Promise.allSettled(
+          (list.items ?? []).map((item) => {
+            const name = item.metadata?.name;
+            if (!name) return Promise.resolve(null);
+            return this.deleteResource(group, version, plural, name, ns).catch(() => null);
+          }),
+        );
+      } catch {
+        // CRD not installed or list failed — continue
+      }
+    };
+
+    // Phase 1: VMIs and VMs first (VMIs must go before VMs)
+    await Promise.allSettled([
+      deleteAll('kubevirt.io', 'v1', 'virtualmachineinstances', namespace),
+      deleteAll('kubevirt.io', 'v1', 'virtualmachines', namespace),
+    ]);
+
+    // Phase 2: Everything else in parallel
+    await Promise.allSettled([
+      deleteAll('template.openshift.io', 'v1', 'templates', namespace),
+      deleteAll('snapshot.kubevirt.io', 'v1beta1', 'virtualmachinesnapshots', namespace),
+      deleteAll('', 'v1', 'secrets', namespace),
+      deleteAll('k8s.cni.cncf.io', 'v1', 'network-attachment-definitions', namespace),
+      deleteAll('instancetype.kubevirt.io', 'v1beta1', 'virtualmachineinstancetypes', namespace),
+      deleteAll('instancetype.kubevirt.io', 'v1beta1', 'virtualmachinepreferences', namespace),
+      deleteAll(
+        'migrations.kubevirt.io',
+        'v1alpha1',
+        'virtualmachinestoragemigrationplans',
+        namespace,
+      ),
+      deleteAll('kubevirt.io', 'v1', 'virtualmachineinstancemigrations', namespace),
+    ]);
+  }
+
   configureUserSettings(
     username = 'kube-admin',
     namespace = 'openshift-cnv',
@@ -242,6 +306,36 @@ export default class RequestContextClient extends BaseClient implements ProxyApi
     );
   }
 
+  async createBlankDataVolume(
+    name: string,
+    namespace: string,
+    size = '1Gi',
+  ): Promise<KubernetesResource | null> {
+    return this.createDataVolume(namespace, {
+      apiVersion: 'cdi.kubevirt.io/v1beta1',
+      kind: 'DataVolume',
+      metadata: { name, namespace },
+      spec: {
+        source: { blank: {} },
+        storage: { resources: { requests: { storage: size } } },
+      },
+    });
+  }
+
+  createConfigMapResource(namespace: string, name: string, data: Record<string, string>) {
+    return this.core.createConfigMap(namespace, name, data);
+  }
+
+  async createCustomResource(
+    group: string,
+    version: string,
+    namespace: string,
+    plural: string,
+    spec: KubernetesResource,
+  ): Promise<KubernetesResource | null> {
+    return this.createResource(group, version, plural, spec, namespace);
+  }
+
   createDataSource(namespace: string, spec: KubernetesResource) {
     return this.cdi.createDataSource(namespace, spec);
   }
@@ -250,14 +344,23 @@ export default class RequestContextClient extends BaseClient implements ProxyApi
     return this.cdi.createDataVolume(namespace, spec);
   }
 
+  // ---------------------------------------------------------------------------
+  // Backward-compat flat methods — delegate to domain handlers
+  // New code should use apiClient.<handler>.<method>() directly.
+  // ---------------------------------------------------------------------------
+
   createMigrationPolicy(spec: KubernetesResource) {
     return this.infra.createMigrationPolicy(spec);
   }
-
   createMultiNsStorageMigrationPlan(spec: KubernetesResource, namespace: string) {
     return this.infra.createMultiNsStorageMigrationPlan(spec, namespace);
   }
-
+  createNamespace(name: string, labels?: Record<string, string>) {
+    return this.project.createProject(name, labels);
+  }
+  createProject(name: string, labels?: Record<string, string>) {
+    return this.project.createProject(name, labels);
+  }
   async createResource(
     group: string,
     version: string,
@@ -271,23 +374,31 @@ export default class RequestContextClient extends BaseClient implements ProxyApi
     const nsSegment = namespace ? `/namespaces/${namespace}` : '';
     return this._request('post', `${apiSegment}${nsSegment}/${plural}`, { data: spec });
   }
+  async createResourceByKind(
+    kind: string,
+    spec: KubernetesResource,
+    namespace?: string,
+  ): Promise<KubernetesResource | null> {
+    const { group, version, plural } = resolveKind(kind);
+    return this.createResource(group, version, plural, spec, namespace);
+  }
+  createSecret(namespace: string, name: string, data: Record<string, string>, type?: string) {
+    return this.core.createSecret(namespace, name, data, type);
+  }
+  createSSHKeySecret(namespace: string, name: string, sshPublicKey?: string) {
+    return this.core.createSSHKeySecret(namespace, name, sshPublicKey);
+  }
 
   createStorageMigrationPlan(spec: KubernetesResource, namespace: string) {
     return this.infra.createStorageMigrationPlan(spec, namespace);
   }
-
   createTemplate(namespace: string, spec: KubernetesResource) {
     return this.template.create(namespace, spec);
   }
-
-  // ---------------------------------------------------------------------------
-  // Backward-compat flat methods — delegate to domain handlers
-  // New code should use apiClient.<handler>.<method>() directly.
-  // ---------------------------------------------------------------------------
-
   createVirtualMachine(namespace: string, spec: KubernetesResource) {
     return this.vm.create(namespace, spec);
   }
+
   createVirtualMachineClusterInstanceType(spec: KubernetesResource) {
     return this.instanceType.createClusterInstanceType(spec);
   }
@@ -300,26 +411,59 @@ export default class RequestContextClient extends BaseClient implements ProxyApi
   createVirtualMachinePreference(namespace: string, spec: KubernetesResource) {
     return this.instanceType.createPreference(namespace, spec);
   }
+
   createVirtualMachineRestore(namespace: string, spec: KubernetesResource) {
     return this.snapshot.createRestore(namespace, spec);
   }
   createVirtualMachineSnapshot(namespace: string, spec: KubernetesResource) {
     return this.snapshot.create(namespace, spec);
   }
+  createVmFromInstanceType(
+    ...args: Parameters<VirtualMachineProxyHandler['createVmFromInstanceType']>
+  ) {
+    return this.vm.createVmFromInstanceType(...args);
+  }
+  createVmFromTemplate(...args: Parameters<VirtualMachineProxyHandler['createVmFromTemplate']>) {
+    return this.vm.createVmFromTemplate(...args);
+  }
+  async createVmSnapshot(
+    snapshotName: string,
+    vmName: string,
+    namespace: string,
+  ): Promise<KubernetesResource | null> {
+    return this.createVirtualMachineSnapshot(namespace, {
+      apiVersion: 'snapshot.kubevirt.io/v1beta1',
+      kind: 'VirtualMachineSnapshot',
+      metadata: { name: snapshotName, namespace },
+      spec: {
+        source: { apiGroup: 'kubevirt.io', kind: 'VirtualMachine', name: vmName },
+      },
+    });
+  }
+  async deleteClusterCustomResource(
+    group: string,
+    version: string,
+    plural: string,
+    name: string,
+  ): Promise<KubernetesResource | null> {
+    return this.deleteResource(group, version, plural, name);
+  }
   deleteDataSource(namespace: string, name: string) {
     return this.cdi.deleteDataSource(namespace, name);
   }
-
   deleteDataVolume(namespace: string, name: string) {
     return this.cdi.deleteDataVolume(namespace, name);
   }
   deleteMigrationPolicy(name: string) {
     return this.infra.deleteMigrationPolicy(name);
   }
+
   deleteMultiNsStorageMigrationPlan(name: string, namespace: string) {
     return this.infra.deleteMultiNsStorageMigrationPlan(name, namespace);
   }
-
+  deleteProject(name: string) {
+    return this.project.deleteProject(name);
+  }
   async deleteResource(
     group: string,
     version: string,
@@ -333,6 +477,18 @@ export default class RequestContextClient extends BaseClient implements ProxyApi
     const nsSegment = namespace ? `/namespaces/${namespace}` : '';
     return this._request('delete', `${apiSegment}${nsSegment}/${plural}/${name}`);
   }
+  async deleteResourceByKind(
+    kind: string,
+    name: string,
+    namespace?: string,
+  ): Promise<KubernetesResource | null> {
+    const { group, version, plural } = resolveKind(kind);
+    return this.deleteResource(group, version, plural, name, namespace);
+  }
+  deleteSecret(namespace: string, name: string) {
+    return this.core.deleteSecret(namespace, name);
+  }
+
   deleteStorageMigrationPlan(name: string, namespace: string) {
     return this.infra.deleteStorageMigrationPlan(name, namespace);
   }
@@ -342,7 +498,6 @@ export default class RequestContextClient extends BaseClient implements ProxyApi
   deleteVirtualMachine(namespace: string, name: string) {
     return this.vm.delete(namespace, name);
   }
-
   deleteVirtualMachineClusterInstanceType(name: string) {
     return this.instanceType.deleteClusterInstanceType(name);
   }
@@ -361,8 +516,34 @@ export default class RequestContextClient extends BaseClient implements ProxyApi
   deleteVirtualMachineSnapshot(namespace: string, name: string) {
     return this.snapshot.delete(namespace, name);
   }
+  disableDeleteProtection(vmName: string, namespace: string) {
+    return this.vm.disableDeleteProtection(namespace, vmName);
+  }
+
+  ensureNamespace(name: string) {
+    return this.project.ensureNamespace(name);
+  }
+  async ensureVmFoldersEnabled(cnvNamespace = 'openshift-cnv'): Promise<void> {
+    try {
+      await this.mergePatchResource(
+        '',
+        'v1',
+        'configmaps',
+        'kubevirt-ui-features',
+        {
+          data: { treeViewFolders: 'true' },
+        },
+        cnvNamespace,
+      );
+    } catch {
+      // ignore
+    }
+  }
   getCdiConfig() {
     return this.cdi.getCdiConfig();
+  }
+  getClusterVersion() {
+    return this.core.getClusterVersion();
   }
   // -- Core --
   getConfigMap(namespace: string, name: string) {
@@ -371,7 +552,6 @@ export default class RequestContextClient extends BaseClient implements ProxyApi
   getDataImportCrons(namespace?: string) {
     return this.cdi.listDataImportCrons(namespace);
   }
-
   getDataSource(namespace: string, name: string) {
     return this.cdi.getDataSource(namespace, name);
   }
@@ -388,13 +568,16 @@ export default class RequestContextClient extends BaseClient implements ProxyApi
   getHyperConverged(namespace = 'openshift-cnv', name = 'kubevirt-hyperconverged') {
     return this.infra.getHyperConverged(namespace, name);
   }
-
   // -- Infra --
   getHyperConvergeds(namespace = 'openshift-cnv') {
     return this.infra.listHyperConvergeds(namespace);
   }
   getKubeVirt(namespace = 'openshift-cnv', name = 'kubevirt-kubevirt-hyperconverged') {
     return this.infra.getKubeVirt(namespace, name);
+  }
+
+  getKubevirtPluginVersion() {
+    return this.infra.getKubevirtPluginVersion();
   }
   getKubeVirtUiFeatures(namespace = 'openshift-cnv') {
     return this.core.getUiFeatures(namespace);
@@ -414,13 +597,21 @@ export default class RequestContextClient extends BaseClient implements ProxyApi
   getNetworkAttachmentDefinitions(namespace: string) {
     return this.infra.listNetworkAttachmentDefinitions(namespace);
   }
+  getNodeOsImage() {
+    return this.infra.getNodeOsImage();
+  }
+  getNodes() {
+    return this.core.getNodes();
+  }
   getPersistentVolumeClaims(namespace: string) {
     return this.core.listPersistentVolumeClaims(namespace);
   }
   getPods(namespace: string) {
     return this.core.listPods(namespace);
   }
-
+  getReadyNodes() {
+    return this.infra.getReadyNodes();
+  }
   async getResource(
     group: string,
     version: string,
@@ -434,6 +625,22 @@ export default class RequestContextClient extends BaseClient implements ProxyApi
     const nsSegment = namespace ? `/namespaces/${namespace}` : '';
     return this._request('get', `${apiSegment}${nsSegment}/${plural}/${name}`);
   }
+  async getResourceByKind(
+    kind: string,
+    name: string,
+    namespace?: string,
+  ): Promise<KubernetesResource | null> {
+    const { group, version, plural } = resolveKind(kind);
+    return this.getResource(group, version, plural, name, namespace);
+  }
+  getStorageClasses() {
+    return this.core.getStorageClasses();
+  }
+  // ---------------------------------------------------------------------------
+  // project.openshift.io — Project patch
+  // (Uses a non-standard /k8s/cluster/... URL, not delegated to a handler)
+  // ---------------------------------------------------------------------------
+
   getStorageMigrationPlan(name: string, namespace: string) {
     return this.infra.getStorageMigrationPlan(name, namespace);
   }
@@ -443,6 +650,7 @@ export default class RequestContextClient extends BaseClient implements ProxyApi
   getStorageProfiles() {
     return this.cdi.listStorageProfiles();
   }
+
   getTemplate(namespace: string, name: string) {
     return this.template.get(namespace, name);
   }
@@ -474,33 +682,102 @@ export default class RequestContextClient extends BaseClient implements ProxyApi
   getVirtualMachineInstances(namespace?: string, queryParams?: Record<string, string>) {
     return this.vm.listInstances(namespace, queryParams);
   }
-
   getVirtualMachineInstanceTypes(namespace: string) {
     return this.instanceType.listInstanceTypes(namespace);
   }
   getVirtualMachinePreferences(namespace: string) {
     return this.instanceType.listPreferences(namespace);
   }
+
+  // ---------------------------------------------------------------------------
+  // Backward-compatible aliases for OcClient API
+  // ---------------------------------------------------------------------------
+
   getVirtualMachineRestore(namespace: string, name: string) {
     return this.snapshot.getRestore(namespace, name);
   }
+
   getVirtualMachineRestores(namespace: string) {
     return this.snapshot.listRestores(namespace);
   }
+
   // -- VMs --
   getVirtualMachines(namespace?: string, queryParams?: Record<string, string>) {
     return this.vm.list(namespace, queryParams);
   }
+
   getVirtualMachineSnapshot(namespace: string, name: string) {
     return this.snapshot.get(namespace, name);
   }
+
+  // ---------------------------------------------------------------------------
+  // Kind-based convenience methods
+  // Backward-compatible with OcClient's kind-based API. Uses the kind resolver
+  // to map oc-style kind strings (e.g. 'vm', 'secret') to full GVR tuples.
+  // ---------------------------------------------------------------------------
+
   // -- Snapshots --
   getVirtualMachineSnapshots(namespace: string) {
     return this.snapshot.list(namespace);
   }
+
+  getVmiCpuSockets(vmName: string, namespace: string) {
+    return this.vm.getVmiCpuSockets(namespace, vmName);
+  }
+
+  getVmiDiskBus(vmName: string, namespace: string, diskName: string) {
+    return this.vm.getVmiDiskBus(namespace, vmName, diskName);
+  }
+
+  getVmiMemoryGuest(vmName: string, namespace: string) {
+    return this.vm.getVmiMemoryGuest(namespace, vmName);
+  }
+
+  getVmIpAddress(vmName: string, namespace: string) {
+    return this.vm.getVmIpAddress(namespace, vmName);
+  }
+
+  // ---------------------------------------------------------------------------
+  // Project / Namespace management
+  // ---------------------------------------------------------------------------
+
+  getVmNodeName(vmName: string, namespace: string) {
+    return this.vm.getVmNodeName(namespace, vmName);
+  }
+
   getVolumeSnapshots(namespace: string) {
     return this.snapshot.listVolumeSnapshots(namespace);
   }
+
+  hotplugVolumeToVm(vmName: string, namespace: string, volumeName: string, diskName: string) {
+    return this.vm.hotplugVolumeToVm(namespace, vmName, volumeName, diskName);
+  }
+
+  isNativeVmTemplateFeatureGateEnabled(namespace?: string, kubevirtName?: string) {
+    return this.infra.isNativeVmTemplateFeatureGateEnabled(namespace, kubevirtName);
+  }
+
+  isStorageMigrationAvailable() {
+    return this.infra.isStorageMigrationAvailable();
+  }
+
+  isVmDiskPersistent(vmName: string, namespace: string, diskName: string) {
+    return this.vm.isVmDiskPersistent(namespace, vmName, diskName);
+  }
+
+  async listMigrationPolicies() {
+    const result = await this.listResources(
+      'migrations.kubevirt.io',
+      'v1alpha1',
+      'migrationpolicies',
+    );
+    return result?.items ?? [];
+  }
+
+  // ---------------------------------------------------------------------------
+  // VM lifecycle (delegates to vm handler)
+  // ---------------------------------------------------------------------------
+
   async listResources(
     group: string,
     version: string,
@@ -518,6 +795,23 @@ export default class RequestContextClient extends BaseClient implements ProxyApi
       `${apiSegment}${nsSegment}/${plural}${qs}`,
     )) as unknown as KubernetesListResource;
   }
+
+  async listResourcesByKind(
+    kind: string,
+    namespace?: string,
+    labels?: Record<string, string>,
+  ): Promise<KubernetesListResource> {
+    const { group, version, plural } = resolveKind(kind);
+    const queryParams = labels
+      ? {
+          labelSelector: Object.entries(labels)
+            .map(([k, v]) => `${k}=${v}`)
+            .join(','),
+        }
+      : undefined;
+    return this.listResources(group, version, plural, namespace, queryParams);
+  }
+
   /**
    * JSON Merge Patch (RFC 7396) any resource through the console proxy.
    * Prefer over `patchResource` when the target sub-path may not exist yet —
@@ -541,15 +835,27 @@ export default class RequestContextClient extends BaseClient implements ProxyApi
       headers: { 'Content-Type': 'application/merge-patch+json' },
     });
   }
+
+  migrationPolicyExists(name: string) {
+    return this.infra.migrationPolicyExists(name);
+  }
+
+  namespaceExists(name: string) {
+    return this.project.namespaceExists(name);
+  }
+
   patchConfigMap(name: string, namespace: string, patchPayload: JsonPatchOp[]) {
     return this.core.patchConfigMap(name, namespace, patchPayload);
   }
+
   patchDataSource(namespace: string, name: string, patch: JsonPatchOp[]) {
     return this.cdi.patchDataSource(namespace, name, patch);
   }
+
   patchDataVolume(namespace: string, name: string, patch: JsonPatchOp[]) {
     return this.cdi.patchDataVolume(namespace, name, patch);
   }
+
   patchHyperConverged(
     namespace = 'openshift-cnv',
     name = 'kubevirt-hyperconverged',
@@ -557,13 +863,10 @@ export default class RequestContextClient extends BaseClient implements ProxyApi
   ) {
     return this.infra.patchHyperConverged(namespace, name, patchPayload);
   }
+
   patchMigrationPolicy(name: string, patch: JsonPatchOp[]) {
     return this.infra.patchMigrationPolicy(name, patch);
   }
-  // ---------------------------------------------------------------------------
-  // project.openshift.io — Project patch
-  // (Uses a non-standard /k8s/cluster/... URL, not delegated to a handler)
-  // ---------------------------------------------------------------------------
 
   async patchProject(projectName: string, patchPayload: JsonPatchOp[]): Promise<void> {
     const base = this.baseUrl.endsWith('/') ? this.baseUrl.slice(0, -1) : this.baseUrl;
@@ -578,6 +881,7 @@ export default class RequestContextClient extends BaseClient implements ProxyApi
       throw new Error(`Failed to patch Project: ${response.status()} ${body}`);
     }
   }
+
   async patchResource(
     group: string,
     version: string,
@@ -595,6 +899,28 @@ export default class RequestContextClient extends BaseClient implements ProxyApi
       headers: { 'Content-Type': 'application/json-patch+json' },
     });
   }
+
+  async patchResourceByKind(
+    kind: string,
+    name: string,
+    patch: JsonPatchOp[] | Record<string, unknown>,
+    namespace?: string,
+    patchType: 'json' | 'merge' = 'json',
+  ): Promise<KubernetesResource | null> {
+    const { group, version, plural } = resolveKind(kind);
+    if (patchType === 'merge') {
+      return this.mergePatchResource(
+        group,
+        version,
+        plural,
+        name,
+        patch as Record<string, unknown>,
+        namespace,
+      );
+    }
+    return this.patchResource(group, version, plural, name, patch as JsonPatchOp[], namespace);
+  }
+
   patchTemplate(namespace: string, name: string, patch: JsonPatchOp[]) {
     return this.template.patch(namespace, name, patch);
   }
@@ -602,6 +928,11 @@ export default class RequestContextClient extends BaseClient implements ProxyApi
   patchVirtualMachine(namespace: string, name: string, patch: JsonPatchOp[]) {
     return this.vm.patch(namespace, name, patch);
   }
+
+  patchVmEvictionStrategy(vmName: string, namespace: string, strategy: 'LiveMigrate' | 'None') {
+    return this.vm.patchVmEvictionStrategy(namespace, vmName, strategy);
+  }
+
   /**
    * Prime the csrf-token cookie by fetching the console root page.
    * The OpenShift console only sets the csrf-token cookie on HTML page responses (not API calls).
@@ -618,15 +949,31 @@ export default class RequestContextClient extends BaseClient implements ProxyApi
       })
       .catch(() => undefined);
   }
+
+  // ---------------------------------------------------------------------------
+  // Infra delegates
+  // ---------------------------------------------------------------------------
+
+  removeVmDeleteProtection(vmName: string, namespace: string) {
+    return this.vm.removeVmDeleteProtection(namespace, vmName);
+  }
+
   resetVirtualMachineInstance(namespace: string, vmName: string) {
     return this.vm.resetInstance(namespace, vmName);
   }
+
   restartVirtualMachine(namespace: string, name: string) {
     return this.vm.restart(namespace, name);
   }
+
+  secretExists(namespace: string, name: string) {
+    return this.core.secretExists(namespace, name);
+  }
+
   setConfirmVmActions(enabled: string, namespace = 'openshift-cnv') {
     return this.core.setConfirmVmActions(enabled, namespace);
   }
+
   setConsoleGuidedTourCompleted(
     completed: boolean,
     username = 'kubeadmin',
@@ -634,6 +981,7 @@ export default class RequestContextClient extends BaseClient implements ProxyApi
   ) {
     return this.core.setConsoleGuidedTourCompleted(completed, username, namespace);
   }
+
   setMemoryDensity(
     memoryOvercommitPercentage: number,
     namespace = 'openshift-cnv',
@@ -641,10 +989,156 @@ export default class RequestContextClient extends BaseClient implements ProxyApi
   ) {
     return this.infra.setMemoryDensity(memoryOvercommitPercentage, namespace, name);
   }
+
+  async setupKubevirtUiConfig(
+    cnvNamespace = 'openshift-cnv',
+    username = 'kube-admin',
+  ): Promise<void> {
+    const userSettingsPatch = `{"quickStart":{"dontShowWelcomeModal":true}}`;
+    try {
+      await this.patchConfigMap('kubevirt-user-settings', cnvNamespace, [
+        { op: 'replace', path: `/data/${username}`, value: userSettingsPatch },
+      ]);
+    } catch {
+      // ConfigMap may not exist yet
+    }
+    try {
+      await this.patchConfigMap('kubevirt-ui-features', cnvNamespace, [
+        { op: 'replace', path: '/data/advancedSearch', value: 'true' },
+        { op: 'replace', path: '/data/treeViewFolders', value: 'true' },
+      ]);
+    } catch {
+      // ConfigMap may not exist yet
+    }
+  }
+
+  setupTestNamespace(namespace: string) {
+    return this.project.setupTestNamespace(namespace);
+  }
+
+  // ---------------------------------------------------------------------------
+  // Core delegates
+  // ---------------------------------------------------------------------------
+
   startVirtualMachine(namespace: string, name: string) {
     return this.vm.start(namespace, name);
   }
+
+  startVm(namespace: string, name: string) {
+    return this.vm.start(namespace, name);
+  }
+
   stopVirtualMachine(namespace: string, name: string) {
     return this.vm.stop(namespace, name);
+  }
+
+  stopVm(namespace: string, name: string) {
+    return this.vm.stop(namespace, name);
+  }
+
+  verifyAuthentication() {
+    return this.infra.verifyAuthentication();
+  }
+
+  verifyLiveMigrationLimits(...args: Parameters<InfraProxyHandler['verifyLiveMigrationLimits']>) {
+    return this.infra.verifyLiveMigrationLimits(...args);
+  }
+
+  verifyMigrationPolicyCreated(name: string, timeoutMs?: number) {
+    return this.infra.verifyMigrationPolicyCreated(name, timeoutMs);
+  }
+
+  async verifyTemplateCreated(
+    name: string,
+    namespace: string,
+    timeoutMs = 10_000,
+  ): Promise<{ exists: boolean }> {
+    const deadline = Date.now() + timeoutMs;
+    while (Date.now() < deadline) {
+      try {
+        const tpl = await this.getTemplate(namespace, name);
+        if (tpl) return { exists: true };
+      } catch {
+        // not yet
+      }
+      await new Promise((r) => setTimeout(r, 2_000));
+    }
+    return { exists: false };
+  }
+
+  // ---------------------------------------------------------------------------
+  // Snapshot/DataVolume convenience methods
+  // ---------------------------------------------------------------------------
+
+  verifyVmCreated(vmName: string, namespace: string, timeoutMs?: number) {
+    return this.vm.verifyVmCreated(namespace, vmName, timeoutMs);
+  }
+
+  async waitForDataVolumeSucceeded(
+    name: string,
+    namespace: string,
+    timeoutMs = 120_000,
+  ): Promise<boolean> {
+    const start = Date.now();
+    while (Date.now() - start < timeoutMs) {
+      try {
+        const dv = await this.getDataVolume(namespace, name);
+        if ((dv?.status as Record<string, unknown>)?.phase === 'Succeeded') return true;
+      } catch {
+        // not ready yet
+      }
+      await new Promise((r) => setTimeout(r, 3000));
+    }
+    return false;
+  }
+
+  waitForNamespaceReady(name: string, timeoutMs?: number) {
+    return this.project.waitForNamespaceReady(name, timeoutMs);
+  }
+
+  async waitForSnapshotReady(
+    snapshotName: string,
+    namespace: string,
+    timeoutMs = 120_000,
+  ): Promise<boolean> {
+    const start = Date.now();
+    while (Date.now() - start < timeoutMs) {
+      try {
+        const snap = await this.getVirtualMachineSnapshot(namespace, snapshotName);
+        if ((snap?.status as Record<string, unknown>)?.readyToUse === true) return true;
+      } catch {
+        // not ready yet
+      }
+      await new Promise((r) => setTimeout(r, 3000));
+    }
+    return false;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Namespace cleanup
+  // ---------------------------------------------------------------------------
+
+  waitForVmDeleted(vmName: string, namespace: string, timeoutMs?: number) {
+    return this.vm.waitForVmDeleted(namespace, vmName, timeoutMs);
+  }
+
+  // ---------------------------------------------------------------------------
+  // Cluster resource cleanup
+  // ---------------------------------------------------------------------------
+
+  waitForVmDiskPresent(vmName: string, namespace: string, diskName: string, timeoutMs?: number) {
+    return this.vm.waitForVmDiskPresent(namespace, vmName, diskName, timeoutMs);
+  }
+
+  // ---------------------------------------------------------------------------
+  // Setup helpers
+  // ---------------------------------------------------------------------------
+
+  waitForVmExists(vmName: string, namespace: string, timeoutMs?: number) {
+    return this.vm.waitForVmExists(namespace, vmName, timeoutMs);
+  }
+
+  waitForVmRunning(vmName: string, namespace: string, timeoutMs?: number) {
+    return this.vm.waitForVmRunning(namespace, vmName, timeoutMs);
   }
 }

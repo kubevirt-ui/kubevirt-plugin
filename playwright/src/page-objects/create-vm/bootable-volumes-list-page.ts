@@ -216,11 +216,7 @@ export default class BootableVolumesListPage extends PageCommons {
   }
 
   async navigateToBootableVolumesViaUI(): Promise<void> {
-    try {
-      await this.clickNavBootableVolumes();
-    } catch {
-      await this.navigateToGeneralBootableVolumes();
-    }
+    await this.clickNavBootableVolumes();
   }
 
   async navigateToGeneralBootableVolumes() {
@@ -228,23 +224,19 @@ export default class BootableVolumesListPage extends PageCommons {
   }
 
   async navigateToNamespaceBootableVolumesViaUI(namespace: string): Promise<void> {
-    try {
-      await this.switchToVirtualizationPerspective();
-      await this.clickNavBootableVolumes();
+    await this.switchToVirtualizationPerspective();
+    await this.clickNavBootableVolumes();
+    await this.page.waitForLoadState('domcontentloaded');
+    if (!this.page.url().includes(`/ns/${namespace}/`)) {
+      const path = `/k8s/ns/${namespace}/bootablevolumes`;
+      await this.page.evaluate((p) => {
+        window.history.pushState({}, '', p);
+        window.dispatchEvent(new PopStateEvent('popstate'));
+      }, path);
+      await this.page.waitForFunction((p: string) => window.location.pathname === p, path, {
+        timeout: TestTimeouts.NAVIGATION,
+      });
       await this.page.waitForLoadState('domcontentloaded');
-      if (!this.page.url().includes(`/ns/${namespace}/`)) {
-        const path = `/k8s/ns/${namespace}/bootablevolumes`;
-        await this.page.evaluate((p) => {
-          window.history.pushState({}, '', p);
-          window.dispatchEvent(new PopStateEvent('popstate'));
-        }, path);
-        await this.page.waitForFunction((p: string) => window.location.pathname === p, path, {
-          timeout: TestTimeouts.NAVIGATION,
-        });
-        await this.page.waitForLoadState('domcontentloaded');
-      }
-    } catch {
-      await this.goTo(`/k8s/ns/${namespace}/bootablevolumes`);
     }
     await this.verifyPageLoaded([], true, TestTimeouts.UI_ELEMENT_VISIBILITY);
   }

@@ -4,9 +4,10 @@
  * Also detects and cleans up stale resources (VMs stuck in problematic states).
  */
 
+import type RequestContextClient from '@/clients/request-context-client';
+import { createApiClientFromToken } from '@/clients/rcc-singleton';
 import type { KubernetesListResource, KubernetesResource } from '@/data-models/kubernetes-types';
 import { getErrorMessage } from '@/data-models/kubernetes-types';
-import * as k8s from '@kubernetes/client-node';
 
 import { EnvVariables } from './env-variables';
 import { logger } from './logger';
@@ -95,17 +96,12 @@ const DEFAULT_OPTIONS: Required<
 
 export class ClusterResourceChecker {
   private backgroundCleanupPromise: Promise<void> | null = null;
-  private coreApi: k8s.CoreV1Api;
-  private customObjectsApi: k8s.CustomObjectsApi;
+  private client!: RequestContextClient;
   private isInitialized = false;
-  private kc: k8s.KubeConfig;
   private namespace: string;
 
   constructor() {
-    this.kc = new k8s.KubeConfig();
     this.namespace = '';
-    this.customObjectsApi = null as unknown as k8s.CustomObjectsApi;
-    this.coreApi = null as unknown as k8s.CoreV1Api;
   }
 
   private sleep(ms: number): Promise<void> {
@@ -131,7 +127,6 @@ export class ClusterResourceChecker {
         lastError = error instanceof Error ? error : new Error(getErrorMessage(error));
         const errorMessage = getErrorMessage(error);
 
-        // Check if it's a transient network/TLS error worth retrying
         const isTransientError =
           errorMessage.includes('socket disconnected') ||
           errorMessage.includes('TLS connection') ||
@@ -170,66 +165,52 @@ export class ClusterResourceChecker {
     const initialized = await this.initialize();
     if (!initialized) {
       return {
-        belowThreshold: true, // Assume OK if we can't check
+        belowThreshold: true,
         runningVms: 0,
         pendingPods: 0,
         vmis: 0,
-        message: 'Unable to initialize Kubernetes client, skipping resource check',
+        message: 'Unable to initialize API client, skipping resource check',
       };
     }
 
     try {
       let runningVms = 0;
       try {
-        const rawList = await this.withRetry(
-          () =>
-            this.customObjectsApi.listNamespacedCustomObject({
-              group: 'kubevirt.io',
-              version: 'v1',
-              namespace: this.namespace,
-              plural: 'virtualmachines',
-            }),
+        const vmList = await this.withRetry(
+          () => this.client.listResourcesByKind('vm', this.namespace),
           'List VMs for count',
         );
-        const vmListBody = (rawList.body ?? rawList) as KubernetesListResource<KubernetesResource>;
-        const vmItems = vmListBody.items ?? [];
+        const vmItems = vmList.items ?? [];
         runningVms = vmItems.filter((vm) => {
           const st = vm.status as Record<string, unknown> | undefined;
           const spec = vm.spec as Record<string, unknown> | undefined;
           return st?.printableStatus === 'Running' || spec?.running === true;
         }).length;
       } catch {
-        // If we can't list VMs, assume 0
         runningVms = 0;
       }
 
       let vmis = 0;
       try {
-        const rawVmis = await this.withRetry(
-          () =>
-            this.customObjectsApi.listNamespacedCustomObject({
-              group: 'kubevirt.io',
-              version: 'v1',
-              namespace: this.namespace,
-              plural: 'virtualmachineinstances',
-            }),
+        const vmiList = await this.withRetry(
+          () => this.client.listResourcesByKind('vmi', this.namespace),
           'List VMIs for count',
         );
-        const vmiListAll = (rawVmis.body ?? rawVmis) as KubernetesListResource<KubernetesResource>;
-        vmis = (vmiListAll.items ?? []).length;
+        vmis = (vmiList.items ?? []).length;
       } catch {
         vmis = 0;
       }
 
       let pendingPods = 0;
       try {
-        const podsResponse = await this.withRetry(
-          () => this.coreApi.listNamespacedPod({ namespace: this.namespace }),
+        const podList = await this.withRetry(
+          () => this.client.listResourcesByKind('pod', this.namespace),
           'List pending pods',
         );
-        pendingPods = (podsResponse.items || []).filter(
-          (pod) => pod.status?.phase === 'Pending',
-        ).length;
+        pendingPods = (podList.items ?? []).filter((pod) => {
+          const phase = (pod.status as Record<string, unknown> | undefined)?.phase;
+          return phase === 'Pending';
+        }).length;
       } catch {
         pendingPods = 0;
       }
@@ -293,7 +274,6 @@ export class ClusterResourceChecker {
         cleanedUpResources: cleanedUpResources.length > 0 ? cleanedUpResources : undefined,
       };
     } catch (error) {
-      // If we can't check, assume OK and continue
       return {
         belowThreshold: true,
         runningVms: 0,
@@ -312,57 +292,14 @@ export class ClusterResourceChecker {
   async cleanupStaleResource(resource: StaleResource, verbose: boolean): Promise<boolean> {
     try {
       if (resource.kind === 'VirtualMachine') {
-        // First, remove delete protection if present
         try {
-          const vmResponse = await this.customObjectsApi.getNamespacedCustomObject({
-            group: 'kubevirt.io',
-            version: 'v1',
-            namespace: resource.namespace,
-            plural: 'virtualmachines',
-            name: resource.name,
-          });
-
-          const vmBody = vmResponse.body ?? vmResponse;
-          const vm = vmBody as KubernetesResource;
-          const deleteProtectionLabels = vm.metadata?.labels as
-            | Record<string, string | undefined>
-            | undefined;
-          const deleteProtection = deleteProtectionLabels?.['kubevirt.io/vm-delete-protection'];
-
-          if (deleteProtection === 'enabled' || deleteProtection === 'true') {
-            if (verbose) {
-              logger.info(`[StaleCleanup] Removing delete protection from ${resource.name}`);
-            }
-
-            await this.customObjectsApi.patchNamespacedCustomObject({
-              group: 'kubevirt.io',
-              version: 'v1',
-              namespace: resource.namespace,
-              plural: 'virtualmachines',
-              name: resource.name,
-              body: {
-                metadata: {
-                  labels: {
-                    'kubevirt.io/vm-delete-protection': null,
-                  },
-                },
-              },
-            });
-
-            // Wait a moment for the patch to apply
-            await this.sleep(500);
-          }
+          await this.client.disableDeleteProtection(resource.name, resource.namespace);
+          await this.sleep(500);
         } catch {
           // Ignore errors checking/removing delete protection
         }
 
-        await this.customObjectsApi.deleteNamespacedCustomObject({
-          group: 'kubevirt.io',
-          version: 'v1',
-          namespace: resource.namespace,
-          plural: 'virtualmachines',
-          name: resource.name,
-        });
+        await this.client.deleteResourceByKind('vm', resource.name, resource.namespace);
 
         if (verbose) {
           logger.info(
@@ -373,13 +310,7 @@ export class ClusterResourceChecker {
         }
         return true;
       } else if (resource.kind === 'VirtualMachineInstance') {
-        await this.customObjectsApi.deleteNamespacedCustomObject({
-          group: 'kubevirt.io',
-          version: 'v1',
-          namespace: resource.namespace,
-          plural: 'virtualmachineinstances',
-          name: resource.name,
-        });
+        await this.client.deleteResourceByKind('vmi', resource.name, resource.namespace);
 
         if (verbose) {
           logger.info(
@@ -436,20 +367,12 @@ export class ClusterResourceChecker {
     const now = Date.now();
 
     try {
-      const vmisResponse = await this.withRetry(
-        () =>
-          this.customObjectsApi.listNamespacedCustomObject({
-            group: 'kubevirt.io',
-            version: 'v1',
-            namespace: this.namespace,
-            plural: 'virtualmachineinstances',
-          }),
+      const vmiList = await this.withRetry(
+        () => this.client.listResourcesByKind('vmi', this.namespace),
         'List VMIs for stale detection',
       );
 
-      const vmiListBody = (vmisResponse.body ??
-        vmisResponse) as KubernetesListResource<KubernetesResource>;
-      const vmis = vmiListBody.items ?? [];
+      const vmis = vmiList.items ?? [];
 
       for (const vmi of vmis) {
         const name = vmi.metadata?.name;
@@ -458,12 +381,10 @@ export class ClusterResourceChecker {
         );
         const creationTimestamp = vmi.metadata?.creationTimestamp;
 
-        // Only check VMIs with 'pw-' prefix (test VMIs)
         if (!name?.startsWith('pw-')) {
           continue;
         }
 
-        // VMI stuck states
         const stuckVmiStates = ['Pending', 'Scheduling', 'Failed', 'Unknown'];
         if (!stuckVmiStates.includes(phase)) {
           continue;
@@ -504,20 +425,12 @@ export class ClusterResourceChecker {
     const now = Date.now();
 
     try {
-      const vmsResponse = await this.withRetry(
-        () =>
-          this.customObjectsApi.listNamespacedCustomObject({
-            group: 'kubevirt.io',
-            version: 'v1',
-            namespace: this.namespace,
-            plural: 'virtualmachines',
-          }),
+      const vmList = await this.withRetry(
+        () => this.client.listResourcesByKind('vm', this.namespace),
         'List VMs for stale detection',
       );
 
-      const listBody = (vmsResponse.body ??
-        vmsResponse) as KubernetesListResource<KubernetesResource>;
-      const vms = listBody.items ?? [];
+      const vms = vmList.items ?? [];
 
       for (const vm of vms) {
         const name = vm.metadata?.name;
@@ -525,12 +438,10 @@ export class ClusterResourceChecker {
         const printable = String(statusRec?.printableStatus ?? 'Unknown');
         const creationTimestamp = vm.metadata?.creationTimestamp;
 
-        // Only check VMs with 'pw-' prefix (test VMs)
         if (!name?.startsWith('pw-')) {
           continue;
         }
 
-        // Check if VM is in a stale state
         if (!config.staleStates.includes(printable)) {
           continue;
         }
@@ -561,12 +472,7 @@ export class ClusterResourceChecker {
     return staleResources;
   }
 
-  /** Core V1 API client (valid after {@link initialize} returns true). */
-  getCoreV1Api(): k8s.CoreV1Api {
-    return this.coreApi;
-  }
-
-  /** Initialize Kubernetes clients from test config (kubeconfig, token, or defaults). */
+  /** Initialize API client from test config. */
   async initialize(): Promise<boolean> {
     if (this.isInitialized) {
       return true;
@@ -576,39 +482,11 @@ export class ClusterResourceChecker {
       const config = TestConfigManager.getConfig();
       this.namespace = config.testNamespace || EnvVariables.testNamespace;
 
-      if (config.kubeConfigPath) {
-        try {
-          this.kc.loadFromFile(config.kubeConfigPath);
-        } catch {
-          // Fall back to token-based auth
-          if (config.authToken) {
-            this.kc.loadFromOptions({
-              clusters: [{ name: 'cluster', server: EnvVariables.clusterUrl, skipTLSVerify: true }],
-              contexts: [{ cluster: 'cluster', name: 'context', user: 'user' }],
-              currentContext: 'context',
-              users: [{ name: 'user', token: config.authToken }],
-            });
-          } else {
-            return false;
-          }
-        }
-      } else if (config.authToken) {
-        this.kc.loadFromOptions({
-          clusters: [{ name: 'cluster', server: EnvVariables.clusterUrl, skipTLSVerify: true }],
-          contexts: [{ cluster: 'cluster', name: 'context', user: 'user' }],
-          currentContext: 'context',
-          users: [{ name: 'user', token: config.authToken }],
-        });
-      } else {
-        try {
-          this.kc.loadFromDefault();
-        } catch {
-          return false;
-        }
+      if (!config.authToken) {
+        return false;
       }
 
-      this.customObjectsApi = this.kc.makeApiClient(k8s.CustomObjectsApi);
-      this.coreApi = this.kc.makeApiClient(k8s.CoreV1Api);
+      this.client = await createApiClientFromToken(config.authToken);
       this.isInitialized = true;
       return true;
     } catch {
@@ -727,23 +605,6 @@ export async function cleanupStaleClusterResources(
   return checker.cleanupStaleResources(staleResources, verbose);
 }
 
-function readKubeClientErrorParts(error: unknown): {
-  statusCode?: number;
-  code?: number;
-  bodyCode?: number;
-} {
-  if (typeof error !== 'object' || error === null) return {};
-  const o = error as Record<string, unknown>;
-  const body =
-    typeof o.body === 'object' && o.body !== null ? (o.body as Record<string, unknown>) : undefined;
-  const bc = typeof body?.code === 'number' ? body.code : undefined;
-  return {
-    statusCode: typeof o.statusCode === 'number' ? o.statusCode : undefined,
-    code: typeof o.code === 'number' ? o.code : undefined,
-    bodyCode: bc,
-  };
-}
-
 /**
  * Wait for the test namespace to be ready before running tests.
  * If namespace doesn't exist, creates it (defensive approach for parallel runs).
@@ -768,14 +629,21 @@ export async function waitForNamespaceReady(
     return true;
   }
 
-  const checker = getClusterResourceChecker();
-  const initialized = await checker.initialize();
-
-  if (!initialized) {
+  if (!config.authToken) {
     if (verbose) {
-      logger.warn('[NamespaceCheck] Could not initialize k8s client, skipping check');
+      logger.warn('[NamespaceCheck] No auth token available, skipping check');
     }
-    return true; // Assume OK if we can't check
+    return true;
+  }
+
+  let client: RequestContextClient;
+  try {
+    client = await createApiClientFromToken(config.authToken);
+  } catch {
+    if (verbose) {
+      logger.warn('[NamespaceCheck] Could not initialize API client, skipping check');
+    }
+    return true;
   }
 
   const startTime = Date.now();
@@ -788,54 +656,32 @@ export async function waitForNamespaceReady(
 
   while (Date.now() - startTime < timeoutMs) {
     try {
-      const coreApi = checker.getCoreV1Api();
-      const nsResponse = await coreApi.readNamespace({ name: ns });
+      const nsResource = await client.getResourceByKind('namespace', ns);
+      const phase = (nsResource?.status as Record<string, unknown> | undefined)?.phase;
 
-      if (nsResponse.status?.phase === 'Active') {
+      if (phase === 'Active') {
         if (verbose) {
           logger.info(`[NamespaceCheck] Namespace '${ns}' is ready`);
         }
         return true;
       }
     } catch (error: unknown) {
-      // Check if namespace doesn't exist (404)
       const errMsg = getErrorMessage(error).toLowerCase();
-      const { statusCode, code, bodyCode } = readKubeClientErrorParts(error);
-      const is404 =
-        statusCode === 404 ||
-        code === 404 ||
-        bodyCode === 404 ||
-        errMsg.includes('404') ||
-        errMsg.includes('not found');
+      const is404 = errMsg.includes('404') || errMsg.includes('not found');
 
       if (is404 && !attemptedCreate) {
-        // Namespace doesn't exist - try to create it (defensive for race conditions)
         attemptedCreate = true;
         if (verbose) {
           logger.info(`[NamespaceCheck] Namespace '${ns}' not found, attempting to create...`);
         }
         try {
-          const coreApi = checker.getCoreV1Api();
-          await coreApi.createNamespace({
-            body: {
-              apiVersion: 'v1',
-              kind: 'Namespace',
-              metadata: { name: ns },
-            },
-          });
+          await client.ensureNamespace(ns);
           if (verbose) {
             logger.info(`[NamespaceCheck] Created namespace '${ns}'`);
           }
         } catch (createError: unknown) {
-          // Ignore 409 (already exists) - race condition with global setup
           const createMsg = getErrorMessage(createError).toLowerCase();
-          const cre = readKubeClientErrorParts(createError);
-          const is409 =
-            cre.statusCode === 409 ||
-            cre.code === 409 ||
-            cre.bodyCode === 409 ||
-            createMsg.includes('409') ||
-            createMsg.includes('already exists');
+          const is409 = createMsg.includes('409') || createMsg.includes('already exists');
 
           if (!is409 && verbose) {
             logger.warn(

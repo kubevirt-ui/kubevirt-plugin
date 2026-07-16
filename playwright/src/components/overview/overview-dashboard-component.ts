@@ -68,11 +68,7 @@ export default class OverviewDashboardComponent extends BaseComponent {
   }
 
   async navigateToCheckupsViaUI(): Promise<void> {
-    try {
-      await this.nav.clickNavCheckups();
-    } catch {
-      await this.navigateToCheckups();
-    }
+    await this.nav.clickNavCheckups();
   }
 
   async navigateToClusterOverview() {
@@ -114,7 +110,7 @@ export default class OverviewDashboardComponent extends BaseComponent {
   }
 
   async navigateToVirtualizationOverviewViaUI(): Promise<void> {
-    await this.goTo('/k8s/all-namespaces/kubevirt.io~v1~VirtualMachine');
+    await this.nav.clickNavVirtualMachines();
     await this.page.waitForLoadState('domcontentloaded');
 
     const overviewTab = this._overviewTab;

@@ -8,13 +8,13 @@
  * be used in new tests.
  */
 
-import { getKubernetesClient } from '@/clients/kubernetes-client-singleton';
+import { getApiClient } from '@/clients/rcc-singleton';
 import { EnvVariables } from '@/utils/env-variables';
 import { TestConfigManager, TestTimeouts } from '@/utils/test-config';
 
 /**
  * @deprecated Legacy duck-typed client passed into SharedResourceManager.
- * Older code paths expected methods that are not modeled on KubernetesClient alone.
+ * Older code paths expected methods that are not modeled on OcClient alone.
  */
 export interface SharedResourceKubernetesSteps {
   createVmFromTemplate(
@@ -113,18 +113,12 @@ export class SharedResourceManager {
 
   private async verifyVmExists(name: string, namespace: string): Promise<boolean> {
     try {
-      const client = getKubernetesClient();
+      const client = getApiClient();
       if (!client) {
         return false;
       }
 
-      const vm = await client.getCustomResource(
-        'kubevirt.io',
-        'v1',
-        namespace,
-        'virtualmachines',
-        name,
-      );
+      const vm = await client.getResourceByKind('vm', name, namespace);
 
       return !!vm;
     } catch {
@@ -136,7 +130,7 @@ export class SharedResourceManager {
     let success = 0;
     let failed = 0;
 
-    const client = getKubernetesClient();
+    const client = getApiClient();
     if (!client) {
       return { success, failed: this.resources.size };
     }
@@ -144,21 +138,9 @@ export class SharedResourceManager {
     for (const resource of Array.from(this.resources.values())) {
       try {
         if (resource.type === 'VirtualMachine') {
-          await client.deleteCustomResource(
-            'kubevirt.io',
-            'v1',
-            resource.namespace,
-            'virtualmachines',
-            resource.name,
-          );
+          await client.deleteResourceByKind('vm', resource.name, resource.namespace);
         } else if (resource.type === 'DataVolume') {
-          await client.deleteCustomResource(
-            'cdi.kubevirt.io',
-            'v1beta1',
-            resource.namespace,
-            'datavolumes',
-            resource.name,
-          );
+          await client.deleteResourceByKind('datavolume', resource.name, resource.namespace);
         }
         success++;
       } catch (error: unknown) {

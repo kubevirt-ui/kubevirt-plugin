@@ -3,7 +3,8 @@
  * Creates VMs with different characteristics for testing search filters.
  */
 
-import type KubernetesClient from '@/clients/kubernetes-client';
+import type RequestContextClient from '@/clients/request-context-client';
+import type { JsonPatchOp } from '@/data-models/kubernetes-types';
 import {
   generateRandomName,
   generateRandomString,
@@ -36,39 +37,39 @@ function generateUniqueSuffix(): string {
 }
 
 async function addVmLabel(
-  client: KubernetesClient,
+  client: RequestContextClient,
   labelKey: string,
   labelValue: string,
   vmName: string,
   namespace: string,
 ): Promise<void> {
-  const vm = await client.getVirtualMachine(vmName, namespace);
+  const vm = await client.getVirtualMachine(namespace, vmName);
   if (!vm) {
     throw new Error(`VM '${vmName}' not found in namespace '${namespace}'`);
   }
   const escapedKey = labelKey.replace(/~/g, '~0').replace(/\//g, '~1');
-  const patchOps: Array<{ op: string; path: string; value?: unknown }> = [];
+  const patchOps: JsonPatchOp[] = [];
   if (!vm.metadata?.labels) {
     patchOps.push({ op: 'add', path: '/metadata/labels', value: { [labelKey]: labelValue } });
   } else {
     patchOps.push({ op: 'add', path: `/metadata/labels/${escapedKey}`, value: labelValue });
   }
-  await client.patchResource('kubevirt.io', 'v1', 'virtualmachines', vmName, namespace, patchOps);
+  await client.patchVirtualMachine(namespace, vmName, patchOps);
 }
 
 async function addVmAnnotation(
-  client: KubernetesClient,
+  client: RequestContextClient,
   annotationKey: string,
   annotationValue: string,
   vmName: string,
   namespace: string,
 ): Promise<void> {
-  const vm = await client.getVirtualMachine(vmName, namespace);
+  const vm = await client.getVirtualMachine(namespace, vmName);
   if (!vm) {
     throw new Error(`VM '${vmName}' not found in namespace '${namespace}'`);
   }
   const escapedKey = annotationKey.replace(/~/g, '~0').replace(/\//g, '~1');
-  const patchOps: Array<{ op: string; path: string; value?: unknown }> = [];
+  const patchOps: JsonPatchOp[] = [];
   if (!vm.metadata?.annotations) {
     patchOps.push({
       op: 'add',
@@ -82,11 +83,11 @@ async function addVmAnnotation(
       value: annotationValue,
     });
   }
-  await client.patchResource('kubevirt.io', 'v1', 'virtualmachines', vmName, namespace, patchOps);
+  await client.patchVirtualMachine(namespace, vmName, patchOps);
 }
 
 export async function createAdvancedSearchTestVms(
-  k8sClient: KubernetesClient,
+  client: RequestContextClient,
   namespace: string,
   options: CreateAdvancedSearchTestVmsOptions = {},
 ): Promise<AdvancedSearchVmNames> {
@@ -98,42 +99,36 @@ export async function createAdvancedSearchTestVms(
     memorySearch = false,
   } = options;
 
-  const templateVmCustomization = memorySearch ? { memory: 4 } : undefined;
-
   const uniquePrefix = `${testPrefix}${generateUniqueSuffix()}`;
 
   const defaultVmName = generateRandomName(`search-default-${uniquePrefix}`);
   const templateVmName = generateRandomName(`search-template-${uniquePrefix}`);
   const instanceTypeVmName = generateRandomName(`search-it-${uniquePrefix}`);
 
-  await k8sClient.createVmFromTemplate(
-    templateName,
-    defaultVmName,
-    namespace,
-    'openshift',
-    startVms,
-    undefined,
-    undefined,
-    templateVmCustomization,
-  );
-  k8sClient.trackResource('VirtualMachine', defaultVmName, namespace);
+  await client.createVmFromTemplate(templateName, defaultVmName, namespace, 'openshift', startVms);
+  client.trackResource('VirtualMachine', defaultVmName, namespace);
 
-  await k8sClient.createVmFromTemplate(
-    templateName,
-    templateVmName,
-    namespace,
-    'openshift',
-    startVms,
-    undefined,
-    undefined,
-    templateVmCustomization,
-  );
-  k8sClient.trackResource('VirtualMachine', templateVmName, namespace);
+  if (memorySearch) {
+    const memPatch: JsonPatchOp[] = [
+      { op: 'replace', path: '/spec/template/spec/domain/resources/requests/memory', value: '4Gi' },
+    ];
+    await client.patchVirtualMachine(namespace, defaultVmName, memPatch);
+  }
 
-  await addVmLabel(k8sClient, 'template', 'true', templateVmName, namespace);
-  await addVmAnnotation(k8sClient, 'description', 'Customized', templateVmName, namespace);
+  await client.createVmFromTemplate(templateName, templateVmName, namespace, 'openshift', startVms);
+  client.trackResource('VirtualMachine', templateVmName, namespace);
 
-  await k8sClient.createVmFromInstanceType(
+  if (memorySearch) {
+    const memPatch: JsonPatchOp[] = [
+      { op: 'replace', path: '/spec/template/spec/domain/resources/requests/memory', value: '4Gi' },
+    ];
+    await client.patchVirtualMachine(namespace, templateVmName, memPatch);
+  }
+
+  await addVmLabel(client, 'template', 'true', templateVmName, namespace);
+  await addVmAnnotation(client, 'description', 'Customized', templateVmName, namespace);
+
+  await client.createVmFromInstanceType(
     bootableVolumeName,
     instanceTypeVmName,
     namespace,
@@ -141,10 +136,10 @@ export async function createAdvancedSearchTestVms(
     'small',
     startVms,
   );
-  k8sClient.trackResource('VirtualMachine', instanceTypeVmName, namespace);
+  client.trackResource('VirtualMachine', instanceTypeVmName, namespace);
 
-  await addVmLabel(k8sClient, 'instancetype', 'true', instanceTypeVmName, namespace);
-  await addVmAnnotation(k8sClient, 'description', 'Customized', instanceTypeVmName, namespace);
+  await addVmLabel(client, 'instancetype', 'true', instanceTypeVmName, namespace);
+  await addVmAnnotation(client, 'description', 'Customized', instanceTypeVmName, namespace);
 
   return {
     defaultVm: defaultVmName,
@@ -155,12 +150,12 @@ export async function createAdvancedSearchTestVms(
 }
 
 export async function setupTestNamespace(
-  k8sClient: KubernetesClient,
+  client: RequestContextClient,
   prefix: string,
 ): Promise<string> {
   const namespace = generateTestNamespace(prefix);
-  await k8sClient.createNamespace(namespace);
-  await k8sClient.waitForNamespaceReady(namespace, TestTimeouts.NAMESPACE_READY);
-  k8sClient.trackResource('Namespace', namespace);
+  await client.ensureNamespace(namespace);
+  await client.waitForNamespaceReady(namespace, TestTimeouts.NAMESPACE_READY);
+  client.trackResource('Namespace', namespace);
   return namespace;
 }

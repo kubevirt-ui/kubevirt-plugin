@@ -31,9 +31,8 @@
  * ```
  */
 
-import KubernetesClient from '@/clients/kubernetes-client';
-import OcCliClient from '@/clients/oc-cli-client';
 import RequestContextClient from '@/clients/request-context-client';
+import { createApiClientFromToken } from '@/clients/rcc-singleton';
 import { ALLURE_API_FEATURE, withAllure } from '@/utils/allure';
 import { EnvVariables } from '@/utils/env-variables';
 import { TestConfigManager } from '@/utils/test-config';
@@ -55,8 +54,8 @@ interface ApiTestFixtures {
    * Only available when `NON_PRIV=1` is set. Tests that use this fixture should
    * guard with `test.skip(!utils.EnvVariables.isNonPrivUser, ...)`.
    *
-   * The token is obtained via `oc login` (a temp kubeconfig) during fixture setup
-   * so no persistent kubeconfig mutation occurs.
+   * The token is obtained via OAuth HTTP flow during fixture setup
+   * so no external CLI tools are required.
    */
   nonPrivApiClient: RequestContextClient;
   /** @internal — auto-applied Allure metadata; not used directly in specs. */
@@ -69,19 +68,16 @@ interface ApiTestFixtures {
  * Worker-scoped fixtures — one instance per worker, shared by all tests and
  * all beforeAll/afterAll hooks within that worker.
  *
- * Making `testNamespace` and `k8sClient` worker-scoped ensures that the
+ * Making `testNamespace` and `ocClient` worker-scoped ensures that the
  * namespace resolved in beforeAll is the same instance seen in individual
  * tests and afterAll — preventing stale or mismatched namespace values.
  */
 interface ApiWorkerFixtures {
   /**
-   * KubernetesClient connected directly to the cluster API (not via console proxy).
-   * Use this for wait/poll operations after console-proxy writes:
-   *   - waitForVmExists / waitForVmRunning / waitForVmDeleted
-   *   - waitForSnapshotReady
-   *   - waitForDataVolumeSucceeded
+   * RequestContextClient for API operations (wait/poll operations after writes).
+   * Created in token mode — no browser required.
    */
-  k8sClient: KubernetesClient;
+  ocClient: RequestContextClient;
   /**
    * Target namespace for test resources. Resolution order:
    *   1. `testNamespace` from `.test-config.json` (set by global setup, includes shard suffix)
@@ -140,15 +136,10 @@ export const test = base.extend<ApiTestFixtures, ApiWorkerFixtures>({
     const username = EnvVariables.testUsername;
     const password = EnvVariables.testUserPassword;
 
-    const oc = new OcCliClient(undefined, {
-      baseUrl: EnvVariables.clusterUrl,
-      username,
-      password,
-    });
-
+    const { fetchOAuthToken } = await import('@/utils/oauth-token');
     let token: string;
     try {
-      token = await oc.fetchTokenForUser(username, password);
+      token = await fetchOAuthToken(EnvVariables.clusterUrl, username, password);
     } catch (err) {
       throw new Error(
         `nonPrivApiClient: could not obtain token for user "${username}". ` +
@@ -170,17 +161,9 @@ export const test = base.extend<ApiTestFixtures, ApiWorkerFixtures>({
     await use(client);
   },
 
-  // Worker-scoped: one KubernetesClient per worker, reused across all tests.
-  k8sClient: [
+  ocClient: [
     async ({}, use) => {
-      const config = TestConfigManager.getConfig();
-      const authConfig = {
-        baseUrl: EnvVariables.clusterUrl,
-        username: EnvVariables.username,
-        password: EnvVariables.password,
-        ...(config?.authToken ? { token: config.authToken } : {}),
-      };
-      const client = new KubernetesClient(undefined, authConfig, config?.kubeConfigPath);
+      const client = await createApiClientFromToken();
       await use(client);
     },
     { scope: 'worker' },

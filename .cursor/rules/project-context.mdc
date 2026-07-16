@@ -96,7 +96,7 @@ kubevirt-plugin/
 ├── playwright/                   # Playwright E2E tests
 │   ├── tests/scenario/           # Scenario specs (new — scenarioTest fixture)
 │   ├── tests/gating/             # Legacy gating specs (frozen)
-│   ├── src/clients/              # KubernetesClient for test setup
+│   ├── src/clients/              # OcClient for test setup
 │   ├── src/fixtures/             # Test fixtures (scenario-fixture.ts)
 │   └── project-dependencies/     # Global setup/teardown + rule engine
 ├── cypress/                      # Cypress E2E tests (legacy)

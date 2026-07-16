@@ -11,12 +11,11 @@
  *      persists the updated storage state to disk so other workers and
  *      future tests pick it up.
  *   3. `refreshApiToken()` — re-authenticates via OAuth and updates the
- *      shared TestConfig + KubernetesClient singleton so API-only
+ *      shared TestConfig + RequestContextClient singleton so API-only
  *      operations (SpecResourceSetup, beforeAll) continue to work.
  */
 
-import KubernetesClient from '@/clients/kubernetes-client';
-import { resetKubernetesClient } from '@/clients/kubernetes-client-singleton';
+import { createApiClientFromToken, getApiClient, resetApiClient } from '@/clients/rcc-singleton';
 import LoginPage from '@/page-objects/cluster/login-page';
 import { EnvVariables } from '@/utils/env-variables';
 import { FileUtils } from '@/utils/file-utils';
@@ -129,7 +128,7 @@ export async function healBrowserAuth(page: Page, context: BrowserContext): Prom
 }
 
 /**
- * Refresh the OAuth API token used by KubernetesClient.
+ * Refresh the OAuth API token used by RequestContextClient.
  *
  * Uses the OAuth token endpoint (same as global.setup) to get a fresh token,
  * then updates the shared test config and resets the client singleton.
@@ -144,7 +143,8 @@ export async function refreshApiToken(): Promise<boolean> {
   }
 
   try {
-    const token = await KubernetesClient.getOAuthToken(clusterUrl, username, password);
+    const { fetchOAuthToken } = await import('@/utils/oauth-token');
+    const token = await fetchOAuthToken(clusterUrl, username, password);
     if (!token) return false;
 
     const config = TestConfigManager.getConfig();
@@ -153,7 +153,10 @@ export async function refreshApiToken(): Promise<boolean> {
 
     TestConfigManager.clearCache();
 
-    resetKubernetesClient();
+    resetApiClient();
+
+    // Re-create the singleton with the fresh token
+    await createApiClientFromToken(token);
 
     logger.info('[AuthHealer] API token refreshed successfully');
     return true;
@@ -170,8 +173,7 @@ export async function refreshApiToken(): Promise<boolean> {
  * the Kubernetes API token is still valid. If not, attempts refresh.
  */
 export async function ensureApiAuth(): Promise<void> {
-  const { getKubernetesClient } = await import('@/clients/kubernetes-client-singleton');
-  const client = getKubernetesClient();
+  const client = getApiClient();
   if (!client) {
     await refreshApiToken();
     return;

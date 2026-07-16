@@ -204,6 +204,11 @@ export default class BaseComponent {
     }
   }
 
+  /**
+   * @deprecated INFRASTRUCTURE ONLY — Do not call from page objects or tests.
+   * Use sidebar navigation (`clickNav*` methods) and `switchProject()` instead.
+   * Permitted only in login-page.ts and global setup/teardown.
+   */
   protected async goTo(url: string) {
     await this.page.goto(url, { timeout: TestTimeouts.NAVIGATION });
     await this.waitForLoadingComplete(TestTimeouts.UI_DELAY_MEDIUM);

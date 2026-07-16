@@ -39,11 +39,6 @@ async function globalSetup(_config: FullConfig) {
 
   const projectRoot = path.resolve(__dirname, '..', '..');
 
-  const kubeConfigDir = path.resolve(projectRoot, '.kubeconfigs');
-  const kubeConfigFileName =
-    useSharding && shardIndex ? `shard-${shardIndex}-config` : 'test-config';
-  const kubeConfigPath = path.join(kubeConfigDir, kubeConfigFileName);
-
   const storageStateDir = path.resolve(projectRoot, '.storage-states');
   let storageStateFileName: string;
   if (useSharding && shardIndex) {
@@ -55,22 +50,18 @@ async function globalSetup(_config: FullConfig) {
   }
   const storageStatePath = path.join(storageStateDir, storageStateFileName);
 
-  for (const dir of [kubeConfigDir, storageStateDir]) {
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
-      logger.info(`📁 Created directory: ${dir}`);
-    }
+  if (!fs.existsSync(storageStateDir)) {
+    fs.mkdirSync(storageStateDir, { recursive: true });
+    logger.info(`📁 Created directory: ${storageStateDir}`);
   }
 
   const ctx: SetupContext = {
-    kubeConfigPath,
     storageStatePath,
     testNamespace,
     cnvNamespace: EnvVariables.cnvNamespace,
     projectRoot,
     useSharding,
     shardIndex,
-    nncpNic: process.env.NNCP_NIC,
   };
 
   const engine = new RuleEngine();
@@ -110,7 +101,6 @@ async function globalSetup(_config: FullConfig) {
     logger.info(`   - Test Namespace: ${ctx.testNamespace}`);
     logger.info(`   - CNV Namespace: ${ctx.cnvNamespace}`);
     logger.info(`   - Auth Token: ${ctx.authToken ? 'Available ✓' : 'Not available'}`);
-    logger.info(`   - NNCP NIC: ${ctx.nncpNic ? ctx.nncpNic : 'Not available'}`);
   } catch (error: unknown) {
     logger.error(`❌ Failed to setup test environment: ${error}`);
     throw error;

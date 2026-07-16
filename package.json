@@ -68,7 +68,6 @@
   "devDependencies": {
     "@commitlint/cli": "^21.0.2",
     "@eslint-react/eslint-plugin": "^5.9.0",
-    "@kubernetes/client-node": "^1.4.0",
     "@openshift-console/dynamic-plugin-sdk": "4.23.0-prerelease.3",
     "@openshift-console/dynamic-plugin-sdk-internal": "4.23.0-prerelease.1",
     "@openshift-console/dynamic-plugin-sdk-webpack": "4.23.0-prerelease.3",

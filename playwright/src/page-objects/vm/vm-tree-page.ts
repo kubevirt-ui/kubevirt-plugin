@@ -372,31 +372,23 @@ export default class VmTreePage extends TreeContextMenuMixin(PageCommons) {
   }
 
   async navigateToNamespaceVirtualMachinesViaUI(namespace: string): Promise<void> {
-    try {
-      await this.clickNavVirtualMachines();
-      await this.page.waitForLoadState('domcontentloaded');
-      const currentUrl = this.page.url();
-      if (!currentUrl.includes(`/ns/${namespace}/`)) {
-        await this.navigateToNamespaceVirtualMachines(namespace);
-      }
-    } catch {
-      await this.navigateToNamespaceVirtualMachines(namespace);
-    }
+    await this.clickNavVirtualMachines();
+    await this.page.waitForLoadState('domcontentloaded');
+    await this.switchProject(namespace);
   }
 
   async navigateToNamespaceVmListAndWait(namespace: string): Promise<void> {
-    await this.goTo(`/k8s/ns/${namespace}/kubevirt.io~v1~VirtualMachine`);
+    await this.clickNavVirtualMachines();
+    await this.switchProject(namespace);
 
     const vmListTab = this._vmListTab.or(this.page.getByRole('tab', { name: 'Virtual machines' }));
-    try {
-      await vmListTab.first().waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
-      await this.robustClick(vmListTab.first());
-      await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
-    } catch {}
+    await vmListTab.first().waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+    await this.robustClick(vmListTab.first());
+    await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
   }
 
   async navigateToProjectViaTreeView(namespace: string): Promise<void> {
-    await this.navigateToAllNamespacesVirtualMachines();
+    await this.navigateToVirtualMachinesViaUI();
     await this.tryCloseWelcomeModal();
     await this.toggleEmptyProjectsDisplay(true);
     await this.searchTreeView(namespace);
@@ -421,22 +413,13 @@ export default class VmTreePage extends TreeContextMenuMixin(PageCommons) {
   async navigateToProjectVmListViaUI(namespace: string): Promise<void> {
     await this.navigateToNamespaceVirtualMachinesViaUI(namespace);
     await this.toggleEmptyProjectsDisplay(true);
-    try {
-      await this.searchTreeView(namespace);
-      await this.clickProjectNode(namespace);
-      await this.clickVmListTab();
-    } catch {
-      await this.navigateToNamespaceVirtualMachines(namespace);
-      await this.clickVmListTab();
-    }
+    await this.searchTreeView(namespace);
+    await this.clickProjectNode(namespace);
+    await this.clickVmListTab();
   }
 
   async navigateToVirtualMachinesViaUI(): Promise<void> {
-    try {
-      await this.clickNavVirtualMachines();
-    } catch {
-      await this.navigateToAllNamespacesVirtualMachines();
-    }
+    await this.clickNavVirtualMachines();
   }
 
   async navigateToVmsWithEmptyProjects(namespace: string): Promise<void> {
@@ -445,7 +428,7 @@ export default class VmTreePage extends TreeContextMenuMixin(PageCommons) {
   }
 
   async navigateToVmViaTreeView(namespace: string, vmName: string): Promise<void> {
-    await this.navigateToAllNamespacesVirtualMachines();
+    await this.navigateToVirtualMachinesViaUI();
     await this.tryCloseWelcomeModal();
     await this.toggleEmptyProjectsDisplay(true);
     await this.searchTreeView(namespace);

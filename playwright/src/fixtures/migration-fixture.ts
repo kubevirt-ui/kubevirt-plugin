@@ -9,7 +9,6 @@
  */
 
 import RequestContextClient from '@/clients/request-context-client';
-import VirtctlClient from '@/clients/virtctl-client';
 import { withSafeActions } from '@/page-objects/base-page';
 import CreateVmCreatePage from '@/page-objects/create-vm/create-vm-create-page';
 import CreateVmTemplatesPage from '@/page-objects/create-vm/create-vm-templates-page';
@@ -30,7 +29,6 @@ interface MigrationFixtures {
   createVmTemplatesPage: CreateVmTemplatesPage;
   createVmCreatePage: CreateVmCreatePage;
   requestContextClient: RequestContextClient;
-  virtctlClient: VirtctlClient;
 }
 
 const test = baseTest.extend<MigrationFixtures>({
@@ -61,22 +59,6 @@ const test = baseTest.extend<MigrationFixtures>({
         password: EnvVariables.password,
         ...(testConfig?.authToken ? { token: testConfig.authToken } : {}),
       }),
-    );
-  },
-  virtctlClient: async ({ page }, use) => {
-    const testConfig = TestConfigManager.getConfig();
-    await use(
-      new VirtctlClient(
-        page,
-        {
-          baseUrl: EnvVariables.clusterUrl,
-          username: EnvVariables.username,
-          password: EnvVariables.password,
-          ...(testConfig?.authToken ? { token: testConfig.authToken } : {}),
-        },
-        'virtctl',
-        testConfig?.kubeConfigPath,
-      ),
     );
   },
 });

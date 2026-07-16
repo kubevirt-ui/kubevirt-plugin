@@ -1,4 +1,5 @@
 import BaseComponent from '@/components/shared/base-component';
+import NavigationComponent from '@/components/shared/navigation-component';
 import type { VmMetricEntry } from '@/data-factories/vm-metrics-mock-factory';
 import { buildPrometheusVectorResponse } from '@/data-factories/vm-metrics-mock-factory';
 import { TestTimeouts } from '@/utils/test-config';
@@ -44,6 +45,8 @@ export default class VmListOverviewWidgetsComponent extends BaseComponent {
 
   private readonly _vmStatusesCard = this.locator('[data-test="vm-statuses-card"]');
 
+  private readonly nav: NavigationComponent;
+
   constructor(
     page: Page,
     private readonly hostTree: {
@@ -51,6 +54,7 @@ export default class VmListOverviewWidgetsComponent extends BaseComponent {
     },
   ) {
     super(page);
+    this.nav = new NavigationComponent(page);
   }
 
   async captureAcmSearchRequestsForCluster(clusterName: string): Promise<{
@@ -775,31 +779,22 @@ export default class VmListOverviewWidgetsComponent extends BaseComponent {
   }
 
   async navigateToStorageMigrationPlansViaUI(): Promise<void> {
-    try {
-      await this.goTo('/k8s/all-namespaces/kubevirt.io~v1~VirtualMachine');
-      await this.page.waitForLoadState('domcontentloaded');
-      const migrationNavBtn = this.page.locator('nav button').filter({ hasText: /^Migration$/ });
-      await migrationNavBtn.waitFor({ state: 'visible', timeout: TestTimeouts.DEFAULT });
-      const isExpanded = (await migrationNavBtn.getAttribute('aria-expanded')) === 'true';
-      if (!isExpanded) {
-        await migrationNavBtn.click();
-        await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
-      }
-      const storageMigrationsLink = this.page.locator(
-        '[data-test-id="storagemigrations-nav-item"]',
-      );
-      await storageMigrationsLink.waitFor({
-        state: 'visible',
-        timeout: TestTimeouts.ELEMENT_WAIT,
-      });
-      await this.robustClick(storageMigrationsLink);
-      await this.page.waitForLoadState('domcontentloaded');
-    } catch {
-      const crdRef =
-        'migrations.kubevirt.io~v1alpha1~MultiNamespaceVirtualMachineStorageMigrationPlan';
-      await this.goTo(`/k8s/all-namespaces/${crdRef}`);
-      await this.page.waitForLoadState('domcontentloaded');
+    await this.nav.clickNavVirtualMachines();
+    await this.page.waitForLoadState('domcontentloaded');
+    const migrationNavBtn = this.page.locator('nav button').filter({ hasText: /^Migration$/ });
+    await migrationNavBtn.waitFor({ state: 'visible', timeout: TestTimeouts.DEFAULT });
+    const isExpanded = (await migrationNavBtn.getAttribute('aria-expanded')) === 'true';
+    if (!isExpanded) {
+      await migrationNavBtn.click();
+      await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
     }
+    const storageMigrationsLink = this.page.locator('[data-test-id="storagemigrations-nav-item"]');
+    await storageMigrationsLink.waitFor({
+      state: 'visible',
+      timeout: TestTimeouts.ELEMENT_WAIT,
+    });
+    await this.robustClick(storageMigrationsLink);
+    await this.page.waitForLoadState('domcontentloaded');
   }
 
   async recoverFromErrorBoundaryIfNeeded(timeout = TestTimeouts.ELEMENT_WAIT): Promise<boolean> {

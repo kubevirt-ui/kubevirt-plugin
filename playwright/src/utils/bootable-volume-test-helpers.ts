@@ -1,11 +1,11 @@
-import type KubernetesClient from '@/clients/kubernetes-client';
+import type RequestContextClient from '@/clients/request-context-client';
 import type { DataVolumeConfig } from '@/data-factories';
 import type { TestUtilsType } from '@/fixtures/test-utils';
 import type BootableVolumesPage from '@/page-objects/create-vm/bootable-volumes-page';
 
 export async function createDataVolumeWithYamlViaUi(
   bootableVolumesPage: BootableVolumesPage,
-  k8sClient: KubernetesClient,
+  client: RequestContextClient,
   namespace: string,
   namePrefix: string,
   utils: TestUtilsType,
@@ -25,6 +25,6 @@ export async function createDataVolumeWithYamlViaUi(
     .join('\n');
   await bootableVolumesPage.clickCreateAndSelectOption('With YAML');
   await bootableVolumesPage.fillYamlEditorAndSave(dataVolumeYaml);
-  k8sClient.trackResource('DataVolume', dataVolumeName, dvNs);
+  client.trackResource('DataVolume', dataVolumeName, dvNs);
   return { dataVolumeName };
 }

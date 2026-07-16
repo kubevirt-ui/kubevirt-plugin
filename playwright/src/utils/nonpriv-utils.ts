@@ -5,7 +5,8 @@
  * rules themselves stay concise.
  */
 
-import type KubernetesClient from '@/clients/kubernetes-client';
+import type RequestContextClient from '@/clients/request-context-client';
+import type { JsonPatchOp } from '@/data-models/kubernetes-types';
 
 import { logger } from './logger';
 import { MINUTE } from './test-config';
@@ -19,11 +20,11 @@ import { MINUTE } from './test-config';
  * least one new Running+Ready pod. This prevents a false-positive where old
  * pods are already Ready before the new deployment starts.
  *
- * @param k8sClient - authenticated admin client
+ * @param client - authenticated admin client
  * @param timeoutMs - how long to wait (default 3 min — typical OAuth rollout)
  */
 export async function waitForOAuthRollout(
-  k8sClient: KubernetesClient,
+  client: RequestContextClient,
   timeoutMs = 3 * MINUTE,
 ): Promise<void> {
   const NAMESPACE = 'openshift-authentication';
@@ -42,21 +43,20 @@ export async function waitForOAuthRollout(
   // Snapshot UIDs of pods that exist right now (pre-rollout).
   let preRolloutUids = new Set<string>();
   try {
-    const existing = await k8sClient.getCoreV1Api().listNamespacedPod({ namespace: NAMESPACE });
+    const podList = await client.getPods(NAMESPACE);
     preRolloutUids = new Set(
-      (existing.items ?? []).map((p) => p.metadata?.uid ?? '').filter(Boolean),
+      (podList.items ?? []).map((p) => p.metadata?.uid ?? '').filter(Boolean),
     );
   } catch {
     // If we can't snapshot, fall through to the ready-pod check below.
   }
 
   // Phase 1: wait until at least one pre-rollout pod is gone (rollout started).
-  // Starts at 500ms and backs off quickly — pod termination is usually fast.
   if (preRolloutUids.size > 0) {
     let delay = 500;
     while (Date.now() < deadline) {
       try {
-        const podList = await k8sClient.getCoreV1Api().listNamespacedPod({ namespace: NAMESPACE });
+        const podList = await client.getPods(NAMESPACE);
         const currentUids = new Set(
           (podList.items ?? []).map((p) => p.metadata?.uid ?? '').filter(Boolean),
         );
@@ -70,15 +70,16 @@ export async function waitForOAuthRollout(
   }
 
   // Phase 2: wait until at least one new (post-rollout) Running+Ready pod exists.
-  // Starts at 1s (pods need a moment to initialise) and backs off up to 10s.
   let delay = 1_000;
   while (Date.now() < deadline) {
     try {
-      const podList = await k8sClient.getCoreV1Api().listNamespacedPod({ namespace: NAMESPACE });
+      const podList = await client.getPods(NAMESPACE);
       const newReadyPods = (podList.items ?? []).filter((pod) => {
         if (preRolloutUids.has(pod.metadata?.uid ?? '')) return false;
-        if (pod.status?.phase !== 'Running') return false;
-        const ready = (pod.status?.conditions ?? []).find((c) => c.type === 'Ready');
+        const status = pod.status as Record<string, unknown> | undefined;
+        if (status?.phase !== 'Running') return false;
+        const conditions = (status?.conditions as Array<{ type?: string; status?: string }>) ?? [];
+        const ready = conditions.find((c) => c.type === 'Ready');
         return ready?.status === 'True';
       });
 
@@ -111,23 +112,31 @@ export async function waitForOAuthRollout(
  *
  * Safe to call even if the binding does not exist (404 is silently ignored).
  *
- * @param k8sClient - authenticated admin client
+ * @param client - authenticated admin client
  * @param username  - non-priv username (default: 'test')
  */
 export async function revokeNonPrivClusterViewAccess(
-  k8sClient: KubernetesClient,
+  client: RequestContextClient,
   username: string,
 ): Promise<void> {
   const bindingName = `test-user-cluster-view-${username
     .replace(/[^a-z0-9]/gi, '-')
     .toLowerCase()}`;
-  await k8sClient.deleteClusterRoleBinding(bindingName);
+  try {
+    await client.deleteResourceByKind('clusterrolebinding', bindingName);
+  } catch {
+    // 404 / not found — already gone
+  }
   logger.info(`✓ Revoked ClusterRoleBinding "${bindingName}" for non-priv user "${username}"`);
 
   const cdiBindingName = `test-user-cdi-reader-${username
     .replace(/[^a-z0-9]/gi, '-')
     .toLowerCase()}`;
-  await k8sClient.deleteClusterRoleBinding(cdiBindingName);
+  try {
+    await client.deleteResourceByKind('clusterrolebinding', cdiBindingName);
+  } catch {
+    // 404 / not found — already gone
+  }
   logger.info(
     `✓ Revoked CDI ClusterRoleBinding "${cdiBindingName}" for non-priv user "${username}"`,
   );
@@ -148,6 +157,8 @@ function ignore404(err: unknown): void {
   };
   const code = e.statusCode ?? e.response?.statusCode ?? e.code ?? e.body?.code;
   if (code === 404) return;
+  const msg = err instanceof Error ? err.message : String(err);
+  if (msg.includes('not found') || msg.includes('NotFound') || msg.includes('404')) return;
   throw err;
 }
 
@@ -167,7 +178,7 @@ function ignore404(err: unknown): void {
  * the remaining cleanup.
  */
 export async function removeNonPrivUser(
-  k8sClient: KubernetesClient,
+  client: RequestContextClient,
   username: string,
   testNamespace: string,
   cnvNamespace: string,
@@ -176,7 +187,7 @@ export async function removeNonPrivUser(
   const nsBindings = ['test-user-admin', 'test-user-kubevirt-edit'];
   for (const name of nsBindings) {
     try {
-      await k8sClient.rbacApi.deleteNamespacedRoleBinding({ name, namespace: testNamespace });
+      await client.deleteResourceByKind('rolebinding', name, testNamespace);
       logger.info(`✓ Deleted RoleBinding ${name} in ${testNamespace}`);
     } catch (err) {
       try {
@@ -189,19 +200,14 @@ export async function removeNonPrivUser(
 
   // 2. Cluster-level ClusterRoleBindings
   try {
-    await revokeNonPrivClusterViewAccess(k8sClient, username);
+    await revokeNonPrivClusterViewAccess(client, username);
   } catch (err) {
     logger.warn(`⚠️ Failed to revoke cluster view access: ${err}`);
   }
 
   // 3. Identity + User
   try {
-    await k8sClient.customObjectsApi.deleteClusterCustomObject({
-      group: 'user.openshift.io',
-      version: 'v1',
-      plural: 'identities',
-      name: `${IDP_NAME}:${username}`,
-    });
+    await client.deleteResourceByKind('identity', `${IDP_NAME}:${username}`);
     logger.info(`✓ Deleted Identity ${IDP_NAME}:${username}`);
   } catch (err) {
     try {
@@ -212,12 +218,7 @@ export async function removeNonPrivUser(
   }
 
   try {
-    await k8sClient.customObjectsApi.deleteClusterCustomObject({
-      group: 'user.openshift.io',
-      version: 'v1',
-      plural: 'users',
-      name: username,
-    });
+    await client.deleteResourceByKind('user', username);
     logger.info(`✓ Deleted User ${username}`);
   } catch (err) {
     try {
@@ -229,11 +230,8 @@ export async function removeNonPrivUser(
 
   // 4. kubevirt-user-settings ConfigMap — remove the user's key
   try {
-    await k8sClient.coreV1Api.patchNamespacedConfigMap({
-      name: 'kubevirt-user-settings',
-      namespace: cnvNamespace,
-      body: [{ op: 'remove', path: `/data/${username}` }],
-    });
+    const patchOps: JsonPatchOp[] = [{ op: 'remove', path: `/data/${username}` }];
+    await client.patchConfigMap('kubevirt-user-settings', cnvNamespace, patchOps);
     logger.info(`✓ Removed "${username}" key from kubevirt-user-settings`);
   } catch (err) {
     try {
@@ -245,7 +243,7 @@ export async function removeNonPrivUser(
 
   // 5. htpasswd secret
   try {
-    await k8sClient.deleteSecret(HTPASSWD_SECRET, OPENSHIFT_CONFIG_NS);
+    await client.deleteSecret(OPENSHIFT_CONFIG_NS, HTPASSWD_SECRET);
     logger.info(`✓ Deleted secret ${HTPASSWD_SECRET} in ${OPENSHIFT_CONFIG_NS}`);
   } catch (err) {
     try {
@@ -260,32 +258,18 @@ export async function removeNonPrivUser(
     interface OAuthSpec {
       spec?: { identityProviders?: Array<{ name: string; type: string }> };
     }
-    const oauthRaw = await k8sClient.customObjectsApi.getClusterCustomObject({
-      group: 'config.openshift.io',
-      version: 'v1',
-      plural: 'oauths',
-      name: 'cluster',
-    });
-    const unwrapped = oauthRaw as OAuthSpec | { body?: OAuthSpec };
-    const oauth: OAuthSpec | undefined =
-      'spec' in unwrapped ? unwrapped : (unwrapped as { body?: OAuthSpec }).body;
+    const oauthRaw = (await client.getResourceByKind('oauth', 'cluster')) as unknown as OAuthSpec;
 
-    const idps = oauth?.spec?.identityProviders ?? [];
+    const idps = oauthRaw?.spec?.identityProviders ?? [];
     const filtered = idps.filter((idp) => idp.name !== IDP_NAME);
 
     if (filtered.length < idps.length) {
-      const patchOp =
+      const patchOp: JsonPatchOp[] =
         filtered.length > 0
-          ? [{ op: 'replace' as const, path: '/spec/identityProviders', value: filtered }]
-          : [{ op: 'remove' as const, path: '/spec/identityProviders' }];
+          ? [{ op: 'replace', path: '/spec/identityProviders', value: filtered }]
+          : [{ op: 'remove', path: '/spec/identityProviders' }];
 
-      await k8sClient.customObjectsApi.patchClusterCustomObject({
-        group: 'config.openshift.io',
-        version: 'v1',
-        plural: 'oauths',
-        name: 'cluster',
-        body: patchOp,
-      });
+      await client.patchResourceByKind('oauth', 'cluster', patchOp, undefined, 'json');
       logger.info(`✓ Removed "${IDP_NAME}" IDP from OAuth cluster config`);
     }
   } catch (err) {

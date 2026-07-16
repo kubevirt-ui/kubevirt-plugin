@@ -9,7 +9,8 @@
  * need to call `cleanup.track*()` manually.
  */
 
-import { getKubernetesClient } from '@/clients/kubernetes-client-singleton';
+import type RequestContextClient from '@/clients/request-context-client';
+import { getApiClient } from '@/clients/rcc-singleton';
 import ScenarioContextManager from '@/context-managers/scenario-context-manager';
 import { TestTimeouts } from '@/utils/test-config';
 import type {
@@ -40,32 +41,22 @@ export interface CleanupFixtureOptions {
  * intermediate DataVolumes created by cancelled/in-progress migrations.
  */
 async function sweepNamespaceBeforeDeletion(
-  client: NonNullable<ReturnType<typeof getKubernetesClient>>,
+  client: RequestContextClient,
   namespace: string,
 ): Promise<void> {
-  const migrationCrds = [
-    {
-      group: 'migrations.kubevirt.io',
-      version: 'v1alpha1',
-      plural: 'multinamespacevirtualmachinestoragemigrationplans',
-    },
-    {
-      group: 'storagemigration.kubevirt.io',
-      version: 'v1alpha1',
-      plural: 'virtualmachinestoragemigrationplans',
-    },
+  const migrationKinds = [
+    'multinamespacevirtualmachinestoragemigrationplans.migrations.kubevirt.io',
+    'virtualmachinestoragemigrationplans.storagemigration.kubevirt.io',
   ];
 
-  for (const { group, version, plural } of migrationCrds) {
+  for (const kind of migrationKinds) {
     try {
-      const plans = await client.listCustomResources(group, version, namespace, plural);
+      const result = await client.listResourcesByKind(kind, namespace);
       await Promise.allSettled(
-        plans.map((plan: { metadata?: { name?: string } }) => {
+        (result.items ?? []).map((plan) => {
           const name = plan.metadata?.name;
           if (!name) return Promise.resolve();
-          return client
-            .deleteCustomResource(group, version, namespace, plural, name)
-            .catch(() => undefined);
+          return client.deleteResourceByKind(kind, name, namespace).catch(() => undefined);
         }),
       );
     } catch {
@@ -75,25 +66,21 @@ async function sweepNamespaceBeforeDeletion(
 
   // Strip finalizers from DataVolumes stuck in Terminating (CDI finalizers block namespace deletion)
   try {
-    const dvs = await client.listCustomResources(
-      'cdi.kubevirt.io',
-      'v1beta1',
-      namespace,
-      'datavolumes',
-    );
+    const result = await client.listResourcesByKind('datavolume', namespace);
     await Promise.allSettled(
-      dvs
-        .filter(
-          (dv: { metadata?: { deletionTimestamp?: string; finalizers?: string[] } }) =>
-            dv.metadata?.deletionTimestamp && dv.metadata?.finalizers?.length,
-        )
-        .map((dv: { metadata?: { name?: string } }) => {
+      (result.items ?? [])
+        .filter((dv) => dv.metadata?.deletionTimestamp && dv.metadata?.finalizers?.length)
+        .map((dv) => {
           const name = dv.metadata?.name;
           if (!name) return Promise.resolve();
           return client
-            .patchResource('cdi.kubevirt.io', 'v1beta1', 'datavolumes', name, namespace, [
-              { op: 'replace', path: '/metadata/finalizers', value: [] },
-            ])
+            .patchResourceByKind(
+              'datavolume',
+              name,
+              [{ op: 'replace', path: '/metadata/finalizers', value: [] }],
+              namespace,
+              'json',
+            )
             .catch(() => undefined);
         }),
     );
@@ -102,89 +89,68 @@ async function sweepNamespaceBeforeDeletion(
   }
 }
 
+function resolveResourceKind(resource: TrackedResource): string {
+  if (resource.apiGroup === '') {
+    return resource.type.toLowerCase();
+  }
+  if (resource.plural) {
+    return resource.apiGroup ? `${resource.plural}.${resource.apiGroup}` : resource.plural;
+  }
+  return resource.type.toLowerCase();
+}
+
 function createDeleteCallback(): (resource: TrackedResource) => Promise<boolean> {
   return async (resource: TrackedResource): Promise<boolean> => {
-    const client = getKubernetesClient();
+    const client = getApiClient();
     if (!client) {
       return false;
     }
 
     try {
-      if (resource.apiGroup === '') {
-        const coreApi = client.getCoreV1Api();
-        const namespace = resource.namespace;
+      if (resource.type === 'Namespace') {
+        await sweepNamespaceBeforeDeletion(client, resource.name);
+        await client.deleteProject(resource.name);
+        return true;
+      }
 
-        switch (resource.type) {
-          case 'Secret':
-            if (!namespace) throw new Error('Namespace is required for Secret');
-            await coreApi.deleteNamespacedSecret({
-              name: resource.name,
-              namespace,
-            });
-            break;
-          case 'ConfigMap':
-            if (!namespace) throw new Error('Namespace is required for ConfigMap');
-            await coreApi.deleteNamespacedConfigMap({
-              name: resource.name,
-              namespace,
-            });
-            break;
-          case 'PersistentVolumeClaim':
-            if (!namespace) throw new Error('Namespace is required for PersistentVolumeClaim');
-            await coreApi.deleteNamespacedPersistentVolumeClaim({
-              name: resource.name,
-              namespace,
-            });
-            break;
-          case 'Service':
-            if (!namespace) throw new Error('Namespace is required for Service');
-            await coreApi.deleteNamespacedService({
-              name: resource.name,
-              namespace,
-            });
-            break;
-          case 'Namespace':
-            await sweepNamespaceBeforeDeletion(client, resource.name);
-            await coreApi.deleteNamespace({
-              name: resource.name,
-            });
-            break;
-          default:
-            return false;
-        }
-      } else {
-        // For VirtualMachines, disable delete protection before deleting
-        if (resource.type === 'VirtualMachine' && resource.namespace) {
-          try {
-            await client.disableDeleteProtection(resource.name, resource.namespace);
-            // Small delay to ensure the patch is applied
-            await new Promise((resolve) => setTimeout(resolve, TestTimeouts.UI_DELAY_SHORT));
-          } catch {
-            // Ignore errors - protection might not be set
-          }
-        }
-
-        if (resource.isClusterScoped) {
-          await client.deleteClusterCustomResource(
-            resource.apiGroup,
-            resource.apiVersion,
-            resource.plural,
+      // For VirtualMachines, disable delete protection before deleting
+      if (resource.type === 'VirtualMachine' && resource.namespace) {
+        try {
+          await client.patchResourceByKind(
+            'vm',
             resource.name,
-          );
-        } else {
-          if (!resource.namespace) {
-            return false;
-          }
-          await client.deleteCustomResource(
-            resource.apiGroup,
-            resource.apiVersion,
+            {
+              metadata: { labels: { 'kubevirt.io/delete-protection': null } },
+              spec: {
+                template: {
+                  metadata: { labels: { 'kubevirt.io/delete-protection': null } },
+                },
+              },
+            },
             resource.namespace,
-            resource.plural,
-            resource.name,
+            'merge',
           );
+          await new Promise((resolve) => setTimeout(resolve, TestTimeouts.UI_DELAY_SHORT));
+        } catch {
+          // Ignore errors - protection might not be set
         }
       }
 
+      const kind = resolveResourceKind(resource);
+      const namespace = resource.isClusterScoped ? undefined : resource.namespace;
+
+      if (!resource.isClusterScoped && !resource.namespace) {
+        return false;
+      }
+
+      try {
+        await client.deleteResourceByKind(kind, resource.name, namespace);
+      } catch (deleteError: unknown) {
+        const msg = deleteError instanceof Error ? deleteError.message : String(deleteError);
+        if (!msg.includes('404') && !msg.includes('not found')) {
+          throw deleteError;
+        }
+      }
       return true;
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : String(error);

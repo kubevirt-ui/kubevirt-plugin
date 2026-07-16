@@ -58,7 +58,7 @@ export { expect, test };
 
 Key points:
 
-- `baseTest` provides `k8sClient`, `utils`, `testConfig`, `page`, `cleanup`, and auto-fixtures
+- `baseTest` provides `apiClient`, `utils`, `testConfig`, `page`, `cleanup`, and auto-fixtures
 - Page objects are wrapped with `withSafeActions()` in the fixture
 - Page objects extend `BasePage` or `PageCommons` (not standalone classes)
 - Components live in `playwright/src/components/` and compose into page objects in `playwright/src/page-objects/`
@@ -76,7 +76,7 @@ test.describe(SUITE, { tag: [T1_TAG, '@tier1-feature-area'] }, () => {
     await somePage.navigateToFeatureViaUI();
   });
 
-  test('does something expected', async ({ somePage, k8sClient, utils }) => {
+  test('does something expected', async ({ somePage, apiClient, utils }) => {
     await utils.withAllure({
       suite: SUITE,
       feature: T1,
@@ -140,9 +140,10 @@ This avoids requiring a running console for test creation and ensures locators m
    ```bash
    ls playwright/src/fixtures/
    ```
-3. **Check KubernetesClient and handlers** — does it have the K8s methods needed?
-   - Use `kubevirt-ui-mcp-get_class_surface` with `KubernetesClient`
+3. **Check RequestContextClient and proxy handlers** — does it have the needed API methods?
+   - Use `kubevirt-ui-mcp-get_class_surface` with `RequestContextClient`
    - Use `kubevirt-ui-mcp-search_methods` to find relevant methods
+   - Check proxy handlers in `playwright/src/clients/proxy-handlers/` for domain-specific methods
 4. **Validate locators**:
    - **`--local` mode**: Search the product source (`src/`) for `data-test` attributes and component structure. Cross-reference with PatternFly component docs for expected roles/names.
    - **Default mode**: Navigate to relevant pages via Playwright MCP and inspect:
@@ -239,19 +240,19 @@ await utils.withAllure({
 
 #### 5. API setup in tests
 
-Use `k8sClient` for Kubernetes operations. Use helpers from `@/utils/` for common patterns:
+Use `apiClient` (`RequestContextClient`) for Kubernetes operations. All API calls go through the console proxy with the authenticated user's permissions. Use helpers from `@/utils/` for common patterns:
 
 ```typescript
 import { setupTestNamespace } from '@/utils/test-setup-helpers';
 
 // In beforeAll or test body:
-const { ns, vmName } = await setupTestNamespace(k8sClient, utils);
+const { ns, vmName } = await setupTestNamespace(apiClient, utils);
 ```
 
 Track created resources for cleanup:
 
 ```typescript
-k8sClient.trackResource('VirtualMachine', vmName, namespace);
+apiClient.trackResource('VirtualMachine', vmName, namespace);
 ```
 
 ### Phase 4: Validation
@@ -271,7 +272,7 @@ k8sClient.trackResource('VirtualMachine', vmName, namespace);
 | **Tests added**               | Count and names              |
 | **Fixture**                   | New or existing fixture used |
 | **Page objects / Components** | New or modified              |
-| **KubernetesClient changes**  | New methods added (if any)   |
+| **API client changes**        | New methods added (if any)   |
 | **Test results**              | Pass / Fail / Blocked        |
 
 ## Project Structure
@@ -298,17 +299,17 @@ playwright/
 │   │   ├── create-vm/             # Create VM pages
 │   │   └── vm-wizard/             # VM wizard pages
 │   ├── fixtures/                  # Per-feature test fixtures (extend baseTest)
-│   │   ├── scenario-test-fixture.ts  # Base fixture — provides k8sClient, utils, auto-fixtures
+│   │   ├── scenario-test-fixture.ts  # Base fixture — provides apiClient, utils, auto-fixtures
 │   │   ├── gating-fixture.ts
 │   │   ├── checkups-fixture.ts
 │   │   ├── vm-tabs-fixture.ts
 │   │   ├── settings-fixture.ts
 │   │   └── ...
-│   ├── clients/                   # K8s clients
-│   │   ├── kubernetes-client.ts   # Main K8s client (flat API, delegates to handlers)
-│   │   ├── handlers/              # Handler classes for client operations
-│   │   ├── virtctl-client.ts      # virtctl CLI wrapper
-│   │   └── oc-cli-client.ts       # oc CLI wrapper
+│   ├── clients/                   # API clients
+│   │   ├── request-context-client.ts  # RequestContextClient — HTTP via console proxy
+│   │   ├── proxy-handlers/            # Domain-specific handlers (vm, core, infra, project)
+│   │   ├── kind-resolver.ts           # Maps resource kinds to GVR tuples
+│   │   └── rcc-singleton.ts           # Singleton management for RequestContextClient
 │   ├── data-models/               # Constants, types, allure metadata
 │   │   └── allure-constants.ts    # Suite/feature/tag constants
 │   ├── data-factories/            # Test data generators (SSH keys, VM specs)

@@ -779,12 +779,7 @@ export default class OverviewSettingsComponent extends BaseComponent {
   }
 
   async navigateToSettingsViaSidebar(): Promise<void> {
-    try {
-      await this.nav.clickNavSettings();
-    } catch {
-      await this.goTo('/k8s/all-namespaces/virtualization-settings');
-      await this.page.waitForLoadState('domcontentloaded');
-    }
+    await this.nav.clickNavSettings();
   }
 
   async navigateToSettingsViaUI(): Promise<void> {

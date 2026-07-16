@@ -587,12 +587,7 @@ export default class TemplatesPage extends PageCommons {
    * @param namespace - The namespace to switch to
    */
   async navigateToNamespaceTemplatesViaUI(namespace: string): Promise<void> {
-    try {
-      await this.clickNavTemplates();
-    } catch {
-      await this.goTo(`/k8s/ns/${namespace}/template.openshift.io~v1~Template`);
-      await this.page.waitForLoadState('domcontentloaded');
-    }
+    await this.clickNavTemplates();
     await this.switchToNamespace(namespace);
   }
 
@@ -630,11 +625,7 @@ export default class TemplatesPage extends PageCommons {
    * Navigates to Templates page via sidebar UI click, falling back to URL navigation.
    */
   async navigateToTemplatesViaUI(): Promise<void> {
-    try {
-      await this.clickNavTemplates();
-    } catch {
-      await this.navigateToAllNamespacesTemplates();
-    }
+    await this.clickNavTemplates();
   }
 
   async openClusterFilter(): Promise<void> {

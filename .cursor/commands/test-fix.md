@@ -22,18 +22,14 @@ Run Playwright tests, analyze failures, fix test code issues, and re-run until s
 
 ### Phase 0: Pre-flight
 
-1. Verify the cluster is reachable:
+1. Verify the environment is configured:
    ```bash
    source .env 2>/dev/null
-   oc whoami 2>/dev/null && echo "cluster ok" || echo "cluster unreachable"
+   echo "Console URL: ${WEB_CONSOLE_URL:-not set}"
    ```
-2. Check for stale test namespaces:
+2. Check for stale test namespaces (if `oc` is available):
    ```bash
-   oc get ns --no-headers | grep '^pw-' | wc -l
-   ```
-   If >20, clean up:
-   ```bash
-   oc get ns --no-headers | grep '^pw-' | awk '{print $1}' | head -20 | xargs -I{} oc delete ns {} --wait=false
+   oc get ns --no-headers 2>/dev/null | grep '^pw-' | wc -l
    ```
 
 ### Phase 1: Run Tests
@@ -78,7 +74,7 @@ Playwright-browser_console_messages → JS errors
 Playwright-browser_network_requests → API calls
 ```
 
-#### With cluster inspection
+#### With cluster inspection (if `oc` is available)
 
 ```bash
 oc get vm -n <test-namespace> -o json | jq '.items[0].status'
@@ -91,14 +87,15 @@ For `test_bug` classified failures:
 
 #### Where to fix
 
-| Layer       | Location                                       | When to touch                                        |
-| ----------- | ---------------------------------------------- | ---------------------------------------------------- |
-| Spec file   | `playwright/tests/<tier>/<feature>/`           | Wrong assertions, missing waits, wrong test logic    |
-| Fixture     | `playwright/src/fixtures/<feature>-fixture.ts` | Missing page object in fixture, fixture setup issues |
-| Page object | `playwright/src/page-objects/<area>/`          | High-level method broken, incorrect delegation       |
-| Component   | `playwright/src/components/<area>/`            | Locator broken, interaction method failing           |
-| K8s client  | `playwright/src/clients/kubernetes-client.ts`  | API setup/teardown issue                             |
-| Utilities   | `playwright/src/utils/`                        | Helper functions, data generators, timeout constants |
+| Layer       | Location                                           | When to touch                                          |
+| ----------- | -------------------------------------------------- | ------------------------------------------------------ |
+| Spec file   | `playwright/tests/<tier>/<feature>/`               | Wrong assertions, missing waits, wrong test logic      |
+| Fixture     | `playwright/src/fixtures/<feature>-fixture.ts`     | Missing page object in fixture, fixture setup issues   |
+| Page object | `playwright/src/page-objects/<area>/`              | High-level method broken, incorrect delegation         |
+| Component   | `playwright/src/components/<area>/`                | Locator broken, interaction method failing             |
+| API client  | `playwright/src/clients/request-context-client.ts` | API setup/teardown issue                               |
+| Handlers    | `playwright/src/clients/proxy-handlers/`           | Domain-specific API methods (vm, core, infra, project) |
+| Utilities   | `playwright/src/utils/`                            | Helper functions, data generators, timeout constants   |
 
 #### Architecture constraints
 
@@ -124,7 +121,7 @@ For `test_bug` classified failures:
 - **Stale locator**: Update the selector in the component or page object, not in the spec
 - **Timing issue**: Add `waitFor()` in the page object method or use `expect.poll()`
 - **Setup failure masking tests**: Remove `setupError` + `test.skip` patterns — let setup failures fail the suite
-- **Missing cleanup**: Add `k8sClient.trackResource()` after resource creation
+- **Missing cleanup**: Add `apiClient.trackResource()` after resource creation
 - **`withSafeActions` silent skip**: If a test appears skipped but should fail, check if `withSafeActions` is swallowing a timeout — the fix belongs in the page object method
 
 ### Phase 5: Re-run Fixed Tests
@@ -188,8 +185,8 @@ playwright/
 │   ├── components/                # UI components (extend BaseComponent)
 │   ├── page-objects/              # Page objects (extend BasePage/PageCommons)
 │   ├── fixtures/                  # Per-feature fixtures (extend baseTest)
-│   │   └── scenario-test-fixture.ts  # Base fixture — k8sClient, utils, auto-fixtures
-│   ├── clients/                   # K8s client + handlers
+│   │   └── scenario-test-fixture.ts  # Base fixture — apiClient, utils, auto-fixtures
+│   ├── clients/                   # RequestContextClient + proxy-handlers + kind-resolver
 │   ├── data-models/               # Constants, types, allure metadata
 │   ├── data-factories/            # Test data generators
 │   └── utils/                     # Env vars, test config, random names
@@ -206,7 +203,8 @@ playwright/
 - **Page objects extend `BasePage` / `PageCommons`** — use `withSafeActions()` in fixtures
 - **Use `TestTimeouts.*` constants** — never inline timeout numbers
 - **Use allure constants** from `@/data-models/allure-constants` — never raw strings
-- **Verify via API** — use `KubernetesClient` to check K8s state after UI actions
+- **Verify via API** — use `apiClient` (`RequestContextClient`) to check K8s state after UI actions
+- **All API calls go through the console proxy** — `RequestContextClient` routes all requests through the console proxy with the authenticated user's permissions. No `oc` CLI or `@kubernetes/client-node` is used.
 - **Single process only** — use `--workers=N`, never concurrent test invocations
 - Report `product_bug` findings without modifying the test — the test is correct, the app is wrong
 - Always run `npm run check-types:playwright` after changes
