@@ -25,6 +25,7 @@ import {
   isCDROMDisk,
 } from '@kubevirt-utils/resources/vm/utils/disk/selectors';
 import { isEmptyContainerDiskImage } from '@kubevirt-utils/resources/vm/utils/disk/utils';
+import { getVMIVolumes } from '@kubevirt-utils/resources/vmi';
 import { getContentScrollableElement } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import {
@@ -80,7 +81,7 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({
   );
 
   const { isCDROMMountedState, volume } = useMemo(() => {
-    const vols = isVMRunning && !isCDROM ? vmi?.spec?.volumes : getVolumes(vm);
+    const vols = isVMRunning && !isCDROM ? getVMIVolumes(vmi) : getVolumes(vm);
     const vol = vols?.find(({ name }) => name === diskName);
 
     const isMountedVolume = (targetVolume: undefined | V1Volume): boolean => {

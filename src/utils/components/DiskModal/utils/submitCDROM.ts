@@ -2,6 +2,7 @@ import produce from 'immer';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getVmCdromUploadKeyFromVm } from '@kubevirt-utils/hooks/useUploadProgressToast/keys/uploadKeys';
+import { getCustomizeWizardVM } from '@kubevirt-utils/signals/customizeWizardVMSignal';
 import { generateUploadDiskName } from '@kubevirt-utils/utils/utils';
 import { isRunning } from '@virtualmachines/utils';
 
@@ -55,6 +56,7 @@ export const submitCDROM = async (
     const diskName = data.disk.name;
     const file = data?.uploadFile?.file;
     const uploadKey = getVmCdromUploadKeyFromVm(vm, diskName);
+
     const createCancelCleanup = isHotPluggable
       ? createEjectMountedDiskCancelCleanup
       : createDetachDiskCancelCleanup;
@@ -87,7 +89,8 @@ export const submitCDROM = async (
             delete draft.dataVolumeTemplate;
           });
 
-          const mountedVm = await mountISOToCDROM(vmAfterEmptyAdd, dataWithVolume, isHotPluggable);
+          const vmForMount = getCustomizeWizardVM() ?? vmAfterEmptyAdd;
+          const mountedVm = await mountISOToCDROM(vmForMount, dataWithVolume, isHotPluggable);
           await onSubmit(mountedVm);
         },
         diskState: mutableData,
