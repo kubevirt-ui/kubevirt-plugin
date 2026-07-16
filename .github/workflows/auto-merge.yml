@@ -12,7 +12,10 @@ name: Auto Merge
 # keeps blocking merge regardless of whether the auto-merge toggle succeeds.
 on:
   pull_request_target:
-    types: [labeled, unlabeled, reopened, synchronize]
+    # opened -- so a brand-new PR gets an immediate, explicit "Merge Gate:
+    # failure" instead of sitting as "Expected -- waiting for status" until
+    # its first label/push event
+    types: [opened, labeled, unlabeled, reopened, synchronize]
 
 permissions:
   contents: read
