@@ -173,26 +173,30 @@ describe('applyLgtm', () => {
 });
 
 describe('cancelLgtm', () => {
-  it('allows the PR author to cancel their own lgtm', async () => {
+  it('allows the PR author to cancel their own lgtm, and revokes approved too', async () => {
     const calls: Call[] = [];
     const octokit = fakeOctokit({ permission: null }, calls);
     const contentsOctokit = fakeOctokit({ permission: null }, calls);
 
     await cancelLgtm(baseCtx(octokit, contentsOctokit, 'pr-author'));
 
-    const removeLabel = calls.find((c) => c.method === 'removeLabel');
-    assert.equal((removeLabel?.args as { name: string }).name, 'lgtm');
+    const removed = calls
+      .filter((c) => c.method === 'removeLabel')
+      .map((c) => (c.args as { name: string }).name);
+    assert.deepEqual(removed.sort(), ['approved', 'lgtm']);
   });
 
-  it('allows any write-access collaborator to cancel', async () => {
+  it('allows any write-access collaborator to cancel, and always revokes approved too -- approved must not outlive the lgtm that justified it just because a non-approver is the one cancelling', async () => {
     const calls: Call[] = [];
     const octokit = fakeOctokit({ permission: 'write' }, calls);
     const contentsOctokit = fakeOctokit({ permission: 'write' }, calls);
 
     await cancelLgtm(baseCtx(octokit, contentsOctokit, 'bob-collaborator'));
 
-    const removeLabel = calls.find((c) => c.method === 'removeLabel');
-    assert.equal((removeLabel?.args as { name: string }).name, 'lgtm');
+    const removed = calls
+      .filter((c) => c.method === 'removeLabel')
+      .map((c) => (c.args as { name: string }).name);
+    assert.deepEqual(removed.sort(), ['approved', 'lgtm']);
   });
 
   it('OWNERS cancel also revokes approved (mirrors lgtm-acts-as-approve)', async () => {

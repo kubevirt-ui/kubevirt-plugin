@@ -77,11 +77,15 @@ export const syncLabelsFromReview = async (
     return 'applied';
   }
 
-  // CHANGES_REQUESTED
+  // CHANGES_REQUESTED -- always revoke both, regardless of whether this
+  // reviewer is themselves an OWNERS approver: `approved` was only ever
+  // granted as part of the same lgtm-acts-as-approve pairing, so it must
+  // not outlive the `lgtm` that justified it just because a lower-trust
+  // reviewer is the one requesting changes now.
   await revokeLgtm(octokit, owner, repo, prNumber);
-  if (isApprover) await revokeApprove(octokit, owner, repo, prNumber);
+  await revokeApprove(octokit, owner, repo, prNumber);
   console.log(
-    `Removed lgtm${isApprover ? ' and approved' : ''} from PR #${prNumber} (Request-changes review by ${reviewAuthor}).`,
+    `Removed lgtm and approved from PR #${prNumber} (Request-changes review by ${reviewAuthor}).`,
   );
   return 'revoked';
 };
