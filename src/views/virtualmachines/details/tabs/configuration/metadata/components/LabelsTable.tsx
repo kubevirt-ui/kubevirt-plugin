@@ -27,30 +27,19 @@ const LabelsTable: FC<LabelsTableProps> = ({ editable = true, onLabelsSubmit, re
   const allLabels = useMemo(() => getLabels(resource, {}), [resource]);
   const entries = useMemo(() => Object.entries(allLabels), [allLabels]);
 
-  const systemLabels = useMemo(
-    () => Object.fromEntries(Object.entries(allLabels).filter(([key]) => isSystemLabel(key))),
-    [allLabels],
-  );
-
-  const editableLabels = useMemo(
-    () => Object.fromEntries(Object.entries(allLabels).filter(([key]) => !isSystemLabel(key))),
-    [allLabels],
-  );
-
   const canDelete = useCallback((key: string): boolean => !isSystemLabel(key), []);
 
   const onAdd = useCallback(
     (): void =>
       createModal(({ isOpen, onClose }) => (
         <LabelsModal
-          initialLabels={editableLabels}
           isOpen={isOpen}
           obj={resource}
           onClose={onClose}
-          onLabelsSubmit={(labels) => onLabelsSubmit({ ...labels, ...systemLabels })}
+          onLabelsSubmit={onLabelsSubmit}
         />
       )),
-    [createModal, editableLabels, onLabelsSubmit, resource, systemLabels],
+    [createModal, onLabelsSubmit, resource],
   );
 
   const onDelete = useCallback(

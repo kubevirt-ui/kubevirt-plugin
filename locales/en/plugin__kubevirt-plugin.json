@@ -149,6 +149,7 @@
   "Active users table": "Active users table",
   "Activity": "Activity",
   "Add": "Add",
+  "Add {{type}}": "Add {{type}}",
   "Add a CD-ROM to the VirtualMachine configuration": "Add a CD-ROM to the VirtualMachine configuration",
   "Add a new bootable volume to the cluster.": "Add a new bootable volume to the cluster.",
   "Add a snapshot available on the cluster to the VirtualMachine.": "Add a snapshot available on the cluster to the VirtualMachine.",

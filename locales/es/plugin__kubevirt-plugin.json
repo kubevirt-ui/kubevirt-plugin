@@ -160,6 +160,7 @@
   "Active users table": "Tabla de usuarios activos",
   "Activity": "Actividad",
   "Add": "Agregar",
+  "Add {{type}}": "Add {{type}}",
   "Add a CD-ROM to the VirtualMachine configuration": "Agregue un CD-ROM a la configuración de la VirtualMachine",
   "Add a new bootable volume to the cluster.": "Agregue un nuevo volumen de arranque al clúster.",
   "Add a snapshot available on the cluster to the VirtualMachine.": "Agregue una instantánea disponible en el clúster de la VirtualMachine.",

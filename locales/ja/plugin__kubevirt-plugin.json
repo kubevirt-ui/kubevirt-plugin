@@ -147,6 +147,7 @@
   "Active users table": "アクティブユーザーテーブル",
   "Activity": "アクティビティー",
   "Add": "追加",
+  "Add {{type}}": "Add {{type}}",
   "Add a CD-ROM to the VirtualMachine configuration": "VirtualMachine 設定に CD-ROM を追加する",
   "Add a new bootable volume to the cluster.": "新しいブート可能なボリュームをクラスターに追加します。",
   "Add a snapshot available on the cluster to the VirtualMachine.": "クラスターで利用可能なスナップショットを VirtualMachine に追加します。",
