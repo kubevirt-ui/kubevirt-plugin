@@ -4,6 +4,8 @@ This directory contains scripts and documentation for the **IBM Cloud hot cluste
 
 Three infrastructure types are supported: **Classic ROKS**, **VPC ROKS** (recommended), and **IPI** (self-managed OpenShift).
 
+**Prow/Tide are gone for this repo.** Gating E2E runs here; merge eligibility (`lgtm`/`approved`/`hold`/`needs-rebase`) and native auto-merge live in GitHub Actions. See [Prow/Tide → GitHub Actions Migration](#prowtide-github-actions-migration-complete-for-this-repo) below.
+
 ## Architecture
 
 **Cluster lifecycle**
@@ -18,13 +20,21 @@ GitHub Actions
 **E2E testing**
 
 ```
-hot-cluster-e2e.yml     → "Hot Cluster E2E" (PR trigger + manual dispatch)
+hot-cluster-e2e.yml     → "Hot Cluster E2E" (workflow_dispatch only -- never a direct PR trigger)
   ├── prepare (resolve cluster config, trust, PR context, initial progress status)
   ├── cluster-check (workflow_call → hot-cluster-check.yml; its `result` job
   │     also runs the manual health check, manual dispatch only)
   ├── progress-check-running-tests (advance progress status once cluster is ready)
   ├── run-e2e-tests (workflow_call → hot-cluster-e2e-run.yml)
-  └── verify-gating-tests (publishes the required "Run Gating Tests" check)
+  └── verify-gating-tests (publishes the required "Run Gating Tests" check;
+        also syncs informational e2e-passed/e2e-failed labels)
+
+PR entry points (thin gates that only dispatch the workflow above):
+  ├── hot-cluster-e2e-pr-gate.yml   → opened/synchronize/reopened
+  ├── ok-to-test-gate.yml           → ok-to-test labeled
+  ├── retest-e2e.yml                → /retest-e2e
+  ├── retest-stale-gating.yml       → main advanced (pool PRs)
+  └── retest-on-pool-entry.yml      → newly pool-eligible + stale check
 
 hot-cluster-e2e-run.yml → "Hot Cluster E2E Run"
   ├── build-kubevirt-plugin-image (podman build + push to ttl.sh)
@@ -34,6 +44,19 @@ hot-cluster-e2e-run.yml → "Hot Cluster E2E Run"
         ├── BRIDGE_BASE_ADDRESS from test stack
         └── Playwright gating (or features project)
 ```
+
+**Merge automation (Prow/Tide replacements)**
+
+```
+auto-merge.yml                → Merge Gate check + enable/disable GitHub auto-merge
+pr_validation_commands.yml    → /lgtm, /approve, /hold (+ cancel), /ai-approved, /ci-approved, /recheck-jira
+pr_review_commands.yml        → Approve / Request changes reviews toggle lgtm (+ approved for OWNERS)
+needs-rebase.yml              → sync needs-rebase from GitHub mergeable (PR events + push to main)
+verify-merge-pool-labels.yml  → strip untrusted UI adds of lgtm/approved/do-not-merge/hold; restore untrusted hold removals
+pr_help_command.yml           → /help from .github/pr-commands.json
+```
+
+Label name SSOT: [`hot-cluster/js/merge-pool-labels.cjs`](hot-cluster/js/merge-pool-labels.cjs). Bot App token helper: [`.github/actions/create-bot-token`](../.github/actions/create-bot-token/action.yml).
 
 ## Infrastructure Types
 
@@ -89,6 +112,15 @@ Uses `openshift-install` to create a fully self-managed OpenShift cluster on IBM
 | Secret              | Description                                                                 |
 | ------------------- | --------------------------------------------------------------------------- |
 | `SLACK_WEBHOOK_URL` | Slack Incoming Webhook URL for credential notifications on cluster creation |
+
+### kubevirt-plugin-bot (required for Prow-replacement merge automation)
+
+| Secret                | Description                             |
+| --------------------- | --------------------------------------- |
+| `BOT_APP_ID`          | GitHub App ID for `kubevirt-plugin-bot` |
+| `BOT_APP_PRIVATE_KEY` | GitHub App private key                  |
+
+Used by `/lgtm`/`/approve`/`/hold`, review sync, `needs-rebase`, auto-merge GraphQL, e2e result labels, and related PR comment/label writes. The App installation must have **Issues: Read & write** and **Pull requests: Read & write**. Shared helper: [`.github/actions/create-bot-token`](../.github/actions/create-bot-token/action.yml).
 
 Ghost runner cleanup reuses the ARC Authentication GitHub App credentials above (`ARC_GITHUB_APP_ID` + `ARC_GITHUB_APP_PRIVATE_KEY`) — no separate secret needed, since that app is already scoped to `administration: write`, exactly what deregistering offline runners requires.
 
@@ -220,56 +252,79 @@ The hot-cluster pipeline manages its own required check ("Run Gating Tests") and
 - **Request `permission-pull-requests: write` on the bot token, not just `permission-issues: write`, for anything that labels, comments on, or reacts to a PR.** GitHub's REST docs list labels/comments/reactions under `/issues/...` paths and say `issues: write` OR `pull-requests: write` should suffice -- but confirmed live, a GitHub App installation token with only `issues: write` still 403'd "Resource not accessible by integration" on `addLabels`/`createComment`/reactions once the target `issue_number` actually resolved to a pull request (every case in this repo, since these commands only ever fire on PRs). `permission-issues: write` is kept alongside it only for the repo-level `createLabel` call in `hold-e2e.yml` (creating the `e2e-hold` label itself isn't PR-scoped). The App's own installation permissions must have "Pull requests: Read & write" granted, not just "Issues: Read & write" -- check this first if a 403 recurs.
 - **Real cancellation has to live at the job level, not the workflow level.** `hot-cluster-e2e.yml` deliberately has no workflow-level `concurrency:` block. A workflow-level group with `cancel-in-progress: true` holds an _entire new run_ at pending (zero jobs, not even `Prepare`) until the older run in the same group reaches a terminal state -- and a `uses:` job (a job that calls a reusable workflow, like `cluster-check` or `run-e2e-tests`) never actually gets killed by that cancellation, so the older run's self-hosted E2E job keeps running to completion untouched and the group never frees. The new run would then never start at all, let alone cancel anything. Instead, `cluster-check` and `run-e2e-tests` each carry their own job-level `concurrency:` group (PR-scoped, own suffix so they don't cancel each other): cheap jobs (`Prepare`, progress/verify) run immediately on every trigger with no gating, and only the two jobs that cost real cluster time enforce "one at a time per PR" -- which GitHub does properly honor for job-level groups, including ones backed by a reusable workflow. Any brief overlap in the cheap jobs' postings is harmless given the same-run check-run update above. `/retest-e2e` relies on the same job-level groups: it always dispatches a fresh run (see above), whose `cluster-check`/`run-e2e-tests` jobs cancel a still-running match via these groups rather than erroring out or racing it.
 
-## Tide Required-Context Gotcha (Prow Migrations)
+## Tide Required-Context Gotcha (historical)
 
-If your required check is published by a GitHub Action (`checks.create()`) rather than a native Prow presubmit, don't rely on Tide's `context_options.from-branch-protection: true` default to treat it as merge-blocking -- it silently didn't for this repo ([PR #4225](https://github.com/kubevirt-ui/kubevirt-plugin/pull/4225) merged while "Run Gating Tests" had never run). Add an explicit override instead, in `openshift/release`'s `core-services/prow/02_config/<org>/<repo>/_prowconfig.yaml`:
+**Tide is no longer used for this repo** (see the next section). The note below remains only as migration context for other repos still on Prow/Tide.
 
-```yaml
-tide:
-  context_options:
-    orgs:
-      <org>:
-        repos:
-          <repo>:
-            required-contexts:
-              - "<your required check's exact context name>"
-```
+If a required check is published by a GitHub Action (`checks.create()`) rather than a native Prow presubmit, do not rely on Tide's `context_options.from-branch-protection: true` default to treat it as merge-blocking -- it silently didn't for this repo ([PR #4225](https://github.com/kubevirt-ui/kubevirt-plugin/pull/4225) merged while "Run Gating Tests" had never run). Repos still on Tide need an explicit `required-contexts` override in `openshift/release`. This repo now blocks merge via GitHub branch protection + the native **`Merge Gate`** check from `auto-merge.yml` instead.
 
-See [openshift/release#81840](https://github.com/openshift/release/pull/81840) for the fix applied here.
+See [openshift/release#81840](https://github.com/openshift/release/pull/81840) for the Tide-era fix that was applied here before Prow was removed.
 
-## Tide/Prow Permanently Removed -- In-Repo lgtm/approve/hold/needs-rebase
+## Prow/Tide → GitHub Actions Migration (complete for this repo)
 
-Tide/Prow are no longer connected to this repo at all -- the `openshift-ci` GitHub App has been uninstalled/deselected for `kubevirt-plugin` (still installed org-wide for other repos). This is permanent, not a transient outage: every Prow plugin previously configured for this repo (`lgtm`, `approve`, `hold`, `needs-rebase`, `wip`, `blunderbuss`, `lifecycle`, `retitle`, `jira-lifecycle-plugin`, etc.) is dead. `auto-merge.yml` (toggling GitHub's native auto-merge) already replaced Tide's merge _execution_, but until now nothing replaced the label _inputs_ its eligibility check (`isMergePoolPr` in [`hot-cluster/js/is-merge-pool-pr.cjs`](hot-cluster/js/is-merge-pool-pr.cjs)) depends on -- confirmed live on [PR #4363](https://github.com/kubevirt-ui/kubevirt-plugin/pull/4363), where neither a plain `/lgtm` comment nor a native "Approve" review did anything at all, since no plugin was listening.
+Tide/Prow are **no longer connected** to `kubevirt-plugin` -- the `openshift-ci` GitHub App has been uninstalled/deselected for this repo (still installed org-wide for other repos). This is permanent: every Prow plugin previously configured here (`lgtm`, `approve`, `hold`, `needs-rebase`, `wip`, `blunderbuss`, `lifecycle`, `retitle`, `jira-lifecycle-plugin`, etc.) is dead.
 
-This section covers the in-repo replacements. Only `lgtm`/`approve`/`hold`/`needs-rebase` are replaced (the pieces `isMergePoolPr`/native auto-merge actually depend on) -- the rest of the dead plugin list above is a known, unaddressed gap.
+Hot Cluster E2E already replaced Prow's **gating test execution**. The pieces below replace Tide's **merge eligibility + merge execution** and the Prow label/command plugins that fed them.
+
+### What replaced what
+
+| Prow / Tide piece                         | In-repo replacement                                                                                        |
+| ----------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| Tide merge pool + merge                   | `auto-merge.yml`: native GitHub auto-merge + required **`Merge Gate`** check                               |
+| Tide pool eligibility (`lgtm`+`approved`) | `isMergePoolPr` in [`hot-cluster/js/is-merge-pool-pr.cjs`](hot-cluster/js/is-merge-pool-pr.cjs)            |
+| Label name SSOT                           | [`hot-cluster/js/merge-pool-labels.cjs`](hot-cluster/js/merge-pool-labels.cjs)                             |
+| `/lgtm`, `/approve`, `/hold` (+ cancel)   | `pr_validation_commands.yml` + `.github/scripts/.../commands/{lgtm,approve,hold}.ts`                       |
+| Review acts as lgtm                       | `pr_review_commands.yml` + `commands/review-event.ts`                                                      |
+| `needs-rebase` plugin                     | `needs-rebase.yml` + `hot-cluster/js/sync-needs-rebase-label.cjs`                                          |
+| Anti-bypass for pool labels               | `verify-merge-pool-labels.yml` (strips untrusted UI adds; restores untrusted `do-not-merge/hold` removals) |
+| Presubmit / gating E2E                    | Hot Cluster E2E (`hot-cluster-e2e.yml` via thin PR gates) + required **`Run Gating Tests`** check          |
+| `/retest`, cancel, hold-for-tests         | `/retest-e2e`, `/cancel-e2e`, `/hold-e2e` (E2E-only; not the same as `/hold`)                              |
+| `/help` command list                      | `pr_help_command.yml` reading `.github/pr-commands.json`                                                   |
+
+Only the merge-critical plugins above are replaced. `wip`, `blunderbuss`, `lifecycle`, `retitle`, etc. remain known gaps (see Known limitations below).
+
+### Merge eligibility (replaces Tide's pool)
+
+A PR is merge-pool eligible when **all** of the following hold (`isMergePoolPr`):
+
+1. Has **`lgtm`**
+2. Has **`approved`**
+3. Has **no blocking labels**: exact `hold`, `e2e-hold`, `needs-rebase`, or any `do-not-merge/*` (including `do-not-merge/hold`)
+
+`auto-merge.yml` then:
+
+- Publishes required check **`Merge Gate`** (`success` iff eligible, else `failure` -- the real merge backstop)
+- Enables/disables GitHub native auto-merge via the bot App (GraphQL; `GITHUB_TOKEN` cannot do this)
+
+Branch protection must require **`Merge Gate`** and **`Run Gating Tests`** (plus build/test as before).
 
 ### Required Setup Steps
 
-To move a repo off Tide/Prow onto this native model, in order:
+To move a repo onto this native model (already done for `kubevirt-plugin`):
 
 1. **Enable "Allow auto-merge"** in repo Settings -> General -> Pull Requests.
 2. **Add `Merge Gate` to branch protection's required status checks** on the default branch (alongside `Run Gating Tests`, `build`, `test`, etc.).
-3. **Grant the bot GitHub App "Issues: Read & write" and "Pull requests: Read & write"** permissions -- required for both the label commands below and `auto-merge.yml`'s `enablePullRequestAutoMerge`/`disablePullRequestAutoMerge` calls. Confirm `BOT_APP_ID`/`BOT_APP_PRIVATE_KEY` are set as repo secrets.
+3. **Install/configure `kubevirt-plugin-bot`** with Issues + Pull requests write; set `BOT_APP_ID` / `BOT_APP_PRIVATE_KEY` secrets.
 4. **Confirm the root `OWNERS` file lists real approvers** -- `/approve` and `/lgtm`'s approve-acting behavior both read it.
-5. **Uninstall/deselect the Prow GitHub App (`openshift-ci`) for this repo**, if not already done. This is what actually stops Tide/Prow from processing the repo; removing the `tide:` block from `openshift/release`'s config is optional hygiene on top, not required.
-6. **Announce the new command set to the team** -- point them at `/help` or the command table below. Existing muscle-memory around `/lgtm`/`/approve`/`/hold` mostly carries over unchanged; the one behavior change worth calling out is that a review with `/lgtm` typed in its body now always honors the review's Approve/Request-changes state (no more silent no-op).
+5. **Uninstall/deselect the Prow GitHub App (`openshift-ci`) for this repo**. Removing the `tide:` block from `openshift/release` is optional hygiene afterward.
+6. **Announce the command set** -- `/help` or the table below. Reviews with `/lgtm` in the body now always honor Approve/Request-changes state (no Prow-style silent no-op).
 
 ### `/lgtm`, `/approve`, `/hold` and their `cancel` variants
 
-New commands in `pr_validation_commands.yml` (`.github/scripts/src/validation/commands/{lgtm,approve,hold}.ts`), alongside the pre-existing `/ai-approved`/`/ci-approved`/`/recheck-jira`. `parse-command.ts`'s token regex now also accepts an optional trailing `cancel` argument (e.g. `/lgtm cancel`), mapped to a distinct `<word>-cancel` command internally -- word-boundary matching still rejects `/hold-e2e` (an unrelated, pre-existing command) as a match for `/hold`.
+Commands in `pr_validation_commands.yml` (`.github/scripts/src/validation/commands/{lgtm,approve,hold}.ts`), alongside `/ai-approved`/`/ci-approved`/`/recheck-jira`. `parse-command.ts` accepts an optional trailing `cancel` (e.g. `/lgtm cancel`); word-boundary matching rejects `/hold-e2e` as `/hold`.
 
-| Command           | Label                         | Who can use it                                                                                |
-| ----------------- | ----------------------------- | --------------------------------------------------------------------------------------------- |
-| `/lgtm`           | `lgtm`                        | Any repo collaborator with write access, except the PR's own author (Prow's original default) |
-| `/lgtm cancel`    | `lgtm` (removed)              | Any write-access collaborator, including the PR's own author                                  |
-| `/approve`        | `approved`                    | Root `OWNERS` approvers only (PR author cannot `/approve` their own PR)                       |
-| `/approve cancel` | `approved` (removed)          | Root `OWNERS` approvers only                                                                  |
-| `/hold`           | `do-not-merge/hold`           | Any repo collaborator with write access (Prow's original default)                             |
-| `/hold cancel`    | `do-not-merge/hold` (removed) | Any repo collaborator with write access                                                       |
+| Command           | Label                                           | Who can use it                                                                                |
+| ----------------- | ----------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| `/lgtm`           | `lgtm`                                          | Any repo collaborator with write access, except the PR's own author (Prow's original default) |
+| `/lgtm cancel`    | `lgtm` (removed); OWNERS also remove `approved` | Any write-access collaborator, including the PR's own author                                  |
+| `/approve`        | `approved`                                      | Root `OWNERS` approvers only (PR author cannot `/approve` their own PR)                       |
+| `/approve cancel` | `approved` (removed)                            | Root `OWNERS` approvers only                                                                  |
+| `/hold`           | `do-not-merge/hold`                             | Any repo collaborator with write access (Prow's original default)                             |
+| `/hold cancel`    | `do-not-merge/hold` (removed)                   | Any repo collaborator with write access                                                       |
 
-- **`/lgtm` acts as `/approve` too** (mirrors Prow's `lgtm_acts_as_approve`): if the `/lgtm`'er is also a root `OWNERS` approver, `approved` is granted at the same time, so an approver never needs to separately `/approve`.
-- **Trust checks**: `/lgtm`/`/hold` use `isWriteCollaborator` (new `collaborator-trust.ts`, `octokit.repos.getCollaboratorPermissionLevel`, collapses GitHub's finer roles like "maintain" into `write`). `/approve` reuses `isListedInOwners` (already used by `/ai-approved`/`/ci-approved`) but against the **root `OWNERS`** file (`ownersPath: 'OWNERS'`), not the narrower `.github/OWNERS` those two use -- root OWNERS is the correct pool for a general code-review approval, not just CI-config review. Auth denials react `-1` and leave a short `@user: …` why-comment on the PR.
-- **Label mechanics** live in `review-labels.ts` (`grantLgtm`/`revokeLgtm`/`grantApprove`/`revokeApprove`/`grantHold`/`revokeHold`), thin wrappers over the existing `addLabel`/`removeLabel` in `github-comments.ts` -- label _names_ come from [`hot-cluster/js/merge-pool-labels.cjs`](hot-cluster/js/merge-pool-labels.cjs) (SSOT also used by `isMergePoolPr`).
+- **`/lgtm` acts as `/approve` too** (mirrors Prow's `lgtm_acts_as_approve`): a root `OWNERS` approver's `/lgtm` also grants `approved`. Their `/lgtm cancel` also revokes `approved` (mirrors Request-changes).
+- **Trust checks**: `/lgtm`/`/hold` use `isWriteCollaborator`; `/approve` uses root `OWNERS` via `isListedInOwners`. Logins compared case-insensitively. Auth denials react `-1` and leave a short `@user: …` why-comment.
+- **Label names** come from [`hot-cluster/js/merge-pool-labels.cjs`](hot-cluster/js/merge-pool-labels.cjs) (SSOT for `isMergePoolPr` and TS grant/revoke helpers).
 
 ### Native GitHub reviews also toggle `lgtm`/`approved`
 
@@ -281,7 +336,7 @@ No PR comment or reaction is posted for a review-triggered change (reviews don't
 
 ### `/hold` vs `/hold-e2e` -- do not confuse these
 
-`/hold` (new, this section) blocks the PR from merging at all, via `isMergePoolPr`. `/hold-e2e` (pre-existing, see the Check-Run & Retest Model section above) only pauses **Hot Cluster E2E** dispatch -- a completely different, narrower mechanism using its own `e2e-hold` label. Both happen to block merge (since `is-merge-pool-pr.cjs` also excludes `e2e-hold`), but only `/hold-e2e` also stops new cluster runs from being dispatched; `/hold` does not.
+`/hold` (this section) blocks the PR from merging at all, via `isMergePoolPr`. `/hold-e2e` (see the Check-Run & Retest Model section above) only pauses **Hot Cluster E2E** dispatch -- a completely different, narrower mechanism using its own `e2e-hold` label. Both happen to block merge (since `is-merge-pool-pr.cjs` also excludes `e2e-hold`), but only `/hold-e2e` also stops new cluster runs from being dispatched; `/hold` does not.
 
 ### `needs-rebase` label
 
@@ -290,15 +345,21 @@ No PR comment or reaction is posted for a review-triggered change (reviews don't
 - `pull_request_target: [opened, synchronize, reopened]` -- checks just that PR.
 - `push: [main]` -- re-checks every open PR targeting `main`, since a conflict can newly appear only because the base moved, which the PR's own events can't catch.
 
-Both call the shared `hot-cluster/js/sync-needs-rebase-label.cjs`, which re-fetches the PR and reads GitHub's own computed `mergeable` field (never re-implements conflict detection itself): `false` -> apply `needs-rebase` (+ a one-time explanatory comment); `true` -> remove it; `null` (not yet computed) -> skip this pass, a later event retries. Label/comment writes use the `kubevirt-plugin-bot` App token (`permission-issues: write` + `permission-pull-requests: write`), not `GITHUB_TOKEN` -- same reason as `/hold-e2e` / e2e result labels. `isMergePoolPr` now also excludes `needs-rebase` -- mostly belt-and-suspenders, since GitHub's native merge already refuses a genuinely-conflicting PR regardless of any label, but it makes `Merge Gate` explain _why_ an otherwise-eligible-looking PR is stuck instead of leaving it silent.
+Both call the shared `hot-cluster/js/sync-needs-rebase-label.cjs`, which re-fetches the PR and reads GitHub's own computed `mergeable` field (never re-implements conflict detection itself):
+
+- `false` -> apply `needs-rebase` + a marker-deduped explanatory comment (`<!-- needs-rebase-comment -->`)
+- `true` -> remove the label and delete any marker comments
+- `null` (not yet computed) -> skip this pass; a later event retries
+
+Per-PR concurrency (`needs-rebase-<PR#>`, `cancel-in-progress: false`) avoids racing label/comment writes. Label/comment writes use the `kubevirt-plugin-bot` App token (`permission-issues: write` + `permission-pull-requests: write`), not `GITHUB_TOKEN` -- same reason as `/hold-e2e` / e2e result labels. `isMergePoolPr` also excludes `needs-rebase` -- mostly belt-and-suspenders, since GitHub's native merge already refuses a genuinely-conflicting PR, but it makes `Merge Gate` explain _why_ an otherwise-eligible-looking PR is stuck.
 
 ### `e2e-passed`/`e2e-failed` labels
 
 Purely informational, PR-list-visible mirror of Hot Cluster E2E's latest _real_ result -- **not** a merge gate (`isMergePoolPr` doesn't read these; the required "Run Gating Tests" check-run is still the actual gate). Added by a new step in `hot-cluster-e2e.yml`'s `verify-gating-tests` job, right after "Publish result for PR": `success` -> `e2e-passed` (+ remove `e2e-failed`); `failure` -> `e2e-failed` (+ remove `e2e-passed`); `neutral` (held/stale/non-real results) -> skipped entirely, leaving whichever label already reflects the last real result untouched. Label writes go through the `kubevirt-plugin-bot` App token (`permission-issues: write` + `permission-pull-requests: write`), same reason as `/hold-e2e`'s `e2e-hold` -- not `GITHUB_TOKEN`.
 
-### `enablePullRequestAutoMerge` needed the bot token, not `GITHUB_TOKEN`
+### `enablePullRequestAutoMerge` needs the bot token, not `GITHUB_TOKEN`
 
-Confirmed live on PR #4363: even with `Merge Gate` correctly reporting `success`, `auto-merge.yml`'s GraphQL call to `enablePullRequestAutoMerge` failed with `Resource not accessible by integration` -- **regardless of the workflow's `permissions:` block**. `enablePullRequestAutoMerge`/`disablePullRequestAutoMerge` are two of a small set of mutations GitHub blocks for the default Actions bot identity as a platform restriction, not a scope you can widen your way around. Fixed by generating a `kubevirt-plugin-bot` App token (`actions/create-github-app-token@v3`, same pattern `hold-e2e.yml`/`retest-e2e.yml`/`pr_validation_commands.yml` already use for the identical class of problem) and passing it as `github-token:` to that one `github-script` step only -- the eligibility-check and Merge-Gate-publishing steps stay on the default token, since those already worked fine.
+Confirmed live on PR #4363: even with `Merge Gate` correctly reporting `success`, `auto-merge.yml`'s GraphQL call to `enablePullRequestAutoMerge` failed with `Resource not accessible by integration` -- **regardless of the workflow's `permissions:` block**. `enablePullRequestAutoMerge`/`disablePullRequestAutoMerge` are two of a small set of mutations GitHub blocks for the default Actions bot identity as a platform restriction, not a scope you can widen your way around. Fixed by generating a `kubevirt-plugin-bot` App token (via [`.github/actions/create-bot-token`](../.github/actions/create-bot-token/action.yml) or `actions/create-github-app-token@v3` directly) and passing it as `github-token:` to that GraphQL step -- eligibility-check and Merge-Gate-publishing steps stay on the default token.
 
 ### Known limitations
 
@@ -327,7 +388,7 @@ Both checks run unconditionally on every PR (`pull_request_target: [opened, sync
 - **The AI-config/CI-scripts overlap on `.github/` is intentional, not an oversight.** `AI_CONFIG.relatedAutomationPaths`/`relatedAutomationPrefixes` (`.github/workflows/pr_validation*.yml`, `.github/scripts/`) is a strict subset of `CI_SCRIPTS_CONFIG`'s `.github/` prefix, so a change to those specific files needs both `/ai-approved` and `/ci-approved`. Kept as defense-in-depth: if `ci-scripts-validation` is ever disabled or broken, `ai-config-validation`'s own narrower self-protection for the validation machinery still holds on its own.
 - **Fine-grained tokens report `issues: write` OR `pull-requests: write` as sufficient for labels/comments -- live behavior on a PR target says otherwise.** Same gotcha as `/retest-e2e`'s bot token above: labels/comments on a PR need `pull-requests: write` specifically, not `issues: write` alone, even though the docs list either as acceptable. `pr_validation_commands.yml` routes `/ai-approved`/`/ci-approved`'s label/reaction calls through the `kubevirt-plugin-bot` app token (requesting both scopes) for the same fork-PR `GITHUB_TOKEN`-read-only reason documented above, but keeps commit-status calls (`setCommitStatus`, used by `ai-config-validation`, `ci-scripts-validation`, and `jira-validation` alike) **and** the `.github/OWNERS` lookup itself (`repos.getContent`, needs `contents: read`) on the ambient `GITHUB_TOKEN` via a second, ambient-scoped Octokit client (`GitHubConfig.statusToken`, `createStatusOctokit` in `github-repo.ts`) -- the bot app has neither `statuses` nor `contents` permission and won't be granted either, and both scopes already work fine on a fork PR via the ambient token. Missing this split for the OWNERS lookup specifically would silently reject every legitimate `/ai-approved`/`/ci-approved` (the bot token's 403 on `getContent` is caught and treated as "untrusted", not surfaced as an error) -- caught in this session's own security review before it shipped.
 - **Adding a check to `required_status_checks` makes every already-open PR show it as "Expected" until its next event.** GitHub doesn't retroactively backfill a status for existing head SHAs -- any PR open before this change won't show `ai-config-validation` as passing until its next push or comment naturally re-triggers `pr_validation.yml`. Time this kind of change for a quiet period, or be ready to explain the transient "Expected -- waiting for status to be reported" row.
-- **Known limitation: `/ai-approved`, `/ci-approved`, and `/recheck-jira` share one concurrency group.** `pr_validation_commands.yml`'s `pr-validation-cmd-<PR#>` group covers all three commands -- a rapid second comment can cancel an in-flight approval mid-way. Pre-existing (jira/ai-config already shared this group before `/ci-approved` existed); not fixing the per-command-group split given the added complexity for a low-frequency race.
+- **`pr_validation_commands.yml` uses `cancel-in-progress: false` on `pr-validation-cmd-<PR#>`.** Rapid successive comments (`/lgtm` then `/approve`, or `/ai-approved` then `/ci-approved`) queue rather than cancel mid-flight -- important now that `/lgtm`/`/approve`/`/hold` share that workflow with the older validation commands.
 - **Known limitation: `isListedInOwners`'s approvers-only matching isn't full Prow OWNERS semantics.** No aliases, no nested/parent OWNERS resolution -- intentional, the same simplified model `check-trust`'s composite action already uses elsewhere in this repo for `/retest-e2e`/`/cancel-e2e`/`/hold-e2e`.
 
 ## Script Configuration
