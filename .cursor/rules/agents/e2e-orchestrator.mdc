@@ -41,16 +41,18 @@ Page objects (page-objects/) → extend BasePage/PageCommons, compose components
   ↓
 Components (components/) → extend BaseComponent, contain locators + interactions
   ↓
-KubernetesClient (clients/kubernetes-client.ts) → K8s API for setup/teardown/verification
+OcClient (clients/oc-cli-client.ts) → oc CLI → K8s API (RBAC-limited in HC mode)
+RequestContextClient (clients/request-context-client.ts) → console proxy → K8s API (admin perms)
 ```
 
 ### Key Components
 
-- **`baseTest`** (`scenario-test-fixture.ts`) — root fixture providing `k8sClient`, `utils`, `testConfig`, auto-fixtures, cleanup
+- **`baseTest`** (`scenario-test-fixture.ts`) — root fixture providing `ocClient`, `utils`, `testConfig`, auto-fixtures, cleanup
 - **Per-feature fixtures** (`fixtures/<feature>-fixture.ts`) — extend `baseTest`, add page objects wrapped with `withSafeActions()`
 - **Page objects** (`page-objects/`) — extend `BasePage` or `PageCommons`, compose components, expose high-level methods
 - **Components** (`components/`) — extend `BaseComponent`, contain locators and interaction methods for UI sections
-- **KubernetesClient** (`clients/kubernetes-client.ts`) — flat K8s API, extend with new methods as needed
+- **OcClient** (`clients/oc-cli-client.ts`) — `oc` CLI wrapper with handler delegates; RBAC-limited in HC mode (see RBAC section below)
+- **RequestContextClient** (`clients/request-context-client.ts`) — HTTP client through the console proxy; has admin-level permissions; use for operations denied to `OcClient` in HC mode
 - **Allure constants** (`data-models/allure-constants.ts`) — suite/feature/tag constants for reporting
 - **Rule engine** — global setup/teardown via `project-dependencies/`
 
@@ -82,11 +84,10 @@ playwright/
 │   │   ├── vm-tabs-fixture.ts
 │   │   ├── settings-fixture.ts
 │   │   └── ...
-│   ├── clients/                   # K8s clients
-│   │   ├── kubernetes-client.ts   # Main K8s client
-│   │   ├── handlers/              # Handler classes
-│   │   ├── virtctl-client.ts      # virtctl CLI wrapper
-│   │   └── oc-cli-client.ts       # oc CLI wrapper
+│   ├── clients/                   # API clients
+│   │   ├── oc-cli-client.ts       # OcClient — oc CLI wrapper (RBAC-limited in HC mode)
+│   │   ├── oc-handlers/           # OcClient handler classes (vm, namespace, template, etc.)
+│   │   └── request-context-client.ts  # RequestContextClient — HTTP via console proxy (admin perms)
 │   ├── data-models/               # Constants, types, allure metadata
 │   ├── data-factories/            # Test data generators
 │   └── utils/                     # Env vars, test config, random names
@@ -111,7 +112,7 @@ test.describe(SUITE, { tag: [T1_TAG, '@tier1-feature-area'] }, () => {
     await somePage.navigateToFeatureViaUI();
   });
 
-  test('does something expected', async ({ somePage, k8sClient, utils }) => {
+  test('does something expected', async ({ somePage, ocClient, utils }) => {
     await utils.withAllure({
       suite: SUITE,
       feature: T1,
@@ -133,23 +134,45 @@ test.describe(SUITE, { tag: [T1_TAG, '@tier1-feature-area'] }, () => {
 - Every `expect()` has a descriptive message string
 - Use `TestTimeouts.*` constants — never inline timeout numbers
 - All UI interactions through page objects — no raw `page` in specs
-- Track created resources: `k8sClient.trackResource(kind, name, namespace)`
+- Track created resources: `ocClient.trackResource(kind, name, namespace)`
 - Setup failures must fail the suite — no `setupError` + `test.skip` patterns
 
-### K8s Client Usage
+### OcClient Usage
 
 ```typescript
 // Setup
-await k8sClient.setupTestNamespace(namespace);
-await k8sClient.createContainerDiskVm(vmName, namespace);
-await k8sClient.waitForVmRunning(vmName, namespace, TestTimeouts.TEST_VM_CREATION);
+await ocClient.setupTestNamespace(namespace);
+await ocClient.createContainerDiskVm(vmName, namespace);
+await ocClient.waitForVmRunning(vmName, namespace, TestTimeouts.TEST_VM_CREATION);
 
 // Track for cleanup
-k8sClient.trackResource('VirtualMachine', vmName, namespace);
+ocClient.trackResource('VirtualMachine', vmName, namespace);
 
 // Teardown
-await k8sClient.cleanupTestNamespace(namespace).catch(() => {});
+await ocClient.cleanupTestNamespace(namespace).catch(() => {});
 ```
+
+### OcClient RBAC Limitations (Hot Cluster / CI)
+
+In hot cluster mode (`HC_E2E=true`), the `OcClient` uses the pod's ServiceAccount token which has restricted RBAC permissions. The following operations are **not available** via `OcClient` in HC mode:
+
+| Denied Operation | Alternative |
+|---|---|
+| Create/manage RBAC resources (Roles, RoleBindings, ServiceAccounts) | Use `installPermissionsIfNeeded()` via the UI, or skip with `test.skip()` |
+| Create NetworkAttachmentDefinitions (NADs) | Assume pre-existing cluster NADs, or use `RequestContextClient` |
+| Create/delete VMI directly | Use VM start/stop which manages VMI lifecycle |
+| Patch HyperConverged (HCO) | Use `RequestContextClient.patchHyperConverged()` |
+| Create PVCs directly | Use DataVolumes which manage PVCs |
+| Patch StorageClasses | Use `RequestContextClient` |
+| OAuth/user management | Handled by global setup (runs as admin) |
+
+**When writing new tests, prefer these approaches in order:**
+
+1. **UI-based** — drive all actions through page objects; ideal for feature tests
+2. **RequestContextClient** — HTTP client through the console proxy; has admin-level permissions; use for API setup/teardown when `OcClient` lacks the permission
+3. **OcClient** — `oc` CLI wrapper; use for operations within the 33 allowed RBAC verbs
+
+In regular CI (non-HC), `OcClient` logs in as admin and has full access. The RBAC constraints only apply to hot cluster mode.
 
 ### Assertions
 
@@ -192,7 +215,7 @@ const test = baseTest.extend<FeatureFixtures>({
 | Page object (`*-page.ts`) | 500 |
 | Component (`*-component.ts`) | 400 |
 | Fixture (`*-fixture.ts`) | 150 |
-| Client (`kubernetes-client.ts`) | 800 |
+| Client (`oc-cli-client.ts`) | 800 |
 | Utility module | 400 |
 
 ### 5. What Belongs Where
@@ -201,7 +224,8 @@ const test = baseTest.extend<FeatureFixtures>({
 |---------|----------|-------------------|
 | Test definitions, assertions | Spec files | |
 | UI interactions, locators | Components / Page objects | |
-| K8s API operations | KubernetesClient / handlers | |
+| K8s API operations (RBAC-safe) | OcClient / oc-handlers | |
+| K8s API operations (admin-only) | RequestContextClient | |
 | Test data generation | `data-factories/` | |
 | Helper functions, shared logic | `utils/` | |
 | Type definitions | `data-models/` | |

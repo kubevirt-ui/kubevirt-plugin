@@ -40,10 +40,10 @@ Read-only coverage assessment of the virtualization module. The **repository is 
 
 This project has two test infrastructures:
 
-| Infrastructure | Directory | Fixture | Status |
-|---|---|---|---|
-| **Scenario** (new) | `playwright/tests/scenario/` | `scenarioTest` from `@/fixtures/scenario-fixture` | Active — new tests go here |
-| **Gating** (legacy) | `playwright/tests/gating/` | `gatingTest` from `scenario-test-fixture` | Frozen — no new tests added |
+| Infrastructure      | Directory                    | Fixture                                           | Status                      |
+| ------------------- | ---------------------------- | ------------------------------------------------- | --------------------------- |
+| **Scenario** (new)  | `playwright/tests/scenario/` | `scenarioTest` from `@/fixtures/scenario-fixture` | Active — new tests go here  |
+| **Gating** (legacy) | `playwright/tests/gating/`   | `gatingTest` from `scenario-test-fixture`         | Frozen — no new tests added |
 
 Coverage analysis scans **both** directories. Proposals for new coverage always target `playwright/tests/scenario/`.
 
@@ -62,10 +62,10 @@ Coverage analysis scans **both** directories. Proposals for new coverage always 
 
 Tests are organized across two directories:
 
-| Directory | Purpose |
-|---|---|
+| Directory                    | Purpose                                 |
+| ---------------------------- | --------------------------------------- |
 | `playwright/tests/scenario/` | New scenario tests (POC infrastructure) |
-| `playwright/tests/gating/` | Legacy gating tests |
+| `playwright/tests/gating/`   | Legacy gating tests                     |
 
 ## Workflow
 
@@ -123,7 +123,7 @@ For each UNTESTED capability:
 1. **Find existing spec** in `playwright/tests/scenario/`
 2. **Generate proposal**: EXTEND existing scenario spec or NEW scenario spec file
 3. All proposals target `playwright/tests/scenario/` (never legacy gating)
-4. Proposals use the `scenarioTest` fixture with page objects injected via fixture and `KubernetesClient` for K8s setup
+4. Proposals use the `scenarioTest` fixture with page objects injected via fixture and `apiClient` (`RequestContextClient`) for K8s setup
 
 ### Phase 6: Output
 
@@ -160,10 +160,10 @@ git show <branch>:playwright/tests/<path>
 
 ### Priority Gaps (ordered by impact)
 
-| #   | Route     | Untested Feature | Source Evidence      | Proposal                                  |
-| --- | --------- | ---------------- | -------------------- | ----------------------------------------- |
-| 1   | Settings  | Live migration   | src/views/settings/  | EXTEND: scenario/settings.spec.ts         |
-| 2   | Templates | Clone action     | src/views/templates/ | NEW: scenario/template-clone.spec.ts      |
+| #   | Route     | Untested Feature | Source Evidence      | Proposal                             |
+| --- | --------- | ---------------- | -------------------- | ------------------------------------ |
+| 1   | Settings  | Live migration   | src/views/settings/  | EXTEND: scenario/settings.spec.ts    |
+| 2   | Templates | Clone action     | src/views/templates/ | NEW: scenario/template-clone.spec.ts |
 
 ### Summary Statistics
 

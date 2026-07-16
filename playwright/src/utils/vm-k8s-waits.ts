@@ -1,11 +1,11 @@
-import type KubernetesClient from '@/clients/kubernetes-client';
+import type RequestContextClient from '@/clients/request-context-client';
 import { TestTimeouts } from '@/utils/test-config';
 
 /**
  * Poll until VirtualMachine status.ready is true (mirrors K8s VM lifecycle step driver).
  */
 export async function waitForVirtualMachineReady(
-  client: KubernetesClient,
+  client: RequestContextClient,
   vmName: string,
   namespace: string,
   timeoutMs: number = TestTimeouts.VM_BOOTUP,
@@ -13,7 +13,7 @@ export async function waitForVirtualMachineReady(
   const start = Date.now();
   while (Date.now() - start < timeoutMs) {
     try {
-      const vm = (await client.getVirtualMachine(vmName, namespace)) as {
+      const vm = (await client.getVirtualMachine(namespace, vmName)) as {
         status?: { ready?: boolean };
       };
       if (vm?.status?.ready === true) {
@@ -31,7 +31,7 @@ export async function waitForVirtualMachineReady(
  * Poll until the VM is stopped.
  */
 export async function waitForVirtualMachineStopped(
-  client: KubernetesClient,
+  client: RequestContextClient,
   vmName: string,
   namespace: string,
   timeoutMs: number = TestTimeouts.VM_BOOTUP,
@@ -39,12 +39,12 @@ export async function waitForVirtualMachineStopped(
   const start = Date.now();
   while (Date.now() - start < timeoutMs) {
     try {
-      const vm = (await client.getVirtualMachine(vmName, namespace)) as {
+      const vm = (await client.getVirtualMachine(namespace, vmName)) as {
         status?: { ready?: boolean };
       };
       if (!vm.status?.ready) {
         try {
-          await client.getVirtualMachineInstance(vmName, namespace);
+          await client.getVirtualMachineInstance(namespace, vmName);
         } catch {
           return;
         }
@@ -61,7 +61,7 @@ export async function waitForVirtualMachineStopped(
  * Poll VMI conditions for Paused=True (mirrors K8s VM lifecycle step driver).
  */
 export async function waitForVirtualMachinePaused(
-  client: KubernetesClient,
+  client: RequestContextClient,
   vmName: string,
   namespace: string,
   timeoutMs: number = TestTimeouts.VM_BOOTUP,
@@ -69,13 +69,9 @@ export async function waitForVirtualMachinePaused(
   const start = Date.now();
   while (Date.now() - start < timeoutMs) {
     try {
-      const vmi = (await client.getCustomResource(
-        'kubevirt.io',
-        'v1',
-        namespace,
-        'virtualmachineinstances',
-        vmName,
-      )) as { status?: { conditions?: Array<{ type?: string; status?: string }> } };
+      const vmi = (await client.getVirtualMachineInstance(namespace, vmName)) as {
+        status?: { conditions?: Array<{ type?: string; status?: string }> };
+      };
       const conditions = vmi.status?.conditions || [];
       const paused = conditions.find((c) => c.type === 'Paused' && c.status === 'True');
       if (paused) {
@@ -93,12 +89,12 @@ export async function waitForVirtualMachinePaused(
  * True if VirtualMachineSnapshot GET returns 404 / not found.
  */
 export async function verifyVirtualMachineSnapshotDeleted(
-  client: KubernetesClient,
+  client: RequestContextClient,
   snapshotName: string,
   namespace: string,
 ): Promise<boolean> {
   try {
-    await client.getVirtualMachineSnapshot(snapshotName, namespace);
+    await client.getVirtualMachineSnapshot(namespace, snapshotName);
     return false;
   } catch (error: unknown) {
     const msg = error instanceof Error ? error.message : String(error);

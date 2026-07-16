@@ -65,11 +65,7 @@ export default class OverviewDashboardPage extends PageCommons {
   }
 
   async navigateToCheckupsViaUI(): Promise<void> {
-    try {
-      await this.clickNavCheckups();
-    } catch {
-      await this.navigateToCheckups();
-    }
+    await this.clickNavCheckups();
   }
 
   async navigateToClusterOverview() {
@@ -77,20 +73,16 @@ export default class OverviewDashboardPage extends PageCommons {
   }
 
   async navigateToClusterOverviewViaUI(): Promise<void> {
-    try {
-      await this.page.waitForLoadState('domcontentloaded', {
-        timeout: TestTimeouts.RESOURCE_CREATION,
-      });
-      await this.page.waitForLoadState('load', {
-        timeout: TestTimeouts.RESOURCE_CREATION,
-      });
-      await this.clickNavClusterOverview();
-      await this.page
-        .waitForLoadState('networkidle', { timeout: TestTimeouts.UI_VISIBILITY_QUICK })
-        .catch(() => undefined);
-    } catch {
-      await this.navigateToClusterOverview();
-    }
+    await this.page.waitForLoadState('domcontentloaded', {
+      timeout: TestTimeouts.RESOURCE_CREATION,
+    });
+    await this.page.waitForLoadState('load', {
+      timeout: TestTimeouts.RESOURCE_CREATION,
+    });
+    await this.clickNavClusterOverview();
+    await this.page
+      .waitForLoadState('networkidle', { timeout: TestTimeouts.UI_VISIBILITY_QUICK })
+      .catch(() => undefined);
   }
 
   async navigateToGeneralOverview() {
@@ -115,7 +107,7 @@ export default class OverviewDashboardPage extends PageCommons {
   }
 
   async navigateToVirtualizationOverviewViaUI(): Promise<void> {
-    await this.goTo('/k8s/all-namespaces/kubevirt.io~v1~VirtualMachine');
+    await this.clickNavVirtualMachines();
     await this.page.waitForLoadState('domcontentloaded');
 
     const overviewTab = this._overviewTab;

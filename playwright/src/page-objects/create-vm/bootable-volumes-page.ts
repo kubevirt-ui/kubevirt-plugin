@@ -357,13 +357,9 @@ export default class BootableVolumesPage extends PageCommons {
     return false;
   }
   async navigateToBootableVolumesViaUI(): Promise<void> {
-    try {
-      await this.switchToVirtualizationPerspective();
-      await this.clickNavBootableVolumes();
-      await this.page.waitForLoadState('domcontentloaded');
-    } catch {
-      await this.navigateToGeneralBootableVolumes();
-    }
+    await this.switchToVirtualizationPerspective();
+    await this.clickNavBootableVolumes();
+    await this.page.waitForLoadState('domcontentloaded');
   }
   async navigateToBootableVolumesWithParams(params: string): Promise<void> {
     const basePath = '/k8s/all-namespaces/bootablevolumes';
@@ -375,15 +371,11 @@ export default class BootableVolumesPage extends PageCommons {
     await this.goTo('/k8s/all-namespaces/bootablevolumes');
   }
   async navigateToNamespaceBootableVolumesViaUI(namespace: string): Promise<void> {
-    try {
-      await this.switchToVirtualizationPerspective();
-      await this.clickNavBootableVolumes();
-      await this.page.waitForLoadState('domcontentloaded');
-      if (!this.page.url().includes(`/ns/${namespace}/`)) {
-        await this.navigateToNamespaceClientSide(namespace);
-      }
-    } catch {
-      await this.goTo(`/k8s/ns/${namespace}/bootablevolumes`);
+    await this.switchToVirtualizationPerspective();
+    await this.clickNavBootableVolumes();
+    await this.page.waitForLoadState('domcontentloaded');
+    if (!this.page.url().includes(`/ns/${namespace}/`)) {
+      await this.navigateToNamespaceClientSide(namespace);
     }
     await this.verifyPageLoaded([], true, TestTimeouts.UI_ELEMENT_VISIBILITY);
   }

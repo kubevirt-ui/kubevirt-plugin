@@ -1,5 +1,5 @@
-import KubernetesClient from '@/clients/kubernetes-client';
-import { setKubernetesClient } from '@/clients/kubernetes-client-singleton';
+import { setApiClient } from '@/clients/rcc-singleton';
+import RequestContextClient from '@/clients/request-context-client';
 import ScenarioContextManager from '@/context-managers/scenario-context-manager';
 import { detectAuthExpired, healBrowserAuth } from '@/utils/auth-healer';
 import { waitForClusterResources, waitForNamespaceReady } from '@/utils/cluster-resource-checker';
@@ -37,11 +37,11 @@ type MutableTestInfo = TestInfo & {
 
 interface WorkerFixtures {
   testConfig: SharedTestConfig;
-  _k8sClient: KubernetesClient;
+  _apiClient: RequestContextClient;
   _sharedResourceManager: SharedResourceManager;
   _workerContext: BrowserContext;
-  /** Worker-scoped KubernetesClient for direct use in specs and beforeAll hooks. */
-  k8sClient: KubernetesClient;
+  /** Worker-scoped RequestContextClient for direct use in specs and beforeAll hooks. */
+  apiClient: RequestContextClient;
   utils: TestUtilsType;
 }
 
@@ -109,11 +109,6 @@ const _test = base.extend<TestFixtures, WorkerFixtures>({
   // eslint-disable-next-line no-empty-pattern
   _autoResourceCheck: [
     async ({}, use) => {
-      if (EnvVariables.isHcE2e) {
-        await use();
-        return;
-      }
-
       await waitForNamespaceReady(undefined, TestTimeouts.DEFAULT, EnvVariables.isDebugMode);
 
       if (EnvVariables.isResourceCheckEnabled) {
@@ -140,15 +135,6 @@ const _test = base.extend<TestFixtures, WorkerFixtures>({
 
   _autoVirtNavigation: [
     async ({ page }, use) => {
-      if (EnvVariables.isHcE2e) {
-        await page.goto(EnvVariables.webConsoleUrl, {
-          waitUntil: 'domcontentloaded',
-          timeout: TestTimeouts.NAVIGATION,
-        });
-        await use();
-        return;
-      }
-
       const baseUrl = EnvVariables.webConsoleUrl;
       const maxRetries = 2;
       const consoleStabilizationMs = 2500;
@@ -406,9 +392,9 @@ const _test = base.extend<TestFixtures, WorkerFixtures>({
     }
   },
 
-  k8sClient: [
-    async ({ _k8sClient }, use) => {
-      await use(_k8sClient);
+  apiClient: [
+    async ({ _apiClient }, use) => {
+      await use(_apiClient);
     },
     { scope: 'worker' },
   ],
@@ -463,16 +449,33 @@ const _test = base.extend<TestFixtures, WorkerFixtures>({
     { scope: 'worker' },
   ],
 
-  _k8sClient: [
+  _apiClient: [
     async ({ testConfig }, use) => {
-      const authConfig = {
-        baseUrl: EnvVariables.clusterUrl,
+      const { request } = await import('@playwright/test');
+      const fs = await import('fs');
+      const playwrightDir = FileUtils.resolvePath(__dirname, '..', '..');
+      const storageStatePath = getStorageStatePath(playwrightDir);
+
+      const apiContext = await request.newContext({
+        baseURL: EnvVariables.webConsoleUrl,
+        ignoreHTTPSErrors: true,
+        ...(storageStatePath && fs.existsSync(storageStatePath)
+          ? { storageState: storageStatePath }
+          : {}),
+        extraHTTPHeaders: {
+          ...(testConfig?.authToken ? { Authorization: `Bearer ${testConfig.authToken}` } : {}),
+        },
+      });
+
+      const client = new RequestContextClient(apiContext, {
+        baseUrl: EnvVariables.webConsoleUrl,
         username: EnvVariables.username,
         password: EnvVariables.password,
         ...(testConfig?.authToken ? { token: testConfig.authToken } : {}),
-      };
-      const client = new KubernetesClient(undefined, authConfig, testConfig?.kubeConfigPath);
-      setKubernetesClient(client);
+      });
+
+      await client.primeCsrfToken();
+      setApiClient(client);
       await use(client);
     },
     { scope: 'worker' },
@@ -526,11 +529,11 @@ const _test = base.extend<TestFixtures, WorkerFixtures>({
     { scope: 'worker' },
   ],
 
-  sharedResources: async ({ _k8sClient, _sharedResourceManager }, use) => {
+  sharedResources: async ({ _apiClient, _sharedResourceManager }, use) => {
     await use(
       createSharedResourceFixture(
         _sharedResourceManager,
-        _k8sClient as unknown as SharedResourceKubernetesSteps,
+        _apiClient as unknown as SharedResourceKubernetesSteps,
       ),
     );
   },

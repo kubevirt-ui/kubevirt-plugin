@@ -1,4 +1,3 @@
-import { EnvVariables } from '@/utils/env-variables';
 import { TestTimeouts } from '@/utils/test-config';
 import type { Locator, Page } from '@playwright/test';
 
@@ -162,10 +161,6 @@ export default class NavigationComponent extends BaseComponent {
   }
 
   async expandVirtualizationNavSection(): Promise<void> {
-    if (EnvVariables.isHcE2e) {
-      throw new Error('Sidebar navigation skipped in HC_E2E mode — use URL fallback');
-    }
-
     await this.switchToVirtualizationPerspective();
 
     const childItem = this.locator(

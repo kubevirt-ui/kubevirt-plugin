@@ -1,6 +1,6 @@
 /** K8s and navigation helpers for VM action specs. */
 
-import type KubernetesClient from '@/clients/kubernetes-client';
+import type RequestContextClient from '@/clients/request-context-client';
 import type CreateVmCreatePage from '@/page-objects/create-vm/create-vm-create-page';
 import type CreateVmTemplatesPage from '@/page-objects/create-vm/create-vm-templates-page';
 import type PageCommons from '@/page-objects/page-commons';
@@ -15,10 +15,13 @@ import { waitForVirtualMachineReady } from '@/utils/vm-k8s-waits';
  * Returns required StorageClass names that are not present in the cluster.
  */
 export async function getMissingStorageClasses(
-  k8sClient: KubernetesClient,
+  client: RequestContextClient,
   requiredNames: string[],
 ): Promise<string[]> {
-  const existing = new Set(await k8sClient.getStorageClassNames());
+  const scList = await client.getStorageClasses();
+  const existing = new Set(
+    (scList.items ?? []).map((sc) => sc.metadata?.name).filter(Boolean) as string[],
+  );
   return requiredNames.filter((name) => !existing.has(name));
 }
 
@@ -28,7 +31,7 @@ export async function getMissingStorageClasses(
  * the multi-namespace variant used by the kubevirt-plugin UI.
  */
 export async function cleanupMigrationPlans(
-  k8sClient: KubernetesClient,
+  client: RequestContextClient,
   additionalNamespaces?: string[],
 ): Promise<boolean> {
   const testConfig = TestConfigManager.getConfig();
@@ -39,24 +42,17 @@ export async function cleanupMigrationPlans(
     return false;
   }
 
-  const migrationCrds = [
-    {
-      group: 'migrations.kubevirt.io',
-      version: 'v1alpha1',
-      plural: 'multinamespacevirtualmachinestoragemigrationplans',
-    },
-    {
-      group: 'storagemigration.kubevirt.io',
-      version: 'v1alpha1',
-      plural: 'virtualmachinestoragemigrationplans',
-    },
+  const migrationKinds = [
+    'MultiNamespaceVirtualMachineStorageMigrationPlan',
+    'VirtualMachineStorageMigrationPlan',
   ];
 
   const cleanupResults = await Promise.allSettled(
     namespacesToClean.flatMap((namespace) =>
-      migrationCrds.map(async ({ group, version, plural }) => {
+      migrationKinds.map(async (kind) => {
         try {
-          const plans = await k8sClient.listCustomResources(group, version, namespace, plural);
+          const result = await client.listResourcesByKind(kind, namespace);
+          const plans = result.items || [];
 
           if (plans.length === 0) {
             return true;
@@ -65,9 +61,7 @@ export async function cleanupMigrationPlans(
           const deletionPromises = plans.map((plan: { metadata?: { name?: string } }) => {
             const name = plan.metadata?.name;
             if (!name) return Promise.resolve();
-            return k8sClient
-              .deleteCustomResource(group, version, namespace, plural, name)
-              .catch(() => undefined);
+            return client.deleteResourceByKind(kind, name, namespace).catch(() => undefined);
           });
 
           await Promise.allSettled(deletionPromises);
@@ -75,6 +69,10 @@ export async function cleanupMigrationPlans(
         } catch (error: unknown) {
           const err = error as { response?: { status?: number; data?: { reason?: string } } };
           if (err.response?.status === 404 && err.response?.data?.reason === 'NotFound') {
+            return true;
+          }
+          const msg = error instanceof Error ? error.message : String(error);
+          if (msg.includes('404') || msg.includes('NotFound')) {
             return true;
           }
           return false;
@@ -91,28 +89,21 @@ export async function cleanupMigrationPlans(
  * Returns plan metadata once found, or null on timeout.
  */
 export async function waitForMigrationPlanCreated(
-  k8sClient: KubernetesClient,
+  client: RequestContextClient,
   namespace: string,
   timeout = TestTimeouts.VM_RUNNING,
 ): Promise<{ name: string; retentionPolicy?: string } | null> {
-  const migrationCrds = [
-    {
-      group: 'migrations.kubevirt.io',
-      version: 'v1alpha1',
-      plural: 'multinamespacevirtualmachinestoragemigrationplans',
-    },
-    {
-      group: 'storagemigration.kubevirt.io',
-      version: 'v1alpha1',
-      plural: 'virtualmachinestoragemigrationplans',
-    },
+  const migrationKinds = [
+    'MultiNamespaceVirtualMachineStorageMigrationPlan',
+    'VirtualMachineStorageMigrationPlan',
   ];
 
   const startTime = Date.now();
   while (Date.now() - startTime < timeout) {
-    for (const { group, version, plural } of migrationCrds) {
+    for (const kind of migrationKinds) {
       try {
-        const plans = await k8sClient.listCustomResources(group, version, namespace, plural);
+        const result = await client.listResourcesByKind(kind, namespace);
+        const plans = result.items || [];
         if (plans.length > 0) {
           const plan = plans[0] as {
             metadata?: { name?: string };
@@ -133,7 +124,7 @@ export async function waitForMigrationPlanCreated(
 
 /** Poll VM spec for a disk name containing `diskPattern`. */
 export async function waitForVmDiskAndGetName(
-  k8sClient: KubernetesClient,
+  client: RequestContextClient,
   vmName: string,
   namespace: string,
   diskPattern: string,
@@ -142,7 +133,7 @@ export async function waitForVmDiskAndGetName(
   const startTime = Date.now();
   while (Date.now() - startTime < timeout) {
     try {
-      const vm = (await k8sClient.getVirtualMachine(vmName, namespace)) as Record<
+      const vm = (await client.getVirtualMachine(namespace, vmName)) as Record<
         string,
         unknown
       > | null;
@@ -166,17 +157,16 @@ export async function waitForVmDiskAndGetName(
 }
 
 export async function getMigrationPlanRetentionPolicy(
-  k8sClient: KubernetesClient,
+  client: RequestContextClient,
   namespace: string,
   planNamePrefix?: string,
 ): Promise<string | null> {
   try {
-    const plans = await k8sClient.listCustomResources(
-      'migrations.kubevirt.io',
-      'v1alpha1',
+    const result = await client.listResourcesByKind(
+      'MultiNamespaceVirtualMachineStorageMigrationPlan',
       namespace,
-      'multinamespacevirtualmachinestoragemigrationplans',
     );
+    const plans = result.items || [];
     const matching = planNamePrefix
       ? plans.filter((p: { metadata?: { name?: string } }) =>
           p.metadata?.name?.startsWith(planNamePrefix),
@@ -193,17 +183,15 @@ export async function getMigrationPlanRetentionPolicy(
 }
 
 export async function getMigrationPlanCount(
-  k8sClient: KubernetesClient,
+  client: RequestContextClient,
   namespace: string,
 ): Promise<number> {
   try {
-    const plans = await k8sClient.listCustomResources(
-      'migrations.kubevirt.io',
-      'v1alpha1',
+    const result = await client.listResourcesByKind(
+      'MultiNamespaceVirtualMachineStorageMigrationPlan',
       namespace,
-      'multinamespacevirtualmachinestoragemigrationplans',
     );
-    return plans.length;
+    return (result.items || []).length;
   } catch {
     return 0;
   }
@@ -213,7 +201,7 @@ export async function getMigrationPlanCount(
  * Wait until DataVolume phase is Succeeded (or same-name-as-VM DV pattern from step driver).
  */
 export async function waitForDataVolumeReady(
-  k8sClient: KubernetesClient,
+  client: RequestContextClient,
   dataVolumeName: string,
   namespace: string,
   timeoutMs: number = TestTimeouts.DATA_VOLUME_STATUS,
@@ -221,13 +209,9 @@ export async function waitForDataVolumeReady(
   const startTime = Date.now();
   while (Date.now() - startTime < timeoutMs) {
     try {
-      const dv = (await k8sClient.getCustomResource(
-        'cdi.kubevirt.io',
-        'v1beta1',
-        namespace,
-        'datavolumes',
-        dataVolumeName,
-      )) as { status?: { phase?: string } };
+      const dv = (await client.getDataVolume(namespace, dataVolumeName)) as {
+        status?: { phase?: string };
+      };
       if (dv?.status?.phase === 'Succeeded') {
         return true;
       }
@@ -243,13 +227,13 @@ export async function waitForDataVolumeReady(
  * Namespace `pw-${prefix}-<random>` plus RBAC-free create; tracks cleanup.
  */
 export async function setupPwTestNamespace(
-  k8sClient: KubernetesClient,
+  client: RequestContextClient,
   cleanup: Pick<TestResourceTracker, 'trackNamespace'>,
   prefix: string,
 ): Promise<{ namespace: string }> {
   const namespace = `pw-${prefix}-${generateRandomString(6, 'alphanumeric').toLowerCase()}`;
-  await k8sClient.createNamespace(namespace);
-  await k8sClient.waitForNamespaceReady(namespace);
+  await client.ensureNamespace(namespace);
+  await client.waitForNamespaceReady(namespace);
   cleanup.trackNamespace(namespace);
   return { namespace };
 }
@@ -333,7 +317,7 @@ export function createStagedVmName(prefix: string): { vmName: string } {
 
 /** Creates a VM from a template via API in an existing namespace. */
 export async function createVmFromTemplateInNamespace(
-  k8sClient: KubernetesClient,
+  client: RequestContextClient,
   cleanup: Pick<TestResourceTracker, 'trackVirtualMachine'>,
   namespace: string,
   prefix: string,
@@ -341,24 +325,13 @@ export async function createVmFromTemplateInNamespace(
   options: {
     start?: boolean;
     waitTimeout?: number;
-    storageClassName?: string;
   } = {},
 ): Promise<{ vmName: string }> {
   const vmName = `pw-${prefix}-${generateRandomString(6, 'alphanumeric').toLowerCase()}`;
   const start = options.start !== false;
-  await k8sClient.createVmFromTemplate(
-    templateMetadataName,
-    vmName,
-    namespace,
-    'openshift',
-    start,
-    undefined,
-    undefined,
-    undefined,
-    options.storageClassName,
-  );
+  await client.createVmFromTemplate(templateMetadataName, vmName, namespace, 'openshift', start);
   if (start && options.waitTimeout != null) {
-    await waitForVirtualMachineReady(k8sClient, vmName, namespace, options.waitTimeout);
+    await waitForVirtualMachineReady(client, vmName, namespace, options.waitTimeout);
   }
   cleanup.trackVirtualMachine(vmName, namespace);
   return { vmName };

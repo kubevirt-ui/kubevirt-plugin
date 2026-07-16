@@ -187,10 +187,11 @@ export async function attachScreenshotToAllure(screenshotPath: string): Promise<
 import * as fs from 'fs';
 import * as path from 'path';
 
-import OcCliClient from '@/clients/oc-cli-client';
+import { createApiClientFromToken } from '@/clients/rcc-singleton';
 
 import { EnvVariables } from './env-variables';
 import { logger } from './logger';
+import { TestConfigManager } from './test-config';
 
 interface HcoProductVersion {
   name?: string;
@@ -241,17 +242,19 @@ export class AllureEnvironment {
     };
 
     try {
-      // Create OcCliClient directly with auth config
-      const authConfig = {
-        baseUrl: EnvVariables.clusterUrl,
-        username: EnvVariables.username,
-        password: EnvVariables.password,
-      };
-      const ocClient = new OcCliClient(undefined, authConfig);
+      const config = TestConfigManager.getConfig();
+      if (!config.authToken) {
+        logger.warn('No auth token available for cluster info collection');
+        return envInfo;
+      }
+
+      const client = await createApiClientFromToken(config.authToken);
 
       try {
-        const clusterVersion = await ocClient.getClusterVersion();
-        const desired = clusterVersion?.status?.desired as { version?: string } | undefined;
+        const clusterVersion = await client.getClusterVersion();
+        const desired = (clusterVersion?.status as Record<string, unknown>)?.desired as
+          | { version?: string }
+          | undefined;
         if (desired?.version) {
           const version = desired.version;
           envInfo['Cluster Version'] = version;
@@ -262,9 +265,8 @@ export class AllureEnvironment {
       }
 
       try {
-        const nodeOs = await ocClient.getNodeOsImage();
+        const nodeOs = await client.getNodeOsImage();
         if (nodeOs) {
-          // Use plain value like other env entries (strip "System=" prefix if present)
           envInfo.OS = nodeOs.replace(/^System=\s*/i, '').trim();
         }
       } catch {
@@ -272,7 +274,7 @@ export class AllureEnvironment {
       }
 
       try {
-        const pluginVersion = await ocClient.getKubevirtPluginVersion();
+        const pluginVersion = await client.getKubevirtPluginVersion();
         if (pluginVersion) {
           envInfo['KubeVirt Console Plugin Version'] = pluginVersion;
         }
@@ -281,13 +283,12 @@ export class AllureEnvironment {
       }
 
       try {
-        const hco = await ocClient.getResource(
-          'hyperconverged',
-          'kubevirt-hyperconverged',
+        const hco = await client.getHyperConverged(
           EnvVariables.cnvNamespace,
+          'kubevirt-hyperconverged',
         );
-        if (hco?.status?.versions && Array.isArray(hco.status.versions)) {
-          const versions = hco.status.versions as HcoProductVersion[];
+        if (hco?.status && (hco.status as Record<string, unknown>).versions) {
+          const versions = (hco.status as Record<string, unknown>).versions as HcoProductVersion[];
           const kubevirtVersion = versions.find((v) => v.name === 'kubevirt');
           if (kubevirtVersion?.version) {
             envInfo.Kubevirt = kubevirtVersion.version;
@@ -302,7 +303,7 @@ export class AllureEnvironment {
       }
 
       try {
-        const csvList = await ocClient.getResources('csv', EnvVariables.cnvNamespace);
+        const csvList = await client.listResourcesByKind('csv', EnvVariables.cnvNamespace);
         const hcoCsv = (csvList?.items || []).find((csv) =>
           csv.metadata?.name?.startsWith('kubevirt-hyperconverged-operator'),
         );

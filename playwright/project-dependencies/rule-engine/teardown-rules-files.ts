@@ -19,35 +19,6 @@ function safeWarn(message: string, err: unknown): void {
 export function getFilesTeardownRules(): TeardownRule[] {
   return [
     {
-      id: 'cleanup-kubeconfig',
-      name: 'Delete kubeconfig file',
-      scope: TeardownScope.FILES,
-      onError: 'skip',
-      guard: () => !EnvVariables.isDebugMode,
-      run: async (ctx) => {
-        try {
-          const kubeConfigPath = ctx.kubeConfigPath;
-          if (!kubeConfigPath || !fs.existsSync(kubeConfigPath)) {
-            return;
-          }
-
-          const workspaceKubeConfigDir = path.join(PROJECT_ROOT, '.kubeconfigs');
-          const resolved = path.resolve(kubeConfigPath);
-          if (!resolved.startsWith(path.resolve(workspaceKubeConfigDir))) {
-            logger.warn(
-              `⚠️ Refusing to delete kubeconfig outside workspace .kubeconfigs/: ${resolved}`,
-            );
-            return;
-          }
-
-          fs.unlinkSync(resolved);
-          logger.info(`✓ Deleted kubeconfig file: ${resolved}`);
-        } catch (error: unknown) {
-          safeWarn('Failed to delete kubeconfig file', error);
-        }
-      },
-    },
-    {
       id: 'cleanup-storage-state',
       name: 'Delete storage state file',
       scope: TeardownScope.FILES,
@@ -94,20 +65,9 @@ export function getFilesTeardownRules(): TeardownRule[] {
       onError: 'skip',
       run: async () => {
         try {
-          const kubeConfigDir = path.join(PROJECT_ROOT, '.kubeconfigs');
           const testConfigDir = path.join(PROJECT_ROOT, '.test-configs');
           const storageStateDir = path.join(PROJECT_ROOT, '.storage-states');
           const testDataDir = path.join(PROJECT_ROOT, '.test-data');
-
-          if (fs.existsSync(kubeConfigDir)) {
-            const kubeFiles = fs.readdirSync(kubeConfigDir);
-            if (kubeFiles.length === 0) {
-              fs.rmdirSync(kubeConfigDir);
-              logger.info('✓ Cleaned up .kubeconfigs directory');
-            } else {
-              logger.info(`📁 .kubeconfigs directory still contains ${kubeFiles.length} file(s)`);
-            }
-          }
 
           if (fs.existsSync(testConfigDir)) {
             const configFiles = fs.readdirSync(testConfigDir);

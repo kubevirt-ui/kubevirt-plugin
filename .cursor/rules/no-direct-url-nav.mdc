@@ -1,0 +1,70 @@
+# No Direct URL Navigation in Tests
+
+All Playwright test navigation must go through UI elements. Direct URL navigation (`goTo()`, `page.goto()`) is **banned** from page objects and test specs.
+
+---
+
+## Rule
+
+1. **Initial landing only**: `page.goto()` is permitted only for the initial cluster landing (login page, global setup, storage state capture)
+2. **All subsequent navigation must be UI-based**: Use the Virtualization perspective switcher, sidebar nav items, namespace dropdown, and tree view
+3. **No URL fallbacks**: If UI navigation fails, the test must fail — never silently fall back to a URL
+4. **Each test uses sidebar navigation**: Sidebar `clickNav*` methods call `expandVirtualizationNavSection()` → `switchToVirtualizationPerspective()` internally
+
+## Navigation Methods
+
+### Perspective Switching
+- `switchToVirtualizationPerspective()` — called automatically by all `clickNav*` methods
+- `switchToAdministratorPerspective()` — for tests that need Core Platform perspective
+
+### Sidebar Navigation (use these)
+- `clickNavVirtualMachines()` → VM list
+- `clickNavTemplates()` → Templates list
+- `clickNavBootableVolumes()` → Bootable Volumes list
+- `clickNavCheckups()` → Checkups
+- `clickNavInstanceTypes()` → Instance Types
+- `clickNavMigrationPolicies()` → Migration Policies
+- `clickNavSettings()` → Settings
+- `clickNavClusterOverview()` → Cluster Overview
+- `clickNavVirtualizationOverview()` → Virtualization Overview
+
+### Namespace Switching
+- `switchProject(namespace)` — switches namespace via the namespace dropdown UI
+
+### Composite ViaUI Methods (preferred in tests)
+- `navigateToVirtualMachinesViaUI()` — sidebar click to VM list
+- `navigateToNamespaceVirtualMachinesViaUI(namespace)` — sidebar click + namespace switch
+- `navigateToTemplatesViaUI()` — sidebar click to Templates
+- `navigateToBootableVolumesViaUI()` — sidebar click to Bootable Volumes
+- `navigateToCheckupsViaUI()` — sidebar click to Checkups
+- `navigateToInstanceTypesViaUI()` — sidebar click to Instance Types
+- `navigateToMigrationPoliciesViaUI()` — sidebar click to Migration Policies
+- `navigateToQuotasViaUI()` — sidebar click to Quotas
+- `navigateToSettingsViaUI()` — sidebar click to Settings
+
+### Tree View (for VM-specific navigation)
+- `searchTreeView(namespace)` + `clickProjectNode(namespace)` — find project in tree
+- `navigateToVmViaTreeView(namespace, vmName)` — find and click a specific VM
+- `navigateToProjectViaTreeView(namespace)` — find and click a project node
+
+## Banned Patterns
+
+```typescript
+// BANNED — direct URL navigation
+await this.goTo('/k8s/ns/default/kubevirt.io~v1~VirtualMachine');
+await this.page.goto('/k8s/all-namespaces/template.openshift.io~v1~Template');
+await this.navigateToNamespaceVirtualMachines(namespace); // uses goTo internally
+await this.navigateToAllNamespacesVirtualMachines(); // uses goTo internally
+
+// CORRECT — UI-based navigation
+await this.clickNavVirtualMachines();
+await this.navigateToVirtualMachinesViaUI();
+await this.navigateToNamespaceVirtualMachinesViaUI(namespace);
+```
+
+## Exceptions
+
+- `login-page.ts` — login is pre-navigation infrastructure
+- `global.setup.ts` / `global.teardown.ts` — initial cluster landing
+- `_autoVirtNavigation` fixture — initial page load uses `page.goto(baseUrl)`
+- `goTo()` in `base-component.ts` is kept for infrastructure but must NOT be called from page objects or tests

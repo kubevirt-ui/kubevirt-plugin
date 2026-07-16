@@ -907,16 +907,9 @@ export default class VirtualMachinesPage extends TreeContextMenuMixin(PageCommon
    * @param namespace - The namespace to switch to
    */
   async navigateToNamespaceVirtualMachinesViaUI(namespace: string): Promise<void> {
-    try {
-      await this.clickNavVirtualMachines();
-      await this.page.waitForLoadState('domcontentloaded');
-      const currentUrl = this.page.url();
-      if (!currentUrl.includes(`/ns/${namespace}/`)) {
-        await this.navigateToNamespaceVirtualMachines(namespace);
-      }
-    } catch {
-      await this.navigateToNamespaceVirtualMachines(namespace);
-    }
+    await this.clickNavVirtualMachines();
+    await this.page.waitForLoadState('domcontentloaded');
+    await this.switchProject(namespace);
   }
 
   async navigateToNamespaceVmListAndWait(namespace: string): Promise<void> {
@@ -939,11 +932,7 @@ export default class VirtualMachinesPage extends TreeContextMenuMixin(PageCommon
    * Navigates to Virtual Machines page via sidebar UI click, falling back to URL navigation.
    */
   async navigateToVirtualMachinesViaUI(): Promise<void> {
-    try {
-      await this.clickNavVirtualMachines();
-    } catch {
-      await this.navigateToAllNamespacesVirtualMachines();
-    }
+    await this.clickNavVirtualMachines();
   }
 
   async openBulkActionsDropdown() {

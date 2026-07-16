@@ -75,7 +75,7 @@ Produce a consolidated report with:
 - Executive summary (features discovered, coverage %, gaps found)
 - Untested features table
 - Jira tickets needing test coverage table
-- Recommended next steps (quick wins, new spec files, KubernetesClient gaps)
+- Recommended next steps (quick wins, new spec files, API client gaps)
 
 ### Phase 5: Implementation Planning (only with `--implement`)
 
@@ -84,7 +84,7 @@ Produce a consolidated report with:
    - Search existing scenario spec files for the feature
    - If a spec covers the area → **Expand** (add new `test()` block)
    - If no existing spec → **New** (create new spec in `playwright/tests/scenario/`)
-3. **Check KubernetesClient gaps** — does the test need K8s methods not yet in `KubernetesClient`?
+3. **Check API client gaps** — does the test need K8s methods not yet in `RequestContextClient`?
 4. **Present the plan** — wait for user approval before implementing
 
 ### Phase 6: Implementation (after approval)
@@ -100,12 +100,12 @@ const NS = generateRandomName('feature');
 test.describe('Feature', () => {
   test.describe.configure({ mode: 'serial' });
 
-  test.beforeAll(async ({ k8sClient }) => {
-    await k8sClient.setupTestNamespace(NS);
+  test.beforeAll(async ({ apiClient }) => {
+    await apiClient.setupTestNamespace(NS);
   });
 
-  test.afterAll(async ({ k8sClient }) => {
-    await k8sClient.cleanupTestNamespace(NS).catch(() => {});
+  test.afterAll(async ({ apiClient }) => {
+    await apiClient.cleanupTestNamespace(NS).catch(() => {});
   });
 
   test('Virtualization perspective loads', async ({ overviewPage }) => {
@@ -117,13 +117,13 @@ test.describe('Feature', () => {
 
 - Page objects are injected via the `scenarioTest` fixture — never use raw `page` in specs
 - Create new page objects in `playwright/src/page-objects/` and wire into `scenario-fixture.ts`
-- Extend `KubernetesClient` if K8s methods are needed
+- Extend `RequestContextClient` if K8s methods are needed (add to `proxy-handlers/`)
 - Run lint and type checks on all changed files
 
 ## Rules
 
 - Without `--implement`: **read-only** — do not modify code, create branches, or commit
-- **New tests always use scenario infrastructure** — `scenarioTest` fixture with page objects injected, `KubernetesClient`
+- **New tests always use scenario infrastructure** — `scenarioTest` fixture with page objects injected, `apiClient` (`RequestContextClient`)
 - **No raw `page` in specs** — destructure page objects from the fixture
 - **Never add tests to `playwright/tests/gating/`** — that directory is legacy/frozen
 - Use MCP snapshots (not screenshots) for element discovery and locator validation

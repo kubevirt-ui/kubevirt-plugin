@@ -216,4 +216,4 @@ When the user provides a scope argument:
 - After running `/coverage-analysis`, the user may invoke `/create-test` to implement proposals
 - The proposals section should reference the exact spec file path that `/create-test` would target
 - Each proposal must include: action (EXTEND/NEW), target file, and effort estimate
-- All proposals target `playwright/tests/scenario/` using `scenarioTest` fixture and `KubernetesClient`
+- All proposals target `playwright/tests/scenario/` using `scenarioTest` fixture and `OcClient`

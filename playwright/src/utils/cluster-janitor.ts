@@ -2,7 +2,7 @@
  * ClusterJanitor — native in-process replacement for the k8s-healer binary.
  *
  * Performs the same stale-resource and stale-namespace cleanup as k8s-healer
- * using the existing KubernetesClient, without requiring an external process.
+ * using the RequestContextClient, without requiring an external process.
  *
  * Cleanup scope mirrors k8s-healer defaults:
  *   - Namespaced KubeVirt/CDI/snapshot/networking/template CRDs in pw-* namespaces
@@ -18,7 +18,8 @@
  * All errors are caught and logged as warnings — never thrown.
  */
 
-import type KubernetesClient from '@/clients/kubernetes-client';
+import type RequestContextClient from '@/clients/request-context-client';
+import type { JsonPatchOp } from '@/data-models/kubernetes-types';
 import { logger } from '@/utils/logger';
 
 // ── Types ──────────────────────────────────────────────────────────────────────
@@ -45,67 +46,38 @@ export interface ClusterJanitorConfig {
 
 // ── Resource type definitions ─────────────────────────────────────────────────
 
-interface CrdResourceType {
-  readonly group: string;
-  readonly version: string;
-  readonly plural: string;
+interface NamespacedResourceKind {
+  readonly kind: string;
 }
 
-interface ClusterCrdResourceType extends CrdResourceType {
+interface ClusterResourceKind {
+  readonly kind: string;
   /** Prefixes that identify test-owned resources for cluster-scoped cleanup. */
   readonly testPrefixes: readonly string[];
 }
 
-const NAMESPACED_RESOURCE_TYPES: readonly CrdResourceType[] = [
-  { group: 'kubevirt.io', version: 'v1', plural: 'virtualmachines' },
-  { group: 'kubevirt.io', version: 'v1', plural: 'virtualmachineinstances' },
-  { group: 'kubevirt.io', version: 'v1', plural: 'virtualmachineinstancemigrations' },
-  { group: 'cdi.kubevirt.io', version: 'v1beta1', plural: 'datavolumes' },
-  { group: 'cdi.kubevirt.io', version: 'v1beta1', plural: 'datasources' },
-  { group: 'snapshot.kubevirt.io', version: 'v1beta1', plural: 'virtualmachinesnapshots' },
-  { group: 'snapshot.kubevirt.io', version: 'v1beta1', plural: 'virtualmachineclones' },
-  { group: 'instancetype.kubevirt.io', version: 'v1beta1', plural: 'virtualmachineinstancetypes' },
-  {
-    group: 'instancetype.kubevirt.io',
-    version: 'v1beta1',
-    plural: 'virtualmachinepreferences',
-  },
-  { group: 'k8s.cni.cncf.io', version: 'v1', plural: 'network-attachment-definitions' },
-  { group: 'k8s.ovn.org', version: 'v1', plural: 'userdefinednetworks' },
-  { group: 'template.openshift.io', version: 'v1', plural: 'templates' },
-  { group: 'template.kubevirt.io', version: 'v1beta1', plural: 'virtualmachinetemplates' },
-  {
-    group: 'storagemigration.kubevirt.io',
-    version: 'v1alpha1',
-    plural: 'virtualmachinestoragemigrationplans',
-  },
+const NAMESPACED_RESOURCE_KINDS: readonly NamespacedResourceKind[] = [
+  { kind: 'vm' },
+  { kind: 'vmi' },
+  { kind: 'vmim' },
+  { kind: 'datavolume' },
+  { kind: 'datasource' },
+  { kind: 'VirtualMachineSnapshot' },
+  { kind: 'VirtualMachineClone' },
+  { kind: 'VirtualMachineInstancetype' },
+  { kind: 'VirtualMachinePreference' },
+  { kind: 'net-attach-def' },
+  { kind: 'UserDefinedNetwork' },
+  { kind: 'template' },
+  { kind: 'VirtualMachineTemplate' },
+  { kind: 'VirtualMachineStorageMigrationPlan' },
 ];
 
-const CLUSTER_RESOURCE_TYPES: readonly ClusterCrdResourceType[] = [
-  {
-    group: 'instancetype.kubevirt.io',
-    version: 'v1beta1',
-    plural: 'virtualmachineclusterinstancetypes',
-    testPrefixes: ['pw-'],
-  },
-  {
-    group: 'instancetype.kubevirt.io',
-    version: 'v1beta1',
-    plural: 'virtualmachineclusterpreferences',
-    testPrefixes: ['pw-'],
-  },
-  {
-    group: 'migrations.kubevirt.io',
-    version: 'v1alpha1',
-    plural: 'migrationpolicies',
-    testPrefixes: ['pw-'],
-  },
-  {
-    group: 'storagemigration.kubevirt.io',
-    version: 'v1alpha1',
-    plural: 'multinamespacevirtualmachinestoragemigrationplans',
-    testPrefixes: ['pw-'],
-  },
+const CLUSTER_RESOURCE_KINDS: readonly ClusterResourceKind[] = [
+  { kind: 'VirtualMachineClusterInstancetype', testPrefixes: ['pw-'] },
+  { kind: 'VirtualMachineClusterPreference', testPrefixes: ['pw-'] },
+  { kind: 'migrationpolicy', testPrefixes: ['pw-'] },
+  { kind: 'MultiNamespaceVirtualMachineStorageMigrationPlan', testPrefixes: ['pw-'] },
 ];
 
 // ── Stale detection ───────────────────────────────────────────────────────────
@@ -192,17 +164,20 @@ function extractHttpStatus(err: unknown): number | null {
   }
   const msg = err instanceof Error ? err.message : String(err);
   const match = /HTTP-Code:\s*(\d{3})/.exec(msg);
-  return match ? parseInt(match[1], 10) : null;
+  if (match) return parseInt(match[1], 10);
+  const notFoundMatch = /not found|NotFound|404/.test(msg);
+  if (notFoundMatch) return 404;
+  return null;
 }
 
 // ── ClusterJanitor ────────────────────────────────────────────────────────────
 
 export class ClusterJanitor {
-  private readonly _client: KubernetesClient;
+  private readonly _client: RequestContextClient;
   private readonly _config: ClusterJanitorConfig;
   private _intervalHandle: ReturnType<typeof setInterval> | null = null;
 
-  constructor(client: KubernetesClient, config: Partial<ClusterJanitorConfig> = {}) {
+  constructor(client: RequestContextClient, config: Partial<ClusterJanitorConfig> = {}) {
     this._client = client;
     this._config = {
       staleAgeMs: config.staleAgeMs ?? 600_000,
@@ -211,15 +186,11 @@ export class ClusterJanitor {
   }
 
   private async _clearNamespaceFinalizers(namespace: string): Promise<void> {
-    for (const resourceType of NAMESPACED_RESOURCE_TYPES) {
+    for (const resourceKind of NAMESPACED_RESOURCE_KINDS) {
       let resources: UnstructuredResource[];
       try {
-        resources = (await this._client.listCustomResources(
-          resourceType.group,
-          resourceType.version,
-          namespace,
-          resourceType.plural,
-        )) as UnstructuredResource[];
+        const result = await this._client.listResourcesByKind(resourceKind.kind, namespace);
+        resources = (result.items ?? []) as UnstructuredResource[];
       } catch {
         continue;
       }
@@ -227,48 +198,33 @@ export class ClusterJanitor {
         const name = resource.metadata?.name;
         const finalizers = resource.metadata?.finalizers;
         if (!name || !finalizers?.length) continue;
-        await this._stripFinalizers(
-          resourceType.group,
-          resourceType.version,
-          resourceType.plural,
-          name,
-          namespace,
-        );
+        await this._stripFinalizers(resourceKind.kind, name, namespace);
       }
     }
   }
 
-  private async _deleteClusterResource(
-    group: string,
-    version: string,
-    plural: string,
-    name: string,
-  ): Promise<void> {
+  private async _deleteClusterResource(kind: string, name: string): Promise<void> {
     try {
-      await this._client.deleteClusterCustomResource(group, version, plural, name);
+      await this._client.deleteResourceByKind(kind, name);
     } catch (err: unknown) {
       if (extractHttpStatus(err) === 404) return;
       const msg = err instanceof Error ? err.message : String(err);
-      logger.warn(
-        `[ClusterJanitor] failed to delete cluster ${plural}/${name} (non-fatal): ${msg}`,
-      );
+      logger.warn(`[ClusterJanitor] failed to delete cluster ${kind}/${name} (non-fatal): ${msg}`);
     }
   }
 
   private async _deleteNamespacedResource(
-    group: string,
-    version: string,
-    plural: string,
+    kind: string,
     name: string,
     namespace: string,
   ): Promise<void> {
     try {
-      await this._client.deleteCustomResource(group, version, namespace, plural, name);
+      await this._client.deleteResourceByKind(kind, name, namespace);
     } catch (err: unknown) {
       if (extractHttpStatus(err) === 404) return;
       const msg = err instanceof Error ? err.message : String(err);
       logger.warn(
-        `[ClusterJanitor] failed to delete ${plural}/${name} in ${namespace} (non-fatal): ${msg}`,
+        `[ClusterJanitor] failed to delete ${kind}/${name} in ${namespace} (non-fatal): ${msg}`,
       );
     }
   }
@@ -277,10 +233,11 @@ export class ClusterJanitor {
 
   private async _discoverTestNamespaces(): Promise<string[]> {
     try {
-      const all = await this._client.getNamespaces();
-      return all.filter(
-        (ns) => ns.startsWith('pw-') && !this._config.excludeNamespaces.includes(ns),
-      );
+      const nsList = await this._client.listResourcesByKind('namespace');
+      const names = (nsList.items ?? [])
+        .map((ns) => ns.metadata?.name)
+        .filter((n): n is string => !!n && n.startsWith('pw-'));
+      return names.filter((ns) => !this._config.excludeNamespaces.includes(ns));
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
       logger.warn(`[ClusterJanitor] failed to list namespaces (non-fatal): ${msg}`);
@@ -290,10 +247,10 @@ export class ClusterJanitor {
 
   private async _maybeDeleteNamespace(name: string): Promise<void> {
     let nsResource: {
-      metadata?: { creationTimestamp?: Date | string; deletionTimestamp?: Date | string };
+      metadata?: { creationTimestamp?: string; deletionTimestamp?: string };
     };
     try {
-      const raw = await this._client.getNamespaceByName(name);
+      const raw = await this._client.getResourceByKind('namespace', name);
       if (!raw) return;
       nsResource = raw as typeof nsResource;
     } catch {
@@ -303,13 +260,12 @@ export class ClusterJanitor {
     const isTerminating = !!nsResource.metadata?.deletionTimestamp;
 
     if (!isTerminating) {
-      const rawCreation = nsResource.metadata?.creationTimestamp;
-      const creationTs = rawCreation instanceof Date ? rawCreation : parseDate(rawCreation);
+      const creationTs = parseDate(nsResource.metadata?.creationTimestamp);
       if (!creationTs) return;
       if (Date.now() - creationTs.getTime() < this._config.staleAgeMs) return;
 
       try {
-        await this._client.deleteNamespace(name, { ignoreNotFound: true });
+        await this._client.deleteResourceByKind('namespace', name);
       } catch (err: unknown) {
         const msg = err instanceof Error ? err.message : String(err);
         logger.warn(`[ClusterJanitor] failed to delete namespace ${name} (non-fatal): ${msg}`);
@@ -321,61 +277,39 @@ export class ClusterJanitor {
     await this._clearNamespaceFinalizers(name);
   }
 
-  private async _stripClusterFinalizers(
-    group: string,
-    version: string,
-    plural: string,
-    name: string,
-  ): Promise<void> {
+  private async _stripClusterFinalizers(kind: string, name: string): Promise<void> {
     try {
-      await this._client.patchClusterCustomResource(group, version, plural, name, [
-        { op: 'replace', path: '/metadata/finalizers', value: [] },
-      ]);
+      const patchOps: JsonPatchOp[] = [{ op: 'replace', path: '/metadata/finalizers', value: [] }];
+      await this._client.patchResourceByKind(kind, name, patchOps, undefined, 'json');
     } catch (err: unknown) {
       const status = extractHttpStatus(err);
       if (status === 400 || status === 404 || status === 409) return;
       const msg = err instanceof Error ? err.message : String(err);
       logger.warn(
-        `[ClusterJanitor] failed to strip finalizers from cluster ${plural}/${name} (non-fatal): ${msg}`,
+        `[ClusterJanitor] failed to strip finalizers from cluster ${kind}/${name} (non-fatal): ${msg}`,
       );
     }
   }
 
-  private async _stripFinalizers(
-    group: string,
-    version: string,
-    plural: string,
-    name: string,
-    namespace: string,
-  ): Promise<void> {
+  private async _stripFinalizers(kind: string, name: string, namespace: string): Promise<void> {
     try {
-      await this._client.patchResource(group, version, plural, name, namespace, [
-        { op: 'replace', path: '/metadata/finalizers', value: [] },
-      ]);
+      const patchOps: JsonPatchOp[] = [{ op: 'replace', path: '/metadata/finalizers', value: [] }];
+      await this._client.patchResourceByKind(kind, name, patchOps, namespace, 'json');
     } catch (err: unknown) {
       const status = extractHttpStatus(err);
       if (status === 400 || status === 404 || status === 409) return;
       const msg = err instanceof Error ? err.message : String(err);
       logger.warn(
-        `[ClusterJanitor] failed to strip finalizers from ${plural}/${name} (non-fatal): ${msg}`,
+        `[ClusterJanitor] failed to strip finalizers from ${kind}/${name} (non-fatal): ${msg}`,
       );
     }
   }
 
-  private async _sweepClusterResources(): Promise<void> {
-    for (const resourceType of CLUSTER_RESOURCE_TYPES) {
-      await this._sweepClusterResourceType(resourceType);
-    }
-  }
-
-  private async _sweepClusterResourceType(resourceType: ClusterCrdResourceType): Promise<void> {
+  private async _sweepClusterResourceKind(resourceKind: ClusterResourceKind): Promise<void> {
     let resources: UnstructuredResource[];
     try {
-      resources = (await this._client.listClusterCustomResources(
-        resourceType.group,
-        resourceType.version,
-        resourceType.plural,
-      )) as UnstructuredResource[];
+      const result = await this._client.listResourcesByKind(resourceKind.kind);
+      resources = (result.items ?? []) as UnstructuredResource[];
     } catch {
       return;
     }
@@ -385,48 +319,32 @@ export class ClusterJanitor {
       if (!name) continue;
 
       // Only touch resources that match a test prefix
-      if (!resourceType.testPrefixes.some((prefix) => name.startsWith(prefix))) continue;
+      if (!resourceKind.testPrefixes.some((prefix) => name.startsWith(prefix))) continue;
 
       if (!isStale(resource, this._config.staleAgeMs)) continue;
 
       if (isStuckTerminating(resource, this._config.staleAgeMs)) {
-        await this._stripClusterFinalizers(
-          resourceType.group,
-          resourceType.version,
-          resourceType.plural,
-          name,
-        );
+        await this._stripClusterFinalizers(resourceKind.kind, name);
       }
 
-      await this._deleteClusterResource(
-        resourceType.group,
-        resourceType.version,
-        resourceType.plural,
-        name,
-      );
+      await this._deleteClusterResource(resourceKind.kind, name);
     }
   }
 
-  private async _sweepNamespacedResources(namespaces: string[]): Promise<void> {
-    for (const ns of namespaces) {
-      for (const resourceType of NAMESPACED_RESOURCE_TYPES) {
-        await this._sweepNamespacedResourceType(ns, resourceType);
-      }
+  private async _sweepClusterResources(): Promise<void> {
+    for (const resourceKind of CLUSTER_RESOURCE_KINDS) {
+      await this._sweepClusterResourceKind(resourceKind);
     }
   }
 
-  private async _sweepNamespacedResourceType(
+  private async _sweepNamespacedResourceKind(
     namespace: string,
-    resourceType: CrdResourceType,
+    resourceKind: NamespacedResourceKind,
   ): Promise<void> {
     let resources: UnstructuredResource[];
     try {
-      resources = (await this._client.listCustomResources(
-        resourceType.group,
-        resourceType.version,
-        namespace,
-        resourceType.plural,
-      )) as UnstructuredResource[];
+      const result = await this._client.listResourcesByKind(resourceKind.kind, namespace);
+      resources = (result.items ?? []) as UnstructuredResource[];
     } catch {
       // CRD may not be installed on this cluster — skip silently
       return;
@@ -440,22 +358,18 @@ export class ClusterJanitor {
 
       // Strip finalizers first if stuck in Terminating
       if (isStuckTerminating(resource, this._config.staleAgeMs)) {
-        await this._stripFinalizers(
-          resourceType.group,
-          resourceType.version,
-          resourceType.plural,
-          name,
-          namespace,
-        );
+        await this._stripFinalizers(resourceKind.kind, name, namespace);
       }
 
-      await this._deleteNamespacedResource(
-        resourceType.group,
-        resourceType.version,
-        resourceType.plural,
-        name,
-        namespace,
-      );
+      await this._deleteNamespacedResource(resourceKind.kind, name, namespace);
+    }
+  }
+
+  private async _sweepNamespacedResources(namespaces: string[]): Promise<void> {
+    for (const ns of namespaces) {
+      for (const resourceKind of NAMESPACED_RESOURCE_KINDS) {
+        await this._sweepNamespacedResourceKind(ns, resourceKind);
+      }
     }
   }
 
@@ -472,16 +386,12 @@ export class ClusterJanitor {
   ): Promise<void> {
     const testNamespaceSet = new Set(testNamespaces);
 
-    for (const resourceType of NAMESPACED_RESOURCE_TYPES) {
+    for (const resourceKind of NAMESPACED_RESOURCE_KINDS) {
       let allResources: UnstructuredResource[];
       try {
-        // listClusterCustomResources hits /apis/{group}/{version}/{plural} which returns
-        // all instances across every namespace with metadata.namespace populated.
-        allResources = (await this._client.listClusterCustomResources(
-          resourceType.group,
-          resourceType.version,
-          resourceType.plural,
-        )) as UnstructuredResource[];
+        // listResourcesByKind with undefined namespace returns all instances across every namespace
+        const result = await this._client.listResourcesByKind(resourceKind.kind);
+        allResources = (result.items ?? []) as UnstructuredResource[];
       } catch {
         // CRD not installed or no cluster-wide list permission — skip silently
         continue;
@@ -500,22 +410,10 @@ export class ClusterJanitor {
         if (!isStale(resource, this._config.staleAgeMs)) continue;
 
         if (isStuckTerminating(resource, this._config.staleAgeMs)) {
-          await this._stripFinalizers(
-            resourceType.group,
-            resourceType.version,
-            resourceType.plural,
-            name,
-            namespace,
-          );
+          await this._stripFinalizers(resourceKind.kind, name, namespace);
         }
 
-        await this._deleteNamespacedResource(
-          resourceType.group,
-          resourceType.version,
-          resourceType.plural,
-          name,
-          namespace,
-        );
+        await this._deleteNamespacedResource(resourceKind.kind, name, namespace);
       }
     }
   }

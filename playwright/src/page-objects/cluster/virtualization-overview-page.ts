@@ -2,6 +2,7 @@
  * Page object for the Virtualization Overview page (namespace-specific).
  */
 
+import NavigationComponent from '@/components/shared/navigation-component';
 import { TestTimeouts } from '@/utils/test-config';
 import type { Page } from '@playwright/test';
 
@@ -16,8 +17,11 @@ export const VmChartType = {
 export type VmChartTypeValue = (typeof VmChartType)[keyof typeof VmChartType];
 
 export default class VirtualizationOverviewPage extends BasePage {
+  private readonly nav: NavigationComponent;
+
   constructor(page: Page) {
     super(page);
+    this.nav = new NavigationComponent(page);
   }
 
   async clickVmListLink(linkText: string): Promise<void> {
@@ -28,6 +32,10 @@ export default class VirtualizationOverviewPage extends BasePage {
 
   async navigateToNamespaceVirtualizationOverview(namespace: string) {
     await this.goTo(`/k8s/ns/${namespace}/virtualization-overview`);
+  }
+
+  async navigateToVirtualizationOverviewViaUI(): Promise<void> {
+    await this.nav.clickNavVirtualizationOverview();
   }
 
   async selectChartType(chartType: VmChartTypeValue): Promise<void> {

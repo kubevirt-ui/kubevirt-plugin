@@ -7,15 +7,14 @@
 #   • Exports HC_E2E=true so global setup uses the in-cluster / SA-token auth
 #     flow and skips browser OAuth login.
 #   • Includes the Gating and Tier1 projects (scenario infrastructure).
-#   • Supports IS_LOCAL=1 for localhost development (oc login + localhost:9000).
+#   • Supports IS_LOCAL=1 for localhost development (localhost:9000).
 #
 # Usage:
 #   ./playwright-runner-hc-e2e.sh [project] [extra-args...]
 #
 # Environment:
 #   IS_LOCAL=1   Run against localhost:9000 (npm run start-console).
-#                Performs oc login from .env credentials and sets
-#                WEB_CONSOLE_URL=http://localhost:9000 automatically.
+#                Sets WEB_CONSOLE_URL=http://localhost:9000 automatically.
 #
 # Examples:
 #   ./playwright-runner-hc-e2e.sh Gating --workers=4
@@ -53,24 +52,7 @@ detect_urls() {
 setup_local() {
   export WEB_CONSOLE_URL="http://localhost:9000"
   echo "🏠 IS_LOCAL=1 — targeting localhost console at ${WEB_CONSOLE_URL}"
-
   detect_urls
-
-  if [[ -z "${CLUSTER_URL:-}" ]]; then
-    echo "❌ CLUSTER_URL is required for oc login. Set it in .env or export it."
-    exit 1
-  fi
-
-  local user="${OPENSHIFT_USERNAME:-kubeadmin}"
-  local pass="${OPENSHIFT_PASSWORD:-}"
-  if [[ -z "${pass}" ]]; then
-    echo "❌ OPENSHIFT_PASSWORD is required for oc login. Set it in .env or export it."
-    exit 1
-  fi
-
-  echo "🔐 Logging in to ${CLUSTER_URL} as ${user}..."
-  oc login "${CLUSTER_URL}" -u "${user}" -p "${pass}" --insecure-skip-tls-verify
-  echo "✓ oc login successful ($(oc whoami))"
 }
 
 # ── Main ─────────────────────────────────────────────────────────────────
@@ -95,7 +77,7 @@ if [[ -z "${PROJECT}" ]]; then
   echo "  all                    Run all projects"
   echo ""
   echo "Environment:"
-  echo "  IS_LOCAL=1             Run against localhost:9000 (oc login + local console)"
+  echo "  IS_LOCAL=1             Run against localhost:9000 (local console)"
   exit 1
 fi
 

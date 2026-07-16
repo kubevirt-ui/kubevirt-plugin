@@ -302,11 +302,7 @@ export default class MigrationPoliciesPage extends PageCommons {
    * Navigates to Migration Policies page via sidebar UI click, falling back to URL navigation.
    */
   async navigateToMigrationPoliciesViaUI(): Promise<void> {
-    try {
-      await this.clickNavMigrationPolicies();
-    } catch {
-      await this.navigateToMigrationPolicies();
-    }
+    await this.clickNavMigrationPolicies();
   }
 
   /**
