@@ -86,6 +86,16 @@ const fakeOctokit = (options: FakeOctokitOptions, calls: Call[]): Octokit => {
         throw new Error('Not Found');
       },
     },
+    checks: {
+      create: async (args: unknown) => {
+        calls.push({ method: 'checks.create', args });
+        return { data: { id: 1000 } };
+      },
+      update: async (args: unknown) => {
+        calls.push({ method: 'checks.update', args });
+        return { data: { id: (args as { check_run_id: number }).check_run_id } };
+      },
+    },
   } as unknown as Octokit;
 };
 
@@ -356,5 +366,15 @@ describe('runPathValidation', () => {
 
     const statuses = statusesOf(calls);
     assert.equal(statuses[0]?.state, 'pending');
+  });
+
+  it('publishes one check-run per run -- pending creates it, the final status updates the same one', async () => {
+    const calls: Call[] = [];
+    const octokit = fakeOctokit({ files: [{ filename: 'src/App.tsx' }], labels: [] }, calls);
+
+    await runPathValidation(buildCtx(octokit), TEST_CONFIG, buildStatusDescription);
+
+    assert.equal(calls.filter((c) => c.method === 'checks.create').length, 1);
+    assert.equal(calls.filter((c) => c.method === 'checks.update').length, 1);
   });
 });

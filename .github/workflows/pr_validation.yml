@@ -12,6 +12,7 @@ jobs:
       pull-requests: write
       issues: write
       statuses: write
+      checks: write
     runs-on: ubuntu-latest
     concurrency:
       group: pr-validation-${{ github.event.pull_request.number }}

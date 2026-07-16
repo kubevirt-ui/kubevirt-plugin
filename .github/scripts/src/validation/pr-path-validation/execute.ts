@@ -1,4 +1,6 @@
 /* eslint-disable no-console */
+import type { Octokit } from '@octokit/rest';
+
 import { runPathValidation } from './run-validation';
 import type { BuildStatusDescription, PathValidationOutcome } from './run-validation';
 import { HandledValidationError } from './errors';
@@ -7,6 +9,7 @@ import { AI_CONFIG } from '../ai-config-validation/constants';
 import { buildStatusDescription as buildAiConfigStatusDescription } from '../ai-config-validation/utils';
 import { CI_SCRIPTS_CONFIG } from '../ci-scripts-validation/constants';
 import { buildStatusDescription as buildCiScriptsStatusDescription } from '../ci-scripts-validation/utils';
+import { publishCheckRun } from './label-sync';
 import { createOctokit, createStatusOctokit } from '../../github-repo';
 import { setCommitStatus } from '../../github-comments';
 import { safeErrorMessage } from '../../utils';
@@ -22,6 +25,9 @@ export type PathValidationInput = {
   baseBranch: string;
   /** Pre-fetched changed files -- lets a caller running multiple path validations for the same PR share one fetch instead of each doing its own. */
   files?: Array<{ filename: string; patch?: string }>;
+  /** Injectable for tests; default to real Octokit clients built from config. */
+  octokit?: Octokit;
+  statusOctokit?: Octokit;
 };
 
 /** Run path-based validation; throws HandledValidationError on failure (already reported via label/status). */
@@ -32,24 +38,61 @@ export const executePathValidation = async (
   onFilesFetched?: (files: Array<{ filename: string; patch?: string }>) => void,
 ): Promise<PathValidationOutcome> => {
   const { config, prNumber, headSha, eventAction, baseBranch, files } = input;
-  const octokit = createOctokit(config);
-  const statusOctokit = createStatusOctokit(config);
+  const octokit = input.octokit ?? createOctokit(config);
+  const statusOctokit = input.statusOctokit ?? createStatusOctokit(config);
+  // Shared with runPathValidation so a throw after it publishes the pending
+  // check-run can finalize that same check-run here instead of leaving it
+  // stuck in_progress and creating an unrelated duplicate.
+  const checkRunId: { current?: number } = {};
 
-  const outcome = await runPathValidation(
-    {
-      baseBranch,
-      config,
-      event: { action: eventAction },
-      files,
-      headSha,
-      octokit,
-      prNumber,
-      statusOctokit,
-    },
-    pathConfig,
-    buildStatusDescription,
-    onFilesFetched,
-  );
+  let outcome: PathValidationOutcome;
+  try {
+    outcome = await runPathValidation(
+      {
+        baseBranch,
+        checkRunId,
+        config,
+        event: { action: eventAction },
+        files,
+        headSha,
+        octokit,
+        prNumber,
+        statusOctokit,
+      },
+      pathConfig,
+      buildStatusDescription,
+      onFilesFetched,
+    );
+  } catch (err) {
+    const message = `${pathConfig.displayName} encountered an unexpected error`;
+    // Independent best-effort boundaries -- a rejected status publish must
+    // not skip finalizing the check-run (or vice versa), and neither must
+    // prevent rethrowing as HandledValidationError below.
+    if (headSha) {
+      await setCommitStatus(
+        statusOctokit,
+        config.owner,
+        config.repo,
+        headSha,
+        'error',
+        message,
+        pathConfig.statusContext,
+      ).catch((statusErr) => {
+        console.error(`Failed to report error status: ${safeErrorMessage(statusErr)}`);
+      });
+    }
+    await publishCheckRun(
+      { checkRunId, config, headSha, octokit: statusOctokit, prNumber },
+      pathConfig,
+      'error',
+      pathConfig.displayName,
+      message,
+    );
+    // Already reported above (status + check-run) -- wrap as
+    // HandledValidationError so the caller's isolation loop doesn't report
+    // this same error again and create a second, duplicate check-run.
+    throw new HandledValidationError(`${message}: ${safeErrorMessage(err)}`);
+  }
 
   if (outcome.kind === 'failed') {
     throw new HandledValidationError(
@@ -66,26 +109,36 @@ export const reportPathValidationError = async (
   headSha: string | undefined,
   pathConfig: Pick<PathValidationConfig, 'statusContext' | 'displayName'>,
   err: unknown,
+  /** Injectable for tests; defaults to a real Octokit client built from config. */
+  statusOctokitOverride?: Octokit,
 ): Promise<void> => {
   console.error('Unexpected error:', safeErrorMessage(err));
   if (!headSha) {
     return;
   }
 
-  try {
-    const statusOctokit = createStatusOctokit(config);
-    await setCommitStatus(
-      statusOctokit,
-      config.owner,
-      config.repo,
-      headSha,
-      'error',
-      `${pathConfig.displayName} encountered an unexpected error`,
-      pathConfig.statusContext,
-    );
-  } catch {
-    // best-effort
-  }
+  const message = `${pathConfig.displayName} encountered an unexpected error`;
+  const statusOctokit = statusOctokitOverride ?? createStatusOctokit(config);
+  // Independent best-effort boundaries -- a rejected status publish must
+  // not skip the check-run publish, or vice versa.
+  await setCommitStatus(
+    statusOctokit,
+    config.owner,
+    config.repo,
+    headSha,
+    'error',
+    message,
+    pathConfig.statusContext,
+  ).catch((statusErr) => {
+    console.error(`Failed to report error status: ${safeErrorMessage(statusErr)}`);
+  });
+  await publishCheckRun(
+    { config, headSha, octokit: statusOctokit, prNumber: -1 },
+    pathConfig,
+    'error',
+    pathConfig.displayName,
+    message,
+  );
 };
 
 const logSuspiciousMatches = (files: Array<{ filename: string; patch?: string }>): void => {

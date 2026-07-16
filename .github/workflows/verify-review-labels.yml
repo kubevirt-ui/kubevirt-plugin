@@ -15,6 +15,7 @@ permissions:
   pull-requests: write
   issues: write
   statuses: write
+  checks: write
 
 jobs:
   verify:

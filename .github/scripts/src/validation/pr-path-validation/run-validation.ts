@@ -20,6 +20,8 @@ export type PathValidationContext = {
   baseBranch: string;
   /** Pre-fetched changed files -- skips the internal getPullRequestFiles call so callers running multiple path validations for the same PR can share one fetch. */
   files?: Array<{ filename: string; patch?: string }>;
+  /** Shared with the caller so an error thrown after the pending check-run is created can still update that same check-run instead of creating a duplicate. Defaults to a fresh holder when omitted. */
+  checkRunId?: { current?: number };
 };
 
 export type PathValidationOutcome =
@@ -47,6 +49,9 @@ export const runPathValidation = async (
     config: ctx.config,
     prNumber: ctx.prNumber,
     headSha: ctx.headSha,
+    // Shared across this run's reportCommitStatus calls so the final
+    // status updates the same check-run created by the pending one.
+    checkRunId: ctx.checkRunId ?? {},
   };
 
   await reportCommitStatus(
