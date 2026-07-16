@@ -293,7 +293,7 @@ A PR is merge-pool eligible when **all** of the following hold (`isMergePoolPr`)
 
 `auto-merge.yml` then:
 
-- Publishes required check **`Merge Gate`** (`success` iff eligible, else `failure` -- the real merge backstop)
+- Its own job -- named **`Merge Gate`** -- fails when the PR isn't eligible and succeeds when it is; that native job check-run (shown in the merge box as **`Auto Merge / Merge Gate`**) is the required check, i.e. the real merge backstop. Deliberately **not** published via `publish-gating-check`/`checks.create()` -- an API-created check-run isn't attached to this workflow run, so GitHub parks it under whichever other check suite happens to exist for the SHA (often "Needs Rebase"), which used to show the confusing "Needs Rebase / Merge Gate" in the merge box.
 - Enables/disables GitHub native auto-merge via the bot App (GraphQL; `GITHUB_TOKEN` cannot do this)
 
 Branch protection must require **`Merge Gate`** and **`Run Gating Tests`** (plus build/test as before).
@@ -359,7 +359,7 @@ Purely informational, PR-list-visible mirror of Hot Cluster E2E's latest _real_ 
 
 ### `enablePullRequestAutoMerge` needs the bot token, not `GITHUB_TOKEN`
 
-Confirmed live on PR #4363: even with `Merge Gate` correctly reporting `success`, `auto-merge.yml`'s GraphQL call to `enablePullRequestAutoMerge` failed with `Resource not accessible by integration` -- **regardless of the workflow's `permissions:` block**. `enablePullRequestAutoMerge`/`disablePullRequestAutoMerge` are two of a small set of mutations GitHub blocks for the default Actions bot identity as a platform restriction, not a scope you can widen your way around. Fixed by generating a `kubevirt-plugin-bot` App token (via [`.github/actions/create-bot-token`](../.github/actions/create-bot-token/action.yml) or `actions/create-github-app-token@v3` directly) and passing it as `github-token:` to that GraphQL step -- eligibility-check and Merge-Gate-publishing steps stay on the default token.
+Confirmed live on PR #4363: even with `Merge Gate` correctly reporting `success`, `auto-merge.yml`'s GraphQL call to `enablePullRequestAutoMerge` failed with `Resource not accessible by integration` -- **regardless of the workflow's `permissions:` block**. `enablePullRequestAutoMerge`/`disablePullRequestAutoMerge` are two of a small set of mutations GitHub blocks for the default Actions bot identity as a platform restriction, not a scope you can widen your way around. Fixed by generating a `kubevirt-plugin-bot` App token (via [`.github/actions/create-bot-token`](../.github/actions/create-bot-token/action.yml) or `actions/create-github-app-token@v3` directly) and passing it as `github-token:` to that GraphQL step -- the eligibility-check step stays on the default token.
 
 ### Known limitations
 
