@@ -120,7 +120,7 @@ Uses `openshift-install` to create a fully self-managed OpenShift cluster on IBM
 | `BOT_APP_ID`          | GitHub App ID for `kubevirt-plugin-bot` |
 | `BOT_APP_PRIVATE_KEY` | GitHub App private key                  |
 
-Used by `/lgtm`/`/approve`/`/hold`, review sync, `needs-rebase`, auto-merge GraphQL, e2e result labels, and related PR comment/label writes. The App installation must have **Issues: Read & write** and **Pull requests: Read & write**. Shared helper: [`.github/actions/create-bot-token`](../.github/actions/create-bot-token/action.yml).
+Used by `/lgtm`/`/approve`/`/hold`, review sync, `needs-rebase`, auto-merge GraphQL, e2e result labels, and related PR comment/label writes. The App installation must have **Issues: Read & write**, **Pull requests: Read & write**, and **Contents: Read & write** (the last one specifically for `enablePullRequestAutoMerge`/`disablePullRequestAutoMerge` -- see below). Shared helper: [`.github/actions/create-bot-token`](../.github/actions/create-bot-token/action.yml).
 
 Ghost runner cleanup reuses the ARC Authentication GitHub App credentials above (`ARC_GITHUB_APP_ID` + `ARC_GITHUB_APP_PRIVATE_KEY`) — no separate secret needed, since that app is already scoped to `administration: write`, exactly what deregistering offline runners requires.
 
@@ -357,9 +357,11 @@ Per-PR concurrency (`needs-rebase-<PR#>`, `cancel-in-progress: false`) avoids ra
 
 Purely informational, PR-list-visible mirror of Hot Cluster E2E's latest _real_ result -- **not** a merge gate (`isMergePoolPr` doesn't read these; the required "Run Gating Tests" check-run is still the actual gate). Added by a new step in `hot-cluster-e2e.yml`'s `verify-gating-tests` job, right after "Publish result for PR": `success` -> `e2e-passed` (+ remove `e2e-failed`); `failure` -> `e2e-failed` (+ remove `e2e-passed`); `neutral` (held/stale/non-real results) -> skipped entirely, leaving whichever label already reflects the last real result untouched. Label writes go through the `kubevirt-plugin-bot` App token (`permission-issues: write` + `permission-pull-requests: write`), same reason as `/hold-e2e`'s `e2e-hold` -- not `GITHUB_TOKEN`.
 
-### `enablePullRequestAutoMerge` needs the bot token, not `GITHUB_TOKEN`
+### `enablePullRequestAutoMerge` needs the bot token, not `GITHUB_TOKEN` -- and needs `contents:write` on that token too
 
 Confirmed live on PR #4363: even with `Merge Gate` correctly reporting `success`, `auto-merge.yml`'s GraphQL call to `enablePullRequestAutoMerge` failed with `Resource not accessible by integration` -- **regardless of the workflow's `permissions:` block**. `enablePullRequestAutoMerge`/`disablePullRequestAutoMerge` are two of a small set of mutations GitHub blocks for the default Actions bot identity as a platform restriction, not a scope you can widen your way around. Fixed by generating a `kubevirt-plugin-bot` App token (via [`.github/actions/create-bot-token`](../.github/actions/create-bot-token/action.yml) or `actions/create-github-app-token@v3` directly) and passing it as `github-token:` to that GraphQL step -- the eligibility-check step stays on the default token.
+
+**Granting the App "Contents: Read & write" in its installation settings is not enough on its own.** `actions/create-github-app-token@v3`'s `permission-*` inputs narrow the generated token to exactly what's requested, regardless of what the App's own installation permissions allow -- requesting only `permission-pull-requests: write` still 403'd with the same error even after the App was granted Contents access, because the token itself never carried a `contents` scope. The `Generate bot token` step in `auto-merge.yml` requests both `permission-contents: write` and `permission-pull-requests: write` for this reason.
 
 ### Known limitations
 
