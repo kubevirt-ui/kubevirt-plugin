@@ -357,5 +357,4 @@ describe('runPathValidation', () => {
     const statuses = statusesOf(calls);
     assert.equal(statuses[0]?.state, 'pending');
   });
-
 });
