@@ -27,6 +27,37 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 2
     steps:
+      # e2e-passed/e2e-failed mirror the *last real* Hot Cluster E2E result --
+      # only on synchronize, since a new push means neither label reflects
+      # the new HEAD until the freshly-dispatched run below reports a fresh
+      # one. opened/reopened have no prior-diff result to invalidate.
+      - name: Generate bot token
+        id: bot-token
+        if: github.event.action == 'synchronize'
+        uses: ./.github/actions/create-bot-token
+        with:
+          app-id: ${{ secrets.BOT_APP_ID }}
+          private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
+
+      - name: Clear stale e2e-passed/e2e-failed on push
+        if: github.event.action == 'synchronize'
+        continue-on-error: true
+        uses: actions/github-script@v9
+        with:
+          github-token: ${{ steps.bot-token.outputs.token || github.token }}
+          script: |
+            for (const name of ['e2e-passed', 'e2e-failed']) {
+              try {
+                await github.rest.issues.removeLabel({
+                  ...context.repo,
+                  issue_number: context.payload.pull_request.number,
+                  name,
+                });
+              } catch (err) {
+                if (err.status !== 404) throw err;
+              }
+            }
+
       - name: Dispatch hot-cluster-e2e.yml
         uses: actions/github-script@v9
         with:

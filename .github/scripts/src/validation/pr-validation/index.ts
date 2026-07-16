@@ -7,9 +7,11 @@ import {
   reportCiScriptsError,
 } from '../pr-path-validation/execute';
 import { buildConfigFromEnv } from './build-config';
+import { clearStaleApproval } from './clear-stale-approval';
 import { setCommitStatus } from '../../github-comments';
 import { createOctokit, createStatusOctokit, getPullRequestFiles } from '../../github-repo';
 import { runChecksIsolated } from './run-checks';
+import type { PrValidationCheck } from './run-checks';
 import { requireEnv, safeErrorMessage } from '../../utils';
 import type { GitHubConfig } from '../../types/index';
 
@@ -51,47 +53,58 @@ const main = async (): Promise<void> => {
   // unexpected-error handling if it rejects.
   const filesPromise = getPullRequestFiles(octokit, config.owner, config.repo, prNumber);
 
-  const anyFailed = await runChecksIsolated(
-    [
-      {
-        name: 'jira-validation',
-        run: () => executeJiraValidation({ baseBranch, config, headSha, prNumber, prTitle }),
-        reportUnexpectedError: reportJiraUnexpectedError,
+  const checks: PrValidationCheck[] = [
+    {
+      name: 'jira-validation',
+      run: () => executeJiraValidation({ baseBranch, config, headSha, prNumber, prTitle }),
+      reportUnexpectedError: reportJiraUnexpectedError,
+    },
+    {
+      name: 'ai-config-validation',
+      run: async () => {
+        const files = await filesPromise;
+        return executeAiConfigValidation({
+          baseBranch,
+          config,
+          eventAction,
+          files,
+          headSha,
+          prNumber,
+        });
       },
-      {
-        name: 'ai-config-validation',
-        run: async () => {
-          const files = await filesPromise;
-          return executeAiConfigValidation({
-            baseBranch,
-            config,
-            eventAction,
-            files,
-            headSha,
-            prNumber,
-          });
-        },
-        reportUnexpectedError: reportAiConfigError,
+      reportUnexpectedError: reportAiConfigError,
+    },
+    {
+      name: 'ci-scripts-validation',
+      run: async () => {
+        const files = await filesPromise;
+        return executeCiScriptsValidation({
+          baseBranch,
+          config,
+          eventAction,
+          files,
+          headSha,
+          prNumber,
+        });
       },
-      {
-        name: 'ci-scripts-validation',
-        run: async () => {
-          const files = await filesPromise;
-          return executeCiScriptsValidation({
-            baseBranch,
-            config,
-            eventAction,
-            files,
-            headSha,
-            prNumber,
-          });
-        },
-        reportUnexpectedError: reportCiScriptsError,
+      reportUnexpectedError: reportCiScriptsError,
+    },
+  ];
+
+  // A new push invalidates any prior lgtm/approved -- mirrors Prow's lgtm
+  // plugin. Only on synchronize: opened/reopened/edited can't carry a stale
+  // review from a different diff.
+  if (eventAction === 'synchronize') {
+    checks.push({
+      name: 'clear-stale-approval',
+      run: () => clearStaleApproval(octokit, config.owner, config.repo, prNumber),
+      reportUnexpectedError: async (_config, _headSha, err) => {
+        console.error(`Failed to clear stale lgtm/approved labels: ${safeErrorMessage(err)}`);
       },
-    ],
-    config,
-    headSha,
-  );
+    });
+  }
+
+  const anyFailed = await runChecksIsolated(checks, config, headSha);
 
   if (anyFailed) {
     process.exit(1);

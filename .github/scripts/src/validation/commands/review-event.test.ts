@@ -154,4 +154,27 @@ describe('syncLabelsFromReview', () => {
       .map((c) => (c.args as { name: string }).name);
     assert.deepEqual(removed.sort(), ['approved', 'lgtm']);
   });
+
+  it('Request changes from a write collaborator who is not an OWNERS approver still revokes both lgtm and approved -- approved must not outlive the lgtm that justified it', async () => {
+    const calls: Call[] = [];
+    const octokit = fakeOctokit({ permission: 'write', ownersContent: OWNERS_CONTENT }, calls);
+
+    const result = await syncLabelsFromReview({
+      octokit,
+      contentsOctokit: octokit,
+      owner: 'kubevirt-ui',
+      repo: 'kubevirt-plugin',
+      prNumber: 42,
+      baseBranch: 'main',
+      reviewState: 'CHANGES_REQUESTED',
+      reviewAuthor: 'bob-collaborator',
+      prAuthor: 'pr-author',
+    });
+
+    assert.equal(result, 'revoked');
+    const removed = calls
+      .filter((c) => c.method === 'removeLabel')
+      .map((c) => (c.args as { name: string }).name);
+    assert.deepEqual(removed.sort(), ['approved', 'lgtm']);
+  });
 });
