@@ -274,7 +274,7 @@ Hot Cluster E2E already replaced Prow's **gating test execution**. The pieces be
 | Tide pool eligibility (`lgtm`+`approved`) | `isMergePoolPr` in [`hot-cluster/js/is-merge-pool-pr.cjs`](hot-cluster/js/is-merge-pool-pr.cjs)            |
 | Label name SSOT                           | [`hot-cluster/js/merge-pool-labels.cjs`](hot-cluster/js/merge-pool-labels.cjs)                             |
 | `/lgtm`, `/approve`, `/hold` (+ cancel)   | `pr_validation_commands.yml` + `.github/scripts/.../commands/{lgtm,approve,hold}.ts`                       |
-| Review acts as lgtm                       | `pr_review_commands.yml` + `commands/review-event.ts`                                                      |
+| Review acts as lgtm                       | `pr_review_commands.yml` + `pr_review_commands_sync.yml` + `commands/review-event.ts`                      |
 | `needs-rebase` plugin                     | `needs-rebase.yml` + `hot-cluster/js/sync-needs-rebase-label.cjs`                                          |
 | Anti-bypass for pool labels               | `verify-merge-pool-labels.yml` (strips untrusted UI adds; restores untrusted `do-not-merge/hold` removals) |
 | Presubmit / gating E2E                    | Hot Cluster E2E (`hot-cluster-e2e.yml` via thin PR gates) + required **`Run Gating Tests`** check          |
@@ -328,11 +328,18 @@ Commands in `pr_validation_commands.yml` (`.github/scripts/src/validation/comman
 
 ### Native GitHub reviews also toggle `lgtm`/`approved`
 
-`pr_review_commands.yml` (`pull_request_review: [submitted]`, entrypoint `commands/review-event.ts`) mirrors Prow's `review_acts_as_lgtm` convenience: an "Approve" review grants `lgtm` (+ `approved` if the reviewer is a root OWNERS approver); a "Request changes" review always removes both `lgtm` and `approved`, regardless of the reviewer's own OWNERS status -- same reasoning as `/lgtm cancel` above. Same write-collaborator check as the comment commands, and the same self-review restriction (a PR author's own review never toggles anything).
+An "Approve" review grants `lgtm` (+ `approved` if the reviewer is a root OWNERS approver); a "Request changes" review always removes both `lgtm` and `approved`, regardless of the reviewer's own OWNERS status -- same reasoning as `/lgtm cancel` above. Same write-collaborator check as the comment commands, and the same self-review restriction (a PR author's own review never toggles anything). Mirrors Prow's `review_acts_as_lgtm` convenience.
 
 **Deliberately simpler than Prow's original behavior**: Prow's real `lgtm` plugin skips handling a review entirely if its body text contains `/lgtm` or `/lgtm cancel` -- a genuinely confusing interaction (an "Approve" review with `/lgtm` typed in the body did _nothing_, neither the literal command nor the review-state auto-behavior), which is exactly what made the PR #4363 investigation so confusing in the first place. This implementation has no such special case: the review's **state** (`APPROVED`/`CHANGES_REQUESTED`) is always honored, regardless of anything typed in its body.
 
 No PR comment or reaction is posted for a review-triggered change (reviews don't support reactions the way issue comments do) -- a routine skip (non-collaborator, self-review) just logs and exits normally. Dismissing a review (as opposed to submitting a new one) is not handled -- see Known limitations below.
+
+**Split across two workflows because GitHub withholds secrets from `pull_request_review` on fork PRs.** `pull_request_review` gives only a read-only `GITHUB_TOKEN` and withholds all repository/organization secrets when the PR head is a fork -- confirmed live, and true for essentially every PR in this repo, since contributors (including maintainers) push from personal forks rather than branches on this repo directly. A single-workflow version of this feature would silently fail to generate the `kubevirt-plugin-bot` token on every such PR.
+
+- [`pr_review_commands.yml`](../.github/workflows/pr_review_commands.yml) (`pull_request_review: [submitted]`) does no checkout and touches no secrets or API at all -- it only captures the review's event-payload fields (`review.state`/`.user.login`, `pull_request.number`/`.user.login`/`.base.ref`; GitHub-computed, not something a fork PR author can fake) and uploads them as a `review-data` artifact.
+- [`pr_review_commands_sync.yml`](../.github/workflows/pr_review_commands_sync.yml) (`workflow_run: {workflows: ['PR Review Commands'], types: [completed]}`) does the actual work. `workflow_run` always runs with full base-repo secrets and a write `GITHUB_TOKEN`, regardless of what triggered the upstream run -- the one event type immune to the fork restriction. It downloads the artifact (`actions/download-artifact@v4` with `run-id: ${{ github.event.workflow_run.id }}` + an explicit `github-token`, required for a cross-run download), generates the bot token, and runs `commands/review-event.ts` exactly as before -- that script itself needed no changes, since it already only reads env vars.
+- `pr_review_commands_sync.yml` only runs `if: github.event.workflow_run.conclusion == 'success'`, so a skipped or failed capture (bot comment, non-Approve/Request-changes state, etc.) never triggers a spurious sync.
+- The bot-token step still keeps its own `continue-on-error` + a `::warning::` fallback for a genuinely broken App (uninstalled, rotated secrets) -- unrelated to the fork restriction this split solves, but worth failing gracefully for too.
 
 ### A new push clears stale `lgtm`/`approved`
 
