@@ -3,65 +3,54 @@ name: PR Review Commands
 # A native GitHub Approve/Request-changes review toggles lgtm/approved the
 # same way the /lgtm command does. Always honors the review's state,
 # regardless of any command text in its body. See ci-scripts/README.md.
+#
+# Split into two workflows because GitHub withholds repository/organization
+# secrets (and gives only a read-only GITHUB_TOKEN) from pull_request_review
+# when the PR head is a fork -- confirmed live, and true for essentially
+# every PR in this repo, since contributors (including maintainers) push
+# from personal forks rather than branches on this repo directly. This half
+# never touches secrets or the API; it only captures the review's
+# already-trustworthy event-payload data (GitHub-computed, not something a
+# fork PR author can fake) and hands it to pr_review_commands_sync.yml via
+# an artifact. That workflow_run-triggered workflow always runs with full
+# base-repo secrets regardless of what triggered the upstream run -- the one
+# event type immune to the fork restriction -- and does the actual sync.
 on:
   pull_request_review:
     types: [submitted]
 
-permissions:
-  contents: read
+permissions: {}
 
 jobs:
-  sync-from-review:
-    name: Sync Lgtm/Approved From Review
+  capture-review:
+    name: Capture Review Event
     if: >-
       !endsWith(github.event.review.user.login, '[bot]') &&
       (github.event.review.state == 'approved' || github.event.review.state == 'changes_requested')
     runs-on: ubuntu-latest
     timeout-minutes: 2
-    # Not cancel-in-progress: two reviews landing close together (e.g. an
-    # Approve immediately followed by Request-changes from someone else)
-    # must both apply in order, not race/clobber each other.
-    concurrency:
-      group: pr-review-cmd-${{ github.event.pull_request.number }}
     steps:
-      # Pin to default branch: this workflow's own definition already loads
-      # from there for a pull_request_review event, but the scripts it
-      # calls into need the same explicit pin other workflows use.
-      - name: Checkout
-        uses: actions/checkout@v7
+      # No checkout, no API calls, no secrets -- just the review's own
+      # event-payload fields, which are GitHub-computed and safe to trust
+      # even though this event can come from a fork PR.
+      - name: Write review data
+        uses: actions/github-script@v9
         with:
-          persist-credentials: false
-          ref: ${{ github.event.repository.default_branch }}
+          script: |
+            const fs = require('fs');
+            const data = {
+              prNumber: context.payload.pull_request.number,
+              reviewState: context.payload.review.state === 'approved' ? 'APPROVED' : 'CHANGES_REQUESTED',
+              reviewAuthor: context.payload.review.user.login,
+              prAuthor: context.payload.pull_request.user.login,
+              baseBranch: context.payload.pull_request.base.ref,
+            };
+            fs.writeFileSync('review-data.json', JSON.stringify(data));
+            core.info(`Captured review data: ${JSON.stringify(data)}`);
 
-      - name: Setup validation scripts
-        uses: ./.github/actions/setup-gh-scripts
+      - name: Upload review data
+        uses: actions/upload-artifact@v4
         with:
-          ref: ${{ github.event.repository.default_branch }}
-
-      # Bot app token required (see ci-scripts/README.md). continue-on-error
-      # so a bad credential still lets the step below report what it can.
-      - name: Generate bot token
-        id: bot-token
-        continue-on-error: true
-        uses: actions/create-github-app-token@v3
-        with:
-          app-id: ${{ secrets.BOT_APP_ID }}
-          private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
-          permission-issues: write
-          permission-pull-requests: write
-
-      # GITHUB_TOKEN: bot (labels). STATUS_GITHUB_TOKEN: ambient token for
-      # reading OWNERS. See createStatusOctokit.
-      - name: Sync lgtm/approved from review state
-        working-directory: .github/scripts
-        env:
-          GITHUB_TOKEN: ${{ steps.bot-token.outputs.token }}
-          STATUS_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          REVIEW_STATE: ${{ github.event.review.state == 'approved' && 'APPROVED' || 'CHANGES_REQUESTED' }}
-          REVIEW_AUTHOR: ${{ github.event.review.user.login }}
-          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-          BASE_BRANCH: ${{ github.event.pull_request.base.ref }}
-          REPO_OWNER: ${{ github.repository_owner }}
-          REPO_NAME: ${{ github.event.repository.name }}
-        run: npx tsx src/validation/commands/review-event.ts
+          name: review-data
+          path: review-data.json
+          retention-days: 1

@@ -1,0 +1,108 @@
+name: PR Review Commands Sync
+
+# Second half of the pr_review_commands.yml split -- see that file's
+# top-of-file comment for why this is split in two. workflow_run always runs
+# with full base-repo secrets and a write GITHUB_TOKEN regardless of what
+# triggered the upstream run (including a fork PR's pull_request_review),
+# so this is where the actual lgtm/approved sync happens. See
+# ci-scripts/README.md.
+on:
+  workflow_run:
+    workflows: ['PR Review Commands']
+    types: [completed]
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  sync-from-review:
+    name: Sync Lgtm/Approved From Review
+    if: github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    # Not cancel-in-progress: two reviews landing close together (e.g. an
+    # Approve immediately followed by Request-changes from someone else)
+    # must both apply in order, not race/clobber each other. Can't key this
+    # on PR number directly -- that would need either the artifact (not
+    # downloaded until a step runs, too late for a concurrency: expression)
+    # or workflow_run.pull_requests[0].number, which GitHub deliberately
+    # leaves empty for fork-originated runs, i.e. exactly the runs this
+    # workflow exists for. head_repository/head_branch are separate,
+    # always-populated top-level fields on workflow_run (unlike
+    # pull_requests), and together uniquely identify the same PR across
+    # multiple reviews.
+    concurrency:
+      group: pr-review-cmd-${{ github.event.workflow_run.head_repository.full_name }}-${{ github.event.workflow_run.head_branch }}
+    steps:
+      # Pin to default branch: the scripts this calls into need the same
+      # explicit pin other workflows use.
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+          ref: ${{ github.event.repository.default_branch }}
+
+      - name: Setup validation scripts
+        uses: ./.github/actions/setup-gh-scripts
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+
+      - name: Download review data
+        uses: actions/download-artifact@v4
+        with:
+          name: review-data
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ github.token }}
+
+      - name: Parse review data
+        id: review
+        run: |
+          node -e "
+            const data = require('./review-data.json');
+            const fs = require('fs');
+            const lines = [
+              'pr_number=' + data.prNumber,
+              'review_state=' + data.reviewState,
+              'review_author=' + data.reviewAuthor,
+              'pr_author=' + data.prAuthor,
+              'base_branch=' + data.baseBranch,
+            ];
+            fs.appendFileSync(process.env.GITHUB_OUTPUT, lines.join('\n') + '\n');
+          "
+
+      # Bot app token required (see ci-scripts/README.md). continue-on-error
+      # so a genuinely bad credential (App uninstalled, secrets rotated --
+      # unrelated to the fork restriction this split already solves) still
+      # lets the step below report what it can instead of crashing.
+      - name: Generate bot token
+        id: bot-token
+        continue-on-error: true
+        uses: actions/create-github-app-token@v3
+        with:
+          app-id: ${{ secrets.BOT_APP_ID }}
+          private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
+          permission-issues: write
+          permission-pull-requests: write
+
+      # GITHUB_TOKEN: bot (labels). STATUS_GITHUB_TOKEN: ambient token for
+      # reading OWNERS. See createStatusOctokit.
+      - name: Sync lgtm/approved from review state
+        if: steps.bot-token.outputs.token != ''
+        working-directory: .github/scripts
+        env:
+          GITHUB_TOKEN: ${{ steps.bot-token.outputs.token }}
+          STATUS_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REVIEW_STATE: ${{ steps.review.outputs.review_state }}
+          REVIEW_AUTHOR: ${{ steps.review.outputs.review_author }}
+          PR_AUTHOR: ${{ steps.review.outputs.pr_author }}
+          PR_NUMBER: ${{ steps.review.outputs.pr_number }}
+          BASE_BRANCH: ${{ steps.review.outputs.base_branch }}
+          REPO_OWNER: ${{ github.repository_owner }}
+          REPO_NAME: ${{ github.event.repository.name }}
+        run: npx tsx src/validation/commands/review-event.ts
+
+      - name: Note bot token failure
+        if: steps.bot-token.outputs.token == ''
+        run: |
+          echo "::warning title=Could not sync lgtm/approved from this review::The kubevirt-plugin-bot token could not be generated (BOT_APP_ID/BOT_APP_PRIVATE_KEY misconfigured, or the App was uninstalled) -- this review's Approve/Request-changes state was not synced to the lgtm/approved labels. Comment /lgtm or /approve on the PR instead."

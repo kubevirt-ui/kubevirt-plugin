@@ -23,14 +23,15 @@ Index of workflows in this directory. Deep design notes (check-run model, merge 
 
 ## Merge automation (Prow / Tide replacements)
 
-| Workflow                       | Trigger                       | Role                                                                                      |
-| ------------------------------ | ----------------------------- | ----------------------------------------------------------------------------------------- |
-| `auto-merge.yml`               | label / review / synchronize… | Required **Merge Gate** + enable/disable GitHub auto-merge                                |
-| `pr_validation_commands.yml`   | issue comment                 | `/lgtm`, `/approve`, `/hold` (+ cancel), `/ai-approved`, `/ci-approved`, `/recheck-jira`  |
-| `pr_review_commands.yml`       | review submitted              | Approve / Request changes ↔ `lgtm` (+ `approved` for root OWNERS)                         |
-| `needs-rebase.yml`             | PR events + push to `main`    | Sync `needs-rebase` from GitHub `mergeable`                                               |
-| `verify-merge-pool-labels.yml` | labeled / unlabeled           | Strip untrusted UI `lgtm`/`approved`/`do-not-merge/hold`; restore untrusted hold removals |
-| `pr_help_command.yml`          | `/help`                       | Comment command list from `pr-commands.json`                                              |
+| Workflow                       | Trigger                       | Role                                                                                                                                   |
+| ------------------------------ | ----------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| `auto-merge.yml`               | label / review / synchronize… | Required **Merge Gate** + enable/disable GitHub auto-merge                                                                             |
+| `pr_validation_commands.yml`   | issue comment                 | `/lgtm`, `/approve`, `/hold` (+ cancel), `/ai-approved`, `/ci-approved`, `/recheck-jira`                                               |
+| `pr_review_commands.yml`       | review submitted              | Captures review data only (no secrets -- see below), uploads artifact                                                                  |
+| `pr_review_commands_sync.yml`  | `workflow_run` (after above)  | Approve / Request changes ↔ `lgtm` (+ `approved` for root OWNERS); split out since `pull_request_review` withholds secrets on fork PRs |
+| `needs-rebase.yml`             | PR events + push to `main`    | Sync `needs-rebase` from GitHub `mergeable`                                                                                            |
+| `verify-merge-pool-labels.yml` | labeled / unlabeled           | Strip untrusted UI `lgtm`/`approved`/`do-not-merge/hold`; restore untrusted hold removals                                              |
+| `pr_help_command.yml`          | `/help`                       | Comment command list from `pr-commands.json`                                                                                           |
 
 Pool eligibility (`isMergePoolPr`): `lgtm` + `approved`, and no blockers (`hold`, `e2e-hold`, `needs-rebase`, any `do-not-merge/*`). Label names: [`ci-scripts/hot-cluster/js/merge-pool-labels.cjs`](../../ci-scripts/hot-cluster/js/merge-pool-labels.cjs).
 
