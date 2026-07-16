@@ -9,7 +9,6 @@ import { AI_CONFIG } from '../ai-config-validation/constants';
 import { buildStatusDescription as buildAiConfigStatusDescription } from '../ai-config-validation/utils';
 import { CI_SCRIPTS_CONFIG } from '../ci-scripts-validation/constants';
 import { buildStatusDescription as buildCiScriptsStatusDescription } from '../ci-scripts-validation/utils';
-import { publishCheckRun } from './label-sync';
 import { createOctokit, createStatusOctokit } from '../../github-repo';
 import { setCommitStatus } from '../../github-comments';
 import { safeErrorMessage } from '../../utils';
@@ -40,17 +39,12 @@ export const executePathValidation = async (
   const { config, prNumber, headSha, eventAction, baseBranch, files } = input;
   const octokit = input.octokit ?? createOctokit(config);
   const statusOctokit = input.statusOctokit ?? createStatusOctokit(config);
-  // Shared with runPathValidation so a throw after it publishes the pending
-  // check-run can finalize that same check-run here instead of leaving it
-  // stuck in_progress and creating an unrelated duplicate.
-  const checkRunId: { current?: number } = {};
 
   let outcome: PathValidationOutcome;
   try {
     outcome = await runPathValidation(
       {
         baseBranch,
-        checkRunId,
         config,
         event: { action: eventAction },
         files,
@@ -65,9 +59,8 @@ export const executePathValidation = async (
     );
   } catch (err) {
     const message = `${pathConfig.displayName} encountered an unexpected error`;
-    // Independent best-effort boundaries -- a rejected status publish must
-    // not skip finalizing the check-run (or vice versa), and neither must
-    // prevent rethrowing as HandledValidationError below.
+    // Best-effort -- a rejected status publish must not prevent rethrowing
+    // as HandledValidationError below.
     if (headSha) {
       await setCommitStatus(
         statusOctokit,
@@ -81,16 +74,8 @@ export const executePathValidation = async (
         console.error(`Failed to report error status: ${safeErrorMessage(statusErr)}`);
       });
     }
-    await publishCheckRun(
-      { checkRunId, config, headSha, octokit: statusOctokit, prNumber },
-      pathConfig,
-      'error',
-      pathConfig.displayName,
-      message,
-    );
-    // Already reported above (status + check-run) -- wrap as
-    // HandledValidationError so the caller's isolation loop doesn't report
-    // this same error again and create a second, duplicate check-run.
+    // Already reported above -- wrap as HandledValidationError so the
+    // caller's isolation loop doesn't report this same error again.
     throw new HandledValidationError(`${message}: ${safeErrorMessage(err)}`);
   }
 
@@ -119,8 +104,6 @@ export const reportPathValidationError = async (
 
   const message = `${pathConfig.displayName} encountered an unexpected error`;
   const statusOctokit = statusOctokitOverride ?? createStatusOctokit(config);
-  // Independent best-effort boundaries -- a rejected status publish must
-  // not skip the check-run publish, or vice versa.
   await setCommitStatus(
     statusOctokit,
     config.owner,
@@ -132,13 +115,6 @@ export const reportPathValidationError = async (
   ).catch((statusErr) => {
     console.error(`Failed to report error status: ${safeErrorMessage(statusErr)}`);
   });
-  await publishCheckRun(
-    { config, headSha, octokit: statusOctokit, prNumber: -1 },
-    pathConfig,
-    'error',
-    pathConfig.displayName,
-    message,
-  );
 };
 
 const logSuspiciousMatches = (files: Array<{ filename: string; patch?: string }>): void => {

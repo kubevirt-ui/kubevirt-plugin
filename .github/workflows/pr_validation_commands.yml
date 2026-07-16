@@ -24,7 +24,6 @@ jobs:
     permissions:
       contents: read
       statuses: write
-      checks: write
     runs-on: ubuntu-latest
     # Not cancel-in-progress: rapid successive commands (e.g. /lgtm then
     # /approve) must both finish applying labels, not race/clobber each other.
