@@ -32,7 +32,7 @@
     "immer": "^9.0.12",
     "ipaddr.js": "2.2.0",
     "js-abbreviation-number": "^1.4.0",
-    "js-yaml": "^4.1.1",
+    "js-yaml": "4.3.0",
     "lodash": "^4.17.23",
     "mochawesome-report-generator": "^6.2.0",
     "murmurhash-js": "1.0.0",
@@ -150,7 +150,8 @@
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "delaunator": "4.0.1",
-    "dompurify": "^3.4.0"
+    "dompurify": "^3.4.0",
+    "js-yaml": "4.3.0"
   },
   "private": true,
   "scripts": {
