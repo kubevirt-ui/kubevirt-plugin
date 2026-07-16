@@ -36,7 +36,6 @@ export const getDetailsTabHardwareIds: SearchItemGetter = (vm) => [
 
 export const getDetailsTabMainIds: SearchItemGetter = (vm) => [
   { id: 'deletion-protection', title: t('Deletion protection') },
-  { id: 'enable-vsock', title: t('Enable VSOCK') },
   { id: 'guest-system-log-access', title: t('Guest system log access') },
   { id: 'headless-mode', title: t('Headless mode') },
   { id: 'hostname', title: t('Hostname') },

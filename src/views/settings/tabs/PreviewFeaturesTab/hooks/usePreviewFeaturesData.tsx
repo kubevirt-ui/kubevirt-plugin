@@ -10,7 +10,6 @@ import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import usePasstFeatureFlag from '@kubevirt-utils/hooks/usePasstFeatureFlag';
 import useVMTemplateFeatureFlag from '@kubevirt-utils/hooks/useVMTemplateFeatureFlag/useVMTemplateFeatureFlag';
-import useVSOCKFeatureFlag from '@kubevirt-utils/hooks/useVSOCKFeatureFlag/useVSOCKFeatureFlag';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { PREVIEW_FEATURES_TAB_IDS } from '@settings/search/constants';
 
@@ -43,7 +42,6 @@ const usePreviewFeaturesData: UsePreviewFeaturesData = (cluster) => {
   const treeViewFoldersFeature = useFeatures(TREE_VIEW_FOLDERS, cluster);
   const passtFeatureFlag = usePasstFeatureFlag(cluster);
   const templateFeatureFlag = useVMTemplateFeatureFlag(cluster);
-  const vsockFeatureFlag = useVSOCKFeatureFlag(cluster);
 
   const features = [
     {
@@ -68,14 +66,6 @@ const usePreviewFeaturesData: UsePreviewFeaturesData = (cluster) => {
       label: t('Enable native VirtualMachine templates'),
       searchItemId: PREVIEW_FEATURES_TAB_IDS.vmTemplates,
       ...templateFeatureFlag,
-    },
-    {
-      externalLink: 'https://kubevirt.io/user-guide/compute/vsock/',
-      id: 'vsockEnabled',
-      label: t('Enable VSOCK'),
-      olsPromptType: OLSPromptType.ENABLE_VSOCK,
-      searchItemId: PREVIEW_FEATURES_TAB_IDS.vsockEnabled,
-      ...vsockFeatureFlag,
     },
   ];
 

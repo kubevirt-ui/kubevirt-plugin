@@ -9,7 +9,6 @@ import CPUMemory from '@kubevirt-utils/components/CPUMemory/CPUMemory';
 import CPUMemoryModal from '@kubevirt-utils/components/CPUMemoryModal/CPUMemoryModal';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { DescriptionModal } from '@kubevirt-utils/components/DescriptionModal/DescriptionModal';
-import EnableVSOCK from '@kubevirt-utils/components/EnableVSOCK/EnableVSOCK';
 import HeadlessMode from '@kubevirt-utils/components/HeadlessMode/HeadlessMode';
 import HostnameModal from '@kubevirt-utils/components/HostnameModal/HostnameModal';
 import InstanceTypeModal from '@kubevirt-utils/components/InstanceTypeModal/InstanceTypeModal';
@@ -56,7 +55,6 @@ import {
   updatedVirtualMachine,
   updateGuestSystemAccessLog,
   updateHeadlessMode,
-  updateVSOCK,
   updateWorkload,
 } from './utils/utils';
 
@@ -245,20 +243,6 @@ const DetailsSection: FC<DetailsSectionProps> = ({ allInstanceTypes, instanceTyp
               isPopover
               olsObj={vm}
               promptType={OLSPromptType.HEADLESS_MODE}
-            />
-            <DescriptionItem
-              bodyContent={t(
-                'Attaches a virtio-vsock device for direct communication between the guest and the host without a network interface.',
-              )}
-              descriptionData={
-                <EnableVSOCK updateVSOCK={(checked) => updateVSOCK(vm, checked)} vm={vm} />
-              }
-              breadcrumb="VirtualMachine.spec.template.devices.autoattachVSOCK"
-              data-test-id={`${vmName}-enable-vsock`}
-              descriptionHeader={<SearchItem id="enable-vsock">{t('Enable VSOCK')}</SearchItem>}
-              isPopover
-              olsObj={vm}
-              promptType={OLSPromptType.ENABLE_VSOCK}
             />
             <DescriptionItem
               bodyContent={t(
