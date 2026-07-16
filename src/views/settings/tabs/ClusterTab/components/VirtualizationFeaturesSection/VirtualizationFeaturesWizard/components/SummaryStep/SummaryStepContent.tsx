@@ -1,10 +1,10 @@
 import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { DESCHEDULER_OPERATOR_NAME } from '@kubevirt-utils/resources/descheduler/constants';
 import { Bullseye, Spinner, Stack, StackItem, Title, TitleSizes } from '@patternfly/react-core';
 import {
   CLUSTER_OBSERVABILITY_OPERATOR_NAME,
-  DESCHEDULER_OPERATOR_NAME,
   NETOBSERV_OPERATOR_NAME,
   NMSTATE_OPERATOR_NAME,
 } from '@settings/tabs/ClusterTab/components/VirtualizationFeaturesSection/utils/constants';

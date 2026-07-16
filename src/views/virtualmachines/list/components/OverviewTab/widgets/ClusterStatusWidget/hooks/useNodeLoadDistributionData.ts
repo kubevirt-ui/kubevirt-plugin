@@ -1,21 +1,10 @@
 import { useMemo } from 'react';
 
-import {
-  DESCHEDULER_ENABLED,
-  DESCHEDULER_NOT_ENABLED,
-  DESCHEDULER_NOT_INSTALLED,
-  DESCHEDULER_UNKNOWN,
-} from '@kubevirt-utils/hooks/constants';
 import { DeschedulerStatus } from '@kubevirt-utils/hooks/useDeschedulerInstalled';
+import { useDeschedulerStatus } from '@kubevirt-utils/hooks/useDeschedulerStatus/useDeschedulerStatus';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import useKubeDescheduler from '@kubevirt-utils/resources/descheduler/hooks/useKubeDescheduler';
 import useWorkerNodes from '@kubevirt-utils/resources/node/hooks/useWorkerNodes';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
-import { DESCHEDULER_OPERATOR_NAME } from '@settings/tabs/ClusterTab/components/VirtualizationFeaturesSection/utils/constants';
-import { InstallState } from '@settings/tabs/ClusterTab/components/VirtualizationFeaturesSection/utils/types';
-import { isInstalled } from '@settings/tabs/ClusterTab/components/VirtualizationFeaturesSection/utils/utils';
-import { useVirtualizationFeaturesContext } from '@settings/tabs/ClusterTab/components/VirtualizationFeaturesSection/utils/VirtualizationFeaturesContext/VirtualizationFeaturesContext';
 
 import { DistributionBucket } from '../../shared/DistributionBarChart/DistributionBarChart';
 import { StatusScoreItem } from '../../shared/StatusScoreList/StatusScoreList';
@@ -43,38 +32,12 @@ type NodeLoadDistributionData = {
   totalNodeCount: number;
 };
 
-const installStateToDeschedulerStatus = (
-  installState: InstallState,
-  hasDeschedulerCR: boolean,
-): DeschedulerStatus => {
-  if (installState === InstallState.INSTALLED) {
-    return hasDeschedulerCR ? DESCHEDULER_ENABLED : DESCHEDULER_NOT_ENABLED;
-  }
-  if (installState === InstallState.NOT_INSTALLED) return DESCHEDULER_NOT_INSTALLED;
-  return DESCHEDULER_UNKNOWN;
-};
-
 export const useNodeLoadDistributionData = (clusterOverride?: string): NodeLoadDistributionData => {
   const { t } = useKubevirtTranslation();
   const clusterParam = useClusterParam();
   const cluster = clusterOverride ?? clusterParam;
-  const { operatorDetailsMap, operatorResourcesLoaded } = useVirtualizationFeaturesContext();
+  const { loaded: deschedulerLoaded, status: deschedulerStatus } = useDeschedulerStatus(cluster);
   const [workerNodes, workerNodesLoaded] = useWorkerNodes(cluster);
-
-  const deschedulerInstallState = operatorDetailsMap?.[DESCHEDULER_OPERATOR_NAME]?.installState;
-  const isOperatorInstalled = isInstalled(deschedulerInstallState);
-
-  const { descheduler: deschedulerCR, deschedulerLoaded: deschedulerCRLoaded } = useKubeDescheduler(
-    { cluster, enabled: isOperatorInstalled },
-  );
-
-  const deschedulerLoaded = operatorResourcesLoaded
-    ? !isOperatorInstalled || deschedulerCRLoaded
-    : false;
-  const deschedulerStatus =
-    deschedulerLoaded && deschedulerInstallState !== undefined
-      ? installStateToDeschedulerStatus(deschedulerInstallState, !isEmpty(deschedulerCR))
-      : DESCHEDULER_UNKNOWN;
 
   const {
     loaded: metricsLoaded,

@@ -1,5 +1,5 @@
+import { DESCHEDULER_OPERATOR_NAME } from '@kubevirt-utils/resources/descheduler/constants';
 import {
-  DESCHEDULER_OPERATOR_NAME,
   FENCE_AGENTS_OPERATOR_NAME,
   NETOBSERV_OPERATOR_NAME,
   NMSTATE_OPERATOR_NAME,
