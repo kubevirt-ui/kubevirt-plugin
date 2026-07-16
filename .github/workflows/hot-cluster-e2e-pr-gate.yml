@@ -1,27 +1,18 @@
 name: Hot Cluster E2E PR Gate
 
-# hot-cluster-e2e.yml used to listen for pull_request_target directly on
-# opened/synchronize/reopened, so every PR push landed the full multi-job
-# graph (Prepare, cluster-check, Run E2E, Verify, and every nested job from
-# their `uses:` reusable workflows) natively on the PR -- GitHub creates a
-# check-run per job the moment the workflow triggers, with no way to hide or
-# nest them under "Hot Cluster E2E Progress". This one-job gatekeeper is now
-# the only thing listening for those PR events, dispatching the real
-# workflow via workflow_dispatch instead so only its own row (plus the
-# API-posted Progress/Run Gating Tests checks) lands in the merge box. See
-# ci-scripts/README.md ("Check-Run & Retest Model").
+# Thin gatekeeper for PR events: dispatches hot-cluster-e2e.yml via
+# workflow_dispatch so only this job (plus API-posted Progress/Run Gating
+# Tests checks) appears in the merge box, instead of the full nested job
+# graph. See ci-scripts/README.md ("Check-Run & Retest Model").
 #
-# When e2e-hold is present, dispatch is skipped (no cluster run) but the
-# held "Run Gating Tests" marker is re-published onto the new HEAD -- a
-# push/force-push would otherwise leave the required check as "Expected --
-# waiting for status" on the new SHA while the neutral marker stayed on
-# the old one (confirmed live on PR #4349).
+# When e2e-hold is present, skip dispatch but re-publish the held
+# "Run Gating Tests" marker onto the new HEAD so the required check isn't
+# left as "Expected" on the new SHA.
 on:
   pull_request_target:
     types: [opened, synchronize, reopened]
 
-# checks: write -- republish-hold's publish-gating-check posts the held
-# marker via the ambient GITHUB_TOKEN (same as hold-e2e.yml's mark-held).
+# checks: write -- republish-hold posts the held marker via GITHUB_TOKEN.
 permissions:
   contents: read
   actions: write
@@ -30,10 +21,8 @@ permissions:
 jobs:
   dispatch:
     name: Dispatch Hot Cluster E2E
-    # Skipped while /hold-e2e is active -- e2e-hold is a durable label so
-    # this holds across every future push too, not just the current one.
-    # Only /retest-e2e removes it (see retest-e2e.yml). republish-hold
-    # covers the required-check side of the hold for those same events.
+    # Skip while e2e-hold is active (durable across pushes; only /retest-e2e
+    # removes it). republish-hold covers the required-check side.
     if: "!contains(github.event.pull_request.labels.*.name, 'e2e-hold')"
     runs-on: ubuntu-latest
     timeout-minutes: 2
@@ -44,11 +33,10 @@ jobs:
           script: |
             const pr = context.payload.pull_request;
 
-            // skip_pool_check: a plain PR open/sync/reopen isn't a
-            // merge-readiness signal, so gating must run regardless of
-            // lgtm/approved. base_ref: the PR's real base branch, so a
-            // release-branch PR resolves cluster/test-engine and merges
-            // against the right tip.
+            // skip_pool_check: open/sync/reopen isn't merge-readiness, so
+            // gating runs regardless of lgtm/approved.
+            // base_ref: PR's real base so release-branch PRs resolve the
+            // right cluster/test-engine tip.
             await github.rest.actions.createWorkflowDispatch({
               ...context.repo,
               workflow_id: 'hot-cluster-e2e.yml',
@@ -60,21 +48,20 @@ jobs:
               },
             });
 
-  # Re-attach the non-passing held marker to whatever HEAD this event
-  # brought in. Without this, skipping dispatch above leaves the new SHA
-  # with no "Run Gating Tests" result at all.
+  # Re-attach the held marker to the new HEAD when dispatch is skipped.
   republish-hold:
     name: Republish Held Gating Check
     if: contains(github.event.pull_request.labels.*.name, 'e2e-hold')
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      # Needed to resolve the local publish-gating-check action. Uses the
-      # base-branch workflow/action (pull_request_target), not the PR tip.
+      # Pin to default branch: pull_request_target checks out the PR base,
+      # which may lack publish-gating-check on older release branches.
       - name: Checkout
         uses: actions/checkout@v7
         with:
           persist-credentials: false
+          ref: ${{ github.event.repository.default_branch }}
 
       - name: Publish held marker for current HEAD
         uses: ./.github/actions/publish-gating-check

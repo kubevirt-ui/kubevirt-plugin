@@ -17,20 +17,21 @@ jobs:
       group: pr-validation-${{ github.event.pull_request.number }}
       cancel-in-progress: true
     steps:
+      # Pin to default branch: pull_request_target checks out the PR base,
+      # which may lack setup-gh-scripts on older release branches.
       - name: Checkout
         uses: actions/checkout@v7
         with:
           persist-credentials: false
+          ref: ${{ github.event.repository.default_branch }}
 
       - name: Setup validation scripts
         uses: ./.github/actions/setup-gh-scripts
         with:
-          ref: ${{ github.event.pull_request.base.ref }}
+          ref: ${{ github.event.repository.default_branch }}
 
-      # Runs Jira, AI-config, and CI-scripts validation from one process --
-      # each still reports its own status/labels independently (jira-validation,
-      # ai-config-validation, ci-scripts-validation), fetching the PR's changed
-      # files once and sharing that between AI-config and CI-scripts.
+      # Runs Jira, AI-config, and CI-scripts validation; each reports its
+      # own status/labels. Changed files are fetched once and shared.
       - name: Run PR validation
         working-directory: .github/scripts
         env:
