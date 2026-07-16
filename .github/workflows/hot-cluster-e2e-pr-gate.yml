@@ -10,20 +10,30 @@ name: Hot Cluster E2E PR Gate
 # workflow via workflow_dispatch instead so only its own row (plus the
 # API-posted Progress/Run Gating Tests checks) lands in the merge box. See
 # ci-scripts/README.md ("Check-Run & Retest Model").
+#
+# When e2e-hold is present, dispatch is skipped (no cluster run) but the
+# held "Run Gating Tests" marker is re-published onto the new HEAD -- a
+# push/force-push would otherwise leave the required check as "Expected --
+# waiting for status" on the new SHA while the neutral marker stayed on
+# the old one (confirmed live on PR #4349).
 on:
   pull_request_target:
     types: [opened, synchronize, reopened]
 
+# checks: write -- republish-hold's publish-gating-check posts the held
+# marker via the ambient GITHUB_TOKEN (same as hold-e2e.yml's mark-held).
 permissions:
   contents: read
   actions: write
+  checks: write
 
 jobs:
   dispatch:
     name: Dispatch Hot Cluster E2E
     # Skipped while /hold-e2e is active -- e2e-hold is a durable label so
     # this holds across every future push too, not just the current one.
-    # Only /retest-e2e removes it (see retest-e2e.yml).
+    # Only /retest-e2e removes it (see retest-e2e.yml). republish-hold
+    # covers the required-check side of the hold for those same events.
     if: "!contains(github.event.pull_request.labels.*.name, 'e2e-hold')"
     runs-on: ubuntu-latest
     timeout-minutes: 2
@@ -49,3 +59,33 @@ jobs:
                 skip_pool_check: 'true',
               },
             });
+
+  # Re-attach the non-passing held marker to whatever HEAD this event
+  # brought in. Without this, skipping dispatch above leaves the new SHA
+  # with no "Run Gating Tests" result at all.
+  republish-hold:
+    name: Republish Held Gating Check
+    if: contains(github.event.pull_request.labels.*.name, 'e2e-hold')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      # Needed to resolve the local publish-gating-check action. Uses the
+      # base-branch workflow/action (pull_request_target), not the PR tip.
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Publish held marker for current HEAD
+        uses: ./.github/actions/publish-gating-check
+        with:
+          head-sha: ${{ github.event.pull_request.head.sha }}
+          status: completed
+          conclusion: neutral
+          title: 'Hot Cluster E2E: held via /hold-e2e'
+          summary: |
+            Required check not satisfied -- hold active. Testing is on hold for this PR.
+
+            No new run will be dispatched automatically -- neither by a push, the `ok-to-test` label, nor `main` advancing -- while this hold is active. Comment `/retest-e2e` to lift the hold and get a fresh result.
+
+            Removing the `e2e-hold` label directly (e.g. from the UI) does **not** lift the hold or refresh this result -- only `/retest-e2e` does both.

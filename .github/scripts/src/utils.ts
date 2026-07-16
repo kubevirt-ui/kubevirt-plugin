@@ -1,10 +1,14 @@
-/* eslint-disable no-console */
-/** Read a required environment variable or exit with an error. */
+/**
+ * Read a required environment variable, or throw. Throwing (not
+ * process.exit) matters: every entrypoint's main().catch(...) attempts
+ * best-effort status/comment reporting on failure -- process.exit would skip
+ * that entirely, e.g. leaving a PR with no feedback at all if a bot-token
+ * generation step failed and left GITHUB_TOKEN empty.
+ */
 export const requireEnv = (name: string): string => {
   const value = process.env[name];
   if (!value) {
-    console.error(`Missing required environment variable: ${name}`);
-    process.exit(1);
+    throw new Error(`Missing required environment variable: ${name}`);
   }
   return value;
 };

@@ -18,9 +18,13 @@ jobs:
     name: Retest Hot Cluster E2E
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    # !endsWith(...'[bot]') -- report comments mention sibling commands as
+    # guidance text (e.g. "comment /hold-e2e"), which could otherwise
+    # re-trigger those workflows against the bot's own comments.
     if: >
       github.event.issue.pull_request != null &&
-      contains(github.event.comment.body, '/retest-e2e')
+      contains(github.event.comment.body, '/retest-e2e') &&
+      !endsWith(github.event.comment.user.login, '[bot]')
     steps:
       # No ref override: reads OWNERS from the default branch, not the commenter's PR.
       - name: Checkout

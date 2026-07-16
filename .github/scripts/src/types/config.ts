@@ -12,6 +12,8 @@ export type JiraConfig = {
 
 export type GitHubConfig = {
   token: string;
+  /** Separate token for calls `token` may lack the scope for (e.g. a bot app token) -- commit statuses, reading .github/OWNERS. Falls back to `token` when unset. */
+  statusToken?: string;
   owner: string;
   repo: string;
 };

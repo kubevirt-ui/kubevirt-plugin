@@ -1,5 +1,5 @@
 {
-  "_note": "Single source of truth for every PR-comment slash command in this repo, read by pr_help_command.yml (/help). Add an entry here whenever a new PR command is added -- same manual-sync convention as RELATED_AUTOMATION_PATHS in .github/scripts/src/ai-config-validation/constants.ts. trust values: 'owners' = root OWNERS approvers/reviewers; 'ai-config-owners' = the narrower .github/OWNERS (kept in sync with .cursor/OWNERS) approvers gating /ai-approved; 'member-or-owner' = GitHub author_association; 'none' = no trust gate.",
+  "_note": "Single source of truth for every PR-comment slash command in this repo, read by pr_help_command.yml (/help). Add an entry here whenever a new PR command is added -- same manual-sync convention as RELATED_AUTOMATION_PATHS in .github/scripts/src/validation/ai-config-validation/constants.ts. trust values: 'owners' = root OWNERS approvers/reviewers; 'github-owners' = the narrower .github/OWNERS (kept in sync with .cursor/OWNERS) approvers gating /ai-approved and /ci-approved; 'member-or-owner' = GitHub author_association; 'none' = no trust gate.",
   "commands": [
     {
       "command": "/retest-e2e",
@@ -40,7 +40,13 @@
     {
       "command": "/ai-approved",
       "description": "Mark AI/editor configuration changes on this PR as security-reviewed.",
-      "trust": "ai-config-owners",
+      "trust": "github-owners",
+      "workflow": ".github/workflows/pr_validation_commands.yml"
+    },
+    {
+      "command": "/ci-approved",
+      "description": "Mark CI configuration changes (.github/, ci-scripts/, Dockerfile, playwright-runner-hc-e2e.sh) on this PR as security-reviewed.",
+      "trust": "github-owners",
       "workflow": ".github/workflows/pr_validation_commands.yml"
     },
     {

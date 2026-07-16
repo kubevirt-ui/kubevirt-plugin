@@ -5,8 +5,8 @@ on:
     types: [opened, synchronize, reopened, edited]
 
 jobs:
-  jira-validation:
-    name: jira-validation
+  pr-validation:
+    name: pr-validation
     if: github.event.action != 'edited' || github.event.changes.title != null
     permissions:
       pull-requests: write
@@ -14,7 +14,7 @@ jobs:
       statuses: write
     runs-on: ubuntu-latest
     concurrency:
-      group: jira-check-${{ github.event.pull_request.number }}
+      group: pr-validation-${{ github.event.pull_request.number }}
       cancel-in-progress: true
     steps:
       - name: Checkout
@@ -27,7 +27,11 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.base.ref }}
 
-      - name: Run Jira PR validation
+      # Runs Jira, AI-config, and CI-scripts validation from one process --
+      # each still reports its own status/labels independently (jira-validation,
+      # ai-config-validation, ci-scripts-validation), fetching the PR's changed
+      # files once and sharing that between AI-config and CI-scripts.
+      - name: Run PR validation
         working-directory: .github/scripts
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -36,39 +40,7 @@ jobs:
           PR_TITLE: ${{ github.event.pull_request.title }}
           BASE_BRANCH: ${{ github.event.pull_request.base.ref }}
           PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
-          REPO_OWNER: ${{ github.repository_owner }}
-          REPO_NAME: ${{ github.event.repository.name }}
-        run: npx tsx src/jira-validation/index.ts
-
-  ai-config-validation:
-    name: ai-config-validation
-    if: github.event.action != 'edited' || github.event.changes.title != null
-    permissions:
-      pull-requests: write
-      issues: write
-      statuses: write
-    runs-on: ubuntu-latest
-    concurrency:
-      group: ai-config-check-${{ github.event.pull_request.number }}
-      cancel-in-progress: true
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v7
-        with:
-          persist-credentials: false
-
-      - name: Setup validation scripts
-        uses: ./.github/actions/setup-gh-scripts
-        with:
-          ref: ${{ github.event.pull_request.base.ref }}
-
-      - name: Run AI configuration PR validation
-        working-directory: .github/scripts
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
           GITHUB_EVENT_ACTION: ${{ github.event.action }}
           REPO_OWNER: ${{ github.repository_owner }}
           REPO_NAME: ${{ github.event.repository.name }}
-        run: npx tsx src/ai-config-validation/index.ts
+        run: npx tsx src/validation/pr-validation/index.ts

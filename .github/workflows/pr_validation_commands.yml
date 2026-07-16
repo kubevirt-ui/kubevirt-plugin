@@ -7,13 +7,17 @@ on:
 jobs:
   command:
     name: pr-validation-command
+    # !endsWith(...'[bot]') -- report comments mention their own trigger
+    # command as guidance text (e.g. "then comment /recheck-jira"), which
+    # would otherwise re-trigger this job against the bot's own comments.
     if: >-
       github.event.issue.pull_request != null &&
+      !endsWith(github.event.comment.user.login, '[bot]') &&
       (contains(github.event.comment.body, '/recheck-jira') ||
-       contains(github.event.comment.body, '/ai-approved'))
+       contains(github.event.comment.body, '/ai-approved') ||
+       contains(github.event.comment.body, '/ci-approved'))
     permissions:
-      pull-requests: write
-      issues: write
+      contents: read
       statuses: write
     runs-on: ubuntu-latest
     concurrency:
@@ -49,10 +53,28 @@ jobs:
         with:
           ref: ${{ steps.pr.outputs.base_ref }}
 
+      # See ci-scripts/README.md ("Check-Run & Retest Model") for why this
+      # needs the bot app, not GITHUB_TOKEN. continue-on-error: a bad
+      # credential must still let the step below run and report what it can.
+      - name: Generate bot token
+        id: bot-token
+        continue-on-error: true
+        uses: actions/create-github-app-token@v3
+        with:
+          app-id: ${{ secrets.BOT_APP_ID }}
+          private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
+          permission-issues: write
+          permission-pull-requests: write
+
+      # GITHUB_TOKEN is the bot token (issues/pull-requests scope).
+      # STATUS_GITHUB_TOKEN is the ambient token -- for commit statuses and
+      # the .github/OWNERS read (needs contents: read), neither of which the
+      # bot app has or will get. See github-repo.ts's createStatusOctokit.
       - name: Run validation command
         working-directory: .github/scripts
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ steps.bot-token.outputs.token }}
+          STATUS_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           JIRA_TOKEN: ${{ secrets.JIRA_TOKEN }}
           COMMENT_BODY: ${{ github.event.comment.body }}
           COMMENT_AUTHOR: ${{ github.event.comment.user.login }}
@@ -63,4 +85,4 @@ jobs:
           PR_HEAD_SHA: ${{ steps.pr.outputs.head_sha }}
           REPO_OWNER: ${{ github.repository_owner }}
           REPO_NAME: ${{ github.event.repository.name }}
-        run: npx tsx src/commands/index.ts
+        run: npx tsx src/validation/commands/index.ts
