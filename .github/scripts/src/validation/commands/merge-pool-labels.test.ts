@@ -24,9 +24,14 @@ const {
   isBlockingLabel: (name: string) => boolean;
 };
 
-const { isMergePoolPr } = require(
+const { getMergePoolBlockers, isMergePoolPr } = require(
   path.join(__dirname, '../../../../../ci-scripts/hot-cluster/js/is-merge-pool-pr.cjs'),
 ) as {
+  getMergePoolBlockers: (labels: Array<string | { name: string }>) => {
+    missingLgtm: boolean;
+    missingApproved: boolean;
+    blockingLabels: string[];
+  };
   isMergePoolPr: (labels: Array<string | { name: string }>) => boolean;
 };
 
@@ -55,5 +60,65 @@ describe('isMergePoolPr', () => {
     assert.equal(isMergePoolPr([LGTM_LABEL, APPROVED_LABEL, DO_NOT_MERGE_HOLD_LABEL]), false);
     assert.equal(isMergePoolPr([LGTM_LABEL, APPROVED_LABEL, E2E_HOLD_LABEL]), false);
     assert.equal(isMergePoolPr([LGTM_LABEL, APPROVED_LABEL, NEEDS_REBASE_LABEL]), false);
+  });
+});
+
+describe('getMergePoolBlockers', () => {
+  it('reports no blockers for lgtm + approved with no blocking label', () => {
+    assert.deepEqual(getMergePoolBlockers([LGTM_LABEL, APPROVED_LABEL]), {
+      missingLgtm: false,
+      missingApproved: false,
+      blockingLabels: [],
+    });
+    assert.deepEqual(getMergePoolBlockers([{ name: LGTM_LABEL }, { name: APPROVED_LABEL }]), {
+      missingLgtm: false,
+      missingApproved: false,
+      blockingLabels: [],
+    });
+  });
+
+  it('reports missingLgtm/missingApproved independently when no labels are present', () => {
+    assert.deepEqual(getMergePoolBlockers([]), {
+      missingLgtm: true,
+      missingApproved: true,
+      blockingLabels: [],
+    });
+    assert.deepEqual(getMergePoolBlockers([LGTM_LABEL]), {
+      missingLgtm: false,
+      missingApproved: true,
+      blockingLabels: [],
+    });
+    assert.deepEqual(getMergePoolBlockers([APPROVED_LABEL]), {
+      missingLgtm: true,
+      missingApproved: false,
+      blockingLabels: [],
+    });
+  });
+
+  it('collects each individual blocking label', () => {
+    assert.deepEqual(
+      getMergePoolBlockers([LGTM_LABEL, APPROVED_LABEL, BARE_HOLD_LABEL]).blockingLabels,
+      [BARE_HOLD_LABEL],
+    );
+    assert.deepEqual(
+      getMergePoolBlockers([LGTM_LABEL, APPROVED_LABEL, DO_NOT_MERGE_HOLD_LABEL]).blockingLabels,
+      [DO_NOT_MERGE_HOLD_LABEL],
+    );
+    assert.deepEqual(
+      getMergePoolBlockers([LGTM_LABEL, APPROVED_LABEL, E2E_HOLD_LABEL]).blockingLabels,
+      [E2E_HOLD_LABEL],
+    );
+    assert.deepEqual(
+      getMergePoolBlockers([LGTM_LABEL, APPROVED_LABEL, NEEDS_REBASE_LABEL]).blockingLabels,
+      [NEEDS_REBASE_LABEL],
+    );
+  });
+
+  it('collects multiple simultaneous blockers, including missing labels', () => {
+    assert.deepEqual(getMergePoolBlockers([E2E_HOLD_LABEL, NEEDS_REBASE_LABEL]), {
+      missingLgtm: true,
+      missingApproved: true,
+      blockingLabels: [E2E_HOLD_LABEL, NEEDS_REBASE_LABEL],
+    });
   });
 });

@@ -4,10 +4,21 @@
 // (fresh re-verification right before the credentialed cluster run).
 const { APPROVED_LABEL, LGTM_LABEL, isBlockingLabel } = require('./merge-pool-labels.cjs');
 
-function isMergePoolPr(labels) {
+// Breaks isMergePoolPr's single boolean down into which specific condition(s)
+// are unmet -- used by auto-merge.yml to report a specific reason on the
+// Merge Gate check instead of one generic sentence.
+function getMergePoolBlockers(labels) {
   const names = (labels || []).map((label) => (typeof label === 'string' ? label : label.name));
-  const hasHold = names.some(isBlockingLabel);
-  return names.includes(LGTM_LABEL) && names.includes(APPROVED_LABEL) && !hasHold;
+  return {
+    missingLgtm: !names.includes(LGTM_LABEL),
+    missingApproved: !names.includes(APPROVED_LABEL),
+    blockingLabels: names.filter(isBlockingLabel),
+  };
 }
 
-module.exports = { isMergePoolPr };
+function isMergePoolPr(labels) {
+  const { missingLgtm, missingApproved, blockingLabels } = getMergePoolBlockers(labels);
+  return !missingLgtm && !missingApproved && blockingLabels.length === 0;
+}
+
+module.exports = { getMergePoolBlockers, isMergePoolPr };

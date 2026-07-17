@@ -1,0 +1,42 @@
+name: Clear E2E Result Labels
+description: >
+  Best-effort removal of the e2e-passed/e2e-failed informational labels
+  (mirror of Hot Cluster E2E's latest real result -- see
+  ci-scripts/README.md) once that result no longer applies: a new push to
+  the PR invalidates the prior diff's result (hot-cluster-e2e-pr-gate.yml),
+  and main advancing past it invalidates the prior base tip's result
+  (retest-stale-gating.yml). Idempotent -- a 404 on either missing label is
+  swallowed. Composite steps run inline within the calling job, so this
+  adds no new job/check-run to the merge box; callers should still wrap the
+  call with continue-on-error: true for the same best-effort reason both
+  callers already do for the inline version this replaces.
+
+inputs:
+  pr-number:
+    description: PR (issue) number to clear the labels from
+    required: true
+  github-token:
+    description: Token used for the removeLabel calls (bot app token preferred)
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Remove e2e-passed/e2e-failed if present
+      uses: actions/github-script@v9
+      env:
+        PR_NUMBER: ${{ inputs.pr-number }}
+      with:
+        github-token: ${{ inputs.github-token }}
+        script: |
+          for (const name of ['e2e-passed', 'e2e-failed']) {
+            try {
+              await github.rest.issues.removeLabel({
+                ...context.repo,
+                issue_number: Number(process.env.PR_NUMBER),
+                name,
+              });
+            } catch (err) {
+              if (err.status !== 404) throw err;
+            }
+          }

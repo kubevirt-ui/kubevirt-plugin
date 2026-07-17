@@ -10,9 +10,7 @@ approvers:
   - adamviktora
   - rszwajko
   - lkladnit
-  - gouyang
   - galkremer1
-  - sjd78
 reviewers:
   - metalice
   - pcbailey
@@ -22,7 +20,6 @@ reviewers:
   - adamviktora
   - rszwajko
   - lkladnit
-  - gouyang
   - batyana
   - aviavissar
   - benbassatido
