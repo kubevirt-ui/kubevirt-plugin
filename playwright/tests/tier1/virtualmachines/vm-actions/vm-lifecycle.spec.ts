@@ -50,11 +50,13 @@ test.describe(
           expect.soft(isStopped, 'VM should reach Stopped status after stop').toBe(true);
         });
 
-        await test.step('Restart VM and verify Running status again', async () => {
+        await test.step('Start VM again and verify Running status', async () => {
           await vmDetailPage.startVmFromActionsDropdown();
           await vmDetailPage.waitForVmOverviewStatusContains('Running', TestTimeouts.VM_BOOTUP);
           const isRunningAgain = await vmDetailPage.verifyVmOverviewStatus('Running');
-          expect.soft(isRunningAgain, 'VM should reach Running status after restart').toBe(true);
+          expect
+            .soft(isRunningAgain, 'VM should reach Running status after second start')
+            .toBe(true);
         });
       },
     );

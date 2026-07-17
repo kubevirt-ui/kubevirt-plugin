@@ -384,46 +384,6 @@ export function getSetupRules(): SetupRule[] {
       },
     },
     {
-      id: 'set-default-storage-class',
-      name: 'Set default StorageClass for VirtualMachines',
-      phase: SetupPhase.CLUSTER,
-      guard: () => !EnvVariables.isHcE2e && !EnvVariables.isNonPrivUser,
-      onError: 'warn',
-      run: async (ctx) => {
-        const apiClient = ctx.apiClient;
-        if (!apiClient) {
-          throw new Error('RequestContextClient not initialized');
-        }
-        const defaultVmStorageClass = EnvVariables.storageClass;
-        logger.info(
-          `📦 Setting default StorageClass for VirtualMachines: ${defaultVmStorageClass}...`,
-        );
-
-        const scList = await apiClient.getStorageClasses();
-        for (const sc of scList.items ?? []) {
-          const scName = sc.metadata?.name;
-          if (!scName) continue;
-          await apiClient.mergePatchResource('storage.k8s.io', 'v1', 'storageclasses', scName, {
-            metadata: {
-              annotations: { 'storageclass.kubevirt.io/is-default-virt-class': 'false' },
-            },
-          });
-        }
-        await apiClient.mergePatchResource(
-          'storage.k8s.io',
-          'v1',
-          'storageclasses',
-          defaultVmStorageClass,
-          {
-            metadata: {
-              annotations: { 'storageclass.kubevirt.io/is-default-virt-class': 'true' },
-            },
-          },
-        );
-        logger.success(`✓ Default for VirtualMachines set to ${defaultVmStorageClass}`);
-      },
-    },
-    {
       id: 'save-config',
       name: 'Persist shared test configuration',
       phase: SetupPhase.CLUSTER,

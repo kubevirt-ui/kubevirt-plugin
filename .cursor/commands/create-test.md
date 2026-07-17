@@ -33,6 +33,7 @@ Without `--local`, locator discovery relies on the live UI via Playwright MCP (`
 | Tier 1   | `tests/tier1/<feature>/` | Per-feature fixture           | `Tier1`      | `@tier1`        | Single-resource CRUD lifecycle per module; VM tab configuration; must NOT overlap gating                 |
 | Tier 2   | `tests/tier2/<feature>/` | Per-feature fixture           | `Tier2`      | `@tier2`        | Cross-module integration (BV→VM wizard, snapshot→clone); VM live/storage migration; multi-step workflows |
 | Settings | `tests/settings/`        | `@/fixtures/settings-fixture` | `Settings`   | `@cnv-settings` | Cluster and user settings pages                                                                          |
+| API      | `tests/api/`             | `@/fixtures/api-test-fixture` | `API`        | `@api`          | API contract tests — CRUD lifecycle and endpoint validation via `RequestContextClient` (no browser UI)   |
 
 ### Where to place a new test
 
@@ -41,6 +42,7 @@ Without `--local`, locator discovery relies on the live UI via Playwright MCP (`
 3. **Does it test a single resource's lifecycle (create → configure → verify → delete)?** → **Tier 1** under `tests/tier1/<feature>/`
 4. **Does it test cross-module integration, multi-resource workflows, or migration?** → **Tier 2** under `tests/tier2/<feature>/`
 5. **Does it test cluster or user settings?** → **Settings** under `tests/settings/`
+6. **Does it validate API contracts (CRUD, list, subresources) without browser UI?** → **API** under `tests/api/`
 
 ### Current test file map
 
@@ -64,10 +66,18 @@ tests/
 │   ├── create-vm/                              # Clone wizard (clone existing VM)
 │   ├── migrations/                             # Live migration, storage migration
 │   └── virtualmachines/                        # Snapshots (take/restore/clone), VM clone
-└── settings/
-    ├── aaq-quotas.spec.ts                      # AAQ quota settings
-    ├── cluster-settings.spec.ts                # Cluster-level settings
-    └── user-settings.spec.ts                   # User preferences
+├── settings/
+│   ├── aaq-quotas.spec.ts                      # AAQ quota settings
+│   ├── cluster-settings.spec.ts                # Cluster-level settings
+│   └── user-settings.spec.ts                   # User preferences
+└── api/                                        # API contract tests (no browser UI)
+    ├── vm-vmi-lifecycle-api.spec.ts             # VM/VMI lifecycle (start/stop/restart/delete)
+    ├── vm-crud-api.spec.ts                      # VM CRUD operations
+    ├── bootable-volumes-crud-api.spec.ts        # BV DataVolume/DataSource CRUD
+    ├── instance-types-crud-api.spec.ts          # Instance type CRUD
+    ├── migration-policies-crud-api.spec.ts      # Migration policy CRUD
+    ├── snapshots-crud-api.spec.ts               # Snapshot CRUD
+    └── ...                                      # See tests/api/ for full list
 ```
 
 ### Fixture Pattern
@@ -328,7 +338,8 @@ playwright/
 │   ├── gating/                    # Gating specs (gating-fixture)
 │   ├── tier1/<feature>/           # Tier 1 specs (per-feature fixtures)
 │   ├── tier2/<feature>/           # Tier 2 specs (per-feature fixtures)
-│   └── settings/                  # Settings specs (settings-fixture)
+│   ├── settings/                  # Settings specs (settings-fixture)
+│   └── api/                       # API contract specs (api-test-fixture)
 ├── src/
 │   ├── components/                # UI components (extend BaseComponent)
 │   │   ├── shared/                # Base classes (base-component, navigation-component)
@@ -360,7 +371,7 @@ playwright/
 │   ├── data-factories/            # Test data generators (SSH keys, VM specs)
 │   └── utils/                     # Env vars, test config, random names, helpers
 ├── project-dependencies/          # Global setup/teardown + rule engine
-└── playwright.config.ts           # Projects: Gating, Tier1, Tier2, Settings
+└── playwright.config.ts           # Projects: Gating, Tier1, Tier2, Settings, API
 ```
 
 ## Rules
@@ -381,4 +392,4 @@ playwright/
 - **All API calls go through the console proxy** — `RequestContextClient` routes all requests through the console proxy with the authenticated user's permissions. Never use `oc` CLI, `@kubernetes/client-node`, or direct cluster access.
 - **No direct URL navigation** — never use `page.goto()` or `goTo()` in specs; always navigate through the Virtualization perspective switcher and sidebar
 - **Never put `ID(CNV-XXXXX)` in test names or step names** — use only in allure tags
-- **DO NOT commit or push** — the user handles git operations
+- **DO NOT commit, push, or create PRs** — never run `git commit`, `git push`, `gh pr create`, or any git write operation. The user handles all git operations manually. Only use git read commands (`git status`, `git diff`, `git log`) when needed for context.
