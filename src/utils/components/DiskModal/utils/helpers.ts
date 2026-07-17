@@ -25,6 +25,10 @@ import {
 import { ANNOTATIONS } from '@kubevirt-utils/resources/template';
 import { getBootDisk, getDataVolumeTemplates, getVolumes } from '@kubevirt-utils/resources/vm';
 import { getOperatingSystem } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
+import {
+  getCustomizeWizardVM,
+  updateVMCustomizeIT,
+} from '@kubevirt-utils/signals/customizeWizardVMSignal';
 import { ensurePath, getRandomChars, isEmpty } from '@kubevirt-utils/utils/utils';
 import { isDNS1123Label } from '@kubevirt-utils/utils/validation';
 import { getCluster } from '@multicluster/helpers/selectors';
@@ -399,6 +403,9 @@ export const detachDiskFromVM = (vm: V1VirtualMachine, diskName: string): V1Virt
   });
 };
 
+// If the VM only exists as an in-memory draft (the creation wizard), the wizard signal is
+// the live source of truth: patch it instead of re-fetching from the cluster, since the
+// draft VM has never been persisted and kubevirtK8sGet would fail.
 const createDiskCancelCleanup =
   (
     vm: V1VirtualMachine,
@@ -406,6 +413,13 @@ const createDiskCancelCleanup =
     transform: (vm: V1VirtualMachine, name: string) => V1VirtualMachine,
   ): (() => Promise<void>) =>
   async () => {
+    const draftVM = getCustomizeWizardVM();
+
+    if (draftVM) {
+      await updateVMCustomizeIT(transform(draftVM, diskName));
+      return;
+    }
+
     const freshVM = await kubevirtK8sGet<V1VirtualMachine>({
       cluster: getCluster(vm),
       model: VirtualMachineModel,

@@ -5,6 +5,7 @@ import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { ejectISOFromCDROM } from '@kubevirt-utils/components/DiskModal/utils/helpers';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getCustomizeWizardVM } from '@kubevirt-utils/signals/customizeWizardVMSignal';
 import { ButtonVariant } from '@patternfly/react-core';
 
 import { updateDisks } from '../../../details/utils/utils';
@@ -29,7 +30,8 @@ const EjectCDROMModal: FC<EjectCDROMModalProps> = ({
   const { t } = useKubevirtTranslation();
 
   const handleEject = () => {
-    const updatedVM = ejectISOFromCDROM(vm, cdromName);
+    const currentVM = getCustomizeWizardVM() ?? vm;
+    const updatedVM = ejectISOFromCDROM(currentVM, cdromName);
 
     if (onSubmit) {
       return onSubmit(updatedVM);
