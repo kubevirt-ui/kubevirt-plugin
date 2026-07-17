@@ -1,19 +1,14 @@
 name: Retest Stale Gating Checks
 
-# Tide-equivalent staleness guard: when main advances, any open PR's
-# already-completed "Run Gating Tests" check was validated against a base
-# tip that no longer exists, and the hot-cluster workflow only reacts to
-# the PR's own push/relabel/comment events. See ci-scripts/README.md
-# ("Check-Run & Retest Model").
+# Tide-equivalent staleness guard: main advancing invalidates any open PR's
+# completed "Run Gating Tests" result, but the hot-cluster workflow only
+# reacts to the PR's own events. See ci-scripts/README.md ("Check-Run &
+# Retest Model").
 #
-# Two tiers, bounded for cost on the single shared hot cluster:
-#   - Cheap pass (every open PR targeting main): mark the existing check
-#     as stale/queued -- a plain Checks API call, no cluster time spent.
-#   - Real retest (merge-pool PRs only): dispatch hot-cluster-e2e.yml's
-#     pr_number path, which tests the PR merged with the new main tip and
-#     publishes the result onto the same check. Pool membership is
-#     re-verified fresh inside that dispatched run, not trusted from this
-#     workflow's earlier snapshot.
+# Two tiers, bounded for cost on the shared hot cluster:
+#   - Cheap: mark every open PR's check stale (Checks API only, no cluster time).
+#   - Real: dispatch a retest for merge-pool PRs only, merged with the new
+#     main tip. Pool membership is re-verified fresh in that dispatched run.
 on:
   push:
     branches: [main]
@@ -61,9 +56,8 @@ jobs:
             core.setOutput('all_pr_numbers', JSON.stringify(all));
             core.setOutput('pool_pr_numbers', JSON.stringify(pool));
 
-  # One matrix job per PR (rather than one job looping over all PRs) so
-  # publish-gating-check can run as a normal step and one PR's failure
-  # (e.g. a deleted fork branch) is isolated and visible on its own.
+  # One matrix job per PR (not a loop) so publish-gating-check runs as a
+  # normal step and one PR's failure (e.g. a deleted fork branch) stays isolated.
   mark-stale:
     name: Mark Stale (PR #${{ matrix.pr_number }})
     needs: list-open-prs
@@ -80,10 +74,8 @@ jobs:
         with:
           persist-credentials: false
 
-      # Skips PRs whose most recent check-run is still in flight from a
-      # real run. Refreshes our own prior stale marker (rather than
-      # freezing its "main advanced to <SHA>" text) as long as the PR
-      # hasn't gotten a fresh real result yet.
+      # Skips PRs still in flight from a real run. Refreshes our own prior
+      # stale marker (SHA text and all) until a fresh real result lands.
       - name: Determine whether to (re-)mark this PR stale
         id: check
         uses: actions/github-script@v9
@@ -98,11 +90,10 @@ jobs:
             const { data: pr } = await github.rest.pulls.get({ ...context.repo, pull_number: prNumber });
             core.setOutput('head_sha', pr.head.sha);
 
-            // /hold-e2e's own marker is more specific than the generic
-            // stale one below -- leave it alone so the PR still points at
-            // "comment /retest-e2e to lift the hold" rather than the
-            // stale-after-main-advanced wording. It's already a completed/
-            // neutral terminal state, so merge stays blocked either way.
+            // /hold-e2e's marker is more specific than the stale one below --
+            // leave it alone so the PR still says "comment /retest-e2e to
+            // lift the hold", not the generic stale wording. Merge stays
+            // blocked either way (already a completed/neutral state).
             const isHeld = (pr.labels || []).some((label) => label.name === 'e2e-hold');
             if (isHeld) {
               core.info(`PR #${prNumber} is held via /hold-e2e -- leaving its check-run alone.`);
@@ -144,11 +135,9 @@ jobs:
             core.info(`PR #${prNumber}: marking stale (superseding check-run ${latest.id}, isOwnStaleMarker=${isOwnStaleMarker}).`);
             core.setOutput('should_mark', 'true');
 
-      # status: completed/neutral (not queued): a `queued` marker can never
-      # transition to any other state by a later real result once posted
-      # (see publish-gating-check), so it would sit forever looking like an
-      # active block. completed/neutral is a proper non-passing terminal
-      # state instead.
+      # completed/neutral, not queued: a `queued` marker can never be
+      # superseded by a later real result (see publish-gating-check), so it
+      # would sit stuck forever instead of a proper non-passing terminal state.
       - name: Mark check stale
         if: steps.check.outputs.should_mark == 'true'
         uses: ./.github/actions/publish-gating-check
@@ -159,17 +148,36 @@ jobs:
           title: 'Hot Cluster E2E: stale -- main has advanced since this ran'
           summary: ${{ steps.check.outputs.summary }}
 
-  # Real retest, merge-pool PRs only. Dispatches hot-cluster-e2e.yml's
-  # pr_number path (against main) rather than reusing /retest-e2e's
-  # reRunWorkflow -- a re-run reuses the original cached event payload
-  # (same head SHA), so it would silently re-test the same commit instead
-  # of merging with the new base tip.
+      # e2e-passed/e2e-failed mirror the *last real* result (ci-scripts/README.md).
+      # Once the check above is marked stale, neither label is valid for the
+      # new base tip -- clear both on the same should_mark condition instead
+      # of leaving a stale "passed" claim. Shared with
+      # hot-cluster-e2e-pr-gate.yml via clear-e2e-result-labels (a composite
+      # action's steps run inline, so no new check appears in the merge box).
+      - name: Generate bot token
+        id: bot-token
+        if: steps.check.outputs.should_mark == 'true'
+        uses: ./.github/actions/create-bot-token
+        with:
+          app-id: ${{ secrets.BOT_APP_ID }}
+          private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
+
+      - name: Clear stale e2e-passed/e2e-failed
+        if: steps.check.outputs.should_mark == 'true'
+        continue-on-error: true
+        uses: ./.github/actions/clear-e2e-result-labels
+        with:
+          pr-number: ${{ matrix.pr_number }}
+          github-token: ${{ steps.bot-token.outputs.token || github.token }}
+
+  # Real retest, merge-pool PRs only. Dispatches fresh (pr_number path,
+  # against main) rather than reRunWorkflow, which would reuse the cached
+  # head SHA and silently re-test the same commit instead of the new base tip.
   #
-  # needs: mark-stale so every stale marker is created before any retest
-  # is dispatched, or a delayed marker could land after a fast real retest
-  # and mask its result. if: always() lets one PR's stale-marking failure
-  # not block retesting the others -- but that also disables the implicit
-  # success() wrapping, so list-open-prs' own result is checked explicitly.
+  # needs: mark-stale so every stale marker lands before any retest, or a
+  # delayed marker could mask a fast retest's result. if: always() keeps one
+  # PR's stale-marking failure from blocking the rest, so list-open-prs'
+  # result is checked explicitly instead of relying on implicit success().
   retest-pool-prs:
     name: Retest Merge-Pool PRs (PR #${{ matrix.pr_number }})
     needs: [list-open-prs, mark-stale]
@@ -192,11 +200,10 @@ jobs:
           script: |
             const prNumber = Number(process.env.PR_NUMBER);
 
-            // base_ref is required, not just an optimization: without it,
-            // checkout-for-retest falls back to github.sha (main's tip) and
-            // would merge a release-branch PR onto main instead of its own
-            // base -- resolve-cluster-config.sh also needs it to pick the
-            // right cluster/test-engine for a release PR.
+            // base_ref is required, not optional: without it,
+            // checkout-for-retest falls back to main's tip and merges a
+            // release-branch PR onto the wrong base; resolve-cluster-config.sh
+            // also needs it to pick the right cluster/test-engine.
             const { data: pr } = await github.rest.pulls.get({ ...context.repo, pull_number: prNumber });
 
             await github.rest.actions.createWorkflowDispatch({

@@ -46,7 +46,44 @@ jobs:
         uses: actions/github-script@v9
         with:
           script: |
-            const { isMergePoolPr } = require('./ci-scripts/hot-cluster/js/is-merge-pool-pr.cjs');
+            const { getMergePoolBlockers } = require('./ci-scripts/hot-cluster/js/is-merge-pool-pr.cjs');
+            const {
+              BARE_HOLD_LABEL,
+              DO_NOT_MERGE_HOLD_LABEL,
+              E2E_HOLD_LABEL,
+              NEEDS_REBASE_LABEL,
+            } = require('./ci-scripts/hot-cluster/js/merge-pool-labels.cjs');
+
+            // Maps one unmet condition to a short phrase (for the title) and
+            // a longer, actionable sentence (for the summary) -- so the
+            // failing check itself names the specific cause(s) instead of
+            // one generic sentence covering every possible reason.
+            const describeBlockingLabel = (label) => {
+              if (label === E2E_HOLD_LABEL) {
+                return { short: 'held via /hold-e2e', long: 'Hot Cluster E2E is on hold. Comment `/retest-e2e` to lift the hold and get a fresh result.' };
+              }
+              if (label === BARE_HOLD_LABEL || label === DO_NOT_MERGE_HOLD_LABEL) {
+                return { short: 'held via /hold', long: 'Comment `/hold cancel` to lift the hold.' };
+              }
+              if (label === NEEDS_REBASE_LABEL) {
+                return { short: 'needs-rebase', long: 'Update this PR with the latest base branch changes.' };
+              }
+              return { short: `blocked by \`${label}\``, long: `Resolve and clear the \`${label}\` label.` };
+            };
+
+            const describeEligibility = (missingLgtm, missingApproved, blockingLabels) => {
+              const reasons = [];
+              if (missingLgtm) {
+                reasons.push({ short: 'missing lgtm', long: 'Comment `/lgtm` (any collaborator), or get a native GitHub Approve review.' });
+              }
+              if (missingApproved) {
+                reasons.push({ short: 'missing approved', long: 'Comment `/approve` (root OWNERS), or get a native GitHub Approve review from an OWNERS approver.' });
+              }
+              for (const label of blockingLabels) {
+                reasons.push(describeBlockingLabel(label));
+              }
+              return reasons;
+            };
 
             // Re-read labels fresh instead of trusting the event payload --
             // closes the race where a queued run's payload could be stale
@@ -55,11 +92,14 @@ jobs:
             let headSha;
             let nodeId = '';
             let determined = true;
+            let reasons = [];
             const prNumber = context.payload.pull_request.number;
 
             try {
               const pr = await github.rest.pulls.get({ ...context.repo, pull_number: prNumber });
-              eligible = isMergePoolPr(pr.data.labels);
+              const { missingLgtm, missingApproved, blockingLabels } = getMergePoolBlockers(pr.data.labels);
+              eligible = !missingLgtm && !missingApproved && blockingLabels.length === 0;
+              reasons = describeEligibility(missingLgtm, missingApproved, blockingLabels);
               headSha = pr.data.head.sha;
               nodeId = pr.data.node_id;
               core.info(
@@ -87,15 +127,17 @@ jobs:
                 ? 'Could not determine eligibility'
                 : eligible
                   ? 'Merge-pool eligible'
-                  : 'Not merge-pool eligible',
+                  : `Not eligible: ${reasons.map((r) => r.short).join(', ')}`,
             );
+            // ' | '-joined (not newline-joined): this flows into a single-line
+            // `::error title=...::summary` annotation command below.
             core.setOutput(
               'summary',
               !determined
                 ? 'Failed to read current PR labels -- failing closed until a later event retries.'
                 : eligible
                   ? 'PR carries lgtm+approved with no hold/do-not-merge label.'
-                  : 'PR is missing lgtm/approved, or carries a hold/do-not-merge label. This check blocks merge independently of auto-merge state.',
+                  : reasons.map((r) => `${r.short} -- ${r.long}`).join(' | '),
             );
 
       # enablePullRequestAutoMerge/disablePullRequestAutoMerge reject the

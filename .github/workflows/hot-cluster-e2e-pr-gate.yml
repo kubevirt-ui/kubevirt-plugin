@@ -1,13 +1,12 @@
 name: Hot Cluster E2E PR Gate
 
 # Thin gatekeeper for PR events: dispatches hot-cluster-e2e.yml via
-# workflow_dispatch so only this job (plus API-posted Progress/Run Gating
-# Tests checks) appears in the merge box, instead of the full nested job
-# graph. See ci-scripts/README.md ("Check-Run & Retest Model").
+# workflow_dispatch so only this job (plus Progress/Run Gating Tests) shows
+# in the merge box, not the full nested job graph. See ci-scripts/README.md
+# ("Check-Run & Retest Model").
 #
-# When e2e-hold is present, skip dispatch but re-publish the held
-# "Run Gating Tests" marker onto the new HEAD so the required check isn't
-# left as "Expected" on the new SHA.
+# When e2e-hold is present, skip dispatch but re-publish the held marker onto
+# the new HEAD so the required check doesn't sit stuck on "Expected".
 on:
   pull_request_target:
     types: [opened, synchronize, reopened]
@@ -22,15 +21,16 @@ jobs:
   dispatch:
     name: Dispatch Hot Cluster E2E
     # Skip while e2e-hold is active (durable across pushes; only /retest-e2e
-    # removes it). republish-hold covers the required-check side.
+    # lifts it) -- republish-hold handles the required-check side.
     if: "!contains(github.event.pull_request.labels.*.name, 'e2e-hold')"
     runs-on: ubuntu-latest
     timeout-minutes: 2
     steps:
-      # e2e-passed/e2e-failed mirror the *last real* Hot Cluster E2E result --
-      # only on synchronize, since a new push means neither label reflects
-      # the new HEAD until the freshly-dispatched run below reports a fresh
-      # one. opened/reopened have no prior-diff result to invalidate.
+      # e2e-passed/e2e-failed mirror the *last real* result -- only clear on
+      # synchronize, since neither label reflects the new HEAD until the
+      # fresh dispatch below reports one (opened/reopened have no prior diff
+      # to invalidate). Shared with retest-stale-gating.yml via
+      # clear-e2e-result-labels (inline composite steps, no new merge-box check).
       - name: Generate bot token
         id: bot-token
         if: github.event.action == 'synchronize'
@@ -42,21 +42,10 @@ jobs:
       - name: Clear stale e2e-passed/e2e-failed on push
         if: github.event.action == 'synchronize'
         continue-on-error: true
-        uses: actions/github-script@v9
+        uses: ./.github/actions/clear-e2e-result-labels
         with:
+          pr-number: ${{ github.event.pull_request.number }}
           github-token: ${{ steps.bot-token.outputs.token || github.token }}
-          script: |
-            for (const name of ['e2e-passed', 'e2e-failed']) {
-              try {
-                await github.rest.issues.removeLabel({
-                  ...context.repo,
-                  issue_number: context.payload.pull_request.number,
-                  name,
-                });
-              } catch (err) {
-                if (err.status !== 404) throw err;
-              }
-            }
 
       - name: Dispatch hot-cluster-e2e.yml
         uses: actions/github-script@v9
@@ -64,10 +53,10 @@ jobs:
           script: |
             const pr = context.payload.pull_request;
 
-            // skip_pool_check: open/sync/reopen isn't merge-readiness, so
+            // skip_pool_check: open/sync/reopen isn't merge-readiness --
             // gating runs regardless of lgtm/approved.
-            // base_ref: PR's real base so release-branch PRs resolve the
-            // right cluster/test-engine tip.
+            // base_ref: resolves the right cluster/test-engine for
+            // release-branch PRs.
             await github.rest.actions.createWorkflowDispatch({
               ...context.repo,
               workflow_id: 'hot-cluster-e2e.yml',
@@ -86,8 +75,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      # Pin to default branch: pull_request_target checks out the PR base,
-      # which may lack publish-gating-check on older release branches.
+      # Pin to default branch: publish-gating-check may be missing from
+      # older release branches that pull_request_target would check out.
       - name: Checkout
         uses: actions/checkout@v7
         with:

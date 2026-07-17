@@ -72,10 +72,11 @@ See [`ci-scripts/manual-console/README.md`](../../ci-scripts/manual-console/READ
 
 ## Shared helpers
 
-| Path                                                                         | Used for                                                                      |
-| ---------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
-| [`.github/actions/setup-gh-scripts`](../actions/setup-gh-scripts/action.yml) | Checkout validation scripts (+ `ci-scripts/hot-cluster/js` SSOT) and `npm ci` |
-| [`.github/actions/create-bot-token`](../actions/create-bot-token/action.yml) | `kubevirt-plugin-bot` App token for label/comment/auto-merge writes           |
-| [`.github/scripts/`](../scripts/)                                            | TypeScript for validation commands, merge-pool verify, Jira/AI/CI checks      |
+| Path                                                                                       | Used for                                                                      |
+| ------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------- |
+| [`.github/actions/setup-gh-scripts`](../actions/setup-gh-scripts/action.yml)               | Checkout validation scripts (+ `ci-scripts/hot-cluster/js` SSOT) and `npm ci` |
+| [`.github/actions/create-bot-token`](../actions/create-bot-token/action.yml)               | `kubevirt-plugin-bot` App token for label/comment/auto-merge writes           |
+| [`.github/actions/clear-e2e-result-labels`](../actions/clear-e2e-result-labels/action.yml) | Remove `e2e-passed`/`e2e-failed` (shared by PR gate + stale-gating)           |
+| [`.github/scripts/`](../scripts/)                                                          | TypeScript for validation commands, merge-pool verify, Jira/AI/CI checks      |
 
 Bot secrets: `BOT_APP_ID`, `BOT_APP_PRIVATE_KEY` (Issues + Pull requests write on the App). Details: [`ci-scripts/README.md`](../../ci-scripts/README.md#kubevirt-plugin-bot-required-for-prow-replacement-merge-automation).
