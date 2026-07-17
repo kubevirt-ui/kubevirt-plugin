@@ -15,6 +15,7 @@ Index of workflows in this directory. Deep design notes (check-run model, merge 
 | `ok-to-test-gate.yml`                 | `ok-to-test` labeled                   | Thin gate for fork PRs                                          |
 | `ok-to-test-reset.yml`                | synchronize while `ok-to-test` present | Remove `ok-to-test` when head moves                             |
 | `retest-e2e.yml`                      | `/retest-e2e`                          | Cancel in-flight via concurrency groups; dispatch fresh run     |
+| `retest-failed.yml`                   | `/retest-failed`                       | Re-run failed CI/PRV jobs; dispatch E2E if currently failing    |
 | `cancel-e2e.yml`                      | `/cancel-e2e`                          | Cancel in-flight E2E without a new result                       |
 | `hold-e2e.yml`                        | `/hold-e2e`                            | `e2e-hold` + neutral gating check; pauses dispatch              |
 | `hot-cluster-e2e-cancel-on-close.yml` | PR closed                              | Cancel in-flight when PR closes                                 |
