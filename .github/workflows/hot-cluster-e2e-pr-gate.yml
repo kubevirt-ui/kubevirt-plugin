@@ -26,6 +26,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 2
     steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+          ref: ${{ github.event.repository.default_branch }}
       # e2e-passed/e2e-failed mirror the *last real* result -- only clear on
       # synchronize, since neither label reflects the new HEAD until the
       # fresh dispatch below reports one (opened/reopened have no prior diff
