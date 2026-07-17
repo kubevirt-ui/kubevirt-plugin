@@ -44,6 +44,12 @@
       "workflow": ".github/workflows/retest-e2e.yml"
     },
     {
+      "command": "/retest-failed",
+      "description": "Re-run failed jobs in the latest CI and PR Validation runs for this PR, and dispatch a fresh Hot Cluster E2E run only if 'Run Gating Tests' is not currently passing (missing, cancelled, or otherwise not a success). Does not lift a /hold-e2e hold (only /retest-e2e does) or force a fresh run of anything already passing.",
+      "trust": "owners",
+      "workflow": ".github/workflows/retest-failed.yml"
+    },
+    {
       "command": "/cancel-e2e",
       "description": "Cancel an in-progress Hot Cluster E2E run for this PR.",
       "trust": "owners",
