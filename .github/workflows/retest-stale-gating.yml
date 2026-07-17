@@ -149,21 +149,22 @@ jobs:
           summary: ${{ steps.check.outputs.summary }}
 
       # e2e-passed/e2e-failed mirror the *last real* result (ci-scripts/README.md).
-      # Once the check above is marked stale, neither label is valid for the
-      # new base tip -- clear both on the same should_mark condition instead
-      # of leaving a stale "passed" claim. Shared with
-      # hot-cluster-e2e-pr-gate.yml via clear-e2e-result-labels (a composite
-      # action's steps run inline, so no new check appears in the merge box).
+      # main advancing invalidates that result for every open PR this job
+      # processes, regardless of should_mark -- that output only decides
+      # whether the *check-run* is touched (e.g. left alone while held, or
+      # while a real run is already in flight), not whether the label is
+      # still valid. Unconditional here, unlike "Mark check stale" above.
+      # Shared with hot-cluster-e2e-pr-gate.yml via clear-e2e-result-labels
+      # (a composite action's steps run inline, so no new check appears in
+      # the merge box).
       - name: Generate bot token
         id: bot-token
-        if: steps.check.outputs.should_mark == 'true'
         uses: ./.github/actions/create-bot-token
         with:
           app-id: ${{ secrets.BOT_APP_ID }}
           private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
 
       - name: Clear stale e2e-passed/e2e-failed
-        if: steps.check.outputs.should_mark == 'true'
         continue-on-error: true
         uses: ./.github/actions/clear-e2e-result-labels
         with:

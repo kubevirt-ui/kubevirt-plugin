@@ -29,6 +29,10 @@ runs:
       with:
         github-token: ${{ inputs.github-token }}
         script: |
+          // Collect the first genuine failure rather than rethrowing
+          // immediately -- a non-404 error removing e2e-passed must not
+          // skip the attempt to also remove e2e-failed.
+          let firstError;
           for (const name of ['e2e-passed', 'e2e-failed']) {
             try {
               await github.rest.issues.removeLabel({
@@ -37,6 +41,7 @@ runs:
                 name,
               });
             } catch (err) {
-              if (err.status !== 404) throw err;
+              if (err.status !== 404) firstError ??= err;
             }
           }
+          if (firstError) throw firstError;
