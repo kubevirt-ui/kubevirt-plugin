@@ -29,8 +29,11 @@ jobs:
       # e2e-passed/e2e-failed mirror the *last real* result -- only clear on
       # synchronize, since neither label reflects the new HEAD until the
       # fresh dispatch below reports one (opened/reopened have no prior diff
-      # to invalidate). Shared with retest-stale-gating.yml via
-      # clear-e2e-result-labels (inline composite steps, no new merge-box check).
+      # to invalidate). This job only runs while e2e-hold is absent -- see
+      # republish-hold's own copy of these two steps for the held case, so
+      # a push doesn't leave a stale label stuck for the life of the hold.
+      # Shared with retest-stale-gating.yml via clear-e2e-result-labels
+      # (inline composite steps, no new merge-box check).
       - name: Generate bot token
         id: bot-token
         if: github.event.action == 'synchronize'
@@ -82,6 +85,25 @@ jobs:
         with:
           persist-credentials: false
           ref: ${{ github.event.repository.default_branch }}
+
+      # This job's own gate already guarantees e2e-hold is present -- the
+      # dispatch job's identical steps only run when it's absent, so between
+      # the two, a push clears the stale label regardless of hold state.
+      - name: Generate bot token
+        id: bot-token
+        if: github.event.action == 'synchronize'
+        uses: ./.github/actions/create-bot-token
+        with:
+          app-id: ${{ secrets.BOT_APP_ID }}
+          private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
+
+      - name: Clear stale e2e-passed/e2e-failed on push
+        if: github.event.action == 'synchronize'
+        continue-on-error: true
+        uses: ./.github/actions/clear-e2e-result-labels
+        with:
+          pr-number: ${{ github.event.pull_request.number }}
+          github-token: ${{ steps.bot-token.outputs.token || github.token }}
 
       - name: Publish held marker for current HEAD
         uses: ./.github/actions/publish-gating-check
