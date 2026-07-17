@@ -9,7 +9,7 @@ test.describe(
   { tag: [T1_TAG, '@catalog-wizard', ADMIN_ONLY_TAG] },
   () => {
     test('Custom configuration wizard creates a RHEL VM through all steps and reaches Running state', async ({
-      k8sClient,
+      apiClient,
       vmTreePage,
       vmWizardNavigationPage,
       vmWizardBootSourcePage,
@@ -23,7 +23,7 @@ test.describe(
         tags: [T1_TAG],
       });
 
-      const wizardNs = await setupTestNamespace(k8sClient, 'wizard-custom');
+      const wizardNs = await setupTestNamespace(apiClient, 'wizard-custom');
 
       await vmTreePage.switchToVirtualizationPerspective();
       await vmTreePage.navigateToProjectVmListViaUI(wizardNs);
@@ -135,9 +135,9 @@ test.describe(
       await test.step('Verify VM resource was created', async () => {
         const vmName = await vmWizardNavigationPage.getCreatedVmNameFromUrl();
         expect(vmName.length, 'VM name should be in the URL').toBeGreaterThan(0);
-        k8sClient.trackResource('VirtualMachine', vmName, wizardNs);
+        apiClient.trackResource('VirtualMachine', vmName, wizardNs);
 
-        const result = await k8sClient.verifyVmCreated(vmName, wizardNs);
+        const result = await apiClient.verifyVmCreated(vmName, wizardNs);
         expect.soft(result.exists, `VM '${vmName}' should exist`).toBe(true);
       });
     });

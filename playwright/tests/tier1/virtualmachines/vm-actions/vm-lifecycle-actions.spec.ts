@@ -10,26 +10,26 @@ test.describe('Tier1 VM Bulk Actions Tests', { tag: [T1_TAG, '@tier1-bulk-ops'] 
   test(
     'Bulk delete selected VMs removes them from the list',
     { tag: ['@nonpriv'] },
-    async ({ vmListPage, vmTreePage, k8sClient, utils }) => {
+    async ({ vmListPage, vmTreePage, apiClient, utils }) => {
       const SUITE = 'VM Bulk Actions';
       await utils.withAllure({ suite: SUITE, feature: T1, tags: [T1_TAG, '@tier1-bulk-ops'] });
 
       const ns = utils.generateTestNamespace('bulk-del');
-      await k8sClient.createNamespace(ns);
-      await k8sClient.waitForNamespaceReady(ns);
-      k8sClient.trackResource('Namespace', ns);
+      await apiClient.createNamespace(ns);
+      await apiClient.waitForNamespaceReady(ns);
+      apiClient.trackResource('Namespace', ns);
 
       const vmName = utils.generateRandomVmName('bulk-del');
-      await k8sClient.createVmFromTemplate(
+      await apiClient.createVmFromTemplate(
         utils.TEMPLATE_METADATA_NAMES.RHEL9,
         vmName,
         ns,
         'openshift',
         false,
       );
-      k8sClient.trackResource('VirtualMachine', vmName, ns);
+      apiClient.trackResource('VirtualMachine', vmName, ns);
 
-      const created = await k8sClient.verifyVmCreated(vmName, ns, utils.TestTimeouts.VM_BOOTUP);
+      const created = await apiClient.verifyVmCreated(vmName, ns, utils.TestTimeouts.VM_BOOTUP);
       expect(created.exists, 'VM should be created').toBe(true);
 
       await vmTreePage.searchTreeView(ns);

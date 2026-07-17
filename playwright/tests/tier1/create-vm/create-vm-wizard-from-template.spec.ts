@@ -9,7 +9,7 @@ test.describe(
   { tag: [T1_TAG, '@catalog-wizard', ADMIN_ONLY_TAG] },
   () => {
     test('From Template wizard selects RHEL9 template, creates VM, and reaches Running state', async ({
-      k8sClient,
+      apiClient,
       vmTreePage,
       vmWizardNavigationPage,
       vmWizardComputePage,
@@ -22,7 +22,7 @@ test.describe(
         tags: [T1_TAG],
       });
 
-      const wizardNs = await setupTestNamespace(k8sClient, 'wizard-tpl');
+      const wizardNs = await setupTestNamespace(apiClient, 'wizard-tpl');
 
       await vmTreePage.switchToVirtualizationPerspective();
       await vmTreePage.navigateToProjectVmListViaUI(wizardNs);
@@ -90,9 +90,9 @@ test.describe(
       await test.step('Verify VM resource was created', async () => {
         const vmName = await vmWizardNavigationPage.getCreatedVmNameFromUrl();
         expect(vmName.length, 'VM name should be in the URL').toBeGreaterThan(0);
-        k8sClient.trackResource('VirtualMachine', vmName, wizardNs);
+        apiClient.trackResource('VirtualMachine', vmName, wizardNs);
 
-        const result = await k8sClient.verifyVmCreated(vmName, wizardNs);
+        const result = await apiClient.verifyVmCreated(vmName, wizardNs);
         expect.soft(result.exists, `VM '${vmName}' should exist`).toBe(true);
       });
     });

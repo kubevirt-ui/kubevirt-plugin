@@ -358,9 +358,21 @@ export class SpecResourceSetup {
           'vm',
           ref.name,
           {
-            metadata: { labels: { 'kubevirt.io/delete-protection': null } },
+            metadata: {
+              labels: {
+                'kubevirt.io/vm-delete-protection': null,
+                'kubevirt.io/delete-protection': null,
+              },
+            },
             spec: {
-              template: { metadata: { labels: { 'kubevirt.io/delete-protection': null } } },
+              template: {
+                metadata: {
+                  labels: {
+                    'kubevirt.io/vm-delete-protection': null,
+                    'kubevirt.io/delete-protection': null,
+                  },
+                },
+              },
             },
           },
           ref.namespace,

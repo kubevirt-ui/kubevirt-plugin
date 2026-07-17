@@ -142,9 +142,6 @@ export class VirtualMachineProxyHandler {
     }
 
     await this.create(namespace, vmSpec);
-    if (startVm) {
-      await this.start(namespace, vmName);
-    }
     return vmName;
   }
 
@@ -189,10 +186,8 @@ export class VirtualMachineProxyHandler {
     const objects = (processed as Record<string, unknown>).objects as KubernetesResource[];
     const vmSpec = objects[0];
 
-    if (!startVm) {
-      vmSpec.spec = vmSpec.spec || {};
-      (vmSpec.spec as Record<string, unknown>).runStrategy = 'Halted';
-    }
+    vmSpec.spec = vmSpec.spec || {};
+    (vmSpec.spec as Record<string, unknown>).runStrategy = startVm ? 'Always' : 'Halted';
 
     if (sshPublicKey) {
       await this._injectSshKey(vmSpec, namespace, sshPublicKey);

@@ -6,33 +6,27 @@ test.describe.serial(
   { tag: [T1_TAG, '@nonpriv'] },
   () => {
     let vmName: string;
-    let setupError: string | undefined;
 
-    test.beforeAll(async ({ k8sClient, utils, testConfig }) => {
-      try {
-        vmName = utils.generateRandomVmName('vm-scheduling');
-        await k8sClient.createVmFromTemplate(
-          utils.TEMPLATE_METADATA_NAMES.RHEL9,
-          vmName,
-          testConfig.testNamespace,
-          'openshift',
-          false,
-        );
-        k8sClient.trackResource('VirtualMachine', vmName, testConfig.testNamespace);
+    test.beforeAll(async ({ apiClient, utils, testConfig }) => {
+      vmName = utils.generateRandomVmName('vm-scheduling');
+      await apiClient.createVmFromTemplate(
+        utils.TEMPLATE_METADATA_NAMES.RHEL9,
+        vmName,
+        testConfig.testNamespace,
+        'openshift',
+        false,
+      );
+      apiClient.trackResource('VirtualMachine', vmName, testConfig.testNamespace);
 
-        const verifyResult = await k8sClient.verifyVmCreated(
-          vmName,
-          testConfig.testNamespace,
-          utils.TestTimeouts.VM_BOOTUP,
-        );
-        if (!verifyResult.exists) throw new Error(`VM ${vmName} was not created`);
-      } catch (error: unknown) {
-        setupError = error instanceof Error ? error.message : String(error);
-      }
+      const verifyResult = await apiClient.verifyVmCreated(
+        vmName,
+        testConfig.testNamespace,
+        utils.TestTimeouts.VM_BOOTUP,
+      );
+      if (!verifyResult.exists) throw new Error(`VM ${vmName} was not created`);
     });
 
     test.beforeEach(async ({ vmTreePage, utils, testConfig }) => {
-      test.skip(!!setupError, `Shared VM setup failed: ${setupError}`);
       test.setTimeout(utils.TestTimeouts.TEST_VM_CREATION);
       await utils.withAllure({
         suite: 'VM Configuration Scheduling',
@@ -44,7 +38,7 @@ test.describe.serial(
     });
 
     test('Configuration Scheduling: requirements and eviction strategy after patch', async ({
-      k8sClient,
+      apiClient,
       vmTreePage,
       vmDetailPage,
       testConfig,
@@ -66,9 +60,9 @@ test.describe.serial(
         )
         .toBe(true);
 
-      await k8sClient.patchVmEvictionStrategy(vmName, testConfig.testNamespace, 'LiveMigrate');
+      await apiClient.patchVmEvictionStrategy(vmName, testConfig.testNamespace, 'LiveMigrate');
 
-      await vmDetailPage.navigateToVirtualMachineDetail(vmName, testConfig.testNamespace);
+      await vmTreePage.navigateToVmViaTreeView(testConfig.testNamespace, vmName);
       await vmDetailPage.navigateToConfigurationScheduling();
 
       const liveMigrateVisible = await vmDetailPage.verifyEvictionStrategyLiveMigrate();

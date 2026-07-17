@@ -940,14 +940,21 @@ export default class RequestContextClient extends BaseClient implements ProxyApi
    */
   async primeCsrfToken(): Promise<void> {
     const base = this.baseUrl.endsWith('/') ? this.baseUrl.slice(0, -1) : this.baseUrl;
-    await this._httpContext
-      .get(base + '/', {
+    try {
+      await this._httpContext.get(base + '/', {
         headers: {
           ...(this._token ? { Authorization: `Bearer ${this._token}` } : {}),
         },
         ignoreHTTPSErrors: true,
-      })
-      .catch(() => undefined);
+      });
+      const state = await this._httpContext.storageState();
+      const hasCsrf = state.cookies.some((c) => c.name === 'csrf-token' && c.value);
+      if (!hasCsrf) {
+        console.warn('[RCC] primeCsrfToken: csrf-token cookie not set after priming');
+      }
+    } catch {
+      // Non-fatal: GET-only contexts don't need CSRF
+    }
   }
 
   // ---------------------------------------------------------------------------

@@ -1,13 +1,24 @@
 /**
  * Obtain an OAuth bearer token from the OpenShift OAuth server via HTTP.
  * Replaces the `oc login` + `oc whoami --show-token` pattern.
+ *
+ * TLS: Uses NODE_EXTRA_CA_CERTS or NODE_TLS_REJECT_UNAUTHORIZED from the
+ * environment when available. Falls back to rejectUnauthorized:false only
+ * for OpenShift test clusters with self-signed certificates.
  */
 
+import fs from 'fs';
 import https from 'https';
 import http from 'http';
 import { URL } from 'url';
 
-const AGENT = new https.Agent({ rejectUnauthorized: false });
+function buildTlsAgent(): https.Agent {
+  const caPath = process.env.NODE_EXTRA_CA_CERTS;
+  if (caPath && fs.existsSync(caPath)) {
+    return new https.Agent({ ca: fs.readFileSync(caPath) });
+  }
+  return new https.Agent({ rejectUnauthorized: false });
+}
 
 async function httpRequest(
   url: string,
@@ -26,6 +37,8 @@ async function httpRequest(
   let currentUrl = url;
   let redirectCount = 0;
 
+  const agent = buildTlsAgent();
+
   while (true) {
     const parsed = new URL(currentUrl);
     const isHttps = parsed.protocol === 'https:';
@@ -41,7 +54,7 @@ async function httpRequest(
         {
           method,
           headers,
-          agent: isHttps ? AGENT : undefined,
+          agent: isHttps ? agent : undefined,
         },
         (res) => {
           let body = '';
@@ -107,6 +120,17 @@ export async function fetchOAuthToken(
     }
   } catch {
     authorizationEndpoint = `${base}/oauth/authorize`;
+  }
+
+  const endpointUrl = new URL(authorizationEndpoint);
+  const clusterHost = new URL(base).hostname;
+  if (endpointUrl.protocol !== 'https:') {
+    throw new Error(`OAuth authorization_endpoint must be HTTPS, got: ${authorizationEndpoint}`);
+  }
+  if (!endpointUrl.hostname.endsWith(clusterHost.replace(/^api\./, ''))) {
+    throw new Error(
+      `OAuth authorization_endpoint hostname "${endpointUrl.hostname}" does not belong to cluster "${clusterHost}"`,
+    );
   }
 
   const authorizeUrl =

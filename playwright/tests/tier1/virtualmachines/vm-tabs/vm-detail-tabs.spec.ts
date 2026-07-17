@@ -5,7 +5,7 @@ const SUITE = 'VM and VMI detail tabs';
 
 test.describe(SUITE, { tag: [T1_TAG] }, () => {
   test('VM and VMI detail tabs show expected content', async ({
-    k8sClient,
+    apiClient,
     vmTreePage,
     vmListPage,
     vmDetailPage,
@@ -21,21 +21,24 @@ test.describe(SUITE, { tag: [T1_TAG] }, () => {
     const namespace = utils.generateTestNamespace('t1-vm-tabs');
     const vmName = utils.generateRandomVmName('t1-vm-tabs');
 
-    await k8sClient.createNamespace(namespace);
-    await k8sClient.waitForNamespaceReady(namespace);
-    k8sClient.trackResource('Namespace', namespace);
-    await k8sClient.createVmFromTemplate(
+    await apiClient.createNamespace(namespace);
+    await apiClient.waitForNamespaceReady(namespace);
+    apiClient.trackResource('Namespace', namespace);
+    await apiClient.createVmFromTemplate(
       utils.TEMPLATE_METADATA_NAMES.RHEL9,
       vmName,
       namespace,
       'openshift',
       true,
     );
-    k8sClient.trackResource('VirtualMachine', vmName, namespace);
-    await k8sClient.waitForVmRunning(vmName, namespace, utils.TestTimeouts.VM_RUNNING);
+    apiClient.trackResource('VirtualMachine', vmName, namespace);
+    await apiClient.waitForVmRunning(vmName, namespace, utils.TestTimeouts.VM_RUNNING);
 
-    await vmTreePage.navigateToVmsWithEmptyProjects(namespace);
-    await vmTreePage.navigateToProjectVmList(namespace);
+    await vmTreePage.navigateToVirtualMachinesViaUI();
+    await vmTreePage.toggleEmptyProjectsDisplay(true);
+    await vmTreePage.searchTreeView(namespace);
+    await vmTreePage.clickProjectNode(namespace);
+    await vmTreePage.clickVmListTab();
 
     const pageLoaded = await vmListPage.verifyPageLoaded();
     expect.soft(pageLoaded, 'VM list page should load').toBe(true);
@@ -83,8 +86,11 @@ test.describe(SUITE, { tag: [T1_TAG] }, () => {
     const utilization = await vmDetailPage.verifyUtilization();
     expect.soft(utilization, 'Utilization visible in Metrics tab').toBe(true);
 
-    await vmTreePage.navigateToVmsWithEmptyProjects(namespace);
-    await vmTreePage.navigateToProjectVmList(namespace);
+    await vmTreePage.navigateToVirtualMachinesViaUI();
+    await vmTreePage.toggleEmptyProjectsDisplay(true);
+    await vmTreePage.searchTreeView(namespace);
+    await vmTreePage.clickProjectNode(namespace);
+    await vmTreePage.clickVmListTab();
     await vmListPage.clickVmByTestId(vmName);
     await vmDetailPage.navigateToOverview();
     await vmDetailPage.clickVmiByTestId(vmName);

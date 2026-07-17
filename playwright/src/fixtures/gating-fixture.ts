@@ -8,6 +8,7 @@
  */
 
 import { withSafeActions } from '@/page-objects/base-page';
+import { detectAuthExpired, healBrowserAuth } from '@/utils/auth-healer';
 import CheckupsPage from '@/page-objects/cluster/checkups-page';
 import MigrationPoliciesPage from '@/page-objects/cluster/migration-policies-page';
 import QuotasPage from '@/page-objects/cluster/quotas-page';
@@ -64,10 +65,28 @@ const test = baseTest.extend<GatingFixtures>({
   // clicks first would pay a ~30s timeout penalty before falling back to
   // direct page.goto(). Skip resource readiness polling entirely.
   _autoVirtNavigation: async ({ page }, use) => {
-    await page.goto(EnvVariables.webConsoleUrl, {
-      waitUntil: 'domcontentloaded',
-      timeout: TestTimeouts.NAVIGATION,
-    });
+    const baseUrl = EnvVariables.webConsoleUrl;
+    for (let attempt = 1; attempt <= 2; attempt++) {
+      try {
+        await page.goto(baseUrl, {
+          waitUntil: 'domcontentloaded',
+          timeout: TestTimeouts.NAVIGATION,
+        });
+
+        if (await detectAuthExpired(page)) {
+          const healed = await healBrowserAuth(page, page.context());
+          if (healed) {
+            await page.goto(baseUrl, {
+              waitUntil: 'domcontentloaded',
+              timeout: TestTimeouts.NAVIGATION,
+            });
+          }
+        }
+        break;
+      } catch {
+        if (attempt === 2) throw new Error(`Gating fixture: page.goto failed after 2 attempts`);
+      }
+    }
     await use();
   },
   // eslint-disable-next-line no-empty-pattern

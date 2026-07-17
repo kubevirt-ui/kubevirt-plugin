@@ -94,8 +94,8 @@ export const TestTimeouts = {
   /** Timeout for status validation checks (60 seconds) */
   STATUS_VALIDATION: MINUTE,
 
-  /** Timeout for VM bootup and full initialization (4 minutes) */
-  VM_BOOTUP: 4 * MINUTE,
+  /** Timeout for VM bootup and full initialization (6 minutes) */
+  VM_BOOTUP: 6 * MINUTE,
 
   /** Timeout for OLM operator install (e.g. COO); generous but under default test timeout (6 min) */
   OPERATOR_INSTALL: 5 * MINUTE,

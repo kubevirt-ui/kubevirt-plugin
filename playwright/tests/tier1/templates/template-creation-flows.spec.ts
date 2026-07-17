@@ -7,18 +7,12 @@ const SUITE = 'Template creation flows';
 
 test.describe.serial('Template creation flows', { tag: [T1_TAG, '@tier1-templates'] }, () => {
   let sharedNs: string;
-  let setupError: string | undefined;
 
-  test.beforeAll(async ({ k8sClient, utils }) => {
-    try {
-      sharedNs = await setupTestNamespace(k8sClient, 'tpl-creation');
-    } catch (error: unknown) {
-      setupError = error instanceof Error ? error.message : String(error);
-    }
+  test.beforeAll(async ({ apiClient, utils }) => {
+    sharedNs = await setupTestNamespace(apiClient, 'tpl-creation');
   });
 
   test.beforeEach(async ({ utils }) => {
-    test.skip(!!setupError, `Shared setup failed: ${setupError}`);
     await utils.withAllure({
       suite: SUITE,
       feature: T1,
@@ -27,8 +21,9 @@ test.describe.serial('Template creation flows', { tag: [T1_TAG, '@tier1-template
   });
 
   test('Save existing VM as a template from the VM detail page', async ({
-    k8sClient,
+    apiClient,
     pageCommons,
+    vmTreePage,
     vmDetailPage,
     templatesPage,
     utils,
@@ -38,42 +33,53 @@ test.describe.serial('Template creation flows', { tag: [T1_TAG, '@tier1-template
     const vmName = utils.generateRandomVmName('vm-save-tpl');
     const templateName = utils.generateRandomTemplateName('saved-tpl');
 
-    await k8sClient.createVmFromTemplate(
+    await apiClient.createVmFromTemplate(
       utils.TEMPLATE_METADATA_NAMES.RHEL9,
       vmName,
       sharedNs,
       'openshift',
       false,
     );
-    k8sClient.trackResource('VirtualMachine', vmName, sharedNs);
+    apiClient.trackResource('VirtualMachine', vmName, sharedNs);
 
-    const vmExists = await k8sClient.waitForVmExists(vmName, sharedNs);
+    const vmExists = await apiClient.waitForVmExists(vmName, sharedNs);
     expect.soft(vmExists, `VM ${vmName} should exist before saving as template`).toBe(true);
 
-    await vmDetailPage.navigateToVirtualMachineDetail(vmName, sharedNs);
+    await vmTreePage.navigateToVmViaTreeView(sharedNs, vmName);
     const isVmVisible = await vmDetailPage.isVmNameVisible(vmName);
     expect.soft(isVmVisible, `VM ${vmName} should be visible on detail page`).toBe(true);
 
     await vmDetailPage.saveAsTemplate(templateName, sharedNs);
-    k8sClient.trackResource('VirtualMachineTemplate', templateName, sharedNs);
+    apiClient.trackResource('VirtualMachineTemplate', templateName, sharedNs);
 
     if (!utils.EnvVariables.onAcm) {
       await pageCommons.switchProject(sharedNs);
     }
-    await templatesPage.navigateToTemplatesViaUI();
-    await templatesPage.filterTemplatesByName(templateName);
-    const isVisible = await templatesPage.isTemplateVisible(templateName);
-    expect.soft(isVisible, `Template ${templateName} should be visible in the list`).toBe(true);
+
+    await expect
+      .poll(
+        async () => {
+          await templatesPage.navigateToTemplatesViaUI();
+          await templatesPage.filterTemplatesByName(templateName);
+          return templatesPage.isTemplateVisible(templateName);
+        },
+        {
+          message: `Template ${templateName} should be visible in the list`,
+          timeout: utils.TestTimeouts.DEFAULT,
+          intervals: [2000, 3000, 5000],
+        },
+      )
+      .toBe(true);
   });
 
   test('Clone a template via the kebab menu', async ({
-    k8sClient,
+    apiClient,
     pageCommons,
     templatesPage,
     utils,
   }) => {
     const { templateName: sourceName } = await setupTemplateFromResource(
-      k8sClient,
+      apiClient,
       'clone-src',
       {
         targetNamespace: sharedNs,
@@ -96,7 +102,7 @@ test.describe.serial('Template creation flows', { tag: [T1_TAG, '@tier1-template
     await templatesPage.clickCloneTemplate(sourceName);
     await templatesPage.fillCloneTemplateModal(cloneName);
     await templatesPage.clickFooterSaveButton();
-    k8sClient.trackResource('Template', cloneName, sharedNs);
+    apiClient.trackResource('Template', cloneName, sharedNs);
 
     await expect
       .poll(
@@ -115,7 +121,7 @@ test.describe.serial('Template creation flows', { tag: [T1_TAG, '@tier1-template
   });
 
   test('Create a template using the YAML editor', async ({
-    k8sClient,
+    apiClient,
     pageCommons,
     templatesPage,
     utils,
@@ -130,7 +136,7 @@ test.describe.serial('Template creation flows', { tag: [T1_TAG, '@tier1-template
 
     await templatesPage.setCreateTemplateExampleNameInYamlEditor(templateName);
     await templatesPage.clickCreateButtonInModal();
-    k8sClient.trackResource('Template', templateName, sharedNs);
+    apiClient.trackResource('Template', templateName, sharedNs);
 
     await templatesPage.navigateToTemplatesViaUI();
     await templatesPage.filterTemplatesByName(templateName);
@@ -140,9 +146,9 @@ test.describe.serial('Template creation flows', { tag: [T1_TAG, '@tier1-template
       .toBe(true);
   });
 
-  test('Delete a template via the UI', async ({ k8sClient, pageCommons, templatesPage, utils }) => {
+  test('Delete a template via the UI', async ({ apiClient, pageCommons, templatesPage, utils }) => {
     const { templateName } = await setupTemplateFromResource(
-      k8sClient,
+      apiClient,
       'del-tpl',
       {
         targetNamespace: sharedNs,

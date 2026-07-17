@@ -104,18 +104,16 @@ export default class VirtualMachineDetailMetricsSnapshotsComponent extends BaseC
       await actionButton.first().click();
 
       const createVmItem = this.locator(
-        'text=Create VirtualMachine, [role="menuitem"]:has-text("Create"), button:has-text("Create VirtualMachine")',
+        '[role="menuitem"]:has-text("Create VirtualMachine"), button:has-text("Create VirtualMachine")',
       );
       await createVmItem.first().waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
       await createVmItem.first().click();
 
       await this.page.waitForTimeout(TestTimeouts.UI_DELAY_EXTRA);
 
-      await this._nameInput.waitFor({
-        state: 'visible',
-        timeout: TestTimeouts.ELEMENT_WAIT,
-      });
-      await this._nameInput.fill(vmName);
+      const cloneNameInput = this.locator('input[id="clone-name"]');
+      await cloneNameInput.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+      await cloneNameInput.fill(vmName);
 
       if (startAfterCreation) {
         const cloneCheckbox = this.locator('input[id="start-clone"]');
@@ -125,11 +123,19 @@ export default class VirtualMachineDetailMetricsSnapshotsComponent extends BaseC
         }
       }
 
-      await this._createButton.first().click({ force: true });
+      const modalSubmit = this.locator('.pf-v6-c-modal-box button.pf-m-primary');
+      await modalSubmit.first().click();
 
-      const vmNameVisible = await this.isVmNameVisible(vmName, TestTimeouts.DEFAULT);
+      const successAlert = this.locator('.pf-v6-c-modal-box .pf-v6-c-alert.pf-m-success');
+      await successAlert.waitFor({ state: 'visible', timeout: TestTimeouts.VM_BOOTUP });
 
-      return vmNameVisible;
+      await modalSubmit.first().click();
+      await this.locator('.pf-v6-c-modal-box').waitFor({
+        state: 'hidden',
+        timeout: TestTimeouts.ELEMENT_WAIT,
+      });
+
+      return true;
     } catch {
       return false;
     }

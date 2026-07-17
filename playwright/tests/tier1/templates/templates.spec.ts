@@ -20,18 +20,12 @@ const lifecycleDedicatedTemplateFields = {
 
 test.describe.serial('Tier1 Template Tests', { tag: [T1_TAG, '@tier1-templates'] }, () => {
   let sharedNs: string;
-  let setupError: string | undefined;
 
-  test.beforeAll(async ({ k8sClient, utils }) => {
-    try {
-      sharedNs = await setupTestNamespace(k8sClient, 'templates-shared');
-    } catch (error: unknown) {
-      setupError = error instanceof Error ? error.message : String(error);
-    }
+  test.beforeAll(async ({ apiClient, utils }) => {
+    sharedNs = await setupTestNamespace(apiClient, 'templates-shared');
   });
 
   test.beforeEach(async ({ utils }) => {
-    test.skip(!!setupError, `Shared setup failed: ${setupError}`);
     await utils.withAllure({
       suite: SUITE_TEST_VM_FROM_EXAMPLE_TEMPLATE,
       feature: T1,
@@ -40,7 +34,7 @@ test.describe.serial('Tier1 Template Tests', { tag: [T1_TAG, '@tier1-templates']
   });
 
   test('Template can be created from an example template and is shown in the list', async ({
-    k8sClient,
+    apiClient,
     pageCommons,
     templatesPage,
     utils,
@@ -55,7 +49,7 @@ test.describe.serial('Tier1 Template Tests', { tag: [T1_TAG, '@tier1-templates']
     await templatesPage.setCreateTemplateExampleNameInYamlEditor(templateName);
     await templatesPage.clickCreateButtonInModal();
 
-    k8sClient.trackResource('Template', templateName, sharedNs);
+    apiClient.trackResource('Template', templateName, sharedNs);
 
     const templateDetailsVerified =
       await templatesPage.verifyTemplateCreationFromExample('Template details');
@@ -66,7 +60,7 @@ test.describe.serial('Tier1 Template Tests', { tag: [T1_TAG, '@tier1-templates']
   });
 
   test('VM created from a template example starts successfully and reaches Running state', async ({
-    k8sClient,
+    apiClient,
     pageCommons,
     templatesPage,
     utils,
@@ -76,7 +70,7 @@ test.describe.serial('Tier1 Template Tests', { tag: [T1_TAG, '@tier1-templates']
     }
 
     const { templateName } = await setupTemplateFromResource(
-      k8sClient,
+      apiClient,
       'fedora-template-merge',
       {
         targetNamespace: sharedNs,
@@ -85,18 +79,18 @@ test.describe.serial('Tier1 Template Tests', { tag: [T1_TAG, '@tier1-templates']
       },
       utils,
     );
-    const templateExists = await k8sClient.verifyTemplateCreated(templateName, sharedNs);
+    const templateExists = await apiClient.verifyTemplateCreated(templateName, sharedNs);
     expect.soft(templateExists.exists, `Template ${templateName} should be created`).toBe(true);
 
     await templatesPage.navigateToTemplatesViaUI();
     await templatesPage.filterTemplatesByName(templateName);
 
     const vmName = utils.generateRandomVmName('vm-from-template-example');
-    await k8sClient.createVmFromTemplate(templateName, vmName, sharedNs, sharedNs, true);
-    k8sClient.trackResource('VirtualMachine', vmName, sharedNs);
-    await k8sClient.waitForVmRunning(vmName, sharedNs, utils.TestTimeouts.VM_BOOTUP);
+    await apiClient.createVmFromTemplate(templateName, vmName, sharedNs, sharedNs, true);
+    apiClient.trackResource('VirtualMachine', vmName, sharedNs);
+    await apiClient.waitForVmRunning(vmName, sharedNs, utils.TestTimeouts.VM_BOOTUP);
 
-    const verifyResult = await k8sClient.verifyVmCreated(
+    const verifyResult = await apiClient.verifyVmCreated(
       vmName,
       sharedNs,
       utils.TestTimeouts.VM_BOOTUP,
@@ -105,7 +99,7 @@ test.describe.serial('Tier1 Template Tests', { tag: [T1_TAG, '@tier1-templates']
   });
 
   test('VM creation wizard allows specifying a custom rootdisk name', async ({
-    k8sClient,
+    apiClient,
     pageCommons,
     templatesPage,
     templateDetailPage,
@@ -114,7 +108,7 @@ test.describe.serial('Tier1 Template Tests', { tag: [T1_TAG, '@tier1-templates']
     const customDiskName = 'custom-boot';
     const vmName = utils.generateRandomVmName('vm-custom-disk');
     const created = await setupTemplateFromResource(
-      k8sClient,
+      apiClient,
       'custom-disk-tpl',
       {
         targetNamespace: sharedNs,
@@ -125,7 +119,7 @@ test.describe.serial('Tier1 Template Tests', { tag: [T1_TAG, '@tier1-templates']
       utils,
     );
     const templateName = created.templateName;
-    const templateExists = await k8sClient.verifyTemplateCreated(templateName, sharedNs);
+    const templateExists = await apiClient.verifyTemplateCreated(templateName, sharedNs);
     expect.soft(templateExists.exists, `Template ${templateName} should be created`).toBe(true);
 
     if (!utils.EnvVariables.onAcm) {
@@ -143,9 +137,9 @@ test.describe.serial('Tier1 Template Tests', { tag: [T1_TAG, '@tier1-templates']
       .soft(diskVisible, `Custom disk "${customDiskName}" should be visible on Disks tab`)
       .toBe(true);
 
-    await k8sClient.createVmFromTemplate(templateName, vmName, sharedNs, sharedNs, true);
-    k8sClient.trackResource('VirtualMachine', vmName, sharedNs);
-    const verifyResult = await k8sClient.verifyVmCreated(
+    await apiClient.createVmFromTemplate(templateName, vmName, sharedNs, sharedNs, true);
+    apiClient.trackResource('VirtualMachine', vmName, sharedNs);
+    const verifyResult = await apiClient.verifyVmCreated(
       vmName,
       sharedNs,
       utils.TestTimeouts.VM_CREATION,
@@ -159,7 +153,7 @@ test.describe.serial('Tier1 Template Tests', { tag: [T1_TAG, '@tier1-templates']
   });
 
   test('User template CPU and memory can be edited and saved via the details page', async ({
-    k8sClient,
+    apiClient,
     pageCommons,
     templatesPage,
     templateDetailPage,
@@ -170,7 +164,7 @@ test.describe.serial('Tier1 Template Tests', { tag: [T1_TAG, '@tier1-templates']
     }
 
     const { templateName } = await setupTemplateFromResource(
-      k8sClient,
+      apiClient,
       'cpu-edit-tpl',
       {
         targetNamespace: sharedNs,
@@ -179,7 +173,7 @@ test.describe.serial('Tier1 Template Tests', { tag: [T1_TAG, '@tier1-templates']
       },
       utils,
     );
-    const templateCreated = await k8sClient.verifyTemplateCreated(templateName, sharedNs);
+    const templateCreated = await apiClient.verifyTemplateCreated(templateName, sharedNs);
     expect.soft(templateCreated.exists, `Template ${templateName} should be created`).toBe(true);
 
     await templatesPage.navigateToTemplatesViaUI();
@@ -195,18 +189,12 @@ test.describe.serial('Tier1 Template Tests', { tag: [T1_TAG, '@tier1-templates']
 
 test.describe.serial(SUITE_TEMPLATE_LIFECYCLE, { tag: [T1_TAG, '@tier1-templates'] }, () => {
   let sharedNs: string;
-  let setupError: string | undefined;
 
-  test.beforeAll(async ({ k8sClient, utils }) => {
-    try {
-      sharedNs = await setupTestNamespace(k8sClient, 'tpl-lifecycle-shared');
-    } catch (error: unknown) {
-      setupError = error instanceof Error ? error.message : String(error);
-    }
+  test.beforeAll(async ({ apiClient, utils }) => {
+    sharedNs = await setupTestNamespace(apiClient, 'tpl-lifecycle-shared');
   });
 
   test.beforeEach(async ({ utils }) => {
-    test.skip(!!setupError, `Shared setup failed: ${setupError}`);
     await utils.withAllure({
       suite: SUITE_TEMPLATE_LIFECYCLE,
       feature: T1,
@@ -215,7 +203,7 @@ test.describe.serial(SUITE_TEMPLATE_LIFECYCLE, { tag: [T1_TAG, '@tier1-templates
   });
 
   test('Template created with dedicated CPU resources is reflected in k8s spec', async ({
-    k8sClient,
+    apiClient,
     pageCommons,
     templatesPage,
     utils,
@@ -228,7 +216,7 @@ test.describe.serial(SUITE_TEMPLATE_LIFECYCLE, { tag: [T1_TAG, '@tier1-templates
     const templateName = utils.generateRandomTemplateName('dedicated-tpl');
 
     await setupTemplateFromResource(
-      k8sClient,
+      apiClient,
       'dedicated-tpl',
       {
         name: templateName,
@@ -238,12 +226,12 @@ test.describe.serial(SUITE_TEMPLATE_LIFECYCLE, { tag: [T1_TAG, '@tier1-templates
       utils,
     );
 
-    const templateExists = await k8sClient.verifyTemplateCreated(templateName, sharedNs);
+    const templateExists = await apiClient.verifyTemplateCreated(templateName, sharedNs);
     expect.soft(templateExists.exists, `Template ${templateName} should exist in k8s`).toBe(true);
   });
 
   test('VM created from template with dedicated resources starts with CPU pinning enabled', async ({
-    k8sClient,
+    apiClient,
     pageCommons,
     vmListPage,
     vmDetailPage,
@@ -257,7 +245,7 @@ test.describe.serial(SUITE_TEMPLATE_LIFECYCLE, { tag: [T1_TAG, '@tier1-templates
     const vmName = utils.generateRandomVmName('vm-dedicated');
 
     await setupTemplateFromResource(
-      k8sClient,
+      apiClient,
       'vm-source-tpl',
       {
         name: templateName,
@@ -267,15 +255,15 @@ test.describe.serial(SUITE_TEMPLATE_LIFECYCLE, { tag: [T1_TAG, '@tier1-templates
       utils,
     );
 
-    const templateExists = await k8sClient.verifyTemplateCreated(templateName, sharedNs);
+    const templateExists = await apiClient.verifyTemplateCreated(templateName, sharedNs);
     expect
       .soft(templateExists.exists, `Template ${templateName} should be created for test setup`)
       .toBe(true);
 
-    await k8sClient.createVmFromTemplate(templateName, vmName, sharedNs, sharedNs, true);
-    k8sClient.trackResource('VirtualMachine', vmName, sharedNs);
+    await apiClient.createVmFromTemplate(templateName, vmName, sharedNs, sharedNs, true);
+    apiClient.trackResource('VirtualMachine', vmName, sharedNs);
 
-    const k8sVerifyResult = await k8sClient.verifyVmCreated(
+    const k8sVerifyResult = await apiClient.verifyVmCreated(
       vmName,
       sharedNs,
       utils.TestTimeouts.VM_BOOTUP,
@@ -312,7 +300,7 @@ test.describe.serial(SUITE_TEMPLATE_LIFECYCLE, { tag: [T1_TAG, '@tier1-templates
   });
 
   test('User template can be deleted via the UI and is removed from the list', async ({
-    k8sClient,
+    apiClient,
     pageCommons,
     templatesPage,
     utils,
@@ -324,7 +312,7 @@ test.describe.serial(SUITE_TEMPLATE_LIFECYCLE, { tag: [T1_TAG, '@tier1-templates
     const templateName = utils.generateRandomTemplateName('delete-tpl');
 
     await setupTemplateFromResource(
-      k8sClient,
+      apiClient,
       'delete-tpl',
       {
         name: templateName,
@@ -334,7 +322,7 @@ test.describe.serial(SUITE_TEMPLATE_LIFECYCLE, { tag: [T1_TAG, '@tier1-templates
       utils,
     );
 
-    const templateExists = await k8sClient.verifyTemplateCreated(templateName, sharedNs);
+    const templateExists = await apiClient.verifyTemplateCreated(templateName, sharedNs);
     expect
       .soft(templateExists.exists, `Template ${templateName} should be created for test setup`)
       .toBe(true);
@@ -352,7 +340,7 @@ test.describe.serial(SUITE_TEMPLATE_LIFECYCLE, { tag: [T1_TAG, '@tier1-templates
       .toBe(true);
 
     const k8sDeleteResult = await verifyTemplateDeletedFromCluster(
-      k8sClient,
+      apiClient,
       templateName,
       sharedNs,
       utils,

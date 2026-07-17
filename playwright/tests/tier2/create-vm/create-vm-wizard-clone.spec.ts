@@ -10,7 +10,7 @@ test.describe(
   { tag: [T2_TAG, '@catalog-wizard', ADMIN_ONLY_TAG] },
   () => {
     test('Clone wizard selects a source VM, creates a clone, and the clone reaches Running state', async ({
-      k8sClient,
+      apiClient,
       vmTreePage,
       vmWizardNavigationPage,
       vmWizardComputePage,
@@ -23,20 +23,20 @@ test.describe(
         tags: [T2_TAG],
       });
 
-      const cloneNs = await setupTestNamespace(k8sClient, 'wizard-clone');
+      const cloneNs = await setupTestNamespace(apiClient, 'wizard-clone');
       const sourceVmName = utils.generateRandomVmName('clone-src');
 
       await test.step('Precondition: Create source VM via K8s API', async () => {
-        await k8sClient.createVmFromTemplate(
+        await apiClient.createVmFromTemplate(
           TEMPLATE_METADATA_NAMES.RHEL9,
           sourceVmName,
           cloneNs,
           'openshift',
           true,
         );
-        k8sClient.trackResource('VirtualMachine', sourceVmName, cloneNs);
+        apiClient.trackResource('VirtualMachine', sourceVmName, cloneNs);
         await utils.waitForVirtualMachineReady(
-          k8sClient,
+          apiClient,
           sourceVmName,
           cloneNs,
           utils.TestTimeouts.VM_BOOTUP,
@@ -101,7 +101,7 @@ test.describe(
           .soft(createButtonText, 'Create button should say "Clone VirtualMachine"')
           .toContain('Clone');
 
-        k8sClient.trackResource('VirtualMachine', cloneVmName, cloneNs);
+        apiClient.trackResource('VirtualMachine', cloneVmName, cloneNs);
         await vmWizardNavigationPage.clickCreateVm();
         const redirected = await vmWizardNavigationPage.verifyRedirectedToVmDetails();
         expect(redirected, 'Should redirect to VM details after cloning').toBe(true);
@@ -110,9 +110,9 @@ test.describe(
       await test.step('Verify clone VM exists and reaches Running state', async () => {
         const urlCloneName = await vmWizardNavigationPage.getCreatedVmNameFromUrl();
         if (urlCloneName) cloneVmName = urlCloneName;
-        k8sClient.trackResource('VirtualMachine', cloneVmName, cloneNs);
+        apiClient.trackResource('VirtualMachine', cloneVmName, cloneNs);
 
-        const result = await k8sClient.verifyVmCreated(
+        const result = await apiClient.verifyVmCreated(
           cloneVmName,
           cloneNs,
           utils.TestTimeouts.VM_BOOTUP,

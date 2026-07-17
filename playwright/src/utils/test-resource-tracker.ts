@@ -5,6 +5,7 @@
 
 export type TrackedResourceType =
   | 'ConfigMap'
+  | 'DataImportCron'
   | 'DataSource'
   | 'DataVolume'
   | 'ManifestWork'
@@ -47,6 +48,13 @@ const RESOURCE_TYPE_DEFINITIONS: Record<
     apiGroup: '',
     apiVersion: 'v1',
     plural: 'configmaps',
+    isClusterScoped: false,
+  },
+  DataImportCron: {
+    type: 'DataImportCron',
+    apiGroup: 'cdi.kubevirt.io',
+    apiVersion: 'v1beta1',
+    plural: 'dataimportcrons',
     isClusterScoped: false,
   },
   DataSource: {
@@ -218,6 +226,7 @@ export class TestResourceTracker {
       // Second: VMs (may have associated resources)
       'VirtualMachine',
       // Third: Storage resources
+      'DataImportCron',
       'DataVolume',
       'DataSource',
       'PersistentVolumeClaim',
@@ -425,6 +434,10 @@ export class TestResourceTracker {
 
   trackConfigMap(name: string, namespace: string, metadata?: Record<string, unknown>): void {
     this.track('ConfigMap', name, namespace, metadata);
+  }
+
+  trackDataImportCron(name: string, namespace: string, metadata?: Record<string, unknown>): void {
+    this.track('DataImportCron', name, namespace, metadata);
   }
 
   trackDataSource(name: string, namespace: string, metadata?: Record<string, unknown>): void {
