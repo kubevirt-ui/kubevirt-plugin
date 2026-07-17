@@ -22,6 +22,12 @@ on:
 permissions:
   contents: read
   pull-requests: write
+  # actions: read -- listJobsForWorkflowRun, to find this job's own
+  # check-run. checks: write -- updating that check-run's output. Neither
+  # is subject to the fork-PR token restriction, and pull_request_target
+  # already gets a non-restricted token regardless -- no bot token needed.
+  actions: read
+  checks: write
 
 jobs:
   sync-auto-merge:
@@ -139,6 +145,38 @@ jobs:
                   ? 'PR carries lgtm+approved with no hold/do-not-merge label.'
                   : reasons.map((r) => `${r.short} -- ${r.long}`).join(' | '),
             );
+
+      # checks.update() on this job's own already-existing check-run (found
+      # via listJobsForWorkflowRun, matched by this job's name) -- not
+      # checks.create(), so it stays correctly attached to this workflow run
+      # instead of repeating the "wrong check suite" grouping bug described
+      # above. Only touches output.title/summary; GitHub still manages the
+      # check-run's own status/conclusion automatically as this job runs.
+      # continue-on-error: cosmetic only -- a failure here must not affect
+      # the real eligibility gate below.
+      - name: Update Merge Gate check-run with the specific reason
+        continue-on-error: true
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const { data: { jobs } } = await github.rest.actions.listJobsForWorkflowRun({
+              ...context.repo,
+              run_id: context.runId,
+            });
+            const job = jobs.find((j) => j.name === 'Merge Gate');
+            if (!job?.check_run_url) {
+              core.warning('Could not find this job\'s own check-run -- merge box row keeps the generic "Failing/Successful after Xs" text.');
+              return;
+            }
+            const checkRunId = Number(job.check_run_url.split('/').pop());
+            await github.rest.checks.update({
+              ...context.repo,
+              check_run_id: checkRunId,
+              output: {
+                title: '${{ steps.eligibility.outputs.title }}',
+                summary: '${{ steps.eligibility.outputs.summary }}',
+              },
+            });
 
       # enablePullRequestAutoMerge/disablePullRequestAutoMerge reject the
       # default GITHUB_TOKEN with "Resource not accessible by integration"

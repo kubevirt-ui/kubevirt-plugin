@@ -153,18 +153,22 @@ jobs:
       # processes, regardless of should_mark -- that output only decides
       # whether the *check-run* is touched (e.g. left alone while held, or
       # while a real run is already in flight), not whether the label is
-      # still valid. Unconditional here, unlike "Mark check stale" above.
-      # Shared with hot-cluster-e2e-pr-gate.yml via clear-e2e-result-labels
-      # (a composite action's steps run inline, so no new check appears in
-      # the merge box).
+      # still valid. if: always() so an earlier failure in this same job
+      # (e.g. "Determine whether to (re-)mark this PR stale" or "Mark check
+      # stale" erroring) doesn't also skip this unrelated cleanup -- it only
+      # needs matrix.pr_number, not any output from those steps. Shared with
+      # hot-cluster-e2e-pr-gate.yml via clear-e2e-result-labels (a composite
+      # action's steps run inline, so no new check appears in the merge box).
       - name: Generate bot token
         id: bot-token
+        if: always()
         uses: ./.github/actions/create-bot-token
         with:
           app-id: ${{ secrets.BOT_APP_ID }}
           private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
 
       - name: Clear stale e2e-passed/e2e-failed
+        if: always()
         continue-on-error: true
         uses: ./.github/actions/clear-e2e-result-labels
         with:
