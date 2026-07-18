@@ -63,7 +63,6 @@ export const GracePeriodInput: FC<GracePeriodInputProps> = ({
                     setGracePeriodSeconds(isEmpty(value) ? null : parseInt(value))
                   }
                   aria-label={t('seconds')}
-                  data-test="grace-period-seconds-input"
                   min={0}
                   type="number"
                   value={gracePeriodSeconds}

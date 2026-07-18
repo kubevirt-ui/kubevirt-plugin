@@ -36,7 +36,7 @@ const DiskInterfaceSelect: FC<DiskInterfaceSelectProps> = ({ isVMRunning }) => {
 
   return (
     <FormGroup fieldId="disk-interface" isRequired label={t('Interface')}>
-      <div data-test-id="disk-interface-select">
+      <div>
         <FormPFSelect
           className="disk-interface-select"
           onSelect={(_, val) => setValue(`disk.${diskType}.bus`, val as string)}
@@ -51,7 +51,7 @@ const DiskInterfaceSelect: FC<DiskInterfaceSelectProps> = ({ isVMRunning }) => {
               (isVMRunning && id === InterfaceTypes.SATA);
             return (
               <SelectOption
-                data-test-id={`disk-interface-select-${id}`}
+                data-test={`disk-interface-select-${id}`}
                 description={t(description)}
                 isDisabled={isDisabled}
                 key={id}

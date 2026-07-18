@@ -1,8 +1,8 @@
 import React, { FC, ReactNode, useState } from 'react';
 
-import { MenuToggleProps, Select, SelectList, SelectProps } from '@patternfly/react-core';
+import { Select, SelectList, SelectProps } from '@patternfly/react-core';
 
-import SelectToggle from '../toggles/SelectToggle';
+import SelectToggle, { MenuTogglePropsWithTestId } from '../toggles/SelectToggle';
 
 import './FormPFSelect.scss';
 
@@ -12,7 +12,7 @@ type FormPFSelectProps = Omit<SelectProps, 'isOpen' | 'toggle'> & {
   isDisabled?: boolean;
   placeholder?: string;
   selectedLabel?: any;
-  toggleProps?: MenuToggleProps;
+  toggleProps?: MenuTogglePropsWithTestId;
 };
 
 /**

@@ -25,7 +25,6 @@ const PVCOwnerWarning: FC<PVCOwnerWarningProps> = ({ cluster, namespace, pvc }) 
         { vmOwnerName },
       )}
       className="pf-v6-u-mt-sm"
-      data-test="pvc-owner-warning"
       isInline
       isPlain
       variant={AlertVariant.warning}

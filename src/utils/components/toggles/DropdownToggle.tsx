@@ -1,11 +1,13 @@
 import React, { Ref } from 'react';
 
-import { MenuToggle, MenuToggleElement, MenuToggleProps } from '@patternfly/react-core';
+import { MenuToggle, MenuToggleElement } from '@patternfly/react-core';
+
+import { MenuTogglePropsWithTestId } from './SelectToggle';
 
 const DropdownToggle =
-  ({ children, ...props }: MenuToggleProps) =>
+  ({ children, 'data-test': dataTestId, ...props }: MenuTogglePropsWithTestId) =>
   (toggleRef: Ref<MenuToggleElement>) => (
-    <MenuToggle ref={toggleRef} {...props}>
+    <MenuToggle data-test={dataTestId} ref={toggleRef} {...props}>
       {children}
     </MenuToggle>
   );

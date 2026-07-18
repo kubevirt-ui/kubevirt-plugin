@@ -26,7 +26,7 @@ const NetworkInterfaceLinkState: FC<NetworkInterfaceLinkStateProps> = ({
 
   return (
     <FormGroup className="form-group-margin" fieldId="link-state" label={t('Link state')}>
-      <div data-test-id="link-state-select">
+      <div>
         <FormPFSelect
           isDisabled={isDisabled}
           onSelect={handleChange}
@@ -35,7 +35,7 @@ const NetworkInterfaceLinkState: FC<NetworkInterfaceLinkStateProps> = ({
           toggleProps={{ isFullWidth: true }}
         >
           {[NetworkInterfaceState.DOWN, NetworkInterfaceState.UP].map((state) => (
-            <SelectOption data-test-id={`link-state-select-${state}`} key={state} value={state}>
+            <SelectOption data-test={`link-state-select-${state}`} key={state} value={state}>
               {describeNetworkState(t, state)}
             </SelectOption>
           ))}

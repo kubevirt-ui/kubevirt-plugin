@@ -65,7 +65,6 @@ const EnvironmentEditor: FC<EnvironmentEditorProps> = ({
         <Tooltip content={t('Remove')}>
           <Button
             className="pairs-list__span-btns"
-            data-test-id="pairs-list__delete-from-btn"
             onClick={() => onRemove(diskName)}
             variant={ButtonVariant.plain}
           >

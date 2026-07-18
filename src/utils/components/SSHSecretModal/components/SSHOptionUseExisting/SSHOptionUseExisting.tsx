@@ -121,7 +121,6 @@ const SSHOptionUseExisting: FC<SSHOptionUseExistingProps> = ({
                 value: project,
               }))}
               className="ssh-use-existing__form-group--project"
-              data-test="ssh-use-existing-project"
               placeholder={t('Select project')}
               selected={selectedProject}
               setSelected={onSelectProject}
@@ -132,7 +131,6 @@ const SSHOptionUseExisting: FC<SSHOptionUseExistingProps> = ({
         <GridItem span={6}>
           <FormGroup
             className="ssh-use-existing__form-group--secret"
-            data-test="ssh-use-existing-secret"
             fieldId="secret"
             label={t('Public SSH key')}
           >

@@ -31,7 +31,7 @@ const NetworkInterfaceNetworkSelect: FC<NetworkInterfaceNetworkSelectProps> = (p
       label={t('Network')}
       labelHelp={<NetworkSelectHelperPopover />}
     >
-      <div data-test-id="network-attachment-definition-select">
+      <div data-test="network-attachment-definition-select">
         <SelectTypeahead
           addOption={(value) => {
             const hasErrors = validators

@@ -21,7 +21,12 @@ export const BootOrderEmptyState: FC<BootOrderEmptyProps> = ({
   onClick,
   title,
 }) => (
-  <EmptyState headingLevel="h5" titleText={<>{title}</>} variant={EmptyStateVariant.full}>
+  <EmptyState
+    data-test="empty-state"
+    headingLevel="h5"
+    titleText={<>{title}</>}
+    variant={EmptyStateVariant.full}
+  >
     <EmptyStateBody>{message}</EmptyStateBody>
     <EmptyStateFooter>
       <EmptyStateActions>

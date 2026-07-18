@@ -24,7 +24,7 @@ const DescriptionItemName: FC<DescriptionItemNameProps> = ({ label, model, resou
         'Name must be unique within a namespace. Is required when creating resources, although some resources may allow a client to request the generation of an appropriate name automatically. Name is primarily intended for creation idempotence and configuration definition. Cannot be updated.',
       )}
       breadcrumb={`${label ?? model.label}.metadata.name`}
-      data-test-id={`${name}-name`}
+      data-test={`${name}-name`}
       descriptionData={name}
       descriptionHeader={t('Name')}
       isPopover

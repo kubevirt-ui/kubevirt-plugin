@@ -10,7 +10,7 @@ const CatalogOnboardingPopover: FC = () => {
   const { t } = useKubevirtTranslation();
 
   const triggerElement = document.querySelector<HTMLElement>(
-    '[data-test-id="virtualmachines-nav-item"]',
+    '[data-test="virtualmachines-nav-item"]',
   );
 
   return (

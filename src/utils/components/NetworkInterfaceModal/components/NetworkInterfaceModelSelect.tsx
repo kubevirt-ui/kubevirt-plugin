@@ -41,7 +41,7 @@ const NetworkInterfaceModelSelect: FC<NetworkInterfaceModelSelectProps> = ({
 
   return (
     <FormGroup fieldId="model" label={t('Model')}>
-      <div data-test-id="model-select">
+      <div data-test="model-select">
         <FormPFSelect
           onSelect={handleChange}
           selected={interfaceModel}
@@ -50,7 +50,7 @@ const NetworkInterfaceModelSelect: FC<NetworkInterfaceModelSelectProps> = ({
         >
           {Object.values(interfaceModelOptions)?.map(({ description, id, name }) => (
             <SelectOption
-              data-test-id={`model-select-${id}`}
+              data-test={`model-select-${id}`}
               description={description}
               key={id}
               value={id}

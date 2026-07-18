@@ -64,7 +64,7 @@ const NetworkInterfaceTypeSelect: FC<NetworkInterfaceTypeSelectProps> = ({
 
   return (
     <FormGroup fieldId="type" label={t('Type')}>
-      <div data-test-id="network-interface-type-select">
+      <div data-test="network-interface-type-select">
         <FormPFSelect
           onSelect={handleChange}
           selected={interfaceType}
@@ -74,7 +74,7 @@ const NetworkInterfaceTypeSelect: FC<NetworkInterfaceTypeSelectProps> = ({
             ?.filter(({ allowOption }) => allowOption)
             ?.map(({ description, id, name }) => (
               <SelectOption
-                data-test-id={`network-interface-type-select-${id}`}
+                data-test={`network-interface-type-select-${id}`}
                 description={description}
                 key={id}
                 value={id}

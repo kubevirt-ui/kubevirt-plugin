@@ -25,7 +25,7 @@ type DescriptionItemProps = {
   bodyContent?: ReactNode;
   breadcrumb?: string;
   className?: string;
-  'data-test-id'?: string;
+  'data-test'?: string;
   descriptionData: any;
   descriptionHeader?: ReactNode;
   isDisabled?: boolean;
@@ -48,7 +48,7 @@ const DescriptionItem: FC<DescriptionItemProps> = ({
   bodyContent,
   breadcrumb,
   className,
-  'data-test-id': testId,
+  'data-test': testId,
   descriptionData,
   descriptionHeader,
   isDisabled,
@@ -128,7 +128,7 @@ const DescriptionItem: FC<DescriptionItemProps> = ({
           {isEdit && showEditOnTitle && (
             <FlexItem>
               <Button
-                data-test-id={`${testId}-edit`}
+                ouiaId={`${testId}-edit`}
                 icon={<PencilAltIcon />}
                 iconPosition="end"
                 isDisabled={isDisabled}
@@ -146,7 +146,7 @@ const DescriptionItem: FC<DescriptionItemProps> = ({
 
       <DescriptionListDescription
         className={classNames({ 'co-editable-label-group': isLabelEditor })}
-        data-test-id={testId}
+        data-test={isEdit && !showEditOnTitle ? undefined : testId}
       >
         {subTitle && <div className="pf-v6-c-description-list__text pf-v6-u-my-sm">{subTitle}</div>}
         {description}

@@ -58,10 +58,10 @@ const NetworkInterfacePasst: FC<NetworkInterfacePasstProps> = ({
       fieldId="passt-checkbox"
       label={t('Binding')}
     >
-      <div data-test-id="network-attachment-definition-select">
+      <div data-test="network-attachment-definition-select">
         <Select
           toggle={SelectToggle({
-            'data-test-id': 'source-type-select',
+            'data-test': 'source-type-select',
             isExpanded: isOpen,
             isFullWidth: true,
             onClick: onToggle,

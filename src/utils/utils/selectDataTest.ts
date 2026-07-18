@@ -5,7 +5,9 @@ export const getSelectDataTestProps = (dataTest?: string) => {
     return {};
   }
 
-  const toggleProps = { 'data-test': `${dataTest}-toggle` } as MenuToggleProps;
+  const toggleProps = {
+    'data-test': `${dataTest}-toggle`,
+  } as MenuToggleProps;
 
   return {
     'data-test': `${dataTest}-select`,

@@ -79,7 +79,7 @@ const DiskSourceUploadPVC: FC<DiskSourceUploadPVCProps> = ({
               }}
               allowEditingUploadedText={false}
               browseButtonText={t('Upload')}
-              data-test-id={diskSourceUploadFieldID}
+              data-test={diskSourceUploadFieldID}
               filename={uploadFilename}
               filenamePlaceholder={t('Drag and drop an image or upload one')}
               id="simple-file"

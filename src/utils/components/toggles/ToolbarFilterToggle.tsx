@@ -12,6 +12,7 @@ import {
 
 type ToolbarFilterToggleProps = {
   badgeNumber?: number;
+  'data-test'?: string;
   isDisabled?: boolean;
   isExpanded: boolean;
   onClick: () => void;
@@ -24,6 +25,7 @@ type ToolbarFilterToggleProps = {
 
 const ToolbarFilterToggle = ({
   badgeNumber,
+  'data-test': dataTestId,
   isDisabled = false,
   isExpanded,
   onClick,
@@ -44,6 +46,7 @@ const ToolbarFilterToggle = ({
             <Badge isRead>{badgeNumber || selectedValues.length || t('All')}</Badge>
           ) : null
         }
+        data-test={dataTestId}
         isDisabled={isDisabled}
         isExpanded={isExpanded}
         onClick={onClick}

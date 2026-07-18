@@ -86,7 +86,7 @@ const SectionWithSwitch: FC<SectionWithSwitchProps> = ({
         {children}{' '}
         <Switch
           className={isLoading && 'kv-cursor--loading'}
-          data-test-id={dataTestID}
+          ouiaId={dataTestID}
           isChecked={switchIsOn}
           isDisabled={isDisabled}
           onChange={(_, checked: boolean) => turnOnSwitch(checked)}

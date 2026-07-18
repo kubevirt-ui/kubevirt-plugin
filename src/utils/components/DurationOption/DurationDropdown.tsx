@@ -26,7 +26,6 @@ const DurationDropdown: FC<DurationDropdownProps> = ({ selectedDuration, selectH
   const selected = t(DurationOption.fromString(selectedDuration)?.getDropdownLabel());
   return (
     <Select
-      data-test-id="duration-select-dropdown"
       isOpen={isOpen}
       isScrollable
       onOpenChange={setIsOpen}
@@ -47,7 +46,7 @@ const DurationDropdown: FC<DurationDropdownProps> = ({ selectedDuration, selectH
             const durationValue = durationOption?.getValue() || '';
 
             return (
-              <SelectOption data-test-id={durationValue} key={durationValue} value={dropdownLabel}>
+              <SelectOption data-test={durationValue} key={durationValue} value={dropdownLabel}>
                 {t(dropdownLabel)}
               </SelectOption>
             );

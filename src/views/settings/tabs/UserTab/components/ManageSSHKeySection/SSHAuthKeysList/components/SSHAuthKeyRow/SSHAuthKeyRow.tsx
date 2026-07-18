@@ -86,7 +86,7 @@ const SSHAuthKeyRow: FC<SSHAuthKeyRowProps> = ({
               value: opt,
             }))}
             toggleProps={{
-              'data-test-id': 'select-project-toggle',
+              'data-test': 'select-project-toggle',
               isFullWidth: true,
             }}
             placeholder={t('Select project')}

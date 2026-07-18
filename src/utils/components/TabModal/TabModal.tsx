@@ -116,7 +116,7 @@ const TabModal: TabModalFC = memo(
     return (
       <Modal
         className="ocs-modal"
-        data-test="dialog-modal"
+        ouiaId="dialog-modal"
         id="tab-modal"
         isOpen={isOpen}
         onClose={closeModal}

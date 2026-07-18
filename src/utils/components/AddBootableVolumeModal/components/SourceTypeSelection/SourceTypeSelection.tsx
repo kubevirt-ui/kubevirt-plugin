@@ -64,7 +64,7 @@ const SourceTypeSelection: FC<SourceTypeSelectionProps> = ({
     <FormGroup fieldId="source-type" label={t('Source type')}>
       <Select
         toggle={SelectToggle({
-          'data-test-id': 'source-type-select',
+          'data-test': 'source-type-select',
           isDisabled,
           isExpanded: isOpen,
           isFullWidth: true,
@@ -83,7 +83,6 @@ const SourceTypeSelection: FC<SourceTypeSelectionProps> = ({
             {...(!canUploadImage && {
               description: getNoPermissionTooltipContent(t),
             })}
-            data-test-id="upload-volume"
           >
             {t(optionsValueLabelMapper[DROPDOWN_FORM_SELECTION.UPLOAD_VOLUME])}
           </SelectOption>
@@ -91,7 +90,7 @@ const SourceTypeSelection: FC<SourceTypeSelectionProps> = ({
         <Divider />
         <SelectGroup label={t('Use existing')}>
           <SelectOption
-            data-test-id="use-existing-volume"
+            data-test="use-existing-volume"
             description={t('Use volume already available on the cluster')}
             isDisabled={!canCreatePVC}
             value={DROPDOWN_FORM_SELECTION.USE_EXISTING_PVC}
@@ -99,7 +98,6 @@ const SourceTypeSelection: FC<SourceTypeSelectionProps> = ({
             {t(optionsValueLabelMapper[DROPDOWN_FORM_SELECTION.USE_EXISTING_PVC])}
           </SelectOption>
           <SelectOption
-            data-test-id="use-snapshot"
             isDisabled={!canCreateSnapshots}
             value={DROPDOWN_FORM_SELECTION.USE_SNAPSHOT}
           >
@@ -109,7 +107,7 @@ const SourceTypeSelection: FC<SourceTypeSelectionProps> = ({
         <Divider />
         <SelectGroup label={t('Import from')}>
           <SelectOption
-            data-test-id="use-registry"
+            data-test="use-registry"
             description={t('Content from container registry')}
             isDisabled={!canCreateDS}
             value={DROPDOWN_FORM_SELECTION.USE_REGISTRY}
@@ -117,7 +115,7 @@ const SourceTypeSelection: FC<SourceTypeSelectionProps> = ({
             {t(optionsValueLabelMapper[DROPDOWN_FORM_SELECTION.USE_REGISTRY])}
           </SelectOption>
           <SelectOption
-            data-test-id="use-http"
+            data-test="use-http"
             description={t('Import content via URL (HTTP or HTTPS endpoint).')}
             isDisabled={!canCreateDS}
             value={DROPDOWN_FORM_SELECTION.USE_HTTP}

@@ -9,7 +9,7 @@ const SysprepInfo: FC = () => {
   const { t } = useKubevirtTranslation();
 
   return (
-    <div data-test="sysprep-info">
+    <div>
       <Stack>
         <StackItem>
           <Content className="kv-sysprep-info" component={ContentVariants.p}>

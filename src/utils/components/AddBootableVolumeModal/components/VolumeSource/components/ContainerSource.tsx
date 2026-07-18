@@ -51,7 +51,7 @@ const ContainerSource: FC<ContainerSourceProps> = ({
         <FormTextInput
           {...(register ? register(`${testId}-containerImage`, { required: true }) : {})}
           aria-label={t('Container image')}
-          data-test-id={`${testId}-container-source-input`}
+          data-test={`${testId}-container-source-input`}
           id={`${testId}-${selectedSourceType}`}
           onChange={onInputValueChange}
           type="text"
@@ -75,7 +75,7 @@ const ContainerSource: FC<ContainerSourceProps> = ({
             errors?.[`${testId}-username`] ? ValidatedOptions.error : ValidatedOptions.default
           }
           aria-label={t('Username')}
-          data-test-id={`${testId}-container-source-username`}
+          data-test={`${testId}-container-source-username`}
           id={`${testId}-${selectedSourceType}-username`}
           onChange={(e) => handleCredentialsChange(e, 'username')}
           type="text"
@@ -93,7 +93,7 @@ const ContainerSource: FC<ContainerSourceProps> = ({
             errors?.[`${testId}-password`] ? ValidatedOptions.error : ValidatedOptions.default
           }
           aria-label={t('Password')}
-          data-test-id={`${testId}-container-source-password`}
+          data-test={`${testId}-container-source-password`}
           id={`${testId}-${selectedSourceType}`}
           onChange={(e) => handleCredentialsChange(e, 'password')}
           type="text"

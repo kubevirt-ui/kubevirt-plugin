@@ -232,7 +232,7 @@ const Dropdown = <T,>({
             activeItemId={selectedItem}
             className={`${config.cssPrefix}__menu`}
             containsFlyout
-            data-test={config.dataTestId}
+            ouiaId={config.dataTestId}
             onActionClick={onActionClick}
             onSelect={onSelect}
             ref={menuRef}

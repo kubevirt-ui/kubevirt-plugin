@@ -70,7 +70,7 @@ const RowFilters: FC<RowFiltersProps> = ({
             {acc}
           </ToolbarFilter>
         ),
-        <div data-test-id="filter-dropdown-toggle">
+        <div data-test="filter-dropdown-toggle">
           <FormPFSelect
             toggleProps={{
               icon: (

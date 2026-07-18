@@ -43,7 +43,7 @@ export const generateRows = <TData, TCallbacks = undefined>({
         cell: (
           <Checkbox
             aria-label={`Select row ${sanitizedRowId}`}
-            data-test={`select-row-${sanitizedRowId}`}
+            ouiaId={`select-row-${sanitizedRowId}`}
             id={`select-row-${sanitizedRowId}`}
             isChecked={isSelected}
             onChange={() => onRowSelect?.(row, index)}

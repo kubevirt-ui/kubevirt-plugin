@@ -14,6 +14,7 @@ import {
 
 type CheckboxSelectProps = {
   badgeNumber?: number;
+  dataTestId?: string;
   isToggleDisabled?: boolean;
   onSelect?: SelectProps['onSelect'];
   options?: SelectOptionProps[];
@@ -26,6 +27,7 @@ type CheckboxSelectProps = {
 
 const CheckboxSelect: FC<CheckboxSelectProps> = ({
   badgeNumber,
+  dataTestId,
   isToggleDisabled = false,
   onSelect,
   options,
@@ -40,6 +42,7 @@ const CheckboxSelect: FC<CheckboxSelectProps> = ({
 
   const toggle = ToolbarFilterToggle({
     badgeNumber,
+    'data-test': dataTestId,
     isDisabled: isToggleDisabled,
     isExpanded: isOpen,
     onClick: () => setIsOpen((prev) => !prev),

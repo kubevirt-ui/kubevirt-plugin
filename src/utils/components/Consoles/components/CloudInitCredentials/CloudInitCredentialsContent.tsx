@@ -29,14 +29,12 @@ const CloudInitCredentialsContent: FC<CloudInitCredentialsContentProps> = ({ vm 
       {users.map((user) => (
         <Flex className="cloud-init-credentials-user-pass" key={user.name}>
           <CloudInitCredentialsItem
-            button-data-test="username-show-hide-button"
             credentials={user?.name || ''}
             credentialTitle={t('User name')}
             hideCredentialText={t('Hide username')}
             showCredentialText={t('Show username')}
           />
           <CloudInitCredentialsItem
-            button-data-test="password-show-hide-button"
             credentials={user?.password || ''}
             credentialTitle={t('Password')}
             hideCredentialText={t('Hide password')}

@@ -24,7 +24,6 @@ export const PendingChangesAlert: FC<PendingChangesAlertProps> = ({
   return (
     <Alert
       className="pending-changes-alert"
-      data-test-id="vm-pending-changes-alert"
       isExpandable={isExpandable}
       isInline
       title={title || t('Pending changes')}

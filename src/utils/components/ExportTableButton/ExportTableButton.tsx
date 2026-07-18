@@ -53,7 +53,6 @@ const ExportTableButton = <TData, TCallbacks = undefined>({
       <Button
         aria-label={t('Export table data to CSV')}
         className={asToolbarItem ? undefined : 'kubevirt-table-toolbar-action'}
-        data-test="export-table-data"
         icon={<ExportIcon />}
         isAriaDisabled={disabled}
         onClick={handleExport}

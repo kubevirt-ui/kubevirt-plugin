@@ -43,7 +43,7 @@ const DiskTypeSelect: FC<DiskTypeSelectProps> = ({ isVMRunning }) => {
   const userHelpText = getDiskTypeHelperText(initialDiskTypeRef.current, isVMRunning);
 
   return (
-    <div data-test-id={DISKTYPE_SELECT_FIELDID}>
+    <div data-test={DISKTYPE_SELECT_FIELDID}>
       <FormGroup fieldId={DISKTYPE_SELECT_FIELDID} label={t('Type')}>
         <FormPFSelect
           onSelect={(_, val) => {
@@ -67,7 +67,7 @@ const DiskTypeSelect: FC<DiskTypeSelectProps> = ({ isVMRunning }) => {
         >
           {Object.values(diskTypes).map((type) => (
             <SelectOption
-              data-test-id={`${DISKTYPE_SELECT_FIELDID}-${type}`}
+              data-test={`${DISKTYPE_SELECT_FIELDID}-${type}`}
               isDisabled={shouldDisableOption(type)}
               key={type}
               value={type}

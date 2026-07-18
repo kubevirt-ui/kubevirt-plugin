@@ -31,7 +31,7 @@ const SelectCluster: FC<SelectClusterProps> = ({ selectedCluster, setSelectedClu
   return (
     <Select
       toggle={SelectToggle({
-        'data-test-id': 'cluster-name-select',
+        'data-test': 'cluster-name-select',
         isExpanded: isOpen,
         isFullWidth: true,
         onClick: onToggle,

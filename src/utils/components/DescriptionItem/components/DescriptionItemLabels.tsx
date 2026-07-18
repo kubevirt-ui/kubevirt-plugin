@@ -72,7 +72,7 @@ const DescriptionItemLabels: FC<DescriptionItemLabelsProps> = ({
       }
       breadcrumb={`${label ?? model.label}.metadata.labels`}
       className={className}
-      data-test-id={`${getName(resource)}-labels`}
+      data-test={`${getName(resource)}-labels`}
       descriptionHeader={descriptionHeader}
       isEdit={editable}
       isLabelEditor

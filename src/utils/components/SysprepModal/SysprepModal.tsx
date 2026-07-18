@@ -76,7 +76,6 @@ export const SysprepModal: FC<{
     >
       <div className="kv-sysprep-modal">
         <ExpandableSection
-          data-test-id="expandable-new-sysprep-section"
           isExpanded={creationSectionOpen}
           isIndented
           onToggle={(_event, val) => setCreationSection(val)}
@@ -90,7 +89,6 @@ export const SysprepModal: FC<{
           />
         </ExpandableSection>
         <ExpandableSection
-          data-test-id="expandable-new-sysprep-section"
           isExpanded={!creationSectionOpen}
           isIndented
           onToggle={() => setCreationSection(!creationSectionOpen)}

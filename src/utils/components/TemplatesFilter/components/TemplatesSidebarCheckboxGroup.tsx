@@ -16,10 +16,10 @@ const TemplatesSidebarCheckboxGroup: FC<TemplatesSidebarCheckboxGroupProps> = ({
   rowFilter,
   universalFilter: { isSelected, onSelect },
 }) => (
-  <Stack className={className} hasGutter>
+  <Stack className={className} data-test={`filter-category-${rowFilter.filterGroupName}`} hasGutter>
     <h5 className="pf-v6-u-text-color-subtle">{rowFilter.filterGroupName}</h5>
     {rowFilter.items.map((item: ExtendedRowFilterItem) => (
-      <StackItem key={item.id}>
+      <StackItem data-test={`${rowFilter.type}-${item.id}`} key={item.id}>
         <Checkbox
           id={`filter-${rowFilter.type}-${item.id}`}
           isChecked={isSelected(rowFilter.type, item.id)}

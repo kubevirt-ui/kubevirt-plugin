@@ -60,7 +60,7 @@ const StorageClassSelect: FC<StorageClassSelectProps> = ({
 
   return (
     <FormGroup fieldId="storage-class" label={t('StorageClass')}>
-      <div data-test-id="storage-class-select">
+      <div data-test="storage-class-select">
         {loaded ? (
           <InlineFilterSelect
             toggleProps={{

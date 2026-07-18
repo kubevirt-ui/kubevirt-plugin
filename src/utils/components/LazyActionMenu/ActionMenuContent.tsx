@@ -42,7 +42,7 @@ const SubMenuContent: FC<GroupMenuContentProps & { checkAccess: CheckAccess }> =
   <MenuItem
     flyoutMenu={
       <Menu containsFlyout>
-        <MenuContent data-test-id="action-items">
+        <MenuContent>
           <MenuList>
             <ActionMenuContent
               checkAccess={checkAccess}
@@ -53,7 +53,7 @@ const SubMenuContent: FC<GroupMenuContentProps & { checkAccess: CheckAccess }> =
         </MenuContent>
       </Menu>
     }
-    data-test-id={option.id}
+    data-test={option.id}
   >
     {option.label}
   </MenuItem>
