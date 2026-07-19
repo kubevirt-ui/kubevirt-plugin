@@ -4,10 +4,9 @@ import { AnnotationsModal } from '@kubevirt-utils/components/AnnotationsModal/An
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getAnnotations } from '@kubevirt-utils/resources/shared';
+import { isSystemKey } from '@kubevirt-utils/utils/labelValidation/labelValidation';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { Truncate } from '@patternfly/react-core';
-
-import { isSystemLabel } from '../utils/utils';
 
 import LabelsAnnotationsTable from './LabelsAnnotationsTable';
 
@@ -28,7 +27,7 @@ const AnnotationsTable: FC<AnnotationsTableProps> = ({
   const allAnnotations = useMemo(() => getAnnotations(resource, {}), [resource]);
   const entries = useMemo(() => Object.entries(allAnnotations), [allAnnotations]);
 
-  const canDelete = useCallback((key: string): boolean => !isSystemLabel(key), []);
+  const canDelete = useCallback((key: string): boolean => !isSystemKey(key), []);
 
   const onAdd = useCallback(
     (): void =>
