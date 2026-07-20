@@ -2,7 +2,6 @@ import React, { FC } from 'react';
 import { Link } from 'react-router-dom-v5-compat';
 
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
-import { ALL_NAMESPACES } from '@kubevirt-utils/hooks/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   MigMigration,
@@ -20,6 +19,7 @@ import {
   DescriptionListTerm,
 } from '@patternfly/react-core';
 import { CloseIcon } from '@patternfly/react-icons';
+import { getStorageMigrationsListUrl } from '../../../../storagemigrations/utils/urls';
 
 import useProgressMigrationMtc from './hooks/useProgressMigrationMtc';
 
@@ -41,9 +41,7 @@ const VirtualMachineMigrationStatusMtc: FC<VirtualMachineMigrationStatusMtcProps
   vmNamespace,
 }) => {
   const { t } = useKubevirtTranslation();
-  const storageMigrationsUrl = vmNamespace
-    ? `/k8s/ns/${vmNamespace}/storagemigrations`
-    : `/k8s/${ALL_NAMESPACES}/storagemigrations`;
+  const storageMigrationsUrl = getStorageMigrationsListUrl(vmNamespace);
 
   const {
     completedMigrationTimestamp,

@@ -194,6 +194,9 @@ const migrationSection = [
     type: 'console.navigation/section',
   } as EncodedExtension<NavSection>,
   {
+    flags: {
+      required: ['SHOW_MIGRATION_SECTION'],
+    },
     properties: {
       dataAttributes: {
         'data-quickstart-id': 'qs-nav-storagemigrations-virt-perspective',
@@ -201,8 +204,8 @@ const migrationSection = [
       },
       id: 'storagemigrations-virt-perspective',
       model: {
-        group: 'migration.openshift.io',
-        kind: 'MigPlan',
+        group: 'migrations.kubevirt.io',
+        kind: 'MultiNamespaceVirtualMachineStorageMigrationPlan',
         version: 'v1alpha1',
       },
       name: '%plugin__kubevirt-plugin~Storage migrations%',

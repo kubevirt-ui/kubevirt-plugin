@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom-v5-compat';
 
 import DeleteModal from '@kubevirt-utils/components/DeleteModal/DeleteModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
-import { ALL_NAMESPACES } from '@kubevirt-utils/hooks/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useNamespaceParam from '@kubevirt-utils/hooks/useNamespaceParam';
 import {
@@ -21,6 +20,7 @@ import {
   useK8sModel,
   useLabelsModal,
 } from '@openshift-console/dynamic-plugin-sdk';
+import { getStorageMigrationsListUrl } from '../utils/urls';
 
 const useStorageMigrationActions: ExtensionHook<
   Action[],
@@ -34,9 +34,7 @@ const useStorageMigrationActions: ExtensionHook<
   const model = isMigPlan ? MigPlanModel : MultiNamespaceVirtualMachineStorageMigrationPlanModel;
 
   const currentNamespace = useNamespaceParam();
-  const storageMigrationsRedirectUrl = currentNamespace
-    ? `/k8s/ns/${currentNamespace}/storagemigrations`
-    : `/k8s/${ALL_NAMESPACES}/storagemigrations`;
+  const storageMigrationsRedirectUrl = getStorageMigrationsListUrl(currentNamespace);
 
   const [, inFlight] = useK8sModel(
     modelToRef(MultiNamespaceVirtualMachineStorageMigrationPlanModel),

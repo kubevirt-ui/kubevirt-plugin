@@ -1,8 +1,8 @@
 import { EncodedExtension } from '@openshift/dynamic-plugin-sdk-webpack';
 import {
   FeatureFlagHookProvider,
-  HrefNavItem,
   NavSection,
+  ResourceNSNavItem,
   RoutePage,
 } from '@openshift-console/dynamic-plugin-sdk';
 import type { ConsolePluginBuildMetadata } from '@openshift-console/dynamic-plugin-sdk-webpack';
@@ -11,6 +11,12 @@ export const exposedModules: ConsolePluginBuildMetadata['exposedModules'] = {
   StorageMigrationList: './views/storagemigrations/list/StorageMigrationList.tsx',
   useStorageMigrationActionsProvider:
     './views/storagemigrations/actions/useStorageMigrationActions.tsx',
+};
+
+const multiNamespaceStorageMigrationPlanModel = {
+  group: 'migrations.kubevirt.io',
+  kind: 'MultiNamespaceVirtualMachineStorageMigrationPlan',
+  version: 'v1alpha1',
 };
 
 export const extensions: EncodedExtension[] = [
@@ -46,6 +52,14 @@ export const extensions: EncodedExtension[] = [
     type: 'console.page/route',
   } as EncodedExtension<RoutePage>,
   {
+    properties: {
+      component: { $codeRef: 'StorageMigrationList' },
+      model: multiNamespaceStorageMigrationPlanModel,
+      prefixNamespaced: true,
+    },
+    type: 'console.page/resource/list',
+  },
+  {
     flags: {
       required: ['SHOW_MIGRATION_SECTION'],
     },
@@ -54,22 +68,17 @@ export const extensions: EncodedExtension[] = [
         'data-quickstart-id': 'qs-nav-storagemigrations',
         'data-test-id': 'storagemigrations-nav-item',
       },
-      href: 'storagemigrations',
       id: 'storagemigrations',
+      model: multiNamespaceStorageMigrationPlanModel,
       name: '%plugin__kubevirt-plugin~Storage migrations%',
-      prefixNamespaced: true,
       section: 'migration',
     },
-    type: 'console.navigation/href',
-  } as EncodedExtension<HrefNavItem>,
+    type: 'console.navigation/resource-ns',
+  } as EncodedExtension<ResourceNSNavItem>,
 
   {
     properties: {
-      model: {
-        group: 'migrations.kubevirt.io',
-        kind: 'MultiNamespaceVirtualMachineStorageMigrationPlan',
-        version: 'v1alpha1',
-      },
+      model: multiNamespaceStorageMigrationPlanModel,
       provider: {
         $codeRef: 'useStorageMigrationActionsProvider',
       },
