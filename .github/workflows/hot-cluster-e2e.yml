@@ -519,18 +519,12 @@ jobs:
               fi
 
               if [[ -n "${TEST_FAILURE_SUMMARY}" ]]; then
-                FAIL_MSG="${FAIL_MSG}
-
----
-
-### Failed Tests
-
-${TEST_FAILURE_SUMMARY}"
+                # Keep --- off column 0 -- a bare --- line is a YAML document separator
+                # and breaks prettier/YAML parsing of this workflow file.
+                FAIL_MSG="${FAIL_MSG}"$'\n\n---\n\n### Failed Tests\n\n'"${TEST_FAILURE_SUMMARY}"
               fi
 
-              FAIL_MSG="${FAIL_MSG}
-
-See the [workflow run](${WORKFLOW_RUN_URL}) for full details, or comment \`/retest-e2e\` once fixed."
+              FAIL_MSG="${FAIL_MSG}"$'\n\n'"See the [workflow run](${WORKFLOW_RUN_URL}) for full details, or comment \`/retest-e2e\` once fixed."
 
               {
                 echo 'summary<<SUMMARY_DELIM'
