@@ -80,11 +80,19 @@ test.describe('Resource creation (gating)', { tag: [GATING_TAG, '@resource-creat
     apiClient.trackResource('VirtualMachine', vmName, testConfig.testNamespace);
 
     await vmTreePage.navigateToNamespaceVirtualMachinesViaUI(testConfig.testNamespace);
-    await vmListPage.clickCreateAndSelectOption('With YAML');
 
-    await vmListPage.page
-      .getByRole('heading', { name: 'Create VirtualMachine', level: 1 })
-      .waitFor({ state: 'visible', timeout: utils.TestTimeouts.UI_ELEMENT_VISIBILITY });
+    for (let attempt = 1; attempt <= 2; attempt++) {
+      try {
+        await vmListPage.clickCreateAndSelectOption('With YAML');
+        await vmListPage.page
+          .getByRole('heading', { name: 'Create VirtualMachine', level: 1 })
+          .waitFor({ state: 'visible', timeout: utils.TestTimeouts.UI_ELEMENT_VISIBILITY });
+        break;
+      } catch {
+        if (attempt === 2) throw new Error('YAML editor heading not visible after 2 attempts');
+        await vmTreePage.navigateToNamespaceVirtualMachinesViaUI(testConfig.testNamespace);
+      }
+    }
 
     await vmListPage.fillYamlEditor(vmYaml);
     await vmListPage.page.getByRole('button', { name: 'Create', exact: true }).click();

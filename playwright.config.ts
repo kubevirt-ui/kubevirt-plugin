@@ -84,6 +84,15 @@ export default defineConfig({
       use: migrationUse,
     },
 
+    // ── API contract tests (browserless, console proxy) ────────────────
+    {
+      fullyParallel: false,
+      name: 'API',
+      retries: 0,
+      testDir: './playwright/tests/api',
+      use: migrationUse,
+    },
+
     // ── Migration projects (use global setup/teardown) ───────────────
     {
       fullyParallel: true,

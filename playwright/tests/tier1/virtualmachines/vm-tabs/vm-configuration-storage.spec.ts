@@ -151,6 +151,17 @@ test.describe.serial(
       expect(diskVisible, 'Hotplugged disk should be visible on Configuration > Storage').toBe(
         true,
       );
+
+      const madePersistent = await vmDetailPage.makeDiskPersistent(diskName);
+      expect.soft(madePersistent, 'Make persistent action should succeed').toBe(true);
+
+      await expect
+        .poll(() => apiClient.isVmDiskPersistent(vmName, ns, diskName), {
+          timeout: 30_000,
+          intervals: [3_000],
+          message: 'Disk should be persistent after Make persistent action',
+        })
+        .toBe(true);
     });
   },
 );

@@ -15,6 +15,7 @@ Run Playwright tests, analyze failures, fix test code issues, and re-run until s
 | `tier1`       | Tier 1 tests (`npx playwright test --project=Tier1`)                  |
 | `tier2`       | Tier 2 tests (`npx playwright test --project=Tier2`)                  |
 | `settings`    | Settings tests (`npx playwright test --project=Settings`)             |
+| `api`         | API contract tests (`npx playwright test --project=API`)              |
 | `<file-path>` | Specific spec file (`npx playwright test <path>`)                     |
 | `<test-name>` | Specific test by name (`npx playwright test -g "<name>" --workers=1`) |
 
@@ -24,7 +25,7 @@ Run Playwright tests, analyze failures, fix test code issues, and re-run until s
 
 1. Verify the environment is configured:
    ```bash
-   echo "Console URL: $(grep -m1 '^WEB_CONSOLE_URL=' .env 2>/dev/null | cut -d= -f2- || echo 'not set')"
+   echo "Console URL: ${WEB_CONSOLE_URL:-not set}"
    ```
 2. Check for stale test namespaces (if `oc` is available):
    ```bash
@@ -186,6 +187,7 @@ Remaining failures: <list with classification>
 | Tier 1   | Single-resource CRUD lifecycle for each module; VM tab configuration; does NOT overlap gating                     | `tests/tier1/<feature>/` |
 | Tier 2   | Cross-module integration (e.g. BV → VM wizard, snapshot → clone); VM live/storage migration; multi-step workflows | `tests/tier2/<feature>/` |
 | Settings | Cluster and user settings                                                                                         | `tests/settings/`        |
+| API      | API contract tests — CRUD lifecycle and endpoint validation via `RequestContextClient` (no browser UI)            | `tests/api/`             |
 
 ### Current test file map
 
@@ -209,10 +211,27 @@ tests/
 │   ├── create-vm/                              # Clone wizard (clone existing VM)
 │   ├── migrations/                             # Live migration, storage migration
 │   └── virtualmachines/                        # Snapshots (take/restore/clone), VM clone
-└── settings/
-    ├── aaq-quotas.spec.ts                      # AAQ quota settings
-    ├── cluster-settings.spec.ts                # Cluster-level settings
-    └── user-settings.spec.ts                   # User preferences
+├── settings/
+│   ├── aaq-quotas.spec.ts                      # AAQ quota settings
+│   ├── cluster-settings.spec.ts                # Cluster-level settings
+│   └── user-settings.spec.ts                   # User preferences
+└── api/                                        # API contract tests (no browser UI)
+    ├── vm-vmi-lifecycle-api.spec.ts             # VM/VMI lifecycle (start/stop/restart/delete)
+    ├── vm-crud-api.spec.ts                      # VM CRUD operations
+    ├── vm-list-api.spec.ts                      # VM list endpoints
+    ├── vm-detail-api.spec.ts                    # VM detail page endpoints
+    ├── vm-migration-api.spec.ts                 # VMIM CRUD
+    ├── vm-snapshots-extended-api.spec.ts        # Snapshot/restore full lifecycle
+    ├── vm-save-as-template-api.spec.ts          # Save VM as template
+    ├── vm-folders-api.spec.ts                   # VM folder operations
+    ├── bootable-volumes-api.spec.ts             # BV read endpoints
+    ├── bootable-volumes-crud-api.spec.ts        # BV DataVolume/DataSource CRUD
+    ├── create-vm-api.spec.ts                    # VM creation page endpoints
+    ├── instance-types-crud-api.spec.ts          # Instance type CRUD
+    ├── migration-policies-crud-api.spec.ts      # Migration policy CRUD
+    ├── snapshots-crud-api.spec.ts               # Snapshot CRUD
+    ├── storage-migration-plan-crud-api.spec.ts  # Storage migration plan CRUD
+    └── templates-crud-api.spec.ts               # Template CRUD
 ```
 
 ## Project Structure Reference
@@ -223,7 +242,8 @@ playwright/
 │   ├── gating/                    # Gating specs (gating-fixture)
 │   ├── tier1/<feature>/           # Tier 1 specs (per-feature fixtures)
 │   ├── tier2/<feature>/           # Tier 2 specs (per-feature fixtures)
-│   └── settings/                  # Settings specs (settings-fixture)
+│   ├── settings/                  # Settings specs (settings-fixture)
+│   └── api/                       # API contract specs (api-test-fixture)
 ├── src/
 │   ├── components/                # UI components (extend BaseComponent)
 │   ├── page-objects/              # Page objects (extend BasePage/PageCommons)
@@ -234,7 +254,7 @@ playwright/
 │   ├── data-factories/            # Test data generators
 │   └── utils/                     # Env vars, test config, random names
 ├── project-dependencies/          # Global setup/teardown + rule engine
-├── playwright.config.ts           # Projects: Gating, Tier1, Tier2, Settings
+├── playwright.config.ts           # Projects: Gating, Tier1, Tier2, Settings, API
 ├── playwright-runner.sh           # Local runner script
 └── playwright-runner-hc-e2e.sh    # CI/hot-cluster runner script
 ```
@@ -252,4 +272,4 @@ playwright/
 - **Single process only** — use `--workers=N`, never concurrent test invocations
 - Report `product_bug` findings without modifying the test — the test is correct, the app is wrong
 - Always run `npm run check-types:playwright` after changes
-- **DO NOT commit or push** — the user handles git operations
+- **DO NOT commit, push, or create PRs** — never run `git commit`, `git push`, `gh pr create`, or any git write operation. The user handles all git operations manually. Only use git read commands (`git status`, `git diff`, `git log`) when needed for context.

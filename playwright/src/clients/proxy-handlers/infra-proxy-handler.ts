@@ -182,11 +182,12 @@ export class InfraProxyHandler {
   async isStorageMigrationAvailable(): Promise<boolean> {
     for (let attempt = 0; attempt < 2; attempt++) {
       try {
-        await this.ctx.listResources(
+        const result = await this.ctx.listResources(
           InfraProxyHandler._MIGRATION_GROUP,
           InfraProxyHandler._MIGRATION_VERSION,
           InfraProxyHandler._MIGRATION_PLAN_PLURAL,
         );
+        if (!result) throw new Error('listResources returned falsy');
         return true;
       } catch {
         if (attempt === 0) await new Promise((r) => setTimeout(r, 2_000));
