@@ -7,7 +7,6 @@ import {
   TemplateParameter,
   V1Template,
   VirtualMachineTemplateModel,
-  VirtualMachineTemplateRequestModel,
 } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -32,6 +31,7 @@ import {
   TEMPLATE_TYPE_BASE,
   TEMPLATE_TYPE_LABEL,
 } from './constants';
+import { generateParameterValueFromExpression } from './generateParameterValue';
 import { getTemplatePVCName, getTemplateVirtualMachineObject } from './selectors';
 
 // Only used for replacing parameters in the template, do not use for anything else
@@ -179,6 +179,23 @@ export const updateTemplate = async (template: Template) => {
   return result;
 };
 
+const generateVirtualMachineTemplateParameters = (
+  template: Template,
+  excludedParameters: TemplateParameter[],
+): (TemplateParameter | V1alpha1VirtualMachineTemplateSpecParameters)[] => {
+  const generatedParameters = (getParameters(template) ?? []).map((parameter) => {
+    if (parameter.generate === 'expression' && parameter.from && !parameter.value) {
+      return {
+        ...parameter,
+        value: generateParameterValueFromExpression(parameter.from),
+      };
+    }
+    return parameter;
+  });
+
+  return [...generatedParameters, ...excludedParameters];
+};
+
 export const createProcessedTemplate = <T extends Template>(
   template: T,
   cluster: string,
@@ -188,12 +205,29 @@ export const createProcessedTemplate = <T extends Template>(
   setError: (value: SetStateAction<Error>) => void,
   setLoading: (value: SetStateAction<boolean>) => void,
 ) => {
+  // VirtualMachineTemplateRequest creates a template from a VM — it is not a process API.
+  // Generate expression parameters client-side for VMTs (matches virt-template expression syntax).
+  if (isVirtualMachineTemplate(template)) {
+    try {
+      const mergedParameters = generateVirtualMachineTemplateParameters(
+        template,
+        excludedParameters,
+      );
+      setTemplateWithGeneratedValues(replaceTemplateParameters(template, mergedParameters));
+      setError(null);
+    } catch (apiError) {
+      setTemplateWithGeneratedValues(template);
+      setError(apiError instanceof Error ? apiError : new Error(String(apiError)));
+    } finally {
+      setLoading(false);
+    }
+    return;
+  }
+
   kubevirtK8sCreate<T>({
     cluster,
     data: template,
-    model: isOpenShiftTemplate(template)
-      ? ProcessedTemplatesModel
-      : VirtualMachineTemplateRequestModel,
+    model: ProcessedTemplatesModel,
     ns: namespace,
     queryParams: {
       dryRun: 'All',
