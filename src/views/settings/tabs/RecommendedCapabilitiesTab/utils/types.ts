@@ -62,3 +62,14 @@ export type UseInstallBundleReturn = {
   installResourcesLoaded: boolean;
   isInstalling: boolean;
 };
+
+export type CapabilityFilterValues = {
+  name: string;
+  status: string[];
+};
+
+export type CapabilitySelectionState = {
+  isSelected: (item: { id: string }) => boolean;
+  onSelect: (isSelecting: boolean, items?: { id: string } | { id: string }[]) => void;
+  selected: { id: string }[];
+};
