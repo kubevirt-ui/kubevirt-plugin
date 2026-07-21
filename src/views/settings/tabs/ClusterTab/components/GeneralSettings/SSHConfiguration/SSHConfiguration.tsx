@@ -19,6 +19,8 @@ import { useSettingsCluster } from '@settings/context/SettingsClusterContext';
 import ExpandSection from '@settings/ExpandSection/ExpandSection';
 import { CLUSTER_TAB_IDS } from '@settings/search/constants';
 
+import { getGeneralSettingsLabels } from '../consts/consts';
+
 type SSHConfigurationProps = { newBadge: boolean };
 
 const SSHConfiguration: FC<SSHConfigurationProps> = ({ newBadge }) => {
@@ -67,7 +69,7 @@ const SSHConfiguration: FC<SSHConfigurationProps> = ({ newBadge }) => {
   return (
     <ExpandSection
       searchItemId={CLUSTER_TAB_IDS.sshConfiguration}
-      toggleText={t('SSH configurations')}
+      toggleText={getGeneralSettingsLabels(t).sshConfigurations}
     >
       <Stack hasGutter>
         <SectionWithSwitch

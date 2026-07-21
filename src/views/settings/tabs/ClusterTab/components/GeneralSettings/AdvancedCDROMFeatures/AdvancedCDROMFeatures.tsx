@@ -7,8 +7,10 @@ import { useSettingsCluster } from '@settings/context/SettingsClusterContext';
 import ExpandSection from '@settings/ExpandSection/ExpandSection';
 import { CLUSTER_TAB_IDS } from '@settings/search/constants';
 
-import useAdvancedCDROMFeatureFlag from './hooks/useAdvancedCDROMFeatureFlag';
+import { getGeneralSettingsLabels } from '../consts/consts';
+
 import AdvancedCDROMPopoverContent from './AdvancedCDROMPopoverContent';
+import useAdvancedCDROMFeatureFlag from './hooks/useAdvancedCDROMFeatureFlag';
 
 type AdvancedCDROMFeaturesProps = {
   newBadge?: boolean;
@@ -22,7 +24,7 @@ const AdvancedCDROMFeatures: FC<AdvancedCDROMFeaturesProps> = ({ newBadge }) => 
   return (
     <ExpandSection
       searchItemId={CLUSTER_TAB_IDS.advancedCDROMFeatures}
-      toggleText={t('Advanced CD-ROM features')}
+      toggleText={getGeneralSettingsLabels(t).advancedCDROMFeatures}
     >
       <SectionWithSwitch
         dataTestID="advanced-cdrom-features"

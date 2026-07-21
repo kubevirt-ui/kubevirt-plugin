@@ -58,6 +58,12 @@ export default class SettingsPage extends BasePage {
     return this._settings.disableCentosStream9ImageCron(...args);
   }
 
+  disableControlDefaultVirtualizationPermissions(
+    ...args: Parameters<OverviewSettingsPage['disableControlDefaultVirtualizationPermissions']>
+  ): ReturnType<OverviewSettingsPage['disableControlDefaultVirtualizationPermissions']> {
+    return this._settings.disableControlDefaultVirtualizationPermissions(...args);
+  }
+
   disableGuidedTour(
     ...args: Parameters<OverviewSettingsPage['disableGuidedTour']>
   ): ReturnType<OverviewSettingsPage['disableGuidedTour']> {
@@ -102,6 +108,14 @@ export default class SettingsPage extends BasePage {
     return this._settings.enableCentosStream9ImageCron(...args);
   }
 
+  enableControlDefaultVirtualizationPermissions(
+    ...args: Parameters<OverviewSettingsPage['enableControlDefaultVirtualizationPermissions']>
+  ): ReturnType<OverviewSettingsPage['enableControlDefaultVirtualizationPermissions']> {
+    return this._settings.enableControlDefaultVirtualizationPermissions(...args);
+  }
+
+  // ── Cluster tab — Virtualization features section ────────────────────────────
+
   enableGuidedTour(
     ...args: Parameters<OverviewSettingsPage['enableGuidedTour']>
   ): ReturnType<OverviewSettingsPage['enableGuidedTour']> {
@@ -131,8 +145,6 @@ export default class SettingsPage extends BasePage {
   ): ReturnType<OverviewSettingsPage['enableSSHOverNodePort']> {
     return this._settings.enableSSHOverNodePort(...args);
   }
-
-  // ── Cluster tab — General settings section ───────────────────────────────────
 
   // SSH configurations
   enableSSHUsingLoadBalancer(
@@ -238,6 +250,18 @@ export default class SettingsPage extends BasePage {
     return this._settings.isAdvancedCdromFeaturesEnabled(...args);
   }
 
+  isAutomaticGrantVirtualizationRolesChecked(
+    ...args: Parameters<OverviewSettingsPage['isAutomaticGrantVirtualizationRolesChecked']>
+  ): ReturnType<OverviewSettingsPage['isAutomaticGrantVirtualizationRolesChecked']> {
+    return this._settings.isAutomaticGrantVirtualizationRolesChecked(...args);
+  }
+
+  isAutomaticGrantVirtualizationRolesEnabled(
+    ...args: Parameters<OverviewSettingsPage['isAutomaticGrantVirtualizationRolesEnabled']>
+  ): ReturnType<OverviewSettingsPage['isAutomaticGrantVirtualizationRolesEnabled']> {
+    return this._settings.isAutomaticGrantVirtualizationRolesEnabled(...args);
+  }
+
   isConfigureFeaturesButtonVisible(
     ...args: Parameters<OverviewVirtualizationFeaturesPage['isConfigureFeaturesButtonVisible']>
   ): ReturnType<OverviewVirtualizationFeaturesPage['isConfigureFeaturesButtonVisible']> {
@@ -286,7 +310,13 @@ export default class SettingsPage extends BasePage {
     return this._settings.navigateToAutomaticSubscription(...args);
   }
 
-  // ── Cluster tab — Guest management section ───────────────────────────────────
+  navigateToClusterTab(
+    ...args: Parameters<OverviewSettingsPage['navigateToClusterTab']>
+  ): ReturnType<OverviewSettingsPage['navigateToClusterTab']> {
+    return this._settings.navigateToClusterTab(...args);
+  }
+
+  // ── Cluster tab — General settings section ───────────────────────────────────
 
   navigateToGeneralSettings(
     ...args: Parameters<OverviewSettingsPage['navigateToGeneralSettings']>
@@ -299,6 +329,8 @@ export default class SettingsPage extends BasePage {
   ): ReturnType<OverviewSettingsPage['navigateToGettingStartedResources']> {
     return this._settings.navigateToGettingStartedResources(...args);
   }
+
+  // ── Cluster tab — Guest management section ───────────────────────────────────
 
   navigateToGuestManagement(
     ...args: Parameters<OverviewSettingsPage['navigateToGuestManagement']>
@@ -344,6 +376,8 @@ export default class SettingsPage extends BasePage {
     return this._settings.navigateToSettingsViaUI(...args);
   }
 
+  // ── Cluster tab — Resource management section ────────────────────────────────
+
   navigateToSSHKeysManagement(
     ...args: Parameters<OverviewSshKeysPage['navigateToSSHKeysManagement']>
   ): ReturnType<OverviewSshKeysPage['navigateToSSHKeysManagement']> {
@@ -370,6 +404,12 @@ export default class SettingsPage extends BasePage {
     return this._settings.openAdvancedCdromFeaturesSettings(...args);
   }
 
+  openAutomaticGrantVirtualizationRolesSection(
+    ...args: Parameters<OverviewSettingsPage['openAutomaticGrantVirtualizationRolesSection']>
+  ): ReturnType<OverviewSettingsPage['openAutomaticGrantVirtualizationRolesSection']> {
+    return this._settings.openAutomaticGrantVirtualizationRolesSection(...args);
+  }
+
   // Memory density
   openMemoryDensitySettings(
     ...args: Parameters<OverviewMigrationsPage['openMemoryDensitySettings']>
@@ -390,12 +430,18 @@ export default class SettingsPage extends BasePage {
     return this._sshKeys.saveSSHKey(...args);
   }
 
-  // ── Cluster tab — SCSI persistent reservation section ───────────────────────
-
   selectProjectInSSHSettings(
     ...args: Parameters<OverviewSshKeysPage['selectProjectInSSHSettings']>
   ): ReturnType<OverviewSshKeysPage['selectProjectInSSHSettings']> {
     return this._sshKeys.selectProjectInSSHSettings(...args);
+  }
+
+  // ── Cluster tab — SCSI persistent reservation section ───────────────────────
+
+  setAutomaticGrantVirtualizationRoles(
+    ...args: Parameters<OverviewSettingsPage['setAutomaticGrantVirtualizationRoles']>
+  ): ReturnType<OverviewSettingsPage['setAutomaticGrantVirtualizationRoles']> {
+    return this._settings.setAutomaticGrantVirtualizationRoles(...args);
   }
 
   setGuestSystemLog(

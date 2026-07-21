@@ -1,5 +1,6 @@
 export const CLUSTER_TAB_IDS = {
   advancedCDROMFeatures: 'advanced-cdrom-features',
+  automaticGrantVirtualizationRoles: 'automatic-grant-virtualization-roles',
   automaticImagesDownload: 'automatic-images-download',
   automaticSubscriptionRhel: 'automatic-subscription-rhel',
   bootableVolumesProject: 'bootable-volumes-project',
@@ -33,6 +34,7 @@ export const RECOMMENDED_TAB_IDS = {
 };
 
 export const PREVIEW_FEATURES_TAB_IDS = {
+  controlDefaultVirtualizationPermissions: 'control-default-virtualization-permissions',
   passtUDNNetwork: 'passt-udn-network',
   previewFeatures: 'preview-features',
   treeViewFolders: 'tree-view-folders',
@@ -41,13 +43,14 @@ export const PREVIEW_FEATURES_TAB_IDS = {
 
 export const SEARCH_ITEM_CHILDREN_TREE = {
   [CLUSTER_TAB_IDS.generalSettings]: [
+    CLUSTER_TAB_IDS.advancedCDROMFeatures,
+    CLUSTER_TAB_IDS.automaticGrantVirtualizationRoles,
     CLUSTER_TAB_IDS.liveMigration,
     CLUSTER_TAB_IDS.memoryDensity,
     CLUSTER_TAB_IDS.sshConfiguration,
     CLUSTER_TAB_IDS.templatesManagement,
     CLUSTER_TAB_IDS.vmActionsConfirmation,
     CLUSTER_TAB_IDS.hideYamlTab,
-    CLUSTER_TAB_IDS.advancedCDROMFeatures,
   ],
   [CLUSTER_TAB_IDS.guestManagement]: [CLUSTER_TAB_IDS.automaticSubscriptionRhel],
   [CLUSTER_TAB_IDS.templatesManagement]: [
@@ -60,6 +63,7 @@ export const SEARCH_ITEM_CHILDREN_TREE = {
     PREVIEW_FEATURES_TAB_IDS.treeViewFolders,
     PREVIEW_FEATURES_TAB_IDS.passtUDNNetwork,
     PREVIEW_FEATURES_TAB_IDS.vmTemplates,
+    PREVIEW_FEATURES_TAB_IDS.controlDefaultVirtualizationPermissions,
   ],
   [USER_TAB_IDS.general]: [USER_TAB_IDS.autoHideNav],
   [USER_TAB_IDS.gettingStarted]: [USER_TAB_IDS.welcomeInformation, USER_TAB_IDS.guidedTour],

@@ -42,6 +42,7 @@ export type HyperConverged = K8sResourceCommon & {
     resourceRequirements: {
       autoCPULimitNamespaceLabelSelector: V1LabelSelector;
     };
+    roleAggregationStrategy?: string;
     virtualMachineOptions: { disableSerialConsoleLog: string };
   };
   status: {
