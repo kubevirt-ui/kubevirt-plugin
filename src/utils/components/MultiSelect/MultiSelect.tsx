@@ -15,6 +15,7 @@ import './MultiSelect.scss';
 export type MultiSelectOption = { content: ReactNode; id: string };
 
 type MultiSelectProps = {
+  dataTestId?: string;
   items: MultiSelectOption[];
   selectedItems: string[];
   setSelectedItems: (items: any[]) => void;
@@ -22,6 +23,7 @@ type MultiSelectProps = {
 };
 
 const MultiSelect: FC<MultiSelectProps> = ({
+  dataTestId,
   items,
   selectedItems,
   setSelectedItems,
@@ -45,6 +47,7 @@ const MultiSelect: FC<MultiSelectProps> = ({
   const toggle = (toggleRef: Ref<MenuToggleElement>) => (
     <MenuToggle
       className="multi-select-toggle"
+      data-test={dataTestId}
       isExpanded={isOpen}
       onClick={onToggleClick}
       ref={toggleRef}

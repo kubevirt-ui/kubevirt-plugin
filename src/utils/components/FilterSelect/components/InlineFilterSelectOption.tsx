@@ -13,7 +13,7 @@ type InlineFilterSelectOptionProps = {
 const InlineFilterSelectOption: FC<InlineFilterSelectOptionProps> = ({ isFocused, option }) => {
   return (
     <SelectOption
-      data-test-id={`select-option-${option.value}`}
+      data-test={`select-option-${option.value}`}
       id={`select-inline-filter-${option.value?.replace(' ', '-')}`}
       isFocused={isFocused}
       value={option.value}

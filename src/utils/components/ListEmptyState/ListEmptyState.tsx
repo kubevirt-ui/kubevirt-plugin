@@ -32,6 +32,7 @@ const ListEmptyState: FC<ListEmptyStateProps> = ({
 }) => (
   <EmptyState
     className={className}
+    data-test="empty-state"
     headingLevel={headingLevel}
     icon={icon === null ? undefined : (icon ?? AddCircleOIcon)}
     titleText={titleText}

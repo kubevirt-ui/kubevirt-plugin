@@ -77,7 +77,7 @@ const StorageClassSelect: FC<StorageClassSelectProps> = ({ checkSC, setShowSCAle
 
   return (
     <FormGroup fieldId={STORAGECLASS_SELECT_FIELDID} label={t('StorageClass')}>
-      <div data-test-id={STORAGECLASS_SELECT_FIELDID}>
+      <div data-test={STORAGECLASS_SELECT_FIELDID}>
         <Controller
           render={({ field: { value } }) => (
             <InlineFilterSelect

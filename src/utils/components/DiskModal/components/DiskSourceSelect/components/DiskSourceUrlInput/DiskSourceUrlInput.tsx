@@ -24,13 +24,13 @@ const DiskSourceUrlInput: FC<DiskSourceUrlInputProps> = ({ os }) => {
 
   return (
     <FormGroup
-      data-test-id={diskSourceURLFieldID}
+      data-test={diskSourceURLFieldID}
       fieldId={diskSourceURLFieldID}
       isRequired
       label={t('URL')}
     >
       <TextInput
-        data-test-id={diskSourceURLFieldID}
+        ouiaId={diskSourceURLFieldID}
         id={diskSourceURLFieldID}
         {...register(DATAVOLUME_HTTPURL_FIELD, {
           required: t('URL is required'),

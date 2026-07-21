@@ -40,7 +40,7 @@ const SearchFilter = forwardRef<HTMLInputElement, SearchFilterProps>((props, ref
         {...otherInputProps}
         aria-label={placeholder}
         className={classNames('co-text-filter__text-input', className)}
-        data-test-id="item-filter"
+        ouiaId="item-filter"
         placeholder={placeholder}
         ref={inputRef}
         tabIndex={0}

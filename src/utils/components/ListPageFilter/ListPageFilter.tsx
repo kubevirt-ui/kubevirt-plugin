@@ -120,7 +120,7 @@ const ListPageFilter = ({
       className={className}
       clearAllFilters={clearAll}
       clearFiltersButtonText={t('Clear all filters')}
-      data-test="filter-toolbar"
+      ouiaId="filter-toolbar"
       id="filter-toolbar"
       isExpanded={toolbarIsExpanded}
     >

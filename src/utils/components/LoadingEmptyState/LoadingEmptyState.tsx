@@ -16,7 +16,7 @@ const LoadingEmptyState: FC<LoadingEmptyStateProps> = ({
   const defaultBodyContents = bodyContents ?? t('Loading ...');
 
   return (
-    <EmptyState icon={iconComponent}>
+    <EmptyState data-test="loading-indicator" icon={iconComponent}>
       <EmptyStateBody>{defaultBodyContents}</EmptyStateBody>
     </EmptyState>
   );

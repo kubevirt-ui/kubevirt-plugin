@@ -69,12 +69,7 @@ export const LabelList: FC<LabelListProps> = ({
           {t('No labels')}
         </div>
       ) : (
-        <PfLabelGroup
-          className="co-label-group"
-          data-test="label-list"
-          defaultIsOpen={true}
-          numLabels={20}
-        >
+        <PfLabelGroup className="co-label-group" defaultIsOpen={true} numLabels={20}>
           {list}
         </PfLabelGroup>
       )}

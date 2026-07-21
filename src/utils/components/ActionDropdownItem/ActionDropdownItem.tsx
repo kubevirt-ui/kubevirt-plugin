@@ -61,7 +61,7 @@ const ActionDropdownItem: FC<ActionDropdownItemProps> = ({
           </Menu>
         )
       }
-      data-test-id={`${action?.id}`}
+      data-test={`${action?.id}`}
       description={action?.description}
       isAriaDisabled={isDisabled}
       key={action?.id}

@@ -45,7 +45,7 @@ const GroupedFilterDropdown: FC<GroupedFilterDropdownProps> = ({
 
   return (
     <>
-      <ToolbarItem data-test-id="filter-dropdown-toggle">
+      <ToolbarItem data-test="filter-dropdown-toggle">
         <FormPFSelect
           toggleProps={{
             icon: (

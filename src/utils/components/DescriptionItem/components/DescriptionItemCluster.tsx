@@ -14,12 +14,7 @@ const DescriptionItemCluster: FC<DescriptionItemClusterProps> = ({ resource }) =
   const cluster = getCluster(resource);
 
   return (
-    <DescriptionItem
-      data-test-id="description-cluster"
-      descriptionData={cluster}
-      descriptionHeader={t('Cluster')}
-      isPopover={false}
-    />
+    <DescriptionItem descriptionData={cluster} descriptionHeader={t('Cluster')} isPopover={false} />
   );
 };
 

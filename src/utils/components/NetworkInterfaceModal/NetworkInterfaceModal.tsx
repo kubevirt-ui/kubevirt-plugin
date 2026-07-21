@@ -150,7 +150,6 @@ const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
       />
       <FormGroup fieldId="nic-boot-source">
         <Checkbox
-          data-test-id="nic-use-as-boot-source"
           id="nic-boot-source"
           isChecked={isBootSource}
           label={t('Use as boot source')}

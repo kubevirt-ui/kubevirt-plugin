@@ -341,7 +341,7 @@ const SelectTypeahead: FC<SelectTypeaheadProps> = ({
       onOpenChange={(isOpen) => {
         !isOpen && closeMenuAndSetInputToSelected();
       }}
-      data-test={dataTestId}
+      ouiaId={dataTestId}
       id={dataTestId}
       isOpen={isOpen}
       isScrollable

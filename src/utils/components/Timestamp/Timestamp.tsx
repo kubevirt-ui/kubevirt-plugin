@@ -37,7 +37,7 @@ const Timestamp: FC<TimestampProps> = ({ className, hideIcon = false, omitSuffix
           </span>,
         ]}
       >
-        <span data-test="timestamp">{timeStamp}</span>
+        <span>{timeStamp}</span>
       </Tooltip>
     </div>
   );

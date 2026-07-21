@@ -129,7 +129,7 @@ const CPUMemoryModal: FC<CPUMemoryModalProps> = ({
       </ModalBody>
       <ModalFooter>
         <Button
-          data-test="save-button"
+          ouiaId="save-button"
           isDisabled={updateInProcess}
           isLoading={updateInProcess}
           key="confirm"

@@ -31,6 +31,7 @@ const DiskSourceSelect: FC<DiskSourceSelectProps> = ({
   return (
     <FormPFSelect
       className={classNames('disk-source-select', className)}
+      data-test="storage-add-button"
       isDisabled={!canUpdate}
       onSelect={(_, val) => onSelect(val as SourceTypes)}
       selectedLabel={t('Add')}

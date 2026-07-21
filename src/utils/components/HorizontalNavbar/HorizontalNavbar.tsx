@@ -109,7 +109,7 @@ const HorizontalNavbar: FC<HorizontalNavbarProps> = ({
                     item.href
                   }
                   className="pf-v6-c-tabs__link"
-                  data-test-id={`horizontal-link-${item.name}`}
+                  data-test={`horizontal-link-${item.name}`}
                   id={`horizontal-pageHeader-${item.name}`}
                 >
                   {item.name}

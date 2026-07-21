@@ -26,6 +26,7 @@ import { type DataViewFilterOption } from '@patternfly/react-data-view';
 
 type GroupedCheckboxSelectProps = {
   data: K8sResourceCommon[];
+  dataTestId?: string;
   filterDef: KubevirtFilter;
   filters: KubevirtFilterState;
   isToggleVisible?: boolean;
@@ -35,6 +36,7 @@ type GroupedCheckboxSelectProps = {
 
 const GroupedCheckboxSelect: FC<GroupedCheckboxSelectProps> = ({
   data,
+  dataTestId,
   filterDef,
   filters,
   isToggleVisible = true,
@@ -55,6 +57,7 @@ const GroupedCheckboxSelect: FC<GroupedCheckboxSelectProps> = ({
   );
 
   const toggle = ToolbarFilterToggle({
+    'data-test': dataTestId,
     isExpanded: isOpen,
     onClick: () => setIsOpen((prev) => !prev),
     selectedValues,

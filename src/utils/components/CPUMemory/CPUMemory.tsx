@@ -28,7 +28,7 @@ const CPUMemory: FC<CPUMemoryProps> = ({ vm, vmi }) => {
 
   return (
     <span
-      data-test-id="virtual-machine-overview-details-cpu-memory"
+      data-test="virtual-machine-overview-details-cpu-memory"
       id="virtual-machine-overview-details-cpu-memory"
     >
       {t('{{cpu}} CPU | {{memory}} Memory', { cpu, memory })}

@@ -31,7 +31,7 @@ const EditButton: FC<EditButtonProps> = ({
     }}
     aria-label={ariaLabel || undefined}
     className={className}
-    data-test-id={testId}
+    ouiaId={testId}
     icon={<PencilAltIcon />}
     iconPosition="end"
     isDisabled={isDisabled}

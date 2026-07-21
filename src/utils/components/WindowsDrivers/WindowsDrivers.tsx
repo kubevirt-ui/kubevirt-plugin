@@ -66,7 +66,7 @@ const WindowsDrivers: FC<WindowsDriversProps> = memo(({ isWindows, updateVM, vm 
       <FlexItem>
         <Checkbox
           className="pf-v6-u-mt-md pf-v6-u-display-flex pf-v6-u-align-items-center"
-          data-test-id="cdrom-drivers"
+          ouiaId="cdrom-drivers"
           id="cdrom-drivers"
           isChecked={isChecked}
           isDisabled={loading || driversImageLoading}

@@ -82,7 +82,7 @@ const EnvironmentFormActions: FC<EnvironmentFormActionsProps> = ({
       <StackItem>
         <ActionGroup className="pf-v6-c-form">
           <Button
-            data-test="save-button"
+            ouiaId="save-button"
             isDisabled={isSaveDisabled || loading}
             isLoading={loading}
             onClick={onSubmit}
@@ -90,12 +90,7 @@ const EnvironmentFormActions: FC<EnvironmentFormActionsProps> = ({
           >
             {t('Save')}
           </Button>
-          <Button
-            data-test="reload-button"
-            onClick={onReload}
-            type="button"
-            variant={ButtonVariant.secondary}
-          >
+          <Button onClick={onReload} type="button" variant={ButtonVariant.secondary}>
             {t('Reload')}
           </Button>
         </ActionGroup>

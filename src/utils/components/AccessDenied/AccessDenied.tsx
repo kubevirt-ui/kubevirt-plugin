@@ -28,7 +28,7 @@ const AccessDenied: FC<AccessDeniedProps> = ({ message }) => {
             {t('Restricted access')}
           </Title>
 
-          <div className="pf-v6-u-text-align-center" data-test="msg-box-detail">
+          <div className="pf-v6-u-text-align-center">
             {t("You don't have access to this section due to cluster policy.")}
           </div>
           {message && (

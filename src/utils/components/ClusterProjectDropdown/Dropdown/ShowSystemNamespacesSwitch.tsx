@@ -32,7 +32,6 @@ const ShowSystemNamespacesSwitch: FC<ShowSystemNamespacesSwitchProps> = ({
             _event.stopPropagation();
             onChange(checked);
           }}
-          data-test="showSystemSwitch"
           id={`${cssPrefix}-show-system-switch`}
           isChecked={isChecked}
           label={t('Show default projects')}

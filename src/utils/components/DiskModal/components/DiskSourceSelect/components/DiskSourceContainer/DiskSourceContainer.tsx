@@ -50,7 +50,7 @@ const DiskSourceContainer: FC<DiskSourceUrlInputProps> = ({
     <>
       <FormGroup fieldId={diskSourceEphemeralFieldID} isRequired label={t('Container')}>
         <FormTextInput
-          data-test-id={diskSourceEphemeralFieldID}
+          data-test={diskSourceEphemeralFieldID}
           id={diskSourceEphemeralFieldID}
           {...register(fieldName, { required: t('Container is required.') })}
         />
@@ -80,7 +80,7 @@ const DiskSourceContainer: FC<DiskSourceUrlInputProps> = ({
                   : ValidatedOptions.default
               }
               aria-label={t('Username')}
-              data-test-id={diskSourceUsernameFieldID}
+              data-test={diskSourceUsernameFieldID}
               id={diskSourceUsernameFieldID}
               type="text"
             />
@@ -98,7 +98,7 @@ const DiskSourceContainer: FC<DiskSourceUrlInputProps> = ({
                   : ValidatedOptions.default
               }
               aria-label={t('Password')}
-              data-test-id={diskSourcePasswordFieldID}
+              data-test={diskSourcePasswordFieldID}
               id={diskSourcePasswordFieldID}
               type="text"
             />

@@ -85,11 +85,12 @@ const OnboardingPopover: FC<OnboardingPopoverProps> = ({
   return (
     <Popover
       footerContent={
-        <Button onClick={hide} variant={ButtonVariant.link}>
+        <Button ouiaId="onboarding-dismiss-btn" onClick={hide} variant={ButtonVariant.link}>
           {t('Got it')}
         </Button>
       }
       bodyContent={bodyContent}
+      data-test="onboarding-popover"
       headerContent={headerContent}
       hideOnOutsideClick={false}
       isVisible={isVisible}

@@ -36,7 +36,7 @@ const SelectTemplate: FC<SelectTemplateProps> = ({
       searchPlaceholder={t('Search templates')}
       selected={getTemplateOptionKey(selectedTemplate)}
       showSearch={hasOptions}
-      toggleProps={{ 'data-test-id': dataTestId, isDisabled, isFullWidth: true }}
+      toggleProps={{ 'data-test': dataTestId, isDisabled, isFullWidth: true }}
     />
   );
 };
