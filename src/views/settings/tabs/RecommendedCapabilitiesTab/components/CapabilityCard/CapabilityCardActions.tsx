@@ -36,11 +36,11 @@ const CapabilityCardActions: FC<CapabilityCardActionsProps> = ({ installState, o
         <HelpTextIcon
           bodyContent={
             <Stack>
-              {operators.map(({ packageName }) => (
+              {operators.map(({ displayName, packageName }) => (
                 <StackItem key={packageName}>
                   <OperatorPackageLink
+                    displayName={displayName}
                     operatorHubURL={detailsMap[packageName]?.operatorHubURL}
-                    packageName={packageName}
                   />
                 </StackItem>
               ))}

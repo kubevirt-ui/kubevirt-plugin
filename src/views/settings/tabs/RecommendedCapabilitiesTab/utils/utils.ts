@@ -13,7 +13,8 @@ import {
   type RecommendedCapabilityDetailsMap,
 } from './types';
 
-export const isBundleFeature = ({ isDefaultBundle }: CapabilityFeature): boolean => isDefaultBundle;
+export const getBundleFeatures = (features: CapabilityFeature[]): CapabilityFeature[] =>
+  features.filter(({ isDefaultBundle }) => isDefaultBundle);
 
 export const computeCapabilityInstallState = (
   feature: CapabilityFeature,
@@ -31,16 +32,14 @@ export const computeCapabilityInstallState = (
   return CapabilityInstallState.NotInstalled;
 };
 
-export const countInstalledBundleCapabilities = (
+export const countInstalledCapabilities = (
   features: CapabilityFeature[],
   detailsMap: RecommendedCapabilityDetailsMap,
 ): number =>
-  features
-    .filter(isBundleFeature)
-    .filter(
-      (feature) =>
-        computeCapabilityInstallState(feature, detailsMap) === CapabilityInstallState.Installed,
-    ).length;
+  features.filter(
+    (feature) =>
+      computeCapabilityInstallState(feature, detailsMap) === CapabilityInstallState.Installed,
+  ).length;
 
 export const getNonInstalledBundleManifests = (
   features: CapabilityFeature[],
@@ -48,9 +47,9 @@ export const getNonInstalledBundleManifests = (
   filteredPackageManifests: PackageManifestKind[],
 ): PackageManifestKind[] => {
   const defaultBundlePackageNames = new Set(
-    features
-      .filter(isBundleFeature)
-      .flatMap(({ operators }) => operators.map(({ packageName }) => packageName)),
+    getBundleFeatures(features).flatMap(({ operators }) =>
+      operators.map(({ packageName }) => packageName),
+    ),
   );
 
   const seen = new Set<string>();

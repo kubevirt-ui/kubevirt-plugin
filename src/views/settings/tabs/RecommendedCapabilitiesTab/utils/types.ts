@@ -19,6 +19,8 @@ export enum CapabilityInstallState {
 
 export type CapabilityFeatureOperator = {
   alternativesPromptType?: OLSPromptType;
+  description: string;
+  displayName: string;
   packageName: string;
 };
 

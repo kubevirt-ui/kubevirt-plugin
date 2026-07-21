@@ -1,6 +1,8 @@
 import { type TFunction } from 'i18next';
 
 import { type LabelProps } from '@patternfly/react-core';
+import { InstallState } from '@settings/tabs/ClusterTab/components/VirtualizationFeaturesSection/utils/types';
+import { isInstalled } from '@settings/tabs/ClusterTab/components/VirtualizationFeaturesSection/utils/utils';
 
 import { CapabilityInstallState } from './types';
 
@@ -33,4 +35,14 @@ export const CAPABILITY_INSTALL_STATE_CONFIG: Record<
     color: 'grey',
     getLabel: (t) => t('Partially installed'),
   },
+};
+
+export const getOperatorInstallStatusLabel = (
+  installState: InstallState | undefined,
+  isRedHatProvided: boolean | undefined,
+  t: TFunction,
+): { color: LabelProps['color']; label: string } => {
+  if (isRedHatProvided && isInstalled(installState))
+    return { color: 'green', label: t('Installed') };
+  return { color: 'orange', label: t('Not installed') };
 };
