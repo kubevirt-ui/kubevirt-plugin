@@ -39,6 +39,7 @@ import VirtualMachineFilterToolbar from '@virtualmachines/search/VirtualMachineF
 import { vmsSignal } from '@virtualmachines/tree/utils/signals';
 import { OBJECTS_FETCHING_LIMIT } from '@virtualmachines/utils';
 
+import VirtIODriversAlert from './components/VirtIODriversAlert/VirtIODriversAlert';
 import VirtualMachineBulkActionButton from './components/VirtualMachineBulkActionButton';
 import VirtualMachineEmptyState from './components/VirtualMachineEmptyState/VirtualMachineEmptyState';
 import VirtualMachineFilteredEmptyState from './components/VirtualMachineFilteredEmptyState/VirtualMachineFilteredEmptyState';
@@ -234,6 +235,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({
                 inputRef={searchInputRef}
                 onSetFilters={handleSetFilters}
               />
+              <VirtIODriversAlert vms={vmsToShow} />
               <VirtualMachineFilterToolbar
                 className="list-managment-group__toolbar"
                 clearAllFilters={clearAllFiltersWithReset}

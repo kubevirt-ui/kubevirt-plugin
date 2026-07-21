@@ -66,6 +66,7 @@ export const documentationURL = {
   VIRT_MANAGER_DOWNLOAD: 'https://virt-manager.org/download.html',
   VIRT_SECONDARY_NETWORK: `${REDHAT_DOC_URL}/html/virtualization/networking#secondary-network-config`,
   VIRTCTL_CLI: `${REDHAT_DOC_URL}/html/virtualization/getting-started#virt-using-the-cli-tools`,
+  VIRTIO_WIN_DRIVERS: `${REDHAT_DOC_URL}/html/virtualization/managing-vms#virt-install-virtio-drivers-on-windows-vms`,
   VIRTUALIZATION_BLOG: `https://cloud.redhat.com/learn/topics/virtualization/`,
   VIRTUALIZATION_WHAT_YOU_CAN_DO: `${REDHAT_DOC_URL}/html/virtualization/about#virt-what-you-can-do-with-virt_about-virt`,
   VOLUME_MODE: `${K8S_PERSISTENT_VOLUMES_URL}/#volume-mode`,

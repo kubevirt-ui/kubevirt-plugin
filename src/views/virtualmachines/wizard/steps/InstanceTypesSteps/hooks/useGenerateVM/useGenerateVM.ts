@@ -83,7 +83,7 @@ const useGenerateVM: UseGenerateVM = () => {
   );
   const generatedVMName = useMemo(() => generatePrettyName(osLabel), [osLabel]);
 
-  const [driversImage] = useDriversImage();
+  const [driversImage] = useDriversImage(cluster);
   const [authorizedSSHKeys] = useKubevirtUserSettings(USER_SETTINGS_KEYS.ssh, cluster);
   const defaultSSHSecretName = authorizedSSHKeys?.[namespace];
 

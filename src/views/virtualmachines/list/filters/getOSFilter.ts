@@ -15,7 +15,7 @@ import {
 } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
 import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
-const getOSName = (obj: V1VirtualMachine) => {
+export const getOSName = (obj: V1VirtualMachine) => {
   const osAnnotation = getAnnotation(obj?.spec?.template, ANNOTATIONS.os);
   const osLabel = getOperatingSystemName(obj) || getOperatingSystem(obj);
   const osPreference = getPreferenceMatcher(obj)?.name;

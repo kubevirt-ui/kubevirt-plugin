@@ -1,9 +1,9 @@
+import { OS_NAME_LABELS } from '@kubevirt-utils/resources/template';
 import {
   NAME_OS_TEMPLATE_ANNOTATION,
   OS_TEMPLATE_LABEL,
   VM_OS_ANNOTATION,
 } from '@kubevirt-utils/resources/vm';
-import { OS_NAME_LABELS } from '@kubevirt-utils/resources/template';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
 /**
