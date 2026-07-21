@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtToast from '@kubevirt-utils/hooks/useKubevirtToast';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { isEmpty, kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { useSettingsCluster } from '@settings/context/SettingsClusterContext';
@@ -81,7 +81,7 @@ const useInstallBundle = ({
     const errors: Error[] = [];
 
     try {
-      await Promise.allSettled(
+      await Promise.all(
         manifestsToInstall.map((pkg) =>
           createOperator(
             packageManifestToOperatorItem(pkg),
@@ -105,6 +105,10 @@ const useInstallBundle = ({
       addSuccessToast({ title: t('Bundle installation started successfully') });
       setIsAwaitingOLM(true);
       return;
+    }
+
+    if (errors.length < manifestsToInstall.length) {
+      setIsAwaitingOLM(true);
     }
 
     addDangerToast({

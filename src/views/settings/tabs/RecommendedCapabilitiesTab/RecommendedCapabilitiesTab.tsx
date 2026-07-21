@@ -1,23 +1,33 @@
-import React, { FC, useMemo } from 'react';
+import React, { FC, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Gallery } from '@patternfly/react-core';
+import { Divider, Stack, StackItem, Title } from '@patternfly/react-core';
 
-import CapabilityCard from './components/CapabilityCard/CapabilityCard';
+import SelectionCards from './components/SelectionCards/SelectionCards';
+import VirtualizationBundleView from './components/VirtualizationBundleView/VirtualizationBundleView';
 import { CapabilitiesDataProvider } from './context/CapabilitiesDataProvider';
-import { getRecommendedCapabilityFeatures } from './utils/capabilityFeatures';
+import { CapabilitiesView } from './utils/types';
 
 const RecommendedCapabilitiesTab: FC = () => {
   const { t } = useKubevirtTranslation();
-  const features = useMemo(() => getRecommendedCapabilityFeatures(t), [t]);
+  const [selectedView, setSelectedView] = useState<CapabilitiesView>(CapabilitiesView.Bundle);
 
   return (
     <CapabilitiesDataProvider>
-      <Gallery hasGutter minWidths={{ default: '17.5rem' }}>
-        {features.map((feature) => (
-          <CapabilityCard key={feature.id} feature={feature} />
-        ))}
-      </Gallery>
+      <Stack hasGutter>
+        <StackItem>
+          <Title headingLevel="h5">{t('Install virtualization capabilities')}</Title>
+        </StackItem>
+        <StackItem className="pf-v6-u-pt-md">
+          <SelectionCards onSelectView={setSelectedView} selectedView={selectedView} />
+        </StackItem>
+        <StackItem className="pf-v6-u-mt-lg">
+          <Divider className="settings-tab__section-divider" />
+        </StackItem>
+        <StackItem>
+          {selectedView === CapabilitiesView.Bundle ? <VirtualizationBundleView /> : null}
+        </StackItem>
+      </Stack>
     </CapabilitiesDataProvider>
   );
 };

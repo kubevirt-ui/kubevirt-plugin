@@ -2,10 +2,13 @@ import React, { FC } from 'react';
 
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Label, Split, SplitItem, Stack, StackItem } from '@patternfly/react-core';
+import { Label, Skeleton, Split, SplitItem, Stack, StackItem } from '@patternfly/react-core';
 
+import { useCapabilitiesData } from '../../context/useCapabilitiesData';
+import { useCapabilitiesActions } from '../../context/useCapabilitiesActions';
 import { CapabilityFeatureOperator, CapabilityInstallState } from '../../utils/types';
 import { CAPABILITY_INSTALL_STATE_CONFIG } from '../../utils/constants';
+import OperatorPackageLink from '../OperatorPackageLink/OperatorPackageLink';
 
 type CapabilityCardActionsProps = {
   installState: CapabilityInstallState;
@@ -14,21 +17,32 @@ type CapabilityCardActionsProps = {
 
 const CapabilityCardActions: FC<CapabilityCardActionsProps> = ({ installState, operators }) => {
   const { t } = useKubevirtTranslation();
+  const { detailsMap } = useCapabilitiesData();
+  const { isInstalling } = useCapabilitiesActions();
   const { color, getLabel } = CAPABILITY_INSTALL_STATE_CONFIG[installState];
 
   return (
     <Split hasGutter>
       <SplitItem>
-        <Label color={color} isCompact>
-          {getLabel(t)}
-        </Label>
+        {isInstalling ? (
+          <Skeleton width="80px" />
+        ) : (
+          <Label color={color} isCompact>
+            {getLabel(t)}
+          </Label>
+        )}
       </SplitItem>
       <SplitItem>
         <HelpTextIcon
           bodyContent={
             <Stack>
               {operators.map(({ packageName }) => (
-                <StackItem key={packageName}>{packageName}</StackItem>
+                <StackItem key={packageName}>
+                  <OperatorPackageLink
+                    operatorHubURL={detailsMap[packageName]?.operatorHubURL}
+                    packageName={packageName}
+                  />
+                </StackItem>
               ))}
             </Stack>
           }
