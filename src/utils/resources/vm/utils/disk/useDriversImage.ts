@@ -1,27 +1,35 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
-import { getDriversImage } from '@kubevirt-utils/resources/vm/utils/disk/drivers';
-import { driverImage, loadingDriver } from '@kubevirt-utils/store/drivers';
+import { getDriverEntry, setDriverEntry } from '@kubevirt-utils/store/drivers';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
+import { useSignals } from '@preact/signals-react/runtime';
 
-export const useDriversImage = (): [string, boolean] => {
-  const cluster = useClusterParam();
-  const [loadingDriverValue, setLoadingDriverValue] = useState(loadingDriver.value);
-  const [driverImageValue, setDriverImageValue] = useState(driverImage.value);
+import { DEFAULT_INFO, getDriversInfo, VirtioWinDriversInfo } from './drivers';
+
+export const useVirtioWinDriversInfo = (clusterParam?: string): [VirtioWinDriversInfo, boolean] => {
+  useSignals();
+  const clusterParamFromURL = useClusterParam();
+  const cluster = clusterParam || clusterParamFromURL;
+
+  const entry = getDriverEntry(cluster);
 
   useEffect(() => {
-    if (!loadingDriver.value) return;
+    if (entry) return;
 
-    getDriversImage(cluster)
-      .then((image) => {
-        driverImage.value = image;
-        setDriverImageValue(image);
-      })
-      .finally(() => {
-        loadingDriver.value = false;
-        setLoadingDriverValue(false);
-      });
-  }, [cluster]);
+    setDriverEntry(cluster, { ...DEFAULT_INFO, loading: true });
 
-  return [driverImageValue, loadingDriverValue];
+    getDriversInfo(cluster)
+      .then((result) => setDriverEntry(cluster, { ...result, loading: false }))
+      .catch(() => setDriverEntry(cluster, { ...DEFAULT_INFO, loading: false }));
+  }, [cluster, entry]);
+
+  return [
+    entry ? { downloadURL: entry.downloadURL, image: entry.image } : DEFAULT_INFO,
+    !entry || entry.loading,
+  ];
+};
+
+export const useDriversImage = (clusterParam?: string): [string, boolean] => {
+  const [info, loading] = useVirtioWinDriversInfo(clusterParam);
+  return [info.image, loading];
 };

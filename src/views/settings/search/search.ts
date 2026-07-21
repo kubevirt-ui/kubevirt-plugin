@@ -1,20 +1,21 @@
+import type { TFunction } from 'i18next';
+
 import { idIsHighlighted } from '@kubevirt-utils/components/SearchItem/useIsHighlighted';
 import { VIRTUALIZATION_PATHS } from '@kubevirt-utils/constants/constants';
-import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   SearchItem,
-  SearchItemGetter,
   SearchItemWithTab,
 } from '@virtualmachines/details/tabs/configuration/utils/search';
 
 import {
   CLUSTER_TAB_IDS,
+  DOWNLOADS_TAB_IDS,
   PREVIEW_FEATURES_TAB_IDS,
   SEARCH_ITEM_CHILDREN_TREE,
   USER_TAB_IDS,
 } from './constants';
 
-export const getClusterTabIds: SearchItemGetter = () => [
+export const getClusterTabIds = (t: TFunction): SearchItem[] => [
   { id: CLUSTER_TAB_IDS.virtualizationFeatures, title: t('Virtualization features') },
   { id: CLUSTER_TAB_IDS.generalSettings, title: t('General settings') },
   { id: CLUSTER_TAB_IDS.liveMigration, title: t('Live migration') },
@@ -37,13 +38,13 @@ export const getClusterTabIds: SearchItemGetter = () => [
   { id: CLUSTER_TAB_IDS.persistentReservation, title: t('Persistent reservation') },
 ];
 
-const getUserTabIds: SearchItemGetter = () => [
+const getUserTabIds = (t: TFunction): SearchItem[] => [
   { id: USER_TAB_IDS.sshKeys, title: t('SSH keys') },
   { id: USER_TAB_IDS.permissions, title: t('Permissions') },
   { id: USER_TAB_IDS.gettingStarted, title: t('Getting started') },
 ];
 
-const getPreviewFeaturesTabIds: SearchItemGetter = () => [
+const getPreviewFeaturesTabIds = (t: TFunction): SearchItem[] => [
   { id: PREVIEW_FEATURES_TAB_IDS.previewFeatures, title: t('Preview features') },
   {
     id: PREVIEW_FEATURES_TAB_IDS.treeViewFolders,
@@ -59,16 +60,23 @@ const getPreviewFeaturesTabIds: SearchItemGetter = () => [
   },
 ];
 
-const tabsIds: { [key: string]: SearchItem[] } = {
-  cluster: getClusterTabIds(),
-  features: getPreviewFeaturesTabIds(),
-  user: getUserTabIds(),
-};
+const getDownloadsTabIds = (t: TFunction): SearchItem[] => [
+  { id: DOWNLOADS_TAB_IDS.virtioDriversWindows, title: t('Windows drivers') },
+];
 
-export const SEARCH_ITEMS: SearchItemWithTab[] = Object.entries(tabsIds)
-  .map(([tab, value]) => value.map((element) => ({ element, tab })))
-  .flat()
-  .sort((a, b) => a.element.title.localeCompare(b.element.title));
+export const getSearchItems = (t: TFunction): SearchItemWithTab[] => {
+  const tabsIds: { [key: string]: SearchItem[] } = {
+    cluster: getClusterTabIds(t),
+    downloads: getDownloadsTabIds(t),
+    features: getPreviewFeaturesTabIds(t),
+    user: getUserTabIds(t),
+  };
+
+  return Object.entries(tabsIds)
+    .map(([tab, value]) => value.map((element) => ({ element, tab })))
+    .flat()
+    .sort((a, b) => a.element.title.localeCompare(b.element.title));
+};
 
 export const createSettingsSearchURL = (
   tab: string,

@@ -35,8 +35,6 @@ const useGenerateVM: UseGenerateVM = () => {
   const { customDiskSize, dvSource, pvcSource, selectedBootableVolume, selectedInstanceType } =
     store;
 
-  const [authorizedSSHKeys] = useKubevirtUserSettings('ssh', cluster);
-
   const [isUDNManagedNamespace] = useNamespaceUDN(getValidNamespace(namespace));
   const isIPv6SingleStack = useIsIPv6SingleStackCluster(cluster);
   const [hyperConverge] = useHyperConvergeConfiguration();
@@ -57,6 +55,7 @@ const useGenerateVM: UseGenerateVM = () => {
   );
   const generatedVMName = useMemo(() => generatePrettyName(osLabel), [osLabel]);
 
+  const [authorizedSSHKeys] = useKubevirtUserSettings('ssh', cluster);
   const sshSecretName = authorizedSSHKeys?.[namespace];
 
   const generatedVM = useMemo(
@@ -98,7 +97,7 @@ const useGenerateVM: UseGenerateVM = () => {
     ],
   );
 
-  const [driversImage] = useDriversImage();
+  const [driversImage] = useDriversImage(cluster);
   const isWindowsOSVolume = useIsWindowsBootableVolume();
 
   return useMemo(

@@ -23,7 +23,7 @@ import { useSignals } from '@preact/signals-react/runtime';
 import { useFleetClusterNames, useHubClusterName } from '@stolostron/multicluster-sdk';
 
 import { SettingsClusterProvider } from './context/SettingsClusterContext';
-import { createSettingsSearchURL, SEARCH_ITEMS } from './search/search';
+import { createSettingsSearchURL, getSearchItems } from './search/search';
 import SettingsTab from './SettingsTab';
 
 import './SettingsPage.scss';
@@ -92,7 +92,7 @@ const SettingsPage: FC = () => {
                 <ConfigurationSearch
                   createSearchURL={createSettingsSearchURL}
                   placeholder={showClusterDropdown ? t('Find in selected cluster') : undefined}
-                  searchItems={SEARCH_ITEMS}
+                  searchItems={getSearchItems(t)}
                 />
               </GridItem>
             </Grid>
