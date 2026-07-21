@@ -204,16 +204,6 @@ export function getClusterTeardownRules(): TeardownRule[] {
           } else {
             logger.info('No hyperconverged settings to restore');
           }
-
-          if (await apiClient.isNativeVmTemplateFeatureGateEnabled(namespace)) {
-            await apiClient.patchResourceByKind(
-              'hyperconverged',
-              hcoName,
-              [{ op: 'remove', path: '/spec/featureGates/deployNativeVMTemplate' }],
-              namespace,
-            );
-            logger.success('✓ Removed native VM template feature gate from HCO');
-          }
         } catch (error: unknown) {
           const err = error as { statusCode?: number; message?: string };
           if (err.statusCode === 404 || err.message?.includes('404')) {

@@ -18,6 +18,7 @@ export type KubevirtHyperconverged = K8sResourceCommon & {
 const useKubevirtHyperconvergeConfiguration = (
   cluster?: string,
 ): {
+  disabledFeatureGates: string[];
   featureGates: string[];
   hcConfig: KubevirtHyperconverged;
   hcError: any;
@@ -36,11 +37,18 @@ const useKubevirtHyperconvergeConfiguration = (
 
   const hcLoaded = _hcLoaded && !isEmpty(operatorNamespace);
 
-  const featureGates = useMemo(() => {
-    return getHyperconvergedConfiguration(hcConfig)?.developerConfiguration?.featureGates;
+  const developerConfiguration = useMemo(() => {
+    return getHyperconvergedConfiguration(hcConfig)?.developerConfiguration;
   }, [hcConfig]);
 
-  return { featureGates, hcConfig, hcError, hcLoaded };
+  const featureGates = developerConfiguration?.featureGates;
+
+  // Not yet in kubevirt-api types; present on KubeVirt 1.8+/1.9+ for Beta opt-out.
+  const disabledFeatureGates = (
+    developerConfiguration as { disabledFeatureGates?: string[] } | undefined
+  )?.disabledFeatureGates;
+
+  return { disabledFeatureGates, featureGates, hcConfig, hcError, hcLoaded };
 };
 
 export default useKubevirtHyperconvergeConfiguration;

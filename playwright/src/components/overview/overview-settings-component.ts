@@ -79,7 +79,6 @@ export default class OverviewSettingsComponent extends BaseComponent {
   private readonly _vmActionsConfirmationToggle = this.locator(
     '[id="confirm-vm-actions"] [role="switch"]',
   );
-  private readonly _vmTemplates = this.locator('[data-test-id="vmTemplates"]');
   private readonly _yAMLTabVisibilityBtn = this.locator('button:has-text("YAML tab visibility")');
   protected readonly nav = new NavigationComponent(this.page);
 
@@ -199,33 +198,6 @@ export default class OverviewSettingsComponent extends BaseComponent {
       await guidedTourSwitch.uncheck({ force: true });
       await this.page.waitForTimeout(TestTimeouts.UI_STABILIZE);
       return true;
-    } catch {
-      return false;
-    }
-  }
-
-  async disableVmTemplatesPreviewFeature(): Promise<boolean> {
-    try {
-      const toggle = this._vmTemplates;
-      await toggle.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
-
-      if (!(await toggle.isChecked())) {
-        return true;
-      }
-
-      const patchPromise = this.page.waitForResponse(
-        (resp) =>
-          (resp.url().includes(KUBEVIRT_UI_FEATURES_RESOURCE) ||
-            resp.url().includes('kubevirt-user-settings')) &&
-          isPatchOrPutRequest(resp) &&
-          isSuccessResponse(resp),
-        { timeout: TestTimeouts.DEFAULT },
-      );
-      await toggle.click({ force: true });
-      await patchPromise.catch(() => void 0);
-
-      await this.page.waitForTimeout(TestTimeouts.UI_DELAY_MEDIUM);
-      return !(await toggle.isChecked().catch(() => true));
     } catch {
       return false;
     }
@@ -371,40 +343,6 @@ export default class OverviewSettingsComponent extends BaseComponent {
       await this._loadBalancerFeatureInputTypeCheckbox.check({ force: true });
 
       return true;
-    } catch {
-      return false;
-    }
-  }
-
-  async enableVmTemplatesPreviewFeature(): Promise<boolean> {
-    try {
-      const toggle = this._vmTemplates;
-      await toggle.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
-
-      if (await toggle.isChecked()) {
-        return true;
-      }
-
-      const patchPromise = this.page.waitForResponse(
-        (resp) =>
-          (resp.url().includes(KUBEVIRT_UI_FEATURES_RESOURCE) ||
-            resp.url().includes('kubevirt-user-settings')) &&
-          isPatchOrPutRequest(resp) &&
-          isSuccessResponse(resp),
-        { timeout: TestTimeouts.DEFAULT },
-      );
-      await toggle.click({ force: true });
-      await patchPromise.catch(() => void 0);
-
-      await this.page.waitForTimeout(TestTimeouts.UI_DELAY_MEDIUM);
-
-      for (let i = 0; i < 10; i++) {
-        const state = await toggle.isChecked().catch(() => false);
-        if (state) return true;
-        await this.page.waitForTimeout(500);
-      }
-
-      return await toggle.isChecked().catch(() => false);
     } catch {
       return false;
     }

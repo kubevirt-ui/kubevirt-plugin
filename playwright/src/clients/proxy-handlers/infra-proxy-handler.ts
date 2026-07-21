@@ -166,19 +166,6 @@ export class InfraProxyHandler {
     );
   }
 
-  async isNativeVmTemplateFeatureGateEnabled(
-    namespace = 'openshift-cnv',
-    kubevirtName = 'kubevirt-kubevirt-hyperconverged',
-  ): Promise<boolean> {
-    const kv = await this.getKubeVirt(namespace, kubevirtName);
-    const spec = kv?.spec as Record<string, unknown> | undefined;
-    const config = spec?.configuration as Record<string, unknown> | undefined;
-    const devConfig = config?.developerConfiguration as Record<string, unknown> | undefined;
-    const featureGates = (devConfig?.featureGates as string[]) ?? [];
-    const disabledFeatureGates = (devConfig?.disabledFeatureGates as string[]) ?? [];
-    return featureGates.includes('Template') && !disabledFeatureGates.includes('Template');
-  }
-
   async isStorageMigrationAvailable(): Promise<boolean> {
     for (let attempt = 0; attempt < 2; attempt++) {
       try {

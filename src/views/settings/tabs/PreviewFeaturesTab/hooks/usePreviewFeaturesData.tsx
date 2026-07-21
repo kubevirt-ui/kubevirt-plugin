@@ -1,6 +1,6 @@
-import React, { ReactNode } from 'react';
+import React, { type ReactNode } from 'react';
 
-import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import {
   CONTROL_DEFAULT_VIRTUALIZATION_PERMISSIONS,
   PASST_UDN_NETWORK,
@@ -10,6 +10,7 @@ import {
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import usePasstFeatureFlag from '@kubevirt-utils/hooks/usePasstFeatureFlag';
+import useIsHyperConvergedV1Available from '@kubevirt-utils/hooks/useVMTemplateFeatureFlag/useIsHyperConvergedV1Available';
 import useVMTemplateFeatureFlag from '@kubevirt-utils/hooks/useVMTemplateFeatureFlag/useVMTemplateFeatureFlag';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { PREVIEW_FEATURES_TAB_IDS } from '@settings/search/constants';
@@ -47,8 +48,11 @@ const usePreviewFeaturesData: UsePreviewFeaturesData = (cluster) => {
     CONTROL_DEFAULT_VIRTUALIZATION_PERMISSIONS,
     cluster,
   );
+  // HCO v1: Template is Beta / first-class — hide jsonpatch toggle.
+  // HCO v1beta1 only: keep Preview Features toggle.
+  const { isHCOV1, loading: hcoV1Loading } = useIsHyperConvergedV1Available();
 
-  const features = [
+  const features: Feature[] = [
     {
       externalLink: null,
       id: TREE_VIEW_FOLDERS,
@@ -65,14 +69,17 @@ const usePreviewFeaturesData: UsePreviewFeaturesData = (cluster) => {
       searchItemId: PREVIEW_FEATURES_TAB_IDS.passtUDNNetwork,
       ...passtFeatureFlag,
     },
-    {
-      externalLink: 'https://kubevirt.io/user-guide/user_workloads/vm_templates/',
-      id: VM_TEMPLATES,
-      label: t('Enable native VirtualMachine templates'),
-      searchItemId: PREVIEW_FEATURES_TAB_IDS.vmTemplates,
-      ...templateFeatureFlag,
-    },
-
+    ...(!hcoV1Loading && !isHCOV1
+      ? [
+          {
+            externalLink: 'https://kubevirt.io/user-guide/user_workloads/vm_templates/',
+            id: VM_TEMPLATES,
+            label: t('Enable native VirtualMachine templates'),
+            searchItemId: PREVIEW_FEATURES_TAB_IDS.vmTemplates,
+            ...templateFeatureFlag,
+          } satisfies Feature,
+        ]
+      : []),
     {
       externalLink: null,
       helpPopoverContent: t(
@@ -96,7 +103,7 @@ const usePreviewFeaturesData: UsePreviewFeaturesData = (cluster) => {
     {
       canEditAll: true,
       isEnabledAll: true,
-      loading: false,
+      loading: hcoV1Loading,
       togglers: [],
     },
   );

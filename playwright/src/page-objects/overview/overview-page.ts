@@ -131,11 +131,6 @@ export default class OverviewPage extends PageCommons {
   ): ReturnType<OverviewMigrationsPage['disableMemoryDensity']> {
     return this.migrations.disableMemoryDensity(...args);
   }
-  disableVmTemplatesPreviewFeature(
-    ...args: Parameters<OverviewSettingsPage['disableVmTemplatesPreviewFeature']>
-  ): ReturnType<OverviewSettingsPage['disableVmTemplatesPreviewFeature']> {
-    return this._settings.disableVmTemplatesPreviewFeature(...args);
-  }
   dismissWelcomeModalCheckbox(
     ...args: Parameters<OverviewSettingsPage['dismissWelcomeModalCheckbox']>
   ): ReturnType<OverviewSettingsPage['dismissWelcomeModalCheckbox']> {
@@ -201,11 +196,6 @@ export default class OverviewPage extends PageCommons {
     return this.virtualizationFeatures.enableVirtualizationOptimizedAndCooLoggingMonitoring(
       ...args,
     );
-  }
-  enableVmTemplatesPreviewFeature(
-    ...args: Parameters<OverviewSettingsPage['enableVmTemplatesPreviewFeature']>
-  ): ReturnType<OverviewSettingsPage['enableVmTemplatesPreviewFeature']> {
-    return this._settings.enableVmTemplatesPreviewFeature(...args);
   }
   enableWelcomeInformation(
     ...args: Parameters<OverviewSettingsPage['enableWelcomeInformation']>
