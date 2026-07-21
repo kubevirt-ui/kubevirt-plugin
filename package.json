@@ -171,13 +171,13 @@
   "overrides": {
     "@openshift-console/dynamic-plugin-sdk": {
       "@patternfly/quickstarts": {
-        "dompurify": "3.4.0"
+        "dompurify": "^3.4.6"
       },
       "immutable": "^3.8.3"
     },
     "@openshift-console/dynamic-plugin-sdk-internal": {
       "@patternfly/quickstarts": {
-        "dompurify": "3.4.0"
+        "dompurify": "^3.4.6"
       },
       "immutable": "^3.8.3"
     },
