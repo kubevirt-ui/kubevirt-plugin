@@ -2,12 +2,14 @@ import { useMemo } from 'react';
 
 import { useClusterFilter } from '@kubevirt-utils/hooks/useClusterFilter';
 import { useProjectFilter } from '@kubevirt-utils/hooks/useProjectFilter';
+import useIsVMTemplateFeatureEnabled from '@kubevirt-utils/hooks/useVMTemplateFeatureFlag/useIsVMTemplateFeatureEnabled';
 import { type Template, type TemplateOrRequest } from '@kubevirt-utils/resources/template';
 import useIsACMPage from '@multicluster/useIsACMPage';
 import { type RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 
 import { TemplateFilterType } from './types';
 import useArchitectureFilter from './useArchitectureFilter';
+import useCategoryFilter from './useCategoryFilter';
 import useOSFilter from './useOSFilter';
 import useProviderFilter from './useProviderFilter';
 import useScopeFilter from './useScopeFilter';
@@ -21,11 +23,13 @@ const useVirtualMachineTemplatesFilters = (
   toolbarFilters: RowFilter<TemplateOrRequest>[];
 } => {
   const isACMPage = useIsACMPage();
+  const { featureEnabled: vmTemplatesEnabled } = useIsVMTemplateFeatureEnabled();
   const clusterFilter = useClusterFilter();
   const projectFilter = useProjectFilter();
 
   const typeFilter = useTypeFilter();
   const architectureFilter = useArchitectureFilter(templates);
+  const categoryFilter = useCategoryFilter(vmTemplatesEnabled ? templates : []);
   const scopeFilter = useScopeFilter();
   const providerFilter = useProviderFilter();
   const osFilter = useOSFilter();
@@ -36,8 +40,24 @@ const useVirtualMachineTemplatesFilters = (
   );
 
   const filters = useMemo<RowFilter<TemplateOrRequest>[]>(
-    () => [typeFilter, architectureFilter, scopeFilter, providerFilter, osFilter].filter(Boolean),
-    [typeFilter, architectureFilter, scopeFilter, providerFilter, osFilter],
+    () =>
+      [
+        typeFilter,
+        architectureFilter,
+        vmTemplatesEnabled ? categoryFilter : null,
+        scopeFilter,
+        providerFilter,
+        osFilter,
+      ].filter(Boolean),
+    [
+      typeFilter,
+      architectureFilter,
+      vmTemplatesEnabled,
+      categoryFilter,
+      scopeFilter,
+      providerFilter,
+      osFilter,
+    ],
   );
 
   // Type is controlled by TemplatesTypeToggle; keep it out of the Filter dropdown/chips.

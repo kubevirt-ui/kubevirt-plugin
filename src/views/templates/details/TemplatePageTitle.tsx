@@ -13,6 +13,7 @@ import {
   getACMTemplateListURL,
   isDeprecatedTemplate,
   isOpenShiftTemplate,
+  isVirtualMachineTemplate,
   type Template,
 } from '@kubevirt-utils/resources/template';
 import useIsACMPage from '@multicluster/useIsACMPage';
@@ -27,6 +28,7 @@ import {
 } from '@patternfly/react-core';
 
 import VirtualMachineTemplatesActions from '../actions/VirtualMachineTemplatesActions';
+import VirtualMachineTemplateActions from '../components/VirtualMachineTemplate/VirtualMachineTemplateActions';
 import CommonTemplateAlert from './CommonTemplateAlert';
 import useEditTemplateAccessReview from './hooks/useIsTemplateEditable';
 import NoPermissionTemplateAlert from './NoPermissionTemplateAlert';
@@ -85,6 +87,9 @@ const TemplatePageTitle: FC<TemplatePageTitleTitleProps> = ({ template }) => {
         <Flex alignItems={{ default: 'alignItemsCenter' }}>
           {isSidebarEditorDisplayed && <SidebarEditorSwitch />}
           {isOSTemplate && <VirtualMachineTemplatesActions template={template} />}
+          {isVirtualMachineTemplate(template) && (
+            <VirtualMachineTemplateActions vmTemplate={template} />
+          )}
         </Flex>
       </PaneHeading>
       {isCommonTemplate && isOSTemplate && <CommonTemplateAlert template={template} />}

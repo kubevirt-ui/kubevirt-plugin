@@ -1,5 +1,5 @@
 import { VirtualMachineTemplateModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1alpha1VirtualMachineTemplate } from '@kubevirt-ui-ext/kubevirt-api/virt-template';
+import { V1beta1VirtualMachineTemplate } from '@kubevirt-ui-ext/kubevirt-api/virt-template';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
 import useListClusters from '@kubevirt-utils/hooks/useListClusters';
@@ -12,7 +12,7 @@ type UseVirtualMachineTemplates = (
 ) => {
   error: any;
   loaded: boolean;
-  vmTemplates: V1alpha1VirtualMachineTemplate[];
+  vmTemplates: V1beta1VirtualMachineTemplate[];
 };
 
 const useVirtualMachineTemplates: UseVirtualMachineTemplates = (namespace, enabled = true) => {
@@ -25,7 +25,7 @@ const useVirtualMachineTemplates: UseVirtualMachineTemplates = (namespace, enabl
   const shouldWatch = enabled && modelAvailable && (isAdmin || Boolean(namespace));
 
   const [vmTemplates, loaded, loadError] = useKubevirtWatchResource<
-    V1alpha1VirtualMachineTemplate[]
+    V1beta1VirtualMachineTemplate[]
   >(
     shouldWatch
       ? {

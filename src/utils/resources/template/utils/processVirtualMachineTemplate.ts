@@ -1,5 +1,5 @@
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { V1alpha1VirtualMachineTemplate } from '@kubevirt-ui-ext/kubevirt-api/virt-template';
+import { V1beta1VirtualMachineTemplate } from '@kubevirt-ui-ext/kubevirt-api/virt-template';
 import { VirtualMachineTemplateModel } from '@kubevirt-utils/models';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getKubevirtBaseAPIPath } from '@multicluster/k8sRequests';
@@ -10,10 +10,10 @@ import { generateVMName } from './helpers';
 import { getParameters } from './selectors';
 import { ProcessedVirtualMachineTemplate, ProcessOptions } from './types';
 
-const API_GROUP_VERSION = 'subresources.template.kubevirt.io/v1alpha1';
+const API_GROUP_VERSION = 'subresources.template.kubevirt.io/v1beta1';
 
 const buildParameterOverrides = (
-  template: V1alpha1VirtualMachineTemplate,
+  template: V1beta1VirtualMachineTemplate,
   vmName?: string,
 ): Record<string, string> => {
   const overrides: Record<string, string> = {};
@@ -30,7 +30,7 @@ const buildParameterOverrides = (
 };
 
 export const processVirtualMachineTemplate = async (
-  template: V1alpha1VirtualMachineTemplate,
+  template: V1beta1VirtualMachineTemplate,
   cluster?: string,
   vmName?: string,
 ): Promise<V1VirtualMachine> => {

@@ -6,12 +6,12 @@ import {
 } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import {
-  V1alpha1VirtualMachineTemplate,
   V1alpha1VirtualMachineTemplateRequest,
+  V1beta1VirtualMachineTemplate,
 } from '@kubevirt-ui-ext/kubevirt-api/virt-template';
 import { ObjectMetadata } from '@openshift-console/dynamic-plugin-sdk';
 
-export type Template = V1alpha1VirtualMachineTemplate | V1Template;
+export type Template = V1beta1VirtualMachineTemplate | V1Template;
 
 export type TemplateOrRequest = Template | V1alpha1VirtualMachineTemplateRequest;
 
@@ -33,7 +33,7 @@ export type ProcessedVirtualMachineTemplate = {
 
 export const isVirtualMachineTemplate = (
   obj: TemplateOrRequest,
-): obj is V1alpha1VirtualMachineTemplate => obj?.kind === VirtualMachineTemplateModel.kind;
+): obj is V1beta1VirtualMachineTemplate => obj?.kind === VirtualMachineTemplateModel.kind;
 
 export const isVirtualMachineTemplateRequest = (
   obj: TemplateOrRequest,

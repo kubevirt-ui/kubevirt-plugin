@@ -3,6 +3,7 @@ import { type RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 import { TemplateFilterType } from '@templates/list/filters/types';
 
 type SplitTemplateFilters = {
+  categoryFilter: RowFilter<TemplateOrRequest> | undefined;
   commonFilters: RowFilter<TemplateOrRequest>[];
   openShiftTemplatesOnlyFilters: RowFilter<TemplateOrRequest>[];
   scopeFilter: RowFilter<TemplateOrRequest> | undefined;
@@ -20,8 +21,9 @@ const splitTemplateFilters = (rowFilters: RowFilter<TemplateOrRequest>[]): Split
     .filter(Boolean);
 
   const scopeFilter = getRowFilter(TemplateFilterType.TemplateScope);
+  const categoryFilter = getRowFilter(TemplateFilterType.Category);
 
-  return { commonFilters, openShiftTemplatesOnlyFilters, scopeFilter };
+  return { categoryFilter, commonFilters, openShiftTemplatesOnlyFilters, scopeFilter };
 };
 
 export default splitTemplateFilters;

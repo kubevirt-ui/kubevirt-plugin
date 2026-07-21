@@ -1,13 +1,15 @@
-import React, { FC, memo, useMemo } from 'react';
+import React, { type FC, memo, useMemo } from 'react';
 
 import DeprecatedBadge from '@kubevirt-utils/components/badges/DeprecatedBadge/DeprecatedBadge';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getAnnotations, getName, getNamespace, getUID } from '@kubevirt-utils/resources/shared';
 import {
+  getTemplateCategoryDisplay,
   getTemplateFlavorData,
   getTemplateOSLabelName,
   isDeprecatedTemplate,
-  Template,
+  isVirtualMachineTemplate,
+  type Template,
 } from '@kubevirt-utils/resources/template';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm';
 import { getOperatingSystemName } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
@@ -107,9 +109,15 @@ const TemplatesCatalogTile: FC<TemplatesCatalogTileProps> = memo(
                 <StackItem>
                   <b>{t('Project')}</b> {getNamespace(template)}
                 </StackItem>
-                <StackItem>
-                  <b>{t('OS')}</b> {osName}
-                </StackItem>
+                {isVirtualMachineTemplate(template) ? (
+                  <StackItem>
+                    <b>{t('Category')}</b> {getTemplateCategoryDisplay(template, t)}
+                  </StackItem>
+                ) : (
+                  <StackItem>
+                    <b>{t('OS')}</b> {osName}
+                  </StackItem>
+                )}
                 <StackItem>
                   <b>{t('vCPU | Memory')}</b> {cpuCount} | {readableSizeUnit(memory)}
                 </StackItem>
