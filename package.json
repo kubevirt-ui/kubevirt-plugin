@@ -162,7 +162,7 @@
     "@types/react": "^17.0.40",
     "react": "17.0.2",
     "react-dom": "17.0.2",
-    "dompurify": "^2.5.8",
+    "dompurify": "^3.4.6",
     "@openshift-console/dynamic-plugin-sdk-internal": {
       "immutable": "^3.8.3"
     },
