@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 import useKubevirtHyperconvergeConfiguration from '@kubevirt-utils/hooks/useKubevirtHyperconvergeConfiguration';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 
-import { TEMPLATE_FEATURE_GATE } from './constants';
+import { isTemplateFeatureGateEnabled } from './utils';
 
 type UseIsVMTemplateFeatureEnabled = (clusterOverride?: string) => {
   featureEnabled: boolean;
@@ -12,13 +12,14 @@ type UseIsVMTemplateFeatureEnabled = (clusterOverride?: string) => {
 
 const useIsVMTemplateFeatureEnabled: UseIsVMTemplateFeatureEnabled = (clusterOverride) => {
   const clusterParam = useClusterParam();
-  const cluster = clusterOverride || clusterParam;
+  const cluster = clusterOverride ?? clusterParam;
 
-  const { featureGates, hcLoaded } = useKubevirtHyperconvergeConfiguration(cluster);
+  const { disabledFeatureGates, featureGates, hcLoaded } =
+    useKubevirtHyperconvergeConfiguration(cluster);
 
   const featureEnabled = useMemo(
-    () => featureGates?.includes(TEMPLATE_FEATURE_GATE) ?? false,
-    [featureGates],
+    () => isTemplateFeatureGateEnabled(featureGates, disabledFeatureGates),
+    [disabledFeatureGates, featureGates],
   );
 
   return { featureEnabled, loading: !hcLoaded };

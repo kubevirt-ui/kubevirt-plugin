@@ -753,10 +753,6 @@ export default class RequestContextClient extends BaseClient implements ProxyApi
     return this.vm.hotplugVolumeToVm(namespace, vmName, volumeName, diskName);
   }
 
-  isNativeVmTemplateFeatureGateEnabled(namespace?: string, kubevirtName?: string) {
-    return this.infra.isNativeVmTemplateFeatureGateEnabled(namespace, kubevirtName);
-  }
-
   isStorageMigrationAvailable() {
     return this.infra.isStorageMigrationAvailable();
   }

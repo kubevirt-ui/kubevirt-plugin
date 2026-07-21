@@ -76,12 +76,6 @@ export default class SettingsPage extends BasePage {
     return this._migrations.disableMemoryDensity(...args);
   }
 
-  disableVmTemplatesPreviewFeature(
-    ...args: Parameters<OverviewSettingsPage['disableVmTemplatesPreviewFeature']>
-  ): ReturnType<OverviewSettingsPage['disableVmTemplatesPreviewFeature']> {
-    return this._settings.disableVmTemplatesPreviewFeature(...args);
-  }
-
   disableWelcomeInformation(
     ...args: Parameters<OverviewSettingsPage['disableWelcomeInformation']>
   ): ReturnType<OverviewSettingsPage['disableWelcomeInformation']> {
@@ -151,12 +145,6 @@ export default class SettingsPage extends BasePage {
     ...args: Parameters<OverviewSettingsPage['enableSSHUsingLoadBalancer']>
   ): ReturnType<OverviewSettingsPage['enableSSHUsingLoadBalancer']> {
     return this._settings.enableSSHUsingLoadBalancer(...args);
-  }
-
-  enableVmTemplatesPreviewFeature(
-    ...args: Parameters<OverviewSettingsPage['enableVmTemplatesPreviewFeature']>
-  ): ReturnType<OverviewSettingsPage['enableVmTemplatesPreviewFeature']> {
-    return this._settings.enableVmTemplatesPreviewFeature(...args);
   }
 
   enableWelcomeInformation(

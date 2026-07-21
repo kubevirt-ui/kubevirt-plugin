@@ -370,7 +370,7 @@ test.describe('Cluster Settings', { tag: [CNV_SETTINGS_TAG, '@adminOnly'] }, () 
 
   // ── Preview features tab ────────────────────────────────────────────────────────
 
-  test('Preview features tab shows VM folders, Passt binding, and native VM templates options', async ({
+  test('Preview features tab shows VM folders and Passt binding options', async ({
     settingsPage,
     utils,
   }) => {
@@ -397,13 +397,21 @@ test.describe('Cluster Settings', { tag: [CNV_SETTINGS_TAG, '@adminOnly'] }, () 
       expect.soft(hasPasst, 'Passt binding preview feature should be listed').toBe(true);
     });
 
-    await test.step('Native VirtualMachine templates feature flag is present', async () => {
+    // Assumes HCO v1 (OCP 4.23+): Template is Beta / first-class, so the
+    // Preview Features jsonpatch toggle is hidden. HCO v1beta1 still shows it
+    // and is not covered here.
+    await test.step('Native VirtualMachine templates feature flag is absent (HCO v1)', async () => {
       const hasNativeTemplates = labels.some(
-        (l) => l.toLowerCase().includes('template') || l.toLowerCase().includes('native'),
+        (l) =>
+          l.toLowerCase().includes('native virtualmachine template') ||
+          l.toLowerCase().includes('enable native'),
       );
       expect
-        .soft(hasNativeTemplates, 'Native VM templates preview feature should be listed')
-        .toBe(true);
+        .soft(
+          hasNativeTemplates,
+          'Native VM templates should not appear in preview features on HCO v1 (CNV-92254)',
+        )
+        .toBe(false);
     });
   });
 

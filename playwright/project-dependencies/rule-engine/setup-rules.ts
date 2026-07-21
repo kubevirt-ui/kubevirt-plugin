@@ -324,66 +324,6 @@ export function getSetupRules(): SetupRule[] {
       },
     },
     {
-      id: 'enable-native-vm-templates',
-      name: 'Enable native VM template feature gate on HCO',
-      phase: SetupPhase.CLUSTER,
-      guard: () => !EnvVariables.isNonPrivUser,
-      onError: 'warn',
-      run: async (ctx) => {
-        const apiClient = ctx.apiClient;
-        if (!apiClient) {
-          throw new Error('RequestContextClient not initialized');
-        }
-
-        const kubevirt = await apiClient.getResourceByKind(
-          'kubevirt',
-          'kubevirt-kubevirt-hyperconverged',
-          'openshift-cnv',
-        );
-        const devConfig = (
-          (kubevirt?.spec as Record<string, unknown>)?.configuration as Record<string, unknown>
-        )?.developerConfiguration as Record<string, unknown> | undefined;
-        const featureGates = (devConfig?.featureGates as string[]) ?? [];
-        const disabledFeatureGates = (devConfig?.disabledFeatureGates as string[]) ?? [];
-
-        if (featureGates.includes('Template')) {
-          logger.success('✓ Native VM template feature gate already enabled');
-          return;
-        }
-
-        const jsonPatchOps: Array<Record<string, unknown>> = [];
-
-        const disabledIndex = disabledFeatureGates.indexOf('Template');
-        if (disabledIndex >= 0) {
-          jsonPatchOps.push({
-            op: 'remove',
-            path: `/spec/configuration/developerConfiguration/disabledFeatureGates/${disabledIndex}`,
-          });
-        }
-
-        jsonPatchOps.push({
-          op: 'add',
-          path: '/spec/configuration/developerConfiguration/featureGates/-',
-          value: 'Template',
-        });
-
-        await apiClient.patchResourceByKind(
-          'HyperConverged',
-          'kubevirt-hyperconverged',
-          {
-            metadata: {
-              annotations: {
-                'kubevirt.kubevirt.io/jsonpatch': JSON.stringify(jsonPatchOps),
-              },
-            },
-          },
-          'openshift-cnv',
-          'merge',
-        );
-        logger.success('✓ Native VM template feature gate enabled on HCO');
-      },
-    },
-    {
       id: 'save-config',
       name: 'Persist shared test configuration',
       phase: SetupPhase.CLUSTER,

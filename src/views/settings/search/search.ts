@@ -1,10 +1,10 @@
-import { TFunction } from 'i18next';
+import { type TFunction } from 'i18next';
 
 import { idIsHighlighted } from '@kubevirt-utils/components/SearchItem/useIsHighlighted';
 import { VIRTUALIZATION_PATHS } from '@kubevirt-utils/constants/constants';
 import {
-  SearchItem,
-  SearchItemWithTab,
+  type SearchItem,
+  type SearchItemWithTab,
 } from '@virtualmachines/details/tabs/configuration/utils/search';
 
 import {
@@ -64,7 +64,12 @@ const getPreviewFeaturesTabIds = (t: TFunction): SearchItem[] => [
   },
   {
     id: PREVIEW_FEATURES_TAB_IDS.vmTemplates,
+    // Shown only on HCO v1beta1; HCO v1 hides the Preview Features toggle.
     title: t('Enable native VirtualMachine templates'),
+  },
+  {
+    id: PREVIEW_FEATURES_TAB_IDS.controlDefaultVirtualizationPermissions,
+    title: t('Control default Virtualization permissions'),
   },
 ];
 
@@ -100,6 +105,6 @@ export const isSearchItemChildrenHighlighted = (itemId: string, hash: string): b
   if (!childrenIds) return false;
 
   return childrenIds.some(
-    (id) => idIsHighlighted(id, hash) || isSearchItemChildrenHighlighted(id, hash),
+    (childId) => idIsHighlighted(childId, hash) || isSearchItemChildrenHighlighted(childId, hash),
   );
 };
