@@ -17,7 +17,7 @@ import {
 } from '@patternfly/react-core';
 
 import { useCapabilitiesData } from '../../context/useCapabilitiesData';
-import { countInstalledBundleCapabilities, isBundleFeature } from '../../utils/utils';
+import { countInstalledCapabilities, getBundleFeatures } from '../../utils/utils';
 import CapabilityCard from '../CapabilityCard/CapabilityCard';
 
 const BUNDLE_TOGGLE_ID = 'bundle-capabilities-toggle';
@@ -28,9 +28,9 @@ const VirtualizationBundleView: FC = () => {
   const [isExpanded, setIsExpanded] = useState(false);
   const { detailsMap, features, loadErrors, resourcesLoaded } = useCapabilitiesData();
 
-  const bundleFeatures = features.filter(isBundleFeature);
+  const bundleFeatures = getBundleFeatures(features);
   const totalBundleCapabilities = bundleFeatures.length;
-  const installedBundleCapabilities = countInstalledBundleCapabilities(features, detailsMap);
+  const installedBundleCapabilities = countInstalledCapabilities(bundleFeatures, detailsMap);
 
   return (
     <Stack hasGutter>

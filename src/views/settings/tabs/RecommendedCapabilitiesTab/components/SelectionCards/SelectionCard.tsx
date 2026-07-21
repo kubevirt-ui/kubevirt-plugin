@@ -14,6 +14,7 @@ import {
 
 import { CapabilitiesView, type SelectionCardConfig } from '../../utils/types';
 import InstallBundleButton from '../InstallBundleButton/InstallBundleButton';
+import InstallSelectedButton from '../InstallSelectedButton/InstallSelectedButton';
 
 import './SelectionCard.scss';
 
@@ -60,14 +61,15 @@ const SelectionCard: FC<SelectionCardProps> = ({ config, isSelected, onSelect })
                 )}
               </Split>
             </SplitItem>
-            {isSelected && id === CapabilitiesView.Bundle && (
+            {isSelected && (
               <SplitItem>
-                <InstallBundleButton />
+                {id === CapabilitiesView.Bundle ? <InstallBundleButton /> : <InstallSelectedButton />}
               </SplitItem>
             )}
           </Split>
         </CardHeader>
         <CardBody>{description}</CardBody>
+
       </Card>
     </GridItem>
   );
