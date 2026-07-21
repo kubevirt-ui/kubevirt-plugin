@@ -24,7 +24,7 @@ export const UtilizationBlock: FC<UtilizationBlockProps> = ({
       <div className="pf-v6-u-pl-lg">
         <div className="pf-v6-u-pb-sm">{title}</div>
         <Flex
-          data-test-id={dataTestId}
+          data-test={dataTestId}
           direction={isNetworkUtil ? null : { default: 'column' }}
           spaceItems={isNetworkUtil ? null : { default: 'spaceItemsNone' }}
         >

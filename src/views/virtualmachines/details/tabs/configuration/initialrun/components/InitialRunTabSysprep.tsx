@@ -79,7 +79,7 @@ const InitialRunTabSysprep: FC<InitialRunTabSysprepProps> = ({ canUpdateVM, onSu
           />
         ))
       }
-      data-test-id="sysprep-button"
+      data-test="sysprep-button"
       descriptionHeader={<SearchItem id="sysprep">{t('Sysprep')}</SearchItem>}
       isDisabled={!canUpdateVM}
       isEdit={canUpdateVM}

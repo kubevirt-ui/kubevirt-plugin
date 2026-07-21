@@ -298,6 +298,7 @@ const SelectTypeahead: FC<SelectTypeaheadProps> = ({
   const toggle = (toggleRef: Ref<MenuToggleElement>) => (
     <MenuToggle
       aria-label="Typeahead menu toggle"
+      data-test={dataTestId}
       isDisabled={isDisabled}
       isExpanded={isOpen}
       isFullWidth={isFullWidth}
@@ -341,7 +342,7 @@ const SelectTypeahead: FC<SelectTypeaheadProps> = ({
       onOpenChange={(isOpen) => {
         !isOpen && closeMenuAndSetInputToSelected();
       }}
-      ouiaId={dataTestId}
+      data-test={dataTestId}
       id={dataTestId}
       isOpen={isOpen}
       isScrollable

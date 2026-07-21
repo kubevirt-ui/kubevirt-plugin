@@ -24,8 +24,11 @@ const TemplateStepFooter: FC = () => {
   return (
     <WizardFooter
       activeStep={activeStep}
+      backButtonProps={{ 'data-test': 'wizard-back-button' } as any}
+      cancelButtonProps={{ 'data-test': 'wizard-cancel-button' } as any}
       isBackDisabled={activeStep.index === 1}
       isNextDisabled={isNextDisabledForStep(VMWizardStep.TEMPLATE)}
+      nextButtonProps={{ 'data-test': 'wizard-next-button' } as any}
       onBack={goToPrevStep}
       onClose={closeWizard}
       onNext={handleGoToNextStep}

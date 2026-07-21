@@ -45,7 +45,7 @@ const InstanceTypeDescription: FC<InstanceTypeDescriptionProps> = ({ vm }) => {
             None
           )
         }
-        data-test-id="virtual-machine-overview-details-instance-type"
+        data-test="virtual-machine-overview-details-instance-type"
         descriptionHeader={t('InstanceType')}
         isPopover
       />
@@ -66,7 +66,6 @@ const InstanceTypeDescription: FC<InstanceTypeDescriptionProps> = ({ vm }) => {
             None
           )
         }
-        data-test-id="virtual-machine-overview-details-preference"
         descriptionHeader={t('Preference')}
         isPopover
         olsObj={vm}

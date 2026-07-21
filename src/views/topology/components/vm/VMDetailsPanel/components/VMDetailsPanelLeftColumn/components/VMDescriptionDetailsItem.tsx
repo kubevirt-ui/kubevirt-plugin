@@ -37,7 +37,7 @@ const VMDescriptionDetailsItem: FC<VMDescriptionDetailsItemProps> = ({ vm }) => 
         ))
       }
       className="topology-vm-details-panel__item"
-      data-test-id={`${getName(vm)}-description`}
+      data-test={`${getName(vm)}-description`}
       descriptionHeader={<SearchItem id="description">{t('Description')}</SearchItem>}
       isEdit
     />

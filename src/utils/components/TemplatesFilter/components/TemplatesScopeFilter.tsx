@@ -24,7 +24,7 @@ const TemplatesScopeFilter: FC<TemplatesScopeFilterProps> = ({
   return (
     <Stack hasGutter>
       <Radio
-        ouiaId="catalog-template-filter-all-items"
+        data-test="catalog-template-filter-all-items"
         data-test-row-filter={TEMPLATE_SCOPE_ID.ALL}
         id={`filter-${type}-${TEMPLATE_SCOPE_ID.ALL}`}
         isChecked={!hasQueryKey(type)}
@@ -35,7 +35,7 @@ const TemplatesScopeFilter: FC<TemplatesScopeFilterProps> = ({
       />
       {items.map((item) => (
         <Radio
-          ouiaId={`catalog-template-filter-${item.id}`}
+          data-test={`catalog-template-filter-${item.id}`}
           data-test-row-filter={item.id}
           id={`filter-${type}-${item.id}`}
           isChecked={isSelected(type, item.id)}

@@ -32,10 +32,7 @@ const VMDetailsPanelRightColumn: FC<VMResourceListProps> = ({ instanceTypeVM, vm
   const vmHasS390xArchitecture = hasS390xArchitecture(vm);
 
   return (
-    <DescriptionList
-      className="pf-v6-c-description-list__group"
-      data-test-id="details-paneel-right-column"
-    >
+    <DescriptionList className="pf-v6-c-description-list__group">
       <VMStatusDetailsItem vm={vm} vmi={vmi} />
       <VMPodDetailsItem pods={pods} vmi={vmi} />
       <VMBootOrderDetailsItem instanceTypeVM={instanceTypeVM} vm={vm} vmi={vmi} />

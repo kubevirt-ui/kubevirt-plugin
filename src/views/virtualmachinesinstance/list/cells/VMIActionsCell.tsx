@@ -9,7 +9,7 @@ type VMIActionsCellProps = {
 };
 
 const VMIActionsCell: FC<VMIActionsCellProps> = ({ row }) => (
-  <div data-test="vmi-row-actions">
+  <div>
     <VirtualMachinesInstanceActions vmi={row} />
   </div>
 );

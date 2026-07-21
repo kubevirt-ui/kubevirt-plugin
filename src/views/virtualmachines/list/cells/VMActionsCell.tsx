@@ -9,9 +9,7 @@ const VMActionsCell: FC<VMCellWithCallbacksProps> = ({ callbacks, row }) => {
   const vmim = callbacks.getVmim(row);
   const [actions] = useVirtualMachineActionsProvider(row, vmim);
 
-  return (
-    <VirtualMachineActions actions={actions} data-test="vm-row-actions" isKebabToggle vm={row} />
-  );
+  return <VirtualMachineActions actions={actions} isKebabToggle vm={row} />;
 };
 
 export default VMActionsCell;

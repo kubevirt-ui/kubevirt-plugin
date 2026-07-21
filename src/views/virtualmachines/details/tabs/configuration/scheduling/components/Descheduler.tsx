@@ -14,6 +14,7 @@ const Descheduler: FC<DeschedulerProps> = ({ vm }) => {
 
   return (
     <Switch
+      data-test="descheduler-edit"
       id="descheduler-switch"
       isChecked={deschedulerEnabled}
       isDisabled={deschedulerSwitchDisabled}

@@ -93,7 +93,7 @@ const DetailsSectionBoot: FC<DetailsSectionBootProps> = ({
           ))
         }
         className="pf-v6-u-mb-lg"
-        data-test-id={`${vmName}-boot-method`}
+        data-test={`${vmName}-boot-method`}
         descriptionHeader={<SearchItem id="boot-mode">{t('Boot mode')}</SearchItem>}
         isEdit={canUpdateVM}
       />
@@ -125,7 +125,7 @@ const DetailsSectionBoot: FC<DetailsSectionBootProps> = ({
           ))
         }
         className="pf-v6-u-mb-lg"
-        data-test-id={`${vmName}-boot-order`}
+        data-test={`${vmName}-boot-order`}
         descriptionData={<BootOrderSummary instanceTypeVM={instanceTypeVM} vm={vm} />}
         descriptionHeader={<SearchItem id="boot-order">{t('Boot order')}</SearchItem>}
         isEdit
@@ -157,7 +157,6 @@ const DetailsSectionBoot: FC<DetailsSectionBootProps> = ({
           <SearchItem id="start-pause-mode">{t('Start in pause mode')}</SearchItem>
         }
         className="pf-v6-u-mb-lg"
-        data-test-id="start-pause-mode"
         isPopover
         olsObj={vm}
         promptType={OLSPromptType.START_IN_PAUSE_MODE}

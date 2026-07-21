@@ -80,7 +80,6 @@ const SSHTabAuthorizedSSHKey: FC<SSHTabAuthorizedSSHKeyProps> = ({
         ))
       }
       className={className}
-      data-test-id="public-ssh-key"
       descriptionHeader={<SearchItem id="public-ssh-key">{t('Public SSH key')}</SearchItem>}
       isEdit={isEditable}
       showEditOnTitle

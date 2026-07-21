@@ -21,3 +21,20 @@ export const ACTIONS_ID = {
   STOP: 'vm-action-stop',
   UNPAUSE: 'vm-action-unpause',
 } as const;
+
+export const BULK_ACTIONS_ID = {
+  DELETE: 'selected-vms-action-delete',
+  EDIT_LABELS: 'selected-vms-action-edit-labels',
+  EDIT_RUN_STRATEGY: 'selected-vms-action-change-run-strategy',
+  MIGRATE_COMPUTE: 'selected-vms-action-migrate-compute',
+  MIGRATE_STORAGE: 'vms-bulk-migrate-storage',
+  MIGRATION_MENU: 'bulk-migration-actions',
+  MOVE_TO_FOLDER: 'selected-vms-action-move-to-folder',
+  PAUSE: 'selected-vms-action-pause',
+  RESET: 'selected-vms-action-reset',
+  RESTART: 'selected-vms-action-restart',
+  SNAPSHOT: 'selected-vms-action-snapshot',
+  START: 'selected-vms-action-start',
+  STOP: 'selected-vms-action-stop',
+  UNPAUSE: 'selected-vms-action-unpause',
+} as const;

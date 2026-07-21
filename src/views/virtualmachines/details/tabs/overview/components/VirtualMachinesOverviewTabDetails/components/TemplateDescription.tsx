@@ -35,7 +35,6 @@ const TemplateDescription: FC<TemplateDescriptionProps> = ({ vm }) => {
           None
         )
       }
-      data-test-id="virtual-machine-overview-details-template"
       descriptionHeader={t('Template')}
     />
   );

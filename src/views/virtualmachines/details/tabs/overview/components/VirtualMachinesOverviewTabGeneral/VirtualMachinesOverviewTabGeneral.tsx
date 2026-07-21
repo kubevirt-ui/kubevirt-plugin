@@ -66,7 +66,6 @@ const VirtualMachinesOverviewTabGeneral: FC<VirtualMachinesOverviewTabGeneralPro
                     truncate
                   />
                 }
-                data-test-id="virtual-machine-overview-general-cluster"
                 descriptionHeader={t('Cluster')}
               />
             )}

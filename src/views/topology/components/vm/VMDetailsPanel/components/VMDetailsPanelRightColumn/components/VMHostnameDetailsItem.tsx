@@ -36,7 +36,7 @@ const VMHostnameDetailsItem: FC<VMHostnameDetailsItemProps> = ({ vm, vmi }) => {
         ))
       }
       className="topology-vm-details-panel__item"
-      data-test-id={`${vmName}-hostname`}
+      data-test={`${vmName}-hostname`}
       descriptionData={getHostname(vm) || vmName}
       descriptionHeader={t('Hostname')}
       isEdit

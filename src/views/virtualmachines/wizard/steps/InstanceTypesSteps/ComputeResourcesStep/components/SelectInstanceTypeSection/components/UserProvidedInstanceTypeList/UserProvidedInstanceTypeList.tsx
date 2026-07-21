@@ -149,7 +149,7 @@ const UserProvidedInstanceTypesList: FC<UserProvidedInstanceTypesListProps> = ({
                   key={`${itName}-${itNamespace}`}
                   onRowClick={() => handleRowClick(itName, itNamespace)}
                 >
-                  <Td>
+                  <Td data-test={itName}>
                     <ResourceLink
                       groupVersionKind={getGroupVersionKindForResource(instanceType)}
                       linkTo={false}

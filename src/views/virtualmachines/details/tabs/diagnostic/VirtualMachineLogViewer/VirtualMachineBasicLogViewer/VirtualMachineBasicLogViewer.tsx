@@ -39,11 +39,7 @@ const VirtualMachineBasicLogViewer: FC<VirtualMachineBasicLogViewerProps> = ({
         <Toolbar>
           <ToolbarContent>
             <ToolbarItem>
-              <LogViewerSearch
-                data-test="search-input"
-                minSearchChars={3}
-                placeholder="Search..."
-              />
+              <LogViewerSearch minSearchChars={3} placeholder="Search..." />
             </ToolbarItem>
             <ToolbarItem align={{ default: 'alignEnd' }}>
               <Checkbox

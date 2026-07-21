@@ -35,7 +35,7 @@ const VMCreatedTimestampDetailsItem: FC<VMCreatedTimestampDetailsItemProps> = ({
         )
       }
       className="topology-vm-details-panel__item"
-      data-test-id="virtual-machine-overview-details-created"
+      data-test="virtual-machine-overview-details-created"
       descriptionHeader={t('Created')}
     />
   );

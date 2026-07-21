@@ -63,7 +63,7 @@ const VirtualMachinesList: FC = () => {
   return (
     <div className="pf-v6-u-mt-sm" ref={listPageBodyRef}>
       {targetNamespace && (
-        <Label className="pf-v6-u-mb-sm" data-test="clone-source-project-label">
+        <Label className="pf-v6-u-mb-sm">
           {t('Project: {{project}}', { project: targetNamespace })}
         </Label>
       )}

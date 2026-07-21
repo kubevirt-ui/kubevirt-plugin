@@ -57,7 +57,7 @@ const DetailsToggleItems: FC<DetailsToggleItemsProps> = ({
           />
         }
         breadcrumb="VirtualMachine.spec.template.devices.autoattachGraphicsDevice"
-        data-test-id={`${vmName}-headless`}
+        data-test={`${vmName}-headless`}
         descriptionHeader={<SearchItem id="headless-mode">{t('Headless mode')}</SearchItem>}
         isPopover
         olsObj={vm}
@@ -83,7 +83,6 @@ const DetailsToggleItems: FC<DetailsToggleItemsProps> = ({
         descriptionHeader={
           <SearchItem id="guest-system-log-access">{t('Guest system log access')}</SearchItem>
         }
-        data-test-id="guest-system-log-access"
         isPopover
         olsObj={vm}
         promptType={OLSPromptType.GUEST_SYSTEM_LOG_ACCESS}
@@ -124,7 +123,6 @@ const DetailsToggleItems: FC<DetailsToggleItemsProps> = ({
         descriptionHeader={
           <SearchItem id="deletion-protection">{t('Deletion protection')}</SearchItem>
         }
-        data-test-id="deletion-protection"
         isPopover
         olsObj={vm}
         promptType={OLSPromptType.DELETION_PROTECTION}

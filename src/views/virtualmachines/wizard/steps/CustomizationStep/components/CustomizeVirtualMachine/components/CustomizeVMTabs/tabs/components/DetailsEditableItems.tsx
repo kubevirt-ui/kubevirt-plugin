@@ -49,7 +49,7 @@ const DetailsEditableItems: FC<DetailsEditableItemsProps> = ({ treeViewFoldersEn
             />
           ))
         }
-        data-test-id={`${vmName}-description`}
+        data-test={`${vmName}-description`}
         descriptionHeader={<SearchItem id="description">{t('Description')}</SearchItem>}
         isEdit
       />
@@ -71,7 +71,7 @@ const DetailsEditableItems: FC<DetailsEditableItemsProps> = ({ treeViewFoldersEn
               />
             ))
           }
-          data-test-id={`${vmName}-folder`}
+          data-test={`${vmName}-folder`}
           descriptionData={getLabel(vm, VM_FOLDER_LABEL)}
           descriptionHeader={<SearchItem id="folder">{t('Group')}</SearchItem>}
           isEdit
@@ -94,7 +94,7 @@ const DetailsEditableItems: FC<DetailsEditableItemsProps> = ({ treeViewFoldersEn
             />
           ))
         }
-        data-test-id={`${vmName}-hostname`}
+        data-test={`${vmName}-hostname`}
         descriptionData={getHostname(vm) || vmName}
         descriptionHeader={<SearchItem id="hostname">{t('Hostname')}</SearchItem>}
         isEdit

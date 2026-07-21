@@ -122,8 +122,8 @@ const OverviewTab: FC<OverviewTabProps> = ({ cluster, namespace }) => {
   const hasNoVMs = vms?.length === 0;
 
   return (
-    <PageSection>
-      <Stack hasGutter>
+    <PageSection data-test="dashboard">
+      <Stack data-test="vm-list-summary" hasGutter>
         <OverviewAlerts
           cluster={cluster}
           disabledClusters={disabledClusters}

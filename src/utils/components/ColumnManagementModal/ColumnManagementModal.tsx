@@ -85,7 +85,7 @@ export const ColumnManagementModal: FC<ColumnManagementModalProps> = ({
 
   return (
     <Modal
-      ouiaId="dialog-modal"
+      data-test="dialog-modal"
       isOpen={isOpen}
       onClose={onClose}
       position="top"
@@ -147,7 +147,7 @@ export const ColumnManagementModal: FC<ColumnManagementModalProps> = ({
           )}
           <Flex spaceItems={{ default: 'spaceItemsSm' }}>
             <Button
-              ouiaId="save-button"
+              data-test="save-button"
               form="modal-with-form-form"
               isDisabled={!loaded}
               isLoading={!loaded}
@@ -158,14 +158,14 @@ export const ColumnManagementModal: FC<ColumnManagementModalProps> = ({
               {t('Save')}
             </Button>
             <Button
-              ouiaId="reset-button"
+              data-test="reset-button"
               key="reset"
               onClick={resetColumns}
               variant={ButtonVariant.secondary}
             >
               {t('Restore default columns')}
             </Button>
-            <Button ouiaId="cancel-button" onClick={onClose} variant={ButtonVariant.link}>
+            <Button data-test="cancel-button" onClick={onClose} variant={ButtonVariant.link}>
               {t('Cancel')}
             </Button>
           </Flex>

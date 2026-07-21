@@ -63,6 +63,7 @@ const TemplatesTableRow: FC<TemplatesTableRowProps> = ({
 
   return (
     <Tr
+      data-test={`template-row-${templateName}`}
       isClickable
       isRowSelected={isRowSelected}
       isSelectable

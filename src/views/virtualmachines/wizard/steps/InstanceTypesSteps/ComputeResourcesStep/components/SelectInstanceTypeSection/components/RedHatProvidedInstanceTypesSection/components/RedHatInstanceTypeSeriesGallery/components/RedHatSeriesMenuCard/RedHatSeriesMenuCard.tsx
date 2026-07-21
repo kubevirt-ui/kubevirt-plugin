@@ -72,6 +72,7 @@ const RedHatSeriesMenuCard: FC<RedHatSeriesMenuCardProps> = ({ rhSeriesItem }) =
         }
       }}
       aria-pressed={isSelectedSeries}
+      data-test={`instance-type-series-${seriesName}`}
       isCompact
       onClick={handleSeriesClick}
       role="button"

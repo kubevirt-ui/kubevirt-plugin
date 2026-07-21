@@ -21,7 +21,6 @@ const ShowOnlyVMProjectsSwitch: FC<ShowOnlyVMProjectsSwitchProps> = ({ hasVMs })
       aria-label={showOnlyVMProjectsLabel}
       checked={isShowOnlyVMProjectsChecked(hasVMs, showEmptyProjects)}
       className="vms-tree-view__toolbar-switch"
-      data-test="show-only-vm-projects-switch"
       isDisabled={!hasVMs}
       isReversed
       onChange={(_, checked) => setShowEmptyProjects(checked ? HIDE : SHOW)}
@@ -36,9 +35,7 @@ const ShowOnlyVMProjectsSwitch: FC<ShowOnlyVMProjectsSwitchProps> = ({ hasVMs })
       <SplitItem isFilled />
       {!hasVMs ? (
         <Tooltip content={t('Create a VirtualMachine to enable this filter.')}>
-          <span data-test="show-only-vm-projects-switch-target" tabIndex={0}>
-            {switchControl}
-          </span>
+          <span tabIndex={0}>{switchControl}</span>
         </Tooltip>
       ) : (
         switchControl

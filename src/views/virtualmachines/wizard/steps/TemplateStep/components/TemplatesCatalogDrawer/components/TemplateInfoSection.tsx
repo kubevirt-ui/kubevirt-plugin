@@ -65,7 +65,6 @@ const TemplateInfoSection: FC = memo(() => {
       />
       <DescriptionItem
         bodyContent={<CPUDescription cpu={getCPU(vm)} />}
-        data-test-id="edit-cpu-mem"
         descriptionData={<CPUMemory vm={vm} />}
         descriptionHeader={t('CPU | Memory')}
         isPopover

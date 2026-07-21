@@ -41,7 +41,7 @@ const FieldGroup: FC<FieldGroupProps> = ({
       label={displayName || name}
     >
       <TextInput
-        data-test-id={fieldId}
+        data-test={fieldId}
         id={fieldId}
         isDisabled={isDisabled}
         isRequired={required}

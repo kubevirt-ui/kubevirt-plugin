@@ -30,7 +30,7 @@ const DiskSourceUrlInput: FC<DiskSourceUrlInputProps> = ({ os }) => {
       label={t('URL')}
     >
       <TextInput
-        ouiaId={diskSourceURLFieldID}
+        data-test={diskSourceURLFieldID}
         id={diskSourceURLFieldID}
         {...register(DATAVOLUME_HTTPURL_FIELD, {
           required: t('URL is required'),

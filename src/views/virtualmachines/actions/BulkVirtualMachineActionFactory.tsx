@@ -41,7 +41,7 @@ import { isLiveMigratable, isRunning, isStopped, printableVMStatus } from '../ut
 
 import ConfirmMultipleVMActionsModal from './components/ConfirmMultipleVMActionsModal/ConfirmMultipleVMActionsModal';
 import VirtualMachineMigrateModal from './components/VirtualMachineMigration/VirtualMachineMigrationModal';
-import { ACTIONS_ID } from './hooks/constants';
+import { ACTIONS_ID, BULK_ACTIONS_ID } from './hooks/constants';
 import { migrateVM, pauseVM, resetVM, restartVM, startVM, stopVM, unpauseVM } from './actions';
 import { BulkVirtualMachineActionFactory } from './types';
 import {
@@ -93,7 +93,7 @@ export const createBulkVirtualMachineActionFactory = (
       )),
     description: getBulkDeleteActionDescription(vms, t),
     disabled: isBulkDeleteActionDisabled(vms),
-    id: ACTIONS_ID.DELETE,
+    id: BULK_ACTIONS_ID.DELETE,
     label: isTreeViewAction ? t('Delete all VMs') : t('Delete'),
   }),
   editLabels: (
@@ -125,7 +125,7 @@ export const createBulkVirtualMachineActionFactory = (
       ));
     },
     disabled: isEmpty(vms),
-    id: ACTIONS_ID.EDIT_LABELS,
+    id: BULK_ACTIONS_ID.EDIT_LABELS,
     label: isTreeViewAction ? t('Edit VM labels') : t('Edit labels'),
   }),
   editRunStrategy: (
@@ -171,7 +171,7 @@ export const createBulkVirtualMachineActionFactory = (
       ));
     },
     disabled: isEmpty(vms),
-    id: ACTIONS_ID.EDIT_RUN_STRATEGY,
+    id: BULK_ACTIONS_ID.EDIT_RUN_STRATEGY,
     label: t('Edit run strategy'),
   }),
   migrateCompute: (
@@ -212,7 +212,7 @@ export const createBulkVirtualMachineActionFactory = (
       disabledTooltip: hasNoMigratableVMs
         ? t('None of the selected VirtualMachines are eligible for live migration')
         : getNoPermissionTooltipContent(t),
-      id: ACTIONS_ID.MIGRATE_COMPUTE,
+      id: BULK_ACTIONS_ID.MIGRATE_COMPUTE,
       label: t('Compute'),
     };
   },
@@ -251,7 +251,7 @@ export const createBulkVirtualMachineActionFactory = (
       description: t('Migrate VirtualMachine storage to a different StorageClass'),
       disabled: isLoading || isUnavailable || !planModel,
       disabledTooltip: migrateStorageDisabledTooltip(),
-      id: ACTIONS_ID.MIGRATE_STORAGE,
+      id: BULK_ACTIONS_ID.MIGRATE_STORAGE,
       label: t('Storage'),
     };
   },
@@ -308,7 +308,7 @@ export const createBulkVirtualMachineActionFactory = (
           ))
         : vms.forEach(pauseVM),
     disabled: vms.every((vm) => vm.status?.printableStatus === Stopped),
-    id: ACTIONS_ID.PAUSE,
+    id: BULK_ACTIONS_ID.PAUSE,
     label: t('Pause'),
   }),
   reset: (
@@ -334,7 +334,7 @@ export const createBulkVirtualMachineActionFactory = (
         : vms.forEach(resetVM),
     description: t('Hard power cycle on the VMs'),
     disabled: vms.every((vm) => vm.status?.printableStatus === Stopped),
-    id: ACTIONS_ID.RESET,
+    id: BULK_ACTIONS_ID.RESET,
     label: t('Reset'),
   }),
   restart: (
@@ -355,7 +355,7 @@ export const createBulkVirtualMachineActionFactory = (
           ))
         : vms.forEach(restartVM),
     disabled: vms.every((vm) => vm.status?.printableStatus === Stopped),
-    id: ACTIONS_ID.RESTART,
+    id: BULK_ACTIONS_ID.RESTART,
     label: t('Restart'),
   }),
   snapshot: (
@@ -370,13 +370,13 @@ export const createBulkVirtualMachineActionFactory = (
           <BulkSnapshotModal vms={vms} {...props} />
         ),
       ),
-    id: ACTIONS_ID.SNAPSHOT,
+    id: BULK_ACTIONS_ID.SNAPSHOT,
     label: t('Take snapshot'),
   }),
   start: (vms: V1VirtualMachine[]): ActionDropdownItemType => ({
     cta: () => vms.forEach(startVM),
     disabled: isEmpty(vms),
-    id: ACTIONS_ID.START,
+    id: BULK_ACTIONS_ID.START,
     label: t('Start'),
   }),
   stop: (
@@ -398,13 +398,13 @@ export const createBulkVirtualMachineActionFactory = (
         : vms.forEach((vm) => stopVM(vm));
     },
     disabled: isEmpty(vms),
-    id: ACTIONS_ID.STOP,
+    id: BULK_ACTIONS_ID.STOP,
     label: t('Stop'),
   }),
   unpause: (vms: V1VirtualMachine[]): ActionDropdownItemType => ({
     cta: () => vms.forEach(unpauseVM),
     disabled: !vms.every((vm) => vm.status?.printableStatus === Paused),
-    id: ACTIONS_ID.UNPAUSE,
+    id: BULK_ACTIONS_ID.UNPAUSE,
     label: t('Unpause'),
   }),
 });

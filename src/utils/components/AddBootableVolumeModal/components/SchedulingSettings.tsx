@@ -84,7 +84,7 @@ const SchedulingSettings: FC<SchedulingSettingsProps> = ({
         label={t('Cron expression')}
       >
         <TextInput
-          ouiaId="volume-registry-retain-cron-expression"
+          data-test="volume-registry-retain-cron-expression"
           id="volume-registry-retain-cron-expression"
           isDisabled={isDisabled}
           onBlur={onCronBlur}

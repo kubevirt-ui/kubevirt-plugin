@@ -74,7 +74,6 @@ const SchedulingSectionLeftGrid: FC<SchedulingSectionLeftGridProps> = ({
               />
             ))
           }
-          data-test-id="node-selector"
           descriptionHeader={<SearchItem id="node-selector">{t('Node selector')}</SearchItem>}
           isEdit={canUpdateVM}
         />
@@ -92,7 +91,6 @@ const SchedulingSectionLeftGrid: FC<SchedulingSectionLeftGridProps> = ({
               />
             ))
           }
-          data-test-id="tolerations"
           descriptionData={<Tolerations vm={vm} />}
           descriptionHeader={<SearchItem id="tolerations">{t('Tolerations')}</SearchItem>}
           isEdit={canUpdateVM}
@@ -110,14 +108,13 @@ const SchedulingSectionLeftGrid: FC<SchedulingSectionLeftGridProps> = ({
               />
             ))
           }
-          data-test-id="affinity-rules"
           descriptionData={<Affinity vm={vm} />}
           descriptionHeader={<SearchItem id="affinity">{t('Affinity rules')}</SearchItem>}
           isEdit={canUpdateVM}
         />
         <DescriptionItem
           bodyContent={<DeschedulerPopover />}
-          data-test-id="descheduler"
+          data-test="descheduler"
           descriptionData={<Descheduler vm={vm} />}
           descriptionHeader={<SearchItem id="descheduler">{t('Descheduler')}</SearchItem>}
           isPopover

@@ -17,7 +17,7 @@ const VMTemplateLink: FC<VMTemplateLinkProps> = ({ name, namespace, uid }) => (
     <ResourceIcon groupVersionKind={getGroupVersionKindForModel(TemplateModel)} />
     <Link
       className="co-resource-item__resource-name"
-      data-test-id={name}
+      data-test={name}
       title={uid}
       to={`/k8s/ns/${namespace}/${VIRTUALMACHINES_TEMPLATES_BASE_URL}/${name}`}
     >

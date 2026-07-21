@@ -50,6 +50,7 @@ const WelcomeModal: FC = () => {
   return (
     <Modal
       aria-label={t('Welcome modal')}
+      data-test="welcome-modal"
       isOpen={isOpen}
       onClose={onClose}
       variant={ModalVariant.large}

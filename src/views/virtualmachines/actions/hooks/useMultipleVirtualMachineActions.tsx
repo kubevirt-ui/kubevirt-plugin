@@ -18,7 +18,7 @@ import { getVMIMFromMapper, VMIMMapper } from '@virtualmachines/utils/mappers';
 import { createBulkVirtualMachineActionFactory } from '../BulkVirtualMachineActionFactory';
 
 import useClusterStorageMigrationAPI from './storageMigrationApi/useClusterStorageMigrationAPI';
-import { ACTIONS_ID } from './constants';
+import { BULK_ACTIONS_ID } from './constants';
 import useIsMTVInstalled from './useIsMTVInstalled';
 import useVirtualMachineActionsProvider from './useVirtualMachineActionsProvider';
 import { someVMIsMigrating } from './utils';
@@ -112,7 +112,7 @@ const useMultipleVirtualMachineActions: UseMultipleVirtualMachineActions = (
             {
               cta: null,
               disabled: hasMigratingVM,
-              id: ACTIONS_ID.MIGRATION_MENU,
+              id: BULK_ACTIONS_ID.MIGRATION_MENU,
               label: t('Migration'),
               options: migrationActions,
             },

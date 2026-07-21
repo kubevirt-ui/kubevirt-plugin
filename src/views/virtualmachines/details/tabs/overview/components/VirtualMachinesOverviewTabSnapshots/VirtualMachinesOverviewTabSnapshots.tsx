@@ -37,7 +37,7 @@ const VirtualMachinesOverviewTabSnapshots: FC<VirtualMachinesOverviewTabSnapshot
   const snapshotsTabLink = createURL('snapshots', location?.pathname);
 
   return (
-    <div data-test-id="virtual-machine-overview-snapshots">
+    <div data-test="virtual-machine-overview-snapshots">
       <Card>
         <CardTitle>
           <Flex justifyContent={{ default: 'justifyContentSpaceBetween' }}>

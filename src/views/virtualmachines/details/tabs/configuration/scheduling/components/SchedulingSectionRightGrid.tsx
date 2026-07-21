@@ -105,7 +105,7 @@ const SchedulingSectionRightGrid: FC<SchedulingSectionRightGridProps> = ({
               />
             ))
           }
-          data-test-id="dedicated-resources"
+          data-test="dedicated-resources"
           descriptionData={<DedicatedResources vm={isExpandableSpecVM(vm) ? instanceTypeVM : vm} />}
           isDisabled={isExpandableSpecVM(vm)}
           isEdit={canUpdateVM}
@@ -114,7 +114,7 @@ const SchedulingSectionRightGrid: FC<SchedulingSectionRightGridProps> = ({
           descriptionHeader={
             <SearchItem id="eviction-strategy">{t('Eviction strategy')}</SearchItem>
           }
-          data-test-id="eviction-strategy"
+          data-test="eviction-strategy"
           descriptionData={evictionStrategy}
           isEdit={canUpdateVM}
           onEditClick={onEditEvictionStrategy}
@@ -141,7 +141,7 @@ const SchedulingSectionRightGrid: FC<SchedulingSectionRightGridProps> = ({
             ))
           }
           bodyContent={getRunStrategyHelpText(t)}
-          data-test-id="run-strategy"
+          data-test="run-strategy"
           descriptionHeader={<SearchItem id="run-strategy">{t('Run strategy')}</SearchItem>}
           isEdit={canUpdateVM}
           isPopover

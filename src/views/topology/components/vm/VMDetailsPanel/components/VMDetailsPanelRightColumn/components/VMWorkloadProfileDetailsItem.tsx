@@ -49,7 +49,7 @@ const VMWorkloadProfileDetailsItem: FC<VMWorkloadProfileDetailsItemProps> = ({ v
           ))
         }
         className="topology-vm-details-panel__item"
-        data-test-id={`${vmName}-workload-profile`}
+        data-test={`${vmName}-workload-profile`}
         descriptionHeader={<SearchItem id="workload-profile">{t('Workload profile')}</SearchItem>}
         isEdit
       />

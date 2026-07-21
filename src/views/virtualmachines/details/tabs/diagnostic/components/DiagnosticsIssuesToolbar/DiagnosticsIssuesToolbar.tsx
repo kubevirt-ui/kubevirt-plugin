@@ -133,7 +133,6 @@ const DiagnosticsIssuesToolbar: FC<DiagnosticsIssuesToolbarProps> = ({
         <ToolbarItem>
           <SearchInput
             aria-label={t('Search diagnostics')}
-            data-test="diagnostics-search"
             onChange={(_event, value) => onSearchChange(value)}
             onClear={() => onSearchChange('')}
             placeholder={t('Search by reason, message...')}

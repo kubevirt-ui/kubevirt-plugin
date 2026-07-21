@@ -21,7 +21,7 @@ const ActiveUserList: FC<ActiveUserListProps> = ({ pathname, vmi }) => {
   const renderContent = (): ReactNode => {
     if (!isGuestAgentConnected && loaded && !loadError) {
       return (
-        <Bullseye data-test="active-users-no-agent">
+        <Bullseye>
           <MutedTextSpan text={t('Guest agent is required')} />
         </Bullseye>
       );

@@ -108,7 +108,6 @@ const VirtualMachineFilterToolbar: FC<VirtualMachineFilterToolbarProps> = ({
         })}
         <ToolbarItem>
           <Button
-            data-test="toggle-more-filters"
             onClick={() => setShowMoreFilters((prev) => !prev)}
             size={ButtonSize.sm}
             variant={ButtonVariant.link}

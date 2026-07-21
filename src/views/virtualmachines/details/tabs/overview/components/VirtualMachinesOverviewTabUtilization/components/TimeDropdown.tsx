@@ -11,7 +11,7 @@ const TimeDropdown: FC = () => {
     setDuration(DurationOption.fromDropdownLabel(value).toString());
 
   return (
-    <div data-test-id="duration-select">
+    <div>
       <DurationDropdown selectedDuration={duration} selectHandler={onDurationSelect} />
     </div>
   );

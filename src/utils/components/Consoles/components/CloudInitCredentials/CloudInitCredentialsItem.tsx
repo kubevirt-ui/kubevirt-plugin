@@ -35,7 +35,7 @@ const CloudInitCredentialsItem: FC<CloudInitCredentialsItemProps> = ({
         {!shouldHideCredentials && (
           <Tooltip content={isCredentialsVisible ? hideCredentialText : showCredentialText}>
             <Button
-              ouiaId={buttonDataTest}
+              data-test={buttonDataTest}
               icon={isCredentialsVisible ? <EyeSlashIcon /> : <EyeIcon />}
               onClick={() => setIsCredentialsVisible(!isCredentialsVisible)}
               variant="plain"

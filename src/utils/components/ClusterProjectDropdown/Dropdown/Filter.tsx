@@ -25,7 +25,7 @@ const Filter: FC<FilterProps> = ({
         <TextInput
           aria-label={t(config.selectPlaceholder)}
           autoFocus
-          ouiaId="dropdown-text-filter"
+          data-test="dropdown-text-filter"
           onChange={(_, value: string) => onFilterChange(value)}
           placeholder={t(config.selectPlaceholder)}
           ref={filterRef}

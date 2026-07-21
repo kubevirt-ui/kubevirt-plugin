@@ -36,7 +36,7 @@ const VMStatusDetailsItem: FC<VMStatusDetailsItemProps> = ({ vm, vmi }) => {
         </Split>
       }
       className="topology-vm-details-panel__item"
-      data-test-id="virtual-machine-overview-details-status"
+      data-test="virtual-machine-overview-details-status"
       descriptionHeader={t('Status')}
     />
   );

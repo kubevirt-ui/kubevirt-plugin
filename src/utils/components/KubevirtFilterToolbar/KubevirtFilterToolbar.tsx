@@ -71,7 +71,7 @@ const KubevirtFilterToolbar: FC<KubevirtFilterToolbarProps> = ({
         setSearchInputText('');
       }}
       clearFiltersButtonText={t('Clear all filters')}
-      ouiaId="filter-toolbar"
+      data-test="filter-toolbar"
       id="filter-toolbar"
     >
       <ToolbarContent>
