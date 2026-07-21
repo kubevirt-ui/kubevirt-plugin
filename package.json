@@ -147,7 +147,8 @@
       "react-i18next": "~16.5.8"
     },
     "eslint": "^8.57.1",
-    "delaunator": "4.0.1"
+    "delaunator": "4.0.1",
+    "dompurify": "^3.4.6"
   },
   "private": true,
   "scripts": {
