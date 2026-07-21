@@ -16,7 +16,7 @@ import type { Page } from '@playwright/test';
 export default class VirtualMachinesPage extends TreeContextMenuMixin(PageCommons) {
   // Move to folder modal locators
   private readonly _inputPlaceholderSearchFolder = this.locator(
-    'input[placeholder="Search folder"]',
+    'input[placeholder="Search group"]',
   );
   readonly emptyState: VmListEmptyStateComponent;
   readonly listActions: VmListActionsComponent;
@@ -167,7 +167,7 @@ export default class VirtualMachinesPage extends TreeContextMenuMixin(PageCommon
       await this.robustClick(existingFolderOption);
     } else {
       // Try clicking the "Create folder" option for creating new folders
-      const createFolderOption = this.page.getByText(`Create folder "${folderName}"`);
+      const createFolderOption = this.page.getByText(`Create group "${folderName}"`);
       await this.robustClick(createFolderOption);
     }
   }

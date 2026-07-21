@@ -48,7 +48,7 @@ const FolderSelect: FC<FoldersSelectProps> = ({
       isDisabled={isDisabled}
       isFullWidth={isFullWidth}
       options={options}
-      placeholder={t('Search folder')}
+      placeholder={t('Search group')}
       selectedValue={selectedFolder}
       setSelectedValue={setSelectedFolder}
     />

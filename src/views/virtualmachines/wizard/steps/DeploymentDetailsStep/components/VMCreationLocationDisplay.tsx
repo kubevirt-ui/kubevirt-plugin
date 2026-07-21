@@ -60,7 +60,7 @@ const VMCreationLocationDisplay: FC<VMCreationLocationDisplayProps> = ({
           {!treeViewFoldersLoading && treeViewFoldersEnabled && (
             <>
               <span className="pf-v6-u-font-weight-bold pf-v6-u-mx-xs">{'>'}</span>
-              <span className="pf-v6-u-font-weight-bold pf-v6-u-mr-xs">{t('Folder')}</span>
+              <span className="pf-v6-u-font-weight-bold pf-v6-u-mr-xs">{t('Group')}</span>
               {folder || NO_DATA_DASH}
             </>
           )}

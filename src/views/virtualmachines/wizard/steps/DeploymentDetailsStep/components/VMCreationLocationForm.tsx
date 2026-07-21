@@ -86,12 +86,12 @@ const VMCreationLocationForm: FC = () => {
           !treeViewFoldersLoading && !treeViewFoldersEnabled ? (
             <HelpTextIcon
               bodyContent={t(
-                'Enable the "Enable folders in VirtualMachines tree view" preview feature in Settings > Preview features to use folders.',
+                'Enable the "Enable groups in VirtualMachines tree view" preview feature in Settings > Preview features to use groups.',
               )}
             />
           ) : undefined
         }
-        label={t('Folder (optional)')}
+        label={t('Group (optional)')}
       >
         <FolderSelect
           setSelectedFolder={(newFolder) =>

@@ -14,7 +14,7 @@ export const getCreateNewFolderOption = (filterValue: string, t: TFunction): Sel
       children: (
         <HelperText>
           <HelperTextItem icon={<InfoIcon />} variant="indeterminate">
-            {t('Type to create folder')}
+            {t('Type to create group')}
           </HelperTextItem>
         </HelperText>
       ),
@@ -35,7 +35,7 @@ export const getCreateNewFolderOption = (filterValue: string, t: TFunction): Sel
   }
 
   return {
-    children: t(`Create folder "{{filterValue}}"`, { filterValue }),
+    children: t(`Create group "{{filterValue}}"`, { filterValue }),
     isDisabled: false,
   };
 };

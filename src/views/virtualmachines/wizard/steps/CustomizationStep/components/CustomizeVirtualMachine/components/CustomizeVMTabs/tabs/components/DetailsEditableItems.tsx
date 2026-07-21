@@ -73,7 +73,7 @@ const DetailsEditableItems: FC<DetailsEditableItemsProps> = ({ treeViewFoldersEn
           }
           data-test-id={`${vmName}-folder`}
           descriptionData={getLabel(vm, VM_FOLDER_LABEL)}
-          descriptionHeader={<SearchItem id="folder">{t('Folder')}</SearchItem>}
+          descriptionHeader={<SearchItem id="folder">{t('Group')}</SearchItem>}
           isEdit
         />
       )}

@@ -454,7 +454,7 @@ export default class VmWizardComputeCustomizationComponent extends BaseComponent
   async verifyCustomizationDetailsFields(): Promise<string[]> {
     const expectedFields = [
       'Description',
-      'Folder',
+      'Group',
       'Hostname',
       'Headless mode',
       'Guest system log access',

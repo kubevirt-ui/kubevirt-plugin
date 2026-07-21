@@ -32,14 +32,14 @@ const MoveVMToFolderModal: FC<MoveVMToFolderModalProps> = ({ isOpen, onClose, on
         removeFolderQuery?.(folderName);
         return onSubmit(folderName);
       }}
-      headerText={t('Move to folder')}
+      headerText={t('Move to group')}
       isOpen={isOpen}
       onClose={onClose}
     >
       <Stack hasGutter>
         <StackItem>
           <Trans t={t}>
-            Move <b>{getName(vm)}</b> VirtualMachine to folder
+            Move <b>{getName(vm)}</b> VirtualMachine to group
           </Trans>
         </StackItem>
         <StackItem>

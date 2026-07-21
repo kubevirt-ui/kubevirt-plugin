@@ -837,7 +837,7 @@ export class CreateVmTemplateCatalogComponent extends BaseComponent {
   );
   private readonly _bootFromCDCheckbox = this.locator('[data-test-id="boot-cd"]');
   private readonly _bootSourceDropdown = this.locator('[data-test-id="cd-boot-source"]');
-  private readonly _createFolderButton = this.locator('button:has-text("Create folder")');
+  private readonly _createFolderButton = this.locator('button:has-text("Create group")');
   private readonly _createVirtualMachineButton = this.locator('button', {
     hasText: 'Create VirtualMachine',
   });
@@ -859,7 +859,7 @@ export class CreateVmTemplateCatalogComponent extends BaseComponent {
 
   private readonly _quickCreateVmButton = this.locator('[data-test-id="quick-create-vm-btn"]');
   private readonly _quickFormVmFolderInput = this.locator(
-    '[id="quick-create-form"] [placeholder="Search folder"]',
+    '[id="quick-create-form"] [placeholder="Search group"]',
   );
   private readonly _quickFormVmFolderSelectButton = this.locator('#vm-folder-select button');
   private readonly _searchCatalogInput = this.locator(

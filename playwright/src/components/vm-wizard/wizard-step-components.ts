@@ -56,7 +56,7 @@ export class VmCreationWizardLocationComponent extends BaseComponent {
         .isVisible({ timeout: TestTimeouts.SHORT_WAIT })
         .catch(() => false),
       folderCombobox: await this.locator(
-        '.pf-v6-c-wizard input[role="combobox"][placeholder*="folder"]',
+        '.pf-v6-c-wizard input[role="combobox"][placeholder*="group"]',
       )
         .first()
         .isVisible({ timeout: TestTimeouts.SHORT_WAIT })

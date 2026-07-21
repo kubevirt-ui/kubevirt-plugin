@@ -49,7 +49,7 @@ const ReviewGridLeftColumn: FC = () => {
         {!treeViewFoldersLoading && treeViewFoldersEnabled && (
           <DescriptionItem
             descriptionData={getFolder(vm) || NO_DATA_DASH}
-            descriptionHeader={t('Folder')}
+            descriptionHeader={t('Group')}
           />
         )}
       </DescriptionList>
