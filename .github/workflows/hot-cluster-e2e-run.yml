@@ -146,6 +146,10 @@ on:
         type: string
         required: false
         default: ''
+    outputs:
+      test_failure_summary:
+        description: Markdown summary of Playwright test failures parsed from JUnit XML (empty when all tests pass or XML is unavailable)
+        value: ${{ jobs.run-gating-tests.outputs.test_failure_summary }}
 
 permissions:
   contents: read
@@ -269,6 +273,8 @@ jobs:
           (inputs.cnv_pin_version == '4.21' || inputs.cnv_pin_version == '4.22') && format('auto-test-secret-{0}', github.run_id) ||
           'auto-test-secret'
         }}
+    outputs:
+      test_failure_summary: ${{ steps.test-summary.outputs.test_summary }}
 
     steps:
       # Folded in from a former standalone "Check Runner Image" job (same
@@ -525,6 +531,84 @@ jobs:
             # features is Cypress-only on release branches; Playwright on main has no features project.
             ./playwright-runner-hc-e2e.sh Gating
           fi
+
+      - name: Extract test failure summary
+        id: test-summary
+        if: always()
+        run: |
+          RESULTS_FILE="playwright/test-results/results.xml"
+          if [[ "${TEST_ENGINE}" != "playwright" || ! -f "${RESULTS_FILE}" ]]; then
+            echo "test_summary=" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          SUMMARY=$(node << 'NODESCRIPT'
+          const fs = require('fs');
+          try {
+            const xml = fs.readFileSync('playwright/test-results/results.xml', 'utf8');
+
+            const decode = (s) => s
+              .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+              .replace(/&quot;/g, '"').replace(/&apos;/g, "'")
+              .replace(/&#10;/g, ' ').replace(/&#13;/g, '');
+
+            const attr = (el, name) => {
+              const m = el.match(new RegExp(name + '="([^"]*)"'));
+              return m ? decode(m[1]) : '';
+            };
+
+            const root = xml.match(/<testsuites[^>]*>/);
+            const total = root ? attr(root[0], 'tests') : '?';
+            const failed = root ? attr(root[0], 'failures') : '?';
+            const skipped = root ? attr(root[0], 'skipped') : '0';
+            const passed = (total !== '?' && failed !== '?')
+              ? String(Number(total) - Number(failed) - Number(skipped))
+              : '?';
+
+            if (failed === '0') process.exit(0);
+
+            const failures = [];
+            const re = /<testcase\s+([\s\S]*?)>([\s\S]*?)<\/testcase>/g;
+            let m;
+            while ((m = re.exec(xml)) !== null) {
+              if (!m[2].includes('<failure')) continue;
+              const failTag = m[2].match(/<failure\s+([\s\S]*?)(?:\/>|>[\s\S]*?<\/failure>)/);
+              failures.push({
+                name: attr(m[1], 'name'),
+                suite: attr(m[1], 'classname'),
+                msg: failTag ? attr(failTag[1], 'message') : '',
+              });
+            }
+
+            if (failures.length === 0) process.exit(0);
+
+            const MAX = 25;
+            let out = `**${failed}** of **${total}** tests failed, **${passed}** passed`;
+            if (skipped !== '0') out += `, ${skipped} skipped`;
+            out += '\n\n| Test | Error |\n| --- | --- |\n';
+            for (const f of failures.slice(0, MAX)) {
+              const name = f.name.replace(/\|/g, '\\|').replace(/\n/g, ' ');
+              const msg = f.msg.replace(/\|/g, '\\|').replace(/\n/g, ' ').substring(0, 200);
+              out += `| ${name} | ${msg} |\n`;
+            }
+            if (failures.length > MAX) {
+              out += `\n_...and ${failures.length - MAX} more failures (see workflow artifacts for full report)_\n`;
+            }
+            if (out.length > 60000) {
+              out = out.substring(0, 60000) + '\n\n_...truncated_\n';
+            }
+            process.stdout.write(out);
+          } catch (e) {
+            process.exit(0);
+          }
+          NODESCRIPT
+          )
+
+          {
+            echo 'test_summary<<SUMMARY_DELIM'
+            echo "${SUMMARY}"
+            echo 'SUMMARY_DELIM'
+          } >> "$GITHUB_OUTPUT"
 
       - name: Upload test artifacts
         if: always()
