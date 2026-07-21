@@ -53,7 +53,7 @@ const TemplatesCatalogTile: FC<TemplatesCatalogTileProps> = memo(
     return (
       <Card
         className="templates-catalog-tile"
-        data-test-id={templateName}
+        data-test={templateName}
         id={templateID}
         isSelectable
         isSelected={isSelected}

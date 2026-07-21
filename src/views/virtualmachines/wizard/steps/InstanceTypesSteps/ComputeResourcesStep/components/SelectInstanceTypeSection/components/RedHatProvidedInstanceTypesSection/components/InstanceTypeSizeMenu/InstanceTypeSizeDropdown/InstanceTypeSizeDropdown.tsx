@@ -116,6 +116,7 @@ const InstanceTypeSizeDropdown: FC<InstanceTypeSizeDropdownProps> = ({
                 )}
                 {standardSizes.map((size) => (
                   <MenuItem
+                    data-test={`instance-type-size-${size.sizeLabel}`}
                     isSelected={size.sizeLabel === selectedSize}
                     key={size.sizeLabel}
                     onClick={() => handleSelect(size.sizeLabel)}

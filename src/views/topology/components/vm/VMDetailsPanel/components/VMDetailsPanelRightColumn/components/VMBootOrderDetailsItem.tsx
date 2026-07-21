@@ -35,7 +35,7 @@ const VMBootOrderDetailsItem: FC<VMBootOrderDetailsItemProps> = ({ instanceTypeV
         ))
       }
       className="topology-vm-details-panel__item"
-      data-test-id={`${getName(vm)}-boot-order`}
+      data-test={`${getName(vm)}-boot-order`}
       descriptionData={<BootOrderSummary instanceTypeVM={instanceTypeVM} vm={vm} />}
       descriptionHeader={t('Boot order')}
       isEdit

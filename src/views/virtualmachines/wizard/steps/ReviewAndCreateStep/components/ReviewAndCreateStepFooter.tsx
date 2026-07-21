@@ -44,7 +44,7 @@ const ReviewAndCreateStepFooter: FC = () => {
                 {backButtonText}
               </Button>
             </ActionListItem>
-            <ActionListItem>
+            <ActionListItem data-test="create-virtual-machine">
               <VMNameConfirmationNextButton isSubmitting={isSubmitting} onClick={createVM}>
                 {createButtonText}
               </VMNameConfirmationNextButton>

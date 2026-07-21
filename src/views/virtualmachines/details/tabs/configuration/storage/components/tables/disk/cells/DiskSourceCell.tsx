@@ -21,12 +21,12 @@ const DiskSourceCell: FC<DiskSourceCellProps> = ({ row, sourcesLoaded, vm }) => 
   const dataTestId = `disk-source-${row.name}`;
 
   if (!sourcesLoaded && (hasPVC || hasDataVolume)) {
-    return <Skeleton data-test-id={dataTestId} width="200px" />;
+    return <Skeleton data-test={dataTestId} width="200px" />;
   }
 
   if (sourcesLoaded && (hasPVC || hasDataVolume)) {
     return (
-      <span data-test-id={dataTestId}>
+      <span data-test={dataTestId}>
         <MulticlusterResourceLink
           groupVersionKind={modelToGroupVersionKind(
             hasDataVolume ? DataVolumeModel : PersistentVolumeClaimModel,
@@ -39,7 +39,7 @@ const DiskSourceCell: FC<DiskSourceCellProps> = ({ row, sourcesLoaded, vm }) => 
     );
   }
 
-  return <span data-test-id={dataTestId}>{source ?? NO_DATA_DASH}</span>;
+  return <span data-test={dataTestId}>{source ?? NO_DATA_DASH}</span>;
 };
 
 export default DiskSourceCell;

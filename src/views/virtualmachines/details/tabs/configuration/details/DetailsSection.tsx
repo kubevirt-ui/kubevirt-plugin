@@ -124,7 +124,7 @@ const DetailsSection: FC<DetailsSectionProps> = ({ allInstanceTypes, instanceTyp
                   />
                 ))
               }
-              data-test-id={`${vmName}-description`}
+              data-test={`${vmName}-description`}
               descriptionHeader={<SearchItem id="description">{t('Description')}</SearchItem>}
               isEdit
             />
@@ -159,7 +159,7 @@ const DetailsSection: FC<DetailsSectionProps> = ({ allInstanceTypes, instanceTyp
                     />
                   ))
                 }
-                data-test-id={`${vmName}-workload-profile`}
+                data-test={`${vmName}-workload-profile`}
                 isEdit
               />
             )}
@@ -195,7 +195,7 @@ const DetailsSection: FC<DetailsSectionProps> = ({ allInstanceTypes, instanceTyp
               }
               additionalContent={hasNUMAConfiguration(cpuMemoryVM) && <NUMABadge />}
               bodyContent={isInstanceType ? null : <CPUDescription cpu={getCPU(vm)} />}
-              data-test-id={`${vmName}-cpu-memory`}
+              data-test={`${vmName}-cpu-memory`}
               descriptionData={<CPUMemory vm={cpuMemoryVM || vm} vmi={vmi} />}
               isEdit={canUpdateVM}
               isPopover
@@ -222,7 +222,7 @@ const DetailsSection: FC<DetailsSectionProps> = ({ allInstanceTypes, instanceTyp
                   />
                 ))
               }
-              data-test-id={`${vmName}-hostname`}
+              data-test={`${vmName}-hostname`}
               descriptionData={vm?.spec?.template?.spec?.hostname || vmName}
               descriptionHeader={<SearchItem id="hostname">{t('Hostname')}</SearchItem>}
               isEdit
@@ -238,7 +238,7 @@ const DetailsSection: FC<DetailsSectionProps> = ({ allInstanceTypes, instanceTyp
                 />
               }
               breadcrumb="VirtualMachine.spec.template.devices.autoattachGraphicsDevice"
-              data-test-id={`${vmName}-headless`}
+              data-test={`${vmName}-headless`}
               descriptionHeader={<SearchItem id="headless-mode">{t('Headless mode')}</SearchItem>}
               isPopover
               olsObj={vm}
@@ -262,7 +262,6 @@ const DetailsSection: FC<DetailsSectionProps> = ({ allInstanceTypes, instanceTyp
               descriptionHeader={
                 <SearchItem id="guest-system-log-access">{t('Guest system log access')}</SearchItem>
               }
-              data-test-id="guest-system-log-access"
               isPopover
               olsObj={vm}
               promptType={OLSPromptType.GUEST_SYSTEM_LOG_ACCESS}
@@ -298,7 +297,6 @@ const DetailsSection: FC<DetailsSectionProps> = ({ allInstanceTypes, instanceTyp
               descriptionHeader={
                 <SearchItem id="deletion-protection">{t('Deletion protection')}</SearchItem>
               }
-              data-test-id="deletion-protection"
               isPopover
               olsObj={vm}
               promptType={OLSPromptType.DELETION_PROTECTION}

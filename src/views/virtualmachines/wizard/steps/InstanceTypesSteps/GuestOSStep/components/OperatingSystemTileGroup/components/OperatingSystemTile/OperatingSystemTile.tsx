@@ -27,6 +27,7 @@ const OperatingSystemTile: FC<OperatingSystemTileProps> = ({
       className={classnames('operating-system-tile', 'pf-v6-u-p-md', {
         'operating-system-tile--selected': isSelected,
       })}
+      data-test={`os-tile-${operatingSystem}`}
       isClickable
       isSelectable
       isSelected={isSelected}

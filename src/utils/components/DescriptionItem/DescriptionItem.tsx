@@ -128,7 +128,7 @@ const DescriptionItem: FC<DescriptionItemProps> = ({
           {isEdit && showEditOnTitle && (
             <FlexItem>
               <Button
-                ouiaId={`${testId}-edit`}
+                data-test={`${testId}-edit`}
                 icon={<PencilAltIcon />}
                 iconPosition="end"
                 isDisabled={isDisabled}

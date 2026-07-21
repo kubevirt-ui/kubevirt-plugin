@@ -38,7 +38,7 @@ const VirtualMachinesOverviewTabFilesystem: FC<VirtualMachinesOverviewTabFilesys
   const renderContent = (): ReactNode => {
     if (!isVMRunning) {
       return (
-        <Bullseye data-test="overview-filesystem-not-running">
+        <Bullseye>
           <MutedTextSpan text={t('VirtualMachine is not running')} />
         </Bullseye>
       );
@@ -46,7 +46,7 @@ const VirtualMachinesOverviewTabFilesystem: FC<VirtualMachinesOverviewTabFilesys
 
     if (!isConnected) {
       return (
-        <Bullseye data-test="overview-filesystem-no-agent">
+        <Bullseye>
           <MutedTextSpan text={t('Guest agent is required')} />
         </Bullseye>
       );
@@ -62,7 +62,7 @@ const VirtualMachinesOverviewTabFilesystem: FC<VirtualMachinesOverviewTabFilesys
   };
 
   return (
-    <Card data-test="overview-filesystem-card">
+    <Card>
       <FilesystemListTitle />
       <Divider />
       <CardBody isFilled>{renderContent()}</CardBody>

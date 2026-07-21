@@ -28,6 +28,7 @@ const CreationMethodTile: FC<CreationMethodTileProps> = ({
   return (
     <Card
       className="vm-creation-method-tile"
+      data-test={`creation-method-${creationMethod}`}
       id={creationMethod}
       isClickable
       isSelectable

@@ -21,10 +21,7 @@ type VMResourceSummaryProps = {
 };
 
 const VMDetailsPanelLeftColumn: FC<VMResourceSummaryProps> = ({ vm, vmi }) => (
-  <DescriptionList
-    className="pf-v6-c-description-list__group"
-    data-test-id="details-panel-left-column"
-  >
+  <DescriptionList className="pf-v6-c-description-list__group">
     <VMNameDetailsItem vm={vm} />
     <VMNamespaceDetailsItem vm={vm} />
     <VMLabelsDetailsItem vm={vm} />

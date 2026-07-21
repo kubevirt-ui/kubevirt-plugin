@@ -82,7 +82,7 @@ const EnvironmentFormActions: FC<EnvironmentFormActionsProps> = ({
       <StackItem>
         <ActionGroup className="pf-v6-c-form">
           <Button
-            ouiaId="save-button"
+            data-test="save-button"
             isDisabled={isSaveDisabled || loading}
             isLoading={loading}
             onClick={onSubmit}

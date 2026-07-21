@@ -19,7 +19,7 @@ const MTVNotInstalledCard: FC = () => {
   const validNamespace = getValidNamespace(activeNamespace);
 
   return (
-    <Card className="mtv-not-installed-card" data-test="mtv-not-installed-card" isCompact>
+    <Card className="mtv-not-installed-card" isCompact>
       <CardHeader>
         <CardTitle className="mtv-not-installed-card__title">
           <Icon size="md">

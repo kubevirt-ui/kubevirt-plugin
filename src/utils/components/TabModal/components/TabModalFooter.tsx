@@ -71,7 +71,7 @@ const TabModalFooter: FC<TabModalFooterProps> = ({
         )}
         <Flex spaceItems={{ default: 'spaceItemsSm' }}>
           <Button
-            ouiaId="save-button"
+            data-test="save-button"
             form="tab-modal-form"
             isDisabled={isDisabled || isSubmitting}
             isLoading={isLoading || isSubmitting}
@@ -87,7 +87,7 @@ const TabModalFooter: FC<TabModalFooterProps> = ({
                 .then(() => (onCancel ?? onClose)())
                 .catch(kubevirtConsole.error);
             }}
-            ouiaId="cancel-button"
+            data-test="cancel-button"
             variant={cancelBtnVariant ?? ButtonVariant.link}
           >
             {cancelBtnText || t('Cancel')}

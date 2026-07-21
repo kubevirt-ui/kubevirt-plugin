@@ -85,7 +85,7 @@ const OnboardingPopover: FC<OnboardingPopoverProps> = ({
   return (
     <Popover
       footerContent={
-        <Button ouiaId="onboarding-dismiss-btn" onClick={hide} variant={ButtonVariant.link}>
+        <Button data-test="onboarding-dismiss-btn" onClick={hide} variant={ButtonVariant.link}>
           {t('Got it')}
         </Button>
       }

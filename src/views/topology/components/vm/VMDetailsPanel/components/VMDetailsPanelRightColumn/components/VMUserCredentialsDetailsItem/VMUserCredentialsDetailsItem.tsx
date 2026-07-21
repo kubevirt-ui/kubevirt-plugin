@@ -25,17 +25,10 @@ const VMUserCredentialsDetailsItem: FC<VMUserCredentialsDetailsItemProps> = ({ v
 
   const content = vmiReady ? (
     <>
-      <div
-        className="topology-vm-details-panel__user-credentials"
-        data-test="details-item-user-credentials-user-name"
-      >
+      <div className="topology-vm-details-panel__user-credentials">
         {t('user: {{user}}', { user })}
       </div>
-      <ClipboardCopy
-        className="topology-vm-details-panel__user-credentials"
-        data-test="SSHDetailsPage-command"
-        isReadOnly
-      >
+      <ClipboardCopy className="topology-vm-details-panel__user-credentials" isReadOnly>
         {sshServiceRunning ? command : `ssh ${user}@`}
       </ClipboardCopy>
       {!sshServiceRunning && (

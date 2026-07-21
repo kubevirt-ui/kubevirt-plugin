@@ -19,7 +19,6 @@ const VMTimezoneDetailsItem: FC<VMTimezoneDetailsItemProps> = ({ vmi }) => {
   return (
     <DescriptionItem
       className="topology-vm-details-panel__item"
-      data-test-id="virtual-machine-overview-details-timezone"
       descriptionData={guestAgentData?.timezone?.split(',')[0] || NO_DATA_DASH}
       descriptionHeader={t('Time zone')}
     />

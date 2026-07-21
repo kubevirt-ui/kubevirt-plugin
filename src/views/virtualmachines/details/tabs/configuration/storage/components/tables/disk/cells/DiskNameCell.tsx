@@ -49,7 +49,7 @@ const DiskNameCell: FC<DiskNameCellProps> = ({ provisioningPercentages, row, vm,
     : undefined;
 
   return (
-    <Stack data-test-id={`disk-${name}`}>
+    <Stack data-test={`disk-${name}`}>
       <StackItem>
         {hasProvisioning ? (
           <Popover

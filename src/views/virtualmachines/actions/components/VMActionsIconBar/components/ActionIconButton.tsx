@@ -28,7 +28,7 @@ const ActionIconButton: FC<VMActionIconDetails> = ({
         <Tooltip content={action?.label}>
           <Button
             className="vm-actions-icon-bar__button"
-            data-test-id={`${action?.id}-button`}
+            data-test={`${action?.id}-button`}
             isDisabled={!actionAllowed || isDisabled}
             onClick={handleClick}
             variant={ButtonVariant.link}

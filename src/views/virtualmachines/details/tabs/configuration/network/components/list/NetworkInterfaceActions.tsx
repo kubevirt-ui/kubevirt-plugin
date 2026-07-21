@@ -119,7 +119,6 @@ const NetworkInterfaceActions: FC<NetworkInterfaceActionsProps> = ({
       <DropdownList>
         {interfaceState === NetworkInterfaceState.DOWN && (
           <DropdownItem
-            data-test-id="set-link-up"
             key="network-interface-state-up"
             onClick={() => setNetworkInterfaceState(vm, nicName, NetworkInterfaceState.UP)}
           >
@@ -128,7 +127,6 @@ const NetworkInterfaceActions: FC<NetworkInterfaceActionsProps> = ({
         )}
         {interfaceState === NetworkInterfaceState.UP && (
           <DropdownItem
-            data-test-id="set-link-down"
             key="network-interface-state-down"
             onClick={() => setNetworkInterfaceState(vm, nicName, NetworkInterfaceState.DOWN)}
           >

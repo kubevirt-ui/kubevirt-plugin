@@ -35,7 +35,7 @@ export const DiskImportActivity: FC<
         <ResourceIcon groupVersionKind={getGroupVersionKindForModel(TemplateModel)} />
         <Link
           className="co-resource-item__resource-name"
-          data-test-id={name}
+          data-test={name}
           title={uid}
           to={`/k8s/ns/${resource?.metadata?.namespace}/${VIRTUALMACHINES_TEMPLATES_BASE_URL}/${name}`}
         >

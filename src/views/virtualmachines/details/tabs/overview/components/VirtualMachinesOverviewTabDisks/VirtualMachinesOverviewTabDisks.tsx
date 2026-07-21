@@ -26,7 +26,7 @@ const VirtualMachinesOverviewTabDisks: FC<VirtualMachinesOverviewTabDisksProps> 
 
   return (
     <div className="VirtualMachinesOverviewTabDisks--main">
-      <Card data-test="overview-disks-card">
+      <Card>
         <CardTitle className="pf-v6-u-text-color-subtle">
           <Link
             to={createURL(

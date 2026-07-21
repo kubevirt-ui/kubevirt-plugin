@@ -158,7 +158,7 @@ const KubevirtTable = <TData, TCallbacks = undefined>(
       cell: (
         <Checkbox
           aria-label={t('Select all rows')}
-          ouiaId={selectAllId}
+          data-test={selectAllId}
           id={selectAllId}
           isChecked={getCheckboxState()}
           onChange={handleSelectAll}

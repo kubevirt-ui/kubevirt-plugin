@@ -32,7 +32,7 @@ const NameCell: FC<NameCellProps> = ({ row }) => {
   const isBootable = Boolean(row.config?.iface?.bootOrder);
 
   return (
-    <Stack data-test-id={`nic-${nicName}`}>
+    <Stack data-test={`nic-${nicName}`}>
       <StackItem>
         {!nicName && interfaceName ? <Label>{interfaceName}</Label> : (nicName ?? NO_DATA_DASH)}
         {isPending && !isInterfaceEphemeral && <PendingBadge />}
@@ -40,7 +40,7 @@ const NameCell: FC<NameCellProps> = ({ row }) => {
       </StackItem>
       {isBootable && (
         <StackItem>
-          <Label color="blue" data-test-id={`nic-bootable-${nicName}`} variant="filled">
+          <Label color="blue" data-test={`nic-bootable-${nicName}`} variant="filled">
             {t('bootable')}
           </Label>
         </StackItem>
@@ -71,7 +71,7 @@ type NetworkCellProps = {
 const NetworkCell: FC<NetworkCellProps> = ({ row }) => {
   const { t } = useKubevirtTranslation();
   return (
-    <span data-test-id={`nic-network-${row.network?.name}`}>
+    <span data-test={`nic-network-${row.network?.name}`}>
       {getNetworkNameLabel(t, { network: row.network }) ?? NO_DATA_DASH}
     </span>
   );
@@ -107,9 +107,7 @@ export const getNetworkInterfaceListColumns = (
     key: 'model',
     label: t('Model'),
     renderCell: (row) => (
-      <span data-test-id={`nic-model-${row.network?.name}`}>
-        {row.iface?.model ?? NO_DATA_DASH}
-      </span>
+      <span data-test={`nic-model-${row.network?.name}`}>{row.iface?.model ?? NO_DATA_DASH}</span>
     ),
     sortable: true,
   },
@@ -132,7 +130,7 @@ export const getNetworkInterfaceListColumns = (
     key: 'type',
     label: t('Type'),
     renderCell: (row) => (
-      <span data-test-id={`nic-type-${row.network?.name}`}>{row.type ?? NO_DATA_DASH}</span>
+      <span data-test={`nic-type-${row.network?.name}`}>{row.type ?? NO_DATA_DASH}</span>
     ),
     sortable: true,
   },
@@ -141,7 +139,7 @@ export const getNetworkInterfaceListColumns = (
     key: 'macAddress',
     label: t('MAC address'),
     renderCell: (row) => (
-      <span data-test-id={`nic-mac-${row.network?.name}`}>
+      <span data-test={`nic-mac-${row.network?.name}`}>
         {row.iface?.macAddress ?? NO_DATA_DASH}
       </span>
     ),

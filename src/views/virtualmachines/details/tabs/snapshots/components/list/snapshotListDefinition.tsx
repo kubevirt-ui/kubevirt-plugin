@@ -31,9 +31,10 @@ type SnapshotCellProps = {
 const NameCell: FC<SnapshotCellProps> = ({ row }) => {
   const name = getName(row);
   return (
-    <span data-test-id={`snapshot-${name}`}>
+    <span data-test={`snapshot-${name}`}>
       <MulticlusterResourceLink
         cluster={getCluster(row)}
+        data-test={name}
         groupVersionKind={VirtualMachineSnapshotModelGroupVersionKind}
         name={name}
         namespace={getNamespace(row)}
@@ -43,13 +44,13 @@ const NameCell: FC<SnapshotCellProps> = ({ row }) => {
 };
 
 const CreatedCell: FC<SnapshotCellProps> = ({ row }) => (
-  <span data-test-id={`snapshot-created-${getName(row)}`}>
+  <span data-test={`snapshot-created-${getName(row)}`}>
     <Timestamp timestamp={row?.metadata?.creationTimestamp} />
   </span>
 );
 
 const StatusCell: FC<SnapshotCellProps> = ({ row }) => (
-  <span data-test-id={`snapshot-status-${getName(row)}`}>
+  <span data-test={`snapshot-status-${getName(row)}`}>
     <SnapshotStatusIcon phase={row?.status?.phase} />
   </span>
 );

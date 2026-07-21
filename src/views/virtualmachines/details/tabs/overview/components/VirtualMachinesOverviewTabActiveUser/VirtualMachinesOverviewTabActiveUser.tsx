@@ -35,7 +35,7 @@ const VirtualMachinesOverviewTabActiveUser: FC<VirtualMachinesOverviewTabActiveU
   const renderContent = (): ReactNode => {
     if (!isVMRunning) {
       return (
-        <Bullseye data-test="overview-active-users-not-running">
+        <Bullseye>
           <MutedTextSpan text={t('VirtualMachine is not running')} />
         </Bullseye>
       );
@@ -43,7 +43,7 @@ const VirtualMachinesOverviewTabActiveUser: FC<VirtualMachinesOverviewTabActiveU
 
     if (!isConnected) {
       return (
-        <Bullseye data-test="overview-active-users-no-agent">
+        <Bullseye>
           <MutedTextSpan text={t('Guest agent is required')} />
         </Bullseye>
       );
@@ -62,7 +62,7 @@ const VirtualMachinesOverviewTabActiveUser: FC<VirtualMachinesOverviewTabActiveU
     guestAgentDataLoaded && isConnected && !guestAgentDataLoadError && isVMRunning;
 
   return (
-    <Card data-test="overview-active-users-card">
+    <Card>
       <CardTitle className="pf-v6-u-text-color-subtle">
         {showUserCount
           ? t('Active users ({{users}})', { users: userList.length })

@@ -129,12 +129,12 @@ const VirtualMachinesOverviewTabDetails: FC<VirtualMachinesOverviewTabDetailsPro
                       <ArchitectureLabel architecture={getArchitecture(vm)} />
                     </Flex>
                   }
-                  data-test-id="virtual-machine-overview-details-name"
+                  data-test="virtual-machine-overview-details-name"
                   descriptionHeader={t('Name')}
                 />
                 {treeViewFoldersEnabled && (
                   <DescriptionItem
-                    data-test-id="virtual-machine-overview-details-folder"
+                    data-test="virtual-machine-overview-details-folder"
                     descriptionData={getLabel(vm, VM_FOLDER_LABEL) || NO_DATA_DASH}
                     descriptionHeader={t('Group')}
                   />
@@ -151,7 +151,7 @@ const VirtualMachinesOverviewTabDetails: FC<VirtualMachinesOverviewTabDetailsPro
                       <VMNotMigratableLabel vm={vm} />
                     </Split>
                   }
-                  data-test-id="virtual-machine-overview-details-status"
+                  data-test="virtual-machine-overview-details-status"
                   descriptionHeader={t('Status')}
                 />
                 <DescriptionItem
@@ -165,11 +165,11 @@ const VirtualMachinesOverviewTabDetails: FC<VirtualMachinesOverviewTabDetailsPro
                       NO_DATA_DASH
                     )
                   }
-                  data-test-id="virtual-machine-overview-details-created"
+                  data-test="virtual-machine-overview-details-created"
                   descriptionHeader={t('Created')}
                 />
                 <DescriptionItem
-                  data-test-id="virtual-machine-overview-details-os"
+                  data-test="virtual-machine-overview-details-os"
                   descriptionData={osName ?? fallback}
                   descriptionHeader={t('Operating system')}
                 />
@@ -180,10 +180,10 @@ const VirtualMachinesOverviewTabDetails: FC<VirtualMachinesOverviewTabDetailsPro
                       {hasNUMAConfiguration(cpuMemoryVM) && <NUMABadge />}
                     </Flex>
                   }
+                  data-test="virtual-machine-overview-details-cpu-memory"
                   descriptionHeader={t('CPU | Memory')}
                 />
                 <DescriptionItem
-                  data-test-id="virtual-machine-overview-details-timezone"
                   descriptionData={guestAgentData?.timezone?.split(',')[0] || NO_DATA_DASH}
                   descriptionHeader={t('Time zone')}
                 />
@@ -193,7 +193,7 @@ const VirtualMachinesOverviewTabDetails: FC<VirtualMachinesOverviewTabDetailsPro
                   <TemplateDescription vm={vm} />
                 )}
                 <DescriptionItem
-                  data-test-id="virtual-machine-overview-details-host"
+                  data-test="virtual-machine-overview-details-host"
                   descriptionData={hostname ?? fallback}
                   descriptionHeader={t('Hostname')}
                 />

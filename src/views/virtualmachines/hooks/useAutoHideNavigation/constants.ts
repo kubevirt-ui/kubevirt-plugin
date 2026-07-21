@@ -6,7 +6,7 @@ export const NAV_TOGGLE_BUTTON_SELECTORS = [
   '#nav-toggle',
   'button.pf-v6-c-masthead__toggle',
   '.pf-v6-c-masthead__toggle button',
-  '[data-test="nav-toggle"]',
+  '[]',
 ];
 
 export const AUTO_HIDE_NAV_DEFAULT = true;

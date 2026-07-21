@@ -94,7 +94,11 @@ const ResourceAllocationChart: FC<ResourceAllocationChartProps> = ({
 
   if (loaded && error) {
     return (
-      <div className="resource-allocation-widget__chart" ref={ref}>
+      <div
+        className="resource-allocation-widget__chart"
+        data-test={`resource-allocation-chart-${metric}`}
+        ref={ref}
+      >
         <ErrorAlert error={error} />
       </div>
     );
@@ -102,7 +106,11 @@ const ResourceAllocationChart: FC<ResourceAllocationChartProps> = ({
 
   if (!loaded || width === 0) {
     return (
-      <div className="resource-allocation-widget__chart" ref={ref}>
+      <div
+        className="resource-allocation-widget__chart"
+        data-test={`resource-allocation-chart-${metric}`}
+        ref={ref}
+      >
         <Skeleton height="100%" width="100%" />
       </div>
     );
@@ -110,7 +118,11 @@ const ResourceAllocationChart: FC<ResourceAllocationChartProps> = ({
 
   if (!isReady && !hasQuotaLines) {
     return (
-      <div className="resource-allocation-widget__chart" ref={ref}>
+      <div
+        className="resource-allocation-widget__chart"
+        data-test={`resource-allocation-chart-${metric}`}
+        ref={ref}
+      >
         <Bullseye>
           <MutedTextSpan text={getNoDataAvailableMessage(t)} />
         </Bullseye>
@@ -119,7 +131,11 @@ const ResourceAllocationChart: FC<ResourceAllocationChartProps> = ({
   }
 
   return (
-    <div className="resource-allocation-widget__chart" ref={ref}>
+    <div
+      className="resource-allocation-widget__chart"
+      data-test={`resource-allocation-chart-${metric}`}
+      ref={ref}
+    >
       <span aria-hidden="true" className="resource-allocation-widget__chart-top-label">
         {topTickLabel}
       </span>
