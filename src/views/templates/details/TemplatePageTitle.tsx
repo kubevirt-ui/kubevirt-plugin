@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 
 import { TemplateModel, VirtualMachineTemplateModel } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -6,18 +6,16 @@ import DetailsPageTitle from '@kubevirt-utils/components/DetailsPageTitle/Detail
 import PaneHeading from '@kubevirt-utils/components/PaneHeading/PaneHeading';
 import SidebarEditorSwitch from '@kubevirt-utils/components/SidebarEditor/SidebarEditorSwitch';
 import { VirtualMachineDetailsTab } from '@kubevirt-utils/constants/tabs-constants';
-import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { useLastNamespacePath } from '@kubevirt-utils/hooks/useLastNamespacePath';
 import { getName } from '@kubevirt-utils/resources/shared';
 import {
   getACMTemplateListURL,
-  getTemplateListURL,
   isDeprecatedTemplate,
   isOpenShiftTemplate,
-  Template,
+  type Template,
 } from '@kubevirt-utils/resources/template';
 import useIsACMPage from '@multicluster/useIsACMPage';
-import { useLastNamespace } from '@openshift-console/dynamic-plugin-sdk-internal';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -29,9 +27,8 @@ import {
 } from '@patternfly/react-core';
 
 import VirtualMachineTemplatesActions from '../actions/VirtualMachineTemplatesActions';
-
-import useEditTemplateAccessReview from './hooks/useIsTemplateEditable';
 import CommonTemplateAlert from './CommonTemplateAlert';
+import useEditTemplateAccessReview from './hooks/useIsTemplateEditable';
 import NoPermissionTemplateAlert from './NoPermissionTemplateAlert';
 
 type TemplatePageTitleTitleProps = {
@@ -42,7 +39,7 @@ const TemplatePageTitle: FC<TemplatePageTitleTitleProps> = ({ template }) => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
   const location = useLocation();
-  const [lastNamespace] = useLastNamespace();
+  const lastNamespacePath = useLastNamespacePath();
   const isACMPage = useIsACMPage();
   const { hasEditPermission, isCommonTemplate } = useEditTemplateAccessReview(template);
 
@@ -60,16 +57,12 @@ const TemplatePageTitle: FC<TemplatePageTitleTitleProps> = ({ template }) => {
         <Breadcrumb>
           <BreadcrumbItem>
             <Button
+              isInline
               onClick={() =>
                 navigate(
-                  isACMPage
-                    ? getACMTemplateListURL()
-                    : getTemplateListURL(
-                        lastNamespace === ALL_NAMESPACES_SESSION_KEY ? undefined : lastNamespace,
-                      ),
+                  isACMPage ? getACMTemplateListURL() : `/k8s/${lastNamespacePath}/templates`,
                 )
               }
-              isInline
               variant={ButtonVariant.link}
             >
               {t('Templates')}
