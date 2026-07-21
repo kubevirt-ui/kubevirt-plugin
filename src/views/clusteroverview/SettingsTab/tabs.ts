@@ -2,11 +2,13 @@ import { FC } from 'react';
 import { TFunction } from 'react-i18next';
 
 import ClusterTab from './ClusterTab/ClusterTab';
+import DownloadsTab from './DownloadsTab/DownloadsTab';
 import PreviewFeaturesTab from './PreviewFeaturesTab/PreviewFeaturesTab';
 import UserTab from './UserTab/UserTab';
 
 export const SETTINGS_TABS = {
   CLUSTER: 'cluster',
+  DOWNLOADS: 'downloads',
   FEATURES: 'features',
   USER: 'user',
 } as const;
@@ -44,5 +46,12 @@ export const getTabs = (isAdmin: boolean, t: TFunction): SettingsTabConfig[] => 
     isEnabled: isAdmin,
     name: SETTINGS_TABS.FEATURES,
     title: t('Preview features'),
+  },
+  {
+    Component: DownloadsTab,
+    dataTest: 'downloads',
+    isEnabled: true,
+    name: SETTINGS_TABS.DOWNLOADS,
+    title: t('Downloads'),
   },
 ];

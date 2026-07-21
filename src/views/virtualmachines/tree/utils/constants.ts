@@ -21,4 +21,5 @@ export const ALL_CLUSTERS_ID = 'ALL_CLUSTERS';
 export const VIRTUALIZATION_PATHS = {
   BASE: '/virtualization',
   OVERVIEW: 'virtualization-overview',
+  SETTINGS: 'virtualization-overview/settings',
 } as const;

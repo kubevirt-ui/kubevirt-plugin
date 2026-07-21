@@ -54,6 +54,7 @@ import { vmsSignal } from '@virtualmachines/tree/utils/signals';
 import { OBJECTS_FETCHING_LIMIT, VirtualMachineRowFilterType } from '@virtualmachines/utils';
 import { getVMIFromMapper, getVMIMFromMapper } from '@virtualmachines/utils/mappers';
 
+import VirtIODriversAlert from './components/VirtIODriversAlert/VirtIODriversAlert';
 import VirtualMachineBulkActionButton from './components/VirtualMachineBulkActionButton';
 import VirtualMachineEmptyState from './components/VirtualMachineEmptyState/VirtualMachineEmptyState';
 import VirtualMachineListSummary from './components/VirtualMachineListSummary/VirtualMachineListSummary';
@@ -212,7 +213,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref
     <>
       <DocumentTitle>{PageTitles.VirtualMachines}</DocumentTitle>
       {!isSearchResultsPage && (
-        <PageSection>
+        <PageSection className="pf-v6-u-pb-0">
           <VirtualMachineListSummary vmis={filteredVMIs} vms={filteredVMs} />
         </PageSection>
       )}
@@ -223,6 +224,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref
             <VirtualMachineEmptyState catalogURL={catalogURL} namespace={namespace} />
           ) : (
             <>
+              <VirtIODriversAlert vms={filteredVMs} />
               <VirtualMachineFilterToolbar
                 onFilterChange={(...args) => {
                   deselectAllVMs();

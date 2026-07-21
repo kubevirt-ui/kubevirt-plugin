@@ -9,7 +9,7 @@ const K8S_PERSISTENT_VOLUMES_URL =
   'https://kubernetes.io/docs/concepts/storage/persistent-volumes/';
 const KV_UG_URL = 'https://kubevirt.io';
 const RH_DOC_URL = 'https://docs.redhat.com/documentation';
-const REDHAT_DOC_URL = `${RH_DOC_URL}/openshift_container_platform/latest`;
+const REDHAT_DOC_URL = `${RH_DOC_URL}/openshift_container_platform/4.21`;
 const RHACM_DOC_URL = `${RH_DOC_URL}/red_hat_advanced_cluster_management_for_kubernetes`;
 
 export const documentationURL = {
@@ -64,6 +64,7 @@ export const documentationURL = {
   VIRT_MANAGER_DOWNLOAD: 'https://virt-manager.org/download.html',
   VIRT_SECONDARY_NETWORK: `${REDHAT_DOC_URL}/html/virtualization/networking#secondary-network-config`,
   VIRTCTL_CLI: `${REDHAT_DOC_URL}/html/virtualization/getting-started#virt-using-the-cli-tools`,
+  VIRTIO_WIN_DRIVERS: `${REDHAT_DOC_URL}/html/virtualization/managing-vms#virt-install-virtio-drivers-on-windows-vms`,
   VIRTUALIZATION_BLOG: `https://cloud.redhat.com/learn/topics/virtualization/`,
   VIRTUALIZATION_WHAT_YOU_CAN_DO: `${REDHAT_DOC_URL}/html/virtualization/about#virt-what-you-can-do-with-virt_about-virt`,
   VOLUME_MODE: `${K8S_PERSISTENT_VOLUMES_URL}/#volume-mode`,

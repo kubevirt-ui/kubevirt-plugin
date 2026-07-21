@@ -4,6 +4,7 @@ import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { mountWinDriversToVM } from '@kubevirt-utils/resources/vm/utils/disk/drivers';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { Alert, AlertVariant, Checkbox, Flex, FlexItem } from '@patternfly/react-core';
 
 import { useDriversImage } from '../../resources/vm/utils/disk/useDriversImage';
@@ -18,11 +19,12 @@ type WindowsDriversProps = {
 
 const WindowsDrivers: FC<WindowsDriversProps> = memo(({ isWindows, updateVM, vm }) => {
   const { t } = useKubevirtTranslation();
+  const cluster = useClusterParam();
   const [isChecked, setIsChecked] = useState<boolean>(null);
   const [error, setError] = useState<Error>(undefined);
   const [loading, setLoading] = useState(false);
 
-  const [driversImage, driversImageLoading] = useDriversImage();
+  const [driversImage, driversImageLoading] = useDriversImage(cluster ?? undefined);
 
   const windowsDriver = useMemo(
     () =>

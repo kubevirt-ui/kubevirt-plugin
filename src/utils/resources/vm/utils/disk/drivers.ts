@@ -12,6 +12,7 @@ import {
   VIRTIO_WIN_CONFIG_MAP_NAME,
   VIRTIO_WIN_CONFIG_MAP_NAMESPACES,
   VIRTIO_WIN_IMAGE,
+  VIRTIO_WIN_IMAGE_DOWNLOAD_URL,
   WINDOWS_DRIVERS_DISK,
 } from './constants';
 
@@ -41,16 +42,31 @@ const getVirtioWinConfigMap = async (cluster?: string): Promise<any> => {
   throw lastException;
 };
 
-export const getDriversImage = async (cluster?: string): Promise<string> => {
-  const driversImage = DEFAULT_WINDOWS_DRIVERS_DISK_IMAGE;
+export type VirtioWinDriversInfo = {
+  downloadURL?: string;
+  image: string;
+};
+
+export const DEFAULT_INFO: VirtioWinDriversInfo = { image: DEFAULT_WINDOWS_DRIVERS_DISK_IMAGE };
+
+export const getDriversInfo = async (cluster?: string): Promise<VirtioWinDriversInfo> => {
   try {
     const configMap = await getVirtioWinConfigMap(cluster);
-    if (configMap?.data?.[VIRTIO_WIN_IMAGE]) return configMap.data[VIRTIO_WIN_IMAGE];
+
+    return {
+      downloadURL: configMap?.data?.[VIRTIO_WIN_IMAGE_DOWNLOAD_URL] || undefined,
+      image: configMap?.data?.[VIRTIO_WIN_IMAGE] || DEFAULT_INFO.image,
+    };
   } catch (error) {
     kubevirtConsole.error(error);
   }
 
-  return driversImage;
+  return DEFAULT_INFO;
+};
+
+export const getDriversImage = async (cluster?: string): Promise<string> => {
+  const info = await getDriversInfo(cluster);
+  return info.image;
 };
 
 export const addWinDriverVolume = (vm: V1VirtualMachine, driverImage: string): V1VirtualMachine => {
