@@ -50,7 +50,7 @@ const usePreviewFeaturesData: UsePreviewFeaturesData = (cluster) => {
   );
   // HCO v1: Template is Beta / first-class — hide jsonpatch toggle.
   // HCO v1beta1 only: keep Preview Features toggle.
-  const { isHCOV1, loading: hcoV1Loading } = useIsHyperConvergedV1Available();
+  const { isHCOV1, loading: hcoV1Loading } = useIsHyperConvergedV1Available(cluster);
 
   const features: Feature[] = [
     {

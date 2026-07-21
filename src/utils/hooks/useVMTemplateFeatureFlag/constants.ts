@@ -1,3 +1,5 @@
+import { HyperConvergedModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
+
 export const KUBEVIRT_JSONPATCH_ANNOTATION = 'kubevirt.kubevirt.io/jsonpatch';
 export const TEMPLATE_FEATURE_GATE = 'Template';
 export const TEMPLATE_FEATURE_GATE_PATH =
@@ -9,9 +11,11 @@ export const ADD_TEMPLATE_FEATURE_GATE_PATCH = {
   value: TEMPLATE_FEATURE_GATE,
 };
 
-/** GVK used to detect whether HCO v1 (slice-based featureGates) is available. */
-export const HYPERCONVERGED_V1_GROUP_VERSION_KIND = {
-  group: 'hco.kubevirt.io',
-  kind: 'HyperConverged',
+/**
+ * Pinned to HCO v1 for availability detection (slice-based featureGates).
+ * HyperConvergedModelGroupVersionKind is v1beta1.
+ */
+export const HyperConvergedV1GroupVersionKind = {
+  ...HyperConvergedModelGroupVersionKind,
   version: 'v1',
 } as const;
