@@ -54,7 +54,7 @@ const CreateVMFooter: FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<any | Error>(null);
   const { createModal } = useModal();
-  const [_, driversImageLoading] = useDriversImage();
+  const [_, driversImageLoading] = useDriversImage(cluster);
 
   const [authorizedSSHKeys, setAuthorizedSSHKeys] = useKubevirtUserSettings('ssh');
 

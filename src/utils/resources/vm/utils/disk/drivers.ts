@@ -4,21 +4,23 @@ import { ConfigMapModel } from '@kubevirt-ui/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { InterfaceTypes } from '@kubevirt-utils/components/DiskModal/utils/types';
 import { ensurePath, kubevirtConsole } from '@kubevirt-utils/utils/utils';
-import { k8sGet } from '@openshift-console/dynamic-plugin-sdk';
+import { kubevirtK8sGet } from '@multicluster/k8sRequests';
 
 import {
   DEFAULT_WINDOWS_DRIVERS_DISK_IMAGE,
   VIRTIO_WIN_CONFIG_MAP_NAME,
   VIRTIO_WIN_CONFIG_MAP_NAMESPACES,
   VIRTIO_WIN_IMAGE,
+  VIRTIO_WIN_IMAGE_DOWNLOAD_URL,
   WINDOWS_DRIVERS_DISK,
 } from './constants';
 
-const getVirtioWinConfigMap = async (): Promise<any> => {
+const getVirtioWinConfigMap = async (cluster?: string): Promise<any> => {
   let lastException = undefined;
   for (const namespace of VIRTIO_WIN_CONFIG_MAP_NAMESPACES) {
     try {
-      const configMap = await k8sGet({
+      const configMap = await kubevirtK8sGet({
+        cluster,
         model: ConfigMapModel,
         name: VIRTIO_WIN_CONFIG_MAP_NAME,
         ns: namespace,
@@ -39,16 +41,31 @@ const getVirtioWinConfigMap = async (): Promise<any> => {
   throw lastException;
 };
 
-export const getDriversImage = async (): Promise<string> => {
-  const driversImage = DEFAULT_WINDOWS_DRIVERS_DISK_IMAGE;
+export type VirtioWinDriversInfo = {
+  downloadURL?: string;
+  image: string;
+};
+
+export const DEFAULT_INFO: VirtioWinDriversInfo = { image: DEFAULT_WINDOWS_DRIVERS_DISK_IMAGE };
+
+export const getDriversInfo = async (cluster?: string): Promise<VirtioWinDriversInfo> => {
   try {
-    const configMap = await getVirtioWinConfigMap();
-    if (configMap?.data?.[VIRTIO_WIN_IMAGE]) return configMap.data[VIRTIO_WIN_IMAGE];
+    const configMap = await getVirtioWinConfigMap(cluster);
+
+    return {
+      downloadURL: configMap?.data?.[VIRTIO_WIN_IMAGE_DOWNLOAD_URL] || undefined,
+      image: configMap?.data?.[VIRTIO_WIN_IMAGE] || DEFAULT_INFO.image,
+    };
   } catch (error) {
     kubevirtConsole.error(error);
   }
 
-  return driversImage;
+  return DEFAULT_INFO;
+};
+
+export const getDriversImage = async (cluster?: string): Promise<string> => {
+  const info = await getDriversInfo(cluster);
+  return info.image;
 };
 
 export const addWinDriverVolume = (vm: V1VirtualMachine, driverImage: string): V1VirtualMachine => {

@@ -5,28 +5,31 @@ import { ANNOTATIONS, OS_NAME_LABELS } from '@kubevirt-utils/resources/template'
 import {
   getOperatingSystem,
   getOperatingSystemName,
+  OS_WINDOWS_PREFIX,
 } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
-import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
+import { RowReducerFilter } from '@openshift-console/dynamic-plugin-sdk';
 import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
-export const getOSFilter = (): RowFilter<V1VirtualMachine> => {
-  const getOSName = (obj: V1VirtualMachine) => {
-    const osAnnotation = getAnnotation(obj?.spec?.template, ANNOTATIONS.os);
-    const osLabel = getOperatingSystemName(obj) || getOperatingSystem(obj);
-    const osPreference = obj?.spec?.preference?.name;
+export const getOSName = (obj: V1VirtualMachine) => {
+  const osAnnotation = getAnnotation(obj?.spec?.template, ANNOTATIONS.os);
+  const osLabel = getOperatingSystemName(obj) || getOperatingSystem(obj);
+  const osPreference = obj?.spec?.preference?.name;
 
-    const termStartsWithOSName = (os: string, term?: string) =>
-      term?.toLowerCase()?.startsWith(os.toLowerCase());
+  const termStartsWithOSName = (os: string, term?: string) =>
+    term?.toLowerCase()?.startsWith(os.toLowerCase());
 
-    const osName = Object.values(OS_NAME_LABELS).find(
-      (osKey) =>
-        termStartsWithOSName(osKey, osAnnotation) ||
-        termStartsWithOSName(osKey, osLabel) ||
-        termStartsWithOSName(osKey, osPreference),
+  const vmOSName = Object.values(OS_NAME_LABELS).find((osNameLabel) => {
+    const osName = osNameLabel === OS_NAME_LABELS.windows ? OS_WINDOWS_PREFIX : osNameLabel;
+    return (
+      termStartsWithOSName(osName, osAnnotation) ||
+      termStartsWithOSName(osName, osLabel) ||
+      termStartsWithOSName(osName, osPreference)
     );
-    return osName;
-  };
+  });
+  return vmOSName;
+};
 
+export const getOSFilter = (): RowReducerFilter<V1VirtualMachine> => {
   return {
     filter: (selectedOS, obj) => {
       return selectedOS.selected?.length === 0 || selectedOS.selected?.includes(getOSName(obj));
