@@ -44,11 +44,28 @@ const main = async (): Promise<void> => {
 
 import type { CommandContext } from './dispatcher';
 
+const CLEANUP_CMD_REGEX = /\/cleanup-manual-console\s+(\S+)/;
+
 export const executeCleanupConsole = async (ctx: CommandContext): Promise<void> => {
+  const clusterMatch = ctx.commentBody.match(CLEANUP_CMD_REGEX);
+  if (!clusterMatch) {
+    throw new Error(
+      '`/cleanup-manual-console` requires a cluster name, e.g. `/cleanup-manual-console my-cluster`.',
+    );
+  }
+
+  const [{ data: pr }, { data: repoData }] = await Promise.all([
+    ctx.octokit.pulls.get({ owner: ctx.owner, repo: ctx.repo, pull_number: ctx.prNumber }),
+    ctx.octokit.repos.get({ owner: ctx.owner, repo: ctx.repo }),
+  ]);
+
   process.env.BOT_TOKEN = process.env.BOT_TOKEN || '';
   process.env.PR_NUMBER = String(ctx.prNumber);
   process.env.COMMENT_ID = String(ctx.commentId);
   process.env.COMMENT_AUTHOR = ctx.author;
+  process.env.BASE_REF = pr.base.ref;
+  process.env.CLUSTER_NAME = clusterMatch[1];
+  process.env.DEFAULT_BRANCH = repoData.default_branch;
   await main();
 };
 
