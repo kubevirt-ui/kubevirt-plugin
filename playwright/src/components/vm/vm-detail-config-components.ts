@@ -12,18 +12,16 @@ import type { Page } from '@playwright/test';
  */
 export class VirtualMachineDetailConfigurationCdromComponent extends BaseComponent {
   private readonly _addDiskButtonInStorage = this.locator(
-    '.kv-configuration-vm-disk-list button:has-text("Add"), [data-test-id="storage-add-button"], button:has-text("Add disk")',
-  );
+    '.kv-configuration-vm-disk-list button:has-text("Add")',
+  )
+    .or(this.testId('storage-add-button'))
+    .or(this.locator('button:has-text("Add disk")'));
   private readonly _btnPlaceholderSelectISOFile = this.locator(
     'button[placeholder="Select ISO file"]',
   );
-  private readonly _configurationStorageSubTab = this.locator(
-    '[data-test-id="vm-configuration-storage"]',
-  );
-  private readonly _configurationTab = this.locator(
-    '[data-test-id="horizontal-link-Configuration"]',
-  );
-  private readonly _fileInput = this.locator('[data-test-id="disk-source-upload"] [type="file"]');
+  private readonly _configurationStorageSubTab = this.testId('vm-configuration-storage');
+  private readonly _configurationTab = this.testId('horizontal-link-Configuration');
+  private readonly _fileInput = this.testId('disk-source-upload').locator('[type="file"]');
   private readonly _inputIdSimpleFileFilename = this.locator('input[id="simple-file-filename"]');
   private readonly _nameInput = this.locator('input[id="name"]');
   private readonly _tabModal = this.locator('#tab-modal');
@@ -75,7 +73,7 @@ export class VirtualMachineDetailConfigurationCdromComponent extends BaseCompone
     if (await cdromMenuOption.isVisible()) {
       await cdromMenuOption.click({ force: true });
     } else {
-      const cdromOption = this.locator('text=CD-ROM, [data-test-id="disk-type-select-cdrom"]');
+      const cdromOption = this.locator('text=CD-ROM').or(this.testId('disk-type-select-cdrom'));
       await cdromOption
         .first()
         .waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
@@ -155,9 +153,9 @@ export class VirtualMachineDetailConfigurationCdromComponent extends BaseCompone
         if (await errorAlert.isVisible()) {
           errorText = (await errorAlert.textContent().catch(() => 'None')) || 'None';
         }
-        const cancelButton = this._tabModal.locator(
-          '[data-test="cancel-button"], button:has-text("Cancel")',
-        );
+        const cancelButton = this._tabModal
+          .locator('[data-test="cancel-button"]')
+          .or(this._tabModal.locator('button:has-text("Cancel")'));
         if (await cancelButton.isVisible()) {
           await cancelButton.click({ force: true });
         }
@@ -237,9 +235,9 @@ export class VirtualMachineDetailConfigurationCdromComponent extends BaseCompone
       }
     }
 
-    const submitBtn = modal.locator(
-      '[data-test="confirm-action"], button.pf-m-primary:not(:has-text("Cancel"))',
-    );
+    const submitBtn = modal
+      .locator('[data-test="save-button"]')
+      .or(modal.locator('button.pf-m-primary:not(:has-text("Cancel"))'));
     const submitButtonLabel = (await submitBtn.textContent().catch(() => ''))?.trim() ?? '';
 
     await modal.locator('button:has-text("Cancel")').click();
@@ -281,9 +279,9 @@ export class VirtualMachineDetailConfigurationCdromComponent extends BaseCompone
       await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
 
       const hasUploadModeSelector = await modal
-        .locator(
-          '[data-test="upload-mode-selector"], select[id*="upload-mode"], [id*="upload-type"], [data-test-id*="upload-mode"]',
-        )
+        .getByTestId('upload-mode-selector')
+        .or(modal.locator('select[id*="upload-mode"]'))
+        .or(modal.locator('[id*="upload-type"]'))
         .isVisible()
         .catch(() => false);
 
@@ -307,17 +305,11 @@ export class VirtualMachineDetailConfigurationComponent extends BaseComponent {
   private readonly _configurationSearchAutocompleteSearchInput = this.locator(
     '#ConfigurationSearch-autocomplete-search input',
   );
-  private readonly _configurationStorageSubTab = this.locator(
-    '[data-test-id="vm-configuration-storage"]',
-  );
-  private readonly _configurationTab = this.locator(
-    '[data-test-id="horizontal-link-Configuration"]',
-  );
-  private readonly _cpuMemoryButton = this.locator(
-    '[data-test-id="virtual-machine-overview-details-cpu-memory"]',
-  );
+  private readonly _configurationStorageSubTab = this.testId('vm-configuration-storage');
+  private readonly _configurationTab = this.testId('horizontal-link-Configuration');
+  private readonly _cpuMemoryButton = this.testId('virtual-machine-overview-details-cpu-memory');
   private readonly _dataVolumeDetails = this.locator('text=DataVolume details');
-  private readonly _evictionStrategyElement = this.locator('[data-test-id="eviction-strategy"]');
+  private readonly _evictionStrategyElement = this.testId('eviction-strategy');
   private readonly _headlessCheckbox = this.locator('input[id="headless-mode"]');
   private readonly _isTextPendingChangesTextRestartRequired = this.locator(
     ':is(:text("Pending changes"), :text("Restart required"))',
@@ -326,11 +318,11 @@ export class VirtualMachineDetailConfigurationComponent extends BaseComponent {
     'button:has-text("Restore template settings")',
   );
   private readonly _tabModal = this.locator('#tab-modal');
-  private readonly _tabModalSaveButton = this.locator('#tab-modal [data-test="save-button"]');
-  private readonly _vmConfigurationDetails = this.locator(
-    '[data-test-id="vm-configuration-details"]',
+  private readonly _tabModalSaveButton = this.locator('#tab-modal').locator(
+    '[data-test="save-button"]',
   );
-  private readonly _vmDetailSaveButton = this.locator('[data-test="save-button"]');
+  private readonly _vmConfigurationDetails = this.testId('vm-configuration-details');
+  private readonly _vmDetailSaveButton = this.testId('save-button');
 
   constructor(page: Page) {
     super(page);
@@ -352,7 +344,7 @@ export class VirtualMachineDetailConfigurationComponent extends BaseComponent {
   async clickPvcLink(volumeName: string): Promise<boolean> {
     try {
       await this.navigateToConfigurationStorage();
-      const pvcLink = this.locator(`a[data-test-id="${volumeName}"]`);
+      const pvcLink = this.testId(volumeName);
       await pvcLink.waitFor({ state: 'visible', timeout: TestTimeouts.VM_CREATION });
       await this.robustClick(pvcLink);
       return true;
@@ -373,7 +365,7 @@ export class VirtualMachineDetailConfigurationComponent extends BaseComponent {
     },
   ): Promise<void> {
     if (vmData.description) {
-      const descButton = this.locator(`button[data-test-id="${vmName}-description"]`);
+      const descButton = this.testId(`${vmName}-description`).first();
       await descButton.waitFor({ state: 'visible', timeout: TestTimeouts.VM_CREATION });
       await this.robustClick(descButton);
       const descTextarea = this._tabModal.locator('textarea[aria-label="description text area"]');
@@ -394,7 +386,7 @@ export class VirtualMachineDetailConfigurationComponent extends BaseComponent {
         timeout: TestTimeouts.VM_CREATION,
       });
       await this.robustClick(this._bootManagementBtn);
-      const bootModeButton = this.locator(`button[data-test-id="${vmName}-boot-method"]`);
+      const bootModeButton = this.testId(`${vmName}-boot-method`).first();
       await bootModeButton.waitFor({ state: 'visible', timeout: TestTimeouts.VM_CREATION });
       await this.robustClick(bootModeButton);
       await this._tabModal.waitFor({
@@ -418,7 +410,7 @@ export class VirtualMachineDetailConfigurationComponent extends BaseComponent {
     }
 
     if (vmData.workload) {
-      const workloadButton = this.locator(`button[data-test-id="${vmName}-workload-profile"]`);
+      const workloadButton = this.testId(`${vmName}-workload-profile`).first();
       await workloadButton.waitFor({ state: 'visible', timeout: TestTimeouts.VM_CREATION });
       await this.robustClick(workloadButton);
       await this._tabModal.waitFor({
@@ -437,7 +429,7 @@ export class VirtualMachineDetailConfigurationComponent extends BaseComponent {
     }
 
     if (vmData.hostname) {
-      const hostnameButton = this.locator(`button[data-test-id="${vmName}-hostname"]`);
+      const hostnameButton = this.testId(`${vmName}-hostname`).first();
       await hostnameButton.waitFor({ state: 'visible', timeout: TestTimeouts.VM_CREATION });
       await this.robustClick(hostnameButton);
       const hostnameInput = this.locator('input[id="hostname"]');
@@ -570,7 +562,7 @@ export class VirtualMachineDetailConfigurationComponent extends BaseComponent {
         await this.robustClick(bootManagementButton);
       }
 
-      const bootModeButton = this.locator(`button[data-test-id="${vmName}-boot-method"]`);
+      const bootModeButton = this.testId(`${vmName}-boot-method`).first();
       await bootModeButton.waitFor({ state: 'visible', timeout: TestTimeouts.VM_CREATION });
       const bootModeText = await bootModeButton.textContent();
       return bootModeText?.includes(expectedBootMode) ?? false;
@@ -621,7 +613,7 @@ export class VirtualMachineDetailConfigurationComponent extends BaseComponent {
   }
 
   async verifyDedicatedResources(expectedText: string): Promise<boolean> {
-    const dedicatedResourcesLocator = this.locator('button[data-test-id="dedicated-resources"]');
+    const dedicatedResourcesLocator = this.testId('dedicated-resources').first();
     try {
       await dedicatedResourcesLocator.waitFor({
         state: 'visible',
@@ -636,7 +628,7 @@ export class VirtualMachineDetailConfigurationComponent extends BaseComponent {
 
   async verifyDescription(vmName: string, expectedDescription: string): Promise<boolean> {
     try {
-      const descButton = this.locator(`button[data-test-id="${vmName}-description"]`);
+      const descButton = this.testId(`${vmName}-description`).first();
       await descButton.waitFor({ state: 'visible', timeout: TestTimeouts.VM_CREATION });
       const descText = await descButton.textContent();
       return descText?.includes(expectedDescription) ?? false;
@@ -695,7 +687,7 @@ export class VirtualMachineDetailConfigurationComponent extends BaseComponent {
 
   async verifyDiskExistsByDataTestId(diskName: string): Promise<boolean> {
     try {
-      const diskLocator = this.locator(`[data-test-id*="${diskName}"]`);
+      const diskLocator = this.locator(`[data-test*="${diskName}"]`);
       await diskLocator.waitFor({ state: 'visible', timeout: TestTimeouts.UI_DELAY_EXTRA });
       return true;
     } catch {
@@ -704,16 +696,16 @@ export class VirtualMachineDetailConfigurationComponent extends BaseComponent {
   }
 
   /**
-   * Verify disk exists by data-test-id pattern: dv-{vmName}-{diskName}-k8ntab
+   * Verify disk exists by data-test pattern: dv-{vmName}-{diskName}-k8ntab
    * @param vmName - The VM name
    * @param diskName - The disk name
-   * @returns true if the disk with the expected data-test-id exists
+   * @returns true if the disk with the expected data-test exists
    */
   async verifyDiskExistsByDataTestIdPattern(vmName: string, diskName: string): Promise<boolean> {
     try {
       await this.navigateToConfigurationStorage();
       const expectedDataTestId = `dv-${vmName}-${diskName}-k8ntab`;
-      const diskLocator = this.locator(`[data-test-id="${expectedDataTestId}"]`);
+      const diskLocator = this.testId(expectedDataTestId);
       await diskLocator.waitFor({ state: 'visible', timeout: TestTimeouts.UI_DELAY_EXTRA });
       return true;
     } catch {
@@ -734,12 +726,12 @@ export class VirtualMachineDetailConfigurationComponent extends BaseComponent {
   }
 
   /**
-   * Verifies a disk row is visible by exact `data-test-id` (e.g. `disk-rootdisk`, uploaded ISO DV name).
+   * Verifies a disk row is visible by exact `data-test` (e.g. `disk-rootdisk`, uploaded ISO DV name).
    */
   async verifyDiskRowVisibleByExactDataTestId(dataTestId: string): Promise<boolean> {
     try {
       await this.navigateToConfigurationStorage();
-      const diskLocator = this.locator(`[data-test-id="${dataTestId}"]`);
+      const diskLocator = this.testId(dataTestId);
       await diskLocator.waitFor({ state: 'visible', timeout: TestTimeouts.UI_DELAY_EXTRA });
       return true;
     } catch {
@@ -748,16 +740,16 @@ export class VirtualMachineDetailConfigurationComponent extends BaseComponent {
   }
 
   /**
-   * Verify disk exists by data-test-id pattern: dv-{vmName}-{diskName}-k8ntab
+   * Verify disk exists by data-test pattern: dv-{vmName}-{diskName}-k8ntab
    * @param vmName - The VM name
    * @param diskName - The disk name
-   * @returns true if the disk with the expected data-test-id exists
+   * @returns true if the disk with the expected data-test exists
    */
   async verifyDiskSourceByDataTestId(vmName: string, diskName: string): Promise<boolean> {
     try {
       await this.navigateToConfigurationStorage();
       const expectedDataTestId = `dv-${vmName}-${diskName}-k8ntab`;
-      const diskLocator = this.locator(`[data-test-id="${expectedDataTestId}"]`);
+      const diskLocator = this.testId(expectedDataTestId);
       await diskLocator.waitFor({ state: 'visible', timeout: TestTimeouts.UI_DELAY_EXTRA });
       return true;
     } catch {
@@ -821,7 +813,7 @@ export class VirtualMachineDetailConfigurationComponent extends BaseComponent {
 
       const timeout = Math.min(TestTimeouts.UI_ELEMENT_VISIBILITY, 30000);
 
-      const evictionStrategyElement = this.locator('[data-test-id="eviction-strategy"]');
+      const evictionStrategyElement = this.testId('eviction-strategy');
 
       const count = await evictionStrategyElement.count();
       if (count === 0) {
@@ -882,7 +874,7 @@ export class VirtualMachineDetailConfigurationComponent extends BaseComponent {
 
   async verifyHostname(vmName: string, expectedHostname: string): Promise<boolean> {
     try {
-      const hostnameButton = this.locator(`button[data-test-id="${vmName}-hostname"]`);
+      const hostnameButton = this.testId(`${vmName}-hostname`).first();
       await hostnameButton.waitFor({ state: 'visible', timeout: TestTimeouts.VM_CREATION });
       const hostnameText = await hostnameButton.textContent();
       return hostnameText?.includes(expectedHostname) ?? false;
@@ -918,7 +910,7 @@ export class VirtualMachineDetailConfigurationComponent extends BaseComponent {
   }
 
   async verifyWorkload(vmName: string, expectedWorkload: string): Promise<boolean> {
-    const workloadLocator = this.locator(`button[data-test-id="${vmName}-workload-profile"]`);
+    const workloadLocator = this.testId(`${vmName}-workload-profile`).first();
     try {
       await workloadLocator.waitFor({
         state: 'visible',

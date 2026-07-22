@@ -15,10 +15,8 @@ export default class VmActionsStorageMigrationComponent extends BaseComponent {
     'button.pf-v6-c-button.pf-m-secondary',
   );
   private readonly _inputIdSelectedVolumes = this.locator('input[id="selected-volumes"]');
-  private readonly _migrateStorageAction = this.locator(
-    '[data-test-id="vm-action-migrate-storage"]',
-  );
-  private readonly _migrationMenuItem = this.locator('[data-test-id="migration-menu"]');
+  private readonly _migrateStorageAction = this.testId('vm-action-migrate-storage');
+  private readonly _migrationMenuItem = this.testId('migration-menu');
   private readonly _selectAllRows = this.locator('[aria-label="Select all rows"]');
   private readonly _trDataOuiaComponentTypePF6TableRow = this.locator(
     'tr[data-ouia-component-type="PF6/TableRow"]',
@@ -29,7 +27,7 @@ export default class VmActionsStorageMigrationComponent extends BaseComponent {
   }
 
   private async clickKebabInVmRow(vmRow: Locator): Promise<void> {
-    const primary = vmRow.locator('[data-test="kebab-button"]');
+    const primary = vmRow.getByTestId('kebab-button');
     const fallback = vmRow.locator('[data-test-id="kebab-button"]');
     const primaryVisible = await primary
       .isVisible({ timeout: TestTimeouts.UI_DELAY_SHORT })
@@ -41,7 +39,7 @@ export default class VmActionsStorageMigrationComponent extends BaseComponent {
   }
 
   async clickBulkMigrateStorage(): Promise<void> {
-    await this.robustClick(this.locator('[data-test-id="vms-bulk-migrate-storage"]'));
+    await this.robustClick(this.testId('vms-bulk-migrate-storage'));
   }
 
   async clickSelectedVolumesRadio(): Promise<void> {
@@ -124,7 +122,7 @@ export default class VmActionsStorageMigrationComponent extends BaseComponent {
   async isMigrateStorageActionEnabled(vmName: string): Promise<boolean> {
     try {
       const vmRow = this._trDataOuiaComponentTypePF6TableRow.filter({
-        has: this.locator(`[data-test-id="${vmName}"]`),
+        has: this.testId(vmName),
       });
       await vmRow.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
       await this.clickKebabInVmRow(vmRow);
@@ -163,11 +161,11 @@ export default class VmActionsStorageMigrationComponent extends BaseComponent {
 
   async openStorageMigrationModal(vmName: string, assertNextEnabled = true): Promise<void> {
     const vmRow = this._trDataOuiaComponentTypePF6TableRow.filter({
-      has: this.locator(`[data-test-id="${vmName}"]`),
+      has: this.testId(vmName),
     });
     await vmRow.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
     await this.clickKebabInVmRow(vmRow);
-    const migrationMenu = this.locator('[data-test-id="migration-menu"]');
+    const migrationMenu = this.testId('migration-menu');
     await migrationMenu.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
     await this.robustClick(migrationMenu);
 
@@ -239,12 +237,12 @@ export default class VmActionsStorageMigrationComponent extends BaseComponent {
   ): Promise<boolean> {
     try {
       const vmRow = this._trDataOuiaComponentTypePF6TableRow.filter({
-        has: this.locator(`[data-test-id="${vmName}"]`),
+        has: this.testId(vmName),
       });
       await vmRow.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
       await this.clickKebabInVmRow(vmRow);
 
-      const migrationMenu = this.locator('[data-test-id="migration-menu"]');
+      const migrationMenu = this.testId('migration-menu');
       await migrationMenu.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
       await this.robustClick(migrationMenu);
 
@@ -304,12 +302,12 @@ export default class VmActionsStorageMigrationComponent extends BaseComponent {
 
   async startStorageMigrationAndCancelWhileInProgress(vmName: string): Promise<void> {
     const vmRow = this._trDataOuiaComponentTypePF6TableRow.filter({
-      has: this.locator(`[data-test-id="${vmName}"]`),
+      has: this.testId(vmName),
     });
     await vmRow.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
     await this.clickKebabInVmRow(vmRow);
 
-    const migrationMenu = this.locator('[data-test-id="migration-menu"]');
+    const migrationMenu = this.testId('migration-menu');
     await migrationMenu.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
     await this.robustClick(migrationMenu);
 
@@ -380,12 +378,12 @@ export default class VmActionsStorageMigrationComponent extends BaseComponent {
     keepOriginalVolumes = false,
   ): Promise<void> {
     const vmRow = this._trDataOuiaComponentTypePF6TableRow.filter({
-      has: this.locator(`[data-test-id="${vmName}"]`),
+      has: this.testId(vmName),
     });
     await vmRow.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
     await this.clickKebabInVmRow(vmRow);
 
-    const migrationMenu = this.locator('[data-test-id="migration-menu"]');
+    const migrationMenu = this.testId('migration-menu');
     await migrationMenu.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
     await this.robustClick(migrationMenu);
 

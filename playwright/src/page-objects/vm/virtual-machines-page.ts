@@ -585,9 +585,8 @@ export default class VirtualMachinesPage extends TreeContextMenuMixin(PageCommon
 
   async hasErrorBoundary(): Promise<boolean> {
     return this.page
-      .locator(
-        '[data-test="error-boundary"], .pf-v6-c-empty-state--xs h4:has-text("Something went wrong")',
-      )
+      .getByTestId('error-boundary')
+      .or(this.page.locator('.pf-v6-c-empty-state--xs h4:has-text("Something went wrong")'))
       .isVisible()
       .catch(() => false);
   }
@@ -774,7 +773,9 @@ export default class VirtualMachinesPage extends TreeContextMenuMixin(PageCommon
 
   async isVmListContentVisible(timeout?: number): Promise<boolean> {
     return this.page
-      .locator('table tbody, [data-test="empty-state"], .pf-v6-c-empty-state')
+      .locator('table tbody')
+      .or(this.page.getByTestId('empty-state'))
+      .or(this.page.locator('.pf-v6-c-empty-state'))
       .first()
       .waitFor({ state: 'visible', timeout: timeout ?? TestTimeouts.UI_ELEMENT_VISIBILITY })
       .then(() => true)

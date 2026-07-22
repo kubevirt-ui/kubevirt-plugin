@@ -141,10 +141,10 @@ export class TemplateVmFactory {
   }
 
   /**
-   * Get the data-test-id selector for template selection
+   * Get the data-test selector for template selection
    */
   static getTemplateSelector(templateConfig: TemplateSelectorConfig): string {
-    return `[data-test-id="${templateConfig.templateTestId}"]`;
+    return templateConfig.templateTestId;
   }
 
   /**

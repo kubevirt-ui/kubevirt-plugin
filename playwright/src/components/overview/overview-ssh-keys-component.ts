@@ -138,7 +138,7 @@ export default class OverviewSshKeysComponent extends BaseComponent {
   }
 
   async selectProjectByNamespace(namespace: string): Promise<void> {
-    const selectProjectToggle = this.locator('[data-test-id="select-project-toggle"]');
+    const selectProjectToggle = this.testId('select-project-toggle');
 
     await this.page
       .waitForLoadState('domcontentloaded', { timeout: TestTimeouts.UI_ACTION_COMPLETE })
@@ -183,8 +183,8 @@ export default class OverviewSshKeysComponent extends BaseComponent {
     await this._selectInlineFilterInput.pressSequentially(namespace, { delay: 300 });
     await this.page.waitForTimeout(TestTimeouts.UI_DELAY_EXTRA);
 
-    const namespaceOption = this.locator(
-      `#select-inline-filter-${namespace} [data-test-id="${namespace}"]`,
+    const namespaceOption = this.locator(`#select-inline-filter-${namespace}`).getByTestId(
+      namespace,
     );
     await namespaceOption.waitFor({
       state: 'visible',
@@ -204,7 +204,7 @@ export default class OverviewSshKeysComponent extends BaseComponent {
    * Otherwise, clicks "Add public SSH key to project" and selects the project from the dropdown.
    */
   async selectProjectInSSHSettings(projectName: string): Promise<void> {
-    const sshSection = this.locator('[data-test-id="settings-user-ssh-key"]');
+    const sshSection = this.testId('settings-user-ssh-key');
     await sshSection.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
 
     const addButton = this.locator('button:has-text("Add public SSH key to project")');
@@ -224,7 +224,7 @@ export default class OverviewSshKeysComponent extends BaseComponent {
       await this.page.waitForTimeout(TestTimeouts.UI_DELAY_MEDIUM);
     }
 
-    const sshToggle = sshSection.locator('[data-test-id="select-project-toggle"]');
+    const sshToggle = sshSection.getByTestId('select-project-toggle');
 
     const maxAddAttempts = 4;
     for (let addAttempt = 1; addAttempt <= maxAddAttempts; addAttempt++) {
@@ -282,7 +282,7 @@ export default class OverviewSshKeysComponent extends BaseComponent {
 
       const filterInput = this.locator('input[placeholder="Select project"]')
         .or(this._selectInlineFilterInput)
-        .or(this.locator('[data-test-id="select-project-toggle"] + * input'))
+        .or(this.testId('select-project-toggle').locator('+ * input'))
         .or(this.locator('.pf-v6-c-menu-toggle input, .pf-v6-c-select__toggle input'))
         .last();
 
@@ -321,15 +321,12 @@ export default class OverviewSshKeysComponent extends BaseComponent {
 
   async verifyPublicSSHKeyVisible(): Promise<boolean> {
     try {
-      await this.locator('[data-test="user-settings"] h6', {
-        hasText: 'Public SSH key',
-      }).waitFor({
+      await this.testId('user-settings').locator('h6', { hasText: 'Public SSH key' }).waitFor({
         state: 'visible',
         timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
       });
-      return await this.locator('[data-test="user-settings"] h6', {
-        hasText: 'Public SSH key',
-      })
+      return await this.testId('user-settings')
+        .locator('h6', { hasText: 'Public SSH key' })
         .isVisible()
         .catch(() => false);
     } catch {

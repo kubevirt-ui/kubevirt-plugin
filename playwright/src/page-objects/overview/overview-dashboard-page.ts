@@ -15,24 +15,22 @@ export default class OverviewDashboardPage extends PageCommons {
   private readonly _btnIdOverviewVmsPerResourceCard = this.locator(
     'button[id="overview-vms-per-resource-card"]',
   );
-  private readonly _buttonOpenShiftVirtualization = this.locator(
-    'button[data-test="OpenShift Virtualization"]',
-  );
+  private readonly _buttonOpenShiftVirtualization = this.testId('OpenShift Virtualization');
   private readonly _divkvHealthPopupAlertsCountHasTextHealthyA = this.locator(
     'div.kv-health-popup__alerts-count:has-text("Healthy") a',
   );
   private readonly _downloadVirtctlForLinuxForX8664 = this.locator(
     'text=Download virtctl for Linux for x86_64',
   );
-  private readonly _inventoryCard = this.locator('[data-test-id="inventory-card"]');
+  private readonly _inventoryCard = this.testId('inventory-card');
   private readonly _kvTopConsumersCardAmountSelect = this.locator(
     '#kv-top-consumers-card-amount-select',
   );
-  private readonly _overviewTab = this.locator('[data-test="overview-tab"]');
-  private readonly _resourceBlock = this.locator('[data-test-id="dashboard"]');
-  private readonly _resourceTitle = this.locator('[data-test-id="resource-title"]');
+  private readonly _overviewTab = this.testId('overview-tab');
+  private readonly _resourceBlock = this.testId('dashboard');
+  private readonly _resourceTitle = this.testId('resource-title');
 
-  private readonly _virtctlDownloadLink = this.locator('[data-test-id="virtctl-download-link"]');
+  private readonly _virtctlDownloadLink = this.testId('virtctl-download-link');
 
   constructor(page: Page) {
     super(page);
@@ -198,7 +196,7 @@ export default class OverviewDashboardPage extends PageCommons {
     visibilityTimeout: number = TestTimeouts.UI_ELEMENT_VISIBILITY,
   ): Promise<boolean> {
     try {
-      const featureHighlightsCard = this.locator('[data-test="card feature-highlights"]');
+      const featureHighlightsCard = this.testId('card feature-highlights');
       await featureHighlightsCard.waitFor({
         state: 'visible',
         timeout: visibilityTimeout,
@@ -331,14 +329,14 @@ export default class OverviewDashboardPage extends PageCommons {
   }
 
   async verifyOverviewQuickStartAndCardItemsVisible(): Promise<boolean> {
-    const selectors = [
-      '[data-test="item all-quick-starts"]',
-      '[data-test="item openshift-virtualization-feature-highlights"]',
-      '[data-test="item openshift-virtualization-related-operators"]',
+    const testIds = [
+      'item all-quick-starts',
+      'item openshift-virtualization-feature-highlights',
+      'item openshift-virtualization-related-operators',
     ];
     try {
-      for (const selector of selectors) {
-        await this.locator(selector).waitFor({
+      for (const id of testIds) {
+        await this.testId(id).waitFor({
           state: 'visible',
           timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
         });
@@ -353,7 +351,7 @@ export default class OverviewDashboardPage extends PageCommons {
     visibilityTimeout: number = TestTimeouts.UI_ELEMENT_VISIBILITY,
   ): Promise<boolean> {
     try {
-      const relatedOperatorsCard = this.locator('[data-test="card related-operators"]');
+      const relatedOperatorsCard = this.testId('card related-operators');
       await relatedOperatorsCard.waitFor({
         state: 'visible',
         timeout: visibilityTimeout,
@@ -370,10 +368,10 @@ export default class OverviewDashboardPage extends PageCommons {
     try {
       await this.page.waitForTimeout(TestTimeouts.RETRY_DELAY);
 
-      const clusterStatus = this.locator('[data-test="cluster-status-widget"]');
-      const vmHealth = this.locator('[data-test="vm-health-widget"]');
-      const resourceAllocation = this.locator(
-        '[data-test="resource-allocation-section"], [data-test="cluster-utilization-widget"]',
+      const clusterStatus = this.testId('cluster-status-widget');
+      const vmHealth = this.testId('vm-health-widget');
+      const resourceAllocation = this.testId('resource-allocation-section').or(
+        this.testId('cluster-utilization-widget'),
       );
 
       const statusVisible = await clusterStatus
@@ -469,9 +467,10 @@ export default class OverviewDashboardPage extends PageCommons {
     try {
       await this.page.waitForTimeout(TestTimeouts.RETRY_DELAY);
 
-      const resourceSection = this.locator(
-        '[data-test="resource-allocation-section"], [data-test="resource-allocation-widget"], [data-test="cluster-utilization-widget"], [data-test="kv-top-consumers-card"]',
-      );
+      const resourceSection = this.testId('resource-allocation-section')
+        .or(this.testId('resource-allocation-widget'))
+        .or(this.testId('cluster-utilization-widget'))
+        .or(this.testId('kv-top-consumers-card'));
       return await resourceSection
         .first()
         .waitFor({ state: 'visible', timeout: TestTimeouts.DEFAULT })
@@ -502,19 +501,16 @@ export default class OverviewDashboardPage extends PageCommons {
         });
         await this._inventoryCard.scrollIntoViewIfNeeded();
 
-        await this.locator(
-          '[data-test="resource-inventory-item"]:has-text("VirtualMachine")',
-        ).waitFor({
+        const vmInventoryItem = this.testId('resource-inventory-item').filter({
+          hasText: 'VirtualMachine',
+        });
+        await vmInventoryItem.waitFor({
           state: 'visible',
           timeout: TestTimeouts.ELEMENT_WAIT,
         });
-        await this.locator(
-          '[data-test="resource-inventory-item"]:has-text("VirtualMachine")',
-        ).scrollIntoViewIfNeeded();
+        await vmInventoryItem.scrollIntoViewIfNeeded();
         await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
-        await this.robustClick(
-          this.locator('[data-test="resource-inventory-item"]:has-text("VirtualMachine")'),
-        );
+        await this.robustClick(vmInventoryItem);
 
         await this.locator(
           'h1:has-text("VirtualMachines"), .pf-v6-c-content--h1:has-text("VirtualMachines")',
@@ -539,7 +535,7 @@ export default class OverviewDashboardPage extends PageCommons {
     visibilityTimeout: number = TestTimeouts.UI_ELEMENT_VISIBILITY,
   ): Promise<boolean> {
     try {
-      const vmPerTemplateCard = this.locator('[data-test-id="vms-per-template-card"]');
+      const vmPerTemplateCard = this.testId('vms-per-template-card');
       await vmPerTemplateCard.waitFor({
         state: 'visible',
         timeout: visibilityTimeout,

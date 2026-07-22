@@ -7,7 +7,6 @@
  *   import { test, expect } from '@/fixtures/gating-fixture';
  */
 
-import { withSafeActions } from '@/page-objects/base-page';
 import { detectAuthExpired, healBrowserAuth } from '@/utils/auth-healer';
 import CheckupsPage from '@/page-objects/cluster/checkups-page';
 import MigrationPoliciesPage from '@/page-objects/cluster/migration-policies-page';
@@ -87,70 +86,99 @@ const test = baseTest.extend<GatingFixtures>({
         if (attempt === 2) throw new Error(`Gating fixture: page.goto failed after 2 attempts`);
       }
     }
+
+    // Dismiss onboarding popover ("We've maximized your workspace") if present.
+    const onboardingDismiss = page.locator('[data-test="onboarding-dismiss-btn"]');
+    if (
+      await onboardingDismiss.isVisible({ timeout: TestTimeouts.RETRY_DELAY }).catch(() => false)
+    ) {
+      await onboardingDismiss.click({ force: true }).catch(() => undefined);
+      await page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
+    }
+
+    // Expand sidebar if collapsed after popover dismissal.
+    const navToggle = page.getByRole('button', { name: 'Side navigation toggle' });
+    const perspToggle = page
+      .getByTestId('perspective-switcher-toggle')
+      .or(page.locator('[data-test-id="perspective-switcher-toggle"]'));
+    if (!(await perspToggle.isVisible({ timeout: TestTimeouts.RETRY_DELAY }).catch(() => false))) {
+      if (await navToggle.isVisible({ timeout: TestTimeouts.RETRY_DELAY }).catch(() => false)) {
+        await navToggle.click().catch(() => undefined);
+        await page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
+      }
+    }
+
+    // Dismiss guided tour modal if present.
+    const tourSkipBtn = page.getByTestId('tour-step-footer-secondary');
+    if (await tourSkipBtn.isVisible({ timeout: TestTimeouts.RETRY_DELAY }).catch(() => false)) {
+      await tourSkipBtn.click({ force: true }).catch(() => undefined);
+      await page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
+    }
+
     await use();
   },
   // eslint-disable-next-line no-empty-pattern
   _autoResourceCheck: async ({}, use) => use(),
 
   checkupsPage: async ({ page }, use) => {
-    await use(withSafeActions(new CheckupsPage(page)));
+    await use(new CheckupsPage(page));
   },
   overviewPage: async ({ page }, use) => {
-    await use(withSafeActions(new OverviewPage(page)));
+    await use(new OverviewPage(page));
   },
   pageCommons: async ({ page }, use) => {
-    await use(withSafeActions(new PageCommons(page)));
+    await use(new PageCommons(page));
   },
   settingsPage: async ({ page }, use) => {
-    await use(withSafeActions(new SettingsPage(page)));
+    await use(new SettingsPage(page));
   },
   vmTreePage: async ({ page }, use) => {
-    await use(withSafeActions(new VmTreePage(page)));
+    await use(new VmTreePage(page));
   },
   vmDetailPage: async ({ page }, use) => {
-    await use(withSafeActions(new VirtualMachineDetailPage(page)));
+    await use(new VirtualMachineDetailPage(page));
   },
   vmListPage: async ({ page }, use) => {
-    await use(withSafeActions(new VirtualMachinesPage(page)));
+    await use(new VirtualMachinesPage(page));
   },
   vmOverviewTabPage: async ({ page }, use) => {
-    await use(withSafeActions(new VmOverviewTabPage(page)));
+    await use(new VmOverviewTabPage(page));
   },
   templatesPage: async ({ page }, use) => {
-    await use(withSafeActions(new TemplatesPage(page)));
+    await use(new TemplatesPage(page));
   },
   templateDetailPage: async ({ page }, use) => {
-    await use(withSafeActions(new TemplateDetailPage(page)));
+    await use(new TemplateDetailPage(page));
   },
   createVmPage: async ({ page }, use) => {
-    await use(withSafeActions(new CreateVmPage(page)));
+    await use(new CreateVmPage(page));
   },
   bootableVolumesPage: async ({ page }, use) => {
-    await use(withSafeActions(new BootableVolumesPage(page)));
+    await use(new BootableVolumesPage(page));
   },
   bootableVolumeDetailPage: async ({ page }, use) => {
-    await use(withSafeActions(new BootableVolumeDetailPage(page)));
+    await use(new BootableVolumeDetailPage(page));
   },
   instanceTypesPage: async ({ page }, use) => {
-    await use(withSafeActions(new InstanceTypesPage(page)));
+    await use(new InstanceTypesPage(page));
   },
   migrationPoliciesPage: async ({ page }, use) => {
-    await use(withSafeActions(new MigrationPoliciesPage(page)));
+    await use(new MigrationPoliciesPage(page));
   },
   quotasPage: async ({ page }, use) => {
-    await use(withSafeActions(new QuotasPage(page)));
+    await use(new QuotasPage(page));
   },
   virtualizationOverviewPage: async ({ page }, use) => {
-    await use(withSafeActions(new VirtualizationOverviewPage(page)));
+    await use(new VirtualizationOverviewPage(page));
   },
   vmCreationWizardPage: async ({ page }, use) => {
-    await use(withSafeActions(new VmCreationWizardPage(page)));
+    await use(new VmCreationWizardPage(page));
   },
   vmWizardBootSourcePage: async ({ page }, use) => {
-    await use(withSafeActions(new VmWizardBootSourcePage(page)));
+    await use(new VmWizardBootSourcePage(page));
   },
   vmWizardNavigationPage: async ({ page }, use) => {
-    await use(withSafeActions(new VmWizardNavigationPage(page)));
+    await use(new VmWizardNavigationPage(page));
   },
 });
 

@@ -96,7 +96,7 @@ export class CoreProxyHandler {
     return this.ctx.getResource('config.openshift.io', 'v1', 'clusterversions', 'version');
   }
 
-  getConfigMap(namespace: string, name: string): Promise<KubernetesResource | null> {
+  getConfigMap(name: string, namespace: string): Promise<KubernetesResource | null> {
     return this.ctx.getResource('', 'v1', 'configmaps', name, namespace);
   }
 
@@ -111,11 +111,11 @@ export class CoreProxyHandler {
   // Named helpers for well-known ConfigMaps
 
   getUiFeatures(namespace = 'openshift-cnv'): Promise<KubernetesResource | null> {
-    return this.getConfigMap(namespace, 'kubevirt-ui-features');
+    return this.getConfigMap('kubevirt-ui-features', namespace);
   }
 
   getUserSettings(namespace = 'openshift-cnv'): Promise<KubernetesResource | null> {
-    return this.getConfigMap(namespace, 'kubevirt-user-settings');
+    return this.getConfigMap('kubevirt-user-settings', namespace);
   }
 
   listPersistentVolumeClaims(

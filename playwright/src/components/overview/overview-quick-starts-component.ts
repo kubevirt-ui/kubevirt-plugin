@@ -10,21 +10,21 @@ export default class OverviewQuickStartsComponent extends BaseComponent {
   private readonly _reviewFailed = this.locator('#review-failed');
   private readonly _reviewSuccess = this.locator('#review-success');
   private readonly _roleAlertPfMDanger = this.locator('[role="alert"].pf-m-danger');
-  private readonly _status = this.locator('[data-test="status"]');
+  private readonly _status = this.testId('status');
 
   constructor(page: Page) {
     super(page);
   }
 
   async checkQuickStartYesCheckbox() {
-    const yesCheckbox = this.locator('[data-testid="qs-drawer-check-yes"]');
+    const yesCheckbox = this.testId('qs-drawer-check-yes');
     await yesCheckbox.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
     await yesCheckbox.check({ force: true });
     await this.page.waitForTimeout(TestTimeouts.UI_DELAY_MEDIUM);
   }
 
   async clickQuickStartByTitle(title: string): Promise<void> {
-    const quickStartTitle = this.locator('[data-test="title"]', { hasText: title });
+    const quickStartTitle = this.testId('title').filter({ hasText: title });
     const titleVisible = await quickStartTitle
       .waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY })
       .then(() => true)
@@ -57,7 +57,7 @@ export default class OverviewQuickStartsComponent extends BaseComponent {
 
   async clickQuickStartStartButton() {
     const candidates = [
-      this.locator('[data-testid="qs-drawer-start"]'),
+      this.testId('qs-drawer-start'),
       this.locator('button:has-text("Start")'),
       this.locator('button:has-text("Resume")'),
       this.locator('button:has-text("Continue")'),
@@ -145,13 +145,13 @@ export default class OverviewQuickStartsComponent extends BaseComponent {
   async navigateToQuickStartViaUI(): Promise<void> {
     await this.dismissBlockingModals();
 
-    const allQuickStartsItem = this.locator('[data-test="item all-quick-starts"]');
+    const allQuickStartsItem = this.testId('item all-quick-starts');
     await allQuickStartsItem.waitFor({
       state: 'visible',
       timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
     });
     await this.robustClick(allQuickStartsItem);
-    await this.locator('[data-test="title"]').first().waitFor({
+    await this.testId('title').first().waitFor({
       state: 'visible',
       timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
     });
@@ -215,7 +215,7 @@ export default class OverviewQuickStartsComponent extends BaseComponent {
     try {
       await tile.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
 
-      const statusByAttr = tile.locator('[data-test="status"]', { hasText: 'Complete' });
+      const statusByAttr = tile.getByTestId('status').filter({ hasText: 'Complete' });
       if (await statusByAttr.isVisible().catch(() => false)) return true;
 
       const completeText = tile.getByText('Complete');

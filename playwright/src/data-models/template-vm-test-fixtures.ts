@@ -6,7 +6,7 @@ const TEMPLATE_VM_TIMEOUT_MS = 30000;
  * Template selector configuration for VM creation
  */
 export type TemplateSelectorConfig = {
-  /** The data-test-id value for template selection (e.g., "rhel7-server-small") */
+  /** The data-test value for template selection (e.g., "rhel7-server-small") */
   templateTestId: string;
   /** Human-readable template name for test descriptions */
   templateName: string;

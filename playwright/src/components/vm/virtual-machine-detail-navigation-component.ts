@@ -7,25 +7,17 @@ import { TestTimeouts } from '@/utils/test-config';
 import type { Page } from '@playwright/test';
 
 export default class VirtualMachineDetailNavigationComponent extends BaseComponent {
-  private readonly _configurationNetworkSubTab = this.locator(
-    '[data-test-id="vm-configuration-network"]',
-  );
-  private readonly _horizontalLinkMetrics = this.locator(
-    '[data-test-id="horizontal-link-Metrics"]',
-  );
-  private readonly _horizontalLinkOverview = this.locator(
-    '[data-test-id="horizontal-link-Overview"]',
-  );
-  private readonly _horizontalLinkSnapshots = this.locator(
-    '[data-test-id="horizontal-link-Snapshots"]',
-  );
+  private readonly _configurationNetworkSubTab = this.testId('vm-configuration-network');
+  private readonly _horizontalLinkMetrics = this.testId('horizontal-link-Metrics');
+  private readonly _horizontalLinkOverview = this.testId('horizontal-link-Overview');
+  private readonly _horizontalLinkSnapshots = this.testId('horizontal-link-Snapshots');
 
   constructor(page: Page) {
     super(page);
   }
 
   async isDiagnosticsTabVisible(): Promise<boolean> {
-    const byTestId = this.locator('[data-test-id="horizontal-link-Diagnostics"]');
+    const byTestId = this.testId('horizontal-link-Diagnostics');
     const byText = this.locator('a[href*="diagnostics"]').filter({ hasText: 'Diagnostics' });
     return await byTestId
       .or(byText)
@@ -63,22 +55,21 @@ export default class VirtualMachineDetailNavigationComponent extends BaseCompone
     });
     await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
 
-    return await this.page.evaluate(() => {
-      const tab = document.querySelector('[data-test-id="horizontal-link-Overview"]');
-      if (!tab) return false;
-      const rect = tab.getBoundingClientRect();
-      return rect.top >= 0 && rect.bottom <= window.innerHeight;
-    });
+    const box = await this._horizontalLinkOverview.boundingBox();
+    if (!box) return false;
+    const viewport = this.page.viewportSize();
+    if (!viewport) return false;
+    return box.y >= 0 && box.y + box.height <= viewport.height;
   }
 
   async navigateToConfigurationInitialRun() {
     await this.navigateToConfigurationTab();
-    await this.navigateToTab(this.locator('[data-test-id="vm-configuration-initial"]'));
+    await this.navigateToTab(this.testId('vm-configuration-initial'));
   }
 
   async navigateToConfigurationMetadata() {
     await this.navigateToConfigurationTab();
-    await this.navigateToTab(this.locator('[data-test-id="vm-configuration-metadata"]'));
+    await this.navigateToTab(this.testId('vm-configuration-metadata'));
   }
 
   async navigateToConfigurationNetwork() {
@@ -88,27 +79,27 @@ export default class VirtualMachineDetailNavigationComponent extends BaseCompone
 
   async navigateToConfigurationTab() {
     await this.navigateToTab(
-      this.locator('[data-test-id="horizontal-link-Configuration"]'),
+      this.testId('horizontal-link-Configuration'),
       TestTimeouts.UI_ACTION_COMPLETE,
     );
   }
 
   async navigateToConsole() {
-    await this.navigateToTab(this.locator('[data-test-id="horizontal-link-Console"]'));
+    await this.navigateToTab(this.testId('horizontal-link-Console'));
   }
 
   async navigateToDiagnostics() {
-    const byTestId = this.locator('[data-test-id="horizontal-link-Diagnostics"]');
+    const byTestId = this.testId('horizontal-link-Diagnostics');
     const byText = this.locator('a[href*="diagnostics"]').filter({ hasText: 'Diagnostics' });
     await this.navigateToTab(byTestId.or(byText).first());
   }
 
   async navigateToDisks(): Promise<void> {
-    await this.navigateToTab(this.locator('[data-test-id="horizontal-link-Disks"]'));
+    await this.navigateToTab(this.testId('horizontal-link-Disks'));
   }
 
   async navigateToEvents() {
-    await this.navigateToTab(this.locator('[data-test-id="horizontal-link-Events"]'));
+    await this.navigateToTab(this.testId('horizontal-link-Events'));
   }
 
   async navigateToMetrics() {
@@ -121,7 +112,7 @@ export default class VirtualMachineDetailNavigationComponent extends BaseCompone
   }
 
   async navigateToNetworks(): Promise<void> {
-    await this.navigateToTab(this.locator('[data-test-id="horizontal-link-Network interfaces"]'));
+    await this.navigateToTab(this.testId('horizontal-link-Network interfaces'));
   }
 
   async navigateToOverview() {
@@ -134,7 +125,7 @@ export default class VirtualMachineDetailNavigationComponent extends BaseCompone
   }
 
   async navigateToScheduling(): Promise<void> {
-    await this.navigateToTab(this.locator('[data-test-id="horizontal-link-Scheduling"]'));
+    await this.navigateToTab(this.testId('horizontal-link-Scheduling'));
   }
 
   async navigateToSnapshots() {
@@ -151,7 +142,7 @@ export default class VirtualMachineDetailNavigationComponent extends BaseCompone
   }
 
   async navigateToYAML() {
-    await this.navigateToTab(this.locator('[data-test-id="horizontal-link-YAML"]'));
+    await this.navigateToTab(this.testId('horizontal-link-YAML'));
   }
 
   async verifyPageTabsVisible(): Promise<boolean> {

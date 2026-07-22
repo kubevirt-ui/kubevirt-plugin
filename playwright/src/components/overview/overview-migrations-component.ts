@@ -7,18 +7,16 @@ export default class OverviewMigrationsComponent extends BaseComponent {
   private readonly _generalSettingsButton = this.locator('button:has-text("General settings")');
   private readonly _inputSliderValueInput = this.locator('input[aria-label="Slider value input"]');
   private readonly _memoryDensityBtn = this.locator('button:has-text("Memory density")');
-  private readonly _memoryDensityDisableConfirmButton = this.locator(
-    '[data-test-id="memory-density-disable-confirm-button"]',
+  private readonly _memoryDensityDisableConfirmButton = this.testId(
+    'memory-density-disable-confirm-button',
   );
-  private readonly _memoryDensityModifyButtonButton = this.locator(
-    '[data-test-id="memory-density-modify-button"] button',
-  );
-  private readonly _memoryDensitySaveButton = this.locator(
-    '[data-test-id="memory-density-save-button"]',
-  );
+  private readonly _memoryDensityModifyButtonButton = this.testId(
+    'memory-density-modify-button',
+  ).locator('button');
+  private readonly _memoryDensitySaveButton = this.testId('memory-density-save-button');
   private readonly _memoryDensityToggle = this.locator('#memory-density-feature input');
   private readonly _migrationStatusSection = this.locator('#migration-status-section');
-  private readonly _overviewTab = this.locator('[data-test="overview-tab"]');
+  private readonly _overviewTab = this.testId('overview-tab');
   private readonly _pfV6CPopoverContent = this.locator('.pf-v6-c-popover__content');
 
   constructor(page: Page) {
@@ -210,7 +208,7 @@ export default class OverviewMigrationsComponent extends BaseComponent {
   }
 
   async selectMigrationsTimeFilter(_timeFilter = '1h') {
-    const section = this.locator('[data-test="migration-status-section"]');
+    const section = this.testId('migration-status-section');
     await section
       .waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY })
       .catch(() => undefined);
@@ -327,8 +325,8 @@ export default class OverviewMigrationsComponent extends BaseComponent {
         timeout: TestTimeouts.RESOURCE_CREATION,
       });
 
-      const versionEl = this.locator('[data-test-id="general-information-installed-version"]');
-      const statusEl = this.locator('[data-test-id="general-information-update-status"]');
+      const versionEl = this.testId('general-information-installed-version');
+      const statusEl = this.testId('general-information-update-status');
 
       await versionEl.waitFor({ state: 'visible', timeout: TestTimeouts.RESOURCE_CREATION });
       await statusEl.waitFor({ state: 'visible', timeout: TestTimeouts.RESOURCE_CREATION });
@@ -396,12 +394,12 @@ export default class OverviewMigrationsComponent extends BaseComponent {
       await this.page.waitForLoadState('domcontentloaded');
       await this.page.waitForTimeout(TestTimeouts.RETRY_DELAY);
 
-      const migrationByDataTest = this.locator(
-        '[data-test="migration-status-section"], [data-test="migrations-widget"]',
+      const migrationByDataTest = this.testId('migration-status-section').or(
+        this.testId('migrations-widget'),
       );
       const migrationByText = this.page.getByText('Migration statuses');
-      const migrationByTab = this.locator(
-        '[data-test-id="horizontal-link-Migrations"].pf-m-current',
+      const migrationByTab = this.testId('horizontal-link-Migrations').and(
+        this.locator('.pf-m-current'),
       );
 
       const dataTestVisible = await migrationByDataTest

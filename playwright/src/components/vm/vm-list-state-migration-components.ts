@@ -48,7 +48,7 @@ export class VmListEmptyStateComponent extends BaseComponent {
 
   async isEmptyStateCreateButtonVisible(): Promise<boolean> {
     try {
-      const btn = this.locator('.pf-v6-c-empty-state [data-test="item-create"]');
+      const btn = this.locator('.pf-v6-c-empty-state').locator('[data-test="item-create"]');
       await btn.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
       return true;
     } catch {
@@ -89,7 +89,7 @@ export class VmListEmptyStateComponent extends BaseComponent {
     timeout: number = TestTimeouts.UI_VISIBILITY_QUICK,
   ): Promise<boolean> {
     try {
-      const popover = this.page.locator('.pf-v6-c-popover:has(button:has-text("Got it"))');
+      const popover = this.page.getByTestId('onboarding-popover');
       await popover.waitFor({ state: 'visible', timeout });
       return true;
     } catch {
@@ -248,7 +248,7 @@ export class VmListTreeComponent extends BaseComponent {
   private readonly _projectName = this.locator('#project-name');
   private readonly _treeNode = this.locator('.pf-v6-c-tree-view__node');
   private readonly _treeView = this.locator('.pf-v6-c-tree-view');
-  private readonly _vmsTreeview = this.locator('[data-test="vms-treeview"]');
+  private readonly _vmsTreeview = this.testId('vms-treeview');
 
   constructor(page: Page) {
     super(page);
@@ -389,7 +389,7 @@ export class VmListTreeComponent extends BaseComponent {
     await this._projectName.clear();
     await this._projectName.fill(projectName);
 
-    const createButton = this.locator('[data-test="save-button"]');
+    const createButton = this.testId('save-button');
     await createButton.click();
 
     await modal.waitFor({ state: 'hidden', timeout: TestTimeouts.ELEMENT_WAIT });
@@ -540,21 +540,17 @@ export class VmListMigrationComponent extends BaseComponent {
     'button.pf-v6-c-button.pf-m-secondary',
   );
   private readonly _inputIdSelectedVolumes = this.locator('input[id="selected-volumes"]');
-  private readonly _migrateStorageAction = this.locator(
-    '[data-test-id="vm-action-migrate-storage"]',
-  );
+  private readonly _migrateStorageAction = this.testId('vm-action-migrate-storage');
   private readonly _migrateVirtualMachineBtn = this.locator(
     '#tab-modal button:has-text("Migrate VirtualMachine")',
   );
-  private readonly _migrationMenuItem = this.locator('[data-test-id="migration-menu"]');
+  private readonly _migrationMenuItem = this.testId('migration-menu');
   private readonly _nodeSearchInput = this.locator('#tab-modal input[placeholder="Search node"]');
   private readonly _selectAllRows = this._migrationModal.locator('[aria-label="Select all rows"]');
   private readonly _specificNodeCheckbox = this.locator(
     '#tab-modal #manual-migration-option-selection',
   );
-  private readonly _vmActionMigrateCompute = this.locator(
-    '[data-test-id="vm-action-migrate-compute"]',
-  );
+  private readonly _vmActionMigrateCompute = this.testId('vm-action-migrate-compute');
 
   constructor(
     page: Page,
@@ -564,7 +560,7 @@ export class VmListMigrationComponent extends BaseComponent {
   }
 
   async clickBulkMigrateStorage(): Promise<void> {
-    await this.robustClick(this.locator('[data-test-id="vms-bulk-migrate-storage"]'));
+    await this.robustClick(this.testId('vms-bulk-migrate-storage'));
   }
 
   async clickSelectedVolumesRadio(): Promise<void> {
@@ -822,7 +818,7 @@ export class VmListMigrationComponent extends BaseComponent {
 
   async openStorageMigrationModal(vmName: string, assertNextEnabled = true): Promise<void> {
     await this.openVmRowActions(vmName);
-    const migrationMenu = this.locator('[data-test-id="migration-menu"]');
+    const migrationMenu = this.testId('migration-menu');
     await migrationMenu.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
     await this.robustClick(migrationMenu);
 
@@ -895,7 +891,7 @@ export class VmListMigrationComponent extends BaseComponent {
     try {
       await this.openVmRowActions(vmName);
 
-      const migrationMenu = this.locator('[data-test-id="migration-menu"]');
+      const migrationMenu = this.testId('migration-menu');
       await migrationMenu.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
       await this.robustClick(migrationMenu);
 
@@ -942,7 +938,7 @@ export class VmListMigrationComponent extends BaseComponent {
   async startStorageMigrationAndCancelWhileInProgress(vmName: string): Promise<void> {
     await this.openVmRowActions(vmName);
 
-    const migrationMenu = this.locator('[data-test-id="migration-menu"]');
+    const migrationMenu = this.testId('migration-menu');
     await migrationMenu.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
     await this.robustClick(migrationMenu);
 
@@ -1014,7 +1010,7 @@ export class VmListMigrationComponent extends BaseComponent {
   ): Promise<void> {
     await this.openVmRowActions(vmName);
 
-    const migrationMenu = this.locator('[data-test-id="migration-menu"]');
+    const migrationMenu = this.testId('migration-menu');
     await migrationMenu.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
     await this.robustClick(migrationMenu);
 

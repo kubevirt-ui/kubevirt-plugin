@@ -7,15 +7,14 @@ export default class MigrationPoliciesPage extends PageCommons {
   private readonly _dataTestRowsResourceRow = this.locator('[data-test-rows="resource-row"]');
 
   /** Filter toolbar (Fleet ACM: Cluster filter) – first Cluster menu-toggle in toolbar only. */
-  private readonly _filterToolbarClusterButton = this.locator(
-    '[data-test="filter-toolbar"] button.pf-v6-c-menu-toggle',
-  )
+  private readonly _filterToolbarClusterButton = this.testId('filter-toolbar')
+    .locator('button.pf-v6-c-menu-toggle')
     .filter({ hasText: 'Cluster' })
     .first();
 
   private readonly _nameInput = this.locator('[role="dialog"] input[type="text"]').first();
 
-  override readonly _createButton = this.locator('[data-test="item-create"]');
+  override readonly _createButton = this.testId('item-create');
 
   constructor(page: Page) {
     super(page);
@@ -25,7 +24,7 @@ export default class MigrationPoliciesPage extends PageCommons {
    * Clicks the actions dropdown button on the detail page.
    */
   override async clickActionsDropdown() {
-    const actionsDropdown = this.locator('[data-test="actions-dropdown"]');
+    const actionsDropdown = this.testId('actions-dropdown');
     await actionsDropdown.waitFor({
       state: 'visible',
       timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
@@ -34,7 +33,7 @@ export default class MigrationPoliciesPage extends PageCommons {
   }
 
   async clickCancelButton() {
-    const byTestId = this.locator('[data-test-id="modal-cancel-action"]');
+    const byTestId = this.testId('modal-cancel-action');
     const formCancelButton = this.page
       .locator('[role="dialog"]')
       .getByRole('button', { name: /^Cancel$/i });
@@ -52,7 +51,7 @@ export default class MigrationPoliciesPage extends PageCommons {
       'With YAML':
         'button[role="menuitem"]:has-text("With YAML"), [role="menuitem"]:has-text("With YAML")',
     };
-    await super.clickCreateAndSelectOption('[data-test="item-create"]', optionSelectors[option]);
+    await super.clickCreateAndSelectOption(this.testId('item-create'), optionSelectors[option]);
   }
 
   async clickCreateButton() {
@@ -66,7 +65,7 @@ export default class MigrationPoliciesPage extends PageCommons {
    * Clicks the delete action from the actions dropdown.
    */
   async clickDeleteAction() {
-    const deleteAction = this.locator('[data-test-id="mp-action-delete"]');
+    const deleteAction = this.testId('mp-action-delete');
     await deleteAction.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
     await this.robustClick(deleteAction);
   }
@@ -75,7 +74,7 @@ export default class MigrationPoliciesPage extends PageCommons {
    * Clicks the save button in the delete confirmation modal.
    */
   async clickSaveButton() {
-    const saveButton = this.locator('[data-test="save-button"]');
+    const saveButton = this.testId('save-button');
     await saveButton.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
     await this.robustClick(saveButton);
   }
@@ -89,7 +88,7 @@ export default class MigrationPoliciesPage extends PageCommons {
   }
 
   async fillBandwidthPerMigration(bandwidth: string) {
-    const bandwidthInput = this.locator('[data-test-id="bandwidthPerMigration-selected"] input');
+    const bandwidthInput = this.testId('bandwidthPerMigration-selected').locator('input');
     await bandwidthInput.waitFor({ state: 'visible' });
     await bandwidthInput.click();
     await bandwidthInput.press('Control+a');
@@ -97,8 +96,8 @@ export default class MigrationPoliciesPage extends PageCommons {
   }
 
   async fillCompletionTimeout(timeout: string) {
-    const completionTimeoutInput = this.locator(
-      '[data-test-id="migration-policy-completion-timeout-input"] input',
+    const completionTimeoutInput = this.testId('migration-policy-completion-timeout-input').locator(
+      'input',
     );
     await completionTimeoutInput.waitFor({ state: 'visible' });
     await completionTimeoutInput.click();
@@ -128,7 +127,7 @@ export default class MigrationPoliciesPage extends PageCommons {
     value: string | null;
     unit: string | null;
   }> {
-    const bandwidthSection = this.locator('[data-test-id="bandwidthPerMigration-selected"]');
+    const bandwidthSection = this.testId('bandwidthPerMigration-selected');
     await bandwidthSection.waitFor({
       state: 'visible',
       timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
@@ -264,7 +263,7 @@ export default class MigrationPoliciesPage extends PageCommons {
    */
   async isPolicyVisible(policyName: string): Promise<boolean> {
     try {
-      const byDataTest = this.locator(`[data-test="policy-${policyName}"]`);
+      const byDataTest = this.testId(`policy-${policyName}`);
       const byDataTestVisible = await byDataTest
         .isVisible({ timeout: TestTimeouts.UI_VISIBILITY_QUICK })
         .catch(() => false);
@@ -290,11 +289,11 @@ export default class MigrationPoliciesPage extends PageCommons {
   }
 
   /**
-   * Navigates to Migration Policies page by clicking [data-test-id="migrationpolicies-nav-item"] (Fleet context).
+   * Navigates to Migration Policies page by clicking [data-test="migrationpolicies-nav-item"] (Fleet context).
    * Expands the Virtualization nav section first so the item is visible.
    */
   async navigateToMigrationPoliciesViaMigrationpoliciesNavItem(): Promise<void> {
-    const navItem = this.locator('[data-test-id="migrationpolicies-nav-item"]');
+    const navItem = this.testId('migrationpolicies-nav-item');
     await navItem.waitFor({
       state: 'visible',
       timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
@@ -326,7 +325,7 @@ export default class MigrationPoliciesPage extends PageCommons {
    * ```
    */
   async navigateToMigrationPolicyDetail(policyName: string) {
-    const policyLink = this.locator(`[data-test="policy-${policyName}"]`);
+    const policyLink = this.testId(`policy-${policyName}`);
     try {
       await policyLink
         .first()
@@ -356,7 +355,7 @@ export default class MigrationPoliciesPage extends PageCommons {
   async openEditPolicyModal(policyName: string): Promise<void> {
     await this.navigateToMigrationPolicyDetail(policyName);
     await this.clickActionsDropdown();
-    const editAction = this.locator('[data-test-id="mp-action-edit"]').or(
+    const editAction = this.testId('mp-action-edit').or(
       this.locator('[role="menuitem"]:has-text("Edit MigrationPolicy")'),
     );
     await editAction.first().waitFor({
@@ -398,25 +397,31 @@ export default class MigrationPoliciesPage extends PageCommons {
   }
 
   async setAutoConverge(enable: boolean) {
-    const autoConvergeToggle = this.locator('[data-test-id="allowAutoConverge-selected"] button');
-    await autoConvergeToggle.waitFor({ state: 'visible' });
-    await autoConvergeToggle.click();
+    const container = this.testId('allowAutoConverge-selected');
+    const toggle = container.locator('button.pf-v6-c-menu-toggle').first();
+    await toggle.waitFor({ state: 'visible' });
+    await toggle.click();
 
-    // Select Yes or No based on the boolean value
     const optionText = enable ? 'Yes' : 'No';
-    const optionLocator = this.locator(`button:has-text("${optionText}")`);
-    await optionLocator.click();
+    const option = this.page
+      .locator('.pf-v6-c-menu__list [role="option"]')
+      .filter({ hasText: optionText });
+    await option.waitFor({ state: 'visible', timeout: TestTimeouts.UI_DELAY_MEDIUM });
+    await option.click();
   }
 
   async setPostCopy(enable: boolean) {
-    const postCopyToggle = this.locator('[data-test-id="allowPostCopy-selected"] button');
-    await postCopyToggle.waitFor({ state: 'visible' });
-    await postCopyToggle.click();
+    const container = this.testId('allowPostCopy-selected');
+    const toggle = container.locator('button.pf-v6-c-menu-toggle').first();
+    await toggle.waitFor({ state: 'visible' });
+    await toggle.click();
 
-    // Select Yes or No based on the boolean value
     const optionText = enable ? 'Yes' : 'No';
-    const optionLocator = this.locator(`button:has-text("${optionText}")`);
-    await optionLocator.click();
+    const option = this.page
+      .locator('.pf-v6-c-menu__list [role="option"]')
+      .filter({ hasText: optionText });
+    await option.waitFor({ state: 'visible', timeout: TestTimeouts.UI_DELAY_MEDIUM });
+    await option.click();
   }
 
   /**
@@ -469,7 +474,7 @@ export default class MigrationPoliciesPage extends PageCommons {
       // 4. Create button (if requested)
       if (includeCreateButton) {
         combinedLocator = combinedLocator.or(
-          this.locator('[data-test="item-create"]', { hasText: 'Create MigrationPolicy' }),
+          this.testId('item-create').filter({ hasText: 'Create MigrationPolicy' }),
         );
       }
 
@@ -521,7 +526,7 @@ export default class MigrationPoliciesPage extends PageCommons {
     policyName: string,
     timeout: number = TestTimeouts.DEFAULT,
   ): Promise<void> {
-    await this.locator(`[data-test="policy-${policyName}"]`).waitFor({
+    await this.testId(`policy-${policyName}`).waitFor({
       state: 'detached',
       timeout,
     });

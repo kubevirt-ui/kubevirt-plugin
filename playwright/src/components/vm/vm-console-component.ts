@@ -16,9 +16,7 @@ export default class VmConsoleComponent extends BaseComponent {
   private readonly _ctrlAlt2 = this.locator('text=Ctrl + Alt + 2');
   private readonly _elapsedTimeSinceLogin = this.locator('text=Elapsed time since login');
   private readonly _guestLoginCredentials = this.locator('text=Guest login credentials');
-  private readonly _horizontalLinkOverview = this.locator(
-    '[data-test-id="horizontal-link-Overview"]',
-  );
+  private readonly _horizontalLinkOverview = this.testId('horizontal-link-Overview');
 
   private readonly _vncConnectButton = this.locator('.console-vnc svg');
 
@@ -122,7 +120,7 @@ export default class VmConsoleComponent extends BaseComponent {
   }
 
   async navigateToConsole() {
-    await super.navigateToTab(this.locator('[data-test-id="horizontal-link-Console"]'));
+    await super.navigateToTab(this.testId('horizontal-link-Console'));
   }
 
   async navigateToOverview() {

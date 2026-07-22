@@ -243,7 +243,7 @@ export class VmCreationWizardTemplateCatalogComponent extends BaseComponent {
 
   async getSelectedTemplateCardTitle(templateTestId: string): Promise<string> {
     try {
-      const card = this.locator(`[data-test-id="${templateTestId}"]`);
+      const card = this.testId(templateTestId);
       return (await card.textContent({ timeout: TestTimeouts.SHORT_WAIT }))?.trim() || '';
     } catch {
       return '';
@@ -251,7 +251,7 @@ export class VmCreationWizardTemplateCatalogComponent extends BaseComponent {
   }
 
   async getTemplateCardFields(templateTestId: string): Promise<string[]> {
-    const card = this.locator(`[data-test-id="${templateTestId}"]`);
+    const card = this.testId(templateTestId);
     const text = (await card.textContent({ timeout: TestTimeouts.SHORT_WAIT }))?.trim() || '';
     const knownFields = ['Architecture', 'Project', 'Boot source', 'Workload', 'CPU', 'Memory'];
     return knownFields.filter((field) => text.includes(field));
@@ -298,7 +298,7 @@ export class VmCreationWizardTemplateCatalogComponent extends BaseComponent {
   }
 
   async selectTemplateByTestId(templateTestId: string): Promise<void> {
-    const card = this.locator(`[data-test-id="${templateTestId}"]`);
+    const card = this.testId(templateTestId);
     await card.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
     await this.robustClick(card);
     await card.evaluate(

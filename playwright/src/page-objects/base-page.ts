@@ -50,6 +50,12 @@ export type TimeoutAwareTestInfo = TestInfo & {
   _diagnosisHandled?: boolean;
 };
 
+export function isBrowserClosedError(error: unknown): boolean {
+  if (!error || typeof error !== 'object') return false;
+  const msg = (error as { message?: string }).message ?? String(error);
+  return /Target page, context or browser has been closed/i.test(msg);
+}
+
 export function isTimeoutError(error: unknown): boolean {
   if (!error || typeof error !== 'object') return false;
   const msg = (error as { message?: string }).message ?? String(error);
@@ -57,17 +63,16 @@ export function isTimeoutError(error: unknown): boolean {
 }
 
 /**
- * Wraps a page object so all async method calls silently swallow errors.
- * Timeout errors are recorded on testInfo._actionTimeouts so the
- * _autoTimeoutGuard fixture can reclassify the test as skipped.
- * Non-timeout errors are swallowed — only expect.soft assertions cause failures.
- *
- * When DIAGNOSE_FAILURES=1, timeout errors are auto-diagnosed by inspecting
- * the page URL and error patterns. The verdict (pass/skip/fail) determines
- * whether the error is swallowed, recorded as a timeout, or re-thrown.
- * A screenshot is captured at the failure point for diagnostic review.
+ * Wraps a page object so async method calls capture errors instead of
+ * failing the test immediately. Timeout errors are recorded on
+ * testInfo._actionTimeouts so the _autoTimeoutGuard fixture can
+ * reclassify the test as skipped. Non-timeout errors are logged to
+ * stderr so the reporter can surface them.
  */
 export function withSafeActions<T extends object>(instance: T): T {
+  const className = (target: T) =>
+    (target as { constructor?: { name?: string } }).constructor?.name ?? 'UnknownPage';
+
   return new Proxy(instance, {
     get(target, prop, receiver) {
       const value = Reflect.get(target, prop, receiver);
@@ -76,19 +81,33 @@ export function withSafeActions<T extends object>(instance: T): T {
           const result = value.apply(target, args);
           if (result && typeof result === 'object' && typeof result.then === 'function') {
             return (result as Promise<unknown>).catch(async (error: unknown) => {
-              if (isTimeoutError(error)) {
-                const msg =
-                  error && typeof error === 'object'
-                    ? ((error as { message?: string }).message ?? String(error))
-                    : String(error);
+              const msg =
+                error && typeof error === 'object'
+                  ? ((error as { message?: string }).message ?? String(error))
+                  : String(error);
+              const label = `${className(target)}.${String(prop)}`;
 
+              if (isBrowserClosedError(error)) {
+                try {
+                  const info = base.info() as TimeoutAwareTestInfo;
+                  if (!info._actionTimeouts) info._actionTimeouts = [];
+                  info._actionTimeouts.push({
+                    method: String(prop),
+                    message: 'browser context closed',
+                  });
+                } catch {
+                  /* outside test context */
+                }
+              } else if (isTimeoutError(error)) {
                 try {
                   const info = base.info() as TimeoutAwareTestInfo;
                   if (!info._actionTimeouts) info._actionTimeouts = [];
                   info._actionTimeouts.push({ method: String(prop), message: msg });
                 } catch {
-                  /* outside test context — swallow */
+                  /* outside test context */
                 }
+              } else {
+                console.error(`[safeAction] ✖ ERROR in ${label}: ${msg.split('\n')[0]}`);
               }
               return undefined;
             });

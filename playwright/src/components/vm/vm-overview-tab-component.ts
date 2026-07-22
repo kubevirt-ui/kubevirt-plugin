@@ -10,25 +10,21 @@ export default class VmOverviewTabComponent extends BaseComponent {
     '**/api/kubernetes/api/v1/namespaces/openshift-cnv/configmaps/kubevirt-user-settings';
 
   private static readonly _VM_LIST_PATH = '/k8s/all-namespaces/kubevirt.io~v1~VirtualMachine';
-  private readonly _clusterStatusWidget = this.locator('[data-test="cluster-status-widget"]');
+  private readonly _clusterStatusWidget = this.testId('cluster-status-widget');
   private readonly _filterToolbar = this.locator('#filter-toolbar');
   private readonly _filterToolbarProjectButton = this._filterToolbar.locator('button', {
     hasText: 'Project',
   });
-  private readonly _guestAgentIssuesWidget = this.locator(
-    '[data-test="guest-agent-issues-widget"]',
-  );
-  private readonly _migrationsWidget = this.locator('[data-test="migrations-widget"]');
+  private readonly _guestAgentIssuesWidget = this.testId('guest-agent-issues-widget');
+  private readonly _migrationsWidget = this.testId('migrations-widget');
   private readonly _nodeLoadDistributionTitle = this.locator('.pf-v6-c-card__title-text', {
     hasText: 'Node load distribution',
   });
   private readonly _overviewTab = this.locator('button[role="tab"]', { hasText: /^Overview$/ });
   private readonly _roleMenuitem = this.locator('[role="menuitem"]');
-  private readonly _storageMigrationPlansWidget = this.locator(
-    '[data-test="storage-migration-plans-widget"]',
-  );
+  private readonly _storageMigrationPlansWidget = this.testId('storage-migration-plans-widget');
 
-  private readonly _vmListSummary = this.locator('[data-test-id="vm-list-summary"]');
+  private readonly _vmListSummary = this.testId('vm-list-summary');
 
   readonly resourceHealth: VmOverviewTabResourceHealthComponent;
 
@@ -123,9 +119,9 @@ export default class VmOverviewTabComponent extends BaseComponent {
     const firstRow = this.locator('tbody tr').first();
     await firstRow.waitFor({ state: 'visible', timeout: TestTimeouts.DEFAULT });
 
-    const kebab = firstRow.locator(
-      '[data-test="kebab-button"], [data-test-id="kebab-button"], button[aria-label="Actions"]',
-    );
+    const kebab = firstRow
+      .getByTestId('kebab-button')
+      .or(firstRow.locator('button[aria-label="Actions"]'));
     await this.robustClick(kebab.first());
     await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
 
@@ -136,9 +132,10 @@ export default class VmOverviewTabComponent extends BaseComponent {
     await this.robustClick(deleteAction);
     await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
 
-    const confirmButton = this.locator(
-      '[data-test="confirm-action"], .pf-v6-c-modal-box__footer button.pf-m-danger, .pf-v6-c-modal-box button.pf-m-danger',
-    ).first();
+    const confirmButton = this.testId('save-button')
+      .or(this.locator('.pf-v6-c-modal-box__footer button.pf-m-danger'))
+      .or(this.locator('.pf-v6-c-modal-box button.pf-m-danger'))
+      .first();
     await confirmButton.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
     await this.robustClick(confirmButton);
 
@@ -187,7 +184,7 @@ export default class VmOverviewTabComponent extends BaseComponent {
     await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
     await this.locator('button:has-text("IP Address")').click();
     await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
-    const filterInput = this.locator('[data-test-id="filter-input"]');
+    const filterInput = this.testId('filter-input');
     await filterInput.clear();
     await filterInput.fill(ipPrefix);
     await filterInput.press('Enter');
@@ -229,7 +226,7 @@ export default class VmOverviewTabComponent extends BaseComponent {
   ): Promise<number> {
     try {
       await this._migrationsWidget.waitFor({ state: 'visible', timeout });
-      const tile = this._migrationsWidget.locator(`[data-test="status-count-${statusKey}"]`);
+      const tile = this._migrationsWidget.getByTestId(`status-count-${statusKey}`);
       const text = await tile.textContent();
       if (!text) return 0;
       const match = text.match(/(\d+)/);
@@ -257,7 +254,7 @@ export default class VmOverviewTabComponent extends BaseComponent {
 
   async getCreateSplitButtonDropdownOptions(): Promise<string[]> {
     try {
-      const toggle = this.locator('[data-test-id="details-actions"] [data-test="item-create"]');
+      const toggle = this.testId('item-create');
       await this.robustClick(toggle);
       await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
       const items = this._roleMenuitem;
@@ -346,7 +343,7 @@ export default class VmOverviewTabComponent extends BaseComponent {
     timeout = TestTimeouts.ELEMENT_WAIT,
   ): Promise<string | null> {
     try {
-      const migrationStatusSection = this.locator('[data-test="migration-status-section"]');
+      const migrationStatusSection = this.testId('migration-status-section');
       await migrationStatusSection.waitFor({ state: 'visible', timeout });
       const heading = migrationStatusSection.locator('h3').first();
       return await heading.textContent();
@@ -441,7 +438,7 @@ export default class VmOverviewTabComponent extends BaseComponent {
   }
 
   async getStorageMigrationPlansColumnNames(): Promise<string[]> {
-    const columnMgmtBtn = this.locator('[data-test="manage-columns"]');
+    const columnMgmtBtn = this.testId('manage-columns');
     await columnMgmtBtn.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
     await this.robustClick(columnMgmtBtn);
 
@@ -501,7 +498,9 @@ export default class VmOverviewTabComponent extends BaseComponent {
         if (visible) return true;
       }
 
-      const tableBody = this.page.locator('table tbody tr, [data-test="search-results"]');
+      const tableBody = this.page
+        .locator('table tbody tr')
+        .or(this.page.getByTestId('search-results'));
       const rowCount = await tableBody.count().catch(() => 0);
       if (rowCount === 0) return true;
 
@@ -526,9 +525,7 @@ export default class VmOverviewTabComponent extends BaseComponent {
 
   async isCreateSplitButtonVisible(): Promise<boolean> {
     try {
-      const splitBtn = this.locator(
-        '[data-test-id="details-actions"] .pf-v6-c-menu-toggle.pf-m-split-button',
-      );
+      const splitBtn = this.locator('.pf-v6-c-menu-toggle.pf-m-split-button');
       await splitBtn.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
       return true;
     } catch {
@@ -538,7 +535,7 @@ export default class VmOverviewTabComponent extends BaseComponent {
 
   async isEmptyStateCreateButtonVisible(): Promise<boolean> {
     try {
-      const btn = this.locator('.pf-v6-c-empty-state [data-test="item-create"]');
+      const btn = this.locator('.pf-v6-c-empty-state').locator('[data-test="item-create"]');
       await btn.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
       return true;
     } catch {
@@ -603,7 +600,7 @@ export default class VmOverviewTabComponent extends BaseComponent {
     timeout: number = TestTimeouts.UI_VISIBILITY_QUICK,
   ): Promise<boolean> {
     try {
-      const popover = this.page.locator('.pf-v6-c-popover:has(button:has-text("Got it"))');
+      const popover = this.page.getByTestId('onboarding-popover');
       await popover.waitFor({ state: 'visible', timeout });
       return true;
     } catch {
@@ -636,8 +633,8 @@ export default class VmOverviewTabComponent extends BaseComponent {
   }
 
   async isOverviewSectionExpanded(sectionDataTest: string): Promise<boolean> {
-    const toggle = this.locator(
-      `[data-test="${sectionDataTest}"] .pf-v6-c-expandable-section__toggle button`,
+    const toggle = this.testId(sectionDataTest).locator(
+      '.pf-v6-c-expandable-section__toggle button',
     );
     const ariaExpanded = await toggle.getAttribute('aria-expanded').catch(() => null);
     return ariaExpanded === 'true';
@@ -670,15 +667,16 @@ export default class VmOverviewTabComponent extends BaseComponent {
     const hasEmptyState = await this.isStorageMigrationEmptyStateVisible();
     if (hasEmptyState) return true;
 
-    const rows = this.locator('[data-test="storage-migrations-list"] tbody tr, tbody tr');
+    const rows = this.testId('storage-migrations-list').locator('tbody tr, tbody tr');
     return (await rows.count().catch(() => 0)) > 0;
   }
 
   async isStorageMigrationEmptyStateVisible(): Promise<boolean> {
     try {
-      const emptyState = this.locator(
-        '[data-test="empty-message"], div:has-text("No storage migration found"), div:has-text("No StorageMigrationPlan"), div:has-text("don\'t have any storage migrations")',
-      );
+      const emptyState = this.testId('empty-message')
+        .or(this.locator('div:has-text("No storage migration found")'))
+        .or(this.locator('div:has-text("No StorageMigrationPlan")'))
+        .or(this.locator('div:has-text("don\'t have any storage migrations")'));
       return await emptyState
         .first()
         .isVisible({ timeout: TestTimeouts.SHORT_WAIT })
@@ -880,9 +878,7 @@ export default class VmOverviewTabComponent extends BaseComponent {
         await migrationNavBtn.click();
         await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
       }
-      const storageMigrationsLink = this.page.locator(
-        '[data-test-id="storagemigrations-nav-item"]',
-      );
+      const storageMigrationsLink = this.page.getByTestId('storagemigrations-nav-item');
       await storageMigrationsLink.waitFor({
         state: 'visible',
         timeout: TestTimeouts.ELEMENT_WAIT,
@@ -912,8 +908,8 @@ export default class VmOverviewTabComponent extends BaseComponent {
   }
 
   async toggleOverviewSection(sectionDataTest: string): Promise<void> {
-    const toggle = this.locator(
-      `[data-test="${sectionDataTest}"] .pf-v6-c-expandable-section__toggle button`,
+    const toggle = this.testId(sectionDataTest).locator(
+      '.pf-v6-c-expandable-section__toggle button',
     );
     await toggle.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
     await toggle.click();

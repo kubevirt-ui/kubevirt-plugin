@@ -189,7 +189,7 @@ export async function ensureApiAuth(): Promise<void> {
 
 async function dismissWelcomeModals(page: Page): Promise<void> {
   try {
-    const tourFooter = page.locator('[data-test="tour-step-footer-secondary"]');
+    const tourFooter = page.getByTestId('tour-step-footer-secondary');
     const visible = await tourFooter
       .waitFor({ state: 'visible', timeout: TestTimeouts.SHORT_WAIT })
       .then(() => true)

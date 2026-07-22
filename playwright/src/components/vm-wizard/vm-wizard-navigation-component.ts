@@ -12,8 +12,8 @@ export default class VmWizardNavigationComponent extends BaseComponent {
   private readonly _fromTemplateRadio = this.locator(
     '.vm-creation-method-tile:has(#template-radio-button), #template',
   );
-  private readonly _generateVmNameButton = this.locator(
-    '.vm-creation-wizard [data-test="generate-vm-name-button"]',
+  private readonly _generateVmNameButton = this.locator('.vm-creation-wizard').locator(
+    '[data-test="generate-vm-name-button"]',
   );
   private readonly _newVmRadio = this.locator(
     '.vm-creation-method-tile:has(#instance-type-radio-button), #instance-type',
@@ -261,7 +261,7 @@ export default class VmWizardNavigationComponent extends BaseComponent {
 
   async getSelectedTemplateCardTitle(templateTestId: string): Promise<string> {
     try {
-      const card = this.locator(`[data-test-id="${templateTestId}"]`);
+      const card = this.testId(templateTestId);
       return (await card.textContent({ timeout: TestTimeouts.SHORT_WAIT }))?.trim() || '';
     } catch {
       return '';
@@ -269,7 +269,7 @@ export default class VmWizardNavigationComponent extends BaseComponent {
   }
 
   async getTemplateCardFields(templateTestId: string): Promise<string[]> {
-    const card = this.locator(`[data-test-id="${templateTestId}"]`);
+    const card = this.testId(templateTestId);
     const text = (await card.textContent({ timeout: TestTimeouts.SHORT_WAIT }))?.trim() || '';
     const knownFields = ['Architecture', 'Project', 'Boot source', 'Workload', 'CPU', 'Memory'];
     return knownFields.filter((field) => text.includes(field));
@@ -378,9 +378,12 @@ export default class VmWizardNavigationComponent extends BaseComponent {
 
     await dismissWelcomeModal();
 
-    const createButton = this.locator(
-      '[data-test="item-create"].pf-m-primary, .pf-m-primary > [data-test="item-create"], [data-test="vms-treeview"] [data-test="item-create"], button[aria-label="Create VirtualMachine"]',
-    ).first();
+    const createButton = this.testId('item-create')
+      .and(this.locator('.pf-m-primary'))
+      .or(this.locator('.pf-m-primary').locator('[data-test="item-create"]'))
+      .or(this.testId('vms-treeview').locator('[data-test="item-create"]'))
+      .or(this.locator('button[aria-label="Create VirtualMachine"]'))
+      .first();
     await createButton.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
     await this.robustClick(createButton);
 
@@ -458,7 +461,7 @@ export default class VmWizardNavigationComponent extends BaseComponent {
   }
 
   async selectTemplateByTestId(templateTestId: string): Promise<void> {
-    const card = this.locator(`[data-test-id="${templateTestId}"]`);
+    const card = this.testId(templateTestId);
     await card.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
     await this.robustClick(card);
 
@@ -613,9 +616,8 @@ export default class VmWizardNavigationComponent extends BaseComponent {
     folderCombobox: boolean;
   }> {
     return {
-      projectDropdown: await this.locator(
-        '.pf-v6-c-wizard [data-test="namespace-dropdown-menu-toggle"]',
-      )
+      projectDropdown: await this.locator('.pf-v6-c-wizard')
+        .getByTestId('namespace-dropdown-menu-toggle')
         .first()
         .isVisible({ timeout: TestTimeouts.SHORT_WAIT })
         .catch(() => false),
@@ -669,7 +671,7 @@ export default class VmWizardNavigationComponent extends BaseComponent {
   }
 
   async verifyNoHeaderProjectSelector(): Promise<boolean> {
-    const headerSelector = this.locator('[data-test-id="namespace-bar-dropdown"]');
+    const headerSelector = this.testId('namespace-bar-dropdown');
     try {
       await headerSelector.waitFor({ state: 'visible', timeout: 3000 });
       return false;

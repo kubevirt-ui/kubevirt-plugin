@@ -13,37 +13,29 @@ export default class VmListOverviewWidgetsComponent extends BaseComponent {
     'Memory usage',
     'Storage allocated',
   ] as const;
-  private readonly _clusterResourcesCard = this.locator('[data-test="cluster-resources-card"]');
-  private readonly _clusterStatusWidget = this.locator('[data-test="cluster-status-widget"]');
-  private readonly _clusterUtilizationWidget = this.locator(
-    '[data-test="cluster-utilization-widget"]',
-  );
-  private readonly _guestAgentIssuesWidget = this.locator(
-    '[data-test="guest-agent-issues-widget"]',
-  );
-  private readonly _migrationsWidget = this.locator('[data-test="migrations-widget"]');
+  private readonly _clusterResourcesCard = this.testId('cluster-resources-card');
+  private readonly _clusterStatusWidget = this.testId('cluster-status-widget');
+  private readonly _clusterUtilizationWidget = this.testId('cluster-utilization-widget');
+  private readonly _guestAgentIssuesWidget = this.testId('guest-agent-issues-widget');
+  private readonly _migrationsWidget = this.testId('migrations-widget');
   private readonly _nodeLoadDistributionTitle = this.locator('.pf-v6-c-card__title-text', {
     hasText: 'Node load distribution',
   });
   private readonly _overviewTab = this.locator('button[role="tab"]', { hasText: /^Overview$/ });
-  private readonly _resourceAllocationCharts = this.locator(
-    '[data-test="resource-allocation-widget"] .resource-allocation-widget__chart',
+  private readonly _resourceAllocationCharts = this.testId('resource-allocation-widget').locator(
+    '.resource-allocation-widget__chart',
   );
-  private readonly _resourceAllocationWidget = this.locator(
-    '[data-test="resource-allocation-widget"]',
-  );
+  private readonly _resourceAllocationWidget = this.testId('resource-allocation-widget');
   private readonly _somethingWrongHappened = this.locator('text=Something wrong happened');
-  private readonly _storageMigrationPlansWidget = this.locator(
-    '[data-test="storage-migration-plans-widget"]',
-  );
+  private readonly _storageMigrationPlansWidget = this.testId('storage-migration-plans-widget');
   private readonly _treeView = this.locator('.pf-v6-c-tree-view');
-  private readonly _vmAlertsWidget = this.locator('[data-test="vm-alerts-widget"]');
-  private readonly _vmListSummary = this.locator('[data-test-id="vm-list-summary"]');
+  private readonly _vmAlertsWidget = this.testId('vm-alerts-widget');
+  private readonly _vmListSummary = this.testId('vm-list-summary');
   private readonly _vmListTab = this.locator('button[role="tab"]', {
     hasText: /^Virtual machines$/,
   });
 
-  private readonly _vmStatusesCard = this.locator('[data-test="vm-statuses-card"]');
+  private readonly _vmStatusesCard = this.testId('vm-statuses-card');
 
   private readonly nav: NavigationComponent;
 
@@ -245,9 +237,9 @@ export default class VmListOverviewWidgetsComponent extends BaseComponent {
     const firstRow = this.locator('tbody tr').first();
     await firstRow.waitFor({ state: 'visible', timeout: TestTimeouts.DEFAULT });
 
-    const kebab = firstRow.locator(
-      '[data-test="kebab-button"], [data-test-id="kebab-button"], button[aria-label="Actions"]',
-    );
+    const kebab = firstRow
+      .getByTestId('kebab-button')
+      .or(firstRow.locator('button[aria-label="Actions"]'));
     await this.robustClick(kebab.first());
     await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
 
@@ -258,9 +250,10 @@ export default class VmListOverviewWidgetsComponent extends BaseComponent {
     await this.robustClick(deleteAction);
     await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
 
-    const confirmButton = this.locator(
-      '[data-test="confirm-action"], .pf-v6-c-modal-box__footer button.pf-m-danger, .pf-v6-c-modal-box button.pf-m-danger',
-    ).first();
+    const confirmButton = this.testId('save-button')
+      .or(this.locator('.pf-v6-c-modal-box__footer button.pf-m-danger'))
+      .or(this.locator('.pf-v6-c-modal-box button.pf-m-danger'))
+      .first();
     await confirmButton.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
     await this.robustClick(confirmButton);
 
@@ -273,20 +266,24 @@ export default class VmListOverviewWidgetsComponent extends BaseComponent {
   async expectResourceAllocationDataKeywordsVisible(
     dataLoadTimeout = TestTimeouts.DEFAULT,
   ): Promise<void> {
-    const selector = '[data-test="resource-allocation-widget"] [data-pf-content="true"]';
     const keywords = ['running', 'vCPU', 'MiB', 'GiB'];
-    await this.page.waitForFunction(
-      ({ sel, kws }: { sel: string; kws: string[] }) => {
-        const nodes = document.querySelectorAll(sel);
-        const combined = Array.from(nodes)
-          .map((el) => el.textContent ?? '')
-          .join(' ');
-        const lower = combined.toLowerCase();
-        return kws.every((k) => lower.includes(k.toLowerCase()));
-      },
-      { sel: selector, kws: keywords },
-      { timeout: dataLoadTimeout },
-    );
+    const contentLocator = this._resourceAllocationWidget.locator('[data-pf-content="true"]');
+    const startTime = Date.now();
+    while (Date.now() - startTime < dataLoadTimeout) {
+      const texts = await contentLocator.allTextContents();
+      const combined = texts.join(' ').toLowerCase();
+      if (keywords.every((k) => combined.includes(k.toLowerCase()))) {
+        return;
+      }
+      await this.page.waitForTimeout(500);
+    }
+    const texts = await contentLocator.allTextContents();
+    const combined = texts.join(' ').toLowerCase();
+    for (const k of keywords) {
+      if (!combined.includes(k.toLowerCase())) {
+        throw new Error(`Keyword "${k}" not found in resource allocation widget`);
+      }
+    }
   }
 
   async getClusterUtilizationMetrics(
@@ -317,7 +314,7 @@ export default class VmListOverviewWidgetsComponent extends BaseComponent {
   ): Promise<number> {
     try {
       await this._migrationsWidget.waitFor({ state: 'visible', timeout });
-      const tile = this._migrationsWidget.locator(`[data-test="status-count-${statusKey}"]`);
+      const tile = this._migrationsWidget.getByTestId(`status-count-${statusKey}`);
       const text = await tile.textContent();
       if (!text) return 0;
       const match = text.match(/(\d+)/);
@@ -423,7 +420,7 @@ export default class VmListOverviewWidgetsComponent extends BaseComponent {
     timeout = TestTimeouts.ELEMENT_WAIT,
   ): Promise<string | null> {
     try {
-      const migrationStatusSection = this.locator('[data-test="migration-status-section"]');
+      const migrationStatusSection = this.testId('migration-status-section');
       await migrationStatusSection.waitFor({ state: 'visible', timeout });
       const heading = migrationStatusSection.locator('h3').first();
       return await heading.textContent();
@@ -527,7 +524,7 @@ export default class VmListOverviewWidgetsComponent extends BaseComponent {
   }
 
   async getStorageMigrationPlansColumnNames(): Promise<string[]> {
-    const columnMgmtBtn = this.locator('[data-test="manage-columns"]');
+    const columnMgmtBtn = this.testId('manage-columns');
     await columnMgmtBtn.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
     await this.robustClick(columnMgmtBtn);
 
@@ -571,8 +568,8 @@ export default class VmListOverviewWidgetsComponent extends BaseComponent {
   async getVmTableMetricValues(): Promise<
     Array<{ vmName: string; memory: string; cpu: string; network: string }>
   > {
-    const table = this.locator(
-      '[data-test="VirtualMachines table"], table[aria-label*="VirtualMachines"]',
+    const table = this.testId('VirtualMachines table').or(
+      this.locator('table[aria-label*="VirtualMachines"]'),
     );
     await table.waitFor({ state: 'visible', timeout: TestTimeouts.DEFAULT });
 
@@ -611,9 +608,7 @@ export default class VmListOverviewWidgetsComponent extends BaseComponent {
 
   async isCreateSplitButtonVisible(): Promise<boolean> {
     try {
-      const splitBtn = this.locator(
-        '[data-test-id="details-actions"] .pf-v6-c-menu-toggle.pf-m-split-button',
-      );
+      const splitBtn = this.locator('.pf-v6-c-menu-toggle.pf-m-split-button');
       await splitBtn.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
       return true;
     } catch {
@@ -669,8 +664,8 @@ export default class VmListOverviewWidgetsComponent extends BaseComponent {
   }
 
   async isOverviewSectionExpanded(sectionDataTest: string): Promise<boolean> {
-    const toggle = this.locator(
-      `[data-test="${sectionDataTest}"] .pf-v6-c-expandable-section__toggle button`,
+    const toggle = this.testId(sectionDataTest).locator(
+      '.pf-v6-c-expandable-section__toggle button',
     );
     const ariaExpanded = await toggle.getAttribute('aria-expanded').catch(() => null);
     return ariaExpanded === 'true';
@@ -686,7 +681,7 @@ export default class VmListOverviewWidgetsComponent extends BaseComponent {
   }
   async isResourceAllocationNoDataVisible(): Promise<boolean> {
     try {
-      const section = this.locator('[data-test="resource-allocation-section"]').or(
+      const section = this.testId('resource-allocation-section').or(
         this.locator('text=Virtualization resource allocation'),
       );
       await section.first().waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
@@ -702,14 +697,15 @@ export default class VmListOverviewWidgetsComponent extends BaseComponent {
     const hasEmptyState = await this.isStorageMigrationEmptyStateVisible();
     if (hasEmptyState) return true;
 
-    const rows = this.locator('[data-test="storage-migrations-list"] tbody tr, tbody tr');
+    const rows = this.testId('storage-migrations-list').locator('tbody tr, tbody tr');
     return (await rows.count().catch(() => 0)) > 0;
   }
   async isStorageMigrationEmptyStateVisible(): Promise<boolean> {
     try {
-      const emptyState = this.locator(
-        '[data-test="empty-message"], div:has-text("No storage migration found"), div:has-text("No StorageMigrationPlan"), div:has-text("don\'t have any storage migrations")',
-      );
+      const emptyState = this.testId('empty-message')
+        .or(this.locator('div:has-text("No storage migration found")'))
+        .or(this.locator('div:has-text("No StorageMigrationPlan")'))
+        .or(this.locator('div:has-text("don\'t have any storage migrations")'));
       return await emptyState
         .first()
         .isVisible({ timeout: TestTimeouts.SHORT_WAIT })
@@ -788,7 +784,7 @@ export default class VmListOverviewWidgetsComponent extends BaseComponent {
       await migrationNavBtn.click();
       await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
     }
-    const storageMigrationsLink = this.page.locator('[data-test-id="storagemigrations-nav-item"]');
+    const storageMigrationsLink = this.page.getByTestId('storagemigrations-nav-item');
     await storageMigrationsLink.waitFor({
       state: 'visible',
       timeout: TestTimeouts.ELEMENT_WAIT,
@@ -818,8 +814,8 @@ export default class VmListOverviewWidgetsComponent extends BaseComponent {
   }
 
   async toggleOverviewSection(sectionDataTest: string): Promise<void> {
-    const toggle = this.locator(
-      `[data-test="${sectionDataTest}"] .pf-v6-c-expandable-section__toggle button`,
+    const toggle = this.testId(sectionDataTest).locator(
+      '.pf-v6-c-expandable-section__toggle button',
     );
     await toggle.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
     await toggle.click();
@@ -842,7 +838,7 @@ export default class VmListOverviewWidgetsComponent extends BaseComponent {
     const widgets: { name: string; locator: ReturnType<typeof this.locator> }[] = [
       {
         name: 'openshift-virtualization-widget',
-        locator: this.locator('[data-test="openshift-virtualization-widget"]'),
+        locator: this.testId('openshift-virtualization-widget'),
       },
       { name: 'cluster-resources-card', locator: this._clusterResourcesCard },
       { name: 'migrations-widget', locator: this._migrationsWidget },

@@ -5,11 +5,9 @@ import type { Page } from '@playwright/test';
 import BaseComponent from './base-component';
 
 export default class PageContentComponent extends BaseComponent {
-  private readonly _statusElements = this.locator(
-    '[data-test-id="virtual-machine-overview-details-status"]',
-  );
-  readonly _createButton = this.locator('[data-test="item-create"]');
-  readonly _saveChangesButton = this.locator('[data-test="save-changes"]');
+  private readonly _statusElements = this.testId('virtual-machine-overview-details-status');
+  readonly _createButton = this.testId('item-create');
+  readonly _saveChangesButton = this.testId('save-changes');
 
   constructor(page: Page) {
     super(page);
@@ -57,9 +55,9 @@ export default class PageContentComponent extends BaseComponent {
 
   async clickMinusButton(): Promise<void> {
     await this.robustClick(
-      this.locator(
-        '[data-test="minus-button"], button[aria-label*="minus" i], button[aria-label*="decrease" i]',
-      ).first(),
+      this.testId('minus-button')
+        .or(this.locator('button[aria-label*="minus" i], button[aria-label*="decrease" i]'))
+        .first(),
     );
   }
 
@@ -70,9 +68,9 @@ export default class PageContentComponent extends BaseComponent {
 
   async clickPlusButton(): Promise<void> {
     await this.robustClick(
-      this.locator(
-        '[data-test="plus-button"], button[aria-label*="plus" i], button[aria-label*="increase" i]',
-      ).first(),
+      this.testId('plus-button')
+        .or(this.locator('button[aria-label*="plus" i], button[aria-label*="increase" i]'))
+        .first(),
     );
   }
 

@@ -8,7 +8,7 @@ import type { Page } from '@playwright/test';
 import { expect } from '@playwright/test';
 
 export default class VirtualMachineDetailActionsComponent extends PageCommons {
-  private readonly _actionsMenuButton = this.locator('[data-test="actions-menu-button"]');
+  private readonly _actionsMenuButton = this.testId('actions-menu-button');
 
   private readonly _connectingText = this.locator('text=Connecting');
 
@@ -19,14 +19,14 @@ export default class VirtualMachineDetailActionsComponent extends PageCommons {
 
   private readonly _inputSearchInput = this.locator('input[aria-label="Search input"]');
 
-  private readonly _migrationMenu = this.locator('[data-test-id="migration-menu"]');
+  private readonly _migrationMenu = this.testId('migration-menu');
 
   private readonly _roleDialog = this.locator('[role="dialog"]');
-  private readonly _vmActionDeleteButton = this.locator('[data-test-id="vm-action-delete"] button');
-  private readonly _vmName = this.locator('[data-test-id="virtual-machine-overview-details-name"]');
-  private readonly _vmOverviewDetailsStatus = this.locator(
-    '[data-test-id="virtual-machine-overview-details-status"] button',
-  );
+  private readonly _vmActionDeleteButton = this.testId('vm-action-delete').locator('button');
+  private readonly _vmName = this.testId('virtual-machine-overview-details-name');
+  private readonly _vmOverviewDetailsStatus = this.testId(
+    'virtual-machine-overview-details-status',
+  ).locator('button');
   private readonly _vncContainer = this.locator('.vnc-container');
 
   constructor(page: Page) {
@@ -47,7 +47,7 @@ export default class VirtualMachineDetailActionsComponent extends PageCommons {
       timeout: TestTimeouts.UI_ACTION_COMPLETE,
     });
     await this.robustClick(this._vmActionDeleteButton);
-    await this.locator('[data-test="dialog-modal"]').waitFor({
+    await this.testId('dialog-modal').waitFor({
       state: 'visible',
       timeout: TestTimeouts.UI_ACTION_COMPLETE,
     });
@@ -242,9 +242,7 @@ export default class VirtualMachineDetailActionsComponent extends PageCommons {
     timeout: number = TestTimeouts.DEFAULT,
   ): Promise<boolean> {
     try {
-      const vmNameSpan = this.locator('[data-test="vms-treeview"] span', {
-        hasText: vmName,
-      }).first();
+      const vmNameSpan = this.testId('vms-treeview').locator('span', { hasText: vmName }).first();
 
       await vmNameSpan.waitFor({ state: 'visible', timeout });
 
@@ -444,34 +442,28 @@ export default class VirtualMachineDetailActionsComponent extends PageCommons {
         return false;
       }
 
-      const createdExists = await this.locator(
-        '[data-test-id="virtual-machine-overview-details-created"]',
-      )
+      const createdExists = await this.testId('virtual-machine-overview-details-created')
         .isVisible()
         .catch(() => false);
       if (!createdExists) {
         return false;
       }
 
-      const osExists = await this.locator('[data-test-id="virtual-machine-overview-details-os"]')
+      const osExists = await this.testId('virtual-machine-overview-details-os')
         .isVisible()
         .catch(() => false);
       if (!osExists) {
         return false;
       }
 
-      const cpuMemExists = await this.locator(
-        '[data-test-id="virtual-machine-overview-details-cpu-memory"]',
-      )
+      const cpuMemExists = await this.testId('virtual-machine-overview-details-cpu-memory')
         .isVisible()
         .catch(() => false);
       if (!cpuMemExists) {
         return false;
       }
 
-      const hostnameExists = await this.locator(
-        '[data-test-id="virtual-machine-overview-details-host"]',
-      )
+      const hostnameExists = await this.testId('virtual-machine-overview-details-host')
         .isVisible()
         .catch(() => false);
       if (!hostnameExists) {
@@ -487,10 +479,10 @@ export default class VirtualMachineDetailActionsComponent extends PageCommons {
       }
 
       if (templateName) {
-        const byTestId = this.locator(`[data-test-id="${templateName}"]`);
+        const byTestId = this.testId(templateName);
         let templateExists = await byTestId.isVisible().catch(() => false);
         if (!templateExists) {
-          const byDataTest = this.locator(`[data-test="${templateName}"]`);
+          const byDataTest = this.locator(`[data-test-id="${templateName}"]`);
           templateExists = await byDataTest.isVisible().catch(() => false);
         }
         if (!templateExists) {
@@ -513,14 +505,12 @@ export default class VirtualMachineDetailActionsComponent extends PageCommons {
 
   async verifyInstanceType(expectedInstanceType: string): Promise<boolean> {
     try {
-      await this.locator('[data-test-id="virtual-machine-overview-details-instance-type"]').waitFor(
-        {
-          state: 'visible',
-          timeout: TestTimeouts.VM_CREATION,
-        },
-      );
-      const instanceTypeText = await this.locator(
-        '[data-test-id="virtual-machine-overview-details-instance-type"]',
+      await this.testId('virtual-machine-overview-details-instance-type').waitFor({
+        state: 'visible',
+        timeout: TestTimeouts.VM_CREATION,
+      });
+      const instanceTypeText = await this.testId(
+        'virtual-machine-overview-details-instance-type',
       ).textContent();
       return instanceTypeText?.includes(expectedInstanceType) ?? false;
     } catch {

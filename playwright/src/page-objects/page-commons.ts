@@ -18,8 +18,8 @@ import BasePage from './base-page';
 
 export default class PageCommons extends BasePage {
   private readonly _btnRoleMenuitem = this.locator('button[role="menuitem"]');
-  private readonly _dropdownTextFilter = this.locator('[data-test="dropdown-text-filter"]');
-  private readonly _namespaceBarDropdown = this.locator('[data-test-id="namespace-bar-dropdown"]');
+  private readonly _dropdownTextFilter = this.testId('dropdown-text-filter');
+  private readonly _namespaceBarDropdown = this.testId('namespace-bar-dropdown');
   private readonly _roleDialogPfV6CModalBox = this.locator('[role="dialog"], .pf-v6-c-modal-box');
   protected readonly vmActions = new VmActionsComponent(this.page);
 
@@ -29,9 +29,7 @@ export default class PageCommons extends BasePage {
 
   protected readonly _actionsDropdown = this.vmActions._actionsDropdown;
   // Fleet Virtualization (ACM) – Cluster and Project dropdowns
-  protected readonly _clusterDropdownToggle = this.locator(
-    '[data-test="cluster-dropdown-menu-toggle"]',
-  );
+  protected readonly _clusterDropdownToggle = this.testId('cluster-dropdown-menu-toggle');
   protected readonly modal = new ModalComponent(this.page);
 
   protected readonly _confirmActionButton = this.modal._confirmActionButton;
@@ -39,9 +37,7 @@ export default class PageCommons extends BasePage {
   readonly _createButton = this.pageContent._createButton;
   protected readonly _fleetDropdownTextFilter = this._dropdownTextFilter;
 
-  protected readonly _namespaceDropdownToggle = this.locator(
-    '[data-test="namespace-dropdown-menu-toggle"]',
-  );
+  protected readonly _namespaceDropdownToggle = this.testId('namespace-dropdown-menu-toggle');
   // Composed components
   protected readonly _navComponent = new NavigationComponent(this.page);
   protected readonly filterToolbar = new FilterToolbarComponent(this.page);
@@ -255,7 +251,7 @@ export default class PageCommons extends BasePage {
 
   override async clickSaveByTestId() {
     await this.page.waitForTimeout(TestTimeouts.UI_DELAY_EXTRA);
-    await this.robustClick(this.locator('footer').locator('button[data-test="save-button"]'));
+    await this.robustClick(this.locator('footer').locator('[data-test="save-button"]'));
   }
 
   override async clickSaveChanges() {
@@ -616,7 +612,7 @@ export default class PageCommons extends BasePage {
       return;
     }
 
-    const projectItem = this.locator('[data-test="dropdown-menu-item-link"]', {
+    const projectItem = this.testId('dropdown-menu-item-link').filter({
       hasText: projectName,
     });
 
@@ -660,7 +656,7 @@ export default class PageCommons extends BasePage {
     await this.page.waitForLoadState('domcontentloaded');
     await this.page.waitForLoadState('load');
 
-    const namespaceDropdown = this.locator('[data-test-id="namespace-bar-dropdown"] button');
+    const namespaceDropdown = this.testId('namespace-bar-dropdown').locator('button');
 
     const dropdownVisible = await namespaceDropdown
       .isVisible({ timeout: TestTimeouts.UI_DELAY_MEDIUM })
@@ -669,7 +665,7 @@ export default class PageCommons extends BasePage {
       return;
     }
 
-    const namespaceOption = this.locator('[data-test="dropdown-menu-item-link"]', {
+    const namespaceOption = this.testId('dropdown-menu-item-link').filter({
       hasText: namespace,
     });
 

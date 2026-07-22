@@ -150,10 +150,15 @@ test.describe('Virtualization pages (gating)', { tag: [GATING_TAG] }, () => {
 
     await test.step('Red Hat templates are visible', async () => {
       await templatesPage.filterByDefaultTemplates();
-      const rhel9Visible = await templatesPage.isTemplateVisible(
-        utils.TEMPLATE_METADATA_NAMES.RHEL9,
-      );
-      expect.soft(rhel9Visible, 'RHEL9 template should be visible').toBe(true);
+
+      const rhel9Name = utils.TEMPLATE_METADATA_NAMES.RHEL9;
+      await expect
+        .poll(() => templatesPage.isTemplateVisible(rhel9Name), {
+          timeout: 30_000,
+          intervals: [2_000],
+          message: 'RHEL9 template should be visible after filtering',
+        })
+        .toBe(true);
 
       if (!utils.EnvVariables.isS390x) {
         const win10Visible = await templatesPage.isTemplateVisible(
@@ -254,6 +259,89 @@ test.describe('Virtualization pages (gating)', { tag: [GATING_TAG] }, () => {
         .toBe(true);
     },
   );
+
+  test('Settings page loads with all tabs and expected cluster sections', async ({
+    settingsPage,
+    utils,
+  }) => {
+    await utils.withAllure({ suite: SUITE, feature: GATING, tags: [GATING_TAG] });
+
+    await settingsPage.navigateToSettingsViaSidebar();
+
+    await test.step('Settings page renders four tabs: Cluster, User, Recommended capabilities, Preview features', async () => {
+      const tabs = await settingsPage.getSettingsTabNames();
+      for (const expected of ['Cluster', 'User', 'Recommended capabilities', 'Preview features']) {
+        expect
+          .soft(
+            tabs.some((t) => t.includes(expected)),
+            `Tab "${expected}" should be present (found: ${tabs.join(', ')})`,
+          )
+          .toBe(true);
+      }
+    });
+
+    await test.step('Cluster tab lists all expected sections', async () => {
+      const sections = await settingsPage.getClusterSettingsSectionNames();
+      for (const expected of [
+        'Virtualization features',
+        'General settings',
+        'Guest management',
+        'Resource management',
+        'SCSI persistent reservation',
+      ]) {
+        expect
+          .soft(
+            sections.some((s) => s.includes(expected)),
+            `Cluster section "${expected}" should be visible (found: ${sections.join(', ')})`,
+          )
+          .toBe(true);
+      }
+    });
+
+    await test.step('General settings section lists expected sub-sections', async () => {
+      await settingsPage.navigateToGeneralSettings();
+      const subSections = await settingsPage.getGeneralSettingsSubSections();
+      for (const expected of [
+        'Live migration',
+        'SSH configurations',
+        'Templates and images management',
+      ]) {
+        expect
+          .soft(
+            subSections.some((s) => s.includes(expected)),
+            `Sub-section "${expected}" should be visible (found: ${subSections.join(', ')})`,
+          )
+          .toBe(true);
+      }
+    });
+
+    await test.step('User tab loads with expected sections', async () => {
+      await settingsPage.navigateToSettingsViaSidebar();
+      const loaded = await settingsPage.navigateToGettingStartedResources();
+      expect.soft(loaded, 'User tab "Getting started resources" section should load').toBe(true);
+    });
+
+    await test.step('Preview features tab loads with feature flags', async () => {
+      const loaded = await settingsPage.navigateToPreviewFeatures();
+      expect.soft(loaded, 'Preview features tab should load').toBe(true);
+      const labels = await settingsPage.getPreviewFeatureLabels();
+      expect
+        .soft(labels.length, 'Preview features should list at least one flag')
+        .toBeGreaterThan(0);
+    });
+
+    await test.step('Search filter surfaces setting suggestions', async () => {
+      await settingsPage.navigateToSettingsViaSidebar();
+      await settingsPage.fillConfigurationSearchInput('migration');
+      const result = await settingsPage.verifyHighlightedSearchResultsVisible();
+      expect
+        .soft(result.isVisible, 'Search should show at least one suggestion for "migration"')
+        .toBe(true);
+      expect
+        .soft(result.count, 'At least one suggestion should appear for "migration"')
+        .toBeGreaterThan(0);
+    });
+  });
 
   test('Preferences item is absent from sidebar navigation', async ({
     overviewPage,

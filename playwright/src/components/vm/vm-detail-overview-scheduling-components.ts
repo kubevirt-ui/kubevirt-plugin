@@ -8,8 +8,8 @@ import { TestTimeouts } from '@/utils/test-config';
 import type { Page } from '@playwright/test';
 
 export class VirtualMachineDetailNetworkComponent extends BaseComponent {
-  private readonly _networkCard = this.locator(
-    '[data-test="overview-network-interfaces-card"], .VirtualMachinesOverviewTabInterfaces--main',
+  private readonly _networkCard = this.testId('overview-network-interfaces-card').or(
+    this.locator('.VirtualMachinesOverviewTabInterfaces--main'),
   );
 
   constructor(page: Page) {
@@ -67,9 +67,9 @@ export class VirtualMachineDetailNetworkComponent extends BaseComponent {
 
   async verifyNetworkInterfacesCard(): Promise<boolean> {
     try {
-      const networkInterfacesTable = this.locator(
-        '[data-test="overview-network-interfaces-card"], [data-test="overview-network-interfaces-table"], [data-test="vm-network-interface-list"]',
-      );
+      const networkInterfacesTable = this.testId('overview-network-interfaces-card')
+        .or(this.testId('overview-network-interfaces-table'))
+        .or(this.testId('vm-network-interface-list'));
       await networkInterfacesTable.first().waitFor({
         state: 'visible',
         timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
@@ -83,16 +83,12 @@ export class VirtualMachineDetailNetworkComponent extends BaseComponent {
 
 export class VirtualMachineDetailOverviewWidgetsComponent extends BaseComponent {
   private readonly _last5Minutes = this.locator('text=Last 5 minutes');
-  private readonly _overviewHardwareDevicesCard = this.locator(
-    '[data-test="overview-hardware-devices-card"]',
-  );
+  private readonly _overviewHardwareDevicesCard = this.testId('overview-hardware-devices-card');
   private readonly _utilChart = this.locator('.util-chart');
-  private readonly _utilSummaryCpu = this.locator('[data-test-id="util-summary-cpu"]');
-  private readonly _utilSummaryMemory = this.locator('[data-test-id="util-summary-memory"]');
-  private readonly _utilSummaryNetworkTransfer = this.locator(
-    '[data-test-id="util-summary-network-transfer"]',
-  );
-  private readonly _utilSummaryStorage = this.locator('[data-test-id="util-summary-storage"]');
+  private readonly _utilSummaryCpu = this.testId('util-summary-cpu');
+  private readonly _utilSummaryMemory = this.testId('util-summary-memory');
+  private readonly _utilSummaryNetworkTransfer = this.testId('util-summary-network-transfer');
+  private readonly _utilSummaryStorage = this.testId('util-summary-storage');
   private readonly _virtualMachinesOverviewTabDisksMain = this.locator(
     '.VirtualMachinesOverviewTabDisks--main',
   );
@@ -213,22 +209,19 @@ export class VirtualMachineDetailOverviewWidgetsComponent extends BaseComponent 
         timeout: TestTimeouts.VM_CREATION,
       });
 
-      const rootInCard = this._virtualMachinesOverviewTabDisksMain.locator(
-        '[data-test-id="disk-rootdisk"]',
-      );
+      const rootInCard = this._virtualMachinesOverviewTabDisksMain.getByTestId('disk-rootdisk');
       await rootInCard.waitFor({ state: 'visible', timeout: TestTimeouts.VM_CREATION });
 
-      const cloudInitInCard = this._virtualMachinesOverviewTabDisksMain.locator(
-        '[data-test-id="disk-cloudinitdisk"], [data-test-id^="disk-cloudinit"]',
-      );
+      const cloudInitInCard = this._virtualMachinesOverviewTabDisksMain
+        .getByTestId('disk-cloudinitdisk')
+        .or(this._virtualMachinesOverviewTabDisksMain.locator('[data-test^="disk-cloudinit"]'));
       try {
         await cloudInitInCard.first().waitFor({
           state: 'visible',
           timeout: TestTimeouts.VM_CREATION,
         });
       } catch {
-        const diskRows =
-          this._virtualMachinesOverviewTabDisksMain.locator('[data-test-id^="disk-"]');
+        const diskRows = this._virtualMachinesOverviewTabDisksMain.locator('[data-test^="disk-"]');
         const diskRowCount = await diskRows.count();
         if (diskRowCount < 2) {
           return false;
@@ -438,40 +431,31 @@ export class VirtualMachineDetailOverviewTabComponent extends BaseComponent {
 }
 
 export class VirtualMachineDetailSchedulingComponent extends BaseComponent {
-  private readonly _affinityModalApplyButton = this.locator(
-    '[role="dialog"] [data-test="save-button"]',
-  );
-  private readonly _affinityModalCancelButton = this.locator(
-    '[role="dialog"] [data-test="cancel-button"]',
-  );
-  private readonly _affinityRulesButton = this.locator(
-    '[role="tabpanel"] button[data-test-id="affinity-rules"]',
-  );
+  private readonly _affinityModalApplyButton =
+    this.locator('[role="dialog"]').getByTestId('save-button');
+  private readonly _affinityModalCancelButton =
+    this.locator('[role="dialog"]').getByTestId('cancel-button');
+  private readonly _affinityRulesButton =
+    this.locator('[role="tabpanel"]').getByTestId('affinity-rules');
   private readonly _btnIdLoadBalancer = this.locator('button[id="LoadBalancer"]');
   private readonly _btnIdNodePort = this.locator('button[id="NodePort"]');
-  private readonly _configurationNetworkSubTab = this.locator(
-    '[data-test-id="vm-configuration-network"]',
-  );
-  private readonly _configurationTab = this.locator(
-    '[data-test-id="horizontal-link-Configuration"]',
-  );
+  private readonly _configurationNetworkSubTab = this.testId('vm-configuration-network');
+  private readonly _configurationTab = this.testId('horizontal-link-Configuration');
   private readonly _copyFQDNBtn = this.locator('button:has-text("Copy FQDN")');
-  private readonly _descheduler = this.locator('[data-test-id="descheduler"]');
+  private readonly _descheduler = this.testId('descheduler');
   private readonly _descheduler1 = this.locator('#descheduler');
-  private readonly _deschedulerEdit = this.locator('[data-test-id="descheduler-edit"]');
+  private readonly _deschedulerEdit = this.testId('descheduler-edit');
   private readonly _inProgress = this.locator('text=In progress');
   private readonly _roleDialog = this.locator('[role="dialog"]');
-  private readonly _sshAccessButton = this.locator('[data-test-id="ssh-access"] button');
-  private readonly _sshCommandCopy = this.locator('[data-test="ssh-command-copy"]');
+  private readonly _sshAccessButton = this.testId('ssh-access').locator('button');
+  private readonly _sshCommandCopy = this.testId('ssh-command-copy');
   private readonly _tabModal = this.locator('#tab-modal');
-  private readonly _tabModalSaveButton = this.locator('#tab-modal [data-test="save-button"]');
-  private readonly _vmConfigurationDetails = this.locator(
-    '[data-test-id="vm-configuration-details"]',
+  private readonly _tabModalSaveButton = this.locator('#tab-modal').locator(
+    '[data-test="save-button"]',
   );
-  private readonly _vmConfigurationScheduling = this.locator(
-    '[data-test-id="vm-configuration-scheduling"]',
-  );
-  private readonly _vmConfigurationSsh = this.locator('[data-test-id="vm-configuration-ssh"]');
+  private readonly _vmConfigurationDetails = this.testId('vm-configuration-details');
+  private readonly _vmConfigurationScheduling = this.testId('vm-configuration-scheduling');
+  private readonly _vmConfigurationSsh = this.testId('vm-configuration-ssh');
 
   constructor(page: Page) {
     super(page);
@@ -492,8 +476,8 @@ export class VirtualMachineDetailSchedulingComponent extends BaseComponent {
   }
 
   private async openDetailVmActionsMenu(): Promise<void> {
-    const dropdown = this.locator('[data-test="actions-dropdown"]');
-    const menuButton = this.locator('[data-test="actions-menu-button"]');
+    const dropdown = this.testId('actions-dropdown');
+    const menuButton = this.testId('actions-menu-button');
     const target = (await dropdown.count()) > 0 ? dropdown.first() : menuButton.first();
     await target.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ACTION_COMPLETE });
     await this.robustClick(target);
@@ -559,7 +543,7 @@ export class VirtualMachineDetailSchedulingComponent extends BaseComponent {
       RerunOnFailure: 'Rerun on failure',
     };
     try {
-      const editButton = this.locator('button[data-test-id="run-strategy"]');
+      const editButton = this.testId('run-strategy').first();
       await editButton.waitFor({
         state: 'visible',
         timeout: TestTimeouts.UI_VISIBILITY_QUICK,
@@ -605,7 +589,7 @@ export class VirtualMachineDetailSchedulingComponent extends BaseComponent {
     try {
       await this.openDetailVmActionsMenu();
 
-      const actionItem = this.locator('[data-test-id="vm-action-change-run-strategy"]');
+      const actionItem = this.testId('vm-action-change-run-strategy');
       await actionItem.waitFor({
         state: 'visible',
         timeout: TestTimeouts.SHORT_WAIT,
@@ -729,12 +713,10 @@ export class VirtualMachineDetailSchedulingComponent extends BaseComponent {
         state: 'visible',
         timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
       });
+      const handle = await this._affinityRulesButton.elementHandle();
       await this.page.waitForFunction(
-        (selector: string) => {
-          const el = document.querySelector(selector);
-          return el && (el.textContent?.trim() ?? '').length > 0;
-        },
-        '[role="tabpanel"] button[data-test-id="affinity-rules"]',
+        (el) => el && (el.textContent?.trim() ?? '').length > 0,
+        handle,
         { timeout: TestTimeouts.SHORT_WAIT },
       );
       return (await this._affinityRulesButton.innerText())?.trim() ?? '';
@@ -745,7 +727,7 @@ export class VirtualMachineDetailSchedulingComponent extends BaseComponent {
 
   async getRunStrategyValue(): Promise<string> {
     try {
-      const runStrategyGroup = this.locator('[data-test-id="run-strategy"]').first();
+      const runStrategyGroup = this.testId('run-strategy').first();
       await runStrategyGroup.waitFor({
         state: 'visible',
         timeout: TestTimeouts.UI_VISIBILITY_QUICK,
@@ -800,12 +782,10 @@ export class VirtualMachineDetailSchedulingComponent extends BaseComponent {
       state: 'visible',
       timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
     });
+    const handle = await this._affinityRulesButton.elementHandle();
     await this.page.waitForFunction(
-      (selector: string) => {
-        const el = document.querySelector(selector);
-        return el && (el.textContent?.trim() ?? '').length > 0;
-      },
-      '[role="tabpanel"] button[data-test-id="affinity-rules"]',
+      (el) => el && (el.textContent?.trim() ?? '').length > 0,
+      handle,
       { timeout: TestTimeouts.SHORT_WAIT },
     );
     await this._affinityRulesButton.click({ force: true });
@@ -906,7 +886,7 @@ export class VirtualMachineDetailSchedulingComponent extends BaseComponent {
 
   async verifySecretOnSSHTab(secretName: string): Promise<boolean> {
     try {
-      const secretLocator = this.locator(`[data-test-id="${secretName}"]`);
+      const secretLocator = this.testId(secretName);
       await secretLocator.waitFor({
         state: 'visible',
         timeout: TestTimeouts.INSTANCE_TYPE_VERIFICATION,

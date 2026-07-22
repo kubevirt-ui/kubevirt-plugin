@@ -18,7 +18,7 @@ export class CreateVmWizardDisksComponent extends BaseComponent {
     'button:has-text("Select PersistentVolumeClaim")',
   );
   private readonly _selectProjectBtn = this.locator('button:has-text("Select Project")');
-  private readonly _storageClassSelect = this.locator('[data-test-id="storage-class-select"]');
+  private readonly _storageClassSelect = this.testId('storage-class-select');
 
   constructor(page: Page) {
     super(page);
@@ -171,7 +171,7 @@ export class CreateVmWizardDisksComponent extends BaseComponent {
       }
 
       if (diskConfig.diskSource.value && diskConfig.diskType) {
-        const containerSourceInput = this.locator('[data-test-id="disk-source-container"]');
+        const containerSourceInput = this.testId('disk-source-container');
         await containerSourceInput.waitFor({
           state: 'visible',
           timeout: TestTimeouts.UI_ACTION_COMPLETE,
@@ -196,10 +196,10 @@ export class CreateVmWizardDisksComponent extends BaseComponent {
     }
 
     if (diskConfig.type) {
-      const diskTypeSelect = this.locator('[data-test-id="disk-type-select"]');
+      const diskTypeSelect = this.testId('disk-type-select');
       await diskTypeSelect.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ACTION_COMPLETE });
       await this.robustClick(diskTypeSelect);
-      const typeOption = this.locator(`[data-test-id="disk-type-select-${diskConfig.type}"]`);
+      const typeOption = this.testId(`disk-type-select-${diskConfig.type}`);
       await typeOption.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ACTION_COMPLETE });
       await this.robustClick(typeOption);
     }
@@ -260,45 +260,40 @@ export class CreateVmWizardTabsComponent extends BaseComponent {
   private readonly _pfV6CModalBoxBody = this.locator('.pf-v6-c-modal-box__body');
   private readonly _tabModal = this.locator('#tab-modal');
 
-  private readonly _wizardAnnotationsEditButton = this.locator(
-    '[data-test-id="wizard-metadata-annotations-edit"], button[data-test-id^="pw-vm-customize-it-"][data-test-id*="annotations"]',
-  );
+  private readonly _wizardAnnotationsEditButton = this.testId(
+    'wizard-metadata-annotations-edit',
+  ).or(this.locator('button[data-test^="pw-vm-customize-it-"][data-test*="annotations"]'));
   private readonly _wizardCpuInput = this.locator('input[name="cpu-input"]');
-  private readonly _wizardCpuMemEditBtn = this.locator(
-    '[data-test-id="wizard-overview-cpu-memory-edit"]',
-  );
+  private readonly _wizardCpuMemEditBtn = this.testId('wizard-overview-cpu-memory-edit');
   private readonly _wizardDedicatedResourcesCheckbox = this.locator('#dedicated-resources');
-  private readonly _wizardDedicatedResourcesEditBtn = this.locator(
-    '[data-test-id="dedicated-resources-edit"]',
-  );
+  private readonly _wizardDedicatedResourcesEditBtn = this.testId('dedicated-resources-edit');
   private readonly _wizardDeschedulerCheckbox = this.locator('#descheduler');
-  private readonly _wizardDeschedulerEditBtn = this.locator('[data-test-id="descheduler-edit"]');
+  private readonly _wizardDeschedulerEditBtn = this.testId('descheduler-edit');
 
   private readonly _wizardEvictionStrategyCheckbox = this.locator('#eviction-strategy');
-  private readonly _wizardEvictionStrategyEditBtn = this.locator(
-    '[data-test-id="eviction-strategy"] button',
-  );
+  private readonly _wizardEvictionStrategyEditBtn =
+    this.testId('eviction-strategy').locator('button');
   private readonly _wizardHeadlessCheckbox = this.locator('#headless-mode');
-  private readonly _wizardHostnameEditBtn = this.locator(
-    '[data-test-id="wizard-overview-hostname-edit"], button[data-test-id^="pw-vm-customize-it-"][data-test-id*="hostname"]',
+  private readonly _wizardHostnameEditBtn = this.testId('wizard-overview-hostname-edit').or(
+    this.locator('button[data-test^="pw-vm-customize-it-"][data-test*="hostname"]'),
   );
   private readonly _wizardHostnameInput = this.locator('input#hostname');
-  private readonly _wizardLabelsEditButton = this.locator(
-    '[data-test-id="wizard-metadata-labels-edit"], button[data-test-id^="pw-vm-customize-it-"][data-test-id*="labels"]',
+  private readonly _wizardLabelsEditButton = this.testId('wizard-metadata-labels-edit').or(
+    this.locator('button[data-test^="pw-vm-customize-it-"][data-test*="labels"]'),
   );
 
-  private readonly _wizardLabelsInput = this.locator('[data-test="tags-input"]');
+  private readonly _wizardLabelsInput = this.testId('tags-input');
 
   private readonly _wizardMemInput = this.locator('input[name="memory-input"]');
   private readonly _wizardNameInput = this.locator('#vm-name');
   private readonly _wizardNicToggle = this.locator('#toggle-id-network');
-  private readonly _wizardNodeSelectorEditButton = this.locator(
-    '[data-test-id="node-selector-edit"], button[data-test-id^="pw-vm-customize-it-"][data-test-id*="node-selector"]',
+  private readonly _wizardNodeSelectorEditButton = this.testId('node-selector-edit').or(
+    this.locator('button[data-test^="pw-vm-customize-it-"][data-test*="node-selector"]'),
   );
 
-  private readonly _wizardSSHKeyEditButton = this.locator('[data-test-id="wizard-sshkey-edit"]');
+  private readonly _wizardSSHKeyEditButton = this.testId('wizard-sshkey-edit');
   private readonly _wizardStartInPauseCheckbox = this.locator('#start-in-pause-mode');
-  private readonly _wizardSysprepEditButton = this.locator('[data-test-id="wizard-sysprep-edit"]');
+  private readonly _wizardSysprepEditButton = this.testId('wizard-sysprep-edit');
   readonly disks: CreateVmWizardDisksComponent;
   constructor(page: Page) {
     super(page);
@@ -336,7 +331,7 @@ export class CreateVmWizardTabsComponent extends BaseComponent {
    * Clicks the final Create VirtualMachine button in the customize wizard.
    */
   async clickWizardCreateButton() {
-    const wizardCreateButton = this.locator('[data-test-id="create-virtual-machine"] button', {
+    const wizardCreateButton = this.testId('create-virtual-machine').locator('button', {
       hasText: 'Create VirtualMachine',
     });
     await wizardCreateButton.waitFor({
@@ -403,7 +398,7 @@ export class CreateVmWizardTabsComponent extends BaseComponent {
         .isVisible({ timeout: TestTimeouts.UI_DELAY_SHORT })
         .catch(() => false);
       if (!annotationsBtnExists) {
-        const altAnnotationsBtn = this.locator('button[data-test-id*="annotation"]').first();
+        const altAnnotationsBtn = this.locator('button[data-test*="annotation"]').first();
         const altExists = await altAnnotationsBtn
           .isVisible({ timeout: TestTimeouts.UI_DELAY_SHORT })
           .catch(() => false);
@@ -462,7 +457,7 @@ export class CreateVmWizardTabsComponent extends BaseComponent {
     headless?: boolean;
   }) {
     if (config.name) {
-      await this.locator('[data-test-id="wizard-overview-name-edit"]').click();
+      await this.testId('wizard-overview-name-edit').click();
       await this._wizardNameInput.clear();
       await this._wizardNameInput.fill(config.name);
       await this.clickSave();
@@ -470,8 +465,8 @@ export class CreateVmWizardTabsComponent extends BaseComponent {
 
     if (config.description) {
       await this.robustClick(
-        this.locator(
-          '[data-test-id="wizard-overview-description-edit"], button[data-test-id^="pw-vm-customize-it-"][data-test-id*="description"]',
+        this.testId('wizard-overview-description-edit').or(
+          this.locator('button[data-test^="pw-vm-customize-it-"][data-test*="description"]'),
         ),
       );
       const tabModal = this._tabModal;
@@ -506,7 +501,7 @@ export class CreateVmWizardTabsComponent extends BaseComponent {
     }
 
     if (config.bootMode) {
-      await this.locator('[data-test-id="wizard-overview-boot-method-edit"]').click();
+      await this.testId('wizard-overview-boot-method-edit').click();
       const modalBody = this._pfV6CModalBoxBody;
       await modalBody.locator('button').first().click();
       // Use exact text matching to avoid partial matches (e.g., "UEFI" vs "UEFI(secure)")
@@ -515,7 +510,7 @@ export class CreateVmWizardTabsComponent extends BaseComponent {
     }
 
     if (config.workload) {
-      await this.locator('[data-test-id="wizard-overview-workload-profile-edit"]').click();
+      await this.testId('wizard-overview-workload-profile-edit').click();
       const modalBody = this._tabModal;
       await modalBody.locator('button.pf-v6-c-menu-toggle').click();
       await this.locator('button', { hasText: config.workload }).click();
@@ -741,7 +736,7 @@ export class CreateVmWizardTabsComponent extends BaseComponent {
   async fillWizardSSH(secretName: string, sshKeyFilePath: string): Promise<void> {
     await this.navigateToWizardHorizontalTab('Scripts');
 
-    const sshEditButton = this.locator('[data-test-id="wizard-sshkey-edit"]');
+    const sshEditButton = this.testId('wizard-sshkey-edit');
     await sshEditButton.waitFor({ state: 'visible', timeout: TestTimeouts.RESOURCE_CREATION });
     await this.robustClick(sshEditButton);
 
@@ -770,7 +765,7 @@ export class CreateVmWizardTabsComponent extends BaseComponent {
 
     await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
 
-    const saveButton = this.locator('[data-test="save-button"]');
+    const saveButton = this.testId('save-button');
     await saveButton.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
     await this.robustClick(saveButton);
     await this.page.waitForTimeout(TestTimeouts.UI_DELAY_MEDIUM);
@@ -788,7 +783,7 @@ export class CreateVmWizardTabsComponent extends BaseComponent {
   ) {
     await this.page.waitForTimeout(TestTimeouts.UI_DELAY_MEDIUM);
 
-    const tabLocator = this.locator(`[data-test-id="horizontal-link-${tabName}"]`);
+    const tabLocator = this.testId(`horizontal-link-${tabName}`);
     await this.robustClick(tabLocator);
   }
 
@@ -825,7 +820,7 @@ export class CreateVmWizardTabsComponent extends BaseComponent {
       throw new Error(`Unknown tab name: ${tabName}`);
     }
 
-    const tabLocator = this.locator(`[data-test-id="${verticalTabId}"]`);
+    const tabLocator = this.testId(verticalTabId);
     await tabLocator.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
     await this.robustClick(tabLocator);
   }
@@ -846,24 +841,26 @@ export class CreateVmWizardTabsComponent extends BaseComponent {
         return true;
       }
 
-      const notFoundSelectors = [
-        'text=Not found',
-        'text=/not found/i',
-        '[data-test="empty-state"]',
-        '.pf-v6-c-empty-state',
-        '.pf-v6-c-empty-state__body',
-        'text=No network interfaces',
-        'text=No network',
+      const notFoundLocators = [
+        this.locator('text=Not found'),
+        this.locator('text=/not found/i'),
+        this.testId('empty-state'),
+        this.locator('.pf-v6-c-empty-state'),
+        this.locator('.pf-v6-c-empty-state__body'),
+        this.locator('text=No network interfaces'),
+        this.locator('text=No network'),
       ];
 
-      for (const selector of notFoundSelectors) {
+      for (const notFoundLocator of notFoundLocators) {
         try {
-          const notFoundLocator = this.locator(selector).first();
-          const isVisible = await notFoundLocator.isVisible({
+          const isVisible = await notFoundLocator.first().isVisible({
             timeout: TestTimeouts.UI_DELAY_SHORT,
           });
           if (isVisible) {
-            const text = await notFoundLocator.textContent().catch(() => '');
+            const text = await notFoundLocator
+              .first()
+              .textContent()
+              .catch(() => '');
             if (
               text?.toLowerCase().includes('not found') ||
               text?.toLowerCase().includes('no network')
@@ -874,9 +871,7 @@ export class CreateVmWizardTabsComponent extends BaseComponent {
         } catch {}
       }
 
-      const networksTabContent = this.locator('[data-test-id="wizard-tab-Networks"]')
-        .locator('..')
-        .locator('..');
+      const networksTabContent = this.testId('wizard-tab-Networks').locator('..').locator('..');
       const tabText = await networksTabContent.textContent().catch(() => '');
       if (
         tabText?.toLowerCase().includes('not found') ||
@@ -966,15 +961,11 @@ export class CreateVmWizardComponent extends BaseComponent {
   private readonly _advancedSettingsBtn = this.locator('button:has-text("Advanced settings")');
   private readonly _buttonIncrement = this.locator('button[aria-label="Increment"]');
   private readonly _dedicatedResources = this.locator('#dedicated-resources');
-  private readonly _dedicatedResourcesEdit = this.locator(
-    '[data-test-id="dedicated-resources-edit"]',
-  );
+  private readonly _dedicatedResourcesEdit = this.testId('dedicated-resources-edit');
   private readonly _descheduler = this.locator('#descheduler');
-  private readonly _deschedulerEdit = this.locator('[data-test-id="descheduler-edit"]');
+  private readonly _deschedulerEdit = this.testId('descheduler-edit');
   private readonly _evictionStrategy = this.locator('#eviction-strategy');
-  private readonly _evictionStrategyButton = this.locator(
-    '[data-test-id="eviction-strategy"] button',
-  );
+  private readonly _evictionStrategyButton = this.testId('eviction-strategy').locator('button');
   private readonly _headlessMode = this.locator('#headless-mode');
   private readonly _inputhostname = this.locator('input#hostname');
   private readonly _inputInput = this.locator('input[aria-label="Input"]');
@@ -986,13 +977,13 @@ export class CreateVmWizardComponent extends BaseComponent {
   );
   private readonly _selectProjectBtn = this.locator('button:has-text("Select Project")');
   private readonly _startInPauseMode = this.locator('#start-in-pause-mode');
-  private readonly _storageClassSelect = this.locator('[data-test-id="storage-class-select"]');
+  private readonly _storageClassSelect = this.testId('storage-class-select');
   private readonly _tabModal = this.locator('#tab-modal');
-  private readonly _tagsInput = this.locator('[data-test="tags-input"]');
+  private readonly _tagsInput = this.testId('tags-input');
   private readonly _toggleIdNetwork = this.locator('#toggle-id-network');
   private readonly _vmName = this.locator('#vm-name');
-  private readonly _wizardSSHKeyEditButton = this.locator('[data-test-id="wizard-sshkey-edit"]');
-  private readonly _wizardSysprepEditButton = this.locator('[data-test-id="wizard-sysprep-edit"]');
+  private readonly _wizardSSHKeyEditButton = this.testId('wizard-sshkey-edit');
+  private readonly _wizardSysprepEditButton = this.testId('wizard-sysprep-edit');
 
   constructor(page: Page) {
     super(page);
@@ -1135,7 +1126,7 @@ export class CreateVmWizardComponent extends BaseComponent {
       }
 
       if (diskConfig.diskSource.value && diskConfig.diskType) {
-        const containerSourceInput = this.locator('[data-test-id="disk-source-container"]');
+        const containerSourceInput = this.testId('disk-source-container');
         await containerSourceInput.waitFor({
           state: 'visible',
           timeout: TestTimeouts.UI_ACTION_COMPLETE,
@@ -1160,10 +1151,10 @@ export class CreateVmWizardComponent extends BaseComponent {
     }
 
     if (diskConfig.type) {
-      const diskTypeSelect = this.locator('[data-test-id="disk-type-select"]');
+      const diskTypeSelect = this.testId('disk-type-select');
       await diskTypeSelect.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ACTION_COMPLETE });
       await this.robustClick(diskTypeSelect);
-      const typeOption = this.locator(`[data-test-id="disk-type-select-${diskConfig.type}"]`);
+      const typeOption = this.testId(`disk-type-select-${diskConfig.type}`);
       await typeOption.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ACTION_COMPLETE });
       await this.robustClick(typeOption);
     }
@@ -1239,17 +1230,14 @@ export class CreateVmWizardComponent extends BaseComponent {
     await this.page.waitForTimeout(TestTimeouts.UI_DELAY_MEDIUM);
 
     if (config.labels && config.labels.length > 0) {
-      await this.locator(
-        '[data-test-id="wizard-metadata-labels-edit"], button[data-test-id^="pw-vm-customize-it-"][data-test-id*="labels"]',
-      ).waitFor({
+      const labelsEditButton = this.testId('wizard-metadata-labels-edit').or(
+        this.locator('button[data-test^="pw-vm-customize-it-"][data-test*="labels"]'),
+      );
+      await labelsEditButton.waitFor({
         state: 'visible',
         timeout: TestTimeouts.UI_ACTION_COMPLETE,
       });
-      await this.robustClick(
-        this.locator(
-          '[data-test-id="wizard-metadata-labels-edit"], button[data-test-id^="pw-vm-customize-it-"][data-test-id*="labels"]',
-        ),
-      );
+      await this.robustClick(labelsEditButton);
 
       await this._tagsInput.waitFor({
         state: 'visible',
@@ -1287,7 +1275,7 @@ export class CreateVmWizardComponent extends BaseComponent {
         .isVisible({ timeout: TestTimeouts.UI_DELAY_SHORT })
         .catch(() => false);
       if (!annotationsBtnExists) {
-        const altAnnotationsBtn = this.locator('button[data-test-id*="annotation"]').first();
+        const altAnnotationsBtn = this.locator('button[data-test*="annotation"]').first();
         const altExists = await altAnnotationsBtn
           .isVisible({ timeout: TestTimeouts.UI_DELAY_SHORT })
           .catch(() => false);
@@ -1340,7 +1328,7 @@ export class CreateVmWizardComponent extends BaseComponent {
     headless?: boolean;
   }) {
     if (config.name) {
-      await this.locator('[data-test-id="wizard-overview-name-edit"]').click();
+      await this.testId('wizard-overview-name-edit').click();
       await this._vmName.clear();
       await this._vmName.fill(config.name);
       await this.clickSave();
@@ -1348,8 +1336,8 @@ export class CreateVmWizardComponent extends BaseComponent {
 
     if (config.description) {
       await this.robustClick(
-        this.locator(
-          '[data-test-id="wizard-overview-description-edit"], button[data-test-id^="pw-vm-customize-it-"][data-test-id*="description"]',
+        this.testId('wizard-overview-description-edit').or(
+          this.locator('button[data-test^="pw-vm-customize-it-"][data-test*="description"]'),
         ),
       );
       const tabModal = this._tabModal;
@@ -1371,7 +1359,7 @@ export class CreateVmWizardComponent extends BaseComponent {
     }
 
     if (config.cpu || config.memory) {
-      await this.locator('[data-test-id="wizard-overview-cpu-memory-edit"]').click();
+      await this.testId('wizard-overview-cpu-memory-edit').click();
       if (config.cpu) {
         await this._inputNameCpuInput.clear();
         await this._inputNameCpuInput.fill(config.cpu.toString());
@@ -1384,7 +1372,7 @@ export class CreateVmWizardComponent extends BaseComponent {
     }
 
     if (config.bootMode) {
-      await this.locator('[data-test-id="wizard-overview-boot-method-edit"]').click();
+      await this.testId('wizard-overview-boot-method-edit').click();
       const modalBody = this.locator('.pf-v6-c-modal-box__body');
       await modalBody.locator('button').first().click();
 
@@ -1393,7 +1381,7 @@ export class CreateVmWizardComponent extends BaseComponent {
     }
 
     if (config.workload) {
-      await this.locator('[data-test-id="wizard-overview-workload-profile-edit"]').click();
+      await this.testId('wizard-overview-workload-profile-edit').click();
       const modalBody = this._tabModal;
       await modalBody.locator('button.pf-v6-c-menu-toggle').click();
       await this.locator('button', { hasText: config.workload }).click();
@@ -1401,17 +1389,14 @@ export class CreateVmWizardComponent extends BaseComponent {
     }
 
     if (config.hostname) {
-      await this.locator(
-        '[data-test-id="wizard-overview-hostname-edit"], button[data-test-id^="pw-vm-customize-it-"][data-test-id*="hostname"]',
-      ).waitFor({
+      const hostnameEditButton = this.testId('wizard-overview-hostname-edit').or(
+        this.locator('button[data-test^="pw-vm-customize-it-"][data-test*="hostname"]'),
+      );
+      await hostnameEditButton.waitFor({
         state: 'visible',
         timeout: TestTimeouts.RESOURCE_CREATION,
       });
-      await this.robustClick(
-        this.locator(
-          '[data-test-id="wizard-overview-hostname-edit"], button[data-test-id^="pw-vm-customize-it-"][data-test-id*="hostname"]',
-        ),
-      );
+      await this.robustClick(hostnameEditButton);
       await this._inputhostname.waitFor({
         state: 'visible',
         timeout: TestTimeouts.UI_ACTION_COMPLETE,
@@ -1594,7 +1579,7 @@ export class CreateVmWizardComponent extends BaseComponent {
   async fillWizardSSH(secretName: string, sshKeyFilePath: string): Promise<void> {
     await this.navigateToWizardHorizontalTab('Scripts');
 
-    const sshEditButton = this.locator('[data-test-id="wizard-sshkey-edit"]');
+    const sshEditButton = this.testId('wizard-sshkey-edit');
     await sshEditButton.waitFor({ state: 'visible', timeout: TestTimeouts.RESOURCE_CREATION });
     await this.robustClick(sshEditButton);
 
@@ -1621,7 +1606,7 @@ export class CreateVmWizardComponent extends BaseComponent {
 
     await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
 
-    const saveButton = this.locator('[data-test="save-button"]');
+    const saveButton = this.testId('save-button');
     await saveButton.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
     await this.robustClick(saveButton);
     await this.page.waitForTimeout(TestTimeouts.UI_DELAY_MEDIUM);
@@ -1639,7 +1624,7 @@ export class CreateVmWizardComponent extends BaseComponent {
   ) {
     await this.page.waitForTimeout(TestTimeouts.UI_DELAY_MEDIUM);
 
-    const tabLocator = this.locator(`[data-test-id="horizontal-link-${tabName}"]`);
+    const tabLocator = this.testId(`horizontal-link-${tabName}`);
     await this.robustClick(tabLocator);
   }
 
@@ -1667,7 +1652,7 @@ export class CreateVmWizardComponent extends BaseComponent {
       throw new Error(`Unknown tab name: ${tabName}`);
     }
 
-    const tabLocator = this.locator(`[data-test-id="${verticalTabId}"]`);
+    const tabLocator = this.testId(verticalTabId);
     await tabLocator.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
     await this.robustClick(tabLocator);
   }
@@ -1682,24 +1667,26 @@ export class CreateVmWizardComponent extends BaseComponent {
         return true;
       }
 
-      const notFoundSelectors = [
-        'text=Not found',
-        'text=/not found/i',
-        '[data-test="empty-state"]',
-        '.pf-v6-c-empty-state',
-        '.pf-v6-c-empty-state__body',
-        'text=No network interfaces',
-        'text=No network',
+      const notFoundLocators = [
+        this.locator('text=Not found'),
+        this.locator('text=/not found/i'),
+        this.testId('empty-state'),
+        this.locator('.pf-v6-c-empty-state'),
+        this.locator('.pf-v6-c-empty-state__body'),
+        this.locator('text=No network interfaces'),
+        this.locator('text=No network'),
       ];
 
-      for (const selector of notFoundSelectors) {
+      for (const notFoundLocator of notFoundLocators) {
         try {
-          const notFoundLocator = this.locator(selector).first();
-          const isVisible = await notFoundLocator.isVisible({
+          const isVisible = await notFoundLocator.first().isVisible({
             timeout: TestTimeouts.UI_DELAY_SHORT,
           });
           if (isVisible) {
-            const text = await notFoundLocator.textContent().catch(() => '');
+            const text = await notFoundLocator
+              .first()
+              .textContent()
+              .catch(() => '');
             if (
               text?.toLowerCase().includes('not found') ||
               text?.toLowerCase().includes('no network')
@@ -1710,9 +1697,7 @@ export class CreateVmWizardComponent extends BaseComponent {
         } catch {}
       }
 
-      const networksTabContent = this.locator('[data-test-id="wizard-tab-Networks"]')
-        .locator('..')
-        .locator('..');
+      const networksTabContent = this.testId('wizard-tab-Networks').locator('..').locator('..');
       const tabText = await networksTabContent.textContent().catch(() => '');
       if (
         tabText?.toLowerCase().includes('not found') ||

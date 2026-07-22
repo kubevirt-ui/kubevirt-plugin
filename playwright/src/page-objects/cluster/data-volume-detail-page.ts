@@ -10,7 +10,7 @@ import BasePage from '../base-page';
 
 export default class DataVolumeDetailPage extends BasePage {
   private readonly _deleteBtn = this.locator('button:has-text("Delete")');
-  private readonly _resourceTitle = this.locator('[data-test-id="resource-title"]');
+  private readonly _resourceTitle = this.testId('resource-title');
 
   constructor(page: Page) {
     super(page);
@@ -66,7 +66,7 @@ export default class DataVolumeDetailPage extends BasePage {
   }
 
   async getStatusText(): Promise<string> {
-    const statusText = this.locator('[data-test="status-text"]');
+    const statusText = this.testId('status-text');
     await statusText.waitFor({
       state: 'visible',
       timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,

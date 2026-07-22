@@ -10,10 +10,12 @@ export default class VirtualMachineDetailCdromComponent extends BaseComponent {
   private readonly _btnPlaceholderSelectISOFile = this.locator(
     'button[placeholder="Select ISO file"]',
   );
-  private readonly _fileInput = this.locator('[data-test-id="disk-source-upload"] [type="file"]');
+  private readonly _fileInput = this.testId('disk-source-upload').locator('[type="file"]');
   private readonly _inputIdSimpleFileFilename = this.locator('input[id="simple-file-filename"]');
   private readonly _tabModal = this.locator('#tab-modal');
-  private readonly _tabModalSaveButton = this.locator('#tab-modal [data-test="save-button"]');
+  private readonly _tabModalSaveButton = this.locator('#tab-modal').locator(
+    '[data-test="save-button"]',
+  );
 
   constructor(page: Page) {
     super(page);
@@ -24,9 +26,11 @@ export default class VirtualMachineDetailCdromComponent extends BaseComponent {
       const diskRow = this.page.locator('tr').filter({ hasText: diskName }).first();
       await diskRow.waitFor({ state: 'visible', timeout: TestTimeouts.DEFAULT });
 
-      const kebabMenu = diskRow.locator(
-        'button.pf-v6-c-menu-toggle.pf-m-plain, [data-test="kebab-button"], [data-test-id="kebab-button"], button[aria-label="Actions"], button[aria-label="Kebab toggle"]',
-      );
+      const kebabMenu = diskRow
+        .locator('button.pf-v6-c-menu-toggle.pf-m-plain')
+        .or(diskRow.getByTestId('kebab-button'))
+        .or(diskRow.locator('button[aria-label="Actions"]'))
+        .or(diskRow.locator('button[aria-label="Kebab toggle"]'));
       await kebabMenu.first().waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
       await this.robustClick(kebabMenu.first());
       await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
@@ -67,9 +71,9 @@ export default class VirtualMachineDetailCdromComponent extends BaseComponent {
       await ejectItem.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
       await ejectItem.click({ force: true });
 
-      const dialogEjectButton = this.page.locator(
-        '[data-test="dialog-modal"] [data-test="save-button"]',
-      );
+      const dialogEjectButton = this.page
+        .locator('[data-test="dialog-modal"]')
+        .locator('[data-test="save-button"]');
       await dialogEjectButton.waitFor({ state: 'visible', timeout: TestTimeouts.DEFAULT });
       await this.robustClick(dialogEjectButton);
 
@@ -90,9 +94,11 @@ export default class VirtualMachineDetailCdromComponent extends BaseComponent {
       const diskRow = this.locator('tr', { hasText: diskName }).first();
       await diskRow.waitFor({ state: 'visible', timeout: TestTimeouts.DEFAULT });
 
-      const kebabMenu = diskRow.locator(
-        'button.pf-v6-c-menu-toggle.pf-m-plain, [data-test="kebab-button"], [data-test-id="kebab-button"], button[aria-label="Actions"], button[aria-label="Kebab toggle"]',
-      );
+      const kebabMenu = diskRow
+        .locator('button.pf-v6-c-menu-toggle.pf-m-plain')
+        .or(diskRow.getByTestId('kebab-button'))
+        .or(diskRow.locator('button[aria-label="Actions"]'))
+        .or(diskRow.locator('button[aria-label="Kebab toggle"]'));
       await kebabMenu.first().waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
       await this.robustClick(kebabMenu.first());
       await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
@@ -138,9 +144,9 @@ export default class VirtualMachineDetailCdromComponent extends BaseComponent {
       }
 
       const hasUploadModeSelector = await modal
-        .locator(
-          '[data-test="upload-mode-selector"], select[id*="upload-mode"], [id*="upload-type"]',
-        )
+        .getByTestId('upload-mode-selector')
+        .or(modal.locator('select[id*="upload-mode"]'))
+        .or(modal.locator('[id*="upload-type"]'))
         .isVisible()
         .catch(() => false);
 
@@ -157,14 +163,14 @@ export default class VirtualMachineDetailCdromComponent extends BaseComponent {
 
   /**
    * Returns a column value from the VMI Disks tab table.
-   * VMI tables use data-test (not data-test-id) selectors.
+   * VMI tables use data-test (not data-test) selectors.
    */
   async getVmiDiskColumnValue(
     diskName: string,
     column: 'drive' | 'interface' | 'name' | 'source' | 'size',
   ): Promise<string | null> {
     try {
-      const cell = this.locator(`[data-test="disk-${column}-${diskName}"]`).first();
+      const cell = this.testId(`disk-${column}-${diskName}`).first();
       const visible = await cell
         .isVisible({ timeout: TestTimeouts.UI_DELAY_MEDIUM })
         .catch(() => false);
@@ -204,9 +210,11 @@ export default class VirtualMachineDetailCdromComponent extends BaseComponent {
       const diskRow = this.locator('tr', { hasText: diskName }).first();
       await diskRow.waitFor({ state: 'visible', timeout: TestTimeouts.DEFAULT });
 
-      const kebabMenu = diskRow.locator(
-        'button.pf-v6-c-menu-toggle.pf-m-plain, [data-test="kebab-button"], [data-test-id="kebab-button"], button[aria-label="Actions"], button[aria-label="Kebab toggle"]',
-      );
+      const kebabMenu = diskRow
+        .locator('button.pf-v6-c-menu-toggle.pf-m-plain')
+        .or(diskRow.getByTestId('kebab-button'))
+        .or(diskRow.locator('button[aria-label="Actions"]'))
+        .or(diskRow.locator('button[aria-label="Kebab toggle"]'));
       await kebabMenu.first().waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
       await this.robustClick(kebabMenu.first());
       await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);

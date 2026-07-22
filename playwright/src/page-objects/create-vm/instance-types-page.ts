@@ -11,13 +11,14 @@ export default class InstanceTypesPage extends PageCommons {
   private readonly _clusterInstanceTypesBtn = this.locator(
     'button:has-text("Cluster InstanceTypes")',
   );
-  private readonly _filterToolbarClusterButton = this.locator(
-    '[data-test="filter-toolbar"], #filter-toolbar',
-  )
+  private readonly _filterToolbarClusterButton = this.testId('filter-toolbar')
+    .or(this.locator('#filter-toolbar'))
     .locator('button')
     .filter({ hasText: 'Cluster' })
     .first();
-  private readonly _inputnameFilterInput = this.locator('input[data-test="name-filter-input"]');
+  private readonly _inputnameFilterInput = this.testId('item-filter').or(
+    this.testId('name-filter-input'),
+  );
   private readonly _noInstanceTypeMessage = this.locator('#no-instancetype-msg');
   private readonly _userInstanceTypesTab = this.locator('button:has-text("User InstanceTypes")');
   constructor(page: Page) {
@@ -27,7 +28,8 @@ export default class InstanceTypesPage extends PageCommons {
   private userTabNameFilterInput() {
     return this.page
       .locator('[id^="pf-tab-section-1-"]')
-      .locator('input[data-test="name-filter-input"]');
+      .locator('[data-test="item-filter"]')
+      .or(this.page.locator('[id^="pf-tab-section-1-"]').getByTestId('name-filter-input'));
   }
 
   async clickClusterInstanceTypesTab() {
@@ -36,23 +38,22 @@ export default class InstanceTypesPage extends PageCommons {
 
   override async clickCreate() {
     await this.page.waitForLoadState('domcontentloaded');
-    const createLink = this.locator(
-      'a[href*="~new"] button, [data-test="item-create"], button:has-text("Create VirtualMachine")',
-    ).first();
+    const createLink = this.locator('a[href*="~new"] button')
+      .or(this.testId('item-create'))
+      .or(this.locator('button:has-text("Create VirtualMachine")'))
+      .first();
     await createLink.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
     await this.robustClick(createLink);
   }
 
   async clickDetailsActions() {
-    const detailsActions = this.locator('[data-test-id="details-actions"]')
-      .locator('button')
-      .first();
-    await detailsActions.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
-    await this.robustClick(detailsActions);
+    const actionsBtn = this.testId('actions-menu-button');
+    await actionsBtn.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+    await this.robustClick(actionsBtn);
   }
 
   async clickInstanceTypeByTestId(name: string): Promise<void> {
-    const row = this.locator(`[data-test-id="${name}"]`).first();
+    const row = this.testId(name).first();
     await row.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
     await this.robustClick(row);
   }
@@ -71,7 +72,7 @@ export default class InstanceTypesPage extends PageCommons {
   }
 
   async deleteClusterInstanceTypeFromDetail(): Promise<void> {
-    const actionsBtn = this.locator('[data-test-id="actions-menu-button"]');
+    const actionsBtn = this.testId('actions-menu-button');
     await actionsBtn.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
     await this.robustClick(actionsBtn);
     const deleteItem = this.page.locator(
@@ -79,7 +80,7 @@ export default class InstanceTypesPage extends PageCommons {
     );
     await deleteItem.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
     await deleteItem.click();
-    const confirmBtn = this.page.locator('[data-test="confirm-action"]');
+    const confirmBtn = this.testId('save-button');
     await confirmBtn.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
     await confirmBtn.click();
     await this.page.waitForURL(/VirtualMachineClusterInstancetype(?!.*\/[^/]+$)/, {
@@ -88,7 +89,7 @@ export default class InstanceTypesPage extends PageCommons {
   }
 
   async deleteUserInstanceTypeFromDetail(): Promise<void> {
-    const actionsBtn = this.locator('[data-test-id="actions-menu-button"]');
+    const actionsBtn = this.testId('actions-menu-button');
     await actionsBtn.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
     await this.robustClick(actionsBtn);
     const deleteItem = this.page.locator(
@@ -96,7 +97,7 @@ export default class InstanceTypesPage extends PageCommons {
     );
     await deleteItem.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
     await deleteItem.click();
-    const confirmBtn = this.page.locator('[data-test="confirm-action"]');
+    const confirmBtn = this.testId('save-button');
     await confirmBtn.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
     await confirmBtn.click();
     await this.page.waitForURL(/VirtualMachineInstancetype(?!.*\/[^/]+$)/, {
@@ -109,6 +110,10 @@ export default class InstanceTypesPage extends PageCommons {
     await visibleInput.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
     await visibleInput.clear();
     await visibleInput.fill(name);
+    await this.page.waitForTimeout(TestTimeouts.UI_FILTER_APPLY / 3);
+    await this.page
+      .waitForLoadState('domcontentloaded', { timeout: TestTimeouts.UI_ACTION_COMPLETE })
+      .catch(() => undefined);
   }
 
   async filterByNameInUserTab(name: string) {
@@ -125,17 +130,17 @@ export default class InstanceTypesPage extends PageCommons {
   }
 
   async navigateToClusterInstanceTypeDetail(name: string): Promise<void> {
-    await this.goTo(
-      `/k8s/cluster/instancetype.kubevirt.io~v1beta1~VirtualMachineClusterInstancetype/${name}`,
-    );
-    await this.page.waitForLoadState('load', { timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+    await this.clickNavInstanceTypes();
+    await this.waitForInstanceTypesListReady();
+    await this.filterByName(name);
+    await this.clickInstanceTypeByTestId(name);
+    await this.page.waitForLoadState('domcontentloaded');
   }
 
   /** @deprecated Use navigateToInstanceTypesViaUI() for more reliable navigation */
   async navigateToClusterInstanceTypes() {
-    await this.goTo(
-      '/k8s/cluster/instancetype.kubevirt.io~v1beta1~VirtualMachineClusterInstancetype',
-    );
+    await this.clickNavInstanceTypes();
+    await this.page.waitForLoadState('domcontentloaded');
   }
 
   async navigateToCrdPage(crdPlural: string): Promise<void> {
@@ -144,7 +149,7 @@ export default class InstanceTypesPage extends PageCommons {
   }
 
   async navigateToInstanceTypesViaInstancetypeNavItem(): Promise<void> {
-    const instancetypeNavItem = this.locator('[data-test-id="instancetype-nav-item"]');
+    const instancetypeNavItem = this.testId('instancetype-nav-item');
     await instancetypeNavItem.waitFor({
       state: 'visible',
       timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
@@ -154,6 +159,7 @@ export default class InstanceTypesPage extends PageCommons {
   }
 
   async navigateToInstanceTypesViaUI(): Promise<void> {
+    await this.switchToVirtualizationPerspective();
     await this.clickNavInstanceTypes();
   }
 
@@ -163,28 +169,31 @@ export default class InstanceTypesPage extends PageCommons {
   }
 
   async navigateToProjectInstanceTypes() {
-    const vmciNav = this.locator('[data-test-id="virtualmachineclusterinstancetypes-nav-item"]');
+    const vmciNav = this.testId('virtualmachineclusterinstancetypes-nav-item');
     await vmciNav.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
     await this.robustClick(vmciNav);
   }
 
   async navigateToUserInstanceTypeDetail(namespace: string, name: string): Promise<void> {
-    await this.goTo(
-      `/k8s/ns/${namespace}/instancetype.kubevirt.io~v1beta1~VirtualMachineInstancetype/${name}`,
-    );
-    await this.page.waitForLoadState('load', { timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+    await this.clickNavInstanceTypes();
+    await this.clickUserInstanceTypesTab();
+    await this.waitForInstanceTypesListReady();
+    await this.navigateToUserInstanceTypesProject(namespace);
+    await this.filterByNameInUserTab(name);
+    await this.clickInstanceTypeByTestId(name);
+    await this.page.waitForLoadState('domcontentloaded');
   }
 
   async navigateToUserInstanceTypesAllNamespaces() {
-    await this.goTo(
-      '/k8s/all-namespaces/instancetype.kubevirt.io~v1beta1~VirtualMachineInstancetype',
-    );
+    await this.clickNavInstanceTypes();
+    await this.clickUserInstanceTypesTab();
+    await this.switchProject('All Projects');
+    await this.page.waitForLoadState('domcontentloaded');
   }
 
   async navigateToUserInstanceTypesProject(projectName: string) {
-    await this.goTo(
-      `/k8s/ns/${projectName}/instancetype.kubevirt.io~v1beta1~VirtualMachineInstancetype`,
-    );
+    await this.switchProject(projectName);
+    await this.page.waitForLoadState('domcontentloaded');
   }
 
   async openClusterFilter(): Promise<void> {
@@ -222,7 +231,7 @@ export default class InstanceTypesPage extends PageCommons {
   async verifyEmptyMessageVisible(): Promise<boolean> {
     try {
       const emptyIndicator = this._noInstanceTypeMessage.or(
-        this.locator('[data-test="empty-box-body"], .pf-v6-c-empty-state, .pf-c-empty-state'),
+        this.testId('empty-box-body').or(this.locator('.pf-v6-c-empty-state, .pf-c-empty-state')),
       );
       const emptyVisible = await emptyIndicator
         .first()
@@ -248,11 +257,16 @@ export default class InstanceTypesPage extends PageCommons {
     }
   }
 
-  async verifyInstanceTypeExists(instanceTypeId: string): Promise<boolean> {
+  async verifyInstanceTypeExists(
+    instanceTypeId: string,
+    timeout = TestTimeouts.UI_DELAY_LONG,
+  ): Promise<boolean> {
     try {
-      const instanceType = this.locator(`[data-test-id="${instanceTypeId}"]`);
-      await instanceType.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
-      return await instanceType.isVisible();
+      const instanceType = this.testId(instanceTypeId).or(
+        this.locator(`a:has-text("${instanceTypeId}")`),
+      );
+      await instanceType.first().waitFor({ state: 'visible', timeout });
+      return await instanceType.first().isVisible();
     } catch {
       return false;
     }
@@ -290,9 +304,9 @@ export default class InstanceTypesPage extends PageCommons {
       async () => {
         const tabsVisible = await this._clusterInstanceTypesBtn.isVisible().catch(() => false);
         const emptyVisible = await this._noInstanceTypeMessage.isVisible().catch(() => false);
-        const nameFilterVisible = await this.locator(
-          'input[data-test="name-filter-input"], input[placeholder*="Search by name"]',
-        )
+        const nameFilterVisible = await this.testId('item-filter')
+          .or(this.testId('name-filter-input'))
+          .or(this.locator('input[placeholder*="Search by name"]'))
           .first()
           .isVisible()
           .catch(() => false);

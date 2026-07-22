@@ -3,23 +3,19 @@ import { TestTimeouts } from '@/utils/test-config';
 import type { Page } from '@playwright/test';
 
 export default class VmListComponent extends BaseComponent {
-  private readonly _actionsDropdown = this.locator('[data-test="actions-dropdown"]');
-  private readonly _actionsDropdownButton = this.locator('[data-test="actions-dropdown"] button');
+  private readonly _actionsDropdown = this.testId('actions-dropdown');
+  private readonly _actionsDropdownButton = this.testId('actions-dropdown').locator('button');
   private readonly _buttonColumnManagement = this.locator('button[aria-label="Column management"]');
   private readonly _dataTestSelectVm = this.locator('[data-test^="select-vm-"]');
-  private readonly _dialogModal = this.locator('[data-test="dialog-modal"]');
-  private readonly _quickCreateVmButton = this.locator('[data-test-id="quick-create-vm-btn"]');
-  private readonly _resetButton = this.locator('[data-test="reset-button"]');
+  private readonly _dialogModal = this.testId('dialog-modal');
+  private readonly _quickCreateVmButton = this.testId('quick-create-vm-btn');
+  private readonly _resetButton = this.testId('reset-button');
   private readonly _selectPage = this.locator('[aria-label="Select page"]');
   private readonly _startAfterCreateCheckbox = this.locator('#start-after-create-checkbox');
   private readonly _statusCells = this.locator('tbody td:nth-child(3)');
-  private readonly _templateVmNameInput = this.locator(
-    '[data-test-id="template-catalog-vm-name-input"]',
-  );
-  private readonly _vmListSaveButton = this.locator('[data-test="save-button"]');
-  readonly _createButton = this.locator(
-    '[data-test-id="details-actions"] [data-test="item-create"]',
-  );
+  private readonly _templateVmNameInput = this.testId('template-catalog-vm-name-input');
+  private readonly _vmListSaveButton = this.testId('save-button');
+  readonly _createButton = this.testId('item-create');
 
   constructor(page: Page) {
     super(page);
@@ -132,13 +128,13 @@ export default class VmListComponent extends BaseComponent {
   }
 
   async clickVmByTestId(vmName: string): Promise<void> {
-    const vmLocator = this.locator(`[data-test-id="${vmName}"]`).first();
+    const vmLocator = this.testId(vmName).first();
     await vmLocator.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
     await this.robustClick(vmLocator);
   }
 
   async clickVmName(vmName: string, _namespace: string): Promise<void> {
-    const vmElement = this.locator(`[data-test-id="${vmName}"]`).first();
+    const vmElement = this.testId(vmName).first();
     await vmElement.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
     await this.robustClick(vmElement);
   }
@@ -196,9 +192,10 @@ export default class VmListComponent extends BaseComponent {
   }
 
   async clickVmStatusButton(vmName: string): Promise<void> {
-    const vmRow = this.locator(
-      `tr:has([data-test-id="${vmName}"]), tr:has-text("${vmName}")`,
-    ).first();
+    const vmRow = this.locator('tr')
+      .filter({ has: this.testId(vmName) })
+      .or(this.locator(`tr:has-text("${vmName}")`))
+      .first();
     await vmRow.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
 
     const statusCell = vmRow.locator('td:nth-child(3)');
@@ -241,9 +238,10 @@ export default class VmListComponent extends BaseComponent {
     timeout: number = TestTimeouts.UI_ELEMENT_VISIBILITY,
   ): Promise<string | null> {
     try {
-      const vmRow = this.locator(
-        `tr:has([data-test-id="${vmName}"]), tr:has-text("${vmName}")`,
-      ).first();
+      const vmRow = this.locator('tr')
+        .filter({ has: this.testId(vmName) })
+        .or(this.locator(`tr:has-text("${vmName}")`))
+        .first();
       await vmRow.waitFor({ state: 'visible', timeout });
 
       const statusCell = vmRow.locator('td:nth-child(3)');
@@ -269,8 +267,8 @@ export default class VmListComponent extends BaseComponent {
   async getVmTableMetricValues(): Promise<
     Array<{ vmName: string; memory: string; cpu: string; network: string }>
   > {
-    const table = this.locator(
-      '[data-test="VirtualMachines table"], table[aria-label*="VirtualMachines"]',
+    const table = this.testId('VirtualMachines table').or(
+      this.locator('table[aria-label*="VirtualMachines"]'),
     );
     await table.waitFor({ state: 'visible', timeout: TestTimeouts.DEFAULT });
 
@@ -326,9 +324,10 @@ export default class VmListComponent extends BaseComponent {
   }
 
   async isLightspeedIconVisibleForVm(vmName: string): Promise<boolean> {
-    const vmRow = this.locator(
-      `tr:has([data-test-id="${vmName}"]), tr:has-text("${vmName}")`,
-    ).first();
+    const vmRow = this.locator('tr')
+      .filter({ has: this.testId(vmName) })
+      .or(this.locator(`tr:has-text("${vmName}")`))
+      .first();
     await vmRow.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
     await new Promise((r) => setTimeout(r, 500));
 
@@ -376,7 +375,7 @@ export default class VmListComponent extends BaseComponent {
     vmName: string,
     timeout: number = TestTimeouts.ELEMENT_WAIT,
   ): Promise<boolean> {
-    const vmElement = this.locator(`[data-test-id="${vmName}"]`).first();
+    const vmElement = this.testId(vmName).first();
     try {
       await vmElement.waitFor({ state: 'detached', timeout });
       return true;
@@ -390,7 +389,7 @@ export default class VmListComponent extends BaseComponent {
     namespace: string,
     timeout: number = TestTimeouts.ELEMENT_WAIT,
   ): Promise<boolean> {
-    const vmElement = this.locator(`[data-test-id="${vmName}"]`).first();
+    const vmElement = this.testId(vmName).first();
     try {
       await vmElement.waitFor({ state: 'visible', timeout });
       return true;
@@ -403,7 +402,7 @@ export default class VmListComponent extends BaseComponent {
     vmName: string,
     timeout: number = TestTimeouts.ELEMENT_WAIT,
   ): Promise<boolean> {
-    const vmElement = this.locator(`[data-test="${vmName}"]`);
+    const vmElement = this.testId(vmName);
     try {
       await vmElement.waitFor({ state: 'visible', timeout });
       return true;
@@ -413,7 +412,7 @@ export default class VmListComponent extends BaseComponent {
   }
 
   async openBulkActionsDropdown() {
-    await this.robustClick(this.locator('[data-test="actions-dropdown"]'));
+    await this.robustClick(this.testId('actions-dropdown'));
     await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
   }
 
@@ -467,14 +466,14 @@ export default class VmListComponent extends BaseComponent {
     if (exists) {
       await this.robustClick(selectPageCheckbox);
     } else {
-      const fallbackCheckbox = this.locator('[data-test-id="select-page"]');
+      const fallbackCheckbox = this.testId('select-page');
       await this.robustClick(fallbackCheckbox);
     }
     await this.page.waitForTimeout(TestTimeouts.RETRY_DELAY);
   }
 
   async selectVmByCheckbox(vmName: string): Promise<void> {
-    const checkbox = this.locator(`[data-test="select-vm-${vmName}"]`);
+    const checkbox = this.testId(`select-vm-${vmName}`);
     await checkbox.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
     const isChecked = await checkbox.isChecked();
     if (!isChecked) {
@@ -562,7 +561,7 @@ export default class VmListComponent extends BaseComponent {
     timeout?: number,
   ): Promise<boolean> {
     if (typeof vmNameOrIndicators === 'string') {
-      const vmNameLocator = this.locator(`[data-test-id="${vmNameOrIndicators}"]`);
+      const vmNameLocator = this.testId(vmNameOrIndicators);
       try {
         await vmNameLocator.waitFor({ state: 'visible', timeout: timeout || TestTimeouts.DEFAULT });
         return await vmNameLocator.isVisible().catch(() => false);
@@ -573,7 +572,7 @@ export default class VmListComponent extends BaseComponent {
 
     const indicators = Array.isArray(vmNameOrIndicators)
       ? vmNameOrIndicators
-      : ['[data-test-id="virtual-machine-name"]'];
+      : ['virtual-machine-name'];
     return await super.verifyPageLoaded(indicators, includeCreateButton, timeout);
   }
 
@@ -581,10 +580,10 @@ export default class VmListComponent extends BaseComponent {
     headerLabel: 'Status' | 'Node' | 'Created',
     shouldExist: boolean,
   ): Promise<boolean> {
-    const header = this.page.locator(
-      'table.kubevirt-table th, table.pf-v6-c-table th, [data-test="vm-list-table"] th',
-      { hasText: new RegExp(`^${headerLabel}$`) },
-    );
+    const header = this.page
+      .locator('table.kubevirt-table th, table.pf-v6-c-table th')
+      .or(this.page.getByTestId('vm-list-table').locator('th'))
+      .filter({ hasText: new RegExp(`^${headerLabel}$`) });
     const waitState = shouldExist ? 'visible' : 'hidden';
     await header
       .first()
@@ -599,7 +598,7 @@ export default class VmListComponent extends BaseComponent {
 
   async verifyVmNameInTable(vmName: string): Promise<boolean> {
     try {
-      const vmLink = this.locator(`[data-test-id="${vmName}"]`).first();
+      const vmLink = this.testId(vmName).first();
       await vmLink.waitFor({ state: 'visible', timeout: TestTimeouts.SHORT_WAIT });
       return await vmLink.isVisible().catch(() => false);
     } catch {
@@ -609,7 +608,7 @@ export default class VmListComponent extends BaseComponent {
 
   async verifyVmNameNotInTable(vmName: string): Promise<boolean> {
     try {
-      const vmLink = this.locator(`[data-test-id="${vmName}"]`).first();
+      const vmLink = this.testId(vmName).first();
       await vmLink.waitFor({ state: 'hidden', timeout: TestTimeouts.SHORT_WAIT }).catch(() => {
         return;
       });
@@ -635,7 +634,7 @@ export default class VmListComponent extends BaseComponent {
 
   async waitForMultipleVMsToDisappear(vmNames: string[], timeout = 60000): Promise<void> {
     for (const vmName of vmNames) {
-      await this.page.waitForSelector(`[data-test-id="${vmName}"]`, {
+      await this.testId(vmName).waitFor({
         state: 'detached',
         timeout,
       });
@@ -655,7 +654,7 @@ export default class VmListComponent extends BaseComponent {
     vmName: string,
     timeout: number = TestTimeouts.DEFAULT,
   ): Promise<void> {
-    await this.locator(`[data-test-id="${vmName}"]`).first().waitFor({
+    await this.testId(vmName).first().waitFor({
       state: 'detached',
       timeout,
     });
@@ -665,7 +664,7 @@ export default class VmListComponent extends BaseComponent {
     vmName: string,
     timeoutMs: number = TestTimeouts.UI_ELEMENT_VISIBILITY,
   ): Promise<void> {
-    const vmRow = this.locator(`[data-test-id="${vmName}"]`).first();
+    const vmRow = this.testId(vmName).first();
     await vmRow.waitFor({ state: 'visible', timeout: timeoutMs });
   }
 

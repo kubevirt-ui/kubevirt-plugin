@@ -9,23 +9,17 @@ import type { Page } from '@playwright/test';
 import { expect } from '@playwright/test';
 
 export class VmSchedulingMetricsComponent extends BaseComponent {
-  private readonly _descheduler = this.locator('[data-test-id="descheduler"]');
+  private readonly _descheduler = this.testId('descheduler');
   private readonly _descheduler1 = this.locator('#descheduler');
-  private readonly _deschedulerEdit = this.locator('[data-test-id="descheduler-edit"]');
+  private readonly _deschedulerEdit = this.testId('descheduler-edit');
   private readonly _divnetwork = this.locator('div#network');
   private readonly _divnetworkPfV6CMenuToggle = this.locator('div#network .pf-v6-c-menu-toggle');
-  private readonly _evictionStrategyElement = this.locator('[data-test-id="eviction-strategy"]');
-  private readonly _horizontalLinkMetrics = this.locator(
-    '[data-test-id="horizontal-link-Metrics"]',
-  );
+  private readonly _evictionStrategyElement = this.testId('eviction-strategy');
+  private readonly _horizontalLinkMetrics = this.testId('horizontal-link-Metrics');
   private readonly _roleOption = this.locator('[role="option"]');
   private readonly _utilization = this.locator('text=Utilization');
-  private readonly _vmConfigurationDetails = this.locator(
-    '[data-test-id="vm-configuration-details"]',
-  );
-  private readonly _vmConfigurationScheduling = this.locator(
-    '[data-test-id="vm-configuration-scheduling"]',
-  );
+  private readonly _vmConfigurationDetails = this.testId('vm-configuration-details');
+  private readonly _vmConfigurationScheduling = this.testId('vm-configuration-scheduling');
 
   constructor(page: Page) {
     super(page);
@@ -139,11 +133,11 @@ export class VmSchedulingMetricsComponent extends BaseComponent {
     timeout: number = TestTimeouts.UI_VISIBILITY_QUICK,
   ): Promise<boolean> {
     try {
-      const timeRange = this.locator(
-        '[data-test="time-range-dropdown"], .pf-v6-c-menu-toggle',
-      ).filter({
-        hasText: /time range|Last \d/i,
-      });
+      const timeRange = this.testId('time-range-dropdown')
+        .or(this.locator('.pf-v6-c-menu-toggle'))
+        .filter({
+          hasText: /time range|Last \d/i,
+        });
       return await timeRange
         .first()
         .isVisible({ timeout })
@@ -248,7 +242,7 @@ export class VmSchedulingMetricsComponent extends BaseComponent {
 
   async navigateToConfigurationTab() {
     await super.navigateToTab(
-      this.locator('[data-test-id="horizontal-link-Configuration"]'),
+      this.testId('horizontal-link-Configuration'),
       TestTimeouts.UI_ACTION_COMPLETE,
     );
   }
@@ -263,7 +257,7 @@ export class VmSchedulingMetricsComponent extends BaseComponent {
   }
 
   async navigateToScheduling(): Promise<void> {
-    await super.navigateToTab(this.locator('[data-test-id="horizontal-link-Scheduling"]'));
+    await super.navigateToTab(this.testId('horizontal-link-Scheduling'));
   }
 
   async selectMetricsNetworkInterface(nicName: string): Promise<{
@@ -304,7 +298,7 @@ export class VmSchedulingMetricsComponent extends BaseComponent {
   }
 
   async verifyDedicatedResources(expectedText: string): Promise<boolean> {
-    const dedicatedResourcesLocator = this.locator('button[data-test-id="dedicated-resources"]');
+    const dedicatedResourcesLocator = this.testId('dedicated-resources');
     try {
       await dedicatedResourcesLocator.waitFor({
         state: 'visible',
@@ -372,7 +366,7 @@ export class VmSchedulingMetricsComponent extends BaseComponent {
 
       const timeout = Math.min(TestTimeouts.UI_ELEMENT_VISIBILITY, 30000);
 
-      const evictionStrategyElement = this.locator('[data-test-id="eviction-strategy"]');
+      const evictionStrategyElement = this.testId('eviction-strategy');
 
       const count = await evictionStrategyElement.count();
       if (count === 0) {
@@ -472,7 +466,7 @@ export class VmSchedulingMetricsComponent extends BaseComponent {
   }
 
   async verifyWorkload(vmName: string, expectedWorkload: string): Promise<boolean> {
-    const workloadLocator = this.locator(`button[data-test-id="${vmName}-workload-profile"]`);
+    const workloadLocator = this.testId(`${vmName}-workload-profile`);
     try {
       await workloadLocator.waitFor({
         state: 'visible',
@@ -493,21 +487,21 @@ export interface VmStorageDiskVerifyHost {
 
 export class VmStorageAddDiskComponent extends BaseComponent {
   private readonly _addDiskButtonInStorage = this.locator(
-    '.kv-configuration-vm-disk-list button:has-text("Add"), [data-test-id="storage-add-button"], button:has-text("Add disk")',
-  );
+    '.kv-configuration-vm-disk-list button:has-text("Add")',
+  )
+    .or(this.testId('storage-add-button'))
+    .or(this.locator('button:has-text("Add disk")'));
   private readonly _advancedSettingsButton = this.locator('button:has-text("Advanced settings")');
   private readonly _blankDiskOption = this.locator('text=Empty disk (blank)');
   private readonly _btnPlaceholderSelectISOFile = this.locator(
     'button[placeholder="Select ISO file"]',
   );
-  private readonly _configurationStorageSubTab = this.locator(
-    '[data-test-id="vm-configuration-storage"]',
-  );
+  private readonly _configurationStorageSubTab = this.testId('vm-configuration-storage');
   private readonly _detachDisk = this.locator('text=Detach disk?');
   private readonly _diskRowActionsButton = this.locator('button.pf-v6-c-menu-toggle.pf-m-plain');
-  private readonly _diskTypeSelect = this.locator('[data-test-id="disk-type-select"]');
-  private readonly _diskTypeSelectLun = this.locator('[data-test-id="disk-type-select-lun"]');
-  private readonly _fileInput = this.locator('[data-test-id="disk-source-upload"] [type="file"]');
+  private readonly _diskTypeSelect = this.testId('disk-type-select');
+  private readonly _diskTypeSelectLun = this.testId('disk-type-select-lun');
+  private readonly _fileInput = this.testId('disk-source-upload').locator('[type="file"]');
   private readonly _inputIdSimpleFileFilename = this.locator('input[id="simple-file-filename"]');
   private readonly _inputInput = this.locator('input[aria-label="Input"]');
   private readonly _lunReservation = this.locator('#lun-reservation');
@@ -516,19 +510,21 @@ export class VmStorageAddDiskComponent extends BaseComponent {
   private readonly _persistentHotplugLabel = this.locator(
     '.pf-v6-c-label__content:has-text("Persistent Hotplug")',
   );
-  private readonly _storageClassSelect = this.locator('[data-test-id="storage-class-select"]');
+  private readonly _storageClassSelect = this.testId('storage-class-select');
   private readonly _tabModal = this.locator('#tab-modal');
-  private readonly _tabModalSaveButton = this.locator('#tab-modal [data-test="save-button"]');
-  private readonly _windowsDriversCheckbox = this.locator('[data-test-id="cdrom-drivers"]');
+  private readonly _tabModalSaveButton = this.locator('#tab-modal').locator(
+    '[data-test="save-button"]',
+  );
+  private readonly _windowsDriversCheckbox = this.testId('cdrom-drivers');
 
   constructor(page: Page) {
     super(page);
   }
 
   private getDiskRow(diskName: string) {
-    return this.locator(
-      `tr:has([data-test-id="disk-${diskName}"]), tr:has([data-test-id="${diskName}"])`,
-    );
+    return this.locator('tr')
+      .filter({ has: this.testId(`disk-${diskName}`) })
+      .or(this.locator('tr').filter({ has: this.testId(diskName) }));
   }
 
   private getStorageClassOption(storageClass: string) {
@@ -537,7 +533,7 @@ export class VmStorageAddDiskComponent extends BaseComponent {
 
   private async navigateToConfigurationStorage(): Promise<void> {
     await this.navigateToTab(
-      this.locator('[data-test-id="horizontal-link-Configuration"]'),
+      this.testId('horizontal-link-Configuration'),
       TestTimeouts.UI_ACTION_COMPLETE,
     );
     await this._configurationStorageSubTab.waitFor({
@@ -605,7 +601,8 @@ export class VmStorageAddDiskComponent extends BaseComponent {
       }
 
       const dialogSaveVisible = await this.page
-        .locator('[role="dialog"] [data-test="save-button"]')
+        .locator('[role="dialog"]')
+        .locator('[data-test="save-button"]')
         .isVisible({ timeout: TestTimeouts.UI_ACTION_COMPLETE })
         .catch(() => false);
       if (dialogSaveVisible) {
@@ -649,7 +646,7 @@ export class VmStorageAddDiskComponent extends BaseComponent {
     if (await cdromMenuOption.isVisible()) {
       await cdromMenuOption.click({ force: true });
     } else {
-      const cdromOption = this.locator('text=CD-ROM, [data-test-id="disk-type-select-cdrom"]');
+      const cdromOption = this.locator('text=CD-ROM').or(this.testId('disk-type-select-cdrom'));
       await cdromOption
         .first()
         .waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
@@ -727,9 +724,9 @@ export class VmStorageAddDiskComponent extends BaseComponent {
         if (await errorAlert.isVisible()) {
           errorText = (await errorAlert.textContent().catch(() => 'None')) || 'None';
         }
-        const cancelButton = this._tabModal.locator(
-          '[data-test="cancel-button"], button:has-text("Cancel")',
-        );
+        const cancelButton = this._tabModal
+          .locator('[data-test="cancel-button"]')
+          .or(this._tabModal.locator('button:has-text("Cancel")'));
         if (await cancelButton.isVisible()) {
           await cancelButton.click({ force: true });
         }
@@ -930,14 +927,17 @@ export class VmStorageAddDiskComponent extends BaseComponent {
         timeout: TestTimeouts.INSTANCE_TYPE_VERIFICATION,
       });
 
-      await this.locator('[role="dialog"] [data-test="save-button"]', {
-        hasText: 'Detach',
-      }).waitFor({
-        state: 'visible',
-        timeout: TestTimeouts.UI_ACTION_COMPLETE,
-      });
+      await this.locator('[role="dialog"]')
+        .locator('[data-test="save-button"]')
+        .filter({ hasText: 'Detach' })
+        .waitFor({
+          state: 'visible',
+          timeout: TestTimeouts.UI_ACTION_COMPLETE,
+        });
       await this.robustClick(
-        this.locator('[role="dialog"] [data-test="save-button"]', { hasText: 'Detach' }),
+        this.locator('[role="dialog"]')
+          .locator('[data-test="save-button"]')
+          .filter({ hasText: 'Detach' }),
       );
 
       await this._detachDisk.waitFor({
@@ -1005,9 +1005,9 @@ export class VmStorageAddDiskComponent extends BaseComponent {
       }
     }
 
-    const submitBtn = modal.locator(
-      '[data-test="confirm-action"], button.pf-m-primary:not(:has-text("Cancel"))',
-    );
+    const submitBtn = modal
+      .locator('[data-test="save-button"]')
+      .or(modal.locator('button.pf-m-primary:not(:has-text("Cancel"))'));
     const submitButtonLabel = (await submitBtn.textContent().catch(() => ''))?.trim() ?? '';
 
     await modal.locator('button:has-text("Cancel")').click();
@@ -1026,9 +1026,11 @@ export class VmStorageAddDiskComponent extends BaseComponent {
       const diskRow = this.locator('tr', { hasText: diskName }).first();
       await diskRow.waitFor({ state: 'visible', timeout: TestTimeouts.DEFAULT });
 
-      const kebabMenu = diskRow.locator(
-        'button.pf-v6-c-menu-toggle.pf-m-plain, [data-test="kebab-button"], [data-test-id="kebab-button"], button[aria-label="Actions"], button[aria-label="Kebab toggle"]',
-      );
+      const kebabMenu = diskRow
+        .locator('button.pf-v6-c-menu-toggle.pf-m-plain')
+        .or(diskRow.getByTestId('kebab-button'))
+        .or(diskRow.locator('button[aria-label="Actions"]'))
+        .or(diskRow.locator('button[aria-label="Kebab toggle"]'));
       await kebabMenu.first().waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
       await this.robustClick(kebabMenu.first());
       await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
@@ -1074,9 +1076,9 @@ export class VmStorageAddDiskComponent extends BaseComponent {
       }
 
       const hasUploadModeSelector = await modal
-        .locator(
-          '[data-test="upload-mode-selector"], select[id*="upload-mode"], [id*="upload-type"]',
-        )
+        .getByTestId('upload-mode-selector')
+        .or(modal.locator('select[id*="upload-mode"]'))
+        .or(modal.locator('[id*="upload-type"]'))
         .isVisible()
         .catch(() => false);
 
@@ -1158,9 +1160,11 @@ export class VmStorageAddDiskComponent extends BaseComponent {
       const diskRow = this.locator('tr', { hasText: diskName }).first();
       await diskRow.waitFor({ state: 'visible', timeout: TestTimeouts.DEFAULT });
 
-      const kebabMenu = diskRow.locator(
-        'button.pf-v6-c-menu-toggle.pf-m-plain, [data-test="kebab-button"], [data-test-id="kebab-button"], button[aria-label="Actions"], button[aria-label="Kebab toggle"]',
-      );
+      const kebabMenu = diskRow
+        .locator('button.pf-v6-c-menu-toggle.pf-m-plain')
+        .or(diskRow.getByTestId('kebab-button'))
+        .or(diskRow.locator('button[aria-label="Actions"]'))
+        .or(diskRow.locator('button[aria-label="Kebab toggle"]'));
       await kebabMenu.first().waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
       await this.robustClick(kebabMenu.first());
       await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
@@ -1290,9 +1294,9 @@ export class VmStorageAddDiskComponent extends BaseComponent {
       await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
 
       const hasUploadModeSelector = await modal
-        .locator(
-          '[data-test="upload-mode-selector"], select[id*="upload-mode"], [id*="upload-type"], [data-test-id*="upload-mode"]',
-        )
+        .getByTestId('upload-mode-selector')
+        .or(modal.locator('select[id*="upload-mode"]'))
+        .or(modal.locator('[id*="upload-type"]'))
         .isVisible()
         .catch(() => false);
 
@@ -1338,16 +1342,16 @@ export class VmStorageAddDiskComponent extends BaseComponent {
 export class VmStorageComponent extends BaseComponent {
   private readonly _advancedSettingsButton = this.locator('button:has-text("Advanced settings")');
 
-  private readonly _configurationStorageSubTab = this.locator(
-    '[data-test-id="vm-configuration-storage"]',
-  );
+  private readonly _configurationStorageSubTab = this.testId('vm-configuration-storage');
   private readonly _dataVolumeDetails = this.locator('text=DataVolume details');
-  private readonly _diskRootdisk = this.locator('[data-test-id="disk-rootdisk"]');
+  private readonly _diskRootdisk = this.testId('disk-rootdisk');
   private readonly _diskRowActionsButton = this.locator('button.pf-v6-c-menu-toggle.pf-m-plain');
 
   private readonly _h1HasTextEditDisk = this.locator('h1:has-text("Edit Disk")');
 
-  private readonly _tabModalSaveButton = this.locator('#tab-modal [data-test="save-button"]');
+  private readonly _tabModalSaveButton = this.locator('#tab-modal').locator(
+    '[data-test="save-button"]',
+  );
 
   readonly addDisk: VmStorageAddDiskComponent;
 
@@ -1357,9 +1361,9 @@ export class VmStorageComponent extends BaseComponent {
   }
 
   private getDiskRow(diskName: string) {
-    return this.locator(
-      `tr:has([data-test-id="disk-${diskName}"]), tr:has([data-test-id="${diskName}"])`,
-    );
+    return this.locator('tr')
+      .filter({ has: this.testId(`disk-${diskName}`) })
+      .or(this.locator('tr').filter({ has: this.testId(diskName) }));
   }
 
   async addBlankDisk(diskName: string, size = '1', storageClass?: string): Promise<boolean> {
@@ -1394,7 +1398,7 @@ export class VmStorageComponent extends BaseComponent {
   async clickPvcLink(volumeName: string): Promise<boolean> {
     try {
       await this.navigateToConfigurationStorage();
-      const pvcLink = this.locator(`a[data-test-id="${volumeName}"]`);
+      const pvcLink = this.testId(volumeName);
       await pvcLink.waitFor({ state: 'visible', timeout: TestTimeouts.VM_CREATION });
       await this.robustClick(pvcLink);
       return true;
@@ -1419,9 +1423,11 @@ export class VmStorageComponent extends BaseComponent {
       const diskRow = this.page.locator('tr').filter({ hasText: diskName }).first();
       await diskRow.waitFor({ state: 'visible', timeout: TestTimeouts.DEFAULT });
 
-      const kebabMenu = diskRow.locator(
-        'button.pf-v6-c-menu-toggle.pf-m-plain, [data-test="kebab-button"], [data-test-id="kebab-button"], button[aria-label="Actions"], button[aria-label="Kebab toggle"]',
-      );
+      const kebabMenu = diskRow
+        .locator('button.pf-v6-c-menu-toggle.pf-m-plain')
+        .or(diskRow.getByTestId('kebab-button'))
+        .or(diskRow.locator('button[aria-label="Actions"]'))
+        .or(diskRow.locator('button[aria-label="Kebab toggle"]'));
       await kebabMenu.first().waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
       await this.robustClick(kebabMenu.first());
       await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
@@ -1460,9 +1466,9 @@ export class VmStorageComponent extends BaseComponent {
       await ejectItem.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
       await ejectItem.click({ force: true });
 
-      const dialogEjectButton = this.page.locator(
-        '[data-test="dialog-modal"] [data-test="save-button"]',
-      );
+      const dialogEjectButton = this.page
+        .locator('[data-test="dialog-modal"]')
+        .locator('[data-test="save-button"]');
       await dialogEjectButton.waitFor({ state: 'visible', timeout: TestTimeouts.DEFAULT });
       await this.robustClick(dialogEjectButton);
 
@@ -1484,7 +1490,7 @@ export class VmStorageComponent extends BaseComponent {
 
   async getDiskDriveValue(diskName: string): Promise<string | null> {
     try {
-      const cell = this.locator(`[data-test-id="disk-drive-${diskName}"]`).first();
+      const cell = this.testId(`disk-drive-${diskName}`).first();
       const visible = await cell
         .isVisible({ timeout: TestTimeouts.UI_DELAY_MEDIUM })
         .catch(() => false);
@@ -1499,7 +1505,7 @@ export class VmStorageComponent extends BaseComponent {
 
   async getDiskInterfaceValue(diskName: string): Promise<string | null> {
     try {
-      const cell = this.locator(`[data-test-id="disk-interface-${diskName}"]`).first();
+      const cell = this.testId(`disk-interface-${diskName}`).first();
       const visible = await cell
         .isVisible({ timeout: TestTimeouts.UI_DELAY_MEDIUM })
         .catch(() => false);
@@ -1526,7 +1532,7 @@ export class VmStorageComponent extends BaseComponent {
     column: 'drive' | 'interface' | 'name' | 'source' | 'size',
   ): Promise<string | null> {
     try {
-      const cell = this.locator(`[data-test="disk-${column}-${diskName}"]`).first();
+      const cell = this.testId(`disk-${column}-${diskName}`).first();
       const visible = await cell
         .isVisible({ timeout: TestTimeouts.UI_DELAY_MEDIUM })
         .catch(() => false);
@@ -1585,13 +1591,13 @@ export class VmStorageComponent extends BaseComponent {
 
   async navigateToConfigurationTab() {
     await super.navigateToTab(
-      this.locator('[data-test-id="horizontal-link-Configuration"]'),
+      this.testId('horizontal-link-Configuration'),
       TestTimeouts.UI_ACTION_COMPLETE,
     );
   }
 
   async navigateToDisks(): Promise<void> {
-    await super.navigateToTab(this.locator('[data-test-id="horizontal-link-Disks"]'));
+    await super.navigateToTab(this.testId('horizontal-link-Disks'));
   }
 
   async navigateToVmiDisksTab(vmName: string, namespace: string): Promise<void> {
@@ -1701,7 +1707,7 @@ export class VmStorageComponent extends BaseComponent {
 
   async verifyDiskExistsByAttribute(
     name: string,
-    attribute: 'data-test' | 'data-test-id' = 'data-test',
+    attribute: 'data-test' | 'data-test' = 'data-test',
   ): Promise<boolean> {
     try {
       const diskLocator = this.locator(`[${attribute}*="${name}"]`);
@@ -1727,7 +1733,7 @@ export class VmStorageComponent extends BaseComponent {
     try {
       await this.navigateToConfigurationStorage();
       const expectedDataTestId = `dv-${vmName}-${diskName}-k8ntab`;
-      const diskLocator = this.locator(`[data-test-id="${expectedDataTestId}"]`);
+      const diskLocator = this.testId(expectedDataTestId);
       await diskLocator.waitFor({ state: 'visible', timeout: TestTimeouts.UI_DELAY_EXTRA });
       return true;
     } catch {
@@ -1772,7 +1778,7 @@ export class VmStorageComponent extends BaseComponent {
   async verifyDiskRowVisibleByExactDataTestId(dataTestId: string): Promise<boolean> {
     try {
       await this.navigateToConfigurationStorage();
-      const diskLocator = this.locator(`[data-test-id="${dataTestId}"]`);
+      const diskLocator = this.testId(dataTestId);
       await diskLocator.waitFor({ state: 'visible', timeout: TestTimeouts.UI_DELAY_EXTRA });
       return true;
     } catch {
@@ -1810,8 +1816,8 @@ export class VmStorageComponent extends BaseComponent {
   async verifyDiskSourceByDataTestId(vmName: string, diskName: string): Promise<boolean> {
     try {
       await this.navigateToConfigurationStorage();
-      const row = this.locator(`[data-test-id="dv-${vmName}-${diskName}-k8ntab"]`);
-      const cell = row.locator(`[data-test-id="disk-source-${diskName}"]`).first();
+      const row = this.testId(`dv-${vmName}-${diskName}-k8ntab`);
+      const cell = row.getByTestId(`disk-source-${diskName}`).first();
       await cell.waitFor({ state: 'visible', timeout: TestTimeouts.UI_DELAY_EXTRA });
       return true;
     } catch {
@@ -1854,9 +1860,9 @@ export class VmStorageComponent extends BaseComponent {
                 .catch(() => false);
               if (rowExists) {
                 const dataTestId = await row
-                  .locator('[data-test-id]')
+                  .locator('[data-test]')
                   .first()
-                  .getAttribute('data-test-id')
+                  .getAttribute('data-test')
                   .catch(() => null);
                 return dataTestId !== null;
               }
@@ -1870,9 +1876,9 @@ export class VmStorageComponent extends BaseComponent {
                 .catch(() => false);
               if (rowExists) {
                 const dataTestId = await row
-                  .locator('[data-test-id]')
+                  .locator('[data-test]')
                   .first()
-                  .getAttribute('data-test-id')
+                  .getAttribute('data-test')
                   .catch(() => null);
                 return dataTestId !== null;
               }

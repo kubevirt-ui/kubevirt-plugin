@@ -546,8 +546,8 @@ export default class RequestContextClient extends BaseClient implements ProxyApi
     return this.core.getClusterVersion();
   }
   // -- Core --
-  getConfigMap(namespace: string, name: string) {
-    return this.core.getConfigMap(namespace, name);
+  getConfigMap(name: string, namespace: string) {
+    return this.core.getConfigMap(name, namespace);
   }
   getDataImportCrons(namespace?: string) {
     return this.cdi.listDataImportCrons(namespace);
@@ -690,7 +690,7 @@ export default class RequestContextClient extends BaseClient implements ProxyApi
   }
 
   // ---------------------------------------------------------------------------
-  // Backward-compatible aliases for OcClient API
+  // VM snapshot & restore aliases
   // ---------------------------------------------------------------------------
 
   getVirtualMachineRestore(namespace: string, name: string) {
@@ -712,8 +712,6 @@ export default class RequestContextClient extends BaseClient implements ProxyApi
 
   // ---------------------------------------------------------------------------
   // Kind-based convenience methods
-  // Backward-compatible with OcClient's kind-based API. Uses the kind resolver
-  // to map oc-style kind strings (e.g. 'vm', 'secret') to full GVR tuples.
   // ---------------------------------------------------------------------------
 
   // -- Snapshots --
@@ -747,6 +745,10 @@ export default class RequestContextClient extends BaseClient implements ProxyApi
 
   getVolumeSnapshots(namespace: string) {
     return this.snapshot.listVolumeSnapshots(namespace);
+  }
+
+  hotplugVolumeEphemeral(vmName: string, namespace: string, volumeName: string, diskName: string) {
+    return this.vm.hotplugVolumeEphemeral(namespace, vmName, volumeName, diskName);
   }
 
   hotplugVolumeToVm(vmName: string, namespace: string, volumeName: string, diskName: string) {

@@ -4,7 +4,7 @@
 
 import BaseComponent from '@/components/shared/base-component';
 import { TestTimeouts } from '@/utils/test-config';
-import type { Page } from '@playwright/test';
+import type { Locator, Page } from '@playwright/test';
 import { expect } from '@playwright/test';
 
 /** Options for the Add volume (create Bootable Volume) form. */
@@ -16,7 +16,7 @@ export interface CreateBootableVolumeFormOptions {
 }
 
 export class BootableVolumesRowActionsComponent extends BaseComponent {
-  private readonly _dialogModal = this.locator('[data-test="dialog-modal"]');
+  private readonly _dialogModal = this.testId('dialog-modal');
 
   constructor(page: Page) {
     super(page);
@@ -24,9 +24,11 @@ export class BootableVolumesRowActionsComponent extends BaseComponent {
 
   /** Clicks a menu item by its exact visible text label. */
   private async clickMenuItemByText(label: string): Promise<void> {
-    const item = this.locator('[role="menuitem"]').filter({
-      has: this.locator('.pf-v6-c-menu__item-text', { hasText: label }),
-    });
+    const item = this.locator('[role="menuitem"]')
+      .filter({
+        has: this.locator('.pf-v6-c-menu__item-text', { hasText: label }),
+      })
+      .first();
     await item.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
     await this.robustClick(item);
   }
@@ -38,14 +40,17 @@ export class BootableVolumesRowActionsComponent extends BaseComponent {
    */
   private async openRowKebabMenu(volumeName: string): Promise<void> {
     const byTestId = this.locator('tbody tr').filter({
-      has: this.locator(`[data-test-id="${volumeName}"]`),
+      has: this.testId(volumeName),
     });
     const byLink = this.locator('tbody tr').filter({
       has: this.locator(`a:has-text("${volumeName}")`),
     });
-    const row = byTestId.or(byLink).first();
+    const byText = this.locator('tbody tr').filter({ hasText: volumeName });
+    const row = byTestId.or(byLink).or(byText).first();
     await row.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
-    const kebabButton = row.locator('button.pf-v6-c-menu-toggle');
+    const kebabButton = row
+      .locator('button.pf-v6-c-menu-toggle.pf-m-plain, button.pf-v6-c-menu-toggle')
+      .first();
     await kebabButton.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
     await this.robustClick(kebabButton);
     await this.locator('[role="menuitem"]')
@@ -94,7 +99,7 @@ export class BootableVolumesRowActionsComponent extends BaseComponent {
    * Call after clickRowActionEditLabels(volumeName) when the modal is open.
    */
   async addLabelInEditLabelsModalAndSave(labelTag: string): Promise<void> {
-    const tagsInput = this.locator('[data-test="tags-input"]');
+    const tagsInput = this.testId('tags-input');
     await tagsInput.waitFor({
       state: 'visible',
       timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
@@ -102,7 +107,7 @@ export class BootableVolumesRowActionsComponent extends BaseComponent {
     await tagsInput.fill(labelTag);
     await this.page.keyboard.press('Enter');
     await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
-    const saveButton = this.locator('[data-test="save-button"]');
+    const saveButton = this.testId('save-button');
     await saveButton.waitFor({
       state: 'visible',
       timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
@@ -196,7 +201,7 @@ export class BootableVolumesRowActionsComponent extends BaseComponent {
    */
   async clickVolumeNameToGoToDetail(volumeName: string): Promise<void> {
     const row = this.locator('tbody tr').filter({
-      has: this.locator(`[data-test-id="${volumeName}"]`),
+      has: this.testId(volumeName),
     });
     const nameLink = row.locator('a').filter({ hasText: volumeName }).first();
     await nameLink.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
@@ -334,11 +339,11 @@ export class BootableVolumesRowActionsComponent extends BaseComponent {
 
   /**
    * On the bootable volume detail page: verifies the labels section shows the expected label text.
-   * Finds the labels control via [data-test-id^="pw-bv-"][data-test-id$="-labels"] (clicks it if
+   * Finds the labels control via [data-test^="pw-bv-"][data-test$="-labels"] (clicks it if
    * it is a button to expand), then checks that the expected label text is visible on the page.
    */
   async verifyLabelVisibleOnDetailPage(expectedLabelText: string): Promise<boolean> {
-    const labelsControl = this.locator('[data-test-id^="pw-bv-"][data-test-id$="-labels"]').first();
+    const labelsControl = this.locator('[data-test^="pw-bv-"][data-test$="-labels"]').first();
     await labelsControl.waitFor({
       state: 'visible',
       timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
@@ -579,7 +584,7 @@ export class BootableVolumesCreateFormsComponent extends BaseComponent {
       timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
     });
 
-    const sourceTypeSelect = this._addVolumeDialog.locator('[data-test-id="source-type-select"]');
+    const sourceTypeSelect = this._addVolumeDialog.getByTestId('source-type-select');
     await sourceTypeSelect.waitFor({
       state: 'visible',
       timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
@@ -587,7 +592,7 @@ export class BootableVolumesCreateFormsComponent extends BaseComponent {
     await this.robustClick(sourceTypeSelect);
     await this.page.waitForTimeout(TestTimeouts.UI_DELAY_MEDIUM);
 
-    const useExistingVolume = this.locator('[data-test-id="use-existing-volume"] button');
+    const useExistingVolume = this.testId('use-existing-volume').locator('button');
     await this.robustClick(useExistingVolume, { force: true });
     await this.page.waitForTimeout(TestTimeouts.UI_DELAY_MEDIUM);
 
@@ -608,7 +613,7 @@ export class BootableVolumesCreateFormsComponent extends BaseComponent {
       await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
     }
 
-    const projectOption = this.locator(`[data-test-id="select-option-${projectNamespace}"]`);
+    const projectOption = this.testId(`select-option-${projectNamespace}`);
     await projectOption.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ACTION_COMPLETE });
     await this.robustClick(projectOption);
 
@@ -629,9 +634,7 @@ export class BootableVolumesCreateFormsComponent extends BaseComponent {
       await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
     }
 
-    const existingVolumeOption = this.locator(
-      `[role="listbox"] [data-test-id="${existingVolumeName}"]`,
-    );
+    const existingVolumeOption = this.locator('[role="listbox"]').getByTestId(existingVolumeName);
     await existingVolumeOption.waitFor({
       state: 'visible',
       timeout: TestTimeouts.UI_ACTION_COMPLETE,
@@ -715,7 +718,7 @@ export class BootableVolumesCreateFormsComponent extends BaseComponent {
       timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
     });
 
-    const sourceTypeSelect = this._addVolumeDialog.locator('[data-test-id="source-type-select"]');
+    const sourceTypeSelect = this._addVolumeDialog.getByTestId('source-type-select');
     await sourceTypeSelect.waitFor({
       state: 'visible',
       timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
@@ -782,7 +785,7 @@ export class BootableVolumesCreateFormsComponent extends BaseComponent {
   /**
    * Fills and submits the Add volume form using HTTP/URL as source.
    * Call after clickCreateAndSelectOption('With form').
-   * Selects source type "HTTP" ([data-test-id="use-http"]), fills Image URL in .disk-source-form-group,
+   * Selects source type "HTTP" ([data-test="use-http"]), fills Image URL in .disk-source-form-group,
    * then volume name, preference and instance type, then saves.
    *
    * @param volumeName - Name for the bootable volume
@@ -801,7 +804,7 @@ export class BootableVolumesCreateFormsComponent extends BaseComponent {
       timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
     });
 
-    const sourceTypeSelect = this._addVolumeDialog.locator('[data-test-id="source-type-select"]');
+    const sourceTypeSelect = this._addVolumeDialog.getByTestId('source-type-select');
     await sourceTypeSelect.waitFor({
       state: 'visible',
       timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
@@ -809,7 +812,7 @@ export class BootableVolumesCreateFormsComponent extends BaseComponent {
     await this.robustClick(sourceTypeSelect);
     await this.page.waitForTimeout(TestTimeouts.UI_DELAY_MEDIUM);
 
-    const useHttp = this.locator('[data-test-id="use-http"]');
+    const useHttp = this.testId('use-http');
     await useHttp.waitFor({
       state: 'visible',
       timeout: TestTimeouts.UI_ACTION_COMPLETE,
@@ -889,7 +892,7 @@ export class BootableVolumesCreateFormsComponent extends BaseComponent {
   /**
    * Fills and submits the Add volume form using Registry as source.
    * Call after clickCreateAndSelectOption('With form').
-   * Selects source type "Registry" ([data-test-id="use-registry"]), fills container image URL,
+   * Selects source type "Registry" ([data-test="use-registry"]), fills container image URL,
    * optional cron expression for retain, volume name, preference and instance type, then saves.
    *
    * @param volumeName - Name for the bootable volume
@@ -910,7 +913,7 @@ export class BootableVolumesCreateFormsComponent extends BaseComponent {
       timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
     });
 
-    const sourceTypeSelect = this._addVolumeDialog.locator('[data-test-id="source-type-select"]');
+    const sourceTypeSelect = this._addVolumeDialog.getByTestId('source-type-select');
     await sourceTypeSelect.waitFor({
       state: 'visible',
       timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
@@ -918,7 +921,7 @@ export class BootableVolumesCreateFormsComponent extends BaseComponent {
     await this.robustClick(sourceTypeSelect);
     await this.page.waitForTimeout(TestTimeouts.UI_DELAY_MEDIUM);
 
-    const useRegistry = this.locator('[data-test-id="use-registry"]');
+    const useRegistry = this.testId('use-registry');
     await useRegistry.waitFor({
       state: 'visible',
       timeout: TestTimeouts.UI_ACTION_COMPLETE,
@@ -926,8 +929,8 @@ export class BootableVolumesCreateFormsComponent extends BaseComponent {
     await this.robustClick(useRegistry);
     await this.page.waitForTimeout(TestTimeouts.UI_DELAY_MEDIUM);
 
-    const containerImageInput = this._addVolumeDialog.locator(
-      '[data-test-id="volume-registry-container-source-input"]',
+    const containerImageInput = this._addVolumeDialog.getByTestId(
+      'volume-registry-container-source-input',
     );
     await containerImageInput.waitFor({
       state: 'visible',
@@ -935,9 +938,9 @@ export class BootableVolumesCreateFormsComponent extends BaseComponent {
     });
     await containerImageInput.fill(registryUrl);
 
-    const cronExpInput = this._addVolumeDialog.locator(
-      'input[data-test-id="volume-registry-retain-cron-expression"], #volume-registry-retain-cron-expression',
-    );
+    const cronExpInput = this._addVolumeDialog
+      .locator('[data-test="volume-registry-retain-cron-expression"]')
+      .or(this._addVolumeDialog.locator('#volume-registry-retain-cron-expression'));
     await cronExpInput.scrollIntoViewIfNeeded();
     await cronExpInput.waitFor({
       state: 'visible',
@@ -1028,7 +1031,7 @@ export class BootableVolumesCreateFormsComponent extends BaseComponent {
       timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
     });
 
-    const sourceTypeSelect = this._addVolumeDialog.locator('[data-test-id="source-type-select"]');
+    const sourceTypeSelect = this._addVolumeDialog.getByTestId('source-type-select');
     await sourceTypeSelect.waitFor({
       state: 'visible',
       timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
@@ -1193,7 +1196,7 @@ export class BootableVolumesCreateComponent extends BaseComponent {
       'With form': 'button[role="menuitem"]:has-text("With form")',
       'With YAML': 'button[role="menuitem"]:has-text("With YAML")',
     };
-    await super.clickCreateAndSelectOption('[data-test="item-create"]', optionSelectors[option]);
+    await super.clickCreateAndSelectOption(this.testId('item-create'), optionSelectors[option]);
   }
 
   async fillCreateBootableVolumeFormAndSave(
@@ -1288,7 +1291,7 @@ export class BootableVolumesCreateComponent extends BaseComponent {
       timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
     });
 
-    const sourceTypeSelect = this._addVolumeDialog.locator('[data-test-id="source-type-select"]');
+    const sourceTypeSelect = this._addVolumeDialog.getByTestId('source-type-select');
     await sourceTypeSelect.waitFor({
       state: 'visible',
       timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
@@ -1296,7 +1299,7 @@ export class BootableVolumesCreateComponent extends BaseComponent {
     await this.robustClick(sourceTypeSelect);
     await this.page.waitForTimeout(TestTimeouts.UI_DELAY_MEDIUM);
 
-    const useExistingVolume = this.locator('[data-test-id="use-existing-volume"] button');
+    const useExistingVolume = this.testId('use-existing-volume').locator('button');
     await this.robustClick(useExistingVolume, { force: true });
     await this.page.waitForTimeout(TestTimeouts.UI_DELAY_MEDIUM);
 
@@ -1317,7 +1320,7 @@ export class BootableVolumesCreateComponent extends BaseComponent {
       await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
     }
 
-    const projectOption = this.locator(`[data-test-id="select-option-${projectNamespace}"]`);
+    const projectOption = this.testId(`select-option-${projectNamespace}`);
     await projectOption.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ACTION_COMPLETE });
     await this.robustClick(projectOption);
 
@@ -1338,9 +1341,7 @@ export class BootableVolumesCreateComponent extends BaseComponent {
       await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
     }
 
-    const existingVolumeOption = this.locator(
-      `[role="listbox"] [data-test-id="${existingVolumeName}"]`,
-    );
+    const existingVolumeOption = this.locator('[role="listbox"]').getByTestId(existingVolumeName);
     await existingVolumeOption.waitFor({
       state: 'visible',
       timeout: TestTimeouts.UI_ACTION_COMPLETE,
@@ -1419,7 +1420,7 @@ export class BootableVolumesCreateComponent extends BaseComponent {
       timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
     });
 
-    const sourceTypeSelect = this._addVolumeDialog.locator('[data-test-id="source-type-select"]');
+    const sourceTypeSelect = this._addVolumeDialog.getByTestId('source-type-select');
     await sourceTypeSelect.waitFor({
       state: 'visible',
       timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
@@ -1495,7 +1496,7 @@ export class BootableVolumesCreateComponent extends BaseComponent {
       timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
     });
 
-    const sourceTypeSelect = this._addVolumeDialog.locator('[data-test-id="source-type-select"]');
+    const sourceTypeSelect = this._addVolumeDialog.getByTestId('source-type-select');
     await sourceTypeSelect.waitFor({
       state: 'visible',
       timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
@@ -1503,7 +1504,7 @@ export class BootableVolumesCreateComponent extends BaseComponent {
     await this.robustClick(sourceTypeSelect);
     await this.page.waitForTimeout(TestTimeouts.UI_DELAY_MEDIUM);
 
-    const useHttp = this.locator('[data-test-id="use-http"]');
+    const useHttp = this.testId('use-http');
     await useHttp.waitFor({
       state: 'visible',
       timeout: TestTimeouts.UI_ACTION_COMPLETE,
@@ -1593,7 +1594,7 @@ export class BootableVolumesCreateComponent extends BaseComponent {
       timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
     });
 
-    const sourceTypeSelect = this._addVolumeDialog.locator('[data-test-id="source-type-select"]');
+    const sourceTypeSelect = this._addVolumeDialog.getByTestId('source-type-select');
     await sourceTypeSelect.waitFor({
       state: 'visible',
       timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
@@ -1601,7 +1602,7 @@ export class BootableVolumesCreateComponent extends BaseComponent {
     await this.robustClick(sourceTypeSelect);
     await this.page.waitForTimeout(TestTimeouts.UI_DELAY_MEDIUM);
 
-    const useRegistry = this.locator('[data-test-id="use-registry"]');
+    const useRegistry = this.testId('use-registry');
     await useRegistry.waitFor({
       state: 'visible',
       timeout: TestTimeouts.UI_ACTION_COMPLETE,
@@ -1609,8 +1610,8 @@ export class BootableVolumesCreateComponent extends BaseComponent {
     await this.robustClick(useRegistry);
     await this.page.waitForTimeout(TestTimeouts.UI_DELAY_MEDIUM);
 
-    const containerImageInput = this._addVolumeDialog.locator(
-      '[data-test-id="volume-registry-container-source-input"]',
+    const containerImageInput = this._addVolumeDialog.getByTestId(
+      'volume-registry-container-source-input',
     );
     await containerImageInput.waitFor({
       state: 'visible',
@@ -1618,9 +1619,9 @@ export class BootableVolumesCreateComponent extends BaseComponent {
     });
     await containerImageInput.fill(registryUrl);
 
-    const cronExpInput = this._addVolumeDialog.locator(
-      'input[data-test-id="volume-registry-retain-cron-expression"], #volume-registry-retain-cron-expression',
-    );
+    const cronExpInput = this._addVolumeDialog
+      .locator('[data-test="volume-registry-retain-cron-expression"]')
+      .or(this._addVolumeDialog.locator('#volume-registry-retain-cron-expression'));
     await cronExpInput.scrollIntoViewIfNeeded();
     await cronExpInput.waitFor({
       state: 'visible',
@@ -1700,7 +1701,7 @@ export class BootableVolumesCreateComponent extends BaseComponent {
       timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
     });
 
-    const sourceTypeSelect = this._addVolumeDialog.locator('[data-test-id="source-type-select"]');
+    const sourceTypeSelect = this._addVolumeDialog.getByTestId('source-type-select');
     await sourceTypeSelect.waitFor({
       state: 'visible',
       timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
@@ -1776,11 +1777,11 @@ export class BootableVolumesCreateComponent extends BaseComponent {
   async selectSourceTypeInAddVolumeModal(
     sourceType: 'URL' | 'Registry' | 'Volume' | 'Volume snapshot',
   ): Promise<void> {
-    const sourceTypeMap: Record<string, string> = {
-      URL: '[data-test-id="use-http"]',
-      Registry: '[data-test-id="use-registry"]',
-      Volume: 'button[role="option"]:has-text("Volume"):not(:has-text("snapshot"))',
-      'Volume snapshot': 'button[role="option"]:has-text("Volume snapshot")',
+    const sourceTypeLocators: Record<string, Locator> = {
+      URL: this.testId('use-http'),
+      Registry: this.testId('use-registry'),
+      Volume: this.locator('button[role="option"]:has-text("Volume"):not(:has-text("snapshot"))'),
+      'Volume snapshot': this.locator('button[role="option"]:has-text("Volume snapshot")'),
     };
 
     await this._addVolumeDialog.waitFor({
@@ -1788,7 +1789,7 @@ export class BootableVolumesCreateComponent extends BaseComponent {
       timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
     });
 
-    const sourceTypeSelect = this._addVolumeDialog.locator('[data-test-id="source-type-select"]');
+    const sourceTypeSelect = this._addVolumeDialog.getByTestId('source-type-select');
     await sourceTypeSelect.waitFor({
       state: 'visible',
       timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
@@ -1796,7 +1797,7 @@ export class BootableVolumesCreateComponent extends BaseComponent {
     await this.robustClick(sourceTypeSelect);
     await this.page.waitForTimeout(TestTimeouts.UI_DELAY_MEDIUM);
 
-    const option = this.locator(sourceTypeMap[sourceType]);
+    const option = sourceTypeLocators[sourceType];
     await option.waitFor({
       state: 'visible',
       timeout: TestTimeouts.UI_ACTION_COMPLETE,

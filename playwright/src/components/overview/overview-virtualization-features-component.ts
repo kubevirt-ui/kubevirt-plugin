@@ -24,17 +24,15 @@ export default class OverviewVirtualizationFeaturesComponent extends BaseCompone
     '#high-availability-summary-section--toggle',
   );
   private readonly _inputSliderValueInput = this.locator('input[aria-label="Slider value input"]');
-  private readonly _ksmCheckbox = this.locator('[data-test-id="kernel-samepage-merging"]');
+  private readonly _ksmCheckbox = this.testId('kernel-samepage-merging');
   private readonly _memoryDensityBtn = this.locator('button:has-text("Memory density")');
-  private readonly _memoryDensityDisableConfirmButton = this.locator(
-    '[data-test-id="memory-density-disable-confirm-button"]',
+  private readonly _memoryDensityDisableConfirmButton = this.testId(
+    'memory-density-disable-confirm-button',
   );
-  private readonly _memoryDensityModifyButtonButton = this.locator(
-    '[data-test-id="memory-density-modify-button"] button',
-  );
-  private readonly _memoryDensitySaveButton = this.locator(
-    '[data-test-id="memory-density-save-button"]',
-  );
+  private readonly _memoryDensityModifyButtonButton = this.testId(
+    'memory-density-modify-button',
+  ).locator('button');
+  private readonly _memoryDensitySaveButton = this.testId('memory-density-save-button');
   private readonly _memoryDensityToggle = this.locator('#memory-density-feature input');
   private readonly _memoryRequestRatioBtn = this.locator('button:has-text("Memory request ratio")');
   private readonly _memoryRequestRatioDecreaseBtn = this.locator(
@@ -48,9 +46,7 @@ export default class OverviewVirtualizationFeaturesComponent extends BaseCompone
   );
 
   private readonly _permissionsBtn = this.locator('button:has-text("Permissions")');
-  private readonly _persistentReservationCheckbox = this.locator(
-    '[data-test-id="persistent-reservation"]',
-  );
+  private readonly _persistentReservationCheckbox = this.testId('persistent-reservation');
   private readonly _resourceManagementBtn = this.locator('button:has-text("Resource management")');
   private readonly _sCSIPersistentReservationBtn = this.locator(
     'button:has-text("SCSI persistent reservation")',
@@ -185,7 +181,7 @@ export default class OverviewVirtualizationFeaturesComponent extends BaseCompone
 
   async enableClusterObservabilityInWizard(): Promise<boolean> {
     try {
-      const control = this.locator('[data-test-id="cluster-observability-operator"]');
+      const control = this.testId('cluster-observability-operator');
       await control.waitFor({
         state: 'visible',
         timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
@@ -723,8 +719,8 @@ export default class OverviewVirtualizationFeaturesComponent extends BaseCompone
         timeout: TestTimeouts.RESOURCE_CREATION,
       });
 
-      const versionEl = this.locator('[data-test-id="general-information-installed-version"]');
-      const statusEl = this.locator('[data-test-id="general-information-update-status"]');
+      const versionEl = this.testId('general-information-installed-version');
+      const statusEl = this.testId('general-information-update-status');
 
       await versionEl.waitFor({ state: 'visible', timeout: TestTimeouts.RESOURCE_CREATION });
       await statusEl.waitFor({ state: 'visible', timeout: TestTimeouts.RESOURCE_CREATION });

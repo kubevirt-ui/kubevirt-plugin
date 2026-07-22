@@ -1,5 +1,6 @@
 import { GATING, GATING_TAG } from '@/data-models/allure-constants';
 import { expect, test } from '@/fixtures/gating-fixture';
+import { isNativeVmTemplatesEnabled } from '@/utils/feature-flags';
 import { buildVmYaml } from '@/utils/vm-yaml-builder';
 
 const SUITE = 'Resource creation (gating)';
@@ -147,10 +148,12 @@ test.describe('Resource creation (gating)', { tag: [GATING_TAG, '@resource-creat
   test('Create a template from a virtual machine', async ({
     apiClient,
     vmDetailPage,
+    vmTreePage,
     templatesPage,
     testConfig,
     utils,
   }) => {
+    test.skip(!(await isNativeVmTemplatesEnabled(apiClient)), 'Native VM templates not enabled');
     await utils.withAllure({ suite: SUITE, feature: GATING, tags: [GATING_TAG] });
 
     const vmName = utils.generateRandomVmName('save-tpl');
@@ -162,7 +165,7 @@ test.describe('Resource creation (gating)', { tag: [GATING_TAG, '@resource-creat
     const created = await apiClient.verifyVmCreated(vmName, ns, utils.TestTimeouts.VM_BOOTUP);
     expect(created.exists, `VM ${vmName} should be created`).toBe(true);
 
-    await vmDetailPage.navigateToVirtualMachineDetail(vmName, ns);
+    await vmTreePage.navigateToVmViaTreeView(ns, vmName);
     const nameVisible = await vmDetailPage.isVmNameVisible(
       vmName,
       utils.TestTimeouts.UI_ELEMENT_VISIBILITY,
@@ -260,6 +263,7 @@ test.describe('Resource creation (gating)', { tag: [GATING_TAG, '@resource-creat
     await bootableVolumesPage.fillYamlEditorAndSave(dataVolumeYaml);
     apiClient.trackResource('DataVolume', dvName, testConfig.testNamespace);
 
+    await bootableVolumesPage.filterByName(dvName);
     const rowVisible = await bootableVolumesPage.verifyDataVolumeRowVisible(
       dvName,
       utils.TestTimeouts.DEFAULT,

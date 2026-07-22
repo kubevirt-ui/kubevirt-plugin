@@ -17,7 +17,7 @@ export default class DataVolumesPage extends BasePage {
       'With form': 'button[role="menuitem"]:has-text("With form")',
       'With YAML': 'button[role="menuitem"]:has-text("With YAML")',
     };
-    await super.clickCreateAndSelectOption('[data-test="item-create"]', optionSelectors[option]);
+    await super.clickCreateAndSelectOption(this.testId('item-create'), optionSelectors[option]);
   }
 
   async navigateToAllNamespacesDataVolumes(): Promise<void> {

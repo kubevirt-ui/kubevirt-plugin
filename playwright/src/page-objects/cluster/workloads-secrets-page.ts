@@ -17,7 +17,7 @@ export default class WorkloadsSecretsPage extends BasePage {
     secretName: string,
     timeout: number = TestTimeouts.UI_ELEMENT_VISIBILITY,
   ): Promise<boolean> {
-    const secretLocator = this.locator(`[data-test="${secretName}"]`);
+    const secretLocator = this.testId(secretName);
     try {
       await secretLocator.waitFor({ state: 'visible', timeout });
       return await secretLocator.isVisible();

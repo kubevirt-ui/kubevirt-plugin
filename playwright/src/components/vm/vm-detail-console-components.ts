@@ -20,9 +20,7 @@ export class VirtualMachineDetailConsoleComponent extends BaseComponent {
   private readonly _ctrlAlt2 = this.locator('text=Ctrl + Alt + 2');
   private readonly _elapsedTimeSinceLogin = this.locator('text=Elapsed time since login');
   private readonly _guestLoginCredentials = this.locator('text=Guest login credentials');
-  private readonly _horizontalLinkOverview = this.locator(
-    '[data-test-id="horizontal-link-Overview"]',
-  );
+  private readonly _horizontalLinkOverview = this.testId('horizontal-link-Overview');
   private readonly _vncConnectButton = this.locator('.console-vnc svg');
   private readonly _vncConsoleContainer = this.locator('.console-container canvas');
   private readonly _vncContainer = this.locator('.vnc-container');
@@ -143,7 +141,7 @@ export class VirtualMachineDetailConsoleComponent extends BaseComponent {
   }
 
   async navigateToConsole(): Promise<void> {
-    await this.navigateToTab(this.locator('[data-test-id="horizontal-link-Console"]'));
+    await this.navigateToTab(this.testId('horizontal-link-Console'));
   }
 
   async navigateToOverview(): Promise<void> {
@@ -475,7 +473,7 @@ export class VirtualMachineDetailConsoleComponent extends BaseComponent {
 }
 
 export class VirtualMachineDetailDiagnosticsComponent extends BaseComponent {
-  private readonly _actionsMenuButton = this.locator('[data-test="actions-menu-button"]');
+  private readonly _actionsMenuButton = this.testId('actions-menu-button');
   private readonly _activeUsers = this.locator('text=Active users');
   private readonly _bootManagementBtn = this.locator('button:has-text("Boot management")');
   private readonly _btnIdLoadBalancer = this.locator('button[id="LoadBalancer"]');
@@ -496,7 +494,7 @@ export class VirtualMachineDetailDiagnosticsComponent extends BaseComponent {
 
   private readonly _canvas = this.locator('canvas');
 
-  private readonly _cloudInitEditButton = this.locator('[data-test-id="undefined-edit"]');
+  private readonly _cloudInitEditButton = this.testId('undefined-edit');
 
   private readonly _cloudInitPasswordInput = this.locator('#cloudinit-password');
 
@@ -506,9 +504,7 @@ export class VirtualMachineDetailDiagnosticsComponent extends BaseComponent {
     '#ConfigurationSearch-autocomplete-search input',
   );
 
-  private readonly _configurationTab = this.locator(
-    '[data-test-id="horizontal-link-Configuration"]',
-  );
+  private readonly _configurationTab = this.testId('horizontal-link-Configuration');
 
   private readonly _copyFQDNBtn = this.locator('button:has-text("Copy FQDN")');
 
@@ -518,19 +514,19 @@ export class VirtualMachineDetailDiagnosticsComponent extends BaseComponent {
 
   private readonly _dataVolumeDetails = this.locator('text=DataVolume details');
 
-  private readonly _descheduler = this.locator('[data-test-id="descheduler"]');
+  private readonly _descheduler = this.testId('descheduler');
 
   private readonly _descheduler1 = this.locator('#descheduler');
 
-  private readonly _deschedulerEdit = this.locator('[data-test-id="descheduler-edit"]');
+  private readonly _deschedulerEdit = this.testId('descheduler-edit');
 
   private readonly _detachDisk = this.locator('text=Detach disk?');
 
-  private readonly _diskRootdisk = this.locator('[data-test-id="disk-rootdisk"]');
+  private readonly _diskRootdisk = this.testId('disk-rootdisk');
 
-  private readonly _diskTypeSelect = this.locator('[data-test-id="disk-type-select"]');
+  private readonly _diskTypeSelect = this.testId('disk-type-select');
 
-  private readonly _diskTypeSelectLun = this.locator('[data-test-id="disk-type-select-lun"]');
+  private readonly _diskTypeSelectLun = this.testId('disk-type-select-lun');
 
   private readonly _divnetwork = this.locator('div#network');
   private readonly _divnetworkPfV6CMenuToggle = this.locator('div#network .pf-v6-c-menu-toggle');
@@ -540,19 +536,11 @@ export class VirtualMachineDetailDiagnosticsComponent extends BaseComponent {
   private readonly _guestSystemLogDisabledText = this.locator(
     'text=Guest system logs are disabled at cluster',
   );
-  private readonly _guestSystemLogText = this.locator(
-    '[data-test-id="vm-diagnostics-guest-system-log"]',
-  );
+  private readonly _guestSystemLogText = this.testId('vm-diagnostics-guest-system-log');
   private readonly _h1HasTextEditDisk = this.locator('h1:has-text("Edit Disk")');
-  private readonly _horizontalLinkMetrics = this.locator(
-    '[data-test-id="horizontal-link-Metrics"]',
-  );
-  private readonly _horizontalLinkOverview = this.locator(
-    '[data-test-id="horizontal-link-Overview"]',
-  );
-  private readonly _horizontalLinkSnapshots = this.locator(
-    '[data-test-id="horizontal-link-Snapshots"]',
-  );
+  private readonly _horizontalLinkMetrics = this.testId('horizontal-link-Metrics');
+  private readonly _horizontalLinkOverview = this.testId('horizontal-link-Overview');
+  private readonly _horizontalLinkSnapshots = this.testId('horizontal-link-Snapshots');
   private readonly _inProgress = this.locator('text=In progress');
   private readonly _inputIdSimpleFileFilename = this.locator('input[id="simple-file-filename"]');
   private readonly _inputInput = this.locator('input[aria-label="Input"]');
@@ -562,12 +550,10 @@ export class VirtualMachineDetailDiagnosticsComponent extends BaseComponent {
   );
   private readonly _last5Minutes = this.locator('text=Last 5 minutes');
   private readonly _lunReservation = this.locator('#lun-reservation');
-  private readonly _migrationMenu = this.locator('[data-test-id="migration-menu"]');
+  private readonly _migrationMenu = this.testId('migration-menu');
   private readonly _name = this.locator('#name');
   private readonly _operatingSystem = this.locator('text=Operating system');
-  private readonly _overviewHardwareDevicesCard = this.locator(
-    '[data-test="overview-hardware-devices-card"]',
-  );
+  private readonly _overviewHardwareDevicesCard = this.testId('overview-hardware-devices-card');
   private readonly _restoreTemplateSettingsBtn = this.locator(
     'button:has-text("Restore template settings")',
   );
@@ -576,30 +562,24 @@ export class VirtualMachineDetailDiagnosticsComponent extends BaseComponent {
   );
   private readonly _roleDialog = this.locator('[role="dialog"]');
   private readonly _roleOption = this.locator('[role="option"]');
-  private readonly _storageClassSelect = this.locator('[data-test-id="storage-class-select"]');
+  private readonly _storageClassSelect = this.testId('storage-class-select');
   private readonly _takeSnapshotBtn = this.locator('button:has-text("Take snapshot")');
   private readonly _utilChart = this.locator('.util-chart');
   private readonly _utilization = this.locator('text=Utilization');
-  private readonly _utilSummaryCpu = this.locator('[data-test-id="util-summary-cpu"]');
-  private readonly _utilSummaryMemory = this.locator('[data-test-id="util-summary-memory"]');
-  private readonly _utilSummaryNetworkTransfer = this.locator(
-    '[data-test-id="util-summary-network-transfer"]',
-  );
-  private readonly _utilSummaryStorage = this.locator('[data-test-id="util-summary-storage"]');
+  private readonly _utilSummaryCpu = this.testId('util-summary-cpu');
+  private readonly _utilSummaryMemory = this.testId('util-summary-memory');
+  private readonly _utilSummaryNetworkTransfer = this.testId('util-summary-network-transfer');
+  private readonly _utilSummaryStorage = this.testId('util-summary-storage');
   private readonly _virtualMachinesOverviewTabDisksMain = this.locator(
     '.VirtualMachinesOverviewTabDisks--main',
   );
   private readonly _virtualMachinesOverviewTabUtilizationMain = this.locator(
     '.VirtualMachinesOverviewTabUtilization--main',
   );
-  private readonly _vmConfigurationDetails = this.locator(
-    '[data-test-id="vm-configuration-details"]',
-  );
-  private readonly _vmConfigurationScheduling = this.locator(
-    '[data-test-id="vm-configuration-scheduling"]',
-  );
-  private readonly _vmConfigurationSsh = this.locator('[data-test-id="vm-configuration-ssh"]');
-  private readonly _vmDetailSaveButton = this.locator('[data-test="save-button"]');
+  private readonly _vmConfigurationDetails = this.testId('vm-configuration-details');
+  private readonly _vmConfigurationScheduling = this.testId('vm-configuration-scheduling');
+  private readonly _vmConfigurationSsh = this.testId('vm-configuration-ssh');
+  private readonly _vmDetailSaveButton = this.testId('save-button');
   constructor(page: Page) {
     super(page);
   }
@@ -727,13 +707,13 @@ export class VirtualMachineDetailDiagnosticsComponent extends BaseComponent {
   }
   async navigateToConfigurationInitialRun(): Promise<void> {
     await this.navigateToConfigurationTab();
-    await this.navigateToTab(this.locator('[data-test-id="vm-configuration-initial"]'));
+    await this.navigateToTab(this.testId('vm-configuration-initial'));
   }
   async navigateToConsole(): Promise<void> {
-    await this.navigateToTab(this.locator('[data-test-id="horizontal-link-Console"]'));
+    await this.navigateToTab(this.testId('horizontal-link-Console'));
   }
   async navigateToYAML(): Promise<void> {
-    await this.navigateToTab(this.locator('[data-test-id="horizontal-link-YAML"]'));
+    await this.navigateToTab(this.testId('horizontal-link-YAML'));
   }
   /**
    * Types into the diagnostics search box.
@@ -898,10 +878,10 @@ export class VirtualMachineDetailDiagnosticsComponent extends BaseComponent {
   }
   async verifyFolderVisible(folderName: string, _namespace?: string): Promise<boolean> {
     try {
-      // `_namespace` retained for callers; folder label is located by data-test-id only.
-      const folderElement = this.locator(
-        '[data-test-id="virtual-machine-overview-details-folder"]',
-      ).filter({ hasText: folderName });
+      // `_namespace` retained for callers; folder label is located by data-test only.
+      const folderElement = this.testId('virtual-machine-overview-details-folder').filter({
+        hasText: folderName,
+      });
       await folderElement.waitFor({ state: 'visible', timeout: TestTimeouts.UI_VISIBILITY_QUICK });
       return await folderElement.isVisible().catch(() => false);
     } catch {

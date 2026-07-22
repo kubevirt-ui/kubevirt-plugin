@@ -232,4 +232,8 @@ import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
 - Unit tests for hooks and utilities
 - Playwright E2E tests for critical user flows (new tests in `playwright/tests/scenario/`)
 - Cypress E2E tests (legacy)
-- Use `data-test` attributes for selectors
+- UI automation IDs follow a **hybrid approach**:
+  - **`ouiaId` prop** on OUIA-compliant PF components (Button, Card, TextInput, Switch, Modal, Toolbar, Checkbox, Radio, Title, DropdownItem, Table, Tr, Menu, Alert, Select) — PF renders `data-ouia-component-id` automatically
+  - **`data-test` attribute** on plain HTML elements and non-OUIA components (MenuToggle, EmptyState, SelectOption, etc.)
+  - See [PatternFly OUIA docs](https://www.patternfly.org/developer-resources/open-ui-automation) for the full list of supported components
+- In Playwright, use `this.testId('id')` for `data-test` elements and `this.ouia('id')` for OUIA elements

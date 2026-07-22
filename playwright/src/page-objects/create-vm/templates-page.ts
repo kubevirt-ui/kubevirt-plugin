@@ -14,23 +14,21 @@ export default class TemplatesPage extends PageCommons {
   private readonly _closeFilterLabelGroup = this.locator(
     '[aria-label="Close label group"]',
   ).first();
-  private readonly _columnsSaveButton = this.locator('[data-test="save-button"]');
-  private readonly _filterToolbarClusterButton = this.locator(
-    '[data-test="filter-toolbar"] button.pf-v6-c-menu-toggle',
-  )
+  private readonly _columnsSaveButton = this.testId('save-button');
+  private readonly _filterToolbarClusterButton = this.testId('filter-toolbar')
+    .locator('button.pf-v6-c-menu-toggle')
     .filter({ hasText: 'Cluster' })
     .first();
-  private readonly _filterToolbarProjectButton = this.locator(
-    '[data-test="filter-toolbar"] button.pf-v6-c-menu-toggle',
-  )
+  private readonly _filterToolbarProjectButton = this.testId('filter-toolbar')
+    .locator('button.pf-v6-c-menu-toggle')
     .filter({ hasText: 'Project' })
     .first();
-  private readonly _footerSaveButton = this.locator('footer [data-test="save-button"]');
+  private readonly _footerSaveButton = this.locator('footer').locator('[data-test="save-button"]');
 
   private readonly _inputSearchInput = this.locator('input[aria-label="Search input"]');
   private readonly _provider = this.locator('#provider');
   private readonly _roleMenuitem = this.locator('[role="menuitem"]');
-  private readonly _templateActionsDropdown = this.locator('[data-test="actions-dropdown"]');
+  private readonly _templateActionsDropdown = this.testId('actions-dropdown');
   private readonly _tr = this.locator('tr');
 
   constructor(page: Page) {
@@ -39,7 +37,7 @@ export default class TemplatesPage extends PageCommons {
 
   private getTemplateActionsButton(templateName: string): Locator {
     const row = this.getTemplateRow(templateName);
-    return row.locator('[data-test="actions-dropdown"] button').first();
+    return row.getByTestId('actions-dropdown').locator('button').first();
   }
 
   private getTemplateRow(templateName: string): Locator {
@@ -47,7 +45,7 @@ export default class TemplatesPage extends PageCommons {
   }
 
   async areAllCreateOptionsVisibleAndEnabled(): Promise<boolean> {
-    const createTemplateButton = this.locator('[data-test="item-create"]');
+    const createTemplateButton = this.testId('item-create');
     await createTemplateButton.waitFor({
       state: 'visible',
       timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
@@ -83,14 +81,14 @@ export default class TemplatesPage extends PageCommons {
   }
 
   async clickCreateButtonInModal() {
-    const createButton = this.locator('[data-test="save-changes"], button:has-text("Create")');
+    const createButton = this.testId('save-changes').or(this.locator('button:has-text("Create")'));
     await createButton.first().waitFor({ state: 'visible', timeout: TestTimeouts.UI_DELAY_LONG });
     await this.robustClick(createButton.first());
     await this.page.waitForTimeout(TestTimeouts.RETRY_DELAY);
   }
 
   async clickCreateTemplate() {
-    const createTemplateButton = this.locator('[data-test="item-create"]');
+    const createTemplateButton = this.testId('item-create');
     await createTemplateButton.waitFor({
       state: 'visible',
       timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
@@ -109,7 +107,7 @@ export default class TemplatesPage extends PageCommons {
   async clickCreateTemplateOption(
     option: 'From an existing template' | 'From a virtual machine' | 'With YAML',
   ): Promise<void> {
-    const createTemplateButton = this.locator('[data-test="item-create"]');
+    const createTemplateButton = this.testId('item-create');
     await createTemplateButton.waitFor({
       state: 'visible',
       timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
@@ -117,7 +115,7 @@ export default class TemplatesPage extends PageCommons {
     await this.robustClick(createTemplateButton);
 
     const menuItem = this.page.getByRole('menuitem', { name: option });
-    await menuItem.waitFor({ state: 'visible', timeout: TestTimeouts.UI_DELAY_MEDIUM });
+    await menuItem.waitFor({ state: 'visible', timeout: TestTimeouts.DEFAULT });
     await this.robustClick(menuItem);
   }
 
@@ -132,9 +130,11 @@ export default class TemplatesPage extends PageCommons {
   }
 
   override async clickTemplateByTestId(templateName: string) {
-    const templateLink = this.locator(`[data-test-id="${templateName}"]`);
+    const templateLink = this.testId(templateName);
 
-    const loadingSpinner = this.locator('.pf-v6-c-spinner, .pf-c-spinner, [data-test="loading"]');
+    const loadingSpinner = this.locator('.pf-v6-c-spinner, .pf-c-spinner').or(
+      this.testId('loading'),
+    );
     await loadingSpinner
       .waitFor({ state: 'hidden', timeout: TestTimeouts.UI_DELAY_MEDIUM })
       .catch(() => {
@@ -276,7 +276,7 @@ export default class TemplatesPage extends PageCommons {
 
   async editBootSourceForDisk(diskName: string) {
     await this.robustClick(this._templateActionsDropdown);
-    await this.robustClick(this.locator('[data-test-id="edit-boot-source"]'));
+    await this.robustClick(this.testId('edit-boot-source'));
 
     const diskRow = this._tr.filter({ hasText: diskName });
     const diskToggle = diskRow.locator('#toggle-id-disk');
@@ -369,6 +369,8 @@ export default class TemplatesPage extends PageCommons {
       if (!isChecked) {
         await newRadio.click({ force: true });
       }
+      await this.page.waitForLoadState('domcontentloaded').catch(() => undefined);
+      await this.page.waitForTimeout(TestTimeouts.UI_FILTER_APPLY / 3);
       return;
     }
     const isOldVisible = await oldCheckbox
@@ -440,7 +442,7 @@ export default class TemplatesPage extends PageCommons {
   }
 
   async filterTemplatesByName(templateName: string) {
-    const templateNameFilter = this.locator('[data-test="name-filter-input"]');
+    const templateNameFilter = this.testId('item-filter').or(this.testId('name-filter-input'));
     await templateNameFilter.waitFor({
       state: 'visible',
       timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
@@ -467,7 +469,7 @@ export default class TemplatesPage extends PageCommons {
   }
 
   async isBaseTemplateVisible(templateName: string): Promise<boolean> {
-    const baseTemplateElement = this.locator(`[data-test="${templateName}"]`);
+    const baseTemplateElement = this.testId(templateName);
     await baseTemplateElement
       .waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY })
       .catch(() => {
@@ -482,7 +484,7 @@ export default class TemplatesPage extends PageCommons {
   async isColumnEnabled(
     columnName: 'namespace' | 'workload' | 'architecture' | 'cpu',
   ): Promise<boolean> {
-    const columnManagementButton = this.locator('[data-test="manage-columns"]');
+    const columnManagementButton = this.testId('manage-columns');
     await columnManagementButton.waitFor({
       state: 'visible',
       timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
@@ -507,8 +509,8 @@ export default class TemplatesPage extends PageCommons {
    */
   async isCreateTemplateModalShowingClusterAndNamespaceOptions(): Promise<boolean> {
     try {
-      const clusterToggle = this.locator('[data-test="cluster-dropdown-menu-toggle"]').first();
-      const namespaceToggle = this.locator('[data-test="namespace-dropdown-menu-toggle"]').first();
+      const clusterToggle = this.testId('cluster-dropdown-menu-toggle').first();
+      const namespaceToggle = this.testId('namespace-dropdown-menu-toggle').first();
       await clusterToggle.waitFor({
         state: 'visible',
         timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
@@ -554,7 +556,7 @@ export default class TemplatesPage extends PageCommons {
   }
 
   async isTemplateNameLinkVisible(templateMetadataName: string): Promise<boolean> {
-    const templateLocator = this.locator(`[data-test-id="${templateMetadataName}-name"]`);
+    const templateLocator = this.testId(`${templateMetadataName}-name`);
     await templateLocator
       .waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY })
       .catch(() => {
@@ -564,7 +566,7 @@ export default class TemplatesPage extends PageCommons {
   }
 
   async isTemplateVisible(templateMetadataName: string): Promise<boolean> {
-    const templateLocator = this.locator(`[data-test-id="${templateMetadataName}"]`);
+    const templateLocator = this.testId(templateMetadataName);
     try {
       await templateLocator.waitFor({ state: 'visible', timeout: TestTimeouts.UI_DELAY_MEDIUM });
       return true;
@@ -598,19 +600,20 @@ export default class TemplatesPage extends PageCommons {
   async navigateToTemplateDetail(templateName: string) {
     const row = this.getTemplateRow(templateName);
     const templateLink = row
-      .locator(`[data-test-id="${templateName}"], a`)
+      .getByTestId(templateName)
+      .or(row.locator('a'))
       .filter({ hasText: templateName })
       .first();
     await this.robustClick(templateLink);
   }
 
   /**
-   * Navigates to Templates page by clicking [data-test-id="templates-nav-item"] (Fleet context).
+   * Navigates to Templates page by clicking [data-test="templates-nav-item"] (Fleet context).
    * Expands the Virtualization nav section first so the item is visible.
    */
   async navigateToTemplatesViaTemplatesNavItem(): Promise<void> {
     await this.expandVirtualizationNavSection();
-    const navItem = this.locator('[data-test-id="templates-nav-item"]');
+    const navItem = this.testId('templates-nav-item');
     await navItem.waitFor({
       state: 'visible',
       timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
@@ -643,9 +646,7 @@ export default class TemplatesPage extends PageCommons {
       .catch(() => false);
 
     if (!isVisible) {
-      await this.robustClick(
-        this.locator('[data-test="filter-toolbar"] [data-test-id="filter-dropdown-toggle"]'),
-      );
+      await this.robustClick(this.testId('filter-toolbar').getByTestId('filter-dropdown-toggle'));
       await dropdownMenu.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
     }
   }
@@ -659,14 +660,14 @@ export default class TemplatesPage extends PageCommons {
   }
 
   async resetColumns() {
-    const columnManagementButton = this.locator('[data-test="manage-columns"]');
+    const columnManagementButton = this.testId('manage-columns');
     await columnManagementButton.waitFor({
       state: 'visible',
       timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
     });
     await this.page.waitForTimeout(TestTimeouts.UI_DELAY_EXTRA);
     await this.robustClick(columnManagementButton);
-    const resetColumnsButton = this.locator('[data-test="reset-button"]');
+    const resetColumnsButton = this.testId('reset-button');
     await resetColumnsButton.waitFor({
       state: 'visible',
       timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
@@ -693,9 +694,7 @@ export default class TemplatesPage extends PageCommons {
 
   async selectPvcAsBootSource(projectName: string, pvcName: string) {
     await this.robustClick(this.locator('button:has-text("Select boot source")'));
-    await this.robustClick(
-      this.locator('[data-test-id="disk-source-select-persistentVolumeClaim"]'),
-    );
+    await this.robustClick(this.testId('disk-source-select-persistentVolumeClaim'));
     await this.robustClick(this.locator('text=--- Select PVC project ---'));
     await this.clickButtonByText(projectName);
     await this.robustClick(this.locator('.pf-c-form-control.pf-c-select__toggle-typeahead'));
@@ -762,7 +761,7 @@ export default class TemplatesPage extends PageCommons {
   }
 
   async toggleColumn(columnName: 'namespace' | 'workload' | 'architecture' | 'cpu') {
-    const columnManagementButton = this.locator('[data-test="manage-columns"]');
+    const columnManagementButton = this.testId('manage-columns');
     await columnManagementButton.waitFor({
       state: 'visible',
       timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
@@ -859,7 +858,7 @@ export default class TemplatesPage extends PageCommons {
       await this.page.waitForLoadState('domcontentloaded');
       await this.page.waitForTimeout(TestTimeouts.UI_STABILIZE);
 
-      const templateNameLocator = this.locator(`[data-test-id="${templateName}"]`);
+      const templateNameLocator = this.testId(templateName);
       try {
         await templateNameLocator.waitFor({
           state: 'visible',
@@ -870,9 +869,23 @@ export default class TemplatesPage extends PageCommons {
         return false;
       }
     }
-    const indicators = Array.isArray(templateNameOrIndicators)
-      ? templateNameOrIndicators
-      : ['[data-test-id="template-name"]'];
+    const indicators = Array.isArray(templateNameOrIndicators) ? templateNameOrIndicators : [];
+    if (indicators.length === 0) {
+      const templateNameLocator = this.testId('template-name');
+      const createButton = this.testId('item-create');
+      const indicator = includeCreateButton
+        ? templateNameLocator.or(createButton)
+        : templateNameLocator;
+      try {
+        await indicator.first().waitFor({
+          state: 'visible',
+          timeout: timeout || TestTimeouts.UI_VISIBILITY_QUICK,
+        });
+        return true;
+      } catch {
+        return false;
+      }
+    }
     return await super.verifyPageLoaded(indicators, includeCreateButton, timeout);
   }
 

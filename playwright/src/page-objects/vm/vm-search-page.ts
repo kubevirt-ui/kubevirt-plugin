@@ -3,43 +3,35 @@ import { TestTimeouts } from '@/utils/test-config';
 import type { Page } from '@playwright/test';
 
 export default class VmSearchPage extends PageCommons {
-  private readonly _advSearchMemOperatorToggle = this.locator(
-    '[data-test="adv-search-mem-operator-toggle"]',
-  );
-  private readonly _advSearchNetwork = this.locator('[data-test="adv-search-network"]');
-  private readonly _advSearchVmProjectToggle = this.locator(
-    '[data-test="adv-search-vm-project-toggle"]',
-  );
+  private readonly _advSearchMemOperatorToggle = this.testId('adv-search-mem-operator-toggle');
+  private readonly _advSearchNetwork = this.testId('adv-search-network');
+  private readonly _advSearchVmProjectToggle = this.testId('adv-search-vm-project-toggle');
   private readonly _allSearchResultsFoundBtn = this.locator(
     'button:has-text("All search results found")',
   );
   private readonly _backToVirtualMachinesListBtn = this.locator(
     'button:has-text("Back to VirtualMachines list")',
   );
-  private readonly _footerSaveButton = this.locator('footer [data-test="save-button"]');
+  private readonly _footerSaveButton = this.locator('footer').locator('[data-test="save-button"]');
   private readonly _h1H2H3H4H5H6 = this.locator('h1, h2, h3, h4, h5, h6');
-  private readonly _savedSearches = this.locator('[data-test="saved-searches"]');
+  private readonly _savedSearches = this.testId('saved-searches');
   private readonly _savedSearchesBtn = this.locator('button:has-text("Saved searches")');
-  private readonly _saveSearchButton = this.locator('[data-test="save-search"]');
-  private readonly _saveSearchDescription = this.locator(
-    '[data-test-id="save-search-description"]',
+  private readonly _saveSearchButton = this.testId('save-search');
+  private readonly _saveSearchDescription = this.testId('save-search-description');
+  private readonly _saveSearchName = this.testId('save-search-name');
+  private readonly _searchBarResults = this.testId('search-results').or(
+    this.locator('.pf-v6-c-panel.pf-m-raised'),
   );
-  private readonly _saveSearchName = this.locator('[data-test-id="save-search-name"]');
-  private readonly _searchBarResults = this.locator(
-    '[data-test="search-results"], .pf-v6-c-panel.pf-m-raised',
-  );
-  private readonly _searchBarResults1 = this.locator('[data-test="search-bar-results"]');
-  private readonly _vmAdvancedSearchButton = this.locator(
-    '[data-test="vm-advanced-search-button"]',
-  );
-  private readonly _vmSearchInputByDataTest = this.locator('[data-test="vm-search-input"] input');
+  private readonly _searchBarResults1 = this.testId('search-bar-results');
+  private readonly _vmAdvancedSearchButton = this.testId('vm-advanced-search-button');
+  private readonly _vmSearchInputByDataTest = this.testId('vm-search-input').locator('input');
 
   constructor(page: Page) {
     super(page);
   }
 
   private async fillAdvSearchField(testId: string, value: string): Promise<void> {
-    const field = this.locator(`[data-test="${testId}"]`);
+    const field = this.testId(testId);
     await field.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
     await field.clear();
     await field.fill(value);
@@ -105,18 +97,19 @@ export default class VmSearchPage extends PageCommons {
     if (clearVisible) {
       await this.robustClick(clearBtn);
     } else {
-      const searchInput = this.locator(
-        '[data-test="vm-adv-search-toolbar"] input, [data-test="vm-search-input"] input',
-      ).first();
+      const searchInput = this.testId('vm-adv-search-toolbar')
+        .locator('input')
+        .or(this.testId('vm-search-input').locator('input'))
+        .first();
       await searchInput.clear();
     }
     await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
   }
 
   async clickDeleteSavedSearch(saveName: string): Promise<void> {
-    const savedSearchItem = this.locator(`[data-test="saved-search-item-${saveName}"]`);
+    const savedSearchItem = this.testId(`saved-search-item-${saveName}`);
     await savedSearchItem.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
-    const deleteButton = savedSearchItem.locator(`[data-test="delete-search-item-${saveName}"]`);
+    const deleteButton = savedSearchItem.getByTestId(`delete-search-item-${saveName}`);
     await deleteButton.waitFor({ state: 'visible', timeout: TestTimeouts.SHORT_WAIT });
     await this.robustClick(deleteButton);
   }
@@ -130,9 +123,10 @@ export default class VmSearchPage extends PageCommons {
   }
 
   async clickResultsAdvancedSearch(): Promise<void> {
-    const advSearchBtn = this.locator(
-      '[data-test="results-advanced-search"], [data-test="advanced-search"], [data-test="try-advanced-search"]',
-    ).first();
+    const advSearchBtn = this.testId('results-advanced-search')
+      .or(this.testId('advanced-search'))
+      .or(this.testId('try-advanced-search'))
+      .first();
     await advSearchBtn.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
     await this.robustClick(advSearchBtn);
   }
@@ -188,15 +182,12 @@ export default class VmSearchPage extends PageCommons {
   }
 
   async clickSearchButton(): Promise<void> {
-    await this.locator('[data-test="search-results"] button', {
-      hasText: 'Search',
-    })
+    await this.testId('search-results')
+      .locator('button', { hasText: 'Search' })
       .first()
       .waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
     await this.robustClick(
-      this.locator('[data-test="search-results"] button', {
-        hasText: 'Search',
-      }).first(),
+      this.testId('search-results').locator('button', { hasText: 'Search' }).first(),
     );
   }
 
@@ -303,9 +294,10 @@ export default class VmSearchPage extends PageCommons {
   }
 
   async searchInAdvSearchToolbar(searchText: string): Promise<void> {
-    const searchInput = this.locator(
-      '[data-test="vm-adv-search-toolbar"] input, [data-test="vm-search-input"] input',
-    ).first();
+    const searchInput = this.testId('vm-adv-search-toolbar')
+      .locator('input')
+      .or(this.testId('vm-search-input').locator('input'))
+      .first();
     await searchInput.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
     await searchInput.clear();
     await searchInput.pressSequentially(searchText, { delay: 100 });
@@ -332,7 +324,7 @@ export default class VmSearchPage extends PageCommons {
   }
 
   async setAdvancedSearchDate(date: string): Promise<void> {
-    const dateToggle = this.locator('[data-test-id="adv-search-vm-date-toggle"]');
+    const dateToggle = this.testId('adv-search-date-select');
     await dateToggle.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
     await this.robustClick(dateToggle);
     await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
@@ -358,7 +350,7 @@ export default class VmSearchPage extends PageCommons {
   }
 
   async setAdvancedSearchLabel(labelKey: string, labelValue: string): Promise<void> {
-    const labelsInput = this.locator('[data-test="adv-search-vm-labels-toggle"]').locator('input');
+    const labelsInput = this.testId('adv-search-vm-labels-toggle').locator('input');
     await labelsInput.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
     await labelsInput.clear();
     await labelsInput.fill(labelKey);
@@ -384,7 +376,7 @@ export default class VmSearchPage extends PageCommons {
   }
 
   async setAdvancedSearchNad(nad: string): Promise<void> {
-    const nadToggle = this.locator('[data-test-id="adv-search-vm-nad-toggle"]');
+    const nadToggle = this.testId('adv-search-vm-nad');
     await nadToggle.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
     await this.robustClick(nadToggle);
     await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
@@ -398,7 +390,7 @@ export default class VmSearchPage extends PageCommons {
   }
 
   async setAdvancedSearchNodes(node: string): Promise<void> {
-    const nodeToggle = this.locator('[data-test-id="adv-search-vm-node-toggle"]');
+    const nodeToggle = this.testId('adv-search-vm-nodes');
     await nodeToggle.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
     await this.robustClick(nodeToggle);
     await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
@@ -408,7 +400,7 @@ export default class VmSearchPage extends PageCommons {
   }
 
   async setAdvancedSearchOs(os: string): Promise<void> {
-    const osToggle = this.locator('[data-test-id="adv-search-vm-os-toggle"]');
+    const osToggle = this.testId('adv-search-vm-os');
     await osToggle.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
     await this.robustClick(osToggle);
     await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
@@ -429,7 +421,7 @@ export default class VmSearchPage extends PageCommons {
   }
 
   async setAdvancedSearchStatus(status: string): Promise<void> {
-    const statusToggle = this.locator('[data-test="adv-search-vm-status-toggle"]');
+    const statusToggle = this.testId('adv-search-vm-status-toggle');
     await statusToggle.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
     await this.robustClick(statusToggle);
     await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
@@ -440,7 +432,7 @@ export default class VmSearchPage extends PageCommons {
   }
 
   async setAdvancedSearchStorageClass(storageClass: string): Promise<void> {
-    const scToggle = this.locator('[data-test-id="adv-search-vm-storageclass-toggle"]');
+    const scToggle = this.testId('adv-search-vm-storage-class');
     await scToggle.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
     await this.robustClick(scToggle);
     await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
@@ -535,7 +527,8 @@ export default class VmSearchPage extends PageCommons {
   async verifyVmNameInSearchResults(vmName: string): Promise<boolean> {
     try {
       const vmLink = this._searchBarResults
-        .locator(`[data-test-id="${vmName}"], a:has-text("${vmName}")`)
+        .getByTestId(vmName)
+        .or(this._searchBarResults.locator(`a:has-text("${vmName}")`))
         .first();
       await vmLink.waitFor({ state: 'visible', timeout: TestTimeouts.SHORT_WAIT });
       return await vmLink.isVisible().catch(() => false);

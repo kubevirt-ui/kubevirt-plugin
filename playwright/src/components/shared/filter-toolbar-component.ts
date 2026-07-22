@@ -29,14 +29,12 @@ export default class FilterToolbarComponent extends BaseComponent {
   }
 
   async clickDropdownButton(): Promise<void> {
-    const filterDropdownButton = this.locator('[data-test-id="filter-dropdown-toggle"]').locator(
-      'button',
-    );
+    const filterDropdownButton = this.testId('filter-dropdown-toggle').locator('button');
     await this.robustClick(filterDropdownButton);
   }
 
   async clickManageColumns(): Promise<void> {
-    await this.robustClick(this.locator('button[data-test="manage-columns"]'));
+    await this.robustClick(this.testId('manage-columns'));
   }
 
   async clickReset(): Promise<void> {
@@ -52,7 +50,7 @@ export default class FilterToolbarComponent extends BaseComponent {
   }
 
   async filterByName(name: string): Promise<void> {
-    const itemFilter = this.locator('[data-test-id="item-filter"]');
+    const itemFilter = this.testId('item-filter');
     await itemFilter.clear();
     await itemFilter.fill(name);
     await itemFilter.press('Tab');
@@ -60,7 +58,7 @@ export default class FilterToolbarComponent extends BaseComponent {
   }
 
   async saveColumns(): Promise<void> {
-    await this.robustClick(this.locator('button#confirm-action'));
+    await this.robustClick(this.testId('save-button'));
   }
 
   async toggleRowFilter(filterKey: string, enable: boolean): Promise<void> {
