@@ -2,10 +2,11 @@ import { useMemo } from 'react';
 
 import { useClusterFilter } from '@kubevirt-utils/hooks/useClusterFilter';
 import { useProjectFilter } from '@kubevirt-utils/hooks/useProjectFilter';
-import { Template, TemplateOrRequest } from '@kubevirt-utils/resources/template';
+import { type Template, type TemplateOrRequest } from '@kubevirt-utils/resources/template';
 import useIsACMPage from '@multicluster/useIsACMPage';
-import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
+import { type RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 
+import { TemplateFilterType } from './types';
 import useArchitectureFilter from './useArchitectureFilter';
 import useOSFilter from './useOSFilter';
 import useProviderFilter from './useProviderFilter';
@@ -17,6 +18,7 @@ const useVirtualMachineTemplatesFilters = (
 ): {
   filters: RowFilter<TemplateOrRequest>[];
   filtersWithSelect: RowFilter<TemplateOrRequest>[];
+  toolbarFilters: RowFilter<TemplateOrRequest>[];
 } => {
   const isACMPage = useIsACMPage();
   const clusterFilter = useClusterFilter();
@@ -38,12 +40,20 @@ const useVirtualMachineTemplatesFilters = (
     [typeFilter, architectureFilter, scopeFilter, providerFilter, osFilter],
   );
 
-  return useMemo(() => {
-    return {
+  // Type is controlled by TemplatesTypeToggle; keep it out of the Filter dropdown/chips.
+  const toolbarFilters = useMemo(
+    () => filters.filter((filter) => filter.type !== TemplateFilterType.Type),
+    [filters],
+  );
+
+  return useMemo(
+    () => ({
       filters,
       filtersWithSelect,
-    };
-  }, [filters, filtersWithSelect]);
+      toolbarFilters,
+    }),
+    [filters, filtersWithSelect, toolbarFilters],
+  );
 };
 
 export default useVirtualMachineTemplatesFilters;

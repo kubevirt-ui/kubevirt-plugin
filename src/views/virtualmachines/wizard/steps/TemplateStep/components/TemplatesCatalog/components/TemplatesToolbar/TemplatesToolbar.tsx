@@ -1,6 +1,6 @@
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
-import { OnFilterChange } from '@openshift-console/dynamic-plugin-sdk';
+import { type OnFilterChange } from '@openshift-console/dynamic-plugin-sdk';
 import { Split, SplitItem } from '@patternfly/react-core';
 import { TemplatesCatalogProjectsDropdown } from '@virtualmachines/wizard/steps/TemplateStep/components/TemplatesCatalog/components/TemplatesToolbar/components/TemplatesCatalogProjectsDropdown/TemplatesCatalogProjectsDropdown';
 import TemplatesCatalogStyleToggle from '@virtualmachines/wizard/steps/TemplateStep/components/TemplatesCatalog/components/TemplatesToolbar/components/TemplatesCatalogStyleToggle';

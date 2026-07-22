@@ -1,0 +1,15 @@
+.templates-type-toggle {
+  // Match toolbar MenuToggle (Filter / Cluster / Project) control height.
+  --pf-v6-c-toggle-group__button--PaddingBlockStart: var(
+    --pf-t--global--spacer--control--vertical--default
+  );
+  --pf-v6-c-toggle-group__button--PaddingBlockEnd: var(
+    --pf-t--global--spacer--control--vertical--default
+  );
+  --pf-v6-c-toggle-group__button--PaddingInlineStart: var(
+    --pf-t--global--spacer--control--horizontal--default
+  );
+  --pf-v6-c-toggle-group__button--PaddingInlineEnd: var(
+    --pf-t--global--spacer--control--horizontal--default
+  );
+}

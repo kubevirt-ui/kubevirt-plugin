@@ -1,6 +1,12 @@
-import { ReactNode } from 'react';
+import { type ReactNode } from 'react';
 
-import { RowFilter, RowFilterItem } from '@openshift-console/dynamic-plugin-sdk';
+import {
+  type ColumnLayout,
+  type K8sResourceCommon,
+  type OnFilterChange,
+  type RowFilter,
+  type RowFilterItem,
+} from '@openshift-console/dynamic-plugin-sdk';
 
 export type ApplyTextFilters = (type: string, value?: string | string[]) => void;
 
@@ -25,6 +31,24 @@ export type ExtendedRowFilterItem = RowFilterItem & {
   content?: ReactNode;
 };
 
-export type ExtendedRowFilter<R = any> = Omit<RowFilter<R>, 'items'> & {
+export type ExtendedRowFilter<R = unknown> = Omit<RowFilter<R>, 'items'> & {
   items: ExtendedRowFilterItem[];
+};
+
+export type ListPageFilterProps = {
+  className?: string;
+  columnLayout?: ColumnLayout;
+  customRowFiltersMenu?: ReactNode;
+  data?: K8sResourceCommon[];
+  filtersWithSelect?: RowFilter[];
+  hideColumnManagement?: boolean;
+  hideLabelFilter?: boolean;
+  hideNameLabelFilters?: boolean;
+  loaded?: boolean;
+  nameFilterPlaceholder?: string;
+  onFilterChange?: OnFilterChange;
+  rowFilters?: RowFilter[];
+  searchFilters?: RowFilter[];
+  toolbarEndContent?: ReactNode;
+  toolbarStartContent?: ReactNode;
 };
