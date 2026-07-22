@@ -3,7 +3,7 @@ import React, { FC, useMemo } from 'react';
 import { V1beta1NetworkMap } from '@forklift-ui/types';
 import { NetworkAttachmentDefinitionModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
-import { NetworkAttachmentDefinition } from '@kubevirt-utils/components/NetworkInterfaceModal/components/hooks/types';
+import { NetworkAttachmentDefinitionKind } from '@kubevirt-utils/resources/nad/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { modelToGroupVersionKind } from '@kubevirt-utils/models';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
@@ -15,7 +15,7 @@ import { getNADNameAndNamespace } from '../utils';
 
 type NetworkMappingProps = {
   changeNetworkMap: UseNetworkReadinessReturnType['changeNetworkMap'];
-  nads: NetworkAttachmentDefinition[];
+  nads: NetworkAttachmentDefinitionKind[];
   networkMap: V1beta1NetworkMap;
 };
 

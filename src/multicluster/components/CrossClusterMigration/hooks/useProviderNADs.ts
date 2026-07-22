@@ -1,5 +1,5 @@
 import { NetworkAttachmentDefinitionModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { NetworkAttachmentDefinition } from '@kubevirt-utils/components/NetworkInterfaceModal/components/hooks/types';
+import { NetworkAttachmentDefinitionKind } from '@kubevirt-utils/resources/nad/types';
 import {
   DEFAULT_NAMESPACE,
   OPENSHIFT_MULTUS_NS,
@@ -10,7 +10,7 @@ import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 
 const useProviderNADs = (targetCluster: string, namespace: string) => {
   const [namespaceNADs, namespaceNADsLoaded, namespaceNADsError] = useK8sWatchData<
-    NetworkAttachmentDefinition[]
+    NetworkAttachmentDefinitionKind[]
   >({
     cluster: targetCluster,
     groupVersionKind: modelToGroupVersionKind(NetworkAttachmentDefinitionModel),
@@ -18,21 +18,21 @@ const useProviderNADs = (targetCluster: string, namespace: string) => {
     namespace,
   });
 
-  const [defaultNADs, defaultNADsLoaded] = useK8sWatchData<NetworkAttachmentDefinition[]>({
+  const [defaultNADs, defaultNADsLoaded] = useK8sWatchData<NetworkAttachmentDefinitionKind[]>({
     cluster: targetCluster,
     groupVersionKind: modelToGroupVersionKind(NetworkAttachmentDefinitionModel),
     isList: true,
     namespace: DEFAULT_NAMESPACE,
   });
 
-  const [multusNADs, multusNADsLoaded] = useK8sWatchData<NetworkAttachmentDefinition[]>({
+  const [multusNADs, multusNADsLoaded] = useK8sWatchData<NetworkAttachmentDefinitionKind[]>({
     cluster: targetCluster,
     groupVersionKind: modelToGroupVersionKind(NetworkAttachmentDefinitionModel),
     isList: true,
     namespace: OPENSHIFT_MULTUS_NS,
   });
 
-  const [sriovNADs, sriovNADsLoaded] = useK8sWatchData<NetworkAttachmentDefinition[]>({
+  const [sriovNADs, sriovNADsLoaded] = useK8sWatchData<NetworkAttachmentDefinitionKind[]>({
     cluster: targetCluster,
     groupVersionKind: modelToGroupVersionKind(NetworkAttachmentDefinitionModel),
     isList: true,

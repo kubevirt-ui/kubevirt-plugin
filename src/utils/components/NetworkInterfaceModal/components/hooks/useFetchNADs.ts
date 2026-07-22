@@ -2,19 +2,21 @@ import { useMemo } from 'react';
 
 import { GLOBAL_NAD_NAMESPACES } from '@kubevirt-utils/constants/constants';
 import { NetworkAttachmentDefinitionModelGroupVersionKind } from '@kubevirt-utils/models';
+import { type NetworkAttachmentDefinitionKind } from '@kubevirt-utils/resources/nad/types';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 
-import { NetworkAttachmentDefinition } from './types';
 import useNADListPermissions from './useNADListPermissions';
 import { resources, watchResourceIfAllowed } from './utils';
 
 export const useFetchNADs = (
   namespace: string,
   cluster: string,
-): [data: NetworkAttachmentDefinition[], loaded: boolean, error: any] => {
+  // K8s watch errors are untyped from the Console SDK.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- propagated to useNADsData consumers
+): [data: NetworkAttachmentDefinitionKind[], loaded: boolean, error: any] => {
   const allowMap = useNADListPermissions(cluster);
   const [namespaceData, namespaceLoaded, namespaceLoadError] = useK8sWatchData<
-    NetworkAttachmentDefinition[]
+    NetworkAttachmentDefinitionKind[]
   >(
     watchResourceIfAllowed(
       {
@@ -28,14 +30,16 @@ export const useFetchNADs = (
   );
 
   const [defaultData, defaultLoaded, defaultLoadError] = useK8sWatchData<
-    NetworkAttachmentDefinition[]
+    NetworkAttachmentDefinitionKind[]
   >(watchResourceIfAllowed(resources.default, allowMap.default, cluster));
 
   const [multusData, multusLoaded, multusLoadError] = useK8sWatchData<
-    NetworkAttachmentDefinition[]
+    NetworkAttachmentDefinitionKind[]
   >(watchResourceIfAllowed(resources.OPENSHIFT_MULTUS_NS, allowMap.OPENSHIFT_MULTUS_NS, cluster));
 
-  const [sriovData, sriovLoaded, sriovLoadError] = useK8sWatchData<NetworkAttachmentDefinition[]>(
+  const [sriovData, sriovLoaded, sriovLoadError] = useK8sWatchData<
+    NetworkAttachmentDefinitionKind[]
+  >(
     watchResourceIfAllowed(
       resources.OPENSHIFT_SRIOV_NETWORK_OPERATOR_NS,
       allowMap.OPENSHIFT_SRIOV_NETWORK_OPERATOR_NS,

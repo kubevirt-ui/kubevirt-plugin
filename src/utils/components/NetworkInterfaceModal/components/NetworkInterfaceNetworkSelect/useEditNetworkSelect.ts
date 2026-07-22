@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction, useEffect, useMemo, useState } from 'react';
 
-import { NetworkAttachmentDefinition } from '../hooks/types';
+import { NetworkAttachmentDefinitionKind } from '@kubevirt-utils/resources/nad/types';
 
 import {
   filterNADsForSelect,
@@ -13,7 +13,7 @@ type UseEditNetworkSelectArgs = {
   editInitValueNetworkName?: string;
   isEditing?: boolean;
   loaded: boolean;
-  nads: NetworkAttachmentDefinition[];
+  nads: NetworkAttachmentDefinitionKind[];
   networkName: string;
   setSubmitDisabled: Dispatch<SetStateAction<boolean>>;
   vmiNamespace: string;

@@ -10,7 +10,7 @@ import {
   UserDefinedNetworkKind,
 } from '@kubevirt-utils/resources/udn/types';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
-import { NetworkAttachmentDefinitionKind } from '@overview/OverviewTab/inventory-card/utils/types';
+import { NetworkAttachmentDefinitionKind } from '@kubevirt-utils/resources/nad/types';
 
 import { VALID_OTHER_VM_NETWORK_TYPES } from '../constants';
 import { OtherVMNetwork, OtherVMNetworkWithType } from '../types';

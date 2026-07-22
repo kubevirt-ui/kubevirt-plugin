@@ -11,7 +11,7 @@ import {
   V1beta1StorageMapSpecMap,
 } from '@forklift-ui/types';
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { NetworkAttachmentDefinition } from '@kubevirt-utils/components/NetworkInterfaceModal/components/hooks/types';
+import { NetworkAttachmentDefinitionKind } from '@kubevirt-utils/resources/nad/types';
 import { getName, getNamespace, getUID } from '@kubevirt-utils/resources/shared';
 import { getNetworks, getVolumes } from '@kubevirt-utils/resources/vm';
 import { getRandomChars } from '@kubevirt-utils/utils/utils';
@@ -76,7 +76,7 @@ export const getNADNameAndNamespace = (nad: string, defaultNamespace?: string) =
 
 export const getInitialNetworkMap = (
   vms: V1VirtualMachine[],
-  targetNADs: NetworkAttachmentDefinition[],
+  targetNADs: NetworkAttachmentDefinitionKind[],
 ): V1beta1NetworkMap => {
   const sourceNamespace = getNamespace(vms?.[0]);
   const networks = vms

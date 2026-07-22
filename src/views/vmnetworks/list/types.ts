@@ -2,7 +2,7 @@ import {
   ClusterUserDefinedNetworkKind,
   UserDefinedNetworkKind,
 } from '@kubevirt-utils/resources/udn/types';
-import { NetworkAttachmentDefinitionKind } from '@overview/OverviewTab/inventory-card/utils/types';
+import { NetworkAttachmentDefinitionKind } from '@kubevirt-utils/resources/nad/types';
 
 export enum VMNetworkType {
   INVALID = 'invalid',

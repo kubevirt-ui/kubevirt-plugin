@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 
 import useIsIPv6SingleStackCluster from '@kubevirt-utils/hooks/useIPStackType/useIsIPv6SingleStackCluster';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useProjectNetworkSettings from '@kubevirt-utils/resources/namespace/hooks/useProjectNetworkSettings';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import useNamespaceUDN from '@kubevirt-utils/resources/udn/hooks/useNamespaceUDN';
 import { interfaceTypesProxy } from '@kubevirt-utils/resources/vm/utils/network/constants';
@@ -50,6 +51,10 @@ export default function useNetworkInterfaceData({
   const isIPv6SingleStack = useIsIPv6SingleStackCluster(getCluster(vm));
   const vmiNamespace = getNamespace(vm) ?? namespace;
   const { loaded, loadError, nads, primaryNADs } = useNADsData(vmiNamespace, getCluster(vm));
+  const { isPodNetworkAllowed, loaded: projectNetworkLoaded } = useProjectNetworkSettings({
+    cluster: getCluster(vm),
+    namespaceName: vmiNamespace,
+  });
   const [isNamespaceManagedByUDN] = useNamespaceUDN(vmiNamespace);
   const podNetworkType = isNamespaceManagedByUDN
     ? interfaceTypesProxy.l2bridge
@@ -91,6 +96,7 @@ export default function useNetworkInterfaceData({
     hasPodNetwork,
     isEditing,
     isIPv6SingleStack,
+    isPodNetworkAllowed,
   });
   const canCreateNetworkInterface = filteredNADs?.length > 0 || !hasPodNetwork;
 
@@ -124,7 +130,8 @@ export default function useNetworkInterfaceData({
   const handleChange = useNetworkAutoSelect({
     canCreateNetworkInterface,
     isEditing,
-    loaded,
+    isPodNetworkAllowed,
+    loaded: loaded && projectNetworkLoaded,
     loadError,
     networkName,
     networkOptions,

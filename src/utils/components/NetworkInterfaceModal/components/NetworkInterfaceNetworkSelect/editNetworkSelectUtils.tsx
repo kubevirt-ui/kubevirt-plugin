@@ -1,4 +1,5 @@
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type NetworkAttachmentDefinitionKind } from '@kubevirt-utils/resources/nad/types';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { getNetworks } from '@kubevirt-utils/resources/vm';
 
@@ -9,7 +10,6 @@ import {
   isOvnOverlayNad,
   isPodNetworkName,
 } from '../../utils/helpers';
-import { type NetworkAttachmentDefinition } from '../hooks/types';
 import type {
   FilterNADsForSelectArgs,
   GetSelectTypeaheadKeyArgs,
@@ -17,7 +17,7 @@ import type {
 } from './types';
 
 export const getNadOptionValue = (
-  nad: NetworkAttachmentDefinition,
+  nad: NetworkAttachmentDefinitionKind,
   vmiNamespace: string,
 ): string => {
   const { name, namespace: nadNamespace } = nad.metadata;
@@ -26,7 +26,7 @@ export const getNadOptionValue = (
 };
 
 export const nadMatchesNetworkName = (
-  nad: NetworkAttachmentDefinition,
+  nad: NetworkAttachmentDefinitionKind,
   networkName: string,
   vmiNamespace: string,
 ): boolean => {
@@ -47,7 +47,7 @@ export const nadMatchesNetworkName = (
 
 export const getSelectNetworkName = (
   networkName: string,
-  nads: NetworkAttachmentDefinition[],
+  nads: NetworkAttachmentDefinitionKind[],
   vmiNamespace: string,
 ): string => {
   if (!networkName) {
@@ -75,7 +75,7 @@ export const filterNADsForSelect = ({
   isEditing,
   nads,
   vmiNamespace,
-}: FilterNADsForSelectArgs): NetworkAttachmentDefinition[] =>
+}: FilterNADsForSelectArgs): NetworkAttachmentDefinitionKind[] =>
   nads?.filter((nad) => {
     if (
       isEditing &&
@@ -94,8 +94,9 @@ export const getShowPodNetworkingOption = ({
   hasPodNetwork,
   isEditing,
   isIPv6SingleStack,
+  isPodNetworkAllowed = true,
 }: GetShowPodNetworkingOptionArgs): boolean => {
-  if (isIPv6SingleStack) {
+  if (isIPv6SingleStack || !isPodNetworkAllowed) {
     return false;
   }
 
