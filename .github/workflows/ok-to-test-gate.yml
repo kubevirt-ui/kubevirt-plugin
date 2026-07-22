@@ -24,23 +24,15 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 2
     steps:
-      - name: Dispatch hot-cluster-e2e.yml
-        uses: actions/github-script@v9
+      - name: Setup scripts
+        uses: ./.github/actions/setup-gh-scripts
         with:
-          script: |
-            const pr = context.payload.pull_request;
+          ref: ${{ github.event.repository.default_branch }}
 
-            // skip_pool_check: ok-to-test is a CI-trust signal, not a
-            // review-readiness one, so this must run regardless of
-            // lgtm/approved. base_ref: the PR's real base branch, so a
-            // release-branch retest merges against the right tip.
-            await github.rest.actions.createWorkflowDispatch({
-              ...context.repo,
-              workflow_id: 'hot-cluster-e2e.yml',
-              ref: 'main',
-              inputs: {
-                pr_number: String(pr.number),
-                base_ref: pr.base.ref,
-                skip_pool_check: 'true',
-              },
-            });
+      - name: Dispatch hot-cluster-e2e.yml
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          BASE_REF: ${{ github.event.pull_request.base.ref }}
+        working-directory: .github/scripts
+        run: npx tsx src/commands/ok-to-test-dispatch.ts

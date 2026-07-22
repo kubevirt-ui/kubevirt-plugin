@@ -56,26 +56,18 @@ jobs:
           pr-number: ${{ github.event.pull_request.number }}
           github-token: ${{ steps.bot-token.outputs.token || github.token }}
 
-      - name: Dispatch hot-cluster-e2e.yml
-        uses: actions/github-script@v9
+      - name: Setup scripts
+        uses: ./.github/actions/setup-gh-scripts
         with:
-          script: |
-            const pr = context.payload.pull_request;
+          ref: ${{ github.event.repository.default_branch }}
 
-            // skip_pool_check: open/sync/reopen isn't merge-readiness --
-            // gating runs regardless of lgtm/approved.
-            // base_ref: resolves the right cluster/test-engine for
-            // release-branch PRs.
-            await github.rest.actions.createWorkflowDispatch({
-              ...context.repo,
-              workflow_id: 'hot-cluster-e2e.yml',
-              ref: 'main',
-              inputs: {
-                pr_number: String(pr.number),
-                base_ref: pr.base.ref,
-                skip_pool_check: 'true',
-              },
-            });
+      - name: Dispatch hot-cluster-e2e.yml
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          BASE_REF: ${{ github.event.pull_request.base.ref }}
+        working-directory: .github/scripts
+        run: npx tsx src/e2e/pr-gate-dispatch.ts
 
   # Re-attach the held marker to the new HEAD when dispatch is skipped.
   republish-hold:

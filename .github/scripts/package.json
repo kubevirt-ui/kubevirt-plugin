@@ -5,6 +5,7 @@
     "node": ">=22.0.0"
   },
   "dependencies": {
+    "@octokit/graphql": "^9.0.3",
     "@octokit/rest": "^21.1.1",
     "tsx": "^4.19.4"
   },

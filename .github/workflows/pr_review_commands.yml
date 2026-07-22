@@ -19,7 +19,8 @@ on:
   pull_request_review:
     types: [submitted]
 
-permissions: {}
+permissions:
+  contents: read
 
 jobs:
   capture-review:
@@ -30,27 +31,32 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 2
     steps:
-      # No checkout, no API calls, no secrets -- just the review's own
-      # event-payload fields, which are GitHub-computed and safe to trust
-      # even though this event can come from a fork PR.
-      - name: Write review data
-        uses: actions/github-script@v9
+      - name: Checkout
+        uses: actions/checkout@v7
         with:
-          script: |
-            const fs = require('fs');
-            const data = {
-              prNumber: context.payload.pull_request.number,
-              reviewState: context.payload.review.state === 'approved' ? 'APPROVED' : 'CHANGES_REQUESTED',
-              reviewAuthor: context.payload.review.user.login,
-              prAuthor: context.payload.pull_request.user.login,
-              baseBranch: context.payload.pull_request.base.ref,
-            };
-            fs.writeFileSync('review-data.json', JSON.stringify(data));
-            core.info(`Captured review data: ${JSON.stringify(data)}`);
+          persist-credentials: false
+
+      - name: Setup scripts
+        uses: ./.github/actions/setup-gh-scripts
+        with:
+          ref: ${{ github.sha }}
+
+      # No API calls, no secrets -- just the review's own event-payload
+      # fields, which are GitHub-computed and safe to trust even though
+      # this event can come from a fork PR.
+      - name: Write review data
+        working-directory: .github/scripts
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REVIEW_STATE: ${{ github.event.review.state == 'approved' && 'APPROVED' || 'CHANGES_REQUESTED' }}
+          REVIEW_AUTHOR: ${{ github.event.review.user.login }}
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+          BASE_BRANCH: ${{ github.event.pull_request.base.ref }}
+        run: npx tsx src/commands/write-review-data.ts
 
       - name: Upload review data
         uses: actions/upload-artifact@v4
         with:
           name: review-data
-          path: review-data.json
+          path: .github/scripts/review-data.json
           retention-days: 1

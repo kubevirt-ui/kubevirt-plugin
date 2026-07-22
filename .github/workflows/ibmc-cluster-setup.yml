@@ -190,26 +190,20 @@ jobs:
     outputs:
       already_ready: ${{ steps.probe.outputs.already_ready }}
     steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Install TS dependencies
+        working-directory: ci-scripts/hot-cluster/ts
+        run: npm ci
+
       - name: Probe for cluster
         id: probe
         env:
           CLUSTER_NAME: ${{ inputs.cluster_name || 'kubevirt-plugin-ci' }}
           INFRASTRUCTURE_TYPE: ${{ inputs.infrastructure_type || 'ipi' }}
-        run: |
-          # The api.<cluster>.<base_domain> hostname is IPI-only -- ROKS
-          # existence is checked separately in provision-cluster.
-          if [[ "${INFRASTRUCTURE_TYPE}" != "ipi" ]]; then
-            echo "already_ready=false" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-
-          API_HOST="api.${CLUSTER_NAME}.${BASE_DOMAIN}"
-          if dig +short "${API_HOST}" 2>/dev/null | grep -q .; then
-            echo "Cluster '${CLUSTER_NAME}' is already reachable (${API_HOST} resolves) — skipping provisioning."
-            echo "already_ready=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "already_ready=false" >> "$GITHUB_OUTPUT"
-          fi
+        working-directory: ci-scripts/hot-cluster/ts
+        run: npx tsx src/scripts/probe-cluster-dns.ts
 
   provision-cluster:
     name: Provision OpenShift Cluster
@@ -218,15 +212,16 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 360
     steps:
-      - name: Validate cluster_name format
-        run: |
-          if [[ ! "${CLUSTER_NAME}" =~ ^[a-z0-9]([a-z0-9-]{0,19}[a-z0-9])?$ ]]; then
-            echo "::error::Invalid cluster_name: '${CLUSTER_NAME}'. Must be a lower-case RFC 1123 DNS label (start/end with alphanumeric, only lower-case letters/digits/hyphens in between — no uppercase, underscores, or dots) and at most 21 characters (IBM Cloud IPI cluster name limit — longer names are silently truncated, which breaks health checks, teardown, and auto-teardown discovery). This name is also used as-is for the ARC Helm release and the api.\${CLUSTER_NAME}.\${BASE_DOMAIN} hostname, both of which require RFC 1123-safe values."
-            exit 1
-          fi
-
       - name: Checkout
         uses: actions/checkout@v7
+
+      - name: Install TS dependencies
+        working-directory: ci-scripts/hot-cluster/ts
+        run: npm ci
+
+      - name: Validate cluster_name format
+        working-directory: ci-scripts/hot-cluster/ts
+        run: npx tsx src/scripts/validate-cluster-name.ts
 
       - name: Setup IBM Cloud CLI
         uses: IBM/actions-ibmcloud-cli@v2
@@ -265,14 +260,8 @@ jobs:
       - name: Check for existing ROKS cluster
         if: inputs.infrastructure_type != 'ipi'
         id: check_cluster
-        run: |
-          if ibmcloud oc cluster get --cluster "${CLUSTER_NAME}" &>/dev/null; then
-            echo "Cluster '${CLUSTER_NAME}' already exists"
-            echo "exists=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "Cluster '${CLUSTER_NAME}' does not exist, will create"
-            echo "exists=false" >> "$GITHUB_OUTPUT"
-          fi
+        working-directory: ci-scripts/hot-cluster/ts
+        run: npx tsx src/scripts/check-roks-cluster.ts
 
       # ──────────────────────────────────────────────────────────────────────
       # Classic infrastructure path
@@ -282,69 +271,18 @@ jobs:
         env:
           ZONE: ${{ inputs.zone }}
           FLAVOR: ${{ inputs.worker_flavor }}
-        run: |
-          echo "Fetching classic infrastructure locations and flavors..."
-          LOCATIONS_JSON=$(
-            ibmcloud oc locations --provider classic --show-flavors --output json |\
-            jq '[.[] | select(.kind=="dc")]'
-          )
-
-          echo "Checking zone '${ZONE}' exists..."
-          ZONE_EXISTS=$(
-            echo "${LOCATIONS_JSON}" |\
-            jq -r --arg z "${ZONE}" \
-              '[.[] | select(.id == $z)] | length'
-          )
-          if [[ "${ZONE_EXISTS}" -ne 1 ]]; then
-            echo "ERROR: Zone '${ZONE}' not found in classic infrastructure locations."
-            echo ""
-            echo "Available zones:"
-            echo "${LOCATIONS_JSON}" | jq -r '.[].id' | sort
-            exit 1
-          fi
-          echo "Zone '${ZONE}' exists"
-
-          echo "Checking flavor '${FLAVOR}' is available in zone '${ZONE}'..."
-          FLAVOR_EXISTS=$(
-            echo "${LOCATIONS_JSON}" |\
-            jq -r --arg z "${ZONE}" --arg f "${FLAVOR}" \
-              '.[] | select(.id == $z) | .flavors | split(",") | any(index($f))'
-          )
-          if [[ "${FLAVOR_EXISTS}" == "false" ]]; then
-            echo "ERROR: Flavor '${FLAVOR}' is not available in zone '${ZONE}'."
-            echo ""
-            echo "Available flavors in '${ZONE}':"
-            echo "${LOCATIONS_JSON}" | jq -r --arg z "${ZONE}" '.[] | select(.id == $z) | .flavors[]? | .id' | sort
-            exit 2
-          fi
-          echo "Flavor '${FLAVOR}' is available in zone '${ZONE}'"
+        working-directory: ci-scripts/hot-cluster/ts
+        run: npx tsx src/scripts/verify-zone-flavor-classic.ts
 
       - name: Create ROKS cluster (classic)
         if: steps.check_cluster.outputs.exists == 'false' && inputs.infrastructure_type == 'classic'
         env:
           ZONE: ${{ inputs.zone }}
-        run: |
-          echo "Looking up existing VLANs in zone '${ZONE}'..."
-          VLAN_JSON=$(ibmcloud oc vlan ls --zone "${ZONE}" --output json 2>/dev/null || echo "[]")
-          PRIVATE_VLAN=$(echo "${VLAN_JSON}" | jq -r '[.[] | select(.type == "private")] | first | .id // empty')
-          PUBLIC_VLAN=$(echo "${VLAN_JSON}" | jq -r '[.[] | select(.type == "public")] | first | .id // empty')
-
-          if [[ -n "${PRIVATE_VLAN}" ]]; then
-            echo "Reusing existing private VLAN: ${PRIVATE_VLAN}"
-            echo "Reusing existing public VLAN: ${PUBLIC_VLAN:-'(none)'}"
-          else
-            echo "No existing VLANs in zone, new VLANs will be created"
-          fi
-
-          echo "Creating cluster '${CLUSTER_NAME}' with ${{ inputs.worker_count }}x ${{ inputs.worker_flavor }} workers in zone ${ZONE}..."
-          ibmcloud oc cluster create classic \
-            --name "${CLUSTER_NAME}" \
-            --version "${{ inputs.openshift_version }}" \
-            --flavor "${{ inputs.worker_flavor }}" \
-            --workers "${{ inputs.worker_count }}" \
-            --zone "${ZONE}" \
-            --private-vlan "${PRIVATE_VLAN}" \
-            --public-vlan "${PUBLIC_VLAN}"
+          OPENSHIFT_VERSION: ${{ inputs.openshift_version }}
+          WORKER_FLAVOR: ${{ inputs.worker_flavor }}
+          WORKER_COUNT: ${{ inputs.worker_count }}
+        working-directory: ci-scripts/hot-cluster/ts
+        run: npx tsx src/scripts/create-roks-classic.ts
 
       # ──────────────────────────────────────────────────────────────────────
       # VPC Gen2 infrastructure path
@@ -365,38 +303,11 @@ jobs:
           SUBNET_ID: ${{ steps.vpc_resources.outputs.subnet_id }}
           COS_CRN: ${{ inputs.cos_instance_crn }}
           COS_INSTANCE_NAME: ${{ inputs.cluster_name || 'kubevirt-plugin-ci' }}-cos
-        run: |
-          if [[ -z "${COS_CRN}" ]]; then
-            echo "No COS CRN provided — looking for existing COS instance '${COS_INSTANCE_NAME}'..."
-            COS_CRN=$(ibmcloud resource service-instances --service-name cloud-object-storage --output json 2>/dev/null \
-              | jq -r --arg n "${COS_INSTANCE_NAME}" '.[] | select(.name == $n) | .crn // empty' || true)
-
-            if [[ -z "${COS_CRN}" ]]; then
-              echo "Creating COS instance '${COS_INSTANCE_NAME}'..."
-              # COS standard plan ID (look up with: ibmcloud catalog service cloud-object-storage)
-              # Using plan ID + deployment name to avoid interactive prompts
-              ibmcloud resource service-instance-create "${COS_INSTANCE_NAME}" cloud-object-storage \
-                744bfc56-d12c-4866-88d5-dac9139e0e5d global \
-                -d premium-global-deployment
-              COS_CRN=$(ibmcloud resource service-instances --service-name cloud-object-storage --output json \
-                | jq -r --arg n "${COS_INSTANCE_NAME}" '.[] | select(.name == $n) | .crn')
-              echo "Created COS instance: ${COS_CRN}"
-            else
-              echo "Reusing existing COS instance: ${COS_CRN}"
-            fi
-          fi
-
-          echo "Creating VPC cluster '${CLUSTER_NAME}' with ${{ inputs.worker_count }}x ${{ inputs.worker_flavor }} workers in zone ${ZONE}..."
-          ibmcloud oc cluster create vpc-gen2 \
-            --name "${CLUSTER_NAME}" \
-            --version "${{ inputs.openshift_version }}" \
-            --flavor "${{ inputs.worker_flavor }}" \
-            --workers "${{ inputs.worker_count }}" \
-            --zone "${ZONE}" \
-            --vpc-id "${VPC_ID}" \
-            --subnet-id "${SUBNET_ID}" \
-            --cos-instance "${COS_CRN}" \
-            --disable-outbound-traffic-protection
+          OPENSHIFT_VERSION: ${{ inputs.openshift_version }}
+          WORKER_FLAVOR: ${{ inputs.worker_flavor }}
+          WORKER_COUNT: ${{ inputs.worker_count }}
+        working-directory: ci-scripts/hot-cluster/ts
+        run: npx tsx src/scripts/create-roks-vpc.ts
 
       # ──────────────────────────────────────────────────────────────────────
       # IPI (self-managed OpenShift) path
@@ -406,32 +317,8 @@ jobs:
         id: ipi_tools
         env:
           OC_VERSION_INPUT: ${{ inputs.openshift_version }}
-        run: |
-          OCP_BASE="${OC_VERSION_INPUT%%_*}"
-
-          if [[ "${OCP_BASE}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            echo "Using pinned OCP version: ${OCP_BASE}"
-            MIRROR="https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/${OCP_BASE}"
-          else
-            OCP_CHANNEL="stable-${OCP_BASE}"
-            echo "Resolving ${OCP_CHANNEL} to latest patch version..."
-            MIRROR="https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/${OCP_CHANNEL}"
-          fi
-
-          echo "Downloading openshift-install..."
-          curl -sL "${MIRROR}/openshift-install-linux.tar.gz" | tar -xz -C /usr/local/bin openshift-install
-          openshift-install version
-
-          echo "Downloading oc + kubectl..."
-          curl -sL "${MIRROR}/openshift-client-linux.tar.gz" | tar -xz -C /usr/local/bin oc kubectl
-          oc version --client
-
-          echo "Downloading ccoctl..."
-          curl -sL "${MIRROR}/ccoctl-linux.tar.gz" | tar -xz -C /usr/local/bin ccoctl 2>/dev/null || echo "ccoctl not available for this version"
-
-          RESOLVED_VERSION=$(openshift-install version | head -1 | awk '{print $2}')
-          echo "ocp_channel=${OCP_CHANNEL}" >> "$GITHUB_OUTPUT"
-          echo "ocp_version=${RESOLVED_VERSION}" >> "$GITHUB_OUTPUT"
+        working-directory: ci-scripts/hot-cluster/ts
+        run: npx tsx src/scripts/install-ipi-tools.ts
 
       - name: Generate IPI install-config
         if: inputs.infrastructure_type == 'ipi'
@@ -440,27 +327,8 @@ jobs:
           PULL_SECRET: ${{ secrets.OPENSHIFT_PULL_SECRET }}
           WORKER_FLAVOR: ${{ inputs.worker_flavor }}
           WORKER_COUNT: ${{ inputs.worker_count }}
-        run: |
-          VPC_REGION="${ZONE%-*}"
-          INSTALL_DIR="${RUNNER_TEMP}/ipi-install"
-          mkdir -p "${INSTALL_DIR}"
-
-          ssh-keygen -t ed25519 -f "${INSTALL_DIR}/ssh-key" -N "" -q
-          SSH_PUB=$(cat "${INSTALL_DIR}/ssh-key.pub")
-
-          IPI_WORKER_FLAVOR=$(echo "${WORKER_FLAVOR}" | sed 's/\./-/g')
-
-          export VPC_REGION IPI_WORKER_FLAVOR SSH_PUB BASE_DOMAIN IBM_RESOURCE_GROUP CONTROL_PLANE_FLAVOR
-          envsubst < "${GITHUB_WORKSPACE}/ci-scripts/hot-cluster/ipi-install-config.yaml.tpl" \
-            > "${INSTALL_DIR}/install-config.yaml"
-
-          echo "install-config.yaml generated at ${INSTALL_DIR}"
-
-          echo "::group::install-config.yaml (redacted)"
-          sed 's/pullSecret:.*/pullSecret: REDACTED/' "${INSTALL_DIR}/install-config.yaml"
-          echo "::endgroup::"
-
-          cp "${INSTALL_DIR}/install-config.yaml" "${INSTALL_DIR}/install-config.yaml.bak"
+        working-directory: ci-scripts/hot-cluster/ts
+        run: npx tsx src/scripts/generate-ipi-install-config.ts
 
       - name: Create IPI cluster (with retry)
         id: ipi_create
@@ -480,26 +348,8 @@ jobs:
         continue-on-error: true
         env:
           INSTALL_DIR: ${{ runner.temp }}/ipi-install
-        run: |
-          echo "=== IPI DNS Diagnostics ==="
-          INFRA_ID=$(jq -r '.infraID // "unknown"' "${INSTALL_DIR}/metadata.json" 2>/dev/null || echo "unknown")
-          echo "  Infra ID: ${INFRA_ID}"
-
-          echo "Checking CIS DNS records..."
-          ibmcloud cis instance-set "$(ibmcloud cis instances --output json 2>/dev/null | jq -r '.[0].crn // empty')" 2>/dev/null || true
-          ZONE_ID=$(ibmcloud cis domains --output json 2>/dev/null | jq -r '.[0].id // empty' || true)
-          if [[ -n "${ZONE_ID}" ]]; then
-            ibmcloud cis dns-records "${ZONE_ID}" --output json 2>/dev/null \
-              | jq -r '.[] | "\(.type) \(.name) -> \(.content)"' || echo "  No DNS records found"
-          else
-            echo "  WARNING: Could not find CIS zone"
-          fi
-
-          echo "Checking DNS resolution from runner..."
-          for host in "api.${CLUSTER_NAME}.${BASE_DOMAIN}" "*.apps.${CLUSTER_NAME}.${BASE_DOMAIN}"; do
-            echo -n "  ${host}: "
-            dig +short "${host}" 2>/dev/null || echo "FAILED"
-          done
+        working-directory: ci-scripts/hot-cluster/ts
+        run: npx tsx src/scripts/ipi-dns-diagnostics.ts
 
       - name: Upload IPI install artifacts
         if: inputs.infrastructure_type == 'ipi' && always()
@@ -517,14 +367,12 @@ jobs:
       # ──────────────────────────────────────────────────────────────────────
       - name: Wait for ROKS cluster ready
         if: inputs.infrastructure_type != 'ipi'
-        run: |
-          ./ci-scripts/hot-cluster/check-roks-cluster-state.sh
+        run: ./ci-scripts/hot-cluster/check-roks-cluster-state.sh
 
       - name: Install oc client
         if: inputs.infrastructure_type != 'ipi'
         run: |
-          CLUSTER_JSON="$(ibmcloud oc cluster get --cluster "${CLUSTER_NAME}" --output json)"
-          export CLUSTER_JSON
+          export CLUSTER_JSON="$(ibmcloud oc cluster get --cluster "${CLUSTER_NAME}" --output json)"
           bash ./ci-scripts/hot-cluster/install-oc-client.sh
 
       - name: Configure kubeconfig
@@ -537,62 +385,16 @@ jobs:
         if: inputs.infrastructure_type == 'ipi'
         env:
           INSTALL_DIR: ${{ runner.temp }}/ipi-install
-        run: |
-          ZONE="${{ inputs.zone }}"
-          VPC_REGION="${ZONE%-*}"
-          ibmcloud target -r "${VPC_REGION}" 2>/dev/null || true
-
-          INFRA_ID=$(jq -r '.infraID' "${INSTALL_DIR}/metadata.json" 2>/dev/null || echo "${CLUSTER_NAME}")
-          echo "Infra ID: ${INFRA_ID}"
-
-          INGRESS_LB_ID=$(ibmcloud is lbs --output json 2>/dev/null \
-            | jq -r --arg id "${INFRA_ID}" \
-              '.[] | select(.name | contains($id)) | select(.name | startswith("kube-")) | .id // empty' | head -1)
-
-          if [[ -z "${INGRESS_LB_ID}" ]]; then
-            echo "::warning::Could not find ingress LB for cluster '${CLUSTER_NAME}'"
-          else
-            SG_ID=$(ibmcloud is lb "${INGRESS_LB_ID}" --output json 2>/dev/null \
-              | jq -r '.security_groups[0].id // empty')
-            if [[ -n "${SG_ID}" ]]; then
-              echo "Adding inbound HTTPS (443) and HTTP (80) rules to SG ${SG_ID}..."
-              ibmcloud is security-group-rule-add "${SG_ID}" inbound tcp \
-                --port-min 443 --port-max 443 --remote "0.0.0.0/0" 2>&1 || echo "  (rule may already exist)"
-              ibmcloud is security-group-rule-add "${SG_ID}" inbound tcp \
-                --port-min 80 --port-max 80 --remote "0.0.0.0/0" 2>&1 || echo "  (rule may already exist)"
-              echo "Ingress LB security group updated for public access."
-            else
-              echo "::warning::Could not find security group for ingress LB"
-            fi
-          fi
+          ZONE: ${{ inputs.zone }}
+        working-directory: ci-scripts/hot-cluster/ts
+        run: npx tsx src/scripts/open-ingress-lb-sg.ts
 
       - name: Detect KVM support
         id: kvm_check
-        run: |
-          echo "Checking for /dev/kvm on worker nodes..."
-          WORKER_NODE=$(oc get nodes --no-headers -l node-role.kubernetes.io/worker 2>/dev/null | head -1 | awk '{print $1}')
-          if [[ -z "${WORKER_NODE}" ]]; then
-            echo "No worker nodes found, checking control plane nodes..."
-            WORKER_NODE=$(oc get nodes --no-headers 2>/dev/null | head -1 | awk '{print $1}')
-          fi
-
-          if [[ -z "${WORKER_NODE}" ]]; then
-            echo "::warning::No nodes available to check KVM. Using input kvm_emulation=${{ inputs.kvm_emulation }}"
-            echo "kvm_emulation=${{ inputs.kvm_emulation }}" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-
-          echo "Checking /dev/kvm on node ${WORKER_NODE} (60s timeout)..."
-          if timeout 60 oc debug "node/${WORKER_NODE}" -- cat /proc/cpuinfo 2>&1 | grep -q "vmx\|svm"; then
-            echo "/dev/kvm support detected (CPU has vmx/svm flags)"
-            echo "kvm_emulation=false" >> "$GITHUB_OUTPUT"
-          elif timeout 30 oc debug "node/${WORKER_NODE}" -- ls -la /dev/kvm 2>&1 | grep -q kvm; then
-            echo "/dev/kvm device found"
-            echo "kvm_emulation=false" >> "$GITHUB_OUTPUT"
-          else
-            echo "::warning::/dev/kvm not detected or check timed out. Falling back to input: kvm_emulation=${{ inputs.kvm_emulation }}"
-            echo "kvm_emulation=${{ inputs.kvm_emulation }}" >> "$GITHUB_OUTPUT"
-          fi
+        env:
+          KVM_EMULATION_INPUT: ${{ inputs.kvm_emulation }}
+        working-directory: ci-scripts/hot-cluster/ts
+        run: npx tsx src/scripts/detect-kvm-support.ts
 
       - name: Install OpenShift Virtualization (CNV)
         id: install_cnv
@@ -610,18 +412,13 @@ jobs:
         run: bash ./ci-scripts/hot-cluster/configure-image-registry.sh
 
       - name: Verify ARC secrets
-        run: |
-          HAS_APP=$([ -n "${{ secrets.ARC_GITHUB_APP_ID }}" ] && [ -n "${{ secrets.ARC_GITHUB_APP_INSTALL_ID }}" ] && [ -n "${{ secrets.ARC_GITHUB_APP_PRIVATE_KEY }}" ] && echo "yes" || echo "no")
-          HAS_PAT=$([ -n "${{ secrets.ARC_GITHUB_PAT }}" ] && echo "yes" || echo "no")
-          if [[ "$HAS_APP" != "yes" && "$HAS_PAT" != "yes" ]]; then
-            echo "::error::ARC authentication secrets are missing or empty."
-            echo "Configure either:"
-            echo "  - ARC_GITHUB_APP_ID, ARC_GITHUB_APP_INSTALL_ID, ARC_GITHUB_APP_PRIVATE_KEY (GitHub App), or"
-            echo "  - ARC_GITHUB_PAT (Personal Access Token)"
-            echo "in Settings → Secrets and variables → Actions for this repository (or its organization)."
-            exit 1
-          fi
-          echo "ARC secrets are present."
+        env:
+          ARC_GITHUB_APP_ID: ${{ secrets.ARC_GITHUB_APP_ID }}
+          ARC_GITHUB_APP_INSTALL_ID: ${{ secrets.ARC_GITHUB_APP_INSTALL_ID }}
+          ARC_GITHUB_APP_PRIVATE_KEY: ${{ secrets.ARC_GITHUB_APP_PRIVATE_KEY }}
+          ARC_GITHUB_PAT: ${{ secrets.ARC_GITHUB_PAT }}
+        working-directory: ci-scripts/hot-cluster/ts
+        run: npx tsx src/scripts/verify-arc-secrets.ts
 
       - name: Build ARC runner image
         id: build_runner
@@ -643,7 +440,7 @@ jobs:
           RUNNER_SCALE_SET_NAME: ${{ env.CLUSTER_NAME }}
           MAX_RUNNERS: ${{ inputs.max_runners }}
         run: |
-          ./ci-scripts/hot-cluster/arc/install-arc-controller.sh
+          ./ci-scripts/hot-cluster/arc/install-arc-controller.sh && \
           ./ci-scripts/hot-cluster/arc/install-runner-scale-set.sh
 
       - name: Bootstrap manual-console RBAC
@@ -652,20 +449,17 @@ jobs:
         continue-on-error: true
         env:
           RUNNER_SCALE_SET_NAME: ${{ env.CLUSTER_NAME }}
-        run: |
-          ./ci-scripts/manual-console/install-manual-console-rbac.sh
+        run: ./ci-scripts/manual-console/install-manual-console-rbac.sh
 
       - name: Install CI environment controller
         env:
           RUNNER_SCALE_SET_NAME: ${{ env.CLUSTER_NAME }}
-        run: |
-          ./ci-scripts/hot-cluster/ci-env/install-ci-env-controller.sh
+        run: ./ci-scripts/hot-cluster/ci-env/install-ci-env-controller.sh
 
       - name: Verify cluster health
         env:
           GITHUB_REPOSITORY: ${{ github.repository }}
-        run: |
-          ./ci-scripts/hot-cluster/check-cluster-health.sh
+        run: ./ci-scripts/hot-cluster/check-cluster-health.sh
 
       # Optional: create an htpasswd admin user for ROKS clusters (no kubeadmin).
       # Set CLUSTER_ADMIN_PASSWORD secret to enable. Not needed for IPI.
@@ -716,59 +510,21 @@ jobs:
           # prepare job; falls back to this run's own ref_name for a direct
           # dispatch of just this workflow.
           BRANCH_NAME: ${{ inputs.branch_name || github.ref_name }}
-        run: |
-          CONSOLE_URL=$(oc get consoles.config.openshift.io cluster -o jsonpath='{.status.consoleURL}' 2>/dev/null || echo "unknown")
-
-          CREDS=""
-          if [[ -f "${INSTALL_DIR}/auth/kubeadmin-password" ]]; then
-            KUBEADMIN_PW=$(cat "${INSTALL_DIR}/auth/kubeadmin-password")
-            echo "::add-mask::${KUBEADMIN_PW}"
-            CREDS=$'\n'"*kubeadmin:* \`${KUBEADMIN_PW}\`"
-          elif [[ -n "${ADMIN_PASSWORD}" ]]; then
-            echo "::add-mask::${ADMIN_PASSWORD}"
-            CREDS=$'\n'"*admin:* \`${ADMIN_PASSWORD}\`"
-          fi
-
-          if [[ -z "${SLACK_WEBHOOK_URL}" ]]; then
-            echo "::warning::SLACK_WEBHOOK_URL not set — skipping Slack notification"
-            exit 0
-          fi
-
-          if [[ -z "${CREDS}" ]]; then
-            echo "::warning::No credentials available to send"
-            exit 0
-          fi
-
-          TEXT=":white_check_mark: *Hot cluster ready [${BRANCH_NAME}]*"
-          TEXT+=$'\n'"*Console:* <${CONSOLE_URL}>"
-          TEXT+="${CREDS}"
-
-          PAYLOAD=$(jq -n --arg text "${TEXT}" '{text: $text}')
-
-          curl -sS -X POST -H 'Content-Type: application/json' -d "${PAYLOAD}" "${SLACK_WEBHOOK_URL}"
-          echo "Slack notification sent."
+        working-directory: ci-scripts/hot-cluster/ts
+        run: npx tsx src/scripts/send-cluster-credentials-slack.ts
 
       - name: Delete ROKS cluster on failure
         if: always() && inputs.infrastructure_type != 'ipi' && job.status == 'failure' && steps.check_cluster.outputs.exists == 'false'
-        run: |
-          echo "Job failed — deleting ROKS cluster '${CLUSTER_NAME}'..."
-          ibmcloud oc cluster rm --cluster "${CLUSTER_NAME}" -f --force-delete-storage 2>&1 || echo "WARNING: cluster deletion failed or cluster not found"
+        working-directory: ci-scripts/hot-cluster/ts
+        run: npx tsx src/scripts/delete-roks-cluster.ts
 
       - name: Destroy IPI cluster on failure
         if: always() && inputs.infrastructure_type == 'ipi' && job.status == 'failure'
         env:
           IC_API_KEY: ${{ secrets.IC_KEY }}
           INSTALL_DIR: ${{ runner.temp }}/ipi-install
-        run: |
-          export IC_API_KEY
-          if [[ -f "${INSTALL_DIR}/metadata.json" ]]; then
-            INFRA_ID=$(jq -r '.infraID' "${INSTALL_DIR}/metadata.json")
-            echo "Job failed — destroying IPI cluster '${INFRA_ID}'..."
-            openshift-install destroy cluster --dir="${INSTALL_DIR}" --log-level=info 2>&1 | tail -50 || true
-            echo "IPI cluster destroyed."
-          else
-            echo "No metadata.json found — no IPI resources to clean up via openshift-install."
-          fi
+        working-directory: ci-scripts/hot-cluster/ts
+        run: npx tsx src/scripts/destroy-ipi-cluster.ts
 
       # Backstop sweep: openshift-install destroy above isn't guaranteed to
       # fully clean up, so run this unconditionally regardless of it.
@@ -783,33 +539,17 @@ jobs:
       - name: Setup summary
         if: always()
         env:
+          INFRASTRUCTURE_TYPE: ${{ inputs.infrastructure_type || 'ipi' }}
+          ZONE: ${{ inputs.zone }}
+          OPENSHIFT_VERSION: ${{ inputs.openshift_version }}
+          WORKER_FLAVOR: ${{ inputs.worker_flavor }}
+          WORKER_COUNT: ${{ inputs.worker_count }}
+          KVM_EMULATION: ${{ inputs.kvm_emulation }}
+          CNV_CHANNEL: ${{ inputs.cnv_channel || 'stable' }}
           CNV_PIN_VERSION_REQUESTED: ${{ inputs.cnv_pin_version || 'unpinned' }}
           # Resolved live by install-hco.sh; distinct from the requested pin
           # above so a failed pin never looks "pinned" -- check job status
           # if this shows the fallback text.
           CNV_INSTALLED_CSV: ${{ steps.install_cnv.outputs.starting_csv || 'unpinned, or pin failed -- check job status' }}
-        run: |
-          echo "## Hot Cluster Setup Summary" >> "$GITHUB_STEP_SUMMARY"
-          echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "| Parameter | Value |" >> "$GITHUB_STEP_SUMMARY"
-          echo "|-----------|-------|" >> "$GITHUB_STEP_SUMMARY"
-          echo "| Infrastructure | \`${{ inputs.infrastructure_type || 'ipi' }}\` |" >> "$GITHUB_STEP_SUMMARY"
-          echo "| Cluster | \`${CLUSTER_NAME}\` |" >> "$GITHUB_STEP_SUMMARY"
-          echo "| Zone | \`${{ inputs.zone }}\` |" >> "$GITHUB_STEP_SUMMARY"
-          echo "| OpenShift | \`${{ inputs.openshift_version }}\` |" >> "$GITHUB_STEP_SUMMARY"
-          echo "| Worker Flavor | \`${{ inputs.worker_flavor }}\` |" >> "$GITHUB_STEP_SUMMARY"
-          echo "| Workers | \`${{ inputs.worker_count }}\` |" >> "$GITHUB_STEP_SUMMARY"
-          echo "| KVM Emulation | \`${{ inputs.kvm_emulation }}\` |" >> "$GITHUB_STEP_SUMMARY"
-          echo "| CNV Channel | \`${{ inputs.cnv_channel || 'stable' }}\` |" >> "$GITHUB_STEP_SUMMARY"
-          echo "| CNV Pin Version (requested) | \`${CNV_PIN_VERSION_REQUESTED}\` |" >> "$GITHUB_STEP_SUMMARY"
-          echo "| CNV Installed CSV | \`${CNV_INSTALLED_CSV}\` |" >> "$GITHUB_STEP_SUMMARY"
-          CONSOLE_URL=$(oc get consoles.config.openshift.io cluster -o jsonpath='{.status.consoleURL}' 2>/dev/null || echo "")
-          if [[ -n "${CONSOLE_URL}" ]]; then
-            echo "| Console | [${CONSOLE_URL}](${CONSOLE_URL}) |" >> "$GITHUB_STEP_SUMMARY"
-          fi
-          echo "" >> "$GITHUB_STEP_SUMMARY"
-          if oc cluster-info &>/dev/null; then
-            echo "Cluster is **healthy** and ready for CI." >> "$GITHUB_STEP_SUMMARY"
-          else
-            echo "Cluster setup **may have issues**. Check the logs and the IAM diagnostics artifact." >> "$GITHUB_STEP_SUMMARY"
-          fi
+        working-directory: ci-scripts/hot-cluster/ts
+        run: npx tsx src/scripts/write-setup-summary.ts

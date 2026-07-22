@@ -33,28 +33,17 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Setup scripts
+        uses: ./.github/actions/setup-gh-scripts
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+
       - name: List open PRs and classify merge-pool membership
         id: list
-        uses: actions/github-script@v9
-        with:
-          script: |
-            const { isMergePoolPr } = require('./ci-scripts/hot-cluster/js/is-merge-pool-pr.cjs');
-
-            const prs = await github.paginate(github.rest.pulls.list, {
-              ...context.repo,
-              state: 'open',
-              base: 'main',
-              per_page: 100,
-            });
-
-            const all = prs.map((pr) => pr.number);
-            const pool = prs.filter((pr) => isMergePoolPr(pr.labels)).map((pr) => pr.number);
-
-            core.info(`Open PRs targeting main: ${all.length} total, ${pool.length} in the merge pool.`);
-            core.info(`Pool PRs: ${pool.join(', ') || '(none)'}`);
-
-            core.setOutput('all_pr_numbers', JSON.stringify(all));
-            core.setOutput('pool_pr_numbers', JSON.stringify(pool));
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        working-directory: .github/scripts
+        run: npx tsx src/merge/stale-gating.ts
 
   # One matrix job per PR (not a loop) so publish-gating-check runs as a
   # normal step and one PR's failure (e.g. a deleted fork branch) stays isolated.
@@ -74,66 +63,19 @@ jobs:
         with:
           persist-credentials: false
 
-      # Skips PRs still in flight from a real run. Refreshes our own prior
-      # stale marker (SHA text and all) until a fresh real result lands.
+      - name: Setup scripts
+        uses: ./.github/actions/setup-gh-scripts
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+
       - name: Determine whether to (re-)mark this PR stale
         id: check
-        uses: actions/github-script@v9
         env:
+          GITHUB_TOKEN: ${{ github.token }}
           PR_NUMBER: ${{ matrix.pr_number }}
           POOL_PR_NUMBERS: ${{ needs.list-open-prs.outputs.pool_pr_numbers }}
-          STALE_MARKER_TITLE: 'Hot Cluster E2E: stale -- main has advanced since this ran'
-          STALE_MARKER_TITLE_LEGACY: 'Stale -- main has advanced since this ran'
-        with:
-          script: |
-            const prNumber = Number(process.env.PR_NUMBER);
-            const { data: pr } = await github.rest.pulls.get({ ...context.repo, pull_number: prNumber });
-            core.setOutput('head_sha', pr.head.sha);
-
-            // /hold-e2e's marker is more specific than the stale one below --
-            // leave it alone so the PR still says "comment /retest-e2e to
-            // lift the hold", not the generic stale wording. Merge stays
-            // blocked either way (already a completed/neutral state).
-            const isHeld = (pr.labels || []).some((label) => label.name === 'e2e-hold');
-            if (isHeld) {
-              core.info(`PR #${prNumber} is held via /hold-e2e -- leaving its check-run alone.`);
-              core.setOutput('should_mark', 'false');
-              return;
-            }
-
-            const inPool = JSON.parse(process.env.POOL_PR_NUMBERS).includes(prNumber);
-            core.setOutput('summary', [
-              `\`main\` advanced to ${context.sha} since this check last completed.`,
-              inPool
-                ? 'This PR is in the merge pool -- a real retest against the new base tip has been dispatched separately.'
-                : "This PR is not currently in the merge pool (needs both 'lgtm' and 'approved', no hold) -- push a commit, relabel, or comment `/retest-e2e` for a fresh result before merging.",
-            ].join('\n\n'));
-
-            const { data: existing } = await github.rest.checks.listForRef({
-              ...context.repo,
-              ref: pr.head.sha,
-              check_name: 'Run Gating Tests',
-            });
-            const [latest] = existing.check_runs.sort(
-              (a, b) => new Date(b.started_at) - new Date(a.started_at),
-            );
-
-            if (!latest) {
-              core.info(`PR #${prNumber}: no existing "Run Gating Tests" check-run yet, nothing to mark stale.`);
-              core.setOutput('should_mark', 'false');
-              return;
-            }
-
-            const isOwnStaleMarker = latest.output?.title === process.env.STALE_MARKER_TITLE ||
-              latest.output?.title === process.env.STALE_MARKER_TITLE_LEGACY;
-            if (latest.status !== 'completed' && !isOwnStaleMarker) {
-              core.info(`PR #${prNumber}: check-run ${latest.id} is ${latest.status} from a real run -- leaving it alone.`);
-              core.setOutput('should_mark', 'false');
-              return;
-            }
-
-            core.info(`PR #${prNumber}: marking stale (superseding check-run ${latest.id}, isOwnStaleMarker=${isOwnStaleMarker}).`);
-            core.setOutput('should_mark', 'true');
+        working-directory: .github/scripts
+        run: npx tsx src/merge/stale-mark-check.ts
 
       # completed/neutral, not queued: a `queued` marker can never be
       # superseded by a later real result (see publish-gating-check), so it
@@ -197,28 +139,14 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 2
     steps:
-      - name: Dispatch hot-cluster-e2e.yml retest
-        uses: actions/github-script@v9
-        env:
-          PR_NUMBER: ${{ matrix.pr_number }}
+      - name: Setup scripts
+        uses: ./.github/actions/setup-gh-scripts
         with:
-          script: |
-            const prNumber = Number(process.env.PR_NUMBER);
+          ref: ${{ github.event.repository.default_branch }}
 
-            // base_ref is required, not optional: without it,
-            // checkout-for-retest falls back to main's tip and merges a
-            // release-branch PR onto the wrong base; resolve-cluster-config.sh
-            // also needs it to pick the right cluster/test-engine.
-            const { data: pr } = await github.rest.pulls.get({ ...context.repo, pull_number: prNumber });
-
-            await github.rest.actions.createWorkflowDispatch({
-              ...context.repo,
-              workflow_id: 'hot-cluster-e2e.yml',
-              ref: 'main',
-              inputs: {
-                pr_number: String(prNumber),
-                base_ref: pr.base.ref,
-                is_pool_retest: 'true',
-              },
-            });
-            core.info(`PR #${prNumber}: dispatched a real retest against the new main tip (base_ref=${pr.base.ref}).`);
+      - name: Dispatch hot-cluster-e2e.yml retest
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ matrix.pr_number }}
+        working-directory: .github/scripts
+        run: npx tsx src/merge/stale-dispatch.ts

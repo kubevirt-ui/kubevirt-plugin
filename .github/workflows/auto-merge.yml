@@ -47,146 +47,6 @@ jobs:
           persist-credentials: false
           ref: ${{ github.event.repository.default_branch }}
 
-      - name: Determine merge-pool eligibility
-        id: eligibility
-        uses: actions/github-script@v9
-        with:
-          script: |
-            const { getMergePoolBlockers } = require('./ci-scripts/hot-cluster/js/is-merge-pool-pr.cjs');
-            const {
-              BARE_HOLD_LABEL,
-              DO_NOT_MERGE_HOLD_LABEL,
-              E2E_HOLD_LABEL,
-              NEEDS_REBASE_LABEL,
-            } = require('./ci-scripts/hot-cluster/js/merge-pool-labels.cjs');
-
-            // Maps one unmet condition to a short phrase (for the title) and
-            // a longer, actionable sentence (for the summary) -- so the
-            // failing check itself names the specific cause(s) instead of
-            // one generic sentence covering every possible reason.
-            const describeBlockingLabel = (label) => {
-              if (label === E2E_HOLD_LABEL) {
-                return { short: 'held via /hold-e2e', long: 'Hot Cluster E2E is on hold. Comment `/retest-e2e` to lift the hold and get a fresh result.' };
-              }
-              if (label === BARE_HOLD_LABEL || label === DO_NOT_MERGE_HOLD_LABEL) {
-                return { short: 'held via /hold', long: 'Comment `/hold cancel` to lift the hold.' };
-              }
-              if (label === NEEDS_REBASE_LABEL) {
-                return { short: 'needs-rebase', long: 'Update this PR with the latest base branch changes.' };
-              }
-              return { short: `blocked by \`${label}\``, long: `Resolve and clear the \`${label}\` label.` };
-            };
-
-            const describeEligibility = (missingLgtm, missingApproved, blockingLabels) => {
-              const reasons = [];
-              if (missingLgtm) {
-                reasons.push({ short: 'missing lgtm', long: 'Comment `/lgtm` (any collaborator), or get a native GitHub Approve review.' });
-              }
-              if (missingApproved) {
-                reasons.push({ short: 'missing approved', long: 'Comment `/approve` (root OWNERS), or get a native GitHub Approve review from an OWNERS approver.' });
-              }
-              for (const label of blockingLabels) {
-                reasons.push(describeBlockingLabel(label));
-              }
-              return reasons;
-            };
-
-            // Re-read labels fresh instead of trusting the event payload --
-            // closes the race where a queued run's payload could be stale
-            // by the time it's this run's turn.
-            let eligible;
-            let headSha;
-            let nodeId = '';
-            let determined = true;
-            let reasons = [];
-            const prNumber = context.payload.pull_request.number;
-
-            try {
-              const pr = await github.rest.pulls.get({ ...context.repo, pull_number: prNumber });
-              const { missingLgtm, missingApproved, blockingLabels } = getMergePoolBlockers(pr.data.labels);
-              eligible = !missingLgtm && !missingApproved && blockingLabels.length === 0;
-              reasons = describeEligibility(missingLgtm, missingApproved, blockingLabels);
-              headSha = pr.data.head.sha;
-              nodeId = pr.data.node_id;
-              core.info(
-                `PR #${prNumber} labels: [${pr.data.labels.map((l) => l.name).join(', ')}] -- merge-pool eligible: ${eligible}`,
-              );
-            } catch (err) {
-              // Fail closed rather than guess or leave a stale conclusion.
-              determined = false;
-              eligible = false;
-              headSha = context.payload.pull_request.head.sha;
-              core.warning(
-                `Could not determine merge-pool eligibility for PR #${prNumber}: ${err.message} -- failing the Merge Gate check closed.`,
-              );
-            }
-
-            core.setOutput('determined', String(determined));
-            core.setOutput('eligible', String(eligible));
-            core.setOutput('node_id', nodeId);
-            core.setOutput('number', String(prNumber));
-            core.setOutput('head_sha', headSha);
-            core.setOutput('conclusion', eligible ? 'success' : 'failure');
-            core.setOutput(
-              'title',
-              !determined
-                ? 'Could not determine eligibility'
-                : eligible
-                  ? 'Merge-pool eligible'
-                  : `Not eligible: ${reasons.map((r) => r.short).join(', ')}`,
-            );
-            // ' | '-joined (not newline-joined): this flows into a single-line
-            // `::error title=...::summary` annotation command below.
-            core.setOutput(
-              'summary',
-              !determined
-                ? 'Failed to read current PR labels -- failing closed until a later event retries.'
-                : eligible
-                  ? 'PR carries lgtm+approved with no hold/do-not-merge label.'
-                  : reasons.map((r) => `${r.short} -- ${r.long}`).join(' | '),
-            );
-
-      # checks.update() on this job's own already-existing check-run (found
-      # via listJobsForWorkflowRun, matched by this job's name) -- not
-      # checks.create(), so it stays correctly attached to this workflow run
-      # instead of repeating the "wrong check suite" grouping bug described
-      # above. Only touches output.title/summary; GitHub still manages the
-      # check-run's own status/conclusion automatically as this job runs.
-      # continue-on-error: cosmetic only -- a failure here must not affect
-      # the real eligibility gate below.
-      - name: Update Merge Gate check-run with the specific reason
-        continue-on-error: true
-        uses: actions/github-script@v9
-        with:
-          script: |
-            const { data: { jobs } } = await github.rest.actions.listJobsForWorkflowRun({
-              ...context.repo,
-              run_id: context.runId,
-            });
-            const job = jobs.find((j) => j.name === 'Merge Gate');
-            if (!job?.check_run_url) {
-              core.warning('Could not find this job\'s own check-run -- merge box row keeps the generic "Failing/Successful after Xs" text.');
-              return;
-            }
-            const checkRunId = Number(job.check_run_url.split('/').pop());
-            await github.rest.checks.update({
-              ...context.repo,
-              check_run_id: checkRunId,
-              output: {
-                title: '${{ steps.eligibility.outputs.title }}',
-                summary: '${{ steps.eligibility.outputs.summary }}',
-              },
-            });
-
-      # enablePullRequestAutoMerge/disablePullRequestAutoMerge reject the
-      # default GITHUB_TOKEN with "Resource not accessible by integration"
-      # regardless of permissions: -- use the same bot App token other
-      # workflows (hold-e2e.yml, retest-e2e.yml) already generate for this.
-      # Needs contents:write too, not just pull-requests:write -- these two
-      # mutations are fundamentally a merge-capability check, and
-      # create-github-app-token@v3's permission-* inputs narrow the token
-      # to exactly what's requested here, regardless of what the App's own
-      # installation permissions allow.
       - name: Generate bot token
         id: bot-token
         continue-on-error: true
@@ -197,65 +57,16 @@ jobs:
           permission-contents: write
           permission-pull-requests: write
 
-      - name: Enable or disable native auto-merge
-        uses: actions/github-script@v9
+      - name: Setup scripts
+        uses: ./.github/actions/setup-gh-scripts
         with:
-          # Falls back to the default token if bot-token generation failed above.
-          github-token: ${{ steps.bot-token.outputs.token || github.token }}
-          script: |
-            const determined = '${{ steps.eligibility.outputs.determined }}' === 'true';
-            const prNumber = '${{ steps.eligibility.outputs.number }}';
+          ref: ${{ github.event.repository.default_branch }}
 
-            if (!determined) {
-              // This job fails closed below regardless -- don't guess by
-              // toggling auto-merge; a later event will retry.
-              core.info(`Skipping auto-merge toggle for PR #${prNumber} -- eligibility could not be determined this run.`);
-              return;
-            }
-
-            const eligible = '${{ steps.eligibility.outputs.eligible }}' === 'true';
-            const nodeId = '${{ steps.eligibility.outputs.node_id }}';
-
-            if (eligible) {
-              try {
-                await github.graphql(
-                  `mutation($id: ID!) {
-                    enablePullRequestAutoMerge(input: { pullRequestId: $id, mergeMethod: MERGE }) {
-                      pullRequest { autoMergeRequest { enabledAt } }
-                    }
-                  }`,
-                  { id: nodeId },
-                );
-                core.info(`Enabled auto-merge for PR #${prNumber}.`);
-              } catch (err) {
-                // Draft/already-merged PRs surface as GraphQL errors here --
-                // this job's own conclusion reflects eligibility regardless,
-                // so this is UX only.
-                core.warning(`Could not enable auto-merge for PR #${prNumber}: ${err.message}`);
-              }
-              return;
-            }
-
-            try {
-              await github.graphql(
-                `mutation($id: ID!) {
-                  disablePullRequestAutoMerge(input: { pullRequestId: $id }) {
-                    pullRequest { autoMergeRequest { enabledAt } }
-                  }
-                }`,
-                { id: nodeId },
-              );
-              core.info(`Disabled auto-merge for PR #${prNumber} (not merge-pool eligible).`);
-            } catch (err) {
-              // Most likely auto-merge was never enabled -- either way,
-              // this job's own failing conclusion (next step) is the real
-              // merge block, not this call.
-              core.info(`No auto-merge to disable for PR #${prNumber} (${err.message}).`);
-            }
-
-      # Runs last so a disable above still happens before the job fails.
-      - name: Fail if not merge-pool eligible
-        if: steps.eligibility.outputs.conclusion == 'failure'
-        run: |
-          echo "::error title=${{ steps.eligibility.outputs.title }}::${{ steps.eligibility.outputs.summary }}"
-          exit 1
+      - name: Determine eligibility and toggle auto-merge
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          BOT_TOKEN: ${{ steps.bot-token.outputs.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          GITHUB_RUN_ID: ${{ github.run_id }}
+        working-directory: .github/scripts
+        run: npx tsx src/merge/auto-merge.ts

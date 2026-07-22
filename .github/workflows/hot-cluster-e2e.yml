@@ -254,40 +254,25 @@ jobs:
       head-sha: ${{ steps.post-status.outputs.head-sha }}
       status-context: ${{ steps.post-status.outputs.status-context }}
     steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Setup scripts
+        uses: ./.github/actions/setup-gh-scripts
+        with:
+          ref: ${{ github.sha }}
+
       - name: Post progress status
         id: post-status
         continue-on-error: true
-        uses: actions/github-script@v9
+        working-directory: .github/scripts
         env:
           HEAD_SHA: ${{ needs.prepare.outputs.progress_head_sha }}
           STATUS_CONTEXT: ${{ needs.prepare.outputs.progress_status_context }}
-        with:
-          script: |
-            const headSha = process.env.HEAD_SHA;
-            const statusContext = process.env.STATUS_CONTEXT;
-
-            // Manual health check can fail cluster-check's own job too, so
-            // check both the output and the job result.
-            const clusterReady = context.eventName === 'workflow_dispatch'
-              ? '${{ needs.cluster-check.outputs.cluster_ready }}' === 'true' && '${{ needs.cluster-check.result }}' === 'success'
-              : '${{ needs.cluster-check.outputs.cluster_ready }}' === 'true';
-
-            if (clusterReady) {
-              core.setOutput('head-sha', headSha);
-              core.setOutput('status-context', statusContext);
-            }
-
-            await github.rest.repos.createCommitStatus({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              sha: headSha,
-              context: statusContext,
-              state: clusterReady ? 'pending' : 'failure',
-              description: clusterReady
-                ? 'Building plugin image'
-                : 'Cluster not ready -- gating tests not run',
-              target_url: `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
-            });
+          CLUSTER_READY: ${{ github.event_name == 'workflow_dispatch' && needs.cluster-check.outputs.cluster_ready == 'true' && needs.cluster-check.result == 'success' || github.event_name != 'workflow_dispatch' && needs.cluster-check.outputs.cluster_ready == 'true' }}
+        run: npx tsx src/e2e/progress-status.ts
 
   run-e2e-tests:
     name: Run E2E Tests
@@ -353,6 +338,16 @@ jobs:
       # GITHUB_TOKEN. pull-requests: read is enough for check-hold's pulls.get.
       pull-requests: read
     steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Setup scripts
+        uses: ./.github/actions/setup-gh-scripts
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+
       - name: Verify hot cluster E2E ran and passed
         id: verify
         env:
@@ -363,324 +358,37 @@ jobs:
           MERGEABLE: ${{ needs.prepare.outputs.pr_mergeable }}
           STILL_IN_POOL: ${{ needs.prepare.outputs.pr_still_in_pool }}
           RETEST_TRUSTED: ${{ needs.prepare.outputs.pr_trusted }}
-        run: |
-          if [[ "${IS_RETEST}" == "true" && ( "${RESOLVE_PR_CONTEXT_RESULT}" == "failure" || "${RESOLVE_PR_CONTEXT_RESULT}" == "cancelled" ) ]]; then
-            echo "::error::Could not resolve PR #${PR_NUMBER}'s context (head SHA / labels / mergeability) -- prepare's Resolve PR Context step ended in '${RESOLVE_PR_CONTEXT_RESULT}'. See the 'Prepare' job for details."
-            echo "reason=resolve-context-failed" >> "$GITHUB_OUTPUT"
-            exit 1
-          fi
+        working-directory: .github/scripts
+        run: npx tsx src/e2e/verify-gating-result.ts
 
-          echo "run-e2e-tests result: ${E2E_RESULT}"
-
-          if [[ "${E2E_RESULT}" == "success" ]]; then
-            echo "Hot cluster gating tests passed."
-            echo "reason=passed" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-
-          if [[ "${IS_RETEST}" == "true" && "${MERGEABLE}" == "false" ]]; then
-            echo "::error::PR #${PR_NUMBER} no longer merges cleanly with the current base branch tip -- resolve the conflict and push an update (this will trigger a normal gating run)."
-            echo "reason=merge-conflict" >> "$GITHUB_OUTPUT"
-          elif [[ "${IS_RETEST}" == "true" && "${STILL_IN_POOL}" == "false" ]]; then
-            echo "::error::PR #${PR_NUMBER} no longer carries the lgtm+approved (no hold) labels required for the merge pool, re-checked fresh at run time -- skipping the retest."
-            echo "reason=left-pool" >> "$GITHUB_OUTPUT"
-          elif [[ "${IS_RETEST}" == "true" && "${RETEST_TRUSTED}" == "false" ]]; then
-            echo "::error::PR #${PR_NUMBER} is not from OWNERS, not from a same-repo branch, and does not currently carry the 'ok-to-test' label -- skipping the retest (re-checked fresh at run time)."
-            echo "reason=untrusted-retest" >> "$GITHUB_OUTPUT"
-          else
-            echo "::error::Hot cluster gating tests did not pass (run-e2e-tests result: '${E2E_RESULT}'). See the 'Run E2E Tests' job for details, or use /retest-e2e once fixed."
-            echo "reason=test-failed" >> "$GITHUB_OUTPUT"
-          fi
-          exit 1
-
-      - name: Complete progress status
-        if: always()
-        continue-on-error: true
-        uses: actions/github-script@v9
-        env:
-          HEAD_SHA: ${{ needs.prepare.outputs.progress_head_sha }}
-          STATUS_CONTEXT: ${{ needs.prepare.outputs.progress_status_context }}
-          JOB_STATUS: ${{ job.status }}
-        with:
-          script: |
-            const passed = process.env.JOB_STATUS === 'success';
-
-            await github.rest.repos.createCommitStatus({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              sha: process.env.HEAD_SHA,
-              context: process.env.STATUS_CONTEXT,
-              state: passed ? 'success' : 'failure',
-              description: passed
-                ? 'Hot cluster gating tests passed'
-                : 'Hot cluster gating tests did not pass',
-              target_url: `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
-            });
-
-      # Fresh, live check right before publishing any real result. Closes a
-      # race /hold-e2e's own cancellation can't: if cluster-check/run-e2e-tests
-      # already finished by the time a hold lands, there's nothing left in
-      # their concurrency groups to cancel, and this job would otherwise
-      # publish a real pass/fail over top of /hold-e2e's neutral marker.
-      # continue-on-error + defaulting to "not held" on failure: an API
-      # hiccup here must never block a normal, unheld run from publishing.
-      - name: Check for active /hold-e2e hold
-        id: check-hold
-        if: always() && inputs.pr_number != ''
-        continue-on-error: true
-        uses: actions/github-script@v9
-        env:
-          PR_NUMBER: ${{ inputs.pr_number }}
-        with:
-          script: |
-            const prNumber = Number(process.env.PR_NUMBER);
-            const { data: pr } = await github.rest.pulls.get({ ...context.repo, pull_number: prNumber });
-            const held = (pr.labels || []).some((label) => label.name === 'e2e-hold');
-            core.info(`PR #${prNumber} e2e-hold label present: ${held}`);
-            core.setOutput('held', held ? 'true' : 'false');
-
-      # Maps verify's reason to a PR-facing title/summary. is_pool_retest picks
-      # "(retest after main advanced)" wording; every other dispatch gets plain PR wording.
-      - name: Determine retest result details
-        id: result-details
-        if: always() && inputs.pr_number != '' && needs.prepare.outputs.pr_head_sha != ''
-        env:
-          REASON: ${{ steps.verify.outputs.reason }}
-          PR_NUMBER: ${{ inputs.pr_number }}
-          MAIN_SHA: ${{ github.sha }}
-          IS_POOL_RETEST: ${{ inputs.is_pool_retest }}
-          HELD: ${{ steps.check-hold.outputs.held }}
-          TEST_FAILURE_SUMMARY: ${{ needs.run-e2e-tests.outputs.test_failure_summary }}
-          WORKFLOW_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-        run: |
-          # Held wins over any real result -- re-checked live here rather
-          # than trusted from earlier in this run, since the hold may have
-          # landed after cluster-check/run-e2e-tests already started.
-          if [[ "${HELD}" == "true" ]]; then
-            echo "conclusion=neutral" >> "$GITHUB_OUTPUT"
-            if [[ "${IS_POOL_RETEST}" == "true" ]]; then
-              echo "title=Hot Cluster E2E: held via /hold-e2e (retest after main advanced)" >> "$GITHUB_OUTPUT"
-            else
-              echo "title=Hot Cluster E2E: held via /hold-e2e" >> "$GITHUB_OUTPUT"
-            fi
-            echo "summary=PR #${PR_NUMBER} is on hold via /hold-e2e (re-checked fresh as this run finished) -- its real result is suppressed so it can't re-green the required check out from under the hold. Comment /retest-e2e to lift the hold and get a fresh result." >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-
-          case "${REASON}" in
-            passed)
-              echo "conclusion=success" >> "$GITHUB_OUTPUT"
-              if [[ "${IS_POOL_RETEST}" == "true" ]]; then
-                echo "title=Hot Cluster E2E: gating tests passed (retest after main advanced)" >> "$GITHUB_OUTPUT"
-                echo "summary=Re-validated PR #${PR_NUMBER} merged with the current main tip (${MAIN_SHA}) after main advanced." >> "$GITHUB_OUTPUT"
-              else
-                echo "title=Hot Cluster E2E: gating tests passed" >> "$GITHUB_OUTPUT"
-                echo "summary=Hot cluster gating tests passed for PR #${PR_NUMBER} at this commit." >> "$GITHUB_OUTPUT"
-              fi
-              ;;
-            merge-conflict)
-              echo "conclusion=failure" >> "$GITHUB_OUTPUT"
-              if [[ "${IS_POOL_RETEST}" == "true" ]]; then
-                echo "title=Hot Cluster E2E: PR no longer merges cleanly with main (retest after main advanced)" >> "$GITHUB_OUTPUT"
-                echo "summary=PR #${PR_NUMBER} no longer merges cleanly with the current main tip (${MAIN_SHA}) -- resolve the conflict and push an update, which will trigger a normal gating run." >> "$GITHUB_OUTPUT"
-              else
-                echo "title=Hot Cluster E2E: PR does not merge cleanly with the base branch" >> "$GITHUB_OUTPUT"
-                echo "summary=PR #${PR_NUMBER} does not merge cleanly with the current base branch tip -- resolve the conflict and push an update to trigger a fresh run." >> "$GITHUB_OUTPUT"
-              fi
-              ;;
-            left-pool)
-              echo "conclusion=failure" >> "$GITHUB_OUTPUT"
-              if [[ "${IS_POOL_RETEST}" == "true" ]]; then
-                echo "title=Hot Cluster E2E: no longer in the merge pool (retest after main advanced)" >> "$GITHUB_OUTPUT"
-                echo "summary=PR #${PR_NUMBER} no longer carries the lgtm+approved (no hold) labels required for the merge pool, re-checked fresh when this retest ran against main tip ${MAIN_SHA} -- the cluster run was skipped." >> "$GITHUB_OUTPUT"
-              else
-                echo "title=Hot Cluster E2E: not in the merge pool" >> "$GITHUB_OUTPUT"
-                echo "summary=PR #${PR_NUMBER} does not carry the lgtm+approved (no hold) labels required for the merge pool, re-checked fresh at run time -- the cluster run was skipped." >> "$GITHUB_OUTPUT"
-              fi
-              ;;
-            untrusted-retest)
-              echo "conclusion=failure" >> "$GITHUB_OUTPUT"
-              if [[ "${IS_POOL_RETEST}" == "true" ]]; then
-                echo "title=Hot Cluster E2E: not CI-trusted for a retest (retest after main advanced)" >> "$GITHUB_OUTPUT"
-                echo "summary=PR #${PR_NUMBER} is not from OWNERS, not from a same-repo branch, and does not currently carry 'ok-to-test' (re-checked fresh when this retest ran against main tip ${MAIN_SHA}) -- the cluster run was skipped. A maintainer can add 'ok-to-test' to allow it." >> "$GITHUB_OUTPUT"
-              else
-                echo "title=Hot Cluster E2E: gating tests did not run (not CI-trusted)" >> "$GITHUB_OUTPUT"
-                echo "summary=Hot cluster E2E has not run for PR #${PR_NUMBER} because the author is not listed in OWNERS, is not from a same-repo branch, and does not currently carry 'ok-to-test' (re-checked fresh at run time). A maintainer can add the 'ok-to-test' label to trigger it." >> "$GITHUB_OUTPUT"
-              fi
-              ;;
-            *)
-              echo "conclusion=failure" >> "$GITHUB_OUTPUT"
-              if [[ "${IS_POOL_RETEST}" == "true" ]]; then
-                echo "title=Hot Cluster E2E: gating tests did not pass (retest after main advanced)" >> "$GITHUB_OUTPUT"
-                FAIL_MSG="Re-validated PR #${PR_NUMBER} merged with the current main tip (${MAIN_SHA}) after main advanced -- tests did not pass."
-              else
-                echo "title=Hot Cluster E2E: gating tests did not pass" >> "$GITHUB_OUTPUT"
-                FAIL_MSG="Hot cluster gating tests did not pass for PR #${PR_NUMBER} (reason: \`${REASON}\`)."
-              fi
-
-              if [[ -n "${TEST_FAILURE_SUMMARY}" ]]; then
-                # Keep --- off column 0 -- a bare --- line is a YAML document separator
-                # and breaks prettier/YAML parsing of this workflow file.
-                FAIL_MSG="${FAIL_MSG}"$'\n\n---\n\n### Failed Tests\n\n'"${TEST_FAILURE_SUMMARY}"
-              fi
-
-              FAIL_MSG="${FAIL_MSG}"$'\n\n'"See the [workflow run](${WORKFLOW_RUN_URL}) for full details, or comment \`/retest-e2e\` once fixed."
-
-              {
-                echo 'summary<<SUMMARY_DELIM'
-                echo "${FAIL_MSG}"
-                echo 'SUMMARY_DELIM'
-              } >> "$GITHUB_OUTPUT"
-              ;;
-          esac
-
-      # Needed to resolve the local publish-gating-check action below --
-      # skipped only for a bare ad-hoc dispatch, which publishes nothing.
-      - name: Checkout
-        if: always() && !(github.event_name == 'workflow_dispatch' && inputs.pr_number == '')
-        uses: actions/checkout@v7
-        with:
-          persist-credentials: false
-
-      # The literal "Run Gating Tests" required check -- the single publish path
-      # for every real PR trigger. Updates prepare's own in_progress check-run
-      # in place (same-run update, always permitted) instead of creating a
-      # second entry, which would leave the first stuck in_progress forever.
-      # Empty check-run-id falls back to creating a fresh one.
-      - name: Publish result for PR
-        id: publish-result
-        if: always() && inputs.pr_number != '' && needs.prepare.outputs.pr_head_sha != ''
-        continue-on-error: true
-        uses: ./.github/actions/publish-gating-check
-        with:
-          head-sha: ${{ needs.prepare.outputs.pr_head_sha }}
-          check-run-id: ${{ needs.prepare.outputs.gating_check_run_id }}
-          status: completed
-          conclusion: ${{ steps.result-details.outputs.conclusion }}
-          title: ${{ steps.result-details.outputs.title }}
-          summary: ${{ steps.result-details.outputs.summary }}
-          details-url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-
-      # Informational, PR-list-visible mirror of the real result above --
-      # not a merge gate (isMergePoolPr doesn't read these). Skipped on a
-      # neutral/held/stale conclusion so it doesn't clobber the last real result.
-      # Bot token (not GITHUB_TOKEN): labeling a PR needs pull-requests: write
-      # on an App installation; GITHUB_TOKEN is also forced read-only for
-      # issues on fork PRs. Same pattern as hold-e2e.yml's e2e-hold.
       - name: Generate bot token for e2e result labels
         id: e2e-label-bot-token
-        if: |
-          always() && inputs.pr_number != '' && needs.prepare.outputs.pr_head_sha != '' &&
-          (steps.result-details.outputs.conclusion == 'success' || steps.result-details.outputs.conclusion == 'failure')
+        if: always() && inputs.pr_number != '' && needs.prepare.outputs.pr_head_sha != ''
+        continue-on-error: true
         uses: ./.github/actions/create-bot-token
         with:
           app-id: ${{ secrets.BOT_APP_ID }}
           private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
 
-      - name: Sync e2e-passed/e2e-failed labels
-        if: |
-          always() && inputs.pr_number != '' && needs.prepare.outputs.pr_head_sha != '' &&
-          (steps.result-details.outputs.conclusion == 'success' || steps.result-details.outputs.conclusion == 'failure')
+      - name: Publish result, sync labels, close orphans
+        id: publish-result
+        if: always() && inputs.pr_number != '' && needs.prepare.outputs.pr_head_sha != ''
         continue-on-error: true
-        uses: actions/github-script@v9
         env:
+          GITHUB_TOKEN: ${{ github.token }}
+          BOT_TOKEN: ${{ steps.e2e-label-bot-token.outputs.token }}
           PR_NUMBER: ${{ inputs.pr_number }}
-          CONCLUSION: ${{ steps.result-details.outputs.conclusion }}
-        with:
-          github-token: ${{ steps.e2e-label-bot-token.outputs.token || github.token }}
-          script: |
-            const prNumber = Number(process.env.PR_NUMBER);
-            const passed = process.env.CONCLUSION === 'success';
-            const toAdd = passed ? 'e2e-passed' : 'e2e-failed';
-            const toRemove = passed ? 'e2e-failed' : 'e2e-passed';
-
-            const labelMeta = {
-              'e2e-passed': { color: '2ea44f', description: 'Hot Cluster E2E passed at the latest real result' },
-              'e2e-failed': { color: 'd73a4a', description: 'Hot Cluster E2E failed at the latest real result' },
-            };
-
-            // addLabels doesn't create a missing label (404s instead) --
-            // check-then-create first, same pattern as hold-e2e.yml's e2e-hold.
-            try {
-              try {
-                await github.rest.issues.getLabel({ ...context.repo, name: toAdd });
-              } catch (err) {
-                if (err.status !== 404) throw err;
-                try {
-                  await github.rest.issues.createLabel({ ...context.repo, name: toAdd, ...labelMeta[toAdd] });
-                } catch (createErr) {
-                  if (createErr.status !== 422) throw createErr;
-                }
-              }
-              await github.rest.issues.addLabels({ ...context.repo, issue_number: prNumber, labels: [toAdd] });
-            } catch (err) {
-              core.warning(
-                `Could not add the ${toAdd} label to PR #${prNumber} -- check that the kubevirt-plugin-bot GitHub App has "Issues: write" and "Pull requests: write" granted and the installation is approved: ${err.message || err}`,
-              );
-            }
-
-            try {
-              await github.rest.issues.removeLabel({ ...context.repo, issue_number: prNumber, name: toRemove });
-            } catch (err) {
-              if (err.status !== 404) {
-                core.warning(`Could not remove the ${toRemove} label from PR #${prNumber}: ${err.message || err}`);
-              }
-            }
-
-      # Best-effort, cross-run safety net for a "Run Gating Tests" check-run left
-      # open by a genuinely different, older run (e.g. one that crashed before
-      # reaching this step -- close-gating-check-on-cancel handles the cancelled
-      # case via a same-run update instead). Gated on publish-result having
-      # actually succeeded with a real id, so a failed/empty publish can't
-      # trigger closing every open check for the SHA. Only closes check-runs
-      # with a lower id than the one just published (ids are creation-ordered),
-      # so a concurrent sibling's still-in-flight marker (created after ours)
-      # is never touched.
-      - name: Close out older open "Run Gating Tests" check-runs for this commit
-        if: |
-          always() && inputs.pr_number != '' && needs.prepare.outputs.pr_head_sha != '' &&
-          steps.publish-result.outcome == 'success' &&
-          steps.publish-result.outputs.check-run-id != ''
-        continue-on-error: true
-        uses: actions/github-script@v9
-        env:
-          HEAD_SHA: ${{ needs.prepare.outputs.pr_head_sha }}
-          PUBLISHED_CHECK_RUN_ID: ${{ steps.publish-result.outputs.check-run-id }}
-          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-        with:
-          script: |
-            const headSha = process.env.HEAD_SHA;
-            const publishedId = Number(process.env.PUBLISHED_CHECK_RUN_ID);
-            const runUrl = process.env.RUN_URL;
-
-            const checkRuns = await github.paginate(github.rest.checks.listForRef, {
-              ...context.repo,
-              ref: headSha,
-              check_name: 'Run Gating Tests',
-              per_page: 100,
-            });
-
-            const orphans = checkRuns.filter(
-              (run) => run.status !== 'completed' && run.id < publishedId,
-            );
-
-            for (const run of orphans) {
-              core.warning(`Completing orphaned "Run Gating Tests" check-run ${run.id} (status: ${run.status}) for ${headSha} -- superseded by check-run ${publishedId}.`);
-              await github.rest.checks.update({
-                ...context.repo,
-                check_run_id: run.id,
-                status: 'completed',
-                conclusion: 'neutral',
-                completed_at: new Date().toISOString(),
-                details_url: runUrl,
-                output: {
-                  title: 'Hot Cluster E2E: superseded',
-                  summary: `This check-run was superseded by a newer "Run Gating Tests" result for this commit -- see ${runUrl}.`,
-                },
-              }).catch((err) => {
-                core.warning(`Could not complete orphaned check-run ${run.id}: ${err.message || err}`);
-              });
-            }
+          REASON: ${{ steps.verify.outputs.reason }}
+          MAIN_SHA: ${{ github.sha }}
+          IS_POOL_RETEST: ${{ inputs.is_pool_retest }}
+          PROGRESS_HEAD_SHA: ${{ needs.prepare.outputs.progress_head_sha }}
+          PROGRESS_STATUS_CONTEXT: ${{ needs.prepare.outputs.progress_status_context }}
+          PR_HEAD_SHA: ${{ needs.prepare.outputs.pr_head_sha }}
+          GATING_CHECK_RUN_ID: ${{ needs.prepare.outputs.gating_check_run_id }}
+          JOB_STATUS: ${{ job.status }}
+          TEST_FAILURE_SUMMARY: ${{ needs.run-e2e-tests.outputs.test_failure_summary }}
+        working-directory: .github/scripts
+        run: npx tsx src/e2e/verify.ts
 
       # No head SHA to publish against if Resolve PR Context failed -- a
       # PR comment is the only channel left. Bot token required for
@@ -704,30 +412,12 @@ jobs:
             needs.prepare.outputs.pr_context_outcome == 'cancelled'
           )
         continue-on-error: true
-        uses: actions/github-script@v9
+        working-directory: .github/scripts
         env:
+          GITHUB_TOKEN: ${{ steps.context-comment-bot-token.outputs.token || github.token }}
           PR_NUMBER: ${{ inputs.pr_number }}
           IS_POOL_RETEST: ${{ inputs.is_pool_retest }}
-        with:
-          github-token: ${{ steps.context-comment-bot-token.outputs.token || github.token }}
-          script: |
-            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
-            const trigger = process.env.IS_POOL_RETEST === 'true'
-              ? 'The automatic retest triggered after `main` advanced'
-              : 'This Hot Cluster E2E run';
-            await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: Number(process.env.PR_NUMBER),
-              body: [
-                `⚠️ ${trigger} could not resolve this PR's context ` +
-                  '(head SHA / labels / mergeability) and did not run.',
-                '',
-                'The existing "Run Gating Tests" result may be stale -- please comment `/retest-e2e` for a fresh result before merging.',
-                '',
-                `See the failed run for details: ${runUrl}`,
-              ].join('\n'),
-            });
+        run: npx tsx src/e2e/report-unresolvable-context.ts
 
   # verify-gating-tests skips entirely on a cancelled cluster-check/run-e2e-tests
   # (a newer same-PR trigger superseded it) to avoid a misleading test-failed
