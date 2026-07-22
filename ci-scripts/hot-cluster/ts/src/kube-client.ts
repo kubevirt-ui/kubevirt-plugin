@@ -18,8 +18,8 @@ const MAX_RETRIES = 5;
 const BASE_DELAY_MS = 1000;
 
 export class KubeClient {
-  readonly kc: k8s.KubeConfig;
   private tokenRefreshTimer: ReturnType<typeof setInterval> | null = null;
+  readonly kc: k8s.KubeConfig;
 
   private constructor(kc: k8s.KubeConfig) {
     this.kc = kc;
@@ -33,6 +33,10 @@ export class KubeClient {
     return client;
   }
 
+  static fromConfig(kc: k8s.KubeConfig): KubeClient {
+    return new KubeClient(kc);
+  }
+
   static fromKubeconfig(path?: string): KubeClient {
     const kc = new k8s.KubeConfig();
     if (path) {
@@ -41,29 +45,6 @@ export class KubeClient {
       kc.loadFromDefault();
     }
     return new KubeClient(kc);
-  }
-
-  static fromConfig(kc: k8s.KubeConfig): KubeClient {
-    return new KubeClient(kc);
-  }
-
-  get coreV1(): k8s.CoreV1Api {
-    return this.kc.makeApiClient(k8s.CoreV1Api);
-  }
-
-  get appsV1(): k8s.AppsV1Api {
-    return this.kc.makeApiClient(k8s.AppsV1Api);
-  }
-
-  get customObjects(): k8s.CustomObjectsApi {
-    return this.kc.makeApiClient(k8s.CustomObjectsApi);
-  }
-
-  dispose(): void {
-    if (this.tokenRefreshTimer) {
-      clearInterval(this.tokenRefreshTimer);
-      this.tokenRefreshTimer = null;
-    }
   }
 
   private startTokenRefresh(): void {
@@ -85,55 +66,8 @@ export class KubeClient {
     }
   }
 
-  /**
-   * Wait for a custom resource to reach a specific condition.
-   * Replaces `oc wait --for=condition=X --timeout=Y`.
-   */
-  async waitForCondition(params: {
-    group: string;
-    version: string;
-    plural: string;
-    name: string;
-    namespace?: string;
-    conditionType: string;
-    timeoutMs: number;
-    pollIntervalMs?: number;
-  }): Promise<void> {
-    const {
-      group,
-      version,
-      plural,
-      name,
-      namespace,
-      conditionType,
-      timeoutMs,
-      pollIntervalMs = 5000,
-    } = params;
-    const deadline = Date.now() + timeoutMs;
-    const api = this.customObjects;
-
-    while (Date.now() < deadline) {
-      try {
-        const result = namespace
-          ? await api.getNamespacedCustomObject({ group, version, namespace, plural, name })
-          : await api.getClusterCustomObject({ group, version, plural, name });
-
-        const obj = result as unknown as {
-          status?: { conditions?: Array<{ type: string; status: string }> };
-        };
-        const condition = obj.status?.conditions?.find((c) => c.type === conditionType);
-
-        if (condition?.status === 'True') return;
-      } catch (err) {
-        if (!isRetryableError(err)) throw err;
-      }
-
-      await sleep(Math.min(pollIntervalMs, deadline - Date.now()));
-    }
-
-    throw new Error(
-      `Timed out waiting for ${group}/${version} ${plural}/${name}${namespace ? ` in ${namespace}` : ''} condition=${conditionType} (${timeoutMs}ms)`,
-    );
+  get appsV1(): k8s.AppsV1Api {
+    return this.kc.makeApiClient(k8s.AppsV1Api);
   }
 
   /**
@@ -191,6 +125,72 @@ export class KubeClient {
     }
 
     return deleted;
+  }
+
+  get coreV1(): k8s.CoreV1Api {
+    return this.kc.makeApiClient(k8s.CoreV1Api);
+  }
+
+  get customObjects(): k8s.CustomObjectsApi {
+    return this.kc.makeApiClient(k8s.CustomObjectsApi);
+  }
+
+  dispose(): void {
+    if (this.tokenRefreshTimer) {
+      clearInterval(this.tokenRefreshTimer);
+      this.tokenRefreshTimer = null;
+    }
+  }
+
+  /**
+   * Wait for a custom resource to reach a specific condition.
+   * Replaces `oc wait --for=condition=X --timeout=Y`.
+   */
+  async waitForCondition(params: {
+    group: string;
+    version: string;
+    plural: string;
+    name: string;
+    namespace?: string;
+    conditionType: string;
+    timeoutMs: number;
+    pollIntervalMs?: number;
+  }): Promise<void> {
+    const {
+      group,
+      version,
+      plural,
+      name,
+      namespace,
+      conditionType,
+      timeoutMs,
+      pollIntervalMs = 5000,
+    } = params;
+    const deadline = Date.now() + timeoutMs;
+    const api = this.customObjects;
+
+    while (Date.now() < deadline) {
+      try {
+        const result = namespace
+          ? await api.getNamespacedCustomObject({ group, version, namespace, plural, name })
+          : await api.getClusterCustomObject({ group, version, plural, name });
+
+        const obj = result as unknown as {
+          status?: { conditions?: Array<{ type: string; status: string }> };
+        };
+        const condition = obj.status?.conditions?.find((c) => c.type === conditionType);
+
+        if (condition?.status === 'True') return;
+      } catch (err) {
+        if (!isRetryableError(err)) throw err;
+      }
+
+      await sleep(Math.min(pollIntervalMs, deadline - Date.now()));
+    }
+
+    throw new Error(
+      `Timed out waiting for ${group}/${version} ${plural}/${name}${namespace ? ` in ${namespace}` : ''} condition=${conditionType} (${timeoutMs}ms)`,
+    );
   }
 }
 

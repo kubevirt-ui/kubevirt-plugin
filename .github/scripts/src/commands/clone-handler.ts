@@ -11,8 +11,6 @@ export const executeClone = async (ctx: CommandContext): Promise<void> => {
   process.env.COMMENT_ID = String(ctx.commentId);
   process.env.COMMENT_AUTHOR = ctx.author;
 
-  const { main } = await import('../clone/index');
-  if (typeof main === 'function') {
-    await main();
-  }
+  // The module self-executes via main().catch() at the bottom
+  await import('../clone/index');
 };

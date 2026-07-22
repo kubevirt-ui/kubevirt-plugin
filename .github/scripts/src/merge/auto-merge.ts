@@ -102,16 +102,20 @@ const main = async (): Promise<void> => {
   }
 
   const conclusion = eligible ? 'success' : 'action_required';
-  const title = !determined
-    ? 'Could not determine eligibility'
-    : eligible
-      ? 'Merge-pool eligible'
-      : `Not eligible: ${reasons.map((r) => r.short).join(', ')}`;
-  const summary = !determined
-    ? 'Failed to read current PR labels -- failing closed until a later event retries.'
-    : eligible
-      ? 'PR carries lgtm+approved with no hold/do-not-merge label.'
-      : reasons.map((r) => `${r.short} -- ${r.long}`).join(' | ');
+
+  let title: string;
+  let summary: string;
+
+  if (!determined) {
+    title = 'Could not determine eligibility';
+    summary = 'Failed to read current PR labels -- failing closed until a later event retries.';
+  } else if (eligible) {
+    title = 'Merge-pool eligible';
+    summary = 'PR carries lgtm+approved with no hold/do-not-merge label.';
+  } else {
+    title = `Not eligible: ${reasons.map((r) => r.short).join(', ')}`;
+    summary = reasons.map((r) => `${r.short} -- ${r.long}`).join(' | ');
+  }
 
   setOutput('determined', String(determined));
   setOutput('eligible', String(eligible));
