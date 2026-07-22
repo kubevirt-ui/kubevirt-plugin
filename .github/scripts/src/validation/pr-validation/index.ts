@@ -8,32 +8,10 @@ import {
 } from '../pr-path-validation/execute';
 import { buildConfigFromEnv } from './build-config';
 import { clearStaleApproval } from './clear-stale-approval';
-import { setCommitStatus } from '../../github-comments';
-import { createOctokit, createStatusOctokit, getPullRequestFiles } from '../../github-repo';
+import { createOctokit, getPullRequestFiles } from '../../github-repo';
 import { runChecksIsolated } from './run-checks';
 import type { PrValidationCheck } from './run-checks';
 import { requireEnv, safeErrorMessage } from '../../utils';
-import type { GitHubConfig } from '../../types/index';
-
-const reportJiraUnexpectedError = async (
-  config: GitHubConfig,
-  headSha: string | undefined,
-  err: unknown,
-): Promise<void> => {
-  if (!headSha) return;
-  try {
-    await setCommitStatus(
-      createStatusOctokit(config),
-      config.owner,
-      config.repo,
-      headSha,
-      'error',
-      'Jira validation encountered an unexpected error',
-    );
-  } catch {
-    // best-effort
-  }
-};
 
 const main = async (): Promise<void> => {
   const config = buildConfigFromEnv();
@@ -57,7 +35,9 @@ const main = async (): Promise<void> => {
     {
       name: 'jira-validation',
       run: () => executeJiraValidation({ baseBranch, config, headSha, prNumber, prTitle }),
-      reportUnexpectedError: reportJiraUnexpectedError,
+      reportUnexpectedError: async (_config, _headSha, err) => {
+        console.error(`Jira validation encountered an unexpected error: ${safeErrorMessage(err)}`);
+      },
     },
     {
       name: 'ai-config-validation',

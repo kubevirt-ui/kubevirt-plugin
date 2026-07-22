@@ -3,7 +3,7 @@ import type { Octokit } from '@octokit/rest';
 
 import { JiraClient } from '../../jira-client';
 import { createOctokit, createStatusOctokit, getReleaseBranches } from '../../github-repo';
-import { hasLabel, reportValidation, setCommitStatus } from '../../github-comments';
+import { hasLabel, reportValidation } from '../../github-comments';
 import { HandledValidationError } from '../pr-path-validation/errors';
 import { isLabelAppliedByTrustedActor } from '../pr-path-validation/owners';
 import { extractTicketIds, getExpectedVersionForBranch } from '../../version-utils';
@@ -23,25 +23,11 @@ export type JiraValidationInput = {
   statusOctokit?: Octokit;
 };
 
-const JIRA_STATUS_CONTEXT = 'jira-validation';
-
 /** Validate Jira tickets referenced in a pull request title. */
 export const executeJiraValidation = async (input: JiraValidationInput): Promise<void> => {
-  const { config, prNumber, prTitle, baseBranch, headSha } = input;
+  const { config, prNumber, prTitle, baseBranch } = input;
   const octokit = input.octokit ?? createOctokit(config);
   const statusOctokit = input.statusOctokit ?? createStatusOctokit(config);
-
-  if (headSha) {
-    await setCommitStatus(
-      statusOctokit,
-      config.owner,
-      config.repo,
-      headSha,
-      'pending',
-      'Jira validation in progress…',
-      JIRA_STATUS_CONTEXT,
-    );
-  }
 
   const shouldSkip = await hasLabel(octokit, config.owner, config.repo, prNumber, SKIP_LABEL);
   if (shouldSkip) {
@@ -65,17 +51,6 @@ export const executeJiraValidation = async (input: JiraValidationInput): Promise
         true,
         `:white_check_mark: **Jira Validation Skipped** — \`${SKIP_LABEL}\` label is present.`,
       );
-      if (headSha) {
-        await setCommitStatus(
-          statusOctokit,
-          config.owner,
-          config.repo,
-          headSha,
-          'success',
-          'Jira validation skipped',
-          JIRA_STATUS_CONTEXT,
-        );
-      }
       return;
     }
     console.log(
@@ -94,52 +69,18 @@ export const executeJiraValidation = async (input: JiraValidationInput): Promise
       '> Edit your PR title to include a valid Jira ticket ID, then comment `/recheck-jira`.';
 
     await reportValidation(octokit, config.owner, config.repo, prNumber, false, msg);
-    if (headSha) {
-      await setCommitStatus(
-        statusOctokit,
-        config.owner,
-        config.repo,
-        headSha,
-        'failure',
-        'No CNV ticket ID found in PR title',
-        JIRA_STATUS_CONTEXT,
-      );
-    }
     throw new HandledValidationError('No CNV ticket ID found in PR title');
   }
 
   const releaseBranches = await getReleaseBranches(octokit, config.owner, config.repo).catch(
     async (err) => {
       const message = `Failed to resolve release branches: ${safeErrorMessage(err)}`;
-      if (headSha) {
-        await setCommitStatus(
-          statusOctokit,
-          config.owner,
-          config.repo,
-          headSha,
-          'error',
-          message,
-          JIRA_STATUS_CONTEXT,
-        );
-      }
       throw new HandledValidationError(message);
     },
   );
   const expectedVersion = getExpectedVersionForBranch(baseBranch, releaseBranches);
 
   if (!process.env.JIRA_TOKEN) {
-    const message = 'Jira validation misconfigured: missing JIRA_TOKEN';
-    if (headSha) {
-      await setCommitStatus(
-        statusOctokit,
-        config.owner,
-        config.repo,
-        headSha,
-        'error',
-        message,
-        JIRA_STATUS_CONTEXT,
-      );
-    }
     throw new HandledValidationError('Missing required environment variable: JIRA_TOKEN');
   }
 
@@ -178,18 +119,6 @@ export const executeJiraValidation = async (input: JiraValidationInput): Promise
 
   const commentBody = formatValidationComment(ticketIds, allChecks, allPassed);
   await reportValidation(octokit, config.owner, config.repo, prNumber, allPassed, commentBody);
-
-  if (headSha) {
-    await setCommitStatus(
-      statusOctokit,
-      config.owner,
-      config.repo,
-      headSha,
-      allPassed ? 'success' : 'failure',
-      allPassed ? 'All Jira checks passed' : 'One or more Jira checks failed',
-      JIRA_STATUS_CONTEXT,
-    );
-  }
 
   if (!allPassed) {
     throw new HandledValidationError('Jira validation failed. See PR comment for details.');

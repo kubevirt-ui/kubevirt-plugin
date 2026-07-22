@@ -1,6 +1,6 @@
 import type { Octokit } from '@octokit/rest';
 
-import { addLabel, removeLabel, setCommitStatus } from '../../github-comments';
+import { addLabel, removeLabel } from '../../github-comments';
 import type { GitHubConfig } from '../../types/index';
 import type { PathValidationConfig } from './types';
 
@@ -10,36 +10,8 @@ export type PathValidationEvent = {
 
 export type LabelSyncContext = {
   octokit: Octokit;
-  /** Commit statuses need a separate permission scope -- defaults to `octokit` when the caller has just one token. */
-  statusOctokit?: Octokit;
   config: GitHubConfig;
   prNumber: number;
-  headSha?: string;
-};
-
-export const reportCommitStatus = async (
-  ctx: LabelSyncContext,
-  pathConfig: PathValidationConfig,
-  state: 'pending' | 'success' | 'failure' | 'error',
-  description: string,
-): Promise<void> => {
-  if (!ctx.headSha) return;
-
-  // Commit status only -- deliberately not also published as a checks.create()
-  // check-run. That check-run wasn't attached to this workflow run, so
-  // GitHub parked it under whatever check suite already existed for the
-  // SHA (e.g. "Needs Rebase"), rendering as the confusing "Needs Rebase /
-  // ci-scripts-validation" in the merge box. The commit status alone
-  // already satisfies branch protection's required context.
-  await setCommitStatus(
-    ctx.statusOctokit ?? ctx.octokit,
-    ctx.config.owner,
-    ctx.config.repo,
-    ctx.headSha,
-    state,
-    description,
-    pathConfig.statusContext,
-  );
 };
 
 export const syncValidationLabels = async (
