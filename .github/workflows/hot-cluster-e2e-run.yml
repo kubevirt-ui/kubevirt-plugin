@@ -442,11 +442,17 @@ jobs:
           retention-days: 7
           if-no-files-found: ignore
 
-      - name: e2e CI diagnostics - Collect pod logs and cluster info
+      - name: e2e CI diagnostics - Collect pod logs
         if: always()
         continue-on-error: true
+        working-directory: ci-scripts/hot-cluster/ts
+        run: npx tsx src/scripts/collect-diagnostics.ts
+
+      - name: e2e CI diagnostics - Collect cluster info (on failure)
+        if: failure()
+        continue-on-error: true
         env:
-          COLLECT_CLUSTER_INFO: ${{ failure() && 'true' || 'false' }}
+          COLLECT_CLUSTER_INFO: 'true'
         working-directory: ci-scripts/hot-cluster/ts
         run: npx tsx src/scripts/collect-diagnostics.ts
 
