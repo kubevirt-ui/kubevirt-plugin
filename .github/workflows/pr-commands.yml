@@ -63,10 +63,13 @@ jobs:
         env:
           BOT_TOKEN: ${{ steps.bot-token.outputs.token }}
           GITHUB_TOKEN: ${{ github.token }}
+          STATUS_GITHUB_TOKEN: ${{ github.token }}
           COMMENT_BODY: ${{ github.event.comment.body }}
           COMMENT_AUTHOR: ${{ github.event.comment.user.login }}
           COMMENT_ID: ${{ github.event.comment.id }}
           PR_NUMBER: ${{ github.event.issue.number }}
+          REPO_OWNER: ${{ github.repository_owner }}
+          REPO_NAME: ${{ github.event.repository.name }}
           JIRA_TOKEN: ${{ secrets.JIRA_TOKEN }}
           GITHUB_SERVER_URL: ${{ github.server_url }}
         working-directory: .github/scripts
