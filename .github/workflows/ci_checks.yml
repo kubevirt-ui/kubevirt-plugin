@@ -28,34 +28,6 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Detect changes
-        id: filter
-        uses: dorny/paths-filter@v3
-        with:
-          filters: |
-            i18n:
-              - 'src/**'
-              - 'locales/**'
-              - 'i18n-scripts/**'
-              - 'i18next-parser.config.js'
-            workflows:
-              - '.github/workflows/**'
-            build:
-              - '**'
-              - '!.github/**'
-              - '!.cursor/**'
-              - '!.husky/**'
-              - '!.vscode/**'
-              - '!playwright/**'
-              - '!ci-scripts/**'
-              - '!i18n-scripts/**'
-              - '!locales/**'
-              - '!scripts/**'
-            package-lock:
-              - package-lock.json
-            scripts:
-              - '.github/scripts/**'
-
       - name: Setup Node
         uses: actions/setup-node@v6
         with:
@@ -68,7 +40,6 @@ jobs:
       # ── i18n ──────────────────────────────────────────────
       - name: Check i18n
         id: i18n
-        if: github.event_name == 'push' || steps.filter.outputs.i18n == 'true'
         continue-on-error: true
         shell: bash
         run: |
@@ -82,33 +53,29 @@ jobs:
 
       # ── actionlint ────────────────────────────────────────
       - name: Install actionlint
-        if: github.event_name == 'push' || steps.filter.outputs.workflows == 'true'
         run: |
           go install github.com/rhysd/actionlint/cmd/actionlint@v1.7.12
           echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
 
       - name: Run actionlint
         id: actionlint
-        if: github.event_name == 'push' || steps.filter.outputs.workflows == 'true'
         continue-on-error: true
         run: actionlint -color -shellcheck= -pyflakes=
 
       # ── lint + build ──────────────────────────────────────
       - name: Lint
         id: lint
-        if: github.event_name == 'push' || steps.filter.outputs.build == 'true'
         continue-on-error: true
         run: npm run lint
 
       - name: Build
         id: build
-        if: github.event_name == 'push' || steps.filter.outputs.build == 'true'
         continue-on-error: true
         run: npm run build
 
+      # ── Hermeto offline install verification ──────────────
       - name: Prefetch npm dependencies with Hermeto
         id: hermeto
-        if: (github.event_name == 'push' || steps.filter.outputs.build == 'true') && steps.filter.outputs.package-lock == 'true'
         continue-on-error: true
         run: |
           git checkout -- package.json package-lock.json
@@ -127,10 +94,8 @@ jobs:
 
       - name: Verify offline install
         id: offline
-        if: (github.event_name == 'push' || steps.filter.outputs.build == 'true') && steps.filter.outputs.package-lock == 'true'
         continue-on-error: true
-        run: |
-          HUSKY=0 npm ci --offline --ignore-scripts --no-audit
+        run: HUSKY=0 npm ci --offline --ignore-scripts --no-audit
 
       # ── unit tests ────────────────────────────────────────
       - name: Run unit tests
@@ -146,20 +111,17 @@ jobs:
 
       # ── workflow script checks ────────────────────────────
       - name: Install workflow script dependencies
-        if: github.event_name == 'push' || steps.filter.outputs.scripts == 'true'
         working-directory: .github/scripts
         run: npm ci
 
       - name: Check workflow script types
         id: script_types
-        if: github.event_name == 'push' || steps.filter.outputs.scripts == 'true'
         continue-on-error: true
         working-directory: .github/scripts
         run: npm run check-types
 
       - name: Run workflow script tests
         id: script_tests
-        if: github.event_name == 'push' || steps.filter.outputs.scripts == 'true'
         continue-on-error: true
         working-directory: .github/scripts
         run: npm test
@@ -167,20 +129,18 @@ jobs:
       # ── final verdict ─────────────────────────────────────
       - name: Check all results
         if: always()
-        run: |
-          failed=""
-          [ "${{ steps.i18n.outcome }}" = "failure" ] && failed="${failed} i18n"
-          [ "${{ steps.actionlint.outcome }}" = "failure" ] && failed="${failed} actionlint"
-          [ "${{ steps.lint.outcome }}" = "failure" ] && failed="${failed} lint"
-          [ "${{ steps.build.outcome }}" = "failure" ] && failed="${failed} build"
-          [ "${{ steps.hermeto.outcome }}" = "failure" ] && failed="${failed} hermeto"
-          [ "${{ steps.offline.outcome }}" = "failure" ] && failed="${failed} offline-install"
-          [ "${{ steps.test.outcome }}" = "failure" ] && failed="${failed} test"
-          [ "${{ steps.script_types.outcome }}" = "failure" ] && failed="${failed} script-types"
-          [ "${{ steps.script_tests.outcome }}" = "failure" ] && failed="${failed} script-tests"
-
-          if [ -n "$failed" ]; then
-            echo "::error::Failed checks:${failed}"
-            exit 1
-          fi
-          echo "All checks passed"
+        env:
+          STEP_RESULTS: >-
+            {
+              "i18n": "${{ steps.i18n.outcome }}",
+              "actionlint": "${{ steps.actionlint.outcome }}",
+              "lint": "${{ steps.lint.outcome }}",
+              "build": "${{ steps.build.outcome }}",
+              "hermeto": "${{ steps.hermeto.outcome }}",
+              "offline-install": "${{ steps.offline.outcome }}",
+              "test": "${{ steps.test.outcome }}",
+              "script-types": "${{ steps.script_types.outcome }}",
+              "script-tests": "${{ steps.script_tests.outcome }}"
+            }
+        working-directory: .github/scripts
+        run: npx tsx src/shared/check-step-results.ts
