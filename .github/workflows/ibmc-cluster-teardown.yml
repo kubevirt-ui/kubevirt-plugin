@@ -88,36 +88,21 @@ jobs:
           persist-credentials: false
 
       - name: Validate cluster_name format
-        run: |
-          if [[ ! "${CLUSTER_NAME}" =~ ^[a-zA-Z0-9][a-zA-Z0-9._-]{0,20}$ ]]; then
-            echo "::error::Invalid cluster_name: '${CLUSTER_NAME}'. Must match [a-zA-Z0-9][a-zA-Z0-9._-]* and be at most 21 characters."
-            exit 1
-          fi
+        working-directory: ci-scripts/hot-cluster/ts
+        run: npx tsx src/scripts/validate-cluster-name.ts
+
+      - name: Setup scripts
+        if: inputs.force != true
+        uses: ./.github/actions/setup-gh-scripts
+        with:
+          ref: ${{ github.event.repository.default_branch || 'main' }}
 
       - name: Check for active setup/e2e workflows
         if: inputs.force != true
-        uses: actions/github-script@v9
-        with:
-          script: |
-            const workflows = [
-              '.github/workflows/ibmc-cluster-setup.yml',
-              '.github/workflows/hot-cluster-e2e.yml',
-              '.github/workflows/hot-cluster-e2e-run.yml',
-            ];
-
-            let active = 0;
-            for (const wf of workflows) {
-              const runs = await github.rest.actions.listWorkflowRuns({
-                ...context.repo, workflow_id: wf, status: 'in_progress', per_page: 1,
-              });
-              active += runs.data.total_count;
-            }
-
-            if (active > 0) {
-              core.setFailed(`Aborting teardown: ${active} setup/e2e workflow(s) are currently running. Use force=true to override.`);
-            } else {
-              core.info('No active setup/e2e workflows. Proceeding with teardown.');
-            }
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        working-directory: .github/scripts
+        run: npx tsx src/infra/teardown-safety-check.ts
 
       - name: Setup IBM Cloud CLI
         uses: IBM/actions-ibmcloud-cli@v2
@@ -133,56 +118,19 @@ jobs:
       - name: Check ROKS cluster exists
         if: inputs.infrastructure_type != 'ipi'
         id: check_cluster
-        run: |
-          if ibmcloud oc cluster get --cluster "${CLUSTER_NAME}" &>/dev/null; then
-            echo "Cluster '${CLUSTER_NAME}' found"
-            echo "exists=true" >> "$GITHUB_OUTPUT"
-            ibmcloud oc cluster config --cluster "${CLUSTER_NAME}" --admin || true
-          else
-            echo "Cluster '${CLUSTER_NAME}' not found, nothing to tear down"
-            echo "exists=false" >> "$GITHUB_OUTPUT"
-          fi
+        working-directory: ci-scripts/hot-cluster/ts
+        run: npx tsx src/scripts/check-roks-exists-teardown.ts
 
       - name: Deregister ARC runners
         if: inputs.infrastructure_type != 'ipi' && steps.check_cluster.outputs.exists == 'true'
         continue-on-error: true
-        run: |
-          if command -v helm &>/dev/null || (curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash); then
-            echo "Uninstalling ARC runner scale set '${CLUSTER_NAME}'..."
-            helm uninstall "${CLUSTER_NAME}" --namespace arc-runners --wait --timeout 5m 2>/dev/null || echo "Runner scale set not found or already removed"
-
-            echo "Uninstalling ARC controller..."
-            helm uninstall arc --namespace arc-systems --wait --timeout 5m 2>/dev/null || echo "ARC controller not found or already removed"
-          else
-            echo "WARNING: Helm not available, skipping Helm uninstall"
-          fi
+        working-directory: ci-scripts/hot-cluster/ts
+        run: npx tsx src/scripts/deregister-arc-runners.ts
 
       - name: Delete ROKS cluster
         if: inputs.infrastructure_type != 'ipi' && steps.check_cluster.outputs.exists == 'true'
-        run: |
-          echo "Deleting cluster '${CLUSTER_NAME}'..."
-          ibmcloud oc cluster rm --cluster "${CLUSTER_NAME}" -f --force-delete-storage
-          echo "Cluster deletion initiated"
-
-          echo "Waiting for cluster to be fully removed..."
-          MAX_WAIT=7200
-          INTERVAL=30
-          ELAPSED=0
-
-          while [[ ${ELAPSED} -lt ${MAX_WAIT} ]]; do
-            if ! ibmcloud oc cluster get --cluster "${CLUSTER_NAME}" &>/dev/null; then
-              echo "Cluster has been removed"
-              break
-            fi
-            echo "[$(date '+%H:%M:%S')] Cluster still being deleted... (${ELAPSED}s elapsed)"
-            sleep ${INTERVAL}
-            ELAPSED=$((ELAPSED + INTERVAL))
-          done
-
-          if ibmcloud oc cluster get --cluster "${CLUSTER_NAME}" &>/dev/null; then
-            echo "::error::Timed out waiting for cluster deletion"
-            exit 1
-          fi
+        working-directory: ci-scripts/hot-cluster/ts
+        run: npx tsx src/scripts/delete-roks-cluster.ts
 
       - name: Clean up VPC resources
         if: inputs.infrastructure_type == 'vpc' && steps.check_cluster.outputs.exists == 'true'
@@ -201,56 +149,20 @@ jobs:
       - name: Download IPI install state
         if: inputs.infrastructure_type == 'ipi'
         continue-on-error: true
+        working-directory: ci-scripts/hot-cluster/ts
         env:
           GH_TOKEN: ${{ github.token }}
           SETUP_RUN_ID: ${{ inputs.ipi_setup_run_id }}
-        run: |
-          INSTALL_DIR="${RUNNER_TEMP}/ipi-install"
-          mkdir -p "${INSTALL_DIR}"
-
-          if [[ -z "${SETUP_RUN_ID}" ]]; then
-            echo "No setup run ID provided. Looking up latest successful setup run for cluster '${CLUSTER_NAME}'..."
-            SETUP_RUN_ID=$(gh run list --repo "${{ github.repository }}" \
-              --workflow="IBM Cloud Hot Cluster Setup" --status=success --limit=20 \
-              --json databaseId,displayTitle 2>/dev/null \
-              | jq -r --arg tag "[${CLUSTER_NAME}]" '.[] | select(.displayTitle | contains($tag)) | .databaseId' \
-              | head -1 || true)
-            if [[ -z "${SETUP_RUN_ID}" ]]; then
-              echo "::warning::No successful IPI setup run found for cluster '${CLUSTER_NAME}' and no ipi_setup_run_id provided. openshift-install destroy will be skipped; the VPC-resource sweep step will still run."
-              exit 1
-            fi
-            echo "Using latest successful setup run for '${CLUSTER_NAME}': ${SETUP_RUN_ID}"
-          fi
-
-          echo "Downloading IPI install state from run ${SETUP_RUN_ID}..."
-          gh run download "${SETUP_RUN_ID}" --repo "${{ github.repository }}" \
-            --name "ipi-install-state-${SETUP_RUN_ID}" \
-            --dir "${INSTALL_DIR}"
-
-          echo "Downloaded files:"
-          ls -la "${INSTALL_DIR}/"
-          echo "install_dir=${INSTALL_DIR}" >> "$GITHUB_OUTPUT"
+        run: npx tsx src/scripts/download-ipi-install-state.ts
 
       - name: Destroy IPI cluster
         if: inputs.infrastructure_type == 'ipi'
         continue-on-error: true
+        working-directory: ci-scripts/hot-cluster/ts
         env:
           IC_API_KEY: ${{ secrets.IC_KEY }}
           INSTALL_DIR: ${{ runner.temp }}/ipi-install
-        run: |
-          export IC_API_KEY
-
-          if [[ ! -f "${INSTALL_DIR}/metadata.json" ]]; then
-            echo "::warning::metadata.json not found in install state. Skipping openshift-install destroy; the VPC-resource sweep step will still run."
-            exit 1
-          fi
-
-          echo "Downloading openshift-install (latest stable)..."
-          curl -sL "https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/stable/openshift-install-linux.tar.gz" \
-            | tar -xz -C /usr/local/bin openshift-install
-
-          echo "Destroying IPI cluster..."
-          openshift-install destroy cluster --dir="${INSTALL_DIR}" --log-level=info 2>&1 | tail -80
+        run: npx tsx src/scripts/destroy-ipi-cluster.ts
 
       # Guaranteed backstop: sweeps by name prefix regardless of whether the
       # steps above found install state or ran openshift-install destroy.
@@ -281,33 +193,15 @@ jobs:
       - name: Clean up ghost runners
         if: always()
         continue-on-error: true
+        working-directory: ci-scripts/hot-cluster/ts
         env:
           GH_TOKEN: ${{ steps.arc-app-token.outputs.token }}
-        run: |
-          echo "Checking for offline self-hosted runners with label '${CLUSTER_NAME}'..."
-          # gh api's --jq only accepts a single jq-expression string (no --arg
-          # support for variable binding), so interpolate CLUSTER_NAME directly.
-          # Safe here since it was already regex-validated earlier in this job.
-          RUNNERS=$(gh api "/repos/${{ github.repository }}/actions/runners" --jq ".runners[] | select(.status == \"offline\") | select(.labels[].name == \"${CLUSTER_NAME}\") | .id" 2>/dev/null || true)
-
-          if [[ -z "${RUNNERS}" ]]; then
-            echo "No offline '${CLUSTER_NAME}' runners found"
-          else
-            for runner_id in ${RUNNERS}; do
-              echo "Deleting offline runner ${runner_id}..."
-              gh api -X DELETE "/repos/${{ github.repository }}/actions/runners/${runner_id}" || echo "Failed to delete runner ${runner_id}"
-            done
-            echo "Ghost runner cleanup complete"
-          fi
+        run: npx tsx src/scripts/cleanup-ghost-runners.ts
 
       - name: Teardown summary
         if: always()
-        run: |
-          echo "## Hot Cluster Teardown Summary" >> "$GITHUB_STEP_SUMMARY"
-          echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "| Parameter | Value |" >> "$GITHUB_STEP_SUMMARY"
-          echo "|-----------|-------|" >> "$GITHUB_STEP_SUMMARY"
-          echo "| Infrastructure | \`${{ inputs.infrastructure_type || 'classic' }}\` |" >> "$GITHUB_STEP_SUMMARY"
-          echo "| Cluster | \`${CLUSTER_NAME}\` |" >> "$GITHUB_STEP_SUMMARY"
-          echo "| Cluster Found | \`${{ steps.check_cluster.outputs.exists || 'N/A (IPI)' }}\` |" >> "$GITHUB_STEP_SUMMARY"
-          echo "" >> "$GITHUB_STEP_SUMMARY"
+        working-directory: ci-scripts/hot-cluster/ts
+        env:
+          INFRASTRUCTURE_TYPE: ${{ inputs.infrastructure_type || 'classic' }}
+          CLUSTER_EXISTS: ${{ steps.check_cluster.outputs.exists || 'N/A (IPI)' }}
+        run: npx tsx src/scripts/write-teardown-summary.ts

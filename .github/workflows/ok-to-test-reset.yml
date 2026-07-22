@@ -27,14 +27,15 @@ jobs:
           permission-pull-requests: write
           permission-issues: write
 
-      - name: Remove ok-to-test label
-        uses: actions/github-script@v9
+      - name: Setup scripts
+        uses: ./.github/actions/setup-gh-scripts
         with:
-          github-token: ${{ steps.bot-token.outputs.token || github.token }}
-          script: |
-            await github.rest.issues.removeLabel({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.payload.pull_request.number,
-              name: 'ok-to-test',
-            }).catch(() => {});
+          ref: ${{ github.event.repository.default_branch }}
+
+      - name: Remove ok-to-test label
+        env:
+          BOT_TOKEN: ${{ steps.bot-token.outputs.token }}
+          GITHUB_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        working-directory: .github/scripts
+        run: npx tsx src/commands/ok-to-test-reset.ts

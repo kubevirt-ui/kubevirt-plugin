@@ -59,44 +59,18 @@ jobs:
       - name: Install CIS plugin
         run: ibmcloud plugin install cis -f 2>/dev/null || true
 
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+          sparse-checkout: ci-scripts/hot-cluster/ts
+
       - name: Discover active clusters
         id: discover
-        run: |
-          CLUSTERS="[]"
-
-          echo "=== Discovering IPI clusters via CIS DNS ==="
-          CIS_CRN=$(ibmcloud cis instances --output json 2>/dev/null | jq -r '.[0].crn // empty' || true)
-          if [[ -n "${CIS_CRN}" ]]; then
-            ibmcloud cis instance-set "${CIS_CRN}" 2>/dev/null || true
-            ZONE_ID=$(ibmcloud cis domains --output json 2>/dev/null | jq -r '.[0].id // empty' || true)
-            if [[ -n "${ZONE_ID}" ]]; then
-              IPI_CLUSTERS=$(ibmcloud cis dns-records "${ZONE_ID}" --output json 2>/dev/null \
-                | jq -c '[.[] | select(.type == "A" or .type == "CNAME") | .name
-                    | capture("^api\\.(?<name>[^.]+)\\.'"${BASE_DOMAIN}"'$") | .name] | unique' \
-                || echo "[]")
-              echo "IPI clusters from DNS: ${IPI_CLUSTERS}"
-              CLUSTERS=$(echo "${CLUSTERS}" | jq -c --argjson ipi "${IPI_CLUSTERS}" '. + $ipi' || echo "[]")
-            else
-              echo "WARNING: Could not find CIS zone"
-            fi
-          else
-            echo "WARNING: No CIS instance found"
-          fi
-
-          echo "=== Discovering ROKS clusters ==="
-          ROKS_CLUSTERS=$(ibmcloud oc cluster ls --output json 2>/dev/null \
-            | jq -c '[.[].name] // []' \
-            || echo "[]")
-          echo "ROKS clusters: ${ROKS_CLUSTERS}"
-          CLUSTERS=$(echo "${CLUSTERS}" | jq -c --argjson roks "${ROKS_CLUSTERS}" '. + $roks | unique' || echo "[]")
-
-          if [[ $(echo "${CLUSTERS}" | jq 'length') -eq 0 ]]; then
-            echo "No clusters discovered — nothing to check"
-            echo "clusters=[]" >> "$GITHUB_OUTPUT"
-          else
-            echo "Discovered clusters: ${CLUSTERS}"
-            echo "clusters=${CLUSTERS}" >> "$GITHUB_OUTPUT"
-          fi
+        env:
+          BASE_DOMAIN: ${{ env.BASE_DOMAIN }}
+        working-directory: ci-scripts/hot-cluster/ts
+        run: npx tsx src/scripts/discover-clusters.ts
 
   validate-input:
     name: Validate Input
@@ -106,16 +80,18 @@ jobs:
     outputs:
       cluster_matrix: ${{ steps.sanitize.outputs.matrix }}
     steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+          sparse-checkout: ci-scripts/hot-cluster/ts
+
       - name: Sanitize cluster_name input
         id: sanitize
         env:
           INPUT_CLUSTER_NAME: ${{ inputs.cluster_name }}
-        run: |
-          if [[ ! "${INPUT_CLUSTER_NAME}" =~ ^[a-zA-Z0-9][a-zA-Z0-9._-]{0,20}$ ]]; then
-            echo "::error::Invalid cluster_name: '${INPUT_CLUSTER_NAME}'. Must match [a-zA-Z0-9][a-zA-Z0-9._-]* and be at most 21 characters."
-            exit 1
-          fi
-          echo "matrix=[\"${INPUT_CLUSTER_NAME}\"]" >> "$GITHUB_OUTPUT"
+        working-directory: ci-scripts/hot-cluster/ts
+        run: npx tsx src/scripts/sanitize-cluster-input.ts
 
   check-and-teardown:
     name: 'Check & Teardown [${{ matrix.cluster_name }}]'
@@ -134,22 +110,22 @@ jobs:
     env:
       CLUSTER_NAME: ${{ matrix.cluster_name }}
     steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            .github/scripts
+            .github/actions/setup-gh-scripts
+            ci-scripts/hot-cluster/ts
+
       - name: Determine idle threshold for this cluster
         id: threshold
         env:
           EVENT_NAME: ${{ github.event_name }}
           INPUT_IDLE_THRESHOLD: ${{ inputs.idle_threshold_minutes }}
-        run: |
-          if [[ "${EVENT_NAME}" == "workflow_dispatch" && -n "${INPUT_IDLE_THRESHOLD}" ]]; then
-            echo "minutes=${INPUT_IDLE_THRESHOLD}" >> "$GITHUB_OUTPUT"
-            echo "Using workflow_dispatch override: ${INPUT_IDLE_THRESHOLD} minutes"
-          elif [[ "${CLUSTER_NAME}" == "kubevirt-plugin-ci" ]]; then
-            echo "minutes=240" >> "$GITHUB_OUTPUT"
-            echo "Default/main cluster: 240 minutes (4h)"
-          else
-            echo "minutes=120" >> "$GITHUB_OUTPUT"
-            echo "Release-branch cluster: 120 minutes (2h)"
-          fi
+        working-directory: ci-scripts/hot-cluster/ts
+        run: npx tsx src/scripts/determine-idle-threshold.ts
 
       # Admin API needs a token GITHUB_TOKEN can't provide -- mint one from the ARC GitHub App.
       - name: Generate ARC app token for runner-busy check
@@ -161,164 +137,35 @@ jobs:
           private-key: ${{ secrets.ARC_GITHUB_APP_PRIVATE_KEY }}
           permission-administration: read
 
-      # Plain gh api, not actions/github-script -- @actions/github isn't requireable in that sandbox.
       - name: Check runner-busy status for this cluster
         id: runner_busy
         env:
           GH_TOKEN: ${{ steps.arc-app-token.outputs.token }}
           CLUSTER_NAME: ${{ matrix.cluster_name }}
-        run: |
-          if [[ -z "${GH_TOKEN}" ]]; then
-            echo "::warning::ARC app token unavailable (see previous step) -- failing closed (treating as busy)."
-            echo "busy=true" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
+        working-directory: ci-scripts/hot-cluster/ts
+        run: npx tsx src/scripts/check-runner-busy.ts
 
-          if ! RUNNERS_JSON=$(gh api "repos/${GITHUB_REPOSITORY}/actions/runners?per_page=100" 2>&1); then
-            echo "::warning::Failed to query self-hosted runners: ${RUNNERS_JSON} -- failing closed (treating as busy)."
-            echo "busy=true" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-
-          # busy:true + matching label means a job is actively running right now.
-          BUSY=$(echo "${RUNNERS_JSON}" | jq --arg name "${CLUSTER_NAME}" \
-            '[.runners[] | select(.busy == true and ((.labels // []) | any(.name == $name)))] | length > 0')
-          TOTAL=$(echo "${RUNNERS_JSON}" | jq '.total_count')
-          echo "Runner pool for '${CLUSTER_NAME}': $([ "${BUSY}" == "true" ] && echo busy || echo idle) (${TOTAL} total runners checked)."
-          echo "busy=${BUSY}" >> "$GITHUB_OUTPUT"
+      - name: Setup scripts
+        uses: ./.github/actions/setup-gh-scripts
+        with:
+          ref: ${{ github.event.repository.default_branch || 'main' }}
 
       - name: Check CI jobs for this cluster
         id: check_ci
-        uses: actions/github-script@v9
         env:
-          INCLUDE_WORKFLOWS: '[".github/workflows/hot-cluster-e2e.yml", ".github/workflows/hot-cluster-e2e-run.yml", ".github/workflows/ibmc-cluster-setup.yml"]'
+          GITHUB_TOKEN: ${{ github.token }}
           CLUSTER_NAME: ${{ matrix.cluster_name }}
           RUNNER_BUSY: ${{ steps.runner_busy.outputs.busy }}
-        with:
-          script: |
-            const INCLUDE_WORKFLOWS = JSON.parse(process.env.INCLUDE_WORKFLOWS);
-            const clusterName = process.env.CLUSTER_NAME;
-            const clusterTag = `[${clusterName}]`;
-
-            // From the runner-busy step above; fails closed if that query failed.
-            const runnerBusy = process.env.RUNNER_BUSY === 'true';
-
-            if (runnerBusy) {
-              core.setOutput('active_jobs', 'true');
-              core.setOutput('last_run_time', '');
-              core.summary.addList([
-                `Cluster: ${clusterName}`,
-                `Runner pool busy: true (skipping teardown -- job running right now)`,
-              ]);
-              await core.summary.write();
-              return;
-            }
-
-            // hot-cluster-e2e.yml's run-name bracket token can be either an
-            // already-resolved cluster_name (a bare ad-hoc dispatch with no
-            // pr_number) or a raw base branch like "release-4.20" (every
-            // PR-related dispatch -- PR gate, ok-to-test, pool/pool-entry
-            // retest, /retest-e2e -- passes base_ref, and hot-cluster-e2e.yml
-            // no longer has a pull_request_target trigger to fall back to).
-            // event type alone can't distinguish these two cases anymore, so
-            // always try the same resolution: pass through an already-
-            // resolved name, remap a release branch, or default to the
-            // shared cluster. The other workflows already show the resolved
-            // name in their own run-name, so they keep a plain substring match.
-            function runMatchesCluster(run, workflow) {
-              const title = run.display_title || '';
-              if (workflow === '.github/workflows/hot-cluster-e2e.yml') {
-                const bracketed = title.match(/^Hot Cluster E2E \[([^\]]+)\]/);
-                if (!bracketed) return false;
-                const token = bracketed[1];
-                let resolved;
-                if (token.startsWith('kubevirt-plugin-')) {
-                  resolved = token;
-                } else {
-                  const release = token.match(/^release-(\d+)\.(\d+)$/);
-                  resolved = release ? `kubevirt-plugin-${release[1]}${release[2]}` : 'kubevirt-plugin-ci';
-                }
-                return resolved === clusterName;
-              }
-              return title.includes(clusterTag);
-            }
-
-            let inProgress = 0;
-            let queued = 0;
-            let lastRunTime = null;
-
-            // Bound "completed" lookup to recent history -- idle thresholds top out at a few hours.
-            const lookbackDate = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString();
-
-            try {
-              for (const workflow of INCLUDE_WORKFLOWS) {
-                for (const status of ['in_progress', 'queued', 'completed']) {
-                  const params = {
-                    ...context.repo,
-                    workflow_id: workflow,
-                    status,
-                    per_page: 100,
-                  };
-                  if (status === 'completed') {
-                    params.created = `>=${lookbackDate}`;
-                  }
-
-                  // Paginate fully before filtering -- a match can fall outside page 1.
-                  const runs = await github.paginate(github.rest.actions.listWorkflowRuns, params);
-
-                  const matching = runs.filter(r => runMatchesCluster(r, workflow));
-
-                  if (status === 'in_progress') inProgress += matching.length;
-                  if (status === 'queued') queued += matching.length;
-                  if (status === 'completed') {
-                    for (const run of matching) {
-                      const t = new Date(run.updated_at);
-                      if (!lastRunTime || t > lastRunTime) lastRunTime = t;
-                    }
-                  }
-                }
-              }
-            } catch (err) {
-              core.setFailed(`Failed to query workflow runs: ${err.message}`);
-              return;
-            }
-
-            const minutesAgo = lastRunTime ? Math.floor((new Date().getTime() - lastRunTime.getTime()) / 60000) : 'N/A';
-            core.summary.addList([
-              `Cluster: ${clusterName}`,
-              `In-progress CI runs (tagged): ${inProgress}`,
-              `Queued CI runs (tagged): ${queued}`,
-              `Last tagged run: ${lastRunTime ? lastRunTime.toISOString() : 'N/A'} (${minutesAgo} minutes ago)`,
-            ]);
-            await core.summary.write();
-            core.setOutput('active_jobs', (inProgress > 0 || queued > 0) ? 'true' : 'false');
-            core.setOutput('last_run_time', lastRunTime ? lastRunTime.toISOString() : '');
+        working-directory: .github/scripts
+        run: npx tsx src/infra/auto-teardown-check-ci.ts
 
       - name: Check business hours
         id: check_hours
         if: steps.check_ci.outputs.active_jobs == 'false'
         env:
           BUSINESS_HOURS_ONLY: ${{ inputs.business_hours_only || 'false' }}
-        run: |
-          if [[ "${BUSINESS_HOURS_ONLY}" != "true" ]]; then
-            echo "skip=false" >> "$GITHUB_OUTPUT"
-            echo "Business hours check disabled — proceeding with idle check."
-            exit 0
-          fi
-
-          HOUR_IL=$(TZ='Asia/Jerusalem' date +%H)
-          DOW=$(TZ='Asia/Jerusalem' date +%u)
-
-          if [[ ${DOW} -ge 1 && ${DOW} -le 4 && ${HOUR_IL} -ge 8 && ${HOUR_IL} -lt 18 ]]; then
-            echo "skip=true" >> "$GITHUB_OUTPUT"
-            echo "Business hours (Sun-Thu 8-18 Israel) — skipping teardown."
-          elif [[ ${DOW} -eq 7 && ${HOUR_IL} -ge 8 && ${HOUR_IL} -lt 18 ]]; then
-            echo "skip=true" >> "$GITHUB_OUTPUT"
-            echo "Business hours (Sunday 8-18 Israel) — skipping teardown."
-          else
-            echo "skip=false" >> "$GITHUB_OUTPUT"
-            echo "Outside business hours — proceeding with idle check."
-          fi
+        working-directory: ci-scripts/hot-cluster/ts
+        run: npx tsx src/scripts/check-business-hours.ts
 
       - name: Setup IBM Cloud CLI
         uses: IBM/actions-ibmcloud-cli@v2
@@ -332,115 +179,28 @@ jobs:
       - name: Check idle threshold
         id: check_idle
         if: steps.check_ci.outputs.active_jobs == 'false' && steps.check_hours.outputs.skip != 'true'
-        uses: actions/github-script@v9
         env:
+          GITHUB_TOKEN: ${{ github.token }}
+          CLUSTER_NAME: ${{ matrix.cluster_name }}
           LAST_RUN_TIME: ${{ steps.check_ci.outputs.last_run_time }}
           IDLE_THRESHOLD_MINUTES: ${{ steps.threshold.outputs.minutes }}
-          CLUSTER_NAME: ${{ matrix.cluster_name }}
-        with:
-          script: |
-            let lastRunTime = process.env.LAST_RUN_TIME;
-            const clusterName = process.env.CLUSTER_NAME;
-            const clusterTag = `[${clusterName}]`;
-
-            if (!lastRunTime) {
-              core.info('No completed tagged CI runs found, checking cluster setup time as fallback...');
-
-              try {
-                const runs = await github.rest.actions.listWorkflowRuns({
-                  ...context.repo,
-                  workflow_id: 'ibmc-cluster-setup.yml',
-                  status: 'success',
-                  per_page: 10,
-                });
-                const match = runs.data.workflow_runs.find(
-                  r => r.display_title && r.display_title.includes(clusterTag)
-                );
-                if (match) {
-                  lastRunTime = match.updated_at;
-                  core.info(`Using last successful setup run time for ${clusterName}: ${lastRunTime}`);
-                }
-              } catch (err) {
-                core.warning(`Failed to query setup runs: ${err.message}`);
-              }
-            }
-
-            if (!lastRunTime) {
-              core.info('Cannot determine last activity time, skipping teardown for safety');
-              core.setOutput('recent_activity', 'true');
-              core.setOutput('reason', 'Cannot determine last activity timestamp');
-              return;
-            }
-
-            const lastTime = new Date(lastRunTime);
-            const idleMinutes = Math.floor((Date.now() - lastTime.getTime()) / 60000);
-            const threshold = parseInt(process.env.IDLE_THRESHOLD_MINUTES, 10);
-
-            core.info(`Cluster: ${clusterName}`);
-            core.info(`Last activity: ${lastRunTime}`);
-            core.info(`Idle for ${idleMinutes} minutes (threshold: ${threshold} minutes)`);
-
-            if (idleMinutes >= threshold) {
-              core.setOutput('recent_activity', 'false');
-              core.setOutput('reason', `CI jobs have been idle for ${idleMinutes} minutes (threshold: ${threshold})`);
-            } else {
-              const remaining = threshold - idleMinutes;
-              core.setOutput('recent_activity', 'true');
-              core.setOutput('reason', `CI jobs last ran ${idleMinutes} minutes ago, ${remaining} minutes remaining before threshold`);
-            }
+        working-directory: .github/scripts
+        run: npx tsx src/infra/auto-teardown-check-idle.ts
 
       - name: Check if cluster exists
         id: check_cluster
         if: steps.check_idle.outputs.recent_activity == 'false'
-        run: |
-          INFRA_TYPE=""
-
-          if ibmcloud oc cluster get --cluster "${CLUSTER_NAME}" &>/dev/null; then
-            STATE=$(ibmcloud oc cluster get --cluster "${CLUSTER_NAME}" --output json 2>/dev/null | jq -r '.state // "unknown"')
-            PROVIDER=$(ibmcloud oc cluster get --cluster "${CLUSTER_NAME}" --output json 2>/dev/null | jq -r '.provider // "classic"')
-            echo "ROKS cluster '${CLUSTER_NAME}' exists (state: ${STATE}, provider: ${PROVIDER})"
-            echo "exists=true" >> "$GITHUB_OUTPUT"
-            if [[ "${PROVIDER}" == "vpc-gen2" ]]; then
-              INFRA_TYPE="vpc"
-            else
-              INFRA_TYPE="classic"
-            fi
-          elif dig +short "api.${CLUSTER_NAME}.${BASE_DOMAIN}" 2>/dev/null | grep -q .; then
-            echo "IPI cluster detected via DNS (api.${CLUSTER_NAME}.${BASE_DOMAIN} resolves)"
-            echo "exists=true" >> "$GITHUB_OUTPUT"
-            INFRA_TYPE="ipi"
-          else
-            echo "No cluster '${CLUSTER_NAME}' found (ROKS or IPI), nothing to do"
-            echo "exists=false" >> "$GITHUB_OUTPUT"
-          fi
-
-          echo "infra_type=${INFRA_TYPE}" >> "$GITHUB_OUTPUT"
+        working-directory: ci-scripts/hot-cluster/ts
+        run: npx tsx src/scripts/check-cluster-exists.ts
 
       - name: Trigger teardown
         if: steps.check_idle.outputs.recent_activity == 'false' && steps.check_cluster.outputs.exists == 'true'
-        uses: actions/github-script@v9
         env:
-          INFRA_TYPE: ${{ steps.check_cluster.outputs.infra_type }}
+          GITHUB_TOKEN: ${{ github.token }}
           CLUSTER_NAME: ${{ matrix.cluster_name }}
-        with:
-          script: |
-            const infraType = process.env.INFRA_TYPE || 'classic';
-            const clusterName = process.env.CLUSTER_NAME;
-
-            const inputs = {
-              cluster_name: clusterName,
-              infrastructure_type: infraType,
-            };
-
-            core.info(`Triggering teardown for ${infraType} cluster '${clusterName}'`);
-
-            await github.rest.actions.createWorkflowDispatch({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              workflow_id: 'ibmc-cluster-teardown.yml',
-              ref: context.ref,
-              inputs,
-            });
+          INFRA_TYPE: ${{ steps.check_cluster.outputs.infra_type }}
+        working-directory: .github/scripts
+        run: npx tsx src/infra/auto-teardown-dispatch.ts
 
       - name: Summary
         if: always()
@@ -452,16 +212,5 @@ jobs:
           IDLE_REASON: ${{ steps.check_idle.outputs.reason }}
           BUSINESS_HOURS_SKIP: ${{ steps.check_hours.outputs.skip }}
           IDLE_THRESHOLD_MINUTES: ${{ steps.threshold.outputs.minutes }}
-        run: |
-          echo "## Auto-Teardown Check: ${CLUSTER_NAME}" >> "$GITHUB_STEP_SUMMARY"
-          echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "| Check | Result |" >> "$GITHUB_STEP_SUMMARY"
-          echo "|-------|--------|" >> "$GITHUB_STEP_SUMMARY"
-          echo "| Cluster | \`${CLUSTER_NAME}\` |" >> "$GITHUB_STEP_SUMMARY"
-          echo "| Idle Threshold | \`${IDLE_THRESHOLD_MINUTES}\` min |" >> "$GITHUB_STEP_SUMMARY"
-          echo "| Business Hours Skip | \`${BUSINESS_HOURS_SKIP:-N/A}\` |" >> "$GITHUB_STEP_SUMMARY"
-          echo "| Cluster Exists | \`${CLUSTER_EXISTS:-(unknown)}\` |" >> "$GITHUB_STEP_SUMMARY"
-          echo "| Active CI Jobs? | \`${WORKFLOW_ACTIVE_JOBS:-N/A}\` |" >> "$GITHUB_STEP_SUMMARY"
-          echo "| Last CI Run | \`${WORKFLOW_LAST_RUN_TIME:-N/A}\` |" >> "$GITHUB_STEP_SUMMARY"
-          echo "| Recent Activity? | \`${IDLE_RECENT_ACTIVITY:-N/A}\` |" >> "$GITHUB_STEP_SUMMARY"
-          echo "| Reason | \`${IDLE_REASON:-N/A}\` |" >> "$GITHUB_STEP_SUMMARY"
+        working-directory: ci-scripts/hot-cluster/ts
+        run: npx tsx src/scripts/write-auto-teardown-summary.ts

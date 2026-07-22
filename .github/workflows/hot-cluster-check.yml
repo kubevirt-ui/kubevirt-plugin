@@ -123,23 +123,21 @@ jobs:
     steps:
       # Skipped for a no-op/irrelevant event -- result's compute step
       # already forces cluster_ready=false when should_run is false.
+      - name: Checkout
+        if: inputs.should_run
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+          sparse-checkout: ci-scripts/hot-cluster/ts
+
       - name: Probe for cluster
         id: probe
         if: inputs.should_run
         env:
           CLUSTER_NAME: ${{ inputs.cluster_name }}
           BASE_DOMAIN: ${{ inputs.base_domain }}
-        run: |
-          API_HOST="api.${CLUSTER_NAME}.${BASE_DOMAIN}"
-
-          echo "Checking if cluster exists via DNS (${API_HOST})..."
-          if dig +short "${API_HOST}" 2>/dev/null | grep -q .; then
-            echo "Cluster '${CLUSTER_NAME}' is reachable (${API_HOST} resolves)"
-            echo "cluster_ready=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "Cluster '${CLUSTER_NAME}' not found (${API_HOST} does not resolve)"
-            echo "cluster_ready=false" >> "$GITHUB_OUTPUT"
-          fi
+        working-directory: ci-scripts/hot-cluster/ts
+        run: npx tsx src/scripts/probe-cluster-dns.ts
 
   # Native reusable-workflow call so the cluster build shows up as a real,
   # nested job in the Checks tab. ibmc-cluster-setup.yml's own `precheck`
@@ -179,30 +177,25 @@ jobs:
     outputs:
       cluster_ready: ${{ steps.compute.outputs.cluster_ready }}
     steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+          sparse-checkout: ci-scripts/hot-cluster
+
       - name: Compute final readiness
         id: compute
         env:
           SHOULD_RUN: ${{ inputs.should_run }}
           PROBE_READY: ${{ needs.probe.outputs.cluster_ready }}
           PROVISION_RESULT: ${{ needs.provision.result }}
-        run: |
-          # A no-op caller (should_run=false) always reports cluster_ready=false.
-          if [[ "${SHOULD_RUN}" == "true" && ( "${PROBE_READY}" == "true" || "${PROVISION_RESULT}" == "success" ) ]]; then
-            echo "cluster_ready=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "cluster_ready=false" >> "$GITHUB_OUTPUT"
-          fi
+        working-directory: ci-scripts/hot-cluster/ts
+        run: npx tsx src/scripts/compute-cluster-readiness.ts
 
       # The manual health check's own extra steps below fail this job
       # directly (a failed command/exit 1, same as before it was folded in
       # from a separate top-level job) -- no separate output needed, the
       # caller reads this job's own result alongside cluster_ready.
-      - name: Checkout (manual health check)
-        if: inputs.run_health_check && steps.compute.outputs.cluster_ready == 'true'
-        uses: actions/checkout@v7
-        with:
-          persist-credentials: false
-
       - name: Setup IBM Cloud CLI (manual health check)
         if: |
           inputs.run_health_check && steps.compute.outputs.cluster_ready == 'true' &&
@@ -223,7 +216,7 @@ jobs:
         run: |
           CLUSTER_JSON="$(ibmcloud oc cluster get --cluster "${CLUSTER_NAME}" --output json)"
           export CLUSTER_JSON
-          bash ./ci-scripts/hot-cluster/install-oc-client.sh
+          cd ci-scripts/hot-cluster/ts && npx tsx src/scripts/install-oc-client.ts
 
       - name: Configure kubeconfig (manual health check, ROKS)
         if: |
@@ -231,10 +224,8 @@ jobs:
           inputs.infrastructure_type != 'ipi'
         env:
           CLUSTER_NAME: ${{ inputs.cluster_name }}
-        run: |
-          ibmcloud oc cluster config --cluster "${CLUSTER_NAME}" --admin
-          oc cluster-info
-          oc get nodes -o wide
+        working-directory: ci-scripts/hot-cluster/ts
+        run: npx tsx src/scripts/configure-kubeconfig-roks.ts
 
       - name: Manual health check (IPI, DNS probe)
         if: |
@@ -243,25 +234,8 @@ jobs:
         env:
           CLUSTER_NAME: ${{ inputs.cluster_name }}
           BASE_DOMAIN: ${{ inputs.base_domain }}
-        run: |
-          API_HOST="api.${CLUSTER_NAME}.${BASE_DOMAIN}"
-          echo "Probing IPI cluster via DNS: ${API_HOST}..."
-
-          if dig +short "${API_HOST}" 2>/dev/null | grep -q .; then
-            echo "API DNS resolves — cluster is alive"
-            API_IP=$(dig +short "${API_HOST}" 2>/dev/null | head -1)
-            echo "  ${API_HOST} -> ${API_IP}"
-          else
-            echo "::error::API DNS does not resolve for ${API_HOST}. Cluster may not exist."
-            exit 1
-          fi
-
-          echo "Checking API reachability (HTTPS)..."
-          if curl -sk --connect-timeout 10 "https://${API_HOST}:6443/healthz" 2>/dev/null | grep -q ok; then
-            echo "API server is healthy"
-          else
-            echo "::warning::API server did not respond to /healthz — cluster may be initializing"
-          fi
+        working-directory: ci-scripts/hot-cluster/ts
+        run: npx tsx src/scripts/ipi-health-check.ts
 
       - name: Manual health check summary
         if: always() && inputs.run_health_check
@@ -269,19 +243,8 @@ jobs:
           CLUSTER_NAME: ${{ inputs.cluster_name }}
           INFRASTRUCTURE_TYPE: ${{ inputs.infrastructure_type }}
           JOB_STATUS: ${{ job.status }}
-        run: |
-          echo "## Manual Cluster Health Check" >> "$GITHUB_STEP_SUMMARY"
-          echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "| Parameter | Value |" >> "$GITHUB_STEP_SUMMARY"
-          echo "|-----------|-------|" >> "$GITHUB_STEP_SUMMARY"
-          echo "| Infrastructure | \`${INFRASTRUCTURE_TYPE}\` |" >> "$GITHUB_STEP_SUMMARY"
-          echo "| Cluster | \`${CLUSTER_NAME}\` |" >> "$GITHUB_STEP_SUMMARY"
-          echo "" >> "$GITHUB_STEP_SUMMARY"
-          if [[ "${JOB_STATUS}" == "success" ]]; then
-            echo "All health checks **passed**. Invoking Playwright gating tests on the hot cluster." >> "$GITHUB_STEP_SUMMARY"
-          else
-            echo "Health checks **failed**. E2E workflow was not invoked." >> "$GITHUB_STEP_SUMMARY"
-          fi
+        working-directory: ci-scripts/hot-cluster/ts
+        run: npx tsx src/scripts/write-health-check-summary.ts
 
       - name: Summary
         if: always()
@@ -289,16 +252,8 @@ jobs:
           CLUSTER_NAME: ${{ inputs.cluster_name }}
           PROBE_READY: ${{ needs.probe.outputs.cluster_ready }}
           PROVISION_RESULT: ${{ needs.provision.result }}
-        run: |
-          echo "## Cluster Availability Check" >> "$GITHUB_STEP_SUMMARY"
-          echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "| Check | Result |" >> "$GITHUB_STEP_SUMMARY"
-          echo "|-------|--------|" >> "$GITHUB_STEP_SUMMARY"
-          echo "| Cluster | \`${CLUSTER_NAME}\` |" >> "$GITHUB_STEP_SUMMARY"
-          echo "| DNS Probe | \`${PROBE_READY}\` |" >> "$GITHUB_STEP_SUMMARY"
-          if [[ "${PROVISION_RESULT}" != "skipped" ]]; then
-            echo "| Provision Job | \`${PROVISION_RESULT}\` |" >> "$GITHUB_STEP_SUMMARY"
-          fi
+        working-directory: ci-scripts/hot-cluster/ts
+        run: npx tsx src/scripts/write-availability-summary.ts
 
       - name: Fail if cluster is not ready
         if: inputs.should_run && steps.compute.outputs.cluster_ready != 'true'
@@ -306,6 +261,5 @@ jobs:
           CLUSTER_NAME: ${{ inputs.cluster_name }}
           PROBE_READY: ${{ needs.probe.outputs.cluster_ready }}
           PROVISION_RESULT: ${{ needs.provision.result }}
-        run: |
-          echo "::error::Cluster '${CLUSTER_NAME}' is not ready (probe=${PROBE_READY}, provision=${PROVISION_RESULT})."
-          exit 1
+        working-directory: ci-scripts/hot-cluster/ts
+        run: npx tsx src/scripts/fail-if-not-ready.ts

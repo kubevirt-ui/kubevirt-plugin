@@ -88,7 +88,7 @@ const prettierOverrides = {
 };
 
 const githubScriptsOverrides = {
-  files: ['.github/**/*.{ts,tsx,js,jsx}'],
+  files: ['.github/**/*.{ts,tsx,js,jsx}', 'ci-scripts/**/*.{ts,tsx,js,jsx}'],
   rules: {
     'no-console': 'off',
   },

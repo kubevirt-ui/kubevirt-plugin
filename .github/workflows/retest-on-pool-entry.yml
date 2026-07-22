@@ -35,70 +35,19 @@ jobs:
           persist-credentials: false
           ref: ${{ github.event.repository.default_branch }}
 
-      - name: Dispatch retest if now pool-eligible and check is stale
-        uses: actions/github-script@v9
+      - name: Setup scripts
+        uses: ./.github/actions/setup-gh-scripts
         with:
-          script: |
-            const fs = require('fs');
-            const { isMergePoolPr } = require('./ci-scripts/hot-cluster/js/is-merge-pool-pr.cjs');
+          ref: ${{ github.event.repository.default_branch }}
 
-            const pr = context.payload.pull_request;
-            const prNumber = pr.number;
-
-            // labels already reflect the post-event state.
-            if (!isMergePoolPr(pr.labels)) {
-              core.info(`PR #${prNumber} is not merge-pool eligible yet (needs lgtm+approved, no hold) -- nothing to do.`);
-              return;
-            }
-
-            // Pre-check CI trust (OWNERS / same-repo / ok-to-test) to avoid
-            // a dispatch that would only fail the same check downstream.
-            const author = pr.user.login;
-            let ownedByAuthor = false;
-            try {
-              const owners = fs.readFileSync('OWNERS', 'utf8');
-              ownedByAuthor = new RegExp(`^\\s*-\\s*${author}\\s*$`, 'm').test(owners);
-            } catch (err) {
-              core.warning(`Could not read OWNERS file: ${err.message}`);
-            }
-            const sameRepo = pr.head.repo?.full_name === pr.base.repo.full_name;
-            const hasOkToTest = pr.labels.some((label) => label.name === 'ok-to-test');
-            const trusted = ownedByAuthor || sameRepo || hasOkToTest;
-
-            if (!trusted) {
-              core.info(`PR #${prNumber} is merge-pool eligible but not CI-trusted (author not in OWNERS, not a same-repo branch, no 'ok-to-test') -- skipping the dispatch rather than sending one that would only fail this same check downstream.`);
-              return;
-            }
-
-            const { data: existing } = await github.rest.checks.listForRef({
-              ...context.repo,
-              ref: pr.head.sha,
-              check_name: 'Run Gating Tests',
-            });
-            const [latest] = existing.check_runs.sort(
-              (a, b) => new Date(b.started_at) - new Date(a.started_at),
-            );
-
-            const staleTitles = [
-              'Hot Cluster E2E: stale -- main has advanced since this ran',
-              'Stale -- main has advanced since this ran',
-            ];
-            const isStale = latest?.status === 'completed' && staleTitles.includes(latest.output?.title);
-
-            if (!isStale) {
-              core.info(`PR #${prNumber}: current "Run Gating Tests" check (${latest?.output?.title ?? 'none'}) isn't the stale marker -- nothing to do.`);
-              return;
-            }
-
-            core.info(`PR #${prNumber} just became merge-pool eligible while its check was stale -- dispatching a fresh retest against main.`);
-            // base_ref so release-branch retests resolve the right tip.
-            await github.rest.actions.createWorkflowDispatch({
-              ...context.repo,
-              workflow_id: 'hot-cluster-e2e.yml',
-              ref: 'main',
-              inputs: {
-                pr_number: String(prNumber),
-                base_ref: pr.base.ref,
-                is_pool_retest: 'true',
-              },
-            });
+      - name: Dispatch retest if now pool-eligible and check is stale
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PR_BASE_REF: ${{ github.event.pull_request.base.ref }}
+          PR_LABELS: ${{ toJSON(github.event.pull_request.labels) }}
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+          PR_HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
+        working-directory: .github/scripts
+        run: npx tsx src/merge/pool-entry.ts

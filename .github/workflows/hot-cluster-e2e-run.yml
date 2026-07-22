@@ -184,14 +184,14 @@ jobs:
           checkout-ref: ${{ inputs.checkout_ref }}
           pr-number: ${{ inputs.pr_number }}
 
+      - name: Install infra script dependencies
+        working-directory: ci-scripts/hot-cluster/ts
+        run: npm ci --ignore-scripts --no-audit
+
       - name: Check if kubevirt-plugin image exists in registry
         id: check_image
-        run: |
-          if skopeo inspect docker://${KUBEVIRT_PLUGIN_IMAGE} &>/dev/null; then
-            echo "IMAGE_EXISTS=true" >> $GITHUB_OUTPUT
-          else
-            echo "IMAGE_EXISTS=false" >> $GITHUB_OUTPUT
-          fi
+        working-directory: ci-scripts/hot-cluster/ts
+        run: npx tsx src/scripts/check-image-exists.ts
 
       - name: Generate tags for the kubevirt-plugin image
         id: meta
@@ -214,21 +214,8 @@ jobs:
         if: steps.check_image.outputs.IMAGE_EXISTS == 'false'
         env:
           LABELS: ${{ steps.meta.outputs.labels }}
-        run: |
-          {
-            echo "## Labels"
-            echo "\`\`\`"
-            echo "${LABELS}"
-            echo "\`\`\`"
-          } | tee -a "$GITHUB_STEP_SUMMARY"
-
-          LABEL_ARGS=()
-          while IFS= read -r line; do
-            [ -n "$line" ] && LABEL_ARGS+=(--label "$line")
-          done <<< "$LABELS"
-
-          podman build "${LABEL_ARGS[@]}" -t ${KUBEVIRT_PLUGIN_IMAGE} -f Dockerfile .
-          podman push ${KUBEVIRT_PLUGIN_IMAGE}
+        working-directory: ci-scripts/hot-cluster/ts
+        run: npx tsx src/scripts/build-and-push-image.ts
 
   run-gating-tests:
     name: ${{ inputs.is_reusable_call && 'Execute tests' || 'Execute tests (standalone dispatch)' }}
@@ -280,131 +267,10 @@ jobs:
       # Folded in from a former standalone "Check Runner Image" job (same
       # runner) to drop a merge-box row; also fails fast before spending
       # any real test-environment cost.
-      - name: Log environment summary
-        run: |
-          {
-            echo "<details><summary>Key Environment Variables</summary>"
-            echo ""
-            echo "| Variable | Value |"
-            echo "| --- | --- |"
-            for var in HOME USER RUNNER_NAME RUNNER_OS RUNNER_ARCH \
-                       GITHUB_REPOSITORY GITHUB_REF GITHUB_SHA GITHUB_RUN_ID GITHUB_RUN_NUMBER \
-                       CNV_NS OS_IMAGES_NS TEST_NS KUBEVIRT_PLUGIN_IMAGE KUBEVIRT_UI_PLUGIN_RUNNER; do
-              echo "| \`$var\` | \`${!var:-<unset>}\` |"
-            done
-            echo "</details>"
-            echo ""
-
-            echo "<details><summary>Tool Availability</summary>"
-            echo ""
-            echo "| Tool | Available |"
-            echo "| --- | --- |"
-            missing=0
-            for cmd in jq yq envsubst curl kubectl oc virtctl helm npm node; do
-              if command -v "$cmd" &>/dev/null; then
-                echo "| \`$cmd\` | ✅ |"
-              else
-                echo "| \`$cmd\` | ❌ |"
-                missing=1
-              fi
-            done
-            echo "</details>"
-            echo ""
-            if [[ "${missing}" -ne 0 ]]; then
-              echo "::error::Required tools are missing on the ARC runner"
-              exit 1
-            fi
-
-            echo "<details><summary>npm / Node Versions</summary>"
-            echo ""
-            echo "\`\`\`json"
-            npm version --json 2>/dev/null || echo "npm not found"
-            echo "\`\`\`"
-            echo "</details>"
-            echo ""
-          } | tee -a "$GITHUB_STEP_SUMMARY"
-
-      - name: Log Client / Server Versions
-        run: |
-          {
-            echo "<details><summary>Client / Server Versions</summary>"
-            echo ""
-            echo "| Tool | Client Version | Server Version |"
-            echo "| --- | --- | --- |"
-            failed=0
-            for cmd in oc virtctl; do
-              if command -v "$cmd" &>/dev/null; then
-                if ! version_output=$("$cmd" version 2>/dev/null); then
-                  echo "| \`$cmd\` | ❌ version failed | ❌ |"
-                  failed=1
-                  continue
-                fi
-                client=$(echo "$version_output" | grep -i "client" | head -1 | sed 's/^[[:space:]]*//')
-                server=$(echo "$version_output" | grep -i "server" | head -1 | sed 's/^[[:space:]]*//')
-                echo "| \`$cmd\` | ${client:-N/A} | ${server:-N/A} |"
-              else
-                echo "| \`$cmd\` | ❌ not found | — |"
-                failed=1
-              fi
-            done
-            echo "</details>"
-            echo ""
-          } | tee -a "$GITHUB_STEP_SUMMARY"
-          if [[ "${failed}" -ne 0 ]]; then
-            echo "::error::Client/server version checks failed"
-            exit 1
-          fi
-
-      - name: Log HCO and managed operator versions
+      - name: Log environment, versions, and HCO operands
         continue-on-error: true
-        run: |
-          {
-            echo "<details><summary>HCO & Managed Operator Versions</summary>"
-            echo ""
-
-            if ! command -v oc &>/dev/null; then
-              echo "> ⚠️ \`oc\` not found — skipping cluster version checks."
-            else
-              echo "### HCO Version (OLM CSV)"
-              echo ""
-              echo "| Name | Version | Phase |"
-              echo "| --- | --- | --- |"
-              oc get csv -n openshift-cnv --no-headers 2>/dev/null \
-                | grep -i hyperconverged \
-                | awk '{ print "| `" $1 "` | `" $2 "` | " $NF " |" }' \
-                || echo "| — | HCO CSV not found | — |"
-              echo ""
-
-              echo "### HCO Managed Operand Versions"
-              echo ""
-              echo "| Operand | Version |"
-              echo "| --- | --- |"
-
-              HCO_LABEL="app.kubernetes.io/managed-by=hco-operator"
-
-              kv_ver=$(oc get kubevirt -A -l "${HCO_LABEL}" \
-                -o jsonpath='{.items[0].status.observedKubeVirtVersion}' 2>/dev/null || echo "")
-              echo "| \`kubevirt\` | \`${kv_ver:-not found}\` |"
-
-              cdi_ver=$(oc get cdi -A -l "${HCO_LABEL}" \
-                -o jsonpath='{.items[0].status.observedVersion}' 2>/dev/null || echo "")
-              echo "| \`cdi\` | \`${cdi_ver:-not found}\` |"
-
-              ssp_ver=$(oc get ssp -A -l "${HCO_LABEL}" \
-                -o jsonpath='{.items[0].status.observedVersion}' 2>/dev/null || echo "")
-              echo "| \`ssp\` | \`${ssp_ver:-not found}\` |"
-
-              cnao_ver=$(oc get networkaddonsconfig -A -l "${HCO_LABEL}" \
-                -o jsonpath='{.items[0].status.observedVersion}' 2>/dev/null || echo "")
-              echo "| \`cnao\` | \`${cnao_ver:-not found}\` |"
-
-              hpp_ver=$(oc get hostpathprovisioner -A -l "${HCO_LABEL}" \
-                -o jsonpath='{.items[0].status.observedVersion}' 2>/dev/null || echo "")
-              echo "| \`hostpath-provisioner\` | \`${hpp_ver:-not found}\` |"
-            fi
-            echo "</details>"
-            echo ""
-          } | tee -a "$GITHUB_STEP_SUMMARY"
+        working-directory: ci-scripts/hot-cluster/ts
+        run: npx tsx src/scripts/log-env-summary.ts
 
       # Pinned to @main (not local ./) since checkout_ref can point at a
       # release branch predating this CI infra, or nothing may be checked
@@ -429,51 +295,12 @@ jobs:
           user-settings-location: ${{ env.TEST_ENGINE == 'cypress' && 'configmap' || '' }}
 
       - name: Create test secret
-        run: |
-          yq e '
-            .metadata.name = strenv(TEST_SECRET_NAME) |
-            .metadata.namespace = strenv(TEST_NS)
-          ' "${TEST_ENGINE}/fixtures/secret.yaml" | oc apply -f -
+        working-directory: ci-scripts/hot-cluster/ts
+        run: npx tsx src/scripts/create-test-secret.ts
 
       - name: Seed kubevirt-user-settings ConfigMap
-        run: |
-          SA_NAME="${CI_ENV_CM}-console"
-
-          SA_UID="$(oc get sa "${SA_NAME}" -n "${TEST_NS}" \
-            -o jsonpath='{.metadata.uid}' 2>/dev/null || true)"
-          SANITIZED_NAME="system-serviceaccount-${TEST_NS}-${SA_NAME}"
-
-          USER_SETTINGS='{"quickStart":{"dontShowWelcomeModal":true},"onboardingPopoversHidden":{"vmsTab":true,"catalog":true,"createProject":true,"navCollapse":true}}'
-
-          if ! oc get configmap kubevirt-user-settings -n "${CNV_NS}" &>/dev/null; then
-            oc create configmap kubevirt-user-settings -n "${CNV_NS}"
-          fi
-
-          PATCH=$(jq -cn \
-            --arg sa_uid    "${SA_UID}" \
-            --arg name_key  "${SANITIZED_NAME}" \
-            --arg val       "${USER_SETTINGS}" \
-            '{data: (if ($sa_uid | length) > 0 then {($sa_uid): $val, ($name_key): $val} else {($name_key): $val} end)}')
-
-          oc patch configmap kubevirt-user-settings -n "${CNV_NS}" \
-            --type merge -p "${PATCH}"
-
-          oc patch configmap kubevirt-ui-features -n "${CNV_NS}" --type=merge \
-            --patch '{"data":{"advancedSearch":"true","treeViewFolders":"true"}}'
-
-          # Cypress-only: seeds console's own guided-tour completion so the
-          # welcome modal never blocks the first test. Mirrors
-          # playwright/pages/LoginPage.ts's browser-side seeding.
-          if [[ "${TEST_ENGINE}" == "cypress" && -n "${SA_UID}" ]]; then
-            GUIDED_TOUR='{"admin":{"completed":true},"dev":{"completed":true},"virtualization-perspective":{"completed":true}}'
-            CONSOLE_CM_NAME="user-settings-${SA_UID}"
-
-            if ! oc get configmap "${CONSOLE_CM_NAME}" -n openshift-console-user-settings &>/dev/null; then
-              oc create configmap "${CONSOLE_CM_NAME}" -n openshift-console-user-settings
-            fi
-            oc patch configmap "${CONSOLE_CM_NAME}" -n openshift-console-user-settings \
-              --type merge -p "$(jq -cn --arg v "${GUIDED_TOUR}" '{data: {"console.guidedTour": $v}}')"
-          fi
+        working-directory: ci-scripts/hot-cluster/ts
+        run: npx tsx src/scripts/seed-user-settings.ts
 
       - name: Install dependencies
         run: |
@@ -485,26 +312,21 @@ jobs:
             npm run playwright-install
           fi
 
+      - name: Install GH script dependencies
+        if: inputs.progress_status_sha != '' && inputs.progress_status_context != ''
+        working-directory: .github/scripts
+        run: npm ci --ignore-scripts --no-audit
+
       # Best-effort follow-up to hot-cluster-e2e.yml's own progress update;
       # no-ops for a standalone dispatch (empty inputs).
       - name: Update progress status
         if: inputs.progress_status_sha != '' && inputs.progress_status_context != ''
         continue-on-error: true
-        uses: actions/github-script@v9
+        working-directory: .github/scripts
         env:
           STATUS_SHA: ${{ inputs.progress_status_sha }}
           STATUS_CONTEXT: ${{ inputs.progress_status_context }}
-        with:
-          script: |
-            await github.rest.repos.createCommitStatus({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              sha: process.env.STATUS_SHA,
-              context: process.env.STATUS_CONTEXT,
-              state: 'pending',
-              description: 'Running gating tests',
-              target_url: `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
-            });
+        run: npx tsx src/e2e/progress-running.ts
 
       - name: Run gating tests
         env:
@@ -620,34 +442,19 @@ jobs:
           retention-days: 7
           if-no-files-found: ignore
 
-      - name: e2e CI diagnostics - Collect console and plugin pod logs
+      - name: e2e CI diagnostics - Collect pod logs
         if: always()
-        run: |
-          TMP=/tmp/e2e-ci-diagnostics/pod-logs
-          mkdir -p "${TMP}"
+        continue-on-error: true
+        working-directory: ci-scripts/hot-cluster/ts
+        run: npx tsx src/scripts/collect-diagnostics.ts
 
-          HELM_RELEASE="$(oc get configmap "${CI_ENV_CM}" -n "${CI_ENV_NS}" \
-            -o jsonpath='{.data.helm-release}' 2>/dev/null || true)"
-          # Falls back to CI_ENV_CM if the field lookup returns empty for
-          # any reason, to avoid an invalid "app=-console" selector.
-          HELM_RELEASE="${HELM_RELEASE:-${CI_ENV_CM}}"
-
-          oc logs -n "${TEST_NS}" -l "app=${HELM_RELEASE}-console" --tail=-1 \
-            > "${TMP}/console.log" 2>&1 || true
-          oc logs -n "${TEST_NS}" -l "app=${HELM_RELEASE}-plugin" --tail=-1 \
-            > "${TMP}/kubevirt-plugin.log" 2>&1 || true
-
-      - name: e2e CI diagnostics - Collect OpenShift cluster information
+      - name: e2e CI diagnostics - Collect cluster info (on failure)
         if: failure()
-        run: |
-          TMP=/tmp/e2e-ci-diagnostics/cluster
-          mkdir -p "${TMP}"
-
-          oc cluster-info dump > "${TMP}/cluster_info.json" 2>/dev/null || true
-          oc get pods -n openshift-cnv -o wide > "${TMP}/hco_pods.txt" 2>/dev/null || true
-          oc get nodes -o wide > "${TMP}/nodes.txt" 2>/dev/null || true
-          oc get events -n "${TEST_NS}" --sort-by='.lastTimestamp' > "${TMP}/test_ns_events.txt" 2>/dev/null || true
-          oc get pods -n "${TEST_NS}" -o wide > "${TMP}/test_ns_pods.txt" 2>/dev/null || true
+        continue-on-error: true
+        env:
+          COLLECT_CLUSTER_INFO: 'true'
+        working-directory: ci-scripts/hot-cluster/ts
+        run: npx tsx src/scripts/collect-diagnostics.ts
 
       - name: e2e CI diagnostics - Upload artifacts
         if: always()
@@ -660,10 +467,9 @@ jobs:
 
       - name: Clean up test entities
         if: always()
-        run: |
-          echo "Cleaning test entities in ${TEST_NS}..."
-          # Fetched from main (not the checked-out tree), which may predate this script.
-          curl -sL "https://raw.githubusercontent.com/kubevirt-ui/kubevirt-plugin/main/ci-scripts/hot-cluster/test-cleanup.sh" | bash
+        continue-on-error: true
+        working-directory: ci-scripts/hot-cluster/ts
+        run: npx tsx src/scripts/test-cleanup.ts
 
       - name: Release CI test environment
         if: always()

@@ -1,0 +1,165 @@
+name: PR Commands
+
+# Unified dispatcher for ALL PR comment commands. Replaces 9 separate
+# issue_comment workflows with a single entry point. The TS dispatcher
+# handles: bot filtering, command matching, OWNERS trust checks, and
+# routing to the appropriate handler. Every exit path is exit(0).
+#
+# Only the concurrency-group cancellation jobs for /cancel-e2e and
+# /hold-e2e need YAML-level if: conditions — everything else is
+# handled inside dispatcher.ts.
+on:
+  issue_comment:
+    types: [created]
+
+# Superset of all command permissions. The bot token (not GITHUB_TOKEN)
+# handles fork-PR restrictions for write operations.
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+  actions: write
+  checks: write
+  statuses: write
+
+jobs:
+  dispatch:
+    name: PR Command
+    # The ONLY yaml-level filter: must be a PR comment (not a plain issue).
+    # Bot filtering, command matching, and trust checks all happen in TS.
+    if: github.event.issue.pull_request != null
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      needs_cancel: ${{ steps.run.outputs.needs_cancel }}
+      needs_hold_mark: ${{ steps.run.outputs.needs_hold_mark }}
+      head_sha: ${{ steps.run.outputs.head_sha }}
+    steps:
+      # Checkout default branch (not the PR branch) so OWNERS is trusted
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Generate bot token
+        id: bot-token
+        continue-on-error: true
+        uses: actions/create-github-app-token@v3
+        with:
+          app-id: ${{ secrets.BOT_APP_ID }}
+          private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
+          permission-contents: write
+          permission-pull-requests: write
+          permission-issues: write
+          permission-actions: write
+
+      - name: Setup scripts
+        uses: ./.github/actions/setup-gh-scripts
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+
+      - name: Dispatch command
+        id: run
+        env:
+          BOT_TOKEN: ${{ steps.bot-token.outputs.token }}
+          GITHUB_TOKEN: ${{ github.token }}
+          COMMENT_BODY: ${{ github.event.comment.body }}
+          COMMENT_AUTHOR: ${{ github.event.comment.user.login }}
+          COMMENT_ID: ${{ github.event.comment.id }}
+          PR_NUMBER: ${{ github.event.issue.number }}
+          JIRA_TOKEN: ${{ secrets.JIRA_TOKEN }}
+          GITHUB_SERVER_URL: ${{ github.server_url }}
+        working-directory: .github/scripts
+        run: npx tsx src/commands/dispatcher.ts
+
+  # Concurrency-group cancellation for /cancel-e2e and /hold-e2e.
+  # These jobs exist SOLELY to enter the E2E concurrency groups with
+  # cancel-in-progress: true — the only mechanism that actually stops
+  # an in-flight cluster-check or run-e2e-tests job. Cannot be done in TS.
+  cancel-cluster-check:
+    name: Cancel Cluster Check
+    needs: [dispatch]
+    if: needs.dispatch.outputs.needs_cancel == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    concurrency:
+      group: hot-cluster-check-${{ github.event.issue.number }}
+      cancel-in-progress: true
+    steps:
+      - run: echo "Entered cluster-check concurrency group for PR ${{ github.event.issue.number }}"
+
+  cancel-run-e2e-tests:
+    name: Cancel Run E2E Tests
+    needs: [dispatch]
+    if: needs.dispatch.outputs.needs_cancel == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    concurrency:
+      group: hot-cluster-run-e2e-${{ github.event.issue.number }}
+      cancel-in-progress: true
+    steps:
+      - run: echo "Entered run-e2e-tests concurrency group for PR ${{ github.event.issue.number }}"
+
+  # Hold-specific: mark the gating check as held (after cancellation completes)
+  mark-held:
+    name: Mark Run Gating Tests Held
+    needs: [dispatch, cancel-cluster-check, cancel-run-e2e-tests]
+    if: needs.dispatch.outputs.needs_hold_mark == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Publish held marker
+        uses: ./.github/actions/publish-gating-check
+        with:
+          head-sha: ${{ needs.dispatch.outputs.head_sha }}
+          status: completed
+          conclusion: neutral
+          title: 'Hot Cluster E2E: held via /hold-e2e'
+          summary: |
+            Required check not satisfied -- hold active. Testing is on hold for this PR.
+
+            No new run will be dispatched automatically while this hold is active.
+            Comment `/retest-e2e` to lift the hold and get a fresh result.
+
+  # Post-hold report (after everything above completes)
+  report-hold:
+    name: Report Hold
+    needs: [dispatch, cancel-cluster-check, cancel-run-e2e-tests, mark-held]
+    if: always() && needs.dispatch.outputs.needs_hold_mark == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Generate bot token
+        id: bot-token
+        continue-on-error: true
+        uses: actions/create-github-app-token@v3
+        with:
+          app-id: ${{ secrets.BOT_APP_ID }}
+          private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
+          permission-pull-requests: write
+          permission-issues: write
+
+      - name: Setup scripts
+        uses: ./.github/actions/setup-gh-scripts
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+
+      - name: Report hold outcome
+        env:
+          BOT_TOKEN: ${{ steps.bot-token.outputs.token }}
+          GITHUB_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.issue.number }}
+          LABEL_OK: 'true'
+          MARKER_OK: ${{ needs.mark-held.result == 'success' }}
+        working-directory: .github/scripts
+        run: npx tsx src/commands/hold-e2e-report.ts

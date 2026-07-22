@@ -106,35 +106,18 @@ jobs:
     outputs:
       key: ${{ steps.compute.outputs.key }}
     steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
       - name: Compute instance key
         id: compute
         env:
           PR_NUMBER: ${{ inputs.pr_number }}
           BRANCH: ${{ inputs.branch }}
-        run: |
-          if [[ -n "${PR_NUMBER}" ]]; then
-            if [[ ! "${PR_NUMBER}" =~ ^[0-9]+$ ]]; then
-              echo "::error::pr_number must be numeric, got '${PR_NUMBER}'"
-              exit 1
-            fi
-            KEY="pr-${PR_NUMBER}"
-          else
-            # Budget: this becomes "console-manual-console-<key>", the first
-            # label of the console Route host, which must stay <=63 chars
-            # (DNS-1123) -- 24 of those are already spent on that fixed
-            # prefix. Truncating the sanitized branch name alone isn't
-            # collision-safe (two different branches sharing the same first
-            # 11 chars would silently overwrite each other's instance), so
-            # pair a short prefix with an 8-hex-char hash of the *full*
-            # branch name -- deterministic (same branch always yields the
-            # same key, for Deploy Plugin redeploys) and distinct whenever
-            # the full names differ, even beyond the truncated prefix.
-            PREFIX="$(echo -n "${BRANCH}" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9]+/-/g' | cut -c1-11 | sed -E 's/^-+//; s/-+$//')"
-            HASH="$(echo -n "${BRANCH}" | sha256sum | cut -c1-8)"
-            KEY="${PREFIX:-branch}-${HASH}"
-          fi
-          echo "key=${KEY}" >> "${GITHUB_OUTPUT}"
-          echo "Computed instance key: ${KEY}"
+        working-directory: ci-scripts/hot-cluster/ts
+        run: npx tsx src/scripts/compute-instance-key.ts
 
   # Only runs for the "deploy" action when pr_number is set (deploying a PR,
   # possibly from a fork). Mirrors hot-cluster-e2e.yml's check-trust: only PR
@@ -232,6 +215,10 @@ jobs:
           path: plugin-src
           persist-credentials: false
 
+      - name: Install infra script dependencies
+        working-directory: ci-scripts/hot-cluster/ts
+        run: npm ci --ignore-scripts --no-audit
+
       - name: Log environment summary
         env:
           BRANCH: ${{ inputs.branch }}
@@ -240,69 +227,32 @@ jobs:
           HEAD_SHA: ${{ needs.resolve-pr.outputs.head_sha }}
           CLUSTER_NAME: ${{ inputs.cluster_name }}
           INSTANCE_KEY: ${{ needs.instance-key.outputs.key }}
-        run: |
-          {
-            echo "## Manual Console Deploy"
-            echo ""
-            echo "| Field | Value |"
-            echo "|---|---|"
-            if [[ -n "${PR_NUMBER}" ]]; then
-              echo "| PR | #${PR_NUMBER} (\`${HEAD_REPO}@${HEAD_SHA}\`) |"
-            else
-              echo "| Branch | \`${BRANCH}\` |"
-            fi
-            echo "| Cluster | \`${CLUSTER_NAME}\` |"
-            echo "| Instance key | \`${INSTANCE_KEY}\` |"
-            echo "| Infrastructure | \`${{ inputs.infrastructure_type }}\` |"
-            echo "| Triggered by | @${{ github.actor }} |"
-          } | tee -a "$GITHUB_STEP_SUMMARY"
+          INFRASTRUCTURE_TYPE: ${{ inputs.infrastructure_type }}
+          ACTOR: ${{ github.actor }}
+        working-directory: ci-scripts/hot-cluster/ts
+        run: npx tsx src/scripts/log-manual-console-env.ts
 
       - name: Build kubevirt-plugin image in-cluster
         id: build
         env:
           INSTANCE_KEY: ${{ needs.instance-key.outputs.key }}
-        run: |
-          NS="${MANUAL_CONSOLE_NS}"
-          export NS
-          # Per-instance ImageStream/BuildConfig name: the default
-          # "kubevirt-plugin" is shared across the whole namespace, so two
-          # PRs building concurrently would race on the same BuildConfig and
-          # stomp each other's ":latest" ImageStreamTag.
-          IMAGE_NAME="kubevirt-plugin-${INSTANCE_KEY}"
-          export IMAGE_NAME
-          # BUILD_DIR points at the plugin-src/ checkout above, not the
-          # workflow-scripts checkout at $GITHUB_WORKSPACE -- see that
-          # checkout step's comment for why these must stay separate.
-          BUILD_DIR="${GITHUB_WORKSPACE}/plugin-src"
-          export BUILD_DIR
-          OUTPUT_FILE="$(mktemp)"
-          bash ci-scripts/manual-console/images/setup-plugin-image.sh | tee "${OUTPUT_FILE}"
-          IMAGE_REF="$(grep '^IMAGE_REF=' "${OUTPUT_FILE}" | cut -d= -f2-)"
-          rm -f "${OUTPUT_FILE}"
-          if [[ -z "${IMAGE_REF}" ]]; then
-            echo "::error::setup-plugin-image.sh did not output IMAGE_REF="
-            exit 1
-          fi
-          echo "image=${IMAGE_REF}" >> "${GITHUB_OUTPUT}"
+          MANUAL_CONSOLE_NS: ${{ env.MANUAL_CONSOLE_NS }}
+        working-directory: ci-scripts/hot-cluster/ts
+        run: npx tsx src/scripts/build-plugin-image.ts
 
       - name: Generate manual console password
         id: creds
-        run: |
-          PASSWORD="$(openssl rand -base64 24)"
-          echo "::add-mask::${PASSWORD}"
-          echo "password=${PASSWORD}" >> "${GITHUB_OUTPUT}"
+        working-directory: ci-scripts/hot-cluster/ts
+        run: npx tsx src/scripts/generate-password.ts
 
       - name: Create short-lived credentials Secret
         id: secret
         env:
           MANUAL_CONSOLE_PASSWORD: ${{ steps.creds.outputs.password }}
-        run: |
-          SECRET_NAME="manual-console-creds-${{ github.run_id }}"
-          oc create secret generic "${SECRET_NAME}" \
-            --namespace="${CI_ENV_NS}" \
-            --from-literal=password="${MANUAL_CONSOLE_PASSWORD}" \
-            --dry-run=client -o yaml | oc apply -f -
-          echo "name=${SECRET_NAME}" >> "${GITHUB_OUTPUT}"
+          SECRET_NAME: manual-console-creds-${{ github.run_id }}
+          CI_ENV_NS: ${{ env.CI_ENV_NS }}
+        working-directory: ci-scripts/hot-cluster/ts
+        run: npx tsx src/scripts/create-credentials-secret.ts
 
       - name: Provision manual console
         id: deploy
@@ -327,53 +277,18 @@ jobs:
           BRANCH: ${{ inputs.branch }}
           PR_NUMBER: ${{ inputs.pr_number }}
           HEAD_REPO: ${{ needs.resolve-pr.outputs.head_repo }}
-        run: |
-          if [[ -z "${SLACK_WEBHOOK_URL}" ]]; then
-            echo "::warning::SLACK_WEBHOOK_URL not set — skipping Slack notification"
-            exit 0
-          fi
-
-          echo "::add-mask::${MANUAL_CONSOLE_PASSWORD}"
-
-          if [[ -n "${PR_NUMBER}" ]]; then
-            SOURCE_LINE="*PR:* <https://github.com/${{ github.repository }}/pull/${PR_NUMBER}|#${PR_NUMBER}> (\`${HEAD_REPO}\`)"
-            CLEANUP_LINE=$'\n'"Done with it? Comment \`/cleanup-manual-console\` on the PR."
-          else
-            SOURCE_LINE="*Branch:* \`${BRANCH}\`"
-            CLEANUP_LINE=""
-          fi
-
-          TEXT=":rocket: *Manual console ready*"
-          TEXT+=$'\n'"*Triggered by:* @${ACTOR}"
-          TEXT+=$'\n'"*URL:* <${CONSOLE_URL}>"
-          TEXT+=$'\n'"*User:* \`${MANUAL_CONSOLE_USER}\`"
-          TEXT+=$'\n'"*Password:* \`${MANUAL_CONSOLE_PASSWORD}\`"
-          TEXT+=$'\n'"${SOURCE_LINE}"
-          TEXT+=$'\n'"*Run:* <https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}>"
-          TEXT+="${CLEANUP_LINE}"
-
-          PAYLOAD=$(jq -n --arg text "${TEXT}" '{text: $text}')
-
-          curl -sS -X POST -H 'Content-Type: application/json' -d "${PAYLOAD}" "${SLACK_WEBHOOK_URL}"
-          echo "Slack notification sent."
+          REPO: ${{ github.repository }}
+          RUN_ID: ${{ github.run_id }}
+        working-directory: ci-scripts/hot-cluster/ts
+        run: npx tsx src/scripts/send-manual-console-slack.ts
 
       - name: Write final job summary
         if: always()
         env:
           CONSOLE_URL: ${{ steps.deploy.outputs.console-route }}
-        run: |
-          {
-            echo ""
-            echo "### Result"
-            echo ""
-            if [[ -n "${CONSOLE_URL}" ]]; then
-              echo "Console URL: ${CONSOLE_URL}"
-              echo ""
-              echo "Login credentials were sent to Slack (if \`SLACK_WEBHOOK_URL\` is configured)."
-            else
-              echo ":x: Deploy did not complete successfully — see logs above."
-            fi
-          } | tee -a "$GITHUB_STEP_SUMMARY"
+          MODE: deploy
+        working-directory: ci-scripts/hot-cluster/ts
+        run: npx tsx src/scripts/write-deploy-summary.ts
 
       # Defense-in-depth: ci-env-controller already deletes this Secret once
       # it reads the password during provisioning, but only if it gets that
@@ -385,9 +300,11 @@ jobs:
       # a no-op on the normal path where the controller already deleted it.
       - name: Clean up credentials Secret
         if: always()
-        run: |
-          SECRET_NAME="manual-console-creds-${{ github.run_id }}"
-          oc delete secret "${SECRET_NAME}" --namespace="${CI_ENV_NS}" --ignore-not-found
+        env:
+          SECRET_NAME: manual-console-creds-${{ github.run_id }}
+          CI_ENV_NS: ${{ env.CI_ENV_NS }}
+        working-directory: ci-scripts/hot-cluster/ts
+        run: npx tsx src/scripts/cleanup-credentials-secret.ts
 
   # Triggered by /cleanup-manual-console. Runs on the target cluster's own
   # runner (same as deploy) and just flips the trigger ConfigMap's
@@ -402,47 +319,31 @@ jobs:
     env:
       CLUSTER_NAME: ${{ inputs.cluster_name }}
     steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Install infra script dependencies
+        working-directory: ci-scripts/hot-cluster/ts
+        run: npm ci --ignore-scripts --no-audit
+
       - name: Mark manual console for teardown
         id: teardown
         env:
           CM_NAME: manual-console-${{ needs.instance-key.outputs.key }}
-        run: |
-          # --ignore-not-found: absent ConfigMap → exit 0 + empty output
-          # (treat as nothing to tear down). Auth/RBAC/API failures still
-          # exit non-zero so we fail instead of silently skipping cleanup.
-          CM_REF="$(oc get configmap "${CM_NAME}" -n "${CI_ENV_NS}" --ignore-not-found -o name)"
-          if [[ -z "${CM_REF}" ]]; then
-            echo "::warning::No manual console ConfigMap ${CI_ENV_NS}/${CM_NAME} found on ${CLUSTER_NAME} -- nothing to tear down."
-            echo "found=false" >> "${GITHUB_OUTPUT}"
-            exit 0
-          fi
-
-          oc patch configmap "${CM_NAME}" -n "${CI_ENV_NS}" \
-            --type merge -p '{"data":{"desired-state":"absent"}}'
-          echo "found=true" >> "${GITHUB_OUTPUT}"
-          echo "Marked ${CI_ENV_NS}/${CM_NAME} for teardown (desired-state=absent); ci-env-controller will remove its Helm release, namespace resources, and OAuth user shortly."
+          CI_ENV_NS: ${{ env.CI_ENV_NS }}
+          CLUSTER_NAME: ${{ inputs.cluster_name }}
+        working-directory: ci-scripts/hot-cluster/ts
+        run: npx tsx src/scripts/mark-manual-console-teardown.ts
 
       - name: Write job summary
         if: always()
         env:
           FOUND: ${{ steps.teardown.outputs.found }}
           INSTANCE_KEY: ${{ needs.instance-key.outputs.key }}
-        run: |
-          {
-            echo "## Manual Console Teardown"
-            echo ""
-            echo "| Field | Value |"
-            echo "|---|---|"
-            echo "| Instance key | \`${INSTANCE_KEY}\` |"
-            echo "| ConfigMap | \`${CI_ENV_NS}/manual-console-${INSTANCE_KEY}\` |"
-            echo "| Cluster | \`${CLUSTER_NAME}\` |"
-            echo "| Triggered by | @${{ github.actor }} |"
-            echo ""
-            if [[ "${FOUND}" == "true" ]]; then
-              echo "Teardown requested; ci-env-controller reconciles this asynchronously."
-            elif [[ "${FOUND}" == "false" ]]; then
-              echo "No matching manual console was found -- nothing to tear down."
-            else
-              echo ":x: Teardown request failed -- see logs above."
-            fi
-          } | tee -a "$GITHUB_STEP_SUMMARY"
+          CI_ENV_NS: ${{ env.CI_ENV_NS }}
+          CLUSTER_NAME: ${{ inputs.cluster_name }}
+          ACTOR: ${{ github.actor }}
+        working-directory: ci-scripts/hot-cluster/ts
+        run: npx tsx src/scripts/write-teardown-summary.ts
