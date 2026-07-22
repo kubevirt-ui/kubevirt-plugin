@@ -55,11 +55,28 @@ const main = async (): Promise<void> => {
 
 import type { CommandContext } from './dispatcher';
 
+const DEPLOY_CMD_REGEX = /\/deploy-manual-console\s+(\S+)/;
+
 export const executeDeployConsole = async (ctx: CommandContext): Promise<void> => {
+  const clusterMatch = ctx.commentBody.match(DEPLOY_CMD_REGEX);
+  if (!clusterMatch) {
+    throw new Error(
+      '`/deploy-manual-console` requires a cluster name, e.g. `/deploy-manual-console my-cluster`.',
+    );
+  }
+
+  const { data: pr } = await ctx.octokit.pulls.get({
+    owner: ctx.owner,
+    repo: ctx.repo,
+    pull_number: ctx.prNumber,
+  });
+
   process.env.BOT_TOKEN = process.env.BOT_TOKEN || '';
   process.env.PR_NUMBER = String(ctx.prNumber);
   process.env.COMMENT_ID = String(ctx.commentId);
   process.env.COMMENT_AUTHOR = ctx.author;
+  process.env.BASE_REF = pr.base.ref;
+  process.env.CLUSTER_NAME = clusterMatch[1];
   await main();
 };
 

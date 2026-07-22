@@ -13,6 +13,8 @@
  * Optional env: JIRA_TOKEN (for /clone and /recheck-jira)
  */
 
+import { resolve } from 'node:path';
+
 import { Octokit } from '@octokit/rest';
 
 import { requireEnv } from '../utils';
@@ -158,7 +160,8 @@ const main = async (): Promise<void> => {
 
   // Trust check (if required)
   if (matched.requiresTrust) {
-    const trusted = isListedInLocalOwners(author);
+    const workspace = process.env.GITHUB_WORKSPACE || resolve(process.cwd(), '../..');
+    const trusted = isListedInLocalOwners(author, resolve(workspace, 'OWNERS'));
     console.log(
       `${author} is ${trusted ? '' : 'not '}listed in OWNERS — ${trusted ? 'trusted' : `untrusted, ignoring ${matched.name}`}.`,
     );
