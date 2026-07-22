@@ -6,7 +6,7 @@ on:
 
 jobs:
   pr-validation:
-    name: pr-validation
+    name: PR Validation
     if: github.event.action != 'edited' || github.event.changes.title != null
     permissions:
       pull-requests: write

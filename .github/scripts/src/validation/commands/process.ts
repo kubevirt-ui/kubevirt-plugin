@@ -2,8 +2,6 @@
 import { isApprovalAuthError } from './approve';
 import { HandledValidationError } from '../pr-path-validation/errors';
 import { reportAiConfigError, reportCiScriptsError } from '../pr-path-validation/execute';
-import { setCommitStatus } from '../../github-comments';
-import { createStatusOctokit } from '../../github-repo';
 import { safeErrorMessage } from '../../utils';
 import type { ValidationCommand } from './parse-command';
 import type { GitHubConfig } from '../../types/index';
@@ -61,23 +59,11 @@ export const reportCommandFailure = async (
     return;
   }
 
-  if (command === 'recheck-jira' && headSha) {
-    try {
-      await setCommitStatus(
-        createStatusOctokit(config),
-        config.owner,
-        config.repo,
-        headSha,
-        'error',
-        'Jira validation encountered an unexpected error',
-      );
-    } catch {
-      // best-effort
-    }
+  if (command === 'recheck-jira') {
     return;
   }
 
-  // Best-effort, like the recheck-jira branch above -- a rejection here must
+  // Best-effort -- a rejection here must
   // not escape to index.ts's top-level catch, which would re-derive every
   // requested command from COMMENT_BODY and re-report this one even if it
   // already succeeded.

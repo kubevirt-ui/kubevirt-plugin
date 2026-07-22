@@ -10,7 +10,6 @@ import { buildStatusDescription as buildAiConfigStatusDescription } from '../ai-
 import { CI_SCRIPTS_CONFIG } from '../ci-scripts-validation/constants';
 import { buildStatusDescription as buildCiScriptsStatusDescription } from '../ci-scripts-validation/utils';
 import { createOctokit, createStatusOctokit } from '../../github-repo';
-import { setCommitStatus } from '../../github-comments';
 import { safeErrorMessage } from '../../utils';
 import type { GitHubConfig } from '../../types/index';
 import type { PathValidationConfig } from './types';
@@ -59,23 +58,6 @@ export const executePathValidation = async (
     );
   } catch (err) {
     const message = `${pathConfig.displayName} encountered an unexpected error`;
-    // Best-effort -- a rejected status publish must not prevent rethrowing
-    // as HandledValidationError below.
-    if (headSha) {
-      await setCommitStatus(
-        statusOctokit,
-        config.owner,
-        config.repo,
-        headSha,
-        'error',
-        message,
-        pathConfig.statusContext,
-      ).catch((statusErr) => {
-        console.error(`Failed to report error status: ${safeErrorMessage(statusErr)}`);
-      });
-    }
-    // Already reported above -- wrap as HandledValidationError so the
-    // caller's isolation loop doesn't report this same error again.
     throw new HandledValidationError(`${message}: ${safeErrorMessage(err)}`);
   }
 
@@ -88,33 +70,14 @@ export const executePathValidation = async (
   return outcome;
 };
 
-/** Best-effort "something broke" handler -- posts an error commit status, never throws. */
+/** Best-effort "something broke" handler -- logs the error, never throws. */
 export const reportPathValidationError = async (
-  config: GitHubConfig,
-  headSha: string | undefined,
-  pathConfig: Pick<PathValidationConfig, 'statusContext' | 'displayName'>,
+  _config: GitHubConfig,
+  _headSha: string | undefined,
+  _pathConfig: Pick<PathValidationConfig, 'statusContext' | 'displayName'>,
   err: unknown,
-  /** Injectable for tests; defaults to a real Octokit client built from config. */
-  statusOctokitOverride?: Octokit,
 ): Promise<void> => {
   console.error('Unexpected error:', safeErrorMessage(err));
-  if (!headSha) {
-    return;
-  }
-
-  const message = `${pathConfig.displayName} encountered an unexpected error`;
-  const statusOctokit = statusOctokitOverride ?? createStatusOctokit(config);
-  await setCommitStatus(
-    statusOctokit,
-    config.owner,
-    config.repo,
-    headSha,
-    'error',
-    message,
-    pathConfig.statusContext,
-  ).catch((statusErr) => {
-    console.error(`Failed to report error status: ${safeErrorMessage(statusErr)}`);
-  });
 };
 
 const logSuspiciousMatches = (files: Array<{ filename: string; patch?: string }>): void => {

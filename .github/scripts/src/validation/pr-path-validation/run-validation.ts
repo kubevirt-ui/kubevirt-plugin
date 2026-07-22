@@ -1,6 +1,6 @@
 import type { Octokit } from '@octokit/rest';
 
-import { reportCommitStatus, syncValidationLabels } from './label-sync';
+import { syncValidationLabels } from './label-sync';
 import type { LabelSyncContext, PathValidationEvent } from './label-sync';
 import { isLabelAppliedByTrustedActor } from './owners';
 import { getSensitivePaths } from './paths';
@@ -43,18 +43,9 @@ export const runPathValidation = async (
 ): Promise<PathValidationOutcome> => {
   const labelCtx: LabelSyncContext = {
     octokit: ctx.octokit,
-    statusOctokit: ctx.statusOctokit,
     config: ctx.config,
     prNumber: ctx.prNumber,
-    headSha: ctx.headSha,
   };
-
-  await reportCommitStatus(
-    labelCtx,
-    pathConfig,
-    'pending',
-    `${pathConfig.displayName} in progress…`,
-  );
 
   const files =
     ctx.files ??
@@ -121,12 +112,6 @@ export const runPathValidation = async (
     // Clear alert/block too -- otherwise "do-not-merge/*-review" stays
     // applied even though the status now reports success.
     await syncValidationLabels(labelCtx, pathConfig, true, hasSensitiveChanges);
-    await reportCommitStatus(
-      labelCtx,
-      pathConfig,
-      'success',
-      `${pathConfig.displayName} skipped (${pathConfig.labels.skip})`,
-    );
     return { kind: 'skipped' };
   }
 
@@ -134,12 +119,6 @@ export const runPathValidation = async (
   const passed = !hasSensitiveChanges || reviewed;
 
   await syncValidationLabels(labelCtx, pathConfig, passed, hasSensitiveChanges);
-  await reportCommitStatus(
-    labelCtx,
-    pathConfig,
-    passed ? 'success' : 'failure',
-    buildStatusDescription(passed, hasSensitiveChanges),
-  );
 
   return {
     kind: passed ? 'passed' : 'failed',
