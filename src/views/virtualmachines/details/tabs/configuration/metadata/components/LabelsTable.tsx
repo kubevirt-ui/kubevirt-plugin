@@ -1,16 +1,16 @@
 import React, { type FC, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router';
 
-import { LabelsModal } from '@kubevirt-utils/components/LabelsModal/LabelsModal';
+import NewLabelsModal from '@kubevirt-utils/components/LabelsModal/NewLabelsModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getLabels, getNamespace } from '@kubevirt-utils/resources/shared';
+import { isSystemKey } from '@kubevirt-utils/utils/labelValidation/labelValidation';
 import { getVMListURL } from '@multicluster/urls';
 import { type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { Button, ButtonVariant, Truncate } from '@patternfly/react-core';
 import { VM_LIST_TAB_PARAM, VM_LIST_TAB_VMS } from '@virtualmachines/navigator/constants';
 
-import { isSystemLabel } from '../utils/utils';
 import LabelsAnnotationsTable from './LabelsAnnotationsTable';
 
 type LabelsTableProps = {
@@ -27,30 +27,19 @@ const LabelsTable: FC<LabelsTableProps> = ({ editable = true, onLabelsSubmit, re
   const allLabels = useMemo(() => getLabels(resource, {}), [resource]);
   const entries = useMemo(() => Object.entries(allLabels), [allLabels]);
 
-  const systemLabels = useMemo(
-    () => Object.fromEntries(Object.entries(allLabels).filter(([key]) => isSystemLabel(key))),
-    [allLabels],
-  );
-
-  const editableLabels = useMemo(
-    () => Object.fromEntries(Object.entries(allLabels).filter(([key]) => !isSystemLabel(key))),
-    [allLabels],
-  );
-
-  const canDelete = useCallback((key: string): boolean => !isSystemLabel(key), []);
+  const canDelete = useCallback((key: string): boolean => !isSystemKey(key), []);
 
   const onAdd = useCallback(
     (): void =>
       createModal(({ isOpen, onClose }) => (
-        <LabelsModal
-          initialLabels={editableLabels}
+        <NewLabelsModal
           isOpen={isOpen}
           obj={resource}
           onClose={onClose}
-          onLabelsSubmit={(labels) => onLabelsSubmit({ ...labels, ...systemLabels })}
+          onLabelsSubmit={onLabelsSubmit}
         />
       )),
-    [createModal, editableLabels, onLabelsSubmit, resource, systemLabels],
+    [createModal, onLabelsSubmit, resource],
   );
 
   const onDelete = useCallback(
