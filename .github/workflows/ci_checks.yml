@@ -240,3 +240,23 @@ jobs:
       - name: Skip workflow script tests
         if: github.event_name != 'push' && steps.filter.outputs.scripts != 'true'
         run: echo "No workflow script changes detected, skipping."
+
+  # Single required check for branch protection. Shows as one line in
+  # the PR merge box. Click "Details" to see individual jobs inside.
+  ci:
+    name: CI
+    needs: [i18n, actionlint, build, test]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    steps:
+      - name: Check results
+        run: |
+          if [[ "${{ needs.i18n.result }}" == "failure" || \
+                "${{ needs.actionlint.result }}" == "failure" || \
+                "${{ needs.build.result }}" == "failure" || \
+                "${{ needs.test.result }}" == "failure" ]]; then
+            echo "One or more CI jobs failed"
+            exit 1
+          fi
+          echo "All CI jobs passed"
