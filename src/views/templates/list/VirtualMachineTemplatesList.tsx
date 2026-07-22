@@ -28,6 +28,8 @@ import { useSignals } from '@preact/signals-react/runtime';
 
 import VirtualMachineTemplatesCreateButton from './components/VirtualMachineTemplatesCreateButton/VirtualMachineTemplatesCreateButton';
 import VirtualMachineTemplatesEmptyState from './components/VirtualMachineTemplatesEmptyState/VirtualMachineTemplatesEmptyState';
+import TemplatesTypeToggle from './components/TemplatesTypeToggle/TemplatesTypeToggle';
+import { TemplateFilterType } from './filters/types';
 import useVirtualMachineTemplatesFilters from './filters/useVirtualMachineTemplatesFilters';
 import useAllTemplateResources from './hooks/useAllTemplateResources';
 import { getTemplateColumns, getTemplateRowId } from './virtualMachineTemplatesDefinition';
@@ -58,6 +60,12 @@ const VirtualMachineTemplatesList: FC<ListPageProps> = ({
   });
 
   const { filters, filtersWithSelect } = useVirtualMachineTemplatesFilters(allTemplates);
+
+  // Type is controlled by TemplatesTypeToggle; keep it out of the Filter dropdown/chips.
+  const toolbarFilters = useMemo(
+    () => filters.filter((filter) => filter.type !== TemplateFilterType.Type),
+    [filters],
+  );
 
   const allFilters = useMemo(
     () => [...filters, ...filtersWithSelect],
@@ -130,7 +138,7 @@ const VirtualMachineTemplatesList: FC<ListPageProps> = ({
             customRowFiltersMenu={
               <TemplatesFilter
                 onFilterChange={onFilterChange}
-                rowFilters={filters}
+                rowFilters={toolbarFilters}
                 variant={TemplatesFilterVariant.Menu}
               />
             }
@@ -153,7 +161,8 @@ const VirtualMachineTemplatesList: FC<ListPageProps> = ({
             hideNameLabelFilters={hideNameLabelFilters}
             loaded={loadedColumns}
             onFilterChange={onFilterChange}
-            rowFilters={filters}
+            rowFilters={toolbarFilters}
+            toolbarStartContent={<TemplatesTypeToggle onFilterChange={onFilterChange} />}
           />
         </div>
         <KubevirtTable<TemplateOrRequest>

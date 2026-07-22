@@ -11,12 +11,8 @@ import {
 import { includeFilter } from '@kubevirt-utils/utils/utils';
 import { ResourceIcon, RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 
+import { TEMPLATE_TYPE_ID } from './constants';
 import { TemplateFilterType } from './types';
-
-const TEMPLATE_TYPE_ID = {
-  OPENSHIFT: 'templates',
-  VM: 'vm-templates',
-} as const;
 
 const getTemplateType = (obj: TemplateOrRequest): string => {
   if (isOpenShiftTemplate(obj)) {

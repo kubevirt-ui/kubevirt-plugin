@@ -8,7 +8,7 @@ import {
   OnFilterChange,
   RowFilter,
 } from '@openshift-console/dynamic-plugin-sdk';
-import { Toolbar, ToolbarContent, ToolbarToggleGroup } from '@patternfly/react-core';
+import { Toolbar, ToolbarContent, ToolbarItem, ToolbarToggleGroup } from '@patternfly/react-core';
 import { FilterIcon } from '@patternfly/react-icons';
 import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
@@ -38,6 +38,8 @@ type ListPageFilterProps = {
   searchFilters?: RowFilter[];
   /** Rendered in the toolbar row before column management */
   toolbarEndContent?: ReactNode;
+  /** Rendered at the start of the toolbar row (before filters) */
+  toolbarStartContent?: ReactNode;
 };
 
 const ListPageFilter = ({
@@ -55,6 +57,7 @@ const ListPageFilter = ({
   rowFilters,
   searchFilters = [],
   toolbarEndContent,
+  toolbarStartContent,
 }: ListPageFilterProps): null | React.ReactElement => {
   const { t } = useKubevirtTranslation();
 
@@ -125,6 +128,7 @@ const ListPageFilter = ({
       isExpanded={toolbarIsExpanded}
     >
       <ToolbarContent>
+        {toolbarStartContent && <ToolbarItem>{toolbarStartContent}</ToolbarItem>}
         <ToolbarToggleGroup breakpoint="md" toggleIcon={<FilterIcon />}>
           <RowFilters
             customMenu={customRowFiltersMenu}
