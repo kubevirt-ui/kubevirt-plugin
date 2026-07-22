@@ -77,7 +77,7 @@ const TemplatePageTitle: FC<TemplatePageTitleTitleProps> = ({ template }) => {
           <span className="co-m-resource-icon co-m-resource-icon--lg">
             {isOSTemplate ? TemplateModel.abbr : VirtualMachineTemplateModel.abbr}
           </span>
-          <span>
+          <span data-test="resource-title">
             {templateName}{' '}
             {isDeprecatedTemplate(template) && <Label isCompact>{t('Deprecated')}</Label>}
           </span>

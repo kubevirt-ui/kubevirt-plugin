@@ -51,11 +51,7 @@ const GettingStartedSectionContents: FC<GettingStartedSectionContentsProps> = ({
         {title}
       </Title>
 
-      {description ? (
-        <Content component={ContentVariants.small} data-test="description">
-          {description}
-        </Content>
-      ) : null}
+      {description ? <Content component={ContentVariants.small}>{description}</Content> : null}
 
       <Flex direction={{ default: 'column' }} grow={{ default: 'grow' }}>
         {links?.length > 0 ? (

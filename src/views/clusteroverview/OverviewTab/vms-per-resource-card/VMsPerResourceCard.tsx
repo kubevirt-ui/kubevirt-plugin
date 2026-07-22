@@ -21,7 +21,7 @@ const VMsPerResourceCard = () => {
   };
 
   return (
-    <Card data-test-id="vms-per-template-card">
+    <Card data-test="vms-per-template-card">
       <CardHeader
         actions={{
           actions: (

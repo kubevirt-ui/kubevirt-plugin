@@ -30,7 +30,6 @@ const ArchitectureField: FC<ArchitectureFieldProps> = ({ vms }) => {
     <FormGroup label={t('Architecture type')}>
       <MultiSelectTypeahead
         allResourceNames={allArchitectures}
-        data-test="adv-search-vm-architecture-type"
         selectedResourceNames={value}
         selectPlaceholder={t('Select architecture type')}
         setSelectedResourceNames={setValue}

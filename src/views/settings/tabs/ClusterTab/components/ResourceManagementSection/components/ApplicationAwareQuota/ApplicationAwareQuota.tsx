@@ -76,6 +76,7 @@ const ApplicationAwareQuota: FC<ApplicationAwareQuotaProps> = ({
         helpTextIconContent={t(
           'Extends ResourceQuota by managing quotas for VM workloads as well as pods and other resource limits. AAQ is virtualization-aware and helps prevent issues such as failing live migrations due to quota limits.',
         )}
+        dataTestID="application-aware-quota"
         isDisabled={!hyperLoaded}
         isLoading={isLoading}
         newBadge={newBadge}

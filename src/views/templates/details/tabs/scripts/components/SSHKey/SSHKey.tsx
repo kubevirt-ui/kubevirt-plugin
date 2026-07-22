@@ -109,7 +109,7 @@ const SSHKey: FC<SSHKeyProps> = ({ template }) => {
     <DescriptionItem
       descriptionData={
         <Stack hasGutter>
-          <div data-test="ssh-popover">
+          <div>
             <Content component={ContentVariants.p}>{t('Select an available secret')}</Content>
           </div>
           <SecretNameLabel secretName={vmAttachedSecretName} />

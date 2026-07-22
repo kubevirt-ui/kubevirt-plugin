@@ -103,7 +103,7 @@ const AdvancedSearchModal: FC<AdvancedSearchModalProps> = ({
     >
       <ModalHeader title={t('Advanced search')} />
       <ModalBody>
-        <div data-test="adv-search-details">
+        <div>
           <ModalExpandableSection title={t('Details')}>
             <Form isHorizontal>
               <NameField />

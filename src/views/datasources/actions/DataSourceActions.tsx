@@ -58,7 +58,6 @@ const DataSourceActions: FC<DataSourceActionProps> = ({
   return (
     <Dropdown
       className="kubevirt-data-source-actions"
-      data-test-id="data-source-actions"
       isOpen={isOpen}
       onOpenChange={setIsOpen}
       popperProps={{ appendTo: getContentScrollableElement, position: 'right' }}
@@ -71,7 +70,7 @@ const DataSourceActions: FC<DataSourceActionProps> = ({
         >
           {dsActions?.map((action) => (
             <DropdownItem
-              data-test-id={action?.id}
+              data-test={action?.id}
               description={action?.description}
               isDisabled={action?.disabled}
               key={action?.id}
@@ -84,7 +83,6 @@ const DataSourceActions: FC<DataSourceActionProps> = ({
         <Divider key="divider" />
         <DropdownGroup key="datasource-manage" label={t('DataImportCron')}>
           <DropdownItem
-            data-test-id="datasource-manage"
             description={manageAction?.description}
             isDisabled={manageAction?.disabled}
             key="datasource-manage"

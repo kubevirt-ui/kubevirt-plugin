@@ -79,7 +79,11 @@ const MigrationPolicyFormFooter: FC<MigrationPolicyFormFooterProps> = ({ migrati
             </Button>
           </ActionListItem>
           <ActionListItem>
-            <Button onClick={closeModal} variant={ButtonVariant.link}>
+            <Button
+              data-test="modal-cancel-action"
+              onClick={closeModal}
+              variant={ButtonVariant.link}
+            >
               {t('Cancel')}
             </Button>
           </ActionListItem>

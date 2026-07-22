@@ -18,7 +18,7 @@ const getSourceOption = (source: SOURCE_OPTIONS_IDS, ns: string, t: TFunction) =
           description={t('Use the default Template disk source')}
           value={SOURCE_TYPES.defaultSource}
         >
-          <span data-test-id={SOURCE_TYPES.defaultSource}>{t('Default')}</span>
+          <span data-test={SOURCE_TYPES.defaultSource}>{t('Default')}</span>
         </SelectOption>
       );
     case SOURCE_TYPES.pvcSource:
@@ -29,7 +29,7 @@ const getSourceOption = (source: SOURCE_OPTIONS_IDS, ns: string, t: TFunction) =
           )}
           value={SOURCE_TYPES.pvcSource}
         >
-          <span data-test-id={SOURCE_TYPES.pvcSource}>{t('PVC (clone PVC)')}</span>
+          <span data-test={SOURCE_TYPES.pvcSource}>{t('PVC (clone PVC)')}</span>
         </SelectOption>
       );
     case SOURCE_TYPES.httpSource:
@@ -38,7 +38,7 @@ const getSourceOption = (source: SOURCE_OPTIONS_IDS, ns: string, t: TFunction) =
           description={t('Import content via URL (HTTP or HTTPS endpoint).')}
           value={SOURCE_TYPES.httpSource}
         >
-          <span data-test-id={SOURCE_TYPES.httpSource}>{t('URL (creates PVC)')}</span>
+          <span data-test={SOURCE_TYPES.httpSource}>{t('URL (creates PVC)')}</span>
         </SelectOption>
       );
     case SOURCE_TYPES.registrySource:
@@ -47,7 +47,7 @@ const getSourceOption = (source: SOURCE_OPTIONS_IDS, ns: string, t: TFunction) =
           description={t('Import content via container registry.')}
           value={SOURCE_TYPES.registrySource}
         >
-          <span data-test-id={SOURCE_TYPES.registrySource}>{t('Registry (ContainerDisk)')}</span>
+          <span data-test={SOURCE_TYPES.registrySource}>{t('Registry (ContainerDisk)')}</span>
         </SelectOption>
       );
     case SOURCE_TYPES.uploadSource:

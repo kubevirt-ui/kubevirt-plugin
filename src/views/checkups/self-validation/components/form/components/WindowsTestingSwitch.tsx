@@ -32,7 +32,6 @@ const WindowsTestingSwitch: FC<WindowsTestingSwitchProps> = ({
         </>
       }
       className="pf-v6-u-mb-sm"
-      data-test="windows-eula-switch"
       id="accept-windows-eula"
       isChecked={acceptWindowsEula}
       isDisabled={!isTier2Selected}

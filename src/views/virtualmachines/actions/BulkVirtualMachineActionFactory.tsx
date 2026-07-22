@@ -287,8 +287,8 @@ export const createBulkVirtualMachineActionFactory = (
         />
       )),
     disabled: !haveSameCluster(vms) || !haveSameNamespace(vms) || isEmpty(vms),
-    id: ACTIONS_ID.MOVE_TO_FOLDER,
-    label: t('Move to group'),
+    id: BULK_ACTIONS_ID.MOVE_TO_FOLDER,
+    label: t('Move to folder'),
   }),
   pause: (
     vms: V1VirtualMachine[],

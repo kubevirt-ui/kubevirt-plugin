@@ -31,7 +31,7 @@ const FeaturedOperatorItem: FC<FeaturedOperatorItemProps> = ({
   const Icon = getInstallStateIcon(installState);
 
   return (
-    <Split className="featured-operator-item" hasGutter>
+    <Split className="featured-operator-item" data-test={operatorName} hasGutter>
       <SplitItem>
         <span className="featured-operator-item__title">
           {title}

@@ -18,7 +18,6 @@ const ClusterField: FC = () => {
     <FormGroup label={t('Cluster')}>
       <MultiSelectTypeahead
         allResourceNames={clusterNames}
-        data-test="adv-search-vm-cluster"
         emptyValuePlaceholder={t('All clusters')}
         selectedResourceNames={value}
         selectPlaceholder={t('Select cluster')}

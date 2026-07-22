@@ -65,7 +65,7 @@ export const extensions: EncodedExtension[] = [
     properties: {
       dataAttributes: {
         'data-quickstart-id': 'qs-nav-virtualmachines',
-        'data-test-id': 'virtualmachines-nav-item',
+        'data-test': 'virtualmachines-nav-item',
       },
       href: `${FLEET_VIRTUAL_MACHINES_PATH}/all-clusters/all-namespaces`,
       id: 'virtualmachines-virt-perspective',
@@ -79,7 +79,7 @@ export const extensions: EncodedExtension[] = [
     properties: {
       dataAttributes: {
         'data-quickstart-id': 'qs-nav-templates',
-        'data-test-id': 'templates-nav-item',
+        'data-test': 'templates-nav-item',
       },
       href: `${FLEET_TEMPLATES_PATH}/all-clusters/all-namespaces`,
       id: 'templates-virt-perspective',
@@ -94,7 +94,7 @@ export const extensions: EncodedExtension[] = [
     properties: {
       dataAttributes: {
         'data-quickstart-id': 'qs-nav-bootablevolumes',
-        'data-test-id': 'bootablevolumes-nav-item',
+        'data-test': 'bootablevolumes-nav-item',
       },
       href: `${FLEET_BOOTABLE_VOLUMES_PATH}/all-clusters/all-namespaces`,
       id: 'bootablevolumes-virt-perspective',
@@ -119,7 +119,7 @@ export const extensions: EncodedExtension[] = [
     properties: {
       dataAttributes: {
         'data-quickstart-id': 'qs-nav-instancetype',
-        'data-test-id': 'instancetype-nav-item',
+        'data-test': 'instancetype-nav-item',
       },
       href: `${FLEET_INSTANCETYPES_PATH}/all-clusters/all-namespaces`,
       id: 'instancetype-virt-perspective',
@@ -144,7 +144,7 @@ export const extensions: EncodedExtension[] = [
     properties: {
       dataAttributes: {
         'data-quickstart-id': 'qs-nav-migrationpolicies',
-        'data-test-id': 'migrationpolicies-nav-item',
+        'data-test': 'migrationpolicies-nav-item',
       },
       href: `${FLEET_MIGRATION_POLICIES_PATH}/all-clusters`,
       id: 'migrationpolicies-virt-perspective',
@@ -159,7 +159,7 @@ export const extensions: EncodedExtension[] = [
     properties: {
       dataAttributes: {
         'data-quickstart-id': 'qs-nav-checkups',
-        'data-test-id': 'checkups-nav-item',
+        'data-test': 'checkups-nav-item',
       },
       href: `${FLEET_CHECKUPS_PATH}/all-clusters/all-namespaces/storage`,
       id: 'checkups-virt-perspective',

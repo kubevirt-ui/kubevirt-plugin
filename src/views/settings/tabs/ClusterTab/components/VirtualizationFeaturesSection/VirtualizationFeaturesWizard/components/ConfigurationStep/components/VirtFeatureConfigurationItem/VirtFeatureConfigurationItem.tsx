@@ -79,7 +79,7 @@ const VirtFeatureConfigurationItem: FC<VirtFeatureConfigurationItemProps> = ({
               <Icon />
             ) : (
               <Switch
-                data-test-id={operatorName}
+                data-test={operatorName}
                 isChecked={switchState}
                 onChange={(_, checked: boolean) => handleSwitchChange(checked)}
               />

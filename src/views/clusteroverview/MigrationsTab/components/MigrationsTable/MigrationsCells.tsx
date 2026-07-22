@@ -39,7 +39,7 @@ export const VMNameCell: FC<CellProps> = ({ row }) => {
   const cluster = getCluster(vmiObj) ?? getCluster(vmim);
 
   if (!vmName) {
-    return <span data-test="migration-vm-name-unknown">{NO_DATA_DASH}</span>;
+    return <span>{NO_DATA_DASH}</span>;
   }
 
   return (
@@ -61,7 +61,7 @@ export const NamespaceCell: FC<CellProps> = ({ row }) => {
   const cluster = getCluster(vmiObj) ?? getCluster(vmim);
 
   if (!namespace) {
-    return <span data-test="migration-namespace-unknown">{NO_DATA_DASH}</span>;
+    return <span>{NO_DATA_DASH}</span>;
   }
 
   return (

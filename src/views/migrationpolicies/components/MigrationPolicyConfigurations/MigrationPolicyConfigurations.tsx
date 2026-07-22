@@ -42,7 +42,7 @@ const MigrationPolicyConfigurations: FC<MigrationPolicyConfigurationsProps> = ({
             ([key, { component: Component, label }]) =>
               key in state && (
                 <FormGroup
-                  data-test-id={`${key}-selected`}
+                  data-test={`${key}-selected`}
                   fieldId={key}
                   hasNoPaddingTop
                   key={key}

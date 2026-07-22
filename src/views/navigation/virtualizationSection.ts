@@ -33,7 +33,7 @@ export const extensions: EncodedExtension[] = [
     properties: {
       dataAttributes: {
         'data-quickstart-id': 'qs-nav-sec-virtualization',
-        'data-test-id': 'virtualization-nav-item',
+        'data-test': 'virtualization-nav-item',
       },
       id: VIRT_SECTION_ID,
       insertAfter: 'workloads',
@@ -45,7 +45,7 @@ export const extensions: EncodedExtension[] = [
     properties: {
       dataAttributes: {
         'data-quickstart-id': 'qs-nav-virtualmachines',
-        'data-test-id': 'virtualmachines-nav-item',
+        'data-test': 'virtualmachines-nav-item',
       },
       id: NAV_ID.VIRTUAL_MACHINES,
       insertAfter: VIRT_SECTION_ID,
@@ -63,7 +63,7 @@ export const extensions: EncodedExtension[] = [
     properties: {
       dataAttributes: {
         'data-quickstart-id': 'qs-nav-templates',
-        'data-test-id': 'templates-nav-item',
+        'data-test': 'templates-nav-item',
       },
       href: 'templates',
       id: NAV_ID.TEMPLATES,
@@ -78,7 +78,7 @@ export const extensions: EncodedExtension[] = [
     properties: {
       dataAttributes: {
         'data-quickstart-id': 'qs-nav-bootablevolumes',
-        'data-test-id': 'bootablevolumes-nav-item',
+        'data-test': 'bootablevolumes-nav-item',
       },
       href: 'bootablevolumes',
       id: NAV_ID.BOOTABLE_VOLUMES,
@@ -107,7 +107,7 @@ export const extensions: EncodedExtension[] = [
     properties: {
       dataAttributes: {
         'data-quickstart-id': 'qs-nav-virtualmachineclusterinstancetypes',
-        'data-test-id': 'virtualmachineclusterinstancetypes-nav-item',
+        'data-test': 'virtualmachineclusterinstancetypes-nav-item',
       },
       id: NAV_ID.INSTANCE_TYPES,
       insertAfter: NAV_ID.SEPARATOR_1,
@@ -128,7 +128,7 @@ export const extensions: EncodedExtension[] = [
     properties: {
       dataAttributes: {
         'data-quickstart-id': 'qs-nav-vmnetwork',
-        'data-test-id': 'vmnetwork-nav-item',
+        'data-test': 'vmnetwork-nav-item',
       },
       href: '/k8s/cluster/virtualmachine-networks',
       id: NAV_ID.VM_NETWORKS,
@@ -154,7 +154,7 @@ export const extensions: EncodedExtension[] = [
     properties: {
       dataAttributes: {
         'data-quickstart-id': 'qs-nav-migrationpolicies',
-        'data-test-id': 'migrationpolicies-nav-item',
+        'data-test': 'migrationpolicies-nav-item',
       },
       id: NAV_ID.MIGRATION_POLICIES,
       insertAfter: NAV_ID.SEPARATOR_2,
@@ -175,7 +175,7 @@ export const extensions: EncodedExtension[] = [
     properties: {
       dataAttributes: {
         'data-quickstart-id': 'qs-nav-quotas',
-        'data-test-id': 'quotas-nav-item',
+        'data-test': 'quotas-nav-item',
       },
       href: 'quotas',
       id: NAV_ID.QUOTAS,
@@ -194,7 +194,7 @@ export const extensions: EncodedExtension[] = [
     properties: {
       dataAttributes: {
         'data-quickstart-id': 'qs-nav-virtualization-checkups',
-        'data-test-id': 'virtualization-checkups-nav-item',
+        'data-test': 'virtualization-checkups-nav-item',
       },
       href: 'checkups',
       id: NAV_ID.CHECKUPS,
@@ -219,7 +219,7 @@ export const extensions: EncodedExtension[] = [
   {
     properties: {
       dataAttributes: {
-        'data-test-id': 'virtualization-settings-nav-item',
+        'data-test': 'virtualization-settings-nav-item',
       },
       href: 'virtualization-settings',
       id: NAV_ID.SETTINGS,

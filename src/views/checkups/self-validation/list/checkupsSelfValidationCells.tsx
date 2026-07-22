@@ -38,7 +38,10 @@ export const NameCell: FC<{ row: IoK8sApiCoreV1ConfigMap }> = ({ row }) => {
   }
 
   return (
-    <Link to={getSelfValidationCheckupURL(name, namespace, isACMPage ? cluster : undefined)}>
+    <Link
+      data-test={name}
+      to={getSelfValidationCheckupURL(name, namespace, isACMPage ? cluster : undefined)}
+    >
       {name}
     </Link>
   );

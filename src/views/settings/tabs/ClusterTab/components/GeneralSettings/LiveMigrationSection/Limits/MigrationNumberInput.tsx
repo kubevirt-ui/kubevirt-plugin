@@ -74,6 +74,7 @@ const MigrationNumberInput: FC<MigrationNumberInputProps> = ({
               return newValue;
             })
           }
+          data-test={`${inputName}-input`}
           inputName={inputName}
           min={minValue}
           value={value}

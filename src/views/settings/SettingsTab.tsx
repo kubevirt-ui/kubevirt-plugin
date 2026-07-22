@@ -17,6 +17,7 @@ const SettingsTab: FC = () => {
         <Tabs activeKey={activeTab} className="settings-tab__tabs">
           {tabs.map(({ name, title }) => (
             <Tab
+              data-test={`settings-tab-${name}`}
               eventKey={name}
               key={name}
               onClick={() => redirectTab(name)}

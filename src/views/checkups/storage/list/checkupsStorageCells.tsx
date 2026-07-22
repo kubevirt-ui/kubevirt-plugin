@@ -35,7 +35,12 @@ export const NameCell: FC<{ row: IoK8sApiCoreV1ConfigMap }> = ({ row }) => {
   }
 
   return (
-    <Link to={getStorageCheckupURL(name, namespace, isACMPage ? cluster : undefined)}>{name}</Link>
+    <Link
+      data-test={name}
+      to={getStorageCheckupURL(name, namespace, isACMPage ? cluster : undefined)}
+    >
+      {name}
+    </Link>
   );
 };
 

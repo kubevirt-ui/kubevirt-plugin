@@ -23,6 +23,7 @@ const GuestManagementSection: FC<GuestManagementSectionProps> = ({
 
   return (
     <ExpandSection
+      dataTestID="guest-management"
       searchItemId={CLUSTER_TAB_IDS.guestManagement}
       toggleText={t('Guest management')}
     >

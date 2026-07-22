@@ -13,7 +13,7 @@ export const MigrationPolicyBreadcrumb: FC = () => {
 
   return (
     <Breadcrumb>
-      <BreadcrumbItem data-test-id="breadcrumb-link-0">
+      <BreadcrumbItem>
         <Link to={migrationPoliciesClusterListPage}>{t('MigrationPolicies')}</Link>
       </BreadcrumbItem>
       <BreadcrumbItem>{t('MigrationPolicy details')}</BreadcrumbItem>

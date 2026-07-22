@@ -56,18 +56,16 @@ const SelectParameterValueType: FC<ParameterValueEditorProps> = ({
             description={t('Value generated using an expression')}
             value={PARAMETER_VALUE_TYPES.GENERATED}
           >
-            <span data-test-id={PARAMETER_VALUE_TYPES.GENERATED}>
-              {t('Generated (expression)')}
-            </span>
+            <span data-test={PARAMETER_VALUE_TYPES.GENERATED}>{t('Generated (expression)')}</span>
           </SelectOption>
           <SelectOption
             description={t('Default value for this parameter')}
             value={PARAMETER_VALUE_TYPES.VALUE}
           >
-            <span data-test-id={PARAMETER_VALUE_TYPES.VALUE}>{t('Value')}</span>
+            <span data-test={PARAMETER_VALUE_TYPES.VALUE}>{t('Value')}</span>
           </SelectOption>
           <SelectOption description={t('No default value')} value={PARAMETER_VALUE_TYPES.NONE}>
-            <span data-test-id={PARAMETER_VALUE_TYPES.NONE}>{t('None')}</span>
+            <span data-test={PARAMETER_VALUE_TYPES.NONE}>{t('None')}</span>
           </SelectOption>
         </FormPFSelect>
       </FormGroup>

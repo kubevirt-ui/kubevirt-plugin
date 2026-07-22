@@ -14,7 +14,7 @@ const VMNamespaceCell: FC<VMNamespaceCellProps> = ({ row }) => {
   const namespace = getNamespace(row);
 
   if (!namespace) {
-    return <span data-test="vm-namespace">{NO_DATA_DASH}</span>;
+    return <span>{NO_DATA_DASH}</span>;
   }
 
   return (

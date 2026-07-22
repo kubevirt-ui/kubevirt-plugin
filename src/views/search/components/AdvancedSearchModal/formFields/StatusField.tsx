@@ -16,7 +16,6 @@ const StatusField: FC = () => {
     <FormGroup label={t('Status')}>
       <MultiSelectTypeahead
         allResourceNames={statusFilterItems?.map((item) => item.title)}
-        data-test="adv-search-vm-status"
         selectedResourceNames={value}
         setSelectedResourceNames={setValue}
       />

@@ -65,6 +65,7 @@ const PersistentReservationSection: FC<PersistentReservationSectionProps> = ({
 
   return (
     <ExpandSection
+      dataTestID="persistent-reservation-section"
       searchItemId={CLUSTER_TAB_IDS.persistentReservation}
       toggleText={t('SCSI persistent reservation')}
     >

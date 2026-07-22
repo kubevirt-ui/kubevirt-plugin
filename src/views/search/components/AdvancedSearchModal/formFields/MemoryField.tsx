@@ -19,7 +19,6 @@ const MemoryField: FC = () => {
     <FormGroup label={t('Memory')}>
       <InputGroup>
         <NumberOperatorSelect
-          data-test="adv-search-mem-operator"
           onSelect={(operator) => setMemory({ ...memory, operator })}
           selected={memory.operator}
         />
@@ -31,7 +30,6 @@ const MemoryField: FC = () => {
           />
         </InputGroupItem>
         <MemoryUnitSelect
-          data-test="adv-search-mem-unit"
           onSelect={(unit) => setMemory({ ...memory, unit })}
           selected={memory.unit}
         />

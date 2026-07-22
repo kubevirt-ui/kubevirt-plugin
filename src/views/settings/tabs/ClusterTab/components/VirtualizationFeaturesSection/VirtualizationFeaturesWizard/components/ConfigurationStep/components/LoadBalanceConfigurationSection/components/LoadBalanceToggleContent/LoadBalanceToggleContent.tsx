@@ -45,7 +45,6 @@ const LoadBalanceToggleContent: FC<LoadBalanceToggleContentProps> = ({ alternati
           <InstalledIconWithTooltip />
         ) : (
           <Switch
-            data-test-id="load-balance"
             isChecked={switchState}
             onChange={(_event, newSwitchState) => handleSwitchChange(newSwitchState)}
           />

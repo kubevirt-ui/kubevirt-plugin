@@ -23,7 +23,6 @@ const ProjectField: FC<ProjectFieldProps> = ({ vms }) => {
     <FormGroup label={t('Project')}>
       <MultiSelectTypeahead
         allResourceNames={allProjectNames}
-        data-test="adv-search-vm-project"
         emptyValuePlaceholder={t('All projects')}
         selectedResourceNames={value}
         selectPlaceholder={t('Select project')}

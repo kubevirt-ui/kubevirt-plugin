@@ -27,11 +27,13 @@ export const NameCell: FC<CellProps> = ({ row }) => {
 
   return (
     <span data-test={`migration-policy-name-${getName(row)}`}>
-      <MulticlusterResourceLink
-        cluster={isACMPage ? cluster : undefined}
-        groupVersionKind={MigrationPolicyModelGroupVersionKind}
-        name={getName(row)}
-      />
+      <span data-test={`policy-${getName(row)}`}>
+        <MulticlusterResourceLink
+          cluster={isACMPage ? cluster : undefined}
+          groupVersionKind={MigrationPolicyModelGroupVersionKind}
+          name={getName(row)}
+        />
+      </span>
     </span>
   );
 };
