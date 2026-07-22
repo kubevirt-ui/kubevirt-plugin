@@ -7,6 +7,7 @@
  */
 
 import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 
 import { Octokit } from '@octokit/rest';
 
@@ -32,7 +33,10 @@ import type { CommandContext } from './dispatcher';
 
 /** Called by the dispatcher when /help is matched. */
 export const executeHelp = async (ctx: CommandContext): Promise<void> => {
-  const { commands } = JSON.parse(readFileSync('.github/pr-commands.json', 'utf8')) as {
+  const workspace = process.env.GITHUB_WORKSPACE || resolve(process.cwd(), '../..');
+  const { commands } = JSON.parse(
+    readFileSync(resolve(workspace, '.github/pr-commands.json'), 'utf8'),
+  ) as {
     commands: CommandEntry[];
   };
 
