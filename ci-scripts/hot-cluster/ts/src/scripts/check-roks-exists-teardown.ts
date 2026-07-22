@@ -25,7 +25,9 @@ const main = async (): Promise<void> => {
     console.log(`Cluster '${clusterName}' found`);
     appendFileSync(process.env.GITHUB_OUTPUT!, 'exists=true\n');
     try {
-      execSync(`ibmcloud oc cluster config --cluster "${clusterName}" --admin`, { stdio: 'inherit' });
+      execSync(`ibmcloud oc cluster config --cluster "${clusterName}" --admin`, {
+        stdio: 'inherit',
+      });
     } catch {
       console.warn('Failed to configure cluster admin kubeconfig, continuing anyway');
     }

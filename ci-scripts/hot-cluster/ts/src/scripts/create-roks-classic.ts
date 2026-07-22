@@ -38,7 +38,9 @@ const main = (): void => {
     console.log('No existing VLANs in zone, new VLANs will be created');
   }
 
-  console.log(`Creating cluster '${clusterName}' with ${workerCount}x ${workerFlavor} workers in zone ${zone}...`);
+  console.log(
+    `Creating cluster '${clusterName}' with ${workerCount}x ${workerFlavor} workers in zone ${zone}...`,
+  );
   execSync(
     [
       'ibmcloud oc cluster create classic',

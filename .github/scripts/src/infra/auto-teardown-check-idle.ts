@@ -31,9 +31,7 @@ const main = async (): Promise<void> => {
         status: 'success',
         per_page: 10,
       });
-      const match = data.workflow_runs.find(
-        (r) => r.display_title?.includes(`[${clusterName}]`),
-      );
+      const match = data.workflow_runs.find((r) => r.display_title?.includes(`[${clusterName}]`));
       if (match) {
         lastRunTime = match.updated_at;
         console.log(`Using last successful setup run time for ${clusterName}: ${lastRunTime}`);
@@ -60,11 +58,17 @@ const main = async (): Promise<void> => {
 
   if (idleMinutes >= threshold) {
     setOutput('recent_activity', 'false');
-    setOutput('reason', `CI jobs have been idle for ${idleMinutes} minutes (threshold: ${threshold})`);
+    setOutput(
+      'reason',
+      `CI jobs have been idle for ${idleMinutes} minutes (threshold: ${threshold})`,
+    );
   } else {
     const remaining = threshold - idleMinutes;
     setOutput('recent_activity', 'true');
-    setOutput('reason', `CI jobs last ran ${idleMinutes} minutes ago, ${remaining} minutes remaining before threshold`);
+    setOutput(
+      'reason',
+      `CI jobs last ran ${idleMinutes} minutes ago, ${remaining} minutes remaining before threshold`,
+    );
   }
 };
 

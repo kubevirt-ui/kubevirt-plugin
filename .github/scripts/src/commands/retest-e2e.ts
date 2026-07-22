@@ -29,7 +29,9 @@ const main = async (): Promise<void> => {
   const octokit = new Octokit({ auth: token });
 
   try {
-    if (!(await enforceCommentTrust(octokit, owner, repo, commentId, author, trusted, '/retest-e2e'))) {
+    if (
+      !(await enforceCommentTrust(octokit, owner, repo, commentId, author, trusted, '/retest-e2e'))
+    ) {
       return;
     }
 
@@ -37,7 +39,9 @@ const main = async (): Promise<void> => {
     const headSha = pr.head.sha;
     const baseRef = pr.base.ref;
 
-    console.log(`/retest-e2e requested by ${author} on PR #${prNumber} (HEAD: ${headSha}, base: ${baseRef})`);
+    console.log(
+      `/retest-e2e requested by ${author} on PR #${prNumber} (HEAD: ${headSha}, base: ${baseRef})`,
+    );
 
     const lookbackDate = new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString();
     const runs = await octokit.paginate(octokit.actions.listWorkflowRuns, {
@@ -64,7 +68,9 @@ const main = async (): Promise<void> => {
         `Run ${runningCandidate.id} for PR #${prNumber} is still ${runningCandidate.status} -- cancelling it and dispatching a fresh run instead.`,
       );
     } else {
-      console.log(`No in-progress Hot Cluster E2E run found for PR #${prNumber} (base: ${baseRef}) -- dispatching a fresh run.`);
+      console.log(
+        `No in-progress Hot Cluster E2E run found for PR #${prNumber} (base: ${baseRef}) -- dispatching a fresh run.`,
+      );
     }
 
     await reactToComment(octokit, owner, repo, commentId, 'rocket');

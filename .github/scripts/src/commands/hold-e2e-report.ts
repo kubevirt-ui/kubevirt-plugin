@@ -44,7 +44,9 @@ const main = async (): Promise<void> => {
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     console.warn(`Could not comment on the PR: ${msg}`);
-    failStep('Failed to comment on the PR. The hold itself (the "Run Gating Tests" check-run) is unaffected.');
+    failStep(
+      'Failed to comment on the PR. The hold itself (the "Run Gating Tests" check-run) is unaffected.',
+    );
   }
 };
 

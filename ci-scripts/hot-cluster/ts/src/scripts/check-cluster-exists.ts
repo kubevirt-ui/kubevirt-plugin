@@ -20,7 +20,9 @@ const main = async (): Promise<void> => {
   try {
     execSync(`ibmcloud oc cluster get --cluster "${clusterName}"`, { stdio: 'pipe' });
     const clusterJson = JSON.parse(
-      execSync(`ibmcloud oc cluster get --cluster "${clusterName}" --output json 2>/dev/null`, { encoding: 'utf8' }),
+      execSync(`ibmcloud oc cluster get --cluster "${clusterName}" --output json 2>/dev/null`, {
+        encoding: 'utf8',
+      }),
     ) as { state?: string; provider?: string };
 
     const state = clusterJson.state ?? 'unknown';

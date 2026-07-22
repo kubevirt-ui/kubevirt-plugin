@@ -27,13 +27,9 @@ const main = (): void => {
   ];
 
   if (found === 'true') {
-    lines.push(
-      'Teardown requested; ci-env-controller reconciles this asynchronously.',
-    );
+    lines.push('Teardown requested; ci-env-controller reconciles this asynchronously.');
   } else if (found === 'false') {
-    lines.push(
-      'No matching manual console was found -- nothing to tear down.',
-    );
+    lines.push('No matching manual console was found -- nothing to tear down.');
   } else {
     lines.push(':x: Teardown request failed -- see logs above.');
   }

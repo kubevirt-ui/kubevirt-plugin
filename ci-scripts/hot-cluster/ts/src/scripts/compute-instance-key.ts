@@ -30,8 +30,7 @@ const main = (): void => {
     // with an 8-hex-char hash of the full branch name is both deterministic
     // (same branch → same key) and collision-resistant.
     const sanitized = branch.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-    const prefix =
-      sanitized.slice(0, 11).replace(/^-+/, '').replace(/-+$/, '') || 'branch';
+    const prefix = sanitized.slice(0, 11).replace(/^-+/, '').replace(/-+$/, '') || 'branch';
     const hash = createHash('sha256').update(branch).digest('hex').slice(0, 8);
     key = `${prefix}-${hash}`;
   }

@@ -28,15 +28,20 @@ const main = (): void => {
   console.log(`  Infra ID: ${infraId}`);
 
   console.log('Checking CIS DNS records...');
-  const cisId = exec("ibmcloud cis instances --output json 2>/dev/null | jq -r '.[0].crn // empty'");
+  const cisId = exec(
+    "ibmcloud cis instances --output json 2>/dev/null | jq -r '.[0].crn // empty'",
+  );
   if (cisId) {
     exec(`ibmcloud cis instance-set "${cisId}"`);
-    const zoneId = exec("ibmcloud cis domains --output json 2>/dev/null | jq -r '.[0].id // empty'");
+    const zoneId = exec(
+      "ibmcloud cis domains --output json 2>/dev/null | jq -r '.[0].id // empty'",
+    );
     if (zoneId) {
       const recordsRaw = exec(`ibmcloud cis dns-records "${zoneId}" --output json 2>/dev/null`);
       if (recordsRaw) {
         try {
-          const records: Array<{ type: string; name: string; content: string }> = JSON.parse(recordsRaw);
+          const records: Array<{ type: string; name: string; content: string }> =
+            JSON.parse(recordsRaw);
           for (const rec of records) {
             console.log(`${rec.type} ${rec.name} -> ${rec.content}`);
           }

@@ -25,7 +25,9 @@ const main = async (): Promise<void> => {
   const trusted = process.env.TRUSTED === 'true';
   const octokit = new Octokit({ auth: token });
 
-  if (!(await enforceCommentTrust(octokit, owner, repo, commentId, author, trusted, '/cancel-e2e'))) {
+  if (
+    !(await enforceCommentTrust(octokit, owner, repo, commentId, author, trusted, '/cancel-e2e'))
+  ) {
     setOutput('was_running', 'false');
     setOutput('head_sha', '');
     return;

@@ -29,20 +29,28 @@ const main = (): void => {
   }
 
   console.log('Downloading openshift-install...');
-  execSync(`curl -sL "${mirror}/openshift-install-linux.tar.gz" | tar -xz -C /usr/local/bin openshift-install`, {
-    stdio: 'inherit',
-  });
+  execSync(
+    `curl -sL "${mirror}/openshift-install-linux.tar.gz" | tar -xz -C /usr/local/bin openshift-install`,
+    {
+      stdio: 'inherit',
+    },
+  );
   execSync('openshift-install version', { stdio: 'inherit' });
 
   console.log('Downloading oc + kubectl...');
-  execSync(`curl -sL "${mirror}/openshift-client-linux.tar.gz" | tar -xz -C /usr/local/bin oc kubectl`, {
-    stdio: 'inherit',
-  });
+  execSync(
+    `curl -sL "${mirror}/openshift-client-linux.tar.gz" | tar -xz -C /usr/local/bin oc kubectl`,
+    {
+      stdio: 'inherit',
+    },
+  );
   execSync('oc version --client', { stdio: 'inherit' });
 
   console.log('Downloading ccoctl...');
   try {
-    execSync(`curl -sL "${mirror}/ccoctl-linux.tar.gz" | tar -xz -C /usr/local/bin ccoctl`, { stdio: 'inherit' });
+    execSync(`curl -sL "${mirror}/ccoctl-linux.tar.gz" | tar -xz -C /usr/local/bin ccoctl`, {
+      stdio: 'inherit',
+    });
   } catch {
     console.log('ccoctl not available for this version');
   }

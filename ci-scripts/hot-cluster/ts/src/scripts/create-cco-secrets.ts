@@ -34,7 +34,9 @@ const main = (): void => {
 
   mkdirSync(manifestsDir, { recursive: true });
 
-  const credEnv = Buffer.from(`IBMCLOUD_AUTHTYPE=iam\nIBMCLOUD_APIKEY=${apiKey}`).toString('base64');
+  const credEnv = Buffer.from(`IBMCLOUD_AUTHTYPE=iam\nIBMCLOUD_APIKEY=${apiKey}`).toString(
+    'base64',
+  );
   const rawKey = Buffer.from(apiKey).toString('base64');
 
   for (const ns of NAMESPACES) {

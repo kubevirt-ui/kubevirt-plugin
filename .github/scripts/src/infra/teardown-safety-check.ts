@@ -20,7 +20,9 @@ const main = async (): Promise<void> => {
   const active = await hasActiveWorkflows(octokit, owner, repo);
 
   if (active > 0) {
-    failStep(`Aborting teardown: ${active} setup/e2e workflow(s) are currently running. Use force=true to override.`);
+    failStep(
+      `Aborting teardown: ${active} setup/e2e workflow(s) are currently running. Use force=true to override.`,
+    );
   } else {
     console.log('No active setup/e2e workflows. Proceeding with teardown.');
   }

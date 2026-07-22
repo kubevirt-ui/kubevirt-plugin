@@ -32,7 +32,8 @@ const main = async (): Promise<void> => {
   let clusterNames: string[];
   try {
     const parsed: unknown = JSON.parse(matchedRaw);
-    clusterNames = Array.isArray(parsed) && parsed.length > 0 ? (parsed as string[]) : [clusterName];
+    clusterNames =
+      Array.isArray(parsed) && parsed.length > 0 ? (parsed as string[]) : [clusterName];
   } catch {
     clusterNames = [clusterName];
   }

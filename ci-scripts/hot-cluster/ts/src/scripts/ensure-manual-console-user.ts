@@ -33,7 +33,10 @@ const main = async (): Promise<void> => {
     console.log(`Removing htpasswd user '${username}'...`);
 
     try {
-      const { data } = await coreApi.readNamespacedSecret({ name: 'htpass-secret', namespace: 'openshift-config' });
+      const { data } = await coreApi.readNamespacedSecret({
+        name: 'htpass-secret',
+        namespace: 'openshift-config',
+      });
       const existingHtpasswd = Buffer.from(data?.['htpasswd'] ?? '', 'base64').toString('utf8');
       const updated = existingHtpasswd
         .split('\n')
@@ -52,7 +55,9 @@ const main = async (): Promise<void> => {
       console.log('htpass-secret not found; nothing to remove.');
     }
 
-    execSync(`oc adm policy remove-cluster-role-from-user cluster-admin "${username}"`, { stdio: 'inherit' });
+    execSync(`oc adm policy remove-cluster-role-from-user cluster-admin "${username}"`, {
+      stdio: 'inherit',
+    });
     console.log(`User '${username}' removed.`);
     return;
   }
@@ -74,12 +79,19 @@ const main = async (): Promise<void> => {
   // Get existing htpasswd data
   let existingHtpasswd = '';
   try {
-    const { data } = await coreApi.readNamespacedSecret({ name: 'htpass-secret', namespace: 'openshift-config' });
+    const { data } = await coreApi.readNamespacedSecret({
+      name: 'htpass-secret',
+      namespace: 'openshift-config',
+    });
     existingHtpasswd = Buffer.from(data?.['htpasswd'] ?? '', 'base64').toString('utf8');
-  } catch { /* doesn't exist yet */ }
+  } catch {
+    /* doesn't exist yet */
+  }
 
   // Generate new hash using htpasswd binary
-  const newHash = execSync(`printf '%s' '${password}' | htpasswd -niB '${username}'`, { encoding: 'utf8' }).trim();
+  const newHash = execSync(`printf '%s' '${password}' | htpasswd -niB '${username}'`, {
+    encoding: 'utf8',
+  }).trim();
 
   // Update: remove existing entry for this user, append new hash
   const updated = existingHtpasswd
@@ -101,10 +113,12 @@ const main = async (): Promise<void> => {
   let hasHtpasswdIdp = '';
   try {
     hasHtpasswdIdp = execSync(
-      "oc get oauth cluster -o jsonpath='{.spec.identityProviders[?(@.type==\"HTPasswd\")].name}'",
+      'oc get oauth cluster -o jsonpath=\'{.spec.identityProviders[?(@.type=="HTPasswd")].name}\'',
       { encoding: 'utf8' },
     ).trim();
-  } catch { /* no IDP yet */ }
+  } catch {
+    /* no IDP yet */
+  }
 
   if (!hasHtpasswdIdp) {
     console.log('Adding htpasswd identity provider to cluster OAuth config...');
@@ -115,7 +129,10 @@ const main = async (): Promise<void> => {
 
     console.log('Waiting for OAuth pods to roll out...');
     try {
-      execSync('oc rollout status deployment/oauth-openshift -n openshift-authentication --timeout=120s', { stdio: 'inherit' });
+      execSync(
+        'oc rollout status deployment/oauth-openshift -n openshift-authentication --timeout=120s',
+        { stdio: 'inherit' },
+      );
     } catch {
       console.warn('WARN: OAuth rollout did not complete within 120s');
     }
@@ -128,7 +145,10 @@ const main = async (): Promise<void> => {
 
   // Extract CA bundle
   const caCertFile = join(tmpdir(), `ca-cert-${Date.now()}.pem`);
-  const caCert = execSync("oc get configmap kube-root-ca.crt -n default -o jsonpath='{.data.ca\\.crt}'", { encoding: 'utf8' });
+  const caCert = execSync(
+    "oc get configmap kube-root-ca.crt -n default -o jsonpath='{.data.ca\\.crt}'",
+    { encoding: 'utf8' },
+  );
   if (!caCert) {
     console.error('ERROR: could not read CA bundle from kube-root-ca.crt');
     process.exit(1);

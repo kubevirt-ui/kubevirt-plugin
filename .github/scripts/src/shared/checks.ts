@@ -86,7 +86,10 @@ export const publishCheckRun = async (
   params: (CreateCheckRunParams | UpdateCheckRunParams) & { checkRunId?: number },
 ): Promise<number> => {
   if (params.checkRunId && params.checkRunId > 0) {
-    return updateCheckRun(octokit, { ...params, checkRunId: params.checkRunId } as UpdateCheckRunParams);
+    return updateCheckRun(octokit, {
+      ...params,
+      checkRunId: params.checkRunId,
+    } as UpdateCheckRunParams);
   }
   return createCheckRun(octokit, params as CreateCheckRunParams);
 };
@@ -140,9 +143,7 @@ export const closeOrphanedCheckRuns = async (
 ): Promise<number> => {
   const runs = await listCheckRunsForRef(octokit, owner, repo, ref, checkName);
 
-  const orphans = runs.filter(
-    (run) => run.status !== 'completed' && run.id < publishedCheckRunId,
-  );
+  const orphans = runs.filter((run) => run.status !== 'completed' && run.id < publishedCheckRunId);
 
   let closed = 0;
   for (const run of orphans) {

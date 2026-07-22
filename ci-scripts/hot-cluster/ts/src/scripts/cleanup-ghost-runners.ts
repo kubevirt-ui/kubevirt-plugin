@@ -45,7 +45,9 @@ const main = async (): Promise<void> => {
   for (const runner of runners) {
     console.log(`Deleting offline runner ${runner.id}...`);
     try {
-      execSync(`gh api -X DELETE "/repos/${repo}/actions/runners/${runner.id}"`, { stdio: 'inherit' });
+      execSync(`gh api -X DELETE "/repos/${repo}/actions/runners/${runner.id}"`, {
+        stdio: 'inherit',
+      });
     } catch {
       console.log(`Failed to delete runner ${runner.id}`);
     }

@@ -32,7 +32,9 @@ const main = async (): Promise<void> => {
     },
   });
 
-  console.log(`PR #${prNumber}: dispatched a real retest against the new main tip (base_ref=${pr.base.ref}).`);
+  console.log(
+    `PR #${prNumber}: dispatched a real retest against the new main tip (base_ref=${pr.base.ref}).`,
+  );
 };
 
 main().catch((err) => {

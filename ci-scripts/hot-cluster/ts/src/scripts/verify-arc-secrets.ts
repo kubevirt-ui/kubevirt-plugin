@@ -17,9 +17,13 @@ const main = (): void => {
   if (!hasApp && !hasPat) {
     console.error('::error::ARC authentication secrets are missing or empty.');
     console.error('Configure either:');
-    console.error('  - ARC_GITHUB_APP_ID, ARC_GITHUB_APP_INSTALL_ID, ARC_GITHUB_APP_PRIVATE_KEY (GitHub App), or');
+    console.error(
+      '  - ARC_GITHUB_APP_ID, ARC_GITHUB_APP_INSTALL_ID, ARC_GITHUB_APP_PRIVATE_KEY (GitHub App), or',
+    );
     console.error('  - ARC_GITHUB_PAT (Personal Access Token)');
-    console.error('in Settings → Secrets and variables → Actions for this repository (or its organization).');
+    console.error(
+      'in Settings → Secrets and variables → Actions for this repository (or its organization).',
+    );
     process.exit(1);
   }
 

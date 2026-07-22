@@ -73,13 +73,16 @@ const main = async (): Promise<void> => {
 
   const summaryFile = process.env.GITHUB_STEP_SUMMARY;
   if (summaryFile) {
-    appendFileSync(summaryFile, [
-      '### Off-cluster console image',
-      '',
-      `Cluster version: **${version}**`,
-      `Console image: \`${image}\``,
-      '',
-    ].join('\n'));
+    appendFileSync(
+      summaryFile,
+      [
+        '### Off-cluster console image',
+        '',
+        `Cluster version: **${version}**`,
+        `Console image: \`${image}\``,
+        '',
+      ].join('\n'),
+    );
   }
 };
 

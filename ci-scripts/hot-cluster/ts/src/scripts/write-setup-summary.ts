@@ -55,10 +55,9 @@ const main = (): void => {
     `| CNV Installed CSV | \`${cnvInstalledCsv}\` |`,
   ];
 
-  const consoleUrl = exec("oc get consoles.config.openshift.io cluster -o jsonpath='{.status.consoleURL}'").replace(
-    /'/g,
-    '',
-  );
+  const consoleUrl = exec(
+    "oc get consoles.config.openshift.io cluster -o jsonpath='{.status.consoleURL}'",
+  ).replace(/'/g, '');
   if (consoleUrl) {
     lines.push(`| Console | [${consoleUrl}](${consoleUrl}) |`);
   }
@@ -69,7 +68,9 @@ const main = (): void => {
   if (clusterInfo) {
     lines.push('Cluster is **healthy** and ready for CI.');
   } else {
-    lines.push('Cluster setup **may have issues**. Check the logs and the IAM diagnostics artifact.');
+    lines.push(
+      'Cluster setup **may have issues**. Check the logs and the IAM diagnostics artifact.',
+    );
   }
 
   appendFileSync(summaryFile, lines.join('\n') + '\n');

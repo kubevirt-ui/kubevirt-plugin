@@ -12,19 +12,37 @@ import { KubeClient } from '../kube-client';
 import type { KubeVirt, CDI, SSP } from '../types/hyperconverged';
 
 const md: string[] = [];
-const emit = (line: string): void => { md.push(line); console.log(line); };
+const emit = (line: string): void => {
+  md.push(line);
+  console.log(line);
+};
 
 const commandExists = (cmd: string): boolean => {
-  try { execSync(`command -v ${cmd}`, { stdio: 'pipe' }); return true; } catch { return false; }
+  try {
+    execSync(`command -v ${cmd}`, { stdio: 'pipe' });
+    return true;
+  } catch {
+    return false;
+  }
 };
 
 const getVersion = (cmd: string): { client: string; server: string } => {
   try {
     const output = execSync(`${cmd} version 2>/dev/null`, { encoding: 'utf8', timeout: 15000 });
-    const client = output.split('\n').find((l) => /client/i.test(l))?.trim() ?? 'N/A';
-    const server = output.split('\n').find((l) => /server/i.test(l))?.trim() ?? 'N/A';
+    const client =
+      output
+        .split('\n')
+        .find((l) => /client/i.test(l))
+        ?.trim() ?? 'N/A';
+    const server =
+      output
+        .split('\n')
+        .find((l) => /server/i.test(l))
+        ?.trim() ?? 'N/A';
     return { client, server };
-  } catch { return { client: 'failed', server: 'failed' }; }
+  } catch {
+    return { client: 'failed', server: 'failed' };
+  }
 };
 
 const main = async (): Promise<void> => {
@@ -32,9 +50,23 @@ const main = async (): Promise<void> => {
   emit('<details><summary>Key Environment Variables</summary>\n');
   emit('| Variable | Value |');
   emit('| --- | --- |');
-  const vars = ['HOME', 'USER', 'RUNNER_NAME', 'RUNNER_OS', 'RUNNER_ARCH',
-    'GITHUB_REPOSITORY', 'GITHUB_REF', 'GITHUB_SHA', 'GITHUB_RUN_ID', 'GITHUB_RUN_NUMBER',
-    'CNV_NS', 'OS_IMAGES_NS', 'TEST_NS', 'KUBEVIRT_PLUGIN_IMAGE', 'KUBEVIRT_UI_PLUGIN_RUNNER'];
+  const vars = [
+    'HOME',
+    'USER',
+    'RUNNER_NAME',
+    'RUNNER_OS',
+    'RUNNER_ARCH',
+    'GITHUB_REPOSITORY',
+    'GITHUB_REF',
+    'GITHUB_SHA',
+    'GITHUB_RUN_ID',
+    'GITHUB_RUN_NUMBER',
+    'CNV_NS',
+    'OS_IMAGES_NS',
+    'TEST_NS',
+    'KUBEVIRT_PLUGIN_IMAGE',
+    'KUBEVIRT_UI_PLUGIN_RUNNER',
+  ];
   for (const v of vars) emit(`| \`${v}\` | \`${process.env[v] ?? '<unset>'}\` |`);
   emit('</details>\n');
 
@@ -58,7 +90,11 @@ const main = async (): Promise<void> => {
   // --- npm / Node versions ---
   emit('<details><summary>npm / Node Versions</summary>\n');
   emit('```json');
-  try { emit(execSync('npm version --json', { encoding: 'utf8' })); } catch { emit('npm not found'); }
+  try {
+    emit(execSync('npm version --json', { encoding: 'utf8' }));
+  } catch {
+    emit('npm not found');
+  }
   emit('```');
   emit('</details>\n');
 
@@ -96,30 +132,66 @@ const main = async (): Promise<void> => {
     emit('| --- | --- | --- |');
     try {
       const csvs = (await api.listNamespacedCustomObject({
-        group: 'operators.coreos.com', version: 'v1alpha1', namespace: 'openshift-cnv', plural: 'clusterserviceversions',
-      })) as unknown as { items: Array<{ metadata: { name: string }; spec?: { version?: string }; status?: { phase?: string } }> };
+        group: 'operators.coreos.com',
+        version: 'v1alpha1',
+        namespace: 'openshift-cnv',
+        plural: 'clusterserviceversions',
+      })) as unknown as {
+        items: Array<{
+          metadata: { name: string };
+          spec?: { version?: string };
+          status?: { phase?: string };
+        }>;
+      };
       const hcoCsvs = csvs.items.filter((c) => /hyperconverged/i.test(c.metadata.name));
-      for (const c of hcoCsvs) emit(`| \`${c.metadata.name}\` | \`${c.spec?.version ?? ''}\` | ${c.status?.phase ?? ''} |`);
+      for (const c of hcoCsvs)
+        emit(
+          `| \`${c.metadata.name}\` | \`${c.spec?.version ?? ''}\` | ${c.status?.phase ?? ''} |`,
+        );
       if (hcoCsvs.length === 0) emit('| — | HCO CSV not found | — |');
-    } catch { emit('| — | HCO CSV not found | — |'); }
+    } catch {
+      emit('| — | HCO CSV not found | — |');
+    }
 
     emit('\n### HCO Managed Operand Versions\n');
     emit('| Operand | Version |');
     emit('| --- | --- |');
 
-    const getOperandVersion = async (group: string, version: string, plural: string, field: string): Promise<string> => {
+    const getOperandVersion = async (
+      group: string,
+      version: string,
+      plural: string,
+      field: string,
+    ): Promise<string> => {
       try {
-        const result = (await api.listClusterCustomObject({ group, version, plural, labelSelector: HCO_LABEL })) as unknown as { items: Array<Record<string, unknown>> };
+        const result = (await api.listClusterCustomObject({
+          group,
+          version,
+          plural,
+          labelSelector: HCO_LABEL,
+        })) as unknown as { items: Array<Record<string, unknown>> };
         const status = (result.items[0] as { status?: Record<string, unknown> })?.status;
         return (status?.[field] as string) ?? 'not found';
-      } catch { return 'not found'; }
+      } catch {
+        return 'not found';
+      }
     };
 
-    emit(`| \`kubevirt\` | \`${await getOperandVersion('kubevirt.io', 'v1', 'kubevirts', 'observedKubeVirtVersion')}\` |`);
-    emit(`| \`cdi\` | \`${await getOperandVersion('cdi.kubevirt.io', 'v1beta1', 'cdis', 'observedVersion')}\` |`);
-    emit(`| \`ssp\` | \`${await getOperandVersion('ssp.kubevirt.io', 'v1beta2', 'ssps', 'observedVersion')}\` |`);
-    emit(`| \`cnao\` | \`${await getOperandVersion('networkaddonsoperator.network.kubevirt.io', 'v1', 'networkaddonsconfigs', 'observedVersion')}\` |`);
-    emit(`| \`hostpath-provisioner\` | \`${await getOperandVersion('hostpathprovisioner.kubevirt.io', 'v1beta1', 'hostpathprovisioners', 'observedVersion')}\` |`);
+    emit(
+      `| \`kubevirt\` | \`${await getOperandVersion('kubevirt.io', 'v1', 'kubevirts', 'observedKubeVirtVersion')}\` |`,
+    );
+    emit(
+      `| \`cdi\` | \`${await getOperandVersion('cdi.kubevirt.io', 'v1beta1', 'cdis', 'observedVersion')}\` |`,
+    );
+    emit(
+      `| \`ssp\` | \`${await getOperandVersion('ssp.kubevirt.io', 'v1beta2', 'ssps', 'observedVersion')}\` |`,
+    );
+    emit(
+      `| \`cnao\` | \`${await getOperandVersion('networkaddonsoperator.network.kubevirt.io', 'v1', 'networkaddonsconfigs', 'observedVersion')}\` |`,
+    );
+    emit(
+      `| \`hostpath-provisioner\` | \`${await getOperandVersion('hostpathprovisioner.kubevirt.io', 'v1beta1', 'hostpathprovisioners', 'observedVersion')}\` |`,
+    );
   } catch {
     emit('> ⚠️ Could not query cluster for operand versions.');
   }

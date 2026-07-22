@@ -32,9 +32,9 @@ import type { CommandContext } from './dispatcher';
 
 /** Called by the dispatcher when /help is matched. */
 export const executeHelp = async (ctx: CommandContext): Promise<void> => {
-  const { commands } = JSON.parse(
-    readFileSync('.github/pr-commands.json', 'utf8'),
-  ) as { commands: CommandEntry[] };
+  const { commands } = JSON.parse(readFileSync('.github/pr-commands.json', 'utf8')) as {
+    commands: CommandEntry[];
+  };
 
   const rows = commands.map(
     (c) => `| \`${c.command}\` | ${c.description} | ${TRUST_LABELS[c.trust] ?? c.trust} |`,

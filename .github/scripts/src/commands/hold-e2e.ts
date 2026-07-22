@@ -43,7 +43,11 @@ import { addLabel } from '../github-comments';
 
 /** Called by the dispatcher. Returns head SHA for the mark-held job. */
 export const executeHoldE2E = async (ctx: CommandContext): Promise<string> => {
-  const { data: pr } = await ctx.octokit.pulls.get({ owner: ctx.owner, repo: ctx.repo, pull_number: ctx.prNumber });
+  const { data: pr } = await ctx.octokit.pulls.get({
+    owner: ctx.owner,
+    repo: ctx.repo,
+    pull_number: ctx.prNumber,
+  });
   console.log(`/hold-e2e requested by ${ctx.author} on PR #${ctx.prNumber} (HEAD: ${pr.head.sha})`);
   await reactToComment(ctx.octokit, ctx.owner, ctx.repo, ctx.commentId, 'eyes');
 

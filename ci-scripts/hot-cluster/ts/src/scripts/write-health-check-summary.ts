@@ -24,7 +24,9 @@ const main = async (): Promise<void> => {
   ];
 
   if (jobStatus === 'success') {
-    lines.push('All health checks **passed**. Invoking Playwright gating tests on the hot cluster.');
+    lines.push(
+      'All health checks **passed**. Invoking Playwright gating tests on the hot cluster.',
+    );
   } else {
     lines.push('Health checks **failed**. E2E workflow was not invoked.');
   }

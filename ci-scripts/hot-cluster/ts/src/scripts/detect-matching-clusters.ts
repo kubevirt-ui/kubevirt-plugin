@@ -32,7 +32,9 @@ const main = async (): Promise<void> => {
   const clusterName = requireEnv('CLUSTER_NAME');
   const ghOutput = process.env.GITHUB_OUTPUT!;
 
-  const cisId = execSafe("ibmcloud cis instances --output json 2>/dev/null | jq -r '.[0].crn // empty'");
+  const cisId = execSafe(
+    "ibmcloud cis instances --output json 2>/dev/null | jq -r '.[0].crn // empty'",
+  );
 
   let dnsClusters: string[] = [];
   if (cisId) {
@@ -41,7 +43,8 @@ const main = async (): Promise<void> => {
     const zones = parseJsonArray(zonesRaw);
 
     for (const zone of zones) {
-      const zoneId = typeof zone === 'object' && zone !== null ? (zone as Record<string, string>).id : '';
+      const zoneId =
+        typeof zone === 'object' && zone !== null ? (zone as Record<string, string>).id : '';
       if (!zoneId) continue;
 
       const recordsRaw = execSafe(

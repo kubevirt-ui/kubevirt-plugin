@@ -45,22 +45,25 @@ const main = async (): Promise<void> => {
     if ((err as { statusCode?: number }).statusCode !== 409) throw err;
   }
 
-  await withRetry(() =>
-    api.createNamespacedCustomObject({
-      group: 'operators.coreos.com',
-      version: 'v1',
-      namespace: CNV_NS,
-      plural: 'operatorgroups',
-      body: {
-        apiVersion: 'operators.coreos.com/v1',
-        kind: 'OperatorGroup',
-        metadata: { name: 'kubevirt-hyperconverged-group', namespace: CNV_NS },
-        spec: { targetNamespaces: [CNV_NS] },
-      },
-    }).catch((err) => {
-      if ((err as { statusCode?: number }).statusCode === 409) return; // already exists
-      throw err;
-    }),
+  await withRetry(
+    () =>
+      api
+        .createNamespacedCustomObject({
+          group: 'operators.coreos.com',
+          version: 'v1',
+          namespace: CNV_NS,
+          plural: 'operatorgroups',
+          body: {
+            apiVersion: 'operators.coreos.com/v1',
+            kind: 'OperatorGroup',
+            metadata: { name: 'kubevirt-hyperconverged-group', namespace: CNV_NS },
+            spec: { targetNamespaces: [CNV_NS] },
+          },
+        })
+        .catch((err) => {
+          if ((err as { statusCode?: number }).statusCode === 409) return; // already exists
+          throw err;
+        }),
     'create OperatorGroup',
   );
 
@@ -70,11 +73,15 @@ const main = async (): Promise<void> => {
 
   if (cnvPinVersion) {
     if (!/^\d+\.\d+$/.test(cnvPinVersion)) {
-      console.error(`ERROR: CNV_PIN_VERSION='${cnvPinVersion}' is not a valid "major.minor" version.`);
+      console.error(
+        `ERROR: CNV_PIN_VERSION='${cnvPinVersion}' is not a valid "major.minor" version.`,
+      );
       process.exit(1);
     }
 
-    console.log(`Resolving pinned CSV for CNV_PIN_VERSION=${cnvPinVersion} from channel '${cnvChannel}'...`);
+    console.log(
+      `Resolving pinned CSV for CNV_PIN_VERSION=${cnvPinVersion} from channel '${cnvChannel}'...`,
+    );
 
     for (let attempt = 1; attempt <= 3; attempt++) {
       try {
@@ -86,16 +93,19 @@ const main = async (): Promise<void> => {
         })) as unknown as { items: PackageManifest[] };
 
         const hcoPm = pmList.items.find(
-          (pm) => pm.metadata.name === 'kubevirt-hyperconverged' &&
-                  pm.status.catalogSource === 'redhat-operators',
+          (pm) =>
+            pm.metadata.name === 'kubevirt-hyperconverged' &&
+            pm.status.catalogSource === 'redhat-operators',
         );
 
         if (hcoPm) {
           const channel = hcoPm.status.channels.find((ch) => ch.name === cnvChannel);
           if (channel) {
             const prefix = `${cnvPinVersion}.`;
-            const matching = (channel as unknown as { entries?: Array<{ version: string; name: string }> })
-              .entries?.filter((e) => e.version.startsWith(prefix))
+            const matching = (
+              channel as unknown as { entries?: Array<{ version: string; name: string }> }
+            ).entries
+              ?.filter((e) => e.version.startsWith(prefix))
               .sort((a, b) => a.version.localeCompare(b.version, undefined, { numeric: true }));
 
             if (matching && matching.length > 0) {
@@ -111,7 +121,9 @@ const main = async (): Promise<void> => {
     }
 
     if (!startingCSV) {
-      console.error(`ERROR: No CSV matching version prefix '${cnvPinVersion}.' found in channel '${cnvChannel}'.`);
+      console.error(
+        `ERROR: No CSV matching version prefix '${cnvPinVersion}.' found in channel '${cnvChannel}'.`,
+      );
       process.exit(1);
     }
 
@@ -131,22 +143,25 @@ const main = async (): Promise<void> => {
   };
   if (startingCSV) subscriptionSpec.startingCSV = startingCSV;
 
-  await withRetry(() =>
-    api.createNamespacedCustomObject({
-      group: 'operators.coreos.com',
-      version: 'v1alpha1',
-      namespace: CNV_NS,
-      plural: 'subscriptions',
-      body: {
-        apiVersion: 'operators.coreos.com/v1alpha1',
-        kind: 'Subscription',
-        metadata: { name: 'hco-operatorhub', namespace: CNV_NS },
-        spec: subscriptionSpec,
-      },
-    }).catch((err) => {
-      if ((err as { statusCode?: number }).statusCode === 409) return;
-      throw err;
-    }),
+  await withRetry(
+    () =>
+      api
+        .createNamespacedCustomObject({
+          group: 'operators.coreos.com',
+          version: 'v1alpha1',
+          namespace: CNV_NS,
+          plural: 'subscriptions',
+          body: {
+            apiVersion: 'operators.coreos.com/v1alpha1',
+            kind: 'Subscription',
+            metadata: { name: 'hco-operatorhub', namespace: CNV_NS },
+            spec: subscriptionSpec,
+          },
+        })
+        .catch((err) => {
+          if ((err as { statusCode?: number }).statusCode === 409) return;
+          throw err;
+        }),
     'create Subscription',
   );
 
@@ -168,7 +183,9 @@ const main = async (): Promise<void> => {
         console.log(`InstallPlan found: ${installPlanName}`);
         break;
       }
-    } catch { /* retry */ }
+    } catch {
+      /* retry */
+    }
 
     if (i === 120) {
       console.error('ERROR: Timed out waiting for CNV InstallPlan');
@@ -189,7 +206,9 @@ const main = async (): Promise<void> => {
     })) as unknown as InstallPlan;
 
     if (!ip.spec.clusterServiceVersionNames.includes(startingCSV)) {
-      console.error(`ERROR: InstallPlan ${installPlanName} does not target ${startingCSV} (targets: ${ip.spec.clusterServiceVersionNames.join(', ')})`);
+      console.error(
+        `ERROR: InstallPlan ${installPlanName} does not target ${startingCSV} (targets: ${ip.spec.clusterServiceVersionNames.join(', ')})`,
+      );
       process.exit(1);
     }
 
@@ -288,7 +307,9 @@ const main = async (): Promise<void> => {
     })) as unknown as Subscription;
 
     if (sub.status?.currentCSV !== startingCSV) {
-      console.error(`ERROR: Installed CSV '${sub.status?.currentCSV}' does not match pinned '${startingCSV}'`);
+      console.error(
+        `ERROR: Installed CSV '${sub.status?.currentCSV}' does not match pinned '${startingCSV}'`,
+      );
       process.exit(1);
     }
     console.log(`Confirmed installed CSV matches pin: ${sub.status?.currentCSV}`);
@@ -298,22 +319,24 @@ const main = async (): Promise<void> => {
   console.log('Waiting for CNV operands...');
 
   console.log('  Waiting for SSP...');
-  await client.waitForCondition({
-    group: 'ssp.kubevirt.io',
-    version: 'v1beta2',
-    plural: 'ssps',
-    name: 'ssp-kubevirt-hyperconverged',
-    namespace: CNV_NS,
-    conditionType: 'Available',
-    timeoutMs: 10 * 60 * 1000,
-  }).catch(() => console.warn('  SSP wait timed out -- may still be deploying'));
+  await client
+    .waitForCondition({
+      group: 'ssp.kubevirt.io',
+      version: 'v1beta2',
+      plural: 'ssps',
+      name: 'ssp-kubevirt-hyperconverged',
+      namespace: CNV_NS,
+      conditionType: 'Available',
+      timeoutMs: 10 * 60 * 1000,
+    })
+    .catch(() => console.warn('  SSP wait timed out -- may still be deploying'));
 
   console.log('  Waiting for NAD CRD (nmstate)...');
   for (let i = 1; i <= 60; i++) {
     try {
-      await client.kc.makeApiClient(
-        (await import('@kubernetes/client-node')).ApiextensionsV1Api,
-      ).readCustomResourceDefinition({ name: 'networkattachmentdefinitions.k8s.cni.cncf.io' });
+      await client.kc
+        .makeApiClient((await import('@kubernetes/client-node')).ApiextensionsV1Api)
+        .readCustomResourceDefinition({ name: 'networkattachmentdefinitions.k8s.cni.cncf.io' });
       console.log('  NAD CRD is registered');
       break;
     } catch {
@@ -349,9 +372,13 @@ const main = async (): Promise<void> => {
       try {
         await storageApi.patchStorageClass({
           name: sc.metadata!.name!,
-          body: { metadata: { annotations: { 'storageclass.kubernetes.io/is-default-class': isDefault } } },
+          body: {
+            metadata: { annotations: { 'storageclass.kubernetes.io/is-default-class': isDefault } },
+          },
         });
-      } catch { /* best effort */ }
+      } catch {
+        /* best effort */
+      }
     }
     console.log('HPP installation complete');
   } else {

@@ -109,7 +109,11 @@ const provision = async (
     return;
   }
 
-  const consoleImage = await resolveConsoleImage(kc, config.consoleImageRegistry, params.consoleImageOverride);
+  const consoleImage = await resolveConsoleImage(
+    kc,
+    config.consoleImageRegistry,
+    params.consoleImageOverride,
+  );
   const routeHost = `console-${cmName}.${cluster.appsDomain}`;
 
   // Create namespace
@@ -123,20 +127,36 @@ const provision = async (
 
   // Helm install (stays as subprocess — no SDK exists)
   const helmArgs = [
-    'helm', 'upgrade', '--install', params.helmRelease,
+    'helm',
+    'upgrade',
+    '--install',
+    params.helmRelease,
     config.helmChartPath,
-    '--namespace', params.testNs,
-    '--set', `plugin.image=${params.pluginImage}`,
-    '--set', `console.image=${consoleImage}`,
-    '--set', `console.apiServer=${cluster.apiServer}`,
-    '--set', `console.route.host=${routeHost}`,
-    '--set', `console.pluginProxy.endpoint=https://kubevirt-apiserver-proxy.${cluster.appsDomain}`,
-    '--set', `console.monitoring.thanosUrl=${cluster.thanosUrl}`,
-    '--set', `console.monitoring.alertmanagerUrl=${cluster.alertmanagerUrl}`,
-    '--set', 'rbac.consoleClusterRole=cluster-admin',
-    '--set', `runner.saName=${config.runnerSaName}`,
-    '--set', `runner.saNamespace=${config.runnerSaNs}`,
-    '--wait', '--timeout', '5m',
+    '--namespace',
+    params.testNs,
+    '--set',
+    `plugin.image=${params.pluginImage}`,
+    '--set',
+    `console.image=${consoleImage}`,
+    '--set',
+    `console.apiServer=${cluster.apiServer}`,
+    '--set',
+    `console.route.host=${routeHost}`,
+    '--set',
+    `console.pluginProxy.endpoint=https://kubevirt-apiserver-proxy.${cluster.appsDomain}`,
+    '--set',
+    `console.monitoring.thanosUrl=${cluster.thanosUrl}`,
+    '--set',
+    `console.monitoring.alertmanagerUrl=${cluster.alertmanagerUrl}`,
+    '--set',
+    'rbac.consoleClusterRole=cluster-admin',
+    '--set',
+    `runner.saName=${config.runnerSaName}`,
+    '--set',
+    `runner.saNamespace=${config.runnerSaNs}`,
+    '--wait',
+    '--timeout',
+    '5m',
   ];
 
   if (params.userSettingsLocation) {
@@ -153,7 +173,10 @@ const provision = async (
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     log(`ERROR: helm install failed: ${msg}`);
-    await patchCm(coreApi, cmName, config.ciEnvNs, { status: 'error', 'error-message': 'helm install failed' });
+    await patchCm(coreApi, cmName, config.ciEnvNs, {
+      status: 'error',
+      'error-message': 'helm install failed',
+    });
     return;
   }
 
@@ -175,7 +198,10 @@ const provision = async (
   }
 
   if (!ready) {
-    await patchCm(coreApi, cmName, config.ciEnvNs, { status: 'error', 'error-message': 'console did not become ready within 5 minutes' });
+    await patchCm(coreApi, cmName, config.ciEnvNs, {
+      status: 'error',
+      'error-message': 'console did not become ready within 5 minutes',
+    });
     return;
   }
 
@@ -200,7 +226,10 @@ const provision = async (
   }
 
   if (!pluginReady) {
-    await patchCm(coreApi, cmName, config.ciEnvNs, { status: 'error', 'error-message': 'plugin bundle did not become ready' });
+    await patchCm(coreApi, cmName, config.ciEnvNs, {
+      status: 'error',
+      'error-message': 'plugin bundle did not become ready',
+    });
     return;
   }
 
@@ -227,7 +256,10 @@ const teardown = async (
   await patchCm(coreApi, cmName, config.ciEnvNs, { status: 'cleaning' });
 
   try {
-    execSync(`helm uninstall "${helmRelease}" -n "${testNs}" --wait`, { stdio: 'pipe', timeout: 120000 });
+    execSync(`helm uninstall "${helmRelease}" -n "${testNs}" --wait`, {
+      stdio: 'pipe',
+      timeout: 120000,
+    });
   } catch {
     /* may not exist */
   }
@@ -239,7 +271,10 @@ const teardown = async (
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       log(`ERROR: failed to remove htpasswd user: ${msg}`);
-      await patchCm(coreApi, cmName, config.ciEnvNs, { status: 'error', 'error-message': `failed to remove htpasswd user ${htpasswdUser}` });
+      await patchCm(coreApi, cmName, config.ciEnvNs, {
+        status: 'error',
+        'error-message': `failed to remove htpasswd user ${htpasswdUser}`,
+      });
       return;
     }
   }
@@ -251,7 +286,9 @@ const teardown = async (
       if (!helmList) {
         await coreApi.deleteNamespace({ name: testNs });
       } else {
-        log(`${helmList.split('\n').length} other Helm release(s) still in ${testNs}; leaving namespace`);
+        log(
+          `${helmList.split('\n').length} other Helm release(s) still in ${testNs}; leaving namespace`,
+        );
       }
     } catch {
       /* best effort */

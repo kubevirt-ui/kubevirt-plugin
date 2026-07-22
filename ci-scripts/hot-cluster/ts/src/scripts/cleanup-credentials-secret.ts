@@ -14,10 +14,9 @@ const main = (): void => {
   requireEnv('SECRET_NAME');
   requireEnv('CI_ENV_NS');
 
-  execSync(
-    'oc delete secret "${SECRET_NAME}" --namespace="${CI_ENV_NS}" --ignore-not-found',
-    { stdio: 'inherit' },
-  );
+  execSync('oc delete secret "${SECRET_NAME}" --namespace="${CI_ENV_NS}" --ignore-not-found', {
+    stdio: 'inherit',
+  });
 };
 
 main();

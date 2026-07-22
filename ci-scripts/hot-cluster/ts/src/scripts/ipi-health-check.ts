@@ -30,14 +30,15 @@ const main = async (): Promise<void> => {
 
   console.log('Checking API reachability (HTTPS)...');
   try {
-    const body = execSync(
-      `curl -sk --connect-timeout 10 "https://${apiHost}:6443/healthz"`,
-      { encoding: 'utf8' },
-    );
+    const body = execSync(`curl -sk --connect-timeout 10 "https://${apiHost}:6443/healthz"`, {
+      encoding: 'utf8',
+    });
     if (body.includes('ok')) {
       console.log('API server is healthy');
     } else {
-      console.log('::warning::API server did not respond to /healthz — cluster may be initializing');
+      console.log(
+        '::warning::API server did not respond to /healthz — cluster may be initializing',
+      );
     }
   } catch {
     console.log('::warning::API server did not respond to /healthz — cluster may be initializing');

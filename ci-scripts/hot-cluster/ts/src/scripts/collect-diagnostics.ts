@@ -31,7 +31,9 @@ const main = async (): Promise<void> => {
     try {
       const { data } = await coreApi.readNamespacedConfigMap({ name: ciEnvCm, namespace: ciEnvNs });
       helmRelease = data?.['helm-release'] || ciEnvCm;
-    } catch { /* use fallback */ }
+    } catch {
+      /* use fallback */
+    }
   }
 
   if (testNs && helmRelease) {
@@ -49,13 +51,17 @@ const main = async (): Promise<void> => {
               namespace: testNs,
             });
             logs.push(`--- ${pod.metadata!.name} ---\n${podLog}`);
-          } catch { /* pod may have no logs */ }
+          } catch {
+            /* pod may have no logs */
+          }
         }
         const filename = component === 'console' ? 'console.log' : 'kubevirt-plugin.log';
         writeFileSync(join(logsDir, filename), logs.join('\n') || '(no logs found)');
         console.log(`Collected ${component} logs (${logs.length} pod(s))`);
       } catch (err) {
-        console.warn(`Could not collect ${component} logs: ${err instanceof Error ? err.message : err}`);
+        console.warn(
+          `Could not collect ${component} logs: ${err instanceof Error ? err.message : err}`,
+        );
       }
     }
   }
@@ -73,38 +79,47 @@ const main = async (): Promise<void> => {
         return `${n.metadata?.name}\t${ready?.status ?? 'Unknown'}\t${n.status?.nodeInfo?.kubeletVersion ?? ''}`;
       });
       writeFileSync(join(clusterDir, 'nodes.txt'), nodeLines.join('\n'));
-    } catch { /* best effort */ }
+    } catch {
+      /* best effort */
+    }
 
     // HCO pods
     try {
       const { items } = await coreApi.listNamespacedPod({ namespace: 'openshift-cnv' });
-      const podLines = items.map((p) =>
-        `${p.metadata?.name}\t${p.status?.phase}\t${p.spec?.nodeName ?? ''}`
+      const podLines = items.map(
+        (p) => `${p.metadata?.name}\t${p.status?.phase}\t${p.spec?.nodeName ?? ''}`,
       );
       writeFileSync(join(clusterDir, 'hco_pods.txt'), podLines.join('\n'));
-    } catch { /* best effort */ }
+    } catch {
+      /* best effort */
+    }
 
     // Test namespace events
     if (testNs) {
       try {
         const { items } = await coreApi.listNamespacedEvent({ namespace: testNs });
-        const sorted = items.sort((a, b) =>
-          new Date(b.lastTimestamp ?? '').getTime() - new Date(a.lastTimestamp ?? '').getTime()
+        const sorted = items.sort(
+          (a, b) =>
+            new Date(b.lastTimestamp ?? '').getTime() - new Date(a.lastTimestamp ?? '').getTime(),
         );
-        const eventLines = sorted.map((e) =>
-          `${e.lastTimestamp}\t${e.type}\t${e.reason}\t${e.message}`
+        const eventLines = sorted.map(
+          (e) => `${e.lastTimestamp}\t${e.type}\t${e.reason}\t${e.message}`,
         );
         writeFileSync(join(clusterDir, 'test_ns_events.txt'), eventLines.join('\n'));
-      } catch { /* best effort */ }
+      } catch {
+        /* best effort */
+      }
 
       // Test namespace pods
       try {
         const { items } = await coreApi.listNamespacedPod({ namespace: testNs });
-        const podLines = items.map((p) =>
-          `${p.metadata?.name}\t${p.status?.phase}\t${p.spec?.nodeName ?? ''}`
+        const podLines = items.map(
+          (p) => `${p.metadata?.name}\t${p.status?.phase}\t${p.spec?.nodeName ?? ''}`,
         );
         writeFileSync(join(clusterDir, 'test_ns_pods.txt'), podLines.join('\n'));
-      } catch { /* best effort */ }
+      } catch {
+        /* best effort */
+      }
     }
 
     console.log('Cluster diagnostics collected');

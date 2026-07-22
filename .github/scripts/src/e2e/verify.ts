@@ -125,8 +125,14 @@ const main = async (): Promise<void> => {
     const toRemove = result.conclusion === 'success' ? E2E_FAILED_LABEL : E2E_PASSED_LABEL;
 
     const labelMeta: Record<string, { color: string; description: string }> = {
-      [E2E_PASSED_LABEL]: { color: '2ea44f', description: 'Hot Cluster E2E passed at the latest real result' },
-      [E2E_FAILED_LABEL]: { color: 'd73a4a', description: 'Hot Cluster E2E failed at the latest real result' },
+      [E2E_PASSED_LABEL]: {
+        color: '2ea44f',
+        description: 'Hot Cluster E2E passed at the latest real result',
+      },
+      [E2E_FAILED_LABEL]: {
+        color: 'd73a4a',
+        description: 'Hot Cluster E2E failed at the latest real result',
+      },
     };
 
     try {

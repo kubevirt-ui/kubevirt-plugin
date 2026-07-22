@@ -58,10 +58,13 @@ const main = async (): Promise<void> => {
     (a, b) => new Date(b.started_at ?? '').getTime() - new Date(a.started_at ?? '').getTime(),
   );
 
-  const isStale = latest?.status === 'completed' && STALE_TITLES.includes(latest.output?.title ?? '');
+  const isStale =
+    latest?.status === 'completed' && STALE_TITLES.includes(latest.output?.title ?? '');
 
   if (!isStale) {
-    console.log(`PR #${prNumber}: current check (${latest?.output?.title ?? 'none'}) isn't stale -- nothing to do.`);
+    console.log(
+      `PR #${prNumber}: current check (${latest?.output?.title ?? 'none'}) isn't stale -- nothing to do.`,
+    );
     return;
   }
 

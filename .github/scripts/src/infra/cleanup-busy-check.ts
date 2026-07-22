@@ -21,7 +21,9 @@ const main = async (): Promise<void> => {
   const busy = await checkBusyClusters(octokit, owner, repo, clusters);
 
   if (busy.length > 0) {
-    failStep(`Refusing to clean up — these matched clusters have active CI jobs: ${busy.join(', ')}. Wait for them to finish, or narrow cluster_name to exclude them.`);
+    failStep(
+      `Refusing to clean up — these matched clusters have active CI jobs: ${busy.join(', ')}. Wait for them to finish, or narrow cluster_name to exclude them.`,
+    );
   } else {
     console.log('No active CI jobs found on any matched cluster — safe to proceed.');
   }

@@ -55,7 +55,9 @@ const main = async (): Promise<void> => {
   );
 
   if (!latest) {
-    console.log(`PR #${prNumber}: no existing "Run Gating Tests" check-run yet, nothing to mark stale.`);
+    console.log(
+      `PR #${prNumber}: no existing "Run Gating Tests" check-run yet, nothing to mark stale.`,
+    );
     setOutput('should_mark', 'false');
     return;
   }
@@ -65,12 +67,16 @@ const main = async (): Promise<void> => {
     latest.output?.title === STALE_MARKER_TITLE_LEGACY;
 
   if (latest.status !== 'completed' && !isOwnStaleMarker) {
-    console.log(`PR #${prNumber}: check-run ${latest.id} is ${latest.status} from a real run -- leaving it alone.`);
+    console.log(
+      `PR #${prNumber}: check-run ${latest.id} is ${latest.status} from a real run -- leaving it alone.`,
+    );
     setOutput('should_mark', 'false');
     return;
   }
 
-  console.log(`PR #${prNumber}: marking stale (superseding check-run ${latest.id}, isOwnStaleMarker=${isOwnStaleMarker}).`);
+  console.log(
+    `PR #${prNumber}: marking stale (superseding check-run ${latest.id}, isOwnStaleMarker=${isOwnStaleMarker}).`,
+  );
   setOutput('should_mark', 'true');
 };
 

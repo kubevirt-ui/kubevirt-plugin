@@ -89,8 +89,14 @@ const main = async (): Promise<void> => {
 
       // List both ephemeral E2E and persistent manual-console ConfigMaps
       const [e2eCms, manualCms] = await Promise.all([
-        coreApi.listNamespacedConfigMap({ namespace: config.ciEnvNs, labelSelector: config.ciEnvLabel }),
-        coreApi.listNamespacedConfigMap({ namespace: config.ciEnvNs, labelSelector: config.manualLabel }),
+        coreApi.listNamespacedConfigMap({
+          namespace: config.ciEnvNs,
+          labelSelector: config.ciEnvLabel,
+        }),
+        coreApi.listNamespacedConfigMap({
+          namespace: config.ciEnvNs,
+          labelSelector: config.manualLabel,
+        }),
       ]);
 
       const allCms = [...(e2eCms.items ?? []), ...(manualCms.items ?? [])];
@@ -99,7 +105,9 @@ const main = async (): Promise<void> => {
         try {
           await reconcileOne(kc, config, cm);
         } catch (err) {
-          log(`ERROR reconciling ${cm.metadata?.name}: ${err instanceof Error ? err.message : err}`);
+          log(
+            `ERROR reconciling ${cm.metadata?.name}: ${err instanceof Error ? err.message : err}`,
+          );
         }
       }
     } catch (err) {

@@ -32,8 +32,7 @@ const main = async (): Promise<void> => {
     serviceUrl: `https://${vpcRegion}.iaas.cloud.ibm.com/v1`,
   });
 
-  const nameMatch = (name: string | undefined): boolean =>
-    !!name && name.startsWith(clusterName);
+  const nameMatch = (name: string | undefined): boolean => !!name && name.startsWith(clusterName);
 
   const runOrDry = async (label: string, fn: () => Promise<unknown>): Promise<void> => {
     if (dryRun) {
@@ -47,22 +46,37 @@ const main = async (): Promise<void> => {
     }
   };
 
-  console.log(`=== Cleaning VPC resources for '${clusterName}' (dry_run=${dryRun}, clean_vpc=${cleanVpc}) ===`);
+  console.log(
+    `=== Cleaning VPC resources for '${clusterName}' (dry_run=${dryRun}, clean_vpc=${cleanVpc}) ===`,
+  );
 
   // 1. DNS records (must be first)
   console.log('1. Deleting stale DNS records...');
   try {
     execSync('ibmcloud plugin install cis -f 2>&1 | tail -1', { stdio: 'pipe' });
-    const cisId = execSync("ibmcloud cis instances --output json 2>/dev/null | jq -r '.[0].crn // empty'", { encoding: 'utf8' }).trim();
+    const cisId = execSync(
+      "ibmcloud cis instances --output json 2>/dev/null | jq -r '.[0].crn // empty'",
+      { encoding: 'utf8' },
+    ).trim();
     if (cisId) {
       execSync(`ibmcloud cis instance-set "${cisId}" 2>&1`, { stdio: 'pipe' });
-      const zones = JSON.parse(execSync('ibmcloud cis domains --output json 2>/dev/null || echo "[]"', { encoding: 'utf8' }));
+      const zones = JSON.parse(
+        execSync('ibmcloud cis domains --output json 2>/dev/null || echo "[]"', {
+          encoding: 'utf8',
+        }),
+      );
       for (const zone of Array.isArray(zones) ? zones : []) {
-        const records = JSON.parse(execSync(`ibmcloud cis dns-records "${zone.id}" --output json 2>/dev/null || echo '[]'`, { encoding: 'utf8' }));
+        const records = JSON.parse(
+          execSync(`ibmcloud cis dns-records "${zone.id}" --output json 2>/dev/null || echo '[]'`, {
+            encoding: 'utf8',
+          }),
+        );
         for (const rec of Array.isArray(records) ? records : []) {
           if (rec.name?.includes(clusterName)) {
             await runOrDry(`delete DNS ${rec.id}`, async () => {
-              execSync(`ibmcloud cis dns-record-delete "${zone.id}" "${rec.id}"`, { stdio: 'pipe' });
+              execSync(`ibmcloud cis dns-record-delete "${zone.id}" "${rec.id}"`, {
+                stdio: 'pipe',
+              });
             });
           }
         }
@@ -83,7 +97,8 @@ const main = async (): Promise<void> => {
   // 3. Collect stale subnet IDs
   console.log('3. Collecting stale subnet IDs...');
   const { result: subnetList } = await vpc.listSubnets();
-  const staleSubnetIds = subnetList.subnets?.filter((s) => nameMatch(s.name)).map((s) => s.id!) ?? [];
+  const staleSubnetIds =
+    subnetList.subnets?.filter((s) => nameMatch(s.name)).map((s) => s.id!) ?? [];
   console.log(`  Found ${staleSubnetIds.length} stale subnet(s)`);
 
   // 4. Load balancers (by subnet + by name)
@@ -107,7 +122,10 @@ const main = async (): Promise<void> => {
     for (let i = 1; i <= 24; i++) {
       const { result: currentLbs } = await vpc.listLoadBalancers();
       const remaining = currentLbs.load_balancers?.filter((lb) => staleLbs.has(lb.id!)).length ?? 0;
-      if (remaining === 0) { console.log('  All LBs deleted.'); break; }
+      if (remaining === 0) {
+        console.log('  All LBs deleted.');
+        break;
+      }
       console.log(`  ${remaining} LB(s) still deleting... (${i}/24)`);
       await sleep(30000);
     }
@@ -116,7 +134,8 @@ const main = async (): Promise<void> => {
   // 6. Detach public gateways
   console.log('6. Detaching public gateways from subnets...');
   const { result: subnetsForGw } = await vpc.listSubnets();
-  for (const s of subnetsForGw.subnets?.filter((s) => nameMatch(s.name) && s.public_gateway) ?? []) {
+  for (const s of subnetsForGw.subnets?.filter((s) => nameMatch(s.name) && s.public_gateway) ??
+    []) {
     await runOrDry(`detach gateway from subnet ${s.id}`, () =>
       vpc.unsetSubnetPublicGateway({ id: s.id! }),
     );
@@ -153,7 +172,9 @@ const main = async (): Promise<void> => {
       for (const rule of rules.rules ?? []) {
         try {
           await vpc.deleteSecurityGroupRule({ securityGroupId: sg.id!, id: rule.id! });
-        } catch { /* best effort */ }
+        } catch {
+          /* best effort */
+        }
       }
     }
   }
@@ -167,7 +188,11 @@ const main = async (): Promise<void> => {
       if (stale.length === 0) break;
       console.log(`  Pass ${pass}: ${stale.length} security group(s) remaining...`);
       for (const sg of stale) {
-        try { await vpc.deleteSecurityGroup({ id: sg.id! }); } catch { /* retry next pass */ }
+        try {
+          await vpc.deleteSecurityGroup({ id: sg.id! });
+        } catch {
+          /* retry next pass */
+        }
       }
       await sleep(10000);
     }
@@ -207,7 +232,9 @@ const main = async (): Promise<void> => {
     for (const cos of Array.isArray(cosInstances) ? cosInstances : []) {
       if (cos.name?.startsWith(clusterName)) {
         await runOrDry(`delete COS ${cos.id}`, async () => {
-          execSync(`ibmcloud resource service-instance-delete "${cos.id}" -f --recursive`, { stdio: 'pipe' });
+          execSync(`ibmcloud resource service-instance-delete "${cos.id}" -f --recursive`, {
+            stdio: 'pipe',
+          });
         });
       }
     }

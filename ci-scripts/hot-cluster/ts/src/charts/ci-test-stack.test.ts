@@ -62,7 +62,8 @@ describe('buildCiTestStack', () => {
   it('labels all resources with managed-by', () => {
     const resources = buildCiTestStack(testConfig);
     for (const r of resources) {
-      const managedBy = (r.metadata as Record<string, unknown>)?.labels as Record<string, string> | undefined;
+      const managedBy = (r.metadata as Record<string, unknown>)?.labels as
+        Record<string, string> | undefined;
       if (managedBy) {
         assert.equal(managedBy['app.kubernetes.io/managed-by'], 'ci-env-controller');
       }

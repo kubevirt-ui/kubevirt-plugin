@@ -20,9 +20,12 @@ const main = (): void => {
   const flavor = requireEnv('FLAVOR');
 
   console.log('Fetching classic infrastructure locations and flavors...');
-  const locationsRaw = execSync('ibmcloud oc locations --provider classic --show-flavors --output json', {
-    encoding: 'utf8',
-  });
+  const locationsRaw = execSync(
+    'ibmcloud oc locations --provider classic --show-flavors --output json',
+    {
+      encoding: 'utf8',
+    },
+  );
   const allLocations: ClassicLocation[] = JSON.parse(locationsRaw);
   const dcLocations = allLocations.filter((loc) => loc.kind === 'dc');
 

@@ -57,7 +57,11 @@ const rerunFailedJobs = async (
     };
   }
   if (!['failure', 'timed_out'].includes(latest.conclusion ?? '')) {
-    return { outcome: 'skip', detail: `${label} already ${latest.conclusion}`, url: latest.html_url };
+    return {
+      outcome: 'skip',
+      detail: `${label} already ${latest.conclusion}`,
+      url: latest.html_url,
+    };
   }
 
   await octokit.actions.reRunWorkflowFailedJobs({ owner, repo, run_id: latest.id });
@@ -95,8 +99,7 @@ const E2E_LINES: Record<string, string> = {
   dispatch:
     '- **Hot Cluster E2E**: dispatching a fresh run -- `Run Gating Tests` was not currently passing for this commit.',
   held: '- **Hot Cluster E2E**: skipped -- this PR is on hold via `/hold-e2e`. `/retest-failed` never lifts a hold; comment `/retest-e2e` to lift it and get a fresh result.',
-  skip_running:
-    '- **Hot Cluster E2E**: skipped -- a run is already in progress for this commit.',
+  skip_running: '- **Hot Cluster E2E**: skipped -- a run is already in progress for this commit.',
   skip_passing:
     '- **Hot Cluster E2E**: skipped -- `Run Gating Tests` already passed for this commit.',
 };
@@ -114,7 +117,17 @@ const main = async (): Promise<void> => {
   const ambientOctokit = new Octokit({ auth: ambientToken });
 
   try {
-    if (!(await enforceCommentTrust(botOctokit, owner, repo, commentId, author, trusted, '/retest-failed'))) {
+    if (
+      !(await enforceCommentTrust(
+        botOctokit,
+        owner,
+        repo,
+        commentId,
+        author,
+        trusted,
+        '/retest-failed',
+      ))
+    ) {
       return;
     }
 
@@ -122,14 +135,18 @@ const main = async (): Promise<void> => {
     const headSha = pr.head.sha;
     const baseRef = pr.base.ref;
 
-    console.log(`/retest-failed requested by ${author} on PR #${prNumber} (HEAD: ${headSha}, base: ${baseRef})`);
+    console.log(
+      `/retest-failed requested by ${author} on PR #${prNumber} (HEAD: ${headSha}, base: ${baseRef})`,
+    );
     await reactToComment(botOctokit, owner, repo, commentId, 'rocket');
 
     // Determine E2E action
     let e2eAction: string;
     const isHeld = (pr.labels || []).some((l) => l.name === E2E_HOLD_LABEL);
     if (isHeld) {
-      console.log(`PR #${prNumber} is on hold via /hold-e2e -- not evaluating "Run Gating Tests" further.`);
+      console.log(
+        `PR #${prNumber} is on hold via /hold-e2e -- not evaluating "Run Gating Tests" further.`,
+      );
       e2eAction = 'held';
     } else {
       const { data: existing } = await ambientOctokit.checks.listForRef({

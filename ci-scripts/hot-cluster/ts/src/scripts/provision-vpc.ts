@@ -92,7 +92,9 @@ const main = async (): Promise<void> => {
       id: subnetId,
       publicGatewayIdentity: { id: gwId },
     });
-  } catch { /* already attached */ }
+  } catch {
+    /* already attached */
+  }
 
   // Outputs
   const outputFile = process.env.GITHUB_OUTPUT;

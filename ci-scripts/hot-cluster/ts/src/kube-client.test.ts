@@ -29,15 +29,19 @@ describe('withRetry', () => {
 
   it('retries on retryable status codes', async () => {
     let attempts = 0;
-    const result = await withRetry(async () => {
-      attempts++;
-      if (attempts < 3) {
-        const err = new Error('conflict') as Error & { statusCode: number };
-        err.statusCode = 409;
-        throw err;
-      }
-      return 'ok';
-    }, 'retry-test', 5);
+    const result = await withRetry(
+      async () => {
+        attempts++;
+        if (attempts < 3) {
+          const err = new Error('conflict') as Error & { statusCode: number };
+          err.statusCode = 409;
+          throw err;
+        }
+        return 'ok';
+      },
+      'retry-test',
+      5,
+    );
     assert.equal(result, 'ok');
     assert.equal(attempts, 3);
   });

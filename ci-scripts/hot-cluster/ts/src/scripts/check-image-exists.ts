@@ -29,7 +29,10 @@ const main = async (): Promise<void> => {
   try {
     const res = await fetch(url, {
       method: 'HEAD',
-      headers: { Accept: 'application/vnd.oci.image.manifest.v1+json, application/vnd.docker.distribution.manifest.v2+json' },
+      headers: {
+        Accept:
+          'application/vnd.oci.image.manifest.v1+json, application/vnd.docker.distribution.manifest.v2+json',
+      },
     });
 
     if (res.ok) {

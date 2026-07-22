@@ -28,7 +28,9 @@ const main = (): void => {
 
   console.log('Checking for /dev/kvm on worker nodes...');
 
-  let workerNode = exec("oc get nodes --no-headers -l node-role.kubernetes.io/worker 2>/dev/null | head -1 | awk '{print $1}'");
+  let workerNode = exec(
+    "oc get nodes --no-headers -l node-role.kubernetes.io/worker 2>/dev/null | head -1 | awk '{print $1}'",
+  );
 
   if (!workerNode) {
     console.log('No worker nodes found, checking control plane nodes...');
@@ -36,7 +38,9 @@ const main = (): void => {
   }
 
   if (!workerNode) {
-    console.log(`::warning::No nodes available to check KVM. Using input kvm_emulation=${kvmFallback}`);
+    console.log(
+      `::warning::No nodes available to check KVM. Using input kvm_emulation=${kvmFallback}`,
+    );
     setOutput(kvmFallback);
     return;
   }
@@ -57,7 +61,9 @@ const main = (): void => {
     return;
   }
 
-  console.log(`::warning::/dev/kvm not detected or check timed out. Falling back to input: kvm_emulation=${kvmFallback}`);
+  console.log(
+    `::warning::/dev/kvm not detected or check timed out. Falling back to input: kvm_emulation=${kvmFallback}`,
+  );
   setOutput(kvmFallback);
 };
 

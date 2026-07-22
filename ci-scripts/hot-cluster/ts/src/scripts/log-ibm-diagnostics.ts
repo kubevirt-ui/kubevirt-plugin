@@ -31,7 +31,9 @@ const run = (cmd: string): string => {
   }
 };
 
-const infraRegion = process.env.IBM_REGION ?? (workerZone && infraType === 'classic' ? mapZoneToRegion(workerZone) : 'eu-de');
+const infraRegion =
+  process.env.IBM_REGION ??
+  (workerZone && infraType === 'classic' ? mapZoneToRegion(workerZone) : 'eu-de');
 
 const lines: string[] = [
   '## IBM Cloud IAM diagnostics',
@@ -59,26 +61,69 @@ const lines: string[] = [
 
 if (infraType === 'ipi') {
   lines.push(
-    '### IPI Prerequisites Check', '',
-    '#### VPC Infrastructure', '```', run('ibmcloud is vpcs 2>&1 | head -3'), '```', '',
-    '#### COS', '```', run('ibmcloud resource service-instances --service-name cloud-object-storage 2>&1 | head -5'), '```', '',
-    '#### DNS', '```', run('ibmcloud plugin install dns -f 2>/dev/null; ibmcloud dns zones 2>&1 | head -10'), '```', '',
-    '#### CIS', '```', run('ibmcloud plugin install cis -f 2>/dev/null; ibmcloud cis instances 2>&1 | head -5'), '```', '',
-    '#### IAM', '```', run('ibmcloud iam service-ids 2>&1 | head -5'), '```', '',
-    '#### Resource groups', '```', run('ibmcloud resource groups 2>&1 | head -10'), '```', '',
-    '#### Authorization policies', '```', run('ibmcloud iam authorization-policies 2>&1 | head -20'), '```', '',
+    '### IPI Prerequisites Check',
+    '',
+    '#### VPC Infrastructure',
+    '```',
+    run('ibmcloud is vpcs 2>&1 | head -3'),
+    '```',
+    '',
+    '#### COS',
+    '```',
+    run('ibmcloud resource service-instances --service-name cloud-object-storage 2>&1 | head -5'),
+    '```',
+    '',
+    '#### DNS',
+    '```',
+    run('ibmcloud plugin install dns -f 2>/dev/null; ibmcloud dns zones 2>&1 | head -10'),
+    '```',
+    '',
+    '#### CIS',
+    '```',
+    run('ibmcloud plugin install cis -f 2>/dev/null; ibmcloud cis instances 2>&1 | head -5'),
+    '```',
+    '',
+    '#### IAM',
+    '```',
+    run('ibmcloud iam service-ids 2>&1 | head -5'),
+    '```',
+    '',
+    '#### Resource groups',
+    '```',
+    run('ibmcloud resource groups 2>&1 | head -10'),
+    '```',
+    '',
+    '#### Authorization policies',
+    '```',
+    run('ibmcloud iam authorization-policies 2>&1 | head -20'),
+    '```',
+    '',
   );
 } else if (infraType === 'vpc') {
   lines.push(
-    '### VPC Infrastructure probe', '',
-    '#### VPCs', '```', run('ibmcloud is vpcs 2>&1'), '```', '',
-    '#### Zones', '```', run('ibmcloud is zones 2>&1'), '```', '',
+    '### VPC Infrastructure probe',
+    '',
+    '#### VPCs',
+    '```',
+    run('ibmcloud is vpcs 2>&1'),
+    '```',
+    '',
+    '#### Zones',
+    '```',
+    run('ibmcloud is zones 2>&1'),
+    '```',
+    '',
   );
 } else {
   lines.push(
-    '### Classic infrastructure permissions', '',
-    `#### ibmcloud ks infra-permissions get --region ${infraRegion}`, '',
-    '```', run(`ibmcloud ks infra-permissions get --region ${infraRegion} -q 2>&1`), '```', '',
+    '### Classic infrastructure permissions',
+    '',
+    `#### ibmcloud ks infra-permissions get --region ${infraRegion}`,
+    '',
+    '```',
+    run(`ibmcloud ks infra-permissions get --region ${infraRegion} -q 2>&1`),
+    '```',
+    '',
   );
 }
 
@@ -91,11 +136,16 @@ console.log('::endgroup::');
 writeFileSync(diagFile, output);
 
 if (process.env.GITHUB_STEP_SUMMARY) {
-  appendFileSync(process.env.GITHUB_STEP_SUMMARY, [
-    '## IBM Cloud IAM diagnostics', '',
-    'Full output in the **Log IBM Cloud IAM diagnostics** step log.', '',
-    output,
-  ].join('\n'));
+  appendFileSync(
+    process.env.GITHUB_STEP_SUMMARY,
+    [
+      '## IBM Cloud IAM diagnostics',
+      '',
+      'Full output in the **Log IBM Cloud IAM diagnostics** step log.',
+      '',
+      output,
+    ].join('\n'),
+  );
 }
 
 console.log(`\n=== IBM Cloud IAM diagnostics written to ${diagFile} ===`);

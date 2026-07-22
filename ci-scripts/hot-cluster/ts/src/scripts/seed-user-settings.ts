@@ -34,7 +34,9 @@ const main = async (): Promise<void> => {
   try {
     const sa = await coreApi.readNamespacedServiceAccount({ name: saName, namespace: testNs });
     saUid = sa.metadata?.uid ?? '';
-  } catch { /* SA may not exist yet */ }
+  } catch {
+    /* SA may not exist yet */
+  }
 
   const sanitizedName = `system-serviceaccount-${testNs}-${saName}`;
 

@@ -11,9 +11,7 @@ import { requireEnv } from '../kube-client';
 const main = async (): Promise<void> => {
   const webhookUrl = process.env.SLACK_WEBHOOK_URL;
   if (!webhookUrl) {
-    console.log(
-      '::warning::SLACK_WEBHOOK_URL not set — skipping Slack notification',
-    );
+    console.log('::warning::SLACK_WEBHOOK_URL not set — skipping Slack notification');
     return;
   }
 
@@ -33,8 +31,7 @@ const main = async (): Promise<void> => {
   let cleanupLine = '';
   if (prNumber) {
     sourceLine = `*PR:* <https://github.com/${repo}/pull/${prNumber}|#${prNumber}> (\`${headRepo}\`)`;
-    cleanupLine =
-      '\nDone with it? Comment `/cleanup-manual-console` on the PR.';
+    cleanupLine = '\nDone with it? Comment `/cleanup-manual-console` on the PR.';
   } else {
     sourceLine = `*Branch:* \`${branch}\``;
   }
@@ -57,9 +54,7 @@ const main = async (): Promise<void> => {
   });
 
   if (!response.ok) {
-    throw new Error(
-      `Slack webhook returned ${response.status}: ${await response.text()}`,
-    );
+    throw new Error(`Slack webhook returned ${response.status}: ${await response.text()}`);
   }
 
   console.log('Slack notification sent.');

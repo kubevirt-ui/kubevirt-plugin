@@ -14,7 +14,9 @@ const main = async (): Promise<void> => {
 
   const ready = shouldRun && (probeReady || provisionResult === 'success');
 
-  console.log(`should_run=${shouldRun}, probe_ready=${probeReady}, provision_result=${provisionResult} → cluster_ready=${ready}`);
+  console.log(
+    `should_run=${shouldRun}, probe_ready=${probeReady}, provision_result=${provisionResult} → cluster_ready=${ready}`,
+  );
   appendFileSync(process.env.GITHUB_OUTPUT!, `cluster_ready=${ready}\n`);
 };
 

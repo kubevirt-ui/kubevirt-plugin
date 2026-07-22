@@ -14,7 +14,9 @@ const main = (): void => {
 
   console.log(`Job failed — deleting ROKS cluster '${clusterName}'...`);
   try {
-    execSync(`ibmcloud oc cluster rm --cluster "${clusterName}" -f --force-delete-storage`, { stdio: 'inherit' });
+    execSync(`ibmcloud oc cluster rm --cluster "${clusterName}" -f --force-delete-storage`, {
+      stdio: 'inherit',
+    });
   } catch {
     console.log('WARNING: cluster deletion failed or cluster not found');
   }

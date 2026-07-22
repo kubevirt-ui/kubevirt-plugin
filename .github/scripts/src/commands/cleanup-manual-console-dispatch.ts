@@ -36,7 +36,9 @@ const main = async (): Promise<void> => {
     },
   });
 
-  console.log(`Dispatched deploy-manual-console.yml teardown for PR #${prNumber} (cluster=${clusterName}).`);
+  console.log(
+    `Dispatched deploy-manual-console.yml teardown for PR #${prNumber} (cluster=${clusterName}).`,
+  );
   setOutput('cluster_name', clusterName);
 };
 

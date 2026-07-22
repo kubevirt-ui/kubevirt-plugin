@@ -19,10 +19,13 @@ const main = async (): Promise<void> => {
 
   let consoleUrl: string;
   try {
-    consoleUrl = execSync("oc get consoles.config.openshift.io cluster -o jsonpath='{.status.consoleURL}'", {
-      encoding: 'utf8',
-      stdio: ['pipe', 'pipe', 'pipe'],
-    })
+    consoleUrl = execSync(
+      "oc get consoles.config.openshift.io cluster -o jsonpath='{.status.consoleURL}'",
+      {
+        encoding: 'utf8',
+        stdio: ['pipe', 'pipe', 'pipe'],
+      },
+    )
       .replace(/'/g, '')
       .trim();
   } catch {

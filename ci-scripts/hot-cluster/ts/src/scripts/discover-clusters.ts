@@ -25,13 +25,17 @@ const main = async (): Promise<void> => {
   // --- IPI clusters via CIS DNS ---
   console.log('=== Discovering IPI clusters via CIS DNS ===');
   const cisInstances = execJson<Array<{ crn?: string }>>(
-    "ibmcloud cis instances --output json 2>/dev/null",
+    'ibmcloud cis instances --output json 2>/dev/null',
     [],
   );
   const cisCrn = cisInstances[0]?.crn;
 
   if (cisCrn) {
-    try { execSync(`ibmcloud cis instance-set "${cisCrn}" 2>/dev/null`, { stdio: 'pipe' }); } catch { /* best effort */ }
+    try {
+      execSync(`ibmcloud cis instance-set "${cisCrn}" 2>/dev/null`, { stdio: 'pipe' });
+    } catch {
+      /* best effort */
+    }
 
     const zones = execJson<Array<{ id?: string }>>(
       'ibmcloud cis domains --output json 2>/dev/null',

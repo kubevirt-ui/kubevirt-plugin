@@ -9,10 +9,7 @@ type DispatchParams = {
 };
 
 /** Dispatch a workflow_dispatch event. */
-export const dispatchWorkflow = async (
-  octokit: Octokit,
-  params: DispatchParams,
-): Promise<void> => {
+export const dispatchWorkflow = async (octokit: Octokit, params: DispatchParams): Promise<void> => {
   await octokit.actions.createWorkflowDispatch({
     owner: params.owner,
     repo: params.repo,

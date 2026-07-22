@@ -31,7 +31,7 @@ const main = (): void => {
 
   execSync(
     'oc patch configmap "${CM_NAME}" -n "${CI_ENV_NS}" ' +
-      "--type merge -p '{\"data\":{\"desired-state\":\"absent\"}}'",
+      '--type merge -p \'{"data":{"desired-state":"absent"}}\'',
     { stdio: 'inherit' },
   );
 

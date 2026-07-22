@@ -14,11 +14,7 @@ const log = (msg: string): void => {
 export const reapStale = async (
   kc: k8s.KubeConfig,
   config: ControllerConfig,
-  teardownFn: (
-    kc: k8s.KubeConfig,
-    config: ControllerConfig,
-    cm: k8s.V1ConfigMap,
-  ) => Promise<void>,
+  teardownFn: (kc: k8s.KubeConfig, config: ControllerConfig, cm: k8s.V1ConfigMap) => Promise<void>,
 ): Promise<void> => {
   const coreApi = kc.makeApiClient(k8s.CoreV1Api);
   const nowEpoch = Date.now() / 1000;
@@ -42,7 +38,9 @@ export const reapStale = async (
     const age = nowEpoch - createdEpoch;
 
     if (age > config.ttlSeconds) {
-      log(`REAPER: ConfigMap ${cm.metadata?.name} is ${Math.round(age)}s old (TTL=${config.ttlSeconds}s), forcing cleanup`);
+      log(
+        `REAPER: ConfigMap ${cm.metadata?.name} is ${Math.round(age)}s old (TTL=${config.ttlSeconds}s), forcing cleanup`,
+      );
       await teardownFn(kc, config, cm);
     }
   }

@@ -48,10 +48,7 @@ describe('isMergePoolPr', () => {
   });
 
   it('handles label objects (with .name property)', () => {
-    assert.equal(
-      isMergePoolPr([{ name: LGTM_LABEL }, { name: APPROVED_LABEL }]),
-      true,
-    );
+    assert.equal(isMergePoolPr([{ name: LGTM_LABEL }, { name: APPROVED_LABEL }]), true);
   });
 
   it('returns false for empty labels', () => {

@@ -99,7 +99,16 @@ export class KubeClient {
     timeoutMs: number;
     pollIntervalMs?: number;
   }): Promise<void> {
-    const { group, version, plural, name, namespace, conditionType, timeoutMs, pollIntervalMs = 5000 } = params;
+    const {
+      group,
+      version,
+      plural,
+      name,
+      namespace,
+      conditionType,
+      timeoutMs,
+      pollIntervalMs = 5000,
+    } = params;
     const deadline = Date.now() + timeoutMs;
     const api = this.customObjects;
 
@@ -109,7 +118,9 @@ export class KubeClient {
           ? await api.getNamespacedCustomObject({ group, version, namespace, plural, name })
           : await api.getClusterCustomObject({ group, version, plural, name });
 
-        const obj = result as unknown as { status?: { conditions?: Array<{ type: string; status: string }> } };
+        const obj = result as unknown as {
+          status?: { conditions?: Array<{ type: string; status: string }> };
+        };
         const condition = obj.status?.conditions?.find((c) => c.type === conditionType);
 
         if (condition?.status === 'True') return;
@@ -197,7 +208,9 @@ export const withRetry = async <T>(
 
       const delay = BASE_DELAY_MS * Math.pow(2, attempt) + Math.random() * 500;
       const statusCode = (err as { statusCode?: number }).statusCode ?? 'unknown';
-      console.warn(`${label}: retryable error (status ${statusCode}), attempt ${attempt + 1}/${maxRetries}, retrying in ${Math.round(delay)}ms`);
+      console.warn(
+        `${label}: retryable error (status ${statusCode}), attempt ${attempt + 1}/${maxRetries}, retrying in ${Math.round(delay)}ms`,
+      );
       await sleep(delay);
     }
   }

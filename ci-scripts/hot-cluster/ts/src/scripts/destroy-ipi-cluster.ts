@@ -29,7 +29,9 @@ const main = (): void => {
 
   console.log(`Job failed — destroying IPI cluster '${infraId}'...`);
   try {
-    execSync(`openshift-install destroy cluster --dir="${installDir}" --log-level=info`, { stdio: 'inherit' });
+    execSync(`openshift-install destroy cluster --dir="${installDir}" --log-level=info`, {
+      stdio: 'inherit',
+    });
   } catch {
     /* best effort */
   }

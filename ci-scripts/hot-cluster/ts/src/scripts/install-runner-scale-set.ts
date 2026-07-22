@@ -44,9 +44,12 @@ const main = async (): Promise<void> => {
   const authArgs: string[] = [];
   if (process.env.ARC_APP_ID && process.env.ARC_APP_INSTALL_ID && process.env.ARC_APP_PRIVATE_KEY) {
     authArgs.push(
-      '--set', `githubConfigSecret.github_app_id=${process.env.ARC_APP_ID}`,
-      '--set', `githubConfigSecret.github_app_installation_id=${process.env.ARC_APP_INSTALL_ID}`,
-      '--set-file', `githubConfigSecret.github_app_private_key=${process.env.ARC_APP_PRIVATE_KEY}`,
+      '--set',
+      `githubConfigSecret.github_app_id=${process.env.ARC_APP_ID}`,
+      '--set',
+      `githubConfigSecret.github_app_installation_id=${process.env.ARC_APP_INSTALL_ID}`,
+      '--set-file',
+      `githubConfigSecret.github_app_private_key=${process.env.ARC_APP_PRIVATE_KEY}`,
     );
   } else if (process.env.ARC_PAT) {
     authArgs.push('--set', `githubConfigSecret.github_token=${process.env.ARC_PAT}`);
@@ -57,21 +60,35 @@ const main = async (): Promise<void> => {
 
   // Helm install
   const helmArgs = [
-    'helm', 'upgrade', scaleSetName,
+    'helm',
+    'upgrade',
+    scaleSetName,
     `${helmRepo}/gha-runner-scale-set`,
     '--install',
-    '--namespace', runnersNs,
-    '--set', `githubConfigUrl=${configUrl}`,
-    '--set', `minRunners=${minRunners}`,
-    '--set', `maxRunners=${maxRunners}`,
-    '--set', `controllerServiceAccount.name=${controllerSaName}`,
-    '--set', `controllerServiceAccount.namespace=${controllerNs}`,
+    '--namespace',
+    runnersNs,
+    '--set',
+    `githubConfigUrl=${configUrl}`,
+    '--set',
+    `minRunners=${minRunners}`,
+    '--set',
+    `maxRunners=${maxRunners}`,
+    '--set',
+    `controllerServiceAccount.name=${controllerSaName}`,
+    '--set',
+    `controllerServiceAccount.namespace=${controllerNs}`,
     ...authArgs,
-    '--values', runnerPodValues,
-    '--wait', '--timeout', '5m',
+    '--values',
+    runnerPodValues,
+    '--wait',
+    '--timeout',
+    '5m',
   ];
   if (process.env.ARC_RUNNER_IMAGE) {
-    helmArgs.push('--set-string', `template.spec.containers[0].image=${process.env.ARC_RUNNER_IMAGE}`);
+    helmArgs.push(
+      '--set-string',
+      `template.spec.containers[0].image=${process.env.ARC_RUNNER_IMAGE}`,
+    );
   }
   if (arcVersion && arcVersion !== 'latest') {
     helmArgs.push('--version', arcVersion);
@@ -83,7 +100,10 @@ const main = async (): Promise<void> => {
   // SCC binding
   const runnerSa = `${scaleSetName}-gha-rs-no-permission`;
   console.log(`Binding SCC github-arc to runner ServiceAccount ${runnerSa}...`);
-  execSync(`oc policy add-role-to-user system:openshift:scc:github-arc -z "${runnerSa}" -n "${runnersNs}"`, { stdio: 'inherit' });
+  execSync(
+    `oc policy add-role-to-user system:openshift:scc:github-arc -z "${runnerSa}" -n "${runnersNs}"`,
+    { stdio: 'inherit' },
+  );
 
   // CI RBAC
   if (process.env.SKIP_ARC_RUNNER_RBAC !== '1') {

@@ -23,8 +23,7 @@ export type PathValidationContext = {
 };
 
 export type PathValidationOutcome =
-  | { kind: 'skipped' }
-  | { kind: 'passed' | 'failed'; sensitivePaths: string[] };
+  { kind: 'skipped' } | { kind: 'passed' | 'failed'; sensitivePaths: string[] };
 
 export type BuildStatusDescription = (passed: boolean, hasSensitiveChanges: boolean) => string;
 

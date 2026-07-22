@@ -33,7 +33,8 @@ export const resolveClusterConfig = (params: {
   inputTestEngine?: string;
   inputCnvChannel?: string;
 }): ClusterConfig => {
-  const { baseRef, inputClusterName, inputOpenshiftVersion, inputTestEngine, inputCnvChannel } = params;
+  const { baseRef, inputClusterName, inputOpenshiftVersion, inputTestEngine, inputCnvChannel } =
+    params;
 
   let clusterName: string;
   let openshiftVersion: string;
@@ -84,7 +85,14 @@ export const resolveClusterConfig = (params: {
     );
   }
 
-  return { clusterName, openshiftVersion, testEngine, cnvChannel, cnvPinVersion, branchName: baseRef };
+  return {
+    clusterName,
+    openshiftVersion,
+    testEngine,
+    cnvChannel,
+    cnvPinVersion,
+    branchName: baseRef,
+  };
 };
 
 const main = (): void => {

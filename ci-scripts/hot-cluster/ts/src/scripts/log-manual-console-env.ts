@@ -17,12 +17,7 @@ const main = (): void => {
   const infraType = process.env.INFRASTRUCTURE_TYPE ?? '';
   const actor = process.env.ACTOR ?? '';
 
-  const lines: string[] = [
-    '## Manual Console Deploy',
-    '',
-    '| Field | Value |',
-    '|---|---|',
-  ];
+  const lines: string[] = ['## Manual Console Deploy', '', '| Field | Value |', '|---|---|'];
 
   if (prNumber) {
     lines.push(`| PR | #${prNumber} (\`${headRepo}@${headSha}\`) |`);

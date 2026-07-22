@@ -39,12 +39,18 @@ const main = async (): Promise<void> => {
   // Helm install
   const controllerSaName = `${installName}-gha-rs-controller`;
   const helmArgs = [
-    'helm', 'upgrade', installName,
+    'helm',
+    'upgrade',
+    installName,
     `${helmRepo}/gha-runner-scale-set-controller`,
     '--install',
-    '--namespace', controllerNs,
-    '--set', `serviceAccount.name=${controllerSaName}`,
-    '--wait', '--timeout', '5m',
+    '--namespace',
+    controllerNs,
+    '--set',
+    `serviceAccount.name=${controllerSaName}`,
+    '--wait',
+    '--timeout',
+    '5m',
   ];
   if (arcVersion && arcVersion !== 'latest') {
     helmArgs.push('--version', arcVersion);

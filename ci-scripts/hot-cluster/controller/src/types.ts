@@ -35,7 +35,9 @@ export const defaultConfig: ControllerConfig = {
   ciEnvLabel: process.env.CI_ENV_LABEL ?? 'ci.kubevirt-plugin/type=test-environment',
   manualLabel: process.env.CI_ENV_MANUAL_LABEL ?? 'ci.kubevirt-plugin/type=manual-console',
   helmChartPath: process.env.HELM_CHART_PATH ?? '/opt/ci-env/helm/ci-test-stack',
-  ensureUserScript: process.env.ENSURE_MANUAL_CONSOLE_USER_SCRIPT ?? '/opt/ci-env/manual-console/ensure-manual-console-user.sh',
+  ensureUserScript:
+    process.env.ENSURE_MANUAL_CONSOLE_USER_SCRIPT ??
+    '/opt/ci-env/manual-console/ensure-manual-console-user.sh',
   runnerSaName: process.env.RUNNER_SA_NAME ?? 'kubevirt-plugin-ci-gha-rs-no-permission',
   runnerSaNs: process.env.RUNNER_SA_NS ?? 'arc-runners',
   consoleImageRegistry: process.env.CONSOLE_IMAGE_REGISTRY ?? 'quay.io/openshift/origin-console',

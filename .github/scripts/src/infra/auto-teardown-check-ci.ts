@@ -33,12 +33,14 @@ const main = async (): Promise<void> => {
       ? Math.floor((Date.now() - new Date(result.lastRunTime).getTime()) / 60000)
       : 'N/A';
 
-    addStepSummary([
-      `- Cluster: ${clusterName}`,
-      `- In-progress CI runs (tagged): ${result.inProgress}`,
-      `- Queued CI runs (tagged): ${result.queued}`,
-      `- Last tagged run: ${result.lastRunTime || 'N/A'} (${minutesAgo} minutes ago)`,
-    ].join('\n'));
+    addStepSummary(
+      [
+        `- Cluster: ${clusterName}`,
+        `- In-progress CI runs (tagged): ${result.inProgress}`,
+        `- Queued CI runs (tagged): ${result.queued}`,
+        `- Last tagged run: ${result.lastRunTime || 'N/A'} (${minutesAgo} minutes ago)`,
+      ].join('\n'),
+    );
 
     setOutput('active_jobs', result.activeJobs ? 'true' : 'false');
     setOutput('last_run_time', result.lastRunTime);

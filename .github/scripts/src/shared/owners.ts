@@ -46,10 +46,7 @@ export const parseOwnersFile = (content: string): OwnersData => {
  * Check whether a GitHub login is listed in the local OWNERS file.
  * Reads from the filesystem (assumes the repo is checked out).
  */
-export const isListedInLocalOwners = (
-  login: string,
-  ownersPath = 'OWNERS',
-): boolean => {
+export const isListedInLocalOwners = (login: string, ownersPath = 'OWNERS'): boolean => {
   try {
     const content = readFileSync(ownersPath, 'utf8');
     const owners = parseOwnersFile(content);

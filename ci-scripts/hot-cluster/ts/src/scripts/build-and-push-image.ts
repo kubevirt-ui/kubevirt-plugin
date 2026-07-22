@@ -30,7 +30,9 @@ const main = (): void => {
     .flatMap((line) => ['--label', line.trim()]);
 
   // Build
-  const buildCmd = ['podman', 'build', ...labelArgs, '-t', image, '-f', 'Dockerfile', '.'].join(' ');
+  const buildCmd = ['podman', 'build', ...labelArgs, '-t', image, '-f', 'Dockerfile', '.'].join(
+    ' ',
+  );
   console.log(`Building: ${image}`);
   execSync(buildCmd, { stdio: 'inherit' });
 

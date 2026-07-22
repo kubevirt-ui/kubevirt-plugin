@@ -24,7 +24,10 @@ const main = async (): Promise<void> => {
 };
 
 main().catch((err) => {
-  console.error('::warning::Could not apply the e2e-hold label:', err instanceof Error ? err.message : err);
+  console.error(
+    '::warning::Could not apply the e2e-hold label:',
+    err instanceof Error ? err.message : err,
+  );
   console.error('::error::Failed to apply e2e-hold label');
   process.exit(1);
 });

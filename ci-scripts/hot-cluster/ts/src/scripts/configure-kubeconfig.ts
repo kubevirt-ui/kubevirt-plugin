@@ -39,7 +39,9 @@ const main = async (): Promise<void> => {
         console.error('::error::Could not connect to cluster after DNS resolved');
         try {
           execSync('oc cluster-info', { stdio: 'inherit' });
-        } catch { /* already logged */ }
+        } catch {
+          /* already logged */
+        }
         process.exit(1);
       }
       console.log(`  Retrying cluster connection... (${i}/6)`);
@@ -79,8 +81,10 @@ const configureIpi = async (clusterName: string): Promise<void> => {
         break;
       }
     } catch (err) {
-      if ((err as NodeJS.ErrnoException).code !== 'ENOTFOUND' &&
-          (err as NodeJS.ErrnoException).code !== 'ENODATA') {
+      if (
+        (err as NodeJS.ErrnoException).code !== 'ENOTFOUND' &&
+        (err as NodeJS.ErrnoException).code !== 'ENODATA'
+      ) {
         throw err;
       }
     }

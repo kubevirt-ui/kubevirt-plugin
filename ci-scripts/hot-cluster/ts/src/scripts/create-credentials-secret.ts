@@ -24,10 +24,7 @@ const main = (): void => {
     { stdio: 'inherit' },
   );
 
-  appendFileSync(
-    process.env.GITHUB_OUTPUT!,
-    `name=${process.env.SECRET_NAME}\n`,
-  );
+  appendFileSync(process.env.GITHUB_OUTPUT!, `name=${process.env.SECRET_NAME}\n`);
 };
 
 main();

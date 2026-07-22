@@ -22,7 +22,9 @@ const main = async (): Promise<void> => {
   mkdirSync(installDir, { recursive: true });
 
   if (!setupRunId) {
-    console.log(`No setup run ID provided. Looking up latest successful setup run for cluster '${clusterName}'...`);
+    console.log(
+      `No setup run ID provided. Looking up latest successful setup run for cluster '${clusterName}'...`,
+    );
 
     try {
       const output = execSync(

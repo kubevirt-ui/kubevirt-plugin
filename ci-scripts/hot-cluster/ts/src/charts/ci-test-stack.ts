@@ -66,7 +66,11 @@ export const buildCiTestStack = (config: CiTestStackConfig): K8sResource[] => {
     apiVersion: 'rbac.authorization.k8s.io/v1',
     kind: 'ClusterRoleBinding',
     metadata: { name: `${releaseName}-console-admin`, labels: labels(config, 'console') },
-    roleRef: { apiGroup: 'rbac.authorization.k8s.io', kind: 'ClusterRole', name: config.rbac.consoleClusterRole },
+    roleRef: {
+      apiGroup: 'rbac.authorization.k8s.io',
+      kind: 'ClusterRole',
+      name: config.rbac.consoleClusterRole,
+    },
     subjects: [{ kind: 'ServiceAccount', name: `${releaseName}-console`, namespace }],
   });
 
@@ -75,15 +79,25 @@ export const buildCiTestStack = (config: CiTestStackConfig): K8sResource[] => {
     apiVersion: 'rbac.authorization.k8s.io/v1',
     kind: 'RoleBinding',
     metadata: { name: `${releaseName}-runner-test`, namespace, labels: labels(config, 'runner') },
-    roleRef: { apiGroup: 'rbac.authorization.k8s.io', kind: 'ClusterRole', name: config.rbac.testRunnerClusterRole },
-    subjects: [{ kind: 'ServiceAccount', name: config.runner.saName, namespace: config.runner.saNamespace }],
+    roleRef: {
+      apiGroup: 'rbac.authorization.k8s.io',
+      kind: 'ClusterRole',
+      name: config.rbac.testRunnerClusterRole,
+    },
+    subjects: [
+      { kind: 'ServiceAccount', name: config.runner.saName, namespace: config.runner.saNamespace },
+    ],
   });
 
   // Console ConfigMap
   resources.push({
     apiVersion: 'v1',
     kind: 'ConfigMap',
-    metadata: { name: `${releaseName}-console-config`, namespace, labels: labels(config, 'console') },
+    metadata: {
+      name: `${releaseName}-console-config`,
+      namespace,
+      labels: labels(config, 'console'),
+    },
     data: {
       'console-config.yaml': JSON.stringify({
         kind: 'ConsoleConfig',
@@ -118,11 +132,13 @@ export const buildCiTestStack = (config: CiTestStackConfig): K8sResource[] => {
       template: {
         metadata: { labels: { app: `${releaseName}-plugin`, ...labels(config, 'plugin') } },
         spec: {
-          containers: [{
-            name: 'plugin',
-            image: config.plugin.image,
-            ports: [{ containerPort: config.plugin.port }],
-          }],
+          containers: [
+            {
+              name: 'plugin',
+              image: config.plugin.image,
+              ports: [{ containerPort: config.plugin.port }],
+            },
+          ],
         },
       },
     },
@@ -144,7 +160,10 @@ export const buildCiTestStack = (config: CiTestStackConfig): K8sResource[] => {
     { name: 'BRIDGE_K8S_MODE', value: 'off-cluster' },
     { name: 'BRIDGE_K8S_MODE_OFF_CLUSTER_ENDPOINT', value: config.console.apiServer },
     { name: 'BRIDGE_USER_SETTINGS_LOCATION', value: config.console.userSettingsLocation },
-    { name: 'BRIDGE_PLUGINS', value: `kubevirt-plugin=https://${releaseName}-plugin:${config.plugin.port}` },
+    {
+      name: 'BRIDGE_PLUGINS',
+      value: `kubevirt-plugin=https://${releaseName}-plugin:${config.plugin.port}`,
+    },
   ];
 
   if (config.console.auth.mode === 'disabled') {
@@ -162,12 +181,14 @@ export const buildCiTestStack = (config: CiTestStackConfig): K8sResource[] => {
         metadata: { labels: { app: `${releaseName}-console`, ...labels(config, 'console') } },
         spec: {
           serviceAccountName: `${releaseName}-console`,
-          containers: [{
-            name: 'console',
-            image: config.console.image,
-            ports: [{ containerPort: config.console.port }],
-            env: consoleEnv,
-          }],
+          containers: [
+            {
+              name: 'console',
+              image: config.console.image,
+              ports: [{ containerPort: config.console.port }],
+              env: consoleEnv,
+            },
+          ],
         },
       },
     },

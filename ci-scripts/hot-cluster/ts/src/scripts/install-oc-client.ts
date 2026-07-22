@@ -26,7 +26,9 @@ const main = async (): Promise<void> => {
         const parts = raw.split('.');
         version = `${parts[0]}.${parts[1]}`;
       }
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
   }
 
   version = version || '4.20';
@@ -50,7 +52,9 @@ const main = async (): Promise<void> => {
   execSync(`tar -xzf "${archivePath}" -C "${tmpDir}"`);
   execSync(`install -m 0755 "${join(tmpDir, 'oc')}" "${join(installDir, 'oc')}"`);
 
-  const clientVersion = execSync(`"${join(installDir, 'oc')}" version --client`, { encoding: 'utf8' }).trim();
+  const clientVersion = execSync(`"${join(installDir, 'oc')}" version --client`, {
+    encoding: 'utf8',
+  }).trim();
   console.log(`Installed: ${clientVersion}`);
 
   execSync(`rm -rf "${tmpDir}"`);

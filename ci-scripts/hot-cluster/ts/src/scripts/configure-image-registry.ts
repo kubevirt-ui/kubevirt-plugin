@@ -24,28 +24,30 @@ const main = async (): Promise<void> => {
 
   if (mgmtState === 'Removed') {
     console.log('Image registry is Removed — setting to Managed with emptyDir storage...');
-    await withRetry(() =>
-      api.patchClusterCustomObject({
-        group: 'imageregistry.operator.openshift.io',
-        version: 'v1',
-        plural: 'configs',
-        name: 'cluster',
-        body: { spec: { managementState: 'Managed', storage: { emptyDir: {} } } },
-      }),
+    await withRetry(
+      () =>
+        api.patchClusterCustomObject({
+          group: 'imageregistry.operator.openshift.io',
+          version: 'v1',
+          plural: 'configs',
+          name: 'cluster',
+          body: { spec: { managementState: 'Managed', storage: { emptyDir: {} } } },
+        }),
       'patch image registry',
     );
   } else if (mgmtState === 'Managed') {
     const storage = registry.spec.storage;
     if (!storage || Object.keys(storage).length === 0) {
       console.log('Image registry has no storage — configuring emptyDir...');
-      await withRetry(() =>
-        api.patchClusterCustomObject({
-          group: 'imageregistry.operator.openshift.io',
-          version: 'v1',
-          plural: 'configs',
-          name: 'cluster',
-          body: { spec: { storage: { emptyDir: {} } } },
-        }),
+      await withRetry(
+        () =>
+          api.patchClusterCustomObject({
+            group: 'imageregistry.operator.openshift.io',
+            version: 'v1',
+            plural: 'configs',
+            name: 'cluster',
+            body: { spec: { storage: { emptyDir: {} } } },
+          }),
         'patch registry storage',
       );
     } else {
@@ -70,7 +72,9 @@ const main = async (): Promise<void> => {
         console.log('Image registry is Available.');
         return;
       }
-    } catch { /* retry */ }
+    } catch {
+      /* retry */
+    }
 
     console.log(`Waiting for image-registry... (${i}/30)`);
     await sleep(20000);

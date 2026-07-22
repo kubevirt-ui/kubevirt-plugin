@@ -15,10 +15,9 @@ export const discoverCluster = async (kc: k8s.KubeConfig): Promise<ClusterInfo> 
   const customApi = kc.makeApiClient(k8s.CustomObjectsApi);
   const coreApi = kc.makeApiClient(k8s.CoreV1Api);
 
-  const apiServer =
-    process.env.KUBERNETES_SERVICE_HOST
-      ? `https://${process.env.KUBERNETES_SERVICE_HOST}:${process.env.KUBERNETES_SERVICE_PORT ?? '443'}`
-      : kc.getCurrentCluster()?.server ?? '';
+  const apiServer = process.env.KUBERNETES_SERVICE_HOST
+    ? `https://${process.env.KUBERNETES_SERVICE_HOST}:${process.env.KUBERNETES_SERVICE_PORT ?? '443'}`
+    : (kc.getCurrentCluster()?.server ?? '');
 
   // Get apps domain from Ingress config
   const ingress = (await customApi.getClusterCustomObject({

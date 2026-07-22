@@ -26,10 +26,11 @@ const main = (): void => {
   const outputFile = execSync('mktemp', { encoding: 'utf8' }).trim();
 
   try {
-    execSync(
-      `bash ci-scripts/manual-console/images/setup-plugin-image.sh | tee "${outputFile}"`,
-      { stdio: 'inherit', env, cwd: workspace },
-    );
+    execSync(`bash ci-scripts/manual-console/images/setup-plugin-image.sh | tee "${outputFile}"`, {
+      stdio: 'inherit',
+      env,
+      cwd: workspace,
+    });
 
     const content = readFileSync(outputFile, 'utf8');
     const match = content.match(/^IMAGE_REF=(.+)$/m);

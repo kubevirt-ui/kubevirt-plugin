@@ -46,7 +46,9 @@ const main = async (): Promise<void> => {
     },
   });
 
-  console.log(`Dispatched deploy-manual-console.yml for PR #${prNumber} (cluster=${clusterName}, infra=${infraType}).`);
+  console.log(
+    `Dispatched deploy-manual-console.yml for PR #${prNumber} (cluster=${clusterName}, infra=${infraType}).`,
+  );
   setOutput('cluster_name', clusterName);
   setOutput('infra_type', infraType);
 };

@@ -22,7 +22,9 @@ const main = async (): Promise<void> => {
     process.exit(1);
   }
 
-  console.log(`Confirmed: cluster_name matches exactly ${actual} distinct cluster(s), as expected.`);
+  console.log(
+    `Confirmed: cluster_name matches exactly ${actual} distinct cluster(s), as expected.`,
+  );
 };
 
 main().catch((err) => {

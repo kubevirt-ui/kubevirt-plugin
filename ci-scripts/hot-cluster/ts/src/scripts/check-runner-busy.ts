@@ -16,7 +16,9 @@ const main = async (): Promise<void> => {
   const ghToken = process.env.GH_TOKEN;
 
   if (!ghToken) {
-    console.log('::warning::ARC app token unavailable (see previous step) -- failing closed (treating as busy).');
+    console.log(
+      '::warning::ARC app token unavailable (see previous step) -- failing closed (treating as busy).',
+    );
     appendFileSync(process.env.GITHUB_OUTPUT!, 'busy=true\n');
     return;
   }
@@ -29,7 +31,9 @@ const main = async (): Promise<void> => {
     );
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
-    console.log(`::warning::Failed to query self-hosted runners: ${msg} -- failing closed (treating as busy).`);
+    console.log(
+      `::warning::Failed to query self-hosted runners: ${msg} -- failing closed (treating as busy).`,
+    );
     appendFileSync(process.env.GITHUB_OUTPUT!, 'busy=true\n');
     return;
   }
@@ -39,9 +43,7 @@ const main = async (): Promise<void> => {
     runners: Array<{ busy: boolean; labels?: Array<{ name: string }> }>;
   };
 
-  const busy = data.runners.some(
-    (r) => r.busy && r.labels?.some((l) => l.name === clusterName),
-  );
+  const busy = data.runners.some((r) => r.busy && r.labels?.some((l) => l.name === clusterName));
 
   console.log(
     `Runner pool for '${clusterName}': ${busy ? 'busy' : 'idle'} (${data.total_count} total runners checked).`,

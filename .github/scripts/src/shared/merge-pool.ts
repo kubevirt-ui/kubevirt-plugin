@@ -27,8 +27,7 @@ export const BLOCKING_LABELS = Object.freeze([
 
 /** True when `name` is a merge-pool blocking label (exact or do-not-merge/*). */
 export const isBlockingLabel = (name: string): boolean =>
-  (BLOCKING_LABELS as readonly string[]).includes(name) ||
-  name.startsWith(DO_NOT_MERGE_PREFIX);
+  (BLOCKING_LABELS as readonly string[]).includes(name) || name.startsWith(DO_NOT_MERGE_PREFIX);
 
 type LabelInput = string | { name: string };
 

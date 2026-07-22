@@ -41,5 +41,4 @@ export const getIamBearerToken = async (apiKey?: string): Promise<string> => {
 export const IKS_API_BASE = 'https://containers.cloud.ibm.com';
 
 /** IBM Cloud VPC API base URL (region-specific). */
-export const getVpcApiBase = (region: string): string =>
-  `https://${region}.iaas.cloud.ibm.com/v1`;
+export const getVpcApiBase = (region: string): string => `https://${region}.iaas.cloud.ibm.com/v1`;

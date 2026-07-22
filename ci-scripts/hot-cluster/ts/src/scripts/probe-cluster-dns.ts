@@ -29,13 +29,20 @@ const main = (): void => {
 
   const apiHost = `api.${clusterName}.${baseDomain}`;
   try {
-    const result = execSync(`dig +short "${apiHost}"`, { encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] }).trim();
+    const result = execSync(`dig +short "${apiHost}"`, {
+      encoding: 'utf8',
+      stdio: ['pipe', 'pipe', 'pipe'],
+    }).trim();
     if (result) {
-      console.log(`Cluster '${clusterName}' is already reachable (${apiHost} resolves) — skipping provisioning.`);
+      console.log(
+        `Cluster '${clusterName}' is already reachable (${apiHost} resolves) — skipping provisioning.`,
+      );
       setOutput('true');
       return;
     }
-  } catch { /* dig failed or host not found */ }
+  } catch {
+    /* dig failed or host not found */
+  }
 
   setOutput('false');
 };

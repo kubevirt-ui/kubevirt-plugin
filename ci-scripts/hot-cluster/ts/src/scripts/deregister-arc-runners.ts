@@ -20,9 +20,12 @@ const helmAvailable = (): boolean => {
 
 const installHelm = (): boolean => {
   try {
-    execSync('curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash', {
-      stdio: 'inherit',
-    });
+    execSync(
+      'curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash',
+      {
+        stdio: 'inherit',
+      },
+    );
     return true;
   } catch {
     return false;
@@ -48,7 +51,9 @@ const main = async (): Promise<void> => {
 
   console.log('Uninstalling ARC controller...');
   try {
-    execSync('helm uninstall arc --namespace arc-systems --wait --timeout 5m', { stdio: 'inherit' });
+    execSync('helm uninstall arc --namespace arc-systems --wait --timeout 5m', {
+      stdio: 'inherit',
+    });
   } catch {
     console.log('ARC controller not found or already removed');
   }

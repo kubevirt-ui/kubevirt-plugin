@@ -58,7 +58,9 @@ const main = (): void => {
     }
   }
 
-  console.log(`Creating VPC cluster '${clusterName}' with ${workerCount}x ${workerFlavor} workers in zone ${zone}...`);
+  console.log(
+    `Creating VPC cluster '${clusterName}' with ${workerCount}x ${workerFlavor} workers in zone ${zone}...`,
+  );
   execSync(
     [
       'ibmcloud oc cluster create vpc-gen2',

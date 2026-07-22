@@ -22,8 +22,7 @@ export const getRepoContext = (): RepoContext => {
 export const getRunId = (): number => Number(requireEnv('GITHUB_RUN_ID'));
 
 /** The current workflow run attempt number. */
-export const getRunAttempt = (): number =>
-  Number(process.env.GITHUB_RUN_ATTEMPT ?? '1');
+export const getRunAttempt = (): number => Number(process.env.GITHUB_RUN_ATTEMPT ?? '1');
 
 /** The event name that triggered the workflow (e.g. "pull_request_target"). */
 export const getEventName = (): string => requireEnv('GITHUB_EVENT_NAME');
