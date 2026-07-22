@@ -21,7 +21,7 @@ const ResourcesInventoryCard: FC = () => {
   const [activeNamespace] = useActiveNamespace();
 
   return (
-    <div className="resources-inventory-card" data-test-id="resources-inventory-card">
+    <div className="resources-inventory-card">
       <Grid className="resources-inventory-card__grid" hasGutter>
         <GridItem>
           <Card className="resources-inventory-card__grid-item">

@@ -18,7 +18,7 @@ export const networkingSection: EncodedExtension[] = [
     properties: {
       dataAttributes: {
         'data-quickstart-id': 'qs-nav-services',
-        'data-test-id': 'services-nav-item',
+        'data-test': 'services-nav-item',
       },
       id: 'services-virt-perspective',
       model: {
@@ -36,7 +36,7 @@ export const networkingSection: EncodedExtension[] = [
     properties: {
       dataAttributes: {
         'data-quickstart-id': 'qs-nav-routes',
-        'data-test-id': 'routes-nav-item',
+        'data-test': 'routes-nav-item',
       },
       id: 'routes-virt-perspective',
       insertAfter: 'services-virt-perspective',
@@ -55,7 +55,7 @@ export const networkingSection: EncodedExtension[] = [
     properties: {
       dataAttributes: {
         'data-quickstart-id': 'qs-nav-ingresses',
-        'data-test-id': 'ingresses-nav-item',
+        'data-test': 'ingresses-nav-item',
       },
       id: 'ingresses-virt-perspective',
       insertAfter: 'routes-virt-perspective',
@@ -74,7 +74,7 @@ export const networkingSection: EncodedExtension[] = [
     properties: {
       dataAttributes: {
         'data-quickstart-id': 'qs-nav-networkpolicies',
-        'data-test-id': 'networkpolicies-nav-item',
+        'data-test': 'networkpolicies-nav-item',
       },
       id: 'networkpolicies-virt-perspective',
       insertAfter: 'ingresses-virt-perspective',
@@ -94,7 +94,7 @@ export const networkingSection: EncodedExtension[] = [
     properties: {
       dataAttributes: {
         'data-quickstart-id': 'qs-nav-multinetworkpolicies',
-        'data-test-id': 'multinetworkpolicies-nav-item',
+        'data-test': 'multinetworkpolicies-nav-item',
       },
       id: 'multinetworkpolicies-virt-perspective',
       insertAfter: 'networkpolicies-virt-perspective',
@@ -116,7 +116,7 @@ export const networkingSection: EncodedExtension[] = [
     properties: {
       dataAttributes: {
         'data-quickstart-id': 'qs-nav-nads',
-        'data-test-id': 'nads-nav-item',
+        'data-test': 'nads-nav-item',
       },
       id: 'networkattachmentdefinitions-virt-perspective',
       model: {
@@ -137,7 +137,7 @@ export const networkingSection: EncodedExtension[] = [
     properties: {
       dataAttributes: {
         'data-quickstart-id': 'qs-nav-udns',
-        'data-test-id': 'udns-nav-item',
+        'data-test': 'udns-nav-item',
       },
       id: 'udns-virt-perspective',
       model: {

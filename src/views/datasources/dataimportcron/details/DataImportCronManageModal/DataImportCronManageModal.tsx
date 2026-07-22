@@ -102,7 +102,7 @@ export const DataImportCronManageModal: FC<DataImportCronManageModalProps> = ({
               <FormTextInput
                 {...register('url', { required: true })}
                 aria-label={t('Registry URL')}
-                data-test-id={'dataimportcron-manage-source-url'}
+                data-test={'dataimportcron-manage-source-url'}
                 defaultValue={dataImportCron?.spec?.template.spec?.source?.registry?.url}
                 id={'dataimportcron-manage-source-url'}
                 type="text"
@@ -194,7 +194,7 @@ export const DataImportCronManageModal: FC<DataImportCronManageModalProps> = ({
                       errors?.['schedule'] ? ValidatedOptions.error : ValidatedOptions.default
                     }
                     aria-label={t('Cron expression')}
-                    data-test-id={'dataimportcron-manage-cron'}
+                    data-test={'dataimportcron-manage-cron'}
                     defaultValue={dataImportCron?.spec?.schedule}
                     id={'dataimportcron-manage-source-cron'}
                     type="text"

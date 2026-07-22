@@ -25,7 +25,7 @@ const InventoryCard: FC = () => {
   const vms = isAdmin ? resources?.vms : getAllowedResourceData(resources, VirtualMachineModel);
 
   return (
-    <Card data-test-id="kv-running-inventory-card">
+    <Card data-test="inventory-card">
       <CardHeader>
         <CardTitle>{t('Inventory')}</CardTitle>
       </CardHeader>

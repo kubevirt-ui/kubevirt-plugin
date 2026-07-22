@@ -61,6 +61,7 @@ const AutomaticSubscriptionRHELGuests: FC<AutomaticSubscriptionRHELGuestsProps> 
           {newBadge && <NewBadge />}
         </>
       }
+      dataTestID="automatic-subscription-rhel"
       id={CLUSTER_TAB_IDS.automaticSubscriptionRhel}
       searchItemId={CLUSTER_TAB_IDS.automaticSubscriptionRhel}
     >

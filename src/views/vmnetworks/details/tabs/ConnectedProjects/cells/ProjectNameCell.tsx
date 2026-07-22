@@ -14,7 +14,7 @@ const ProjectNameCell: FC<ProjectNameCellProps> = ({ row }) => {
   const { projectName } = row;
 
   if (!projectName) {
-    return <span data-test="project-name">{NO_DATA_DASH}</span>;
+    return <span>{NO_DATA_DASH}</span>;
   }
 
   return (

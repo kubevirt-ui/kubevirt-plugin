@@ -18,6 +18,7 @@ const GeneralSettings: FC<GeneralSettingsProps> = ({ hyperConvergeConfiguration,
 
   return (
     <ExpandSection
+      dataTestID="general-settings"
       searchItemId={CLUSTER_TAB_IDS.generalSettings}
       toggleText={t('General settings')}
     >

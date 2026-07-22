@@ -1363,6 +1363,7 @@
   "Mount point": "마운트 지점",
   "Mount Windows drivers disk": "Windows 드라이버 디스크 마운트",
   "Move <1>{getName(vm)}</1> VirtualMachine to group": "Move <1>{getName(vm)}</1> VirtualMachine to group",
+  "Move to folder": "Move to folder",
   "Move to group": "Move to group",
   "Move virtual machine_one": "가상 머신 이동",
   "Move virtual machine_other": "가상 머신 이동",

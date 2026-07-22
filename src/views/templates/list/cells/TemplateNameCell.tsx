@@ -36,7 +36,6 @@ const TemplateNameCell: FC<TemplateNameCellProps> = ({ row }) => {
           <MulticlusterResourceLink
             cluster={cluster}
             data-test={name}
-            data-test-id={name}
             groupVersionKind={getGroupVersionKindForResource(row)}
             name={name}
             namespace={namespace}

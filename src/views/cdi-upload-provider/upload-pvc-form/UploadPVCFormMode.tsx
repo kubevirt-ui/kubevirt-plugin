@@ -19,7 +19,7 @@ const UploadPVCFormMode = ({
   const provisioner =
     storageClasses?.find((sc) => sc.metadata.name === storageClassName)?.provisioner || '';
   return applySP ? (
-    <div data-test="sp-default-settings">
+    <div>
       {t('Access mode: {{accessMode}} / Volume mode: {{volumeMode}}', {
         accessMode,
         volumeMode,

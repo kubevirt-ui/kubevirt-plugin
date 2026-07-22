@@ -43,7 +43,7 @@ const NetworkDetailsPage: FC<NetworkDetailsPageProps> = ({ obj: network }) => {
           <Title className="pf-v6-u-mb-md" headingLevel="h2">
             {t('Virtual machine network details')}
           </Title>
-          <DL className="co-m-pane__details" data-test-id="resource-summary">
+          <DL className="co-m-pane__details">
             <DescriptionItemName
               label={t('Name')}
               model={ClusterUserDefinedNetworkModel}

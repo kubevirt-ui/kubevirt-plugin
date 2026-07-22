@@ -12,7 +12,7 @@ import RecentEvent from './utils/RecentEvent';
 const ActivityCard: FC = memo(() => {
   const { t } = useKubevirtTranslation();
   return (
-    <Card className="co-overview-card--gradient" data-test-id="kv-activity-card">
+    <Card className="co-overview-card--gradient">
       <CardHeader
         actions={{
           actions: <Link to={VIEW_EVENTS_PATH}>{t('View events')}</Link>,

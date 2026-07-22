@@ -48,7 +48,7 @@ const DataSourcePageTitle: FC<DataSourcePageTitleProps> = ({ dataSource, name, n
       <PaneHeading>
         <Title className="co-resource-item" headingLevel="h1">
           <span className="co-m-resource-icon co-m-resource-icon--lg">{t('DS')}</span>
-          <span data-test-id="resource-title">{name ?? dataSource?.metadata?.name} </span>
+          <span data-test="resource-title">{name ?? dataSource?.metadata?.name} </span>
           {isDataSourceReady(dataSource) && (
             <span className="dps-resource-item__resource-status pf-v6-u-display-none pf-v6-u-display-inline-on-md">
               <Label isCompact>{t('Ready')}</Label>

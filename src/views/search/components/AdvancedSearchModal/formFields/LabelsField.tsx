@@ -24,7 +24,6 @@ const LabelsField: FC<LabelsFieldProps> = ({ vms }) => {
     <FormGroup label={t('Labels')}>
       <MultiSelectTypeahead
         allResourceNames={allLabels}
-        data-test="adv-search-vm-labels"
         initialInputValue={labelInputValue}
         selectedResourceNames={value}
         selectPlaceholder={t('Add label')}

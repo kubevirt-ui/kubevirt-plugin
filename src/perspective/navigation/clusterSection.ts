@@ -10,7 +10,7 @@ export const clusterSection: EncodedExtension[] = [
     properties: {
       dataAttributes: {
         'data-quickstart-id': 'qs-nav-sec-cluster-virt-perspective',
-        'data-test-id': 'cluster-virt-perspective-nav-item',
+        'data-test': 'cluster-virt-perspective-nav-item',
       },
       id: 'cluster-virt-perspective',
       insertAfter: suffixId(NAV_ID.SETTINGS),
@@ -24,7 +24,7 @@ export const clusterSection: EncodedExtension[] = [
     properties: {
       dataAttributes: {
         'data-quickstart-id': 'qs-nav-cluster-overview',
-        'data-test-id': 'cluster-overview-nav-item',
+        'data-test': 'cluster-overview-nav-item',
       },
       href: '/dashboards',
       id: 'overview-virt-perspective',

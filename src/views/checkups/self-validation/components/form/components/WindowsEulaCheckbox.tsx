@@ -30,7 +30,6 @@ const WindowsEulaCheckbox: FC<WindowsEulaCheckboxProps> = ({
             for each deployment or installation for the Microsoft product(s).
           </Trans>
         }
-        data-test="windows-eula-checkbox"
         id="windows-eula-checkbox"
         isChecked={isEulaConfirmed}
         onChange={(_event, checked) => setIsEulaConfirmed(checked)}

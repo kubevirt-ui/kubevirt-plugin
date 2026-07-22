@@ -18,7 +18,6 @@ const CPUField: FC = () => {
     <FormGroup label={t('vCPU')}>
       <InputGroup>
         <NumberOperatorSelect
-          data-test="adv-search-vcpu-operator"
           onSelect={(operator) => setVCPU({ ...vCPU, operator })}
           selected={vCPU.operator}
         />

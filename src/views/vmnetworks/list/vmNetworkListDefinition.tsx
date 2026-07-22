@@ -23,11 +23,11 @@ const MTUCell: FC<MTUCellProps> = ({ obj }) => {
   const mtu = getMTU(obj);
 
   if (mtu) {
-    return <span data-test-id={`vmnetwork-mtu-${getName(obj)}`}>{mtu}</span>;
+    return <span data-test={`vmnetwork-mtu-${getName(obj)}`}>{mtu}</span>;
   }
 
   return (
-    <span className="pf-v6-u-text-color-subtle" data-test-id={`vmnetwork-mtu-${getName(obj)}`}>
+    <span className="pf-v6-u-text-color-subtle" data-test={`vmnetwork-mtu-${getName(obj)}`}>
       {t('Not available')}
     </span>
   );
@@ -47,7 +47,7 @@ export const getVMNetworkListColumns = (
     renderCell: (row) => {
       const name = getName(row);
       return (
-        <span data-test-id={`vmnetwork-name-${name}`}>
+        <span data-test={`vmnetwork-name-${name}`}>
           <Link to={`${VM_NETWORKS_PATH}/${name}`}>{name}</Link>
         </span>
       );
@@ -64,7 +64,7 @@ export const getVMNetworkListColumns = (
     key: 'physicalNetworkName',
     label: t('Physical network name'),
     renderCell: (row) => (
-      <span data-test-id={`vmnetwork-physicalnetwork-${getName(row)}`}>
+      <span data-test={`vmnetwork-physicalnetwork-${getName(row)}`}>
         {getLocalnet(row)?.physicalNetworkName ?? NO_DATA_DASH}
       </span>
     ),
@@ -75,9 +75,7 @@ export const getVMNetworkListColumns = (
     key: 'vlanID',
     label: t('VLAN ID'),
     renderCell: (row) => (
-      <span data-test-id={`vmnetwork-vlanid-${getName(row)}`}>
-        {getVLANID(row) ?? NO_DATA_DASH}
-      </span>
+      <span data-test={`vmnetwork-vlanid-${getName(row)}`}>{getVLANID(row) ?? NO_DATA_DASH}</span>
     ),
     sortable: true,
   },

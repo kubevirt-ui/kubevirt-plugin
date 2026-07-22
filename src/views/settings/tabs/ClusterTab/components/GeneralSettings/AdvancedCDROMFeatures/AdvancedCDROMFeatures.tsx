@@ -23,6 +23,7 @@ const AdvancedCDROMFeatures: FC<AdvancedCDROMFeaturesProps> = ({ newBadge }) => 
 
   return (
     <ExpandSection
+      dataTestID="advanced-cdrom-features-section"
       searchItemId={CLUSTER_TAB_IDS.advancedCDROMFeatures}
       toggleText={getGeneralSettingsLabels(t).advancedCDROMFeatures}
     >

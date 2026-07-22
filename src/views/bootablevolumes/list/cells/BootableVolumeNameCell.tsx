@@ -94,11 +94,11 @@ const BootableVolumeNameCell: FC<BootableVolumeNameCellProps> = ({ callbacks, ro
   }, [isDataSource, cluster, row, bootableVolumeName, bootableVolumeNamespace]);
 
   return (
-    <>
+    <span data-test={bootableVolumeName}>
       {resourceLink}
       {isDeprecated(bootableVolumeName) && <DeprecatedBadge />}
       {isDataSource && isCloning && <Label>{t('Clone in progress')}</Label>}
-    </>
+    </span>
   );
 };
 

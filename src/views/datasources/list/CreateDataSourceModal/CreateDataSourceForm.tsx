@@ -45,7 +45,6 @@ export const CreateDataSourceForm: FC<CreateDataSourceFormProps> = ({
         <FormTextInput
           {...register('name', { required: true })}
           aria-label={t('Name')}
-          data-test-id="datasource-create-name"
           id="datasource-create-name"
           type="text"
           validated={errors?.['name'] ? ValidatedOptions.error : ValidatedOptions.default}
@@ -65,7 +64,7 @@ export const CreateDataSourceForm: FC<CreateDataSourceFormProps> = ({
         <FormTextInput
           {...register('url', { required: true })}
           aria-label={t('Registry URL')}
-          data-test-id={'datasource-create-source-url'}
+          data-test={'datasource-create-source-url'}
           id={'datasource-create-source-url'}
           type="text"
           validated={errors?.['url'] ? ValidatedOptions.error : ValidatedOptions.default}
@@ -140,7 +139,7 @@ export const CreateDataSourceForm: FC<CreateDataSourceFormProps> = ({
             },
           })}
           aria-label={t('Cron expression')}
-          data-test-id={'datasource-create-cron'}
+          data-test={'datasource-create-cron'}
           id={'datasource-create-source-cron'}
           isRequired
           type="text"

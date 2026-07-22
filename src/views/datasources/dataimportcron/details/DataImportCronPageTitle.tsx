@@ -40,7 +40,7 @@ const DataImportCronPageTitle: FC<DataImportCronPageTitleProps> = ({
       <PaneHeading>
         <Title className="co-resource-item" headingLevel="h1">
           <span className="co-m-resource-icon co-m-resource-icon--lg">{t('DIC')}</span>
-          <span data-test-id="resource-title">{name ?? dataImportCron?.metadata?.name} </span>
+          <span data-test="resource-title">{name ?? dataImportCron?.metadata?.name} </span>
         </Title>
         <DataImportCronActions dataImportCron={dataImportCron} />
       </PaneHeading>

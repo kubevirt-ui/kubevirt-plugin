@@ -1367,6 +1367,7 @@
   "Mount point": "Mount point",
   "Mount Windows drivers disk": "Mount Windows drivers disk",
   "Move <1>{getName(vm)}</1> VirtualMachine to group": "Move <1>{getName(vm)}</1> VirtualMachine to group",
+  "Move to folder": "Move to folder",
   "Move to group": "Move to group",
   "Move virtual machine_one": "Move virtual machine",
   "Move virtual machine_other": "Move virtual machine",

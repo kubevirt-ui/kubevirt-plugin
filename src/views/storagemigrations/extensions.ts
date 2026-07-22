@@ -27,7 +27,7 @@ export const extensions: EncodedExtension[] = [
     properties: {
       dataAttributes: {
         'data-quickstart-id': 'qs-nav-sec-migration',
-        'data-testid': 'migration-nav-item',
+        'data-test': 'migration-nav-item',
       },
       id: 'migration',
       insertAfter: ['virtualization', 'workloads'],
@@ -50,7 +50,7 @@ export const extensions: EncodedExtension[] = [
     properties: {
       dataAttributes: {
         'data-quickstart-id': 'qs-nav-storagemigrations',
-        'data-test-id': 'storagemigrations-nav-item',
+        'data-test': 'storagemigrations-nav-item',
       },
       href: 'storagemigrations',
       id: 'storagemigrations',

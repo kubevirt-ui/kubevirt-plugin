@@ -22,6 +22,7 @@ const ResourceManagementSection: FC<ResourceManagementSectionProps> = ({
 
   return (
     <ExpandSection
+      dataTestID="resource-management"
       searchItemId={CLUSTER_TAB_IDS.resourceManagement}
       toggleText={t('Resource management')}
     >

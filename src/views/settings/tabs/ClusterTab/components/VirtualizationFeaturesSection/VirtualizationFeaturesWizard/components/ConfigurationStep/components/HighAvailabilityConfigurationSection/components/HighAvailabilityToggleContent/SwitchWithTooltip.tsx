@@ -20,7 +20,7 @@ const SwitchWithTooltip: FC<SwitchWithTooltipProps> = ({
   switchIsDisabled ? (
     <Tooltip content={disabledTooltipContent}>
       <Switch
-        data-test-id={dataTestID}
+        data-test={dataTestID}
         isChecked={switchState}
         isDisabled={switchIsDisabled}
         onChange={(_, checked: boolean) => onSwitchChange(checked)}
@@ -28,7 +28,7 @@ const SwitchWithTooltip: FC<SwitchWithTooltipProps> = ({
     </Tooltip>
   ) : (
     <Switch
-      data-test-id={dataTestID}
+      data-test={dataTestID}
       isChecked={switchState}
       onChange={(_, checked: boolean) => onSwitchChange(checked)}
     />

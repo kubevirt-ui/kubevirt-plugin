@@ -10,8 +10,6 @@ import { useSettingsCluster } from '@settings/context/SettingsClusterContext';
 import ExpandSection from '@settings/ExpandSection/ExpandSection';
 import { CLUSTER_TAB_IDS } from '@settings/search/constants';
 
-import { getGeneralSettingsLabels } from '../consts/consts';
-
 type HideYamlTabProps = {
   newBadge?: boolean;
 };
@@ -30,8 +28,9 @@ const HideYamlTab: FC<HideYamlTabProps> = ({ newBadge = false }) => {
 
   return (
     <ExpandSection
+      dataTestID="yaml-tab-visibility"
       searchItemId={CLUSTER_TAB_IDS.hideYamlTab}
-      toggleText={getGeneralSettingsLabels(t).yamlTabVisibility}
+      toggleText={t('YAML tab visibility')}
     >
       <SectionWithSwitch
         helpTextIconContent={t(

@@ -61,7 +61,6 @@ export const DataImportCronManageDetails: FC<DataImportCronManageDetailsProps> =
                   <DescriptionListDescription>
                     <ClipboardCopy
                       clickTip={t('Copied')}
-                      data-test="cron-copy-command"
                       hoverTip={t('Copy to clipboard')}
                       isReadOnly
                     >
@@ -75,7 +74,6 @@ export const DataImportCronManageDetails: FC<DataImportCronManageDetailsProps> =
           />
         </DescriptionList>
       }
-      data-test-id="dataimportcron-manage-details"
       descriptionHeader={t('Automatic update and scheduling')}
       isEdit={!isOwnedBySSP}
       onEditClick={onEditClick}

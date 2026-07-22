@@ -37,7 +37,6 @@ const DateCreatedField: FC = () => {
       {effectiveDateOption === DateSelectOption.Custom && (
         <div className="pf-v6-u-mt-sm">
           <DateFromToPicker
-            data-test="adv-search-date"
             dateFromString={dateFromString}
             dateToString={dateToString}
             setDateFromString={setDateFromString}

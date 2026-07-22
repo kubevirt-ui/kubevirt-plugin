@@ -94,6 +94,7 @@ const AutomaticImagesDownload: FC<AutomaticImagesDownloadProps> = ({
 
   return (
     <ExpandSection
+      dataTestID="automatic-images-download"
       searchItemId={CLUSTER_TAB_IDS.automaticImagesDownload}
       toggleText={t('Automatic images download')}
     >

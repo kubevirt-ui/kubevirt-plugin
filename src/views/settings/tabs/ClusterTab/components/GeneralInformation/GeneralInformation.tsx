@@ -52,7 +52,7 @@ const GeneralInformation: FC<GeneralInformationProps> = ({
       <SplitItem>
         <DescriptionList>
           <DescriptionItem
-            data-test-id="general-information-installed-version"
+            data-test="general-information-installed-version"
             descriptionData={loaded ? version : <Skeleton />}
             descriptionHeader={t('Installed version')}
           />
@@ -62,7 +62,7 @@ const GeneralInformation: FC<GeneralInformationProps> = ({
       <SplitItem>
         <DescriptionList>
           <DescriptionItem
-            data-test-id="general-information-update-status"
+            data-test="general-information-update-status"
             descriptionData={getUpdateStatusContent()}
             descriptionHeader={t('Update status')}
           />

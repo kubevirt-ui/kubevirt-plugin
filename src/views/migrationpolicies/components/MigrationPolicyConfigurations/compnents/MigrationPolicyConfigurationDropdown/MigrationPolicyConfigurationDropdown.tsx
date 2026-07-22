@@ -42,14 +42,13 @@ const MigrationPolicyConfigurationDropdown: FC<MigrationPolicyConfigurationDropd
         onClick: onToggle,
       })}
       className="migration-policy__form-config-dropdown"
-      data-test-id="migration-policies-configurations"
       isOpen={isOpen}
       onOpenChange={setIsOpen}
     >
       <DropdownList>
         {Object.entries(options).map(([key, { defaultValue, description, label }]) => (
           <DropdownItem
-            data-test-id={key}
+            data-test={key}
             description={description}
             isDisabled={key in state}
             key={key}

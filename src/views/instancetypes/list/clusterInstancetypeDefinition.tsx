@@ -17,7 +17,7 @@ import { getCluster } from '@multicluster/helpers/selectors';
 import ClusterInstancetypeActions from '../actions/ClusterInstancetypeActions';
 
 const NameCell = ({ row }: { row: V1beta1VirtualMachineClusterInstancetype }) => (
-  <>
+  <span data-test={getName(row)}>
     <MulticlusterResourceLink
       cluster={getCluster(row)}
       groupVersionKind={VirtualMachineClusterInstancetypeModelGroupVersionKind}
@@ -25,7 +25,7 @@ const NameCell = ({ row }: { row: V1beta1VirtualMachineClusterInstancetype }) =>
       name={getName(row)}
     />
     <RedHatLabel obj={row} />
-  </>
+  </span>
 );
 
 const ClusterCell = ({ row }: { row: V1beta1VirtualMachineClusterInstancetype }) => (

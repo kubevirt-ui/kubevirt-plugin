@@ -62,7 +62,6 @@ const MemoryRequestRatioInput: FC<MemoryRequestRatioInputProps> = ({
         <Stack hasGutter>
           <StackItem>
             <NumberInput
-              data-test-id="memory-request-ratio-input"
               inputAriaLabel={t('Memory request ratio percentage')}
               inputName="memory-request-ratio"
               isDisabled={isLoading}
@@ -111,7 +110,6 @@ const MemoryRequestRatioInput: FC<MemoryRequestRatioInputProps> = ({
               <Split hasGutter>
                 <SplitItem>
                   <Button
-                    data-test-id="memory-request-ratio-save"
                     isDisabled={isLoading || !isValid}
                     isLoading={isLoading}
                     onClick={onSave}
@@ -122,7 +120,6 @@ const MemoryRequestRatioInput: FC<MemoryRequestRatioInputProps> = ({
                 </SplitItem>
                 <SplitItem>
                   <Button
-                    data-test-id="memory-request-ratio-restore"
                     isDisabled={isLoading}
                     onClick={onRestoreDefault}
                     variant={ButtonVariant.link}

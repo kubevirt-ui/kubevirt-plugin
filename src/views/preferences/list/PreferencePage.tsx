@@ -99,22 +99,10 @@ const PreferencePage: FC<ListPageProps> = (props) => {
         activeKey={activeTabKey}
         style={{ flexShrink: 0 }}
       >
-        <Tab
-          title={
-            <TabTitleText data-test="cluster-preferences-tab">
-              {t('Cluster Preferences')}
-            </TabTitleText>
-          }
-          eventKey={0}
-        >
+        <Tab title={<TabTitleText>{t('Cluster Preferences')}</TabTitleText>} eventKey={0}>
           <ClusterPreferenceList {...props} />
         </Tab>
-        <Tab
-          title={
-            <TabTitleText data-test="user-preferences-tab">{t('User Preferences')}</TabTitleText>
-          }
-          eventKey={1}
-        >
+        <Tab title={<TabTitleText>{t('User Preferences')}</TabTitleText>} eventKey={1}>
           <UserPreferenceList {...props} />
         </Tab>
       </Tabs>

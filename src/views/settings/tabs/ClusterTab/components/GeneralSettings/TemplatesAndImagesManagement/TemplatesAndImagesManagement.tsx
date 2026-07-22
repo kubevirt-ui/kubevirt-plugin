@@ -34,6 +34,7 @@ const TemplatesAndImagesManagement: FC<TemplatesAndImagesManagementProps> = ({
 
   return (
     <ExpandSection
+      dataTestID="templates-and-images-management"
       searchItemId={CLUSTER_TAB_IDS.templatesManagement}
       toggleText={getGeneralSettingsLabels(t).templatesAndImagesManagement}
     >

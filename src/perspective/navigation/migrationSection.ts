@@ -11,7 +11,7 @@ export const migrationSection: EncodedExtension[] = [
     properties: {
       dataAttributes: {
         'data-quickstart-id': 'qs-nav-sec-migration-virt-perspective',
-        'data-testid': 'migration-virt-perspective-nav-item',
+        'data-test': 'migration-virt-perspective-nav-item',
       },
       id: 'migration-virt-perspective',
       insertAfter: 'cluster-virt-perspective',
@@ -27,7 +27,7 @@ export const migrationSection: EncodedExtension[] = [
     properties: {
       dataAttributes: {
         'data-quickstart-id': 'qs-nav-storagemigrations-virt-perspective',
-        'data-test-id': 'storagemigrations-virt-perspective-nav-item',
+        'data-test': 'storagemigrations-virt-perspective-nav-item',
       },
       href: 'storagemigrations',
       id: 'storagemigrations-virt-perspective',

@@ -19,7 +19,6 @@ const CompletionTimeout: FC<CompletionTimeoutProps> = ({
       onChange={(event: ChangeEvent<HTMLInputElement>) =>
         +event?.target?.value >= 0 && setState(+event.target.value)
       }
-      data-test-id="migration-policy-completion-timeout-input"
       id="migration-policy-completion-timeout-input"
       min={0}
       minusBtnAriaLabel={t('Decrement')}

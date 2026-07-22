@@ -37,7 +37,7 @@ const QuotaPageTitle: FC<QuotaPageTitleProps> = ({ name, namespace, quota }) => 
     >
       <PaneHeading>
         <Title className="co-resource-item" headingLevel="h1">
-          <span data-test-id="resource-title">{name ?? quota?.metadata?.name}</span>
+          <span data-test="resource-title">{name ?? quota?.metadata?.name}</span>
         </Title>
         <QuotaActions quota={quota} />
       </PaneHeading>

@@ -45,7 +45,7 @@ const ExpandSection: FC<ExpandSectionProps> = ({
         { 'expand-section__disabled': isDisabled, isHighlighted },
         'ExpandSection',
       )}
-      data-test-id={dataTestID}
+      data-test={dataTestID}
       id={id}
       isExpanded={isExpanded}
       isIndented={isIndented}

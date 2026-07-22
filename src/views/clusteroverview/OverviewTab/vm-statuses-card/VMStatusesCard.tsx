@@ -71,7 +71,7 @@ const VMStatusesCard: FC = () => {
   const isLoaded = loaded && observabilityLoaded;
 
   return (
-    <Card className="vm-statuses-card" data-test-id="vm-statuses-card">
+    <Card className="vm-statuses-card" data-test="vm-statuses-card">
       <CardHeader className="vm-statuses-card__header">
         <CardTitle>{t('VirtualMachine statuses')}</CardTitle>
       </CardHeader>
