@@ -1,38 +1,31 @@
-import React, { FC, useMemo } from 'react';
+import React, { type FC } from 'react';
 
-import { modelToRef, TemplateModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import GuidedTour from '@kubevirt-utils/components/GuidedTour/GuidedTour';
 import { runningTourSignal } from '@kubevirt-utils/components/GuidedTour/utils/guidedTourSignals';
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
-import { buildColumnLayout } from '@kubevirt-utils/components/KubevirtTable/utils';
 import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
 import TemplatesFilter from '@kubevirt-utils/components/TemplatesFilter/TemplatesFilter';
 import { TemplatesFilterVariant } from '@kubevirt-utils/components/TemplatesFilter/types';
-import useFiltersFromURL from '@kubevirt-utils/hooks/useFiltersFromURL';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import useKubevirtUserSettingsTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettingsTableColumns';
 import useNamespaceParam from '@kubevirt-utils/hooks/useNamespaceParam';
 import useSelectedRowFilterClusters from '@kubevirt-utils/hooks/useSelectedRowFilterClusters';
 import useSelectedRowFilterProjects from '@kubevirt-utils/hooks/useSelectedRowFilterProjects';
 import { EXPORT_TABLE_KEYS, KubevirtTableExport } from '@kubevirt-utils/hooks/useTableExport';
-import { TemplateOrRequest } from '@kubevirt-utils/resources/template/utils';
-import { ListPageProps } from '@kubevirt-utils/utils/types';
+import { type TemplateOrRequest } from '@kubevirt-utils/resources/template/utils';
+import { type ListPageProps } from '@kubevirt-utils/utils/types';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useIsAllClustersPage from '@multicluster/hooks/useIsAllClustersPage';
-import {
-  ListPageBody,
-  ListPageHeader,
-  useListPageFilter,
-} from '@openshift-console/dynamic-plugin-sdk';
+import { ListPageBody, ListPageHeader } from '@openshift-console/dynamic-plugin-sdk';
+import { ToolbarItem } from '@patternfly/react-core';
 import { useSignals } from '@preact/signals-react/runtime';
 
+import TemplatesTypeToggle from './components/TemplatesTypeToggle/TemplatesTypeToggle';
 import VirtualMachineTemplatesCreateButton from './components/VirtualMachineTemplatesCreateButton/VirtualMachineTemplatesCreateButton';
 import VirtualMachineTemplatesEmptyState from './components/VirtualMachineTemplatesEmptyState/VirtualMachineTemplatesEmptyState';
-import TemplatesTypeToggle from './components/TemplatesTypeToggle/TemplatesTypeToggle';
-import { TemplateFilterType } from './filters/types';
-import useVirtualMachineTemplatesFilters from './filters/useVirtualMachineTemplatesFilters';
 import useAllTemplateResources from './hooks/useAllTemplateResources';
-import { getTemplateColumns, getTemplateRowId } from './virtualMachineTemplatesDefinition';
+import useVirtualMachineTemplatesListColumns from './hooks/useVirtualMachineTemplatesListColumns';
+import useVirtualMachineTemplatesListFilters from './hooks/useVirtualMachineTemplatesListFilters';
+import { getTemplateRowId } from './virtualMachineTemplatesDefinition';
 
 import '@kubevirt-utils/styles/list-managment-group.scss';
 
@@ -46,74 +39,24 @@ const VirtualMachineTemplatesList: FC<ListPageProps> = ({
   showTitle = true,
 }) => {
   useSignals();
+  const { t } = useKubevirtTranslation();
   const selectedClusters = useSelectedRowFilterClusters();
   const selectedProjects = useSelectedRowFilterProjects();
   const namespaceParam = useNamespaceParam();
   const isAllClustersPage = useIsAllClustersPage();
 
-  const { t } = useKubevirtTranslation();
-
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- hook error typed as any
   const { allTemplates, allTemplatesWithRequests, error, loaded } = useAllTemplateResources({
     fieldSelector,
     namespace: namespaceParam,
     selector,
   });
 
-  const { filters, filtersWithSelect } = useVirtualMachineTemplatesFilters(allTemplates);
+  const { filteredData, filtersWithSelect, onFilterChange, toolbarFilters, unfilteredData } =
+    useVirtualMachineTemplatesListFilters(allTemplates, allTemplatesWithRequests, nameFilter);
 
-  // Type is controlled by TemplatesTypeToggle; keep it out of the Filter dropdown/chips.
-  const toolbarFilters = useMemo(
-    () => filters.filter((filter) => filter.type !== TemplateFilterType.Type),
-    [filters],
-  );
-
-  const allFilters = useMemo(
-    () => [...filters, ...filtersWithSelect],
-    [filters, filtersWithSelect],
-  );
-
-  const filtersFromURL = useFiltersFromURL(allFilters);
-
-  const staticFilters = useMemo(
-    () => ({
-      ...filtersFromURL,
-      ...(nameFilter && { name: { selected: [nameFilter] } }),
-    }),
-    [filtersFromURL, nameFilter],
-  );
-
-  const [unfilteredData, filteredData, onFilterChange] = useListPageFilter(
-    allTemplatesWithRequests,
-    allFilters,
-    staticFilters,
-  );
-
-  const columns = useMemo(
-    () => getTemplateColumns(t, namespaceParam, isAllClustersPage),
-    [t, namespaceParam, isAllClustersPage],
-  );
-
-  const manageableColumns = useMemo(() => columns.filter((col) => col.label), [columns]);
-
-  const [activeColumns, , loadedColumns] = useKubevirtUserSettingsTableColumns<TemplateOrRequest>({
-    columnManagementID: modelToRef(TemplateModel),
-    columns: manageableColumns.map((col) => ({
-      additional: col.additional,
-      id: col.key,
-      props: col.props,
-      title: col.label,
-    })),
-  });
-
-  const activeColumnKeys = useMemo(
-    () => activeColumns?.map((col) => col?.id) ?? manageableColumns.map((col) => col.key),
-    [activeColumns, manageableColumns],
-  );
-
-  const columnLayout = useMemo(
-    () => buildColumnLayout(manageableColumns, activeColumnKeys, modelToRef(TemplateModel)),
-    [manageableColumns, activeColumnKeys],
-  );
+  const { activeColumnKeys, columnLayout, columns, loadedColumns } =
+    useVirtualMachineTemplatesListColumns(namespaceParam, isAllClustersPage);
 
   if (
     !runningTourSignal.value &&
@@ -135,6 +78,7 @@ const VirtualMachineTemplatesList: FC<ListPageProps> = ({
       <ListPageBody>
         <div className="list-managment-group">
           <ListPageFilter
+            columnLayout={columnLayout}
             customRowFiltersMenu={
               <TemplatesFilter
                 onFilterChange={onFilterChange}
@@ -142,6 +86,14 @@ const VirtualMachineTemplatesList: FC<ListPageProps> = ({
                 variant={TemplatesFilterVariant.Menu}
               />
             }
+            data={unfilteredData}
+            filtersWithSelect={filtersWithSelect}
+            hideColumnManagement={hideColumnManagement}
+            hideLabelFilter={hideTextFilter}
+            hideNameLabelFilters={hideNameLabelFilters}
+            loaded={loadedColumns}
+            onFilterChange={onFilterChange}
+            rowFilters={toolbarFilters}
             toolbarEndContent={
               <KubevirtTableExport
                 activeColumnKeys={activeColumnKeys}
@@ -153,16 +105,11 @@ const VirtualMachineTemplatesList: FC<ListPageProps> = ({
                 loaded={loaded && loadedColumns}
               />
             }
-            columnLayout={columnLayout}
-            data={unfilteredData}
-            filtersWithSelect={filtersWithSelect}
-            hideColumnManagement={hideColumnManagement}
-            hideLabelFilter={hideTextFilter}
-            hideNameLabelFilters={hideNameLabelFilters}
-            loaded={loadedColumns}
-            onFilterChange={onFilterChange}
-            rowFilters={toolbarFilters}
-            toolbarStartContent={<TemplatesTypeToggle onFilterChange={onFilterChange} />}
+            toolbarStartContent={
+              <ToolbarItem>
+                <TemplatesTypeToggle onFilterChange={onFilterChange} />
+              </ToolbarItem>
+            }
           />
         </div>
         <KubevirtTable<TemplateOrRequest>
@@ -171,8 +118,9 @@ const VirtualMachineTemplatesList: FC<ListPageProps> = ({
           columns={columns}
           data={filteredData}
           getRowId={getTemplateRowId}
-          initialSortKey="none" // TODO: not clean, fix later
+          initialSortKey="none"
           loaded={loaded && loadedColumns}
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- hook error typed as any
           loadError={error}
           noFilteredDataMsg={t('No templates found')}
           unfilteredData={allTemplatesWithRequests}

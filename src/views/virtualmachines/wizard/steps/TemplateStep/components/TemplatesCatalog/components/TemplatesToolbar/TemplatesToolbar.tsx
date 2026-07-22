@@ -2,7 +2,6 @@ import React, { type FC } from 'react';
 
 import { type OnFilterChange } from '@openshift-console/dynamic-plugin-sdk';
 import { Split, SplitItem } from '@patternfly/react-core';
-import TemplatesTypeToggle from '@templates/list/components/TemplatesTypeToggle/TemplatesTypeToggle';
 import { TemplatesCatalogProjectsDropdown } from '@virtualmachines/wizard/steps/TemplateStep/components/TemplatesCatalog/components/TemplatesToolbar/components/TemplatesCatalogProjectsDropdown/TemplatesCatalogProjectsDropdown';
 import TemplatesCatalogStyleToggle from '@virtualmachines/wizard/steps/TemplateStep/components/TemplatesCatalog/components/TemplatesToolbar/components/TemplatesCatalogStyleToggle';
 import TemplatesSearchInput from '@virtualmachines/wizard/steps/TemplateStep/components/TemplatesCatalog/components/TemplatesToolbar/components/TemplatesSearchInput';
@@ -24,9 +23,6 @@ const TemplatesToolbar: FC<TemplatesToolbarProps> = ({
 }) => {
   return (
     <Split hasGutter>
-      <SplitItem>
-        <TemplatesTypeToggle onFilterChange={onFilterChange} />
-      </SplitItem>
       <SplitItem>
         <TemplatesCatalogProjectsDropdown onChange={setNamespace} selectedProject={namespace} />
       </SplitItem>

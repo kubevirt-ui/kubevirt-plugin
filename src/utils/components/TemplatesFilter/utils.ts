@@ -1,9 +1,16 @@
-import { TemplateOrRequest } from '@kubevirt-utils/resources/template';
-import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
+import { type TemplateOrRequest } from '@kubevirt-utils/resources/template';
+import { type RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 import { TemplateFilterType } from '@templates/list/filters/types';
 
-const splitTemplateFilters = (rowFilters: RowFilter<TemplateOrRequest>[]) => {
-  const getRowFilter = (type: TemplateFilterType) => rowFilters.find((f) => f.type === type);
+type SplitTemplateFilters = {
+  commonFilters: RowFilter<TemplateOrRequest>[];
+  openShiftTemplatesOnlyFilters: RowFilter<TemplateOrRequest>[];
+  scopeFilter: RowFilter<TemplateOrRequest> | undefined;
+};
+
+const splitTemplateFilters = (rowFilters: RowFilter<TemplateOrRequest>[]): SplitTemplateFilters => {
+  const getRowFilter = (type: TemplateFilterType): RowFilter<TemplateOrRequest> | undefined =>
+    rowFilters.find((filter) => filter.type === type);
 
   // Type filter is rendered as TemplatesTypeToggle outside the Filter dropdown.
   const commonFilters = [TemplateFilterType.Architecture].map(getRowFilter).filter(Boolean);
