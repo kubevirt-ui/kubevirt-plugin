@@ -101,7 +101,7 @@ const main = async (): Promise<void> => {
     );
   }
 
-  const conclusion = eligible ? 'success' : 'failure';
+  const conclusion = eligible ? 'success' : 'action_required';
   const title = !determined
     ? 'Could not determine eligibility'
     : eligible
@@ -122,24 +122,27 @@ const main = async (): Promise<void> => {
   setOutput('title', title);
   setOutput('summary', summary);
 
-  // Update this job's own check-run with the specific reason
-  try {
-    const {
-      data: { jobs },
-    } = await octokit.actions.listJobsForWorkflowRun({ owner, repo, run_id: runId });
-    const job = jobs.find((j) => j.name === 'Merge Gate');
-    if (job?.check_run_url) {
-      const checkRunId = Number(job.check_run_url.split('/').pop());
-      await octokit.checks.update({
+  // Publish a separate "Merge Gate" check-run via API.
+  // This is the branch-protection required check (not the job's own check).
+  // Uses action_required (orange) when not eligible, success (green) when eligible.
+  const prHeadSha = process.env.PR_HEAD_SHA || headSha;
+  if (prHeadSha) {
+    try {
+      await octokit.checks.create({
         owner,
         repo,
-        check_run_id: checkRunId,
+        name: 'Merge Gate',
+        head_sha: prHeadSha,
+        status: 'completed',
+        conclusion,
         output: { title, summary },
+        details_url: `${process.env.GITHUB_SERVER_URL ?? 'https://github.com'}/${owner}/${repo}/actions/runs/${runId}`,
       });
+      console.log(`Published "Merge Gate" check-run: ${conclusion} — ${title}`);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      console.warn(`Could not publish Merge Gate check-run: ${msg}`);
     }
-  } catch (err) {
-    const msg = err instanceof Error ? err.message : String(err);
-    console.warn(`Could not update Merge Gate check-run output: ${msg}`);
   }
 
   // Toggle auto-merge via GraphQL
@@ -179,10 +182,8 @@ const main = async (): Promise<void> => {
     }
   }
 
-  if (conclusion === 'failure') {
-    console.error(`::error title=${title}::${summary}`);
-    process.exit(1);
-  }
+  // Job always exits 0 — the "Merge Gate" check-run is the real gate, not this job.
+  // Even when not eligible, the job succeeds (green) and the check-run shows orange.
 };
 
 main().catch((err) => {

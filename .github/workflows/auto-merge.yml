@@ -1,46 +1,30 @@
 name: Auto Merge
 
-# Toggles GitHub's native auto-merge instead of merging PRs ourselves --
-# GitHub then merges automatically once branch protection's required checks
-# pass and there are no conflicts. See ci-scripts/README.md.
+# Evaluates merge-pool eligibility and publishes the "Merge Gate" check-run.
+# The job itself always succeeds (green). The real merge blocker is the
+# API-published "Merge Gate" check-run with conclusion: action_required
+# (orange) when not eligible, or success (green) when eligible.
 #
-# The GraphQL enable/disable calls are convenience only; the real backstop
-# is this job's own native check-run, named "Merge Gate" below, which is a
-# required check. Deliberately not published via checks.create() (e.g.
-# publish-gating-check) -- an API-created check-run isn't attached to this
-# workflow run, so GitHub parks it under an unrelated check suite for the
-# SHA (often "Needs Rebase"), which used to render as the confusing
-# "Needs Rebase / Merge Gate" in the merge box instead of "Auto Merge /
-# Merge Gate".
+# Branch protection requires the "Merge Gate" check-run name (API-published),
+# NOT this job's own name.
 on:
   pull_request_target:
-    # opened -- so a brand-new PR gets an immediate, explicit "Merge Gate:
-    # failure" instead of sitting as "Expected -- waiting for status" until
-    # its first label/push event
     types: [opened, labeled, unlabeled, reopened, synchronize]
 
 permissions:
   contents: read
   pull-requests: write
-  # actions: read -- listJobsForWorkflowRun, to find this job's own
-  # check-run. checks: write -- updating that check-run's output. Neither
-  # is subject to the fork-PR token restriction, and pull_request_target
-  # already gets a non-restricted token regardless -- no bot token needed.
   actions: read
   checks: write
 
 jobs:
-  sync-auto-merge:
-    name: Merge Gate
+  evaluate:
+    name: Evaluate Merge Eligibility
     runs-on: ubuntu-latest
     timeout-minutes: 2
-    # Serialize per PR so out-of-order concurrent label events can't leave
-    # auto-merge/the merge gate reflecting a stale label state.
     concurrency:
       group: auto-merge-${{ github.event.pull_request.number }}
     steps:
-      # Pin to default branch: pull_request_target checks out the PR base,
-      # which may lack ci-scripts/hot-cluster/ on older release branches.
       - name: Checkout
         uses: actions/checkout@v7
         with:
@@ -67,6 +51,7 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
           BOT_TOKEN: ${{ steps.bot-token.outputs.token }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
           GITHUB_RUN_ID: ${{ github.run_id }}
         working-directory: .github/scripts
         run: npx tsx src/merge/auto-merge.ts
