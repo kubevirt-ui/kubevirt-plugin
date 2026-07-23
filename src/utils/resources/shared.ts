@@ -23,16 +23,16 @@ import { isDataSourceReady } from '../../views/datasources/utils';
 
 import { getNamespacePathSegment, isEmpty } from './../utils/utils';
 import { getDataImportCronFromDataSource } from './bootableresources/helpers';
+import { SINGLE_CLUSTER_KEY } from './constants';
 import type {
   MultiNamespaceVirtualMachineStorageMigrationPlan,
   StorageMigrationPlanNamespaceStatus,
 } from './migrations/constants';
+import { ANNOTATIONS, TEMPLATE_TYPE_LABEL } from './template';
 import {
   isDataSourceCloning,
   isDataSourceUploading,
 } from './template/hooks/useVmTemplateSource/utils';
-import { SINGLE_CLUSTER_KEY } from './constants';
-import { ANNOTATIONS, TEMPLATE_TYPE_LABEL } from './template';
 
 /**
  * A selector for a resource's description
@@ -621,13 +621,16 @@ export const getResourceKey = (resource: K8sResourceCommon): string =>
     resource,
   )}`;
 
-export const isFolderLabel = (label: string): boolean =>
-  label?.startsWith(`${VM_FOLDER_LABEL}=`) ?? false;
-
 const VM_FOLDER_LABEL_PREFIX = `${VM_FOLDER_LABEL}=`;
+
+export const isFolderLabel = (label: string): boolean =>
+  label?.startsWith(VM_FOLDER_LABEL_PREFIX) ?? false;
 
 export const getFolderNameFromLabel = (label: string): string | undefined =>
   isFolderLabel(label) ? label.slice(VM_FOLDER_LABEL_PREFIX.length) || undefined : undefined;
+
+export const buildFolderLabel = (folderName: string): string =>
+  `${VM_FOLDER_LABEL_PREFIX}${folderName}`;
 
 export const getClusterKey = (resource: K8sResourceCommon): string =>
   getCluster(resource) || SINGLE_CLUSTER_KEY;

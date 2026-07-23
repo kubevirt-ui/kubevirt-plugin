@@ -1,5 +1,5 @@
-import React from 'react';
 import { isEmpty } from 'lodash';
+import React from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { tourGuideVM } from '@kubevirt-utils/components/GuidedTour/utils/constants';
@@ -9,13 +9,17 @@ import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { SINGLE_CLUSTER_KEY } from '@kubevirt-utils/resources/constants';
 import { isSystemNamespace } from '@kubevirt-utils/resources/namespace/helper';
 import {
+  buildFolderLabel,
   getFolderNameFromLabel,
   getLabel,
   getName,
   getNamespace,
   isFolderLabel,
 } from '@kubevirt-utils/resources/shared';
-import { ROW_FILTERS_PREFIX } from '@kubevirt-utils/utils/constants';
+import {
+  CLUSTER_LIST_FILTER_TYPE,
+  PROJECT_LIST_FILTER_TYPE,
+} from '@kubevirt-utils/utils/constants';
 import { universalComparator } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { UseMulticlusterNamespacesReturn } from '@multicluster/hooks/useMulticlusterNamespaces';
@@ -34,8 +38,6 @@ import {
   ProjectDiagramIcon,
 } from '@patternfly/react-icons';
 import { signal } from '@preact/signals-react';
-import { skipRowFilterPrefix, validSearchQueryParams } from '@search/utils/constants';
-import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
 import { statusIcon } from '../icons/utils';
 
@@ -174,7 +176,12 @@ const createFolderTreeItems = (
       children: vmItems,
       defaultExpanded: folderExpanded,
       expandedIcon: <FolderOpenIcon />,
-      href: `${getVMListNamespacesURL(cluster, project)}${queryParams || ''}`,
+      href: `${getVMListNamespacesURL(cluster, project)}${buildTreeItemQuery({
+        cluster,
+        folderName: folder,
+        project,
+        query: queryParams,
+      })}`,
       icon: <FolderIcon />,
       id: folderTreeItemID,
       name: folder,
@@ -222,9 +229,11 @@ const createProjectTreeItem = (
     children: projectChildren,
     customBadgeContent: projectMap[project]?.count || '0',
     defaultExpanded: (currentPageNamespace === project && clusterSelected) || isTourRunning,
-    href: `${getVMListNamespacesURL(cluster, project)}${
-      removeFilterQueryParams(queryParams) || ''
-    }`,
+    href: `${getVMListNamespacesURL(cluster, project)}${buildTreeItemQuery({
+      cluster,
+      project,
+      query: queryParams,
+    })}`,
     icon: (
       <Tooltip content={t('Project')}>
         <ProjectDiagramIcon />
@@ -250,7 +259,7 @@ const createAllNamespacesTreeItem = (
     children: treeViewData,
     defaultExpanded: true,
     hasBadge: false,
-    href: `${getVMListURL()}${removeFilterQueryParams(queryParams) || ''}`,
+    href: `${getVMListURL()}${buildTreeItemQuery({ query: queryParams })}`,
     icon: <ClusterIcon />,
     id: ALL_NAMESPACES_SESSION_KEY,
     name: t(LOCAL_CLUSTER),
@@ -400,7 +409,10 @@ export const createMultiClusterTreeViewData = (
         children: treeViewData,
         defaultExpanded: clusterSelected,
         hasBadge: false,
-        href: `${getACMVMListURL(clusterName)}${removeFilterQueryParams(queryParams) || ''}`,
+        href: `${getACMVMListURL(clusterName)}${buildTreeItemQuery({
+          cluster: clusterName,
+          query: queryParams,
+        })}`,
         icon: (
           <Tooltip content={t('Cluster')}>
             <ClusterIcon />
@@ -421,7 +433,7 @@ export const createMultiClusterTreeViewData = (
     children: treeWithClusters,
     defaultExpanded: true,
     hasBadge: false,
-    href: `${getACMVMListURL()}${removeFilterQueryParams(queryParams) || ''}`,
+    href: `${getACMVMListURL()}${buildTreeItemQuery({ query: queryParams })}`,
     icon: <ClusterIcon />,
     id: ALL_CLUSTERS_ID,
     name: allClustersLabel,
@@ -566,20 +578,44 @@ export const getClusterElement = (treeData: TreeViewDataItem[]): HTMLElement => 
   return document.getElementById(targetId)?.querySelector('.pf-v6-c-tree-view__node-text');
 };
 
-const plainFilterKeys = new Set<string>(validSearchQueryParams);
-
-const removeFilterQueryParams = (query?: string): string => {
+const removeFolderLabels = (query?: string): URLSearchParams => {
   const params = new URLSearchParams(query ?? '');
 
-  [...params.keys()].forEach((key) => {
-    if (
-      key.startsWith(ROW_FILTERS_PREFIX) ||
-      skipRowFilterPrefix.has(key as VirtualMachineRowFilterType) ||
-      plainFilterKeys.has(key)
-    ) {
-      params.delete(key);
-    }
-  });
+  params
+    .getAll(STATIC_SEARCH_FILTERS.labels)
+    .filter(isFolderLabel)
+    .forEach((label) => params.delete(STATIC_SEARCH_FILTERS.labels, label));
+
+  return params;
+};
+
+type BuildTreeItemQueryOptions = {
+  cluster?: string;
+  folderName?: string;
+  project?: string;
+  query?: string;
+};
+
+const buildTreeItemQuery = ({
+  cluster,
+  folderName,
+  project,
+  query,
+}: BuildTreeItemQueryOptions): string => {
+  const params = removeFolderLabels(query);
+
+  params.delete(CLUSTER_LIST_FILTER_TYPE);
+  params.delete(PROJECT_LIST_FILTER_TYPE);
+
+  if (cluster) {
+    params.set(CLUSTER_LIST_FILTER_TYPE, cluster);
+  }
+  if (project) {
+    params.set(PROJECT_LIST_FILTER_TYPE, project);
+  }
+  if (folderName) {
+    params.append(STATIC_SEARCH_FILTERS.labels, buildFolderLabel(folderName));
+  }
 
   return params.size > 0 ? `?${params.toString()}` : '';
 };

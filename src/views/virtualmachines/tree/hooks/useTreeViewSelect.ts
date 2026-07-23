@@ -4,10 +4,7 @@ import { useNavigate } from 'react-router';
 import { logTreeViewAction } from '@kubevirt-utils/extensions/telemetry/multicluster';
 import { TELEMETRY_TREE_VIEW_ACTION } from '@kubevirt-utils/extensions/telemetry/utils/property-constants';
 
-import { FOLDER_SELECTOR_PREFIX } from '../utils/constants';
 import { TreeViewDataItemWithHref } from '../utils/utils';
-
-import { appendFolderLabelParam } from './utils';
 
 const useTreeViewSelect = (): [
   selected: TreeViewDataItemWithHref,
@@ -23,11 +20,6 @@ const useTreeViewSelect = (): [
       logTreeViewAction(
         treeViewItem.href ? TELEMETRY_TREE_VIEW_ACTION.NAVIGATE : TELEMETRY_TREE_VIEW_ACTION.FILTER,
       );
-
-      if (treeViewItem.id.startsWith(FOLDER_SELECTOR_PREFIX)) {
-        const folderName = treeViewItem.name as string;
-        return navigate(appendFolderLabelParam(treeViewItem.href, folderName));
-      }
 
       if (treeViewItem.href) navigate(treeViewItem.href);
     },

@@ -6,8 +6,6 @@ import useClusterFilter from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/f
 import useProjectFilter from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/filters/useProjectFilter';
 import { KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import useNamespaceParam from '@kubevirt-utils/hooks/useNamespaceParam';
-import useClusterParam from '@multicluster/hooks/useClusterParam';
 import useIsACMPage from '@multicluster/useIsACMPage';
 import { useAccessibleResources } from '@virtualmachines/search/hooks/useAccessibleResources';
 import { PVCMapper, VMIMapper } from '@virtualmachines/utils/mappers';
@@ -35,8 +33,6 @@ const useVMListFilters = (
 ): KubevirtFilter<V1VirtualMachine>[] => {
   const { t } = useKubevirtTranslation();
   const isACMPage = useIsACMPage();
-  const cluster = useClusterParam();
-  const namespace = useNamespaceParam();
 
   const { resources: vms } = useAccessibleResources<V1VirtualMachine>({
     groupVersionKind: VirtualMachineModelGroupVersionKind,
@@ -55,24 +51,14 @@ const useVMListFilters = (
     if (isACMPage) {
       filters.push({
         ...clusterFilter,
-        disabled: Boolean(cluster),
-        disabledTooltip: t(
-          'Cluster is already selected. To update filters, choose another project or cluster in the tree view.',
-        ),
         showAllBadge: true,
-        toggleBadgeNumber: Boolean(cluster) ? 1 : undefined,
       });
     }
 
     filters.push(
       {
         ...projectFilter,
-        disabled: Boolean(namespace),
-        disabledTooltip: t(
-          'Project is already selected. To update filters, choose another project or cluster in the tree view.',
-        ),
         showAllBadge: true,
-        toggleBadgeNumber: Boolean(namespace) ? 1 : undefined,
       },
       getStatusFilter(t),
       getOSFilter(t),
@@ -96,8 +82,6 @@ const useVMListFilters = (
   }, [
     t,
     isACMPage,
-    cluster,
-    namespace,
     clusterFilter,
     projectFilter,
     storageClassFilter,
