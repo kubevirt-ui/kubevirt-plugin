@@ -1,6 +1,6 @@
-import React, { FC, useState } from 'react';
+import React, { type FC, useState } from 'react';
 
-import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -35,11 +35,15 @@ const VirtualMachineBasicLogViewer: FC<VirtualMachineBasicLogViewerProps> = ({
 
   return (
     <LogViewer
+      data={data}
+      isTextWrapped={isTextWrapped}
+      scrollToRow={data.length}
+      theme="dark"
       toolbar={
         <Toolbar>
           <ToolbarContent>
             <ToolbarItem>
-              <LogViewerSearch minSearchChars={3} placeholder="Search..." />
+              <LogViewerSearch minSearchChars={3} placeholder={t('Search...')} />
             </ToolbarItem>
             <ToolbarItem align={{ default: 'alignEnd' }}>
               <Checkbox
@@ -65,10 +69,6 @@ const VirtualMachineBasicLogViewer: FC<VirtualMachineBasicLogViewerProps> = ({
           </ToolbarContent>
         </Toolbar>
       }
-      data={data}
-      isTextWrapped={isTextWrapped}
-      scrollToRow={data.length}
-      theme="dark"
     />
   );
 };

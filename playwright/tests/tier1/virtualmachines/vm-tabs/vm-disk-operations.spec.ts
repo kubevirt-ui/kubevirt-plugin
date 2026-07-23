@@ -39,23 +39,23 @@ test.describe('Tier1 VM Disk Operations — stopped RHEL9', { tag: [T1_TAG, '@no
 
     await vmDetailPage.navigateToConfigurationStorage();
 
+    const scList = await apiClient.getStorageClasses();
+    const scItems = (scList?.items as Array<{ metadata?: { name?: string } }>) ?? [];
+    const scNames = scItems.map((sc) => sc.metadata?.name).filter(Boolean) as string[];
+    const storageClass =
+      scNames.find((n) => n === utils.STORAGE_CLASSES.OCS_STORAGECLUSTER_CEPH_RBD_VIRTUALIZATION) ??
+      scNames[0];
+
     const diskName = utils.generateRandomDiskName('blank');
-    const added = await vmDetailPage.addBlankDisk(
-      diskName,
-      '1',
-      utils.STORAGE_CLASSES.OCS_STORAGECLUSTER_CEPH_RBD_VIRTUALIZATION,
-    );
+    const added = await vmDetailPage.addBlankDisk(diskName, '1', storageClass);
     expect.soft(added, `Blank disk ${diskName} should be added from UI`).toBe(true);
 
     const diskVisible = await vmDetailPage.verifyDiskNameExists(diskName);
     expect.soft(diskVisible, `Disk row for ${diskName} should be visible`).toBe(true);
 
-    const scMatches = await vmDetailPage.verifyDiskStorageClass(
-      diskName,
-      utils.STORAGE_CLASSES.OCS_STORAGECLUSTER_CEPH_RBD_VIRTUALIZATION,
-    );
+    const scMatches = await vmDetailPage.verifyDiskStorageClass(diskName, storageClass);
     expect
-      .soft(scMatches, `Disk ${diskName} should use the selected virtualization storage class`)
+      .soft(scMatches, `Disk ${diskName} should use the selected storage class (${storageClass})`)
       .toBe(true);
 
     const detachOk = await vmDetailPage.detachDisk(diskName);

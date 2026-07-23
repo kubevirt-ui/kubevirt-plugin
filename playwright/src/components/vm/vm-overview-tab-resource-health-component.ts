@@ -11,14 +11,16 @@ export default class VmOverviewTabResourceHealthComponent extends BaseComponent 
     'Storage allocated',
   ] as const;
 
-  private readonly _clusterResourcesCard = this.testId('cluster-resources-card');
+  private readonly _clusterResourcesCard = this.testId('all-clusters-resources-card').or(
+    this.testId('single-cluster-resources-card'),
+  );
   private readonly _clusterStatusWidget = this.testId('cluster-status-widget');
   private readonly _clusterUtilizationWidget = this.testId('cluster-utilization-widget');
   private readonly _guestAgentIssuesWidget = this.testId('guest-agent-issues-widget');
   private readonly _migrationsWidget = this.testId('migrations-widget');
   private readonly _resourceAllocationWidget = this.testId('resource-allocation-widget');
   private readonly _vmAlertsWidget = this.testId('vm-alerts-widget');
-  private readonly _vmStatusesCard = this.testId('vm-statuses-card');
+  private readonly _vmStatusesCard = this.testId('overview-vm-statuses-card');
 
   constructor(page: Page) {
     super(page);

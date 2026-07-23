@@ -7,7 +7,7 @@ type Loading = { size?: SpinnerProps['size'] | spinnerSize };
 
 const Loading: FC<Loading> = ({ size = spinnerSize.md }) => {
   const { t } = useKubevirtTranslation();
-  return <Spinner aria-label={t('Loading')} data-test="loading-indicator" size={size} />;
+  return <Spinner aria-label={t('Loading')} data-test="loading-spinner" size={size} />;
 };
 
 export default memo(Loading);

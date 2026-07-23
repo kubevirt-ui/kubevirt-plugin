@@ -46,7 +46,12 @@ const GettingStartedSectionContents: FC<GettingStartedSectionContentsProps> = ({
       direction={{ default: 'column' }}
       grow={{ default: 'grow' }}
     >
-      <Title data-test="title" headingLevel="h3" size={TitleSizes.md} style={{ color: titleColor }}>
+      <Title
+        data-test="getting-started-section-title"
+        headingLevel="h3"
+        size={TitleSizes.md}
+        style={{ color: titleColor }}
+      >
         {icon ? <span className="getting-started-section-contents__title-icon">{icon}</span> : null}
         {title}
       </Title>

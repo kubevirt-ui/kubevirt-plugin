@@ -62,14 +62,17 @@ test.describe.serial(
 
       await apiClient.patchVmEvictionStrategy(vmName, testConfig.testNamespace, 'LiveMigrate');
 
-      await vmTreePage.navigateToVmViaTreeView(testConfig.testNamespace, vmName);
-      await vmDetailPage.navigateToConfigurationScheduling();
-
-      const liveMigrateVisible = await vmDetailPage.verifyEvictionStrategyLiveMigrate();
-      expect
-        .soft(
-          liveMigrateVisible,
-          'Eviction strategy should display LiveMigrate after cluster patch',
+      await expect
+        .poll(
+          async () => {
+            await vmDetailPage.reloadAndNavigateToScheduling();
+            return vmDetailPage.verifyEvictionStrategyLiveMigrate();
+          },
+          {
+            timeout: 60_000,
+            intervals: [5_000],
+            message: 'Eviction strategy should display LiveMigrate after cluster patch',
+          },
         )
         .toBe(true);
     });

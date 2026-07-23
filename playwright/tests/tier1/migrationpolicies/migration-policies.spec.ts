@@ -99,9 +99,19 @@ test.describe.serial(
       await migrationPoliciesPage.clickCreateButton();
       apiClient.trackResource('MigrationPolicy', autoConvergePolicyName);
 
-      await migrationPoliciesPage.navigateToMigrationPoliciesViaUI();
-      const visible = await migrationPoliciesPage.isPolicyVisible(autoConvergePolicyName);
-      expect(visible, `Policy ${autoConvergePolicyName} should appear in the list`).toBe(true);
+      await expect
+        .poll(
+          async () => {
+            await migrationPoliciesPage.navigateToMigrationPoliciesViaUI();
+            return migrationPoliciesPage.isPolicyVisible(autoConvergePolicyName);
+          },
+          {
+            timeout: 30_000,
+            intervals: [2_000],
+            message: `Policy ${autoConvergePolicyName} should appear in the list`,
+          },
+        )
+        .toBe(true);
 
       await test.step('Delete via actions dropdown', async () => {
         await migrationPoliciesPage.navigateToMigrationPolicyDetail(autoConvergePolicyName);

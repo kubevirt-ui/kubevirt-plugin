@@ -141,7 +141,7 @@ test.describe.serial(
       await apiClient.createBlankDataVolume(diskName, ns, '1Gi');
       apiClient.trackResource('DataVolume', diskName, ns);
       await apiClient.waitForDataVolumeSucceeded(diskName, ns);
-      await apiClient.hotplugVolumeToVm(vmName, ns, diskName, diskName);
+      await apiClient.hotplugVolumeEphemeral(vmName, ns, diskName, diskName);
       await apiClient.waitForVmDiskPresent(vmName, ns, diskName);
 
       await vmTreePage.navigateToVmViaTreeView(ns, vmName);

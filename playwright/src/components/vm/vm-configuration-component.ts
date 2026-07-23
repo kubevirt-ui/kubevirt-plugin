@@ -10,7 +10,7 @@ export default class VmConfigurationComponent extends PageCommons {
   private readonly _configurationSearchAutocompleteSearchInput = this.locator(
     '#ConfigurationSearch-autocomplete-search input',
   );
-  private readonly _cpuMemoryButton = this.testId('virtual-machine-overview-details-cpu-memory');
+  private readonly _cpuMemoryButton = this.testId('cpu-memory-value');
 
   private readonly _headlessCheckbox = this.locator('input[id="headless-mode"]');
 

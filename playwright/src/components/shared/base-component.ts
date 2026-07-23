@@ -37,7 +37,7 @@ export default class BaseComponent {
     return this.page
       .locator(this.loadingIndicators.join(', '))
       .or(this.page.getByTestId('loading'))
-      .or(this.page.getByTestId('loading-indicator'));
+      .or(this.page.getByTestId('loading-spinner'));
   }
 
   private async performRobustClick(
