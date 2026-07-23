@@ -27,10 +27,10 @@ import {
 } from '@patternfly/react-core';
 
 import {
+  DEFAULT_TEST_SUITES,
   SELF_VALIDATION_NAME,
   selfValidationCheckupImageSettings,
   TEST_SUITE_OPTIONS,
-  TEST_SUITES,
 } from '../../utils';
 import { calculatePVCStorageSize } from '../../utils/selfValidationJob/resourceTemplates';
 
@@ -55,7 +55,7 @@ const CheckupsSelfValidationForm = () => {
   const [name, setName] = useState<string>(generatePrettyName(SELF_VALIDATION_NAME));
   const [checkupImage, checkupImageLoaded, checkupImageLoadError, checkupImageIsFallback] =
     useRelatedImage(selfValidationCheckupImageSettings);
-  const [selectedTestSuites, setSelectedTestSuites] = useState<string[]>(TEST_SUITES);
+  const [selectedTestSuites, setSelectedTestSuites] = useState<string[]>(DEFAULT_TEST_SUITES);
   const [isDryRun, setIsDryRun] = useState<boolean>(false);
   const [storageClass, setStorageClass] = useState<string>('');
   const [testSkips, setTestSkips] = useState<string>('');
