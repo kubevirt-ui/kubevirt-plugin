@@ -34,7 +34,7 @@ const VMStatuses: FC<VMStatusesProps> = ({ vms }) => {
   const otherPath = useVMStatusesPath(namespace, OTHER_STATUSES);
 
   return (
-    <Card className="vm-statuses-card health-card" data-test="vm-statuses-card" isCompact>
+    <Card className="vm-statuses-card health-card" data-test="vm-list-statuses-card" isCompact>
       <CardHeader className="health-card__header">
         <CardTitle>{t('Virtual machine statuses')}</CardTitle>
       </CardHeader>

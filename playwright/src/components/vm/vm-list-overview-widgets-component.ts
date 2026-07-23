@@ -13,7 +13,9 @@ export default class VmListOverviewWidgetsComponent extends BaseComponent {
     'Memory usage',
     'Storage allocated',
   ] as const;
-  private readonly _clusterResourcesCard = this.testId('cluster-resources-card');
+  private readonly _clusterResourcesCard = this.testId('all-clusters-resources-card').or(
+    this.testId('single-cluster-resources-card'),
+  );
   private readonly _clusterStatusWidget = this.testId('cluster-status-widget');
   private readonly _clusterUtilizationWidget = this.testId('cluster-utilization-widget');
   private readonly _guestAgentIssuesWidget = this.testId('guest-agent-issues-widget');
@@ -35,7 +37,7 @@ export default class VmListOverviewWidgetsComponent extends BaseComponent {
     hasText: /^Virtual machines$/,
   });
 
-  private readonly _vmStatusesCard = this.testId('vm-statuses-card');
+  private readonly _vmStatusesCard = this.testId('vm-list-statuses-card');
 
   private readonly nav: NavigationComponent;
 
@@ -385,7 +387,7 @@ export default class VmListOverviewWidgetsComponent extends BaseComponent {
   ): Promise<{ allVisible: boolean; missing: string[] }> {
     const widgets: { name: string; locator: ReturnType<typeof this.locator> }[] = [
       { name: 'vm-alerts-widget', locator: this._vmAlertsWidget },
-      { name: 'vm-statuses-card', locator: this._vmStatusesCard },
+      { name: 'vm-list-statuses-card', locator: this._vmStatusesCard },
       { name: 'guest-agent-issues-widget', locator: this._guestAgentIssuesWidget },
     ];
     const missing: string[] = [];
@@ -979,7 +981,7 @@ export default class VmListOverviewWidgetsComponent extends BaseComponent {
       .waitFor({ state: 'visible', timeout })
       .then(() => true)
       .catch(() => false);
-    if (!statusesVisible) missing.push('vm-statuses-card');
+    if (!statusesVisible) missing.push('vm-list-statuses-card');
 
     const guestVisible = await this._guestAgentIssuesWidget
       .waitFor({ state: 'visible', timeout })

@@ -1,5 +1,6 @@
 import { T1, T1_TAG } from '@/data-models/allure-constants';
 import { expect, test } from '@/fixtures/templates-fixture';
+import { isNativeVmTemplatesEnabled } from '@/utils/feature-flags';
 import { setupTemplateFromResource } from '@/utils/template-test-helpers';
 import { setupTestNamespace } from '@/utils/test-setup-helpers';
 
@@ -28,6 +29,7 @@ test.describe.serial('Template creation flows', { tag: [T1_TAG, '@tier1-template
     templatesPage,
     utils,
   }) => {
+    test.skip(!(await isNativeVmTemplatesEnabled(apiClient)), 'Native VM templates not enabled');
     test.setTimeout(utils.TestTimeouts.TEST_VM_CREATION);
 
     const vmName = utils.generateRandomVmName('vm-save-tpl');
@@ -181,14 +183,23 @@ test.describe.serial('Template creation flows', { tag: [T1_TAG, '@tier1-template
       utils,
     );
 
-    if (!utils.EnvVariables.onAcm) {
-      await pageCommons.switchProject(sharedNs);
-    }
-
-    await templatesPage.navigateToTemplatesViaUI();
-    await templatesPage.filterTemplatesByName(templateName);
-    const isVisible = await templatesPage.isTemplateVisible(templateName);
-    expect.soft(isVisible, `Template ${templateName} should be visible before deletion`).toBe(true);
+    await expect
+      .poll(
+        async () => {
+          await templatesPage.navigateToTemplatesViaUI();
+          if (!utils.EnvVariables.onAcm) {
+            await pageCommons.switchProject(sharedNs);
+          }
+          await templatesPage.filterTemplatesByName(templateName);
+          return templatesPage.isTemplateVisible(templateName);
+        },
+        {
+          message: `Template ${templateName} should be visible before deletion`,
+          timeout: utils.TestTimeouts.DEFAULT,
+          intervals: [2_000, 3_000, 5_000],
+        },
+      )
+      .toBe(true);
 
     await templatesPage.deleteTemplateFromList(templateName);
     await templatesPage.waitForTemplateRowDetached(templateName);

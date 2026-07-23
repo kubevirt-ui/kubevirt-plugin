@@ -27,10 +27,7 @@ const CPUMemory: FC<CPUMemoryProps> = ({ vm, vmi }) => {
   const memory = readableSizeUnit(getMemory(vmi) || getMemory(vm));
 
   return (
-    <span
-      data-test="virtual-machine-overview-details-cpu-memory"
-      id="virtual-machine-overview-details-cpu-memory"
-    >
+    <span data-test="cpu-memory-value" id="virtual-machine-overview-details-cpu-memory">
       {t('{{cpu}} CPU | {{memory}} Memory', { cpu, memory })}
     </span>
   );

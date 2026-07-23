@@ -9,7 +9,7 @@ export default class VmDetailComponent extends PageCommons {
   private readonly _actionsMenuButton = this.testId('actions-menu-button');
   private readonly _alertsCard = this.locator('.alerts-card__drawer');
   private readonly _connectingText = this.locator('text=Connecting');
-  private readonly _cpuMemoryButton = this.testId('virtual-machine-overview-details-cpu-memory');
+  private readonly _cpuMemoryButton = this.testId('cpu-memory-value');
   private readonly _deletionProtectionCheckbox = this.locator('input#deletion-protection');
   private readonly _deletionProtectionLabel = this.locator('label[for="deletion-protection"]');
   private readonly _enableBtn = this.locator('button:has-text("Enable")');

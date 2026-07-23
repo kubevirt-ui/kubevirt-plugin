@@ -628,7 +628,17 @@ export default class TemplatesPage extends PageCommons {
    * Navigates to Templates page via sidebar UI click, falling back to URL navigation.
    */
   async navigateToTemplatesViaUI(): Promise<void> {
-    await this.clickNavTemplates();
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      await this.clickNavTemplates();
+      if (/template/i.test(this.page.url())) {
+        await this.page
+          .getByRole('heading', { name: 'Templates', level: 1 })
+          .waitFor({ state: 'visible', timeout: TestTimeouts.UI_DELAY_MEDIUM })
+          .catch(() => undefined);
+        return;
+      }
+      await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
+    }
   }
 
   async openClusterFilter(): Promise<void> {
@@ -705,7 +715,10 @@ export default class TemplatesPage extends PageCommons {
   /**
    * Sets the template name in the create-template-from-example YAML editor.
    */
-  async setCreateTemplateExampleNameInYamlEditor(templateName: string): Promise<void> {
+  async setCreateTemplateExampleNameInYamlEditor(
+    templateName: string,
+    namespace?: string,
+  ): Promise<void> {
     await this.page.waitForSelector('.monaco-editor', {
       state: 'visible',
       timeout: TestTimeouts.ELEMENT_WAIT,
@@ -753,9 +766,13 @@ export default class TemplatesPage extends PageCommons {
       throw new Error('Could not get create-template YAML editor content');
     }
 
-    const updated = content
+    let updated = content
       .replace(/\bname: example\b/, `name: ${templateName}`)
       .replace(/vm\.kubevirt\.io\/template: example\b/, `vm.kubevirt.io/template: ${templateName}`);
+
+    if (namespace) {
+      updated = updated.replace(/^(\s*namespace:\s+)\S+/m, `$1${namespace}`);
+    }
 
     await this.fillYamlEditor(updated);
   }

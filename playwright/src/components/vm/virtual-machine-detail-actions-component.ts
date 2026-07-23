@@ -479,7 +479,7 @@ export default class VirtualMachineDetailActionsComponent extends PageCommons {
         return false;
       }
 
-      const cpuMemExists = await this.testId('virtual-machine-overview-details-cpu-memory')
+      const cpuMemExists = await this.testId('cpu-memory-value')
         .isVisible()
         .catch(() => false);
       if (!cpuMemExists) {

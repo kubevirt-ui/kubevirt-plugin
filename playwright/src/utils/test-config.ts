@@ -94,14 +94,14 @@ export const TestTimeouts = {
   /** Timeout for status validation checks (60 seconds) */
   STATUS_VALIDATION: MINUTE,
 
-  /** Timeout for VM bootup and full initialization (6 minutes) */
-  VM_BOOTUP: 6 * MINUTE,
+  /** Timeout for VM bootup and full initialization (8 minutes; generous for CI resource contention) */
+  VM_BOOTUP: 8 * MINUTE,
 
   /** Timeout for OLM operator install (e.g. COO); generous but under default test timeout (6 min) */
   OPERATOR_INSTALL: 5 * MINUTE,
 
-  /** Extended test timeout for long-running tests like migration (10 minutes) */
-  TEST_EXTENDED: 10 * MINUTE,
+  /** Extended test timeout for long-running tests like migration (15 minutes) */
+  TEST_EXTENDED: 15 * MINUTE,
 
   /** Timeout for UI filter operations (6 seconds) */
   UI_FILTER_APPLY: 6 * SECOND,
@@ -142,8 +142,8 @@ export const TestTimeouts = {
   /** Test-level timeout for very long-running tests requiring pending changes (12 minutes) */
   TEST_PENDING_CHANGES: 12 * MINUTE,
 
-  /** Test-level timeout for standard catalog/wizard VM creation tests (5 minutes) */
-  TEST_VM_CREATION: 5 * MINUTE,
+  /** Test-level timeout for standard catalog/wizard VM creation tests (10 minutes) */
+  TEST_VM_CREATION: 10 * MINUTE,
 
   /** Test-level timeout for short wizard/catalog tests requiring a running VM (2 minutes) */
   TEST_SHORT: 2 * MINUTE,

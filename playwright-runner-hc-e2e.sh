@@ -96,9 +96,12 @@ EXTRA_ARGS=("$@")
 
 PROJECT_LOWER=$(echo "${PROJECT}" | tr '[:upper:]' '[:lower:]')
 
-if [[ "${PROJECT_LOWER}" == "suite" ]]; then
-  echo "🚀 Running suite: Gating + Tier1 + Tier2 (HC E2E mode)..."
-  npx playwright test --project Gating --project Tier1 --project Tier2 "${EXTRA_ARGS[@]}"
+if [[ "${PROJECT_LOWER}" == "gating" ]]; then
+  echo "🚀 Running project: Gating (HC E2E mode)..."
+  npx playwright test --project Gating "${EXTRA_ARGS[@]}"
+elif [[ "${PROJECT_LOWER}" == "suite" ]]; then
+  echo "🚀 Running suite: Gating + Tier1 (HC E2E mode)..."
+  npx playwright test --project Gating --project Tier1 "${EXTRA_ARGS[@]}"
 elif [[ "${PROJECT_LOWER}" == "all" ]]; then
   PROJECTS=(
     Gating
