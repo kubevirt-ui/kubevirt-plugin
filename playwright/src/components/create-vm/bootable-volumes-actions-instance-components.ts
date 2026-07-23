@@ -14,7 +14,7 @@ import type { Page } from '@playwright/test';
  */
 export class BootableVolumeDetailComponent extends BaseComponent {
   private readonly _deleteBtn = this.locator('button:has-text("Delete")');
-  private readonly _resourceTitle = this.locator('[data-test-id="resource-title"]');
+  private readonly _resourceTitle = this.testId('resource-title');
   private readonly _roleTab = this.locator('[role="tab"]');
 
   constructor(page: Page) {
@@ -134,7 +134,7 @@ export class BootableVolumeDetailComponent extends BaseComponent {
   }
 
   async getStatusText(): Promise<string> {
-    const statusText = this.locator('[data-test="status-text"]');
+    const statusText = this.testId('status-text');
     await statusText.waitFor({
       state: 'visible',
       timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
@@ -172,12 +172,12 @@ export class BootableVolumeDetailComponent extends BaseComponent {
     timeout: number = TestTimeouts.DATA_VOLUME_STATUS,
   ): Promise<boolean> {
     try {
+      const statusLocator = this.testId('status-text');
+      await statusLocator.waitFor({ state: 'attached', timeout });
+      const statusEl = await statusLocator.elementHandle();
       await this.page.waitForFunction(
-        ({ selector, expected }) => {
-          const element = document.querySelector(selector);
-          return element?.textContent?.trim() === expected;
-        },
-        { selector: '[data-test="status-text"]', expected: expectedStatus.trim() },
+        ({ el, expected }) => el?.textContent?.trim() === expected,
+        { el: statusEl, expected: expectedStatus.trim() },
         { timeout },
       );
       return true;
@@ -243,21 +243,21 @@ export class CreateVmInstanceTypesComponent extends BaseComponent {
     '.create-vm-instance-type-footer button',
     { hasText: 'Customize VirtualMachine' },
   );
-  private readonly _dialogModalDescription = this.locator(
-    '[data-test="dialog-modal"] #description',
-  );
-  private readonly _filterDropdownToggle = this.locator('[data-test-id="filter-dropdown-toggle"]');
+  private readonly _dialogModalDescription = this.testId('dialog-modal').locator('#description');
+  private readonly _filterDropdownToggle = this.testId('filter-dropdown-toggle');
   private readonly _instanceTypeHelpText = this.locator(
     '.create-vm-instance-type-section__HelpTextIcon:has-text("From the Volume table, select a bootable volume to boot your VirtualMachine")',
   );
-  private readonly _instancetypesTab = this.locator('[data-test="instancetypes-tab"]');
+  private readonly _instancetypesTab = this.testId('instancetypes-tab');
   private readonly _instanceTypesVmDetailsSection = this.locator(
     '.instancetypes-vm-details-section',
   );
   private readonly _instancetypesVmDetailsSectionPlaceholderSearchFolder = this.locator(
     '.instancetypes-vm-details-section [placeholder="Search group"]',
   );
-  private readonly _nameFilterInput = this.locator('[data-test="name-filter-input"]');
+  private readonly _nameFilterInput = this.testId('item-filter')
+    .or(this.testId('name-filter-input'))
+    .first();
   private readonly _nameVmname = this.locator('[name="vmname"]');
   private readonly _rootRedHatProvidedBtn = this.locator(
     '#root button:has-text("Red Hat provided")',
@@ -293,9 +293,7 @@ export class CreateVmInstanceTypesComponent extends BaseComponent {
 
       await this.page.waitForTimeout(TestTimeouts.UI_DELAY_MEDIUM);
 
-      const sourceTypeSelect = this.locator(
-        '[data-test="dialog-modal"] [data-test-id="source-type-select"]',
-      );
+      const sourceTypeSelect = this.testId('dialog-modal').getByTestId('source-type-select');
       await sourceTypeSelect.waitFor({
         state: 'visible',
         timeout: TestTimeouts.UI_ACTION_COMPLETE,
@@ -303,13 +301,13 @@ export class CreateVmInstanceTypesComponent extends BaseComponent {
       await this.robustClick(sourceTypeSelect);
 
       await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
-      const registryOption = this.locator('[data-test-id="use-registry"]');
+      const registryOption = this.testId('use-registry');
       await this.robustClick(registryOption);
 
       await this.page.waitForTimeout(TestTimeouts.UI_DELAY_MEDIUM);
 
-      const containerImageInput = this.locator(
-        '[data-test="dialog-modal"] [data-test-id="volume-registry-container-source-input"]',
+      const containerImageInput = this.testId('dialog-modal').getByTestId(
+        'volume-registry-container-source-input',
       );
       await containerImageInput.waitFor({
         state: 'visible',
@@ -317,8 +315,8 @@ export class CreateVmInstanceTypesComponent extends BaseComponent {
       });
       await containerImageInput.fill(registryUrl);
 
-      const usernameInput = this.locator(
-        '[data-test="dialog-modal"] [data-test-id="volume-registry-container-source-username"]',
+      const usernameInput = this.testId('dialog-modal').getByTestId(
+        'volume-registry-container-source-username',
       );
       await usernameInput.waitFor({
         state: 'visible',
@@ -326,8 +324,8 @@ export class CreateVmInstanceTypesComponent extends BaseComponent {
       });
       await usernameInput.fill(username);
 
-      const passwordInput = this.locator(
-        '[data-test="dialog-modal"] [data-test-id="volume-registry-container-source-password"]',
+      const passwordInput = this.testId('dialog-modal').getByTestId(
+        'volume-registry-container-source-password',
       );
       await passwordInput.waitFor({
         state: 'visible',
@@ -335,8 +333,8 @@ export class CreateVmInstanceTypesComponent extends BaseComponent {
       });
       await passwordInput.fill(password);
 
-      const cronExpInput = this.locator(
-        '[data-test="dialog-modal"] input[data-test-id="volume-registry-retain-cron-expression"]',
+      const cronExpInput = this.testId('dialog-modal').locator(
+        '[data-test="volume-registry-retain-cron-expression"]',
       );
       await cronExpInput.scrollIntoViewIfNeeded();
       await cronExpInput.waitFor({
@@ -346,14 +344,12 @@ export class CreateVmInstanceTypesComponent extends BaseComponent {
       await cronExpInput.clear();
       await cronExpInput.fill(cronExpression);
 
-      const volumeNameInput = this.locator(
-        '[data-test="dialog-modal"] #volume-name, [data-test="dialog-modal"] #name',
-      ).first();
+      const volumeNameInput = this.testId('dialog-modal').locator('#volume-name, #name').first();
       await volumeNameInput.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ACTION_COMPLETE });
       await volumeNameInput.fill(volumeName);
 
-      const selectPreferenceButton = this.locator(
-        '[data-test="dialog-modal"] button:has-text("Select preference")',
+      const selectPreferenceButton = this.testId('dialog-modal').locator(
+        'button:has-text("Select preference")',
       );
       await selectPreferenceButton.scrollIntoViewIfNeeded();
       await selectPreferenceButton.waitFor({
@@ -380,8 +376,8 @@ export class CreateVmInstanceTypesComponent extends BaseComponent {
       });
       await this.robustClick(preferenceOption);
 
-      const selectInstanceButton = this.locator(
-        '[data-test="dialog-modal"] button:has-text("Select InstanceType")',
+      const selectInstanceButton = this.testId('dialog-modal').locator(
+        'button:has-text("Select InstanceType")',
       );
       await selectInstanceButton.scrollIntoViewIfNeeded();
       await selectInstanceButton.waitFor({
@@ -449,24 +445,22 @@ export class CreateVmInstanceTypesComponent extends BaseComponent {
 
       await this.page.waitForTimeout(TestTimeouts.UI_DELAY_MEDIUM);
 
-      const uploadInput = this.locator('[data-test="dialog-modal"] input[type="file"]');
+      const uploadInput = this.testId('dialog-modal').locator('input[type="file"]');
 
       await uploadInput.setInputFiles(isoFilePath);
 
-      const isoCheckbox = this.locator('[data-test="dialog-modal"] input[id="iso-checkbox"]');
+      const isoCheckbox = this.testId('dialog-modal').locator('input[id="iso-checkbox"]');
       const isChecked = await isoCheckbox.isChecked().catch(() => false);
       if (!isChecked) {
         await isoCheckbox.check({ force: true });
       }
 
-      const volumeNameInput = this.locator(
-        '[data-test="dialog-modal"] #volume-name, [data-test="dialog-modal"] #name',
-      ).first();
+      const volumeNameInput = this.testId('dialog-modal').locator('#volume-name, #name').first();
       await volumeNameInput.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ACTION_COMPLETE });
       await volumeNameInput.fill(volumeName);
 
-      const selectPreferenceButton = this.locator(
-        '[data-test="dialog-modal"] button:has-text("Select preference")',
+      const selectPreferenceButton = this.testId('dialog-modal').locator(
+        'button:has-text("Select preference")',
       );
       await selectPreferenceButton.waitFor({
         state: 'visible',
@@ -486,8 +480,8 @@ export class CreateVmInstanceTypesComponent extends BaseComponent {
       );
       await this.robustClick(preferenceOption);
 
-      const selectInstanceButton = this.locator(
-        '[data-test="dialog-modal"] button:has-text("Select InstanceType")',
+      const selectInstanceButton = this.testId('dialog-modal').locator(
+        'button:has-text("Select InstanceType")',
       );
       await selectInstanceButton.waitFor({
         state: 'visible',
@@ -631,16 +625,15 @@ export class CreateVmInstanceTypesComponent extends BaseComponent {
 
   async filterVolumeByName(volumeName = 'fedora'): Promise<boolean> {
     try {
-      await this.locator(
-        '.create-vm-instance-type-section input[data-test-id="item-filter"]',
-      ).waitFor({
+      const itemFilter = this.locator('.create-vm-instance-type-section').locator(
+        '[data-test="item-filter"]',
+      );
+      await itemFilter.waitFor({
         state: 'visible',
         timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
       });
 
-      await this.locator('.create-vm-instance-type-section input[data-test-id="item-filter"]').fill(
-        volumeName,
-      );
+      await itemFilter.fill(volumeName);
 
       await this.page.waitForTimeout(TestTimeouts.UI_DELAY_EXTRA);
 
@@ -762,9 +755,9 @@ export class CreateVmInstanceTypesComponent extends BaseComponent {
 
   async isEnvironmentEditorVisible(): Promise<boolean> {
     try {
-      await this.locator(
-        '.wizard-environment-tab, .environment-form__form, [data-test="save-button"]',
-      )
+      await this.locator('.wizard-environment-tab')
+        .or(this.locator('.environment-form__form'))
+        .or(this.testId('save-button'))
         .first()
         .waitFor({ state: 'attached', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
       return true;

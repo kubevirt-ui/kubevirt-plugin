@@ -4,15 +4,13 @@ import type { Page } from '@playwright/test';
 
 export default class VmConfigurationComponent extends PageCommons {
   private readonly _bootManagementBtn = this.locator('button:has-text("Boot management")');
-  private readonly _cloudInitEditButton = this.locator('[data-test-id="undefined-edit"]');
+  private readonly _cloudInitEditButton = this.testId('undefined-edit');
   private readonly _cloudInitPasswordInput = this.locator('#cloudinit-password');
   private readonly _cloudInitUsernameInput = this.locator('#cloudinit-user');
   private readonly _configurationSearchAutocompleteSearchInput = this.locator(
     '#ConfigurationSearch-autocomplete-search input',
   );
-  private readonly _cpuMemoryButton = this.locator(
-    '[data-test-id="virtual-machine-overview-details-cpu-memory"]',
-  );
+  private readonly _cpuMemoryButton = this.testId('virtual-machine-overview-details-cpu-memory');
 
   private readonly _headlessCheckbox = this.locator('input[id="headless-mode"]');
 
@@ -26,13 +24,13 @@ export default class VmConfigurationComponent extends PageCommons {
 
   private readonly _tabModal = this.locator('#tab-modal');
 
-  private readonly _tabModalSaveButton = this.locator('#tab-modal [data-test="save-button"]');
-
-  private readonly _vmConfigurationDetails = this.locator(
-    '[data-test-id="vm-configuration-details"]',
+  private readonly _tabModalSaveButton = this.locator('#tab-modal').locator(
+    '[data-test="save-button"]',
   );
 
-  private readonly _vmDetailSaveButton = this.locator('[data-test="save-button"]');
+  private readonly _vmConfigurationDetails = this.testId('vm-configuration-details');
+
+  private readonly _vmDetailSaveButton = this.testId('save-button');
 
   constructor(page: Page) {
     super(page);
@@ -50,7 +48,7 @@ export default class VmConfigurationComponent extends PageCommons {
     },
   ): Promise<void> {
     if (vmData.description) {
-      const descButton = this.locator(`button[data-test-id="${vmName}-description"]`);
+      const descButton = this.testId(`${vmName}-description`);
       await descButton.waitFor({ state: 'visible', timeout: TestTimeouts.VM_CREATION });
       await this.robustClick(descButton);
       const descTextarea = this._tabModal.locator('textarea[aria-label="description text area"]');
@@ -72,7 +70,7 @@ export default class VmConfigurationComponent extends PageCommons {
         timeout: TestTimeouts.VM_CREATION,
       });
       await this.robustClick(bootManagementButton);
-      const bootModeButton = this.locator(`button[data-test-id="${vmName}-boot-method"]`);
+      const bootModeButton = this.testId(`${vmName}-boot-method`);
       await bootModeButton.waitFor({ state: 'visible', timeout: TestTimeouts.VM_CREATION });
       await this.robustClick(bootModeButton);
       await this._tabModal.waitFor({
@@ -96,7 +94,7 @@ export default class VmConfigurationComponent extends PageCommons {
     }
 
     if (vmData.workload) {
-      const workloadButton = this.locator(`button[data-test-id="${vmName}-workload-profile"]`);
+      const workloadButton = this.testId(`${vmName}-workload-profile`);
       await workloadButton.waitFor({ state: 'visible', timeout: TestTimeouts.VM_CREATION });
       await this.robustClick(workloadButton);
       await this._tabModal.waitFor({
@@ -115,7 +113,7 @@ export default class VmConfigurationComponent extends PageCommons {
     }
 
     if (vmData.hostname) {
-      const hostnameButton = this.locator(`button[data-test-id="${vmName}-hostname"]`);
+      const hostnameButton = this.testId(`${vmName}-hostname`);
       await hostnameButton.waitFor({ state: 'visible', timeout: TestTimeouts.VM_CREATION });
       await this.robustClick(hostnameButton);
       const hostnameInput = this.locator('input[id="hostname"]');
@@ -168,7 +166,7 @@ export default class VmConfigurationComponent extends PageCommons {
       RerunOnFailure: 'Rerun on failure',
     };
     try {
-      const editButton = this.locator('button[data-test-id="run-strategy"]');
+      const editButton = this.testId('run-strategy');
       await editButton.waitFor({
         state: 'visible',
         timeout: TestTimeouts.UI_VISIBILITY_QUICK,
@@ -214,7 +212,7 @@ export default class VmConfigurationComponent extends PageCommons {
     try {
       await this.openVmActionsDropdown();
 
-      const actionItem = this.locator('[data-test-id="vm-action-change-run-strategy"]');
+      const actionItem = this.testId('vm-action-change-run-strategy');
       await actionItem.waitFor({
         state: 'visible',
         timeout: TestTimeouts.SHORT_WAIT,
@@ -282,7 +280,7 @@ export default class VmConfigurationComponent extends PageCommons {
 
   async getRunStrategyValue(): Promise<string> {
     try {
-      const runStrategyGroup = this.locator('[data-test-id="run-strategy"]').first();
+      const runStrategyGroup = this.testId('run-strategy').first();
       await runStrategyGroup.waitFor({
         state: 'visible',
         timeout: TestTimeouts.UI_VISIBILITY_QUICK,
@@ -321,27 +319,27 @@ export default class VmConfigurationComponent extends PageCommons {
 
   async navigateToConfigurationInitialRun() {
     await this.navigateToConfigurationTab();
-    await super.navigateToTab(this.locator('[data-test-id="vm-configuration-initial"]'));
+    await super.navigateToTab(this.testId('vm-configuration-initial'));
   }
 
   async navigateToConfigurationMetadata() {
     await this.navigateToConfigurationTab();
-    await super.navigateToTab(this.locator('[data-test-id="vm-configuration-metadata"]'));
+    await super.navigateToTab(this.testId('vm-configuration-metadata'));
   }
 
   async navigateToConfigurationTab() {
     await super.navigateToTab(
-      this.locator('[data-test-id="horizontal-link-Configuration"]'),
+      this.testId('horizontal-link-Configuration'),
       TestTimeouts.UI_ACTION_COMPLETE,
     );
   }
 
   async navigateToConsole() {
-    await super.navigateToTab(this.locator('[data-test-id="horizontal-link-Console"]'));
+    await super.navigateToTab(this.testId('horizontal-link-Console'));
   }
 
   async navigateToYAML() {
-    await super.navigateToTab(this.locator('[data-test-id="horizontal-link-YAML"]'));
+    await super.navigateToTab(this.testId('horizontal-link-YAML'));
   }
 
   async restoreTemplateDefaults(): Promise<void> {
@@ -450,7 +448,7 @@ export default class VmConfigurationComponent extends PageCommons {
         await this.robustClick(bootManagementButton);
       }
 
-      const bootModeButton = this.locator(`button[data-test-id="${vmName}-boot-method"]`);
+      const bootModeButton = this.testId(`${vmName}-boot-method`);
       await bootModeButton.waitFor({ state: 'visible', timeout: TestTimeouts.VM_CREATION });
       const bootModeText = await bootModeButton.textContent();
       return bootModeText?.includes(expectedBootMode) ?? false;
@@ -605,7 +603,7 @@ export default class VmConfigurationComponent extends PageCommons {
 
   async verifyDescription(vmName: string, expectedDescription: string): Promise<boolean> {
     try {
-      const descButton = this.locator(`button[data-test-id="${vmName}-description"]`);
+      const descButton = this.testId(`${vmName}-description`);
       await descButton.waitFor({ state: 'visible', timeout: TestTimeouts.VM_CREATION });
       const descText = await descButton.textContent();
       return descText?.includes(expectedDescription) ?? false;
@@ -616,9 +614,9 @@ export default class VmConfigurationComponent extends PageCommons {
 
   async verifyFolderVisible(folderName: string, _namespace?: string): Promise<boolean> {
     try {
-      const folderElement = this.locator(
-        '[data-test-id="virtual-machine-overview-details-folder"]',
-      ).filter({ hasText: folderName });
+      const folderElement = this.testId('virtual-machine-overview-details-folder').filter({
+        hasText: folderName,
+      });
       await folderElement.waitFor({ state: 'visible', timeout: TestTimeouts.UI_VISIBILITY_QUICK });
       return await folderElement.isVisible().catch(() => false);
     } catch {
@@ -656,7 +654,7 @@ export default class VmConfigurationComponent extends PageCommons {
 
   async verifyHostname(vmName: string, expectedHostname: string): Promise<boolean> {
     try {
-      const hostnameButton = this.locator(`button[data-test-id="${vmName}-hostname"]`);
+      const hostnameButton = this.testId(`${vmName}-hostname`);
       await hostnameButton.waitFor({ state: 'visible', timeout: TestTimeouts.VM_CREATION });
       const hostnameText = await hostnameButton.textContent();
       return hostnameText?.includes(expectedHostname) ?? false;
@@ -666,7 +664,7 @@ export default class VmConfigurationComponent extends PageCommons {
   }
 
   async verifyWorkload(vmName: string, expectedWorkload: string): Promise<boolean> {
-    const workloadLocator = this.locator(`button[data-test-id="${vmName}-workload-profile"]`);
+    const workloadLocator = this.testId(`${vmName}-workload-profile`);
     try {
       await workloadLocator.waitFor({
         state: 'visible',

@@ -58,7 +58,7 @@ export default class VmWizardComputeCustomizationComponent extends BaseComponent
 
   async editSchedulingRunStrategy(strategy: string): Promise<boolean> {
     try {
-      const editButton = this.locator('button[data-test-id="run-strategy"]');
+      const editButton = this.testId('run-strategy');
       await editButton.waitFor({
         state: 'visible',
         timeout: TestTimeouts.UI_VISIBILITY_QUICK,
@@ -218,7 +218,7 @@ export default class VmWizardComputeCustomizationComponent extends BaseComponent
   async getSchedulingRunStrategy(): Promise<string> {
     try {
       const panel = this._roleTabpanel;
-      const dd = panel.locator('[data-test-id="run-strategy"]').first();
+      const dd = panel.getByTestId('run-strategy').first();
       return (await dd.textContent({ timeout: TestTimeouts.SHORT_WAIT }))?.trim() || '';
     } catch {
       return '';
@@ -249,16 +249,16 @@ export default class VmWizardComputeCustomizationComponent extends BaseComponent
 
   async getStorageTabDisks(): Promise<string[]> {
     const panel = this._roleTabpanel;
-    const diskList = panel.locator('[data-test="vm-disk-list"]');
+    const diskList = panel.getByTestId('vm-disk-list');
     await diskList.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
-    const firstDisk = diskList.locator('[data-test-id^="disk-"]').first();
+    const firstDisk = diskList.locator('[data-test^="disk-"]').first();
     await firstDisk.waitFor({ state: 'attached', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
 
-    const allDiskEls = diskList.locator('[data-test-id]');
+    const allDiskEls = diskList.locator('[data-test]');
     const count = await allDiskEls.count();
     const disks: string[] = [];
     for (let i = 0; i < count; i++) {
-      const testId = await allDiskEls.nth(i).getAttribute('data-test-id');
+      const testId = await allDiskEls.nth(i).getAttribute('data-test');
       if (
         testId &&
         testId.startsWith('disk-') &&
@@ -356,7 +356,7 @@ export default class VmWizardComputeCustomizationComponent extends BaseComponent
 
   async selectUserProvidedInstanceTypeByName(name: string): Promise<void> {
     const row = this.locator('tbody tr.pf-m-clickable').filter({
-      has: this.locator(`[data-test-id="${name}"]`),
+      has: this.testId(name),
     });
     await row.first().waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
     await this.robustClick(row.first());
@@ -546,7 +546,7 @@ export default class VmWizardComputeCustomizationComponent extends BaseComponent
         .isVisible({ timeout: TestTimeouts.UI_ELEMENT_VISIBILITY })
         .catch(() => false),
       sysprepSection: await panel
-        .locator('[data-test-id="sysprep-button"]')
+        .getByTestId('sysprep-button')
         .isVisible({ timeout: TestTimeouts.UI_ELEMENT_VISIBILITY })
         .catch(() => false),
     };
@@ -572,7 +572,7 @@ export default class VmWizardComputeCustomizationComponent extends BaseComponent
     await panel.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
     return {
       labelsEditButton: await panel
-        .locator('[data-test-id$="-labels-edit"]')
+        .locator('[data-test$="-labels-edit"]')
         .first()
         .isVisible({ timeout: TestTimeouts.UI_ELEMENT_VISIBILITY })
         .catch(() => false),
@@ -594,7 +594,7 @@ export default class VmWizardComputeCustomizationComponent extends BaseComponent
     const panel = this._roleTabpanel;
     return {
       interfaceTable: await panel
-        .locator('[data-test="wizard-network-interfaces-table"]')
+        .getByTestId('wizard-network-interfaces-table')
         .isVisible({ timeout: TestTimeouts.SHORT_WAIT })
         .catch(() => false),
       addButton: await panel
@@ -688,11 +688,11 @@ export default class VmWizardComputeCustomizationComponent extends BaseComponent
     await panel.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
     return {
       sshAccessField: await panel
-        .locator('[data-test-id="ssh-access"]')
+        .getByTestId('ssh-access')
         .isVisible({ timeout: TestTimeouts.UI_ELEMENT_VISIBILITY })
         .catch(() => false),
       publicKeyEditButton: await panel
-        .locator('[data-test-id="public-ssh-key-edit"]')
+        .getByTestId('public-ssh-key-edit')
         .isVisible({ timeout: TestTimeouts.UI_ELEMENT_VISIBILITY })
         .catch(() => false),
     };
@@ -719,7 +719,7 @@ export default class VmWizardComputeCustomizationComponent extends BaseComponent
     const panel = this._roleTabpanel;
     return {
       diskList: await panel
-        .locator('[data-test="vm-disk-list"]')
+        .getByTestId('vm-disk-list')
         .isVisible({ timeout: TestTimeouts.SHORT_WAIT })
         .catch(() => false),
       addButton: await panel
@@ -732,7 +732,7 @@ export default class VmWizardComputeCustomizationComponent extends BaseComponent
         .isVisible({ timeout: TestTimeouts.SHORT_WAIT })
         .catch(() => false),
       windowsDriversCheckbox: await panel
-        .locator('[data-test-id="cdrom-drivers"]')
+        .locator('[data-test="cdrom-drivers"]')
         .isVisible({ timeout: TestTimeouts.SHORT_WAIT })
         .catch(() => false),
     };

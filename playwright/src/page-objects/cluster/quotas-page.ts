@@ -8,8 +8,8 @@ export default class QuotasPage extends BasePage {
     'a:has-text("Learn more about managing VM quotas with AAQ")',
   );
 
-  private readonly _createButton = this.locator('[data-test="item-create"]');
-  private readonly _pageHeading = this.locator('[data-test="page-heading"] h1');
+  private readonly _createButton = this.testId('item-create');
+  private readonly _pageHeading = this.testId('page-heading').locator('h1');
   private readonly _roleMenuitemHasTextWithForm = this.locator(
     '[role="menuitem"]:has-text("With form")',
   );
@@ -40,7 +40,9 @@ export default class QuotasPage extends BasePage {
   }
 
   async deleteQuotaFromList(quotaName: string): Promise<void> {
-    const kebab = this.locator(`tr:has-text("${quotaName}") [data-test="actions-dropdown"] button`);
+    const kebab = this.locator(`tr:has-text("${quotaName}")`)
+      .getByTestId('actions-dropdown')
+      .locator('button');
     await kebab.waitFor({ state: 'visible', timeout: TestTimeouts.DEFAULT });
     await this.robustClick(kebab);
     await this.page.waitForTimeout(500);
@@ -50,7 +52,7 @@ export default class QuotasPage extends BasePage {
     await this.robustClick(deleteOption.first());
     await this.page.waitForTimeout(500);
 
-    const confirmBtn = this.locator('[data-test="save-button"]:has-text("Delete")');
+    const confirmBtn = this.testId('save-button').filter({ hasText: 'Delete' });
     await confirmBtn.waitFor({ state: 'visible', timeout: TestTimeouts.SHORT_WAIT });
     await this.robustClick(confirmBtn);
     await this.page.waitForTimeout(2000);
@@ -227,7 +229,7 @@ export default class QuotasPage extends BasePage {
 
   async verifyFormViewSelected(): Promise<boolean> {
     try {
-      const formRadio = this.locator('[data-test="form-view-input"]');
+      const formRadio = this.testId('form-view-input');
       return await formRadio.isChecked();
     } catch {
       return false;

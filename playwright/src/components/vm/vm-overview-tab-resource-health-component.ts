@@ -11,20 +11,14 @@ export default class VmOverviewTabResourceHealthComponent extends BaseComponent 
     'Storage allocated',
   ] as const;
 
-  private readonly _clusterResourcesCard = this.locator('[data-test="cluster-resources-card"]');
-  private readonly _clusterStatusWidget = this.locator('[data-test="cluster-status-widget"]');
-  private readonly _clusterUtilizationWidget = this.locator(
-    '[data-test="cluster-utilization-widget"]',
-  );
-  private readonly _guestAgentIssuesWidget = this.locator(
-    '[data-test="guest-agent-issues-widget"]',
-  );
-  private readonly _migrationsWidget = this.locator('[data-test="migrations-widget"]');
-  private readonly _resourceAllocationWidget = this.locator(
-    '[data-test="resource-allocation-widget"]',
-  );
-  private readonly _vmAlertsWidget = this.locator('[data-test="vm-alerts-widget"]');
-  private readonly _vmStatusesCard = this.locator('[data-test="vm-statuses-card"]');
+  private readonly _clusterResourcesCard = this.testId('cluster-resources-card');
+  private readonly _clusterStatusWidget = this.testId('cluster-status-widget');
+  private readonly _clusterUtilizationWidget = this.testId('cluster-utilization-widget');
+  private readonly _guestAgentIssuesWidget = this.testId('guest-agent-issues-widget');
+  private readonly _migrationsWidget = this.testId('migrations-widget');
+  private readonly _resourceAllocationWidget = this.testId('resource-allocation-widget');
+  private readonly _vmAlertsWidget = this.testId('vm-alerts-widget');
+  private readonly _vmStatusesCard = this.testId('vm-statuses-card');
 
   constructor(page: Page) {
     super(page);
@@ -106,20 +100,15 @@ export default class VmOverviewTabResourceHealthComponent extends BaseComponent 
   async expectResourceAllocationDataKeywordsVisible(
     dataLoadTimeout = TestTimeouts.DEFAULT,
   ): Promise<void> {
-    const selector = '[data-test="resource-allocation-widget"] [data-pf-content="true"]';
     const keywords = ['running', 'vCPU', 'MiB', 'GiB'];
-    await this.page.waitForFunction(
-      ({ sel, kws }: { sel: string; kws: string[] }) => {
-        const nodes = document.querySelectorAll(sel);
-        const combined = Array.from(nodes)
-          .map((el) => el.textContent ?? '')
-          .join(' ');
-        const lower = combined.toLowerCase();
-        return kws.every((k) => lower.includes(k.toLowerCase()));
-      },
-      { sel: selector, kws: keywords },
-      { timeout: dataLoadTimeout },
-    );
+    const contentNodes = this._resourceAllocationWidget.locator('[data-pf-content="true"]');
+    await expect(async () => {
+      const texts = await contentNodes.allTextContents();
+      const combined = texts.join(' ').toLowerCase();
+      for (const kw of keywords) {
+        expect(combined).toContain(kw.toLowerCase());
+      }
+    }).toPass({ timeout: dataLoadTimeout });
   }
 
   async getClusterUtilizationMetrics(
@@ -225,9 +214,7 @@ export default class VmOverviewTabResourceHealthComponent extends BaseComponent 
   async getResourceAllocationChartsVisibility(
     timeout = TestTimeouts.DEFAULT,
   ): Promise<{ count: number; allVisible: boolean }> {
-    const charts = this.locator(
-      '[data-test="resource-allocation-widget"] .resource-allocation-widget__chart',
-    );
+    const charts = this._resourceAllocationWidget.locator('.resource-allocation-widget__chart');
     await expect(charts).toHaveCount(4, { timeout });
     let allVisible = true;
     for (let i = 0; i < 4; i++) {
@@ -284,7 +271,7 @@ export default class VmOverviewTabResourceHealthComponent extends BaseComponent 
 
   async isResourceAllocationNoDataVisible(): Promise<boolean> {
     try {
-      const section = this.locator('[data-test="resource-allocation-section"]');
+      const section = this.testId('resource-allocation-section');
       await section.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
       const noData = section.getByText('No data available');
       return (await noData.count()) > 0;
@@ -301,7 +288,7 @@ export default class VmOverviewTabResourceHealthComponent extends BaseComponent 
     const widgets: { name: string; locator: ReturnType<typeof this.locator> }[] = [
       {
         name: 'openshift-virtualization-widget',
-        locator: this.locator('[data-test="openshift-virtualization-widget"]'),
+        locator: this.testId('openshift-virtualization-widget'),
       },
       { name: 'cluster-resources-card', locator: this._clusterResourcesCard },
       { name: 'migrations-widget', locator: this._migrationsWidget },
@@ -434,9 +421,7 @@ export default class VmOverviewTabResourceHealthComponent extends BaseComponent 
   }
 
   async waitForResourceAllocationChartsVisible(timeout = TestTimeouts.DEFAULT): Promise<void> {
-    const charts = this.locator(
-      '[data-test="resource-allocation-widget"] .resource-allocation-widget__chart',
-    );
+    const charts = this._resourceAllocationWidget.locator('.resource-allocation-widget__chart');
     await expect(charts).toHaveCount(4, { timeout });
     for (let i = 0; i < 4; i++) {
       await charts.nth(i).waitFor({ state: 'visible', timeout });

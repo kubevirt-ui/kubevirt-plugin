@@ -79,7 +79,7 @@ export default class CheckupsPage extends PageCommons {
   }
 
   async clickNetworkLatencyTab() {
-    const networkLatencyTab = this.locator('[data-test-id="horizontal-link-Network latency"]');
+    const networkLatencyTab = this.testId('horizontal-link-Network latency');
     await networkLatencyTab.waitFor({ state: 'visible', timeout: TestTimeouts.DEFAULT });
     await this.robustClick(networkLatencyTab);
   }
@@ -128,9 +128,7 @@ export default class CheckupsPage extends PageCommons {
   }
 
   async clickSelfValidationTab() {
-    const selfValidationTabButton = this.locator(
-      '[data-test-id="horizontal-link-Self validation"]',
-    );
+    const selfValidationTabButton = this.testId('horizontal-link-Self validation');
     await selfValidationTabButton.waitFor({
       state: 'visible',
       timeout: TestTimeouts.DEFAULT,
@@ -277,11 +275,11 @@ export default class CheckupsPage extends PageCommons {
   }
 
   /**
-   * Navigates to the Checkups page by clicking the sidebar nav item [data-test-id="checkups-nav-item"].
+   * Navigates to the Checkups page by clicking the sidebar nav item [data-test="checkups-nav-item"].
    * Expands the Virtualization nav section first so the item is visible in Fleet context.
    */
   async navigateToCheckupsViaCheckupsNavItem(): Promise<void> {
-    const checkupsNavItem = this.locator('[data-test-id="checkups-nav-item"]');
+    const checkupsNavItem = this.testId('checkups-nav-item');
     await checkupsNavItem.waitFor({
       state: 'visible',
       timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
@@ -293,7 +291,7 @@ export default class CheckupsPage extends PageCommons {
   }
 
   /**
-   * Navigates to the Checkups page via sidebar UI click (uses [data-test-id="virtualization-checkups-nav-item"] from PageCommons).
+   * Navigates to the Checkups page via sidebar UI click (uses [data-test="virtualization-checkups-nav-item"] from PageCommons).
    */
   async navigateToCheckupsViaUI(): Promise<void> {
     await this.expandVirtualizationNavSection();
@@ -311,7 +309,7 @@ export default class CheckupsPage extends PageCommons {
    */
   async navigateToProjectNetworkCheckupsViaUI(namespace: string): Promise<void> {
     await this.switchToNamespace(namespace);
-    // Direct route is stable across console versions; horizontal tab data-test-id labels vary.
+    // Direct route is stable across console versions; horizontal tab data-test labels vary.
     await this.navigateToProjectNetworkCheckups(namespace);
   }
 

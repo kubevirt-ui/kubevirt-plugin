@@ -302,6 +302,80 @@ export function getClusterTeardownRules(): TeardownRule[] {
       },
     },
     {
+      id: 'cleanup-default-namespace-vms',
+      name: 'Delete stray test VMs from the default namespace',
+      scope: TeardownScope.CLUSTER,
+      onError: 'warn',
+      guard: (ctx) => ctx.shouldCleanupClusterResources,
+      run: async (ctx) => {
+        if (!ctx.apiClient) return;
+        const apiClient = ctx.apiClient;
+        const ns = 'default';
+
+        try {
+          const { items: vms } = await apiClient.listResourcesByKind('vm', ns);
+          const strayVms = vms.filter((vm) => vm.metadata?.name?.startsWith('pw-'));
+
+          if (strayVms.length === 0) return;
+
+          logger.info(`Cleaning up ${strayVms.length} stray test VM(s) from "${ns}" namespace...`);
+          const results = await Promise.allSettled(
+            strayVms.map((vm) => {
+              const name = vm.metadata?.name;
+              if (!name) return Promise.resolve();
+              return apiClient
+                .deleteResourceByKind('vm', name, ns)
+                .then(() => logger.info(`✓ Deleted stray VM: ${ns}/${name}`))
+                .catch((err: unknown) => safeWarn(`Failed to delete VM ${ns}/${name}`, err));
+            }),
+          );
+          const deleted = results.filter((r) => r.status === 'fulfilled').length;
+          logger.success(`Cleaned up ${deleted} stray VM(s) from "${ns}" namespace`);
+        } catch (err: unknown) {
+          safeWarn('Failed to list VMs in default namespace', err);
+        }
+      },
+    },
+    {
+      id: 'cleanup-test-namespace-datavolumes',
+      name: 'Delete stray test DataVolumes from test namespace',
+      scope: TeardownScope.CLUSTER,
+      onError: 'warn',
+      guard: (ctx) => ctx.shouldCleanupClusterResources,
+      run: async (ctx) => {
+        if (!ctx.apiClient || !ctx.testNamespace) return;
+        const apiClient = ctx.apiClient;
+        const ns = ctx.testNamespace;
+
+        try {
+          const { items: dvs } = await apiClient.listResourcesByKind('datavolume', ns);
+          const strayDvs = dvs.filter((dv) => dv.metadata?.name?.startsWith('pw-'));
+
+          if (strayDvs.length === 0) return;
+
+          logger.info(
+            `Cleaning up ${strayDvs.length} stray test DataVolume(s) from "${ns}" namespace...`,
+          );
+          const results = await Promise.allSettled(
+            strayDvs.map((dv) => {
+              const name = dv.metadata?.name;
+              if (!name) return Promise.resolve();
+              return apiClient
+                .deleteResourceByKind('datavolume', name, ns)
+                .then(() => logger.info(`✓ Deleted stray DataVolume: ${ns}/${name}`))
+                .catch((err: unknown) =>
+                  safeWarn(`Failed to delete DataVolume ${ns}/${name}`, err),
+                );
+            }),
+          );
+          const deleted = results.filter((r) => r.status === 'fulfilled').length;
+          logger.success(`Cleaned up ${deleted} stray DataVolume(s) from "${ns}" namespace`);
+        } catch (err: unknown) {
+          safeWarn('Failed to list DataVolumes in test namespace', err);
+        }
+      },
+    },
+    {
       id: 'cleanup-test-namespaces',
       name: 'Delete test namespaces by prefix',
       scope: TeardownScope.CLUSTER,

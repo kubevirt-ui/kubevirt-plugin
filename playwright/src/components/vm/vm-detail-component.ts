@@ -6,48 +6,36 @@ import type { Page } from '@playwright/test';
 import { expect } from '@playwright/test';
 
 export default class VmDetailComponent extends PageCommons {
-  private readonly _actionsMenuButton = this.locator('[data-test="actions-menu-button"]');
+  private readonly _actionsMenuButton = this.testId('actions-menu-button');
   private readonly _alertsCard = this.locator('.alerts-card__drawer');
   private readonly _connectingText = this.locator('text=Connecting');
-  private readonly _cpuMemoryButton = this.locator(
-    '[data-test-id="virtual-machine-overview-details-cpu-memory"]',
-  );
+  private readonly _cpuMemoryButton = this.testId('virtual-machine-overview-details-cpu-memory');
   private readonly _deletionProtectionCheckbox = this.locator('input#deletion-protection');
   private readonly _deletionProtectionLabel = this.locator('label[for="deletion-protection"]');
   private readonly _enableBtn = this.locator('button:has-text("Enable")');
   private readonly _guestSystemLogDisabledText = this.locator(
     'text=Guest system logs are disabled at cluster',
   );
-  private readonly _guestSystemLogText = this.locator(
-    '[data-test-id="vm-diagnostics-guest-system-log"]',
-  );
-  private readonly _horizontalLinkOverview = this.locator(
-    '[data-test-id="horizontal-link-Overview"]',
-  );
+  private readonly _guestSystemLogText = this.testId('vm-diagnostics-guest-system-log');
+  private readonly _horizontalLinkOverview = this.testId('horizontal-link-Overview');
   private readonly _inputSearchInput = this.locator('input[aria-label="Search input"]');
   private readonly _last5Minutes = this.locator('text=Last 5 minutes');
-  private readonly _migrationMenu = this.locator('[data-test-id="migration-menu"]');
+  private readonly _migrationMenu = this.testId('migration-menu');
   private readonly _operatingSystem = this.locator('text=Operating system');
-  private readonly _overviewHardwareDevicesCard = this.locator(
-    '[data-test="overview-hardware-devices-card"]',
-  );
-  private readonly _snapshotsCard = this.locator(
-    '[data-test-id="virtual-machine-overview-snapshots"]',
-  );
+  private readonly _overviewHardwareDevicesCard = this.testId('overview-hardware-devices-card');
+  private readonly _snapshotsCard = this.testId('virtual-machine-overview-snapshots');
 
-  private readonly _successIcon = this.locator('[data-test="success-icon"]');
+  private readonly _successIcon = this.testId('success-icon');
 
   private readonly _utilChart = this.locator('.util-chart');
 
-  private readonly _utilSummaryCpu = this.locator('[data-test-id="util-summary-cpu"]');
+  private readonly _utilSummaryCpu = this.testId('util-summary-cpu');
 
-  private readonly _utilSummaryMemory = this.locator('[data-test-id="util-summary-memory"]');
+  private readonly _utilSummaryMemory = this.testId('util-summary-memory');
 
-  private readonly _utilSummaryNetworkTransfer = this.locator(
-    '[data-test-id="util-summary-network-transfer"]',
-  );
+  private readonly _utilSummaryNetworkTransfer = this.testId('util-summary-network-transfer');
 
-  private readonly _utilSummaryStorage = this.locator('[data-test-id="util-summary-storage"]');
+  private readonly _utilSummaryStorage = this.testId('util-summary-storage');
 
   private readonly _virtualMachinesOverviewTabDisksMain = this.locator(
     '.VirtualMachinesOverviewTabDisks--main',
@@ -57,13 +45,13 @@ export default class VmDetailComponent extends PageCommons {
     '.VirtualMachinesOverviewTabUtilization--main',
   );
 
-  private readonly _vmActionDeleteButton = this.locator('[data-test-id="vm-action-delete"] button');
+  private readonly _vmActionDeleteButton = this.testId('vm-action-delete').locator('button');
 
-  private readonly _vmName = this.locator('[data-test-id="virtual-machine-overview-details-name"]');
+  private readonly _vmName = this.testId('virtual-machine-overview-details-name');
 
-  private readonly _vmOverviewDetailsStatus = this.locator(
-    '[data-test-id="virtual-machine-overview-details-status"] button',
-  );
+  private readonly _vmOverviewDetailsStatus = this.testId(
+    'virtual-machine-overview-details-status',
+  ).locator('button');
 
   private readonly _vncContainer = this.locator('.vnc-container');
 
@@ -108,7 +96,7 @@ export default class VmDetailComponent extends PageCommons {
       timeout: TestTimeouts.UI_ACTION_COMPLETE,
     });
     await this.robustClick(this._vmActionDeleteButton);
-    await this.locator('[data-test="dialog-modal"]').waitFor({
+    await this.testId('dialog-modal').waitFor({
       state: 'visible',
       timeout: TestTimeouts.UI_ACTION_COMPLETE,
     });
@@ -248,7 +236,7 @@ export default class VmDetailComponent extends PageCommons {
   }
 
   async clickVmiByTestId(vmName: string): Promise<void> {
-    const vmiLocator = this.locator(`[data-test-id="${vmName}"]`).first();
+    const vmiLocator = this.testId(vmName).first();
     await vmiLocator.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
     await this.robustClick(vmiLocator);
   }
@@ -364,12 +352,11 @@ export default class VmDetailComponent extends PageCommons {
     });
     await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
 
-    return await this.page.evaluate(() => {
-      const tab = document.querySelector('[data-test-id="horizontal-link-Overview"]');
-      if (!tab) return false;
-      const rect = tab.getBoundingClientRect();
-      return rect.top >= 0 && rect.bottom <= window.innerHeight;
-    });
+    const box = await this._horizontalLinkOverview.boundingBox();
+    if (!box) return false;
+    const viewport = this.page.viewportSize();
+    if (!viewport) return false;
+    return box.y >= 0 && box.y + box.height <= viewport.height;
   }
 
   async isTextVisible(text: string, timeout: number = TestTimeouts.ELEMENT_WAIT): Promise<boolean> {
@@ -387,9 +374,7 @@ export default class VmDetailComponent extends PageCommons {
     timeout: number = TestTimeouts.DEFAULT,
   ): Promise<boolean> {
     try {
-      const vmNameSpan = this.locator('[data-test="vms-treeview"] span', {
-        hasText: vmName,
-      }).first();
+      const vmNameSpan = this.testId('vms-treeview').locator('span', { hasText: vmName }).first();
 
       await vmNameSpan.waitFor({ state: 'visible', timeout });
 
@@ -496,11 +481,11 @@ export default class VmDetailComponent extends PageCommons {
   }
 
   async navigateToDiagnostics() {
-    await super.navigateToTab(this.locator('[data-test-id="horizontal-link-Diagnostics"]'));
+    await super.navigateToTab(this.testId('horizontal-link-Diagnostics'));
   }
 
   async navigateToEvents() {
-    await super.navigateToTab(this.locator('[data-test-id="horizontal-link-Events"]'));
+    await super.navigateToTab(this.testId('horizontal-link-Events'));
   }
 
   async navigateToOverview() {
@@ -664,16 +649,14 @@ export default class VmDetailComponent extends PageCommons {
         return false;
       }
 
-      const createdExists = await this.locator(
-        '[data-test-id="virtual-machine-overview-details-created"]',
-      )
+      const createdExists = await this.testId('virtual-machine-overview-details-created')
         .isVisible()
         .catch(() => false);
       if (!createdExists) {
         return false;
       }
 
-      const osExists = await this.locator('[data-test-id="virtual-machine-overview-details-os"]')
+      const osExists = await this.testId('virtual-machine-overview-details-os')
         .isVisible()
         .catch(() => false);
       if (!osExists) {
@@ -685,9 +668,7 @@ export default class VmDetailComponent extends PageCommons {
         return false;
       }
 
-      const hostnameExists = await this.locator(
-        '[data-test-id="virtual-machine-overview-details-host"]',
-      )
+      const hostnameExists = await this.testId('virtual-machine-overview-details-host')
         .isVisible()
         .catch(() => false);
       if (!hostnameExists) {
@@ -703,10 +684,10 @@ export default class VmDetailComponent extends PageCommons {
       }
 
       if (templateName) {
-        const byTestId = this.locator(`[data-test-id="${templateName}"]`);
+        const byTestId = this.testId(templateName);
         let templateExists = await byTestId.isVisible().catch(() => false);
         if (!templateExists) {
-          const byDataTest = this.locator(`[data-test="${templateName}"]`);
+          const byDataTest = this.locator(`[data-test-id="${templateName}"]`);
           templateExists = await byDataTest.isVisible().catch(() => false);
         }
         if (!templateExists) {
@@ -735,22 +716,19 @@ export default class VmDetailComponent extends PageCommons {
         timeout: TestTimeouts.VM_CREATION,
       });
 
-      const rootInCard = this._virtualMachinesOverviewTabDisksMain.locator(
-        '[data-test-id="disk-rootdisk"]',
-      );
+      const rootInCard = this._virtualMachinesOverviewTabDisksMain.getByTestId('disk-rootdisk');
       await rootInCard.waitFor({ state: 'visible', timeout: TestTimeouts.VM_CREATION });
 
-      const cloudInitInCard = this._virtualMachinesOverviewTabDisksMain.locator(
-        '[data-test-id="disk-cloudinitdisk"], [data-test-id^="disk-cloudinit"]',
-      );
+      const cloudInitInCard = this._virtualMachinesOverviewTabDisksMain
+        .getByTestId('disk-cloudinitdisk')
+        .or(this._virtualMachinesOverviewTabDisksMain.locator('[data-test^="disk-cloudinit"]'));
       try {
         await cloudInitInCard.first().waitFor({
           state: 'visible',
           timeout: TestTimeouts.VM_CREATION,
         });
       } catch {
-        const diskRows =
-          this._virtualMachinesOverviewTabDisksMain.locator('[data-test-id^="disk-"]');
+        const diskRows = this._virtualMachinesOverviewTabDisksMain.locator('[data-test^="disk-"]');
         const diskRowCount = await diskRows.count();
         if (diskRowCount < 2) {
           return false;
@@ -861,14 +839,12 @@ export default class VmDetailComponent extends PageCommons {
 
   async verifyInstanceType(expectedInstanceType: string): Promise<boolean> {
     try {
-      await this.locator('[data-test-id="virtual-machine-overview-details-instance-type"]').waitFor(
-        {
-          state: 'visible',
-          timeout: TestTimeouts.VM_CREATION,
-        },
-      );
-      const instanceTypeText = await this.locator(
-        '[data-test-id="virtual-machine-overview-details-instance-type"]',
+      await this.testId('virtual-machine-overview-details-instance-type').waitFor({
+        state: 'visible',
+        timeout: TestTimeouts.VM_CREATION,
+      });
+      const instanceTypeText = await this.testId(
+        'virtual-machine-overview-details-instance-type',
       ).textContent();
       return instanceTypeText?.includes(expectedInstanceType) ?? false;
     } catch {

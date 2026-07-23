@@ -47,7 +47,7 @@ export function TreeContextMenuMixin<TBase extends Constructor>(Base: TBase) {
       const menu = this.locator('[role="menu"]').first();
       await menu.waitFor({ state: 'visible', timeout: TestTimeouts.DEFAULT });
 
-      const byTestId = menu.locator(`[data-test-id="${itemIdOrText}"]`);
+      const byTestId = menu.getByTestId(itemIdOrText);
       const hasTestId = await byTestId
         .waitFor({ state: 'visible', timeout: TestTimeouts.SHORT_WAIT })
         .then(() => true)
@@ -79,7 +79,7 @@ export function TreeContextMenuMixin<TBase extends Constructor>(Base: TBase) {
         // eslint-disable-next-line @typescript-eslint/no-empty-function
         .catch(() => {});
 
-      const backdrop = this.locator('[data-test="right-click-backdrop"]');
+      const backdrop = this.testId('right-click-backdrop');
       if (await backdrop.isVisible({ timeout: TestTimeouts.SHORT_WAIT }).catch(() => false)) {
         await backdrop.click({ force: true });
         await backdrop
@@ -92,12 +92,12 @@ export function TreeContextMenuMixin<TBase extends Constructor>(Base: TBase) {
     async getTreeViewContextMenuItems(): Promise<
       { testId: string; text: string; disabled: boolean }[]
     > {
-      const menuItems = this.locator('[role="menu"] [data-test-id]');
+      const menuItems = this.locator('[role="menu"] [data-test]');
       await menuItems.first().waitFor({ state: 'visible', timeout: TestTimeouts.DEFAULT });
       const items = await menuItems.all();
       const result: { testId: string; text: string; disabled: boolean }[] = [];
       for (const item of items) {
-        const testId = (await item.getAttribute('data-test-id')) ?? '';
+        const testId = (await item.getAttribute('data-test')) ?? '';
         const text = (await item.locator('.pf-v6-c-menu__item-text').textContent()) ?? '';
         const disabled = await item.evaluate((el) => el.classList.contains('pf-m-disabled'));
         result.push({ testId, text: text.trim(), disabled });

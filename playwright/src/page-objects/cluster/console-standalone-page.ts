@@ -77,7 +77,7 @@ export default class ConsoleStandalonePage extends BasePage {
       const url = this.page.url();
       if (!url.includes('/console/standalone')) return false;
 
-      const detailTabsVisible = await this.locator('[data-test-id="horizontal-link-Overview"]')
+      const detailTabsVisible = await this.testId('horizontal-link-Overview')
         .isVisible()
         .catch(() => false);
 

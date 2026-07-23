@@ -16,7 +16,7 @@ export default class LoginPage extends BasePage {
     '[title^="Log in with"]:not([title*="admin"]), a[href*="idp="]:not([href*="kube%3Aadmin"])',
   );
 
-  private readonly _userDropdownToggle = this.locator('[data-test="user-dropdown-toggle"]');
+  private readonly _userDropdownToggle = this.testId('user-dropdown-toggle');
   constructor(page: Page) {
     super(page);
   }
@@ -112,10 +112,11 @@ export default class LoginPage extends BasePage {
   }
 
   async performLogout() {
-    const loggedUser = this.locator(
-      '[data-test="user-dropdown"], [data-test="username"], [data-test="user-dropdown-toggle"]',
-    ).first();
-    const logoutBtn = this.locator('[data-test="log-out"]');
+    const loggedUser = this.testId('user-dropdown')
+      .or(this.testId('username'))
+      .or(this.testId('user-dropdown-toggle'))
+      .first();
+    const logoutBtn = this.testId('log-out');
     await loggedUser.waitFor({ state: 'visible', timeout: 30000 });
     await loggedUser.scrollIntoViewIfNeeded();
     // PF6 page drawer may overlap the header; use dispatchEvent as fallback
@@ -141,10 +142,10 @@ export default class LoginPage extends BasePage {
     const impersonateItem = this.page.getByRole('menuitem', { name: 'Impersonate User' });
     await impersonateItem.waitFor({ state: 'visible', timeout: 10000 });
     await impersonateItem.click();
-    const usernameInput = this.locator('[data-test="username-input"]');
+    const usernameInput = this.testId('username-input');
     await usernameInput.waitFor({ state: 'visible', timeout: 10000 });
     await usernameInput.fill(username);
-    const impersonateBtn = this.locator('[data-test="impersonate-button"]');
+    const impersonateBtn = this.testId('impersonate-button');
     await impersonateBtn.waitFor({ state: 'visible', timeout: 5000 });
     await impersonateBtn.click();
     // Wait for the impersonation banner to confirm the switch

@@ -5,19 +5,17 @@ import type { Page } from '@playwright/test';
 export default class VmNetworkSshComponent extends BaseComponent {
   private readonly _btnIdLoadBalancer = this.locator('button[id="LoadBalancer"]');
   private readonly _btnIdNodePort = this.locator('button[id="NodePort"]');
-  private readonly _configurationNetworkSubTab = this.locator(
-    '[data-test-id="vm-configuration-network"]',
-  );
+  private readonly _configurationNetworkSubTab = this.testId('vm-configuration-network');
   private readonly _copyFQDNBtn = this.locator('button:has-text("Copy FQDN")');
   private readonly _inProgress = this.locator('text=In progress');
-  private readonly _networkCard = this.locator(
-    '[data-test="overview-network-interfaces-card"], [data-test="vm-network-interface-list"]',
+  private readonly _networkCard = this.testId('overview-network-interfaces-card').or(
+    this.testId('vm-network-interface-list'),
   );
-  private readonly _sshAccessButton = this.locator('[data-test-id="ssh-access"] button');
+  private readonly _sshAccessButton = this.testId('ssh-access').locator('button');
 
-  private readonly _sshServiceTypeSelect = this.locator('[data-test-id="ssh-service-type"]');
+  private readonly _sshServiceTypeSelect = this.testId('ssh-service-type');
 
-  private readonly _vmConfigurationSsh = this.locator('[data-test-id="vm-configuration-ssh"]');
+  private readonly _vmConfigurationSsh = this.testId('vm-configuration-ssh');
 
   constructor(page: Page) {
     super(page);
@@ -130,7 +128,7 @@ export default class VmNetworkSshComponent extends BaseComponent {
 
       await this.robustClick(nodePortOption.first());
 
-      const sshCommandCopy = this.locator('[data-test="ssh-command-copy"]');
+      const sshCommandCopy = this.testId('ssh-command-copy');
       await sshCommandCopy.waitFor({
         state: 'visible',
         timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
@@ -225,13 +223,13 @@ export default class VmNetworkSshComponent extends BaseComponent {
 
   async navigateToConfigurationTab() {
     await super.navigateToTab(
-      this.locator('[data-test-id="horizontal-link-Configuration"]'),
+      this.testId('horizontal-link-Configuration'),
       TestTimeouts.UI_ACTION_COMPLETE,
     );
   }
 
   async navigateToNetworks(): Promise<void> {
-    await super.navigateToTab(this.locator('[data-test-id="horizontal-link-Network interfaces"]'));
+    await super.navigateToTab(this.testId('horizontal-link-Network interfaces'));
   }
 
   async navigateToNetworkTabFromOverview(): Promise<void> {
@@ -309,9 +307,9 @@ export default class VmNetworkSshComponent extends BaseComponent {
 
   async verifyNetworkInterfacesCard(): Promise<boolean> {
     try {
-      const networkInterfacesTable = this.locator(
-        '[data-test="overview-network-interfaces-card"], [data-test="overview-network-interfaces-table"], [data-test="vm-network-interface-list"]',
-      );
+      const networkInterfacesTable = this.testId('overview-network-interfaces-card')
+        .or(this.testId('overview-network-interfaces-table'))
+        .or(this.testId('vm-network-interface-list'));
       await networkInterfacesTable.first().waitFor({
         state: 'visible',
         timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
@@ -328,7 +326,7 @@ export default class VmNetworkSshComponent extends BaseComponent {
 
   async verifySecretOnSSHTab(secretName: string): Promise<boolean> {
     try {
-      const secretLocator = this.locator(`[data-test-id="${secretName}"]`);
+      const secretLocator = this.testId(secretName);
       await secretLocator.waitFor({
         state: 'visible',
         timeout: TestTimeouts.INSTANCE_TYPE_VERIFICATION,

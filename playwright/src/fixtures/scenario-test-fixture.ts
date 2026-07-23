@@ -14,12 +14,6 @@ import { expect, test as base } from '@playwright/test';
 
 import type { CleanupFixture } from './cleanup-fixture';
 import { createCleanupFixture } from './cleanup-fixture';
-import type { SharedResourceFixture } from './shared-resource-fixture';
-import {
-  type SharedResourceKubernetesSteps,
-  createSharedResourceFixture,
-  SharedResourceManager,
-} from './shared-resource-fixture';
 import type { TestUtilsType } from './test-utils';
 import { getTestUtils } from './test-utils';
 
@@ -38,7 +32,6 @@ type MutableTestInfo = TestInfo & {
 interface WorkerFixtures {
   testConfig: SharedTestConfig;
   _apiClient: RequestContextClient;
-  _sharedResourceManager: SharedResourceManager;
   _workerContext: BrowserContext;
   /** Worker-scoped RequestContextClient for direct use in specs and beforeAll hooks. */
   apiClient: RequestContextClient;
@@ -51,7 +44,6 @@ interface TestFixtures {
   _autoResourceCheck: void;
   _autoVirtNavigation: void;
   cleanup: CleanupFixture;
-  sharedResources: SharedResourceFixture;
   constants: TestUtilsType;
   timeouts: typeof TestTimeouts;
 }
@@ -62,17 +54,16 @@ const _test = base.extend<TestFixtures, WorkerFixtures>({
     async ({}, use, testInfo) => {
       await use();
 
-      const info = testInfo as TimeoutAwareTestInfo & MutableTestInfo;
+      const info = testInfo as TimeoutAwareTestInfo;
       if (!info._actionTimeouts?.length || info.status === 'skipped') return;
 
       const first = info._actionTimeouts[0];
-      const reason = `Timeout in ${first.method}: ${first.message.split('\n')[0].slice(0, 200)}`;
+      const isBrowserClosed = first.message === 'browser context closed';
+      const reason = isBrowserClosed
+        ? 'browser context closed'
+        : `Timeout in ${first.method}: ${first.message.split('\n')[0].slice(0, 200)}`;
 
-      testInfo.annotations.push({ type: 'skip', description: reason });
-      info.status = 'skipped';
-      info.expectedStatus = 'skipped';
-      if (Array.isArray(info.errors)) info.errors = [];
-      if (Array.isArray(info._errors)) info._errors = [];
+      testInfo.annotations.push({ type: 'fixme', description: reason });
     },
     { auto: true },
   ],
@@ -159,12 +150,23 @@ const _test = base.extend<TestFixtures, WorkerFixtures>({
           }
 
           // Dismiss Core platform "Welcome to OpenShift" guided tour modal.
-          const tourSkipBtn = page.locator('[data-test="tour-step-footer-secondary"]');
+          const tourSkipBtn = page.getByTestId('tour-step-footer-secondary');
           const hasTour = await tourSkipBtn
             .isVisible({ timeout: TestTimeouts.RETRY_DELAY })
             .catch(() => false);
           if (hasTour) {
             await tourSkipBtn.click({ force: true }).catch(() => undefined);
+            await page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
+          }
+
+          // Dismiss onboarding popover ("We've maximized your workspace") if present.
+          const onboardingDismiss = page.locator('[data-test="onboarding-dismiss-btn"]');
+          if (
+            await onboardingDismiss
+              .isVisible({ timeout: TestTimeouts.RETRY_DELAY })
+              .catch(() => false)
+          ) {
+            await onboardingDismiss.click({ force: true }).catch(() => undefined);
             await page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
           }
 
@@ -188,7 +190,9 @@ const _test = base.extend<TestFixtures, WorkerFixtures>({
 
           await page.waitForTimeout(consoleStabilizationMs);
 
-          const perspectiveToggle = page.locator('[data-test-id="perspective-switcher-toggle"]');
+          const perspectiveToggle = page
+            .getByTestId('perspective-switcher-toggle')
+            .or(page.locator('[data-test-id="perspective-switcher-toggle"]'));
           const virtNavSection = page.locator('[data-quickstart-id="qs-nav-sec-virtualization"]');
 
           const navType = await Promise.race([
@@ -206,7 +210,8 @@ const _test = base.extend<TestFixtures, WorkerFixtures>({
 
             if (!inTargetPerspective) {
               const perspectiveOption = page
-                .locator('[data-test-id="perspective-switcher-menu-option"]')
+                .getByTestId('perspective-switcher-menu-option')
+                .or(page.locator('[data-test-id="perspective-switcher-menu-option"]'))
                 .filter({
                   has: page.locator('.pf-v6-c-menu__item-text', {
                     hasText: /^Virtualization$/,
@@ -216,7 +221,9 @@ const _test = base.extend<TestFixtures, WorkerFixtures>({
               const selectionAttempts = 3;
               for (let selAttempt = 1; selAttempt <= selectionAttempts; selAttempt++) {
                 try {
-                  const toggle = page.locator('[data-test-id="perspective-switcher-toggle"]');
+                  const toggle = page
+                    .getByTestId('perspective-switcher-toggle')
+                    .or(page.locator('[data-test-id="perspective-switcher-toggle"]'));
                   await toggle.waitFor({ state: 'visible', timeout: TestTimeouts.DEFAULT });
                   await toggle.click();
                   await perspectiveOption.waitFor({
@@ -481,25 +488,6 @@ const _test = base.extend<TestFixtures, WorkerFixtures>({
     { scope: 'worker' },
   ],
 
-  _sharedResourceManager: [
-    async ({}, use) => {
-      const manager = new SharedResourceManager();
-
-      try {
-        await use(manager);
-      } finally {
-        if (manager.count > 0) {
-          try {
-            await manager.cleanupAll();
-          } catch {
-            await Promise.resolve();
-          }
-        }
-      }
-    },
-    { scope: 'worker' },
-  ],
-
   _workerContext: [
     async ({ browser }, use) => {
       const playwrightDir = FileUtils.resolvePath(__dirname, '..', '..');
@@ -528,15 +516,6 @@ const _test = base.extend<TestFixtures, WorkerFixtures>({
     },
     { scope: 'worker' },
   ],
-
-  sharedResources: async ({ _apiClient, _sharedResourceManager }, use) => {
-    await use(
-      createSharedResourceFixture(
-        _sharedResourceManager,
-        _apiClient as unknown as SharedResourceKubernetesSteps,
-      ),
-    );
-  },
 });
 
 export const test = _test;
@@ -547,13 +526,6 @@ export const baseTest = test;
 export { expect };
 
 export type { CleanupFixture } from './cleanup-fixture';
-export type {
-  SharedDataVolumeConfig,
-  SharedResourceFixture,
-  SharedResourceKubernetesSteps,
-  SharedResourceResult,
-  SharedVmConfig,
-} from './shared-resource-fixture';
 export type {
   CleanupOptions,
   CleanupResult,

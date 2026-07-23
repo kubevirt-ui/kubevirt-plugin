@@ -9,7 +9,7 @@ export default class ModalComponent extends BaseComponent {
   private readonly _welcomeModalCloseButton = this.locator(
     '[id="guided-tour-modal"] button[aria-label="Close"]',
   );
-  readonly _confirmActionButton = this.locator('[data-test="confirm-action"]');
+  readonly _confirmActionButton = this.testId('save-button');
 
   constructor(page: Page) {
     super(page);

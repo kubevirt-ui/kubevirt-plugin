@@ -1,14 +1,13 @@
 #!/usr/bin/env bash
 # ────────────────────────────────────────────────────────────────────────────
-# playwright-runner.sh — Run migration Playwright projects for kubevirt-plugin
+# playwright-runner.sh — Run Playwright projects for kubevirt-plugin
 #
 # Usage:
 #   ./playwright-runner.sh [project] [extra-args...]
 #
 # Examples:
-#   ./playwright-runner.sh migration-gating
-#   ./playwright-runner.sh migration-tier1 --workers=2
-#   ./playwright-runner.sh migration-nonpriv --headed
+#   ./playwright-runner.sh Gating
+#   ./playwright-runner.sh suite --workers=4
 #   ./playwright-runner.sh all
 # ────────────────────────────────────────────────────────────────────────────
 set -euo pipefail
@@ -59,6 +58,7 @@ if [[ -z "${PROJECT}" ]]; then
   echo "  migration-nonpriv      Non-privileged user specs"
   echo "  migration-migrations   Migration specs"
   echo "  migration-settings     Settings specs"
+  echo "  suite                  Run Gating + Tier1 + Tier2 together"
   echo "  all                    Run all projects"
   exit 1
 fi
@@ -75,7 +75,12 @@ detect_urls
 
 EXTRA_ARGS=("$@")
 
-if [[ "${PROJECT}" == "all" ]]; then
+PROJECT_LOWER=$(echo "${PROJECT}" | tr '[:upper:]' '[:lower:]')
+
+if [[ "${PROJECT_LOWER}" == "suite" ]]; then
+  echo "🚀 Running suite: Gating + Tier1 + Tier2..."
+  npx playwright test --project Gating --project Tier1 --project Tier2 "${EXTRA_ARGS[@]}"
+elif [[ "${PROJECT_LOWER}" == "all" ]]; then
   PROJECTS=(
     Gating
     Tier1

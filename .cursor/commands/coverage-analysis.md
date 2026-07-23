@@ -1,6 +1,9 @@
 # Coverage Analysis
 
-Read-only coverage assessment of the virtualization module. The **repository is the single source of truth** — features are enumerated from `src/views/` and coverage is determined by scanning both `playwright/tests/scenario/*.spec.ts` (new) and `playwright/tests/gating/*.spec.ts` (legacy).
+Read-only coverage assessment of the virtualization module. Uses two complementary methods:
+
+1. **`data-test` / `ouiaId` cross-reference** — matches attributes defined in `src/` against Playwright locator usage
+2. **Feature-surface enumeration** — decomposes `src/views/` routes into testable capabilities and maps them to spec files
 
 ## Input
 
@@ -36,16 +39,17 @@ Read-only coverage assessment of the virtualization module. The **repository is 
 /coverage-analysis wizard --compare=main    # Compare wizard coverage vs main
 ```
 
-## Test Infrastructure Note
+## Test Infrastructure
 
-This project has two test infrastructures:
+| Tier         | Directory                    | Purpose                                   | Status                       |
+| ------------ | ---------------------------- | ----------------------------------------- | ---------------------------- |
+| **Gating**   | `playwright/tests/gating/`   | Smoke: navigation, page loads, basic CRUD | Must always pass, no retries |
+| **Tier 1**   | `playwright/tests/tier1/`    | Single-resource CRUD lifecycle            | Active                       |
+| **Tier 2**   | `playwright/tests/tier2/`    | Cross-module integration                  | Active                       |
+| **Settings** | `playwright/tests/settings/` | Cluster-wide config (runs in isolation)   | Active                       |
+| **API**      | `playwright/tests/api/`      | API contract validation                   | Active                       |
 
-| Infrastructure      | Directory                    | Fixture                                           | Status                      |
-| ------------------- | ---------------------------- | ------------------------------------------------- | --------------------------- |
-| **Scenario** (new)  | `playwright/tests/scenario/` | `scenarioTest` from `@/fixtures/scenario-fixture` | Active — new tests go here  |
-| **Gating** (legacy) | `playwright/tests/gating/`   | `gatingTest` from `scenario-test-fixture`         | Frozen — no new tests added |
-
-Coverage analysis scans **both** directories. Proposals for new coverage always target `playwright/tests/scenario/`.
+Coverage analysis scans **all** directories. Proposals for new coverage target `tier1/` or `tier2/` based on complexity.
 
 ## Constraints
 
@@ -58,24 +62,83 @@ Coverage analysis scans **both** directories. Proposals for new coverage always 
 - **Networking excluded** — owned by a separate team, always excluded
 - **Comparison is non-destructive** — `--compare` reads the other branch via `git show`/`git ls-tree`, never checks it out
 
-## Test Structure
-
-Tests are organized across two directories:
-
-| Directory                    | Purpose                                 |
-| ---------------------------- | --------------------------------------- |
-| `playwright/tests/scenario/` | New scenario tests (POC infrastructure) |
-| `playwright/tests/gating/`   | Legacy gating tests                     |
-
 ## Workflow
 
-### Phase 1: Feature Inventory (source enumeration)
+### Phase 1: UI Automation ID Cross-Reference
+
+This is the primary, code-level coverage signal. It maps every `data-test` attribute and `ouiaId` prop in `src/` to its usage (or absence) in Playwright locators.
+
+#### Step 1a: Extract all automation IDs from `src/`
+
+```bash
+# Static data-test IDs: data-test="foo"
+rg 'data-test="([^"]+)"' src/ --glob '*.tsx' --glob '*.ts' -o \
+  | sed 's/.*data-test="//;s/"//' | sort -u > /tmp/src-ids.txt
+
+# Static ouiaId values: ouiaId="foo"
+rg 'ouiaId="([^"]+)"' src/ --glob '*.tsx' --glob '*.ts' -o \
+  | sed 's/.*ouiaId="//;s/"//' | sort -u >> /tmp/src-ids.txt
+
+# Dynamic prefixes: data-test={`foo-${var}`} or ouiaId={`foo-${var}`}
+rg '(?:data-test|ouiaId)=\{`([^$`]+)' src/ --glob '*.tsx' --glob '*.ts' -o \
+  | sed 's/.*=\{`//' | sort -u > /tmp/src-ids-dynamic.txt
+
+# Merge into single input
+cat /tmp/src-ids.txt /tmp/src-ids-dynamic.txt | sort -u > /tmp/src-ids-all.txt
+```
+
+#### Step 1b: Extract all automation ID references from Playwright
+
+```bash
+# Collect all locator patterns:
+# testId('id'), getByTestId('id'), ouia('id'),
+# [data-test="id"], [data-ouia-component-id="id"], [data-test-id="id"]
+{
+  rg "testId\(" playwright/ --glob '*.ts' --glob '*.tsx' \
+    | perl -nle "print \$1 if /testId\(['\"]([^'\"]+)['\"]/"
+  rg "getByTestId\(" playwright/ --glob '*.ts' --glob '*.tsx' \
+    | perl -nle "print \$1 if /getByTestId\(['\"]([^'\"]+)['\"]/"
+  rg "ouia\(" playwright/ --glob '*.ts' --glob '*.tsx' \
+    | perl -nle "print \$1 if /ouia\(['\"]([^'\"]+)['\"]/"
+  rg '\[data-test="[^"]+"\]' playwright/ --glob '*.ts' --glob '*.tsx' -o \
+    | grep -oP '(?<=\[data-test=")[^"]+'
+  rg '\[data-ouia-component-id="[^"]+"\]' playwright/ --glob '*.ts' --glob '*.tsx' -o \
+    | grep -oP '(?<=\[data-ouia-component-id=")[^"]+'
+  rg '\[data-test-id="[^"]+"\]' playwright/ --glob '*.ts' --glob '*.tsx' -o \
+    | grep -oP '(?<=\[data-test-id=")[^"]+'
+} | sort -u > /tmp/pw-ids.txt
+```
+
+#### Step 1c: Cross-reference
+
+For each ID in `src/`:
+
+- **COVERED** — exact match (or dynamic prefix match) found in Playwright refs
+- **UNCOVERED** — no Playwright reference targets this element
+
+For each ID in Playwright:
+
+- **IN SRC** — the ID exists in our `src/` code
+- **EXTERNAL** — the ID comes from Console SDK, PatternFly, or other external dependencies (not actionable)
+
+#### Step 1d: Map uncovered IDs to source files and feature areas
+
+```bash
+# For each uncovered ID, find ALL source files containing it
+rg -l '(?:data-test|ouiaId).*"<ID>"' src/ --glob '*.tsx' --glob '*.ts'
+
+# Classify by location:
+# - Files under src/views/<route>/ → feature area = <route>
+# - Files under src/utils/components/ → report as "shared" or
+#   resolve to consuming views via rg for the component name
+```
+
+### Phase 2: Feature-Surface Enumeration
 
 Enumerate testable capabilities from `src/views/` for each route in scope:
 
 ```bash
-find src/views/<route> -maxdepth 3 -type d | sort
-find src/views/<route> -name '*.tsx' -o -name '*.ts' | wc -l
+rg --files src/views/<route> --glob '*.tsx' | wc -l
 ```
 
 Decompose each route into discrete testable capabilities:
@@ -86,27 +149,34 @@ Decompose each route into discrete testable capabilities:
 - **Forms/Wizards**: each step renders, template catalog browsing
 - **Navigation**: sidebar items, perspective switching, project switching
 
-### Phase 2: Test Inventory (spec scanning)
+### Phase 3: Test Inventory (spec scanning)
 
-Scan **both** test directories:
+Count spec files and tests per tier:
 
 ```bash
-rg -c "test\('" playwright/tests/scenario/ --type ts
-rg -c "test\('" playwright/tests/gating/ --type ts
-rg "test\('" playwright/tests/scenario/ playwright/tests/gating/ --type ts --no-heading -N
+# Spec file counts per tier
+for tier in gating tier1 tier2 settings api; do
+  files=$(rg --files playwright/tests/$tier --glob '*.spec.ts' | wc -l)
+  tests=$(rg -c 'test\(' playwright/tests/$tier --glob '*.spec.ts' \
+    | awk -F: '{s+=$2}END{print s+0}')
+  echo "$tier: $files specs, $tests tests"
+done
+
+# List all test names for coverage mapping
+rg 'test\(' playwright/tests/ --glob '*.spec.ts' --no-heading -N
 ```
 
-### Phase 3: Coverage Mapping
+### Phase 4: Coverage Mapping
 
-For each capability from Phase 1, determine coverage status:
+Merge signals from Phase 1 (automation ID cross-reference) and Phase 2 (feature enumeration):
 
-| Status       | Criteria                                                                                     |
-| ------------ | -------------------------------------------------------------------------------------------- |
-| **TESTED**   | A Playwright test explicitly exercises this capability (navigates to it, interacts, asserts) |
-| **PARTIAL**  | A spec file exists for the route but doesn't exercise this specific sub-feature              |
-| **UNTESTED** | No Playwright test touches this capability                                                   |
+| Status       | Criteria                                                                                                                                              |
+| ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **TESTED**   | A Playwright spec explicitly exercises this capability (navigates to it, interacts, asserts). Automation ID cross-reference is supplemental evidence. |
+| **PARTIAL**  | A spec exists for the route but doesn't exercise this specific sub-feature, or only some aspects are covered.                                         |
+| **UNTESTED** | No Playwright spec touches this capability. Missing automation IDs reinforce the gap but are not the sole criterion.                                  |
 
-### Phase 4: Scoring
+### Phase 5: Scoring
 
 Per-route:
 
@@ -116,29 +186,47 @@ total = TESTED + PARTIAL + UNTESTED
 score = (tested_count / total) * 100
 ```
 
-### Phase 5: Proposals
+### Phase 6: Proposals
 
 For each UNTESTED capability:
 
-1. **Find existing spec** in `playwright/tests/scenario/`
-2. **Generate proposal**: EXTEND existing scenario spec or NEW scenario spec file
-3. All proposals target `playwright/tests/scenario/` (never legacy gating)
-4. Proposals use the `scenarioTest` fixture with page objects injected via fixture and `apiClient` (`RequestContextClient`) for K8s setup
+1. **Find existing spec** in the appropriate tier directory
+2. **Generate proposal**: EXTEND existing spec or NEW spec file
+3. Proposals use:
+   - `gatingTest` fixture for gating tests
+   - `scenarioTest` fixture for tier1/tier2/settings tests
+   - `apiClient` (`RequestContextClient`) for K8s setup
+   - UI-based navigation (never `page.goto`)
 
-### Phase 6: Output
+### Phase 7: Output
 
 Render the structured report to CLI.
 
-### Phase 7 (only with `--compare`): Branch Comparison
+### Phase 8 (only with `--compare`): Branch Comparison
 
-When `--compare=<branch>` is provided, run Phases 1-4 against the comparison branch
-using git tree inspection (without checking it out), then compute deltas.
+When `--compare=<branch>` is provided, re-run Phases 1-4 against the comparison
+branch using `git show` and `git grep` (never checkout), then compute deltas.
 
 ```bash
+# Verify branch exists
 git rev-parse --verify <branch> 2>/dev/null
+
+# Phase 1 on <branch>: extract automation IDs from branch src/
+git grep -h 'data-test=\|ouiaId=' <branch> -- 'src/**/*.tsx' 'src/**/*.ts' \
+  | perl -nle 'print $1 if /(?:data-test|ouiaId)="([^"]+)"/' | sort -u > /tmp/compare-src-ids.txt
+
+# Phase 1 on <branch>: extract Playwright refs
+git grep -h 'testId\|getByTestId\|ouia\|data-test=\|data-ouia-component-id=' <branch> -- 'playwright/**/*.ts' \
+  | perl -nle 'print $1 if /(?:testId|getByTestId|ouia)\(['\''"]([^'\''"]+)/' > /tmp/compare-pw-ids.txt
+
+# Phase 2-3 on <branch>: feature and test inventory
 git ls-tree -r --name-only <branch> -- src/views/ | sort
 git ls-tree -r --name-only <branch> -- playwright/tests/ | sort
+# Read individual spec files as needed:
 git show <branch>:playwright/tests/<path>
+
+# Compute deltas between current branch and <branch> results
+# Report: new coverage, removed coverage, changed scores
 ```
 
 ## Output Template
@@ -147,8 +235,30 @@ git show <branch>:playwright/tests/<path>
 ## Coverage Analysis: Virtualization Module
 
 **Source of truth:** Repository (current branch)
-**Scope:** <scope> | **Method:** Feature-surface enumeration from src/views/
+**Scope:** <scope> | **Method:** automation ID cross-reference + feature-surface enumeration
 **Overall coverage:** XX% (YY/ZZ testable capabilities covered by Playwright tests)
+
+### Automation ID Cross-Reference Summary
+
+| Metric                                           | Count     |
+| ------------------------------------------------ | --------- |
+| data-test IDs defined in src/                    | NNN       |
+| ouiaId values defined in src/                    | NNN       |
+| IDs referenced in Playwright                     | NNN       |
+| src/ IDs covered by tests                        | NNN (XX%) |
+| src/ IDs uncovered                               | NNN (XX%) |
+| Playwright refs from external (Console SDK / PF) | NNN       |
+
+### Uncovered Elements by Feature Area
+
+| Feature Area      | Uncovered IDs | Element Types          | Impact                 |
+| ----------------- | ------------- | ---------------------- | ---------------------- |
+| migrationpolicies | 9             | List columns           | HIGH — page loads only |
+| storagemigrations | 5             | List cells             | HIGH — no spec files   |
+| clusteroverview   | 7             | Migrations table cells | MEDIUM                 |
+| ...               | ...           | ...                    | ...                    |
+
+> **Note:** vmnetworks is excluded (owned by a separate team).
 
 ### Per-Route Breakdown
 
@@ -160,23 +270,38 @@ git show <branch>:playwright/tests/<path>
 
 ### Priority Gaps (ordered by impact)
 
-| #   | Route     | Untested Feature | Source Evidence      | Proposal                             |
-| --- | --------- | ---------------- | -------------------- | ------------------------------------ |
-| 1   | Settings  | Live migration   | src/views/settings/  | EXTEND: scenario/settings.spec.ts    |
-| 2   | Templates | Clone action     | src/views/templates/ | NEW: scenario/template-clone.spec.ts |
+| #   | Route      | Untested Feature | Uncovered IDs           | Proposal                          |
+| --- | ---------- | ---------------- | ----------------------- | --------------------------------- |
+| 1   | migpol     | List cell values | migration-policy-name…  | EXTEND: tier1/migrationpolicies/… |
+| 2   | storagemig | All list cells   | storage-migration-name… | NEW: tier2/storagemigrations/…    |
 
 ### Summary Statistics
 
 | Metric                      | Value |
 | --------------------------- | ----- |
-| Routes analyzed             | 9     |
+| Routes analyzed             | N     |
 | Total testable capabilities | ZZ    |
 | Capabilities tested         | YY    |
+| Automation ID coverage      | XX%   |
 | Gaps identified             | NN    |
 | Proposals generated         | PP    |
-| Scenario spec files         | N     |
-| Legacy gating spec files    | N     |
+| Spec files (gating)         | N     |
+| Spec files (tier1)          | N     |
+| Spec files (tier2)          | N     |
+| Spec files (settings)       | N     |
 ```
+
+## UI Automation ID Convention
+
+This project uses a **hybrid approach** for UI automation identifiers:
+
+- **`ouiaId` prop** — used on OUIA-compliant PatternFly components (Button, Card, TextInput, Switch, Modal, Toolbar, Checkbox, Radio, Title, DropdownItem, Table, Tr, Menu, Alert, Select). PF renders `data-ouia-component-id` and `data-ouia-component-type` automatically.
+- **`data-test` attribute** — used on plain HTML elements (span, div, a) and non-OUIA PF/custom components (MenuToggle, EmptyState, SelectOption, DescriptionItem, etc.).
+
+In Playwright:
+
+- `this.testId('id')` → matches `data-test` attributes
+- `this.ouia('id')` → matches `data-ouia-component-id` attributes
 
 ## Rules
 
@@ -185,5 +310,6 @@ git show <branch>:playwright/tests/<path>
 - **NEVER run tests** — only scan spec files
 - **NEVER checkout another branch** — `--compare` uses `git ls-tree` and `git show`
 - Use `rg` for fast spec file scanning (not `grep`)
-- Proposals target `playwright/tests/scenario/` only (never legacy gating)
 - Report results even if partial data is available
+- Automation ID cross-reference is the primary coverage signal — always include it
+- External IDs (Console SDK, PatternFly) are reported but not counted as gaps

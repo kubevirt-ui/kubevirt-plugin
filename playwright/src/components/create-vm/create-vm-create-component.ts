@@ -3,41 +3,39 @@ import { TestTimeouts } from '@/utils/test-config';
 import type { Page } from '@playwright/test';
 
 export default class CreateVmCreateComponent extends BaseComponent {
-  private readonly _bootCd = this.locator('[data-test-id="boot-cd"]');
+  private readonly _bootCd = this.testId('boot-cd');
   private readonly _btnPlaceholderSelectProject = this.locator(
     'button[placeholder="Select project..."]',
   );
   private readonly _btnPlaceholderSelectTLSCertificate = this.locator(
     'button[placeholder="Select TLS certificate"]',
   );
-  private readonly _cdBootSource = this.locator('[data-test-id="cd-boot-source"]');
-  private readonly _createFolderButton = this.locator('button:has-text("Create group")');
+  private readonly _cdBootSource = this.testId('cd-boot-source');
+  private readonly _createFolderButton = this.locator('button:has-text("Create folder")');
   private readonly _customizeVirtualMachineFooterButton = this.locator(
     '.create-vm-instance-type-footer button',
     { hasText: 'Customize VirtualMachine' },
   );
-  private readonly _customizeVmBtn = this.locator('[data-test-id="customize-vm-btn"]');
-  private readonly _diskBootSource = this.locator('[data-test-id="disk-boot-source"]');
-  private readonly _diskBootSourceContainerSourceInput = this.locator(
-    '[data-test-id="disk-boot-source-container-source-input"]',
+  private readonly _customizeVmBtn = this.testId('customize-vm-btn');
+  private readonly _diskBootSource = this.testId('disk-boot-source');
+  private readonly _diskBootSourceContainerSourceInput = this.testId(
+    'disk-boot-source-container-source-input',
   );
-  private readonly _diskBootSourceHttpSourceInput = this.locator(
-    '[data-test-id="disk-boot-source-http-source-input"]',
+  private readonly _diskBootSourceHttpSourceInput = this.testId(
+    'disk-boot-source-http-source-input',
   );
   private readonly _idQuickCreateFormPlaceholderSearchFolder = this.locator(
-    '[id="quick-create-form"] [placeholder="Search group"]',
+    '[id="quick-create-form"] [placeholder="Search folder"]',
   );
-  private readonly _quickCreateVmBtn = this.locator('[data-test-id="quick-create-vm-btn"]');
+  private readonly _quickCreateVmBtn = this.testId('quick-create-vm-btn');
   private readonly _startAfterCreationCheckbox = this.locator(
     '#start-after-create-checkbox',
   ).first();
-  private readonly _templateCatalogVmNameInput = this.locator(
-    '[data-test-id="template-catalog-vm-name-input"]',
-  );
+  private readonly _templateCatalogVmNameInput = this.testId('template-catalog-vm-name-input');
   private readonly _tLSCertificate = this.locator('[aria-label="TLS certificate"]');
   private readonly _tlsCertRequiredCheckbox = this.locator('#tls-certificate-required');
 
-  private readonly _windowsDriversCheckbox = this.locator('[data-test-id="cdrom-drivers"]');
+  private readonly _windowsDriversCheckbox = this.testId('cdrom-drivers');
 
   constructor(page: Page) {
     super(page);
@@ -174,12 +172,13 @@ export default class CreateVmCreateComponent extends BaseComponent {
       timeout: TestTimeouts.RESOURCE_CREATION,
     });
 
+    const vmNameEl = await this._templateCatalogVmNameInput.elementHandle();
     await this.page.waitForFunction(
-      (selector) => {
-        const el = document.querySelector(selector) as HTMLInputElement | null;
-        return el && !el.disabled && !el.readOnly;
+      (el) => {
+        const input = el as HTMLInputElement | null;
+        return input && !input.disabled && !input.readOnly;
       },
-      '[data-test-id="template-catalog-vm-name-input"]',
+      vmNameEl,
       { timeout: TestTimeouts.RESOURCE_CREATION },
     );
 
@@ -269,7 +268,7 @@ export default class CreateVmCreateComponent extends BaseComponent {
 
     switch (diskSource) {
       case 'URL':
-        await this.robustClick(this.locator('[data-test-id="http"]'));
+        await this.robustClick(this.testId('http'));
         if (value) {
           await this._diskBootSourceHttpSourceInput.waitFor({
             state: 'visible',
@@ -279,7 +278,7 @@ export default class CreateVmCreateComponent extends BaseComponent {
         }
         break;
       case 'Registry':
-        await this.robustClick(this.locator('[data-test-id="registry"]'));
+        await this.robustClick(this.testId('registry'));
         if (value) {
           await this._diskBootSourceContainerSourceInput.waitFor({
             state: 'visible',
@@ -288,18 +287,14 @@ export default class CreateVmCreateComponent extends BaseComponent {
           await this._diskBootSourceContainerSourceInput.fill(value);
         }
         if (username) {
-          await this.locator('[data-test-id="disk-boot-source-container-source-username"]').fill(
-            username,
-          );
+          await this.testId('disk-boot-source-container-source-username').fill(username);
         }
         if (password) {
-          await this.locator('[data-test-id="disk-boot-source-container-source-password"]').fill(
-            password,
-          );
+          await this.testId('disk-boot-source-container-source-password').fill(password);
         }
         break;
       case 'PVC':
-        await this.robustClick(this.locator('[data-test-id="pvc-clone"]'));
+        await this.robustClick(this.testId('pvc-clone'));
         break;
       case 'Upload': {
         const uploadMenuItem = this.locator('.pf-v6-c-menu__item-main', {

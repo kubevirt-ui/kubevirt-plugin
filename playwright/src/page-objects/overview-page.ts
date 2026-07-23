@@ -13,7 +13,9 @@ export class OverviewPage {
 
   constructor(private readonly page: Page) {
     this.heading = page.locator('h1').filter({ hasText: 'VirtualMachines' }).first();
-    this.perspectiveToggle = page.locator('[data-test-id="perspective-switcher-toggle"]');
+    this.perspectiveToggle = page
+      .getByTestId('perspective-switcher-toggle')
+      .or(page.locator('[data-test-id="perspective-switcher-toggle"]'));
   }
 
   /**
@@ -25,7 +27,8 @@ export class OverviewPage {
     await this.page.waitForLoadState('networkidle');
 
     const virtOption = this.page
-      .locator('[data-test-id="perspective-switcher-menu-option"]')
+      .getByTestId('perspective-switcher-menu-option')
+      .or(this.page.locator('[data-test-id="perspective-switcher-menu-option"]'))
       .filter({ hasText: 'Virtualization' });
 
     const deadline = Date.now() + timeout;

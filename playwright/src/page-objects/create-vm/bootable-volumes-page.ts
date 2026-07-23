@@ -92,12 +92,12 @@ export default class BootableVolumesPage extends PageCommons {
       'With form': 'button[role="menuitem"]:has-text("With form")',
       'With YAML': 'button[role="menuitem"]:has-text("With YAML")',
     };
-    await super.clickCreateAndSelectOption('[data-test="item-create"]', optionSelectors[option]);
+    await super.clickCreateAndSelectOption(this.testId('item-create'), optionSelectors[option]);
   }
 
   async clickManageColumnsAndVerifyNamespaceAndClusterInModal(): Promise<boolean> {
     try {
-      const btn = this.locator('[data-test="manage-columns"]');
+      const btn = this.testId('manage-columns');
       await btn.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
       await btn.click();
       const nsVis = await this.locator('#table-column-management-item-namespace')
@@ -163,7 +163,7 @@ export default class BootableVolumesPage extends PageCommons {
   }
 
   async closeRowFilterDropdown(): Promise<void> {
-    const toggle = this.locator('[data-test-id="filter-dropdown-toggle"]');
+    const toggle = this.testId('filter-dropdown-toggle');
     await toggle.click();
   }
 
@@ -398,7 +398,7 @@ export default class BootableVolumesPage extends PageCommons {
     await this._projectFilterButton.click();
   }
   async openRowFilterDropdown(): Promise<void> {
-    const toggle = this.locator('[data-test-id="filter-dropdown-toggle"]');
+    const toggle = this.testId('filter-dropdown-toggle');
     await toggle.waitFor({ state: 'visible', timeout: TestTimeouts.NAVIGATION });
     await this.robustClick(toggle);
     await this.locator('[data-test-row-filter]').first().waitFor({
@@ -438,24 +438,24 @@ export default class BootableVolumesPage extends PageCommons {
   async selectSourceTypeInAddVolumeModal(
     sourceType: 'URL' | 'Registry' | 'Volume' | 'Volume snapshot',
   ): Promise<void> {
-    const sourceTypeMap: Record<string, string> = {
-      URL: '[data-test-id="use-http"]',
-      Registry: '[data-test-id="use-registry"]',
-      Volume: 'button[role="option"]:has-text("Volume"):not(:has-text("snapshot"))',
-      'Volume snapshot': 'button[role="option"]:has-text("Volume snapshot")',
-    };
     await this._addVolumeDialog.waitFor({
       state: 'visible',
       timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
     });
-    const sourceTypeSelect = this._addVolumeDialog.locator('[data-test-id="source-type-select"]');
+    const sourceTypeSelect = this._addVolumeDialog.getByTestId('source-type-select');
     await sourceTypeSelect.waitFor({
       state: 'visible',
       timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
     });
     await this.robustClick(sourceTypeSelect);
     await this.page.waitForTimeout(TestTimeouts.UI_DELAY_MEDIUM);
-    const opt = this.locator(sourceTypeMap[sourceType]);
+    const sourceTypeLocatorMap: Record<string, ReturnType<typeof this.locator>> = {
+      URL: this.testId('use-http'),
+      Registry: this.testId('use-registry'),
+      Volume: this.locator('button[role="option"]:has-text("Volume"):not(:has-text("snapshot"))'),
+      'Volume snapshot': this.locator('button[role="option"]:has-text("Volume snapshot")'),
+    };
+    const opt = sourceTypeLocatorMap[sourceType];
     await opt.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ACTION_COMPLETE });
     await this.robustClick(opt);
     await this.page.waitForTimeout(TestTimeouts.UI_DELAY_MEDIUM);
@@ -471,7 +471,7 @@ export default class BootableVolumesPage extends PageCommons {
     const t = TestTimeouts.UI_DELAY_MEDIUM;
     try {
       if (
-        await this.locator('[data-test-id="local-cluster"]')
+        await this.testId('local-cluster')
           .isVisible({ timeout: t })
           .catch(() => false)
       )
@@ -485,7 +485,7 @@ export default class BootableVolumesPage extends PageCommons {
             .catch(() => false)
         )
           return true;
-        const byId = this.locator(`[data-test-id="${name}"]`);
+        const byId = this.testId(name);
         if (
           (await byId.count()) > 0 &&
           (await byId
@@ -506,7 +506,7 @@ export default class BootableVolumesPage extends PageCommons {
     const t = TestTimeouts.UI_DELAY_MEDIUM;
     try {
       if (
-        await this.locator('[data-test="openshift-virtualization-os-images"]')
+        await this.testId('openshift-virtualization-os-images')
           .isVisible({ timeout: t })
           .catch(() => false)
       )
@@ -520,7 +520,7 @@ export default class BootableVolumesPage extends PageCommons {
             .catch(() => false)
         )
           return true;
-        const byId = this.locator(`[data-test-id="${name}"]`);
+        const byId = this.testId(name);
         if (
           (await byId.count()) > 0 &&
           (await byId
@@ -586,7 +586,7 @@ export default class BootableVolumesPage extends PageCommons {
     timeout = TestTimeouts.DEFAULT,
   ): Promise<boolean> {
     try {
-      const byTestId = this.locator(`[data-test-id="${volumeName}"]`);
+      const byTestId = this.testId(volumeName);
       const byLink = this.locator(`table tbody tr`).filter({
         has: this.page.locator(`a:has-text("${volumeName}")`),
       });
@@ -601,7 +601,7 @@ export default class BootableVolumesPage extends PageCommons {
   async verifyFormCreatedVolumeRowVisible(timeout = 10000): Promise<boolean> {
     try {
       const row = this.locator(
-        '[data-test-id^="pw-bv-form-"], [data-test-id^="pw-bv-registry-"], [data-test-id^="pw-bv-http-"]',
+        '[data-test^="pw-bv-form-"], [data-test^="pw-bv-registry-"], [data-test^="pw-bv-http-"]',
       );
       await row.first().waitFor({ state: 'visible', timeout });
       return await row.first().isVisible();
@@ -631,7 +631,7 @@ export default class BootableVolumesPage extends PageCommons {
     try {
       await this.waitForLoadingComplete(Math.min(timeout / 2, TestTimeouts.UI_DELAY_MEDIUM));
       const tableLocator = this.locator('.kubevirt-table, [class*="c-table"]').first();
-      const createButton = this.locator('[data-test="item-create"]');
+      const createButton = this.testId('item-create');
       let pageIndicator = tableLocator.or(createButton);
       if (indicatorSelectors.length > 0) {
         for (const name of indicatorSelectors) {
@@ -650,7 +650,7 @@ export default class BootableVolumesPage extends PageCommons {
 
   async verifySearchFilterVisible(): Promise<boolean> {
     try {
-      await this.locator('[data-test-id="item-filter"]').waitFor({
+      await this.testId('item-filter').waitFor({
         state: 'visible',
         timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
       });

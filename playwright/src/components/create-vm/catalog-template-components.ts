@@ -12,43 +12,41 @@ export class TemplateDetailComponent extends BaseComponent {
     '.pf-v6-c-description-list__group:has-text("SSH key")',
   );
   private readonly _pfV6CModalBoxBody = this.locator('.pf-v6-c-modal-box__body');
-  private readonly _tableDiskRowRoleGrid = this.locator(
-    'table, [data-test="disk-row"], [role="grid"]',
-  );
-  private readonly _yamlTab = this.locator('[data-test-id="horizontal-link-YAML"]');
+  private readonly _tableDiskRowRoleGrid = this.locator('table')
+    .or(this.testId('disk-row'))
+    .or(this.locator('[role="grid"]'));
+  private readonly _yamlTab = this.testId('horizontal-link-YAML');
 
   constructor(page: Page) {
     super(page);
   }
 
   async clickActionsDropdown() {
-    await this.robustClick(this.locator('[data-test="actions-dropdown"]'));
+    await this.robustClick(this.testId('actions-dropdown'));
   }
 
   async clickCloneTemplate() {
-    await this.robustClick(this.locator('[data-test="actions-dropdown-item-clone"]'));
+    await this.robustClick(this.testId('actions-dropdown-item-clone'));
   }
 
   async clickDeleteTemplate() {
-    await this.robustClick(this.locator('[data-test-id="delete-template"]'));
+    await this.robustClick(this.testId('delete-template'));
   }
 
   async clickEditAnnotations() {
-    await this.robustClick(this.locator('[data-test="actions-dropdown-item-edit-annotations"]'));
+    await this.robustClick(this.testId('actions-dropdown-item-edit-annotations'));
   }
 
   async clickEditBootSource() {
-    await this.robustClick(this.locator('[data-test="actions-dropdown-item-edit-boot-source"]'));
+    await this.robustClick(this.testId('actions-dropdown-item-edit-boot-source'));
   }
 
   async clickEditBootSourceRef() {
-    await this.robustClick(
-      this.locator('[data-test="actions-dropdown-item-edit-boot-source-ref"]'),
-    );
+    await this.robustClick(this.testId('actions-dropdown-item-edit-boot-source-ref'));
   }
 
   async clickEditLabels() {
-    await this.robustClick(this.locator('[data-test="actions-dropdown-item-edit-labels"]'));
+    await this.robustClick(this.testId('actions-dropdown-item-edit-labels'));
   }
 
   async editDetails(templateData: {
@@ -171,7 +169,7 @@ export class TemplateDetailComponent extends BaseComponent {
         }
 
         if (disk.diskSource?.selector) {
-          const diskSourceSelect = this.locator('[data-test-id="disk-source-select"]');
+          const diskSourceSelect = this.testId('disk-source-select');
           await diskSourceSelect.waitFor({
             state: 'visible',
             timeout: TestTimeouts.UI_DELAY_MEDIUM,
@@ -221,21 +219,19 @@ export class TemplateDetailComponent extends BaseComponent {
         }
 
         if (nic.model) {
-          const nicModelSelect = this.locator('[data-test-id="model-select"]');
+          const nicModelSelect = this.testId('model-select');
           await nicModelSelect.waitFor({
             state: 'visible',
             timeout: TestTimeouts.UI_DELAY_MEDIUM,
           });
           await this.robustClick(nicModelSelect);
-          const modelOption = this.locator(`[data-test-id="model-select-${nic.model}"]`);
+          const modelOption = this.testId(`model-select-${nic.model}`);
           await modelOption.waitFor({ state: 'visible', timeout: TestTimeouts.UI_DELAY_MEDIUM });
           await this.robustClick(modelOption);
         }
 
         if (nic.network) {
-          const nicNetworkSelect = this.locator(
-            '[data-test-id="network-attachment-definition-select"]',
-          );
+          const nicNetworkSelect = this.testId('network-attachment-definition-select');
           await nicNetworkSelect.waitFor({
             state: 'visible',
             timeout: TestTimeouts.UI_DELAY_MEDIUM,
@@ -247,15 +243,13 @@ export class TemplateDetailComponent extends BaseComponent {
         }
 
         if (nic.type) {
-          const nicTypeSelect = this.locator('[data-test-id="network-interface-type-select"]');
+          const nicTypeSelect = this.testId('network-interface-type-select');
           await nicTypeSelect.waitFor({
             state: 'visible',
             timeout: TestTimeouts.UI_DELAY_MEDIUM,
           });
           await this.robustClick(nicTypeSelect);
-          const typeOption = this.locator(
-            `button[data-test-id="network-interface-type-select-${nic.type}"]`,
-          );
+          const typeOption = this.testId(`network-interface-type-select-${nic.type}`);
           await typeOption.waitFor({ state: 'visible', timeout: TestTimeouts.UI_DELAY_MEDIUM });
           await this.robustClick(typeOption);
         }
@@ -537,15 +531,15 @@ export class TemplateDetailComponent extends BaseComponent {
   }
 
   async isParametersTabActive(): Promise<boolean> {
-    const activeTab = this.locator(
-      '[data-test-id="horizontal-link-Parameters"][aria-selected="true"], [data-test-id="horizontal-link-Parameters"].pf-m-current',
+    const activeTab = this.testId('horizontal-link-Parameters').and(
+      this.locator('[aria-selected="true"]').or(this.locator('.pf-m-current')),
     );
     return activeTab
       .first()
       .waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY })
       .then(() => true)
       .catch(async () => {
-        const tab = this.locator('[data-test-id="horizontal-link-Parameters"]');
+        const tab = this.testId('horizontal-link-Parameters');
         return tab
           .waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY })
           .then(() => true)
@@ -587,7 +581,7 @@ export class TemplateDetailComponent extends BaseComponent {
   }
 
   async navigateToDisks() {
-    await super.navigateToTab(this.locator('[data-test-id="horizontal-link-Disks"]'));
+    await super.navigateToTab(this.testId('horizontal-link-Disks'));
 
     const diskTable = this._tableDiskRowRoleGrid;
     await diskTable
@@ -599,9 +593,11 @@ export class TemplateDetailComponent extends BaseComponent {
   }
 
   async navigateToNetworks() {
-    await super.navigateToTab(this.locator('[data-test-id="horizontal-link-Network interfaces"]'));
+    await super.navigateToTab(this.testId('horizontal-link-Network interfaces'));
 
-    const networkTable = this.locator('table, [data-test="network-row"], [role="grid"]');
+    const networkTable = this.locator('table')
+      .or(this.testId('network-row'))
+      .or(this.locator('[role="grid"]'));
     await networkTable
       .first()
       .waitFor({ state: 'visible', timeout: TestTimeouts.DEFAULT })
@@ -611,19 +607,19 @@ export class TemplateDetailComponent extends BaseComponent {
   }
 
   async navigateToParameters() {
-    await super.navigateToTab(this.locator('[data-test-id="horizontal-link-Parameters"]'));
+    await super.navigateToTab(this.testId('horizontal-link-Parameters'));
 
     await this.waitForLoadingComplete(5000);
   }
 
   async navigateToScheduling() {
-    await super.navigateToTab(this.locator('[data-test-id="horizontal-link-Scheduling"]'));
+    await super.navigateToTab(this.testId('horizontal-link-Scheduling'));
 
     await this.waitForLoadingComplete(5000);
   }
 
   async navigateToScripts() {
-    await super.navigateToTab(this.locator('[data-test-id="horizontal-link-Scripts"]'));
+    await super.navigateToTab(this.testId('horizontal-link-Scripts'));
 
     await this.waitForLoadingComplete(5000);
   }
@@ -682,7 +678,7 @@ export class TemplateDetailComponent extends BaseComponent {
       this.locator('[data-test*="containerdisk"]'),
       this.locator('td:has-text("containerdisk")'),
       this.locator('[role="cell"]:has-text("containerdisk")'),
-      this.locator('[data-test="disk-row"]:has-text("containerdisk")'),
+      this.testId('disk-row').filter({ hasText: 'containerdisk' }),
     ];
 
     for (const locator of containerdiskLocators) {
@@ -796,7 +792,7 @@ export class TemplateDetailComponent extends BaseComponent {
       this.locator('[data-test*="rootdisk"]'),
       this.locator('td:has-text("rootdisk")'),
       this.locator('[role="cell"]:has-text("rootdisk")'),
-      this.locator('[data-test="disk-row"]:has-text("rootdisk")'),
+      this.testId('disk-row').filter({ hasText: 'rootdisk' }),
     ];
 
     for (const locator of rootdiskLocators) {
@@ -819,8 +815,8 @@ export class TemplateDetailComponent extends BaseComponent {
 
 export class CreateVmTemplateCatalogComponent extends BaseComponent {
   /**
-   * Maps legacy TEMPLATE_DISPLAY_NAMES to metadata names used as data-test-id in CNV 4.99+.
-   * In CNV 4.99+ the card text no longer contains the display name, so we look up by data-test-id.
+   * Maps legacy TEMPLATE_DISPLAY_NAMES to metadata names used as data-test in CNV 4.99+.
+   * In CNV 4.99+ the card text no longer contains the display name, so we look up by data-test.
    */
   private static readonly _displayNameToMetadataName: Record<string, string> = {
     'Red Hat Enterprise Linux 8 VM': 'rhel8-server-small',
@@ -832,49 +828,41 @@ export class CreateVmTemplateCatalogComponent extends BaseComponent {
     'Microsoft Windows Server 2016 VM': 'windows2k16-server-medium',
     'Microsoft Windows Server 2019 VM': 'windows2k19-server-medium',
   };
-  private readonly _architectureFilter = this.locator(
-    '[data-test-id="filter-category-Architecture"]',
-  );
-  private readonly _bootFromCDCheckbox = this.locator('[data-test-id="boot-cd"]');
-  private readonly _bootSourceDropdown = this.locator('[data-test-id="cd-boot-source"]');
-  private readonly _createFolderButton = this.locator('button:has-text("Create group")');
+  private readonly _architectureFilter = this.testId('filter-category-Architecture');
+  private readonly _bootFromCDCheckbox = this.testId('boot-cd');
+  private readonly _bootSourceDropdown = this.testId('cd-boot-source');
+  private readonly _createFolderButton = this.locator('button:has-text("Create folder")');
   private readonly _createVirtualMachineButton = this.locator('button', {
     hasText: 'Create VirtualMachine',
   });
-  private readonly _customizeVirtualMachineButton = this.locator(
-    '[data-test-id="customize-vm-btn"]',
-  );
+  private readonly _customizeVirtualMachineButton = this.testId('customize-vm-btn');
   private readonly _customizeVirtualMachineFooterButton = this.locator(
     '.create-vm-instance-type-footer button',
     { hasText: 'Customize VirtualMachine' },
   );
-  private readonly _diskSourceDropdown = this.locator('[data-test-id="disk-boot-source"]');
-  private readonly _diskSourceRegistryInput = this.locator(
-    '[data-test-id="disk-boot-source-container-source-input"]',
+  private readonly _diskSourceDropdown = this.testId('disk-boot-source');
+  private readonly _diskSourceRegistryInput = this.testId(
+    'disk-boot-source-container-source-input',
   );
-  private readonly _diskSourceURLInput = this.locator(
-    '[data-test-id="disk-boot-source-http-source-input"]',
-  );
+  private readonly _diskSourceURLInput = this.testId('disk-boot-source-http-source-input');
   private readonly _filterDropdownButton = this.locator('button:has-text("Filter")');
 
-  private readonly _quickCreateVmButton = this.locator('[data-test-id="quick-create-vm-btn"]');
+  private readonly _quickCreateVmButton = this.testId('quick-create-vm-btn');
   private readonly _quickFormVmFolderInput = this.locator(
-    '[id="quick-create-form"] [placeholder="Search group"]',
+    '[id="quick-create-form"] [placeholder="Search folder"]',
   );
   private readonly _quickFormVmFolderSelectButton = this.locator('#vm-folder-select button');
-  private readonly _searchCatalogInput = this.locator(
-    '[data-test="search-catalog"] input, input[placeholder="Filter by keyword..."]',
-  );
+  private readonly _searchCatalogInput = this.testId('search-catalog')
+    .locator('input')
+    .or(this.locator('input[placeholder="Filter by keyword..."]'));
 
   private readonly _selectInlineFilterInput = this.locator('#select-inline-filter input');
   private readonly _startAfterCreationCheckbox = this.locator(
     '#start-after-create-checkbox',
   ).first();
 
-  private readonly _templateCatalogVmNameInput = this.locator(
-    '[data-test-id="template-catalog-vm-name-input"]',
-  );
-  private readonly _templatesTab = this.locator('[data-test="templates-tab"]');
+  private readonly _templateCatalogVmNameInput = this.testId('template-catalog-vm-name-input');
+  private readonly _templatesTab = this.testId('templates-tab');
   private readonly _tlsCertRequiredCheckbox = this.locator('#tls-certificate-required');
   private readonly _tlsCertSelectDropdown = this.locator(
     'button[placeholder="Select TLS certificate"]',
@@ -886,7 +874,7 @@ export class CreateVmTemplateCatalogComponent extends BaseComponent {
   private readonly _userProvidedTab = this.locator('#filter-templateScope-user, #user-templates');
   private readonly _vmCatalogGrid = this.locator('#vm-catalog-grid');
 
-  private readonly _windowsDriversCheckbox = this.locator('[data-test-id="cdrom-drivers"]');
+  private readonly _windowsDriversCheckbox = this.testId('cdrom-drivers');
 
   constructor(page: Page) {
     super(page);
@@ -937,7 +925,7 @@ export class CreateVmTemplateCatalogComponent extends BaseComponent {
    * Clicks the "All" button to show all templates.
    */
   async clickAllTemplatesButton() {
-    const allTemplatesButton = this.locator('[data-test-id="catalog-template-filter-all-items"]');
+    const allTemplatesButton = this.testId('catalog-template-filter-all-items');
     const exists = await allTemplatesButton.isVisible({ timeout: 2000 }).catch(() => false);
     if (exists) {
       await this.robustClick(allTemplatesButton);
@@ -947,7 +935,7 @@ export class CreateVmTemplateCatalogComponent extends BaseComponent {
 
   /**
    * Clicks the Customize VirtualMachine button (text-based locator).
-   * This is different from clickCustomizeVmButton which uses a data-test-id.
+   * This is different from clickCustomizeVmButton which uses a data-test.
    */
   async clickCustomizeVirtualMachineButton() {
     await this._customizeVirtualMachineButton.waitFor({
@@ -1007,15 +995,14 @@ export class CreateVmTemplateCatalogComponent extends BaseComponent {
     }
   }
   /**
-   * Clicks on a template card by its metadataName (data-test-id).
+   * Clicks on a template card by its metadataName (data-test).
    *
-   * @param templateMetadataName - The template metadataName (data-test-id attribute)
+   * @param templateMetadataName - The template metadataName (data-test attribute)
    */
   async clickTemplateByMetadataName(templateMetadataName: string) {
-    await super.clickTemplateByTestId(
-      templateMetadataName,
-      `div[data-test-id="${templateMetadataName}"]`,
-    );
+    const card = this.testId(templateMetadataName);
+    await card.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+    await this.robustClick(card);
     await this.page.waitForTimeout(TestTimeouts.UI_DELAY_LONG);
   }
   async clickTemplatesTab() {
@@ -1163,11 +1150,11 @@ export class CreateVmTemplateCatalogComponent extends BaseComponent {
     // CNV 4.99+: try metadata name lookup first
     const metadataName = CreateVmTemplateCatalogComponent._displayNameToMetadataName[templateName];
     if (metadataName) {
-      const byId = this._vmCatalogGrid.locator(`[data-test-id="${metadataName}"]`);
+      const byId = this._vmCatalogGrid.getByTestId(metadataName);
       const countById = await byId.count();
       if (countById > 0) return countById;
     }
-    const wizardCards = this._vmCatalogGrid.locator('[data-test-id]', { hasText: templateName });
+    const wizardCards = this._vmCatalogGrid.locator('[data-test]', { hasText: templateName });
     const wizardCount = await wizardCards.count();
     if (wizardCount > 0) return wizardCount;
     return this._vmCatalogGrid
@@ -1187,12 +1174,13 @@ export class CreateVmTemplateCatalogComponent extends BaseComponent {
       timeout: TestTimeouts.RESOURCE_CREATION,
     });
 
+    const vmNameEl = await this._templateCatalogVmNameInput.elementHandle();
     await this.page.waitForFunction(
-      (selector) => {
-        const el = document.querySelector(selector) as HTMLInputElement | null;
-        return el && !el.disabled && !el.readOnly;
+      (el) => {
+        const input = el as HTMLInputElement | null;
+        return input && !input.disabled && !input.readOnly;
       },
-      '[data-test-id="template-catalog-vm-name-input"]',
+      vmNameEl,
       { timeout: TestTimeouts.RESOURCE_CREATION },
     );
 
@@ -1230,9 +1218,9 @@ export class CreateVmTemplateCatalogComponent extends BaseComponent {
       await this._toggleWizardFilter('only-available', check);
     } else {
       // CNV 4.99+: boot source filter removed from the catalog UI — skip gracefully
-      const bootSourceFilter = this.locator(
-        '[data-test-id="boot-source-available-Boot source available"]',
-      ).locator('input[type="checkbox"]');
+      const bootSourceFilter = this.testId('boot-source-available-Boot source available').locator(
+        'input[type="checkbox"]',
+      );
       const exists = await bootSourceFilter.isVisible({ timeout: 2000 }).catch(() => false);
       if (!exists) {
         return;
@@ -1262,11 +1250,9 @@ export class CreateVmTemplateCatalogComponent extends BaseComponent {
       await this._toggleWizardFilter(wizardFilterKey, check);
     } else {
       // CNV 4.99+: filter inputs are directly accessible by ID
-      // Older builds: filter inputs are inside [data-test-id="osName-*"] containers
+      // Older builds: filter inputs are inside [data-test="osName-*"] containers
       const osFilterById = this.locator(`input#filter-osName-${wizardFilterKey}`);
-      const osFilterLegacy = this.locator(
-        `[data-test-id="osName-${osName}"] input[type="checkbox"]`,
-      );
+      const osFilterLegacy = this.testId(`osName-${osName}`).locator('input[type="checkbox"]');
       const osFilter = osFilterById.or(osFilterLegacy);
       await osFilter
         .first()
@@ -1324,9 +1310,7 @@ export class CreateVmTemplateCatalogComponent extends BaseComponent {
       await this._toggleWizardFilter(workload.toLowerCase(), check);
     } else {
       // CNV 4.99+: workload filter removed from the catalog UI — skip gracefully
-      const workloadFilter = this.locator(`[data-test-id="workload-${workload}"]`).locator(
-        'input[type="checkbox"]',
-      );
+      const workloadFilter = this.testId(`workload-${workload}`).locator('input[type="checkbox"]');
       const exists = await workloadFilter.isVisible({ timeout: 2000 }).catch(() => false);
       if (!exists) {
         return;
@@ -1474,7 +1458,7 @@ export class CreateVmTemplateCatalogComponent extends BaseComponent {
 
     switch (diskSource) {
       case 'URL':
-        await this.robustClick(this.locator('[data-test-id="http"]'));
+        await this.robustClick(this.testId('http'));
         if (value) {
           await this._diskSourceURLInput.waitFor({
             state: 'visible',
@@ -1484,7 +1468,7 @@ export class CreateVmTemplateCatalogComponent extends BaseComponent {
         }
         break;
       case 'Registry':
-        await this.robustClick(this.locator('[data-test-id="registry"]'));
+        await this.robustClick(this.testId('registry'));
         if (value) {
           await this._diskSourceRegistryInput.waitFor({
             state: 'visible',
@@ -1493,18 +1477,14 @@ export class CreateVmTemplateCatalogComponent extends BaseComponent {
           await this._diskSourceRegistryInput.fill(value);
         }
         if (username) {
-          await this.locator('[data-test-id="disk-boot-source-container-source-username"]').fill(
-            username,
-          );
+          await this.testId('disk-boot-source-container-source-username').fill(username);
         }
         if (password) {
-          await this.locator('[data-test-id="disk-boot-source-container-source-password"]').fill(
-            password,
-          );
+          await this.testId('disk-boot-source-container-source-password').fill(password);
         }
         break;
       case 'PVC':
-        await this.robustClick(this.locator('[data-test-id="pvc-clone"]'));
+        await this.robustClick(this.testId('pvc-clone'));
         break;
       case 'Upload': {
         const uploadMenuItem = this.locator('.pf-v6-c-menu__item-main', {
@@ -1562,7 +1542,7 @@ export class CreateVmTemplateCatalogComponent extends BaseComponent {
   /**
    * Selects a namespace from the catalog project dropdown by opening the dropdown,
    * searching in the #select-inline-filter input, and clicking the option with
-   * data-test-id equal to the namespace name.
+   * data-test equal to the namespace name.
    *
    * @param namespace - The namespace name to select (e.g. pw-bv-form-catalog-123)
    */
@@ -1581,7 +1561,7 @@ export class CreateVmTemplateCatalogComponent extends BaseComponent {
     await filterInput.pressSequentially(namespace, { delay: 100 });
     await this.page.waitForTimeout(TestTimeouts.UI_DELAY_MEDIUM);
 
-    const namespaceOption = this.locator(`[data-test-id="${namespace}"]`).first();
+    const namespaceOption = this.testId(namespace).first();
     await namespaceOption.waitFor({
       state: 'visible',
       timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
@@ -1759,7 +1739,7 @@ export class CreateVmTemplateCatalogComponent extends BaseComponent {
       await this.page.waitForTimeout(TestTimeouts.UI_DELAY_MEDIUM);
 
       const hasAnyCards = await this._vmCatalogGrid
-        .locator('[data-test-id], .vm-catalog-grid-tile')
+        .locator('[data-test], .vm-catalog-grid-tile')
         .first()
         .isVisible({ timeout: TestTimeouts.UI_ACTION_COMPLETE })
         .catch(() => false);
@@ -1768,15 +1748,15 @@ export class CreateVmTemplateCatalogComponent extends BaseComponent {
         await this.page.waitForTimeout(TestTimeouts.UI_FILTER_APPLY / 3);
       }
 
-      // CNV 4.99+: cards use data-test-id (metadata name), not display name in text.
+      // CNV 4.99+: cards use data-test (metadata name), not display name in text.
       // Try metadata name lookup first, then fall back to text-based match.
       const metadataName =
         CreateVmTemplateCatalogComponent._displayNameToMetadataName[templateName];
 
       let cardLocator;
       if (metadataName) {
-        const byMetadataId = this._vmCatalogGrid.locator(`[data-test-id="${metadataName}"]`);
-        const wizardCard = this._vmCatalogGrid.locator('[data-test-id]', {
+        const byMetadataId = this._vmCatalogGrid.getByTestId(metadataName);
+        const wizardCard = this._vmCatalogGrid.locator('[data-test]', {
           hasText: templateName,
         });
         const oldCard = this._vmCatalogGrid.locator(
@@ -1787,7 +1767,7 @@ export class CreateVmTemplateCatalogComponent extends BaseComponent {
         );
         cardLocator = byMetadataId.or(wizardCard).or(oldCard);
       } else {
-        const wizardCard = this._vmCatalogGrid.locator('[data-test-id]', {
+        const wizardCard = this._vmCatalogGrid.locator('[data-test]', {
           hasText: templateName,
         });
         const oldCard = this._vmCatalogGrid.locator(
@@ -1831,11 +1811,11 @@ export class CreateVmTemplateCatalogComponent extends BaseComponent {
         .catch(() => false);
       if (nameVisible) return true;
 
-      // CNV 4.99+: display name is no longer used; try metadata name as data-test-id
+      // CNV 4.99+: display name is no longer used; try metadata name as data-test
       const metadataName =
         CreateVmTemplateCatalogComponent._displayNameToMetadataName[templateName];
       if (metadataName) {
-        const byMetadataId = container.locator(`[data-test-id="${metadataName}"]`);
+        const byMetadataId = container.getByTestId(metadataName);
         await byMetadataId.first().waitFor({
           state: 'visible',
           timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,

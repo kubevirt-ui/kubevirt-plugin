@@ -9,8 +9,8 @@ import type { Page } from '@playwright/test';
 import PageCommons from '../page-commons';
 
 export default class VirtualMachineSnapshotDetailPage extends PageCommons {
-  private readonly _actionsMenuButton = this.locator('[data-test-id="actions-menu-button"]');
-  private readonly _confirmAction = this.locator('[data-test="confirm-action"]');
+  private readonly _actionsMenuButton = this.testId('actions-menu-button');
+  private readonly _confirmAction = this.testId('save-button');
   constructor(page: Page) {
     super(page);
   }
@@ -20,8 +20,8 @@ export default class VirtualMachineSnapshotDetailPage extends PageCommons {
    * Call after clickEditAnnotations() when the annotations modal is open.
    */
   async addAnnotation(key: string, value: string): Promise<void> {
-    const keyInput = this.locator('[data-test="pairs-list-name"]');
-    const valueInput = this.locator('[data-test="pairs-list-value"]');
+    const keyInput = this.testId('pairs-list-name');
+    const valueInput = this.testId('pairs-list-value');
     await keyInput.waitFor({ state: 'visible', timeout: TestTimeouts.VM_CREATION });
     await keyInput.fill(key);
     await valueInput.waitFor({ state: 'visible', timeout: TestTimeouts.VM_CREATION });
@@ -37,7 +37,7 @@ export default class VirtualMachineSnapshotDetailPage extends PageCommons {
    * Call after clickEditLabels() when the labels modal is open.
    */
   async addLabelTag(tag: string): Promise<void> {
-    const tagsInput = this.locator('[data-test="tags-input"]');
+    const tagsInput = this.testId('tags-input');
     await tagsInput.waitFor({ state: 'visible', timeout: TestTimeouts.VM_CREATION });
     await tagsInput.fill(tag);
     const confirmButton = this._confirmAction;
@@ -101,7 +101,7 @@ export default class VirtualMachineSnapshotDetailPage extends PageCommons {
    */
   async editYamlAndSave(yamlContent: string): Promise<void> {
     await this.fillYamlEditor(yamlContent);
-    const saveButton = this.locator('[data-test="save-changes"]');
+    const saveButton = this.testId('save-changes');
     await saveButton.waitFor({ state: 'visible', timeout: TestTimeouts.VM_CREATION });
     await this.robustClick(saveButton);
     await this.page.waitForTimeout(TestTimeouts.UI_DELAY_EXTRA);
@@ -120,7 +120,7 @@ export default class VirtualMachineSnapshotDetailPage extends PageCommons {
    * Verifies that the edit-annotations element contains the given text (e.g. '1 annotation').
    */
   async verifyEditAnnotationsContainsText(text: string): Promise<boolean> {
-    const editAnnotations = this.locator('[data-test="edit-annotations"]');
+    const editAnnotations = this.testId('edit-annotations');
     await editAnnotations.waitFor({ state: 'visible', timeout: TestTimeouts.VM_CREATION });
     const content = await editAnnotations.textContent();
     return content?.includes(text) ?? false;
@@ -130,7 +130,7 @@ export default class VirtualMachineSnapshotDetailPage extends PageCommons {
    * Verifies that [data-test="label-key"] contains the expected text.
    */
   async verifyLabelKeyContainsText(expectedText: string): Promise<boolean> {
-    const labelKey = this.locator('[data-test="label-key"]').filter({ hasText: expectedText });
+    const labelKey = this.testId('label-key').filter({ hasText: expectedText });
     await labelKey.waitFor({ state: 'visible', timeout: TestTimeouts.VM_CREATION });
     return labelKey.isVisible().catch(() => false);
   }

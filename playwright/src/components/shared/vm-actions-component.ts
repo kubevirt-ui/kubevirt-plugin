@@ -4,33 +4,69 @@ import type { Page } from '@playwright/test';
 import BaseComponent from './base-component';
 
 export default class VmActionsComponent extends BaseComponent {
-  readonly _actionsDropdown = this.locator('[data-test="actions-dropdown"] button');
-  readonly _vmActionClone = this.locator('[data-test-id="vm-action-clone"]');
-  readonly _vmActionDelete = this.locator('[data-test-id="vm-action-delete"]');
-  readonly _vmActionEditLabels = this.locator('[data-test-id="vm-action-edit-labels"]');
-  readonly _vmActionMigrateCompute = this.locator('[data-test-id="vm-action-migrate-compute"]');
-  readonly _vmActionMigrateStorage = this.locator('[data-test-id="vm-action-migrate-storage"]');
-  readonly _vmActionMoveToFolder = this.locator('[data-test-id="vm-action-move-to-folder"]');
-  readonly _vmActionPause = this.locator('[data-test-id="vm-action-pause"]');
-  readonly _vmActionPauseButton = this.locator('[data-test-id="vm-action-pause-button"]');
-  readonly _vmActionReset = this.locator('[data-test-id="vm-action-reset"]');
-  readonly _vmActionRestart = this.locator('[data-test-id="vm-action-restart"]');
-  readonly _vmActionRestartButton = this.locator('[data-test-id="vm-action-restart-button"]');
+  readonly _actionsDropdown = this.testId('actions-dropdown').locator('button');
+  readonly _vmActionClone = this.testId('vm-action-clone');
+  readonly _vmActionDelete = this.testId('vm-action-delete');
+  readonly _vmActionEditLabels = this.testId('vm-action-edit-labels');
+  readonly _vmActionMigrateCompute = this.testId('vm-action-migrate-compute');
+  readonly _vmActionMigrateStorage = this.testId('vm-action-migrate-storage');
+  readonly _vmActionMoveToFolder = this.testId('vm-action-move-to-folder');
+  readonly _vmActionPause = this.testId('vm-action-pause');
+  readonly _vmActionPauseButton = this.testId('vm-action-pause-button');
+  readonly _vmActionReset = this.testId('vm-action-reset');
+  readonly _vmActionRestart = this.testId('vm-action-restart');
+  readonly _vmActionRestartButton = this.testId('vm-action-restart-button');
   readonly _vmActionSaveAsTemplate = this.page.getByRole('menuitem', {
     name: 'Save as template',
   });
-  readonly _vmActionsDropdown = this.locator('[data-test="actions-dropdown"]');
-  readonly _vmActionSnapshot = this.locator('[data-test-id="vm-action-snapshot"]');
-  readonly _vmActionStart = this.locator('[data-test-id="vm-action-start"]');
-  readonly _vmActionStop = this.locator('[data-test-id="vm-action-stop"]');
-  readonly _vmActionStopButton = this.locator('[data-test-id="vm-action-stop-button"]');
-  readonly _vmActionUnpause = this.locator('[data-test-id="vm-action-unpause"]');
-  readonly _vmActionUnpauseButton = this.locator('[data-test-id="vm-action-unpause-button"]');
-  readonly _vmControlMenu = this.locator('[data-test-id="control-menu"]');
+  readonly _vmActionsDropdown = this.testId('actions-dropdown');
+  readonly _vmActionSnapshot = this.testId('vm-action-snapshot');
+  readonly _vmActionStart = this.testId('vm-action-start');
+  readonly _vmActionStop = this.testId('vm-action-stop');
+  readonly _vmActionStopButton = this.testId('vm-action-stop-button');
+  readonly _vmActionUnpause = this.testId('vm-action-unpause');
+  readonly _vmActionUnpauseButton = this.testId('vm-action-unpause-button');
+  readonly _vmControlMenu = this.testId('control-menu');
   readonly actionsButton = this.locator('button:has-text("Actions")');
 
   constructor(page: Page) {
     super(page);
+  }
+
+  /**
+   * If a ConfirmVMActionModal appeared after clicking the action menu item,
+   * click the confirmation button (and check the checkbox for 'reset').
+   */
+  private async confirmVmActionModalIfPresent(action: string): Promise<void> {
+    await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
+    const modal = this.page.locator('[role="dialog"]');
+    const modalVisible = await modal
+      .waitFor({ state: 'visible', timeout: TestTimeouts.UI_DELAY_LONG })
+      .then(() => true)
+      .catch(() => false);
+    if (!modalVisible) return;
+
+    if (action === 'reset') {
+      const checkbox = modal.locator('input[type="checkbox"]');
+      const isChecked = await checkbox.isChecked().catch(() => true);
+      if (!isChecked) {
+        await checkbox.check({ force: true });
+      }
+    }
+
+    const actionLabels: Record<string, string> = {
+      stop: 'Stop',
+      restart: 'Restart',
+      reset: 'Reset',
+      pause: 'Pause',
+    };
+    const label = actionLabels[action] ?? action;
+    const confirmBtn = modal.getByRole('button', { name: label, exact: true });
+    await confirmBtn.waitFor({ state: 'visible', timeout: TestTimeouts.UI_DELAY_MEDIUM });
+    await confirmBtn.click();
+    await modal
+      .waitFor({ state: 'hidden', timeout: TestTimeouts.UI_ACTION_COMPLETE })
+      .catch(() => undefined);
   }
 
   async checkActionMenu(item: string): Promise<void> {
@@ -59,7 +95,7 @@ export default class VmActionsComponent extends BaseComponent {
   }
 
   async clickKebabButton(): Promise<void> {
-    const kebabButton = this.locator('[data-test="kebab-button"], [data-test-id="kebab-button"]');
+    const kebabButton = this.testId('kebab-button');
     await kebabButton.waitFor({
       state: 'visible',
       timeout: TestTimeouts.UI_ACTION_COMPLETE,
@@ -84,7 +120,7 @@ export default class VmActionsComponent extends BaseComponent {
       'edit-labels': this._vmActionEditLabels,
       'save-as-template': this._vmActionSaveAsTemplate,
     };
-    return actionMap[action] || this.locator(`[data-test-id="vm-action-${action}"]`);
+    return actionMap[action] || this.testId(`vm-action-${action}`);
   }
 
   async hoverOverControlMenu(): Promise<void> {
@@ -143,5 +179,11 @@ export default class VmActionsComponent extends BaseComponent {
     const actionLocator = this.getVmActionLocator(action);
     await actionLocator.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ACTION_COMPLETE });
     await this.robustClick(actionLocator);
+
+    // Actions with confirmVMActions enabled show a confirmation modal.
+    const actionsWithConfirmation = ['stop', 'restart', 'reset', 'pause'];
+    if (actionsWithConfirmation.includes(action)) {
+      await this.confirmVmActionModalIfPresent(action);
+    }
   }
 }

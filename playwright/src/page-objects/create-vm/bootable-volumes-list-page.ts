@@ -12,7 +12,7 @@ export default class BootableVolumesListPage extends PageCommons {
   });
   private readonly _dataLabelCluster = this.locator('[data-label="Cluster"]');
   private readonly _dataLabelNamespace = this.locator('[data-label="Namespace"]');
-  private readonly _dialogModal = this.locator('[data-test="dialog-modal"]');
+  private readonly _dialogModal = this.testId('dialog-modal');
   private readonly _projectFilterButton = this.locator('#filter-toolbar').locator('button', {
     hasText: 'Project',
   });
@@ -33,7 +33,7 @@ export default class BootableVolumesListPage extends PageCommons {
 
   private async openRowKebabMenu(volumeName: string): Promise<void> {
     const byTestId = this.locator('tbody tr').filter({
-      has: this.locator(`[data-test-id="${volumeName}"]`),
+      has: this.testId(volumeName),
     });
     const byLink = this.locator('tbody tr').filter({
       has: this.page.locator(`a:has-text("${volumeName}")`),
@@ -70,12 +70,12 @@ export default class BootableVolumesListPage extends PageCommons {
   }
 
   async addLabelInEditLabelsModalAndSave(labelTag: string): Promise<void> {
-    const tagsInput = this.locator('[data-test="tags-input"]');
+    const tagsInput = this.testId('tags-input');
     await tagsInput.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
     await tagsInput.fill(labelTag);
     await this.page.keyboard.press('Enter');
     await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
-    const saveButton = this.locator('[data-test="save-button"]');
+    const saveButton = this.testId('save-button');
     await saveButton.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
     await this.robustClick(saveButton);
   }
@@ -90,7 +90,7 @@ export default class BootableVolumesListPage extends PageCommons {
 
   async clickManageColumnsAndVerifyNamespaceAndClusterInModal(): Promise<boolean> {
     try {
-      const manageColumnsBtn = this.locator('[data-test="manage-columns"]');
+      const manageColumnsBtn = this.testId('manage-columns');
       await manageColumnsBtn.waitFor({
         state: 'visible',
         timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
@@ -142,7 +142,7 @@ export default class BootableVolumesListPage extends PageCommons {
 
   async clickVolumeNameToGoToDetail(volumeName: string): Promise<void> {
     const row = this.locator('tbody tr').filter({
-      has: this.locator(`[data-test-id="${volumeName}"]`),
+      has: this.testId(volumeName),
     });
     const nameLink = row.locator('a').filter({ hasText: volumeName }).first();
     await nameLink.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
@@ -293,13 +293,13 @@ export default class BootableVolumesListPage extends PageCommons {
     if (clusterNames.length === 0) return true;
     const visibilityTimeout = TestTimeouts.UI_DELAY_MEDIUM;
     try {
-      const localClusterIdentifier = this.locator('[data-test-id="local-cluster"]');
+      const localClusterIdentifier = this.testId('local-cluster');
       if (await localClusterIdentifier.isVisible({ timeout: visibilityTimeout }).catch(() => false))
         return true;
       for (const name of clusterNames) {
         const cell = this._dataLabelCluster.filter({ hasText: name }).first();
         if (await cell.isVisible({ timeout: visibilityTimeout }).catch(() => false)) return true;
-        const byTestId = this.locator(`[data-test-id="${name}"]`);
+        const byTestId = this.testId(name);
         if ((await byTestId.count()) > 0) {
           if (
             await byTestId
@@ -320,13 +320,13 @@ export default class BootableVolumesListPage extends PageCommons {
     if (namespaceNames.length === 0) return true;
     const visibilityTimeout = TestTimeouts.UI_DELAY_MEDIUM;
     try {
-      const osImagesIndicator = this.locator('[data-test="openshift-virtualization-os-images"]');
+      const osImagesIndicator = this.testId('openshift-virtualization-os-images');
       if (await osImagesIndicator.isVisible({ timeout: visibilityTimeout }).catch(() => false))
         return true;
       for (const name of namespaceNames) {
         const cell = this._dataLabelNamespace.filter({ hasText: name }).first();
         if (await cell.isVisible({ timeout: visibilityTimeout }).catch(() => false)) return true;
-        const byTestId = this.locator(`[data-test-id="${name}"]`);
+        const byTestId = this.testId(name);
         if ((await byTestId.count()) > 0) {
           if (
             await byTestId
@@ -390,7 +390,7 @@ export default class BootableVolumesListPage extends PageCommons {
     timeout = TestTimeouts.DEFAULT,
   ): Promise<boolean> {
     try {
-      const byTestId = this.locator(`[data-test-id="${volumeName}"]`);
+      const byTestId = this.testId(volumeName);
       const byLink = this.locator(`table tbody tr`).filter({
         has: this.page.locator(`a:has-text("${volumeName}")`),
       });
@@ -405,7 +405,7 @@ export default class BootableVolumesListPage extends PageCommons {
   async verifyFormCreatedVolumeRowVisible(timeout = 10000): Promise<boolean> {
     try {
       const row = this.locator(
-        '[data-test-id^="pw-bv-form-"], [data-test-id^="pw-bv-registry-"], [data-test-id^="pw-bv-http-"]',
+        '[data-test^="pw-bv-form-"], [data-test^="pw-bv-registry-"], [data-test^="pw-bv-http-"]',
       );
       await row.first().waitFor({ state: 'visible', timeout });
       return await row.first().isVisible();
@@ -415,7 +415,7 @@ export default class BootableVolumesListPage extends PageCommons {
   }
 
   async verifyLabelVisibleOnDetailPage(expectedLabelText: string): Promise<boolean> {
-    const labelsControl = this.locator('[data-test-id^="pw-bv-"][data-test-id$="-labels"]').first();
+    const labelsControl = this.locator('[data-test^="pw-bv-"][data-test$="-labels"]').first();
     await labelsControl.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
     const isButton = (await labelsControl.evaluate((el) => el.tagName === 'BUTTON')) ?? false;
     if (isButton) {
@@ -446,7 +446,7 @@ export default class BootableVolumesListPage extends PageCommons {
 
   async verifySearchFilterVisible(): Promise<boolean> {
     try {
-      const filter = this.locator('[data-test-id="item-filter"]');
+      const filter = this.testId('item-filter');
       await filter.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
       return true;
     } catch {

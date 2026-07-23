@@ -82,16 +82,16 @@ export default class InstanceTypeCustomizeWizardComponent extends BaseComponent 
     }
 
     if (diskConfig.type) {
-      const diskTypeSelect = this.locator('[data-test-id="disk-type-select"]');
+      const diskTypeSelect = this.testId('disk-type-select');
       await diskTypeSelect.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ACTION_COMPLETE });
       await this.robustClick(diskTypeSelect);
-      const typeOption = this.locator(`[data-test-id="disk-type-select-${diskConfig.type}"]`);
+      const typeOption = this.testId(`disk-type-select-${diskConfig.type}`);
       await typeOption.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ACTION_COMPLETE });
       await this.robustClick(typeOption);
     }
 
     if (diskConfig.storageClass) {
-      const storageClassSelect = this.locator('[data-test-id="storage-class-select"]');
+      const storageClassSelect = this.testId('storage-class-select');
       await storageClassSelect.waitFor({
         state: 'visible',
         timeout: TestTimeouts.UI_ACTION_COMPLETE,
@@ -190,7 +190,7 @@ export default class InstanceTypeCustomizeWizardComponent extends BaseComponent 
   }
 
   async clickCreateButton(): Promise<void> {
-    const wizardCreateButton = this.locator('[data-test-id="create-virtual-machine"] button', {
+    const wizardCreateButton = this.testId('create-virtual-machine').locator('button', {
       hasText: 'Create VirtualMachine',
     });
     await wizardCreateButton.waitFor({
@@ -244,7 +244,7 @@ export default class InstanceTypeCustomizeWizardComponent extends BaseComponent 
 
     if (config.labels && config.labels.length > 0) {
       const wizardLabelsEditButton = this.locator(
-        'button[data-test-id^="pw-vm-customize-it-"][data-test-id*="labels"]',
+        'button[data-test^="pw-vm-customize-it-"][data-test*="labels"]',
       );
       await wizardLabelsEditButton.waitFor({
         state: 'visible',
@@ -252,7 +252,7 @@ export default class InstanceTypeCustomizeWizardComponent extends BaseComponent 
       });
       await this.robustClick(wizardLabelsEditButton);
 
-      const wizardLabelsInput = this.locator('[data-test="tags-input"]');
+      const wizardLabelsInput = this.testId('tags-input');
       await wizardLabelsInput.waitFor({
         state: 'visible',
         timeout: TestTimeouts.UI_ACTION_COMPLETE,
@@ -281,13 +281,13 @@ export default class InstanceTypeCustomizeWizardComponent extends BaseComponent 
 
     if (config.annotations && config.annotations.length > 0) {
       const wizardAnnotationsEditButton = this.locator(
-        'button[data-test-id^="pw-vm-customize-it-"][data-test-id*="annotations"]',
+        'button[data-test^="pw-vm-customize-it-"][data-test*="annotations"]',
       );
       const annotationsBtnExists = await wizardAnnotationsEditButton
         .isVisible({ timeout: TestTimeouts.UI_DELAY_SHORT })
         .catch(() => false);
       if (!annotationsBtnExists) {
-        const altAnnotationsBtn = this.locator('button[data-test-id*="annotation"]').first();
+        const altAnnotationsBtn = this.locator('button[data-test*="annotation"]').first();
         const altExists = await altAnnotationsBtn
           .isVisible({ timeout: TestTimeouts.UI_DELAY_SHORT })
           .catch(() => false);
@@ -329,7 +329,7 @@ export default class InstanceTypeCustomizeWizardComponent extends BaseComponent 
 
     if (config.nodeSelector) {
       const wizardNodeSelectorEditButton = this.locator(
-        'button[data-test-id^="pw-vm-customize-it-"][data-test-id*="node-selector"]',
+        'button[data-test^="pw-vm-customize-it-"][data-test*="node-selector"]',
       );
       await wizardNodeSelectorEditButton.waitFor({
         state: 'visible',
@@ -394,21 +394,19 @@ export default class InstanceTypeCustomizeWizardComponent extends BaseComponent 
         }
 
         if (nic.model) {
-          const wizardNicModelSelect = this.locator('[data-test-id="model-select"]');
+          const wizardNicModelSelect = this.testId('model-select');
           await wizardNicModelSelect.waitFor({
             state: 'visible',
             timeout: TestTimeouts.UI_ACTION_COMPLETE,
           });
           await this.robustClick(wizardNicModelSelect);
-          const modelOption = this.locator(`[data-test-id="model-select-${nic.model}"]`);
+          const modelOption = this.testId(`model-select-${nic.model}`);
           await modelOption.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ACTION_COMPLETE });
           await this.robustClick(modelOption);
         }
 
         if (nic.network) {
-          const wizardNicNetworkSelect = this.locator(
-            '[data-test-id="network-attachment-definition-select"]',
-          );
+          const wizardNicNetworkSelect = this.testId('network-attachment-definition-select');
           await wizardNicNetworkSelect.waitFor({
             state: 'visible',
             timeout: TestTimeouts.UI_ACTION_COMPLETE,
@@ -425,17 +423,13 @@ export default class InstanceTypeCustomizeWizardComponent extends BaseComponent 
         }
 
         if (nic.type) {
-          const wizardNicTypeSelect = this.locator(
-            '[data-test-id="network-interface-type-select"]',
-          );
+          const wizardNicTypeSelect = this.testId('network-interface-type-select');
           await wizardNicTypeSelect.waitFor({
             state: 'visible',
             timeout: TestTimeouts.UI_ACTION_COMPLETE,
           });
           await this.robustClick(wizardNicTypeSelect);
-          const typeOption = this.locator(
-            `button[data-test-id="network-interface-type-select-${nic.type}"]`,
-          );
+          const typeOption = this.testId(`network-interface-type-select-${nic.type}`);
           await typeOption.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ACTION_COMPLETE });
           await this.robustClick(typeOption);
         }
@@ -458,7 +452,7 @@ export default class InstanceTypeCustomizeWizardComponent extends BaseComponent 
     headless?: boolean;
   }) {
     if (config.name) {
-      await this.locator('[data-test-id="wizard-overview-name-edit"]').click();
+      await this.testId('wizard-overview-name-edit').click();
       const wizardNameInput = this.locator('#vm-name');
       await wizardNameInput.clear();
       await wizardNameInput.fill(config.name);
@@ -467,7 +461,7 @@ export default class InstanceTypeCustomizeWizardComponent extends BaseComponent 
 
     if (config.description) {
       await this.robustClick(
-        this.locator('button[data-test-id^="pw-vm-customize-it-"][data-test-id*="description"]'),
+        this.locator('button[data-test^="pw-vm-customize-it-"][data-test*="description"]'),
       );
       const tabModal = this._tabModal;
       await tabModal.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ACTION_COMPLETE });
@@ -489,7 +483,7 @@ export default class InstanceTypeCustomizeWizardComponent extends BaseComponent 
     }
 
     if (config.cpu || config.memory) {
-      await this.locator('[data-test-id="wizard-overview-cpu-memory-edit"]').click();
+      await this.testId('wizard-overview-cpu-memory-edit').click();
       const wizardCpuInput = this.locator('input[name="cpu-input"]');
       const wizardMemInput = this.locator('input[name="memory-input"]');
       if (config.cpu) {
@@ -504,7 +498,7 @@ export default class InstanceTypeCustomizeWizardComponent extends BaseComponent 
     }
 
     if (config.bootMode) {
-      await this.locator('[data-test-id="wizard-overview-boot-method-edit"]').click();
+      await this.testId('wizard-overview-boot-method-edit').click();
       const modalBody = this.locator('.pf-v6-c-modal-box__body');
       await modalBody.locator('button').first().click();
       // Use exact text matching to avoid partial matches (e.g., "UEFI" vs "UEFI(secure)")
@@ -513,7 +507,7 @@ export default class InstanceTypeCustomizeWizardComponent extends BaseComponent 
     }
 
     if (config.workload) {
-      await this.locator('[data-test-id="wizard-overview-workload-profile-edit"]').click();
+      await this.testId('wizard-overview-workload-profile-edit').click();
       const modalBody = this._tabModal;
       await modalBody.locator('button.pf-v6-c-menu-toggle').click();
       await this.locator('button', { hasText: config.workload }).click();
@@ -522,7 +516,7 @@ export default class InstanceTypeCustomizeWizardComponent extends BaseComponent 
 
     if (config.hostname) {
       const wizardHostnameEditBtn = this.locator(
-        'button[data-test-id^="pw-vm-customize-it-"][data-test-id*="hostname"]',
+        'button[data-test^="pw-vm-customize-it-"][data-test*="hostname"]',
       );
       await wizardHostnameEditBtn.waitFor({
         state: 'visible',
@@ -604,7 +598,7 @@ export default class InstanceTypeCustomizeWizardComponent extends BaseComponent 
     await this.page.waitForTimeout(TestTimeouts.UI_DELAY_MEDIUM);
 
     if (config.descheduler !== undefined) {
-      const wizardDeschedulerEditBtn = this.locator('[data-test-id="descheduler-edit"]');
+      const wizardDeschedulerEditBtn = this.testId('descheduler-edit');
       await wizardDeschedulerEditBtn.waitFor({
         state: 'visible',
         timeout: TestTimeouts.UI_ACTION_COMPLETE,
@@ -621,9 +615,7 @@ export default class InstanceTypeCustomizeWizardComponent extends BaseComponent 
     }
 
     if (config.dedicatedResources !== undefined) {
-      const wizardDedicatedResourcesEditBtn = this.locator(
-        '[data-test-id="dedicated-resources-edit"]',
-      );
+      const wizardDedicatedResourcesEditBtn = this.testId('dedicated-resources-edit');
       await wizardDedicatedResourcesEditBtn.waitFor({
         state: 'visible',
         timeout: TestTimeouts.UI_ACTION_COMPLETE,
@@ -642,9 +634,7 @@ export default class InstanceTypeCustomizeWizardComponent extends BaseComponent 
     }
 
     if (config.evictionStrategy !== undefined) {
-      const wizardEvictionStrategyEditBtn = this.locator(
-        '[data-test-id="eviction-strategy"] button',
-      );
+      const wizardEvictionStrategyEditBtn = this.testId('eviction-strategy').locator('button');
       // Check if eviction strategy edit button exists (may not be available in all contexts)
       const evictionBtnExists = await wizardEvictionStrategyEditBtn
         .isVisible({ timeout: TestTimeouts.UI_DELAY_SHORT })
@@ -695,7 +685,7 @@ export default class InstanceTypeCustomizeWizardComponent extends BaseComponent 
   ): Promise<void> {
     await this.navigateToWizardTab('SSH');
 
-    const sshEditButton = this.locator('[data-test-id="wizard-sshkey-edit"]');
+    const sshEditButton = this.testId('wizard-sshkey-edit');
     await sshEditButton.waitFor({ state: 'visible', timeout: TestTimeouts.RESOURCE_CREATION });
     await this.robustClick(sshEditButton);
 
@@ -722,7 +712,7 @@ export default class InstanceTypeCustomizeWizardComponent extends BaseComponent 
 
     await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
 
-    const saveButton = this.locator('[data-test="save-button"]');
+    const saveButton = this.testId('save-button');
     await saveButton.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
     await this.robustClick(saveButton);
     await this.page.waitForTimeout(TestTimeouts.UI_DELAY_MEDIUM);
@@ -748,7 +738,7 @@ export default class InstanceTypeCustomizeWizardComponent extends BaseComponent 
       throw new Error(`Unknown tab name: ${tabName}`);
     }
 
-    const tabLocator = this.locator(`[data-test-id="${verticalTabId}"]`);
+    const tabLocator = this.testId(verticalTabId);
     await this.robustClick(tabLocator);
   }
 
@@ -781,24 +771,26 @@ export default class InstanceTypeCustomizeWizardComponent extends BaseComponent 
         return true;
       }
 
-      const notFoundSelectors = [
-        'text=Not found',
-        'text=/not found/i',
-        '[data-test="empty-state"]',
-        '.pf-v6-c-empty-state',
-        '.pf-v6-c-empty-state__body',
-        'text=No network interfaces',
-        'text=No network',
+      const notFoundLocators = [
+        this.locator('text=Not found'),
+        this.locator('text=/not found/i'),
+        this.testId('empty-state'),
+        this.locator('.pf-v6-c-empty-state'),
+        this.locator('.pf-v6-c-empty-state__body'),
+        this.locator('text=No network interfaces'),
+        this.locator('text=No network'),
       ];
 
-      for (const selector of notFoundSelectors) {
+      for (const notFoundLocator of notFoundLocators) {
         try {
-          const notFoundLocator = this.locator(selector).first();
-          const isVisible = await notFoundLocator.isVisible({
+          const isVisible = await notFoundLocator.first().isVisible({
             timeout: TestTimeouts.UI_DELAY_SHORT,
           });
           if (isVisible) {
-            const text = await notFoundLocator.textContent().catch(() => '');
+            const text = await notFoundLocator
+              .first()
+              .textContent()
+              .catch(() => '');
             if (
               text?.toLowerCase().includes('not found') ||
               text?.toLowerCase().includes('no network')
@@ -811,7 +803,7 @@ export default class InstanceTypeCustomizeWizardComponent extends BaseComponent 
         }
       }
 
-      const networksTabContent = this.locator('[data-test-id="vm-configuration-network"]')
+      const networksTabContent = this.testId('vm-configuration-network')
         .locator('..')
         .locator('..');
       const tabText = await networksTabContent.textContent().catch(() => '');

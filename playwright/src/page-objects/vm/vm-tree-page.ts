@@ -12,7 +12,7 @@ export default class VmTreePage extends TreeContextMenuMixin(PageCommons) {
   private readonly _vmListTab = this.locator('button[role="tab"]', {
     hasText: /^Virtual machines$/,
   });
-  private readonly _vmsTreeview = this.locator('[data-test="vms-treeview"]');
+  private readonly _vmsTreeview = this.testId('vms-treeview');
 
   constructor(page: Page) {
     super(page);
@@ -257,7 +257,7 @@ export default class VmTreePage extends TreeContextMenuMixin(PageCommons) {
     await this._projectName.clear();
     await this._projectName.fill(projectName);
 
-    const createButton = this.locator('[data-test="save-button"]');
+    const createButton = this.testId('save-button');
     await createButton.click();
 
     await modal.waitFor({ state: 'hidden', timeout: TestTimeouts.ELEMENT_WAIT });

@@ -130,9 +130,7 @@ export default class VirtualMachineDetailPage extends PageCommons {
       .locator('[role="dialog"], #tab-modal')
       .filter({ hasText: 'Edit network interface' })
       .first();
-    const nadSelectRoot = modalScope.locator(
-      '[data-test-id="network-attachment-definition-select"]',
-    );
+    const nadSelectRoot = modalScope.getByTestId('network-attachment-definition-select');
     await nadSelectRoot.waitFor({ state: 'visible', timeout: TestTimeouts.UI_DELAY_MEDIUM });
 
     const menuToggle = nadSelectRoot
@@ -247,7 +245,7 @@ export default class VirtualMachineDetailPage extends PageCommons {
   }
 
   async clickVmiByTestId(vmName: string): Promise<void> {
-    const vmiLocator = this.locator(`[data-test-id="${vmName}"]`).first();
+    const vmiLocator = this.testId(vmName).first();
     await vmiLocator.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
     await this.robustClick(vmiLocator);
   }
@@ -686,6 +684,11 @@ export default class VirtualMachineDetailPage extends PageCommons {
     return this.console.performVncConsolePaste();
   }
 
+  async reloadAndNavigateToScheduling() {
+    await this.page.reload({ waitUntil: 'domcontentloaded' });
+    await this.scheduling.navigateToConfigurationScheduling();
+  }
+
   async resetVmFromActionsDropdown() {
     return this.actions.resetVmFromActionsDropdown();
   }
@@ -856,10 +859,10 @@ export default class VirtualMachineDetailPage extends PageCommons {
     return this.configuration.verifyDiskExistsByDataTestId(diskName);
   }
   /**
-   * Verify disk exists by data-test-id pattern: dv-{vmName}-{diskName}-k8ntab
+   * Verify disk exists by data-test pattern: dv-{vmName}-{diskName}-k8ntab
    * @param vmName - The VM name
    * @param diskName - The disk name
-   * @returns true if the disk with the expected data-test-id exists
+   * @returns true if the disk with the expected data-test exists
    */
   async verifyDiskExistsByDataTestIdPattern(vmName: string, diskName: string): Promise<boolean> {
     return this.configuration.verifyDiskExistsByDataTestIdPattern(vmName, diskName);
@@ -874,7 +877,7 @@ export default class VirtualMachineDetailPage extends PageCommons {
     return this.configuration.verifyDiskNameExists(diskName);
   }
   /**
-   * Verifies a disk row is visible by exact `data-test-id` (e.g. `disk-rootdisk`, uploaded ISO DV name).
+   * Verifies a disk row is visible by exact `data-test` (e.g. `disk-rootdisk`, uploaded ISO DV name).
    */
   async verifyDiskRowVisibleByExactDataTestId(dataTestId: string): Promise<boolean> {
     return this.configuration.verifyDiskRowVisibleByExactDataTestId(dataTestId);
@@ -886,10 +889,10 @@ export default class VirtualMachineDetailPage extends PageCommons {
     return this.disks.verifyDiskSource(diskName, expectedSource);
   }
   /**
-   * Verify disk exists by data-test-id pattern: dv-{vmName}-{diskName}-k8ntab
+   * Verify disk exists by data-test pattern: dv-{vmName}-{diskName}-k8ntab
    * @param vmName - The VM name
    * @param diskName - The disk name
-   * @returns true if the disk with the expected data-test-id exists
+   * @returns true if the disk with the expected data-test exists
    */
   async verifyDiskSourceByDataTestId(vmName: string, diskName: string): Promise<boolean> {
     return this.configuration.verifyDiskSourceByDataTestId(vmName, diskName);
@@ -1007,7 +1010,7 @@ export default class VirtualMachineDetailPage extends PageCommons {
     timeout = 60000,
   ): Promise<boolean> {
     try {
-      const table = this.locator('[data-test="vm-network-interface-list"]');
+      const table = this.testId('vm-network-interface-list');
       await table.waitFor({ state: 'visible', timeout: TestTimeouts.VM_CREATION });
       const row = table.locator('tr').filter({ hasText: nicName }).filter({ hasText: ipAddress });
       await row.first().waitFor({ state: 'visible', timeout });

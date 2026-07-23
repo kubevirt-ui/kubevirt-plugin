@@ -4,15 +4,11 @@ import type { Page } from '@playwright/test';
 
 /** VM list split Create control, template quick-create form, and catalog navigation from the list page. */
 export default class VmListTemplateCreateComponent extends BaseComponent {
-  private readonly _createButton = this.locator(
-    '[data-test-id="details-actions"] [data-test="item-create"]',
-  );
-  private readonly _quickCreateVmButton = this.locator('[data-test-id="quick-create-vm-btn"]');
+  private readonly _createButton = this.testId('item-create');
+  private readonly _quickCreateVmButton = this.testId('quick-create-vm-btn');
   private readonly _roleMenuitem = this.locator('[role="menuitem"]');
   private readonly _startAfterCreateCheckbox = this.locator('#start-after-create-checkbox');
-  private readonly _templateVmNameInput = this.locator(
-    '[data-test-id="template-catalog-vm-name-input"]',
-  );
+  private readonly _templateVmNameInput = this.testId('template-catalog-vm-name-input');
 
   constructor(page: Page) {
     super(page);
@@ -70,7 +66,7 @@ export default class VmListTemplateCreateComponent extends BaseComponent {
 
   async getCreateSplitButtonDropdownOptions(): Promise<string[]> {
     try {
-      const toggle = this.locator('[data-test-id="details-actions"] [data-test="item-create"]');
+      const toggle = this.testId('item-create');
       await this.robustClick(toggle);
       await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
       const items = this._roleMenuitem;

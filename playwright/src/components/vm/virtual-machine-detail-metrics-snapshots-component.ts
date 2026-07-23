@@ -7,29 +7,23 @@ import { TestTimeouts } from '@/utils/test-config';
 import type { Page } from '@playwright/test';
 
 export default class VirtualMachineDetailMetricsSnapshotsComponent extends BaseComponent {
-  private readonly _createButton = this.locator(
-    'button.pf-v6-c-button.pf-m-primary.pf-m-progress, [data-test="create-button"], button.pf-m-primary:has-text("Create")',
-  );
+  private readonly _createButton = this.locator('button.pf-v6-c-button.pf-m-primary.pf-m-progress')
+    .or(this.testId('create-button'))
+    .or(this.locator('button.pf-m-primary:has-text("Create")'));
   private readonly _divnetwork = this.locator('div#network');
   private readonly _divnetworkPfV6CMenuToggle = this.locator('div#network .pf-v6-c-menu-toggle');
-  private readonly _horizontalLinkMetrics = this.locator(
-    '[data-test-id="horizontal-link-Metrics"]',
-  );
-  private readonly _horizontalLinkSnapshots = this.locator(
-    '[data-test-id="horizontal-link-Snapshots"]',
-  );
+  private readonly _horizontalLinkMetrics = this.testId('horizontal-link-Metrics');
+  private readonly _horizontalLinkSnapshots = this.testId('horizontal-link-Snapshots');
   private readonly _nameInput = this.locator('input[id="name"]');
   private readonly _restoreVirtualMachineFromSnapshot = this.locator(
     'text=Restore VirtualMachine from snapshot',
   );
   private readonly _roleOption = this.locator('[role="option"]');
-  private readonly _snapshotsCard = this.locator(
-    '[data-test-id="virtual-machine-overview-snapshots"]',
-  );
-  private readonly _successIcon = this.locator('[data-test="success-icon"]');
+  private readonly _snapshotsCard = this.testId('virtual-machine-overview-snapshots');
+  private readonly _successIcon = this.testId('success-icon');
   private readonly _takeSnapshotBtn = this.locator('button:has-text("Take snapshot")');
-  private readonly _vmDetailSaveButton = this.locator('[data-test="save-button"]');
-  private readonly _vmName = this.locator('[data-test-id="virtual-machine-overview-details-name"]');
+  private readonly _vmDetailSaveButton = this.testId('save-button');
+  private readonly _vmName = this.testId('virtual-machine-overview-details-name');
 
   constructor(page: Page) {
     super(page);
@@ -48,7 +42,7 @@ export default class VirtualMachineDetailMetricsSnapshotsComponent extends BaseC
   }
 
   async cancelRestoreModal(): Promise<void> {
-    const cancelButton = this.locator('[data-test="cancel-button"]');
+    const cancelButton = this.testId('cancel-button');
     await cancelButton.waitFor({ state: 'visible', timeout: TestTimeouts.SHORT_WAIT });
     await this.robustClick(cancelButton);
   }
@@ -74,12 +68,10 @@ export default class VirtualMachineDetailMetricsSnapshotsComponent extends BaseC
   }
   /**
    * Clicks the snapshot row/link to select it (e.g. to open detail and show actions menu).
-   * Uses data-test or data-test-id matching the snapshot name.
+   * Uses data-test or data-test matching the snapshot name.
    */
   async clickSnapshot(snapshotName: string): Promise<void> {
-    const snapshotLocator = this.locator(
-      `[data-test="${snapshotName}"], [data-test-id="${snapshotName}"]`,
-    ).first();
+    const snapshotLocator = this.testId(snapshotName).first();
     await snapshotLocator.waitFor({
       state: 'visible',
       timeout: TestTimeouts.INSTANCE_TYPE_VERIFICATION,
@@ -98,9 +90,12 @@ export default class VirtualMachineDetailMetricsSnapshotsComponent extends BaseC
       const snapshotRow = this.locator(`tr:has-text("${snapshotName}")`);
       await snapshotRow.waitFor({ state: 'visible', timeout: TestTimeouts.VM_CREATION });
 
-      const actionButton = snapshotRow.locator(
-        'button.pf-v6-c-menu-toggle.pf-m-plain, [data-test="kebab-button"], button[aria-label="Actions"], button[aria-label="Kebab toggle"], td:last-child button',
-      );
+      const actionButton = snapshotRow
+        .locator('button.pf-v6-c-menu-toggle.pf-m-plain')
+        .or(snapshotRow.getByTestId('kebab-button'))
+        .or(snapshotRow.locator('button[aria-label="Actions"]'))
+        .or(snapshotRow.locator('button[aria-label="Kebab toggle"]'))
+        .or(snapshotRow.locator('td:last-child button'));
       await actionButton.first().click();
 
       const createVmItem = this.locator(
@@ -151,7 +146,7 @@ export default class VirtualMachineDetailMetricsSnapshotsComponent extends BaseC
     const deleteMenuItem = this.locator('[role="menuitem"]').filter({ hasText: 'Delete snapshot' });
     await deleteMenuItem.waitFor({ state: 'visible', timeout: TestTimeouts.VM_CREATION });
     await this.robustClick(deleteMenuItem);
-    const confirmButton = this.locator('[data-test="save-button"]');
+    const confirmButton = this.testId('save-button');
     await confirmButton.waitFor({ state: 'visible', timeout: TestTimeouts.VM_CREATION });
     await this.robustClick(confirmButton);
   }
@@ -163,7 +158,7 @@ export default class VirtualMachineDetailMetricsSnapshotsComponent extends BaseC
   async getFirstSnapshotNameFromSnapshotsTable(
     timeoutMs: number = TestTimeouts.STATUS_VALIDATION,
   ): Promise<string> {
-    const nameLink = this.locator('[data-test="vm-snapshot-list"] a').first();
+    const nameLink = this.testId('vm-snapshot-list').locator('a').first();
     await nameLink.waitFor({ state: 'visible', timeout: timeoutMs });
     const text = (await nameLink.textContent()) || '';
     return text.trim();
@@ -256,11 +251,11 @@ export default class VirtualMachineDetailMetricsSnapshotsComponent extends BaseC
     timeout: number = TestTimeouts.UI_VISIBILITY_QUICK,
   ): Promise<boolean> {
     try {
-      const timeRange = this.locator(
-        '[data-test="time-range-dropdown"], .pf-v6-c-menu-toggle',
-      ).filter({
-        hasText: /time range|Last \d/i,
-      });
+      const timeRange = this.testId('time-range-dropdown')
+        .or(this.locator('.pf-v6-c-menu-toggle'))
+        .filter({
+          hasText: /time range|Last \d/i,
+        });
       return await timeRange
         .first()
         .isVisible({ timeout })
@@ -525,7 +520,7 @@ export default class VirtualMachineDetailMetricsSnapshotsComponent extends BaseC
    * Verifies the Snapshots tab shows "No snapshots found" in the snapshot list empty state heading.
    */
   async verifyNoSnapshotsFoundInLoadingBox(): Promise<boolean> {
-    const emptyHeading = this.locator('[data-test="vm-snapshot-list"] h4');
+    const emptyHeading = this.testId('vm-snapshot-list').locator('h4');
     await emptyHeading.waitFor({ state: 'visible', timeout: TestTimeouts.STATUS_VALIDATION });
     const text = await emptyHeading.textContent();
     return text?.includes('No snapshots found') ?? false;
@@ -536,9 +531,10 @@ export default class VirtualMachineDetailMetricsSnapshotsComponent extends BaseC
   async verifyNoVirtualMachineSnapshotsEmptyState(): Promise<boolean> {
     try {
       await this.navigateToSnapshots();
-      const emptyBox = this.locator(
-        '[data-test="empty-box-body"], .pf-v6-c-empty-state, .pf-c-empty-state',
-      ).first();
+      const emptyBox = this.testId('empty-box-body')
+        .or(this.locator('.pf-v6-c-empty-state'))
+        .or(this.locator('.pf-c-empty-state'))
+        .first();
       await emptyBox.waitFor({ state: 'visible', timeout: TestTimeouts.STATUS_VALIDATION });
       const text = await emptyBox.textContent();
       return (
@@ -555,9 +551,9 @@ export default class VirtualMachineDetailMetricsSnapshotsComponent extends BaseC
   async verifySnapshotExists(snapshotName: string): Promise<boolean> {
     try {
       await this.navigateToSnapshots();
-      const snapshotLocator = this.locator(
-        `[data-test="${snapshotName}"], [data-test-id="${snapshotName}"], a:has-text("${snapshotName}")`,
-      ).first();
+      const snapshotLocator = this.testId(snapshotName)
+        .or(this.locator(`a:has-text("${snapshotName}")`))
+        .first();
       await snapshotLocator.waitFor({
         state: 'visible',
         timeout: TestTimeouts.INSTANCE_TYPE_VERIFICATION,

@@ -5,43 +5,35 @@ import { expect } from '@playwright/test';
 
 /** VM list bulk/kebab actions, table row status and navigation helpers, and delete or confirmation modals from the list. */
 export default class VmListActionsComponent extends BaseComponent {
-  private readonly _actionsDropdown = this.locator('[data-test="actions-dropdown"] button');
-  private readonly _actionsDropdownButton = this.locator('[data-test="actions-dropdown"] button');
-  private readonly _controlMenu = this.locator('[data-test-id="control-menu"]');
+  private readonly _actionsDropdown = this.testId('actions-dropdown').locator('button');
+  private readonly _actionsDropdownButton = this.testId('actions-dropdown').locator('button');
+  private readonly _controlMenu = this.testId('control-menu');
   private readonly _dataTestSelectVm = this.locator('[data-test^="select-vm-"]');
-  private readonly _dialogModal = this.locator('[data-test="dialog-modal"]');
+  private readonly _dialogModal = this.testId('dialog-modal');
   private readonly _inputIdName = this.locator('input[id="name"], input[id="clone-name"]').first();
-  private readonly _kebabButton = this.locator('[data-test="kebab-button"]');
-  private readonly _migrateStorageAction = this.locator(
-    '[data-test-id="vm-action-migrate-storage"]',
-  );
-  private readonly _migrationMenuItem = this.locator('[data-test-id="migration-menu"]');
+  private readonly _kebabButton = this.testId('kebab-button');
+  private readonly _migrateStorageAction = this.testId('vm-action-migrate-storage');
+  private readonly _migrationMenuItem = this.testId('migration-menu');
   private readonly _selectPage = this.locator('[aria-label="Select page"]');
   private readonly _startClone = this.locator('#start-clone');
   private readonly _statusCells = this.locator('tbody td:nth-child(3)');
   private readonly _tagItemContent = this.locator('.tag-item-content');
-  private readonly _vmActionBulkMigration = this.locator('[data-test-id="bulk-migration-actions"]');
-  private readonly _vmActionClone = this.locator('[data-test-id="vm-action-clone"]');
-  private readonly _vmActionDelete = this.locator('[data-test-id="vm-action-delete"]');
-  private readonly _vmActionEditLabels = this.locator('[data-test-id="vm-action-edit-labels"]');
-  private readonly _vmActionMigrateCompute = this.locator(
-    '[data-test-id="vm-action-migrate-compute"]',
-  );
-  private readonly _vmActionMoveToFolder = this.locator(
-    '[data-test-id="vm-action-move-to-folder"]',
-  );
-  private readonly _vmActionOpenConsole = this.locator('[data-test-id="vm-action-open-console"]');
-  private readonly _vmActionPauseButton = this.locator('[data-test-id="vm-action-pause-button"]');
-  private readonly _vmActionReset = this.locator('[data-test-id="vm-action-reset"]');
-  private readonly _vmActionRestart = this.locator('[data-test-id="vm-action-restart"]');
-  private readonly _vmActionsDropdown = this.locator('[data-test="actions-dropdown"]');
-  private readonly _vmActionSnapshot = this.locator('[data-test-id="vm-action-snapshot"]');
-  private readonly _vmActionStart = this.locator('[data-test-id="vm-action-start"]');
-  private readonly _vmActionStop = this.locator('[data-test-id="vm-action-stop"]');
-  private readonly _vmActionUnpauseButton = this.locator(
-    '[data-test-id="vm-action-unpause-button"]',
-  );
-  private readonly _vmListSaveButton = this.locator('[data-test="save-button"]');
+  private readonly _vmActionBulkMigration = this.testId('bulk-migration-actions');
+  private readonly _vmActionClone = this.testId('vm-action-clone');
+  private readonly _vmActionDelete = this.testId('vm-action-delete');
+  private readonly _vmActionEditLabels = this.testId('vm-action-edit-labels');
+  private readonly _vmActionMigrateCompute = this.testId('vm-action-migrate-compute');
+  private readonly _vmActionMoveToFolder = this.testId('vm-action-move-to-folder');
+  private readonly _vmActionOpenConsole = this.testId('vm-action-open-console');
+  private readonly _vmActionPauseButton = this.testId('vm-action-pause-button');
+  private readonly _vmActionReset = this.testId('vm-action-reset');
+  private readonly _vmActionRestart = this.testId('vm-action-restart');
+  private readonly _vmActionsDropdown = this.testId('actions-dropdown');
+  private readonly _vmActionSnapshot = this.testId('vm-action-snapshot');
+  private readonly _vmActionStart = this.testId('vm-action-start');
+  private readonly _vmActionStop = this.testId('vm-action-stop');
+  private readonly _vmActionUnpauseButton = this.testId('vm-action-unpause-button');
+  private readonly _vmListSaveButton = this.testId('save-button');
 
   constructor(page: Page) {
     super(page);
@@ -122,19 +114,19 @@ export default class VmListActionsComponent extends BaseComponent {
   ): Promise<void> {
     switch (action) {
       case 'start':
-        await this.robustClick(this.locator('[data-test-id="selected-vms-action-start"]'));
+        await this.robustClick(this.testId('selected-vms-action-start'));
         break;
       case 'restart':
-        await this.robustClick(this.locator('[data-test-id="selected-vms-action-restart"]'));
+        await this.robustClick(this.testId('selected-vms-action-restart'));
         break;
       case 'stop':
-        await this.robustClick(this.locator('[data-test-id="selected-vms-action-stop"]'));
+        await this.robustClick(this.testId('selected-vms-action-stop'));
         break;
       case 'pause':
-        await this.robustClick(this.locator('[data-test-id="selected-vms-action-pause"]'));
+        await this.robustClick(this.testId('selected-vms-action-pause'));
         break;
       case 'unpause':
-        await this.robustClick(this.locator('[data-test-id="selected-vms-action-unpause"]'));
+        await this.robustClick(this.testId('selected-vms-action-unpause'));
         break;
       case 'bulk-migration':
         await this.robustClick(this._vmActionBulkMigration);
@@ -143,7 +135,7 @@ export default class VmListActionsComponent extends BaseComponent {
         await this.robustClick(this._vmActionMoveToFolder);
         break;
       case 'edit-labels':
-        await this.robustClick(this.locator('[data-test-id="selected-vms-action-edit-labels"]'));
+        await this.robustClick(this.testId('selected-vms-action-edit-labels'));
         break;
       case 'delete':
         await this.robustClick(this._vmActionDelete);
@@ -154,7 +146,7 @@ export default class VmListActionsComponent extends BaseComponent {
   }
 
   private async clickKebabInVmRow(vmRow: Locator): Promise<void> {
-    const primary = vmRow.locator('[data-test="kebab-button"]');
+    const primary = vmRow.getByTestId('kebab-button');
     const fallback = vmRow.locator('[data-test-id="kebab-button"]');
     const primaryVisible = await primary
       .isVisible({ timeout: TestTimeouts.UI_DELAY_SHORT })
@@ -355,13 +347,13 @@ export default class VmListActionsComponent extends BaseComponent {
   }
 
   async clickVmByTestId(vmName: string): Promise<void> {
-    const vmLocator = this.locator(`[data-test-id="${vmName}"]`).first();
+    const vmLocator = this.testId(vmName).first();
     await vmLocator.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
     await this.robustClick(vmLocator);
   }
 
   async clickVmName(vmName: string, _namespace: string): Promise<void> {
-    const vmElement = this.locator(`[data-test-id="${vmName}"]`).first();
+    const vmElement = this.testId(vmName).first();
     await vmElement.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
     await this.robustClick(vmElement);
   }
@@ -388,18 +380,18 @@ export default class VmListActionsComponent extends BaseComponent {
     }
 
     const actionMap: { [key: string]: string } = {
-      start: '[data-test-id="vm-action-start"]',
-      stop: '[data-test-id="vm-action-stop"]',
-      restart: '[data-test-id="vm-action-restart"]',
-      reset: '[data-test-id="vm-action-reset"]',
-      pause: '[data-test-id="vm-action-pause"]',
-      unpause: '[data-test-id="vm-action-unpause"]',
-      snapshot: '[data-test-id="vm-action-snapshot"]',
-      migrate: '[data-test-id="vm-action-migrate"]',
-      delete: '[data-test-id="vm-action-delete"]',
-      clone: '[data-test-id="vm-action-clone"]',
+      start: 'vm-action-start',
+      stop: 'vm-action-stop',
+      restart: 'vm-action-restart',
+      reset: 'vm-action-reset',
+      pause: 'vm-action-pause',
+      unpause: 'vm-action-unpause',
+      snapshot: 'vm-action-snapshot',
+      migrate: 'vm-action-migrate',
+      delete: 'vm-action-delete',
+      clone: 'vm-action-clone',
     };
-    const actionLocator = this.locator(actionMap[action]);
+    const actionLocator = this.testId(actionMap[action]);
     await this.robustClick(actionLocator);
     await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
   }
@@ -457,9 +449,10 @@ export default class VmListActionsComponent extends BaseComponent {
   }
 
   async clickVmStatusButton(vmName: string): Promise<void> {
-    const vmRow = this.locator(
-      `tr:has([data-test-id="${vmName}"]), tr:has-text("${vmName}")`,
-    ).first();
+    const vmRow = this.locator('tr')
+      .filter({ has: this.testId(vmName) })
+      .or(this.locator(`tr:has-text("${vmName}")`))
+      .first();
     await vmRow.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
     const statusCell = vmRow.locator('td:nth-child(3)');
     const statusButton = statusCell.locator('button');
@@ -492,7 +485,7 @@ export default class VmListActionsComponent extends BaseComponent {
         await this._startClone.click({ force: true });
       }
     }
-    const cloneBtn = this.locator('[data-test="save-button"]', { hasText: 'Clone' });
+    const cloneBtn = this.testId('save-button').filter({ hasText: 'Clone' });
     await cloneBtn.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
     await expect(cloneBtn).toBeEnabled({ timeout: TestTimeouts.ELEMENT_WAIT });
     await this.robustClick(cloneBtn);
@@ -526,7 +519,7 @@ export default class VmListActionsComponent extends BaseComponent {
 
   getVmRow(vmName: string) {
     return this.locator('tr[data-ouia-component-type="PF6/TableRow"]').filter({
-      has: this.locator(`[data-test-id="${vmName}"]`),
+      has: this.testId(vmName),
     });
   }
 
@@ -535,9 +528,10 @@ export default class VmListActionsComponent extends BaseComponent {
     timeout: number = TestTimeouts.UI_ELEMENT_VISIBILITY,
   ): Promise<string | null> {
     try {
-      const vmRow = this.locator(
-        `tr:has([data-test-id="${vmName}"]), tr:has-text("${vmName}")`,
-      ).first();
+      const vmRow = this.locator('tr')
+        .filter({ has: this.testId(vmName) })
+        .or(this.locator(`tr:has-text("${vmName}")`))
+        .first();
       await vmRow.waitFor({ state: 'visible', timeout });
 
       const statusCell = vmRow.locator('td:nth-child(3)');
@@ -602,7 +596,7 @@ export default class VmListActionsComponent extends BaseComponent {
   }
 
   async hoverOverMigrateMenu(): Promise<void> {
-    const migrateMenuButton = this.locator('[data-test-id="migration-menu"]');
+    const migrateMenuButton = this.testId('migration-menu');
     await migrateMenuButton.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ACTION_COMPLETE });
     await migrateMenuButton.hover();
     await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
@@ -628,7 +622,7 @@ export default class VmListActionsComponent extends BaseComponent {
     timeout: number = TestTimeouts.ELEMENT_WAIT,
   ): Promise<boolean> {
     try {
-      const actionLocator = this.locator(`[data-test-id="${actionTestId}"] button`);
+      const actionLocator = this.testId(actionTestId).locator('button');
       const isVisible = await actionLocator.isVisible({ timeout });
       if (!isVisible) {
         return false;
@@ -645,7 +639,7 @@ export default class VmListActionsComponent extends BaseComponent {
     timeout: number = TestTimeouts.ELEMENT_WAIT,
   ): Promise<boolean> {
     try {
-      const actionLocator = this.locator(`[data-test-id="${actionTestId}"] button`);
+      const actionLocator = this.testId(actionTestId).locator('button');
       return await actionLocator.isVisible({ timeout });
     } catch {
       return false;
@@ -653,9 +647,10 @@ export default class VmListActionsComponent extends BaseComponent {
   }
 
   async isLightspeedIconVisibleForVm(vmName: string): Promise<boolean> {
-    const vmRow = this.locator(
-      `tr:has([data-test-id="${vmName}"]), tr:has-text("${vmName}")`,
-    ).first();
+    const vmRow = this.locator('tr')
+      .filter({ has: this.testId(vmName) })
+      .or(this.locator(`tr:has-text("${vmName}")`))
+      .first();
     await vmRow.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
     await new Promise((r) => setTimeout(r, 500));
 
@@ -752,7 +747,7 @@ export default class VmListActionsComponent extends BaseComponent {
     vmName: string,
     timeout: number = TestTimeouts.ELEMENT_WAIT,
   ): Promise<boolean> {
-    const vmElement = this.locator(`[data-test-id="${vmName}"]`).first();
+    const vmElement = this.testId(vmName).first();
     try {
       await vmElement.waitFor({ state: 'detached', timeout });
       return true;
@@ -766,7 +761,7 @@ export default class VmListActionsComponent extends BaseComponent {
     _namespace: string,
     timeout: number = TestTimeouts.ELEMENT_WAIT,
   ): Promise<boolean> {
-    const vmElement = this.locator(`[data-test-id="${vmName}"]`).first();
+    const vmElement = this.testId(vmName).first();
     try {
       await vmElement.waitFor({ state: 'visible', timeout });
       return true;
@@ -791,17 +786,17 @@ export default class VmListActionsComponent extends BaseComponent {
     try {
       await this.openVmRowActions(vmName);
       const actionMap: { [key: string]: string } = {
-        start: '[data-test-id="vm-action-start"]',
-        stop: '[data-test-id="vm-action-stop"]',
-        restart: '[data-test-id="vm-action-restart"]',
-        pause: '[data-test-id="vm-action-pause"]',
-        unpause: '[data-test-id="vm-action-unpause"]',
-        snapshot: '[data-test-id="vm-action-snapshot"]',
-        migrate: '[data-test-id="vm-action-migrate"]',
-        delete: '[data-test-id="vm-action-delete"]',
-        clone: '[data-test-id="vm-action-clone"]',
+        start: 'vm-action-start',
+        stop: 'vm-action-stop',
+        restart: 'vm-action-restart',
+        pause: 'vm-action-pause',
+        unpause: 'vm-action-unpause',
+        snapshot: 'vm-action-snapshot',
+        migrate: 'vm-action-migrate',
+        delete: 'vm-action-delete',
+        clone: 'vm-action-clone',
       };
-      const actionLocator = this.locator(actionMap[action]);
+      const actionLocator = this.testId(actionMap[action]);
       const isVisible = await actionLocator.isVisible({ timeout: TestTimeouts.UI_DELAY_LONG });
       if (!isVisible) {
         return false;
@@ -829,17 +824,17 @@ export default class VmListActionsComponent extends BaseComponent {
     try {
       await this.openVmRowActions(vmName);
       const actionMap: { [key: string]: string } = {
-        start: '[data-test-id="vm-action-start"]',
-        stop: '[data-test-id="vm-action-stop"]',
-        restart: '[data-test-id="vm-action-restart"]',
-        pause: '[data-test-id="vm-action-pause"]',
-        unpause: '[data-test-id="vm-action-unpause"]',
-        snapshot: '[data-test-id="vm-action-snapshot"]',
-        migrate: '[data-test-id="vm-action-migrate"]',
-        delete: '[data-test-id="vm-action-delete"]',
-        clone: '[data-test-id="vm-action-clone"]',
+        start: 'vm-action-start',
+        stop: 'vm-action-stop',
+        restart: 'vm-action-restart',
+        pause: 'vm-action-pause',
+        unpause: 'vm-action-unpause',
+        snapshot: 'vm-action-snapshot',
+        migrate: 'vm-action-migrate',
+        delete: 'vm-action-delete',
+        clone: 'vm-action-clone',
       };
-      const actionLocator = this.locator(actionMap[action]);
+      const actionLocator = this.testId(actionMap[action]);
       return await actionLocator.isVisible({ timeout: TestTimeouts.UI_DELAY_LONG });
     } catch {
       return false;
@@ -850,7 +845,7 @@ export default class VmListActionsComponent extends BaseComponent {
     vmName: string,
     timeout: number = TestTimeouts.ELEMENT_WAIT,
   ): Promise<boolean> {
-    const vmElement = this.locator(`[data-test="${vmName}"]`);
+    const vmElement = this.testId(vmName);
     try {
       await vmElement.waitFor({ state: 'visible', timeout });
       return true;
@@ -860,7 +855,7 @@ export default class VmListActionsComponent extends BaseComponent {
   }
 
   async openBulkActionsDropdown() {
-    await this.robustClick(this.locator('[data-test="actions-dropdown"]'));
+    await this.robustClick(this.testId('actions-dropdown'));
     await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
   }
 
@@ -900,7 +895,7 @@ export default class VmListActionsComponent extends BaseComponent {
     if (exists) {
       await this.robustClick(selectPageCheckbox);
     } else {
-      const fallbackCheckbox = this.locator('[data-test-id="select-page"]');
+      const fallbackCheckbox = this.testId('select-page');
       await this.robustClick(fallbackCheckbox);
     }
     await this.page.waitForTimeout(TestTimeouts.RETRY_DELAY);
@@ -977,7 +972,7 @@ export default class VmListActionsComponent extends BaseComponent {
       .isVisible({ timeout: TestTimeouts.SHORT_WAIT })
       .catch(() => false));
 
-    await this.robustClick(this.locator('[data-test="cancel-button"]'));
+    await this.robustClick(this.testId('cancel-button'));
     return absent;
   }
 
@@ -1015,7 +1010,7 @@ export default class VmListActionsComponent extends BaseComponent {
 
   async waitForMultipleVMsToDisappear(vmNames: string[], timeout = 60000): Promise<void> {
     for (const vmName of vmNames) {
-      await this.page.waitForSelector(`[data-test-id="${vmName}"]`, {
+      await this.testId(vmName).waitFor({
         state: 'detached',
         timeout,
       });
@@ -1026,7 +1021,7 @@ export default class VmListActionsComponent extends BaseComponent {
     vmName: string,
     timeout: number = TestTimeouts.DEFAULT,
   ): Promise<void> {
-    await this.locator(`[data-test-id="${vmName}"]`).first().waitFor({
+    await this.testId(vmName).first().waitFor({
       state: 'detached',
       timeout,
     });
@@ -1036,7 +1031,7 @@ export default class VmListActionsComponent extends BaseComponent {
     vmName: string,
     timeoutMs: number = TestTimeouts.UI_ELEMENT_VISIBILITY,
   ): Promise<void> {
-    const vmRow = this.locator(`[data-test-id="${vmName}"]`).first();
+    const vmRow = this.testId(vmName).first();
     await vmRow.waitFor({ state: 'visible', timeout: timeoutMs });
   }
 

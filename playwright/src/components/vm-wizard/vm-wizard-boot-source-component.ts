@@ -3,14 +3,15 @@ import { TestTimeouts } from '@/utils/test-config';
 import type { Page } from '@playwright/test';
 
 export default class VmWizardBootSourceComponent extends BaseComponent {
-  private readonly _dialogModalTabModal = this.locator('[data-test="dialog-modal"], #tab-modal');
+  private readonly _dialogModalTabModal = this.testId('dialog-modal').or(
+    this.locator('#tab-modal'),
+  );
   private readonly _noBootSource = this.locator('text=No boot source');
   private readonly _pfV6CWizardAddVolumeBtn = this.locator(
     '.pf-v6-c-wizard button:has-text("Add volume")',
   );
-  private readonly _pfV6CWizardInputnameFilterInput = this.locator(
-    '.pf-v6-c-wizard input[data-test="name-filter-input"]',
-  );
+  private readonly _pfV6CWizardInputnameFilterInput =
+    this.locator('.pf-v6-c-wizard').getByTestId('name-filter-input');
   private readonly _pfV6CWizardTableTbodyTr = this.locator('.pf-v6-c-wizard table tbody tr');
   constructor(page: Page) {
     super(page);
@@ -157,9 +158,9 @@ export default class VmWizardBootSourceComponent extends BaseComponent {
 
   async isBootVolumeOsFilterVisible(): Promise<boolean> {
     try {
-      const osFilter = this.locator(
-        '.pf-v6-c-wizard [data-test="os-filter"], .pf-v6-c-wizard [data-test-row-filter="operating-system"]',
-      );
+      const osFilter = this.locator('.pf-v6-c-wizard')
+        .getByTestId('os-filter')
+        .or(this.locator('.pf-v6-c-wizard [data-test-row-filter="operating-system"]'));
       return await osFilter
         .first()
         .isVisible({ timeout: TestTimeouts.SHORT_WAIT })
