@@ -2,9 +2,8 @@ import { VirtualMachineTemplateRequestModelGroupVersionKind } from '@kubevirt-ui
 import { V1alpha1VirtualMachineTemplateRequest } from '@kubevirt-ui-ext/kubevirt-api/virt-template';
 import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
 import useListClusters from '@kubevirt-utils/hooks/useListClusters';
+import isResourceNotFoundError from '@kubevirt-utils/utils/isResourceNotFoundError';
 import { useK8sModel } from '@openshift-console/dynamic-plugin-sdk';
-
-import isResourceNotFoundError from './isResourceNotFoundError';
 
 type UseVirtualMachineTemplateRequests = (
   namespace?: string,

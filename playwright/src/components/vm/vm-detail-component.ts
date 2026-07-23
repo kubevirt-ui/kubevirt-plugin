@@ -529,7 +529,11 @@ export default class VmDetailComponent extends PageCommons {
     await this.performVmAction('restart');
   }
 
-  async saveAsTemplate(templateName: string, project: string): Promise<void> {
+  async saveAsTemplate(
+    templateName: string,
+    project: string,
+    options?: { category?: string },
+  ): Promise<void> {
     await this.performVmAction('save-as-template');
 
     const nameInput = this.locator('#template-name');
@@ -546,6 +550,25 @@ export default class VmDetailComponent extends PageCommons {
     const projectOption = this.locator(`[role="option"]:has-text("${project}")`);
     await projectOption.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
     await this.robustClick(projectOption);
+
+    if (options?.category) {
+      const categorySelect = this.locator('[data-test="template-category-select"]');
+      await categorySelect.waitFor({
+        state: 'visible',
+        timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+      });
+      const categoryInput = categorySelect.locator('input[role="combobox"]');
+      await this.robustClick(categoryInput);
+      await categoryInput.fill(options.category);
+      const categoryOption = this.page
+        .getByRole('option', { name: options.category, exact: true })
+        .first();
+      await categoryOption.waitFor({
+        state: 'visible',
+        timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+      });
+      await this.robustClick(categoryOption);
+    }
 
     const submitBtn = this.locator('button:has-text("Save as template")').last();
     await submitBtn.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });

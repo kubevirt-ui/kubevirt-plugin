@@ -1,9 +1,9 @@
-import { V1Template, VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { type V1Template, VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
-  V1Disk,
-  V1Interface,
-  V1Network,
-  V1VirtualMachine,
+  type V1Disk,
+  type V1Interface,
+  type V1Network,
+  type V1VirtualMachine,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getAnnotation, getLabel, getLabels, getName } from '@kubevirt-utils/resources/shared';
 import { getCPU } from '@kubevirt-utils/resources/vm';
@@ -14,13 +14,14 @@ import {
   FLAVORS,
   OS_NAME_TYPES,
   TEMPLATE_BASE_IMAGE_NAME_PARAMETER,
+  TEMPLATE_CATEGORY_LABEL,
   TEMPLATE_DATA_SOURCE_NAME_PARAMETER,
   TEMPLATE_DEFAULT_VARIANT_LABEL,
   TEMPLATE_FLAVOR_LABEL,
   TEMPLATE_WORKLOAD_LABEL,
   WORKLOADS,
 } from './constants';
-import { isOpenShiftTemplate, isVirtualMachineTemplate, Template } from './types';
+import { isOpenShiftTemplate, isVirtualMachineTemplate, type Template } from './types';
 
 /**
  * A selector that returns the VirtualMachine object of a given template
@@ -95,7 +96,6 @@ export const getTemplateImportURLs = (template: V1Template): string[] | undefine
  * @param {Template} template - template
  */
 export const getTemplateFlavor = (template: Template): string => {
-  // eslint-disable-next-line jsdoc/require-jsdoc
   const isFlavorExist = (flavor: string) =>
     getLabel(template, `${TEMPLATE_FLAVOR_LABEL}/${flavor}`) === 'true';
 
@@ -107,11 +107,23 @@ export const getTemplateFlavor = (template: Template): string => {
  * @param {Template} template - template
  */
 export const getTemplateWorkload = (template: Template): string => {
-  // eslint-disable-next-line jsdoc/require-jsdoc
   const isWorkloadExist = (workload: string) =>
     getLabel(template, `${TEMPLATE_WORKLOAD_LABEL}/${workload}`) === 'true';
 
   return Object.values(WORKLOADS).find((flavor) => isWorkloadExist(flavor)) ?? 'unknown';
+};
+
+/**
+ * A selector that returns the category of a VirtualMachineTemplate.
+ * OpenShift Templates do not have categories.
+ * @param {Template} template - template
+ */
+export const getTemplateCategory = (template: Template): string | undefined => {
+  if (!isVirtualMachineTemplate(template)) {
+    return undefined;
+  }
+
+  return getLabel(template, TEMPLATE_CATEGORY_LABEL);
 };
 
 /**

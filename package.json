@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "@forklift-ui/types": "^1.2.1",
-    "@kubevirt-ui-ext/kubevirt-api": "2.1.1",
+    "@kubevirt-ui-ext/kubevirt-api": "2.1.4",
     "@kubevirt-ui-ext/vnc-keymaps": "1.0.4",
     "@novnc/novnc": "1.5.0",
     "@patternfly/quickstarts": "~6.5.0",

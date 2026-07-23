@@ -48,7 +48,8 @@ export type SelectTypeaheadOptionProps = {
 };
 
 type SelectTypeaheadProps = {
-  addOption?: (value: string) => boolean;
+  /** Return true to accept the input as-is, a string to accept a normalized value, or false to reject. */
+  addOption?: (value: string) => boolean | string;
   canCreate?: boolean;
   dataTestId?: string;
   getCreateAction?: (value: string, t: TFunction) => SelectOptionProps;
@@ -192,8 +193,9 @@ const SelectTypeahead: FC<SelectTypeaheadProps> = ({
     if (!value) return;
 
     if (value === createActionId) {
-      if (addOption?.(inputValue)) {
-        selectOption({ value: inputValue });
+      const result = addOption?.(inputValue);
+      if (result) {
+        selectOption({ value: typeof result === 'string' ? result : inputValue });
       }
       return;
     }

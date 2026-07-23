@@ -3,9 +3,8 @@ import { V1alpha1VirtualMachineTemplate } from '@kubevirt-ui-ext/kubevirt-api/vi
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
 import useListClusters from '@kubevirt-utils/hooks/useListClusters';
+import isResourceNotFoundError from '@kubevirt-utils/utils/isResourceNotFoundError';
 import { useK8sModel } from '@openshift-console/dynamic-plugin-sdk';
-
-import isResourceNotFoundError from './isResourceNotFoundError';
 
 type UseVirtualMachineTemplates = (
   namespace?: string,

@@ -482,7 +482,7 @@ export default class TemplatesPage extends PageCommons {
    * Opens the column manager and returns whether the given column checkbox is currently checked.
    */
   async isColumnEnabled(
-    columnName: 'namespace' | 'workload' | 'architecture' | 'cpu',
+    columnName: 'namespace' | 'category' | 'architecture' | 'cpu',
   ): Promise<boolean> {
     const columnManagementButton = this.testId('manage-columns');
     await columnManagementButton.waitFor({
@@ -492,7 +492,7 @@ export default class TemplatesPage extends PageCommons {
     await this.robustClick(columnManagementButton);
     const idMap: Record<string, string> = {
       namespace: '#data-list-namespace',
-      workload: '#data-list-workload',
+      category: '#data-list-category',
       architecture: '#data-list-architecture',
       cpu: '#data-list-cpu',
     };
@@ -760,7 +760,9 @@ export default class TemplatesPage extends PageCommons {
     await this.fillYamlEditor(updated);
   }
 
-  async toggleColumn(columnName: 'namespace' | 'workload' | 'architecture' | 'cpu') {
+  async toggleColumn(
+    columnName: 'namespace' | 'workload' | 'category' | 'architecture' | 'cpu',
+  ): Promise<void> {
     const columnManagementButton = this.testId('manage-columns');
     await columnManagementButton.waitFor({
       state: 'visible',
@@ -775,6 +777,9 @@ export default class TemplatesPage extends PageCommons {
         break;
       case 'workload':
         checkbox = this.locator('#data-list-workload');
+        break;
+      case 'category':
+        checkbox = this.locator('#data-list-category');
         break;
       case 'architecture':
         checkbox = this.locator('#data-list-architecture');
@@ -922,7 +927,7 @@ export default class TemplatesPage extends PageCommons {
   }
 
   async verifyTableHeaderExists(
-    headerLabel: 'Namespace' | 'Architecture' | 'Workload profile' | 'CPU | Memory',
+    headerLabel: 'Namespace' | 'Architecture' | 'Category' | 'CPU | Memory',
     shouldExist: boolean,
   ): Promise<boolean> {
     const header = this.page.locator('table.kubevirt-table th', { hasText: headerLabel });
