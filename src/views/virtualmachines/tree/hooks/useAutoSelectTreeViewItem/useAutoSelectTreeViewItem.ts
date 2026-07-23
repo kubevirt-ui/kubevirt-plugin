@@ -161,7 +161,8 @@ const useAutoSelectTreeViewItem = ({ dataMap, loaded }: UseAutoSelectTreeViewIte
       }
     }
 
-    if (!selected?.id || location.pathname !== selected?.href) {
+    const selectedPathname = selected?.href?.split?.('?')?.[0];
+    if (!selected?.id || location.pathname !== selectedPathname) {
       selectNamespaceOrFallback();
       return;
     }

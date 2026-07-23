@@ -1,26 +1,6 @@
-import { TFunction } from 'i18next';
-
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { resolveDateCreatedValue } from '@search/utils/dateCreatedValues';
 import { AdvancedSearchFilter } from '@stolostron/multicluster-sdk';
-import { VirtualMachineRowFilterType } from '@virtualmachines/utils/constants';
-
-export const getTooltipContent = (
-  filterType: VirtualMachineRowFilterType,
-  t: TFunction,
-): string | null => {
-  if (filterType === VirtualMachineRowFilterType.Cluster) {
-    return t(
-      'Cluster is already selected. To update filters, choose another project or cluster in the tree view.',
-    );
-  }
-  if (filterType === VirtualMachineRowFilterType.Project) {
-    return t(
-      'Project is already selected. To update filters, choose another project or cluster in the tree view.',
-    );
-  }
-  return null;
-};
 
 type DateCreatedSearchParams = {
   createdFrom: string | null;

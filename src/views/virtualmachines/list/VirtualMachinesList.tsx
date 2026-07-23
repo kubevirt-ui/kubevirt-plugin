@@ -43,7 +43,7 @@ import VirtualMachineBulkActionButton from './components/VirtualMachineBulkActio
 import VirtualMachineEmptyState from './components/VirtualMachineEmptyState/VirtualMachineEmptyState';
 import VirtualMachineFilteredEmptyState from './components/VirtualMachineFilteredEmptyState/VirtualMachineFilteredEmptyState';
 import VirtualMachineSelection from './components/VirtualMachineSelection/VirtualMachineSelection';
-import useClearFiltersOnClusterNamespaceChange from './hooks/useClearFiltersOnClusterNamespaceChange';
+import useFilterSync from './hooks/useFilterSync/useFilterSync';
 import useVirtualMachineListColumnUtils from './hooks/useVirtualMachineListColumnUtils';
 import useVirtualMachineListColumns from './hooks/useVirtualMachinesListColumns';
 import useVMListFilters from './hooks/useVMListFilters';
@@ -150,13 +150,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({
     [onSetFilters, resetPagination],
   );
 
-  useClearFiltersOnClusterNamespaceChange({
-    cluster,
-    filters,
-    namespace,
-    onSetFilters,
-    resetPagination,
-  });
+  useFilterSync(handleSetFilters);
 
   useEffect(() => {
     deselectAllVMs();
