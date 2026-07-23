@@ -5,20 +5,20 @@ import { useNavigate } from 'react-router';
 import { Button } from '@patternfly/react-core';
 
 type OperatorPackageLinkProps = {
+  displayName: string;
   operatorHubURL: string | undefined;
-  packageName: string;
 };
 
-const OperatorPackageLink: FC<OperatorPackageLinkProps> = ({ operatorHubURL, packageName }) => {
+const OperatorPackageLink: FC<OperatorPackageLinkProps> = ({ displayName, operatorHubURL }) => {
   const navigate = useNavigate();
 
   if (!operatorHubURL) {
-    return <>{packageName}</>;
+    return <>{displayName}</>;
   }
 
   return (
     <Button isInline onClick={() => navigate(operatorHubURL)} variant="link">
-      {packageName}
+      {displayName}
     </Button>
   );
 };

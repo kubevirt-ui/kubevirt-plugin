@@ -10,7 +10,7 @@ import { InstallState } from '@settings/tabs/ClusterTab/components/Virtualizatio
 
 import { useCapabilitiesActions } from '../../context/useCapabilitiesActions';
 import { useCapabilitiesData } from '../../context/useCapabilitiesData';
-import { countInstalledBundleCapabilities, isBundleFeature } from '../../utils/utils';
+import { countInstalledCapabilities, getBundleFeatures } from '../../utils/utils';
 
 const getInstallBundleTooltipContent = (
   isAdmin: boolean,
@@ -36,9 +36,9 @@ const InstallBundleButton: FC = () => {
     return <Skeleton width="120px" />;
   }
 
-  const bundleFeatures = features.filter(isBundleFeature);
+  const bundleFeatures = getBundleFeatures(features);
   const allBundleCapabilitiesInstalled =
-    countInstalledBundleCapabilities(features, detailsMap) === bundleFeatures.length;
+    countInstalledCapabilities(bundleFeatures, detailsMap) === bundleFeatures.length;
 
   const isBundleInstallInProgress = bundleFeatures.some((feature) =>
     feature.operators.some(

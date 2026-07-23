@@ -19,9 +19,9 @@ const SelectionCards: FC<SelectionCardsProps> = ({ onSelectView, selectedView })
     <Grid hasGutter>
       {getSelectionCardConfigs(t).map((config) => (
         <SelectionCard
-          key={config.id}
           config={config}
           isSelected={selectedView === config.id}
+          key={config.id}
           onSelect={onSelectView}
         />
       ))}
