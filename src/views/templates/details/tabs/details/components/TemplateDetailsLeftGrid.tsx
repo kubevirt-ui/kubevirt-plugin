@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
 import DescriptionItemAnnotations from '@kubevirt-utils/components/DescriptionItem/components/DescriptionItemAnnotations';
 import DescriptionItemCluster from '@kubevirt-utils/components/DescriptionItem/components/DescriptionItemCluster';
@@ -13,6 +13,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import {
   getTemplateModel,
   getTemplateVirtualMachineObject,
+  isVirtualMachineTemplate,
 } from '@kubevirt-utils/resources/template';
 import { getMachineType } from '@kubevirt-utils/resources/vm';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
@@ -20,13 +21,14 @@ import { getOperatingSystemName } from '@kubevirt-utils/resources/vm/utils/opera
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { DescriptionList } from '@patternfly/react-core';
 
-import useEditTemplateAccessReview from '../../../hooks/useIsTemplateEditable';
-import { TemplateDetailsGridProps } from '../TemplateDetailsPage';
+import { type TemplateDetailsGridProps } from '../TemplateDetailsPage';
 
-import BootMethod from './BootMethod/BootMethod';
+import useEditTemplateAccessReview from '../../../hooks/useIsTemplateEditable';
 import BaseTemplate from './BaseTemplate';
+import BootMethod from './BootMethod/BootMethod';
 import CPUMemory from './CPUMemory';
 import DisplayName from './DisplayName';
+import TemplateCategory from './TemplateCategory';
 import WorkloadProfile from './WorkloadProfile';
 
 const TemplateDetailsLeftGrid: FC<TemplateDetailsGridProps> = ({ template }) => {
@@ -34,12 +36,14 @@ const TemplateDetailsLeftGrid: FC<TemplateDetailsGridProps> = ({ template }) => 
   const machineType = getMachineType(getTemplateVirtualMachineObject(template)) || NO_DATA_DASH;
   const { isTemplateEditable } = useEditTemplateAccessReview(template);
   const model = getTemplateModel(template);
+  const isVMTemplate = isVirtualMachineTemplate(template);
 
   return (
     <DescriptionList>
       <DescriptionItemName model={model} resource={template} />
       <DescriptionItemCluster resource={template} />
       <DescriptionItemNamespace model={model} resource={template} />
+      {isVMTemplate && <TemplateCategory editable={isTemplateEditable} template={template} />}
       <DescriptionItemLabels editable={isTemplateEditable} model={model} resource={template} />
       <DescriptionItemAnnotations editable={isTemplateEditable} model={model} resource={template} />
       <DisplayName editable={isTemplateEditable} template={template} />

@@ -1,19 +1,17 @@
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
-import { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
+import { type V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import ArchitectureLabel from '@kubevirt-utils/components/ArchitectureLabel/ArchitectureLabel';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getAnnotation, getName, getUID } from '@kubevirt-utils/resources/shared';
 import {
   ANNOTATIONS,
+  getTemplateCategoryDisplay,
   getTemplateFlavorData,
   getTemplateName,
-  getTemplateWorkload,
-  Template,
-  WORKLOADS_LABELS,
+  type Template,
 } from '@kubevirt-utils/resources/template';
 import { getTemplateBootSourceType } from '@kubevirt-utils/resources/template/hooks/useVmTemplateSource/utils';
-import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { getVMBootSourceLabel } from '@kubevirt-utils/resources/vm/utils/source';
 import { ARCHITECTURE_ID, getArchitecture } from '@kubevirt-utils/utils/architecture';
 import { readableSizeUnit } from '@kubevirt-utils/utils/units';
@@ -23,7 +21,6 @@ import { Tr } from '@patternfly/react-table';
 import { getTemplateOSIcon } from '@virtualmachines/wizard/utils/os-icons/os-icons';
 
 import TemplateRowAvailableSource from '../TemplateRowAvailableSource/TemplateRowAvailableSource';
-
 import TemplatesTableRowCell from './TemplatesTableRowCell';
 
 type TemplatesTableRowProps = {
@@ -87,9 +84,9 @@ const TemplatesTableRow: FC<TemplatesTableRowProps> = ({
           <ArchitectureLabel architecture={getArchitecture(template)} />
         </span>
       </TemplatesTableRowCell>
-      <TemplatesTableRowCell activeColumnIDs={activeColumnIDs} id="workload" width={10}>
-        <span data-test={`template-workload-${templateName}`}>
-          {WORKLOADS_LABELS?.[getTemplateWorkload(template)] ?? NO_DATA_DASH}
+      <TemplatesTableRowCell activeColumnIDs={activeColumnIDs} id="category" width={10}>
+        <span data-test={`template-category-${templateName}`}>
+          {getTemplateCategoryDisplay(template, t)}
         </span>
       </TemplatesTableRowCell>
       <TemplatesTableRowCell activeColumnIDs={activeColumnIDs} id="source">

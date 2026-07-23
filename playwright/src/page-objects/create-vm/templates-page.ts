@@ -291,6 +291,32 @@ export default class TemplatesPage extends PageCommons {
     await this.robustClick(this._footerSaveButton);
   }
 
+  async editCategoryFromDetails(category: string): Promise<void> {
+    const categoryValue = this.locator('[data-test="template-category"]');
+    await categoryValue.waitFor({
+      state: 'visible',
+      timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+    });
+    await this.robustClick(categoryValue);
+
+    const modal = this.locator('[role="dialog"]');
+    await modal.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+    const categorySelect = modal.locator('[data-test="template-category-select"]');
+    const categoryInput = categorySelect.locator('input[role="combobox"]');
+    await this.robustClick(categoryInput);
+    await categoryInput.fill(category);
+    const categoryOption = this.page.getByRole('option', { name: category, exact: true }).first();
+    await categoryOption.waitFor({
+      state: 'visible',
+      timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+    });
+    await this.robustClick(categoryOption);
+
+    const saveButton = modal.locator('button:has-text("Save")').last();
+    await this.robustClick(saveButton);
+    await modal.waitFor({ state: 'hidden', timeout: TestTimeouts.UI_ACTION_COMPLETE });
+  }
+
   async fillCloneTemplateModal(
     metadataName: string,
     displayName?: string,
@@ -468,6 +494,18 @@ export default class TemplatesPage extends PageCommons {
     }
   }
 
+  async hasCategoryInTemplateRow(templateName: string, category: string): Promise<boolean> {
+    const row = this.getTemplateRow(templateName);
+    const categoryCell = row.locator(`[data-test="template-category-${templateName}"]`);
+    try {
+      await categoryCell.waitFor({ state: 'visible', timeout: TestTimeouts.UI_DELAY_MEDIUM });
+      const text = await categoryCell.textContent();
+      return text?.trim() === category;
+    } catch {
+      return false;
+    }
+  }
+
   async isBaseTemplateVisible(templateName: string): Promise<boolean> {
     const baseTemplateElement = this.testId(templateName);
     await baseTemplateElement
@@ -476,6 +514,20 @@ export default class TemplatesPage extends PageCommons {
         return;
       });
     return await baseTemplateElement.isVisible().catch(() => false);
+  }
+
+  async isCategoryVisibleOnDetails(category: string): Promise<boolean> {
+    const categoryValue = this.locator('[data-test="template-category"]');
+    try {
+      await categoryValue.waitFor({
+        state: 'visible',
+        timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+      });
+      const text = await categoryValue.textContent();
+      return text?.includes(category) ?? false;
+    } catch {
+      return false;
+    }
   }
 
   /**

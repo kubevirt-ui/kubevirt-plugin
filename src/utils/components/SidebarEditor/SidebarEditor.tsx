@@ -94,7 +94,7 @@ const SidebarEditor = <Resource extends K8sResourceCommon>({
 
   return (
     <Sidebar className="sidebar-editor" hasGutter hasNoBackground isPanelRight>
-      <SidebarContent>{childrenComponent}</SidebarContent>
+      <SidebarContent hasNoBackground>{childrenComponent}</SidebarContent>
       {showEditor && (
         <SidebarPanel
           className="sidebar-editor__panel"

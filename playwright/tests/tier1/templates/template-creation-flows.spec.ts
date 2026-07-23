@@ -32,9 +32,13 @@ test.describe.serial('Template creation flows', { tag: [T1_TAG, '@tier1-template
 
     const vmName = utils.generateRandomVmName('vm-save-tpl');
     const templateName = utils.generateRandomTemplateName('saved-tpl');
-    // Display label with a space; persisted label value replaces spaces with '-'.
-    const categoryDisplay = 'Operating systems';
-    const categoryLabel = 'Operating-systems';
+    // Spaces in the typeahead input are normalized to '-' on the persisted label.
+    const saveAsTemplateCategory = {
+      display: 'Operating systems',
+      label: 'Operating-systems',
+    } as const;
+    const editedCategory = 'Databases';
+    const finalCategory = 'Security';
 
     await apiClient.createVmFromTemplate(
       utils.TEMPLATE_METADATA_NAMES.RHEL9,
@@ -52,7 +56,9 @@ test.describe.serial('Template creation flows', { tag: [T1_TAG, '@tier1-template
     const isVmVisible = await vmDetailPage.isVmNameVisible(vmName);
     expect.soft(isVmVisible, `VM ${vmName} should be visible on detail page`).toBe(true);
 
-    await vmDetailPage.saveAsTemplate(templateName, sharedNs, { category: categoryDisplay });
+    await vmDetailPage.saveAsTemplate(templateName, sharedNs, {
+      category: saveAsTemplateCategory.display,
+    });
     apiClient.trackResource('VirtualMachineTemplate', templateName, sharedNs);
 
     await expect
@@ -68,12 +74,12 @@ test.describe.serial('Template creation flows', { tag: [T1_TAG, '@tier1-template
           return template?.metadata?.labels?.['vm.kubevirt.io/category'];
         },
         {
-          message: `Template ${templateName} should have category label "${categoryLabel}"`,
+          message: `Template ${templateName} should have category label "${saveAsTemplateCategory.label}"`,
           timeout: utils.TestTimeouts.DEFAULT,
           intervals: [2000, 3000, 5000],
         },
       )
-      .toBe(categoryLabel);
+      .toBe(saveAsTemplateCategory.label);
 
     if (!utils.EnvVariables.onAcm) {
       await pageCommons.switchProject(sharedNs);
@@ -92,6 +98,34 @@ test.describe.serial('Template creation flows', { tag: [T1_TAG, '@tier1-template
           intervals: [2000, 3000, 5000],
         },
       )
+      .toBe(true);
+
+    await templatesPage.navigateToTemplateDetail(templateName);
+    await templatesPage.editCategoryFromDetails(editedCategory);
+    await expect
+      .poll(() => templatesPage.isCategoryVisibleOnDetails(editedCategory), {
+        message: `Template details should show category ${editedCategory}`,
+        timeout: utils.TestTimeouts.DEFAULT,
+        intervals: [1000, 2000],
+      })
+      .toBe(true);
+
+    await templatesPage.navigateToTemplatesViaUI();
+    await templatesPage.filterTemplatesByName(templateName);
+    const categoryInList = await templatesPage.hasCategoryInTemplateRow(
+      templateName,
+      editedCategory,
+    );
+    expect.soft(categoryInList, `Template row should show category ${editedCategory}`).toBe(true);
+
+    await templatesPage.navigateToTemplateDetail(templateName);
+    await templatesPage.editCategoryFromDetails(finalCategory);
+    await expect
+      .poll(() => templatesPage.isCategoryVisibleOnDetails(finalCategory), {
+        message: `Template details should show updated category ${finalCategory}`,
+        timeout: utils.TestTimeouts.DEFAULT,
+        intervals: [1000, 2000],
+      })
       .toBe(true);
   });
 
