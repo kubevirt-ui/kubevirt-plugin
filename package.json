@@ -140,6 +140,9 @@
     "shell-quote": "^1.8.4",
     "ajv-keywords@5.1.0": {
       "ajv": "^8.17.1"
+    },
+    "@openshift-console/plugin-shared": {
+      "sanitize-html": "2.17.4"
     }
   },
   "private": true,
