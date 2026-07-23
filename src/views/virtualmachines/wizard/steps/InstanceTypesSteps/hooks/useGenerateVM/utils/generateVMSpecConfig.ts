@@ -1,4 +1,4 @@
-import { V1Interface } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import {
   DEFAULT_INSTANCETYPE_LABEL,
   DEFAULT_PREFERENCE_KIND_LABEL,
@@ -7,17 +7,13 @@ import {
 import { VirtualMachineInstancetypeModel } from '@kubevirt-utils/models';
 import { isBootableVolumeISO } from '@kubevirt-utils/resources/bootableresources/helpers';
 import { getPVCStorageClassName } from '@kubevirt-utils/resources/bootableresources/selectors';
-import { getLabel, getLabels } from '@kubevirt-utils/resources/shared';
 import {
-  DEFAULT_NETWORK_INTERFACE,
-  getDefaultRunningStrategy,
-  UDN_BINDING_NAME,
-} from '@kubevirt-utils/resources/vm';
+  buildDefaultNetwork,
+  buildDefaultNetworkInterface,
+} from '@kubevirt-utils/resources/namespace/networkDefault';
+import { getLabel, getLabels } from '@kubevirt-utils/resources/shared';
+import { getDefaultRunningStrategy } from '@kubevirt-utils/resources/vm';
 import { OS_WINDOWS_PREFIX } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
-import { GenerateVMSpecConfiguration, GenerateVMSpecTemplateConfiguration } from '../types';
-import { getDataVolumeTemplates } from './generateVMSpecTemplateConfig';
-
-import { DEFAULT_NETWORK } from '@kubevirt-utils/resources/vm';
 import { getArchitecture } from '@kubevirt-utils/utils/architecture';
 import {
   HEADLESS_SERVICE_LABEL,
@@ -25,22 +21,31 @@ import {
 } from '@kubevirt-utils/utils/headless-service';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 
+import {
+  type GenerateVMSpecConfiguration,
+  type GenerateVMSpecTemplateConfiguration,
+} from '../types';
+
+import { getDataVolumeTemplates } from './generateVMSpecTemplateConfig';
 import { getDomainDisks, getTemplateVolumes } from './templateVolumeAndDisk';
 
+type VMSpecTemplate = NonNullable<NonNullable<V1VirtualMachine['spec']>['template']>;
+type VMSpec = NonNullable<V1VirtualMachine['spec']>;
+
 const getSpecTemplateConfiguration = ({
-  isUDNManagedNamespace,
   enableMultiArchBootImageImport,
   isIPv6SingleStack,
   isIso,
-  vmName,
-  selectedPreference,
+  isUDNManagedNamespace,
   populatedCloudInitYAML,
-  volumeName,
   selectedBootableVolume,
-}: GenerateVMSpecTemplateConfiguration) => {
-  const defaultInterface = isUDNManagedNamespace
-    ? ({ binding: { name: UDN_BINDING_NAME }, name: DEFAULT_NETWORK_INTERFACE.name } as V1Interface)
-    : DEFAULT_NETWORK_INTERFACE;
+  selectedPreference,
+  vmCreationNad,
+  vmName,
+  volumeName,
+}: GenerateVMSpecTemplateConfiguration): VMSpecTemplate => {
+  const defaultInterface = buildDefaultNetworkInterface({ isUDNManagedNamespace, vmCreationNad });
+  const defaultNetwork = buildDefaultNetwork({ vmCreationNad });
 
   const isWindowsVM = selectedPreference?.startsWith(OS_WINDOWS_PREFIX);
 
@@ -66,7 +71,7 @@ const getSpecTemplateConfiguration = ({
           interfaces: isIPv6SingleStack ? [] : [defaultInterface],
         },
       },
-      networks: isIPv6SingleStack ? [] : [DEFAULT_NETWORK],
+      networks: isIPv6SingleStack ? [] : [defaultNetwork],
       subdomain: HEADLESS_SERVICE_NAME,
       volumes: getTemplateVolumes(volumeName, isIso, vmName, isWindowsVM, populatedCloudInitYAML),
     },
@@ -74,17 +79,18 @@ const getSpecTemplateConfiguration = ({
 };
 
 export const getSpecConfiguration = ({
-  selectedBootableVolume,
-  dvSource,
-  pvcSource,
   customDiskSize,
-  vmName,
-  selectedInstanceType,
+  dvSource,
   enableMultiArchBootImageImport,
   isIPv6SingleStack,
-  populatedCloudInitYAML,
   isUDNManagedNamespace,
-}: GenerateVMSpecConfiguration) => {
+  populatedCloudInitYAML,
+  pvcSource,
+  selectedBootableVolume,
+  selectedInstanceType,
+  vmCreationNad,
+  vmName,
+}: GenerateVMSpecConfiguration): VMSpec => {
   const selectedPreference = getLabel(selectedBootableVolume, DEFAULT_PREFERENCE_LABEL);
   const selectPreferenceKind = getLabel(
     selectedBootableVolume,
@@ -97,21 +103,21 @@ export const getSpecConfiguration = ({
 
   return {
     dataVolumeTemplates: getDataVolumeTemplates({
-      volumeName,
-      selectedBootableVolume,
-      dvSource,
-      pvcSource,
       customDiskSize,
+      dvSource,
       isIso,
+      pvcSource,
+      selectedBootableVolume,
       storageClassName,
       vmName,
+      volumeName,
     }),
     instancetype: {
       ...(selectedInstanceType?.namespace && {
         kind: VirtualMachineInstancetypeModel.kind,
       }),
       name:
-        selectedInstanceType?.name ||
+        selectedInstanceType?.name ??
         getLabels(selectedBootableVolume)?.[DEFAULT_INSTANCETYPE_LABEL],
     },
     preference: {
@@ -123,12 +129,13 @@ export const getSpecConfiguration = ({
       enableMultiArchBootImageImport,
       isIPv6SingleStack,
       isIso,
-      vmName,
-      selectedPreference,
+      isUDNManagedNamespace,
       populatedCloudInitYAML,
       selectedBootableVolume,
+      selectedPreference,
+      vmCreationNad,
+      vmName,
       volumeName,
-      isUDNManagedNamespace,
     }),
   };
 };

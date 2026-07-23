@@ -1,5 +1,6 @@
 import { type Dispatch, type SetStateAction, useCallback, useEffect } from 'react';
 
+import { resolveProjectDefaultNetworkSelectValue } from '@kubevirt-utils/resources/namespace/networkDefault';
 import { POD_NETWORK } from '@kubevirt-utils/resources/vm';
 
 import { type NetworkSelectTypeaheadOptionProps } from './types';
@@ -7,6 +8,7 @@ import { type NetworkSelectTypeaheadOptionProps } from './types';
 type UseNetworkAutoSelectArgs = {
   canCreateNetworkInterface: boolean;
   isEditing?: boolean;
+  isPodNetworkAllowed?: boolean;
   loaded: boolean;
   loadError: unknown;
   networkName: string;
@@ -22,6 +24,7 @@ type UseNetworkAutoSelectArgs = {
 export const useNetworkAutoSelect = ({
   canCreateNetworkInterface,
   isEditing,
+  isPodNetworkAllowed = true,
   loaded,
   loadError,
   networkName,
@@ -54,7 +57,10 @@ export const useNetworkAutoSelect = ({
 
     if (loaded && !loadError && !selectedFirstOnLoad) {
       setSelectedFirstOnLoad(true);
-      const networkToPreselect = networkOptions?.[0]?.value;
+      const networkToPreselect = resolveProjectDefaultNetworkSelectValue(
+        isPodNetworkAllowed,
+        networkOptions,
+      );
       if (networkToPreselect) handleChange(networkToPreselect);
       return;
     }
@@ -66,6 +72,7 @@ export const useNetworkAutoSelect = ({
     loadError,
     canCreateNetworkInterface,
     isEditing,
+    isPodNetworkAllowed,
     loaded,
     networkName,
     networkOptions,

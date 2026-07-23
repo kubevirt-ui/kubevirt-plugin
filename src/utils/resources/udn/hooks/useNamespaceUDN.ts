@@ -5,7 +5,7 @@ import { NetworkAttachmentDefinitionModelGroupVersionKind } from '@kubevirt-util
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
-import { NetworkAttachmentDefinitionKind } from '@overview/OverviewTab/inventory-card/utils/types';
+import { NetworkAttachmentDefinitionKind } from '@kubevirt-utils/resources/nad/types';
 
 import { NADRole, NADTopology, PrimaryTopologies } from '../../nad/constants';
 

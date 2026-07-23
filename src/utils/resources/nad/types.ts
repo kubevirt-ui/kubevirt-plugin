@@ -1,4 +1,15 @@
+import { K8sResourceKind } from '@openshift-console/dynamic-plugin-sdk';
+
 import { NADTopology } from './constants';
+
+// The config is a JSON object with the NetworkAttachmentDefinitionConfig type stored as a string
+export type NetworkAttachmentDefinitionSpec = {
+  config: string;
+};
+
+export type NetworkAttachmentDefinitionKind = {
+  spec?: NetworkAttachmentDefinitionSpec;
+} & K8sResourceKind;
 
 type IPAMConfig = {
   dataDir?: string;

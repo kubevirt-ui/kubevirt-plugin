@@ -30,6 +30,7 @@ export const generateVM: GenerateVMCallback = ({
   isIPv6SingleStack,
   isUDNManagedNamespace,
   populatedCloudInitYAML,
+  vmCreationNad,
   pvcSource,
   selectedBootableVolume,
   selectedInstanceType,
@@ -59,6 +60,7 @@ export const generateVM: GenerateVMCallback = ({
       isIPv6SingleStack,
       populatedCloudInitYAML,
       isUDNManagedNamespace,
+      vmCreationNad,
     }),
   };
 

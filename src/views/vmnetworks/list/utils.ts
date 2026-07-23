@@ -14,7 +14,7 @@ import {
   UserDefinedNetworkKind,
 } from '@kubevirt-utils/resources/udn/types';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm';
-import { NetworkAttachmentDefinitionKind } from '@overview/OverviewTab/inventory-card/utils/types';
+import { NetworkAttachmentDefinitionKind } from '@kubevirt-utils/resources/nad/types';
 
 import { OtherVMNetwork, VMNetworkType } from './types';
 

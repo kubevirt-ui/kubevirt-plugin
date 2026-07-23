@@ -7,16 +7,7 @@ import {
   WatchK8sResults,
 } from '@openshift-console/dynamic-plugin-sdk';
 
-import { K8sResourceKind } from '../../../utils/types';
-
-// The config is a JSON object with the NetworkAttachmentDefinitionConfig type stored as a string
-export type NetworkAttachmentDefinitionSpec = {
-  config: string;
-};
-
-export type NetworkAttachmentDefinitionKind = {
-  spec?: NetworkAttachmentDefinitionSpec;
-} & K8sResourceKind;
+import { NetworkAttachmentDefinitionKind } from '@kubevirt-utils/resources/nad/types';
 
 export type InventoryCardResources = {
   nads: NetworkAttachmentDefinitionKind[];

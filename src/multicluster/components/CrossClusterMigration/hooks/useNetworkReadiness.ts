@@ -3,7 +3,7 @@ import { Updater } from 'use-immer';
 
 import { V1beta1NetworkMap, V1beta1NetworkMapSpecMapDestination } from '@forklift-ui/types';
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { NetworkAttachmentDefinition } from '@kubevirt-utils/components/NetworkInterfaceModal/components/hooks/types';
+import { NetworkAttachmentDefinitionKind } from '@kubevirt-utils/resources/nad/types';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 
@@ -21,7 +21,7 @@ export type UseNetworkReadinessReturnType = {
   isReady: boolean;
   loaded: boolean;
   networkMap: V1beta1NetworkMap;
-  targetNADs: NetworkAttachmentDefinition[];
+  targetNADs: NetworkAttachmentDefinitionKind[];
 };
 
 const useNetworkReadiness = (

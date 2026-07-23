@@ -1,7 +1,7 @@
 import partition from 'lodash/partition';
 
 import { NetworkAttachmentDefinitionModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { NetworkAttachmentDefinition } from '@kubevirt-utils/components/NetworkInterfaceModal/components/hooks/types';
+import { type NetworkAttachmentDefinitionKind } from '@kubevirt-utils/resources/nad/types';
 import {
   DEFAULT_NAMESPACE,
   OPENSHIFT_MULTUS_NS,
@@ -32,7 +32,7 @@ export const resources = {
   },
 };
 
-export const filterUDNNads = (nads: NetworkAttachmentDefinition[]) => {
+export const filterUDNNads = (nads: NetworkAttachmentDefinitionKind[]) => {
   const vmAvailableNADs = (nads ?? []).filter(
     (nad) => getName(nad) !== PRIMARY_UDN_KUBEVIRT_BINDING,
   );

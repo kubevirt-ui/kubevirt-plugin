@@ -9,7 +9,7 @@ import { HelperText, HelperTextItem, Label, type SelectOptionProps } from '@patt
 import { InfoIcon } from '@patternfly/react-icons';
 
 import { getNadFullName, getNameAndNs, isNadFullName, isOvnOverlayNad } from '../../utils/helpers';
-import { type NetworkAttachmentDefinition } from '../hooks/types';
+import { type NetworkAttachmentDefinitionKind } from '@kubevirt-utils/resources/nad/types';
 import InvalidNADNamespace from './components/InvalidNADNamespace';
 import { type NetworkSelectTypeaheadOptionProps } from './types';
 
@@ -97,8 +97,8 @@ export const buildValidators = ({
   vmiNamespace,
 }: {
   currentlyUsedNADFullNames: string[];
-  nads: NetworkAttachmentDefinition[];
-  primaryNADs: NetworkAttachmentDefinition[];
+  nads: NetworkAttachmentDefinitionKind[];
+  primaryNADs: NetworkAttachmentDefinitionKind[];
   t: TFunction;
   vmiNamespace: string;
 }): ((fullName: string) => ReactNode)[] => {

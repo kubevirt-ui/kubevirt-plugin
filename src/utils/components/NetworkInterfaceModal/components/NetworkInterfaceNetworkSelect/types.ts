@@ -5,7 +5,7 @@ import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { type SelectTypeaheadOptionProps } from '@kubevirt-utils/components/SelectTypeahead/SelectTypeahead';
 import { type ValidatedOptions } from '@patternfly/react-core';
 
-import { type NetworkAttachmentDefinition } from '../hooks/types';
+import { type NetworkAttachmentDefinitionKind } from '@kubevirt-utils/resources/nad/types';
 
 export type NetworkSelectTypeaheadOptionProps = SelectTypeaheadOptionProps & {
   type: string;
@@ -39,13 +39,14 @@ export type GetShowPodNetworkingOptionArgs = {
   hasPodNetwork: boolean;
   isEditing?: boolean;
   isIPv6SingleStack: boolean;
+  isPodNetworkAllowed?: boolean;
 };
 
 export type FilterNADsForSelectArgs = {
   currentlyUsedNADFullNames: string[];
   editInitValueNetworkName?: string;
   isEditing?: boolean;
-  nads: NetworkAttachmentDefinition[];
+  nads: NetworkAttachmentDefinitionKind[];
   vmiNamespace: string;
 };
 
@@ -67,7 +68,7 @@ export type GetEditingNetworkOptionIfMissingArgs = {
 export type BuildNetworkSelectOptionsArgs = {
   createdNetworkOptions: NetworkSelectTypeaheadOptionProps[];
   editInitValueNetworkName?: string;
-  filteredNADs: NetworkAttachmentDefinition[];
+  filteredNADs: NetworkAttachmentDefinitionKind[];
   isEditing?: boolean;
   podNetworkingText: string;
   podNetworkType: string;

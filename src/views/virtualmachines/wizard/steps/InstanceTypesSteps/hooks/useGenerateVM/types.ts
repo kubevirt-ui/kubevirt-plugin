@@ -1,8 +1,9 @@
-import { V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
-import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
-import { VMWizardFormValues } from '@virtualmachines/wizard/state/vm-wizard-form/types';
+import { type V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
+import { type IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
+import { type NetworkAttachmentDefinitionKind } from '@kubevirt-utils/resources/nad/types';
+import { type VMWizardFormValues } from '@virtualmachines/wizard/state/vm-wizard-form/types';
 
 type GenerateVMArgs = {
   cluster?: string;
@@ -18,6 +19,7 @@ type GenerateVMArgs = {
   selectedInstanceType: { name: string; namespace: string };
   sshSecretName?: string;
   targetNamespace: string;
+  vmCreationNad?: NetworkAttachmentDefinitionKind;
   vmDescription?: string;
   vmName?: string;
 };
@@ -25,37 +27,39 @@ type GenerateVMArgs = {
 export type GenerateVMCallback = (props: GenerateVMArgs) => V1VirtualMachine;
 
 export type GenerateVMSpecConfiguration = {
-  selectedBootableVolume: BootableVolume;
-  dvSource: VMWizardFormValues['instanceTypeData']['dvSource'];
-  pvcSource: VMWizardFormValues['instanceTypeData']['pvcSource'];
   customDiskSize: string;
-  vmName: string;
-  selectedInstanceType: VMWizardFormValues['instanceTypeData']['selectedInstanceType'];
+  dvSource: VMWizardFormValues['instanceTypeData']['dvSource'];
   enableMultiArchBootImageImport: boolean;
   isIPv6SingleStack: boolean;
-  populatedCloudInitYAML: string;
   isUDNManagedNamespace: boolean;
+  populatedCloudInitYAML: string;
+  pvcSource: VMWizardFormValues['instanceTypeData']['pvcSource'];
+  selectedBootableVolume: BootableVolume;
+  selectedInstanceType: VMWizardFormValues['instanceTypeData']['selectedInstanceType'];
+  vmCreationNad?: NetworkAttachmentDefinitionKind;
+  vmName: string;
 };
 
 export type GenerateVMSpecTemplateConfiguration = {
-  isUDNManagedNamespace: boolean;
   enableMultiArchBootImageImport: boolean;
   isIPv6SingleStack: boolean;
   isIso: boolean;
-  vmName: string;
+  isUDNManagedNamespace: boolean;
   populatedCloudInitYAML: string;
-  volumeName: string;
-  selectedPreference: string;
   selectedBootableVolume: BootableVolume;
+  selectedPreference: string;
+  vmCreationNad?: NetworkAttachmentDefinitionKind;
+  vmName: string;
+  volumeName: string;
 };
 
 export type GenerateVMSpecDataVolumeTemplates = {
-  volumeName: string;
-  selectedBootableVolume: BootableVolume;
-  dvSource: Parameters<GenerateVMCallback>[0]['dvSource'];
-  pvcSource: Parameters<GenerateVMCallback>[0]['pvcSource'];
   customDiskSize: string | undefined;
+  dvSource: Parameters<GenerateVMCallback>[0]['dvSource'];
   isIso: boolean;
+  pvcSource: Parameters<GenerateVMCallback>[0]['pvcSource'];
+  selectedBootableVolume: BootableVolume;
   storageClassName: string;
   vmName: string;
+  volumeName: string;
 };

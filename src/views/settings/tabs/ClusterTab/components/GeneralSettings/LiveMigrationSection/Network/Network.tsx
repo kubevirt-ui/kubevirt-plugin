@@ -6,7 +6,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { getName } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
-import { NetworkAttachmentDefinitionKind } from '@overview/OverviewTab/inventory-card/utils/types';
+import { NetworkAttachmentDefinitionKind } from '@kubevirt-utils/resources/nad/types';
 import {
   Alert,
   AlertVariant,

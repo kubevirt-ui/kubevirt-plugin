@@ -1,14 +1,17 @@
 import React from 'react';
-import { TFunction } from 'i18next';
+import { type TFunction } from 'i18next';
 
 import {
-  V1Disk,
-  V1Interface,
-  V1Network,
-  V1VirtualMachine,
+  type V1Disk,
+  type V1Interface,
+  type V1Network,
+  type V1VirtualMachine,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import TechPreviewBadge from '@kubevirt-utils/components/TechPreviewBadge/TechPreviewBadge';
-import { NetworkAttachmentDefinitionConfig } from '@kubevirt-utils/resources/nad/types';
+import {
+  type NetworkAttachmentDefinitionConfig,
+  type NetworkAttachmentDefinitionKind,
+} from '@kubevirt-utils/resources/nad/types';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getDisks, getInterface, getInterfaces, getNetworks } from '@kubevirt-utils/resources/vm';
 import {
@@ -20,7 +23,7 @@ import {
 import {
   interfaceLabelsProxy,
   interfaceTypesProxy,
-  NetworkPresentation,
+  type NetworkPresentation,
 } from '@kubevirt-utils/resources/vm/utils/network/constants';
 import {
   patchVM,
@@ -32,13 +35,10 @@ import {
   hasAutoAttachedPodNetwork,
   isPodNetwork,
 } from '@kubevirt-utils/resources/vm/utils/network/selectors';
-import { NetworkInterfaceState } from '@kubevirt-utils/resources/vm/utils/network/types';
+import { type NetworkInterfaceState } from '@kubevirt-utils/resources/vm/utils/network/types';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
-import { NetworkAttachmentDefinitionKind } from '@overview/OverviewTab/inventory-card/utils/types';
 import { ABSENT } from '@virtualmachines/details/tabs/configuration/network/utils/constants';
 import { isRunning, isStopped } from '@virtualmachines/utils';
-
-import { NetworkAttachmentDefinition } from '../components/hooks/types';
 
 export const hasExplicitlyDefinedPodNetwork = (vm: V1VirtualMachine): boolean =>
   getNetworks(vm)?.some(isPodNetwork);
@@ -162,9 +162,9 @@ export const prepareNICBootOrder = (vm: V1VirtualMachine): NICBootOrderPreparati
   };
 };
 
-type NADTypes = NetworkAttachmentDefinition | NetworkAttachmentDefinitionKind;
-
-export const parseNADConfig = (nad?: NADTypes): NetworkAttachmentDefinitionConfig | null => {
+export const parseNADConfig = (
+  nad?: NetworkAttachmentDefinitionKind,
+): NetworkAttachmentDefinitionConfig | null => {
   if (!nad?.spec?.config) return null;
 
   try {
@@ -175,18 +175,18 @@ export const parseNADConfig = (nad?: NADTypes): NetworkAttachmentDefinitionConfi
   }
 };
 
-const getRawNadConfigType = (nad: NetworkAttachmentDefinition): string | undefined => {
+const getRawNadConfigType = (nad: NetworkAttachmentDefinitionKind): string | undefined => {
   const config = parseNADConfig(nad);
   //can be config.type or config.plugin first element only!
   return config?.type || config?.plugins?.[0]?.type;
 };
 
-export const getNadType = (nad: NetworkAttachmentDefinition): string => {
+export const getNadType = (nad: NetworkAttachmentDefinitionKind): string => {
   const rawType = getRawNadConfigType(nad);
   return interfaceTypesProxy?.[rawType];
 };
 
-export const getNADRole = (nad: NetworkAttachmentDefinition): string => {
+export const getNADRole = (nad: NetworkAttachmentDefinitionKind): string => {
   const config = parseNADConfig(nad);
   return config?.role;
 };
@@ -194,7 +194,7 @@ export const getNADRole = (nad: NetworkAttachmentDefinition): string => {
 export const getNadFullName = ({ name, namespace }: { name: string; namespace: string }) =>
   `${namespace}/${name}`;
 
-export const getNameAndNs = (nad: NetworkAttachmentDefinition) => ({
+export const getNameAndNs = (nad: NetworkAttachmentDefinitionKind) => ({
   name: getName(nad) ?? '',
   namespace: getNamespace(nad) ?? '',
 });
@@ -202,14 +202,14 @@ export const getNameAndNs = (nad: NetworkAttachmentDefinition) => ({
 export const isNadFullName = (name: string) => name?.split('/').length === 2;
 
 export const isNADUsedInVM = (
-  nad: NetworkAttachmentDefinition,
+  nad: NetworkAttachmentDefinitionKind,
   currentlyUsedNADsNames: string[],
 ): boolean => {
   const nadFullName = getNadFullName(getNameAndNs(nad));
   return currentlyUsedNADsNames.includes(nadFullName);
 };
 
-export const isOvnOverlayNad = (nad: NetworkAttachmentDefinition): boolean => {
+export const isOvnOverlayNad = (nad: NetworkAttachmentDefinitionKind): boolean => {
   const rawType = getRawNadConfigType(nad);
   return rawType === NAD_TYPE_OVN_K8S_CNI_OVERLAY;
 };
