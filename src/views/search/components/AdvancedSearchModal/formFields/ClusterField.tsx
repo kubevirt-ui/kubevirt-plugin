@@ -8,7 +8,11 @@ import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
 import { useAdvancedSearchField } from '../store/useAdvancedSearchStore';
 
-const ClusterField: FC = () => {
+type ClusterFieldProps = {
+  isDisabled?: boolean;
+};
+
+const ClusterField: FC<ClusterFieldProps> = ({ isDisabled }) => {
   const { t } = useKubevirtTranslation();
   const { setValue, value } = useAdvancedSearchField(VirtualMachineRowFilterType.Cluster);
 
@@ -19,6 +23,7 @@ const ClusterField: FC = () => {
       <MultiSelectTypeahead
         allResourceNames={clusterNames}
         emptyValuePlaceholder={t('All clusters')}
+        isDisabled={isDisabled}
         selectedResourceNames={value}
         selectPlaceholder={t('Select cluster')}
         setSelectedResourceNames={setValue}

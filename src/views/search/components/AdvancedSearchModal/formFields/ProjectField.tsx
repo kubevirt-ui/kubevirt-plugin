@@ -10,10 +10,11 @@ import useProjectsWithVMs from '../hooks/useProjectsWithVMs';
 import { useAdvancedSearchField } from '../store/useAdvancedSearchStore';
 
 type ProjectFieldProps = {
+  isDisabled?: boolean;
   vms: V1VirtualMachine[];
 };
 
-const ProjectField: FC<ProjectFieldProps> = ({ vms }) => {
+const ProjectField: FC<ProjectFieldProps> = ({ isDisabled, vms }) => {
   const { t } = useKubevirtTranslation();
   const { setValue, value } = useAdvancedSearchField(VirtualMachineRowFilterType.Project);
 
@@ -24,6 +25,7 @@ const ProjectField: FC<ProjectFieldProps> = ({ vms }) => {
       <MultiSelectTypeahead
         allResourceNames={allProjectNames}
         emptyValuePlaceholder={t('All projects')}
+        isDisabled={isDisabled}
         selectedResourceNames={value}
         selectPlaceholder={t('Select project')}
         setSelectedResourceNames={setValue}
