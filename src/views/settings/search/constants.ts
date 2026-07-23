@@ -19,6 +19,10 @@ export const CLUSTER_TAB_IDS = {
   vmActionsConfirmation: 'vm-actions-confirmation',
 };
 
+export const DOWNLOADS_TAB_IDS = {
+  virtioDriversWindows: 'virtio-drivers-windows',
+};
+
 export const USER_TAB_IDS = {
   autoHideNav: 'auto-hide-nav',
   general: 'general',

@@ -44,6 +44,7 @@ export const CDROM_DEVICE_NAME = 'cd-rom';
 export const DISK_DEVICE_NAME = 'disk';
 export const WINDOWS_DRIVERS_DISK = 'windows-drivers-disk';
 export const VIRTIO_WIN_IMAGE = 'virtio-win-image';
+export const VIRTIO_WIN_IMAGE_DOWNLOAD_URL = 'virtio-win-image-download-url';
 
 export const VIRTIO_WIN_CONFIG_MAP_NAME = 'virtio-win';
 // Different releases, different locations. Respect the order when resolving. Otherwise the configMap name/namespace is considered as well-known.

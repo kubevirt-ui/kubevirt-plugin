@@ -9,6 +9,7 @@ import {
 
 import {
   CLUSTER_TAB_IDS,
+  DOWNLOADS_TAB_IDS,
   PREVIEW_FEATURES_TAB_IDS,
   RECOMMENDED_TAB_IDS,
   SEARCH_ITEM_CHILDREN_TREE,
@@ -73,9 +74,14 @@ const getPreviewFeaturesTabIds = (t: TFunction): SearchItem[] => [
   },
 ];
 
+const getDownloadsTabIds = (t: TFunction): SearchItem[] => [
+  { id: DOWNLOADS_TAB_IDS.virtioDriversWindows, title: t('VirtIO drivers for Windows') },
+];
+
 export const getSearchItems = (t: TFunction): SearchItemWithTab[] => {
   const tabsIds: { [key: string]: SearchItem[] } = {
     cluster: getClusterTabIds(t),
+    downloads: getDownloadsTabIds(t),
     features: getPreviewFeaturesTabIds(t),
     recommended: getRecommendedTabIds(t),
     user: getUserTabIds(t),
