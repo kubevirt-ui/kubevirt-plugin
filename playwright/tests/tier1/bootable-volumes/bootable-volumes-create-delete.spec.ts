@@ -56,7 +56,24 @@ test.describe('Tier1 Bootable Volumes - Create and Delete', { tag: [T1_TAG] }, (
 
       const dvName = utils.generateRandomDataVolumeName('bv-del');
 
-      await test.step('Create a DataSource via API as a bootable volume', async () => {
+      await test.step('Create a PVC and DataSource via API as a bootable volume', async () => {
+        await apiClient.createResource(
+          '',
+          'v1',
+          'persistentvolumeclaims',
+          {
+            apiVersion: 'v1',
+            kind: 'PersistentVolumeClaim',
+            metadata: { name: dvName, namespace: ns },
+            spec: {
+              accessModes: ['ReadWriteOnce'],
+              resources: { requests: { storage: '1Gi' } },
+            },
+          },
+          ns,
+        );
+        apiClient.trackResource('PersistentVolumeClaim', dvName, ns);
+
         await apiClient.createCustomResource('cdi.kubevirt.io', 'v1beta1', ns, 'datasources', {
           apiVersion: 'cdi.kubevirt.io/v1beta1',
           kind: 'DataSource',
@@ -87,7 +104,7 @@ test.describe('Tier1 Bootable Volumes - Create and Delete', { tag: [T1_TAG] }, (
           ns,
           utils.TestTimeouts.DEFAULT,
         );
-        expect.soft(rowVisible, 'DataSource row should be visible before deletion').toBe(true);
+        expect(rowVisible, 'DataSource row must be visible before deletion').toBe(true);
       });
 
       await test.step('Delete the bootable volume via kebab menu', async () => {

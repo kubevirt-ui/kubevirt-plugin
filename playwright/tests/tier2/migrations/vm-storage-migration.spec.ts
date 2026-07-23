@@ -74,6 +74,14 @@ test.describe(
     }) => {
       test.setTimeout(utils.TestTimeouts.TEST_EXTENDED);
 
+      const storageClasses = await apiClient.getStorageClasses();
+      const scNames = (storageClasses as { items?: Array<{ metadata?: { name?: string } }> })?.items
+        ?.map((sc) => sc.metadata?.name)
+        .filter(Boolean) as string[];
+      const destinationSC =
+        scNames?.find((n) => n === utils.STORAGE_CLASSES.VOL_DESTINATION) ?? scNames?.[0];
+      test.skip(!destinationSC, 'No storage class available for migration');
+
       const ns = await setupTestNamespace(apiClient, 'stor-mig-full');
       const vmName = utils.generateRandomVmName('stor-mig-full');
 
@@ -90,7 +98,7 @@ test.describe(
       await vmTreePage.navigateToProjectViaTreeView(ns);
       await vmListPage.clickVmListTab();
 
-      await vmListPage.performStorageClassMigration(vmName, utils.STORAGE_CLASSES.VOL_DESTINATION);
+      await vmListPage.performStorageClassMigration(vmName, destinationSC);
     });
 
     test('Start storage migration and cancel while in progress', async ({

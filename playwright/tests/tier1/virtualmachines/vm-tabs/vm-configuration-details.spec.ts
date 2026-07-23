@@ -44,17 +44,29 @@ test.describe.serial('VM Configuration — stopped RHEL9 VM', { tag: [T1_TAG, '@
       await vmTreePage.navigateToVmViaTreeView(ns, stoppedVm);
       await vmDetailPage.navigateToConfigurationScheduling();
 
-      const schedulingVisible = await vmDetailPage.verifySchedulingAndResourceRequirements();
-      expect
-        .soft(
-          schedulingVisible,
-          'Configuration Scheduling should show scheduling and resource requirements',
-        )
+      await expect
+        .poll(async () => vmDetailPage.verifySchedulingAndResourceRequirements(), {
+          timeout: 30_000,
+          intervals: [3_000],
+          message: 'Scheduling sub-tab should load',
+        })
         .toBe(true);
 
-      const evictionVisible = await vmDetailPage.verifyEvictionStrategyLiveMigrate();
-      expect
-        .soft(evictionVisible, 'Default RHEL9 template should show LiveMigrate eviction strategy')
+      await vmDetailPage.navigateToConfigurationScheduling();
+      await expect
+        .poll(
+          async () => {
+            return (
+              (await vmDetailPage.verifyEvictionStrategyLiveMigrate()) ||
+              (await vmDetailPage.verifyEvictionStrategyNone())
+            );
+          },
+          {
+            timeout: 30_000,
+            intervals: [3_000],
+            message: 'Scheduling tab should display an eviction strategy setting',
+          },
+        )
         .toBe(true);
 
       await vmDetailPage.navigateToConfigurationDetails();

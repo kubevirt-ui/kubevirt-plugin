@@ -20,7 +20,7 @@ const SingleClusterResourcesCard: FC<SingleClusterResourcesCardProps> = ({
   const { loaded: nodesLoaded, nodes: nodesCount } = useResourcesQuantities();
 
   return (
-    <div className="cluster-resources-card" data-test="cluster-resources-card">
+    <div className="cluster-resources-card" data-test="single-cluster-resources-card">
       <div
         aria-hidden="true"
         className="cluster-resources-card__tile cluster-resources-card__tile--placeholder"

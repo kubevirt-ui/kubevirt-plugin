@@ -307,7 +307,7 @@ export class VirtualMachineDetailConfigurationComponent extends BaseComponent {
   );
   private readonly _configurationStorageSubTab = this.testId('vm-configuration-storage');
   private readonly _configurationTab = this.testId('horizontal-link-Configuration');
-  private readonly _cpuMemoryButton = this.testId('virtual-machine-overview-details-cpu-memory');
+  private readonly _cpuMemoryButton = this.testId('cpu-memory-value');
   private readonly _dataVolumeDetails = this.locator('text=DataVolume details');
   private readonly _evictionStrategyElement = this.testId('eviction-strategy');
   private readonly _headlessCheckbox = this.locator('input[id="headless-mode"]');

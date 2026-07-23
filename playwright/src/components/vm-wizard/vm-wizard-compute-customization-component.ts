@@ -332,7 +332,14 @@ export default class VmWizardComputeCustomizationComponent extends BaseComponent
   }
 
   async selectCustomizationTab(
-    tabName: 'Details' | 'Storage' | 'Network' | 'Scheduling' | 'SSH' | 'Initial run' | 'Metadata',
+    tabName:
+      | 'Details'
+      | 'Storage'
+      | 'Network'
+      | 'Scheduling'
+      | 'SSH'
+      | 'Initial run'
+      | 'Labels and annotations',
   ): Promise<void> {
     const tab = this.locator(`button[role="tab"]:has-text("${tabName}")`);
     await this.robustClick(tab.first());
@@ -515,11 +522,13 @@ export default class VmWizardComputeCustomizationComponent extends BaseComponent
       'Scheduling',
       'SSH',
       'Initial run',
-      'Metadata',
+      'Labels and annotations',
     ];
     try {
+      const tablist = this.locator('[role="tablist"]');
+      await tablist.first().waitFor({ state: 'visible', timeout: TestTimeouts.SHORT_WAIT });
       for (const tabName of expectedTabs) {
-        const tab = this.locator(`button[role="tab"]:has-text("${tabName}")`);
+        const tab = tablist.getByRole('tab', { name: tabName });
         await tab.first().waitFor({
           state: 'visible',
           timeout: TestTimeouts.SHORT_WAIT,
@@ -566,7 +575,7 @@ export default class VmWizardComputeCustomizationComponent extends BaseComponent
     labelsEditButton: boolean;
     annotationsButton: boolean;
   }> {
-    await this.selectCustomizationTab('Metadata');
+    await this.selectCustomizationTab('Labels and annotations');
     await this.page.waitForTimeout(1000);
     const panel = this._roleTabpanel;
     await panel.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });

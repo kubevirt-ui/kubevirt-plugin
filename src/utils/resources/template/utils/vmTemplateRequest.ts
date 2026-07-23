@@ -1,6 +1,6 @@
 import { VirtualMachineTemplateRequestModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { type V1beta1VirtualMachineTemplateRequest } from '@kubevirt-ui-ext/kubevirt-api/virt-template';
+import { type V1alpha1VirtualMachineTemplateRequest } from '@kubevirt-ui-ext/kubevirt-api/virt-template';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
@@ -20,10 +20,10 @@ export const createVMTemplateRequest = async ({
   templateName,
   templateNamespace,
   vm,
-}: CreateVMTemplateRequestOptions): Promise<V1beta1VirtualMachineTemplateRequest> => {
+}: CreateVMTemplateRequestOptions): Promise<V1alpha1VirtualMachineTemplateRequest> => {
   const cluster = getCluster(vm);
 
-  const vmTemplateRequest: V1beta1VirtualMachineTemplateRequest = {
+  const vmTemplateRequest: V1alpha1VirtualMachineTemplateRequest = {
     apiVersion: `${VirtualMachineTemplateRequestModel.apiGroup}/${VirtualMachineTemplateRequestModel.apiVersion}`,
     kind: VirtualMachineTemplateRequestModel.kind,
     metadata: {

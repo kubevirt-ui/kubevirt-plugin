@@ -23,7 +23,7 @@ const AllClustersResourcesCard: FC<AllClustersResourcesCardProps> = ({
   const { loaded: nodesLoaded, nodesCount } = useAllClustersWorkerNodes();
 
   return (
-    <div className="cluster-resources-card" data-test="cluster-resources-card">
+    <div className="cluster-resources-card" data-test="all-clusters-resources-card">
       <ResourceTile count={clustersCount} label={t('Clusters')} />
       <ResourceTile count={nodesCount} isLoading={!nodesLoaded} label={t('Nodes')} />
       <ResourceTile count={projectsCount} label={t('Projects')} />

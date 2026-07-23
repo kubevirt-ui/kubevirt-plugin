@@ -1,5 +1,6 @@
 import { T1, T1_TAG } from '@/data-models/allure-constants';
 import { expect, test } from '@/fixtures/templates-fixture';
+import { isNativeVmTemplatesEnabled } from '@/utils/feature-flags';
 import { setupTemplateFromResource } from '@/utils/template-test-helpers';
 import { setupTestNamespace } from '@/utils/test-setup-helpers';
 
@@ -28,6 +29,7 @@ test.describe.serial('Template creation flows', { tag: [T1_TAG, '@tier1-template
     templatesPage,
     utils,
   }) => {
+    test.skip(!(await isNativeVmTemplatesEnabled(apiClient)), 'Native VM templates not enabled');
     test.setTimeout(utils.TestTimeouts.TEST_VM_CREATION);
 
     const vmName = utils.generateRandomVmName('vm-save-tpl');

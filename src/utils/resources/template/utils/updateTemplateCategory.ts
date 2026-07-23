@@ -1,5 +1,5 @@
 import { VirtualMachineTemplateModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { type V1beta1VirtualMachineTemplate } from '@kubevirt-ui-ext/kubevirt-api/virt-template';
+import { type V1alpha1VirtualMachineTemplate } from '@kubevirt-ui-ext/kubevirt-api/virt-template';
 import { getLabels } from '@kubevirt-utils/resources/shared';
 import { escapeJsonPointerToken, isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
@@ -11,7 +11,7 @@ import { toTemplateCategoryLabelValue } from './getTemplateCategoryLabel';
 
 type UpdateTemplateCategoryOptions = {
   category?: string;
-  template: V1beta1VirtualMachineTemplate;
+  template: V1alpha1VirtualMachineTemplate;
 };
 
 type GetTemplateCategoryPatchOptions = {
@@ -59,7 +59,7 @@ export const getTemplateCategoryPatch = ({
 export const updateTemplateCategory = ({
   category,
   template,
-}: UpdateTemplateCategoryOptions): Promise<V1beta1VirtualMachineTemplate> => {
+}: UpdateTemplateCategoryOptions): Promise<V1alpha1VirtualMachineTemplate> => {
   const currentLabels = getLabels(template) ?? {};
   const categoryLabelValue = category ? toTemplateCategoryLabelValue(category) : undefined;
   const data = getTemplateCategoryPatch({ categoryLabelValue, currentLabels });

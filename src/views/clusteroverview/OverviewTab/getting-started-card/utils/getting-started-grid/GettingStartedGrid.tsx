@@ -38,7 +38,12 @@ export const GettingStartedGrid: FC<GettingStartedGridProps> = ({ children }) =>
       variant="secondary"
     >
       <CardHeader onExpand={onExpand}>
-        <Title data-test="title" headingLevel="h2" id="tour-step-resources" size={TitleSizes.lg}>
+        <Title
+          data-test="getting-started-title"
+          headingLevel="h2"
+          id="tour-step-resources"
+          size={TitleSizes.lg}
+        >
           {title}{' '}
           <Tooltip content={titleTooltip}>
             <span
