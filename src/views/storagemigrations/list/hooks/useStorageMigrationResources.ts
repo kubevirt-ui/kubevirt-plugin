@@ -12,7 +12,7 @@ import {
 } from '@kubevirt-utils/resources/migrations/constants';
 import { normalizeSingleNsPlan } from '@kubevirt-utils/resources/migrations/singleNs/overview';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
-import isResourceNotFoundError from '@templates/list/hooks/isResourceNotFoundError';
+import isResourceNotFoundError from '@kubevirt-utils/utils/isResourceNotFoundError';
 
 type UseStorageMigrationResources = () => {
   loaded: boolean;

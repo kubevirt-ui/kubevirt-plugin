@@ -711,8 +711,12 @@ export default class VirtualMachineDetailPage extends PageCommons {
     return this.metricsSnapshots.restoreVmFromSnapshot(snapshotName);
   }
 
-  async saveAsTemplate(templateName: string, project: string): Promise<void> {
-    return this.actions.saveAsTemplate(templateName, project);
+  async saveAsTemplate(
+    templateName: string,
+    project: string,
+    options?: { category?: string },
+  ): Promise<void> {
+    return this.actions.saveAsTemplate(templateName, project, options);
   }
 
   async searchConfiguration(searchTerm: string, expectedResult?: string): Promise<boolean> {

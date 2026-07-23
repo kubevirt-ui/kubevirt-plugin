@@ -177,7 +177,19 @@ const tsConfigs = tseslint.configs.recommended.map((config) => ({
     '@typescript-eslint/no-deprecated': 'error',
     '@typescript-eslint/no-explicit-any': 'error',
 
-    '@typescript-eslint/no-floating-promises': 'error',
+    '@typescript-eslint/no-floating-promises': [
+      'error',
+      {
+        allowForKnownSafeCalls: [
+          {
+            from: 'package',
+            name: 'NavigateFunction',
+            package: 'react-router',
+          },
+        ],
+        ignoreVoid: true,
+      },
+    ],
     '@typescript-eslint/no-misused-promises': ['error', { checksVoidReturn: false }],
     '@typescript-eslint/no-non-null-assertion': 'error',
     '@typescript-eslint/no-require-imports': 'error',

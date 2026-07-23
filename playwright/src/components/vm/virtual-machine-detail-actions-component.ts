@@ -301,9 +301,13 @@ export default class VirtualMachineDetailActionsComponent extends PageCommons {
 
   /**
    * Opens the "Save as template" modal from the VM actions dropdown,
-   * fills in the template name and project, then submits.
+   * fills in the template name, project, and optional category, then submits.
    */
-  async saveAsTemplate(templateName: string, project: string): Promise<void> {
+  async saveAsTemplate(
+    templateName: string,
+    project: string,
+    options?: { category?: string },
+  ): Promise<void> {
     await this.performVmAction('save-as-template');
 
     const nameInput = this.locator('#template-name');
@@ -351,6 +355,25 @@ export default class VirtualMachineDetailActionsComponent extends PageCommons {
         timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
       });
       await this.robustClick(projectOption);
+    }
+
+    if (options?.category) {
+      const categorySelect = modal.locator('[data-test="template-category-select"]');
+      await categorySelect.waitFor({
+        state: 'visible',
+        timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+      });
+      const categoryInput = categorySelect.locator('input[role="combobox"]');
+      await this.robustClick(categoryInput);
+      await categoryInput.fill(options.category);
+      const categoryOption = this.page
+        .getByRole('option', { name: options.category, exact: true })
+        .first();
+      await categoryOption.waitFor({
+        state: 'visible',
+        timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+      });
+      await this.robustClick(categoryOption);
     }
 
     const submitBtn = this.locator('button:has-text("Save as template")').last();

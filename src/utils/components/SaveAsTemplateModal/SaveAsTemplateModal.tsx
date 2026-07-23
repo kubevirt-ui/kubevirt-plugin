@@ -1,11 +1,12 @@
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import CategorySelect from '@kubevirt-utils/components/CategorySelect/CategorySelect';
 import SelectProject from '@kubevirt-utils/components/CloneTemplateModal/SelectProject';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getCluster } from '@multicluster/helpers/selectors';
-import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import { type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Alert,
   AlertVariant,
@@ -27,8 +28,15 @@ type SaveAsTemplateModalProps = {
 const SaveAsTemplateModal: FC<SaveAsTemplateModalProps> = ({ isOpen, onClose, vm }) => {
   const { t } = useKubevirtTranslation();
 
-  const { onSubmit, selectedProject, setSelectedProject, setTemplateName, templateName } =
-    useSaveAsTemplateModal(vm);
+  const {
+    category,
+    onSubmit,
+    selectedProject,
+    setCategory,
+    setSelectedProject,
+    setTemplateName,
+    templateName,
+  } = useSaveAsTemplateModal(vm);
 
   return (
     <TabModal<K8sResourceCommon>
@@ -44,10 +52,10 @@ const SaveAsTemplateModal: FC<SaveAsTemplateModalProps> = ({ isOpen, onClose, vm
     >
       {isRunning(vm) && (
         <Alert
+          isInline
           title={t(
             'Creating a template from a running virtual machine might result in inconsistent data because the system is still writing changes. For best results, stop the VM before creating the template.',
           )}
-          isInline
           variant={AlertVariant.info}
         />
       )}
@@ -55,7 +63,7 @@ const SaveAsTemplateModal: FC<SaveAsTemplateModalProps> = ({ isOpen, onClose, vm
       <FormGroup fieldId="template-name" isRequired label={t('Name')}>
         <TextInput
           id="template-name"
-          onChange={(_, value: string) => setTemplateName(value)}
+          onChange={(_event, value: string) => setTemplateName(value)}
           type="text"
           value={templateName}
         />
@@ -67,6 +75,10 @@ const SaveAsTemplateModal: FC<SaveAsTemplateModalProps> = ({ isOpen, onClose, vm
           selectedProject={selectedProject}
           setSelectedProject={setSelectedProject}
         />
+      </FormGroup>
+
+      <FormGroup fieldId="template-category-select" label={t('Category')}>
+        <CategorySelect selectedCategory={category} setSelectedCategory={setCategory} />
       </FormGroup>
     </TabModal>
   );

@@ -32,6 +32,9 @@ test.describe.serial('Template creation flows', { tag: [T1_TAG, '@tier1-template
 
     const vmName = utils.generateRandomVmName('vm-save-tpl');
     const templateName = utils.generateRandomTemplateName('saved-tpl');
+    // Display label with a space; persisted label value replaces spaces with '-'.
+    const categoryDisplay = 'Operating systems';
+    const categoryLabel = 'Operating-systems';
 
     await apiClient.createVmFromTemplate(
       utils.TEMPLATE_METADATA_NAMES.RHEL9,
@@ -49,8 +52,28 @@ test.describe.serial('Template creation flows', { tag: [T1_TAG, '@tier1-template
     const isVmVisible = await vmDetailPage.isVmNameVisible(vmName);
     expect.soft(isVmVisible, `VM ${vmName} should be visible on detail page`).toBe(true);
 
-    await vmDetailPage.saveAsTemplate(templateName, sharedNs);
+    await vmDetailPage.saveAsTemplate(templateName, sharedNs, { category: categoryDisplay });
     apiClient.trackResource('VirtualMachineTemplate', templateName, sharedNs);
+
+    await expect
+      .poll(
+        async () => {
+          const template = await apiClient.getResource(
+            'template.kubevirt.io',
+            'v1beta1',
+            'virtualmachinetemplates',
+            templateName,
+            sharedNs,
+          );
+          return template?.metadata?.labels?.['vm.kubevirt.io/category'];
+        },
+        {
+          message: `Template ${templateName} should have category label "${categoryLabel}"`,
+          timeout: utils.TestTimeouts.DEFAULT,
+          intervals: [2000, 3000, 5000],
+        },
+      )
+      .toBe(categoryLabel);
 
     if (!utils.EnvVariables.onAcm) {
       await pageCommons.switchProject(sharedNs);
