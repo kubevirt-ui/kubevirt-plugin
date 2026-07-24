@@ -295,7 +295,7 @@ test.describe.serial(SUITE_TEMPLATE_LIFECYCLE, { tag: [T1_TAG, '@tier1-templates
       `disk-${utils.DISK_NAMES.ROOT}`,
     );
     expect
-      .soft(rootDiskVisible, 'Root disk row should be visible (data-test-id disk-rootdisk)')
+      .soft(rootDiskVisible, 'Root disk row should be visible (data-test disk-rootdisk)')
       .toBe(true);
   });
 

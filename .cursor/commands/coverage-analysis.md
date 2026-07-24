@@ -2,7 +2,7 @@
 
 Read-only coverage assessment of the virtualization module. Uses two complementary methods:
 
-1. **`data-test` / `ouiaId` cross-reference** — matches attributes defined in `src/` against Playwright locator usage
+1. **`data-test` / `data-test` cross-reference** — matches attributes defined in `src/` against Playwright locator usage
 2. **Feature-surface enumeration** — decomposes `src/views/` routes into testable capabilities and maps them to spec files
 
 ## Input
@@ -66,7 +66,7 @@ Coverage analysis scans **all** directories. Proposals for new coverage target `
 
 ### Phase 1: UI Automation ID Cross-Reference
 
-This is the primary, code-level coverage signal. It maps every `data-test` attribute and `ouiaId` prop in `src/` to its usage (or absence) in Playwright locators.
+This is the primary, code-level coverage signal. It maps every `data-test` attribute and `data-test` prop in `src/` to its usage (or absence) in Playwright locators.
 
 #### Step 1a: Extract all automation IDs from `src/`
 
@@ -75,12 +75,8 @@ This is the primary, code-level coverage signal. It maps every `data-test` attri
 rg 'data-test="([^"]+)"' src/ --glob '*.tsx' --glob '*.ts' -o \
   | sed 's/.*data-test="//;s/"//' | sort -u > /tmp/src-ids.txt
 
-# Static ouiaId values: ouiaId="foo"
-rg 'ouiaId="([^"]+)"' src/ --glob '*.tsx' --glob '*.ts' -o \
-  | sed 's/.*ouiaId="//;s/"//' | sort -u >> /tmp/src-ids.txt
-
-# Dynamic prefixes: data-test={`foo-${var}`} or ouiaId={`foo-${var}`}
-rg '(?:data-test|ouiaId)=\{`([^$`]+)' src/ --glob '*.tsx' --glob '*.ts' -o \
+# Dynamic prefixes: data-test={`foo-${var}`}
+rg 'data-test=\{`([^$`]+)' src/ --glob '*.tsx' --glob '*.ts' -o \
   | sed 's/.*=\{`//' | sort -u > /tmp/src-ids-dynamic.txt
 
 # Merge into single input
@@ -91,19 +87,14 @@ cat /tmp/src-ids.txt /tmp/src-ids-dynamic.txt | sort -u > /tmp/src-ids-all.txt
 
 ```bash
 # Collect all locator patterns:
-# testId('id'), getByTestId('id'), ouia('id'),
-# [data-test="id"], [data-ouia-component-id="id"], [data-test-id="id"]
+# testId('id'), getByTestId('id'), [data-test="id"], [data-test-id="id"]
 {
   rg "testId\(" playwright/ --glob '*.ts' --glob '*.tsx' \
     | perl -nle "print \$1 if /testId\(['\"]([^'\"]+)['\"]/"
   rg "getByTestId\(" playwright/ --glob '*.ts' --glob '*.tsx' \
     | perl -nle "print \$1 if /getByTestId\(['\"]([^'\"]+)['\"]/"
-  rg "ouia\(" playwright/ --glob '*.ts' --glob '*.tsx' \
-    | perl -nle "print \$1 if /ouia\(['\"]([^'\"]+)['\"]/"
   rg '\[data-test="[^"]+"\]' playwright/ --glob '*.ts' --glob '*.tsx' -o \
     | grep -oP '(?<=\[data-test=")[^"]+'
-  rg '\[data-ouia-component-id="[^"]+"\]' playwright/ --glob '*.ts' --glob '*.tsx' -o \
-    | grep -oP '(?<=\[data-ouia-component-id=")[^"]+'
   rg '\[data-test-id="[^"]+"\]' playwright/ --glob '*.ts' --glob '*.tsx' -o \
     | grep -oP '(?<=\[data-test-id=")[^"]+'
 } | sort -u > /tmp/pw-ids.txt
@@ -125,7 +116,7 @@ For each ID in Playwright:
 
 ```bash
 # For each uncovered ID, find ALL source files containing it
-rg -l '(?:data-test|ouiaId).*"<ID>"' src/ --glob '*.tsx' --glob '*.ts'
+rg -l '(?:data-test|data-test).*"<ID>"' src/ --glob '*.tsx' --glob '*.ts'
 
 # Classify by location:
 # - Files under src/views/<route>/ → feature area = <route>
@@ -212,12 +203,22 @@ branch using `git show` and `git grep` (never checkout), then compute deltas.
 git rev-parse --verify <branch> 2>/dev/null
 
 # Phase 1 on <branch>: extract automation IDs from branch src/
-git grep -h 'data-test=\|ouiaId=' <branch> -- 'src/**/*.tsx' 'src/**/*.ts' \
-  | perl -nle 'print $1 if /(?:data-test|ouiaId)="([^"]+)"/' | sort -u > /tmp/compare-src-ids.txt
+{
+  git grep -h 'data-test="' <branch> -- 'src/**/*.tsx' 'src/**/*.ts' \
+    | perl -nle 'print $1 if /data-test="([^"]+)"/'
+  git grep -h 'data-test=\{`' <branch> -- 'src/**/*.tsx' 'src/**/*.ts' \
+    | perl -nle 'print $1 if /data-test=\{`([^$`]+)/'
+} | sort -u > /tmp/compare-src-ids.txt
 
 # Phase 1 on <branch>: extract Playwright refs
-git grep -h 'testId\|getByTestId\|ouia\|data-test=\|data-ouia-component-id=' <branch> -- 'playwright/**/*.ts' \
-  | perl -nle 'print $1 if /(?:testId|getByTestId|ouia)\(['\''"]([^'\''"]+)/' > /tmp/compare-pw-ids.txt
+{
+  git grep -h 'testId\|getByTestId' <branch> -- 'playwright/**/*.ts' \
+    | perl -nle 'print $1 if /(?:testId|getByTestId)\(['\''"]([^'\''"]+)/'
+  git grep -h '\[data-test="' <branch> -- 'playwright/**/*.ts' \
+    | perl -nle 'print $1 if /\[data-test="([^"]+)"/'
+  git grep -h '\[data-test-id="' <branch> -- 'playwright/**/*.ts' \
+    | perl -nle 'print $1 if /\[data-test-id="([^"]+)"/'
+} | sort -u > /tmp/compare-pw-ids.txt
 
 # Phase 2-3 on <branch>: feature and test inventory
 git ls-tree -r --name-only <branch> -- src/views/ | sort
@@ -243,7 +244,7 @@ git show <branch>:playwright/tests/<path>
 | Metric                                           | Count     |
 | ------------------------------------------------ | --------- |
 | data-test IDs defined in src/                    | NNN       |
-| ouiaId values defined in src/                    | NNN       |
+| data-test values defined in src/                 | NNN       |
 | IDs referenced in Playwright                     | NNN       |
 | src/ IDs covered by tests                        | NNN (XX%) |
 | src/ IDs uncovered                               | NNN (XX%) |
@@ -295,13 +296,14 @@ git show <branch>:playwright/tests/<path>
 
 This project uses a **hybrid approach** for UI automation identifiers:
 
-- **`ouiaId` prop** — used on OUIA-compliant PatternFly components (Button, Card, TextInput, Switch, Modal, Toolbar, Checkbox, Radio, Title, DropdownItem, Table, Tr, Menu, Alert, Select). PF renders `data-ouia-component-id` and `data-ouia-component-type` automatically.
-- **`data-test` attribute** — used on plain HTML elements (span, div, a) and non-OUIA PF/custom components (MenuToggle, EmptyState, SelectOption, DescriptionItem, etc.).
+- **`data-test` prop** — used on data-test-compliant PatternFly components (Button, Card, TextInput, Switch, Modal, Toolbar, Checkbox, Radio, Title, DropdownItem, Table, Tr, Menu, Alert, Select). PF renders `data-test` and `data-data-test-component-type` automatically.
+- **`data-test` attribute** — used on plain HTML elements (span, div, a) and non-data-test PF/custom components (MenuToggle, EmptyState, SelectOption, DescriptionItem, etc.).
 
 In Playwright:
 
-- `this.testId('id')` → matches `data-test` attributes
-- `this.ouia('id')` → matches `data-ouia-component-id` attributes
+- `this.testId('id')` → matches `data-test` attributes (via `testIdAttribute: 'data-test'` in config)
+- `this.page.getByTestId('id')` → matches `data-test` attributes
+- `[data-test="id"]` / `[data-test-id="id"]` → CSS attribute selectors
 
 ## Rules
 

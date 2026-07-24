@@ -113,17 +113,34 @@ test.describe('Resource creation (gating)', { tag: [GATING_TAG, '@resource-creat
     await utils.withAllure({ suite: SUITE, feature: GATING, tags: [GATING_TAG] });
 
     const templateName = utils.generateRandomTemplateName('gating-yaml-tpl');
+    const ns = testConfig.testNamespace;
 
     await templatesPage.navigateToTemplatesViaUI();
+    await templatesPage.switchProject(ns);
     await templatesPage.clickCreateTemplate();
-    await templatesPage.setCreateTemplateExampleNameInYamlEditor(templateName);
+    await templatesPage.setCreateTemplateExampleNameInYamlEditor(templateName, ns);
     await templatesPage.clickCreateButtonInModal();
-    apiClient.trackResource('Template', templateName, testConfig.testNamespace);
+    apiClient.trackResource('Template', templateName, ns);
 
-    await templatesPage.navigateToTemplatesViaUI();
-    await templatesPage.filterTemplatesByName(templateName);
-    const isVisible = await templatesPage.isTemplateVisible(templateName);
-    expect(isVisible, `Template ${templateName} should be visible after creation`).toBe(true);
+    await templatesPage.page.waitForURL((url) => url.pathname.includes(templateName), {
+      timeout: utils.TestTimeouts.DEFAULT,
+    });
+
+    await expect
+      .poll(
+        async () => {
+          await templatesPage.navigateToTemplatesViaUI();
+          await templatesPage.switchProject(ns);
+          await templatesPage.filterTemplatesByName(templateName);
+          return templatesPage.isTemplateVisible(templateName);
+        },
+        {
+          message: `Template ${templateName} should be visible after creation`,
+          timeout: utils.TestTimeouts.UI_ELEMENT_VISIBILITY,
+          intervals: [2000, 3000, 5000],
+        },
+      )
+      .toBe(true);
   });
 
   test('Clone a template from an existing template', async ({

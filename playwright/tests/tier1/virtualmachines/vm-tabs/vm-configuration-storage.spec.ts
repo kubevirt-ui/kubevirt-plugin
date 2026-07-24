@@ -111,14 +111,15 @@ test.describe.serial(
       expect.soft(dvDiskSize, 'DataVolume disk size should not be "—"').not.toBe('—');
 
       const sizeInfo = await vmDetailPage.getEditDiskModalSizeInfo(dvDiskName);
-      expect.soft(sizeInfo.value, 'Edit modal should load the PVC size value').not.toBeNull();
+      expect.soft(sizeInfo, 'Edit modal should return disk size info').toBeTruthy();
+      expect.soft(sizeInfo?.value, 'Edit modal should load the PVC size value').not.toBeNull();
       expect
-        .soft(Number(sizeInfo.value), 'PVC size should be a positive number')
+        .soft(Number(sizeInfo?.value), 'PVC size should be a positive number')
         .toBeGreaterThan(0);
-      expect.soft(sizeInfo.unit, 'Size unit should be populated').not.toBeNull();
+      expect.soft(sizeInfo?.unit, 'Size unit should be populated').not.toBeNull();
       expect
         .soft(
-          sizeInfo.decrementDisabled,
+          sizeInfo?.decrementDisabled,
           'PVC size decrement should be disabled (PVCs can only grow)',
         )
         .toBe(true);
@@ -141,7 +142,7 @@ test.describe.serial(
       await apiClient.createBlankDataVolume(diskName, ns, '1Gi');
       apiClient.trackResource('DataVolume', diskName, ns);
       await apiClient.waitForDataVolumeSucceeded(diskName, ns);
-      await apiClient.hotplugVolumeToVm(vmName, ns, diskName, diskName);
+      await apiClient.hotplugVolumeEphemeral(vmName, ns, diskName, diskName);
       await apiClient.waitForVmDiskPresent(vmName, ns, diskName);
 
       await vmTreePage.navigateToVmViaTreeView(ns, vmName);
