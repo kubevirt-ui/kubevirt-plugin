@@ -159,3 +159,60 @@ export async function setupTestNamespace(
   client.trackResource('Namespace', namespace);
   return namespace;
 }
+
+export type ProjectNetworkSettingsAnnotations = {
+  /** Value for kubevirt.io/default-network (NAD name in the project). */
+  defaultNetwork?: string;
+  /**
+   * When false, sets kubevirt.io/allow-pod-network to "false".
+   * When true/undefined, the annotation is omitted (pod networking allowed by default).
+   */
+  allowPodNetwork?: boolean;
+};
+
+/** Creates a bridge NetworkAttachmentDefinition for project-network UI tests. */
+export async function createBridgeNetworkAttachmentDefinition(
+  client: RequestContextClient,
+  name: string,
+  namespace: string,
+  bridge = 'br1',
+): Promise<void> {
+  await client.createResourceByKind(
+    'NetworkAttachmentDefinition',
+    {
+      apiVersion: 'k8s.cni.cncf.io/v1',
+      kind: 'NetworkAttachmentDefinition',
+      metadata: { name, namespace },
+      spec: {
+        config: JSON.stringify({
+          cniVersion: '0.3.1',
+          name,
+          type: 'bridge',
+          bridge,
+        }),
+      },
+    },
+    namespace,
+  );
+  client.trackResource('NetworkAttachmentDefinition', name, namespace);
+}
+
+/**
+ * Sets project-level KubeVirt network annotations on a Namespace.
+ * Always writes both annotation keys; omitted/undefined values are cleared via
+ * JSON merge-patch nulls so configs can be replaced cleanly.
+ */
+export async function setProjectNetworkSettings(
+  client: RequestContextClient,
+  namespace: string,
+  settings: ProjectNetworkSettingsAnnotations = {},
+): Promise<void> {
+  const annotations: Record<string, string | null> = {
+    'kubevirt.io/default-network': settings.defaultNetwork ?? null,
+    'kubevirt.io/allow-pod-network': settings.allowPodNetwork === false ? 'false' : null,
+  };
+
+  await client.mergePatchResource('', 'v1', 'namespaces', namespace, {
+    metadata: { annotations },
+  });
+}

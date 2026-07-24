@@ -1,9 +1,9 @@
 import React from 'react';
 
-import { CustomWizardNavItemFunction } from '@patternfly/react-core';
+import { type CustomWizardNavItemFunction } from '@patternfly/react-core';
 import VMGenerationWizardNavItem from '@virtualmachines/wizard/components/VMGenerationWizardNavItem/VMGenerationWizardNavItem';
 
-import { WizardStepNavItemConfig } from './types';
+import { type WizardStepNavItemConfig } from './types';
 
 export const getVMGenerationNavItem =
   (navItemConfig: WizardStepNavItemConfig): CustomWizardNavItemFunction =>
@@ -13,6 +13,7 @@ export const getVMGenerationNavItem =
       goToStepByIndex={goToStepByIndex}
       handleNavItemClick={navItemConfig.handleNavItemClick}
       isGeneratingVM={navItemConfig.isGeneratingVM}
+      loaded={navItemConfig.loaded}
       step={step}
     />
   );

@@ -32,9 +32,12 @@ import {
 
 import { createPopulatedCloudInitYAML } from './utils/generateVM';
 
-export type UseGenerateVM = () => V1VirtualMachine;
+export type UseGenerateVMResult = {
+  generatedVM: V1VirtualMachine;
+  loaded: boolean;
+};
 
-const useGenerateVM: UseGenerateVM = () => {
+const useGenerateVM = (): UseGenerateVMResult => {
   const { control } = useVMWizard();
   const [
     cluster,
@@ -79,7 +82,10 @@ const useGenerateVM: UseGenerateVM = () => {
 
   const validNamespace = getValidNamespace(namespace);
   const [isUDNManagedNamespace] = useNamespaceUDN(validNamespace);
-  const { vmCreationNad } = useProjectDefaultNad({ cluster, namespaceName: validNamespace });
+  const { loaded, vmCreationNad } = useProjectDefaultNad({
+    cluster,
+    namespaceName: validNamespace,
+  });
   const isIPv6SingleStack = useIsIPv6SingleStackCluster(cluster);
   const [hyperConverge] = useHyperConvergeConfiguration();
   const enableMultiArchBootImageImport =
@@ -101,7 +107,10 @@ const useGenerateVM: UseGenerateVM = () => {
 
   const [driversImage] = useDriversImage(cluster);
   const [authorizedSSHKeys] = useKubevirtUserSettings(USER_SETTINGS_KEYS.ssh, cluster);
-  const defaultSSHSecretName = authorizedSSHKeys?.[namespace];
+  const defaultSSHSecretName =
+    typeof authorizedSSHKeys?.[namespace] === 'string'
+      ? (authorizedSSHKeys[namespace] as string)
+      : undefined;
 
   const generatedVM = useMemo(() => {
     return generateVM({
@@ -142,10 +151,12 @@ const useGenerateVM: UseGenerateVM = () => {
     vmName,
   ]);
 
-  return useMemo(() => {
+  const vmWithDrivers = useMemo(() => {
     const isWindowsOSVolume = isWindowBootableVolume(selectedBootableVolume);
     return isWindowsOSVolume ? addWinDriverVolume(generatedVM, driversImage) : generatedVM;
   }, [driversImage, generatedVM, selectedBootableVolume]);
+
+  return { generatedVM: vmWithDrivers, loaded };
 };
 
 export default useGenerateVM;

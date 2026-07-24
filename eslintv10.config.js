@@ -211,7 +211,14 @@ const tsConfigs = tseslint.configs.recommended.map((config) => ({
         varsIgnorePattern: '^_',
       },
     ],
-    '@typescript-eslint/prefer-nullish-coalescing': 'error',
+    '@typescript-eslint/prefer-nullish-coalescing': [
+      'error',
+      {
+        ignorePrimitives: {
+          boolean: true,
+        },
+      },
+    ],
     '@typescript-eslint/prefer-optional-chain': 'error',
     '@typescript-eslint/restrict-template-expressions': [
       'error',

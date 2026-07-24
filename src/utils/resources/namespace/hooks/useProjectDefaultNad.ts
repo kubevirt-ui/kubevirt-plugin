@@ -14,6 +14,7 @@ type UseProjectDefaultNadArgs = {
 };
 
 type UseProjectDefaultNadReturn = {
+  loaded: boolean;
   vmCreationNad?: NetworkAttachmentDefinitionKind;
 };
 
@@ -21,14 +22,18 @@ const useProjectDefaultNad = ({
   cluster,
   namespaceName,
 }: UseProjectDefaultNadArgs): UseProjectDefaultNadReturn => {
-  const { defaultNadName, isPodNetworkAllowed } = useProjectNetworkSettings({
+  const {
+    defaultNadName,
+    isPodNetworkAllowed,
+    loaded: networkSettingsLoaded,
+  } = useProjectNetworkSettings({
     cluster,
     namespaceName,
   });
 
-  const [nads] = useFetchNADs(namespaceName ?? '', cluster);
+  const [nads, nadsLoaded] = useFetchNADs(namespaceName ?? '', cluster);
 
-  const [annotatedNad] = useK8sWatchData<NetworkAttachmentDefinitionKind>(
+  const [annotatedNad, annotatedNadLoaded] = useK8sWatchData<NetworkAttachmentDefinitionKind>(
     defaultNadName && namespaceName
       ? {
           cluster,
@@ -59,7 +64,12 @@ const useProjectDefaultNad = ({
     return undefined;
   }, [annotatedNad, defaultNadName, firstAvailableNad, isPodNetworkAllowed]);
 
+  const vmCreationNadLoaded = defaultNadName
+    ? annotatedNadLoaded
+    : isPodNetworkAllowed || nadsLoaded;
+
   return {
+    loaded: networkSettingsLoaded && vmCreationNadLoaded,
     vmCreationNad,
   };
 };

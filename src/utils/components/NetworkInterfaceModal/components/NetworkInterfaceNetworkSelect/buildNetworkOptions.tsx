@@ -98,12 +98,12 @@ export const buildNetworkSelectOptions = ({
       label: podNetworkingText,
       optionProps: {
         children: (
-          <>
+          <span data-test="network-option-pod-networking">
             {podNetworkingText}{' '}
             <Label isCompact>
               {podNetworkType} {t('Binding')}
             </Label>
-          </>
+          </span>
         ),
         key: POD_NETWORK,
       },
