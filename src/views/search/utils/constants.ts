@@ -15,6 +15,26 @@ export enum GuestAgentStatus {
   REPORTING = 'reporting',
 }
 
+export const singleStringFields = new Set([
+  VirtualMachineRowFilterType.DateCreatedFrom,
+  VirtualMachineRowFilterType.DateCreatedTo,
+  VirtualMachineRowFilterType.Description,
+  VirtualMachineRowFilterType.IP,
+  VirtualMachineRowFilterType.Name,
+]);
+
+export const arrayFields = new Set([
+  VirtualMachineRowFilterType.Architecture,
+  VirtualMachineRowFilterType.Cluster,
+  VirtualMachineRowFilterType.Labels,
+  VirtualMachineRowFilterType.NAD,
+  VirtualMachineRowFilterType.Node,
+  VirtualMachineRowFilterType.OS,
+  VirtualMachineRowFilterType.Project,
+  VirtualMachineRowFilterType.Status,
+  VirtualMachineRowFilterType.StorageClass,
+]);
+
 export const skipRowFilterPrefix = new Set([
   VirtualMachineRowFilterType.Name,
   VirtualMachineRowFilterType.Labels,

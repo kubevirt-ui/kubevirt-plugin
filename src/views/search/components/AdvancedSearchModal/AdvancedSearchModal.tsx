@@ -1,11 +1,8 @@
 import React, { FC, useRef } from 'react';
 
-import { VirtualMachineModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { ModalComponentProps } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import useNamespaceParam from '@kubevirt-utils/hooks/useNamespaceParam';
-import useClusterParam from '@multicluster/hooks/useClusterParam';
 import useIsACMPage from '@multicluster/useIsACMPage';
 import {
   Button,
@@ -17,9 +14,6 @@ import {
   ModalFooter,
   ModalHeader,
 } from '@patternfly/react-core';
-import { buildContextSearchInputs } from '@search/utils/query';
-import { useAccessibleResources } from '@virtualmachines/search/hooks/useAccessibleResources';
-import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
 import { AdvancedSearchInputs, AdvancedSearchQueryInputs } from '../../utils/types';
 
@@ -42,17 +36,14 @@ import ProjectField from './formFields/ProjectField';
 import SchedulingField from './formFields/SchedulingField';
 import StatusField from './formFields/StatusField';
 import StorageClassField from './formFields/StorageClassField';
-import {
-  useAdvancedSearchActions,
-  useAdvancedSearchField,
-  useIsSearchDisabled,
-} from './store/useAdvancedSearchStore';
+import { useAdvancedSearchActions, useIsSearchDisabled } from './store/useAdvancedSearchStore';
 
 import './advanced-search-modal.scss';
 
 type AdvancedSearchModalProps = Pick<ModalComponentProps, 'isOpen' | 'onClose'> & {
   onSubmit: (searchInputs: AdvancedSearchQueryInputs) => void;
   prefillInputs?: AdvancedSearchInputs;
+  vms: V1VirtualMachine[];
 };
 
 const AdvancedSearchModal: FC<AdvancedSearchModalProps> = ({
@@ -60,23 +51,9 @@ const AdvancedSearchModal: FC<AdvancedSearchModalProps> = ({
   onClose,
   onSubmit,
   prefillInputs = {},
+  vms,
 }) => {
   const { t } = useKubevirtTranslation();
-
-  const { value: selectedClusters } = useAdvancedSearchField(VirtualMachineRowFilterType.Cluster);
-
-  const { resources: vms } = useAccessibleResources<V1VirtualMachine>({
-    clusters: selectedClusters,
-    groupVersionKind: VirtualMachineModelGroupVersionKind,
-  });
-  const namespace = useNamespaceParam();
-  const cluster = useClusterParam();
-
-  const prefillInputsWithClusterAndNamespace = {
-    ...prefillInputs,
-    ...buildContextSearchInputs(cluster, namespace),
-  };
-
   const isACMPage = useIsACMPage();
 
   const isSearchDisabled = useIsSearchDisabled();
@@ -85,7 +62,7 @@ const AdvancedSearchModal: FC<AdvancedSearchModalProps> = ({
   // Initialize store with prefill inputs when component mounts
   const hasInitialized = useRef(false);
   if (!hasInitialized.current) {
-    initializeWithPrefill(prefillInputsWithClusterAndNamespace);
+    initializeWithPrefill(prefillInputs);
     hasInitialized.current = true;
   }
 

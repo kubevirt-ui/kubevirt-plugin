@@ -14,12 +14,12 @@ import {
   initialVCPU,
 } from '../constants/initialValues';
 
-export type AdvancedSearchState = AdvancedSearchInputs & {
+type AdvancedSearchState = AdvancedSearchInputs & {
   dateOption?: DateSelectOption;
   isValidDate?: boolean;
 };
 
-export type SetAdvancedSearchField = <K extends keyof AdvancedSearchState>(
+type SetAdvancedSearchField = <K extends keyof AdvancedSearchState>(
   field: K,
 ) => (value: AdvancedSearchState[K]) => void;
 

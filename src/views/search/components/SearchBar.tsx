@@ -1,5 +1,6 @@
-import React, { FC, RefObject, useCallback } from 'react';
+import React, { FC, RefObject, useCallback, useMemo } from 'react';
 
+import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import {
   KubevirtFilter,
   KubevirtFilterState,
@@ -8,6 +9,7 @@ import {
 import { InputGroup, InputGroupItem } from '@patternfly/react-core';
 import useShowAdvancedSearchModal from '@search/hooks/useShowAdvancedSearchModal';
 import { useSearchLanguageInput } from '@search/searchLanguage/hooks/useSearchLanguageInput/useSearchLanguageInput';
+import { convertFilterStateToModalInputs } from '@search/utils/query';
 
 import SavedSearchesDropdown from './SavedSearchesDropdown/SavedSearchesDropdown';
 import useRecentSearches from './SearchDropdown/hooks/useRecentSearches';
@@ -22,6 +24,7 @@ type SearchBarProps = {
   filters: KubevirtFilterState;
   inputRef?: RefObject<HTMLInputElement>;
   onSetFilters: OnSetFilters;
+  vms: V1VirtualMachine[];
 };
 
 const SearchBar: FC<SearchBarProps> = ({
@@ -30,8 +33,10 @@ const SearchBar: FC<SearchBarProps> = ({
   filters,
   inputRef,
   onSetFilters,
+  vms,
 }) => {
-  const showSearchModal = useShowAdvancedSearchModal(onSetFilters, clearAllFilters);
+  const showSearchModal = useShowAdvancedSearchModal(onSetFilters, clearAllFilters, vms);
+  const modalInputs = useMemo(() => convertFilterStateToModalInputs(filters), [filters]);
 
   const { addRecentSearch, recentSearches } = useRecentSearches();
 
@@ -57,7 +62,7 @@ const SearchBar: FC<SearchBarProps> = ({
           filterDefinitions={filterDefinitions}
           filters={filters}
           inputRef={inputRef}
-          onOpenAdvancedSearch={showSearchModal}
+          onOpenAdvancedSearch={() => showSearchModal(modalInputs)}
           onSelectQueryText={onSelectQueryText}
           onSetFilters={onSetFilters}
           recentSearches={recentSearches}

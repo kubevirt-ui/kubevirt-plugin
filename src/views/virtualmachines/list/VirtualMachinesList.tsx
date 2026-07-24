@@ -228,6 +228,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({
                 filters={filters}
                 inputRef={searchInputRef}
                 onSetFilters={handleSetFilters}
+                vms={accessibleVMs}
               />
               <VirtIODriversAlert vms={vmsToShow} />
               <VirtualMachineFilterToolbar
