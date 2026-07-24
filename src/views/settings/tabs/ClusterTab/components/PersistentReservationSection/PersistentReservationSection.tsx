@@ -1,6 +1,6 @@
 import React, { FC, useState } from 'react';
 
-import { HyperConvergedModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { HyperConvergedV1Beta1Model as HyperConvergedModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import SectionWithSwitch from '@kubevirt-utils/components/SectionWithSwitch/SectionWithSwitch';
 import {
   FEATURE_HCO_PERSISTENT_RESERVATION,

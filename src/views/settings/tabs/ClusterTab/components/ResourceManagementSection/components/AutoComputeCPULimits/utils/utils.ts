@@ -1,4 +1,4 @@
-import { HyperConvergedModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { HyperConvergedV1Beta1Model as HyperConvergedModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { K8S_OPS } from '@kubevirt-utils/constants/constants';
 import { HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { kubevirtK8sPatch } from '@multicluster/k8sRequests';

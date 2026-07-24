@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-import { HyperConvergedModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { HyperConvergedV1Beta1ModelGroupVersionKind as HyperConvergedModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1LabelSelector } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import { V1MigrationConfiguration } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { CalculationMethod } from '@kubevirt-utils/resources/quotas/types';

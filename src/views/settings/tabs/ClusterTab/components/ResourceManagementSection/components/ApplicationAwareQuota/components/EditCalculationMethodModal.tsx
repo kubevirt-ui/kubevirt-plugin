@@ -1,9 +1,9 @@
 import React, { FC, useState } from 'react';
 
+import { HyperConvergedV1Beta1Model as HyperConvergedModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { HyperConvergedModel } from '@kubevirt-utils/models';
 import { CalculationMethod } from '@kubevirt-utils/resources/quotas/types';
 import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
 import { FormGroup, Radio } from '@patternfly/react-core';

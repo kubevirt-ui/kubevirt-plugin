@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 import { Link } from 'react-router';
 
-import { HyperConvergedModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { HyperConvergedV1Beta1Model as HyperConvergedModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { AlertType } from '@kubevirt-utils/components/AlertsCard/utils/types';
 import useHyperConvergeConfiguration from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import useInfrastructureAlerts from '@kubevirt-utils/hooks/useInfrastructureAlerts/useInfrastructureAlerts';
