@@ -1,13 +1,14 @@
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 import classNames from 'classnames';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useUniversalFilter from '@kubevirt-utils/hooks/useUniversalFilter/useUniversalFilter';
-import { TemplateOrRequest } from '@kubevirt-utils/resources/template';
+import { type TemplateOrRequest } from '@kubevirt-utils/resources/template';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { OnFilterChange, RowFilter } from '@openshift-console/dynamic-plugin-sdk';
+import { type OnFilterChange, type RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 import { Divider, Stack } from '@patternfly/react-core';
 
+import TemplatesCategoryFilter from './components/TemplatesCategoryFilter';
 import TemplatesMenuCheckboxGroup from './components/TemplatesMenuCheckboxGroup';
 import TemplatesScopeFilter from './components/TemplatesScopeFilter';
 import TemplatesSidebarCheckboxGroup from './components/TemplatesSidebarCheckboxGroup';
@@ -30,7 +31,7 @@ const TemplatesFilter: FC<TemplatesFilterProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const universalFilter = useUniversalFilter({ onFilterChange });
-  const { commonFilters, openShiftTemplatesOnlyFilters, scopeFilter } =
+  const { categoryFilter, commonFilters, openShiftTemplatesOnlyFilters, scopeFilter } =
     splitTemplateFilters(rowFilters);
 
   const isSidebar = variant === TemplatesFilterVariant.Sidebar;
@@ -53,13 +54,20 @@ const TemplatesFilter: FC<TemplatesFilterProps> = ({
           />
         ))}
 
+        {categoryFilter && (
+          <Stack className={classNames({ 'pf-v6-u-px-lg pf-v6-u-py-md': isMenu })} hasGutter>
+            {!isEmpty(commonFilters) && <Divider />}
+            <TemplatesCategoryFilter
+              isMenu={isMenu}
+              rowFilter={categoryFilter}
+              universalFilter={universalFilter}
+            />
+          </Stack>
+        )}
+
         <Stack className={classNames({ 'pf-v6-u-px-lg pf-v6-u-py-md': isMenu })} hasGutter>
-          {!isEmpty(commonFilters) && (
-            <>
-              <Divider />
-              <h4 className="pf-v6-u-font-weight-bold">{t('OpenShift templates only')}</h4>
-            </>
-          )}
+          <Divider />
+          <h4 className="pf-v6-u-font-weight-bold">{t('OpenShift templates only')}</h4>
           <TemplatesScopeFilter
             isMenu={isMenu}
             scopeFilter={scopeFilter}

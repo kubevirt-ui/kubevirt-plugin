@@ -38,6 +38,17 @@ export const extensions: EncodedExtension[] = [
       model: {
         group: 'template.kubevirt.io',
         kind: 'VirtualMachineTemplate',
+        version: 'v1beta1',
+      },
+    },
+    type: 'console.page/resource/details',
+  } as EncodedExtension<ResourceDetailsPage>,
+  {
+    properties: {
+      component: { $codeRef: 'TemplateNavPage' },
+      model: {
+        group: 'template.kubevirt.io',
+        kind: 'VirtualMachineTemplate',
         version: 'v1alpha1',
       },
     },

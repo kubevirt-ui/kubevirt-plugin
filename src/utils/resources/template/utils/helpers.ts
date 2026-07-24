@@ -11,7 +11,7 @@ import {
 } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { V1alpha1VirtualMachineTemplateSpecParameters } from '@kubevirt-ui-ext/kubevirt-api/virt-template';
+import { V1beta1VirtualMachineTemplateSpecParameters } from '@kubevirt-ui-ext/kubevirt-api/virt-template';
 import { logTemplateEdited } from '@kubevirt-utils/extensions/telemetry/templates';
 import { getAnnotation, getLabels, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import {
@@ -103,23 +103,23 @@ export const generateParamsWithPrettyName = (template: Template) => {
 
 export const replaceTemplateParameters = (
   template: Template,
-  parameters: TemplateParameter[] | V1alpha1VirtualMachineTemplateSpecParameters[],
+  parameters: TemplateParameter[] | V1beta1VirtualMachineTemplateSpecParameters[],
 ) =>
   produce(template, (draftTemplate) => {
     if (isOpenShiftTemplate(draftTemplate)) draftTemplate.parameters = parameters;
     if (isVirtualMachineTemplate(draftTemplate))
-      draftTemplate.spec.parameters = parameters as V1alpha1VirtualMachineTemplateSpecParameters[];
+      draftTemplate.spec.parameters = parameters as V1beta1VirtualMachineTemplateSpecParameters[];
   });
 
 export const createTemplateDraft = (
   template: Template,
   namespace: string,
-  parameters: TemplateParameter[] | V1alpha1VirtualMachineTemplateSpecParameters[],
+  parameters: TemplateParameter[] | V1beta1VirtualMachineTemplateSpecParameters[],
 ) =>
   produce(template, (draftTemplate) => {
     if (isOpenShiftTemplate(draftTemplate)) draftTemplate.parameters = parameters;
     if (isVirtualMachineTemplate(draftTemplate))
-      draftTemplate.spec.parameters = parameters as V1alpha1VirtualMachineTemplateSpecParameters[];
+      draftTemplate.spec.parameters = parameters as V1beta1VirtualMachineTemplateSpecParameters[];
 
     draftTemplate.metadata = { ...draftTemplate.metadata, namespace };
   });

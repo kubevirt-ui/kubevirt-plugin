@@ -1,10 +1,10 @@
-import React, { FC, useMemo } from 'react';
+import React, { type FC, useMemo } from 'react';
 import { useWatch } from 'react-hook-form';
 
-import { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
+import { type V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getUID } from '@kubevirt-utils/resources/shared';
-import { getTemplateName, Template } from '@kubevirt-utils/resources/template';
+import { getTemplateName, type Template } from '@kubevirt-utils/resources/template';
 import { ARCHITECTURE_ID, ARCHITECTURE_TITLE } from '@kubevirt-utils/utils/architecture';
 import { Table, TableVariant, Tbody, Th, Thead, Tr } from '@patternfly/react-table';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
@@ -37,7 +37,7 @@ const TemplatesTable: FC<TemplatesTableProps> = ({
   });
 
   const activeColumnIDs = useMemo(
-    () => ['name', ARCHITECTURE_ID, 'workload', 'source', 'cpu-memory'],
+    () => ['name', ARCHITECTURE_ID, 'category', 'source', 'cpu-memory'],
     [],
   );
 
@@ -55,8 +55,16 @@ const TemplatesTable: FC<TemplatesTableProps> = ({
           <Th id={ARCHITECTURE_ID} width={10}>
             {ARCHITECTURE_TITLE}
           </Th>
-          <Th id="workload" width={10}>
-            {t('Workload')}
+          <Th
+            id="category"
+            info={{
+              tooltip: t(
+                'Shows Workload profile for OpenShift templates and Category for VM templates.',
+              ),
+            }}
+            width={10}
+          >
+            {t('Category')}
           </Th>
           <Th id="source">{t('Boot source')}</Th>
           <Th id="cpu-memory" width={20}>
@@ -65,12 +73,12 @@ const TemplatesTable: FC<TemplatesTableProps> = ({
         </Tr>
       </Thead>
       <Tbody>
-        {templates.map((template, idx) => (
+        {templates.map((template) => (
           <TemplatesTableRow
             activeColumnIDs={activeColumnIDs}
             availableDatasources={availableDatasources}
             availableTemplatesUID={availableTemplatesUID}
-            key={getUID(template) ?? getTemplateName(template) ?? `template-${idx}`}
+            key={getUID(template) ?? getTemplateName(template)}
             onSelectTemplate={onTemplateClick}
             selectedTemplate={selectedTemplate}
             template={template}

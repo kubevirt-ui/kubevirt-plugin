@@ -2,6 +2,7 @@ export * from './annotations';
 export * from './categories';
 export * from './constants';
 export * from './flavor';
+export * from './getTemplateCategoryDisplay';
 export * from './getTemplateCategoryLabel';
 export * from './helpers';
 export * from './selectors';
