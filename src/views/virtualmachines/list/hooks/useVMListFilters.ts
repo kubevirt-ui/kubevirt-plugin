@@ -25,6 +25,7 @@ import useArchitectureFilter from '../filters/useArchitectureFilter';
 import useNodeFilter from '../filters/useNodeFilter';
 import useStorageClassFilter from '../filters/useStorageClassFilter';
 
+import useProjectsWithVMs from '@search/components/AdvancedSearchModal/hooks/useProjectsWithVMs';
 import { useInstanceTypeMapper } from './useInstanceTypeMapper';
 
 const useVMListFilters = (
@@ -39,8 +40,10 @@ const useVMListFilters = (
   });
   const { instanceTypeMapper } = useInstanceTypeMapper();
 
+  const projectsWithVMs = useProjectsWithVMs(vms);
+
   const clusterFilter = useClusterFilter();
-  const projectFilter = useProjectFilter();
+  const projectFilter = useProjectFilter({ allowedProjects: projectsWithVMs });
   const nodeFilter = useNodeFilter(vmiMapper);
   const storageClassFilter = useStorageClassFilter(vms, pvcMapper);
   const architectureFilter = useArchitectureFilter(vms);

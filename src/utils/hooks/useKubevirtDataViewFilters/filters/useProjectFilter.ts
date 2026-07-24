@@ -14,7 +14,12 @@ import useIsACMPage from '@multicluster/useIsACMPage';
 
 import { KubevirtFilter, KubevirtFilterLayout } from '../types';
 
-const useProjectFilter = (): KubevirtFilter => {
+type UseProjectFilterOptions = {
+  /** When provided, overrides the default project list with these project names */
+  allowedProjects?: string[];
+};
+
+const useProjectFilter = (options?: UseProjectFilterOptions): KubevirtFilter => {
   const { t } = useKubevirtTranslation();
   const isACMPage = useIsACMPage();
   const selectedClusters = useListClusters(CLUSTER_LIST_FILTER_TYPE);
@@ -36,10 +41,15 @@ const useProjectFilter = (): KubevirtFilter => {
     [multiclusterNamespaces],
   );
 
-  const projectNames = useMemo(
-    () => (isACMPage ? multiclusterNamespacesNames : (projects ?? [])),
-    [isACMPage, multiclusterNamespacesNames, projects],
-  );
+  const projectNames = useMemo(() => {
+    if (options?.allowedProjects) {
+      return options.allowedProjects;
+    }
+    if (isACMPage) {
+      return multiclusterNamespacesNames;
+    }
+    return projects ?? [];
+  }, [options?.allowedProjects, isACMPage, multiclusterNamespacesNames, projects]);
 
   return useMemo(
     () => ({

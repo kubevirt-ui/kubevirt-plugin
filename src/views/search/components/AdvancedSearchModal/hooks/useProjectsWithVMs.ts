@@ -1,13 +1,9 @@
 import { useMemo } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { getNamespace } from '@kubevirt-utils/resources/shared';
-import { universalComparator } from '@kubevirt-utils/utils/utils';
+import { getProjectsWithVMs } from '@kubevirt-utils/resources/namespace/helper';
 
 const useProjectsWithVMs = (vms: V1VirtualMachine[]): string[] =>
-  useMemo(
-    () => [...new Set(vms?.map(getNamespace))].sort((a, b) => universalComparator(a, b)),
-    [vms],
-  );
+  useMemo(() => getProjectsWithVMs(vms), [vms]);
 
 export default useProjectsWithVMs;
