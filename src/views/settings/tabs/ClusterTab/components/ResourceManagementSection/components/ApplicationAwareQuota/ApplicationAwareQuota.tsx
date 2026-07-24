@@ -1,10 +1,10 @@
 import React, { FC, useEffect, useMemo, useState } from 'react';
 import { getQuotaListURL } from 'src/views/quotas/utils/url';
 
+import { HyperConvergedV1Beta1Model as HyperConvergedModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import SectionWithSwitch from '@kubevirt-utils/components/SectionWithSwitch/SectionWithSwitch';
 import { HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { HyperConvergedModel } from '@kubevirt-utils/models';
 import { getAAQCalculationMethod } from '@kubevirt-utils/resources/hyperconverged/selectors';
 import { isAAQEnabled } from '@kubevirt-utils/resources/hyperconverged/utils';
 import { CalculationMethod } from '@kubevirt-utils/resources/quotas/types';

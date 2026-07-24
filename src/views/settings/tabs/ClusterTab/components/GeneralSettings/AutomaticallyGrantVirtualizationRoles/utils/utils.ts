@@ -1,4 +1,4 @@
-import { HyperConvergedModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { HyperConvergedV1Beta1Model as HyperConvergedModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { K8S_OPS } from '@kubevirt-utils/constants/constants';
 import { HCO_MANUAL_ROLE_AGGREGATION_STRATEGY } from '@kubevirt-utils/flags/consts';
 import { HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
