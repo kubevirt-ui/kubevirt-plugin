@@ -12,6 +12,8 @@ import { CREATE_VM_FORM_FIELDS_VM_DATA } from '@virtualmachines/wizard/state/vm-
 
 import TemplatesTableRow from './TemplatesTableRow';
 
+import './TemplatesTable.scss';
+
 type TemplatesTableProps = {
   availableDatasources: Record<string, V1beta1DataSource>;
   availableTemplatesUID: Set<string>;
@@ -49,7 +51,7 @@ const TemplatesTable: FC<TemplatesTableProps> = ({
     <Table aria-label={t('Templates catalog table')} variant={TableVariant.compact}>
       <Thead>
         <Tr>
-          <Th id="name" width={40}>
+          <Th id="name" width={35}>
             {t('Name')}
           </Th>
           <Th id={ARCHITECTURE_ID} width={10}>
@@ -58,11 +60,12 @@ const TemplatesTable: FC<TemplatesTableProps> = ({
           <Th
             id="category"
             info={{
+              className: 'table-column-help-width',
               tooltip: t(
                 'Shows Workload profile for OpenShift templates and Category for VM templates.',
               ),
             }}
-            width={10}
+            width={15}
           >
             {t('Category')}
           </Th>

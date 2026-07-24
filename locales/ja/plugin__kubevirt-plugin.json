@@ -2617,7 +2617,6 @@
   "VM name is required": "VM name is required",
   "VM Networks table": "仮想マシンネットワークテーブル",
   "VM status e.g. status:running,error": "VM status e.g. status:running,error",
-  "VM templates": "VM templates",
   "VMI": "VMI",
   "VMI instances": "VMI インスタンス",
   "VMI limits": "VMI 制限",

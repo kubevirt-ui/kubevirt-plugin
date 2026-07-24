@@ -2617,7 +2617,6 @@
   "VM name is required": "VM name is required",
   "VM Networks table": "VM 네트워크 테이블",
   "VM status e.g. status:running,error": "VM status e.g. status:running,error",
-  "VM templates": "VM templates",
   "VMI": "VMI",
   "VMI instances": "VMI 인스턴스",
   "VMI limits": "VMI 제한",

@@ -66,7 +66,7 @@ const TemplatesTableRow: FC<TemplatesTableRowProps> = ({
       isSelectable
       onClick={() => onSelectTemplate(template)}
     >
-      <TemplatesTableRowCell activeColumnIDs={activeColumnIDs} id="name" width={40}>
+      <TemplatesTableRowCell activeColumnIDs={activeColumnIDs} id="name" width={35}>
         <Flex alignItems={{ default: 'alignItemsCenter' }} columnGap={{ default: 'columnGapXs' }}>
           <img alt="os-icon" className="vm-catalog-row-icon" src={getTemplateOSIcon(template)} />
           <FlexItem>
@@ -84,7 +84,7 @@ const TemplatesTableRow: FC<TemplatesTableRowProps> = ({
           <ArchitectureLabel architecture={getArchitecture(template)} />
         </span>
       </TemplatesTableRowCell>
-      <TemplatesTableRowCell activeColumnIDs={activeColumnIDs} id="category" width={10}>
+      <TemplatesTableRowCell activeColumnIDs={activeColumnIDs} id="category" width={15}>
         <span data-test={`template-category-${templateName}`}>
           {getTemplateCategoryDisplay(template, t)}
         </span>

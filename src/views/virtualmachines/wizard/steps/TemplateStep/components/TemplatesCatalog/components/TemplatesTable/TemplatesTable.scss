@@ -1,0 +1,5 @@
+// PatternFly's column-help uses inline-grid, which shrink-to-fits and
+// truncates the header label (e.g. "Category" → "C").
+.table-column-help-width span {
+  width: 100%;
+}

@@ -2622,7 +2622,6 @@
   "VM name is required": "VM name is required",
   "VM Networks table": "VM Networks table",
   "VM status e.g. status:running,error": "VM status e.g. status:running,error",
-  "VM templates": "VM templates",
   "VMI": "VMI",
   "VMI instances": "VMI instances",
   "VMI limits": "VMI limits",

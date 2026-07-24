@@ -8,7 +8,7 @@ import {
   type Template,
   type TemplateOrRequest,
 } from '@kubevirt-utils/resources/template';
-import { includeFilter } from '@kubevirt-utils/utils/utils';
+import { includeFilter, isEmpty } from '@kubevirt-utils/utils/utils';
 import { type RowFilter, type RowFilterItem } from '@openshift-console/dynamic-plugin-sdk';
 
 import { TemplateFilterType } from './types';
@@ -32,7 +32,7 @@ const useCategoryFilter = (templates: Template[]): RowFilter<TemplateOrRequest> 
   return useMemo(
     () => ({
       filter: (selectedCategories, obj): boolean => {
-        if (!selectedCategories.selected?.length) {
+        if (isEmpty(selectedCategories.selected)) {
           return true;
         }
 
@@ -42,7 +42,7 @@ const useCategoryFilter = (templates: Template[]): RowFilter<TemplateOrRequest> 
 
         return includeFilter(selectedCategories, items, getTemplateCategory(obj) ?? '');
       },
-      filterGroupName: t('VM templates'),
+      filterGroupName: t('Category'),
       items,
       reducer: (obj): string =>
         isVirtualMachineTemplate(obj) ? (getTemplateCategory(obj) ?? '') : '',

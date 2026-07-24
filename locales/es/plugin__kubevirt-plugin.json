@@ -2646,7 +2646,6 @@
   "VM name is required": "VM name is required",
   "VM Networks table": "Tabla de redes de máquinas virtuales",
   "VM status e.g. status:running,error": "VM status e.g. status:running,error",
-  "VM templates": "VM templates",
   "VMI": "VMI",
   "VMI instances": "Instancias de VMI",
   "VMI limits": "Límites de VMI",
