@@ -3,6 +3,7 @@ import { OnboardingPopoversHidden } from '@kubevirt-utils/components/OnboardingP
 export type UserSettingsState = {
   cards: CardsUserSettings;
   columns: ColumnsUserSettings;
+  defaultVMLabels: DefaultVMLabelsUserSettings;
   favoriteBootableVolumes: string[];
   navigation: NavigationUserSettings;
   onboardingPopoversHidden: OnboardingPopoversHidden;
@@ -33,4 +34,8 @@ type QuickStartUserSettings = {
 
 type CardsUserSettings = {
   [cardPage: string]: { cardName: string; value: boolean };
+};
+
+type DefaultVMLabelsUserSettings = {
+  [labelKey: string]: string;
 };

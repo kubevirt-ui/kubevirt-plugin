@@ -7,6 +7,7 @@ export const ACTIONS = 'actions';
 export const USER_SETTINGS_KEYS = {
   cards: 'cards',
   columns: 'columns',
+  defaultVMLabels: 'defaultVMLabels',
   favoriteBootableVolumes: 'favoriteBootableVolumes',
   navigation: 'navigation',
   onboardingPopoversHidden: 'onboardingPopoversHidden',

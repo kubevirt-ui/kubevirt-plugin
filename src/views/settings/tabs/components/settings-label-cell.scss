@@ -1,0 +1,11 @@
+.settings-label-cell {
+  &__row {
+    display: flex;
+    align-items: center;
+    min-height: 36px;
+  }
+
+  &__value-input {
+    max-width: 200px;
+  }
+}

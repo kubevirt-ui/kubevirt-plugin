@@ -43,6 +43,7 @@ export const getClusterTabIds = (t: TFunction): SearchItem[] => [
 const getUserTabIds = (t: TFunction): SearchItem[] => [
   { id: USER_TAB_IDS.general, title: t('General') },
   { id: USER_TAB_IDS.autoHideNav, title: t('Auto-hide navigation menu') },
+  { id: USER_TAB_IDS.defaultVMLabels, title: t('Default VM labels') },
   { id: USER_TAB_IDS.sshKeys, title: t('SSH keys') },
   { id: USER_TAB_IDS.permissions, title: t('Permissions') },
   { id: USER_TAB_IDS.gettingStarted, title: t('Getting started') },

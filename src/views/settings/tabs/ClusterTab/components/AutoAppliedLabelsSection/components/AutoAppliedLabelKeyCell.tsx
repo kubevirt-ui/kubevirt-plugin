@@ -14,6 +14,8 @@ import {
 } from '@patternfly/react-core';
 import { CheckIcon, PencilAltIcon, TrashIcon } from '@patternfly/react-icons';
 
+import '@settings/tabs/components/settings-label-cell.scss';
+
 type AutoAppliedLabelKeyCellProps = {
   existingKeys: string[];
   isDisabled: boolean;
@@ -48,14 +50,9 @@ const AutoAppliedLabelKeyCell: FC<AutoAppliedLabelKeyCellProps> = ({
     setIsEditing(false);
   }, [canSave, editKey, label, onUpdate]);
 
-  const onCancel = useCallback((): void => {
-    setEditKey(label.key);
-    setIsEditing(false);
-  }, [label.key]);
-
   return (
     <>
-      <Split hasGutter>
+      <Split className="settings-label-cell__row" hasGutter>
         <SplitItem isFilled>
           {isEditing ? (
             <LabelKeyInput existingKeys={otherKeys} onChange={setEditKey} value={editKey} />
@@ -65,41 +62,37 @@ const AutoAppliedLabelKeyCell: FC<AutoAppliedLabelKeyCellProps> = ({
         </SplitItem>
         <SplitItem>
           {isEditing ? (
-            <>
-              <Button
-                aria-label={t('Confirm')}
-                icon={<CheckIcon />}
-                isDisabled={!canSave}
-                onClick={onSave}
-                variant={ButtonVariant.plain}
-              />
-              <Button
-                aria-label={t('Cancel')}
-                icon={<TrashIcon />}
-                onClick={onCancel}
-                variant={ButtonVariant.plain}
-              />
-            </>
+            <Button
+              aria-label={t('Confirm')}
+              icon={<CheckIcon />}
+              isDisabled={!canSave}
+              onClick={onSave}
+              variant={ButtonVariant.plain}
+            />
           ) : (
-            <>
-              <Button
-                aria-label={t('Edit')}
-                icon={<PencilAltIcon />}
-                isDisabled={isDisabled}
-                onClick={() => {
-                  setEditKey(label.key);
-                  setIsEditing(true);
-                }}
-                variant={ButtonVariant.plain}
-              />
-              <Button
-                aria-label={t('Delete')}
-                icon={<TrashIcon />}
-                isDisabled={isDisabled}
-                onClick={onDelete}
-                variant={ButtonVariant.plain}
-              />
-            </>
+            <Split>
+              <SplitItem>
+                <Button
+                  aria-label={t('Edit')}
+                  icon={<PencilAltIcon />}
+                  isDisabled={isDisabled}
+                  onClick={() => {
+                    setEditKey(label.key);
+                    setIsEditing(true);
+                  }}
+                  variant={ButtonVariant.plain}
+                />
+              </SplitItem>
+              <SplitItem>
+                <Button
+                  aria-label={t('Delete')}
+                  icon={<TrashIcon />}
+                  isDisabled={isDisabled}
+                  onClick={onDelete}
+                  variant={ButtonVariant.plain}
+                />
+              </SplitItem>
+            </Split>
           )}
         </SplitItem>
       </Split>

@@ -2,7 +2,7 @@ import React, { FC, useCallback, useState } from 'react';
 
 import { AutoAppliedLabel } from '@kubevirt-utils/hooks/useAutoAppliedLabels/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { validateLabelEntry } from '@kubevirt-utils/utils/labelValidation/labelValidation';
+import { validateK8sLabelValue } from '@kubevirt-utils/utils/labelValidation/labelValidation';
 import {
   Button,
   ButtonVariant,
@@ -12,17 +12,17 @@ import {
   SplitItem,
   TextInput,
 } from '@patternfly/react-core';
-import { CheckIcon } from '@patternfly/react-icons';
+import { CheckIcon, PencilAltIcon, TrashIcon } from '@patternfly/react-icons';
+
+import '@settings/tabs/components/settings-label-cell.scss';
 
 type AutoAppliedLabelValueCellProps = {
-  existingKeys: string[];
   isDisabled: boolean;
   label: AutoAppliedLabel;
   onUpdate: (label: AutoAppliedLabel) => void;
 };
 
 const AutoAppliedLabelValueCell: FC<AutoAppliedLabelValueCellProps> = ({
-  existingKeys,
   isDisabled,
   label,
   onUpdate,
@@ -31,9 +31,7 @@ const AutoAppliedLabelValueCell: FC<AutoAppliedLabelValueCellProps> = ({
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(label.value);
 
-  const valueError = isEditing
-    ? validateLabelEntry(label.key, editValue, t, undefined, existingKeys)
-    : undefined;
+  const valueError = isEditing ? validateK8sLabelValue(editValue, t) : undefined;
   const canSave = !valueError && !isDisabled;
 
   const onSave = useCallback((): void => {
@@ -42,51 +40,72 @@ const AutoAppliedLabelValueCell: FC<AutoAppliedLabelValueCellProps> = ({
     setIsEditing(false);
   }, [canSave, editValue, label, onUpdate]);
 
-  if (!isEditing) {
+  const onClear = useCallback((): void => {
+    onUpdate({ ...label, value: '' });
+  }, [label, onUpdate]);
+
+  if (isEditing) {
     return (
-      <Button
-        isDisabled={isDisabled}
-        isInline
-        onClick={() => {
-          setEditValue(label.value);
-          setIsEditing(true);
-        }}
-        variant={ButtonVariant.link}
-      >
-        {label.value || t('Set value')}
-      </Button>
+      <>
+        <Split className="settings-label-cell__row" hasGutter>
+          <SplitItem isFilled>
+            <TextInput
+              aria-label={t('Value for {{key}}', { key: label.key })}
+              isDisabled={isDisabled}
+              onChange={(_event, value) => setEditValue(value)}
+              placeholder={t('Enter a value')}
+              validated={valueError ? 'error' : 'default'}
+              value={editValue}
+            />
+          </SplitItem>
+          <SplitItem>
+            <Button
+              aria-label={t('Confirm')}
+              icon={<CheckIcon />}
+              isDisabled={!canSave}
+              onClick={onSave}
+              variant={ButtonVariant.plain}
+            />
+          </SplitItem>
+        </Split>
+        {valueError && (
+          <HelperText>
+            <HelperTextItem variant="error">{valueError}</HelperTextItem>
+          </HelperText>
+        )}
+      </>
     );
   }
 
   return (
-    <>
-      <Split hasGutter>
-        <SplitItem isFilled>
-          <TextInput
-            aria-label={t('Value')}
-            isDisabled={isDisabled}
-            onChange={(_event, value) => setEditValue(value)}
-            placeholder={t('Enter a value')}
-            validated={valueError ? 'error' : 'default'}
-            value={editValue}
-          />
-        </SplitItem>
-        <SplitItem>
-          <Button
-            aria-label={t('Confirm')}
-            icon={<CheckIcon />}
-            isDisabled={!canSave}
-            onClick={onSave}
-            variant={ButtonVariant.plain}
-          />
-        </SplitItem>
-      </Split>
-      {valueError && (
-        <HelperText>
-          <HelperTextItem variant="error">{valueError}</HelperTextItem>
-        </HelperText>
-      )}
-    </>
+    <Split className="settings-label-cell__row" hasGutter>
+      <SplitItem isFilled>{label.value || t('No value set')}</SplitItem>
+      <SplitItem>
+        <Split>
+          <SplitItem>
+            <Button
+              aria-label={t('Edit value')}
+              icon={<PencilAltIcon />}
+              isDisabled={isDisabled}
+              onClick={() => {
+                setEditValue(label.value);
+                setIsEditing(true);
+              }}
+              variant={ButtonVariant.plain}
+            />
+          </SplitItem>
+          <SplitItem>
+            <Button
+              aria-label={t('Clear value')}
+              icon={<TrashIcon />}
+              isDisabled={isDisabled || !label.value}
+              onClick={onClear}
+              variant={ButtonVariant.plain}
+            />
+          </SplitItem>
+        </Split>
+      </SplitItem>
+    </Split>
   );
 };
 
