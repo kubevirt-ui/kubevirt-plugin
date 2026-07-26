@@ -13,7 +13,6 @@ import GeneralSettings from './components/GeneralSettings/GeneralSettings';
 import GuestManagementSection from './components/GuestManagmentSection/GuestManagementSection';
 import PersistentReservationSection from './components/PersistentReservationSection/PersistentReservationSection';
 import ResourceManagementSection from './components/ResourceManagementSection/ResourceManagementSection';
-import VirtualizationFeaturesList from './components/VirtualizationFeaturesSection/VirtualizationFeaturesList/VirtualizationFeaturesList';
 
 const ClusterTab: FC = () => {
   const cluster = useSettingsCluster();
@@ -26,8 +25,6 @@ const ClusterTab: FC = () => {
       <Card variant="secondary">
         <GeneralInformation {...CSVDetails} />
       </Card>
-      <Divider className="settings-tab__section-divider" />
-      <VirtualizationFeaturesList />
       <Divider className="settings-tab__section-divider" />
       <GeneralSettings
         hyperConvergeConfiguration={hyperConvergeConfiguration}

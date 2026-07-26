@@ -201,12 +201,6 @@ export default class SettingsPage extends BasePage {
     return this._settings.getSettingsTabNames(...args);
   }
 
-  getVirtualizationFeatureItems(
-    ...args: Parameters<OverviewVirtualizationFeaturesPage['getVirtualizationFeatureItems']>
-  ): ReturnType<OverviewVirtualizationFeaturesPage['getVirtualizationFeatureItems']> {
-    return this._features.getVirtualizationFeatureItems(...args);
-  }
-
   // VirtualMachine actions confirmation
   getVmActionsConfirmationState(
     ...args: Parameters<OverviewSettingsPage['getVmActionsConfirmationState']>
@@ -248,12 +242,6 @@ export default class SettingsPage extends BasePage {
     ...args: Parameters<OverviewSettingsPage['isAutomaticGrantVirtualizationRolesEnabled']>
   ): ReturnType<OverviewSettingsPage['isAutomaticGrantVirtualizationRolesEnabled']> {
     return this._settings.isAutomaticGrantVirtualizationRolesEnabled(...args);
-  }
-
-  isConfigureFeaturesButtonVisible(
-    ...args: Parameters<OverviewVirtualizationFeaturesPage['isConfigureFeaturesButtonVisible']>
-  ): ReturnType<OverviewVirtualizationFeaturesPage['isConfigureFeaturesButtonVisible']> {
-    return this._features.isConfigureFeaturesButtonVisible(...args);
   }
 
   isGuestSystemLogEnabled(
@@ -377,12 +365,6 @@ export default class SettingsPage extends BasePage {
     ...args: Parameters<OverviewSettingsPage['navigateToTemplatesAndImagesManagement']>
   ): ReturnType<OverviewSettingsPage['navigateToTemplatesAndImagesManagement']> {
     return this._settings.navigateToTemplatesAndImagesManagement(...args);
-  }
-
-  navigateToVirtualizationFeatures(
-    ...args: Parameters<OverviewVirtualizationFeaturesPage['navigateToVirtualizationFeatures']>
-  ): ReturnType<OverviewVirtualizationFeaturesPage['navigateToVirtualizationFeatures']> {
-    return this._features.navigateToVirtualizationFeatures(...args);
   }
 
   // Advanced CD-ROM features
@@ -534,11 +516,5 @@ export default class SettingsPage extends BasePage {
     ...args: Parameters<OverviewVirtualizationFeaturesPage['verifyUserPermissions']>
   ): ReturnType<OverviewVirtualizationFeaturesPage['verifyUserPermissions']> {
     return this._features.verifyUserPermissions(...args);
-  }
-
-  verifyVirtualizationFeatures(
-    ...args: Parameters<OverviewVirtualizationFeaturesPage['verifyVirtualizationFeatures']>
-  ): ReturnType<OverviewVirtualizationFeaturesPage['verifyVirtualizationFeatures']> {
-    return this._features.verifyVirtualizationFeatures(...args);
   }
 }
