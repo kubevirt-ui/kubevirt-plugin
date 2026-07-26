@@ -5,7 +5,7 @@ import { type TFunction } from 'i18next';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Button, Skeleton, Tooltip } from '@patternfly/react-core';
-import { InstallState } from '@settings/tabs/ClusterTab/components/VirtualizationFeaturesSection/utils/types';
+import { InstallState } from '../../utils/types';
 
 import { useCapabilitiesActions } from '../../context/useCapabilitiesActions';
 import { useCapabilitiesData } from '../../context/useCapabilitiesData';

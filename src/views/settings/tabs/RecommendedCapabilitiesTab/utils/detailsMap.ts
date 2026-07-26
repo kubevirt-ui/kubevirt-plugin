@@ -1,21 +1,21 @@
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { type OperatorGroupKind, type SubscriptionKind } from '@overview/utils/types';
-import { type UseOperatorResourcesReturn } from '@settings/tabs/ClusterTab/components/VirtualizationFeaturesSection/utils/hooks/useOperatorResources/utils/types';
-import { InstallState } from '@settings/tabs/ClusterTab/components/VirtualizationFeaturesSection/utils/types';
+
+import { type UseOperatorResourcesReturn } from '../hooks/useOperatorResources/utils/types';
+import { RED_HAT } from './constants';
+import { RECOMMENDED_OPERATOR_PACKAGE_NAMES } from './operatorNames';
+import {
+  InstallState,
+  type RecommendedCapabilityDetailsMap,
+  type RecommendedCapabilityOperatorDetails,
+} from './types';
 import {
   clusterServiceVersionFor,
   computeInstallState,
   getOperatorHubURL,
   getPackageUID,
   getSubscriptionInstalledCSV,
-} from '@settings/tabs/ClusterTab/components/VirtualizationFeaturesSection/utils/VirtualizationFeaturesContext/utils/utils';
-import { RED_HAT } from '@settings/tabs/ClusterTab/components/VirtualizationFeaturesSection/VirtualizationFeaturesWizard/utils/hooks/useCreateOperator/utils/constants';
-
-import { RECOMMENDED_OPERATOR_PACKAGE_NAMES } from './operatorNames';
-import {
-  type RecommendedCapabilityDetailsMap,
-  type RecommendedCapabilityOperatorDetails,
-} from './types';
+} from './utils';
 
 const findSubscriptionByPackageName = (
   allSubscriptions: SubscriptionKind[],

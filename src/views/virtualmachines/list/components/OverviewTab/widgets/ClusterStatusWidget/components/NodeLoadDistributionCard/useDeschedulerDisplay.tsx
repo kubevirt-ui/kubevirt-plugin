@@ -15,7 +15,7 @@ import { GreenCheckCircleIcon } from '@openshift-console/dynamic-plugin-sdk';
 import { BlueInfoCircleIcon } from '@openshift-console/dynamic-plugin-sdk/lib/app/components/status/icons';
 import { Button, ButtonVariant, Popover } from '@patternfly/react-core';
 import { UnknownIcon } from '@patternfly/react-icons';
-import { OPERATOR_HUB_PATH } from '@settings/tabs/ClusterTab/components/VirtualizationFeaturesSection/utils/constants';
+const OPERATOR_HUB_PATH = '/operatorhub';
 
 type DeschedulerStatusDisplay = { icon: ReactNode; label: string };
 

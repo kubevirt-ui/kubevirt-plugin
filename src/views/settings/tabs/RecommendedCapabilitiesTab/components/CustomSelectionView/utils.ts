@@ -1,4 +1,4 @@
-import { InstallState } from '@settings/tabs/ClusterTab/components/VirtualizationFeaturesSection/utils/types';
+import { InstallState } from '../../utils/types';
 
 import {
   type CapabilityFeature,

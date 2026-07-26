@@ -5,8 +5,8 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { getName } from '@kubevirt-utils/resources/shared';
 import { isEmpty, kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { useSettingsCluster } from '@settings/context/SettingsClusterContext';
-import { createOperator } from '@settings/tabs/ClusterTab/components/VirtualizationFeaturesSection/VirtualizationFeaturesWizard/utils/hooks/useCreateOperator/utils/createOperator';
-import { InstallState } from '@settings/tabs/ClusterTab/components/VirtualizationFeaturesSection/utils/types';
+import { InstallState } from '../utils/types';
+import { createOperator } from '../utils/createOperator/createOperator';
 
 import { OLM_PROCESSING_DELAY_MS } from '../utils/constants';
 import { UseInstallBundleParams, UseInstallBundleReturn } from '../utils/types';

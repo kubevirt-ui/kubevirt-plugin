@@ -1,7 +1,7 @@
 import { V1CPU, V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getAnnotations } from '@kubevirt-utils/resources/shared';
 import { Template } from '@kubevirt-utils/resources/template';
-import { parseJSONAnnotation } from '@settings/tabs/ClusterTab/components/VirtualizationFeaturesSection/utils/VirtualizationFeaturesContext/utils/utils';
+import { parseJSONAnnotation } from '@kubevirt-utils/utils/utils';
 
 export enum CPUInputType {
   editTopologyManually = 'editTopologyManually',

@@ -4,7 +4,38 @@ import {
   type PackageManifestKind,
   type SubscriptionKind,
 } from '@overview/utils/types';
-import { InstallState } from '@settings/tabs/ClusterTab/components/VirtualizationFeaturesSection/utils/types';
+
+export type VirtualizationFeatureOperators =
+  | 'cluster-kube-descheduler-operator'
+  | 'cluster-observability-operator'
+  | 'fence-agents-remediation'
+  | 'kubernetes-nmstate-operator'
+  | 'netobserv-operator'
+  | 'node-healthcheck-operator';
+
+export enum InstallState {
+  'FAILED' = 'failed',
+  'INSTALLED' = 'installed',
+  'INSTALLING' = 'installing',
+  'NOT_INSTALLED' = 'notInstalled',
+  'UNKNOWN' = 'unknown',
+}
+
+export type VirtFeatureOperatorItem = {
+  [key: string]: any;
+  catalogSource?: string;
+  catalogSourceNamespace?: string;
+  createdAt?: string;
+  installState?: InstallState;
+  kind?: string;
+  name: string;
+  obj: PackageManifestKind;
+  provider?: string;
+  source?: string;
+  subscription?: SubscriptionKind;
+  uid: string;
+  validSubscription?: string[];
+};
 
 export enum CapabilitiesView {
   Bundle = 'bundle',
