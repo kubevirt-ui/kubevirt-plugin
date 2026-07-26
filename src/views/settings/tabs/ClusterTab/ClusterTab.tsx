@@ -7,6 +7,7 @@ import { isNewBadgeNeeded } from '@overview/utils/utils';
 import { Card, Divider } from '@patternfly/react-core';
 import { useSettingsCluster } from '@settings/context/SettingsClusterContext';
 
+import AutoAppliedLabelsSection from './components/AutoAppliedLabelsSection/AutoAppliedLabelsSection';
 import GeneralInformation from './components/GeneralInformation/GeneralInformation';
 import GeneralSettings from './components/GeneralSettings/GeneralSettings';
 import GuestManagementSection from './components/GuestManagmentSection/GuestManagementSection';
@@ -32,6 +33,8 @@ const ClusterTab: FC = () => {
         hyperConvergeConfiguration={hyperConvergeConfiguration}
         newBadge={newBadge}
       />
+      <Divider className="settings-tab__section-divider" />
+      <AutoAppliedLabelsSection />
       <Divider className="settings-tab__section-divider" />
       <GuestManagementSection
         hyperConvergeConfiguration={hyperConvergeConfiguration}
