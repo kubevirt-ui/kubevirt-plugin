@@ -54,11 +54,14 @@ const useOperatorCsvs = ({
       return true;
     }
 
-    return csvResourceKeys.every((key) => csvData?.[key]?.loaded);
+    return csvResourceKeys.every((key) => csvData?.[key]?.loaded || csvData?.[key]?.loadError);
   }, [csvData, csvResourceKeys, enabled]);
 
   const loadErrors = useMemo(
-    () => mapWatchResourceErrors(csvResourceKeys, csvData),
+    () =>
+      mapWatchResourceErrors(csvResourceKeys, csvData).filter(
+        (error) => (error as { code?: number })?.code !== 404,
+      ),
     [csvData, csvResourceKeys],
   );
 

@@ -3,9 +3,11 @@ import React, { type FC, type ReactNode, useCallback, useMemo, useState } from '
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getValidNamespace } from '@kubevirt-utils/utils/utils';
 import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
+import { useDataViewSelection } from '@patternfly/react-data-view';
 import useOperatorResources from '@settings/tabs/ClusterTab/components/VirtualizationFeaturesSection/utils/hooks/useOperatorResources/useOperatorResources';
 
 import useInstallBundle from '../hooks/useInstallBundle';
+import useInstallFeature from '../hooks/useInstallFeature';
 import { getRecommendedCapabilityFeatures } from '../utils/capabilityFeatures';
 import { buildRecommendedDetailsMap } from '../utils/detailsMap';
 import { RECOMMENDED_OPERATOR_PACKAGE_NAMES } from '../utils/operatorNames';
@@ -76,6 +78,18 @@ export const CapabilitiesDataProvider: FC<{ children?: ReactNode }> = ({ childre
     subscriptions,
   });
 
+  const { installFeature, installingFeatures } = useInstallFeature({
+    detailsMap,
+    features,
+    filteredPackageManifests,
+    operatorGroups,
+    subscriptions,
+  });
+
+  const capabilitySelection = useDataViewSelection({
+    matchOption: (a: { id: string }, b: { id: string }) => a.id === b.id,
+  });
+
   const dataValue: CapabilitiesDataValue = useMemo(
     () => ({
       alternativeState,
@@ -96,8 +110,24 @@ export const CapabilitiesDataProvider: FC<{ children?: ReactNode }> = ({ childre
   );
 
   const actionsValue: CapabilitiesActionsValue = useMemo(
-    () => ({ installBundle, installResourcesLoaded, isInstalling, setAlternative }),
-    [installBundle, installResourcesLoaded, isInstalling, setAlternative],
+    () => ({
+      capabilitySelection,
+      installBundle,
+      installFeature,
+      installingFeatures,
+      installResourcesLoaded,
+      isInstalling,
+      setAlternative,
+    }),
+    [
+      capabilitySelection,
+      installBundle,
+      installFeature,
+      installingFeatures,
+      installResourcesLoaded,
+      isInstalling,
+      setAlternative,
+    ],
   );
 
   return (

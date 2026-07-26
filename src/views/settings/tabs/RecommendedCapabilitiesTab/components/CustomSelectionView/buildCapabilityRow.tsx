@@ -5,7 +5,7 @@ import { type TFunction } from 'i18next';
 import ActionsDropdown from '@kubevirt-utils/components/ActionsDropdown/ActionsDropdown';
 import { type ActionDropdownItemType } from '@kubevirt-utils/components/ActionsDropdown/constants';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
-import { Label } from '@patternfly/react-core';
+import { Label, Spinner } from '@patternfly/react-core';
 
 import { CAPABILITY_INSTALL_STATE_CONFIG } from '../../utils/constants';
 import { type CapabilityFeature, CapabilityInstallState } from '../../utils/types';
@@ -13,6 +13,7 @@ import { type CapabilityFeature, CapabilityInstallState } from '../../utils/type
 export const buildCapabilityRow = (
   feature: CapabilityFeature,
   installState: CapabilityInstallState,
+  isInstalling: boolean,
   actions: ActionDropdownItemType[],
   t: TFunction,
 ) => {
@@ -28,7 +29,9 @@ export const buildCapabilityRow = (
       ),
     },
     {
-      cell: (
+      cell: isInstalling ? (
+        <Spinner aria-label={t('Installing')} size="md" />
+      ) : (
         <Label color={color} isCompact>
           {getLabel(t)}
         </Label>
@@ -36,7 +39,7 @@ export const buildCapabilityRow = (
     },
     {
       cell:
-        installState !== CapabilityInstallState.Installed ? (
+        installState !== CapabilityInstallState.Installed && !isInstalling ? (
           <ActionsDropdown actions={actions} isKebabToggle />
         ) : null,
       props: { className: 'pf-v6-c-table__action' },

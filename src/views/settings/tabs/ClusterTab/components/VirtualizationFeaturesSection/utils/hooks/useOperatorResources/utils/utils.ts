@@ -13,16 +13,15 @@ import {
   type SubscriptionKind,
 } from '@overview/utils/types';
 import { OPENSHIFT_MARKETPLACE_NAMESPACE } from '@settings/tabs/ClusterTab/components/VirtualizationFeaturesSection/utils/constants';
+import { RED_HAT_CATALOG_SOURCE } from '@settings/tabs/ClusterTab/components/VirtualizationFeaturesSection/VirtualizationFeaturesWizard/utils/hooks/useCreateOperator/utils/constants';
 import {
   getSubscriptionInstalledCSV,
   subscriptionFor,
 } from '@settings/tabs/ClusterTab/components/VirtualizationFeaturesSection/utils/VirtualizationFeaturesContext/utils/utils';
 import { type FleetWatchK8sResource } from '@stolostron/multicluster-sdk';
 
+import { PACKAGE_MANIFESTS_WATCH_KEY } from './constants';
 import { type OperatorWatchResourceResult } from './types';
-
-export const getPackageManifestResourceKey = (packageName: string): string =>
-  `packageManifest_${packageName}`;
 
 export const getCsvResourceKey = (packageName: string): string =>
   `clusterServiceVersion_${packageName}`;
@@ -75,20 +74,15 @@ export const getCsvWatchResources = (
 
 export const getPackageManifestWatchResources = (
   cluster: string | undefined,
-  packageNames: readonly string[],
-): Record<string, FleetWatchK8sResource> =>
-  Object.fromEntries(
-    packageNames.map((name) => [
-      getPackageManifestResourceKey(name),
-      {
-        cluster,
-        groupVersionKind: getGroupVersionKindForModel(PackageManifestModel),
-        isList: false,
-        name,
-        namespace: OPENSHIFT_MARKETPLACE_NAMESPACE,
-      },
-    ]),
-  );
+): Record<string, FleetWatchK8sResource> => ({
+  [PACKAGE_MANIFESTS_WATCH_KEY]: {
+    cluster,
+    groupVersionKind: getGroupVersionKindForModel(PackageManifestModel),
+    isList: true,
+    namespace: OPENSHIFT_MARKETPLACE_NAMESPACE,
+    selector: { matchLabels: { catalog: RED_HAT_CATALOG_SOURCE } },
+  },
+});
 
 export const getBaseOperatorWatchResources = (
   cluster?: string,

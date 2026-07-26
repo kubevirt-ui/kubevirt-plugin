@@ -6,13 +6,9 @@ import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Alert, Stack, StackItem } from '@patternfly/react-core';
-import {
-  DataView,
-  DataViewTable,
-  type DataViewTrTree,
-  useDataViewSelection,
-} from '@patternfly/react-data-view';
+import { DataView, DataViewTable, type DataViewTrTree } from '@patternfly/react-data-view';
 
+import { useCapabilitiesActions } from '../../context/useCapabilitiesActions';
 import { useCapabilitiesData } from '../../context/useCapabilitiesData';
 import { countInstalledCapabilities } from '../../utils/utils';
 
@@ -20,7 +16,7 @@ import { buildTreeRows } from './buildTreeRows';
 import CustomSelectionToolbar from './CustomSelectionToolbar';
 import { useCapabilityFilters } from './useCapabilityFilters';
 import { useCustomSelectionColumns } from './useCustomSelectionColumns';
-import { sortFeatures } from './utils';
+import { isCapabilitySelectable, sortFeatures } from './utils';
 
 const CustomSelectionView: FC = () => {
   const { t } = useKubevirtTranslation();
@@ -28,10 +24,7 @@ const CustomSelectionView: FC = () => {
   const isAdmin = useIsAdmin();
   const { detailsMap, features, getCapabilityInstallState, loadErrors, resourcesLoaded } =
     useCapabilitiesData();
-
-  const selection = useDataViewSelection<DataViewTrTree>({
-    matchOption: (a, b) => a.id === b.id,
-  });
+  const { capabilitySelection, installFeature, installingFeatures } = useCapabilitiesActions();
 
   const { columns, direction, sortBy } = useCustomSelectionColumns();
   const { clearAllFilters, filteredData, filters, onSetFilters } = useCapabilityFilters(
@@ -50,16 +43,44 @@ const CustomSelectionView: FC = () => {
         detailsMap,
         features: sortedFeatures,
         getCapabilityInstallState,
+        installFeature,
+        installingFeatures,
         isAdmin,
         navigate,
         t,
       }),
-    [detailsMap, getCapabilityInstallState, isAdmin, navigate, sortedFeatures, t],
+    [
+      detailsMap,
+      getCapabilityInstallState,
+      installFeature,
+      installingFeatures,
+      isAdmin,
+      navigate,
+      sortedFeatures,
+      t,
+    ],
   );
 
   const installedCount = useMemo(
     () => countInstalledCapabilities(features, detailsMap),
     [features, detailsMap],
+  );
+
+  const selectableRows = useMemo(
+    () =>
+      treeRows.filter((row) => {
+        const feature = features.find((feature) => feature.id === row.id);
+        return (
+          feature &&
+          isCapabilitySelectable(feature, detailsMap, installingFeatures, getCapabilityInstallState)
+        );
+      }),
+    [detailsMap, features, getCapabilityInstallState, installingFeatures, treeRows],
+  );
+
+  const selectableIds = useMemo(
+    () => new Set(selectableRows.map((row) => row.id)),
+    [selectableRows],
   );
 
   return (
@@ -79,7 +100,8 @@ const CustomSelectionView: FC = () => {
           installedCount={installedCount}
           onSetFilters={onSetFilters}
           resourcesLoaded={resourcesLoaded}
-          selection={selection}
+          selectableRows={selectableRows}
+          selection={capabilitySelection}
           totalCount={features.length}
           treeRows={treeRows}
         />
@@ -88,8 +110,8 @@ const CustomSelectionView: FC = () => {
         <StateHandler hasData={!isEmpty(features)} loaded={resourcesLoaded} showSkeletonLoading>
           <DataView
             selection={{
-              ...selection,
-              isSelectDisabled: (item: DataViewTrTree) => !item.children,
+              ...capabilitySelection,
+              isSelectDisabled: (item: DataViewTrTree) => !selectableIds.has(item.id),
             }}
           >
             <DataViewTable
