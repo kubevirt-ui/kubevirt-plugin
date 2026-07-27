@@ -17,12 +17,22 @@ import LabelKeyInput from './LabelKeyInput';
 type LabelRowProps = {
   existingKeys: string[];
   initialKeys?: Set<string>;
+  isKeyProtected?: boolean;
+  isValueProtected?: boolean;
   label: { key: string; value: string };
   onChange: (label: { key: string; value: string }) => void;
   onDelete: () => void;
 };
 
-const LabelRow: FC<LabelRowProps> = ({ existingKeys, initialKeys, label, onChange, onDelete }) => {
+const LabelRow: FC<LabelRowProps> = ({
+  existingKeys,
+  initialKeys,
+  isKeyProtected,
+  isValueProtected,
+  label,
+  onChange,
+  onDelete,
+}) => {
   const { t } = useKubevirtTranslation();
 
   const error = useMemo(
@@ -33,15 +43,20 @@ const LabelRow: FC<LabelRowProps> = ({ existingKeys, initialKeys, label, onChang
   return (
     <>
       <GridItem span={5}>
-        <LabelKeyInput
-          existingKeys={existingKeys}
-          onChange={(newKey) => onChange({ ...label, key: newKey })}
-          value={label.key}
-        />
+        {isKeyProtected ? (
+          <TextInput aria-label={t('Label key')} isDisabled value={label.key} />
+        ) : (
+          <LabelKeyInput
+            existingKeys={existingKeys}
+            onChange={(newKey) => onChange({ ...label, key: newKey })}
+            value={label.key}
+          />
+        )}
       </GridItem>
       <GridItem span={5}>
         <TextInput
           aria-label={t('label value')}
+          isDisabled={isValueProtected}
           onChange={(_event, newValue) => onChange({ ...label, value: newValue })}
           placeholder={t('Value')}
           type="text"
@@ -53,6 +68,7 @@ const LabelRow: FC<LabelRowProps> = ({ existingKeys, initialKeys, label, onChang
         <Button
           aria-label={t('Remove label')}
           icon={<MinusCircleIcon />}
+          isDisabled={isKeyProtected}
           onClick={onDelete}
           variant={ButtonVariant.plain}
         />

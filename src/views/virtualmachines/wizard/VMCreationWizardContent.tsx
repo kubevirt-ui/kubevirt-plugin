@@ -5,6 +5,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { Wizard, WizardHeader, WizardStep, WizardStepType } from '@patternfly/react-core';
 import useCloseWizard from '@virtualmachines/wizard/hooks/useCloseWizard';
 
+import RequiredLabelsDrawerWrapper from './components/RequiredLabelsDrawerWrapper';
 import TemplatesDrawerWrapper from './components/TemplatesDrawerWrapper';
 
 import {
@@ -17,6 +18,7 @@ import useWizardStepValidation from '@virtualmachines/wizard/hooks/useWizardStep
 import useVMGenerationNavClick from './hooks/useVMGenerationNavClick';
 import { useVMWizard } from './state/vm-wizard-context/VMWizardContext';
 import {
+  CREATE_VM_FORM_FIELDS_STEP_NAVIGATION,
   CREATE_VM_FORM_FIELDS_UI_STATE,
   CREATE_VM_FORM_FIELDS_VM_DATA,
 } from './state/vm-wizard-form/consts';
@@ -57,6 +59,7 @@ const VMCreationWizardContent: FC = () => {
       }
 
       if (currentStep?.id) {
+        setValue(CREATE_VM_FORM_FIELDS_STEP_NAVIGATION.CURRENT_STEP, currentStep.id);
         markStepVisited(String(currentStep.id), getValues, setValue);
       }
 
@@ -73,28 +76,30 @@ const VMCreationWizardContent: FC = () => {
   );
 
   return (
-    <TemplatesDrawerWrapper>
-      <Wizard
-        className="vm-creation-wizard"
-        header={<WizardHeader isCloseHidden title={t('Create VirtualMachine')} />}
-        onClose={closeWizard}
-        onStepChange={(_, currentStep, prevStep) => onStepChange(currentStep, prevStep)}
-        title={t('Create VirtualMachine')}
-      >
-        {stepsToDisplay?.map(({ children, footer, id, isDisabled, name, navItem }) => (
-          <WizardStep
-            footer={footer}
-            id={id}
-            isDisabled={isDisabled}
-            key={id}
-            name={name}
-            navItem={navItem}
-          >
-            {children}
-          </WizardStep>
-        ))}
-      </Wizard>
-    </TemplatesDrawerWrapper>
+    <RequiredLabelsDrawerWrapper>
+      <TemplatesDrawerWrapper>
+        <Wizard
+          className="vm-creation-wizard"
+          header={<WizardHeader isCloseHidden title={t('Create VirtualMachine')} />}
+          onClose={closeWizard}
+          onStepChange={(_, currentStep, prevStep) => onStepChange(currentStep, prevStep)}
+          title={t('Create VirtualMachine')}
+        >
+          {stepsToDisplay?.map(({ children, footer, id, isDisabled, name, navItem }) => (
+            <WizardStep
+              footer={footer}
+              id={id}
+              isDisabled={isDisabled}
+              key={id}
+              name={name}
+              navItem={navItem}
+            >
+              {children}
+            </WizardStep>
+          ))}
+        </Wizard>
+      </TemplatesDrawerWrapper>
+    </RequiredLabelsDrawerWrapper>
   );
 };
 

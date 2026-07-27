@@ -11,6 +11,7 @@ import {
   DrawerPanelBody,
   DrawerPanelContent,
 } from '@patternfly/react-core';
+import { WIZARD_DRAWER_SIZE } from '@settings/constants';
 import { getTemplateOSIcon } from '@virtualmachines/wizard/utils/os-icons/os-icons';
 
 import TemplatesCatalogDrawerPanel from './components/TemplatesCatalogDrawerPanel/TemplatesCatalogDrawerPanel';
@@ -32,7 +33,11 @@ export const TemplatesCatalogDrawer: FC<TemplatesCatalogDrawerProps> = ({ onClos
 
   return (
     <DrawerContextProvider template={template}>
-      <DrawerPanelContent className="template-catalog-drawer" maxSize="37.5rem" minSize="37.5rem">
+      <DrawerPanelContent
+        className="template-catalog-drawer"
+        maxSize={WIZARD_DRAWER_SIZE}
+        minSize={WIZARD_DRAWER_SIZE}
+      >
         <DrawerHead>
           <CatalogItemHeader
             className="co-catalog-page__overlay-header"

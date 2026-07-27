@@ -2,7 +2,6 @@ import { createElement } from 'react';
 import { VMCreationMethod, VMWizardStep } from './constants';
 
 import { TFunction } from 'i18next';
-import DefaultWizardFooter from '../components/DefaultWizardFooter';
 import CloneSourceStep from '../steps/CloneSourceStep/CloneSourceStep';
 import CustomizationStep from '../steps/CustomizationStep/CustomizationStep';
 import DeploymentDetailsStepFooter from '../steps/DeploymentDetailsStep/components/DeploymentDetailsStepFooter';
@@ -34,10 +33,11 @@ const getCustomizationStep = (
   t: TFunction,
   navItemConfig: WizardStepNavItemConfig,
   isStepDisabled: (stepId: VMWizardStep) => boolean,
+  isNextDisabledForStep: (stepId: VMWizardStep) => boolean,
 ): VMWizardStepDisplay => ({
   children: createElement(CustomizationStep),
   displayIndex: 6,
-  footer: createElement(DefaultWizardFooter),
+  footer: { isNextDisabled: isNextDisabledForStep(VMWizardStep.CUSTOMIZATION) },
   id: VMWizardStep.CUSTOMIZATION,
   isDisabled: isStepDisabled(VMWizardStep.CUSTOMIZATION),
   name: t('Customization'),
@@ -65,7 +65,12 @@ export const getStepsToDisplayByCreationMethod = ({
   t,
 }: GetStepsToDisplayByCreationMethodArgs): Record<VMCreationMethod, VMWizardStepDisplay[]> => {
   const deploymentDetailsStep = getDeploymentDetailsStep(t);
-  const customizationStep = getCustomizationStep(t, navItemConfig, isStepDisabled);
+  const customizationStep = getCustomizationStep(
+    t,
+    navItemConfig,
+    isStepDisabled,
+    isNextDisabledForStep,
+  );
   const reviewAndCreateStep = getReviewAndCreateStep(t, navItemConfig, isStepDisabled);
 
   return {
