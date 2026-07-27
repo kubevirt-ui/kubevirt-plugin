@@ -9,7 +9,7 @@ export type SimpleNICPresentation = {
   isInterfaceEphemeral: boolean;
   isPending: boolean;
   isSRIOV: boolean;
-  network: { multus?: { networkName: string }; name: string };
+  network: { multus?: { networkName: string }; name: string; pod?: object };
   runtimeLinkState?: string;
   type: string;
 };
