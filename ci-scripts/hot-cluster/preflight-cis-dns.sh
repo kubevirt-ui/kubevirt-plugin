@@ -64,7 +64,9 @@ CREATE_RC="${CREATE_RC:-0}"
 
 if [[ "${CREATE_RC}" -ne 0 ]]; then
   echo "${CREATE_OUT}"
-  if echo "${CREATE_OUT}" | grep -qiE 'Method Not Allowed|405|not authorized|forbidden|403|not permitted'; then
+  if echo "${CREATE_OUT}" | grep -qiE 'Trial period has expired'; then
+    echo "::error::CIS DNS create failed because the CIS instance trial has expired (API code 10002 / HTTP 405). Upgrade cnv-cis (or the CIS instance for ${BASE_DOMAIN}) to at least Standard Next, then re-run setup. openshift-install hits the same failure creating api.${CLUSTER_NAME}.${BASE_DOMAIN}."
+  elif echo "${CREATE_OUT}" | grep -qiE 'Method Not Allowed|405|not authorized|forbidden|403|not permitted'; then
     echo "::error::CIS DNS create failed (HTTP 403/405 or auth). openshift-install will hit the same error creating api.${CLUSTER_NAME}.${BASE_DOMAIN}. Fix: CIS plan must be Standard Next (or higher), and IC_KEY needs Internet Services Administrator/Writer on the CIS instance / resource group. Then re-run setup."
   else
     echo "::error::CIS DNS create failed during preflight. Fix CIS permissions/zone before running IPI install."
