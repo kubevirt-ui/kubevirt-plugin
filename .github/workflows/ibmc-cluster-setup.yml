@@ -217,6 +217,11 @@ jobs:
     if: needs.precheck.outputs.already_ready != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 360
+    # One provision at a time per cluster name. Cancel stale manual/E2E
+    # races that would otherwise fight over the same CIS DNS + VPC resources.
+    concurrency:
+      group: hot-cluster-setup-${{ inputs.cluster_name || 'kubevirt-plugin-ci' }}
+      cancel-in-progress: true
     steps:
       - name: Validate cluster_name format
         run: |
@@ -408,26 +413,49 @@ jobs:
           OC_VERSION_INPUT: ${{ inputs.openshift_version }}
         run: |
           OCP_BASE="${OC_VERSION_INPUT%%_*}"
+          OCP_CHANNEL=""
 
           if [[ "${OCP_BASE}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
             echo "Using pinned OCP version: ${OCP_BASE}"
             MIRROR="https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/${OCP_BASE}"
+            MIRROR_LABEL="${OCP_BASE}"
           else
             OCP_CHANNEL="stable-${OCP_BASE}"
             echo "Resolving ${OCP_CHANNEL} to latest patch version..."
             MIRROR="https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/${OCP_CHANNEL}"
+            MIRROR_LABEL="${OCP_CHANNEL}"
           fi
 
+          download_ocp_tarball() {
+            local url="$1"
+            local dest="$2"
+            local label="$3"
+            local http_code
+            http_code=$(curl -sL -o "${dest}" -w "%{http_code}" "${url}")
+            if [[ "${http_code}" != "200" ]] || ! gzip -t "${dest}" 2>/dev/null; then
+              echo "::error::OpenShift client download failed for '${label}' (HTTP ${http_code}). '${OC_VERSION_INPUT}' is not available under mirror.openshift.com .../clients/ocp/. Use a GA channel such as 4.22_openshift. OCP 5.0 early builds live under ocp-dev-preview and are not supported by this workflow yet."
+              rm -f "${dest}"
+              exit 1
+            fi
+          }
+
           echo "Downloading openshift-install..."
-          curl -sL "${MIRROR}/openshift-install-linux.tar.gz" | tar -xz -C /usr/local/bin openshift-install
+          download_ocp_tarball "${MIRROR}/openshift-install-linux.tar.gz" "${RUNNER_TEMP}/openshift-install-linux.tar.gz" "${MIRROR_LABEL}"
+          tar -xz -C /usr/local/bin -f "${RUNNER_TEMP}/openshift-install-linux.tar.gz" openshift-install
           openshift-install version
 
           echo "Downloading oc + kubectl..."
-          curl -sL "${MIRROR}/openshift-client-linux.tar.gz" | tar -xz -C /usr/local/bin oc kubectl
+          download_ocp_tarball "${MIRROR}/openshift-client-linux.tar.gz" "${RUNNER_TEMP}/openshift-client-linux.tar.gz" "${MIRROR_LABEL}"
+          tar -xz -C /usr/local/bin -f "${RUNNER_TEMP}/openshift-client-linux.tar.gz" oc kubectl
           oc version --client
 
           echo "Downloading ccoctl..."
-          curl -sL "${MIRROR}/ccoctl-linux.tar.gz" | tar -xz -C /usr/local/bin ccoctl 2>/dev/null || echo "ccoctl not available for this version"
+          CCOCTL_CODE=$(curl -sL -o "${RUNNER_TEMP}/ccoctl-linux.tar.gz" -w "%{http_code}" "${MIRROR}/ccoctl-linux.tar.gz" || true)
+          if [[ "${CCOCTL_CODE}" == "200" ]] && gzip -t "${RUNNER_TEMP}/ccoctl-linux.tar.gz" 2>/dev/null; then
+            tar -xz -C /usr/local/bin -f "${RUNNER_TEMP}/ccoctl-linux.tar.gz" ccoctl
+          else
+            echo "ccoctl not available for this version"
+          fi
 
           RESOLVED_VERSION=$(openshift-install version | head -1 | awk '{print $2}')
           echo "ocp_channel=${OCP_CHANNEL}" >> "$GITHUB_OUTPUT"
@@ -461,6 +489,15 @@ jobs:
           echo "::endgroup::"
 
           cp "${INSTALL_DIR}/install-config.yaml" "${INSTALL_DIR}/install-config.yaml.bak"
+
+      # Fail in minutes (not after 5×90m install attempts) when CIS cannot
+      # create DNS records — the same failure mode as openshift-install's
+      # "Method Not Allowed" on api*.<cluster>.<base_domain>.
+      - name: Preflight CIS DNS write access
+        if: inputs.infrastructure_type == 'ipi'
+        env:
+          IC_API_KEY: ${{ secrets.IC_KEY }}
+        run: bash ./ci-scripts/hot-cluster/preflight-cis-dns.sh
 
       - name: Create IPI cluster (with retry)
         id: ipi_create

@@ -92,6 +92,7 @@ Uses `openshift-install` to create a fully self-managed OpenShift cluster on IBM
 - **Flavor**: `bx2-8x32` (hyphen format, auto-converted from dot format)
 - **Base domain**: `cnv-ui.com` (registered in IBM Cloud CIS)
 - **Required**: VPC Admin, COS Manager, DNS/CIS access, IAM Identity Admin, `OPENSHIFT_PULL_SECRET` GitHub secret
+- **CIS write preflight**: before `openshift-install`, setup runs [`preflight-cis-dns.sh`](hot-cluster/preflight-cis-dns.sh) (create+delete a throwaway A record). A 403/405 here means CIS plan/IAM must be fixed — do not expect IPI to succeed until that passes. CIS needs at least **Standard Next**, and `IC_KEY` needs Internet Services Administrator/Writer on the CIS instance.
 
 ## Required GitHub Secrets
 
