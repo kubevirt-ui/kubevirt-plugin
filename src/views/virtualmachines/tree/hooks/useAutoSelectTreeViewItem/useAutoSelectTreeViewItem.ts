@@ -11,7 +11,7 @@ import { getVMListURL } from '@multicluster/urls';
 import useIsACMPage from '@multicluster/useIsACMPage';
 import { useLastNamespace } from '@openshift-console/dynamic-plugin-sdk-internal';
 import { useSignals } from '@preact/signals-react/runtime';
-import { TEXT_FILTER_LABELS_ID } from '@virtualmachines/list/hooks/constants';
+import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
 import { FOLDER_SELECTOR_PREFIX, HIDE, SHOW_EMPTY_PROJECTS_KEY } from '../../utils/constants';
 import { vmsSignal } from '../../utils/signals';
@@ -62,7 +62,7 @@ const useAutoSelectTreeViewItem = ({ dataMap, loaded }: UseAutoSelectTreeViewIte
 
     if (ns && cluster && loaded) {
       const folderPrefix = `${FOLDER_SELECTOR_PREFIX}/${cluster}/${ns}/`;
-      const hasFolderFilter = searchParams.has(TEXT_FILTER_LABELS_ID);
+      const hasFolderFilter = searchParams.has(VirtualMachineRowFilterType.Group);
       if (selected?.id?.startsWith(folderPrefix) && hasFolderFilter) return;
 
       const projectTreeItem = getProjectTreeItem(dataMap, cluster, ns);
@@ -108,7 +108,7 @@ const useAutoSelectTreeViewItem = ({ dataMap, loaded }: UseAutoSelectTreeViewIte
     const { vmName, vmNamespace } = getVMInfoFromPathname(location.pathname);
     if (vmName && vmNamespace) return;
 
-    const hasFolderFilter = searchParams.has(TEXT_FILTER_LABELS_ID);
+    const hasFolderFilter = searchParams.has(VirtualMachineRowFilterType.Group);
     const isFolderSelected =
       ns && selected?.id?.startsWith(`${FOLDER_SELECTOR_PREFIX}/${SINGLE_CLUSTER_KEY}/${ns}/`);
 

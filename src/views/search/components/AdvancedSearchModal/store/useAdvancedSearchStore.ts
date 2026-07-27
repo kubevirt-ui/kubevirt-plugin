@@ -45,6 +45,7 @@ const getInitialState = (prefillInputs: AdvancedSearchInputs = {}): AdvancedSear
     [VirtualMachineRowFilterType.DateCreatedFrom]: '',
     [VirtualMachineRowFilterType.DateCreatedTo]: '',
     [VirtualMachineRowFilterType.Description]: '',
+    [VirtualMachineRowFilterType.Group]: [],
     [VirtualMachineRowFilterType.GuestAgent]: initialGuestAgent,
     [VirtualMachineRowFilterType.HWDevices]: initialHWDevices,
     [VirtualMachineRowFilterType.IP]: '',

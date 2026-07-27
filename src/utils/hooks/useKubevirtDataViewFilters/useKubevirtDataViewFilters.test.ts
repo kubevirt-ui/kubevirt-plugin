@@ -104,8 +104,7 @@ describe('useKubevirtDataViewFilters', () => {
     });
 
     it('should filter by labels (must match all selected labels)', () => {
-      mockFiltersState = { labels: [], name: [], status: [] };
-      searchParamsMock.append('labels', 'app=web');
+      mockFiltersState = { labels: ['app=web'], name: [], status: [] };
 
       const { result } = renderHook(() =>
         useKubevirtDataViewFilters({ data: sampleData, filterDefinitions: baseFilters }),
@@ -119,9 +118,7 @@ describe('useKubevirtDataViewFilters', () => {
     });
 
     it('should require all labels to match when multiple labels selected', () => {
-      mockFiltersState = { labels: [], name: [], status: [] };
-      searchParamsMock.append('labels', 'app=web');
-      searchParamsMock.append('labels', 'status=running');
+      mockFiltersState = { labels: ['app=web', 'status=running'], name: [], status: [] };
 
       const { result } = renderHook(() =>
         useKubevirtDataViewFilters({ data: sampleData, filterDefinitions: baseFilters }),
@@ -145,8 +142,7 @@ describe('useKubevirtDataViewFilters', () => {
     });
 
     it('should combine name + labels + custom filters with AND logic', () => {
-      mockFiltersState = { labels: [], name: ['alpha'], status: ['running'] };
-      searchParamsMock.append('labels', 'app=web');
+      mockFiltersState = { labels: ['app=web'], name: ['alpha'], status: ['running'] };
 
       const { result } = renderHook(() =>
         useKubevirtDataViewFilters({ data: sampleData, filterDefinitions: baseFilters }),

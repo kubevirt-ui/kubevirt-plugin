@@ -2,6 +2,8 @@ import React, { FC, useRef } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { ModalComponentProps } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import { TREE_VIEW_FOLDERS } from '@kubevirt-utils/hooks/useFeatures/constants';
+import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useIsACMPage from '@multicluster/useIsACMPage';
 import {
@@ -23,6 +25,7 @@ import ClusterField from './formFields/ClusterField';
 import CPUField from './formFields/CPUField';
 import DateCreatedField from './formFields/DateCreatedField';
 import DescriptionField from './formFields/DescriptionField';
+import GroupField from './formFields/GroupField';
 import GuestAgentField from './formFields/GuestAgentField';
 import HardwareDevicesField from './formFields/HardwareDevicesField';
 import IPField from './formFields/IPField';
@@ -55,6 +58,7 @@ const AdvancedSearchModal: FC<AdvancedSearchModalProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const isACMPage = useIsACMPage();
+  const { featureEnabled: treeViewFoldersEnabled } = useFeatures(TREE_VIEW_FOLDERS);
 
   const isSearchDisabled = useIsSearchDisabled();
   const { getSearchQueryInputs, initializeWithPrefill, resetForm } = useAdvancedSearchActions();
@@ -86,6 +90,7 @@ const AdvancedSearchModal: FC<AdvancedSearchModalProps> = ({
               <NameField />
               {isACMPage && <ClusterField />}
               <ProjectField vms={vms} />
+              {treeViewFoldersEnabled && <GroupField vms={vms} />}
               <DescriptionField />
               <StatusField />
               <OperatingSystemField />

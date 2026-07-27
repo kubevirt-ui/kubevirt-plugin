@@ -10,7 +10,7 @@ import { EMPTY_FILTERS } from './constants';
 import { getLabelFilter } from './filters/getLabelFilter';
 import { getNameFilter } from './filters/getNameFilter';
 import useMigratedSearchParams from './hooks/useMigratedSearchParams';
-import useSyncedLabelsFilter from './hooks/useSyncedLabelsFilter';
+import useSyncedGroupFilter from './hooks/useSyncedGroupFilter';
 import { KubevirtFilter, KubevirtFilterState, OnSetFilters } from './types';
 import { matchesWithExclusion } from './utils';
 
@@ -53,7 +53,7 @@ const useKubevirtDataViewFilters = <T extends K8sResourceCommon>({
     setSearchParams,
   });
 
-  const { syncedFilters, syncedOnSetFilters } = useSyncedLabelsFilter(
+  const { syncedFilters, syncedOnSetFilters } = useSyncedGroupFilter(
     filters,
     onSetFilters,
     searchParams,

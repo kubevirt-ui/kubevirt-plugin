@@ -1,16 +1,16 @@
 import { NumberOperator, numberOperatorInfo } from '@kubevirt-utils/utils/constants';
-import { ALL_SEARCH_KEY_BADGES } from '@search/components/SearchDropdown/constants';
+import { SEARCH_KEY_BADGES } from '@search/components/SearchDropdown/constants';
 import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
 export const EXCLUSION_URL_PREFIX = '!';
 export const EXCLUSION_PREFIX = '-';
 
 export const SEARCH_KEY_TO_FILTER_TYPE = new Map<string, string>(
-  ALL_SEARCH_KEY_BADGES.map(({ filterType, searchKey }) => [searchKey, filterType]),
+  SEARCH_KEY_BADGES.map(({ filterType, searchKey }) => [searchKey, filterType]),
 );
 
 export const FILTER_TYPE_TO_SEARCH_KEY = new Map<string, string>(
-  ALL_SEARCH_KEY_BADGES.map(({ filterType, searchKey }) => [filterType, searchKey]),
+  SEARCH_KEY_BADGES.map(({ filterType, searchKey }) => [filterType, searchKey]),
 );
 
 export const OPERATOR_TO_SIGN: Record<string, string> = Object.fromEntries(

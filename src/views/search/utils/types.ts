@@ -16,6 +16,7 @@ export type AdvancedSearchQueryInputs = Partial<{
   [VirtualMachineRowFilterType.DateCreatedFrom]: string;
   [VirtualMachineRowFilterType.DateCreatedTo]: string;
   [VirtualMachineRowFilterType.Description]: string;
+  [VirtualMachineRowFilterType.Group]: string[];
   [VirtualMachineRowFilterType.GuestAgent]: GuestAgentValue;
   [VirtualMachineRowFilterType.HWDevices]: HWDevicesValue;
   [VirtualMachineRowFilterType.IP]: string;

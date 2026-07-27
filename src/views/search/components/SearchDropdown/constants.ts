@@ -8,6 +8,7 @@ import { SearchExample, SearchKeyBadge, ValueOption } from './types';
 export const SEARCH_KEYS = {
   NAME: 'name',
   PROJECT: 'project',
+  GROUP: 'group',
   STATUS: 'status',
   CPU: 'vcpu',
   STORAGE_CLASS: 'storage',
@@ -26,16 +27,26 @@ export const SEARCH_KEYS = {
   CLUSTER: 'cluster',
 } as const;
 
-const BASE_SEARCH_KEY_BADGES: SearchKeyBadge[] = [
+export const SEARCH_KEY_BADGES: SearchKeyBadge[] = [
   {
     filterType: VirtualMachineRowFilterType.Name,
     getDescription: (t) => t('VM name - contains match (or just type free text)'),
     searchKey: SEARCH_KEYS.NAME,
   },
   {
+    filterType: VirtualMachineRowFilterType.Cluster,
+    getDescription: (t) => t('Cluster name e.g. cluster:production,local-cluster'),
+    searchKey: SEARCH_KEYS.CLUSTER,
+  },
+  {
     filterType: VirtualMachineRowFilterType.Project,
     getDescription: (t) => t('Namespace / project e.g. project:default,openshift'),
     searchKey: SEARCH_KEYS.PROJECT,
+  },
+  {
+    filterType: VirtualMachineRowFilterType.Group,
+    getDescription: (t) => t('Group (folder) e.g. group:production,staging'),
+    searchKey: SEARCH_KEYS.GROUP,
   },
   {
     filterType: VirtualMachineRowFilterType.Status,
@@ -117,16 +128,16 @@ const BASE_SEARCH_KEY_BADGES: SearchKeyBadge[] = [
   },
 ];
 
-const CLUSTER_BADGE: SearchKeyBadge = {
-  filterType: VirtualMachineRowFilterType.Cluster,
-  getDescription: (t) => t('Cluster name e.g. cluster:production,local-cluster'),
-  searchKey: SEARCH_KEYS.CLUSTER,
-};
-
-export const ALL_SEARCH_KEY_BADGES = [CLUSTER_BADGE, ...BASE_SEARCH_KEY_BADGES];
-
-export const getSearchKeyBadges = (isACMPage: boolean): SearchKeyBadge[] =>
-  isACMPage ? ALL_SEARCH_KEY_BADGES : BASE_SEARCH_KEY_BADGES;
+export const getSearchKeyBadges = (isACMPage: boolean, foldersEnabled: boolean): SearchKeyBadge[] =>
+  SEARCH_KEY_BADGES.map((badge) => {
+    if (!foldersEnabled && badge.filterType === VirtualMachineRowFilterType.Group) {
+      return undefined;
+    }
+    if (!isACMPage && badge.filterType === VirtualMachineRowFilterType.Cluster) {
+      return undefined;
+    }
+    return badge;
+  }).filter(Boolean);
 
 export const getSearchExamples = (t: TFunction): SearchExample[] => [
   {

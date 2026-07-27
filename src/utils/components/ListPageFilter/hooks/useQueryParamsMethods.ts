@@ -42,10 +42,31 @@ export const useQueryParamsMethods = () => {
     [navigate],
   );
 
+  const removeQueryArgumentValues = useCallback(
+    (key: string, valuesToRemove: string[]) => {
+      const params = new URLSearchParams(window.location.search);
+      if (!params.has(key)) return;
+
+      const hadValues = valuesToRemove.some((v) => params.has(key, v));
+      if (!hadValues) return;
+
+      valuesToRemove.forEach((v) => params.delete(key, v));
+
+      const url = new URL(window.location.href);
+      navigate(`${url.pathname}?${params.toString()}${url.hash}`, { replace: true });
+    },
+    [navigate],
+  );
+
   const setOrRemoveQueryArgument = useCallback(
     (k: string, v?: string) => (v ? setAllQueryArguments({ [k]: v }) : removeQueryArguments(k)),
     [setAllQueryArguments, removeQueryArguments],
   );
 
-  return { removeQueryArguments, setAllQueryArguments, setOrRemoveQueryArgument };
+  return {
+    removeQueryArguments,
+    removeQueryArgumentValues,
+    setAllQueryArguments,
+    setOrRemoveQueryArgument,
+  };
 };
