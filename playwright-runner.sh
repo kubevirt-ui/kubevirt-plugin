@@ -52,12 +52,6 @@ if [[ -z "${PROJECT}" ]]; then
   echo "  Tier2                  Tier 2 specs (scenario infrastructure)"
   echo "  Settings               Settings specs (scenario infrastructure)"
   echo "  API                    API contract tests (browserless)"
-  echo "  migration-gating       Migration gating specs"
-  echo "  migration-tier1        Migration tier 1 specs"
-  echo "  migration-tier2        Tier 2 specs"
-  echo "  migration-nonpriv      Non-privileged user specs"
-  echo "  migration-migrations   Migration specs"
-  echo "  migration-settings     Settings specs"
   echo "  suite                  Run Gating + Tier1 + Tier2 together"
   echo "  all                    Run all projects"
   exit 1
@@ -87,12 +81,6 @@ elif [[ "${PROJECT_LOWER}" == "all" ]]; then
     Tier2
     Settings
     API
-    migration-gating
-    migration-tier1
-    migration-tier2
-    migration-nonpriv
-    migration-migrations
-    migration-settings
   )
   PROJECT_ARGS=()
   for p in "${PROJECTS[@]}"; do

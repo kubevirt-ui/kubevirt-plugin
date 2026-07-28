@@ -8,7 +8,7 @@ import { TestConfigManager } from '@/utils/test-config';
 import type { TeardownRule } from './types';
 import { TeardownScope } from './types';
 
-/** Repo root: rule-engine → project-dependencies → playwright → kubevirt-ui */
+/** Repo root: rule-engine → project-dependencies → playwright → kubevirt-plugin */
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..', '..');
 
 function safeWarn(message: string, err: unknown): void {
