@@ -4,28 +4,47 @@ import {
   ConfigMapModel,
   modelToGroupVersionKind,
 } from '@kubevirt-utils/models';
-import { getAnnotation } from '@kubevirt-utils/resources/shared';
+import { getAnnotation, getName } from '@kubevirt-utils/resources/shared';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
+import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import { useHubClusterName } from '@stolostron/multicluster-sdk';
 
 import {
-  OBSERVABILITY_CONTROLLER_NAME,
+  OBSERVABILITY_CMA_NAMES,
   VIRTUALIZATION_OBSERVABILITY_CONFIG_MAP_NAME,
   VIRTUALIZATION_OBSERVABILITY_CONFIG_MAP_NAMESPACE,
   VIRTUALIZATION_OBSERVABILITY_DASHBOARD_ANNOTATION,
   VIRTUALIZATION_OBSERVABILITY_DASHBOARD_JSON_NAME,
 } from './constants';
 
+const isObservabilityCMA = (addon: K8sResourceCommon): boolean => {
+  const name = getName(addon);
+  return Boolean(name && (OBSERVABILITY_CMA_NAMES as readonly string[]).includes(name));
+};
+
 export const useVirtualizationObservabilityLink = () => {
+  const [hubClusterName] = useHubClusterName();
+
   const [virtObservabilityConfigMap] = useK8sWatchData<IoK8sApiCoreV1ConfigMap>({
+    cluster: hubClusterName,
     groupVersionKind: modelToGroupVersionKind(ConfigMapModel),
     name: VIRTUALIZATION_OBSERVABILITY_CONFIG_MAP_NAME,
     namespace: VIRTUALIZATION_OBSERVABILITY_CONFIG_MAP_NAMESPACE,
   });
 
-  const [observabilityController] = useK8sWatchData({
+  // Watch all CMAs and accept either the legacy observability-controller or
+  // MCOA's multicluster-observability-addon (CNV-93086).
+  const [observabilityAddOns] = useK8sWatchData<K8sResourceCommon[]>({
+    cluster: hubClusterName,
     groupVersionKind: modelToGroupVersionKind(ClusterManagementAddOnModel),
-    name: OBSERVABILITY_CONTROLLER_NAME,
+    isList: true,
   });
+
+  const observabilityAddon = observabilityAddOns?.find(
+    (addon) =>
+      isObservabilityCMA(addon) &&
+      getAnnotation(addon, VIRTUALIZATION_OBSERVABILITY_DASHBOARD_ANNOTATION),
+  );
 
   const parsedDashboardData = JSON.parse(
     virtObservabilityConfigMap?.data?.[VIRTUALIZATION_OBSERVABILITY_DASHBOARD_JSON_NAME] || '{}',
@@ -34,7 +53,7 @@ export const useVirtualizationObservabilityLink = () => {
   const dashboardId = parsedDashboardData?.uid;
 
   const grafanaLink = getAnnotation(
-    observabilityController,
+    observabilityAddon,
     VIRTUALIZATION_OBSERVABILITY_DASHBOARD_ANNOTATION,
   );
 
