@@ -31,8 +31,10 @@ type LabelsAnnotationsTableProps = {
   onAdd: () => void;
   onDelete: (key: string) => void;
   onEdit?: (key: string) => void;
+  renderKey?: (key: string) => ReactNode;
   renderValue: (key: string, value: string) => ReactNode;
   searchId: string;
+  summaryContent?: ReactNode;
   title: string;
 };
 
@@ -48,8 +50,10 @@ const LabelsAnnotationsTable: FC<LabelsAnnotationsTableProps> = ({
   onAdd,
   onDelete,
   onEdit,
+  renderKey,
   renderValue,
   searchId,
+  summaryContent,
   title,
 }) => {
   const { t } = useKubevirtTranslation();
@@ -94,6 +98,7 @@ const LabelsAnnotationsTable: FC<LabelsAnnotationsTableProps> = ({
             {addButtonLabel}
           </Button>
         )}
+        {summaryContent}
         <Table data-test={`${dataTest}-table`} variant="compact">
           <Thead>
             <Tr>
@@ -105,22 +110,20 @@ const LabelsAnnotationsTable: FC<LabelsAnnotationsTableProps> = ({
           <Tbody>
             {entries.map(([key, value]) => (
               <Tr key={key}>
-                <Td dataLabel={t('Key')}>{key}</Td>
+                <Td dataLabel={t('Key')}>{renderKey ? renderKey(key) : key}</Td>
                 <Td dataLabel={t('Value')}>{renderValue(key, value)}</Td>
                 {editable && (
                   <Td className="pf-v6-c-table__action">
                     <Split>
-                      {canEdit?.(key) && (
-                        <SplitItem>
-                          <Button
-                            aria-label={t('Edit {{key}}', { key })}
-                            data-test={`edit-${searchId}-${key}`}
-                            icon={<PencilAltIcon />}
-                            onClick={() => onEdit?.(key)}
-                            variant={ButtonVariant.plain}
-                          />
-                        </SplitItem>
-                      )}
+                      <SplitItem style={{ visibility: canEdit?.(key) ? 'visible' : 'hidden' }}>
+                        <Button
+                          aria-label={t('Edit {{key}}', { key })}
+                          data-test={`edit-${searchId}-${key}`}
+                          icon={<PencilAltIcon />}
+                          onClick={() => onEdit?.(key)}
+                          variant={ButtonVariant.plain}
+                        />
+                      </SplitItem>
                       <SplitItem>
                         <Button
                           aria-label={t('Remove {{key}}', { key })}

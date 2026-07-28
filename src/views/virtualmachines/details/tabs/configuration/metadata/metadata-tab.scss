@@ -5,6 +5,10 @@
     .pf-v6-c-table {
       table-layout: fixed;
       width: 100%;
+
+      .pf-v6-c-table__action {
+        width: 5rem;
+      }
     }
   }
 
