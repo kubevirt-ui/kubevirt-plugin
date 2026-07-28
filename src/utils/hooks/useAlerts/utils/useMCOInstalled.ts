@@ -1,6 +1,11 @@
 import { TFunction } from 'i18next';
 
-import { MultiClusterObservabilityModel } from '@kubevirt-utils/models';
+import { OBSERVABILITY_CMA_NAMES } from '@kubevirt-utils/hooks/useVirtualizationObservabilityLink/constants';
+import {
+  ClusterManagementAddOnModel,
+  MultiClusterObservabilityModel,
+} from '@kubevirt-utils/models';
+import { getName } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 import useIsACMPage from '@multicluster/useIsACMPage';
@@ -26,19 +31,44 @@ type UseMCOInstalledResult = {
  * MCO is required for fleet-wide Prometheus metrics polling.
  * When MCO is not installed, only the hub cluster should be shown and spoke clusters
  * should be disabled with a tooltip.
+ *
+ * Detection accepts either:
+ * - a MultiClusterObservability CR, or
+ * - a ClusterManagementAddOn named observability-controller (legacy) or
+ *   multicluster-observability-addon (MCOA) — see CNV-93086.
  */
 export const useMCOInstalled = (): UseMCOInstalledResult => {
   const isACMPage = useIsACMPage();
   const [hubClusterName] = useHubClusterName();
 
-  const [mcoResource, loaded, error] = useK8sWatchData<K8sResourceCommon[]>(
-    isACMPage
+  const watchOnHub = isACMPage
+    ? {
+        cluster: hubClusterName,
+      }
+    : null;
+
+  const [mcoResource, mcoLoaded, mcoError] = useK8sWatchData<K8sResourceCommon[]>(
+    watchOnHub
       ? {
-          cluster: hubClusterName,
+          ...watchOnHub,
           groupVersionKind: {
             group: MultiClusterObservabilityModel.apiGroup,
             kind: MultiClusterObservabilityModel.kind,
             version: MultiClusterObservabilityModel.apiVersion,
+          },
+          isList: true,
+        }
+      : null,
+  );
+
+  const [observabilityAddOns, cmaLoaded, cmaError] = useK8sWatchData<K8sResourceCommon[]>(
+    watchOnHub
+      ? {
+          ...watchOnHub,
+          groupVersionKind: {
+            group: ClusterManagementAddOnModel.apiGroup,
+            kind: ClusterManagementAddOnModel.kind,
+            version: ClusterManagementAddOnModel.apiVersion,
           },
           isList: true,
         }
@@ -52,11 +82,17 @@ export const useMCOInstalled = (): UseMCOInstalledResult => {
       mcoInstalled: true,
     };
   }
-  const mcoInstalled = !isEmpty(mcoResource);
+
+  const hasObservabilityCMA = observabilityAddOns?.some((addon) => {
+    const name = getName(addon);
+    return Boolean(name && (OBSERVABILITY_CMA_NAMES as readonly string[]).includes(name));
+  });
+
+  const mcoInstalled = !isEmpty(mcoResource) || Boolean(hasObservabilityCMA);
 
   return {
-    error,
-    loaded,
+    error: mcoError || cmaError,
+    loaded: mcoLoaded && cmaLoaded,
     mcoInstalled,
   };
 };
