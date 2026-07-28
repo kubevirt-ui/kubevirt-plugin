@@ -1,3 +1,4 @@
+import { type KubevirtFilterState } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
 export enum HWDeviceKind {
@@ -42,5 +43,13 @@ export const skipRowFilterPrefix = new Set([
 ]);
 
 export const validSearchQueryParams: string[] = Object.values(VirtualMachineRowFilterType);
+
+export const emptyFilterState = validSearchQueryParams.reduce<Partial<KubevirtFilterState>>(
+  (acc, key) => {
+    acc[key] = [];
+    return acc;
+  },
+  {},
+);
 
 export const VM_SEARCH_INPUT_ID = 'vm-search-input';
