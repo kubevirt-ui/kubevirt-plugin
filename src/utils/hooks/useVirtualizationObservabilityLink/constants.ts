@@ -3,17 +3,10 @@ export const VIRTUALIZATION_OBSERVABILITY_CONFIG_MAP_NAME =
 
 export const VIRTUALIZATION_OBSERVABILITY_CONFIG_MAP_NAMESPACE =
   'open-cluster-management-observability';
+const OBSERVABILITY_CONTROLLER_NAME = 'observability-controller';
 
-/** Legacy Multicluster Observability ClusterManagementAddOn name. */
-export const OBSERVABILITY_CONTROLLER_NAME = 'observability-controller';
+const MULTICLUSTER_OBSERVABILITY_ADDON_NAME = 'multicluster-observability-addon';
 
-/**
- * MCOA (Multicluster Observability Addon) ClusterManagementAddOn name.
- * Replaces the legacy observability-controller CMA when MCOA is enabled.
- */
-export const MULTICLUSTER_OBSERVABILITY_ADDON_NAME = 'multicluster-observability-addon';
-
-/** CMA names that indicate ACM observability collection is available. */
 export const OBSERVABILITY_CMA_NAMES = [
   OBSERVABILITY_CONTROLLER_NAME,
   MULTICLUSTER_OBSERVABILITY_ADDON_NAME,

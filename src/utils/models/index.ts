@@ -62,7 +62,6 @@ export const ClusterManagementAddOnModel: K8sModel = {
   kind: 'ClusterManagementAddOn',
   label: 'ClusterManagementAddOn',
   labelPlural: 'ClusterManagementAddOns',
-  // ClusterManagementAddOn is a cluster-scoped OCM resource.
   namespaced: false,
   plural: 'clustermanagementaddons',
 };
