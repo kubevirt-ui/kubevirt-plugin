@@ -25,6 +25,7 @@ export const ADVANCED_CDROM_FEATURES = 'advancedCDROMFeatures';
 export const TREE_VIEW_FOLDERS = 'treeViewFolders';
 export const PASST_UDN_NETWORK = 'passtUDNNetwork';
 export const VM_TEMPLATES = 'vmTemplates';
+export const AUTO_APPLIED_LABELS = 'autoAppliedLabels';
 export const CONTROL_DEFAULT_VIRTUALIZATION_PERMISSIONS = 'controlDefaultVirtualizationPermissions';
 
 export const FEATURES_CONFIG_MAP_NAME = 'kubevirt-ui-features';
@@ -35,6 +36,7 @@ export const FEATURE_PERSISTENT_RESERVATION = 'persistentReservation';
 export const FEATURE_HCO_PERSISTENT_RESERVATION = 'persistentReservationHCO';
 
 export const FEATURES_CONFIG_MAP_INITIAL_DATA: Record<string, string> = {
+  [AUTO_APPLIED_LABELS]: '[]',
   [AUTOMATIC_SUBSCRIPTION_ACTIVATION_KEY]: '',
   [AUTOMATIC_SUBSCRIPTION_ORGANIZATION_ID]: '',
   [CONFIRM_VM_ACTIONS]: 'false',

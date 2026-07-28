@@ -1,0 +1,73 @@
+import { useCallback, useMemo, useState } from 'react';
+
+import { ConfigMapModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { AUTO_APPLIED_LABELS } from '@kubevirt-utils/hooks/useFeatures/constants';
+import useFeaturesConfigMap from '@kubevirt-utils/hooks/useFeatures/useFeaturesConfigMap';
+import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
+import { useSettingsCluster } from '@settings/context/SettingsClusterContext';
+
+import { AutoAppliedLabel, UseAutoAppliedLabelsResult } from './types';
+
+const parseLabels = (raw: string | undefined): AutoAppliedLabel[] => {
+  if (!raw) {
+    return [];
+  }
+
+  try {
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+};
+
+const useAutoAppliedLabels = (cluster?: string): UseAutoAppliedLabelsResult => {
+  const settingsCluster = useSettingsCluster();
+  const resolvedCluster = cluster ?? settingsCluster;
+  const {
+    featuresConfigMapData: [featureConfigMap, loaded, loadError],
+    isAdmin,
+  } = useFeaturesConfigMap(resolvedCluster);
+  const [updateError, setUpdateError] = useState<Error | null>(null);
+
+  const labels = useMemo(
+    () => parseLabels(featureConfigMap?.data?.[AUTO_APPLIED_LABELS]),
+    [featureConfigMap?.data],
+  );
+
+  const updateLabels = useCallback(
+    async (nextLabels: AutoAppliedLabel[]): Promise<void> => {
+      if (!featureConfigMap) {
+        return;
+      }
+
+      setUpdateError(null);
+      const path = `/data/${AUTO_APPLIED_LABELS}`;
+      const op = featureConfigMap.data?.[AUTO_APPLIED_LABELS] === undefined ? 'add' : 'replace';
+
+      try {
+        await kubevirtK8sPatch({
+          cluster: resolvedCluster,
+          data: [{ op, path, value: JSON.stringify(nextLabels) }],
+          model: ConfigMapModel,
+          resource: featureConfigMap,
+        });
+      } catch (err) {
+        const error = err instanceof Error ? err : new Error(String(err));
+        setUpdateError(error);
+        throw error;
+      }
+    },
+    [featureConfigMap, resolvedCluster],
+  );
+
+  return {
+    error: updateError || loadError || null,
+    isAdmin,
+    labels,
+    loaded: Boolean(loaded),
+    updateLabels,
+  };
+};
+
+export default useAutoAppliedLabels;

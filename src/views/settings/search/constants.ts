@@ -1,5 +1,6 @@
 export const CLUSTER_TAB_IDS = {
   advancedCDROMFeatures: 'advanced-cdrom-features',
+  autoAppliedLabels: 'auto-applied-labels',
   automaticGrantVirtualizationRoles: 'automatic-grant-virtualization-roles',
   automaticImagesDownload: 'automatic-images-download',
   automaticSubscriptionRhel: 'automatic-subscription-rhel',
