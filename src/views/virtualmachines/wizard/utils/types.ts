@@ -1,26 +1,26 @@
-import { TFunction } from 'i18next';
-import { FC, ReactNode } from 'react';
-import { UseFormGetValues, UseFormSetValue } from 'react-hook-form';
-import { NavigateFunction } from 'react-router';
+import { type FC, type ReactNode } from 'react';
+import { type UseFormGetValues, type UseFormSetValue } from 'react-hook-form';
+import { type NavigateFunction } from 'react-router';
+import { type TFunction } from 'i18next';
 
 import {
-  V1beta1DataImportCron,
-  V1beta1DataVolume,
+  type V1beta1DataImportCron,
+  type V1beta1DataVolume,
 } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
-import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import {
-  V1beta1VirtualMachineClone,
-  V1beta1VirtualMachineClusterInstancetype,
-  V1beta1VirtualMachineClusterPreference,
-  V1beta1VirtualMachineInstancetype,
+  type V1beta1VirtualMachineClone,
+  type V1beta1VirtualMachineClusterInstancetype,
+  type V1beta1VirtualMachineClusterPreference,
+  type V1beta1VirtualMachineInstancetype,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { VolumeSnapshotKind } from '@kubevirt-utils/components/SelectSnapshot/types';
-import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
-import { ClusterNamespacedResourceMap } from '@kubevirt-utils/resources/shared';
-import { WizardStepProps, WizardStepType } from '@patternfly/react-core';
-import { VMWizardStep } from '@virtualmachines/wizard/utils/constants';
+import { type VolumeSnapshotKind } from '@kubevirt-utils/components/SelectSnapshot/types';
+import { type BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
+import { type ClusterNamespacedResourceMap } from '@kubevirt-utils/resources/shared';
+import { type WizardStepProps, type WizardStepType } from '@patternfly/react-core';
+import { type VMWizardStep } from '@virtualmachines/wizard/utils/constants';
 
-import { VMWizardFormValues } from '../state/vm-wizard-form/types';
+import { type VMWizardFormValues } from '../state/vm-wizard-form/types';
 
 export type VMGenerationNavItemClickHandler = (
   step: WizardStepType,
@@ -31,6 +31,7 @@ export type VMGenerationNavItemClickHandler = (
 export type WizardStepNavItemConfig = {
   handleNavItemClick: VMGenerationNavItemClickHandler;
   isGeneratingVM: boolean;
+  loaded: boolean;
 };
 
 export type VMWizardStepDisplay = WizardStepProps & {
@@ -54,7 +55,7 @@ export type UseInstanceTypeAndPreferencesValues = {
   allInstanceTypes: InstanceTypes;
   clusterInstanceTypes: V1beta1VirtualMachineClusterInstancetype[];
   loaded: boolean;
-  loadError: any;
+  loadError: Error | undefined;
   preferences: V1beta1VirtualMachineClusterPreference[];
 };
 
@@ -101,7 +102,7 @@ export type HandleCloneRequestPhaseChangeParams = {
   navigate: NavigateFunction;
   setError: (error: unknown) => void;
   setIsSubmitting: (isSubmitting: boolean) => void;
-  submittedCloneRequest: undefined | V1beta1VirtualMachineClone;
   setSubmittedCloneRequest: (cloneRequest: undefined | V1beta1VirtualMachineClone) => void;
+  submittedCloneRequest: undefined | V1beta1VirtualMachineClone;
   t: TFunction;
 };

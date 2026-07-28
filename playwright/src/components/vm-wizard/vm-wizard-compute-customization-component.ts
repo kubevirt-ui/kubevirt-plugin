@@ -42,12 +42,34 @@ export default class VmWizardComputeCustomizationComponent extends BaseComponent
     }
   }
 
+  private networkInterfaceModal() {
+    return this.page
+      .locator('[role="dialog"]')
+      .filter({ hasText: /network interface/i })
+      .first();
+  }
+
   private async toggleSwitch(switchId: string): Promise<void> {
     await this.dismissOverlayIfPresent();
     const label = this.page.locator(`label:has(#${switchId})`);
     await label.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
     await label.click();
     await this.page.waitForTimeout(300);
+  }
+
+  async cancelNetworkInterfaceModal(): Promise<void> {
+    const modal = this.networkInterfaceModal();
+    const cancelButton = modal.getByTestId('cancel-button');
+    if (
+      await cancelButton.isVisible({ timeout: TestTimeouts.UI_DELAY_MEDIUM }).catch(() => false)
+    ) {
+      await this.robustClick(cancelButton);
+    } else {
+      await this.page.keyboard.press('Escape');
+    }
+    await modal
+      .waitFor({ state: 'hidden', timeout: TestTimeouts.ELEMENT_WAIT })
+      .catch(() => undefined);
   }
 
   async clearReviewVmName(): Promise<void> {
@@ -117,6 +139,17 @@ export default class VmWizardComputeCustomizationComponent extends BaseComponent
     } catch {
       return '';
     }
+  }
+
+  /** Selected Network typeahead display value in the Add/Edit network interface modal. */
+  async getAddNetworkInterfaceSelectedNetwork(): Promise<string> {
+    const modal = this.networkInterfaceModal();
+    const selectRoot = modal.getByTestId('network-attachment-definition-select');
+    await selectRoot.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+
+    const input = selectRoot.locator('input[role="combobox"]').first();
+    await input.waitFor({ state: 'visible', timeout: TestTimeouts.UI_DELAY_MEDIUM });
+    return ((await input.inputValue()) ?? '').trim();
   }
 
   async getComputeSizeDropdownText(): Promise<string> {
@@ -275,6 +308,17 @@ export default class VmWizardComputeCustomizationComponent extends BaseComponent
     return disks;
   }
 
+  /** Returns the Network column text for a NIC row on the customization Network tab. */
+  async getWizardNetworkInterfaceNetworkName(nicName: string): Promise<string> {
+    await this.selectCustomizationTab('Network');
+    const table = this.page.getByTestId('wizard-network-interfaces-table');
+    await table.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+
+    const networkCell = table.getByTestId(`nic-network-${nicName}`);
+    await networkCell.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+    return ((await networkCell.textContent()) ?? '').trim();
+  }
+
   async isCreateButtonDisabled(): Promise<boolean> {
     try {
       const createBtn = this._pfV6CWizardButtonpfV6CButtonpfMPrimary.first();
@@ -297,6 +341,26 @@ export default class VmWizardComputeCustomizationComponent extends BaseComponent
     return await this.locator('#headless-mode').isChecked();
   }
 
+  async isPodNetworkingOptionVisibleInAddNetworkModal(): Promise<boolean> {
+    const modal = this.networkInterfaceModal();
+    const selectRoot = modal.getByTestId('network-attachment-definition-select');
+    await selectRoot.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+
+    // Opening via the typeahead input avoids PF MenuToggle class selectors.
+    const input = selectRoot.locator('input[role="combobox"]').first();
+    await input.waitFor({ state: 'visible', timeout: TestTimeouts.UI_DELAY_MEDIUM });
+    await this.robustClick(input);
+
+    const podOption = this.page.getByTestId('network-option-pod-networking');
+    const visible = await podOption
+      .isVisible({ timeout: TestTimeouts.UI_DELAY_MEDIUM })
+      .catch(() => false);
+
+    await this.page.keyboard.press('Escape');
+    await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
+    return visible;
+  }
+
   async isStartAfterCreationChecked(): Promise<boolean> {
     try {
       const checkbox = this._startAfterCreateCheckbox;
@@ -305,6 +369,21 @@ export default class VmWizardComputeCustomizationComponent extends BaseComponent
     } catch {
       return false;
     }
+  }
+
+  async openAddNetworkInterfaceModal(): Promise<void> {
+    await this.selectCustomizationTab('Network');
+    const addButton = this._roleTabpanel
+      .locator('[data-test="item-create"], button:has-text("Add network interface")')
+      .first();
+    await addButton.waitFor({ state: 'visible', timeout: TestTimeouts.RESOURCE_CREATION });
+    await this.robustClick(addButton);
+
+    await this.page
+      .locator('[role="dialog"]')
+      .filter({ hasText: /network interface/i })
+      .first()
+      .waitFor({ state: 'visible', timeout: TestTimeouts.INSTANCE_TYPE_VERIFICATION });
   }
 
   async searchCustomizationSettings(query: string): Promise<void> {
