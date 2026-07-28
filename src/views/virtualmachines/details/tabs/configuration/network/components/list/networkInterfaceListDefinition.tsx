@@ -1,19 +1,21 @@
-import React, { FC, ReactNode } from 'react';
-import { TFunction } from 'i18next';
+import { type TFunction } from 'i18next';
+import React, { type FC, type ReactNode } from 'react';
 
-import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import {
+  type V1VirtualMachine,
+  type V1VirtualMachineInstance,
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import EphemeralBadge from '@kubevirt-utils/components/badges/EphemeralBadge/EphemeralBadge';
 import PendingBadge from '@kubevirt-utils/components/badges/PendingBadge/PendingBadge';
 import NetworkIcon from '@kubevirt-utils/components/NetworkIcons/NetworkIcon';
-import { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
+import { type ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
-import { getNetworkNameLabel } from '@kubevirt-utils/resources/vm/utils/network/network-columns';
 import { Label, Stack, StackItem } from '@patternfly/react-core';
 
-import { SimpleNICPresentation } from '../../utils/types';
+import { type SimpleNICPresentation } from '../../utils/types';
 import { getConfigInterfaceState, getRuntimeInterfaceState } from '../../utils/utils';
-
+import NetworkCell from './NetworkCell';
 import NetworkInterfaceActions from './NetworkInterfaceActions';
 
 export type NetworkInterfaceListCallbacks = {
@@ -64,19 +66,6 @@ const StateCell: FC<StateCellProps> = ({ row }) => {
   );
 };
 
-type NetworkCellProps = {
-  row: SimpleNICPresentation;
-};
-
-const NetworkCell: FC<NetworkCellProps> = ({ row }) => {
-  const { t } = useKubevirtTranslation();
-  return (
-    <span data-test={`nic-network-${row.network?.name}`}>
-      {getNetworkNameLabel(t, { network: row.network }) ?? NO_DATA_DASH}
-    </span>
-  );
-};
-
 const renderActionsCell = (
   row: SimpleNICPresentation,
   callbacks: NetworkInterfaceListCallbacks,
@@ -115,7 +104,7 @@ export const getNetworkInterfaceListColumns = (
     getValue: (row) => row.network?.multus?.networkName ?? '',
     key: 'network',
     label: t('Network'),
-    renderCell: (row) => <NetworkCell row={row} />,
+    renderCell: (row, callbacks) => <NetworkCell callbacks={callbacks} row={row} />,
     sortable: true,
   },
   {
