@@ -41,26 +41,44 @@ export const countInstalledCapabilities = (
       computeCapabilityInstallState(feature, detailsMap) === CapabilityInstallState.Installed,
   ).length;
 
+const getNonInstalledManifests = (
+  packageNames: Set<string>,
+  detailsMap: RecommendedCapabilityDetailsMap,
+  filteredPackageManifests: PackageManifestKind[],
+): PackageManifestKind[] => {
+  const seen = new Set<string>();
+
+  return filteredPackageManifests.filter((pkg) => {
+    const name = getName(pkg);
+    if (!packageNames.has(name)) return false;
+    if (detailsMap[name]?.installState !== InstallState.NOT_INSTALLED) return false;
+    if (!pkg.status?.provider?.name?.includes(RED_HAT)) return false;
+    return seen.has(name) ? false : (seen.add(name), true);
+  });
+};
+
 export const getNonInstalledBundleManifests = (
   features: CapabilityFeature[],
   detailsMap: RecommendedCapabilityDetailsMap,
   filteredPackageManifests: PackageManifestKind[],
 ): PackageManifestKind[] => {
-  const defaultBundlePackageNames = new Set(
+  const bundlePackageNames = new Set(
     getBundleFeatures(features).flatMap(({ operators }) =>
       operators.map(({ packageName }) => packageName),
     ),
   );
 
-  const seen = new Set<string>();
+  return getNonInstalledManifests(bundlePackageNames, detailsMap, filteredPackageManifests);
+};
 
-  return filteredPackageManifests.filter((pkg) => {
-    const name = getName(pkg);
-    if (!defaultBundlePackageNames.has(name)) return false;
-    if (detailsMap[name]?.installState !== InstallState.NOT_INSTALLED) return false;
-    if (!pkg.status?.provider?.name?.includes(RED_HAT)) return false;
-    return seen.has(name) ? false : (seen.add(name), true);
-  });
+export const getNonInstalledFeatureManifests = (
+  feature: CapabilityFeature,
+  detailsMap: RecommendedCapabilityDetailsMap,
+  filteredPackageManifests: PackageManifestKind[],
+): PackageManifestKind[] => {
+  const featurePackageNames = new Set(feature.operators.map(({ packageName }) => packageName));
+
+  return getNonInstalledManifests(featurePackageNames, detailsMap, filteredPackageManifests);
 };
 
 export const packageManifestToOperatorItem = (

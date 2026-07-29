@@ -63,6 +63,19 @@ export type UseInstallBundleReturn = {
   isInstalling: boolean;
 };
 
+export type UseInstallFeatureParams = {
+  detailsMap: RecommendedCapabilityDetailsMap;
+  features: CapabilityFeature[];
+  filteredPackageManifests: PackageManifestKind[];
+  operatorGroups: OperatorGroupKind[];
+  subscriptions: SubscriptionKind[];
+};
+
+export type UseInstallFeatureReturn = {
+  installFeature: (feature: CapabilityFeature) => Promise<void>;
+  installingFeatures: Set<string>;
+};
+
 export type CapabilityFilterValues = {
   name: string;
   status: string[];

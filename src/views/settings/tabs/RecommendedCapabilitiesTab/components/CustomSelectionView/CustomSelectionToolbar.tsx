@@ -1,6 +1,7 @@
 import React, { FC, useCallback, useMemo } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   BulkSelect,
   BulkSelectValue,
@@ -30,6 +31,7 @@ type CustomSelectionToolbarProps = {
   installedCount: number;
   onSetFilters: (newFilters: Partial<CapabilityFilterValues>) => void;
   resourcesLoaded: boolean;
+  selectableRows: DataViewTrTree[];
   selection: CapabilitySelectionState;
   totalCount: number;
   treeRows: DataViewTrTree[];
@@ -42,14 +44,15 @@ const CustomSelectionToolbar: FC<CustomSelectionToolbarProps> = ({
   installedCount,
   onSetFilters,
   resourcesLoaded,
+  selectableRows,
   selection,
   totalCount,
   treeRows,
 }) => {
   const { t } = useKubevirtTranslation();
 
-  const isAllSelected = treeRows.length > 0 && treeRows.every(selection.isSelected);
-  const isPartiallySelected = !isAllSelected && treeRows.some(selection.isSelected);
+  const isAllSelected = !isEmpty(selectableRows) && selectableRows.every(selection.isSelected);
+  const isPartiallySelected = !isAllSelected && selectableRows.some(selection.isSelected);
 
   const selectedCapabilityCount = useMemo(() => {
     const capabilityIds = new Set(treeRows.map((row) => row.id));
@@ -59,12 +62,12 @@ const CustomSelectionToolbar: FC<CustomSelectionToolbarProps> = ({
   const handleBulkSelect = useCallback(
     (value: BulkSelectValue) => {
       if (value === BulkSelectValue.none || value === BulkSelectValue.nonePage) {
-        selection.onSelect(false, treeRows);
+        selection.onSelect(false, selectableRows);
       } else {
-        selection.onSelect(true, treeRows);
+        selection.onSelect(true, selectableRows);
       }
     },
-    [treeRows, selection],
+    [selectableRows, selection],
   );
 
   const statusOptions = useMemo(
@@ -93,11 +96,11 @@ const CustomSelectionToolbar: FC<CustomSelectionToolbarProps> = ({
           <BulkSelect
             canSelectAll
             onSelect={handleBulkSelect}
-            pageCount={treeRows.length}
+            pageCount={selectableRows.length}
             pagePartiallySelected={isPartiallySelected}
             pageSelected={isAllSelected}
             selectedCount={selectedCapabilityCount}
-            totalCount={treeRows.length}
+            totalCount={selectableRows.length}
           />
         </ToolbarItem>
         <ToolbarItem>

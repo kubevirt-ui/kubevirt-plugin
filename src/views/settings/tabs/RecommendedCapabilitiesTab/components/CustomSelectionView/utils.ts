@@ -1,9 +1,13 @@
-import { compareWithDirection } from '@kubevirt-utils/utils/utils';
-import { SortByDirection } from '@patternfly/react-table';
+import { InstallState } from '@settings/tabs/ClusterTab/components/VirtualizationFeaturesSection/utils/types';
 
-import { type CapabilityFeature, CapabilityInstallState } from '../../utils/types';
-
+import {
+  type CapabilityFeature,
+  CapabilityInstallState,
+  type RecommendedCapabilityDetailsMap,
+} from '../../utils/types';
 import { COLUMN_KEYS } from './useCustomSelectionColumns';
+import { SortByDirection } from '@patternfly/react-table';
+import { compareWithDirection } from '@kubevirt-utils/utils/utils';
 
 export const matchesName = (feature: CapabilityFeature, query: string): boolean => {
   const lowerQuery = query.toLowerCase();
@@ -18,6 +22,25 @@ export const matchesStatus = (
   statusFilters: string[],
   getCapabilityInstallState: (f: CapabilityFeature) => CapabilityInstallState,
 ): boolean => statusFilters.includes(getCapabilityInstallState(feature));
+
+export const hasOperatorsInstalling = (
+  feature: CapabilityFeature,
+  detailsMap: RecommendedCapabilityDetailsMap,
+): boolean =>
+  feature.operators.some(
+    ({ packageName }) => detailsMap[packageName]?.installState === InstallState.INSTALLING,
+  );
+
+export const isCapabilitySelectable = (
+  feature: CapabilityFeature,
+  detailsMap: RecommendedCapabilityDetailsMap,
+  installingFeatures: Set<string>,
+  getCapabilityInstallState: (feature: CapabilityFeature) => CapabilityInstallState,
+): boolean => {
+  if (getCapabilityInstallState(feature) === CapabilityInstallState.Installed) return false;
+  if (installingFeatures.has(feature.id)) return false;
+  return !hasOperatorsInstalling(feature, detailsMap);
+};
 
 export const sortFeatures = (
   features: CapabilityFeature[],
