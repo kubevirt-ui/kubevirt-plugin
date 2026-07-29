@@ -1,32 +1,32 @@
 export type ValidationCheck = {
+  message: string;
   name: string;
   passed: boolean;
-  message: string;
 };
 
 export type JiraConfig = {
   baseUrl: string;
-  token: string;
   projectKey: string;
+  token: string;
 };
 
 export type GitHubConfig = {
-  token: string;
-  /** Separate token for calls `token` may lack the scope for (e.g. a bot app token) -- commit statuses, reading .github/OWNERS. Falls back to `token` when unset. */
-  statusToken?: string;
   owner: string;
   repo: string;
+  /** Separate token for calls `token` may lack the scope for (e.g. a bot app token) -- commit statuses, reading .github/OWNERS. Falls back to `token` when unset. */
+  statusToken?: string;
+  token: string;
 };
 
 export type ClonedTicket = {
-  originalKey: string;
   clonedKey: string;
+  originalKey: string;
 };
 
 export type CherryPickResult = {
+  cherryPickBranch: string;
   cherryPickClean: boolean;
   conflictDetails: string;
-  cherryPickBranch: string;
 };
 
 export const JIRA_BASE_URL = 'https://redhat.atlassian.net';

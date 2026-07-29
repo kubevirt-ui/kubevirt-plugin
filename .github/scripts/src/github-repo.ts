@@ -15,25 +15,15 @@ export const getReleaseBranches = async (
   owner: string,
   repo: string,
 ): Promise<string[]> => {
-  const branches: string[] = [];
-  let page = 1;
+  const allBranches = await octokit.paginate(octokit.repos.listBranches, {
+    owner,
+    per_page: 100,
+    repo,
+  });
 
-  while (true) {
-    const { data } = await octokit.repos.listBranches({ owner, repo, per_page: 100, page });
-
-    if (data.length === 0) break;
-
-    for (const branch of data) {
-      if (branch.name.startsWith('release-')) {
-        branches.push(branch.name);
-      }
-    }
-
-    if (data.length < 100) break;
-    page++;
-  }
-
-  return branches;
+  return allBranches
+    .filter((branch) => branch.name.startsWith('release-'))
+    .map((branch) => branch.name);
 };
 
 /** Check if a branch exists in the repo. */
@@ -44,7 +34,7 @@ export const branchExists = async (
   branch: string,
 ): Promise<boolean> => {
   try {
-    await octokit.repos.getBranch({ owner, repo, branch });
+    await octokit.repos.getBranch({ branch, owner, repo });
     return true;
   } catch {
     return false;
@@ -60,9 +50,9 @@ export const getPullRequestFiles = async (
 ): Promise<Array<{ filename: string; patch?: string }>> =>
   octokit.paginate(octokit.pulls.listFiles, {
     owner,
-    repo,
-    pull_number: pullNumber,
     per_page: 100,
+    pull_number: pullNumber,
+    repo,
   });
 
 /** Create a pull request and return its number and URL. */
@@ -71,13 +61,13 @@ export const createPullRequest = async (
   owner: string,
   repo: string,
   params: {
-    title: string;
-    body: string;
-    head: string;
     base: string;
+    body: string;
     draft?: boolean;
+    head: string;
+    title: string;
   },
-): Promise<{ number: number; html_url: string }> => {
+): Promise<{ html_url: string; number: number }> => {
   const { data } = await octokit.pulls.create({ owner, repo, ...params });
-  return { number: data.number, html_url: data.html_url };
+  return { html_url: data.html_url, number: data.number };
 };

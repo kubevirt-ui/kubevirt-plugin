@@ -1,4 +1,4 @@
-name: CI
+name: Code Checks
 on:
   pull_request:
     types:
@@ -16,41 +16,31 @@ permissions:
   contents: read
 
 jobs:
-  i18n:
-    name: i18n
+  code-checks:
+    name: Code Checks
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
     steps:
       - name: Checkout
         uses: actions/checkout@v7
         with:
           persist-credentials: false
 
-      - name: Detect i18n-related changes
-        id: filter
-        uses: dorny/paths-filter@v3
-        with:
-          filters: |
-            i18n:
-              - 'src/**'
-              - 'locales/**'
-              - 'i18n-scripts/**'
-              - 'i18next-parser.config.js'
-
-      - name: Skip i18n check
-        if: github.event_name != 'push' && steps.filter.outputs.i18n != 'true'
-        run: echo "No i18n-related changes detected, skipping."
-
       - name: Setup Node
-        if: github.event_name == 'push' || steps.filter.outputs.i18n == 'true'
         uses: actions/setup-node@v6
         with:
           node-version: '22'
           cache: npm
-      - if: github.event_name == 'push' || steps.filter.outputs.i18n == 'true'
+
+      - name: Install dependencies
         run: npm ci --ignore-scripts
 
+      # ── i18n ──────────────────────────────────────────────
       - name: Check i18n
-        if: github.event_name == 'push' || steps.filter.outputs.i18n == 'true'
+        id: i18n
+        continue-on-error: true
         shell: bash
         run: |
           npm run i18n
@@ -61,106 +51,32 @@ jobs:
             exit 1
           fi
 
-  # No GitHub Actions semantic linter existed in this repo before -- only
-  # Prettier/YAML formatting is checked elsewhere, which can't catch invalid
-  # `needs.*.outputs` references, expression type errors, or other
-  # GHA-specific mistakes in workflow files. actionlint is installed via
-  # `go install` pinned to a specific released version (checksum-verified
-  # through the Go module proxy) rather than curling and piping the
-  # maintainer's download script from `main`, which is a known supply-chain
-  # risk for CI runners (see https://github.com/rhysd/actionlint/issues/617).
-  #
-  # shellcheck/pyflakes integration is disabled: enabling it surfaces a long
-  # tail of pre-existing style/robustness findings across `run:` scripts in
-  # other, unrelated workflow files, which would fail this brand new check
-  # on unrelated debt. actionlint's own GHA-specific checks (the thing this
-  # job exists for -- invalid needs.*.outputs references, expression type
-  # errors, etc.) are unaffected by this. Revisit enabling shellcheck once
-  # that pre-existing debt has been triaged separately.
-  actionlint:
-    name: actionlint
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v7
-        with:
-          persist-credentials: false
-
-      - name: Detect workflow changes
-        id: filter
-        uses: dorny/paths-filter@v3
-        with:
-          filters: |
-            workflows:
-              - '.github/workflows/**'
-
-      - name: Skip actionlint
-        if: github.event_name != 'push' && steps.filter.outputs.workflows != 'true'
-        run: echo "No workflow file changes detected, skipping."
-
+      # ── actionlint ────────────────────────────────────────
       - name: Install actionlint
-        if: github.event_name == 'push' || steps.filter.outputs.workflows == 'true'
         run: |
           go install github.com/rhysd/actionlint/cmd/actionlint@v1.7.12
           echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
 
       - name: Run actionlint
-        if: github.event_name == 'push' || steps.filter.outputs.workflows == 'true'
+        id: actionlint
+        continue-on-error: true
         run: actionlint -color -shellcheck= -pyflakes=
 
-  build:
-    name: build
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      pull-requests: read
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v7
-        with:
-          persist-credentials: false
-      - name: Detect build-related changes
-        id: filter
-        uses: dorny/paths-filter@v3
-        with:
-          filters: |
-            build:
-              - '**'
-              - '!.github/**'
-              - '!.cursor/**'
-              - '!.husky/**'
-              - '!.vscode/**'
-              - '!playwright/**'
-              - '!ci-scripts/**'
-              - '!i18n-scripts/**'
-              - '!locales/**'
-              - '!scripts/**'
-            package-lock:
-              - package-lock.json
-
-      - name: Skip build
-        if: github.event_name != 'push' && steps.filter.outputs.build != 'true'
-        run: echo "No build-related changes detected, skipping."
-
-      - name: Setup Node
-        if: github.event_name == 'push' || steps.filter.outputs.build == 'true'
-        uses: actions/setup-node@v6
-        with:
-          node-version: '22'
-          cache: npm
-      - if: github.event_name == 'push' || steps.filter.outputs.build == 'true'
-        run: npm ci --ignore-scripts
-
+      # ── lint + build ──────────────────────────────────────
       - name: Lint
-        if: github.event_name == 'push' || steps.filter.outputs.build == 'true'
+        id: lint
+        continue-on-error: true
         run: npm run lint
 
       - name: Build
-        if: github.event_name == 'push' || steps.filter.outputs.build == 'true'
+        id: build
+        continue-on-error: true
         run: npm run build
 
+      # ── Hermeto offline install verification ──────────────
       - name: Prefetch npm dependencies with Hermeto
-        if: (github.event_name == 'push' || steps.filter.outputs.build == 'true') && steps.filter.outputs.package-lock == 'true'
+        id: hermeto
+        continue-on-error: true
         run: |
           git checkout -- package.json package-lock.json
           rm -rf node_modules hermeto-output
@@ -177,66 +93,54 @@ jobs:
             inject-files "$HERMETO_OUTPUT" --for-output-dir "$HERMETO_OUTPUT"
 
       - name: Verify offline install
-        if: (github.event_name == 'push' || steps.filter.outputs.build == 'true') && steps.filter.outputs.package-lock == 'true'
-        run: |
-          HUSKY=0 npm ci --offline --ignore-scripts --no-audit
+        id: offline
+        continue-on-error: true
+        run: HUSKY=0 npm ci --offline --ignore-scripts --no-audit
 
-  test:
-    name: test
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v7
-        with:
-          persist-credentials: false
-
-      - name: Detect workflow script changes
-        id: filter
-        uses: dorny/paths-filter@v3
-        with:
-          filters: |
-            scripts:
-              - '.github/scripts/**'
-
-      - name: Setup Node
-        uses: actions/setup-node@v6
-        with:
-          node-version: '22'
-          cache: npm
-          cache-dependency-path: package-lock.json
-      - run: npm ci --ignore-scripts
-
+      # ── unit tests ────────────────────────────────────────
       - name: Run unit tests
+        id: test
+        continue-on-error: true
         run: npm run test-cov
 
       - name: Coverage upload
+        if: always()
         uses: codecov/codecov-action@v7
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
 
-      - name: Setup Node for workflow scripts
-        if: github.event_name == 'push' || steps.filter.outputs.scripts == 'true'
-        uses: actions/setup-node@v6
-        with:
-          node-version: '22'
-          cache: npm
-          cache-dependency-path: .github/scripts/package-lock.json
-
+      # ── workflow script checks ────────────────────────────
       - name: Install workflow script dependencies
-        if: github.event_name == 'push' || steps.filter.outputs.scripts == 'true'
         working-directory: .github/scripts
         run: npm ci
 
       - name: Check workflow script types
-        if: github.event_name == 'push' || steps.filter.outputs.scripts == 'true'
+        id: script_types
+        continue-on-error: true
         working-directory: .github/scripts
         run: npm run check-types
 
       - name: Run workflow script tests
-        if: github.event_name == 'push' || steps.filter.outputs.scripts == 'true'
+        id: script_tests
+        continue-on-error: true
         working-directory: .github/scripts
         run: npm test
 
-      - name: Skip workflow script tests
-        if: github.event_name != 'push' && steps.filter.outputs.scripts != 'true'
-        run: echo "No workflow script changes detected, skipping."
+      # ── final verdict ─────────────────────────────────────
+      - name: Check all results
+        if: always()
+        env:
+          STEP_RESULTS: >-
+            {
+              "i18n": "${{ steps.i18n.outcome }}",
+              "actionlint": "${{ steps.actionlint.outcome }}",
+              "lint": "${{ steps.lint.outcome }}",
+              "build": "${{ steps.build.outcome }}",
+              "hermeto": "${{ steps.hermeto.outcome }}",
+              "offline-install": "${{ steps.offline.outcome }}",
+              "test": "${{ steps.test.outcome }}",
+              "script-types": "${{ steps.script_types.outcome }}",
+              "script-tests": "${{ steps.script_tests.outcome }}"
+            }
+        working-directory: .github/scripts
+        run: npx tsx src/shared/check-step-results.ts

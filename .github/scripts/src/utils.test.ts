@@ -8,8 +8,11 @@ describe('requireEnv', () => {
   const original = process.env[KEY];
 
   afterEach(() => {
-    if (original === undefined) delete process.env[KEY];
-    else process.env[KEY] = original;
+    if (original === undefined) {
+      delete process.env[KEY];
+    } else {
+      process.env[KEY] = original;
+    }
   });
 
   it('returns the value when set', () => {

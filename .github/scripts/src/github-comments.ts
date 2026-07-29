@@ -1,4 +1,4 @@
-import { Octokit } from '@octokit/rest';
+import { type Octokit } from '@octokit/rest';
 
 import { BLOCK_LABEL, VALIDATION_COMMENT_MARKER } from './types/index';
 
@@ -14,22 +14,22 @@ export const upsertComment = async (
   const markedBody = `${marker}\n${body}`;
 
   const comments = await octokit.paginate(octokit.issues.listComments, {
-    owner,
-    repo,
     issue_number: issueNumber,
+    owner,
     per_page: 100,
+    repo,
   });
 
-  const existing = comments.find((c) => c.body?.includes(marker));
+  const existing = comments.find((comment) => comment.body?.includes(marker));
 
   if (existing) {
-    await octokit.issues.updateComment({ owner, repo, comment_id: existing.id, body: markedBody });
+    await octokit.issues.updateComment({ body: markedBody, comment_id: existing.id, owner, repo });
   } else {
     await octokit.issues.createComment({
+      body: markedBody,
+      issue_number: issueNumber,
       owner,
       repo,
-      issue_number: issueNumber,
-      body: markedBody,
     });
   }
 };
@@ -44,21 +44,21 @@ export const addLabel = async (
   labelMeta?: { color: string; description: string },
 ): Promise<void> => {
   try {
-    await octokit.issues.getLabel({ owner, repo, name: label });
+    await octokit.issues.getLabel({ name: label, owner, repo });
   } catch (err: unknown) {
     const status = (err as { status?: number }).status;
     if (status === 404) {
       await octokit.issues.createLabel({
-        owner,
-        repo,
-        name: label,
         color: labelMeta?.color ?? 'e11d48',
         description: labelMeta?.description ?? 'Automated label for repository integration',
+        name: label,
+        owner,
+        repo,
       });
     }
   }
 
-  await octokit.issues.addLabels({ owner, repo, issue_number: issueNumber, labels: [label] });
+  await octokit.issues.addLabels({ issue_number: issueNumber, labels: [label], owner, repo });
 };
 
 /** Remove a label from a PR (no-op if the label is not present). */
@@ -70,11 +70,13 @@ export const removeLabel = async (
   label: string,
 ): Promise<void> => {
   try {
-    await octokit.issues.removeLabel({ owner, repo, issue_number: issueNumber, name: label });
+    await octokit.issues.removeLabel({ issue_number: issueNumber, name: label, owner, repo });
   } catch (err: unknown) {
     // Only a missing label is a no-op -- other failures (auth, network) must
     // propagate so callers can't treat a failed revoke as success.
-    if ((err as { status?: number }).status !== 404) throw err;
+    if ((err as { status?: number }).status !== 404) {
+      throw err;
+    }
   }
 };
 
@@ -86,10 +88,10 @@ export const getPrLabelNames = async (
   issueNumber: number,
 ): Promise<Set<string>> => {
   const { data: labels } = await octokit.issues.listLabelsOnIssue({
-    owner,
-    repo,
     issue_number: issueNumber,
+    owner,
     per_page: 100,
+    repo,
   });
   return new Set(labels.map((label) => label.name));
 };
@@ -112,17 +114,17 @@ export const setCommitStatus = async (
   owner: string,
   repo: string,
   sha: string,
-  state: 'pending' | 'success' | 'failure' | 'error',
+  state: 'error' | 'failure' | 'pending' | 'success',
   description: string,
   context = 'jira-validation',
 ): Promise<void> => {
   await octokit.repos.createCommitStatus({
+    context,
+    description: description.slice(0, 140),
     owner,
     repo,
     sha,
     state,
-    context,
-    description: description.slice(0, 140),
   });
 };
 

@@ -5,14 +5,16 @@ import type { Octokit } from '@octokit/rest';
 
 import { removeLabel } from './github-comments';
 
-type Call = { method: string; args: unknown };
+type Call = { args: unknown; method: string };
 
 const fakeOctokit = (behavior: 'ok' | number, calls: Call[]): Octokit =>
   ({
     issues: {
       removeLabel: async (args: unknown) => {
-        calls.push({ method: 'removeLabel', args });
-        if (behavior === 'ok') return;
+        calls.push({ args, method: 'removeLabel' });
+        if (behavior === 'ok') {
+          return;
+        }
         const err = new Error(`HTTP ${behavior}`) as Error & { status: number };
         err.status = behavior;
         throw err;

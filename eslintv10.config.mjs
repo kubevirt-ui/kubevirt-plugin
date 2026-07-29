@@ -27,7 +27,6 @@ const ignoresConfig = {
     'cypress/gui-test-screenshots/**',
     'cypress/cypress-a11y-report.json',
     'locales/**',
-    '.github/**', // will be removed when errors are fixed, in the meantime it is linted by default eslint.config.js
     'playwright/**',
     'webpack.config.ts', // will be removed when errors are fixed, in the meantime it is linted by default eslint.config.js
     'i18next-parser.config.js', // will be removed when errors are fixed, in the meantime it is linted by default eslint.config.js
@@ -277,7 +276,16 @@ const testingLibraryConfig = {
 const testFilesOverrides = {
   files: ['**/*.test.{ts,tsx}', '**/*.spec.{ts,tsx}', '**/__tests__/**/*.{ts,tsx}'],
   rules: {
+    '@typescript-eslint/explicit-function-return-type': 'off',
+    '@typescript-eslint/naming-convention': 'off',
+    '@typescript-eslint/no-explicit-any': 'off',
+    '@typescript-eslint/no-floating-promises': 'off',
+    '@typescript-eslint/no-unsafe-assignment': 'off',
     'i18next/no-literal-string': 'off',
+    'id-length': 'off',
+    'max-lines': 'off',
+    'sonarjs/assertions-in-tests': 'off',
+    'sonarjs/use-type-alias': 'off',
   },
 };
 
@@ -311,9 +319,19 @@ const jsdocConfig = {
 };
 
 const githubScriptsOverrides = {
-  files: ['.github/**/*.{ts,tsx,js,jsx}'],
+  files: ['.github/**/*.{ts,tsx,js,jsx}', 'ci-scripts/**/*.{ts,tsx,js,jsx}'],
   rules: {
+    'i18next/no-literal-string': 'off',
     'no-console': 'off',
+    'perfectionist/sort-classes': 'off',
+    'sonarjs/cognitive-complexity': 'off',
+    'sonarjs/no-alphabetical-sort': 'off',
+    'sonarjs/no-hardcoded-passwords': 'off',
+    'sonarjs/no-misleading-array-reverse': 'off',
+    'sonarjs/no-os-command-from-path': 'off',
+    'sonarjs/pseudo-random': 'off',
+    'sonarjs/publicly-writable-directories': 'off',
+    'sonarjs/super-linear-regex': 'off',
   },
 };
 
