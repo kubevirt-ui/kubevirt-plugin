@@ -3,19 +3,11 @@ import React from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { tourGuideVM } from '@kubevirt-utils/components/GuidedTour/utils/constants';
-import { STATIC_SEARCH_FILTERS } from '@kubevirt-utils/components/ListPageFilter/constants';
 import { ALL_NAMESPACES_SESSION_KEY, LOCAL_CLUSTER } from '@kubevirt-utils/hooks/constants';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { SINGLE_CLUSTER_KEY } from '@kubevirt-utils/resources/constants';
 import { isSystemNamespace } from '@kubevirt-utils/resources/namespace/helper';
-import {
-  buildFolderLabel,
-  getFolderNameFromLabel,
-  getLabel,
-  getName,
-  getNamespace,
-  isFolderLabel,
-} from '@kubevirt-utils/resources/shared';
+import { getLabel, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import {
   CLUSTER_LIST_FILTER_TYPE,
   PROJECT_LIST_FILTER_TYPE,
@@ -38,6 +30,7 @@ import {
   ProjectDiagramIcon,
 } from '@patternfly/react-icons';
 import { signal } from '@preact/signals-react';
+import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
 import { statusIcon } from '../icons/utils';
 
@@ -132,9 +125,7 @@ const buildProjectMap = (
 
 const getFolderNameFromQueryParams = (queryParams?: string): string | undefined => {
   const params = new URLSearchParams(queryParams?.replace(/^\?/, '') ?? '');
-  const folderLabel = params.getAll(STATIC_SEARCH_FILTERS.labels).find(isFolderLabel);
-
-  return folderLabel ? getFolderNameFromLabel(folderLabel) : undefined;
+  return params.get(VirtualMachineRowFilterType.Group) || undefined;
 };
 
 const isFolderExpanded = (
@@ -578,17 +569,6 @@ export const getClusterElement = (treeData: TreeViewDataItem[]): HTMLElement => 
   return document.getElementById(targetId)?.querySelector('.pf-v6-c-tree-view__node-text');
 };
 
-const removeFolderLabels = (query?: string): URLSearchParams => {
-  const params = new URLSearchParams(query ?? '');
-
-  params
-    .getAll(STATIC_SEARCH_FILTERS.labels)
-    .filter(isFolderLabel)
-    .forEach((label) => params.delete(STATIC_SEARCH_FILTERS.labels, label));
-
-  return params;
-};
-
 type BuildTreeItemQueryOptions = {
   cluster?: string;
   folderName?: string;
@@ -602,10 +582,11 @@ const buildTreeItemQuery = ({
   project,
   query,
 }: BuildTreeItemQueryOptions): string => {
-  const params = removeFolderLabels(query);
+  const params = new URLSearchParams(query ?? '');
 
   params.delete(CLUSTER_LIST_FILTER_TYPE);
   params.delete(PROJECT_LIST_FILTER_TYPE);
+  params.delete(VirtualMachineRowFilterType.Group);
 
   if (cluster) {
     params.set(CLUSTER_LIST_FILTER_TYPE, cluster);
@@ -614,7 +595,7 @@ const buildTreeItemQuery = ({
     params.set(PROJECT_LIST_FILTER_TYPE, project);
   }
   if (folderName) {
-    params.append(STATIC_SEARCH_FILTERS.labels, buildFolderLabel(folderName));
+    params.set(VirtualMachineRowFilterType.Group, folderName);
   }
 
   return params.size > 0 ? `?${params.toString()}` : '';

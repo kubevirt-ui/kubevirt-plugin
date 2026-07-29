@@ -1,15 +1,11 @@
 import { useMemo } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { STATIC_SEARCH_FILTERS } from '@kubevirt-utils/components/ListPageFilter/constants';
 import useQuery from '@kubevirt-utils/hooks/useQuery';
-import {
-  getFolderNameFromLabel,
-  getLabel,
-  getName,
-  isFolderLabel,
-} from '@kubevirt-utils/resources/shared';
+import { getLabel, getName } from '@kubevirt-utils/resources/shared';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
+import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
 type UseFolderFilterResult = {
   filteredVMs: V1VirtualMachine[];
@@ -19,20 +15,20 @@ type UseFolderFilterResult = {
 const useFolderFilter = (vms: undefined | V1VirtualMachine[]): UseFolderFilterResult => {
   const queryParams = useQuery();
 
-  const folderName = useMemo(() => {
-    const folderLabel = queryParams.getAll(STATIC_SEARCH_FILTERS.labels).find(isFolderLabel);
-    return folderLabel ? getFolderNameFromLabel(folderLabel) : undefined;
-  }, [queryParams]);
+  const folderNames = useMemo(
+    () => queryParams.getAll(VirtualMachineRowFilterType.Group).filter(Boolean),
+    [queryParams],
+  );
 
   const filteredVMs = useMemo(() => {
-    if (!folderName || !vms) return vms || [];
-    return vms.filter((vm) => getLabel(vm, VM_FOLDER_LABEL) === folderName);
-  }, [vms, folderName]);
+    if (isEmpty(folderNames) || !vms) return vms || [];
+    return vms.filter((vm) => folderNames.includes(getLabel(vm, VM_FOLDER_LABEL)));
+  }, [vms, folderNames]);
 
   const vmNames = useMemo(() => {
-    if (!folderName) return undefined;
+    if (isEmpty(folderNames)) return undefined;
     return filteredVMs.map((vm) => getName(vm)).filter(Boolean);
-  }, [folderName, filteredVMs]);
+  }, [folderNames, filteredVMs]);
 
   return { filteredVMs, vmNames };
 };

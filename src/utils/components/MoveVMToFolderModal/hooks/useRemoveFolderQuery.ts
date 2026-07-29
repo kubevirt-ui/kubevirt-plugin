@@ -1,47 +1,46 @@
 import { useMemo } from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useQueryParamsMethods } from '@kubevirt-utils/components/ListPageFilter/hooks/useQueryParamsMethods';
 import useQuery from '@kubevirt-utils/hooks/useQuery';
 import useVMsInNamespace from '@kubevirt-utils/hooks/useVMsInNamespace';
-import { getLabel, getNamespace } from '@kubevirt-utils/resources/shared';
+import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { TEXT_FILTER_LABELS_ID } from '@virtualmachines/list/hooks/constants';
-import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
+import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
-export type RemoveFolderQuery = ((newFolderName: string) => void) | null;
+import { isVMInGroup } from '../utils';
 
-// if no vmsToMove are passed, checking that all VMs in current folder are moved is skipped and has to be done elsewhere
-const useRemoveFolderQuery = (vmsToMove?: V1VirtualMachine[]): RemoveFolderQuery => {
-  const skipCheckMovingAllVMs = isEmpty(vmsToMove);
+type RemoveFolderQuery = ((newFolderName: string) => void) | null;
 
-  // can't conditionally call useVMsInNamespace hook, so use invalid namespace '-'
-  const namespace = skipCheckMovingAllVMs ? '-' : getNamespace(vmsToMove[0]);
+const useRemoveFolderQuery = (vmsToMove: V1VirtualMachine[]): RemoveFolderQuery => {
+  const namespace = getNamespace(vmsToMove[0]);
   const allVMsInNamespace = useVMsInNamespace(namespace);
 
-  const { setOrRemoveQueryArgument } = useQueryParamsMethods();
+  const { removeQueryArgumentValues } = useQueryParamsMethods();
   const queryParams = useQuery();
-  const labelFilters = useMemo(() => queryParams.get('labels')?.split(',') ?? [], [queryParams]);
 
-  const currentFolderLabel = labelFilters.find((label) => label.startsWith(VM_FOLDER_LABEL));
-  if (!currentFolderLabel) {
+  const currentGroups = useMemo(
+    () => queryParams.getAll(VirtualMachineRowFilterType.Group).filter(Boolean),
+    [queryParams],
+  );
+
+  if (isEmpty(currentGroups)) {
     return null;
   }
 
-  const currentFolderName = currentFolderLabel.split('=')[1];
+  const removeFolderQuery = (newFolderName: string): void => {
+    const groupsToRemove = currentGroups.filter((group) => {
+      // VMs are moving into this group — it won't become empty
+      if (group === newFolderName) return false;
 
-  const isVMInCurrentFolder = (vm: V1VirtualMachine) =>
-    getLabel(vm, VM_FOLDER_LABEL) === currentFolderName;
+      const vmsInGroup = allVMsInNamespace.filter(isVMInGroup(group));
+      const movedFromGroup = vmsToMove.filter(isVMInGroup(group));
 
-  const isMovingAllVMs =
-    skipCheckMovingAllVMs ||
-    vmsToMove.filter(isVMInCurrentFolder).length ===
-      allVMsInNamespace.filter(isVMInCurrentFolder).length;
+      return !isEmpty(movedFromGroup) && movedFromGroup.length === vmsInGroup.length;
+    });
 
-  const removeFolderQuery = (newFolderName: string) => {
-    if (isMovingAllVMs && newFolderName !== currentFolderName) {
-      const newLabelQuery = labelFilters.filter((label) => label !== currentFolderLabel).join(',');
-      setOrRemoveQueryArgument(TEXT_FILTER_LABELS_ID, newLabelQuery);
+    if (!isEmpty(groupsToRemove)) {
+      removeQueryArgumentValues(VirtualMachineRowFilterType.Group, groupsToRemove);
     }
   };
 

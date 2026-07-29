@@ -2,8 +2,9 @@ import { MouseEvent, useCallback, useEffect, useLayoutEffect, useMemo, useState 
 import { useNavigate } from 'react-router';
 
 import { tourContextMenuTriggerSignal } from '@kubevirt-utils/components/GuidedTour/utils/guidedTourSignals';
-import useRemoveFolderQuery from '@kubevirt-utils/components/MoveVMToFolderModal/hooks/useRemoveFolderQuery';
+import { useQueryParamsMethods } from '@kubevirt-utils/components/ListPageFilter/hooks/useQueryParamsMethods';
 import { TreeViewDataItem, TreeViewProps } from '@patternfly/react-core';
+import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
 import { CLUSTER_SELECTOR_PREFIX } from '../utils/constants';
 import {
@@ -26,8 +27,13 @@ type UseTreeViewItemActions = (treeData: TreeViewDataItem[]) => {
 const useTreeViewItemActions: UseTreeViewItemActions = (treeData) => {
   const [triggerElement, setTriggerElement] = useState<HTMLElement>();
 
-  const removeFolderQuery = useRemoveFolderQuery();
+  const { removeQueryArgumentValues } = useQueryParamsMethods();
   const navigate = useNavigate();
+
+  const removeGroupValue = useCallback(
+    (group: string) => removeQueryArgumentValues(VirtualMachineRowFilterType.Group, [group]),
+    [removeQueryArgumentValues],
+  );
 
   const dropElements = useMemo(
     () => [...getAllTreeViewFolderItems(treeData), ...getAllTreeViewProjectItems(treeData)],
@@ -69,11 +75,11 @@ const useTreeViewItemActions: UseTreeViewItemActions = (treeData) => {
     if (!dropElements) return;
 
     const removeEventListeners = dropElements.map((element) =>
-      addDropEventListeners(element, removeFolderQuery),
+      addDropEventListeners(element, removeGroupValue),
     );
 
     return () => removeEventListeners?.forEach((removeEventListener) => removeEventListener?.());
-  }, [dropElements, removeFolderQuery]);
+  }, [dropElements, removeGroupValue]);
 
   const addListeners = useCallback(
     (_event: MouseEvent, item: TreeViewDataItem) => {
@@ -92,12 +98,12 @@ const useTreeViewItemActions: UseTreeViewItemActions = (treeData) => {
 
         vmItems?.forEach(addDragEventListener);
 
-        dropInnerElements.forEach((element) => addDropEventListeners(element, removeFolderQuery));
+        dropInnerElements.forEach((element) => addDropEventListeners(element, removeGroupValue));
 
         allRightClickableItems.forEach(addRightClickEvent);
       }, 200);
     },
-    [addRightClickEvent, navigate, removeFolderQuery],
+    [addRightClickEvent, navigate, removeGroupValue],
   );
 
   useEffect(() => tourContextMenuTriggerSignal.subscribe(setTriggerElement), []);

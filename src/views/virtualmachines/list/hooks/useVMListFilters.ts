@@ -2,6 +2,8 @@ import { useMemo } from 'react';
 
 import { VirtualMachineModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { TREE_VIEW_FOLDERS } from '@kubevirt-utils/hooks/useFeatures/constants';
+import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import useClusterFilter from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/filters/useClusterFilter';
 import useProjectFilter from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/filters/useProjectFilter';
 import { KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
@@ -13,6 +15,7 @@ import { PVCMapper, VMIMapper } from '@virtualmachines/utils/mappers';
 import { getCPUFilter } from '../filters/getCPUFilter';
 import { getDateCreatedFilter, getDateFromFilter, getDateToFilter } from '../filters/getDateFilter';
 import { getDescriptionFilter } from '../filters/getDescriptionFilter';
+import { getGroupFilter } from '../filters/getGroupFilter';
 import { getGuestAgentFilter } from '../filters/getGuestAgentFilter';
 import { getHWDevicesFilter } from '../filters/getHWDevicesFilter';
 import { getIPFilter } from '../filters/getIPFilter';
@@ -34,6 +37,7 @@ const useVMListFilters = (
 ): KubevirtFilter<V1VirtualMachine>[] => {
   const { t } = useKubevirtTranslation();
   const isACMPage = useIsACMPage();
+  const { featureEnabled: treeViewFoldersEnabled } = useFeatures(TREE_VIEW_FOLDERS);
 
   const { resources: vms } = useAccessibleResources<V1VirtualMachine>({
     groupVersionKind: VirtualMachineModelGroupVersionKind,
@@ -56,6 +60,10 @@ const useVMListFilters = (
         ...clusterFilter,
         showAllBadge: true,
       });
+    }
+
+    if (treeViewFoldersEnabled) {
+      filters.push(getGroupFilter(t));
     }
 
     filters.push(
@@ -85,6 +93,7 @@ const useVMListFilters = (
   }, [
     t,
     isACMPage,
+    treeViewFoldersEnabled,
     clusterFilter,
     projectFilter,
     storageClassFilter,

@@ -1,8 +1,10 @@
-import React from 'react';
 import { TFunction } from 'i18next';
+import React from 'react';
 
-import { VirtualMachineInstanceMigrationModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import {
+  VirtualMachineInstanceMigrationModel,
+  VirtualMachineModel,
+} from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { ActionDropdownItemType } from '@kubevirt-utils/components/ActionsDropdown/constants';
 import { LabelsModal } from '@kubevirt-utils/components/LabelsModal/LabelsModal';
@@ -28,8 +30,11 @@ import {
   getEffectiveRunStrategy,
   isVMNotStopped,
 } from '@kubevirt-utils/resources/vm/utils/selectors';
-import { getNoPermissionTooltipContent, kubevirtConsole } from '@kubevirt-utils/utils/utils';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
+import {
+  getNoPermissionTooltipContent,
+  isEmpty,
+  kubevirtConsole,
+} from '@kubevirt-utils/utils/utils';
 import CrossClusterMigration from '@multicluster/components/CrossClusterMigration/CrossClusterMigration';
 import { CROSS_CLUSTER_MIGRATION_ACTION_ID } from '@multicluster/constants';
 import { getCluster } from '@multicluster/helpers/selectors';
@@ -39,10 +44,10 @@ import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
 
 import { isLiveMigratable, isRunning, isStopped, printableVMStatus } from '../utils';
 
+import { migrateVM, pauseVM, resetVM, restartVM, startVM, stopVM, unpauseVM } from './actions';
 import ConfirmMultipleVMActionsModal from './components/ConfirmMultipleVMActionsModal/ConfirmMultipleVMActionsModal';
 import VirtualMachineMigrateModal from './components/VirtualMachineMigration/VirtualMachineMigrationModal';
 import { ACTIONS_ID, BULK_ACTIONS_ID } from './hooks/constants';
-import { migrateVM, pauseVM, resetVM, restartVM, startVM, stopVM, unpauseVM } from './actions';
 import { BulkVirtualMachineActionFactory } from './types';
 import {
   getBulkDeleteActionDescription,
@@ -288,7 +293,7 @@ export const createBulkVirtualMachineActionFactory = (
       )),
     disabled: !haveSameCluster(vms) || !haveSameNamespace(vms) || isEmpty(vms),
     id: BULK_ACTIONS_ID.MOVE_TO_FOLDER,
-    label: t('Move to folder'),
+    label: t('Move to group'),
   }),
   pause: (
     vms: V1VirtualMachine[],

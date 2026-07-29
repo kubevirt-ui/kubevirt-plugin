@@ -19,6 +19,7 @@ export enum VirtualMachineRowFilterType {
   DateCreatedFrom = 'dateCreatedFrom',
   DateCreatedTo = 'dateCreatedTo',
   Description = 'description',
+  Group = 'group',
   GuestAgent = 'guestAgent',
   HWDevices = 'hwDevices',
   IP = 'ip',

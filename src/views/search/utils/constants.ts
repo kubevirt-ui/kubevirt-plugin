@@ -27,6 +27,7 @@ export const singleStringFields = new Set([
 export const arrayFields = new Set([
   VirtualMachineRowFilterType.Architecture,
   VirtualMachineRowFilterType.Cluster,
+  VirtualMachineRowFilterType.Group,
   VirtualMachineRowFilterType.Labels,
   VirtualMachineRowFilterType.NAD,
   VirtualMachineRowFilterType.Node,

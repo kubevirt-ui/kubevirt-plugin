@@ -1,9 +1,8 @@
 import { VirtualMachineModel } from 'src/views/dashboard-extensions/utils';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { RemoveFolderQuery } from '@kubevirt-utils/components/MoveVMToFolderModal/hooks/useRemoveFolderQuery';
 import { SINGLE_CLUSTER_KEY } from '@kubevirt-utils/resources/constants';
-import { getLabels, getNamespace } from '@kubevirt-utils/resources/shared';
+import { getLabel, getLabels, getNamespace } from '@kubevirt-utils/resources/shared';
 import { escapeJsonPointerToken, isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
@@ -71,7 +70,7 @@ export const addDragEventListener = (treeViewItem: TreeViewDataItem): RemoveList
 
 export const addDropEventListeners = (
   treeViewItem: TreeViewDataItem,
-  removeFolderQuery: RemoveFolderQuery,
+  removeGroupValue: (group: string) => void,
 ): RemoveListenerFunction => {
   const dropHTMLElement = document.getElementById(treeViewItem.id);
 
@@ -84,7 +83,8 @@ export const addDropEventListeners = (
     event.preventDefault();
 
     if (isDraggingVMAloneInFolder) {
-      removeFolderQuery?.(folderName);
+      const sourceFolder = getLabel(draggingVM, VM_FOLDER_LABEL);
+      removeGroupValue(sourceFolder);
     }
     changeVMFolder(folderName);
 
