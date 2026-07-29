@@ -46,7 +46,7 @@ export const getTabs = (isAdmin: boolean, t: TFunction): SettingsTabConfig[] => 
   {
     Component: RecommendedCapabilitiesTab,
     dataTest: 'recommended-capabilities',
-    isEnabled: true,
+    isEnabled: isAdmin,
     isFullWidth: true,
     name: SETTINGS_TABS.RECOMMENDED,
     title: t('Recommended capabilities'),
