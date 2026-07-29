@@ -19,32 +19,51 @@ on:
   pull_request_review:
     types: [submitted]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}-${{ github.event.review.id }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 
 jobs:
   capture-review:
     name: Capture Review Event
-    if: >-
-      !endsWith(github.event.review.user.login, '[bot]') &&
-      (github.event.review.state == 'approved' || github.event.review.state == 'changes_requested')
     runs-on: ubuntu-latest
     timeout-minutes: 2
     steps:
+      - name: Check applicability
+        id: check
+        env:
+          REVIEW_USER: ${{ github.event.review.user.login }}
+          REVIEW_STATE: ${{ github.event.review.state }}
+        run: |
+          if [[ "$REVIEW_USER" == *"[bot]" ]]; then
+            echo "Bot review -- nothing to do."
+            echo "applicable=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if [[ "$REVIEW_STATE" != "approved" && "$REVIEW_STATE" != "changes_requested" ]]; then
+            echo "Review state '$REVIEW_STATE' -- only approvals/change-requests toggle labels."
+            echo "applicable=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "applicable=true" >> "$GITHUB_OUTPUT"
+
       - name: Checkout
+        if: steps.check.outputs.applicable == 'true'
         uses: actions/checkout@v7
         with:
           persist-credentials: false
 
       - name: Setup scripts
+        if: steps.check.outputs.applicable == 'true'
         uses: ./.github/actions/setup-gh-scripts
         with:
           ref: ${{ github.sha }}
 
-      # No API calls, no secrets -- just the review's own event-payload
-      # fields, which are GitHub-computed and safe to trust even though
-      # this event can come from a fork PR.
       - name: Write review data
+        if: steps.check.outputs.applicable == 'true'
         working-directory: .github/scripts
         env:
           PR_NUMBER: ${{ github.event.pull_request.number }}
@@ -55,6 +74,7 @@ jobs:
         run: npx tsx src/commands/write-review-data.ts
 
       - name: Upload review data
+        if: steps.check.outputs.applicable == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: review-data
