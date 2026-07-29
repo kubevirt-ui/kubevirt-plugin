@@ -37,6 +37,12 @@ export const CAPABILITY_INSTALL_STATE_CONFIG: Record<
   },
 };
 
+export const STATUS_COUNT_TEMPLATES: Record<string, string> = {
+  [CapabilityInstallState.Installed]: '{{count}} out of {{total}} capabilities installed',
+  [CapabilityInstallState.NotInstalled]: '{{count}} out of {{total}} not installed',
+  [CapabilityInstallState.PartiallyInstalled]: '{{count}} out of {{total}} partially installed',
+};
+
 export const getOperatorInstallStatusLabel = (
   installState: InstallState | undefined,
   isRedHatProvided: boolean | undefined,

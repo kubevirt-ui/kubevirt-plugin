@@ -3,8 +3,9 @@ import React, { FC, useState } from 'react';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Divider, Stack, StackItem, Title } from '@patternfly/react-core';
 
-import SelectionCards from './components/SelectionCards/SelectionCards';
+import CustomSelectionView from './components/CustomSelectionView/CustomSelectionView';
 import VirtualizationBundleView from './components/VirtualizationBundleView/VirtualizationBundleView';
+import SelectionCards from './components/SelectionCards/SelectionCards';
 import { CapabilitiesDataProvider } from './context/CapabilitiesDataProvider';
 import { CapabilitiesView } from './utils/types';
 
@@ -25,7 +26,11 @@ const RecommendedCapabilitiesTab: FC = () => {
           <Divider className="settings-tab__section-divider" />
         </StackItem>
         <StackItem>
-          {selectedView === CapabilitiesView.Bundle ? <VirtualizationBundleView /> : null}
+          {selectedView === CapabilitiesView.Bundle ? (
+            <VirtualizationBundleView />
+          ) : (
+            <CustomSelectionView />
+          )}
         </StackItem>
       </Stack>
     </CapabilitiesDataProvider>
