@@ -45,7 +45,7 @@ const OWNERS_WITH_COMMENTS_CONTENT = [
   '  - dave-reviewer',
 ].join('\n');
 
-const fakeOctokit = (expectedPath: string, content: string | null): Octokit =>
+const fakeOctokit = (expectedPath: string, content: null | string): Octokit =>
   ({
     repos: {
       getContent: async ({ path }: { path: string }) => {
@@ -205,8 +205,8 @@ describe('isListedInOwners', () => {
 });
 
 type FakeLabelEventsOptions = {
-  events: Array<{ label: string; actor: string }>;
-  ownersContent?: string | null;
+  events: Array<{ actor: string; label: string }>;
+  ownersContent?: null | string;
 };
 
 const fakeLabelEventsOctokit = ({
@@ -214,15 +214,15 @@ const fakeLabelEventsOctokit = ({
   ownersContent = null,
 }: FakeLabelEventsOptions): Octokit =>
   ({
+    issues: {
+      listEvents: async () => ({ data: [] }), // unused body -- fake paginate() above ignores the method reference.
+    },
     paginate: async () =>
       events.map((e) => ({
         actor: { login: e.actor },
         event: 'labeled',
         label: { name: e.label },
       })),
-    issues: {
-      listEvents: async () => ({ data: [] }), // unused body -- fake paginate() above ignores the method reference.
-    },
     repos: {
       getContent: async () => {
         if (ownersContent === null) throw new Error('Not Found');

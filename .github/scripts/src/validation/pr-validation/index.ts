@@ -1,4 +1,5 @@
-/* eslint-disable no-console */
+import { createOctokit, getPullRequestFiles } from '../../github-repo';
+import { requireEnv, safeErrorMessage } from '../../utils';
 import { executeJiraValidation } from '../jira-validation/execute';
 import {
   executeAiConfigValidation,
@@ -8,32 +9,8 @@ import {
 } from '../pr-path-validation/execute';
 import { buildConfigFromEnv } from './build-config';
 import { clearStaleApproval } from './clear-stale-approval';
-import { setCommitStatus } from '../../github-comments';
-import { createOctokit, createStatusOctokit, getPullRequestFiles } from '../../github-repo';
-import { runChecksIsolated } from './run-checks';
 import type { PrValidationCheck } from './run-checks';
-import { requireEnv, safeErrorMessage } from '../../utils';
-import type { GitHubConfig } from '../../types/index';
-
-const reportJiraUnexpectedError = async (
-  config: GitHubConfig,
-  headSha: string | undefined,
-  err: unknown,
-): Promise<void> => {
-  if (!headSha) return;
-  try {
-    await setCommitStatus(
-      createStatusOctokit(config),
-      config.owner,
-      config.repo,
-      headSha,
-      'error',
-      'Jira validation encountered an unexpected error',
-    );
-  } catch {
-    // best-effort
-  }
-};
+import { runChecksIsolated } from './run-checks';
 
 const main = async (): Promise<void> => {
   const config = buildConfigFromEnv();
@@ -56,12 +33,16 @@ const main = async (): Promise<void> => {
   const checks: PrValidationCheck[] = [
     {
       name: 'jira-validation',
-      run: () => executeJiraValidation({ baseBranch, config, headSha, prNumber, prTitle }),
-      reportUnexpectedError: reportJiraUnexpectedError,
+      reportUnexpectedError: async (_config, _headSha, err): Promise<void> => {
+        console.error(`Jira validation encountered an unexpected error: ${safeErrorMessage(err)}`);
+      },
+      run: (): Promise<void> =>
+        executeJiraValidation({ baseBranch, config, headSha, prNumber, prTitle }),
     },
     {
       name: 'ai-config-validation',
-      run: async () => {
+      reportUnexpectedError: reportAiConfigError,
+      run: async (): Promise<void> => {
         const files = await filesPromise;
         return executeAiConfigValidation({
           baseBranch,
@@ -72,11 +53,11 @@ const main = async (): Promise<void> => {
           prNumber,
         });
       },
-      reportUnexpectedError: reportAiConfigError,
     },
     {
       name: 'ci-scripts-validation',
-      run: async () => {
+      reportUnexpectedError: reportCiScriptsError,
+      run: async (): Promise<void> => {
         const files = await filesPromise;
         return executeCiScriptsValidation({
           baseBranch,
@@ -87,7 +68,6 @@ const main = async (): Promise<void> => {
           prNumber,
         });
       },
-      reportUnexpectedError: reportCiScriptsError,
     },
   ];
 
@@ -97,10 +77,10 @@ const main = async (): Promise<void> => {
   if (eventAction === 'synchronize') {
     checks.push({
       name: 'clear-stale-approval',
-      run: () => clearStaleApproval(octokit, config.owner, config.repo, prNumber),
-      reportUnexpectedError: async (_config, _headSha, err) => {
+      reportUnexpectedError: async (_config, _headSha, err): Promise<void> => {
         console.error(`Failed to clear stale lgtm/approved labels: ${safeErrorMessage(err)}`);
       },
+      run: (): Promise<void> => clearStaleApproval(octokit, config.owner, config.repo, prNumber),
     });
   }
 
@@ -111,7 +91,7 @@ const main = async (): Promise<void> => {
   }
 };
 
-main().catch((err) => {
+void main().catch((err) => {
   console.error(safeErrorMessage(err));
   process.exit(1);
 });

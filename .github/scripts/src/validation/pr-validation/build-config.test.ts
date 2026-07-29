@@ -5,13 +5,18 @@ import { buildConfigFromEnv } from './build-config';
 
 const ENV_KEYS = ['GITHUB_TOKEN', 'STATUS_GITHUB_TOKEN', 'REPO_OWNER', 'REPO_NAME'] as const;
 const originalEnv: Record<string, string | undefined> = {};
-for (const key of ENV_KEYS) originalEnv[key] = process.env[key];
+for (const key of ENV_KEYS) {
+  originalEnv[key] = process.env[key];
+}
 
 describe('buildConfigFromEnv', () => {
   afterEach(() => {
     for (const key of ENV_KEYS) {
-      if (originalEnv[key] === undefined) delete process.env[key];
-      else process.env[key] = originalEnv[key];
+      if (originalEnv[key] === undefined) {
+        delete process.env[key];
+      } else {
+        process.env[key] = originalEnv[key];
+      }
     }
   });
 

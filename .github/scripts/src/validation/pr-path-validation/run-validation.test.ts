@@ -8,16 +8,16 @@ import { runPathValidation } from './run-validation';
 import type { PathValidationConfig } from './types';
 
 const TEST_CONFIG: PathValidationConfig = {
+  commandName: '/test-approved',
+  displayName: 'Test validation',
   exactPaths: [],
-  pathPrefixes: ['protected/'],
-  labels: { alert: 'alert', block: 'block', reviewed: 'reviewed', skip: 'skip' },
   labelMeta: {
     alert: { color: 'f59e0b', description: 'alert' },
     block: { color: 'b60205', description: 'block' },
   },
+  labels: { alert: 'alert', block: 'block', reviewed: 'reviewed', skip: 'skip' },
+  pathPrefixes: ['protected/'],
   statusContext: 'test-validation',
-  displayName: 'Test validation',
-  commandName: '/test-approved',
 };
 
 const buildStatusDescription = (passed: boolean, hasSensitiveChanges: boolean): string =>
@@ -25,12 +25,12 @@ const buildStatusDescription = (passed: boolean, hasSensitiveChanges: boolean): 
 
 type FakeOctokitOptions = {
   files: Array<{ filename: string; patch?: string }>;
-  labels: string[];
   /** Fake "labeled" issue-events, most recent last -- drives isLabelAppliedByTrustedActor's actor lookup for the skip label. */
-  labelEvents?: Array<{ label: string; actor: string }>;
+  labelEvents?: Array<{ actor: string; label: string }>;
+  labels: string[];
 };
 
-type Call = { method: string; args: unknown };
+type Call = { args: unknown; method: string };
 
 const fakeOctokit = (options: FakeOctokitOptions, calls: Call[]): Octokit => {
   const labels = new Set(options.labels);
@@ -44,6 +44,29 @@ const fakeOctokit = (options: FakeOctokitOptions, calls: Call[]): Octokit => {
   });
 
   return {
+    issues: {
+      addLabels: async (args: { labels: string[] }) => {
+        calls.push({ args, method: 'addLabels' });
+        for (const l of args.labels) labels.add(l);
+      },
+      createLabel: async () => ({ data: {} }),
+      getLabel: async ({ name }: { name: string }) => {
+        if (!labels.has(name)) {
+          const err = new Error('Not Found') as Error & { status: number };
+          err.status = 404;
+          throw err;
+        }
+        return { data: {} };
+      },
+      listEvents,
+      listLabelsOnIssue: async () => ({
+        data: [...labels].map((name) => ({ name })),
+      }),
+      removeLabel: async (args: { name: string }) => {
+        calls.push({ args, method: 'removeLabel' });
+        labels.delete(args.name);
+      },
+    },
     // getPullRequestFiles / isLabelAppliedByTrustedActor's only paginate calls.
     paginate: async (method: unknown) => {
       if (method === listFiles) return (await listFiles()).data;
@@ -53,32 +76,9 @@ const fakeOctokit = (options: FakeOctokitOptions, calls: Call[]): Octokit => {
     pulls: {
       listFiles,
     },
-    issues: {
-      listEvents,
-      listLabelsOnIssue: async () => ({
-        data: [...labels].map((name) => ({ name })),
-      }),
-      getLabel: async ({ name }: { name: string }) => {
-        if (!labels.has(name)) {
-          const err = new Error('Not Found') as Error & { status: number };
-          err.status = 404;
-          throw err;
-        }
-        return { data: {} };
-      },
-      createLabel: async () => ({ data: {} }),
-      addLabels: async (args: { labels: string[] }) => {
-        calls.push({ method: 'addLabels', args });
-        args.labels.forEach((l) => labels.add(l));
-      },
-      removeLabel: async (args: { name: string }) => {
-        calls.push({ method: 'removeLabel', args });
-        labels.delete(args.name);
-      },
-    },
     repos: {
-      createCommitStatus: async (args: { state: string; description: string }) => {
-        calls.push({ method: 'createCommitStatus', args });
+      createCommitStatus: async (args: { description: string; state: string }) => {
+        calls.push({ args, method: 'createCommitStatus' });
       },
       // No OWNERS file mocked -- isListedInOwners fails closed (false) for
       // any non-bot actor, which is what the tests below rely on.
@@ -94,19 +94,19 @@ const buildCtx = (
   event: { action?: string } = {},
   statusOctokit?: Octokit,
 ): PathValidationContext => ({
-  octokit,
-  statusOctokit,
   baseBranch: 'main',
-  config: { token: 'x', owner: 'kubevirt-ui', repo: 'kubevirt-plugin' },
-  prNumber: 1,
-  headSha: 'abc123',
+  config: { owner: 'kubevirt-ui', repo: 'kubevirt-plugin', token: 'x' },
   event,
+  headSha: 'abc123',
+  octokit,
+  prNumber: 1,
+  statusOctokit,
 });
 
-const statusesOf = (calls: Call[]): Array<{ state: string; description: string }> =>
+const statusesOf = (calls: Call[]): Array<{ description: string; state: string }> =>
   calls
     .filter((c) => c.method === 'createCommitStatus')
-    .map((c) => c.args as { state: string; description: string });
+    .map((c) => c.args as { description: string; state: string });
 
 describe('runPathValidation', () => {
   it('passes with no sensitive changes -- alert/block removed, success status', async () => {

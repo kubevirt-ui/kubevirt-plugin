@@ -7,34 +7,34 @@ import { syncLabelsFromReview } from './review-event';
 
 const OWNERS_CONTENT = ['approvers:', '  - alice-approver'].join('\n');
 
-type Call = { method: string; args: unknown };
+type Call = { args: unknown; method: string };
 
 type FakeOptions = {
-  permission: string | null;
-  ownersContent?: string | null;
+  ownersContent?: null | string;
+  permission: null | string;
 };
 
-const fakeOctokit = ({ permission, ownersContent = null }: FakeOptions, calls: Call[]): Octokit =>
+const fakeOctokit = ({ ownersContent = null, permission }: FakeOptions, calls: Call[]): Octokit =>
   ({
+    issues: {
+      addLabels: async (args: unknown) => {
+        calls.push({ args, method: 'addLabels' });
+      },
+      getLabel: async () => ({ data: {} }),
+      removeLabel: async (args: unknown) => {
+        calls.push({ args, method: 'removeLabel' });
+      },
+    },
     repos: {
       getCollaboratorPermissionLevel: async (args: unknown) => {
-        calls.push({ method: 'getCollaboratorPermissionLevel', args });
+        calls.push({ args, method: 'getCollaboratorPermissionLevel' });
         if (permission === null) throw new Error('Not Found');
         return { data: { permission } };
       },
       getContent: async (args: unknown) => {
-        calls.push({ method: 'getContent', args });
+        calls.push({ args, method: 'getContent' });
         if (ownersContent === null) throw new Error('Not Found');
         return { data: { content: Buffer.from(ownersContent, 'utf8').toString('base64') } };
-      },
-    },
-    issues: {
-      getLabel: async () => ({ data: {} }),
-      addLabels: async (args: unknown) => {
-        calls.push({ method: 'addLabels', args });
-      },
-      removeLabel: async (args: unknown) => {
-        calls.push({ method: 'removeLabel', args });
       },
     },
   }) as unknown as Octokit;
@@ -42,18 +42,18 @@ const fakeOctokit = ({ permission, ownersContent = null }: FakeOptions, calls: C
 describe('syncLabelsFromReview', () => {
   it('skips self-reviews without touching labels', async () => {
     const calls: Call[] = [];
-    const octokit = fakeOctokit({ permission: 'write', ownersContent: OWNERS_CONTENT }, calls);
+    const octokit = fakeOctokit({ ownersContent: OWNERS_CONTENT, permission: 'write' }, calls);
 
     const result = await syncLabelsFromReview({
-      octokit,
-      contentsOctokit: octokit,
-      owner: 'kubevirt-ui',
-      repo: 'kubevirt-plugin',
-      prNumber: 42,
       baseBranch: 'main',
-      reviewState: 'APPROVED',
-      reviewAuthor: 'pr-author',
+      contentsOctokit: octokit,
+      octokit,
+      owner: 'kubevirt-ui',
       prAuthor: 'pr-author',
+      prNumber: 42,
+      repo: 'kubevirt-plugin',
+      reviewAuthor: 'pr-author',
+      reviewState: 'APPROVED',
     });
 
     assert.equal(result, 'skipped');
@@ -68,15 +68,15 @@ describe('syncLabelsFromReview', () => {
     const octokit = fakeOctokit({ permission: 'read' }, calls);
 
     const result = await syncLabelsFromReview({
-      octokit,
-      contentsOctokit: octokit,
-      owner: 'kubevirt-ui',
-      repo: 'kubevirt-plugin',
-      prNumber: 42,
       baseBranch: 'main',
-      reviewState: 'APPROVED',
-      reviewAuthor: 'outsider',
+      contentsOctokit: octokit,
+      octokit,
+      owner: 'kubevirt-ui',
       prAuthor: 'pr-author',
+      prNumber: 42,
+      repo: 'kubevirt-plugin',
+      reviewAuthor: 'outsider',
+      reviewState: 'APPROVED',
     });
 
     assert.equal(result, 'skipped');
@@ -88,18 +88,18 @@ describe('syncLabelsFromReview', () => {
 
   it('Approve from a write collaborator grants lgtm only', async () => {
     const calls: Call[] = [];
-    const octokit = fakeOctokit({ permission: 'write', ownersContent: OWNERS_CONTENT }, calls);
+    const octokit = fakeOctokit({ ownersContent: OWNERS_CONTENT, permission: 'write' }, calls);
 
     const result = await syncLabelsFromReview({
-      octokit,
-      contentsOctokit: octokit,
-      owner: 'kubevirt-ui',
-      repo: 'kubevirt-plugin',
-      prNumber: 42,
       baseBranch: 'main',
-      reviewState: 'APPROVED',
-      reviewAuthor: 'bob-collaborator',
+      contentsOctokit: octokit,
+      octokit,
+      owner: 'kubevirt-ui',
       prAuthor: 'pr-author',
+      prNumber: 42,
+      repo: 'kubevirt-plugin',
+      reviewAuthor: 'bob-collaborator',
+      reviewState: 'APPROVED',
     });
 
     assert.equal(result, 'applied');
@@ -111,18 +111,18 @@ describe('syncLabelsFromReview', () => {
 
   it('Approve from a root OWNERS approver grants lgtm and approved', async () => {
     const calls: Call[] = [];
-    const octokit = fakeOctokit({ permission: 'write', ownersContent: OWNERS_CONTENT }, calls);
+    const octokit = fakeOctokit({ ownersContent: OWNERS_CONTENT, permission: 'write' }, calls);
 
     const result = await syncLabelsFromReview({
-      octokit,
-      contentsOctokit: octokit,
-      owner: 'kubevirt-ui',
-      repo: 'kubevirt-plugin',
-      prNumber: 42,
       baseBranch: 'main',
-      reviewState: 'APPROVED',
-      reviewAuthor: 'alice-approver',
+      contentsOctokit: octokit,
+      octokit,
+      owner: 'kubevirt-ui',
       prAuthor: 'pr-author',
+      prNumber: 42,
+      repo: 'kubevirt-plugin',
+      reviewAuthor: 'alice-approver',
+      reviewState: 'APPROVED',
     });
 
     assert.equal(result, 'applied');
@@ -134,18 +134,18 @@ describe('syncLabelsFromReview', () => {
 
   it('Request changes from an OWNERS approver revokes lgtm and approved', async () => {
     const calls: Call[] = [];
-    const octokit = fakeOctokit({ permission: 'write', ownersContent: OWNERS_CONTENT }, calls);
+    const octokit = fakeOctokit({ ownersContent: OWNERS_CONTENT, permission: 'write' }, calls);
 
     const result = await syncLabelsFromReview({
-      octokit,
-      contentsOctokit: octokit,
-      owner: 'kubevirt-ui',
-      repo: 'kubevirt-plugin',
-      prNumber: 42,
       baseBranch: 'main',
-      reviewState: 'CHANGES_REQUESTED',
-      reviewAuthor: 'alice-approver',
+      contentsOctokit: octokit,
+      octokit,
+      owner: 'kubevirt-ui',
       prAuthor: 'pr-author',
+      prNumber: 42,
+      repo: 'kubevirt-plugin',
+      reviewAuthor: 'alice-approver',
+      reviewState: 'CHANGES_REQUESTED',
     });
 
     assert.equal(result, 'revoked');
@@ -157,18 +157,18 @@ describe('syncLabelsFromReview', () => {
 
   it('Request changes from a write collaborator who is not an OWNERS approver still revokes both lgtm and approved -- approved must not outlive the lgtm that justified it', async () => {
     const calls: Call[] = [];
-    const octokit = fakeOctokit({ permission: 'write', ownersContent: OWNERS_CONTENT }, calls);
+    const octokit = fakeOctokit({ ownersContent: OWNERS_CONTENT, permission: 'write' }, calls);
 
     const result = await syncLabelsFromReview({
-      octokit,
-      contentsOctokit: octokit,
-      owner: 'kubevirt-ui',
-      repo: 'kubevirt-plugin',
-      prNumber: 42,
       baseBranch: 'main',
-      reviewState: 'CHANGES_REQUESTED',
-      reviewAuthor: 'bob-collaborator',
+      contentsOctokit: octokit,
+      octokit,
+      owner: 'kubevirt-ui',
       prAuthor: 'pr-author',
+      prNumber: 42,
+      repo: 'kubevirt-plugin',
+      reviewAuthor: 'bob-collaborator',
+      reviewState: 'CHANGES_REQUESTED',
     });
 
     assert.equal(result, 'revoked');

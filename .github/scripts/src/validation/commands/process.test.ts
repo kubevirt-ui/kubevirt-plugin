@@ -1,22 +1,22 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { processCommands, reportCommandFailure, shouldReportGenericFailure } from './process';
-import type { CommandHandlers } from './process';
-import { HandledValidationError } from '../pr-path-validation/errors';
 import type { GitHubConfig } from '../../types/index';
+import { HandledValidationError } from '../pr-path-validation/errors';
+import type { CommandHandlers } from './process';
+import { processCommands, reportCommandFailure, shouldReportGenericFailure } from './process';
 
 // CommandHandlers is an exhaustive Record -- unused here, but every fixture needs a stub.
 const NOOP_NEW_HANDLERS: Pick<
   CommandHandlers,
-  'lgtm' | 'lgtm-cancel' | 'approve' | 'approve-cancel' | 'hold' | 'hold-cancel'
+  'approve-cancel' | 'approve' | 'hold-cancel' | 'hold' | 'lgtm-cancel' | 'lgtm'
 > = {
-  lgtm: async () => {},
-  'lgtm-cancel': async () => {},
   approve: async () => {},
   'approve-cancel': async () => {},
   hold: async () => {},
   'hold-cancel': async () => {},
+  lgtm: async () => {},
+  'lgtm-cancel': async () => {},
 };
 
 describe('processCommands', () => {

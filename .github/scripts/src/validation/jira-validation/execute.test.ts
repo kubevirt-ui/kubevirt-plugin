@@ -3,19 +3,19 @@ import { afterEach, beforeEach, describe, it } from 'node:test';
 
 import type { Octokit } from '@octokit/rest';
 
-import { executeJiraValidation } from './execute';
-import { HandledValidationError } from '../pr-path-validation/errors';
 import type { GitHubConfig } from '../../types/index';
+import { HandledValidationError } from '../pr-path-validation/errors';
+import { executeJiraValidation } from './execute';
 
-type Call = { method: string; args: unknown };
+type Call = { args: unknown; method: string };
 
 type FakeOctokitOptions = {
-  labels?: string[];
   branches?: string[];
   branchesError?: boolean;
   /** Fake "labeled" issue-events, most recent last -- drives skip-label trust. */
-  labelEvents?: Array<{ label: string; actor: string }>;
-  ownersContent?: string | null;
+  labelEvents?: Array<{ actor: string; label: string }>;
+  labels?: string[];
+  ownersContent?: null | string;
 };
 
 const fakeOctokit = (options: FakeOctokitOptions, calls: Call[]): Octokit => {
@@ -28,18 +28,14 @@ const fakeOctokit = (options: FakeOctokitOptions, calls: Call[]): Octokit => {
     })),
   });
   return {
-    paginate: async (method: unknown) => {
-      if (method === listEvents) return (await listEvents()).data;
-      return [];
-    },
     issues: {
-      listEvents,
-      listComments: async () => ({ data: [] }),
-      createComment: async () => {
-        calls.push({ method: 'createComment', args: {} });
+      addLabels: async (args: unknown) => {
+        calls.push({ args, method: 'addLabels' });
       },
-      updateComment: async () => {},
-      listLabelsOnIssue: async () => ({ data: [...labels].map((name) => ({ name })) }),
+      createComment: async () => {
+        calls.push({ args: {}, method: 'createComment' });
+      },
+      createLabel: async () => ({ data: {} }),
       getLabel: async ({ name }: { name: string }) => {
         if (!labels.has(name)) {
           const err = new Error('Not Found') as Error & { status: number };
@@ -48,21 +44,21 @@ const fakeOctokit = (options: FakeOctokitOptions, calls: Call[]): Octokit => {
         }
         return { data: {} };
       },
-      createLabel: async () => ({ data: {} }),
-      addLabels: async (args: unknown) => {
-        calls.push({ method: 'addLabels', args });
-      },
+      listComments: async () => ({ data: [] }),
+      listEvents,
+      listLabelsOnIssue: async () => ({ data: [...labels].map((name) => ({ name })) }),
       removeLabel: async (args: unknown) => {
-        calls.push({ method: 'removeLabel', args });
+        calls.push({ args, method: 'removeLabel' });
       },
+      updateComment: async () => {},
+    },
+    paginate: async (method: unknown) => {
+      if (method === listEvents) return (await listEvents()).data;
+      return [];
     },
     repos: {
-      listBranches: async () => {
-        if (options.branchesError) throw new Error('API rate limit exceeded');
-        return { data: (options.branches ?? []).map((name) => ({ name })) };
-      },
       createCommitStatus: async (args: unknown) => {
-        calls.push({ method: 'createCommitStatus', args });
+        calls.push({ args, method: 'createCommitStatus' });
       },
       getContent: async () => {
         if (options.ownersContent === null || options.ownersContent === undefined) {
@@ -72,16 +68,20 @@ const fakeOctokit = (options: FakeOctokitOptions, calls: Call[]): Octokit => {
           data: { content: Buffer.from(options.ownersContent, 'utf8').toString('base64') },
         };
       },
+      listBranches: async () => {
+        if (options.branchesError) throw new Error('API rate limit exceeded');
+        return { data: (options.branches ?? []).map((name) => ({ name })) };
+      },
     },
   } as unknown as Octokit;
 };
 
-const CONFIG: GitHubConfig = { token: 'x', owner: 'kubevirt-ui', repo: 'kubevirt-plugin' };
+const CONFIG: GitHubConfig = { owner: 'kubevirt-ui', repo: 'kubevirt-plugin', token: 'x' };
 
-const statusesOf = (calls: Call[]): Array<{ state: string; description: string }> =>
+const statusesOf = (calls: Call[]): Array<{ description: string; state: string }> =>
   calls
     .filter((c) => c.method === 'createCommitStatus')
-    .map((c) => c.args as { state: string; description: string });
+    .map((c) => c.args as { description: string; state: string });
 
 describe('executeJiraValidation', () => {
   const originalJiraToken = process.env.JIRA_TOKEN;

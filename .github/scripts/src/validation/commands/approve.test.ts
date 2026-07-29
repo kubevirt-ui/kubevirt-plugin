@@ -9,35 +9,35 @@ import { applyApprove, approveAiConfig, approveCiScripts, cancelApprove } from '
 
 const OWNERS_CONTENT = ['approvers:', '  - alice-approver'].join('\n');
 
-type Call = { method: string; args: unknown };
+type Call = { args: unknown; method: string };
 
-const fakeOctokit = (ownersContent: string | null, calls: Call[]): Octokit =>
+const fakeOctokit = (ownersContent: null | string, calls: Call[]): Octokit =>
   ({
-    repos: {
-      getContent: async (args: unknown) => {
-        calls.push({ method: 'getContent', args });
-        if (ownersContent === null) throw new Error('Not Found');
-        return { data: { content: Buffer.from(ownersContent, 'utf8').toString('base64') } };
-      },
-    },
     issues: {
-      getLabel: async (args: unknown) => {
-        calls.push({ method: 'getLabel', args });
-        return { data: {} };
-      },
       addLabels: async (args: unknown) => {
-        calls.push({ method: 'addLabels', args });
-      },
-      removeLabel: async (args: unknown) => {
-        calls.push({ method: 'removeLabel', args });
+        calls.push({ args, method: 'addLabels' });
       },
       createComment: async (args: unknown) => {
-        calls.push({ method: 'createComment', args });
+        calls.push({ args, method: 'createComment' });
+      },
+      getLabel: async (args: unknown) => {
+        calls.push({ args, method: 'getLabel' });
+        return { data: {} };
+      },
+      removeLabel: async (args: unknown) => {
+        calls.push({ args, method: 'removeLabel' });
       },
     },
     reactions: {
       createForIssueComment: async (args: unknown) => {
-        calls.push({ method: 'createForIssueComment', args });
+        calls.push({ args, method: 'createForIssueComment' });
+      },
+    },
+    repos: {
+      getContent: async (args: unknown) => {
+        calls.push({ args, method: 'getContent' });
+        if (ownersContent === null) throw new Error('Not Found');
+        return { data: { content: Buffer.from(ownersContent, 'utf8').toString('base64') } };
       },
     },
   }) as unknown as Octokit;
@@ -48,15 +48,15 @@ const baseCtx = (
   author: string,
   prAuthor = 'pr-author',
 ): ApprovalContext => ({
-  octokit,
-  contentsOctokit,
-  owner: 'kubevirt-ui',
-  repo: 'kubevirt-plugin',
-  prNumber: 42,
-  baseBranch: 'main',
   author,
+  baseBranch: 'main',
   commentId: 123,
+  contentsOctokit,
+  octokit,
+  owner: 'kubevirt-ui',
   prAuthor,
+  prNumber: 42,
+  repo: 'kubevirt-plugin',
 });
 
 describe('approveAiConfig', () => {
