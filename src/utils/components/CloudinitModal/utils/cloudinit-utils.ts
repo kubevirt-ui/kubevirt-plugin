@@ -1,14 +1,15 @@
 import produce from 'immer';
-import { dump, load, LoadOptions } from 'js-yaml';
+import { dump, type LoadOptions } from 'js-yaml';
 
 import {
-  V1CloudInitNoCloudSource,
-  V1VirtualMachine,
-  V1Volume,
+  type V1CloudInitNoCloudSource,
+  type V1VirtualMachine,
+  type V1Volume,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { RHELAutomaticSubscriptionData } from '@kubevirt-utils/hooks/useRHELAutomaticSubscription/utils/types';
+import { type RHELAutomaticSubscriptionData } from '@kubevirt-utils/hooks/useRHELAutomaticSubscription/utils/types';
 import { getVolumes } from '@kubevirt-utils/resources/vm';
 import { isEmpty, kubevirtConsole } from '@kubevirt-utils/utils/utils';
+import { safeYAMLToJS } from '@kubevirt-utils/utils/yaml';
 import { AutomaticSubscriptionTypeEnum } from '@settings/tabs/ClusterTab/components/GuestManagmentSection/AutomaticSubscriptionRHELGuests/components/AutomaticSubscriptionType/utils/utils';
 
 import { AUTO_UPDATE_OS_CMD, CLOUD_CONFIG_HEADER, DNF_AUTOMATIC_PACKAGE } from './constants';
@@ -28,11 +29,7 @@ export const convertYAMLUserDataObject = (
   userData: string,
   opts?: LoadOptions,
 ): CloudInitUserData => {
-  try {
-    return load(userData, opts) as CloudInitUserData;
-  } catch (e) {
-    return undefined;
-  }
+  return safeYAMLToJS<CloudInitUserData | undefined>(userData, undefined, opts);
 };
 
 export const convertUserDataObjectToYAML = (
@@ -50,33 +47,28 @@ export const convertUserDataObjectToYAML = (
 };
 
 export const convertYAMLToNetworkDataObject = (networkData: string): CloudInitNetworkData => {
-  try {
-    const networkObj = load(networkData) as CloudInitNetwork;
+  const networkObj = safeYAMLToJS<CloudInitNetwork | undefined>(networkData, undefined);
+  if (!networkObj) return undefined;
 
-    const name = networkObj?.ethernets && Object.keys(networkObj?.ethernets)?.[0];
+  const name = networkObj?.ethernets && Object.keys(networkObj?.ethernets)?.[0];
 
-    const ips =
-      !isEmpty(networkObj?.ethernets?.[name]?.addresses) &&
-      networkObj?.ethernets?.[name]?.addresses;
+  const ips =
+    !isEmpty(networkObj?.ethernets?.[name]?.addresses) && networkObj?.ethernets?.[name]?.addresses;
 
-    const addresses = Array.isArray(ips) ? ips?.join(',') : ips;
-    const gateway4 = networkObj?.ethernets?.[name]?.gateway4;
-    const gateway6 = networkObj?.ethernets?.[name]?.gateway6;
+  const addresses = Array.isArray(ips) ? ips?.join(',') : ips;
+  const gateway4 = networkObj?.ethernets?.[name]?.gateway4;
+  const gateway6 = networkObj?.ethernets?.[name]?.gateway6;
 
-    const nonEmptyNetworkObj = !!addresses || !!name || !!gateway4 || !!gateway6;
+  const nonEmptyNetworkObj = !!addresses || !!name || !!gateway4 || !!gateway6;
 
-    return (
-      nonEmptyNetworkObj && {
-        addresses,
-        gateway4,
-        gateway6,
-        name,
-      }
-    );
-  } catch (e) {
-    kubevirtConsole.error(e);
-    return undefined;
-  }
+  return (
+    nonEmptyNetworkObj && {
+      addresses,
+      gateway4,
+      gateway6,
+      name,
+    }
+  );
 };
 
 export const convertNetworkDataObjectToYAML = (networkData: CloudInitNetworkData): string => {

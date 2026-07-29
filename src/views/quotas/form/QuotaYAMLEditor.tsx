@@ -1,10 +1,11 @@
-import React, { FC, Suspense, useState } from 'react';
+import React, { type FC, Suspense, useState } from 'react';
 import { load } from 'js-yaml';
 
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
-import { YAMLEditorProps } from '@kubevirt-utils/components/SyncedEditor/utils/types';
-import { ApplicationAwareQuota } from '@kubevirt-utils/resources/quotas/types';
+import { type YAMLEditorProps } from '@kubevirt-utils/components/SyncedEditor/utils/types';
+import { type ApplicationAwareQuota } from '@kubevirt-utils/resources/quotas/types';
+import { safeYAMLToJS } from '@kubevirt-utils/utils/yaml';
 import { ResourceYAMLEditor } from '@openshift-console/dynamic-plugin-sdk';
 
 import useOnQuotaSubmit from './hooks/useOnQuotaSubmit';
@@ -23,7 +24,7 @@ const QuotaYAMLEditor: FC<YAMLEditorProps> = ({ initialYAML = '', isEdit = false
       <ResourceYAMLEditor
         create={!isEdit}
         hideHeader
-        initialResource={load(initialYAML)}
+        initialResource={safeYAMLToJS(initialYAML, {})}
         onChange={onChange}
         onSave={onSave}
       />

@@ -3,6 +3,7 @@ import { dump } from 'js-yaml';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { PATHS_TO_HIGHLIGHT } from '@kubevirt-utils/resources/vm/utils/constants';
+import { safeYAMLToJS } from '@kubevirt-utils/utils/yaml';
 import { type K8sResourceCommon, YAMLEditor } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Alert,
@@ -22,7 +23,6 @@ import {
 import Loading from '../Loading/Loading';
 import { SidebarEditorContext } from './SidebarEditorContext';
 import { useEditorHighlighter } from './useEditorHighlighter';
-import { safeLoad } from './utils';
 
 import './sidebar-editor.scss';
 
@@ -59,13 +59,14 @@ const SidebarEditor = <Resource extends K8sResourceCommon>({
   }
 
   const { isEditable, showEditor } = useContext(SidebarEditorContext);
-  const editedResource = safeLoad<Resource>(editableYAML);
+  const editedResource = safeYAMLToJS<Resource | undefined>(editableYAML, undefined);
   const editorRef = useEditorHighlighter(editableYAML, pathsToHighlight, showEditor);
 
   const changeResource = (newValue: string): Record<string, never> => {
     setEditableYAML(newValue);
 
-    if (onChange) onChange(safeLoad<Resource>(newValue));
+    const parsedResource = safeYAMLToJS<Resource | undefined>(newValue, undefined);
+    if (onChange && parsedResource) onChange(parsedResource);
     return {};
   };
 
