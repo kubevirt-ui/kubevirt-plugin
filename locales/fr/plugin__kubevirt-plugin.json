@@ -2791,8 +2791,6 @@
   "You don't have any volumes for the chosen OS yet": "You don't have any volumes for the chosen OS yet",
   "You don't have any volumes yet": "You don't have any volumes yet",
   "You don't have permission to perform this action": "Vous n’êtes pas autorisé à effectuer cette action.",
-  "You must be an administrator to install operators": "You must be an administrator to install operators",
-  "You must be an administrator to manage operators": "You must be an administrator to manage operators",
   "You must ensure that the configuration is correct before starting the VirtualMachine.": "Vous devez vous assurer que la configuration est correcte avant de démarrer la machine virtuelle.",
   "You're all set!": "C'est tout bon !",
   "You're in view-only mode": "Vous êtes en mode lecture seule",
