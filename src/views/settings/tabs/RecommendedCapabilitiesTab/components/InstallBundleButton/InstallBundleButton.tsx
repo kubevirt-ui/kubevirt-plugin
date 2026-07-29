@@ -2,7 +2,6 @@ import React, { FC } from 'react';
 
 import { type TFunction } from 'i18next';
 
-import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Button, Skeleton, Tooltip } from '@patternfly/react-core';
@@ -13,12 +12,10 @@ import { useCapabilitiesData } from '../../context/useCapabilitiesData';
 import { countInstalledCapabilities, getBundleFeatures } from '../../utils/utils';
 
 const getInstallBundleTooltipContent = (
-  isAdmin: boolean,
   allBundleCapabilitiesInstalled: boolean,
   hasLoadErrors: boolean,
   t: TFunction,
 ): string | undefined => {
-  if (!isAdmin) return t('You must be an administrator to install operators');
   if (hasLoadErrors) return t('Cannot install while operator data failed to load');
   if (allBundleCapabilitiesInstalled) return t('All bundle capabilities are already installed');
   return undefined;
@@ -26,7 +23,6 @@ const getInstallBundleTooltipContent = (
 
 const InstallBundleButton: FC = () => {
   const { t } = useKubevirtTranslation();
-  const isAdmin = useIsAdmin();
   const { detailsMap, features, loadErrors, resourcesLoaded } = useCapabilitiesData();
   const { installBundle, installResourcesLoaded, isInstalling } = useCapabilitiesActions();
 
@@ -49,14 +45,9 @@ const InstallBundleButton: FC = () => {
   const hasLoadErrors = !isEmpty(loadErrors);
 
   const isDisabled =
-    !isAdmin ||
-    isInstalling ||
-    isBundleInstallInProgress ||
-    allBundleCapabilitiesInstalled ||
-    hasLoadErrors;
+    isInstalling || isBundleInstallInProgress || allBundleCapabilitiesInstalled || hasLoadErrors;
 
   const tooltipContent = getInstallBundleTooltipContent(
-    isAdmin,
     allBundleCapabilitiesInstalled,
     hasLoadErrors,
     t,

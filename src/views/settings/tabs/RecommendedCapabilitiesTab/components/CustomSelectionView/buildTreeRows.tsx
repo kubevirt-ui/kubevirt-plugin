@@ -19,7 +19,6 @@ type BuildTreeRowsParams = {
   getCapabilityInstallState: (feature: CapabilityFeature) => CapabilityInstallState;
   installFeature: (feature: CapabilityFeature) => Promise<void>;
   installingFeatures: Set<string>;
-  isAdmin: boolean;
   navigate: (path: string) => void;
   t: TFunction;
 };
@@ -30,23 +29,18 @@ export const buildTreeRows = ({
   getCapabilityInstallState,
   installFeature,
   installingFeatures,
-  isAdmin,
   navigate,
   t,
-}: BuildTreeRowsParams): DataViewTrTree[] => {
-  const notAdminTooltip = t('You must be an administrator to manage operators');
-
-  return features.map((feature) => {
+}: BuildTreeRowsParams): DataViewTrTree[] =>
+  features.map((feature) => {
     const installState = getCapabilityInstallState(feature);
     const isFeatureInstalling =
       installingFeatures.has(feature.id) || hasOperatorsInstalling(feature, detailsMap);
     const actions = getCapabilityRowActions(
       feature,
       installState,
-      isAdmin,
       isFeatureInstalling,
       installFeature,
-      notAdminTooltip,
       t,
     );
 
@@ -58,4 +52,3 @@ export const buildTreeRows = ({
       row: buildCapabilityRow(feature, installState, isFeatureInstalling, actions, t),
     };
   });
-};

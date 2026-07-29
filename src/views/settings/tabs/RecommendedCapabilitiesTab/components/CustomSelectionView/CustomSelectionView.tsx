@@ -2,7 +2,6 @@ import React, { FC, useMemo } from 'react';
 import { useNavigate } from 'react-router';
 
 import StateHandler from '@kubevirt-utils/components/StateHandler/StateHandler';
-import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Alert, Stack, StackItem } from '@patternfly/react-core';
@@ -21,7 +20,6 @@ import { isCapabilitySelectable, sortFeatures } from './utils';
 const CustomSelectionView: FC = () => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
-  const isAdmin = useIsAdmin();
   const { detailsMap, features, getCapabilityInstallState, loadErrors, resourcesLoaded } =
     useCapabilitiesData();
   const { capabilitySelection, installFeature, installingFeatures } = useCapabilitiesActions();
@@ -45,7 +43,6 @@ const CustomSelectionView: FC = () => {
         getCapabilityInstallState,
         installFeature,
         installingFeatures,
-        isAdmin,
         navigate,
         t,
       }),
@@ -54,7 +51,6 @@ const CustomSelectionView: FC = () => {
       getCapabilityInstallState,
       installFeature,
       installingFeatures,
-      isAdmin,
       navigate,
       sortedFeatures,
       t,

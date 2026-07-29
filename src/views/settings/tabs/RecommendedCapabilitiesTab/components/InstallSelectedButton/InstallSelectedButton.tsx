@@ -2,7 +2,6 @@ import React, { FC, useCallback, useMemo } from 'react';
 
 import { type TFunction } from 'i18next';
 
-import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Button, Skeleton, Tooltip } from '@patternfly/react-core';
@@ -13,12 +12,10 @@ import { CapabilityInstallState } from '../../utils/types';
 import { hasOperatorsInstalling } from '../CustomSelectionView/utils';
 
 const getTooltipContent = (
-  isAdmin: boolean,
   hasSelection: boolean,
   hasLoadErrors: boolean,
   t: TFunction,
 ): string | undefined => {
-  if (!isAdmin) return t('You must be an administrator to install operators');
   if (hasLoadErrors) return t('Cannot install while operator data failed to load');
   if (!hasSelection) return t('Select capabilities to install');
   return undefined;
@@ -26,7 +23,6 @@ const getTooltipContent = (
 
 const InstallSelectedButton: FC = () => {
   const { t } = useKubevirtTranslation();
-  const isAdmin = useIsAdmin();
   const { detailsMap, features, getCapabilityInstallState, loadErrors, resourcesLoaded } =
     useCapabilitiesData();
   const {
@@ -62,9 +58,9 @@ const InstallSelectedButton: FC = () => {
   const hasSelection = !isEmpty(installableSelectedFeatures);
   const hasLoadErrors = !isEmpty(loadErrors);
   const isAnyInstalling = isInstalling || installingFeatures.size > 0;
-  const isDisabled = !isAdmin || !hasSelection || isAnyInstalling || hasLoadErrors;
+  const isDisabled = !hasSelection || isAnyInstalling || hasLoadErrors;
 
-  const tooltipContent = getTooltipContent(isAdmin, hasSelection, hasLoadErrors, t);
+  const tooltipContent = getTooltipContent(hasSelection, hasLoadErrors, t);
 
   const button = (
     <Button

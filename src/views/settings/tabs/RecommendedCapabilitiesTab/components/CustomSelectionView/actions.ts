@@ -7,21 +7,15 @@ import { type CapabilityFeature, CapabilityInstallState } from '../../utils/type
 export const getCapabilityRowActions = (
   feature: CapabilityFeature,
   installState: CapabilityInstallState,
-  isAdmin: boolean,
   isFeatureInstalling: boolean,
   installFeature: (feature: CapabilityFeature) => Promise<void>,
-  notAdminTooltip: string,
   t: TFunction,
 ): ActionDropdownItemType[] => {
-  const isDisabled = !isAdmin || isFeatureInstalling;
-  const disabledTooltip = !isAdmin ? notAdminTooltip : undefined;
-
   if (installState === CapabilityInstallState.NotInstalled) {
     return [
       {
         cta: () => void installFeature(feature),
-        disabled: isDisabled,
-        disabledTooltip,
+        disabled: isFeatureInstalling,
         id: `install-all-${feature.id}`,
         label: t('Install all operators'),
       },
@@ -32,8 +26,7 @@ export const getCapabilityRowActions = (
     return [
       {
         cta: () => void installFeature(feature),
-        disabled: isDisabled,
-        disabledTooltip,
+        disabled: isFeatureInstalling,
         id: `install-missing-${feature.id}`,
         label: t('Install missing operators'),
       },
