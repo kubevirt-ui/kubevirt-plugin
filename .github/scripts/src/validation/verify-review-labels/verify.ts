@@ -163,4 +163,17 @@ export const verifyReviewLabel = async (
   if (stripped.ci) {
     await dispatchValidation(deps.executeCiScriptsValidation, ctx);
   }
+
+  // When a trusted label is left in place, re-run the matching validation so
+  // the commit status updates from "failed" to "success" (the reviewed label
+  // is now present, so runPathValidation will compute passed=true).
+  const triggeredAi = AI_LABELS.has(ctx.labelName) && !stripped.ai;
+  const triggeredCi = CI_LABELS.has(ctx.labelName) && !stripped.ci;
+
+  if (triggeredAi) {
+    await dispatchValidation(deps.executeAiConfigValidation, ctx);
+  }
+  if (triggeredCi) {
+    await dispatchValidation(deps.executeCiScriptsValidation, ctx);
+  }
 };
