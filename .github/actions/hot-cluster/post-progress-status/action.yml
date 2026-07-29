@@ -26,20 +26,12 @@ runs:
   steps:
     - name: Post progress status
       continue-on-error: true
-      uses: actions/github-script@v9
+      shell: bash
       env:
+        GITHUB_TOKEN: ${{ github.token }}
         STATUS_HEAD_SHA: ${{ inputs.head-sha }}
         STATUS_CONTEXT: ${{ inputs.status-context }}
         STATUS_STATE: ${{ inputs.state }}
         STATUS_DESCRIPTION: ${{ inputs.description }}
-      with:
-        script: |
-          await github.rest.repos.createCommitStatus({
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            sha: process.env.STATUS_HEAD_SHA,
-            context: process.env.STATUS_CONTEXT,
-            state: process.env.STATUS_STATE,
-            description: process.env.STATUS_DESCRIPTION,
-            target_url: `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
-          });
+      working-directory: .github/scripts
+      run: npx tsx src/e2e/post-progress-status.ts
