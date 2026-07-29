@@ -6,6 +6,8 @@
 
 import type { CommandContext } from './dispatcher';
 
+import { main as runValidationCommands } from '../validation/commands/index';
+
 export const executeValidationCommand = async (ctx: CommandContext): Promise<void> => {
   const { data: pullRequest } = await ctx.octokit.pulls.get({
     owner: ctx.owner,
@@ -22,5 +24,5 @@ export const executeValidationCommand = async (ctx: CommandContext): Promise<voi
   process.env.PR_HEAD_SHA = pullRequest.head.sha;
   process.env.PR_AUTHOR = pullRequest.user?.login ?? '';
 
-  await import('../validation/commands/index');
+  await runValidationCommands();
 };
