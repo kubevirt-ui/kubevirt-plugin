@@ -24,35 +24,5 @@ runs:
         CM_NAME: ${{ inputs.configmap-name }}
         CM_NS: ${{ inputs.ci-env-namespace }}
         TIMEOUT: ${{ inputs.timeout }}
-      run: |
-        if ! oc get configmap "${CM_NAME}" -n "${CM_NS}" &>/dev/null; then
-          echo "ConfigMap ${CM_NS}/${CM_NAME} not found, nothing to clean up."
-          exit 0
-        fi
-
-        oc patch configmap "${CM_NAME}" -n "${CM_NS}" \
-          --type merge -p '{"data":{"desired-state":"absent"}}'
-
-        echo "Waiting for controller to clean up..."
-        INTERVAL=5
-        ELAPSED=0
-
-        while true; do
-          STATUS="$(oc get configmap "${CM_NAME}" -n "${CM_NS}" \
-            -o jsonpath='{.data.status}' 2>/dev/null || echo "")"
-
-          if [[ "${STATUS}" == "cleaned" ]]; then
-            echo "Cleanup complete."
-            break
-          fi
-
-          if (( ELAPSED >= TIMEOUT )); then
-            echo "::warning::Timed out waiting for controller cleanup (status=${STATUS})"
-            break
-          fi
-
-          sleep "${INTERVAL}"
-          ELAPSED=$(( ELAPSED + INTERVAL ))
-        done
-
-        oc delete configmap "${CM_NAME}" -n "${CM_NS}" 2>/dev/null || true
+      working-directory: ci-scripts/hot-cluster/ts
+      run: npx tsx src/scripts/ci-env-release.ts
