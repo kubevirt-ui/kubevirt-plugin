@@ -16,7 +16,7 @@ import { parseCommand } from './parse-command';
 import type { CommandHandlers, CommandOutcome } from './process';
 import { processCommands, reportCommandFailure } from './process';
 
-const main = async (): Promise<void> => {
+export const main = async (): Promise<void> => {
   const commands = parseCommand(requireEnv('COMMENT_BODY'));
 
   const config: GitHubConfig = {
@@ -94,29 +94,31 @@ const main = async (): Promise<void> => {
   }
 
   if (failures.length > 0) {
-    process.exit(1);
+    throw new Error(`${failures.length} command(s) failed`);
   }
 };
 
-void main().catch(async (err) => {
-  console.error(safeErrorMessage(err));
+if (require.main === module) {
+  void main().catch(async (err) => {
+    console.error(safeErrorMessage(err));
 
-  // Reaching here means something failed *before* the per-command loop even
-  // started (e.g. requireEnv('GITHUB_TOKEN') throwing because a bot-token
-  // generation step failed) -- nothing has been reported yet. Best-effort
-  // report it against every requested command via the ambient/status token,
-  // which doesn't depend on the credential that just failed.
-  const owner = process.env.REPO_OWNER;
-  const repo = process.env.REPO_NAME;
-  const statusToken = process.env.STATUS_GITHUB_TOKEN ?? process.env.GITHUB_TOKEN;
+    // Reaching here means something failed *before* the per-command loop even
+    // started (e.g. requireEnv('GITHUB_TOKEN') throwing because a bot-token
+    // generation step failed) -- nothing has been reported yet. Best-effort
+    // report it against every requested command via the ambient/status token,
+    // which doesn't depend on the credential that just failed.
+    const owner = process.env.REPO_OWNER;
+    const repo = process.env.REPO_NAME;
+    const statusToken = process.env.STATUS_GITHUB_TOKEN ?? process.env.GITHUB_TOKEN;
 
-  if (owner && repo && statusToken) {
-    const commands = parseCommand(process.env.COMMENT_BODY ?? '');
-    const config: GitHubConfig = { owner, repo, token: statusToken };
-    for (const command of commands) {
-      await reportCommandFailure({ command, error: err }, config, process.env.PR_HEAD_SHA);
+    if (owner && repo && statusToken) {
+      const commands = parseCommand(process.env.COMMENT_BODY ?? '');
+      const config: GitHubConfig = { owner, repo, token: statusToken };
+      for (const command of commands) {
+        await reportCommandFailure({ command, error: err }, config, process.env.PR_HEAD_SHA);
+      }
     }
-  }
 
-  process.exit(1);
-});
+    process.exit(1);
+  });
+}

@@ -25,15 +25,14 @@ import { dispatchWorkflow } from '../shared/dispatch';
 import { getRepoContext } from '../shared/actions-context';
 import type { GitHubConfig } from '../types/index';
 import { requireEnv, safeErrorMessage } from '../utils';
-import { verifyMergePoolHoldRemoval, verifyMergePoolLabel } from '../validation/verify-merge-pool-labels/verify';
+import {
+  verifyMergePoolHoldRemoval,
+  verifyMergePoolLabel,
+} from '../validation/verify-merge-pool-labels/verify';
 
 const VERIFY_ON_LABELED = new Set(['lgtm', 'approved', 'do-not-merge/hold']);
 const RETEST_ON_LABELED = new Set(['lgtm', 'approved']);
-const RETEST_ON_UNLABELED = new Set([
-  'do-not-merge/hold',
-  'hold',
-  'needs-rebase',
-]);
+const RETEST_ON_UNLABELED = new Set(['do-not-merge/hold', 'hold', 'needs-rebase']);
 
 type Route = { verify: boolean; retest: boolean };
 
@@ -157,9 +156,7 @@ const main = async (): Promise<void> => {
     token: requireEnv('GITHUB_TOKEN'),
   };
 
-  console.log(
-    `Label "${labelName}" (${action}) → verify=${route.verify}, retest=${route.retest}`,
-  );
+  console.log(`Label "${labelName}" (${action}) → verify=${route.verify}, retest=${route.retest}`);
 
   if (route.verify) {
     await runVerify(config, action);

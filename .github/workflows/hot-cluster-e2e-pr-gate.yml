@@ -38,6 +38,7 @@ jobs:
         with:
           app-id: ${{ secrets.BOT_APP_ID }}
           private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
+          permission-checks: write
 
       - name: Clear stale e2e-passed/e2e-failed on push
         if: github.event.action == 'synchronize'
