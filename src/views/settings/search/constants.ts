@@ -26,6 +26,7 @@ export const DOWNLOADS_TAB_IDS = {
 
 export const USER_TAB_IDS = {
   autoHideNav: 'auto-hide-nav',
+  defaultVMLabels: 'default-vm-labels',
   general: 'general',
   gettingStarted: 'getting-started',
   guidedTour: 'guided-tour',

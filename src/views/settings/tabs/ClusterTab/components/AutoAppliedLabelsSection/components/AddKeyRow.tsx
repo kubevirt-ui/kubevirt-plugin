@@ -7,6 +7,8 @@ import { validateLabelEntry } from '@kubevirt-utils/utils/labelValidation/labelV
 import {
   Button,
   ButtonVariant,
+  Flex,
+  FlexItem,
   Grid,
   GridItem,
   HelperText,
@@ -48,20 +50,26 @@ const AddKeyRow: FC<AddKeyRowProps> = ({ existingKeys, isDisabled, onAdd, onCanc
             <LabelKeyInput existingKeys={existingKeys} onChange={setKey} value={key} />
           </SplitItem>
           <SplitItem>
-            <Button
-              aria-label={t('Confirm')}
-              icon={<CheckIcon />}
-              isDisabled={!canConfirm}
-              onClick={onConfirm}
-              variant={ButtonVariant.plain}
-            />
-            <Button
-              aria-label={t('Cancel')}
-              icon={<TrashIcon />}
-              isDisabled={isDisabled}
-              onClick={onCancel}
-              variant={ButtonVariant.plain}
-            />
+            <Flex flexWrap={{ default: 'nowrap' }} spaceItems={{ default: 'spaceItemsNone' }}>
+              <FlexItem>
+                <Button
+                  aria-label={t('Confirm')}
+                  icon={<CheckIcon />}
+                  isDisabled={!canConfirm}
+                  onClick={onConfirm}
+                  variant={ButtonVariant.plain}
+                />
+              </FlexItem>
+              <FlexItem>
+                <Button
+                  aria-label={t('Cancel')}
+                  icon={<TrashIcon />}
+                  isDisabled={isDisabled}
+                  onClick={onCancel}
+                  variant={ButtonVariant.plain}
+                />
+              </FlexItem>
+            </Flex>
           </SplitItem>
         </Split>
         {keyError && (

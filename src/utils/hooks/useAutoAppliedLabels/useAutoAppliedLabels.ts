@@ -8,6 +8,13 @@ import { useSettingsCluster } from '@settings/context/SettingsClusterContext';
 
 import { AutoAppliedLabel, UseAutoAppliedLabelsResult } from './types';
 
+const isAutoAppliedLabel = (entry: unknown): entry is AutoAppliedLabel =>
+  typeof entry === 'object' &&
+  entry !== null &&
+  typeof (entry as AutoAppliedLabel).key === 'string' &&
+  typeof (entry as AutoAppliedLabel).value === 'string' &&
+  typeof (entry as AutoAppliedLabel).required === 'boolean';
+
 const parseLabels = (raw: string | undefined): AutoAppliedLabel[] => {
   if (!raw) {
     return [];
@@ -15,7 +22,7 @@ const parseLabels = (raw: string | undefined): AutoAppliedLabel[] => {
 
   try {
     const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : [];
+    return Array.isArray(parsed) ? parsed.filter(isAutoAppliedLabel) : [];
   } catch {
     return [];
   }

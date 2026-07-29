@@ -3,6 +3,7 @@ import React, { FC } from 'react';
 import { Divider } from '@patternfly/react-core';
 import { useIsSettingsSpokeCluster } from '@settings/context/SettingsClusterContext';
 
+import DefaultVMLabelsSection from './components/DefaultVMLabelsSection/DefaultVMLabelsSection';
 import GeneralSection from './components/GeneralSection/GeneralSection';
 import GettingStartedSection from './components/GettingStartedSection/GettingStartedSection';
 import ManageSSHKeySection from './components/ManageSSHKeySection/ManageSSHKeySection';
@@ -18,6 +19,8 @@ const UserTab: FC = () => {
       <GeneralSection />
       <Divider className="settings-tab__section-divider" />
       <ManageSSHKeySection />
+      <Divider className="settings-tab__section-divider" />
+      <DefaultVMLabelsSection />
       <Divider className="settings-tab__section-divider" />
       <TaskPermissionsSection />
       {!isSpokeCluster && (

@@ -7,6 +7,8 @@ import { Grid, GridItem, Switch } from '@patternfly/react-core';
 import AutoAppliedLabelKeyCell from './AutoAppliedLabelKeyCell';
 import AutoAppliedLabelValueCell from './AutoAppliedLabelValueCell';
 
+import '@settings/tabs/components/settings-label-cell.scss';
+
 type AutoAppliedLabelRowProps = {
   existingKeys: string[];
   isDisabled: boolean;
@@ -36,14 +38,9 @@ const AutoAppliedLabelRow: FC<AutoAppliedLabelRowProps> = ({
         />
       </GridItem>
       <GridItem span={5}>
-        <AutoAppliedLabelValueCell
-          existingKeys={existingKeys}
-          isDisabled={isDisabled}
-          label={label}
-          onUpdate={onUpdate}
-        />
+        <AutoAppliedLabelValueCell isDisabled={isDisabled} label={label} onUpdate={onUpdate} />
       </GridItem>
-      <GridItem span={2}>
+      <GridItem className="settings-label-cell__row" span={2}>
         <Switch
           aria-label={t('Required')}
           isChecked={label.required}
