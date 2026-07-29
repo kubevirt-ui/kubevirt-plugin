@@ -1,13 +1,14 @@
 import { useMemo } from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useQueryParamsMethods } from '@kubevirt-utils/components/ListPageFilter/hooks/useQueryParamsMethods';
 import useQuery from '@kubevirt-utils/hooks/useQuery';
 import useVMsInNamespace from '@kubevirt-utils/hooks/useVMsInNamespace';
-import { getLabel, getNamespace } from '@kubevirt-utils/resources/shared';
+import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
 import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
+
+import { isVMInGroup } from '../utils';
 
 type RemoveFolderQuery = ((newFolderName: string) => void) | null;
 
@@ -27,15 +28,13 @@ const useRemoveFolderQuery = (vmsToMove: V1VirtualMachine[]): RemoveFolderQuery 
     return null;
   }
 
-  const removeFolderQuery = (newFolderName: string) => {
+  const removeFolderQuery = (newFolderName: string): void => {
     const groupsToRemove = currentGroups.filter((group) => {
       // VMs are moving into this group — it won't become empty
       if (group === newFolderName) return false;
 
-      const isVMInGroup = (vm: V1VirtualMachine) => getLabel(vm, VM_FOLDER_LABEL) === group;
-
-      const vmsInGroup = allVMsInNamespace.filter(isVMInGroup);
-      const movedFromGroup = vmsToMove.filter(isVMInGroup);
+      const vmsInGroup = allVMsInNamespace.filter(isVMInGroup(group));
+      const movedFromGroup = vmsToMove.filter(isVMInGroup(group));
 
       return !isEmpty(movedFromGroup) && movedFromGroup.length === vmsInGroup.length;
     });

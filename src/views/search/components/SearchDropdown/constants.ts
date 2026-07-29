@@ -129,15 +129,15 @@ export const SEARCH_KEY_BADGES: SearchKeyBadge[] = [
 ];
 
 export const getSearchKeyBadges = (isACMPage: boolean, foldersEnabled: boolean): SearchKeyBadge[] =>
-  SEARCH_KEY_BADGES.map((badge) => {
-    if (!foldersEnabled && badge.filterType === VirtualMachineRowFilterType.Group) {
-      return undefined;
+  SEARCH_KEY_BADGES.filter((badge) => {
+    if (badge.filterType === VirtualMachineRowFilterType.Group) {
+      return foldersEnabled;
     }
-    if (!isACMPage && badge.filterType === VirtualMachineRowFilterType.Cluster) {
-      return undefined;
+    if (badge.filterType === VirtualMachineRowFilterType.Cluster) {
+      return isACMPage;
     }
-    return badge;
-  }).filter(Boolean);
+    return true;
+  });
 
 export const getSearchExamples = (t: TFunction): SearchExample[] => [
   {
