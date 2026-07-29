@@ -31,13 +31,17 @@ export const getTemplateCategoryPatch = ({
 
   if (!isEmpty(categoryLabelValue)) {
     return [
+      ...(isEmpty(currentLabels)
+        ? [
+            {
+              op: 'add' as const,
+              path: '/metadata/labels',
+              value: {},
+            },
+          ]
+        : []),
       {
-        op: 'add',
-        path: '/metadata/labels',
-        value: {},
-      },
-      {
-        op: 'add',
+        op: hasCategoryLabel ? 'replace' : 'add',
         path: categoryPath,
         value: categoryLabelValue,
       },

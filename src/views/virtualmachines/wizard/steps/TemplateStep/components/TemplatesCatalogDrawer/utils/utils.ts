@@ -4,7 +4,7 @@ import {
   V1ContainerDiskSource,
   V1VirtualMachine,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { V1alpha1VirtualMachineTemplateSpecParameters } from '@kubevirt-ui-ext/kubevirt-api/virt-template';
+import { V1beta1VirtualMachineTemplateSpecParameters } from '@kubevirt-ui-ext/kubevirt-api/virt-template';
 import {
   getParameters,
   isOpenShiftTemplate,
@@ -64,7 +64,7 @@ export const changeTemplateParameterValue = (
 
   if (isOpenShiftTemplate(template)) template.parameters = parameters;
   if (isVirtualMachineTemplate(template))
-    template.spec.parameters = parameters as V1alpha1VirtualMachineTemplateSpecParameters[];
+    template.spec.parameters = parameters as V1beta1VirtualMachineTemplateSpecParameters[];
 
   return template;
 };

@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 import { useDebounceCallback } from 'src/views/clusteroverview/utils/hooks/useDebounceCallback';
 
 import { useApplyFiltersWithQuery } from '@kubevirt-utils/components/ListPageFilter/hooks/useApplyFiltersWithQuery';
-import { OnFilterChange } from '@openshift-console/dynamic-plugin-sdk';
+import { type OnFilterChange } from '@openshift-console/dynamic-plugin-sdk';
 import { getRowFilterQueryKey } from '@search/utils/query';
 
 import useQuery from '../useQuery';
@@ -16,8 +16,8 @@ export type UniversalFilter = {
   isSelected: (queryKey: string, value: string) => boolean;
   onSelect: (queryKey: string, value: string) => void;
   queryParams: URLSearchParams;
-  setValue: (queryKey: string, value: string) => void;
-  setValueWithDebounce: (queryKey: string, value: string) => void;
+  setValue: (queryKey: string, value?: string | string[]) => void;
+  setValueWithDebounce: (queryKey: string, value?: string | string[]) => void;
 };
 
 type UseUniversalFilter = (props: UniversalFilterProps) => UniversalFilter;
@@ -47,7 +47,7 @@ const useUniversalFilter: UseUniversalFilter = ({ onFilterChange }) => {
       applyFiltersWithQuery(
         queryKey,
         selectedValues.includes(value)
-          ? selectedValues.filter((v) => v !== value)
+          ? selectedValues.filter((selectedValue) => selectedValue !== value)
           : [...selectedValues, value],
       );
     },
@@ -55,7 +55,7 @@ const useUniversalFilter: UseUniversalFilter = ({ onFilterChange }) => {
   );
 
   const setValue = useCallback(
-    (queryKey: string, value: string) => applyFiltersWithQuery(queryKey, value),
+    (queryKey: string, value?: string | string[]) => applyFiltersWithQuery(queryKey, value),
     [applyFiltersWithQuery],
   );
 

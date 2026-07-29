@@ -1,8 +1,8 @@
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
-import { ExtendedRowFilterItem } from '@kubevirt-utils/components/ListPageFilter/types';
-import { UniversalFilter } from '@kubevirt-utils/hooks/useUniversalFilter/useUniversalFilter';
-import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
+import { type ExtendedRowFilterItem } from '@kubevirt-utils/components/ListPageFilter/types';
+import { type UniversalFilter } from '@kubevirt-utils/hooks/useUniversalFilter/useUniversalFilter';
+import { type RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 import { Checkbox, Stack, StackItem } from '@patternfly/react-core';
 
 type TemplatesSidebarCheckboxGroupProps = {
