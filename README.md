@@ -155,4 +155,3 @@ config to enable the plugin.
 oc patch consoles.operator.openshift.io cluster \
   --patch '{ "spec": { "plugins": ["kubevirt-plugin"] } }' --type=merge
 ```
-
