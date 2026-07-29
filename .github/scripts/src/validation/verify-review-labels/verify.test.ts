@@ -98,7 +98,7 @@ describe('verifyReviewLabel', () => {
     );
 
     assert.equal(calls.length, 0);
-    assert.equal(dispatched.length, 0);
+    assert.deepEqual(dispatched, ['ai', 'ci']);
   });
 
   it('does not exempt an unrelated bot/app -- only the exact approval bot login is trusted', async () => {
@@ -110,7 +110,7 @@ describe('verifyReviewLabel', () => {
     );
 
     assert.equal(calls.length, 1);
-    assert.deepEqual(dispatched, ['ai']);
+    assert.deepEqual(dispatched, ['ai', 'ci']);
   });
 
   it('does not exempt an unrelated bot/app on a skip-* label either', async () => {
@@ -123,7 +123,7 @@ describe('verifyReviewLabel', () => {
 
     assert.equal(calls.length, 1);
     assert.equal((calls[0].args as { name: string }).name, 'skip-ai-config-check');
-    assert.deepEqual(dispatched, ['ai']);
+    assert.deepEqual(dispatched, ['ai', 'ci']);
   });
 
   it('leaves the label in place for an OWNERS-listed sender', async () => {
@@ -135,10 +135,10 @@ describe('verifyReviewLabel', () => {
     );
 
     assert.equal(calls.length, 0);
-    assert.equal(dispatched.length, 0);
+    assert.deepEqual(dispatched, ['ai', 'ci']);
   });
 
-  it('strips the label and dispatches AI validation for an unauthorized sender on an AI label', async () => {
+  it('strips the label and dispatches validation for an unauthorized sender on an AI label', async () => {
     const calls: Call[] = [];
     const dispatched: string[] = [];
     await verifyReviewLabel(
@@ -148,10 +148,10 @@ describe('verifyReviewLabel', () => {
 
     assert.equal(calls.length, 1);
     assert.equal((calls[0].args as { name: string }).name, 'ai-config-reviewed');
-    assert.deepEqual(dispatched, ['ai']);
+    assert.deepEqual(dispatched, ['ai', 'ci']);
   });
 
-  it('strips the label and dispatches CI validation for an unauthorized sender on a CI label', async () => {
+  it('strips the label and dispatches validation for an unauthorized sender on a CI label', async () => {
     const calls: Call[] = [];
     const dispatched: string[] = [];
     await verifyReviewLabel(
@@ -161,13 +161,12 @@ describe('verifyReviewLabel', () => {
 
     assert.equal(calls.length, 1);
     assert.equal((calls[0].args as { name: string }).name, 'ci-scripts-reviewed');
-    assert.deepEqual(dispatched, ['ci']);
+    assert.deepEqual(dispatched, ['ai', 'ci']);
   });
 
   it('reconciles other watched labels on the PR when an unauthorized label is added during verification', async () => {
     const calls: Call[] = [];
     const dispatched: string[] = [];
-    // Authorized AI reviewed already present; untrusted CI skip is the trigger.
     await verifyReviewLabel(
       buildCtx({ labelName: 'skip-ci-scripts-check', sender: 'random-user' }, calls, [
         { actor: 'alice-approver', label: 'ai-config-reviewed' },
@@ -184,7 +183,7 @@ describe('verifyReviewLabel', () => {
       calls.some((c) => (c.args as { name: string }).name === 'ai-config-reviewed'),
       false,
     );
-    assert.deepEqual(dispatched, ['ci']);
+    assert.deepEqual(dispatched, ['ai', 'ci']);
   });
 
   it('swallows HandledValidationError from the re-run validation', async () => {

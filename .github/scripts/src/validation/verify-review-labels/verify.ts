@@ -123,7 +123,6 @@ export const verifyReviewLabel = async (
   }
 
   const senderTrusted = await isEventSenderTrusted(ctx);
-  const stripped = { ai: false, ci: false };
 
   for (const labelName of labelsToCheck) {
     const trusted =
@@ -144,23 +143,14 @@ export const verifyReviewLabel = async (
         : `"${labelName}" is not trusted -- stripping.`,
     );
 
-    if (trusted) {
-      continue;
-    }
-
-    await removeLabel(ctx.octokit, ctx.config.owner, ctx.config.repo, ctx.prNumber, labelName);
-    if (AI_LABELS.has(labelName)) {
-      stripped.ai = true;
-    }
-    if (CI_LABELS.has(labelName)) {
-      stripped.ci = true;
+    if (!trusted) {
+      await removeLabel(ctx.octokit, ctx.config.owner, ctx.config.repo, ctx.prNumber, labelName);
     }
   }
 
-  if (stripped.ai) {
-    await dispatchValidation(deps.executeAiConfigValidation, ctx);
-  }
-  if (stripped.ci) {
-    await dispatchValidation(deps.executeCiScriptsValidation, ctx);
-  }
+  // Always re-run both validations — they compute pass/fail from current
+  // label state. Whether labels were stripped or left in place, the commit
+  // status should reflect the latest truth.
+  await dispatchValidation(deps.executeAiConfigValidation, ctx);
+  await dispatchValidation(deps.executeCiScriptsValidation, ctx);
 };

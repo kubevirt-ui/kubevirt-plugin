@@ -19,35 +19,29 @@ on:
   pull_request_review:
     types: [submitted]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}-${{ github.event.review.id }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 
 jobs:
   capture-review:
     name: Capture Review Event
-    if: >-
-      !endsWith(github.event.review.user.login, '[bot]') &&
-      (github.event.review.state == 'approved' || github.event.review.state == 'changes_requested')
     runs-on: ubuntu-latest
     timeout-minutes: 2
     steps:
-      - name: Checkout
-        uses: actions/checkout@v7
-        with:
-          persist-credentials: false
-
       - name: Setup scripts
         uses: ./.github/actions/setup-gh-scripts
         with:
           ref: ${{ github.sha }}
 
-      # No API calls, no secrets -- just the review's own event-payload
-      # fields, which are GitHub-computed and safe to trust even though
-      # this event can come from a fork PR.
       - name: Write review data
         working-directory: .github/scripts
         env:
           PR_NUMBER: ${{ github.event.pull_request.number }}
+          REVIEW_USER: ${{ github.event.review.user.login }}
           REVIEW_STATE: ${{ github.event.review.state == 'approved' && 'APPROVED' || 'CHANGES_REQUESTED' }}
           REVIEW_AUTHOR: ${{ github.event.review.user.login }}
           PR_AUTHOR: ${{ github.event.pull_request.user.login }}
@@ -55,6 +49,7 @@ jobs:
         run: npx tsx src/commands/write-review-data.ts
 
       - name: Upload review data
+        if: hashFiles('.github/scripts/review-data.json') != ''
         uses: actions/upload-artifact@v4
         with:
           name: review-data
