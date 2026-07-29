@@ -26,6 +26,7 @@ export const createInitialVMWizardFormValues = ({
     volumeSnapshotSource: null,
   },
   stepNavigation: {
+    currentStep: VMWizardStep.DEPLOYMENT_DETAILS,
     visitedSteps: new Set([VMWizardStep.DEPLOYMENT_DETAILS]),
   },
   uiState: {
@@ -34,6 +35,7 @@ export const createInitialVMWizardFormValues = ({
     shouldCheckVMNameProperly: false,
   },
   vmData: {
+    autoLabelsMerged: false,
     cluster,
     creationMethod: VMCreationMethod.INSTANCE_TYPE,
     description: '',
@@ -45,6 +47,7 @@ export const createInitialVMWizardFormValues = ({
 });
 
 export const CREATE_VM_FORM_FIELDS_VM_DATA: Record<string, FieldPath<VMWizardFormValues>> = {
+  AUTO_LABELS_MERGED: 'vmData.autoLabelsMerged',
   CLUSTER: 'vmData.cluster',
   CREATION_METHOD: 'vmData.creationMethod',
   DESCRIPTION: 'vmData.description',
@@ -65,6 +68,7 @@ export const CREATE_VM_FORM_FIELDS_STEP_NAVIGATION: Record<
   string,
   FieldPath<VMWizardFormValues>
 > = {
+  CURRENT_STEP: 'stepNavigation.currentStep',
   VISITED_STEPS: 'stepNavigation.visitedSteps',
 };
 

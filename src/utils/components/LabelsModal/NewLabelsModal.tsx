@@ -1,6 +1,7 @@
-import React, { FC } from 'react';
+import React, { FC, useMemo } from 'react';
 
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
+import useAutoAppliedLabels from '@kubevirt-utils/hooks/useAutoAppliedLabels/useAutoAppliedLabels';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { Button, ButtonVariant, Grid, GridItem, Stack, StackItem } from '@patternfly/react-core';
@@ -25,6 +26,12 @@ const NewLabelsModal: FC<NewLabelsModalProps> = ({
   onLabelsSubmit,
 }) => {
   const { t } = useKubevirtTranslation();
+  const { labels: autoAppliedLabels } = useAutoAppliedLabels();
+
+  const protectedKeys = useMemo(
+    () => new Map(autoAppliedLabels.map((label) => [label.key, Boolean(label.value)])),
+    [autoAppliedLabels],
+  );
 
   const {
     existingKeys,
@@ -61,6 +68,8 @@ const NewLabelsModal: FC<NewLabelsModalProps> = ({
               <LabelRow
                 existingKeys={existingKeys}
                 initialKeys={initialKeys}
+                isKeyProtected={protectedKeys.has(entry.key)}
+                isValueProtected={protectedKeys.get(entry.key) === true}
                 key={entry.id}
                 label={entry}
                 onChange={(updated) => onLabelChange(entry.id, updated)}

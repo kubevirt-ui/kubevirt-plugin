@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router';
 
 import NewLabelsModal from '@kubevirt-utils/components/LabelsModal/NewLabelsModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import useAutoAppliedLabels from '@kubevirt-utils/hooks/useAutoAppliedLabels/useAutoAppliedLabels';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getLabels, getNamespace } from '@kubevirt-utils/resources/shared';
 import { isSystemKey } from '@kubevirt-utils/utils/labelValidation/labelValidation';
@@ -24,12 +25,27 @@ const LabelsTable: FC<LabelsTableProps> = ({ editable = true, onLabelsSubmit, re
   const { createModal } = useModal();
   const navigate = useNavigate();
 
+  const { labels: autoAppliedLabels, loaded: autoAppliedLoaded } = useAutoAppliedLabels();
+  const autoAppliedMap = useMemo(
+    () => new Map(autoAppliedLabels.map((label) => [label.key, label])),
+    [autoAppliedLabels],
+  );
+
   const allLabels = useMemo(() => getLabels(resource, {}), [resource]);
   const entries = useMemo(() => Object.entries(allLabels), [allLabels]);
 
-  const canDelete = useCallback((key: string): boolean => !isSystemKey(key), []);
+  const canDelete = useCallback(
+    (key: string): boolean => autoAppliedLoaded && !isSystemKey(key) && !autoAppliedMap.has(key),
+    [autoAppliedLoaded, autoAppliedMap],
+  );
 
-  const onAdd = useCallback(
+  const canEdit = useCallback(
+    (key: string): boolean =>
+      autoAppliedLoaded && autoAppliedMap.has(key) && !autoAppliedMap.get(key)?.value,
+    [autoAppliedLoaded, autoAppliedMap],
+  );
+
+  const openLabelsModal = useCallback(
     (): void =>
       createModal(({ isOpen, onClose }) => (
         <NewLabelsModal
@@ -75,13 +91,15 @@ const LabelsTable: FC<LabelsTableProps> = ({ editable = true, onLabelsSubmit, re
     <LabelsAnnotationsTable
       addButtonLabel={t('Add labels')}
       canDelete={canDelete}
+      canEdit={canEdit}
       dataTest="labels-card"
       editable={editable}
       emptyMessage={t('No labels yet.')}
       entries={entries}
       helpText={t('Labels can be used to organize and categorize VMs.')}
-      onAdd={onAdd}
+      onAdd={openLabelsModal}
       onDelete={onDelete}
+      onEdit={openLabelsModal}
       renderValue={renderValue}
       searchId="labels"
       title={t('Labels')}

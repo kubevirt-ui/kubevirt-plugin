@@ -9,6 +9,7 @@ import { isPodNetwork } from '@kubevirt-utils/resources/vm/utils/network/selecto
 import { removePodNetworkFromVM } from '@kubevirt-utils/resources/vm/utils/network/utils';
 import { customizeWizardVMSignal } from '@kubevirt-utils/signals/customizeWizardVMSignal';
 import { Stack, StackItem, Title, TitleSizes } from '@patternfly/react-core';
+import useApplyAutoLabels from '@virtualmachines/wizard/hooks/useApplyAutoLabels';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
 import { CREATE_VM_FORM_FIELDS_VM_DATA } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
 import CustomizeVirtualMachine from '@virtualmachines/wizard/steps/CustomizationStep/components/CustomizeVirtualMachine/CustomizeVirtualMachine';
@@ -19,6 +20,8 @@ const CustomizationStep: FC = () => {
   const cluster = useWatch({ control, name: CREATE_VM_FORM_FIELDS_VM_DATA.CLUSTER });
   const isIPv6SingleStack = useIsIPv6SingleStackCluster(cluster);
   const vm = customizeWizardVMSignal.value;
+
+  useApplyAutoLabels();
 
   useEffect(() => {
     if (isIPv6SingleStack && vm && getNetworks(vm)?.some(isPodNetwork)) {

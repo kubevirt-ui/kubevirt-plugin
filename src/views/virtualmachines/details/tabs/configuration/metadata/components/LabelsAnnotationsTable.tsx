@@ -11,8 +11,10 @@ import {
   CardBody,
   CardHeader,
   CardTitle,
+  Split,
+  SplitItem,
 } from '@patternfly/react-core';
-import { MinusCircleIcon } from '@patternfly/react-icons';
+import { MinusCircleIcon, PencilAltIcon } from '@patternfly/react-icons';
 import { Table, Tbody, Td, Th, Thead, Tr } from '@patternfly/react-table';
 
 import MetadataEmptyState from './MetadataEmptyState';
@@ -20,6 +22,7 @@ import MetadataEmptyState from './MetadataEmptyState';
 type LabelsAnnotationsTableProps = {
   addButtonLabel: string;
   canDelete?: (key: string) => boolean;
+  canEdit?: (key: string) => boolean;
   dataTest: string;
   editable: boolean;
   emptyMessage: string;
@@ -27,6 +30,7 @@ type LabelsAnnotationsTableProps = {
   helpText: string;
   onAdd: () => void;
   onDelete: (key: string) => void;
+  onEdit?: (key: string) => void;
   renderValue: (key: string, value: string) => ReactNode;
   searchId: string;
   title: string;
@@ -35,6 +39,7 @@ type LabelsAnnotationsTableProps = {
 const LabelsAnnotationsTable: FC<LabelsAnnotationsTableProps> = ({
   addButtonLabel,
   canDelete = (): boolean => true,
+  canEdit,
   dataTest,
   editable,
   emptyMessage,
@@ -42,6 +47,7 @@ const LabelsAnnotationsTable: FC<LabelsAnnotationsTableProps> = ({
   helpText,
   onAdd,
   onDelete,
+  onEdit,
   renderValue,
   searchId,
   title,
@@ -103,15 +109,29 @@ const LabelsAnnotationsTable: FC<LabelsAnnotationsTableProps> = ({
                 <Td dataLabel={t('Value')}>{renderValue(key, value)}</Td>
                 {editable && (
                   <Td className="pf-v6-c-table__action">
-                    {canDelete(key) && (
-                      <Button
-                        aria-label={t('Remove {{key}}', { key })}
-                        data-test={`delete-${searchId}-${key}`}
-                        icon={<MinusCircleIcon />}
-                        onClick={() => onDelete(key)}
-                        variant={ButtonVariant.plain}
-                      />
-                    )}
+                    <Split>
+                      {canEdit?.(key) && (
+                        <SplitItem>
+                          <Button
+                            aria-label={t('Edit {{key}}', { key })}
+                            data-test={`edit-${searchId}-${key}`}
+                            icon={<PencilAltIcon />}
+                            onClick={() => onEdit?.(key)}
+                            variant={ButtonVariant.plain}
+                          />
+                        </SplitItem>
+                      )}
+                      <SplitItem>
+                        <Button
+                          aria-label={t('Remove {{key}}', { key })}
+                          data-test={`delete-${searchId}-${key}`}
+                          icon={<MinusCircleIcon />}
+                          isDisabled={!canDelete(key)}
+                          onClick={() => onDelete(key)}
+                          variant={ButtonVariant.plain}
+                        />
+                      </SplitItem>
+                    </Split>
                   </Td>
                 )}
               </Tr>

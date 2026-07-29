@@ -11,6 +11,7 @@ export type SelectedInstanceType = { name: string; namespace: null | string };
 
 /** VM identity, placement, and provisioning choices collected across wizard steps. */
 type VMWizardVirtualMachineData = {
+  autoLabelsMerged: boolean;
   cluster: string;
   creationMethod: VMCreationMethod;
   description: string;
@@ -29,6 +30,7 @@ type VMWizardUIState = {
 
 /** Wizard flow position and per-step next-button availability. */
 type VMWizardStepNavigation = {
+  currentStep: string;
   visitedSteps: Set<string>;
 };
 

@@ -1,6 +1,8 @@
 import { useCallback, useMemo } from 'react';
 import { useWatch } from 'react-hook-form';
 
+import useAutoAppliedLabels from '@kubevirt-utils/hooks/useAutoAppliedLabels/useAutoAppliedLabels';
+import { getLabels } from '@kubevirt-utils/resources/shared';
 import { customizeWizardVMSignal } from '@kubevirt-utils/signals/customizeWizardVMSignal';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { isDNS1123Label } from '@kubevirt-utils/utils/validation';
@@ -24,6 +26,7 @@ const useWizardStepValidation = (): WizardStepValidation => {
   useSignals();
   const { control } = useVMWizard();
   const [
+    autoLabelsMerged,
     creationMethod,
     name,
     selectedTemplate,
@@ -38,6 +41,7 @@ const useWizardStepValidation = (): WizardStepValidation => {
   ] = useWatch({
     control,
     name: [
+      CREATE_VM_FORM_FIELDS_VM_DATA.AUTO_LABELS_MERGED,
       CREATE_VM_FORM_FIELDS_VM_DATA.CREATION_METHOD,
       CREATE_VM_FORM_FIELDS_VM_DATA.NAME,
       CREATE_VM_FORM_FIELDS_VM_DATA.SELECTED_TEMPLATE,
@@ -52,8 +56,18 @@ const useWizardStepValidation = (): WizardStepValidation => {
     ],
   });
 
+  const { labels: autoAppliedLabels } = useAutoAppliedLabels();
+
   const activeFlow = useMemo(() => getActiveFlow(creationMethod), [creationMethod]);
   const currentVMSignalValue = customizeWizardVMSignal.value;
+
+  const hasRequiredLabelsMissing = useMemo(() => {
+    if (!autoLabelsMerged) return false;
+    const vmLabels = getLabels(currentVMSignalValue, {});
+    return autoAppliedLabels.some(
+      (label) => label.required && !String(vmLabels[label.key] ?? '').trim(),
+    );
+  }, [autoAppliedLabels, currentVMSignalValue, autoLabelsMerged]);
 
   const stepNextDisabled: Record<VMWizardStep, boolean> = useMemo(() => {
     const isRedHatProvided = Boolean(selectedSeries) && Boolean(selectedSize);
@@ -65,7 +79,7 @@ const useWizardStepValidation = (): WizardStepValidation => {
       [VMWizardStep.BOOT_SOURCE]: useBootSource && isEmpty(selectedBootableVolume),
       [VMWizardStep.CLONE]: isEmpty(currentVMSignalValue),
       [VMWizardStep.COMPUTE_RESOURCES]: !isRedHatProvided && !isUserProvided,
-      [VMWizardStep.CUSTOMIZATION]: false,
+      [VMWizardStep.CUSTOMIZATION]: hasRequiredLabelsMissing,
       [VMWizardStep.DEPLOYMENT_DETAILS]: !isValidVMName,
       [VMWizardStep.GUEST_OS]: !operatingSystemType || !preference,
       [VMWizardStep.REVIEW_AND_CREATE]: false,
@@ -74,6 +88,7 @@ const useWizardStepValidation = (): WizardStepValidation => {
   }, [
     creationMethod,
     currentVMSignalValue,
+    hasRequiredLabelsMissing,
     name,
     operatingSystemType,
     preference,
