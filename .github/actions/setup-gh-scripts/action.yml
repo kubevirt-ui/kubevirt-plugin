@@ -15,7 +15,7 @@ runs:
         ref: ${{ inputs.ref }}
         sparse-checkout: |
           .github/scripts
-          .github/actions/setup-gh-scripts
+          .github/actions
           ci-scripts/hot-cluster/js
         persist-credentials: false
 
