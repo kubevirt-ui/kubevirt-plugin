@@ -11,16 +11,13 @@ import {
   ResourceLink,
   Timestamp,
 } from '@openshift-console/dynamic-plugin-sdk';
-import {
-  ActionList,
-  ActionListItem,
-  Bullseye,
-  Pagination,
-  SearchInput,
-} from '@patternfly/react-core';
+import { ActionList, ActionListItem, Pagination, SearchInput } from '@patternfly/react-core';
 import { Table, TableVariant, Tbody, Td, Th, Thead, Tr } from '@patternfly/react-table';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
-import { CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
+import {
+  CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA,
+  CREATE_VM_FORM_FIELDS_VM_DATA,
+} from '@virtualmachines/wizard/state/vm-wizard-form/consts';
 import { InstanceTypes } from '@virtualmachines/wizard/utils/types';
 
 import UserProvidedInstanceTypesEmptyState from './components/UserProvidedInstanceTypesEmptyState';
@@ -28,6 +25,7 @@ import useInstanceTypeListColumns from './hooks/useInstanceTypeListColumn';
 import { paginationDefaultValues, paginationInitialState } from './utils/constants';
 
 import './UserProvidedInstanceTypeList.scss';
+import UserProvidedComputeResourcesEmptyState from './components/UserProvidedComputeResourcesEmptyState';
 
 type UserProvidedInstanceTypesListProps = {
   userProvidedInstanceTypes: InstanceTypes;
@@ -42,6 +40,10 @@ const UserProvidedInstanceTypesList: FC<UserProvidedInstanceTypesListProps> = ({
   const selectedInstanceType = useWatch({
     control,
     name: CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.SELECTED_INSTANCE_TYPE,
+  });
+  const namespace = useWatch({
+    control,
+    name: CREATE_VM_FORM_FIELDS_VM_DATA.PROJECT,
   });
 
   const [searchInput, setSearchInput] = useState('');
@@ -70,11 +72,7 @@ const UserProvidedInstanceTypesList: FC<UserProvidedInstanceTypesListProps> = ({
   );
 
   if (isAllNamespaces(activeNamespace) && isEmpty(userProvidedInstanceTypes)) {
-    return (
-      <Bullseye className={'instance-type-list__all-projects'}>
-        {t('Select a project in order to see user-provided InstanceTypes')}
-      </Bullseye>
-    );
+    return <UserProvidedComputeResourcesEmptyState namespace={namespace} />;
   }
 
   const handleRowClick = (itName: string, itNamespace: string) => {
