@@ -13,13 +13,20 @@ import type { PrValidationCheck } from './run-checks';
 import { runChecksIsolated } from './run-checks';
 
 const main = async (): Promise<void> => {
+  const eventAction = process.env.GITHUB_EVENT_ACTION;
+  const titleChanged = process.env.TITLE_CHANGED === 'true';
+
+  if (eventAction === 'edited' && !titleChanged) {
+    console.log('Body-only edit -- title unchanged, nothing to re-validate.');
+    return;
+  }
+
   const config = buildConfigFromEnv();
 
   const prNumber = parseInt(requireEnv('PR_NUMBER'), 10);
   const prTitle = requireEnv('PR_TITLE');
   const baseBranch = requireEnv('BASE_BRANCH');
   const headSha = process.env.PR_HEAD_SHA;
-  const eventAction = process.env.GITHUB_EVENT_ACTION;
 
   const octokit = createOctokit(config);
   // Started once and shared (a Promise memoizes itself) between ai-config and

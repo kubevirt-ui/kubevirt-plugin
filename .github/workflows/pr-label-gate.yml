@@ -1,10 +1,5 @@
 name: PR Label Gate
 
-# Consolidated from ok-to-test-gate.yml + verify-review-labels.yml.
-#
-# A single job handles routing based on the added label. This avoids
-# multiple "Skipped" entries in the PR checks UI -- the job exits
-# cleanly when no action is needed.
 on:
   pull_request_target:
     types: [labeled]
@@ -27,51 +22,21 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - name: Evaluate label
-        id: eval
-        env:
-          LABEL: ${{ github.event.label.name }}
-          PR_LABELS: ${{ toJSON(github.event.pull_request.labels.*.name) }}
-        run: |
-          REVIEW_LABELS='["ai-config-reviewed","ci-scripts-reviewed","skip-ai-config-check","skip-ci-scripts-check"]'
-
-          if [[ "$LABEL" == "ok-to-test" ]]; then
-            if echo "$PR_LABELS" | jq -e 'map(select(. == "e2e-hold")) | length == 0' > /dev/null 2>&1; then
-              echo "action=dispatch-e2e" >> "$GITHUB_OUTPUT"
-            else
-              echo "action=none" >> "$GITHUB_OUTPUT"
-            fi
-          elif echo "$REVIEW_LABELS" | jq -e --arg l "$LABEL" 'map(select(. == $l)) | length > 0' > /dev/null 2>&1; then
-            echo "action=verify-review" >> "$GITHUB_OUTPUT"
-          else
-            echo "action=none" >> "$GITHUB_OUTPUT"
-          fi
-
       - name: Setup scripts
-        if: steps.eval.outputs.action != 'none'
         uses: ./.github/actions/setup-gh-scripts
         with:
           ref: ${{ github.event.repository.default_branch }}
 
-      - name: Dispatch hot-cluster-e2e.yml
-        if: steps.eval.outputs.action == 'dispatch-e2e'
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-          BASE_REF: ${{ github.event.pull_request.base.ref }}
-        working-directory: .github/scripts
-        run: npx tsx src/commands/ok-to-test-dispatch.ts
-
-      - name: Verify label author is OWNERS-listed
-        if: steps.eval.outputs.action == 'verify-review'
+      - name: Run label gate
         working-directory: .github/scripts
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           LABEL_NAME: ${{ github.event.label.name }}
-          SENDER: ${{ github.event.sender.login }}
+          PR_LABELS: ${{ toJSON(github.event.pull_request.labels.*.name) }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
-          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
           BASE_BRANCH: ${{ github.event.pull_request.base.ref }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          SENDER: ${{ github.event.sender.login }}
           REPO_OWNER: ${{ github.repository_owner }}
           REPO_NAME: ${{ github.event.repository.name }}
-        run: npx tsx src/validation/verify-review-labels/index.ts
+        run: npx tsx src/label-gate/index.ts
