@@ -6,6 +6,7 @@ import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
 import { useDataViewSelection } from '@patternfly/react-data-view';
 import useOperatorResources from '@settings/tabs/ClusterTab/components/VirtualizationFeaturesSection/utils/hooks/useOperatorResources/useOperatorResources';
 
+import useAutopilotStatus from '../hooks/useAutopilotStatus';
 import useInstallBundle from '../hooks/useInstallBundle';
 import useInstallFeature from '../hooks/useInstallFeature';
 import { getRecommendedCapabilityFeatures } from '../utils/capabilityFeatures';
@@ -29,6 +30,8 @@ export const CapabilitiesDataProvider: FC<{ children?: ReactNode }> = ({ childre
   const validNamespace = getValidNamespace(activeNamespace);
 
   const features = useMemo(() => getRecommendedCapabilityFeatures(t), [t]);
+
+  const { autopilotEnabled, autopilotLoaded, autopilotStatusMap } = useAutopilotStatus();
 
   const [alternativeState, setAlternativeState] = useState<AlternativeStateMap>({});
 
@@ -93,14 +96,19 @@ export const CapabilitiesDataProvider: FC<{ children?: ReactNode }> = ({ childre
   const dataValue: CapabilitiesDataValue = useMemo(
     () => ({
       alternativeState,
+      autopilotEnabled,
+      autopilotStatusMap,
       detailsMap,
       features,
       getCapabilityInstallState,
       loadErrors,
-      resourcesLoaded: operatorResourcesLoaded,
+      resourcesLoaded: operatorResourcesLoaded && autopilotLoaded,
     }),
     [
       alternativeState,
+      autopilotEnabled,
+      autopilotLoaded,
+      autopilotStatusMap,
       detailsMap,
       features,
       getCapabilityInstallState,

@@ -2,6 +2,7 @@ import { createContext, useContext } from 'react';
 
 import {
   type AlternativeStateMap,
+  type AutopilotStatusMap,
   type CapabilityFeature,
   CapabilityInstallState,
   type RecommendedCapabilityDetailsMap,
@@ -9,6 +10,8 @@ import {
 
 export type CapabilitiesDataValue = {
   alternativeState: AlternativeStateMap;
+  autopilotEnabled: boolean;
+  autopilotStatusMap: AutopilotStatusMap;
   detailsMap: RecommendedCapabilityDetailsMap;
   features: CapabilityFeature[];
   getCapabilityInstallState: (feature: CapabilityFeature) => CapabilityInstallState;
@@ -18,6 +21,8 @@ export type CapabilitiesDataValue = {
 
 const defaultDataValue: CapabilitiesDataValue = {
   alternativeState: {},
+  autopilotEnabled: false,
+  autopilotStatusMap: {},
   detailsMap: {},
   features: [],
   getCapabilityInstallState: () => CapabilityInstallState.NotInstalled,

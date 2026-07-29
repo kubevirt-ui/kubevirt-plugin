@@ -1,4 +1,5 @@
 import { OLSPromptType } from '@lightspeed/utils/prompts';
+import { type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import {
   type OperatorGroupKind,
   type PackageManifestKind,
@@ -46,6 +47,19 @@ export type SelectionCardConfig = {
   label: string;
   showRecommendedBadge: boolean;
 };
+
+export enum ConfigurationStatus {
+  Manual = 'Manual',
+  Recommended = 'Recommended',
+}
+
+export type AutopilotOperatorStatus = {
+  configStatus?: ConfigurationStatus;
+  managedCR?: K8sResourceCommon;
+  recommendedYAML: string;
+};
+
+export type AutopilotStatusMap = Record<string, AutopilotOperatorStatus>;
 
 export type AlternativeStateMap = Record<string, boolean>;
 
