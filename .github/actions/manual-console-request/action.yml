@@ -20,8 +20,7 @@ inputs:
     default: manual-console
   helm-release:
     description: >
-      Helm release name. Defaults to configmap-name (this action's
-      historical behavior) when left empty.
+      Helm release name. Defaults to configmap-name when left empty.
     default: ''
   ci-env-namespace:
     description: Namespace where ci-env-controller runs
@@ -33,8 +32,7 @@ inputs:
     description: >
       Name of a short-lived Secret (in ci-env-namespace) with key "password".
       The controller reads it and deletes it immediately after applying the
-      htpasswd user -- the password itself is never written to the
-      ConfigMap.
+      htpasswd user.
     required: true
   timeout:
     description: Max seconds to wait for environment to become ready
@@ -43,118 +41,25 @@ inputs:
 outputs:
   console-route:
     description: External HTTPS route for the manual console
-    value: ${{ steps.wait.outputs.console-route }}
+    value: ${{ steps.request.outputs.console-route }}
   bridge-base-address:
     description: In-cluster URL for the console bridge (debugging)
-    value: ${{ steps.wait.outputs.bridge-base-address }}
+    value: ${{ steps.request.outputs.bridge-base-address }}
 
 runs:
   using: composite
   steps:
-    # Uses `apply` (not `create`) since this ConfigMap is a single, reused
-    # name across deploys. `apply`'s 3-way merge never touches `status`
-    # (this manifest doesn't set it, the controller does via `oc patch`),
-    # so the follow-up patch below forces it back to "pending" explicitly
-    # -- otherwise a leftover "ready" from the last deploy would make the
-    # controller skip provisioning entirely.
-    - name: Create or update trigger ConfigMap
-      shell: bash
-      run: |
-        cat <<EOF | oc apply -f -
-        apiVersion: v1
-        kind: ConfigMap
-        metadata:
-          name: ${{ inputs.configmap-name }}
-          namespace: ${{ inputs.ci-env-namespace }}
-          labels:
-            ci.kubevirt-plugin/type: manual-console
-        data:
-          desired-state: "present"
-          plugin-image: "${{ inputs.plugin-image }}"
-          test-namespace: "${{ inputs.test-namespace }}"
-          helm-release: "${{ inputs.helm-release || inputs.configmap-name }}"
-          auth-mode: "openshift"
-          htpasswd-user: "${{ inputs.htpasswd-user }}"
-          htpasswd-secret-name: "${{ inputs.htpasswd-secret-name }}"
-        EOF
-        echo "Created/updated trigger ConfigMap ${{ inputs.configmap-name }} in ${{ inputs.ci-env-namespace }}"
-
-        oc patch configmap ${{ inputs.configmap-name }} -n ${{ inputs.ci-env-namespace }} \
-          --type merge -p '{"data":{"status":"pending","error-message":null}}'
-        echo "Reset status=pending so ci-env-controller re-provisions on this dispatch"
-
-    - name: Wait for environment ready
-      id: wait
+    - name: Request and wait for manual console environment
+      id: request
       shell: bash
       env:
         CM_NAME: ${{ inputs.configmap-name }}
         CM_NS: ${{ inputs.ci-env-namespace }}
-        TIMEOUT: ${{ inputs.timeout }}
-      run: |
-        echo "Waiting for ci-env-controller to provision the manual console environment..."
-        INTERVAL=10
-        ELAPSED=0
-
-        while true; do
-          STATUS="$(oc get configmap "${CM_NAME}" -n "${CM_NS}" \
-            -o jsonpath='{.data.status}' 2>/dev/null || echo "")"
-
-          case "${STATUS}" in
-            ready)
-              echo "Environment is ready."
-              break
-              ;;
-            error)
-              ERR_MSG="$(oc get configmap "${CM_NAME}" -n "${CM_NS}" \
-                -o jsonpath='{.data.error-message}' 2>/dev/null || echo "unknown error")"
-              echo "::error::Environment provisioning failed: ${ERR_MSG}"
-              exit 1
-              ;;
-            *)
-              if (( ELAPSED >= TIMEOUT )); then
-                echo "::error::Timed out waiting for environment (status=${STATUS:-pending})"
-                exit 1
-              fi
-              echo "  status=${STATUS:-pending} (${ELAPSED}s / ${TIMEOUT}s)..."
-              sleep "${INTERVAL}"
-              ELAPSED=$(( ELAPSED + INTERVAL ))
-              ;;
-          esac
-        done
-
-        BRIDGE_BASE_ADDRESS="$(oc get configmap "${CM_NAME}" -n "${CM_NS}" \
-          -o jsonpath='{.data.bridge-base-address}' 2>/dev/null || echo "")"
-        CONSOLE_ROUTE="$(oc get configmap "${CM_NAME}" -n "${CM_NS}" \
-          -o jsonpath='{.data.console-route}' 2>/dev/null || echo "")"
-
-        echo "bridge-base-address=${BRIDGE_BASE_ADDRESS}" >> "${GITHUB_OUTPUT}"
-        echo "console-route=${CONSOLE_ROUTE}" >> "${GITHUB_OUTPUT}"
-
-    - name: Write job summary
-      shell: bash
-      env:
-        CM_NAME: ${{ inputs.configmap-name }}
-        CM_NS: ${{ inputs.ci-env-namespace }}
-        HELM_RELEASE: ${{ inputs.helm-release || inputs.configmap-name }}
         PLUGIN_IMAGE: ${{ inputs.plugin-image }}
         TEST_NS: ${{ inputs.test-namespace }}
+        HELM_RELEASE: ${{ inputs.helm-release }}
         HTPASSWD_USER: ${{ inputs.htpasswd-user }}
-        ROUTE: ${{ steps.wait.outputs.console-route }}
-      run: |
-        {
-          echo "<details><summary>Manual Console Environment</summary>"
-          echo ""
-          echo "| Input Parameter | Value |"
-          echo "|------|-------|"
-          echo "| ConfigMap | \`${CM_NS}/${CM_NAME}\` |"
-          echo "| Helm release | \`${HELM_RELEASE}\` |"
-          echo "| Plugin image | \`${PLUGIN_IMAGE}\` |"
-          echo "| Namespace | \`${TEST_NS}\` |"
-          echo "| Login username | \`${HTPASSWD_USER}\` |"
-          echo ""
-          echo "| Output Parameter | Value |"
-          echo "|------|-------|"
-          echo "| Console route | \`${ROUTE}\` |"
-          echo ""
-          echo "</details>"
-        } >> "${GITHUB_STEP_SUMMARY}"
+        HTPASSWD_SECRET_NAME: ${{ inputs.htpasswd-secret-name }}
+        TIMEOUT: ${{ inputs.timeout }}
+      working-directory: ci-scripts/hot-cluster/ts
+      run: npx tsx src/scripts/manual-console-request.ts

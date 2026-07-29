@@ -58,7 +58,7 @@ verify-merge-pool-labels.yml  → strip untrusted UI adds of lgtm/approved/do-no
 pr_help_command.yml           → /help from .github/pr-commands.json
 ```
 
-Label name SSOT: [`hot-cluster/js/merge-pool-labels.cjs`](hot-cluster/js/merge-pool-labels.cjs). Bot App token helper: [`.github/actions/create-bot-token`](../.github/actions/create-bot-token/action.yml).
+Label name SSOT: [`.github/scripts/src/shared/merge-pool.ts`](../.github/scripts/src/shared/merge-pool.ts). Bot App token helper: [`.github/actions/create-bot-token`](../.github/actions/create-bot-token/action.yml).
 
 ## Infrastructure Types
 
@@ -194,11 +194,7 @@ ci-scripts/
     ci-env/
     helm/
     images/
-    js/                             (.cjs helpers required from actions/github-script steps)
-      merge-pool-labels.cjs         (SSOT for pool required + blocking label names)
-      is-merge-pool-pr.cjs
-      pr-command-helpers.cjs
-      sync-needs-rebase-label.cjs
+    js/                             (retired — logic moved to .github/scripts/src/)
   manual-console/                  (manual UI testing -- see manual-console/README.md)
     ensure-manual-console-user.sh
     images/
@@ -274,11 +270,11 @@ Hot Cluster E2E already replaced Prow's **gating test execution**. The pieces be
 | Prow / Tide piece                         | In-repo replacement                                                                                        |
 | ----------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
 | Tide merge pool + merge                   | `auto-merge.yml`: native GitHub auto-merge + required **`Merge Gate`** check                               |
-| Tide pool eligibility (`lgtm`+`approved`) | `isMergePoolPr` in [`hot-cluster/js/is-merge-pool-pr.cjs`](hot-cluster/js/is-merge-pool-pr.cjs)            |
-| Label name SSOT                           | [`hot-cluster/js/merge-pool-labels.cjs`](hot-cluster/js/merge-pool-labels.cjs)                             |
+| Tide pool eligibility (`lgtm`+`approved`) | `isMergePoolPr` in [`.github/scripts/src/shared/merge-pool.ts`](../.github/scripts/src/shared/merge-pool.ts) |
+| Label name SSOT                           | [`.github/scripts/src/shared/merge-pool.ts`](../.github/scripts/src/shared/merge-pool.ts)                    |
 | `/lgtm`, `/approve`, `/hold` (+ cancel)   | `pr_validation_commands.yml` + `.github/scripts/.../commands/{lgtm,approve,hold}.ts`                       |
 | Review acts as lgtm                       | `pr_review_commands.yml` + `pr_review_commands_sync.yml` + `commands/review-event.ts`                      |
-| `needs-rebase` plugin                     | `needs-rebase.yml` + `hot-cluster/js/sync-needs-rebase-label.cjs`                                          |
+| `needs-rebase` plugin                     | `needs-rebase.yml` + `.github/scripts/src/merge/needs-rebase.ts`                                           |
 | Anti-bypass for pool labels               | `verify-merge-pool-labels.yml` (strips untrusted UI adds; restores untrusted `do-not-merge/hold` removals) |
 | Presubmit / gating E2E                    | Hot Cluster E2E (`hot-cluster-e2e.yml` via thin PR gates) + required **`Run Gating Tests`** check          |
 | `/retest` (retry failing contexts)        | `/retest-failed` (`retest-failed.yml`) -- CI, PR Validation, E2E; only if currently failing                |
@@ -329,7 +325,7 @@ Commands in `pr_validation_commands.yml` (`.github/scripts/src/validation/comman
 
 - **`/lgtm` acts as `/approve` too** (mirrors Prow's `lgtm_acts_as_approve`): a root `OWNERS` approver's `/lgtm` also grants `approved`. `/lgtm cancel` always revokes `approved` too, **regardless of whether the cancelling actor is themselves an OWNERS approver** -- `approved` was only ever granted as part of that same pairing, so it must not outlive the `lgtm` that justified it just because a lower-trust actor is the one lifting it (an earlier version only revoked `approved` when the canceller was an approver, which let it silently survive a non-approver's `/lgtm cancel`).
 - **Trust checks**: `/lgtm`/`/hold` use `isWriteCollaborator`; `/approve` uses root `OWNERS` via `isListedInOwners`. Logins compared case-insensitively. Auth denials react `-1` and leave a short `@user: …` why-comment.
-- **Label names** come from [`hot-cluster/js/merge-pool-labels.cjs`](hot-cluster/js/merge-pool-labels.cjs) (SSOT for `isMergePoolPr` and TS grant/revoke helpers).
+- **Label names** come from [`.github/scripts/src/shared/merge-pool.ts`](../.github/scripts/src/shared/merge-pool.ts) (SSOT for `isMergePoolPr` and TS grant/revoke helpers).
 
 ### Native GitHub reviews also toggle `lgtm`/`approved`
 
