@@ -1,16 +1,3 @@
-import { load } from 'js-yaml';
-
-import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
-
-export const safeLoad = <Resource>(value: string): Resource | undefined => {
-  try {
-    return load(value) as Resource;
-  } catch (error) {
-    kubevirtConsole.error(error);
-    return;
-  }
-};
-
 export type LineRange = { end: number; start: number };
 
 const getLineFromPath = (resourceYAML: string, path): LineRange => {

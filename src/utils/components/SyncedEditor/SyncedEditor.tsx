@@ -1,20 +1,20 @@
-import React, { ComponentType, FC, useState } from 'react';
+import React, { type ComponentType, type FC, useState } from 'react';
 import { isEqual } from 'lodash';
 
 import {
   logEditorViewSwitched,
   TELEMETRY_EDITOR_VIEW_SWITCH,
 } from '@kubevirt-utils/extensions/telemetry';
-import { ResourceTypeTelemetry } from '@kubevirt-utils/extensions/telemetry/utils/types';
+import { type ResourceTypeTelemetry } from '@kubevirt-utils/extensions/telemetry/utils/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { K8sResourceKind } from '@openshift-console/dynamic-plugin-sdk';
+import { asyncYAMLToJS, safeJSToYAML } from '@kubevirt-utils/utils/yaml';
+import { type K8sResourceKind } from '@openshift-console/dynamic-plugin-sdk';
 import { Alert, AlertVariant, Button, ButtonVariant } from '@patternfly/react-core';
 
 import { EditorToggle } from './components/EditorToggle';
 import { useEditorType } from './hooks/useEditorType';
 import { YAML_TO_JS_OPTIONS } from './utils/constants';
-import { EditorType, FormEditorProps, YAMLEditorProps } from './utils/types';
-import { asyncYAMLToJS, safeJSToYAML } from './utils/yaml';
+import { EditorType, type FormEditorProps, type YAMLEditorProps } from './utils/types';
 
 type SyncedEditorProps = {
   context?: {

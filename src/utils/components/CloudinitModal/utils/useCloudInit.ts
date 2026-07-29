@@ -1,19 +1,19 @@
 import { useMemo, useState } from 'react';
-import { load } from 'js-yaml';
 
 import {
-  V1CloudInitNoCloudSource,
-  V1VirtualMachine,
-  V1Volume,
+  type V1CloudInitNoCloudSource,
+  type V1VirtualMachine,
+  type V1Volume,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { produceVMDisks } from '@kubevirt-utils/components/DiskModal/utils/helpers';
 import { InterfaceTypes } from '@kubevirt-utils/components/DiskModal/utils/types';
 import { getVolumes } from '@kubevirt-utils/resources/vm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { safeYAMLToJS } from '@kubevirt-utils/utils/yaml';
 
 import {
-  CloudInitNetworkData,
-  CloudInitUserData,
+  type CloudInitNetworkData,
+  type CloudInitUserData,
   convertNetworkDataObjectToYAML,
   convertUserDataObjectToYAML,
   convertYAMLToNetworkDataObject,
@@ -90,8 +90,10 @@ export const useCloudInit = (vm: V1VirtualMachine): UseCloudInitValues => {
     });
   };
 
-  const updateFromYAML = (yaml: string) => {
-    const cloudData = <V1CloudInitNoCloudSource>load(yaml);
+  const updateFromYAML = (yaml: string): void => {
+    const cloudData = safeYAMLToJS<undefined | V1CloudInitNoCloudSource>(yaml, undefined);
+    if (!cloudData) return;
+
     setYamlJSObject(cloudData);
     const networkDataObj =
       cloudData?.networkData && convertYAMLToNetworkDataObject(cloudData?.networkData);
