@@ -72,6 +72,7 @@ jobs:
           ref: ${{ github.event.repository.default_branch }}
 
       - name: Dispatch hot-cluster-e2e.yml
+        id: dispatch
         if: "!contains(github.event.pull_request.labels.*.name, 'e2e-hold')"
         env:
           GITHUB_TOKEN: ${{ github.token }}
@@ -87,8 +88,9 @@ jobs:
           head-sha: ${{ github.event.pull_request.head.sha }}
           status: queued
           title: 'Hot Cluster E2E: dispatched, waiting for cluster'
+          details-url: ${{ steps.dispatch.outputs.run_url || format('{0}/{1}/actions/workflows/hot-cluster-e2e.yml', github.server_url, github.repository) }}
           summary: |
             E2E run has been dispatched. Waiting for a hot cluster to become available.
 
-            The status will update to **in_progress** once the cluster is ready and tests begin running. See the [Actions tab](${{ github.server_url }}/${{ github.repository }}/actions/workflows/hot-cluster-e2e.yml) for the dispatched run.
+            The status will update to **in_progress** once the cluster is ready and tests begin running.
           github-token: ${{ steps.bot-token.outputs.token }}
