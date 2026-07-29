@@ -18,6 +18,10 @@ inputs:
     description: Pull requests permission for the token (omit with empty string)
     required: false
     default: write
+  permission-checks:
+    description: Checks permission for the token (omit with empty string)
+    required: false
+    default: ''
 
 outputs:
   token:
@@ -36,3 +40,4 @@ runs:
         private-key: ${{ inputs.private-key }}
         permission-issues: ${{ inputs.permission-issues }}
         permission-pull-requests: ${{ inputs.permission-pull-requests }}
+        permission-checks: ${{ inputs.permission-checks }}
