@@ -7,12 +7,12 @@ import { HandledValidationError } from '../pr-path-validation/errors';
 import type { VerifyReviewLabelContext, VerifyReviewLabelDeps } from './verify';
 import { verifyReviewLabel } from './verify';
 
-type Call = { method: string; args: unknown };
+type Call = { args: unknown; method: string };
 
 const fakeOctokit = (
-  ownersContent: string | null,
+  ownersContent: null | string,
   calls: Call[],
-  labelEvents: Array<{ label: string; actor: string }> = [],
+  labelEvents: Array<{ actor: string; label: string }> = [],
 ): Octokit => {
   const listEvents = async () => ({
     data: labelEvents.map((e) => ({
@@ -22,6 +22,12 @@ const fakeOctokit = (
     })),
   });
   return {
+    issues: {
+      listEvents,
+      removeLabel: async (args: { name: string }) => {
+        calls.push({ args, method: 'removeLabel' });
+      },
+    },
     paginate: async (method: unknown) => {
       if (method === listEvents) return (await listEvents()).data;
       return [];
@@ -32,12 +38,6 @@ const fakeOctokit = (
         return { data: { content: Buffer.from(ownersContent, 'utf8').toString('base64') } };
       },
     },
-    issues: {
-      listEvents,
-      removeLabel: async (args: { name: string }) => {
-        calls.push({ method: 'removeLabel', args });
-      },
-    },
   } as unknown as Octokit;
 };
 
@@ -46,15 +46,15 @@ const OWNERS_CONTENT = ['approvers:', '  - alice-approver'].join('\n');
 const buildCtx = (
   overrides: Partial<VerifyReviewLabelContext>,
   calls: Call[],
-  labelEvents?: Array<{ label: string; actor: string }>,
+  labelEvents?: Array<{ actor: string; label: string }>,
 ): VerifyReviewLabelContext => ({
-  octokit: fakeOctokit(OWNERS_CONTENT, calls, labelEvents),
-  config: { token: 'x', owner: 'kubevirt-ui', repo: 'kubevirt-plugin' },
-  labelName: 'ai-config-reviewed',
-  sender: 'alice-approver',
   baseBranch: 'main',
-  prNumber: 1,
+  config: { owner: 'kubevirt-ui', repo: 'kubevirt-plugin', token: 'x' },
   headSha: 'abc123',
+  labelName: 'ai-config-reviewed',
+  octokit: fakeOctokit(OWNERS_CONTENT, calls, labelEvents),
+  prNumber: 1,
+  sender: 'alice-approver',
   ...overrides,
 });
 
