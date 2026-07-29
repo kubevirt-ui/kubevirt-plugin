@@ -11,6 +11,9 @@ import {
 } from './metrics';
 import { VMCallbacks } from './virtualMachinesDefinition';
 
+const EMPTY_STRING_VALUE = '';
+const EMPTY_NUMBER_VALUE = 0;
+
 const createVMSort = (
   compareFn: (a: V1VirtualMachine, b: V1VirtualMachine, callbacks?: VMCallbacks) => number,
 ) => {
@@ -31,20 +34,15 @@ const createNullSafeSort = (
   isString = false,
 ) => {
   return createVMSort((a, b, callbacks) => {
-    const valA = extractor(a, callbacks);
-    const valB = extractor(b, callbacks);
-
-    // Use nullish checks for numbers (preserves 0), falsy checks for strings
-    const aEmpty = isString ? !valA : valA == null;
-    const bEmpty = isString ? !valB : valB == null;
-
-    if (aEmpty && bEmpty) return 0;
-    if (aEmpty) return 1;
-    if (bEmpty) return -1;
+    const firstValue = extractor(a, callbacks);
+    const secondValue = extractor(b, callbacks);
 
     return isString
-      ? (valA as string).localeCompare(valB as string)
-      : (valA as number) - (valB as number);
+      ? ((firstValue as string) ?? EMPTY_STRING_VALUE).localeCompare(
+          (secondValue as string) ?? EMPTY_STRING_VALUE,
+        )
+      : ((firstValue as number) ?? EMPTY_NUMBER_VALUE) -
+          ((secondValue as number) ?? EMPTY_NUMBER_VALUE);
   });
 };
 
