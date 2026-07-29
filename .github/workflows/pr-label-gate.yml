@@ -1,0 +1,75 @@
+name: PR Label Gate
+
+# Consolidated from ok-to-test-gate.yml + verify-review-labels.yml.
+#
+# Both are thin gatekeepers triggered on pull_request_target: [labeled].
+# Each job has its own if: filter so only the relevant one executes:
+#
+# 1. dispatch-ok-to-test: dispatches Hot Cluster E2E when ok-to-test is added.
+# 2. verify-review-labels: strips unauthorized ai-config-reviewed /
+#    ci-scripts-reviewed / skip-* labels if the sender isn't in .github/OWNERS.
+on:
+  pull_request_target:
+    types: [labeled]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+  statuses: write
+  checks: write
+  actions: write
+
+jobs:
+  dispatch-ok-to-test:
+    name: Dispatch Hot Cluster E2E if ok-to-test
+    if: github.event.label.name == 'ok-to-test' && !contains(github.event.pull_request.labels.*.name, 'e2e-hold')
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Setup scripts
+        uses: ./.github/actions/setup-gh-scripts
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+
+      - name: Dispatch hot-cluster-e2e.yml
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          BASE_REF: ${{ github.event.pull_request.base.ref }}
+        working-directory: .github/scripts
+        run: npx tsx src/commands/ok-to-test-dispatch.ts
+
+  verify-review-labels:
+    name: Verify Review Labels
+    if: >-
+      contains(
+        fromJSON('["ai-config-reviewed","ci-scripts-reviewed","skip-ai-config-check","skip-ci-scripts-check"]'),
+        github.event.label.name
+      )
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+          ref: ${{ github.event.repository.default_branch }}
+
+      - name: Setup validation scripts
+        uses: ./.github/actions/setup-gh-scripts
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+
+      - name: Verify label author is OWNERS-listed
+        working-directory: .github/scripts
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          LABEL_NAME: ${{ github.event.label.name }}
+          SENDER: ${{ github.event.sender.login }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          BASE_BRANCH: ${{ github.event.pull_request.base.ref }}
+          REPO_OWNER: ${{ github.repository_owner }}
+          REPO_NAME: ${{ github.event.repository.name }}
+        run: npx tsx src/validation/verify-review-labels/index.ts

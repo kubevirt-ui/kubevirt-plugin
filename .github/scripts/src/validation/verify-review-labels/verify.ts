@@ -1,5 +1,7 @@
 import type { Octokit } from '@octokit/rest';
 
+import { getPrLabelNames, removeLabel } from '../../github-comments';
+import type { GitHubConfig } from '../../types/index';
 import { AI_CONFIG } from '../ai-config-validation/constants';
 import { CI_SCRIPTS_CONFIG } from '../ci-scripts-validation/constants';
 import { HandledValidationError } from '../pr-path-validation/errors';
@@ -12,8 +14,6 @@ import {
   isLabelAppliedByTrustedActor,
   isListedInOwners,
 } from '../pr-path-validation/owners';
-import { getPrLabelNames, removeLabel } from '../../github-comments';
-import type { GitHubConfig } from '../../types/index';
 
 export const AI_LABELS = new Set<string>([AI_CONFIG.labels.reviewed, AI_CONFIG.labels.skip]);
 export const CI_LABELS = new Set<string>([
@@ -24,22 +24,22 @@ export const CI_LABELS = new Set<string>([
 const WATCHED_LABELS = new Set<string>([...AI_LABELS, ...CI_LABELS]);
 
 export type ValidationDispatcher = (input: {
+  baseBranch: string;
   config: GitHubConfig;
   eventAction: string;
   headSha?: string;
   prNumber: number;
-  baseBranch: string;
 }) => Promise<void>;
 
 export type VerifyReviewLabelContext = {
-  octokit: Octokit;
+  baseBranch: string;
   config: GitHubConfig;
+  headSha?: string;
   /** Label that triggered this `labeled` event. */
   labelName: string;
-  sender: string;
-  baseBranch: string;
+  octokit: Octokit;
   prNumber: number;
-  headSha?: string;
+  sender: string;
 };
 
 export type VerifyReviewLabelDeps = {
@@ -59,7 +59,9 @@ const isEventSenderTrusted = async (ctx: VerifyReviewLabelContext): Promise<bool
   // the bot adds the label -- that labeled event's sender is the bot, so
   // without this exemption verify would strip valid bot-applied approvals.
   // Exact match only: trusting every *[bot] would let any label-write app bypass.
-  if (ctx.sender === APPROVAL_BOT_LOGIN) return true;
+  if (ctx.sender === APPROVAL_BOT_LOGIN) {
+    return true;
+  }
   return isListedInOwners(
     ctx.octokit,
     ctx.config.owner,
@@ -82,7 +84,9 @@ const dispatchValidation = async (
       prNumber: ctx.prNumber,
     });
   } catch (err) {
-    if (!(err instanceof HandledValidationError)) throw err;
+    if (!(err instanceof HandledValidationError)) {
+      throw err;
+    }
   }
 };
 
@@ -97,16 +101,21 @@ export const verifyReviewLabel = async (
   deps: VerifyReviewLabelDeps = defaultDeps,
 ): Promise<void> => {
   const listLabels = deps.getPrLabelNames ?? getPrLabelNames;
-  let labelsToCheck: string[];
-  try {
-    const current = await listLabels(ctx.octokit, ctx.config.owner, ctx.config.repo, ctx.prNumber);
-    labelsToCheck = [...WATCHED_LABELS].filter((name) => current.has(name));
-  } catch {
-    labelsToCheck = WATCHED_LABELS.has(ctx.labelName) ? [ctx.labelName] : [];
-  }
+  const labelsToCheck: string[] = await (async (): Promise<string[]> => {
+    try {
+      const current = await listLabels(
+        ctx.octokit,
+        ctx.config.owner,
+        ctx.config.repo,
+        ctx.prNumber,
+      );
+      return [...WATCHED_LABELS].filter((name) => current.has(name));
+    } catch {
+      return WATCHED_LABELS.has(ctx.labelName) ? [ctx.labelName] : [];
+    }
+  })();
 
   if (labelsToCheck.length === 0) {
-    // eslint-disable-next-line no-console
     console.log(
       `No watched review/skip labels present on PR #${ctx.prNumber} -- nothing to verify.`,
     );
@@ -114,13 +123,9 @@ export const verifyReviewLabel = async (
   }
 
   const senderTrusted = await isEventSenderTrusted(ctx);
-  let strippedAi = false;
-  let strippedCi = false;
+  const stripped = { ai: false, ci: false };
 
   for (const labelName of labelsToCheck) {
-    // Triggering label: trust the webhook sender (handles the bot-apply race
-    // where the timeline may not yet show the labeled event). Other watched
-    // labels already on the PR: look up the applying actor via the timeline.
     const trusted =
       labelName === ctx.labelName
         ? senderTrusted
@@ -133,24 +138,29 @@ export const verifyReviewLabel = async (
             ctx.baseBranch,
           );
 
-    // eslint-disable-next-line no-console
     console.log(
       trusted
         ? `"${labelName}" is trusted -- leaving in place.`
         : `"${labelName}" is not trusted -- stripping.`,
     );
 
-    if (trusted) continue;
+    if (trusted) {
+      continue;
+    }
 
     await removeLabel(ctx.octokit, ctx.config.owner, ctx.config.repo, ctx.prNumber, labelName);
-    if (AI_LABELS.has(labelName)) strippedAi = true;
-    if (CI_LABELS.has(labelName)) strippedCi = true;
+    if (AI_LABELS.has(labelName)) {
+      stripped.ai = true;
+    }
+    if (CI_LABELS.has(labelName)) {
+      stripped.ci = true;
+    }
   }
 
-  if (strippedAi) {
+  if (stripped.ai) {
     await dispatchValidation(deps.executeAiConfigValidation, ctx);
   }
-  if (strippedCi) {
+  if (stripped.ci) {
     await dispatchValidation(deps.executeCiScriptsValidation, ctx);
   }
 };

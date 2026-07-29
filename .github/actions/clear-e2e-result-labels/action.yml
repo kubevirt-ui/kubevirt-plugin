@@ -5,7 +5,7 @@ description: >
   ci-scripts/README.md) once that result no longer applies: a new push to
   the PR invalidates the prior diff's result (hot-cluster-e2e-pr-gate.yml),
   and main advancing past it invalidates the prior base tip's result
-  (retest-stale-gating.yml). Idempotent -- a 404 on either missing label is
+  (on-main-push.yml). Idempotent -- a 404 on either missing label is
   swallowed. Composite steps run inline within the calling job, so this
   adds no new job/check-run to the merge box; callers should still wrap the
   call with continue-on-error: true for the same best-effort reason both
@@ -23,25 +23,9 @@ runs:
   using: composite
   steps:
     - name: Remove e2e-passed/e2e-failed if present
-      uses: actions/github-script@v9
+      shell: bash
       env:
+        GITHUB_TOKEN: ${{ inputs.github-token }}
         PR_NUMBER: ${{ inputs.pr-number }}
-      with:
-        github-token: ${{ inputs.github-token }}
-        script: |
-          // Collect the first genuine failure rather than rethrowing
-          // immediately -- a non-404 error removing e2e-passed must not
-          // skip the attempt to also remove e2e-failed.
-          let firstError;
-          for (const name of ['e2e-passed', 'e2e-failed']) {
-            try {
-              await github.rest.issues.removeLabel({
-                ...context.repo,
-                issue_number: Number(process.env.PR_NUMBER),
-                name,
-              });
-            } catch (err) {
-              if (err.status !== 404) firstError ??= err;
-            }
-          }
-          if (firstError) throw firstError;
+      working-directory: .github/scripts
+      run: npx tsx src/e2e/clear-result-labels.ts

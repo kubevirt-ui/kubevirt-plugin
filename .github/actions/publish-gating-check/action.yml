@@ -10,7 +10,7 @@ description: |
   check-run; the merge box shows whichever reported most recently.
 
   Single source of truth for the check's name/shape, used by
-  retest-stale-gating.yml, and by hot-cluster-e2e.yml's prepare job
+  on-main-push.yml, and by hot-cluster-e2e.yml's prepare job
   (creates the initial in_progress check-run) and its verify-gating-tests
   job (updates that same check-run to its final completed result).
 
@@ -47,6 +47,13 @@ inputs:
     description: Check-run name (only used when creating a fresh check-run)
     required: false
     default: 'Run Gating Tests'
+  github-token:
+    description: |
+      Token to create/update the check-run with. Use a bot App token so the
+      check-run gets its own check-suite and isn't grouped under an unrelated
+      workflow in the PR checks UI. Falls back to the default GITHUB_TOKEN.
+    required: false
+    default: ''
 
 outputs:
   check-run-id:
@@ -58,68 +65,16 @@ runs:
   steps:
     - name: Create or update check-run
       id: publish
-      uses: actions/github-script@v9
+      shell: bash
       env:
-        CHECK_HEAD_SHA: ${{ inputs['head-sha'] }}
-        CHECK_RUN_ID: ${{ inputs['check-run-id'] }}
+        GITHUB_TOKEN: ${{ inputs.github-token || github.token }}
+        CHECK_HEAD_SHA: ${{ inputs.head-sha }}
+        CHECK_RUN_ID: ${{ inputs.check-run-id }}
         CHECK_STATUS: ${{ inputs.status }}
         CHECK_CONCLUSION: ${{ inputs.conclusion }}
         CHECK_TITLE: ${{ inputs.title }}
         CHECK_SUMMARY: ${{ inputs.summary }}
-        CHECK_DETAILS_URL: ${{ inputs['details-url'] }}
+        CHECK_DETAILS_URL: ${{ inputs.details-url }}
         CHECK_NAME: ${{ inputs.name }}
-      with:
-        script: |
-          const output = {
-            title: process.env.CHECK_TITLE,
-            summary: process.env.CHECK_SUMMARY,
-          };
-
-          const payload = {
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            status: process.env.CHECK_STATUS,
-            output,
-          };
-
-          if (process.env.CHECK_STATUS === 'completed') {
-            payload.conclusion = process.env.CHECK_CONCLUSION;
-            payload.completed_at = new Date().toISOString();
-          }
-          if (process.env.CHECK_DETAILS_URL) {
-            payload.details_url = process.env.CHECK_DETAILS_URL;
-          }
-
-          const existingCheckRunId = process.env.CHECK_RUN_ID;
-          const headSha = process.env.CHECK_HEAD_SHA;
-
-          // Fail fast with a clear message instead of letting checks.create()
-          // reject an undefined head_sha with an opaque 422 -- callers must
-          // supply exactly one of these two ways to target a check-run.
-          if (!existingCheckRunId && !headSha) {
-            core.setFailed('publish-gating-check requires either check-run-id (to update an existing check-run) or head-sha (to create a new one) -- both were empty.');
-            return;
-          }
-
-          let data;
-          if (existingCheckRunId) {
-            const checkRunId = Number(existingCheckRunId);
-            if (!Number.isInteger(checkRunId) || checkRunId <= 0) {
-              core.setFailed(`publish-gating-check received an invalid check-run-id: "${existingCheckRunId}".`);
-              return;
-            }
-            ({ data } = await github.rest.checks.update({
-              ...payload,
-              check_run_id: checkRunId,
-            }));
-            core.info(`Updated check-run ${data.id} to "${payload.status}".`);
-          } else {
-            ({ data } = await github.rest.checks.create({
-              ...payload,
-              name: process.env.CHECK_NAME,
-              head_sha: headSha,
-            }));
-            core.info(`Created check-run ${data.id} ("${payload.status}") for ${headSha}.`);
-          }
-
-          core.setOutput('check_run_id', String(data.id));
+      working-directory: .github/scripts
+      run: npx tsx src/e2e/publish-gating-check.ts

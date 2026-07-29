@@ -15,28 +15,32 @@ import {
   verifyMergePoolLabel,
 } from './verify';
 
-type Call = { method: string; args: unknown };
+type Call = { args: unknown; method: string };
 
 const ROOT_OWNERS = ['approvers:', '  - alice-approver'].join('\n');
 
 const fakeOctokit = (
   opts: {
-    ownersContent?: string | null;
+    ownersContent?: null | string;
     /** Default permission, or per-username map. */
-    permission?: string | null | Record<string, string | null>;
+    permission?: null | Record<string, null | string> | string;
   },
   calls: Call[],
 ): Octokit =>
   ({
-    repos: {
-      getContent: async () => {
-        if (opts.ownersContent === null || opts.ownersContent === undefined) {
-          throw new Error('Not Found');
-        }
-        return {
-          data: { content: Buffer.from(opts.ownersContent, 'utf8').toString('base64') },
-        };
+    issues: {
+      addLabels: async (args: unknown) => {
+        calls.push({ args, method: 'addLabels' });
       },
+      getLabel: async (args: unknown) => {
+        calls.push({ args, method: 'getLabel' });
+        return { data: {} };
+      },
+      removeLabel: async (args: unknown) => {
+        calls.push({ args, method: 'removeLabel' });
+      },
+    },
+    repos: {
       getCollaboratorPermissionLevel: async (args: { username: string }) => {
         const permission =
           typeof opts.permission === 'object' && opts.permission !== null
@@ -47,17 +51,13 @@ const fakeOctokit = (
         }
         return { data: { permission } };
       },
-    },
-    issues: {
-      removeLabel: async (args: unknown) => {
-        calls.push({ method: 'removeLabel', args });
-      },
-      getLabel: async (args: unknown) => {
-        calls.push({ method: 'getLabel', args });
-        return { data: {} };
-      },
-      addLabels: async (args: unknown) => {
-        calls.push({ method: 'addLabels', args });
+      getContent: async () => {
+        if (opts.ownersContent === null || opts.ownersContent === undefined) {
+          throw new Error('Not Found');
+        }
+        return {
+          data: { content: Buffer.from(opts.ownersContent, 'utf8').toString('base64') },
+        };
       },
     },
   }) as unknown as Octokit;
@@ -66,20 +66,20 @@ const buildCtx = (
   overrides: Partial<VerifyMergePoolLabelContext>,
   calls: Call[],
   octokitOpts: {
-    ownersContent?: string | null;
-    permission?: string | null | Record<string, string | null>;
+    ownersContent?: null | string;
+    permission?: null | Record<string, null | string> | string;
   } = {
     ownersContent: ROOT_OWNERS,
     permission: 'write',
   },
 ): VerifyMergePoolLabelContext => ({
-  octokit: fakeOctokit(octokitOpts, calls),
-  config: { token: 'x', owner: 'kubevirt-ui', repo: 'kubevirt-plugin' },
-  labelName: 'lgtm',
-  sender: 'bob-collaborator',
   baseBranch: 'main',
-  prNumber: 1,
+  config: { owner: 'kubevirt-ui', repo: 'kubevirt-plugin', token: 'x' },
+  labelName: 'lgtm',
+  octokit: fakeOctokit(octokitOpts, calls),
   prAuthor: 'pr-author',
+  prNumber: 1,
+  sender: 'bob-collaborator',
   ...overrides,
 });
 
@@ -87,8 +87,8 @@ const fakeDeps = (
   presentLabels: string[],
   actors: Record<string, string>,
 ): VerifyMergePoolLabelDeps => ({
-  getPrLabelNames: async () => new Set(presentLabels),
   getLabelApplyingActor: async (_o, _ow, _r, _n, labelName) => actors[labelName],
+  getPrLabelNames: async () => new Set(presentLabels),
 });
 
 describe('isTrustedMergePoolLabelActor', () => {
@@ -259,8 +259,8 @@ describe('verifyMergePoolLabel', () => {
       buildCtx(
         {
           labelName: 'approved',
-          sender: 'alice-approver',
           prAuthor: 'alice-approver',
+          sender: 'alice-approver',
         },
         calls,
         { ownersContent: ROOT_OWNERS, permission: 'admin' },
@@ -277,8 +277,8 @@ describe('verifyMergePoolLabel', () => {
       buildCtx({ labelName: 'lgtm', sender: 'random-user' }, calls, {
         ownersContent: ROOT_OWNERS,
         permission: {
-          'random-user': 'read',
           'bob-collaborator': 'write',
+          'random-user': 'read',
         },
       }),
       fakeDeps(['lgtm', 'do-not-merge/hold'], {
@@ -297,10 +297,10 @@ describe('verifyMergePoolLabel', () => {
     await assert.rejects(
       () =>
         verifyMergePoolLabel(buildCtx({ labelName: 'lgtm' }, calls), {
+          getLabelApplyingActor: async () => 'bob',
           getPrLabelNames: async () => {
             throw new Error('list labels failed');
           },
-          getLabelApplyingActor: async () => 'bob',
         }),
       /list labels failed/,
     );
@@ -312,10 +312,10 @@ describe('verifyMergePoolLabel', () => {
     await assert.rejects(
       () =>
         verifyMergePoolLabel(buildCtx({ labelName: 'lgtm', sender: 'random-user' }, calls), {
-          getPrLabelNames: async () => new Set(['lgtm', 'do-not-merge/hold']),
           getLabelApplyingActor: async () => {
             throw new Error('timeline failed');
           },
+          getPrLabelNames: async () => new Set(['lgtm', 'do-not-merge/hold']),
         }),
       /timeline failed/,
     );
@@ -328,11 +328,11 @@ describe('getLabelApplyingActor', () => {
       data: [{ actor: { login: 'bob' }, event: 'labeled', label: { name: 'approved' } }],
     });
     const octokit = {
+      issues: { listEvents },
       paginate: async (method: unknown) => {
         if (method === listEvents) return (await listEvents()).data;
         return [];
       },
-      issues: { listEvents },
     } as unknown as Octokit;
 
     assert.equal(await getLabelApplyingActor(octokit, 'o', 'r', 1, 'lgtm'), undefined);
@@ -343,10 +343,10 @@ describe('getLabelApplyingActor', () => {
       throw new Error('API down');
     };
     const octokit = {
+      issues: { listEvents },
       paginate: async () => {
         throw new Error('API down');
       },
-      issues: { listEvents },
     } as unknown as Octokit;
 
     await assert.rejects(() => getLabelApplyingActor(octokit, 'o', 'r', 1, 'lgtm'), /API down/);
@@ -357,12 +357,12 @@ describe('verifyMergePoolHoldRemoval', () => {
   const holdCtx = (
     sender: string,
     calls: Call[],
-    permission: string | null | Record<string, string | null> = 'write',
+    permission: null | Record<string, null | string> | string = 'write',
   ): VerifyHoldRemovalContext => ({
+    config: { owner: 'kubevirt-ui', repo: 'kubevirt-plugin', token: 'x' },
     octokit: fakeOctokit({ permission }, calls),
-    config: { token: 'x', owner: 'kubevirt-ui', repo: 'kubevirt-plugin' },
-    sender,
     prNumber: 1,
+    sender,
   });
 
   it('allows bot removals without restoring', async () => {
