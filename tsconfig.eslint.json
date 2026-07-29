@@ -11,5 +11,16 @@
     "strictFunctionTypes": true,
     "strictNullChecks": true,
     "useUnknownInCatchVariables": true
-  }
+  },
+  "include": [
+    "src/**/*",
+    "images/**/*",
+    "plugin-metadata.ts",
+    "plugin-extensions.ts",
+    "knip.config.ts",
+    "@types/**/*",
+    ".github/scripts/src/**/*",
+    "ci-scripts/hot-cluster/ts/src/**/*",
+    "ci-scripts/hot-cluster/controller/src/**/*"
+  ]
 }

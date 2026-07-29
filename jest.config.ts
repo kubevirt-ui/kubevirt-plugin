@@ -36,6 +36,7 @@ const config: Config.InitialOptions = {
     '<rootDir>/node_modules/',
     '<rootDir>/dist/',
     '<rootDir>/.github/scripts/',
+    '<rootDir>/ci-scripts/',
   ],
   testRegex: '.*\\.test\\.(ts|tsx|js|jsx)$',
   transform: {
