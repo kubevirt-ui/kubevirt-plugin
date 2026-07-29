@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { createOctokit } from '../../github-repo';
 import type { GitHubConfig } from '../../types/index';
 import { requireEnv, safeErrorMessage } from '../../utils';
@@ -6,9 +5,9 @@ import { verifyMergePoolHoldRemoval, verifyMergePoolLabel } from './verify';
 
 const main = async (): Promise<void> => {
   const config: GitHubConfig = {
-    token: requireEnv('GITHUB_TOKEN'),
     owner: requireEnv('REPO_OWNER'),
     repo: requireEnv('REPO_NAME'),
+    token: requireEnv('GITHUB_TOKEN'),
   };
   const eventAction = requireEnv('EVENT_ACTION');
   const octokit = createOctokit(config);
@@ -16,22 +15,22 @@ const main = async (): Promise<void> => {
   const sender = requireEnv('SENDER');
 
   if (eventAction === 'unlabeled') {
-    await verifyMergePoolHoldRemoval({ octokit, config, sender, prNumber });
+    await verifyMergePoolHoldRemoval({ config, octokit, prNumber, sender });
     return;
   }
 
   await verifyMergePoolLabel({
-    octokit,
+    baseBranch: requireEnv('BASE_BRANCH'),
     config,
     labelName: requireEnv('LABEL_NAME'),
-    sender,
-    baseBranch: requireEnv('BASE_BRANCH'),
-    prNumber,
+    octokit,
     prAuthor: requireEnv('PR_AUTHOR'),
+    prNumber,
+    sender,
   });
 };
 
-main().catch((err) => {
+void main().catch((err) => {
   console.error(safeErrorMessage(err));
   process.exit(1);
 });

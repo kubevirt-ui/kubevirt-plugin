@@ -1,29 +1,28 @@
-/* eslint-disable no-console */
 // Entrypoint for pr_review_commands.yml -- an Approve/Request-changes
 // review toggles lgtm/approved the same way the /lgtm command does. No PR
 // comment/reaction is posted (reviews don't support reactions) -- a
 // routine skip just logs and exits normally rather than failing the job.
 import type { Octokit } from '@octokit/rest';
 
-import { isWriteCollaborator } from './collaborator-trust';
 import { createOctokit, createStatusOctokit } from '../../github-repo';
-import { isListedInOwners } from '../pr-path-validation/owners';
-import { grantApprove, grantLgtm, revokeApprove, revokeLgtm } from './review-labels';
-import { requireEnv, safeErrorMessage, sameGitHubLogin } from '../../utils';
 import type { GitHubConfig } from '../../types/index';
+import { requireEnv, safeErrorMessage, sameGitHubLogin } from '../../utils';
+import { isListedInOwners } from '../pr-path-validation/owners';
+import { isWriteCollaborator } from './collaborator-trust';
+import { grantApprove, grantLgtm, revokeApprove, revokeLgtm } from './review-labels';
 
 export type ReviewSyncResult = 'applied' | 'revoked' | 'skipped';
 
 export type SyncLabelsFromReviewArgs = {
-  octokit: Octokit;
-  contentsOctokit: Octokit;
-  owner: string;
-  repo: string;
-  prNumber: number;
   baseBranch: string;
-  reviewState: 'APPROVED' | 'CHANGES_REQUESTED';
-  reviewAuthor: string;
+  contentsOctokit: Octokit;
+  octokit: Octokit;
+  owner: string;
   prAuthor: string;
+  prNumber: number;
+  repo: string;
+  reviewAuthor: string;
+  reviewState: 'APPROVED' | 'CHANGES_REQUESTED';
 };
 
 /** Core logic for pr_review_commands.yml -- exported for unit tests. */
@@ -31,15 +30,15 @@ export const syncLabelsFromReview = async (
   args: SyncLabelsFromReviewArgs,
 ): Promise<ReviewSyncResult> => {
   const {
-    octokit,
-    contentsOctokit,
-    owner,
-    repo,
-    prNumber,
     baseBranch,
-    reviewState,
-    reviewAuthor,
+    contentsOctokit,
+    octokit,
+    owner,
     prAuthor,
+    prNumber,
+    repo,
+    reviewAuthor,
+    reviewState,
   } = args;
 
   // A self-review should never grant lgtm/approved.
@@ -70,7 +69,9 @@ export const syncLabelsFromReview = async (
 
   if (reviewState === 'APPROVED') {
     await grantLgtm(octokit, owner, repo, prNumber);
-    if (isApprover) await grantApprove(octokit, owner, repo, prNumber);
+    if (isApprover) {
+      await grantApprove(octokit, owner, repo, prNumber);
+    }
     console.log(
       `Applied lgtm${isApprover ? ' and approved' : ''} to PR #${prNumber} (Approve review by ${reviewAuthor}).`,
     );
@@ -103,30 +104,30 @@ const main = async (): Promise<void> => {
   }
 
   const config: GitHubConfig = {
-    token: requireEnv('GITHUB_TOKEN'),
-    statusToken: process.env.STATUS_GITHUB_TOKEN,
     owner: requireEnv('REPO_OWNER'),
     repo: requireEnv('REPO_NAME'),
+    statusToken: process.env.STATUS_GITHUB_TOKEN,
+    token: requireEnv('GITHUB_TOKEN'),
   };
   const prNumber = parseInt(requireEnv('PR_NUMBER'), 10);
   const baseBranch = requireEnv('BASE_BRANCH');
 
   await syncLabelsFromReview({
-    octokit: createOctokit(config),
-    contentsOctokit: createStatusOctokit(config),
-    owner: config.owner,
-    repo: config.repo,
-    prNumber,
     baseBranch,
-    reviewState,
-    reviewAuthor,
+    contentsOctokit: createStatusOctokit(config),
+    octokit: createOctokit(config),
+    owner: config.owner,
     prAuthor,
+    prNumber,
+    repo: config.repo,
+    reviewAuthor,
+    reviewState,
   });
 };
 
 // Only auto-run when executed as the workflow entrypoint (not when imported by tests).
 if (require.main === module) {
-  main().catch((err) => {
+  void main().catch((err) => {
     console.error(safeErrorMessage(err));
     process.exit(1);
   });

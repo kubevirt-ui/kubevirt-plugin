@@ -1,30 +1,29 @@
-/* eslint-disable no-console */
-import { applyApprove, approveAiConfig, approveCiScripts, cancelApprove } from './approve';
-import type { ApprovalContext } from './approve';
-import { AI_CONFIG_EVENT_ACTIONS } from '../ai-config-validation/constants';
-import { applyHold, cancelHold } from './hold';
 import { createOctokit, createStatusOctokit } from '../../github-repo';
+import type { GitHubConfig } from '../../types/index';
+import { requireEnv, safeErrorMessage } from '../../utils';
+import { AI_CONFIG_EVENT_ACTIONS } from '../ai-config-validation/constants';
 import { executeJiraValidation } from '../jira-validation/execute';
-import { applyLgtm, cancelLgtm } from './lgtm';
-import type { ReviewContext } from './lgtm';
-import { parseCommand } from './parse-command';
 import {
   executeAiConfigValidation,
   executeCiScriptsValidation,
 } from '../pr-path-validation/execute';
-import { processCommands, reportCommandFailure } from './process';
+import type { ApprovalContext } from './approve';
+import { applyApprove, approveAiConfig, approveCiScripts, cancelApprove } from './approve';
+import { applyHold, cancelHold } from './hold';
+import type { ReviewContext } from './lgtm';
+import { applyLgtm, cancelLgtm } from './lgtm';
+import { parseCommand } from './parse-command';
 import type { CommandHandlers, CommandOutcome } from './process';
-import { requireEnv, safeErrorMessage } from '../../utils';
-import type { GitHubConfig } from '../../types/index';
+import { processCommands, reportCommandFailure } from './process';
 
 const main = async (): Promise<void> => {
   const commands = parseCommand(requireEnv('COMMENT_BODY'));
 
   const config: GitHubConfig = {
-    token: requireEnv('GITHUB_TOKEN'),
-    statusToken: process.env.STATUS_GITHUB_TOKEN,
     owner: requireEnv('REPO_OWNER'),
     repo: requireEnv('REPO_NAME'),
+    statusToken: process.env.STATUS_GITHUB_TOKEN,
+    token: requireEnv('GITHUB_TOKEN'),
   };
 
   const prNumber = parseInt(requireEnv('PR_NUMBER'), 10);
@@ -36,48 +35,51 @@ const main = async (): Promise<void> => {
   const prAuthor = requireEnv('PR_AUTHOR');
 
   const approvalCtx: ApprovalContext = {
-    octokit: createOctokit(config),
-    contentsOctokit: createStatusOctokit(config),
-    owner: config.owner,
-    repo: config.repo,
-    prNumber,
-    baseBranch,
     author,
+    baseBranch,
     commentId,
+    contentsOctokit: createStatusOctokit(config),
+    octokit: createOctokit(config),
+    owner: config.owner,
     prAuthor,
+    prNumber,
+    repo: config.repo,
   };
   const reviewCtx: ReviewContext = approvalCtx;
 
+  const aiApproved = async (): Promise<void> => {
+    await approveAiConfig(approvalCtx);
+    await executeAiConfigValidation({
+      baseBranch,
+      config,
+      eventAction: AI_CONFIG_EVENT_ACTIONS.AI_APPROVED,
+      headSha,
+      prNumber,
+    });
+  };
+  const ciApproved = async (): Promise<void> => {
+    await approveCiScripts(approvalCtx);
+    await executeCiScriptsValidation({
+      baseBranch,
+      config,
+      eventAction: 'ci-approved',
+      headSha,
+      prNumber,
+    });
+  };
+  const recheckJira = async (): Promise<void> => {
+    await executeJiraValidation({ baseBranch, config, headSha, prNumber, prTitle });
+  };
   const handlers: CommandHandlers = {
-    'ai-approved': async () => {
-      await approveAiConfig(approvalCtx);
-      await executeAiConfigValidation({
-        baseBranch,
-        config,
-        eventAction: AI_CONFIG_EVENT_ACTIONS.AI_APPROVED,
-        headSha,
-        prNumber,
-      });
-    },
-    'ci-approved': async () => {
-      await approveCiScripts(approvalCtx);
-      await executeCiScriptsValidation({
-        baseBranch,
-        config,
-        eventAction: 'ci-approved',
-        headSha,
-        prNumber,
-      });
-    },
-    'recheck-jira': async () => {
-      await executeJiraValidation({ baseBranch, config, headSha, prNumber, prTitle });
-    },
-    lgtm: async () => applyLgtm(reviewCtx),
-    'lgtm-cancel': async () => cancelLgtm(reviewCtx),
-    approve: async () => applyApprove(approvalCtx),
-    'approve-cancel': async () => cancelApprove(approvalCtx),
-    hold: async () => applyHold(approvalCtx),
-    'hold-cancel': async () => cancelHold(approvalCtx),
+    ['ai-approved']: aiApproved,
+    approve: async (): Promise<void> => applyApprove(approvalCtx),
+    ['approve-cancel']: async (): Promise<void> => cancelApprove(approvalCtx),
+    ['ci-approved']: ciApproved,
+    hold: async (): Promise<void> => applyHold(approvalCtx),
+    ['hold-cancel']: async (): Promise<void> => cancelHold(approvalCtx),
+    lgtm: async (): Promise<void> => applyLgtm(reviewCtx),
+    ['lgtm-cancel']: async (): Promise<void> => cancelLgtm(reviewCtx),
+    ['recheck-jira']: recheckJira,
   };
 
   // A comment can contain more than one command (e.g. "/ai-approved
@@ -96,7 +98,7 @@ const main = async (): Promise<void> => {
   }
 };
 
-main().catch(async (err) => {
+void main().catch(async (err) => {
   console.error(safeErrorMessage(err));
 
   // Reaching here means something failed *before* the per-command loop even
@@ -106,7 +108,7 @@ main().catch(async (err) => {
   // which doesn't depend on the credential that just failed.
   const owner = process.env.REPO_OWNER;
   const repo = process.env.REPO_NAME;
-  const statusToken = process.env.STATUS_GITHUB_TOKEN || process.env.GITHUB_TOKEN;
+  const statusToken = process.env.STATUS_GITHUB_TOKEN ?? process.env.GITHUB_TOKEN;
 
   if (owner && repo && statusToken) {
     const commands = parseCommand(process.env.COMMENT_BODY ?? '');

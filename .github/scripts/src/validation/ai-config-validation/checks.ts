@@ -23,7 +23,9 @@ const SUSPICIOUS_PATTERNS: Array<{ label: string; regex: RegExp }> = [
 ];
 
 const getAddedLines = (patch?: string): string[] => {
-  if (!patch) return [];
+  if (!patch) {
+    return [];
+  }
 
   return patch
     .split('\n')
@@ -34,10 +36,28 @@ const getAddedLines = (patch?: string): string[] => {
 /** True when the only review-bypass hit is the trusted skip-label constant itself. */
 const isTrustedSkipLabelDeclaration = (line: string, reviewBypassRegex: RegExp): boolean => {
   const skipLabel = AI_CONFIG.labels.skip;
-  if (!line.includes(skipLabel)) return false;
+  if (!line.includes(skipLabel)) {
+    return false;
+  }
   // Strip every occurrence of the trusted skip label; if nothing bypass-like
   // remains, the hit was only the legitimate constant declaration.
   return !reviewBypassRegex.test(line.split(skipLabel).join(''));
+};
+
+const scanFileLines = (filename: string, lines: string[]): SuspiciousPatternMatch[] => {
+  const matches: SuspiciousPatternMatch[] = [];
+  for (const line of lines) {
+    for (const { label, regex } of SUSPICIOUS_PATTERNS) {
+      if (!regex.test(line)) {
+        continue;
+      }
+      if (label === 'review bypass' && isTrustedSkipLabelDeclaration(line, regex)) {
+        continue;
+      }
+      matches.push({ file: filename, pattern: label });
+    }
+  }
+  return matches;
 };
 
 /** Scan added lines in PR patches for known AI supply-chain attack patterns. */
@@ -48,17 +68,8 @@ export const scanForSuspiciousPatterns = (
   const matches: SuspiciousPatternMatch[] = [];
 
   for (const file of files) {
-    if (!sensitiveFiles.has(file.filename)) continue;
-
-    for (const line of getAddedLines(file.patch)) {
-      for (const { label, regex } of SUSPICIOUS_PATTERNS) {
-        if (!regex.test(line)) continue;
-        if (label === 'review bypass' && isTrustedSkipLabelDeclaration(line, regex)) continue;
-        matches.push({
-          file: file.filename,
-          pattern: label,
-        });
-      }
+    if (sensitiveFiles.has(file.filename)) {
+      matches.push(...scanFileLines(file.filename, getAddedLines(file.patch)));
     }
   }
 

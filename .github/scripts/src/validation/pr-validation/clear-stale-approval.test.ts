@@ -3,16 +3,16 @@ import { describe, it } from 'node:test';
 
 import type { Octokit } from '@octokit/rest';
 
-import { clearStaleApproval } from './clear-stale-approval';
 import { APPROVED_LABEL, LGTM_LABEL } from '../commands/review-labels';
+import { clearStaleApproval } from './clear-stale-approval';
 
-type Call = { method: string; args: unknown };
+type Call = { args: unknown; method: string };
 
 const fakeOctokit = (calls: Call[]): Octokit =>
   ({
     issues: {
       removeLabel: async (args: unknown) => {
-        calls.push({ method: 'removeLabel', args });
+        calls.push({ args, method: 'removeLabel' });
       },
     },
   }) as unknown as Octokit;
@@ -23,8 +23,8 @@ describe('clearStaleApproval', () => {
     await clearStaleApproval(fakeOctokit(calls), 'kubevirt-ui', 'kubevirt-plugin', 42);
 
     const removed = calls
-      .filter((c) => c.method === 'removeLabel')
-      .map((c) => (c.args as { name: string }).name);
+      .filter((call) => call.method === 'removeLabel')
+      .map((call) => (call.args as { name: string }).name);
     assert.deepEqual(removed, [LGTM_LABEL, APPROVED_LABEL]);
   });
 
@@ -59,7 +59,7 @@ describe('clearStaleApproval', () => {
     const octokit = {
       issues: {
         removeLabel: async (args: { name: string }) => {
-          calls.push({ method: 'removeLabel', args });
+          calls.push({ args, method: 'removeLabel' });
           if (args.name === LGTM_LABEL) {
             throw new Error('rate limit exceeded');
           }
@@ -70,8 +70,11 @@ describe('clearStaleApproval', () => {
     await assert.rejects(clearStaleApproval(octokit, 'kubevirt-ui', 'kubevirt-plugin', 42));
 
     const removed = calls
-      .filter((c) => c.method === 'removeLabel')
-      .map((c) => (c.args as { name: string }).name);
-    assert.deepEqual(removed.sort(), [APPROVED_LABEL, LGTM_LABEL].sort());
+      .filter((call) => call.method === 'removeLabel')
+      .map((call) => (call.args as { name: string }).name);
+    assert.deepEqual(
+      [...removed].sort((left: string, right: string) => left.localeCompare(right)),
+      [APPROVED_LABEL, LGTM_LABEL].sort((left: string, right: string) => left.localeCompare(right)),
+    );
   });
 });

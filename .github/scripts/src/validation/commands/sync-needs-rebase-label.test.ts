@@ -10,50 +10,53 @@ const { COMMENT_MARKER, NEEDS_REBASE_LABEL, syncNeedsRebaseLabel } = require(
   COMMENT_MARKER: string;
   NEEDS_REBASE_LABEL: string;
   syncNeedsRebaseLabel: (args: {
-    github: unknown;
-    core: { info: (msg: string) => void };
     context: { repo: { owner: string; repo: string } };
+    core: { info: (msg: string) => void };
+    github: unknown;
     prNumber: number;
   }) => Promise<void>;
 };
 
-type Call = { method: string; args: unknown };
+type Call = { args: unknown; method: string };
 
 const fakeGithub = (opts: {
-  mergeable: boolean | null;
-  labels?: string[];
+  createLabelStatus?: number;
   existingComments?: string[];
   getLabelStatus?: number;
-  createLabelStatus?: number;
+  labels?: string[];
+  mergeable: boolean | null;
 }) => {
   const calls: Call[] = [];
   const labels = opts.labels ?? [];
-  const comments = (opts.existingComments ?? []).map((body, i) => ({ id: i + 1, body }));
+  const comments = (opts.existingComments ?? []).map((body, i) => ({ body, id: i + 1 }));
 
   const github = {
     paginate: async (fn: unknown, args: unknown) => {
-      calls.push({ method: 'paginate', args });
+      calls.push({ args, method: 'paginate' });
       if (fn === github.rest.issues.listComments) return comments;
       return [];
     },
     rest: {
-      pulls: {
-        get: async (args: unknown) => {
-          calls.push({ method: 'pulls.get', args });
-          return {
-            data: {
-              mergeable: opts.mergeable,
-              base: { ref: 'main' },
-              user: { login: 'pr-author' },
-              labels: labels.map((name) => ({ name })),
-            },
-          };
-        },
-      },
       issues: {
-        listComments: async () => ({ data: comments }),
+        addLabels: async (args: unknown) => {
+          calls.push({ args, method: 'addLabels' });
+        },
+        createComment: async (args: unknown) => {
+          calls.push({ args, method: 'createComment' });
+        },
+        createLabel: async (args: unknown) => {
+          calls.push({ args, method: 'createLabel' });
+          if (opts.createLabelStatus === 422) {
+            const err = new Error('already_exists') as Error & { status: number };
+            err.status = 422;
+            throw err;
+          }
+        },
+        deleteComment: async (args: unknown) => {
+          calls.push({ args, method: 'deleteComment' });
+        },
         getLabel: async (args: unknown) => {
-          calls.push({ method: 'getLabel', args });
+          calls.push({ args, method: 'getLabel' });
           if (opts.getLabelStatus === 404) {
             const err = new Error('Not Found') as Error & { status: number };
             err.status = 404;
@@ -61,31 +64,28 @@ const fakeGithub = (opts: {
           }
           return { data: {} };
         },
-        createLabel: async (args: unknown) => {
-          calls.push({ method: 'createLabel', args });
-          if (opts.createLabelStatus === 422) {
-            const err = new Error('already_exists') as Error & { status: number };
-            err.status = 422;
-            throw err;
-          }
-        },
-        addLabels: async (args: unknown) => {
-          calls.push({ method: 'addLabels', args });
-        },
+        listComments: async () => ({ data: comments }),
         removeLabel: async (args: unknown) => {
-          calls.push({ method: 'removeLabel', args });
+          calls.push({ args, method: 'removeLabel' });
         },
-        createComment: async (args: unknown) => {
-          calls.push({ method: 'createComment', args });
-        },
-        deleteComment: async (args: unknown) => {
-          calls.push({ method: 'deleteComment', args });
+      },
+      pulls: {
+        get: async (args: unknown) => {
+          calls.push({ args, method: 'pulls.get' });
+          return {
+            data: {
+              base: { ref: 'main' },
+              labels: labels.map((name) => ({ name })),
+              mergeable: opts.mergeable,
+              user: { login: 'pr-author' },
+            },
+          };
         },
       },
     },
   };
 
-  return { github, calls };
+  return { calls, github };
 };
 
 const core = { info: () => {} };
@@ -93,8 +93,8 @@ const context = { repo: { owner: 'kubevirt-ui', repo: 'kubevirt-plugin' } };
 
 describe('syncNeedsRebaseLabel', () => {
   it('skips when mergeable is still null', async () => {
-    const { github, calls } = fakeGithub({ mergeable: null });
-    await syncNeedsRebaseLabel({ github, core, context, prNumber: 42 });
+    const { calls, github } = fakeGithub({ mergeable: null });
+    await syncNeedsRebaseLabel({ context, core, github, prNumber: 42 });
     assert.equal(
       calls.some((c) => c.method === 'addLabels'),
       false,
@@ -106,8 +106,8 @@ describe('syncNeedsRebaseLabel', () => {
   });
 
   it('applies label + comment on first conflict', async () => {
-    const { github, calls } = fakeGithub({ mergeable: false, getLabelStatus: 404 });
-    await syncNeedsRebaseLabel({ github, core, context, prNumber: 42 });
+    const { calls, github } = fakeGithub({ getLabelStatus: 404, mergeable: false });
+    await syncNeedsRebaseLabel({ context, core, github, prNumber: 42 });
 
     assert.equal(
       calls.some((c) => c.method === 'createLabel'),
@@ -122,12 +122,12 @@ describe('syncNeedsRebaseLabel', () => {
   });
 
   it('tolerates 422 already_exists when creating the label', async () => {
-    const { github, calls } = fakeGithub({
-      mergeable: false,
-      getLabelStatus: 404,
+    const { calls, github } = fakeGithub({
       createLabelStatus: 422,
+      getLabelStatus: 404,
+      mergeable: false,
     });
-    await syncNeedsRebaseLabel({ github, core, context, prNumber: 42 });
+    await syncNeedsRebaseLabel({ context, core, github, prNumber: 42 });
     assert.equal(
       calls.some((c) => c.method === 'addLabels'),
       true,
@@ -135,12 +135,12 @@ describe('syncNeedsRebaseLabel', () => {
   });
 
   it('does not re-comment when the marker is already present', async () => {
-    const { github, calls } = fakeGithub({
-      mergeable: false,
-      labels: [NEEDS_REBASE_LABEL],
+    const { calls, github } = fakeGithub({
       existingComments: [`${COMMENT_MARKER}\n\nalready told you`],
+      labels: [NEEDS_REBASE_LABEL],
+      mergeable: false,
     });
-    await syncNeedsRebaseLabel({ github, core, context, prNumber: 42 });
+    await syncNeedsRebaseLabel({ context, core, github, prNumber: 42 });
     assert.equal(
       calls.some((c) => c.method === 'createComment'),
       false,
@@ -152,12 +152,12 @@ describe('syncNeedsRebaseLabel', () => {
   });
 
   it('removes the label and marker comments when mergeable becomes true', async () => {
-    const { github, calls } = fakeGithub({
-      mergeable: true,
-      labels: [NEEDS_REBASE_LABEL],
+    const { calls, github } = fakeGithub({
       existingComments: [`${COMMENT_MARKER}\n\nalready told you`],
+      labels: [NEEDS_REBASE_LABEL],
+      mergeable: true,
     });
-    await syncNeedsRebaseLabel({ github, core, context, prNumber: 42 });
+    await syncNeedsRebaseLabel({ context, core, github, prNumber: 42 });
     assert.equal(
       (calls.find((c) => c.method === 'removeLabel')?.args as { name: string }).name,
       NEEDS_REBASE_LABEL,

@@ -1,12 +1,12 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { runChecksIsolated } from './run-checks';
-import type { PrValidationCheck } from './run-checks';
-import { HandledValidationError } from '../pr-path-validation/errors';
 import type { GitHubConfig } from '../../types/index';
+import { HandledValidationError } from '../pr-path-validation/errors';
+import type { PrValidationCheck } from './run-checks';
+import { runChecksIsolated } from './run-checks';
 
-const CONFIG: GitHubConfig = { token: 'x', owner: 'kubevirt-ui', repo: 'kubevirt-plugin' };
+const CONFIG: GitHubConfig = { owner: 'kubevirt-ui', repo: 'kubevirt-plugin', token: 'x' };
 
 const buildCheck = (
   name: string,

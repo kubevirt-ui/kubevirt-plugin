@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { AI_CONFIG } from './constants';
 import { scanForSuspiciousPatterns } from './checks';
+import { AI_CONFIG } from './constants';
 
 describe('scanForSuspiciousPatterns', () => {
   it('flags Miasma-style attack patterns in added lines', () => {

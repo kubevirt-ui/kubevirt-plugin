@@ -14,15 +14,15 @@ export type PathValidationLabels = {
  * the shared pr-path-validation core.
  */
 export type PathValidationConfig = {
+  commandName: string;
+  /** Plain-English name for status descriptions, e.g. "CI configuration validation". */
+  displayName: string;
   exactPaths: readonly string[];
+  labelMeta: { alert: LabelMeta; block: LabelMeta };
+  labels: PathValidationLabels;
   pathPrefixes: readonly string[];
   relatedAutomationPaths?: readonly string[];
   relatedAutomationPrefixes?: readonly string[];
-  labels: PathValidationLabels;
-  labelMeta: { alert: LabelMeta; block: LabelMeta };
   /** Commit status context (slug, e.g. "ci-scripts-validation"). */
   statusContext: string;
-  /** Plain-English name for status descriptions, e.g. "CI configuration validation". */
-  displayName: string;
-  commandName: string;
 };

@@ -5,11 +5,13 @@ import type { Octokit } from '@octokit/rest';
 
 import { isWriteCollaborator } from './collaborator-trust';
 
-const fakeOctokit = (permission: string | null): Octokit =>
+const fakeOctokit = (permission: null | string): Octokit =>
   ({
     repos: {
       getCollaboratorPermissionLevel: async () => {
-        if (permission === null) throw new Error('Not Found');
+        if (permission === null) {
+          throw new Error('Not Found');
+        }
         return { data: { permission } };
       },
     },

@@ -1,20 +1,7 @@
-import { createRequire } from 'node:module';
-import path from 'node:path';
-
 import type { Octokit } from '@octokit/rest';
 
 import { addLabel, removeLabel } from '../../github-comments';
-
-// Runtime require of the CJS SSOT -- keeps grant/revoke names aligned with
-// isMergePoolPr without duplicating string literals here.
-const require = createRequire(__filename);
-const { APPROVED_LABEL, DO_NOT_MERGE_HOLD_LABEL, LGTM_LABEL } = require(
-  path.join(__dirname, '../../../../../ci-scripts/hot-cluster/js/merge-pool-labels.cjs'),
-) as {
-  APPROVED_LABEL: string;
-  DO_NOT_MERGE_HOLD_LABEL: string;
-  LGTM_LABEL: string;
-};
+import { APPROVED_LABEL, DO_NOT_MERGE_HOLD_LABEL, LGTM_LABEL } from '../../shared/merge-pool';
 
 export { APPROVED_LABEL, LGTM_LABEL };
 /** Label written by /hold -- blocked by isMergePoolPr via do-not-merge/* prefix. */

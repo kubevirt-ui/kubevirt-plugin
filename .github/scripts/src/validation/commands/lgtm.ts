@@ -1,9 +1,9 @@
+import { sameGitHubLogin } from '../../utils';
+import { isListedInOwners } from '../pr-path-validation/owners';
 import type { ApprovalContext } from './approve';
 import { denyCommand, reactToComment } from './approve';
 import { isWriteCollaborator } from './collaborator-trust';
-import { isListedInOwners } from '../pr-path-validation/owners';
 import { grantApprove, grantLgtm, revokeApprove, revokeLgtm } from './review-labels';
-import { sameGitHubLogin } from '../../utils';
 
 export type ReviewContext = ApprovalContext;
 

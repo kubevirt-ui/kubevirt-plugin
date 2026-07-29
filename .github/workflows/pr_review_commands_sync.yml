@@ -57,19 +57,8 @@ jobs:
 
       - name: Parse review data
         id: review
-        run: |
-          node -e "
-            const data = require('./review-data.json');
-            const fs = require('fs');
-            const lines = [
-              'pr_number=' + data.prNumber,
-              'review_state=' + data.reviewState,
-              'review_author=' + data.reviewAuthor,
-              'pr_author=' + data.prAuthor,
-              'base_branch=' + data.baseBranch,
-            ];
-            fs.appendFileSync(process.env.GITHUB_OUTPUT, lines.join('\n') + '\n');
-          "
+        working-directory: .github/scripts
+        run: npx tsx src/commands/parse-review-data.ts
 
       # Bot app token required (see ci-scripts/README.md). continue-on-error
       # so a genuinely bad credential (App uninstalled, secrets rotated --

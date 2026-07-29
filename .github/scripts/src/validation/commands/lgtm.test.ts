@@ -3,64 +3,64 @@ import { describe, it } from 'node:test';
 
 import type { Octokit } from '@octokit/rest';
 
-import { applyLgtm, cancelLgtm } from './lgtm';
 import type { ReviewContext } from './lgtm';
+import { applyLgtm, cancelLgtm } from './lgtm';
 
 const OWNERS_CONTENT = ['approvers:', '  - alice-approver'].join('\n');
 
-type Call = { method: string; args: unknown };
+type Call = { args: unknown; method: string };
 
 type FakeOptions = {
-  permission: string | null;
-  ownersContent?: string | null;
+  ownersContent?: null | string;
+  permission: null | string;
 };
 
-const fakeOctokit = ({ permission, ownersContent = null }: FakeOptions, calls: Call[]): Octokit =>
+const fakeOctokit = ({ ownersContent = null, permission }: FakeOptions, calls: Call[]): Octokit =>
   ({
-    repos: {
-      getCollaboratorPermissionLevel: async (args: unknown) => {
-        calls.push({ method: 'getCollaboratorPermissionLevel', args });
-        if (permission === null) throw new Error('Not Found');
-        return { data: { permission } };
-      },
-      getContent: async (args: unknown) => {
-        calls.push({ method: 'getContent', args });
-        if (ownersContent === null) throw new Error('Not Found');
-        return { data: { content: Buffer.from(ownersContent, 'utf8').toString('base64') } };
-      },
-    },
     issues: {
-      getLabel: async (args: unknown) => {
-        calls.push({ method: 'getLabel', args });
-        return { data: {} };
-      },
       addLabels: async (args: unknown) => {
-        calls.push({ method: 'addLabels', args });
-      },
-      removeLabel: async (args: unknown) => {
-        calls.push({ method: 'removeLabel', args });
+        calls.push({ args, method: 'addLabels' });
       },
       createComment: async (args: unknown) => {
-        calls.push({ method: 'createComment', args });
+        calls.push({ args, method: 'createComment' });
+      },
+      getLabel: async (args: unknown) => {
+        calls.push({ args, method: 'getLabel' });
+        return { data: {} };
+      },
+      removeLabel: async (args: unknown) => {
+        calls.push({ args, method: 'removeLabel' });
       },
     },
     reactions: {
       createForIssueComment: async (args: unknown) => {
-        calls.push({ method: 'createForIssueComment', args });
+        calls.push({ args, method: 'createForIssueComment' });
+      },
+    },
+    repos: {
+      getCollaboratorPermissionLevel: async (args: unknown) => {
+        calls.push({ args, method: 'getCollaboratorPermissionLevel' });
+        if (permission === null) throw new Error('Not Found');
+        return { data: { permission } };
+      },
+      getContent: async (args: unknown) => {
+        calls.push({ args, method: 'getContent' });
+        if (ownersContent === null) throw new Error('Not Found');
+        return { data: { content: Buffer.from(ownersContent, 'utf8').toString('base64') } };
       },
     },
   }) as unknown as Octokit;
 
 const baseCtx = (octokit: Octokit, contentsOctokit: Octokit, author: string): ReviewContext => ({
-  octokit,
-  contentsOctokit,
-  owner: 'kubevirt-ui',
-  repo: 'kubevirt-plugin',
-  prNumber: 42,
-  baseBranch: 'main',
   author,
+  baseBranch: 'main',
   commentId: 123,
+  contentsOctokit,
+  octokit,
+  owner: 'kubevirt-ui',
   prAuthor: 'pr-author',
+  prNumber: 42,
+  repo: 'kubevirt-plugin',
 });
 
 describe('applyLgtm', () => {
@@ -124,7 +124,7 @@ describe('applyLgtm', () => {
     const calls: Call[] = [];
     const octokit = fakeOctokit({ permission: 'write' }, calls);
     const contentsOctokit = fakeOctokit(
-      { permission: 'write', ownersContent: OWNERS_CONTENT },
+      { ownersContent: OWNERS_CONTENT, permission: 'write' },
       calls,
     );
 
@@ -143,7 +143,7 @@ describe('applyLgtm', () => {
     const calls: Call[] = [];
     const octokit = fakeOctokit({ permission: 'write' }, calls);
     const contentsOctokit = fakeOctokit(
-      { permission: 'write', ownersContent: OWNERS_CONTENT },
+      { ownersContent: OWNERS_CONTENT, permission: 'write' },
       calls,
     );
 
@@ -161,7 +161,7 @@ describe('applyLgtm', () => {
     const contentsCalls: Call[] = [];
     const octokit = fakeOctokit({ permission: 'write' }, calls);
     const contentsOctokit = fakeOctokit(
-      { permission: 'write', ownersContent: OWNERS_CONTENT },
+      { ownersContent: OWNERS_CONTENT, permission: 'write' },
       contentsCalls,
     );
 
@@ -202,9 +202,9 @@ describe('cancelLgtm', () => {
   it('OWNERS cancel also revokes approved (mirrors lgtm-acts-as-approve)', async () => {
     const calls: Call[] = [];
     const contentsCalls: Call[] = [];
-    const octokit = fakeOctokit({ permission: 'write', ownersContent: OWNERS_CONTENT }, calls);
+    const octokit = fakeOctokit({ ownersContent: OWNERS_CONTENT, permission: 'write' }, calls);
     const contentsOctokit = fakeOctokit(
-      { permission: 'write', ownersContent: OWNERS_CONTENT },
+      { ownersContent: OWNERS_CONTENT, permission: 'write' },
       contentsCalls,
     );
 

@@ -5,18 +5,18 @@ import { getSensitivePaths, isSensitivePath } from './paths';
 import type { PathValidationConfig } from './types';
 
 const TEST_CONFIG: PathValidationConfig = {
+  commandName: '/test-approved',
+  displayName: 'Test validation',
   exactPaths: ['Dockerfile'],
-  pathPrefixes: ['.github/'],
-  relatedAutomationPaths: ['scripts/build.sh'],
-  relatedAutomationPrefixes: ['tools/'],
-  labels: { alert: 'alert', block: 'block', reviewed: 'reviewed', skip: 'skip' },
   labelMeta: {
     alert: { color: 'f59e0b', description: 'alert' },
     block: { color: 'b60205', description: 'block' },
   },
+  labels: { alert: 'alert', block: 'block', reviewed: 'reviewed', skip: 'skip' },
+  pathPrefixes: ['.github/'],
+  relatedAutomationPaths: ['scripts/build.sh'],
+  relatedAutomationPrefixes: ['tools/'],
   statusContext: 'test-validation',
-  displayName: 'Test validation',
-  commandName: '/test-approved',
 };
 
 describe('isSensitivePath edge cases', () => {

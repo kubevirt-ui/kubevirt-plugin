@@ -7,14 +7,9 @@ import type { PathValidationConfig } from '../pr-path-validation/types';
  * no separate related-automation self-protection list needed.
  */
 export const CI_SCRIPTS_CONFIG = {
+  commandName: '/ci-approved',
+  displayName: 'CI configuration validation',
   exactPaths: ['Dockerfile', 'playwright-runner-hc-e2e.sh'],
-  pathPrefixes: ['.github/', 'ci-scripts/'],
-  labels: {
-    alert: 'ci-scripts-changed',
-    block: 'do-not-merge/ci-scripts-review',
-    reviewed: 'ci-scripts-reviewed',
-    skip: 'skip-ci-scripts-check',
-  },
   labelMeta: {
     alert: {
       color: 'f59e0b',
@@ -22,7 +17,12 @@ export const CI_SCRIPTS_CONFIG = {
     },
     block: { color: 'b60205', description: 'Blocked until ci-scripts-reviewed label is added' },
   },
+  labels: {
+    alert: 'ci-scripts-changed',
+    block: 'do-not-merge/ci-scripts-review',
+    reviewed: 'ci-scripts-reviewed',
+    skip: 'skip-ci-scripts-check',
+  },
+  pathPrefixes: ['.github/', 'ci-scripts/'],
   statusContext: 'ci-scripts-validation',
-  displayName: 'CI configuration validation',
-  commandName: '/ci-approved',
 } as const satisfies PathValidationConfig;
