@@ -54,12 +54,12 @@ on:
       infrastructure_type:
         description: Infrastructure type of the target cluster (used to provision if not already up)
         required: false
-        default: ipi
+        default: vpc
         type: choice
         options:
-          - ipi
           - vpc
           - classic
+          - ipi
       openshift_version:
         description: 'OpenShift version to provision if the cluster is not already up (e.g. 4.22_openshift)'
         required: false

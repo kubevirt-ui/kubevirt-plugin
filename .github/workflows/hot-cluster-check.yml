@@ -17,7 +17,7 @@ on:
         description: Infrastructure type for provisioning
         type: string
         required: false
-        default: ipi
+        default: vpc
       zone:
         description: Zone for cluster provisioning
         type: string

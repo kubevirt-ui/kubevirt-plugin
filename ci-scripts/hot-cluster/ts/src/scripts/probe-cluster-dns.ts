@@ -3,7 +3,8 @@
  * If api.<cluster>.<base_domain> resolves, the cluster already exists.
  * Replaces: inline bash in ibmc-cluster-setup.yml (precheck job)
  *
- * Required env: CLUSTER_NAME, INFRASTRUCTURE_TYPE, BASE_DOMAIN
+ * Required env: CLUSTER_NAME, INFRASTRUCTURE_TYPE
+ * Required env (IPI only): BASE_DOMAIN
  * Output: already_ready=true|false, cluster_ready=true|false
  */
 
@@ -22,12 +23,13 @@ const setOutput = (value: string): void => {
 const main = async (): Promise<void> => {
   const clusterName = requireEnv('CLUSTER_NAME');
   const infraType = requireEnv('INFRASTRUCTURE_TYPE');
-  const baseDomain = requireEnv('BASE_DOMAIN');
 
   if (infraType !== 'ipi') {
     setOutput('false');
     return;
   }
+
+  const baseDomain = requireEnv('BASE_DOMAIN');
 
   const apiHost = `api.${clusterName}.${baseDomain}`;
   try {
