@@ -6,12 +6,12 @@ on:
       infrastructure_type:
         description: 'Infrastructure type used to create the cluster'
         required: true
-        default: 'ipi'
+        default: 'vpc'
         type: choice
         options:
-          - ipi
           - vpc
           - classic
+          - ipi
       cluster_name:
         description: 'Cluster name to tear down'
         required: true

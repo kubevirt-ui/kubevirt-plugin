@@ -7,12 +7,12 @@ on:
       infrastructure_type:
         description: 'Infrastructure type'
         required: true
-        default: 'ipi'
+        default: 'vpc'
         type: choice
         options:
-          - ipi
           - vpc
           - classic
+          - ipi
       cluster_name:
         description: 'Cluster name (max 21 chars — IBM Cloud IPI limit, longer names get silently truncated)'
         required: true
@@ -82,7 +82,7 @@ on:
       infrastructure_type:
         description: 'Infrastructure type'
         required: false
-        default: 'ipi'
+        default: 'vpc'
         type: string
       cluster_name:
         description: 'Cluster name (max 21 chars — IBM Cloud IPI limit, longer names get silently truncated)'
@@ -171,7 +171,7 @@ permissions:
 
 env:
   CLUSTER_NAME: ${{ inputs.cluster_name || 'kubevirt-plugin-ci' }}
-  INFRASTRUCTURE_TYPE: ${{ inputs.infrastructure_type || 'ipi' }}
+  INFRASTRUCTURE_TYPE: ${{ inputs.infrastructure_type || 'vpc' }}
   # IBM_REGION is the account/API targeting region (not where resources are created).
   # VPC/IPI steps target the deployment region dynamically from the zone input.
   IBM_REGION: eu-de
@@ -201,7 +201,7 @@ jobs:
         id: probe
         env:
           CLUSTER_NAME: ${{ inputs.cluster_name || 'kubevirt-plugin-ci' }}
-          INFRASTRUCTURE_TYPE: ${{ inputs.infrastructure_type || 'ipi' }}
+          INFRASTRUCTURE_TYPE: ${{ inputs.infrastructure_type || 'vpc' }}
         working-directory: ci-scripts/hot-cluster/ts
         run: npx tsx src/scripts/probe-cluster-dns.ts
 
@@ -236,7 +236,7 @@ jobs:
         continue-on-error: true
         env:
           WORKER_ZONE: ${{ inputs.zone }}
-          INFRASTRUCTURE_TYPE: ${{ inputs.infrastructure_type || 'ipi' }}
+          INFRASTRUCTURE_TYPE: ${{ inputs.infrastructure_type || 'vpc' }}
         run: bash ./ci-scripts/hot-cluster/log-ibmcloud-iam-diagnostics.sh
 
       - name: Upload IAM diagnostics log
@@ -378,7 +378,7 @@ jobs:
       - name: Configure kubeconfig
         env:
           OCP_CHANNEL: ${{ steps.ipi_tools.outputs.ocp_channel }}
-          INFRASTRUCTURE_TYPE: ${{ inputs.infrastructure_type || 'ipi' }}
+          INFRASTRUCTURE_TYPE: ${{ inputs.infrastructure_type || 'vpc' }}
         run: bash ./ci-scripts/hot-cluster/configure-kubeconfig.sh
 
       - name: Open ingress LB security group for public access
@@ -539,7 +539,7 @@ jobs:
       - name: Setup summary
         if: always()
         env:
-          INFRASTRUCTURE_TYPE: ${{ inputs.infrastructure_type || 'ipi' }}
+          INFRASTRUCTURE_TYPE: ${{ inputs.infrastructure_type || 'vpc' }}
           ZONE: ${{ inputs.zone }}
           OPENSHIFT_VERSION: ${{ inputs.openshift_version }}
           WORKER_FLAVOR: ${{ inputs.worker_flavor }}

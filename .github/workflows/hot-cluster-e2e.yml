@@ -26,12 +26,12 @@ on:
       infrastructure_type:
         description: Infrastructure type used for the cluster
         required: true
-        default: ipi
+        default: vpc
         type: choice
         options:
-          - ipi
           - vpc
           - classic
+          - ipi
       runner_label:
         description: ARC runner label (defaults to cluster_name)
         required: false
@@ -106,7 +106,7 @@ permissions:
 # a new run would sit pending. Cancellation is per-job instead, only on the
 # two jobs that cost real cluster time.
 env:
-  INFRASTRUCTURE_TYPE: ${{ inputs.infrastructure_type || 'ipi' }}
+  INFRASTRUCTURE_TYPE: ${{ inputs.infrastructure_type || 'vpc' }}
   IBM_REGION: eu-de
   IBM_RESOURCE_GROUP: cnv-ui
   BASE_DOMAIN: cnv-ui.com
@@ -250,7 +250,7 @@ jobs:
     uses: ./.github/workflows/hot-cluster-check.yml
     with:
       cluster_name: ${{ needs.prepare.outputs.cluster_name }}
-      infrastructure_type: ${{ inputs.infrastructure_type || 'ipi' }}
+      infrastructure_type: ${{ inputs.infrastructure_type || 'vpc' }}
       openshift_version: ${{ needs.prepare.outputs.openshift_version }}
       cnv_channel: ${{ needs.prepare.outputs.cnv_channel }}
       cnv_pin_version: ${{ needs.prepare.outputs.cnv_pin_version }}
