@@ -1,3 +1,5 @@
+import { type TFunction } from 'i18next';
+
 import { type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { getAnnotation, getLabel } from '@kubevirt-utils/resources/shared';
 
@@ -8,7 +10,8 @@ import {
   AUTOPILOT_MODE_UNMANAGED,
 } from './autopilotConstants';
 import { AUTOPILOT_REGISTRY, type AutopilotRegistryEntry } from './autopilotRegistry';
-import { ConfigurationStatus } from './types';
+import { getRecommendedCapabilityFeatures } from './capabilityFeatures';
+import { type CapabilityFeature, ConfigurationStatus } from './types';
 
 export const watchAutopilotResources = Object.fromEntries(
   AUTOPILOT_REGISTRY.map((entry) => [
@@ -40,3 +43,16 @@ export const getRegistryEntryByPackageName = (
   packageName: string,
 ): AutopilotRegistryEntry | undefined =>
   AUTOPILOT_REGISTRY.find((entry) => entry.operatorPackageName === packageName);
+
+const AUTOPILOT_PACKAGE_NAMES = new Set(
+  AUTOPILOT_REGISTRY.map((entry) => entry.operatorPackageName),
+);
+
+const isAutopilotCapability = (feature: CapabilityFeature): boolean =>
+  feature.operators.every(({ packageName }) => AUTOPILOT_PACKAGE_NAMES.has(packageName));
+
+export const getAutopilotCapabilities = (t: TFunction): CapabilityFeature[] =>
+  getRecommendedCapabilityFeatures(t).filter(isAutopilotCapability);
+
+export const getManualCapabilities = (t: TFunction): CapabilityFeature[] =>
+  getRecommendedCapabilityFeatures(t).filter((feature) => !isAutopilotCapability(feature));

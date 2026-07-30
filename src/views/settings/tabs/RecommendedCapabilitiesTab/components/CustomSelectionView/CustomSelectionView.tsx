@@ -20,13 +20,13 @@ import { isCapabilitySelectable, sortFeatures } from './utils';
 const CustomSelectionView: FC = () => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
-  const { detailsMap, features, getCapabilityInstallState, loadErrors, resourcesLoaded } =
+  const { autopilotFeatures, detailsMap, getCapabilityInstallState, loadErrors, resourcesLoaded } =
     useCapabilitiesData();
   const { capabilitySelection, installFeature, installingFeatures } = useCapabilitiesActions();
 
   const { columns, direction, sortBy } = useCustomSelectionColumns();
   const { clearAllFilters, filteredData, filters, onSetFilters } = useCapabilityFilters(
-    features,
+    autopilotFeatures,
     getCapabilityInstallState,
   );
 
@@ -41,6 +41,7 @@ const CustomSelectionView: FC = () => {
         detailsMap,
         features: sortedFeatures,
         getCapabilityInstallState,
+        includeConfigCell: true,
         installFeature,
         installingFeatures,
         navigate,
@@ -58,20 +59,20 @@ const CustomSelectionView: FC = () => {
   );
 
   const installedCount = useMemo(
-    () => countInstalledCapabilities(features, detailsMap),
-    [features, detailsMap],
+    () => countInstalledCapabilities(autopilotFeatures, detailsMap),
+    [autopilotFeatures, detailsMap],
   );
 
   const selectableRows = useMemo(
     () =>
       treeRows.filter((row) => {
-        const feature = features.find((feature) => feature.id === row.id);
+        const feature = autopilotFeatures.find((feature) => feature.id === row.id);
         return (
           feature &&
           isCapabilitySelectable(feature, detailsMap, installingFeatures, getCapabilityInstallState)
         );
       }),
-    [detailsMap, features, getCapabilityInstallState, installingFeatures, treeRows],
+    [autopilotFeatures, detailsMap, getCapabilityInstallState, installingFeatures, treeRows],
   );
 
   const selectableIds = useMemo(
@@ -98,12 +99,16 @@ const CustomSelectionView: FC = () => {
           resourcesLoaded={resourcesLoaded}
           selectableRows={selectableRows}
           selection={capabilitySelection}
-          totalCount={features.length}
+          totalCount={autopilotFeatures.length}
           treeRows={treeRows}
         />
       </StackItem>
       <StackItem>
-        <StateHandler hasData={!isEmpty(features)} loaded={resourcesLoaded} showSkeletonLoading>
+        <StateHandler
+          hasData={!isEmpty(autopilotFeatures)}
+          loaded={resourcesLoaded}
+          showSkeletonLoading
+        >
           <DataView
             selection={{
               ...capabilitySelection,

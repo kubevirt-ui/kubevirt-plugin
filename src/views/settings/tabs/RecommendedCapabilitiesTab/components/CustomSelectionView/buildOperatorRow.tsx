@@ -2,6 +2,9 @@ import React from 'react';
 
 import { type TFunction } from 'i18next';
 
+import ActionsDropdown from '@kubevirt-utils/components/ActionsDropdown/ActionsDropdown';
+import { type ActionDropdownItemType } from '@kubevirt-utils/components/ActionsDropdown/constants';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Button, Label } from '@patternfly/react-core';
 import { type DataViewTrTree } from '@patternfly/react-data-view';
 
@@ -16,6 +19,8 @@ export const buildOperatorRow = (
   opDetails: RecommendedCapabilityOperatorDetails | undefined,
   navigate: (path: string) => void,
   t: TFunction,
+  actions?: ActionDropdownItemType[],
+  includeConfigCell = false,
 ): DataViewTrTree => {
   const { color, label } = getOperatorInstallStatusLabel(
     opDetails?.installState,
@@ -31,10 +36,10 @@ export const buildOperatorRow = (
       {
         cell: operatorHubURL ? (
           <Button isInline onClick={() => navigate(operatorHubURL)} variant="link">
-            {operator.packageName}
+            {operator.displayName}
           </Button>
         ) : (
-          operator.packageName
+          operator.displayName
         ),
       },
       {
@@ -44,7 +49,11 @@ export const buildOperatorRow = (
           </Label>
         ),
       },
-      { cell: null, props: { className: 'pf-v6-c-table__action' } },
+      ...(includeConfigCell ? [{ cell: null }] : []),
+      {
+        cell: !isEmpty(actions) ? <ActionsDropdown actions={actions} isKebabToggle /> : null,
+        props: { className: 'pf-v6-c-table__action' },
+      },
     ],
   };
 };

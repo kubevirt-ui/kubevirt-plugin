@@ -4,11 +4,8 @@ import { type CapabilityFeature, type CapabilitySelectionState } from '../utils/
 
 export type CapabilitiesActionsValue = {
   capabilitySelection: CapabilitySelectionState;
-  installBundle: () => Promise<void>;
   installFeature: (feature: CapabilityFeature) => Promise<void>;
   installingFeatures: Set<string>;
-  installResourcesLoaded: boolean;
-  isInstalling: boolean;
   setAlternative: (packageName: string, inUse: boolean) => void;
 };
 
@@ -20,11 +17,8 @@ const defaultActionsValue: CapabilitiesActionsValue = {
     onSelect: () => undefined,
     selected: [],
   },
-  installBundle: () => Promise.resolve(),
   installFeature: () => Promise.resolve(),
   installingFeatures: EMPTY_SET,
-  installResourcesLoaded: false,
-  isInstalling: false,
   setAlternative: () => undefined,
 };
 
