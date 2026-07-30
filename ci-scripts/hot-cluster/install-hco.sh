@@ -227,13 +227,14 @@ oc wait ssp -n ${CNV_NS} --all --for=condition=Available --timeout=10m
 echo "  Waiting for NetworkAttachmentDefinition CRD (nmstate)..."
 for i in $(seq 1 60); do
   if oc get crd networkattachmentdefinitions.k8s.cni.cncf.io &>/dev/null; then
-    echo "  NAD CRD is registered"
+    oc wait --for=condition=Established crd/networkattachmentdefinitions.k8s.cni.cncf.io --timeout=60s 2>/dev/null || true
+    echo "  NAD CRD is registered and established"
     break
   fi
   if [[ "${i}" -eq 60 ]]; then
-    echo "  WARNING: NAD CRD not found after 10 minutes (nmstate may not be installed)"
+    echo "  WARNING: NAD CRD not found after 5 minutes (nmstate may not be installed)"
   fi
-  sleep 10
+  sleep 5
 done
 
 echo "  Waiting for common templates to be created..."
@@ -244,9 +245,9 @@ for i in $(seq 1 60); do
     break
   fi
   if [[ "${i}" -eq 60 ]]; then
-    echo "  WARNING: No common templates found after 10 minutes"
+    echo "  WARNING: No common templates found after 5 minutes"
   fi
-  sleep 10
+  sleep 5
 done
 
 echo "  Waiting for DataSources in os-images namespace..."

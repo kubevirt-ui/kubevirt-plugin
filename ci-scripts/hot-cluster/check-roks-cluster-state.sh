@@ -37,8 +37,9 @@ while [[ ${ELAPSED} -lt ${MAX_WAIT} ]]; do
   INGRESS_STATUS=$(echo "${CLUSTER_JSON}" | jq -r '.ingress.status // "unknown"')
   INGRESS_HOSTNAME=$(echo "${CLUSTER_JSON}" | jq -r '.ingress.hostname // ""')
   WORKER_STATUS=$(echo "${CLUSTER_JSON}" | jq -r '.status // "unknown"')
+  WORKER_COUNT=$(echo "${CLUSTER_JSON}" | jq -r '.workerCount // 0')
 
-  echo "[$(date '+%H:%M:%S')] state=${STATE}  master=${MASTER_STATUS}/${MASTER_HEALTH}  ingress=${INGRESS_STATUS}  hostname=${INGRESS_HOSTNAME:-<empty>}  workers=\"${WORKER_STATUS}\"  (${ELAPSED}s elapsed)"
+  echo "[$(date '+%H:%M:%S')] state=${STATE}  master=${MASTER_STATUS}/${MASTER_HEALTH}  ingress=${INGRESS_STATUS}  hostname=${INGRESS_HOSTNAME:-<empty>}  workers=${WORKER_COUNT} \"${WORKER_STATUS}\"  (${ELAPSED}s elapsed)"
 
   if [[ "${STATE}" == "critical" || "${STATE}" == "delete_failed" ]]; then
     echo "ERROR: Cluster entered '${STATE}' state"
