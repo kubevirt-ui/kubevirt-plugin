@@ -22,19 +22,68 @@ const TEST_CONFIG: PathValidationConfig = {
 
 const buildStatusDescription = (): string => 'unused';
 
+type Call = { args: unknown; method: string };
+
+type FakeOptions = {
+  /** Reject createCommitStatus starting from this call number onward (1-indexed). Ignored when unset. */
+  rejectCommitStatusFromCall?: number;
+};
+
 /** issues.listLabelsOnIssue throws -- simulating a genuinely unexpected failure inside runPathValidation. */
-const fakeOctokitThrowing = (): Octokit =>
+const fakeOctokitThrowingAfterPending = (calls: Call[], options: FakeOptions = {}): Octokit =>
   ({
     issues: {
       listLabelsOnIssue: async () => {
+        calls.push({ args: {}, method: 'issues.listLabelsOnIssue' });
         throw new Error('API rate limit exceeded');
+      },
+    },
+    repos: {
+      createCommitStatus: async (args: unknown) => {
+        const callNumber = calls.filter((c) => c.method === 'createCommitStatus').length + 1;
+        calls.push({ args, method: 'createCommitStatus' });
+        if (
+          options.rejectCommitStatusFromCall !== undefined &&
+          callNumber >= options.rejectCommitStatusFromCall
+        ) {
+          throw new Error('secondary outage: statuses unavailable');
+        }
       },
     },
   }) as unknown as Octokit;
 
 describe('executePathValidation', () => {
-  it('wraps unexpected errors in HandledValidationError', async () => {
-    const octokit = fakeOctokitThrowing();
+  it('reports a final "error" status when an unexpected error occurs', async () => {
+    const calls: Call[] = [];
+    const octokit = fakeOctokitThrowingAfterPending(calls);
+
+    await assert.rejects(
+      executePathValidation(
+        {
+          baseBranch: 'main',
+          config: { owner: 'kubevirt-ui', repo: 'kubevirt-plugin', token: 'x' },
+          files: [{ filename: 'protected/foo.ts' }],
+          headSha: 'abc123',
+          octokit,
+          prNumber: 1,
+          statusOctokit: octokit,
+        },
+        TEST_CONFIG,
+        buildStatusDescription,
+      ),
+      HandledValidationError,
+    );
+
+    const statuses = calls
+      .filter((c) => c.method === 'createCommitStatus')
+      .map((c) => c.args as { context: string; state: string });
+    assert.equal(statuses.at(-1)?.state, 'error');
+    assert.equal(statuses.at(-1)?.context, 'test-validation');
+  });
+
+  it('still rethrows HandledValidationError even when the error status publish itself rejects', async () => {
+    const calls: Call[] = [];
+    const octokit = fakeOctokitThrowingAfterPending(calls, { rejectCommitStatusFromCall: 1 });
 
     await assert.rejects(
       executePathValidation(
@@ -60,7 +109,7 @@ describe('reportPathValidationError', () => {
     await assert.doesNotReject(
       reportPathValidationError(
         { owner: 'kubevirt-ui', repo: 'kubevirt-plugin', token: 'x' },
-        'abc123',
+        undefined,
         TEST_CONFIG,
         new Error('boom'),
       ),

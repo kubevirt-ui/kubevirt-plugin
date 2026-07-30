@@ -1,5 +1,6 @@
 import type { Octokit } from '@octokit/rest';
 
+import { setCommitStatus } from '../../github-comments';
 import { createOctokit, createStatusOctokit } from '../../github-repo';
 import type { GitHubConfig } from '../../types/index';
 import { safeErrorMessage } from '../../utils';
@@ -38,24 +39,44 @@ export const executePathValidation = async (
   const octokit = input.octokit ?? createOctokit(config);
   const statusOctokit = input.statusOctokit ?? createStatusOctokit(config);
 
-  const outcome: PathValidationOutcome = await runPathValidation(
-    {
-      baseBranch,
-      config,
-      event: { action: eventAction },
-      files,
-      headSha,
-      octokit,
-      prNumber,
-      statusOctokit,
-    },
-    pathConfig,
-    buildStatusDescription,
-    onFilesFetched,
-  ).catch((err) => {
+  let outcome: PathValidationOutcome;
+  try {
+    outcome = await runPathValidation(
+      {
+        baseBranch,
+        config,
+        event: { action: eventAction },
+        files,
+        headSha,
+        octokit,
+        prNumber,
+        statusOctokit,
+      },
+      pathConfig,
+      buildStatusDescription,
+      onFilesFetched,
+    );
+  } catch (err) {
     const message = `${pathConfig.displayName} encountered an unexpected error`;
+    // Best-effort -- a rejected status publish must not prevent rethrowing
+    // as HandledValidationError below.
+    if (headSha) {
+      await setCommitStatus(
+        statusOctokit,
+        config.owner,
+        config.repo,
+        headSha,
+        'error',
+        message,
+        pathConfig.statusContext,
+      ).catch((statusErr) => {
+        console.error(`Failed to report error status: ${safeErrorMessage(statusErr)}`);
+      });
+    }
+    // Already reported above -- wrap as HandledValidationError so the
+    // caller's isolation loop doesn't report this same error again.
     throw new HandledValidationError(`${message}: ${safeErrorMessage(err)}`);
-  });
+  }
 
   if (outcome.kind === 'failed') {
     throw new HandledValidationError(
@@ -66,14 +87,33 @@ export const executePathValidation = async (
   return outcome;
 };
 
-/** Best-effort "something broke" handler -- logs the error, never throws. */
+/** Best-effort "something broke" handler -- posts an error commit status, never throws. */
 export const reportPathValidationError = async (
-  _config: GitHubConfig,
-  _headSha: string | undefined,
-  _pathConfig: Pick<PathValidationConfig, 'displayName' | 'statusContext'>,
+  config: GitHubConfig,
+  headSha: string | undefined,
+  pathConfig: Pick<PathValidationConfig, 'displayName' | 'statusContext'>,
   err: unknown,
 ): Promise<void> => {
   console.error('Unexpected error:', safeErrorMessage(err));
+  if (!headSha) {
+    return;
+  }
+
+  const message = `${pathConfig.displayName} encountered an unexpected error`;
+  try {
+    const statusOctokit = createStatusOctokit(config);
+    await setCommitStatus(
+      statusOctokit,
+      config.owner,
+      config.repo,
+      headSha,
+      'error',
+      message,
+      pathConfig.statusContext,
+    );
+  } catch (statusErr) {
+    console.error(`Failed to report error status: ${safeErrorMessage(statusErr)}`);
+  }
 };
 
 const logSuspiciousMatches = (files: Array<{ filename: string; patch?: string }>): void => {
