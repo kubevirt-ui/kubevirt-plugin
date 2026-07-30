@@ -7,7 +7,7 @@
  * Env: KUBEVIRT_PLUGIN_IMAGE, LABELS
  */
 
-import { execSync } from 'node:child_process';
+import { execFileSync } from 'node:child_process';
 import { appendFileSync } from 'node:fs';
 
 import { requireEnv } from '../kube-client';
@@ -30,15 +30,13 @@ const main = async (): Promise<void> => {
     .flatMap((line) => ['--label', line.trim()]);
 
   // Build
-  const buildCmd = ['podman', 'build', ...labelArgs, '-t', image, '-f', 'Dockerfile', '.'].join(
-    ' ',
-  );
+  const buildArgs = ['build', ...labelArgs, '-t', image, '-f', 'Dockerfile', '.'];
   console.log(`Building: ${image}`);
-  execSync(buildCmd, { stdio: 'inherit' });
+  execFileSync('podman', buildArgs, { stdio: 'inherit' });
 
   // Push
   console.log(`Pushing: ${image}`);
-  execSync(`podman push ${image}`, { stdio: 'inherit' });
+  execFileSync('podman', ['push', image], { stdio: 'inherit' });
 };
 
 void main().catch((err) => {
