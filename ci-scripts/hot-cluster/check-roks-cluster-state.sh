@@ -2,7 +2,13 @@
 set -euo pipefail
 
 # Polls IBM Cloud until the ROKS cluster is fully available.
-# The cluster is ready when .state is "normal" AND .ingress.status is "healthy".
+# The cluster is ready when:
+#   .state is "normal" AND (.ingress.status is "healthy" OR .ingress.hostname is non-empty)
+#
+# IBM Cloud's ingress.status can remain "critical" due to stale monitoring even when
+# the actual OpenShift Ingress Operator is healthy (Available=True, Degraded=False).
+# A non-empty ingress.hostname means DNS + TLS are provisioned and the cluster is
+# functional, so we accept that as a readiness signal.
 #
 # Required env:
 #   CLUSTER_NAME   - name of the cluster to check
@@ -16,7 +22,7 @@ MAX_WAIT="${MAX_WAIT:-7200}"
 INTERVAL="${INTERVAL:-60}"
 
 echo "Waiting for cluster '${CLUSTER_NAME}' to be fully available..."
-echo "  Ready when: state=normal, ingress.status=healthy"
+echo "  Ready when: state=normal AND (ingress.status=healthy OR ingress.hostname is assigned)"
 echo "  Timeout: ${MAX_WAIT}s, poll interval: ${INTERVAL}s"
 echo ""
 
@@ -42,6 +48,12 @@ while [[ ${ELAPSED} -lt ${MAX_WAIT} ]]; do
   if [[ "${STATE}" == "normal" && "${INGRESS_STATUS}" == "healthy" ]]; then
     echo ""
     echo "Cluster is fully available!"
+    exit 0
+  fi
+
+  if [[ "${STATE}" == "normal" && -n "${INGRESS_HOSTNAME}" ]]; then
+    echo ""
+    echo "Cluster is ready (ingress hostname assigned; IBM Cloud status reporting may be stale)."
     exit 0
   fi
 

@@ -422,10 +422,13 @@ jobs:
 
       - name: Build ARC runner image
         id: build_runner
+        env:
+          ARC_RUNNER_IMAGE_FILE: ${{ runner.temp }}/arc-runner-image-ref.txt
         run: |
           OC_VERSION="${{ inputs.openshift_version || '4.21_openshift' }}"
           export OC_VERSION="${OC_VERSION%%_*}"
-          IMAGE_REF=$(./ci-scripts/hot-cluster/images/setup-arc-runner-image.sh | grep '^IMAGE_REF=' | cut -d= -f2-)
+          ./ci-scripts/hot-cluster/images/setup-arc-runner-image.sh
+          IMAGE_REF=$(cat "$ARC_RUNNER_IMAGE_FILE")
           echo "image_ref=${IMAGE_REF}" >> "$GITHUB_OUTPUT"
 
       - name: Install ARC
@@ -463,8 +466,12 @@ jobs:
 
       # Optional: create an htpasswd admin user for ROKS clusters (no kubeadmin).
       # Set CLUSTER_ADMIN_PASSWORD secret to enable. Not needed for IPI.
+      # NOTE: VPC ROKS with hosted control plane locks the OAuth CR via
+      # ValidatingAdmissionPolicy -- htpasswd cannot be applied directly.
+      # The step is continue-on-error so it never blocks provisioning.
       - name: Create console admin user (ROKS)
         if: inputs.infrastructure_type != 'ipi' && env.ADMIN_PASSWORD != ''
+        continue-on-error: true
         env:
           ADMIN_PASSWORD: ${{ secrets.CLUSTER_ADMIN_PASSWORD }}
         run: |
@@ -480,7 +487,7 @@ jobs:
             --from-literal=htpasswd="${HTPASSWD}" \
             -n openshift-config --dry-run=client -o yaml | oc apply -f -
 
-          oc apply -f - <<'OAUTH_EOF'
+          if ! oc apply -f - <<'OAUTH_EOF'
           apiVersion: config.openshift.io/v1
           kind: OAuth
           metadata:
@@ -494,6 +501,10 @@ jobs:
                 fileData:
                   name: htpass-secret
           OAUTH_EOF
+          then
+            echo "::warning::Cannot modify OAuth CR -- this is expected on VPC ROKS (hosted control plane manages OAuth via ValidatingAdmissionPolicy). Console login with htpasswd is not available; use IAM or kubeconfig instead."
+            exit 0
+          fi
 
           oc adm policy add-cluster-role-to-user cluster-admin admin 2>&1 || true
 
