@@ -90,7 +90,7 @@ Uses `openshift-install` to create a fully self-managed OpenShift cluster on IBM
 
 - **Zone format**: `us-south-1`, `eu-de-1`
 - **Flavor**: `bx2-8x32` (hyphen format, auto-converted from dot format)
-- **Base domain**: `cnv-ui.com` (registered in IBM Cloud CIS)
+- **Base domain**: `cnv-ui.com` (IPI only — requires IBM Cloud CIS; not needed for ROKS)
 - **Required**: VPC Admin, COS Manager, DNS/CIS access, IAM Identity Admin, `OPENSHIFT_PULL_SECRET` GitHub secret
 
 ## Required GitHub Secrets
