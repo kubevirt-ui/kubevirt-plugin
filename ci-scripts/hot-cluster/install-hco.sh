@@ -225,28 +225,23 @@ echo "  Waiting for SSP to be available..."
 oc wait ssp -n ${CNV_NS} --all --for=condition=Available --timeout=10m
 
 echo "  Waiting for NetworkAttachmentDefinition CRD (nmstate)..."
-for i in $(seq 1 60); do
-  if oc get crd networkattachmentdefinitions.k8s.cni.cncf.io &>/dev/null; then
-    echo "  NAD CRD is registered"
-    break
-  fi
-  if [[ "${i}" -eq 60 ]]; then
-    echo "  WARNING: NAD CRD not found after 10 minutes (nmstate may not be installed)"
-  fi
-  sleep 10
-done
+if oc wait --for=condition=Established crd/networkattachmentdefinitions.k8s.cni.cncf.io --timeout=120s 2>/dev/null; then
+  echo "  NAD CRD is registered and established"
+else
+  echo "  WARNING: NAD CRD not established after 2 minutes (nmstate may not be installed)"
+fi
 
 echo "  Waiting for common templates to be created..."
-for i in $(seq 1 60); do
+for i in $(seq 1 24); do
   TPL_COUNT=$(oc get templates -n openshift --no-headers 2>/dev/null | wc -l | tr -d ' ')
   if [[ "${TPL_COUNT}" -gt 0 ]]; then
     echo "  Found ${TPL_COUNT} common templates"
     break
   fi
-  if [[ "${i}" -eq 60 ]]; then
-    echo "  WARNING: No common templates found after 10 minutes"
+  if [[ "${i}" -eq 24 ]]; then
+    echo "  WARNING: No common templates found after 2 minutes"
   fi
-  sleep 10
+  sleep 5
 done
 
 echo "  Waiting for DataSources in os-images namespace..."
