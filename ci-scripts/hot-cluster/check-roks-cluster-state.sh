@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # Polls IBM Cloud until the ROKS cluster is fully available.
-# The cluster is ready when .state is "normal" AND .ingressStatus is "healthy".
+# The cluster is ready when .state is "normal" AND .ingress.status is "healthy".
 #
 # Required env:
 #   CLUSTER_NAME   - name of the cluster to check
@@ -16,7 +16,7 @@ MAX_WAIT="${MAX_WAIT:-7200}"
 INTERVAL="${INTERVAL:-60}"
 
 echo "Waiting for cluster '${CLUSTER_NAME}' to be fully available..."
-echo "  Ready when: state=normal, ingressStatus=healthy"
+echo "  Ready when: state=normal, ingress.status=healthy"
 echo "  Timeout: ${MAX_WAIT}s, poll interval: ${INTERVAL}s"
 echo ""
 
@@ -26,10 +26,12 @@ while [[ ${ELAPSED} -lt ${MAX_WAIT} ]]; do
   CLUSTER_JSON=$(ibmcloud oc cluster get --cluster "${CLUSTER_NAME}" --output json 2>/dev/null || echo "{}")
 
   STATE=$(echo "${CLUSTER_JSON}" | jq -r '.state // "unknown"')
-  MASTER_STATE=$(echo "${CLUSTER_JSON}" | jq -r '.masterState // "unknown"')
-  INGRESS_STATUS=$(echo "${CLUSTER_JSON}" | jq -r '.ingressStatus // "unknown"')
+  MASTER_STATUS=$(echo "${CLUSTER_JSON}" | jq -r '.lifecycle.masterStatus // "unknown"')
+  MASTER_HEALTH=$(echo "${CLUSTER_JSON}" | jq -r '.lifecycle.masterHealth // "unknown"')
+  INGRESS_STATUS=$(echo "${CLUSTER_JSON}" | jq -r '.ingress.status // "unknown"')
+  INGRESS_HOSTNAME=$(echo "${CLUSTER_JSON}" | jq -r '.ingress.hostname // ""')
 
-  echo "[$(date '+%H:%M:%S')] state=${STATE}  masterState=${MASTER_STATE}  ingressStatus=${INGRESS_STATUS}  (${ELAPSED}s elapsed)"
+  echo "[$(date '+%H:%M:%S')] state=${STATE}  master=${MASTER_STATUS}/${MASTER_HEALTH}  ingress=${INGRESS_STATUS}  hostname=${INGRESS_HOSTNAME:-<empty>}  (${ELAPSED}s elapsed)"
 
   if [[ "${STATE}" == "critical" || "${STATE}" == "delete_failed" ]]; then
     echo "ERROR: Cluster entered '${STATE}' state"
