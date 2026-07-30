@@ -32,7 +32,7 @@ const fetchPrWithMergeability = async (
   const attempts = Array.from({ length: MERGEABLE_RETRIES });
   const result = await attempts.reduce<Promise<PullData | undefined>>(async (prev, _attempt, i) => {
     const current = await prev;
-    if (current?.mergeable !== null) {
+    if (current !== undefined && current.mergeable !== null) {
       return current;
     }
     if (i > 0) {
