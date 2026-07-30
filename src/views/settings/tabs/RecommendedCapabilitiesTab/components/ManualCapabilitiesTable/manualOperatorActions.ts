@@ -1,9 +1,9 @@
 import { type TFunction } from 'i18next';
 
 import { type ActionDropdownItemType } from '@kubevirt-utils/components/ActionsDropdown/constants';
-import { isInstalled } from '@settings/tabs/ClusterTab/components/VirtualizationFeaturesSection/utils/utils';
 
 import { type RecommendedCapabilityOperatorDetails } from '../../utils/types';
+import { isInstalled } from '../../utils/utils';
 
 export const getManualOperatorActions = (
   details: RecommendedCapabilityOperatorDetails | undefined,
