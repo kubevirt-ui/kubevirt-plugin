@@ -61,9 +61,9 @@ on:
           - classic
           - ipi
       openshift_version:
-        description: 'OpenShift version to provision if the cluster is not already up (e.g. 4.22_openshift)'
+        description: 'OpenShift version to provision if the cluster is not already up (e.g. 4.21_openshift)'
         required: false
-        default: '4.22_openshift'
+        default: '4.21_openshift'
         type: string
       cnv_channel:
         description: CNV OLM subscription channel to install if the cluster is not already up

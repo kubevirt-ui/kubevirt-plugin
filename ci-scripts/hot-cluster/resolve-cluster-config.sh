@@ -17,7 +17,7 @@ set -euo pipefail
 # Usage: ./ci-scripts/hot-cluster/resolve-cluster-config.sh >> "$GITHUB_OUTPUT"
 
 DEFAULT_CLUSTER_NAME="kubevirt-plugin-ci"
-DEFAULT_OPENSHIFT_VERSION="4.22_openshift"
+DEFAULT_OPENSHIFT_VERSION="4.21_openshift"
 DEFAULT_TEST_ENGINE="playwright"
 DEFAULT_CNV_CHANNEL="stable"
 

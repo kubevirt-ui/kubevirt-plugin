@@ -27,7 +27,7 @@ on:
         description: OpenShift version
         type: string
         required: false
-        default: '4.22_openshift'
+        default: '4.21_openshift'
       branch_name:
         description: |
           Branch identity to report in the "Hot cluster ready" Slack

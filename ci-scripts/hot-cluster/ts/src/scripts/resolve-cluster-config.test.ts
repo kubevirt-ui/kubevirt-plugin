@@ -22,7 +22,7 @@ describe('resolveClusterConfig', () => {
   it('falls back to defaults for main branch', () => {
     const config = resolveClusterConfig({ baseRef: 'main' });
     assert.equal(config.clusterName, 'kubevirt-plugin-ci');
-    assert.equal(config.openshiftVersion, '4.22_openshift');
+    assert.equal(config.openshiftVersion, '4.21_openshift');
     assert.equal(config.testEngine, 'playwright');
   });
 
