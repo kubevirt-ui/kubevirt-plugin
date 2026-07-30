@@ -1,17 +1,20 @@
-import React, { type FC, useCallback, useMemo } from 'react';
+import React, { type FC, type ReactNode, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router';
 
+import AutoAppliedBadge from '@kubevirt-utils/components/badges/AutoAppliedBadge/AutoAppliedBadge';
 import NewLabelsModal from '@kubevirt-utils/components/LabelsModal/NewLabelsModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import useAutoAppliedLabels from '@kubevirt-utils/hooks/useAutoAppliedLabels/useAutoAppliedLabels';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getLabels, getNamespace } from '@kubevirt-utils/resources/shared';
 import { isSystemKey } from '@kubevirt-utils/utils/labelValidation/labelValidation';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getVMListURL } from '@multicluster/urls';
 import { type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
-import { Button, ButtonVariant, Truncate } from '@patternfly/react-core';
+import { Button, ButtonVariant, Split, SplitItem, Truncate } from '@patternfly/react-core';
 import { VM_LIST_TAB_PARAM, VM_LIST_TAB_VMS } from '@virtualmachines/navigator/constants';
 
+import AutoAppliedCount from './AutoAppliedCount';
 import LabelsAnnotationsTable from './LabelsAnnotationsTable';
 
 type LabelsTableProps = {
@@ -33,6 +36,11 @@ const LabelsTable: FC<LabelsTableProps> = ({ editable = true, onLabelsSubmit, re
 
   const allLabels = useMemo(() => getLabels(resource, {}), [resource]);
   const entries = useMemo(() => Object.entries(allLabels), [allLabels]);
+
+  const autoAppliedCount = useMemo(
+    () => entries.filter(([key]) => autoAppliedMap.has(key)).length,
+    [entries, autoAppliedMap],
+  );
 
   const canDelete = useCallback(
     (key: string): boolean => autoAppliedLoaded && !isSystemKey(key) && !autoAppliedMap.has(key),
@@ -87,6 +95,21 @@ const LabelsTable: FC<LabelsTableProps> = ({ editable = true, onLabelsSubmit, re
     [onLabelClick, t],
   );
 
+  const renderKey = useCallback(
+    (key: string): ReactNode => {
+      if (!autoAppliedMap.has(key)) return key;
+      return (
+        <Split hasGutter>
+          <SplitItem>{key}</SplitItem>
+          <SplitItem>
+            <AutoAppliedBadge />
+          </SplitItem>
+        </Split>
+      );
+    },
+    [autoAppliedMap],
+  );
+
   return (
     <LabelsAnnotationsTable
       addButtonLabel={t('Add labels')}
@@ -100,8 +123,10 @@ const LabelsTable: FC<LabelsTableProps> = ({ editable = true, onLabelsSubmit, re
       onAdd={openLabelsModal}
       onDelete={onDelete}
       onEdit={openLabelsModal}
+      renderKey={renderKey}
       renderValue={renderValue}
       searchId="labels"
+      summaryContent={!isEmpty(autoAppliedLabels) && <AutoAppliedCount count={autoAppliedCount} />}
       title={t('Labels')}
     />
   );
