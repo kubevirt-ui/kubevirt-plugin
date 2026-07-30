@@ -291,6 +291,7 @@ jobs:
         continue-on-error: true
         working-directory: .github/scripts
         env:
+          GITHUB_TOKEN: ${{ github.token }}
           HEAD_SHA: ${{ needs.prepare.outputs.progress_head_sha }}
           STATUS_CONTEXT: ${{ needs.prepare.outputs.progress_status_context }}
           CLUSTER_READY: ${{ github.event_name == 'workflow_dispatch' && needs.cluster-check.outputs.cluster_ready == 'true' && needs.cluster-check.result == 'success' || github.event_name != 'workflow_dispatch' && needs.cluster-check.outputs.cluster_ready == 'true' }}
