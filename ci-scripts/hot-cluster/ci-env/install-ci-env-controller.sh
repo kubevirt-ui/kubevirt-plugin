@@ -45,21 +45,19 @@ echo ""
 # --- Resolve controller image ---
 if [[ -z "${CI_ENV_CONTROLLER_IMAGE:-}" ]]; then
   echo "Building controller image via setup-ci-env-runner-image.sh..."
-  IMAGE_OUTPUT_FILE="$(mktemp)"
-  if ! CI_ENV_NS="${CI_ENV_NS}" bash "${CI_SCRIPTS_DIR}/images/setup-ci-env-runner-image.sh" > "${IMAGE_OUTPUT_FILE}" 2>&1; then
-    echo "ERROR: setup-ci-env-runner-image.sh failed. Output:"
-    cat "${IMAGE_OUTPUT_FILE}"
-    rm -f "${IMAGE_OUTPUT_FILE}"
+  CI_ENV_RUNNER_IMAGE_FILE="$(mktemp)"
+  export CI_ENV_RUNNER_IMAGE_FILE
+  if ! CI_ENV_NS="${CI_ENV_NS}" bash "${CI_SCRIPTS_DIR}/images/setup-ci-env-runner-image.sh"; then
+    echo "ERROR: setup-ci-env-runner-image.sh failed."
+    rm -f "${CI_ENV_RUNNER_IMAGE_FILE}"
     exit 1
   fi
-  CI_ENV_CONTROLLER_IMAGE="$(grep '^IMAGE_REF=' "${IMAGE_OUTPUT_FILE}" | cut -d= -f2-)"
+  CI_ENV_CONTROLLER_IMAGE="$(cat "${CI_ENV_RUNNER_IMAGE_FILE}")"
+  rm -f "${CI_ENV_RUNNER_IMAGE_FILE}"
   if [[ -z "${CI_ENV_CONTROLLER_IMAGE}" ]]; then
-    echo "ERROR: setup-ci-env-runner-image.sh did not output IMAGE_REF=. Output:"
-    cat "${IMAGE_OUTPUT_FILE}"
-    rm -f "${IMAGE_OUTPUT_FILE}"
+    echo "ERROR: setup-ci-env-runner-image.sh did not produce an image reference."
     exit 1
   fi
-  rm -f "${IMAGE_OUTPUT_FILE}"
   echo "Built image: ${CI_ENV_CONTROLLER_IMAGE}"
 else
   echo "Using provided image: ${CI_ENV_CONTROLLER_IMAGE}"
