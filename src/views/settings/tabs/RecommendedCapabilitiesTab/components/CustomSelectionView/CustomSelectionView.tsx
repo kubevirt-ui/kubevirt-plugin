@@ -9,20 +9,35 @@ import { DataView, DataViewTable, type DataViewTrTree } from '@patternfly/react-
 
 import { useCapabilitiesActions } from '../../context/useCapabilitiesActions';
 import { useCapabilitiesData } from '../../context/useCapabilitiesData';
-import { countInstalledCapabilities } from '../../utils/utils';
+import ReviewRecommendationModal from '../ReviewRecommendationModal/ReviewRecommendationModal';
 
-import { buildTreeRows } from './buildTreeRows';
 import CustomSelectionToolbar from './CustomSelectionToolbar';
 import { useCapabilityFilters } from './useCapabilityFilters';
+import useCustomSelectionRows from './useCustomSelectionRows';
 import { useCustomSelectionColumns } from './useCustomSelectionColumns';
-import { isCapabilitySelectable, sortFeatures } from './utils';
+import useReviewRecommendationModal from './useReviewRecommendationModal';
+import { sortFeatures } from './utils';
 
 const CustomSelectionView: FC = () => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
-  const { autopilotFeatures, detailsMap, getCapabilityInstallState, loadErrors, resourcesLoaded } =
-    useCapabilitiesData();
+  const {
+    autopilotFeatures,
+    autopilotStatusMap,
+    detailsMap,
+    getCapabilityInstallState,
+    loadErrors,
+    resourcesLoaded,
+  } = useCapabilitiesData();
   const { capabilitySelection, installFeature, installingFeatures } = useCapabilitiesActions();
+
+  const {
+    onCloseReviewModal,
+    onOpenReviewModal,
+    reviewAutopilotStatus,
+    reviewOperatorDisplayName,
+    reviewRegistryEntry,
+  } = useReviewRecommendationModal(autopilotFeatures, autopilotStatusMap);
 
   const { columns, direction, sortBy } = useCustomSelectionColumns();
   const { clearAllFilters, filteredData, filters, onSetFilters } = useCapabilityFilters(
@@ -35,50 +50,18 @@ const CustomSelectionView: FC = () => {
     [filteredData, sortBy, direction, getCapabilityInstallState],
   );
 
-  const treeRows = useMemo(
-    () =>
-      buildTreeRows({
-        detailsMap,
-        features: sortedFeatures,
-        getCapabilityInstallState,
-        includeConfigCell: true,
-        installFeature,
-        installingFeatures,
-        navigate,
-        t,
-      }),
-    [
-      detailsMap,
-      getCapabilityInstallState,
-      installFeature,
-      installingFeatures,
-      navigate,
-      sortedFeatures,
-      t,
-    ],
-  );
-
-  const installedCount = useMemo(
-    () => countInstalledCapabilities(autopilotFeatures, detailsMap),
-    [autopilotFeatures, detailsMap],
-  );
-
-  const selectableRows = useMemo(
-    () =>
-      treeRows.filter((row) => {
-        const feature = autopilotFeatures.find((feature) => feature.id === row.id);
-        return (
-          feature &&
-          isCapabilitySelectable(feature, detailsMap, installingFeatures, getCapabilityInstallState)
-        );
-      }),
-    [autopilotFeatures, detailsMap, getCapabilityInstallState, installingFeatures, treeRows],
-  );
-
-  const selectableIds = useMemo(
-    () => new Set(selectableRows.map((row) => row.id)),
-    [selectableRows],
-  );
+  const { installedCount, selectableIds, selectableRows, treeRows } = useCustomSelectionRows({
+    autopilotStatusMap,
+    detailsMap,
+    features: autopilotFeatures,
+    getCapabilityInstallState,
+    installFeature,
+    installingFeatures,
+    navigate,
+    onOpenReviewModal,
+    sortedFeatures,
+    t,
+  });
 
   return (
     <Stack hasGutter>
@@ -124,6 +107,16 @@ const CustomSelectionView: FC = () => {
           </DataView>
         </StateHandler>
       </StackItem>
+      {reviewRegistryEntry && reviewAutopilotStatus && (
+        <ReviewRecommendationModal
+          isOpen={!!reviewRegistryEntry}
+          managedCR={reviewAutopilotStatus.managedCR}
+          onClose={onCloseReviewModal}
+          operatorDisplayName={reviewOperatorDisplayName}
+          recommendedYAML={reviewAutopilotStatus.recommendedYAML}
+          registryEntry={reviewRegistryEntry}
+        />
+      )}
     </Stack>
   );
 };

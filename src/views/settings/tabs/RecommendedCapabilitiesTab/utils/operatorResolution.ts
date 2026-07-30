@@ -1,26 +1,19 @@
-import { isNil } from 'lodash';
-
 import { getName } from '@kubevirt-utils/resources/shared';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   type ClusterServiceVersionKind,
-  ClusterServiceVersionPhase,
   type OperatorGroupKind,
   type PackageManifestKind,
   type SubscriptionKind,
 } from '@overview/utils/types';
 
-import { INSTALL_SUCCEEDED_STATUS, RED_HAT } from './constants';
+import { RED_HAT } from './constants';
+import { getBundleFeatures } from './installState';
 import {
   type CapabilityFeature,
-  CapabilityInstallState,
   InstallState,
   type RecommendedCapabilityDetailsMap,
   type VirtFeatureOperatorItem,
 } from './types';
-
-export const isInstalled = (installState: InstallState): boolean =>
-  installState === InstallState.INSTALLED;
 
 export const getPackageUID = (pkg: PackageManifestKind) =>
   `${pkg.metadata.name}-${pkg.status.catalogSource}-${pkg.status.catalogSourceNamespace}`;
@@ -49,51 +42,6 @@ export const subscriptionFor = (
 
 export const getOperatorHubURL = (uid: string, namespace: string) =>
   `/catalog/ns/${namespace || 'default'}?selectedId=${uid}`;
-
-export const computeInstallState = (
-  csv: ClusterServiceVersionKind,
-  subscription: SubscriptionKind,
-) => {
-  const installPhase = csv?.status?.phase;
-  const installInProgress =
-    !isNil(subscription) &&
-    !isNil(csv?.status?.phase) &&
-    csv?.status?.phase !== INSTALL_SUCCEEDED_STATUS;
-
-  if (installPhase === ClusterServiceVersionPhase.CSVPhaseSucceeded) return InstallState.INSTALLED;
-  if (installPhase === ClusterServiceVersionPhase.CSVPhaseFailed) return InstallState.FAILED;
-  if (installInProgress) return InstallState.INSTALLING;
-  if (subscription?.status?.installedCSV) return InstallState.INSTALLED;
-  return InstallState.NOT_INSTALLED;
-};
-
-export const getBundleFeatures = (features: CapabilityFeature[]): CapabilityFeature[] =>
-  features.filter(({ isDefaultBundle }) => isDefaultBundle);
-
-export const computeCapabilityInstallState = (
-  feature: CapabilityFeature,
-  detailsMap: RecommendedCapabilityDetailsMap,
-): CapabilityInstallState => {
-  if (isEmpty(detailsMap)) return CapabilityInstallState.NotInstalled;
-
-  const satisfiedCount = feature.operators.filter(({ packageName }) => {
-    const details = detailsMap[packageName];
-    return details?.isRedHatProvided && isInstalled(details.installState);
-  }).length;
-
-  if (satisfiedCount === feature.operators.length) return CapabilityInstallState.Installed;
-  if (satisfiedCount > 0) return CapabilityInstallState.PartiallyInstalled;
-  return CapabilityInstallState.NotInstalled;
-};
-
-export const countInstalledCapabilities = (
-  features: CapabilityFeature[],
-  detailsMap: RecommendedCapabilityDetailsMap,
-): number =>
-  features.filter(
-    (feature) =>
-      computeCapabilityInstallState(feature, detailsMap) === CapabilityInstallState.Installed,
-  ).length;
 
 const getNonInstalledManifests = (
   packageNames: Set<string>,

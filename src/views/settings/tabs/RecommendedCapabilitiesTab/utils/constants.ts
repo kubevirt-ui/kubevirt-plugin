@@ -3,11 +3,10 @@ import { type TFunction } from 'i18next';
 import { type LabelProps } from '@patternfly/react-core';
 
 import { CapabilityInstallState, InstallState } from './types';
-import { isInstalled } from './utils';
+import { isInstalled } from './installState';
 
 export const RED_HAT = 'Red Hat';
 export const CONSOLE_OPERATOR_CONFIG_NAME = 'cluster';
-export const INSTALL_SUCCEEDED_STATUS = 'Succeeded';
 export const OPENSHIFT_MARKETPLACE_NAMESPACE = 'openshift-marketplace';
 
 export const OLM_PROCESSING_DELAY_MS = 30_000;

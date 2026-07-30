@@ -9,7 +9,12 @@ import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Label, Spinner } from '@patternfly/react-core';
 
 import { CAPABILITY_INSTALL_STATE_CONFIG } from '../../utils/constants';
-import { type CapabilityFeature, CapabilityInstallState } from '../../utils/types';
+import {
+  type CapabilityFeature,
+  CapabilityInstallState,
+  ConfigurationStatus,
+} from '../../utils/types';
+import ConfigurationStatusCell from '../ConfigurationStatusCell/ConfigurationStatusCell';
 
 export const buildCapabilityRow = (
   feature: CapabilityFeature,
@@ -18,6 +23,7 @@ export const buildCapabilityRow = (
   actions: ActionDropdownItemType[],
   t: TFunction,
   includeConfigCell = false,
+  configStatus?: ConfigurationStatus,
 ) => {
   const { color, getLabel } = CAPABILITY_INSTALL_STATE_CONFIG[installState];
 
@@ -39,7 +45,9 @@ export const buildCapabilityRow = (
         </Label>
       ),
     },
-    ...(includeConfigCell ? [{ cell: null }] : []),
+    ...(includeConfigCell
+      ? [{ cell: <ConfigurationStatusCell configStatus={configStatus} /> }]
+      : []),
     {
       cell:
         !isEmpty(actions) && installState !== CapabilityInstallState.Installed && !isInstalling ? (

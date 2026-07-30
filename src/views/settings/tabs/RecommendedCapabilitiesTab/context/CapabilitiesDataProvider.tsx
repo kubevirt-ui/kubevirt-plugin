@@ -17,7 +17,7 @@ import {
   type CapabilityFeature,
   type RecommendedCapabilityDetailsMap,
 } from '../utils/types';
-import { computeCapabilityInstallState } from '../utils/utils';
+import { computeCapabilityInstallState } from '../utils/installState';
 import {
   CapabilitiesActionsContext,
   type CapabilitiesActionsValue,
