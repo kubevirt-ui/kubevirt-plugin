@@ -1,14 +1,21 @@
 import { type TFunction } from 'i18next';
 
 import { type LabelProps } from '@patternfly/react-core';
-import { InstallState } from '@settings/tabs/ClusterTab/components/VirtualizationFeaturesSection/utils/types';
-import { isInstalled } from '@settings/tabs/ClusterTab/components/VirtualizationFeaturesSection/utils/utils';
 
-import { CapabilityInstallState } from './types';
+import {
+  CapabilitiesView,
+  CapabilityInstallState,
+  InstallState,
+  type SelectionCardConfig,
+} from './types';
+import { isInstalled } from './utils';
+
+export const RED_HAT = 'Red Hat';
+export const CONSOLE_OPERATOR_CONFIG_NAME = 'cluster';
+export const INSTALL_SUCCEEDED_STATUS = 'Succeeded';
+export const OPENSHIFT_MARKETPLACE_NAMESPACE = 'openshift-marketplace';
 
 export const OLM_PROCESSING_DELAY_MS = 30_000;
-
-import { CapabilitiesView, type SelectionCardConfig } from './types';
 
 export const getSelectionCardConfigs = (t: TFunction): SelectionCardConfig[] => [
   {

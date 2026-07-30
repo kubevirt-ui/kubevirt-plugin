@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { InstallState } from '@settings/tabs/ClusterTab/components/VirtualizationFeaturesSection/utils/types';
+import { InstallState } from '../utils/types';
 
 import { OLM_PROCESSING_DELAY_MS } from '../utils/constants';
 import { type RecommendedCapabilityDetailsMap } from '../utils/types';

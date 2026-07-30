@@ -9,7 +9,7 @@ import {
   useAccessReview,
 } from '@openshift-console/dynamic-plugin-sdk';
 import { useSettingsCluster } from '@settings/context/SettingsClusterContext';
-import { CONSOLE_OPERATOR_CONFIG_NAME } from '@settings/tabs/ClusterTab/components/VirtualizationFeaturesSection/VirtualizationFeaturesWizard/utils/hooks/useCreateOperator/utils/constants';
+import { CONSOLE_OPERATOR_CONFIG_NAME } from '../utils/constants';
 
 type UseInstallResourcesReturn = {
   canPatchConsoleOperatorConfig: boolean;

@@ -312,3 +312,26 @@ export const createIfNotExists = async (request: Promise<unknown>): Promise<void
     if (error.code !== ALREADY_CREATED_ERROR_CODE) throw error;
   }
 };
+
+export const parseJSONAnnotation = <T = any>(
+  annotations: Record<string, string> | undefined,
+  key: string,
+  options?: { onError?: (error: any) => void; validate?: (value: any) => boolean },
+): T => {
+  const { onError, validate } = options ?? {};
+  const annotation = annotations?.[key];
+  if (!annotation) {
+    return null;
+  }
+  try {
+    const parsed: T = JSON.parse(annotation);
+    const valid = validate?.(parsed) ?? true;
+    if (!valid) {
+      throw new Error(`Invalid value: "${annotation}"`);
+    }
+    return parsed;
+  } catch (e) {
+    onError?.(e.message);
+    return null;
+  }
+};

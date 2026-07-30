@@ -4,7 +4,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { getValidNamespace } from '@kubevirt-utils/utils/utils';
 import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
 import { useDataViewSelection } from '@patternfly/react-data-view';
-import useOperatorResources from '@settings/tabs/ClusterTab/components/VirtualizationFeaturesSection/utils/hooks/useOperatorResources/useOperatorResources';
+import useOperatorResources from '../hooks/useOperatorResources/useOperatorResources';
 
 import useInstallBundle from '../hooks/useInstallBundle';
 import useInstallFeature from '../hooks/useInstallFeature';

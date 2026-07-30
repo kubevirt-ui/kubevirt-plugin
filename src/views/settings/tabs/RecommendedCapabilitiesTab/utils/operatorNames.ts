@@ -1,11 +1,10 @@
 import { DESCHEDULER_OPERATOR_NAME } from '@kubevirt-utils/resources/descheduler/constants';
-import {
-  CLUSTER_OBSERVABILITY_OPERATOR_NAME,
-  FENCE_AGENTS_OPERATOR_NAME,
-  NETOBSERV_OPERATOR_NAME,
-  NMSTATE_OPERATOR_NAME,
-  NODE_HEALTH_OPERATOR_NAME,
-} from '@settings/tabs/ClusterTab/components/VirtualizationFeaturesSection/utils/constants';
+
+export const NMSTATE_OPERATOR_NAME = 'kubernetes-nmstate-operator';
+export const NETOBSERV_OPERATOR_NAME = 'netobserv-operator';
+export const NODE_HEALTH_OPERATOR_NAME = 'node-healthcheck-operator';
+export const FENCE_AGENTS_OPERATOR_NAME = 'fence-agents-remediation';
+export const CLUSTER_OBSERVABILITY_OPERATOR_NAME = 'cluster-observability-operator';
 
 export const MTV_OPERATOR_NAME = 'mtv-operator';
 export const SANDBOXED_CONTAINERS_OPERATOR_NAME = 'sandboxed-containers-operator';
@@ -37,4 +36,13 @@ export const RECOMMENDED_OPERATOR_PACKAGE_NAMES: readonly string[] = [
   NUMA_RESOURCES_OPERATOR_NAME,
   OADP_OPERATOR_NAME,
   SANDBOXED_CONTAINERS_OPERATOR_NAME,
+];
+
+export const operatorPackageNames = [
+  NMSTATE_OPERATOR_NAME,
+  NETOBSERV_OPERATOR_NAME,
+  NODE_HEALTH_OPERATOR_NAME,
+  FENCE_AGENTS_OPERATOR_NAME,
+  DESCHEDULER_OPERATOR_NAME,
+  CLUSTER_OBSERVABILITY_OPERATOR_NAME,
 ];
