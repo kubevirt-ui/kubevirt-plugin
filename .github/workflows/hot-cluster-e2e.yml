@@ -217,6 +217,7 @@ jobs:
         with:
           app-id: ${{ secrets.BOT_APP_ID }}
           private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
+          permission-checks: write
 
       - name: Supersede stale "Run Gating Tests" check for this run
         id: supersede-gating-check
@@ -392,6 +393,7 @@ jobs:
         with:
           app-id: ${{ secrets.BOT_APP_ID }}
           private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
+          permission-checks: write
 
       - name: Publish result, sync labels, close orphans
         id: publish-result
@@ -476,6 +478,7 @@ jobs:
         with:
           app-id: ${{ secrets.BOT_APP_ID }}
           private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
+          permission-checks: write
 
       - name: Close prepare's check-run as superseded
         continue-on-error: true
