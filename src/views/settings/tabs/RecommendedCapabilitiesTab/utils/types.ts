@@ -38,11 +38,6 @@ export type VirtFeatureOperatorItem = {
   validSubscription?: string[];
 };
 
-export enum CapabilitiesView {
-  Bundle = 'bundle',
-  Custom = 'custom',
-}
-
 export enum CapabilityInstallState {
   Installed = 'Installed',
   NotInstalled = 'NotInstalled',
@@ -72,13 +67,6 @@ export type RecommendedCapabilityOperatorDetails = {
 
 export type RecommendedCapabilityDetailsMap = Record<string, RecommendedCapabilityOperatorDetails>;
 
-export type SelectionCardConfig = {
-  description: string;
-  id: CapabilitiesView;
-  label: string;
-  showRecommendedBadge: boolean;
-};
-
 export enum ConfigurationStatus {
   Manual = 'Manual',
   Recommended = 'Recommended',
@@ -93,20 +81,6 @@ export type AutopilotOperatorStatus = {
 export type AutopilotStatusMap = Record<string, AutopilotOperatorStatus>;
 
 export type AlternativeStateMap = Record<string, boolean>;
-
-export type UseInstallBundleParams = {
-  detailsMap: RecommendedCapabilityDetailsMap;
-  features: CapabilityFeature[];
-  filteredPackageManifests: PackageManifestKind[];
-  operatorGroups: OperatorGroupKind[];
-  subscriptions: SubscriptionKind[];
-};
-
-export type UseInstallBundleReturn = {
-  installBundle: () => Promise<void>;
-  installResourcesLoaded: boolean;
-  isInstalling: boolean;
-};
 
 export type UseInstallFeatureParams = {
   detailsMap: RecommendedCapabilityDetailsMap;

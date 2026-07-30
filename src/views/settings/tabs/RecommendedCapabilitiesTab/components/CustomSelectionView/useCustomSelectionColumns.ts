@@ -6,6 +6,7 @@ import { type ThProps } from '@patternfly/react-table';
 
 export const COLUMN_KEYS = {
   actions: 'actions',
+  configuration: 'configuration',
   name: 'name',
   status: 'status',
 };
@@ -40,6 +41,7 @@ export const useCustomSelectionColumns = () => {
     () => [
       { cell: t('Name'), props: { sort: getSortParams(COLUMN_KEYS.name) } },
       { cell: t('Status'), props: { sort: getSortParams(COLUMN_KEYS.status) } },
+      { cell: t('Configuration') },
       { cell: '', props: { className: 'pf-v6-c-table__action' } },
     ],
     [getSortParams, t],

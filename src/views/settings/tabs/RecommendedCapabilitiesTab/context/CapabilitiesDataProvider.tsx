@@ -7,8 +7,8 @@ import { useDataViewSelection } from '@patternfly/react-data-view';
 import useOperatorResources from '../hooks/useOperatorResources/useOperatorResources';
 
 import useAutopilotStatus from '../hooks/useAutopilotStatus';
-import useInstallBundle from '../hooks/useInstallBundle';
 import useInstallFeature from '../hooks/useInstallFeature';
+import { getAutopilotCapabilities, getManualCapabilities } from '../utils/autopilotUtils';
 import { getRecommendedCapabilityFeatures } from '../utils/capabilityFeatures';
 import { buildRecommendedDetailsMap } from '../utils/detailsMap';
 import { RECOMMENDED_OPERATOR_PACKAGE_NAMES } from '../utils/operatorNames';
@@ -29,7 +29,14 @@ export const CapabilitiesDataProvider: FC<{ children?: ReactNode }> = ({ childre
   const [activeNamespace] = useActiveNamespace();
   const validNamespace = getValidNamespace(activeNamespace);
 
-  const features = useMemo(() => getRecommendedCapabilityFeatures(t), [t]);
+  const { autopilotFeatures, features, manualFeatures } = useMemo(
+    () => ({
+      autopilotFeatures: getAutopilotCapabilities(t),
+      features: getRecommendedCapabilityFeatures(t),
+      manualFeatures: getManualCapabilities(t),
+    }),
+    [t],
+  );
 
   const { autopilotEnabled, autopilotLoaded, autopilotStatusMap } = useAutopilotStatus();
 
@@ -73,14 +80,6 @@ export const CapabilitiesDataProvider: FC<{ children?: ReactNode }> = ({ childre
     [detailsMap],
   );
 
-  const { installBundle, installResourcesLoaded, isInstalling } = useInstallBundle({
-    detailsMap,
-    features,
-    filteredPackageManifests,
-    operatorGroups,
-    subscriptions,
-  });
-
   const { installFeature, installingFeatures } = useInstallFeature({
     detailsMap,
     features,
@@ -97,22 +96,26 @@ export const CapabilitiesDataProvider: FC<{ children?: ReactNode }> = ({ childre
     () => ({
       alternativeState,
       autopilotEnabled,
+      autopilotFeatures,
       autopilotStatusMap,
       detailsMap,
       features,
       getCapabilityInstallState,
       loadErrors,
+      manualFeatures,
       resourcesLoaded: operatorResourcesLoaded && autopilotLoaded,
     }),
     [
       alternativeState,
       autopilotEnabled,
+      autopilotFeatures,
       autopilotLoaded,
       autopilotStatusMap,
       detailsMap,
       features,
       getCapabilityInstallState,
       loadErrors,
+      manualFeatures,
       operatorResourcesLoaded,
     ],
   );
@@ -120,22 +123,11 @@ export const CapabilitiesDataProvider: FC<{ children?: ReactNode }> = ({ childre
   const actionsValue: CapabilitiesActionsValue = useMemo(
     () => ({
       capabilitySelection,
-      installBundle,
       installFeature,
       installingFeatures,
-      installResourcesLoaded,
-      isInstalling,
       setAlternative,
     }),
-    [
-      capabilitySelection,
-      installBundle,
-      installFeature,
-      installingFeatures,
-      installResourcesLoaded,
-      isInstalling,
-      setAlternative,
-    ],
+    [capabilitySelection, installFeature, installingFeatures, setAlternative],
   );
 
   return (

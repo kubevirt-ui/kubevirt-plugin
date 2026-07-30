@@ -17,6 +17,7 @@ import {
 } from '@patternfly/react-core';
 import { DataViewCheckboxFilter, type DataViewTrTree } from '@patternfly/react-data-view';
 
+import InstallSelectedButton from '../InstallSelectedButton/InstallSelectedButton';
 import { STATUS_COUNT_TEMPLATES } from '../../utils/constants';
 import {
   type CapabilityFilterValues,
@@ -120,6 +121,9 @@ const CustomSelectionToolbar: FC<CustomSelectionToolbarProps> = ({
             title={t('Status')}
             value={filters.status}
           />
+        </ToolbarItem>
+        <ToolbarItem>
+          <InstallSelectedButton />
         </ToolbarItem>
         <ToolbarItem className="pf-v6-u-ml-auto">
           {resourcesLoaded ? (

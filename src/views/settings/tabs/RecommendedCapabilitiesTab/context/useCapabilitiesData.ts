@@ -11,22 +11,26 @@ import {
 export type CapabilitiesDataValue = {
   alternativeState: AlternativeStateMap;
   autopilotEnabled: boolean;
+  autopilotFeatures: CapabilityFeature[];
   autopilotStatusMap: AutopilotStatusMap;
   detailsMap: RecommendedCapabilityDetailsMap;
   features: CapabilityFeature[];
   getCapabilityInstallState: (feature: CapabilityFeature) => CapabilityInstallState;
   loadErrors: unknown[];
+  manualFeatures: CapabilityFeature[];
   resourcesLoaded: boolean;
 };
 
 const defaultDataValue: CapabilitiesDataValue = {
   alternativeState: {},
   autopilotEnabled: false,
+  autopilotFeatures: [],
   autopilotStatusMap: {},
   detailsMap: {},
   features: [],
   getCapabilityInstallState: () => CapabilityInstallState.NotInstalled,
   loadErrors: [],
+  manualFeatures: [],
   resourcesLoaded: false,
 };
 

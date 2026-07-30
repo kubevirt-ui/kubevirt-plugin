@@ -23,41 +23,39 @@ const getTooltipContent = (
 
 const InstallSelectedButton: FC = () => {
   const { t } = useKubevirtTranslation();
-  const { detailsMap, features, getCapabilityInstallState, loadErrors, resourcesLoaded } =
+  const { autopilotFeatures, detailsMap, getCapabilityInstallState, loadErrors, resourcesLoaded } =
     useCapabilitiesData();
-  const {
-    capabilitySelection,
-    installFeature,
-    installingFeatures,
-    installResourcesLoaded,
-    isInstalling,
-  } = useCapabilitiesActions();
-
-  const isLoaded = resourcesLoaded && installResourcesLoaded;
+  const { capabilitySelection, installFeature, installingFeatures } = useCapabilitiesActions();
 
   const installableSelectedFeatures = useMemo(
     () =>
-      features.filter(
+      autopilotFeatures.filter(
         (feature) =>
           capabilitySelection.isSelected({ id: feature.id }) &&
           getCapabilityInstallState(feature) !== CapabilityInstallState.Installed &&
           !installingFeatures.has(feature.id) &&
           !hasOperatorsInstalling(feature, detailsMap),
       ),
-    [capabilitySelection, detailsMap, features, getCapabilityInstallState, installingFeatures],
+    [
+      autopilotFeatures,
+      capabilitySelection,
+      detailsMap,
+      getCapabilityInstallState,
+      installingFeatures,
+    ],
   );
 
   const handleInstall = useCallback(() => {
     installableSelectedFeatures.forEach((feature) => void installFeature(feature));
   }, [installableSelectedFeatures, installFeature]);
 
-  if (!isLoaded) {
+  if (!resourcesLoaded) {
     return <Skeleton width="120px" />;
   }
 
   const hasSelection = !isEmpty(installableSelectedFeatures);
   const hasLoadErrors = !isEmpty(loadErrors);
-  const isAnyInstalling = isInstalling || installingFeatures.size > 0;
+  const isAnyInstalling = installingFeatures.size > 0;
   const isDisabled = !hasSelection || isAnyInstalling || hasLoadErrors;
 
   const tooltipContent = getTooltipContent(hasSelection, hasLoadErrors, t);
