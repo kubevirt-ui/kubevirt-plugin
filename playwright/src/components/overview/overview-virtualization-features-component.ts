@@ -1,28 +1,14 @@
 import BaseComponent from '@/components/shared/base-component';
 import OverviewSettingsPage from '@/page-objects/overview/overview-settings-page';
-import { regexFromLiteral } from '@/utils/regex-utils';
 import { TestTimeouts } from '@/utils/test-config';
 import { waitForCondition } from '@/utils/wait-helpers';
 import type { Page } from '@playwright/test';
 
 export default class OverviewVirtualizationFeaturesComponent extends BaseComponent {
-  private static readonly _EXPECTED_FEATURE_SUMMARY_TEXTS = [
-    'Cluster observability',
-    'Network observability',
-    'Host network management (NMState)',
-    'Node Health Check (NHC)',
-    'Fence Agents Remediation (FAR)',
-    'Load balance',
-  ] as const;
   private readonly _aaqSwitch = this.locator(
     '.section-with-switch:has-text("Application Aware Quota") .pf-v6-c-switch input',
   );
-  private readonly _configureFeaturesBtn = this.locator('button:has-text("Configure features")');
-  private readonly _deschedulerSection = this.locator('.descheduler-section');
   private readonly _generalSettingsButton = this.locator('button:has-text("General settings")');
-  private readonly _highAvailabilitySummarySectionToggle = this.locator(
-    '#high-availability-summary-section--toggle',
-  );
   private readonly _inputSliderValueInput = this.locator('input[aria-label="Slider value input"]');
   private readonly _ksmCheckbox = this.testId('kernel-samepage-merging');
   private readonly _memoryDensityBtn = this.locator('button:has-text("Memory density")');
@@ -56,12 +42,6 @@ export default class OverviewVirtualizationFeaturesComponent extends BaseCompone
     hasText: 'User',
   });
 
-  private readonly _virtualizationFeaturesBtn = this.locator(
-    'button:has-text("Virtualization features")',
-  );
-
-  private readonly _wizardMain = this.locator('.pf-v6-c-wizard__main');
-
   constructor(page: Page) {
     super(page);
   }
@@ -86,26 +66,6 @@ export default class OverviewVirtualizationFeaturesComponent extends BaseCompone
     } catch {
       return false;
     }
-  }
-
-  async clickHighAvailabilitySummarySectionToggle(): Promise<void> {
-    await this._highAvailabilitySummarySectionToggle.waitFor({
-      state: 'visible',
-      timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
-    });
-    await this.robustClick(this._highAvailabilitySummarySectionToggle);
-  }
-
-  async clickVirtualizationFeaturesWizardSubmit(): Promise<void> {
-    await this.locator(
-      '.virtualization-features-configuration-wizard button[type="submit"]',
-    ).waitFor({
-      state: 'visible',
-      timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
-    });
-    await this.robustClick(
-      this.locator('.virtualization-features-configuration-wizard button[type="submit"]'),
-    );
   }
 
   async disableAaq(): Promise<boolean> {
@@ -179,23 +139,6 @@ export default class OverviewVirtualizationFeaturesComponent extends BaseCompone
     }
   }
 
-  async enableClusterObservabilityInWizard(): Promise<boolean> {
-    try {
-      const control = this.testId('cluster-observability-operator');
-      await control.waitFor({
-        state: 'visible',
-        timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
-      });
-      const checked = await control.isChecked().catch(() => false);
-      if (!checked) {
-        await this.robustClick(control);
-      }
-      return true;
-    } catch {
-      return false;
-    }
-  }
-
   async enableKSM(): Promise<void> {
     await this._ksmCheckbox.waitFor({
       state: 'visible',
@@ -238,78 +181,8 @@ export default class OverviewVirtualizationFeaturesComponent extends BaseCompone
     await this._persistentReservationCheckbox.click({ force: true });
   }
 
-  async enableVirtualizationOptimizedAndCooLoggingMonitoring(): Promise<boolean> {
-    try {
-      const labels = [
-        'Virtualization optimized',
-        'Cluster Observability',
-        'logging and monitoring',
-      ];
-      for (const label of labels) {
-        await this.enableWizardFeatureByLabel(label);
-      }
-      return true;
-    } catch {
-      return false;
-    }
-  }
-
-  async enableWizardFeatureByLabel(labelText: string): Promise<boolean> {
-    try {
-      const withinWizard = this._wizardMain;
-      const regex = regexFromLiteral(labelText);
-
-      const checkbox = withinWizard.getByRole('checkbox', { name: regex }).first();
-      const checkVisible = await checkbox.isVisible().catch(() => false);
-      if (checkVisible) {
-        const checked = await checkbox.isChecked().catch(() => false);
-        if (!checked) await this.robustClick(checkbox);
-        return true;
-      }
-
-      const switchRole = withinWizard.getByRole('switch', { name: regex }).first();
-      const switchVisible = await switchRole.isVisible().catch(() => false);
-      if (switchVisible) {
-        const checked = await switchRole.isChecked().catch(() => false);
-        if (!checked) await this.robustClick(switchRole);
-        return true;
-      }
-
-      const labelLocator = withinWizard.getByText(regex).first();
-      const labelVisible = await labelLocator.isVisible().catch(() => false);
-      if (labelVisible) {
-        const control = labelLocator.locator('..').locator('input, [role="switch"]').first();
-        if (await control.isVisible().catch(() => false)) {
-          const checked = await control.isChecked().catch(() => false);
-          if (!checked) await this.robustClick(control);
-          return true;
-        }
-      }
-      return false;
-    } catch {
-      return false;
-    }
-  }
-
-  async finishWizardAndVerifyClosed(): Promise<boolean> {
-    try {
-      const finishButton = this._wizardMain.getByRole('button', { name: 'Finish' });
-      await finishButton.waitFor({ state: 'visible', timeout: TestTimeouts.UI_VISIBILITY_QUICK });
-      await this.robustClick(finishButton);
-
-      await this._wizardMain.waitFor({
-        state: 'hidden',
-        timeout: TestTimeouts.UI_ACTION_COMPLETE,
-      });
-      return true;
-    } catch {
-      return false;
-    }
-  }
-
   async getClusterSettingsSectionNames(): Promise<string[]> {
     const knownSections = [
-      'Virtualization features',
       'General settings',
       'Guest management',
       'Resource management',
@@ -353,28 +226,6 @@ export default class OverviewVirtualizationFeaturesComponent extends BaseCompone
     }
   }
 
-  async getVirtualizationFeatureItems(): Promise<string[]> {
-    const knownFeatures = [
-      'Cluster observability',
-      'Network observability',
-      'Host network management',
-      'High availability',
-      'Load balance',
-    ];
-    const found: string[] = [];
-    for (const feature of knownFeatures) {
-      const item = this.locator(`text=${feature}`).first();
-      const visible = await item
-        .waitFor({ state: 'visible', timeout: TestTimeouts.UI_VISIBILITY_QUICK })
-        .then(() => true)
-        .catch(() => false);
-      if (visible) {
-        found.push(feature);
-      }
-    }
-    return found;
-  }
-
   async isAaqControlVisible(timeoutMs: number = TestTimeouts.ELEMENT_WAIT): Promise<boolean> {
     return await this._aaqSwitch
       .first()
@@ -389,16 +240,6 @@ export default class OverviewVirtualizationFeaturesComponent extends BaseCompone
         timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
       });
       return await this._aaqSwitch.first().isChecked();
-    } catch {
-      return false;
-    }
-  }
-
-  async isConfigureFeaturesButtonVisible(): Promise<boolean> {
-    try {
-      const btn = this._configureFeaturesBtn;
-      await btn.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
-      return true;
     } catch {
       return false;
     }
@@ -436,49 +277,6 @@ export default class OverviewVirtualizationFeaturesComponent extends BaseCompone
       timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
     });
     await this.robustClick(this._resourceManagementBtn);
-  }
-
-  async navigateToVirtualizationFeatures() {
-    await new OverviewSettingsPage(this.page).navigateToSettings();
-    await this._virtualizationFeaturesBtn.waitFor({
-      state: 'visible',
-      timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
-    });
-    await this.robustClick(this._virtualizationFeaturesBtn);
-  }
-
-  async navigateToWizardSummaryStep(): Promise<boolean> {
-    try {
-      const nextButton = this._wizardMain.locator('button:has-text("Next")');
-      await nextButton.waitFor({ state: 'visible', timeout: TestTimeouts.UI_VISIBILITY_QUICK });
-      await this.robustClick(nextButton);
-
-      const finishButton = this._wizardMain.getByRole('button', { name: 'Finish' });
-      await finishButton.waitFor({ state: 'visible', timeout: TestTimeouts.UI_VISIBILITY_QUICK });
-      return await finishButton.isVisible().catch(() => false);
-    } catch {
-      return false;
-    }
-  }
-
-  async navigateWizardStepsAndVerifySummary(): Promise<boolean> {
-    try {
-      await this.clickHighAvailabilitySummarySectionToggle();
-      const summaryItemsValid = await this.verifyFeatureSummaryItemsContainExpectedTexts();
-      if (!summaryItemsValid) return false;
-      await this.clickVirtualizationFeaturesWizardSubmit();
-      return true;
-    } catch {
-      return false;
-    }
-  }
-
-  async openConfigureFeaturesWizard() {
-    await this._configureFeaturesBtn.waitFor({
-      state: 'visible',
-      timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
-    });
-    await this.robustClick(this._configureFeaturesBtn);
   }
 
   async openMemoryDensitySettings(): Promise<boolean> {
@@ -592,32 +390,6 @@ export default class OverviewVirtualizationFeaturesComponent extends BaseCompone
     }
   }
 
-  async testLoadBalanceFeature(): Promise<boolean> {
-    try {
-      await this.locator(
-        'button:has-text("Load balance"), a:has-text("Load balance"), :text("Load balance")',
-      )
-        .first()
-        .waitFor({
-          state: 'visible',
-          timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
-        });
-      await this.robustClick(
-        this.locator(
-          'button:has-text("Load balance"), a:has-text("Load balance"), :text("Load balance")',
-        ).first(),
-      );
-      await this._deschedulerSection
-        .waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY })
-        .catch(() => {
-          return;
-        });
-      return await this._deschedulerSection.isVisible().catch(() => false);
-    } catch {
-      return false;
-    }
-  }
-
   async toggleMemoryDensity(): Promise<boolean> {
     try {
       await this._memoryDensityToggle.waitFor({
@@ -627,80 +399,6 @@ export default class OverviewVirtualizationFeaturesComponent extends BaseCompone
 
       await this._memoryDensityToggle.click({ force: true });
 
-      return true;
-    } catch {
-      return false;
-    }
-  }
-
-  async verifyClusterObservabilityEnabled(): Promise<boolean> {
-    try {
-      const item = this.page
-        .locator('.featured-operator-item')
-        .filter({ hasText: 'Cluster observability (COO)' });
-      const installedIcon = item.locator('.installed-icon');
-      await installedIcon.first().waitFor({
-        state: 'visible',
-        timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
-      });
-      return true;
-    } catch {
-      return false;
-    }
-  }
-
-  async verifyConfigurationWizard(): Promise<boolean> {
-    try {
-      const titleLocator = this.locator('h1, h2').filter({ hasText: 'Configuration' });
-      const subtitleLocator = this.locator('h2, .pf-v6-c-wizard__main').filter({
-        hasText: 'Virtualization features',
-      });
-
-      const [titleExists, subtitleExists] = await Promise.all([
-        titleLocator
-          .waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY })
-          .then(() => true)
-          .catch(() => false),
-        subtitleLocator
-          .waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY })
-          .then(() => true)
-          .catch(() => false),
-      ]);
-
-      return titleExists && subtitleExists;
-    } catch {
-      return false;
-    }
-  }
-
-  async verifyFeatureSummaryContainsClusterObservabilityInstalled(): Promise<boolean> {
-    try {
-      const item = this._wizardMain
-        .locator('.feature-summary-item, [class*="summary-item"], li, dd')
-        .filter({ hasText: /Cluster observability/i })
-        .filter({ hasText: /Installed/i })
-        .first();
-      await item.waitFor({
-        state: 'visible',
-        timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
-      });
-      return await item.isVisible().catch(() => false);
-    } catch {
-      return false;
-    }
-  }
-
-  async verifyFeatureSummaryItemsContainExpectedTexts(): Promise<boolean> {
-    try {
-      for (const expected of OverviewVirtualizationFeaturesComponent._EXPECTED_FEATURE_SUMMARY_TEXTS) {
-        const item = this._wizardMain
-          .locator('.feature-summary-item')
-          .filter({ hasText: expected });
-        await item.first().waitFor({
-          state: 'visible',
-          timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
-        });
-      }
       return true;
     } catch {
       return false;
@@ -786,19 +484,6 @@ export default class OverviewVirtualizationFeaturesComponent extends BaseCompone
           .catch(() => false),
       ]);
       return attachExists && cloneExists && uploadExists;
-    } catch {
-      return false;
-    }
-  }
-
-  async verifyVirtualizationFeatures(): Promise<boolean> {
-    try {
-      const features = ['Network observability', 'Host network management', 'High availability'];
-      for (const feature of features) {
-        const item = this.locator(`text=${feature}`).first();
-        await item.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
-      }
-      return true;
     } catch {
       return false;
     }

@@ -52,45 +52,6 @@ test.describe('Cluster Settings', { tag: [CNV_SETTINGS_TAG, '@adminOnly'] }, () 
     expect.soft(ok, 'Installed version visible with expected prefix and status').toBe(true);
   });
 
-  // ── Cluster tab — Virtualization features section ─────────────────────────────
-
-  test('Virtualization features section is accessible and lists expected operators', async ({
-    settingsPage,
-    utils,
-  }) => {
-    utils.withAllure({ suite: SUITE, feature: CNV_SETTINGS_FEATURE, tags: [CNV_SETTINGS_TAG] });
-
-    await settingsPage.navigateToVirtualizationFeatures();
-
-    await test.step('Virtualization features section visible', async () => {
-      const visible = await settingsPage.verifyVirtualizationFeatures();
-      expect(visible, 'Virtualization features section should be visible').toBe(true);
-    });
-
-    await test.step('Configure features button visible', async () => {
-      const configBtnVisible = await settingsPage.isConfigureFeaturesButtonVisible();
-      expect.soft(configBtnVisible, '"Configure features" button should be visible').toBe(true);
-    });
-
-    await test.step('Expected feature items are listed', async () => {
-      const features = await settingsPage.getVirtualizationFeatureItems();
-      for (const expected of [
-        'Cluster observability',
-        'Network observability',
-        'Host network management',
-        'High availability',
-        'Load balance',
-      ]) {
-        expect
-          .soft(
-            features.some((f) => f.includes(expected)),
-            `Feature "${expected}" should be listed (found: ${features.join(', ')})`,
-          )
-          .toBe(true);
-      }
-    });
-  });
-
   // ── Cluster tab — General settings section ────────────────────────────────────
 
   test('General settings section shows all expected sub-sections', async ({

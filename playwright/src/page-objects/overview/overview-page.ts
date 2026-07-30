@@ -37,13 +37,6 @@ export default class OverviewPage extends PageCommons {
   ): ReturnType<OverviewQuickStartsPage['checkQuickStartYesCheckbox']> {
     return this.quickStarts.checkQuickStartYesCheckbox(...args);
   }
-  clickHighAvailabilitySummarySectionToggle(
-    ...args: Parameters<
-      OverviewVirtualizationFeaturesPage['clickHighAvailabilitySummarySectionToggle']
-    >
-  ): ReturnType<OverviewVirtualizationFeaturesPage['clickHighAvailabilitySummarySectionToggle']> {
-    return this.virtualizationFeatures.clickHighAvailabilitySummarySectionToggle(...args);
-  }
   clickLastButton(
     ...args: Parameters<OverviewMigrationsPage['clickLastButton']>
   ): ReturnType<OverviewMigrationsPage['clickLastButton']> {
@@ -93,13 +86,6 @@ export default class OverviewPage extends PageCommons {
     ...args: Parameters<OverviewMigrationsPage['clickTimeRangeButton']>
   ): ReturnType<OverviewMigrationsPage['clickTimeRangeButton']> {
     return this.migrations.clickTimeRangeButton(...args);
-  }
-  clickVirtualizationFeaturesWizardSubmit(
-    ...args: Parameters<
-      OverviewVirtualizationFeaturesPage['clickVirtualizationFeaturesWizardSubmit']
-    >
-  ): ReturnType<OverviewVirtualizationFeaturesPage['clickVirtualizationFeaturesWizardSubmit']> {
-    return this.virtualizationFeatures.clickVirtualizationFeaturesWizardSubmit(...args);
   }
   clickVmimNameLink(
     ...args: Parameters<OverviewMigrationsPage['clickVmimNameLink']>
@@ -151,11 +137,6 @@ export default class OverviewPage extends PageCommons {
   ): ReturnType<OverviewSettingsPage['enableCentosStream9ImageCron']> {
     return this._settings.enableCentosStream9ImageCron(...args);
   }
-  enableClusterObservabilityInWizard(
-    ...args: Parameters<OverviewVirtualizationFeaturesPage['enableClusterObservabilityInWizard']>
-  ): ReturnType<OverviewVirtualizationFeaturesPage['enableClusterObservabilityInWizard']> {
-    return this.virtualizationFeatures.enableClusterObservabilityInWizard(...args);
-  }
   enableGuidedTour(
     ...args: Parameters<OverviewSettingsPage['enableGuidedTour']>
   ): ReturnType<OverviewSettingsPage['enableGuidedTour']> {
@@ -186,26 +167,10 @@ export default class OverviewPage extends PageCommons {
   ): ReturnType<OverviewSettingsPage['enableSSHUsingLoadBalancer']> {
     return this._settings.enableSSHUsingLoadBalancer(...args);
   }
-  enableVirtualizationOptimizedAndCooLoggingMonitoring(
-    ...args: Parameters<
-      OverviewVirtualizationFeaturesPage['enableVirtualizationOptimizedAndCooLoggingMonitoring']
-    >
-  ): ReturnType<
-    OverviewVirtualizationFeaturesPage['enableVirtualizationOptimizedAndCooLoggingMonitoring']
-  > {
-    return this.virtualizationFeatures.enableVirtualizationOptimizedAndCooLoggingMonitoring(
-      ...args,
-    );
-  }
   enableWelcomeInformation(
     ...args: Parameters<OverviewSettingsPage['enableWelcomeInformation']>
   ): ReturnType<OverviewSettingsPage['enableWelcomeInformation']> {
     return this._settings.enableWelcomeInformation(...args);
-  }
-  enableWizardFeatureByLabel(
-    ...args: Parameters<OverviewVirtualizationFeaturesPage['enableWizardFeatureByLabel']>
-  ): ReturnType<OverviewVirtualizationFeaturesPage['enableWizardFeatureByLabel']> {
-    return this.virtualizationFeatures.enableWizardFeatureByLabel(...args);
   }
   ensureWelcomeModalDismissed(
     ...args: Parameters<OverviewSettingsPage['ensureWelcomeModalDismissed']>
@@ -221,11 +186,6 @@ export default class OverviewPage extends PageCommons {
     ...args: Parameters<OverviewSettingsPage['fillConfigurationSearchInput']>
   ): ReturnType<OverviewSettingsPage['fillConfigurationSearchInput']> {
     return this._settings.fillConfigurationSearchInput(...args);
-  }
-  finishWizardAndVerifyClosed(
-    ...args: Parameters<OverviewVirtualizationFeaturesPage['finishWizardAndVerifyClosed']>
-  ): ReturnType<OverviewVirtualizationFeaturesPage['finishWizardAndVerifyClosed']> {
-    return this.virtualizationFeatures.finishWizardAndVerifyClosed(...args);
   }
   getClusterSettingsSectionNames(
     ...args: Parameters<OverviewVirtualizationFeaturesPage['getClusterSettingsSectionNames']>
@@ -261,11 +221,6 @@ export default class OverviewPage extends PageCommons {
     ...args: Parameters<OverviewSettingsPage['getSettingsTabNames']>
   ): ReturnType<OverviewSettingsPage['getSettingsTabNames']> {
     return this._settings.getSettingsTabNames(...args);
-  }
-  getVirtualizationFeatureItems(
-    ...args: Parameters<OverviewVirtualizationFeaturesPage['getVirtualizationFeatureItems']>
-  ): ReturnType<OverviewVirtualizationFeaturesPage['getVirtualizationFeatureItems']> {
-    return this.virtualizationFeatures.getVirtualizationFeatureItems(...args);
   }
   getVmActionsConfirmationState(
     ...args: Parameters<OverviewSettingsPage['getVmActionsConfirmationState']>
@@ -306,11 +261,6 @@ export default class OverviewPage extends PageCommons {
     ...args: Parameters<OverviewSettingsPage['isAdvancedCdromFeaturesEnabled']>
   ): ReturnType<OverviewSettingsPage['isAdvancedCdromFeaturesEnabled']> {
     return this._settings.isAdvancedCdromFeaturesEnabled(...args);
-  }
-  isConfigureFeaturesButtonVisible(
-    ...args: Parameters<OverviewVirtualizationFeaturesPage['isConfigureFeaturesButtonVisible']>
-  ): ReturnType<OverviewVirtualizationFeaturesPage['isConfigureFeaturesButtonVisible']> {
-    return this.virtualizationFeatures.isConfigureFeaturesButtonVisible(...args);
   }
   isKsmControlVisible(
     ...args: Parameters<OverviewVirtualizationFeaturesPage['isKsmControlVisible']>
@@ -452,11 +402,6 @@ export default class OverviewPage extends PageCommons {
   ): ReturnType<OverviewDashboardPage['navigateToTopConsumers']> {
     return this._dashboard.navigateToTopConsumers(...args);
   }
-  navigateToVirtualizationFeatures(
-    ...args: Parameters<OverviewVirtualizationFeaturesPage['navigateToVirtualizationFeatures']>
-  ): ReturnType<OverviewVirtualizationFeaturesPage['navigateToVirtualizationFeatures']> {
-    return this.virtualizationFeatures.navigateToVirtualizationFeatures(...args);
-  }
   navigateToVirtualizationOverview(
     ...args: Parameters<OverviewDashboardPage['navigateToVirtualizationOverview']>
   ): ReturnType<OverviewDashboardPage['navigateToVirtualizationOverview']> {
@@ -467,25 +412,10 @@ export default class OverviewPage extends PageCommons {
   ): ReturnType<OverviewDashboardPage['navigateToVirtualizationOverviewViaUI']> {
     return this._dashboard.navigateToVirtualizationOverviewViaUI(...args);
   }
-  navigateToWizardSummaryStep(
-    ...args: Parameters<OverviewVirtualizationFeaturesPage['navigateToWizardSummaryStep']>
-  ): ReturnType<OverviewVirtualizationFeaturesPage['navigateToWizardSummaryStep']> {
-    return this.virtualizationFeatures.navigateToWizardSummaryStep(...args);
-  }
-  navigateWizardStepsAndVerifySummary(
-    ...args: Parameters<OverviewVirtualizationFeaturesPage['navigateWizardStepsAndVerifySummary']>
-  ): ReturnType<OverviewVirtualizationFeaturesPage['navigateWizardStepsAndVerifySummary']> {
-    return this.virtualizationFeatures.navigateWizardStepsAndVerifySummary(...args);
-  }
   openAdvancedCdromFeaturesSettings(
     ...args: Parameters<OverviewSettingsPage['openAdvancedCdromFeaturesSettings']>
   ): ReturnType<OverviewSettingsPage['openAdvancedCdromFeaturesSettings']> {
     return this._settings.openAdvancedCdromFeaturesSettings(...args);
-  }
-  openConfigureFeaturesWizard(
-    ...args: Parameters<OverviewVirtualizationFeaturesPage['openConfigureFeaturesWizard']>
-  ): ReturnType<OverviewVirtualizationFeaturesPage['openConfigureFeaturesWizard']> {
-    return this.virtualizationFeatures.openConfigureFeaturesWizard(...args);
   }
   openCreateVmFromVolumeQuickStart(
     ...args: Parameters<OverviewQuickStartsPage['openCreateVmFromVolumeQuickStart']>
@@ -547,11 +477,6 @@ export default class OverviewPage extends PageCommons {
   ): ReturnType<OverviewSettingsPage['setVmActionsConfirmation']> {
     return this._settings.setVmActionsConfirmation(...args);
   }
-  testLoadBalanceFeature(
-    ...args: Parameters<OverviewVirtualizationFeaturesPage['testLoadBalanceFeature']>
-  ): ReturnType<OverviewVirtualizationFeaturesPage['testLoadBalanceFeature']> {
-    return this.virtualizationFeatures.testLoadBalanceFeature(...args);
-  }
   testPasstBindingSetting(
     ...args: Parameters<OverviewSettingsPage['testPasstBindingSetting']>
   ): ReturnType<OverviewSettingsPage['testPasstBindingSetting']> {
@@ -577,16 +502,6 @@ export default class OverviewPage extends PageCommons {
   ): ReturnType<OverviewSettingsPage['verifyCentosStream9ImageCronEnabled']> {
     return this._settings.verifyCentosStream9ImageCronEnabled(...args);
   }
-  verifyClusterObservabilityEnabled(
-    ...args: Parameters<OverviewVirtualizationFeaturesPage['verifyClusterObservabilityEnabled']>
-  ): ReturnType<OverviewVirtualizationFeaturesPage['verifyClusterObservabilityEnabled']> {
-    return this.virtualizationFeatures.verifyClusterObservabilityEnabled(...args);
-  }
-  verifyConfigurationWizard(
-    ...args: Parameters<OverviewVirtualizationFeaturesPage['verifyConfigurationWizard']>
-  ): ReturnType<OverviewVirtualizationFeaturesPage['verifyConfigurationWizard']> {
-    return this.virtualizationFeatures.verifyConfigurationWizard(...args);
-  }
   verifyDangerAlertNotVisible(
     ...args: Parameters<OverviewQuickStartsPage['verifyDangerAlertNotVisible']>
   ): ReturnType<OverviewQuickStartsPage['verifyDangerAlertNotVisible']> {
@@ -606,26 +521,6 @@ export default class OverviewPage extends PageCommons {
     ...args: Parameters<OverviewDashboardPage['verifyFeatureHighlightsCard']>
   ): ReturnType<OverviewDashboardPage['verifyFeatureHighlightsCard']> {
     return this._dashboard.verifyFeatureHighlightsCard(...args);
-  }
-  verifyFeatureSummaryContainsClusterObservabilityInstalled(
-    ...args: Parameters<
-      OverviewVirtualizationFeaturesPage['verifyFeatureSummaryContainsClusterObservabilityInstalled']
-    >
-  ): ReturnType<
-    OverviewVirtualizationFeaturesPage['verifyFeatureSummaryContainsClusterObservabilityInstalled']
-  > {
-    return this.virtualizationFeatures.verifyFeatureSummaryContainsClusterObservabilityInstalled(
-      ...args,
-    );
-  }
-  verifyFeatureSummaryItemsContainExpectedTexts(
-    ...args: Parameters<
-      OverviewVirtualizationFeaturesPage['verifyFeatureSummaryItemsContainExpectedTexts']
-    >
-  ): ReturnType<
-    OverviewVirtualizationFeaturesPage['verifyFeatureSummaryItemsContainExpectedTexts']
-  > {
-    return this.virtualizationFeatures.verifyFeatureSummaryItemsContainExpectedTexts(...args);
   }
   verifyGuidedTourSteps(
     ...args: Parameters<OverviewSettingsPage['verifyGuidedTourSteps']>
@@ -761,11 +656,6 @@ export default class OverviewPage extends PageCommons {
     ...args: Parameters<OverviewVirtualizationFeaturesPage['verifyUserPermissions']>
   ): ReturnType<OverviewVirtualizationFeaturesPage['verifyUserPermissions']> {
     return this.virtualizationFeatures.verifyUserPermissions(...args);
-  }
-  verifyVirtualizationFeatures(
-    ...args: Parameters<OverviewVirtualizationFeaturesPage['verifyVirtualizationFeatures']>
-  ): ReturnType<OverviewVirtualizationFeaturesPage['verifyVirtualizationFeatures']> {
-    return this.virtualizationFeatures.verifyVirtualizationFeatures(...args);
   }
   verifyVirtualMachineLink(
     ...args: Parameters<OverviewDashboardPage['verifyVirtualMachineLink']>
