@@ -4,7 +4,7 @@
  * Replaces: inline bash in ibmc-cluster-setup.yml (precheck job)
  *
  * Required env: CLUSTER_NAME, INFRASTRUCTURE_TYPE, BASE_DOMAIN
- * Output: already_ready=true|false
+ * Output: already_ready=true|false, cluster_ready=true|false
  */
 
 import { execSync } from 'node:child_process';
@@ -15,7 +15,7 @@ import { requireEnv } from '../kube-client';
 const setOutput = (value: string): void => {
   const outputFile = process.env.GITHUB_OUTPUT;
   if (outputFile) {
-    appendFileSync(outputFile, `already_ready=${value}\n`);
+    appendFileSync(outputFile, `already_ready=${value}\ncluster_ready=${value}\n`);
   }
 };
 
