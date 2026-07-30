@@ -393,6 +393,7 @@ jobs:
         with:
           app-id: ${{ secrets.BOT_APP_ID }}
           private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
+          permission-checks: write
 
       - name: Publish result, sync labels, close orphans
         id: publish-result
