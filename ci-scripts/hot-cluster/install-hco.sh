@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # Installs OpenShift Virtualization (CNV) from Red Hat's redhat-operators
-# catalog into openshift-cnv, with nmstate bundled as an operand.
+# catalog into openshift-cnv.
 #
 # Environment variables (all have defaults):
 #   KVM_EMULATION          - "true" or "false" (only bare metal nodes have real KVM)
@@ -224,18 +224,12 @@ echo "Waiting for CNV operands to finish deploying..."
 echo "  Waiting for SSP to be available..."
 oc wait ssp -n ${CNV_NS} --all --for=condition=Available --timeout=10m
 
-echo "  Waiting for NetworkAttachmentDefinition CRD (nmstate)..."
-for i in $(seq 1 60); do
-  if oc get crd networkattachmentdefinitions.k8s.cni.cncf.io &>/dev/null; then
-    oc wait --for=condition=Established crd/networkattachmentdefinitions.k8s.cni.cncf.io --timeout=60s 2>/dev/null || true
-    echo "  NAD CRD is registered and established"
-    break
-  fi
-  if [[ "${i}" -eq 60 ]]; then
-    echo "  WARNING: NAD CRD not found after 5 minutes (nmstate may not be installed)"
-  fi
-  sleep 5
-done
+echo "  Checking for NetworkAttachmentDefinition CRD (Multus/OVN-Kubernetes)..."
+if oc get crd networkattachmentdefinitions.k8s.cni.cncf.io &>/dev/null; then
+  echo "  NAD CRD is present (OVN-Kubernetes with Multus)"
+else
+  echo "  WARNING: NAD CRD not present (expected with OVN-Kubernetes; missing on Calico-based clusters)"
+fi
 
 echo "  Waiting for common templates to be created..."
 for i in $(seq 1 60); do
@@ -251,16 +245,16 @@ for i in $(seq 1 60); do
 done
 
 echo "  Waiting for DataSources in os-images namespace..."
-for i in $(seq 1 90); do
+for i in $(seq 1 60); do
   DS_COUNT=$(oc get datasource -n openshift-virtualization-os-images --no-headers 2>/dev/null | wc -l | tr -d ' ')
   if [[ "${DS_COUNT}" -gt 0 ]]; then
     echo "  Found ${DS_COUNT} DataSources in openshift-virtualization-os-images"
     break
   fi
-  if [[ "${i}" -eq 90 ]]; then
-    echo "  WARNING: No DataSources found after 15 minutes (DataImportCrons may still be importing)"
+  if [[ "${i}" -eq 60 ]]; then
+    echo "  WARNING: No DataSources found after 5 minutes (DataImportCrons may still be importing)"
   fi
-  sleep 10
+  sleep 5
 done
 
 echo "CNV operands are ready."

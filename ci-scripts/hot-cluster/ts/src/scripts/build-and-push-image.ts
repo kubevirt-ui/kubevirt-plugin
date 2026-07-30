@@ -30,7 +30,10 @@ const main = async (): Promise<void> => {
     .flatMap((line) => ['--label', line.trim()]);
 
   // Build
-  const buildArgs = ['build', ...labelArgs, '-t', image, '-f', 'Dockerfile', '.'];
+  const repoRoot =
+    process.env.GITHUB_WORKSPACE ??
+    execFileSync('git', ['rev-parse', '--show-toplevel'], { encoding: 'utf8' }).trim();
+  const buildArgs = ['build', ...labelArgs, '-t', image, '-f', `${repoRoot}/Dockerfile`, repoRoot];
   console.log(`Building: ${image}`);
   execFileSync('podman', buildArgs, { stdio: 'inherit' });
 
