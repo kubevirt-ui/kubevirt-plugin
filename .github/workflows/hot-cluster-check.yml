@@ -140,6 +140,7 @@ jobs:
         if: inputs.should_run
         env:
           CLUSTER_NAME: ${{ inputs.cluster_name }}
+          INFRASTRUCTURE_TYPE: ${{ inputs.infrastructure_type }}
           BASE_DOMAIN: ${{ inputs.base_domain }}
         working-directory: ci-scripts/hot-cluster/ts
         run: npx tsx src/scripts/probe-cluster-dns.ts
