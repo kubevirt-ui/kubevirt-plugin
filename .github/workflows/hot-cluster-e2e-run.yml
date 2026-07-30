@@ -324,6 +324,7 @@ jobs:
         continue-on-error: true
         working-directory: .github/scripts
         env:
+          GITHUB_TOKEN: ${{ github.token }}
           STATUS_SHA: ${{ inputs.progress_status_sha }}
           STATUS_CONTEXT: ${{ inputs.progress_status_context }}
         run: npx tsx src/e2e/progress-running.ts
