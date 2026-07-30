@@ -70,7 +70,7 @@ Label name SSOT: [`.github/scripts/src/shared/merge-pool.ts`](../.github/scripts
 
 ### VPC ROKS (recommended)
 
-Uses standard IBM Cloud IAM (no SoftLayer/classic permissions). VPC, subnet, public gateway, and COS instance are auto-created and reused across runs.
+Uses standard IBM Cloud IAM (no SoftLayer/classic permissions). VPC, subnet, public gateway, and COS instance are auto-created and reused across runs. No public DNS (CIS) dependency — IBM Cloud DNS Services provides private resolution within the VPC automatically.
 
 - **Zone format**: `us-south-1`, `eu-de-1`
 - **Flavor**: `bx2.8x32`, `cx2.4x8` (list with `ibmcloud oc flavors --zone <zone> --provider vpc-gen2`)
