@@ -30,8 +30,9 @@ while [[ ${ELAPSED} -lt ${MAX_WAIT} ]]; do
   MASTER_HEALTH=$(echo "${CLUSTER_JSON}" | jq -r '.lifecycle.masterHealth // "unknown"')
   INGRESS_STATUS=$(echo "${CLUSTER_JSON}" | jq -r '.ingress.status // "unknown"')
   INGRESS_HOSTNAME=$(echo "${CLUSTER_JSON}" | jq -r '.ingress.hostname // ""')
+  WORKER_STATUS=$(echo "${CLUSTER_JSON}" | jq -r '.status // "unknown"')
 
-  echo "[$(date '+%H:%M:%S')] state=${STATE}  master=${MASTER_STATUS}/${MASTER_HEALTH}  ingress=${INGRESS_STATUS}  hostname=${INGRESS_HOSTNAME:-<empty>}  (${ELAPSED}s elapsed)"
+  echo "[$(date '+%H:%M:%S')] state=${STATE}  master=${MASTER_STATUS}/${MASTER_HEALTH}  ingress=${INGRESS_STATUS}  hostname=${INGRESS_HOSTNAME:-<empty>}  workers=\"${WORKER_STATUS}\"  (${ELAPSED}s elapsed)"
 
   if [[ "${STATE}" == "critical" || "${STATE}" == "delete_failed" ]]; then
     echo "ERROR: Cluster entered '${STATE}' state"
@@ -49,4 +50,7 @@ while [[ ${ELAPSED} -lt ${MAX_WAIT} ]]; do
 done
 
 echo "ERROR: Cluster did not become fully available within ${MAX_WAIT}s"
+echo ""
+echo "Final cluster state:"
+echo "${CLUSTER_JSON}" | jq '{state, status, ingress, lifecycle}' 2>/dev/null || true
 exit 1
