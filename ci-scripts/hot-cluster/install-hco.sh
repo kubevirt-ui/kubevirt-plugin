@@ -251,16 +251,16 @@ for i in $(seq 1 60); do
 done
 
 echo "  Waiting for DataSources in os-images namespace..."
-for i in $(seq 1 90); do
+for i in $(seq 1 60); do
   DS_COUNT=$(oc get datasource -n openshift-virtualization-os-images --no-headers 2>/dev/null | wc -l | tr -d ' ')
   if [[ "${DS_COUNT}" -gt 0 ]]; then
     echo "  Found ${DS_COUNT} DataSources in openshift-virtualization-os-images"
     break
   fi
-  if [[ "${i}" -eq 90 ]]; then
-    echo "  WARNING: No DataSources found after 15 minutes (DataImportCrons may still be importing)"
+  if [[ "${i}" -eq 60 ]]; then
+    echo "  WARNING: No DataSources found after 5 minutes (DataImportCrons may still be importing)"
   fi
-  sleep 10
+  sleep 5
 done
 
 echo "CNV operands are ready."
