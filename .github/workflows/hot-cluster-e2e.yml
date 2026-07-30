@@ -153,6 +153,18 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: .github/scripts/package-lock.json
+
+      - name: Install script dependencies
+        shell: bash
+        working-directory: .github/scripts
+        run: npm ci
+
       - name: Resolve cluster config
         id: resolve-config
         if: always()
