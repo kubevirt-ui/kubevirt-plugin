@@ -1,6 +1,6 @@
 import type { Octokit } from '@octokit/rest';
 
-import { addLabel, removeLabel } from '../../github-comments';
+import { addLabel, removeLabel, setCommitStatus } from '../../github-comments';
 import type { GitHubConfig } from '../../types/index';
 import type { PathValidationConfig } from './types';
 
@@ -10,8 +10,29 @@ export type PathValidationEvent = {
 
 export type LabelSyncContext = {
   config: GitHubConfig;
+  headSha?: string;
   octokit: Octokit;
   prNumber: number;
+  statusOctokit?: Octokit;
+};
+
+export const reportCommitStatus = async (
+  ctx: LabelSyncContext,
+  pathConfig: PathValidationConfig,
+  state: 'error' | 'failure' | 'pending' | 'success',
+  description: string,
+): Promise<void> => {
+  if (!ctx.headSha) return;
+
+  await setCommitStatus(
+    ctx.statusOctokit ?? ctx.octokit,
+    ctx.config.owner,
+    ctx.config.repo,
+    ctx.headSha,
+    state,
+    description,
+    pathConfig.statusContext,
+  );
 };
 
 export const syncValidationLabels = async (
