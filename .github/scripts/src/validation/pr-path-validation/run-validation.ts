@@ -4,7 +4,7 @@ import { getPrLabelNames, removeLabel } from '../../github-comments';
 import { getPullRequestFiles } from '../../github-repo';
 import type { GitHubConfig } from '../../types/index';
 import type { LabelSyncContext, PathValidationEvent } from './label-sync';
-import { syncValidationLabels } from './label-sync';
+import { reportCommitStatus, syncValidationLabels } from './label-sync';
 import { isLabelAppliedByTrustedActor } from './owners';
 import { getSensitivePaths } from './paths';
 import type { PathValidationConfig } from './types';
@@ -43,9 +43,18 @@ export const runPathValidation = async (
 ): Promise<PathValidationOutcome> => {
   const labelCtx: LabelSyncContext = {
     config: ctx.config,
+    headSha: ctx.headSha,
     octokit: ctx.octokit,
     prNumber: ctx.prNumber,
+    statusOctokit: ctx.statusOctokit,
   };
+
+  await reportCommitStatus(
+    labelCtx,
+    pathConfig,
+    'pending',
+    `${pathConfig.displayName} in progress…`,
+  );
 
   const files =
     ctx.files ??
@@ -112,6 +121,12 @@ export const runPathValidation = async (
     // Clear alert/block too -- otherwise "do-not-merge/*-review" stays
     // applied even though the status now reports success.
     await syncValidationLabels(labelCtx, pathConfig, true, hasSensitiveChanges);
+    await reportCommitStatus(
+      labelCtx,
+      pathConfig,
+      'success',
+      `${pathConfig.displayName} skipped (${pathConfig.labels.skip})`,
+    );
     return { kind: 'skipped' };
   }
 
@@ -119,6 +134,12 @@ export const runPathValidation = async (
   const passed = !hasSensitiveChanges || reviewed;
 
   await syncValidationLabels(labelCtx, pathConfig, passed, hasSensitiveChanges);
+  await reportCommitStatus(
+    labelCtx,
+    pathConfig,
+    passed ? 'success' : 'failure',
+    buildStatusDescription(passed, hasSensitiveChanges),
+  );
 
   return {
     kind: passed ? 'passed' : 'failed',
