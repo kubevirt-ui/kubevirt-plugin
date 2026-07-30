@@ -306,6 +306,7 @@ jobs:
           OPENSHIFT_VERSION: ${{ inputs.openshift_version }}
           WORKER_FLAVOR: ${{ inputs.worker_flavor }}
           WORKER_COUNT: ${{ inputs.worker_count }}
+          CNI_PLUGIN: OVNKubernetes
         working-directory: ci-scripts/hot-cluster/ts
         run: npx tsx src/scripts/create-roks-vpc.ts
 

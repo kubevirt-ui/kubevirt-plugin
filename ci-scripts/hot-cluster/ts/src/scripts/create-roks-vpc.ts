@@ -5,7 +5,7 @@
  *
  * Required env: CLUSTER_NAME, ZONE, VPC_ID, SUBNET_ID, OPENSHIFT_VERSION,
  *               WORKER_FLAVOR, WORKER_COUNT
- * Optional env: COS_CRN, COS_INSTANCE_NAME
+ * Optional env: COS_CRN, COS_INSTANCE_NAME, CNI_PLUGIN
  */
 
 import { execSync } from 'node:child_process';
@@ -20,6 +20,7 @@ const main = async (): Promise<void> => {
   const openshiftVersion = requireEnv('OPENSHIFT_VERSION');
   const workerFlavor = requireEnv('WORKER_FLAVOR');
   const workerCount = requireEnv('WORKER_COUNT');
+  const cniPlugin = process.env.CNI_PLUGIN ?? 'OVNKubernetes';
   const cosInstanceName = process.env.COS_INSTANCE_NAME ?? `${clusterName}-cos`;
   const cosCrn = await (async (): Promise<string> => {
     const initial = process.env.COS_CRN ?? '';
@@ -67,7 +68,7 @@ const main = async (): Promise<void> => {
   })();
 
   console.log(
-    `Creating VPC cluster '${clusterName}' with ${workerCount}x ${workerFlavor} workers in zone ${zone}...`,
+    `Creating VPC cluster '${clusterName}' with ${workerCount}x ${workerFlavor} workers in zone ${zone} (CNI: ${cniPlugin})...`,
   );
   execSync(
     [
@@ -80,6 +81,7 @@ const main = async (): Promise<void> => {
       `--vpc-id "${vpcId}"`,
       `--subnet-id "${subnetId}"`,
       `--cos-instance "${cosCrn}"`,
+      `--cni "${cniPlugin}"`,
       '--disable-outbound-traffic-protection',
     ].join(' '),
     { stdio: 'inherit' },
