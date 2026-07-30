@@ -20,7 +20,7 @@ export const AI_CONFIG = {
   },
   pathPrefixes: ['.cursor/', '.claude/', '.codex/', '.windsurf/', '.gemini/', '.vscode/'],
   relatedAutomationPaths: [
-    '.github/workflows/pr_validation.yml',
+    '.github/workflows/pr-validation.yml',
     '.github/workflows/pr_validation_commands.yml',
     '.github/actions/setup-gh-scripts/action.yml',
   ],

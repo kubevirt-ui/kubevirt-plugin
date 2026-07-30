@@ -95,7 +95,7 @@ const main = async (): Promise<void> => {
 
     const [ciResult, prValidation] = await Promise.all([
       rerunFailedJobsSafe(botOctokit, owner, repo, headSha, 'ci_checks.yml', 'CI'),
-      rerunFailedJobsSafe(botOctokit, owner, repo, headSha, 'pr_validation.yml', 'PR Validation'),
+      rerunFailedJobsSafe(botOctokit, owner, repo, headSha, 'pr-validation.yml', 'PR Validation'),
     ]);
 
     if (e2eAction === 'dispatch') {

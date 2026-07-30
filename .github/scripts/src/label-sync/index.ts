@@ -84,7 +84,7 @@ const runRetest = async (): Promise<void> => {
   const { owner, repo } = getRepoContext();
   const prNumber = Number(requireEnv('PR_NUMBER'));
   const headSha = requireEnv('PR_HEAD_SHA');
-  const baseRef = requireEnv('PR_BASE_REF');
+  const baseRef = requireEnv('BASE_BRANCH');
   const labels = JSON.parse(requireEnv('PR_LABELS')) as Array<{ name: string }>;
   const prAuthor = requireEnv('PR_AUTHOR');
   const headRepoFullName = process.env.PR_HEAD_REPO ?? '';
@@ -140,7 +140,7 @@ const runRetest = async (): Promise<void> => {
   });
 };
 
-const main = async (): Promise<void> => {
+export const main = async (): Promise<void> => {
   const labelName = requireEnv('LABEL_NAME');
   const action = requireEnv('EVENT_ACTION');
   const route = resolveRoute(labelName, action);
@@ -166,7 +166,9 @@ const main = async (): Promise<void> => {
   }
 };
 
-void main().catch((err) => {
-  console.error(safeErrorMessage(err));
-  process.exit(1);
-});
+if (require.main === module) {
+  void main().catch((err) => {
+    console.error(safeErrorMessage(err));
+    process.exit(1);
+  });
+}

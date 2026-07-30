@@ -87,9 +87,10 @@ const verifyReview = async (): Promise<void> => {
   });
 };
 
-const main = async (): Promise<void> => {
+export const main = async (): Promise<void> => {
   const labelName = requireEnv('LABEL_NAME');
-  const prLabels: string[] = JSON.parse(process.env.PR_LABELS ?? '[]');
+  const rawLabels: Array<string | { name: string }> = JSON.parse(process.env.PR_LABELS ?? '[]');
+  const prLabels: string[] = rawLabels.map((l) => (typeof l === 'string' ? l : l.name));
   const action = resolveAction(labelName, prLabels);
 
   if (action === 'none') {
@@ -106,22 +107,24 @@ const main = async (): Promise<void> => {
   }
 };
 
-void main().catch(async (err) => {
-  console.error(safeErrorMessage(err));
+if (require.main === module) {
+  void main().catch(async (err) => {
+    console.error(safeErrorMessage(err));
 
-  const labelName = process.env.LABEL_NAME ?? '';
-  const config: GitHubConfig = {
-    owner: process.env.REPO_OWNER ?? '',
-    repo: process.env.REPO_NAME ?? '',
-    token: process.env.GITHUB_TOKEN ?? '',
-  };
-  const headSha = process.env.PR_HEAD_SHA;
+    const labelName = process.env.LABEL_NAME ?? '';
+    const config: GitHubConfig = {
+      owner: process.env.REPO_OWNER ?? '',
+      repo: process.env.REPO_NAME ?? '',
+      token: process.env.GITHUB_TOKEN ?? '',
+    };
+    const headSha = process.env.PR_HEAD_SHA;
 
-  if (AI_LABELS.has(labelName)) {
-    await reportAiConfigError(config, headSha, err);
-  } else if (CI_LABELS.has(labelName)) {
-    await reportCiScriptsError(config, headSha, err);
-  }
+    if (AI_LABELS.has(labelName)) {
+      await reportAiConfigError(config, headSha, err);
+    } else if (CI_LABELS.has(labelName)) {
+      await reportCiScriptsError(config, headSha, err);
+    }
 
-  process.exit(1);
-});
+    process.exit(1);
+  });
+}
