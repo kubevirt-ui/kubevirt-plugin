@@ -61,7 +61,7 @@ export const isListedInOwners = async (
 /**
  * Return true only when the most recent time `labelName` was added to this
  * PR, the actor was the approval bot or an OWNERS-listed user. Labels are
- * presence-only signals -- pr-label-gate.yml strips an untrusted
+ * presence-only signals -- pr-validation.yml strips an untrusted
  * skip/reviewed label soon after it's applied, but a validation run
  * triggered by a near-simultaneous event (e.g. a push right after the
  * label) could otherwise race ahead of that and trust it anyway. Fails

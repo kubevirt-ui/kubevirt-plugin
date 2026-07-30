@@ -12,7 +12,7 @@ Index of workflows in this directory. Deep design notes (check-run model, merge 
 | `hot-cluster-e2e-run.yml`             | `workflow_call`                        | Build plugin image + run Playwright on ARC                      |
 | `hot-cluster-check.yml`               | `workflow_call` (+ manual health)      | Cluster readiness / health                                      |
 | `hot-cluster-e2e-pr-gate.yml`         | PR opened / synchronize / reopened     | Thin gate → dispatch `hot-cluster-e2e.yml`                      |
-| `pr-label-gate.yml`                   | `ok-to-test` or review label added     | Dispatch E2E for fork PRs; verify review labels                 |
+| `pr-validation.yml`                   | All PR events (push + label)           | Unified PR validation: Jira, path checks, review labels, E2E dispatch, merge-pool sync |
 | `ok-to-test-reset.yml`                | synchronize while `ok-to-test` present | Remove `ok-to-test` when head moves                             |
 | `hot-cluster-e2e-cancel-on-close.yml` | PR closed                              | Cancel in-flight when PR closes                                 |
 | `on-main-push.yml`                    | push to `main`                         | Mark checks stale; retest merge-pool PRs; sync needs-rebase     |
@@ -26,7 +26,6 @@ Index of workflows in this directory. Deep design notes (check-run model, merge 
 | `pr_review_commands.yml`      | review submitted              | Captures review data only (no secrets -- see below), uploads artifact                                                                  |
 | `pr_review_commands_sync.yml` | `workflow_run` (after above)  | Approve / Request changes ↔ `lgtm` (+ `approved` for root OWNERS); split out since `pull_request_review` withholds secrets on fork PRs |
 | `needs-rebase.yml`            | PR events                     | Sync `needs-rebase` from GitHub `mergeable`                                                                                            |
-| `pr-label-sync.yml`           | labeled / unlabeled           | Verify merge-pool labels trust; retest if newly pool-eligible                                                                          |
 
 Pool eligibility (`isMergePoolPr`): `lgtm` + `approved`, and no blockers (`hold`, `e2e-hold`, `needs-rebase`, any `do-not-merge/*`). Label names: [`.github/scripts/src/shared/merge-pool.ts`](../scripts/src/shared/merge-pool.ts).
 
@@ -36,9 +35,9 @@ Pool eligibility (`isMergePoolPr`): `lgtm` + `approved`, and no blockers (`hold`
 
 | Workflow            | Trigger               | Role                                              |
 | ------------------- | --------------------- | -------------------------------------------------- |
-| `pr_validation.yml` | `pull_request_target` | Jira + AI-config + CI-scripts validation statuses |
+| `pr-validation.yml` | `pull_request_target` | Jira + AI-config + CI-scripts validation statuses |
 
-Sensitive-path review uses `/ai-approved` and `/ci-approved` (`.github/OWNERS`), not `/approve`. Review label trust enforcement is handled by the `verify-review-labels` job in `pr-label-gate.yml`.
+Sensitive-path review uses `/ai-approved` and `/ci-approved` (`.github/OWNERS`), not `/approve`. Review label trust enforcement is handled by the label-gate route in `pr-validation.yml`.
 
 ## Cluster lifecycle & manual console
 

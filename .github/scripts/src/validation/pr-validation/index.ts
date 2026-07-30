@@ -12,7 +12,7 @@ import { clearStaleApproval } from './clear-stale-approval';
 import type { PrValidationCheck } from './run-checks';
 import { runChecksIsolated } from './run-checks';
 
-const main = async (): Promise<void> => {
+export const main = async (): Promise<void> => {
   const eventAction = process.env.GITHUB_EVENT_ACTION;
   const titleChanged = process.env.TITLE_CHANGED === 'true';
 
@@ -98,7 +98,9 @@ const main = async (): Promise<void> => {
   }
 };
 
-void main().catch((err) => {
-  console.error(safeErrorMessage(err));
-  process.exit(1);
-});
+if (require.main === module) {
+  void main().catch((err) => {
+    console.error(safeErrorMessage(err));
+    process.exit(1);
+  });
+}

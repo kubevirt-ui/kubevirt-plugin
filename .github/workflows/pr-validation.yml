@@ -1,11 +1,11 @@
-name: PR Label Gate
+name: PR Validation
 
 on:
   pull_request_target:
-    types: [labeled]
+    types: [opened, synchronize, reopened, edited, labeled, unlabeled]
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}-${{ github.event.label.name }}
+  group: pr-validation-${{ github.event.pull_request.number }}-${{ github.event.label.name || 'pr-update' }}
   cancel-in-progress: true
 
 permissions:
@@ -17,8 +17,8 @@ permissions:
   actions: write
 
 jobs:
-  handle-label:
-    name: Handle Label
+  validate:
+    name: PR Validation
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -34,16 +34,22 @@ jobs:
         with:
           ref: ${{ github.event.repository.default_branch }}
 
-      - name: Run label gate
+      - name: Run validation
         working-directory: .github/scripts
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          LABEL_NAME: ${{ github.event.label.name }}
-          PR_LABELS: ${{ toJSON(github.event.pull_request.labels.*.name) }}
+          JIRA_TOKEN: ${{ secrets.JIRA_TOKEN }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
           BASE_BRANCH: ${{ github.event.pull_request.base.ref }}
           PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
-          SENDER: ${{ github.event.sender.login }}
           REPO_OWNER: ${{ github.repository_owner }}
           REPO_NAME: ${{ github.event.repository.name }}
-        run: npx tsx src/label-gate/index.ts
+          EVENT_ACTION: ${{ github.event.action }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          TITLE_CHANGED: ${{ github.event.changes.title != null }}
+          LABEL_NAME: ${{ github.event.label.name }}
+          PR_LABELS: ${{ toJSON(github.event.pull_request.labels) }}
+          SENDER: ${{ github.event.sender.login }}
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+          PR_HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
+        run: npx tsx src/pr-validation/dispatcher.ts
