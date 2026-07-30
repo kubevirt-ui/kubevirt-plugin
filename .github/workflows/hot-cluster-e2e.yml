@@ -38,9 +38,9 @@ on:
         default: ''
         type: string
       openshift_version:
-        description: 'OpenShift version (e.g. 4.22_openshift)'
+        description: 'OpenShift version (e.g. 4.21_openshift)'
         required: false
-        default: '4.22_openshift'
+        default: '4.21_openshift'
         type: string
       test_engine:
         description: |

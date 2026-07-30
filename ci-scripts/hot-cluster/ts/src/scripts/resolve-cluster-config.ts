@@ -10,7 +10,7 @@
 import { appendFileSync } from 'node:fs';
 
 const DEFAULT_CLUSTER_NAME = 'kubevirt-plugin-ci';
-const DEFAULT_OPENSHIFT_VERSION = '4.22_openshift';
+const DEFAULT_OPENSHIFT_VERSION = '4.21_openshift';
 const DEFAULT_TEST_ENGINE = 'playwright';
 const DEFAULT_CNV_CHANNEL = 'stable';
 

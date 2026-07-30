@@ -24,9 +24,9 @@ on:
         default: 'us-south-1'
         type: string
       openshift_version:
-        description: 'OpenShift version (e.g. 4.22_openshift)'
+        description: 'OpenShift version (e.g. 4.21_openshift)'
         required: true
-        default: '4.22_openshift'
+        default: '4.21_openshift'
         type: string
       worker_flavor:
         description: 'Worker node flavor (classic: mb4c.4x32; vpc/ipi: bx2.8x32)'
@@ -95,9 +95,9 @@ on:
         default: 'us-south-1'
         type: string
       openshift_version:
-        description: 'OpenShift version (e.g. 4.22_openshift)'
+        description: 'OpenShift version (e.g. 4.21_openshift)'
         required: false
-        default: '4.22_openshift'
+        default: '4.21_openshift'
         type: string
       worker_flavor:
         description: 'Worker node flavor (classic: mb4c.4x32; vpc/ipi: bx2.8x32)'
@@ -423,7 +423,7 @@ jobs:
       - name: Build ARC runner image
         id: build_runner
         run: |
-          OC_VERSION="${{ inputs.openshift_version || '4.22_openshift' }}"
+          OC_VERSION="${{ inputs.openshift_version || '4.21_openshift' }}"
           export OC_VERSION="${OC_VERSION%%_*}"
           IMAGE_REF=$(./ci-scripts/hot-cluster/images/setup-arc-runner-image.sh | grep '^IMAGE_REF=' | cut -d= -f2-)
           echo "image_ref=${IMAGE_REF}" >> "$GITHUB_OUTPUT"
