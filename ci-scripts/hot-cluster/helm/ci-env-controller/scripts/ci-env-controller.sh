@@ -73,17 +73,12 @@ resolve_console_image() {
     return
   fi
 
-  local version
-  version="$(oc get clusterversion version \
-    -o jsonpath='{.status.desired.version}' 2>/dev/null || true)"
-  if [[ -z "${version}" ]]; then
-    echo "${CONSOLE_IMAGE_REGISTRY}:latest"
-    return
-  fi
-
-  local major minor
-  IFS='.' read -r major minor _ <<< "${version}"
-  echo "${CONSOLE_IMAGE_REGISTRY}:${major}.${minor}"
+  # Default to :latest so the test console always matches the plugin SDK
+  # version on main (which tracks the newest console API / PatternFly).
+  # A newer console can load older-SDK plugins, but an older console
+  # cannot load newer-SDK plugins (e.g. PF5 console vs PF6 plugin).
+  # Release branches can override via the ConfigMap's console-image field.
+  echo "${CONSOLE_IMAGE_REGISTRY}:latest"
 }
 
 # --------------------------------------------------------------------------- #
