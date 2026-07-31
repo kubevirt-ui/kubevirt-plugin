@@ -9,19 +9,23 @@ import * as k8s from '@kubernetes/client-node';
 
 import { KubeClient, requireEnv } from '../kube-client';
 
-const mergeConfigMapData = async (
-  api: k8s.CoreV1Api,
+const makePatchApi = (client: KubeClient): k8s.KubernetesObjectApi =>
+  k8s.KubernetesObjectApi.makeApiClient(client.kubeConfig);
+
+const patchConfigMapData = async (
+  patchApi: k8s.KubernetesObjectApi,
   name: string,
   namespace: string,
   data: Record<string, string>,
 ): Promise<void> => {
-  const cm = await api.readNamespacedConfigMap({ name, namespace });
-  const merged = { ...cm.data, ...data };
-  await api.replaceNamespacedConfigMap({
-    body: { ...cm, data: merged },
-    name,
-    namespace,
-  });
+  await patchApi.patch(
+    { apiVersion: 'v1', kind: 'ConfigMap', metadata: { name, namespace }, data },
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    k8s.PatchStrategy.MergePatch,
+  );
 };
 
 const USER_SETTINGS = JSON.stringify({
@@ -43,6 +47,7 @@ const main = async (): Promise<void> => {
 
   const client = KubeClient.fromKubeconfig();
   const coreApi = client.coreV1;
+  const patchApi = makePatchApi(client);
 
   const saName = `${ciEnvCm}-console`;
 
@@ -77,7 +82,7 @@ const main = async (): Promise<void> => {
     patchData[saUid] = USER_SETTINGS;
   }
 
-  await mergeConfigMapData(coreApi, 'kubevirt-user-settings', cnvNs, patchData);
+  await patchConfigMapData(patchApi, 'kubevirt-user-settings', cnvNs, patchData);
 
   // Ensure kubevirt-ui-features ConfigMap exists
   try {
@@ -89,7 +94,7 @@ const main = async (): Promise<void> => {
     });
   }
 
-  await mergeConfigMapData(coreApi, 'kubevirt-ui-features', cnvNs, {
+  await patchConfigMapData(patchApi, 'kubevirt-ui-features', cnvNs, {
     advancedSearch: 'true',
     treeViewFolders: 'true',
   });
@@ -108,7 +113,7 @@ const main = async (): Promise<void> => {
       });
     }
 
-    await mergeConfigMapData(coreApi, cmName, cmNs, { 'console.guidedTour': GUIDED_TOUR });
+    await patchConfigMapData(patchApi, cmName, cmNs, { 'console.guidedTour': GUIDED_TOUR });
   }
 
   console.log('User settings seeded successfully.');
