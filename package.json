@@ -29,7 +29,7 @@
     "global": "^4.4.0",
     "immer": "^9.0.12",
     "js-abbreviation-number": "^1.4.0",
-    "js-yaml": "4.3.0",
+    "js-yaml": "^4.3.0",
     "lodash": "^4.17.23",
     "mochawesome-report-generator": "^6.2.0",
     "murmurhash-js": "1.0.0",
