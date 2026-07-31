@@ -12,7 +12,10 @@ import {
   type UseInstallFeatureParams,
   type UseInstallFeatureReturn,
 } from '../utils/types';
-import { getNonInstalledFeatureManifests, packageManifestToOperatorItem } from '../utils/utils';
+import {
+  getNonInstalledFeatureManifests,
+  packageManifestToOperatorItem,
+} from '../utils/operatorResolution';
 import useAwaitingOLM from './useAwaitingOLM';
 import useInstallResources from './useInstallResources';
 

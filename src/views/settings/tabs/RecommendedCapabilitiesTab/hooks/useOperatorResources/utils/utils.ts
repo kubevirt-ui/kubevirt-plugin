@@ -16,7 +16,7 @@ import { type FleetWatchK8sResource } from '@stolostron/multicluster-sdk';
 
 import { OPENSHIFT_MARKETPLACE_NAMESPACE } from '../../../utils/constants';
 import { RED_HAT_CATALOG_SOURCE } from '../../../utils/createOperator/constants';
-import { getSubscriptionInstalledCSV, subscriptionFor } from '../../../utils/utils';
+import { getSubscriptionInstalledCSV, subscriptionFor } from '../../../utils/operatorResolution';
 import { PACKAGE_MANIFESTS_WATCH_KEY } from './constants';
 import { type OperatorWatchResourceResult } from './types';
 

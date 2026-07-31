@@ -34,7 +34,8 @@ const useAutopilotStatus = (): UseAutopilotStatusResult => {
         const resource = result?.data;
 
         statusMap[entry.operatorPackageName] = {
-          configStatus: result?.loaded ? deriveConfigStatus(resource) : undefined,
+          configStatus:
+            result?.loaded && !result?.loadError ? deriveConfigStatus(resource) : undefined,
           managedCR: resource || undefined,
           recommendedYAML: entry.recommendedYAML,
         };

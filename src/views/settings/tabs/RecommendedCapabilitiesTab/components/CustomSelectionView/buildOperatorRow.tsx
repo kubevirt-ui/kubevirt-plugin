@@ -11,8 +11,10 @@ import { type DataViewTrTree } from '@patternfly/react-data-view';
 import { getOperatorInstallStatusLabel } from '../../utils/constants';
 import {
   type CapabilityFeatureOperator,
+  ConfigurationStatus,
   type RecommendedCapabilityOperatorDetails,
 } from '../../utils/types';
+import ConfigurationStatusCell from '../ConfigurationStatusCell/ConfigurationStatusCell';
 
 export const buildOperatorRow = (
   operator: CapabilityFeatureOperator,
@@ -21,6 +23,8 @@ export const buildOperatorRow = (
   t: TFunction,
   actions?: ActionDropdownItemType[],
   includeConfigCell = false,
+  configStatus?: ConfigurationStatus,
+  onReviewClick?: () => void,
 ): DataViewTrTree => {
   const { color, label } = getOperatorInstallStatusLabel(
     opDetails?.installState,
@@ -49,7 +53,18 @@ export const buildOperatorRow = (
           </Label>
         ),
       },
-      ...(includeConfigCell ? [{ cell: null }] : []),
+      ...(includeConfigCell
+        ? [
+            {
+              cell: (
+                <ConfigurationStatusCell
+                  configStatus={configStatus}
+                  onReviewClick={onReviewClick}
+                />
+              ),
+            },
+          ]
+        : []),
       {
         cell: !isEmpty(actions) ? <ActionsDropdown actions={actions} isKebabToggle /> : null,
         props: { className: 'pf-v6-c-table__action' },

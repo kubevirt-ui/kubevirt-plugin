@@ -1,0 +1,36 @@
+.review-recommendation-modal {
+  &__description {
+    font-size: var(--pf-t--global--font--size--body--lg);
+    margin-bottom: var(--pf-t--global--spacer--md);
+  }
+
+  &__separator {
+    border: none;
+    border-top: 1px solid var(--pf-t--global--border--color--default);
+    margin: var(--pf-t--global--spacer--sm) var(--pf-t--global--spacer--lg) 0;
+  }
+
+  &__editor {
+    display: flex;
+    flex-direction: column;
+    height: 350px;
+    margin-top: var(--pf-t--global--spacer--md);
+
+    > * {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+
+      > * {
+        flex: 1;
+        overflow-y: auto;
+      }
+    }
+  }
+
+  &__footer {
+    display: flex;
+    gap: var(--pf-t--global--spacer--sm);
+  }
+}

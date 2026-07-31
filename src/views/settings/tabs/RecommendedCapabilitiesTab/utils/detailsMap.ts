@@ -11,11 +11,11 @@ import {
 } from './types';
 import {
   clusterServiceVersionFor,
-  computeInstallState,
   getOperatorHubURL,
   getPackageUID,
   getSubscriptionInstalledCSV,
-} from './utils';
+} from './operatorResolution';
+import { computeInstallState } from './installState';
 
 const findSubscriptionByPackageName = (
   allSubscriptions: SubscriptionKind[],
