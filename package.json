@@ -140,8 +140,7 @@
     "shell-quote": "^1.8.4",
     "ajv-keywords@5.1.0": {
       "ajv": "^8.17.1"
-    },
-    "js-yaml": "4.3.0"
+    }
   },
   "private": true,
   "scripts": {
