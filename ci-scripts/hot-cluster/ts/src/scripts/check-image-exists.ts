@@ -23,7 +23,6 @@ const main = async (): Promise<void> => {
 
   const [, registry, repo, tag] = match;
 
-  // ttl.sh uses anonymous access — no auth needed
   const url = `https://${registry}/v2/${repo}/manifests/${tag}`;
 
   try {
