@@ -13,9 +13,9 @@ import type VmTreePage from '@/page-objects/vm/vm-tree-page';
 import { TestTimeouts } from '@/utils/test-config';
 import {
   createBridgeNetworkAttachmentDefinition,
-  type ProjectNetworkSettingsAnnotations,
   setProjectNetworkSettings,
   setupTestNamespace,
+  type ProjectNetworkSettingsAnnotations,
 } from '@/utils/test-setup-helpers';
 
 const SUITE = 'Project network settings';
@@ -80,6 +80,7 @@ async function navigateWizardToCustomizationNetwork(args: {
   await vmWizardNavigationPage.clickNext();
 
   await vmWizardComputePage.verifyComputeResourcesStepVisible();
+  await vmWizardComputePage.clickElementByExactText('div', 'Compute Exclusive');
   // Give namespace/NAD watches time to settle before Compute → Next snapshots the VM.
   await vmWizardNavigationPage.page.waitForTimeout(TestTimeouts.CLUSTER_STATE_PROPAGATION);
   await vmWizardNavigationPage.clickNext();
