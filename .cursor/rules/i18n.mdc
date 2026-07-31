@@ -250,21 +250,12 @@ Add a comment in `src/utils/i18n.ts` for the parser. This is the **only** file w
 
 ## 7. Updating Translations
 
-### After Adding Strings
-```bash
-# Extract new strings to translation files
-npm run i18n
-```
+When to run `npm run i18n` and the Memsource upload flow are documented in [INTERNATIONALIZATION.md](../../INTERNATIONALIZATION.md).
 
-### What This Does
+### What `npm run i18n` Does
 1. Scans source files for `t()` calls
 2. Extracts strings to `locales/en/plugin__kubevirt-plugin.json`
 3. Syncs with other language files (adds missing keys)
-
-### Commit Translation Changes
-- Always commit translation file updates
-- Run `npm run i18n` before PR
-- lint-staged runs this automatically for src changes
 
 ---
 
@@ -291,12 +282,14 @@ npm run i18n
 
 ## 9. Testing Translations
 
-### Verify All Strings Translated
-```bash
-# Check for missing translations
-npm run i18n
+### Verify Translation Usage in Code
+- Review PRs for hardcoded strings and incorrect `t()` patterns (see Section 12)
+- English UI works with key-as-text even when locale JSON is not yet refreshed
 
-# Look for changes in translation files
+### Before Translation Upload
+```bash
+# Extract strings, then inspect locale diffs
+npm run i18n
 git diff locales/
 ```
 
@@ -371,15 +364,16 @@ These rules are mandatory for AI agents when generating or reviewing code:
 - **Never** import `{ t }` directly from `useKubevirtTranslation` -- always pass `t` as a parameter
 - Never invent custom types for the translation function
 - Use interpolation for dynamic values: `t('{{count}} items', { count })` -- never concatenate
-- After adding or changing any user-facing string, run `npm run i18n`
 
 ### When Reviewing Code
+Reviewers (and AI review agents) must carefully verify translation correctness in source:
 - Verify every user-facing string is wrapped in `t()`
 - Verify `TFunction` is imported from `i18next`, not defined inline
 - Flag any string concatenation with `t()` results as a **blocker**
 - Flag any `// t('...')` comment-only patterns as a **blocker** -- these do not wire up translations. **Exception**: `src/utils/i18n.ts` uses comment-only `// t('...')` intentionally for `i18next-parser` string extraction (see Section 4)
 - Flag any hardcoded user-facing strings (JSX text content, button labels, etc.) as a **blocker**
-- Verify locale diffs are present in the PR when user-facing strings change
+- Flag split sentences / multiple adjacent `t()` calls that lose translator context as a **blocker**
+- Confirm console extension labels use `%plugin__kubevirt-plugin~...%` and are registered in `src/utils/i18n.ts` when applicable
 
 ### Common Mistakes to Catch
 ```tsx
@@ -398,6 +392,9 @@ const getLabel = (t: (key: string) => string) => t('Name');
 
 // BLOCKER: template literal with t()
 `${t('Make persistent disk')} - (${names.join(', ')})`
+
+// BLOCKER: split sentence loses context for translators
+{t('Click')} {t('here')} {t('to continue')}
 ```
 
 ---
@@ -409,8 +406,6 @@ const getLabel = (t: (key: string) => string) => t('Name');
 - [ ] `TFunction` imported from `i18next` (no custom types)
 - [ ] Dynamic values use interpolation `{{variable}}`
 - [ ] No string concatenation for translated text
-- [ ] No comment-only `// t('...')` patterns
+- [ ] No comment-only `// t('...')` patterns (except `src/utils/i18n.ts`)
 - [ ] Console extensions use `%plugin__...%` format
 - [ ] Extension strings registered in `utils/i18n.ts`
-- [ ] `npm run i18n` run before commit
-- [ ] Translation file changes committed

@@ -293,8 +293,7 @@ src/views/{feature}/components/{component-name}/
 
 ### i18n
 - [ ] Uses `useKubevirtTranslation`
-- [ ] All strings translated
-- [ ] `npm run i18n` run
+- [ ] All strings wrapped in `t()` with correct patterns
 
 ### Styling
 - [ ] SCSS file created

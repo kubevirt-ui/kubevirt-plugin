@@ -116,8 +116,8 @@ add the message from console extensions files to your message catalog as follows
 // t('plugin__kubevirt-plugin~VirtualMachines')
 ```
 
-Run `npm run i18n` to update the JSON files in the `locales` folder of the
-dynamic plugin when adding or changing messages.
+See [INTERNATIONALIZATION.md](./INTERNATIONALIZATION.md) for when to update
+locale files.
 
 ## Docker image
 

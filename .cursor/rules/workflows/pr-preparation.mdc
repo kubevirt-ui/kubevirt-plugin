@@ -58,18 +58,13 @@ npm run check-types && npm run lint && npm test
 
 ## 3. i18n Verification
 
-### Run i18n
-```bash
-npm run i18n
-```
-
 ### Translation Checklist
 - [ ] All user-facing strings use `t()` function
-- [ ] `npm run i18n` has been run
-- [ ] Translation file changes committed
 - [ ] No hardcoded strings in UI
 - [ ] Proper interpolation for dynamic values
 - [ ] Pluralization handled correctly
+- [ ] `TFunction` from `i18next` (no custom types / no direct `{ t }` import)
+- [ ] No string concatenation or split sentences that lose translator context
 
 ---
 
@@ -309,7 +304,7 @@ See `AI_README.md` for the full merge policy. Do not use PR comments to approve;
 
 ### Code
 - [ ] All checks pass (types, lint, test)
-- [ ] i18n updated
+- [ ] User-facing strings correctly wrapped in `t()`
 - [ ] No debug code
 - [ ] Self-reviewed
 
@@ -336,9 +331,6 @@ npm run check-types && npm run lint && npm test
 
 # Fix lint issues
 npm run lint:fix
-
-# Update translations
-npm run i18n
 
 # Run specific test
 npm test path/to/file.test.ts

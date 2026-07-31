@@ -112,6 +112,6 @@ Based on user choice:
 
 After implementing fixes:
 
-- Run `npm run i18n` if any strings were added or changed
+- Verify all new/changed user-facing strings are correctly wrapped in `t()`
 - Run `npm run check-types` to verify no type errors
 - Run `npm run lint` to verify linting passes

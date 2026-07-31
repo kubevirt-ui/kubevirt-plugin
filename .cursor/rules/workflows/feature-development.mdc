@@ -219,7 +219,7 @@ Address any blockers or suggestions before moving on.
 
 Following `pr-preparation.mdc`:
 - [ ] All checks pass (types, lint, test)
-- [ ] i18n updated (`npm run i18n`)
+- [ ] User-facing strings correctly wrapped in `t()`
 - [ ] No debug code
 - [ ] Self-reviewed
 

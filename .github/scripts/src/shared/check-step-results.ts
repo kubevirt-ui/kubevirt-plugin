@@ -3,7 +3,7 @@
  * Entry point: npx tsx src/shared/check-step-results.ts
  *
  * Env: STEP_RESULTS — JSON object mapping step names to outcomes
- *      e.g. {"i18n":"success","lint":"failure","build":"success"}
+ *      e.g. {"lint":"failure","build":"success"}
  */
 
 import { requireEnv } from '../utils';

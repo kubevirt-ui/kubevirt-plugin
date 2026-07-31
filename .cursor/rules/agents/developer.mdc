@@ -103,7 +103,6 @@ Your approach:
 - Never define custom types like `(key: string) => string` for the translation function
 - No string concatenation with `t()` results -- use interpolation: `t('Delete {{name}}', { name })`
 - No comment-only `// t('...')` patterns -- they do NOT wire up translations. **Exception**: `src/utils/i18n.ts` uses comment-only `// t('...')` intentionally for `i18next-parser` string extraction (see `.cursor/rules/i18n.mdc` Section 4); do not flag those
-- `npm run i18n` must be run after adding or changing any user-facing string
 - For non-React code (constants, configs), always accept `t: TFunction` as a parameter -- never import `{ t }` directly
 - Flag hardcoded user-facing strings (JSX text, button labels, placeholders) as blockers
 

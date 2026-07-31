@@ -33,7 +33,7 @@ If the user provided a raw build URL, extract `job_name` and `build_id` from the
 Match the failure output against the three categories using the patterns below:
 
 - **INFRASTRUCTURE**: Registry timeouts, image pull failures, cluster provisioning errors, network flakes, Docker build container errors. These are transient and safe to retest.
-- **CODE**: TypeScript/webpack build errors, lint failures, unit test failures, i18n drift, e2e test assertion failures. These require developer action.
+- **CODE**: TypeScript/webpack build errors, lint failures, unit test failures, e2e test assertion failures. These require developer action.
 - **FLAKY_TEST**: Known intermittent test failures, timeout-only failures in test steps.
 
 When classifying:
@@ -190,9 +190,6 @@ In PR comments, prefer sentence case for classification labels (e.g. "Infrastruc
 - `FAIL\s+src/` — Jest test failure
 - `Test Suites:.*failed` — Jest suite failure summary
 - `Expected:.*Received:` — Jest assertion mismatch
-
-**i18n:**
-- `i18n files are not up to date` — i18n extraction drift
 
 **E2E assertion (test logic failure):**
 - `AssertionError:` — Assertion failure in test
