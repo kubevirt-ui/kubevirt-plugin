@@ -6,7 +6,7 @@ Trigger selector:     {{ .Values.label }}
 
 Manually request a test stack for a plugin image:
   export CONFIGMAP_NAME=ci-env-test-1234
-  export PLUGIN_IMAGE=ttl.sh/custom-plugin-image-1234:1h
+  export PLUGIN_IMAGE=quay.io/kubevirt-ui/kubevirt-ui-ci:run-1234
   export TEST_NAMESPACE=ci-env-test-ns-12324
 
   oc create -f - <<EOF

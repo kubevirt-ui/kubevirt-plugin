@@ -162,7 +162,7 @@ env:
   TEST_NS: kubevirt-plugin-ci-test-${{ github.run_id }}
   TEST_SECRET_NAME: ci-test-secret
 
-  KUBEVIRT_PLUGIN_IMAGE: 'ttl.sh/kubevirt-plugin-ci-${{ github.run_id }}-${{ github.run_attempt }}:2h'
+  KUBEVIRT_PLUGIN_IMAGE: 'quay.io/kubevirt-ui/kubevirt-ui-ci:run-${{ github.run_id }}-${{ github.run_attempt }}'
 
   CI_ENV_NS: ci-env
   CI_ENV_CM: ci-env-${{ github.run_id }}
@@ -209,6 +209,10 @@ jobs:
             type=semver,pattern={{major}}.{{minor}}
             type=semver,pattern={{major}}
             type=sha
+
+      - name: Login to Quay.io
+        if: steps.check_image.outputs.IMAGE_EXISTS == 'false'
+        run: podman login quay.io -u "${{ secrets.QUAY_USERNAME }}" -p "${{ secrets.QUAY_PASS }}"
 
       - name: Build and push
         if: steps.check_image.outputs.IMAGE_EXISTS == 'false'

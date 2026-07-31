@@ -19,7 +19,7 @@ Manual-console is the same underlying stack with three differences:
 | Namespace    | Ephemeral `kubevirt-plugin-ci-test-<run_id>` | Persistent `manual-console`                        |
 | Lifecycle    | Torn down after the test run; 2h TTL reaper  | Persists until the next deploy; **not** TTL-reaped |
 | Auth         | `BRIDGE_USER_AUTH=disabled` (bearer token)   | `BRIDGE_USER_AUTH=openshift` (OAuth login)         |
-| Plugin image | Built on `ubuntu-latest`, pushed to `ttl.sh` | Built in-cluster via an OpenShift BuildConfig      |
+| Plugin image | Built on `ubuntu-latest`, pushed to `quay.io` | Built in-cluster via an OpenShift BuildConfig      |
 
 ## Prerequisites
 

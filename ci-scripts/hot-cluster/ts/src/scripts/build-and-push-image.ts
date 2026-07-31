@@ -23,11 +23,15 @@ const main = async (): Promise<void> => {
   }
   console.log(`## Labels\n\`\`\`\n${labelsRaw}\n\`\`\``);
 
-  // Build label args
-  const labelArgs = labelsRaw
-    .split('\n')
-    .filter((line) => line.trim() !== '')
-    .flatMap((line) => ['--label', line.trim()]);
+  // Build label args (quay.expires-after triggers automatic tag expiration on Quay.io)
+  const labelArgs = [
+    ...labelsRaw
+      .split('\n')
+      .filter((line) => line.trim() !== '')
+      .flatMap((line) => ['--label', line.trim()]),
+    '--label',
+    'quay.expires-after=2h',
+  ];
 
   // Build
   const repoRoot =
