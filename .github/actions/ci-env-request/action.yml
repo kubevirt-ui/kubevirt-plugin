@@ -38,6 +38,11 @@ outputs:
 runs:
   using: composite
   steps:
+    - name: Install infra script dependencies
+      shell: bash
+      working-directory: ci-scripts/hot-cluster/ts
+      run: npm ci --ignore-scripts --no-audit
+
     - name: Request and wait for test environment
       id: request
       shell: bash
