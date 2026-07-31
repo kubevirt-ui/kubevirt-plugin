@@ -50,7 +50,25 @@ echo "  YQ_VERSION:      ${YQ_VERSION}"
 echo "  OC_URL:          ${OC_URL:-(fallback to mirror.openshift.com)}"
 echo "  VIRTCTL_URL:     ${VIRTCTL_URL:-(fallback to GitHub releases)}"
 echo "  HELM_URL:        ${HELM_URL:-(fallback to get.helm.sh)}"
+echo "  FORCE_BUILD:     ${FORCE_BUILD:-false}"
 echo ""
+
+# Skip build if the ImageStream already has a :latest tag and FORCE_BUILD is not set
+if [[ "${FORCE_BUILD:-false}" != "true" ]]; then
+  EXISTING_REF=$(oc get imagestreamtag "${IMAGE_NAME}:latest" -n "${NS}" -o jsonpath='{.image.dockerImageReference}' 2>/dev/null || echo "")
+  if [[ -n "${EXISTING_REF}" ]]; then
+    resolve_internal_registry
+    IMAGE_REF="${INTERNAL_REGISTRY}/${NS}/${IMAGE_NAME}:latest"
+    echo "Image already exists, skipping build: ${IMAGE_REF}"
+    echo ""
+    if [[ -n "${ARC_RUNNER_IMAGE_FILE:-}" ]]; then
+      printf '%s\n' "${IMAGE_REF}" > "${ARC_RUNNER_IMAGE_FILE}"
+      echo "Wrote ${ARC_RUNNER_IMAGE_FILE}"
+    fi
+    echo "IMAGE_REF=${IMAGE_REF}"
+    exit 0
+  fi
+fi
 
 if [[ ! -f "${IMAGE_DIR}/Dockerfile" ]]; then
   echo "ERROR: Dockerfile not found at ${IMAGE_DIR}/Dockerfile"
