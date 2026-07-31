@@ -1,6 +1,6 @@
 # Hot Cluster CI
 
-This directory contains scripts and documentation for the **IBM Cloud hot cluster** CI stack: an OpenShift cluster used for KubeVirt plugin E2E testing, with **Hyperconverged Cluster Operator (HCO)** and **GitHub Actions Runner Controller (ARC)** for self-hosted runners (`kubevirt-plugin-ci`).
+This directory contains scripts and documentation for the **IBM Cloud hot-cluster** CI stack: an OpenShift cluster used for KubeVirt plugin E2E testing, with **Hyperconverged Cluster Operator (HCO)** and **GitHub Actions Runner Controller (ARC)** for self-hosted runners (`kubevirt-plugin-ci`).
 
 Three infrastructure types are supported: **Classic ROKS**, **VPC ROKS** (recommended; OVN-Kubernetes CNI with Multus), and **IPI** (self-managed OpenShift).
 
