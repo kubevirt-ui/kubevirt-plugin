@@ -5,7 +5,7 @@
  * Cypress-specific env: TEST_NS, OS_IMAGES_NS, CNV_NS, TEST_SECRET_NAME
  */
 
-import { execSync } from 'node:child_process';
+import { execFileSync, execSync } from 'node:child_process';
 
 import { requireEnv } from '../utils';
 
@@ -32,7 +32,10 @@ const main = async (): Promise<void> => {
     const spec = testProject === 'features' ? 'tests/tier1.cy.ts' : 'tests/gating.cy.ts';
     execSync(`npm run test-cypress-headless -- --spec ${spec}`, { env, stdio: 'inherit' });
   } else {
-    execSync('./playwright-runner-hc-e2e.sh Gating', { stdio: 'inherit' });
+    const repoRoot =
+      process.env.GITHUB_WORKSPACE ??
+      execFileSync('git', ['rev-parse', '--show-toplevel'], { encoding: 'utf8' }).trim();
+    execSync('./playwright-runner-hc-e2e.sh Gating', { cwd: repoRoot, stdio: 'inherit' });
   }
 };
 

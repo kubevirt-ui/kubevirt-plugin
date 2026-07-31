@@ -2,7 +2,7 @@
 
 This directory contains scripts and documentation for the **IBM Cloud hot cluster** CI stack: an OpenShift cluster used for KubeVirt plugin E2E testing, with **Hyperconverged Cluster Operator (HCO)** and **GitHub Actions Runner Controller (ARC)** for self-hosted runners (`kubevirt-plugin-ci`).
 
-Three infrastructure types are supported: **Classic ROKS**, **VPC ROKS** (recommended; OVN-Kubernetes CNI, Multus support), and **IPI** (self-managed OpenShift).
+Three infrastructure types are supported: **Classic ROKS**, **VPC ROKS** (recommended; OVN-Kubernetes CNI, Multus), and **IPI** (self-managed OpenShift).
 
 **Prow/Tide are gone for this repo.** Gating E2E runs here; merge eligibility (`lgtm`/`approved`/`hold`/`needs-rebase`) and native auto-merge live in GitHub Actions. See [Prow/Tide → GitHub Actions Migration](#prowtide-github-actions-migration-complete-for-this-repo) below.
 
