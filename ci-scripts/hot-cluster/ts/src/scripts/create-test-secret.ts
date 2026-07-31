@@ -6,6 +6,7 @@
  */
 
 import * as yaml from 'js-yaml';
+import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
@@ -16,7 +17,10 @@ const main = async (): Promise<void> => {
   const testNs = requireEnv('TEST_NS');
   const testEngine = process.env.TEST_ENGINE ?? 'playwright';
 
-  const fixturePath = resolve(testEngine, 'fixtures', 'secret.yaml');
+  const repoRoot =
+    process.env.GITHUB_WORKSPACE ??
+    execFileSync('git', ['rev-parse', '--show-toplevel'], { encoding: 'utf8' }).trim();
+  const fixturePath = resolve(repoRoot, testEngine, 'fixtures', 'secret.yaml');
   const content = yaml.load(readFileSync(fixturePath, 'utf8')) as Record<string, unknown>;
 
   const metadata = content.metadata as Record<string, unknown>;
