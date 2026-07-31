@@ -5,7 +5,24 @@
  * Env: CI_ENV_CM, TEST_NS, CNV_NS, TEST_ENGINE
  */
 
+import * as k8s from '@kubernetes/client-node';
+
 import { KubeClient, requireEnv } from '../kube-client';
+
+const mergeConfigMapData = async (
+  api: k8s.CoreV1Api,
+  name: string,
+  namespace: string,
+  data: Record<string, string>,
+): Promise<void> => {
+  const cm = await api.readNamespacedConfigMap({ name, namespace });
+  const merged = { ...cm.data, ...data };
+  await api.replaceNamespacedConfigMap({
+    body: { ...cm, data: merged },
+    name,
+    namespace,
+  });
+};
 
 const USER_SETTINGS = JSON.stringify({
   onboardingPopoversHidden: { catalog: true, createProject: true, navCollapse: true, vmsTab: true },
@@ -54,23 +71,27 @@ const main = async (): Promise<void> => {
     });
   }
 
-  // Patch user settings
+  // Merge user settings into ConfigMap via read + replace
   const patchData: Record<string, string> = { [sanitizedName]: USER_SETTINGS };
   if (saUid) {
     patchData[saUid] = USER_SETTINGS;
   }
 
-  await coreApi.patchNamespacedConfigMap({
-    body: { data: patchData },
-    name: 'kubevirt-user-settings',
-    namespace: cnvNs,
-  });
+  await mergeConfigMapData(coreApi, 'kubevirt-user-settings', cnvNs, patchData);
 
-  // Patch kubevirt-ui-features
-  await coreApi.patchNamespacedConfigMap({
-    body: { data: { advancedSearch: 'true', treeViewFolders: 'true' } },
-    name: 'kubevirt-ui-features',
-    namespace: cnvNs,
+  // Ensure kubevirt-ui-features ConfigMap exists
+  try {
+    await coreApi.readNamespacedConfigMap({ name: 'kubevirt-ui-features', namespace: cnvNs });
+  } catch {
+    await coreApi.createNamespacedConfigMap({
+      body: { metadata: { name: 'kubevirt-ui-features', namespace: cnvNs } },
+      namespace: cnvNs,
+    });
+  }
+
+  await mergeConfigMapData(coreApi, 'kubevirt-ui-features', cnvNs, {
+    advancedSearch: 'true',
+    treeViewFolders: 'true',
   });
 
   // Cypress-only: seed guided tour completion
@@ -87,11 +108,7 @@ const main = async (): Promise<void> => {
       });
     }
 
-    await coreApi.patchNamespacedConfigMap({
-      body: { data: { 'console.guidedTour': GUIDED_TOUR } },
-      name: cmName,
-      namespace: cmNs,
-    });
+    await mergeConfigMapData(coreApi, cmName, cmNs, { 'console.guidedTour': GUIDED_TOUR });
   }
 
   console.log('User settings seeded successfully.');
