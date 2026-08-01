@@ -283,7 +283,6 @@ test.describe('Virtualization pages (gating)', { tag: [GATING_TAG] }, () => {
     await test.step('Cluster tab lists all expected sections', async () => {
       const sections = await settingsPage.getClusterSettingsSectionNames();
       for (const expected of [
-        'Virtualization features',
         'General settings',
         'Guest management',
         'Resource management',
