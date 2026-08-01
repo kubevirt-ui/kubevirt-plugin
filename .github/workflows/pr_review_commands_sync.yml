@@ -49,7 +49,7 @@ jobs:
           ref: ${{ github.event.repository.default_branch }}
 
       - name: Download review data
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: review-data
           run-id: ${{ github.event.workflow_run.id }}
