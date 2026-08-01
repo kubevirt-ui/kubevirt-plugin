@@ -1,7 +1,13 @@
+import { Buffer } from 'buffer';
+
 import type { Octokit } from '@octokit/rest';
 
-/** The only identity commands/approve.ts uses to add reviewed/skip labels -- any other bot/app with label-write access must still pass the OWNERS check below. */
+/** The primary identity commands/approve.ts uses to add reviewed/skip labels. */
 export const APPROVAL_BOT_LOGIN = 'kubevirt-plugin-bot[bot]';
+
+const TRUSTED_BOT_LOGINS: ReadonlySet<string> = new Set([APPROVAL_BOT_LOGIN, 'openshift-ci[bot]']);
+
+export const isTrustedBot = (login: string): boolean => TRUSTED_BOT_LOGINS.has(login);
 
 const escapeRegExp = (value: string): string => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
@@ -93,7 +99,7 @@ export const isLabelAppliedByTrustedActor = async (
       return false;
     }
 
-    if (actor === APPROVAL_BOT_LOGIN) {
+    if (isTrustedBot(actor)) {
       return true;
     }
     return await isListedInOwners(octokit, owner, repo, baseRef, actor);
