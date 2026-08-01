@@ -5,7 +5,7 @@ import { APPROVED_LABEL, DO_NOT_MERGE_HOLD_LABEL, LGTM_LABEL } from '../../share
 import type { GitHubConfig } from '../../types/index';
 import { sameGitHubLogin } from '../../utils';
 import { isWriteCollaborator } from '../commands/collaborator-trust';
-import { APPROVAL_BOT_LOGIN, isListedInOwners } from '../pr-path-validation/owners';
+import { isListedInOwners, isTrustedBot } from '../pr-path-validation/owners';
 
 /** Pool-facing labels whose presence must match the slash-command trust model. */
 export const MERGE_POOL_WATCHED_LABELS = new Set<string>([
@@ -67,7 +67,7 @@ export const isTrustedMergePoolLabelActor = async (
   actor: string,
   prAuthor: string,
 ): Promise<boolean> => {
-  if (actor === APPROVAL_BOT_LOGIN) {
+  if (isTrustedBot(actor)) {
     return true;
   }
 
@@ -79,6 +79,9 @@ export const isTrustedMergePoolLabelActor = async (
   }
 
   if (labelName === APPROVED_LABEL) {
+    if (await isListedInOwners(octokit, owner, repo, baseBranch, prAuthor, 'OWNERS')) {
+      return true;
+    }
     if (sameGitHubLogin(actor, prAuthor)) {
       return false;
     }

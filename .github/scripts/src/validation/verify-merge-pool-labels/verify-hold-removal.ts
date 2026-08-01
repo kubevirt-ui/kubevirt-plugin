@@ -5,7 +5,7 @@ import { DO_NOT_MERGE_HOLD_LABEL } from '../../shared/merge-pool';
 import type { GitHubConfig } from '../../types/index';
 import { sameGitHubLogin } from '../../utils';
 import { isWriteCollaborator } from '../commands/collaborator-trust';
-import { APPROVAL_BOT_LOGIN } from '../pr-path-validation/owners';
+import { isTrustedBot } from '../pr-path-validation/owners';
 
 export type VerifyHoldRemovalContext = {
   config: GitHubConfig;
@@ -21,8 +21,8 @@ export type VerifyHoldRemovalContext = {
 export const verifyMergePoolHoldRemoval = async (ctx: VerifyHoldRemovalContext): Promise<void> => {
   const { config, octokit, prNumber, sender } = ctx;
 
-  if (sameGitHubLogin(sender, APPROVAL_BOT_LOGIN)) {
-    console.log(`Hold removal by bot ${APPROVAL_BOT_LOGIN} — trusted.`);
+  if (isTrustedBot(sender)) {
+    console.log(`Hold removal by bot ${sender} — trusted.`);
     return;
   }
 

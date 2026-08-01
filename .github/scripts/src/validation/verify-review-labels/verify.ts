@@ -10,9 +10,9 @@ import {
   executeCiScriptsValidation,
 } from '../pr-path-validation/execute';
 import {
-  APPROVAL_BOT_LOGIN,
   isLabelAppliedByTrustedActor,
   isListedInOwners,
+  isTrustedBot,
 } from '../pr-path-validation/owners';
 
 export const AI_LABELS = new Set<string>([AI_CONFIG.labels.reviewed, AI_CONFIG.labels.skip]);
@@ -59,7 +59,7 @@ const isEventSenderTrusted = async (ctx: VerifyReviewLabelContext): Promise<bool
   // the bot adds the label -- that labeled event's sender is the bot, so
   // without this exemption verify would strip valid bot-applied approvals.
   // Exact match only: trusting every *[bot] would let any label-write app bypass.
-  if (ctx.sender === APPROVAL_BOT_LOGIN) {
+  if (isTrustedBot(ctx.sender)) {
     return true;
   }
   return isListedInOwners(
