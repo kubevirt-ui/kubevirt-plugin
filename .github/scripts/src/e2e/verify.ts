@@ -4,9 +4,9 @@
  *   1. Complete progress status
  *   2. Check for active /hold-e2e hold
  *   3. Determine result details (via result-mapper.ts)
- *   4. Publish "Run Gating Tests" check-run
- *   5. Sync e2e-passed/e2e-failed labels
- *   6. Close orphaned check-runs
+ *   4. Publish "Run Gating Tests" check-run (GITHUB_TOKEN / github-actions)
+ *   5. Sync e2e-passed/e2e-failed labels (BOT_TOKEN)
+ *   6. Close orphaned check-runs (including older completed failures)
  *
  * Entry point: npx tsx src/e2e/verify.ts
  *
@@ -83,8 +83,11 @@ const main = async (): Promise<void> => {
   setOutput('title', result.title);
   setOutput('summary', result.summary);
 
+  // Publish with GITHUB_TOKEN (github-actions app) so the check satisfies
+  // branch protection, which pins "Run Gating Tests" to app_id 15368.
+  // Labels still need the bot App (fork-PR GITHUB_TOKEN is issues-readonly).
   const publishedCheckRunId = await publishGatingResult(
-    botOctokit,
+    octokit,
     owner,
     repo,
     prHeadSha,
@@ -94,7 +97,7 @@ const main = async (): Promise<void> => {
   );
 
   await syncE2ELabels(botOctokit, owner, repo, prNumber, result.conclusion);
-  await closeOrphans(botOctokit, owner, repo, prHeadSha, publishedCheckRunId, runUrl);
+  await closeOrphans(octokit, owner, repo, prHeadSha, publishedCheckRunId, runUrl);
 };
 
 void main().catch((err) => {

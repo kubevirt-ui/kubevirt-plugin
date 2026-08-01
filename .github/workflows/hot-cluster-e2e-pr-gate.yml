@@ -38,7 +38,8 @@ jobs:
         with:
           app-id: ${{ secrets.BOT_APP_ID }}
           private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
-          permission-checks: write
+          permission-issues: write
+          permission-pull-requests: write
 
       - name: Clear stale e2e-passed/e2e-failed on push
         if: github.event.action == 'synchronize'
@@ -49,6 +50,7 @@ jobs:
           github-token: ${{ steps.bot-token.outputs.token || github.token }}
 
       # ── Held path: republish neutral marker onto new HEAD ──
+      # GITHUB_TOKEN so the required check (github-actions app) is updated.
       - name: Publish held marker for current HEAD
         if: contains(github.event.pull_request.labels.*.name, 'e2e-hold')
         uses: ./.github/actions/publish-gating-check
@@ -57,7 +59,6 @@ jobs:
           status: completed
           conclusion: neutral
           title: 'Hot Cluster E2E: held via /hold-e2e'
-          github-token: ${{ steps.bot-token.outputs.token }}
           summary: |
             Required check not satisfied -- hold active. Testing is on hold for this PR.
 
@@ -94,4 +95,3 @@ jobs:
             E2E run has been dispatched. Waiting for a hot cluster to become available.
 
             The status will update to **in_progress** once the cluster is ready and tests begin running.
-          github-token: ${{ steps.bot-token.outputs.token }}

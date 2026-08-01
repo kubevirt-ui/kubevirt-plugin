@@ -116,15 +116,6 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Generate bot token
-        id: bot-token
-        continue-on-error: true
-        uses: actions/create-github-app-token@v3
-        with:
-          app-id: ${{ secrets.BOT_APP_ID }}
-          private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
-          permission-checks: write
-
       - name: Publish held marker
         uses: ./.github/actions/publish-gating-check
         with:
@@ -137,7 +128,6 @@ jobs:
 
             No new run will be dispatched automatically while this hold is active.
             Comment `/retest-e2e` to lift the hold and get a fresh result.
-          github-token: ${{ steps.bot-token.outputs.token }}
 
   # Post-hold report (after everything above completes)
   report-hold:

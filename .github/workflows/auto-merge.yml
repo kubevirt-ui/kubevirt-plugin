@@ -14,6 +14,7 @@ permissions:
   contents: read
   pull-requests: write
   actions: read
+  checks: write
 
 jobs:
   evaluate:
@@ -22,6 +23,9 @@ jobs:
     timeout-minutes: 2
     concurrency:
       group: auto-merge-${{ github.event.pull_request.number }}
+      # Without this, rapid label events stack completed failure check-runs for
+      # the same SHA; GitHub's status rollup can stay red after a later success.
+      cancel-in-progress: true
     steps:
       - name: Checkout
         uses: actions/checkout@v7

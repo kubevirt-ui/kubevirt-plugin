@@ -49,9 +49,10 @@ inputs:
     default: 'Run Gating Tests'
   github-token:
     description: |
-      Token to create/update the check-run with. Use a bot App token so the
-      check-run gets its own check-suite and isn't grouped under an unrelated
-      workflow in the PR checks UI. Falls back to the default GITHUB_TOKEN.
+      Token to create/update the check-run with. Prefer the default GITHUB_TOKEN
+      (github-actions app, id 15368) so the check satisfies branch protection,
+      which pins "Run Gating Tests" to that app. A bot App token publishes under
+      kubevirt-plugin-bot instead and will NOT satisfy the required check.
     required: false
     default: ''
 

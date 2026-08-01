@@ -58,19 +58,34 @@ export const publishGatingResult = async (
   existingCheckRunId: number,
   result: ResultDetails,
   detailsUrl: string,
-): Promise<number> =>
-  publishCheckRun(octokit, {
-    checkRunId: existingCheckRunId > 0 ? existingCheckRunId : undefined,
+): Promise<number> => {
+  const params = {
     conclusion: result.conclusion,
     detailsUrl,
     headSha,
     name: GATING_CHECK_NAME,
     owner,
     repo,
-    status: 'completed',
+    status: 'completed' as const,
     summary: result.summary,
     title: result.title,
-  });
+  };
+
+  if (existingCheckRunId > 0) {
+    try {
+      return await publishCheckRun(octokit, { ...params, checkRunId: existingCheckRunId });
+    } catch (err) {
+      // Different apps cannot update each other's check-runs (e.g. bot-created
+      // id after switching publishers to GITHUB_TOKEN). Create fresh instead.
+      const msg = err instanceof Error ? err.message : String(err);
+      console.warn(
+        `Could not update check-run ${existingCheckRunId} (${msg}); creating a fresh check-run.`,
+      );
+    }
+  }
+
+  return publishCheckRun(octokit, params);
+};
 
 /** Sync e2e-passed / e2e-failed labels based on check conclusion. */
 export const syncE2ELabels = async (
@@ -108,6 +123,9 @@ export const closeOrphans = async (
       GATING_CHECK_NAME,
       keepCheckRunId,
       detailsUrl,
+      // Stale completed failures/neutrals can keep the merge box blocked even
+      // after a newer success for the same check name — rewrite them too.
+      { supersedeCompleted: true },
     );
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);

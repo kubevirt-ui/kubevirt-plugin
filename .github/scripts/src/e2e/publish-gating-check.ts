@@ -38,24 +38,12 @@ const main = async (): Promise<void> => {
     );
   }
 
-  const checkRunId: number = await (async (): Promise<number> => {
-    if (existingCheckRunId) {
-      const parsedId = Number(existingCheckRunId);
-      if (!Number.isInteger(parsedId) || parsedId <= 0) {
-        failStep(`publish-gating-check received an invalid CHECK_RUN_ID: "${existingCheckRunId}".`);
-      }
-      const result = await updateCheckRun(octokit, {
-        checkRunId: parsedId,
-        conclusion,
-        detailsUrl,
-        owner,
-        repo,
-        status,
-        summary,
-        title,
-      });
-      console.log(`Updated check-run ${result} to "${status}".`);
-      return result;
+  const createFresh = async (): Promise<number> => {
+    if (!headSha) {
+      failStep(
+        'publish-gating-check cannot create a check-run without CHECK_HEAD_SHA ' +
+          '(update of CHECK_RUN_ID failed or was skipped).',
+      );
     }
     const result = await createCheckRun(octokit, {
       conclusion,
@@ -70,6 +58,38 @@ const main = async (): Promise<void> => {
     });
     console.log(`Created check-run ${result} ("${status}") for ${headSha}.`);
     return result;
+  };
+
+  const checkRunId: number = await (async (): Promise<number> => {
+    if (existingCheckRunId) {
+      const parsedId = Number(existingCheckRunId);
+      if (!Number.isInteger(parsedId) || parsedId <= 0) {
+        failStep(`publish-gating-check received an invalid CHECK_RUN_ID: "${existingCheckRunId}".`);
+      }
+      try {
+        const result = await updateCheckRun(octokit, {
+          checkRunId: parsedId,
+          conclusion,
+          detailsUrl,
+          owner,
+          repo,
+          status,
+          summary,
+          title,
+        });
+        console.log(`Updated check-run ${result} to "${status}".`);
+        return result;
+      } catch (err) {
+        // Different apps cannot update each other's check-runs (e.g. a bot-created
+        // id after we switched publishing to GITHUB_TOKEN). Fall back to create.
+        const msg = err instanceof Error ? err.message : String(err);
+        console.warn(
+          `Could not update check-run ${parsedId} (${msg}); creating a fresh check-run instead.`,
+        );
+        return createFresh();
+      }
+    }
+    return createFresh();
   })();
 
   setOutput('check_run_id', String(checkRunId));

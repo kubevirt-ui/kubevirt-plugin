@@ -1,9 +1,20 @@
 import type { Octokit } from '@octokit/rest';
 
+export type CloseOrphanedCheckRunsOptions = {
+  /**
+   * When true, also rewrite older *completed* check-runs (failure, cancelled,
+   * neutral, …) to cancelled. Needed because GitHub's merge box / status
+   * rollup can keep treating stale completed failures as blocking even after
+   * a newer success is published for the same check name.
+   */
+  supersedeCompleted?: boolean;
+};
+
 /**
  * Close all check-runs for a given name/ref except the one we just published.
  * Older workflow runs can leave "in_progress" ghosts when a new run supersedes
- * them; this cleans those up so the PR doesn't show stale pending checks.
+ * them; with `supersedeCompleted` this also clears stale completed failures so
+ * they cannot keep the PR merge-blocked after a later success.
  */
 export const closeOrphanedCheckRuns = async (
   octokit: Octokit,
@@ -13,7 +24,10 @@ export const closeOrphanedCheckRuns = async (
   checkName: string,
   keepCheckRunId: number,
   detailsUrl: string,
+  options: CloseOrphanedCheckRunsOptions = {},
 ): Promise<void> => {
+  const { supersedeCompleted = false } = options;
+
   const runs = await octokit.paginate(octokit.checks.listForRef, {
     check_name: checkName,
     owner,
@@ -22,7 +36,15 @@ export const closeOrphanedCheckRuns = async (
     repo,
   });
 
-  const orphans = runs.filter((run) => run.id !== keepCheckRunId && run.status !== 'completed');
+  const orphans = runs.filter((run) => {
+    if (run.id === keepCheckRunId) {
+      return false;
+    }
+    if (run.status !== 'completed') {
+      return true;
+    }
+    return supersedeCompleted;
+  });
 
   for (const orphan of orphans) {
     try {

@@ -8,7 +8,8 @@
  * The native job check ("Auto Merge / Evaluate Merge Eligibility") is the
  * branch-protection required check. When not eligible the job fails (red X)
  * with a step summary explaining why; when eligible it succeeds (green).
- * No Checks API calls needed.
+ * After a successful evaluation, older completed failures for the same check
+ * name/SHA are superseded so they cannot keep the status rollup red.
  */
 
 import { graphql } from '@octokit/graphql';
@@ -16,15 +17,19 @@ import { Octokit } from '@octokit/rest';
 
 import { requireEnv } from '../utils';
 
-import { getRepoContext } from '../shared/actions-context';
+import { getRepoContext, getRunUrl } from '../shared/actions-context';
+import { closeOrphanedCheckRuns } from '../shared/close-orphaned-checks';
 import { getMergePoolBlockers } from '../shared/merge-pool';
 import { addStepSummary, failStep } from '../shared/output';
 import type { Reason } from './merge-eligibility';
 import { describeEligibility } from './merge-eligibility';
 
+const MERGE_ELIGIBILITY_CHECK = 'Evaluate Merge Eligibility';
+
 type EligibilityResult = {
   determined: boolean;
   eligible: boolean;
+  headSha: string;
   nodeId: string;
   reasons: Reason[];
 };
@@ -51,6 +56,7 @@ const evaluateEligibility = async (
     return {
       determined: true,
       eligible: isEligible,
+      headSha: pullRequest.head.sha,
       nodeId: pullRequest.node_id,
       reasons: prReasons,
     };
@@ -59,7 +65,7 @@ const evaluateEligibility = async (
     console.warn(
       `Could not determine merge-pool eligibility for PR #${prNumber}: ${msg} -- failing closed.`,
     );
-    return { determined: false, eligible: false, nodeId: '', reasons: [] };
+    return { determined: false, eligible: false, headSha: '', nodeId: '', reasons: [] };
   }
 };
 
@@ -122,6 +128,63 @@ const toggleAutoMerge = async (
   }
 };
 
+/** Resolve this workflow job's check-run id (still in_progress while we run). */
+const resolveCurrentEligibilityCheckRunId = async (
+  octokit: Octokit,
+  owner: string,
+  repo: string,
+): Promise<number | undefined> => {
+  const runId = Number(process.env.GITHUB_RUN_ID ?? '0');
+  if (!runId) {
+    return undefined;
+  }
+
+  const { data } = await octokit.actions.listJobsForWorkflowRun({
+    owner,
+    repo,
+    run_id: runId,
+  });
+  const job = data.jobs.find((entry) => entry.name === MERGE_ELIGIBILITY_CHECK);
+  const match = job?.check_run_url?.match(/\/check-runs\/(\d+)/);
+  return match ? Number(match[1]) : undefined;
+};
+
+/** Keep this run's check; cancel older stale Evaluate Merge Eligibility runs. */
+const supersedeStaleEligibilityChecks = async (
+  octokit: Octokit,
+  owner: string,
+  repo: string,
+  headSha: string,
+): Promise<void> => {
+  if (!headSha) {
+    return;
+  }
+
+  const detailsUrl = getRunUrl();
+
+  try {
+    const keepId = await resolveCurrentEligibilityCheckRunId(octokit, owner, repo);
+    if (!keepId) {
+      console.log(`No "${MERGE_ELIGIBILITY_CHECK}" check-run for this run; skipping orphan close.`);
+      return;
+    }
+
+    await closeOrphanedCheckRuns(
+      octokit,
+      owner,
+      repo,
+      headSha,
+      MERGE_ELIGIBILITY_CHECK,
+      keepId,
+      detailsUrl,
+      { supersedeCompleted: true },
+    );
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.warn(`Could not supersede stale "${MERGE_ELIGIBILITY_CHECK}" checks: ${msg}`);
+  }
+};
+
 const main = async (): Promise<void> => {
   const token = requireEnv('GITHUB_TOKEN');
   const botToken = process.env.BOT_TOKEN ?? token;
@@ -140,6 +203,10 @@ const main = async (): Promise<void> => {
     const short = result.reasons.map((reason) => reason.short).join(', ');
     failStep(`Not eligible: ${short ?? 'could not determine eligibility'}`);
   }
+
+  // Only after success: neutralize older completed failures on this SHA so the
+  // status rollup / merge box cannot stay blocked by superseded red checks.
+  await supersedeStaleEligibilityChecks(octokit, owner, repo, result.headSha);
 };
 
 void main().catch((err) => {

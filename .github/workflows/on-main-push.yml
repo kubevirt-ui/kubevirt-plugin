@@ -85,6 +85,8 @@ jobs:
         with:
           app-id: ${{ secrets.BOT_APP_ID }}
           private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
+          permission-issues: write
+          permission-pull-requests: write
 
       - name: Mark check stale
         if: steps.check.outputs.should_mark == 'true'
@@ -95,7 +97,6 @@ jobs:
           conclusion: neutral
           title: 'Hot Cluster E2E: stale -- main has advanced since this ran'
           summary: ${{ steps.check.outputs.summary }}
-          github-token: ${{ steps.bot-token.outputs.token }}
 
       - name: Clear stale e2e-passed/e2e-failed
         if: always()
