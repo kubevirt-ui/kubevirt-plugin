@@ -39,7 +39,6 @@
     "plugin-metadata.ts",
     "plugin-extensions.ts",
     "knip.config.ts",
-    "@types/**/*",
-    ".github/scripts/src/**/*.ts"
+    "@types/**/*"
   ]
 }

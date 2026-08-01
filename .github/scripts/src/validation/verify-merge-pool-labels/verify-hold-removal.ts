@@ -3,7 +3,6 @@ import type { Octokit } from '@octokit/rest';
 import { addLabel } from '../../github-comments';
 import { DO_NOT_MERGE_HOLD_LABEL } from '../../shared/merge-pool';
 import type { GitHubConfig } from '../../types/index';
-import { sameGitHubLogin } from '../../utils';
 import { isWriteCollaborator } from '../commands/collaborator-trust';
 import { isTrustedBot } from '../pr-path-validation/owners';
 
