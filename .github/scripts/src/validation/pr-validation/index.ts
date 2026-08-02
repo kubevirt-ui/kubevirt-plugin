@@ -94,13 +94,16 @@ export const main = async (): Promise<void> => {
   const anyFailed = await runChecksIsolated(checks, config, headSha);
 
   if (anyFailed) {
-    process.exit(1);
+    // Each check already published its own commit status (ci-scripts-validation,
+    // ai-config-validation, jira-validation). Don't fail the job — a native job
+    // failure accumulates in GitHub's status rollup and permanently blocks
+    // auto-merge even after the individual statuses flip to success.
+    console.warn('One or more checks failed — see individual commit statuses for details.');
   }
 };
 
 if (require.main === module) {
   void main().catch((err) => {
     console.error(safeErrorMessage(err));
-    process.exit(1);
   });
 }

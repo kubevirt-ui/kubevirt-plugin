@@ -293,9 +293,9 @@ A PR is merge-pool eligible when **all** of the following hold (`isMergePoolPr`)
 
 `auto-merge.yml` then:
 
-- Its own job -- named **`Merge Gate`** -- fails when the PR isn't eligible and succeeds when it is; that native job check-run (shown in the merge box as **`Auto Merge / Merge Gate`**) is the required check, i.e. the real merge backstop. Deliberately **not** published via `publish-gating-check`/`checks.create()` -- an API-created check-run isn't attached to this workflow run, so GitHub parks it under whichever other check suite happens to exist for the SHA (often "Needs Rebase"), which used to show the confusing "Needs Rebase / Merge Gate" in the merge box.
+- Publishes a **`Merge Gate`** commit status (`repos.createCommitStatus`) -- success when eligible, failure when not. Commit statuses only keep the latest result per context name per SHA, so stale failures never accumulate in the rollup. The job itself always exits 0.
 - Enables/disables GitHub native auto-merge via the bot App (GraphQL; `GITHUB_TOKEN` cannot do this)
-- Names the **specific** condition(s) on every outcome -- e.g. `Not eligible: missing lgtm, held via /hold-e2e`, or `Merge-pool eligible` on success -- via `getMergePoolBlockers` in [`hot-cluster/js/is-merge-pool-pr.cjs`](hot-cluster/js/is-merge-pool-pr.cjs), which splits `isMergePoolPr`'s boolean into `missingLgtm`/`missingApproved`/`blockingLabels`. Written directly onto the row itself: a dedicated step calls `checks.update()` on this job's own already-existing check-run (found via `listJobsForWorkflowRun`, matched by job name -- not `checks.create()`, so it stays attached to this run) with that text as `output.title`/`output.summary`, so the merge box shows it without opening the check's log or cross-referencing the separately-published `Run Gating Tests` check elsewhere in the box.
+- Names the **specific** condition(s) on every outcome -- e.g. `Not eligible: Missing lgtm`, or `Merge-pool eligible` on success -- via `getMergePoolBlockers`.
 
 Branch protection must require **`Merge Gate`** and **`Run Gating Tests`** (plus build/test as before).
 
