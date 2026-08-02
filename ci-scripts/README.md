@@ -269,7 +269,7 @@ Hot Cluster E2E already replaced Prow's **gating test execution**. The pieces be
 
 | Prow / Tide piece                         | In-repo replacement                                                                                          |
 | ----------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
-| Tide merge pool + merge                   | `auto-merge.yml`: native GitHub auto-merge + required **`Merge Gate`** check                                 |
+| Tide merge pool + merge                   | `auto-merge.yml`: direct API merge via bot token + required **`Merge Gate`** commit status                   |
 | Tide pool eligibility (`lgtm`+`approved`) | `isMergePoolPr` in [`.github/scripts/src/shared/merge-pool.ts`](../.github/scripts/src/shared/merge-pool.ts) |
 | Label name SSOT                           | [`.github/scripts/src/shared/merge-pool.ts`](../.github/scripts/src/shared/merge-pool.ts)                    |
 | `/lgtm`, `/approve`, `/hold` (+ cancel)   | `pr_validation_commands.yml` + `.github/scripts/.../commands/{lgtm,approve,hold}.ts`                         |
@@ -293,20 +293,19 @@ A PR is merge-pool eligible when **all** of the following hold (`isMergePoolPr`)
 
 `auto-merge.yml` then:
 
-- Publishes a **`Merge Gate`** commit status (`repos.createCommitStatus`) -- success when eligible, failure when not. Commit statuses only keep the latest result per context name per SHA, so stale failures never accumulate in the rollup. The job itself always exits 0.
-- Enables/disables GitHub native auto-merge via the bot App (GraphQL; `GITHUB_TOKEN` cannot do this)
-- Names the **specific** condition(s) on every outcome -- e.g. `Not eligible: Missing lgtm`, or `Merge-pool eligible` on success -- via `getMergePoolBlockers`.
+- Publishes a **`Merge Gate`** commit status (`repos.createCommitStatus`) reflecting current eligibility.
+- When eligible AND all required checks pass (`Run Gating Tests`, `Code Checks`), **merges directly via `pulls.merge()`** using the bot App token. This bypasses GitHub's native auto-merge (`enablePullRequestAutoMerge`) which has a known platform bug where `mergeStateStatus` reports `BLOCKED` even when all required checks pass.
+- Names the **specific** condition(s) on every outcome -- e.g. `Not eligible: Missing lgtm`, `Waiting: Run Gating Tests`, or `Merged` on success.
 
 Branch protection must require **`Merge Gate`** and **`Run Gating Tests`** (plus build/test as before).
 
 ### Required Setup Steps
 
-To move a repo onto this native model (already done for `kubevirt-plugin`):
+To move a repo onto this model (already done for `kubevirt-plugin`):
 
-1. **Enable "Allow auto-merge"** in repo Settings -> General -> Pull Requests.
-2. **Add `Merge Gate` to branch protection's required status checks** on the default branch (alongside `Run Gating Tests`, `build`, `test`, etc.).
-3. **Install/configure `kubevirt-plugin-bot`** with Issues + Pull requests write; set `BOT_APP_ID` / `BOT_APP_PRIVATE_KEY` secrets.
-4. **Confirm the root `OWNERS` file lists real approvers** -- `/approve` and `/lgtm`'s approve-acting behavior both read it.
+1. **Add `Merge Gate` to branch protection's required status checks** on the default branch (alongside `Run Gating Tests`, `build`, `test`, etc.). Native "Allow auto-merge" is **not** required — the script merges directly via the API.
+2. **Install/configure `kubevirt-plugin-bot`** with Contents + Pull requests write; set `BOT_APP_ID` / `BOT_APP_PRIVATE_KEY` secrets. The bot token is **required** for merging — without it the merge gate reports failure.
+3. **Confirm the root `OWNERS` file lists real approvers** -- `/approve` and `/lgtm`'s approve-acting behavior both read it.
 5. **Uninstall/deselect the Prow GitHub App (`openshift-ci`) for this repo**. Removing the `tide:` block from `openshift/release` is optional hygiene afterward.
 6. **Announce the command set** -- `/help` or the table below. Reviews with `/lgtm` in the body now always honor Approve/Request-changes state (no Prow-style silent no-op).
 
