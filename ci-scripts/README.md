@@ -473,3 +473,4 @@ Always verify the cluster has been torn down when done testing. The auto-teardow
 - Check Node/npm version compatibility (runner image provides Node 22)
 - Verify the runner can reach `registry.npmjs.org`
   // verify trusted bot fix - 1785662227
+<!-- test: verify Merge Gate commit status -->
