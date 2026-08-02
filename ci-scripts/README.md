@@ -267,19 +267,19 @@ Hot Cluster E2E already replaced Prow's **gating test execution**. The pieces be
 
 ### What replaced what
 
-| Prow / Tide piece                         | In-repo replacement                                                                                        |
-| ----------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
-| Tide merge pool + merge                   | `auto-merge.yml`: native GitHub auto-merge + required **`Merge Gate`** check                               |
+| Prow / Tide piece                         | In-repo replacement                                                                                          |
+| ----------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| Tide merge pool + merge                   | `auto-merge.yml`: native GitHub auto-merge + required **`Merge Gate`** check                                 |
 | Tide pool eligibility (`lgtm`+`approved`) | `isMergePoolPr` in [`.github/scripts/src/shared/merge-pool.ts`](../.github/scripts/src/shared/merge-pool.ts) |
 | Label name SSOT                           | [`.github/scripts/src/shared/merge-pool.ts`](../.github/scripts/src/shared/merge-pool.ts)                    |
-| `/lgtm`, `/approve`, `/hold` (+ cancel)   | `pr_validation_commands.yml` + `.github/scripts/.../commands/{lgtm,approve,hold}.ts`                       |
-| Review acts as lgtm                       | `pr_review_commands.yml` + `pr_review_commands_sync.yml` + `commands/review-event.ts`                      |
-| `needs-rebase` plugin                     | `needs-rebase.yml` + `.github/scripts/src/merge/needs-rebase.ts`                                           |
-| Anti-bypass for pool labels               | `verify-merge-pool-labels.yml` (strips untrusted UI adds; restores untrusted `do-not-merge/hold` removals) |
-| Presubmit / gating E2E                    | Hot Cluster E2E (`hot-cluster-e2e.yml` via thin PR gates) + required **`Run Gating Tests`** check          |
-| `/retest` (retry failing contexts)        | `/retest-failed` (`retest-failed.yml`) -- CI, PR Validation, E2E; only if currently failing                |
-| cancel, hold-for-tests (E2E-only)         | `/retest-e2e`, `/cancel-e2e`, `/hold-e2e` (not `/hold`; `/retest-e2e` always forces a fresh run)           |
-| `/help` command list                      | `pr_help_command.yml` reading `.github/pr-commands.json`                                                   |
+| `/lgtm`, `/approve`, `/hold` (+ cancel)   | `pr_validation_commands.yml` + `.github/scripts/.../commands/{lgtm,approve,hold}.ts`                         |
+| Review acts as lgtm                       | `pr_review_commands.yml` + `pr_review_commands_sync.yml` + `commands/review-event.ts`                        |
+| `needs-rebase` plugin                     | `needs-rebase.yml` + `.github/scripts/src/merge/needs-rebase.ts`                                             |
+| Anti-bypass for pool labels               | `verify-merge-pool-labels.yml` (strips untrusted UI adds; restores untrusted `do-not-merge/hold` removals)   |
+| Presubmit / gating E2E                    | Hot Cluster E2E (`hot-cluster-e2e.yml` via thin PR gates) + required **`Run Gating Tests`** check            |
+| `/retest` (retry failing contexts)        | `/retest-failed` (`retest-failed.yml`) -- CI, PR Validation, E2E; only if currently failing                  |
+| cancel, hold-for-tests (E2E-only)         | `/retest-e2e`, `/cancel-e2e`, `/hold-e2e` (not `/hold`; `/retest-e2e` always forces a fresh run)             |
+| `/help` command list                      | `pr_help_command.yml` reading `.github/pr-commands.json`                                                     |
 
 Only the merge-critical plugins above are replaced. `wip`, `blunderbuss`, `lifecycle`, `retitle`, etc. remain known gaps (see Known limitations below).
 
@@ -293,9 +293,9 @@ A PR is merge-pool eligible when **all** of the following hold (`isMergePoolPr`)
 
 `auto-merge.yml` then:
 
-- Its own job -- named **`Merge Gate`** -- fails when the PR isn't eligible and succeeds when it is; that native job check-run (shown in the merge box as **`Auto Merge / Merge Gate`**) is the required check, i.e. the real merge backstop. Deliberately **not** published via `publish-gating-check`/`checks.create()` -- an API-created check-run isn't attached to this workflow run, so GitHub parks it under whichever other check suite happens to exist for the SHA (often "Needs Rebase"), which used to show the confusing "Needs Rebase / Merge Gate" in the merge box.
+- Publishes a **`Merge Gate`** commit status (`repos.createCommitStatus`) -- success when eligible, failure when not. Commit statuses only keep the latest result per context name per SHA, so stale failures never accumulate in the rollup. The job itself always exits 0.
 - Enables/disables GitHub native auto-merge via the bot App (GraphQL; `GITHUB_TOKEN` cannot do this)
-- Names the **specific** condition(s) on every outcome -- e.g. `Not eligible: missing lgtm, held via /hold-e2e`, or `Merge-pool eligible` on success -- via `getMergePoolBlockers` in [`hot-cluster/js/is-merge-pool-pr.cjs`](hot-cluster/js/is-merge-pool-pr.cjs), which splits `isMergePoolPr`'s boolean into `missingLgtm`/`missingApproved`/`blockingLabels`. Written directly onto the row itself: a dedicated step calls `checks.update()` on this job's own already-existing check-run (found via `listJobsForWorkflowRun`, matched by job name -- not `checks.create()`, so it stays attached to this run) with that text as `output.title`/`output.summary`, so the merge box shows it without opening the check's log or cross-referencing the separately-published `Run Gating Tests` check elsewhere in the box.
+- Names the **specific** condition(s) on every outcome -- e.g. `Not eligible: Missing lgtm`, or `Merge-pool eligible` on success -- via `getMergePoolBlockers`.
 
 Branch protection must require **`Merge Gate`** and **`Run Gating Tests`** (plus build/test as before).
 
@@ -472,3 +472,4 @@ Always verify the cluster has been torn down when done testing. The auto-teardow
 - Run `npm install` locally and commit the updated `package-lock.json`
 - Check Node/npm version compatibility (runner image provides Node 22)
 - Verify the runner can reach `registry.npmjs.org`
+  // verify trusted bot fix - 1785662227

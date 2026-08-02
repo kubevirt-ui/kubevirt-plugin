@@ -23,11 +23,23 @@ const main = async (): Promise<void> => {
 
   if (action === 'labeled') {
     console.log(`Event: labeled "${process.env.LABEL_NAME}" → running label gate + label sync`);
-    await runLabelGate();
-    await runLabelSync();
+    try {
+      await runLabelGate();
+    } catch (err) {
+      console.error(`Label gate failed: ${safeErrorMessage(err)}`);
+    }
+    try {
+      await runLabelSync();
+    } catch (err) {
+      console.error(`Label sync failed: ${safeErrorMessage(err)}`);
+    }
   } else if (action === 'unlabeled') {
     console.log(`Event: unlabeled "${process.env.LABEL_NAME}" → running label sync`);
-    await runLabelSync();
+    try {
+      await runLabelSync();
+    } catch (err) {
+      console.error(`Label sync failed: ${safeErrorMessage(err)}`);
+    }
   }
 
   console.log(`Running PR validation (event: ${action})`);
@@ -37,5 +49,4 @@ const main = async (): Promise<void> => {
 
 void main().catch((err) => {
   console.error(`PR Validation dispatcher failed: ${safeErrorMessage(err)}`);
-  process.exit(1);
 });

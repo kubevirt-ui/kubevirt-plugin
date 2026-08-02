@@ -3,22 +3,23 @@
  * Entry point: npx tsx src/merge/auto-merge.ts
  *
  * Required env: GITHUB_TOKEN, BOT_TOKEN (optional), GITHUB_REPOSITORY,
- *               PR_NUMBER
+ *               PR_NUMBER, PR_HEAD_SHA
  *
- * The native job check ("Auto Merge / Evaluate Merge Eligibility") is the
- * branch-protection required check. When not eligible the job fails (red X)
- * with a step summary explaining why; when eligible it succeeds (green).
- * No Checks API calls needed.
+ * Publishes a "Merge Gate" commit status (success / failure) instead of
+ * relying on the native job exit code. Commit statuses only keep the latest
+ * result per context — no accumulation of stale failures that block the
+ * GitHub status rollup and auto-merge. The job itself always exits 0.
  */
 
 import { graphql } from '@octokit/graphql';
 import { Octokit } from '@octokit/rest';
 
+import { setCommitStatus } from '../github-comments';
 import { requireEnv } from '../utils';
 
 import { getRepoContext } from '../shared/actions-context';
 import { getMergePoolBlockers } from '../shared/merge-pool';
-import { addStepSummary, failStep } from '../shared/output';
+import { addStepSummary, warnStep } from '../shared/output';
 import type { Reason } from './merge-eligibility';
 import { describeEligibility } from './merge-eligibility';
 
@@ -122,9 +123,12 @@ const toggleAutoMerge = async (
   }
 };
 
+const MERGE_GATE_CONTEXT = 'Merge Gate';
+
 const main = async (): Promise<void> => {
   const token = requireEnv('GITHUB_TOKEN');
   const botToken = process.env.BOT_TOKEN ?? token;
+  const headSha = requireEnv('PR_HEAD_SHA');
   const { owner, repo } = getRepoContext();
   const prNumber = Number(requireEnv('PR_NUMBER'));
   const octokit = new Octokit({ auth: token });
@@ -136,12 +140,40 @@ const main = async (): Promise<void> => {
     await toggleAutoMerge(botToken, result.nodeId, result.eligible, prNumber);
   }
 
+  const state = result.eligible ? 'success' : 'failure';
+  const description = result.eligible
+    ? 'Merge-pool eligible'
+    : result.reasons.map((r) => r.short).join(', ') || 'could not determine eligibility';
+
+  await setCommitStatus(octokit, owner, repo, headSha, state, description, MERGE_GATE_CONTEXT);
+
   if (!result.eligible) {
-    const short = result.reasons.map((reason) => reason.short).join(', ');
-    failStep(`Not eligible: ${short ?? 'could not determine eligibility'}`);
+    warnStep(`Not eligible: ${description}`);
   }
 };
 
-void main().catch((err) => {
-  failStep(err instanceof Error ? err.message : String(err));
+void main().catch(async (err) => {
+  const msg = err instanceof Error ? err.message : String(err);
+  console.error(`::error::${msg}`);
+
+  const headSha = process.env.PR_HEAD_SHA;
+  const fullRepo = process.env.GITHUB_REPOSITORY;
+  const token = process.env.GITHUB_TOKEN;
+
+  if (headSha && fullRepo && token) {
+    const [owner, repo] = fullRepo.split('/');
+    try {
+      await setCommitStatus(
+        new Octokit({ auth: token }),
+        owner,
+        repo,
+        headSha,
+        'failure',
+        `Script error: ${msg}`.slice(0, 140),
+        MERGE_GATE_CONTEXT,
+      );
+    } catch {
+      console.error('Could not publish failure commit status.');
+    }
+  }
 });
