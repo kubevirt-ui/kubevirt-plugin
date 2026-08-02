@@ -1,11 +1,11 @@
 name: Auto Merge
 
-# Evaluates merge-pool eligibility and publishes a "Merge Gate" commit status.
-# Uses a commit status instead of the native job exit code so that only the
-# latest result per SHA is visible — no accumulation of stale failures that
-# block GitHub auto-merge.
+# Evaluates merge-pool eligibility, verifies required status checks, and
+# merges directly via the REST API using the bot token. Bypasses GitHub's
+# native auto-merge (enablePullRequestAutoMerge) which has a known bug
+# where mergeStateStatus reports BLOCKED even when all required checks pass.
 #
-# Branch protection requires the "Merge Gate" commit status context.
+# Publishes a "Merge Gate" commit status for visibility in the PR merge box.
 on:
   pull_request_target:
     types: [opened, labeled, unlabeled, reopened, synchronize]
@@ -14,6 +14,7 @@ permissions:
   contents: read
   pull-requests: write
   statuses: write
+  checks: read
   actions: read
 
 jobs:
@@ -39,13 +40,14 @@ jobs:
           private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
           permission-contents: write
           permission-pull-requests: write
+          permission-administration: read
 
       - name: Setup scripts
         uses: ./.github/actions/setup-gh-scripts
         with:
           ref: ${{ github.event.repository.default_branch }}
 
-      - name: Determine eligibility and toggle auto-merge
+      - name: Evaluate eligibility and merge if ready
         env:
           GITHUB_TOKEN: ${{ github.token }}
           BOT_TOKEN: ${{ steps.bot-token.outputs.token }}
