@@ -5,6 +5,6 @@ import { requireEnv } from '../../utils';
 export const buildConfigFromEnv = (): GitHubConfig => ({
   owner: requireEnv('REPO_OWNER'),
   repo: requireEnv('REPO_NAME'),
-  statusToken: process.env.STATUS_GITHUB_TOKEN ?? undefined,
+  statusToken: process.env.STATUS_GITHUB_TOKEN || undefined,
   token: requireEnv('GITHUB_TOKEN'),
 });

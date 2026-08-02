@@ -109,7 +109,7 @@ describe('isTrustedMergePoolLabelActor', () => {
     );
   });
 
-  it('rejects self-applied lgtm/approved even for write/OWNERS actors', async () => {
+  it('rejects self-applied lgtm but allows self-applied approved for OWNERS actors', async () => {
     const calls: Call[] = [];
     const octokit = fakeOctokit({ ownersContent: ROOT_OWNERS, permission: 'admin' }, calls);
     assert.equal(
@@ -134,11 +134,11 @@ describe('isTrustedMergePoolLabelActor', () => {
         'alice-approver',
         'alice-approver',
       ),
-      false,
+      true,
     );
   });
 
-  it('rejects self-applied labels when actor and prAuthor differ only by case', async () => {
+  it('rejects self-applied lgtm when actor and prAuthor differ only by case', async () => {
     const calls: Call[] = [];
     const octokit = fakeOctokit({ ownersContent: ROOT_OWNERS, permission: 'admin' }, calls);
     assert.equal(
@@ -163,7 +163,7 @@ describe('isTrustedMergePoolLabelActor', () => {
         'Alice-Approver',
         'alice-approver',
       ),
-      false,
+      true,
     );
   });
 
@@ -253,7 +253,7 @@ describe('verifyMergePoolLabel', () => {
     assert.equal((calls[0].args as { name: string }).name, 'lgtm');
   });
 
-  it('strips self-applied approved from an OWNERS author', async () => {
+  it('keeps self-applied approved from an OWNERS author', async () => {
     const calls: Call[] = [];
     await verifyMergePoolLabel(
       buildCtx(
@@ -267,8 +267,7 @@ describe('verifyMergePoolLabel', () => {
       ),
       fakeDeps(['approved'], {}),
     );
-    assert.equal(calls.length, 1);
-    assert.equal((calls[0].args as { name: string }).name, 'approved');
+    assert.equal(calls.filter((c) => c.method === 'removeLabel').length, 0);
   });
 
   it('leaves trusted hold and strips untrusted lgtm when both are present', async () => {

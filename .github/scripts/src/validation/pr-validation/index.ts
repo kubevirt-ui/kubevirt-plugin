@@ -27,6 +27,7 @@ export const main = async (): Promise<void> => {
   const prTitle = requireEnv('PR_TITLE');
   const baseBranch = requireEnv('BASE_BRANCH');
   const headSha = process.env.PR_HEAD_SHA;
+  const prAuthor = process.env.PR_AUTHOR;
 
   const octokit = createOctokit(config);
   // Started once and shared (a Promise memoizes itself) between ai-config and
@@ -87,7 +88,8 @@ export const main = async (): Promise<void> => {
       reportUnexpectedError: async (_config, _headSha, err): Promise<void> => {
         console.error(`Failed to clear stale lgtm/approved labels: ${safeErrorMessage(err)}`);
       },
-      run: (): Promise<void> => clearStaleApproval(octokit, config.owner, config.repo, prNumber),
+      run: (): Promise<void> =>
+        clearStaleApproval(octokit, config.owner, config.repo, prNumber, prAuthor, baseBranch),
     });
   }
 

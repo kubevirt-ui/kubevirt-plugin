@@ -227,7 +227,13 @@ const main = async (): Promise<void> => {
     return;
   }
 
-  const requiredChecksResult = await getRequiredChecks(octokit, owner, repo, result.baseBranch);
+  const protectionClient = botToken ? new Octokit({ auth: botToken }) : octokit;
+  const requiredChecksResult = await getRequiredChecks(
+    protectionClient,
+    owner,
+    repo,
+    result.baseBranch,
+  );
 
   if (!requiredChecksResult.ok) {
     addStepSummary(buildStepSummary(result));
