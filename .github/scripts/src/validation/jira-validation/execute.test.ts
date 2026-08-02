@@ -27,13 +27,14 @@ const fakeOctokit = (options: FakeOctokitOptions, calls: Call[]): Octokit => {
       label: { name: e.label },
     })),
   });
+  const listComments = async () => ({ data: [] as Array<{ body: string; id: number }> });
   return {
     issues: {
       addLabels: async (args: unknown) => {
         calls.push({ args, method: 'addLabels' });
       },
-      createComment: async () => {
-        calls.push({ args: {}, method: 'createComment' });
+      createComment: async (args: unknown) => {
+        calls.push({ args, method: 'createComment' });
       },
       createLabel: async () => ({ data: {} }),
       getLabel: async ({ name }: { name: string }) => {
@@ -44,7 +45,7 @@ const fakeOctokit = (options: FakeOctokitOptions, calls: Call[]): Octokit => {
         }
         return { data: {} };
       },
-      listComments: async () => ({ data: [] }),
+      listComments,
       listEvents,
       listLabelsOnIssue: async () => ({ data: [...labels].map((name) => ({ name })) }),
       removeLabel: async (args: unknown) => {
@@ -54,6 +55,7 @@ const fakeOctokit = (options: FakeOctokitOptions, calls: Call[]): Octokit => {
     },
     paginate: async (method: unknown) => {
       if (method === listEvents) return (await listEvents()).data;
+      if (method === listComments) return (await listComments()).data;
       return [];
     },
     repos: {
@@ -78,10 +80,13 @@ const fakeOctokit = (options: FakeOctokitOptions, calls: Call[]): Octokit => {
 
 const CONFIG: GitHubConfig = { owner: 'kubevirt-ui', repo: 'kubevirt-plugin', token: 'x' };
 
-const statusesOf = (calls: Call[]): Array<{ description: string; state: string }> =>
+const addLabelsOf = (calls: Call[]): string[] =>
   calls
-    .filter((c) => c.method === 'createCommitStatus')
-    .map((c) => c.args as { description: string; state: string });
+    .filter((c) => c.method === 'addLabels')
+    .flatMap((c) => (c.args as { labels: string[] }).labels);
+
+const commentsOf = (calls: Call[]): string[] =>
+  calls.filter((c) => c.method === 'createComment').map((c) => (c.args as { body: string }).body);
 
 describe('executeJiraValidation', () => {
   const originalJiraToken = process.env.JIRA_TOKEN;
@@ -98,11 +103,9 @@ describe('executeJiraValidation', () => {
     }
   });
 
-  it('throws HandledValidationError and posts a specific failure status when the PR title has no ticket ID', async () => {
-    const mainCalls: Call[] = [];
-    const statusCalls: Call[] = [];
-    const octokit = fakeOctokit({}, mainCalls);
-    const statusOctokit = fakeOctokit({}, statusCalls);
+  it('throws HandledValidationError and posts a failure comment when the PR title has no ticket ID', async () => {
+    const calls: Call[] = [];
+    const octokit = fakeOctokit({}, calls);
 
     await assert.rejects(
       executeJiraValidation({
@@ -112,21 +115,17 @@ describe('executeJiraValidation', () => {
         octokit,
         prNumber: 1,
         prTitle: 'Fix the login button',
-        statusOctokit,
+        statusOctokit: octokit,
       }),
       HandledValidationError,
     );
 
-    assert.equal(
-      mainCalls.some((c) => c.method === 'createCommitStatus'),
-      false,
-    );
-    const statuses = statusesOf(statusCalls);
-    assert.equal(statuses.at(-1)?.state, 'failure');
-    assert.equal(statuses.at(-1)?.description, 'No CNV ticket ID found in PR title');
+    const comments = commentsOf(calls);
+    assert.ok(comments.some((body) => body.includes('No `CNV-XXXXX` ticket ID found')));
+    assert.ok(addLabelsOf(calls).includes('do-not-merge/jira-invalid'));
   });
 
-  it('throws HandledValidationError and posts an error status when release branches cannot be resolved', async () => {
+  it('throws HandledValidationError when release branches cannot be resolved', async () => {
     const calls: Call[] = [];
     const octokit = fakeOctokit({ branchesError: true }, calls);
 
@@ -142,13 +141,9 @@ describe('executeJiraValidation', () => {
       }),
       HandledValidationError,
     );
-
-    const statuses = statusesOf(calls);
-    assert.equal(statuses.at(-1)?.state, 'error');
-    assert.match(statuses.at(-1)?.description ?? '', /Failed to resolve release branches/);
   });
 
-  it('throws HandledValidationError and posts an error status when JIRA_TOKEN is missing', async () => {
+  it('throws HandledValidationError when JIRA_TOKEN is missing', async () => {
     const calls: Call[] = [];
     const octokit = fakeOctokit({ branches: [] }, calls);
 
@@ -164,13 +159,9 @@ describe('executeJiraValidation', () => {
       }),
       HandledValidationError,
     );
-
-    const statuses = statusesOf(calls);
-    assert.equal(statuses.at(-1)?.state, 'error');
-    assert.equal(statuses.at(-1)?.description, 'Jira validation misconfigured: missing JIRA_TOKEN');
   });
 
-  it('throws HandledValidationError and posts a failure status when a ticket check fails', async () => {
+  it('throws HandledValidationError and adds block label when a ticket check fails', async () => {
     process.env.JIRA_TOKEN = 'fake-jira-token';
     const originalFetch = globalThis.fetch;
     globalThis.fetch = (async () =>
@@ -197,15 +188,13 @@ describe('executeJiraValidation', () => {
         HandledValidationError,
       );
 
-      const statuses = statusesOf(calls);
-      assert.equal(statuses.at(-1)?.state, 'failure');
-      assert.equal(statuses.at(-1)?.description, 'One or more Jira checks failed');
+      assert.ok(addLabelsOf(calls).includes('do-not-merge/jira-invalid'));
     } finally {
       globalThis.fetch = originalFetch;
     }
   });
 
-  it('skips validation and posts a success status when the skip label was applied by a trusted actor', async () => {
+  it('skips validation and removes block label when the skip label was applied by a trusted actor', async () => {
     const calls: Call[] = [];
     const octokit = fakeOctokit(
       {
@@ -225,9 +214,9 @@ describe('executeJiraValidation', () => {
       statusOctokit: octokit,
     });
 
-    const statuses = statusesOf(calls);
-    assert.equal(statuses.at(-1)?.state, 'success');
-    assert.equal(statuses.at(-1)?.description, 'Jira validation skipped');
+    const comments = commentsOf(calls);
+    assert.ok(comments.some((body) => body.includes('Jira Validation Skipped')));
+    assert.equal(addLabelsOf(calls).includes('do-not-merge/jira-invalid'), false);
   });
 
   it('ignores an untrusted skip label and fails closed when the title has no ticket', async () => {
@@ -253,8 +242,6 @@ describe('executeJiraValidation', () => {
       HandledValidationError,
     );
 
-    const statuses = statusesOf(calls);
-    assert.equal(statuses.at(-1)?.state, 'failure');
-    assert.equal(statuses.at(-1)?.description, 'No CNV ticket ID found in PR title');
+    assert.ok(addLabelsOf(calls).includes('do-not-merge/jira-invalid'));
   });
 });

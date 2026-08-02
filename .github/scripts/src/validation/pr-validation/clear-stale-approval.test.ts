@@ -17,8 +17,26 @@ const fakeOctokit = (calls: Call[]): Octokit =>
     },
   }) as unknown as Octokit;
 
+const fakeOctokitWithOwners = (calls: Call[], ownersList: string[]): Octokit =>
+  ({
+    issues: {
+      removeLabel: async (args: unknown) => {
+        calls.push({ args, method: 'removeLabel' });
+      },
+    },
+    repos: {
+      getContent: async () => ({
+        data: {
+          content: Buffer.from(
+            `approvers:\n${ownersList.map((u) => `  - ${u}`).join('\n')}\n`,
+          ).toString('base64'),
+        },
+      }),
+    },
+  }) as unknown as Octokit;
+
 describe('clearStaleApproval', () => {
-  it('removes both lgtm and approved', async () => {
+  it('removes both lgtm and approved when no author info provided', async () => {
     const calls: Call[] = [];
     await clearStaleApproval(fakeOctokit(calls), 'kubevirt-ui', 'kubevirt-plugin', 42);
 
@@ -26,6 +44,30 @@ describe('clearStaleApproval', () => {
       .filter((call) => call.method === 'removeLabel')
       .map((call) => (call.args as { name: string }).name);
     assert.deepEqual(removed, [LGTM_LABEL, APPROVED_LABEL]);
+  });
+
+  it('removes both lgtm and approved when author is NOT in OWNERS', async () => {
+    const calls: Call[] = [];
+    const octokit = fakeOctokitWithOwners(calls, ['alice', 'bob']);
+
+    await clearStaleApproval(octokit, 'kubevirt-ui', 'kubevirt-plugin', 42, 'charlie', 'main');
+
+    const removed = calls
+      .filter((call) => call.method === 'removeLabel')
+      .map((call) => (call.args as { name: string }).name);
+    assert.deepEqual(removed, [LGTM_LABEL, APPROVED_LABEL]);
+  });
+
+  it('removes only lgtm (keeps approved) when author IS in OWNERS', async () => {
+    const calls: Call[] = [];
+    const octokit = fakeOctokitWithOwners(calls, ['alice', 'bob']);
+
+    await clearStaleApproval(octokit, 'kubevirt-ui', 'kubevirt-plugin', 42, 'alice', 'main');
+
+    const removed = calls
+      .filter((call) => call.method === 'removeLabel')
+      .map((call) => (call.args as { name: string }).name);
+    assert.deepEqual(removed, [LGTM_LABEL]);
   });
 
   it('is idempotent when neither label is present -- removeLabel no-ops on 404', async () => {

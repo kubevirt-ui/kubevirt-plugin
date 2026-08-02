@@ -48,13 +48,20 @@ export const addLabel = async (
   } catch (err: unknown) {
     const status = (err as { status?: number }).status;
     if (status === 404) {
-      await octokit.issues.createLabel({
-        color: labelMeta?.color ?? 'e11d48',
-        description: labelMeta?.description ?? 'Automated label for repository integration',
-        name: label,
-        owner,
-        repo,
-      });
+      try {
+        await octokit.issues.createLabel({
+          color: labelMeta?.color ?? 'e11d48',
+          description: labelMeta?.description ?? 'Automated label for repository integration',
+          name: label,
+          owner,
+          repo,
+        });
+      } catch (createErr: unknown) {
+        // 422 = already_exists race — another caller created it first.
+        if ((createErr as { status?: number }).status !== 422) {
+          throw createErr;
+        }
+      }
     }
   }
 
