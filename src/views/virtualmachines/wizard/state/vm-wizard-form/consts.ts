@@ -33,6 +33,7 @@ export const createInitialVMWizardFormValues = ({
     isTemplatesDrawerOpen: false,
     lastProcessedTemplateKey: '',
     shouldCheckVMNameProperly: false,
+    templateProcessError: null,
   },
   vmData: {
     autoLabelsMerged: false,
@@ -62,6 +63,7 @@ export const CREATE_VM_FORM_FIELDS_UI_STATE: Record<string, FieldPath<VMWizardFo
   IS_TEMPLATES_DRAWER_OPEN: 'uiState.isTemplatesDrawerOpen',
   LAST_PROCESSED_TEMPLATE_KEY: 'uiState.lastProcessedTemplateKey',
   SHOULD_CHECK_VM_NAME_PROPERLY: 'uiState.shouldCheckVMNameProperly',
+  TEMPLATE_PROCESS_ERROR: 'uiState.templateProcessError',
 };
 
 export const CREATE_VM_FORM_FIELDS_STEP_NAVIGATION: Record<

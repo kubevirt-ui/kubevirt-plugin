@@ -8,9 +8,9 @@ import {
   Template,
   useVMTemplateSource,
 } from '@kubevirt-utils/resources/template';
-import useVMTemplateGeneratedParams from '@kubevirt-utils/resources/template/hooks/useVMTemplateGeneratedParams';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
 import { CREATE_VM_FORM_FIELDS_VM_DATA } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
+import useVMTemplateGeneratedParams from '@virtualmachines/wizard/steps/TemplateStep/hooks/useVMTemplateGeneratedParams';
 
 export type DrawerContext = {
   setTemplate: Updater<Template>;

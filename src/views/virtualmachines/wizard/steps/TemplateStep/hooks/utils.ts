@@ -5,6 +5,7 @@ import { DYNAMIC_CREDENTIALS_SUPPORT } from '@kubevirt-utils/components/DynamicS
 import { addSecretToVM } from '@kubevirt-utils/components/SSHSecretModal/utils/utils';
 import { getLabel, getName } from '@kubevirt-utils/resources/shared';
 import {
+  getTemplateVirtualMachineObject,
   isVirtualMachineTemplate,
   LABEL_USED_TEMPLATE_NAME,
   LABEL_USED_TEMPLATE_NAMESPACE,
@@ -14,21 +15,39 @@ import { processOpenShiftTemplate } from '@kubevirt-utils/resources/template/uti
 import { processVirtualMachineTemplate } from '@kubevirt-utils/resources/template/utils/processVirtualMachineTemplate';
 import { getDefaultRunningStrategy } from '@kubevirt-utils/resources/vm';
 import { getDataVolumeSourceHTTP } from '@kubevirt-utils/resources/vm/utils/dataVolumeTemplate/selectors';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { INSTALLATION_CDROM_NAME } from '@virtualmachines/wizard/steps/TemplateStep/components/TemplatesCatalog/utils/consts';
+import { ensurePath, isEmpty } from '@kubevirt-utils/utils/utils';
 import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
+import { INSTALLATION_CDROM_NAME } from '@virtualmachines/wizard/steps/TemplateStep/components/TemplatesCatalog/utils/consts';
 
-export const resolveVMFromTemplate = (
+export const resolveVMFromTemplate = async (
   selectedTemplate: Template,
   namespace: string,
   cluster: string,
   vmName?: string,
 ): Promise<V1VirtualMachine> => {
-  if (isVirtualMachineTemplate(selectedTemplate)) {
-    return processVirtualMachineTemplate(selectedTemplate, cluster, vmName);
+  const isVMTemplate = isVirtualMachineTemplate(selectedTemplate);
+
+  if (isVMTemplate) {
+    const processedTemplate = await processVirtualMachineTemplate(
+      selectedTemplate,
+      cluster,
+      vmName,
+    );
+
+    const vm = processedTemplate.virtualMachine;
+    if (cluster) vm.cluster = cluster;
+    return vm;
   }
 
-  return processOpenShiftTemplate(selectedTemplate, namespace, cluster, vmName);
+  const processedTemplate = await processOpenShiftTemplate(
+    selectedTemplate,
+    namespace,
+    cluster,
+    vmName,
+  );
+  const vm = getTemplateVirtualMachineObject(processedTemplate);
+  if (cluster) vm.cluster = cluster;
+  return vm;
 };
 
 export const applyCertConfigMapToCDRom = (
@@ -64,6 +83,9 @@ export const getVMObjectFromTemplate = ({
   vmName?: string;
 }) => {
   const generatedVM = produce(vm, (draftVM) => {
+    ensurePath(draftVM, 'metadata.labels');
+    ensurePath(draftVM, 'metadata.annotations');
+
     if (!isEmpty(description)) {
       draftVM.metadata.annotations.description = description;
     }

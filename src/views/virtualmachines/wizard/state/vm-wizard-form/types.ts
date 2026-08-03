@@ -26,6 +26,7 @@ type VMWizardUIState = {
   isTemplatesDrawerOpen: boolean;
   lastProcessedTemplateKey: string;
   shouldCheckVMNameProperly: boolean;
+  templateProcessError: null | string;
 };
 
 /** Wizard flow position and per-step next-button availability. */

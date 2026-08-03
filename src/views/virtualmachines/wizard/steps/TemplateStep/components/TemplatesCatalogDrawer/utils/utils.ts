@@ -1,4 +1,4 @@
-import { TemplateParameter, V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { TemplateParameter } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
   V1beta1DataVolumeSpec,
   V1ContainerDiskSource,
@@ -69,8 +69,16 @@ export const changeTemplateParameterValue = (
   return template;
 };
 
-export const allRequiredParametersAreFulfilled = (template: V1Template): boolean =>
-  template?.parameters?.every((param) => {
-    if (!param.required || param.name === NAME_INPUT_FIELD) return true;
-    return Boolean(param.value?.trim()) || Boolean(param.generate);
-  }) ?? true;
+export const isRequiredParameterUnfulfilled = (param: TemplateParameter): boolean =>
+  Boolean(param.required) &&
+  param.name !== NAME_INPUT_FIELD &&
+  !param.value?.trim() &&
+  !param.generate;
+
+export const getFirstUnfulfilledRequiredParameter = (
+  template: Template,
+): TemplateParameter | undefined =>
+  (getParameters(template) ?? []).find(isRequiredParameterUnfulfilled);
+
+export const allRequiredParametersAreFulfilled = (template: Template): boolean =>
+  !getFirstUnfulfilledRequiredParameter(template);
