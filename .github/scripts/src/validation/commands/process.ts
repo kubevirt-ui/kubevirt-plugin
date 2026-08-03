@@ -1,7 +1,11 @@
 import type { GitHubConfig } from '../../types/index';
 import { safeErrorMessage } from '../../utils';
 import { HandledValidationError } from '../pr-path-validation/errors';
-import { reportAiConfigError, reportCiScriptsError } from '../pr-path-validation/execute';
+import {
+  reportAiConfigError,
+  reportCiScriptsError,
+  reportI18nError,
+} from '../pr-path-validation/execute';
 import { isApprovalAuthError } from './approve';
 import type { ValidationCommand } from './parse-command';
 
@@ -37,9 +41,14 @@ export const shouldReportGenericFailure = (error: unknown): boolean =>
 export type ReportCommandFailureDeps = {
   reportAiConfigError: typeof reportAiConfigError;
   reportCiScriptsError: typeof reportCiScriptsError;
+  reportI18nError: typeof reportI18nError;
 };
 
-const defaultReportDeps: ReportCommandFailureDeps = { reportAiConfigError, reportCiScriptsError };
+const defaultReportDeps: ReportCommandFailureDeps = {
+  reportAiConfigError,
+  reportCiScriptsError,
+  reportI18nError,
+};
 
 /** Reports the failure of a single command via its own status/label channel. Assumes the handler already reported anything reportable before throwing. */
 export const reportCommandFailure = async (
@@ -82,6 +91,16 @@ export const reportCommandFailure = async (
     } catch (reportErr) {
       console.error(
         `ci-approved failed to report its own unexpected error: ${safeErrorMessage(reportErr)}`,
+      );
+    }
+  }
+
+  if (command === 'i18n-approved' && !isApprovalAuthError(error, '/i18n-approved')) {
+    try {
+      await deps.reportI18nError(config, headSha, error);
+    } catch (reportErr) {
+      console.error(
+        `i18n-approved failed to report its own unexpected error: ${safeErrorMessage(reportErr)}`,
       );
     }
   }

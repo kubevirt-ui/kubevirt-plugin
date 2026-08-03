@@ -3,7 +3,7 @@
  *
  * Receives the `labeled` event context and routes to:
  *   - Dispatch hot-cluster-e2e.yml (ok-to-test without e2e-hold)
- *   - Verify review label trust (ai-config-reviewed, ci-scripts-reviewed, skip-*)
+ *   - Verify review label trust (ai-config-reviewed, ci-scripts-reviewed, i18n-reviewed, skip-*)
  *   - Exit 0 (any other label — no action needed)
  *
  * Entry point: npx tsx src/label-gate/index.ts
@@ -20,13 +20,19 @@ import { dispatchWorkflowAndResolveRun } from '../shared/dispatch';
 import { failStep, setOutput } from '../shared/output';
 import type { GitHubConfig } from '../types/index';
 import { requireEnv, safeErrorMessage } from '../utils';
-import { AI_LABELS, CI_LABELS, verifyReviewLabel } from '../validation/verify-review-labels/verify';
+import {
+  AI_LABELS,
+  CI_LABELS,
+  I18N_LABELS,
+  verifyReviewLabel,
+} from '../validation/verify-review-labels/verify';
 import {
   reportAiConfigError,
   reportCiScriptsError,
+  reportI18nError,
 } from '../validation/pr-path-validation/execute';
 
-const REVIEW_LABELS = new Set([...AI_LABELS, ...CI_LABELS]);
+const REVIEW_LABELS = new Set([...AI_LABELS, ...CI_LABELS, ...I18N_LABELS]);
 
 type Action = 'dispatch-e2e' | 'none' | 'verify-review';
 
@@ -123,6 +129,8 @@ if (require.main === module) {
       await reportAiConfigError(config, headSha, err);
     } else if (CI_LABELS.has(labelName)) {
       await reportCiScriptsError(config, headSha, err);
+    } else if (I18N_LABELS.has(labelName)) {
+      await reportI18nError(config, headSha, err);
     }
 
     process.exit(1);

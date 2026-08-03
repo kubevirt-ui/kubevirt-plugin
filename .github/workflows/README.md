@@ -33,11 +33,11 @@ Pool eligibility (`isMergePoolPr`): `lgtm` + `approved`, and no blockers (`hold`
 
 ## PR validation (OWNERS-gated paths)
 
-| Workflow            | Trigger               | Role                                              |
-| ------------------- | --------------------- | ------------------------------------------------- |
-| `pr-validation.yml` | `pull_request_target` | Jira + AI-config + CI-scripts validation statuses |
+| Workflow            | Trigger               | Role                                                     |
+| ------------------- | --------------------- | -------------------------------------------------------- |
+| `pr-validation.yml` | `pull_request_target` | Jira + AI-config + CI-scripts + i18n validation statuses |
 
-Sensitive-path review uses `/ai-approved` and `/ci-approved` (`.github/OWNERS`), not `/approve`. Review label trust enforcement is handled by the label-gate route in `pr-validation.yml`.
+Sensitive-path review uses `/ai-approved`, `/ci-approved`, and `/i18n-approved` (`.github/OWNERS`), not `/approve`. Review label trust enforcement is handled by the label-gate route in `pr-validation.yml`.
 
 ## Cluster lifecycle & manual console
 

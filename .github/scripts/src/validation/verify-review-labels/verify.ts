@@ -4,10 +4,12 @@ import { getPrLabelNames, removeLabel } from '../../github-comments';
 import type { GitHubConfig } from '../../types/index';
 import { AI_CONFIG } from '../ai-config-validation/constants';
 import { CI_SCRIPTS_CONFIG } from '../ci-scripts-validation/constants';
+import { I18N_CONFIG } from '../i18n-validation/constants';
 import { HandledValidationError } from '../pr-path-validation/errors';
 import {
   executeAiConfigValidation,
   executeCiScriptsValidation,
+  executeI18nValidation,
 } from '../pr-path-validation/execute';
 import {
   isLabelAppliedByTrustedActor,
@@ -20,8 +22,9 @@ export const CI_LABELS = new Set<string>([
   CI_SCRIPTS_CONFIG.labels.reviewed,
   CI_SCRIPTS_CONFIG.labels.skip,
 ]);
+export const I18N_LABELS = new Set<string>([I18N_CONFIG.labels.reviewed, I18N_CONFIG.labels.skip]);
 
-const WATCHED_LABELS = new Set<string>([...AI_LABELS, ...CI_LABELS]);
+const WATCHED_LABELS = new Set<string>([...AI_LABELS, ...CI_LABELS, ...I18N_LABELS]);
 
 export type ValidationDispatcher = (input: {
   baseBranch: string;
@@ -45,6 +48,7 @@ export type VerifyReviewLabelContext = {
 export type VerifyReviewLabelDeps = {
   executeAiConfigValidation: ValidationDispatcher;
   executeCiScriptsValidation: ValidationDispatcher;
+  executeI18nValidation: ValidationDispatcher;
   /** Injectable for tests -- defaults to reading current PR labels from GitHub. */
   getPrLabelNames?: typeof getPrLabelNames;
 };
@@ -52,13 +56,15 @@ export type VerifyReviewLabelDeps = {
 const defaultDeps: VerifyReviewLabelDeps = {
   executeAiConfigValidation,
   executeCiScriptsValidation,
+  executeI18nValidation,
 };
 
 const isEventSenderTrusted = async (ctx: VerifyReviewLabelContext): Promise<boolean> => {
-  // /ai-approved and /ci-approved already OWNERS-check the commenter before
-  // the bot adds the label -- that labeled event's sender is the bot, so
-  // without this exemption verify would strip valid bot-applied approvals.
-  // Exact match only: trusting every *[bot] would let any label-write app bypass.
+  // /ai-approved, /ci-approved, and /i18n-approved already OWNERS-check the
+  // commenter before the bot adds the label -- that labeled event's sender is
+  // the bot, so without this exemption verify would strip valid bot-applied
+  // approvals. Exact match only: trusting every *[bot] would let any
+  // label-write app bypass.
   if (isTrustedBot(ctx.sender)) {
     return true;
   }
@@ -91,7 +97,7 @@ const dispatchValidation = async (
 };
 
 /**
- * Strips untrusted AI/CI review or skip labels, then re-runs matching
+ * Strips untrusted AI/CI/i18n review or skip labels, then re-runs matching
  * validation(s). Reconciles every watched label currently on the PR so a
  * concurrent `labeled` event cannot leave an untrusted label behind if an
  * earlier verification run is still in flight.
@@ -148,9 +154,10 @@ export const verifyReviewLabel = async (
     }
   }
 
-  // Always re-run both validations — they compute pass/fail from current
+  // Always re-run all path validations — they compute pass/fail from current
   // label state. Whether labels were stripped or left in place, the commit
   // status should reflect the latest truth.
   await dispatchValidation(deps.executeAiConfigValidation, ctx);
   await dispatchValidation(deps.executeCiScriptsValidation, ctx);
+  await dispatchValidation(deps.executeI18nValidation, ctx);
 };

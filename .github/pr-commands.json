@@ -1,5 +1,5 @@
 {
-  "_note": "Single source of truth for every PR-comment slash command in this repo, read by pr_help_command.yml (/help). Add an entry here whenever a new PR command is added -- same manual-sync convention as RELATED_AUTOMATION_PATHS in .github/scripts/src/validation/ai-config-validation/constants.ts. trust values: 'owners' = root OWNERS approvers; 'github-owners' = the narrower .github/OWNERS (kept in sync with .cursor/OWNERS) approvers gating /ai-approved and /ci-approved; 'collaborator' = any repo collaborator with write access; 'member-or-owner' = GitHub author_association; 'none' = no trust gate.",
+  "_note": "Single source of truth for every PR-comment slash command in this repo, read by /help. Add an entry here whenever a new PR command is added -- same manual-sync convention as RELATED_AUTOMATION_PATHS in .github/scripts/src/validation/ai-config-validation/constants.ts. trust values: 'owners' = root OWNERS approvers; 'github-owners' = the narrower .github/OWNERS (kept in sync with .cursor/OWNERS) approvers gating /ai-approved, /ci-approved, and /i18n-approved; 'collaborator' = any repo collaborator with write access; 'member-or-owner' = GitHub author_association; 'none' = no trust gate.",
   "commands": [
     {
       "command": "/lgtm",
@@ -90,6 +90,12 @@
       "description": "Mark CI configuration changes (.github/, ci-scripts/, Dockerfile, playwright-runner-hc-e2e.sh) on this PR as security-reviewed.",
       "trust": "github-owners",
       "workflow": ".github/workflows/pr_validation_commands.yml"
+    },
+    {
+      "command": "/i18n-approved",
+      "description": "Mark translation catalog changes (locales/) on this PR as reviewed.",
+      "trust": "github-owners",
+      "workflow": ".github/workflows/pr-commands.yml"
     },
     {
       "command": "/clone",

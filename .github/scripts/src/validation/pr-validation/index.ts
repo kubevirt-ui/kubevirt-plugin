@@ -4,8 +4,10 @@ import { executeJiraValidation } from '../jira-validation/execute';
 import {
   executeAiConfigValidation,
   executeCiScriptsValidation,
+  executeI18nValidation,
   reportAiConfigError,
   reportCiScriptsError,
+  reportI18nError,
 } from '../pr-path-validation/execute';
 import { buildConfigFromEnv } from './build-config';
 import { clearStaleApproval } from './clear-stale-approval';
@@ -30,12 +32,12 @@ export const main = async (): Promise<void> => {
   const prAuthor = process.env.PR_AUTHOR;
 
   const octokit = createOctokit(config);
-  // Started once and shared (a Promise memoizes itself) between ai-config and
-  // ci-scripts, which each used to fetch this independently. Not awaited
+  // Started once and shared (a Promise memoizes itself) between the path
+  // validations, which each used to fetch this independently. Not awaited
   // here -- jira-validation doesn't need it, so a fetch failure must not
-  // stop it from running; ai-config/ci-scripts each await it inside their
-  // own isolated check and report the failure through their normal
-  // unexpected-error handling if it rejects.
+  // stop it from running; each path check awaits it inside its own isolated
+  // check and reports the failure through its normal unexpected-error
+  // handling if it rejects.
   const filesPromise = getPullRequestFiles(octokit, config.owner, config.repo, prNumber);
 
   const checks: PrValidationCheck[] = [
@@ -68,6 +70,21 @@ export const main = async (): Promise<void> => {
       run: async (): Promise<void> => {
         const files = await filesPromise;
         return executeCiScriptsValidation({
+          baseBranch,
+          config,
+          eventAction,
+          files,
+          headSha,
+          prNumber,
+        });
+      },
+    },
+    {
+      name: 'i18n-validation',
+      reportUnexpectedError: reportI18nError,
+      run: async (): Promise<void> => {
+        const files = await filesPromise;
+        return executeI18nValidation({
           baseBranch,
           config,
           eventAction,

@@ -9,9 +9,9 @@ export type PathValidationLabels = {
 
 /**
  * Generic config for a "does this PR touch a sensitive path, and if so has
- * an OWNERS reviewer signed off" check. ai-config-validation and
- * ci-scripts-validation are both thin wrappers supplying one of these to
- * the shared pr-path-validation core.
+ * an OWNERS reviewer signed off" check. ai-config, ci-scripts, and i18n
+ * validation are thin wrappers supplying one of these to the shared
+ * pr-path-validation core.
  */
 export type PathValidationConfig = {
   commandName: string;

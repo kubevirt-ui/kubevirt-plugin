@@ -9,12 +9,19 @@ import { processCommands, reportCommandFailure, shouldReportGenericFailure } fro
 // CommandHandlers is an exhaustive Record -- unused here, but every fixture needs a stub.
 const NOOP_NEW_HANDLERS: Pick<
   CommandHandlers,
-  'approve-cancel' | 'approve' | 'hold-cancel' | 'hold' | 'lgtm-cancel' | 'lgtm'
+  | 'approve-cancel'
+  | 'approve'
+  | 'hold-cancel'
+  | 'hold'
+  | 'i18n-approved'
+  | 'lgtm-cancel'
+  | 'lgtm'
 > = {
   approve: async () => {},
   'approve-cancel': async () => {},
   hold: async () => {},
   'hold-cancel': async () => {},
+  'i18n-approved': async () => {},
   lgtm: async () => {},
   'lgtm-cancel': async () => {},
 };
@@ -166,6 +173,7 @@ describe('reportCommandFailure', () => {
             throw new Error('failed to post ai-config-validation status');
           },
           reportCiScriptsError: async () => {},
+          reportI18nError: async () => {},
         },
       ),
     );
@@ -182,6 +190,7 @@ describe('reportCommandFailure', () => {
           reportCiScriptsError: async () => {
             throw new Error('failed to post ci-scripts-validation status');
           },
+          reportI18nError: async () => {},
         },
       ),
     );
@@ -199,6 +208,9 @@ describe('reportCommandFailure', () => {
         },
         reportCiScriptsError: async () => {
           calledWith.push('ci-approved');
+        },
+        reportI18nError: async () => {
+          calledWith.push('i18n-approved');
         },
       },
     );

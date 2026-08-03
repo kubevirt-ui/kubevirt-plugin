@@ -4,6 +4,7 @@ import { addLabel } from '../../github-comments';
 import { safeErrorMessage, sameGitHubLogin } from '../../utils';
 import { AI_CONFIG } from '../ai-config-validation/constants';
 import { CI_SCRIPTS_CONFIG } from '../ci-scripts-validation/constants';
+import { I18N_CONFIG } from '../i18n-validation/constants';
 import { isListedInOwners } from '../pr-path-validation/owners';
 import { grantApprove, revokeApprove } from './review-labels';
 
@@ -61,7 +62,7 @@ export type ApprovalContext = {
   repo: string;
 };
 
-/** Shared by /ai-approved and /ci-approved: OWNERS trust-check, then add the "reviewed" label. Both gate on the same .github/OWNERS approver group. */
+/** Shared by /ai-approved, /ci-approved, and /i18n-approved: OWNERS trust-check, then add the "reviewed" label. All gate on the same .github/OWNERS approver group. */
 const approveViaOwnersLabel = async (
   ctx: ApprovalContext,
   commandName: string,
@@ -104,6 +105,12 @@ export const approveCiScripts = (ctx: ApprovalContext): Promise<void> =>
   approveViaOwnersLabel(ctx, '/ci-approved', CI_SCRIPTS_CONFIG.labels.reviewed, {
     color: '0e8a16',
     description: 'CI configuration security review completed',
+  });
+
+export const approveI18n = (ctx: ApprovalContext): Promise<void> =>
+  approveViaOwnersLabel(ctx, '/i18n-approved', I18N_CONFIG.labels.reviewed, {
+    color: '0e8a16',
+    description: 'Translation catalog review completed',
   });
 
 export const isApprovalAuthError = (err: unknown, commandName: string): boolean =>

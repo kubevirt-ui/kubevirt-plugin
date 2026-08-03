@@ -6,9 +6,16 @@ import { executeJiraValidation } from '../jira-validation/execute';
 import {
   executeAiConfigValidation,
   executeCiScriptsValidation,
+  executeI18nValidation,
 } from '../pr-path-validation/execute';
 import type { ApprovalContext } from './approve';
-import { applyApprove, approveAiConfig, approveCiScripts, cancelApprove } from './approve';
+import {
+  applyApprove,
+  approveAiConfig,
+  approveCiScripts,
+  approveI18n,
+  cancelApprove,
+} from './approve';
 import { applyHold, cancelHold } from './hold';
 import type { ReviewContext } from './lgtm';
 import { applyLgtm, cancelLgtm } from './lgtm';
@@ -67,6 +74,16 @@ export const main = async (): Promise<void> => {
       prNumber,
     });
   };
+  const i18nApproved = async (): Promise<void> => {
+    await approveI18n(approvalCtx);
+    await executeI18nValidation({
+      baseBranch,
+      config,
+      eventAction: 'i18n-approved',
+      headSha,
+      prNumber,
+    });
+  };
   const recheckJira = async (): Promise<void> => {
     await executeJiraValidation({ baseBranch, config, headSha, prNumber, prTitle });
   };
@@ -77,6 +94,7 @@ export const main = async (): Promise<void> => {
     ['ci-approved']: ciApproved,
     hold: async (): Promise<void> => applyHold(approvalCtx),
     ['hold-cancel']: async (): Promise<void> => cancelHold(approvalCtx),
+    ['i18n-approved']: i18nApproved,
     lgtm: async (): Promise<void> => applyLgtm(reviewCtx),
     ['lgtm-cancel']: async (): Promise<void> => cancelLgtm(reviewCtx),
     ['recheck-jira']: recheckJira,

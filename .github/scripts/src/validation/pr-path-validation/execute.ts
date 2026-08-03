@@ -8,6 +8,8 @@ import { AI_CONFIG } from '../ai-config-validation/constants';
 import { buildStatusDescription as buildAiConfigStatusDescription } from '../ai-config-validation/utils';
 import { CI_SCRIPTS_CONFIG } from '../ci-scripts-validation/constants';
 import { buildStatusDescription as buildCiScriptsStatusDescription } from '../ci-scripts-validation/utils';
+import { I18N_CONFIG } from '../i18n-validation/constants';
+import { buildStatusDescription as buildI18nStatusDescription } from '../i18n-validation/utils';
 import { HandledValidationError } from './errors';
 import type { BuildStatusDescription, PathValidationOutcome } from './run-validation';
 import { runPathValidation } from './run-validation';
@@ -132,3 +134,21 @@ export const reportCiScriptsError = (
   headSha: string | undefined,
   err: unknown,
 ): Promise<void> => reportPathValidationError(config, headSha, CI_SCRIPTS_CONFIG, err);
+
+/** Run translation catalog validation for a pull request. */
+export const executeI18nValidation = async (input: PathValidationInput): Promise<void> => {
+  const outcome = await executePathValidation(input, I18N_CONFIG, buildI18nStatusDescription);
+
+  if (outcome.kind === 'skipped') {
+    console.log('Skipped: skip-i18n-check label present.');
+    return;
+  }
+
+  console.log('Translations validation passed.');
+};
+
+export const reportI18nError = (
+  config: GitHubConfig,
+  headSha: string | undefined,
+  err: unknown,
+): Promise<void> => reportPathValidationError(config, headSha, I18N_CONFIG, err);

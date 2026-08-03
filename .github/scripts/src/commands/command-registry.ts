@@ -79,7 +79,7 @@ export const COMMANDS: CommandConfig[] = [
   {
     execute: executeValidationCommand,
     name: 'validation',
-    pattern: /(^|\s)\/(lgtm|approve|hold|recheck-jira|ai-approved|ci-approved)(\s|$)/,
+    pattern: /(^|\s)\/(lgtm|approve|hold|recheck-jira|ai-approved|ci-approved|i18n-approved)(\s|$)/,
     requiresTrust: false,
   },
 ];
