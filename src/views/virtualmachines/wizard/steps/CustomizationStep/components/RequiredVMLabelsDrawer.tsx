@@ -29,13 +29,17 @@ const RequiredVMLabelsDrawer: FC<RequiredVMLabelsDrawerProps> = ({
   const { t } = useKubevirtTranslation();
 
   return (
-    <DrawerPanelContent maxSize={WIZARD_DRAWER_SIZE} minSize={WIZARD_DRAWER_SIZE}>
+    <DrawerPanelContent
+      data-test="required-labels-drawer"
+      maxSize={WIZARD_DRAWER_SIZE}
+      minSize={WIZARD_DRAWER_SIZE}
+    >
       <DrawerHead>
         <Title headingLevel="h2" size={TitleSizes.lg}>
           {t('Required VM labels')}
         </Title>
         <DrawerActions>
-          <DrawerCloseButton onClick={onClose} />
+          <DrawerCloseButton data-test="required-labels-drawer-close" onClick={onClose} />
         </DrawerActions>
       </DrawerHead>
       <DrawerPanelBody>
