@@ -1,13 +1,10 @@
-import { SetStateAction } from 'react';
 import produce from 'immer';
 
 import {
-  ProcessedTemplatesModel,
   TemplateModel,
   TemplateParameter,
   V1Template,
   VirtualMachineTemplateModel,
-  VirtualMachineTemplateRequestModel,
 } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -15,7 +12,6 @@ import { V1beta1VirtualMachineTemplateSpecParameters } from '@kubevirt-ui-ext/ku
 import { logTemplateEdited } from '@kubevirt-utils/extensions/telemetry/templates';
 import { getAnnotation, getLabels, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import {
-  getParameters,
   isOpenShiftTemplate,
   isVirtualMachineTemplate,
   Template,
@@ -23,7 +19,7 @@ import {
 import { vmBootDiskSourceIsRegistry } from '@kubevirt-utils/resources/vm/utils/source';
 import { generatePrettyName } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
-import { kubevirtK8sCreate, kubevirtK8sUpdate } from '@multicluster/k8sRequests';
+import { kubevirtK8sUpdate } from '@multicluster/k8sRequests';
 import { K8sModel } from '@openshift-console/dynamic-plugin-sdk';
 
 import { ANNOTATIONS } from './annotations';
@@ -32,7 +28,7 @@ import {
   TEMPLATE_TYPE_BASE,
   TEMPLATE_TYPE_LABEL,
 } from './constants';
-import { getTemplatePVCName, getTemplateVirtualMachineObject } from './selectors';
+import { getParameters, getTemplatePVCName, getTemplateVirtualMachineObject } from './selectors';
 
 // Only used for replacing parameters in the template, do not use for anything else
 // eslint-disable-next-line jsdoc/require-jsdoc
@@ -177,38 +173,4 @@ export const updateTemplate = async (template: Template) => {
   });
   logTemplateEdited(template);
   return result;
-};
-
-export const createProcessedTemplate = <T extends Template>(
-  template: T,
-  cluster: string,
-  namespace: string,
-  excludedParameters: TemplateParameter[],
-  setTemplateWithGeneratedValues: (value: SetStateAction<Template>) => void,
-  setError: (value: SetStateAction<Error>) => void,
-  setLoading: (value: SetStateAction<boolean>) => void,
-) => {
-  kubevirtK8sCreate<T>({
-    cluster,
-    data: template,
-    model: isOpenShiftTemplate(template)
-      ? ProcessedTemplatesModel
-      : VirtualMachineTemplateRequestModel,
-    ns: namespace,
-    queryParams: {
-      dryRun: 'All',
-    },
-  })
-    .then((processedTemplate) => {
-      const mergedParameters = [...(getParameters(processedTemplate) ?? []), ...excludedParameters];
-
-      setTemplateWithGeneratedValues(replaceTemplateParameters(template, mergedParameters));
-      setError(null);
-      setLoading(false);
-    })
-    .catch((apiError) => {
-      setTemplateWithGeneratedValues(template);
-      setError(apiError);
-      setLoading(false);
-    });
 };

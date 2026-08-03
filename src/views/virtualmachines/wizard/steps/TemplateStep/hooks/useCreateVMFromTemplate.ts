@@ -22,17 +22,23 @@ import {
 } from '@virtualmachines/wizard/steps/TemplateStep/hooks/utils';
 
 type UseCreateVMFromTemplate = () => {
-  createError: any;
-  createVMFromTemplate: () => Promise<void>;
+  createVMFromTemplate: () => Promise<boolean>;
+  isProcessing: boolean;
 };
 
 const useCreateVMFromTemplate: UseCreateVMFromTemplate = () => {
-  const [createError, setCreateError] = useState(undefined);
+  const [isProcessing, setIsProcessing] = useState(false);
   const { control, getValues, setValue } = useVMWizard();
   const cluster = useWatch({ control, name: CREATE_VM_FORM_FIELDS_VM_DATA.CLUSTER });
   const [authorizedSSHKeys] = useKubevirtUserSettings(USER_SETTINGS_KEYS.ssh, cluster);
 
-  const createVMFromTemplate = async () => {
+  const failWithProcessError = (message: string): false => {
+    setValue(CREATE_VM_FORM_FIELDS_UI_STATE.TEMPLATE_PROCESS_ERROR, message);
+    setValue(CREATE_VM_FORM_FIELDS_UI_STATE.IS_TEMPLATES_DRAWER_OPEN, true);
+    return false;
+  };
+
+  const createVMFromTemplate = async (): Promise<boolean> => {
     const {
       description,
       folder,
@@ -43,13 +49,14 @@ const useCreateVMFromTemplate: UseCreateVMFromTemplate = () => {
     const lastProcessedTemplateKey = getValues(
       CREATE_VM_FORM_FIELDS_UI_STATE.LAST_PROCESSED_TEMPLATE_KEY,
     );
-    setCreateError(undefined);
+    setValue(CREATE_VM_FORM_FIELDS_UI_STATE.TEMPLATE_PROCESS_ERROR, null);
 
     const selectedKey = getResourceKey(selectedTemplate);
-    if (selectedKey === lastProcessedTemplateKey) return;
+    if (selectedKey === lastProcessedTemplateKey) return true;
 
     logTemplateFlowEvent(CUSTOMIZE_VM_BUTTON_CLICKED, selectedTemplate);
 
+    setIsProcessing(true);
     try {
       const vm = await resolveVMFromTemplate(selectedTemplate, namespace, cluster, vmName);
 
@@ -62,14 +69,18 @@ const useCreateVMFromTemplate: UseCreateVMFromTemplate = () => {
         vm,
       });
       setValue(CREATE_VM_FORM_FIELDS_UI_STATE.LAST_PROCESSED_TEMPLATE_KEY, selectedKey);
+      return true;
     } catch (error) {
-      setCreateError(error);
+      const message = (error as Error)?.message ?? String(error);
       logTemplateFlowEvent(CUSTOMIZE_VM_FAILED, selectedTemplate);
       logVMCreationFailedFromTemplate(selectedTemplate, error);
+      return failWithProcessError(message);
+    } finally {
+      setIsProcessing(false);
     }
   };
 
-  return { createError, createVMFromTemplate };
+  return { createVMFromTemplate, isProcessing };
 };
 
 export default useCreateVMFromTemplate;

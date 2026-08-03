@@ -1,4 +1,3 @@
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { V1beta1VirtualMachineTemplate } from '@kubevirt-ui-ext/kubevirt-api/virt-template';
 import { VirtualMachineTemplateModel } from '@kubevirt-utils/models';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
@@ -33,7 +32,7 @@ export const processVirtualMachineTemplate = async (
   template: V1beta1VirtualMachineTemplate,
   cluster?: string,
   vmName?: string,
-): Promise<V1VirtualMachine> => {
+): Promise<ProcessedVirtualMachineTemplate> => {
   const basePath = await getKubevirtBaseAPIPath(cluster);
   const url = `${basePath}/apis/${API_GROUP_VERSION}/namespaces/${getNamespace(template)}/${
     VirtualMachineTemplateModel.plural
@@ -51,9 +50,9 @@ export const processVirtualMachineTemplate = async (
     method: 'POST',
   });
 
-  const result: ProcessedVirtualMachineTemplate = await response.json();
+  const processedTemplate = await response.json();
 
-  if (cluster) result.virtualMachine.cluster = cluster;
+  if (cluster) processedTemplate.cluster = cluster;
 
-  return result.virtualMachine;
+  return processedTemplate;
 };

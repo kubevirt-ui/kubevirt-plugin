@@ -1,17 +1,19 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router';
 
+import { type V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import {
-  createProcessedTemplate,
   createTemplateDraft,
+  getParameters,
+  isVirtualMachineTemplate,
+  processOpenShiftTemplate,
   replaceTemplateParameters,
   Template,
 } from '@kubevirt-utils/resources/template';
+import { generateParamsWithPrettyName } from '@kubevirt-utils/resources/template/utils/helpers';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
-
-import { generateParamsWithPrettyName } from './../utils/helpers';
 
 const useVMTemplateGeneratedParams = (
   template: Template,
@@ -40,23 +42,33 @@ const useVMTemplateGeneratedParams = (
       { excludedParameters: [], parametersToGenerate: [] },
     );
 
-    if (isEmpty(parametersToGenerate)) {
+    // VirtualMachineTemplates are processed on Next, not on selection.
+    if (isEmpty(parametersToGenerate) || isVirtualMachineTemplate(template)) {
       setError(null);
+      setLoading(false);
       setTemplateWithGeneratedValues(replaceTemplateParameters(template, parameters));
       return;
     }
 
     setLoading(true);
     const templateDraft = createTemplateDraft(template, namespace, parametersToGenerate);
-    createProcessedTemplate(
-      templateDraft,
-      cluster,
-      namespace,
-      excludedParameters,
-      setTemplateWithGeneratedValues,
-      setError,
-      setLoading,
-    );
+
+    processOpenShiftTemplate(templateDraft as V1Template, namespace, cluster)
+      .then((processedTemplate) => {
+        const mergedParameters = [
+          ...(getParameters(processedTemplate) ?? []),
+          ...excludedParameters,
+        ];
+
+        setTemplateWithGeneratedValues(replaceTemplateParameters(templateDraft, mergedParameters));
+        setError(null);
+        setLoading(false);
+      })
+      .catch((apiError: Error) => {
+        setTemplateWithGeneratedValues(templateDraft);
+        setError(apiError);
+        setLoading(false);
+      });
   }, [namespace, template, cluster]);
 
   return [templateWithGeneratedValues, loading, error];

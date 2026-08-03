@@ -46,6 +46,8 @@ const TemplatesCatalog: FC = () => {
   const handleTemplateSelect = useCallback(
     (template: Template) => {
       setValue(CREATE_VM_FORM_FIELDS_VM_DATA.SELECTED_TEMPLATE, template);
+      setValue(CREATE_VM_FORM_FIELDS_UI_STATE.TEMPLATE_PROCESS_ERROR, null);
+      setValue(CREATE_VM_FORM_FIELDS_UI_STATE.LAST_PROCESSED_TEMPLATE_KEY, '');
       logTemplateFlowEvent(TEMPLATE_SELECTED, template);
       setValue(CREATE_VM_FORM_FIELDS_UI_STATE.IS_TEMPLATES_DRAWER_OPEN, true);
     },

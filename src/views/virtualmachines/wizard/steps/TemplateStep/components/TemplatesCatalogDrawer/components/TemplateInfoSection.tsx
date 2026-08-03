@@ -9,6 +9,7 @@ import NetworksReviewTable from '@kubevirt-utils/components/NetworksReviewTable/
 import useIsIPv6SingleStackCluster from '@kubevirt-utils/hooks/useIPStackType/useIsIPv6SingleStackCluster';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { WORKLOADS_LABELS } from '@kubevirt-utils/resources/template/utils/constants';
+import { getTemplateCategoryDisplay } from '@kubevirt-utils/resources/template/utils/getTemplateCategoryDisplay';
 import {
   getTemplateDescription,
   getTemplateInterfaces,
@@ -16,6 +17,7 @@ import {
   getTemplateWorkload,
   isDefaultVariantTemplate,
 } from '@kubevirt-utils/resources/template/utils/selectors';
+import { isVirtualMachineTemplate } from '@kubevirt-utils/resources/template/utils/types';
 import { getCPU } from '@kubevirt-utils/resources/vm';
 import { networksHavePodNetwork } from '@kubevirt-utils/resources/vm/utils/network/utils';
 import { getOperatingSystemName } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
@@ -38,6 +40,7 @@ const TemplateInfoSection: FC = memo(() => {
 
   const notAvailable = t('N/A');
   const description = getTemplateDescription(template) || notAvailable;
+  const isVMTemplate = isVirtualMachineTemplate(template);
   const workload = getTemplateWorkload(template);
   const networks = getTemplateNetworks(template);
   const interfaces = getTemplateInterfaces(template);
@@ -46,6 +49,9 @@ const TemplateInfoSection: FC = memo(() => {
   const hasPodNetwork = networksHavePodNetwork(networks);
 
   const operatingSystem = getOperatingSystemName(template) || notAvailable;
+  const categoryOrWorkload = isVMTemplate
+    ? getTemplateCategoryDisplay(template, t)
+    : `${WORKLOADS_LABELS[workload] ?? t('Other')} ${isDefaultTemplate ? t('(default)') : ''}`;
 
   return (
     <DescriptionList className="pf-v6-u-mt-lg">
@@ -54,10 +60,8 @@ const TemplateInfoSection: FC = memo(() => {
         descriptionHeader={t('Operating system')}
       />
       <DescriptionItem
-        descriptionData={`${WORKLOADS_LABELS[workload] ?? t('Other')} ${
-          isDefaultTemplate ? t('(default)') : ''
-        }`}
-        descriptionHeader={t('Workload type')}
+        descriptionData={categoryOrWorkload}
+        descriptionHeader={isVMTemplate ? t('Category') : t('Workload type')}
       />
       <DescriptionItem
         descriptionData={<TemplateExpandableDescription description={description} />}

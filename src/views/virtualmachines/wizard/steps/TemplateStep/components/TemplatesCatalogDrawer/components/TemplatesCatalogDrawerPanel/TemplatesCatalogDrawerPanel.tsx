@@ -1,9 +1,13 @@
-import React, { FC, memo, useCallback, useState } from 'react';
+import React, { FC, memo, useCallback, useEffect, useState } from 'react';
+import { useWatch } from 'react-hook-form';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getResourceKey } from '@kubevirt-utils/resources/shared';
 import { getParameters } from '@kubevirt-utils/resources/template';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Alert, AlertVariant, Spinner, Tab, Tabs, TabTitleText } from '@patternfly/react-core';
+import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
+import { CREATE_VM_FORM_FIELDS_UI_STATE } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
 import { TemplatesDrawerTabKey } from '@virtualmachines/wizard/steps/TemplateStep/components/TemplatesCatalogDrawer/components/TemplatesCatalogDrawerPanel/utils/types';
 import { useDrawerContext } from '@virtualmachines/wizard/steps/TemplateStep/components/TemplatesCatalogDrawer/hooks/useDrawerContext';
 import { getTemplateParametersSplit } from '@virtualmachines/wizard/steps/TemplateStep/components/TemplatesCatalogDrawer/utils/utils';
@@ -13,12 +17,29 @@ import TemplateInfoSection from '../TemplateInfoSection';
 
 const TemplatesCatalogDrawerPanel: FC = memo(() => {
   const { t } = useKubevirtTranslation();
+  const { control } = useVMWizard();
+  const templateProcessError = useWatch({
+    control,
+    name: CREATE_VM_FORM_FIELDS_UI_STATE.TEMPLATE_PROCESS_ERROR,
+  });
   const [activeTabKey, setActiveTabKey] = useState<TemplatesDrawerTabKey>(
     TemplatesDrawerTabKey.Details,
   );
   const { template, templateDataLoaded, templateLoadingError } = useDrawerContext();
+  const templateKey = getResourceKey(template);
 
   const [requiredParameters] = getTemplateParametersSplit(getParameters(template) ?? []);
+  const hasRequiredParameters = !isEmpty(requiredParameters);
+
+  useEffect(() => {
+    setActiveTabKey(TemplatesDrawerTabKey.Details);
+  }, [templateKey]);
+
+  useEffect(() => {
+    if (templateProcessError && hasRequiredParameters) {
+      setActiveTabKey(TemplatesDrawerTabKey.RequiredParams);
+    }
+  }, [templateProcessError, hasRequiredParameters]);
 
   const handleTabKey = useCallback((_: unknown, tabKey: TemplatesDrawerTabKey): void => {
     setActiveTabKey(tabKey);
@@ -37,22 +58,37 @@ const TemplatesCatalogDrawerPanel: FC = memo(() => {
   }
 
   return (
-    <Tabs activeKey={activeTabKey} onSelect={handleTabKey}>
-      <Tab
-        eventKey={TemplatesDrawerTabKey.Details}
-        title={<TabTitleText>{t('Details')}</TabTitleText>}
-      >
-        <TemplateInfoSection />
-      </Tab>
-      {!isEmpty(requiredParameters) && (
-        <Tab
-          eventKey={TemplatesDrawerTabKey.RequiredParams}
-          title={<TabTitleText>{t('Required parameters')}</TabTitleText>}
+    <>
+      {templateProcessError && (
+        <Alert
+          className="pf-v6-u-mt-md"
+          isInline
+          title={t('Unable to continue')}
+          variant={AlertVariant.danger}
         >
-          <ParametersSections requiredParameters={requiredParameters} />
-        </Tab>
+          {templateProcessError}
+        </Alert>
       )}
-    </Tabs>
+      <Tabs activeKey={activeTabKey} onSelect={handleTabKey}>
+        <Tab
+          eventKey={TemplatesDrawerTabKey.Details}
+          title={<TabTitleText>{t('Details')}</TabTitleText>}
+        >
+          <TemplateInfoSection />
+        </Tab>
+        {hasRequiredParameters && (
+          <Tab
+            eventKey={TemplatesDrawerTabKey.RequiredParams}
+            title={<TabTitleText>{t('Required parameters')}</TabTitleText>}
+          >
+            <ParametersSections
+              requiredParameters={requiredParameters}
+              showValidation={Boolean(templateProcessError)}
+            />
+          </Tab>
+        )}
+      </Tabs>
+    </>
   );
 });
 

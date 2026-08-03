@@ -5,6 +5,8 @@ export * from './flavor';
 export * from './getTemplateCategoryDisplay';
 export * from './getTemplateCategoryLabel';
 export * from './helpers';
+export * from './processOpenShiftTemplate';
+export * from './processVirtualMachineTemplate';
 export * from './selectors';
 export * from './sorting';
 export * from './types';
