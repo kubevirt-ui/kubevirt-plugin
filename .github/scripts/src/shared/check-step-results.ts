@@ -1,9 +1,12 @@
 /**
- * Aggregate step outcomes and fail if any failed.
+ * Aggregate step outcomes and fail if any failed or were skipped.
  * Entry point: npx tsx src/shared/check-step-results.ts
  *
  * Env: STEP_RESULTS — JSON object mapping step names to outcomes
  *      e.g. {"i18n":"success","lint":"failure","build":"success"}
+ *
+ * Skipped checks count as failures so a missing setup step cannot hide
+ * behind an empty "All checks passed" summary.
  */
 
 import { requireEnv } from '../utils';
@@ -15,15 +18,26 @@ const main = (): void => {
   const results = JSON.parse(raw) as Record<string, string>;
 
   const failed: string[] = [];
+  const skipped: string[] = [];
   const names = Object.keys(results);
   for (const name of names) {
-    if (results[name] === 'failure') {
+    const outcome = results[name];
+    if (outcome === 'failure') {
       failed.push(name);
+    } else if (outcome === 'skipped' || outcome === '') {
+      skipped.push(name);
     }
   }
 
+  const problems: string[] = [];
   if (failed.length > 0) {
-    failStep(`Failed checks: ${failed.join(', ')}`);
+    problems.push(`Failed checks: ${failed.join(', ')}`);
+  }
+  if (skipped.length > 0) {
+    problems.push(`Skipped checks: ${skipped.join(', ')}`);
+  }
+  if (problems.length > 0) {
+    failStep(problems.join('; '));
   }
 
   console.log('All checks passed');

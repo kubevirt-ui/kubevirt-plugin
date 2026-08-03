@@ -24,6 +24,7 @@ jobs:
       pull-requests: read
     steps:
       - name: Checkout
+        id: checkout
         uses: actions/checkout@v7
         with:
           persist-credentials: false
@@ -35,12 +36,17 @@ jobs:
           cache: npm
 
       - name: Install dependencies
+        id: npm_ci
         run: npm ci --ignore-scripts
+
+      # Check steps intentionally omit continue-on-error so failures show as red
+      # in the Actions UI. Each step uses if: !cancelled() && <setup ok> so later
+      # checks still run after an earlier check fails.
 
       # ── i18n ──────────────────────────────────────────────
       - name: Check i18n
         id: i18n
-        continue-on-error: true
+        if: ${{ !cancelled() && steps.npm_ci.outcome == 'success' }}
         shell: bash
         run: |
           npm run i18n
@@ -53,30 +59,32 @@ jobs:
 
       # ── actionlint ────────────────────────────────────────
       - name: Install actionlint
+        id: actionlint_install
+        if: ${{ !cancelled() && steps.checkout.outcome == 'success' }}
         run: |
           go install github.com/rhysd/actionlint/cmd/actionlint@v1.7.12
           echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
 
       - name: Run actionlint
         id: actionlint
-        continue-on-error: true
+        if: ${{ !cancelled() && steps.actionlint_install.outcome == 'success' }}
         run: actionlint -color -shellcheck= -pyflakes=
 
       # ── lint + build ──────────────────────────────────────
       - name: Lint
         id: lint
-        continue-on-error: true
+        if: ${{ !cancelled() && steps.npm_ci.outcome == 'success' }}
         run: npm run lint
 
       - name: Build
         id: build
-        continue-on-error: true
+        if: ${{ !cancelled() && steps.npm_ci.outcome == 'success' }}
         run: npm run build
 
       # ── Hermeto offline install verification ──────────────
       - name: Prefetch npm dependencies with Hermeto
         id: hermeto
-        continue-on-error: true
+        if: ${{ !cancelled() && steps.npm_ci.outcome == 'success' }}
         run: |
           git checkout -- package.json package-lock.json
           rm -rf node_modules hermeto-output
@@ -94,13 +102,13 @@ jobs:
 
       - name: Verify offline install
         id: offline
-        continue-on-error: true
+        if: ${{ !cancelled() && steps.npm_ci.outcome == 'success' }}
         run: HUSKY=0 npm ci --offline --ignore-scripts --no-audit
 
       # ── unit tests ────────────────────────────────────────
       - name: Run unit tests
         id: test
-        continue-on-error: true
+        if: ${{ !cancelled() && steps.npm_ci.outcome == 'success' }}
         run: npm run test-cov
 
       - name: Coverage upload
@@ -111,18 +119,20 @@ jobs:
 
       # ── workflow script checks ────────────────────────────
       - name: Install workflow script dependencies
+        id: script_deps
+        if: ${{ !cancelled() && steps.checkout.outcome == 'success' }}
         working-directory: .github/scripts
         run: npm ci
 
       - name: Check workflow script types
         id: script_types
-        continue-on-error: true
+        if: ${{ !cancelled() && steps.script_deps.outcome == 'success' }}
         working-directory: .github/scripts
         run: npm run check-types
 
       - name: Run workflow script tests
         id: script_tests
-        continue-on-error: true
+        if: ${{ !cancelled() && steps.script_deps.outcome == 'success' }}
         working-directory: .github/scripts
         run: npm test
 
@@ -143,4 +153,8 @@ jobs:
               "script-tests": "${{ steps.script_tests.outcome }}"
             }
         working-directory: .github/scripts
-        run: npx tsx src/shared/check-step-results.ts
+        run: |
+          if [ ! -d node_modules ]; then
+            npm ci --ignore-scripts
+          fi
+          npx tsx src/shared/check-step-results.ts
