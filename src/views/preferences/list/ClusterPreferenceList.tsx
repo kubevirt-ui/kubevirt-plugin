@@ -91,6 +91,7 @@ const ClusterPreferenceList: FC<ListPageProps> = ({
         loadError={loadError}
         noDataMsg={t('No preferences found')}
         pagination={pagination}
+        persistSortInUrl
         unfilteredData={preferences}
       />
     </ListPageBody>

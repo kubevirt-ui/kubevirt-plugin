@@ -15,6 +15,8 @@ export const useDataViewTableSort = <TData, TCallbacks = undefined>(
   initialSortKey?: string,
   initialSortDirection: 'asc' | 'desc' = 'asc',
   callbacks?: TCallbacks,
+  searchParams?: URLSearchParams,
+  setSearchParams?: (params: URLSearchParams) => void,
 ): {
   sortedData: TData[];
   tableColumns: DataViewTh[];
@@ -24,6 +26,8 @@ export const useDataViewTableSort = <TData, TCallbacks = undefined>(
 
   const { direction, onSort, sortBy } = useDataViewSort({
     initialSort: { direction: initialSortDirection, sortBy: initialSortKey ?? columns[0]?.key },
+    searchParams,
+    setSearchParams,
   });
 
   const sortByIndex = useMemo(

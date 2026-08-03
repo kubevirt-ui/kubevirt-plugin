@@ -132,6 +132,7 @@ const DataSourcesList: FC<DataSourcesListProps> = ({ kind, namespace }) => {
           loadError={loadError}
           noDataMsg={t("You don't have any DataSources yet")}
           pagination={pagination}
+          persistSortInUrl
           unfilteredData={unfilteredData}
         />
       </ListPageBody>

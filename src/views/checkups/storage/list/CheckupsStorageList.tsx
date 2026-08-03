@@ -151,6 +151,7 @@ const CheckupsStorageList = () => {
         loadError={error}
         noDataMsg={t('No storage checkups found')}
         pagination={pagination}
+        persistSortInUrl
         unfilteredData={unfilteredData}
       />
     </ListPageBody>

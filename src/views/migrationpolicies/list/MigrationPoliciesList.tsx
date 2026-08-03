@@ -108,6 +108,7 @@ const MigrationPoliciesList: FC<ListPageProps> = ({
           loaded={isLoaded}
           loadError={loadError}
           noDataMsg={t("You don't have any MigrationPolicies yet")}
+          persistSortInUrl
           unfilteredData={mps}
         />
       </ListPageBody>

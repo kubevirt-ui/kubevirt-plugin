@@ -106,6 +106,7 @@ const UserPreferenceList: FC<ListPageProps> = ({
         loadError={loadError}
         noDataMsg={t("You don't have any VirtualMachinePreferences yet")}
         pagination={pagination}
+        persistSortInUrl
         unfilteredData={preferences}
       />
     </ListPageBody>

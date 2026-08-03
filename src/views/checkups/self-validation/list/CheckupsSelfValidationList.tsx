@@ -150,6 +150,7 @@ const CheckupsSelfValidationList: FC = () => {
         loadError={error}
         noDataMsg={t('No self validation checkups found')}
         pagination={pagination}
+        persistSortInUrl
         unfilteredData={unfilteredData}
       />
     </ListPageBody>

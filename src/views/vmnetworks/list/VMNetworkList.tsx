@@ -42,6 +42,7 @@ const VMNetworkList: FC<VMNetworkListProps> = ({ onCreate }) => {
             initialSortKey="name"
             loaded={loaded}
             loadError={error}
+            persistSortInUrl
             unfilteredData={data}
           />
         </ListPageBody>

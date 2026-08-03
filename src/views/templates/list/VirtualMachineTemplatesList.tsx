@@ -123,6 +123,7 @@ const VirtualMachineTemplatesList: FC<ListPageProps> = ({
           // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- hook error typed as any
           loadError={error}
           noFilteredDataMsg={t('No templates found')}
+          persistSortInUrl
           unfilteredData={allTemplatesWithRequests}
         />
       </ListPageBody>
