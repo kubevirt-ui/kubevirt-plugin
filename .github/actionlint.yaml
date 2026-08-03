@@ -11,3 +11,9 @@ paths:
       # actionlint v1.7.12's schema doesn't recognize yet -- not a bug in
       # our workflows. Safe to drop once actionlint's schema catches up.
       - 'unexpected key "queue" for "concurrency" section'
+      # create-github-app-token@v3 now uses client-id (app-id deprecated), but
+      # actionlint v1.7.12's bundled popular_actions schema still requires
+      # app-id and doesn't know client-id. Fixed upstream in
+      # https://github.com/rhysd/actionlint/pull/668 — drop once released.
+      - 'missing input "app-id" which is required by action "actions/create-github-app-token@'
+      - 'input "client-id" is not defined in action "actions/create-github-app-token@'
