@@ -12,8 +12,9 @@
  * merges via PUT /pulls/:number/merge using the bot token so that
  * post-merge workflows (deploy, etc.) are triggered.
  *
- * Publishes a "Merge Gate" commit status for visibility in the PR merge box.
- * The job itself always exits 0.
+ * Publishes a "Merge Gate" commit status (also a required branch-protection
+ * check). Success is set before the merge API call so GitHub does not reject
+ * the merge for a pending/failed Merge Gate. The job itself always exits 0.
  */
 
 import { Octokit } from '@octokit/rest';
@@ -299,18 +300,36 @@ const main = async (): Promise<void> => {
   }
 
   const botOctokit = new Octokit({ auth: botToken });
-  const merged = await tryMerge(botOctokit, owner, repo, prNumber, headSha);
-  addStepSummary(buildStepSummary(result, statusResult, merged));
 
+  // Merge Gate is required by branch protection. Mark it successful only after
+  // eligibility + other required checks pass, and before calling the merge API.
+  // Otherwise GitHub rejects the merge when Merge Gate is still pending/failed.
   await setCommitStatus(
     octokit,
     owner,
     repo,
     headSha,
-    merged ? 'success' : 'failure',
-    merged ? 'Merged' : 'Merge failed — see workflow log',
+    'success',
+    'Ready to merge',
     MERGE_GATE_CONTEXT,
   );
+
+  const merged = await tryMerge(botOctokit, owner, repo, prNumber, headSha);
+  addStepSummary(buildStepSummary(result, statusResult, merged));
+
+  if (!merged) {
+    await setCommitStatus(
+      octokit,
+      owner,
+      repo,
+      headSha,
+      'failure',
+      'Merge failed — see workflow log',
+      MERGE_GATE_CONTEXT,
+    );
+  } else {
+    await setCommitStatus(octokit, owner, repo, headSha, 'success', 'Merged', MERGE_GATE_CONTEXT);
+  }
 };
 
 void main().catch(async (err) => {
