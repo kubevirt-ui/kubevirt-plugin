@@ -41,6 +41,7 @@ jobs:
           private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
           permission-contents: write
           permission-pull-requests: write
+          permission-workflows: write
           permission-administration: read
 
       - name: Setup scripts

@@ -6,16 +6,16 @@ Index of workflows in this directory. Deep design notes (check-run model, merge 
 
 ## Hot Cluster E2E
 
-| Workflow                              | Trigger                                | Role                                                            |
-| ------------------------------------- | -------------------------------------- | --------------------------------------------------------------- |
-| `hot-cluster-e2e.yml`                 | `workflow_dispatch` only               | Full E2E graph; publishes required **Run Gating Tests**         |
-| `hot-cluster-e2e-run.yml`             | `workflow_call`                        | Build plugin image + run Playwright on ARC                      |
-| `hot-cluster-check.yml`               | `workflow_call` (+ manual health)      | Cluster readiness / health                                      |
-| `hot-cluster-e2e-pr-gate.yml`         | PR opened / synchronize / reopened     | Thin gate → dispatch `hot-cluster-e2e.yml`                      |
+| Workflow                              | Trigger                                | Role                                                                                   |
+| ------------------------------------- | -------------------------------------- | -------------------------------------------------------------------------------------- |
+| `hot-cluster-e2e.yml`                 | `workflow_dispatch` only               | Full E2E graph; publishes required **Run Gating Tests**                                |
+| `hot-cluster-e2e-run.yml`             | `workflow_call`                        | Build plugin image + run Playwright on ARC                                             |
+| `hot-cluster-check.yml`               | `workflow_call` (+ manual health)      | Cluster readiness / health                                                             |
+| `hot-cluster-e2e-pr-gate.yml`         | PR opened / synchronize / reopened     | Thin gate → dispatch `hot-cluster-e2e.yml`                                             |
 | `pr-validation.yml`                   | All PR events (push + label)           | Unified PR validation: Jira, path checks, review labels, E2E dispatch, merge-pool sync |
-| `ok-to-test-reset.yml`                | synchronize while `ok-to-test` present | Remove `ok-to-test` when head moves                             |
-| `hot-cluster-e2e-cancel-on-close.yml` | PR closed                              | Cancel in-flight when PR closes                                 |
-| `on-main-push.yml`                    | push to `main`                         | Mark checks stale; retest merge-pool PRs; sync needs-rebase     |
+| `ok-to-test-reset.yml`                | synchronize while `ok-to-test` present | Remove `ok-to-test` when head moves                                                    |
+| `hot-cluster-e2e-cancel-on-close.yml` | PR closed                              | Cancel in-flight when PR closes                                                        |
+| `on-main-push.yml`                    | push to `main`                         | Mark checks stale; retest merge-pool PRs; sync needs-rebase                            |
 
 ## Merge automation (Prow / Tide replacements)
 
@@ -34,7 +34,7 @@ Pool eligibility (`isMergePoolPr`): `lgtm` + `approved`, and no blockers (`hold`
 ## PR validation (OWNERS-gated paths)
 
 | Workflow            | Trigger               | Role                                              |
-| ------------------- | --------------------- | -------------------------------------------------- |
+| ------------------- | --------------------- | ------------------------------------------------- |
 | `pr-validation.yml` | `pull_request_target` | Jira + AI-config + CI-scripts validation statuses |
 
 Sensitive-path review uses `/ai-approved` and `/ci-approved` (`.github/OWNERS`), not `/approve`. Review label trust enforcement is handled by the label-gate route in `pr-validation.yml`.
@@ -68,4 +68,4 @@ See [`ci-scripts/manual-console/README.md`](../../ci-scripts/manual-console/READ
 | [`.github/actions/clear-e2e-result-labels`](../actions/clear-e2e-result-labels/action.yml) | Remove `e2e-passed`/`e2e-failed` (shared by PR gate + on-main-push)           |
 | [`.github/scripts/`](../scripts/)                                                          | TypeScript for validation commands, merge-pool verify, Jira/AI/CI checks      |
 
-Bot secrets: `BOT_APP_ID`, `BOT_APP_PRIVATE_KEY` (Issues + Pull requests write on the App). Details: [`ci-scripts/README.md`](../../ci-scripts/README.md#kubevirt-plugin-bot-required-for-prow-replacement-merge-automation).
+Bot secrets: `BOT_APP_ID`, `BOT_APP_PRIVATE_KEY` (Issues + Pull requests + Contents + Workflows write on the App; Workflows is required for auto-merge of PRs that touch `.github/workflows/*`). Details: [`ci-scripts/README.md`](../../ci-scripts/README.md#kubevirt-plugin-bot-required-for-prow-replacement-merge-automation).
