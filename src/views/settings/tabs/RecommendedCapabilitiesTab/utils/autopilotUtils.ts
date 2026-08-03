@@ -1,7 +1,8 @@
 import { type TFunction } from 'i18next';
 
-import { getAnnotation, getLabel } from '@kubevirt-utils/resources/shared';
-import { type K8sModel, type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import { modelToGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { getAnnotation, getLabel, getName } from '@kubevirt-utils/resources/shared';
+import { type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
 import {
   AUTOPILOT_MANAGED_BY_LABEL,
@@ -17,7 +18,7 @@ export const watchAutopilotResources = Object.fromEntries(
   AUTOPILOT_REGISTRY.map((entry) => [
     entry.operatorPackageName,
     {
-      groupVersionKind: entry.crGVK,
+      groupVersionKind: modelToGroupVersionKind(entry.crModel),
       name: entry.crName,
       ...(entry.crNamespace && { namespace: entry.crNamespace }),
     },
@@ -27,7 +28,7 @@ export const watchAutopilotResources = Object.fromEntries(
 export const deriveConfigStatus = (
   resource: K8sResourceCommon | undefined,
 ): ConfigurationStatus | undefined => {
-  if (!resource?.metadata?.name) return undefined;
+  if (!getName(resource)) return undefined;
 
   const managedBy = getLabel(resource, AUTOPILOT_MANAGED_BY_LABEL);
   const mode = getAnnotation(resource, AUTOPILOT_MODE_ANNOTATION);
@@ -43,21 +44,6 @@ export const getRegistryEntryByPackageName = (
   packageName: string,
 ): AutopilotRegistryEntry | undefined =>
   AUTOPILOT_REGISTRY.find((entry) => entry.operatorPackageName === packageName);
-
-export const buildModelFromRegistryEntry = (entry: AutopilotRegistryEntry): K8sModel => {
-  const { group, kind, version } = entry.crGVK;
-  return {
-    abbr: kind.slice(0, 3).toUpperCase(),
-    apiGroup: group,
-    apiVersion: version,
-    crd: true,
-    kind,
-    label: kind,
-    labelPlural: kind,
-    namespaced: !!entry.crNamespace,
-    plural: entry.crPlural,
-  };
-};
 
 const AUTOPILOT_PACKAGE_NAMES = new Set(
   AUTOPILOT_REGISTRY.map((entry) => entry.operatorPackageName),

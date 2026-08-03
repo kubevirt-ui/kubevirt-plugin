@@ -16,16 +16,27 @@ import {
 } from '../../utils/types';
 import ConfigurationStatusCell from '../ConfigurationStatusCell/ConfigurationStatusCell';
 
-export const buildOperatorRow = (
-  operator: CapabilityFeatureOperator,
-  opDetails: RecommendedCapabilityOperatorDetails | undefined,
-  navigate: (path: string) => void,
-  t: TFunction,
-  actions?: ActionDropdownItemType[],
+type BuildOperatorRowParams = {
+  actions?: ActionDropdownItemType[];
+  configStatus?: ConfigurationStatus;
+  includeConfigCell?: boolean;
+  navigate: (path: string) => void;
+  onReviewClick?: () => void;
+  opDetails: RecommendedCapabilityOperatorDetails | undefined;
+  operator: CapabilityFeatureOperator;
+  t: TFunction;
+};
+
+export const buildOperatorRow = ({
+  actions,
+  configStatus,
   includeConfigCell = false,
-  configStatus?: ConfigurationStatus,
-  onReviewClick?: () => void,
-): DataViewTrTree => {
+  navigate,
+  onReviewClick,
+  opDetails,
+  operator,
+  t,
+}: BuildOperatorRowParams): DataViewTrTree => {
   const { color, label } = getOperatorInstallStatusLabel(
     opDetails?.installState,
     opDetails?.isRedHatProvided,

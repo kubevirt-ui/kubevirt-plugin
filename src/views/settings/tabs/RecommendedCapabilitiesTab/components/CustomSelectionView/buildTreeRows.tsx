@@ -72,26 +72,26 @@ export const buildTreeRows = ({
           opAutopilotStatus?.configStatus,
           opDetails,
         );
-        return buildOperatorRow(
-          op,
-          opDetails,
-          navigate,
-          t,
-          opActions,
+        return buildOperatorRow({
+          actions: opActions,
+          configStatus: effectiveConfigStatus,
           includeConfigCell,
-          effectiveConfigStatus,
-          onOpenReviewModal ? () => onOpenReviewModal(op.packageName) : undefined,
-        );
+          navigate,
+          onReviewClick: onOpenReviewModal ? () => onOpenReviewModal(op.packageName) : undefined,
+          opDetails,
+          operator: op,
+          t,
+        });
       }),
       id: feature.id,
-      row: buildCapabilityRow(
+      row: buildCapabilityRow({
+        actions: capabilityActions,
+        configStatus: capabilityConfigStatus,
         feature,
-        installState,
-        isFeatureInstalling,
-        capabilityActions,
-        t,
         includeConfigCell,
-        capabilityConfigStatus,
-      ),
+        installState,
+        isInstalling: isFeatureInstalling,
+        t,
+      }),
     };
   });
