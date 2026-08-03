@@ -87,3 +87,9 @@ export const VISUAL = 'Visual';
 
 /** Playwright/Allure tag for visual regression tests. */
 export const VISUAL_TAG = '@visual';
+
+/** Playwright/Allure tag for auto-applied labels feature tests. */
+export const AUTO_LABELS_TAG = '@auto-labels';
+
+/** Allure feature label for auto-applied labels tests. */
+export const AUTO_LABELS_FEATURE = 'Auto-Applied Labels';
