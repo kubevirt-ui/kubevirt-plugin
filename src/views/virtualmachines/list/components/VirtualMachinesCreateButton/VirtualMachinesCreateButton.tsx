@@ -1,12 +1,13 @@
 import React, { FC, MouseEvent, Ref, useCallback, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
 
-import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import HidableTooltip from '@kubevirt-utils/components/HidableTooltip/HidableTooltip';
 import { DEFAULT_NAMESPACE, YAML } from '@kubevirt-utils/constants/constants';
 import { TELEMETRY_VM_CREATION_METHOD } from '@kubevirt-utils/extensions/telemetry/utils/property-constants';
 import { logVMCreationStarted } from '@kubevirt-utils/extensions/telemetry/vm-creation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getVMListPath } from '@kubevirt-utils/resources/vm';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useCluster from '@multicluster/hooks/useCluster';
 import { getACMVMListURL, navigateToVMWizard } from '@multicluster/urls';
 import useIsACMPage from '@multicluster/useIsACMPage';
@@ -20,6 +21,10 @@ import {
   MenuToggleElement,
 } from '@patternfly/react-core';
 import { useFleetAccessReview } from '@stolostron/multicluster-sdk';
+import {
+  getCanCreateVMFleetAccessReview,
+  getDisabledCreateVMTooltip,
+} from '@virtualmachines/list/utils/utils';
 
 type VirtualMachinesCreateButtonProps = {
   buttonText?: string;
@@ -40,13 +45,9 @@ const VirtualMachinesCreateButton: FC<VirtualMachinesCreateButtonProps> = ({
   const cluster = useCluster();
   const selectedNamespace = namespace || DEFAULT_NAMESPACE;
 
-  const [canCreateVM] = useFleetAccessReview({
-    cluster,
-    group: VirtualMachineModel.apiGroup,
-    namespace: selectedNamespace,
-    resource: VirtualMachineModel.plural,
-    verb: 'create',
-  });
+  const [canCreateVM] = useFleetAccessReview(
+    getCanCreateVMFleetAccessReview(selectedNamespace, cluster),
+  );
 
   const wizardCluster = useMemo(() => (isACMPage ? cluster || '' : ''), [isACMPage, cluster]);
 
@@ -72,52 +73,64 @@ const VirtualMachinesCreateButton: FC<VirtualMachinesCreateButtonProps> = ({
     [navigate, wizardCluster, namespace, yamlURL],
   );
 
-  if (!canCreateVM) return null;
+  const disabledTooltip = getDisabledCreateVMTooltip(t, isEmpty(namespace));
+
+  const isDisabled = useMemo(() => !canCreateVM, [canCreateVM]);
 
   if (!showDropdown) {
     return (
-      <Button
-        data-test="item-create"
-        onClick={() => navigateToVMWizard({ cluster: wizardCluster, namespace, navigate })}
-        variant="primary"
-      >
-        {buttonText ?? t('Create VirtualMachine')}
-      </Button>
+      <HidableTooltip content={disabledTooltip} hidden={canCreateVM}>
+        <Button
+          data-test="item-create"
+          isAriaDisabled={isDisabled}
+          onClick={() => navigateToVMWizard({ cluster: wizardCluster, namespace, navigate })}
+          variant="primary"
+          isDisabled={isDisabled}
+        >
+          {buttonText ?? t('Create VirtualMachine')}
+        </Button>
+      </HidableTooltip>
     );
   }
 
   return (
-    <span id="tour-step-create-button">
-      <Dropdown
-        toggle={(toggleRef: Ref<MenuToggleElement>) => (
-          <MenuToggle
-            splitButtonItems={[
-              <MenuToggleAction
-                aria-label={t('Create VirtualMachine')}
-                key="create-vm"
-                onClick={() => navigateToVMWizard({ cluster: wizardCluster, namespace, navigate })}
-              >
-                {t('Create')}
-              </MenuToggleAction>,
-            ]}
-            data-test="item-create"
-            isExpanded={isOpen}
-            onClick={() => setIsOpen((prev) => !prev)}
-            ref={toggleRef}
-            variant="primary"
-          />
-        )}
-        isOpen={isOpen}
-        onOpenChange={setIsOpen}
-        onSelect={onSelect}
-      >
-        <DropdownList>
-          <DropdownItem key={YAML} value={YAML}>
-            {t('With YAML')}
-          </DropdownItem>
-        </DropdownList>
-      </Dropdown>
-    </span>
+    <HidableTooltip content={disabledTooltip} hidden={canCreateVM}>
+      <span id="tour-step-create-button">
+        <Dropdown
+          toggle={(toggleRef: Ref<MenuToggleElement>) => (
+            <MenuToggle
+              splitButtonItems={[
+                <MenuToggleAction
+                  aria-label={t('Create VirtualMachine')}
+                  isDisabled={isDisabled}
+                  key="create-vm"
+                  onClick={() =>
+                    navigateToVMWizard({ cluster: wizardCluster, namespace, navigate })
+                  }
+                >
+                  {t('Create')}
+                </MenuToggleAction>,
+              ]}
+              data-test="item-create"
+              isDisabled={isDisabled}
+              isExpanded={isOpen}
+              onClick={() => setIsOpen((prev) => !prev)}
+              ref={toggleRef}
+              variant="primary"
+            />
+          )}
+          isOpen={isOpen}
+          onOpenChange={setIsOpen}
+          onSelect={onSelect}
+        >
+          <DropdownList>
+            <DropdownItem key={YAML} value={YAML}>
+              {t('With YAML')}
+            </DropdownItem>
+          </DropdownList>
+        </Dropdown>
+      </span>
+    </HidableTooltip>
   );
 };
 

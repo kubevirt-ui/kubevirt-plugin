@@ -15,6 +15,11 @@ import {
 } from '@virtualmachines/tree/utils/constants';
 import { vmsSignal } from '@virtualmachines/tree/utils/signals';
 
+import { isEmpty } from '@kubevirt-utils/utils/utils';
+import {
+  getCanCreateVMFleetAccessReview,
+  getDisabledCreateVMTooltip,
+} from '@virtualmachines/list/utils/utils';
 import ClusterRightClickActionMenu from './ClusterRightClickActionMenu';
 import DefaultRightClickActionMenu from './DefaultRightClickActionMenu';
 import VMRightClickActionMenu from './VMRightClickActionMenu';
@@ -31,6 +36,8 @@ export const getCreateVMAction = (
     },
     id: 'create-vm',
     label: t('Create VirtualMachine'),
+    accessReview: getCanCreateVMFleetAccessReview(namespace, cluster),
+    disabledTooltip: getDisabledCreateVMTooltip(t, isEmpty(namespace)),
   };
 };
 
