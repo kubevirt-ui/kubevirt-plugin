@@ -134,9 +134,6 @@
     "node": ">=22.0.0"
   },
   "lint-staged": {
-    "src/**/*.{js,ts,tsx,jsx,json}": [
-      "npm run i18n"
-    ],
     "*.{js,ts,tsx,jsx}": [
       "eslint --config eslintv10.config.js --no-warn-ignored --fix"
     ],

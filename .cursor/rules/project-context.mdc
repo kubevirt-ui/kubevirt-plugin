@@ -213,8 +213,7 @@ import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
 
 ### i18n
 - Use `useKubevirtTranslation` hook
-- All user-facing strings must be translated
-- Run `npm run i18n` after adding strings
+- All user-facing strings must be wrapped in `t()`
 
 ### Styling
 - Use PatternFly components and variables (tokens)

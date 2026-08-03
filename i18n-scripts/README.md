@@ -21,6 +21,8 @@ Example CLI usage for upload script: `npm run memsource-upload -- -v 4.8 -s 200`
 * -v is the current OpenShift version
 * -s is the current sprint number
 
+`memsource-upload` runs `npm run i18n` first to extract strings from source.
+
 Example CLI usage for download script: `npm run memsource-download -- -p 6sB6qwpbRkGCeBQq4hUyK1`
 * -p is the project ID in Memsource. The project ID can be obtained from the Memsource project URL (it's the series of numbers and letters after /show/, i.e. https://cloud.memsource.com/web/project2/show/FBfZeTEWPYaC4VXhgrW0R2).
 

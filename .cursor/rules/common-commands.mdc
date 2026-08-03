@@ -98,7 +98,7 @@ npm run cypress-postreport   # Full report pipeline
 ## 5. Internationalization (i18n)
 
 ```bash
-npm run i18n                 # Extract strings and update translations
+npm run i18n                 # Extract strings and update locale files
 npm run i18n:verbose         # Verbose output
 npm run i18n-dummy-locale    # Create dummy locale for testing
 npm run i18n-to-po           # Convert i18n to PO format
@@ -172,7 +172,6 @@ npm run check-types && npm run lint      # Quick quality check
 ### Before Commit
 ```bash
 npm run check-types && npm run lint && npm test
-npm run i18n                             # If strings changed
 ```
 
 ### Troubleshooting

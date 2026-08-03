@@ -13,6 +13,8 @@ Internationalized text and translations are located in JSON files in a locales f
 In general, these files shouldn't be manually updated, though sometimes plurals will need to be adjusted manually
 after files are generated.
 
+There is no need to run `npm run i18n` on every commit or PR. Locale files are updated when preparing to upload strings for translation (`npm run memsource-upload` runs extraction automatically). Feature work should wrap user-facing strings in `t()` correctly; PR review should verify translation patterns in source.
+
 To generate and update text files:
 
 ```

@@ -317,7 +317,6 @@ Before completing any code generation or review, verify **all** of the following
 - [ ] Utility functions use `t: TFunction` from `i18next` (not custom types)
 - [ ] No string concatenation with `t()` results -- use interpolation
 - [ ] No comment-only `// t('...')` patterns
-- [ ] `npm run i18n` run after adding/changing strings
 
 ### Code Quality
 - [ ] Check for existing similar components before creating new ones

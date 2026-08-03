@@ -18,6 +18,10 @@ BRANCH=$(git branch  --show-current)
 
 echo "Creating project with title \"[CNV $VERSION] UI Localization - Sprint $SPRINT/Branch $BRANCH\""
 
+echo "Extracting i18n strings from source"
+npm run i18n
+echo "i18n extraction complete"
+
 echo "Exporting PO files"
 npm run export-pos
 echo "Exported all PO files"

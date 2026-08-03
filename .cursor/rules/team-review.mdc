@@ -62,7 +62,6 @@ Use *"/review"* to run **all six review agents in parallel** on the current chan
 - No string concatenation with `t()` results; use interpolation: `t('Delete {{name}}', { name })`
 - No comment-only `// t('...')` patterns -- they do NOT wire up translations. **Exception**: `src/utils/i18n.ts` uses comment-only `// t('...')` intentionally for `i18next-parser` string extraction
 - For non-React code (constants, configs), always accept `t: TFunction` as a parameter -- never import `{ t }` directly
-- `npm run i18n` must be run after adding or changing any user-facing string
 
 ### Code Standards
 - One exported component per file (exception: unexported helpers in `*Definition.tsx` and `*Cells.tsx`)
@@ -111,8 +110,9 @@ Use *"/review"* to run **all six review agents in parallel** on the current chan
 ✅ [Selectors used correctly]
 
 ### 🌐 i18n Compliance
-🔴 [Untranslated string / wrong TFunction type]
-✅ [All strings properly translated]
+🔴 [Hardcoded / untranslated string, concatenation, or wrong TFunction type]
+🟡 [Split sentences or weak translator context]
+✅ [All strings properly wrapped in `t()` with correct patterns]
 
 ### 📏 Code Standards
 🟡 [File structure / naming issue]
@@ -149,9 +149,7 @@ For thorough analysis from a single perspective, invoke a specific agent:
 - [ ] **UX**: Accessibility, states, consistency
 - [ ] **QE**: Edge cases, tests, async issues
 - [ ] **Security**: Input validation, auth, XSS
-- [ ] **KubeVirt**: K8s patterns, VM lifecycle, API usage
-- [ ] **Selectors**: Field access via selectors, no unnecessary inline property chains
-- [ ] **i18n**: All strings translated, `TFunction` from `i18next`, no concatenation
+- [ ] **i18n**: All user-facing strings wrapped in `t()`, `TFunction` from `i18next`, no concatenation / hardcoded text
 - [ ] **Standards**: One component per file, filename matches, files under 150 lines
 
 ### After Review

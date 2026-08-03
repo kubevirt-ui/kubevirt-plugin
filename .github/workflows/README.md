@@ -56,7 +56,7 @@ See [`ci-scripts/manual-console/README.md`](../../ci-scripts/manual-console/READ
 
 | Workflow        | Role                                          |
 | --------------- | --------------------------------------------- |
-| `ci_checks.yml` | Unit tests, build, i18n, actionlint           |
+| `ci_checks.yml` | Unit tests, build, lint, actionlint           |
 | `deploy.yml`    | Build/push multi-arch Quay image on main/tags |
 
 ## Shared helpers
