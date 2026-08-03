@@ -65,7 +65,7 @@ export const useAccessibleResources = <T>({
   const loadPerNamespace = !isACMPage && projectNamesLoaded && !isAdmin;
 
   const shouldFetchClusterWide = isAdmin || isACMPage;
-  const [allResources, allResourcesLoaded] = useKubevirtWatchResource<T[]>(
+  const [allResources, allResourcesLoaded, allResourcesLoadError] = useKubevirtWatchResource<T[]>(
     shouldFetchClusterWide
       ? {
           cluster: clusterToWatch,
@@ -107,13 +107,12 @@ export const useAccessibleResources = <T>({
   }, [allResources, allowedResources, loadPerNamespace]);
 
   const loaded = shouldFetchClusterWide
-    ? allResourcesLoaded
+    ? allResourcesLoaded || !!allResourcesLoadError
     : projectNamesLoaded &&
       (isEmpty(allowedResources) ||
         Object.values(allowedResources).some((resource) => resource.loaded || resource.loadError));
 
-  // Cluster-wide watches do not need OpenShift Project discovery.
-  const loadError = shouldFetchClusterWide ? undefined : projectNamesError;
+  const loadError = shouldFetchClusterWide ? allResourcesLoadError : projectNamesError;
 
   return { loaded, loadError, resources };
 };
