@@ -1,6 +1,10 @@
 /**
  * Run gating tests: dispatches to the correct test engine (Cypress or Playwright).
  *
+ * Playwright (main): runs Gating + Tier1 via playwright-runner-hc-e2e.sh Gating.
+ * Cypress (release branches): runs tests/gating.cy.ts, or tests/tier1.cy.ts when
+ * TEST_PROJECT=features.
+ *
  * Required env: TEST_ENGINE, BRIDGE_BASE_ADDRESS, TEST_PROJECT
  * Cypress-specific env: TEST_NS, OS_IMAGES_NS, CNV_NS, TEST_SECRET_NAME
  */

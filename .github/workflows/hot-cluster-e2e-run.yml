@@ -333,6 +333,8 @@ jobs:
           STATUS_CONTEXT: ${{ inputs.progress_status_context }}
         run: npx tsx src/e2e/progress-running.ts
 
+      # Playwright (main): Gating + Tier1 via playwright-runner-hc-e2e.sh Gating.
+      # Cypress (release): gating.cy.ts, or tier1.cy.ts when test_project=features.
       - name: Run gating tests
         env:
           BRIDGE_BASE_ADDRESS: ${{ steps.ci-env.outputs.bridge-base-address }}

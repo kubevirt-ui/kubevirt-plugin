@@ -17,8 +17,9 @@
 #                Sets WEB_CONSOLE_URL=http://localhost:9000 automatically.
 #
 # Examples:
-#   ./playwright-runner-hc-e2e.sh Gating --workers=4
+#   ./playwright-runner-hc-e2e.sh Gating --workers=4   # Gating + Tier1 (PR CI)
 #   IS_LOCAL=1 ./playwright-runner-hc-e2e.sh Gating --headed
+#   ./playwright-runner-hc-e2e.sh Tier1
 #   ./playwright-runner-hc-e2e.sh all
 # ────────────────────────────────────────────────────────────────────────────
 set -euo pipefail
@@ -64,9 +65,9 @@ if [[ -z "${PROJECT}" ]]; then
   echo "Usage: $0 <project> [extra-args...]"
   echo ""
   echo "Available projects:"
-  echo "  Gating                 Gating specs (scenario infrastructure)"
-  echo "  Tier1                  Tier 1 specs (scenario infrastructure)"
-  echo "  Tier2                  Tier 2 specs (scenario infrastructure)"
+  echo "  Gating                 Gating + Tier1 specs (PR Hot Cluster E2E)"
+  echo "  Tier1                  Tier 1 specs only (scenario infrastructure)"
+  echo "  Tier2                  Tier 2 specs only (scenario infrastructure)"
   echo "  Settings               Settings specs (scenario infrastructure)"
   echo "  API                    API contract tests (browserless)"
   echo "  suite                  Run Gating + Tier1 + Tier2 together"
@@ -97,11 +98,11 @@ EXTRA_ARGS=("$@")
 PROJECT_LOWER=$(echo "${PROJECT}" | tr '[:upper:]' '[:lower:]')
 
 if [[ "${PROJECT_LOWER}" == "gating" ]]; then
-  echo "🚀 Running project: Gating (HC E2E mode)..."
-  npx playwright test --project Gating "${EXTRA_ARGS[@]}"
-elif [[ "${PROJECT_LOWER}" == "suite" ]]; then
-  echo "🚀 Running suite: Gating + Tier1 (HC E2E mode)..."
+  echo "🚀 Running Gating + Tier1 (HC E2E mode)..."
   npx playwright test --project Gating --project Tier1 "${EXTRA_ARGS[@]}"
+elif [[ "${PROJECT_LOWER}" == "suite" ]]; then
+  echo "🚀 Running suite: Gating + Tier1 + Tier2 (HC E2E mode)..."
+  npx playwright test --project Gating --project Tier1 --project Tier2 "${EXTRA_ARGS[@]}"
 elif [[ "${PROJECT_LOWER}" == "all" ]]; then
   PROJECTS=(
     Gating
