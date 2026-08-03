@@ -283,6 +283,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({
                   />
                 }
                 pagination={pagination}
+                persistSortInUrl
                 unfilteredData={allVMsInNamespace}
               />
             </>

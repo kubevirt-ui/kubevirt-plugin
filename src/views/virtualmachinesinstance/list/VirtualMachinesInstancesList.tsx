@@ -64,6 +64,7 @@ const VirtualMachinesInstancesList: FC<VirtualMachinesInstancesListProps> = ({ n
               namespace={namespace || DEFAULT_NAMESPACE}
             />
           }
+          persistSortInUrl
           unfilteredData={vmis}
         />
       </ListPageBody>

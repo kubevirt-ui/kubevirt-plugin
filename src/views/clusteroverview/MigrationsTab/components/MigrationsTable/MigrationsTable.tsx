@@ -106,6 +106,7 @@ const MigrationTable: FC<MigrationTableProps> = ({ tableData }) => {
         loadError={loadErrors}
         noDataMsg={t('No migrations found')}
         pagination={pagination}
+        persistSortInUrl
         unfilteredData={migrationsTableUnfilteredData}
       />
     </ListPageBody>

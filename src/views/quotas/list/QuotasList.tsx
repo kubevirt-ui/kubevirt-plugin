@@ -190,6 +190,7 @@ const QuotasList: FC = () => {
               noDataMsg={t("You don't have any application-aware quotas yet")}
               noFilteredDataMsg={t('No application-aware quotas found')}
               pagination={pagination}
+              persistSortInUrl
               unfilteredData={unfilteredData}
             />
           </>

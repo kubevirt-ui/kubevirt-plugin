@@ -163,6 +163,7 @@ const BootableVolumesList: FC = () => {
             loadError={error}
             noDataMsg={t("You don't have any bootable volumes yet")}
             pagination={pagination}
+            persistSortInUrl
             unfilteredData={bootableVolumes}
           />
         </Stack>

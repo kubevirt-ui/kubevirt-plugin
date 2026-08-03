@@ -38,6 +38,8 @@ type BaseKubevirtTableProps<TData, TCallbacks = undefined> = {
   noFilteredDataMsg?: ReactNode;
   /** Pagination state from usePagination hook. When provided, table will slice sorted data accordingly */
   pagination?: PaginationState;
+  /** When true, sort state (column and direction) is persisted in URL search params */
+  persistSortInUrl?: boolean;
   unfilteredData?: TData[];
 };
 

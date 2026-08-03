@@ -136,6 +136,7 @@ const UserInstancetypeList: FC<UserInstancetypeListProps> = ({
         loadError={loadError}
         noDataMsg={t("You don't have any VirtualMachineInstanceTypes yet")}
         pagination={pagination}
+        persistSortInUrl
         unfilteredData={instanceTypes}
       />
     </ListPageBody>

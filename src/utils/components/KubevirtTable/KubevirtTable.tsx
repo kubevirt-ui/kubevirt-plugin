@@ -1,4 +1,5 @@
 import React, { ReactElement, ReactNode, useEffect, useMemo } from 'react';
+import { useSearchParams } from 'react-router';
 
 import { PF_TABLE_CHECK_CLASS } from '@kubevirt-utils/hooks/useDataViewTableSort/constants';
 import { useDataViewTableSort } from '@kubevirt-utils/hooks/useDataViewTableSort/useDataViewTableSort';
@@ -12,8 +13,8 @@ import MutedTextSpan from '../MutedTextSpan/MutedTextSpan';
 import StateHandler from '../StateHandler/StateHandler';
 
 import { useTableSelection } from './hooks/useTableSelection';
-import { getActiveColumns } from './utils/getActiveColumns';
 import { KubevirtTableProps } from './types';
+import { getActiveColumns } from './utils/getActiveColumns';
 
 import './KubevirtTable.scss';
 
@@ -55,8 +56,11 @@ const KubevirtTable = <TData, TCallbacks = undefined>(
     noDataMsg,
     noFilteredDataMsg,
     pagination,
+    persistSortInUrl,
     unfilteredData,
   } = props;
+
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const isSelectable = props.selectable === true;
   const onSelect = isSelectable ? props.onSelect : undefined;
@@ -82,6 +86,8 @@ const KubevirtTable = <TData, TCallbacks = undefined>(
     effectiveInitialSortKey,
     initialSortDirection,
     callbacks,
+    persistSortInUrl ? searchParams : undefined,
+    persistSortInUrl ? setSearchParams : undefined,
   );
 
   const paginatedData = useMemo(() => {

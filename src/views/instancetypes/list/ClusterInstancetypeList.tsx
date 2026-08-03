@@ -118,6 +118,7 @@ const ClusterInstancetypeList: FC<ListPageProps> = ({
         loadError={loadError}
         noDataMsg={t("You don't have any VirtualMachineClusterInstanceTypes yet")}
         pagination={pagination}
+        persistSortInUrl
         unfilteredData={instanceTypes}
       />
     </ListPageBody>
