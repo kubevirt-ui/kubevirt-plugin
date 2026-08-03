@@ -7,6 +7,7 @@ import {
   CUSTOMIZE_VM_FAILED,
 } from '@kubevirt-utils/extensions/telemetry/utils/constants';
 import { logVMCreationFailedFromTemplate } from '@kubevirt-utils/extensions/telemetry/vm-creation';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
 import { USER_SETTINGS_KEYS } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/const';
 import { getResourceKey } from '@kubevirt-utils/resources/shared';
@@ -16,6 +17,7 @@ import {
   CREATE_VM_FORM_FIELDS_UI_STATE,
   CREATE_VM_FORM_FIELDS_VM_DATA,
 } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
+import { getFirstUnfulfilledRequiredParameter } from '@virtualmachines/wizard/steps/TemplateStep/components/TemplatesCatalogDrawer/utils/utils';
 import {
   getVMObjectFromTemplate,
   resolveVMFromTemplate,
@@ -27,6 +29,7 @@ type UseCreateVMFromTemplate = () => {
 };
 
 const useCreateVMFromTemplate: UseCreateVMFromTemplate = () => {
+  const { t } = useKubevirtTranslation();
   const [isProcessing, setIsProcessing] = useState(false);
   const { control, getValues, setValue } = useVMWizard();
   const cluster = useWatch({ control, name: CREATE_VM_FORM_FIELDS_VM_DATA.CLUSTER });
@@ -53,6 +56,13 @@ const useCreateVMFromTemplate: UseCreateVMFromTemplate = () => {
 
     const selectedKey = getResourceKey(selectedTemplate);
     if (selectedKey === lastProcessedTemplateKey) return true;
+
+    const missingParam = getFirstUnfulfilledRequiredParameter(selectedTemplate);
+    if (missingParam) {
+      return failWithProcessError(
+        t('{{name}} must be filled in to continue.', { name: missingParam.name }),
+      );
+    }
 
     logTemplateFlowEvent(CUSTOMIZE_VM_BUTTON_CLICKED, selectedTemplate);
 

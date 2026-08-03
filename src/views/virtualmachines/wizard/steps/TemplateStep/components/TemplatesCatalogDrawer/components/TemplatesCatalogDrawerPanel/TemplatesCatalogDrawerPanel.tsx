@@ -10,7 +10,10 @@ import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMW
 import { CREATE_VM_FORM_FIELDS_UI_STATE } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
 import { TemplatesDrawerTabKey } from '@virtualmachines/wizard/steps/TemplateStep/components/TemplatesCatalogDrawer/components/TemplatesCatalogDrawerPanel/utils/types';
 import { useDrawerContext } from '@virtualmachines/wizard/steps/TemplateStep/components/TemplatesCatalogDrawer/hooks/useDrawerContext';
-import { getTemplateParametersSplit } from '@virtualmachines/wizard/steps/TemplateStep/components/TemplatesCatalogDrawer/utils/utils';
+import {
+  allRequiredParametersAreFulfilled,
+  getTemplateParametersSplit,
+} from '@virtualmachines/wizard/steps/TemplateStep/components/TemplatesCatalogDrawer/utils/utils';
 
 import ParametersSections from '../ParametersSections';
 import TemplateInfoSection from '../TemplateInfoSection';
@@ -63,7 +66,11 @@ const TemplatesCatalogDrawerPanel: FC = memo(() => {
         <Alert
           className="pf-v6-u-mt-md"
           isInline
-          title={t('Unable to continue')}
+          title={
+            allRequiredParametersAreFulfilled(template)
+              ? t('Unable to continue')
+              : t('Missing field')
+          }
           variant={AlertVariant.danger}
         >
           {templateProcessError}

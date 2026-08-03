@@ -69,8 +69,16 @@ export const changeTemplateParameterValue = (
   return template;
 };
 
+export const isRequiredParameterUnfulfilled = (param: TemplateParameter): boolean =>
+  Boolean(param.required) &&
+  param.name !== NAME_INPUT_FIELD &&
+  !param.value?.trim() &&
+  !param.generate;
+
+export const getFirstUnfulfilledRequiredParameter = (
+  template: Template,
+): TemplateParameter | undefined =>
+  (getParameters(template) ?? []).find(isRequiredParameterUnfulfilled);
+
 export const allRequiredParametersAreFulfilled = (template: Template): boolean =>
-  (getParameters(template) ?? []).every((param) => {
-    if (!param.required || param.name === NAME_INPUT_FIELD) return true;
-    return Boolean(param.value?.trim()) || Boolean(param.generate);
-  });
+  !getFirstUnfulfilledRequiredParameter(template);
