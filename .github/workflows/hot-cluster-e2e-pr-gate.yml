@@ -36,7 +36,7 @@ jobs:
         id: bot-token
         uses: ./.github/actions/create-bot-token
         with:
-          app-id: ${{ secrets.BOT_APP_ID }}
+          client-id: ${{ secrets.BOT_APP_ID }}
           private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
           permission-checks: write
 

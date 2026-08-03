@@ -215,7 +215,7 @@ jobs:
         continue-on-error: true
         uses: ./.github/actions/create-bot-token
         with:
-          app-id: ${{ secrets.BOT_APP_ID }}
+          client-id: ${{ secrets.BOT_APP_ID }}
           private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
           permission-checks: write
 
@@ -391,7 +391,7 @@ jobs:
         continue-on-error: true
         uses: ./.github/actions/create-bot-token
         with:
-          app-id: ${{ secrets.BOT_APP_ID }}
+          client-id: ${{ secrets.BOT_APP_ID }}
           private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
           permission-checks: write
 
@@ -427,7 +427,7 @@ jobs:
           )
         uses: ./.github/actions/create-bot-token
         with:
-          app-id: ${{ secrets.BOT_APP_ID }}
+          client-id: ${{ secrets.BOT_APP_ID }}
           private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
 
       - name: Report unresolvable PR context on the PR
@@ -476,7 +476,7 @@ jobs:
         continue-on-error: true
         uses: ./.github/actions/create-bot-token
         with:
-          app-id: ${{ secrets.BOT_APP_ID }}
+          client-id: ${{ secrets.BOT_APP_ID }}
           private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
           permission-checks: write
 

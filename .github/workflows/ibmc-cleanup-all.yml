@@ -126,7 +126,7 @@ jobs:
         continue-on-error: true
         uses: actions/create-github-app-token@v3
         with:
-          app-id: ${{ secrets.ARC_GITHUB_APP_ID }}
+          client-id: ${{ secrets.ARC_GITHUB_APP_ID }}
           private-key: ${{ secrets.ARC_GITHUB_APP_PRIVATE_KEY }}
           permission-administration: write
 

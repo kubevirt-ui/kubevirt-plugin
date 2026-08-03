@@ -4,8 +4,10 @@ description: >
   continue-on-error so a bad credential still lets callers fall back to github.token.
 
 inputs:
-  app-id:
-    description: GitHub App ID (BOT_APP_ID secret)
+  client-id:
+    description: >
+      GitHub App Client ID (preferred). The BOT_APP_ID secret may hold either the
+      Client ID or legacy numeric App ID — both work as the JWT issuer.
     required: true
   private-key:
     description: GitHub App private key (BOT_APP_PRIVATE_KEY secret)
@@ -36,7 +38,7 @@ runs:
       continue-on-error: true
       uses: actions/create-github-app-token@v3
       with:
-        app-id: ${{ inputs.app-id }}
+        client-id: ${{ inputs.client-id }}
         private-key: ${{ inputs.private-key }}
         permission-issues: ${{ inputs.permission-issues }}
         permission-pull-requests: ${{ inputs.permission-pull-requests }}

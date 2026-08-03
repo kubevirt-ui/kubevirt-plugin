@@ -117,10 +117,10 @@ Uses `openshift-install` to create a fully self-managed OpenShift cluster on IBM
 
 ### kubevirt-plugin-bot (required for Prow-replacement merge automation)
 
-| Secret                | Description                             |
-| --------------------- | --------------------------------------- |
-| `BOT_APP_ID`          | GitHub App ID for `kubevirt-plugin-bot` |
-| `BOT_APP_PRIVATE_KEY` | GitHub App private key                  |
+| Secret                | Description                                                                 |
+| --------------------- | --------------------------------------------------------------------------- |
+| `BOT_APP_ID`          | GitHub App Client ID for `kubevirt-plugin-bot` (numeric App ID still works) |
+| `BOT_APP_PRIVATE_KEY` | GitHub App private key                                                      |
 
 Used by `/lgtm`/`/approve`/`/hold`, review sync, `needs-rebase`, auto-merge GraphQL, e2e result labels, and related PR comment/label writes. The App installation must have **Issues: Read & write**, **Pull requests: Read & write**, and **Contents: Read & write** (the last one specifically for `enablePullRequestAutoMerge`/`disablePullRequestAutoMerge` -- see below). Shared helper: [`.github/actions/create-bot-token`](../.github/actions/create-bot-token/action.yml).
 
@@ -306,8 +306,8 @@ To move a repo onto this model (already done for `kubevirt-plugin`):
 1. **Add `Merge Gate` to branch protection's required status checks** on the default branch (alongside `Run Gating Tests`, `build`, `test`, etc.). Native "Allow auto-merge" is **not** required — the script merges directly via the API.
 2. **Install/configure `kubevirt-plugin-bot`** with Contents + Pull requests write; set `BOT_APP_ID` / `BOT_APP_PRIVATE_KEY` secrets. The bot token is **required** for merging — without it the merge gate reports failure.
 3. **Confirm the root `OWNERS` file lists real approvers** -- `/approve` and `/lgtm`'s approve-acting behavior both read it.
-5. **Uninstall/deselect the Prow GitHub App (`openshift-ci`) for this repo**. Removing the `tide:` block from `openshift/release` is optional hygiene afterward.
-6. **Announce the command set** -- `/help` or the table below. Reviews with `/lgtm` in the body now always honor Approve/Request-changes state (no Prow-style silent no-op).
+4. **Uninstall/deselect the Prow GitHub App (`openshift-ci`) for this repo**. Removing the `tide:` block from `openshift/release` is optional hygiene afterward.
+5. **Announce the command set** -- `/help` or the table below. Reviews with `/lgtm` in the body now always honor Approve/Request-changes state (no Prow-style silent no-op).
 
 ### `/lgtm`, `/approve`, `/hold` and their `cancel` variants
 
@@ -471,5 +471,5 @@ Always verify the cluster has been torn down when done testing. The auto-teardow
 - Run `npm install` locally and commit the updated `package-lock.json`
 - Check Node/npm version compatibility (runner image provides Node 22)
 - Verify the runner can reach `registry.npmjs.org`
-  // verify trusted bot fix - 1785662227
+// verify trusted bot fix - 1785662227
 <!-- test: verify Merge Gate commit status -->
