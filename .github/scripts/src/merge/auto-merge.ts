@@ -9,7 +9,7 @@
  * the platform's mergeStateStatus evaluation is unreliable — it can report
  * BLOCKED even when all required checks pass (known GitHub bug). Instead,
  * this script checks label eligibility + required statuses itself, then
- * merges via PUT /pulls/:number/merge using the bot token so that
+ * squash-merges via PUT /pulls/:number/merge using the bot token so that
  * post-merge workflows (deploy, etc.) are triggered.
  *
  * Publishes a "Merge Gate" commit status (also a required branch-protection
@@ -153,13 +153,13 @@ const tryMerge = async (
 ): Promise<boolean> => {
   try {
     await botOctokit.pulls.merge({
-      merge_method: 'merge',
+      merge_method: 'squash',
       owner,
       pull_number: prNumber,
       repo,
       sha,
     });
-    console.log(`Merged PR #${prNumber} via API.`);
+    console.log(`Squash-merged PR #${prNumber} via API.`);
     return true;
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
