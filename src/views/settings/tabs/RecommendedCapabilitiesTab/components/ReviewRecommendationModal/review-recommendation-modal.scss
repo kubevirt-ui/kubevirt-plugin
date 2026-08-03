@@ -1,13 +1,8 @@
 .review-recommendation-modal {
-  &__description {
-    font-size: var(--pf-t--global--font--size--body--lg);
-    margin-bottom: var(--pf-t--global--spacer--md);
-  }
-
   &__separator {
     border: none;
     border-top: 1px solid var(--pf-t--global--border--color--default);
-    margin: var(--pf-t--global--spacer--sm) var(--pf-t--global--spacer--lg) 0;
+    margin: 0 var(--pf-t--global--spacer--lg) var(--pf-t--global--spacer--md);
   }
 
   &__editor {
@@ -27,10 +22,5 @@
         overflow-y: auto;
       }
     }
-  }
-
-  &__footer {
-    display: flex;
-    gap: var(--pf-t--global--spacer--sm);
   }
 }

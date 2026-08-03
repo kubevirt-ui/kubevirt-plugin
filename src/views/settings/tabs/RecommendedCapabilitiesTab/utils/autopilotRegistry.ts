@@ -1,14 +1,14 @@
-import { type K8sGroupVersionKind } from '@openshift-console/dynamic-plugin-sdk';
+import { type K8sModel } from '@openshift-console/dynamic-plugin-sdk';
 
 import {
   CLUSTER_OBSERVABILITY_OPERATOR_PACKAGE,
-  ClusterLogForwarderGVK,
+  ClusterLogForwarderModel,
   DESCHEDULER_OPERATOR_PACKAGE,
-  ForkliftControllerGVK,
-  KubeDeschedulerGVK,
-  LokiStackGVK,
-  MetalLBGVK,
-  UIPluginGVK,
+  ForkliftControllerModel,
+  KubeDeschedulerModel,
+  LokiStackModel,
+  MetalLBModel,
+  UIPluginModel,
 } from './autopilotConstants';
 import {
   CLUSTER_LOG_FORWARDER_RECOMMENDED_YAML,
@@ -26,10 +26,9 @@ import {
 } from './operatorNames';
 
 export type AutopilotRegistryEntry = {
-  crGVK: K8sGroupVersionKind;
+  crModel: K8sModel;
   crName: string;
   crNamespace?: string;
-  crPlural: string;
   enableAnnotation?: string;
   operatorPackageName: string;
   recommendedYAML: string;
@@ -37,52 +36,46 @@ export type AutopilotRegistryEntry = {
 
 export const AUTOPILOT_REGISTRY: AutopilotRegistryEntry[] = [
   {
-    crGVK: KubeDeschedulerGVK,
+    crModel: KubeDeschedulerModel,
     crName: 'cluster',
     crNamespace: 'openshift-kube-descheduler-operator',
-    crPlural: 'kubedeschedulers',
     operatorPackageName: DESCHEDULER_OPERATOR_PACKAGE,
     recommendedYAML: KUBE_DESCHEDULER_RECOMMENDED_YAML,
   },
   {
-    crGVK: MetalLBGVK,
+    crModel: MetalLBModel,
     crName: 'metallb',
     crNamespace: 'metallb-system',
-    crPlural: 'metallbs',
     enableAnnotation: 'platform.kubevirt.io/enable-metallb',
     operatorPackageName: METALLB_OPERATOR_NAME,
     recommendedYAML: METALLB_RECOMMENDED_YAML,
   },
   {
-    crGVK: ForkliftControllerGVK,
+    crModel: ForkliftControllerModel,
     crName: 'forklift-controller',
     crNamespace: 'openshift-mtv',
-    crPlural: 'forkliftcontrollers',
     enableAnnotation: 'platform.kubevirt.io/enable-mtv',
     operatorPackageName: MTV_OPERATOR_NAME,
     recommendedYAML: FORKLIFT_CONTROLLER_RECOMMENDED_YAML,
   },
   {
-    crGVK: UIPluginGVK,
+    crModel: UIPluginModel,
     crName: 'monitoring',
-    crPlural: 'uiplugins',
     operatorPackageName: CLUSTER_OBSERVABILITY_OPERATOR_PACKAGE,
     recommendedYAML: UI_PLUGIN_RECOMMENDED_YAML,
   },
   {
-    crGVK: LokiStackGVK,
+    crModel: LokiStackModel,
     crName: 'logging-loki',
     crNamespace: 'openshift-logging',
-    crPlural: 'lokistacks',
     enableAnnotation: 'platform.kubevirt.io/enable-logging',
     operatorPackageName: LOKI_OPERATOR_NAME,
     recommendedYAML: LOKI_STACK_RECOMMENDED_YAML,
   },
   {
-    crGVK: ClusterLogForwarderGVK,
+    crModel: ClusterLogForwarderModel,
     crName: 'instance',
     crNamespace: 'openshift-logging',
-    crPlural: 'clusterlogforwarders',
     enableAnnotation: 'platform.kubevirt.io/enable-logging',
     operatorPackageName: CLUSTER_LOGGING_OPERATOR_NAME,
     recommendedYAML: CLUSTER_LOG_FORWARDER_RECOMMENDED_YAML,

@@ -1,4 +1,4 @@
-import { type K8sGroupVersionKind } from '@openshift-console/dynamic-plugin-sdk';
+import { type K8sModel } from '@openshift-console/dynamic-plugin-sdk';
 
 export const AUTOPILOT_MANAGED_BY_LABEL = 'platform.kubevirt.io/managed-by';
 export const AUTOPILOT_MANAGED_BY_VALUE = 'virt-platform-autopilot';
@@ -9,38 +9,74 @@ export const HCO_AUTOPILOT_ANNOTATION = 'platform.kubevirt.io/autopilot';
 export const DESCHEDULER_OPERATOR_PACKAGE = 'cluster-kube-descheduler-operator';
 export const CLUSTER_OBSERVABILITY_OPERATOR_PACKAGE = 'cluster-observability-operator';
 
-export const KubeDeschedulerGVK: K8sGroupVersionKind = {
-  group: 'operator.openshift.io',
+export const KubeDeschedulerModel: K8sModel = {
+  abbr: 'KD',
+  apiGroup: 'operator.openshift.io',
+  apiVersion: 'v1',
+  crd: true,
   kind: 'KubeDescheduler',
-  version: 'v1',
+  label: 'KubeDescheduler',
+  labelPlural: 'KubeDeschedulers',
+  namespaced: true,
+  plural: 'kubedeschedulers',
 };
 
-export const MetalLBGVK: K8sGroupVersionKind = {
-  group: 'metallb.io',
+export const MetalLBModel: K8sModel = {
+  abbr: 'MLB',
+  apiGroup: 'metallb.io',
+  apiVersion: 'v1beta1',
+  crd: true,
   kind: 'MetalLB',
-  version: 'v1beta1',
+  label: 'MetalLB',
+  labelPlural: 'MetalLBs',
+  namespaced: true,
+  plural: 'metallbs',
 };
 
-export const ForkliftControllerGVK: K8sGroupVersionKind = {
-  group: 'forklift.konveyor.io',
+export const ForkliftControllerModel: K8sModel = {
+  abbr: 'FC',
+  apiGroup: 'forklift.konveyor.io',
+  apiVersion: 'v1beta1',
+  crd: true,
   kind: 'ForkliftController',
-  version: 'v1beta1',
+  label: 'ForkliftController',
+  labelPlural: 'ForkliftControllers',
+  namespaced: true,
+  plural: 'forkliftcontrollers',
 };
 
-export const UIPluginGVK: K8sGroupVersionKind = {
-  group: 'observability.openshift.io',
+export const UIPluginModel: K8sModel = {
+  abbr: 'UIP',
+  apiGroup: 'observability.openshift.io',
+  apiVersion: 'v1alpha1',
+  crd: true,
   kind: 'UIPlugin',
-  version: 'v1alpha1',
+  label: 'UIPlugin',
+  labelPlural: 'UIPlugins',
+  namespaced: false,
+  plural: 'uiplugins',
 };
 
-export const LokiStackGVK: K8sGroupVersionKind = {
-  group: 'loki.grafana.com',
+export const LokiStackModel: K8sModel = {
+  abbr: 'LS',
+  apiGroup: 'loki.grafana.com',
+  apiVersion: 'v1',
+  crd: true,
   kind: 'LokiStack',
-  version: 'v1',
+  label: 'LokiStack',
+  labelPlural: 'LokiStacks',
+  namespaced: true,
+  plural: 'lokistacks',
 };
 
-export const ClusterLogForwarderGVK: K8sGroupVersionKind = {
-  group: 'observability.openshift.io',
+export const ClusterLogForwarderModel: K8sModel = {
+  abbr: 'CLF',
+  apiGroup: 'observability.openshift.io',
+  apiVersion: 'v1',
+  crd: true,
   kind: 'ClusterLogForwarder',
-  version: 'v1',
+  label: 'ClusterLogForwarder',
+  labelPlural: 'ClusterLogForwarders',
+  namespaced: true,
+  plural: 'clusterlogforwarders',
 };

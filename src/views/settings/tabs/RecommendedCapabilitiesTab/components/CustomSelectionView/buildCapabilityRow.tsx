@@ -16,15 +16,25 @@ import {
 } from '../../utils/types';
 import ConfigurationStatusCell from '../ConfigurationStatusCell/ConfigurationStatusCell';
 
-export const buildCapabilityRow = (
-  feature: CapabilityFeature,
-  installState: CapabilityInstallState,
-  isInstalling: boolean,
-  actions: ActionDropdownItemType[],
-  t: TFunction,
+type BuildCapabilityRowParams = {
+  actions: ActionDropdownItemType[];
+  configStatus?: ConfigurationStatus;
+  feature: CapabilityFeature;
+  includeConfigCell?: boolean;
+  installState: CapabilityInstallState;
+  isInstalling: boolean;
+  t: TFunction;
+};
+
+export const buildCapabilityRow = ({
+  actions,
+  configStatus,
+  feature,
   includeConfigCell = false,
-  configStatus?: ConfigurationStatus,
-) => {
+  installState,
+  isInstalling,
+  t,
+}: BuildCapabilityRowParams) => {
   const { color, getLabel } = CAPABILITY_INSTALL_STATE_CONFIG[installState];
 
   return [

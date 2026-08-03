@@ -54,7 +54,7 @@ spec:
 export const CLUSTER_LOG_FORWARDER_RECOMMENDED_YAML = `apiVersion: observability.openshift.io/v1
 kind: ClusterLogForwarder
 metadata:
-  name: collector
+  name: instance
   namespace: openshift-logging
 spec:
   managementState: Managed
