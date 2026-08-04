@@ -30,18 +30,18 @@ export const parseTestE2ECommand = (commentBody: string): ParsedTestE2ECommand |
     return null;
   }
 
-  const match = line.match(/^\/test-e2e(?:\s+([a-zA-Z0-9_-]+))?(?:\s+(.+))?$/);
-  if (!match?.[1]) {
+  const [command, suite, ...argParts] = line.split(/\s+/);
+  if (command !== '/test-e2e' || !suite) {
     return null;
   }
 
-  const testProject = match[1].toLowerCase();
+  const testProject = suite.toLowerCase();
   if (!(VALID_TEST_E2E_PROJECTS as readonly string[]).includes(testProject)) {
     return null;
   }
 
   return {
-    testArgs: (match[2] ?? '').trim(),
+    testArgs: argParts.join(' '),
     testProject: testProject as TestE2EProject,
   };
 };
