@@ -1,13 +1,6 @@
 /**
  * Run E2E tests: dispatches to the correct test engine (Cypress or Playwright).
  *
- * Playwright (main): maps TEST_PROJECT to a playwright-runner-hc-e2e.sh project
- * (gating, tier1, tier2, suite, …) and forwards TEST_ARGS as extra CLI args
- * (file paths, -g patterns, --workers, …).
- *
- * Cypress (release branches): runs tests/gating.cy.ts, or tests/tier1.cy.ts when
- * TEST_PROJECT=features (or tier1).
- *
  * Required env: TEST_ENGINE, BRIDGE_BASE_ADDRESS, TEST_PROJECT
  * Optional env: TEST_ARGS
  * Cypress-specific env: TEST_NS, OS_IMAGES_NS, CNV_NS, TEST_SECRET_NAME
@@ -17,15 +10,21 @@ import { execFileSync, execSync } from 'node:child_process';
 
 import { requireEnv } from '../utils';
 
+/** Playwright (main) TEST_PROJECT → playwright-runner-hc-e2e.sh project name. */
 const PLAYWRIGHT_PROJECT_BY_TEST_PROJECT: Record<string, string> = {
   all: 'all',
   api: 'API',
-  features: 'Tier1',
   gating: 'Gating',
   settings: 'Settings',
   suite: 'suite',
   tier1: 'Tier1',
   tier2: 'Tier2',
+};
+
+/** Cypress (release) TEST_PROJECT → spec file. `features` is Cypress's Tier1 suite. */
+const CYPRESS_TEST_PROJECTS: Record<string, string> = {
+  features: 'tests/tier1.cy.ts',
+  gating: 'tests/gating.cy.ts',
 };
 
 const parseTestArgs = (raw: string): string[] => {
@@ -45,6 +44,18 @@ const resolvePlaywrightProject = (testProject: string): string => {
   throw new Error(
     `Unsupported TEST_PROJECT '${testProject}' for Playwright. ` +
       `Expected one of: ${Object.keys(PLAYWRIGHT_PROJECT_BY_TEST_PROJECT).join(', ')}`,
+  );
+};
+
+const resolveCypressSpec = (testProject: string): string => {
+  const key = testProject.toLowerCase();
+  const spec = CYPRESS_TEST_PROJECTS[key];
+  if (spec) {
+    return spec;
+  }
+  throw new Error(
+    `Unsupported TEST_PROJECT '${testProject}' for Cypress. ` +
+      `Expected one of: ${Object.keys(CYPRESS_TEST_PROJECTS).join(', ')}`,
   );
 };
 
@@ -69,11 +80,7 @@ const main = async (): Promise<void> => {
 
     execSync(`oc project "${testNs}"`, { env, stdio: 'inherit' });
 
-    const projectLower = testProject.toLowerCase();
-    const spec =
-      projectLower === 'features' || projectLower === 'tier1'
-        ? 'tests/tier1.cy.ts'
-        : 'tests/gating.cy.ts';
+    const spec = resolveCypressSpec(testProject);
     execSync(`npm run test-cypress-headless -- --spec ${spec}`, { env, stdio: 'inherit' });
   } else {
     const repoRoot =

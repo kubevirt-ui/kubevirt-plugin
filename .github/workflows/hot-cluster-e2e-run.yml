@@ -6,8 +6,9 @@ on:
     inputs:
       test_project:
         description: |
-          Suite to run. Playwright: gating / tier1 / tier2 / suite / settings / api / all.
-          Cypress (release): gating or features (=tier1).
+          Suite to run.
+          Playwright (main): gating / tier1 / tier2 / suite / settings / api / all.
+          Cypress (release only): gating or features (Cypress's Tier1 suite — not a Playwright project).
         required: true
         default: gating
         type: choice
@@ -91,7 +92,9 @@ on:
   workflow_call:
     inputs:
       test_project:
-        description: Suite to run (gating, tier1, tier2, suite, features, settings, api, all)
+        description: |
+          Suite to run. Playwright: gating / tier1 / tier2 / suite / settings / api / all.
+          Cypress (release only): gating or features (Cypress's Tier1 suite — not a Playwright project).
         type: string
         required: false
         default: gating

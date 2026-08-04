@@ -12,8 +12,10 @@ on:
     inputs:
       test_project:
         description: |
-          Suite to run. Playwright: gating / tier1 / tier2 / suite / settings / api / all.
-          Cypress (release): gating or features (=tier1). Default gating is the required PR check.
+          Suite to run.
+          Playwright (main): gating / tier1 / tier2 / suite / settings / api / all.
+          Cypress (release only): gating or features (Cypress's Tier1 suite — not a Playwright project).
+          Default gating is the required PR check.
         required: true
         default: gating
         type: choice
