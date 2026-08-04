@@ -5,9 +5,6 @@ import {
   executeAiConfigValidation,
   executeCiScriptsValidation,
   executeI18nValidation,
-  reportAiConfigError,
-  reportCiScriptsError,
-  reportI18nError,
 } from '../pr-path-validation/execute';
 import { buildConfigFromEnv } from './build-config';
 import { clearStaleApproval } from './clear-stale-approval';
@@ -36,22 +33,17 @@ export const main = async (): Promise<void> => {
   // validations, which each used to fetch this independently. Not awaited
   // here -- jira-validation doesn't need it, so a fetch failure must not
   // stop it from running; each path check awaits it inside its own isolated
-  // check and reports the failure through its normal unexpected-error
-  // handling if it rejects.
+  // check and surfaces the failure through runChecksIsolated if it rejects.
   const filesPromise = getPullRequestFiles(octokit, config.owner, config.repo, prNumber);
 
   const checks: PrValidationCheck[] = [
     {
       name: 'jira-validation',
-      reportUnexpectedError: async (_config, _headSha, err): Promise<void> => {
-        console.error(`Jira validation encountered an unexpected error: ${safeErrorMessage(err)}`);
-      },
       run: (): Promise<void> =>
         executeJiraValidation({ baseBranch, config, headSha, prNumber, prTitle }),
     },
     {
       name: 'ai-config-validation',
-      reportUnexpectedError: reportAiConfigError,
       run: async (): Promise<void> => {
         const files = await filesPromise;
         return executeAiConfigValidation({
@@ -59,14 +51,12 @@ export const main = async (): Promise<void> => {
           config,
           eventAction,
           files,
-          headSha,
           prNumber,
         });
       },
     },
     {
       name: 'ci-scripts-validation',
-      reportUnexpectedError: reportCiScriptsError,
       run: async (): Promise<void> => {
         const files = await filesPromise;
         return executeCiScriptsValidation({
@@ -74,14 +64,12 @@ export const main = async (): Promise<void> => {
           config,
           eventAction,
           files,
-          headSha,
           prNumber,
         });
       },
     },
     {
       name: 'i18n-validation',
-      reportUnexpectedError: reportI18nError,
       run: async (): Promise<void> => {
         const files = await filesPromise;
         return executeI18nValidation({
@@ -89,7 +77,6 @@ export const main = async (): Promise<void> => {
           config,
           eventAction,
           files,
-          headSha,
           prNumber,
         });
       },
@@ -102,27 +89,25 @@ export const main = async (): Promise<void> => {
   if (eventAction === 'synchronize') {
     checks.push({
       name: 'clear-stale-approval',
-      reportUnexpectedError: async (_config, _headSha, err): Promise<void> => {
-        console.error(`Failed to clear stale lgtm/approved labels: ${safeErrorMessage(err)}`);
-      },
       run: (): Promise<void> =>
         clearStaleApproval(octokit, config.owner, config.repo, prNumber, prAuthor, baseBranch),
     });
   }
 
-  const anyFailed = await runChecksIsolated(checks, config, headSha);
+  const anyFailed = await runChecksIsolated(checks);
 
   if (anyFailed) {
-    // Each check already published its own commit status (ci-scripts-validation,
-    // ai-config-validation, jira-validation). Don't fail the job — a native job
-    // failure accumulates in GitHub's status rollup and permanently blocks
-    // auto-merge even after the individual statuses flip to success.
-    console.warn('One or more checks failed — see individual commit statuses for details.');
+    // Path gates already synced do-not-merge/* labels; jira-validation already
+    // published its commit status. Don't fail the job — a native job failure
+    // accumulates in GitHub's status rollup and permanently blocks auto-merge
+    // even after labels/statuses recover.
+    console.warn('One or more checks failed — see labels / jira-validation status for details.');
   }
 };
 
 if (require.main === module) {
   void main().catch((err) => {
     console.error(safeErrorMessage(err));
+    process.exit(1);
   });
 }

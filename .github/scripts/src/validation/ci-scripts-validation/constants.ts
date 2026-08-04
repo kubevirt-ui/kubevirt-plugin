@@ -24,5 +24,4 @@ export const CI_SCRIPTS_CONFIG = {
     skip: 'skip-ci-scripts-check',
   },
   pathPrefixes: ['.github/', 'ci-scripts/'],
-  statusContext: 'ci-scripts-validation',
 } as const satisfies PathValidationConfig;

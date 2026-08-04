@@ -50,7 +50,6 @@ const buildCtx = (
 ): VerifyReviewLabelContext => ({
   baseBranch: 'main',
   config: { owner: 'kubevirt-ui', repo: 'kubevirt-plugin', token: 'x' },
-  headSha: 'abc123',
   labelName: 'ai-config-reviewed',
   octokit: fakeOctokit(OWNERS_CONTENT, calls, labelEvents),
   prNumber: 1,

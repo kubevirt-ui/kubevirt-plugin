@@ -4,7 +4,7 @@ import { describe, it } from 'node:test';
 import type { Octokit } from '@octokit/rest';
 
 import { HandledValidationError } from './errors';
-import { executePathValidation, reportPathValidationError } from './execute';
+import { executePathValidation } from './execute';
 import type { PathValidationConfig } from './types';
 
 const TEST_CONFIG: PathValidationConfig = {
@@ -17,10 +17,7 @@ const TEST_CONFIG: PathValidationConfig = {
   },
   labels: { alert: 'alert', block: 'block', reviewed: 'reviewed', skip: 'skip' },
   pathPrefixes: ['protected/'],
-  statusContext: 'test-validation',
 };
-
-const buildStatusDescription = (): string => 'unused';
 
 /** issues.listLabelsOnIssue throws -- simulating a genuinely unexpected failure inside runPathValidation. */
 const fakeOctokitThrowing = (): Octokit =>
@@ -42,28 +39,13 @@ describe('executePathValidation', () => {
           baseBranch: 'main',
           config: { owner: 'kubevirt-ui', repo: 'kubevirt-plugin', token: 'x' },
           files: [{ filename: 'protected/foo.ts' }],
-          headSha: 'abc123',
           octokit,
           prNumber: 1,
           statusOctokit: octokit,
         },
         TEST_CONFIG,
-        buildStatusDescription,
       ),
       HandledValidationError,
-    );
-  });
-});
-
-describe('reportPathValidationError', () => {
-  it('does not throw', async () => {
-    await assert.doesNotReject(
-      reportPathValidationError(
-        { owner: 'kubevirt-ui', repo: 'kubevirt-plugin', token: 'x' },
-        'abc123',
-        TEST_CONFIG,
-        new Error('boom'),
-      ),
     );
   });
 });

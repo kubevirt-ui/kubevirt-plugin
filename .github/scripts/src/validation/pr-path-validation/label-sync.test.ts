@@ -17,7 +17,6 @@ const TEST_CONFIG: PathValidationConfig = {
   },
   labels: { alert: 'alert', block: 'block', reviewed: 'reviewed', skip: 'skip' },
   pathPrefixes: ['protected/'],
-  statusContext: 'test-validation',
 };
 
 type Call = { args: unknown; method: string };
@@ -31,11 +30,6 @@ const fakeOctokit = (calls: Call[], tag: string): Octokit =>
       getLabel: async () => ({ data: {} }),
       removeLabel: async (args: unknown) => {
         calls.push({ args, method: `removeLabel:${tag}` });
-      },
-    },
-    repos: {
-      createCommitStatus: async (args: unknown) => {
-        calls.push({ args, method: `createCommitStatus:${tag}` });
       },
     },
   }) as unknown as Octokit;

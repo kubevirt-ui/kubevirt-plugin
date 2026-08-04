@@ -30,14 +30,12 @@ export type ValidationDispatcher = (input: {
   baseBranch: string;
   config: GitHubConfig;
   eventAction: string;
-  headSha?: string;
   prNumber: number;
 }) => Promise<void>;
 
 export type VerifyReviewLabelContext = {
   baseBranch: string;
   config: GitHubConfig;
-  headSha?: string;
   /** Label that triggered this `labeled` event. */
   labelName: string;
   octokit: Octokit;
@@ -86,7 +84,6 @@ const dispatchValidation = async (
       baseBranch: ctx.baseBranch,
       config: ctx.config,
       eventAction: 'label-stripped',
-      headSha: ctx.headSha,
       prNumber: ctx.prNumber,
     });
   } catch (err) {

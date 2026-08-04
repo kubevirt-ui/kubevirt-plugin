@@ -19,5 +19,4 @@ export const I18N_CONFIG = {
     skip: 'skip-i18n-check',
   },
   pathPrefixes: ['locales/'],
-  statusContext: 'i18n-validation',
 } as const satisfies PathValidationConfig;

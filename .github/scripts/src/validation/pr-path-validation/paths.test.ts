@@ -16,7 +16,6 @@ const TEST_CONFIG: PathValidationConfig = {
   pathPrefixes: ['.github/'],
   relatedAutomationPaths: ['scripts/build.sh'],
   relatedAutomationPrefixes: ['tools/'],
-  statusContext: 'test-validation',
 };
 
 describe('isSensitivePath edge cases', () => {

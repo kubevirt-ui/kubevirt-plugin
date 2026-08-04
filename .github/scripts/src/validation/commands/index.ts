@@ -60,7 +60,6 @@ export const main = async (): Promise<void> => {
       baseBranch,
       config,
       eventAction: AI_CONFIG_EVENT_ACTIONS.AI_APPROVED,
-      headSha,
       prNumber,
     });
   };
@@ -70,7 +69,6 @@ export const main = async (): Promise<void> => {
       baseBranch,
       config,
       eventAction: 'ci-approved',
-      headSha,
       prNumber,
     });
   };
@@ -80,7 +78,6 @@ export const main = async (): Promise<void> => {
       baseBranch,
       config,
       eventAction: 'i18n-approved',
-      headSha,
       prNumber,
     });
   };
@@ -108,7 +105,7 @@ export const main = async (): Promise<void> => {
   );
 
   for (const failure of failures) {
-    await reportCommandFailure(failure, config, headSha);
+    reportCommandFailure(failure);
   }
 
   if (failures.length > 0) {
@@ -117,24 +114,14 @@ export const main = async (): Promise<void> => {
 };
 
 if (require.main === module) {
-  void main().catch(async (err) => {
+  void main().catch((err) => {
     console.error(safeErrorMessage(err));
 
     // Reaching here means something failed *before* the per-command loop even
     // started (e.g. requireEnv('GITHUB_TOKEN') throwing because a bot-token
-    // generation step failed) -- nothing has been reported yet. Best-effort
-    // report it against every requested command via the ambient/status token,
-    // which doesn't depend on the credential that just failed.
-    const owner = process.env.REPO_OWNER;
-    const repo = process.env.REPO_NAME;
-    const statusToken = process.env.STATUS_GITHUB_TOKEN ?? process.env.GITHUB_TOKEN;
-
-    if (owner && repo && statusToken) {
-      const commands = parseCommand(process.env.COMMENT_BODY ?? '');
-      const config: GitHubConfig = { owner, repo, token: statusToken };
-      for (const command of commands) {
-        await reportCommandFailure({ command, error: err }, config, process.env.PR_HEAD_SHA);
-      }
+    // generation step failed). Log against every requested command for triage.
+    for (const command of parseCommand(process.env.COMMENT_BODY ?? '')) {
+      reportCommandFailure({ command, error: err });
     }
 
     process.exit(1);

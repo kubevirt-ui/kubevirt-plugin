@@ -17,11 +17,7 @@ const TEST_CONFIG: PathValidationConfig = {
   },
   labels: { alert: 'alert', block: 'block', reviewed: 'reviewed', skip: 'skip' },
   pathPrefixes: ['protected/'],
-  statusContext: 'test-validation',
 };
-
-const buildStatusDescription = (passed: boolean, hasSensitiveChanges: boolean): string =>
-  `passed=${passed} sensitive=${hasSensitiveChanges}`;
 
 type FakeOctokitOptions = {
   files: Array<{ filename: string; patch?: string }>;
@@ -77,9 +73,6 @@ const fakeOctokit = (options: FakeOctokitOptions, calls: Call[]): Octokit => {
       listFiles,
     },
     repos: {
-      createCommitStatus: async (args: { description: string; state: string }) => {
-        calls.push({ args, method: 'createCommitStatus' });
-      },
       // No OWNERS file mocked -- isListedInOwners fails closed (false) for
       // any non-bot actor, which is what the tests below rely on.
       getContent: async () => {
@@ -97,53 +90,43 @@ const buildCtx = (
   baseBranch: 'main',
   config: { owner: 'kubevirt-ui', repo: 'kubevirt-plugin', token: 'x' },
   event,
-  headSha: 'abc123',
   octokit,
   prNumber: 1,
   statusOctokit,
 });
 
-const statusesOf = (calls: Call[]): Array<{ description: string; state: string }> =>
-  calls
-    .filter((c) => c.method === 'createCommitStatus')
-    .map((c) => c.args as { description: string; state: string });
-
 describe('runPathValidation', () => {
-  it('passes with no sensitive changes -- alert/block removed, success status', async () => {
+  it('passes with no sensitive changes -- alert/block removed', async () => {
     const calls: Call[] = [];
     const octokit = fakeOctokit(
       { files: [{ filename: 'src/App.tsx' }], labels: ['alert', 'block'] },
       calls,
     );
 
-    const outcome = await runPathValidation(buildCtx(octokit), TEST_CONFIG, buildStatusDescription);
+    const outcome = await runPathValidation(buildCtx(octokit), TEST_CONFIG);
 
     assert.deepEqual(outcome, { kind: 'passed', sensitivePaths: [] });
     assert.equal(calls.filter((c) => c.method === 'removeLabel').length, 2);
-    const statuses = statusesOf(calls);
-    assert.equal(statuses.at(-1)?.state, 'success');
   });
 
-  it('fails with sensitive changes and no reviewed label -- alert+block added, failure status', async () => {
+  it('fails with sensitive changes and no reviewed label -- alert+block added', async () => {
     const calls: Call[] = [];
     const octokit = fakeOctokit({ files: [{ filename: 'protected/foo.ts' }], labels: [] }, calls);
 
-    const outcome = await runPathValidation(buildCtx(octokit), TEST_CONFIG, buildStatusDescription);
+    const outcome = await runPathValidation(buildCtx(octokit), TEST_CONFIG);
 
     assert.deepEqual(outcome, { kind: 'failed', sensitivePaths: ['protected/foo.ts'] });
     assert.equal(calls.filter((c) => c.method === 'addLabels').length, 2);
-    const statuses = statusesOf(calls);
-    assert.equal(statuses.at(-1)?.state, 'failure');
   });
 
-  it('passes with sensitive changes and the reviewed label present -- block removed, success status', async () => {
+  it('passes with sensitive changes and the reviewed label present -- block removed', async () => {
     const calls: Call[] = [];
     const octokit = fakeOctokit(
       { files: [{ filename: 'protected/foo.ts' }], labels: ['reviewed'] },
       calls,
     );
 
-    const outcome = await runPathValidation(buildCtx(octokit), TEST_CONFIG, buildStatusDescription);
+    const outcome = await runPathValidation(buildCtx(octokit), TEST_CONFIG);
 
     assert.deepEqual(outcome, { kind: 'passed', sensitivePaths: ['protected/foo.ts'] });
     assert.equal(
@@ -152,11 +135,9 @@ describe('runPathValidation', () => {
       ),
       true,
     );
-    const statuses = statusesOf(calls);
-    assert.equal(statuses.at(-1)?.state, 'success');
   });
 
-  it('skips when the skip label was applied by the approval bot -- also clears alert/block, success status', async () => {
+  it('skips when the skip label was applied by the approval bot -- also clears alert/block', async () => {
     const calls: Call[] = [];
     const octokit = fakeOctokit(
       {
@@ -167,7 +148,7 @@ describe('runPathValidation', () => {
       calls,
     );
 
-    const outcome = await runPathValidation(buildCtx(octokit), TEST_CONFIG, buildStatusDescription);
+    const outcome = await runPathValidation(buildCtx(octokit), TEST_CONFIG);
 
     assert.deepEqual(outcome, { kind: 'skipped' });
     // Block is cleared; alert stays (already present, and still sensitive).
@@ -177,8 +158,6 @@ describe('runPathValidation', () => {
       ),
       true,
     );
-    const statuses = statusesOf(calls);
-    assert.equal(statuses.at(-1)?.state, 'success');
   });
 
   it('does not skip when the skip label was applied by an untrusted actor -- recomputes as failed instead', async () => {
@@ -192,11 +171,9 @@ describe('runPathValidation', () => {
       calls,
     );
 
-    const outcome = await runPathValidation(buildCtx(octokit), TEST_CONFIG, buildStatusDescription);
+    const outcome = await runPathValidation(buildCtx(octokit), TEST_CONFIG);
 
     assert.deepEqual(outcome, { kind: 'failed', sensitivePaths: ['protected/foo.ts'] });
-    const statuses = statusesOf(calls);
-    assert.equal(statuses.at(-1)?.state, 'failure');
   });
 
   it('does not skip when the skip label\u2019s applying actor can\u2019t be determined (no matching labeled event) -- fails closed', async () => {
@@ -206,7 +183,7 @@ describe('runPathValidation', () => {
       calls,
     );
 
-    const outcome = await runPathValidation(buildCtx(octokit), TEST_CONFIG, buildStatusDescription);
+    const outcome = await runPathValidation(buildCtx(octokit), TEST_CONFIG);
 
     assert.deepEqual(outcome, { kind: 'failed', sensitivePaths: ['protected/foo.ts'] });
   });
@@ -221,7 +198,6 @@ describe('runPathValidation', () => {
     const outcome = await runPathValidation(
       buildCtx(octokit, { action: 'synchronize' }),
       TEST_CONFIG,
-      buildStatusDescription,
     );
 
     assert.deepEqual(outcome, { kind: 'failed', sensitivePaths: ['protected/foo.ts'] });
@@ -231,8 +207,6 @@ describe('runPathValidation', () => {
       ),
       true,
     );
-    const statuses = statusesOf(calls);
-    assert.equal(statuses.at(-1)?.state, 'failure');
   });
 
   it('clears a maintainer skip on synchronize with new sensitive changes -- bypass cannot be reused', async () => {
@@ -249,7 +223,6 @@ describe('runPathValidation', () => {
     const outcome = await runPathValidation(
       buildCtx(octokit, { action: 'synchronize' }),
       TEST_CONFIG,
-      buildStatusDescription,
     );
 
     assert.deepEqual(outcome, { kind: 'failed', sensitivePaths: ['protected/foo.ts'] });
@@ -257,8 +230,6 @@ describe('runPathValidation', () => {
       calls.some((c) => c.method === 'removeLabel' && (c.args as { name: string }).name === 'skip'),
       true,
     );
-    const statuses = statusesOf(calls);
-    assert.equal(statuses.at(-1)?.state, 'failure');
   });
 
   it('reads OWNERS via statusOctokit when provided, not the bot octokit', async () => {
@@ -293,11 +264,7 @@ describe('runPathValidation', () => {
         throw new Error('Not Found');
       };
 
-    await runPathValidation(
-      buildCtx(botOctokit, {}, statusOctokit),
-      TEST_CONFIG,
-      buildStatusDescription,
-    );
+    await runPathValidation(buildCtx(botOctokit, {}, statusOctokit), TEST_CONFIG);
 
     assert.equal(statusGetContent > 0, true);
     assert.equal(botGetContent, 0);
@@ -310,11 +277,7 @@ describe('runPathValidation', () => {
       calls,
     );
 
-    const outcome = await runPathValidation(
-      buildCtx(octokit, { action: 'opened' }),
-      TEST_CONFIG,
-      buildStatusDescription,
-    );
+    const outcome = await runPathValidation(buildCtx(octokit, { action: 'opened' }), TEST_CONFIG);
 
     assert.deepEqual(outcome, { kind: 'passed', sensitivePaths: ['protected/foo.ts'] });
     assert.equal(
@@ -342,19 +305,8 @@ describe('runPathValidation', () => {
     const outcome = await runPathValidation(
       { ...buildCtx(octokit), files: [{ filename: 'protected/foo.ts' }] },
       TEST_CONFIG,
-      buildStatusDescription,
     );
 
     assert.deepEqual(outcome, { kind: 'failed', sensitivePaths: ['protected/foo.ts'] });
-  });
-
-  it('reports an initial pending status before resolving', async () => {
-    const calls: Call[] = [];
-    const octokit = fakeOctokit({ files: [{ filename: 'src/App.tsx' }], labels: [] }, calls);
-
-    await runPathValidation(buildCtx(octokit), TEST_CONFIG, buildStatusDescription);
-
-    const statuses = statusesOf(calls);
-    assert.equal(statuses[0]?.state, 'pending');
   });
 });

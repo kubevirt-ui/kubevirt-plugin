@@ -4,7 +4,7 @@ import { getPrLabelNames, removeLabel } from '../../github-comments';
 import { getPullRequestFiles } from '../../github-repo';
 import type { GitHubConfig } from '../../types/index';
 import type { LabelSyncContext, PathValidationEvent } from './label-sync';
-import { reportCommitStatus, syncValidationLabels } from './label-sync';
+import { syncValidationLabels } from './label-sync';
 import { isLabelAppliedByTrustedActor } from './owners';
 import { getSensitivePaths } from './paths';
 import type { PathValidationConfig } from './types';
@@ -16,9 +16,9 @@ export type PathValidationContext = {
   event: PathValidationEvent;
   /** Pre-fetched changed files -- skips the internal getPullRequestFiles call so callers running multiple path validations for the same PR can share one fetch. */
   files?: Array<{ filename: string; patch?: string }>;
-  headSha?: string;
   octokit: Octokit;
   prNumber: number;
+  /** Ambient token for OWNERS / timeline reads -- the bot app token lacks contents:read. */
   statusOctokit?: Octokit;
 };
 
@@ -26,35 +26,22 @@ export type PathValidationOutcome =
   | { kind: 'failed' | 'passed'; sensitivePaths: string[] }
   | { kind: 'skipped' };
 
-export type BuildStatusDescription = (passed: boolean, hasSensitiveChanges: boolean) => string;
-
 /**
  * Run generic path-based sensitive-change validation for a pull request:
- * pending status -> fetch changed files -> compute sensitivity ->
- * skip-label short-circuit -> clear skip/reviewed on synchronize -> compute
- * passed -> sync labels -> final status. ai-config-validation and
- * ci-scripts-validation are both thin wrappers around this.
+ * fetch changed files -> compute sensitivity -> skip-label short-circuit ->
+ * clear skip/reviewed on synchronize -> compute passed -> sync labels.
+ * Merge blocking is via do-not-merge/* labels (Merge Gate), not commit statuses.
  */
 export const runPathValidation = async (
   ctx: PathValidationContext,
   pathConfig: PathValidationConfig,
-  buildStatusDescription: BuildStatusDescription,
   onFilesFetched?: (files: Array<{ filename: string; patch?: string }>) => void,
 ): Promise<PathValidationOutcome> => {
   const labelCtx: LabelSyncContext = {
     config: ctx.config,
-    headSha: ctx.headSha,
     octokit: ctx.octokit,
     prNumber: ctx.prNumber,
-    statusOctokit: ctx.statusOctokit,
   };
-
-  await reportCommitStatus(
-    labelCtx,
-    pathConfig,
-    'pending',
-    `${pathConfig.displayName} in progress…`,
-  );
 
   const files =
     ctx.files ??
@@ -74,9 +61,6 @@ export const runPathValidation = async (
     ctx.prNumber,
   );
 
-  // statusOctokit (ambient token) for OWNERS / timeline reads -- the bot
-  // app token lacks contents:read. Fall back to octokit when only one client
-  // was supplied.
   const ownersOctokit = ctx.statusOctokit ?? ctx.octokit;
 
   // A prior skip/reviewed must not survive a new push of sensitive changes
@@ -119,14 +103,8 @@ export const runPathValidation = async (
     ))
   ) {
     // Clear alert/block too -- otherwise "do-not-merge/*-review" stays
-    // applied even though the status now reports success.
+    // applied even though validation is skipped.
     await syncValidationLabels(labelCtx, pathConfig, true, hasSensitiveChanges);
-    await reportCommitStatus(
-      labelCtx,
-      pathConfig,
-      'success',
-      `${pathConfig.displayName} skipped (${pathConfig.labels.skip})`,
-    );
     return { kind: 'skipped' };
   }
 
@@ -134,12 +112,6 @@ export const runPathValidation = async (
   const passed = !hasSensitiveChanges || reviewed;
 
   await syncValidationLabels(labelCtx, pathConfig, passed, hasSensitiveChanges);
-  await reportCommitStatus(
-    labelCtx,
-    pathConfig,
-    passed ? 'success' : 'failure',
-    buildStatusDescription(passed, hasSensitiveChanges),
-  );
 
   return {
     kind: passed ? 'passed' : 'failed',
