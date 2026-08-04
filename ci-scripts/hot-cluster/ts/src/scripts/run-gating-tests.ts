@@ -10,6 +10,8 @@ import { execFileSync, execSync } from 'node:child_process';
 
 import { requireEnv } from '../utils';
 
+import { parseTestArgs } from './parse-test-args';
+
 /** Playwright (main) TEST_PROJECT → playwright-runner-hc-e2e.sh project name. */
 const PLAYWRIGHT_PROJECT_BY_TEST_PROJECT: Record<string, string> = {
   all: 'all',
@@ -25,18 +27,6 @@ const PLAYWRIGHT_PROJECT_BY_TEST_PROJECT: Record<string, string> = {
 const CYPRESS_TEST_PROJECTS: Record<string, string> = {
   features: 'tests/tier1.cy.ts',
   gating: 'tests/gating.cy.ts',
-};
-
-/** Strip zero-width / bidi marks that may ride along in TEST_ARGS from PR comments. */
-const sanitizeTestArg = (value: string): string =>
-  value.replace(/[\u200B-\u200F\u202A-\u202E\u2060\uFEFF]/g, '');
-
-const parseTestArgs = (raw: string): string[] => {
-  const trimmed = sanitizeTestArg(raw).trim();
-  if (!trimmed) {
-    return [];
-  }
-  return trimmed.split(/\s+/).map(sanitizeTestArg).filter(Boolean);
 };
 
 const resolvePlaywrightProject = (testProject: string): string => {

@@ -31,7 +31,7 @@ on:
       test_args:
         description: |
           Optional Playwright filter forwarded as CLI args (space-separated), e.g.
-          a spec path (playwright/tests/tier1/foo.spec.ts) or -g MyTestName.
+          a spec path (playwright/tests/tier1/foo.spec.ts) or -g "My Test Name".
           Leave empty to run the full selected suite.
         required: false
         default: ''

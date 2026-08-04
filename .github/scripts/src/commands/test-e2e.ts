@@ -9,6 +9,7 @@
  *   /test-e2e suite
  *   /test-e2e tier1 playwright/tests/tier1/foo.spec.ts
  *   /test-e2e gating -g MyTestName
+ *   /test-e2e tier1 -g "VM Search Language"
  *
  * Entry point: npx tsx src/commands/test-e2e.ts
  *
@@ -65,6 +66,7 @@ const main = async (): Promise<void> => {
           '- `/test-e2e suite`',
           '- `/test-e2e tier1 playwright/tests/tier1/foo.spec.ts`',
           '- `/test-e2e gating -g MyTestName`',
+          '- `/test-e2e tier1 -g "VM Search Language"`',
         ].join('\n'),
         issue_number: prNumber,
         owner,
