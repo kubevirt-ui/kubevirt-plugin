@@ -24,14 +24,12 @@ const RecommendedCapabilitiesTab: FC = () => {
     <CapabilitiesDataProvider>
       <Stack hasGutter>
         <StackItem className="recommended-capabilities-tab__title">
-          <Title headingLevel="h2">{t('Install virtualization capabilities')}</Title>
+          <Title headingLevel="h2">{t('Manage Virtualization capabilities')}</Title>
         </StackItem>
         <StackItem className="recommended-capabilities-tab__card">
           <Card>
             <CardHeader>
-              <CardTitle>
-                {t('Automatically install and configure virtualization capabilities')}
-              </CardTitle>
+              <CardTitle>{t('Install capabilities automatically')}</CardTitle>
             </CardHeader>
             <CardBody>
               <CustomSelectionView />
@@ -41,7 +39,7 @@ const RecommendedCapabilitiesTab: FC = () => {
         <StackItem className="recommended-capabilities-tab__card">
           <Card>
             <CardHeader>
-              <CardTitle>{t('Additional recommended capabilities to manually manage')}</CardTitle>
+              <CardTitle>{t('Additional capabilities (manual setup required)')}</CardTitle>
             </CardHeader>
             <CardBody>
               <ManualCapabilitiesTable />

@@ -1,4 +1,5 @@
 import React, { FC, Suspense } from 'react';
+import { Trans } from 'react-i18next';
 
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
@@ -36,9 +37,14 @@ const ReviewRecommendationModal: FC<ReviewRecommendationModalProps> = ({
 
   return (
     <TabModal
-      headerDescription={t(
-        'Review the recommended settings for this operator. Apply to switch to recommended configuration, or close to keep your manual configuration.',
-      )}
+      headerDescription={
+        <Content component={ContentVariants.p}>
+          <Trans t={t}>
+            Review the settings for this operator. Click <strong>Apply</strong> to use the
+            recommended configuration, or <strong>Cancel</strong> to keep your current setup.
+          </Trans>
+        </Content>
+      }
       headerText={t('Recommended settings for {{name}}', { name: operatorDisplayName })}
       isOpen={isOpen}
       modalVariant={ModalVariant.large}
@@ -57,7 +63,7 @@ const ReviewRecommendationModal: FC<ReviewRecommendationModalProps> = ({
           </div>
         </GridItem>
         <GridItem span={6}>
-          <Content component={ContentVariants.h4}>{t('Managed by autopilot')}</Content>
+          <Content component={ContentVariants.h4}>{t('Recommended configuration')}</Content>
           <div className="review-recommendation-modal__editor">
             <Suspense fallback={<Loading />}>
               <YAMLEditor minHeight="350px" options={EDITOR_OPTIONS} value={recommendedYAML} />
