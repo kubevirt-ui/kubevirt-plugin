@@ -21,11 +21,15 @@ export type ParsedTestE2ECommand = {
   testProject: TestE2EProject;
 };
 
+/** Strip zero-width / bidi marks that GitHub or editors may inject into copied paths. */
+export const sanitizeTestE2EArg = (value: string): string =>
+  value.replace(/[\u200B-\u200F\u202A-\u202E\u2060\uFEFF]/g, '');
+
 /** Parse `/test-e2e <suite> [args…]` from a PR comment body (first matching line). */
 export const parseTestE2ECommand = (commentBody: string): null | ParsedTestE2ECommand => {
   const line = commentBody
     .split(/\r?\n/)
-    .map((entry) => entry.trim())
+    .map((entry) => sanitizeTestE2EArg(entry).trim())
     .find((entry) => entry.startsWith('/test-e2e'));
   if (!line) {
     return null;

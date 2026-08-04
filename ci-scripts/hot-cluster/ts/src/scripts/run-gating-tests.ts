@@ -27,12 +27,16 @@ const CYPRESS_TEST_PROJECTS: Record<string, string> = {
   gating: 'tests/gating.cy.ts',
 };
 
+/** Strip zero-width / bidi marks that may ride along in TEST_ARGS from PR comments. */
+const sanitizeTestArg = (value: string): string =>
+  value.replace(/[\u200B-\u200F\u202A-\u202E\u2060\uFEFF]/g, '');
+
 const parseTestArgs = (raw: string): string[] => {
-  const trimmed = raw.trim();
+  const trimmed = sanitizeTestArg(raw).trim();
   if (!trimmed) {
     return [];
   }
-  return trimmed.split(/\s+/);
+  return trimmed.split(/\s+/).map(sanitizeTestArg).filter(Boolean);
 };
 
 const resolvePlaywrightProject = (testProject: string): string => {

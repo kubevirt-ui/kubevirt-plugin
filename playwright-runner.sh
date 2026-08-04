@@ -8,7 +8,11 @@
 # Examples:
 #   ./playwright-runner.sh Gating
 #   ./playwright-runner.sh suite --workers=4
+#   ./playwright-runner.sh Tier1 playwright/tests/tier1/foo.spec.ts
 #   ./playwright-runner.sh all
+#
+# Note: --project=Name (equals form) is required so Playwright's variadic
+# --project option does not swallow file-path / -g filter args.
 # ────────────────────────────────────────────────────────────────────────────
 set -euo pipefail
 
@@ -73,7 +77,7 @@ PROJECT_LOWER=$(echo "${PROJECT}" | tr '[:upper:]' '[:lower:]')
 
 if [[ "${PROJECT_LOWER}" == "suite" ]]; then
   echo "🚀 Running suite: Gating + Tier1 + Tier2..."
-  npx playwright test --project Gating --project Tier1 --project Tier2 "${EXTRA_ARGS[@]}"
+  npx playwright test --project=Gating --project=Tier1 --project=Tier2 "${EXTRA_ARGS[@]}"
 elif [[ "${PROJECT_LOWER}" == "all" ]]; then
   PROJECTS=(
     Gating
@@ -84,11 +88,11 @@ elif [[ "${PROJECT_LOWER}" == "all" ]]; then
   )
   PROJECT_ARGS=()
   for p in "${PROJECTS[@]}"; do
-    PROJECT_ARGS+=(--project "${p}")
+    PROJECT_ARGS+=(--project="${p}")
   done
   echo "🚀 Running all projects..."
   npx playwright test "${PROJECT_ARGS[@]}" "${EXTRA_ARGS[@]}"
 else
   echo "🚀 Running project: ${PROJECT}..."
-  npx playwright test --project "${PROJECT}" "${EXTRA_ARGS[@]}"
+  npx playwright test --project="${PROJECT}" "${EXTRA_ARGS[@]}"
 fi
