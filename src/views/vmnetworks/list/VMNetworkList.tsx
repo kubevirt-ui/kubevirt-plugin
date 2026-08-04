@@ -1,14 +1,12 @@
 import React, { FC, useMemo } from 'react';
 
+import KubevirtFilterToolbar from '@kubevirt-utils/components/KubevirtFilterToolbar/KubevirtFilterToolbar';
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
 import StateHandler from '@kubevirt-utils/components/StateHandler/StateHandler';
+import useKubevirtDataViewFilters from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/useKubevirtDataViewFilters';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import {
-  ListPageBody,
-  ListPageFilter,
-  useListPageFilter,
-} from '@openshift-console/dynamic-plugin-sdk';
+import { ListPageBody } from '@openshift-console/dynamic-plugin-sdk';
 
 import useVMNetworks from '../hooks/useVMNetworks';
 
@@ -22,16 +20,29 @@ type VMNetworkListProps = {
 const VMNetworkList: FC<VMNetworkListProps> = ({ onCreate }) => {
   const { t } = useKubevirtTranslation();
   const [vmNetworks, loaded, error] = useVMNetworks();
-  const [data, filteredData, onFilterChange] = useListPageFilter(vmNetworks);
+  const { clearAllFilters, filteredData, filters, onSetFilters } = useKubevirtDataViewFilters({
+    data: vmNetworks ?? [],
+  });
   const columns = useMemo(() => getVMNetworkListColumns(t), [t]);
 
   return (
-    <StateHandler error={error} hasData={!!data} loaded={loaded} showSkeletonLoading withBullseye>
-      {loaded && isEmpty(data) ? (
+    <StateHandler
+      error={error}
+      hasData={!!vmNetworks}
+      loaded={loaded}
+      showSkeletonLoading
+      withBullseye
+    >
+      {loaded && isEmpty(vmNetworks) ? (
         <LocalnetEmptyState onCreate={onCreate} />
       ) : (
         <ListPageBody>
-          <ListPageFilter data={data} loaded={loaded} onFilterChange={onFilterChange} />
+          <KubevirtFilterToolbar
+            clearAllFilters={clearAllFilters}
+            filters={filters}
+            loaded={loaded}
+            onSetFilters={onSetFilters}
+          />
           <KubevirtTable
             ariaLabel={t('VM Networks table')}
             columns={columns}
@@ -43,7 +54,7 @@ const VMNetworkList: FC<VMNetworkListProps> = ({ onCreate }) => {
             loaded={loaded}
             loadError={error}
             persistSortInUrl
-            unfilteredData={data}
+            unfilteredData={vmNetworks}
           />
         </ListPageBody>
       )}

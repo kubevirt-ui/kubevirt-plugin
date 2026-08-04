@@ -1,8 +1,9 @@
 import React, { FC, useMemo } from 'react';
 
+import KubevirtFilterToolbar from '@kubevirt-utils/components/KubevirtFilterToolbar/KubevirtFilterToolbar';
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
 import { buildColumnLayout } from '@kubevirt-utils/components/KubevirtTable/utils';
-import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
+import useKubevirtDataViewFilters from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/useKubevirtDataViewFilters';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtTableColumns';
 import useNamespaceParam from '@kubevirt-utils/hooks/useNamespaceParam';
@@ -22,7 +23,6 @@ import {
   ListPageBody,
   ListPageHeader,
   useK8sWatchResource,
-  useListPageFilter,
 } from '@openshift-console/dynamic-plugin-sdk';
 import { Pagination, Tab, Tabs, TabTitleText } from '@patternfly/react-core';
 
@@ -75,10 +75,16 @@ const QuotasList: FC = () => {
 
   const showEmptyState = loaded && !loadError && isEmpty(quotas);
 
-  const [unfilteredData, filteredData, onFilterChange] = useListPageFilter(quotas);
+  const { clearAllFilters, filteredData, filters, onSetFilters } = useKubevirtDataViewFilters({
+    data: quotas ?? [],
+  });
 
-  const { handleFilterChange, handlePerPageSelect, handleSetPage, pagination } =
-    usePaginationWithFilters(filteredData?.length ?? 0, onFilterChange);
+  const {
+    handlePerPageSelect,
+    handleSetPage,
+    pagination,
+    handleFilterChange: handleSetFilters,
+  } = usePaginationWithFilters(filteredData?.length ?? 0, onSetFilters);
 
   const columns = useMemo(
     () => getQuotaColumns(t, namespace, activeTab, calculationMethod),
@@ -147,11 +153,16 @@ const QuotasList: FC = () => {
         ) : (
           <>
             <div className="list-managment-group">
-              <ListPageFilter
+              <KubevirtFilterToolbar
+                clearAllFilters={clearAllFilters}
+                columnLayout={columnLayout}
+                data={quotas}
+                filters={filters}
+                loaded={isLoaded}
+                onSetFilters={handleSetFilters}
                 toolbarEndContent={
                   <KubevirtTableExport<ApplicationAwareQuota, QuotaCallbacks>
                     activeColumnKeys={activeColumnKeys}
-                    asToolbarItem
                     callbacks={callbacks}
                     columns={columns}
                     data={filteredData ?? []}
@@ -159,10 +170,6 @@ const QuotasList: FC = () => {
                     loaded={isLoaded}
                   />
                 }
-                columnLayout={columnLayout}
-                data={unfilteredData}
-                loaded={isLoaded}
-                onFilterChange={handleFilterChange}
               />
               {!isEmpty(filteredData) && isLoaded && (
                 <Pagination
@@ -191,7 +198,7 @@ const QuotasList: FC = () => {
               noFilteredDataMsg={t('No application-aware quotas found')}
               pagination={pagination}
               persistSortInUrl
-              unfilteredData={unfilteredData}
+              unfilteredData={quotas}
             />
           </>
         )}
