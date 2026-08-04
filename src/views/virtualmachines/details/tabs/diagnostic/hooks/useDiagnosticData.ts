@@ -8,6 +8,7 @@ import {
   V1VirtualMachineCondition,
   V1VolumeSnapshotStatus,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { CLOUDINITDISK } from '@kubevirt-utils/constants/constants';
 import { getCluster } from '@multicluster/helpers/selectors';
 import useKubevirtWatchResources from '@multicluster/hooks/useKubevirtWatchResources';
 import { FleetWatchK8sResults } from '@stolostron/multicluster-sdk';
@@ -59,7 +60,7 @@ const volumeSnapshotStatusesTransformer = (
         type: DiagnosticCategory.Storage,
       },
       reason,
-      severity: getSnapshotSeverity(vss?.enabled),
+      severity: vss?.name === CLOUDINITDISK ? 'healthy' : getSnapshotSeverity(vss?.enabled),
       status: vss?.enabled,
     };
   });
