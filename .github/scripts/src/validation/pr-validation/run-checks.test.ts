@@ -5,7 +5,10 @@ import { HandledValidationError } from '../pr-path-validation/errors';
 import type { PrValidationCheck } from './run-checks';
 import { runChecksIsolated } from './run-checks';
 
-const buildCheck = (name: string, overrides: Partial<PrValidationCheck> = {}): PrValidationCheck => ({
+const buildCheck = (
+  name: string,
+  overrides: Partial<PrValidationCheck> = {},
+): PrValidationCheck => ({
   name,
   run: async () => {},
   ...overrides,

@@ -196,7 +196,9 @@ describe('approveI18n', () => {
 
     const addLabels = botCalls.find((c) => c.method === 'addLabels');
     assert.ok(addLabels);
-    assert.deepEqual((addLabels.args as { labels: string[] }).labels, [I18N_CONFIG.labels.reviewed]);
+    assert.deepEqual((addLabels.args as { labels: string[] }).labels, [
+      I18N_CONFIG.labels.reviewed,
+    ]);
     const reaction = botCalls.find((c) => c.method === 'createForIssueComment');
     assert.equal((reaction?.args as { content: string }).content, '+1');
   });

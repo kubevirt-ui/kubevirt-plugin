@@ -7,13 +7,7 @@ import { processCommands, reportCommandFailure } from './process';
 // CommandHandlers is an exhaustive Record -- unused here, but every fixture needs a stub.
 const NOOP_NEW_HANDLERS: Pick<
   CommandHandlers,
-  | 'approve-cancel'
-  | 'approve'
-  | 'hold-cancel'
-  | 'hold'
-  | 'i18n-approved'
-  | 'lgtm-cancel'
-  | 'lgtm'
+  'approve-cancel' | 'approve' | 'hold-cancel' | 'hold' | 'i18n-approved' | 'lgtm-cancel' | 'lgtm'
 > = {
   approve: async () => {},
   'approve-cancel': async () => {},
