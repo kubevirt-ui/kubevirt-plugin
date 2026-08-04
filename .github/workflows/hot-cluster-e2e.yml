@@ -235,13 +235,12 @@ jobs:
           private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
           permission-checks: write
 
-      # Only the required gating suite owns "Run Gating Tests". Ad-hoc
-      # tier1/tier2/suite/filter runs must not supersede that check.
       - name: Supersede stale "Run Gating Tests" check for this run
         id: supersede-gating-check
         if: |
           always() &&
-          (inputs.test_project == 'gating' || inputs.test_project == '') &&
+          (inputs.test_project || 'gating') == 'gating' &&
+          !inputs.test_args &&
           steps.resolve-progress.outputs.head-sha != '' &&
           !(github.event_name == 'workflow_dispatch' && inputs.pr_number == '') &&
           steps.resolve-pr-context.outcome != 'failure' &&
@@ -433,7 +432,6 @@ jobs:
           GATING_CHECK_RUN_ID: ${{ needs.prepare.outputs.gating_check_run_id }}
           JOB_STATUS: ${{ job.status }}
           TEST_FAILURE_SUMMARY: ${{ needs.run-e2e-tests.outputs.test_failure_summary }}
-          # Non-gating suites must not publish/overwrite "Run Gating Tests".
           TEST_PROJECT: ${{ inputs.test_project || 'gating' }}
           TEST_ARGS: ${{ inputs.test_args || '' }}
         working-directory: .github/scripts

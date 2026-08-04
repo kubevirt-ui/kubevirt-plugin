@@ -28,7 +28,6 @@ const PLAYWRIGHT_PROJECT_BY_TEST_PROJECT: Record<string, string> = {
   tier2: 'Tier2',
 };
 
-/** Split TEST_ARGS on whitespace for safe argv forwarding (no shell). */
 const parseTestArgs = (raw: string): string[] => {
   const trimmed = raw.trim();
   if (!trimmed) {

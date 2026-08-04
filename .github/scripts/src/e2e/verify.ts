@@ -22,6 +22,7 @@ import { Octokit } from '@octokit/rest';
 import { requireEnv } from '../utils';
 
 import { getRepoContext, getRunUrl } from '../shared/actions-context';
+import { isRequiredGatingSuite } from '../shared/is-required-gating-suite';
 import { E2E_HOLD_LABEL } from '../shared/merge-pool';
 import { failStep, setOutput } from '../shared/output';
 import { mapResultDetails, type VerifyReason } from './result-mapper';
@@ -69,10 +70,8 @@ const main = async (): Promise<void> => {
 
   const testProject = (process.env.TEST_PROJECT ?? 'gating').toLowerCase();
   const testArgs = (process.env.TEST_ARGS ?? '').trim();
-  const isGatingSuite = testProject === 'gating';
+  const isGatingSuite = isRequiredGatingSuite(testProject, testArgs);
 
-  // Ad-hoc /test-e2e tier1|tier2|suite|filter runs must not overwrite the
-  // required "Run Gating Tests" check or e2e-passed/e2e-failed labels.
   if (!isGatingSuite) {
     const suiteLabel = testArgs ? `${testProject} (${testArgs})` : testProject;
     const passed = reason === 'passed';

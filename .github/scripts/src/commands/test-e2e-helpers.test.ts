@@ -45,16 +45,9 @@ describe('parseTestE2ECommand', () => {
 });
 
 describe('buildTestE2EReport', () => {
-  it('warns that non-gating suites do not update Run Gating Tests', () => {
-    const body = buildTestE2EReport('o', 'r', 'tier1', '');
-    assert.match(body, /does \*\*not\*\* update/);
-    assert.match(body, /tier1/);
-  });
-
-  it('omits the ad-hoc warning for gating', () => {
-    const body = buildTestE2EReport('o', 'r', 'gating', '-g Foo');
-    assert.doesNotMatch(body, /does \*\*not\*\* update/);
-    assert.match(body, /gating/);
-    assert.match(body, /-g Foo/);
+  it('warns for ad-hoc runs and omits the warning for unfiltered gating', () => {
+    assert.match(buildTestE2EReport('o', 'r', 'tier1', ''), /does \*\*not\*\* update/);
+    assert.match(buildTestE2EReport('o', 'r', 'gating', '-g Foo'), /does \*\*not\*\* update/);
+    assert.doesNotMatch(buildTestE2EReport('o', 'r', 'gating', ''), /does \*\*not\*\* update/);
   });
 });

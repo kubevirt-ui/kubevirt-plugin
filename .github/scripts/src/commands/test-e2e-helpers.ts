@@ -1,5 +1,6 @@
 import type { Octokit } from '@octokit/rest';
 
+import { isRequiredGatingSuite } from '../shared/is-required-gating-suite';
 import { failStep, setOutput } from '../shared/output';
 
 export const VALID_TEST_E2E_PROJECTS = [
@@ -56,7 +57,7 @@ export const buildTestE2EReport = (
   const suiteLabel = testArgs ? `\`${testProject}\` with \`${testArgs}\`` : `\`${testProject}\``;
   const lines = [`🚀 \`/test-e2e\` dispatched Hot Cluster E2E for ${suiteLabel} on this PR.`, ''];
 
-  if (testProject !== 'gating') {
+  if (!isRequiredGatingSuite(testProject, testArgs)) {
     lines.push(
       '> This is an ad-hoc suite run — it does **not** update the required **Run Gating Tests** check.',
       '',
