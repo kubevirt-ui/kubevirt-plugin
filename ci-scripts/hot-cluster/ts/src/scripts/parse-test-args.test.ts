@@ -22,9 +22,8 @@ describe('parseTestArgs', () => {
   });
 
   it('preserves spec paths and strips invisible bidi marks', () => {
-    assert.deepEqual(
-      parseTestArgs('playwright/tests/tier1/foo.spec.ts\u200e'),
-      ['playwright/tests/tier1/foo.spec.ts'],
-    );
+    assert.deepEqual(parseTestArgs('playwright/tests/tier1/foo.spec.ts\u200e'), [
+      'playwright/tests/tier1/foo.spec.ts',
+    ]);
   });
 });

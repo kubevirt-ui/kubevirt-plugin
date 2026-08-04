@@ -32,9 +32,7 @@ describe('parseTestE2ECommand', () => {
 
   it('strips invisible bidi / zero-width marks from copied spec paths', () => {
     assert.deepEqual(
-      parseTestE2ECommand(
-        '/test-e2e tier1 playwright/tests/tier1/foo.spec.ts\u200e',
-      ),
+      parseTestE2ECommand('/test-e2e tier1 playwright/tests/tier1/foo.spec.ts\u200e'),
       {
         testArgs: 'playwright/tests/tier1/foo.spec.ts',
         testProject: 'tier1',
