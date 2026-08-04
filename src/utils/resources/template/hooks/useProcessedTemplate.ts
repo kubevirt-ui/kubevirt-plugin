@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { ProcessedTemplatesModel, V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { ProcessedTemplatesModel, type V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { kubevirtK8sCreate } from '@multicluster/k8sRequests';
@@ -16,11 +16,11 @@ import { generateParamsWithPrettyName } from './../utils/helpers';
 export const useProcessedTemplate = (
   template: V1Template,
   namespace: string = DEFAULT_NAMESPACE,
-): [V1Template, boolean, any] => {
+): [V1Template, boolean, Error | undefined] => {
   const cluster = useClusterParam();
   const [processedTemplate, setProcessedTemplate] = useState<undefined | V1Template>(undefined);
   const [loaded, setLoaded] = useState(false);
-  const [error, setError] = useState<any>();
+  const [error, setError] = useState<Error | undefined>();
   useEffect(() => {
     setLoaded(false);
 

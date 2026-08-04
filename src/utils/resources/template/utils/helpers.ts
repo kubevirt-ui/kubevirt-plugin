@@ -2,25 +2,25 @@ import produce from 'immer';
 
 import {
   TemplateModel,
-  TemplateParameter,
-  V1Template,
+  type TemplateParameter,
+  type V1Template,
   VirtualMachineTemplateModel,
 } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { V1beta1VirtualMachineTemplateSpecParameters } from '@kubevirt-ui-ext/kubevirt-api/virt-template';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1beta1VirtualMachineTemplateSpecParameters } from '@kubevirt-ui-ext/kubevirt-api/virt-template';
 import { logTemplateEdited } from '@kubevirt-utils/extensions/telemetry/templates';
 import { getAnnotation, getLabels, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import {
   isOpenShiftTemplate,
   isVirtualMachineTemplate,
-  Template,
+  type Template,
 } from '@kubevirt-utils/resources/template';
 import { vmBootDiskSourceIsRegistry } from '@kubevirt-utils/resources/vm/utils/source';
 import { generatePrettyName } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sUpdate } from '@multicluster/k8sRequests';
-import { K8sModel } from '@openshift-console/dynamic-plugin-sdk';
+import { type K8sModel } from '@openshift-console/dynamic-plugin-sdk';
 
 import { ANNOTATIONS } from './annotations';
 import {
@@ -31,17 +31,15 @@ import {
 import { getParameters, getTemplatePVCName, getTemplateVirtualMachineObject } from './selectors';
 
 // Only used for replacing parameters in the template, do not use for anything else
-// eslint-disable-next-line jsdoc/require-jsdoc
 export const poorManProcess = (template: V1Template): V1Template => {
   if (!template) return null;
 
   let templateString = JSON.stringify(template);
 
-  template?.parameters
-    ?.filter((p) => p.value)
-    ?.forEach((p) => {
-      templateString = templateString.replaceAll(`\${${p?.name}}`, p?.value);
-    });
+  const filteredParams = template?.parameters?.filter((param) => param.value) ?? [];
+  for (const param of filteredParams) {
+    templateString = templateString.replaceAll(`\${${param?.name}}`, param?.value);
+  }
 
   return JSON.parse(templateString);
 };
@@ -78,20 +76,21 @@ export const generateVMName = (template: Template): string => {
   return generatePrettyName(getTemplatePVCName(template) || template?.metadata?.name);
 };
 
-export const generateVMNamePrettyParam = (template: Template): TemplateParameter => {
+export const generateVMNamePrettyParam = (template: Template): TemplateParameter | undefined => {
   if (getAnnotation(template, GENERATE_VM_PRETTY_NAME_ANNOTATION)) {
     return { description: 'VM name', name: 'NAME', value: generateVMName(template) };
   }
 };
 
-export const generateParamsWithPrettyName = (template: Template) => {
+export const generateParamsWithPrettyName = (template: Template): TemplateParameter[] => {
   const parameters = getParameters(template);
   if (parameters) {
-    const [nameParam, ...restParams] = parameters?.reduce(
-      (acc: TemplateParameter[], param) =>
-        (param?.name === 'NAME' ? acc.unshift(param) : acc.push(param)) && acc,
+    const sorted = parameters?.reduce<TemplateParameter[]>(
+      (acc, param) => (param?.name === 'NAME' ? acc.unshift(param) : acc.push(param)) && acc,
       [],
     );
+    const [nameParam, ...restParams] = sorted;
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     return [...restParams, generateVMNamePrettyParam(template) ?? nameParam];
   }
   return [];
@@ -100,7 +99,7 @@ export const generateParamsWithPrettyName = (template: Template) => {
 export const replaceTemplateParameters = (
   template: Template,
   parameters: TemplateParameter[] | V1beta1VirtualMachineTemplateSpecParameters[],
-) =>
+): Template =>
   produce(template, (draftTemplate) => {
     if (isOpenShiftTemplate(draftTemplate)) draftTemplate.parameters = parameters;
     if (isVirtualMachineTemplate(draftTemplate))
@@ -111,7 +110,7 @@ export const createTemplateDraft = (
   template: Template,
   namespace: string,
   parameters: TemplateParameter[] | V1beta1VirtualMachineTemplateSpecParameters[],
-) =>
+): Template =>
   produce(template, (draftTemplate) => {
     if (isOpenShiftTemplate(draftTemplate)) draftTemplate.parameters = parameters;
     if (isVirtualMachineTemplate(draftTemplate))
@@ -120,49 +119,17 @@ export const createTemplateDraft = (
     draftTemplate.metadata = { ...draftTemplate.metadata, namespace };
   });
 
-export const bootDiskSourceIsRegistry = (template: V1Template) => {
+export const bootDiskSourceIsRegistry = (template: V1Template): boolean => {
   const vmObject: V1VirtualMachine = getTemplateVirtualMachineObject(template);
   return vmBootDiskSourceIsRegistry(vmObject);
 };
 
-const canParseUrl = (url: string): boolean => {
-  if (URL?.canParse) {
-    return URL.canParse(url);
-  }
-  try {
-    new URL(url);
-    return true;
-  } catch {
-    return false;
-  }
-};
-
-export const isValidTemplateIconUrl = (url: string): boolean => {
-  if (!url) return false;
-
-  // Allow relative paths starting with /
-  if (/^\/[^/]/.test(url)) {
-    return true;
-  }
-
-  // For absolute URLs, validate using canParseUrl helper and check protocol
-  if (canParseUrl(url)) {
-    try {
-      const parsedUrl = new URL(url);
-      // Only allow http, https protocols (block javascript:, data:, vbscript:, etc.)
-      return ['http:', 'https:'].includes(parsedUrl.protocol);
-    } catch {
-      return false;
-    }
-  }
-
-  return false;
-};
+export { createProcessedTemplate } from './processTemplate';
 
 export const getTemplateModel = (template: Template): K8sModel =>
   isVirtualMachineTemplate(template) ? VirtualMachineTemplateModel : TemplateModel;
 
-export const updateTemplate = async (template: Template) => {
+export const updateTemplate = async (template: Template): Promise<Template> => {
   const model = getTemplateModel(template);
   const result = await kubevirtK8sUpdate({
     cluster: getCluster(template),
@@ -174,3 +141,5 @@ export const updateTemplate = async (template: Template) => {
   logTemplateEdited(template);
   return result;
 };
+
+export { isValidTemplateIconUrl } from './templateUrlValidation';

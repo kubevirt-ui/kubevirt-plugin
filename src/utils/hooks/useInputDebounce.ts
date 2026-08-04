@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { type MutableRefObject, useEffect, useRef, useState } from 'react';
 
 import { useURLParams } from '@kubevirt-utils/hooks/useURLParams';
 
@@ -20,38 +20,40 @@ export const useInputDebounce = ({
   initialValue?: string;
   onChange?: (value: string) => void;
   updateURLParam?: string;
-}) => {
-  let typingTimer: null | ReturnType<typeof setTimeout> = null;
+}): { inputRef: MutableRefObject<HTMLInputElement>; resetValue: () => void; value: string } => {
+  const typingTimerRef = useRef<null | ReturnType<typeof setTimeout>>(null);
 
   const { params, setParam } = useURLParams();
   const [value, setValue] = useState<string>();
   const param = params.get(updateURLParam);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // eslint-disable-next-line jsdoc/require-jsdoc
-  const updateValue = (v: string) => {
-    setValue(v || '');
+  const updateValue = (newValue: string): void => {
+    setValue(newValue ?? '');
     if (updateURLParam) {
-      setParam(updateURLParam, v);
+      setParam(updateURLParam, newValue);
     }
     if (onChange) {
-      onChange(v);
+      onChange(newValue);
     }
   };
 
-  // eslint-disable-next-line jsdoc/require-jsdoc
-  const resetValue = () => {
+  const resetValue = (): void => {
     setValue('');
     if (inputRef?.current?.value) {
       inputRef.current.value = '';
     }
   };
 
-  useEventListener('keydown', () => clearTimeout(typingTimer));
-  useEventListener('keyup', () => {
-    clearTimeout(typingTimer);
-    typingTimer = setTimeout(() => updateValue(inputRef.current?.value || ''), delay);
-  });
+  useEventListener('keydown', () => clearTimeout(typingTimerRef.current), inputRef);
+  useEventListener(
+    'keyup',
+    () => {
+      clearTimeout(typingTimerRef.current);
+      typingTimerRef.current = setTimeout(() => updateValue(inputRef.current?.value ?? ''), delay);
+    },
+    inputRef,
+  );
 
   useEffect(() => {
     if (updateURLParam) {

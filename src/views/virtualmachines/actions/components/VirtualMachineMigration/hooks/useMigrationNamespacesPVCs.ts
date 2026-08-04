@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 
 import { PersistentVolumeClaimModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import useDeepCompareMemoize from '@kubevirt-utils/hooks/useDeepCompareMemoize/useDeepCompareMemoize';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { getCluster } from '@multicluster/helpers/selectors';
@@ -10,11 +10,11 @@ import { kubevirtK8sListItems } from '@multicluster/k8sRequests';
 
 type UseMigrationNamespacesPVCs = (
   vms: V1VirtualMachine[],
-) => [IoK8sApiCoreV1PersistentVolumeClaim[], boolean, any];
+) => [IoK8sApiCoreV1PersistentVolumeClaim[], boolean, Error | null];
 
 const useMigrationNamespacesPVCs: UseMigrationNamespacesPVCs = (vms) => {
-  const [pvcs, setPVCs] = useState<IoK8sApiCoreV1PersistentVolumeClaim[]>([]);
-  const [pvcsLoaded, setPVCsLoaded] = useState<boolean>(false);
+  const [pvcs, setPvcs] = useState<IoK8sApiCoreV1PersistentVolumeClaim[]>([]);
+  const [pvcsLoaded, setPvcsLoaded] = useState<boolean>(false);
   const [listError, setListError] = useState<Error | null>(null);
   const cluster = getCluster(vms?.[0]);
 
@@ -32,12 +32,12 @@ const useMigrationNamespacesPVCs: UseMigrationNamespacesPVCs = (vms) => {
       ),
     )
       .then((results) => {
-        setPVCs(results.flat());
-        setPVCsLoaded(true);
+        setPvcs(results.flat());
+        setPvcsLoaded(true);
       })
       .catch((err) => {
         setListError(err);
-        setPVCsLoaded(false);
+        setPvcsLoaded(false);
       });
   }, [memoizedNamespaces, cluster]);
 

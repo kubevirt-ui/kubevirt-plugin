@@ -1,4 +1,4 @@
-import { V1Disk } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1Disk } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import {
   CONTAINER_EPHERMAL,
   DYNAMIC,
@@ -13,7 +13,10 @@ import {
   getPVCStorageClassName,
 } from '@kubevirt-utils/resources/bootableresources/selectors';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
-import { DiskRawData, DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
+import {
+  type DiskRawData,
+  type DiskRowDataLayout,
+} from '@kubevirt-utils/resources/vm/utils/disk/constants';
 import {
   getDataVolumeName,
   getPrintableDiskDrive,
@@ -39,10 +42,9 @@ export const getDiskRowDataLayout = (
 ): DiskRowDataLayout[] => {
   return disks?.map((device) => {
     const { dataVolume, dataVolumeTemplate, disk, pvc, volume } = device;
-    // eslint-disable-next-line jsdoc/require-jsdoc
     const volumeSource = Object.keys(volume).find((key) => key !== 'name');
 
-    const isDiskConfigured = disk && (disk.disk || disk.cdrom || disk.lun);
+    const isDiskConfigured = disk && (disk.disk ?? disk.cdrom ?? disk.lun);
 
     const diskRowDataObject: DiskRowDataLayout = {
       drive: isEmpty(disk) || !isDiskConfigured ? NO_DATA_DASH : getPrintableDiskDrive(disk),
@@ -51,7 +53,7 @@ export const getDiskRowDataLayout = (
       interface:
         isEmpty(disk) || !isDiskConfigured
           ? NO_DATA_DASH
-          : getPrintableDiskInterface(disk) || NO_DATA_DASH,
+          : (getPrintableDiskInterface(disk) ?? NO_DATA_DASH),
       isBootDisk: disk?.name === bootDisk?.name,
       isEnvDisk: !!volume?.configMap || !!volume?.secret || !!volume?.serviceAccount,
       metadata: { name: volume?.name },
@@ -59,23 +61,23 @@ export const getDiskRowDataLayout = (
       namespace: getNamespace(pvc),
       size: NO_DATA_DASH,
       source: OTHER,
-      storageClass: dataVolumeTemplate?.spec?.storage?.storageClassName || NO_DATA_DASH,
+      storageClass: dataVolumeTemplate?.spec?.storage?.storageClassName ?? NO_DATA_DASH,
     };
 
     const pvcSize = getPVCSize(pvc);
     const dataVolumeSize = getDataVolumeSize(dataVolume);
     const dataVolumeTemplateSize = dataVolumeTemplate?.spec?.storage?.resources?.requests?.storage;
 
-    const size = getHumanizedSize(pvcSize || dataVolumeSize || dataVolumeTemplateSize);
+    const size = getHumanizedSize(pvcSize ?? dataVolumeSize ?? dataVolumeTemplateSize);
 
     diskRowDataObject.size = size.value === 0 ? NO_DATA_DASH : size.string;
 
-    const source = pvc || dataVolume;
+    const source = pvc ?? dataVolume;
     if (source) {
       diskRowDataObject.source = getName(source);
       diskRowDataObject.sourceStatus = getPhase(source);
       diskRowDataObject.storageClass =
-        getPVCStorageClassName(pvc) || getDataVolumeStorageClassName(dataVolume);
+        getPVCStorageClassName(pvc) ?? getDataVolumeStorageClassName(dataVolume);
     } else {
       const volumeSourceName = getPVCClaimName(volume) ?? getDataVolumeName(volume);
 

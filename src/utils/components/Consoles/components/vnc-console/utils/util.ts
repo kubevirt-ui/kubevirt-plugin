@@ -1,4 +1,4 @@
-import { MutableRefObject } from 'react';
+import { type MutableRefObject } from 'react';
 import partition from 'lodash/partition';
 
 import { sleep } from '@kubevirt-utils/components/Consoles/utils/utils';
@@ -6,12 +6,10 @@ import RFBCreate from '@novnc/novnc/lib/rfb';
 import { consoleFetchText } from '@openshift-console/dynamic-plugin-sdk';
 
 import { ConsoleState } from '../../utils/ConsoleConsts';
-import { ConsoleComponentState } from '../../utils/types';
-
+import { type ConsoleComponentState } from '../../utils/types';
 import { ALL_SESSIONS, KEYBOARD_DELAY, VNC_IN_USE_ERROR_TEXT, VNC_LOG_LEVELS } from './constants';
-import { RFB, RfbSession, VncLogLevel } from './VncConsoleTypes';
+import { type RFB, type RfbSession, type VncLogLevel } from './VncConsoleTypes';
 
-// eslint-disable-next-line jsdoc/require-jsdoc
 export function isVncLogLevel(value: unknown): value is VncLogLevel {
   return value === false || (VNC_LOG_LEVELS as unknown as unknown[]).includes(value);
 }
@@ -20,7 +18,7 @@ export const isSessionAlreadyInUse = (error: Error): boolean => {
   return error?.message?.includes?.(VNC_IN_USE_ERROR_TEXT) ?? false;
 };
 
-export const isConnectableState = (state: ConsoleState) =>
+export const isConnectableState = (state: ConsoleState): boolean =>
   [
     ConsoleState.connecting,
     ConsoleState.disconnected,
@@ -63,7 +61,7 @@ export const notifyParentAboutDisconnect = ({
   setVncState: (producer: (state: ConsoleComponentState) => Partial<ConsoleComponentState>) => void;
   sourceLabel: string;
   targetSession: number;
-}) => {
+}): void => {
   if (targetSession !== sessionRef.current) {
     log(
       `[VncConsole][${sourceLabel}] notifyParentAboutDisconnect. Session already closed. Target session ${targetSession}, active session ${sessionRef.current}.`,
@@ -108,18 +106,20 @@ export const disconnect = ({
   sessionRef: MutableRefObject<number>;
   setVncState: (producer: (state: ConsoleComponentState) => Partial<ConsoleComponentState>) => void;
   sourceLabel?: string;
-}) => {
+}): void => {
   log(
     `[VncConsole] disconnect from ${sourceLabel}. Target session ${sessionID}, active session ${sessionRef.current}.`,
   );
   const [targetAndOlderSessions, newerSessions] = partition(
     rfbRefs.current ?? [],
-    (session) => sessionID === ALL_SESSIONS || session.sessionID <= sessionID,
-  );
+    (session: RfbSession) => sessionID === ALL_SESSIONS || session.sessionID <= sessionID,
+  ) as [RfbSession[], RfbSession[]];
   rfbRefs.current = newerSessions;
-  targetAndOlderSessions.forEach(
-    ({ rfb }) => rfb?._rfbConnectionState !== 'disconnected' && rfb?.disconnect(),
-  );
+  for (const { rfb } of targetAndOlderSessions) {
+    if (rfb?._rfbConnectionState !== 'disconnected') {
+      rfb?.disconnect();
+    }
+  }
   if (newerSessions.length || targetAndOlderSessions.length > 1) {
     log(
       `[VncConsole] disconnect from ${sourceLabel}. Closed [${targetAndOlderSessions.length}] orphaned sessions starting with sessionID=${sessionID}, active session ${sessionRef.current}.`,

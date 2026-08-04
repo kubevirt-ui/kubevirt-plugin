@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react';
 
 import useDeepCompareMemoize from '@kubevirt-utils/hooks/useDeepCompareMemoize/useDeepCompareMemoize';
 import { kubevirtK8sGet } from '@multicluster/k8sRequests';
-import { K8sResourceCommon, WatchK8sResult } from '@openshift-console/dynamic-plugin-sdk';
-import { FleetK8sGetOptions } from '@stolostron/multicluster-sdk';
+import { type K8sResourceCommon, type WatchK8sResult } from '@openshift-console/dynamic-plugin-sdk';
+import { type FleetK8sGetOptions } from '@stolostron/multicluster-sdk';
 
 const useK8sGetData = <T extends K8sResourceCommon>(
   options: false | FleetK8sGetOptions | null,
@@ -44,7 +44,7 @@ const useK8sGetData = <T extends K8sResourceCommon>(
         }
       });
 
-    return () => {
+    return (): void => {
       canceled = true;
     };
   }, [memoizedOptions]);

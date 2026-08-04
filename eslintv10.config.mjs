@@ -1,7 +1,5 @@
-import barrelFiles from 'eslint-plugin-barrel-files';
 import i18next from 'eslint-plugin-i18next';
 import importX from 'eslint-plugin-import-x';
-import jsdoc from 'eslint-plugin-jsdoc';
 import perfectionist from 'eslint-plugin-perfectionist';
 import prettier from 'eslint-plugin-prettier/recommended';
 import promise from 'eslint-plugin-promise';
@@ -18,8 +16,8 @@ const ignoresConfig = {
   ignores: [
     'dist/**',
     'node_modules/**',
-    'eslint.config.js',
-    'eslintv10.config.js',
+    'eslint.config.mjs',
+    'eslintv10.config.mjs',
     'package-lock.json',
     'i18n-scripts/**',
     'coverage/**',
@@ -48,7 +46,6 @@ const baseConfig = {
     sourceType: 'module',
   },
   plugins: {
-    'barrel-files': barrelFiles,
     i18next,
     'import-x': importX,
     promise,
@@ -57,8 +54,6 @@ const baseConfig = {
     unicorn,
   },
   rules: {
-    'barrel-files/avoid-barrel-files': 'warn',
-    'barrel-files/avoid-re-export-all': 'error',
     curly: ['error', 'all'],
     eqeqeq: ['error', 'always'],
     'i18next/no-literal-string': 'error',
@@ -74,11 +69,11 @@ const baseConfig = {
     'no-restricted-imports': [
       'error',
       {
-        patterns: [
+        paths: [
           {
-            group: ['lodash'],
             message:
               'Import specific lodash modules (e.g., lodash/get) instead of the full bundle.',
+            name: 'lodash',
           },
         ],
       },
@@ -87,8 +82,7 @@ const baseConfig = {
     'no-var': 'error',
     'no-warning-comments': ['warn', { location: 'start', terms: ['todo', 'fixme', 'hack', 'xxx'] }],
     'prefer-const': 'error',
-    'promise/always-return': 'warn',
-    'promise/catch-or-return': ['error', { allowFinally: true }],
+    'promise/always-return': ['warn', { ignoreLastCallback: true }],
     'promise/no-nesting': 'warn',
     'promise/no-return-wrap': 'error',
     'promise/param-names': 'error',
@@ -168,6 +162,7 @@ const tsConfigs = tseslint.configs.recommended.map((config) => ({
       },
       { format: ['camelCase', 'PascalCase'], selector: 'function' },
       { format: ['PascalCase'], selector: 'typeLike' },
+      { format: ['PascalCase', 'UPPER_CASE'], selector: 'enum' },
       { format: ['PascalCase', 'UPPER_CASE'], selector: 'enumMember' },
       { format: null, selector: 'property' },
       { format: ['camelCase'], leadingUnderscore: 'allow', selector: 'parameter' },
@@ -235,6 +230,7 @@ const sonarConfig = {
     'sonarjs/fixme-tag': 'off',
     'sonarjs/function-return-type': 'off',
     'sonarjs/no-globals-shadowing': 'off',
+    'sonarjs/no-redundant-jump': 'off',
     'sonarjs/no-unused-vars': 'off',
     'sonarjs/todo-tag': 'off',
     'sonarjs/unused-import': 'off',
@@ -295,29 +291,6 @@ const prettierOverrides = {
   },
 };
 
-const jsdocConfig = {
-  files: ['src/utils/**/*.{js,ts,tsx}'],
-  plugins: { jsdoc },
-  rules: {
-    'jsdoc/require-jsdoc': [
-      'warn',
-      {
-        require: {
-          FunctionDeclaration: true,
-          FunctionExpression: true,
-        },
-      },
-    ],
-    'jsdoc/require-param': 'warn',
-    'jsdoc/require-param-name': 'warn',
-    'jsdoc/require-param-type': 'off',
-    'jsdoc/require-property': 'warn',
-    'jsdoc/require-property-description': 'warn',
-    'jsdoc/require-property-name': 'warn',
-    'jsdoc/require-property-type': 'warn',
-  },
-};
-
 const githubScriptsOverrides = {
   files: ['.github/**/*.{ts,tsx,js,jsx}', 'ci-scripts/**/*.{ts,tsx,js,jsx}'],
   rules: {
@@ -347,6 +320,5 @@ export default [
   testFilesOverrides,
   prettier,
   prettierOverrides,
-  jsdocConfig,
   githubScriptsOverrides,
 ];

@@ -8,9 +8,8 @@ import { kubevirtK8sGet } from '@multicluster/k8sRequests';
 import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
 import { useSettingsCluster } from '@settings/context/SettingsClusterContext';
 
-import { AuthKeyRow } from '../utils/types';
+import { type AuthKeyRow } from '../utils/types';
 import { createAuthKeyRow } from '../utils/utils';
-
 import useSSHAuthProjects from './useSSHAuthProjects';
 
 type UseSSHAuthKeys = () => {
@@ -22,7 +21,7 @@ type UseSSHAuthKeys = () => {
   selectableProjects: string[];
 };
 
-const filterAuthRows = async (rows: AuthKeyRow[], cluster?: string) => {
+const filterAuthRows = async (rows: AuthKeyRow[], cluster?: string): Promise<AuthKeyRow[]> => {
   const filteredRows = await Promise.all(
     rows.map(async (row) => {
       if (!row?.projectName || !row?.secretName) return null;
@@ -41,7 +40,7 @@ const filterAuthRows = async (rows: AuthKeyRow[], cluster?: string) => {
     }),
   );
 
-  const validRows = filteredRows.filter((r): r is AuthKeyRow => r !== null);
+  const validRows = filteredRows.filter((row): row is AuthKeyRow => row !== null);
 
   return validRows.length > 0 ? validRows : [createAuthKeyRow(rows[0].projectName)];
 };
@@ -51,25 +50,32 @@ const useSSHAuthKeys: UseSSHAuthKeys = () => {
   const [authorizedSSHKeys = {}, updateAuthorizedSSHKeys, loadedSettings] = useKubevirtUserSettings(
     USER_SETTINGS_KEYS.ssh,
     cluster,
-  );
+  ) as [
+    Record<string, string>,
+    (val: Record<string, string>) => Promise<Record<string, string>>,
+    boolean,
+    Error,
+  ];
 
   const [activeNamespace] = useActiveNamespace();
 
-  const [authKeyRows, setAuthKeyRows] = useState<AuthKeyRow[]>([createAuthKeyRow(activeNamespace)]);
+  const [authKeyRows, setAuthKeyRows] = useState<AuthKeyRow[]>(() => [
+    createAuthKeyRow(activeNamespace),
+  ]);
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     if (loadedSettings) {
       if (!isEmpty(authorizedSSHKeys)) {
         const authRows: AuthKeyRow[] = Object.entries(authorizedSSHKeys).map(
-          ([projectName, secretName], id) => ({
-            id,
+          ([projectName, secretName], index) => ({
+            id: index,
             projectName,
             secretName,
           }),
         );
 
-        filterAuthRows(authRows, cluster)
+        void filterAuthRows(authRows, cluster)
           .then((filteredRows) => {
             setAuthKeyRows(filteredRows);
           })
@@ -87,7 +93,7 @@ const useSSHAuthKeys: UseSSHAuthKeys = () => {
       ...prevKeys,
       createAuthKeyRow(activeNamespace, prevKeys.at(-1).id + 1),
     ]);
-  }, []);
+  }, [activeNamespace]);
 
   const onAuthKeyChange = useCallback(
     (updatedKey: AuthKeyRow) => {
@@ -97,7 +103,7 @@ const useSSHAuthKeys: UseSSHAuthKeys = () => {
 
       const { projectName, secretName } = updatedKey;
       if (!isEmpty(projectName) && !isEmpty(secretName)) {
-        updateAuthorizedSSHKeys({
+        void updateAuthorizedSSHKeys({
           ...authorizedSSHKeys,
           [projectName]: secretName,
         });
@@ -108,16 +114,16 @@ const useSSHAuthKeys: UseSSHAuthKeys = () => {
 
   const onAuthKeyDelete = useCallback(
     (keyToRemove: AuthKeyRow) => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { [keyToRemove.projectName]: _, ...rest } = authorizedSSHKeys;
-      updateAuthorizedSSHKeys(rest);
+      const { [keyToRemove.projectName]: _removed, ...rest } = authorizedSSHKeys;
+
+      void updateAuthorizedSSHKeys(rest);
 
       setAuthKeyRows((prevKeys) => {
         const updatedKeys = prevKeys.filter(({ id }) => id !== keyToRemove.id);
         return isEmpty(updatedKeys) ? [createAuthKeyRow(activeNamespace)] : updatedKeys;
       });
     },
-    [authorizedSSHKeys, updateAuthorizedSSHKeys],
+    [activeNamespace, authorizedSSHKeys, updateAuthorizedSSHKeys],
   );
 
   return {

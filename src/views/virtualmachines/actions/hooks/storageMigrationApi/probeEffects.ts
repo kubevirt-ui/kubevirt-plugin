@@ -4,18 +4,18 @@ import {
   VirtualMachineStorageMigrationPlanModel,
 } from '@kubevirt-utils/models';
 import {
-  type StorageMigrationAPI,
   MTC_MIGRATION_NAMESPACE,
   STORAGE_MIGRATION_API,
+  type StorageMigrationAPI,
 } from '@kubevirt-utils/resources/migrations/constants';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { kubevirtK8sListItems } from '@multicluster/k8sRequests';
 
 import {
-  type StorageMigrationProbeFallbackPhase,
   csvLoadedIndicatesMultiNsStorageMigrationApi,
   STORAGE_MIGRATION_PROBE_PHASE_IDLE,
   STORAGE_MIGRATION_PROBE_PHASE_WAITING_CSV_AFTER_MULTI_NS_404,
+  type StorageMigrationProbeFallbackPhase,
 } from './constants';
 import { STORAGE_MIGRATION_PROBE_MULTI_NS_LIST_NON_404_WARN } from './probeConstants';
 import { isStorageMigrationResourceNotFound } from './probeHttpUtils';

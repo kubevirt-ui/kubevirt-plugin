@@ -1,16 +1,16 @@
 import React from 'react';
 
 import {
-  CharMappingWithModifiers,
-  KeyMapDef,
+  type CharMappingWithModifiers,
+  type KeyMapDef,
   keyMaps,
   resolveCharMapping,
 } from '@kubevirt-ui-ext/vnc-keymaps';
 import KeyTable from '@novnc/novnc/lib/input/keysym';
 
 import { readFromClipboard } from '../../utils/utils';
-import { PasteParams } from '../AccessConsoles/utils/accessConsoles';
-
+import { type PasteParams } from '../AccessConsoles/utils/accessConsoles';
+import UnsupportedCharModal from './UnsupportedCharModal';
 import {
   ALT_L,
   CONTROL_L,
@@ -30,13 +30,11 @@ import {
   TWO,
 } from './utils/constants';
 import { typeAndWait } from './utils/util';
-import { RFB, ScanCodeName } from './utils/VncConsoleTypes';
-import UnsupportedCharModal from './UnsupportedCharModal';
+import { type RFB, type ScanCodeName } from './utils/VncConsoleTypes';
 
 const canExecuteCommands = (rfb: RFB): boolean =>
   rfb._rfbConnectionState === 'connected' && !rfb._viewOnly;
 
-// eslint-disable-next-line jsdoc/require-jsdoc
 function sendCtrlAltPlusKey(rfb: RFB, keysym: number, code: ScanCodeName): void {
   if (!canExecuteCommands(rfb)) {
     return;
@@ -49,13 +47,11 @@ function sendCtrlAltPlusKey(rfb: RFB, keysym: number, code: ScanCodeName): void 
   rfb.sendKey(KeyTable.XK_Control_L, CONTROL_L, false);
 }
 
-// eslint-disable-next-line jsdoc/require-jsdoc
-export function sendCtrlAlt1() {
+export function sendCtrlAlt1(): void {
   sendCtrlAltPlusKey(this, KeyTable.XK_1, ONE);
 }
 
-// eslint-disable-next-line jsdoc/require-jsdoc
-export function sendCtrlAlt2() {
+export function sendCtrlAlt2(): void {
   sendCtrlAltPlusKey(this, KeyTable.XK_2, TWO);
 }
 
@@ -65,7 +61,7 @@ export function sendCtrlAlt2() {
  * @param params required for VNC (will do early return if missing)
  * @returns void
  */
-export async function sendPasteCMD(params?: PasteParams) {
+export async function sendPasteCMD(params?: PasteParams): Promise<void> {
   const { createModal, selectedKeyboard, shouldFocusOnConsole = true } = params ?? {};
   if (!createModal || !selectedKeyboard) {
     return;
@@ -123,9 +119,8 @@ export async function sendPasteCMD(params?: PasteParams) {
   }
 }
 
-// eslint-disable-next-line jsdoc/require-jsdoc
-function createSendKeyFunction(keysym: number, scanCode: ScanCodeName) {
-  return function () {
+function createSendKeyFunction(keysym: number, scanCode: ScanCodeName): () => void {
+  return function (): void {
     if (!canExecuteCommands(this)) {
       return;
     }
