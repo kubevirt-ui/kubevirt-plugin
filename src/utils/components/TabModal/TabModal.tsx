@@ -25,7 +25,7 @@ export type TabModalProps<T extends K8sResourceCommon = K8sResourceCommon> = {
   children: ReactNode;
   closeOnSubmit?: boolean;
   formClassName?: string;
-  headerDescription?: string;
+  headerDescription?: ReactNode;
   headerText: string;
   isDisabled?: boolean;
   isHorizontal?: boolean;
