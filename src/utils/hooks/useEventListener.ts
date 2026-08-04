@@ -1,4 +1,4 @@
-import { RefObject, useEffect, useRef } from 'react';
+import { type RefObject, useEffect, useRef } from 'react';
 
 function useEventListener<K extends keyof WindowEventMap>(
   eventName: K,
@@ -25,32 +25,31 @@ function useEventListener<
   element?: RefObject<T>,
 ): void {
   // Create a ref that stores handler
-  const savedHandler = useRef<typeof handler>();
+  const savedHandlerRef = useRef<typeof handler>();
 
   useEffect(() => {
     // Define the listening target
-    const targetElement: T | Window = element?.current || window;
+    const targetElement: T | Window = element?.current ?? window;
     if (!(targetElement && targetElement.addEventListener)) {
       return;
     }
 
     // Update saved handler if necessary
-    if (savedHandler.current !== handler) {
-      savedHandler.current = handler;
+    if (savedHandlerRef.current !== handler) {
+      savedHandlerRef.current = handler;
     }
 
     // Create event listener that calls handler function stored in ref
-    // eslint-disable-next-line jsdoc/require-jsdoc
-    const eventListener: typeof handler = (event) => {
-      if (savedHandler?.current) {
-        savedHandler.current(event);
+    const eventListener: typeof handler = (event): void => {
+      if (savedHandlerRef?.current) {
+        savedHandlerRef.current(event);
       }
     };
 
     targetElement.addEventListener(eventName, eventListener);
 
     // Remove event listener on cleanup
-    return () => {
+    return (): void => {
       targetElement.removeEventListener(eventName, eventListener);
     };
   }, [eventName, element, handler]);

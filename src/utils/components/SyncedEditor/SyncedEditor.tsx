@@ -1,5 +1,5 @@
 import React, { type ComponentType, type FC, useState } from 'react';
-import { isEqual } from 'lodash';
+import isEqual from 'lodash/isEqual';
 
 import {
   logEditorViewSwitched,
@@ -18,8 +18,8 @@ import { EditorType, type FormEditorProps, type YAMLEditorProps } from './utils/
 
 type SyncedEditorProps = {
   context?: {
-    formContext: { [key: string]: any };
-    yamlContext: { [key: string]: any };
+    formContext: Record<string, unknown>;
+    yamlContext: Record<string, unknown>;
   };
   displayConversionError?: boolean;
   FormEditor: ComponentType<FormEditorProps>;
@@ -45,18 +45,20 @@ type SyncedEditorProps = {
 export const SyncedEditor: FC<SyncedEditorProps> = ({
   context = {} as SyncedEditorProps['context'],
   displayConversionError,
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   FormEditor,
   initialData = {},
   isEdit = false,
-  onChange = () => null,
-  onChangeEditorType = () => null,
+  onChange = (): null => null,
+  onChangeEditorType = (): void => undefined,
   telemetryResourceType,
   telemetryStepOrField,
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   YAMLEditor,
 }) => {
   const { t } = useKubevirtTranslation();
   const [formData, setFormData] = useState<K8sResourceKind>(initialData);
-  const [yaml, setYAML] = useState(
+  const [yaml, setYAML] = useState(() =>
     safeJSToYAML(initialData, 'yamlData', {
       skipInvalid: true,
     }),
@@ -67,19 +69,19 @@ export const SyncedEditor: FC<SyncedEditorProps> = ({
 
   const { formContext, yamlContext } = context;
 
-  const handleFormDataChange = (newFormData: K8sResourceKind = {}) => {
+  const handleFormDataChange = (newFormData: K8sResourceKind = {}): void => {
     if (!isEqual(newFormData, formData)) {
       setFormData(newFormData);
       onChange(newFormData);
     }
   };
 
-  const handleYAMLChange = (newYAML = '') => {
+  const handleYAMLChange = (newYAML = ''): void => {
     asyncYAMLToJS(newYAML)
-      .then((js) => {
+      .then((parsed) => {
         setSwitchError(undefined);
-        handleFormDataChange(js);
-        setYAML(safeJSToYAML(js, yaml, YAML_TO_JS_OPTIONS));
+        handleFormDataChange(parsed);
+        setYAML(safeJSToYAML(parsed, yaml, YAML_TO_JS_OPTIONS));
       })
       .catch((err) => setSwitchError(String(err)));
   };
@@ -97,7 +99,7 @@ export const SyncedEditor: FC<SyncedEditorProps> = ({
     );
   };
 
-  const handleToggleToForm = () => {
+  const handleToggleToForm = (): void => {
     if (switchError === undefined) {
       changeEditorType(EditorType.Form);
     } else {
@@ -105,31 +107,26 @@ export const SyncedEditor: FC<SyncedEditorProps> = ({
     }
   };
 
-  const handleToggleToYAML = () => {
+  const handleToggleToYAML = (): void => {
     setYAML(safeJSToYAML(formData, yaml, YAML_TO_JS_OPTIONS));
     changeEditorType(EditorType.YAML);
   };
 
-  const onClickYAMLWarningConfirm = () => {
+  const onClickYAMLWarningConfirm = (): void => {
     setSwitchError(undefined);
     setYAMLWarning(false);
     changeEditorType(EditorType.Form);
   };
 
-  const onClickYAMLWarningCancel = () => {
+  const onClickYAMLWarningCancel = (): void => {
     setYAMLWarning(false);
   };
 
-  const onChangeType = (newType: EditorType) => {
-    switch (newType) {
-      case EditorType.YAML:
-        handleToggleToYAML();
-        break;
-      case EditorType.Form:
-        handleToggleToForm();
-        break;
-      default:
-        break;
+  const onChangeType = (newType: EditorType): void => {
+    if (newType === EditorType.YAML) {
+      handleToggleToYAML();
+    } else if (newType === EditorType.Form) {
+      handleToggleToForm();
     }
   };
 

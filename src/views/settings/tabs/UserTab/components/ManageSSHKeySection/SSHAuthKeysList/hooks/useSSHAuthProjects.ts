@@ -8,10 +8,10 @@ import {
 import { getName } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
-import { checkAccess, K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import { checkAccess, type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { useSettingsCluster } from '@settings/context/SettingsClusterContext';
 
-import { AuthKeyRow } from '../utils/types';
+import { type AuthKeyRow } from '../utils/types';
 
 type UseSSHAuthProjects = (authKeyRows: AuthKeyRow[]) => {
   loaded: boolean;
@@ -67,7 +67,7 @@ const useSSHAuthProjects: UseSSHAuthProjects = (authKeyRows) => {
       }),
     );
 
-    Promise.allSettled(promises)
+    void Promise.allSettled(promises)
       .then((settledResults) => {
         if (cancelled) return;
 
@@ -93,7 +93,7 @@ const useSSHAuthProjects: UseSSHAuthProjects = (authKeyRows) => {
         if (!cancelled) setLoading(false);
       });
 
-    return () => {
+    return (): void => {
       cancelled = true;
     };
   }, [projects, selectedProjects, loaded]);

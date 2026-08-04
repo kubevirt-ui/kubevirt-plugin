@@ -1,5 +1,3 @@
-/* eslint-disable jsdoc/require-jsdoc */
-
 import AddCDROMModal from '../AddCDROMModal';
 import BlankDiskModal from '../BlankDiskModal';
 import ClonePVCDiskModal from '../ClonePVCDiskModal';
@@ -9,8 +7,9 @@ import OtherDiskModal from '../OtherDiskModal';
 import PVCDiskModal from '../PVCDiskModal';
 import RegistryDiskModal from '../RegistryDiskModal';
 import UploadDiskModal from '../UploadDiskModal';
-import { SourceTypes } from '../utils/types';
 import VolumeSnapshotDiskModal from '../VolumeSnapshotDiskModal';
+
+import { SourceTypes } from '../utils/types';
 
 const DiskModalBySource = {
   [SourceTypes.BLANK]: BlankDiskModal,
@@ -25,7 +24,10 @@ const DiskModalBySource = {
 };
 
 export const getDiskModalBySource = new Proxy(DiskModalBySource, {
-  get(target, prop) {
-    return target[prop] ?? OtherDiskModal;
+  get(
+    target: typeof DiskModalBySource,
+    prop: string,
+  ): (typeof DiskModalBySource)[keyof typeof DiskModalBySource] {
+    return target[prop as keyof typeof DiskModalBySource] ?? OtherDiskModal;
   },
 });

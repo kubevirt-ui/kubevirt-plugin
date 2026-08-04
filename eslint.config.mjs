@@ -1,6 +1,6 @@
 import i18next from 'eslint-plugin-i18next';
-import jsdoc from 'eslint-plugin-jsdoc';
 import perfectionist from 'eslint-plugin-perfectionist';
+import promise from 'eslint-plugin-promise';
 import prettier from 'eslint-plugin-prettier/recommended';
 import reactHooks from 'eslint-plugin-react-hooks';
 import simpleImportSort from 'eslint-plugin-simple-import-sort';
@@ -11,7 +11,7 @@ const ignoresConfig = {
   ignores: [
     'dist/**',
     'node_modules/**',
-    'eslintv10.config.js',
+    'eslintv10.config.mjs',
     'package-lock.json',
     'i18n-scripts/**',
     'coverage/**',
@@ -19,6 +19,7 @@ const ignoresConfig = {
     'cypress/gui-test-screenshots/**',
     'cypress/cypress-a11y-report.json',
     'locales/**',
+    'playwright/**',
   ],
 };
 
@@ -41,8 +42,8 @@ const baseConfig = {
   },
   plugins: {
     i18next,
-    jsdoc,
     perfectionist,
+    promise,
     'react-hooks': reactHooks,
     'simple-import-sort': simpleImportSort,
   },
@@ -50,6 +51,10 @@ const baseConfig = {
     'i18next/no-literal-string': 'error',
     'no-console': 'error',
     'no-nested-ternary': 'error',
+    'promise/always-return': ['warn', { ignoreLastCallback: true }],
+    'promise/no-nesting': 'warn',
+    'promise/no-return-wrap': 'error',
+    'promise/param-names': 'error',
     'perfectionist/sort-classes': [
       'error',
       {
@@ -105,14 +110,7 @@ const testFilesOverrides = {
     'i18next/no-literal-string': 'off',
   },
 };
-
-const playwrightOverrides = {
-  files: ['playwright/**/*.{ts,tsx}'],
-  rules: {
-    'no-console': 'off',
-  },
-};
-
+//part 2 will add the rules for the playwright tests.
 export default [
   ignoresConfig,
   baseConfig,
@@ -122,5 +120,4 @@ export default [
   githubScriptsOverrides,
   testingLibraryConfig,
   testFilesOverrides,
-  playwrightOverrides,
 ];

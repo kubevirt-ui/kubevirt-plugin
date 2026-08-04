@@ -1,7 +1,10 @@
 import { useEffect, useState } from 'react';
 
-import { AccessReviewResourceAttributes, checkAccess } from '@openshift-console/dynamic-plugin-sdk';
-import { ImpersonateKind } from '@openshift-console/dynamic-plugin-sdk/lib/app/redux-types';
+import {
+  type AccessReviewResourceAttributes,
+  checkAccess,
+} from '@openshift-console/dynamic-plugin-sdk';
+import { type ImpersonateKind } from '@openshift-console/dynamic-plugin-sdk/lib/app/redux-types';
 
 type UseMultipleAccessReviews = (
   multipleResourceAttributes: AccessReviewResourceAttributes[],

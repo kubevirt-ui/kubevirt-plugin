@@ -1,7 +1,7 @@
-import React, { FC, useMemo, useState } from 'react';
+import React, { type FC, useMemo, useState } from 'react';
 
 import { DataVolumeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1VirtualMachine, V1Volume } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine, type V1Volume } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import ConfirmActionMessage from '@kubevirt-utils/components/ConfirmActionMessage/ConfirmActionMessage';
 import { CONFIRM_ACTIONS } from '@kubevirt-utils/components/ConfirmActionMessage/constants';
 import {
@@ -17,11 +17,10 @@ import { buildOwnerReference, compareOwnerReferences } from '@kubevirt-utils/res
 import { getDataVolumeTemplates, getDisks, getVolumes } from '@kubevirt-utils/resources/vm';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sUpdate } from '@multicluster/k8sRequests';
-import { k8sDelete, K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import { k8sDelete, type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { ButtonVariant, Checkbox, Stack, StackItem } from '@patternfly/react-core';
 
 import { updateDisks } from '../../../details/utils/utils';
-
 import useVolumeOwnedResource from './hooks/useVolumeOwnedResource';
 
 type DeleteDiskModalProps = {
@@ -53,8 +52,8 @@ const DeleteDiskModal: FC<DeleteDiskModalProps> = ({
   } = useVolumeOwnedResource(vm, volume);
 
   const updatedVirtualMachine = useMemo(() => {
-    const updatedDisks = (getDisks(vm) || [])?.filter(({ name }) => name !== diskName);
-    const updatedVolumes = (getVolumes(vm) || [])?.filter(({ name }) => name !== diskName);
+    const updatedDisks = (getDisks(vm) ?? [])?.filter(({ name }) => name !== diskName);
+    const updatedVolumes = (getVolumes(vm) ?? [])?.filter(({ name }) => name !== diskName);
     const updatedDataVolumeTemplates = (getDataVolumeTemplates(vm) || [])?.filter(
       (dvt) => dvt?.metadata?.name !== volumeResourceName,
     );
@@ -67,44 +66,46 @@ const DeleteDiskModal: FC<DeleteDiskModalProps> = ({
     return updatedVM;
   }, [vm, diskName, volumeResourceName]);
 
-  const onSubmit = (updatedVM: V1VirtualMachine) => {
+  const onSubmit = async (
+    updatedVM: V1VirtualMachine,
+  ): Promise<K8sResourceCommon | undefined | void> => {
     const deletePromise = isHotPluginVolume
       ? getRemoveHotplugPromise(vm, diskName)
       : updateDisks(updatedVM);
 
-    return deletePromise.then(() => {
-      if (isHotPluginVolume) {
-        logVMDiskHotplug(TELEMETRY_HOTPLUG_OPERATION.REMOVE);
-      }
+    await deletePromise;
 
-      if (volumeResource) {
-        if (deleteOwnedResource) {
-          // we need to delete the owned resource
-          return k8sDelete({
-            json: undefined,
-            model: volumeResourceModel,
-            requestInit: undefined,
-            resource: volumeResource,
-          });
-        }
-        // we don't need to delete the owned resource
-        // so we remove the resource's ownerReference from the owned resource
-        const vmOwnerRef = buildOwnerReference(updatedVM);
-        const updatedVolumeOwnerReferences = volumeResource?.metadata?.ownerReferences?.filter(
-          (ref) => {
-            return !compareOwnerReferences(ref, vmOwnerRef);
-          },
-        );
-        const updatedResourceVolume = { ...volumeResource };
-        updatedResourceVolume.metadata.ownerReferences = updatedVolumeOwnerReferences;
-        return kubevirtK8sUpdate({
-          cluster: getCluster(vm),
-          data: updatedResourceVolume,
-          model: volumeResourceModel,
-          name: updatedResourceVolume?.metadata?.name,
-          ns: updatedResourceVolume?.metadata?.namespace,
-        });
-      }
+    if (isHotPluginVolume) {
+      logVMDiskHotplug(TELEMETRY_HOTPLUG_OPERATION.REMOVE);
+    }
+
+    if (!volumeResource) {
+      return;
+    }
+
+    if (deleteOwnedResource) {
+      return k8sDelete({
+        json: undefined,
+        model: volumeResourceModel,
+        requestInit: undefined,
+        resource: volumeResource,
+      });
+    }
+
+    // we don't need to delete the owned resource
+    // so we remove the resource's ownerReference from the owned resource
+    const vmOwnerRef = buildOwnerReference(updatedVM);
+    const updatedVolumeOwnerReferences = volumeResource?.metadata?.ownerReferences?.filter(
+      (ref) => !compareOwnerReferences(ref, vmOwnerRef),
+    );
+    const updatedResourceVolume = { ...volumeResource };
+    updatedResourceVolume.metadata.ownerReferences = updatedVolumeOwnerReferences;
+    return kubevirtK8sUpdate({
+      cluster: getCluster(vm),
+      data: updatedResourceVolume,
+      model: volumeResourceModel,
+      name: updatedResourceVolume?.metadata?.name,
+      ns: updatedResourceVolume?.metadata?.namespace,
     });
   };
 
@@ -122,16 +123,18 @@ const DeleteDiskModal: FC<DeleteDiskModalProps> = ({
       <Stack hasGutter>
         <StackItem>
           <ConfirmActionMessage
+            action={CONFIRM_ACTIONS.detach}
             obj={{
               metadata: { name: diskName },
             }}
-            action={CONFIRM_ACTIONS.detach}
           />
         </StackItem>
         {loaded && (
           <StackItem>
             {volumeResource && (
               <Checkbox
+                id="delete-owned-resource"
+                isChecked={deleteOwnedResource}
                 label={t('Delete {{volumeResourceName}} {{modelLabel}}', {
                   modelLabel:
                     volumeResourceModel === DataVolumeModel
@@ -139,8 +142,6 @@ const DeleteDiskModal: FC<DeleteDiskModalProps> = ({
                       : volumeResourceModel.label,
                   volumeResourceName,
                 })}
-                id="delete-owned-resource"
-                isChecked={deleteOwnedResource}
                 onChange={(_event, val) => setDeleteOwnedResource(val)}
               />
             )}

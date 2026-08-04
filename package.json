@@ -90,10 +90,8 @@
     "eslint": "10.5.0",
     "eslint-config-prettier": "10.1.8",
     "eslint-import-resolver-typescript": "4.4.5",
-    "eslint-plugin-barrel-files": "^3.0.1",
     "eslint-plugin-i18next": "^6.1.4",
     "eslint-plugin-import-x": "4.16.2",
-    "eslint-plugin-jsdoc": "63.0.6",
     "eslint-plugin-perfectionist": "5.9.1",
     "eslint-plugin-prettier": "5.5.6",
     "eslint-plugin-promise": "^7.3.0",
@@ -135,7 +133,7 @@
   },
   "lint-staged": {
     "*.{js,ts,tsx,jsx}": [
-      "eslint --config eslintv10.config.js --no-warn-ignored --fix"
+      "eslint --config eslintv10.config.mjs --no-warn-ignored --fix"
     ],
     "*.scss": [
       "stylelint --fix"
