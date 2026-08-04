@@ -6,12 +6,12 @@ Index of workflows in this directory. Deep design notes (check-run model, merge 
 
 ## Hot Cluster E2E
 
-| Workflow                              | Trigger                                | Role                                                                                   |
-| ------------------------------------- | -------------------------------------- | -------------------------------------------------------------------------------------- |
-| `hot-cluster-e2e.yml`                 | `workflow_dispatch` only               | Full E2E graph; publishes required **Run Gating Tests**                                |
-| `hot-cluster-e2e-run.yml`             | `workflow_call`                        | Build plugin image + run Playwright on ARC                                             |
-| `hot-cluster-check.yml`               | `workflow_call` (+ manual health)      | Cluster readiness / health                                                             |
-| `hot-cluster-e2e-pr-gate.yml`         | PR opened / synchronize / reopened     | Thin gate → dispatch `hot-cluster-e2e.yml`                                             |
+| Workflow                              | Trigger                                | Role                                                                                                                         |
+| ------------------------------------- | -------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `hot-cluster-e2e.yml`                 | `workflow_dispatch` only               | Full E2E graph; suite via `test_project` (+ optional `test_args`); publishes required **Run Gating Tests** only for `gating` |
+| `hot-cluster-e2e-run.yml`             | `workflow_call` / `workflow_dispatch`  | Build plugin image + run Playwright/Cypress on ARC                                                                           |
+| `hot-cluster-check.yml`               | `workflow_call` (+ manual health)      | Cluster readiness / health                                                                                                   |
+| `hot-cluster-e2e-pr-gate.yml`         | PR opened / synchronize / reopened     | Thin gate → dispatch `hot-cluster-e2e.yml`                                                                                   |
 | `pr-validation.yml`                   | All PR events (push + label)           | Unified PR validation: Jira, path checks, review labels, E2E dispatch, merge-pool sync |
 | `ok-to-test-reset.yml`                | synchronize while `ok-to-test` present | Remove `ok-to-test` when head moves                                                    |
 | `hot-cluster-e2e-cancel-on-close.yml` | PR closed                              | Cancel in-flight when PR closes                                                        |
@@ -22,7 +22,7 @@ Index of workflows in this directory. Deep design notes (check-run model, merge 
 | Workflow                      | Trigger                       | Role                                                                                                                                   |
 | ----------------------------- | ----------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
 | `auto-merge.yml`              | label / review / synchronize… | Required **Merge Gate** + enable/disable GitHub auto-merge                                                                             |
-| `pr-commands.yml`             | issue comment                 | Unified dispatcher for all PR commands (`/lgtm`, `/approve`, `/hold`, `/retest-e2e`, etc.)                                             |
+| `pr-commands.yml`             | issue comment                 | Unified dispatcher for all PR commands (`/lgtm`, `/approve`, `/hold`, `/retest-e2e`, `/test-e2e`, etc.)                                 |
 | `pr_review_commands.yml`      | review submitted              | Captures review data only (no secrets -- see below), uploads artifact                                                                  |
 | `pr_review_commands_sync.yml` | `workflow_run` (after above)  | Approve / Request changes ↔ `lgtm` (+ `approved` for root OWNERS); split out since `pull_request_review` withholds secrets on fork PRs |
 | `needs-rebase.yml`            | PR events                     | Sync `needs-rebase` from GitHub `mergeable`                                                                                            |

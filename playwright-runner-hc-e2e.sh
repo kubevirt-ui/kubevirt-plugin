@@ -6,8 +6,9 @@
 # Differences from playwright-runner.sh:
 #   • Exports HC_E2E=true so global setup uses the in-cluster / SA-token auth
 #     flow and skips browser OAuth login.
-#   • Includes the Gating and Tier1 projects (scenario infrastructure).
+#   • Includes the Gating, Tier1, and Tier2 projects (scenario infrastructure).
 #   • Supports IS_LOCAL=1 for localhost development (localhost:9000).
+#   • Extra args (file paths, -g patterns, --workers, …) are forwarded to Playwright.
 #
 # Usage:
 #   ./playwright-runner-hc-e2e.sh [project] [extra-args...]
@@ -18,7 +19,10 @@
 #
 # Examples:
 #   ./playwright-runner-hc-e2e.sh Gating --workers=4
+#   ./playwright-runner-hc-e2e.sh Tier1
+#   ./playwright-runner-hc-e2e.sh Tier2 playwright/tests/tier2/foo.spec.ts
 #   IS_LOCAL=1 ./playwright-runner-hc-e2e.sh Gating --headed
+#   ./playwright-runner-hc-e2e.sh suite
 #   ./playwright-runner-hc-e2e.sh all
 # ────────────────────────────────────────────────────────────────────────────
 set -euo pipefail
@@ -72,6 +76,8 @@ if [[ -z "${PROJECT}" ]]; then
   echo "  suite                  Run Gating + Tier1 + Tier2 together"
   echo "  all                    Run all projects"
   echo ""
+  echo "Extra args are forwarded to Playwright (file paths, -g, --workers, …)."
+  echo ""
   echo "Environment:"
   echo "  IS_LOCAL=1             Run against localhost:9000 (local console)"
   exit 1
@@ -99,9 +105,15 @@ PROJECT_LOWER=$(echo "${PROJECT}" | tr '[:upper:]' '[:lower:]')
 if [[ "${PROJECT_LOWER}" == "gating" ]]; then
   echo "🚀 Running project: Gating (HC E2E mode)..."
   npx playwright test --project Gating "${EXTRA_ARGS[@]}"
+elif [[ "${PROJECT_LOWER}" == "tier1" ]]; then
+  echo "🚀 Running project: Tier1 (HC E2E mode)..."
+  npx playwright test --project Tier1 "${EXTRA_ARGS[@]}"
+elif [[ "${PROJECT_LOWER}" == "tier2" ]]; then
+  echo "🚀 Running project: Tier2 (HC E2E mode)..."
+  npx playwright test --project Tier2 "${EXTRA_ARGS[@]}"
 elif [[ "${PROJECT_LOWER}" == "suite" ]]; then
-  echo "🚀 Running suite: Gating + Tier1 (HC E2E mode)..."
-  npx playwright test --project Gating --project Tier1 "${EXTRA_ARGS[@]}"
+  echo "🚀 Running suite: Gating + Tier1 + Tier2 (HC E2E mode)..."
+  npx playwright test --project Gating --project Tier1 --project Tier2 "${EXTRA_ARGS[@]}"
 elif [[ "${PROJECT_LOWER}" == "all" ]]; then
   PROJECTS=(
     Gating

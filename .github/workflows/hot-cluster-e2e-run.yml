@@ -5,13 +5,29 @@ on:
   workflow_dispatch:
     inputs:
       test_project:
-        description: Test project/suite to run (gating, or the features/tier1 equivalent)
+        description: |
+          Suite to run.
+          Playwright (main): gating / tier1 / tier2 / suite / settings / api / all.
+          Cypress (release only): gating or features (Cypress's Tier1 suite — not a Playwright project).
         required: true
         default: gating
         type: choice
         options:
           - gating
+          - tier1
+          - tier2
+          - suite
           - features
+          - settings
+          - api
+          - all
+      test_args:
+        description: |
+          Optional Playwright filter (space-separated CLI args), e.g. a spec path
+          or -g MyTestName. Leave empty to run the full selected suite.
+        required: false
+        default: ''
+        type: string
       test_engine:
         description: |
           E2E test engine to run against the checked-out code. Defaults to
@@ -76,10 +92,17 @@ on:
   workflow_call:
     inputs:
       test_project:
-        description: Test project/suite to run (gating, or the features/tier1 equivalent)
+        description: |
+          Suite to run. Playwright: gating / tier1 / tier2 / suite / settings / api / all.
+          Cypress (release only): gating or features (Cypress's Tier1 suite — not a Playwright project).
         type: string
         required: false
         default: gating
+      test_args:
+        description: Optional Playwright filter CLI args (space-separated)
+        type: string
+        required: false
+        default: ''
       test_engine:
         description: E2E test engine to run (playwright or cypress); see hot-cluster-e2e.yml's prepare job for auto-detection.
         type: string
@@ -333,10 +356,11 @@ jobs:
           STATUS_CONTEXT: ${{ inputs.progress_status_context }}
         run: npx tsx src/e2e/progress-running.ts
 
-      - name: Run gating tests
+      - name: Run E2E tests
         env:
           BRIDGE_BASE_ADDRESS: ${{ steps.ci-env.outputs.bridge-base-address }}
           TEST_PROJECT: ${{ inputs.test_project }}
+          TEST_ARGS: ${{ inputs.test_args || '' }}
         working-directory: ci-scripts/hot-cluster/ts
         run: npx tsx src/scripts/run-gating-tests.ts
 

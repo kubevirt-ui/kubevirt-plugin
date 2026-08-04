@@ -22,6 +22,7 @@ import { Octokit } from '@octokit/rest';
 import { requireEnv } from '../utils';
 
 import { getRepoContext, getRunUrl } from '../shared/actions-context';
+import { isRequiredGatingSuite } from '../shared/is-required-gating-suite';
 import { E2E_HOLD_LABEL } from '../shared/merge-pool';
 import { failStep, setOutput } from '../shared/output';
 import { mapResultDetails, type VerifyReason } from './result-mapper';
@@ -64,6 +65,40 @@ const main = async (): Promise<void> => {
 
   if (!prNumber || !prHeadSha) {
     console.log('No PR context -- skipping check-run publishing (ad-hoc dispatch).');
+    return;
+  }
+
+  const testProject = (process.env.TEST_PROJECT ?? 'gating').toLowerCase();
+  const testArgs = (process.env.TEST_ARGS ?? '').trim();
+  const isGatingSuite = isRequiredGatingSuite(testProject, testArgs);
+
+  if (!isGatingSuite) {
+    const suiteLabel = testArgs ? `${testProject} (${testArgs})` : testProject;
+    const passed = reason === 'passed';
+    const emoji = passed ? '✅' : '❌';
+    const body = [
+      `${emoji} Hot Cluster E2E ad-hoc suite \`${suiteLabel}\` ${passed ? 'passed' : 'failed'}.`,
+      '',
+      `[View run](${runUrl})`,
+      testFailureSummary ? `\n${testFailureSummary}` : '',
+    ]
+      .filter(Boolean)
+      .join('\n');
+
+    console.log(
+      `test_project=${testProject} -- skipping Run Gating Tests publish; commenting on PR #${prNumber}.`,
+    );
+    try {
+      await botOctokit.issues.createComment({
+        body,
+        issue_number: Number(prNumber),
+        owner,
+        repo,
+      });
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      console.warn(`Could not comment ad-hoc suite result: ${msg}`);
+    }
     return;
   }
 

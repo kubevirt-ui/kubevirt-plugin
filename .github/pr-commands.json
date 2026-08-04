@@ -44,6 +44,12 @@
       "workflow": ".github/workflows/retest-e2e.yml"
     },
     {
+      "command": "/test-e2e <suite> [args…]",
+      "description": "Run a Hot Cluster E2E suite on this PR (Playwright: gating, tier1, tier2, suite, settings, api, all; Cypress release: gating or features). Optional Playwright args (spec path or -g name) filter the run. Non-gating / filtered runs do not update the required Run Gating Tests check. OWNERS only.",
+      "trust": "owners",
+      "workflow": ".github/workflows/pr-commands.yml"
+    },
+    {
       "command": "/retest-failed",
       "description": "Re-run failed jobs in the latest CI and PR Validation runs for this PR, and dispatch a fresh Hot Cluster E2E run only if 'Run Gating Tests' is not currently passing (missing, cancelled, or otherwise not a success). Does not lift a /hold-e2e hold (only /retest-e2e does) or force a fresh run of anything already passing.",
       "trust": "owners",

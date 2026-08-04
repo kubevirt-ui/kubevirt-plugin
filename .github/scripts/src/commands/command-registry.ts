@@ -8,6 +8,7 @@ import { executeHelp } from './help';
 import { executeHoldE2E } from './hold-e2e';
 import { executeRetestE2E } from './retest-e2e';
 import { executeRetestFailed } from './retest-failed';
+import { executeTestE2E } from './test-e2e';
 import { executeValidationCommand } from './validation-handler';
 
 export type CommandContext = {
@@ -38,6 +39,12 @@ export const COMMANDS: CommandConfig[] = [
     execute: executeRetestE2E,
     name: 'retest-e2e',
     pattern: /(^|\s)\/retest-e2e(\s|$)/,
+    requiresTrust: true,
+  },
+  {
+    execute: executeTestE2E,
+    name: 'test-e2e',
+    pattern: /(^|\s)\/test-e2e(\s|$)/,
     requiresTrust: true,
   },
   {
