@@ -226,7 +226,7 @@ Map commits to routes by path (same path registry as above).
 ```bash
 BASE_JQL='project = CNV AND component = "CNV User Interface"'
 TYPE_FILTER='AND type IN (Story, Epic, "Feature Request")'
-VERSION_FILTER='AND fixVersion IN ("CNV v4.22.0", "CNV v4.23.0")'
+VERSION_FILTER='AND fixVersion IN ("CNV v5.0.0", "CNV v5.0.z")'
 KEYWORD='AND text ~ "<route-jql-keywords>"'
 ```
 
