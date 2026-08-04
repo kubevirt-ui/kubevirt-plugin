@@ -21,7 +21,7 @@ export type ParsedTestE2ECommand = {
 };
 
 /** Parse `/test-e2e <suite> [args…]` from a PR comment body (first matching line). */
-export const parseTestE2ECommand = (commentBody: string): ParsedTestE2ECommand | null => {
+export const parseTestE2ECommand = (commentBody: string): null | ParsedTestE2ECommand => {
   const line = commentBody
     .split(/\r?\n/)
     .map((entry) => entry.trim())
@@ -54,10 +54,7 @@ export const buildTestE2EReport = (
   testArgs: string,
 ): string => {
   const suiteLabel = testArgs ? `\`${testProject}\` with \`${testArgs}\`` : `\`${testProject}\``;
-  const lines = [
-    `🚀 \`/test-e2e\` dispatched Hot Cluster E2E for ${suiteLabel} on this PR.`,
-    '',
-  ];
+  const lines = [`🚀 \`/test-e2e\` dispatched Hot Cluster E2E for ${suiteLabel} on this PR.`, ''];
 
   if (testProject !== 'gating') {
     lines.push(

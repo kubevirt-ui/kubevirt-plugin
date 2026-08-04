@@ -26,10 +26,10 @@ import { dispatchWorkflow } from '../shared/dispatch';
 import { failStep } from '../shared/output';
 import type { CommandContext } from './command-registry';
 import {
-  VALID_TEST_E2E_PROJECTS,
   buildTestE2EReport,
   parseTestE2ECommand,
   reportTestE2EError,
+  VALID_TEST_E2E_PROJECTS,
 } from './test-e2e-helpers';
 
 const main = async (): Promise<void> => {
@@ -77,8 +77,9 @@ const main = async (): Promise<void> => {
     const headSha = pullRequest.head.sha;
     const baseRef = pullRequest.base.ref;
 
+    const suiteArgs = parsed.testArgs ? ` ${parsed.testArgs}` : '';
     console.log(
-      `/test-e2e ${parsed.testProject}${parsed.testArgs ? ` ${parsed.testArgs}` : ''} ` +
+      `/test-e2e ${parsed.testProject}${suiteArgs} ` +
         `requested by ${author} on PR #${prNumber} (HEAD: ${headSha}, base: ${baseRef})`,
     );
 
