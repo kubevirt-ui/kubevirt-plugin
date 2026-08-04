@@ -1,20 +1,16 @@
 import React, { FC, useMemo } from 'react';
 
+import KubevirtFilterToolbar from '@kubevirt-utils/components/KubevirtFilterToolbar/KubevirtFilterToolbar';
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
 import { buildColumnLayout } from '@kubevirt-utils/components/KubevirtTable/utils';
-import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
+import useKubevirtDataViewFilters from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/useKubevirtDataViewFilters';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtTableColumns';
 import usePaginationWithFilters from '@kubevirt-utils/hooks/usePagination/usePaginationWithFilters';
 import { paginationDefaultValues } from '@kubevirt-utils/hooks/usePagination/utils/constants';
 import { EXPORT_TABLE_KEYS, KubevirtTableExport } from '@kubevirt-utils/hooks/useTableExport';
-import { MultiNamespaceVirtualMachineStorageMigrationPlan } from '@kubevirt-utils/resources/migrations/constants';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import {
-  ListPageBody,
-  ListPageHeader,
-  useListPageFilter,
-} from '@openshift-console/dynamic-plugin-sdk';
+import { ListPageBody, ListPageHeader } from '@openshift-console/dynamic-plugin-sdk';
 import { Pagination } from '@patternfly/react-core';
 
 import useStorageMigrationResources from './hooks/useStorageMigrationResources';
@@ -30,20 +26,24 @@ const StorageMigrationList: FC = () => {
   const { loaded, loadError, storageMigPlans } = useStorageMigrationResources();
 
   const columns = useMemo(() => getStorageMigrationColumns(t), [t]);
-  const statusFilters = useMemo(() => getStorageMigrationStatusFilters(t), [t]);
+  const filterDefinitions = useMemo(() => getStorageMigrationStatusFilters(t), [t]);
 
   const { activeColumnKeys, loaded: loadedColumns } = useKubevirtTableColumns({
     columnManagementID: COLUMN_MANAGEMENT_ID_STORAGE_MIGRATIONS,
     columns,
   });
 
-  const [unfilteredData, data, onFilterChange] = useListPageFilter<
-    MultiNamespaceVirtualMachineStorageMigrationPlan,
-    MultiNamespaceVirtualMachineStorageMigrationPlan
-  >(storageMigPlans, statusFilters);
+  const { clearAllFilters, filteredData, filters, onSetFilters } = useKubevirtDataViewFilters({
+    data: storageMigPlans ?? [],
+    filterDefinitions,
+  });
 
-  const { handleFilterChange, handlePerPageSelect, handleSetPage, pagination } =
-    usePaginationWithFilters(data?.length ?? 0, onFilterChange);
+  const {
+    handlePerPageSelect,
+    handleSetPage,
+    pagination,
+    handleFilterChange: handleSetFilters,
+  } = usePaginationWithFilters(filteredData?.length ?? 0, onSetFilters);
 
   const columnLayout = useMemo(
     () =>
@@ -64,28 +64,29 @@ const StorageMigrationList: FC = () => {
 
       <ListPageBody>
         <div className="list-managment-group">
-          <ListPageFilter
+          <KubevirtFilterToolbar
+            clearAllFilters={clearAllFilters}
+            columnLayout={columnLayout}
+            data={storageMigPlans}
+            filterDefinitions={filterDefinitions}
+            filters={filters}
+            loaded={isLoaded}
+            onSetFilters={handleSetFilters}
             toolbarEndContent={
               <KubevirtTableExport
                 activeColumnKeys={activeColumnKeys}
-                asToolbarItem
                 columns={columns}
-                data={data ?? []}
+                data={filteredData ?? []}
                 exportKey={EXPORT_TABLE_KEYS.STORAGE_MIGRATIONS}
                 loaded={isLoaded}
               />
             }
-            columnLayout={columnLayout}
-            data={unfilteredData}
-            loaded={isLoaded}
-            onFilterChange={handleFilterChange}
-            rowFilters={statusFilters}
           />
-          {!isEmpty(data) && isLoaded && (
+          {!isEmpty(filteredData) && isLoaded && (
             <Pagination
               className="list-managment-group__pagination"
               isLastFullPageShown
-              itemCount={data?.length ?? 0}
+              itemCount={filteredData?.length ?? 0}
               onPerPageSelect={handlePerPageSelect}
               onSetPage={handleSetPage}
               page={pagination?.page}
@@ -98,7 +99,7 @@ const StorageMigrationList: FC = () => {
           activeColumnKeys={activeColumnKeys}
           ariaLabel={t('Storage migrations table')}
           columns={columns}
-          data={data ?? []}
+          data={filteredData ?? []}
           dataTest="storage-migrations-list"
           getRowId={getStorageMigrationRowId}
           loaded={isLoaded}
@@ -106,7 +107,7 @@ const StorageMigrationList: FC = () => {
           noDataMsg={t("You don't have any storage migrations yet")}
           pagination={pagination}
           persistSortInUrl
-          unfilteredData={unfilteredData}
+          unfilteredData={storageMigPlans}
         />
       </ListPageBody>
     </>

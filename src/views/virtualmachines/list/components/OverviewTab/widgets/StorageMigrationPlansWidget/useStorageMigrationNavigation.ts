@@ -6,22 +6,18 @@ import {
   STORAGE_MIGRATION_API,
 } from '@kubevirt-utils/resources/migrations/constants';
 import { getResourceUrl } from '@kubevirt-utils/resources/shared';
-import { ROW_FILTERS_PREFIX } from '@kubevirt-utils/utils/constants';
 import useManagedClusterConsoleURLs from '@multicluster/hooks/useManagedClusterConsoleURLs';
 import { buildSpokeConsoleUrl } from '@multicluster/urls';
 import { useHubClusterName } from '@stolostron/multicluster-sdk';
 import { spokeSupportsCustomMigrationsRoute } from '@virtualmachines/actions/hooks/storageMigrationApi/constants';
 
-import {
-  STORAGE_MIGRATION_STATUS_FILTER_TYPE,
-  StorageMigrationStatusFilterValue,
-} from '../../../../../../storagemigrations/list/StorageMigrationListFilters';
+import { StorageMigrationStatusFilterValue } from '@kubevirt-utils/resources/migrations/storageMigrationLifecycle';
+import { STORAGE_MIGRATION_STATUS_FILTER_TYPE } from '../../../../../../storagemigrations/list/StorageMigrationListFilters';
 
 const ALL_NAMESPACES_STORAGE_MIGRATIONS_LIST = '/k8s/all-namespaces/storagemigrations';
-const STATUS_FILTER_PARAM = `${ROW_FILTERS_PREFIX}${STORAGE_MIGRATION_STATUS_FILTER_TYPE}`;
 
 const withStatusFilter = (base: string, value: StorageMigrationStatusFilterValue): string =>
-  `${base}?${STATUS_FILTER_PARAM}=${value}`;
+  `${base}?${STORAGE_MIGRATION_STATUS_FILTER_TYPE}=${value}`;
 
 /**
  * Resolves the console path for spoke clusters.
