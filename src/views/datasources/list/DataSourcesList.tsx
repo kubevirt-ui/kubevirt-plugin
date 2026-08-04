@@ -3,11 +3,12 @@ import { useNavigate } from 'react-router';
 
 import { DataSourceModelRef } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
+import KubevirtFilterToolbar from '@kubevirt-utils/components/KubevirtFilterToolbar/KubevirtFilterToolbar';
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
 import { buildColumnLayout } from '@kubevirt-utils/components/KubevirtTable/utils';
-import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
+import useKubevirtDataViewFilters from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/useKubevirtDataViewFilters';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtTableColumns';
 import usePaginationWithFilters from '@kubevirt-utils/hooks/usePagination/usePaginationWithFilters';
@@ -19,7 +20,6 @@ import {
   ListPageCreateDropdown,
   ListPageHeader,
   useK8sWatchResource,
-  useListPageFilter,
 } from '@openshift-console/dynamic-plugin-sdk';
 import { Pagination } from '@patternfly/react-core';
 
@@ -47,11 +47,18 @@ const DataSourcesList: FC<DataSourcesListProps> = ({ kind, namespace }) => {
     namespaced: true,
   });
 
-  const filters = getDataImportCronFilter(t);
-  const [unfilteredData, filteredData, onFilterChange] = useListPageFilter(dataSources, filters);
+  const filterDefinitions = useMemo(() => getDataImportCronFilter(t), [t]);
+  const { clearAllFilters, filteredData, filters, onSetFilters } = useKubevirtDataViewFilters({
+    data: dataSources ?? [],
+    filterDefinitions,
+  });
 
-  const { handleFilterChange, handlePerPageSelect, handleSetPage, pagination } =
-    usePaginationWithFilters(filteredData?.length ?? 0, onFilterChange);
+  const {
+    handlePerPageSelect,
+    handleSetPage,
+    pagination,
+    handleFilterChange: handleSetFilters,
+  } = usePaginationWithFilters(filteredData?.length ?? 0, onSetFilters);
 
   const columns = useMemo(() => getDataSourceColumns(t, namespace), [t, namespace]);
 
@@ -91,22 +98,23 @@ const DataSourcesList: FC<DataSourcesListProps> = ({ kind, namespace }) => {
       </ListPageHeader>
       <ListPageBody>
         <div className="list-managment-group">
-          <ListPageFilter
+          <KubevirtFilterToolbar
+            clearAllFilters={clearAllFilters}
+            columnLayout={columnLayout}
+            data={dataSources}
+            filterDefinitions={filterDefinitions}
+            filters={filters}
+            loaded={isLoaded}
+            onSetFilters={handleSetFilters}
             toolbarEndContent={
               <KubevirtTableExport
                 activeColumnKeys={activeColumnKeys}
-                asToolbarItem
                 columns={columns}
                 data={filteredData ?? []}
                 exportKey={EXPORT_TABLE_KEYS.DATASOURCES}
                 loaded={isLoaded}
               />
             }
-            columnLayout={columnLayout}
-            data={unfilteredData}
-            loaded={isLoaded}
-            onFilterChange={handleFilterChange}
-            rowFilters={filters}
           />
           {!isEmpty(filteredData) && isLoaded && (
             <Pagination
@@ -133,7 +141,7 @@ const DataSourcesList: FC<DataSourcesListProps> = ({ kind, namespace }) => {
           noDataMsg={t("You don't have any DataSources yet")}
           pagination={pagination}
           persistSortInUrl
-          unfilteredData={unfilteredData}
+          unfilteredData={dataSources}
         />
       </ListPageBody>
     </>
