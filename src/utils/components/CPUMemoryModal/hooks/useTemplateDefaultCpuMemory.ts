@@ -2,9 +2,9 @@ import { TemplateModel, V1Template } from '@kubevirt-ui-ext/kubevirt-api/console
 import { V1CPU } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
 import { getCPU, getMemory } from '@kubevirt-utils/resources/vm';
+import { Quantity } from '@kubevirt-utils/types/quantity';
+import { toQuantity } from '@kubevirt-utils/utils/units';
 import useK8sGetData from '@multicluster/hooks/useK8sGetData';
-
-import { getMemorySize } from '../utils/CpuMemoryUtils';
 
 type UseTemplateDefaultCpuMemory = (
   templateName: string,
@@ -13,7 +13,7 @@ type UseTemplateDefaultCpuMemory = (
 ) => {
   data: {
     defaultCpu: V1CPU;
-    defaultMemory: { size: number; unit: string };
+    defaultMemory: Quantity | undefined;
   };
   error: Error | undefined;
   loaded: boolean;
@@ -32,7 +32,8 @@ const useTemplateDefaultCpuMemory: UseTemplateDefaultCpuMemory = (
   });
 
   const vmObject = getTemplateVirtualMachineObject(template);
-  const defaultMemory = getMemorySize(getMemory(vmObject));
+  const memoryQuantity = getMemory(vmObject);
+  const defaultMemory = memoryQuantity ? toQuantity(memoryQuantity) : undefined;
   const defaultCpu = getCPU(vmObject);
 
   return {

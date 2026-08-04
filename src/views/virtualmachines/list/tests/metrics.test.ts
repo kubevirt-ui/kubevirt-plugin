@@ -1,6 +1,6 @@
-import { V1CPU, V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1CPU, type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { SINGLE_CLUSTER_KEY } from '@kubevirt-utils/resources/constants';
-import { PrometheusResponse } from '@openshift-console/dynamic-plugin-sdk';
+import { type PrometheusResponse } from '@openshift-console/dynamic-plugin-sdk';
 
 import {
   getCPUUsagePercentage,
@@ -30,7 +30,7 @@ const TWO_GIB_IN_BYTES = 2147483648;
 const ONE_MIB_IN_BYTES = 1048576;
 
 jest.mock('@kubevirt-utils/resources/shared', () => ({
-  getClusterKey: (obj: { cluster?: string }) => obj?.cluster || SINGLE_CLUSTER_KEY,
+  getClusterKey: (obj: { cluster?: string }) => obj?.cluster ?? SINGLE_CLUSTER_KEY,
   getName: (obj: { metadata?: { name?: string } }) => obj?.metadata?.name,
   getNamespace: (obj: { metadata?: { namespace?: string } }) => obj?.metadata?.namespace,
 }));
@@ -38,15 +38,7 @@ jest.mock('@kubevirt-utils/resources/shared', () => ({
 jest.mock('@kubevirt-utils/resources/vm', () => ({
   getVCPUCount: (cpu: V1CPU) => {
     if (!cpu) return 0;
-    return (cpu.sockets || 1) * (cpu.cores || 1) * (cpu.threads || 1);
-  },
-}));
-
-jest.mock('@kubevirt-utils/components/CPUMemoryModal/utils/CpuMemoryUtils', () => ({
-  getMemorySize: (memory: string) => {
-    if (!memory) return null;
-    const match = memory.match(/^(\d+)(\w+)$/);
-    return match ? { size: parseInt(match[1], 10), unit: match[2].replace('B', '') } : null;
+    return (cpu.sockets ?? 1) * (cpu.cores ?? 1) * (cpu.threads ?? 1);
   },
 }));
 
@@ -238,16 +230,52 @@ describe('VM Metrics', () => {
       );
 
       const vm = createMockVM({ name: 'mem-vm', namespace: 'mem-ns' });
-      expect(getMemoryUsagePercentage(vm, '4GiB')).toBeCloseTo(50, 0);
+      expect(getMemoryUsagePercentage(vm, '4Gi')).toBeCloseTo(50, 0);
+    });
+
+    it('should calculate memory usage percentage for Ki guest memory units', () => {
+      // 1953125Ki = 2000000000 bytes; half usage => 50%
+      setMetricFromResponse(
+        createMockPrometheusResponse([{ name: 'ki-vm', namespace: 'ki-ns', value: 1000000000 }]),
+        Metric.memoryUsage,
+      );
+
+      const vm = createMockVM({ name: 'ki-vm', namespace: 'ki-ns' });
+      expect(getMemoryUsagePercentage(vm, '1953125Ki')).toBeCloseTo(50, 0);
+    });
+
+    it('should calculate memory usage percentage for M guest memory units', () => {
+      // 1024M = 1024000000 bytes; half usage => 50%
+      setMetricFromResponse(
+        createMockPrometheusResponse([{ name: 'm-vm', namespace: 'm-ns', value: 512000000 }]),
+        Metric.memoryUsage,
+      );
+
+      const vm = createMockVM({ name: 'm-vm', namespace: 'm-ns' });
+      expect(getMemoryUsagePercentage(vm, '1024M')).toBeCloseTo(50, 0);
     });
 
     it('should return undefined when no memory data or invalid vmiMemory', () => {
       expect(
         getMemoryUsagePercentage(
           createMockVM({ name: 'no-mem-vm', namespace: 'no-mem-ns' }),
-          '8GiB',
+          '8Gi',
         ),
       ).toBeUndefined();
+    });
+
+    it('should return undefined for invalid or zero guest memory capacity', () => {
+      setMetricFromResponse(
+        createMockPrometheusResponse([
+          { name: 'bad-mem-vm', namespace: 'bad-mem-ns', value: ONE_GIB_IN_BYTES },
+        ]),
+        Metric.memoryUsage,
+      );
+
+      const vm = createMockVM({ name: 'bad-mem-vm', namespace: 'bad-mem-ns' });
+      expect(getMemoryUsagePercentage(vm, 'not-a-quantity')).toBeUndefined();
+      expect(getMemoryUsagePercentage(vm, '0Gi')).toBeUndefined();
+      expect(getMemoryUsagePercentage(vm, '0')).toBeUndefined();
     });
   });
 

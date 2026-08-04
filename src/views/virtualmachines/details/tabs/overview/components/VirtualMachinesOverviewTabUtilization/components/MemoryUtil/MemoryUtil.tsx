@@ -1,15 +1,15 @@
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 import xbytes from 'xbytes';
 
-import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import SubTitleChartLabel from '@kubevirt-utils/components/Charts/ChartLabels/SubTitleChartLabel';
 import TitleChartLabel from '@kubevirt-utils/components/Charts/ChartLabels/TitleChartLabel';
 import ComponentReady from '@kubevirt-utils/components/Charts/ComponentReady/ComponentReady';
-import { getMemorySize } from '@kubevirt-utils/components/CPUMemoryModal/utils/CpuMemoryUtils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useVMQueries from '@kubevirt-utils/hooks/useVMQueries';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { getMemory } from '@kubevirt-utils/resources/vm';
+import { convertToBaseValue } from '@kubevirt-utils/utils/humanize.js';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { PrometheusEndpoint } from '@openshift-console/dynamic-plugin-sdk';
@@ -28,7 +28,7 @@ const MemoryUtil: FC<MemoryUtilProps> = ({ vmi }) => {
   const { currentTime } = useDuration();
 
   const queries = useVMQueries(vmi);
-  const memory = getMemorySize(getMemory(vmi));
+  const memory = getMemory(vmi);
 
   const [data, loaded, error] = useFleetPrometheusPoll({
     cluster: getCluster(vmi),
@@ -40,21 +40,23 @@ const MemoryUtil: FC<MemoryUtilProps> = ({ vmi }) => {
 
   const isLoading = !loaded;
   const memoryUsed = +data?.data?.result?.[0]?.value?.[1];
-  const memoryAvailableBytes = xbytes.parseSize(`${memory?.size} ${memory?.unit}B`);
-  const percentageMemoryUsed = (memoryUsed / memoryAvailableBytes) * 100;
-  const isReady = loaded && !isEmpty(memory) && !Number.isNaN(percentageMemoryUsed);
+  const memoryAvailableBytes = Number(convertToBaseValue(memory));
+  const hasMemoryCapacity = Number.isFinite(memoryAvailableBytes) && memoryAvailableBytes > 0;
+  const percentageMemoryUsed = hasMemoryCapacity ? (memoryUsed / memoryAvailableBytes) * 100 : NaN;
+  const isReady =
+    loaded && !isEmpty(memory) && hasMemoryCapacity && Number.isFinite(percentageMemoryUsed);
 
   return (
     <UtilizationBlock
-      usedOfTotalText={
-        isReady ? t('Used of {{ total }}', { total: `${memory?.size} ${memory?.unit}B` }) : ''
-      }
       dataTestId="util-summary-memory"
       title={t('Memory')}
       usageValue={isReady ? xbytes(memoryUsed || 0, { fixed: 0, iec: true }) : ''}
+      usedOfTotalText={isReady ? t('Used of {{ total }}', { total: memory }) : ''}
     >
       <ComponentReady error={error} isLoading={isLoading} isReady={isReady}>
         <ChartDonutUtilization
+          animate
+          constrainToVisibleArea
           data={{
             x: t('Memory used'),
             y: Number(percentageMemoryUsed?.toFixed(2)),
@@ -62,8 +64,6 @@ const MemoryUtil: FC<MemoryUtilProps> = ({ vmi }) => {
           labels={({ datum }) =>
             datum.x ? `${datum.x}: ${xbytes(memoryUsed || 0, { iec: true })}` : null
           }
-          animate
-          constrainToVisibleArea
           style={{ labels: { fontSize: 20 } }}
           subTitle={t('Used')}
           subTitleComponent={<SubTitleChartLabel y={135} />}
