@@ -1,8 +1,9 @@
 import React, { FC, useMemo } from 'react';
 
 import { IoK8sApiBatchV1Job } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import KubevirtFilterToolbar from '@kubevirt-utils/components/KubevirtFilterToolbar/KubevirtFilterToolbar';
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
-import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
+import useKubevirtDataViewFilters from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/useKubevirtDataViewFilters';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtTableColumns';
 import {
@@ -19,7 +20,6 @@ import { Pagination } from '@patternfly/react-core';
 import { useHubClusterName } from '@stolostron/multicluster-sdk';
 
 import { CHECKUPS_COLUMN_KEYS } from '../../utils/constants';
-import useCheckupsListFilters from '../../utils/hooks/useCheckupsListFilters';
 import { getCheckupsConfigMapRowId, getJobByName } from '../../utils/utils';
 import useCheckupsSelfValidationData from '../components/hooks/useCheckupsSelfValidationData';
 import useCheckupsSelfValidationPermissions from '../components/hooks/useCheckupsSelfValidationPermissions';
@@ -48,13 +48,18 @@ const CheckupsSelfValidationList: FC = () => {
   const { configMaps, error: dataError, jobs, loaded } = useCheckupsSelfValidationData();
   const error = dataError || permissionsError;
 
-  const [unfilteredData, filteredData, onFilterChange, filters] = useCheckupsListFilters(
-    configMaps || [],
-    getCheckupsSelfValidationListFilters,
-  );
+  const filterDefinitions = useMemo(() => getCheckupsSelfValidationListFilters(t), [t]);
+  const { clearAllFilters, filteredData, filters, onSetFilters } = useKubevirtDataViewFilters({
+    data: configMaps ?? [],
+    filterDefinitions,
+  });
 
-  const { handleFilterChange, handlePerPageSelect, handleSetPage, pagination } =
-    usePaginationWithFilters(filteredData?.length ?? 0, onFilterChange);
+  const {
+    handlePerPageSelect,
+    handleSetPage,
+    pagination,
+    handleFilterChange: handleSetFilters,
+  } = usePaginationWithFilters(filteredData?.length ?? 0, onSetFilters);
 
   const columns = useMemo(
     () => getCheckupsSelfValidationColumns(t, isACMPage, jobs ?? [], hubClusterName),
@@ -102,11 +107,17 @@ const CheckupsSelfValidationList: FC = () => {
   return (
     <ListPageBody>
       <div className="list-managment-group">
-        <ListPageFilter
+        <KubevirtFilterToolbar
+          clearAllFilters={clearAllFilters}
+          columnLayout={columnLayout}
+          data={configMaps}
+          filterDefinitions={filterDefinitions}
+          filters={filters}
+          loaded={isLoaded}
+          onSetFilters={handleSetFilters}
           toolbarEndContent={
             <KubevirtTableExport
               activeColumnKeys={activeColumnKeys}
-              asToolbarItem
               callbacks={callbacks}
               columns={columns}
               data={filteredData ?? []}
@@ -116,11 +127,6 @@ const CheckupsSelfValidationList: FC = () => {
               loaded={isLoaded}
             />
           }
-          columnLayout={columnLayout}
-          data={unfilteredData}
-          loaded={isLoaded}
-          onFilterChange={handleFilterChange}
-          rowFilters={filters}
         />
         {!isEmpty(filteredData) && isLoaded && (
           <Pagination
@@ -151,7 +157,7 @@ const CheckupsSelfValidationList: FC = () => {
         noDataMsg={t('No self validation checkups found')}
         pagination={pagination}
         persistSortInUrl
-        unfilteredData={unfilteredData}
+        unfilteredData={configMaps}
       />
     </ListPageBody>
   );

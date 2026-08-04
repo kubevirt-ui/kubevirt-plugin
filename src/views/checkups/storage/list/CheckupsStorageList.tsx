@@ -1,10 +1,11 @@
 import React, { useMemo } from 'react';
 
 import { IoK8sApiBatchV1Job } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import KubevirtFilterToolbar from '@kubevirt-utils/components/KubevirtFilterToolbar/KubevirtFilterToolbar';
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
-import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
+import useKubevirtDataViewFilters from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/useKubevirtDataViewFilters';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtTableColumns';
 import {
@@ -20,7 +21,6 @@ import { ListPageBody } from '@openshift-console/dynamic-plugin-sdk';
 import { Pagination } from '@patternfly/react-core';
 import { useHubClusterName } from '@stolostron/multicluster-sdk';
 
-import useCheckupsListFilters from '../../utils/hooks/useCheckupsListFilters';
 import { getCheckupsConfigMapRowId, getJobByName } from '../../utils/utils';
 import useCheckupsStorageData from '../components/hooks/useCheckupsStorageData';
 import { useCheckupsStoragePermissions } from '../components/hooks/useCheckupsStoragePermissions';
@@ -49,13 +49,18 @@ const CheckupsStorageList = () => {
   } = useCheckupsStoragePermissions();
   const { configMaps, error, jobs, loaded } = useCheckupsStorageData();
 
-  const [unfilteredData, filteredData, onFilterChange, filters] = useCheckupsListFilters(
-    configMaps || [],
-    getFilters,
-  );
+  const filterDefinitions = useMemo(() => getFilters(t, jobs ?? []), [t, jobs]);
+  const { clearAllFilters, filteredData, filters, onSetFilters } = useKubevirtDataViewFilters({
+    data: configMaps ?? [],
+    filterDefinitions,
+  });
 
-  const { handleFilterChange, handlePerPageSelect, handleSetPage, pagination } =
-    usePaginationWithFilters(filteredData?.length ?? 0, onFilterChange);
+  const {
+    handlePerPageSelect,
+    handleSetPage,
+    pagination,
+    handleFilterChange: handleSetFilters,
+  } = usePaginationWithFilters(filteredData?.length ?? 0, onSetFilters);
 
   const columns = useMemo(
     () => getCheckupsStorageColumns(t, isACMPage, showNamespace, hubClusterName),
@@ -107,11 +112,17 @@ const CheckupsStorageList = () => {
   return (
     <ListPageBody>
       <div className="list-managment-group">
-        <ListPageFilter
+        <KubevirtFilterToolbar
+          clearAllFilters={clearAllFilters}
+          columnLayout={columnLayout}
+          data={configMaps}
+          filterDefinitions={filterDefinitions}
+          filters={filters}
+          loaded={isLoaded}
+          onSetFilters={handleSetFilters}
           toolbarEndContent={
             <KubevirtTableExport
               activeColumnKeys={activeColumnKeys}
-              asToolbarItem
               callbacks={callbacks}
               columns={columns}
               data={filteredData ?? []}
@@ -119,11 +130,6 @@ const CheckupsStorageList = () => {
               loaded={isLoaded}
             />
           }
-          columnLayout={columnLayout}
-          data={unfilteredData}
-          loaded={isLoaded}
-          onFilterChange={handleFilterChange}
-          rowFilters={filters}
         />
         {!isEmpty(filteredData) && isLoaded && (
           <Pagination
@@ -152,7 +158,7 @@ const CheckupsStorageList = () => {
         noDataMsg={t('No storage checkups found')}
         pagination={pagination}
         persistSortInUrl
-        unfilteredData={unfilteredData}
+        unfilteredData={configMaps}
       />
     </ListPageBody>
   );

@@ -1,39 +1,51 @@
 import { TFunction } from 'i18next';
 
-import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
-import { FilterValue, RowFilter } from '@openshift-console/dynamic-plugin-sdk';
+import {
+  IoK8sApiBatchV1Job,
+  IoK8sApiCoreV1ConfigMap,
+} from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 
-const status = {
-  active: 'running',
-  false: 'failed',
-  true: 'succeeded',
-  unknown: 'unknown',
+import { getName } from '@kubevirt-utils/resources/shared';
+import { CheckupsStatus, getConfigMapStatus, getJobByName, getJobStatus } from '../../utils/utils';
+
+const STORAGE_STATUS_FILTER_ID = 'status';
+
+const STORAGE_STATUS = {
+  running: 'running',
+  failed: 'failed',
+  succeeded: 'succeeded',
+} as const;
+
+const checkupsStatusToFilterValue: Record<CheckupsStatus, string> = {
+  [CheckupsStatus.Deleting]: STORAGE_STATUS.running,
+  [CheckupsStatus.Done]: STORAGE_STATUS.succeeded,
+  [CheckupsStatus.Failed]: STORAGE_STATUS.failed,
+  [CheckupsStatus.Pending]: STORAGE_STATUS.running,
+  [CheckupsStatus.Running]: STORAGE_STATUS.running,
 };
 
-const statusHandler = {
-  get: (mapper: typeof status, prop: string) => {
-    const value = mapper[prop];
-    if (value) return value;
-    return status.unknown;
-  },
+const getFilterStatusValue = (obj: IoK8sApiCoreV1ConfigMap, jobs: IoK8sApiBatchV1Job[]): string => {
+  const matchedJobs = getJobByName(jobs, getName(obj) ?? '');
+  const job = matchedJobs?.[0];
+  const jobStatus = getJobStatus(job);
+  const configMapStatus = getConfigMapStatus(obj, jobStatus);
+
+  return checkupsStatusToFilterValue[configMapStatus];
 };
 
-const statusMapper = new Proxy(status, statusHandler);
-
-export const getFilters = (t: TFunction): RowFilter<IoK8sApiCoreV1ConfigMap>[] => [
+export const getFilters = (
+  t: TFunction,
+  jobs: IoK8sApiBatchV1Job[],
+): KubevirtFilter<IoK8sApiCoreV1ConfigMap>[] => [
   {
-    filter: ({ selected }: FilterValue, obj: IoK8sApiCoreV1ConfigMap) => {
-      const value = statusMapper[(obj?.data, obj?.data?.['status.succeeded'])];
-      return selected?.length === 0 || selected?.includes(value);
-    },
-    filterGroupName: t('Status'),
-    items: [
-      { id: 'succeeded', title: t('Succeeded') },
-      { id: 'failed', title: t('Failed') },
-      { id: 'running', title: t('Running') },
-      { id: 'unknown', title: t('Unknown') },
+    categoryLabel: t('Status'),
+    id: STORAGE_STATUS_FILTER_ID,
+    match: (obj, selected) => selected.includes(getFilterStatusValue(obj, jobs)),
+    options: [
+      { label: t('Succeeded'), value: STORAGE_STATUS.succeeded },
+      { label: t('Failed'), value: STORAGE_STATUS.failed },
+      { label: t('Running'), value: STORAGE_STATUS.running },
     ],
-    reducer: (obj) => statusMapper[obj?.data?.['status.succeeded']],
-    type: 'status',
   },
 ];

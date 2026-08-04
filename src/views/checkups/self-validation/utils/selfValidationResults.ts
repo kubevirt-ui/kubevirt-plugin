@@ -6,7 +6,6 @@ import {
   IoK8sApiCoreV1ConfigMap,
 } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
-import { FilterValue, RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 
 import { CONFIGMAP_NAME, extractConfigMapBaseName, getJobContainers } from '../../utils/utils';
 
@@ -208,26 +207,6 @@ export const formatGoDuration = (durationStr: string): string => {
     return durationStr;
   }
 };
-
-export const getCheckupsSelfValidationListFilters = (
-  t: TFunction,
-): RowFilter<IoK8sApiCoreV1ConfigMap>[] => [
-  {
-    filter: ({ selected }: FilterValue, obj: IoK8sApiCoreV1ConfigMap) => {
-      const status = obj?.data?.[SELF_VALIDATION_RESULTS_KEY] ? 'completed' : 'running';
-      return selected?.length === 0 || selected?.includes(status);
-    },
-    filterGroupName: t('Status'),
-    items: [
-      { id: 'completed', title: t('Completed') },
-      { id: 'running', title: t('Running') },
-    ],
-    reducer: (obj) => {
-      return obj?.data?.[SELF_VALIDATION_RESULTS_KEY] ? 'completed' : 'running';
-    },
-    type: 'self-validation-status',
-  },
-];
 
 /**
  * Generates the results ConfigMap name from a job name
