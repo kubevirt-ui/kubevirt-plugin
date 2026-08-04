@@ -1,13 +1,13 @@
 // Re-export all utilities from the consolidated files
 
 // Constants
+export * from './constants';
 export type {
   JobResults,
   JobResultsTimestamps,
   TEST_STATUS,
   ValidatedJobParameters,
 } from './constants';
-export * from './constants';
 export { downloadResults, getDefaultErrorMessage, validateDownloadInputs } from './downloadResults';
 
 // Download results utilities
@@ -47,10 +47,10 @@ export {
 // RBAC permissions
 export type { PermissionOperationResult } from './selfValidationPermissions';
 // Results parsing and status
+export { getCheckupsSelfValidationListFilters } from './filters';
 export {
   formatGoDuration,
   formatStatusTimestamp,
-  getCheckupsSelfValidationListFilters,
   getCompletedSummaryText,
   getInProgressSummaryText,
   getOverallProgressFromJob,
