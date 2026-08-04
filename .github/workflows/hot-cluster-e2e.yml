@@ -3,7 +3,7 @@
 # never lands natively on a PR. Composes hot-cluster-check.yml,
 # hot-cluster-e2e-run.yml, and .github/actions/hot-cluster/ via `uses:`.
 name: Hot Cluster E2E
-run-name: "Hot Cluster E2E [${{ inputs.base_ref || inputs.cluster_name || github.base_ref || 'kubevirt-plugin-ci' }}] @ ${{ inputs.pr_number != '' && format('PR#{0} retest', inputs.pr_number) || github.head_ref || github.ref_name }}"
+run-name: "Hot Cluster E2E [${{ inputs.test_project || 'gating' }}] [${{ inputs.base_ref || inputs.cluster_name || github.base_ref || 'kubevirt-plugin-ci' }}] @ ${{ inputs.pr_number != '' && format('PR#{0} retest', inputs.pr_number) || github.head_ref || github.ref_name }}"
 
 # No PR events trigger this directly -- pr-validation.yml and
 # hot-cluster-e2e-pr-gate.yml dispatch it via workflow_dispatch instead.
@@ -11,13 +11,29 @@ on:
   workflow_dispatch:
     inputs:
       test_project:
-        description: Playwright project to run (setup runs automatically as dependency)
+        description: |
+          Suite to run. Playwright: gating / tier1 / tier2 / suite / settings / api / all.
+          Cypress (release): gating or features (=tier1). Default gating is the required PR check.
         required: true
         default: gating
         type: choice
         options:
           - gating
+          - tier1
+          - tier2
+          - suite
           - features
+          - settings
+          - api
+          - all
+      test_args:
+        description: |
+          Optional Playwright filter forwarded as CLI args (space-separated), e.g.
+          a spec path (playwright/tests/tier1/foo.spec.ts) or -g MyTestName.
+          Leave empty to run the full selected suite.
+        required: false
+        default: ''
+        type: string
       cluster_name:
         description: 'Cluster name (max 21 chars — IBM Cloud IPI limit, longer names get silently truncated)'
         required: true
@@ -219,10 +235,13 @@ jobs:
           private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
           permission-checks: write
 
+      # Only the required gating suite owns "Run Gating Tests". Ad-hoc
+      # tier1/tier2/suite/filter runs must not supersede that check.
       - name: Supersede stale "Run Gating Tests" check for this run
         id: supersede-gating-check
         if: |
           always() &&
+          (inputs.test_project == 'gating' || inputs.test_project == '') &&
           steps.resolve-progress.outputs.head-sha != '' &&
           !(github.event_name == 'workflow_dispatch' && inputs.pr_number == '') &&
           steps.resolve-pr-context.outcome != 'failure' &&
@@ -243,9 +262,10 @@ jobs:
   cluster-check:
     needs: [prepare]
     if: always()
-    # Cancels a same-PR push/retest's stale cluster check.
+    # Cancels a same-PR+suite push/retest's stale cluster check. Suite is in
+    # the key so /test-e2e tier1 does not cancel an in-flight gating run.
     concurrency:
-      group: hot-cluster-check-${{ inputs.pr_number || format('{0}-{1}', github.ref, inputs.cluster_name || 'kubevirt-plugin-ci') }}
+      group: hot-cluster-check-${{ inputs.pr_number || format('{0}-{1}', github.ref, inputs.cluster_name || 'kubevirt-plugin-ci') }}-${{ inputs.test_project || 'gating' }}
       cancel-in-progress: true
     uses: ./.github/workflows/hot-cluster-check.yml
     with:
@@ -320,11 +340,12 @@ jobs:
       needs.prepare.outputs.pr_trusted != 'false'
     # Own group, same reasoning as cluster-check's concurrency.
     concurrency:
-      group: hot-cluster-run-e2e-${{ inputs.pr_number || format('{0}-{1}', github.ref, inputs.cluster_name || 'kubevirt-plugin-ci') }}
+      group: hot-cluster-run-e2e-${{ inputs.pr_number || format('{0}-{1}', github.ref, inputs.cluster_name || 'kubevirt-plugin-ci') }}-${{ inputs.test_project || 'gating' }}
       cancel-in-progress: true
     uses: ./.github/workflows/hot-cluster-e2e-run.yml
     with:
       test_project: ${{ inputs.test_project || 'gating' }}
+      test_args: ${{ inputs.test_args || '' }}
       test_engine: ${{ needs.prepare.outputs.test_engine }}
       runner_label: ${{ inputs.runner_label || needs.prepare.outputs.cluster_name }}
       cluster_name: ${{ needs.prepare.outputs.cluster_name }}
@@ -412,6 +433,9 @@ jobs:
           GATING_CHECK_RUN_ID: ${{ needs.prepare.outputs.gating_check_run_id }}
           JOB_STATUS: ${{ job.status }}
           TEST_FAILURE_SUMMARY: ${{ needs.run-e2e-tests.outputs.test_failure_summary }}
+          # Non-gating suites must not publish/overwrite "Run Gating Tests".
+          TEST_PROJECT: ${{ inputs.test_project || 'gating' }}
+          TEST_ARGS: ${{ inputs.test_args || '' }}
         working-directory: .github/scripts
         run: npx tsx src/e2e/verify.ts
 

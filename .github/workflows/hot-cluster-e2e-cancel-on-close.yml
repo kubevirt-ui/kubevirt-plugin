@@ -44,24 +44,31 @@ jobs:
   # that job). Gating this on detect's findings would leave a real
   # in-progress job running untouched whenever that lookup misses it (API
   # lag, or the run hasn't reached in_progress/queued yet).
+  # Matrix covers every test_project key used in hot-cluster-e2e.yml.
   cancel-cluster-check:
-    name: Cancel Cluster Check
+    name: Cancel Cluster Check (${{ matrix.suite }})
     runs-on: ubuntu-latest
     timeout-minutes: 2
+    strategy:
+      matrix:
+        suite: [gating, tier1, tier2, suite, features, settings, api, all]
     concurrency:
-      group: hot-cluster-check-${{ github.event.pull_request.number }}
+      group: hot-cluster-check-${{ github.event.pull_request.number }}-${{ matrix.suite }}
       cancel-in-progress: true
     steps:
-      - run: echo "Entered the cluster-check concurrency group for PR ${{ github.event.pull_request.number }} -- cancels any in-progress instance."
+      - run: echo "Entered the cluster-check concurrency group for PR ${{ github.event.pull_request.number }} suite ${{ matrix.suite }}."
 
   # Same as above, for run-e2e-tests -- the job that actually costs real
   # cluster/test time.
   cancel-run-e2e-tests:
-    name: Cancel Run E2E Tests
+    name: Cancel Run E2E Tests (${{ matrix.suite }})
     runs-on: ubuntu-latest
     timeout-minutes: 2
+    strategy:
+      matrix:
+        suite: [gating, tier1, tier2, suite, features, settings, api, all]
     concurrency:
-      group: hot-cluster-run-e2e-${{ github.event.pull_request.number }}
+      group: hot-cluster-run-e2e-${{ github.event.pull_request.number }}-${{ matrix.suite }}
       cancel-in-progress: true
     steps:
-      - run: echo "Entered the run-e2e-tests concurrency group for PR ${{ github.event.pull_request.number }} -- cancels any in-progress instance."
+      - run: echo "Entered the run-e2e-tests concurrency group for PR ${{ github.event.pull_request.number }} suite ${{ matrix.suite }}."

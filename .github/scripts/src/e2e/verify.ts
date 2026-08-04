@@ -67,6 +67,42 @@ const main = async (): Promise<void> => {
     return;
   }
 
+  const testProject = (process.env.TEST_PROJECT ?? 'gating').toLowerCase();
+  const testArgs = (process.env.TEST_ARGS ?? '').trim();
+  const isGatingSuite = testProject === 'gating';
+
+  // Ad-hoc /test-e2e tier1|tier2|suite|filter runs must not overwrite the
+  // required "Run Gating Tests" check or e2e-passed/e2e-failed labels.
+  if (!isGatingSuite) {
+    const suiteLabel = testArgs ? `${testProject} (${testArgs})` : testProject;
+    const passed = reason === 'passed';
+    const emoji = passed ? '✅' : '❌';
+    const body = [
+      `${emoji} Hot Cluster E2E ad-hoc suite \`${suiteLabel}\` ${passed ? 'passed' : 'failed'}.`,
+      '',
+      `[View run](${runUrl})`,
+      testFailureSummary ? `\n${testFailureSummary}` : '',
+    ]
+      .filter(Boolean)
+      .join('\n');
+
+    console.log(
+      `test_project=${testProject} -- skipping Run Gating Tests publish; commenting on PR #${prNumber}.`,
+    );
+    try {
+      await botOctokit.issues.createComment({
+        body,
+        issue_number: Number(prNumber),
+        owner,
+        repo,
+      });
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      console.warn(`Could not comment ad-hoc suite result: ${msg}`);
+    }
+    return;
+  }
+
   const held = await checkHoldState(octokit, owner, repo, prNumber, E2E_HOLD_LABEL);
 
   const result = mapResultDetails({

@@ -85,8 +85,10 @@ jobs:
     if: needs.dispatch.outputs.needs_cancel == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 1
+    # Must match hot-cluster-e2e.yml's gating suite concurrency key
+    # (…-${{ pr }}-gating). Ad-hoc /test-e2e tier* runs use a different key.
     concurrency:
-      group: hot-cluster-check-${{ github.event.issue.number }}
+      group: hot-cluster-check-${{ github.event.issue.number }}-gating
       cancel-in-progress: true
     steps:
       - run: echo "Entered cluster-check concurrency group for PR ${{ github.event.issue.number }}"
@@ -98,7 +100,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 1
     concurrency:
-      group: hot-cluster-run-e2e-${{ github.event.issue.number }}
+      group: hot-cluster-run-e2e-${{ github.event.issue.number }}-gating
       cancel-in-progress: true
     steps:
       - run: echo "Entered run-e2e-tests concurrency group for PR ${{ github.event.issue.number }}"

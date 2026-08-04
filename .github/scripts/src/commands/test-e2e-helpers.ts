@@ -1,0 +1,98 @@
+import type { Octokit } from '@octokit/rest';
+
+import { failStep, setOutput } from '../shared/output';
+
+export const VALID_TEST_E2E_PROJECTS = [
+  'gating',
+  'tier1',
+  'tier2',
+  'suite',
+  'features',
+  'settings',
+  'api',
+  'all',
+] as const;
+
+export type TestE2EProject = (typeof VALID_TEST_E2E_PROJECTS)[number];
+
+export type ParsedTestE2ECommand = {
+  testArgs: string;
+  testProject: TestE2EProject;
+};
+
+/** Parse `/test-e2e <suite> [args…]` from a PR comment body (first matching line). */
+export const parseTestE2ECommand = (commentBody: string): ParsedTestE2ECommand | null => {
+  const line = commentBody
+    .split(/\r?\n/)
+    .map((entry) => entry.trim())
+    .find((entry) => entry.startsWith('/test-e2e'));
+  if (!line) {
+    return null;
+  }
+
+  const match = line.match(/^\/test-e2e(?:\s+([a-zA-Z0-9_-]+))?(?:\s+(.+))?$/);
+  if (!match?.[1]) {
+    return null;
+  }
+
+  const testProject = match[1].toLowerCase();
+  if (!(VALID_TEST_E2E_PROJECTS as readonly string[]).includes(testProject)) {
+    return null;
+  }
+
+  return {
+    testArgs: (match[2] ?? '').trim(),
+    testProject: testProject as TestE2EProject,
+  };
+};
+
+/** Build the comment body for a successful /test-e2e dispatch. */
+export const buildTestE2EReport = (
+  owner: string,
+  repo: string,
+  testProject: string,
+  testArgs: string,
+): string => {
+  const suiteLabel = testArgs ? `\`${testProject}\` with \`${testArgs}\`` : `\`${testProject}\``;
+  const lines = [
+    `🚀 \`/test-e2e\` dispatched Hot Cluster E2E for ${suiteLabel} on this PR.`,
+    '',
+  ];
+
+  if (testProject !== 'gating') {
+    lines.push(
+      '> This is an ad-hoc suite run — it does **not** update the required **Run Gating Tests** check.',
+      '',
+    );
+  }
+
+  lines.push(
+    `Track progress in the [Actions tab](https://github.com/${owner}/${repo}/actions/workflows/hot-cluster-e2e.yml).`,
+  );
+  return lines.join('\n');
+};
+
+/** Report an unexpected error for /test-e2e. */
+export const reportTestE2EError = async (
+  octokit: Octokit,
+  owner: string,
+  repo: string,
+  prNumber: number,
+  message: string,
+): Promise<void> => {
+  setOutput('unexpected_error', 'true');
+  setOutput('error_message', message);
+
+  try {
+    await octokit.issues.createComment({
+      body: `⚠️ \`/test-e2e\` hit an unexpected error:\n\n\`\`\`\n${message}\n\`\`\``,
+      issue_number: prNumber,
+      owner,
+      repo,
+    });
+  } catch {
+    /* best effort */
+  }
+
+  failStep(message);
+};
