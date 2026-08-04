@@ -1,4 +1,4 @@
-import { GATING, GATING_TAG } from '@/data-models/allure-constants';
+import { GATING, GATING_TAG, VM_SEARCH_TAG } from '@/data-models/allure-constants';
 import { expect, test } from '@/fixtures/gating-fixture';
 
 const SUITE = 'Virtualization pages';
@@ -87,6 +87,44 @@ test.describe('Virtualization pages (gating)', { tag: [GATING_TAG] }, () => {
         .toBe(true);
 
       await vmListPage.dismissContextMenu();
+    });
+  });
+
+  test('VM search bar accepts key:value syntax and produces filter chips', async ({
+    vmListPage,
+    testConfig,
+    utils,
+  }) => {
+    await utils.withAllure({
+      suite: SUITE,
+      feature: GATING,
+      tags: [GATING_TAG, VM_SEARCH_TAG],
+    });
+
+    await vmListPage.navigateToNamespaceVirtualMachinesViaUI(testConfig.testNamespace);
+    await vmListPage.clickVmListTab();
+
+    await test.step('Search bar is visible and accepts key:value input', async () => {
+      await vmListPage.typeInVmSearchInput('status:');
+      const dropdownVisible = await vmListPage.isSearchDropdownVisible();
+      expect
+        .soft(dropdownVisible, 'Search dropdown should appear after typing a search key')
+        .toBe(true);
+    });
+
+    await test.step('Submitting key:value search produces a filter chip', async () => {
+      await vmListPage.fillVmSearchInput('status:Running');
+      const chips = await vmListPage.getFilterChipTexts();
+      const hasRunningChip = chips.some((chip) => chip.includes('Running'));
+      expect
+        .soft(hasRunningChip, `Filter chip "Running" should appear (got: ${chips.join(', ')})`)
+        .toBe(true);
+    });
+
+    await test.step('Clearing search resets input and filters', async () => {
+      await vmListPage.clickClearSearchButton();
+      const isEmpty = await vmListPage.verifyVmSearchInputEmpty();
+      expect.soft(isEmpty, 'Search input should be empty after clearing').toBe(true);
     });
   });
 

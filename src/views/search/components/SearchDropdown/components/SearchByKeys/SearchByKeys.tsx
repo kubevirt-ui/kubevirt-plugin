@@ -36,7 +36,7 @@ const SearchByKeys: FC<SearchByKeysProps> = ({
   const rightBadges = searchKeyBadges.slice(midpoint);
 
   return (
-    <div className="search-dropdown__section">
+    <div className="search-dropdown__section" data-test="search-keys-section">
       <div className="search-dropdown__section-title">
         <Content component={ContentVariants.h6}>{t('Search by')}</Content>
         <Content className="search-dropdown__subtitle" component={ContentVariants.small}>

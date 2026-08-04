@@ -8,7 +8,7 @@ import '../search-dropdown.scss';
 
 const SearchDropdownMenu: FC<MenuProps> = ({ children, ...props }) => {
   return (
-    <Menu className="search-dropdown" {...props}>
+    <Menu className="search-dropdown" data-test="search-dropdown" {...props}>
       <MenuContent className="search-dropdown__content">{children}</MenuContent>
       <SearchDropdownFooter />
     </Menu>

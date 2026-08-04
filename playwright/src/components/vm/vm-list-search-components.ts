@@ -261,9 +261,6 @@ export class VmListSearchComponent extends BaseComponent {
   private readonly _advSearchVmIp = this.testId('adv-search-vm-ip');
   private readonly _advSearchVmName = this.testId('adv-search-vm-name');
   private readonly _advSearchVmProjectToggle = this.testId('adv-search-vm-project-toggle');
-  private readonly _allSearchResultsFoundBtn = this.locator(
-    'button:has-text("All search results found")',
-  );
   private readonly _backToVirtualMachinesListBtn = this.locator(
     'button:has-text("Back to VirtualMachines list")',
   );
@@ -274,10 +271,9 @@ export class VmListSearchComponent extends BaseComponent {
   private readonly _saveSearchButton = this.testId('save-search');
   private readonly _saveSearchDescription = this.testId('save-search-description');
   private readonly _saveSearchName = this.testId('save-search-name');
-  private readonly _searchBarResults = this.testId('search-results').or(
-    this.locator('.pf-v6-c-panel.pf-m-raised'),
-  );
   private readonly _searchBarResults1 = this.testId('search-bar-results');
+  private readonly _searchDropdown = this.testId('search-dropdown');
+  private readonly _searchKeysSection = this.testId('search-keys-section');
   private readonly _vmAdvancedSearchButton = this.testId('vm-advanced-search-button');
   private readonly _vmSearchInputByDataTest = this.testId('vm-search-input').locator('input');
 
@@ -312,14 +308,6 @@ export class VmListSearchComponent extends BaseComponent {
     const resetButton = this.locator('button[aria-label="Clear search"]');
     await resetButton.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
     await this.robustClick(resetButton);
-  }
-
-  async clickAllSearchResultsFound(): Promise<void> {
-    await this._allSearchResultsFoundBtn.waitFor({
-      state: 'visible',
-      timeout: TestTimeouts.ELEMENT_WAIT,
-    });
-    await this.robustClick(this._allSearchResultsFoundBtn);
   }
 
   async clickBackToVirtualMachinesList(): Promise<void> {
@@ -464,7 +452,7 @@ export class VmListSearchComponent extends BaseComponent {
     });
     await this._vmSearchInputByDataTest.clear();
     await this._vmSearchInputByDataTest.pressSequentially(searchText, { delay: 250 });
-    await this.clickSearchButton();
+    await this._vmSearchInputByDataTest.press('Enter');
   }
 
   async getAdvancedSearchIpValidationWarning(): Promise<string | null> {
@@ -497,6 +485,30 @@ export class VmListSearchComponent extends BaseComponent {
     await toggleInput.click();
     await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
     return texts.map((t) => t.trim()).filter(Boolean);
+  }
+
+  async getFilterChipTexts(): Promise<string[]> {
+    await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
+    const chips = this.page.locator('.pf-v6-c-label__text');
+    const count = await chips.count().catch(() => 0);
+    if (count === 0) return [];
+    return (await chips.allTextContents()).map((t) => t.trim()).filter(Boolean);
+  }
+
+  async getSearchDropdownValues(): Promise<string[]> {
+    await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
+    const values = this._searchDropdown.locator('[data-test^="search-value-"]');
+    const count = await values.count().catch(() => 0);
+    if (count === 0) return [];
+    return (await values.allTextContents()).map((t) => t.trim()).filter(Boolean);
+  }
+
+  async getSearchInputValue(): Promise<string> {
+    await this._vmSearchInputByDataTest.waitFor({
+      state: 'visible',
+      timeout: TestTimeouts.ELEMENT_WAIT,
+    });
+    return this._vmSearchInputByDataTest.inputValue();
   }
 
   async isAdvancedSearchNoResultsVisible(): Promise<boolean> {
@@ -536,16 +548,6 @@ export class VmListSearchComponent extends BaseComponent {
     }
   }
 
-  async isProjectContextInSuggestBox(projectName: string): Promise<boolean> {
-    try {
-      const projectText = this._searchBarResults.locator(`text=project ${projectName}`).first();
-      await projectText.waitFor({ state: 'visible', timeout: TestTimeouts.SHORT_WAIT });
-      return true;
-    } catch {
-      return false;
-    }
-  }
-
   async isSaveSearchButtonVisible(timeout: number = TestTimeouts.SHORT_WAIT): Promise<boolean> {
     try {
       await this._saveSearchButton.waitFor({ state: 'visible', timeout });
@@ -565,6 +567,34 @@ export class VmListSearchComponent extends BaseComponent {
         '.pf-v6-c-helper-text__item.pf-m-error, .pf-v6-c-helper-text__item.pf-m-warning',
       ).first();
       return await errorItem.isVisible().catch(() => false);
+    } catch {
+      return false;
+    }
+  }
+
+  async isSearchDropdownVisible(): Promise<boolean> {
+    try {
+      await this._searchDropdown.waitFor({ state: 'visible', timeout: TestTimeouts.SHORT_WAIT });
+      return await this._searchDropdown.isVisible().catch(() => false);
+    } catch {
+      return false;
+    }
+  }
+
+  async isSearchKeysSectionVisible(): Promise<boolean> {
+    try {
+      await this._searchKeysSection.waitFor({ state: 'visible', timeout: TestTimeouts.SHORT_WAIT });
+      return await this._searchKeysSection.isVisible().catch(() => false);
+    } catch {
+      return false;
+    }
+  }
+
+  async isSearchKeyVisible(searchKey: string): Promise<boolean> {
+    try {
+      const key = this._searchKeysSection.getByTestId(`search-key-${searchKey}`);
+      await key.waitFor({ state: 'visible', timeout: TestTimeouts.SHORT_WAIT });
+      return await key.isVisible().catch(() => false);
     } catch {
       return false;
     }
@@ -607,6 +637,18 @@ export class VmListSearchComponent extends BaseComponent {
     } catch {
       return false;
     }
+  }
+
+  async selectSearchDropdownOperator(operator: string): Promise<void> {
+    const operatorItem = this._searchDropdown.getByTestId(`search-operator-${operator}`);
+    await operatorItem.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+    await this.robustClick(operatorItem);
+  }
+
+  async selectSearchDropdownValue(value: string): Promise<void> {
+    const valueItem = this._searchDropdown.getByTestId(`search-value-${value}`);
+    await valueItem.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+    await this.robustClick(valueItem);
   }
 
   async setAdvancedSearchDate(date: string): Promise<void> {
@@ -768,17 +810,6 @@ export class VmListSearchComponent extends BaseComponent {
     await this._vmSearchInputByDataTest.fill(searchText);
   }
 
-  async verifyAllSearchResultsFoundButton(): Promise<boolean> {
-    try {
-      const allResultsButton = this._searchBarResults.locator(
-        'button:has-text("All search results found")',
-      );
-      return await allResultsButton.isVisible().catch(() => false);
-    } catch {
-      return false;
-    }
-  }
-
   async verifySavedSearchNotExists(saveName: string): Promise<boolean> {
     try {
       const savedSearchButton = this.locator(`button:has-text("${saveName}")`);
@@ -803,15 +834,6 @@ export class VmListSearchComponent extends BaseComponent {
     }
   }
 
-  async verifySearchBarResultsVisible(): Promise<boolean> {
-    try {
-      await this._searchBarResults.waitFor({ state: 'visible', timeout: TestTimeouts.SHORT_WAIT });
-      return await this._searchBarResults.isVisible().catch(() => false);
-    } catch {
-      return false;
-    }
-  }
-
   async verifySearchResultsSubtitle(): Promise<boolean> {
     try {
       const advSearchPanel = this.testId('results-advanced-search')
@@ -820,31 +842,6 @@ export class VmListSearchComponent extends BaseComponent {
         .first();
       await advSearchPanel.waitFor({ state: 'visible', timeout: TestTimeouts.SHORT_WAIT });
       return await advSearchPanel.isVisible().catch(() => false);
-    } catch {
-      return false;
-    }
-  }
-
-  async verifySearchSuggestBoxHidden(): Promise<boolean> {
-    try {
-      await this._searchBarResults.waitFor({
-        state: 'hidden',
-        timeout: TestTimeouts.SHORT_WAIT,
-      });
-      return !(await this._searchBarResults.isVisible().catch(() => false));
-    } catch {
-      return false;
-    }
-  }
-
-  async verifyVmNameInSearchResults(vmName: string): Promise<boolean> {
-    try {
-      const vmLink = this._searchBarResults
-        .getByTestId(vmName)
-        .or(this._searchBarResults.locator(`a:has-text("${vmName}")`))
-        .first();
-      await vmLink.waitFor({ state: 'visible', timeout: TestTimeouts.SHORT_WAIT });
-      return await vmLink.isVisible().catch(() => false);
     } catch {
       return false;
     }

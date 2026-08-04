@@ -79,6 +79,9 @@ export const MIGRATION_FEATURE = 'Migrations';
 /** Playwright/Allure tag for VM migration tests. */
 export const MIGRATION_TAG = '@migration';
 
+/** Playwright/Allure tag for VM search language tests. */
+export const VM_SEARCH_TAG = '@vm-search';
+
 /** Allure feature label for visual regression tests. */
 export const VISUAL = 'Visual';
 
