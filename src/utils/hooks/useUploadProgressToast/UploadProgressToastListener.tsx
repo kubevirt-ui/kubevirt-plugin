@@ -14,6 +14,7 @@ const UploadProgressToastListener: FC = () => {
   const { addDangerToast, addInfoToast, addSuccessToast, addWarningToast, removeToast } =
     useKubevirtToast();
   const uploads = useUploadProgressStore((state) => state.uploads);
+  const cancelTrackedUpload = useUploadProgressStore((state) => state.cancelTrackedUpload);
   const tryMarkTerminalToastShown = useUploadProgressStore(
     (state) => state.tryMarkTerminalToastShown,
   );
@@ -39,6 +40,7 @@ const UploadProgressToastListener: FC = () => {
         addInfoToast,
         addSuccessToast,
         addWarningToast,
+        cancelTrackedUpload,
         navigate,
         removeToast,
         removeUpload,
@@ -55,6 +57,7 @@ const UploadProgressToastListener: FC = () => {
     addInfoToast,
     addSuccessToast,
     addWarningToast,
+    cancelTrackedUpload,
     navigate,
     removeToast,
     removeUpload,

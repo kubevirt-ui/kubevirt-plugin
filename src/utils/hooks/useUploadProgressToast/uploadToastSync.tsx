@@ -1,11 +1,11 @@
-import React from 'react';
 import { TFunction } from 'i18next';
+import React from 'react';
 
 import useKubevirtToast from '@kubevirt-utils/hooks/useKubevirtToast';
 
 import UploadProgressToastContent from './components/UploadProgressToastContent';
-import { getUploadTitle, isTerminalUploadStatus } from './toast/uploadTitles';
 import { UPLOAD_PROGRESS_STATUS } from './constants';
+import { getUploadTitle, isTerminalUploadStatus } from './toast/uploadTitles';
 import { UploadEntry } from './types';
 
 type ToastActions = ReturnType<typeof useKubevirtToast>;
@@ -15,6 +15,7 @@ type UploadToastContext = {
   addInfoToast: ToastActions['addInfoToast'];
   addSuccessToast: ToastActions['addSuccessToast'];
   addWarningToast: ToastActions['addWarningToast'];
+  cancelTrackedUpload: (uploadKey: string) => void;
   navigate: (path: string) => void;
   removeToast: ToastActions['removeToast'];
   removeUpload: (uploadKey: string) => void;
@@ -38,6 +39,8 @@ export const showInProgressUploadToast = (
   const toastId = context.addInfoToast({
     content: <UploadProgressToastContent navigate={context.navigate} uploadKey={uploadKey} />,
     dismissible: false,
+    minimizable: true,
+    onClose: () => context.cancelTrackedUpload(uploadKey),
     timeout: false,
     title: getUploadTitle(upload, context.t),
   });

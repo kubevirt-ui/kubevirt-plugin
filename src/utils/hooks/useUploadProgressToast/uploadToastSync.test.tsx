@@ -20,11 +20,14 @@ jest.mock('./toast/uploadTitles', () => ({
 const UPLOAD_KEY = 'test-upload-key';
 const TOAST_ID = 'toast-123';
 
+type MockToastOptions = { onClose?: () => void } & Record<string, unknown>;
+
 const createMockContext = () => ({
-  addDangerToast: jest.fn(() => 'danger-toast-id'),
-  addInfoToast: jest.fn(() => TOAST_ID),
-  addSuccessToast: jest.fn(() => 'success-toast-id'),
-  addWarningToast: jest.fn(() => 'warning-toast-id'),
+  addDangerToast: jest.fn((_options: MockToastOptions) => 'danger-toast-id'),
+  addInfoToast: jest.fn((_options: MockToastOptions) => TOAST_ID),
+  addSuccessToast: jest.fn((_options: MockToastOptions) => 'success-toast-id'),
+  addWarningToast: jest.fn((_options: MockToastOptions) => 'warning-toast-id'),
+  cancelTrackedUpload: jest.fn(),
   navigate: jest.fn(),
   removeToast: jest.fn(),
   removeUpload: jest.fn(),
@@ -72,6 +75,31 @@ describe('showInProgressUploadToast', () => {
     expect(processedToasts.has(UPLOAD_KEY)).toBe(true);
     expect(context.addInfoToast).toHaveBeenCalledTimes(1);
     expect(context.trySetToastId).toHaveBeenCalledWith(UPLOAD_KEY, TOAST_ID);
+  });
+
+  it('should pass minimizable: true so the toast can be minimized instead of cleared', () => {
+    const context = createMockContext();
+    const processedToasts = new Set<string>();
+    const upload = createUploadEntry();
+
+    showInProgressUploadToast(UPLOAD_KEY, upload, context, processedToasts);
+
+    expect(context.addInfoToast).toHaveBeenCalledWith(
+      expect.objectContaining({ minimizable: true }),
+    );
+  });
+
+  it('should call context.cancelTrackedUpload with the upload key when onClose fires', () => {
+    const context = createMockContext();
+    const processedToasts = new Set<string>();
+    const upload = createUploadEntry();
+
+    showInProgressUploadToast(UPLOAD_KEY, upload, context, processedToasts);
+
+    const { onClose } = context.addInfoToast.mock.calls[0][0];
+    onClose?.();
+
+    expect(context.cancelTrackedUpload).toHaveBeenCalledWith(UPLOAD_KEY);
   });
 
   it('should remove toast and processedToasts entry if trySetToastId fails', () => {
@@ -151,6 +179,19 @@ describe('replaceWithTerminalUploadToast', () => {
     replaceWithTerminalUploadToast(UPLOAD_KEY, upload, context);
 
     expect(context.addWarningToast).toHaveBeenCalledTimes(1);
+  });
+
+  it('should pass onClose that calls removeUpload (not cancelTrackedUpload) for terminal toast', () => {
+    const context = createMockContext();
+    const upload = createUploadEntry({ status: UPLOAD_PROGRESS_STATUS.SUCCESS });
+
+    replaceWithTerminalUploadToast(UPLOAD_KEY, upload, context);
+
+    const { onClose } = context.addSuccessToast.mock.calls[0][0] as MockToastOptions;
+    onClose?.();
+
+    expect(context.removeUpload).toHaveBeenCalledWith(UPLOAD_KEY);
+    expect(context.cancelTrackedUpload).not.toHaveBeenCalled();
   });
 });
 

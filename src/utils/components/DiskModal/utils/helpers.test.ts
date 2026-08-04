@@ -117,4 +117,67 @@ describe('createEjectMountedDiskCancelCleanup / createDetachDiskCancelCleanup', 
       expect(patchedVM.spec.template.spec.volumes).toEqual([]);
     });
   });
+
+  describe('cancelling multiple disks on the same VM at once (e.g. "Clear all")', () => {
+    it('serializes the fetch+patch cycles instead of racing on a stale VM read', async () => {
+      const secondCdromName = 'cdrom-2';
+      const vmWithTwoCdroms = (): V1VirtualMachine => ({
+        metadata: { name: 'test-vm', namespace: 'test-ns' },
+        spec: {
+          template: {
+            spec: {
+              domain: {
+                devices: {
+                  disks: [
+                    { cdrom: {}, name: cdromName },
+                    { cdrom: {}, name: secondCdromName },
+                  ],
+                },
+              },
+              volumes: [
+                { dataVolume: { name: 'dv-1' }, name: cdromName },
+                { dataVolume: { name: 'dv-2' }, name: secondCdromName },
+              ],
+            },
+          },
+        },
+      });
+
+      let resolveFirstGet: (vm: V1VirtualMachine) => void = () => undefined;
+      mockKubevirtK8sGet.mockImplementationOnce(
+        () =>
+          new Promise<V1VirtualMachine>((resolve) => {
+            resolveFirstGet = resolve;
+          }),
+      );
+
+      const firstCleanup = createEjectMountedDiskCancelCleanup(vmWithTwoCdroms(), cdromName);
+      const secondCleanup = createEjectMountedDiskCancelCleanup(vmWithTwoCdroms(), secondCdromName);
+
+      const firstDone = firstCleanup();
+      const secondDone = secondCleanup();
+
+      await Promise.resolve();
+      await Promise.resolve();
+
+      // The second cleanup must not fetch the VM until the first has fully patched it,
+      // otherwise it would read stale data and overwrite the first cleanup's changes.
+      expect(mockKubevirtK8sGet).toHaveBeenCalledTimes(1);
+
+      resolveFirstGet(vmWithTwoCdroms());
+      await firstDone;
+
+      mockKubevirtK8sGet.mockResolvedValueOnce(mockUpdateDisks.mock.calls[0][0]);
+      await secondDone;
+
+      expect(mockKubevirtK8sGet).toHaveBeenCalledTimes(2);
+      expect(mockUpdateDisks).toHaveBeenCalledTimes(2);
+
+      const finalPatchedVM = mockUpdateDisks.mock.calls[1][0] as V1VirtualMachine;
+      // Both CD-ROMs must be ejected (volumes removed) in the final patch — the first
+      // cleanup's eject was not clobbered by the second cleanup's stale read.
+      expect(finalPatchedVM.spec.template.spec.volumes).toEqual([]);
+      expect(finalPatchedVM.spec.template.spec.domain.devices.disks).toHaveLength(2);
+    });
+  });
 });
