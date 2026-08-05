@@ -1,5 +1,4 @@
 import { V1beta1PersistentVolumeClaim, V1Disk } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 
 export type DiskPresentation = {
   drive: string;
@@ -25,7 +24,6 @@ export type DiskRaw = V1Disk & { pvc?: V1beta1PersistentVolumeClaim };
 export const diskTypes = {
   cdrom: 'CD-ROM',
   disk: 'Disk',
-  floppy: 'Floppy',
   LUN: 'LUN',
 };
 
@@ -50,23 +48,3 @@ export const diskStructureCreator = (disks: DiskRaw[]): DiskPresentation[] => {
     };
   });
 };
-
-export const filters: RowFilter[] = [
-  {
-    filter: (drives, obj) => {
-      const status = obj?.drive;
-      return (
-        drives.selected?.length === 0 ||
-        drives.selected?.includes(status) ||
-        !drives?.all?.find((s) => s === status)
-      );
-    },
-    filterGroupName: 'Disk type',
-    items: Object.keys(diskTypes).map((type) => ({
-      id: type,
-      title: diskTypes[type],
-    })),
-    reducer: (obj) => obj?.drive,
-    type: 'disk-type',
-  },
-];

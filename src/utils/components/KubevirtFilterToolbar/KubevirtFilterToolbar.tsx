@@ -1,6 +1,7 @@
-import React, { FC, ReactNode, useMemo, useState } from 'react';
+import React, { ReactNode, useMemo, useState } from 'react';
 
 import {
+  FilterableObject,
   KubevirtFilter,
   KubevirtFilterLayout,
   KubevirtFilterState,
@@ -8,7 +9,7 @@ import {
 } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { ColumnLayout, K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import { ColumnLayout } from '@openshift-console/dynamic-plugin-sdk';
 import { Toolbar, ToolbarContent, ToolbarToggleGroup } from '@patternfly/react-core';
 import { FilterIcon } from '@patternfly/react-icons';
 
@@ -20,35 +21,39 @@ import HiddenFilterChips from './components/HiddenFilterChips';
 import SelectFilterItem from './components/SelectFilterItem';
 import TextSearchFilters from './components/TextSearchFilters';
 
-type KubevirtFilterToolbarProps = {
+type KubevirtFilterToolbarProps<T extends FilterableObject = FilterableObject> = {
   clearAllFilters: () => void;
   columnLayout?: ColumnLayout;
-  data?: K8sResourceCommon[];
-  filterDefinitions?: KubevirtFilter[];
+  data?: T[];
+  filterDefinitions?: KubevirtFilter<T>[];
   filters: KubevirtFilterState;
   hideColumnManagement?: boolean;
+  hideLabelFilter?: boolean;
   loaded?: boolean;
   onSetFilters: OnSetFilters;
   toolbarEndContent?: ReactNode;
 };
 
-const KubevirtFilterToolbar: FC<KubevirtFilterToolbarProps> = ({
+const KubevirtFilterToolbar = <T extends FilterableObject = FilterableObject>({
   clearAllFilters,
   columnLayout,
   data,
-  filterDefinitions = EMPTY_FILTERS,
+  filterDefinitions = EMPTY_FILTERS as KubevirtFilter<T>[],
   filters,
   hideColumnManagement,
+  hideLabelFilter,
   loaded,
   onSetFilters,
   toolbarEndContent,
-}) => {
+}: KubevirtFilterToolbarProps<T>) => {
   const { t } = useKubevirtTranslation();
 
   const groupedFilters = useMemo(
     () =>
       filterDefinitions.filter(
-        (f) => ![KubevirtFilterLayout.HIDDEN, KubevirtFilterLayout.SELECT].includes(f.filterLayout),
+        (f) =>
+          f.filterLayout !== KubevirtFilterLayout.HIDDEN &&
+          f.filterLayout !== KubevirtFilterLayout.SELECT,
       ),
     [filterDefinitions],
   );
@@ -95,6 +100,7 @@ const KubevirtFilterToolbar: FC<KubevirtFilterToolbarProps> = ({
           <TextSearchFilters
             data={data}
             filters={filters}
+            hideLabelFilter={hideLabelFilter}
             onSetFilters={onSetFilters}
             searchInputText={searchInputText}
             setSearchInputText={setSearchInputText}

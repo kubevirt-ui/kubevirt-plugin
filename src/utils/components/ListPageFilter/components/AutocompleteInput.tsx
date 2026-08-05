@@ -1,7 +1,7 @@
-import React, { Dispatch, FC, SetStateAction, useMemo, useState } from 'react';
 import classNames from 'classnames';
+import React, { Dispatch, FC, SetStateAction, useMemo, useState } from 'react';
 
-import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import { FilterableObject } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { Label, SelectList } from '@patternfly/react-core';
 
 import { MAX_SUGGESTIONS, suggestionBoxKeyHandler } from '../constants';
@@ -11,9 +11,9 @@ import { fuzzyCaseInsensitive, labelParser } from '../utils';
 import SearchFilter from './SearchFilter';
 
 type AutocompleteInputProps = {
-  data?: K8sResourceCommon[];
+  data?: FilterableObject[];
   onSuggestionSelect: (selected: string) => void;
-  placeholder?: string;
+  placeholder: string;
   setTextValue: Dispatch<SetStateAction<string>>;
   suggestionCount?: number;
   textValue: string;
@@ -57,7 +57,7 @@ const AutocompleteInput: FC<AutocompleteInputProps> = ({
       {visible && (
         <SelectList
           className={classNames('co-suggestion-box__suggestions', {
-            'co-suggestion-box__suggestions--shadowed': suggestions?.length > 0,
+            'co-suggestion-box__suggestions--shadowed': suggestions && suggestions?.length > 0,
           })}
         >
           {suggestions?.map((elem) => (

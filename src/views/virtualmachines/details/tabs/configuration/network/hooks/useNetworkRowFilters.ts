@@ -1,36 +1,30 @@
 import { useMemo } from 'react';
 
+import { KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { interfaceTypesProxy } from '@kubevirt-utils/resources/vm/utils/network/constants';
-import { getNetworkInterfaceType } from '@kubevirt-utils/resources/vm/utils/network/selectors';
-import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
+import {
+  interfaceLabelsProxy,
+  interfaceTypesProxy,
+} from '@kubevirt-utils/resources/vm/utils/network/constants';
 
-const useNetworkRowFilters = (): RowFilter[] => {
+import { SimpleNICPresentation } from '../utils/types';
+
+const INTERFACE_TYPE_FILTER_ID = 'interface-type';
+
+const useNetworkRowFilters = (): KubevirtFilter<SimpleNICPresentation>[] => {
   const { t } = useKubevirtTranslation();
-  const filters: RowFilter[] = useMemo(
+
+  return useMemo(
     () => [
       {
-        filter: (interfaces, obj) => {
-          const drive = getNetworkInterfaceType(obj?.iface);
-          return (
-            interfaces.selected?.length === 0 ||
-            interfaces.selected?.includes(drive) ||
-            !interfaces?.all?.find((item) => item === drive)
-          );
-        },
-        filterGroupName: t('Interface type'),
-        items: Object.keys(interfaceTypesProxy).map((type) => ({
-          id: type,
-          title: interfaceTypesProxy[type],
-        })),
-        reducer: (obj) => getNetworkInterfaceType(obj?.iface),
-        type: 'interface-type',
+        categoryLabel: t('Interface type'),
+        id: INTERFACE_TYPE_FILTER_ID,
+        match: (obj, selected) => selected.includes(interfaceLabelsProxy[obj?.type]),
+        options: Object.entries(interfaceTypesProxy).map(([value, label]) => ({ label, value })),
       },
     ],
     [t],
   );
-
-  return filters;
 };
 
 export default useNetworkRowFilters;

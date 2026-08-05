@@ -1,7 +1,6 @@
 import { useMemo } from 'react';
 
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { useDataViewFilters } from '@patternfly/react-data-view';
 
 import { useKubevirtTranslation } from '../useKubevirtTranslation';
@@ -11,31 +10,37 @@ import { getLabelFilter } from './filters/getLabelFilter';
 import { getNameFilter } from './filters/getNameFilter';
 import useMigratedSearchParams from './hooks/useMigratedSearchParams';
 import useSyncedGroupFilter from './hooks/useSyncedGroupFilter';
-import { KubevirtFilter, KubevirtFilterState, OnSetFilters } from './types';
+import { FilterableObject, KubevirtFilter, KubevirtFilterState, OnSetFilters } from './types';
 import { matchesWithExclusion } from './utils';
 
-type UseKubevirtDataViewFiltersArgs<T extends K8sResourceCommon> = {
+type UseKubevirtDataViewFiltersArgs<T extends FilterableObject> = {
   data: T[];
   filterDefinitions?: KubevirtFilter<T>[];
+  hideLabelFilter?: boolean;
 };
 
-type UseKubevirtDataViewFiltersResult<T extends K8sResourceCommon> = {
+type UseKubevirtDataViewFiltersResult<T extends FilterableObject> = {
   clearAllFilters: () => void;
   filteredData: T[];
   filters: KubevirtFilterState;
   onSetFilters: OnSetFilters;
 };
 
-const useKubevirtDataViewFilters = <T extends K8sResourceCommon>({
+const useKubevirtDataViewFilters = <T extends FilterableObject>({
   data,
   filterDefinitions: filterDefinitionsProp = EMPTY_FILTERS,
+  hideLabelFilter,
 }: UseKubevirtDataViewFiltersArgs<T>): UseKubevirtDataViewFiltersResult<T> => {
   const { t } = useKubevirtTranslation();
   const [searchParams, setSearchParams] = useMigratedSearchParams();
 
   const filterDefinitions = useMemo(
-    () => [getNameFilter(t), getLabelFilter(t), ...filterDefinitionsProp],
-    [filterDefinitionsProp, t],
+    () => [
+      getNameFilter(t),
+      ...(hideLabelFilter ? [] : [getLabelFilter(t)]),
+      ...filterDefinitionsProp,
+    ],
+    [filterDefinitionsProp, hideLabelFilter, t],
   );
 
   const initialFilters = useMemo<KubevirtFilterState>(

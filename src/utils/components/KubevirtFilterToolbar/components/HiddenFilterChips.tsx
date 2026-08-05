@@ -11,7 +11,8 @@ import ToolbarFilterMultiChip from './ToolbarFilter/ToolbarFilterMultiChip';
 
 type HiddenFilterChipsProps = {
   filters: KubevirtFilterState;
-  hiddenFilters: KubevirtFilter[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  hiddenFilters: KubevirtFilter<any>[];
   onSetFilters: OnSetFilters;
 };
 

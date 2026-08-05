@@ -2,12 +2,12 @@ import React, { FC } from 'react';
 
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import {
+  FilterableObject,
   KubevirtFilter,
   KubevirtFilterState,
   OnSetFilters,
 } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { Badge, Icon, SelectGroup, SelectOption, ToolbarItem } from '@patternfly/react-core';
 import { FilterIcon } from '@patternfly/react-icons';
 
@@ -18,9 +18,10 @@ import { getOnSelect } from '../utils';
 import ToolbarFilterMultiChip from './ToolbarFilter/ToolbarFilterMultiChip';
 
 type GroupedFilterDropdownProps = {
-  data?: K8sResourceCommon[];
+  data?: FilterableObject[];
   filters: KubevirtFilterState;
-  groupedFilters: KubevirtFilter[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  groupedFilters: KubevirtFilter<any>[];
   onSetFilters: OnSetFilters;
 };
 
@@ -35,7 +36,7 @@ const GroupedFilterDropdown: FC<GroupedFilterDropdownProps> = ({
 
   const itemCounts = useItemCounts(groupedFilters, data);
 
-  const onGroupedFilterSelect = (_, selectedOption: GroupedFilterOptionValue) => {
+  const onGroupedFilterSelect = (_event: unknown, selectedOption: GroupedFilterOptionValue) => {
     const { filterId, value } = selectedOption;
     const filterDef = groupedFilters.find((f) => f.id === filterId);
     if (!filterDef) return;

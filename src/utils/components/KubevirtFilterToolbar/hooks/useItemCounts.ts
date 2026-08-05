@@ -1,11 +1,14 @@
 import { useMemo } from 'react';
 
-import { KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
-import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import {
+  FilterableObject,
+  KubevirtFilter,
+} from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 
 const useItemCounts = (
-  filters: KubevirtFilter[],
-  data?: K8sResourceCommon[],
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  filters: KubevirtFilter<any>[],
+  data?: FilterableObject[],
 ): Record<string, Record<string, number>> =>
   useMemo(() => {
     const counts: Record<string, Record<string, number>> = {};

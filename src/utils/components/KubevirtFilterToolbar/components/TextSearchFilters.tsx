@@ -1,20 +1,22 @@
-import React, { FC, useMemo, useState } from 'react';
+import React, { Dispatch, FC, SetStateAction, useMemo, useState } from 'react';
 
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import AutocompleteInput from '@kubevirt-utils/components/ListPageFilter/components/AutocompleteInput';
 import SearchFilter from '@kubevirt-utils/components/ListPageFilter/components/SearchFilter';
 import {
   STATIC_SEARCH_FILTERS,
+  STATIC_SEARCH_FILTERS_DROPDOWN_VALUES,
   STATIC_SEARCH_FILTERS_LABELS,
   STATIC_SEARCH_FILTERS_PLACEHOLDERS,
+  TextSearchFilterType,
 } from '@kubevirt-utils/components/ListPageFilter/constants';
 import { getLabelFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/filters/getLabelFilter';
 import {
+  FilterableObject,
   KubevirtFilterState,
   OnSetFilters,
 } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import {
   InputGroup,
   InputGroupItem,
@@ -26,25 +28,27 @@ import {
 import ToolbarFilterMultiChip from './ToolbarFilter/ToolbarFilterMultiChip';
 
 type TextSearchFiltersProps = {
-  data?: K8sResourceCommon[];
+  data?: FilterableObject[];
   filters: KubevirtFilterState;
+  hideLabelFilter?: boolean;
   onSetFilters: OnSetFilters;
   searchInputText: string;
-  setSearchInputText: (text: string) => void;
+  setSearchInputText: Dispatch<SetStateAction<string>>;
 };
 
 const TextSearchFilters: FC<TextSearchFiltersProps> = ({
   data,
   filters,
+  hideLabelFilter,
   onSetFilters,
   searchInputText,
   setSearchInputText,
 }) => {
   const { t } = useKubevirtTranslation();
 
-  const [searchType, setSearchType] = useState<string>(STATIC_SEARCH_FILTERS.name);
+  const [searchType, setSearchType] = useState<TextSearchFilterType>(STATIC_SEARCH_FILTERS.name);
 
-  const searchSelectOptions: Record<string, string> = useMemo(
+  const searchSelectOptions: Record<TextSearchFilterType, string> = useMemo(
     () => ({
       [STATIC_SEARCH_FILTERS.labels]: t('Label'),
       [STATIC_SEARCH_FILTERS.name]: t(STATIC_SEARCH_FILTERS_LABELS.name),
@@ -63,19 +67,21 @@ const TextSearchFilters: FC<TextSearchFiltersProps> = ({
         labels={filters.name}
       >
         <InputGroup className="co-filter-group">
-          <InputGroupItem isFill>
-            <FormPFSelect
-              onSelect={(_e, value: string) => setSearchType(value)}
-              selected={searchType}
-              selectedLabel={searchSelectOptions[searchType]}
-            >
-              {Object.entries(searchSelectOptions).map(([key, label]) => (
-                <SelectOption key={key} value={key}>
-                  {label}
-                </SelectOption>
-              ))}
-            </FormPFSelect>
-          </InputGroupItem>
+          {!hideLabelFilter && (
+            <InputGroupItem isFill>
+              <FormPFSelect
+                onSelect={(_e, value: TextSearchFilterType) => setSearchType(value)}
+                selected={searchType}
+                selectedLabel={searchSelectOptions[searchType]}
+              >
+                {STATIC_SEARCH_FILTERS_DROPDOWN_VALUES.map((key) => (
+                  <SelectOption key={key} value={key}>
+                    {searchSelectOptions[key]}
+                  </SelectOption>
+                ))}
+              </FormPFSelect>
+            </InputGroupItem>
+          )}
           {searchType === STATIC_SEARCH_FILTERS.labels ? (
             <AutocompleteInput
               onSuggestionSelect={(selected) => {
@@ -102,13 +108,15 @@ const TextSearchFilters: FC<TextSearchFiltersProps> = ({
         </InputGroup>
       </ToolbarFilter>
 
-      <ToolbarFilterMultiChip
-        filterDef={getLabelFilter(t)}
-        filters={filters}
-        onSetFilters={onSetFilters}
-      >
-        <></>
-      </ToolbarFilterMultiChip>
+      {!hideLabelFilter && (
+        <ToolbarFilterMultiChip
+          filterDef={getLabelFilter(t)}
+          filters={filters}
+          onSetFilters={onSetFilters}
+        >
+          <></>
+        </ToolbarFilterMultiChip>
+      )}
     </ToolbarItem>
   );
 };

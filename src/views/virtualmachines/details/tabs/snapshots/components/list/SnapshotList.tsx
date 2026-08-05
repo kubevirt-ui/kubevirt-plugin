@@ -1,11 +1,12 @@
 import React, { FC, useMemo } from 'react';
 
+import KubevirtFilterToolbar from '@kubevirt-utils/components/KubevirtFilterToolbar/KubevirtFilterToolbar';
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
+import useKubevirtDataViewFilters from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/useKubevirtDataViewFilters';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { ListPageFilter, useListPageFilter } from '@openshift-console/dynamic-plugin-sdk';
 
 import { UseSnapshotData } from '../../hooks/useSnapshotData';
-import { filters } from '../../utils/filters';
+import { getSnapshotFilters } from '../../utils/filters';
 
 import {
   getSnapshotListColumns,
@@ -24,7 +25,11 @@ const SnapshotsList: FC<SnapshotsListProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const columns = useMemo(() => getSnapshotListColumns(t), [t]);
-  const [data, filteredData, onFilterChange] = useListPageFilter(snapshots, filters);
+  const filterDefinitions = useMemo(() => getSnapshotFilters(t), [t]);
+  const { clearAllFilters, filteredData, filters, onSetFilters } = useKubevirtDataViewFilters({
+    data: snapshots ?? [],
+    filterDefinitions,
+  });
 
   const callbacks: SnapshotListCallbacks = useMemo(
     () => ({
@@ -36,11 +41,13 @@ const SnapshotsList: FC<SnapshotsListProps> = ({
 
   return (
     <>
-      <ListPageFilter
-        data={data}
+      <KubevirtFilterToolbar
+        clearAllFilters={clearAllFilters}
+        data={snapshots}
+        filterDefinitions={filterDefinitions}
+        filters={filters}
         loaded={loaded}
-        onFilterChange={onFilterChange}
-        rowFilters={filters}
+        onSetFilters={onSetFilters}
       />
       <KubevirtTable
         ariaLabel={t('Snapshots table')}
@@ -55,7 +62,7 @@ const SnapshotsList: FC<SnapshotsListProps> = ({
         loadError={error}
         noDataMsg={t('No snapshots found')}
         noFilteredDataMsg={t('No results match the current filters')}
-        unfilteredData={data}
+        unfilteredData={snapshots}
       />
     </>
   );

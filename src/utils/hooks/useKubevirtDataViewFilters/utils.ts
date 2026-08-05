@@ -2,7 +2,7 @@ import { ROW_FILTERS_PREFIX } from '@kubevirt-utils/utils/constants';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { EXCLUSION_URL_PREFIX } from '@search/searchLanguage/constants';
 
-import { KubevirtFilter } from './types';
+import { FilterableObject, KubevirtFilter } from './types';
 
 /**
  * Migrates legacy filter parameters (starting with rowFilter- prefix) to parameters without the prefix.
@@ -40,7 +40,7 @@ export const isExcludedValue = (value: string): boolean => value.startsWith(EXCL
 export const stripExclusionPrefix = (value: string): string =>
   isExcludedValue(value) ? value.slice(EXCLUSION_URL_PREFIX.length) : value;
 
-export const matchesWithExclusion = <T extends K8sResourceCommon>(
+export const matchesWithExclusion = <T extends FilterableObject>(
   filterDef: KubevirtFilter<T>,
   obj: T,
   selected: string[],

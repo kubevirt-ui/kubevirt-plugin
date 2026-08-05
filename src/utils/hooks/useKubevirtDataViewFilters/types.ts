@@ -1,6 +1,5 @@
 import { ReactNode } from 'react';
 
-import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { DataViewFilterOption } from '@patternfly/react-data-view';
 
 export enum KubevirtFilterLayout {
@@ -14,7 +13,15 @@ export type KubevirtFilterOptionGroup = {
   values: string[];
 };
 
-export type KubevirtFilter<TData extends K8sResourceCommon = K8sResourceCommon> = {
+/**
+ * Minimal structural type for filterable data objects.
+ * Objects only need `metadata.name` for name filtering and `metadata.labels` for label filtering.
+ */
+export type FilterableObject = {
+  metadata?: { labels?: Record<string, string>; name?: string };
+};
+
+export type KubevirtFilter<TData extends FilterableObject = FilterableObject> = {
   applyWhenEmpty?: boolean;
   categoryLabel?: string;
   categoryLabelShort?: string;
