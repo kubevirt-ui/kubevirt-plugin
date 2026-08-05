@@ -13,3 +13,7 @@ console-extensions.md
 scripts/ca.crt
 scripts/console-client-secret
 *.json-*
+.cursor/rules/personal-*.mdc
+.cursor/debug-*.log
+/playwright
+.playwright-mcp
