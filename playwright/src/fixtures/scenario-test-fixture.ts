@@ -205,8 +205,11 @@ const _test = base.extend<TestFixtures, WorkerFixtures>({
           ]).catch(() => 'none' as const);
 
           if (navType === 'perspective') {
-            const perspectiveUrlPattern = /virtualization/;
-            const inTargetPerspective = perspectiveUrlPattern.test(page.url());
+            const toggleLabel = ((await perspectiveToggle.textContent().catch(() => '')) ?? '')
+              .replace(/\s+/g, ' ')
+              .trim();
+            const inTargetPerspective =
+              /^Virtualization$/i.test(toggleLabel) || /^Core Platform$/i.test(toggleLabel);
 
             if (!inTargetPerspective) {
               const perspectiveOption = page
@@ -215,6 +218,14 @@ const _test = base.extend<TestFixtures, WorkerFixtures>({
                 .filter({
                   has: page.locator('.pf-v6-c-menu__item-text', {
                     hasText: /^Virtualization$/,
+                  }),
+                });
+              const corePlatformOption = page
+                .getByTestId('perspective-switcher-menu-option')
+                .or(page.locator('[data-test-id="perspective-switcher-menu-option"]'))
+                .filter({
+                  has: page.locator('.pf-v6-c-menu__item-text', {
+                    hasText: /^Core Platform$/i,
                   }),
                 });
 
@@ -226,22 +237,61 @@ const _test = base.extend<TestFixtures, WorkerFixtures>({
                     .or(page.locator('[data-test-id="perspective-switcher-toggle"]'));
                   await toggle.waitFor({ state: 'visible', timeout: TestTimeouts.DEFAULT });
                   await toggle.click();
-                  await perspectiveOption.waitFor({
-                    state: 'visible',
-                    timeout: TestTimeouts.UI_DELAY_LONG,
-                  });
-                  await perspectiveOption.scrollIntoViewIfNeeded();
-                  await page.waitForTimeout(TestTimeouts.UI_DELAY_MICRO);
-                  await perspectiveOption.click();
 
-                  await page.waitForURL(perspectiveUrlPattern, {
-                    timeout: TestTimeouts.UI_DELAY_LONG,
-                  });
+                  const virtVisible = await perspectiveOption
+                    .waitFor({
+                      state: 'visible',
+                      timeout: TestTimeouts.UI_DELAY_LONG,
+                    })
+                    .then(() => true)
+                    .catch(() => false);
+
+                  if (virtVisible) {
+                    await perspectiveOption.scrollIntoViewIfNeeded();
+                    await page.waitForTimeout(TestTimeouts.UI_DELAY_MICRO);
+                    await perspectiveOption.click();
+                    await page.waitForFunction(
+                      () => {
+                        const el = document.querySelector(
+                          '[data-test-id="perspective-switcher-toggle"], [data-test="perspective-switcher-toggle"]',
+                        );
+                        const text = (el?.textContent ?? '').replace(/\s+/g, ' ').trim();
+                        return /^Virtualization$/i.test(text);
+                      },
+                      undefined,
+                      { timeout: TestTimeouts.UI_DELAY_LONG },
+                    );
+                  } else {
+                    const coreVisible = await corePlatformOption
+                      .waitFor({
+                        state: 'visible',
+                        timeout: TestTimeouts.UI_DELAY_LONG,
+                      })
+                      .then(() => true)
+                      .catch(() => false);
+                    if (!coreVisible) {
+                      throw new Error('Neither Virtualization nor Core Platform perspective found');
+                    }
+                    await corePlatformOption.scrollIntoViewIfNeeded();
+                    await page.waitForTimeout(TestTimeouts.UI_DELAY_MICRO);
+                    await corePlatformOption.click();
+                    await page.waitForFunction(
+                      () => {
+                        const el = document.querySelector(
+                          '[data-test-id="perspective-switcher-toggle"], [data-test="perspective-switcher-toggle"]',
+                        );
+                        const text = (el?.textContent ?? '').replace(/\s+/g, ' ').trim();
+                        return /^Core Platform$/i.test(text);
+                      },
+                      undefined,
+                      { timeout: TestTimeouts.UI_DELAY_LONG },
+                    );
+                  }
                   await page.waitForLoadState('load');
                   break;
                 } catch {
                   if (selAttempt === selectionAttempts)
-                    throw new Error('Perspective selection did not navigate to target URL');
+                    throw new Error('Perspective selection did not navigate to Virtualization');
                   await page.keyboard.press('Escape').catch(() => undefined);
                   await page.waitForTimeout(TestTimeouts.POLLING_INTERVAL);
                 }

@@ -85,7 +85,6 @@ tests/
 Every fixture extends `baseTest` from `scenario-test-fixture.ts`:
 
 ```typescript
-import { withSafeActions } from '@/page-objects/base-page';
 import SomePage from '@/page-objects/some/some-page';
 import { baseTest, expect } from './scenario-test-fixture';
 
@@ -95,7 +94,7 @@ interface MyFixtures {
 
 const test = baseTest.extend<MyFixtures>({
   somePage: async ({ page }, use) => {
-    await use(withSafeActions(new SomePage(page)));
+    await use(new SomePage(page));
   },
 });
 
@@ -105,7 +104,6 @@ export { expect, test };
 Key points:
 
 - `baseTest` provides `apiClient`, `utils`, `testConfig`, `page`, `cleanup`, and auto-fixtures
-- Page objects are wrapped with `withSafeActions()` in the fixture
 - Page objects extend `BasePage` or `PageCommons` (not standalone classes)
 - Components live in `playwright/src/components/` and compose into page objects in `playwright/src/page-objects/`
 
@@ -204,7 +202,6 @@ This avoids requiring a running console for test creation and ensures locators m
 If no fixture exists for the feature area, create one in `playwright/src/fixtures/<feature>-fixture.ts`:
 
 ```typescript
-import { withSafeActions } from '@/page-objects/base-page';
 import FeaturePage from '@/page-objects/feature/feature-page';
 import PageCommons from '@/page-objects/page-commons';
 import { baseTest, expect } from './scenario-test-fixture';
@@ -216,10 +213,10 @@ interface FeatureFixtures {
 
 const test = baseTest.extend<FeatureFixtures>({
   featurePage: async ({ page }, use) => {
-    await use(withSafeActions(new FeaturePage(page)));
+    await use(new FeaturePage(page));
   },
   pageCommons: async ({ page }, use) => {
-    await use(withSafeActions(new PageCommons(page)));
+    await use(new PageCommons(page));
   },
 });
 
@@ -377,7 +374,6 @@ playwright/
 ## Rules
 
 - **Every fixture extends `baseTest`** from `scenario-test-fixture.ts`
-- **Page objects are wrapped with `withSafeActions()`** in fixtures
 - **Page objects extend `BasePage` or `PageCommons`** — not standalone classes
 - **Components extend `BaseComponent`** and are composed by page objects
 - **Use allure constants** from `@/data-models/allure-constants` — never raw strings for tier/feature labels

@@ -161,7 +161,7 @@ Never run two concurrent `npx playwright test` commands. Global setup creates sh
 ```text
 Spec (.spec.ts) → imports { test, expect } from feature fixture
   ↓
-Feature fixture → extends baseTest, wraps page objects with withSafeActions()
+Feature fixture → extends baseTest, provides page objects
   ↓
 Page objects (page-objects/) → extend BasePage/PageCommons, compose components
   ↓
@@ -241,11 +241,9 @@ playwright/
 ### Fixtures
 
 - Every fixture extends `baseTest` from `scenario-test-fixture.ts`.
-- Page objects are wrapped with `withSafeActions()` in the fixture.
 - `baseTest` provides `apiClient`, `utils`, `testConfig`, `page`, `cleanup`, and auto-fixtures.
 
 ```typescript
-import { withSafeActions } from '@/page-objects/base-page';
 import FeaturePage from '@/page-objects/feature/feature-page';
 import { baseTest, expect } from './scenario-test-fixture';
 
@@ -255,7 +253,7 @@ interface FeatureFixtures {
 
 const test = baseTest.extend<FeatureFixtures>({
   featurePage: async ({ page }, use) => {
-    await use(withSafeActions(new FeaturePage(page)));
+    await use(new FeaturePage(page));
   },
 });
 
@@ -395,15 +393,15 @@ Explore live UI workflows to find visual, functional, or UX issues.
 
 ## Common Failure Patterns
 
-| Symptom                        | Likely Cause                         | Fix Location                      |
-| ------------------------------ | ------------------------------------ | --------------------------------- |
-| `Timeout waiting for selector` | Selector changed in product          | Component or page object          |
-| `locator.click: Target closed` | Page navigated mid-action            | Add wait in page object method    |
-| `expect.toBe: false`           | Assertion timing                     | Use `waitFor()` / `expect.poll()` |
-| `strict mode violation`        | Multiple matches                     | Refine locator in component       |
-| `net::ERR_CONNECTION_REFUSED`  | Cluster unreachable                  | Environment issue                 |
-| `401 Unauthorized`             | Token expired                        | Re-run global setup               |
-| Test silently skipped          | `withSafeActions` swallowing timeout | Fix timeout in page object        |
+| Symptom                        | Likely Cause                      | Fix Location                      |
+| ------------------------------ | --------------------------------- | --------------------------------- |
+| `Timeout waiting for selector` | Selector changed in product       | Component or page object          |
+| `locator.click: Target closed` | Page navigated mid-action         | Add wait in page object method    |
+| `expect.toBe: false`           | Assertion timing                  | Use `waitFor()` / `expect.poll()` |
+| `strict mode violation`        | Multiple matches                  | Refine locator in component       |
+| `net::ERR_CONNECTION_REFUSED`  | Cluster unreachable               | Environment issue                 |
+| `401 Unauthorized`             | Token expired                     | Re-run global setup               |
+| Test silently skipped          | Soft assertion or swallowed error | Fix timeout / error handling      |
 
 ---
 

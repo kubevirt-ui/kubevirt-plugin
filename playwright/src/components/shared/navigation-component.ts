@@ -14,6 +14,27 @@ export default class NavigationComponent extends BaseComponent {
     super(page);
   }
 
+  private async closePerspectiveMenu(): Promise<void> {
+    const openOption = this.consoleTestId('perspective-switcher-menu-option').first();
+    const isOpen = await openOption.isVisible().catch(() => false);
+    if (!isOpen) return;
+
+    await this.page.keyboard.press('Escape').catch(() => undefined);
+    const closed = await openOption
+      .waitFor({ state: 'hidden', timeout: TestTimeouts.UI_DELAY_MEDIUM })
+      .then(() => true)
+      .catch(() => false);
+    if (closed) return;
+
+    // Escape sometimes leaves the PF menu open — toggle again to close.
+    await this.consoleTestId('perspective-switcher-toggle')
+      .click({ force: true })
+      .catch(() => undefined);
+    await openOption
+      .waitFor({ state: 'hidden', timeout: TestTimeouts.UI_DELAY_SHORT })
+      .catch(() => undefined);
+  }
+
   private async dismissBlockingModals(): Promise<void> {
     const welcomeModal = this.testId('welcome-modal');
     if (await welcomeModal.isVisible().catch(() => false)) {
@@ -171,9 +192,19 @@ export default class NavigationComponent extends BaseComponent {
       });
 
     if (expectedUrlPattern) {
-      await this.page
-        .waitForURL(expectedUrlPattern, { timeout: TestTimeouts.NAVIGATION })
-        .catch(() => undefined);
+      const navigated = await this.page
+        .waitForURL(expectedUrlPattern, { timeout: TestTimeouts.UI_DELAY_LONG })
+        .then(() => true)
+        .catch(() => false);
+      if (!navigated) {
+        await this.closePerspectiveMenu();
+        await navLocator
+          .click({ force: true, timeout: TestTimeouts.UI_DELAY_MEDIUM })
+          .catch(async () => {
+            await navLocator.dispatchEvent('click');
+          });
+        await this.page.waitForURL(expectedUrlPattern, { timeout: TestTimeouts.UI_DELAY_LONG });
+      }
     }
 
     await this.page.waitForLoadState('domcontentloaded');
@@ -188,10 +219,14 @@ export default class NavigationComponent extends BaseComponent {
   }
 
   async expandVirtualizationNavSection(): Promise<void> {
-    await this.switchToVirtualizationPerspective();
+    try {
+      await this.switchToVirtualizationPerspective();
+    } catch {
+      // Perspective switch unavailable — continue with section expansion under current perspective.
+    }
+    await this.closePerspectiveMenu();
     // Wait for the auto-hide requestAnimationFrame to fire and settle before checking sidebar state
     await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
-
     await this.ensureSidebarExpanded();
 
     const childItem = this.testId('virtualmachines-nav-item')
@@ -358,11 +393,35 @@ export default class NavigationComponent extends BaseComponent {
       }
     }
 
-    const currentText = (await toggle.textContent().catch(() => '')) ?? '';
-    if (currentText.toLowerCase().includes('virtualization')) return;
+    const getToggleText = async (): Promise<string> =>
+      ((await toggle.textContent().catch(() => '')) ?? '').replace(/\s+/g, ' ').trim();
 
+    const isVirtualizationToggle = (text: string): boolean =>
+      /virtualization/i.test(text) && !/fleet/i.test(text);
+
+    const hasVirtNav = async (): Promise<boolean> => {
+      const section = this.locator('[data-quickstart-id="qs-nav-sec-virtualization"]');
+      const navItem = this.testId('bootablevolumes-nav-item')
+        .or(this.testId('virtualmachines-nav-item'))
+        .or(this.testId('templates-nav-item'))
+        .or(this.testId('virtualmachineclusterinstancetypes-nav-item'));
+      return (
+        (await section.isVisible().catch(() => false)) ||
+        (await navItem.first().isVisible().catch(() => false))
+      );
+    };
+
+    // Already on Virtualization (or Core Platform with virt nav) — do not open the menu.
+    if (isVirtualizationToggle(await getToggleText()) || (await hasVirtNav())) {
+      await this.closePerspectiveMenu();
+      return;
+    }
+
+    // Exact label match avoids selecting "Fleet Virtualization".
     const virtOption = this.consoleTestId('perspective-switcher-menu-option').filter({
-      hasText: 'Virtualization',
+      has: this.locator('.pf-v6-c-menu__item-text', {
+        hasText: /^Virtualization$/,
+      }),
     });
 
     const maxAttempts = 4;
@@ -384,10 +443,14 @@ export default class NavigationComponent extends BaseComponent {
         await clickTarget.click({ force: true, timeout: TestTimeouts.DEFAULT });
         await this.page.waitForLoadState('domcontentloaded');
         await this.waitForLoadingComplete(TestTimeouts.SHORT_WAIT);
-        return;
+        await this.closePerspectiveMenu();
+
+        if (isVirtualizationToggle(await getToggleText()) || (await hasVirtNav())) {
+          return;
+        }
       }
 
-      await this.page.keyboard.press('Escape').catch(() => undefined);
+      await this.closePerspectiveMenu();
       await this.page.waitForTimeout(TestTimeouts.RETRY_DELAY);
     }
 

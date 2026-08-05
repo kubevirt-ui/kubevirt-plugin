@@ -7,7 +7,6 @@
  *   import { test, expect } from '@/fixtures/vm-tabs-fixture';
  */
 
-import { withSafeActions } from '@/page-objects/base-page';
 import ConsoleStandalonePage from '@/page-objects/cluster/console-standalone-page';
 import CreateVmCreatePage from '@/page-objects/create-vm/create-vm-create-page';
 import CreateVmPage from '@/page-objects/create-vm/create-vm-page';
@@ -36,34 +35,34 @@ interface VmTabsFixtures {
 
 const test = baseTest.extend<VmTabsFixtures>({
   vmTreePage: async ({ page }, use) => {
-    await use(withSafeActions(new VmTreePage(page)));
+    await use(new VmTreePage(page));
   },
   vmDetailPage: async ({ page }, use) => {
-    await use(withSafeActions(new VirtualMachineDetailPage(page)));
+    await use(new VirtualMachineDetailPage(page));
   },
   vmListPage: async ({ page }, use) => {
-    await use(withSafeActions(new VirtualMachinesPage(page)));
+    await use(new VirtualMachinesPage(page));
   },
   pageCommons: async ({ page }, use) => {
-    await use(withSafeActions(new PageCommons(page)));
+    await use(new PageCommons(page));
   },
   overviewPage: async ({ page }, use) => {
-    await use(withSafeActions(new OverviewPage(page)));
+    await use(new OverviewPage(page));
   },
   snapshotDetailPage: async ({ page }, use) => {
-    await use(withSafeActions(new VirtualMachineSnapshotDetailPage(page)));
+    await use(new VirtualMachineSnapshotDetailPage(page));
   },
   consoleStandalonePage: async ({ page }, use) => {
-    await use(withSafeActions(new ConsoleStandalonePage(page)));
+    await use(new ConsoleStandalonePage(page));
   },
   createVmPage: async ({ page }, use) => {
-    await use(withSafeActions(new CreateVmPage(page)));
+    await use(new CreateVmPage(page));
   },
   createVmCreatePage: async ({ page }, use) => {
-    await use(withSafeActions(new CreateVmCreatePage(page)));
+    await use(new CreateVmCreatePage(page));
   },
   createVmTemplatesPage: async ({ page }, use) => {
-    await use(withSafeActions(new CreateVmTemplatesPage(page)));
+    await use(new CreateVmTemplatesPage(page));
   },
 });
 

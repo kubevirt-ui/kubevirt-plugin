@@ -100,7 +100,6 @@ For `test_bug` classified failures:
 #### Architecture constraints
 
 - All fixtures extend `baseTest` from `scenario-test-fixture.ts`
-- Page objects are wrapped with `withSafeActions()` in fixtures
 - Page objects extend `BasePage` or `PageCommons`
 - Components extend `BaseComponent` and are composed by page objects
 - Specs import `test` and `expect` from their feature fixture — never from `@playwright/test`
@@ -129,7 +128,6 @@ For `test_bug` classified failures:
 - **Timing issue**: Add `waitFor()` in the page object method or use `expect.poll()`
 - **Setup failure masking tests**: Remove `setupError` + `test.skip` patterns — let setup failures fail the suite
 - **Missing cleanup**: Add `apiClient.trackResource()` after resource creation
-- **`withSafeActions` silent skip**: If a test appears skipped but should fail, check if `withSafeActions` is swallowing a timeout — the fix belongs in the page object method
 
 ### Phase 5: Re-run Fixed Tests
 
@@ -158,16 +156,16 @@ Remaining failures: <list with classification>
 
 ## Common Failure Patterns
 
-| Symptom                        | Likely Cause                       | Fix Location                      |
-| ------------------------------ | ---------------------------------- | --------------------------------- |
-| `Timeout waiting for selector` | Selector changed                   | Component or page object          |
-| `locator.click: Target closed` | Page navigated mid-action          | Add wait in page object method    |
-| `expect.toBe: false`           | Assertion timing                   | Use `waitFor()` / `expect.poll()` |
-| `strict mode violation`        | Multiple matches                   | Refine locator in component       |
-| `net::ERR_CONNECTION_REFUSED`  | Cluster down                       | Environment issue                 |
-| `401 Unauthorized`             | Token expired                      | Re-run global setup               |
-| `test.skip` but should fail    | `withSafeActions` swallowing error | Fix timeout in page object        |
-| `setupError` skip cascade      | Catch-and-skip in beforeAll        | Remove pattern, let it fail       |
+| Symptom                        | Likely Cause                      | Fix Location                      |
+| ------------------------------ | --------------------------------- | --------------------------------- |
+| `Timeout waiting for selector` | Selector changed                  | Component or page object          |
+| `locator.click: Target closed` | Page navigated mid-action         | Add wait in page object method    |
+| `expect.toBe: false`           | Assertion timing                  | Use `waitFor()` / `expect.poll()` |
+| `strict mode violation`        | Multiple matches                  | Refine locator in component       |
+| `net::ERR_CONNECTION_REFUSED`  | Cluster down                      | Environment issue                 |
+| `401 Unauthorized`             | Token expired                     | Re-run global setup               |
+| `test.skip` but should fail    | Soft assertion or swallowed error | Fix timeout in page object        |
+| `setupError` skip cascade      | Catch-and-skip in beforeAll       | Remove pattern, let it fail       |
 
 ## Environment Variables
 
@@ -263,7 +261,7 @@ playwright/
 
 - **Fix locators in components/page objects** — not in spec files
 - **Specs import from feature fixtures** — never from `@playwright/test` directly
-- **Page objects extend `BasePage` / `PageCommons`** — use `withSafeActions()` in fixtures
+- **Page objects extend `BasePage` / `PageCommons`**
 - **Use `TestTimeouts.*` constants** — never inline timeout numbers
 - **Use allure constants** from `@/data-models/allure-constants` — never raw strings
 - **Verify via API** — use `apiClient` (`RequestContextClient`) to check K8s state after UI actions

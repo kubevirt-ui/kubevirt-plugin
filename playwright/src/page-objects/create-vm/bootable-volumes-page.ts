@@ -45,18 +45,6 @@ export default class BootableVolumesPage extends PageCommons {
     this.uploadToast = new UploadProgressToastComponent(page);
   }
 
-  private async navigateToNamespaceClientSide(namespace: string): Promise<void> {
-    const path = `/k8s/ns/${namespace}/bootablevolumes`;
-    await this.page.evaluate((p) => {
-      window.history.pushState({}, '', p);
-      window.dispatchEvent(new PopStateEvent('popstate'));
-    }, path);
-    await this.page.waitForFunction((p: string) => window.location.pathname === p, path, {
-      timeout: TestTimeouts.NAVIGATION,
-    });
-    await this.page.waitForLoadState('domcontentloaded');
-  }
-
   async addAnnotationInEditAnnotationsModalAndSave(
     annotationKey: string,
     annotationValue: string,
@@ -399,31 +387,16 @@ export default class BootableVolumesPage extends PageCommons {
     return false;
   }
   async navigateToBootableVolumesViaUI(): Promise<void> {
-    await this.switchToVirtualizationPerspective();
     await this.clickNavBootableVolumes();
     await this.page.waitForLoadState('domcontentloaded');
   }
-  async navigateToBootableVolumesWithParams(params: string): Promise<void> {
-    const basePath = '/k8s/all-namespaces/bootablevolumes';
-    await this.goTo(`${basePath}?${params}`);
-    await this.waitForTableData();
-  }
-  /** @deprecated Use navigateToBootableVolumesViaUI() */
-  async navigateToGeneralBootableVolumes() {
-    await this.goTo('/k8s/all-namespaces/bootablevolumes');
-  }
   async navigateToNamespaceBootableVolumesViaUI(namespace: string): Promise<void> {
-    await this.switchToVirtualizationPerspective();
     await this.clickNavBootableVolumes();
     await this.page.waitForLoadState('domcontentloaded');
     if (!this.page.url().includes(`/ns/${namespace}/`)) {
-      await this.navigateToNamespaceClientSide(namespace);
+      await this.switchToNamespace(namespace);
     }
     await this.verifyPageLoaded([], true, TestTimeouts.UI_ELEMENT_VISIBILITY);
-  }
-  /** @deprecated Use navigateToNamespaceBootableVolumesViaUI() */
-  async navigateToProjectBootableVolumes(projectName: string) {
-    await this.goTo(`/k8s/ns/${projectName}/bootablevolumes`);
   }
   async openClusterFilter(): Promise<void> {
     await this._clusterFilterButton.waitFor({

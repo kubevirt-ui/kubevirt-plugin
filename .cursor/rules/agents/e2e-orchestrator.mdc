@@ -35,7 +35,7 @@ Tests are organized by tiers. Each tier maps to a Playwright project and has its
 ```
 Spec (.spec.ts) → imports { test, expect } from feature fixture
   ↓
-Feature fixture → extends baseTest, wraps page objects with withSafeActions()
+Feature fixture → extends baseTest, provides page objects
   ↓
 Page objects (page-objects/) → extend BasePage/PageCommons, compose components
   ↓
@@ -48,7 +48,7 @@ RequestContextClient (clients/request-context-client.ts) → console proxy → K
 ### Key Components
 
 - **`baseTest`** (`scenario-test-fixture.ts`) — root fixture providing `ocClient`, `utils`, `testConfig`, auto-fixtures, cleanup
-- **Per-feature fixtures** (`fixtures/<feature>-fixture.ts`) — extend `baseTest`, add page objects wrapped with `withSafeActions()`
+- **Per-feature fixtures** (`fixtures/<feature>-fixture.ts`) — extend `baseTest`, add page objects
 - **Page objects** (`page-objects/`) — extend `BasePage` or `PageCommons`, compose components, expose high-level methods
 - **Components** (`components/`) — extend `BaseComponent`, contain locators and interaction methods for UI sections
 - **OcClient** (`clients/oc-cli-client.ts`) — `oc` CLI wrapper with handler delegates; RBAC-limited in HC mode (see RBAC section below)
@@ -190,7 +190,7 @@ All fixtures extend `baseTest`. Create per-feature fixtures for each test area:
 ```typescript
 const test = baseTest.extend<FeatureFixtures>({
   featurePage: async ({ page }, use) => {
-    await use(withSafeActions(new FeaturePage(page)));
+    await use(new FeaturePage(page));
   },
 });
 ```
