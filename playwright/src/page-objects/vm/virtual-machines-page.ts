@@ -1,11 +1,15 @@
 import VmListActionsComponent from '@/components/vm/vm-list-actions-component';
 import VmListComponent from '@/components/vm/vm-list-component';
 import VmListOverviewWidgetsComponent from '@/components/vm/vm-list-overview-widgets-component';
-import { VmListFiltersComponent } from '@/components/vm/vm-list-search-components';
-import { VmListSearchComponent } from '@/components/vm/vm-list-search-components';
-import { VmListEmptyStateComponent } from '@/components/vm/vm-list-state-migration-components';
-import { VmListMigrationComponent } from '@/components/vm/vm-list-state-migration-components';
-import { VmListTreeComponent } from '@/components/vm/vm-list-state-migration-components';
+import {
+  VmListFiltersComponent,
+  VmListSearchComponent,
+} from '@/components/vm/vm-list-search-components';
+import {
+  VmListEmptyStateComponent,
+  VmListMigrationComponent,
+  VmListTreeComponent,
+} from '@/components/vm/vm-list-state-migration-components';
 import VmListTemplateCreateComponent from '@/components/vm/vm-list-template-create-component';
 import type { VmMetricEntry } from '@/data-factories/vm-metrics-mock-factory';
 import PageCommons from '@/page-objects/page-commons';
@@ -101,10 +105,6 @@ export default class VirtualMachinesPage extends TreeContextMenuMixin(PageCommon
 
   async clickAdvancedSearchReset(): Promise<void> {
     return this.search.clickAdvancedSearchReset();
-  }
-
-  async clickAllSearchResultsFound(): Promise<void> {
-    return this.search.clickAllSearchResultsFound();
   }
 
   async clickBackToVirtualMachinesList(): Promise<void> {
@@ -496,6 +496,10 @@ export default class VirtualMachinesPage extends TreeContextMenuMixin(PageCommon
     return this.emptyState.getEmptyStateBodyText();
   }
 
+  async getFilterChipTexts(): Promise<string[]> {
+    return this.search.getFilterChipTexts();
+  }
+
   async getGuestAgentWidgetTitle(timeout?: number): Promise<string | null> {
     return this.overviewWidgets.getGuestAgentWidgetTitle(timeout);
   }
@@ -535,6 +539,14 @@ export default class VirtualMachinesPage extends TreeContextMenuMixin(PageCommon
     timeout?: number,
   ): Promise<{ count: number; allVisible: boolean }> {
     return this.overviewWidgets.getResourceAllocationChartsVisibility(timeout);
+  }
+
+  async getSearchDropdownValues(): Promise<string[]> {
+    return this.search.getSearchDropdownValues();
+  }
+
+  async getSearchInputValue(): Promise<string> {
+    return this.search.getSearchInputValue();
   }
 
   async getSelectedTabName(timeout?: number): Promise<string | null> {
@@ -695,10 +707,6 @@ export default class VirtualMachinesPage extends TreeContextMenuMixin(PageCommon
     return this.overviewWidgets.isOverviewTabSelected();
   }
 
-  async isProjectContextInSuggestBox(projectName: string): Promise<boolean> {
-    return this.search.isProjectContextInSuggestBox(projectName);
-  }
-
   async isProjectHintVisible(timeout: number = TestTimeouts.ELEMENT_WAIT): Promise<boolean> {
     return this.emptyState.isProjectHintVisible(timeout);
   }
@@ -721,6 +729,18 @@ export default class VirtualMachinesPage extends TreeContextMenuMixin(PageCommon
 
   async isSaveSearchNameDuplicateErrorVisible(): Promise<boolean> {
     return this.search.isSaveSearchNameDuplicateErrorVisible();
+  }
+
+  async isSearchDropdownVisible(): Promise<boolean> {
+    return this.search.isSearchDropdownVisible();
+  }
+
+  async isSearchKeysSectionVisible(): Promise<boolean> {
+    return this.search.isSearchKeysSectionVisible();
+  }
+
+  async isSearchKeyVisible(searchKey: string): Promise<boolean> {
+    return this.search.isSearchKeyVisible(searchKey);
   }
 
   async isShareableLabelVisibleInDeleteModal(): Promise<boolean> {
@@ -1012,6 +1032,14 @@ export default class VirtualMachinesPage extends TreeContextMenuMixin(PageCommon
     return this.listFilters.selectProjectInFilterMenu(projectName);
   }
 
+  async selectSearchDropdownOperator(operator: string): Promise<void> {
+    return this.search.selectSearchDropdownOperator(operator);
+  }
+
+  async selectSearchDropdownValue(value: string): Promise<void> {
+    return this.search.selectSearchDropdownValue(value);
+  }
+
   async selectVmByCheckbox(vmName: string): Promise<void> {
     const vmList = new VmListComponent(this.page);
     return vmList.selectVmByCheckbox(vmName);
@@ -1127,10 +1155,6 @@ export default class VirtualMachinesPage extends TreeContextMenuMixin(PageCommon
     return this.search.typeInVmSearchInput(searchText);
   }
 
-  async verifyAllSearchResultsFoundButton(): Promise<boolean> {
-    return this.search.verifyAllSearchResultsFoundButton();
-  }
-
   async verifyAllStatusCellsContain(expectedStatus: string, timeout?: number): Promise<boolean> {
     return this.listActions.verifyAllStatusCellsContain(expectedStatus, timeout);
   }
@@ -1201,16 +1225,8 @@ export default class VirtualMachinesPage extends TreeContextMenuMixin(PageCommon
     return this.search.verifySaveSearchTitle();
   }
 
-  async verifySearchBarResultsVisible(): Promise<boolean> {
-    return this.search.verifySearchBarResultsVisible();
-  }
-
   async verifySearchResultsSubtitle(): Promise<boolean> {
     return this.search.verifySearchResultsSubtitle();
-  }
-
-  async verifySearchSuggestBoxHidden(): Promise<boolean> {
-    return this.search.verifySearchSuggestBoxHidden();
   }
 
   async verifyStorageMigrationPlansPageLoaded(): Promise<boolean> {
@@ -1232,10 +1248,6 @@ export default class VirtualMachinesPage extends TreeContextMenuMixin(PageCommon
     timeout?: number,
   ): Promise<{ allVisible: boolean; missing: string[] }> {
     return this.overviewWidgets.verifyVirtualMachinesHealthSectionWidgetsVisible(timeout);
-  }
-
-  async verifyVmNameInSearchResults(vmName: string): Promise<boolean> {
-    return this.search.verifyVmNameInSearchResults(vmName);
   }
 
   async verifyVmSearchInputEmpty(): Promise<boolean> {

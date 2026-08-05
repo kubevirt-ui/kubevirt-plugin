@@ -20,7 +20,12 @@ const SearchKeyItem: FC<SearchKeyItemProps> = ({ badge, categoryLabel, isFocused
 
   return (
     <Tooltip content={getDescription(t)} entryDelay={TOOLTIP_DELAY_MS}>
-      <SearchMenuItem isFocused={isFocused} itemId={searchKey} onClick={() => onClick(badge)}>
+      <SearchMenuItem
+        data-test={`search-key-${searchKey}`}
+        isFocused={isFocused}
+        itemId={searchKey}
+        onClick={() => onClick(badge)}
+      >
         <Label className="pf-v6-u-mr-sm" isCompact>
           {searchKey}
           {usesColon !== false && ':'}

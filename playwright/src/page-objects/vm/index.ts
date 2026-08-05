@@ -8,7 +8,6 @@ export { default as VmDetailPage } from './vm-detail-page';
 export { default as VmListPage } from './vm-list-page';
 export { default as VmOverviewTabPage } from './vm-overview-tab-page';
 export { default as VmSchedulingMetricsPage } from './vm-scheduling-metrics-page';
-export { default as VmSearchPage } from './vm-search-page';
 export { default as VmSnapshotsPage } from './vm-snapshots-page';
 export { default as VmStoragePage } from './vm-storage-page';
 export { default as VmTreePage } from './vm-tree-page';
