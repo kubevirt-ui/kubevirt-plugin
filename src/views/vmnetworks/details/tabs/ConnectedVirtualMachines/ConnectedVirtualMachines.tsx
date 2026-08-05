@@ -2,8 +2,11 @@ import React, { FC, useCallback, useMemo, useState } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import ActionsDropdown from '@kubevirt-utils/components/ActionsDropdown/ActionsDropdown';
+import KubevirtFilterToolbar from '@kubevirt-utils/components/KubevirtFilterToolbar/KubevirtFilterToolbar';
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
+import ListEmptyState from '@kubevirt-utils/components/ListEmptyState/ListEmptyState';
 import ListSkeleton from '@kubevirt-utils/components/StateHandler/ListSkeleton';
+import useKubevirtDataViewFilters from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/useKubevirtDataViewFilters';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import usePaginationWithFilters from '@kubevirt-utils/hooks/usePagination/usePaginationWithFilters';
 import { paginationDefaultValues } from '@kubevirt-utils/hooks/usePagination/utils/constants';
@@ -11,15 +14,11 @@ import { VirtualMachineModel } from '@kubevirt-utils/models';
 import { asAccessReview, getName } from '@kubevirt-utils/resources/shared';
 import { ClusterUserDefinedNetworkKind } from '@kubevirt-utils/resources/udn/types';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import {
-  ListPageBody,
-  ListPageFilter,
-  useListPageFilter,
-  useModal,
-} from '@openshift-console/dynamic-plugin-sdk';
+import { ListPageBody, useModal } from '@openshift-console/dynamic-plugin-sdk';
 import { Action } from '@openshift-console/dynamic-plugin-sdk/lib/extensions/actions';
 import { BulkSelect, BulkSelectValue } from '@patternfly/react-component-groups';
 import { Flex, Pagination } from '@patternfly/react-core';
+import { VirtualMachineIcon } from '@patternfly/react-icons';
 
 import useConnectedVMs from '../../../hooks/useConnectedVMs';
 
@@ -42,11 +41,17 @@ const ConnectedVirtualMachines: FC<ConnectedVirtualMachinesProps> = ({ obj: vmNe
   const { t } = useKubevirtTranslation();
   const createModal = useModal();
   const [vms, loadedVMs, error] = useConnectedVMs(vmNetwork);
-  const [unfilteredData, filteredData, onFilterChange] = useListPageFilter(vms);
+  const { clearAllFilters, filteredData, filters, onSetFilters } = useKubevirtDataViewFilters({
+    data: vms ?? [],
+  });
   const [selectedVMs, setSelectedVMs] = useState<V1VirtualMachine[]>([]);
 
-  const { handleFilterChange, handlePerPageSelect, handleSetPage, pagination } =
-    usePaginationWithFilters(filteredData?.length ?? 0, onFilterChange);
+  const {
+    handleFilterChange: handleSetFilters,
+    handlePerPageSelect,
+    handleSetPage,
+    pagination,
+  } = usePaginationWithFilters(filteredData?.length ?? 0, onSetFilters);
 
   const vmNetworkName = getName(vmNetwork);
 
@@ -101,6 +106,18 @@ const ConnectedVirtualMachines: FC<ConnectedVirtualMachinesProps> = ({ obj: vmNe
     );
   }
 
+  if (isEmpty(vms)) {
+    return (
+      <ListPageBody>
+        <ListEmptyState
+          bodyContent={t('Virtual machines connected to this network will appear here.')}
+          icon={VirtualMachineIcon}
+          titleText={t('No connected virtual machines yet')}
+        />
+      </ListPageBody>
+    );
+  }
+
   return (
     <ListPageBody>
       <div className="list-managment-group">
@@ -117,10 +134,12 @@ const ConnectedVirtualMachines: FC<ConnectedVirtualMachinesProps> = ({ obj: vmNe
             selectedCount={selectedVMs.length}
             totalCount={filteredData.length}
           />
-          <ListPageFilter
-            data={unfilteredData}
+          <KubevirtFilterToolbar
+            clearAllFilters={clearAllFilters}
+            data={vms}
+            filters={filters}
             loaded={loadedVMs}
-            onFilterChange={handleFilterChange}
+            onSetFilters={handleSetFilters}
           />
           <ActionsDropdown
             actions={bulkActions}
@@ -152,13 +171,12 @@ const ConnectedVirtualMachines: FC<ConnectedVirtualMachinesProps> = ({ obj: vmNe
         initialSortKey={CONNECTED_VMS_COLUMN_KEYS.name}
         loaded={loadedVMs}
         loadError={error}
-        noDataMsg={t('No connected virtual machines found')}
         noFilteredDataMsg={t('No virtual machines match the filter criteria')}
         onSelect={setSelectedVMs}
         pagination={pagination}
         selectable
         selectedItems={selectedVMs}
-        unfilteredData={unfilteredData}
+        unfilteredData={vms}
       />
     </ListPageBody>
   );

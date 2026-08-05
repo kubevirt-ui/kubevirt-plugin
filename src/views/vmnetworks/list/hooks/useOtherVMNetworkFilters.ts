@@ -1,12 +1,12 @@
 import { useMemo } from 'react';
 
+import { KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   ClusterUserDefinedNetworkModel,
   NetworkAttachmentDefinitionModel,
   UserDefinedNetworkModel,
 } from '@kubevirt-utils/models';
-import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 
 import { VALID_OTHER_VM_NETWORK_TYPES } from '../constants';
 import { OtherVMNetworkWithType, VMNetworkType } from '../types';
@@ -18,61 +18,50 @@ enum KindFilterIDs {
   UDN = 'udn',
 }
 
-const getIDFromKind = (kind: string): KindFilterIDs => {
+const getIDFromKind = (kind?: string): KindFilterIDs | undefined => {
   if (kind === ClusterUserDefinedNetworkModel.kind) return KindFilterIDs.CUDN;
   if (kind === UserDefinedNetworkModel.kind) return KindFilterIDs.UDN;
   if (kind === NetworkAttachmentDefinitionModel.kind) return KindFilterIDs.NAD;
   return undefined;
 };
 
-const useOtherVMNetworkFilters = (): RowFilter<OtherVMNetworkWithType>[] => {
+const useOtherVMNetworkFilters = (): KubevirtFilter[] => {
   const { t } = useKubevirtTranslation();
 
   return useMemo(
     () => [
       {
-        filter: ({ selected }, obj) => {
-          if (selected?.length === 0) return true;
-
+        categoryLabel: t('Kind'),
+        id: 'vm-network-kind',
+        match: (obj, selected) => {
           const id = getIDFromKind(obj.kind);
-          if (id && selected.includes(id)) return true;
-
-          return false;
+          return Boolean(id && selected.includes(id));
         },
-        filterGroupName: t('Kind'),
-        items: [
+        options: [
           {
-            id: KindFilterIDs.CUDN,
-            title: t('Cluster-wide UserDefinedNetworks'),
+            label: t('Cluster-wide UserDefinedNetworks'),
+            value: KindFilterIDs.CUDN,
           },
           {
-            id: KindFilterIDs.UDN,
-            title: t('Namespaced UserDefinedNetworks'),
+            label: t('Namespaced UserDefinedNetworks'),
+            value: KindFilterIDs.UDN,
           },
           {
-            id: KindFilterIDs.NAD,
-            title: t('NetworkAttachmentDefinitions'),
+            label: t('NetworkAttachmentDefinitions'),
+            value: KindFilterIDs.NAD,
           },
         ],
-        reducer: (obj) => {
-          return getIDFromKind(obj.kind);
-        },
-        type: 'vm-network-kind',
       },
       {
-        filter: ({ selected }, obj) => {
-          if (selected?.length === 0) return true;
-          return selected.includes(obj.type);
-        },
-        filterGroupName: t('Type'),
-        items: Object.values(VMNetworkType)
+        categoryLabel: t('Type'),
+        id: 'vm-network-type',
+        match: (obj, selected) => selected.includes((obj as OtherVMNetworkWithType).type),
+        options: Object.values(VMNetworkType)
           .filter((type) => VALID_OTHER_VM_NETWORK_TYPES.has(type))
           .map((type) => ({
-            id: type,
-            title: getVMNetworkTypeLabel(type, t),
+            label: getVMNetworkTypeLabel(type, t),
+            value: type,
           })),
-        reducer: (obj) => obj.type,
-        type: 'vm-network-type',
       },
     ],
     [t],

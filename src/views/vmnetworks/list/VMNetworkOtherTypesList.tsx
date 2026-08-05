@@ -1,14 +1,12 @@
 import React, { FC, useMemo } from 'react';
 
+import KubevirtFilterToolbar from '@kubevirt-utils/components/KubevirtFilterToolbar/KubevirtFilterToolbar';
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
 import StateHandler from '@kubevirt-utils/components/StateHandler/StateHandler';
+import useKubevirtDataViewFilters from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/useKubevirtDataViewFilters';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import {
-  ListPageBody,
-  ListPageFilter,
-  useListPageFilter,
-} from '@openshift-console/dynamic-plugin-sdk';
+import { ListPageBody } from '@openshift-console/dynamic-plugin-sdk';
 import { EmptyState } from '@patternfly/react-core';
 
 import useOtherVMNetworkFilters from './hooks/useOtherVMNetworkFilters';
@@ -21,9 +19,12 @@ import {
 const VMNetworkOtherTypesList: FC = () => {
   const { t } = useKubevirtTranslation();
 
-  const [otherVMNetworks, loaded, error] = useOtherVMNetworks();
-  const filters = useOtherVMNetworkFilters();
-  const [data, filteredData, onFilterChange] = useListPageFilter(otherVMNetworks, filters);
+  const [data, loaded, error] = useOtherVMNetworks();
+  const filterDefinitions = useOtherVMNetworkFilters();
+  const { clearAllFilters, filteredData, filters, onSetFilters } = useKubevirtDataViewFilters({
+    data,
+    filterDefinitions,
+  });
   const columns = useMemo(() => getVMNetworkOtherTypesColumns(t), [t]);
 
   return (
@@ -32,12 +33,13 @@ const VMNetworkOtherTypesList: FC = () => {
         <EmptyState headingLevel="h4" titleText={t('No other virtual machine networks found')} />
       ) : (
         <ListPageBody>
-          <ListPageFilter
+          <KubevirtFilterToolbar
+            clearAllFilters={clearAllFilters}
             data={data}
-            hideLabelFilter
+            filterDefinitions={filterDefinitions}
+            filters={filters}
             loaded={loaded}
-            onFilterChange={onFilterChange}
-            rowFilters={filters}
+            onSetFilters={onSetFilters}
           />
           <KubevirtTable
             ariaLabel={t('Other VM Networks table')}
