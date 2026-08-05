@@ -4,6 +4,7 @@ import { isRequiredGatingSuite } from '../shared/is-required-gating-suite';
 import { failStep, setOutput } from '../shared/output';
 
 export const VALID_TEST_E2E_PROJECTS = [
+  'auto',
   'gating',
   'tier1',
   'tier2',
@@ -25,7 +26,7 @@ export type ParsedTestE2ECommand = {
 export const sanitizeTestE2EArg = (value: string): string =>
   value.replace(/[\u200B-\u200F\u202A-\u202E\u2060\uFEFF]/g, '');
 
-/** Parse `/test-e2e <suite> [args…]` from a PR comment body (first matching line). */
+/** Parse `/test-e2e [suite] [args…]` from a PR comment body (first matching line). */
 export const parseTestE2ECommand = (commentBody: string): null | ParsedTestE2ECommand => {
   const line = commentBody
     .split(/\r?\n/)
@@ -35,19 +36,25 @@ export const parseTestE2ECommand = (commentBody: string): null | ParsedTestE2ECo
     return null;
   }
 
-  const [command, suite, ...argParts] = line.split(/\s+/);
-  if (command !== '/test-e2e' || !suite) {
+  const [command, ...tokens] = line.split(/\s+/);
+  if (command !== '/test-e2e' || tokens.length === 0) {
     return null;
   }
 
-  const testProject = suite.toLowerCase();
-  if (!(VALID_TEST_E2E_PROJECTS as readonly string[]).includes(testProject)) {
-    return null;
+  const [first, ...rest] = tokens;
+  const firstLower = first.toLowerCase();
+
+  if ((VALID_TEST_E2E_PROJECTS as readonly string[]).includes(firstLower)) {
+    return {
+      testArgs: rest.join(' '),
+      testProject: firstLower as TestE2EProject,
+    };
   }
 
+  // Suite omitted: treat everything as Playwright args with auto project
   return {
-    testArgs: argParts.join(' '),
-    testProject: testProject as TestE2EProject,
+    testArgs: tokens.join(' '),
+    testProject: 'auto',
   };
 };
 
