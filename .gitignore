@@ -32,3 +32,6 @@ ci-scripts/generated/
 # Personal Cursor rules (not shared with team)
 .cursor/rules/personal-*.mdc
 test-results/
+
+# Ignore Claude Code local settings
+.claude/settings.local.json
