@@ -558,13 +558,12 @@ export class VirtualMachineProxyHandler {
     const start = Date.now();
     while (Date.now() - start < timeoutMs) {
       try {
-        const vmi = await this.getInstance(namespace, vmName);
-        if (vmi) {
-          const status = vmi.status as Record<string, unknown> | undefined;
-          if (status?.phase === 'Running') return true;
-        }
+        const vm = await this.get(namespace, vmName);
+        const printableStatus = (vm?.status as { printableStatus?: string } | undefined)
+          ?.printableStatus;
+        if (printableStatus === 'Running') return true;
       } catch {
-        // VMI not yet available
+        // VM not yet available
       }
       await new Promise((r) => setTimeout(r, 5000));
     }

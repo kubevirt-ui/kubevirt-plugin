@@ -12,7 +12,9 @@ export default class MigrationPoliciesPage extends PageCommons {
     .filter({ hasText: 'Cluster' })
     .first();
 
-  private readonly _nameInput = this.locator('[role="dialog"] input[type="text"]').first();
+  private readonly _nameInput = this.page.locator('#migration-policy-name');
+
+  private readonly _descriptionInput = this.page.locator('#migration-policy-description');
 
   override readonly _createButton = this.testId('item-create');
 
@@ -55,10 +57,20 @@ export default class MigrationPoliciesPage extends PageCommons {
   }
 
   async clickCreateButton() {
-    // Use text-based locator for the Create button in the form
-    const createButton = this.page.locator('[role="dialog"] button', { hasText: 'Create' });
+    const dialog = this.page.locator('[role="dialog"]');
+    const createButton = dialog.getByRole('button', { name: 'Create', exact: true });
     await createButton.waitFor({ state: 'visible', timeout: TestTimeouts.UI_DELAY_MEDIUM });
+
+    const enabledDeadline = Date.now() + TestTimeouts.UI_ELEMENT_VISIBILITY;
+    while (Date.now() < enabledDeadline && !(await createButton.isEnabled())) {
+      await this.page.waitForTimeout(TestTimeouts.NETWORK_DELAY);
+    }
+    if (!(await createButton.isEnabled())) {
+      throw new Error('Create MigrationPolicy button remained disabled — form may be invalid');
+    }
+
     await createButton.click();
+    await dialog.waitFor({ state: 'hidden', timeout: TestTimeouts.RESOURCE_CREATION });
   }
 
   /**
@@ -91,8 +103,15 @@ export default class MigrationPoliciesPage extends PageCommons {
     const bandwidthInput = this.testId('bandwidthPerMigration-selected').locator('input');
     await bandwidthInput.waitFor({ state: 'visible' });
     await bandwidthInput.click();
-    await bandwidthInput.press('Control+a');
-    await bandwidthInput.pressSequentially(bandwidth);
+    await bandwidthInput.fill(bandwidth);
+    if ((await bandwidthInput.inputValue()) !== bandwidth) {
+      await bandwidthInput.fill(bandwidth);
+    }
+    if ((await bandwidthInput.inputValue()) !== bandwidth) {
+      throw new Error(
+        `Bandwidth input expected "${bandwidth}" but got "${await bandwidthInput.inputValue()}"`,
+      );
+    }
   }
 
   async fillCompletionTimeout(timeout: string) {
@@ -100,23 +119,26 @@ export default class MigrationPoliciesPage extends PageCommons {
       'input',
     );
     await completionTimeoutInput.waitFor({ state: 'visible' });
-    await completionTimeoutInput.click();
-    await completionTimeoutInput.press('Control+a');
-    await completionTimeoutInput.pressSequentially(timeout);
+    await completionTimeoutInput.fill(timeout);
   }
 
   async fillDescription(description: string) {
-    const descriptionInput = this.locator('[role="dialog"] input[type="text"]').nth(1);
-    await descriptionInput.waitFor({ state: 'visible' });
-    await descriptionInput.clear();
-    await descriptionInput.fill(description);
+    await this._descriptionInput.waitFor({ state: 'visible' });
+    await this._descriptionInput.fill(description);
   }
 
   // Form field interaction methods
   async fillPolicyName(name: string) {
     await this._nameInput.waitFor({ state: 'visible' });
-    await this._nameInput.clear();
     await this._nameInput.fill(name);
+    if ((await this._nameInput.inputValue()) !== name) {
+      await this._nameInput.fill(name);
+    }
+    if ((await this._nameInput.inputValue()) !== name) {
+      throw new Error(
+        `MigrationPolicy name expected "${name}" but got "${await this._nameInput.inputValue()}"`,
+      );
+    }
   }
 
   /**

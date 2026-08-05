@@ -7,7 +7,6 @@
  *   import { test, expect } from '@/fixtures/bootable-volumes-fixture';
  */
 
-import { withSafeActions } from '@/page-objects/base-page';
 import BootableVolumeDetailPage from '@/page-objects/create-vm/bootable-volume-detail-page';
 import BootableVolumesPage from '@/page-objects/create-vm/bootable-volumes-page';
 import CreateVmPage from '@/page-objects/create-vm/create-vm-page';
@@ -26,19 +25,19 @@ interface BootableVolumesFixtures {
 
 const test = baseTest.extend<BootableVolumesFixtures>({
   bootableVolumesPage: async ({ page }, use) => {
-    await use(withSafeActions(new BootableVolumesPage(page)));
+    await use(new BootableVolumesPage(page));
   },
   bootableVolumeDetailPage: async ({ page }, use) => {
-    await use(withSafeActions(new BootableVolumeDetailPage(page)));
+    await use(new BootableVolumeDetailPage(page));
   },
   createVmPage: async ({ page }, use) => {
-    await use(withSafeActions(new CreateVmPage(page)));
+    await use(new CreateVmPage(page));
   },
   vmDetailPage: async ({ page }, use) => {
-    await use(withSafeActions(new VirtualMachineDetailPage(page)));
+    await use(new VirtualMachineDetailPage(page));
   },
   vmListPage: async ({ page }, use) => {
-    await use(withSafeActions(new VirtualMachinesPage(page)));
+    await use(new VirtualMachinesPage(page));
   },
 });
 

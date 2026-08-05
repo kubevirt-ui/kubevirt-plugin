@@ -160,7 +160,6 @@ export default class InstanceTypesPage extends PageCommons {
 
   async navigateToInstanceTypesViaUI(): Promise<void> {
     for (let attempt = 1; attempt <= 3; attempt++) {
-      await this.switchToVirtualizationPerspective();
       await this.clickNavInstanceTypes();
       if (/instancetype/i.test(this.page.url())) return;
       await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);

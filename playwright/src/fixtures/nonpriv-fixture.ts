@@ -10,7 +10,6 @@
  * Run with: `./playwright-runner.sh test-nonpriv`
  */
 
-import { withSafeActions } from '@/page-objects/base-page';
 import BootableVolumeDetailPage from '@/page-objects/create-vm/bootable-volume-detail-page';
 import BootableVolumesPage from '@/page-objects/create-vm/bootable-volumes-page';
 import InstanceTypesPage from '@/page-objects/create-vm/instance-types-page';
@@ -43,40 +42,40 @@ interface NonPrivFixtures {
 
 const test = baseTest.extend<NonPrivFixtures>({
   vmTreePage: async ({ page }, use) => {
-    await use(withSafeActions(new VmTreePage(page)));
+    await use(new VmTreePage(page));
   },
   vmListPage: async ({ page }, use) => {
-    await use(withSafeActions(new VirtualMachinesPage(page)));
+    await use(new VirtualMachinesPage(page));
   },
   vmListTabPage: async ({ page }, use) => {
-    await use(withSafeActions(new VmListPage(page)));
+    await use(new VmListPage(page));
   },
   vmDetailPage: async ({ page }, use) => {
-    await use(withSafeActions(new VirtualMachineDetailPage(page)));
+    await use(new VirtualMachineDetailPage(page));
   },
   bootableVolumesPage: async ({ page }, use) => {
-    await use(withSafeActions(new BootableVolumesPage(page)));
+    await use(new BootableVolumesPage(page));
   },
   bootableVolumeDetailPage: async ({ page }, use) => {
-    await use(withSafeActions(new BootableVolumeDetailPage(page)));
+    await use(new BootableVolumeDetailPage(page));
   },
   instanceTypesPage: async ({ page }, use) => {
-    await use(withSafeActions(new InstanceTypesPage(page)));
+    await use(new InstanceTypesPage(page));
   },
   templatesPage: async ({ page }, use) => {
-    await use(withSafeActions(new TemplatesPage(page)));
+    await use(new TemplatesPage(page));
   },
   overviewPage: async ({ page }, use) => {
-    await use(withSafeActions(new OverviewPage(page)));
+    await use(new OverviewPage(page));
   },
   vmWizardNavigationPage: async ({ page }, use) => {
-    await use(withSafeActions(new VmWizardNavigationPage(page)));
+    await use(new VmWizardNavigationPage(page));
   },
   vmWizardBootSourcePage: async ({ page }, use) => {
-    await use(withSafeActions(new VmWizardBootSourcePage(page)));
+    await use(new VmWizardBootSourcePage(page));
   },
   vmWizardComputePage: async ({ page }, use) => {
-    await use(withSafeActions(new VmWizardComputeCustomizationPage(page)));
+    await use(new VmWizardComputeCustomizationPage(page));
   },
 });
 

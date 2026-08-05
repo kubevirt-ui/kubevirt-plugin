@@ -1,9 +1,9 @@
-import { ADMIN_ONLY_TAG, T1, T1_TAG, VM_SEARCH_TAG } from '@/data-models/allure-constants';
+import { ADMIN_ONLY_TAG, GATING, GATING_TAG, VM_SEARCH_TAG } from '@/data-models/allure-constants';
 import { expect, test } from '@/fixtures/vm-search-fixture';
 
 const SUITE = 'VM Search Language';
 
-test.describe(SUITE, { tag: [T1_TAG, VM_SEARCH_TAG] }, () => {
+test.describe(SUITE, { tag: [GATING_TAG, VM_SEARCH_TAG] }, () => {
   test.beforeEach(async ({ vmListPage, testConfig }) => {
     await vmListPage.navigateToNamespaceVirtualMachinesViaUI(testConfig.testNamespace);
     await vmListPage.clickVmListTab();
@@ -12,8 +12,8 @@ test.describe(SUITE, { tag: [T1_TAG, VM_SEARCH_TAG] }, () => {
   test('plain text search filters VMs by name', async ({ vmListPage, utils }) => {
     await utils.withAllure({
       suite: SUITE,
-      feature: T1,
-      tags: [T1_TAG, VM_SEARCH_TAG, ADMIN_ONLY_TAG],
+      feature: GATING,
+      tags: [GATING_TAG, VM_SEARCH_TAG, ADMIN_ONLY_TAG],
     });
 
     await test.step('Type plain text and submit search', async () => {
@@ -38,8 +38,8 @@ test.describe(SUITE, { tag: [T1_TAG, VM_SEARCH_TAG] }, () => {
   test('key:value search filters by status', async ({ vmListPage, utils }) => {
     await utils.withAllure({
       suite: SUITE,
-      feature: T1,
-      tags: [T1_TAG, VM_SEARCH_TAG, ADMIN_ONLY_TAG],
+      feature: GATING,
+      tags: [GATING_TAG, VM_SEARCH_TAG, ADMIN_ONLY_TAG],
     });
 
     await test.step('Submit status:Running search', async () => {
@@ -60,8 +60,8 @@ test.describe(SUITE, { tag: [T1_TAG, VM_SEARCH_TAG] }, () => {
   test('comma-separated values apply OR logic within a key', async ({ vmListPage, utils }) => {
     await utils.withAllure({
       suite: SUITE,
-      feature: T1,
-      tags: [T1_TAG, VM_SEARCH_TAG, ADMIN_ONLY_TAG],
+      feature: GATING,
+      tags: [GATING_TAG, VM_SEARCH_TAG, ADMIN_ONLY_TAG],
     });
 
     await test.step('Submit status:Running,Stopped search', async () => {
@@ -92,8 +92,8 @@ test.describe(SUITE, { tag: [T1_TAG, VM_SEARCH_TAG] }, () => {
   test('space-separated tokens apply AND logic across keys', async ({ vmListPage, utils }) => {
     await utils.withAllure({
       suite: SUITE,
-      feature: T1,
-      tags: [T1_TAG, VM_SEARCH_TAG, ADMIN_ONLY_TAG],
+      feature: GATING,
+      tags: [GATING_TAG, VM_SEARCH_TAG, ADMIN_ONLY_TAG],
     });
 
     await test.step('Submit multi-key search with AND logic', async () => {
@@ -118,8 +118,8 @@ test.describe(SUITE, { tag: [T1_TAG, VM_SEARCH_TAG] }, () => {
   test('numeric filter with > operator for vcpu', async ({ vmListPage, utils }) => {
     await utils.withAllure({
       suite: SUITE,
-      feature: T1,
-      tags: [T1_TAG, VM_SEARCH_TAG, ADMIN_ONLY_TAG],
+      feature: GATING,
+      tags: [GATING_TAG, VM_SEARCH_TAG, ADMIN_ONLY_TAG],
     });
 
     await test.step('Submit vcpu>4 search', async () => {
@@ -140,8 +140,8 @@ test.describe(SUITE, { tag: [T1_TAG, VM_SEARCH_TAG] }, () => {
   test('numeric filter with >= operator for memory', async ({ vmListPage, utils }) => {
     await utils.withAllure({
       suite: SUITE,
-      feature: T1,
-      tags: [T1_TAG, VM_SEARCH_TAG, ADMIN_ONLY_TAG],
+      feature: GATING,
+      tags: [GATING_TAG, VM_SEARCH_TAG, ADMIN_ONLY_TAG],
     });
 
     await test.step('Submit memory>=8GiB search', async () => {
@@ -165,8 +165,8 @@ test.describe(SUITE, { tag: [T1_TAG, VM_SEARCH_TAG] }, () => {
   test('exclusion prefix -key:value shows Exclude chip', async ({ vmListPage, utils }) => {
     await utils.withAllure({
       suite: SUITE,
-      feature: T1,
-      tags: [T1_TAG, VM_SEARCH_TAG, ADMIN_ONLY_TAG],
+      feature: GATING,
+      tags: [GATING_TAG, VM_SEARCH_TAG, ADMIN_ONLY_TAG],
     });
 
     await test.step('Submit -status:Error search', async () => {
@@ -189,8 +189,8 @@ test.describe(SUITE, { tag: [T1_TAG, VM_SEARCH_TAG] }, () => {
   test('exclusion with has key: -has:gpu', async ({ vmListPage, utils }) => {
     await utils.withAllure({
       suite: SUITE,
-      feature: T1,
-      tags: [T1_TAG, VM_SEARCH_TAG, ADMIN_ONLY_TAG],
+      feature: GATING,
+      tags: [GATING_TAG, VM_SEARCH_TAG, ADMIN_ONLY_TAG],
     });
 
     await test.step('Submit -has:gpu search', async () => {
@@ -213,8 +213,8 @@ test.describe(SUITE, { tag: [T1_TAG, VM_SEARCH_TAG] }, () => {
   test('description: key explicitly searches descriptions', async ({ vmListPage, utils }) => {
     await utils.withAllure({
       suite: SUITE,
-      feature: T1,
-      tags: [T1_TAG, VM_SEARCH_TAG, ADMIN_ONLY_TAG],
+      feature: GATING,
+      tags: [GATING_TAG, VM_SEARCH_TAG, ADMIN_ONLY_TAG],
     });
 
     await test.step('Submit description:database search', async () => {
@@ -238,8 +238,8 @@ test.describe(SUITE, { tag: [T1_TAG, VM_SEARCH_TAG] }, () => {
   test('search input clears with clear button', async ({ vmListPage, utils }) => {
     await utils.withAllure({
       suite: SUITE,
-      feature: T1,
-      tags: [T1_TAG, VM_SEARCH_TAG, ADMIN_ONLY_TAG],
+      feature: GATING,
+      tags: [GATING_TAG, VM_SEARCH_TAG, ADMIN_ONLY_TAG],
     });
 
     await test.step('Enter a search query', async () => {
@@ -258,8 +258,8 @@ test.describe(SUITE, { tag: [T1_TAG, VM_SEARCH_TAG] }, () => {
   test('search dropdown shows key suggestions on focus', async ({ vmListPage, utils }) => {
     await utils.withAllure({
       suite: SUITE,
-      feature: T1,
-      tags: [T1_TAG, VM_SEARCH_TAG, ADMIN_ONLY_TAG],
+      feature: GATING,
+      tags: [GATING_TAG, VM_SEARCH_TAG, ADMIN_ONLY_TAG],
     });
 
     await test.step('Focus search input to open dropdown', async () => {
@@ -294,8 +294,8 @@ test.describe(SUITE, { tag: [T1_TAG, VM_SEARCH_TAG] }, () => {
   }) => {
     await utils.withAllure({
       suite: SUITE,
-      feature: T1,
-      tags: [T1_TAG, VM_SEARCH_TAG, ADMIN_ONLY_TAG],
+      feature: GATING,
+      tags: [GATING_TAG, VM_SEARCH_TAG, ADMIN_ONLY_TAG],
     });
 
     await test.step('Type "status:" to trigger value autocomplete', async () => {
@@ -324,8 +324,8 @@ test.describe(SUITE, { tag: [T1_TAG, VM_SEARCH_TAG] }, () => {
   test('combined search: status:Running vcpu>4 -has:gpu', async ({ vmListPage, utils }) => {
     await utils.withAllure({
       suite: SUITE,
-      feature: T1,
-      tags: [T1_TAG, VM_SEARCH_TAG, ADMIN_ONLY_TAG],
+      feature: GATING,
+      tags: [GATING_TAG, VM_SEARCH_TAG, ADMIN_ONLY_TAG],
     });
 
     await test.step('Submit combined multi-token search', async () => {
@@ -357,8 +357,8 @@ test.describe(SUITE, { tag: [T1_TAG, VM_SEARCH_TAG] }, () => {
   test('search examples are shown in dropdown', async ({ vmListPage, utils }) => {
     await utils.withAllure({
       suite: SUITE,
-      feature: T1,
-      tags: [T1_TAG, VM_SEARCH_TAG, ADMIN_ONLY_TAG],
+      feature: GATING,
+      tags: [GATING_TAG, VM_SEARCH_TAG, ADMIN_ONLY_TAG],
     });
 
     await test.step('Focus search input and verify examples appear', async () => {

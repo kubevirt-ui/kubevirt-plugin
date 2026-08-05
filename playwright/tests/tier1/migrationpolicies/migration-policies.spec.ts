@@ -37,18 +37,22 @@ test.describe.serial(
       await migrationPoliciesPage.clickCreateButton();
       apiClient.trackResource('MigrationPolicy', bandwidthPolicyName);
 
+      const created = await apiClient.verifyMigrationPolicyCreated(
+        bandwidthPolicyName,
+        utils.TestTimeouts.DEFAULT,
+      );
+      expect(created, `MigrationPolicy ${bandwidthPolicyName} should exist after creation`).toBe(
+        true,
+      );
+
+      await migrationPoliciesPage.navigateToMigrationPoliciesViaUI();
+      await migrationPoliciesPage.filterByName(bandwidthPolicyName);
       await expect
-        .poll(
-          async () => {
-            await migrationPoliciesPage.navigateToMigrationPoliciesViaUI();
-            return migrationPoliciesPage.isPolicyVisible(bandwidthPolicyName);
-          },
-          {
-            message: `Policy ${bandwidthPolicyName} should appear in the list`,
-            timeout: utils.TestTimeouts.DEFAULT,
-            intervals: [2000, 3000, 5000],
-          },
-        )
+        .poll(() => migrationPoliciesPage.isPolicyVisible(bandwidthPolicyName), {
+          message: `Policy ${bandwidthPolicyName} should appear in the list`,
+          timeout: utils.TestTimeouts.DEFAULT,
+          intervals: [2000, 3000, 5000],
+        })
         .toBe(true);
     });
 
@@ -74,8 +78,8 @@ test.describe.serial(
 
       await expect
         .soft(
-          migrationPoliciesPage.detailContentLocator(/64\s*M/),
-          'Bandwidth value should display 64 M (64Mi converted to human-readable)',
+          migrationPoliciesPage.detailContentLocator(/^\s*64\s+MiB\s*$/),
+          'Bandwidth value should display 64 MiB (64Mi converted to human-readable)',
         )
         .toBeVisible();
     });
@@ -99,18 +103,22 @@ test.describe.serial(
       await migrationPoliciesPage.clickCreateButton();
       apiClient.trackResource('MigrationPolicy', autoConvergePolicyName);
 
+      const created = await apiClient.verifyMigrationPolicyCreated(
+        autoConvergePolicyName,
+        utils.TestTimeouts.DEFAULT,
+      );
+      expect(created, `MigrationPolicy ${autoConvergePolicyName} should exist after creation`).toBe(
+        true,
+      );
+
+      await migrationPoliciesPage.navigateToMigrationPoliciesViaUI();
+      await migrationPoliciesPage.filterByName(autoConvergePolicyName);
       await expect
-        .poll(
-          async () => {
-            await migrationPoliciesPage.navigateToMigrationPoliciesViaUI();
-            return migrationPoliciesPage.isPolicyVisible(autoConvergePolicyName);
-          },
-          {
-            timeout: 30_000,
-            intervals: [2_000],
-            message: `Policy ${autoConvergePolicyName} should appear in the list`,
-          },
-        )
+        .poll(() => migrationPoliciesPage.isPolicyVisible(autoConvergePolicyName), {
+          timeout: utils.TestTimeouts.DEFAULT,
+          intervals: [2_000],
+          message: `Policy ${autoConvergePolicyName} should appear in the list`,
+        })
         .toBe(true);
 
       await test.step('Delete via actions dropdown', async () => {

@@ -26,9 +26,6 @@ import VirtualMachinesPage from '@/page-objects/vm/virtual-machines-page';
 import VmOverviewTabPage from '@/page-objects/vm/vm-overview-tab-page';
 import VmTreePage from '@/page-objects/vm/vm-tree-page';
 import VmCreationWizardPage from '@/page-objects/vm-wizard/vm-creation-wizard-page';
-import VmWizardBootSourcePage from '@/page-objects/vm-wizard/vm-wizard-boot-source-page';
-import VmWizardComputeCustomizationPage from '@/page-objects/vm-wizard/vm-wizard-compute-customization-page';
-import VmWizardNavigationPage from '@/page-objects/vm-wizard/vm-wizard-navigation-page';
 import { EnvVariables } from '@/utils/env-variables';
 import { TestTimeouts } from '@/utils/test-config';
 
@@ -53,9 +50,6 @@ interface GatingFixtures {
   quotasPage: QuotasPage;
   virtualizationOverviewPage: VirtualizationOverviewPage;
   vmCreationWizardPage: VmCreationWizardPage;
-  vmWizardBootSourcePage: VmWizardBootSourcePage;
-  vmWizardComputePage: VmWizardComputeCustomizationPage;
-  vmWizardNavigationPage: VmWizardNavigationPage;
 }
 
 const test = baseTest.extend<GatingFixtures>({
@@ -175,15 +169,6 @@ const test = baseTest.extend<GatingFixtures>({
   },
   vmCreationWizardPage: async ({ page }, use) => {
     await use(new VmCreationWizardPage(page));
-  },
-  vmWizardBootSourcePage: async ({ page }, use) => {
-    await use(new VmWizardBootSourcePage(page));
-  },
-  vmWizardComputePage: async ({ page }, use) => {
-    await use(new VmWizardComputeCustomizationPage(page));
-  },
-  vmWizardNavigationPage: async ({ page }, use) => {
-    await use(new VmWizardNavigationPage(page));
   },
 });
 
