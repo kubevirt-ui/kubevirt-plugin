@@ -14,5 +14,8 @@ scripts/ca.crt
 scripts/console-client-secret
 *.json-*
 /playwright
+.playwright-mcp
 .env.local
 local.env
+.cursor/rules/personal-*.mdc
+.cursor/debug-*.log

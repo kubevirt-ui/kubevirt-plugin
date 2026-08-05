@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { useDrawerContext } from '@catalog/templatescatalog/components/TemplatesCatalogDrawer/hooks/useDrawerContext';
 import { TemplateSSHDetails } from '@catalog/templatescatalog/components/TemplatesCatalogDrawer/hooks/useTemplateSecrets/utils/types';
@@ -39,6 +39,9 @@ const useTemplateSecrets: UseTemplateSecrets = (
   cluster,
 ) => {
   const { setSSHDetails, setVM, sshDetails, template, vm } = useDrawerContext();
+
+  // Prevents the initialization effect from overwriting an explicit user choice.
+  const userHasSetSSH = useRef(false);
 
   const [templateSecretDetails] = useState<TemplateSSHDetails>(getTemplateSSHSecret(template));
   const { templateSecretName, templateSecretNamespace } = templateSecretDetails;
@@ -91,7 +94,16 @@ const useTemplateSecrets: UseTemplateSecrets = (
     [sshDetails, setVM, vm, setSSHDetails],
   );
 
+  const onUserSSHChange = useCallback(
+    (newSSHDetails: SSHSecretDetails) => {
+      userHasSetSSH.current = true;
+      return onSSHChange(newSSHDetails);
+    },
+    [onSSHChange],
+  );
+
   useEffect(() => {
+    if (userHasSetSSH.current) return;
     if (isEmpty(sshDetails) || !secretsData?.secretsLoaded) {
       const initialSSHDetails = getInitialSSHDetails({
         applyKeyToProject: !isEmpty(namespaceDefaultSecretName),
@@ -117,7 +129,7 @@ const useTemplateSecrets: UseTemplateSecrets = (
 
   return {
     copyTemplateSecretToTargetNS,
-    onSSHChange,
+    onSSHChange: onUserSSHChange,
     overwriteTemplateSSHKey: !isEmpty(namespaceDefaultSecretName) && !isEmpty(templateSecretName),
     sshDetails,
   };
