@@ -66,7 +66,7 @@ const VirtIODriversAlert: FC<VirtIODriversAlertProps> = ({ vms }) => {
     >
       <p className="pf-v6-u-mt-xs">
         {t(
-          'The latest VirtIO-win version includes critical enhancements for Windows VMs. You can download the latest cluster-provided version from Virtualization > Settings > Downloads tab.',
+          'The latest version of VirtIO drivers includes critical enhancements for Windows VMs. You can download the latest cluster-provided version from Virtualization > Settings > Downloads tab.',
         )}
       </p>
       <Flex className="pf-v6-u-mt-sm">
