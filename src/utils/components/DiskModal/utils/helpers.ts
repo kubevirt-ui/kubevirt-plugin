@@ -38,6 +38,7 @@ import { updateDisks } from '@virtualmachines/details/tabs/configuration/details
 
 import { HotPlugFeatures } from './constants';
 import { BuildUploadTrackMetadataParams, SourceTypes, V1DiskFormState } from './types';
+import { runExclusiveForVm } from './vmCancelCleanupQueue';
 
 export const getEmptyVMDataVolumeResource = (
   vm: V1VirtualMachine,
@@ -47,7 +48,7 @@ export const getEmptyVMDataVolumeResource = (
   // (has a resourceVersion, which indicates it's been persisted)
   // Setting ownerReference to a non-existent VM causes immediate garbage collection
   const shouldSetOwnerRef =
-    createOwnerReference === true && vm?.metadata?.uid && vm?.metadata?.resourceVersion;
+    createOwnerReference === true && getUID(vm) && vm?.metadata?.resourceVersion;
 
   return {
     apiVersion: `${DataVolumeModel.apiGroup}/${DataVolumeModel.apiVersion}`,
@@ -55,7 +56,7 @@ export const getEmptyVMDataVolumeResource = (
     kind: DataVolumeModel.kind,
     metadata: {
       name: '',
-      namespace: vm?.metadata?.namespace,
+      namespace: getNamespace(vm),
       ...(shouldSetOwnerRef
         ? { ownerReferences: [buildOwnerReference(vm, { blockOwnerDeletion: false })] }
         : {}),
@@ -403,6 +404,15 @@ export const detachDiskFromVM = (vm: V1VirtualMachine, diskName: string): V1Virt
   });
 };
 
+const CUSTOMIZE_WIZARD_DRAFT_QUEUE_KEY = 'customize-wizard-draft';
+
+// All disk cancel-cleanups for the same VM must run one at a time (see runExclusiveForVm),
+// since each one reads the VM, transforms it, and patches it back.
+const getVmCancelCleanupQueueKey = (vm: V1VirtualMachine): string =>
+  getCustomizeWizardVM()
+    ? CUSTOMIZE_WIZARD_DRAFT_QUEUE_KEY
+    : `${getCluster(vm) ?? ''}/${getNamespace(vm) ?? ''}/${getName(vm) ?? ''}`;
+
 // If the VM only exists as an in-memory draft (the creation wizard), the wizard signal is
 // the live source of truth: patch it instead of re-fetching from the cluster, since the
 // draft VM has never been persisted and kubevirtK8sGet would fail.
@@ -412,22 +422,23 @@ const createDiskCancelCleanup =
     diskName: string,
     transform: (vm: V1VirtualMachine, name: string) => V1VirtualMachine,
   ): (() => Promise<void>) =>
-  async () => {
-    const draftVM = getCustomizeWizardVM();
+  () =>
+    runExclusiveForVm(getVmCancelCleanupQueueKey(vm), async () => {
+      const draftVM = getCustomizeWizardVM();
 
-    if (draftVM) {
-      await updateVMCustomizeIT(transform(draftVM, diskName));
-      return;
-    }
+      if (draftVM) {
+        await updateVMCustomizeIT(transform(draftVM, diskName));
+        return;
+      }
 
-    const freshVM = await kubevirtK8sGet<V1VirtualMachine>({
-      cluster: getCluster(vm),
-      model: VirtualMachineModel,
-      name: getName(vm),
-      ns: getNamespace(vm),
+      const freshVM = await kubevirtK8sGet<V1VirtualMachine>({
+        cluster: getCluster(vm),
+        model: VirtualMachineModel,
+        name: getName(vm),
+        ns: getNamespace(vm),
+      });
+      await updateDisks(transform(freshVM, diskName));
     });
-    await updateDisks(transform(freshVM, diskName));
-  };
 
 export const createEjectMountedDiskCancelCleanup = (
   vm: V1VirtualMachine,
