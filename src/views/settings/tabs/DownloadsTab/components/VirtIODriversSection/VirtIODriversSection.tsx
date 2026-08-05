@@ -39,7 +39,7 @@ const VirtIODriversSection: FC = () => {
     <ExpandSectionWithCustomToggle
       id="virtio-drivers-section"
       searchItemId={DOWNLOADS_TAB_IDS.virtioDriversWindows}
-      toggleContent={t('VirtIO drivers for Windows')}
+      toggleContent={t('Windows drivers')}
       customContent={
         downloadURL ? (
           downloadButton

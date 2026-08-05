@@ -77,7 +77,7 @@ const getPreviewFeaturesTabIds = (t: TFunction): SearchItem[] => [
 ];
 
 const getDownloadsTabIds = (t: TFunction): SearchItem[] => [
-  { id: DOWNLOADS_TAB_IDS.virtioDriversWindows, title: t('VirtIO drivers for Windows') },
+  { id: DOWNLOADS_TAB_IDS.virtioDriversWindows, title: t('Windows drivers') },
 ];
 
 export const getSearchItems = (t: TFunction, isAdmin: boolean): SearchItemWithTab[] => {
