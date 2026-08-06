@@ -2,10 +2,7 @@ import { useMemo } from 'react';
 import { useWatch } from 'react-hook-form';
 
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import {
-  DEFAULT_PREFERENCE_LABEL,
-  KUBEVIRT_OS,
-} from '@kubevirt-utils/constants/instancetypes-and-preferences';
+import { KUBEVIRT_OS } from '@kubevirt-utils/constants/instancetypes-and-preferences';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import useHyperConvergeConfiguration from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import useIsIPv6SingleStackCluster from '@kubevirt-utils/hooks/useIPStackType/useIsIPv6SingleStackCluster';
@@ -20,17 +17,13 @@ import { useDriversImage } from '@kubevirt-utils/resources/vm/utils/disk/useDriv
 import { generatePrettyName, getValidNamespace } from '@kubevirt-utils/utils/utils';
 import { AUTOMATIC_UPDATE_FEATURE_NAME } from '@settings/tabs/ClusterTab/components/GuestManagmentSection/AutomaticSubscriptionRHELGuests/utils/constants';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
-import {
-  CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA,
-  CREATE_VM_FORM_FIELDS_VM_DATA,
-} from '@virtualmachines/wizard/state/vm-wizard-form/consts';
 import { type VMWizardFormValues } from '@virtualmachines/wizard/state/vm-wizard-form/types';
 import {
+  createPopulatedCloudInitYAML,
   generateVM,
   isWindowBootableVolume,
 } from '@virtualmachines/wizard/steps/InstanceTypesSteps/hooks/useGenerateVM/utils/generateVM';
-
-import { createPopulatedCloudInitYAML } from './utils/generateVM';
+import { getSelectedPreferenceName } from '@virtualmachines/wizard/steps/InstanceTypesSteps/hooks/useGenerateVM/utils/getSelectedPreference';
 
 export type UseGenerateVMResult = {
   generatedVM: V1VirtualMachine;
@@ -39,48 +32,18 @@ export type UseGenerateVMResult = {
 
 const useGenerateVM = (): UseGenerateVMResult => {
   const { control } = useVMWizard();
-  const [
-    cluster,
-    namespace,
-    selectedBootableVolume,
-    vmDescription,
-    folder,
-    vmName,
-    customDiskSize,
-    dvSource,
-    pvcSource,
-    selectedInstanceType,
-  ] = useWatch({
+  const [vmData, instanceTypeData] = useWatch({
     control,
-    name: [
-      CREATE_VM_FORM_FIELDS_VM_DATA.CLUSTER,
-      CREATE_VM_FORM_FIELDS_VM_DATA.PROJECT,
-      CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.SELECTED_BOOTABLE_VOLUME,
-      CREATE_VM_FORM_FIELDS_VM_DATA.DESCRIPTION,
-      CREATE_VM_FORM_FIELDS_VM_DATA.FOLDER,
-      CREATE_VM_FORM_FIELDS_VM_DATA.NAME,
-      CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.CUSTOM_DISK_SIZE,
-      CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.DV_SOURCE,
-      CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.PVC_SOURCE,
-      CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.SELECTED_INSTANCE_TYPE,
-    ],
-  }) as [
-    VMWizardFormValues['vmData']['cluster'],
-    VMWizardFormValues['vmData']['project'],
-    VMWizardFormValues['instanceTypeData']['selectedBootableVolume'],
-    VMWizardFormValues['vmData']['description'],
-    VMWizardFormValues['vmData']['folder'],
-    VMWizardFormValues['vmData']['name'],
-    VMWizardFormValues['instanceTypeData']['customDiskSize'],
-    VMWizardFormValues['instanceTypeData']['dvSource'],
-    VMWizardFormValues['instanceTypeData']['pvcSource'],
-    VMWizardFormValues['instanceTypeData']['selectedInstanceType'],
-  ];
-  const { featureEnabled: autoUpdateEnabled } = useFeatures(AUTOMATIC_UPDATE_FEATURE_NAME);
+    name: ['vmData', 'instanceTypeData'],
+  }) as [VMWizardFormValues['vmData'], VMWizardFormValues['instanceTypeData']];
 
+  const { cluster, name, project } = vmData;
+  const { preference, selectedBootableVolume } = instanceTypeData;
+
+  const { featureEnabled: autoUpdateEnabled } = useFeatures(AUTOMATIC_UPDATE_FEATURE_NAME);
   const { subscriptionData } = useRHELAutomaticSubscription();
 
-  const validNamespace = getValidNamespace(namespace);
+  const validNamespace = getValidNamespace(project);
   const [isUDNManagedNamespace] = useNamespaceUDN(validNamespace);
   const { loaded, vmCreationNad } = useProjectDefaultNad({
     cluster,
@@ -91,8 +54,8 @@ const useGenerateVM = (): UseGenerateVMResult => {
   const enableMultiArchBootImageImport =
     hyperConverge?.spec?.featureGates?.enableMultiArchBootImageImport;
 
-  const selectedPreference = getLabel(selectedBootableVolume, DEFAULT_PREFERENCE_LABEL);
-  const osLabel = getLabel(selectedBootableVolume, KUBEVIRT_OS);
+  const selectedPreference = getSelectedPreferenceName(selectedBootableVolume, preference);
+  const osLabel = getLabel(selectedBootableVolume, KUBEVIRT_OS) || preference?.name;
   const populatedCloudInitYAML = useMemo(
     () =>
       createPopulatedCloudInitYAML(
@@ -108,48 +71,38 @@ const useGenerateVM = (): UseGenerateVMResult => {
   const [driversImage] = useDriversImage(cluster);
   const [authorizedSSHKeys] = useKubevirtUserSettings(USER_SETTINGS_KEYS.ssh, cluster);
   const defaultSSHSecretName =
-    typeof authorizedSSHKeys?.[namespace] === 'string'
-      ? (authorizedSSHKeys[namespace] as string)
+    typeof authorizedSSHKeys?.[project] === 'string'
+      ? (authorizedSSHKeys[project] as string)
       : undefined;
 
-  const generatedVM = useMemo(() => {
-    return generateVM({
-      cluster,
-      customDiskSize,
-      dvSource,
+  const generatedVM = useMemo(
+    () =>
+      generateVM({
+        context: {
+          enableMultiArchBootImageImport,
+          isIPv6SingleStack,
+          isUDNManagedNamespace,
+          populatedCloudInitYAML,
+          sshSecretName: defaultSSHSecretName,
+          vmCreationNad,
+          vmName: name ?? generatedVMName,
+        },
+        instanceTypeData,
+        vmData,
+      }),
+    [
+      defaultSSHSecretName,
       enableMultiArchBootImageImport,
-      folder,
+      generatedVMName,
+      instanceTypeData,
       isIPv6SingleStack,
       isUDNManagedNamespace,
+      name,
       populatedCloudInitYAML,
-      pvcSource,
-      selectedBootableVolume,
-      selectedInstanceType,
-      sshSecretName: defaultSSHSecretName,
-      targetNamespace: namespace,
       vmCreationNad,
-      vmDescription,
-      vmName: vmName ?? generatedVMName,
-    });
-  }, [
-    cluster,
-    customDiskSize,
-    defaultSSHSecretName,
-    dvSource,
-    enableMultiArchBootImageImport,
-    folder,
-    generatedVMName,
-    isIPv6SingleStack,
-    isUDNManagedNamespace,
-    populatedCloudInitYAML,
-    vmCreationNad,
-    pvcSource,
-    selectedBootableVolume,
-    selectedInstanceType,
-    namespace,
-    vmDescription,
-    vmName,
-  ]);
+      vmData,
+    ],
+  );
 
   const vmWithDrivers = useMemo(() => {
     const isWindowsOSVolume = isWindowBootableVolume(selectedBootableVolume);
