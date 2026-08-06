@@ -39,18 +39,24 @@ const CapacityInput: FC<CapacityInputProps> = ({
   const { unit, value } = toQuantity(size) ?? {};
 
   const onValueChange = (newValue: number) => {
+    if (!unit) return;
     onChange(quantityToString({ unit, value: newValue }));
   };
 
-  const onUnitChange = (_, newUnit: BinaryUnit) => {
+  const onUnitChange = (_event: unknown, newUnit: BinaryUnit) => {
+    if (value === undefined) return;
     onChange(quantityToString({ unit: newUnit, value }));
   };
 
-  const onMinus = () => onValueChange(Number.isInteger(value) ? value - 1 : Math.floor(value));
+  const onMinus = () => {
+    if (value === undefined) return;
+    onValueChange(Number.isInteger(value) ? value - 1 : Math.floor(value));
+  };
 
-  const onPlus = () =>
-    value < Number.MAX_SAFE_INTEGER &&
+  const onPlus = () => {
+    if (value === undefined || value >= Number.MAX_SAFE_INTEGER) return;
     onValueChange(Number.isInteger(value) ? value + 1 : Math.ceil(value));
+  };
 
   const unitOptions = useUnitOptions(size);
 

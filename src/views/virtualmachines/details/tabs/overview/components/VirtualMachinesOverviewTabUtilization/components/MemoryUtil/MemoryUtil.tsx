@@ -52,9 +52,7 @@ const MemoryUtil: FC<MemoryUtilProps> = ({ vmi }) => {
       dataTestId="util-summary-memory"
       title={t('Memory')}
       usageValue={isReady ? xbytes(memoryUsed || 0, { fixed: 0, iec: true }) : ''}
-      usedOfTotalText={
-        isReady ? t('Used of {{ total }}', { total: readableSizeUnit(memory) }) : ''
-      }
+      usedOfTotalText={isReady ? t('Used of {{ total }}', { total: readableSizeUnit(memory) }) : ''}
     >
       <ComponentReady error={error} isLoading={isLoading} isReady={isReady}>
         <ChartDonutUtilization
