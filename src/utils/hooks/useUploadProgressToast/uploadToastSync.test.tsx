@@ -3,6 +3,7 @@ import { TFunction } from 'i18next';
 
 import { UPLOAD_PROGRESS_STATUS } from './constants';
 import { UploadEntry } from './types';
+import { useUploadProgressStore } from './uploadProgressStore';
 import {
   replaceWithTerminalUploadToast,
   showInProgressUploadToast,
@@ -116,6 +117,10 @@ describe('showInProgressUploadToast', () => {
 });
 
 describe('replaceWithTerminalUploadToast', () => {
+  afterEach(() => {
+    useUploadProgressStore.setState({ uploads: {} });
+  });
+
   it('should skip non-terminal upload statuses', () => {
     const context = createMockContext();
     const upload = createUploadEntry({ status: UPLOAD_PROGRESS_STATUS.UPLOADING });
@@ -192,6 +197,58 @@ describe('replaceWithTerminalUploadToast', () => {
 
     expect(context.removeUpload).toHaveBeenCalledWith(UPLOAD_KEY);
     expect(context.cancelTrackedUpload).not.toHaveBeenCalled();
+  });
+
+  it('should not remove the store entry when a retry reused the key with a new non-terminal upload', () => {
+    const context = createMockContext();
+    const upload = createUploadEntry({ status: UPLOAD_PROGRESS_STATUS.CANCELED });
+
+    replaceWithTerminalUploadToast(UPLOAD_KEY, upload, context);
+
+    const { onClose } = context.addWarningToast.mock.calls[0][0] as MockToastOptions;
+
+    // Simulate a retry: a new upload was started for the same uploadKey,
+    // overwriting the store entry with a fresh, in-progress upload.
+    useUploadProgressStore.getState().startUpload(UPLOAD_KEY, { fileName: 'new.iso' });
+
+    onClose?.();
+
+    expect(context.removeUpload).not.toHaveBeenCalled();
+  });
+
+  it('should still remove the store entry on close when no retry has started', () => {
+    const context = createMockContext();
+    const upload = createUploadEntry({ status: UPLOAD_PROGRESS_STATUS.CANCELED });
+
+    replaceWithTerminalUploadToast(UPLOAD_KEY, upload, context);
+
+    const { onClose } = context.addWarningToast.mock.calls[0][0] as MockToastOptions;
+
+    onClose?.();
+
+    expect(context.removeUpload).toHaveBeenCalledWith(UPLOAD_KEY);
+  });
+
+  it('should not remove the store entry when a retry has started and itself became terminal before the old toast closes', () => {
+    const context = createMockContext();
+
+    // Start the first upload through the store so it gets generation = 1.
+    useUploadProgressStore.getState().startUpload(UPLOAD_KEY, { fileName: 'image.iso' });
+    useUploadProgressStore.getState().markUploadCanceled(UPLOAD_KEY);
+    const canceledUpload = useUploadProgressStore.getState().getUpload(UPLOAD_KEY)!;
+
+    replaceWithTerminalUploadToast(UPLOAD_KEY, canceledUpload, context);
+
+    const { onClose } = context.addWarningToast.mock.calls[0][0] as MockToastOptions;
+
+    // Retry: new upload starts (generation = 2) and quickly reaches a terminal state.
+    useUploadProgressStore.getState().startUpload(UPLOAD_KEY, { fileName: 'image.iso' });
+    useUploadProgressStore.getState().failUpload(UPLOAD_KEY, 'network error');
+
+    // Closing the old canceled toast must NOT evict the retry's store entry.
+    onClose?.();
+
+    expect(context.removeUpload).not.toHaveBeenCalled();
   });
 });
 

@@ -8,16 +8,23 @@ import UploadProgressErrorToast from './UploadProgressErrorToast';
 import UploadProgressSuccessToast from './UploadProgressSuccessToast';
 import UploadProgressUploadingToast from './UploadProgressUploadingToast';
 
+import { UploadEntry } from '../types';
+
 type UploadProgressToastContentProps = {
   navigate: (path: string) => void;
   uploadKey: string;
+  uploadSnapshot?: UploadEntry;
 };
 
 const UploadProgressToastContent: FC<UploadProgressToastContentProps> = ({
   navigate,
   uploadKey,
+  uploadSnapshot,
 }) => {
-  const upload = useUploadProgressStore((state) => state.uploads[uploadKey]);
+  const storeUpload = useUploadProgressStore((state) =>
+    uploadSnapshot ? undefined : state.uploads[uploadKey],
+  );
+  const upload = uploadSnapshot ?? storeUpload;
 
   if (!upload) {
     return null;

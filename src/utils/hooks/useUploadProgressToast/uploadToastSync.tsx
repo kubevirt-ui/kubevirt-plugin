@@ -7,6 +7,7 @@ import UploadProgressToastContent from './components/UploadProgressToastContent'
 import { UPLOAD_PROGRESS_STATUS } from './constants';
 import { getUploadTitle, isTerminalUploadStatus } from './toast/uploadTitles';
 import { UploadEntry } from './types';
+import { useUploadProgressStore } from './uploadProgressStore';
 
 type ToastActions = ReturnType<typeof useKubevirtToast>;
 
@@ -68,10 +69,27 @@ export const replaceWithTerminalUploadToast = (
     context.removeToast(upload.toastId);
   }
 
+  const capturedGeneration = upload.generation;
+
   const toastOptions = {
-    content: <UploadProgressToastContent navigate={context.navigate} uploadKey={uploadKey} />,
+    content: (
+      <UploadProgressToastContent
+        navigate={context.navigate}
+        uploadKey={uploadKey}
+        uploadSnapshot={upload}
+      />
+    ),
     dismissible: true,
-    onClose: () => context.removeUpload(uploadKey),
+    onClose: () => {
+      const latestUpload = useUploadProgressStore.getState().getUpload(uploadKey);
+      if (latestUpload && latestUpload.generation !== capturedGeneration) {
+        return;
+      }
+      if (latestUpload && !isTerminalUploadStatus(latestUpload.status)) {
+        return;
+      }
+      context.removeUpload(uploadKey);
+    },
     timeout: false,
     title: getUploadTitle(upload, context.t),
   };
