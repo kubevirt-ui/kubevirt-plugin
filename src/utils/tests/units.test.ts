@@ -56,6 +56,16 @@ describe('Test quantity utilities', () => {
   });
 
   describe('toQuantity', () => {
+    describe('Empty input', () => {
+      it('returns undefined for undefined input', () => {
+        expect(toQuantity()).toBeUndefined();
+      });
+
+      it('returns undefined for empty string', () => {
+        expect(toQuantity('')).toBeUndefined();
+      });
+    });
+
     describe('Binary units', () => {
       it('converts 1Ki to binary unit', () => {
         expect(toQuantity('1Ki')).toStrictEqual({ unit: 'Ki', value: 1 });

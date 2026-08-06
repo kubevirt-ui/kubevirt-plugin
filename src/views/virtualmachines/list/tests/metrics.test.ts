@@ -1,6 +1,6 @@
 import { type V1CPU, type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { SINGLE_CLUSTER_KEY } from '@kubevirt-utils/resources/constants';
 import { type PrometheusResponse } from '@openshift-console/dynamic-plugin-sdk';
+import { SINGLE_CLUSTER_KEY } from '@kubevirt-utils/resources/constants';
 
 import {
   getCPUUsagePercentage,
@@ -255,7 +255,7 @@ describe('VM Metrics', () => {
       expect(getMemoryUsagePercentage(vm, '1024M')).toBeCloseTo(50, 0);
     });
 
-    it('should return undefined when no memory data or invalid vmiMemory', () => {
+    it('should return undefined when no memory data', () => {
       expect(
         getMemoryUsagePercentage(
           createMockVM({ name: 'no-mem-vm', namespace: 'no-mem-ns' }),

@@ -82,10 +82,8 @@ const CPUMemoryModal: FC<CPUMemoryModalProps> = ({ isOpen, onClose, onSubmit, te
 
   useEffect(() => {
     if (vm?.metadata) {
-      const memoryQuantity = getMemory(vm);
-      const { unit: memUnit, value: memSize } = memoryQuantity
-        ? toQuantity(memoryQuantity)
-        : { unit: undefined, value: undefined };
+      const memoryQuantity = toQuantity(getMemory(vm));
+      const { unit: memUnit, value: memSize } = memoryQuantity ?? {};
       setMemoryUnit(memUnit);
       setMemory(memSize);
       setCPU(getCPU(vm));

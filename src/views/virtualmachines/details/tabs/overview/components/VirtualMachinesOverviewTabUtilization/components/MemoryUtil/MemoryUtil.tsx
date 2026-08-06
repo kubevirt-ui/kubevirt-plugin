@@ -10,6 +10,7 @@ import useVMQueries from '@kubevirt-utils/hooks/useVMQueries';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { getMemory } from '@kubevirt-utils/resources/vm';
 import { convertToBaseValue } from '@kubevirt-utils/utils/humanize.js';
+import { readableSizeUnit } from '@kubevirt-utils/utils/units';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { PrometheusEndpoint } from '@openshift-console/dynamic-plugin-sdk';
@@ -51,7 +52,9 @@ const MemoryUtil: FC<MemoryUtilProps> = ({ vmi }) => {
       dataTestId="util-summary-memory"
       title={t('Memory')}
       usageValue={isReady ? xbytes(memoryUsed || 0, { fixed: 0, iec: true }) : ''}
-      usedOfTotalText={isReady ? t('Used of {{ total }}', { total: memory }) : ''}
+      usedOfTotalText={
+        isReady ? t('Used of {{ total }}', { total: readableSizeUnit(memory) }) : ''
+      }
     >
       <ComponentReady error={error} isLoading={isLoading} isReady={isReady}>
         <ChartDonutUtilization

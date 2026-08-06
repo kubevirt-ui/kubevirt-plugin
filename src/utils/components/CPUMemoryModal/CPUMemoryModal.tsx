@@ -51,8 +51,8 @@ const CPUMemoryModal: FC<CPUMemoryModalProps> = ({
   const [updateInProcess, setUpdateInProcess] = useState<boolean>(false);
   const [updateError, setUpdateError] = useState<string>();
 
-  const memoryQuantity = getMemory(vm);
-  const { unit, value } = memoryQuantity ? toQuantity(memoryQuantity) : { unit: undefined, value: undefined };
+  const memoryQuantity = toQuantity(getMemory(vm));
+  const { unit, value } = memoryQuantity ?? {};
   const [memory, setMemory] = useState<number>(value || undefined);
   const [memoryUnit, setMemoryUnit] = useState<string>(unit || undefined);
   const [cpu, setCPU] = useState<V1CPU>(getCPU(vm));

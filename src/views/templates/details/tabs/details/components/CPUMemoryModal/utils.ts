@@ -11,10 +11,8 @@ type CPUMemoryValues = {
 export const getDefaultCPUMemoryValues = (template: Template): CPUMemoryValues => {
   const vmObject = getTemplateVirtualMachineObject(template);
   const defaultCPU = getCPU(vmObject);
-  const memoryQuantity = getMemory(vmObject);
-  const { unit, value } = memoryQuantity
-    ? toQuantity(memoryQuantity)
-    : { unit: undefined, value: undefined };
+  const memoryQuantity = toQuantity(getMemory(vmObject));
+  const { unit, value } = memoryQuantity ?? {};
 
   return {
     defaultCPU,

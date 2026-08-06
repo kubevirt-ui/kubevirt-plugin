@@ -32,8 +32,7 @@ const useTemplateDefaultCpuMemory: UseTemplateDefaultCpuMemory = (
   });
 
   const vmObject = getTemplateVirtualMachineObject(template);
-  const memoryQuantity = getMemory(vmObject);
-  const defaultMemory = memoryQuantity ? toQuantity(memoryQuantity) : undefined;
+  const defaultMemory = toQuantity(getMemory(vmObject));
   const defaultCpu = getCPU(vmObject);
 
   return {
