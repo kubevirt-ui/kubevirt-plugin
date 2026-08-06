@@ -22,6 +22,7 @@ export type UploadEntry = {
   dvNamespace?: string;
   errorMessage?: string;
   fileName: string;
+  generation?: number;
   onCancelCleanup?: () => Promise<void>;
   progress: number;
   resourceName?: string;
@@ -32,7 +33,7 @@ export type UploadEntry = {
   toastId?: string;
 };
 
-export type StartUploadEntry = Omit<UploadEntry, 'progress' | 'status' | 'toastId'>;
+export type StartUploadEntry = Omit<UploadEntry, 'generation' | 'progress' | 'status' | 'toastId'>;
 
 export type CdiUploadTrackMetadata = Partial<
   Pick<

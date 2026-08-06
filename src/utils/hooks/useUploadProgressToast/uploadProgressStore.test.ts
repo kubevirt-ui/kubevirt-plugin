@@ -58,6 +58,7 @@ describe('useUploadProgressStore', () => {
       expect(upload).toEqual({
         blockNavigation: true,
         fileName: FILE_IMAGE_ISO,
+        generation: 1,
         progress: 0,
         status: UPLOAD_PROGRESS_STATUS.UPLOADING,
       });
