@@ -34,7 +34,7 @@ const MigrationsTab: FC<MigrationsTabProps> = ({ duration }) => {
 
   const migrationCardDataAndFilters = useMigrationCardDataAndFilters(duration);
 
-  const { filteredVMIMS, loaded, loadErrors, onFilterChange } = migrationCardDataAndFilters;
+  const { filteredVMIMS, loaded, loadErrors, onSetFilters } = migrationCardDataAndFilters;
 
   return (
     <Overview>
@@ -63,7 +63,7 @@ const MigrationsTab: FC<MigrationsTabProps> = ({ duration }) => {
                     <CardTitle>{t('Migrations')}</CardTitle>
                   </CardHeader>
                   <CardBody className="kv-monitoring-card__body">
-                    <MigrationsChartDonut onFilterChange={onFilterChange} vmims={filteredVMIMS} />
+                    <MigrationsChartDonut onSetFilters={onSetFilters} vmims={filteredVMIMS} />
                   </CardBody>
                 </GridItem>
                 <GridItem className="kv-monitoring-card__resources" span={6}>

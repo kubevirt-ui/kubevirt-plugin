@@ -6,8 +6,7 @@ import {
 } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 
 const useItemCounts = (
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  filters: KubevirtFilter<any>[],
+  filters: KubevirtFilter[],
   data?: FilterableObject[],
 ): Record<string, Record<string, number>> =>
   useMemo(() => {

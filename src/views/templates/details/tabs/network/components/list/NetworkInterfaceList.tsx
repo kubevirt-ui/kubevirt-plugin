@@ -1,11 +1,12 @@
 import React, { FC, useMemo } from 'react';
 
+import KubevirtFilterToolbar from '@kubevirt-utils/components/KubevirtFilterToolbar/KubevirtFilterToolbar';
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
+import useKubevirtDataViewFilters from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/useKubevirtDataViewFilters';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getTemplateVirtualMachineObject, Template } from '@kubevirt-utils/resources/template';
 import { getInterfaces, getNetworks } from '@kubevirt-utils/resources/vm';
 import { getNetworkInterfaceRowData } from '@kubevirt-utils/resources/vm/utils/network/rowData';
-import { ListPageFilter, useListPageFilter } from '@openshift-console/dynamic-plugin-sdk';
 
 import useNetworkRowFilters from '../../hooks/useNetworkRowFilters';
 
@@ -24,21 +25,29 @@ const NetworkInterfaceList: FC<NetworkInterfaceListProps> = ({ template }) => {
   const vm = getTemplateVirtualMachineObject(template);
   const networks = getNetworks(vm);
   const interfaces = getInterfaces(vm);
-  const filters = useNetworkRowFilters();
+  const filterDefinitions = useNetworkRowFilters();
 
   const networkInterfacesData = getNetworkInterfaceRowData(networks, interfaces);
-  const [data, filteredData, onFilterChange] = useListPageFilter(networkInterfacesData, filters);
+
+  const { clearAllFilters, filteredData, filters, onSetFilters } = useKubevirtDataViewFilters({
+    data: networkInterfacesData,
+    filterDefinitions,
+    hideLabelFilter: true,
+  });
 
   const columns = useMemo(() => getTemplateNetworkColumns(t), [t]);
   const callbacks: TemplateNetworkCallbacks = useMemo(() => ({ template }), [template]);
 
   return (
     <>
-      <ListPageFilter
-        data={data}
-        loaded={true}
-        onFilterChange={onFilterChange}
-        rowFilters={filters}
+      <KubevirtFilterToolbar
+        clearAllFilters={clearAllFilters}
+        data={networkInterfacesData}
+        filterDefinitions={filterDefinitions}
+        filters={filters}
+        hideLabelFilter
+        loaded
+        onSetFilters={onSetFilters}
       />
       <KubevirtTable
         ariaLabel={t('Template network interfaces table')}
@@ -51,7 +60,7 @@ const NetworkInterfaceList: FC<NetworkInterfaceListProps> = ({ template }) => {
         initialSortKey="name"
         loaded={true}
         noDataMsg={t('No network interfaces found')}
-        unfilteredData={data}
+        unfilteredData={networkInterfacesData}
       />
     </>
   );

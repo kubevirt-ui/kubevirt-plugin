@@ -10,8 +10,7 @@ import { ToolbarFilter, ToolbarLabel } from '@patternfly/react-core';
 import { EXCLUSION_URL_PREFIX } from '@search/searchLanguage/constants';
 
 type ToolbarFilterMultiChipProps = PropsWithChildren<{
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  filterDef: KubevirtFilter<any>;
+  filterDef: KubevirtFilter;
   filters: KubevirtFilterState;
   onSetFilters: OnSetFilters;
 }>;
