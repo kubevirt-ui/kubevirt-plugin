@@ -1,36 +1,37 @@
 import produce from 'immer';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getDisks } from '@kubevirt-utils/resources/vm';
 
 const applyDiskAsBootable = (vm: V1VirtualMachine, diskName: string): V1VirtualMachine => {
   return produce(vm, (draftVM) => {
     const disks = getDisks(draftVM);
 
-    disks.forEach((disk, index) => {
+    for (const [index, disk] of disks.entries()) {
       if (disk.name === diskName) {
         disk.bootOrder = 1;
-        return;
+        continue;
       }
 
       disk.bootOrder = index + 2;
-    });
+    }
   });
 };
 
 const removeDiskAsBootable = (vm: V1VirtualMachine, diskName: string): V1VirtualMachine => {
   return produce(vm, (draftVM) => {
     const disks = getDisks(draftVM);
-    const disk = disks.find((d) => d.name === diskName);
+    const disk = disks.find((diskItem) => diskItem.name === diskName);
 
     if (disk) delete disk.bootOrder;
 
-    disks
-      .filter((d) => d.name !== diskName && d.bootOrder != null)
-      .sort((a, b) => (a.bootOrder ?? Infinity) - (b.bootOrder ?? Infinity))
-      .forEach((d, index) => {
-        d.bootOrder = index + 1;
-      });
+    const sortedDisks = disks
+      // eslint-disable-next-line eqeqeq -- intentional null/undefined check
+      .filter((diskItem) => diskItem.name !== diskName && diskItem.bootOrder != null)
+      .sort((a, b) => (a.bootOrder ?? Infinity) - (b.bootOrder ?? Infinity));
+    for (const [index, sortedDisk] of sortedDisks.entries()) {
+      sortedDisk.bootOrder = index + 1;
+    }
   });
 };
 
@@ -39,7 +40,7 @@ export const reorderBootDisk = (
   diskName: string,
   isBootDisk: boolean,
   initialBootDisk: boolean,
-) => {
+): V1VirtualMachine => {
   if (isBootDisk === initialBootDisk) return vm;
 
   return isBootDisk ? applyDiskAsBootable(vm, diskName) : removeDiskAsBootable(vm, diskName);

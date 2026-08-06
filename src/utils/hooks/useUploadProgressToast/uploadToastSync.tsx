@@ -1,12 +1,12 @@
 import React from 'react';
-import { TFunction } from 'i18next';
+import { type TFunction } from 'i18next';
 
-import useKubevirtToast from '@kubevirt-utils/hooks/useKubevirtToast';
+import type useKubevirtToast from '@kubevirt-utils/hooks/useKubevirtToast';
 
 import UploadProgressToastContent from './components/UploadProgressToastContent';
-import { getUploadTitle, isTerminalUploadStatus } from './toast/uploadTitles';
 import { UPLOAD_PROGRESS_STATUS } from './constants';
-import { UploadEntry } from './types';
+import { getUploadTitle, isTerminalUploadStatus } from './toast/uploadTitles';
+import { type UploadEntry } from './types';
 
 type ToastActions = ReturnType<typeof useKubevirtToast>;
 
@@ -68,7 +68,7 @@ export const replaceWithTerminalUploadToast = (
   const toastOptions = {
     content: <UploadProgressToastContent navigate={context.navigate} uploadKey={uploadKey} />,
     dismissible: true,
-    onClose: () => context.removeUpload(uploadKey),
+    onClose: (): void => context.removeUpload(uploadKey),
     timeout: false,
     title: getUploadTitle(upload, context.t),
   };
@@ -87,13 +87,13 @@ export const syncUploadToasts = (
   context: UploadToastContext,
   processedToasts: Set<string>,
 ): void => {
-  Object.entries(uploads).forEach(([uploadKey, upload]) => {
+  for (const [uploadKey, upload] of Object.entries(uploads)) {
     if (upload.status === UPLOAD_PROGRESS_STATUS.UPLOADING) {
       showInProgressUploadToast(uploadKey, upload, context, processedToasts);
-      return;
+      continue;
     }
 
     processedToasts.delete(uploadKey);
     replaceWithTerminalUploadToast(uploadKey, upload, context);
-  });
+  }
 };

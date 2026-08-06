@@ -1,6 +1,6 @@
 import { Fragment } from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { GreenRunningIcon } from '@kubevirt-utils/icons/GreenRunningIcon';
 import { getVMStatus } from '@kubevirt-utils/resources/shared';
 import { VM_ERROR_STATUSES, VM_STATUS } from '@kubevirt-utils/resources/vm/utils/vmStatus';
@@ -53,20 +53,20 @@ export type StatusCounts = {
 };
 
 export const getVMStatuses = (vms: V1VirtualMachine[]): StatusCounts => {
-  const statusCounts = initializeStatusCountsObject();
-  vms.forEach((vm) => {
-    const status = getVMStatus(vm);
+  const statusCounts = initializeStatusCountsObject() as Record<string, number>;
+  for (const vm of vms) {
+    const status: string = getVMStatus(vm);
     statusCounts[status] = statusCounts[status] + 1;
-  });
+  }
 
   statusCounts[ERROR] = VM_ERROR_STATUSES.reduce((acc, state) => {
-    const count = acc + (statusCounts?.[state] || 0);
+    const count = acc + (statusCounts?.[state] ?? 0);
     delete statusCounts[state];
     return count;
   }, 0);
 
-  const primaryStatuses = PRIMARY_STATUSES.reduce((acc, state) => {
-    acc[state] = statusCounts?.[state] || 0;
+  const primaryStatuses = PRIMARY_STATUSES.reduce<Record<string, number>>((acc, state) => {
+    acc[state] = statusCounts?.[state] ?? 0;
     delete statusCounts[state];
     return acc;
   }, {});

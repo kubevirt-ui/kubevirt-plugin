@@ -1,5 +1,8 @@
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { logVMBulkActionPerformed, VMActionTelemetry } from '@kubevirt-utils/extensions/telemetry';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import {
+  logVMBulkActionPerformed,
+  type VMActionTelemetry,
+} from '@kubevirt-utils/extensions/telemetry';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 
@@ -7,8 +10,8 @@ export const getVMNamesByNamespace = (vms: V1VirtualMachine[]): { [key: string]:
   vms?.reduce((acc: { [key: string]: string[] }, vm) => {
     const vmName = getName(vm);
     const vmNamespace = getNamespace(vm);
-    const existingNames = acc?.[vmNamespace] || [];
-    acc[vmNamespace] = [vmName, ...existingNames];
+    const existingNames: string[] = (acc?.[vmNamespace] ?? []) as string[];
+    acc[vmNamespace] = [vmName, ...existingNames] as string[];
     return acc;
   }, {});
 
@@ -21,21 +24,24 @@ export const runActionOnVMs = async (
   action: (vm: V1VirtualMachine) => Promise<string | void>,
   actionType: VMActionTelemetry,
 ): Promise<void> => {
-  const results = await Promise.allSettled(vms?.map((vm) => action(vm)) ?? []);
+  const results: PromiseSettledResult<string | void>[] = await Promise.allSettled(
+    vms?.map((vm) => action(vm)) ?? [],
+  );
 
   if (vms.length) {
-    logVMBulkActionPerformed(actionType as VMActionTelemetry, vms.length);
+    logVMBulkActionPerformed(actionType, vms.length);
   }
 
-  const failures = results.filter((result) => result.status === 'rejected');
+  const failures: PromiseRejectedResult[] = results.filter(
+    (result): result is PromiseRejectedResult => result.status === 'rejected',
+  );
 
   if (failures.length === 0) {
     return;
   }
 
-  failures.forEach((failure) =>
-    kubevirtConsole.error(`Failed to ${actionType.toLowerCase()}:`, failure.reason),
-  );
+  for (const failure of failures)
+    kubevirtConsole.error(`Failed to ${actionType.toLowerCase()}:`, failure.reason);
   throw new Error(
     `Failed to ${actionType.toLowerCase()} for ${failures.length} of ${
       vms?.length ?? 0

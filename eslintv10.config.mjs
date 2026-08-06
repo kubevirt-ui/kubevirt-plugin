@@ -59,7 +59,11 @@ const baseConfig = {
     'i18next/no-literal-string': 'error',
     'id-length': [
       'error',
-      { exceptions: ['t', 'e', 'i', 'a', 'b', 'vm', 'vmi', 'ns'], min: 3, properties: 'never' },
+      {
+        exceptions: ['t', 'e', 'i', 'a', 'b', 'id', 'vm', 'vmi', 'ns'],
+        min: 3,
+        properties: 'never',
+      },
     ],
     'max-lines': ['error', { max: 150, skipBlankLines: true, skipComments: true }],
     'no-console': 'error',

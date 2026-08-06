@@ -1,7 +1,7 @@
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { StatusGroupMapper } from '@openshift-console/dynamic-plugin-sdk';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type StatusGroupMapper } from '@openshift-console/dynamic-plugin-sdk';
 import { OffIcon } from '@patternfly/react-icons';
 import { VirtualMachineRowFilterType } from '@virtualmachines/utils/constants';
 
@@ -57,13 +57,13 @@ export const getVMStatusGroups: StatusGroupMapper = (vms) => {
     },
   };
 
-  vms.forEach((vm: V1VirtualMachine) => {
+  for (const vm of vms as V1VirtualMachine[]) {
     const group =
       Object.keys(groups).find((key) =>
         groups[key].statusIDs.includes(getVmStatusLabelFromPrintable(vm?.status?.printableStatus)),
-      ) || InventoryStatusGroup.UNKNOWN;
+      ) ?? InventoryStatusGroup.UNKNOWN;
     groups[group].count++;
-  });
+  }
 
   return groups;
 };

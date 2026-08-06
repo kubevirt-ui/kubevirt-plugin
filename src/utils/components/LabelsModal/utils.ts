@@ -1,21 +1,21 @@
-import { LabelEntry } from './constants';
+import { type LabelEntry } from './constants';
 
 // Old LabelsModal utilities (tag-input based)
 export const labelsToArray = (labels: { [key: string]: string }): string[] => {
-  return Object.entries(labels).map(([k, v]) => (v ? `${k}=${v}` : k));
+  return Object.entries(labels).map(([key, value]) => (value ? `${key}=${value}` : key));
 };
 
 export const labelsArrayToObject = (labels: string[]): { [key: string]: string } => {
   const result = {};
-  labels.forEach((item) => {
+  for (const item of labels) {
     const [key, value = null] = item.split('=');
     result[key] = value;
-  });
+  }
   return result;
 };
 
-export const isLabelValid = (label: string) => {
-  return /^[0-9A-Za-z/\-_.]+\s*=?\s*[0-9A-Za-z/\-_.]+$/.test(label) && !/\s/g.test(label);
+export const isLabelValid = (label: string): boolean => {
+  return /^[0-9A-Za-z/\-_.=]+$/.test(label) && !label.includes(' ');
 };
 
 // New LabelsModal utilities (row-based)

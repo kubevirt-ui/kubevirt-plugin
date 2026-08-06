@@ -1,13 +1,13 @@
-import { Group } from '@kubevirt-utils/types/prometheus';
+import { type Group } from '@kubevirt-utils/types/prometheus';
 import { generateAlertId } from '@kubevirt-utils/utils/prometheus';
 import {
-  Alert,
+  type Alert,
   AlertStates,
-  PrometheusAlert,
-  PrometheusRule,
-  Rule,
+  type PrometheusAlert,
+  type PrometheusRule,
+  type Rule,
   RuleStates,
-  Silence,
+  type Silence,
   SilenceStates,
 } from '@openshift-console/dynamic-plugin-sdk';
 
@@ -18,7 +18,7 @@ export const addAlertIdToRule = (group: Group, rule: PrometheusRule): Rule => {
 export const isSilenced = (alert: Alert | PrometheusAlert, silence: Silence): boolean =>
   [AlertStates.Firing, AlertStates.Silenced].includes(alert.state) &&
   silence?.matchers?.every((matcher) => {
-    const alertValue = alert?.labels?.[matcher.name] || '';
+    const alertValue = alert?.labels?.[matcher.name] ?? '';
     const isMatch = matcher.isRegex
       ? new RegExp(`^${matcher.value}$`).test(alertValue)
       : alertValue === matcher.value;
@@ -33,12 +33,13 @@ const getSilencesForRule = (alert: Alert, activeSilences: Silence[]): Silence[] 
     alert?.rule?.alerts?.some((ruleAlert) => isSilenced(ruleAlert, silence)),
   );
 
-const setRuleAlertsState = (alert: Alert): void =>
-  alert?.rule?.alerts?.forEach((ruleAlert) => {
+const setRuleAlertsState = (alert: Alert): void => {
+  for (const ruleAlert of alert?.rule?.alerts ?? []) {
     if (alert?.silencedBy?.some((silence) => isSilenced(ruleAlert, silence))) {
       ruleAlert.state = AlertStates.Silenced;
     }
-  });
+  }
+};
 
 const alertIsSilenced = (alert: Alert): boolean => alert?.silencedBy?.length > 0;
 

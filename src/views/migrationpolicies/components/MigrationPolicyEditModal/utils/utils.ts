@@ -1,43 +1,44 @@
 import produce from 'immer';
 import { migrationPolicySpecKeys } from 'src/views/migrationpolicies/utils/constants';
 
-import { V1alpha1MigrationPolicy } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1alpha1MigrationPolicy } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { DESCRIPTION_ANNOTATION } from '@kubevirt-utils/resources/vm';
 import { toQuantity } from '@kubevirt-utils/utils/units';
 
 import { getEmptyMigrationPolicy } from '../../../utils/utils';
-
-import { EditMigrationPolicyInitialState } from './constants';
+import { type EditMigrationPolicyInitialState } from './constants';
 
 export const extractEditMigrationPolicyInitialValues = (
-  mp: V1alpha1MigrationPolicy,
+  policy: V1alpha1MigrationPolicy,
 ): EditMigrationPolicyInitialState => {
   const initState: EditMigrationPolicyInitialState = {
-    migrationPolicyName: mp?.metadata?.name,
+    migrationPolicyName: policy?.metadata?.name,
   };
-  if (migrationPolicySpecKeys.ALLOW_AUTO_CONVERGE in mp?.spec) {
-    initState.allowAutoConverge = mp?.spec?.allowAutoConverge;
+  if (migrationPolicySpecKeys.ALLOW_AUTO_CONVERGE in policy?.spec) {
+    initState.allowAutoConverge = policy?.spec?.allowAutoConverge;
   }
-  if (migrationPolicySpecKeys.BANDWIDTH_PER_MIGRATION in mp?.spec) {
-    if (mp?.spec?.bandwidthPerMigration != null) {
-      initState.bandwidthPerMigration = toQuantity(mp.spec.bandwidthPerMigration.toString());
-    }
+  if (
+    migrationPolicySpecKeys.BANDWIDTH_PER_MIGRATION in policy?.spec &&
+    // eslint-disable-next-line eqeqeq -- intentional null/undefined check
+    policy?.spec?.bandwidthPerMigration != null
+  ) {
+    initState.bandwidthPerMigration = toQuantity(policy.spec.bandwidthPerMigration.toString());
   }
-  if (migrationPolicySpecKeys.COMPLETION_TIMEOUT_PER_GIB in mp?.spec) {
-    initState.completionTimeoutPerGiB = mp?.spec?.completionTimeoutPerGiB;
+  if (migrationPolicySpecKeys.COMPLETION_TIMEOUT_PER_GIB in policy?.spec) {
+    initState.completionTimeoutPerGiB = policy?.spec?.completionTimeoutPerGiB;
   }
-  if (migrationPolicySpecKeys.ALLOW_POST_COPY in mp?.spec) {
-    initState.allowPostCopy = mp?.spec?.allowPostCopy;
+  if (migrationPolicySpecKeys.ALLOW_POST_COPY in policy?.spec) {
+    initState.allowPostCopy = policy?.spec?.allowPostCopy;
   }
   return initState;
 };
 
 export const produceUpdatedMigrationPolicy = (
-  mp: V1alpha1MigrationPolicy,
+  policy: V1alpha1MigrationPolicy,
   state: EditMigrationPolicyInitialState,
 ): V1alpha1MigrationPolicy =>
   produce<V1alpha1MigrationPolicy>(
-    mp?.metadata?.name !== state?.migrationPolicyName ? getEmptyMigrationPolicy() : mp,
+    policy?.metadata?.name !== state?.migrationPolicyName ? getEmptyMigrationPolicy() : policy,
     (mpDraft: V1alpha1MigrationPolicy) => {
       const {
         allowAutoConverge,
@@ -59,10 +60,10 @@ export const produceUpdatedMigrationPolicy = (
         bandwidthPerMigration?.unit &&
         `${bandwidthPerMigration?.value}${bandwidthPerMigration?.unit}`;
 
-      if (mp?.metadata?.name !== state?.migrationPolicyName) {
+      if (policy?.metadata?.name !== state?.migrationPolicyName) {
         mpDraft.metadata.annotations[DESCRIPTION_ANNOTATION] =
-          mp?.metadata?.annotations?.[DESCRIPTION_ANNOTATION];
-        mpDraft.spec.selectors = { ...mp?.spec?.selectors };
+          policy?.metadata?.annotations?.[DESCRIPTION_ANNOTATION];
+        mpDraft.spec.selectors = { ...policy?.spec?.selectors };
       }
     },
   );

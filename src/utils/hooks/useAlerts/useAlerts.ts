@@ -4,19 +4,18 @@ import { ALL_CLUSTERS_KEY } from '@kubevirt-utils/hooks/constants';
 import useActiveClusterParam from '@multicluster/hooks/useActiveClusterParam';
 import useIsACMPage from '@multicluster/useIsACMPage';
 import {
-  Alert,
+  type Alert,
   PrometheusEndpoint,
-  PrometheusResponse,
+  type PrometheusResponse,
 } from '@openshift-console/dynamic-plugin-sdk';
 import { useFleetPrometheusPoll, useHubClusterName } from '@stolostron/multicluster-sdk';
 
 import useSilences from '../useSilences/useSilences';
-
+import useSingleClusterAlerts from './useSingleClusterAlerts';
 import { buildAlertsQuery } from './utils/alertQueries';
 import { convertMetricResultsToAlerts } from './utils/metricToAlerts';
 import { useClusterObservabilityDisabled } from './utils/useClusterObservabilityDisabled';
 import { silenceFiringAlerts } from './utils/utils';
-import useSingleClusterAlerts from './useSingleClusterAlerts';
 
 type UseAlerts = () => {
   alerts: Alert[];
@@ -61,11 +60,9 @@ const useAlerts: UseAlerts = () => {
     let clusterParam: string | undefined = undefined;
     let hubClusterNameParam: string | undefined = undefined;
 
-    if (!hasSelectedClusters) {
-      if (!isAllClusters) {
-        clusterParam = cluster;
-        hubClusterNameParam = hubClusterName;
-      }
+    if (!hasSelectedClusters && !isAllClusters) {
+      clusterParam = cluster;
+      hubClusterNameParam = hubClusterName;
     }
 
     return buildAlertsQuery(
@@ -94,10 +91,9 @@ const useAlerts: UseAlerts = () => {
       }
       const alerts = convertMetricResultsToAlerts(metricResponse as PrometheusResponse);
       return silenceFiringAlerts(alerts, silences);
-    } else {
-      // For non-ACM pages, use single cluster alerts hook
-      return singleClusterAlerts.alerts;
     }
+    // For non-ACM pages, use single cluster alerts hook
+    return singleClusterAlerts.alerts;
   }, [isACMPage, metricResponse, metricError, silences, singleClusterAlerts.alerts]);
 
   return {

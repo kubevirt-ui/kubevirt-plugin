@@ -1,16 +1,16 @@
 import { KUBEVIRT } from '@kubevirt-utils/constants/constants';
 import { SECONDS_TO_MILLISECONDS_MULTIPLIER } from '@kubevirt-utils/resources/vm/utils/constants';
-import { PrometheusRulesResponse } from '@kubevirt-utils/types/prometheus';
+import { type PrometheusRulesResponse } from '@kubevirt-utils/types/prometheus';
 import {
-  Alert,
+  type Alert,
   AlertSeverity,
   AlertStates,
-  PrometheusAlert,
-  PrometheusRule,
-  Rule,
+  type PrometheusAlert,
+  type PrometheusRule,
+  type Rule,
   RuleStates,
 } from '@openshift-console/dynamic-plugin-sdk';
-import { PrometheusResponse } from '@openshift-console/dynamic-plugin-sdk';
+import { type PrometheusResponse } from '@openshift-console/dynamic-plugin-sdk';
 
 import { addAlertIdToRule } from './utils';
 
@@ -26,17 +26,17 @@ export const convertMetricResultsToAlerts = (response: null | PrometheusResponse
 
   const alerts: Alert[] = [];
 
-  response.data.result.forEach((result) => {
+  for (const result of response.data.result) {
     const labels = result.metric || {};
     const { alertname, alertstate, severity = AlertSeverity.Warning } = labels;
 
     if (!alertname) {
-      return;
+      continue;
     }
 
     // Skip non-firing alerts
     if (alertstate !== AlertStates.Firing) {
-      return;
+      continue;
     }
 
     // Create a minimal PrometheusAlert from metric labels
@@ -48,8 +48,8 @@ export const convertMetricResultsToAlerts = (response: null | PrometheusResponse
     const prometheusAlert: PrometheusAlert = {
       activeAt: timestamp,
       annotations: {
-        description: labels.description || labels.message || '',
-        summary: labels.summary || labels.message || '',
+        description: labels.description ?? labels.message ?? '',
+        summary: labels.summary ?? labels.message ?? '',
       },
       labels: {
         ...labels,
@@ -58,14 +58,14 @@ export const convertMetricResultsToAlerts = (response: null | PrometheusResponse
         severity,
       },
       state: alertstate as AlertStates,
-      value: result.value?.[1] || '1',
+      value: result.value?.[1] ?? '1',
     };
 
     const prometheusRule: PrometheusRule = {
       alerts: [],
       annotations: {
-        description: labels.description || labels.message || '',
-        summary: labels.summary || labels.message || '',
+        description: labels.description ?? labels.message ?? '',
+        summary: labels.summary ?? labels.message ?? '',
       },
       duration: 0,
       labels: {
@@ -81,7 +81,7 @@ export const convertMetricResultsToAlerts = (response: null | PrometheusResponse
 
     // Generate unique ID and create Rule
     const rule: Rule = {
-      ...addAlertIdToRule({ file: labels.file || '', name: alertname, rules: [] }, prometheusRule),
+      ...addAlertIdToRule({ file: labels.file ?? '', name: alertname, rules: [] }, prometheusRule),
       alerts: [prometheusAlert],
     };
 
@@ -92,7 +92,7 @@ export const convertMetricResultsToAlerts = (response: null | PrometheusResponse
     };
 
     alerts.push(alert);
-  });
+  }
 
   return alerts;
 };
@@ -109,14 +109,14 @@ export const convertRulesToAlerts = (response: null | PrometheusRulesResponse): 
 
   const alerts: Alert[] = [];
 
-  response.data.groups.forEach((ruleGroup) => {
-    ruleGroup.rules?.forEach((rule) => {
+  for (const ruleGroup of response.data.groups) {
+    for (const rule of ruleGroup.rules ?? []) {
       // Only process firing rules for KubeVirt operator
       if (
         rule?.state === RuleStates.Firing &&
         rule?.labels?.kubernetes_operator_part_of === KUBEVIRT
       ) {
-        rule.alerts?.forEach((prometheusAlert) => {
+        for (const prometheusAlert of rule.alerts ?? []) {
           // Create Rule object with ID
           const ruleWithId: Rule = addAlertIdToRule(ruleGroup, rule);
 
@@ -127,10 +127,10 @@ export const convertRulesToAlerts = (response: null | PrometheusRulesResponse): 
           };
 
           alerts.push(alert);
-        });
+        }
       }
-    });
-  });
+    }
+  }
 
   return alerts;
 };

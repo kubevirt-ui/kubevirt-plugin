@@ -5,18 +5,19 @@ import {
   VirtualMachineStorageMigrationPlanModel,
 } from '@kubevirt-utils/models';
 import {
-  MultiNamespaceVirtualMachineStorageMigrationPlan,
+  type MultiNamespaceVirtualMachineStorageMigrationPlan,
   STORAGE_MIGRATION_PLAN_RETENTION_POLICY,
-  VirtualMachineStorageMigration,
-  VirtualMachineStorageMigrationPlan,
+  type VirtualMachineStorageMigration,
+  type VirtualMachineStorageMigrationPlan,
 } from '@kubevirt-utils/resources/migrations/constants';
 import { normalizeSingleNsPlan } from '@kubevirt-utils/resources/migrations/singleNs/overview';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getRandomChars, truncateToK8sName } from '@kubevirt-utils/utils/utils';
 import { kubevirtK8sCreate } from '@multicluster/k8sRequests';
 
-import { MIGPLAN_PREFIX, MIGRATION_PREFIX } from '../../utils/constants';
 import type { MigrateVMsParams } from '../types';
+
+import { MIGPLAN_PREFIX, MIGRATION_PREFIX } from '../../utils/constants';
 
 export const getEmptySingleNsMigPlan = (
   namespace: string,
@@ -25,7 +26,7 @@ export const getEmptySingleNsMigPlan = (
   apiVersion: `${VirtualMachineStorageMigrationPlanModel.apiGroup}/${VirtualMachineStorageMigrationPlanModel.apiVersion}`,
   kind: VirtualMachineStorageMigrationPlanModel.kind,
   metadata: {
-    name: planName || `${MIGPLAN_PREFIX}-${getRandomChars()}`,
+    name: planName ?? `${MIGPLAN_PREFIX}-${getRandomChars()}`,
     namespace,
   },
   spec: {
@@ -40,7 +41,7 @@ export const getSingleNsMigration = (
   kind: VirtualMachineStorageMigrationModel.kind,
   metadata: {
     name: truncateToK8sName(
-      `${MIGRATION_PREFIX}-${getName(migrationPlan) || getRandomChars()}`,
+      `${MIGRATION_PREFIX}-${getName(migrationPlan) ?? getRandomChars()}`,
       '',
     ),
     namespace: getNamespace(migrationPlan),
@@ -72,7 +73,7 @@ export const migrateVMsSingleNs = async ({
   const namespace = getNamespace(selectedMigrations[0].pvc);
 
   const uniqueNamespaces = new Set(
-    selectedMigrations.map((m) => m.vmNamespace ?? getNamespace(m.pvc)),
+    selectedMigrations.map((mig) => mig.vmNamespace ?? getNamespace(mig.pvc)),
   );
   if (uniqueNamespaces.size > 1) {
     throw new Error(
@@ -86,12 +87,12 @@ export const migrateVMsSingleNs = async ({
     ? STORAGE_MIGRATION_PLAN_RETENTION_POLICY.KEEP_SOURCE
     : STORAGE_MIGRATION_PLAN_RETENTION_POLICY.DELETE_SOURCE;
 
-  const migrationsPerVM: Record<string, typeof selectedMigrations> = groupBy(
-    selectedMigrations,
-    'vmName',
-  );
+  const migrationsPerVM = groupBy(selectedMigrations, 'vmName') as Record<
+    string,
+    typeof selectedMigrations
+  >;
 
-  Object.entries(migrationsPerVM).forEach(([vmName, vmMigrations]) => {
+  for (const [vmName, vmMigrations] of Object.entries(migrationsPerVM)) {
     migrationPlan.spec.virtualMachines.push({
       name: vmName,
       targetMigrationPVCs: vmMigrations.map((migration) => ({
@@ -101,7 +102,7 @@ export const migrateVMsSingleNs = async ({
         volumeName: migration.volumeName,
       })),
     });
-  });
+  }
 
   const createdPlan = await kubevirtK8sCreate<VirtualMachineStorageMigrationPlan>({
     cluster,
@@ -116,5 +117,7 @@ export const migrateVMsSingleNs = async ({
   });
 
   // kubevirtK8sCreate throws on failure, so createdPlan is always defined here.
-  return normalizeSingleNsPlan(createdPlan)!;
+  const normalizedPlan = normalizeSingleNsPlan(createdPlan);
+  if (!normalizedPlan) throw new Error('Failed to normalize single-namespace migration plan');
+  return normalizedPlan;
 };

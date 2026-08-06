@@ -16,7 +16,7 @@ export const createQueuedUserSettingWrite = (): QueuedUserSettingWrite => {
   let pending: null | PendingBatch = null;
   let isRunning = false;
 
-  const drain = async () => {
+  const drain = async (): Promise<void> => {
     if (isRunning) {
       return;
     }
@@ -31,9 +31,9 @@ export const createQueuedUserSettingWrite = (): QueuedUserSettingWrite => {
 
         try {
           await batch.write(batch.value);
-          batch.resolvers.forEach(({ resolve }) => resolve());
+          for (const { resolve } of batch.resolvers) resolve();
         } catch (error) {
-          batch.resolvers.forEach(({ reject }) => reject(error));
+          for (const { reject } of batch.resolvers) reject(error);
         }
       }
     } finally {
@@ -41,18 +41,16 @@ export const createQueuedUserSettingWrite = (): QueuedUserSettingWrite => {
     }
   };
 
-  return <T>(value: T, write: (value: T) => Promise<void>) =>
-    new Promise<void>((resolve, reject) => {
-      if (!pending) {
-        pending = {
-          resolvers: [],
-          value,
-          write: (nextValue) => write(nextValue as T),
-        };
-      }
+  return <T>(value: T, write: (value: T) => Promise<void>): Promise<void> =>
+    new Promise<void>((resolve, reject): void => {
+      pending ??= {
+        resolvers: [],
+        value,
+        write: (nextValue): Promise<void> => write(nextValue as T),
+      };
 
       pending.value = value;
-      pending.write = (nextValue) => write(nextValue as T);
+      pending.write = (nextValue): Promise<void> => write(nextValue as T);
       pending.resolvers.push({ reject, resolve });
       void drain();
     });

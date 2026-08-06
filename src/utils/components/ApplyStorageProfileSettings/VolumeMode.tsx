@@ -1,20 +1,19 @@
-import React, { FC, useCallback, useEffect } from 'react';
+import React, { type FC, useCallback, useEffect } from 'react';
 import { Trans } from 'react-i18next';
-import { uniq } from 'lodash';
+import uniq from 'lodash/uniq';
 
 import {
-  V1beta1StorageSpecAccessModesEnum,
+  type V1beta1StorageSpecAccessModesEnum,
   V1beta1StorageSpecVolumeModeEnum,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { ClaimPropertySets } from '@kubevirt-utils/types/storage';
+import { type ClaimPropertySets } from '@kubevirt-utils/types/storage';
 import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverContentWithLightspeedButton/PopoverContentWithLightspeedButton';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { FormGroup, Radio } from '@patternfly/react-core';
 
 import HelpTextIcon from '../HelpTextIcon/HelpTextIcon';
-
 import RecommendationLabel from './RecommendationLabel';
 import { getAccessModesForVolume, VOLUME_MODE_RADIO_OPTIONS } from './utils';
 
@@ -37,17 +36,17 @@ export const VolumeMode: FC<VolumeModeProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
 
-  const recommendedVolumeModes = uniq(
+  const recommendedVolumeModes = (uniq as <T>(arr: T[]) => T[])(
     claimPropertySets
-      .map((it) => it.volumeMode)
-      .filter((mode) =>
-        Object.values(V1beta1StorageSpecVolumeModeEnum).some((key) => key === mode),
+      .map((item) => item.volumeMode)
+      .filter((mode): mode is V1beta1StorageSpecVolumeModeEnum =>
+        (Object.values(V1beta1StorageSpecVolumeModeEnum) as string[]).includes(mode as string),
       ),
   );
   const recommendedVolumeMode = recommendedVolumeModes?.[0];
 
   const setBothModes = useCallback(
-    (mode) => {
+    (mode: V1beta1StorageSpecVolumeModeEnum) => {
       const accessModes = getAccessModesForVolume(claimPropertySets, mode);
       setAccessMode(accessModes[0]);
       setVolumeMode(mode);
@@ -64,6 +63,8 @@ export const VolumeMode: FC<VolumeModeProps> = ({
 
   return (
     <FormGroup
+      isStack
+      label={t('Volume mode')}
       labelHelp={
         <HelpTextIcon
           bodyContent={(hide) => (
@@ -83,27 +84,25 @@ export const VolumeMode: FC<VolumeModeProps> = ({
           )}
         />
       }
-      isStack
-      label={t('Volume mode')}
     >
       {VOLUME_MODE_RADIO_OPTIONS.map(({ label, value }) => (
         <Radio
+          id={value}
+          isChecked={value === volumeMode}
+          isDisabled={isDisabled}
+          key={value}
           label={
             <div className="ApplyStorageProfileSettings--labelWithGap">
               {label}
               {recommendedVolumeMode === value && <RecommendationLabel />}
             </div>
           }
+          name="volumeMode"
           onChange={(_event, checked) => {
             if (checked) {
               setBothModes(value);
             }
           }}
-          id={value}
-          isChecked={value === volumeMode}
-          isDisabled={isDisabled}
-          key={value}
-          name="volumeMode"
         />
       ))}
     </FormGroup>

@@ -1,17 +1,24 @@
-import React, { Dispatch, FC, memo, SetStateAction, useCallback, useEffect, useRef } from 'react';
+import React, {
+  type Dispatch,
+  type FC,
+  memo,
+  type SetStateAction,
+  useCallback,
+  useEffect,
+  useRef,
+} from 'react';
 
 import { ClipboardAddon } from '@xterm/addon-clipboard';
 import { FitAddon } from '@xterm/addon-fit';
-import { IDisposable, Terminal } from '@xterm/xterm';
+import { type IDisposable, Terminal } from '@xterm/xterm';
 
 import { INSECURE, SECURE } from '../../utils/constants';
 import { isConnectionEncrypted, readFromClipboard } from '../../utils/utils';
-import { PasteParams } from '../AccessConsoles/utils/accessConsoles';
-import { ConsoleState, SERIAL_CONSOLE_TYPE, WS, WSS } from '../utils/ConsoleConsts';
-import { ConsoleComponentState } from '../utils/types';
-
-import { addResizeObserver, createURL, removeResizeObserver } from './utils/serialConsole';
+import { type PasteParams } from '../AccessConsoles/utils/accessConsoles';
+import { ConsoleState, SERIAL_CONSOLE_TYPE, WS_PROTOCOL, WSS } from '../utils/ConsoleConsts';
+import { type ConsoleComponentState } from '../utils/types';
 import { addSocketListener, BlobOnlyAttachAddon } from './BlobOnlyAttachAddon';
+import { addResizeObserver, createURL, removeResizeObserver } from './utils/serialConsole';
 
 import '@xterm/xterm/css/xterm.css';
 
@@ -45,10 +52,10 @@ const SerialConsole: FC<SerialConsoleConnectorProps> = ({ basePath, setState }) 
 
   const connect = useCallback(() => {
     setSerialState(() => ({
-      state: ConsoleState.connecting,
+      state: ConsoleState.Connecting,
     }));
     const websocketOptions = {
-      host: `${isConnectionEncrypted() ? WSS : WS}://${window.location.hostname}:${
+      host: `${isConnectionEncrypted() ? WSS : WS_PROTOCOL}://${window.location.hostname}:${
         window.location.port || (isConnectionEncrypted() ? SECURE : INSECURE)
       }`,
       jsonParse: false,
@@ -61,11 +68,11 @@ const SerialConsole: FC<SerialConsoleConnectorProps> = ({ basePath, setState }) 
 
     const fitAddon = new FitAddon();
 
-    const ws = new WebSocket(url, websocketOptions.subprotocols);
+    const wsConn = new WebSocket(url, websocketOptions.subprotocols);
     const disposables: IDisposable[] = [
-      addSocketListener(ws, 'open', () => {
+      addSocketListener(wsConn, 'open', () => {
         setSerialState(() => ({
-          state: ConsoleState.connected,
+          state: ConsoleState.Connected,
         }));
         terminal.open(terminalRef.current);
         terminal.focus();
@@ -75,10 +82,10 @@ const SerialConsole: FC<SerialConsoleConnectorProps> = ({ basePath, setState }) 
           fitAddon.fit.bind(fitAddon),
         );
       }),
-      addSocketListener(ws, 'close', () => {
+      addSocketListener(wsConn, 'close', () => {
         disconnect();
       }),
-      addSocketListener(ws, 'error', () => {
+      addSocketListener(wsConn, 'error', () => {
         disconnect();
       }),
     ];
@@ -90,7 +97,7 @@ const SerialConsole: FC<SerialConsoleConnectorProps> = ({ basePath, setState }) 
       screenReaderMode: true,
     });
 
-    const attachAddon = new BlobOnlyAttachAddon(ws, { bidirectional: true });
+    const attachAddon = new BlobOnlyAttachAddon(wsConn, { bidirectional: true });
     const clipboardAddon = new ClipboardAddon();
     terminal.loadAddon(attachAddon);
     terminal.loadAddon(clipboardAddon);
@@ -99,10 +106,10 @@ const SerialConsole: FC<SerialConsoleConnectorProps> = ({ basePath, setState }) 
     terminal.loadAddon({
       activate: () => {},
       dispose: () => {
-        disposables.forEach((it) => it.dispose());
+        for (const disposable of disposables) disposable.dispose();
         setSerialState(() => ({
           // paste action is not bound to terminal object and can be used with next terminal
-          state: ConsoleState.disconnected,
+          state: ConsoleState.Disconnected,
         }));
       },
     });
@@ -131,7 +138,7 @@ const SerialConsole: FC<SerialConsoleConnectorProps> = ({ basePath, setState }) 
       }));
     }
 
-    return () => disconnect();
+    return (): void => disconnect();
   }, [disconnect, connect, setSerialState]);
 
   return (

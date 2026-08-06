@@ -1,7 +1,7 @@
-import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import { type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { renderHook } from '@testing-library/react';
 
-import { KubevirtFilter, KubevirtFilterState } from './types';
+import { type KubevirtFilter, type KubevirtFilterState } from './types';
 import useKubevirtDataViewFilters from './useKubevirtDataViewFilters';
 
 let mockFiltersState: KubevirtFilterState = { labels: [], name: [] };
@@ -48,7 +48,7 @@ describe('useKubevirtDataViewFilters', () => {
   beforeEach(() => {
     mockFiltersState = { labels: [], name: [] };
     // labels are read from searchParams directly (not from useDataViewFilters state)
-    Array.from(searchParamsMock.keys()).forEach((key) => searchParamsMock.delete(key));
+    for (const key of Array.from(searchParamsMock.keys())) searchParamsMock.delete(key);
     jest.clearAllMocks();
   });
 

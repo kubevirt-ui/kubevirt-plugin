@@ -7,7 +7,7 @@ import { PROJECT_LIST_FILTER_TYPE } from '@kubevirt-utils/utils/constants';
 import { isEmpty, universalComparator } from '@kubevirt-utils/utils/utils';
 import useMulticlusterNamespaces from '@multicluster/hooks/useMulticlusterNamespaces';
 import useIsACMPage from '@multicluster/useIsACMPage';
-import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
+import { type RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 
 import useListClusters from './useListClusters';
 
@@ -39,12 +39,12 @@ export const useProjectFilter = <R extends K8sResourceCommon>(): RowFilter<R> =>
   );
 
   return {
-    filter: (input, obj) => {
+    filter: (input, obj): boolean => {
       if (isEmpty(input.selected)) {
         return true;
       }
 
-      return input.selected.some((projectName) => projectName === getNamespace(obj));
+      return input.selected.includes(getNamespace(obj));
     },
     filterGroupName: t('Project'),
     isMatch: () => true,

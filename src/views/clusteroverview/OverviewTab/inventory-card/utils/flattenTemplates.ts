@@ -1,5 +1,5 @@
-import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import {
   getTemplateName,
   isCommonTemplate,
@@ -9,27 +9,29 @@ import {
 } from '@kubevirt-utils/resources/template';
 import { findKeySuffixValue } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
 import { get } from '@kubevirt-utils/utils/utils';
-import { WatchK8sResultsObject } from '@openshift-console/dynamic-plugin-sdk';
+import { type WatchK8sResultsObject } from '@openshift-console/dynamic-plugin-sdk';
 
-import { K8sResourceKind } from '../../../utils/types';
-
+import { type K8sResourceKind } from '../../../utils/types';
 import { TEMPLATE_CUSTOMIZED_ANNOTATION } from './constants';
 import {
-  Flatten,
-  TemplateItem,
-  VirtualMachineTemplateBundle,
-  VMGenericLikeEntityKind,
+  type Flatten,
+  type TemplateItem,
+  type VirtualMachineTemplateBundle,
+  type VMGenericLikeEntityKind,
 } from './types';
 
-export const getLabels = (entity: K8sResourceKind, defaultValue?: { [key: string]: string }) =>
-  get(entity, 'metadata.labels', defaultValue);
+export const getLabels = (
+  entity: K8sResourceKind,
+  defaultValue?: Record<string, string>,
+): Record<string, string> | undefined =>
+  get(entity, 'metadata.labels', defaultValue) as Record<string, string> | undefined;
 
 export const getLoadedData = <T extends K8sResourceKind | K8sResourceKind[] = K8sResourceKind[]>(
   result: WatchK8sResultsObject<T>,
   defaultValue = null,
 ): T => (result && result.loaded && !result.loadError ? result.data : defaultValue);
 
-export const getWorkloadProfile = (vm: VMGenericLikeEntityKind) =>
+export const getWorkloadProfile = (vm: VMGenericLikeEntityKind): string =>
   findKeySuffixValue(getLabels(vm), TEMPLATE_WORKLOAD_LABEL);
 
 export const filterTemplates = (templates: V1Template[]): TemplateItem[] => {
@@ -78,12 +80,12 @@ export const filterTemplates = (templates: V1Template[]): TemplateItem[] => {
       {} as { [key: string]: TemplateItem },
     );
 
-  Object.keys(commonTemplateItems).forEach((key) => {
+  for (const key of Object.keys(commonTemplateItems)) {
     const recommendedProfile = getWorkloadProfile(commonTemplateItems[key].variants[0]);
     commonTemplateItems[key].variants = commonTemplateItems[key].variants.filter(
       (t) => getWorkloadProfile(t) === recommendedProfile,
     );
-  });
+  }
 
   return [...userTemplateItems, ...Object.values(commonTemplateItems)];
 };
@@ -97,7 +99,9 @@ export const flattenTemplates: Flatten<
     ...getLoadedData<V1VirtualMachine[]>(vms, []).map((vm) => {
       let template: V1Template;
       try {
-        template = JSON.parse(vm.metadata.annotations[TEMPLATE_CUSTOMIZED_ANNOTATION]);
+        template = JSON.parse(
+          vm.metadata.annotations[TEMPLATE_CUSTOMIZED_ANNOTATION],
+        ) as V1Template;
       } catch {
         return null;
       }

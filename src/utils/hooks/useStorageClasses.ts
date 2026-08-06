@@ -1,11 +1,14 @@
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { getVirtualMachineStorageClasses, PVCMapper } from '@virtualmachines/utils/mappers';
+import { getVirtualMachineStorageClasses, type PVCMapper } from '@virtualmachines/utils/mappers';
 
 type StorageClassByVM = { [namespace in string]: { [name in string]: Set<string> } };
 
-export const useStorageClasses = (vms: V1VirtualMachine[], pvcMapper: PVCMapper) => {
+export const useStorageClasses = (
+  vms: V1VirtualMachine[],
+  pvcMapper: PVCMapper,
+): { allStorageClasses: Set<string>; storageClassesByVM: StorageClassByVM } => {
   return vms?.reduce(
     (acc, vm) => {
       const vmNamespace = getNamespace(vm);
@@ -13,7 +16,7 @@ export const useStorageClasses = (vms: V1VirtualMachine[], pvcMapper: PVCMapper)
 
       const storageClasses = getVirtualMachineStorageClasses(vm, pvcMapper);
 
-      storageClasses.forEach((storageClass) => {
+      for (const storageClass of storageClasses) {
         acc.allStorageClasses.add(storageClass);
         if (isEmpty(acc.storageClassesByVM[vmNamespace])) acc.storageClassesByVM[vmNamespace] = {};
 
@@ -21,7 +24,7 @@ export const useStorageClasses = (vms: V1VirtualMachine[], pvcMapper: PVCMapper)
           acc.storageClassesByVM[vmNamespace][vmName] = new Set<string>();
 
         acc.storageClassesByVM[vmNamespace][vmName].add(storageClass);
-      });
+      }
       return acc;
     },
     {
