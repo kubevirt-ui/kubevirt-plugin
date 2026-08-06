@@ -26,15 +26,15 @@ const ExpandPVC: FC<ExpandPVCProps> = ({ pvc }) => {
   }
 
   const size = expandPVCSize ?? pvcStorage;
-  const { unit, value } = toQuantity(size);
+  const { unit, value } = toQuantity(size) ?? {};
 
   const minSizes = getMinSizes(pvcStorage);
 
   const onQuantityChange = (quantityString: string) => {
-    const { unit: newUnit, value: newValue } = toQuantity(quantityString);
+    const { unit: newUnit, value: newValue } = toQuantity(quantityString) ?? {};
 
     // unit has changed -> adjust size to be bigger than minimal size for that unit
-    if (newUnit !== unit) {
+    if (newUnit && newUnit !== unit) {
       const minSize = minSizes[newUnit];
 
       if (minSize > newValue) {

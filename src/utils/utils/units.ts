@@ -117,9 +117,7 @@ const convertExponentialToDecimal = (quantityString: string): Quantity => {
  * @param quantityString - The quantity string to convert, must be in a {@link https://github.com/kubevirt/kubevirt/blob/205d9455db56d5fcd42fb331122cfef358f19a69/vendor/k8s.io/apimachinery/pkg/api/resource/quantity.go#L33 Kubernetes Quantity} format
  * @returns The Quantity object, or undefined when the input is empty.
  */
-export function toQuantity(quantityString: string): Quantity;
-export function toQuantity(quantityString?: string): Quantity | undefined;
-export function toQuantity(quantityString?: string): Quantity | undefined {
+export const toQuantity = (quantityString?: string): Quantity | undefined => {
   if (!quantityString) {
     return undefined;
   }
@@ -142,7 +140,7 @@ export function toQuantity(quantityString?: string): Quantity | undefined {
   const { unit, value } = getHumanizedSize(quantityString, 'withoutB');
 
   return { unit, value };
-}
+};
 
 export const quantityToString = ({ unit, value }: Quantity) =>
   `${value}${unit === 'B' ? '' : unit}`;

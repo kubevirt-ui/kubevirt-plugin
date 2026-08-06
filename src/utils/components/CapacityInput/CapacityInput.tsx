@@ -36,7 +36,7 @@ const CapacityInput: FC<CapacityInputProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
 
-  const { unit, value } = toQuantity(size);
+  const { unit, value } = toQuantity(size) ?? {};
 
   const onValueChange = (newValue: number) => {
     onChange(quantityToString({ unit, value: newValue }));
