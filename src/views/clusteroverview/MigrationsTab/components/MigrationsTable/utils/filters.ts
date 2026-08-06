@@ -1,54 +1,56 @@
 import { TFunction } from 'i18next';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { vmimStatuses } from '@kubevirt-utils/resources/vmim/statuses';
-import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 
-export const getStatusFilter = (t: TFunction): RowFilter[] => [
+import {
+  getMigrationSourceNode,
+  getMigrationTargetNode,
+} from '@kubevirt-utils/resources/vmi/utils/selectors';
+import { getMigrationPhase } from '@kubevirt-utils/resources/vmim/selectors';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
+import {
+  MIGRATION_SOURCE_FILTER_ID,
+  MIGRATION_STATUS_FILTER_ID,
+  MIGRATION_TARGET_FILTER_ID,
+} from './constants';
+import { MigrationTableDataLayout } from './utils';
+
+export const getStatusFilter = (t: TFunction): KubevirtFilter<MigrationTableDataLayout>[] => [
   {
-    filter: (statuses, obj) => {
-      const status = obj?.vmim?.status?.phase;
-
-      return statuses?.selected?.length === 0 || statuses?.selected?.includes(status);
-    },
-    filterGroupName: t('Status'),
-    items: Object.keys(vmimStatuses).map((status) => ({
-      id: status,
-      title: status,
+    categoryLabel: t('Status'),
+    id: MIGRATION_STATUS_FILTER_ID,
+    match: (obj, selected) => selected.includes(getMigrationPhase(obj?.vmim)),
+    options: Object.keys(vmimStatuses).map((status) => ({
+      label: status,
+      value: status,
     })),
-    reducer: (obj) => obj?.vmim?.status?.phase,
-    type: 'status',
   },
 ];
 
 export const getSourceNodeFilter = (
   t: TFunction,
   vmis: V1VirtualMachineInstance[],
-): RowFilter[] => {
-  if (vmis?.length === 0 || vmis?.every((vmi) => !vmi?.status?.migrationState?.sourceNode)) {
-    return [] as RowFilter[];
+): KubevirtFilter<MigrationTableDataLayout>[] => {
+  if (isEmpty(vmis) || vmis.every((vmi) => !getMigrationSourceNode(vmi))) {
+    return [];
   }
 
-  const nodes = new Set(
-    (vmis || []).map((vmi) => vmi?.status?.migrationState?.sourceNode)?.filter(Boolean),
-  );
+  const nodes = new Set((vmis || []).map((vmi) => getMigrationSourceNode(vmi))?.filter(Boolean));
 
   return [
     {
-      filter: (selectedNodes, obj) => {
-        const nodeName = obj?.vmiObj?.status?.migrationState?.sourceNode;
-        return (
-          selectedNodes?.selected?.length === 0 ||
-          selectedNodes?.selected?.includes(`source-${nodeName}`)
-        );
+      categoryLabel: t('Source Node'),
+      id: MIGRATION_SOURCE_FILTER_ID,
+      match: (obj, selected) => {
+        const nodeName = getMigrationSourceNode(obj?.vmiObj);
+        return selected.includes(`source-${nodeName}`);
       },
-      filterGroupName: t('Source Node'),
-      items: Array.from(nodes).map((nodeName) => ({
-        id: `source-${nodeName}`,
-        title: nodeName,
+      options: Array.from(nodes).map((nodeName) => ({
+        label: nodeName,
+        value: `source-${nodeName}`,
       })),
-      reducer: (obj) => `source-${obj?.vmiObj?.status?.migrationState?.sourceNode}`,
-      type: 'source',
     },
   ];
 };
@@ -56,33 +58,25 @@ export const getSourceNodeFilter = (
 export const getTargetNodeFilter = (
   t: TFunction,
   vmis: V1VirtualMachineInstance[],
-): RowFilter[] => {
-  if (vmis?.length === 0 || vmis?.every((vm) => !vm?.status?.migrationState?.targetNode)) {
-    return [] as RowFilter[];
+): KubevirtFilter<MigrationTableDataLayout>[] => {
+  if (isEmpty(vmis) || vmis.every((vmi) => !getMigrationTargetNode(vmi))) {
+    return [];
   }
 
-  const nodes = new Set(
-    (vmis || []).map((vmi) => vmi?.status?.migrationState?.targetNode)?.filter(Boolean),
-  );
+  const nodes = new Set((vmis || []).map((vmi) => getMigrationTargetNode(vmi))?.filter(Boolean));
 
   return [
     {
-      filter: (selectedNodes, obj) => {
-        const nodeName = obj?.vmiObj?.status?.migrationState?.targetNode;
-        return (
-          selectedNodes?.selected?.length === 0 ||
-          selectedNodes?.selected?.includes(`target-${nodeName}`)
-        );
+      categoryLabel: t('Target Node'),
+      id: MIGRATION_TARGET_FILTER_ID,
+      match: (obj, selected) => {
+        const nodeName = getMigrationTargetNode(obj?.vmiObj);
+        return selected.includes(`target-${nodeName}`);
       },
-      filterGroupName: t('Target Node'),
-      items: Array.from(nodes).map((nodeName) => ({
-        id: `target-${nodeName}`,
-        title: nodeName,
+      options: Array.from(nodes).map((nodeName) => ({
+        label: nodeName,
+        value: `target-${nodeName}`,
       })),
-      reducer: (obj) => {
-        return `target-${obj?.vmiObj?.status?.migrationState?.targetNode}`;
-      },
-      type: 'target',
     },
   ];
 };

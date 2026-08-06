@@ -1,18 +1,18 @@
-import React, { FC } from 'react';
-import { Link } from 'react-router';
+import React, { type FC } from 'react';
 
-import { OnFilterChange } from '@openshift-console/dynamic-plugin-sdk';
-import { Flex, FlexItem } from '@patternfly/react-core';
+import { type OnSetFilters } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
+import { Button, Flex, FlexItem } from '@patternfly/react-core';
 
+import { MIGRATION_STATUS_FILTER_ID } from '../MigrationsTable/utils/constants';
 import { colorScale } from './constants';
-import { ChartDataItem } from './MigrationsChartDonut';
+import { type ChartDataItem } from './MigrationsChartDonut';
 
 type MigrationChartLegendProps = {
   legendItems: ChartDataItem[];
-  onFilterChange: OnFilterChange;
+  onSetFilters: OnSetFilters;
 };
 
-const MigrationChartLegend: FC<MigrationChartLegendProps> = ({ legendItems, onFilterChange }) => {
+const MigrationChartLegend: FC<MigrationChartLegendProps> = ({ legendItems, onSetFilters }) => {
   return (
     <Flex gap={{ default: 'gapMd' }}>
       {legendItems?.map((item, index) => {
@@ -24,14 +24,13 @@ const MigrationChartLegend: FC<MigrationChartLegendProps> = ({ legendItems, onFi
               className="fas fa-square"
               style={{ color: colorScale[index % colorScale.length] }}
             />{' '}
-            <Link
-              onClick={() => {
-                onFilterChange('status', { all: [status], selected: [status] });
-              }}
-              to={`?rowFilter-status=${status}`}
+            <Button
+              isInline
+              onClick={() => onSetFilters({ [MIGRATION_STATUS_FILTER_ID]: [status] })}
+              variant="link"
             >
               {statusCount} {status}
-            </Link>
+            </Button>
           </FlexItem>
         );
       })}

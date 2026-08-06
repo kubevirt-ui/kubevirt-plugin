@@ -99,3 +99,9 @@ export const getVMIStatusConditionByType = (
   conditionType: string,
 ): undefined | V1VirtualMachineCondition =>
   getResourceStatusConditionsByType<V1VirtualMachineCondition>(vmi, conditionType);
+
+export const getMigrationSourceNode = (vmi: V1VirtualMachineInstance) =>
+  vmi?.status?.migrationState?.sourceNode;
+
+export const getMigrationTargetNode = (vmi: V1VirtualMachineInstance) =>
+  vmi?.status?.migrationState?.targetNode;
