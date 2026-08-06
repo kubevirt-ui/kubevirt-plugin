@@ -5,6 +5,7 @@ export type ValidationCommand =
   | 'ci-approved'
   | 'hold-cancel'
   | 'hold'
+  | 'i18n-approved'
   | 'lgtm-cancel'
   | 'lgtm'
   | 'recheck-jira';
@@ -13,6 +14,7 @@ const COMMANDS_IN_ORDER: readonly ValidationCommand[] = [
   'recheck-jira',
   'ai-approved',
   'ci-approved',
+  'i18n-approved',
   'lgtm',
   'lgtm-cancel',
   'approve',
@@ -26,7 +28,7 @@ const COMMANDS_IN_ORDER: readonly ValidationCommand[] = [
 // Word-boundary lookaheads reject suffixes/prefixes/paths/URLs the same
 // way the single-word commands do -- e.g. "/hold-e2e" never matches "hold".
 const COMMAND_TOKEN =
-  /(?:^|\s)\/(recheck-jira|ai-approved|ci-approved|lgtm|approve|hold)(?:\s+(cancel)(?!\S))?(?!\S)/gm;
+  /(?:^|\s)\/(recheck-jira|ai-approved|ci-approved|i18n-approved|lgtm|approve|hold)(?:\s+(cancel)(?!\S))?(?!\S)/gm;
 
 /** Returns every matched command, in a fixed order -- a comment can contain more than one, e.g. "/ai-approved /ci-approved". */
 export const parseCommand = (commentBody: string): ValidationCommand[] => {

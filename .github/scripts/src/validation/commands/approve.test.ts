@@ -4,8 +4,15 @@ import { describe, it } from 'node:test';
 import type { Octokit } from '@octokit/rest';
 
 import { CI_SCRIPTS_CONFIG } from '../ci-scripts-validation/constants';
+import { I18N_CONFIG } from '../i18n-validation/constants';
 import type { ApprovalContext } from './approve';
-import { applyApprove, approveAiConfig, approveCiScripts, cancelApprove } from './approve';
+import {
+  applyApprove,
+  approveAiConfig,
+  approveCiScripts,
+  approveI18n,
+  cancelApprove,
+} from './approve';
 
 const OWNERS_CONTENT = ['approvers:', '  - alice-approver'].join('\n');
 
@@ -154,6 +161,43 @@ describe('approveCiScripts', () => {
     assert.ok(addLabels);
     assert.deepEqual((addLabels.args as { labels: string[] }).labels, [
       CI_SCRIPTS_CONFIG.labels.reviewed,
+    ]);
+    const reaction = botCalls.find((c) => c.method === 'createForIssueComment');
+    assert.equal((reaction?.args as { content: string }).content, '+1');
+  });
+});
+
+describe('approveI18n', () => {
+  it('rejects an untrusted author: reacts -1, adds no label, throws', async () => {
+    const botCalls: Call[] = [];
+    const contentsCalls: Call[] = [];
+    const octokit = fakeOctokit(OWNERS_CONTENT, botCalls);
+    const contentsOctokit = fakeOctokit(OWNERS_CONTENT, contentsCalls);
+
+    await assert.rejects(
+      () => approveI18n(baseCtx(octokit, contentsOctokit, 'random-contributor')),
+      /not authorized to use \/i18n-approved/,
+    );
+
+    assert.equal(botCalls.filter((c) => c.method === 'createForIssueComment').length, 1);
+    assert.equal(
+      botCalls.some((c) => c.method === 'addLabels'),
+      false,
+    );
+  });
+
+  it('approves a trusted author: adds the i18n reviewed label, reacts +1', async () => {
+    const botCalls: Call[] = [];
+    const contentsCalls: Call[] = [];
+    const octokit = fakeOctokit(OWNERS_CONTENT, botCalls);
+    const contentsOctokit = fakeOctokit(OWNERS_CONTENT, contentsCalls);
+
+    await approveI18n(baseCtx(octokit, contentsOctokit, 'alice-approver'));
+
+    const addLabels = botCalls.find((c) => c.method === 'addLabels');
+    assert.ok(addLabels);
+    assert.deepEqual((addLabels.args as { labels: string[] }).labels, [
+      I18N_CONFIG.labels.reviewed,
     ]);
     const reaction = botCalls.find((c) => c.method === 'createForIssueComment');
     assert.equal((reaction?.args as { content: string }).content, '+1');

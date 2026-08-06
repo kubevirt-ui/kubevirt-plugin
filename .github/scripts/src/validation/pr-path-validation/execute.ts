@@ -5,11 +5,10 @@ import type { GitHubConfig } from '../../types/index';
 import { safeErrorMessage } from '../../utils';
 import { scanForSuspiciousPatterns } from '../ai-config-validation/checks';
 import { AI_CONFIG } from '../ai-config-validation/constants';
-import { buildStatusDescription as buildAiConfigStatusDescription } from '../ai-config-validation/utils';
 import { CI_SCRIPTS_CONFIG } from '../ci-scripts-validation/constants';
-import { buildStatusDescription as buildCiScriptsStatusDescription } from '../ci-scripts-validation/utils';
+import { I18N_CONFIG } from '../i18n-validation/constants';
 import { HandledValidationError } from './errors';
-import type { BuildStatusDescription, PathValidationOutcome } from './run-validation';
+import type { PathValidationOutcome } from './run-validation';
 import { runPathValidation } from './run-validation';
 import type { PathValidationConfig } from './types';
 
@@ -20,21 +19,19 @@ export type PathValidationInput = {
   eventAction?: string;
   /** Pre-fetched changed files -- lets a caller running multiple path validations for the same PR share one fetch instead of each doing its own. */
   files?: Array<{ filename: string; patch?: string }>;
-  headSha?: string;
   /** Injectable for tests; default to real Octokit clients built from config. */
   octokit?: Octokit;
   prNumber: number;
   statusOctokit?: Octokit;
 };
 
-/** Run path-based validation; throws HandledValidationError on failure (already reported via label/status). */
+/** Run path-based validation; throws HandledValidationError on failure (already reported via labels). */
 export const executePathValidation = async (
   input: PathValidationInput,
   pathConfig: PathValidationConfig,
-  buildStatusDescription: BuildStatusDescription,
   onFilesFetched?: (files: Array<{ filename: string; patch?: string }>) => void,
 ): Promise<PathValidationOutcome> => {
-  const { baseBranch, config, eventAction, files, headSha, prNumber } = input;
+  const { baseBranch, config, eventAction, files, prNumber } = input;
   const octokit = input.octokit ?? createOctokit(config);
   const statusOctokit = input.statusOctokit ?? createStatusOctokit(config);
 
@@ -44,13 +41,11 @@ export const executePathValidation = async (
       config,
       event: { action: eventAction },
       files,
-      headSha,
       octokit,
       prNumber,
       statusOctokit,
     },
     pathConfig,
-    buildStatusDescription,
     onFilesFetched,
   ).catch((err) => {
     const message = `${pathConfig.displayName} encountered an unexpected error`;
@@ -64,16 +59,6 @@ export const executePathValidation = async (
   }
 
   return outcome;
-};
-
-/** Best-effort "something broke" handler -- logs the error, never throws. */
-export const reportPathValidationError = async (
-  _config: GitHubConfig,
-  _headSha: string | undefined,
-  _pathConfig: Pick<PathValidationConfig, 'displayName' | 'statusContext'>,
-  err: unknown,
-): Promise<void> => {
-  console.error('Unexpected error:', safeErrorMessage(err));
 };
 
 const logSuspiciousMatches = (files: Array<{ filename: string; patch?: string }>): void => {
@@ -90,12 +75,7 @@ const logSuspiciousMatches = (files: Array<{ filename: string; patch?: string }>
 
 /** Run AI/editor configuration validation for a pull request. */
 export const executeAiConfigValidation = async (input: PathValidationInput): Promise<void> => {
-  const outcome = await executePathValidation(
-    input,
-    AI_CONFIG,
-    buildAiConfigStatusDescription,
-    logSuspiciousMatches,
-  );
+  const outcome = await executePathValidation(input, AI_CONFIG, logSuspiciousMatches);
 
   if (outcome.kind === 'skipped') {
     console.log('Skipped: skip-ai-config-check label present.');
@@ -105,19 +85,9 @@ export const executeAiConfigValidation = async (input: PathValidationInput): Pro
   console.log('AI configuration validation passed.');
 };
 
-export const reportAiConfigError = (
-  config: GitHubConfig,
-  headSha: string | undefined,
-  err: unknown,
-): Promise<void> => reportPathValidationError(config, headSha, AI_CONFIG, err);
-
 /** Run CI configuration validation for a pull request. */
 export const executeCiScriptsValidation = async (input: PathValidationInput): Promise<void> => {
-  const outcome = await executePathValidation(
-    input,
-    CI_SCRIPTS_CONFIG,
-    buildCiScriptsStatusDescription,
-  );
+  const outcome = await executePathValidation(input, CI_SCRIPTS_CONFIG);
 
   if (outcome.kind === 'skipped') {
     console.log('Skipped: skip-ci-scripts-check label present.');
@@ -127,8 +97,14 @@ export const executeCiScriptsValidation = async (input: PathValidationInput): Pr
   console.log('CI configuration validation passed.');
 };
 
-export const reportCiScriptsError = (
-  config: GitHubConfig,
-  headSha: string | undefined,
-  err: unknown,
-): Promise<void> => reportPathValidationError(config, headSha, CI_SCRIPTS_CONFIG, err);
+/** Run translation catalog validation for a pull request. */
+export const executeI18nValidation = async (input: PathValidationInput): Promise<void> => {
+  const outcome = await executePathValidation(input, I18N_CONFIG);
+
+  if (outcome.kind === 'skipped') {
+    console.log('Skipped: skip-i18n-check label present.');
+    return;
+  }
+
+  console.log('Translations validation passed.');
+};

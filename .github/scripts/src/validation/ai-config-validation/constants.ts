@@ -25,7 +25,6 @@ export const AI_CONFIG = {
     '.github/actions/setup-gh-scripts/action.yml',
   ],
   relatedAutomationPrefixes: ['.github/scripts/'],
-  statusContext: 'ai-config-validation',
 } as const satisfies PathValidationConfig;
 
 export const AI_CONFIG_EVENT_ACTIONS = {

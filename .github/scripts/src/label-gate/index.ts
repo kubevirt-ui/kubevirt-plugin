@@ -3,13 +3,13 @@
  *
  * Receives the `labeled` event context and routes to:
  *   - Dispatch hot-cluster-e2e.yml (ok-to-test without e2e-hold)
- *   - Verify review label trust (ai-config-reviewed, ci-scripts-reviewed, skip-*)
+ *   - Verify review label trust (ai-config-reviewed, ci-scripts-reviewed, i18n-reviewed, skip-*)
  *   - Exit 0 (any other label — no action needed)
  *
  * Entry point: npx tsx src/label-gate/index.ts
  *
  * Required env: GITHUB_TOKEN, LABEL_NAME, PR_LABELS (JSON array of label names),
- *               PR_NUMBER, BASE_BRANCH, PR_HEAD_SHA, SENDER, REPO_OWNER, REPO_NAME
+ *               PR_NUMBER, BASE_BRANCH, SENDER, REPO_OWNER, REPO_NAME
  */
 
 import { Octokit } from '@octokit/rest';
@@ -17,16 +17,17 @@ import { Octokit } from '@octokit/rest';
 import { createOctokit } from '../github-repo';
 import { getRepoContext } from '../shared/actions-context';
 import { dispatchWorkflowAndResolveRun } from '../shared/dispatch';
-import { failStep, setOutput } from '../shared/output';
+import { setOutput } from '../shared/output';
 import type { GitHubConfig } from '../types/index';
 import { requireEnv, safeErrorMessage } from '../utils';
-import { AI_LABELS, CI_LABELS, verifyReviewLabel } from '../validation/verify-review-labels/verify';
 import {
-  reportAiConfigError,
-  reportCiScriptsError,
-} from '../validation/pr-path-validation/execute';
+  AI_LABELS,
+  CI_LABELS,
+  I18N_LABELS,
+  verifyReviewLabel,
+} from '../validation/verify-review-labels/verify';
 
-const REVIEW_LABELS = new Set([...AI_LABELS, ...CI_LABELS]);
+const REVIEW_LABELS = new Set([...AI_LABELS, ...CI_LABELS, ...I18N_LABELS]);
 
 type Action = 'dispatch-e2e' | 'none' | 'verify-review';
 
@@ -79,7 +80,6 @@ const verifyReview = async (): Promise<void> => {
   await verifyReviewLabel({
     baseBranch: requireEnv('BASE_BRANCH'),
     config,
-    headSha: process.env.PR_HEAD_SHA,
     labelName: requireEnv('LABEL_NAME'),
     octokit: createOctokit(config),
     prNumber: parseInt(requireEnv('PR_NUMBER'), 10),
@@ -108,23 +108,8 @@ export const main = async (): Promise<void> => {
 };
 
 if (require.main === module) {
-  void main().catch(async (err) => {
+  void main().catch((err) => {
     console.error(safeErrorMessage(err));
-
-    const labelName = process.env.LABEL_NAME ?? '';
-    const config: GitHubConfig = {
-      owner: process.env.REPO_OWNER ?? '',
-      repo: process.env.REPO_NAME ?? '',
-      token: process.env.GITHUB_TOKEN ?? '',
-    };
-    const headSha = process.env.PR_HEAD_SHA;
-
-    if (AI_LABELS.has(labelName)) {
-      await reportAiConfigError(config, headSha, err);
-    } else if (CI_LABELS.has(labelName)) {
-      await reportCiScriptsError(config, headSha, err);
-    }
-
     process.exit(1);
   });
 }

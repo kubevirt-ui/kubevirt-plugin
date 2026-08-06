@@ -1,20 +1,19 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import type { GitHubConfig } from '../../types/index';
-import { HandledValidationError } from '../pr-path-validation/errors';
 import type { CommandHandlers } from './process';
-import { processCommands, reportCommandFailure, shouldReportGenericFailure } from './process';
+import { processCommands, reportCommandFailure } from './process';
 
 // CommandHandlers is an exhaustive Record -- unused here, but every fixture needs a stub.
 const NOOP_NEW_HANDLERS: Pick<
   CommandHandlers,
-  'approve-cancel' | 'approve' | 'hold-cancel' | 'hold' | 'lgtm-cancel' | 'lgtm'
+  'approve-cancel' | 'approve' | 'hold-cancel' | 'hold' | 'i18n-approved' | 'lgtm-cancel' | 'lgtm'
 > = {
   approve: async () => {},
   'approve-cancel': async () => {},
   hold: async () => {},
   'hold-cancel': async () => {},
+  'i18n-approved': async () => {},
   lgtm: async () => {},
   'lgtm-cancel': async () => {},
 };
@@ -89,120 +88,10 @@ describe('processCommands', () => {
   });
 });
 
-describe('shouldReportGenericFailure', () => {
-  it('is false for a HandledValidationError -- executeJiraValidation already reported a specific status', () => {
-    assert.equal(
-      shouldReportGenericFailure(new HandledValidationError('No CNV ticket ID found in PR title')),
-      false,
-    );
-  });
-
-  it('is true for a genuinely unexpected error -- nothing specific was reported yet', () => {
-    assert.equal(shouldReportGenericFailure(new Error('Jira API unreachable')), true);
-  });
-
-  it('is true for a non-Error thrown value', () => {
-    assert.equal(shouldReportGenericFailure('some string'), true);
-  });
-});
-
 describe('reportCommandFailure', () => {
-  const CONFIG: GitHubConfig = { owner: 'kubevirt-ui', repo: 'kubevirt-plugin', token: 'x' };
-
-  it('returns without attempting a network call for a HandledValidationError', async () => {
-    await assert.doesNotReject(
-      reportCommandFailure(
-        { command: 'recheck-jira', error: new HandledValidationError('No CNV ticket ID found') },
-        CONFIG,
-        'abc123',
-      ),
+  it('logs without throwing', () => {
+    assert.doesNotThrow(() =>
+      reportCommandFailure({ command: 'ai-approved', error: new Error('network timeout') }),
     );
-  });
-
-  it('returns without attempting a network call for recheck-jira without a headSha', async () => {
-    await assert.doesNotReject(
-      reportCommandFailure(
-        { command: 'recheck-jira', error: new Error('Jira API unreachable') },
-        CONFIG,
-        undefined,
-      ),
-    );
-  });
-
-  it('skips reporting for an ai-approved auth-rejection error', async () => {
-    await assert.doesNotReject(
-      reportCommandFailure(
-        {
-          command: 'ai-approved',
-          error: new Error('random-user is not authorized to use /ai-approved'),
-        },
-        CONFIG,
-        'abc123',
-      ),
-    );
-  });
-
-  it('skips reporting for a ci-approved auth-rejection error', async () => {
-    await assert.doesNotReject(
-      reportCommandFailure(
-        {
-          command: 'ci-approved',
-          error: new Error('random-user is not authorized to use /ci-approved'),
-        },
-        CONFIG,
-        'abc123',
-      ),
-    );
-  });
-
-  it('swallows a rejection from reportAiConfigError -- does not escape to the caller', async () => {
-    await assert.doesNotReject(
-      reportCommandFailure(
-        { command: 'ai-approved', error: new Error('network timeout') },
-        CONFIG,
-        'abc123',
-        {
-          reportAiConfigError: async () => {
-            throw new Error('failed to post ai-config-validation status');
-          },
-          reportCiScriptsError: async () => {},
-        },
-      ),
-    );
-  });
-
-  it('swallows a rejection from reportCiScriptsError -- does not escape to the caller', async () => {
-    await assert.doesNotReject(
-      reportCommandFailure(
-        { command: 'ci-approved', error: new Error('network timeout') },
-        CONFIG,
-        'abc123',
-        {
-          reportAiConfigError: async () => {},
-          reportCiScriptsError: async () => {
-            throw new Error('failed to post ci-scripts-validation status');
-          },
-        },
-      ),
-    );
-  });
-
-  it('still calls the injected reporter for the branch that matches the failing command', async () => {
-    const calledWith: string[] = [];
-    await reportCommandFailure(
-      { command: 'ai-approved', error: new Error('network timeout') },
-      CONFIG,
-      'abc123',
-      {
-        reportAiConfigError: async () => {
-          calledWith.push('ai-approved');
-        },
-        reportCiScriptsError: async () => {
-          calledWith.push('ci-approved');
-        },
-      },
-    );
-
-    assert.deepEqual(calledWith, ['ai-approved']);
   });
 });

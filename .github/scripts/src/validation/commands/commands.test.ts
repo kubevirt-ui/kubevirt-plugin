@@ -8,6 +8,7 @@ describe('validation comment commands', () => {
     assert.deepEqual(parseCommand('please /recheck-jira'), ['recheck-jira']);
     assert.deepEqual(parseCommand('/ai-approved'), ['ai-approved']);
     assert.deepEqual(parseCommand('/ci-approved'), ['ci-approved']);
+    assert.deepEqual(parseCommand('/i18n-approved'), ['i18n-approved']);
     assert.deepEqual(parseCommand('thanks!'), []);
   });
 
@@ -17,10 +18,11 @@ describe('validation comment commands', () => {
       'ai-approved',
     ]);
     assert.deepEqual(parseCommand('/ai-approved /ci-approved'), ['ai-approved', 'ci-approved']);
-    assert.deepEqual(parseCommand('/recheck-jira /ai-approved /ci-approved'), [
+    assert.deepEqual(parseCommand('/recheck-jira /ai-approved /ci-approved /i18n-approved'), [
       'recheck-jira',
       'ai-approved',
       'ci-approved',
+      'i18n-approved',
     ]);
   });
 
@@ -28,12 +30,15 @@ describe('validation comment commands', () => {
     assert.deepEqual(parseCommand('/recheck-jira-now'), []);
     assert.deepEqual(parseCommand('/ai-approved-extra'), []);
     assert.deepEqual(parseCommand('/ci-approved!'), []);
+    assert.deepEqual(parseCommand('/i18n-approved-extra'), []);
     assert.deepEqual(parseCommand('please/recheck-jira'), []);
     assert.deepEqual(parseCommand('path/ai-approved'), []);
     assert.deepEqual(parseCommand('prefix/ci-approved'), []);
+    assert.deepEqual(parseCommand('prefix/i18n-approved'), []);
     assert.deepEqual(parseCommand('https://example.com/recheck-jira'), []);
     assert.deepEqual(parseCommand('https://example.com/ai-approved'), []);
     assert.deepEqual(parseCommand('https://example.com/ci-approved'), []);
+    assert.deepEqual(parseCommand('https://example.com/i18n-approved'), []);
     assert.deepEqual(parseCommand('see /recheck-jirafoo'), []);
   });
 });
@@ -61,9 +66,10 @@ describe('lgtm/approve/hold and their cancel variants', () => {
     assert.deepEqual(parseCommand('/hold-e2e cancel'), []);
   });
 
-  it('never confuses /ai-approved or /ci-approved with /approve', () => {
+  it('never confuses /ai-approved, /ci-approved, or /i18n-approved with /approve', () => {
     assert.deepEqual(parseCommand('/ai-approved'), ['ai-approved']);
     assert.deepEqual(parseCommand('/ci-approved'), ['ci-approved']);
+    assert.deepEqual(parseCommand('/i18n-approved'), ['i18n-approved']);
     assert.deepEqual(parseCommand('/approved'), []);
   });
 
