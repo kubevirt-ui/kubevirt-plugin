@@ -7,6 +7,7 @@ import { Divider, PageSection } from '@patternfly/react-core';
 
 import CheckupsDetailsPageHistory from '../../../../CheckupsDetailsPageHistory';
 import { CHECKUPS_COLUMN_KEYS } from '../../../../utils/constants';
+import { getIsJobCompleted } from '../../../../utils/utils';
 import CheckupsSelfValidationHistoryActions from '../../../components/actions/CheckupsSelfValidationHistoryActions';
 import useJobResults from '../../../components/hooks/useJobResults';
 import useProgressTracking from '../../components/progress/hooks/useProgressTracking';
@@ -29,11 +30,8 @@ const CheckupsSelfValidationDetailsTab: FC = () => {
     namespace: getNamespace(configMap) || '',
   });
 
-  const isJobRunning = currentJob && !currentJob.status?.succeeded && !currentJob.status?.failed;
-  const isJobCompleted = !!(
-    currentJob &&
-    (currentJob.status?.succeeded === 1 || currentJob.status?.failed === 1)
-  );
+  const isJobCompleted = getIsJobCompleted(currentJob);
+  const isJobRunning = Boolean(currentJob) && !isJobCompleted;
 
   const {
     error: progressError,

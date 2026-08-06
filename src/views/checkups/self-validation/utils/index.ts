@@ -31,7 +31,6 @@ export {
   getTestSuitesFromJob,
   getTimestampFromJob,
   getWinImageDownloadUrlFromJob,
-  getWinImageNameFromJob,
   isJobRunning,
   rerunSelfValidationCheckup,
   selfValidationJob,

@@ -5,15 +5,15 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { PopoverPosition, StackItem, Switch, Tooltip } from '@patternfly/react-core';
 
 type WindowsTestingSwitchProps = {
-  acceptWindowsEula: boolean;
   isTier2Selected: boolean;
-  setAcceptWindowsEula: (checked: boolean) => void;
+  setWindowsServerTesting: (checked: boolean) => void;
+  windowsServerTesting: boolean;
 };
 
 const WindowsTestingSwitch: FC<WindowsTestingSwitchProps> = ({
-  acceptWindowsEula,
   isTier2Selected,
-  setAcceptWindowsEula,
+  setWindowsServerTesting,
+  windowsServerTesting,
 }) => {
   const { t } = useKubevirtTranslation();
 
@@ -32,11 +32,11 @@ const WindowsTestingSwitch: FC<WindowsTestingSwitchProps> = ({
         </>
       }
       className="pf-v6-u-mb-sm"
-      id="accept-windows-eula"
-      isChecked={acceptWindowsEula}
+      id="windows-server-testing"
+      isChecked={windowsServerTesting}
       isDisabled={!isTier2Selected}
       isReversed={true}
-      onChange={(_event, checked) => setAcceptWindowsEula(checked)}
+      onChange={(_event, checked) => setWindowsServerTesting(checked)}
     />
   );
 

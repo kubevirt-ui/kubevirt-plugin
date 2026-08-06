@@ -7,6 +7,7 @@ import {
   IoK8sApiBatchV1Job,
   IoK8sApiCoreV1ConfigMap,
 } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sGet, kubevirtK8sPatch } from '@multicluster/k8sRequests';
@@ -24,7 +25,6 @@ import {
   getTestSuitesFromJob,
   getTimestampFromJob,
   getWinImageDownloadUrlFromJob,
-  getWinImageNameFromJob,
 } from './selfValidationJob/jobExtraction';
 import { createResultsResourcesJob } from './selfValidationJob/resultsResources';
 import {
@@ -335,7 +335,7 @@ const validateJobParametersForResults = (
 ): { error: boolean } | ValidatedJobParameters => {
   const cluster = getCluster(job);
 
-  const namespace = job?.metadata?.namespace;
+  const namespace = getNamespace(job);
   if (!namespace) {
     kubevirtConsole.error(`Job namespace is required: ${job}`);
     return { error: true };
@@ -367,7 +367,6 @@ const validateJobParametersForResults = (
   const testSkips = getTestSkipsFromJob(job);
   const storageCapabilities = getStorageCapabilitiesFromJob(job);
   const winImageDownloadUrl = getWinImageDownloadUrlFromJob(job);
-  const winImageName = getWinImageNameFromJob(job);
 
   // Extract PVC name from original job (to reuse it)
   const pvcName = getPVCNameFromJob(job);
@@ -416,7 +415,6 @@ const validateJobParametersForResults = (
     testSuites,
     timestamp,
     winImageDownloadUrl,
-    winImageName,
   };
 };
 
