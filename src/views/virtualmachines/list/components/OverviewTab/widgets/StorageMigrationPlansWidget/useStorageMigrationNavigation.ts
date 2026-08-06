@@ -2,16 +2,17 @@ import { useMemo } from 'react';
 
 import { getStorageMigrationBackend } from '@kubevirt-utils/resources/migrations/backends';
 import {
-  type StorageMigrationAPI,
   STORAGE_MIGRATION_API,
+  type StorageMigrationAPI,
 } from '@kubevirt-utils/resources/migrations/constants';
+import { StorageMigrationStatusFilterValue } from '@kubevirt-utils/resources/migrations/storageMigrationLifecycle';
 import { getResourceUrl } from '@kubevirt-utils/resources/shared';
+import { isManagedSpokeCluster } from '@multicluster/helpers/isManagedSpokeCluster';
 import useManagedClusterConsoleURLs from '@multicluster/hooks/useManagedClusterConsoleURLs';
 import { buildSpokeConsoleUrl } from '@multicluster/urls';
 import { useHubClusterName } from '@stolostron/multicluster-sdk';
 import { spokeSupportsCustomMigrationsRoute } from '@virtualmachines/actions/hooks/storageMigrationApi/constants';
 
-import { StorageMigrationStatusFilterValue } from '@kubevirt-utils/resources/migrations/storageMigrationLifecycle';
 import { STORAGE_MIGRATION_STATUS_FILTER_TYPE } from '../../../../../../storagemigrations/list/StorageMigrationListFilters';
 
 const ALL_NAMESPACES_STORAGE_MIGRATIONS_LIST = '/k8s/all-namespaces/storagemigrations';
@@ -69,9 +70,8 @@ const useStorageMigrationNavigation = (
       };
     }
 
-    const isManagedSpokeCluster =
-      Boolean(cluster) && hubClusterLoaded && cluster !== hubClusterName;
-    const useSpokeConsoleUrl = Boolean(spokeConsoleURL) && isManagedSpokeCluster;
+    const useSpokeConsoleUrl =
+      Boolean(spokeConsoleURL) && isManagedSpokeCluster(cluster, hubClusterName, hubClusterLoaded);
 
     const consolePath = useSpokeConsoleUrl
       ? getSpokeStorageMigrationListPath(storageMigAPI, spokeCsvVersion)
