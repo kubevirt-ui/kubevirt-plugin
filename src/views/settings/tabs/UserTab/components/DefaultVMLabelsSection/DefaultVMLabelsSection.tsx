@@ -1,10 +1,9 @@
-import React, { FC, useMemo } from 'react';
+import React, { type FC, useMemo } from 'react';
 
 import RequiredCountBadge from '@kubevirt-utils/components/badges/RequiredCountBadge/RequiredCountBadge';
 import ExpandSectionWithCustomToggle from '@kubevirt-utils/components/ExpandSectionWithCustomToggle/ExpandSectionWithCustomToggle';
 import useAutoAppliedLabels from '@kubevirt-utils/hooks/useAutoAppliedLabels/useAutoAppliedLabels';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { USER_TAB_IDS } from '@settings/search/constants';
 
 import DefaultVMLabelsTable from './DefaultVMLabelsTable';
@@ -16,9 +15,7 @@ const DefaultVMLabelsSection: FC = () => {
 
   return (
     <ExpandSectionWithCustomToggle
-      customContent={
-        !isEmpty(requiredLabels) && <RequiredCountBadge count={requiredLabels.length} />
-      }
+      customContent={<RequiredCountBadge count={requiredLabels.length} />}
       helpTextContent={t(
         'Shows the label keys configured by your administrator. You can set values for keys the administrator left empty.',
       )}
