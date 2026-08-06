@@ -25,7 +25,7 @@ const getIDFromKind = (kind?: string): KindFilterIDs | undefined => {
   return undefined;
 };
 
-const useOtherVMNetworkFilters = (): KubevirtFilter[] => {
+const useOtherVMNetworkFilters = (): KubevirtFilter<OtherVMNetworkWithType>[] => {
   const { t } = useKubevirtTranslation();
 
   return useMemo(
@@ -55,7 +55,7 @@ const useOtherVMNetworkFilters = (): KubevirtFilter[] => {
       {
         categoryLabel: t('Type'),
         id: 'vm-network-type',
-        match: (obj, selected) => selected.includes((obj as OtherVMNetworkWithType).type),
+        match: (obj, selected) => selected.includes(obj.type),
         options: Object.values(VMNetworkType)
           .filter((type) => VALID_OTHER_VM_NETWORK_TYPES.has(type))
           .map((type) => ({

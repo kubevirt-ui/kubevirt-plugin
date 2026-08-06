@@ -2,16 +2,14 @@ import React, { FC, useMemo } from 'react';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import DiskListTitle from '@kubevirt-utils/components/DiskListTitle/DiskListTitle';
+import KubevirtFilterToolbar from '@kubevirt-utils/components/KubevirtFilterToolbar/KubevirtFilterToolbar';
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
+import useKubevirtDataViewFilters from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/useKubevirtDataViewFilters';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import {
-  ListPageBody,
-  ListPageFilter,
-  useListPageFilter,
-} from '@openshift-console/dynamic-plugin-sdk';
+import { ListPageBody } from '@openshift-console/dynamic-plugin-sdk';
 
 import useDisksTableDisks from '../../hooks/useDisksTableDisks';
-import { filters } from '../../utils/virtualMachinesInstancePageDisksTabUtils';
+import { getVMIDiskFilters } from '../../utils/filters';
 
 import { getVMIDiskRowId, getVMIDisksTableColumns } from './disksTableDefinition';
 
@@ -23,17 +21,24 @@ const DisksTable: FC<DisksTableProps> = ({ vmi }) => {
   const { t } = useKubevirtTranslation();
   const columns = useMemo(() => getVMIDisksTableColumns(t), [t]);
   const [disks, loaded, loadingError] = useDisksTableDisks(vmi);
-  const [data, filteredData, onFilterChange] = useListPageFilter(disks, filters);
+  const filterDefinitions = useMemo(() => getVMIDiskFilters(t), [t]);
+  const { clearAllFilters, filteredData, filters, onSetFilters } = useKubevirtDataViewFilters({
+    data: disks ?? [],
+    filterDefinitions,
+    hideLabelFilter: true,
+  });
 
   return (
     <ListPageBody>
-      <DiskListTitle />
-      <ListPageFilter
-        data={data}
+      <DiskListTitle className="pf-v6-u-mb-md" />
+      <KubevirtFilterToolbar
+        clearAllFilters={clearAllFilters}
+        data={disks}
+        filterDefinitions={filterDefinitions}
+        filters={filters}
         hideLabelFilter
         loaded={loaded}
-        onFilterChange={onFilterChange}
-        rowFilters={filters}
+        onSetFilters={onSetFilters}
       />
       <KubevirtTable
         ariaLabel={t('Disks table')}
@@ -46,7 +51,8 @@ const DisksTable: FC<DisksTableProps> = ({ vmi }) => {
         loaded={loaded}
         loadError={loadingError}
         noDataMsg={t('No disks found')}
-        unfilteredData={data}
+        noFilteredDataMsg={t('No results match the current filters')}
+        unfilteredData={disks}
       />
     </ListPageBody>
   );

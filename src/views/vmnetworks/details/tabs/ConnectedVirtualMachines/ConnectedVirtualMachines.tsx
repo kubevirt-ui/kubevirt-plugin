@@ -106,7 +106,7 @@ const ConnectedVirtualMachines: FC<ConnectedVirtualMachinesProps> = ({ obj: vmNe
     );
   }
 
-  if (isEmpty(vms)) {
+  if (isEmpty(vms) && !error) {
     return (
       <ListPageBody>
         <ListEmptyState

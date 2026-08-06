@@ -14,8 +14,8 @@ import {
 import { getRowFilterQueryKey } from '@search/utils/query';
 import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
-import { useSearchFiltersParameters } from './hooks/useSearchFiltersParameters';
 import { STATIC_SEARCH_FILTERS, STATIC_SEARCH_FILTERS_PLACEHOLDERS } from './constants';
+import { useSearchFiltersParameters } from './hooks/useSearchFiltersParameters';
 import { ExtendedRowFilter, TextFiltersType } from './types';
 
 export type Filter = {
@@ -99,12 +99,12 @@ export const intersection = (a: string[], b: string[]) => {
 };
 
 export const getLabelsAsString = (obj: K8sResourceCommon): string[] => {
-  const requirements = toRequirements(obj.metadata.labels);
+  const requirements = toRequirements(obj?.metadata?.labels);
   return Object.values(requirements).map(requirementToString);
 };
 
-export const labelParser = (resources: K8sResourceCommon[]): Set<string> => {
-  return resources.reduce((acc: Set<string>, resource: K8sResourceCommon) => {
+export const labelParser = (resources?: K8sResourceCommon[]): Set<string> => {
+  return (resources ?? []).reduce((acc: Set<string>, resource: K8sResourceCommon) => {
     getLabelsAsString(resource).forEach((label) => acc.add(label));
     return acc;
   }, new Set<string>());
@@ -112,7 +112,7 @@ export const labelParser = (resources: K8sResourceCommon[]): Set<string> => {
 
 const toArray = (value) => (Array.isArray(value) ? value : [value]);
 
-export const requirementToString = (requirement: MatchExpression): string => {
+const requirementToString = (requirement: MatchExpression): string => {
   const requirementStrings = {
     [Operator.DoesNotExist]: `!${requirement.key}`,
     [Operator.Equals]: `${requirement.key}=${requirement.values[0]}`,
@@ -127,7 +127,7 @@ export const requirementToString = (requirement: MatchExpression): string => {
   return requirementStrings[requirement.operator] || '';
 };
 
-export const createEquals = (key: string, value: string): MatchExpression => ({
+const createEquals = (key: string, value: string): MatchExpression => ({
   key,
   operator: Operator.Equals,
   values: [value],
@@ -135,7 +135,7 @@ export const createEquals = (key: string, value: string): MatchExpression => ({
 
 const isOldFormat = (selector: Selector) => !selector.matchLabels && !selector.matchExpressions;
 
-export const toRequirements = (selector: Selector = {}) => {
+const toRequirements = (selector: Selector = {}) => {
   const matchLabels = isOldFormat(selector) ? selector : selector.matchLabels;
   const { matchExpressions } = selector;
 

@@ -3,6 +3,14 @@ export const STATIC_SEARCH_FILTERS = {
   name: 'name',
 } as const;
 
+export type TextSearchFilterType =
+  (typeof STATIC_SEARCH_FILTERS)[keyof typeof STATIC_SEARCH_FILTERS];
+
+export const STATIC_SEARCH_FILTERS_DROPDOWN_VALUES: TextSearchFilterType[] = [
+  STATIC_SEARCH_FILTERS.name,
+  STATIC_SEARCH_FILTERS.labels,
+];
+
 export const STATIC_SEARCH_FILTERS_LABELS = {
   labels: 'Labels',
   name: 'Name',

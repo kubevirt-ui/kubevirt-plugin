@@ -6,21 +6,18 @@ import DiskListTitle from '@kubevirt-utils/components/DiskListTitle/DiskListTitl
 import DiskSourceSelect from '@kubevirt-utils/components/DiskModal/components/DiskSourceSelect/DiskSourceSelect';
 import DiskModal from '@kubevirt-utils/components/DiskModal/DiskModal';
 import { SourceTypes } from '@kubevirt-utils/components/DiskModal/utils/types';
+import KubevirtFilterToolbar from '@kubevirt-utils/components/KubevirtFilterToolbar/KubevirtFilterToolbar';
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import WindowsDrivers from '@kubevirt-utils/components/WindowsDrivers/WindowsDrivers';
 import useIsWindowsSupportedArchitecture from '@kubevirt-utils/hooks/useIsWindowsSupportedArchitecture';
+import useKubevirtDataViewFilters from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/useKubevirtDataViewFilters';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { VirtualMachineSubresourcesModel } from '@kubevirt-utils/models';
 import { asAccessReview, getNamespace } from '@kubevirt-utils/resources/shared';
 import useDisksTableData from '@kubevirt-utils/resources/vm/hooks/disk/useDisksTableData';
 import useProvisioningPercentage from '@kubevirt-utils/resources/vm/hooks/useProvisioningPercentage';
-import {
-  K8sVerb,
-  ListPageFilter,
-  useAccessReview,
-  useListPageFilter,
-} from '@openshift-console/dynamic-plugin-sdk';
+import { K8sVerb, useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
 import { Flex, FlexItem } from '@patternfly/react-core';
 import { useFleetAccessReview } from '@stolostron/multicluster-sdk';
 import { updateDisks } from '@virtualmachines/details/tabs/configuration/details/utils/utils';
@@ -45,8 +42,12 @@ const DiskList: FC<DiskListProps> = ({ customize = false, onDiskUpdate, vm, vmi 
   const isWindowsSupported = useIsWindowsSupportedArchitecture();
   const columns = useMemo(() => getDiskListColumns(t), [t]);
   const [disks, sourcesLoaded, loadError] = useDisksTableData(vm, vmi);
-  const filters = useDisksFilters();
-  const [data, filteredData, onFilterChange] = useListPageFilter(disks, filters);
+  const filterDefinitions = useDisksFilters();
+  const { clearAllFilters, filteredData, filters, onSetFilters } = useKubevirtDataViewFilters({
+    data: disks ?? [],
+    filterDefinitions,
+    hideLabelFilter: true,
+  });
 
   const addVolumeAccessReview = asAccessReview(
     VirtualMachineSubresourcesModel,
@@ -106,12 +107,14 @@ const DiskList: FC<DiskListProps> = ({ customize = false, onDiskUpdate, vm, vmi 
       />
       <Flex>
         <FlexItem>
-          <ListPageFilter
-            data={data}
+          <KubevirtFilterToolbar
+            clearAllFilters={clearAllFilters}
+            data={disks}
+            filterDefinitions={filterDefinitions}
+            filters={filters}
             hideLabelFilter
             loaded={sourcesLoaded}
-            onFilterChange={onFilterChange}
-            rowFilters={filters}
+            onSetFilters={onSetFilters}
           />
         </FlexItem>
 
@@ -134,7 +137,7 @@ const DiskList: FC<DiskListProps> = ({ customize = false, onDiskUpdate, vm, vmi 
         loadError={loadError}
         noDataMsg={t('No disks found')}
         noFilteredDataMsg={t('No results match the current filters')}
-        unfilteredData={data}
+        unfilteredData={disks}
       />
     </div>
   );

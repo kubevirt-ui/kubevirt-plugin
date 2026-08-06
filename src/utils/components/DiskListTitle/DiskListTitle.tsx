@@ -1,15 +1,19 @@
-import React from 'react';
+import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Title } from '@patternfly/react-core';
 
 import SearchItem from '../SearchItem/SearchItem';
 
-const DiskListTitle = () => {
+type DiskListTitleProps = {
+  className?: string;
+};
+
+const DiskListTitle: FC<DiskListTitleProps> = ({ className }) => {
   const { t } = useKubevirtTranslation();
 
   return (
-    <Title headingLevel="h2">
+    <Title headingLevel="h2" className={className}>
       <SearchItem id="disks">{t('Disks')}</SearchItem>
     </Title>
   );

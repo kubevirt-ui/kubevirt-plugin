@@ -1,35 +1,28 @@
 import { useMemo } from 'react';
 
+import { KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { diskTypesLabels } from '@kubevirt-utils/resources/vm/utils/disk/constants';
-import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
+import {
+  DiskRowDataLayout,
+  diskTypesLabels,
+} from '@kubevirt-utils/resources/vm/utils/disk/constants';
 
-const useDisksFilters = (): RowFilter[] => {
+const DISK_TYPE_FILTER_ID = 'disk-type';
+
+const useDisksFilters = (): KubevirtFilter<DiskRowDataLayout>[] => {
   const { t } = useKubevirtTranslation();
-  const filters: RowFilter[] = useMemo(
+
+  return useMemo(
     () => [
       {
-        filter: (drives, obj) => {
-          const drive = obj?.drive;
-          return (
-            drives.selected?.length === 0 ||
-            drives.selected?.includes(drive) ||
-            !drives?.all?.find((item) => item === drive)
-          );
-        },
-        filterGroupName: t('Disk type'),
-        items: Object.keys(diskTypesLabels).map((type) => ({
-          id: diskTypesLabels[type],
-          title: diskTypesLabels[type],
-        })),
-        reducer: (obj) => obj?.drive,
-        type: 'disk-type',
+        categoryLabel: t('Disk type'),
+        id: DISK_TYPE_FILTER_ID,
+        match: (obj, selected) => selected.includes(obj?.drive),
+        options: Object.values(diskTypesLabels).map((value) => ({ label: value, value })),
       },
     ],
     [t],
   );
-
-  return filters;
 };
 
 export default useDisksFilters;

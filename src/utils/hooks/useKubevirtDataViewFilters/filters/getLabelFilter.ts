@@ -2,10 +2,12 @@ import { TFunction } from 'i18next';
 
 import { STATIC_SEARCH_FILTERS } from '@kubevirt-utils/components/ListPageFilter/constants';
 import { getLabelsAsString } from '@kubevirt-utils/components/ListPageFilter/utils';
-import { KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
-import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import {
+  FilterableObject,
+  KubevirtFilter,
+} from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 
-export const getLabelFilter = (t: TFunction): KubevirtFilter<K8sResourceCommon> => ({
+export const getLabelFilter = (t: TFunction): KubevirtFilter<FilterableObject> => ({
   categoryLabel: t('Label'),
   id: STATIC_SEARCH_FILTERS.labels,
   match: (obj, selected) => {
