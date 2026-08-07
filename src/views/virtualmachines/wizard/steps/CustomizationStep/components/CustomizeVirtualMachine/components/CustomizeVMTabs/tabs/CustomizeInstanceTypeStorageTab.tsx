@@ -3,6 +3,8 @@ import React from 'react';
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import EnvironmentForm from '@kubevirt-utils/components/EnvironmentEditor/EnvironmentForm';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
+import VirtIORecommendationAlert from '@kubevirt-utils/components/VirtIORecommendationAlert/VirtIORecommendationAlert';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getDataVolumeTemplates, getDisks, getVolumes } from '@kubevirt-utils/resources/vm';
 import {
   customizeWizardVMSignal,
@@ -12,9 +14,14 @@ import {
 import { Divider, Grid, GridItem, PageSection } from '@patternfly/react-core';
 import { useSignals } from '@preact/signals-react/runtime';
 import DiskList from '@virtualmachines/details/tabs/configuration/storage/components/tables/disk/DiskList';
+import {
+  hasNonVirtioDisk,
+  switchDisksToVirtio,
+} from '@virtualmachines/wizard/steps/CustomizationStep/utils/virtioUtils';
 
 const CustomizeInstanceTypeStorageTab = () => {
   useSignals();
+  const { t } = useKubevirtTranslation();
   const vm = customizeWizardVMSignal.value;
 
   if (!vm) {
@@ -25,6 +32,15 @@ const CustomizeInstanceTypeStorageTab = () => {
     <Grid hasGutter>
       <GridItem>
         <PageSection>
+          {hasNonVirtioDisk(vm) && (
+            <VirtIORecommendationAlert
+              description={t(
+                'VirtIO provides the best performance. Switch disk interfaces to VirtIO unless guest drivers are unavailable.',
+              )}
+              onSwitchToVirtio={() => patchCustomizeWizardVMSignal(switchDisksToVirtio(vm))}
+              title={t('Non-VirtIO disk interfaces detected')}
+            />
+          )}
           <DiskList
             onDiskUpdate={(updatedVM: V1VirtualMachine) => {
               const vmModified = patchCustomizeWizardVMSignal([

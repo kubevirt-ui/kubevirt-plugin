@@ -8,6 +8,7 @@ import DisksReviewTable from '@kubevirt-utils/components/DisksReviewTable/DisksR
 import NetworksReviewTable from '@kubevirt-utils/components/NetworksReviewTable/NetworksReviewTable';
 import useIsIPv6SingleStackCluster from '@kubevirt-utils/hooks/useIPStackType/useIsIPv6SingleStackCluster';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getTemplateBootSourceType } from '@kubevirt-utils/resources/template/hooks/useVmTemplateSource/utils';
 import { WORKLOADS_LABELS } from '@kubevirt-utils/resources/template/utils/constants';
 import { getTemplateCategoryDisplay } from '@kubevirt-utils/resources/template/utils/getTemplateCategoryDisplay';
 import {
@@ -18,7 +19,7 @@ import {
   isDefaultVariantTemplate,
 } from '@kubevirt-utils/resources/template/utils/selectors';
 import { isVirtualMachineTemplate } from '@kubevirt-utils/resources/template/utils/types';
-import { getCPU } from '@kubevirt-utils/resources/vm';
+import { getCPU, getVMBootSourceLabel } from '@kubevirt-utils/resources/vm';
 import { networksHavePodNetwork } from '@kubevirt-utils/resources/vm/utils/network/utils';
 import { getOperatingSystemName } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
@@ -53,6 +54,14 @@ const TemplateInfoSection: FC = memo(() => {
     ? getTemplateCategoryDisplay(template, t)
     : `${WORKLOADS_LABELS[workload] ?? t('Other')} ${isDefaultTemplate ? t('(default)') : ''}`;
 
+  const bootSource = getTemplateBootSourceType(template);
+  const sourceRef = bootSource?.source?.sourceRef;
+  const bootSourceLabel = sourceRef?.name
+    ? sourceRef.namespace
+      ? t('{{name}} ({{namespace}})', { name: sourceRef.name, namespace: sourceRef.namespace })
+      : sourceRef.name
+    : getVMBootSourceLabel(bootSource?.type);
+
   return (
     <DescriptionList className="pf-v6-u-mt-lg">
       <DescriptionItem
@@ -74,6 +83,14 @@ const TemplateInfoSection: FC = memo(() => {
         isPopover
         olsObj={vm}
         promptType={OLSPromptType.CPU_MEMORY}
+      />
+      <DescriptionItem
+        bodyContent={t(
+          'The DataSource or volume that provides the root disk image for this template.',
+        )}
+        descriptionData={bootSourceLabel || notAvailable}
+        descriptionHeader={t('Boot source')}
+        isPopover
       />
       <DescriptionItem
         descriptionData={<NetworksReviewTable interfaces={interfaces} networks={networks} />}
