@@ -27,21 +27,10 @@ jobs:
           - linux/arm64
           - linux/s390x
     steps:
-      - name: Checkout
-        uses: actions/checkout@v7
-        with:
-          persist-credentials: false
-          sparse-checkout: ci-scripts/hot-cluster/ts
-
-      - name: Install infra-script dependencies
-        working-directory: ci-scripts/hot-cluster/ts
-        run: npm ci
-
       - name: Prepare
-        working-directory: ci-scripts/hot-cluster/ts
-        env:
-          PLATFORM: ${{ matrix.platform }}
-        run: npx tsx src/scripts/prepare-platform-pair.ts
+        run: |
+          platform=${{ matrix.platform }}
+          echo "PLATFORM_PAIR=${platform//\//-}" >> $GITHUB_ENV
 
       - name: Docker meta
         id: meta
@@ -76,11 +65,10 @@ jobs:
           outputs: type=image,name-canonical=true,push=true
 
       - name: Export digest
-        working-directory: ci-scripts/hot-cluster/ts
-        env:
-          DIGEST: ${{ steps.build.outputs.digest }}
-          DIGEST_DIR: ${{ runner.temp }}/digests
-        run: npx tsx src/scripts/export-digest.ts
+        run: |
+          mkdir -p ${{ runner.temp }}/digests
+          digest="${{ steps.build.outputs.digest }}"
+          touch "${{ runner.temp }}/digests/${digest#sha256:}"
 
       - name: Upload digest
         uses: actions/upload-artifact@v7
@@ -95,12 +83,6 @@ jobs:
     needs:
       - build
     steps:
-      - name: Checkout
-        uses: actions/checkout@v7
-        with:
-          persist-credentials: false
-          sparse-checkout: ci-scripts/hot-cluster/ts
-
       - name: Download digests
         uses: actions/download-artifact@v8
         with:
@@ -118,16 +100,12 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
 
-      - name: Install infra-script dependencies
-        working-directory: ci-scripts/hot-cluster/ts
-        run: npm ci
-
       - name: Create manifest list and push
-        working-directory: ci-scripts/hot-cluster/ts
-        env:
-          DIGEST_DIR: ${{ runner.temp }}/digests
-        run: npx tsx src/scripts/create-manifest-list.ts
+        working-directory: ${{ runner.temp }}/digests
+        run: |
+          docker buildx imagetools create -t ${{ env.REGISTRY_IMAGE }}:${{ env.VERSION_TAG }} \
+            $(printf '${{ env.REGISTRY_IMAGE }}@sha256:%s ' *)
 
       - name: Inspect image
-        working-directory: ci-scripts/hot-cluster/ts
-        run: npx tsx src/scripts/inspect-image.ts
+        run: |
+          docker buildx imagetools inspect ${{ env.REGISTRY_IMAGE }}:${{ env.VERSION_TAG }}
