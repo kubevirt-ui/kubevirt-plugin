@@ -9,6 +9,7 @@ import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getLabel } from '@kubevirt-utils/resources/shared';
 import { getCPU, getMemory, VM_TEMPLATE_ANNOTATION } from '@kubevirt-utils/resources/vm';
+import { toQuantity } from '@kubevirt-utils/utils/units';
 import { ensurePath } from '@kubevirt-utils/utils/utils';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import {
@@ -24,7 +25,6 @@ import {
 } from '@patternfly/react-core';
 
 import useTemplateDefaultCpuMemory from './hooks/useTemplateDefaultCpuMemory';
-import { getMemorySize } from './utils/CpuMemoryUtils';
 
 import './cpu-memory-modal.scss';
 
@@ -51,8 +51,9 @@ const CPUMemoryModal: FC<CPUMemoryModalProps> = ({
   const [updateInProcess, setUpdateInProcess] = useState<boolean>(false);
   const [updateError, setUpdateError] = useState<string>();
 
-  const { size, unit } = getMemorySize(getMemory(vm));
-  const [memory, setMemory] = useState<number>(size || undefined);
+  const memoryQuantity = toQuantity(getMemory(vm));
+  const { unit, value } = memoryQuantity ?? {};
+  const [memory, setMemory] = useState<number>(value || undefined);
   const [memoryUnit, setMemoryUnit] = useState<string>(unit || undefined);
   const [cpu, setCPU] = useState<V1CPU>(getCPU(vm));
 
@@ -68,7 +69,7 @@ const CPUMemoryModal: FC<CPUMemoryModalProps> = ({
   const { defaultCpu, defaultMemory } = templateDefaultsData || {};
 
   const cpuLimits = getCPULimitsFromVM(vm);
-  const { size: defaultMemorySize, unit: defaultMemoryUnit } = defaultMemory || {};
+  const { unit: defaultMemoryUnit, value: defaultMemorySize } = defaultMemory || {};
 
   const templateName = getLabel(vm, VM_TEMPLATE_ANNOTATION);
 

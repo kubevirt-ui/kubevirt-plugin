@@ -3,10 +3,10 @@ import { Link } from 'react-router';
 import xbytes from 'xbytes';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { getMemorySize } from '@kubevirt-utils/components/CPUMemoryModal/utils/CpuMemoryUtils';
 import useVMQuery from '@kubevirt-utils/hooks/useVMQuery';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { getMemory } from '@kubevirt-utils/resources/vm';
+import { convertToBaseValue } from '@kubevirt-utils/utils/humanize.js';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { PrometheusEndpoint } from '@openshift-console/dynamic-plugin-sdk';
@@ -48,8 +48,6 @@ const MemoryThresholdChart: FC<MemoryThresholdChartProps> = ({ vmi }) => {
   const { query, queryLink } = useVMQuery(vmi, VMQueries.MEMORY_USAGE);
   const { height, ref, width } = useResponsiveCharts();
 
-  const memory = getMemorySize(getMemory(vmi));
-
   const [data, loaded, error] = useFleetPrometheusPoll({
     cluster: getCluster(vmi),
     endpoint: PrometheusEndpoint?.QUERY_RANGE,
@@ -61,7 +59,7 @@ const MemoryThresholdChart: FC<MemoryThresholdChartProps> = ({ vmi }) => {
 
   const isLoading = !loaded;
   const prometheusMemoryData = data?.data?.result?.[0]?.values;
-  const memoryAvailableBytes = xbytes.parseSize(`${memory?.size} ${memory?.unit}B`);
+  const memoryAvailableBytes = convertToBaseValue(getMemory(vmi));
 
   const chartData = prometheusMemoryData?.map(([x, y]) => {
     return { name: 'Memory used', x: new Date(x * MILLISECONDS_MULTIPLIER), y: Number(y) };

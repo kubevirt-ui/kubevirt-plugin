@@ -1,10 +1,7 @@
-import xbytes from 'xbytes';
-
 import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { getMemorySize } from '@kubevirt-utils/components/CPUMemoryModal/utils/CpuMemoryUtils';
 import { getCPU, getMemory, getVCPUCount } from '@kubevirt-utils/resources/vm';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
-import { humanizeCpuCores } from '@kubevirt-utils/utils/humanize.js';
+import { convertToBaseValue, humanizeCpuCores } from '@kubevirt-utils/utils/humanize.js';
 import { METRICS } from '@overview/OverviewTab/metric-charts-card/utils/constants';
 import {
   findUnit,
@@ -33,10 +30,7 @@ export const getCpuUsageText = (cpuUsage: number) => {
 
 export const getMemoryCapacityText = (vmis: V1VirtualMachineInstance[]) => {
   const bytes = vmis
-    .map((vmi) => {
-      const memorySize = getMemorySize(getMemory(vmi));
-      return xbytes.parseSize(`${memorySize?.size} ${memorySize?.unit}B`);
-    })
+    .map((vmi) => convertToBaseValue(getMemory(vmi)) || 0)
     .reduce((acc, cur) => acc + cur, 0);
 
   return getValueWithUnitText(bytes, METRICS.MEMORY);

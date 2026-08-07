@@ -1,11 +1,8 @@
-import xbytes from 'xbytes';
-
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { V1CPU } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { getMemorySize } from '@kubevirt-utils/components/CPUMemoryModal/utils/CpuMemoryUtils';
+import { V1CPU, V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { SINGLE_CLUSTER_KEY } from '@kubevirt-utils/resources/constants';
 import { getClusterKey, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getVCPUCount } from '@kubevirt-utils/resources/vm';
+import { convertToBaseValue } from '@kubevirt-utils/utils/humanize.js';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { PrometheusResponse } from '@openshift-console/dynamic-plugin-sdk';
 import { signal } from '@preact/signals-core';
@@ -86,14 +83,11 @@ export const getMemoryUsagePercentage = (vm: V1VirtualMachine, vmiMemory: string
 
   if (isEmpty(memoryUsage) || isEmpty(vmiMemory)) return;
 
-  const memoryRequested = getMemorySize(vmiMemory);
+  const memoryAvailableBytes = convertToBaseValue(vmiMemory);
 
-  const memoryAvailableBytes = xbytes.parseSize(
-    `${memoryRequested?.size} ${memoryRequested?.unit}B`,
-  );
+  if (!memoryAvailableBytes) return;
 
-  const percentage = (memoryUsage * 100) / memoryAvailableBytes;
-  return percentage;
+  return (memoryUsage * 100) / memoryAvailableBytes;
 };
 
 export const getNetworkUsagePercentage = (vm: V1VirtualMachine) => {

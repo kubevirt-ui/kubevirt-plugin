@@ -5,10 +5,10 @@ import { V1CPU } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import CPUInput from '@kubevirt-utils/components/CPUMemoryModal/components/CPUInput/CPUInput';
 import { getCPULimitsFromTemplate } from '@kubevirt-utils/components/CPUMemoryModal/components/CPUInput/utils/utils';
 import MemoryInput from '@kubevirt-utils/components/CPUMemoryModal/components/MemoryInput/MemoryInput';
-import { getMemorySize } from '@kubevirt-utils/components/CPUMemoryModal/utils/CpuMemoryUtils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getTemplateVirtualMachineObject, Template } from '@kubevirt-utils/resources/template';
 import { getCPU, getMemory } from '@kubevirt-utils/resources/vm';
+import { toQuantity } from '@kubevirt-utils/utils/units';
 import { ensurePath } from '@kubevirt-utils/utils/utils';
 import {
   Alert,
@@ -82,7 +82,8 @@ const CPUMemoryModal: FC<CPUMemoryModalProps> = ({ isOpen, onClose, onSubmit, te
 
   useEffect(() => {
     if (vm?.metadata) {
-      const { size: memSize, unit: memUnit } = getMemorySize(getMemory(vm));
+      const memoryQuantity = toQuantity(getMemory(vm));
+      const { unit: memUnit, value: memSize } = memoryQuantity ?? {};
       setMemoryUnit(memUnit);
       setMemory(memSize);
       setCPU(getCPU(vm));
