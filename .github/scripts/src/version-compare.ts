@@ -4,6 +4,13 @@ import { extractVersionNumber, parseVersionToNumber } from './version-parse';
 const RELEASE_BRANCH_REGEX = /^release-(\d+\.\d+)$/;
 const RELEASE_SUMMARY_PREFIX_REGEX = /^\[release-\d+\.\d+\]\s*/i;
 
+/**
+ * Minimum fix version accepted on `main` (matches Jira "CNV v5.0.0" → "5.0").
+ * Used as a floor when release-branch auto-detection still points at a 4.x next
+ * minor (e.g. highest branch is release-4.22 → computed 4.23) after a major bump.
+ */
+export const MAIN_MIN_FIX_VERSION = '5.0';
+
 /** Extract "4.21" from "release-4.21". Returns null for non-release branches. */
 export const extractVersionFromBranch = (branchName: string): null | string => {
   const match = RELEASE_BRANCH_REGEX.exec(branchName);
@@ -56,8 +63,13 @@ export const getExpectedVersionForBranch = (
 
   if (baseBranch === 'main') {
     const highest = findHighestReleaseBranchVersion(releaseBranches);
-    if (!highest) return null;
-    return computeNextVersion(highest);
+    const computed = highest ? computeNextVersion(highest) : null;
+    if (!computed) {
+      return MAIN_MIN_FIX_VERSION;
+    }
+    return parseVersionToNumber(computed) >= parseVersionToNumber(MAIN_MIN_FIX_VERSION)
+      ? computed
+      : MAIN_MIN_FIX_VERSION;
   }
 
   return null;
