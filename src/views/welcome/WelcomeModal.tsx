@@ -1,14 +1,8 @@
-import React, { FC, useCallback, useEffect, useState } from 'react';
 import openCulture from 'images/openCulture.svg';
+import React, { FC } from 'react';
 
-import {
-  runningTourSignal,
-  welcomeModalDismissedSignal,
-} from '@kubevirt-utils/components/GuidedTour/utils/guidedTourSignals';
 import useIsWindowsSupportedArchitecture from '@kubevirt-utils/hooks/useIsWindowsSupportedArchitecture';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
-import { USER_SETTINGS_KEYS } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/const';
 import {
   Checkbox,
   Content,
@@ -21,31 +15,16 @@ import {
   Stack,
   Title,
 } from '@patternfly/react-core';
-import { useSignals } from '@preact/signals-react/runtime';
 
 import WelcomeButtons from './components/WelcomeButtons';
+import useWelcomeModal from './hooks/useWelcomeModal';
 
 import './WelcomeModal.scss';
 
 const WelcomeModal: FC = () => {
-  useSignals();
   const { t } = useKubevirtTranslation();
-  const [isOpen, setIsOpen] = useState<boolean>(true);
-  const [quickStarts, setQuickStarts, loaded] = useKubevirtUserSettings(
-    USER_SETTINGS_KEYS.quickStart,
-  );
   const isWindowsSupported = useIsWindowsSupportedArchitecture();
-
-  useEffect(() => {
-    welcomeModalDismissedSignal.value = false;
-  }, []);
-
-  const onClose = useCallback(() => {
-    setIsOpen(false);
-    welcomeModalDismissedSignal.value = true;
-  }, []);
-
-  if (runningTourSignal.value || !loaded || quickStarts?.dontShowWelcomeModal) return null;
+  const { isOpen, onClose, quickStarts, onDontShowAgainCheckboxChange } = useWelcomeModal();
 
   return (
     <Modal
@@ -84,9 +63,7 @@ const WelcomeModal: FC = () => {
               <WelcomeButtons onClose={onClose} />
 
               <Checkbox
-                onChange={(_event, value) =>
-                  setQuickStarts({ ...quickStarts, dontShowWelcomeModal: value })
-                }
+                onChange={onDontShowAgainCheckboxChange}
                 className="WelcomeModal__checkbox"
                 id="welcome-modal-checkbox"
                 isChecked={quickStarts?.dontShowWelcomeModal}
