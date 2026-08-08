@@ -13,7 +13,7 @@ import { useHubClusterName } from '@stolostron/multicluster-sdk';
 
 import CheckupsStatusIcon from '../../CheckupsStatusIcon';
 import { ClusterCell, NamespaceCell } from '../../components/cells/CheckupsSharedCells';
-import { STATUS_START_TIME_STAMP } from '../../utils/utils';
+import { getIsJobCompleted, STATUS_START_TIME_STAMP } from '../../utils/utils';
 import CheckupsSelfValidationActions from '../components/actions/CheckupsSelfValidationActions';
 import {
   formatStatusTimestamp,
@@ -86,8 +86,7 @@ export const SummaryCell: FC<{
   const jobs = callbacks.getJobByName(row?.metadata?.name, false);
   const latestJob = jobs?.[0];
 
-  const isJobCompleted =
-    (latestJob?.status?.succeeded ?? 0) > 0 || (latestJob?.status?.failed ?? 0) > 0;
+  const isJobCompleted = getIsJobCompleted(latestJob);
 
   const resultsConfigMapName = useMemo(
     () => (latestJob?.metadata?.name ? getResultsConfigMapName(latestJob.metadata.name) : null),

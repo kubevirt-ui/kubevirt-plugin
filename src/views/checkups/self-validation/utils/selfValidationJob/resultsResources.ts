@@ -31,7 +31,6 @@ export const createResultsResourcesJob = async (
     testSuites,
     timestamp,
     winImageDownloadUrl,
-    winImageName,
   } = validatedParams;
 
   // Create the job with CREATE_RESULTS_RESOURCES=true
@@ -50,7 +49,6 @@ export const createResultsResourcesJob = async (
     testSkips,
     timestamp,
     winImageDownloadUrl,
-    winImageName,
   });
 
   // Create the job (no PVC creation needed - reusing existing one)
