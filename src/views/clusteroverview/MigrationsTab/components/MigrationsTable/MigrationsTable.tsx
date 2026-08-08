@@ -1,9 +1,9 @@
 import React, { FC, useMemo } from 'react';
 
 import { NodeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import KubevirtFilterToolbar from '@kubevirt-utils/components/KubevirtFilterToolbar/KubevirtFilterToolbar';
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
 import { buildColumnLayout } from '@kubevirt-utils/components/KubevirtTable/utils';
-import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
 import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtTableColumns';
@@ -15,8 +15,8 @@ import { Pagination } from '@patternfly/react-core';
 
 import { UseMigrationCardDataAndFiltersValues } from '../../hooks/useMigrationCardData';
 
-import { COLUMN_MANAGEMENT_ID_MIGRATIONS, MIGRATION_COLUMN_KEYS } from './utils/constants';
 import { getMigrationsTableColumns, getMigrationsTableRowId } from './migrationsTableDefinition';
+import { COLUMN_MANAGEMENT_ID_MIGRATIONS, MIGRATION_COLUMN_KEYS } from './utils/constants';
 
 import '@kubevirt-utils/styles/list-managment-group.scss';
 
@@ -29,12 +29,14 @@ const MigrationTable: FC<MigrationTableProps> = ({ tableData }) => {
   const activeNamespace = useActiveNamespace();
 
   const {
+    clearAllFilters,
+    filterDefinitions,
     filters,
     loaded,
     loadErrors,
     migrationsTableFilteredData,
     migrationsTableUnfilteredData,
-    onFilterChange,
+    onSetFilters,
   } = tableData || {};
 
   const [canGetNode] = useAccessReview({
@@ -54,8 +56,12 @@ const MigrationTable: FC<MigrationTableProps> = ({ tableData }) => {
     columns,
   });
 
-  const { handleFilterChange, handlePerPageSelect, handleSetPage, pagination } =
-    usePaginationWithFilters(migrationsTableFilteredData?.length ?? 0, onFilterChange);
+  const {
+    handleFilterChange: handleSetFilters,
+    handlePerPageSelect,
+    handleSetPage,
+    pagination,
+  } = usePaginationWithFilters(migrationsTableFilteredData?.length ?? 0, onSetFilters);
 
   const columnLayout = useMemo(
     () =>
@@ -73,12 +79,14 @@ const MigrationTable: FC<MigrationTableProps> = ({ tableData }) => {
   return (
     <ListPageBody>
       <div className="list-managment-group">
-        <ListPageFilter
+        <KubevirtFilterToolbar
+          clearAllFilters={clearAllFilters}
           columnLayout={columnLayout}
           data={migrationsTableUnfilteredData}
+          filterDefinitions={filterDefinitions}
+          filters={filters}
           loaded={isLoaded}
-          onFilterChange={handleFilterChange}
-          rowFilters={filters ?? []}
+          onSetFilters={handleSetFilters}
         />
         {!isEmpty(migrationsTableFilteredData) && isLoaded && (
           <Pagination

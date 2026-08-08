@@ -5,12 +5,13 @@ import DiskListTitle from '@kubevirt-utils/components/DiskListTitle/DiskListTitl
 import DiskSourceSelect from '@kubevirt-utils/components/DiskModal/components/DiskSourceSelect/DiskSourceSelect';
 import DiskModal from '@kubevirt-utils/components/DiskModal/DiskModal';
 import { SourceTypes } from '@kubevirt-utils/components/DiskModal/utils/types';
+import KubevirtFilterToolbar from '@kubevirt-utils/components/KubevirtFilterToolbar/KubevirtFilterToolbar';
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
+import useKubevirtDataViewFilters from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/useKubevirtDataViewFilters';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { replaceTemplateVM, Template, updateTemplate } from '@kubevirt-utils/resources/template';
-import { ListPageFilter, useListPageFilter } from '@openshift-console/dynamic-plugin-sdk';
 import { PageSection, Stack, StackItem } from '@patternfly/react-core';
 
 import useEditTemplateAccessReview from '../../hooks/useIsTemplateEditable';
@@ -32,8 +33,14 @@ const TemplateDisksPage: FC<TemplateDisksPageProps> = ({ obj: template }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const [disks, disksLoaded, loadError] = useTemplateDisksTableData(template);
-  const filters = useDisksFilters();
-  const [data, filteredData, onFilterChange] = useListPageFilter(disks, filters);
+  const filterDefinitions = useDisksFilters();
+
+  const { clearAllFilters, filteredData, filters, onSetFilters } = useKubevirtDataViewFilters({
+    data: disks,
+    filterDefinitions,
+    hideLabelFilter: true,
+  });
+
   const vm = getTemplateVMWithNamespace(template);
   const columns = useMemo(() => getTemplateDiskColumns(t), [t]);
 
@@ -74,12 +81,14 @@ const TemplateDisksPage: FC<TemplateDisksPageProps> = ({ obj: template }) => {
             </StackItem>
           )}
           <StackItem>
-            <ListPageFilter
-              data={data}
+            <KubevirtFilterToolbar
+              clearAllFilters={clearAllFilters}
+              data={disks}
+              filterDefinitions={filterDefinitions}
+              filters={filters}
               hideLabelFilter
               loaded={disksLoaded}
-              onFilterChange={onFilterChange}
-              rowFilters={filters}
+              onSetFilters={onSetFilters}
             />
             <KubevirtTable
               ariaLabel={t('Template disks table')}
@@ -93,7 +102,7 @@ const TemplateDisksPage: FC<TemplateDisksPageProps> = ({ obj: template }) => {
               loaded={disksLoaded}
               loadError={loadError}
               noDataMsg={t('No disks found')}
-              unfilteredData={data}
+              unfilteredData={disks}
             />
           </StackItem>
         </Stack>

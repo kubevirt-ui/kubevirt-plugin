@@ -1,18 +1,19 @@
 import React, { FC } from 'react';
 import { Link } from 'react-router';
 
-import { OnFilterChange } from '@openshift-console/dynamic-plugin-sdk';
+import { OnSetFilters } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { Flex, FlexItem } from '@patternfly/react-core';
 
+import { MIGRATION_STATUS_FILTER_ID } from '../MigrationsTable/utils/constants';
 import { colorScale } from './constants';
 import { ChartDataItem } from './MigrationsChartDonut';
 
 type MigrationChartLegendProps = {
   legendItems: ChartDataItem[];
-  onFilterChange: OnFilterChange;
+  onSetFilters: OnSetFilters;
 };
 
-const MigrationChartLegend: FC<MigrationChartLegendProps> = ({ legendItems, onFilterChange }) => {
+const MigrationChartLegend: FC<MigrationChartLegendProps> = ({ legendItems, onSetFilters }) => {
   return (
     <Flex gap={{ default: 'gapMd' }}>
       {legendItems?.map((item, index) => {
@@ -26,9 +27,9 @@ const MigrationChartLegend: FC<MigrationChartLegendProps> = ({ legendItems, onFi
             />{' '}
             <Link
               onClick={() => {
-                onFilterChange('status', { all: [status], selected: [status] });
+                onSetFilters({ [MIGRATION_STATUS_FILTER_ID]: [status] });
               }}
-              to={`?rowFilter-status=${status}`}
+              to={`?${MIGRATION_STATUS_FILTER_ID}=${status}`}
             >
               {statusCount} {status}
             </Link>

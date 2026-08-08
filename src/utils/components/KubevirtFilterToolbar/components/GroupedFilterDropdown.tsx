@@ -20,8 +20,7 @@ import ToolbarFilterMultiChip from './ToolbarFilter/ToolbarFilterMultiChip';
 type GroupedFilterDropdownProps = {
   data?: FilterableObject[];
   filters: KubevirtFilterState;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  groupedFilters: KubevirtFilter<any>[];
+  groupedFilters: KubevirtFilter[];
   onSetFilters: OnSetFilters;
 };
 
