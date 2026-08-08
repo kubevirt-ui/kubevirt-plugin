@@ -13,6 +13,7 @@ import {
   VmCreationWizardComputeComponent,
   VmCreationWizardLocationComponent,
 } from '@/components/vm-wizard/wizard-step-components';
+import WizardLabelsComponent from '@/components/vm-wizard/wizard-labels-component';
 import { TestTimeouts } from '@/utils/test-config';
 import type { Page } from '@playwright/test';
 
@@ -33,6 +34,7 @@ export default class VmCreationWizardComponent extends BaseComponent {
   readonly compute: VmCreationWizardComputeComponent;
   readonly deployment: VmCreationWizardDeploymentComponent;
 
+  readonly labels: WizardLabelsComponent;
   readonly location: VmCreationWizardLocationComponent;
 
   readonly navigation: VmCreationWizardNavigationComponent;
@@ -45,6 +47,7 @@ export default class VmCreationWizardComponent extends BaseComponent {
     this.clone = new VmCreationWizardCloneComponent(page);
     this.compute = new VmCreationWizardComputeComponent(page);
     this.deployment = new VmCreationWizardDeploymentComponent(page);
+    this.labels = new WizardLabelsComponent(page);
     this.location = new VmCreationWizardLocationComponent(page);
     this.navigation = new VmCreationWizardNavigationComponent(page);
     this.review = new VmCreationWizardReviewComponent(page);

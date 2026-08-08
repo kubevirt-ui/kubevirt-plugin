@@ -18,7 +18,7 @@ const DefaultVMLabelRow: FC<DefaultVMLabelRowProps> = ({ label, onValueChange, u
   const hasAdminValue = Boolean(label.value);
 
   return (
-    <Grid hasGutter>
+    <Grid data-test={`label-row-${label.key}`} hasGutter>
       <GridItem span={5}>
         <Split className="settings-label-cell__row" hasGutter>
           <SplitItem>{label.key}</SplitItem>
