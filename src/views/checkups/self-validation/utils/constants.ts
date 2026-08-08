@@ -55,8 +55,18 @@ export const TEST_SUITE_NETWORK = 'network';
 export const TEST_SUITE_STORAGE = 'storage';
 export const TEST_SUITE_SSP = 'ssp';
 export const TEST_SUITE_TIER2 = 'tier2';
+export const TEST_SUITE_VIRT_CLUSTER_VALIDATE = 'virt-cluster-validate';
 
 export const TEST_SUITES = [
+  TEST_SUITE_COMPUTE,
+  TEST_SUITE_NETWORK,
+  TEST_SUITE_STORAGE,
+  TEST_SUITE_SSP,
+  TEST_SUITE_TIER2,
+  TEST_SUITE_VIRT_CLUSTER_VALIDATE,
+];
+
+export const DEFAULT_TEST_SUITES = [
   TEST_SUITE_COMPUTE,
   TEST_SUITE_NETWORK,
   TEST_SUITE_STORAGE,
@@ -70,6 +80,7 @@ export const TEST_SUITE_OPTIONS = [
   { label: 'Storage', value: TEST_SUITE_STORAGE },
   { label: 'SSP', value: TEST_SUITE_SSP },
   { label: 'Tier2', value: TEST_SUITE_TIER2 },
+  { label: 'Virt cluster validation', value: TEST_SUITE_VIRT_CLUSTER_VALIDATE },
 ];
 
 type SelfValidationTestSuiteName =
@@ -77,7 +88,8 @@ type SelfValidationTestSuiteName =
   | typeof TEST_SUITE_NETWORK
   | typeof TEST_SUITE_SSP
   | typeof TEST_SUITE_STORAGE
-  | typeof TEST_SUITE_TIER2;
+  | typeof TEST_SUITE_TIER2
+  | typeof TEST_SUITE_VIRT_CLUSTER_VALIDATE;
 
 type SelfValidationSuiteResult = {
   failed_tests?: string[];
