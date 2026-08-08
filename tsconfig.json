@@ -1,6 +1,5 @@
 {
   "$schema": "https://schemastore.org/tsconfig",
-
   "compilerOptions": {
     "allowSyntheticDefaultImports": true,
     "allowJs": true,
@@ -29,7 +28,6 @@
       "@virtualmachines/*": ["src/views/virtualmachines/*"]
     },
     "skipLibCheck": true,
-    "sourceMap": true,
     "target": "es2021",
     "typeRoots": ["node_modules/@types", "@types"]
   },
