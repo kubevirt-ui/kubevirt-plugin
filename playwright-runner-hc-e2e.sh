@@ -21,9 +21,15 @@
 #   ./playwright-runner-hc-e2e.sh Gating --workers=4
 #   ./playwright-runner-hc-e2e.sh Tier1
 #   ./playwright-runner-hc-e2e.sh Tier2 playwright/tests/tier2/foo.spec.ts
+#   ./playwright-runner-hc-e2e.sh auto playwright/tests/tier1/foo.spec.ts
+#   ./playwright-runner-hc-e2e.sh auto -g "creates a bootable volume"
 #   IS_LOCAL=1 ./playwright-runner-hc-e2e.sh Gating --headed
 #   ./playwright-runner-hc-e2e.sh suite
 #   ./playwright-runner-hc-e2e.sh all
+#
+# Note: --project=Name (equals form) is required so Playwright's variadic
+# --project option does not swallow file-path / -g filter args.
+# Use project "auto" to omit --project (filter by path / -g across projects).
 # ────────────────────────────────────────────────────────────────────────────
 set -euo pipefail
 
@@ -75,6 +81,7 @@ if [[ -z "${PROJECT}" ]]; then
   echo "  API                    API contract tests (browserless)"
   echo "  suite                  Run Gating + Tier1 + Tier2 together"
   echo "  all                    Run all projects"
+  echo "  auto                   No --project filter (requires path / -g args)"
   echo ""
   echo "Extra args are forwarded to Playwright (file paths, -g, --workers, …)."
   echo ""
@@ -102,18 +109,16 @@ EXTRA_ARGS=("$@")
 
 PROJECT_LOWER=$(echo "${PROJECT}" | tr '[:upper:]' '[:lower:]')
 
-if [[ "${PROJECT_LOWER}" == "gating" ]]; then
-  echo "🚀 Running project: Gating (HC E2E mode)..."
-  npx playwright test --project Gating "${EXTRA_ARGS[@]}"
-elif [[ "${PROJECT_LOWER}" == "tier1" ]]; then
-  echo "🚀 Running project: Tier1 (HC E2E mode)..."
-  npx playwright test --project Tier1 "${EXTRA_ARGS[@]}"
-elif [[ "${PROJECT_LOWER}" == "tier2" ]]; then
-  echo "🚀 Running project: Tier2 (HC E2E mode)..."
-  npx playwright test --project Tier2 "${EXTRA_ARGS[@]}"
+if [[ "${PROJECT_LOWER}" == "auto" ]]; then
+  if [[ ${#EXTRA_ARGS[@]} -eq 0 ]]; then
+    echo "❌ Project 'auto' requires Playwright filter args (spec path or -g)."
+    exit 1
+  fi
+  echo "🚀 Running Playwright without --project filter (HC E2E mode)..."
+  npx playwright test "${EXTRA_ARGS[@]}"
 elif [[ "${PROJECT_LOWER}" == "suite" ]]; then
   echo "🚀 Running suite: Gating + Tier1 + Tier2 (HC E2E mode)..."
-  npx playwright test --project Gating --project Tier1 --project Tier2 "${EXTRA_ARGS[@]}"
+  npx playwright test --project=Gating --project=Tier1 --project=Tier2 "${EXTRA_ARGS[@]}"
 elif [[ "${PROJECT_LOWER}" == "all" ]]; then
   PROJECTS=(
     Gating
@@ -124,11 +129,11 @@ elif [[ "${PROJECT_LOWER}" == "all" ]]; then
   )
   PROJECT_ARGS=()
   for p in "${PROJECTS[@]}"; do
-    PROJECT_ARGS+=(--project "${p}")
+    PROJECT_ARGS+=(--project="${p}")
   done
   echo "🚀 Running all projects (HC E2E mode)..."
   npx playwright test "${PROJECT_ARGS[@]}" "${EXTRA_ARGS[@]}"
 else
   echo "🚀 Running project: ${PROJECT} (HC E2E mode)..."
-  npx playwright test --project "${PROJECT}" "${EXTRA_ARGS[@]}"
+  npx playwright test --project="${PROJECT}" "${EXTRA_ARGS[@]}"
 fi

@@ -10,10 +10,13 @@ import { execFileSync, execSync } from 'node:child_process';
 
 import { requireEnv } from '../utils';
 
+import { parseTestArgs } from './parse-test-args';
+
 /** Playwright (main) TEST_PROJECT → playwright-runner-hc-e2e.sh project name. */
 const PLAYWRIGHT_PROJECT_BY_TEST_PROJECT: Record<string, string> = {
   all: 'all',
   api: 'API',
+  auto: 'auto',
   gating: 'Gating',
   settings: 'Settings',
   suite: 'suite',
@@ -25,14 +28,6 @@ const PLAYWRIGHT_PROJECT_BY_TEST_PROJECT: Record<string, string> = {
 const CYPRESS_TEST_PROJECTS: Record<string, string> = {
   features: 'tests/tier1.cy.ts',
   gating: 'tests/gating.cy.ts',
-};
-
-const parseTestArgs = (raw: string): string[] => {
-  const trimmed = raw.trim();
-  if (!trimmed) {
-    return [];
-  }
-  return trimmed.split(/\s+/);
 };
 
 const resolvePlaywrightProject = (testProject: string): string => {
@@ -87,9 +82,17 @@ const main = async (): Promise<void> => {
       process.env.GITHUB_WORKSPACE ??
       execFileSync('git', ['rev-parse', '--show-toplevel'], { encoding: 'utf8' }).trim();
     const playwrightProject = resolvePlaywrightProject(testProject);
+    if (playwrightProject === 'auto' && testArgs.length === 0) {
+      throw new Error(
+        "TEST_PROJECT 'auto' requires TEST_ARGS (spec path or -g filter). " +
+          'Omit auto and pick a suite to run an entire project.',
+      );
+    }
     console.log(
-      `Running Playwright project '${playwrightProject}'` +
-        (testArgs.length > 0 ? ` with args: ${testArgs.join(' ')}` : ''),
+      playwrightProject === 'auto'
+        ? `Running Playwright without --project filter with args: ${testArgs.join(' ')}`
+        : `Running Playwright project '${playwrightProject}'` +
+            (testArgs.length > 0 ? ` with args: ${testArgs.join(' ')}` : ''),
     );
     execFileSync('./playwright-runner-hc-e2e.sh', [playwrightProject, ...testArgs], {
       cwd: repoRoot,

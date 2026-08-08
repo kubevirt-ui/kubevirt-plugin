@@ -8,7 +8,10 @@
  *   /test-e2e tier2
  *   /test-e2e suite
  *   /test-e2e tier1 playwright/tests/tier1/foo.spec.ts
+ *   /test-e2e playwright/tests/tier1/foo.spec.ts
  *   /test-e2e gating -g MyTestName
+ *   /test-e2e -g "creates a bootable volume"
+ *   /test-e2e tier1 -g "VM Search Language"
  *
  * Entry point: npx tsx src/commands/test-e2e.ts
  *
@@ -50,12 +53,15 @@ const main = async (): Promise<void> => {
     }
 
     const parsed = parseTestE2ECommand(commentBody);
-    if (!parsed) {
+    if (!parsed || (parsed.testProject === 'auto' && !parsed.testArgs.trim())) {
       await octokit.issues.createComment({
         body: [
-          '⚠️ `/test-e2e` needs a suite name.',
+          '⚠️ `/test-e2e` needs a suite name, or a Playwright filter (spec path / `-g`).',
           '',
-          'Usage: `/test-e2e <suite> [playwright-args…]`',
+          'Usage:',
+          '- `/test-e2e <suite> [playwright-args…]`',
+          '- `/test-e2e <spec-path>`',
+          '- `/test-e2e -g "test title"`',
           '',
           `Suites: \`${VALID_TEST_E2E_PROJECTS.join('` · `')}\``,
           '',
@@ -64,7 +70,10 @@ const main = async (): Promise<void> => {
           '- `/test-e2e tier2`',
           '- `/test-e2e suite`',
           '- `/test-e2e tier1 playwright/tests/tier1/foo.spec.ts`',
+          '- `/test-e2e playwright/tests/tier1/bootable-volumes/bootable-volumes.spec.ts`',
           '- `/test-e2e gating -g MyTestName`',
+          '- `/test-e2e -g "creates a bootable volume"`',
+          '- `/test-e2e tier1 -g "VM Search Language"`',
         ].join('\n'),
         issue_number: prNumber,
         owner,

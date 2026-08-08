@@ -7,7 +7,8 @@ on:
       test_project:
         description: |
           Suite to run.
-          Playwright (main): gating / tier1 / tier2 / suite / settings / api / all.
+          Playwright (main): gating / tier1 / tier2 / suite / settings / api / all / auto.
+          auto omits --project and requires test_args (spec path or -g).
           Cypress (release only): gating or features (Cypress's Tier1 suite — not a Playwright project).
         required: true
         default: gating
@@ -21,10 +22,12 @@ on:
           - settings
           - api
           - all
+          - auto
       test_args:
         description: |
           Optional Playwright filter (space-separated CLI args), e.g. a spec path
-          or -g MyTestName. Leave empty to run the full selected suite.
+          or -g MyTestName. Required when test_project is auto.
+          Leave empty to run the full selected suite.
         required: false
         default: ''
         type: string
