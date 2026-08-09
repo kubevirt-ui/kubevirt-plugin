@@ -1,13 +1,13 @@
-import React, { FC, memo, useState } from 'react';
+import React, { type FC, memo, useState } from 'react';
 
 import {
   ConsoleState,
   VNC_CONSOLE_TYPE,
 } from '@kubevirt-utils/components/Consoles/components/utils/ConsoleConsts';
-import { ConsoleComponentState } from '@kubevirt-utils/components/Consoles/components/utils/types';
+import { type ConsoleComponentState } from '@kubevirt-utils/components/Consoles/components/utils/types';
 import HideConsole from '@kubevirt-utils/components/Consoles/components/vnc-console/HideConsole';
 import { isConnectableState } from '@kubevirt-utils/components/Consoles/components/vnc-console/utils/util';
-import { VncLogLevel } from '@kubevirt-utils/components/Consoles/components/vnc-console/utils/VncConsoleTypes';
+import { type VncLogLevel } from '@kubevirt-utils/components/Consoles/components/vnc-console/utils/VncConsoleTypes';
 import VncConsole from '@kubevirt-utils/components/Consoles/components/vnc-console/VncConsole';
 import { getConsoleBasePath } from '@kubevirt-utils/components/Consoles/utils/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -41,11 +41,12 @@ const VirtualMachinesOverviewTabDetailsConsole: FC<
 }) => {
   const { t } = useKubevirtTranslation();
   const [apiPath, apiPathLoaded] = useK8sBaseAPIPath(vmCluster);
-  const [{ actions, state }, setState] = useState<ConsoleComponentState>({
+  const [consoleState, setConsoleState] = useState<ConsoleComponentState>({
     actions: {},
-    state: ConsoleState.init,
+    state: ConsoleState.Init,
     type: VNC_CONSOLE_TYPE,
   });
+  const { actions, state } = consoleState;
   const enableConsole = isVMRunning && !isHeadlessMode && canConnectConsole;
   const showConnect =
     !enableConsole || // connect component is also empty state here
@@ -63,28 +64,32 @@ const VirtualMachinesOverviewTabDetailsConsole: FC<
     <Bullseye className="console-overview">
       <div className="link">
         <Button
-          onClick={(e) => {
-            e.preventDefault();
-            actions?.disconnect?.();
-            window.open(getConsoleStandaloneURL(vmNamespace, vmName, vmCluster));
-          }}
           component="a"
           href={getConsoleStandaloneURL(vmNamespace, vmName, vmCluster)}
           icon={<ExternalLinkAltIcon className="icon" />}
           iconPosition="end"
           isDisabled={!enableConsole}
+          onClick={(e) => {
+            e.preventDefault();
+            actions?.disconnect?.();
+            window.open(
+              getConsoleStandaloneURL(vmNamespace, vmName, vmCluster),
+              '_blank',
+              'noopener',
+            );
+          }}
           variant={ButtonVariant.link}
         >
           {t('Open web console')}
         </Button>
       </div>
       {enableConsole && (
-        <HideConsole isHidden={state !== ConsoleState.connected}>
+        <HideConsole isHidden={state !== ConsoleState.Connected}>
           <VncConsole
             basePath={vncBasePath}
             // force re-create on change
             key={`vnc-${vncBasePath}-${vncLogLevel}`}
-            setState={setState}
+            setState={setConsoleState}
             viewOnly
             vncLogLevel={vncLogLevel}
           />
@@ -94,10 +99,10 @@ const VirtualMachinesOverviewTabDetailsConsole: FC<
         <div className="console-vnc">
           <VirtualMachinesOverviewTabDetailsConsoleConnect
             connect={actions?.connect}
-            isConnecting={state === ConsoleState.connecting}
+            isConnecting={state === ConsoleState.Connecting}
             isDisabled={!enableConsole}
             isHeadlessMode={isHeadlessMode}
-            isSessionAlreadyInUse={state === ConsoleState.session_already_in_use}
+            isSessionAlreadyInUse={state === ConsoleState.SessionAlreadyInUse}
           />
         </div>
       )}

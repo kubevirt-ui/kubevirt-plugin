@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { type FC, type MouseEvent } from 'react';
 
 import { LabelsEditor } from '@kubevirt-utils/components/LabelsEditor/LabelsEditor';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -7,12 +7,12 @@ import { Button, ButtonVariant, GridItem, TextInput } from '@patternfly/react-co
 import { MinusCircleIcon } from '@patternfly/react-icons';
 import { SimpleSelect } from '@patternfly/react-templates';
 
-import { AffinityLabel } from '../../../../utils/types';
+import { type AffinityLabel } from '../../../../utils/types';
 
 type AffinityExpressionRowProps = {
   expression: AffinityLabel;
   onChange: (label: AffinityLabel) => void;
-  onDelete: (id: any) => void;
+  onDelete: (id: number) => void;
   rowID?: string;
 };
 
@@ -26,16 +26,17 @@ const AffinityExpressionRow: FC<AffinityExpressionRowProps> = ({
   const { id, key, operator, values = [] } = expression;
   const enableValueField = operator !== Operator.Exists && operator !== Operator.DoesNotExist;
 
-  const onSelectOperator = (_event, selection) => {
-    onChange({ ...expression, operator: selection });
+  const onSelectOperator = (_event: MouseEvent<Element>, selection: number | string): void => {
+    onChange({ ...expression, operator: selection as Operator });
   };
 
-  const onSelectValues = (_event, selection) => {
-    const isValueExist = values.some((item) => item === selection);
+  const onSelectValues = (_event: MouseEvent<Element>, selection: number | string): void => {
+    const selectionStr = String(selection);
+    const isValueExist = values.includes(selectionStr);
     if (isValueExist) {
-      onChange({ ...expression, values: values.filter((item) => item !== selection) });
+      onChange({ ...expression, values: values.filter((item) => item !== selectionStr) });
     } else {
-      onChange({ ...expression, values: [...values, selection] });
+      onChange({ ...expression, values: [...values, selectionStr] });
     }
   };
 
@@ -53,6 +54,7 @@ const AffinityExpressionRow: FC<AffinityExpressionRowProps> = ({
       </GridItem>
       <GridItem span={2}>
         <SimpleSelect
+          id={`${rowID}-${id}-effect-select`}
           initialOptions={[Operator.Exists, Operator.DoesNotExist, Operator.In, Operator.NotIn].map(
             (operatorOption) => ({
               content: operatorOption,
@@ -60,7 +62,6 @@ const AffinityExpressionRow: FC<AffinityExpressionRowProps> = ({
               value: operatorOption,
             }),
           )}
-          id={`${rowID}-${id}-effect-select`}
           onSelect={onSelectOperator}
         />
       </GridItem>

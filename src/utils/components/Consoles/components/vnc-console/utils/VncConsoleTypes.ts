@@ -1,8 +1,7 @@
-import { Dispatch, MouseEventHandler, SetStateAction } from 'react';
+import { type Dispatch, type MouseEventHandler, type SetStateAction } from 'react';
 
-import { ConsoleComponentState } from '../../utils/types';
-
-import { SCAN_CODE_NAMES, VNC_LOG_LEVELS } from './constants';
+import { type ConsoleComponentState } from '../../utils/types';
+import { type SCAN_CODE_NAMES, type VNC_LOG_LEVELS } from './constants';
 
 export type VncConsoleActionsProps = {
   /** VNC console additional send keys elements */
@@ -22,7 +21,7 @@ export type CustomConnectComponentProps = {
 export type RFB = {
   _rfbConnectionState: string;
   _sock: { on: (name: string, callback: (args: { code?: number }) => void) => void };
-  _socketClose: () => void;
+  _socketClose: (args?: { code: number; reason?: string }) => void;
   _viewOnly: boolean;
   addEventListener: (name: string, callback: () => void) => void;
   disconnect: () => void;

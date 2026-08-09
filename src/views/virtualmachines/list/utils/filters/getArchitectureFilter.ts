@@ -1,23 +1,23 @@
-import { TFunction } from 'i18next';
+import { type TFunction } from 'i18next';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getArchitecture } from '@kubevirt-utils/resources/vm/utils/selectors';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
+import { type RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
 export const getArchitectureFilter = (
   t: TFunction,
   vms: V1VirtualMachine[],
 ): RowFilter<V1VirtualMachine> => ({
-  filter: (input, vm) => {
+  filter: (input, vm): boolean => {
     const selectedArchitectures = input.selected;
 
     if (isEmpty(selectedArchitectures)) {
       return true;
     }
 
-    return selectedArchitectures.some((architecture) => getArchitecture(vm) === architecture);
+    return selectedArchitectures.includes(getArchitecture(vm));
   },
   filterGroupName: t('Architecture type'),
   isMatch: (vm, architecture) => getArchitecture(vm) === architecture,

@@ -1,44 +1,28 @@
-import produce from 'immer';
-import { Draft } from 'immer';
-
-import { DataVolumeModel, VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
+import { DataVolumeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { type V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import {
-  V1AddVolumeOptions,
-  V1DataVolumeTemplateSpec,
-  V1Disk,
-  V1RemoveVolumeOptions,
-  V1VirtualMachine,
-  V1VirtualMachineInstance,
-  V1Volume,
+  type V1DataVolumeTemplateSpec,
+  type V1VirtualMachine,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getVmDiskUploadSuccessLinks } from '@kubevirt-utils/hooks/useUploadProgressToast/completion/uploadLinks';
-import { CdiUploadTrackMetadata } from '@kubevirt-utils/hooks/useUploadProgressToast/types';
+import { type CdiUploadTrackMetadata } from '@kubevirt-utils/hooks/useUploadProgressToast/types';
 import {
   buildOwnerReference,
-  getAnnotation,
   getName,
   getNamespace,
   getUID,
 } from '@kubevirt-utils/resources/shared';
-import { ANNOTATIONS } from '@kubevirt-utils/resources/template';
-import { getBootDisk, getDataVolumeTemplates, getVolumes } from '@kubevirt-utils/resources/vm';
-import { getOperatingSystem } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
-import {
-  getCustomizeWizardVM,
-  updateVMCustomizeIT,
-} from '@kubevirt-utils/signals/customizeWizardVMSignal';
-import { ensurePath, getRandomChars, isEmpty } from '@kubevirt-utils/utils/utils';
+import { getRandomChars } from '@kubevirt-utils/utils/utils';
 import { isDNS1123Label } from '@kubevirt-utils/utils/validation';
 import { getCluster } from '@multicluster/helpers/selectors';
-import { kubevirtK8sCreate, kubevirtK8sGet } from '@multicluster/k8sRequests';
-import { addPersistentVolume, removeVolume } from '@virtualmachines/actions/actions';
-import { updateDisks } from '@virtualmachines/details/tabs/configuration/details/utils/utils';
 
-import { HotPlugFeatures } from './constants';
-import { BuildUploadTrackMetadataParams, SourceTypes, V1DiskFormState } from './types';
-import { runExclusiveForVm } from './vmCancelCleanupQueue';
+import { type BuildUploadTrackMetadataParams, type V1DiskFormState } from './types';
+
+export * from './diskOperations';
+export * from './diskValidation';
+export * from './hotplugHelpers';
+export * from './vmProducers';
 
 export const getEmptyVMDataVolumeResource = (
   vm: V1VirtualMachine,
@@ -73,418 +57,19 @@ export const getEmptyVMDataVolumeResource = (
   };
 };
 
-export const getRemoveHotplugPromise = (vm: V1VirtualMachine, diskName: string) => {
-  const bodyRequestRemoveVolume: V1RemoveVolumeOptions = {
-    name: diskName,
-  };
-  return removeVolume(vm, bodyRequestRemoveVolume);
-};
-
-export const checkDifferentStorageClassFromBootPVC = (
-  vm: V1VirtualMachine,
-  selectedStorageClass: string,
-): boolean => {
-  const bootDiskName = getBootDisk(vm)?.name;
-  const bootVolume = getVolumes(vm).find((vol) => vol?.name === bootDiskName);
-  const bootDVT = getDataVolumeTemplates(vm)?.find(
-    (dvt) => getName(dvt) === bootVolume?.dataVolume?.name,
-  );
-
-  const source = Boolean(bootDVT?.spec?.source?.pvc || bootDVT?.spec?.sourceRef);
-  return source && bootDVT?.spec?.storage?.storageClassName !== selectedStorageClass;
-};
-
-export const getRunningVMMissingDisksFromVMI = (
-  vmDisks: V1Disk[],
-  vmi: V1VirtualMachineInstance,
-): V1Disk[] => {
-  const vmDiskNames = vmDisks?.map((disk) => disk?.name);
-  const missingDisksFromVMI = (vmi?.spec?.domain?.devices?.disks || [])?.filter(
-    (disk) => !vmDiskNames?.includes(disk?.name),
-  );
-  return missingDisksFromVMI || [];
-};
-
-export const getRunningVMMissingVolumesFromVMI = (
-  vmVolumes: V1Volume[],
-  vmi: V1VirtualMachineInstance,
-): V1Volume[] => {
-  const vmVolumeNames = vmVolumes?.map((vol) => vol?.name);
-  const missingVolumesFromVMI = (vmi?.spec?.volumes || [])?.filter(
-    (vol) => !vmVolumeNames?.includes(vol?.name),
-  );
-  return missingVolumesFromVMI || [];
-};
-
-const getDataVolumeHotplugPromise = (
-  vm: V1VirtualMachine,
-  resultDataVolume: V1beta1DataVolume | V1DataVolumeTemplateSpec,
-  resultDisk: V1Disk,
-) => {
-  const bodyRequestAddVolume: V1AddVolumeOptions = {
-    disk: resultDisk,
-    name: resultDisk.name,
-    volumeSource: {
-      dataVolume: {
-        name: resultDataVolume.metadata.name,
-      },
-    },
-  };
-
-  return kubevirtK8sCreate({
-    cluster: getCluster(vm),
-    data: resultDataVolume,
-    model: DataVolumeModel,
-    ns: getNamespace(resultDataVolume),
-  }).then(() => addPersistentVolume(vm, bodyRequestAddVolume));
-};
-
-const getPersistentVolumeClaimHotplugPromise = (
-  vm: V1VirtualMachine,
-  pvcName: string,
-  resultDisk: V1Disk,
-) => {
-  const bodyRequestAddVolume: V1AddVolumeOptions = {
-    disk: resultDisk,
-    name: resultDisk.name,
-    volumeSource: {
-      persistentVolumeClaim: {
-        claimName: pvcName,
-      },
-    },
-  };
-
-  return addPersistentVolume(vm, bodyRequestAddVolume);
-};
-
-export const hotplugPromise = (vmObj: V1VirtualMachine, diskState: V1DiskFormState) => {
-  const diskSource = getSourceFromVolume(diskState.volume, diskState.dataVolumeTemplate);
-
-  if (diskSource === SourceTypes.PVC) {
-    return getPersistentVolumeClaimHotplugPromise(
-      vmObj,
-      diskState?.volume?.persistentVolumeClaim?.claimName,
-      diskState.disk,
-    );
-  }
-
-  const dataVolume = produce(diskState.dataVolumeTemplate, (draftDataVolumeTemplate) => {
-    draftDataVolumeTemplate.metadata.ownerReferences = [
-      buildOwnerReference(vmObj, { blockOwnerDeletion: false }),
-    ];
-
-    draftDataVolumeTemplate.metadata.namespace = getNamespace(vmObj);
-    draftDataVolumeTemplate.kind = DataVolumeModel.kind;
-    draftDataVolumeTemplate.apiVersion = `${DataVolumeModel.apiGroup}/${DataVolumeModel.apiVersion}`;
-  });
-
-  return getDataVolumeHotplugPromise(vmObj, dataVolume, diskState.disk);
-};
-
-export const produceVMDisks = (
-  vm: V1VirtualMachine,
-  updateDraftDisks: (vmDraft: Draft<V1VirtualMachine>) => void,
-) => {
-  return produce(vm, (draftVM) => {
-    ensurePath(draftVM, ['spec.template.spec.domain.devices']);
-
-    if (!draftVM.spec.template.spec.domain.devices.disks)
-      draftVM.spec.template.spec.domain.devices.disks = [];
-
-    if (!draftVM.spec.template.spec.volumes) draftVM.spec.template.spec.volumes = [];
-
-    if (!draftVM.spec.dataVolumeTemplates) draftVM.spec.dataVolumeTemplates = [];
-
-    updateDraftDisks(draftVM);
-  });
-};
-
-export const produceVMNetworks = (
-  vm: V1VirtualMachine,
-  updateNetworks: (vmDraft: Draft<V1VirtualMachine>) => void,
-): V1VirtualMachine => {
-  return produce(vm, (draftVM) => {
-    ensurePath(draftVM, ['spec.template.spec.domain.devices']);
-    if (!draftVM.spec.template.spec.networks) draftVM.spec.template.spec.networks = [];
-    if (!draftVM.spec.template.spec.domain.devices.interfaces)
-      draftVM.spec.template.spec.domain.devices.interfaces = [];
-    updateNetworks(draftVM);
-  });
-};
-
-export const produceVMDevices = (
-  vm: V1VirtualMachine,
-  updateDevices: (vmDraft: Draft<V1VirtualMachine>) => void,
-): V1VirtualMachine => {
-  return produce(vm, (draftVM) => {
-    ensurePath(draftVM, ['spec.template.spec.domain.devices']);
-    if (!draftVM.spec.template.spec.domain.devices.gpus)
-      draftVM.spec.template.spec.domain.devices.gpus = [];
-    if (!draftVM.spec.template.spec.domain.devices.hostDevices)
-      draftVM.spec.template.spec.domain.devices.hostDevices = [];
-    updateDevices(draftVM);
-  });
-};
-
-export const doesSourceRequireDataVolume = (diskSource: SourceTypes): boolean => {
-  return [
-    SourceTypes.BLANK,
-    SourceTypes.CDROM,
-    SourceTypes.CLONE_PVC,
-    SourceTypes.DATA_SOURCE,
-    SourceTypes.HTTP,
-    SourceTypes.REGISTRY,
-    SourceTypes.UPLOAD,
-    SourceTypes.VOLUME_SNAPSHOT,
-  ].includes(diskSource);
-};
-
-export const getSourceFromVolume = (
-  volume: V1Volume,
-  dataVolumeTemplate: V1DataVolumeTemplateSpec,
-): SourceTypes => {
-  if (dataVolumeTemplate?.spec?.source?.http) return SourceTypes.HTTP;
-
-  if (dataVolumeTemplate?.spec?.source?.pvc) return SourceTypes.CLONE_PVC;
-
-  if (dataVolumeTemplate?.spec?.source?.registry) return SourceTypes.REGISTRY;
-
-  if (dataVolumeTemplate?.spec?.source?.blank) return SourceTypes.BLANK;
-
-  if (dataVolumeTemplate?.spec?.source?.upload) return SourceTypes.UPLOAD;
-
-  if (dataVolumeTemplate?.spec?.source?.snapshot) return SourceTypes.VOLUME_SNAPSHOT;
-
-  if (dataVolumeTemplate?.spec?.sourceRef) return SourceTypes.DATA_SOURCE;
-
-  if (volume?.persistentVolumeClaim) return SourceTypes.PVC;
-
-  if (volume?.containerDisk) return SourceTypes.EPHEMERAL;
-
-  return SourceTypes.OTHER;
-};
-
-export const diskModalTitle = (isEditDisk: boolean, isVMRunning: boolean) => {
+export const diskModalTitle = (isEditDisk: boolean, isVMRunning: boolean): string => {
   if (isEditDisk) return t('Edit disk');
-
   return isVMRunning ? t('Add disk (hot plugged)') : t('Add disk');
 };
 
-export const getOS = (vm: V1VirtualMachine) =>
-  getAnnotation(vm?.spec?.template, ANNOTATIONS.os) || getOperatingSystem(vm);
-
-export const getOSNameWithoutVersionNumber = (osName: string): string => {
-  const name = osName?.match(/[a-zA-Z]+/g);
-  return name?.[0];
-};
-
-export const doesDataVolumeTemplateHaveDisk = (vm: V1VirtualMachine, diskName: string) => {
-  const diskVolume = getVolumes(vm)?.find((volume) => volume.name === diskName);
-  const dataVolumeTemplate = getDataVolumeTemplates(vm)?.find(
-    (dv) => getName(dv) === diskVolume?.dataVolume?.name,
-  );
-
-  return !isEmpty(dataVolumeTemplate);
-};
-
-export const createDataVolumeName = (vm: V1VirtualMachine, diskName: string) => {
+export const createDataVolumeName = (vm: V1VirtualMachine, diskName: string): string => {
   const middlePart = [getName(vm), diskName].filter(isDNS1123Label).join('-').substring(0, 53);
   // prefix: 2
   // middlePart: max 53
   // suffix: 6
   // hyphens: max 2
   // together: max 63
-  return `dv-${middlePart}${!middlePart || middlePart.endsWith('-') ? '' : '-'}${getRandomChars(
-    6,
-  )}`;
-};
-
-const getVolumeSourceForMount = (diskState: V1DiskFormState, isHotPluggable: boolean) => {
-  if (diskState.dataVolumeTemplate) {
-    return {
-      dataVolume: {
-        name: diskState.dataVolumeTemplate.metadata.name,
-        ...(isHotPluggable && { hotpluggable: true }),
-      },
-    };
-  }
-
-  if (diskState.volume?.dataVolume?.name) {
-    return {
-      dataVolume: {
-        name: diskState.volume.dataVolume.name,
-        ...(isHotPluggable && { hotpluggable: true }),
-      },
-    };
-  }
-
-  return {
-    persistentVolumeClaim: {
-      claimName: diskState.volume.persistentVolumeClaim.claimName,
-      ...(isHotPluggable && { hotpluggable: true }),
-    },
-  };
-};
-
-export const mountISOToCDROM = async (
-  vm: V1VirtualMachine,
-  diskState: V1DiskFormState,
-  isHotPluggable: boolean,
-): Promise<V1VirtualMachine> => {
-  const newVolumeSource = getVolumeSourceForMount(diskState, isHotPluggable);
-
-  return produceVMDisks(vm, (draftVM) => {
-    // Find the index of the existing CD-ROM volume, if it exists
-    const volumes = draftVM.spec.template.spec.volumes || [];
-    const volumeIndex = volumes.findIndex((volume) => volume.name === diskState.disk.name);
-
-    const newVolume = {
-      name: diskState.disk.name,
-      ...newVolumeSource,
-    };
-
-    if (volumeIndex !== -1) {
-      draftVM.spec.template.spec.volumes[volumeIndex] = newVolume;
-    } else {
-      draftVM.spec.template.spec.volumes = [...volumes, newVolume];
-    }
-
-    if (diskState.dataVolumeTemplate) {
-      const templates = draftVM.spec.dataVolumeTemplates || [];
-      const templateName = getName(diskState.dataVolumeTemplate);
-      const hasTemplate = templates.some((template) => getName(template) === templateName);
-
-      if (!hasTemplate) {
-        draftVM.spec.dataVolumeTemplates = [...templates, diskState.dataVolumeTemplate];
-      }
-    }
-  });
-};
-
-export const ejectISOFromCDROM = (vm: V1VirtualMachine, cdromName: string): V1VirtualMachine => {
-  return produce(vm, (draftVM) => {
-    // Find the volume to be removed
-    const volumeToRemove = (draftVM.spec.template.spec.volumes || []).find(
-      (volume) => volume.name === cdromName,
-    );
-
-    // If a DataVolume was used, remove its template
-    if (volumeToRemove?.dataVolume?.name) {
-      draftVM.spec.dataVolumeTemplates = (draftVM.spec.dataVolumeTemplates || []).filter(
-        (dataVolume) => dataVolume.metadata.name !== volumeToRemove.dataVolume.name,
-      );
-    }
-
-    // Remove the volume entry - empty CD-ROM means disk exists but no volume
-    draftVM.spec.template.spec.volumes = (draftVM.spec.template.spec.volumes || []).filter(
-      (volume) => volume.name !== cdromName,
-    );
-  });
-};
-
-export const detachDiskFromVM = (vm: V1VirtualMachine, diskName: string): V1VirtualMachine => {
-  return produceVMDisks(vm, (draftVM) => {
-    const volumeToRemove = (draftVM.spec.template.spec.volumes || []).find(
-      (volume) => volume.name === diskName,
-    );
-
-    draftVM.spec.template.spec.domain.devices.disks = (
-      draftVM.spec.template.spec.domain.devices.disks || []
-    ).filter((disk) => disk.name !== diskName);
-
-    draftVM.spec.template.spec.volumes = (draftVM.spec.template.spec.volumes || []).filter(
-      (volume) => volume.name !== diskName,
-    );
-
-    if (volumeToRemove?.dataVolume?.name) {
-      draftVM.spec.dataVolumeTemplates = (draftVM.spec.dataVolumeTemplates || []).filter(
-        (dv) => dv.metadata?.name !== volumeToRemove.dataVolume.name,
-      );
-    }
-  });
-};
-
-const CUSTOMIZE_WIZARD_DRAFT_QUEUE_KEY = 'customize-wizard-draft';
-
-// All disk cancel-cleanups for the same VM must run one at a time (see runExclusiveForVm),
-// since each one reads the VM, transforms it, and patches it back.
-const getVmCancelCleanupQueueKey = (vm: V1VirtualMachine): string =>
-  getCustomizeWizardVM()
-    ? CUSTOMIZE_WIZARD_DRAFT_QUEUE_KEY
-    : `${getCluster(vm) ?? ''}/${getNamespace(vm) ?? ''}/${getName(vm) ?? ''}`;
-
-// If the VM only exists as an in-memory draft (the creation wizard), the wizard signal is
-// the live source of truth: patch it instead of re-fetching from the cluster, since the
-// draft VM has never been persisted and kubevirtK8sGet would fail.
-const createDiskCancelCleanup =
-  (
-    vm: V1VirtualMachine,
-    diskName: string,
-    transform: (vm: V1VirtualMachine, name: string) => V1VirtualMachine,
-  ): (() => Promise<void>) =>
-  () =>
-    runExclusiveForVm(getVmCancelCleanupQueueKey(vm), async () => {
-      const draftVM = getCustomizeWizardVM();
-
-      if (draftVM) {
-        await updateVMCustomizeIT(transform(draftVM, diskName));
-        return;
-      }
-
-      const freshVM = await kubevirtK8sGet<V1VirtualMachine>({
-        cluster: getCluster(vm),
-        model: VirtualMachineModel,
-        name: getName(vm),
-        ns: getNamespace(vm),
-      });
-      await updateDisks(transform(freshVM, diskName));
-    });
-
-export const createEjectMountedDiskCancelCleanup = (
-  vm: V1VirtualMachine,
-  diskName: string,
-): (() => Promise<void>) => createDiskCancelCleanup(vm, diskName, ejectISOFromCDROM);
-
-export const createDetachDiskCancelCleanup = (
-  vm: V1VirtualMachine,
-  diskName: string,
-): (() => Promise<void>) => createDiskCancelCleanup(vm, diskName, detachDiskFromVM);
-
-/**
- * Creates a shallow copy of the form data with a mutable dataVolumeTemplate.spec.source.
- * Needed for fire-and-forget uploads where uploadDataVolume attempts to delete
- * source.upload on a possibly frozen react-hook-form object.
- * @param data The disk form state to convert into a mutable copy
- */
-export const createMutableUploadData = (data: V1DiskFormState): V1DiskFormState => {
-  if (!data.dataVolumeTemplate) return data;
-
-  return {
-    ...data,
-    dataVolumeTemplate: {
-      ...data.dataVolumeTemplate,
-      spec: {
-        ...data.dataVolumeTemplate.spec,
-        source: { ...data.dataVolumeTemplate.spec?.source },
-      },
-    },
-  };
-};
-
-export const isDeclarativeHotplugVolumesEnabled = (featureGates: string[]) => {
-  if (featureGates?.includes(HotPlugFeatures.DeclarativeHotplugVolumes)) {
-    return true;
-  }
-  return false;
-};
-
-export const isHotPluggableEnabled = (featureGates: string[]) => {
-  if (isDeclarativeHotplugVolumesEnabled(featureGates)) {
-    if (!featureGates?.includes(HotPlugFeatures.HotplugVolumes)) {
-      return true;
-    }
-  }
-  return false;
+  return `dv-${middlePart}${!middlePart || middlePart.endsWith('-') ? '' : '-'}${getRandomChars(6)}`;
 };
 
 export const convertDataVolumeToTemplate = (
@@ -500,6 +85,26 @@ export const convertDataVolumeToTemplate = (
     },
   },
 });
+
+/**
+ * Creates a shallow copy of the form data with a mutable dataVolumeTemplate.spec.source.
+ * Needed for fire-and-forget uploads where uploadDataVolume attempts to delete
+ * source.upload on a possibly frozen react-hook-form object.
+ */
+export const createMutableUploadData = (data: V1DiskFormState): V1DiskFormState => {
+  if (!data.dataVolumeTemplate) return data;
+
+  return {
+    ...data,
+    dataVolumeTemplate: {
+      ...data.dataVolumeTemplate,
+      spec: {
+        ...data.dataVolumeTemplate.spec,
+        source: { ...data.dataVolumeTemplate.spec?.source },
+      },
+    },
+  };
+};
 
 export const buildUploadTrackMetadata = ({
   abortTooltip,

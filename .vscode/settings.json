@@ -7,7 +7,10 @@
     "source.fixAll.eslint": "always",
     "source.organizeImports": "always"
   },
-  "eslint.validate": ["javascript", "typescript"],
+  "eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact"],
+  "eslint.options": {
+    "overrideConfigFile": "eslintv10.config.mjs"
+  },
   "cSpell.words": ["hyperconverged", "kubevirt"],
   "yaml.validate": true,
   "files.associations": {

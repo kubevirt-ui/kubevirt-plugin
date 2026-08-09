@@ -1,12 +1,12 @@
 import { useMemo } from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { SimplifiedAlerts } from '@kubevirt-utils/components/AlertsCard/utils/types';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type SimplifiedAlerts } from '@kubevirt-utils/components/AlertsCard/utils/types';
 import { createAlertKey } from '@kubevirt-utils/components/AlertsCard/utils/utils';
 import { KUBEVIRT } from '@kubevirt-utils/constants/constants';
 import { getAlertsBasePath } from '@kubevirt-utils/constants/prometheus';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
-import { PrometheusRulesResponse } from '@kubevirt-utils/types/prometheus';
+import { type PrometheusRulesResponse } from '@kubevirt-utils/types/prometheus';
 import { generateAlertId, labelsToParams } from '@kubevirt-utils/utils/prometheus';
 import {
   PrometheusEndpoint,
@@ -29,28 +29,29 @@ const useVMAlerts: UseVMAlerts = (vm: V1VirtualMachine) => {
     const vmName = getName(vm);
     return (
       (query as PrometheusRulesResponse)?.data?.groups?.reduce((acc, ruleGroup) => {
-        ruleGroup?.rules?.forEach((rule) => {
+        for (const rule of ruleGroup?.rules ?? []) {
           if (
             rule?.state === RuleStates.Firing &&
             rule?.labels?.kubernetes_operator_part_of === KUBEVIRT
           ) {
-            rule?.alerts?.forEach((alert) => {
+            for (const alert of rule?.alerts ?? []) {
               const alertPodName = alert?.labels?.pod;
               const metricName = alert?.labels?.name;
               // NOTE: in 4.11 the alerts are missing a vmName label,
               // in 4.12 we will replace the following check with alertLabelVMName === vmName
               if (
-                alertPodName?.includes(vmName) ||
+                (vmName && alertPodName?.includes(vmName)) ||
                 (metricName && vmName && metricName === vmName)
               ) {
                 acc[alert?.labels?.severity] = [
-                  ...(acc?.[alert?.labels?.severity] || []),
+                  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+                  ...(acc?.[alert?.labels?.severity] ?? []),
                   {
                     alertName: alert?.labels?.alertname,
                     description: alert?.annotations?.summary,
                     isVMAlert: true,
                     key: createAlertKey(alert?.activeAt, alert?.labels),
-                    link: `${getAlertsBasePath(perspective, getNamespace(vm))}/${generateAlertId(
+                    link: `${getAlertsBasePath(perspective, getNamespace(vm) ?? '')}/${generateAlertId(
                       ruleGroup,
                       rule,
                     )}?${labelsToParams(alert?.labels)}`,
@@ -58,14 +59,14 @@ const useVMAlerts: UseVMAlerts = (vm: V1VirtualMachine) => {
                   },
                 ];
               }
-            });
+            }
           }
-        });
+        }
 
         return acc;
-      }, data) || data
+      }, data) ?? data
     );
-  }, [query, vm]);
+  }, [query, vm, perspective]);
 
   return vmAlerts;
 };

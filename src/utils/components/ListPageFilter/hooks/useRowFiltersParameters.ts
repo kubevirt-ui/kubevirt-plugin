@@ -23,10 +23,10 @@ export const useRowFiltersParameters: UseRowFiltersParametersType = ({ filterKey
 
   const syncRowFilterParams = useCallback(
     (selected: string[]) => {
-      Object.entries(filters || {}).forEach(([key, value]) => {
+      for (const [key, value] of Object.entries(filters || {})) {
         const recognized = selected.filter((item) => value.includes(item));
         setOrRemoveQueryArgument(filterKeys[key], recognized.join(','));
-      });
+      }
     },
     [filters, setOrRemoveQueryArgument, filterKeys],
   );

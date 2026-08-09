@@ -2,7 +2,7 @@ import { ROW_FILTERS_PREFIX } from '@kubevirt-utils/utils/constants';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { EXCLUSION_URL_PREFIX } from '@search/searchLanguage/constants';
 
-import { FilterableObject, KubevirtFilter } from './types';
+import { type FilterableObject, type KubevirtFilter } from './types';
 
 /**
  * Migrates legacy filter parameters (starting with rowFilter- prefix) to parameters without the prefix.
@@ -28,7 +28,7 @@ export const migrateLegacyFilterParams = (params: URLSearchParams): null | URLSe
     migrated.delete(key);
 
     if (!params.has(plainKey)) {
-      value.split(',').forEach((v) => migrated.append(plainKey, v));
+      for (const filterValue of value.split(',')) migrated.append(plainKey, filterValue);
     }
   }
 
@@ -45,7 +45,7 @@ export const matchesWithExclusion = <T extends FilterableObject>(
   obj: T,
   selected: string[],
 ): boolean => {
-  const included = selected.filter((v) => !isExcludedValue(v));
+  const included = selected.filter((value) => !isExcludedValue(value));
   const excluded = selected.filter(isExcludedValue).map(stripExclusionPrefix);
 
   const matchesIncluded = included.length === 0 || filterDef.match(obj, included);

@@ -1,4 +1,4 @@
-import { IoK8sApiBatchV1Job } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type IoK8sApiBatchV1Job } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 
 import {
@@ -6,15 +6,13 @@ import {
   getOverallProgressFromJob,
   getTestSuitesFromJob,
   TEST_PROGRESS_ANNOTATION_PREFIX,
-  TEST_STATUS,
+  type TEST_STATUS,
   TEST_STATUS_COMPLETED,
   TEST_STATUS_FAILED,
   TEST_STATUS_PENDING,
   TEST_STATUS_RUNNING,
-  TEST_SUITE_OPTIONS,
-  TestProgressAnnotations,
+  type TestProgressAnnotations,
 } from '../../../../utils';
-
 import type {
   JobData,
   JobOverallProgressData,
@@ -22,6 +20,8 @@ import type {
   OverallProgress,
   TestSuiteProgress,
 } from './types';
+
+export * from './progressHelpers';
 
 const getAllJobData = (job: IoK8sApiBatchV1Job | null | undefined): JobData => {
   if (!job) {
@@ -33,7 +33,7 @@ const getAllJobData = (job: IoK8sApiBatchV1Job | null | undefined): JobData => {
   }
 
   try {
-    const annotations = (job?.metadata?.annotations || {}) as TestProgressAnnotations;
+    const annotations = (job?.metadata?.annotations ?? {}) as TestProgressAnnotations;
 
     const testSuites = getTestSuitesFromJob(job);
 
@@ -48,12 +48,16 @@ const getAllJobData = (job: IoK8sApiBatchV1Job | null | undefined): JobData => {
     };
 
     for (const suiteName of testSuites) {
-      const total = annotations[`${TEST_PROGRESS_ANNOTATION_PREFIX}/${suiteName}-total`];
-      const passed = annotations[`${TEST_PROGRESS_ANNOTATION_PREFIX}/${suiteName}-passed`];
-      const failed = annotations[`${TEST_PROGRESS_ANNOTATION_PREFIX}/${suiteName}-failed`];
-      const percent = annotations[`${TEST_PROGRESS_ANNOTATION_PREFIX}/${suiteName}-percent`];
-      const finished = annotations[`${TEST_PROGRESS_ANNOTATION_PREFIX}/${suiteName}-finished`];
-      const duration = annotations[`${TEST_PROGRESS_ANNOTATION_PREFIX}/${suiteName}-duration`];
+      const getAnnotation = (suffix: string): string | undefined =>
+        annotations[`${TEST_PROGRESS_ANNOTATION_PREFIX}/${suiteName}-${suffix}`] as
+          | string
+          | undefined;
+      const total = getAnnotation('total');
+      const passed = getAnnotation('passed');
+      const failed = getAnnotation('failed');
+      const percent = getAnnotation('percent');
+      const finished = getAnnotation('finished');
+      const duration = getAnnotation('duration');
 
       if (!total) {
         suiteProgress[suiteName] = { started: false };
@@ -61,9 +65,9 @@ const getAllJobData = (job: IoK8sApiBatchV1Job | null | undefined): JobData => {
       }
 
       const totalNum = Number.parseInt(total, 10);
-      const passedNum = Number.parseInt(passed || '0', 10);
-      const failedNum = Number.parseInt(failed || '0', 10);
-      const percentNum = Number.parseInt(percent || '0', 10);
+      const passedNum = Number.parseInt(passed ?? '0', 10);
+      const failedNum = Number.parseInt(failed ?? '0', 10);
+      const percentNum = Number.parseInt(percent ?? '0', 10);
 
       suiteProgress[suiteName] = {
         duration: duration ? formatGoDuration(duration) : undefined,
@@ -93,17 +97,18 @@ const getAllJobData = (job: IoK8sApiBatchV1Job | null | undefined): JobData => {
  */
 const parseSuiteProgressFromJobData = (
   suiteName: string,
+
   jobProgress: JobSuiteProgressData,
   lastUpdated?: string,
 ): TestSuiteProgress => {
   // Use provided lastUpdated or current timestamp as ISO string
-  const lastUpdatedString = lastUpdated || new Date().toISOString();
+  const lastUpdatedString = lastUpdated ?? new Date().toISOString();
   let status: TEST_STATUS;
 
   if (jobProgress.finished) {
     // Check if there are any failed tests - if so, mark as FAILED, otherwise COMPLETED
-    status = (jobProgress?.testsFailed || 0) > 0 ? TEST_STATUS_FAILED : TEST_STATUS_COMPLETED;
-  } else if ((jobProgress?.duration || jobProgress?.progress > 0) && !jobProgress?.finished) {
+    status = (jobProgress?.testsFailed ?? 0) > 0 ? TEST_STATUS_FAILED : TEST_STATUS_COMPLETED;
+  } else if ((jobProgress?.duration ?? jobProgress?.progress > 0) && !jobProgress?.finished) {
     status = TEST_STATUS_RUNNING;
   } else {
     status = TEST_STATUS_PENDING;
@@ -112,12 +117,12 @@ const parseSuiteProgressFromJobData = (
   return {
     duration: jobProgress?.duration,
     lastUpdated: lastUpdatedString,
-    progress: jobProgress?.progress || 0,
+    progress: jobProgress?.progress ?? 0,
     status,
     suiteName,
-    testsFailed: jobProgress?.testsFailed || 0,
-    testsPassed: jobProgress?.testsPassed || 0,
-    testsRun: jobProgress?.testsRun || 0,
+    testsFailed: jobProgress?.testsFailed ?? 0,
+    testsPassed: jobProgress?.testsPassed ?? 0,
+    testsRun: jobProgress?.testsRun ?? 0,
   };
 };
 
@@ -133,6 +138,7 @@ export const getOverallProgress = (job: IoK8sApiBatchV1Job | null | undefined): 
 
   if (job) {
     const jobData = getAllJobData(job);
+
     testSuites = jobData.testSuites;
     allJobProgress = jobData.suiteProgress;
     overallProgressData = jobData.overallProgress;
@@ -145,19 +151,19 @@ export const getOverallProgress = (job: IoK8sApiBatchV1Job | null | undefined): 
   for (const suiteName of testSuites) {
     const progress = parseSuiteProgressFromJobData(
       suiteName,
-      allJobProgress[suiteName] || { started: false },
+      allJobProgress[suiteName] ?? { started: false },
       overallProgressData.lastUpdated,
     );
     suites.push(progress);
   }
 
-  const completedSuites = suites.filter((s) => s.status === TEST_STATUS_COMPLETED).length;
-  const currentRunningSuites = suites.filter((s) => s.status === TEST_STATUS_RUNNING);
-  const failedSuites = suites.filter((s) => s.status === TEST_STATUS_FAILED).length;
+  const completedSuites = suites.filter((suite) => suite.status === TEST_STATUS_COMPLETED).length;
+  const currentRunningSuites = suites.filter((suite) => suite.status === TEST_STATUS_RUNNING);
+  const failedSuites = suites.filter((suite) => suite.status === TEST_STATUS_FAILED).length;
   const totalSuites = suites.length;
   const passedTests = overallProgressData.passed;
 
-  const jobStartTime = job?.status?.startTime || job?.metadata?.creationTimestamp;
+  const jobStartTime = job?.status?.startTime ?? job?.metadata?.creationTimestamp;
 
   return {
     completedSuites,
@@ -176,29 +182,3 @@ export const getOverallProgress = (job: IoK8sApiBatchV1Job | null | undefined): 
 };
 
 export { formatElapsedTime, getElapsedTimeInSeconds } from '@kubevirt-utils/utils/elapsedTime';
-
-export const getTotalSkippedTests = (suites: TestSuiteProgress[]): number => {
-  if (!suites) {
-    return 0;
-  }
-
-  let totalSkipped = 0;
-  for (const suite of suites) {
-    if (suite.status === TEST_STATUS_COMPLETED || suite.status === TEST_STATUS_FAILED) {
-      if (
-        suite.testsRun !== undefined &&
-        suite.testsPassed !== undefined &&
-        suite.testsFailed !== undefined
-      ) {
-        const skipped = suite.testsRun - (suite.testsPassed + suite.testsFailed);
-        totalSkipped += Math.max(0, skipped);
-      }
-    }
-  }
-
-  return totalSkipped;
-};
-
-export const getTestSuiteLabel = (suiteName: string): string => {
-  return TEST_SUITE_OPTIONS.find((option) => option.value === suiteName)?.label || suiteName;
-};

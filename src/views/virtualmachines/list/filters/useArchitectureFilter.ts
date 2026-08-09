@@ -1,8 +1,8 @@
 import { useMemo } from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import {
-  KubevirtFilter,
+  type KubevirtFilter,
   KubevirtFilterLayout,
 } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -21,7 +21,7 @@ const useArchitectureFilter = (vms: V1VirtualMachine[]): KubevirtFilter<V1Virtua
           return acc;
         }, new Set<string>()) ?? [],
       )
-        .sort()
+        .sort((a, b) => a.localeCompare(b))
         .map((arch) => ({ label: arch, value: arch })),
     [vms],
   );
@@ -31,7 +31,7 @@ const useArchitectureFilter = (vms: V1VirtualMachine[]): KubevirtFilter<V1Virtua
       categoryLabel: t('Architecture type'),
       filterLayout: KubevirtFilterLayout.HIDDEN,
       id: VirtualMachineRowFilterType.Architecture,
-      match: (obj, selected) => selected.some((arch) => getArchitecture(obj) === arch),
+      match: (obj, selected) => selected.includes(getArchitecture(obj)),
       options,
     }),
     [t, options],

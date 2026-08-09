@@ -1,14 +1,14 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Updater } from 'use-immer';
+import { type Updater } from 'use-immer';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { InterfaceTypes } from '@kubevirt-utils/components/DiskModal/utils/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getDisks, getVolumes } from '@kubevirt-utils/resources/vm';
 import { isWindows } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
 import { ensurePath, getRandomChars } from '@kubevirt-utils/utils/utils';
 
-import { EnvironmentKind, EnvironmentVariable } from '../constants';
+import { type EnvironmentKind, type EnvironmentVariable } from '../constants';
 import {
   areEnvironmentsChanged,
   getRandomSerial,
@@ -84,8 +84,8 @@ const useEnvironments = (
     name: string,
     serial: string,
     kind: EnvironmentKind,
-  ) => {
-    if (environments.find((env) => env.name === name)) {
+  ): void => {
+    if (environments.some((env) => env.name === name)) {
       return setError(new Error(t('Resource already selected')));
     }
 
@@ -95,7 +95,7 @@ const useEnvironments = (
 
     updateVM((draftVM: V1VirtualMachine) => {
       const volumes = getVolumes(draftVM);
-      const envVolumeIndex = volumes?.findIndex((volume) => volume.name === diskName);
+      const envVolumeIndex = volumes?.findIndex((volume) => volume.name === diskName) ?? -1;
       const envDisk = getDisks(draftVM)?.find((disk) => disk.name === diskName);
 
       if (!envDisk || envVolumeIndex < 0) setError(undefined);
@@ -104,18 +104,18 @@ const useEnvironments = (
 
       const newEnvVolume = updateVolumeForKind(volumes[envVolumeIndex], name, kind);
 
-      volumes.splice(envVolumeIndex, 1, newEnvVolume);
+      if (newEnvVolume) volumes.splice(envVolumeIndex, 1, newEnvVolume);
     });
   };
 
   const onEnvironmentRemove = useCallback(
     (diskName: string) => {
       updateVM((draftVM) => {
-        draftVM.spec.template.spec.volumes = (getVolumes(draftVM) || []).filter(
+        draftVM.spec.template.spec.volumes = (getVolumes(draftVM) ?? []).filter(
           (volume) => volume.name !== diskName,
         );
 
-        draftVM.spec.template.spec.domain.devices.disks = (getDisks(draftVM) || []).filter(
+        draftVM.spec.template.spec.domain.devices.disks = (getDisks(draftVM) ?? []).filter(
           (disk) => disk.name !== diskName,
         );
       });

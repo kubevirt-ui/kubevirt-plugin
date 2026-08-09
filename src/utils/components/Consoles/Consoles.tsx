@@ -1,4 +1,4 @@
-import React, { FC, memo, useState } from 'react';
+import React, { type FC, memo, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getConsoleStandaloneURL } from '@multicluster/urls';
@@ -16,28 +16,15 @@ import {
   SERIAL_CONSOLE_TYPE,
   VNC_CONSOLE_TYPE,
 } from './components/utils/ConsoleConsts';
-import { ConsoleComponentState, ConsoleType } from './components/utils/types';
+import { type ConsoleComponentState, type ConsoleType } from './components/utils/types';
 import HideConsole from './components/vnc-console/HideConsole';
 import SessionAlreadyInUseModal from './components/vnc-console/SessionAlreadyInUseModal';
 import { isConnectableState } from './components/vnc-console/utils/util';
-import { VncLogLevel } from './components/vnc-console/utils/VncConsoleTypes';
 import VncConnect from './components/vnc-console/VncConnect';
 import VncConsole from './components/vnc-console/VncConsole';
+import { type ConsolesProps } from './ConsolesTypes';
 
 import './consoles.scss';
-
-type ConsolesProps = {
-  consoleContainerClass?: string;
-  isHeadlessMode: boolean;
-  isStandAlone?: boolean;
-  isVmRunning?: boolean;
-  isWindowsVM: boolean;
-  path: string;
-  vmCluster?: string;
-  vmName: string;
-  vmNamespace: string;
-  vncLogLevel?: VncLogLevel;
-};
 
 const Consoles: FC<ConsolesProps> = ({
   consoleContainerClass,
@@ -51,17 +38,18 @@ const Consoles: FC<ConsolesProps> = ({
   vncLogLevel,
 }) => {
   const { t } = useKubevirtTranslation();
-  const [{ actions, state, type }, setState] = useState<ConsoleComponentState>({
+  const [consoleState, setConsoleState] = useState<ConsoleComponentState>({
     actions: {},
-    state: ConsoleState.init,
+    state: ConsoleState.Init,
     type: VNC_CONSOLE_TYPE,
   });
+  const { actions, state, type } = consoleState;
 
   if (isHeadlessMode) {
     return <div>{t('Console is disabled in headless mode')}</div>;
   }
 
-  const isConnected = state === ConsoleState.connected;
+  const isConnected = state === ConsoleState.Connected;
   const showConnect = isConnectableState(state);
 
   return (
@@ -86,12 +74,12 @@ const Consoles: FC<ConsolesProps> = ({
               {!isStandAlone && (
                 <FlexItem>
                   <Button
+                    icon={<ExternalLinkAltIcon />}
+                    iconPosition="end"
                     onClick={() => {
                       actions?.disconnect?.();
                       window.open(getConsoleStandaloneURL(vmNamespace, vmName, vmCluster));
                     }}
-                    icon={<ExternalLinkAltIcon />}
-                    iconPosition="end"
                     variant={ButtonVariant.secondary}
                   >
                     {t('Open web console')}
@@ -100,11 +88,15 @@ const Consoles: FC<ConsolesProps> = ({
               )}
               <FlexItem>
                 <AccessConsoles
-                  setType={(newType: ConsoleType) =>
-                    setState({ actions: {}, state: ConsoleState.disconnected, type: newType })
-                  }
                   actions={actions}
                   isWindowsVM={isWindowsVM}
+                  setType={(newType: ConsoleType) =>
+                    setConsoleState({
+                      actions: {},
+                      state: ConsoleState.Disconnected,
+                      type: newType,
+                    })
+                  }
                   state={state}
                   type={type}
                 />
@@ -115,7 +107,7 @@ const Consoles: FC<ConsolesProps> = ({
       </StackItem>
       <StackItem className={consoleContainerClass}>
         {type === VNC_CONSOLE_TYPE && showConnect && (
-          <VncConnect connect={actions?.connect} isConnecting={state === ConsoleState.connecting} />
+          <VncConnect connect={actions?.connect} isConnecting={state === ConsoleState.Connecting} />
         )}
         {type === VNC_CONSOLE_TYPE && (
           <HideConsole isHidden={!isConnected}>
@@ -123,7 +115,7 @@ const Consoles: FC<ConsolesProps> = ({
               basePath={path}
               // force re-create on change
               key={`vnc-${path}-${vncLogLevel}`}
-              setState={setState}
+              setState={setConsoleState}
               vncLogLevel={vncLogLevel}
             />
           </HideConsole>
@@ -131,12 +123,12 @@ const Consoles: FC<ConsolesProps> = ({
         {type === SERIAL_CONSOLE_TYPE && showConnect && (
           <SerialConnect
             connect={actions?.connect}
-            isConnecting={state === ConsoleState.connecting}
+            isConnecting={state === ConsoleState.Connecting}
           />
         )}
         {type === SERIAL_CONSOLE_TYPE && (
           <HideConsole isHidden={!isConnected}>
-            <SerialConsole basePath={path} setState={setState} />
+            <SerialConsole basePath={path} setState={setConsoleState} />
           </HideConsole>
         )}
         {type === DESKTOP_VIEWER_CONSOLE_TYPE && (
@@ -144,13 +136,13 @@ const Consoles: FC<ConsolesProps> = ({
         )}
       </StackItem>
       <SessionAlreadyInUseModal
-        setConsoleState={(consoleState: ConsoleState) =>
-          setState((prev) =>
-            prev.type !== VNC_CONSOLE_TYPE ? prev : { ...prev, state: consoleState },
+        connect={actions.connect}
+        isOpen={type === VNC_CONSOLE_TYPE && state === ConsoleState.SessionAlreadyInUse}
+        setConsoleState={(newState: ConsoleState) =>
+          setConsoleState((prev) =>
+            prev.type !== VNC_CONSOLE_TYPE ? prev : { ...prev, state: newState },
           )
         }
-        connect={actions.connect}
-        isOpen={type === VNC_CONSOLE_TYPE && state === ConsoleState.session_already_in_use}
       />
     </Stack>
   );

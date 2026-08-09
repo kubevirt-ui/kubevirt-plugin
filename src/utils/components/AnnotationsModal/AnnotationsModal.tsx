@@ -1,8 +1,8 @@
-import React, { FC, useEffect, useState } from 'react';
+import React, { type FC, useEffect, useState } from 'react';
 
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import { type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { Button, ButtonVariant, Grid } from '@patternfly/react-core';
 import { PlusCircleIcon } from '@patternfly/react-icons';
 
@@ -10,7 +10,12 @@ import { AnnotationsModalRow } from './AnnotationsModalRow';
 
 import './AnnotationsModal.scss';
 
-const getIdAnnotations = (annotations: { [key: string]: string }) =>
+const uniqWith = <T,>(arr: T[], compareFn: (a: T, b: T) => boolean): T[] =>
+  arr.filter((element, index) => arr.findIndex((step) => compareFn(element, step)) === index);
+
+const getIdAnnotations = (annotations: {
+  [key: string]: string;
+}): { [k: string]: { key: string; value: string } } =>
   Object.fromEntries(Object.entries(annotations).map(([key, value], i) => [i, { key, value }]));
 
 export const AnnotationsModal: FC<{
@@ -25,8 +30,8 @@ export const AnnotationsModal: FC<{
     [id: number]: { [key: string]: string };
   }>({});
 
-  const onAnnotationAdd = () => {
-    const keys = new Set([...Object.keys(annotations)]);
+  const onAnnotationAdd = (): void => {
+    const keys = new Set(Object.keys(annotations));
     let index = 0;
     while (keys.has(index.toString())) {
       index++;
@@ -41,10 +46,7 @@ export const AnnotationsModal: FC<{
     });
   };
 
-  const onAnnotationsSubmit = () => {
-    const uniqWith = (arr, fn) =>
-      arr.filter((element, index) => arr.findIndex((step) => fn(element, step)) === index);
-
+  const onAnnotationsSubmit = (): Promise<K8sResourceCommon | void> => {
     if (
       uniqWith(Object.values(annotations), (a, b) => a.key === b.key).length !==
       Object.values(annotations).length
@@ -52,8 +54,8 @@ export const AnnotationsModal: FC<{
       return Promise.reject({ message: t('Duplicate keys found') });
     }
 
-    const updatedAnnotations = Object.fromEntries(
-      Object.entries(annotations).map(([, { key, value }]) => [key, value]),
+    const updatedAnnotations: Record<string, string> = Object.fromEntries(
+      Object.entries(annotations).map(([, { key, value }]): [string, string] => [key, value]),
     );
 
     return onSubmit(updatedAnnotations);
@@ -78,6 +80,8 @@ export const AnnotationsModal: FC<{
       <Grid hasGutter>
         {Object.entries(annotations || {}).map(([id, { key, value }]) => (
           <AnnotationsModalRow
+            annotation={{ key, value }}
+            key={id}
             onChange={(annotation) =>
               setAnnotations({
                 ...annotations,
@@ -86,11 +90,11 @@ export const AnnotationsModal: FC<{
             }
             onDelete={() =>
               setAnnotations(
-                Object.fromEntries(Object.entries(annotations).filter(([k]) => k !== id)),
+                Object.fromEntries(
+                  Object.entries(annotations).filter(([annotationId]) => annotationId !== id),
+                ),
               )
             }
-            annotation={{ key, value }}
-            key={id}
           />
         ))}
         <div className="co-toolbar__group co-toolbar__group--left">

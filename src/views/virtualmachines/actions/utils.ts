@@ -1,15 +1,11 @@
-import { TFunction } from 'i18next';
-
 import { DataVolumeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getAnnotation, getLabels, getName } from '@kubevirt-utils/resources/shared';
 import { getDataVolumeTemplates, getVolumes } from '@kubevirt-utils/resources/vm';
 import { escapeJsonPointerToken, isEmpty } from '@kubevirt-utils/utils/utils';
-import { k8sDelete, Patch } from '@openshift-console/dynamic-plugin-sdk';
-import { isDeletionProtectionEnabled } from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/utils/utils';
+import { k8sDelete, type Patch } from '@openshift-console/dynamic-plugin-sdk';
 import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
-import { isRunning } from '@virtualmachines/utils';
 
 import { ANNOTATION_PREFIX_MIGRATION_ORIGIN_CLAIMNAME } from './constants';
 
@@ -60,29 +56,27 @@ export const createRollbackPatchData = (vm: V1VirtualMachine): Patch[] => {
 
     if (originalClaimStorageMigration) {
       acc.push(
-        ...[
-          {
-            op: 'remove',
-            path: `/metadata/annotations/${escapeJsonPointerToken(originalClaimAnnotation)}`,
-          },
-          {
-            op: 'replace',
-            path: `/spec/template/spec/volumes/${volumeIndex}/dataVolume/name`,
-            value: originalClaimStorageMigration,
-          },
-          {
-            op: 'replace',
-            path: `/spec/dataVolumeTemplates/${dvIndex}/metadata/name`,
-            value: originalClaimStorageMigration,
-          },
-        ],
+        {
+          op: 'remove',
+          path: `/metadata/annotations/${escapeJsonPointerToken(originalClaimAnnotation)}`,
+        },
+        {
+          op: 'replace',
+          path: `/spec/template/spec/volumes/${volumeIndex}/dataVolume/name`,
+          value: originalClaimStorageMigration,
+        },
+        {
+          op: 'replace',
+          path: `/spec/dataVolumeTemplates/${dvIndex}/metadata/name`,
+          value: originalClaimStorageMigration,
+        },
       );
     }
 
     return acc;
   }, [] as Patch[]);
 
-  const pvcRollback = (vmVolumes || []).reduce((acc, volume, volumeIndex) => {
+  const pvcRollback = (vmVolumes ?? []).reduce((acc, volume, volumeIndex) => {
     const pvcName = volume.persistentVolumeClaim?.claimName;
 
     const originalClaimAnnotation = getMigrationClaimNameAnnotation(pvcName);
@@ -91,17 +85,15 @@ export const createRollbackPatchData = (vm: V1VirtualMachine): Patch[] => {
 
     if (originalClaimStorageMigration) {
       acc.push(
-        ...[
-          {
-            op: 'remove',
-            path: `/metadata/annotations/${escapeJsonPointerToken(originalClaimAnnotation)}`,
-          },
-          {
-            op: 'replace',
-            path: `/spec/template/spec/volumes/${volumeIndex}/persistentVolumeClaim/claimName`,
-            value: originalClaimStorageMigration,
-          },
-        ],
+        {
+          op: 'remove',
+          path: `/metadata/annotations/${escapeJsonPointerToken(originalClaimAnnotation)}`,
+        },
+        {
+          op: 'replace',
+          path: `/spec/template/spec/volumes/${volumeIndex}/persistentVolumeClaim/claimName`,
+          value: originalClaimStorageMigration,
+        },
       );
     }
 
@@ -122,16 +114,16 @@ export const getCommonLabels = (vms: V1VirtualMachine[]): Labels => {
     }
 
     const intersection: Labels = {};
-    Object.keys(common).forEach((key) => {
+    for (const key of Object.keys(common)) {
       if (currentVMLabels[key] === common[key]) {
         intersection[key] = common[key];
       }
-    });
+    }
 
     return intersection;
   }, {});
 
-  const { [VM_FOLDER_LABEL]: _, ...commonLabelsWithoutFolder } = commonLabels;
+  const { [VM_FOLDER_LABEL]: _folder, ...commonLabelsWithoutFolder } = commonLabels;
   return commonLabelsWithoutFolder;
 };
 
@@ -172,20 +164,4 @@ export const getLabelsDiffPatch = (
   return patchArray;
 };
 
-export const isBulkDeleteActionDisabled = (vms: V1VirtualMachine[]): boolean =>
-  isEmpty(vms) || vms?.some(isRunning) || vms?.some(isDeletionProtectionEnabled);
-
-export const getBulkDeleteActionDescription = (
-  vms: V1VirtualMachine[],
-  t: TFunction,
-): string | undefined => {
-  if (vms?.some(isRunning)) {
-    return t('Some VirtualMachines are running');
-  }
-
-  if (vms?.some(isDeletionProtectionEnabled)) {
-    return t('Some VirtualMachines are protected');
-  }
-
-  return undefined;
-};
+export { getBulkDeleteActionDescription, isBulkDeleteActionDisabled } from './bulkDeleteUtils';

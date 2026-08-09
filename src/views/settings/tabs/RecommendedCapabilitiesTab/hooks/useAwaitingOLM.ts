@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { InstallState } from '../utils/types';
 
 import { OLM_PROCESSING_DELAY_MS } from '../utils/constants';
+import { InstallState } from '../utils/types';
 import { type RecommendedCapabilityDetailsMap } from '../utils/types';
 
 type UseAwaitingOLMReturn = {
@@ -15,7 +15,7 @@ const useAwaitingOLM = (
   detailsMap: RecommendedCapabilityDetailsMap,
   getFeaturePackageNames: (featureId: string) => string[],
 ): UseAwaitingOLMReturn => {
-  const [awaitingOLMFeatures, setAwaitingOLMFeatures] = useState<Set<string>>(new Set());
+  const [awaitingOLMFeatures, setAwaitingOLMFeatures] = useState<Set<string>>(() => new Set());
   const timersRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
 
   useEffect(() => {
@@ -30,16 +30,21 @@ const useAwaitingOLM = (
 
     setAwaitingOLMFeatures((prev) => {
       const next = new Set(prev);
-      resolved.forEach((id) => next.delete(id));
+      for (const id of resolved) next.delete(id);
       return next;
     });
-    resolved.forEach((id) => {
+    for (const id of resolved) {
       clearTimeout(timersRef.current.get(id));
       timersRef.current.delete(id);
-    });
+    }
   }, [awaitingOLMFeatures, detailsMap, getFeaturePackageNames]);
 
-  useEffect(() => () => timersRef.current.forEach((timer) => clearTimeout(timer)), []);
+  useEffect(
+    () => (): void => {
+      for (const timer of timersRef.current.values()) clearTimeout(timer);
+    },
+    [],
+  );
 
   const markAwaitingOLM = useCallback((featureId: string) => {
     setAwaitingOLMFeatures((prev) => new Set(prev).add(featureId));

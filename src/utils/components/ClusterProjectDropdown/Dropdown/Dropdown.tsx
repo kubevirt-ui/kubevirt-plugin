@@ -1,8 +1,6 @@
-import React, { MouseEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import fuzzysearch from 'fuzzysearch';
+import React, { useRef, useState } from 'react';
 
 import { useClickOutside } from '@kubevirt-utils/hooks/useClickOutside/useClickOutside';
-import { isSystemNamespace } from '@kubevirt-utils/resources/namespace/helper';
 import { Menu, MenuContent, Popper, Tooltip } from '@patternfly/react-core';
 
 import DropdownGroup from './DropdownGroup';
@@ -10,40 +8,13 @@ import DropdownMenuToggle from './DropdownMenuToggle';
 import Filter from './Filter';
 import NoResults from './NoResults';
 import ShowSystemNamespacesSwitch from './ShowSystemNamespacesSwitch';
-import type { DropdownBookmarks, DropdownConfig, DropdownOption } from './types';
+import type { DropdownConfig, DropdownProps } from './types';
 export type { DropdownConfig };
+import { useDropdownCallbacks } from './useDropdownCallbacks';
+import { useDropdownOptions } from './useDropdownOptions';
+import { useFilteredOptions } from './useFilteredOptions';
+
 import './Dropdown.scss';
-
-type ShowSystemToggle = {
-  hasSystemItems: boolean;
-  onChange: (showSystem: boolean) => void;
-  show: boolean;
-};
-
-type DropdownBookmarksProps = {
-  bookmarks: DropdownBookmarks;
-};
-
-type DropdownDataFetchingProps<T> = {
-  extractKey: (item: T) => string;
-  extractTitle: (item: T) => string;
-  items: null | T[] | undefined;
-  itemsLoaded: boolean;
-};
-
-type DropdownProps<T> = DropdownBookmarksProps &
-  DropdownDataFetchingProps<T> & {
-    config: DropdownConfig;
-    disabled?: boolean;
-    disabledItemTooltip?: string;
-    disabledTooltip?: string;
-    includeAllItems?: boolean;
-    isItemDisabled?: (key: string) => boolean;
-    omittedItems?: string[];
-    onChange: (item: string) => void;
-    selectedItem: string;
-    showSystemToggle?: ShowSystemToggle;
-  };
 
 const Dropdown = <T,>({
   bookmarks,
@@ -61,7 +32,7 @@ const Dropdown = <T,>({
   onChange,
   selectedItem,
   showSystemToggle,
-}: DropdownProps<T>) => {
+}: DropdownProps<T>): React.JSX.Element => {
   const menuRef = useRef<HTMLDivElement>(null);
   const toggleRef = useRef<HTMLButtonElement>(null);
   const filterRef = useRef<HTMLInputElement>(null);
@@ -76,145 +47,35 @@ const Dropdown = <T,>({
   const { allItemsTitle } = config;
   const title = selectedItem === config.allItemsKey ? allItemsTitle : selectedItem;
 
-  const optionItems = useMemo(() => {
-    if (!items || !itemsLoaded) return [];
-
-    // Filter out omitted items
-    const omittedSet = omittedItems ? new Set(omittedItems) : new Set();
-    const filteredItems = items.filter((item) => {
-      const key = extractKey(item);
-      return !omittedSet.has(key);
-    });
-
-    const mappedItems = filteredItems.map((item) => {
-      const key = extractKey(item);
-      const isDisabled = isItemDisabled?.(key) ?? false;
-      return {
-        disabled: isDisabled,
-        key,
-        title: extractTitle(item),
-        tooltip: isDisabled && disabledItemTooltip ? disabledItemTooltip : undefined,
-      };
-    });
-
-    mappedItems.sort((a, b) => a.title.localeCompare(b.title));
-
-    if (includeAllItems) {
-      const allItemsDisabled = isItemDisabled?.(config.allItemsKey) ?? false;
-      mappedItems.unshift({
-        disabled: allItemsDisabled,
-        key: config.allItemsKey,
-        title: allItemsTitle,
-        tooltip: allItemsDisabled && disabledItemTooltip ? disabledItemTooltip : undefined,
-      });
-    }
-
-    return mappedItems;
-  }, [
-    items,
-    itemsLoaded,
-    includeAllItems,
-    allItemsTitle,
-    config.allItemsKey,
+  const optionItems = useDropdownOptions({
+    config,
     disabledItemTooltip,
     extractKey,
     extractTitle,
+    includeAllItems,
     isItemDisabled,
+    items,
+    itemsLoaded,
     omittedItems,
-  ]);
+    onChange,
+    selectedItem,
+  });
 
-  // Revert to first enabled item if selected item is not in the list
-  useEffect(() => {
-    if (!itemsLoaded || !optionItems.length) return;
+  const { filteredFavorites, filteredOptions } = useFilteredOptions({
+    bookmarks,
+    filterText,
+    optionItems,
+    showSystemToggle,
+  });
 
-    if (selectedItem && !optionItems.some((item) => item.key === selectedItem)) {
-      const firstEnabledItem =
-        optionItems.find((item) => !item.disabled)?.key ?? optionItems[0]?.key;
-      if (firstEnabledItem) {
-        onChange(firstEnabledItem);
-      }
-    }
-  }, [itemsLoaded, optionItems, selectedItem, onChange]);
-
-  const { filteredFavorites, filteredOptions } = useMemo(() => {
-    const favorites: DropdownOption[] = [];
-    const regular: DropdownOption[] = [];
-    const showSystemNamespaces = showSystemToggle?.show ?? true;
-
-    optionItems.forEach((option) => {
-      const isFav = !!bookmarks.bookmarks?.[option.key];
-      const matchesFilter = fuzzysearch(filterText.toLowerCase(), option.title.toLowerCase());
-
-      if (!matchesFilter) {
-        return;
-      }
-
-      if (isFav) {
-        favorites.push(option);
-        return;
-      }
-
-      const isSystemItem = showSystemToggle ? isSystemNamespace(option.key) : false;
-      if (!showSystemNamespaces && isSystemItem) {
-        return;
-      }
-
-      regular.push(option);
-    });
-
-    return { filteredFavorites: favorites, filteredOptions: regular };
-  }, [optionItems, filterText, bookmarks.bookmarks, showSystemToggle]);
-
-  const onSetFavorite = useCallback(
-    async (key: string, active: boolean) => {
-      if (!bookmarks.bookmarksLoaded || !bookmarks.updateBookmarks) return;
-
-      const newBookmarks = { ...bookmarks.bookmarks };
-      if (active) {
-        newBookmarks[key] = true;
-      } else {
-        delete newBookmarks[key];
-      }
-
-      try {
-        await bookmarks.updateBookmarks(newBookmarks);
-      } catch {
-        // Error handling is done in the hook
-      }
-    },
-    [bookmarks],
-  );
-
-  const onSelect = useCallback(
-    (_event: MouseEvent, itemId: string) => {
-      setIsOpen(false);
-      onChange(itemId);
-    },
-    [onChange],
-  );
-
-  const onActionClick = useCallback(
-    (event: MouseEvent, itemID: string) => {
-      event.preventDefault();
-      event.stopPropagation();
-      const isCurrentFavorite = bookmarks.bookmarks?.[itemID];
-      onSetFavorite(itemID, !isCurrentFavorite);
-    },
-    [bookmarks.bookmarks, onSetFavorite],
-  );
-
-  const onClearFilters = useCallback(
-    (event: MouseEvent<HTMLButtonElement>) => {
-      event.preventDefault();
-      event.stopPropagation();
-      setFilterText('');
-      if (showSystemToggle && !showSystemToggle.show) {
-        showSystemToggle.onChange(true);
-      }
-      filterRef.current?.focus();
-    },
-    [showSystemToggle],
-  );
+  const { onActionClick, onClearFilters, onSelect } = useDropdownCallbacks({
+    bookmarks,
+    filterRef,
+    onChange,
+    setFilterText,
+    setIsOpen,
+    showSystemToggle,
+  });
 
   const dropdown = (
     <div className={config.cssPrefix}>
@@ -227,6 +88,8 @@ const Dropdown = <T,>({
         toggleRef={toggleRef}
       />
       <Popper
+        isVisible={isOpen}
+        placement="bottom-start"
         popper={
           <Menu
             activeItemId={selectedItem}
@@ -278,8 +141,6 @@ const Dropdown = <T,>({
             </MenuContent>
           </Menu>
         }
-        isVisible={isOpen}
-        placement="bottom-start"
         triggerRef={toggleRef}
       />
     </div>

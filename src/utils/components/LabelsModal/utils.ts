@@ -1,21 +1,26 @@
-import { LabelEntry } from './constants';
+import { type LabelEntry } from './constants';
 
 // Old LabelsModal utilities (tag-input based)
 export const labelsToArray = (labels: { [key: string]: string }): string[] => {
-  return Object.entries(labels).map(([k, v]) => (v ? `${k}=${v}` : k));
+  return Object.entries(labels).map(([key, value]) => (value ? `${key}=${value}` : key));
 };
 
 export const labelsArrayToObject = (labels: string[]): { [key: string]: string } => {
-  const result = {};
-  labels.forEach((item) => {
-    const [key, value = null] = item.split('=');
-    result[key] = value;
-  });
+  const result: { [key: string]: string } = {};
+  for (const item of labels) {
+    const separatorIndex = item.indexOf('=');
+    const key = separatorIndex === -1 ? item : item.slice(0, separatorIndex);
+    const value = separatorIndex === -1 ? '' : item.slice(separatorIndex + 1);
+    if (key) result[key] = value;
+  }
   return result;
 };
 
-export const isLabelValid = (label: string) => {
-  return /^[0-9A-Za-z/\-_.]+\s*=?\s*[0-9A-Za-z/\-_.]+$/.test(label) && !/\s/g.test(label);
+export const isLabelValid = (label: string): boolean => {
+  if (!label || label.includes(' ')) return false;
+  const separatorIndex = label.indexOf('=');
+  const key = separatorIndex === -1 ? label : label.slice(0, separatorIndex);
+  return key.length > 0 && /^[0-9A-Za-z/\-_.=]+$/.test(label);
 };
 
 // New LabelsModal utilities (row-based)

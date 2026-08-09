@@ -2,17 +2,16 @@ import React from 'react';
 
 import { render, screen } from '@testing-library/react';
 
-import { MigrationTargetResponse } from '../hooks/useClusterRecommendationTypes';
-
+import { type MigrationTargetResponse } from '../hooks/useClusterRecommendationTypes';
 import ClusterRecommendationPanel from './ClusterRecommendationPanel';
 
 jest.mock('@kubevirt-utils/hooks/useKubevirtTranslation', () => {
   const t = (key: string, params?: Record<string, string>) => {
     let result = key;
     if (params) {
-      Object.entries(params).forEach(([k, v]) => {
-        result = result.replace(`{{${k}}}`, String(v));
-      });
+      for (const [paramKey, value] of Object.entries(params)) {
+        result = result.replace(`{{${paramKey}}}`, String(value));
+      }
     }
     return result;
   };

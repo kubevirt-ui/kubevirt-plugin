@@ -1,26 +1,26 @@
-import { DataVolumeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
+import { DataVolumeModel, VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { type V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import {
-  K8sIoApiCoreV1VolumeResourceRequirements,
-  V1beta1PersistentVolumeClaim,
-  V1VirtualMachine,
+  type K8sIoApiCoreV1PersistentVolumeClaimSpecAccessModesEnum,
+  type K8sIoApiCoreV1PersistentVolumeClaimSpecVolumeModeEnum,
+  type K8sIoApiCoreV1VolumeResourceRequirements,
+  type V1beta1PersistentVolumeClaim,
+  type V1VirtualMachine,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { V1Template } from '@kubevirt-utils/models';
+import { type V1Template } from '@kubevirt-utils/models';
 import { getAnnotations, getLabel, getLabels } from '@kubevirt-utils/resources/shared';
 import {
   TEMPLATE_BASE_IMAGE_NAME_PARAMETER,
   TEMPLATE_BASE_IMAGE_NAMESPACE_PARAMETER,
   TEMPLATE_DATA_SOURCE_NAME_PARAMETER,
   TEMPLATE_DATA_SOURCE_NAMESPACE_PARAMETER,
+  TEMPLATE_VERSION_LABEL,
 } from '@kubevirt-utils/resources/template';
-import { TEMPLATE_VERSION_LABEL } from '@kubevirt-utils/resources/template';
 import { getDataVolumeTemplates } from '@kubevirt-utils/resources/vm';
-import { multipliers } from '@kubevirt-utils/utils/unitConstants';
 import {
   getAPIVersionForModel,
-  K8sModel,
-  K8sResourceCommon,
+  type K8sModel,
+  type K8sResourceCommon,
 } from '@openshift-console/dynamic-plugin-sdk';
 
 import {
@@ -34,25 +34,31 @@ import {
   TEMPLATE_OS_NAME_ANNOTATION,
   VM_TEMPLATE_NAME_PARAMETER,
 } from './consts';
+import type { OperatingSystemRecord } from './types';
 import { compareVersions, removeOSDups, stringValueUnitSplit } from './utils';
+
+export { getGiBUploadPVCSizeByImage } from './uploadSize';
 
 const getAnnotation = (
   pvc: V1beta1PersistentVolumeClaim,
   annotationName: string,
   defaultValue?: string,
-): string => pvc?.metadata?.annotations?.[annotationName] || defaultValue;
+): string => pvc?.metadata?.annotations?.[annotationName] ?? defaultValue;
 
 const getStorageSize = (value: K8sIoApiCoreV1VolumeResourceRequirements): string =>
   value?.requests?.storage?.toString() ?? '';
 
 const getParameterValue = (obj: V1Template, name: string, defaultValue = null): string =>
-  obj?.parameters?.find((parameter) => parameter.name === name)?.value || defaultValue;
+  obj?.parameters?.find((parameter) => parameter.name === name)?.value ?? defaultValue;
 
-const getPVCDataVolumeResources = (dataVolume: V1beta1DataVolume) =>
-  dataVolume?.spec?.pvc?.resources;
+const getPVCDataVolumeResources = (
+  dataVolume: V1beta1DataVolume,
+): K8sIoApiCoreV1VolumeResourceRequirements => dataVolume?.spec?.pvc?.resources;
 
-const getDataVolumeResources = (dataVolume: V1beta1DataVolume) =>
-  dataVolume?.spec?.storage?.resources || getPVCDataVolumeResources(dataVolume);
+const getDataVolumeResources = (
+  dataVolume: V1beta1DataVolume,
+): K8sIoApiCoreV1VolumeResourceRequirements =>
+  dataVolume?.spec?.storage?.resources ?? getPVCDataVolumeResources(dataVolume);
 
 export const getDataVolumeStorageSize = (dataVolume: V1beta1DataVolume): string =>
   getStorageSize(getDataVolumeResources(dataVolume));
@@ -65,47 +71,53 @@ export const getPVCName = (obj: V1Template): string =>
   getParameterValue(obj, TEMPLATE_BASE_IMAGE_NAME_PARAMETER) ||
   getParameterValue(obj, TEMPLATE_DATA_SOURCE_NAME_PARAMETER);
 
-export const getPvcResources = (pvc: V1beta1PersistentVolumeClaim) => pvc?.spec?.resources;
+export const getPvcResources = (
+  pvc: V1beta1PersistentVolumeClaim,
+): K8sIoApiCoreV1VolumeResourceRequirements => pvc?.spec?.resources;
 
 export const getPvcStorageSize = (pvc: V1beta1PersistentVolumeClaim): string =>
   getStorageSize(getPvcResources(pvc));
 
-export const getPvcAccessModes = (pvc: V1beta1PersistentVolumeClaim) => pvc?.spec?.accessModes;
-export const getPvcVolumeMode = (pvc: V1beta1PersistentVolumeClaim) => pvc?.spec?.volumeMode;
+export const getPvcAccessModes = (
+  pvc: V1beta1PersistentVolumeClaim,
+): K8sIoApiCoreV1PersistentVolumeClaimSpecAccessModesEnum[] => pvc?.spec?.accessModes;
+export const getPvcVolumeMode = (
+  pvc: V1beta1PersistentVolumeClaim,
+): K8sIoApiCoreV1PersistentVolumeClaimSpecVolumeModeEnum => pvc?.spec?.volumeMode;
 export const getPvcStorageClassName = (pvc: V1beta1PersistentVolumeClaim): string =>
   pvc?.spec?.storageClassName;
 
-export const getPvcImportPodName = (pvc: V1beta1PersistentVolumeClaim) =>
+export const getPvcImportPodName = (pvc: V1beta1PersistentVolumeClaim): string =>
   getAnnotation(pvc, STORAGE_IMPORT_POD_LABEL);
 
 // upload pvc selectors
-export const getPvcUploadPodName = (pvc: V1beta1PersistentVolumeClaim) =>
+export const getPvcUploadPodName = (pvc: V1beta1PersistentVolumeClaim): string =>
   getAnnotation(pvc, CDI_UPLOAD_POD_NAME_ANNOTATION);
 
-export const getPvcPhase = (pvc: V1beta1PersistentVolumeClaim) =>
+export const getPvcPhase = (pvc: V1beta1PersistentVolumeClaim): string =>
   getAnnotation(pvc, CDI_UPLOAD_POD_ANNOTATION);
 
-export const getPvcCloneToken = (pvc: V1beta1PersistentVolumeClaim) =>
+export const getPvcCloneToken = (pvc: V1beta1PersistentVolumeClaim): string =>
   getAnnotation(pvc, CDI_CLONE_TOKEN_ANNOTAION);
 
-export const isPvcUploading = (pvc: V1beta1PersistentVolumeClaim) =>
+export const isPvcUploading = (pvc: V1beta1PersistentVolumeClaim): boolean =>
   !getPvcCloneToken(pvc) && getPvcUploadPodName(pvc) && getPvcPhase(pvc) === CDI_PVC_PHASE_RUNNING;
 
-export const isPvcCloning = (pvc: V1beta1PersistentVolumeClaim) =>
+export const isPvcCloning = (pvc: V1beta1PersistentVolumeClaim): boolean =>
   !!getPvcCloneToken(pvc) && getPvcPhase(pvc) === CDI_PVC_PHASE_RUNNING;
 
-export const isPvcBoundToCDI = (pvc: V1beta1PersistentVolumeClaim) =>
+export const isPvcBoundToCDI = (pvc: V1beta1PersistentVolumeClaim): boolean =>
   pvc?.metadata?.ownerReferences?.some(
-    (or) =>
-      or.apiVersion.startsWith(CDI_KUBEVIRT_IO) &&
-      or.kind === DataVolumeModel.kind &&
-      or.name === pvc?.metadata?.name,
+    (ownerRef) =>
+      ownerRef.apiVersion.startsWith(CDI_KUBEVIRT_IO) &&
+      ownerRef.kind === DataVolumeModel.kind &&
+      ownerRef.name === pvc?.metadata?.name,
   );
 
-export const getName = <A extends K8sResourceCommon = K8sResourceCommon>(value: A) =>
+export const getName = <A extends K8sResourceCommon = K8sResourceCommon>(value: A): string =>
   value?.metadata?.name;
 
-export const getNamespace = <A extends K8sResourceCommon = K8sResourceCommon>(value: A) =>
+export const getNamespace = <A extends K8sResourceCommon = K8sResourceCommon>(value: A): string =>
   value?.metadata?.namespace;
 
 export const getKubevirtModelAvailableAPIVersion = (model: K8sModel): string =>
@@ -116,29 +128,22 @@ export const getVM = (vmTemplate: V1Template): V1VirtualMachine =>
 
 export const getTemplatesLabelValues = (templates: V1Template[], label: string): string[] => {
   const labelValues = [];
-  (templates || []).forEach((template) => {
-    const labels = Object.keys(getLabels(template, {})).filter((l) => l.startsWith(label));
-    labels.forEach((l) => {
-      const labelParts = l.split('/');
+  for (const template of templates ?? []) {
+    const labels = Object.keys(getLabels(template, {})).filter((lbl) => lbl.startsWith(label));
+    for (const lbl of labels) {
+      const labelParts = lbl.split('/');
       if (labelParts.length > 1) {
         const labelName = labelParts[labelParts.length - 1];
-        if (labelValues.indexOf(labelName) === -1) {
+        if (!labelValues.includes(labelName)) {
           labelValues.push(labelName);
         }
       }
-    });
-  });
+    }
+  }
   return labelValues;
 };
 
-export const getGiBUploadPVCSizeByImage = (sizeInBytes: number) => {
-  const sizeGi = sizeInBytes / multipliers.Gi;
-
-  if (sizeGi < 0.5) return 1;
-  return Math.ceil(sizeGi) * 2;
-};
-
-export const getTemplateOperatingSystems = (templates: V1Template[]) => {
+export const getTemplateOperatingSystems = (templates: V1Template[]): OperatingSystemRecord[] => {
   const osIds = getTemplatesLabelValues(templates, TEMPLATE_OS_LABEL);
   const sortedTemplates = [...templates].sort((a, b) => {
     const aVersion = getLabel(a, TEMPLATE_VERSION_LABEL);
@@ -156,15 +161,16 @@ export const getTemplateOperatingSystems = (templates: V1Template[]) => {
       );
       const vm = getVM(template);
       const dvTemplates = getDataVolumeTemplates(vm);
-      const dv = dvTemplates?.find((dvt) => dvt?.metadata?.name === VM_TEMPLATE_NAME_PARAMETER);
+      const dvt = dvTemplates?.find((tmpl) => tmpl?.metadata?.name === VM_TEMPLATE_NAME_PARAMETER);
 
       return {
         baseImageName: getPVCName(template),
         baseImageNamespace: getPVCNamespace(template),
         baseImageRecomendedSize:
-          dv && stringValueUnitSplit(getDataVolumeStorageSize(dv as unknown as V1beta1DataVolume)),
+          dvt &&
+          stringValueUnitSplit(getDataVolumeStorageSize(dvt as unknown as V1beta1DataVolume)),
         id: osId,
-        isSourceRef: !!dv?.spec?.sourceRef,
+        isSourceRef: !!dvt?.spec?.sourceRef,
         name: getAnnotation(template, nameAnnotation),
       };
     }),

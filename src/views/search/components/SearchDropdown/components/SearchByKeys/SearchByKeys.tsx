@@ -1,12 +1,11 @@
-import React, { FC, useMemo } from 'react';
+import React, { type FC, useMemo } from 'react';
 
-import { KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
+import { type KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Content, ContentVariants } from '@patternfly/react-core';
 
 import useSearchKeyBadges from '../../hooks/useSearchKeyBadges';
-import { SearchKeyBadge } from '../../types';
-
+import { type SearchKeyBadge } from '../../types';
 import SearchKeysList from './components/SearchKeysList';
 
 type SearchByKeysProps = {
@@ -25,9 +24,9 @@ const SearchByKeys: FC<SearchByKeysProps> = ({
 
   const labelLookup = useMemo(() => {
     const map = new Map<string, string>();
-    filterDefinitions.forEach((def) => {
+    for (const def of filterDefinitions) {
       if (def.categoryLabel) map.set(def.id, def.categoryLabel);
-    });
+    }
     return map;
   }, [filterDefinitions]);
 

@@ -36,7 +36,7 @@ test.describe('Welcome Modal', { tag: [T2_TAG, '@tier2-welcome-modal'] }, () => 
       await page.reload({ waitUntil: 'load' });
       await page.waitForLoadState('load');
 
-      await page.locator('button:has-text("Start tour")').click();
+      await page.getByTestId('start-tour-btn').click();
 
       await tourStepsTest(page);
 

@@ -1,7 +1,7 @@
 import React, {
-  Dispatch,
-  FC,
-  SetStateAction,
+  type Dispatch,
+  type FC,
+  type SetStateAction,
   useCallback,
   useEffect,
   useMemo,
@@ -14,47 +14,21 @@ import { useClickOutside } from '@kubevirt-utils/hooks/useClickOutside/useClickO
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import {
-  ActionService,
+  type ActionService,
   ActionServiceProvider,
   checkAccess as defaultCheckAccess,
-  MenuOption,
+  type MenuOption,
 } from '@openshift-console/dynamic-plugin-sdk';
-import {
-  ActionContext,
-  ActionMenuVariant,
-  LazyActionMenuProps,
-} from '@openshift-console/dynamic-plugin-sdk/lib/api/internal-types';
+import { ActionMenuVariant } from '@openshift-console/dynamic-plugin-sdk/lib/api/internal-types';
 import { impersonateStateToProps } from '@openshift-console/dynamic-plugin-sdk/lib/app/core/reducers/coreSelectors';
-import { ImpersonateKind } from '@openshift-console/dynamic-plugin-sdk/lib/app/redux-types';
-import {
-  Menu,
-  MenuContent,
-  MenuList,
-  MenuToggle,
-  MenuToggleProps,
-  Popper,
-  Tooltip,
-} from '@patternfly/react-core';
+import { type ImpersonateKind } from '@openshift-console/dynamic-plugin-sdk/lib/app/redux-types';
+import { Menu, MenuContent, MenuList, MenuToggle, Popper, Tooltip } from '@patternfly/react-core';
 import { EllipsisVIcon } from '@patternfly/react-icons';
 
 import ActionMenuContent from './ActionMenuContent';
+import type { ExtendedLazyActionMenuProps, LazyFetchProps } from './LazyActionMenuTypes';
+export type { CheckAccess, ExtendedLazyActionMenuProps } from './LazyActionMenuTypes';
 import { flattenToAccessReview, mergeOptions } from './overrides';
-
-export type CheckAccess = typeof defaultCheckAccess;
-
-export type ExtendedLazyActionMenuProps = LazyActionMenuProps & {
-  checkAccessDelegate?: CheckAccess;
-  disabledTooltip?: string;
-  localOptions?: MenuOption[];
-  toggleSize?: MenuToggleProps['size'];
-};
-
-type LazyFetchProps = {
-  checkAccess: CheckAccess;
-  context: ActionContext;
-  mergedOptions?: MenuOption[];
-  setRemoteOptions: Dispatch<SetStateAction<MenuOption[]>>;
-};
 
 const ActionReceiver: FC<
   ActionService & { setRemoteOptions: Dispatch<SetStateAction<MenuOption[]>> }
@@ -82,11 +56,11 @@ const LazyFetchInternal: FC<LazyFetchProps & { impersonate: ImpersonateKind }> =
   useEffect(() => {
     // Check access after loading actions from service over a kebab to minimize flicker when opened.
     // This depends on `checkAccess` being memoized.
-    flattenToAccessReview(mergedOptions).forEach((accessReview) =>
+    for (const accessReview of flattenToAccessReview(mergedOptions)) {
       checkAccess(accessReview, impersonate).catch((e) =>
         kubevirtConsole.warn('Could not check access for action menu', e),
-      ),
-    );
+      );
+    }
   }, [mergedOptions, impersonate, checkAccess]);
 
   return (
@@ -118,7 +92,7 @@ const LazyActionMenu: FC<ExtendedLazyActionMenuProps> = ({
   useClickOutside([menuRef, toggleRef], () => setIsOpen(false));
 
   const isKebabVariant = variant === ActionMenuVariant.KEBAB;
-  const toggleLabel = label || t('Actions');
+  const toggleLabel = label ?? t('Actions');
 
   const hideMenu = useCallback(() => setIsOpen(false), []);
   const onToggleClick = useCallback(() => setIsOpen((prevIsOpen) => !prevIsOpen), []);
@@ -161,6 +135,8 @@ const LazyActionMenu: FC<ExtendedLazyActionMenuProps> = ({
       )}
       {toggle}
       <Popper
+        isVisible={isOpen}
+        placement="bottom-end"
         popper={
           <Menu containsFlyout ref={menuRef}>
             <MenuContent>
@@ -174,8 +150,6 @@ const LazyActionMenu: FC<ExtendedLazyActionMenuProps> = ({
             </MenuContent>
           </Menu>
         }
-        isVisible={isOpen}
-        placement="bottom-end"
         triggerRef={toggleRef}
       />
     </>

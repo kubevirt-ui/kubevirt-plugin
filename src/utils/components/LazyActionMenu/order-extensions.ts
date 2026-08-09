@@ -1,5 +1,7 @@
 import partition from 'lodash/partition';
 
+import { isEmpty } from '@kubevirt-utils/utils/utils';
+
 type ItemsToSort = {
   id: string;
   insertAfter?: string | string[];
@@ -13,7 +15,7 @@ export const toArray = <T>(value: T | T[]): T[] => {
   return Array.isArray(value) ? value : [value];
 };
 
-const mapIdToIndex = (ids: string[], currentItems: ItemsToSort[]) =>
+const mapIdToIndex = (ids: string[], currentItems: ItemsToSort[]): number[] =>
   ids
     .map((id) => currentItems.findIndex((other) => other.id === id))
     .filter((index) => index !== -1);
@@ -28,7 +30,7 @@ export const itemDependsOnItem = <T extends ItemsToSort>(item: T, other: T): boo
 };
 
 export const isPositioned = <T extends ItemsToSort>(item: T, allItems: T[]): boolean =>
-  !!allItems.find((other) => itemDependsOnItem<T>(item, other));
+  allItems.some((other) => itemDependsOnItem<T>(item, other));
 
 export const findIndexForItem = <T extends ItemsToSort>(item: T, currentItems: T[]): number => {
   const { insertAfter, insertBefore } = item;
@@ -59,26 +61,28 @@ export const insertPositionedItems = <T extends ItemsToSort>(
     return;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const [positionedItems, sortedItems] = partition(insertItems, (item) =>
     isPositioned<T>(item, insertItems),
   );
 
   if (sortedItems.length === 0) {
     // Circular dependencies
-    positionedItems.forEach((i) => insertItem<T>(i, currentItems));
+    for (const i of positionedItems) insertItem<T>(i, currentItems);
     return;
   }
 
-  sortedItems.forEach((i) => insertItem<T>(i, currentItems));
+  for (const i of sortedItems) insertItem<T>(i, currentItems);
   insertPositionedItems<T>(positionedItems, currentItems);
 };
 
 export const orderExtensionBasedOnInsertBeforeAndAfter = <T extends ItemsToSort>(
   items: T[],
 ): T[] => {
-  if (!items || !items.length) {
+  if (isEmpty(items)) {
     return [];
   }
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const [positionedItems, sortedItems] = partition(items, (item) => isPositioned<T>(item, items));
   insertPositionedItems<T>(positionedItems, sortedItems);
   return sortedItems;

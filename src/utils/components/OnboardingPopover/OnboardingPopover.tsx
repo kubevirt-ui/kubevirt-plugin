@@ -1,10 +1,10 @@
-import React, { FC, ReactNode } from 'react';
+import React, { type FC, type ReactNode } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Button, ButtonVariant, Popover, PopoverPosition } from '@patternfly/react-core';
 
 import useOnboardingPopover from './hooks/useOnboardingPopover';
-import { OnboardingPopoverKey } from './types';
+import { type OnboardingPopoverKey } from './types';
 
 type OnboardingPopoverProps = {
   bodyContent: ReactNode;
@@ -24,14 +24,13 @@ const OnboardingPopover: FC<OnboardingPopoverProps> = ({
   triggerElement,
 }) => {
   const { t } = useKubevirtTranslation();
-
   const { dismiss, isVisible } = useOnboardingPopover({
     coveredByTourSteps,
     popoverKey,
     triggerElement,
   });
 
-  const handleClose = (event: KeyboardEvent | MouseEvent) => {
+  const handleClose = (event: KeyboardEvent | MouseEvent): void => {
     const isMouseClick = event instanceof MouseEvent;
     const isClickOnTriggerElement = isMouseClick && triggerElement?.contains(event.target as Node);
     const shouldDismissPopover = hideOnTriggerClick || !isClickOnTriggerElement;
@@ -44,13 +43,13 @@ const OnboardingPopover: FC<OnboardingPopoverProps> = ({
 
   return (
     <Popover
+      bodyContent={bodyContent}
+      data-test="onboarding-popover"
       footerContent={
         <Button data-test="onboarding-dismiss-btn" onClick={dismiss} variant={ButtonVariant.link}>
           {t('Got it')}
         </Button>
       }
-      bodyContent={bodyContent}
-      data-test="onboarding-popover"
       headerContent={headerContent}
       hideOnOutsideClick={false}
       isVisible={isVisible}

@@ -12,7 +12,7 @@ import { Metric, setMetricFromResponse } from '../metrics';
 
 import { VMListQueries } from './constants';
 
-const useVMMetrics = () => {
+const useVMMetrics = (): void => {
   const namespace = useNamespaceParam();
   const cluster = useClusterParam();
   const allClusters = useIsAllClustersPage();
@@ -55,23 +55,23 @@ const useVMMetrics = () => {
   });
 
   useEffect(() => {
-    setMetricFromResponse(networkTotalResponse, Metric.networkUsage);
+    setMetricFromResponse(networkTotalResponse, Metric.NetworkUsage);
   }, [networkTotalResponse]);
 
   useEffect(() => {
-    setMetricFromResponse(memoryUsageResponse, Metric.memoryUsage);
+    setMetricFromResponse(memoryUsageResponse, Metric.MemoryUsage);
   }, [memoryUsageResponse]);
 
   useEffect(() => {
-    setMetricFromResponse(cpuUsageResponse, Metric.cpuUsage);
+    setMetricFromResponse(cpuUsageResponse, Metric.CpuUsage);
   }, [cpuUsageResponse]);
 
   useEffect(() => {
-    setMetricFromResponse(storageUsageResponse, Metric.storageUsage);
+    setMetricFromResponse(storageUsageResponse, Metric.StorageUsage);
   }, [storageUsageResponse]);
 
   useEffect(() => {
-    setMetricFromResponse(storageCapacityResponse, Metric.storageCapacity);
+    setMetricFromResponse(storageCapacityResponse, Metric.StorageCapacity);
   }, [storageCapacityResponse]);
 };
 
