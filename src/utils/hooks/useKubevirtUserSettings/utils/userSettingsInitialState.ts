@@ -27,7 +27,7 @@ type ColumnsUserSettings = {
   [tableName: string]: string[];
 };
 
-type QuickStartUserSettings = {
+export type QuickStartUserSettings = {
   dontShowWelcomeModal?: boolean;
   tourStepsSeen?: number[];
 };
