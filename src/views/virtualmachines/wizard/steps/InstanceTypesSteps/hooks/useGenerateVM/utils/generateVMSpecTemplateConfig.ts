@@ -1,3 +1,4 @@
+import { type V1DataVolumeTemplateSpec } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { DEFAULT_DISK_SIZE } from '@kubevirt-utils/components/DiskModal/utils/constants';
 import { DataSourceModel } from '@kubevirt-utils/models';
 import { isBootableVolumePVCKind } from '@kubevirt-utils/resources/bootableresources/helpers';
@@ -5,16 +6,26 @@ import {
   getDataVolumeSize,
   getPVCSize,
 } from '@kubevirt-utils/resources/bootableresources/selectors';
-import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
+import { type BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
-import { GenerateVMCallback, GenerateVMSpecDataVolumeTemplates } from '../types';
+
+import { type GenerateVMSpecDataVolumeTemplates } from '../types';
+
+type DataVolumeStorageResources = NonNullable<
+  NonNullable<NonNullable<V1DataVolumeTemplateSpec['spec']>['storage']>['resources']
+>;
+
+type BootVolumeDataVolumeSource = Pick<
+  NonNullable<V1DataVolumeTemplateSpec['spec']>,
+  'source' | 'sourceRef'
+>;
 
 const getMainDataVolumeStorage = (
-  dvSource: Parameters<GenerateVMCallback>[0]['dvSource'],
-  pvcSource: Parameters<GenerateVMCallback>[0]['pvcSource'],
+  dvSource: GenerateVMSpecDataVolumeTemplates['dvSource'],
+  pvcSource: GenerateVMSpecDataVolumeTemplates['pvcSource'],
   customDiskSize?: string,
   isIso?: boolean,
-) => {
+): DataVolumeStorageResources => {
   if (customDiskSize && !isIso) {
     return { requests: { storage: customDiskSize } };
   }
@@ -22,7 +33,7 @@ const getMainDataVolumeStorage = (
   if (dvSource || pvcSource) {
     return {
       requests: {
-        storage: getDataVolumeSize(dvSource) || getPVCSize(pvcSource),
+        storage: getDataVolumeSize(dvSource) ?? getPVCSize(pvcSource),
       },
     };
   }
@@ -35,10 +46,11 @@ const getISODataVolumeTemplates = (
   vmName: string,
   storageClassName: string,
   customDiskSize?: string,
-) => {
+): V1DataVolumeTemplateSpec[] => {
   if (!isIso) return [];
 
-  const storage = customDiskSize || '30Gi';
+  // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- empty string must fall back
+  const storage = customDiskSize || DEFAULT_DISK_SIZE;
 
   return [
     {
@@ -58,7 +70,9 @@ const getISODataVolumeTemplates = (
   ];
 };
 
-const getBootVolumeDataVolumeSource = (selectedBootableVolume: BootableVolume) => {
+const getBootVolumeDataVolumeSource = (
+  selectedBootableVolume: BootableVolume,
+): BootVolumeDataVolumeSource => {
   const name = getName(selectedBootableVolume);
   const namespace = getNamespace(selectedBootableVolume);
 
@@ -82,13 +96,13 @@ const getBootVolumeDataVolumeSource = (selectedBootableVolume: BootableVolume) =
 export const getDataVolumeTemplates = ({
   customDiskSize,
   dvSource,
-  pvcSource,
   isIso,
+  pvcSource,
+  selectedBootableVolume,
   storageClassName,
   vmName,
   volumeName,
-  selectedBootableVolume,
-}: GenerateVMSpecDataVolumeTemplates) => {
+}: GenerateVMSpecDataVolumeTemplates): V1DataVolumeTemplateSpec[] => {
   return [
     {
       metadata: {
