@@ -13,8 +13,7 @@ import { getOnSelect } from '../utils';
 import ToolbarFilterMultiChip from './ToolbarFilter/ToolbarFilterMultiChip';
 
 type SelectFilterItemProps = {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  filterDef: KubevirtFilter<any>;
+  filterDef: KubevirtFilter;
   filters: KubevirtFilterState;
   isToggleVisible?: boolean;
   onSetFilters: OnSetFilters;

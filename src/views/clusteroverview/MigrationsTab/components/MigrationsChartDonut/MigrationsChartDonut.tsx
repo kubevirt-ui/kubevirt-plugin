@@ -3,8 +3,8 @@ import React, { FC } from 'react';
 import { V1VirtualMachineInstanceMigration } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import SubTitleChartLabel from '@kubevirt-utils/components/Charts/ChartLabels/SubTitleChartLabel';
 import TitleChartLabel from '@kubevirt-utils/components/Charts/ChartLabels/TitleChartLabel';
+import { OnSetFilters } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { OnFilterChange } from '@openshift-console/dynamic-plugin-sdk';
 import { ChartDonut } from '@patternfly/react-charts/victory';
 import { CardFooter, Split, SplitItem } from '@patternfly/react-core';
 
@@ -14,7 +14,7 @@ import { colorScale } from './constants';
 import MigrationChartLegend from './MigrationChartLegend';
 
 type MigrationsChartDonutProps = {
-  onFilterChange: OnFilterChange;
+  onSetFilters: OnSetFilters;
   vmims: V1VirtualMachineInstanceMigration[];
 };
 
@@ -23,7 +23,7 @@ export type ChartDataItem = {
   y: number; // count of each status
 };
 
-const MigrationsChartDonut: FC<MigrationsChartDonutProps> = ({ onFilterChange, vmims }) => {
+const MigrationsChartDonut: FC<MigrationsChartDonutProps> = ({ onSetFilters, vmims }) => {
   const { t } = useKubevirtTranslation();
 
   if (!vmims?.length) return null;
@@ -67,7 +67,7 @@ const MigrationsChartDonut: FC<MigrationsChartDonutProps> = ({ onFilterChange, v
       <CardFooter>
         <Split hasGutter>
           <SplitItem isFilled>
-            <MigrationChartLegend legendItems={chartData} onFilterChange={onFilterChange} />
+            <MigrationChartLegend legendItems={chartData} onSetFilters={onSetFilters} />
           </SplitItem>
           <SplitItem>
             <LiveMigrationSettingsPopover />

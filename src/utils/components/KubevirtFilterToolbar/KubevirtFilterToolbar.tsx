@@ -1,4 +1,4 @@
-import React, { ReactNode, useMemo, useState } from 'react';
+import React, { FC, ReactNode, useMemo, useState } from 'react';
 
 import {
   FilterableObject,
@@ -21,11 +21,11 @@ import HiddenFilterChips from './components/HiddenFilterChips';
 import SelectFilterItem from './components/SelectFilterItem';
 import TextSearchFilters from './components/TextSearchFilters';
 
-type KubevirtFilterToolbarProps<T extends FilterableObject = FilterableObject> = {
+type KubevirtFilterToolbarProps = {
   clearAllFilters: () => void;
   columnLayout?: ColumnLayout;
-  data?: T[];
-  filterDefinitions?: KubevirtFilter<T>[];
+  data?: FilterableObject[];
+  filterDefinitions?: KubevirtFilter[];
   filters: KubevirtFilterState;
   hideColumnManagement?: boolean;
   hideLabelFilter?: boolean;
@@ -34,18 +34,18 @@ type KubevirtFilterToolbarProps<T extends FilterableObject = FilterableObject> =
   toolbarEndContent?: ReactNode;
 };
 
-const KubevirtFilterToolbar = <T extends FilterableObject = FilterableObject>({
+const KubevirtFilterToolbar: FC<KubevirtFilterToolbarProps> = ({
   clearAllFilters,
   columnLayout,
   data,
-  filterDefinitions = EMPTY_FILTERS as KubevirtFilter<T>[],
+  filterDefinitions = EMPTY_FILTERS,
   filters,
   hideColumnManagement,
   hideLabelFilter,
   loaded,
   onSetFilters,
   toolbarEndContent,
-}: KubevirtFilterToolbarProps<T>) => {
+}) => {
   const { t } = useKubevirtTranslation();
 
   const groupedFilters = useMemo(

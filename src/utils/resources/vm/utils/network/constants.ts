@@ -10,6 +10,7 @@ import {
 
 export type NetworkPresentation = {
   iface: V1Interface;
+  metadata?: { name?: string };
   network: V1Network;
 };
 
