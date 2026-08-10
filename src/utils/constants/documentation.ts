@@ -53,6 +53,7 @@ export const documentationURL = {
   OS_IMAGE_RHEL: `${RH_ACCESS_URL}/downloads/content/479`,
   OS_IMAGE_WINDOWS: 'https://www.microsoft.com/en-us/software-download/windows10ISO',
   PASST: `${KV_UG_URL}/user-guide/network/net_binding_plugins/passt/#vm-passt-network-interface`,
+  PIPELINES_INSTALL: `${RH_DOC_URL}/red_hat_openshift_pipelines/latest/html/installing_and_configuring/installing-pipelines`,
   PROJECTS: 'https://docs.okd.io/latest/applications/projects/working-with-projects.html',
   REDHAT_BLOG: `${REDHAT_BASE_URL}/blog/channel/red-hat-openshift`,
   RHACM: RHACM_DOC_URL,

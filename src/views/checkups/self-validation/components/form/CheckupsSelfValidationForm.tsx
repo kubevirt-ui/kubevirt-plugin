@@ -33,6 +33,7 @@ import {
   TEST_SUITES,
 } from '../../utils';
 import { calculatePVCStorageSize } from '../../utils/selfValidationJob/resourceTemplates';
+import useIsOpenShiftPipelinesInstalled from '../hooks/useIsOpenShiftPipelinesInstalled';
 
 import AdvancedSettings from './AdvancedSettings';
 import CheckupsSelfValidationFormActions from './CheckupsSelfValidationFormActions';
@@ -61,7 +62,8 @@ const CheckupsSelfValidationForm = () => {
   const [testSkips, setTestSkips] = useState<string>('');
   const [storageCapabilities, setStorageCapabilities] = useState<string[]>([]);
 
-  const windowsState = useWindowsValidationFormState(selectedTestSuites, cluster);
+  const windowsState = useWindowsValidationFormState(selectedTestSuites);
+  const [pipelinesInstalled, pipelinesLoaded] = useIsOpenShiftPipelinesInstalled();
 
   const defaultPvcSize = useMemo(
     () => calculatePVCStorageSize(selectedTestSuites),
@@ -173,18 +175,15 @@ const CheckupsSelfValidationForm = () => {
               </FormGroup>
               <Stack hasGutter>
                 <WindowsValidationSettings
-                  acceptWindowsEula={windowsState.acceptWindowsEula}
-                  dataSourceOptions={windowsState.dataSourceOptions}
-                  dataSourcesError={windowsState.dataSourcesError}
-                  dataSourcesLoaded={windowsState.dataSourcesLoaded}
                   isEulaConfirmed={windowsState.isEulaConfirmed}
                   isTier2Selected={windowsState.isTier2Selected}
-                  setAcceptWindowsEula={windowsState.handleAcceptWindowsEulaChange}
+                  pipelinesInstalled={pipelinesInstalled}
+                  pipelinesLoaded={pipelinesLoaded}
                   setIsEulaConfirmed={windowsState.setIsEulaConfirmed}
                   setWinImageDownloadUrl={windowsState.setWinImageDownloadUrl}
-                  setWinImageName={windowsState.setWinImageName}
+                  setWindowsServerTesting={windowsState.setWindowsServerTesting}
                   winImageDownloadUrl={windowsState.winImageDownloadUrl}
-                  winImageName={windowsState.winImageName}
+                  windowsServerTesting={windowsState.windowsServerTesting}
                 />
               </Stack>
               <AdvancedSettings
@@ -206,7 +205,6 @@ const CheckupsSelfValidationForm = () => {
               />
 
               <CheckupsSelfValidationFormActions
-                acceptWindowsEula={windowsState.acceptWindowsEula}
                 checkupImage={checkupImage}
                 isDryRun={isDryRun}
                 isEulaConfirmed={windowsState.isEulaConfirmed}
@@ -217,7 +215,7 @@ const CheckupsSelfValidationForm = () => {
                 storageClass={effectiveStorageClass}
                 testSkips={testSkips}
                 winImageDownloadUrl={windowsState.winImageDownloadUrl}
-                winImageName={windowsState.winImageName}
+                windowsServerTesting={windowsState.windowsServerTesting}
               />
             </FormSection>
           </Form>

@@ -1,60 +1,70 @@
 import React, { FC } from 'react';
+import { Trans } from 'react-i18next';
+
+import { HelperText, HelperTextItem, Stack, StackItem } from '@patternfly/react-core';
+
+import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+
+import { WINDOWS_GOLDEN_IMAGE_MANIFEST_URL } from '../../utils/constants';
 
 import WindowsDownloadUrlField from './components/WindowsDownloadUrlField';
 import WindowsEulaCheckbox from './components/WindowsEulaCheckbox';
-import WindowsImageNameField from './components/WindowsImageNameField';
 import WindowsTestingSwitch from './components/WindowsTestingSwitch';
+import WindowsImageCreationInfoAlert from './components/windowsValidationAlerts/WindowsImageCreationInfoAlert';
+import WindowsPipelinesMissingAlert from './components/windowsValidationAlerts/WindowsPipelinesMissingAlert';
 import { WindowsValidationSettingsProps } from './types';
-import { isDownloadUrlDisabled, shouldShowDownloadUrlTooltip } from './utils';
 
 const WindowsValidationSettings: FC<WindowsValidationSettingsProps> = ({
-  acceptWindowsEula,
-  dataSourceOptions,
-  dataSourcesError,
-  dataSourcesLoaded,
   isEulaConfirmed,
   isTier2Selected,
-  setAcceptWindowsEula,
+  pipelinesInstalled,
+  pipelinesLoaded,
   setIsEulaConfirmed,
   setWinImageDownloadUrl,
-  setWinImageName,
+  setWindowsServerTesting,
   winImageDownloadUrl,
-  winImageName,
+  windowsServerTesting,
 }) => {
-  const downloadUrlDisabled = isDownloadUrlDisabled(winImageName, dataSourceOptions);
-  const showDownloadUrlTooltip = shouldShowDownloadUrlTooltip(
-    winImageName,
-    winImageDownloadUrl,
-    dataSourceOptions,
-  );
+  const { t } = useKubevirtTranslation();
+  const pipelinesMissing = pipelinesLoaded && !pipelinesInstalled;
 
   return (
     <>
       <WindowsTestingSwitch
-        acceptWindowsEula={acceptWindowsEula}
         isTier2Selected={isTier2Selected}
-        setAcceptWindowsEula={setAcceptWindowsEula}
+        setWindowsServerTesting={setWindowsServerTesting}
+        windowsServerTesting={windowsServerTesting}
       />
-      {acceptWindowsEula && (
-        <div aria-live="polite">
-          <WindowsEulaCheckbox
-            isEulaConfirmed={isEulaConfirmed}
-            setIsEulaConfirmed={setIsEulaConfirmed}
-          />
-          <WindowsDownloadUrlField
-            isDownloadUrlDisabled={downloadUrlDisabled}
-            setWinImageDownloadUrl={setWinImageDownloadUrl}
-            showDownloadUrlTooltip={showDownloadUrlTooltip}
-            winImageDownloadUrl={winImageDownloadUrl}
-          />
-          <WindowsImageNameField
-            dataSourceOptions={dataSourceOptions}
-            dataSourcesError={dataSourcesError}
-            dataSourcesLoaded={dataSourcesLoaded}
-            setWinImageName={setWinImageName}
-            winImageName={winImageName}
-          />
-        </div>
+      {windowsServerTesting && (
+        <StackItem>
+          <Stack hasGutter>
+            <WindowsEulaCheckbox
+              isEulaConfirmed={isEulaConfirmed}
+              setIsEulaConfirmed={setIsEulaConfirmed}
+            />
+            {pipelinesMissing && <WindowsPipelinesMissingAlert />}
+            <StackItem className="pf-v6-u-pl-lg">
+              <WindowsDownloadUrlField
+                setWinImageDownloadUrl={setWinImageDownloadUrl}
+                winImageDownloadUrl={winImageDownloadUrl}
+              />
+            </StackItem>
+            <WindowsImageCreationInfoAlert pipelinesMissing={pipelinesMissing} />
+            <StackItem className="pf-v6-u-pl-lg">
+              <HelperText>
+                <HelperTextItem>
+                  <Trans ns="plugin__kubevirt-plugin" t={t}>
+                    Already have a Windows image? Apply the{' '}
+                    <ExternalLink href={WINDOWS_GOLDEN_IMAGE_MANIFEST_URL}>
+                      golden-image.yaml manifest before running.
+                    </ExternalLink>
+                  </Trans>
+                </HelperTextItem>
+              </HelperText>
+            </StackItem>
+          </Stack>
+        </StackItem>
       )}
     </>
   );

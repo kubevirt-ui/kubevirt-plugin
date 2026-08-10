@@ -1,0 +1,29 @@
+.windows-image-creation-info-alert {
+  &__secondary {
+    display: flex;
+    align-items: flex-start;
+    // Pull into the Alert icon column so the secondary icon aligns with the status icon.
+    margin-block-start: var(--pf-t--global--spacer--md);
+    margin-inline-start: calc(
+      -1 *
+        (
+          var(--pf-t--global--icon--size--md) +
+            var(--pf-t--global--spacer--gap--text-to-element--default)
+        )
+    );
+    column-gap: var(--pf-t--global--spacer--gap--text-to-element--default);
+  }
+
+  &__secondary-icon {
+    flex-shrink: 0;
+    margin-block-start: var(--pf-t--global--spacer--xs);
+    font-size: var(--pf-t--global--icon--size--md);
+    color: var(--pf-t--global--icon--color--status--info--default);
+    // Match .pf-v6-c-alert__icon visual size
+    scale: 1.14;
+  }
+
+  &__secondary-title {
+    font-weight: var(--pf-t--global--font--weight--body--bold);
+  }
+}
