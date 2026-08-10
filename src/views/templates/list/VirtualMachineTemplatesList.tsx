@@ -2,8 +2,8 @@ import React, { type FC } from 'react';
 
 import GuidedTour from '@kubevirt-utils/components/GuidedTour/GuidedTour';
 import { runningTourSignal } from '@kubevirt-utils/components/GuidedTour/utils/guidedTourSignals';
+import KubevirtFilterToolbar from '@kubevirt-utils/components/KubevirtFilterToolbar/KubevirtFilterToolbar';
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
-import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
 import TemplatesFilter from '@kubevirt-utils/components/TemplatesFilter/TemplatesFilter';
 import { TemplatesFilterVariant } from '@kubevirt-utils/components/TemplatesFilter/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -34,7 +34,6 @@ const VirtualMachineTemplatesList: FC<ListPageProps> = ({
   hideColumnManagement,
   hideNameLabelFilters,
   hideTextFilter,
-  nameFilter,
   selector,
   showTitle = true,
 }) => {
@@ -52,8 +51,14 @@ const VirtualMachineTemplatesList: FC<ListPageProps> = ({
     selector,
   });
 
-  const { filteredData, filtersWithSelect, onFilterChange, toolbarFilters, unfilteredData } =
-    useVirtualMachineTemplatesListFilters(allTemplates, allTemplatesWithRequests, nameFilter);
+  const {
+    clearAllFilters,
+    filterDefinitions,
+    filteredData,
+    filters,
+    onSetFilters,
+    toolbarFilterDefinitions,
+  } = useVirtualMachineTemplatesListFilters(allTemplates, allTemplatesWithRequests);
 
   const { activeColumnKeys, columnLayout, columns, loadedColumns } =
     useVirtualMachineTemplatesListColumns(namespaceParam, isAllClustersPage);
@@ -77,23 +82,24 @@ const VirtualMachineTemplatesList: FC<ListPageProps> = ({
       </ListPageHeader>
       <ListPageBody>
         <div className="list-managment-group">
-          <ListPageFilter
+          <KubevirtFilterToolbar
+            clearAllFilters={clearAllFilters}
             columnLayout={columnLayout}
-            customRowFiltersMenu={
+            customFilterMenu={
               <TemplatesFilter
-                onFilterChange={onFilterChange}
-                rowFilters={toolbarFilters}
+                filterDefinitions={filterDefinitions}
+                filters={filters}
+                onSetFilters={onSetFilters}
                 variant={TemplatesFilterVariant.Menu}
               />
             }
-            data={unfilteredData}
-            filtersWithSelect={filtersWithSelect}
+            data={allTemplatesWithRequests}
+            filterDefinitions={toolbarFilterDefinitions}
+            filters={filters}
             hideColumnManagement={hideColumnManagement}
-            hideLabelFilter={hideTextFilter}
-            hideNameLabelFilters={hideNameLabelFilters}
+            hideLabelFilter={hideTextFilter || hideNameLabelFilters}
             loaded={loadedColumns}
-            onFilterChange={onFilterChange}
-            rowFilters={toolbarFilters}
+            onSetFilters={onSetFilters}
             toolbarEndContent={
               <KubevirtTableExport
                 activeColumnKeys={activeColumnKeys}
@@ -107,7 +113,7 @@ const VirtualMachineTemplatesList: FC<ListPageProps> = ({
             }
             toolbarStartContent={
               <ToolbarItem>
-                <TemplatesTypeToggle onFilterChange={onFilterChange} />
+                <TemplatesTypeToggle filters={filters} onSetFilters={onSetFilters} />
               </ToolbarItem>
             }
           />

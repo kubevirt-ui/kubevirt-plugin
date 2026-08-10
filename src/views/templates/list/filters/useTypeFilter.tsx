@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 
-import { ExtendedRowFilterItem } from '@kubevirt-utils/components/ListPageFilter/types';
+import { KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useIsVMTemplateFeatureEnabled from '@kubevirt-utils/hooks/useVMTemplateFeatureFlag/useIsVMTemplateFeatureEnabled';
 import { isOpenShiftTemplate, TemplateOrRequest } from '@kubevirt-utils/resources/template';
@@ -8,8 +8,7 @@ import {
   TemplateModelGroupVersionKind,
   VirtualMachineTemplateGroupVersionKind,
 } from '@kubevirt-utils/resources/template/hooks/constants';
-import { includeFilter } from '@kubevirt-utils/utils/utils';
-import { ResourceIcon, RowFilter } from '@openshift-console/dynamic-plugin-sdk';
+import { ResourceIcon } from '@openshift-console/dynamic-plugin-sdk';
 
 import { TEMPLATE_TYPE_ID } from './constants';
 import { TemplateFilterType } from './types';
@@ -21,7 +20,7 @@ const getTemplateType = (obj: TemplateOrRequest): string => {
   return TEMPLATE_TYPE_ID.VM;
 };
 
-const useTypeFilter = (): null | RowFilter<TemplateOrRequest> => {
+const useTypeFilter = (): KubevirtFilter<TemplateOrRequest> | null => {
   const { t } = useKubevirtTranslation();
   const { featureEnabled: vmTemplatesEnabled } = useIsVMTemplateFeatureEnabled();
 
@@ -31,35 +30,30 @@ const useTypeFilter = (): null | RowFilter<TemplateOrRequest> => {
     const openShiftTemplateTitle = t('OpenShift templates');
     const virtualMachineTemplateTitle = t('VirtualMachine templates');
 
-    const typeFilterItems: ExtendedRowFilterItem[] = [
-      {
-        content: (
-          <>
-            <ResourceIcon groupVersionKind={TemplateModelGroupVersionKind} />
-            {openShiftTemplateTitle}
-          </>
-        ),
-        id: TEMPLATE_TYPE_ID.OPENSHIFT,
-        title: openShiftTemplateTitle,
-      },
-      {
-        content: (
-          <>
-            <ResourceIcon groupVersionKind={VirtualMachineTemplateGroupVersionKind} />
-            {virtualMachineTemplateTitle}
-          </>
-        ),
-        id: TEMPLATE_TYPE_ID.VM,
-        title: virtualMachineTemplateTitle,
-      },
-    ];
-
     return {
-      filter: (types, obj) => includeFilter(types, typeFilterItems, getTemplateType(obj)),
-      filterGroupName: t('Type'),
-      items: typeFilterItems,
-      reducer: (obj) => getTemplateType(obj),
-      type: TemplateFilterType.Type,
+      categoryLabel: t('Type'),
+      id: TemplateFilterType.Type,
+      match: (obj, selected) => selected.includes(getTemplateType(obj)),
+      options: [
+        {
+          label: (
+            <>
+              <ResourceIcon groupVersionKind={TemplateModelGroupVersionKind} />
+              {openShiftTemplateTitle}
+            </>
+          ),
+          value: TEMPLATE_TYPE_ID.OPENSHIFT,
+        },
+        {
+          label: (
+            <>
+              <ResourceIcon groupVersionKind={VirtualMachineTemplateGroupVersionKind} />
+              {virtualMachineTemplateTitle}
+            </>
+          ),
+          value: TEMPLATE_TYPE_ID.VM,
+        },
+      ],
     };
   }, [vmTemplatesEnabled, t]);
 };

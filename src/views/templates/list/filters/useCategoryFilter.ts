@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 
+import { KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   getAvailableTemplateCategories,
@@ -8,47 +9,38 @@ import {
   type Template,
   type TemplateOrRequest,
 } from '@kubevirt-utils/resources/template';
-import { includeFilter, isEmpty } from '@kubevirt-utils/utils/utils';
-import { type RowFilter, type RowFilterItem } from '@openshift-console/dynamic-plugin-sdk';
 
 import { TemplateFilterType } from './types';
 
 export const TEMPLATE_CATEGORY_FILTER_ALL = 'all';
 
-const useCategoryFilter = (templates: Template[]): RowFilter<TemplateOrRequest> => {
+const useCategoryFilter = (templates: Template[]): KubevirtFilter<TemplateOrRequest> => {
   const { t } = useKubevirtTranslation();
 
-  const items: RowFilterItem[] = useMemo(
+  const options = useMemo(
     () =>
       getAvailableTemplateCategories(templates)
         .map((category) => ({
-          id: category,
-          title: category,
+          label: category,
+          value: category,
         }))
-        .sort((a, b) => a.title.localeCompare(b.title)),
+        .sort((a, b) => a.label.localeCompare(b.label)),
     [templates],
   );
 
   return useMemo(
     () => ({
-      filter: (selectedCategories, obj): boolean => {
-        if (isEmpty(selectedCategories.selected)) {
-          return true;
-        }
-
+      categoryLabel: t('Category'),
+      id: TemplateFilterType.Category,
+      match: (obj, selected): boolean => {
         if (!isVirtualMachineTemplate(obj)) {
           return false;
         }
-
-        return includeFilter(selectedCategories, items, getTemplateCategory(obj) ?? '');
+        return selected.includes(getTemplateCategory(obj) ?? '');
       },
-      filterGroupName: t('Category'),
-      items,
-      reducer: (obj): string =>
-        isVirtualMachineTemplate(obj) ? (getTemplateCategory(obj) ?? '') : '',
-      type: TemplateFilterType.Category,
+      options,
     }),
-    [items, t],
+    [options, t],
   );
 };
 

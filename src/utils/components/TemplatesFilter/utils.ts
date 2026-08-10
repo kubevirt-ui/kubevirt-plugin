@@ -1,15 +1,16 @@
-import { type UniversalFilter } from '@kubevirt-utils/hooks/useUniversalFilter/useUniversalFilter';
+import { KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { type TemplateOrRequest } from '@kubevirt-utils/resources/template';
-import { type RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 import { TEMPLATE_TYPE_ID } from '@templates/list/filters/constants';
 import { TemplateFilterType } from '@templates/list/filters/types';
 
+import { type UniversalFilter } from '../../hooks/useUniversalFilter/useUniversalFilter';
+
 type SplitTemplateFilters = {
-  categoryFilter: RowFilter<TemplateOrRequest> | undefined;
-  commonFilters: RowFilter<TemplateOrRequest>[];
-  openShiftTemplatesOnlyFilters: RowFilter<TemplateOrRequest>[];
-  scopeFilter: RowFilter<TemplateOrRequest> | undefined;
-  typeFilter: RowFilter<TemplateOrRequest> | undefined;
+  categoryFilter: KubevirtFilter<TemplateOrRequest> | undefined;
+  commonFilters: KubevirtFilter<TemplateOrRequest>[];
+  openShiftTemplatesOnlyFilters: KubevirtFilter<TemplateOrRequest>[];
+  scopeFilter: KubevirtFilter<TemplateOrRequest> | undefined;
+  typeFilter: KubevirtFilter<TemplateOrRequest> | undefined;
 };
 
 export type TemplateTypeSelectionState = {
@@ -24,10 +25,6 @@ export type TemplateTypeSelectionState = {
 /**
  * Derives Type checkbox selection and which filter sections to show.
  * Missing Type in the query means both kinds are selected (All).
- * @param root0
- * @param root0.hasQueryKey
- * @param root0.isSelected
- * @param root0.vmTemplatesEnabled
  */
 export const getTemplateTypeSelectionStateFromFilter = ({
   hasQueryKey,
@@ -52,22 +49,24 @@ export const getTemplateTypeSelectionStateFromFilter = ({
   };
 };
 
-const splitTemplateFilters = (rowFilters: RowFilter<TemplateOrRequest>[]): SplitTemplateFilters => {
-  const getRowFilter = (type: TemplateFilterType): RowFilter<TemplateOrRequest> | undefined =>
-    rowFilters.find((filter) => filter.type === type);
+const splitTemplateFilters = (
+  filterDefinitions: KubevirtFilter<TemplateOrRequest>[],
+): SplitTemplateFilters => {
+  const getFilter = (filterId: TemplateFilterType): KubevirtFilter<TemplateOrRequest> | undefined =>
+    filterDefinitions.find((filter) => filter.id === filterId);
 
-  const typeFilter = getRowFilter(TemplateFilterType.Type);
+  const typeFilter = getFilter(TemplateFilterType.Type);
   // Architecture + OS apply to both template kinds; Provider is OpenShift-only.
   const commonFilters = [TemplateFilterType.Architecture, TemplateFilterType.OSName]
-    .map(getRowFilter)
+    .map(getFilter)
     .filter(Boolean);
 
   const openShiftTemplatesOnlyFilters = [TemplateFilterType.Provider]
-    .map(getRowFilter)
+    .map(getFilter)
     .filter(Boolean);
 
-  const scopeFilter = getRowFilter(TemplateFilterType.TemplateScope);
-  const categoryFilter = getRowFilter(TemplateFilterType.Category);
+  const scopeFilter = getFilter(TemplateFilterType.TemplateScope);
+  const categoryFilter = getFilter(TemplateFilterType.Category);
 
   return {
     categoryFilter,

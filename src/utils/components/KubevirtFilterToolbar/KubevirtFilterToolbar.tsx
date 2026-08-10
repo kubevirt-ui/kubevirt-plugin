@@ -24,6 +24,8 @@ import TextSearchFilters from './components/TextSearchFilters';
 type KubevirtFilterToolbarProps = {
   clearAllFilters: () => void;
   columnLayout?: ColumnLayout;
+  /** Replaces the default checkbox content inside the Filter dropdown */
+  customFilterMenu?: ReactNode;
   data?: FilterableObject[];
   filterDefinitions?: KubevirtFilter[];
   filters: KubevirtFilterState;
@@ -32,11 +34,13 @@ type KubevirtFilterToolbarProps = {
   loaded?: boolean;
   onSetFilters: OnSetFilters;
   toolbarEndContent?: ReactNode;
+  toolbarStartContent?: ReactNode;
 };
 
 const KubevirtFilterToolbar: FC<KubevirtFilterToolbarProps> = ({
   clearAllFilters,
   columnLayout,
+  customFilterMenu,
   data,
   filterDefinitions = EMPTY_FILTERS,
   filters,
@@ -45,6 +49,7 @@ const KubevirtFilterToolbar: FC<KubevirtFilterToolbarProps> = ({
   loaded,
   onSetFilters,
   toolbarEndContent,
+  toolbarStartContent,
 }) => {
   const { t } = useKubevirtTranslation();
 
@@ -65,7 +70,7 @@ const KubevirtFilterToolbar: FC<KubevirtFilterToolbarProps> = ({
     () => filterDefinitions.filter((f) => f.filterLayout === KubevirtFilterLayout.HIDDEN),
     [filterDefinitions],
   );
-  const [searchInputText, setSearchInputText] = useState('');
+  const [searchInputText, setSearchInputText] = useState(filters.name[0] ?? '');
 
   if (!loaded) return null;
 
@@ -80,9 +85,11 @@ const KubevirtFilterToolbar: FC<KubevirtFilterToolbarProps> = ({
       id="filter-toolbar"
     >
       <ToolbarContent>
+        {toolbarStartContent}
         <ToolbarToggleGroup breakpoint="md" toggleIcon={<FilterIcon />}>
-          {!isEmpty(groupedFilters) && (
+          {(customFilterMenu || !isEmpty(groupedFilters)) && (
             <GroupedFilterDropdown
+              customMenu={customFilterMenu}
               data={data}
               filters={filters}
               groupedFilters={groupedFilters}

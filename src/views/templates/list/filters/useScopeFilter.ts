@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 
+import { KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   isCommonTemplate,
@@ -7,8 +8,6 @@ import {
   isOpenShiftTemplate,
   TemplateOrRequest,
 } from '@kubevirt-utils/resources/template';
-import { includeFilter } from '@kubevirt-utils/utils/utils';
-import { RowFilter, RowFilterItem } from '@openshift-console/dynamic-plugin-sdk';
 
 import { TemplateFilterType } from './types';
 
@@ -25,27 +24,21 @@ const getTemplateScope = (obj: TemplateOrRequest): string => {
   return TEMPLATE_SCOPE_ID.ALL;
 };
 
-const useScopeFilter = (): RowFilter<TemplateOrRequest> => {
+const useScopeFilter = (): KubevirtFilter<TemplateOrRequest> => {
   const { t } = useKubevirtTranslation();
-
-  const items: RowFilterItem[] = useMemo(
-    () => [
-      { id: TEMPLATE_SCOPE_ID.DEFAULT, title: t('Default templates') },
-      { id: TEMPLATE_SCOPE_ID.USER, title: t('User templates') },
-    ],
-    [t],
-  );
 
   return useMemo(
     () => ({
-      filter: (input, obj) =>
-        !isOpenShiftTemplate(obj) || includeFilter(input, items, getTemplateScope(obj)),
-      filterGroupName: t('Template scope'),
-      items,
-      reducer: (obj) => getTemplateScope(obj),
-      type: TemplateFilterType.TemplateScope,
+      categoryLabel: t('Template scope'),
+      id: TemplateFilterType.TemplateScope,
+      match: (obj, selected) =>
+        !isOpenShiftTemplate(obj) || selected.includes(getTemplateScope(obj)),
+      options: [
+        { label: t('Default templates'), value: TEMPLATE_SCOPE_ID.DEFAULT },
+        { label: t('User templates'), value: TEMPLATE_SCOPE_ID.USER },
+      ],
     }),
-    [items, t],
+    [t],
   );
 };
 

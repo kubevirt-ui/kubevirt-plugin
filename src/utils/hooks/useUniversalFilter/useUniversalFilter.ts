@@ -1,62 +1,63 @@
 import { useCallback } from 'react';
+import { useSearchParams } from 'react-router';
 import { useDebounceCallback } from 'src/views/clusteroverview/utils/hooks/useDebounceCallback';
 
-import { useApplyFiltersWithQuery } from '@kubevirt-utils/components/ListPageFilter/hooks/useApplyFiltersWithQuery';
-import { type OnFilterChange } from '@openshift-console/dynamic-plugin-sdk';
-import { getRowFilterQueryKey } from '@search/utils/query';
-
-import useQuery from '../useQuery';
-
-type UniversalFilterProps = {
-  onFilterChange: OnFilterChange;
-};
+import {
+  KubevirtFilterState,
+  OnSetFilters,
+} from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 
 export type UniversalFilter = {
-  hasQueryKey: (queryKey: string) => boolean;
-  isSelected: (queryKey: string, value: string) => boolean;
-  onSelect: (queryKey: string, value: string) => void;
-  queryParams: URLSearchParams;
-  setValue: (queryKey: string, value?: string | string[]) => void;
-  setValueWithDebounce: (queryKey: string, value?: string | string[]) => void;
+  hasQueryKey: (filterId: string) => boolean;
+  isSelected: (filterId: string, value: string) => boolean;
+  onSelect: (filterId: string, value: string) => void;
+  setValue: (filterId: string, value?: null | string | string[]) => void;
+  setValueWithDebounce: (filterId: string, value?: null | string | string[]) => void;
 };
 
-type UseUniversalFilter = (props: UniversalFilterProps) => UniversalFilter;
+type UseUniversalFilterProps = {
+  filters: KubevirtFilterState;
+  onSetFilters: OnSetFilters;
+};
 
-const useUniversalFilter: UseUniversalFilter = ({ onFilterChange }) => {
-  const queryParams = useQuery();
-  const applyFiltersWithQuery = useApplyFiltersWithQuery(onFilterChange);
+const useUniversalFilter = ({
+  filters,
+  onSetFilters,
+}: UseUniversalFilterProps): UniversalFilter => {
+  const [searchParams] = useSearchParams();
 
-  const getSelectedValues = useCallback(
-    (queryKey: string) => queryParams.get(getRowFilterQueryKey(queryKey))?.split(',') ?? [],
-    [queryParams],
+  const hasQueryKey = useCallback(
+    (filterId: string) => searchParams.has(filterId) || !isEmpty(filters[filterId]),
+    [searchParams, filters],
   );
 
   const isSelected = useCallback(
-    (queryKey: string, value: string) => getSelectedValues(queryKey).includes(value),
-    [getSelectedValues],
-  );
-
-  const hasQueryKey = useCallback(
-    (queryKey: string) => queryParams.has(getRowFilterQueryKey(queryKey)),
-    [queryParams],
+    (filterId: string, value: string) => filters[filterId]?.includes(value) ?? false,
+    [filters],
   );
 
   const onSelect = useCallback(
-    (queryKey: string, value: string) => {
-      const selectedValues = getSelectedValues(queryKey);
-      applyFiltersWithQuery(
-        queryKey,
-        selectedValues.includes(value)
-          ? selectedValues.filter((selectedValue) => selectedValue !== value)
-          : [...selectedValues, value],
-      );
+    (filterId: string, value: string) => {
+      const current = filters[filterId] ?? [];
+      const nextValues = current.includes(value)
+        ? current.filter((v) => v !== value)
+        : [...current, value];
+      onSetFilters({ [filterId]: nextValues });
     },
-    [getSelectedValues, applyFiltersWithQuery],
+    [filters, onSetFilters],
   );
 
   const setValue = useCallback(
-    (queryKey: string, value?: string | string[]) => applyFiltersWithQuery(queryKey, value),
-    [applyFiltersWithQuery],
+    (filterId: string, value?: null | string | string[]) => {
+      if (value === null || value === undefined) {
+        onSetFilters({ [filterId]: [] });
+        return;
+      }
+      const values = Array.isArray(value) ? value : [value];
+      onSetFilters({ [filterId]: values });
+    },
+    [onSetFilters],
   );
 
   const setValueWithDebounce = useDebounceCallback(setValue, 250);
@@ -65,7 +66,6 @@ const useUniversalFilter: UseUniversalFilter = ({ onFilterChange }) => {
     hasQueryKey,
     isSelected,
     onSelect,
-    queryParams,
     setValue,
     setValueWithDebounce,
   };
