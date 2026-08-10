@@ -24,7 +24,6 @@ import {
   JOB_ENV_TEST_SUITES,
   JOB_ENV_TIMESTAMP,
   JOB_ENV_WIN_IMAGE_DOWNLOAD_URL,
-  JOB_ENV_WIN_IMAGE_NAME,
   JOB_RESULTS_DIR_PATH,
   JOB_VOLUME_RESULTS,
   SELF_VALIDATION_ACCEPT_WINDOWS_EULA_KEY,
@@ -39,7 +38,6 @@ import {
   SELF_VALIDATION_TEST_SKIPS_KEY,
   SELF_VALIDATION_TEST_SUITES_KEY,
   SELF_VALIDATION_WIN_IMAGE_DOWNLOAD_URL_KEY,
-  SELF_VALIDATION_WIN_IMAGE_NAME_KEY,
   TEST_SUITE_TIER2,
 } from '../constants';
 
@@ -83,7 +81,6 @@ export type SelfValidationJobOptions = {
   testSkips?: string;
   timestamp?: string;
   winImageDownloadUrl?: string;
-  winImageName?: string;
 };
 
 /**
@@ -147,7 +144,6 @@ type SelfValidationConfigMapOptions = {
   storageClass?: string;
   testSkips?: string;
   winImageDownloadUrl?: string;
-  winImageName?: string;
 };
 
 const selfValidationConfigMap = ({
@@ -162,7 +158,6 @@ const selfValidationConfigMap = ({
   storageClass,
   testSkips,
   winImageDownloadUrl,
-  winImageName,
 }: SelfValidationConfigMapOptions): IoK8sApiCoreV1ConfigMap => ({
   apiVersion: 'v1',
   data: {
@@ -184,8 +179,6 @@ const selfValidationConfigMap = ({
       winImageDownloadUrl && {
         [SELF_VALIDATION_WIN_IMAGE_DOWNLOAD_URL_KEY]: winImageDownloadUrl,
       }),
-    ...(acceptWindowsEula &&
-      winImageName && { [SELF_VALIDATION_WIN_IMAGE_NAME_KEY]: winImageName }),
   },
   kind: 'ConfigMap',
   metadata: {
@@ -210,7 +203,6 @@ export const selfValidationJob = ({
   testSkips,
   timestamp,
   winImageDownloadUrl,
-  winImageName,
 }: SelfValidationJobOptions): IoK8sApiBatchV1Job => {
   const jobName = jobNameOverride || generateWithNumbers(name);
   // ConfigMap name logic:
@@ -226,9 +218,6 @@ export const selfValidationJob = ({
       : []),
     ...(acceptWindowsEula && winImageDownloadUrl
       ? [{ name: JOB_ENV_WIN_IMAGE_DOWNLOAD_URL, value: winImageDownloadUrl }]
-      : []),
-    ...(acceptWindowsEula && winImageName
-      ? [{ name: JOB_ENV_WIN_IMAGE_NAME, value: winImageName }]
       : []),
     { name: JOB_ENV_TEST_SUITES, value: selectedTestSuites.join(',') },
     { name: JOB_ENV_TEST_SKIPS, value: testSkips || '' },

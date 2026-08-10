@@ -22,10 +22,9 @@ import useCheckupsSelfValidationPermissions from '../hooks/useCheckupsSelfValida
 import HeavyLoadCheckupConfirmationModal from './HeavyLoadCheckupConfirmationModal';
 import RunButtonWithTooltip from './RunButtonWithTooltip';
 import { CheckupsSelfValidationFormActionsProps } from './types';
-import { resolveWinImageName } from './utils';
+import { isValidWinImageDownloadUrl } from './utils';
 
 const CheckupsSelfValidationFormActions: FC<CheckupsSelfValidationFormActionsProps> = ({
-  acceptWindowsEula,
   checkupImage,
   isDryRun,
   isEulaConfirmed,
@@ -36,7 +35,7 @@ const CheckupsSelfValidationFormActions: FC<CheckupsSelfValidationFormActionsPro
   storageClass,
   testSkips,
   winImageDownloadUrl,
-  winImageName,
+  windowsServerTesting,
 }) => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
@@ -68,9 +67,8 @@ const CheckupsSelfValidationFormActions: FC<CheckupsSelfValidationFormActionsPro
     [selfValidationActionState],
   );
 
-  const resolvedWinImageName = resolveWinImageName(winImageName);
-
-  const eulaPendingConfirmation = acceptWindowsEula && !isEulaConfirmed;
+  const eulaPendingConfirmation = windowsServerTesting && !isEulaConfirmed;
+  const trimmedWinImageDownloadUrl = winImageDownloadUrl?.trim();
   const isFormValid = name && checkupImage && selectedTestSuites.length > 0;
   const isSubmitDisabled =
     isSubmitting ||
@@ -87,11 +85,22 @@ const CheckupsSelfValidationFormActions: FC<CheckupsSelfValidationFormActionsPro
   const showTooltip = eulaPendingConfirmation || showRunningCheckupTooltip;
 
   const executeRun = async () => {
+    if (
+      windowsServerTesting &&
+      trimmedWinImageDownloadUrl &&
+      !isValidWinImageDownloadUrl(trimmedWinImageDownloadUrl)
+    ) {
+      setError(
+        t('Enter a valid http or https URL, or leave empty to use the default Windows ISO.'),
+      );
+      return;
+    }
+
     setError(null);
     setIsSubmitting(true);
     try {
       await createSelfValidationCheckup({
-        acceptWindowsEula,
+        acceptWindowsEula: windowsServerTesting,
         checkupImage,
         cluster,
         isDryRun,
@@ -104,8 +113,10 @@ const CheckupsSelfValidationFormActions: FC<CheckupsSelfValidationFormActionsPro
         storageCapabilities,
         storageClass,
         testSkips,
-        ...(acceptWindowsEula && winImageDownloadUrl && { winImageDownloadUrl }),
-        ...(acceptWindowsEula && resolvedWinImageName && { winImageName: resolvedWinImageName }),
+        ...(windowsServerTesting &&
+          trimmedWinImageDownloadUrl && {
+            winImageDownloadUrl: trimmedWinImageDownloadUrl,
+          }),
       });
       navigate(getSelfValidationCheckupURL(name, namespace, cluster));
     } catch (e) {

@@ -7,12 +7,14 @@ import {
   IoK8sApiBatchV1Job,
   IoK8sApiCoreV1ConfigMap,
 } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { getName, getUID } from '@kubevirt-utils/resources/shared';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sCreate, kubevirtK8sDelete, kubevirtK8sPatch } from '@multicluster/k8sRequests';
 
 import { STATUS_COMPLETION_TIME_STAMP, STATUS_START_TIME_STAMP } from '../../../utils/utils';
 import {
+  LEGACY_WIN_IMAGE_NAME_KEY,
   SELF_VALIDATION_ACCEPT_WINDOWS_EULA_KEY,
   SELF_VALIDATION_CHECKUP_IMAGE_KEY,
   SELF_VALIDATION_DRY_RUN_KEY,
@@ -22,7 +24,6 @@ import {
   SELF_VALIDATION_TEST_SKIPS_KEY,
   SELF_VALIDATION_TEST_SUITES_KEY,
   SELF_VALIDATION_WIN_IMAGE_DOWNLOAD_URL_KEY,
-  SELF_VALIDATION_WIN_IMAGE_NAME_KEY,
 } from '../constants';
 import { getResultsConfigMapName } from '../selfValidationResults';
 
@@ -48,7 +49,6 @@ export type CreateSelfValidationCheckupOptions = {
   storageClass?: string;
   testSkips?: string;
   winImageDownloadUrl?: string;
-  winImageName?: string;
 };
 
 /**
@@ -101,7 +101,8 @@ const createJobWithPVC = async (
   }
 
   // Best-effort: add owner reference so PVC is GC'd with the Job
-  if (job.metadata?.uid) {
+  const jobUid = getUID(job);
+  if (jobUid) {
     await addOwnerReference(
       PersistentVolumeClaimModel,
       jobName,
@@ -111,7 +112,7 @@ const createJobWithPVC = async (
         apiVersion: 'batch/v1',
         kind: 'Job',
         name: jobName,
-        uid: job.metadata.uid,
+        uid: jobUid,
       },
       onWarning,
     );
@@ -140,7 +141,6 @@ export const createSelfValidationCheckup = async ({
   storageClass,
   testSkips,
   winImageDownloadUrl,
-  winImageName,
 }: CreateSelfValidationCheckupOptions): Promise<IoK8sApiBatchV1Job> => {
   const jobData = selfValidationJob({
     acceptWindowsEula,
@@ -153,7 +153,6 @@ export const createSelfValidationCheckup = async ({
     storageClass,
     testSkips,
     winImageDownloadUrl,
-    winImageName,
   });
 
   await kubevirtK8sCreate({
@@ -170,7 +169,6 @@ export const createSelfValidationCheckup = async ({
       storageClass,
       testSkips,
       winImageDownloadUrl,
-      winImageName,
     }),
     model: ConfigMapModel,
   });
@@ -252,9 +250,6 @@ export const rerunSelfValidationCheckup = async (
   const winImageDownloadUrl = acceptWindowsEula
     ? configMap?.data?.[SELF_VALIDATION_WIN_IMAGE_DOWNLOAD_URL_KEY]
     : undefined;
-  const winImageName = acceptWindowsEula
-    ? configMap?.data?.[SELF_VALIDATION_WIN_IMAGE_NAME_KEY]
-    : undefined;
 
   if (!imageFromConfigMap) {
     throw new Error('Cannot rerun checkup: no checkup image configured in ConfigMap');
@@ -271,9 +266,9 @@ export const rerunSelfValidationCheckup = async (
   for (const job of runningJobs) {
     try {
       await deleteSelfValidationJob(job);
-      kubevirtConsole.log('Deleted running job:', job.metadata.name);
+      kubevirtConsole.log('Deleted running job:', getName(job));
     } catch (error) {
-      deletionErrors.push(job.metadata.name);
+      deletionErrors.push(getName(job) || 'unknown');
       kubevirtConsole.error('Failed to delete running job:', error);
     }
   }
@@ -288,6 +283,11 @@ export const rerunSelfValidationCheckup = async (
 
   if (configMap?.data?.[STATUS_COMPLETION_TIME_STAMP]) {
     patchOperations.push({ op: 'remove', path: `/data/${STATUS_COMPLETION_TIME_STAMP}` });
+  }
+
+  // Drop legacy key from older ConfigMaps — UI no longer passes WIN_IMAGE_NAME
+  if (configMap?.data?.[LEGACY_WIN_IMAGE_NAME_KEY]) {
+    patchOperations.push({ op: 'remove', path: `/data/${LEGACY_WIN_IMAGE_NAME_KEY}` });
   }
 
   patchOperations.push({
@@ -319,7 +319,6 @@ export const rerunSelfValidationCheckup = async (
     storageClass,
     testSkips,
     winImageDownloadUrl,
-    winImageName,
   });
 
   return createJobWithPVC(jobData, cluster, namespace, pvcSize, storageClass, onWarning);
@@ -342,7 +341,7 @@ export const deleteSelfValidationCheckup = async (
     try {
       await deleteSelfValidationJob(job);
     } catch (error) {
-      const jobName = job.metadata?.name || 'unknown';
+      const jobName = getName(job) || 'unknown';
       kubevirtConsole.error(`Failed to delete job ${jobName}:`, error);
       errors.push(jobName);
     }
@@ -356,7 +355,7 @@ export const deleteSelfValidationCheckup = async (
     });
   } catch (error) {
     kubevirtConsole.error('Failed to delete tracking configmap:', error);
-    errors.push(configMap.metadata?.name || 'configmap');
+    errors.push(getName(configMap) || 'configmap');
   }
 
   if (errors.length > 0) {

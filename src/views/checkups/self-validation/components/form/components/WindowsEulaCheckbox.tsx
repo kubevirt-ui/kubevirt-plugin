@@ -19,7 +19,7 @@ const WindowsEulaCheckbox: FC<WindowsEulaCheckboxProps> = ({
   const { t } = useKubevirtTranslation();
 
   return (
-    <StackItem className="pf-v6-u-pl-lg windows-eula-checkbox">
+    <StackItem className="pf-v6-u-pl-lg">
       <Checkbox
         label={
           <Trans ns="plugin__kubevirt-plugin" t={t}>

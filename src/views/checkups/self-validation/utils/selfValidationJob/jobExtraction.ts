@@ -13,7 +13,6 @@ import {
   JOB_ENV_TEST_SUITES,
   JOB_ENV_TIMESTAMP,
   JOB_ENV_WIN_IMAGE_DOWNLOAD_URL,
-  JOB_ENV_WIN_IMAGE_NAME,
   JOB_VOLUME_RESULTS,
   SELF_VALIDATION_LABEL_VALUE,
 } from '../constants';
@@ -41,9 +40,6 @@ export const getAcceptWindowsEulaFromJob = (job: IoK8sApiBatchV1Job): boolean =>
 
 export const getWinImageDownloadUrlFromJob = (job: IoK8sApiBatchV1Job): string | undefined =>
   getEnvVarFromJob(job, JOB_ENV_WIN_IMAGE_DOWNLOAD_URL);
-
-export const getWinImageNameFromJob = (job: IoK8sApiBatchV1Job): string | undefined =>
-  getEnvVarFromJob(job, JOB_ENV_WIN_IMAGE_NAME);
 
 export const getTimestampFromJob = (job: IoK8sApiBatchV1Job): null | string =>
   getEnvVarFromJob(job, JOB_ENV_TIMESTAMP) ?? null;

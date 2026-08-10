@@ -1,5 +1,4 @@
 import { IoK8sApiStorageV1StorageClass } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
-import { EnhancedSelectOptionProps } from '@kubevirt-utils/components/FilterSelect/utils/types';
 import { SelectProps } from '@patternfly/react-core';
 
 export type AdvancedSettingsProps = {
@@ -21,7 +20,6 @@ export type AdvancedSettingsProps = {
 };
 
 export type CheckupsSelfValidationFormActionsProps = {
-  acceptWindowsEula: boolean;
   checkupImage: string;
   isDryRun: boolean;
   isEulaConfirmed: boolean;
@@ -32,7 +30,7 @@ export type CheckupsSelfValidationFormActionsProps = {
   storageClass?: string;
   testSkips?: string;
   winImageDownloadUrl?: string;
-  winImageName?: string;
+  windowsServerTesting: boolean;
 };
 
 export type HeavyLoadCheckupConfirmationModalProps = {
@@ -52,16 +50,13 @@ export type RunButtonWithTooltipProps = {
 };
 
 export type WindowsValidationSettingsProps = {
-  acceptWindowsEula: boolean;
-  dataSourceOptions: EnhancedSelectOptionProps[];
-  dataSourcesError: boolean;
-  dataSourcesLoaded: boolean;
   isEulaConfirmed: boolean;
   isTier2Selected: boolean;
-  setAcceptWindowsEula: (checked: boolean) => void;
+  pipelinesInstalled: boolean;
+  pipelinesLoaded: boolean;
   setIsEulaConfirmed: (checked: boolean) => void;
   setWinImageDownloadUrl: (url: string) => void;
-  setWinImageName: (name: string) => void;
+  setWindowsServerTesting: (checked: boolean) => void;
   winImageDownloadUrl: string;
-  winImageName: string;
+  windowsServerTesting: boolean;
 };

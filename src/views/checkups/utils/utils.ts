@@ -112,6 +112,29 @@ export enum CheckupsStatus {
   'Running' = 'running',
 }
 
+const FAILED_JOB_CONDITION_TYPES = new Set(['Failed', 'FailureTarget']);
+
+/**
+ * Detects a Job that has terminally failed but whose `status.failed` counter has not been
+ * incremented yet. This happens when the Job controller reaches its backoff limit (condition
+ * `FailureTarget`/`Failed` with status `"True"`) while the failed Pod is still only recorded in
+ * `status.uncountedTerminatedPods.failed` (Pod accounting not yet finalized, e.g. Pod stuck with
+ * the `batch.kubernetes.io/job-tracking` finalizer).
+ */
+export const isJobFailedCondition = (job?: IoK8sApiBatchV1Job): boolean => {
+  const status = job?.status;
+  if (!status) return false;
+
+  const hasFailedCondition = status.conditions?.some(
+    (condition) => FAILED_JOB_CONDITION_TYPES.has(condition.type) && condition.status === 'True',
+  );
+  if (hasFailedCondition) return true;
+
+  const hasUncountedFailedPods = (status.uncountedTerminatedPods?.failed?.length ?? 0) > 0;
+  const isStillActive = Boolean(status.active && status.active > 0);
+  return hasUncountedFailedPods && !isStillActive;
+};
+
 export const getJobStatus = (job?: IoK8sApiBatchV1Job): CheckupsStatus => {
   if (!job) return CheckupsStatus.Pending;
 
@@ -120,6 +143,7 @@ export const getJobStatus = (job?: IoK8sApiBatchV1Job): CheckupsStatus => {
 
   if (status.succeeded && status.succeeded > 0) return CheckupsStatus.Done;
   if (status.failed && status.failed > 0) return CheckupsStatus.Failed;
+  if (isJobFailedCondition(job)) return CheckupsStatus.Failed;
   if (status.active && status.active > 0) return CheckupsStatus.Running;
   if (status.terminating && status.terminating > 0) return CheckupsStatus.Deleting;
 
@@ -128,6 +152,11 @@ export const getJobStatus = (job?: IoK8sApiBatchV1Job): CheckupsStatus => {
 
 export const isJobRunning = (job?: IoK8sApiBatchV1Job): boolean =>
   getJobStatus(job) === CheckupsStatus.Running;
+
+export const getIsJobCompleted = (job?: IoK8sApiBatchV1Job): boolean => {
+  const status = getJobStatus(job);
+  return status === CheckupsStatus.Done || status === CheckupsStatus.Failed;
+};
 
 const STATUS_RANK: Record<CheckupsStatus, number> = {
   [CheckupsStatus.Deleting]: 3,

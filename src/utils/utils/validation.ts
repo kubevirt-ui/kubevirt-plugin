@@ -124,3 +124,42 @@ export const validateCronExpression = (t: TFunction, value: string): string | un
 
   return undefined;
 };
+
+type UrlValidationOptions = {
+  /** Empty/whitespace value is considered valid (for optional fields). Default: false. */
+  allowEmpty?: boolean;
+  /** Paths like /foo/bar are considered valid, in addition to absolute http(s) URLs. Default: false. */
+  allowRelative?: boolean;
+  /** If set, values longer than this are rejected. */
+  maxLength?: number;
+};
+
+const canParseUrl = (url: string): boolean => {
+  if (URL?.canParse) {
+    return URL.canParse(url);
+  }
+  try {
+    // eslint-disable-next-line no-new
+    new URL(url);
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+export const isValidUrl = (url: string, options: UrlValidationOptions = {}): boolean => {
+  const { allowEmpty, allowRelative, maxLength } = options;
+  const trimmed = url?.trim() ?? '';
+
+  if (!trimmed) return !!allowEmpty;
+  if (maxLength && trimmed.length > maxLength) return false;
+  if (allowRelative && /^\/[^/]/.test(trimmed)) return true;
+
+  if (!canParseUrl(trimmed)) return false;
+
+  try {
+    return ['http:', 'https:'].includes(new URL(trimmed).protocol);
+  } catch {
+    return false;
+  }
+};
