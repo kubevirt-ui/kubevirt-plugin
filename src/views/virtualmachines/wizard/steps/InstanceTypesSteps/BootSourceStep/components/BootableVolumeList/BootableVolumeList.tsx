@@ -1,9 +1,8 @@
 import React, { FC } from 'react';
 import { useWatch } from 'react-hook-form';
 
+import { OnSetFilters } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
-import useHideDeprecatedBootableVolumes from '@kubevirt-utils/resources/bootableresources/hooks/useHideDeprecatedBootableVolumes';
-import { OnFilterChange } from '@openshift-console/dynamic-plugin-sdk';
 import { Card, Skeleton } from '@patternfly/react-core';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
 import { CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
@@ -51,14 +50,16 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
 
   const {
     activeColumns,
+    clearAllFilters,
     columnLayout,
     data,
+    filterDefinitions,
     filters,
     getSortType,
     isEmptyVolumes,
     isPreferenceFilterEmpty,
     loadedColumns,
-    onFilterChange,
+    onSetFilters,
     pagination,
     setPagination,
     sortedPaginatedData,
@@ -70,8 +71,8 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
     userPreferencesMap,
   );
 
-  const handleFilterChange: OnFilterChange = (...args: Parameters<OnFilterChange>) => {
-    onFilterChange(...args);
+  const handleSetFilters: OnSetFilters = (newFilters) => {
+    onSetFilters(newFilters);
     setPagination((prevPagination) => ({
       ...prevPagination,
       endIndex: prevPagination.perPage,
@@ -80,8 +81,6 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
     }));
   };
 
-  useHideDeprecatedBootableVolumes(onFilterChange);
-
   const isVolumesLoaded = loaded && loadedColumns && userPreferencesLoaded;
   const displayVolumes = isVolumesLoaded && !isEmptyVolumes && !isPreferenceFilterEmpty;
 
@@ -89,14 +88,16 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
     <Card className="bootable-volume-list pf-v6-u-p-lg">
       <div className="bootable-volume-list__container">
         <BootableVolumeListToolbar
+          clearAllFilters={clearAllFilters}
           columnLayout={columnLayout}
           data={data}
           displayVolumes={displayVolumes}
           effectiveNamespace={effectiveNamespace}
+          filterDefinitions={filterDefinitions}
           filters={filters}
           loaded={loaded}
           loadedColumns={loadedColumns}
-          onFilterChange={handleFilterChange}
+          onSetFilters={handleSetFilters}
           pagination={pagination}
           setPagination={setPagination}
           unfilteredData={unfilteredData}

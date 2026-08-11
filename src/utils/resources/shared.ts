@@ -92,8 +92,11 @@ export const getDisplayName = (entity: K8sResourceCommon): string | undefined =>
  * @param {string} defaultValue - default value to return if label is not found
  * @returns the label value or defaultValue if not found
  */
-export const getLabel = (entity: K8sResourceCommon, label: string, defaultValue?: string): string =>
-  entity?.metadata?.labels?.[label] ?? defaultValue;
+export const getLabel = (
+  entity: K8sResourceCommon,
+  label: string,
+  defaultValue?: string,
+): string | undefined => entity?.metadata?.labels?.[label] ?? defaultValue;
 
 type ResourceUrlProps = {
   activeNamespace?: string;

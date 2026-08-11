@@ -6,17 +6,18 @@ import {
   V1beta1VirtualMachinePreference,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { ALL_PROJECTS } from '@kubevirt-utils/hooks/constants';
+import useKubevirtDataViewFilters from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/useKubevirtDataViewFilters';
+import {
+  KubevirtFilter,
+  KubevirtFilterState,
+  OnSetFilters,
+} from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { PaginationState } from '@kubevirt-utils/hooks/usePagination/utils/types';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { NamespacedResourceMap, ResourceMap } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import {
-  ColumnLayout,
-  OnFilterChange,
-  RowFilter,
-  useListPageFilter,
-} from '@openshift-console/dynamic-plugin-sdk';
+import { ColumnLayout } from '@openshift-console/dynamic-plugin-sdk';
 import { ThSortType } from '@patternfly/react-table/dist/esm/components/Table/base/types';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
 import { CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
@@ -31,14 +32,16 @@ import { TableColumnWithOptionalIndex } from '../../../types';
 
 type BootableVolumesTableData = {
   activeColumns: TableColumnWithOptionalIndex<BootableVolume>[];
+  clearAllFilters: () => void;
   columnLayout: ColumnLayout;
   data: BootableVolume[];
-  filters: RowFilter<BootableVolume>[];
+  filterDefinitions: KubevirtFilter<BootableVolume>[];
+  filters: KubevirtFilterState;
   getSortType: (columnIndex: number) => ThSortType;
   isEmptyVolumes: boolean;
   isPreferenceFilterEmpty: boolean;
   loadedColumns: boolean;
-  onFilterChange: OnFilterChange;
+  onSetFilters: OnSetFilters;
   pagination: PaginationState;
   setPagination: (
     value: ((prevState: PaginationState) => PaginationState) | PaginationState,
@@ -78,15 +81,21 @@ const useBootableVolumesTableData: UseBootableVolumesTableData = (
     [bootableVolumes, preferenceName],
   );
 
-  const filters = useMemo(
+  const filterDefinitions = useMemo(
     () => getBootVolumeTableFilters(preferenceFilteredVolumes, preferenceName, t),
     [preferenceFilteredVolumes, preferenceName, t],
   );
 
-  const [unfilteredData, data, onFilterChange] = useListPageFilter(
-    preferenceFilteredVolumes,
+  const {
+    clearAllFilters,
+    filteredData: data,
     filters,
-  );
+    onSetFilters,
+  } = useKubevirtDataViewFilters({
+    data: preferenceFilteredVolumes,
+    filterDefinitions,
+    hideLabelFilter: true,
+  });
 
   const [pagination, setPagination] = useState(paginationInitialStateForm);
 
@@ -110,19 +119,21 @@ const useBootableVolumesTableData: UseBootableVolumesTableData = (
 
   return {
     activeColumns,
+    clearAllFilters,
     columnLayout,
     data,
+    filterDefinitions,
     filters,
     getSortType,
     isEmptyVolumes: isEmpty(bootableVolumes),
     isPreferenceFilterEmpty,
     loadedColumns,
-    onFilterChange,
+    onSetFilters,
     pagination,
     setPagination,
     sortedData,
     sortedPaginatedData,
-    unfilteredData,
+    unfilteredData: preferenceFilteredVolumes,
   };
 };
 

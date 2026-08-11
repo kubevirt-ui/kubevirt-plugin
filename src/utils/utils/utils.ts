@@ -9,8 +9,6 @@ import {
   OPENSHIFT_OS_IMAGES_NS,
 } from '@kubevirt-utils/constants/constants';
 import { ALL_NAMESPACES, ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
-import { OTHER } from '@kubevirt-utils/utils/constants';
-import { type FilterValue, type RowFilterItem } from '@openshift-console/dynamic-plugin-sdk';
 import { k8sBasePath } from '@openshift-console/dynamic-plugin-sdk/lib/utils/k8s/k8s';
 
 export * from './errorUtils';
@@ -100,22 +98,6 @@ export const findAllIndexes = <T>(
     (acc, [index, element]) => (predicate(element, index, array) ? [...acc, index] : acc),
     [],
   );
-
-// return the name or 'Other' if the name not included in the array of available items for filtering
-export const getItemNameWithOther = (itemName: string, items: RowFilterItem[]): string => {
-  return !items?.find((item: RowFilterItem) => item.id === itemName) || itemName === OTHER
-    ? OTHER
-    : itemName;
-};
-
-export const includeFilter = (
-  compareData: FilterValue,
-  items: RowFilterItem[],
-  itemName: string,
-): boolean => {
-  const compareString = getItemNameWithOther(itemName, items);
-  return compareData.selected?.length === 0 || compareData.selected?.includes(compareString);
-};
 
 export const ensurePath = <T extends object>(data: T, paths: string | string[]): void => {
   let current: Record<string, unknown> = data as Record<string, unknown>;

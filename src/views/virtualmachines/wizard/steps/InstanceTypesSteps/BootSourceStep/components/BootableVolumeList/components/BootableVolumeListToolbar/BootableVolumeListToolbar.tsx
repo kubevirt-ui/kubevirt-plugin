@@ -1,13 +1,18 @@
 import React, { Dispatch, FC, SetStateAction } from 'react';
 import { Controller } from 'react-hook-form';
 
-import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
+import KubevirtFilterToolbar from '@kubevirt-utils/components/KubevirtFilterToolbar/KubevirtFilterToolbar';
 import ProjectDropdown from '@kubevirt-utils/components/ProjectDropdown/ProjectDropdown';
+import {
+  KubevirtFilter,
+  KubevirtFilterState,
+  OnSetFilters,
+} from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { PaginationState } from '@kubevirt-utils/hooks/usePagination/utils/types';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
-import { ColumnLayout, OnFilterChange, RowFilter } from '@openshift-console/dynamic-plugin-sdk';
+import { ColumnLayout } from '@openshift-console/dynamic-plugin-sdk';
 import { FormGroup, Split, SplitItem } from '@patternfly/react-core';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
 import { CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
@@ -15,28 +20,32 @@ import { CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA } from '@virtualmachines/wizar
 import BootableVolumeListPagination from '../BootableVolumeListPagination/BootableVolumeListPagination';
 
 type BootableVolumeListToolbarProps = {
+  clearAllFilters: () => void;
   columnLayout: ColumnLayout;
   data: BootableVolume[];
   displayVolumes: boolean;
   effectiveNamespace: string;
-  filters: RowFilter<BootableVolume>[];
+  filterDefinitions: KubevirtFilter<BootableVolume>[];
+  filters: KubevirtFilterState;
   loaded: boolean;
   loadedColumns: boolean;
-  onFilterChange: OnFilterChange;
+  onSetFilters: OnSetFilters;
   pagination: PaginationState;
   setPagination: Dispatch<SetStateAction<PaginationState>>;
   unfilteredData: BootableVolume[];
 };
 
 const BootableVolumeListToolbar: FC<BootableVolumeListToolbarProps> = ({
+  clearAllFilters,
   columnLayout,
   data,
   displayVolumes,
   effectiveNamespace,
+  filterDefinitions,
   filters,
   loaded,
   loadedColumns,
-  onFilterChange,
+  onSetFilters,
   pagination,
   setPagination,
   unfilteredData,
@@ -69,13 +78,15 @@ const BootableVolumeListToolbar: FC<BootableVolumeListToolbarProps> = ({
       {displayVolumes && (
         <>
           <SplitItem className="bootable-volume-list-bar__filter">
-            <ListPageFilter
+            <KubevirtFilterToolbar
+              clearAllFilters={clearAllFilters}
               columnLayout={columnLayout}
               data={unfilteredData}
+              filterDefinitions={filterDefinitions}
+              filters={filters}
               hideLabelFilter
               loaded={loaded && loadedColumns}
-              onFilterChange={onFilterChange}
-              rowFilters={filters}
+              onSetFilters={onSetFilters}
             />
           </SplitItem>
           <SplitItem isFilled />

@@ -7,8 +7,8 @@ export const ARCHITECTURE_TITLE = t('Architecture');
 // label on DS and Template resources
 export const ARCHITECTURE_LABEL = 'template.kubevirt.io/architecture';
 
-export const getArchitecture = (resource: K8sResourceCommon): string =>
+export const getArchitecture = (resource: K8sResourceCommon): string | undefined =>
   getLabel(resource, ARCHITECTURE_LABEL);
 
-export const getUniqueArchitectures = (resources: K8sResourceCommon[]): string[] =>
+export const getUniqueArchitectures = (resources: K8sResourceCommon[]): (string | undefined)[] =>
   Array.from(new Set(resources.map((resource) => getArchitecture(resource))));
