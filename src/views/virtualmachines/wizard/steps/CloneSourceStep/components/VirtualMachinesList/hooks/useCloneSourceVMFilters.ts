@@ -1,44 +1,42 @@
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { useMemo } from 'react';
+
+import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
+import { toGrouped } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
-import { useNodesFilter } from '@virtualmachines/list/hooks/useVMListFilters/useNodesFilter';
-import { useStorageClassFilter } from '@virtualmachines/list/hooks/useVMListFilters/useStorageClassFilter';
-import { getArchitectureFilter } from '@virtualmachines/list/utils/filters/getArchitectureFilter';
-import { getGuestAgentFilter } from '@virtualmachines/list/utils/filters/getGuestAgentFilter';
-import { getHWDevicesFilter } from '@virtualmachines/list/utils/filters/getHWDevicesFilter';
-import { getOSFilter } from '@virtualmachines/list/utils/filters/getOSFilter';
-import { getSchedulingFilter } from '@virtualmachines/list/utils/filters/getSchedulingFilter';
-import { getStatusFilter } from '@virtualmachines/list/utils/filters/getStatusFilter';
-import { PVCMapper, VMIMapper } from '@virtualmachines/utils/mappers';
+import { getGuestAgentFilter } from '@virtualmachines/list/filters/getGuestAgentFilter';
+import { getHWDevicesFilter } from '@virtualmachines/list/filters/getHWDevicesFilter';
+import { getOSFilter } from '@virtualmachines/list/filters/getOSFilter';
+import { getSchedulingFilter } from '@virtualmachines/list/filters/getSchedulingFilter';
+import { getStatusFilter } from '@virtualmachines/list/filters/getStatusFilter';
+import useArchitectureFilter from '@virtualmachines/list/filters/useArchitectureFilter';
+import useNodeFilter from '@virtualmachines/list/filters/useNodeFilter';
+import useStorageClassFilter from '@virtualmachines/list/filters/useStorageClassFilter';
+import type { PVCMapper, VMIMapper } from '@virtualmachines/utils/mappers';
 
 export const useCloneSourceVMFilters = (
   vms: V1VirtualMachine[],
   vmiMapper: VMIMapper,
   pvcMapper: PVCMapper,
-): {
-  rowFilters: RowFilter<V1VirtualMachine>[];
-} => {
+): KubevirtFilter<V1VirtualMachine>[] => {
   const { t } = useKubevirtTranslation();
 
-  const statusFilter = getStatusFilter(t);
-  const osFilters = getOSFilter(t);
   const storageClassFilter = useStorageClassFilter(vms, pvcMapper);
-  const hwDevicesFilter = getHWDevicesFilter(t);
-  const schedulingFilter = getSchedulingFilter(t);
-  const nodesFilter = useNodesFilter(vmiMapper);
-  const guestAgentFilter = getGuestAgentFilter(t);
-  const architectureFilter = getArchitectureFilter(t, vms);
+  const nodeFilter = useNodeFilter(vmiMapper);
+  const architectureFilter = useArchitectureFilter(vms);
 
-  return {
-    rowFilters: [
-      statusFilter,
-      osFilters,
-      storageClassFilter,
-      hwDevicesFilter,
-      schedulingFilter,
-      nodesFilter,
-      guestAgentFilter,
-      architectureFilter,
-    ],
-  };
+  return useMemo(
+    () =>
+      [
+        getStatusFilter(t),
+        getOSFilter(t),
+        storageClassFilter,
+        getHWDevicesFilter(t),
+        getSchedulingFilter(t),
+        nodeFilter,
+        getGuestAgentFilter(t),
+        architectureFilter,
+      ].map(toGrouped),
+    [t, storageClassFilter, nodeFilter, architectureFilter],
+  );
 };
