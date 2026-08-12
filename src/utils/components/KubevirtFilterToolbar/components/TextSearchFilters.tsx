@@ -1,15 +1,14 @@
 import React, { Dispatch, FC, SetStateAction, useMemo, useState } from 'react';
 
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
-import AutocompleteInput from '@kubevirt-utils/components/ListPageFilter/components/AutocompleteInput';
-import SearchFilter from '@kubevirt-utils/components/ListPageFilter/components/SearchFilter';
 import {
   STATIC_SEARCH_FILTERS,
   STATIC_SEARCH_FILTERS_DROPDOWN_VALUES,
   STATIC_SEARCH_FILTERS_LABELS,
   STATIC_SEARCH_FILTERS_PLACEHOLDERS,
   TextSearchFilterType,
-} from '@kubevirt-utils/components/ListPageFilter/constants';
+} from '../constants';
+
 import { getLabelFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/filters/getLabelFilter';
 import {
   FilterableObject,
@@ -24,6 +23,8 @@ import {
   ToolbarFilter,
   ToolbarItem,
 } from '@patternfly/react-core';
+import AutocompleteInput from './AutocompleteInput';
+import SearchFilter from './SearchFilter';
 
 import { useDebounceCallback } from '@overview/utils/hooks/useDebounceCallback';
 import ToolbarFilterMultiChip from './ToolbarFilter/ToolbarFilterMultiChip';

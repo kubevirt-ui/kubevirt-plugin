@@ -2,7 +2,7 @@ import { type MouseEvent, useCallback, useEffect, useLayoutEffect, useMemo, useS
 import { useNavigate } from 'react-router';
 
 import { tourContextMenuTriggerSignal } from '@kubevirt-utils/components/GuidedTour/utils/guidedTourSignals';
-import { useQueryParamsMethods } from '@kubevirt-utils/components/ListPageFilter/hooks/useQueryParamsMethods';
+import { useQueryParamsMethods } from '@kubevirt-utils/hooks/useQueryParamsMethods';
 import { type TreeViewDataItem, type TreeViewProps } from '@patternfly/react-core';
 import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 

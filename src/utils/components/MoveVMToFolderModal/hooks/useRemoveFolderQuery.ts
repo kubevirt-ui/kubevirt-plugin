@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { useQueryParamsMethods } from '@kubevirt-utils/components/ListPageFilter/hooks/useQueryParamsMethods';
+import { useQueryParamsMethods } from '@kubevirt-utils/hooks/useQueryParamsMethods';
 import useQuery from '@kubevirt-utils/hooks/useQuery';
 import useVMsInNamespace from '@kubevirt-utils/hooks/useVMsInNamespace';
 import { getNamespace } from '@kubevirt-utils/resources/shared';

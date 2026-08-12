@@ -1,3 +1,4 @@
+import fuzzy from 'fuzzysearch';
 import { type TFunction } from 'i18next';
 
 import { type IoK8sApiCoreV1Service } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
@@ -141,3 +142,6 @@ export const parseJSONAnnotation = <T = unknown>(
     return null as T;
   }
 };
+
+export const fuzzyCaseInsensitive = (a: string, b: string): boolean =>
+  fuzzy(a.toLowerCase(), b.toLowerCase());

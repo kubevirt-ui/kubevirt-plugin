@@ -12,7 +12,7 @@ import { useModal } from '../ModalProvider/ModalProvider';
 type ColumnManagementProps = {
   /** When true, renders as a PatternFly ToolbarItem (use inside TableToolbarActionsGroup). */
   asToolbarItem?: boolean;
-  columnLayout: ColumnLayout;
+  columnLayout?: ColumnLayout;
   hideColumnManagement?: boolean;
 };
 

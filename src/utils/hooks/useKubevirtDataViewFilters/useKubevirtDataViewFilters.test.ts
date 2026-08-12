@@ -8,13 +8,6 @@ let mockFiltersState: KubevirtFilterState = { labels: [], name: [] };
 const mockClearAllFilters = jest.fn();
 const mockOnSetFilters = jest.fn();
 
-jest.mock('@kubevirt-utils/components/ListPageFilter/utils', () => ({
-  fuzzyCaseInsensitive: (needle: string, haystack: string) =>
-    haystack.toLowerCase().includes(needle.toLowerCase()),
-  getLabelsAsString: (obj: K8sResourceCommon) =>
-    Object.entries(obj?.metadata?.labels ?? {}).map(([k, v]) => `${k}=${v}`),
-}));
-
 jest.mock('@kubevirt-utils/hooks/useKubevirtTranslation', () => ({
   useKubevirtTranslation: () => ({ t: (str: string) => str }),
 }));

@@ -5,13 +5,13 @@ import { ColumnLayout } from '@openshift-console/dynamic-plugin-sdk';
 import ColumnManagement from '../../ColumnManagementModal/ColumnManagement';
 import { TableToolbarActionsGroup } from '../../TableToolbarActions/TableToolbarActionsGroup';
 
-type ListPageFilterToolbarActionsProps = {
+type ToolbarActionsProps = {
   columnLayout?: ColumnLayout;
   hideColumnManagement?: boolean;
   toolbarEndContent?: ReactNode;
 };
 
-const ListPageFilterToolbarActions: FC<ListPageFilterToolbarActionsProps> = ({
+const ToolbarActions: FC<ToolbarActionsProps> = ({
   columnLayout,
   hideColumnManagement,
   toolbarEndContent,
@@ -26,4 +26,4 @@ const ListPageFilterToolbarActions: FC<ListPageFilterToolbarActionsProps> = ({
   </TableToolbarActionsGroup>
 );
 
-export default ListPageFilterToolbarActions;
+export default ToolbarActions;
