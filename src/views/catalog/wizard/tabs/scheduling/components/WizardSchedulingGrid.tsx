@@ -1,8 +1,6 @@
 import React, { FC } from 'react';
 
 import { UpdateValidatedVM } from '@catalog/utils/WizardVMContext';
-import { modelToGroupVersionKind, NodeModel } from '@kubevirt-ui/kubevirt-api/console';
-import { IoK8sApiCoreV1Node } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import AffinityModal from '@kubevirt-utils/components/AffinityModal/AffinityModal';
 import DedicatedResourcesModal from '@kubevirt-utils/components/DedicatedResourcesModal/DedicatedResourcesModal';
@@ -13,8 +11,8 @@ import NodeSelectorDetailItem from '@kubevirt-utils/components/NodeSelectorDetai
 import NodeSelectorModal from '@kubevirt-utils/components/NodeSelectorModal/NodeSelectorModal';
 import TolerationsModal from '@kubevirt-utils/components/TolerationsModal/TolerationsModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useNodes from '@kubevirt-utils/hooks/useNodes';
 import { getEvictionStrategy } from '@kubevirt-utils/resources/vm';
-import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { DescriptionList, Grid, GridItem } from '@patternfly/react-core';
 
 import { WizardDescriptionItem } from '../../../components/WizardDescriptionItem';
@@ -34,10 +32,7 @@ const WizardSchedulingGrid: FC<WizardSchedulingGridProps> = ({ updateVM, vm }) =
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
 
-  const [nodes, nodesLoaded] = useK8sWatchResource<IoK8sApiCoreV1Node[]>({
-    groupVersionKind: modelToGroupVersionKind(NodeModel),
-    isList: true,
-  });
+  const [nodes, nodesLoaded] = useNodes();
 
   return (
     <Grid className="wizard-scheduling-tab__grid" hasGutter>

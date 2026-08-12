@@ -17,3 +17,5 @@ playwright/
 .playwright-mcp
 .cursor/rules/personal-*.mdc
 .cursor/debug-*.log
+.env.local
+local.env

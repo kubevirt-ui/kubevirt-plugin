@@ -4,8 +4,8 @@ import { VirtualMachineModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/c
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource';
 import { VM_STATUS } from '@kubevirt-utils/resources/vm/utils/vmStatus';
-import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Accordion,
@@ -34,7 +34,7 @@ const VMStatusesCard: React.FC = () => {
   );
 
   const { t } = useKubevirtTranslation();
-  const [vms] = useK8sWatchResource<V1VirtualMachine[]>({
+  const [vms] = useKubevirtWatchResource<V1VirtualMachine[]>({
     groupVersionKind: VirtualMachineModelGroupVersionKind,
     isList: true,
     namespace: namespace,

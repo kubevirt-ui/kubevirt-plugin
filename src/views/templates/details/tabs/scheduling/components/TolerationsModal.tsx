@@ -2,8 +2,7 @@ import * as React from 'react';
 import produce from 'immer';
 import { getTolerations } from 'src/views/templates/utils/selectors';
 
-import { modelToGroupVersionKind, NodeModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
-import { IoK8sApiCoreV1Node } from '@kubevirt-ui/kubevirt-api/kubernetes/models';
+import { NodeModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import {
   K8sIoApiCoreV1Toleration,
   K8sIoApiCoreV1TolerationEffectEnum,
@@ -19,9 +18,9 @@ import TolerationModalDescriptionText from '@kubevirt-utils/components/Toleratio
 import { TolerationLabel } from '@kubevirt-utils/components/TolerationsModal/utils/constants';
 import { getNodeTaintQualifier } from '@kubevirt-utils/components/TolerationsModal/utils/helpers';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useNodes from '@kubevirt-utils/hooks/useNodes';
 import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { Form, ModalVariant } from '@patternfly/react-core';
 
 type TolerationsModalProps = {
@@ -47,10 +46,7 @@ const TolerationsModal: React.FC<TolerationsModalProps> = ({
     (getTolerations(template) || []).map((toleration, id) => ({ ...toleration, id })),
   );
   const tolerationLabelsEmpty = tolerationsLabels?.length === 0;
-  const [nodes, nodesLoaded] = useK8sWatchResource<IoK8sApiCoreV1Node[]>({
-    groupVersionKind: modelToGroupVersionKind(NodeModel),
-    isList: true,
-  });
+  const [nodes, nodesLoaded] = useNodes();
   const qualifiedNodes = getNodeTaintQualifier(nodes, nodesLoaded, tolerationsLabels);
 
   const onSelectorLabelAdd = () =>

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 
+import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { AccessReviewResourceAttributes, checkAccess } from '@openshift-console/dynamic-plugin-sdk';
 import { ImpersonateKind } from '@openshift-console/dynamic-plugin-sdk/lib/app/redux-types';
 
@@ -30,8 +31,7 @@ const useMultipleAccessReviews: UseMultipleAccessReviews = (
         setAllowedResourceAttributes(updatedAllowedArr);
       })
       .catch((e) => {
-        // eslint-disable-next-line no-console
-        console.warn('SelfSubjectAccessReview failed', e);
+        kubevirtConsole.warn('SelfSubjectAccessReview failed', e);
         setLoading(false);
       });
   }, [impersonate, multipleResourceAttributes]);
