@@ -1,9 +1,9 @@
-import { KeyboardEvent, useCallback, useState } from 'react';
+import { type KeyboardEvent, useCallback, useState } from 'react';
 
-import { KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
+import { type KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { KeyTypes } from '@patternfly/react-core';
 
-import { AutocompleteMode, SearchKeyBadge } from '../../types';
+import { type AutocompleteMode, type SearchKeyBadge } from '../../types';
 import { useDefaultMenuNavigation } from '../useDefaultMenuNavigation/useDefaultMenuNavigation';
 import { useKeyListNavigation } from '../useKeyListNavigation/useKeyListNavigation';
 import { useOperatorListNavigation } from '../useOperatorListNavigation/useOperatorListNavigation';
@@ -82,19 +82,17 @@ export const useDropdownNavigation = ({
   const handleKeyDown = useCallback(
     (event: KeyboardEvent<HTMLInputElement>) => {
       if (
-        event.key === KeyTypes.ArrowDown ||
-        event.key === KeyTypes.ArrowUp ||
-        event.key === KeyTypes.ArrowLeft ||
-        event.key === KeyTypes.ArrowRight
-      ) {
-        if (onArrowKey?.(event)) return;
-      }
+        (event.key === KeyTypes.ArrowDown ||
+          event.key === KeyTypes.ArrowUp ||
+          event.key === KeyTypes.ArrowLeft ||
+          event.key === KeyTypes.ArrowRight) &&
+        onArrowKey?.(event)
+      )
+        return;
 
-      if (event.key === KeyTypes.Enter || event.key === KeyTypes.Tab) {
-        if (onSelectHighlighted?.()) {
-          event.preventDefault();
-          return;
-        }
+      if ((event.key === KeyTypes.Enter || event.key === KeyTypes.Tab) && onSelectHighlighted?.()) {
+        event.preventDefault();
+        return;
       }
 
       onInputKeyDown(event);

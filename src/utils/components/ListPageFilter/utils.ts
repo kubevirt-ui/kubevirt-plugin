@@ -1,22 +1,20 @@
 import * as fuzzy from 'fuzzysearch';
-import { TFunction } from 'i18next';
 
-import { numberOperatorInfo } from '@kubevirt-utils/utils/constants';
 import {
-  K8sResourceCommon,
-  MatchExpression,
+  type K8sResourceCommon,
+  type MatchExpression,
   Operator,
-  RowFilter,
-  RowMatchFilter,
-  RowReducerFilter,
-  Selector,
+  type RowFilter,
+  type RowMatchFilter,
+  type RowReducerFilter,
+  type Selector,
 } from '@openshift-console/dynamic-plugin-sdk';
 import { getRowFilterQueryKey } from '@search/utils/query';
-import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
-import { STATIC_SEARCH_FILTERS, STATIC_SEARCH_FILTERS_PLACEHOLDERS } from './constants';
-import { useSearchFiltersParameters } from './hooks/useSearchFiltersParameters';
-import { ExtendedRowFilter, TextFiltersType } from './types';
+import { STATIC_SEARCH_FILTERS } from './constants';
+import { type ExtendedRowFilter, type TextFiltersType } from './types';
+
+export * from './searchTextUtils';
 
 export type Filter = {
   [key: string]: string[];
@@ -38,21 +36,25 @@ export const getInitialSearchType = (
   const hasNameFilter = 'name' in filterDropdownItems;
 
   return (
-    alreadySearchedCustomParam ||
+    alreadySearchedCustomParam ??
     (hasNameFilter ? STATIC_SEARCH_FILTERS.name : Object.keys(filterDropdownItems)?.[0])
   );
 };
 
-export const generateRowFilters = (rowFilters: ExtendedRowFilter[], data: K8sResourceCommon[]) =>
+export const generateRowFilters = (
+  rowFilters: ExtendedRowFilter[],
+  data: K8sResourceCommon[],
+): ExtendedRowFilter[] =>
   rowFilters.map((rowFilter) => ({
     ...rowFilter,
     items: rowFilter.items.map((item) => ({
       ...item,
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       count: (rowFilter as RowMatchFilter).isMatch
-        ? data.filter((d) => (rowFilter as RowMatchFilter).isMatch(d, item.id)).length
+        ? data.filter((_dataItem) => (rowFilter as RowMatchFilter).isMatch(_dataItem, item.id))
+            .length
         : (data.reduce((acc, current) => {
-            const currentKey = (rowFilter as RowReducerFilter).reducer(current);
-            acc[currentKey] ? acc[currentKey]++ : (acc[currentKey] = 1);
+            (rowFilter as RowReducerFilter).reducer(current);
             return acc;
           }, {})?.[item.id] ?? '0'),
     })),
@@ -61,7 +63,9 @@ export const generateRowFilters = (rowFilters: ExtendedRowFilter[], data: K8sRes
 export const fuzzyCaseInsensitive = (a: string, b: string): boolean =>
   fuzzy(a.toLowerCase(), b.toLowerCase());
 
-export const getFiltersData = (generatedRowFilters) =>
+export const getFiltersData = (
+  generatedRowFilters: ExtendedRowFilter[],
+): [Filter, FilterKeys, FilterKeys, string[]] =>
   generatedRowFilters.reduce(
     (
       [filtersAcc, filtersNameMapAcc, filterKeysAcc, defaultSelectedAcc],
@@ -70,6 +74,7 @@ export const getFiltersData = (generatedRowFilters) =>
       // (rowFilters) => {'rowFilterTypeA': ['staA', 'staB'], 'rowFilterTypeB': ['stbA'] }
       {
         ...filtersAcc,
+
         [filterGroupName]: (items ?? []).map(({ id }) => id),
       } as Filter,
       // {id: 'a' , title: 'A'} => filterNameMap['a'] = A
@@ -78,6 +83,7 @@ export const getFiltersData = (generatedRowFilters) =>
         ...(items ?? []).reduce(
           (itemAcc, { id, title }) => ({
             ...itemAcc,
+
             [id]: title,
           }),
           {},
@@ -88,14 +94,15 @@ export const getFiltersData = (generatedRowFilters) =>
         [filterGroupName]: getRowFilterQueryKey(type),
       } as FilterKeys,
       // Default selections
+
       Array.from(new Set([...defaultSelectedAcc, ...(defaultSelected ?? [])])),
     ],
     [{}, {}, {}, []],
   );
 
-export const intersection = (a: string[], b: string[]) => {
-  const s = new Set(b);
-  return a.filter((x) => s.has(x));
+export const intersection = (a: string[], bArr: string[]): string[] => {
+  const filterSet = new Set(bArr);
+  return a.filter((item) => filterSet.has(item));
 };
 
 export const getLabelsAsString = (obj: K8sResourceCommon): string[] => {
@@ -105,12 +112,12 @@ export const getLabelsAsString = (obj: K8sResourceCommon): string[] => {
 
 export const labelParser = (resources?: K8sResourceCommon[]): Set<string> => {
   return (resources ?? []).reduce((acc: Set<string>, resource: K8sResourceCommon) => {
-    getLabelsAsString(resource).forEach((label) => acc.add(label));
+    for (const label of getLabelsAsString(resource)) acc.add(label);
     return acc;
   }, new Set<string>());
 };
 
-const toArray = (value) => (Array.isArray(value) ? value : [value]);
+const toArray = (value: unknown): unknown[] => (Array.isArray(value) ? value : [value]);
 
 const requirementToString = (requirement: MatchExpression): string => {
   const requirementStrings = {
@@ -124,7 +131,7 @@ const requirementToString = (requirement: MatchExpression): string => {
     [Operator.NotIn]: `${requirement.key} notin (${toArray(requirement.values).join(',')})`,
   };
 
-  return requirementStrings[requirement.operator] || '';
+  return requirementStrings[requirement.operator] ?? '';
 };
 
 const createEquals = (key: string, value: string): MatchExpression => ({
@@ -133,65 +140,18 @@ const createEquals = (key: string, value: string): MatchExpression => ({
   values: [value],
 });
 
-const isOldFormat = (selector: Selector) => !selector.matchLabels && !selector.matchExpressions;
+const isOldFormat = (selector: Selector): boolean =>
+  !selector.matchLabels && !selector.matchExpressions;
 
-const toRequirements = (selector: Selector = {}) => {
+const toRequirements = (selector: Selector = {}): MatchExpression[] => {
   const matchLabels = isOldFormat(selector) ? selector : selector.matchLabels;
   const { matchExpressions } = selector;
 
-  const requirements = Object.keys(matchLabels || {})
-    .sort()
+  const requirements = Object.keys(matchLabels ?? {})
+    .sort((first, second) => first.localeCompare(second))
     .map((match) => createEquals(match, matchLabels[match]));
 
-  requirements.push(...(matchExpressions || []));
+  requirements.push(...(matchExpressions ?? []));
 
   return requirements;
-};
-
-export const getInitialSearchText = (
-  searchText: ReturnType<typeof useSearchFiltersParameters>,
-  searchFilterType: string,
-) => (searchFilterType !== STATIC_SEARCH_FILTERS.labels ? searchText[searchFilterType] : '');
-
-type PlaceholderKey = keyof typeof STATIC_SEARCH_FILTERS_PLACEHOLDERS;
-
-export const getSearchTextPlaceholder = (
-  t: TFunction,
-  searchType: string,
-  selectedSearchFilter: RowFilter,
-  nameFilterPlaceholder: string,
-) => {
-  if (searchType === STATIC_SEARCH_FILTERS.name)
-    return nameFilterPlaceholder
-      ? t(nameFilterPlaceholder)
-      : t(STATIC_SEARCH_FILTERS_PLACEHOLDERS.name);
-
-  const isValidPlaceholderKey = (key: string): key is PlaceholderKey =>
-    key in STATIC_SEARCH_FILTERS_PLACEHOLDERS;
-
-  return isValidPlaceholderKey(searchType)
-    ? t(STATIC_SEARCH_FILTERS_PLACEHOLDERS[searchType])
-    : t('Search by {{filterName}}...', {
-        filterName: selectedSearchFilter?.filterGroupName,
-      });
-};
-
-export const getFilterLabels = (
-  query?: null | string,
-  filterType?: VirtualMachineRowFilterType,
-) => {
-  if (!query) {
-    return [];
-  }
-
-  if (
-    filterType === VirtualMachineRowFilterType.CPU ||
-    filterType === VirtualMachineRowFilterType.Memory
-  ) {
-    const [operator, number, unit] = query.split(' ');
-
-    return [`${numberOperatorInfo[operator].sign} ${number}${unit ? ` ${unit}` : ''}`];
-  }
-
-  return query.split(',');
 };

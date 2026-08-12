@@ -1,13 +1,17 @@
-import { modelToRef, V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
+/* eslint-disable @typescript-eslint/no-unsafe-assignment -- topology resource data */
+import { modelToRef, type V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import {
+  type V1VirtualMachine,
+  type V1VirtualMachineInstance,
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getAnnotations, getLabels, getName, getVMStatus } from '@kubevirt-utils/resources/shared';
 import { VM_TEMPLATE_ANNOTATION } from '@kubevirt-utils/resources/vm';
-import { K8sResourceKind } from '@openshift-console/dynamic-plugin-sdk';
+import { type K8sResourceKind } from '@openshift-console/dynamic-plugin-sdk';
 import {
-  OverviewItem,
-  TopologyDataObject,
-  TopologyDataResources,
+  type OverviewItem,
+  type TopologyDataObject,
+  type TopologyDataResources,
 } from '@openshift-console/dynamic-plugin-sdk/lib/extensions/topology-types';
 import {
   getTopologyEdgeItems,
@@ -15,13 +19,12 @@ import {
   getTopologyNodeItem,
   mergeGroup,
 } from '@openshift-console/dynamic-plugin-sdk-internal';
-import { Model, NodeShape } from '@patternfly/react-topology';
+import { type Model, NodeShape } from '@patternfly/react-topology';
 
 import { getKubevirtModelAvailableAPIVersion } from '../../cdi-upload-provider/utils/selectors';
-
-import { getImageForIconClass } from './icon-image-utils/catalog-item-icon';
-import { VMNodeData } from './types/types';
 import { VIRTUAL_MACHINE_TYPE, WORKLOAD_TYPES } from './constants';
+import { getImageForIconClass } from './icon-image-utils/catalog-item-icon';
+import { type VMNodeData } from './types/types';
 import { WorkloadModelProps } from './utils';
 
 export const getOperatingSystemImage = (vm: V1VirtualMachine, templates: V1Template[]): string => {
@@ -32,12 +35,8 @@ export const getOperatingSystemImage = (vm: V1VirtualMachine, templates: V1Templ
 };
 
 export const createVMOverviewItem = (vm: K8sResourceKind): OverviewItem => {
-  if (!vm?.apiVersion) {
-    vm.apiVersion = getKubevirtModelAvailableAPIVersion(VirtualMachineModel);
-  }
-  if (!vm?.kind) {
-    vm.kind = VirtualMachineModel.kind;
-  }
+  vm.apiVersion ??= getKubevirtModelAvailableAPIVersion(VirtualMachineModel);
+  vm.kind ??= VirtualMachineModel.kind;
 
   return {
     isMonitorable: false,
@@ -52,6 +51,7 @@ const createTopologyVMNodeData = (
   resources: TopologyDataResources,
 ): TopologyDataObject<VMNodeData> => {
   const { labels, name, uid } = vm.metadata;
+
   const vmis = resources?.virtualmachineinstances?.data;
   const vmi = vmis?.find((instance) => getName(instance) === name) as V1VirtualMachineInstance;
   const templates = resources?.virtualmachinetemplates?.data as V1Template[];
@@ -78,38 +78,38 @@ export const getKubevirtTopologyDataModel = (
   resources: TopologyDataResources,
 ): Promise<Model> => {
   const vmsDataModel: Model = { edges: [], nodes: [] };
-  const vmsResources = [];
 
   if (resources?.virtualmachines?.data.length) {
     const vms = resources?.virtualmachines?.data as V1VirtualMachine[];
-    vms?.forEach((vm) => {
-      const vmOverview = createVMOverviewItem(vm);
-      const { uid } = vm?.metadata;
-      vmsResources.push(uid);
-      const data = createTopologyVMNodeData(vm, vmOverview, resources);
-      vmsDataModel?.nodes.push(
-        getTopologyNodeItem(
-          vm,
-          VIRTUAL_MACHINE_TYPE,
-          data,
-          WorkloadModelProps,
-          undefined,
-          undefined,
-          NodeShape.rect,
-        ),
-      );
-      vmsDataModel.edges.push(...getTopologyEdgeItems(vm, resources?.virtualmachines?.data));
-      WORKLOAD_TYPES.forEach((workload) => {
-        vmsDataModel.edges.push(...getTopologyEdgeItems(vm, resources[workload]?.data)); // create visual connector from all WORKLOAD_TYPES to VMs
-      });
-      mergeGroup(getTopologyGroupItems(vm), vmsDataModel.nodes);
-    });
+    if (vms)
+      for (const vm of vms) {
+        const vmOverview = createVMOverviewItem(vm);
+        const data = createTopologyVMNodeData(vm, vmOverview, resources);
+        vmsDataModel?.nodes.push(
+          getTopologyNodeItem(
+            vm,
+            VIRTUAL_MACHINE_TYPE,
+            data,
+            WorkloadModelProps,
+            undefined,
+            undefined,
+            NodeShape.rect,
+          ),
+        );
+        vmsDataModel.edges.push(...getTopologyEdgeItems(vm, resources?.virtualmachines?.data));
+        for (const workload of WORKLOAD_TYPES) {
+          vmsDataModel.edges.push(...getTopologyEdgeItems(vm, resources[workload]?.data)); // create visual connector from all WORKLOAD_TYPES to VMs
+        }
+        mergeGroup(getTopologyGroupItems(vm), vmsDataModel.nodes);
+      }
 
-    WORKLOAD_TYPES.forEach((resource) => {
-      resources[resource]?.data?.forEach((d) => {
-        vmsDataModel.edges.push(...getTopologyEdgeItems(d, resources?.virtualmachines?.data)); // create visual connector from VMs to all WORKLOAD_TYPES
-      });
-    });
+    for (const resource of WORKLOAD_TYPES) {
+      for (const resourceItem of resources[resource]?.data ?? []) {
+        vmsDataModel.edges.push(
+          ...getTopologyEdgeItems(resourceItem, resources?.virtualmachines?.data),
+        ); // create visual connector from VMs to all WORKLOAD_TYPES
+      }
+    }
   }
 
   return Promise.resolve(vmsDataModel);

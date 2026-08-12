@@ -29,6 +29,7 @@ export type FilterInfo = {
 
 export type ExtendedRowFilterItem = RowFilterItem & {
   content?: ReactNode;
+  count?: number | string;
 };
 
 export type ExtendedRowFilter<R = unknown> = Omit<RowFilter<R>, 'items'> & {

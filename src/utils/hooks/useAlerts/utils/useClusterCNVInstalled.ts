@@ -5,7 +5,7 @@ import { KUBEVIRT_HYPERCONVERGED } from '@kubevirt-utils/constants/constants';
 import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
 import { operatorNamespaceSignal } from '@kubevirt-utils/store/operatorNamespace';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { SubscriptionKind } from '@overview/utils/types';
+import { type SubscriptionKind } from '@overview/utils/types';
 import { useFleetClusterNames } from '@stolostron/multicluster-sdk';
 
 export const useClusterCNVInstalled = (): {
@@ -34,7 +34,7 @@ export const useClusterCNVInstalled = (): {
     const subscriptionsByCluster = new Map<string, SubscriptionKind[]>();
     const subscriptions = Array.isArray(allSubscriptions) ? allSubscriptions : [];
 
-    subscriptions.forEach((sub: SubscriptionKind & { cluster?: string }) => {
+    for (const sub of subscriptions as (SubscriptionKind & { cluster?: string })[]) {
       const cluster = sub?.cluster;
       if (cluster) {
         if (!subscriptionsByCluster.has(cluster)) {
@@ -42,10 +42,10 @@ export const useClusterCNVInstalled = (): {
         }
         subscriptionsByCluster.get(cluster)?.push(sub);
       }
-    });
+    }
 
-    clusterNames.forEach((clusterName) => {
-      const clusterSubs = subscriptionsByCluster.get(clusterName) || [];
+    for (const clusterName of clusterNames) {
+      const clusterSubs = subscriptionsByCluster.get(clusterName) ?? [];
       const hasCNV = clusterSubs.some((sub) => sub?.spec?.name?.endsWith(KUBEVIRT_HYPERCONVERGED));
 
       if (hasCNV) {
@@ -53,7 +53,7 @@ export const useClusterCNVInstalled = (): {
       } else {
         notInstalled.push(clusterName);
       }
-    });
+    }
 
     return {
       cnvInstalledClusters: installed,

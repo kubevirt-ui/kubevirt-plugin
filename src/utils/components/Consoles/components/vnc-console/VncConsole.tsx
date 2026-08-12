@@ -1,38 +1,26 @@
-import React, { FC, memo, useEffect, useRef } from 'react';
+import React, { type FC, memo, useEffect, useRef } from 'react';
 
 import RFBCreate from '@novnc/novnc/lib/rfb';
 import { getLogging, initLogging } from '@novnc/novnc/lib/util/logging';
 
 import { INSECURE, SECURE } from '../../utils/constants';
 import { isConnectionEncrypted } from '../../utils/utils';
-import { ConsoleState, HTTP, HTTPS, VNC_CONSOLE_TYPE, WS, WSS } from '../utils/ConsoleConsts';
-import { ConsoleComponentState } from '../utils/types';
-
+import {
+  ConsoleState,
+  HTTP,
+  HTTPS,
+  VNC_CONSOLE_TYPE,
+  WS_PROTOCOL,
+  WSS,
+} from '../utils/ConsoleConsts';
+import { type ConsoleComponentState } from '../utils/types';
+import { bindRfbActions } from './bindActions';
 import { ALL_SESSIONS, AUTO_CONNECT, USER_CONNECT, WARN } from './utils/constants';
 import * as utils from './utils/util';
-import { RFB, RfbSession, VncConsoleProps } from './utils/VncConsoleTypes';
-import {
-  sendCtrlAlt1,
-  sendCtrlAlt2,
-  sendF1,
-  sendF2,
-  sendF3,
-  sendF4,
-  sendF5,
-  sendF6,
-  sendF7,
-  sendF8,
-  sendF9,
-  sendF10,
-  sendF11,
-  sendF12,
-  sendPasteCMD,
-} from './actions';
+import { type RFB, type RfbSession, type VncConsoleProps } from './utils/VncConsoleTypes';
 import vncLogger from './VncLogger';
 
 import './vnc-console.scss';
-
-const { connected, connecting } = ConsoleState;
 
 export const VncConsole: FC<VncConsoleProps> = ({
   basePath,
@@ -41,28 +29,29 @@ export const VncConsole: FC<VncConsoleProps> = ({
   viewOnly = false,
   vncLogLevel = false,
 }) => {
-  const rfbRefs = useRef<RfbSession[]>([]);
+  const rfbRef = useRef<RfbSession[]>([]);
   const staticRenderLocationRef = useRef(null);
   const sessionRef = useRef(0);
   const setVncState = (
     producer: (state: ConsoleComponentState) => Partial<ConsoleComponentState>,
-  ) =>
+  ): void =>
     setState((oldState) =>
       oldState.type === VNC_CONSOLE_TYPE ? { ...oldState, ...producer(oldState) } : oldState,
     );
-  const log = (...args: unknown[]) => vncLogger.log(vncLogLevel, ...args, rfbRefs.current);
+  const log = (...args: unknown[]): void => vncLogger.log(vncLogLevel, ...args, rfbRef.current);
 
   // render should be called once
+  // eslint-disable-next-line react-hooks/refs -- component renders once by design
   log(`[VncConsole] render. Active session ${sessionRef.current}.`);
 
-  const disconnect = ({ sessionID = sessionRef.current, sourceLabel = 'action' } = {}) =>
-    utils.disconnect({ log, rfbRefs, sessionID, sessionRef, setVncState, sourceLabel });
+  const disconnect = ({ sessionID = sessionRef.current, sourceLabel = 'action' } = {}): void =>
+    utils.disconnect({ log, rfbRefs: rfbRef, sessionID, sessionRef, setVncState, sourceLabel });
 
   const connect = (sourceLabel: string, preserveSession: boolean = true): void => {
-    setVncState(() => ({ state: connecting }));
+    setVncState(() => ({ state: ConsoleState.Connecting }));
     const sessionID = ++sessionRef.current;
     // prevent disconnect for old session to interact with current connection attempt
-    const isMySession = () => sessionID === sessionRef.current;
+    const isMySession = (): boolean => sessionID === sessionRef.current;
 
     const isEncrypted = isConnectionEncrypted();
     const path = `${basePath}/vnc`;
@@ -72,12 +61,12 @@ export const VncConsole: FC<VncConsoleProps> = ({
       path,
       port,
       preserveSession,
-      protocol: isEncrypted ? WSS : WS,
+      protocol: isEncrypted ? WSS : WS_PROTOCOL,
     });
-    const rfbInst: RFB = new RFBCreate(staticRenderLocationRef.current, connectUrl);
+    const rfbInst = new RFBCreate(staticRenderLocationRef.current, connectUrl) as RFB;
     rfbInst.addEventListener('connect', () => {
       log(`[VncConsole][${sourceLabel}] connect id=${sessionID} currentId=${sessionRef.current}`);
-      isMySession() && setVncState(() => ({ state: connected }));
+      isMySession() && setVncState(() => ({ state: ConsoleState.Connected }));
     });
     rfbInst.addEventListener('disconnect', () =>
       disconnect({ sessionID, sourceLabel: 'disconnectEvent' }),
@@ -115,8 +104,8 @@ export const VncConsole: FC<VncConsoleProps> = ({
         );
         // tag the session by adding a testUrl
         // that information can be later retrieved in the disconnect even handler
-        rfbRefs.current =
-          rfbRefs.current?.map(
+        rfbRef.current =
+          rfbRef.current?.map(
             (session): RfbSession => ({
               ...session,
               testUrl: session.sessionID === sessionID ? testUrl : session.testUrl,
@@ -131,37 +120,21 @@ export const VncConsole: FC<VncConsoleProps> = ({
     rfbInst.viewOnly = viewOnly;
     rfbInst.scaleViewport = scaleViewport;
 
-    rfbRefs.current = [{ rfb: rfbInst, sessionID }, ...rfbRefs.current];
+    rfbRef.current = [{ rfb: rfbInst, sessionID }, ...rfbRef.current];
 
     setVncState((prev) => ({
       actions: {
-        // get methods that are not bound to rfb instance (i.e. connect())
-        // those are initialized during initial loading with useEffect
         ...prev.actions,
-        sendCtrlAlt1: sendCtrlAlt1.bind(rfbInst),
-        sendCtrlAlt2: sendCtrlAlt2.bind(rfbInst),
         sendCtrlAltDel: rfbInst.sendCtrlAltDel?.bind(rfbInst),
-        sendF1: sendF1.bind(rfbInst),
-        sendF10: sendF10.bind(rfbInst),
-        sendF11: sendF11.bind(rfbInst),
-        sendF12: sendF12.bind(rfbInst),
-        sendF2: sendF2.bind(rfbInst),
-        sendF3: sendF3.bind(rfbInst),
-        sendF4: sendF4.bind(rfbInst),
-        sendF5: sendF5.bind(rfbInst),
-        sendF6: sendF6.bind(rfbInst),
-        sendF7: sendF7.bind(rfbInst),
-        sendF8: sendF8.bind(rfbInst),
-        sendF9: sendF9.bind(rfbInst),
-        sendPaste: sendPasteCMD.bind(rfbInst),
+        ...bindRfbActions(rfbInst),
       },
     }));
   };
 
   // auto-connect only on first load
   useEffect(() => {
-    if (rfbRefs.current?.length) {
-      log(`[VncConsole] Session queue dirty on initialization.`, rfbRefs.current);
+    if (rfbRef.current?.length) {
+      log(`[VncConsole] Session queue dirty on initialization.`, rfbRef.current);
       return;
     }
 
@@ -170,7 +143,7 @@ export const VncConsole: FC<VncConsoleProps> = ({
     }
     log(`[VncConsole] auto-connect. Active session ${sessionRef.current}.`);
     connect(AUTO_CONNECT);
-    const userConnect = (preserveSession?: boolean) => connect(USER_CONNECT, preserveSession);
+    const userConnect = (preserveSession?: boolean): void => connect(USER_CONNECT, preserveSession);
     setVncState((prev) => ({
       actions: {
         // keep the methods bound during connect()
@@ -184,7 +157,8 @@ export const VncConsole: FC<VncConsoleProps> = ({
     // and prevents re-creating this component (the render is called once)
     // Thanks to that the the cleanup is launched only when the parent is unmounted
     // At this point we don't notify the parent and can just close all sessions
-    return () => disconnect({ sessionID: ALL_SESSIONS, sourceLabel: 'useEffect' });
+    return (): void => disconnect({ sessionID: ALL_SESSIONS, sourceLabel: 'useEffect' });
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional mount-only effect
   }, []);
 
   return <div className={'vnc-container'} ref={staticRenderLocationRef} />;

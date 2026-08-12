@@ -1,28 +1,28 @@
 import { useMemo } from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import {
-  KubevirtFilter,
+  type KubevirtFilter,
   KubevirtFilterLayout,
 } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { useStorageClasses } from '@kubevirt-utils/hooks/useStorageClasses';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
+import { getVMStorageClasses } from '@kubevirt-utils/resources/vm/utils/getVMStorageClasses';
 import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
-import { PVCMapper } from '@virtualmachines/utils/mappers';
+import type { PVCMapper } from '@virtualmachines/utils/mappers';
 
 const useStorageClassFilter = (
   vms: V1VirtualMachine[],
   pvcMapper: PVCMapper,
 ): KubevirtFilter<V1VirtualMachine> => {
   const { t } = useKubevirtTranslation();
-  const { allStorageClasses, storageClassesByVM } = useStorageClasses(vms, pvcMapper);
+  const { allStorageClasses, storageClassesByVM } = getVMStorageClasses(vms, pvcMapper);
 
   const options = useMemo(
     () =>
       Array.from(allStorageClasses)
-        .sort()
-        .map((sc) => ({ label: sc, value: sc })),
+        .sort((a, b) => a.localeCompare(b))
+        .map((storageClass) => ({ label: storageClass, value: storageClass })),
     [allStorageClasses],
   );
 
@@ -32,7 +32,9 @@ const useStorageClassFilter = (
       filterLayout: KubevirtFilterLayout.SELECT,
       id: VirtualMachineRowFilterType.StorageClass,
       match: (obj: V1VirtualMachine, selected: string[]) =>
-        selected.some((sc) => storageClassesByVM?.[getNamespace(obj)]?.[getName(obj)]?.has(sc)),
+        selected.some((storageClass) =>
+          storageClassesByVM?.[getNamespace(obj)]?.[getName(obj)]?.has(storageClass),
+        ),
       options,
     }),
     [t, options, storageClassesByVM],

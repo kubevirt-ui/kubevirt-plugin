@@ -5,6 +5,7 @@ import prettier from 'eslint-plugin-prettier/recommended';
 import reactHooks from 'eslint-plugin-react-hooks';
 import simpleImportSort from 'eslint-plugin-simple-import-sort';
 import testingLibrary from 'eslint-plugin-testing-library';
+import unicorn from 'eslint-plugin-unicorn';
 import tseslint from 'typescript-eslint';
 
 const ignoresConfig = {
@@ -46,6 +47,7 @@ const baseConfig = {
     promise,
     'react-hooks': reactHooks,
     'simple-import-sort': simpleImportSort,
+    unicorn,
   },
   rules: {
     'i18next/no-literal-string': 'error',
@@ -75,6 +77,12 @@ const baseConfig = {
     'react-hooks/rules-of-hooks': 'off',
     'simple-import-sort/exports': 'off',
     'simple-import-sort/imports': 'off',
+    'unicorn/no-for-each': 'error',
+    'unicorn/no-lonely-if': 'error',
+    'unicorn/no-useless-spread': 'error',
+    'unicorn/prefer-array-some': 'error',
+    'unicorn/prefer-includes': 'error',
+    'unicorn/throw-new-error': 'error',
   },
   settings: {
     'import-x/resolver': {

@@ -19,11 +19,9 @@ export const isSessionAlreadyInUse = (error: Error): boolean => {
 };
 
 export const isConnectableState = (state: ConsoleState): boolean =>
-  [
-    ConsoleState.connecting,
-    ConsoleState.disconnected,
-    ConsoleState.session_already_in_use,
-  ].includes(state);
+  [ConsoleState.Connecting, ConsoleState.Disconnected, ConsoleState.SessionAlreadyInUse].includes(
+    state,
+  );
 
 /**
  * Add delay to QEMUExtendedKeyEvent
@@ -73,7 +71,7 @@ export const notifyParentAboutDisconnect = ({
   );
   setVncState((prev) => ({
     actions: { connect: prev.actions.connect, disconnect: prev.actions.disconnect },
-    state: sessionAlreadyInUse ? ConsoleState.session_already_in_use : ConsoleState.disconnected,
+    state: sessionAlreadyInUse ? ConsoleState.SessionAlreadyInUse : ConsoleState.Disconnected,
   }));
 };
 

@@ -1,5 +1,4 @@
-import React, { FC, useCallback, useMemo } from 'react';
-
+import React, { type FC, useCallback, useMemo } from 'react';
 import { type TFunction } from 'i18next';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -46,7 +45,7 @@ const InstallSelectedButton: FC = () => {
   );
 
   const handleInstall = useCallback(() => {
-    installableSelectedFeatures.forEach((feature) => void installFeature(feature));
+    for (const feature of installableSelectedFeatures) void installFeature(feature);
   }, [installableSelectedFeatures, installFeature]);
 
   if (!resourcesLoaded) {

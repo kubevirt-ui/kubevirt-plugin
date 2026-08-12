@@ -1,9 +1,9 @@
-import { MouseEvent, useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
+import { type MouseEvent, useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
 
 import { tourContextMenuTriggerSignal } from '@kubevirt-utils/components/GuidedTour/utils/guidedTourSignals';
 import { useQueryParamsMethods } from '@kubevirt-utils/components/ListPageFilter/hooks/useQueryParamsMethods';
-import { TreeViewDataItem, TreeViewProps } from '@patternfly/react-core';
+import { type TreeViewDataItem, type TreeViewProps } from '@patternfly/react-core';
 import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
 import { CLUSTER_SELECTOR_PREFIX } from '../utils/constants';
@@ -12,9 +12,8 @@ import {
   getAllTreeViewFolderItems,
   getAllTreeViewProjectItems,
   getAllTreeViewVMItems,
-  TreeViewDataItemWithHref,
+  type TreeViewDataItemWithHref,
 } from '../utils/utils';
-
 import { RIGHT_CLICK_LISTENER } from './constants';
 import { addDragEventListener, addDropEventListeners } from './dragndrop';
 
@@ -43,7 +42,7 @@ const useTreeViewItemActions: UseTreeViewItemActions = (treeData) => {
   const addRightClickEvent = useCallback((treeItem: TreeViewDataItem): (() => void) => {
     const element = document.getElementById(treeItem.id);
 
-    const handler = (event) => {
+    const handler = (event): void => {
       event.preventDefault();
       event.stopPropagation();
       document.body.click();
@@ -60,7 +59,9 @@ const useTreeViewItemActions: UseTreeViewItemActions = (treeData) => {
 
     const removeRightClickListeners = allRightClickableItems?.map(addRightClickEvent);
 
-    return () => removeRightClickListeners?.forEach((removeListener) => removeListener?.());
+    return (): void => {
+      for (const removeListener of removeRightClickListeners ?? []) removeListener?.();
+    };
   }, [treeData, addRightClickEvent]);
 
   useLayoutEffect(() => {
@@ -68,7 +69,9 @@ const useTreeViewItemActions: UseTreeViewItemActions = (treeData) => {
 
     const removeDragListeners = vmItems?.map(addDragEventListener);
 
-    return () => removeDragListeners?.forEach((removeListener) => removeListener?.());
+    return (): void => {
+      for (const removeListener of removeDragListeners ?? []) removeListener?.();
+    };
   }, [treeData, addRightClickEvent]);
 
   useLayoutEffect(() => {
@@ -78,7 +81,9 @@ const useTreeViewItemActions: UseTreeViewItemActions = (treeData) => {
       addDropEventListeners(element, removeGroupValue),
     );
 
-    return () => removeEventListeners?.forEach((removeEventListener) => removeEventListener?.());
+    return (): void => {
+      for (const removeEventListener of removeEventListeners ?? []) removeEventListener?.();
+    };
   }, [dropElements, removeGroupValue]);
 
   const addListeners = useCallback(
@@ -96,11 +101,11 @@ const useTreeViewItemActions: UseTreeViewItemActions = (treeData) => {
           ...getAllTreeViewProjectItems([item]),
         ];
 
-        vmItems?.forEach(addDragEventListener);
+        for (const vmItem of vmItems ?? []) addDragEventListener(vmItem);
 
-        dropInnerElements.forEach((element) => addDropEventListeners(element, removeGroupValue));
+        for (const element of dropInnerElements) addDropEventListeners(element, removeGroupValue);
 
-        allRightClickableItems.forEach(addRightClickEvent);
+        for (const clickableItem of allRightClickableItems) addRightClickEvent(clickableItem);
       }, 200);
     },
     [addRightClickEvent, navigate, removeGroupValue],

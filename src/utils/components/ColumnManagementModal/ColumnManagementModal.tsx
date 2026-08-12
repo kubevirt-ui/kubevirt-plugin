@@ -1,25 +1,27 @@
-import React, { FC, FormEvent, MouseEventHandler, SyntheticEvent, useState } from 'react';
+import React, {
+  type FC,
+  type FormEvent,
+  type MouseEventHandler,
+  type SyntheticEvent,
+  useState,
+} from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettingsTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettingsTableColumns';
-import { ColumnLayout } from '@openshift-console/dynamic-plugin-sdk';
+import { type ColumnLayout } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Alert,
   AlertVariant,
-  Button,
-  ButtonVariant,
   DataList,
-  Flex,
   Grid,
   GridItem,
   Modal,
   ModalBody,
-  ModalFooter,
   ModalHeader,
   ModalVariant,
-  Stack,
 } from '@patternfly/react-core';
 
+import ColumnManagementModalFooter from './ColumnManagementModalFooter';
 import DataListRow from './DataListRow';
 import { createInputId, getColumnId, getMaxColumnsToSelect } from './utils';
 
@@ -42,12 +44,12 @@ export const ColumnManagementModal: FC<ColumnManagementModalProps> = ({
   const defaultColumns = columns.filter((column) => column.id && !column.additional);
   const additionalColumns = columns.filter((column) => column.additional);
 
-  const [_, setActiveColumns, loaded, error] = useKubevirtUserSettingsTableColumns({
+  const [_activeColumns, setActiveColumns, loaded, error] = useKubevirtUserSettingsTableColumns({
     columnManagementID: id,
     columns,
   });
 
-  const [checkedColumns, setCheckedColumns] = useState<Set<string>>(
+  const [checkedColumns, setCheckedColumns] = useState<Set<string>>(() =>
     selectedColumns && selectedColumns.size !== 0
       ? new Set(selectedColumns)
       : new Set(defaultColumns.map((col) => col.id)),
@@ -62,12 +64,12 @@ export const ColumnManagementModal: FC<ColumnManagementModalProps> = ({
     setCheckedColumns(updatedCheckedColumns);
   };
 
-  const submit: MouseEventHandler<HTMLButtonElement> = async (event) => {
+  const submit: MouseEventHandler<HTMLButtonElement> = (event) => {
     event.preventDefault();
     const orderedCheckedColumns = new Set<string>();
-    checkedColumns.forEach((ids) => orderedCheckedColumns.add(ids));
+    for (const ids of checkedColumns) orderedCheckedColumns.add(ids);
 
-    await setActiveColumns([...orderedCheckedColumns]);
+    setActiveColumns([...orderedCheckedColumns]);
     onClose();
   };
 
@@ -78,8 +80,8 @@ export const ColumnManagementModal: FC<ColumnManagementModalProps> = ({
   const resetColumns = (event: SyntheticEvent): void => {
     event.preventDefault();
     const updatedCheckedColumns = new Set(checkedColumns);
-    defaultColumns.forEach((col) => col.id && updatedCheckedColumns.add(col.id));
-    additionalColumns.forEach((col) => updatedCheckedColumns.delete(col.id));
+    for (const col of defaultColumns) col.id && updatedCheckedColumns.add(col.id);
+    for (const col of additionalColumns) updatedCheckedColumns.delete(col.id);
     setCheckedColumns(updatedCheckedColumns);
   };
 
@@ -138,39 +140,13 @@ export const ColumnManagementModal: FC<ColumnManagementModalProps> = ({
           </Grid>
         </div>
       </ModalBody>
-      <ModalFooter>
-        <Stack className="kv-tabmodal-footer" hasGutter>
-          {error && (
-            <Alert isInline title={t('An error occurred')} variant={AlertVariant.danger}>
-              {error.message}
-            </Alert>
-          )}
-          <Flex spaceItems={{ default: 'spaceItemsSm' }}>
-            <Button
-              data-test="save-button"
-              form="modal-with-form-form"
-              isDisabled={!loaded}
-              isLoading={!loaded}
-              key="create"
-              onClick={submit}
-              variant={ButtonVariant.primary}
-            >
-              {t('Save')}
-            </Button>
-            <Button
-              data-test="reset-button"
-              key="reset"
-              onClick={resetColumns}
-              variant={ButtonVariant.secondary}
-            >
-              {t('Restore default columns')}
-            </Button>
-            <Button data-test="cancel-button" onClick={onClose} variant={ButtonVariant.link}>
-              {t('Cancel')}
-            </Button>
-          </Flex>
-        </Stack>
-      </ModalFooter>
+      <ColumnManagementModalFooter
+        error={error}
+        loaded={loaded}
+        onClose={onClose}
+        resetColumns={resetColumns}
+        submit={submit}
+      />
     </Modal>
   );
 };

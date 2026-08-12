@@ -1,7 +1,7 @@
 import { MigPlanModel } from '@kubevirt-utils/models';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 
-import { MigPlan, MultiNamespaceVirtualMachineStorageMigrationPlan } from '../constants';
+import { type MigPlan, type MultiNamespaceVirtualMachineStorageMigrationPlan } from '../constants';
 
 // Build KubeVirt-shaped spec (namespaces / virtualMachines / targetMigrationPVCs) from wizard selections.
 export const buildKubeVirtShapedSpecFromMigrations = (
@@ -17,22 +17,22 @@ export const buildKubeVirtShapedSpecFromMigrations = (
   type Sel = (typeof selectedMigrations)[number];
   const byNs = new Map<string, Map<string, Sel[]>>();
 
-  selectedMigrations.forEach((m) => {
-    const ns = m.vmNamespace ?? getNamespace(m.pvc);
-    if (!ns) return;
+  for (const migration of selectedMigrations) {
+    const ns = migration.vmNamespace ?? getNamespace(migration.pvc);
+    if (!ns) continue;
     if (!byNs.has(ns)) byNs.set(ns, new Map());
     const vmMap = byNs.get(ns);
-    if (!vmMap) return;
-    if (!vmMap.has(m.vmName)) vmMap.set(m.vmName, []);
-    vmMap.get(m.vmName)?.push(m);
-  });
+    if (!vmMap) continue;
+    if (!vmMap.has(migration.vmName)) vmMap.set(migration.vmName, []);
+    vmMap.get(migration.vmName)?.push(migration);
+  }
 
   const namespaces: MultiNamespaceVirtualMachineStorageMigrationPlan['spec']['namespaces'] = [];
 
-  byNs.forEach((vmMap, nsName) => {
+  for (const [nsName, vmMap] of byNs) {
     const virtualMachines: MultiNamespaceVirtualMachineStorageMigrationPlan['spec']['namespaces'][0]['virtualMachines'] =
       [];
-    vmMap.forEach((migs, vmName) => {
+    for (const [vmName, migs] of vmMap) {
       virtualMachines.push({
         name: vmName,
         targetMigrationPVCs: migs.map((migration) => ({
@@ -42,13 +42,13 @@ export const buildKubeVirtShapedSpecFromMigrations = (
           volumeName: migration.volumeName,
         })),
       });
-    });
+    }
     namespaces.push({
       name: nsName,
       retentionPolicy,
       virtualMachines,
     });
-  });
+  }
 
   return { namespaces };
 };

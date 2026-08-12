@@ -1,4 +1,4 @@
-import { TFunction } from 'i18next';
+import { type TFunction } from 'i18next';
 
 import {
   errorPrintableVMStatus,
@@ -102,9 +102,9 @@ describe('VM Status Filter', () => {
       const expectedStatuses = Object.keys(printableVMStatus).concat('Error');
 
       const itemIds = statusFilterItems.map((item) => item.id);
-      expectedStatuses.forEach((status) => {
+      for (const status of expectedStatuses) {
         expect(itemIds).toContain(status);
-      });
+      }
     });
   });
 });

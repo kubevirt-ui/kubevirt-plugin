@@ -62,9 +62,9 @@ jest.mock('@kubevirt-utils/hooks/useKubevirtTranslation', () => {
   const t = (key: string, params?: Record<string, string>): string => {
     let result = key;
     if (params) {
-      Object.entries(params).forEach(([objKey, value]) => {
+      for (const [objKey, value] of Object.entries(params)) {
         result = result.replace(`{{${objKey}}}`, String(value));
-      });
+      }
     }
     return result;
   };

@@ -1,6 +1,6 @@
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
-import { Td, TdProps } from '@patternfly/react-table';
+import { Td, type TdProps } from '@patternfly/react-table';
 
 type TemplatesTableRowCellProps = Omit<TdProps, 'ref'> & {
   activeColumnIDs: string[];
@@ -12,7 +12,7 @@ const TemplatesTableRowCell: FC<TemplatesTableRowCellProps> = ({
   id,
   ...otherProps
 }) =>
-  activeColumnIDs?.some((activeID) => activeID === id) ? (
+  activeColumnIDs?.includes(id) ? (
     <Td id={id} {...otherProps}>
       {children}
     </Td>

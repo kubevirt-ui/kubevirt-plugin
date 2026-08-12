@@ -1,8 +1,8 @@
-import { ObjectMetadata } from '@openshift-console/dynamic-plugin-sdk';
+import { type ObjectMetadata } from '@openshift-console/dynamic-plugin-sdk';
 import {
-  AllQuickStartStates,
+  type AllQuickStartStates,
   getQuickStartStatus,
-  QuickStart,
+  type QuickStart,
   QuickStartStatus,
 } from '@patternfly/quickstarts';
 
@@ -17,44 +17,46 @@ export const orderQuickStarts = (
   const orderedQuickStarts: Merge<QuickStart, { metadata: ObjectMetadata }>[] = [];
   const filteredQuickStarts = filter ? allQuickStarts.filter(filter) : allQuickStarts;
 
-  const isFeatured = (quickStart: Merge<QuickStart, { metadata: ObjectMetadata }>) =>
+  const isFeatured = (quickStart: Merge<QuickStart, { metadata: ObjectMetadata }>): boolean =>
     featured?.includes(quickStart?.metadata?.name);
-  const getStatus = (quickStart: Merge<QuickStart, { metadata: ObjectMetadata }>) =>
-    getQuickStartStatus(allQuickStartStates, quickStart?.metadata?.name);
+  const getStatus = (
+    quickStart: Merge<QuickStart, { metadata: ObjectMetadata }>,
+  ): QuickStartStatus => getQuickStartStatus(allQuickStartStates, quickStart?.metadata?.name);
 
   // Prioritize featured quick starts and keep specified order
   if (featured) {
     const featuredQuickStartsByName = filteredQuickStarts.reduce(
-      (acc, q) => {
-        acc[q?.metadata?.name] = q;
+      (acc, qsItem) => {
+        acc[qsItem?.metadata?.name] = qsItem;
         return acc;
       },
       {} as Record<string, Merge<QuickStart, { metadata: ObjectMetadata }>>,
     );
-    featured.forEach((quickStartName) => {
+    for (const quickStartName of featured) {
       if (
         featuredQuickStartsByName[quickStartName] &&
         getStatus(featuredQuickStartsByName[quickStartName]) !== QuickStartStatus.COMPLETE
       ) {
         orderedQuickStarts.push(featuredQuickStartsByName[quickStartName]);
       }
-    });
+    }
   }
 
   // Show non-featured in progress quick starts
   orderedQuickStarts.push(
     ...filteredQuickStarts.filter(
-      (q) => !isFeatured(q) && getStatus(q) === QuickStartStatus.IN_PROGRESS,
+      (quickStart) =>
+        !isFeatured(quickStart) && getStatus(quickStart) === QuickStartStatus.IN_PROGRESS,
     ),
   );
 
   // Show non-featured completed and unstarted quick starts
   orderedQuickStarts.push(
     ...filteredQuickStarts.filter(
-      (q) =>
-        !isFeatured(q) &&
-        (getStatus(q) === QuickStartStatus.NOT_STARTED ||
-          getStatus(q) === QuickStartStatus.COMPLETE),
+      (quickStart) =>
+        !isFeatured(quickStart) &&
+        (getStatus(quickStart) === QuickStartStatus.NOT_STARTED ||
+          getStatus(quickStart) === QuickStartStatus.COMPLETE),
     ),
   );
   return orderedQuickStarts;

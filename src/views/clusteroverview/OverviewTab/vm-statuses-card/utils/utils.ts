@@ -1,6 +1,6 @@
 import { Fragment } from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { GreenRunningIcon } from '@kubevirt-utils/icons/GreenRunningIcon';
 import { getVMStatus } from '@kubevirt-utils/resources/shared';
 import { VM_ERROR_STATUSES, VM_STATUS } from '@kubevirt-utils/resources/vm/utils/vmStatus';
@@ -40,33 +40,35 @@ export const getOtherStatuses = (): VM_STATUS[] => {
   );
 };
 
-const initializeStatusCountsObject = (): { [key in VM_STATUS]?: number } =>
-  Object.keys(VM_STATUS).reduce((acc, status) => {
+const initializeStatusCountsObject = (): Record<string, number> =>
+  Object.keys(VM_STATUS).reduce<Record<string, number>>((acc, status) => {
     acc[status] = 0;
     return acc;
   }, {});
 
 export type StatusCounts = {
-  otherStatuses: { [key in VM_STATUS]?: number };
+  otherStatuses: Record<string, number>;
   otherStatusesCount: number;
-  primaryStatuses: { [key in 'Error' | VM_STATUS]?: number };
+  primaryStatuses: Record<string, number>;
 };
 
 export const getVMStatuses = (vms: V1VirtualMachine[]): StatusCounts => {
   const statusCounts = initializeStatusCountsObject();
-  vms.forEach((vm) => {
+  for (const vm of vms) {
     const status = getVMStatus(vm);
-    statusCounts[status] = statusCounts[status] + 1;
-  });
+    if (status) {
+      statusCounts[status] = (statusCounts[status] ?? 0) + 1;
+    }
+  }
 
   statusCounts[ERROR] = VM_ERROR_STATUSES.reduce((acc, state) => {
-    const count = acc + (statusCounts?.[state] || 0);
+    const count = acc + (statusCounts?.[state] ?? 0);
     delete statusCounts[state];
     return count;
   }, 0);
 
-  const primaryStatuses = PRIMARY_STATUSES.reduce((acc, state) => {
-    acc[state] = statusCounts?.[state] || 0;
+  const primaryStatuses = PRIMARY_STATUSES.reduce<Record<string, number>>((acc, state) => {
+    acc[state] = statusCounts?.[state] ?? 0;
     delete statusCounts[state];
     return acc;
   }, {});

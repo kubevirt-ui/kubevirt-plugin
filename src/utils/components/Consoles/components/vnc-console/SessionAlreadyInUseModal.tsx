@@ -1,4 +1,4 @@
-import React, { Dispatch, FC, SetStateAction } from 'react';
+import React, { type Dispatch, type FC, type SetStateAction } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from '@patternfly/react-core';
@@ -17,7 +17,7 @@ const SessionAlreadyInUseModal: FC<SessionAlreadyInUseModalProps> = ({
   setConsoleState,
 }) => {
   const { t } = useKubevirtTranslation();
-  const onClose = () => setConsoleState(ConsoleState.disconnected);
+  const onClose = (): void => setConsoleState(ConsoleState.Disconnected);
   return (
     <Modal isOpen={isOpen} onClose={onClose} position="top" variant={'small'}>
       <ModalHeader title={t('VNC session already in use')} titleIconVariant={'warning'} />

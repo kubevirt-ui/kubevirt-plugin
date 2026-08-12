@@ -1,273 +1,56 @@
-import { isEmpty } from 'lodash';
-import React from 'react';
-
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { tourGuideVM } from '@kubevirt-utils/components/GuidedTour/utils/constants';
-import { ALL_NAMESPACES_SESSION_KEY, LOCAL_CLUSTER } from '@kubevirt-utils/hooks/constants';
-import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { SINGLE_CLUSTER_KEY } from '@kubevirt-utils/resources/constants';
-import { isSystemNamespace } from '@kubevirt-utils/resources/namespace/helper';
-import { getLabel, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import {
   CLUSTER_LIST_FILTER_TYPE,
   PROJECT_LIST_FILTER_TYPE,
 } from '@kubevirt-utils/utils/constants';
-import { universalComparator } from '@kubevirt-utils/utils/utils';
-import { getCluster } from '@multicluster/helpers/selectors';
-import { UseMulticlusterNamespacesReturn } from '@multicluster/hooks/useMulticlusterNamespaces';
-import {
-  getACMVMListURL,
-  getVMListNamespacesURL,
-  getVMListURL,
-  getVMURL,
-  isACMPath,
-} from '@multicluster/urls';
-import { Tooltip, TreeViewDataItem } from '@patternfly/react-core';
-import {
-  ClusterIcon,
-  FolderIcon,
-  FolderOpenIcon,
-  ProjectDiagramIcon,
-} from '@patternfly/react-icons';
+import { isACMPath } from '@multicluster/urls';
+import { type TreeViewDataItem } from '@patternfly/react-core';
 import { signal } from '@preact/signals-react';
 import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
-import { statusIcon } from '../icons/utils';
-
 import {
-  ALL_CLUSTERS_ID,
   CLUSTER_SELECTOR_PREFIX,
   FOLDER_SELECTOR_PREFIX,
-  HIDE,
   PROJECT_SELECTOR_PREFIX,
-  SHOW,
-  VM_FOLDER_LABEL,
 } from './constants';
 
+export * from './clusterVMHelpers';
+export * from './projectTreeItems';
+export * from './treeDataAssembly';
+export * from './treeHelpers';
+export * from './treeItemBuilders';
+
 export const treeDataMap = signal<Record<string, TreeViewDataItemWithHref>>(null);
-export interface TreeViewDataItemWithHref extends TreeViewDataItem {
+
+export type TreeViewDataItemWithHref = {
   href?: string;
-}
+} & TreeViewDataItem;
 
-export const getVMTreeViewItemID = (vmName: string, vmNamespace: string, vmCluster: string) =>
-  `${vmCluster || SINGLE_CLUSTER_KEY}/${vmNamespace}/${vmName}`;
+export const getVMTreeViewItemID = (
+  vmName: string,
+  vmNamespace: string,
+  vmCluster: string,
+): string => `${vmCluster || SINGLE_CLUSTER_KEY}/${vmNamespace}/${vmName}`;
 
-export const getProjectTreeViewItemID = (cluster: string | undefined, project: string) =>
+export const getProjectTreeViewItemID = (cluster: string | undefined, project: string): string =>
   `${PROJECT_SELECTOR_PREFIX}/${cluster ?? SINGLE_CLUSTER_KEY}/${project}`;
 
 export const getFolderTreeViewItemID = (
   cluster: string | undefined,
   project: string,
   folder: string,
-) => `${FOLDER_SELECTOR_PREFIX}/${cluster ?? SINGLE_CLUSTER_KEY}/${project}/${folder}`;
+): string => `${FOLDER_SELECTOR_PREFIX}/${cluster ?? SINGLE_CLUSTER_KEY}/${project}/${folder}`;
 
-export const getClusterTreeViewItemID = (clusterName: string) =>
+export const getClusterTreeViewItemID = (clusterName: string): string =>
   `${CLUSTER_SELECTOR_PREFIX}/${clusterName}`;
 
-const buildProjectMap = (
-  vms: V1VirtualMachine[],
-  currentPageVMName: string,
-  currentVMTab: string,
-  treeViewDataMap: Record<string, TreeViewDataItemWithHref>,
-  foldersEnabled: boolean,
-  isTourRunning = false,
-) => {
-  if (isEmpty(vms)) return {};
-
-  const projectMap: Record<
-    string,
-    {
-      count: number;
-      folders: Record<string, TreeViewDataItemWithHref[]>;
-      ungrouped: TreeViewDataItemWithHref[];
-    }
-  > = {};
-
-  vms?.forEach((vm) => {
-    const vmNamespace = getNamespace(vm);
-    const vmName = getName(vm);
-    const vmCluster = getCluster(vm);
-    const folder = foldersEnabled ? getLabel(vm, VM_FOLDER_LABEL) : null;
-    const vmTreeItemID = getVMTreeViewItemID(vmName, vmNamespace, vmCluster);
-    const VMStatusIcon = statusIcon[vm?.status?.printableStatus];
-
-    const vmTreeItem: TreeViewDataItemWithHref = {
-      defaultExpanded: currentPageVMName && currentPageVMName === vmName,
-      href: isTourRunning
-        ? undefined
-        : `${getVMURL(vmCluster, vmNamespace, vmName)}/${currentVMTab}`,
-      icon: <VMStatusIcon />,
-      id: vmTreeItemID,
-      name: vmName,
-    };
-
-    if (!treeViewDataMap[vmTreeItemID]) {
-      treeViewDataMap[vmTreeItemID] = vmTreeItem;
-    }
-
-    if (!projectMap[vmNamespace]) {
-      projectMap[vmNamespace] = { count: 0, folders: {}, ungrouped: [] };
-    }
-
-    projectMap[vmNamespace].count++;
-    if (folder) {
-      if (!projectMap[vmNamespace].folders[folder]) {
-        projectMap[vmNamespace].folders[folder] = [];
-      }
-      return projectMap[vmNamespace].folders[folder].push(vmTreeItem);
-    }
-
-    projectMap[vmNamespace].ungrouped.push(vmTreeItem);
-  });
-
-  return projectMap;
-};
-
-const getFolderNameFromQueryParams = (queryParams?: string): string | undefined => {
-  const params = new URLSearchParams(queryParams?.replace(/^\?/, '') ?? '');
-  return params.get(VirtualMachineRowFilterType.Group) || undefined;
-};
-
-const isFolderExpanded = (
-  folder: string,
-  project: string,
-  vmItems: TreeViewDataItemWithHref[],
-  currentPageVMName: string | undefined,
-  currentPageNamespace: string,
-  currentFolderName: string | undefined,
-  clusterSelected = true,
-): boolean =>
-  !!(currentPageVMName && vmItems.some((item) => (item.name as string) === currentPageVMName)) ||
-  (clusterSelected && currentFolderName === folder && currentPageNamespace === project);
-
-const createFolderTreeItems = (
-  folders: Record<string, TreeViewDataItemWithHref[]>,
-  project: string,
-  currentPageVMName: string,
-  currentPageNamespace: string,
-  currentFolderName: string | undefined,
-  treeViewDataMap: Record<string, TreeViewDataItemWithHref>,
-  queryParams?: string,
-  cluster?: string,
-  clusterSelected = true,
-): TreeViewDataItemWithHref[] =>
-  Object.entries(folders).map(([folder, vmItems]) => {
-    const folderTreeItemID = getFolderTreeViewItemID(cluster, project, folder);
-    const folderExpanded = isFolderExpanded(
-      folder,
-      project,
-      vmItems,
-      currentPageVMName,
-      currentPageNamespace,
-      currentFolderName,
-      clusterSelected,
-    );
-
-    const folderTreeItem: TreeViewDataItemWithHref = {
-      children: vmItems,
-      defaultExpanded: folderExpanded,
-      expandedIcon: <FolderOpenIcon />,
-      href: `${getVMListNamespacesURL(cluster, project)}${buildTreeItemQuery({
-        cluster,
-        folderName: folder,
-        project,
-        query: queryParams,
-      })}`,
-      icon: <FolderIcon />,
-      id: folderTreeItemID,
-      name: folder,
-    };
-
-    if (!treeViewDataMap[folderTreeItemID]) {
-      treeViewDataMap[folderTreeItemID] = folderTreeItem;
-    }
-
-    return folderTreeItem;
-  });
-
-const createProjectTreeItem = (
-  project: string,
-  projectMap: Record<string, any>,
-  currentPageVMName: string,
-  currentPageNamespace: string,
-  treeViewDataMap: Record<string, TreeViewDataItemWithHref>,
-  queryParams?: string,
-  cluster?: string,
-  clusterSelected = true,
-  isTourRunning = false,
-  currentFolderName?: string,
-): TreeViewDataItemWithHref => {
-  const projectFolders = createFolderTreeItems(
-    projectMap[project]?.folders || {},
-    project,
-    currentPageVMName,
-    currentPageNamespace,
-    currentFolderName,
-    treeViewDataMap,
-    queryParams,
-    cluster,
-    clusterSelected,
-  );
-
-  const sortProjectFolders = projectFolders.sort((folderA, folderB) =>
-    folderA.id.localeCompare(folderB.id),
-  );
-
-  const projectChildren = [...sortProjectFolders, ...(projectMap[project]?.ungrouped || [])];
-
-  const projectTreeItemID = getProjectTreeViewItemID(cluster, project);
-  const projectTreeItem: TreeViewDataItemWithHref = {
-    children: projectChildren,
-    customBadgeContent: projectMap[project]?.count || '0',
-    defaultExpanded: (currentPageNamespace === project && clusterSelected) || isTourRunning,
-    href: `${getVMListNamespacesURL(cluster, project)}${buildTreeItemQuery({
-      cluster,
-      project,
-      query: queryParams,
-    })}`,
-    icon: (
-      <Tooltip content={t('Project')}>
-        <ProjectDiagramIcon />
-      </Tooltip>
-    ),
-    id: projectTreeItemID,
-    name: project,
-  };
-
-  if (!treeViewDataMap[projectTreeItemID]) {
-    treeViewDataMap[projectTreeItemID] = projectTreeItem;
-  }
-
-  return projectTreeItem;
-};
-
-const createAllNamespacesTreeItem = (
-  treeViewData: TreeViewDataItemWithHref[],
-  treeViewDataMap: Record<string, TreeViewDataItemWithHref>,
-  queryParams?: string,
-): TreeViewDataItemWithHref => {
-  const allNamespacesTreeItem: TreeViewDataItemWithHref = {
-    children: treeViewData,
-    defaultExpanded: true,
-    hasBadge: false,
-    href: `${getVMListURL()}${buildTreeItemQuery({ query: queryParams })}`,
-    icon: <ClusterIcon />,
-    id: ALL_NAMESPACES_SESSION_KEY,
-    name: t(LOCAL_CLUSTER),
-  };
-  if (!treeViewDataMap[ALL_NAMESPACES_SESSION_KEY]) {
-    treeViewDataMap[ALL_NAMESPACES_SESSION_KEY] = allNamespacesTreeItem;
-  }
-  treeDataMap.value = treeViewDataMap;
-  return allNamespacesTreeItem;
-};
-
-export const getVMInfoFromPathname = (pathname: string) => {
+export const getVMInfoFromPathname = (
+  pathname: string,
+): { currentVMTab: string; vmCluster: string; vmName: string; vmNamespace: string } => {
   const splitPathname = pathname.split('/');
-  const isACMTreeView = isACMPath(pathname);
 
-  if (isACMTreeView) {
-    const currentVMTab = splitPathname?.[8] || '';
+  if (isACMPath(pathname)) {
+    const currentVMTab = splitPathname?.[8] ?? '';
     const vmName = splitPathname?.[7];
     const vmNamespace = splitPathname?.[6];
     const vmCluster = splitPathname?.[4];
@@ -275,298 +58,11 @@ export const getVMInfoFromPathname = (pathname: string) => {
     return { currentVMTab, vmCluster, vmName, vmNamespace };
   }
 
-  const currentVMTab = splitPathname?.[6] || '';
+  const currentVMTab = splitPathname?.[6] ?? '';
   const vmName = splitPathname?.[5];
   const vmNamespace = splitPathname?.[3];
 
   return { currentVMTab, vmCluster: null, vmName, vmNamespace };
-};
-
-export const createSingleClusterTreeViewData = (
-  projectNames: string[],
-  vms: V1VirtualMachine[],
-  pathname: string,
-  foldersEnabled: boolean,
-  queryParams: string,
-  isTourRunning = false,
-): TreeViewDataItem[] => {
-  const { currentVMTab, vmName, vmNamespace } = getVMInfoFromPathname(pathname);
-  const currentFolderName = getFolderNameFromQueryParams(queryParams);
-
-  const projectsToShow = isTourRunning ? [getNamespace(tourGuideVM)] : projectNames;
-  const vmsToShow = isTourRunning ? [tourGuideVM] : vms;
-
-  const treeViewDataMap: Record<string, TreeViewDataItem> = {};
-  const projectMap = buildProjectMap(
-    vmsToShow,
-    vmName,
-    currentVMTab,
-    treeViewDataMap,
-    foldersEnabled,
-    isTourRunning,
-  );
-
-  const treeViewData = projectsToShow.map((project) =>
-    createProjectTreeItem(
-      project,
-      projectMap,
-      vmName,
-      vmNamespace,
-      treeViewDataMap,
-      queryParams,
-      undefined,
-      true,
-      isTourRunning,
-      currentFolderName,
-    ),
-  );
-
-  const allNamespacesTreeItem = createAllNamespacesTreeItem(
-    treeViewData,
-    treeViewDataMap,
-    queryParams,
-  );
-
-  treeDataMap.value = treeViewDataMap;
-
-  const tree = allNamespacesTreeItem ? [allNamespacesTreeItem] : treeViewData;
-
-  return tree;
-};
-
-const getVMsPerCluster = (vms: V1VirtualMachine[]): Record<string, V1VirtualMachine[]> => {
-  return vms?.reduce((acc, vm) => {
-    const cluster = getCluster(vm);
-
-    if (!acc[cluster]) {
-      acc[cluster] = [];
-    }
-    acc[cluster].push(vm);
-    return acc;
-  }, {});
-};
-
-export const createMultiClusterTreeViewData = (
-  vms: V1VirtualMachine[],
-  pathname: string,
-  foldersEnabled: boolean,
-  projectsByClusters: UseMulticlusterNamespacesReturn['namespacesByCluster'],
-  allClustersLabel: string,
-  queryParams?: string,
-  clusterNames?: string[],
-): TreeViewDataItem[] => {
-  const { currentVMTab, vmCluster, vmName, vmNamespace } = getVMInfoFromPathname(pathname);
-  const currentFolderName = getFolderNameFromQueryParams(queryParams);
-
-  const vmsPerCluster = getVMsPerCluster(vms) ?? {};
-
-  const treeViewDataMap: Record<string, TreeViewDataItem> = {};
-
-  const treeWithClusters = clusterNames
-    ?.sort((a, b) => universalComparator(a, b))
-    ?.map((clusterName) => {
-      const clusterVMs = vmsPerCluster[clusterName] ?? [];
-
-      const clusterProjects = projectsByClusters[clusterName]
-        ?.map((project) => getName(project))
-        ?.sort((a, b) => universalComparator(a, b));
-
-      const projectMap = buildProjectMap(
-        clusterVMs,
-        vmName,
-        currentVMTab,
-        treeViewDataMap,
-        foldersEnabled,
-      );
-
-      const clusterSelected = vmCluster === clusterName;
-
-      const treeViewData = clusterProjects?.map((project) =>
-        createProjectTreeItem(
-          project,
-          projectMap,
-          vmName,
-          vmNamespace,
-          treeViewDataMap,
-          queryParams,
-          clusterName,
-          clusterSelected,
-          false,
-          currentFolderName,
-        ),
-      );
-
-      const clusterTreeItem: TreeViewDataItemWithHref = {
-        children: treeViewData,
-        defaultExpanded: clusterSelected,
-        hasBadge: false,
-        href: `${getACMVMListURL(clusterName)}${buildTreeItemQuery({
-          cluster: clusterName,
-          query: queryParams,
-        })}`,
-        icon: (
-          <Tooltip content={t('Cluster')}>
-            <ClusterIcon />
-          </Tooltip>
-        ),
-        id: getClusterTreeViewItemID(clusterName),
-        name: clusterName,
-      };
-
-      if (!treeViewDataMap[clusterTreeItem.id]) {
-        treeViewDataMap[clusterTreeItem.id] = clusterTreeItem;
-      }
-
-      return clusterTreeItem;
-    });
-
-  const allClustersTreeItem: TreeViewDataItemWithHref = {
-    children: treeWithClusters,
-    defaultExpanded: true,
-    hasBadge: false,
-    href: `${getACMVMListURL()}${buildTreeItemQuery({ query: queryParams })}`,
-    icon: <ClusterIcon />,
-    id: ALL_CLUSTERS_ID,
-    name: allClustersLabel,
-  };
-
-  treeViewDataMap[ALL_CLUSTERS_ID] = allClustersTreeItem;
-  treeDataMap.value = treeViewDataMap;
-
-  return [allClustersTreeItem];
-};
-
-const nameMatchesSearch = (item: TreeViewDataItem, searchText: string): boolean =>
-  (item.name as string).toLowerCase().includes(searchText.toLowerCase());
-
-const isAllNamespacesItem = (item: TreeViewDataItem): boolean =>
-  item.id === ALL_NAMESPACES_SESSION_KEY;
-
-const isClusterItem = (item: TreeViewDataItem): boolean =>
-  item.id?.startsWith(CLUSTER_SELECTOR_PREFIX);
-
-const isProjectItem = (item: TreeViewDataItem): boolean =>
-  item.id?.startsWith(PROJECT_SELECTOR_PREFIX);
-
-const isFolderItem = (item: TreeViewDataItem): boolean =>
-  item.id?.startsWith(FOLDER_SELECTOR_PREFIX);
-
-const isVMItem = (item: TreeViewDataItem): boolean => !item.children;
-
-// searches for clusters, projects and folders
-export const filterItems = (item: TreeViewDataItem, input: string) => {
-  if (isVMItem(item)) {
-    return false;
-  }
-
-  if (
-    nameMatchesSearch(item, input) &&
-    item.id !== ALL_NAMESPACES_SESSION_KEY &&
-    item.id !== ALL_CLUSTERS_ID
-  ) {
-    return true;
-  }
-
-  if (item.children) {
-    return (
-      (item.children = item.children
-        .map((opt) => Object.assign({}, opt))
-        .filter((child) => filterItems(child, input))).length > 0
-    );
-  }
-};
-
-export const getEffectiveShowEmptyProjects = (
-  hasVMs: boolean,
-  showEmptyProjects: string,
-): string => (hasVMs ? showEmptyProjects : SHOW);
-
-export const isShowOnlyVMProjectsChecked = (hasVMs: boolean, showEmptyProjects: string): boolean =>
-  getEffectiveShowEmptyProjects(hasVMs, showEmptyProjects) === HIDE;
-
-// Show projects that have VMs all the time
-// Show / hide projects that have no VMs depending on showEmptyProjects flag
-// Hide system namespaces unless they contain VMs
-export const filterNamespaceItems = (item: TreeViewDataItem, showEmptyProjects: boolean) => {
-  if (isProjectItem(item)) {
-    const hasVMs = item.children?.length > 0;
-    if (hasVMs) return true;
-
-    const projectName = item.name as string;
-    if (isSystemNamespace(projectName)) return false;
-
-    return showEmptyProjects;
-  }
-
-  if (item.children) {
-    item.children = item.children
-      .map((opt) => Object.assign({}, opt))
-      .filter((child) => filterNamespaceItems(child, showEmptyProjects));
-
-    return item.children.length > 0 || isClusterItem(item) || isAllNamespacesItem(item);
-  }
-};
-
-export const getAllTreeViewItems = (treeData: TreeViewDataItem[]): TreeViewDataItem[] => {
-  return treeData
-    ?.map((treeItem) => [treeItem, ...getAllTreeViewItems(treeItem.children || [])])
-    ?.flat();
-};
-
-export const getAllTreeViewVMItems = (treeData: TreeViewDataItem[]): TreeViewDataItem[] =>
-  getAllTreeViewItems(treeData).filter(isVMItem);
-
-export const getAllRightClickableTreeViewItems = (
-  treeData: TreeViewDataItem[],
-): TreeViewDataItem[] =>
-  getAllTreeViewItems(treeData).filter((treeItem) => !treeItem.id.startsWith(ALL_CLUSTERS_ID));
-
-export const getAllTreeViewFolderItems = (treeData: TreeViewDataItem[]): TreeViewDataItem[] =>
-  getAllTreeViewItems(treeData)?.filter((treeItem) => isFolderItem(treeItem)) || [];
-
-export const getAllTreeViewProjectItems = (treeData: TreeViewDataItem[]): TreeViewDataItem[] =>
-  getAllTreeViewItems(treeData).filter((treeItem) => isProjectItem(treeItem));
-
-export const getAllTreeViewClusterItems = (treeData: TreeViewDataItem[]): TreeViewDataItem[] =>
-  getAllTreeViewItems(treeData).filter((treeItem) => isClusterItem(treeItem));
-
-export const getMatchedProjectItems = (
-  treeData: TreeViewDataItem[],
-  searchText: string,
-): TreeViewDataItem[] =>
-  getAllTreeViewProjectItems(treeData).filter((item) => nameMatchesSearch(item, searchText));
-
-export const getMatchedClusterItems = (
-  treeData: TreeViewDataItem[],
-  searchText: string,
-): TreeViewDataItem[] =>
-  getAllTreeViewClusterItems(treeData).filter((item) => nameMatchesSearch(item, searchText));
-
-export const highlightMatchedTreeItems = (
-  treeData: TreeViewDataItem[],
-  searchText: string,
-): TreeViewDataItem[] => {
-  if (!searchText) return treeData;
-
-  return treeData.map((item) => {
-    const copy = { ...item };
-
-    if ((isProjectItem(copy) || isClusterItem(copy)) && nameMatchesSearch(copy, searchText)) {
-      copy.name = <b className="pf-v6-u-font-weight-bold">{copy.name}</b>;
-    }
-
-    if (copy.children) {
-      copy.children = highlightMatchedTreeItems(copy.children, searchText);
-    }
-
-    return copy;
-  });
-};
-
-export const getClusterElement = (treeData: TreeViewDataItem[]): HTMLElement => {
-  const root = treeData?.[0];
-  const targetId = root?.id === ALL_CLUSTERS_ID ? root?.children?.[0]?.id : root?.id;
-  return document.getElementById(targetId)?.querySelector('.pf-v6-c-tree-view__node-text');
 };
 
 type BuildTreeItemQueryOptions = {
@@ -576,7 +72,7 @@ type BuildTreeItemQueryOptions = {
   query?: string;
 };
 
-const buildTreeItemQuery = ({
+export const buildTreeItemQuery = ({
   cluster,
   folderName,
   project,

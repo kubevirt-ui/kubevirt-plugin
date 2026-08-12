@@ -1,6 +1,6 @@
 import {
-  KubevirtFilterState,
-  OnSetFilters,
+  type KubevirtFilterState,
+  type OnSetFilters,
 } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 
@@ -13,17 +13,15 @@ export const updateFilterState = (
   let hasChanges = false;
 
   for (const key of Object.keys(currentFilters)) {
-    if (!(key in newFilters)) {
-      if (!isEmpty(currentFilters[key])) {
-        update[key] = [];
-        hasChanges = true;
-      }
+    if (!(key in newFilters) && !isEmpty(currentFilters[key])) {
+      update[key] = [];
+      hasChanges = true;
     }
   }
 
   for (const [key, values] of Object.entries(newFilters)) {
     const currentSet = new Set(currentFilters[key] ?? []);
-    const isEqual = currentSet.size === values.length && values.every((v) => currentSet.has(v));
+    const isEqual = currentSet.size === values.length && values.every((val) => currentSet.has(val));
     if (!isEqual) {
       update[key] = values;
       hasChanges = true;

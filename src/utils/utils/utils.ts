@@ -1,8 +1,6 @@
-import { TFunction } from 'i18next';
-import * as ipaddr from 'ipaddr.js';
-import { animals, colors, NumberDictionary, uniqueNamesGenerator } from 'unique-names-generator';
+import { type TFunction } from 'i18next';
 
-import { IoK8sApiCoreV1Service } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type IoK8sApiCoreV1Service } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import {
   DEFAULT_NAMESPACE,
   KUBEVIRT_HYPERCONVERGED,
@@ -11,19 +9,15 @@ import {
   OPENSHIFT_OS_IMAGES_NS,
 } from '@kubevirt-utils/constants/constants';
 import { ALL_NAMESPACES, ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
-import { getLabels } from '@kubevirt-utils/resources/shared';
-import { MAX_K8S_NAME_LENGTH, OTHER } from '@kubevirt-utils/utils/constants';
-import {
-  FilterValue,
-  K8sResourceCommon,
-  MatchExpression,
-  Operator,
-  RowFilterItem,
-} from '@openshift-console/dynamic-plugin-sdk';
+import { OTHER } from '@kubevirt-utils/utils/constants';
+import { type FilterValue, type RowFilterItem } from '@openshift-console/dynamic-plugin-sdk';
 import { k8sBasePath } from '@openshift-console/dynamic-plugin-sdk/lib/utils/k8s/k8s';
-import { SortByDirection } from '@patternfly/react-table';
 
-import { IPAddress } from './types';
+export * from './errorUtils';
+export * from './ipUtils';
+export * from './matchExpressions';
+export * from './nameGenerators';
+export * from './sortingUtils';
 
 // JSON Pointer (RFC 6901) requires `/` in keys to be escaped as `~1`
 export const escapeJsonPointerToken = (token: string): string => token.replace(/\//g, '~1');
@@ -32,81 +26,63 @@ export const kubevirtConsole = console;
 
 export const clusterBasePath = k8sBasePath.slice(0, k8sBasePath.lastIndexOf('api/kubernetes'));
 
-export const isAllNamespaces = (namespace: string) =>
+export const isAllNamespaces = (namespace: string): boolean =>
   !namespace || namespace === ALL_NAMESPACES || namespace === ALL_NAMESPACES_SESSION_KEY;
 
-export const getValidNamespace = (activeNamespace: string) =>
+export const getValidNamespace = (activeNamespace: string): string =>
   activeNamespace === ALL_NAMESPACES_SESSION_KEY ? DEFAULT_NAMESPACE : activeNamespace;
 
-export const getNamespacePathSegment = (namespace: string) =>
+export const getNamespacePathSegment = (namespace: string): string =>
   isAllNamespaces(namespace) ? ALL_NAMESPACES : `ns/${namespace}`;
 
-export const isEmpty = (obj) =>
-  [Array, Object].includes((obj || {}).constructor) && !Object.entries(obj || {}).length;
+export const isEmpty = (obj: unknown): boolean =>
+  [Array, Object].includes(((obj || {}) as object).constructor as ArrayConstructor) &&
+  !Object.entries((obj || {}) as object).length;
 
 export const sumObjectValues = (obj: Record<string, number | undefined>): number =>
-  Object.values(obj).reduce((acc, val) => acc + (val || 0), 0);
+  Object.values(obj).reduce((acc, val) => acc + (val ?? 0), 0);
 
-export const get = (obj: unknown, path: string | string[], defaultValue = undefined) => {
-  const travel = (regexp: RegExp) =>
+export const get = (
+  obj: unknown,
+  path: string | string[],
+  defaultValue: unknown = undefined,
+): unknown => {
+  const travel = (regexp: RegExp): unknown =>
     String.prototype.split
       .call(path, regexp)
       .filter(Boolean)
-      .reduce((res: { [x: string]: any }, key: number | string) => {
-        return res !== null && res !== undefined ? res[key] : res;
-      }, obj);
-  const result = travel(/[,[\]]+?/) || travel(/[,[\].]+?/);
+      .reduce(
+        (res: unknown, key: string) => (res != null ? (res as Record<string, unknown>)[key] : res),
+        obj,
+      );
+  const result = travel(/[,[\]]+/) ?? travel(/[,[\].]+/);
   return result === undefined || result === obj ? defaultValue : result;
 };
 
-export const pick = (object, keys) => {
-  return keys.reduce((obj, key) => {
-    if (object && object.hasOwnProperty(key)) {
+export const pick = (object: Record<string, unknown>, keys: string[]): Record<string, unknown> => {
+  return keys.reduce((obj: Record<string, unknown>, key: string) => {
+    if (object?.hasOwnProperty(key)) {
       obj[key] = object[key];
     }
     return obj;
   }, {});
 };
 
-export const isUpstream = window.SERVER_FLAGS.branding === 'okd';
+export const isUpstream: boolean = window.SERVER_FLAGS.branding === 'okd';
 
 export const DEFAULT_OPERATOR_NAMESPACE = isUpstream ? KUBEVIRT_HYPERCONVERGED : OPENSHIFT_CNV;
 
 export const OS_IMAGES_NS = isUpstream ? KUBEVIRT_OS_IMAGES_NS : OPENSHIFT_OS_IMAGES_NS;
 
-export const isString = (val: unknown) => val !== null && typeof val === 'string';
+export const isString = (val: unknown): boolean => val !== null && typeof val === 'string';
 
-export const getSSHNodePort = (sshService: IoK8sApiCoreV1Service) =>
+export const getSSHNodePort = (sshService: IoK8sApiCoreV1Service): number =>
   sshService?.spec?.ports?.find((port) => parseInt(port.targetPort, 10) === 22)?.nodePort;
 
-export const isTemplateParameter = (value: string): boolean =>
-  Boolean(/^\${[A-z0-9_]+}$/.test(value));
-
-export const getRandomChars = (len = 6): string => {
-  return Math.random()
-    .toString(36)
-    .replace(/[^a-z0-9]+/g, '')
-    .substr(1, len);
-};
-
-export const addRandomSuffix = (str: string) => str.concat(`-${getRandomChars()}`);
-
-export const truncateToK8sName = (
-  name: string,
-  suffix: string = getRandomChars(),
-  maxLength = MAX_K8S_NAME_LENGTH,
-): string => {
-  const separator = suffix ? '-' : '';
-  const fullName = `${name}${separator}${suffix}`;
-  if (fullName.length <= maxLength) return fullName;
-
-  const availableLength = maxLength - suffix.length - separator.length;
-  const truncatedName = name.slice(0, Math.max(1, availableLength)).replace(/-$/, '');
-  return `${truncatedName}${separator}${suffix}`;
-};
+export const isTemplateParameter = (value: string): boolean => Boolean(/^\${\w+}$/.test(value));
 
 export const SSH_PUBLIC_KEY_VALIDATION_REGEX =
-  /^(ssh-(rsa|dss|ed25519)|sk-ssh-(rsa|ed25519)@openssh\.com|ecdsa-sha2-nistp(256|384|521))\s+[A-Za-z0-9+/=]+(?:\s+.+)?$/;
+  /^(ssh-(rsa|dss|ed25519)|sk-ssh-(rsa|ed25519)@openssh\.com|ecdsa-sha2-nistp(256|384|521))\s+[A-Za-z0-9+/=]+(?:\s+\S.*)?$/;
 
 export const validateSSHPublicKey = (value: string): boolean => {
   const trimmedValue = value?.trim();
@@ -138,200 +114,48 @@ export const includeFilter = (
   itemName: string,
 ): boolean => {
   const compareString = getItemNameWithOther(itemName, items);
-
   return compareData.selected?.length === 0 || compareData.selected?.includes(compareString);
 };
 
-export const ensurePath = <T extends object>(data: T, paths: string | string[]) => {
-  let current = data;
+export const ensurePath = <T extends object>(data: T, paths: string | string[]): void => {
+  let current: Record<string, unknown> = data as Record<string, unknown>;
 
   if (Array.isArray(paths)) {
-    paths.forEach((path) => ensurePath(data, path));
+    for (const path of paths) ensurePath(data, path);
   } else {
     const keys = paths.split('.');
 
     for (const key of keys) {
       if (!current[key]) current[key] = {};
-      current = current[key];
+      current = current[key] as Record<string, unknown>;
     }
   }
 };
 
-export const getValueByPath = <T = K8sResourceCommon>(obj: T, path: string) => {
-  const pathArray = path?.split('.');
-  return pathArray?.reduce((acc, field) => acc?.[field], obj);
-};
-
-export const comparePathsValues =
-  <T>(path: string) =>
-  (first: T, second: T): number =>
-    universalComparator(getValueByPath(first, path), getValueByPath(second, path));
-
-export const columnSorting = <T>(
-  data: T[],
-  direction: string,
-  pagination: { [key: string]: any },
-  path: string,
-) => columnSortingCompare(data, direction, pagination, comparePathsValues(path));
-
-export const columnSortingCompare = <T>(
-  data: T[],
-  direction: string,
-  pagination: { [key: string]: any },
-  compareFunction: (a: T, b: T) => number,
-) => {
-  const { endIndex, startIndex } = pagination || { endIndex: data.length, startIndex: 0 };
-  const predicate = (a: T, b: T) => {
-    const { first, second } =
-      direction === 'asc' ? { first: a, second: b } : { first: b, second: a };
-    return compareFunction(first, second);
-  };
-  return data?.sort(predicate)?.slice(startIndex, endIndex);
-};
-
-export const removeDuplicatesByName = <T>(array: T[], nameProperty = 'name'): T[] =>
-  array?.reduce<T[]>((acc, curr) => {
-    if (!acc.find((item) => item?.[nameProperty] === curr?.[nameProperty])) acc.push(curr);
-    return acc;
-  }, []);
-
-export const generatePrettyName = (prefix?: string): string => {
-  const numberDictionary = NumberDictionary.generate({ length: 2 });
-  const prefixValue = prefix ? `${prefix}-` : '';
-
-  return `${prefixValue}${uniqueNamesGenerator({
-    dictionaries: [colors, animals, numberDictionary],
-    separator: '-',
-  })}`;
-};
-
-export const generateUploadDiskName = (diskName: string, prefix: string): string => {
-  return `${diskName}-${generatePrettyName(prefix)}`;
-};
-
-const DOCKER_PREFIX = 'docker://';
-
-export const appendDockerPrefix = (image: string) => {
-  return image?.startsWith(DOCKER_PREFIX) ? image : DOCKER_PREFIX.concat(image);
-};
-export const removeDockerPrefix = (image: string) => image?.replace(DOCKER_PREFIX, '');
-
-export const removeAllWhitespace = (str: string): string => {
-  return str.trim().replace(/\s+/g, '');
-};
-
-/**
- * Compares all types by converting them to string.
- * Nullish entities are converted to empty string.
- * @see localeCompare
- * @param a -
- * @param b -
- * @param locale to be used by string compareFn
- */
-export const universalComparator = (a: any, b: any, locale?: string): number =>
-  localeCompare(String(a ?? ''), String(b ?? ''), locale);
-
-/**
- * Uses native string localCompare method with numeric option enabled.
- * @param a -
- * @param b -
- * @param locale to be used by string compareFn
- */
-export const localeCompare = (a: string, b: string, locale: string): number =>
-  a.localeCompare(b, locale, { numeric: true });
-
-export const sortByDirection = (
-  comparator: (a: any, b: any, locale?: string) => number,
-  direction: SortByDirection,
-) => {
-  const multiplier = direction === SortByDirection.desc ? -1 : 1;
-  return (a: any, b: any, locale?: string) => multiplier * comparator(a, b, locale);
-};
-
-export const compareWithDirection = (direction: SortByDirection, a: any, b: any) =>
-  sortByDirection(universalComparator, direction)(a, b);
-
-/**
- * Link-local address prefix (fe80::/10)
- * @see https://www.rfc-editor.org/rfc/rfc4291#section-2.5.6
- */
-export const IPV6_LINK_LOCAL_CIDR = 'fe80::/10';
-
-export const isIPV6LinkLocal = (ip: string): boolean => {
-  if (!ipaddr.IPv6.isValid(ip)) {
-    return false;
-  }
-  return ipaddr.parse(ip).match(ipaddr.parseCIDR(IPV6_LINK_LOCAL_CIDR));
-};
-
-export const removeLinkLocalIPV6 = (ipAddress: IPAddress[]) =>
-  ipAddress.filter((item) => !isIPV6LinkLocal(item?.ip?.trim()));
-
-export const getNoPermissionTooltipContent = (t: TFunction) =>
+export const getNoPermissionTooltipContent = (t: TFunction): string =>
   t(`You don't have permission to perform this action`);
-
-export const verifyMatchExpressions = (
-  resource: K8sResourceCommon,
-  matchExpressions: MatchExpression[],
-): boolean =>
-  matchExpressions?.every((expr) => {
-    switch (expr.operator) {
-      case Operator.Exists:
-        return getLabels(resource)?.[expr.key] !== undefined;
-      case Operator.DoesNotExist:
-        return getLabels(resource)?.[expr.key] === undefined;
-      case Operator.GreaterThan:
-        return parseInt(getLabels(resource)?.[expr.key], 10) > parseInt(expr?.values[0], 10);
-      case Operator.LessThan:
-        return parseInt(getLabels(resource)?.[expr.key], 10) < parseInt(expr?.values[0], 10);
-      case Operator.Equals:
-        return getLabels(resource)?.[expr.key] === expr?.values[0];
-      case Operator.NotEquals:
-      case Operator.NotEqual:
-        return getLabels(resource)?.[expr.key] !== expr?.values[0];
-      case Operator.In:
-        return expr.values.includes(getLabels(resource)?.[expr.key]);
-      case Operator.NotIn:
-        return !expr.values.includes(getLabels(resource)?.[expr.key]);
-      default:
-        return false;
-    }
-  });
 
 export const getNoDataAvailableMessage = (t: TFunction): string => t('No data available');
 
-export const getErrorMessage = (error: any) =>
-  error instanceof Error ? error.message : String(error);
-
-const ALREADY_CREATED_ERROR_CODE = 409;
-
-export const createIfNotExists = async (request: Promise<unknown>): Promise<void> => {
-  try {
-    await request;
-  } catch (error) {
-    if (error.code !== ALREADY_CREATED_ERROR_CODE) throw error;
-  }
-};
-
-export const parseJSONAnnotation = <T = any>(
+export const parseJSONAnnotation = <T = unknown>(
   annotations: Record<string, string> | undefined,
   key: string,
-  options?: { onError?: (error: any) => void; validate?: (value: any) => boolean },
+  options?: { onError?: (error: unknown) => void; validate?: (value: unknown) => boolean },
 ): T => {
   const { onError, validate } = options ?? {};
   const annotation = annotations?.[key];
   if (!annotation) {
-    return null;
+    return null as T;
   }
   try {
-    const parsed: T = JSON.parse(annotation);
+    const parsed: T = JSON.parse(annotation) as T;
     const valid = validate?.(parsed) ?? true;
     if (!valid) {
       throw new Error(`Invalid value: "${annotation}"`);
     }
     return parsed;
-  } catch (e) {
-    onError?.(e.message);
-    return null;
+  } catch (error) {
+    onError?.((error as Error).message);
+    return null as T;
   }
 };

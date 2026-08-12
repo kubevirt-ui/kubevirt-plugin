@@ -1,13 +1,13 @@
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
-import { Td, TdProps } from '@patternfly/react-table';
+import { Td, type TdProps } from '@patternfly/react-table';
 
 type TableDataProps = Omit<TdProps, 'ref'> & {
   activeColumnIDs: string[];
 };
 
 const TableData: FC<TableDataProps> = ({ activeColumnIDs, children, id, ...otherProps }) =>
-  activeColumnIDs?.some((activeID) => activeID === id) ? (
+  activeColumnIDs?.includes(id) ? (
     <Td id={id} {...otherProps}>
       {children}
     </Td>

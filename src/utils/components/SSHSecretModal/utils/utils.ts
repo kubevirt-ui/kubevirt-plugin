@@ -1,13 +1,13 @@
 import produce from 'immer';
 
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { IoK8sApiCoreV1Secret } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type IoK8sApiCoreV1Secret } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import {
-  V1CloudInitConfigDriveSource,
-  V1CloudInitNoCloudSource,
-  V1SSHPublicKeyAccessCredentialPropagationMethod,
-  V1VirtualMachine,
-  V1Volume,
+  type V1CloudInitConfigDriveSource,
+  type V1CloudInitNoCloudSource,
+  type V1SSHPublicKeyAccessCredentialPropagationMethod,
+  type V1VirtualMachine,
+  type V1Volume,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import {
   convertUserDataObjectToYAML,
@@ -18,17 +18,17 @@ import {
 import {
   DYNAMIC_SSH_INJECTION_CMD,
   MAX_NAME_LENGTH,
-  MIN_NAME_LENGTH_FOR_GENERATED_SUFFIX,
 } from '@kubevirt-utils/components/SSHSecretModal/utils/constants';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { decodeSecret } from '@kubevirt-utils/resources/secret/utils';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getVolumes } from '@kubevirt-utils/resources/vm';
 import { isWindows } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
-import { generatePrettyName, isEmpty, validateSSHPublicKey } from '@kubevirt-utils/utils/utils';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sUpdate } from '@multicluster/k8sRequests';
-import { WatchK8sResults } from '@openshift-console/dynamic-plugin-sdk';
+import { type WatchK8sResults } from '@openshift-console/dynamic-plugin-sdk';
+
+export * from './sshSecretHelpers';
 
 export const getAllSecrets = (
   secretsData: WatchK8sResults<{ [p: string]: IoK8sApiCoreV1Secret[] }>,
@@ -41,7 +41,7 @@ export const getAllSecrets = (
 
 export const getSecretsLoaded = (
   secretsData: WatchK8sResults<{ [p: string]: IoK8sApiCoreV1Secret[] }>,
-) => Object.values(secretsData)?.every((data) => data.loaded);
+): boolean => Object.values(secretsData)?.every((data) => data.loaded);
 
 export const validateSecretNameLength = (secretName: string): boolean =>
   secretName.length <= MAX_NAME_LENGTH;
@@ -78,12 +78,12 @@ export const getSecretNameErrorMessage = (
   return null;
 };
 
-export const removeSecretFromVM = (vm: V1VirtualMachine) =>
+export const removeSecretFromVM = (vm: V1VirtualMachine): V1VirtualMachine =>
   produce(vm, (vmDraft) => {
     delete vmDraft.spec.template.spec.accessCredentials;
   });
 
-export const detachVMSecret = async (vm: V1VirtualMachine) => {
+export const detachVMSecret = async (vm: V1VirtualMachine): Promise<void> => {
   await kubevirtK8sUpdate({
     cluster: getCluster(vm),
     data: removeSecretFromVM(vm),
@@ -110,7 +110,11 @@ export const applyCloudDriveCloudInitVolume = (
   return getVolumes(vm).map((vol) => (vol.name === cloudDriveVolume.name ? cloudDriveVolume : vol));
 };
 
-export const addSecretToVM = (vm: V1VirtualMachine, secretName?: string, isDynamic?: boolean) => {
+export const addSecretToVM = (
+  vm: V1VirtualMachine,
+  secretName?: string,
+  isDynamic?: boolean,
+): V1VirtualMachine => {
   if (isWindows(vm?.spec?.template)) return vm;
 
   return produce(vm, (vmDraft) => {
@@ -121,7 +125,7 @@ export const addSecretToVM = (vm: V1VirtualMachine, secretName?: string, isDynam
           propagationMethod: getCloudInitPropagationMethod(isDynamic, vm),
           source: {
             secret: {
-              secretName: secretName?.toString() || `${getName(vm)}-ssh-key`,
+              secretName: secretName?.toString() ?? `${getName(vm)}-ssh-key`,
             },
           },
         },
@@ -145,7 +149,7 @@ export const getCloudInitPropagationMethod = (
     : ({ noCloud: {} } as V1SSHPublicKeyAccessCredentialPropagationMethod);
 };
 
-export const cmdIsSSHInjection = (cmd: string | string[]) => {
+export const cmdIsSSHInjection = (cmd: string | string[]): boolean => {
   const extendedCommand = Array.isArray(cmd) ? cmd?.join(' ') : cmd;
   return extendedCommand?.includes(DYNAMIC_SSH_INJECTION_CMD);
 };
@@ -158,7 +162,7 @@ export const getCloudInitConfigDrive = (
 
   userData.runcmd ??= [];
 
-  if (isDynamic && !userData.runcmd.find(cmdIsSSHInjection))
+  if (isDynamic && !userData.runcmd.some(cmdIsSSHInjection))
     userData.runcmd.push(DYNAMIC_SSH_INJECTION_CMD);
 
   if (!isDynamic) userData.runcmd = userData.runcmd.filter((cmd) => !cmdIsSSHInjection(cmd));
@@ -168,43 +172,3 @@ export const getCloudInitConfigDrive = (
     userData: convertUserDataObjectToYAML(userData, true),
   };
 };
-
-export const getAllSecretsFromSecretData = (secretsResourceData: IoK8sApiCoreV1Secret[]) => {
-  const sshKeySecrets = secretsResourceData
-    ?.filter((secret) => secret?.data?.key && validateSSHPublicKey(decodeSecret(secret)))
-    ?.sort((a, b) => a?.metadata?.name.localeCompare(b?.metadata?.name));
-
-  return sshKeySecrets;
-};
-
-export const getMappedProjectsWithKeys = (
-  secretsData: IoK8sApiCoreV1Secret[],
-): { [namespace: string]: IoK8sApiCoreV1Secret[] } => {
-  const sshKeySecrets = getAllSecretsFromSecretData(secretsData);
-
-  const sshData = sshKeySecrets.reduce(
-    (acc, secret) => {
-      acc[secret?.metadata?.namespace] = [...(acc?.[secret?.metadata?.namespace] || []), secret];
-      return acc;
-    },
-    {} as { [namespace: string]: IoK8sApiCoreV1Secret[] },
-  );
-
-  return sshData;
-};
-
-export const getPropagationMethod = (
-  vm: V1VirtualMachine,
-): V1SSHPublicKeyAccessCredentialPropagationMethod =>
-  vm?.spec?.template?.spec?.accessCredentials?.[0].sshPublicKey.propagationMethod;
-
-export const generateValidSecretName = (secretName: string) =>
-  secretName.length > MIN_NAME_LENGTH_FOR_GENERATED_SUFFIX
-    ? generatePrettyName()
-    : generatePrettyName(secretName);
-
-export const addNewSecret = (
-  namespace: string,
-  targetProject: string,
-  activeNamespace: string,
-): boolean => (namespace ? targetProject !== namespace : targetProject !== activeNamespace);

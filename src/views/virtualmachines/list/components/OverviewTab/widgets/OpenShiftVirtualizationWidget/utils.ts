@@ -1,8 +1,8 @@
-import { TFunction } from 'i18next';
+import { type TFunction } from 'i18next';
 
 import { HCOHealthStatus } from '@kubevirt-utils/extensions/dashboard/types';
-import { HealthState, PrometheusResult } from '@openshift-console/dynamic-plugin-sdk';
-import { SubscriptionKind, SubscriptionState } from '@overview/utils/types';
+import { HealthState, type PrometheusResult } from '@openshift-console/dynamic-plugin-sdk';
+import { type SubscriptionKind, SubscriptionState } from '@overview/utils/types';
 
 const hcoValueToHealthState: Record<number, HealthState> = {
   [HCOHealthStatus.critical]: HealthState.ERROR,
@@ -26,16 +26,18 @@ export const processHealthResults = (
   const degradedClusters: string[] = [];
   let clusterHealthState = HealthState.NOT_AVAILABLE;
 
-  results.forEach((result) => {
+  for (const result of results) {
     const value = Number(result?.value?.[1]);
     const resultCluster = result?.metric?.cluster;
 
-    if (Number.isNaN(value)) return;
+    if (Number.isNaN(value)) continue;
 
-    if (value === HCOHealthStatus.critical) {
-      if (resultCluster) criticalClusters.push(resultCluster);
-    } else if (value === HCOHealthStatus.warning) {
-      if (resultCluster) degradedClusters.push(resultCluster);
+    if (resultCluster) {
+      if (value === HCOHealthStatus.critical) {
+        criticalClusters.push(resultCluster);
+      } else if (value === HCOHealthStatus.warning) {
+        degradedClusters.push(resultCluster);
+      }
     }
 
     // isLocalMatch: no cluster filter requested and result has no cluster label (local/hub cluster)
@@ -47,13 +49,13 @@ export const processHealthResults = (
     if (isLocalMatch || isClusterMatch) {
       clusterHealthState = hcoValueToHealthState[value] ?? HealthState.NOT_AVAILABLE;
     }
-  });
+  }
 
   return { clusterHealthState, criticalClusters, degradedClusters };
 };
 
 export const isUpdateAvailable = (subscription: SubscriptionKind): boolean => {
-  const { currentCSV, installedCSV, state } = subscription?.status || {};
+  const { currentCSV, installedCSV, state } = subscription?.status ?? {};
 
   if (
     state === SubscriptionState.SubscriptionStateUpgradeAvailable ||

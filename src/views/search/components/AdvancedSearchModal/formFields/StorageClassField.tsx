@@ -1,10 +1,10 @@
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import MultiSelectTypeahead from '@kubevirt-utils/components/MultiSelectTypeahead/MultiSelectTypeahead';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { usePVCMapper } from '@kubevirt-utils/hooks/usePVCMapper';
-import { useStorageClasses } from '@kubevirt-utils/hooks/useStorageClasses';
+import { getVMStorageClasses } from '@kubevirt-utils/resources/vm/utils/getVMStorageClasses';
 import { FormGroup } from '@patternfly/react-core';
 import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
@@ -20,7 +20,7 @@ const StorageClassField: FC<StorageClassFieldProps> = ({ vms }) => {
 
   const pvcMapper = usePVCMapper(null);
 
-  const { allStorageClasses } = useStorageClasses(vms, pvcMapper);
+  const { allStorageClasses } = getVMStorageClasses(vms, pvcMapper);
 
   return (
     <FormGroup label={t('Storage class')}>

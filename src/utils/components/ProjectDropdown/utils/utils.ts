@@ -1,12 +1,12 @@
-import { MouseEvent } from 'react';
+import { type MouseEvent } from 'react';
 
 import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { EnhancedSelectOptionProps } from '@kubevirt-utils/components/FilterSelect/utils/types';
-import { ConsoleBookmarks } from '@kubevirt-utils/hooks/consoleUserSettings/types';
+import { type EnhancedSelectOptionProps } from '@kubevirt-utils/components/FilterSelect/utils/types';
+import { type ConsoleBookmarks } from '@kubevirt-utils/hooks/consoleUserSettings/types';
 import { ALL_PROJECTS } from '@kubevirt-utils/hooks/constants';
 import { isSystemNamespace } from '@kubevirt-utils/resources/namespace/helper';
 import { getName } from '@kubevirt-utils/resources/shared';
-import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import { type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
 type UpdateBookmarks = (bookmarks: ConsoleBookmarks) => Promise<ConsoleBookmarks>;
 
@@ -28,15 +28,15 @@ export const getProjectOptions = ({
   const favoriteOptions: EnhancedSelectOptionProps[] = [];
   const regularOptions: EnhancedSelectOptionProps[] = [];
 
-  projects.forEach((proj) => {
+  for (const proj of projects) {
     const name = getName(proj);
-    if (!name) return;
+    if (!name) continue;
 
     const isFavorite = Boolean(bookmarks[name]);
     const isSystemProject = isSystemNamespace(name);
 
     if (!showSystemNamespaces && isSystemProject && !isFavorite) {
-      return;
+      continue;
     }
 
     const option: EnhancedSelectOptionProps = {
@@ -47,7 +47,7 @@ export const getProjectOptions = ({
       name,
       onFavorite:
         updateBookmarks &&
-        ((e: MouseEvent) => {
+        ((e: MouseEvent): void => {
           e.stopPropagation();
           const newBookmarks = {
             ...bookmarks,
@@ -57,7 +57,7 @@ export const getProjectOptions = ({
           if (isFavorite) {
             delete newBookmarks[name];
           }
-          updateBookmarks(newBookmarks);
+          void updateBookmarks(newBookmarks);
         }),
       value: name,
     };
@@ -67,7 +67,7 @@ export const getProjectOptions = ({
     } else {
       regularOptions.push(option);
     }
-  });
+  }
 
   // Sort each group alphabetically
   favoriteOptions.sort((a, b) => a.value.localeCompare(b.value));

@@ -35,7 +35,7 @@ export const useURLParams = (
    * @param {string} key - the parameter key
    * @param {string} value - the parameter value
    */
-  const setParam = (key: string, value: string) => {
+  const setParam = (key: string, value: string): void => {
     if (value) {
       params.set(key, value);
       navigate({ pathname: location.pathname, search: params.toString() }, navigateOptions);
@@ -52,7 +52,7 @@ export const useURLParams = (
    * @param {string} key - the parameter key
    * @param {string} value - the parameter value
    */
-  const appendParam = (key: string, value: string) => {
+  const appendParam = (key: string, value: string): void => {
     params.append(key, value);
     navigate({ pathname: location.pathname, search: params.toString() }, navigateOptions);
   };
@@ -62,11 +62,11 @@ export const useURLParams = (
    * @param {string} key - the parameter key
    * @param {string} value - the parameter value
    */
-  const deleteParam = (key: string, value?: string) => {
+  const deleteParam = (key: string, value?: string): void => {
     if (value) {
-      const newParams = [...params.getAll(key)].filter((v) => v !== value);
+      const newParams = [...params.getAll(key)].filter((paramValue) => paramValue !== value);
       params.delete(key);
-      newParams.forEach((v) => params.append(key, v));
+      for (const paramValue of newParams) params.append(key, paramValue);
       navigate({ pathname: location.pathname, search: params.toString() }, navigateOptions);
     } else {
       if (params.has(key)) {

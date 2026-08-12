@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 import { useNavigate } from 'react-router';
 
 import CreateProjectModal from '@kubevirt-utils/components/CreateProjectModal/CreateProjectModal';
@@ -17,7 +17,7 @@ type WelcomeButtonsProps = {
 
 const WelcomeButtons: FC<WelcomeButtonsProps> = ({ onClose }) => {
   const { t } = useKubevirtTranslation();
-  const [, setActiveNamespace] = useActiveNamespace();
+  const [, setActiveNamespace] = useActiveNamespace() as [string, (ns: string) => void];
   const navigate = useNavigate();
   const { createModal } = useModal();
 
@@ -25,13 +25,13 @@ const WelcomeButtons: FC<WelcomeButtonsProps> = ({ onClose }) => {
   const [projects, projectsLoaded, projectsError] = useProjects(undefined, true);
   const hasNoProjects = projectsLoaded && !projectsError && (!projects || projects.length === 0);
 
-  const onCreateVM = () => {
+  const onCreateVM = (): void => {
     navigateToVMWizard({ cluster: '', navigate });
-    onClose();
+    Promise.resolve(onClose()).catch(() => undefined);
   };
 
-  const onCreateProject = () => {
-    onClose();
+  const onCreateProject = (): void => {
+    Promise.resolve(onClose()).catch(() => undefined);
     createModal?.((props) => (
       <CreateProjectModal
         {...props}
@@ -58,11 +58,12 @@ const WelcomeButtons: FC<WelcomeButtonsProps> = ({ onClose }) => {
       </SplitItem>
       <SplitItem>
         <Button
-          onClick={() => {
-            startTour();
-            onClose();
-          }}
           className="WelcomeModal__button"
+          data-test="start-tour-btn"
+          onClick={async (): Promise<void> => {
+            startTour();
+            await onClose();
+          }}
           variant={ButtonVariant.link}
         >
           {t('Start tour')}

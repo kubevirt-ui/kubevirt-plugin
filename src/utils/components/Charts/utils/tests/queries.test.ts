@@ -170,9 +170,9 @@ describe('getUtilizationQueries', () => {
       expect(queries[VMQueries.MIGRATION_DATA_PROCESSED]).toBeDefined();
 
       // All query types should have the cluster filter for managed cluster
-      Object.values(queries).forEach((query) => {
+      for (const query of Object.values(queries)) {
         expect(query).toContain(`cluster='${MANAGED_CLUSTER_NAME}'`);
-      });
+      }
     });
   });
 

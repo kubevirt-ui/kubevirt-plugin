@@ -6,7 +6,7 @@ import { OPERATOR_LABEL_KEY } from '@kubevirt-utils/constants/prometheus';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import useAlerts from '@kubevirt-utils/hooks/useAlerts/useAlerts';
 import useNamespaceParam from '@kubevirt-utils/hooks/useNamespaceParam';
-import { Alert, AlertSeverity, AlertStates } from '@openshift-console/dynamic-plugin-sdk';
+import { type Alert, AlertSeverity, AlertStates } from '@openshift-console/dynamic-plugin-sdk';
 
 type VMAlertCounts = Record<AlertType, number> & {
   error: Error | unknown;
@@ -28,12 +28,13 @@ const countBySeverity = (alerts: Alert[]): Record<AlertType, number> => {
     [AlertType.info]: 0,
     [AlertType.warning]: 0,
   };
-  alerts?.forEach((alert) => {
-    const severity = alert.labels?.severity;
-    if (severity === AlertSeverity.Critical) counts[AlertType.critical]++;
-    else if (severity === AlertSeverity.Warning) counts[AlertType.warning]++;
-    else if (severity === AlertSeverity.Info) counts[AlertType.info]++;
-  });
+  if (alerts)
+    for (const alert of alerts) {
+      const severity = alert.labels?.severity;
+      if (severity === AlertSeverity.Critical) counts[AlertType.critical]++;
+      else if (severity === AlertSeverity.Warning) counts[AlertType.warning]++;
+      else if (severity === AlertSeverity.Info) counts[AlertType.info]++;
+    }
   return counts;
 };
 
@@ -49,7 +50,7 @@ const useVMAlerts = (vmNames?: string[]): VMAlertCounts => {
   const folderFilteredAlerts = useMemo(() => {
     if (!vmNames) return vmAlerts;
     const nameSet = new Set(vmNames);
-    return vmAlerts?.filter((alert) => nameSet.has(alert.labels?.name || alert.labels?.vmName));
+    return vmAlerts?.filter((alert) => nameSet.has(alert.labels?.name ?? alert.labels?.vmName));
   }, [vmAlerts, vmNames]);
 
   return useMemo(

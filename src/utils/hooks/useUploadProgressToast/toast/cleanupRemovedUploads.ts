@@ -1,10 +1,10 @@
-import { TFunction } from 'i18next';
+import { type TFunction } from 'i18next';
 
-import { ToastActions } from '@kubevirt-utils/hooks/useKubevirtToast';
+import { type ToastActions } from '@kubevirt-utils/hooks/useKubevirtToast';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 
 import { UPLOAD_PROGRESS_STATUS } from '../constants';
-import { UploadEntry } from '../types';
+import { type UploadEntry } from '../types';
 
 type CleanupRemovedUploadsParams = {
   addWarningToast: ToastActions['addWarningToast'];
@@ -25,7 +25,7 @@ export const cleanupRemovedUploads = ({
 }: CleanupRemovedUploadsParams): void => {
   const batchCanceledFileNames: string[] = [];
 
-  Object.entries(previousUploads).forEach(([uploadKey, upload]) => {
+  for (const [uploadKey, upload] of Object.entries(previousUploads)) {
     if (!currentUploads[uploadKey]) {
       processedToasts.delete(uploadKey);
       if (upload.toastId) {
@@ -35,7 +35,7 @@ export const cleanupRemovedUploads = ({
         batchCanceledFileNames.push(upload.fileName);
       }
     }
-  });
+  }
 
   if (isEmpty(batchCanceledFileNames)) {
     return;

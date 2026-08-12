@@ -1,4 +1,4 @@
-import { V1CPU } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1CPU } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { isAllNamespaces, isEmpty } from '@kubevirt-utils/utils/utils';
 import { getACMVMListURL, getVMListNamespacesURL, getVMListURL } from '@multicluster/urls';
 
@@ -18,9 +18,9 @@ const getFiltersQueryString = (filters: Record<string, FilterQueryValue>): strin
   if (isEmpty(filters)) return '';
 
   const params = new URLSearchParams();
-  Object.entries(filters).forEach(([key, value]) => {
-    (Array.isArray(value) ? value : [value]).forEach((item) => params.append(key, item));
-  });
+  for (const [key, value] of Object.entries(filters)) {
+    for (const item of Array.isArray(value) ? value : [value]) params.append(key, item);
+  }
 
   return params.toString();
 };
@@ -38,4 +38,5 @@ export const getACMListPathWithFilters = (
 ): string => `${getACMVMListURL(cluster, namespace)}?${getFiltersQueryString(filters)}`;
 
 export const getVCPUCount = (cpu: V1CPU): number =>
+  // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- 0 is invalid for CPU topology
   (cpu?.sockets || 1) * (cpu?.cores || 1) * (cpu?.threads || 1);

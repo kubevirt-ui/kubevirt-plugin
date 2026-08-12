@@ -1,4 +1,4 @@
-import { TFunction } from 'i18next';
+import { type TFunction } from 'i18next';
 
 import { OS_NAME_LABELS } from '@kubevirt-utils/resources/template';
 
@@ -300,9 +300,9 @@ describe('VM OS Filter', () => {
       const expectedOSTypes = Object.values(OS_NAME_LABELS);
       const itemIds = osFilter.items.map((item) => item.id);
 
-      expectedOSTypes.forEach((os) => {
+      for (const os of expectedOSTypes) {
         expect(itemIds).toContain(os);
-      });
+      }
     });
   });
 

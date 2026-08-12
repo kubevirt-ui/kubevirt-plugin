@@ -9,13 +9,14 @@ import { QuickStartModel } from '@kubevirt-utils/models';
 import {
   getGroupVersionKindForModel,
   useK8sWatchResource,
-  WatchK8sResult,
+  type WatchK8sResult,
 } from '@openshift-console/dynamic-plugin-sdk';
-import { getDisabledQuickStarts, QuickStart } from '@patternfly/quickstarts';
+import { getDisabledQuickStarts, type QuickStart } from '@patternfly/quickstarts';
 
 const useQuickStarts = (filterDisabledQuickStarts = true): WatchK8sResult<QuickStart[]> => {
   const preferredLanguage = useTranslation().i18n.language;
 
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const [quickStarts, quickStartsLoaded, quickStartsError] = useK8sWatchResource<QuickStart[]>({
     groupVersionKind: getGroupVersionKindForModel(QuickStartModel),
     isList: true,
@@ -29,7 +30,7 @@ const useQuickStarts = (filterDisabledQuickStarts = true): WatchK8sResult<QuickS
 
     if (filterDisabledQuickStarts) {
       const disabledQuickStarts = getDisabledQuickStarts();
-      disabledQuickStarts.forEach((quickStartName) => delete groupedQuickStarts[quickStartName]);
+      for (const quickStartName of disabledQuickStarts) delete groupedQuickStarts[quickStartName];
     }
 
     return Object.values(groupedQuickStarts).map((quickStartsByName) =>

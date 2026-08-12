@@ -1,6 +1,6 @@
 import { type V1CPU, type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { type PrometheusResponse } from '@openshift-console/dynamic-plugin-sdk';
 import { SINGLE_CLUSTER_KEY } from '@kubevirt-utils/resources/constants';
+import { type PrometheusResponse } from '@openshift-console/dynamic-plugin-sdk';
 
 import {
   getCPUUsagePercentage,
@@ -82,7 +82,7 @@ describe('VM Metrics', () => {
         { cluster: MANAGED_CLUSTER_NAME, name: 'vm-managed', namespace: 'ns-managed', value: 1.5 },
       ]);
 
-      setMetricFromResponse(response, Metric.cpuUsage);
+      setMetricFromResponse(response, Metric.CpuUsage);
 
       expect(getVMMetricsWithParams('vm-1', 'ns-1').cpuUsage).toBe(0.5);
       expect(
@@ -97,24 +97,24 @@ describe('VM Metrics', () => {
             data: { result: [], resultType: PROMETHEUS_RESULT_TYPE_VECTOR },
             status: PROMETHEUS_STATUS_SUCCESS,
           },
-          Metric.networkUsage,
+          Metric.NetworkUsage,
         ),
       ).not.toThrow();
       expect(() =>
-        setMetricFromResponse(undefined as unknown as PrometheusResponse, Metric.cpuUsage),
+        setMetricFromResponse(undefined as unknown as PrometheusResponse, Metric.CpuUsage),
       ).not.toThrow();
     });
 
     it('should store different metric types for the same VM', () => {
       setMetricFromResponse(
         createMockPrometheusResponse([{ name: 'multi-vm', namespace: 'ns', value: 2.5 }]),
-        Metric.cpuUsage,
+        Metric.CpuUsage,
       );
       setMetricFromResponse(
         createMockPrometheusResponse([
           { name: 'multi-vm', namespace: 'ns', value: ONE_GIB_IN_BYTES },
         ]),
-        Metric.memoryUsage,
+        Metric.MemoryUsage,
       );
 
       const metrics = getVMMetricsWithParams('multi-vm', 'ns');
@@ -160,9 +160,9 @@ describe('VM Metrics', () => {
       };
 
       // Should not throw when processing responses with missing fields
-      expect(() => setMetricFromResponse(responseWithMissingName, Metric.cpuUsage)).not.toThrow();
+      expect(() => setMetricFromResponse(responseWithMissingName, Metric.CpuUsage)).not.toThrow();
       expect(() =>
-        setMetricFromResponse(responseWithMissingNamespace, Metric.cpuUsage),
+        setMetricFromResponse(responseWithMissingNamespace, Metric.CpuUsage),
       ).not.toThrow();
     });
   });
@@ -171,13 +171,13 @@ describe('VM Metrics', () => {
     it('should keep metrics isolated between hub and managed clusters with same VM names', () => {
       setMetricFromResponse(
         createMockPrometheusResponse([{ name: 'dup-vm', namespace: 'dup-ns', value: 1.0 }]),
-        Metric.cpuUsage,
+        Metric.CpuUsage,
       );
       setMetricFromResponse(
         createMockPrometheusResponse([
           { cluster: MANAGED_CLUSTER_NAME, name: 'dup-vm', namespace: 'dup-ns', value: 2.0 },
         ]),
-        Metric.cpuUsage,
+        Metric.CpuUsage,
       );
 
       const hubVM = createMockVM({ name: 'dup-vm', namespace: 'dup-ns' });
@@ -197,7 +197,7 @@ describe('VM Metrics', () => {
     it('should calculate CPU usage percentage correctly', () => {
       setMetricFromResponse(
         createMockPrometheusResponse([{ name: 'cpu-vm', namespace: 'cpu-ns', value: 2 }]),
-        Metric.cpuUsage,
+        Metric.CpuUsage,
       );
 
       const vm = createMockVM({ name: 'cpu-vm', namespace: 'cpu-ns' });
@@ -212,7 +212,7 @@ describe('VM Metrics', () => {
     it('should handle multi-socket/core/thread CPU configuration', () => {
       setMetricFromResponse(
         createMockPrometheusResponse([{ name: 'complex-vm', namespace: 'complex-ns', value: 4 }]),
-        Metric.cpuUsage,
+        Metric.CpuUsage,
       );
 
       const vm = createMockVM({ name: 'complex-vm', namespace: 'complex-ns' });
@@ -226,7 +226,7 @@ describe('VM Metrics', () => {
         createMockPrometheusResponse([
           { name: 'mem-vm', namespace: 'mem-ns', value: TWO_GIB_IN_BYTES },
         ]),
-        Metric.memoryUsage,
+        Metric.MemoryUsage,
       );
 
       const vm = createMockVM({ name: 'mem-vm', namespace: 'mem-ns' });
@@ -237,7 +237,7 @@ describe('VM Metrics', () => {
       // 1953125Ki = 2000000000 bytes; half usage => 50%
       setMetricFromResponse(
         createMockPrometheusResponse([{ name: 'ki-vm', namespace: 'ki-ns', value: 1000000000 }]),
-        Metric.memoryUsage,
+        Metric.MemoryUsage,
       );
 
       const vm = createMockVM({ name: 'ki-vm', namespace: 'ki-ns' });
@@ -248,7 +248,7 @@ describe('VM Metrics', () => {
       // 1024M = 1024000000 bytes; half usage => 50%
       setMetricFromResponse(
         createMockPrometheusResponse([{ name: 'm-vm', namespace: 'm-ns', value: 512000000 }]),
-        Metric.memoryUsage,
+        Metric.MemoryUsage,
       );
 
       const vm = createMockVM({ name: 'm-vm', namespace: 'm-ns' });
@@ -269,7 +269,7 @@ describe('VM Metrics', () => {
         createMockPrometheusResponse([
           { name: 'bad-mem-vm', namespace: 'bad-mem-ns', value: ONE_GIB_IN_BYTES },
         ]),
-        Metric.memoryUsage,
+        Metric.MemoryUsage,
       );
 
       const vm = createMockVM({ name: 'bad-mem-vm', namespace: 'bad-mem-ns' });
@@ -285,7 +285,7 @@ describe('VM Metrics', () => {
         createMockPrometheusResponse([
           { name: 'net-vm', namespace: 'net-ns', value: ONE_MIB_IN_BYTES },
         ]),
-        Metric.networkUsage,
+        Metric.NetworkUsage,
       );
 
       expect(getNetworkUsagePercentage(createMockVM({ name: 'net-vm', namespace: 'net-ns' }))).toBe(

@@ -1,37 +1,16 @@
-import React, { Dispatch, FC, SetStateAction, useEffect, useState } from 'react';
+import React, { type Dispatch, type FC, type SetStateAction } from 'react';
 
-import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { IoK8sApiStorageV1StorageClass } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
-import { V1beta1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { getDefaultStorageClass } from '@kubevirt-utils/components/DiskModal/components/StorageClassAndPreallocation/utils/helpers';
-import Loading from '@kubevirt-utils/components/Loading/Loading';
+import { type V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { type IoK8sApiStorageV1StorageClass } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type V1beta1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import useStorageProfileClaimPropertySets from '@kubevirt-utils/hooks/useStorageProfileClaimPropertySets';
-import { BinaryUnit } from '@kubevirt-utils/utils/unitConstants';
-import {
-  Alert,
-  AlertVariant,
-  Checkbox,
-  FileUpload,
-  FormGroup,
-  Split,
-  SplitItem,
-} from '@patternfly/react-core';
+import { Alert, AlertVariant, FormGroup } from '@patternfly/react-core';
 
-import {
-  getGiBUploadPVCSizeByImage,
-  getName,
-  getNamespace,
-  getTemplateOperatingSystems,
-} from '../utils/selectors';
-import { OperatingSystemRecord } from '../utils/types';
-import { updateDV } from '../utils/utils';
-
+import UploadPVCFormFileInput from './UploadPVCFormFileInput';
 import UploadPVCFormGoldenImage from './UploadPVCFormGoldenImage';
-import UploadPVCFormMode from './UploadPVCFormMode';
 import UploadPVCFormPVCName from './UploadPVCFormPVCName';
-import UploadPVCFormSize from './UploadPVCFormSize';
-import UploadPVCFormStorageClass from './UploadPVCFormStorageClass';
+import UploadPVCFormStorageSection from './UploadPVCFormStorageSection';
+import { useUploadPVCFormLogic } from './useUploadPVCFormLogic';
 
 import './upload-pvc-form.scss';
 
@@ -67,124 +46,47 @@ const UploadPVCForm: FC<UploadPVCFormProps> = ({
   storageClasses,
 }) => {
   const { t } = useKubevirtTranslation();
-  const operatingSystems = getTemplateOperatingSystems(commonTemplates).filter(
-    (o) => !o?.isSourceRef,
-  );
-  const operatingSystemHaveDV = operatingSystems?.find(
-    (os) => os?.baseImageName && os?.baseImageNamespace,
-  );
-  const [storageClassName, setStorageClassName] = useState<string>('');
-  const [pvcName, setPvcName] = useState<string>('');
-  const [namespace, setNamespace] = useState<string>(ns);
-  const [accessMode, setAccessMode] = useState<string>('');
-  const [volumeMode, setVolumeMode] = useState<string>();
-  const [requestSizeValue, setRequestSizeValue] = useState<string>('');
-  const [requestSizeUnit, setRequestSizeUnit] = useState<string>('Gi');
-  const [isGolden, setIsGolden] = useState<boolean>(!!osParam);
-  const [os, setOs] = useState<OperatingSystemRecord>();
-  const [pvcSizeFromTemplate, setPvcSizeFromTemplate] = useState<boolean>(false);
-  const [mountAsCDROM, setMountAsCDROM] = useState<boolean>();
-  const [osImageExists, setOsImageExists] = useState<boolean>(false);
-  const defaultSCName = getDefaultStorageClass(storageClasses)?.metadata?.name;
-  const [applySP, setApplySP] = useState<boolean>(true);
   const {
-    claimPropertySets,
-    error: loadError,
-    loaded: spLoaded,
-  } = useStorageProfileClaimPropertySets(storageClassName || defaultSCName);
-  const { accessModes: spAccessMode, volumeMode: spVolumeMode } = claimPropertySets?.[0] || {};
-
-  useEffect(() => {
-    !storageClassName && setStorageClassName(defaultSCName ?? storageClasses?.[0]?.metadata?.name);
-  }, [defaultSCName, storageClassName, storageClasses]);
-
-  useEffect(() => {
-    const value = getGiBUploadPVCSizeByImage((fileValue as File)?.size);
-    const isIso = (fileValue as File)?.name?.toLowerCase().endsWith('.iso');
-    setMountAsCDROM(isIso);
-    setPvcSizeFromTemplate(!isIso);
-    setRequestSizeValue(isIso ? value?.toString() : os?.baseImageRecomendedSize?.[0] || '');
-    setRequestSizeUnit(os?.baseImageRecomendedSize[1] || BinaryUnit.Gi);
-  }, [fileValue, os]);
-
-  useEffect(() => {
-    if (storageClassName && spLoaded && applySP) {
-      spAccessMode?.[0] !== accessMode && setAccessMode(spAccessMode?.[0]);
-      spVolumeMode !== volumeMode && setVolumeMode(spVolumeMode);
-    }
-  }, [spLoaded, spAccessMode, spVolumeMode, accessMode, volumeMode, storageClassName, applySP]);
-
-  useEffect(() => {
-    onChange(
-      updateDV({
-        accessMode,
-        mountAsCDROM,
-        namespace,
-        pvcName,
-        requestSizeUnit,
-        requestSizeValue,
-        storageClassName,
-        volumeMode,
-      }),
-    );
-  }, [
-    accessMode,
-    volumeMode,
-    namespace,
-    pvcName,
-    onChange,
+    applySP,
+    handleGoldenCheckbox,
+    handleOs,
+    handlePvcSizeTemplate,
+    isGolden,
+    loadError,
     mountAsCDROM,
-    storageClassName,
-    requestSizeValue,
+    namespace,
+    operatingSystemHaveDV,
+    operatingSystems,
+    osImageExists,
+    pvcName,
+    pvcSizeFromTemplate,
     requestSizeUnit,
-  ]);
-
-  const handleGoldenCheckbox = (checked: boolean) => {
-    setIsGolden(checked);
-    if (checked) {
-      setNamespace(os?.baseImageNamespace);
-      setPvcName(pvcName && !os ? '' : os?.baseImageName);
-      return;
-    }
-    setNamespace(ns);
-  };
-
-  const handleOs = (newOs: string) => {
-    const operatingSystem = operatingSystems?.find((o) => o.id === newOs);
-    setOs(operatingSystem);
-    setPvcName(operatingSystem?.baseImageName);
-    operatingSystem?.baseImageNamespace && setNamespace(operatingSystem.baseImageNamespace);
-  };
-
-  const handlePvcSizeTemplate = (checked: boolean) => {
-    setPvcSizeFromTemplate(checked);
-    setRequestSizeValue(
-      checked
-        ? os?.baseImageRecomendedSize?.[0] || ''
-        : getGiBUploadPVCSizeByImage((fileValue as File)?.size)?.toString(),
-    );
-  };
-
-  useEffect(() => {
-    !isLoading && osParam && handleOs(osParam);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isLoading]);
-
-  useEffect(() => {
-    const goldenImagePVC = goldenPvcs?.find(
-      (pvc) => getName(pvc) === os?.baseImageName && getNamespace(pvc) === os?.baseImageNamespace,
-    );
-    if (goldenImagePVC) {
-      setOsImageExists(true);
-      setDisableFormSubmit(true);
-      return;
-    }
-    if (osImageExists) {
-      setOsImageExists(false);
-      setDisableFormSubmit(false);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [goldenPvcs, os]);
+    requestSizeValue,
+    selectedOS,
+    setAccessMode,
+    setApplySP,
+    setMountAsCDROM,
+    setPvcName,
+    setRequestSizeUnit,
+    setRequestSizeValue,
+    setStorageClassName,
+    setVolumeMode,
+    spAccessMode,
+    spLoaded,
+    spVolumeMode,
+    storageClassName,
+    volumeMode,
+  } = useUploadPVCFormLogic({
+    commonTemplates,
+    fileValue,
+    goldenPvcs,
+    isLoading,
+    ns,
+    onChange,
+    osParam,
+    setDisableFormSubmit,
+    storageClasses,
+  });
 
   return (
     <>
@@ -195,40 +97,16 @@ const UploadPVCForm: FC<UploadPVCFormProps> = ({
           )}
         </Alert>
       </FormGroup>
-      <FormGroup fieldId="file-upload" isRequired label={t('Upload data')}>
-        <FileUpload
-          dropzoneProps={{
-            accept: { 'application/*': ['.iso,.img,.qcow2,.gz,.xz'] },
-            onDropAccepted: () => setIsFileRejected(false),
-            onDropRejected: () => setIsFileRejected(true),
-          }}
-          onClearClick={(event) => {
-            handleFileChange(event, null);
-            handleFileNameChange(event, '');
-          }}
-          onFileInputChange={(event, file: File) => {
-            handleFileChange(event, file);
-            handleFileNameChange(event, file.name);
-          }}
-          browseButtonText="Upload"
-          className="upload-pvc-form__file-upload"
-          filename={fileName}
-          filenamePlaceholder="Drag and drop a file or upload one"
-          hideDefaultPreview
-          id="file-upload"
-          value={fileValue}
-        />
-        {operatingSystemHaveDV && (
-          <Checkbox
-            className="kv--create-upload__golden-switch"
-            data-checked-state={isGolden}
-            id="golden-os-switch"
-            isChecked={isGolden}
-            label={t('Attach this data to a VirtualMachine operating system')}
-            onChange={(_event, checked: boolean) => handleGoldenCheckbox(checked)}
-          />
-        )}
-      </FormGroup>
+      <UploadPVCFormFileInput
+        fileName={fileName}
+        fileValue={fileValue}
+        handleFileChange={handleFileChange}
+        handleFileNameChange={handleFileNameChange}
+        handleGoldenCheckbox={handleGoldenCheckbox}
+        isGolden={isGolden}
+        operatingSystemHaveDV={!!operatingSystemHaveDV}
+        setIsFileRejected={setIsFileRejected}
+      />
       {isGolden && (
         <UploadPVCFormGoldenImage
           goldenPvcs={goldenPvcs}
@@ -239,7 +117,7 @@ const UploadPVCForm: FC<UploadPVCFormProps> = ({
           mountAsCDROM={mountAsCDROM}
           namespace={namespace}
           operatingSystems={operatingSystems}
-          os={os}
+          os={selectedOS}
           osImageExists={osImageExists}
           pvcSizeFromTemplate={pvcSizeFromTemplate}
         />
@@ -250,38 +128,24 @@ const UploadPVCForm: FC<UploadPVCFormProps> = ({
         isLoading={isLoading}
         pvcName={pvcName}
       />
-      <Split hasGutter>
-        <SplitItem>
-          <UploadPVCFormStorageClass
-            applySP={applySP}
-            setApplySP={setApplySP}
-            setStorageClassName={setStorageClassName}
-            storageClasses={storageClasses}
-            storageClassName={storageClassName}
-          />
-        </SplitItem>
-        <SplitItem>
-          <UploadPVCFormSize
-            requestSizeUnit={requestSizeUnit}
-            requestSizeValue={requestSizeValue}
-            setRequestSizeUnit={setRequestSizeUnit}
-            setRequestSizeValue={setRequestSizeValue}
-          />
-        </SplitItem>
-      </Split>
-      {!spLoaded && !loadError ? (
-        <Loading />
-      ) : (
-        <UploadPVCFormMode
-          accessMode={spAccessMode?.[0]}
-          applySP={applySP}
-          setAccessMode={setAccessMode}
-          setVolumeMode={setVolumeMode}
-          storageClasses={storageClasses}
-          storageClassName={storageClassName}
-          volumeMode={volumeMode ?? spVolumeMode}
-        />
-      )}
+      <UploadPVCFormStorageSection
+        applySP={applySP}
+        loadError={loadError}
+        requestSizeUnit={requestSizeUnit}
+        requestSizeValue={requestSizeValue}
+        setAccessMode={setAccessMode}
+        setApplySP={setApplySP}
+        setRequestSizeUnit={setRequestSizeUnit}
+        setRequestSizeValue={setRequestSizeValue}
+        setStorageClassName={setStorageClassName}
+        setVolumeMode={setVolumeMode}
+        spAccessMode={spAccessMode}
+        spLoaded={spLoaded}
+        spVolumeMode={spVolumeMode}
+        storageClasses={storageClasses}
+        storageClassName={storageClassName}
+        volumeMode={volumeMode}
+      />
     </>
   );
 };

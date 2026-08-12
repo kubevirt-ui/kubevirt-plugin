@@ -5,7 +5,7 @@ import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchReso
 import { getLabel, getName } from '@kubevirt-utils/resources/shared';
 import { ManagedClusterModel } from '@multicluster/constants';
 import useIsACMPage from '@multicluster/useIsACMPage';
-import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import { type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { useHubClusterName } from '@stolostron/multicluster-sdk';
 
 import { useClusterCNVInstalled } from './useClusterCNVInstalled';
@@ -78,18 +78,18 @@ export const useClusterObservabilityDisabled = (
     const disabled: string[] = [];
     const enabled: string[] = [];
 
-    clusters.forEach((mc) => {
-      const clusterName = getName(mc);
-      if (!clusterName) return;
+    for (const cluster of clusters) {
+      const clusterName = getName(cluster);
+      if (!clusterName) continue;
 
       all.push(clusterName);
-      const observabilityDisabled = getLabel(mc, 'observability') === 'disabled';
+      const observabilityDisabled = getLabel(cluster, 'observability') === 'disabled';
       if (observabilityDisabled) {
         disabled.push(clusterName);
       } else {
         enabled.push(clusterName);
       }
-    });
+    }
 
     return { allClusterNames: all, disabledClusters: disabled, enabledClusters: enabled };
   }, [isACMPage, managedClusterData]);
