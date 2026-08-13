@@ -1,8 +1,11 @@
-import React, { FC, useCallback } from 'react';
+import React, { type FC, useCallback } from 'react';
 
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { IoK8sApiCoreV1Node } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
-import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type IoK8sApiCoreV1Node } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import {
+  type V1VirtualMachine,
+  type V1VirtualMachineInstance,
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import AffinityModal from '@kubevirt-utils/components/AffinityModal/AffinityModal';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
@@ -52,7 +55,7 @@ const SchedulingSectionLeftGrid: FC<SchedulingSectionLeftGridProps> = ({
             name: updatedVM?.metadata?.name,
             ns: updatedVM?.metadata?.namespace,
           }),
-    [onUpdateVM],
+    [onUpdateVM, vm],
   );
 
   return (
@@ -62,6 +65,8 @@ const SchedulingSectionLeftGrid: FC<SchedulingSectionLeftGridProps> = ({
           descriptionData={
             <NodeSelectorDetailItem nodeSelector={vm?.spec?.template?.spec?.nodeSelector} />
           }
+          descriptionHeader={<SearchItem id="node-selector">{t('Node selector')}</SearchItem>}
+          isEdit={canUpdateVM}
           onEditClick={() =>
             createModal(({ isOpen, onClose }) => (
               <NodeSelectorModal
@@ -74,10 +79,11 @@ const SchedulingSectionLeftGrid: FC<SchedulingSectionLeftGridProps> = ({
               />
             ))
           }
-          descriptionHeader={<SearchItem id="node-selector">{t('Node selector')}</SearchItem>}
-          isEdit={canUpdateVM}
         />
         <DescriptionItem
+          descriptionData={<Tolerations vm={vm} />}
+          descriptionHeader={<SearchItem id="tolerations">{t('Tolerations')}</SearchItem>}
+          isEdit={canUpdateVM}
           onEditClick={() =>
             createModal(({ isOpen, onClose }) => (
               <TolerationsModal
@@ -91,11 +97,11 @@ const SchedulingSectionLeftGrid: FC<SchedulingSectionLeftGridProps> = ({
               />
             ))
           }
-          descriptionData={<Tolerations vm={vm} />}
-          descriptionHeader={<SearchItem id="tolerations">{t('Tolerations')}</SearchItem>}
-          isEdit={canUpdateVM}
         />
         <DescriptionItem
+          descriptionData={<Affinity vm={vm} />}
+          descriptionHeader={<SearchItem id="affinity">{t('Affinity rules')}</SearchItem>}
+          isEdit={canUpdateVM}
           onEditClick={() =>
             createModal(({ isOpen, onClose }) => (
               <AffinityModal
@@ -108,9 +114,6 @@ const SchedulingSectionLeftGrid: FC<SchedulingSectionLeftGridProps> = ({
               />
             ))
           }
-          descriptionData={<Affinity vm={vm} />}
-          descriptionHeader={<SearchItem id="affinity">{t('Affinity rules')}</SearchItem>}
-          isEdit={canUpdateVM}
         />
         <DescriptionItem
           bodyContent={<DeschedulerPopover />}

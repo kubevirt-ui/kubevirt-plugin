@@ -1,7 +1,8 @@
 import { useMemo } from 'react';
 
-import { JobResults } from '../../../../utils';
-import { TestSuiteData } from '../TestSuiteCard';
+import { type TestSuiteData } from '../TestSuiteCard';
+
+import { type JobResults } from '../../../../utils';
 
 /**
  * Hook to filter and format test suites from job results
@@ -14,5 +15,5 @@ export const useFilteredTestSuites = (
     return Object.entries(results.tests)
       .filter(([key]) => key !== 'summary')
       .map(([key, value]) => [key, value as TestSuiteData]);
-  }, [results?.tests]);
+  }, [results]);
 };

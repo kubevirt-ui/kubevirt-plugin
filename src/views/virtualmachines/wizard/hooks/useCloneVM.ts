@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 
-import { V1beta1VirtualMachineClone } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1beta1VirtualMachineClone } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import useCloneVMModal from '@kubevirt-utils/components/CloneVMModal/hooks/useCloneVMModal';
 import {
   cloneVM as createCloneRequest,
@@ -47,13 +47,13 @@ const useCloneVM: UseCloneVM = () => {
       navigate,
       setError,
       setIsSubmitting,
-      submittedCloneRequest,
       setSubmittedCloneRequest,
+      submittedCloneRequest,
       t,
     });
-  }, [cloneRequest, getValues, navigate, submittedCloneRequest]);
+  }, [cloneRequest, getValues, navigate, submittedCloneRequest, t]);
 
-  const cloneVM = async () => {
+  const cloneVM = async (): Promise<void> => {
     if (isSubmitting || submittedCloneRequest) {
       return;
     }
@@ -64,7 +64,12 @@ const useCloneVM: UseCloneVM = () => {
       description,
       name,
       project: targetNamespace,
-    } = getValues(CREATE_VM_FORM_FIELDS_VM_DATA.ROOT);
+    } = getValues(CREATE_VM_FORM_FIELDS_VM_DATA.ROOT) as {
+      cluster: string | undefined;
+      description: string;
+      name: string;
+      project: string;
+    };
 
     if (!source) {
       setError(new Error(t('Select a VirtualMachine to clone')));
@@ -75,7 +80,7 @@ const useCloneVM: UseCloneVM = () => {
     setError(null);
 
     try {
-      const targetCluster = getCluster(source) || cluster;
+      const targetCluster = getCluster(source) ?? cluster;
       const vmSameName = await vmExists(name, targetNamespace, targetCluster);
 
       if (vmSameName) {
@@ -92,10 +97,10 @@ const useCloneVM: UseCloneVM = () => {
       );
 
       setSubmittedCloneRequest(request);
-    } catch (err) {
+    } catch (err: unknown) {
       setError(err);
       setIsSubmitting(false);
-      logVMCreationFailed(TELEMETRY_VM_CREATION_METHOD.CLONE, err);
+      logVMCreationFailed(TELEMETRY_VM_CREATION_METHOD.CLONE, err as Error);
     }
   };
 

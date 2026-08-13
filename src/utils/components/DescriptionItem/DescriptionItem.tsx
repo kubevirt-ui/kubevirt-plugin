@@ -1,13 +1,13 @@
-import React, { FC, ReactNode, useMemo } from 'react';
+import React, { type FC, type ReactNode, useMemo } from 'react';
 import classNames from 'classnames';
 
 import { DescriptionItemHeader } from '@kubevirt-utils/components/DescriptionItem/DescriptionItemHeader';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { OLSPromptType } from '@lightspeed/utils/prompts';
+import { type OLSPromptType } from '@lightspeed/utils/prompts';
+import { type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Button,
-  ButtonVariant,
   DescriptionListDescription,
   DescriptionListGroup,
   DescriptionListTermHelpText,
@@ -26,7 +26,7 @@ type DescriptionItemProps = {
   breadcrumb?: string;
   className?: string;
   'data-test'?: string;
-  descriptionData: any;
+  descriptionData: ReactNode;
   descriptionHeader?: ReactNode;
   isDisabled?: boolean;
   isEdit?: boolean;
@@ -66,51 +66,46 @@ const DescriptionItem: FC<DescriptionItemProps> = ({
   subTitle,
 }) => {
   const { t } = useKubevirtTranslation();
-  const NotAvailable = <MutedTextSpan text={t('Not available')} />;
-
-  const description = useMemo(
-    () =>
-      isEdit && !showEditOnTitle ? (
-        <>
-          <EditButtonWithTooltip
-            isEditable={!isDisabled}
-            onEditClick={onEditClick}
-            testId={testId}
-            tooltipContent={messageOnDisabled}
-          >
-            {descriptionData ?? NotAvailable}
-          </EditButtonWithTooltip>
-          {additionalContent}
-        </>
-      ) : (
-        descriptionData
-      ),
-    [
-      descriptionData,
-      isDisabled,
-      onEditClick,
-      messageOnDisabled,
-      testId,
-      additionalContent,
-      showEditOnTitle,
-    ],
-  );
+  const description = useMemo(() => {
+    if (!isEdit || showEditOnTitle) return descriptionData;
+    const fallback = <MutedTextSpan text={t('Not available')} />;
+    return (
+      <>
+        <EditButtonWithTooltip
+          isEditable={!isDisabled}
+          onEditClick={onEditClick}
+          testId={testId}
+          tooltipContent={messageOnDisabled}
+        >
+          {descriptionData ?? fallback}
+        </EditButtonWithTooltip>
+        {additionalContent}
+      </>
+    );
+  }, [
+    descriptionData,
+    isDisabled,
+    isEdit,
+    t,
+    onEditClick,
+    messageOnDisabled,
+    testId,
+    additionalContent,
+    showEditOnTitle,
+  ]);
+  const hasHeader =
+    bodyContent || breadcrumb || descriptionHeader || isRequired || label || moreInfoURL;
 
   return (
     <DescriptionListGroup className={className}>
       <DescriptionListTermHelpText>
         <Flex
+          className={classNames({ 'pf-v6-u-w-100': isLabelEditor })}
           justifyContent={{
             default: isLabelEditor ? 'justifyContentSpaceBetween' : 'justifyContentFlexStart',
           }}
-          className={classNames({ 'pf-v6-u-w-100': isLabelEditor })}
         >
-          {(bodyContent ||
-            breadcrumb ||
-            descriptionHeader ||
-            isRequired ||
-            label ||
-            moreInfoURL) && (
+          {hasHeader && (
             <FlexItem>
               <DescriptionItemHeader
                 bodyContent={bodyContent}
@@ -135,7 +130,7 @@ const DescriptionItem: FC<DescriptionItemProps> = ({
                 isInline
                 onClick={onEditClick}
                 type="button"
-                variant={ButtonVariant.link}
+                variant="link"
               >
                 {t('Edit')}
               </Button>
@@ -143,7 +138,6 @@ const DescriptionItem: FC<DescriptionItemProps> = ({
           )}
         </Flex>
       </DescriptionListTermHelpText>
-
       <DescriptionListDescription
         className={classNames({ 'co-editable-label-group': isLabelEditor })}
         data-test={isEdit && !showEditOnTitle ? undefined : testId}

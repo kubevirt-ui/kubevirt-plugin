@@ -26,6 +26,7 @@ const removeDiskAsBootable = (vm: V1VirtualMachine, diskName: string): V1Virtual
     if (disk) delete disk.bootOrder;
 
     const sortedDisks = disks
+
       .filter((diskItem) => diskItem.name !== diskName && diskItem.bootOrder != null)
       .sort((a, b) => (a.bootOrder ?? Infinity) - (b.bootOrder ?? Infinity));
     for (const [index, sortedDisk] of sortedDisks.entries()) {

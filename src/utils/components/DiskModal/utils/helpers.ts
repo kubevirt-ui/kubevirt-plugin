@@ -64,11 +64,7 @@ export const diskModalTitle = (isEditDisk: boolean, isVMRunning: boolean): strin
 
 export const createDataVolumeName = (vm: V1VirtualMachine, diskName: string): string => {
   const middlePart = [getName(vm), diskName].filter(isDNS1123Label).join('-').substring(0, 53);
-  // prefix: 2
-  // middlePart: max 53
-  // suffix: 6
-  // hyphens: max 2
-  // together: max 63
+  // prefix: 2, middlePart: max 53, suffix: 6, hyphens: max 2, together: max 63
   return `dv-${middlePart}${!middlePart || middlePart.endsWith('-') ? '' : '-'}${getRandomChars(6)}`;
 };
 

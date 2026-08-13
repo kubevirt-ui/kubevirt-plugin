@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import { UseConsoleShowSystemNamespaces } from '@kubevirt-utils/hooks/consoleUserSettings/types';
+import { type UseConsoleShowSystemNamespaces } from '@kubevirt-utils/hooks/consoleUserSettings/types';
 import useConsoleUserSettingLocalStorage from '@kubevirt-utils/hooks/consoleUserSettings/useConsoleUserSettingLocalStorage/useConsoleUserSettingLocalStorage';
 import {
   parseBooleanUserPreference,
@@ -44,7 +44,9 @@ const useConsoleShowSystemNamespaces: UseConsoleShowSystemNamespaces = (cluster)
   } = useConsoleUserSettingsConfigMap(settingsCluster);
 
   const contextRef = useRef({ configMapName, userConfigMap, userName });
-  contextRef.current = { configMapName, userConfigMap, userName };
+  useEffect(() => {
+    contextRef.current = { configMapName, userConfigMap, userName };
+  }, [configMapName, userConfigMap, userName]);
 
   const valueFromConfigMap = useMemo(
     () =>
@@ -140,7 +142,7 @@ const useConsoleShowSystemNamespaces: UseConsoleShowSystemNamespaces = (cluster)
     showSystemNamespaces,
     updateConfigMapValue,
     settingsLoaded,
-    error || errorUser || configMapError,
+    error ?? errorUser ?? configMapError,
   ];
 };
 

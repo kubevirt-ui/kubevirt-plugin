@@ -21,7 +21,7 @@ const useConsoleFetch = <R>(
     if (!url) return;
     if (loaded) return;
 
-    const fetchData = async () => {
+    const fetchData = async (): Promise<void> => {
       try {
         const response = await consoleFetch(url, initialValue, timeout);
         setData(await response.json());
@@ -32,7 +32,8 @@ const useConsoleFetch = <R>(
       }
     };
 
-    fetchData();
+    void fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- initialValue and timeout are intentionally captured once at mount
   }, [loaded, url]);
 
   return { data, error, loaded };

@@ -8,11 +8,11 @@ import {
 import useConsoleUserSettingsConfigMap from '@kubevirt-utils/hooks/useConsoleUserSettingsConfigMap/useConsoleUserSettingsConfigMap';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 
-import { ConsoleBookmarks, ConsoleUserSettingHookResult } from '../types';
+import { type ConsoleBookmarks, type ConsoleUserSettingHookResult } from '../types';
+
 import useConsoleUserSettingLocalStorage from '../useConsoleUserSettingLocalStorage/useConsoleUserSettingLocalStorage';
 import useConsoleUserSettingsCluster from '../useConsoleUserSettingsCluster/useConsoleUserSettingsCluster';
 import useQueuedUserSettingWrite from '../useQueuedUserSettingWrite/useQueuedUserSettingWrite';
-
 import { areBookmarksEqual, parseBookmarks, parseStoredBookmarks } from './utils';
 
 type UseConsoleBookmarksResult = ConsoleUserSettingHookResult<
@@ -45,7 +45,9 @@ const useConsoleBookmarks = (key: string, cluster?: string): UseConsoleBookmarks
   } = useConsoleUserSettingsConfigMap(settingsCluster);
 
   const contextRef = useRef({ configMapName, userConfigMap, userName });
-  contextRef.current = { configMapName, userConfigMap, userName };
+  useEffect(() => {
+    contextRef.current = { configMapName, userConfigMap, userName };
+  }, [configMapName, userConfigMap, userName]);
 
   const bookmarksFromConfigMap = useMemo(
     () => getConfigMapValue(userConfigMap, userName, loadedConfigMap, key, parseBookmarks, {}),
@@ -133,7 +135,7 @@ const useConsoleBookmarks = (key: string, cluster?: string): UseConsoleBookmarks
     bookmarks,
     updateConfigMapBookmarks,
     settingsLoaded,
-    error || errorUser || configMapError,
+    error ?? errorUser ?? configMapError,
   ];
 };
 

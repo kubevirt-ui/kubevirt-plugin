@@ -1,7 +1,7 @@
-import React, { FC, useCallback } from 'react';
+import React, { type FC, useCallback } from 'react';
 import { useNavigate } from 'react-router';
 
-import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { type V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import CloneTemplateModal from '@kubevirt-utils/components/CloneTemplateModal/CloneTemplateModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -35,16 +35,16 @@ const CommonTemplateAlert: FC<CommonTemplateAlertProps> = ({ template }) => {
         ),
       );
     },
-    [navigate],
+    [isACMPage, navigate],
   );
 
   return (
     <Alert
+      data-test="common-template-alert"
+      isInline
       title={t('Templates provided by {{providerName}} are not editable.', {
         providerName,
       })}
-      data-test="common-template-alert"
-      isInline
       variant={AlertVariant.info}
     >
       {t(
@@ -58,6 +58,7 @@ const CommonTemplateAlert: FC<CommonTemplateAlertProps> = ({ template }) => {
       })}
       <div className="pf-v6-u-mt-md">
         <Button
+          isInline
           onClick={() =>
             createModal(({ isOpen, onClose }) => (
               <CloneTemplateModal
@@ -68,7 +69,6 @@ const CommonTemplateAlert: FC<CommonTemplateAlertProps> = ({ template }) => {
               />
             ))
           }
-          isInline
           variant={ButtonVariant.link}
         >
           {t('Create a new custom Template')}

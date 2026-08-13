@@ -1,4 +1,4 @@
-import React, { FC, useMemo } from 'react';
+import React, { type FC, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 
 import { trimLastHistoryPath } from '@kubevirt-utils/components/HorizontalNavbar/utils/utils';
@@ -49,21 +49,18 @@ const CheckupsRunButton: FC = () => {
       default:
         return true;
     }
-  }, [namespace, currentCheckupType, isCreateStoragePermitted]);
+  }, [isAllNamespaces, currentCheckupType, isCreateStoragePermitted]);
 
-  const handleRunCheckup = () => {
+  const handleRunCheckup = (): void => {
     if (isDisabled || !currentCheckupType) return;
 
     const basePath = trimLastHistoryPath(location.pathname, Object.values(CHECKUP_URLS));
-    switch (currentCheckupType) {
-      case CHECKUP_URLS.STORAGE:
-        navigate(
-          isACMpage
-            ? getStorageCheckupURL('form', namespace, cluster || hubClusterName)
-            : createURL(`${CHECKUP_URLS.STORAGE}/form`, basePath),
-        );
-        break;
-      // Self-validation is handled by SelfValidationCheckupRunButton
+    if (currentCheckupType === CHECKUP_URLS.STORAGE) {
+      navigate(
+        isACMpage
+          ? getStorageCheckupURL('form', namespace, cluster ?? hubClusterName)
+          : createURL(`${CHECKUP_URLS.STORAGE}/form`, basePath),
+      );
     }
   };
 

@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router';
 
 import DeleteModal from '@kubevirt-utils/components/DeleteModal/DeleteModal';
@@ -6,11 +6,11 @@ import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { modelToRef } from '@kubevirt-utils/models';
 import { getStorageMigrationPlanModelForKind } from '@kubevirt-utils/resources/migrations/backends';
-import { MultiNamespaceVirtualMachineStorageMigrationPlan } from '@kubevirt-utils/resources/migrations/constants';
+import { type MultiNamespaceVirtualMachineStorageMigrationPlan } from '@kubevirt-utils/resources/migrations/constants';
 import { asAccessReview, getResourceUrl } from '@kubevirt-utils/resources/shared';
 import {
-  Action,
-  ExtensionHook,
+  type Action,
+  type ExtensionHook,
   k8sDelete,
   useAnnotationsModal,
   useK8sModel,
@@ -29,6 +29,12 @@ const useStorageMigrationActions: ExtensionHook<
   const [, inFlight] = useK8sModel(modelToRef(planModel));
   const labelsModalLauncher = useLabelsModal(migPlan);
   const annotationsModalLauncher = useAnnotationsModal(migPlan);
+
+  const deleteSubmitHandler = useCallback(
+    (): Promise<void> => k8sDelete({ model: planModel, resource: migPlan }).then(() => undefined),
+    [migPlan, planModel],
+  );
+
   const actions = useMemo(
     () => [
       {
@@ -45,8 +51,8 @@ const useStorageMigrationActions: ExtensionHook<
       },
       {
         accessReview: asAccessReview(planModel, migPlan, 'update'),
-        cta: () =>
-          navigate(
+        cta: (): void =>
+          void navigate(
             `${getResourceUrl({
               model: planModel,
               resource: migPlan,
@@ -59,19 +65,14 @@ const useStorageMigrationActions: ExtensionHook<
       },
       {
         accessReview: asAccessReview(planModel, migPlan, 'delete'),
-        cta: () =>
+        cta: (): void =>
           createModal(({ isOpen, onClose }) => (
             <DeleteModal
-              onDeleteSubmit={() =>
-                k8sDelete({
-                  model: planModel,
-                  resource: migPlan,
-                })
-              }
               headerText={t('Delete migration plan?')}
               isOpen={isOpen}
               obj={migPlan}
               onClose={onClose}
+              onDeleteSubmit={deleteSubmitHandler}
             />
           )),
         disabled: false,
@@ -84,12 +85,12 @@ const useStorageMigrationActions: ExtensionHook<
     [
       annotationsModalLauncher,
       createModal,
+      deleteSubmitHandler,
       labelsModalLauncher,
       migPlan,
       navigate,
       planModel,
       t,
-      inFlight,
     ],
   );
 

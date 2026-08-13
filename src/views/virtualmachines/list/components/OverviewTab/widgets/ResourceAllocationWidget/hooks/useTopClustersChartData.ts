@@ -1,9 +1,10 @@
 import { useMemo } from 'react';
 
 import DurationOption from '@kubevirt-utils/components/DurationOption/DurationOption';
+import useCurrentTime from '@kubevirt-utils/hooks/useCurrentTime';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { PrometheusEndpoint } from '@openshift-console/dynamic-plugin-sdk';
-import { ChartDomain } from '@overview/OverviewTab/metric-charts-card/utils/hooks/types';
+import { type ChartDomain } from '@overview/OverviewTab/metric-charts-card/utils/hooks/types';
 import {
   findUnit,
   formatLargestValue,
@@ -21,7 +22,7 @@ import {
   EMPTY_DOMAIN,
   extractClusterNames,
   extractPerClusterData,
-  TopClustersMetricData,
+  type TopClustersMetricData,
 } from '../utils/topClustersChartUtils';
 
 export type { ClusterChartSeries, TopClustersMetricData } from '../utils/topClustersChartUtils';
@@ -39,7 +40,7 @@ export const useTopClustersChartData = (
   enabled = true,
 ): TopClustersMetricData => {
   const { t } = useKubevirtTranslation();
-  const currentTime = useMemo(() => Date.now(), []);
+  const currentTime = useCurrentTime(60_000);
 
   const query = useMemo(
     () =>
@@ -63,15 +64,15 @@ export const useTopClustersChartData = (
   return useMemo(() => {
     const rawClusters = extractPerClusterData(queryData, t('Unknown'));
 
-    const allValues = rawClusters.flatMap((c) => c.values);
+    const allValues = rawClusters.flatMap((cluster) => cluster.values);
     const largestRaw = Math.max(0, getLargestValue(allValues));
     const unit = findUnit(metric, largestRaw) ?? '';
     const largestValue = formatLargestValue(metric, largestRaw, unit);
 
     const chartSeries = buildChartSeries(rawClusters, topClusterNames, metric, unit);
 
-    const allPoints = chartSeries.flatMap((s) => s.data);
-    const xValues = allPoints.map((p) => p.x);
+    const allPoints = chartSeries.flatMap((series) => series.data);
+    const xValues = allPoints.map((point) => point.x);
     const domain: ChartDomain =
       xValues.length > 0
         ? {
@@ -87,7 +88,7 @@ export const useTopClustersChartData = (
       chartSeries,
       domain,
       error,
-      isReady: chartSeries.length > 0 && chartSeries.some((s) => s.data.length > 0),
+      isReady: chartSeries.length > 0 && chartSeries.some((series) => series.data.length > 0),
       loaded: isLoaded,
       unit,
     };

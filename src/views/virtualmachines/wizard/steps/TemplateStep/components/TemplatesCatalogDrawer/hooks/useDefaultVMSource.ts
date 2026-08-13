@@ -1,33 +1,40 @@
-import { useCallback, useRef } from 'react';
+import { useCallback, useState } from 'react';
 
 import {
-  V1beta1DataVolumeSpec,
-  V1ContainerDiskSource,
-  V1VirtualMachine,
+  type V1beta1DataVolumeSpec,
+  type V1ContainerDiskSource,
+  type V1VirtualMachine,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { isEqualObject } from '@kubevirt-utils/components/NodeSelectorModal/utils/helpers';
 import { ROOTDISK } from '@kubevirt-utils/constants/constants';
 import { getDiskSource } from '@virtualmachines/wizard/steps/TemplateStep/components/TemplatesCatalogDrawer/utils/utils';
 
-const useDefaultVMSource = (vm: V1VirtualMachine) => {
-  const defaultDiskSource = useRef<V1beta1DataVolumeSpec | V1ContainerDiskSource>();
+type DiskSource = V1beta1DataVolumeSpec | V1ContainerDiskSource;
+
+type UseDefaultVMSourceResult = {
+  currentDiskSource: DiskSource | undefined;
+  isDefaultDiskSource: boolean;
+  updateDefaultDiskSource: (generatedVM: V1VirtualMachine) => void;
+};
+
+const useDefaultVMSource = (vm: V1VirtualMachine): UseDefaultVMSourceResult => {
+  const [defaultDiskSourceState, setDefaultDiskSourceState] = useState<DiskSource>();
 
   const currentDiskSource = getDiskSource(vm, ROOTDISK);
 
   const updateDefaultDiskSource = useCallback((generatedVM: V1VirtualMachine) => {
     const source = getDiskSource(generatedVM, ROOTDISK);
-
-    defaultDiskSource.current = source;
+    setDefaultDiskSourceState(source);
   }, []);
 
-  const { storage: _, ...restDefaultSpec }: V1beta1DataVolumeSpec = {
-    ...(defaultDiskSource.current as V1beta1DataVolumeSpec),
+  const { storage: _defaultStorage, ...restDefaultSpec }: V1beta1DataVolumeSpec = {
+    ...(defaultDiskSourceState as V1beta1DataVolumeSpec),
   };
-  const { storage: __, ...restCurrentSpec }: V1beta1DataVolumeSpec = {
+  const { storage: _currentStorage, ...restCurrentSpec }: V1beta1DataVolumeSpec = {
     ...(currentDiskSource as V1beta1DataVolumeSpec),
   };
   const isDefaultDiskSource =
-    defaultDiskSource.current !== undefined && isEqualObject(restDefaultSpec, restCurrentSpec);
+    defaultDiskSourceState !== undefined && isEqualObject(restDefaultSpec, restCurrentSpec);
 
   return {
     currentDiskSource,

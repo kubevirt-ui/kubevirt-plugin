@@ -1,19 +1,19 @@
-import { useRef } from 'react';
+import { useState } from 'react';
 
 import { isEqualObject } from '@kubevirt-utils/components/NodeSelectorModal/utils/helpers';
 
-const useDeepCompareMemoize = <T = any>(value: T, strinfigy?: boolean): T => {
-  const ref = useRef<T>();
+const useDeepCompareMemoize = <T = unknown>(value: T, stringify?: boolean): T => {
+  const [memoizedValue, setMemoizedValue] = useState<T>(value);
 
-  if (
-    strinfigy
-      ? JSON.stringify(value) !== JSON.stringify(ref.current)
-      : !isEqualObject(value, ref.current)
-  ) {
-    ref.current = value;
+  const hasChanged = stringify
+    ? JSON.stringify(value) !== JSON.stringify(memoizedValue)
+    : !isEqualObject(value, memoizedValue);
+
+  if (hasChanged) {
+    setMemoizedValue(value);
   }
 
-  return ref.current;
+  return hasChanged ? value : memoizedValue;
 };
 
 export default useDeepCompareMemoize;

@@ -1,14 +1,15 @@
-import React, { FC, useState } from 'react';
+import React, { type FC, useState } from 'react';
 
 import {
-  V1beta1VirtualMachineSnapshot,
-  V1VirtualMachine,
+  type V1beta1VirtualMachineSnapshot,
+  type V1VirtualMachine,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import RestoreModal from '@kubevirt-utils/components/SnapshotModal/RestoreModal';
 import { timestampFor } from '@kubevirt-utils/components/Timestamp/utils/datetime';
 import KebabToggle from '@kubevirt-utils/components/toggles/KebabToggle';
+import useCurrentTime from '@kubevirt-utils/hooks/useCurrentTime';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   DescriptionList,
@@ -24,7 +25,6 @@ import {
 
 import { printableVMStatus } from '../../../../../utils';
 import IndicationLabelList from '../../../snapshots/components/IndicationLabel/IndicationLabelList';
-
 import SnapshotDeleteModal from './component/SnapshotDeleteModal';
 import { icon } from './utils/snapshotStatus';
 
@@ -41,15 +41,16 @@ const VirtualMachinesOverviewTabSnapshotsRow: FC<VirtualMachinesOverviewTabSnaps
   const [isKebabOpen, setIsKebabOpen] = useState(false);
   const { createModal } = useModal();
 
+  const currentTime = useCurrentTime(60_000);
   const timestamp = timestampFor(
     new Date(snapshot?.metadata?.creationTimestamp),
-    new Date(Date.now()),
+    new Date(currentTime),
     false,
-  );
+  ) as string;
 
-  const StatusIcon = icon[snapshot?.status?.phase];
+  const StatusIcon = icon[snapshot?.status?.phase as keyof typeof icon] as FC;
 
-  const onToggle = () => setIsKebabOpen((prevIsOpen) => !prevIsOpen);
+  const onToggle = (): void => setIsKebabOpen((prevIsOpen) => !prevIsOpen);
 
   return (
     <Flex flexWrap={{ default: 'nowrap' }}>
@@ -90,7 +91,7 @@ const VirtualMachinesOverviewTabSnapshotsRow: FC<VirtualMachinesOverviewTabSnaps
             </DescriptionListTermHelpTextButton>
           </Popover>
         </DescriptionList>
-        <span className="pf-v6-u-text-color-subtle">{`(${timestamp})`}</span>
+        <span className="pf-v6-u-text-color-subtle">{`(${String(timestamp)})`}</span>
       </Flex>
       <Dropdown
         isOpen={isKebabOpen}
@@ -108,10 +109,10 @@ const VirtualMachinesOverviewTabSnapshotsRow: FC<VirtualMachinesOverviewTabSnaps
             {t('Restore')}
           </DropdownItem>
           <DropdownItem
+            key="delete"
             onClick={() =>
               createModal((props) => <SnapshotDeleteModal snapshot={snapshot} {...props} />)
             }
-            key="delete"
           >
             {t('Delete')}
           </DropdownItem>

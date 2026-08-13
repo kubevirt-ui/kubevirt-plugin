@@ -1,18 +1,15 @@
-import React, { FC, useState } from 'react';
+import React, { type FC, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { isDataImportCronAutoUpdated } from 'src/views/datasources/utils';
 
 import {
-  V1beta1DataImportCron,
-  V1beta1DataSource,
+  type V1beta1DataImportCron,
+  type V1beta1DataSource,
 } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
-import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import { FormTextInput } from '@kubevirt-utils/components/FormTextInput/FormTextInput';
-import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
-import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getFieldRequiredMessage } from '@kubevirt-utils/utils/validation';
 import {
@@ -20,12 +17,12 @@ import {
   Divider,
   Form,
   FormGroup,
-  NumberInput,
   Stack,
   StackItem,
   ValidatedOptions,
 } from '@patternfly/react-core';
 
+import AutoUpdateSettings from './components/AutoUpdateSettings';
 import { onDataImportCronManageSubmit } from './utils';
 
 export type DataImportCronManageFormType = {
@@ -48,7 +45,7 @@ export const DataImportCronManageModal: FC<DataImportCronManageModalProps> = ({
   onClose,
 }) => {
   const { t } = useKubevirtTranslation();
-  const [allowAutoUpdate, setAllowAutoUpdate] = useState(
+  const [allowAutoUpdate, setAllowAutoUpdate] = useState(() =>
     isDataImportCronAutoUpdated(dataSource, dataImportCron),
   );
   const {
@@ -59,22 +56,17 @@ export const DataImportCronManageModal: FC<DataImportCronManageModalProps> = ({
     watch,
   } = useForm<DataImportCronManageFormType>({
     defaultValues: {
-      importsToKeep: dataImportCron?.spec?.importsToKeep || 3,
+      importsToKeep: dataImportCron?.spec?.importsToKeep ?? 3,
     },
   });
+  // eslint-disable-next-line react-hooks/incompatible-library
   const importsToKeep = watch('importsToKeep');
 
   const onSubmit = handleSubmit(
     (data) =>
       onDataImportCronManageSubmit({
-        data: {
-          ...data,
-          allowAutoUpdate,
-        },
-        resources: {
-          dataImportCron,
-          dataSource,
-        },
+        data: { ...data, allowAutoUpdate },
+        resources: { dataImportCron, dataSource },
       }),
     () => Promise.reject(t('Missing required fields')),
   );
@@ -128,90 +120,14 @@ export const DataImportCronManageModal: FC<DataImportCronManageModalProps> = ({
               />
             </FormGroup>
             {allowAutoUpdate && (
-              <>
-                <FormGroup
-                  labelHelp={
-                    <HelpTextIcon
-                      bodyContent={t(
-                        'As new versions of a DataSource become available older versions will be replaced',
-                      )}
-                      buttonAriaLabel={t('More info for retain revisions field')}
-                    />
-                  }
-                  fieldId="retain-revision-info"
-                  isRequired
-                  label={t('Retain revisions')}
-                >
-                  <NumberInput
-                    id={'dataimportcron-manage-imports-to-keep'}
-                    max={10}
-                    min={0}
-                    onMinus={() => setValue('importsToKeep', importsToKeep - 1)}
-                    onPlus={() => setValue('importsToKeep', importsToKeep + 1)}
-                    value={importsToKeep}
-                  />
-                  <FormGroupHelperText>
-                    <Stack>
-                      <StackItem>
-                        <MutedTextSpan
-                          text={t('Specify the number of revisions that should be retained.')}
-                        />
-                      </StackItem>
-                      <StackItem>
-                        <MutedTextSpan
-                          text={t('A value of X means that the X latest versions will be kept')}
-                        />
-                      </StackItem>
-                    </Stack>
-                  </FormGroupHelperText>
-                </FormGroup>
-                <FormGroup
-                  fieldId="dataimportcron-manage-schedule"
-                  label={t('Scheduling settings')}
-                >
-                  <FormGroupHelperText>
-                    <>
-                      {t(
-                        'Schedule specifies in cron format when and how often to look for new imports.',
-                      )}
-                      <ExternalLink href={documentationURL.CRON_INFO} text={t('Learn more')} />
-                    </>
-                  </FormGroupHelperText>
-                </FormGroup>
-                <FormGroup fieldId="dataimportcron-manage-cron" label={t('Cron expression')}>
-                  <FormTextInput
-                    {...register('schedule', {
-                      validate: {
-                        required: (value) => {
-                          if (!value && allowAutoUpdate) {
-                            return t('Required when automatic update is enabled');
-                          }
-                          return true;
-                        },
-                      },
-                    })}
-                    validated={
-                      errors?.['schedule'] ? ValidatedOptions.error : ValidatedOptions.default
-                    }
-                    aria-label={t('Cron expression')}
-                    data-test={'dataimportcron-manage-cron'}
-                    defaultValue={dataImportCron?.spec?.schedule}
-                    id={'dataimportcron-manage-source-cron'}
-                    type="text"
-                  />
-                  <FormGroupHelperText
-                    validated={
-                      errors?.['schedule'] ? ValidatedOptions.error : ValidatedOptions.default
-                    }
-                  >
-                    {errors?.['schedule']
-                      ? getFieldRequiredMessage(t)
-                      : t('Example (At 00:00 on Tuesday): {{exampleCron}}', {
-                          exampleCron: '0 0 * * 2',
-                        })}
-                  </FormGroupHelperText>
-                </FormGroup>
-              </>
+              <AutoUpdateSettings
+                allowAutoUpdate={allowAutoUpdate}
+                dataImportCron={dataImportCron}
+                errors={errors}
+                importsToKeep={importsToKeep}
+                register={register}
+                setValue={setValue}
+              />
             )}
           </Form>
         </StackItem>

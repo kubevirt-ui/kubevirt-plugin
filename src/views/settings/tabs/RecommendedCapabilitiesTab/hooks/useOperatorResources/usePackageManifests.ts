@@ -24,16 +24,16 @@ const usePackageManifests = ({
     useKubevirtWatchResources<Record<string, PackageManifestKind[]>>(packageManifestResources);
 
   const packageManifestWatch = packageManifestData?.[PACKAGE_MANIFESTS_WATCH_KEY];
-  const allManifests = (packageManifestWatch?.data ?? []) as PackageManifestKind[];
   const loaded = packageManifestWatch?.loaded ?? false;
-  const loadError = packageManifestWatch?.loadError;
+  const loadError = packageManifestWatch?.loadError as Error | undefined;
 
   const packageManifests = useMemo(() => {
     if (!loaded) return [];
 
+    const allManifests = (packageManifestWatch?.data ?? []) as PackageManifestKind[];
     const nameSet = new Set(memoizedPackageNames);
     return allManifests.filter((pkg) => nameSet.has(getName(pkg)));
-  }, [allManifests, loaded, memoizedPackageNames]);
+  }, [packageManifestWatch?.data, loaded, memoizedPackageNames]);
 
   const loadErrors = useMemo(() => (loadError ? [loadError] : []), [loadError]);
 

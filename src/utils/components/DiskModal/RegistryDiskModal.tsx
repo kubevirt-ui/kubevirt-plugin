@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
 import AdvancedSettings from '@kubevirt-utils/components/DiskModal/components/AdvancedSettings/AdvancedSettings';
@@ -22,7 +22,7 @@ import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { isRunning } from '@virtualmachines/utils';
 
 import { getDefaultCreateValues, getDefaultEditValues } from './utils/form';
-import { SourceTypes, V1DiskFormState, V1SubDiskModalProps } from './utils/types';
+import { SourceTypes, type V1DiskFormState, type V1SubDiskModalProps } from './utils/types';
 
 const RegistryDiskModal: FC<V1SubDiskModalProps> = (props) => {
   const { defaultFormValues, editDiskName, isCreated, isOpen, onClose, onSubmit, pvc, vm } = props;
@@ -44,15 +44,16 @@ const RegistryDiskModal: FC<V1SubDiskModalProps> = (props) => {
     watch,
   } = methods;
 
+  // eslint-disable-next-line react-hooks/incompatible-library -- react-hook-form watch() is required for form state observation
   const formRegistryCredentials = watch(REGISTRY_CREDENTIALS_FIELD);
-  const { password, username } = formRegistryCredentials || { password: '', username: '' };
+  const { password, username } = formRegistryCredentials ?? { password: '', username: '' };
   const credentialsValid = (username && password) || (!username && !password);
 
-  const handleSubmitForm = () => {
+  const handleSubmitForm = (): Promise<void> => {
     return handleSubmit(async (data) => submit({ data, editDiskName, onSubmit, pvc, vm }))();
   };
 
-  const os = getOS(vm);
+  const operatingSystem = getOS(vm);
   const isVMRunning = isRunning(vm);
   const namespace = getNamespace(vm);
 
@@ -71,7 +72,9 @@ const RegistryDiskModal: FC<V1SubDiskModalProps> = (props) => {
         <PendingChanges isVMRunning={isVMRunning} />
         <BootSourceCheckbox editDiskName={editDiskName} isDisabled={isVMRunning} vm={vm} />
         <DiskNameInput />{' '}
-        {!isCreated && <DiskSourceContainer fieldName={REGISTRYURL_DATAVOLUME_FIELD} os={os} />}
+        {!isCreated && (
+          <DiskSourceContainer fieldName={REGISTRYURL_DATAVOLUME_FIELD} os={operatingSystem} />
+        )}
         <DiskSizeInput isCreated={isCreated} namespace={namespace} pvc={pvc} />
         <DiskTypeSelect isVMRunning={isVMRunning} />
         <DiskInterfaceSelect isVMRunning={isVMRunning} />

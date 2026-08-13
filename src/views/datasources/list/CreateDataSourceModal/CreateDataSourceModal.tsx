@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router';
 
@@ -49,6 +49,7 @@ export const CreateDataSourceModal: FC<CreateDataSourceModalProps> = ({
       size: DEFAULT_DISK_SIZE,
     },
   });
+  // eslint-disable-next-line react-hooks/incompatible-library
   const importsToKeep = watch('importsToKeep');
   const size = watch('size');
   const name = watch('name');

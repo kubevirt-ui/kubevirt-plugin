@@ -1,8 +1,8 @@
-import React, { FC, useMemo } from 'react';
+import React, { type FC, useMemo } from 'react';
 import { Link } from 'react-router';
 
 import { ConfigMapModel, modelToGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getSelfValidationCheckupURL } from '@kubevirt-utils/resources/checkups/urls';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
@@ -11,10 +11,6 @@ import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 import useIsACMPage from '@multicluster/useIsACMPage';
 import { useHubClusterName } from '@stolostron/multicluster-sdk';
 
-import CheckupsStatusIcon from '../../CheckupsStatusIcon';
-import { ClusterCell, NamespaceCell } from '../../components/cells/CheckupsSharedCells';
-import { getIsJobCompleted, STATUS_START_TIME_STAMP } from '../../utils/utils';
-import CheckupsSelfValidationActions from '../components/actions/CheckupsSelfValidationActions';
 import {
   formatStatusTimestamp,
   getCompletedSummaryText,
@@ -22,19 +18,23 @@ import {
   getResultsConfigMapName,
 } from '../utils';
 
-import { CheckupsSelfValidationCallbacks } from './checkupsSelfValidationListDefinition';
+import CheckupsStatusIcon from '../../CheckupsStatusIcon';
+import { ClusterCell, NamespaceCell } from '../../components/cells/CheckupsSharedCells';
+import { getIsJobCompleted, STATUS_START_TIME_STAMP } from '../../utils/utils';
+import CheckupsSelfValidationActions from '../components/actions/CheckupsSelfValidationActions';
+import { type CheckupsSelfValidationCallbacks } from './checkupsSelfValidationListDefinition';
 
 export { ClusterCell, NamespaceCell };
 
 export const NameCell: FC<{ row: IoK8sApiCoreV1ConfigMap }> = ({ row }) => {
   const [hubClusterName] = useHubClusterName();
   const isACMPage = useIsACMPage();
-  const cluster = getCluster(row) || hubClusterName;
+  const cluster = getCluster(row) ?? hubClusterName;
   const name = row?.metadata?.name;
   const namespace = row?.metadata?.namespace;
 
   if (!name || !namespace) {
-    return <>{name || NO_DATA_DASH}</>;
+    return <>{name ?? NO_DATA_DASH}</>;
   }
 
   return (
@@ -70,7 +70,7 @@ export const TimeCell: FC<TimeCellProps> = ({ callbacks, row, type }) => {
 
   const timestamp =
     type === 'start'
-      ? latestJob?.status?.startTime || row?.data?.[STATUS_START_TIME_STAMP]
+      ? (latestJob?.status?.startTime ?? row?.data?.[STATUS_START_TIME_STAMP])
       : latestJob?.status?.completionTime;
 
   return <>{formatStatusTimestamp(timestamp, t, NO_DATA_DASH)}</>;
@@ -82,7 +82,7 @@ export const SummaryCell: FC<{
 }> = ({ callbacks, row }) => {
   const { t } = useKubevirtTranslation();
   const [hubClusterName] = useHubClusterName();
-  const cluster = getCluster(row) || hubClusterName;
+  const cluster = getCluster(row) ?? hubClusterName;
   const jobs = callbacks.getJobByName(row?.metadata?.name, false);
   const latestJob = jobs?.[0];
 
@@ -90,7 +90,7 @@ export const SummaryCell: FC<{
 
   const resultsConfigMapName = useMemo(
     () => (latestJob?.metadata?.name ? getResultsConfigMapName(latestJob.metadata.name) : null),
-    [latestJob?.metadata?.name],
+    [latestJob],
   );
 
   const resultsConfigMapWatchConfig = useMemo(
@@ -104,7 +104,7 @@ export const SummaryCell: FC<{
             namespace: latestJob.metadata.namespace,
           }
         : null,
-    [isJobCompleted, resultsConfigMapName, latestJob?.metadata?.namespace, cluster],
+    [isJobCompleted, resultsConfigMapName, latestJob, cluster],
   );
 
   const [resultsConfigMap] = useK8sWatchData<IoK8sApiCoreV1ConfigMap>(resultsConfigMapWatchConfig);

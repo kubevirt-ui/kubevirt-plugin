@@ -1,4 +1,9 @@
-import { useRef } from 'react';
+import { useState } from 'react';
+
+type StableYMaxState = {
+  prevResetKey: unknown;
+  stableMax: null | number;
+};
 
 /**
  * Tracks the running maximum of a chart's Y value across renders.
@@ -8,23 +13,32 @@ import { useRef } from 'react';
  * @param resetKey
  */
 const useStableYMax = (currentMax: null | number, resetKey?: unknown): null | number => {
-  const stableMax = useRef<null | number>(null);
-  const prevResetKey = useRef(resetKey);
+  const [state, setState] = useState<StableYMaxState>({
+    prevResetKey: resetKey,
+    stableMax: null,
+  });
 
-  if (prevResetKey.current !== resetKey) {
-    stableMax.current = null;
-    prevResetKey.current = resetKey;
+  let { stableMax } = state;
+
+  if (state.prevResetKey !== resetKey) {
+    stableMax = null;
+    setState({ prevResetKey: resetKey, stableMax: null });
   }
 
   if (
     currentMax !== null &&
     Number.isFinite(currentMax) &&
-    (stableMax.current === null || currentMax > stableMax.current)
+    (stableMax === null || currentMax > stableMax)
   ) {
-    stableMax.current = currentMax;
+    const nextMax = currentMax;
+    setState((prev) => ({
+      ...prev,
+      stableMax: nextMax,
+    }));
+    return nextMax;
   }
 
-  return stableMax.current;
+  return stableMax;
 };
 
 export default useStableYMax;

@@ -135,7 +135,7 @@ export const ensurePath = <T extends object>(data: T, paths: string | string[]):
 export const getNoPermissionTooltipContent = (t: TFunction): string =>
   t(`You don't have permission to perform this action`);
 
-export const getNoDataAvailableMessage = (t: TFunction): string => t('No data available');
+export const getNoDataAvailableMessage = (tFunc: TFunction): string => tFunc('No data available');
 
 export const parseJSONAnnotation = <T = unknown>(
   annotations: Record<string, string> | undefined,

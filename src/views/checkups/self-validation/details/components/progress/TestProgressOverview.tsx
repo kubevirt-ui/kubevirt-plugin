@@ -1,4 +1,4 @@
-import React, { FC, useMemo } from 'react';
+import React, { type FC, useMemo } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Alert, AlertVariant, Card, CardBody, Spinner, Title } from '@patternfly/react-core';
@@ -9,10 +9,9 @@ import {
   TEST_STATUS_PENDING,
   TEST_STATUS_RUNNING,
 } from '../../../utils';
-
-import type { OverallProgress } from './utils/types';
 import OverallProgressCard from './OverallProgressCard';
 import TestSuiteProgressCard from './TestSuiteProgressCard';
+import type { OverallProgress } from './utils/types';
 
 import './progress-components.scss';
 
@@ -40,7 +39,7 @@ const TestProgressOverview: FC<TestProgressOverviewProps> = ({ error, loading, p
       const orderB = statusOrder[b.status] || 4;
       return orderA - orderB;
     });
-  }, [progress?.suites]);
+  }, [progress]);
 
   if (loading && !progress) {
     return (

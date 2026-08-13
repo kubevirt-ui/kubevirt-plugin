@@ -40,13 +40,13 @@ export const processHealthResults = (
       }
     }
 
-    // isLocalMatch: no cluster filter requested and result has no cluster label (local/hub cluster)
-    const isLocalMatch = !cluster && !resultCluster;
-    // isClusterMatch: cluster filter set; also matches results without a label for backward
-    // compatibility with non-multi-cluster setups where metrics lack a cluster dimension
-    const isClusterMatch = cluster && (!resultCluster || resultCluster === cluster);
+    // No cluster filter: match only results without a cluster label (local/hub)
+    // Cluster filter: match when result has no label or label matches the filter
+    const isRelevantResult = !cluster
+      ? !resultCluster
+      : !resultCluster || resultCluster === cluster;
 
-    if (isLocalMatch || isClusterMatch) {
+    if (isRelevantResult) {
       clusterHealthState = hcoValueToHealthState[value] ?? HealthState.NOT_AVAILABLE;
     }
   }

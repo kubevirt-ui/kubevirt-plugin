@@ -12,7 +12,7 @@ import { universalComparator } from '@kubevirt-utils/utils/utils';
 import useMulticlusterNamespaces from '@multicluster/hooks/useMulticlusterNamespaces';
 import useIsACMPage from '@multicluster/useIsACMPage';
 
-import { KubevirtFilter, KubevirtFilterLayout } from '../types';
+import { type KubevirtFilter, KubevirtFilterLayout } from '../types';
 
 type UseProjectFilterOptions = {
   /** When provided, overrides the default project list with these project names */
@@ -41,15 +41,17 @@ const useProjectFilter = (options?: UseProjectFilterOptions): KubevirtFilter => 
     [multiclusterNamespaces],
   );
 
+  const allowedProjects = options?.allowedProjects;
+
   const projectNames = useMemo(() => {
-    if (options?.allowedProjects) {
-      return options.allowedProjects;
+    if (allowedProjects) {
+      return allowedProjects;
     }
     if (isACMPage) {
       return multiclusterNamespacesNames;
     }
     return projects ?? [];
-  }, [options?.allowedProjects, isACMPage, multiclusterNamespacesNames, projects]);
+  }, [allowedProjects, isACMPage, multiclusterNamespacesNames, projects]);
 
   return useMemo(
     () => ({

@@ -1,4 +1,4 @@
-import React, { FC, useMemo } from 'react';
+import React, { type FC, useMemo } from 'react';
 import { useNavigate } from 'react-router';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -12,7 +12,6 @@ import { useHubClusterName } from '@stolostron/multicluster-sdk';
 
 import { CHECKUP_URLS } from '../../utils/constants';
 import { getSelectProjectText } from '../../utils/utils';
-
 import {
   getActionState,
   SELF_VALIDATION_ACTION_MODE,
@@ -30,7 +29,7 @@ const SelfValidationCheckupRunButton: FC = () => {
   const namespace = namespaces?.[0];
   const isAllNamespaces = isEmpty(namespace);
 
-  const cluster = clusterParam?.[0] || hubClusterName;
+  const cluster = clusterParam?.[0] ?? hubClusterName;
 
   const { t } = useKubevirtTranslation();
 
@@ -59,9 +58,9 @@ const SelfValidationCheckupRunButton: FC = () => {
       return true;
     }
     return selfValidationActionState ? !selfValidationActionState.isEnabled : true;
-  }, [namespace, selfValidationActionState, jobsLoaded, jobsError]);
+  }, [isAllNamespaces, selfValidationActionState, jobsLoaded, jobsError]);
 
-  const handleRunCheckup = () => {
+  const handleRunCheckup = (): void => {
     if (!namespace || isDisabled || !selfValidationActionState?.isEnabled) return;
 
     if (isACMpage) {

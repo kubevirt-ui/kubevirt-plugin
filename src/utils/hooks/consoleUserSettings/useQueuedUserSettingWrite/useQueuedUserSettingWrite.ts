@@ -1,10 +1,13 @@
-import { useRef } from 'react';
+import { useState } from 'react';
 
-import { createQueuedUserSettingWrite, QueuedUserSettingWrite } from './queuedUserSettingWrite';
+import {
+  createQueuedUserSettingWrite,
+  type QueuedUserSettingWrite,
+} from './queuedUserSettingWrite';
 
 const useQueuedUserSettingWrite = (): QueuedUserSettingWrite => {
-  const writerRef = useRef(createQueuedUserSettingWrite());
-  return writerRef.current;
+  const [writer] = useState(() => createQueuedUserSettingWrite());
+  return writer;
 };
 
 export default useQueuedUserSettingWrite;

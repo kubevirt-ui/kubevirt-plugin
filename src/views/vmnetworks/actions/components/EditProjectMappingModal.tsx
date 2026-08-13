@@ -1,10 +1,10 @@
-import React, { FC, useState } from 'react';
+import React, { type FC, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ClusterUserDefinedNetworkModel } from '@kubevirt-utils/models';
-import { ClusterUserDefinedNetworkKind } from '@kubevirt-utils/resources/udn/types';
+import { type ClusterUserDefinedNetworkKind } from '@kubevirt-utils/resources/udn/types';
 import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Alert,
@@ -19,7 +19,7 @@ import {
 } from '@patternfly/react-core';
 
 import ProjectMapping from '../../form/components/ProjectMapping';
-import { VMNetworkForm } from '../../form/constants';
+import { type VMNetworkForm } from '../../form/constants';
 import { isValidProjectMapping } from '../../utils';
 import { getDefaultProjectMappingOption } from '../utils/utils';
 
@@ -30,7 +30,7 @@ export type EditProjectMappingModalProps = {
 
 const EditProjectMappingModal: FC<EditProjectMappingModalProps> = ({ closeModal, obj }) => {
   const { t } = useKubevirtTranslation();
-  const [apiError, setError] = useState<Error>(null);
+  const [apiError, setApiError] = useState<Error>(null);
 
   const methods = useForm<VMNetworkForm>({
     defaultValues: {
@@ -45,13 +45,14 @@ const EditProjectMappingModal: FC<EditProjectMappingModalProps> = ({ closeModal,
     watch,
   } = methods;
 
+  // eslint-disable-next-line react-hooks/incompatible-library -- react-hook-form watch() cannot be memoized
   const namespaceSelector = watch('network.spec.namespaceSelector');
   const projectMappingOption = watch('projectMappingOption');
 
   const isSubmitDisabled =
     isSubmitting || !isValidProjectMapping(projectMappingOption, namespaceSelector);
 
-  const onSubmit = async (data: VMNetworkForm) => {
+  const onSubmit = async (data: VMNetworkForm): Promise<void> => {
     try {
       await k8sUpdate({
         data: data.network,
@@ -59,7 +60,7 @@ const EditProjectMappingModal: FC<EditProjectMappingModalProps> = ({ closeModal,
       });
       closeModal();
     } catch (error) {
-      setError(error);
+      setApiError(error);
     }
   };
 
@@ -79,10 +80,10 @@ const EditProjectMappingModal: FC<EditProjectMappingModalProps> = ({ closeModal,
         <FormProvider {...methods}>
           <Form id="edit-project-mapping-form">
             <Alert
+              isInline
               title={t(
                 'Virtual machines in projects that are no longer enrolled will lose connectivity',
               )}
-              isInline
               variant="warning"
             />
             <ProjectMapping isEditModal />
