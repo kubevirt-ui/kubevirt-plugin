@@ -1,6 +1,6 @@
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import MultiSelectTypeahead from '@kubevirt-utils/components/MultiSelectTypeahead/MultiSelectTypeahead';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup } from '@patternfly/react-core';
@@ -23,6 +23,7 @@ const GroupField: FC<GroupFieldProps> = ({ vms }) => {
     <FormGroup label={t('Group')}>
       <MultiSelectTypeahead
         allResourceNames={allGroupNames}
+        data-test="adv-search-vm-group"
         emptyValuePlaceholder={t('All groups')}
         selectedResourceNames={value}
         selectPlaceholder={t('Select group')}

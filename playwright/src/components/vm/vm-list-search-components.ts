@@ -373,7 +373,7 @@ export class VmListSearchComponent extends BaseComponent {
       state: 'visible',
       timeout: TestTimeouts.ELEMENT_WAIT,
     });
-    const savedSearchButton = this._savedSearches.locator(`button:has-text("${saveName}")`);
+    const savedSearchButton = this._savedSearches.locator('button', { hasText: saveName });
     await savedSearchButton.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
     await this.robustClick(savedSearchButton);
   }
@@ -656,7 +656,7 @@ export class VmListSearchComponent extends BaseComponent {
     await dateToggle.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
     await this.robustClick(dateToggle);
     await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
-    const dateOption = this.locator(`button:has-text("${date}")`);
+    const dateOption = this.locator('button', { hasText: date });
     await dateOption.waitFor({ state: 'visible', timeout: TestTimeouts.SHORT_WAIT });
     await this.robustClick(dateOption);
   }
@@ -675,7 +675,7 @@ export class VmListSearchComponent extends BaseComponent {
       state: 'visible',
       timeout: TestTimeouts.ELEMENT_WAIT,
     });
-    const networkButton = this._advSearchNetwork.locator('button:has-text("Network")');
+    const networkButton = this._advSearchNetwork.locator('button', { hasText: 'Network' });
     await networkButton.waitFor({ state: 'visible', timeout: TestTimeouts.SHORT_WAIT });
     await this.robustClick(networkButton);
     await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
@@ -693,7 +693,7 @@ export class VmListSearchComponent extends BaseComponent {
     await labelsInput.clear();
     await labelsInput.fill(labelKey);
     await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
-    const labelButton = this.locator(`button:has-text("${labelKey}=${labelValue}")`);
+    const labelButton = this.locator('button', { hasText: `${labelKey}=${labelValue}` });
     await labelButton.waitFor({ state: 'visible', timeout: TestTimeouts.SHORT_WAIT });
     await this.robustClick(labelButton);
   }
@@ -706,7 +706,7 @@ export class VmListSearchComponent extends BaseComponent {
       });
       await this.robustClick(this._advSearchMemOperatorToggle);
       await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
-      const operatorButton = this.locator(`button:has-text("${operator}")`);
+      const operatorButton = this.locator('button', { hasText: operator });
       await operatorButton.waitFor({ state: 'visible', timeout: TestTimeouts.SHORT_WAIT });
       await this.robustClick(operatorButton);
     }
@@ -723,7 +723,7 @@ export class VmListSearchComponent extends BaseComponent {
     await nadToggle.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
     await this.robustClick(nadToggle);
     await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
-    const nadOption = this.locator(`button:has-text("${nad}")`);
+    const nadOption = this.locator('button', { hasText: nad });
     await nadOption.waitFor({ state: 'visible', timeout: TestTimeouts.SHORT_WAIT });
     await this.robustClick(nadOption);
   }
@@ -737,7 +737,7 @@ export class VmListSearchComponent extends BaseComponent {
     await nodeToggle.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
     await this.robustClick(nodeToggle);
     await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
-    const nodeOption = this.locator(`button:has-text("${node}")`);
+    const nodeOption = this.locator('button', { hasText: node });
     await nodeOption.waitFor({ state: 'visible', timeout: TestTimeouts.SHORT_WAIT });
     await this.robustClick(nodeOption);
   }
@@ -747,9 +747,21 @@ export class VmListSearchComponent extends BaseComponent {
     await osToggle.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
     await this.robustClick(osToggle);
     await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
-    const osOption = this.locator(`button:has-text("${os}")`);
+    const osOption = this.locator('button', { hasText: os });
     await osOption.waitFor({ state: 'visible', timeout: TestTimeouts.SHORT_WAIT });
     await this.robustClick(osOption);
+  }
+
+  async setAdvancedSearchGroup(groupName: string): Promise<void> {
+    const groupToggle = this.testId('adv-search-vm-group-toggle');
+    const groupInput = groupToggle.locator('input');
+    await groupInput.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+    await groupInput.clear();
+    await groupInput.fill(groupName);
+    await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
+    const option = this.locator('button[role="option"]', { hasText: groupName }).first();
+    await option.waitFor({ state: 'visible', timeout: TestTimeouts.SHORT_WAIT });
+    await this.robustClick(option);
   }
 
   async setAdvancedSearchProject(projectName: string): Promise<void> {
@@ -758,7 +770,7 @@ export class VmListSearchComponent extends BaseComponent {
     await projectInput.clear();
     await projectInput.fill(projectName);
     await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
-    const option = this.locator(`button[role="option"]:has-text("${projectName}")`).first();
+    const option = this.locator('button[role="option"]', { hasText: projectName }).first();
     await option.waitFor({ state: 'visible', timeout: TestTimeouts.SHORT_WAIT });
     await this.robustClick(option);
   }
@@ -778,7 +790,7 @@ export class VmListSearchComponent extends BaseComponent {
     await scToggle.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
     await this.robustClick(scToggle);
     await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
-    const scOption = this.locator(`button:has-text("${storageClass}")`);
+    const scOption = this.locator('button', { hasText: storageClass });
     await scOption.waitFor({ state: 'visible', timeout: TestTimeouts.SHORT_WAIT });
     await this.robustClick(scOption);
   }
@@ -812,7 +824,7 @@ export class VmListSearchComponent extends BaseComponent {
 
   async verifySavedSearchNotExists(saveName: string): Promise<boolean> {
     try {
-      const savedSearchButton = this.locator(`button:has-text("${saveName}")`);
+      const savedSearchButton = this.locator('button', { hasText: saveName });
       await savedSearchButton
         .waitFor({ state: 'hidden', timeout: TestTimeouts.SHORT_WAIT })
         .catch(() => {
