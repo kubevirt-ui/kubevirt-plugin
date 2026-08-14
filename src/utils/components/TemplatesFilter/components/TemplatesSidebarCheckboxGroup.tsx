@@ -1,30 +1,35 @@
 import React, { type FC } from 'react';
 
-import { type ExtendedRowFilterItem } from '@kubevirt-utils/components/ListPageFilter/types';
-import { type UniversalFilter } from '@kubevirt-utils/hooks/useUniversalFilter/useUniversalFilter';
-import { type RowFilter } from '@openshift-console/dynamic-plugin-sdk';
+import { KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
+import { type TemplateOrRequest } from '@kubevirt-utils/resources/template';
 import { Checkbox, Stack, StackItem } from '@patternfly/react-core';
+
+import { type UniversalFilter } from '../../../hooks/useUniversalFilter/useUniversalFilter';
 
 type TemplatesSidebarCheckboxGroupProps = {
   className?: string;
-  rowFilter: RowFilter;
+  filterDefinition: KubevirtFilter<TemplateOrRequest>;
   universalFilter: UniversalFilter;
 };
 
 const TemplatesSidebarCheckboxGroup: FC<TemplatesSidebarCheckboxGroupProps> = ({
   className,
-  rowFilter,
+  filterDefinition,
   universalFilter: { isSelected, onSelect },
 }) => (
-  <Stack className={className} data-test={`filter-category-${rowFilter.filterGroupName}`} hasGutter>
-    <h5 className="pf-v6-u-text-color-subtle">{rowFilter.filterGroupName}</h5>
-    {rowFilter.items.map((item: ExtendedRowFilterItem) => (
-      <StackItem data-test={`${rowFilter.type}-${item.id}`} key={item.id}>
+  <Stack
+    className={className}
+    data-test={`filter-category-${filterDefinition.categoryLabel}`}
+    hasGutter
+  >
+    <h5 className="pf-v6-u-text-color-subtle">{filterDefinition.categoryLabel}</h5>
+    {filterDefinition.options?.map(({ label, value }) => (
+      <StackItem data-test={`${filterDefinition.id}-${value}`} key={value}>
         <Checkbox
-          id={`filter-${rowFilter.type}-${item.id}`}
-          isChecked={isSelected(rowFilter.type, item.id)}
-          label={item.content ?? item.title}
-          onChange={() => onSelect(rowFilter.type, item.id)}
+          id={`filter-${filterDefinition.id}-${value}`}
+          isChecked={isSelected(filterDefinition.id, value)}
+          label={label}
+          onChange={() => onSelect(filterDefinition.id, value)}
         />
       </StackItem>
     ))}

@@ -1,12 +1,9 @@
-import { useCallback, useMemo } from 'react';
+import { useMemo } from 'react';
 
-import { useQueryParamsMethods } from '@kubevirt-utils/components/ListPageFilter/hooks/useQueryParamsMethods';
-import useFiltersFromURL from '@kubevirt-utils/hooks/useFiltersFromURL';
 import useIsWindowsSupportedArchitecture from '@kubevirt-utils/hooks/useIsWindowsSupportedArchitecture';
-import { OS_NAME_TYPES } from '@kubevirt-utils/resources/template';
+import useKubevirtDataViewFilters from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/useKubevirtDataViewFilters';
+import { OS_NAME_TYPES, type Template } from '@kubevirt-utils/resources/template';
 import { getTemplateOS } from '@kubevirt-utils/resources/template/utils/selectors';
-import { useListPageFilter } from '@openshift-console/dynamic-plugin-sdk';
-import { getRowFilterQueryKey } from '@search/utils/query';
 import useVirtualMachineTemplatesFilters from '@templates/list/filters/useVirtualMachineTemplatesFilters';
 import useTemplatesWithAvailableSource from '@virtualmachines/wizard/steps/TemplateStep/components/TemplatesCatalog/hooks/useTemplatesWithAvailableSource/useTemplatesWithAvailableSource';
 
@@ -28,33 +25,26 @@ const useTemplatesCatalog = () => {
     [templates, isWindowsSupported],
   );
 
-  const { filters } = useVirtualMachineTemplatesFilters(supportedTemplates);
-  const filtersFromURL = useFiltersFromURL(filters);
-  const [, filteredTemplates, onFilterChange] = useListPageFilter(
-    supportedTemplates,
-    filters,
-    filtersFromURL,
-  );
+  const filterDefinitions = useVirtualMachineTemplatesFilters(supportedTemplates);
 
-  const { removeQueryArguments } = useQueryParamsMethods();
-
-  const clearAll = useCallback(() => {
-    const filterKeys = filters.map((rf) => getRowFilterQueryKey(rf.type));
-
-    removeQueryArguments(...filterKeys, getRowFilterQueryKey('name'));
-  }, [filters, removeQueryArguments]);
+  const { clearAllFilters, filteredData, filters, onSetFilters } =
+    useKubevirtDataViewFilters<Template>({
+      data: supportedTemplates,
+      filterDefinitions,
+    });
 
   return {
     availableDataSources,
     availableTemplatesUID,
     bootSourcesLoaded,
-    clearAll,
-    filteredTemplates,
+    clearAll: clearAllFilters,
+    filterDefinitions,
+    filteredTemplates: filteredData,
     filters,
     isList,
     loaded,
     namespace,
-    onFilterChange,
+    onSetFilters,
     setIsList,
     setNamespace,
   };

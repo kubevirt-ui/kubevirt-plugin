@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 
+import { KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getLabel } from '@kubevirt-utils/resources/shared';
 import {
@@ -10,8 +11,6 @@ import {
   TemplateOrRequest,
 } from '@kubevirt-utils/resources/template';
 import { OTHER } from '@kubevirt-utils/utils/constants';
-import { getItemNameWithOther, includeFilter } from '@kubevirt-utils/utils/utils';
-import { RowFilter, RowFilterItem } from '@openshift-console/dynamic-plugin-sdk';
 
 import { getTemplateProviderName } from '../../utils/selectors';
 
@@ -38,34 +37,20 @@ const getRowProvider = (obj: TemplateOrRequest): string => {
   return OTHER;
 };
 
-const useProviderFilter = (): RowFilter<TemplateOrRequest> => {
+const useProviderFilter = (): KubevirtFilter<TemplateOrRequest> => {
   const { t } = useKubevirtTranslation();
-
-  const providers: RowFilterItem[] = useMemo(
-    () => [
-      {
-        id: PROVIDER_ID.RED_HAT,
-        title: t('Red Hat'),
-      },
-      {
-        id: PROVIDER_ID.OTHER,
-        title: t('Other'),
-      },
-    ],
-    [t],
-  );
 
   return useMemo(
     () => ({
-      filter: (availableTemplateProviders, obj) =>
-        !isOpenShiftTemplate(obj) ||
-        includeFilter(availableTemplateProviders, providers, getRowProvider(obj)),
-      filterGroupName: t('Provider'),
-      items: providers,
-      reducer: (obj) => getItemNameWithOther(getRowProvider(obj), providers),
-      type: TemplateFilterType.Provider,
+      categoryLabel: t('Provider'),
+      id: TemplateFilterType.Provider,
+      match: (obj, selected) => !isOpenShiftTemplate(obj) || selected.includes(getRowProvider(obj)),
+      options: [
+        { label: t('Red Hat'), value: PROVIDER_ID.RED_HAT },
+        { label: t('Other'), value: PROVIDER_ID.OTHER },
+      ],
     }),
-    [providers, t],
+    [t],
   );
 };
 

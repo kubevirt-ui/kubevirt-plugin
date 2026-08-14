@@ -1,17 +1,22 @@
-import React, { type FC, useEffect } from 'react';
 import classNames from 'classnames';
+import React, { type FC, useEffect } from 'react';
 
+import {
+  KubevirtFilter,
+  KubevirtFilterState,
+  OnSetFilters,
+} from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import useUniversalFilter from '@kubevirt-utils/hooks/useUniversalFilter/useUniversalFilter';
 import { type TemplateOrRequest } from '@kubevirt-utils/resources/template';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { type OnFilterChange, type RowFilter } from '@openshift-console/dynamic-plugin-sdk';
-import { Divider, Stack } from '@patternfly/react-core';
+import { Stack } from '@patternfly/react-core';
 import { TemplateFilterType } from '@templates/list/filters/types';
 
+import useUniversalFilter from '../../hooks/useUniversalFilter/useUniversalFilter';
 import TemplatesCategoryFilter from './components/TemplatesCategoryFilter';
 import TemplatesMenuCheckboxGroup from './components/TemplatesMenuCheckboxGroup';
 import TemplatesScopeFilter from './components/TemplatesScopeFilter';
+import TemplatesSectionHeading from './components/TemplatesSectionHeading';
 import TemplatesSidebarCheckboxGroup from './components/TemplatesSidebarCheckboxGroup';
 import TemplatesTypeFilter from './components/TemplatesTypeFilter';
 import useFilterDefaultTemplates from './hooks/useFilterDefaultTemplates';
@@ -21,21 +26,23 @@ import splitTemplateFilters, { getTemplateTypeSelectionStateFromFilter } from '.
 import './TemplatesFilter.scss';
 
 type TemplatesFilterProps = {
-  onFilterChange: OnFilterChange;
-  rowFilters: RowFilter<TemplateOrRequest>[];
+  filterDefinitions: KubevirtFilter<TemplateOrRequest>[];
+  filters: KubevirtFilterState;
+  onSetFilters: OnSetFilters;
   variant: TemplatesFilterVariant;
 };
 
 const TemplatesFilter: FC<TemplatesFilterProps> = ({
-  onFilterChange,
-  rowFilters,
+  filterDefinitions,
+  filters,
+  onSetFilters,
   variant = TemplatesFilterVariant.Sidebar,
 }) => {
   const { t } = useKubevirtTranslation();
-  const universalFilter = useUniversalFilter({ onFilterChange });
+  const universalFilter = useUniversalFilter({ filters, onSetFilters });
   const { hasQueryKey, setValue } = universalFilter;
   const { categoryFilter, commonFilters, openShiftTemplatesOnlyFilters, scopeFilter, typeFilter } =
-    splitTemplateFilters(rowFilters);
+    splitTemplateFilters(filterDefinitions);
 
   const isSidebar = variant === TemplatesFilterVariant.Sidebar;
   const isMenu = variant === TemplatesFilterVariant.Menu;
@@ -59,54 +66,59 @@ const TemplatesFilter: FC<TemplatesFilterProps> = ({
     }
   }, [hasQueryKey, setValue, showVirtualMachineFilters]);
 
+  const showSectionDivider = !isEmpty(commonFilters) || (isSidebar && !!typeFilter);
+
   return (
     <div className={classNames({ 'templates-catalog-sidebar': isSidebar })}>
       <Stack hasGutter={isSidebar}>
         {isSidebar && typeFilter && (
           <TemplatesTypeFilter
-            rowFilter={typeFilter}
+            filterDefinition={typeFilter}
             typeSelection={typeSelection}
             universalFilter={universalFilter}
           />
         )}
 
-        {commonFilters.map((rowFilter) => (
+        {commonFilters.map((filterDef) => (
           <FilterGroupComponent
-            key={rowFilter.type}
-            rowFilter={rowFilter}
+            filterDefinition={filterDef}
+            key={filterDef.id}
             universalFilter={universalFilter}
           />
         ))}
 
         {showVirtualMachineFilters && categoryFilter && (
-          <Stack className={classNames({ 'pf-v6-u-px-lg pf-v6-u-py-md': isMenu })} hasGutter>
-            {(!isEmpty(commonFilters) || (isSidebar && typeFilter)) && <Divider />}
-            <h4 className="pf-v6-u-font-weight-bold">{t('VirtualMachine templates')}</h4>
+          <TemplatesSectionHeading
+            isMenu={isMenu}
+            showDivider={showSectionDivider}
+            title={t('VirtualMachine templates')}
+          >
             <TemplatesCategoryFilter
+              filterDefinition={categoryFilter}
               isMenu={isMenu}
-              rowFilter={categoryFilter}
               universalFilter={universalFilter}
             />
-          </Stack>
+          </TemplatesSectionHeading>
         )}
 
         {showOpenShiftFilters && (
           <>
-            <Stack className={classNames({ 'pf-v6-u-px-lg pf-v6-u-py-md': isMenu })} hasGutter>
-              {!isEmpty(commonFilters) || (isSidebar && typeFilter && <Divider />)}
-              <h4 className="pf-v6-u-font-weight-bold">{t('OpenShift templates only')}</h4>
+            <TemplatesSectionHeading
+              isMenu={isMenu}
+              showDivider={showSectionDivider}
+              title={t('OpenShift templates')}
+            >
               <TemplatesScopeFilter
                 isMenu={isMenu}
                 scopeFilter={scopeFilter}
                 universalFilter={universalFilter}
               />
-            </Stack>
+            </TemplatesSectionHeading>
 
-            {openShiftTemplatesOnlyFilters.map((rowFilter) => (
+            {openShiftTemplatesOnlyFilters.map((filterDef) => (
               <FilterGroupComponent
-                className={classNames({ 'pf-v6-u-pl-lg': isSidebar })}
-                key={rowFilter.type}
-                rowFilter={rowFilter}
+                filterDefinition={filterDef}
+                key={filterDef.id}
                 universalFilter={universalFilter}
               />
             ))}

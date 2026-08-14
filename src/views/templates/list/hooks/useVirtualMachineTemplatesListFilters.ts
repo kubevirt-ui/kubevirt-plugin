@@ -1,59 +1,61 @@
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 
-import useFiltersFromURL from '@kubevirt-utils/hooks/useFiltersFromURL';
-import { type Template, type TemplateOrRequest } from '@kubevirt-utils/resources/template/utils';
 import {
-  type OnFilterChange,
-  type RowFilter,
-  useListPageFilter,
-} from '@openshift-console/dynamic-plugin-sdk';
+  KubevirtFilter,
+  KubevirtFilterState,
+  OnSetFilters,
+} from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
+import useKubevirtDataViewFilters from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/useKubevirtDataViewFilters';
+import { type Template, type TemplateOrRequest } from '@kubevirt-utils/resources/template/utils';
 
+import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { TemplateFilterType } from '../filters/types';
 import useVirtualMachineTemplatesFilters from '../filters/useVirtualMachineTemplatesFilters';
 
 type UseVirtualMachineTemplatesListFiltersResult = {
+  clearAllFilters: () => void;
+  /** All filter definitions (for TemplatesFilter custom menu content). */
+  filterDefinitions: KubevirtFilter<TemplateOrRequest>[];
   filteredData: TemplateOrRequest[];
-  filtersWithSelect: RowFilter<TemplateOrRequest>[];
-  onFilterChange: OnFilterChange;
-  toolbarFilters: RowFilter<TemplateOrRequest>[];
-  unfilteredData: TemplateOrRequest[];
+  filters: KubevirtFilterState;
+  onSetFilters: OnSetFilters;
+  /** Filter definitions excluding Type (for KubevirtFilterToolbar chip rendering). */
+  toolbarFilterDefinitions: KubevirtFilter<TemplateOrRequest>[];
 };
 
 const useVirtualMachineTemplatesListFilters = (
   allTemplates: Template[],
   allTemplatesWithRequests: TemplateOrRequest[],
-  nameFilter?: string,
 ): UseVirtualMachineTemplatesListFiltersResult => {
-  const { filters, filtersWithSelect, toolbarFilters } =
-    useVirtualMachineTemplatesFilters(allTemplates);
+  const filterDefinitions = useVirtualMachineTemplatesFilters(allTemplates);
 
-  const allFilters = useMemo(
-    () => [...filters, ...filtersWithSelect],
-    [filters, filtersWithSelect],
-  );
+  const { clearAllFilters, filteredData, filters, onSetFilters } = useKubevirtDataViewFilters({
+    data: allTemplatesWithRequests,
+    filterDefinitions,
+  });
 
-  const filtersFromURL = useFiltersFromURL(allFilters);
+  // Type is controlled by TemplatesTypeToggle; preserve it on "Clear all filters".
+  const clearAllFiltersExceptType = useCallback(() => {
+    const typeValue = filters[TemplateFilterType.Type];
+    clearAllFilters();
+    if (!isEmpty(typeValue)) {
+      onSetFilters({ [TemplateFilterType.Type]: typeValue });
+    }
+  }, [clearAllFilters, filters, onSetFilters]);
 
-  const staticFilters = useMemo(
-    () => ({
-      ...filtersFromURL,
-      ...(nameFilter && { name: { selected: [nameFilter] } }),
-    }),
-    [filtersFromURL, nameFilter],
-  );
-
-  // eslint-disable-next-line @typescript-eslint/no-deprecated -- migrate to Data View in a follow-up
-  const [unfilteredData, filteredData, onFilterChange] = useListPageFilter(
-    allTemplatesWithRequests,
-    allFilters,
-    staticFilters,
+  // Type is controlled by TemplatesTypeToggle; keep it out of toolbar chips.
+  const toolbarFilterDefinitions = useMemo(
+    () => filterDefinitions.filter((f) => f.id !== TemplateFilterType.Type),
+    [filterDefinitions],
   );
 
   return {
+    clearAllFilters: clearAllFiltersExceptType,
+    filterDefinitions,
     filteredData,
-    filtersWithSelect,
-    onFilterChange,
-    toolbarFilters,
-    unfilteredData,
+    filters,
+    onSetFilters,
+    toolbarFilterDefinitions,
   };
 };
 

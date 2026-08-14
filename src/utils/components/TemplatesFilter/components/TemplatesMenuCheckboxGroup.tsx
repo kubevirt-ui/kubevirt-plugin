@@ -1,32 +1,33 @@
 import React, { FC } from 'react';
 
-import { ExtendedRowFilterItem } from '@kubevirt-utils/components/ListPageFilter/types';
-import { UniversalFilter } from '@kubevirt-utils/hooks/useUniversalFilter/useUniversalFilter';
-import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
+import { KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
+import { TemplateOrRequest } from '@kubevirt-utils/resources/template';
 import { SelectGroup, SelectOption } from '@patternfly/react-core';
+
+import { type UniversalFilter } from '../../../hooks/useUniversalFilter/useUniversalFilter';
 
 type TemplatesMenuCheckboxGroupProps = {
   className?: string;
-  rowFilter: RowFilter;
+  filterDefinition: KubevirtFilter<TemplateOrRequest>;
   universalFilter: UniversalFilter;
 };
 
 const TemplatesMenuCheckboxGroup: FC<TemplatesMenuCheckboxGroupProps> = ({
   className,
-  rowFilter,
+  filterDefinition,
   universalFilter: { isSelected, onSelect },
 }) => (
-  <SelectGroup className={className} label={rowFilter.filterGroupName}>
-    {rowFilter.items.map((item: ExtendedRowFilterItem) => (
+  <SelectGroup className={className} label={filterDefinition.categoryLabel}>
+    {filterDefinition.options?.map(({ label, value }) => (
       <SelectOption
-        data-test-row-filter={item.id}
+        data-test-row-filter={value}
         hasCheckbox
-        isSelected={isSelected(rowFilter.type, item.id)}
-        key={item.id}
-        onClick={() => onSelect(rowFilter.type, item.id)}
-        value={item.id}
+        isSelected={isSelected(filterDefinition.id, value)}
+        key={value}
+        onClick={() => onSelect(filterDefinition.id, value)}
+        value={value}
       >
-        {item.content ?? item.title}
+        {label}
       </SelectOption>
     ))}
   </SelectGroup>

@@ -25,6 +25,7 @@ import {
   ToolbarItem,
 } from '@patternfly/react-core';
 
+import { useDebounceCallback } from '@overview/utils/hooks/useDebounceCallback';
 import ToolbarFilterMultiChip from './ToolbarFilter/ToolbarFilterMultiChip';
 
 type TextSearchFiltersProps = {
@@ -55,6 +56,8 @@ const TextSearchFilters: FC<TextSearchFiltersProps> = ({
     }),
     [t],
   );
+
+  const debouncedOnSetFilters = useDebounceCallback(onSetFilters, 250);
 
   return (
     <ToolbarItem className="co-filter-search--full-width">
@@ -98,11 +101,11 @@ const TextSearchFilters: FC<TextSearchFiltersProps> = ({
               onChange={(_, newSearchInput: string) => {
                 setSearchInputText(newSearchInput);
                 const trimmedName = newSearchInput.trim();
-                onSetFilters({ name: trimmedName ? [trimmedName] : [] });
+                debouncedOnSetFilters({ name: trimmedName ? [trimmedName] : [] });
               }}
               data-test="name-filter-input"
               placeholder={t(STATIC_SEARCH_FILTERS_PLACEHOLDERS.name)}
-              value={searchInputText || (filters.name[0] ?? '')}
+              value={searchInputText}
             />
           )}
         </InputGroup>

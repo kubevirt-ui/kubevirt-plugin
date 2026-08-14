@@ -1,14 +1,16 @@
 import React, { FC } from 'react';
 
+import { KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { UniversalFilter } from '@kubevirt-utils/hooks/useUniversalFilter/useUniversalFilter';
-import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
+import { TemplateOrRequest } from '@kubevirt-utils/resources/template';
 import { Radio, Stack } from '@patternfly/react-core';
 import { TEMPLATE_SCOPE_ID } from '@templates/list/filters/useScopeFilter';
 
+import { type UniversalFilter } from '../../../hooks/useUniversalFilter/useUniversalFilter';
+
 type TemplatesScopeFilterProps = {
   isMenu?: boolean;
-  scopeFilter: RowFilter;
+  scopeFilter: KubevirtFilter<TemplateOrRequest>;
   universalFilter: UniversalFilter;
 };
 
@@ -19,31 +21,31 @@ const TemplatesScopeFilter: FC<TemplatesScopeFilterProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const { hasQueryKey, isSelected, setValue } = universalFilter;
-  const { items, type } = scopeFilter;
+  const { id, options } = scopeFilter;
 
   return (
     <Stack hasGutter>
       <Radio
         data-test="catalog-template-filter-all-items"
         data-test-row-filter={TEMPLATE_SCOPE_ID.ALL}
-        id={`filter-${type}-${TEMPLATE_SCOPE_ID.ALL}`}
-        isChecked={!hasQueryKey(type)}
+        id={`filter-${id}-${TEMPLATE_SCOPE_ID.ALL}`}
+        isChecked={!hasQueryKey(id)}
         isLabelWrapped={isMenu}
         label={t('All templates')}
-        name={type}
-        onChange={() => setValue(type, null)}
+        name={id}
+        onChange={() => setValue(id, null)}
       />
-      {items.map((item) => (
+      {options?.map(({ label, value }) => (
         <Radio
-          data-test={`catalog-template-filter-${item.id}`}
-          data-test-row-filter={item.id}
-          id={`filter-${type}-${item.id}`}
-          isChecked={isSelected(type, item.id)}
+          data-test={`catalog-template-filter-${value}`}
+          data-test-row-filter={value}
+          id={`filter-${id}-${value}`}
+          isChecked={isSelected(id, value)}
           isLabelWrapped={isMenu}
-          key={item.id}
-          label={item.title}
-          name={type}
-          onChange={() => setValue(type, item.id)}
+          key={value}
+          label={label}
+          name={id}
+          onChange={() => setValue(id, value)}
         />
       ))}
     </Stack>

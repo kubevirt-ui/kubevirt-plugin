@@ -1,9 +1,14 @@
 import React, { type FC } from 'react';
 
+import {
+  KubevirtFilterState,
+  OnSetFilters,
+} from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import useUniversalFilter from '@kubevirt-utils/hooks/useUniversalFilter/useUniversalFilter';
+import useUniversalFilter, {
+  type UniversalFilter,
+} from '@kubevirt-utils/hooks/useUniversalFilter/useUniversalFilter';
 import useIsVMTemplateFeatureEnabled from '@kubevirt-utils/hooks/useVMTemplateFeatureFlag/useIsVMTemplateFeatureEnabled';
-import { type OnFilterChange } from '@openshift-console/dynamic-plugin-sdk';
 import { ToggleGroup, ToggleGroupItem } from '@patternfly/react-core';
 import { TEMPLATE_TYPE_ID } from '@templates/list/filters/constants';
 import { TemplateFilterType } from '@templates/list/filters/types';
@@ -11,13 +16,17 @@ import { TemplateFilterType } from '@templates/list/filters/types';
 import './templates-type-toggle.scss';
 
 type TemplatesTypeToggleProps = {
-  onFilterChange: OnFilterChange;
+  filters: KubevirtFilterState;
+  onSetFilters: OnSetFilters;
 };
 
-const TemplatesTypeToggle: FC<TemplatesTypeToggleProps> = ({ onFilterChange }) => {
+const TemplatesTypeToggle: FC<TemplatesTypeToggleProps> = ({ filters, onSetFilters }) => {
   const { t } = useKubevirtTranslation();
   const { featureEnabled: vmTemplatesEnabled } = useIsVMTemplateFeatureEnabled();
-  const { hasQueryKey, isSelected, setValue } = useUniversalFilter({ onFilterChange });
+  const { hasQueryKey, isSelected, setValue }: UniversalFilter = useUniversalFilter({
+    filters,
+    onSetFilters,
+  });
 
   if (!vmTemplatesEnabled) {
     return null;

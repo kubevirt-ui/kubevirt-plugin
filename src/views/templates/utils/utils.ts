@@ -11,9 +11,9 @@ import {
   vCPUCount,
 } from '@kubevirt-utils/resources/template';
 import {
-  getArchitecture as getVMArchitecture,
   getCPU,
   getMemoryCPU,
+  getArchitecture as getVMArchitecture,
   NO_DATA_DASH,
 } from '@kubevirt-utils/resources/vm';
 import { getArchitecture } from '@kubevirt-utils/utils/architecture';
@@ -45,5 +45,7 @@ export const getTemplateArchitecture = (template: TemplateOrRequest): string | u
 
 export const getUniqueTemplateArchitectures = (templates: Template[]): string[] =>
   Array.from(
-    new Set(templates.map((template) => getTemplateArchitecture(template)).filter(Boolean)),
+    new Set(
+      templates.map((template) => getTemplateArchitecture(template)).filter(Boolean) as string[],
+    ),
   );

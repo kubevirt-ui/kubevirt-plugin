@@ -27,12 +27,13 @@ const TemplatesCatalog: FC = () => {
     availableTemplatesUID,
     bootSourcesLoaded,
     clearAll,
+    filterDefinitions,
     filteredTemplates,
     filters,
     isList,
     loaded,
     namespace,
-    onFilterChange,
+    onSetFilters,
     setIsList,
     setNamespace,
   } = useTemplatesCatalog();
@@ -61,17 +62,19 @@ const TemplatesCatalog: FC = () => {
   return (
     <Card className="vm-catalog">
       <TemplatesToolbar
+        filters={filters}
         isList={isList}
         namespace={namespace}
-        onFilterChange={onFilterChange}
+        onSetFilters={onSetFilters}
         setIsList={setIsList}
         setNamespace={setNamespace}
       />
       <Split className="co-catalog-page__content">
         <SplitItem className="pf-v6-u-flex-shrink-0">
           <TemplatesFilter
-            onFilterChange={onFilterChange}
-            rowFilters={filters}
+            filterDefinitions={filterDefinitions}
+            filters={filters}
+            onSetFilters={onSetFilters}
             variant={TemplatesFilterVariant.Sidebar}
           />
         </SplitItem>

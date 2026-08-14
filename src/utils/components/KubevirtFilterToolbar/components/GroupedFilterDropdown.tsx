@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, ReactNode } from 'react';
 
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import {
@@ -18,6 +18,8 @@ import { getOnSelect } from '../utils';
 import ToolbarFilterMultiChip from './ToolbarFilter/ToolbarFilterMultiChip';
 
 type GroupedFilterDropdownProps = {
+  /** Replaces the default content inside the dropdown */
+  customMenu?: ReactNode;
   data?: FilterableObject[];
   filters: KubevirtFilterState;
   groupedFilters: KubevirtFilter[];
@@ -25,6 +27,7 @@ type GroupedFilterDropdownProps = {
 };
 
 const GroupedFilterDropdown: FC<GroupedFilterDropdownProps> = ({
+  customMenu,
   data,
   filters,
   groupedFilters,
@@ -55,29 +58,30 @@ const GroupedFilterDropdown: FC<GroupedFilterDropdownProps> = ({
             ),
           }}
           closeOnSelect={false}
-          onSelect={onGroupedFilterSelect}
+          onSelect={customMenu ? undefined : onGroupedFilterSelect}
           selectedLabel={t('Filter')}
         >
-          {groupedFilters.map((filterDef) => (
-            <SelectGroup key={filterDef.id} label={filterDef.categoryLabel}>
-              {filterDef.options?.map(({ label, value }) => (
-                <SelectOption
-                  data-test-row-filter={value}
-                  hasCheckbox
-                  isSelected={filters[filterDef.id]?.includes(value)}
-                  key={value}
-                  value={{ filterId: filterDef.id, value } as GroupedFilterOptionValue}
-                >
-                  <span className="co-filter-dropdown-item__name">{label}</span>
-                  {!filterDef.hideCountBadge && (
-                    <Badge isRead key={value}>
-                      {itemCounts[filterDef.id]?.[value] ?? 0}
-                    </Badge>
-                  )}
-                </SelectOption>
-              ))}
-            </SelectGroup>
-          ))}
+          {customMenu ??
+            groupedFilters.map((filterDef) => (
+              <SelectGroup key={filterDef.id} label={filterDef.categoryLabel}>
+                {filterDef.options?.map(({ label, value }) => (
+                  <SelectOption
+                    data-test-row-filter={value}
+                    hasCheckbox
+                    isSelected={filters[filterDef.id]?.includes(value)}
+                    key={value}
+                    value={{ filterId: filterDef.id, value } as GroupedFilterOptionValue}
+                  >
+                    <span className="co-filter-dropdown-item__name">{label}</span>
+                    {!filterDef.hideCountBadge && (
+                      <Badge isRead key={value}>
+                        {itemCounts[filterDef.id]?.[value] ?? 0}
+                      </Badge>
+                    )}
+                  </SelectOption>
+                ))}
+              </SelectGroup>
+            ))}
         </FormPFSelect>
       </ToolbarItem>
 

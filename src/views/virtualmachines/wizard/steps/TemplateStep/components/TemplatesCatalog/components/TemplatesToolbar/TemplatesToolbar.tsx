@@ -1,23 +1,28 @@
 import React, { type FC } from 'react';
 
-import { type OnFilterChange } from '@openshift-console/dynamic-plugin-sdk';
+import {
+  KubevirtFilterState,
+  OnSetFilters,
+} from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { Split, SplitItem } from '@patternfly/react-core';
 import { TemplatesCatalogProjectsDropdown } from '@virtualmachines/wizard/steps/TemplateStep/components/TemplatesCatalog/components/TemplatesToolbar/components/TemplatesCatalogProjectsDropdown/TemplatesCatalogProjectsDropdown';
 import TemplatesCatalogStyleToggle from '@virtualmachines/wizard/steps/TemplateStep/components/TemplatesCatalog/components/TemplatesToolbar/components/TemplatesCatalogStyleToggle';
 import TemplatesSearchInput from '@virtualmachines/wizard/steps/TemplateStep/components/TemplatesCatalog/components/TemplatesToolbar/components/TemplatesSearchInput';
 
 type TemplatesToolbarProps = {
+  filters: KubevirtFilterState;
   isList: boolean;
   namespace: string;
-  onFilterChange: OnFilterChange;
+  onSetFilters: OnSetFilters;
   setIsList: (value: boolean) => void;
   setNamespace: (value: string) => void;
 };
 
 const TemplatesToolbar: FC<TemplatesToolbarProps> = ({
+  filters,
   isList,
   namespace,
-  onFilterChange,
+  onSetFilters,
   setIsList,
   setNamespace,
 }) => {
@@ -27,7 +32,7 @@ const TemplatesToolbar: FC<TemplatesToolbarProps> = ({
         <TemplatesCatalogProjectsDropdown onChange={setNamespace} selectedProject={namespace} />
       </SplitItem>
       <SplitItem>
-        <TemplatesSearchInput onFilterChange={onFilterChange} />
+        <TemplatesSearchInput filters={filters} onSetFilters={onSetFilters} />
       </SplitItem>
       <SplitItem isFilled />
       <SplitItem>
