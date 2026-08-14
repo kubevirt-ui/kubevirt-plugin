@@ -1,4 +1,4 @@
-import { MenuToggleProps } from '@patternfly/react-core';
+import { type MenuToggleProps } from '@patternfly/react-core';
 
 export const getSelectDataTestProps = (dataTest?: string) => {
   if (!dataTest) {

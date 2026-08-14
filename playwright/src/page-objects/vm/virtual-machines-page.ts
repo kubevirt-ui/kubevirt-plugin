@@ -1053,6 +1053,10 @@ export default class VirtualMachinesPage extends TreeContextMenuMixin(PageCommon
     return this.search.setAdvancedSearchDescription(description);
   }
 
+  async setAdvancedSearchGroup(groupName: string): Promise<void> {
+    return this.search.setAdvancedSearchGroup(groupName);
+  }
+
   async setAdvancedSearchIp(ipAddress: string): Promise<void> {
     return this.search.setAdvancedSearchIp(ipAddress);
   }
