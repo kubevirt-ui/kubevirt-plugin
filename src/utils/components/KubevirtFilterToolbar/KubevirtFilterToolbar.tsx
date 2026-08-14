@@ -1,21 +1,20 @@
-import React, { FC, ReactNode, useMemo, useState } from 'react';
+import React, { type FC, type ReactNode, useMemo, useState } from 'react';
 
+import { EMPTY_FILTERS } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/constants';
 import {
-  FilterableObject,
-  KubevirtFilter,
+  type FilterableObject,
+  type KubevirtFilter,
   KubevirtFilterLayout,
-  KubevirtFilterState,
-  OnSetFilters,
+  type KubevirtFilterState,
+  type OnSetFilters,
 } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { ColumnLayout } from '@openshift-console/dynamic-plugin-sdk';
+import { type ColumnLayout } from '@openshift-console/dynamic-plugin-sdk';
 import { Toolbar, ToolbarContent, ToolbarToggleGroup } from '@patternfly/react-core';
 import { FilterIcon } from '@patternfly/react-icons';
 
 import ListPageFilterToolbarActions from '../ListPageFilter/components/ListPageFilterToolbarActions';
-
-import { EMPTY_FILTERS } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/constants';
 import GroupedFilterDropdown from './components/GroupedFilterDropdown';
 import HiddenFilterChips from './components/HiddenFilterChips';
 import SelectFilterItem from './components/SelectFilterItem';

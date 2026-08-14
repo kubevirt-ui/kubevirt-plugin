@@ -8,6 +8,7 @@ export type PaginationState = {
 export type UsePaginationValues = {
   onPaginationChange: (newPagination: PaginationState) => void;
   pagination: PaginationState;
+  resetPagination: () => void;
 };
 
 export type UsePagination = () => UsePaginationValues;
