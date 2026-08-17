@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from 'react';
 import concat from 'lodash/concat';
 import keyBy from 'lodash/keyBy';
+import { useEffect, useRef, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { type EventMessage } from '@kubevirt-utils/hooks/useResourceEvents/utils/types';
