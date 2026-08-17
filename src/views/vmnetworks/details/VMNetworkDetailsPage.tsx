@@ -1,4 +1,4 @@
-import React, { FC, lazy, useMemo } from 'react';
+import React, { type FC, useMemo } from 'react';
 import { useParams } from 'react-router';
 
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
@@ -7,10 +7,14 @@ import StateHandler from '@kubevirt-utils/components/StateHandler/StateHandler';
 import useHideYamlTab, { removeYamlTabs } from '@kubevirt-utils/hooks/useHideYamlTab';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ClusterUserDefinedNetworkModelGroupVersionKind } from '@kubevirt-utils/models';
-import { ClusterUserDefinedNetworkKind } from '@kubevirt-utils/resources/udn/types';
+import { type ClusterUserDefinedNetworkKind } from '@kubevirt-utils/resources/udn/types';
 import { HorizontalNav, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 
 import VMNetworkTitle from './components/VMNetworkTitle';
+import ConnectedProjects from './tabs/ConnectedProjects/ConnectedProjects';
+import ConnectedVirtualMachines from './tabs/ConnectedVirtualMachines/ConnectedVirtualMachines';
+import NetworkDetailPage from './tabs/NetworkDetailPage';
+import NetworkYAMLPage from './tabs/NetworkYAMLPage';
 
 const VMNetworkDetailsPage: FC = () => {
   const { t } = useKubevirtTranslation();
@@ -20,7 +24,7 @@ const VMNetworkDetailsPage: FC = () => {
     isList: false,
     name: name,
     namespaced: false,
-  });
+  }) as [ClusterUserDefinedNetworkKind, boolean, Error];
 
   const { hideYamlTab } = useHideYamlTab();
   const pages = useMemo(
@@ -28,24 +32,22 @@ const VMNetworkDetailsPage: FC = () => {
       removeYamlTabs(
         [
           {
-            component: lazy(() => import('./tabs/NetworkDetailPage')),
+            component: NetworkDetailPage,
             href: '',
             name: t('Details'),
           },
           {
-            component: lazy(() => import('./tabs/NetworkYAMLPage')),
+            component: NetworkYAMLPage,
             href: 'yaml',
             name: t('YAML'),
           },
           {
-            component: lazy(() => import('./tabs/ConnectedProjects/ConnectedProjects')),
+            component: ConnectedProjects,
             href: 'connected-projects',
             name: t('Connected projects'),
           },
           {
-            component: lazy(
-              () => import('./tabs/ConnectedVirtualMachines/ConnectedVirtualMachines'),
-            ),
+            component: ConnectedVirtualMachines,
             href: 'connected-virtual-machines',
             name: t('Connected virtual machines'),
           },

@@ -1,12 +1,11 @@
 import { useMemo } from 'react';
 
-import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { type V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 import { Operator } from '@openshift-console/dynamic-plugin-sdk-internal/lib/api/common-types';
 
 import { TEMPLATE_TYPE_BASE, TEMPLATE_TYPE_LABEL, TEMPLATE_TYPE_VM } from '../utils/constants';
-
 import { TemplateModelGroupVersionKind } from './constants';
 import useWatchNonAdminTemplates from './useWatchNonAdminTemplates';
 
@@ -14,10 +13,10 @@ import useWatchNonAdminTemplates from './useWatchNonAdminTemplates';
  * @param namespace - The namespace to filter the templates by
  * @param cluster
  */
-export const useVmTemplates = (namespace?: string, cluster?: string): useVmTemplatesValues => {
+export const useVmTemplates = (namespace?: string, cluster?: string): UseVmTemplatesValues => {
   const isAdmin = useIsAdmin();
 
-  const { allowedTemplates, allowedTemplatesError, allowedTemplatesloaded } =
+  const { allowedTemplates, allowedTemplatesError, allowedTemplatesLoaded } =
     useWatchNonAdminTemplates();
 
   const [allTemplates, allTemplatesLoaded, allTemplatesError] = useK8sWatchData<V1Template[]>(
@@ -50,14 +49,14 @@ export const useVmTemplates = (namespace?: string, cluster?: string): useVmTempl
   );
 
   return {
-    loaded: isAdmin ? allTemplatesLoaded : allowedTemplatesloaded,
+    loaded: isAdmin ? allTemplatesLoaded : allowedTemplatesLoaded,
     loadError: isAdmin ? allTemplatesError : allowedTemplatesError,
     templates: memoizedTemplates,
   };
 };
 
-type useVmTemplatesValues = {
+type UseVmTemplatesValues = {
   loaded: boolean;
-  loadError: any;
+  loadError: Error | string;
   templates: V1Template[];
 };

@@ -1,4 +1,4 @@
-import React, { FC, useMemo, useState } from 'react';
+import React, { type FC, useMemo, useState } from 'react';
 
 import {
   modelToGroupVersionKind,
@@ -6,8 +6,11 @@ import {
   ServiceModel,
   VirtualMachineModelGroupVersionKind,
 } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { IoK8sApiCoreV1Pod, IoK8sApiCoreV1Service } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import {
+  type IoK8sApiCoreV1Pod,
+  type IoK8sApiCoreV1Service,
+} from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
@@ -21,7 +24,7 @@ import { isRunning } from '@virtualmachines/utils';
 import MultusNetwork from './Components/MultusNetwork';
 import RDPConnector from './Components/RDPConnector';
 import { MULTUS, POD } from './utils/constants';
-import { DesktopViewerProps, Network } from './utils/types';
+import { type DesktopViewerProps, type Network } from './utils/types';
 import { getDefaultNetwork, getRdpAddressPort, getVmRdpNetworks } from './utils/utils';
 
 const DesktopViewer: FC<DesktopViewerProps> = ({
@@ -39,7 +42,9 @@ const DesktopViewer: FC<DesktopViewerProps> = ({
   const { vmi, vmiLoaded } = useVMI(name, namespace, vmCluster, isRunning(vm));
 
   const networks = getVmRdpNetworks(vm, vmi);
-  const [selectedNetwork, setSelectedNetwork] = useState<Network>(getDefaultNetwork(networks));
+  const [selectedNetwork, setSelectedNetwork] = useState<Network>(() =>
+    getDefaultNetwork(networks),
+  );
 
   const [pods, podsLoaded] = useK8sWatchData<IoK8sApiCoreV1Pod[]>({
     cluster: getCluster(vm),
@@ -63,10 +68,10 @@ const DesktopViewer: FC<DesktopViewerProps> = ({
   const networkItems = networks?.map((network) => {
     return (
       <SelectOption
+        key={network?.name}
         onClick={() => {
           setSelectedNetwork(network);
         }}
-        key={network?.name}
         value={network?.name}
       >
         {network?.name}

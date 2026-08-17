@@ -32,25 +32,25 @@ export const useCloudInit = (vm: V1VirtualMachine): UseCloudInitValues => {
 
   const [yamlJSObject, setYamlJSObject] = useState<V1CloudInitNoCloudSource>(cloudInit);
 
-  const [userData, setUserData] = useState<CloudInitUserData>(
+  const [userData, setUserData] = useState<CloudInitUserData>(() =>
     !isEmpty(cloudInit?.userData) ? convertYAMLUserDataObject(cloudInit?.userData) : undefined,
   );
 
-  const [networkData, setNetworkData] = useState<CloudInitNetworkData>(
+  const [networkData, setNetworkData] = useState<CloudInitNetworkData>(() =>
     !isEmpty(cloudInit?.networkData)
       ? convertYAMLToNetworkDataObject(cloudInit?.networkData)
       : undefined,
   );
   const [latestNetworkData, setLatestNetworkData] = useState<CloudInitNetworkData>();
   const [enableNetworkData, setEnableNetworkData] = useState<boolean>(
-    !isEmpty(cloudInit?.networkData),
+    () => !isEmpty(cloudInit?.networkData),
   );
 
   const wrappedSetEnableNetworkData = (checked: boolean): void => {
     setLatestNetworkData(networkData);
     setYamlJSObject((yaml) => {
-      const { networkData: _ = '', ...restYaml } = yaml || {};
-      const ntData = convertNetworkDataObjectToYAML(latestNetworkData || networkData);
+      const { networkData: _unused, ...restYaml } = yaml || {};
+      const ntData = convertNetworkDataObjectToYAML(latestNetworkData ?? networkData);
       return checked
         ? {
             ...yaml,
@@ -80,7 +80,7 @@ export const useCloudInit = (vm: V1VirtualMachine): UseCloudInitValues => {
           ...prevNetworkData,
           [key]: value,
         });
-        const { networkData: _, ...restYaml } = yamlObj || {};
+        const { networkData: _unused, ...restYaml } = yamlObj || {};
         return {
           ...restYaml,
           ...(ntData && { networkData: ntData }),

@@ -15,13 +15,17 @@ import { TEMPLATE_TYPE_BASE, TEMPLATE_TYPE_LABEL, TEMPLATE_TYPE_VM } from '../ut
 import { TemplateModelGroupVersionKind } from './constants';
 import useWatchNonAdminExternalTemplates from './useWatchNonAdminExternalClusterTemplates';
 
-const useWatchNonAdminTemplates = () => {
+const useWatchNonAdminTemplates = (): {
+  allowedTemplates: V1Template[];
+  allowedTemplatesError: Error | string;
+  allowedTemplatesLoaded: boolean;
+} => {
   const isAdmin = useIsAdmin();
   const [hubClusterName] = useHubClusterName();
   const cluster = useClusterParam();
 
   const [allowedTemplates, setAllowedTemplates] = useState<V1Template[]>([]);
-  const [allowedTemplatesloaded, setAllowedTemplatesLoaded] = useState<boolean>(false);
+  const [allowedTemplatesLoaded, setAllowedTemplatesLoaded] = useState<boolean>(false);
   const [allowedTemplatesError, setAllowedTemplatesError] = useState<string>('');
 
   const isLocalCluster = isEmpty(cluster) || cluster === hubClusterName;
@@ -87,7 +91,7 @@ const useWatchNonAdminTemplates = () => {
           return allowedResources[key].loaded || allowedResources[key].loadError;
         })
       ) {
-        setAllowedTemplates(Object.values(allowedResources).flatMap((r) => r.data));
+        setAllowedTemplates(Object.values(allowedResources).flatMap((resource) => resource.data));
         setAllowedTemplatesLoaded(true);
       }
     }
@@ -97,14 +101,14 @@ const useWatchNonAdminTemplates = () => {
     () => ({
       allowedTemplates: isLocalCluster ? allowedTemplates : externalClusterTemplates,
       allowedTemplatesError: isLocalCluster ? allowedTemplatesError : externalClusterTemplatesError,
-      allowedTemplatesloaded: isLocalCluster
-        ? allowedTemplatesloaded
+      allowedTemplatesLoaded: isLocalCluster
+        ? allowedTemplatesLoaded
         : externalClusterTemplatesLoaded,
     }),
     [
       allowedTemplates,
       allowedTemplatesError,
-      allowedTemplatesloaded,
+      allowedTemplatesLoaded,
       externalClusterTemplates,
       externalClusterTemplatesError,
       externalClusterTemplatesLoaded,

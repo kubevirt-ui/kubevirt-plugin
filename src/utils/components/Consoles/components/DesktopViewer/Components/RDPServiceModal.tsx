@@ -1,6 +1,9 @@
-import React, { FC, useState } from 'react';
+import React, { type FC, useState } from 'react';
 
-import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import {
+  type V1VirtualMachine,
+  type V1VirtualMachineInstance,
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
@@ -29,7 +32,7 @@ type RDPServiceModalProps = {
 
 const RDPServiceModal: FC<RDPServiceModalProps> = ({ isOpen, onClose, vm, vmi }) => {
   const { t } = useKubevirtTranslation();
-  const [isChecked, setChecked] = useState<boolean>(false);
+  const [isChecked, setIsChecked] = useState<boolean>(false);
 
   const [pods, podsLoaded] = usePods(getNamespace(vmi), getCluster(vmi));
   const pod = getVMIPod(vmi, pods);
@@ -51,7 +54,7 @@ const RDPServiceModal: FC<RDPServiceModalProps> = ({ isOpen, onClose, vm, vmi })
             id="rdp-service-checkbox"
             isChecked={isChecked}
             label={t('Expose RDP Service')}
-            onChange={(_event, val) => setChecked(val)}
+            onChange={(_event, val) => setIsChecked(val)}
           />
         </StackItem>
         <StackItem>

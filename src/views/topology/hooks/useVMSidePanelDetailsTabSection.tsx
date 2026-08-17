@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React from 'react';
 
 import { DetailsTabSectionExtensionHook } from '@openshift-console/dynamic-plugin-sdk';

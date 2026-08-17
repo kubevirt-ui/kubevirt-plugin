@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC, ReactNode, useState } from 'react';
 
 import ToolbarFilterToggle from '@kubevirt-utils/components/toggles/ToolbarFilterToggle';

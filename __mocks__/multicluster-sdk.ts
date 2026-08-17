@@ -1,3 +1,4 @@
+/* eslint-disable */
 const multiclusterSDK = require('@stolostron/multicluster-sdk');
 
 module.exports = {

@@ -1,7 +1,7 @@
-import React, { FC, useState } from 'react';
+import React, { type FC, useState } from 'react';
 import produce from 'immer';
 
-import { V1CPU, V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1CPU, type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import CPUInput from '@kubevirt-utils/components/CPUMemoryModal/components/CPUInput/CPUInput';
 import { getCPULimitsFromVM } from '@kubevirt-utils/components/CPUMemoryModal/components/CPUInput/utils/utils';
 import MemoryInput from '@kubevirt-utils/components/CPUMemoryModal/components/MemoryInput/MemoryInput';
@@ -53,9 +53,9 @@ const CPUMemoryModal: FC<CPUMemoryModalProps> = ({
 
   const memoryQuantity = toQuantity(getMemory(vm));
   const { unit, value } = memoryQuantity ?? {};
-  const [memory, setMemory] = useState<number>(value || undefined);
-  const [memoryUnit, setMemoryUnit] = useState<string>(unit || undefined);
-  const [cpu, setCPU] = useState<V1CPU>(getCPU(vm));
+  const [memory, setMemory] = useState<number>(value ?? undefined);
+  const [memoryUnit, setMemoryUnit] = useState<string>(unit ?? undefined);
+  const [cpu, setCPU] = useState<V1CPU>(() => getCPU(vm));
 
   const {
     data: templateDefaultsData,
@@ -63,17 +63,17 @@ const CPUMemoryModal: FC<CPUMemoryModalProps> = ({
     loaded: defaultsLoaded,
   } = useTemplateDefaultCpuMemory(
     vm?.metadata?.labels?.['vm.kubevirt.io/template'],
-    vm?.metadata?.labels?.['vm.kubevirt.io/template.namespace'] || templateNamespace,
+    vm?.metadata?.labels?.['vm.kubevirt.io/template.namespace'] ?? templateNamespace,
     cluster,
   );
-  const { defaultCpu, defaultMemory } = templateDefaultsData || {};
+  const { defaultCpu, defaultMemory } = templateDefaultsData ?? {};
 
   const cpuLimits = getCPULimitsFromVM(vm);
-  const { unit: defaultMemoryUnit, value: defaultMemorySize } = defaultMemory || {};
+  const { unit: defaultMemoryUnit, value: defaultMemorySize } = defaultMemory ?? {};
 
   const templateName = getLabel(vm, VM_TEMPLATE_ANNOTATION);
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (): Promise<void> => {
     setUpdateInProcess(true);
     setUpdateError(null);
 
@@ -143,13 +143,13 @@ const CPUMemoryModal: FC<CPUMemoryModalProps> = ({
           isDisabled={
             !templateName || !defaultsLoaded || !defaultCpu || !defaultMemory || !!defaultLoadError
           }
+          isLoading={templateName && !defaultsLoaded}
+          key="default"
           onClick={() => {
             setCPU(defaultCpu);
             setMemory(defaultMemorySize);
             setMemoryUnit(defaultMemoryUnit);
           }}
-          isLoading={templateName && !defaultsLoaded}
-          key="default"
           variant={ButtonVariant.secondary}
         >
           {t('Restore template settings')}

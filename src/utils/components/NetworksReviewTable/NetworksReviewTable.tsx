@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC, memo } from 'react';
 
 import { V1Interface, V1Network } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';

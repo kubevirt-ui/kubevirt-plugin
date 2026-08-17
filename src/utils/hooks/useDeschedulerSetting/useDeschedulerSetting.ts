@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useDeschedulerInstalled } from '@kubevirt-utils/hooks/useDeschedulerInstalled';
 import {
   isDeschedulerEnabled,
@@ -8,7 +8,7 @@ import {
   updateDeschedulerForVM,
 } from '@kubevirt-utils/hooks/useDeschedulerSetting/utils';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
-import { getTemplateVirtualMachineObject, Template } from '@kubevirt-utils/resources/template';
+import { getTemplateVirtualMachineObject, type Template } from '@kubevirt-utils/resources/template';
 import { getVMTemplateAnnotations } from '@kubevirt-utils/resources/vm';
 import { isVM } from '@kubevirt-utils/utils/typeGuards';
 import { getCluster } from '@multicluster/helpers/selectors';
@@ -28,9 +28,9 @@ const useDeschedulerSetting: UseDeschedulerSetting = (obj) => {
 
   const vm = isVM(obj) ? obj : getTemplateVirtualMachineObject(obj);
   const annotations = getVMTemplateAnnotations(vm);
-  const [isEnabled, setIsEnabled] = useState<boolean>(isDeschedulerEnabled(annotations));
+  const [isEnabled, setIsEnabled] = useState<boolean>(() => isDeschedulerEnabled(annotations));
 
-  const onDeschedulerChange = (checked: boolean) => {
+  const onDeschedulerChange = (checked: boolean): Promise<Template | V1VirtualMachine> => {
     setIsEnabled(checked);
     return isVMObj
       ? updateDeschedulerForVM(obj, checked)

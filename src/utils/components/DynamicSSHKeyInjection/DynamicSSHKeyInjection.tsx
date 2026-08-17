@@ -1,6 +1,6 @@
-import React, { FC, useEffect, useState } from 'react';
+import React, { type FC, useEffect, useState } from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getIsDynamicSSHInjectionEnabled } from '@kubevirt-utils/resources/vm';
 import { Switch } from '@patternfly/react-core';
 
@@ -19,7 +19,7 @@ export const DynamicSSHKeyInjection: FC<DynamicSSHKeyInjectionProps> = ({
   vm,
 }) => {
   const [isChecked, setIsChecked] = useState<boolean>(
-    getIsDynamicSSHInjectionEnabled(vm) || hasDynamicSSHInjectionCommand(vm),
+    () => getIsDynamicSSHInjectionEnabled(vm) || hasDynamicSSHInjectionCommand(vm),
   );
 
   useEffect(() => {
@@ -28,12 +28,12 @@ export const DynamicSSHKeyInjection: FC<DynamicSSHKeyInjectionProps> = ({
 
   return (
     <Switch
+      isChecked={isChecked}
+      isDisabled={isDisabled}
       onChange={(_event, checked) => {
         setIsChecked(checked);
         onSubmit(checked);
       }}
-      isChecked={isChecked}
-      isDisabled={isDisabled}
     />
   );
 };

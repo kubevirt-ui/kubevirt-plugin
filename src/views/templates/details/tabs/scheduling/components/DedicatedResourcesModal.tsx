@@ -1,9 +1,9 @@
-import React, { FC, useMemo, useState } from 'react';
+import React, { type FC, useMemo, useState } from 'react';
 import { Link } from 'react-router';
 import produce from 'immer';
 import { isDedicatedCPUPlacement } from 'src/views/templates/utils/utils';
 
-import { IoK8sApiCoreV1Node } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type IoK8sApiCoreV1Node } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import {
   cpuManagerLabel,
   cpuManagerLabelKey,
@@ -14,7 +14,7 @@ import Loading from '@kubevirt-utils/components/Loading/Loading';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { modelToGroupVersionKind, NodeModel } from '@kubevirt-utils/models';
-import { getTemplateVirtualMachineObject, Template } from '@kubevirt-utils/resources/template';
+import { getTemplateVirtualMachineObject, type Template } from '@kubevirt-utils/resources/template';
 import { ensurePath, isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { ResourceLink, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
@@ -44,11 +44,11 @@ const DedicatedResourcesModal: FC<DedicatedResourcesModalProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const cluster = getCluster(template);
-  const [checked, setChecked] = useState<boolean>(isDedicatedCPUPlacement(template));
+  const [checked, setChecked] = useState<boolean>(() => isDedicatedCPUPlacement(template));
   const [nodes, nodesLoaded, loadError] = useK8sWatchResource<IoK8sApiCoreV1Node[]>({
     groupVersionKind: modelToGroupVersionKind(NodeModel),
     isList: true,
-  });
+  }) as [IoK8sApiCoreV1Node[], boolean, Error];
 
   const { hasNodes, qualifiedNodes } = useMemo(() => {
     const filteredNodes = nodes?.filter(
@@ -96,12 +96,13 @@ const DedicatedResourcesModal: FC<DedicatedResourcesModalProps> = ({
           id="dedicated-resources"
           isChecked={checked}
           label={t('Schedule this workload with dedicated resources (guaranteed policy)')}
-          onChange={(_, check: boolean) => setChecked(check)}
+          onChange={(_event, check: boolean) => setChecked(check)}
         />
       </FormGroup>
       <FormGroup fieldId="dedicated-resources-node">
         {!isEmpty(nodes) ? (
           <Alert
+            isInline
             title={
               hasNodes
                 ? t('{{qualifiedNodesCount}} matching nodes found', {
@@ -111,7 +112,6 @@ const DedicatedResourcesModal: FC<DedicatedResourcesModalProps> = ({
                     cpuManagerLabel,
                   })
             }
-            isInline
             variant={hasNodes ? AlertVariant.success : AlertVariant.warning}
           >
             {hasNodes ? (

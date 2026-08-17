@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef } from 'react';
-import { SetURLSearchParams, useSearchParams } from 'react-router';
+import { type SetURLSearchParams, useSearchParams } from 'react-router';
 
 import { migrateLegacyFilterParams } from '../utils';
 
@@ -14,10 +14,10 @@ const useMigratedSearchParams: UseMigratedSearchParams = () => {
   );
   const searchParams = migratedParams ?? rawSearchParams;
 
-  const migrationDone = useRef(false);
+  const migrationDoneRef = useRef(false);
   useEffect(() => {
-    if (migratedParams && !migrationDone.current) {
-      migrationDone.current = true;
+    if (migratedParams && !migrationDoneRef.current) {
+      migrationDoneRef.current = true;
       setSearchParams(migratedParams, { replace: true });
     }
   }, [migratedParams, setSearchParams]);

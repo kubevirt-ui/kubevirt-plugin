@@ -1,9 +1,9 @@
-import React, { FC, useMemo, useState } from 'react';
+import React, { type FC, useMemo, useState } from 'react';
 import { Link } from 'react-router';
 import produce from 'immer';
 
-import { IoK8sApiCoreV1Node } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
-import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type IoK8sApiCoreV1Node } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getDedicatedResourcesSearchHREF } from '@kubevirt-utils/components/DedicatedResourcesModal/utils/utils';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import ModalPendingChangesAlert from '@kubevirt-utils/components/PendingChanges/ModalPendingChangesAlert/ModalPendingChangesAlert';
@@ -28,15 +28,7 @@ import {
 } from '@patternfly/react-core';
 
 import { cpuManagerLabel, cpuManagerLabelKey, cpuManagerLabelValue } from './utils/constants';
-
-type DedicatedResourcesModalProps = {
-  headerText: string;
-  isOpen: boolean;
-  onClose: () => void;
-  onSubmit: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine | void>;
-  vm: V1VirtualMachine;
-  vmi?: V1VirtualMachineInstance;
-};
+import { type DedicatedResourcesModalProps } from './utils/types';
 
 const DedicatedResourcesModal: FC<DedicatedResourcesModalProps> = ({
   headerText,
@@ -48,14 +40,13 @@ const DedicatedResourcesModal: FC<DedicatedResourcesModalProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const cluster = getCluster(vm);
-  const [checked, setChecked] = useState<boolean>(!!getCPU(vm)?.dedicatedCpuPlacement);
+  const [checked, setChecked] = useState<boolean>(() => !!getCPU(vm)?.dedicatedCpuPlacement);
 
   const [nodes, loaded, loadError] = useK8sWatchData<IoK8sApiCoreV1Node[]>({
-    cluster: cluster,
+    cluster,
     groupVersionKind: modelToGroupVersionKind(NodeModel),
     isList: true,
   });
-
   const { hasNodes, qualifiedNodes } = useMemo(() => {
     const filteredNodes = nodes?.filter(
       (node) => node?.metadata?.labels?.[cpuManagerLabelKey] === cpuManagerLabelValue,
@@ -65,14 +56,14 @@ const DedicatedResourcesModal: FC<DedicatedResourcesModalProps> = ({
       qualifiedNodes: filteredNodes,
     };
   }, [nodes]);
-
-  const updatedVirtualMachine = useMemo(() => {
-    const updatedVM = produce<V1VirtualMachine>(vm, (vmDraft: V1VirtualMachine) => {
-      ensurePath(vmDraft, ['spec.template.spec.domain.cpu']);
-      vmDraft.spec.template.spec.domain.cpu.dedicatedCpuPlacement = checked;
-    });
-    return updatedVM;
-  }, [vm, checked]);
+  const updatedVirtualMachine = useMemo(
+    () =>
+      produce<V1VirtualMachine>(vm, (vmDraft: V1VirtualMachine) => {
+        ensurePath(vmDraft, ['spec.template.spec.domain.cpu']);
+        vmDraft.spec.template.spec.domain.cpu.dedicatedCpuPlacement = checked;
+      }),
+    [vm, checked],
+  );
   return (
     <TabModal
       headerText={headerText}
@@ -108,6 +99,7 @@ const DedicatedResourcesModal: FC<DedicatedResourcesModalProps> = ({
       <FormGroup fieldId="dedicated-resources-node">
         {!isEmpty(nodes) ? (
           <Alert
+            isInline
             title={
               hasNodes
                 ? t('{{qualifiedNodesCount}} matching nodes found', {
@@ -117,7 +109,6 @@ const DedicatedResourcesModal: FC<DedicatedResourcesModalProps> = ({
                     cpuManagerLabel,
                   })
             }
-            isInline
             variant={hasNodes ? AlertVariant.success : AlertVariant.warning}
           >
             {hasNodes ? (

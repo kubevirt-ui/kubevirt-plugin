@@ -5,10 +5,10 @@ import usePreserveTabDisplay from '@kubevirt-utils/hooks/usePreserveTabDisplay';
 
 const LAST_CHECKUPS_TAB = 'lastCheckupsTab';
 
-const useCheckupsTabsNavigation = (defaultTab: string) => {
+const useCheckupsTabsNavigation = (defaultTab: string): void => {
   const location = useLocation();
   const navigate = useNavigate();
-  const isInitialMount = useRef(true);
+  const isInitialMountRef = useRef(true);
 
   usePreserveTabDisplay({
     basePath: 'checkups',
@@ -25,7 +25,7 @@ const useCheckupsTabsNavigation = (defaultTab: string) => {
     // Redirect to default tab if URL is just /checkups (initial mount)
     // On namespace change, keep the same tab (from session storage)
     if (location.pathname.endsWith('/checkups')) {
-      const targetTab = isInitialMount.current
+      const targetTab = isInitialMountRef.current
         ? defaultTab
         : sessionStorage.getItem(LAST_CHECKUPS_TAB);
 
@@ -34,7 +34,7 @@ const useCheckupsTabsNavigation = (defaultTab: string) => {
       }
     }
 
-    isInitialMount.current = false;
+    isInitialMountRef.current = false;
   }, [location.pathname, navigate, defaultTab]);
 };
 

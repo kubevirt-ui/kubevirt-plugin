@@ -1,6 +1,6 @@
-import React, { FC, useState } from 'react';
+import React, { type FC, useState } from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { isHeadlessMode } from '@kubevirt-utils/resources/vm';
 import { Switch } from '@patternfly/react-core';
 
@@ -10,15 +10,15 @@ type HeadlessModeProps = {
 };
 
 const HeadlessMode: FC<HeadlessModeProps> = ({ updateHeadlessMode, vm }) => {
-  const [isChecked, setIsChecked] = useState<boolean>(isHeadlessMode(vm));
+  const [isChecked, setIsChecked] = useState<boolean>(() => isHeadlessMode(vm));
   return (
     <Switch
-      onChange={(_event, checked: boolean) => {
-        setIsChecked(checked);
-        updateHeadlessMode(checked);
-      }}
       checked={isChecked}
       id="headless-mode"
+      onChange={(_event, checked: boolean) => {
+        setIsChecked(checked);
+        void updateHeadlessMode(checked);
+      }}
     />
   );
 };

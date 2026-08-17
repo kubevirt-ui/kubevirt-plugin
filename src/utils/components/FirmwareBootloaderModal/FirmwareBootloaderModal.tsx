@@ -1,6 +1,9 @@
-import React, { FC, MouseEvent, useMemo, useState } from 'react';
+import React, { type FC, type MouseEvent, useMemo, useState } from 'react';
 
-import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import {
+  type V1VirtualMachine,
+  type V1VirtualMachineInstance,
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import ModalPendingChangesAlert from '@kubevirt-utils/components/PendingChanges/ModalPendingChangesAlert/ModalPendingChangesAlert';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import useHcoWorkloadArchitectures from '@kubevirt-utils/hooks/useHcoWorkloadArchitectures';
@@ -9,9 +12,8 @@ import { getCluster } from '@multicluster/helpers/selectors';
 import { FormGroup, SelectOption } from '@patternfly/react-core';
 
 import FormPFSelect from '../FormPFSelect/FormPFSelect';
-
-import { BootMode, BootModeTitles } from './utils/constants';
-import { BootloaderOptionValue } from './utils/types';
+import { type BootMode, BootModeTitles } from './utils/constants';
+import { type BootloaderOptionValue } from './utils/types';
 import {
   getBootloaderFromVM,
   getBootloaderOptions,
@@ -40,7 +42,7 @@ const FirmwareBootloaderModal: FC<FirmwareBootloaderModalProps> = ({
   const [clusterWorkloadArchitectures] = useHcoWorkloadArchitectures(getCluster(vm));
   const clusterOnlyArchitecture = getClusterOnlyArchitecture(clusterWorkloadArchitectures);
   const [selectedFirmwareBootloader, setSelectedFirmwareBootloader] =
-    useState<BootloaderOptionValue>(
+    useState<BootloaderOptionValue>(() =>
       getBootloaderFromVM(vm, preferredBootmode, clusterOnlyArchitecture),
     );
 
@@ -49,7 +51,10 @@ const FirmwareBootloaderModal: FC<FirmwareBootloaderModalProps> = ({
     [vm, clusterOnlyArchitecture],
   );
 
-  const handleChange = (event: MouseEvent<HTMLSelectElement>, value: BootloaderOptionValue) => {
+  const handleChange = (
+    event: MouseEvent<HTMLSelectElement>,
+    value: BootloaderOptionValue,
+  ): void => {
     event.preventDefault();
     setSelectedFirmwareBootloader(value);
   };

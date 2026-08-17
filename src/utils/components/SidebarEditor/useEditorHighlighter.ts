@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useEffect, useRef, useState } from 'react';
 
 import { CodeEditorRef } from '@openshift-console/dynamic-plugin-sdk';

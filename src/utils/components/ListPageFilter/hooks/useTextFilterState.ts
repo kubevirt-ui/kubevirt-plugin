@@ -1,9 +1,9 @@
-import { Dispatch, SetStateAction, useState } from 'react';
+import { type Dispatch, type SetStateAction, useState } from 'react';
 
-import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
-import { SelectProps } from '@patternfly/react-core';
+import { type RowFilter } from '@openshift-console/dynamic-plugin-sdk';
+import { type SelectProps } from '@patternfly/react-core';
 
-import { TextFiltersType } from '../types';
+import { type TextFiltersType } from '../types';
 import { getInitialSearchText, getInitialSearchType } from '../utils';
 
 type UseTextFilterState = (inputs: {
@@ -22,15 +22,15 @@ const useTextFilterState: UseTextFilterState = ({
   textFilters,
   textFilterSelectOptionNames,
 }) => {
-  const [searchType, setSearchType] = useState<string>(
+  const [searchType, setSearchType] = useState<string>(() =>
     getInitialSearchType(searchFilters, textFilters, textFilterSelectOptionNames),
   );
 
-  const [searchInputText, setSearchInputText] = useState<string>(
+  const [searchInputText, setSearchInputText] = useState<string>(() =>
     getInitialSearchText(textFilters, searchType),
   );
 
-  const onSelect = (_, value: string) => {
+  const onSelect = (_event: unknown, value: string): void => {
     setSearchInputText(getInitialSearchText(textFilters, value));
     setSearchType(value);
   };

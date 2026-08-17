@@ -1,11 +1,11 @@
-import React, { FC, useState } from 'react';
+import React, { type FC, useState } from 'react';
 import produce from 'immer';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName } from '@kubevirt-utils/resources/shared';
-import { getRandomChars } from '@kubevirt-utils/utils/utils';
+import { truncateToK8sName } from '@kubevirt-utils/utils/nameGenerators';
 import { kubevirtK8sCreate } from '@multicluster/k8sRequests';
-import { K8sModel } from '@openshift-console/dynamic-plugin-sdk';
+import { type K8sModel } from '@openshift-console/dynamic-plugin-sdk';
 import { FormGroup, TextInput } from '@patternfly/react-core';
 
 import TabModal from '../TabModal/TabModal';
@@ -27,9 +27,9 @@ const CloneResourceModal: FC<CloneResourceModalProps> = ({
   ...modalProps
 }) => {
   const { t } = useKubevirtTranslation();
-  const [newName, setNewName] = useState(`${getName(object)}-clone-${getRandomChars(5)}`);
+  const [newName, setNewName] = useState(() => truncateToK8sName(`${getName(object)}-clone`));
 
-  const onSubmit = () => {
+  const onSubmit = (): ReturnType<typeof kubevirtK8sCreate> => {
     const newObject = produce(object, (draftObject) => {
       draftObject.metadata = {};
       draftObject.metadata.name = newName;
@@ -46,7 +46,7 @@ const CloneResourceModal: FC<CloneResourceModalProps> = ({
   return (
     <TabModal
       {...modalProps}
-      headerText={headerText || t('Clone {{kind}}', { kind: model?.kind })}
+      headerText={headerText ?? t('Clone {{kind}}', { kind: model?.kind })}
       onSubmit={onSubmit}
       shouldWrapInForm
     >

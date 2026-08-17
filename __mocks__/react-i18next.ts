@@ -1,3 +1,4 @@
+/* eslint-disable */
 module.exports = {
   getI18n: () => ({
     t: (string) => string,

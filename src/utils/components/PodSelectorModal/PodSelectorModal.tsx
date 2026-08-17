@@ -1,12 +1,12 @@
-import React, { FC, useState } from 'react';
+import React, { type FC, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { get, isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   getGroupVersionKindForModel,
-  K8sModel,
+  type K8sModel,
   k8sPatch,
-  K8sResourceCommon,
+  type K8sResourceCommon,
   ResourceIcon,
 } from '@openshift-console/dynamic-plugin-sdk';
 import {
@@ -43,14 +43,14 @@ const PodSelectorModal: FC<PodSelectorModalProps> = ({
   const [error, setError] = useState();
   const initialSelector = get(resource, path);
 
-  const [selector, setSelector] = useState(arrayify(initialSelector));
+  const [selector, setSelector] = useState(() => arrayify(initialSelector));
 
   const createPath = isEmpty(initialSelector);
 
-  const updatePodSelector = async () => {
+  const updatePodSelector = async (): Promise<void> => {
     setLoading(true);
     try {
-      k8sPatch({
+      await k8sPatch({
         data: [
           {
             op: createPath ? 'add' : 'replace',
@@ -82,6 +82,7 @@ const PodSelectorModal: FC<PodSelectorModalProps> = ({
       <ModalBody>
         <div className="pf-v6-c-form">
           <FormGroup
+            fieldId="tags-input"
             label={
               <>
                 {t('Pod selector for')}{' '}
@@ -89,7 +90,6 @@ const PodSelectorModal: FC<PodSelectorModalProps> = ({
                 {resource?.metadata?.name}
               </>
             }
-            fieldId="tags-input"
           >
             <SelectorInput
               autoFocus

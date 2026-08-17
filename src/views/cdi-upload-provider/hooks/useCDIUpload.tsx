@@ -2,14 +2,14 @@ import { useEffect, useRef, useState } from 'react';
 import axios from 'axios';
 
 import { CDIConfigModelRef } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { CDIConfig } from '@kubevirt-utils/hooks/useCDIUpload/types';
+import { type CDIConfig } from '@kubevirt-utils/hooks/useCDIUpload/types';
 import { getUploadProxyURL } from '@kubevirt-utils/hooks/useCDIUpload/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { useK8sWatchResource, WatchK8sResource } from '@openshift-console/dynamic-plugin-sdk';
+import { useK8sWatchResource, type WatchK8sResource } from '@openshift-console/dynamic-plugin-sdk';
 
 import { CDI_UPLOAD_URL_BUILDER, UPLOAD_STATUS } from '../utils/consts';
-import { CDIUploadContextProps } from '../utils/context';
-import { DataUpload, UploadDataProps } from '../utils/types';
+import { type CDIUploadContextProps } from '../utils/context';
+import { type DataUpload, type UploadDataProps } from '../utils/types';
 
 const resource: WatchK8sResource = {
   isList: false,
@@ -20,14 +20,18 @@ const resource: WatchK8sResource = {
 
 const useCDIUpload = (): CDIUploadContextProps => {
   const { t } = useKubevirtTranslation();
-  const [cdiConfig, configLoaded, configError] = useK8sWatchResource<CDIConfig>(resource);
+  const [cdiConfig, configLoaded, configError] = useK8sWatchResource<CDIConfig>(resource) as [
+    CDIConfig,
+    boolean,
+    Error,
+  ];
   const [uploads, setUploads] = useState<DataUpload[]>([]);
-  const canUpdateState = useRef<boolean>(true);
+  const canUpdateStateRef = useRef<boolean>(true);
   const uploadProxyURL = getUploadProxyURL(cdiConfig);
 
-  const updateUpload = (changedUpload: DataUpload) => {
-    if (canUpdateState.current) {
-      canUpdateState.current = false;
+  const updateUpload = (changedUpload: DataUpload): void => {
+    if (canUpdateStateRef.current) {
+      canUpdateStateRef.current = false;
 
       setUploads((prevUploads) => {
         const rest = prevUploads?.filter(
@@ -40,7 +44,7 @@ const useCDIUpload = (): CDIUploadContextProps => {
     }
   };
 
-  const uploadData = ({ file, namespace, pvcName, token }: UploadDataProps) => {
+  const uploadData = ({ file, namespace, pvcName, token }: UploadDataProps): void => {
     const { CancelToken } = axios;
     const cancelSource = CancelToken.source();
     const noRouteFound = configError || !configLoaded || !uploadProxyURL;
@@ -65,7 +69,7 @@ const useCDIUpload = (): CDIUploadContextProps => {
     const form = new FormData();
     form.append('file', file);
     try {
-      axios({
+      void axios({
         cancelToken: cancelSource.token,
         data: form,
         headers: {
@@ -97,8 +101,8 @@ const useCDIUpload = (): CDIUploadContextProps => {
 
   // multiple uploads could cause abuse of setUploads, so we use a Ref until state finished updating.
   useEffect(() => {
-    if (!canUpdateState.current) {
-      canUpdateState.current = true;
+    if (!canUpdateStateRef.current) {
+      canUpdateStateRef.current = true;
     }
   }, [uploads]);
 

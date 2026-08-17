@@ -1,10 +1,10 @@
-import React, { FC, useState } from 'react';
+import React, { type FC, useState } from 'react';
 
 import {
-  V1GPU,
-  V1HostDevice,
-  V1VirtualMachine,
-  V1VirtualMachineInstance,
+  type V1GPU,
+  type V1HostDevice,
+  type V1VirtualMachine,
+  type V1VirtualMachineInstance,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { produceVMDevices } from '@kubevirt-utils/components/DiskModal/utils/helpers';
 import ModalPendingChangesAlert from '@kubevirt-utils/components/PendingChanges/ModalPendingChangesAlert/ModalPendingChangesAlert';
@@ -16,9 +16,8 @@ import { MinusCircleIcon, PlusCircleIcon } from '@patternfly/react-icons';
 import DeviceNameSelect from '../form/DeviceNameSelect';
 import NameFormField from '../form/NameFormField';
 import useHCPermittedHostDevices from '../hooks/useHCPermittedHostDevices';
-import { HARDWARE_DEVICE_TYPE, HardwareDeviceModalRow } from '../utils/constants';
+import { type HARDWARE_DEVICE_TYPE, type HardwareDeviceModalRow } from '../utils/constants';
 import { getInitialDevices } from '../utils/helpers';
-
 import HardwareDeviceModalDescription from './HardwareDeviceModalDescription';
 
 import '../hardware-devices-table.scss';
@@ -46,19 +45,19 @@ const HardwareDevicesModal: FC<HardwareDevicesModalProps> = ({
   vm,
   vmi,
 }) => {
-  const [devices, setDevices] = useState<HardwareDeviceModalRow[]>(
+  const [devices, setDevices] = useState<HardwareDeviceModalRow[]>(() =>
     getInitialDevices(initialDevices, type),
   );
   const { permittedHostDevices } = useHCPermittedHostDevices();
 
-  const onAddDevice = () => {
+  const onAddDevice = (): void => {
     setDevices((listDevices) => [
       ...listDevices,
       { deviceIndex: devices.length, deviceName: '', name: generatePrettyName(type) },
     ]);
   };
 
-  const onDelete = (index: number) => {
+  const onDelete = (index: number): void => {
     setDevices((listDevices) =>
       listDevices
         ?.filter((device) => device?.deviceIndex !== index)
@@ -95,6 +94,8 @@ const HardwareDevicesModal: FC<HardwareDevicesModalProps> = ({
         <Grid hasGutter key={deviceIndex}>
           <GridItem span={5}>
             <NameFormField
+              index={deviceIndex}
+              name={name}
               setName={(newName: string) => {
                 setDevices((prevDevices) => {
                   const newDevices = [...prevDevices];
@@ -102,12 +103,13 @@ const HardwareDevicesModal: FC<HardwareDevicesModalProps> = ({
                   return newDevices;
                 });
               }}
-              index={deviceIndex}
-              name={name}
             />
           </GridItem>
           <GridItem span={5}>
             <DeviceNameSelect
+              deviceName={deviceName}
+              index={deviceIndex}
+              permittedHostDevices={permittedHostDevices}
               setDeviceName={(newDeviceName: string) => {
                 setDevices((prevDevices) => {
                   const newDevices = [...prevDevices];
@@ -118,9 +120,6 @@ const HardwareDevicesModal: FC<HardwareDevicesModalProps> = ({
                   return newDevices;
                 });
               }}
-              deviceName={deviceName}
-              index={deviceIndex}
-              permittedHostDevices={permittedHostDevices}
             />
           </GridItem>
           <GridItem className="hardware-devices-form-button" span={2}>
