@@ -6,6 +6,7 @@ import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevir
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import SidebarEditorSwitch from '@kubevirt-utils/components/SidebarEditor/SidebarEditorSwitch';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import useVirtualMachineInstanceMigration from '@kubevirt-utils/resources/vmi/hooks/useVirtualMachineInstanceMigration';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
@@ -35,12 +36,20 @@ const VirtualMachineNavPageTitle: FC<VirtualMachineNavPageTitleProps> = ({
   const { t } = useKubevirtTranslation();
   const location = useLocation();
 
-  const [vmi] = useK8sWatchResource<V1VirtualMachineInstance>({
-    groupVersionKind: VirtualMachineInstanceModelGroupVersionKind,
-    isList: false,
-    name: vm?.metadata?.name,
-    namespace: vm?.metadata?.namespace,
-  });
+  const vmName = getName(vm);
+  const vmNamespace = getNamespace(vm);
+
+  // `vm` starts as `{}` before the VM watch resolves; without this guard, undefined
+  // name/namespace would fall back to a cluster-wide VMI list.
+  const [vmi] = useK8sWatchResource<V1VirtualMachineInstance>(
+    vmName &&
+      vmNamespace && {
+        groupVersionKind: VirtualMachineInstanceModelGroupVersionKind,
+        isList: false,
+        name: vmName,
+        namespace: vmNamespace,
+      },
+  );
   const vmim = useVirtualMachineInstanceMigration(vm);
   const [actions] = useVirtualMachineActionsProvider(vm, vmim);
   const StatusIcon = getVMStatusIcon(vm?.status?.printableStatus);

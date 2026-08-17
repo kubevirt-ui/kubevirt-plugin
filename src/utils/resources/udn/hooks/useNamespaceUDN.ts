@@ -1,3 +1,4 @@
+import ClusterUserDefinedNetworkModel from '@kubevirt-ui/kubevirt-api/console/models/ClusterUserDefinedNetworkModel';
 import {
   ClusterUserDefinedNetworkModelGroupVersionKind,
   modelToGroupVersionKind,
@@ -11,7 +12,12 @@ import {
 } from '@kubevirt-utils/resources/udn/types';
 import { matchSelector } from '@kubevirt-utils/utils/matchSelector';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { K8sResourceCommon, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import {
+  K8sResourceCommon,
+  K8sVerb,
+  useAccessReview,
+  useK8sWatchResource,
+} from '@openshift-console/dynamic-plugin-sdk';
 
 const useNamespaceUDN = (
   namespace: string,
@@ -30,10 +36,20 @@ const useNamespaceUDN = (
     namespace,
   });
 
-  const [clusterUDNs] = useK8sWatchResource<ClusterUserDefinedNetworkKind[]>({
-    groupVersionKind: ClusterUserDefinedNetworkModelGroupVersionKind,
-    isList: true,
+  // ClusterUserDefinedNetwork is cluster-scoped; non-admins are frequently denied `watch` on it.
+  const [canWatchClusterUDNs, canWatchClusterUDNsLoading] = useAccessReview({
+    group: ClusterUserDefinedNetworkModelGroupVersionKind.group,
+    resource: ClusterUserDefinedNetworkModel.plural,
+    verb: 'watch' as K8sVerb,
   });
+
+  const [clusterUDNs] = useK8sWatchResource<ClusterUserDefinedNetworkKind[]>(
+    !canWatchClusterUDNsLoading &&
+      canWatchClusterUDNs && {
+        groupVersionKind: ClusterUserDefinedNetworkModelGroupVersionKind,
+        isList: true,
+      },
+  );
 
   const primaryUDN = udns?.find(
     (udn) => udn?.spec?.layer2?.role === UserDefinedNetworkRole.Primary,

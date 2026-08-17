@@ -1,17 +1,12 @@
 import React, { FC } from 'react';
 
-import { modelToGroupVersionKind, NodeModel } from '@kubevirt-ui/kubevirt-api/console';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
-import { IoK8sApiCoreV1Node } from '@kubevirt-ui/kubevirt-api/kubernetes/models';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useNodes from '@kubevirt-utils/hooks/useNodes';
 import { asAccessReview } from '@kubevirt-utils/resources/shared';
-import {
-  K8sVerb,
-  useAccessReview,
-  useK8sWatchResource,
-} from '@openshift-console/dynamic-plugin-sdk';
+import { K8sVerb, useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
 import { Grid, GridItem, Title } from '@patternfly/react-core';
 
 import SchedulingSectionLeftGrid from './SchedulingSectionLeftGrid';
@@ -26,10 +21,7 @@ type SchedulingSectionProps = {
 
 const SchedulingSection: FC<SchedulingSectionProps> = ({ instanceTypeVM, onSubmit, vm, vmi }) => {
   const { t } = useKubevirtTranslation();
-  const [nodes, nodesLoaded] = useK8sWatchResource<IoK8sApiCoreV1Node[]>({
-    groupVersionKind: modelToGroupVersionKind(NodeModel),
-    isList: true,
-  });
+  const [nodes, nodesLoaded] = useNodes();
   const accessReview = asAccessReview(VirtualMachineModel, vm, 'update' as K8sVerb);
   const [canUpdateVM] = useAccessReview(accessReview || {});
 

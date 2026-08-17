@@ -1,12 +1,10 @@
 import React, { Dispatch, SetStateAction, useMemo } from 'react';
 
-import { modelToGroupVersionKind, NodeModel } from '@kubevirt-ui/kubevirt-api/console';
-import { IoK8sApiCoreV1Node } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import { EnhancedSelectOptionProps } from '@kubevirt-utils/components/FilterSelect/utils/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useNodes from '@kubevirt-utils/hooks/useNodes';
 import { getName } from '@kubevirt-utils/resources/shared';
-import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Button,
   ButtonVariant,
@@ -39,10 +37,7 @@ const CheckupsNetworkFormNodes = ({
 }) => {
   const { t } = useKubevirtTranslation();
 
-  const [nodes] = useK8sWatchResource<IoK8sApiCoreV1Node[]>({
-    groupVersionKind: modelToGroupVersionKind(NodeModel),
-    isList: true,
-  });
+  const [nodes] = useNodes();
 
   const options: EnhancedSelectOptionProps[] = useMemo(
     () =>

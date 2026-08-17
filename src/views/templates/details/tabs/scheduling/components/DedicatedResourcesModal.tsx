@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom-v5-compat';
 import produce from 'immer';
 import { isDedicatedCPUPlacement } from 'src/views/templates/utils/utils';
 
-import { IoK8sApiCoreV1Node } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import {
   cpuManagerLabel,
   cpuManagerLabelKey,
@@ -12,10 +11,11 @@ import {
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useNodes from '@kubevirt-utils/hooks/useNodes';
 import { modelToGroupVersionKind, NodeModel, V1Template } from '@kubevirt-utils/models';
 import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
 import { ensurePath, isEmpty } from '@kubevirt-utils/utils/utils';
-import { ResourceLink, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Alert,
   AlertVariant,
@@ -42,10 +42,7 @@ const DedicatedResourcesModal: FC<DedicatedResourcesModalProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const [checked, setChecked] = useState<boolean>(isDedicatedCPUPlacement(template));
-  const [nodes, nodesLoaded, loadError] = useK8sWatchResource<IoK8sApiCoreV1Node[]>({
-    groupVersionKind: modelToGroupVersionKind(NodeModel),
-    isList: true,
-  });
+  const [nodes, nodesLoaded, loadError] = useNodes();
 
   const { hasNodes, qualifiedNodes } = useMemo(() => {
     const filteredNodes = nodes?.filter(
