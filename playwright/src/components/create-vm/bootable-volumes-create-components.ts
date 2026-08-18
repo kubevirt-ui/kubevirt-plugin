@@ -119,6 +119,17 @@ export class BootableVolumesRowActionsComponent extends BaseComponent {
    * Clicks Cancel in the Manage source modal.
    */
   async cancelManageSourceModal(): Promise<void> {
+    await this.cancelOpenDialogModal();
+  }
+
+  /**
+   * Clicks Cancel in the Upload to registry modal.
+   */
+  async cancelUploadToRegistryModal(): Promise<void> {
+    await this.cancelOpenDialogModal();
+  }
+
+  private async cancelOpenDialogModal(): Promise<void> {
     const cancelButton = this._dialogModal.locator('button', { hasText: 'Cancel' });
     await cancelButton.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
     await this.robustClick(cancelButton);
@@ -359,19 +370,30 @@ export class BootableVolumesRowActionsComponent extends BaseComponent {
   }
 
   /**
-   * Verifies that the Upload to registry modal shows the Upload steps section
-   * ([aria-label="Upload steps"]). Call after clickRowActionUploadToRegistry(volumeName).
+   * Verifies that the Upload to registry modal has rendered its form fields
+   * (Name, Destination, Username, Password). Call after
+   * clickRowActionUploadToRegistry(volumeName).
    */
-  async verifyUploadStepsVisibleInUploadToRegistryModal(): Promise<boolean> {
-    await this.page.waitForLoadState('load', {
-      timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
-    });
-    await this.page.waitForTimeout(TestTimeouts.UI_DELAY_EXTRA);
+  async verifyUploadToRegistryFormFieldsVisible(): Promise<boolean> {
+    const dialog = this._dialogModal;
+    await dialog.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
 
-    const uploadSteps = this.locator('[aria-label="Upload steps"]');
-    return await uploadSteps
-      .isVisible({ timeout: TestTimeouts.UI_ELEMENT_VISIBILITY })
-      .catch(() => false);
+    const requiredFields = [
+      dialog.locator('#registryName'),
+      dialog.locator('#destination'),
+      dialog.locator('#username'),
+      dialog.locator('#password'),
+    ];
+
+    for (const field of requiredFields) {
+      const visible = await field
+        .waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY })
+        .then(() => true)
+        .catch(() => false);
+      if (!visible) return false;
+    }
+
+    return true;
   }
 }
 

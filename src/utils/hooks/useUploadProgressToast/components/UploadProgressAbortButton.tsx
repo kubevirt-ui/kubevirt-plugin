@@ -20,6 +20,7 @@ const UploadProgressAbortButton: FC<UploadProgressAbortButtonProps> = ({
 
   const button = (
     <Button
+      data-test="upload-progress-abort"
       isDanger
       onClick={() => cancelTrackedUpload(uploadKey)}
       variant={ButtonVariant.secondary}

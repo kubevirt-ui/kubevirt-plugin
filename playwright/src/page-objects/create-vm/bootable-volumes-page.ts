@@ -7,6 +7,7 @@ import {
   BootableVolumesCreateFormsComponent,
   BootableVolumesRowActionsComponent,
 } from '@/components/create-vm/bootable-volumes-create-components';
+import UploadProgressToastComponent from '@/components/shared/upload-progress-toast-component';
 import { TestTimeouts } from '@/utils/test-config';
 import type { Page } from '@playwright/test';
 
@@ -35,11 +36,13 @@ export default class BootableVolumesPage extends PageCommons {
   );
   readonly createForms: BootableVolumesCreateFormsComponent;
   readonly rowActions: BootableVolumesRowActionsComponent;
+  private readonly uploadToast: UploadProgressToastComponent;
 
   constructor(page: Page) {
     super(page);
     this.createForms = new BootableVolumesCreateFormsComponent(page);
     this.rowActions = new BootableVolumesRowActionsComponent(page);
+    this.uploadToast = new UploadProgressToastComponent(page);
   }
 
   private async navigateToNamespaceClientSide(namespace: string): Promise<void> {
@@ -79,12 +82,20 @@ export default class BootableVolumesPage extends PageCommons {
     return this.rowActions.cancelManageSourceModal();
   }
 
+  async cancelUploadToRegistryModal(): Promise<void> {
+    return this.rowActions.cancelUploadToRegistryModal();
+  }
+
   async checkDeletePvcCheckbox(): Promise<void> {
     return this.rowActions.checkDeletePvcCheckbox();
   }
 
   async clearAllFilters(): Promise<void> {
     await this.filterToolbar.clearAllFilters();
+  }
+
+  async clickAbortUpload(fileName?: string): Promise<void> {
+    return this.uploadToast.clickAbortUpload(fileName);
   }
 
   override async clickCreateAndSelectOption(option: 'With form' | 'With YAML') {
@@ -192,6 +203,29 @@ export default class BootableVolumesPage extends PageCommons {
       await this.ensureDataVolumeRowVisibleWithReNav(volumeName, namespace);
       await action();
     }
+  }
+
+  async expectAbortedUploadToastVisible(fileName?: string, timeout?: number): Promise<void> {
+    return this.uploadToast.expectAbortedToastVisible(fileName, timeout);
+  }
+
+  async expectSuccessUploadToastWithLink(linkLabel?: string, timeout?: number): Promise<void> {
+    return this.uploadToast.expectSuccessToastWithLink(linkLabel, timeout);
+  }
+
+  async expectUploadingOrTerminalToastVisible(
+    fileName?: string,
+    timeout?: number,
+  ): Promise<'uploading' | 'success' | 'error' | 'aborted'> {
+    return this.uploadToast.expectUploadingOrTerminalToastVisible(fileName, timeout);
+  }
+
+  async expectUploadingToastVisible(fileName?: string, timeout?: number): Promise<void> {
+    return this.uploadToast.expectUploadingToastVisible(fileName, timeout);
+  }
+
+  async expectErrorUploadToastVisible(fileName?: string, timeout?: number): Promise<void> {
+    return this.uploadToast.expectErrorToastVisible(fileName, timeout);
   }
 
   async fillCreateBootableVolumeFormAndSave(
@@ -318,6 +352,14 @@ export default class BootableVolumesPage extends PageCommons {
   async getVisibleRowCount(): Promise<number> {
     return this._row.count();
   }
+  async isAbortUploadButtonVisible(timeout?: number, fileName?: string): Promise<boolean> {
+    return this.uploadToast.isAbortButtonVisible(timeout, fileName);
+  }
+
+  async isAnyUploadToastVisible(timeout?: number): Promise<boolean> {
+    return this.uploadToast.isAnyUploadToastVisible(timeout);
+  }
+
   async isClusterFilterButtonVisible(
     timeout: number = TestTimeouts.UI_VISIBILITY_QUICK,
   ): Promise<boolean> {
@@ -660,8 +702,8 @@ export default class BootableVolumesPage extends PageCommons {
     }
   }
 
-  async verifyUploadStepsVisibleInUploadToRegistryModal(): Promise<boolean> {
-    return this.rowActions.verifyUploadStepsVisibleInUploadToRegistryModal();
+  async verifyUploadToRegistryFormFieldsVisible(): Promise<boolean> {
+    return this.rowActions.verifyUploadToRegistryFormFieldsVisible();
   }
 
   async waitForClusterFilterApplied(): Promise<void> {

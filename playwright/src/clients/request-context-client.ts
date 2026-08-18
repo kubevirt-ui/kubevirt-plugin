@@ -3,6 +3,7 @@ import type {
   KubernetesListResource,
   KubernetesResource,
 } from '@/data-models/kubernetes-types';
+import { DATA_VOLUME_DELETION_POLLING } from '@/data-models/constants';
 import type { APIRequestContext, APIResponse, Page } from '@playwright/test';
 
 import type { ClusterAuthConfig } from './base-client';
@@ -1093,6 +1094,24 @@ export default class RequestContextClient extends BaseClient implements ProxyApi
         // not ready yet
       }
       await new Promise((r) => setTimeout(r, 3000));
+    }
+    return false;
+  }
+
+  async waitForDataVolumeGone(
+    name: string,
+    namespace: string,
+    timeoutMs = DATA_VOLUME_DELETION_POLLING.TIMEOUT_MS,
+  ): Promise<boolean> {
+    const start = Date.now();
+    while (Date.now() - start < timeoutMs) {
+      try {
+        const dv = await this.getDataVolume(namespace, name);
+        if (!dv) return true;
+      } catch {
+        // Non-404 error (auth, proxy, server, etc.) — keep retrying until timeout.
+      }
+      await new Promise((r) => setTimeout(r, DATA_VOLUME_DELETION_POLLING.RETRY_INTERVAL_MS));
     }
     return false;
   }

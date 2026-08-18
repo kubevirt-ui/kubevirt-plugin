@@ -2,6 +2,7 @@
  * Page object for VirtualMachine detail/overview page.
  */
 
+import UploadProgressToastComponent from '@/components/shared/upload-progress-toast-component';
 import { DISK_NAMES } from '@/data-models';
 import { TestTimeouts } from '@/utils/test-config';
 import type { Page } from '@playwright/test';
@@ -42,6 +43,7 @@ export default class VirtualMachineDetailPage extends PageCommons {
   readonly overviewTab: VirtualMachineDetailOverviewTabPage;
   readonly overviewWidgets: VirtualMachineDetailOverviewWidgetsPage;
   readonly scheduling: VirtualMachineDetailSchedulingPage;
+  private readonly uploadToast: UploadProgressToastComponent;
 
   constructor(page: Page) {
     super(page);
@@ -61,6 +63,7 @@ export default class VirtualMachineDetailPage extends PageCommons {
       this.overviewWidgets,
       this.configuration,
     );
+    this.uploadToast = new UploadProgressToastComponent(page);
   }
 
   async addBlankDisk(diskName: string, size = '1', storageClass?: string): Promise<boolean> {
@@ -174,6 +177,10 @@ export default class VirtualMachineDetailPage extends PageCommons {
 
   override async clickActionsDropdown() {
     return this.actions.clickActionsDropdown();
+  }
+
+  async clickAbortUpload(fileName?: string): Promise<void> {
+    return this.uploadToast.clickAbortUpload(fileName);
   }
 
   async clickConfigurationStorageSubTab() {
@@ -333,6 +340,25 @@ export default class VirtualMachineDetailPage extends PageCommons {
 
   async expandWarningSeverityAccordion(): Promise<void> {
     return this.alerts.expandWarningSeverityAccordion();
+  }
+
+  async expectAbortedUploadToastVisible(fileName?: string, timeout?: number): Promise<void> {
+    return this.uploadToast.expectAbortedToastVisible(fileName, timeout);
+  }
+
+  async expectUploadingOrTerminalToastVisible(
+    fileName?: string,
+    timeout?: number,
+  ): Promise<'uploading' | 'success' | 'error' | 'aborted'> {
+    return this.uploadToast.expectUploadingOrTerminalToastVisible(fileName, timeout);
+  }
+
+  async expectUploadingToastVisible(fileName?: string, timeout?: number): Promise<void> {
+    return this.uploadToast.expectUploadingToastVisible(fileName, timeout);
+  }
+
+  async isAbortUploadButtonVisible(timeout?: number, fileName?: string): Promise<boolean> {
+    return this.uploadToast.isAbortButtonVisible(timeout, fileName);
   }
 
   async getAffinityRulesButtonText(): Promise<string> {

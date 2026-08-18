@@ -6,7 +6,7 @@
 import BaseComponent from '@/components/shared/base-component';
 import type { ContextKey, ContextValueType } from '@/context-managers/context-keys';
 import ScenarioContextManager from '@/context-managers/scenario-context-manager';
-import { EnvVariables } from '@/utils/env-variables';
+
 import type { TrackedResourceType } from '@/utils/test-resource-tracker';
 import type { Page, TestInfo } from '@playwright/test';
 import { test as base } from '@playwright/test';
@@ -43,6 +43,7 @@ const TIMEOUT_PATTERNS: RegExp[] = [
   /waiting for selector/i,
   /Navigation timeout/i,
   /net::ERR_TIMED_OUT/i,
+  /within \d+ms$/i,
 ];
 
 export type TimeoutAwareTestInfo = TestInfo & {
