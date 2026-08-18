@@ -13,6 +13,7 @@ const UploadProgressLinks: FC<UploadProgressLinksProps> = ({ links = [], navigat
   <>
     {links.map((link, index) => (
       <Button
+        data-test="upload-progress-link"
         isInline
         key={`${link.url}-${index}`}
         onClick={() => navigate(link.url)}

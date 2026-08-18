@@ -19,7 +19,7 @@ const UploadProgressSuccessToast: FC<UploadProgressSuccessToastProps> = ({ navig
     successLinks ?? (resourceUrl ? [{ label: t('View volume'), url: resourceUrl }] : []);
 
   return (
-    <ToastLayout>
+    <ToastLayout dataTest="upload-progress-success-toast">
       <UploadProgressLinks links={links} navigate={navigate} />
     </ToastLayout>
   );

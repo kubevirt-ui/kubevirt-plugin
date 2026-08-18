@@ -859,6 +859,13 @@ export default class PageCommons extends BasePage {
     await this.pageContent.waitForDomContentLoaded();
   }
 
+  async waitForElementHidden(
+    selector: string,
+    timeout: number = TestTimeouts.ELEMENT_WAIT,
+  ): Promise<boolean> {
+    return this.pageContent.waitForElementHidden(selector, timeout);
+  }
+
   async waitForLoadStateNetworkIdle(timeoutMs = 30_000): Promise<void> {
     await this.pageContent.waitForLoadStateNetworkIdle(timeoutMs);
   }

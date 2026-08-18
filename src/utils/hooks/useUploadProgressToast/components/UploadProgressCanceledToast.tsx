@@ -20,7 +20,7 @@ const UploadProgressCanceledToast: FC<UploadProgressCanceledToastProps> = ({
   const { contextLinks, fileName, progress } = upload;
 
   return (
-    <ToastLayout>
+    <ToastLayout dataTest="upload-progress-aborted-toast">
       <UploadProgressBar
         fileName={fileName}
         progress={progress}

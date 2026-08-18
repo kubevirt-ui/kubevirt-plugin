@@ -18,7 +18,7 @@ const UploadProgressErrorToast: FC<UploadProgressErrorToastProps> = ({ navigate,
   const { t } = useKubevirtTranslation();
 
   return (
-    <ToastLayout>
+    <ToastLayout dataTest="upload-progress-error-toast">
       <FlexItem>{upload.errorMessage ?? t('Upload failed.')}</FlexItem>
       {!isEmpty(upload.contextLinks) && (
         <FlexItem>

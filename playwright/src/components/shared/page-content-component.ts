@@ -181,6 +181,16 @@ export default class PageContentComponent extends BaseComponent {
     await this.page.waitForLoadState('domcontentloaded');
   }
 
+  async waitForElementHidden(
+    selector: string,
+    timeout: number = TestTimeouts.ELEMENT_WAIT,
+  ): Promise<boolean> {
+    return this.locator(selector)
+      .waitFor({ state: 'hidden', timeout })
+      .then(() => true)
+      .catch(() => false);
+  }
+
   async waitForLoadStateNetworkIdle(timeoutMs = 30_000): Promise<void> {
     await this.page.waitForLoadState('networkidle', { timeout: timeoutMs }).catch(() => undefined);
   }

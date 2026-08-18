@@ -734,3 +734,24 @@ export const SSH_KEY_PATHS = {
   /** Public SSH key file path */
   PUBLIC_KEY: './fixtures/rsa.pub',
 } as const;
+
+/**
+ * Byte-size constants for generated test files (see TestFileFactory)
+ */
+export const TEST_FILE_SIZES = {
+  /** Default size for a non-empty ISO-like file, large enough to keep a CDI upload
+   * in progress long enough for abort/toast assertions. */
+  DEFAULT_ISO_SIZE_BYTES: 5 * 1024 * 1024,
+  /** Chunk size used when writing a sized test file to disk. */
+  ISO_WRITE_CHUNK_SIZE_BYTES: 64 * 1024,
+} as const;
+
+/**
+ * DataVolume deletion polling constants
+ */
+export const DATA_VOLUME_DELETION_POLLING = {
+  /** Timeout for waiting for DataVolume deletion in milliseconds */
+  TIMEOUT_MS: 60_000,
+  /** Retry interval for polling DataVolume deletion in milliseconds */
+  RETRY_INTERVAL_MS: 2000,
+} as const;

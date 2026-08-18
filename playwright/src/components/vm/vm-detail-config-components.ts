@@ -102,13 +102,19 @@ export class VirtualMachineDetailConfigurationCdromComponent extends BaseCompone
 
       await this._fileInput.setInputFiles(sourceValue);
 
-      await this._tabModal
-        .locator('[role="progressbar"], .pf-v6-c-progress, .pf-c-progress')
-        .first()
-        .waitFor({ state: 'visible', timeout: TestTimeouts.FILE_UPLOAD })
-        .catch(() => undefined);
-
-      await this.page.waitForTimeout(TestTimeouts.UI_DELAY_MEDIUM);
+      const fileBasename = sourceValue.split('/').pop() ?? sourceValue;
+      await this._inputIdSimpleFileFilename.waitFor({
+        state: 'attached',
+        timeout: TestTimeouts.UI_ACTION_COMPLETE,
+      });
+      await this.page.waitForFunction(
+        ({ selector, name }) => {
+          const input = document.querySelector(selector) as HTMLInputElement | null;
+          return Boolean(input?.value && input.value.includes(name));
+        },
+        { selector: 'input[id="simple-file-filename"]', name: fileBasename },
+        { timeout: TestTimeouts.UI_ACTION_COMPLETE },
+      );
     } else if (cdromSource === 'Use existing ISO' && sourceValue) {
       const mountExistingRadio = this.page.locator(
         'input[id="cdrom-source-existing"], input#cdrom-source-existing',

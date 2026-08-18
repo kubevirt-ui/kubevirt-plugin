@@ -5,6 +5,7 @@ import { Flex, FlexItem } from '@patternfly/react-core';
 
 import { UploadEntry } from '../types';
 
+import ToastLayout from './ToastLayout';
 import UploadProgressAbortButton from './UploadProgressAbortButton';
 import UploadProgressBar from './UploadProgressBar';
 import UploadProgressLinks from './UploadProgressLinks';
@@ -25,7 +26,7 @@ const UploadProgressUploadingToast: FC<UploadProgressUploadingToastProps> = ({
   const hasActions = !isEmpty(contextLinks) || showAbort;
 
   return (
-    <Flex direction={{ default: 'column' }}>
+    <ToastLayout dataTest="upload-progress-toast">
       <UploadProgressBar fileName={fileName} progress={progress} showSpinner />
       {hasActions && (
         <Flex alignItems={{ default: 'alignItemsCenter' }} className="pf-v6-u-w-100">
@@ -41,7 +42,7 @@ const UploadProgressUploadingToast: FC<UploadProgressUploadingToastProps> = ({
           )}
         </Flex>
       )}
-    </Flex>
+    </ToastLayout>
   );
 };
 

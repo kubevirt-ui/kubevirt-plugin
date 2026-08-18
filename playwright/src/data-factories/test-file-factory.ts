@@ -3,6 +3,8 @@ import * as http from 'http';
 import * as https from 'https';
 import * as path from 'path';
 
+import { TEST_FILE_SIZES } from '@/data-models/constants';
+
 /**
  * Data factory for creating test files in the .test-data directory.
  *
@@ -26,12 +28,35 @@ export class TestFileFactory {
    * ```
    */
   static createEmptyIsoFile(filename: string): string {
-    const testDataDir = this.ensureTestDataDirectory();
-    const filePath = path.join(testDataDir, filename);
-
-    // Create empty ISO file
+    const filePath = this.resolveSafeFilePath(filename);
     fs.writeFileSync(filePath, '');
+    return filePath;
+  }
 
+  /**
+   * Creates a non-empty ISO-like file large enough that CDI uploads stay in
+   * progress long enough for abort/toast assertions (default 5 MiB).
+   */
+  static createSizedIsoFile(
+    filename: string,
+    sizeBytes = TEST_FILE_SIZES.DEFAULT_ISO_SIZE_BYTES,
+  ): string {
+    if (!Number.isSafeInteger(sizeBytes) || sizeBytes <= 0) {
+      throw new Error(`Invalid sizeBytes (must be a positive safe integer): ${sizeBytes}`);
+    }
+    const filePath = this.resolveSafeFilePath(filename);
+    const chunk = Buffer.alloc(TEST_FILE_SIZES.ISO_WRITE_CHUNK_SIZE_BYTES, 0);
+    const fd = fs.openSync(filePath, 'w');
+    try {
+      let written = 0;
+      while (written < sizeBytes) {
+        const toWrite = Math.min(chunk.length, sizeBytes - written);
+        fs.writeSync(fd, chunk, 0, toWrite);
+        written += toWrite;
+      }
+    } finally {
+      fs.closeSync(fd);
+    }
     return filePath;
   }
 
@@ -50,8 +75,7 @@ export class TestFileFactory {
    * ```
    */
   static async downloadCirrosImage(filename: string, url?: string): Promise<string> {
-    const testDataDir = this.ensureTestDataDirectory();
-    const filePath = path.join(testDataDir, filename);
+    const filePath = this.resolveSafeFilePath(filename);
     const cirrosUrl = url || 'https://download.cirros-cloud.net/0.3.0/cirros-0.3.0-x86_64-disk.img';
 
     // If file already exists, return the path (avoid re-downloading)
@@ -132,8 +156,7 @@ export class TestFileFactory {
    * ```
    */
   static async downloadIsoFile(filename: string, url?: string): Promise<string> {
-    const testDataDir = this.ensureTestDataDirectory();
-    const filePath = path.join(testDataDir, filename);
+    const filePath = this.resolveSafeFilePath(filename);
     // Default to CirrOS ISO - a small, commonly used test ISO
     const isoUrl = url || 'https://download.cirros-cloud.net/0.3.0/cirros-0.3.0-x86_64-disk.iso';
 
@@ -221,4 +244,15 @@ export class TestFileFactory {
     const projectRoot = process.cwd();
     return path.join(projectRoot, this.TEST_DATA_DIR);
   }
+
+  /** Resolves a basename-only filename under `.test-data`, rejecting path traversal. */
+  private static resolveSafeFilePath(filename: string): string {
+    const base = path.basename(filename);
+    if (!filename || filename === '.' || base !== filename || filename.includes('..') || path.isAbsolute(filename)) {
+      throw new Error(`Invalid test filename (basename only required): ${filename}`);
+    }
+    const testDataDir = this.ensureTestDataDirectory();
+    return path.join(testDataDir, base);
+  }
 }
+
