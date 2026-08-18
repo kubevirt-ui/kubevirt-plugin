@@ -1,21 +1,18 @@
-/* eslint-disable */
-import React, { FC, useCallback, useMemo, useRef } from 'react';
+import React, { type FC, useCallback, useMemo, useRef } from 'react';
 import { useWatch } from 'react-hook-form';
-
-import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Wizard, WizardHeader, WizardStep, WizardStepType } from '@patternfly/react-core';
-import useCloseWizard from '@virtualmachines/wizard/hooks/useCloseWizard';
-
-import RequiredLabelsDrawerWrapper from './components/RequiredLabelsDrawerWrapper';
-import TemplatesDrawerWrapper from './components/TemplatesDrawerWrapper';
 
 import {
   logVMCreationStarted,
   mapWizardStepToCreationMethodTelemetry,
 } from '@kubevirt-utils/extensions/telemetry';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { Wizard, WizardHeader, WizardStep, type WizardStepType } from '@patternfly/react-core';
+import useCloseWizard from '@virtualmachines/wizard/hooks/useCloseWizard';
 import { useSyncDeploymentDetails } from '@virtualmachines/wizard/hooks/useSyncDeploymentDetails';
 import useWizardStepValidation from '@virtualmachines/wizard/hooks/useWizardStepValidation';
 
+import RequiredLabelsDrawerWrapper from './components/RequiredLabelsDrawerWrapper';
+import TemplatesDrawerWrapper from './components/TemplatesDrawerWrapper';
 import useVMGenerationNavClick from './hooks/useVMGenerationNavClick';
 import { useVMWizard } from './state/vm-wizard-context/VMWizardContext';
 import {
@@ -23,9 +20,9 @@ import {
   CREATE_VM_FORM_FIELDS_UI_STATE,
   CREATE_VM_FORM_FIELDS_VM_DATA,
 } from './state/vm-wizard-form/consts';
-import { VMWizardStep } from './utils/constants';
+import { type VMCreationMethod, VMWizardStep } from './utils/constants';
 import { getStepsToDisplayByCreationMethod } from './utils/displaySteps';
-import { VMWizardStepDisplay } from './utils/types';
+import { type VMWizardStepDisplay } from './utils/types';
 import { markStepVisited } from './utils/utils';
 
 import './Wizard.scss';
@@ -39,7 +36,7 @@ const VMCreationWizardContent: FC = () => {
   const creationMethod = useWatch({ control, name: CREATE_VM_FORM_FIELDS_VM_DATA.CREATION_METHOD });
   const navItemConfig = useVMGenerationNavClick(creationMethod);
   const syncDeploymentDetails = useSyncDeploymentDetails();
-  const hasLoggedCreationStarted = useRef(false);
+  const hasLoggedCreationStartedRef = useRef(false);
 
   const stepsToDisplay: VMWizardStepDisplay[] = useMemo(
     () =>
@@ -48,7 +45,7 @@ const VMCreationWizardContent: FC = () => {
         isStepDisabled,
         navItemConfig,
         t,
-      })[creationMethod].sort((a, b) => a.displayIndex - b.displayIndex),
+      })[creationMethod as VMCreationMethod].toSorted((a, b) => a.displayIndex - b.displayIndex),
     [navItemConfig, isStepDisabled, isNextDisabledForStep, creationMethod, t],
   );
 
@@ -68,8 +65,8 @@ const VMCreationWizardContent: FC = () => {
         String(currentStep?.id),
       );
 
-      if (!hasLoggedCreationStarted.current && creationMethodTelemetry) {
-        hasLoggedCreationStarted.current = true;
+      if (!hasLoggedCreationStartedRef.current && creationMethodTelemetry) {
+        hasLoggedCreationStartedRef.current = true;
         logVMCreationStarted(creationMethodTelemetry);
       }
     },
@@ -83,7 +80,7 @@ const VMCreationWizardContent: FC = () => {
           className="vm-creation-wizard"
           header={<WizardHeader isCloseHidden title={t('Create VirtualMachine')} />}
           onClose={closeWizard}
-          onStepChange={(_, currentStep, prevStep) => onStepChange(currentStep, prevStep)}
+          onStepChange={(_event, currentStep, prevStep) => onStepChange(currentStep, prevStep)}
           title={t('Create VirtualMachine')}
         >
           {stepsToDisplay?.map(({ children, footer, id, isDisabled, name, navItem }) => (

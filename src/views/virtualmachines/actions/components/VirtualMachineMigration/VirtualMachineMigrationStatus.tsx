@@ -1,9 +1,8 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import { createElement, type FC } from 'react';
 
 import {
+  type MultiNamespaceVirtualMachineStorageMigrationPlan,
   type StorageMigrationAPI,
-  MultiNamespaceVirtualMachineStorageMigrationPlan,
 } from '@kubevirt-utils/resources/migrations/constants';
 
 import { getStorageMigrationProgressComponent } from './backends/progressComponentByApi';
@@ -17,13 +16,13 @@ type VirtualMachineMigrationStatusProps = {
 
 const VirtualMachineMigrationStatus: FC<VirtualMachineMigrationStatusProps> = (props) => {
   const { storageMigAPI } = props;
-  const Progress = getStorageMigrationProgressComponent(storageMigAPI);
+  const progressComponent = getStorageMigrationProgressComponent(storageMigAPI);
 
-  if (!Progress) {
+  if (!progressComponent) {
     return null;
   }
 
-  return <Progress {...props} />;
+  return createElement(progressComponent, props);
 };
 
 export default VirtualMachineMigrationStatus;

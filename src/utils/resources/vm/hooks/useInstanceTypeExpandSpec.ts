@@ -1,7 +1,6 @@
-/* eslint-disable */
 import { useEffect, useMemo, useState } from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { runningTourSignal } from '@kubevirt-utils/components/GuidedTour/utils/guidedTourSignals';
 import useDeepCompareMemoize from '@kubevirt-utils/hooks/useDeepCompareMemoize/useDeepCompareMemoize';
 import { isExpandableSpecVM } from '@kubevirt-utils/resources/instancetype/helper';
@@ -32,26 +31,37 @@ const useInstanceTypeExpandSpec: UseInstanceTypeExpandSpec = (vm) => {
       return;
     }
 
-    const fetch = async () => {
+    const controller = new AbortController();
+
+    const fetchSpec = async (): Promise<void> => {
       setLoadingExpandedSpec(true);
       try {
-        const response = await consoleFetch(url);
-        const json = await response.json();
-        setInstanceTypeExpandedSpec(json);
+        const response = await consoleFetch(url, { signal: controller.signal });
+        const json = (await response.json()) as V1VirtualMachine;
+        if (!controller.signal.aborted) {
+          setInstanceTypeExpandedSpec(json);
+        }
       } catch (err) {
-        kubevirtConsole.log(err.message);
-        setErrorExpandedSpec(err);
+        if (!controller.signal.aborted) {
+          const error = err instanceof Error ? err : new Error(String(err));
+          kubevirtConsole.log(error.message);
+          setErrorExpandedSpec(error);
+        }
       } finally {
-        setLoadingExpandedSpec(false);
+        if (!controller.signal.aborted) {
+          setLoadingExpandedSpec(false);
+        }
       }
     };
 
     if (!isEmpty(innerVM) && isExpandableSpec && !runningTourSignal.value) {
-      fetch();
+      void fetchSpec();
     } else {
       setInstanceTypeExpandedSpec(undefined);
       setErrorExpandedSpec(undefined);
     }
+
+    return (): void => controller.abort();
   }, [namespace, name, isExpandableSpec, url, urlLoaded, innerVM]);
 
   return [instanceTypeExpandedSpec, loadingExpandedSpec, errorExpandedSpec];

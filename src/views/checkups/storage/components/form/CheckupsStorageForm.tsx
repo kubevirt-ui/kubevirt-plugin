@@ -1,8 +1,7 @@
-/* eslint-disable */
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { type FC, useEffect, useMemo, useRef, useState } from 'react';
 import CheckupImageField from 'src/views/checkups/components/CheckupImageField';
 
-import { IoK8sApiStorageV1StorageClass } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type IoK8sApiStorageV1StorageClass } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { getDefaultStorageClass } from '@kubevirt-utils/components/DiskModal/components/StorageClassAndPreallocation/utils/helpers';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -22,16 +21,15 @@ import {
 } from '@patternfly/react-core';
 
 import { storageCheckupImageSettings } from '../../utils/const';
-
-import AdvancedSettings, { StorageCheckupAdvancedSettings } from './AdvancedSettings';
+import AdvancedSettings, { type StorageCheckupAdvancedSettings } from './AdvancedSettings';
 import CheckupsStorageFormActions from './CheckupsStorageFormActions';
 
 import './checkups-storage-form.scss';
 
-const CheckupsStorageForm = () => {
+const CheckupsStorageForm: FC = () => {
   const { t } = useKubevirtTranslation();
   const cluster = useClusterParam();
-  const [name, setName] = useState<string>(generatePrettyName('kubevirt-storage-checkup'));
+  const [name, setName] = useState<string>(() => generatePrettyName('kubevirt-storage-checkup'));
   const [timeOut, setTimeOut] = useState<string>('10');
   const [checkupImage, checkupImageLoaded, checkupImageLoadError, checkupImageIsFallback] =
     useRelatedImage({
@@ -56,12 +54,12 @@ const CheckupsStorageForm = () => {
 
   const defaultSC = useMemo(() => getDefaultStorageClass(storageClasses ?? []), [storageClasses]);
 
-  const hasAppliedDefaultSC = useRef(false);
+  const hasAppliedDefaultSCRef = useRef(false);
 
   useEffect(() => {
-    if (!hasAppliedDefaultSC.current && storageClassesLoaded && !isEmpty(defaultSC)) {
+    if (!hasAppliedDefaultSCRef.current && storageClassesLoaded && !isEmpty(defaultSC)) {
       setAdvancedSettings((prev) => ({ ...prev, storageClass: defaultSC?.metadata?.name }));
-      hasAppliedDefaultSC.current = true;
+      hasAppliedDefaultSCRef.current = true;
     }
   }, [defaultSC, storageClassesLoaded]);
 
@@ -84,15 +82,15 @@ const CheckupsStorageForm = () => {
               />
             </FormGroup>
             <FormGroup
+              fieldId="timeout"
+              isRequired
+              label={t('Timeout (minutes)')}
               labelHelp={
                 <HelpTextIcon
                   bodyContent={t('How much time before the check will try to close itself')}
                   position={PopoverPosition.right}
                 />
               }
-              fieldId="timeout"
-              isRequired
-              label={t('Timeout (minutes)')}
             >
               <TextInput
                 className="CheckupsStorageForm--main__number-input"

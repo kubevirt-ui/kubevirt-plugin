@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC, useEffect, useMemo, useState } from 'react';
+import React, { type FC, useEffect, useMemo, useState } from 'react';
 
 import NewBadge from '@kubevirt-utils/components/badges/NewBadge/NewBadge';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
@@ -42,7 +41,7 @@ const AutomaticSubscriptionRHELGuests: FC<AutomaticSubscriptionRHELGuestsProps> 
     [formProps?.subscriptionData?.type],
   );
 
-  const [selected, setSelected] = useState<{ title: string; value: string }>(
+  const [selected, setSelected] = useState<{ title: string; value: string }>(() =>
     getSubscriptionItem(type),
   );
 
@@ -52,19 +51,19 @@ const AutomaticSubscriptionRHELGuests: FC<AutomaticSubscriptionRHELGuestsProps> 
     setSelected(getSubscriptionItem(type));
   }, [type]);
 
-  const isInitialLoad = loading && featureEnabled === null;
+  const isInitialLoad = loading && featureEnabled == null;
 
   return (
     <ExpandSection
+      dataTestID="automatic-subscription-rhel"
+      id={CLUSTER_TAB_IDS.automaticSubscriptionRhel}
+      searchItemId={CLUSTER_TAB_IDS.automaticSubscriptionRhel}
       toggleContent={
         <>
           {t('Automatic subscription of new RHEL VirtualMachines')}
           {newBadge && <NewBadge />}
         </>
       }
-      dataTestID="automatic-subscription-rhel"
-      id={CLUSTER_TAB_IDS.automaticSubscriptionRhel}
-      searchItemId={CLUSTER_TAB_IDS.automaticSubscriptionRhel}
     >
       <Stack hasGutter>
         <MutedTextSpan
@@ -82,21 +81,21 @@ const AutomaticSubscriptionRHELGuests: FC<AutomaticSubscriptionRHELGuestsProps> 
             {selected?.value !== AutomaticSubscriptionTypeEnum.NO_SUBSCRIPTION && (
               <>
                 <SectionWithSwitch
+                  dataTestID={AUTOMATIC_UPDATE_FEATURE_NAME}
                   helpTextIconContent={t(
                     'Automatically pull updates from the RHEL repository. Activation key and Organization ID are mandatory to enable this.',
                   )}
-                  turnOnSwitch={(val) => {
-                    if (!loading) {
-                      toggleFeature(val);
-                    }
-                  }}
-                  dataTestID={AUTOMATIC_UPDATE_FEATURE_NAME}
                   id={AUTOMATIC_UPDATE_FEATURE_NAME}
                   isDisabled={isInitialLoad}
                   isLoading={loading}
                   olsPromptType={OLSPromptType.SUBSCRIPTIONS}
                   switchIsOn={featureEnabled}
                   title={t('Enable auto updates for RHEL VirtualMachines')}
+                  turnOnSwitch={(val) => {
+                    if (!loading) {
+                      void toggleFeature(val);
+                    }
+                  }}
                 />
                 {selected?.value ===
                   AutomaticSubscriptionTypeEnum.MONITOR_AND_MANAGE_SUBSCRIPTIONS && (

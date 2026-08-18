@@ -1,16 +1,15 @@
-/* eslint-disable */
-import React, { FC, ReactNode, useState } from 'react';
+import React, { type FC, type ReactNode, useState } from 'react';
 
 import ToolbarFilterToggle from '@kubevirt-utils/components/toggles/ToolbarFilterToggle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
-  MenuToggleProps,
+  type MenuToggleProps,
   Select,
   SelectList,
   SelectOption,
-  SelectOptionProps,
-  SelectProps,
+  type SelectOptionProps,
+  type SelectProps,
 } from '@patternfly/react-core';
 
 type CheckboxSelectProps = {
@@ -19,7 +18,7 @@ type CheckboxSelectProps = {
   isToggleDisabled?: boolean;
   onSelect?: SelectProps['onSelect'];
   options?: SelectOptionProps[];
-  selectedValues: any[];
+  selectedValues: string[];
   showAllBadge?: boolean;
   toggleSize?: MenuToggleProps['size'];
   toggleTitle?: ReactNode;
@@ -66,8 +65,8 @@ const CheckboxSelect: FC<CheckboxSelectProps> = ({
       toggle={toggle}
     >
       <SelectList>
-        {options?.map((option, index) => (
-          <SelectOption hasCheckbox key={index} {...option} />
+        {options?.map((option) => (
+          <SelectOption hasCheckbox key={String(option.value)} {...option} />
         ))}
         {isEmpty(options) && <SelectOption isDisabled>{t('No options found')}</SelectOption>}
       </SelectList>

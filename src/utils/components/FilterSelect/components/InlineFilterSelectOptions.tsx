@@ -1,13 +1,11 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC, Fragment } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Divider, SelectGroup, SelectOption } from '@patternfly/react-core';
 
 import { NO_RESULTS } from '../utils/constants';
-import { EnhancedSelectOptionProps } from '../utils/types';
-
+import { type EnhancedSelectOptionProps } from '../utils/types';
 import InlineFilterSelectOption from './InlineFilterSelectOption';
 
 type InlineFilterSelectOptionsProps = {
@@ -36,18 +34,18 @@ const InlineFilterSelectOptions: FC<InlineFilterSelectOptionsProps> = ({
     return (
       <>
         {Object.entries(groupedOptions).map(([group, opts], groupIndex) => (
-          <>
+          <Fragment key={group}>
             <SelectGroup key={group} label={group}>
               {opts.map((option, index) => (
                 <InlineFilterSelectOption
                   isFocused={focusedItemIndex === index}
-                  key={option.value}
+                  key={String(option.value)}
                   option={option}
                 />
               ))}
             </SelectGroup>
             {groupIndex !== lastGroupIndex && <Divider />}
-          </>
+          </Fragment>
         ))}
       </>
     );
@@ -58,7 +56,7 @@ const InlineFilterSelectOptions: FC<InlineFilterSelectOptionsProps> = ({
       {filterOptions.map((option, index) => (
         <InlineFilterSelectOption
           isFocused={focusedItemIndex === index}
-          key={option.value}
+          key={String(option.value)}
           option={option}
         />
       ))}

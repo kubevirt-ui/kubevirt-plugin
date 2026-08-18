@@ -1,27 +1,39 @@
-/* eslint-disable */
 import { useEffect, useRef, useState } from 'react';
 
-import { CodeEditorRef } from '@openshift-console/dynamic-plugin-sdk';
+import { type CodeEditorRef } from '@openshift-console/dynamic-plugin-sdk';
 
 import { createSelection, getLinesToHighlight } from './utils';
+
+type EditorInstance = {
+  getAction: (id: string) => { run: () => Promise<void> };
+  revealLineInCenter: (lineNumber: number) => void;
+  setSelections: (selections: unknown[]) => void;
+};
 
 export const useEditorHighlighter = (
   editableYAML: string,
   pathsToHighlight: string[],
   showEditor: boolean,
-) => {
-  const [editor, setEditor] = useState<CodeEditorRef['editor']>();
-  const isHighlighed = useRef(false);
+): ((ref: CodeEditorRef) => void) => {
+  const [editor, setEditor] = useState<EditorInstance>();
+  const isHighlighedRef = useRef(false);
 
   useEffect(() => {
-    isHighlighed.current = false;
+    isHighlighedRef.current = false;
   }, [pathsToHighlight, showEditor]);
 
   useEffect(() => {
-    const highlightPaths = async () => {
-      if (editor && editableYAML && pathsToHighlight && !isHighlighed.current) {
-        isHighlighed.current = true;
+    let timeoutId: ReturnType<typeof setTimeout>;
+
+    const highlightPaths = async (): Promise<void> => {
+      if (editor && editableYAML && pathsToHighlight && !isHighlighedRef.current) {
         const ranges = getLinesToHighlight(editableYAML, pathsToHighlight);
+
+        if (ranges.length === 0) {
+          return;
+        }
+
+        isHighlighedRef.current = true;
 
         await editor.getAction('editor.foldAll').run();
 
@@ -29,12 +41,14 @@ export const useEditorHighlighter = (
 
         editor.setSelections(selections);
         await editor.getAction('editor.unfoldRecursively').run();
-        setTimeout(() => editor.revealLineInCenter(ranges.at(-1).start), 500);
+        timeoutId = setTimeout(() => editor.revealLineInCenter(ranges.at(-1).start), 500);
       }
     };
 
-    highlightPaths();
-  }, [editableYAML, editor, pathsToHighlight]);
+    void highlightPaths();
 
-  return (ref: CodeEditorRef) => setEditor(ref?.editor);
+    return (): void => clearTimeout(timeoutId);
+  }, [editableYAML, editor, pathsToHighlight, showEditor]);
+
+  return (ref: CodeEditorRef): void => setEditor(ref?.editor as EditorInstance);
 };

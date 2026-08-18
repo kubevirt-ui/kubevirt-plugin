@@ -1,11 +1,11 @@
-import React, { FC, useMemo } from 'react';
+import React, { type FC, useMemo } from 'react';
 
-import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ListPageBody } from '@openshift-console/dynamic-plugin-sdk';
 
-import useVirtualMachineInstanceNetworkTab from './hooks/useVirtualMachineInstanceNetworkTab';
+import getVirtualMachineInstanceNetworkTab from './getVirtualMachineInstanceNetworkTab';
 import { getVMINetworkColumns, getVMINetworkRowId } from './vmiNetworkTableDefinition';
 
 import './virtual-machines-insance-page-network-tab.scss';
@@ -18,7 +18,7 @@ const VirtualMachinesInstancePageNetworkTab: FC<VirtualMachinesInstancePageNetwo
   obj: vmi,
 }) => {
   const { t } = useKubevirtTranslation();
-  const [data] = useVirtualMachineInstanceNetworkTab(vmi);
+  const data = getVirtualMachineInstanceNetworkTab(vmi);
 
   const columns = useMemo(() => getVMINetworkColumns(t), [t]);
 

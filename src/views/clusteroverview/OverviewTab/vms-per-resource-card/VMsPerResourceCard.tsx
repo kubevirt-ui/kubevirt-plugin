@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { useState } from 'react';
+import React, { type ChangeEvent, type FC, type MouseEvent, useState } from 'react';
 
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -10,14 +9,14 @@ import VMsPerResourceChart from './VMsPerResourceChart';
 
 import './VMsPerResourceCard.scss';
 
-const VMsPerResourceCard = () => {
+const VMsPerResourceCard: FC = () => {
   const { t } = useKubevirtTranslation();
-  const [vmResourceOption, setvmResourceOption] = useState(vmsPerResourceOptions[0]?.title);
+  const [vmResourceOption, setVmResourceOption] = useState(vmsPerResourceOptions[0]?.title);
   const [type, setType] = useState(vmsPerResourceOptions[0]?.type);
 
-  const handleSelect = (_event, value) => {
+  const handleSelect = (_event: ChangeEvent | MouseEvent, value: string): void => {
     const selected = vmsPerResourceOptions?.find((option) => option.title === value);
-    setvmResourceOption(selected?.title);
+    setVmResourceOption(selected?.title);
     setType(selected?.type);
   };
 

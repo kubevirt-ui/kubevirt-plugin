@@ -1,8 +1,7 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { createElement, type FC } from 'react';
 import { useLocation, useParams } from 'react-router';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import DetailsPageTitle from '@kubevirt-utils/components/DetailsPageTitle/DetailsPageTitle';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import PaneHeading from '@kubevirt-utils/components/PaneHeading/PaneHeading';
@@ -47,7 +46,7 @@ const VirtualMachineNavPageTitle: FC<VirtualMachineNavPageTitleProps> = ({
   const { vmi } = useVMI(name, namespace, cluster, isRunning(vm));
   const vmim = useVirtualMachineInstanceMigration(vm);
   const [actions] = useVirtualMachineActionsProvider(vm, vmim);
-  const StatusIcon = getVMStatusIcon(vm?.status?.printableStatus);
+  const statusIcon = getVMStatusIcon(vm?.status?.printableStatus);
 
   const isSidebarEditorDisplayed = vmTabsWithYAML.find((tab) =>
     location.pathname.includes(`/${name}/${tab}`),
@@ -62,7 +61,7 @@ const VirtualMachineNavPageTitle: FC<VirtualMachineNavPageTitleProps> = ({
               <span className="co-m-resource-icon co-m-resource-icon--lg">{t('VM')}</span>
               <span>{name} </span>
               {!isEmpty(vm) && (
-                <Label className="vm-resource-label" icon={<StatusIcon />}>
+                <Label className="vm-resource-label" icon={createElement(statusIcon)}>
                   {vm?.status?.printableStatus}
                 </Label>
               )}

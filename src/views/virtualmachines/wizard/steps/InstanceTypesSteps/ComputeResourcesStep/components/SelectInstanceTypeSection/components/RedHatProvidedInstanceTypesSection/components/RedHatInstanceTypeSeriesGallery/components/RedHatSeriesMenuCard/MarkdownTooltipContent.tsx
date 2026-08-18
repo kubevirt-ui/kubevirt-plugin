@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Stack } from '@patternfly/react-core';
@@ -14,11 +13,11 @@ const MarkdownTooltipContent: FC<MarkdownTooltipContentProps> = ({ content }) =>
 
   return (
     <Stack hasGutter>
-      {content.split('\n\n').map((paragraph, paragraphIdx) => (
-        <p key={`paragraph-${paragraphIdx}`}>
-          {paragraph.split(MARKDOWN_BOLD_REGEX).map((part, partIdx) => {
+      {content.split('\n\n').map((paragraph) => (
+        <p key={paragraph}>
+          {paragraph.split(MARKDOWN_BOLD_REGEX).map((part) => {
             if (part.startsWith('*') && part.endsWith('*')) {
-              return <strong key={`part-${paragraphIdx}-${partIdx}`}>{part.slice(1, -1)}</strong>;
+              return <strong key={part}>{part.slice(1, -1)}</strong>;
             }
             return part || null;
           })}
