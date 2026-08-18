@@ -13,6 +13,7 @@ import { runningTourSignal } from '@kubevirt-utils/components/GuidedTour/utils/g
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
 import { TableToolbarActionsFlex } from '@kubevirt-utils/components/TableToolbarActions/TableToolbarActionsFlex';
 import { PageTitles } from '@kubevirt-utils/constants/page-constants';
+import { sortDataViewTableData } from '@kubevirt-utils/hooks/useDataViewTableSort/useDataViewTableSort';
 import { KUBEVIRT_APISERVER_PROXY } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { type KubevirtFilterState } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
@@ -30,6 +31,7 @@ import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useIsAllClustersPage from '@multicluster/hooks/useIsAllClustersPage';
 import { DocumentTitle, type K8sVerb, ListPageBody } from '@openshift-console/dynamic-plugin-sdk';
 import { Flex, Pagination } from '@patternfly/react-core';
+import { DataViewSortParams } from '@patternfly/react-data-view';
 import { useSignals } from '@preact/signals-react/runtime';
 import SearchBar from '@search/components/SearchBar';
 import { useFleetAccessReview } from '@stolostron/multicluster-sdk';
@@ -81,6 +83,14 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({
   useVMMetrics();
 
   const query = useQuery();
+  const sortBy = query.get(DataViewSortParams.SORT_BY);
+  const sortDirection = query.get(DataViewSortParams.DIRECTION);
+  const selectionResetKey = useMemo(() => {
+    const params = new URLSearchParams(query);
+    params.delete(DataViewSortParams.SORT_BY);
+    params.delete(DataViewSortParams.DIRECTION);
+    return params.toString();
+  }, [query]);
 
   const [namespacedVMs, namespacedVMsLoaded, loadError] = useKubevirtWatchResource<
     V1VirtualMachine[]
@@ -134,12 +144,18 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({
   const [pagination, setPagination] = useState(paginationInitialState);
 
   const resetPagination = useCallback(() => {
-    setPagination((prev) => ({
-      ...prev,
-      endIndex: prev?.perPage,
-      page: 1,
-      startIndex: 0,
-    }));
+    setPagination((prev) => {
+      if (prev.page === 1 && prev.startIndex === 0) {
+        return prev;
+      }
+
+      return {
+        ...prev,
+        endIndex: prev?.perPage,
+        page: 1,
+        startIndex: 0,
+      };
+    });
   }, []);
 
   const handleSetFilters = useCallback(
@@ -155,7 +171,11 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({
 
   useEffect(() => {
     deselectAllVMs();
-  }, [namespace, cluster, query]);
+  }, [namespace, cluster, selectionResetKey]);
+
+  useEffect(() => {
+    resetPagination();
+  }, [resetPagination, sortBy, sortDirection]);
 
   const searchInputRef = useRef<HTMLInputElement>(null);
 
@@ -183,6 +203,18 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({
   );
 
   const loaded = vmsLoaded && columnUtilsLoaded && !loadingFeatureProxy && loadedColumns;
+
+  const sortedVMs = useMemo(
+    () =>
+      sortDataViewTableData(
+        filteredVMs ?? [],
+        columns,
+        sortBy ?? VM_COLUMN_KEYS.name,
+        sortDirection ?? 'asc',
+        callbacks,
+      ),
+    [callbacks, columns, filteredVMs, sortBy, sortDirection],
+  );
 
   useVMListTelemetry({ loaded });
 
@@ -241,7 +273,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({
                 vms={vmsToShow}
               />
               <div className="list-managment-group">
-                <VirtualMachineSelection pagination={pagination} vms={filteredVMs} />
+                <VirtualMachineSelection pagination={pagination} vms={sortedVMs} />
                 <Flex className="list-managment-group__flex" flexWrap={{ default: 'nowrap' }}>
                   <VirtualMachineBulkActionButton vmimMapper={vmimMapper} vms={filteredVMs} />
                   <TableToolbarActionsFlex>
