@@ -1,6 +1,6 @@
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { CONFIRM_VM_ACTIONS } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
@@ -21,7 +21,7 @@ const VMActionsIconBar: FC<VMActionsIconBarProps> = ({ vm }) => {
   return (
     <Flex className="vm-actions-icon-bar" spaceItems={{ default: 'spaceItemsSm' }}>
       {getVMActionIconsDetails(vm, confirmVMActionsEnabled, createModal, t).map((actionDetails) => (
-        <ActionIconButton {...actionDetails} key={actionDetails?.action?.id} />
+        <ActionIconButton key={actionDetails?.action?.id} {...actionDetails} />
       ))}
     </Flex>
   );

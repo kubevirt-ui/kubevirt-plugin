@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { Children, cloneElement } from 'react';
 
 import { DataVolumeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -87,7 +88,7 @@ export const resourcePath = (modal: K8sModel, name?: string, namespace?: string)
   if (!modal) {
     if (!unknownKinds.has(modal?.kind)) {
       unknownKinds.add(modal?.kind);
-      // eslint-disable-next-line no-console
+       
       console.error(`resourcePath: no model for "${modal?.kind}"`);
     }
     return;

@@ -1,17 +1,19 @@
 import { useEffect, useRef, useState } from 'react';
-import { concat, keyBy, omit } from 'lodash';
+import concat from 'lodash/concat';
+import keyBy from 'lodash/keyBy';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { EventMessage, EventType } from '@kubevirt-utils/hooks/useResourceEvents/utils/types';
+import { type EventMessage } from '@kubevirt-utils/hooks/useResourceEvents/utils/types';
 import { getFieldSelector, watchURL } from '@kubevirt-utils/hooks/useResourceEvents/utils/utils';
 import { EventModel } from '@kubevirt-utils/models';
-import { getNamespace, getUID } from '@kubevirt-utils/resources/shared';
+import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty, kubevirtConsole } from '@kubevirt-utils/utils/utils';
-import { EventKind } from '@openshift-console/dynamic-plugin-sdk/lib/api/internal-types';
+import { type EventKind } from '@openshift-console/dynamic-plugin-sdk/lib/api/internal-types';
 import { WSFactory } from '@openshift-console/dynamic-plugin-sdk/lib/utils/k8s/ws-factory';
 import { sortEvents } from '@stolostron/multicluster-sdk/lib/internal/FleetResourceEventStream/utils';
 
 import { EVENTS_FLUSH_INTERVAL, EVENTS_MAX_MESSAGES } from './utils/constants';
+import processEventMessage from './utils/processEventMessage';
 
 type UseResourceEvents = (
   obj: K8sResourceCommon,
@@ -36,16 +38,16 @@ const useResourceEvents: UseResourceEvents = (
   const [loaded, setLoaded] = useState<boolean>(false);
 
   const namespace = getNamespace(obj);
-  const ws = useRef(null);
-  const timeoutId = useRef<null | ReturnType<typeof setTimeout>>(null);
+  const wsRef = useRef(null);
+  const timeoutIdRef = useRef<null | ReturnType<typeof setTimeout>>(null);
   const fieldSelector = getFieldSelector(obj);
 
   // Handle websocket setup and teardown when dependent props change
   useEffect(() => {
-    ws.current?.destroy();
+    wsRef.current?.destroy();
     setSortedEvents([]);
 
-    const webSocketID = `${namespace || 'all'}-sysevents`;
+    const webSocketID = `${namespace ?? 'all'}-sysevents`;
     const watchURLOptions = {
       ...(namespace ? { ns: namespace } : {}),
       ...(fieldSelector
@@ -67,65 +69,47 @@ const useResourceEvents: UseResourceEvents = (
       subprotocols: [],
     };
 
-    ws.current = new WSFactory(webSocketID, webSocketOptions)
+    wsRef.current = new WSFactory(webSocketID, webSocketOptions)
       .onbulkmessage((messages: EventMessage[]) => {
-        // Clear timeout since events arrived
-        if (timeoutId.current) {
-          clearTimeout(timeoutId.current);
-          timeoutId.current = null;
+        if (timeoutIdRef.current) {
+          clearTimeout(timeoutIdRef.current);
+          timeoutIdRef.current = null;
         }
 
         // Make one update to state per batch of events.
         setSortedEvents((currentSortedEvents): EventKind[] => {
           const topEvents = currentSortedEvents.slice(0, maxEvents - 1);
-          const batch: Record<string, EventKind> = messages.reduce(
-            (acc, { object: event, type: eventType }) => {
-              const { count: messageCount } = event;
-              const uid = getUID(event);
-              switch (eventType) {
-                case EventType.Added:
-                case EventType.Modified:
-                  if (acc[uid] && acc[uid].count > messageCount) {
-                    // We already have a more recent version of this message stored, so skip this one
-                    return acc;
-                  }
-                  return { ...acc, [uid]: event };
-                case EventType.Deleted:
-                  return omit(acc, uid);
-                default:
-                  kubevirtConsole.error(`Unhandled event: ${eventType}`);
-                  return acc;
-              }
-            },
+          const batch = messages.reduce<Record<string, EventKind>>(
+            processEventMessage,
             keyBy(topEvents, 'metadata.uid'),
           );
           return !isEmpty(batch) ? sortEvents(concat(Object.values(batch))) : [];
         });
 
         setLoaded(true);
-        if (!keepSocketOpen) ws.current?.destroy();
+        if (!keepSocketOpen) wsRef.current?.destroy();
       })
       .onopen(() => {
         setError(null);
         setLoaded(false);
 
-        if (timeoutId.current) {
-          clearTimeout(timeoutId.current);
-          timeoutId.current = null;
+        if (timeoutIdRef.current) {
+          clearTimeout(timeoutIdRef.current);
+          timeoutIdRef.current = null;
         }
 
         if (timeout) {
-          timeoutId.current = setTimeout(() => {
+          timeoutIdRef.current = setTimeout(() => {
             setLoaded(true);
-            ws.current?.destroy();
-            timeoutId.current = null;
+            wsRef.current?.destroy();
+            timeoutIdRef.current = null;
           }, timeout);
         }
       })
       .onclose((event) => {
-        if (timeoutId.current) {
-          clearTimeout(timeoutId.current);
-          timeoutId.current = null;
+        if (timeoutIdRef.current) {
+          clearTimeout(timeoutIdRef.current);
+          timeoutIdRef.current = null;
         }
 
         if (event?.wasClean === false) {
@@ -136,9 +120,9 @@ const useResourceEvents: UseResourceEvents = (
         setLoaded(true);
       })
       .onerror(() => {
-        if (timeoutId.current) {
-          clearTimeout(timeoutId.current);
-          timeoutId.current = null;
+        if (timeoutIdRef.current) {
+          clearTimeout(timeoutIdRef.current);
+          timeoutIdRef.current = null;
         }
 
         const errorMessage = t('An error occurred.');
@@ -146,15 +130,15 @@ const useResourceEvents: UseResourceEvents = (
         kubevirtConsole.error(errorMessage);
 
         setLoaded(true);
-        ws.current?.destroy();
+        wsRef.current?.destroy();
       });
 
-    return () => {
-      if (timeoutId.current) {
-        clearTimeout(timeoutId.current);
-        timeoutId.current = null;
+    return (): void => {
+      if (timeoutIdRef.current) {
+        clearTimeout(timeoutIdRef.current);
+        timeoutIdRef.current = null;
       }
-      ws.current?.destroy();
+      wsRef.current?.destroy();
     };
   }, [namespace, fieldSelector, t, maxEvents, keepSocketOpen, timeout]);
 

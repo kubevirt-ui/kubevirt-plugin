@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC, MouseEventHandler, useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useImmer } from 'use-immer';

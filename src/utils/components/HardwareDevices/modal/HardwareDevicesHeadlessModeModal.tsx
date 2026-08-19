@@ -1,7 +1,10 @@
-import React, { FC, useMemo, useState } from 'react';
+import React, { type FC, useMemo, useState } from 'react';
 import produce from 'immer';
 
-import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import {
+  type V1VirtualMachine,
+  type V1VirtualMachineInstance,
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import ModalPendingChangesAlert from '@kubevirt-utils/components/PendingChanges/ModalPendingChangesAlert/ModalPendingChangesAlert';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
@@ -26,7 +29,7 @@ const HardwareDevicesHeadlessModeModal: FC<HardwareDevicesHeadlessModeModalProps
   vmi,
 }) => {
   const { t } = useKubevirtTranslation();
-  const [checked, setChecked] = useState<boolean>(isHeadlessMode(vm));
+  const [checked, setChecked] = useState<boolean>(() => isHeadlessMode(vm));
 
   const updatedVirtualMachine = useMemo(() => {
     const updatedVM = produce<V1VirtualMachine>(vm, (vmDraft: V1VirtualMachine) => {

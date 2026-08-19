@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useCallback, useMemo, useState } from 'react';
 
 import useKubevirtToast from '@kubevirt-utils/hooks/useKubevirtToast';

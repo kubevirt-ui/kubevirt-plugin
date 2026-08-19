@@ -1,8 +1,8 @@
-import React, { FC, useMemo, useState } from 'react';
+import React, { type FC, useMemo, useState } from 'react';
 import produce from 'immer';
 import { getAffinity } from 'src/views/templates/utils/selectors';
 
-import { IoK8sApiCoreV1Node } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type IoK8sApiCoreV1Node } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import AffinityEditModal from '@kubevirt-utils/components/AffinityModal/components/AffinityEditModal/AffinityEditModal';
 import AffinityEmptyState from '@kubevirt-utils/components/AffinityModal/components/AffinityEmptyState';
 import AffinityList from '@kubevirt-utils/components/AffinityModal/components/AffinityList/AffinityList';
@@ -13,12 +13,12 @@ import {
   getAvailableAffinityID,
   getRowsDataFromAffinity,
 } from '@kubevirt-utils/components/AffinityModal/utils/helpers';
-import { AffinityRowData } from '@kubevirt-utils/components/AffinityModal/utils/types';
+import { type AffinityRowData } from '@kubevirt-utils/components/AffinityModal/utils/types';
 import { isEqualObject } from '@kubevirt-utils/components/NodeSelectorModal/utils/helpers';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { modelToGroupVersionKind, NodeModel } from '@kubevirt-utils/models';
-import { getTemplateVirtualMachineObject, Template } from '@kubevirt-utils/resources/template';
+import { getTemplateVirtualMachineObject, type Template } from '@kubevirt-utils/resources/template';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { ModalVariant } from '@patternfly/react-core';
@@ -32,7 +32,7 @@ type AffinityModalProps = {
 
 const AffinityRulesModal: FC<AffinityModalProps> = ({ isOpen, onClose, onSubmit, template }) => {
   const { t } = useKubevirtTranslation();
-  const [affinities, setAffinities] = useState<AffinityRowData[]>(
+  const [affinities, setAffinities] = useState<AffinityRowData[]>(() =>
     getRowsDataFromAffinity(getAffinity(template)),
   );
   const [focusedAffinity, setFocusedAffinity] = useState<AffinityRowData>(defaultNewAffinity);
@@ -48,13 +48,13 @@ const AffinityRulesModal: FC<AffinityModalProps> = ({ isOpen, onClose, onSubmit,
     affinities,
   );
 
-  const onAffinityAdd = (affinity: AffinityRowData) => {
+  const onAffinityAdd = (affinity: AffinityRowData): void => {
     setAffinities((prevAffinities) => [...(prevAffinities || []), affinity]);
     setIsEditing(false);
     setIsCreating(false);
   };
 
-  const onAffinityChange = (updatedAffinity: AffinityRowData) => {
+  const onAffinityChange = (updatedAffinity: AffinityRowData): void => {
     setAffinities((prevAffinities) =>
       prevAffinities.map((affinity) => {
         if (affinity.id === updatedAffinity.id) return { ...affinity, ...updatedAffinity };
@@ -64,21 +64,21 @@ const AffinityRulesModal: FC<AffinityModalProps> = ({ isOpen, onClose, onSubmit,
     setIsEditing(false);
   };
 
-  const onAffinityClickAdd = () => {
+  const onAffinityClickAdd = (): void => {
     setIsEditing(true);
     setIsCreating(true);
     setFocusedAffinity({ ...defaultNewAffinity, id: getAvailableAffinityID(affinities) });
   };
 
-  const onAffinityClickEdit = (affinity: AffinityRowData) => {
+  const onAffinityClickEdit = (affinity: AffinityRowData): void => {
     setFocusedAffinity(affinity);
     setIsEditing(true);
   };
 
-  const onAffinityDelete = (affinity: AffinityRowData) =>
+  const onAffinityDelete = (affinity: AffinityRowData): void =>
     setAffinities((prevAffinities) => prevAffinities.filter(({ id }) => id !== affinity.id));
 
-  const onCancel = () => {
+  const onCancel = (): void => {
     setIsEditing(false);
     setIsCreating(false);
   };

@@ -1,9 +1,9 @@
-import React, { FC, useMemo, useState } from 'react';
+import React, { type FC, useMemo, useState } from 'react';
 
 import { VirtualMachineSnapshotModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
-  V1beta1VirtualMachineSnapshot,
-  V1VirtualMachine,
+  type V1beta1VirtualMachineSnapshot,
+  type V1VirtualMachine,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import {
   generateSnapshot,
@@ -35,7 +35,6 @@ import { getVolumeSnapshotStatusesPartition } from '@virtualmachines/details/tab
 import { printableVMStatus } from '@virtualmachines/utils';
 
 import FormGroupHelperText from '../FormGroupHelperText/FormGroupHelperText';
-
 import SupportedVolumesAlert from './alerts/SupportedVolumesAlert';
 import UnsupportedVolumesAlert from './alerts/UnsupportedVolumesAlert';
 import SnapshotDeadlineFormField from './SnapshotFormFields/SnapshotDeadlineFormField';
@@ -51,7 +50,7 @@ type SnapshotModalProps = {
 
 const SnapshotModal: FC<SnapshotModalProps> = ({ isOpen, onClose, vm }) => {
   const { t } = useKubevirtTranslation();
-  const [snapshotName, setSnapshotName] = useState<string>(generateSnapshotName(vm));
+  const [snapshotName, setSnapshotName] = useState<string>(() => generateSnapshotName(vm));
   const isSnapshotNameValid = isDNS1123Label(snapshotName);
   const [description, setDescription] = useState<string>(undefined);
   const [deadline, setDeadline] = useState<string>(undefined);
@@ -61,7 +60,7 @@ const SnapshotModal: FC<SnapshotModalProps> = ({ isOpen, onClose, vm }) => {
   const { supportedVolumes, unsupportedVolumes } =
     getVolumeSnapshotStatusesPartition(volumeSnapshotStatuses);
 
-  const [isSubmitDisabled, setSubmitDisabled] = useState<boolean>(false);
+  const [isSubmitDisabled, setIsSubmitDisabled] = useState<boolean>(false);
 
   const resultSnapshot = useMemo(
     () => generateSnapshot(vm, snapshotName, description, deadline, deadlineUnit),
@@ -70,6 +69,11 @@ const SnapshotModal: FC<SnapshotModalProps> = ({ isOpen, onClose, vm }) => {
 
   return (
     <TabModal<V1beta1VirtualMachineSnapshot>
+      headerText={t('Take snapshot')}
+      isDisabled={isSubmitDisabled || !isSnapshotNameValid}
+      isOpen={isOpen}
+      obj={resultSnapshot}
+      onClose={onClose}
       onSubmit={async (obj) => {
         try {
           const result = await kubevirtK8sCreate<V1beta1VirtualMachineSnapshot>({
@@ -87,11 +91,6 @@ const SnapshotModal: FC<SnapshotModalProps> = ({ isOpen, onClose, vm }) => {
           throw error;
         }
       }}
-      headerText={t('Take snapshot')}
-      isDisabled={isSubmitDisabled || !isSnapshotNameValid}
-      isOpen={isOpen}
-      obj={resultSnapshot}
-      onClose={onClose}
       shouldWrapInForm
     >
       <SupportedVolumesAlert
@@ -100,7 +99,7 @@ const SnapshotModal: FC<SnapshotModalProps> = ({ isOpen, onClose, vm }) => {
       <FormGroup fieldId="name" isRequired label={t('Name')}>
         <TextInput
           id="name"
-          onChange={(_, newName: string) => setSnapshotName(newName)}
+          onChange={(_event, newName: string) => setSnapshotName(newName)}
           type="text"
           validated={isSnapshotNameValid ? ValidatedOptions.default : ValidatedOptions.error}
           value={snapshotName}
@@ -115,7 +114,7 @@ const SnapshotModal: FC<SnapshotModalProps> = ({ isOpen, onClose, vm }) => {
         <TextArea
           className="snapshot-modal__description-textarea"
           id="description"
-          onChange={(_, newDescription: string) => setDescription(newDescription)}
+          onChange={(_event, newDescription: string) => setDescription(newDescription)}
           resizeOrientation="vertical"
           value={description}
         />
@@ -125,7 +124,7 @@ const SnapshotModal: FC<SnapshotModalProps> = ({ isOpen, onClose, vm }) => {
         deadlineUnit={deadlineUnit}
         setDeadline={setDeadline}
         setDeadlineUnit={setDeadlineUnit}
-        setIsError={setSubmitDisabled}
+        setIsError={setIsSubmitDisabled}
       />
       <SnapshotSupportedVolumeList volumesCount={supportedVolumes?.length ?? 0}>
         <List>

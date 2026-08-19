@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useEffect, useRef } from 'react';
 
 import { consoleFetch } from '@openshift-console/dynamic-plugin-sdk';

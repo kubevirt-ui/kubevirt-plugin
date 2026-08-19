@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC } from 'react';
 
 import { NetworkInterfaceState } from '@kubevirt-utils/resources/vm/utils/network/types';

@@ -1,10 +1,9 @@
-import React, { FC, useState } from 'react';
+import React, { type FC, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ExpandableSection, FormGroup, ModalVariant } from '@patternfly/react-core';
 
 import TabModal from '../TabModal/TabModal';
-
 import SelectSysprep from './SelectSysprep';
 import Sysprep from './Sysprep';
 
@@ -34,10 +33,10 @@ export const SysprepModal: FC<{
   const { t } = useKubevirtTranslation();
   const [autoUnattend, setAutoUnattend] = useState(initialAutoUnattend);
   const [unattend, setUnattend] = useState(initialUnattend);
-  const [creationSectionOpen, setCreationSection] = useState(shouldCreateConfigMap);
+  const [creationSectionOpen, setCreationSectionOpen] = useState(shouldCreateConfigMap);
   const [selectedSysprepName, setSelectedSysprepName] = useState(sysprepSelected);
 
-  const submitHandler = async () => {
+  const submitHandler = async (): Promise<void> => {
     if (enableCreation && creationSectionOpen) {
       return await onSysprepCreation(unattend, autoUnattend);
     }
@@ -78,7 +77,7 @@ export const SysprepModal: FC<{
         <ExpandableSection
           isExpanded={creationSectionOpen}
           isIndented
-          onToggle={(_event, val) => setCreationSection(val)}
+          onToggle={(_event, val) => setCreationSectionOpen(val)}
           toggleText={t('Create new sysprep')}
         >
           <Sysprep
@@ -91,7 +90,7 @@ export const SysprepModal: FC<{
         <ExpandableSection
           isExpanded={!creationSectionOpen}
           isIndented
-          onToggle={() => setCreationSection(!creationSectionOpen)}
+          onToggle={() => setCreationSectionOpen(!creationSectionOpen)}
           toggleText={t('Attach existing sysprep')}
         >
           <SelectSysprep

@@ -1,5 +1,36 @@
 import { type LabelEntry } from './constants';
 
+type ProcessLabelChangeResult =
+  | { isValid: false; labels?: never }
+  | { isValid: true; labels: string[] };
+
+const getLabelKey = (label: string): string => label.split('=')[0];
+
+export const processLabelChange = (
+  newLabels: string[],
+  changed: string[],
+): ProcessLabelChangeResult => {
+  const newLabel = changed[0];
+  if (!isLabelValid(newLabel)) {
+    return { isValid: false };
+  }
+
+  // duplicate labels
+  if (newLabels.filter((label) => label === newLabel).length > 1) {
+    return { isValid: false };
+  }
+
+  // if key exists, overwrite value
+  if (newLabels.filter((label) => getLabelKey(label) === getLabelKey(newLabel)).length > 1) {
+    const filteredLabels = newLabels.filter(
+      (label) => getLabelKey(label) !== getLabelKey(newLabel),
+    );
+    return { isValid: true, labels: [...filteredLabels, newLabel] };
+  }
+
+  return { isValid: true, labels: newLabels };
+};
+
 // Old LabelsModal utilities (tag-input based)
 export const labelsToArray = (labels: { [key: string]: string }): string[] => {
   return Object.entries(labels).map(([key, value]) => (value ? `${key}=${value}` : key));

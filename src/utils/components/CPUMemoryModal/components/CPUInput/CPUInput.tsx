@@ -1,6 +1,6 @@
-import React, { Dispatch, FC, SetStateAction, useState } from 'react';
+import React, { type Dispatch, type FC, type SetStateAction, useState } from 'react';
 
-import { V1CPU } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1CPU } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import VCPUInput from '@kubevirt-utils/components/CPUMemoryModal/components/CPUInput/components/vCPUInput/VCPUInput';
 import {
   convertTopologyToVCPUs,
@@ -31,12 +31,12 @@ const CPUInput: FC<CPUInputProps> = ({
   userEnteredCPU,
 }) => {
   const { t } = useKubevirtTranslation();
-  const [selectedRadioOption, setSelectedRadioOption] = useState<CPUInputType>(
+  const [selectedRadioOption, setSelectedRadioOption] = useState<CPUInputType>(() =>
     getInitialCPUInputType(userEnteredCPU),
   );
 
   // Disable vCPU mode for complex topologies (cores > 1 or threads > 1)
-  const isComplexTopology = (userEnteredCPU?.cores || 1) > 1 || (userEnteredCPU?.threads || 1) > 1;
+  const isComplexTopology = (userEnteredCPU?.cores ?? 1) > 1 || (userEnteredCPU?.threads ?? 1) > 1;
 
   const radioInputName = 'cpu-input-type';
 
@@ -59,16 +59,16 @@ const CPUInput: FC<CPUInputProps> = ({
             setCPU={setUserEnteredCPU}
           />
         }
-        onClick={() => {
-          if (!isComplexTopology) {
-            setSelectedRadioOption(CPUInputType.editVCPU);
-          }
-        }}
         id={CPUInputType.editVCPU}
         isChecked={selectedRadioOption === CPUInputType.editVCPU}
         isDisabled={isComplexTopology}
         isLabelWrapped
         name={radioInputName}
+        onClick={() => {
+          if (!isComplexTopology) {
+            setSelectedRadioOption(CPUInputType.editVCPU);
+          }
+        }}
       />
       <CPUHelperText
         cpu={userEnteredCPU}
@@ -84,14 +84,14 @@ const CPUInput: FC<CPUInputProps> = ({
             setCPU={setUserEnteredCPU}
           />
         }
-        onClick={() => {
-          setSelectedRadioOption(CPUInputType.editTopologyManually);
-        }}
         className="cpu-input__edit-topology-manually"
         id={CPUInputType.editTopologyManually}
         isChecked={selectedRadioOption === CPUInputType.editTopologyManually}
         label={<>{t('Set CPU topology manually')}</>}
         name={radioInputName}
+        onClick={() => {
+          setSelectedRadioOption(CPUInputType.editTopologyManually);
+        }}
       />
     </div>
   );

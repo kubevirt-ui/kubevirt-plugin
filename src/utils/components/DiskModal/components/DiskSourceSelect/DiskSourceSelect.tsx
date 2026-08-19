@@ -1,12 +1,11 @@
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 import classNames from 'classnames';
 
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Divider, SelectGroup } from '@patternfly/react-core';
 
-import { SourceTypes } from '../../utils/types';
-
+import { type SourceTypes } from '../../utils/types';
 import DiskSourceOption from './components/DiskSourceOption/DiskSourceOption';
 import { getAttachExistingGroupOptions, getBlankOption, getCDROMOption } from './utils/constants';
 
@@ -33,7 +32,7 @@ const DiskSourceSelect: FC<DiskSourceSelectProps> = ({
       className={classNames('disk-source-select', className)}
       data-test="storage-add-button"
       isDisabled={!canUpdate}
-      onSelect={(_, val) => onSelect(val as SourceTypes)}
+      onSelect={(_event, val) => onSelect(val as SourceTypes)}
       selectedLabel={t('Add')}
       toggleProps={{ className: 'pf-v6-u-mb-sm', variant: 'primary' }}
     >
@@ -44,7 +43,7 @@ const DiskSourceSelect: FC<DiskSourceSelectProps> = ({
         label={attachExistingGroupOptions.groupLabel}
       >
         {attachExistingGroupOptions.items.map((item) => (
-          <DiskSourceOption {...item} isDisabled={!canUpdate} key={item.id} onSelect={onSelect} />
+          <DiskSourceOption key={item.id} {...item} isDisabled={!canUpdate} onSelect={onSelect} />
         ))}
       </SelectGroup>
       <Divider component="li" />

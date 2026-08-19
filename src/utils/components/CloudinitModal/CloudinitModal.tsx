@@ -1,7 +1,10 @@
-import React, { FC, useState } from 'react';
+import React, { type FC, useState } from 'react';
 import produce from 'immer';
 
-import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import {
+  type V1VirtualMachine,
+  type V1VirtualMachineInstance,
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import ModalPendingChangesAlert from '@kubevirt-utils/components/PendingChanges/ModalPendingChangesAlert/ModalPendingChangesAlert';
 import {
   getCloudInitPropagationMethod,
@@ -12,9 +15,8 @@ import { Radio, Split, SplitItem, Stack, StackItem } from '@patternfly/react-cor
 
 import CloudInitInfoHelper from '../CloudinitDescription/CloudinitInfoHelper';
 import TabModal from '../TabModal/TabModal';
-
-import { useCloudInit } from './utils/useCloudInit';
 import CloudinitForm from './CloudinitForm';
+import { useCloudInit } from './utils/useCloudInit';
 
 import './cloud-init.scss';
 
@@ -30,14 +32,14 @@ const CloudinitModal: FC<{
   const { updatedVM, updateFromYAML, ...cloudInitHookValues } = useCloudInit(vm);
 
   const [showEditor, setShowEditor] = useState<boolean>(false);
-  const [isSubmitDisabled, setSubmitDisabled] = useState<boolean>(false);
+  const [isSubmitDisabled, setIsSubmitDisabled] = useState<boolean>(false);
 
-  const onEditorSave = (yaml: string) => {
-    setSubmitDisabled(false);
+  const onEditorSave = (yaml: string): void => {
+    setIsSubmitDisabled(false);
     updateFromYAML(yaml);
   };
 
-  const onSubmitModal = () => {
+  const onSubmitModal = (): Promise<V1VirtualMachine | void> => {
     const updateSSHDynamicInjectionVM = produce<V1VirtualMachine>(
       updatedVM,
       (vmDraft: V1VirtualMachine) => {
@@ -70,28 +72,28 @@ const CloudinitModal: FC<{
               </SplitItem>
               <SplitItem>
                 <Radio
-                  onChange={() => {
-                    setShowEditor(false);
-                    setSubmitDisabled(false);
-                  }}
                   aria-label={t('Form view')}
                   id="form-radio"
                   isChecked={!showEditor}
                   label={t('Form view')}
                   name={'form-radio'}
+                  onChange={() => {
+                    setShowEditor(false);
+                    setIsSubmitDisabled(false);
+                  }}
                 />
               </SplitItem>
               <SplitItem>
                 <Radio
-                  onChange={() => {
-                    setShowEditor(true);
-                    setSubmitDisabled(true);
-                  }}
                   aria-label={t('Script')}
                   id="editor-radio"
                   isChecked={showEditor}
                   label={t('Script')}
                   name={'editor-radio'}
+                  onChange={() => {
+                    setShowEditor(true);
+                    setIsSubmitDisabled(true);
+                  }}
                 />
               </SplitItem>
             </Split>
@@ -99,7 +101,7 @@ const CloudinitModal: FC<{
         )}
         <CloudinitForm
           onEditorSave={onEditorSave}
-          setSubmitDisabled={setSubmitDisabled}
+          setSubmitDisabled={setIsSubmitDisabled}
           showEditor={showEditor}
           {...cloudInitHookValues}
         />

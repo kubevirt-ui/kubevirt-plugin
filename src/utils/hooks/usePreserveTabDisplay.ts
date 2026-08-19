@@ -8,20 +8,20 @@ type UsePreserveTabDisplayProps = {
   storageKey: string;
 };
 
-const usePreserveTabDisplay = ({ basePath, storageKey }: UsePreserveTabDisplayProps) => {
+const usePreserveTabDisplay = ({ basePath, storageKey }: UsePreserveTabDisplayProps): void => {
   const { ns: namespace } = useParams<{ ns: string }>();
   const location = useLocation();
   const navigate = useNavigate();
   const currentNsRef = useRef(namespace);
   const currentTabRef = useRef<string>('');
-  const isInitialMount = useRef(true);
+  const isInitialMountRef = useRef(true);
 
   useEffect(() => {
     if (runningTourSignal.value) return;
 
     const extractPathSegmentRegex = new RegExp(`${basePath}/(.+)`);
-    const match = location.pathname.match(extractPathSegmentRegex);
-    const currentTab = match?.[1] || '';
+    const match = extractPathSegmentRegex.exec(location.pathname);
+    const currentTab = match?.[1] ?? '';
 
     const namespaceChanged = currentNsRef.current !== namespace;
     const prevTab = currentTabRef.current;
@@ -33,8 +33,8 @@ const usePreserveTabDisplay = ({ basePath, storageKey }: UsePreserveTabDisplayPr
       sessionStorage.setItem(storageKey, currentTab);
     }
 
-    if (isInitialMount.current) {
-      isInitialMount.current = false;
+    if (isInitialMountRef.current) {
+      isInitialMountRef.current = false;
       return;
     }
 

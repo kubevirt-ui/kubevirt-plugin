@@ -1,7 +1,7 @@
-import React, { FC, useState } from 'react';
+import React, { type FC, useState } from 'react';
 import { Trans } from 'react-i18next';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import FolderSelect from '@kubevirt-utils/components/FolderSelect/FolderSelect';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -22,19 +22,19 @@ type MoveVMToFolderModalProps = {
 
 const MoveVMToFolderModal: FC<MoveVMToFolderModalProps> = ({ isOpen, onClose, onSubmit, vm }) => {
   const { t } = useKubevirtTranslation();
-  const [folderName, setFolderName] = useState<string>(getLabel(vm, VM_FOLDER_LABEL));
+  const [folderName, setFolderName] = useState<string>(() => getLabel(vm, VM_FOLDER_LABEL));
 
   const removeFolderQuery = useRemoveFolderQuery([vm]);
 
   return (
     <TabModal<V1VirtualMachine>
+      headerText={t('Move to group')}
+      isOpen={isOpen}
+      onClose={onClose}
       onSubmit={() => {
         removeFolderQuery?.(folderName);
         return onSubmit(folderName);
       }}
-      headerText={t('Move to group')}
-      isOpen={isOpen}
-      onClose={onClose}
     >
       <Stack hasGutter>
         <StackItem>

@@ -1,9 +1,9 @@
-import React, { createRef, FC } from 'react';
+import React, { type FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
-  BootableDeviceType,
-  DeviceType,
+  type BootableDeviceType,
+  type DeviceType,
 } from '@kubevirt-utils/resources/vm/utils/boot-order/bootOrder';
 import {
   Button,
@@ -43,7 +43,7 @@ export const BootOrderModalBody: FC<{
     return result;
   };
 
-  const onDrop = (source, dest) => {
+  const onDrop = (source, dest): boolean | undefined => {
     if (dest) {
       const newBootableDevices = reorder(devices, source.index, dest.index);
       onChange(newBootableDevices);
@@ -53,8 +53,8 @@ export const BootOrderModalBody: FC<{
   };
 
   // Remove a bootOrder from a device by index.
-  const onDelete = (name: string) => {
-    const deviceToUpdate = devices.find((d) => d.value.name === name);
+  const onDelete = (name: string): void => {
+    const deviceToUpdate = devices.find((disk) => disk.value.name === name);
 
     const newDevices = [
       ...devices.filter((device) => device.value.name !== name),
@@ -70,15 +70,15 @@ export const BootOrderModalBody: FC<{
     <>
       {showEmpty ? (
         <BootOrderEmptyState
+          addItemDisabledMessage={t('All sources selected')}
+          addItemIsDisabled={devices.length === 0}
+          addItemMessage={t('Add source')}
           message={t(
             'VirtualMachine will attempt to boot from disks by order of apearance in YAML file',
           )}
           onClick={() => {
             changeEditMode(true);
           }}
-          addItemDisabledMessage={t('All sources selected')}
-          addItemIsDisabled={devices.length === 0}
-          addItemMessage={t('Add source')}
           title={t('No resource selected')}
         />
       ) : (
@@ -87,7 +87,7 @@ export const BootOrderModalBody: FC<{
             <DataList aria-label="draggable data list example">
               {devices.map(({ type, value }, index) => (
                 <Draggable hasNoWrapper key={value.name}>
-                  <DataListItem aria-labelledby={value.name} ref={createRef()}>
+                  <DataListItem aria-labelledby={value.name}>
                     <DataListItemRow>
                       <DataListControl>
                         <DataListDragButton

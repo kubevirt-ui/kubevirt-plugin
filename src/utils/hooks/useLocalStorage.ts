@@ -1,18 +1,18 @@
 import { useCallback, useEffect, useState } from 'react';
 
-import { parseNestedJSON } from './useKubevirtUserSettings/utils/utils';
 import { EVENT_LOCALSTORAGE } from './constants';
+import { parseNestedJSON } from './useKubevirtUserSettings/utils/utils';
 
 type UseLocalStorage = <T = string>(
   key: string,
   initialValue?: string,
-) => [value: T, setLocalStorageValue: (newValue: any) => void, removeItem: () => void];
+) => [value: T, setLocalStorageValue: (newValue: T) => void, removeItem: () => void];
 
 const event = new Event(EVENT_LOCALSTORAGE);
 const useLocalStorage: UseLocalStorage = <T = string>(key, initialValue) => {
-  const [value, setValue] = useState<T>(parseNestedJSON(localStorage.getItem(key)));
+  const [value, setValue] = useState<T>(() => parseNestedJSON(localStorage.getItem(key)));
 
-  const setLocalStorageValue = (val: any) => {
+  const setLocalStorageValue = (val: T): void => {
     localStorage.setItem(key, JSON.stringify(val));
     document.dispatchEvent(event);
   };
@@ -21,7 +21,7 @@ const useLocalStorage: UseLocalStorage = <T = string>(key, initialValue) => {
     setLocalStorageValue(initialValue);
   }
 
-  const removeItem = () => {
+  const removeItem = (): void => {
     localStorage.removeItem(key);
     document.dispatchEvent(event);
   };
@@ -32,7 +32,7 @@ const useLocalStorage: UseLocalStorage = <T = string>(key, initialValue) => {
 
   useEffect(() => {
     document.addEventListener(EVENT_LOCALSTORAGE, localStorageSetHandler, false);
-    return () => {
+    return (): void => {
       document.removeEventListener(EVENT_LOCALSTORAGE, localStorageSetHandler, false);
     };
   }, [localStorageSetHandler]);

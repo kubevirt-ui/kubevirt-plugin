@@ -1,17 +1,17 @@
-import { Dispatch, SetStateAction } from 'react';
-import { TFunction } from 'i18next';
+import { type Dispatch, type SetStateAction } from 'react';
+import { type TFunction } from 'i18next';
 
-import { KeyboardLayout, keyMaps } from '@kubevirt-ui-ext/vnc-keymaps';
-import { ModalComponent } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import { type KeyboardLayout, keyMaps } from '@kubevirt-ui-ext/vnc-keymaps';
+import { type ModalComponent } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import useLocalStorage from '@kubevirt-utils/hooks/useLocalStorage';
 
 import {
-  ConsoleState,
+  type ConsoleState,
   DESKTOP_VIEWER_CONSOLE_TYPE,
   SERIAL_CONSOLE_TYPE,
   VNC_CONSOLE_TYPE,
 } from '../../utils/ConsoleConsts';
-import { ConsoleType } from '../../utils/types';
+import { type ConsoleType } from '../../utils/types';
 
 export type AccessConsolesActions = {
   connect?: () => void;
@@ -62,7 +62,7 @@ export const useFavoriteKeymaps = (): {
   updateFavorite: (value: KeyboardLayout) => void;
 } => {
   const [savedFavoriteKeymaps, setLocalStorageValue, removeItem] =
-    useLocalStorage(VNC_FAVORITE_KEYMAPS_KEY);
+    useLocalStorage<KeyboardLayout[]>(VNC_FAVORITE_KEYMAPS_KEY);
   const knownKeymaps = new Set(Object.keys(keyMaps));
   const filteredFavoriteKeymaps: KeyboardLayout[] = (
     Array.isArray(savedFavoriteKeymaps) ? savedFavoriteKeymaps : []
@@ -70,7 +70,7 @@ export const useFavoriteKeymaps = (): {
   return {
     defaultKeyboard: filteredFavoriteKeymaps?.[0] ?? EN_US,
     favoriteKeymaps: filteredFavoriteKeymaps,
-    updateFavorite: (value: KeyboardLayout) => {
+    updateFavorite: (value: KeyboardLayout): void => {
       if (!filteredFavoriteKeymaps.includes(value)) {
         // put the new value first - main use case: add/remove EN_US on top
         // of existing favorites to change the defaults

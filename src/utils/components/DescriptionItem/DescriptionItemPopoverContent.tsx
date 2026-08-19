@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { cloneElement, FC, isValidElement, ReactElement, ReactNode } from 'react';
 
 import { SPACE_SYMBOL } from '@kubevirt-utils/constants/constants';

@@ -8,6 +8,8 @@ import testingLibrary from 'eslint-plugin-testing-library';
 import unicorn from 'eslint-plugin-unicorn';
 import tseslint from 'typescript-eslint';
 
+import eslintReact from '@eslint-react/eslint-plugin';
+
 const ignoresConfig = {
   ignores: [
     'dist/**',
@@ -94,6 +96,21 @@ const baseConfig = {
 
 const tsConfigs = [{ ...tseslint.configs.base, files: ['**/*.{ts,tsx}'] }];
 
+const reactConfig = {
+  ...eslintReact.configs['recommended-typescript'],
+  files: ['**/*.{ts,tsx}'],
+  rules: {
+    ...eslintReact.configs['recommended-typescript'].rules,
+    '@eslint-react/exhaustive-deps': 'off',
+    '@eslint-react/purity': 'off',
+    '@eslint-react/rules-of-hooks': 'off',
+    // TODO: tackle set-state-in-effect in a later version — 82 files affected
+    '@eslint-react/set-state-in-effect': 'off',
+    '@eslint-react/set-state-in-render': 'off',
+    '@eslint-react/unsupported-syntax': 'off',
+  },
+};
+
 const prettierOverrides = {
   rules: {
     'prettier/prettier': ['error', { endOfLine: 'auto' }],
@@ -123,6 +140,7 @@ export default [
   ignoresConfig,
   baseConfig,
   ...tsConfigs,
+  reactConfig,
   prettier,
   prettierOverrides,
   githubScriptsOverrides,

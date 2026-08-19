@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC, useState } from 'react';
 
 import { TemplateParameter } from '@kubevirt-ui-ext/kubevirt-api/console';

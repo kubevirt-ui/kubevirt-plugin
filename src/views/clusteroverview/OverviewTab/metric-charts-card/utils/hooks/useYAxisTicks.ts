@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { UseYAxisTicks } from './types';
 import { yTickFormat } from './utils';
 

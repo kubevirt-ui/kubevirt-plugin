@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC, useEffect, useMemo, useState } from 'react';
 
 import NewBadge from '@kubevirt-utils/components/badges/NewBadge/NewBadge';

@@ -1,9 +1,9 @@
-import React, { FC, useState } from 'react';
+import React, { type FC, useState } from 'react';
 
 import { VirtualMachineSnapshotModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
-  V1beta1VirtualMachineSnapshot,
-  V1VirtualMachine,
+  type V1beta1VirtualMachineSnapshot,
+  type V1VirtualMachine,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import {
   generateSnapshot,
@@ -12,31 +12,17 @@ import {
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { addRandomSuffix } from '@kubevirt-utils/utils/utils';
-import { getDNS1123LabelError } from '@kubevirt-utils/utils/validation';
-import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverContentWithLightspeedButton/PopoverContentWithLightspeedButton';
-import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sCreate } from '@multicluster/k8sRequests';
-import {
-  FormGroup,
-  List,
-  ListItem,
-  Stack,
-  StackItem,
-  TextArea,
-  TextInput,
-  ValidatedOptions,
-} from '@patternfly/react-core';
+import { FormGroup, List, ListItem, Stack, StackItem, TextArea } from '@patternfly/react-core';
 import { deadlineUnits } from '@virtualmachines/details/tabs/snapshots/utils/consts';
 import { getVolumeSnapshotStatusesPartitionPerVM } from '@virtualmachines/details/tabs/snapshots/utils/helpers';
 
-import FormGroupHelperText from '../FormGroupHelperText/FormGroupHelperText';
-import HelpTextIcon from '../HelpTextIcon/HelpTextIcon';
 import TabModal from '../TabModal/TabModal';
-
 import BulkUnsupportedVolumesAlert from './alerts/BulkUnsupportedVolumesAlert';
 import { useSuffixValidation } from './hooks/useSuffixValidation';
 import SnapshotDeadlineFormField from './SnapshotFormFields/SnapshotDeadlineFormField';
+import SnapshotSuffixFormField from './SnapshotFormFields/SnapshotSuffixFormField';
 import SnapshotSupportedVolumeList from './SnapshotFormFields/SnapshotSupportedVolumeList';
 
 import './BulkSnapshotModal.scss';
@@ -50,7 +36,7 @@ type BulkSnapshotModalProps = {
 const BulkSnapshotModal: FC<BulkSnapshotModalProps> = ({ isOpen, onClose, vms }) => {
   const { t } = useKubevirtTranslation();
 
-  const [snapshotSuffix, setSnapshotSuffix] = useState<string>(generateSnapshotSuffix());
+  const [snapshotSuffix, setSnapshotSuffix] = useState<string>(() => generateSnapshotSuffix());
   const {
     isSuffixValid,
     isSuffixValidDNS1123Label,
@@ -67,7 +53,7 @@ const BulkSnapshotModal: FC<BulkSnapshotModalProps> = ({ isOpen, onClose, vms })
 
   const { supportedVolumes, unsupportedVolumes } = getVolumeSnapshotStatusesPartitionPerVM(vms);
 
-  const onSubmit = () => {
+  const onSubmit = (): Promise<V1beta1VirtualMachineSnapshot[]> => {
     return Promise.all(
       vms.map((vm) => {
         const shortenVMName = getName(vm).substring(0, maxVMNameLength);
@@ -92,53 +78,18 @@ const BulkSnapshotModal: FC<BulkSnapshotModalProps> = ({ isOpen, onClose, vms })
       onSubmit={onSubmit}
       shouldWrapInForm
     >
-      <FormGroup
-        labelHelp={
-          <HelpTextIcon
-            bodyContent={(hide) => (
-              <PopoverContentWithLightspeedButton
-                content={t(
-                  'The resulting snapshot name will be formatted as {VM name}-{random 6 characters}-{suffix}.',
-                )}
-                hide={hide}
-                promptType={OLSPromptType.SNAPSHOTS}
-              />
-            )}
-          />
-        }
-        fieldId="suffix"
-        isRequired
-        label={t('Suffix')}
-      >
-        <TextInput
-          id="suffix"
-          onChange={(_, newName: string) => setSnapshotSuffix(newName)}
-          type="text"
-          validated={isSuffixValid ? ValidatedOptions.default : ValidatedOptions.error}
-          value={snapshotSuffix}
-        />
-        {!snapshotSuffix && (
-          <FormGroupHelperText validated={ValidatedOptions.error}>
-            {t('Suffix cannot be empty')}
-          </FormGroupHelperText>
-        )}
-        {!isSuffixValidLength && (
-          <FormGroupHelperText validated={ValidatedOptions.error}>
-            {t('Suffix cannot be longer than {{maxSuffixLength}} characters', {
-              maxSuffixLength,
-            })}
-          </FormGroupHelperText>
-        )}
-        {snapshotSuffix && !isSuffixValidDNS1123Label && (
-          <FormGroupHelperText validated={ValidatedOptions.error}>
-            {getDNS1123LabelError(snapshotSuffix)?.(t)}
-          </FormGroupHelperText>
-        )}
-      </FormGroup>
+      <SnapshotSuffixFormField
+        isSuffixValid={isSuffixValid}
+        isSuffixValidDNS1123Label={isSuffixValidDNS1123Label}
+        isSuffixValidLength={isSuffixValidLength}
+        maxSuffixLength={maxSuffixLength}
+        setSnapshotSuffix={setSnapshotSuffix}
+        snapshotSuffix={snapshotSuffix}
+      />
       <FormGroup fieldId="description" label={t('Description')}>
         <TextArea
           id="description"
-          onChange={(_, newDescription: string) => setDescription(newDescription)}
+          onChange={(_event, newDescription: string) => setDescription(newDescription)}
           resizeOrientation="vertical"
           value={description}
         />

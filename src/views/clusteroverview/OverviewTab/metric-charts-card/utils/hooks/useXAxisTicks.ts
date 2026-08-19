@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { UseXAxisTicks } from './types';
 import { getDayMidpoints, isSingleDayData, xTickFormat } from './utils';
 

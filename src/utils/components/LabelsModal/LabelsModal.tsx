@@ -1,22 +1,14 @@
-import React, {
-  ChangeEvent,
-  DetailedHTMLProps,
-  FC,
-  HTMLAttributes,
-  memo,
-  useMemo,
-  useState,
-} from 'react';
+import React, { type ChangeEvent, type FC, memo, type ReactNode, useMemo, useState } from 'react';
 import TagsInput from 'react-tagsinput';
 
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { logVMLabelsCollectedIfVirtualMachine } from '@kubevirt-utils/extensions/telemetry/labels';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import { type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { Label as PFLabel, Stack, StackItem, Truncate } from '@patternfly/react-core';
 
-import { isLabelValid, labelsArrayToObject, labelsToArray } from './utils';
+import { isLabelValid, labelsArrayToObject, labelsToArray, processLabelChange } from './utils';
 
 import './LabelsModal.scss';
 
@@ -29,7 +21,14 @@ type LabelsModalProps = {
   modalDescriptionText?: string;
   obj: K8sResourceCommon;
   onClose: () => void;
-  onLabelsSubmit: (labels: { [key: string]: string }) => Promise<any>;
+  onLabelsSubmit: (labels: { [key: string]: string }) => Promise<unknown>;
+};
+
+type RenderTagProps = {
+  getTagDisplayValue: (tagValue: string) => string;
+  key: number;
+  onRemove: (tagKey: number) => void;
+  tag: string;
 };
 
 export const LabelsModal: FC<LabelsModalProps> = memo(
@@ -47,7 +46,7 @@ export const LabelsModal: FC<LabelsModalProps> = memo(
     const [isInputValid, setIsInputValid] = useState(true);
 
     const initLabels = useMemo(() => {
-      if (initialLabels !== null && initialLabels !== undefined) {
+      if (initialLabels !== undefined) {
         return initialLabels;
       }
 
@@ -58,9 +57,9 @@ export const LabelsModal: FC<LabelsModalProps> = memo(
       return {};
     }, [initialLabels, obj?.metadata?.labels]);
 
-    const [labels, setLabels] = useState<string[]>(labelsToArray(initLabels));
+    const [labels, setLabels] = useState<string[]>(() => labelsToArray(initLabels));
 
-    const onInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const onInputChange = (e: ChangeEvent<HTMLInputElement>): void => {
       const value = e.target.value;
 
       if (value === '') {
@@ -72,35 +71,20 @@ export const LabelsModal: FC<LabelsModalProps> = memo(
       setIsInputValid(isLabelValid(value));
     };
 
-    const handleLabelsChange = (newLabels: string[], changed: string[]) => {
-      const newLabel = changed[0];
-      if (!isLabelValid(newLabel)) {
+    const handleLabelsChange = (newLabels: string[], changed: string[]): void => {
+      const result = processLabelChange(newLabels, changed);
+      if (!result.isValid) {
         setIsInputValid(false);
         return;
       }
-
-      // duplicate labels
-      if (newLabels.filter((l) => l === newLabel).length > 1) {
-        setIsInputValid(false);
-        return;
-      }
-
-      // if key exists, overwrite value
-      if (newLabels.filter((l) => l.split('=')[0] === newLabel.split('=')[0]).length > 1) {
-        const filteredLabels = newLabels.filter((l) => l.split('=')[0] !== newLabel.split('=')[0]);
-        setLabels([...filteredLabels, newLabel]);
-        setInputValue('');
-        return;
-      }
-
-      setLabels(newLabels);
+      setLabels(result.labels);
       setInputValue('');
     };
 
-    const renderTag = ({ getTagDisplayValue, key, onRemove, tag }) => {
+    const renderTag = ({ getTagDisplayValue, key, onRemove, tag }: RenderTagProps): ReactNode => {
       return (
         <PFLabel
-          className={'co-label tag-item-content'.concat(labelClassName || '')}
+          className={'co-label tag-item-content'.concat(labelClassName ?? '')}
           key={key}
           onClose={() => onRemove(key)}
         >
@@ -125,7 +109,7 @@ export const LabelsModal: FC<LabelsModalProps> = memo(
     // Backspace deletes tags, but not if there is text being edited in the input field
     const removeKeys = inputValue.length ? [] : [8];
 
-    const handleSubmit = async () => {
+    const handleSubmit = async (): Promise<unknown> => {
       const updatedLabels = labelsArrayToObject(labels);
       const result = await onLabelsSubmit(updatedLabels);
       logVMLabelsCollectedIfVirtualMachine(obj, updatedLabels);
@@ -168,13 +152,3 @@ export const LabelsModal: FC<LabelsModalProps> = memo(
     );
   },
 );
-
-// console is declaring a new html element for some reason, we have to copy it for css reasons.
-declare global {
-  // eslint-disable-next-line @typescript-eslint/no-namespace
-  namespace JSX {
-    interface IntrinsicElements {
-      'tags-input': DetailedHTMLProps<HTMLAttributes<HTMLElement>, HTMLElement>;
-    }
-  }
-}

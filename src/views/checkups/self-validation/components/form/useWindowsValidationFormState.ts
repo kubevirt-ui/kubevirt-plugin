@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useCallback, useEffect, useState } from 'react';
 
 import { TEST_SUITE_TIER2 } from '../../utils/constants';

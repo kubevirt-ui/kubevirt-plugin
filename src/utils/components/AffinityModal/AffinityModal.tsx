@@ -1,8 +1,8 @@
-import React, { FC, useMemo, useState } from 'react';
+import React, { type FC, useMemo, useState } from 'react';
 import produce from 'immer';
 
-import { IoK8sApiCoreV1Node } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type IoK8sApiCoreV1Node } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { isEqualObject } from '@kubevirt-utils/components/NodeSelectorModal/utils/helpers';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -20,7 +20,7 @@ import {
   getAvailableAffinityID,
   getRowsDataFromAffinity,
 } from './utils/helpers';
-import { AffinityRowData } from './utils/types';
+import { type AffinityRowData } from './utils/types';
 
 type AffinityModalProps = {
   isOpen: boolean;
@@ -41,7 +41,7 @@ const AffinityModal: FC<AffinityModalProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
 
-  const [affinities, setAffinities] = useState<AffinityRowData[]>(
+  const [affinities, setAffinities] = useState<AffinityRowData[]>(() =>
     getRowsDataFromAffinity(getAffinity(vm)),
   );
   const [focusedAffinity, setFocusedAffinity] = useState<AffinityRowData>(defaultNewAffinity);
@@ -55,13 +55,13 @@ const AffinityModal: FC<AffinityModalProps> = ({
     affinities,
   );
 
-  const onAffinityAdd = (affinity: AffinityRowData) => {
+  const onAffinityAdd = (affinity: AffinityRowData): void => {
     setAffinities((prevAffinities) => [...(prevAffinities || []), affinity]);
     setIsEditing(false);
     setIsCreating(false);
   };
 
-  const onAffinityChange = (updatedAffinity: AffinityRowData) => {
+  const onAffinityChange = (updatedAffinity: AffinityRowData): void => {
     setAffinities((prevAffinities) =>
       prevAffinities.map((affinity) => {
         if (affinity.id === updatedAffinity.id) return { ...affinity, ...updatedAffinity };
@@ -71,21 +71,21 @@ const AffinityModal: FC<AffinityModalProps> = ({
     setIsEditing(false);
   };
 
-  const onAffinityClickAdd = () => {
+  const onAffinityClickAdd = (): void => {
     setIsEditing(true);
     setIsCreating(true);
     setFocusedAffinity({ ...defaultNewAffinity, id: getAvailableAffinityID(affinities) });
   };
 
-  const onAffinityClickEdit = (affinity: AffinityRowData) => {
+  const onAffinityClickEdit = (affinity: AffinityRowData): void => {
     setFocusedAffinity(affinity);
     setIsEditing(true);
   };
 
-  const onAffinityDelete = (affinity: AffinityRowData) =>
+  const onAffinityDelete = (affinity: AffinityRowData): void =>
     setAffinities((prevAffinities) => prevAffinities.filter(({ id }) => id !== affinity.id));
 
-  const onCancel = () => {
+  const onCancel = (): void => {
     setIsEditing(false);
     setIsCreating(false);
   };
@@ -94,9 +94,7 @@ const AffinityModal: FC<AffinityModalProps> = ({
 
   const updatedVirtualMachine = useMemo(() => {
     const updatedVM = produce<V1VirtualMachine>(vm, (vmDraft: V1VirtualMachine) => {
-      if (!vmDraft.spec.template.spec.affinity) {
-        vmDraft.spec.template.spec.affinity = {};
-      }
+      vmDraft.spec.template.spec.affinity ??= {};
 
       const updatedAffinity = getAffinityFromRowsData(affinities);
 
