@@ -1,10 +1,14 @@
-import { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
+import { type ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { ACTIONS } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/const';
-import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
+import {
+  getClusterNamespaceNameKey,
+  getName,
+  getNamespace,
+} from '@kubevirt-utils/resources/shared';
 import { getCluster } from '@multicluster/helpers/selectors';
-import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import { type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
-import { ColumnLayout } from './types';
+import { type ColumnLayout } from './types';
 
 export const buildColumnLayout = <TData, TCallbacks = undefined>(
   columns: ColumnConfig<TData, TCallbacks>[],
@@ -51,3 +55,14 @@ export const getK8sRowId = <T extends K8sResourceCommon>(
 
   return `${fallbackPrefix}-${index}`;
 };
+
+/**
+ * Stable selection identity for K8s resources.
+ * Uses cluster/namespace/name so selection survives object-reference changes from resource watches.
+ */
+export const getK8sSelectionId = <T extends K8sResourceCommon>(resource: T): string =>
+  getClusterNamespaceNameKey(
+    getCluster(resource) ?? '',
+    getNamespace(resource) ?? '',
+    getName(resource) ?? '',
+  );
