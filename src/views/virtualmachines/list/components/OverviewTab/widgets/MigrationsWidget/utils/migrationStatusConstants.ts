@@ -13,6 +13,8 @@ export const OTHER_STATUSES = [
   vmimStatuses.PreparingTarget,
   vmimStatuses.Pending,
   vmimStatuses.Paused,
+  vmimStatuses.Synchronizing,
+  vmimStatuses.WaitingForSync,
 ];
 
 export const buildStatusFilterPath = (basePath: string, statuses: string[]): string =>
