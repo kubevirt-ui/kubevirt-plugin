@@ -23,22 +23,14 @@ type UsePaginationWithFiltersResult = {
   ) => void;
   onPaginationChange: (newPagination: PaginationState) => void;
   pagination: PaginationState;
+  resetPagination: () => void;
 };
 
 const usePaginationWithFilters = (
   filteredDataLength: number,
   onFilterChange?: OnFilterChange,
 ): UsePaginationWithFiltersResult => {
-  const { onPaginationChange, pagination } = usePagination();
-
-  const resetPagination = useCallback(() => {
-    onPaginationChange({
-      endIndex: pagination?.perPage,
-      page: 1,
-      perPage: pagination?.perPage,
-      startIndex: 0,
-    });
-  }, [onPaginationChange, pagination?.perPage]);
+  const { onPaginationChange, pagination, resetPagination } = usePagination();
 
   const handleFilterChange = useCallback(
     (...args: Parameters<OnFilterChange>) => {
@@ -72,6 +64,7 @@ const usePaginationWithFilters = (
     handleSetPage,
     onPaginationChange,
     pagination,
+    resetPagination,
   };
 };
 

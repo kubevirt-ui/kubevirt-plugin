@@ -1,5 +1,5 @@
 /* eslint-disable max-lines */
-import React, { type FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { type FC, useCallback, useEffect, useMemo, useRef } from 'react';
 
 import {
   NodeModel,
@@ -13,18 +13,15 @@ import { runningTourSignal } from '@kubevirt-utils/components/GuidedTour/utils/g
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
 import { TableToolbarActionsFlex } from '@kubevirt-utils/components/TableToolbarActions/TableToolbarActionsFlex';
 import { PageTitles } from '@kubevirt-utils/constants/page-constants';
-import { sortDataViewTableData } from '@kubevirt-utils/hooks/useDataViewTableSort/useDataViewTableSort';
+import { useSortedTableData } from '@kubevirt-utils/hooks/useDataViewTableSort/useSortedTableData';
 import { KUBEVIRT_APISERVER_PROXY } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { type KubevirtFilterState } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import useKubevirtDataViewFilters from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/useKubevirtDataViewFilters';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
-import {
-  paginationDefaultValues,
-  paginationInitialState,
-} from '@kubevirt-utils/hooks/usePagination/utils/constants';
-import { type PaginationState } from '@kubevirt-utils/hooks/usePagination/utils/types';
+import usePagination from '@kubevirt-utils/hooks/usePagination/usePagination';
+import { paginationDefaultValues } from '@kubevirt-utils/hooks/usePagination/utils/constants';
 import useQuery from '@kubevirt-utils/hooks/useQuery';
 import { EXPORT_TABLE_KEYS, KubevirtTableExport } from '@kubevirt-utils/hooks/useTableExport';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -83,8 +80,6 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({
   useVMMetrics();
 
   const query = useQuery();
-  const sortBy = query.get(DataViewSortParams.SORT_BY);
-  const sortDirection = query.get(DataViewSortParams.DIRECTION);
   const selectionResetKey = useMemo(() => {
     const params = new URLSearchParams(query);
     params.delete(DataViewSortParams.SORT_BY);
@@ -141,22 +136,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({
     filterDefinitions,
   });
 
-  const [pagination, setPagination] = useState(paginationInitialState);
-
-  const resetPagination = useCallback(() => {
-    setPagination((prev) => {
-      if (prev.page === 1 && prev.startIndex === 0) {
-        return prev;
-      }
-
-      return {
-        ...prev,
-        endIndex: prev?.perPage,
-        page: 1,
-        startIndex: 0,
-      };
-    });
-  }, []);
+  const { onPaginationChange, pagination, resetPagination } = usePagination();
 
   const handleSetFilters = useCallback(
     (newFilters: Partial<KubevirtFilterState>) => {
@@ -173,20 +153,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({
     deselectAllVMs();
   }, [namespace, cluster, selectionResetKey]);
 
-  useEffect(() => {
-    resetPagination();
-  }, [resetPagination, sortBy, sortDirection]);
-
   const searchInputRef = useRef<HTMLInputElement>(null);
-
-  const onPageChange = ({ endIndex, page, perPage, startIndex }: PaginationState): void => {
-    setPagination(() => ({
-      endIndex,
-      page,
-      perPage,
-      startIndex,
-    }));
-  };
 
   const [canGetNode] = useFleetAccessReview({
     cluster,
@@ -204,17 +171,12 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({
 
   const loaded = vmsLoaded && columnUtilsLoaded && !loadingFeatureProxy && loadedColumns;
 
-  const sortedVMs = useMemo(
-    () =>
-      sortDataViewTableData(
-        filteredVMs ?? [],
-        columns,
-        sortBy ?? VM_COLUMN_KEYS.name,
-        sortDirection ?? 'asc',
-        callbacks,
-      ),
-    [callbacks, columns, filteredVMs, sortBy, sortDirection],
-  );
+  const sortedVMs = useSortedTableData({
+    callbacks,
+    columns,
+    data: filteredVMs ?? [],
+    initialSortKey: VM_COLUMN_KEYS.name,
+  });
 
   useVMListTelemetry({ loaded });
 
@@ -255,7 +217,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({
           ) : (
             <>
               <SearchBar
-                clearAllFilters={clearAllFilters}
+                clearAllFilters={clearAllFiltersWithReset}
                 filterDefinitions={filterDefinitions}
                 filters={filters}
                 inputRef={searchInputRef}
@@ -286,10 +248,10 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({
                     isLastFullPageShown
                     itemCount={filteredVMs?.length}
                     onPerPageSelect={(_event, perPage, page, startIndex, endIndex) =>
-                      onPageChange({ endIndex, page, perPage, startIndex })
+                      onPaginationChange({ endIndex, page, perPage, startIndex })
                     }
                     onSetPage={(_event, page, perPage, startIndex, endIndex) =>
-                      onPageChange({ endIndex, page, perPage, startIndex })
+                      onPaginationChange({ endIndex, page, perPage, startIndex })
                     }
                     page={pagination?.page}
                     perPage={pagination?.perPage}

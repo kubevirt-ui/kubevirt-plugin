@@ -13,7 +13,22 @@ const usePagination: UsePagination = () => {
     }));
   }, []);
 
-  return { onPaginationChange, pagination };
+  const resetPagination = useCallback(() => {
+    setPagination((prev) => {
+      if (prev.page === 1 && prev.startIndex === 0) {
+        return prev;
+      }
+
+      return {
+        ...prev,
+        endIndex: prev?.perPage,
+        page: 1,
+        startIndex: 0,
+      };
+    });
+  }, []);
+
+  return { onPaginationChange, pagination, resetPagination };
 };
 
 export default usePagination;
