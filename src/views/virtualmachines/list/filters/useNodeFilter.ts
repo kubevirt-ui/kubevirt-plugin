@@ -7,18 +7,15 @@ import {
 } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getVMINodeName } from '@kubevirt-utils/resources/vmi';
-import { universalComparator } from '@kubevirt-utils/utils/utils';
 import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 import { getVMIFromMapper, VMIMapper } from '@virtualmachines/utils/mappers';
+import { getNodes } from './utils';
 
 const useNodeFilter = (vmiMapper: VMIMapper): KubevirtFilter<V1VirtualMachine> => {
   const { t } = useKubevirtTranslation();
 
   const options = useMemo(
-    () =>
-      Object.values(vmiMapper?.nodeNames)
-        .sort((a, b) => universalComparator(a?.id, b?.id))
-        .map((node) => ({ label: node.id, value: node.id })),
+    () => getNodes(vmiMapper).map((node) => ({ label: node, value: node })),
     [vmiMapper],
   );
 

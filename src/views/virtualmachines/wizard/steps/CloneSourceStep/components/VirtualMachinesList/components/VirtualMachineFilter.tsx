@@ -1,56 +1,67 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
+import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import KubevirtFilterToolbar from '@kubevirt-utils/components/KubevirtFilterToolbar/KubevirtFilterToolbar';
+import type {
+  KubevirtFilter,
+  KubevirtFilterState,
+  OnSetFilters,
+} from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { paginationDefaultValues } from '@kubevirt-utils/hooks/usePagination/utils/constants';
-import { PaginationState } from '@kubevirt-utils/hooks/usePagination/utils/types';
-import { ColumnLayout, OnFilterChange, RowFilter } from '@openshift-console/dynamic-plugin-sdk';
+import type { PaginationState } from '@kubevirt-utils/hooks/usePagination/utils/types';
+import type { ColumnLayout } from '@openshift-console/dynamic-plugin-sdk';
 import { Pagination, Split, SplitItem } from '@patternfly/react-core';
 
 type VirtualMachineFilterProps = {
+  clearAllFilters: () => void;
   columnLayout: ColumnLayout;
+  data: V1VirtualMachine[];
+  filterDefinitions: KubevirtFilter<V1VirtualMachine>[];
   filteredVMsCount: number | undefined;
+  filters: KubevirtFilterState;
   isCompact: boolean;
-  onFilterChange: OnFilterChange;
   onPageChange: (pagination: PaginationState) => void;
+  onSetFilters: OnSetFilters;
   pagination: PaginationState;
-  rowFilters: RowFilter<V1VirtualMachine>[];
-  unfilteredData: V1VirtualMachine[];
 };
 
 const VirtualMachineFilter: FC<VirtualMachineFilterProps> = ({
+  clearAllFilters,
   columnLayout,
+  data,
+  filterDefinitions,
   filteredVMsCount,
+  filters,
   isCompact,
-  onFilterChange,
   onPageChange,
+  onSetFilters,
   pagination,
-  rowFilters,
-  unfilteredData,
 }) => (
   <Split className="pf-v6-u-mb-sm" hasGutter>
     <SplitItem>
-      <ListPageFilter
+      <KubevirtFilterToolbar
+        clearAllFilters={clearAllFilters}
         columnLayout={columnLayout}
-        data={unfilteredData}
+        data={data}
+        filterDefinitions={filterDefinitions}
+        filters={filters}
         loaded
-        onFilterChange={onFilterChange}
-        rowFilters={rowFilters}
+        onSetFilters={onSetFilters}
       />
     </SplitItem>
     <SplitItem isFilled />
     <SplitItem>
       <Pagination
-        onPerPageSelect={(_e, perPage, page, startIndex, endIndex) =>
-          onPageChange({ endIndex, page, perPage, startIndex })
-        }
-        onSetPage={(_e, page, perPage, startIndex, endIndex) =>
-          onPageChange({ endIndex, page, perPage, startIndex })
-        }
-        className="list-managment-group__pagination"
         isCompact={isCompact}
         isLastFullPageShown
         itemCount={filteredVMsCount}
+        onPerPageSelect={(_event, perPage, page, startIndex, endIndex) =>
+          onPageChange({ endIndex, page, perPage, startIndex })
+        }
+        onSetPage={(_event, page, perPage, startIndex, endIndex) =>
+          onPageChange({ endIndex, page, perPage, startIndex })
+        }
         page={pagination?.page}
         perPage={pagination?.perPage}
         perPageOptions={paginationDefaultValues}

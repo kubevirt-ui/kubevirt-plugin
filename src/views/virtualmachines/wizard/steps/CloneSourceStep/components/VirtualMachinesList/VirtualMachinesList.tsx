@@ -1,10 +1,9 @@
 import React, { FC, useMemo, useRef, useState } from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import useContainerWidth from '@kubevirt-utils/hooks/useContainerWidth';
+import useKubevirtDataViewFilters from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/useKubevirtDataViewFilters';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { paginationInitialState } from '@kubevirt-utils/hooks/usePagination/utils/constants';
-import { useListPageFilter } from '@openshift-console/dynamic-plugin-sdk';
 import { Label } from '@patternfly/react-core';
 import { getListPageBodySize, ListPageBodySize } from '@virtualmachines/list/listPageBodySize';
 
@@ -19,9 +18,9 @@ const VirtualMachinesList: FC = () => {
 
   const {
     cluster,
+    filterDefinitions,
     loadingFeatureProxy,
     pvcMapper,
-    rowFilters,
     targetNamespace,
     vmiMapper,
     vmimMapper,
@@ -36,13 +35,22 @@ const VirtualMachinesList: FC = () => {
 
   const [pagination, setPagination] = useState(paginationInitialState);
 
-  const [unfilteredData, filteredVMs, onFilterChange] = useListPageFilter<
-    V1VirtualMachine,
-    V1VirtualMachine
-  >(vms, rowFilters, {});
+  const {
+    clearAllFilters,
+    filteredData: filteredVMs,
+    filters,
+    onSetFilters,
+  } = useKubevirtDataViewFilters({
+    data: vms ?? [],
+    filterDefinitions,
+  });
 
   const listPageBodyRef = useRef<HTMLDivElement>(null);
   const listPageBodySize = getListPageBodySize(useContainerWidth(listPageBodyRef));
+
+  const resetToFirstPage = (): void => {
+    setPagination((prevPagination) => getPaginationFirstPageState(prevPagination));
+  };
 
   const onPageChange = ({ endIndex, page, perPage, startIndex }) => {
     setPagination({ endIndex, page, perPage, startIndex });
@@ -68,17 +76,22 @@ const VirtualMachinesList: FC = () => {
         </Label>
       )}
       <VirtualMachineFilter
-        onFilterChange={(...args) => {
-          onFilterChange(...args);
-          setPagination((prevPagination) => getPaginationFirstPageState(prevPagination));
+        clearAllFilters={() => {
+          clearAllFilters();
+          resetToFirstPage();
+        }}
+        onSetFilters={(newFilters) => {
+          onSetFilters(newFilters);
+          resetToFirstPage();
         }}
         columnLayout={columnLayout}
+        data={vms}
+        filterDefinitions={filterDefinitions}
         filteredVMsCount={filteredVMs?.length}
+        filters={filters}
         isCompact={listPageBodySize !== ListPageBodySize.lg}
         onPageChange={onPageChange}
         pagination={pagination}
-        rowFilters={rowFilters}
-        unfilteredData={unfilteredData}
       />
       <VirtualMachineTable
         callbacks={callbacks}

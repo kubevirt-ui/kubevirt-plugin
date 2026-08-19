@@ -45,6 +45,8 @@ export const errorPrintableVMStatus = {
   ImagePullBackOff: 'ImagePullBackOff',
 };
 
+export const STATUS_LIST = [...Object.keys(printableVMStatus), ERROR_STATUS];
+
 export const STATUS_VALUE_GROUPS: string[][] = [
   [
     printableVMStatus.Running,

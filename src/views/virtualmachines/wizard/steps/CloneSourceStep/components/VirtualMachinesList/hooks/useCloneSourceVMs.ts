@@ -4,11 +4,11 @@ import { VirtualMachineModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-a
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { KUBEVIRT_APISERVER_PROXY } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
+import { KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
 import { usePVCMapper } from '@kubevirt-utils/hooks/usePVCMapper';
 import useVirtualMachineInstanceMigrationMapper from '@kubevirt-utils/resources/vmim/hooks/useVirtualMachineInstanceMigrationMapper';
 import useVirtualMachineInstanceMigrations from '@kubevirt-utils/resources/vmim/hooks/useVirtualMachineInstanceMigrations';
-import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 import { useSignals } from '@preact/signals-react/runtime';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
 import { CREATE_VM_FORM_FIELDS_VM_DATA } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
@@ -26,9 +26,9 @@ import { useCloneSourceVMFilters } from './useCloneSourceVMFilters';
 
 type UseCloneSourceVMsReturn = {
   cluster: string;
+  filterDefinitions: KubevirtFilter<V1VirtualMachine>[];
   loadingFeatureProxy: boolean;
   pvcMapper: PVCMapper;
-  rowFilters: RowFilter<V1VirtualMachine>[];
   targetNamespace: string;
   vmiMapper: VMIMapper;
   vmimMapper: VMIMMapper;
@@ -93,13 +93,13 @@ export const useCloneSourceVMs = (): UseCloneSourceVMsReturn => {
   const virtualMachineInstanceMigrationMapper = useVirtualMachineInstanceMigrationMapper(vmims);
   const pvcMapper = usePVCMapper(targetNamespace, cluster);
 
-  const { rowFilters } = useCloneSourceVMFilters(vms, vmiMapper, pvcMapper);
+  const filterDefinitions = useCloneSourceVMFilters(vms, vmiMapper, pvcMapper);
 
   return {
     cluster,
+    filterDefinitions,
     loadingFeatureProxy,
     pvcMapper,
-    rowFilters,
     targetNamespace,
     vmiMapper,
     vmimMapper: virtualMachineInstanceMigrationMapper,

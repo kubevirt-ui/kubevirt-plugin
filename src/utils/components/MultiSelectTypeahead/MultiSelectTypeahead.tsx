@@ -10,7 +10,7 @@ type MultiSelectTypeaheadProps = {
   emptyValuePlaceholder?: string;
   hasCheckboxes?: boolean;
   initialInputValue?: string;
-  selectedResourceNames: string[];
+  selectedResourceNames?: string[];
   selectPlaceholder?: string;
   setSelectedResourceNames: (selected: string[]) => void;
 };
@@ -21,7 +21,7 @@ const MultiSelectTypeahead: FC<MultiSelectTypeaheadProps> = ({
   emptyValuePlaceholder = '',
   hasCheckboxes,
   initialInputValue,
-  selectedResourceNames,
+  selectedResourceNames = [],
   selectPlaceholder,
   setSelectedResourceNames,
 }) => {

@@ -9,20 +9,13 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { getArchitecture } from '@kubevirt-utils/resources/vm/utils/selectors';
 import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
+import { getArchitectures } from './utils';
+
 const useArchitectureFilter = (vms: V1VirtualMachine[]): KubevirtFilter<V1VirtualMachine> => {
   const { t } = useKubevirtTranslation();
 
   const options = useMemo(
-    () =>
-      Array.from(
-        vms?.reduce((acc, vm) => {
-          const arch = getArchitecture(vm);
-          if (arch) acc.add(arch);
-          return acc;
-        }, new Set<string>()) ?? [],
-      )
-        .sort((a, b) => a.localeCompare(b))
-        .map((arch) => ({ label: arch, value: arch })),
+    () => getArchitectures(vms).map((arch) => ({ label: arch, value: arch })),
     [vms],
   );
 

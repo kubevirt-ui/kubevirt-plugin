@@ -4,9 +4,9 @@ import MultiSelectTypeahead from '@kubevirt-utils/components/MultiSelectTypeahea
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup } from '@patternfly/react-core';
 import { useVirtualMachineInstanceMapper } from '@virtualmachines/list/hooks/useVirtualMachineInstanceMapper';
-import { useNodesFilter } from '@virtualmachines/list/hooks/useVMListFilters/useNodesFilter';
 import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
+import { getNodes } from '@virtualmachines/list/filters/utils';
 import { useAdvancedSearchField } from '../store/useAdvancedSearchStore';
 
 const NodesField: FC = () => {
@@ -14,9 +14,8 @@ const NodesField: FC = () => {
   const { setValue, value } = useAdvancedSearchField(VirtualMachineRowFilterType.Node);
 
   const { vmiMapper } = useVirtualMachineInstanceMapper();
-  const nodesFilter = useNodesFilter(vmiMapper);
 
-  const allNodes = nodesFilter.items.map((node) => node.id);
+  const allNodes = getNodes(vmiMapper);
 
   return (
     <FormGroup label={t('Nodes')}>

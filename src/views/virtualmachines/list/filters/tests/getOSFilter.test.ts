@@ -2,11 +2,10 @@ import { type TFunction } from 'i18next';
 
 import { OS_NAME_LABELS } from '@kubevirt-utils/resources/template';
 
-import { getOSFilter } from '../getOSFilter';
+import { getOSFilter, getOSName } from '../getOSFilter';
 
 import { createMockVM } from './mockVM';
 
-// Mock translations
 const t = (str: string) => str;
 jest.mock('@kubevirt-utils/hooks/useKubevirtTranslation', () => ({
   t: (str: string) => str,
@@ -16,13 +15,7 @@ jest.mock('@kubevirt-utils/hooks/useKubevirtTranslation', () => ({
 describe('VM OS Filter', () => {
   const osFilter = getOSFilter(t as TFunction);
 
-  describe('filter function', () => {
-    it('should return true when no OS is selected', () => {
-      const vm = createMockVM();
-      const result = osFilter.filter({ all: [], selected: [] }, vm);
-      expect(result).toBe(true);
-    });
-
+  describe('match function', () => {
     it('should return true when VM OS matches selected OS', () => {
       const vm = createMockVM({
         spec: {
@@ -35,8 +28,7 @@ describe('VM OS Filter', () => {
           },
         },
       });
-      const result = osFilter.filter({ all: [], selected: [OS_NAME_LABELS.rhel] }, vm);
-      expect(result).toBe(true);
+      expect(osFilter.match(vm, [OS_NAME_LABELS.rhel])).toBe(true);
     });
   });
 
@@ -56,7 +48,7 @@ describe('VM OS Filter', () => {
 
     it.each(testCases)(
       'should detect $expectedOS from annotation "$annotation"',
-      ({ annotation, expectedOS }) => {
+      ({ annotation, expectedOS }: { annotation: string; expectedOS: string }) => {
         const vm = createMockVM({
           spec: {
             template: {
@@ -68,8 +60,7 @@ describe('VM OS Filter', () => {
             },
           },
         });
-        const result = osFilter.filter({ all: [], selected: [expectedOS] }, vm);
-        expect(result).toBe(true);
+        expect(osFilter.match(vm, [expectedOS])).toBe(true);
       },
     );
   });
@@ -84,7 +75,7 @@ describe('VM OS Filter', () => {
 
     it.each(testCases)(
       'should detect $expectedOS from label "os.template.kubevirt.io/$label"',
-      ({ expectedOS, label }) => {
+      ({ expectedOS, label }: { expectedOS: string; label: string }) => {
         const vm = createMockVM({
           metadata: {
             labels: {
@@ -94,8 +85,7 @@ describe('VM OS Filter', () => {
             namespace: 'default',
           },
         });
-        const result = osFilter.filter({ all: [], selected: [expectedOS] }, vm);
-        expect(result).toBe(true);
+        expect(osFilter.match(vm, [expectedOS])).toBe(true);
       },
     );
   });
@@ -112,7 +102,7 @@ describe('VM OS Filter', () => {
 
     it.each(testCases)(
       'should detect $expectedOS from preference name "$preferenceName"',
-      ({ expectedOS, preferenceName }) => {
+      ({ expectedOS, preferenceName }: { expectedOS: string; preferenceName: string }) => {
         const vm = createMockVM({
           spec: {
             preference: {
@@ -121,8 +111,7 @@ describe('VM OS Filter', () => {
             template: {},
           },
         });
-        const result = osFilter.filter({ all: [], selected: [expectedOS] }, vm);
-        expect(result).toBe(true);
+        expect(osFilter.match(vm, [expectedOS])).toBe(true);
       },
     );
   });
@@ -163,17 +152,16 @@ describe('VM OS Filter', () => {
         },
       });
 
-      expect(osFilter.filter({ all: [], selected: [OS_NAME_LABELS.rhel] }, vmLower)).toBe(true);
-      expect(osFilter.filter({ all: [], selected: [OS_NAME_LABELS.rhel] }, vmUpper)).toBe(true);
-      expect(osFilter.filter({ all: [], selected: [OS_NAME_LABELS.rhel] }, vmMixed)).toBe(true);
+      expect(osFilter.match(vmLower, [OS_NAME_LABELS.rhel])).toBe(true);
+      expect(osFilter.match(vmUpper, [OS_NAME_LABELS.rhel])).toBe(true);
+      expect(osFilter.match(vmMixed, [OS_NAME_LABELS.rhel])).toBe(true);
     });
   });
 
   describe('edge cases', () => {
     it('should return undefined for VM with no OS information', () => {
       const vm = createMockVM();
-      const reducer = osFilter.reducer;
-      expect(reducer(vm)).toBeUndefined();
+      expect(getOSName(vm)).toBeUndefined();
     });
 
     it('should handle multiple selected OS types', () => {
@@ -213,9 +201,9 @@ describe('VM OS Filter', () => {
 
       const selected = [OS_NAME_LABELS.rhel, OS_NAME_LABELS.windows];
 
-      expect(osFilter.filter({ all: [], selected }, rhelVM)).toBe(true);
-      expect(osFilter.filter({ all: [], selected }, windowsVM)).toBe(true);
-      expect(osFilter.filter({ all: [], selected }, fedoraVM)).toBe(false);
+      expect(osFilter.match(rhelVM, selected)).toBe(true);
+      expect(osFilter.match(windowsVM, selected)).toBe(true);
+      expect(osFilter.match(fedoraVM, selected)).toBe(false);
     });
 
     it('should match OS with custom suffix when it starts with valid OS prefix', () => {
@@ -230,8 +218,7 @@ describe('VM OS Filter', () => {
           },
         },
       });
-      // This should still match RHEL since it starts with 'rhel'
-      expect(osFilter.filter({ all: [], selected: [OS_NAME_LABELS.rhel] }, vm)).toBe(true);
+      expect(osFilter.match(vm, [OS_NAME_LABELS.rhel])).toBe(true);
     });
   });
 
@@ -248,13 +235,13 @@ describe('VM OS Filter', () => {
           },
         },
       });
-      expect(osFilter.filter({ all: [], selected: [OS_NAME_LABELS.windows] }, vm)).toBe(false);
+      expect(osFilter.match(vm, [OS_NAME_LABELS.windows])).toBe(false);
     });
 
     it('should return false when VM has no OS and a filter is selected', () => {
       const vm = createMockVM();
-      expect(osFilter.filter({ all: [], selected: [OS_NAME_LABELS.rhel] }, vm)).toBe(false);
-      expect(osFilter.filter({ all: [], selected: [OS_NAME_LABELS.windows] }, vm)).toBe(false);
+      expect(osFilter.match(vm, [OS_NAME_LABELS.rhel])).toBe(false);
+      expect(osFilter.match(vm, [OS_NAME_LABELS.windows])).toBe(false);
     });
 
     it('should return false when VM OS does not match any of multiple selected filters', () => {
@@ -269,12 +256,7 @@ describe('VM OS Filter', () => {
           },
         },
       });
-      expect(
-        osFilter.filter(
-          { all: [], selected: [OS_NAME_LABELS.rhel, OS_NAME_LABELS.windows] },
-          centosVM,
-        ),
-      ).toBe(false);
+      expect(osFilter.match(centosVM, [OS_NAME_LABELS.rhel, OS_NAME_LABELS.windows])).toBe(false);
     });
 
     it('should return false for unknown OS when known OS filter is selected', () => {
@@ -289,19 +271,19 @@ describe('VM OS Filter', () => {
           },
         },
       });
-      expect(osFilter.filter({ all: [], selected: [OS_NAME_LABELS.rhel] }, vm)).toBe(false);
-      expect(osFilter.filter({ all: [], selected: [OS_NAME_LABELS.windows] }, vm)).toBe(false);
-      expect(osFilter.filter({ all: [], selected: [OS_NAME_LABELS.fedora] }, vm)).toBe(false);
+      expect(osFilter.match(vm, [OS_NAME_LABELS.rhel])).toBe(false);
+      expect(osFilter.match(vm, [OS_NAME_LABELS.windows])).toBe(false);
+      expect(osFilter.match(vm, [OS_NAME_LABELS.fedora])).toBe(false);
     });
   });
 
-  describe('filter items', () => {
+  describe('options', () => {
     it('should contain all OS types', () => {
       const expectedOSTypes = Object.values(OS_NAME_LABELS);
-      const itemIds = osFilter.items.map((item) => item.id);
+      const optionValues = osFilter.options?.map((option) => option.value);
 
       for (const os of expectedOSTypes) {
-        expect(itemIds).toContain(os);
+        expect(optionValues).toContain(os);
       }
     });
   });
@@ -322,8 +304,7 @@ describe('VM OS Filter', () => {
           },
         },
       });
-      // Annotation should take priority
-      expect(osFilter.filter({ all: [], selected: [OS_NAME_LABELS.rhel] }, vm)).toBe(true);
+      expect(osFilter.match(vm, [OS_NAME_LABELS.rhel])).toBe(true);
     });
   });
 });
