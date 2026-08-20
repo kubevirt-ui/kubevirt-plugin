@@ -1,26 +1,20 @@
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
-import { V1VirtualMachineInstanceMigration } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachineInstanceMigration } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import SubTitleChartLabel from '@kubevirt-utils/components/Charts/ChartLabels/SubTitleChartLabel';
 import TitleChartLabel from '@kubevirt-utils/components/Charts/ChartLabels/TitleChartLabel';
-import { OnSetFilters } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
+import { type OnSetFilters } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ChartDonut } from '@patternfly/react-charts/victory';
 import { CardFooter, Split, SplitItem } from '@patternfly/react-core';
 
 import LiveMigrationSettingsPopover from '../LiveMigrationSettingsPopover/LiveMigrationSettingsPopover';
-
-import { colorScale } from './constants';
 import MigrationChartLegend from './MigrationChartLegend';
+import { getMigrationChartData, getMigrationChartTotal } from './utils';
 
 type MigrationsChartDonutProps = {
   onSetFilters: OnSetFilters;
   vmims: V1VirtualMachineInstanceMigration[];
-};
-
-export type ChartDataItem = {
-  x: string; // vmim status key
-  y: number; // count of each status
 };
 
 const MigrationsChartDonut: FC<MigrationsChartDonutProps> = ({ onSetFilters, vmims }) => {
@@ -28,39 +22,23 @@ const MigrationsChartDonut: FC<MigrationsChartDonutProps> = ({ onSetFilters, vmi
 
   if (!vmims?.length) return null;
 
-  const vmimsStatusCountMap = vmims?.reduce(
-    (acc, vmim) => {
-      const vmimStatusKey = vmim?.status?.phase;
-
-      acc[vmimStatusKey] = acc?.[vmimStatusKey] + 1 || 1;
-
-      return acc;
-    },
-    {} as { [status: string]: number },
-  );
-
-  const chartData: ChartDataItem[] = Object.entries(vmimsStatusCountMap)?.map(
-    ([status, statusCount]) => ({
-      x: status,
-      y: statusCount,
-    }),
-  );
+  const chartData = getMigrationChartData(vmims);
 
   return (
     <>
       <ChartDonut
         ariaDesc={t('Cluster scope migrations')}
         ariaTitle={t('Migrations')}
-        colorScale={colorScale}
         constrainToVisibleArea
         data={chartData}
         height={220}
-        labels={({ datum }) => `${datum.x}: ${datum.y}`}
+        labels={({ datum }) => t('{{status}}: {{count}}', { count: datum.y, status: datum.x })}
         legendPosition="bottom"
         padding={20}
+        style={{ data: { fill: ({ datum }) => datum.fill } }}
         subTitle={t('Migrations')}
         subTitleComponent={<SubTitleChartLabel />}
-        title={vmims?.length.toString()}
+        title={getMigrationChartTotal(chartData).toString()}
         titleComponent={<TitleChartLabel />}
         width={600}
       />

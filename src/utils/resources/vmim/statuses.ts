@@ -7,6 +7,8 @@ export const vmimStatuses = {
   Scheduled: 'Scheduled',
   Scheduling: 'Scheduling',
   Succeeded: 'Succeeded',
+  Synchronizing: 'Synchronizing',
   TargetReady: 'TargetReady',
   Unset: '',
+  WaitingForSync: 'WaitingForSync',
 };
