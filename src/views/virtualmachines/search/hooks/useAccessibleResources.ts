@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
-import { KubevirtDataPodFilters } from '@kubevirt-utils/hooks/useKubevirtDataPod/useKubevirtDataPodFilters';
+import { type KubevirtDataPodFilters } from '@kubevirt-utils/hooks/useKubevirtDataPod/types';
 import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
 import useProjects from '@kubevirt-utils/hooks/useProjects';
 import { isSystemNamespace } from '@kubevirt-utils/resources/namespace/helper';
@@ -9,11 +9,11 @@ import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import useIsACMPage from '@multicluster/useIsACMPage';
 import {
-  K8sGroupVersionKind,
-  Selector,
+  type K8sGroupVersionKind,
+  type Selector,
   useK8sWatchResources,
 } from '@openshift-console/dynamic-plugin-sdk';
-import { AdvancedSearchFilter } from '@stolostron/multicluster-sdk';
+import { type AdvancedSearchFilter } from '@stolostron/multicluster-sdk';
 import { getSearchQueries } from '@virtualmachines/search/utils';
 import { OBJECTS_FETCHING_LIMIT } from '@virtualmachines/utils/constants';
 
@@ -31,7 +31,7 @@ type UseAccessibleResourcesArgs = {
 
 type UseAccessibleResourcesReturn<T> = {
   loaded: boolean;
-  loadError?: any;
+  loadError?: Error;
   resources: T[];
 };
 

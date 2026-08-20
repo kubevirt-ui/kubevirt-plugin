@@ -40,6 +40,19 @@ export const isExcludedValue = (value: string): boolean => value.startsWith(EXCL
 export const stripExclusionPrefix = (value: string): string =>
   isExcludedValue(value) ? value.slice(EXCLUSION_URL_PREFIX.length) : value;
 
+export const hasActiveProxyFilter = (
+  query: URLSearchParams,
+  filterOptions?: Record<string, unknown>,
+): boolean => {
+  if (!filterOptions) return false;
+
+  for (const [key, value] of query.entries()) {
+    if (Object.hasOwn(filterOptions, key) && !isExcludedValue(value)) return true;
+  }
+
+  return false;
+};
+
 export const matchesWithExclusion = <T extends FilterableObject>(
   filterDef: KubevirtFilter<T>,
   obj: T,
