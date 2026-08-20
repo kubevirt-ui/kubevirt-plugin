@@ -1,34 +1,40 @@
-/* eslint-disable */
-import { useCallback, useRef } from 'react';
+import { useCallback, useState } from 'react';
 
 import {
-  V1beta1DataVolumeSpec,
-  V1ContainerDiskSource,
-  V1VirtualMachine,
+  type V1beta1DataVolumeSpec,
+  type V1ContainerDiskSource,
+  type V1VirtualMachine,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { isEqualObject } from '@kubevirt-utils/components/NodeSelectorModal/utils/helpers';
 import { ROOTDISK } from '@kubevirt-utils/constants/constants';
 import { getDiskSource } from '@virtualmachines/wizard/steps/TemplateStep/components/TemplatesCatalogDrawer/utils/utils';
 
-const useDefaultVMSource = (vm: V1VirtualMachine) => {
-  const defaultDiskSource = useRef<V1beta1DataVolumeSpec | V1ContainerDiskSource>();
+type DefaultVMSourceResult = {
+  currentDiskSource: undefined | V1beta1DataVolumeSpec | V1ContainerDiskSource;
+  isDefaultDiskSource: boolean;
+  updateDefaultDiskSource: (generatedVM: V1VirtualMachine) => void;
+};
 
-  const currentDiskSource = getDiskSource(vm, ROOTDISK);
+const useDefaultVMSource = (virtualMachine: V1VirtualMachine): DefaultVMSourceResult => {
+  const [defaultDiskSource, setDefaultDiskSource] = useState<
+    V1beta1DataVolumeSpec | V1ContainerDiskSource
+  >();
 
-  const updateDefaultDiskSource = useCallback((generatedVM: V1VirtualMachine) => {
+  const currentDiskSource = getDiskSource(virtualMachine, ROOTDISK);
+
+  const updateDefaultDiskSource = useCallback((generatedVM: V1VirtualMachine): void => {
     const source = getDiskSource(generatedVM, ROOTDISK);
-
-    defaultDiskSource.current = source;
+    setDefaultDiskSource(source);
   }, []);
 
-  const { storage: _, ...restDefaultSpec }: V1beta1DataVolumeSpec = {
-    ...(defaultDiskSource.current as V1beta1DataVolumeSpec),
+  const { storage: _defaultStorage, ...restDefaultSpec }: V1beta1DataVolumeSpec = {
+    ...(defaultDiskSource as V1beta1DataVolumeSpec),
   };
-  const { storage: __, ...restCurrentSpec }: V1beta1DataVolumeSpec = {
+  const { storage: _currentStorage, ...restCurrentSpec }: V1beta1DataVolumeSpec = {
     ...(currentDiskSource as V1beta1DataVolumeSpec),
   };
   const isDefaultDiskSource =
-    defaultDiskSource.current !== undefined && isEqualObject(restDefaultSpec, restCurrentSpec);
+    defaultDiskSource !== undefined && isEqualObject(restDefaultSpec, restCurrentSpec);
 
   return {
     currentDiskSource,

@@ -1,8 +1,7 @@
-/* eslint-disable */
-import React, { FC, useRef } from 'react';
+import React, { type FC, useEffect, useRef } from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { ModalComponentProps } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type ModalComponentProps } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { TREE_VIEW_FOLDERS } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -18,8 +17,7 @@ import {
   ModalHeader,
 } from '@patternfly/react-core';
 
-import { AdvancedSearchInputs, AdvancedSearchQueryInputs } from '../../utils/types';
-
+import { type AdvancedSearchInputs, type AdvancedSearchQueryInputs } from '../../utils/types';
 import ModalExpandableSection from './components/ModalExpandableSection';
 import ArchitectureField from './formFields/ArchitectureField';
 import ClusterField from './formFields/ClusterField';
@@ -64,14 +62,15 @@ const AdvancedSearchModal: FC<AdvancedSearchModalProps> = ({
   const isSearchDisabled = useIsSearchDisabled();
   const { getSearchQueryInputs, initializeWithPrefill, resetForm } = useAdvancedSearchActions();
 
-  // Initialize store with prefill inputs when component mounts
-  const hasInitialized = useRef(false);
-  if (!hasInitialized.current) {
-    initializeWithPrefill(prefillInputs);
-    hasInitialized.current = true;
-  }
+  const hasInitializedRef = useRef(false);
+  useEffect(() => {
+    if (!hasInitializedRef.current) {
+      initializeWithPrefill(prefillInputs);
+      hasInitializedRef.current = true;
+    }
+  }, [initializeWithPrefill, prefillInputs]);
 
-  const submitForm = () => {
+  const submitForm = (): void => {
     onSubmit(getSearchQueryInputs());
   };
 

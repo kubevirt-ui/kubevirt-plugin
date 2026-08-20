@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
 import { tickLabels } from '@kubevirt-utils/components/Charts/ChartLabels/styleOverrides';
 import useResponsiveCharts from '@kubevirt-utils/components/Charts/hooks/useResponsiveCharts';
@@ -8,17 +7,19 @@ import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Chart, ChartAxis, ChartLine, createContainer } from '@patternfly/react-charts/victory';
 import { GridItem, HelperText, HelperTextItem } from '@patternfly/react-core';
 
-import { ChartDataObject } from '../constants';
+import { type ChartDataObject } from '../constants';
+
+const CursorVoronoiContainer = createContainer('voronoi', 'cursor');
 
 type MigrationsUtilizationChartProps = {
   chartData: ChartDataObject[];
   domain?: {
     x: [number, number];
     y: [number, number];
-  };
-  labels: any;
-  tickFormat?: ((tick: any, index: number, ticks: any[]) => number | string) | any[];
-  tickValues?: any[];
+  } | null;
+  labels: (datum: Record<string, unknown>) => string;
+  tickFormat?: ((tick: number, index: number, ticks: number[]) => number | string) | number[];
+  tickValues?: null | number[];
   title: string;
 };
 
@@ -26,13 +27,12 @@ const MigrationsUtilizationChart: FC<MigrationsUtilizationChartProps> = ({
   chartData,
   domain = null,
   labels,
-  tickFormat = (y) => y,
+  tickFormat = (val: number): number => val,
   tickValues = null,
   title,
 }) => {
   const { t } = useKubevirtTranslation();
   const { height, width } = useResponsiveCharts();
-  const CursorVoronoiContainer = createContainer('voronoi', 'cursor');
 
   return (
     <GridItem className="co-utilization-card__item">

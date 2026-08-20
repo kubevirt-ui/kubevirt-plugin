@@ -1,34 +1,34 @@
-/* eslint-disable */
-import { useEffect, useRef } from 'react';
+import { useEffect, useState } from 'react';
 
 import { consoleFetch } from '@openshift-console/dynamic-plugin-sdk';
 import { signal } from '@preact/signals-core';
 
 import { PROXY_KUBEVIRT_URL, PROXY_KUBEVIRT_URL_HEALTH_PATH } from '../utils/constants';
 
-const healthPromiseSignal = signal<Promise<any>>(null);
+const healthPromiseSignal = signal<null | Promise<Response>>(null);
 
 const useKubevirtDataPodHealth = (): boolean | null => {
-  const alive = useRef<boolean>(null);
+  const [alive, setAlive] = useState<boolean | null>(null);
+
   useEffect(() => {
-    const fetch = async () => {
-      if (!healthPromiseSignal.value) {
-        healthPromiseSignal.value = consoleFetch(
-          `${PROXY_KUBEVIRT_URL}${PROXY_KUBEVIRT_URL_HEALTH_PATH}`,
-        );
-      }
+    const checkHealth = async (): Promise<void> => {
+      const promise =
+        healthPromiseSignal.value ??
+        consoleFetch(`${PROXY_KUBEVIRT_URL}${PROXY_KUBEVIRT_URL_HEALTH_PATH}`);
+      healthPromiseSignal.value = promise;
 
       try {
-        const response = await healthPromiseSignal.value;
-        alive.current = response.ok;
+        const response = await promise;
+        setAlive(response.ok);
       } catch {
-        alive.current = false;
+        setAlive(false);
       }
     };
 
-    alive.current === null && fetch();
+    void checkHealth();
   }, []);
 
-  return alive.current;
+  return alive;
 };
+
 export default useKubevirtDataPodHealth;

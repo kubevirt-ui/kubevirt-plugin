@@ -1,6 +1,5 @@
-/* eslint-disable */
-import React, { FC, useEffect, useRef, useState } from 'react';
-import { FormProvider, useForm } from 'react-hook-form';
+import React, { type FC, useEffect, useRef, useState } from 'react';
+import { FormProvider, useForm, useWatch } from 'react-hook-form';
 import { useNavigate } from 'react-router';
 
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
@@ -28,28 +27,32 @@ import { isValidProjectMapping } from '../utils';
 import NetworkDefinition from './components/NetworkDefinition';
 import ProjectMapping from './components/ProjectMapping';
 import VMNetworkWizardHeader from './components/VMNetworkWizardHeader';
+import {
+  getDefaultFormValue,
+  NODE_NETWORK_MAPPING_PARAM_KEY,
+  type VMNetworkForm,
+} from './constants';
 import { getVLANIDValidatedOption } from './utils/utils';
-import { getDefaultFormValue, NODE_NETWORK_MAPPING_PARAM_KEY, VMNetworkForm } from './constants';
 
 const VMNetworkNewForm: FC = () => {
   const navigate = useNavigate();
   const { t } = useKubevirtTranslation();
-  const [apiError, setError] = useState<Error>(null);
+  const [apiError, setApiError] = useState<Error>(null);
 
   const params = useQuery();
   const nodeNetworkMapping = params.get(NODE_NETWORK_MAPPING_PARAM_KEY) ?? '';
 
-  const completed = useRef(false);
-  const currentStepId = useRef<number | string>('wizard-network-definition');
+  const completedRef = useRef(false);
+  const currentStepIdRef = useRef<number | string>('wizard-network-definition');
 
   useEffect(() => {
     logEventWithName(VM_NETWORK_CREATION_STARTED);
   }, []);
 
   useEffect(() => {
-    return () => {
-      if (!completed.current) {
-        logEventWithName(VM_NETWORK_ABANDONED, { stepId: currentStepId.current });
+    return (): void => {
+      if (!completedRef.current) {
+        logEventWithName(VM_NETWORK_ABANDONED, { stepId: currentStepIdRef.current });
       }
     };
   }, []);
@@ -59,17 +62,20 @@ const VMNetworkNewForm: FC = () => {
   });
 
   const {
+    control,
     formState: { isSubmitting },
     handleSubmit,
-    watch,
   } = methods;
 
-  const name = watch('network.metadata.name');
-  const bridgeMapping = watch('network.spec.network.localnet.physicalNetworkName');
-  const mtu = watch('network.spec.network.localnet.mtu');
-  const vlan = watch('network.spec.network.localnet.vlan');
-  const namespaceSelector = watch('network.spec.namespaceSelector');
-  const projectMappingOption = watch('projectMappingOption');
+  const name = useWatch({ control, name: 'network.metadata.name' });
+  const bridgeMapping = useWatch({
+    control,
+    name: 'network.spec.network.localnet.physicalNetworkName',
+  });
+  const mtu = useWatch({ control, name: 'network.spec.network.localnet.mtu' });
+  const vlan = useWatch({ control, name: 'network.spec.network.localnet.vlan' });
+  const namespaceSelector = useWatch({ control, name: 'network.spec.namespaceSelector' });
+  const projectMappingOption = useWatch({ control, name: 'projectMappingOption' });
 
   const isVLANInvalid =
     vlan?.mode &&
@@ -80,34 +86,36 @@ const VMNetworkNewForm: FC = () => {
 
   const isProjectMappingInvalid = !isValidProjectMapping(projectMappingOption, namespaceSelector);
 
-  const onSubmit = async (data: VMNetworkForm) => {
+  const onSubmit = async (data: VMNetworkForm): Promise<void> => {
     try {
       await k8sCreate({
         data: data.network,
         model: ClusterUserDefinedNetworkModel,
       });
 
-      completed.current = true;
+      completedRef.current = true;
       logVMNetworkCreated(data.network, data.projectMappingOption);
 
       navigate(`${VM_NETWORKS_PATH}/${name}`);
     } catch (error) {
-      completed.current = true;
+      completedRef.current = true;
       logCreationFailed(VM_NETWORK_CREATION_FAILED, error);
-      setError(error);
+      setApiError(error as Error);
     }
   };
 
-  const onClose = () => navigate(VM_NETWORKS_PATH);
+  const onClose = (): void => {
+    navigate(VM_NETWORKS_PATH);
+  };
 
   return (
     <FormProvider {...methods}>
       <Wizard
-        onStepChange={(_, currentStep) => {
-          currentStepId.current = currentStep.id;
-        }}
         header={<VMNetworkWizardHeader />}
-        onSave={handleSubmit(onSubmit)}
+        onSave={(evt) => handleSubmit(onSubmit)(evt)}
+        onStepChange={(_evt, currentStep) => {
+          currentStepIdRef.current = currentStep.id;
+        }}
       >
         <WizardStep
           footer={{

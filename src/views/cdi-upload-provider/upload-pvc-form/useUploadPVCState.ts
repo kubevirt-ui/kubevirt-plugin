@@ -7,8 +7,8 @@ import useNamespaceParam from '@kubevirt-utils/hooks/useNamespaceParam';
 import useReadyStorageClasses from '@kubevirt-utils/hooks/useReadyStorageClasses/useReadyStorageClasses';
 
 import { CDIUploadContext } from '../utils/context';
+import { resourcePath } from '../utils/resourceUtils';
 import { getNamespace } from '../utils/selectors';
-import { resourcePath } from '../utils/utils';
 import { useUploadPVCFile } from './useUploadPVCFile';
 import { useUploadPVCTemplates } from './useUploadPVCTemplates';
 import { useUploadSave } from './useUploadSave';

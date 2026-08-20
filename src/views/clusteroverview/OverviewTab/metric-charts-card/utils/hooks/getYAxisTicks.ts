@@ -1,8 +1,7 @@
-/* eslint-disable */
-import { UseYAxisTicks } from './types';
+import { type UseYAxisTicks } from './types';
 import { yTickFormat } from './utils';
 
-const useYAxisTicks: UseYAxisTicks = (metricChartData) => {
+const getYAxisTicks: UseYAxisTicks = (metricChartData) => {
   const { largestValue } = metricChartData;
 
   // There should be five Y-axis ticks with only 0 and the highest value labeled
@@ -16,4 +15,4 @@ const useYAxisTicks: UseYAxisTicks = (metricChartData) => {
   return [tickValues, yTickFormat];
 };
 
-export default useYAxisTicks;
+export default getYAxisTicks;

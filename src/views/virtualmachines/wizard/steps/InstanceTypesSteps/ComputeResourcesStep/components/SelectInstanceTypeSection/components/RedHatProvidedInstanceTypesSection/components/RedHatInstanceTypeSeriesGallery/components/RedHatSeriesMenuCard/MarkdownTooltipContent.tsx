@@ -11,18 +11,23 @@ type MarkdownTooltipContentProps = {
 const MarkdownTooltipContent: FC<MarkdownTooltipContentProps> = ({ content }) => {
   if (isEmpty(content)) return null;
 
+  const paragraphs = content.split('\n\n');
+
   return (
     <Stack hasGutter>
-      {content.split('\n\n').map((paragraph) => (
-        <p key={paragraph}>
-          {paragraph.split(MARKDOWN_BOLD_REGEX).map((part) => {
-            if (part.startsWith('*') && part.endsWith('*')) {
-              return <strong key={part}>{part.slice(1, -1)}</strong>;
-            }
-            return part || null;
-          })}
-        </p>
-      ))}
+      {paragraphs.map((paragraph) => {
+        const parts = paragraph.split(MARKDOWN_BOLD_REGEX);
+        return (
+          <p key={paragraph}>
+            {parts.map((part) => {
+              if (part.startsWith('*') && part.endsWith('*')) {
+                return <strong key={part}>{part.slice(1, -1)}</strong>;
+              }
+              return part || null;
+            })}
+          </p>
+        );
+      })}
     </Stack>
   );
 };
