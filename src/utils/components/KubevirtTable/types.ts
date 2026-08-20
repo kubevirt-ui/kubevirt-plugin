@@ -3,7 +3,7 @@ import { ReactNode } from 'react';
 import { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { PaginationState } from '@kubevirt-utils/hooks/usePagination/utils/types';
 
-// Column layout types (for ListPageFilter integration)
+// Column layout types (for KubevirtFilterToolbar integration)
 export type ColumnLayoutColumn = {
   additional?: boolean;
   id: string;

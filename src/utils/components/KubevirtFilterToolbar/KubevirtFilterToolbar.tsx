@@ -14,11 +14,11 @@ import { type ColumnLayout } from '@openshift-console/dynamic-plugin-sdk';
 import { Toolbar, ToolbarContent, ToolbarToggleGroup } from '@patternfly/react-core';
 import { FilterIcon } from '@patternfly/react-icons';
 
-import ListPageFilterToolbarActions from '../ListPageFilter/components/ListPageFilterToolbarActions';
 import GroupedFilterDropdown from './components/GroupedFilterDropdown';
 import HiddenFilterChips from './components/HiddenFilterChips';
 import SelectFilterItem from './components/SelectFilterItem';
 import TextSearchFilters from './components/TextSearchFilters';
+import ToolbarActions from './components/ToolbarActions';
 
 type KubevirtFilterToolbarProps = {
   className?: string;
@@ -120,7 +120,7 @@ const KubevirtFilterToolbar: FC<KubevirtFilterToolbarProps> = ({
             onSetFilters={onSetFilters}
           />
         </ToolbarToggleGroup>
-        <ListPageFilterToolbarActions
+        <ToolbarActions
           columnLayout={columnLayout}
           hideColumnManagement={hideColumnManagement}
           toolbarEndContent={toolbarEndContent}

@@ -1,7 +1,7 @@
 import { TFunction } from 'i18next';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { fuzzyCaseInsensitive } from '@kubevirt-utils/components/ListPageFilter/utils';
+import { fuzzyCaseInsensitive } from '@kubevirt-utils/utils/utils';
 import {
   KubevirtFilter,
   KubevirtFilterLayout,

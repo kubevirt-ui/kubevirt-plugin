@@ -2,12 +2,13 @@ import classNames from 'classnames';
 import React, { Dispatch, FC, SetStateAction, useMemo, useState } from 'react';
 
 import { FilterableObject } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
+import { labelParser } from '@kubevirt-utils/utils/labelUtils';
+import { fuzzyCaseInsensitive } from '@kubevirt-utils/utils/utils';
 import { Label, SelectList } from '@patternfly/react-core';
 
-import { MAX_SUGGESTIONS, suggestionBoxKeyHandler } from '../constants';
 import { useDocumentListener } from '../hooks/useDocumentListener';
-import { fuzzyCaseInsensitive, labelParser } from '../utils';
 
+import { MAX_SUGGESTIONS, suggestionBoxKeyHandler } from '../constants';
 import SearchFilter from './SearchFilter';
 
 type AutocompleteInputProps = {
