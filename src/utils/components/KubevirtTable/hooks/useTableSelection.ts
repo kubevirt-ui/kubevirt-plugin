@@ -1,5 +1,7 @@
 import { useCallback, useMemo } from 'react';
 
+import { addItemsToSelection, removeItemsFromSelection } from '../utils/getBulkSelectedItems';
+
 export type UseTableSelectionProps<TData> = {
   /** Full dataset (sorted but not paginated) - used for validating selected items */
   data: TData[];
@@ -76,16 +78,9 @@ export const useTableSelection = <TData>({
   // handleSelectAll operates on current page only
   const handleSelectAll = useCallback(() => {
     if (allSelected || someSelected) {
-      // Deselect only items on current page
-      const paginatedIds = new Set(paginatedData.map((item, index) => getRowId(item, index)));
-      onSelect(selectedItems.filter((item, i) => !paginatedIds.has(getRowId(item, i))));
+      onSelect(removeItemsFromSelection(selectedItems, paginatedData, getRowId));
     } else {
-      // Select all items on current page (add to existing selection)
-      const existingIds = new Set(selectedItems.map((item, index) => getRowId(item, index)));
-      const newItems = paginatedData.filter(
-        (item, index) => !existingIds.has(getRowId(item, index)),
-      );
-      onSelect([...selectedItems, ...newItems]);
+      onSelect(addItemsToSelection(selectedItems, paginatedData, getRowId));
     }
   }, [allSelected, someSelected, onSelect, paginatedData, selectedItems, getRowId]);
 

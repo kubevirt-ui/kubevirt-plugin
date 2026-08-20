@@ -1,7 +1,8 @@
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { PaginationState } from '@kubevirt-utils/hooks/usePagination/utils/types';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { getK8sSelectionId } from '@kubevirt-utils/components/KubevirtTable/utils';
+import { type PaginationState } from '@kubevirt-utils/hooks/usePagination/utils/types';
 import { BulkSelect } from '@patternfly/react-component-groups/dist/dynamic/BulkSelect';
 import { FlexItem } from '@patternfly/react-core';
 import useExistingSelectedVMs from '@virtualmachines/list/hooks/useExistingSelectedVMs';
@@ -18,20 +19,21 @@ type VirtualMachineSelectionProps = {
 const VirtualMachineSelection: FC<VirtualMachineSelectionProps> = ({ pagination, vms }) => {
   const existingSelectedVMs = useExistingSelectedVMs(vms);
   const currentPageVMs = vms.slice(pagination.startIndex, pagination.endIndex);
+  const selectedIds = new Set(existingSelectedVMs.map((vm) => getK8sSelectionId(vm)));
 
   const isPageChecked =
-    currentPageVMs.length && currentPageVMs.every((vm) => existingSelectedVMs.includes(vm));
+    currentPageVMs.length && currentPageVMs.every((vm) => selectedIds.has(getK8sSelectionId(vm)));
   const isPagePartiallyChecked =
-    !isPageChecked && currentPageVMs.some((vm) => existingSelectedVMs.includes(vm));
+    !isPageChecked && currentPageVMs.some((vm) => selectedIds.has(getK8sSelectionId(vm)));
 
   return (
     <FlexItem className="virtual-machine-selection">
       <BulkSelect
         canSelectAll
-        onSelect={(value) => handleBulkSelect(value, vms, currentPageVMs)}
+        onSelect={(value) => handleBulkSelect(value, vms, currentPageVMs, existingSelectedVMs)}
         pageCount={currentPageVMs.length}
         pagePartiallySelected={isPagePartiallyChecked}
-        pageSelected={isPageChecked}
+        pageSelected={Boolean(isPageChecked)}
         selectedCount={existingSelectedVMs.length}
         totalCount={vms.length}
       />
