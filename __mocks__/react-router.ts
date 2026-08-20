@@ -1,4 +1,4 @@
-/* eslint-disable */
+/* eslint-disable @eslint-react/no-unnecessary-use-prefix */
 module.exports = {
   matchPath: () => null,
   useLocation: () => ({

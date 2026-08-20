@@ -1,10 +1,16 @@
-/* eslint-disable */
-import React, { FC, PropsWithChildren, useEffect, useMemo, useState } from 'react';
+import React, {
+  createElement,
+  type FC,
+  type PropsWithChildren,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import { Link } from 'react-router';
 
 import { MigrationPolicyModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import { dateTimeFormatter } from '@kubevirt-utils/components/Timestamp/utils/datetime';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -24,7 +30,6 @@ type MigrationProgressPopoverProps = PropsWithChildren<{
 const MigrationProgressPopover: FC<MigrationProgressPopoverProps> = ({ children, vmi }) => {
   const { t } = useKubevirtTranslation();
   const vmim = useVirtualMachineInstanceMigration(vmi);
-  const Icon = getMigrationPhaseIcon(vmim?.status?.phase);
   const startTimestamp = vmi?.status?.migrationState?.startTimestamp;
   const endTimestamp = vmi?.status?.migrationState?.endTimestamp;
 
@@ -45,7 +50,7 @@ const MigrationProgressPopover: FC<MigrationProgressPopoverProps> = ({ children,
     const interval = setInterval(() => {
       setElapsedSeconds(getElapsedTimeInSeconds(startTimestamp));
     }, 1000);
-    return () => clearInterval(interval);
+    return (): void => clearInterval(interval);
   }, [startTimestamp, endTimestamp]);
 
   return (
@@ -53,7 +58,8 @@ const MigrationProgressPopover: FC<MigrationProgressPopoverProps> = ({ children,
       bodyContent={
         <Stack hasGutter>
           <StackItem>
-            <b>{t('Phase')}</b> <Icon /> {vmim?.status?.phase}
+            <b>{t('Phase')}</b> {createElement(getMigrationPhaseIcon(vmim?.status?.phase))}{' '}
+            {vmim?.status?.phase}
           </StackItem>
           <StackItem>
             <b>{t('Started')}</b>{' '}

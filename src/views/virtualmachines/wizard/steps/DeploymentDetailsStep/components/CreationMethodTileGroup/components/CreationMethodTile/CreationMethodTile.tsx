@@ -1,9 +1,8 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { createElement, type FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Card, CardBody, CardHeader, Stack, StackItem, Title } from '@patternfly/react-core';
-import { VMCreationMethod } from '@virtualmachines/wizard/utils/constants';
+import { type VMCreationMethod } from '@virtualmachines/wizard/utils/constants';
 import { getVMCreationMethodDetails } from '@virtualmachines/wizard/utils/utils';
 
 import './CreationMethodTile.scss';
@@ -20,9 +19,10 @@ const CreationMethodTile: FC<CreationMethodTileProps> = ({
   setSelectedCreationMethod,
 }) => {
   const { t } = useKubevirtTranslation();
-  const { description, IconComponent, label } = getVMCreationMethodDetails(creationMethod, t);
+  const creationMethodDetails = getVMCreationMethodDetails(creationMethod, t);
+  const { description, label } = creationMethodDetails;
 
-  const handleClick = () => {
+  const handleClick = (): void => {
     setSelectedCreationMethod(creationMethod);
   };
 
@@ -47,7 +47,7 @@ const CreationMethodTile: FC<CreationMethodTileProps> = ({
         }}
       >
         <div className="vm-creation-method-tile__icon">
-          <IconComponent />
+          {createElement(creationMethodDetails.IconComponent)}
         </div>
       </CardHeader>
       <CardBody>

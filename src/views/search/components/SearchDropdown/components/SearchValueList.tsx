@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC, Fragment, useMemo } from 'react';
+import React, { type FC, Fragment, type ReactElement, useMemo } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -7,7 +6,7 @@ import { Divider, MenuGroup, MenuItem, MenuList } from '@patternfly/react-core';
 import { STATUS_VALUE_GROUPS } from '@virtualmachines/utils';
 import { VirtualMachineRowFilterType } from '@virtualmachines/utils/constants';
 
-import { ValueOption } from '../types';
+import { type ValueOption } from '../types';
 import { getFilteredOrderedOptions } from '../utils';
 
 import SearchMenuItem from './SearchMenuItem';
@@ -32,7 +31,7 @@ const SearchValueList: FC<SearchValueListProps> = ({
   const { t } = useKubevirtTranslation();
 
   const selectedSet = useMemo(
-    () => new Set(selectedValues.map((v) => v.toLowerCase())),
+    () => new Set(selectedValues.map((val) => val.toLowerCase())),
     [selectedValues],
   );
 
@@ -46,7 +45,7 @@ const SearchValueList: FC<SearchValueListProps> = ({
     [orderedOptions, selectedSet],
   );
 
-  const renderItem = (option: ValueOption, index: number) => (
+  const renderItem = (option: ValueOption, index: number): ReactElement => (
     <SearchMenuItem
       data-test={`search-value-${option.value}`}
       isFocused={index === focusedItemIndex}
@@ -79,7 +78,7 @@ const SearchValueList: FC<SearchValueListProps> = ({
           const items = groupItems.map((option) => renderItem(option, flatIndex++));
 
           return (
-            <Fragment key={groupIdx}>
+            <Fragment key={group.join(',')}>
               {groupIdx > 0 && <Divider />}
               <MenuGroup>
                 <MenuList>{items}</MenuList>

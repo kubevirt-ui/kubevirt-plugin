@@ -1,4 +1,4 @@
-/* eslint-disable */
+/* eslint-disable @eslint-react/no-unnecessary-use-prefix */
 // This dummy file is used to resolve @Console imports from @openshift-console for JEST
 // You can add any exports needed by your tests here
 // Check "moduleNameMapper" in package.json

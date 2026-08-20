@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { useCallback, useMemo, useState } from 'react';
 
 import useKubevirtToast from '@kubevirt-utils/hooks/useKubevirtToast';
@@ -6,17 +5,17 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { getName } from '@kubevirt-utils/resources/shared';
 import { isEmpty, kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { useSettingsCluster } from '@settings/context/SettingsClusterContext';
-import { createOperator } from '../utils/createOperator/createOperator';
 
+import { createOperator } from '../utils/createOperator/createOperator';
+import {
+  getNonInstalledFeatureManifests,
+  packageManifestToOperatorItem,
+} from '../utils/operatorResolution';
 import {
   type CapabilityFeature,
   type UseInstallFeatureParams,
   type UseInstallFeatureReturn,
 } from '../utils/types';
-import {
-  getNonInstalledFeatureManifests,
-  packageManifestToOperatorItem,
-} from '../utils/operatorResolution';
 import useAwaitingOLM from './useAwaitingOLM';
 import useInstallResources from './useInstallResources';
 
@@ -30,7 +29,7 @@ const useInstallFeature = ({
   const { t } = useKubevirtTranslation();
   const { addDangerToast, addSuccessToast } = useKubevirtToast();
   const cluster = useSettingsCluster();
-  const [apiInstallingFeatures, setApiInstallingFeatures] = useState<Set<string>>(new Set());
+  const [apiInstallingFeatures, setApiInstallingFeatures] = useState<Set<string>>(() => new Set());
 
   const getFeaturePackageNames = useCallback(
     (featureId: string) =>

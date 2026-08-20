@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import { createElement, type FC } from 'react';
 
 import useDismissMenu from './hooks/useDismissMenu';
 import { getActionMenuComponent } from './utils';
@@ -17,9 +16,10 @@ const TreeViewRightClickActionMenu: FC<TreeViewRightClickActionMenuProps> = ({
 
   if (!triggerElement) return null;
 
-  const ActionMenu = getActionMenuComponent(triggerElement);
-
-  return <ActionMenu hideMenu={hideMenu} triggerElement={triggerElement} />;
+  return createElement(getActionMenuComponent(triggerElement), {
+    hideMenu,
+    triggerElement,
+  });
 };
 
 export default TreeViewRightClickActionMenu;

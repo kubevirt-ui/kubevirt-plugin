@@ -1,9 +1,8 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
 import { Button, ButtonVariant } from '@patternfly/react-core';
 
-import { UploadSuccessLink } from '../types';
+import { type UploadSuccessLink } from '../types';
 
 type UploadProgressLinksProps = {
   links?: UploadSuccessLink[];
@@ -12,11 +11,11 @@ type UploadProgressLinksProps = {
 
 const UploadProgressLinks: FC<UploadProgressLinksProps> = ({ links = [], navigate }) => (
   <>
-    {links.map((link, index) => (
+    {links.map((link) => (
       <Button
         data-test="upload-progress-link"
         isInline
-        key={`${link.url}-${index}`}
+        key={link.url}
         onClick={() => navigate(link.url)}
         variant={ButtonVariant.link}
       >

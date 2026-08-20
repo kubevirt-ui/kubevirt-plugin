@@ -1,7 +1,6 @@
-/* eslint-disable */
-import React, { FC, useState } from 'react';
+import React, { type FC, useState } from 'react';
 
-import { TemplateParameter } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { type TemplateParameter } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Checkbox, ExpandableSection, FormGroup, TextInput } from '@patternfly/react-core';
 
@@ -15,18 +14,18 @@ type ParameterEditorProps = {
 
 const ParameterEditor: FC<ParameterEditorProps> = ({ isEditDisabled, onChange, parameter }) => {
   const { t } = useKubevirtTranslation();
-  const [isExpanded, setExpanded] = useState(true);
+  const [isExpanded, setIsExpanded] = useState(true);
 
   return (
     <ExpandableSection
+      isExpanded={isExpanded}
+      isIndented
+      onToggle={(_event, expand: boolean) => setIsExpanded(expand)}
       toggleContent={
         <>
           <strong>{t('Name')} </strong> {parameter.name}
         </>
       }
-      isExpanded={isExpanded}
-      isIndented
-      onToggle={(_, expand: boolean) => setExpanded(expand)}
     >
       <FormGroup fieldId={`${parameter.name}-required`}>
         <Checkbox

@@ -1,4 +1,3 @@
-/* eslint-disable */
 import {
   modelToGroupVersionKind,
   NodeModel,
@@ -14,60 +13,54 @@ import {
 } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { getAllowedResources, getAllowedTemplateResources } from '@kubevirt-utils/resources/shared';
 import { TEMPLATE_TYPE_LABEL } from '@kubevirt-utils/resources/template';
+import { type WatchK8sResource } from '@openshift-console/dynamic-plugin-sdk';
 
 import { useProjectNames } from './useProjectNames';
 
-const useNonAdminResourcesInventoryCard = () => {
+const adminResources: Record<string, WatchK8sResource> = {
+  nads: {
+    groupVersionKind: NetworkAttachmentDefinitionModelGroupVersionKind,
+    isList: true,
+    namespaced: false,
+  },
+  nodes: {
+    groupVersionKind: modelToGroupVersionKind(NodeModel),
+    isList: true,
+    namespaced: false,
+  },
+  vms: {
+    groupVersionKind: VirtualMachineModelGroupVersionKind,
+    isList: true,
+    namespaced: true,
+  },
+  vmTemplates: {
+    groupVersionKind: modelToGroupVersionKind(TemplateModel),
+    isList: true,
+    selector: {
+      matchExpressions: [
+        {
+          key: TEMPLATE_TYPE_LABEL,
+          operator: 'Exists',
+        },
+      ],
+    },
+  },
+};
+
+export const useWatchedResourcesInventoryCard = (
+  isAdmin: boolean,
+): Record<string, WatchK8sResource> => {
   const projectNames = useProjectNames();
-  const allowedVMResources = getAllowedResources(projectNames, VirtualMachineModel);
-  const allowedNADResources = getAllowedResources(projectNames, NetworkAttachmentDefinitionModel);
-  const allowedTemplateResources = getAllowedTemplateResources(projectNames);
-
-  const watchedResources = {
-    ...allowedVMResources,
-    ...allowedTemplateResources,
+  const nonAdminResources = {
+    ...getAllowedResources(projectNames, VirtualMachineModel),
+    ...getAllowedTemplateResources(projectNames),
     nodes: {
       groupVersionKind: modelToGroupVersionKind(NodeModel),
       isList: true,
       namespaced: false,
     },
-    ...allowedNADResources,
+    ...getAllowedResources(projectNames, NetworkAttachmentDefinitionModel),
   };
-  return watchedResources;
-};
 
-const useAdminResourcesInventoryCard = () => {
-  return {
-    nads: {
-      groupVersionKind: NetworkAttachmentDefinitionModelGroupVersionKind,
-      isList: true,
-      namespaced: false,
-    },
-    nodes: {
-      groupVersionKind: modelToGroupVersionKind(NodeModel),
-      isList: true,
-      namespaced: false,
-    },
-    vms: {
-      groupVersionKind: VirtualMachineModelGroupVersionKind,
-      isList: true,
-      namespaced: true,
-    },
-    vmTemplates: {
-      groupVersionKind: modelToGroupVersionKind(TemplateModel),
-      isList: true,
-      selector: {
-        matchExpressions: [
-          {
-            key: TEMPLATE_TYPE_LABEL,
-            operator: 'Exists',
-          },
-        ],
-      },
-    },
-  };
-};
-
-export const useWatchedResourcesHook = (isAdmin: boolean) => {
-  return isAdmin ? useAdminResourcesInventoryCard : useNonAdminResourcesInventoryCard;
+  return isAdmin ? adminResources : nonAdminResources;
 };

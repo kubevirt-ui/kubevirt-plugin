@@ -1,11 +1,10 @@
-/* eslint-disable */
-import React, { FC, useMemo } from 'react';
+import React, { type FC, type ReactNode, useMemo } from 'react';
 
-import { V1VirtualMachineInstanceMigration } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachineInstanceMigration } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
-  type MigrationStatusCounts,
   getMigrationStatusCounts,
+  type MigrationStatusCounts,
 } from '@kubevirt-utils/resources/vmim/utils';
 import { GreenCheckCircleIcon } from '@openshift-console/dynamic-plugin-sdk';
 import { vmStatusIcon } from '@overview/OverviewTab/vm-statuses-card/utils/utils';
@@ -21,7 +20,6 @@ import {
 
 import StatusCountItem, { getLinkProps } from '../shared/StatusCountItem';
 import ViewAllLink from '../shared/ViewAllLink';
-
 import {
   buildStatusFilterPath,
   FAILED_STATUSES,
@@ -55,7 +53,7 @@ const MigrationsWidget: FC<MigrationsWidgetProps> = ({
   const { t } = useKubevirtTranslation();
 
   const isExternal = !!migrationsTabHref;
-  const basePath = migrationsTabPath || migrationsTabHref;
+  const basePath = migrationsTabPath ?? migrationsTabHref;
 
   const statusCounts = useMemo(
     () => precomputedStatusCounts ?? getMigrationStatusCounts(vmims ?? []),
@@ -75,7 +73,7 @@ const MigrationsWidget: FC<MigrationsWidgetProps> = ({
 
   const hasNavigation = !!migrationsTabPath || !!migrationsTabHref;
 
-  const headerActions = (() => {
+  const headerActions = ((): ReactNode => {
     if (hasNavigation) {
       return <ViewAllLink href={migrationsTabHref} linkPath={migrationsTabPath} />;
     }
@@ -143,11 +141,11 @@ const MigrationsWidget: FC<MigrationsWidgetProps> = ({
             },
           ].map(({ count, icon, key, label }) => (
             <StatusCountItem
+              key={key}
               {...getLinkProps(statusLinks[key], isExternal)}
               count={count}
               icon={icon}
               isLoading={isLoading}
-              key={key}
               label={label}
             />
           ))}

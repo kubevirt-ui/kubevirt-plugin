@@ -1,7 +1,10 @@
-import React, { FC, useMemo } from 'react';
+import React, { type FC, useMemo } from 'react';
 import { Link } from 'react-router';
 
-import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import {
+  type V1VirtualMachine,
+  type V1VirtualMachineInstance,
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
 import { VirtualMachineDetailsTab } from '@kubevirt-utils/constants/tabs-constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -10,9 +13,8 @@ import useNamespaceUDN from '@kubevirt-utils/resources/udn/hooks/useNamespaceUDN
 import { Card, CardBody, CardTitle, Divider } from '@patternfly/react-core';
 
 import { createURL } from '../../utils/utils';
-
 import VirtualMachinesOverviewTabNetworkFQDN from './components/VirtualMachinesOverviewTabNetworkFQDN';
-import useVirtualMachinesOverviewTabInterfacesData from './hooks/useVirtualMachinesOverviewTabInterfacesData';
+import getVirtualMachinesOverviewTabInterfacesData from './getVirtualMachinesOverviewTabInterfacesData';
 import {
   getOverviewNetworkInterfaceRowId,
   getOverviewNetworkInterfacesColumns,
@@ -30,7 +32,7 @@ const VirtualMachinesOverviewTabInterfaces: FC<VirtualMachinesOverviewTabInterfa
   vmi,
 }) => {
   const { t } = useKubevirtTranslation();
-  const data = useVirtualMachinesOverviewTabInterfacesData(vm, vmi);
+  const data = getVirtualMachinesOverviewTabInterfacesData(vm, vmi);
   const columns = useMemo(() => getOverviewNetworkInterfacesColumns(t), [t]);
 
   const [isNamespaceManagedByUDN] = useNamespaceUDN(getNamespace(vm));

@@ -1,14 +1,20 @@
-/* eslint-disable */
-import React, { FC, MouseEventHandler, useCallback, useEffect, useState } from 'react';
+import React, {
+  type FC,
+  Fragment,
+  type MouseEventHandler,
+  useCallback,
+  useEffect,
+  useState,
+} from 'react';
 import { useNavigate } from 'react-router';
 import { useImmer } from 'use-immer';
 
-import { TemplateParameter } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { type TemplateParameter } from '@kubevirt-ui-ext/kubevirt-api/console';
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import { isEqualObject } from '@kubevirt-utils/components/NodeSelectorModal/utils/helpers';
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getParameters, Template, updateTemplate } from '@kubevirt-utils/resources/template';
+import { getParameters, type Template, updateTemplate } from '@kubevirt-utils/resources/template';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   ActionGroup,
@@ -24,7 +30,6 @@ import {
 } from '@patternfly/react-core';
 
 import useEditTemplateAccessReview from '../../hooks/useIsTemplateEditable';
-
 import ParameterEditor from './ParameterEditor';
 
 import './template-parameters-page.scss';
@@ -53,10 +58,10 @@ const TemplateParametersPage: FC<TemplateParametersPageProps> = ({ obj: template
   if (isEmpty(parameters))
     return <EmptyState>{t('No parameters found in this template.')}</EmptyState>;
 
-  const onParameterChange = (parameter: TemplateParameter) => {
+  const onParameterChange = (parameter: TemplateParameter): void => {
     setEditableTemplate((draft) => {
       const draftParameters = getParameters(draft);
-      const parameterIndex = draftParameters?.findIndex((p) => p.name === parameter.name);
+      const parameterIndex = draftParameters?.findIndex((param) => param.name === parameter.name);
       if (parameterIndex >= 0) draftParameters[parameterIndex] = parameter;
     });
   };
@@ -86,15 +91,14 @@ const TemplateParametersPage: FC<TemplateParametersPageProps> = ({ obj: template
           <Title headingLevel="h2">{t('Parameters')}</Title>
 
           {parameters.map((parameter, index) => (
-            <>
+            <Fragment key={parameter.name}>
               <ParameterEditor
                 isEditDisabled={!isTemplateEditable}
-                key={parameter.name}
                 onChange={onParameterChange}
                 parameter={parameter}
               />
               {index !== parameters.length - 1 && <Divider />}
-            </>
+            </Fragment>
           ))}
 
           <ErrorAlert error={error} />

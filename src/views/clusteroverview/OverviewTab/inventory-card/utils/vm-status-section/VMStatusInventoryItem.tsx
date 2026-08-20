@@ -1,12 +1,11 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 import { Link } from 'react-router';
 
 import { ALL_NAMESPACES } from '@kubevirt-utils/hooks/constants';
 import { getVMListPathWithFilters } from '@kubevirt-utils/resources/vm/utils/utils';
 import useActiveClusterParam from '@multicluster/hooks/useActiveClusterParam';
 
-import { getVMStatusIcon } from '../utils';
+import { iconMap } from '../utils';
 
 import './VMStatusInventoryItem.scss';
 
@@ -17,13 +16,15 @@ export type VMStatusInventoryItemProps = {
 
 const VMStatusInventoryItem: FC<VMStatusInventoryItemProps> = ({ count, status }) => {
   const cluster = useActiveClusterParam();
-  const Icon = getVMStatusIcon(status);
-  const to = getVMListPathWithFilters(ALL_NAMESPACES, { status }, cluster);
+  const vmListPath = getVMListPathWithFilters(ALL_NAMESPACES, { status }, cluster);
+  const StatusIcon = iconMap[status as keyof typeof iconMap] ?? iconMap.Unknown;
 
   return (
     <div className="co-inventory-card__status">
-      <span className="co-dashboard-icon kv-inventory-card__status-icon">{<Icon />}</span>
-      <Link to={to}>
+      <span className="co-dashboard-icon kv-inventory-card__status-icon">
+        <StatusIcon />
+      </span>
+      <Link to={vmListPath}>
         <span className="kv-inventory-card__status-text">{count}</span>
       </Link>
       <span>{status}</span>

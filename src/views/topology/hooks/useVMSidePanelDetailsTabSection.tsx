@@ -1,12 +1,12 @@
-/* eslint-disable */
+/* eslint-disable @eslint-react/no-unnecessary-use-prefix */
 import React from 'react';
 
-import { DetailsTabSectionExtensionHook } from '@openshift-console/dynamic-plugin-sdk';
-import { GraphElement } from '@patternfly/react-topology';
+import { type DetailsTabSectionExtensionHook } from '@openshift-console/dynamic-plugin-sdk';
+import { type GraphElement } from '@patternfly/react-topology';
 import { isVMType } from '@topology/utils/utils';
 
 import TopologyVMDetailsPanel from '../components/vm/VMDetailsPanel/TopologyVMDetailsPanel';
-import { VMNode } from '../utils/types/types';
+import { type VMNode } from '../utils/types/types';
 
 const useVMSidePanelDetailsTabSection: DetailsTabSectionExtensionHook = (element: GraphElement) => {
   if (!isVMType(element.getType())) {

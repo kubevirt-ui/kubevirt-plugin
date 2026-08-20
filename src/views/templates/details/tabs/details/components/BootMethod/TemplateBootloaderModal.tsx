@@ -1,9 +1,8 @@
-/* eslint-disable */
-import React, { FC, MouseEvent, useMemo, useState } from 'react';
+import React, { type FC, type MouseEvent, useMemo, useState } from 'react';
 import produce from 'immer';
 
 import { BootModeTitles } from '@kubevirt-utils/components/FirmwareBootloaderModal/utils/constants';
-import { BootloaderOptionValue } from '@kubevirt-utils/components/FirmwareBootloaderModal/utils/types';
+import { type BootloaderOptionValue } from '@kubevirt-utils/components/FirmwareBootloaderModal/utils/types';
 import {
   getBootloaderFromVM,
   getBootloaderOptions,
@@ -14,7 +13,7 @@ import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import useHcoWorkloadArchitectures from '@kubevirt-utils/hooks/useHcoWorkloadArchitectures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getTemplateVirtualMachineObject, Template } from '@kubevirt-utils/resources/template';
+import { getTemplateVirtualMachineObject, type Template } from '@kubevirt-utils/resources/template';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { FormGroup, SelectOption } from '@patternfly/react-core';
 
@@ -36,14 +35,19 @@ const TemplateBootloaderModal: FC<TemplateBootloaderModalProps> = ({
   const [clusterWorkloadArchitectures] = useHcoWorkloadArchitectures(getCluster(vm));
   const clusterOnlyArchitecture = getClusterOnlyArchitecture(clusterWorkloadArchitectures);
   const [selectedFirmwareBootloader, setSelectedFirmwareBootloader] =
-    useState<BootloaderOptionValue>(getBootloaderFromVM(vm, undefined, clusterOnlyArchitecture));
+    useState<BootloaderOptionValue>(() =>
+      getBootloaderFromVM(vm, undefined, clusterOnlyArchitecture),
+    );
 
   const bootloaderOptions = useMemo(
     () => getBootloaderOptions(vm, clusterOnlyArchitecture),
     [vm, clusterOnlyArchitecture],
   );
 
-  const handleChange = (event: MouseEvent<HTMLSelectElement>, value: BootloaderOptionValue) => {
+  const handleChange = (
+    event: MouseEvent<HTMLSelectElement>,
+    value: BootloaderOptionValue,
+  ): void => {
     event.preventDefault();
     setSelectedFirmwareBootloader(value);
   };

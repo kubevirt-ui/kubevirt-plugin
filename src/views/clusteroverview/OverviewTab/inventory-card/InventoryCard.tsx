@@ -1,13 +1,16 @@
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getAllowedResourceData } from '@kubevirt-utils/resources/shared';
-import { K8sResourceCommon, useK8sWatchResources } from '@openshift-console/dynamic-plugin-sdk';
+import {
+  type K8sResourceCommon,
+  useK8sWatchResources,
+} from '@openshift-console/dynamic-plugin-sdk';
 import { Card, CardHeader, CardTitle, Grid, GridItem } from '@patternfly/react-core';
 
-import { useWatchedResourcesHook } from './hooks/useWatchedResourcesInventoryCard';
+import { useWatchedResourcesInventoryCard } from './hooks/useWatchedResourcesInventoryCard';
 import ResourcesSection from './utils/ResourcesSection';
 import VMStatusSection from './utils/vm-status-section/VMStatusSection';
 
@@ -17,8 +20,7 @@ const InventoryCard: FC = () => {
   const { t } = useKubevirtTranslation();
   const isAdmin = useIsAdmin();
 
-  const useWatchedResourcesInventoryCard = useWatchedResourcesHook(isAdmin);
-  const watchedResources = useWatchedResourcesInventoryCard();
+  const watchedResources = useWatchedResourcesInventoryCard(isAdmin);
 
   const resources = useK8sWatchResources<{ [key: string]: K8sResourceCommon[] }>(watchedResources);
 
@@ -57,7 +59,7 @@ const InventoryCard: FC = () => {
             </div>
           </GridItem>
           <GridItem span={8}>
-            <VMStatusSection vms={vms?.data || []} vmsLoaded={vms?.loaded} />
+            <VMStatusSection vms={vms?.data ?? []} vmsLoaded={vms?.loaded} />
           </GridItem>
         </Grid>
       </div>

@@ -1,11 +1,11 @@
-/* eslint-disable */
-import React, { FC, useCallback, useState } from 'react';
+import React, { type FC, useCallback, useState } from 'react';
 
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
-import { AutoAppliedLabel } from '@kubevirt-utils/hooks/useAutoAppliedLabels/types';
+import { type AutoAppliedLabel } from '@kubevirt-utils/hooks/useAutoAppliedLabels/types';
 import useAutoAppliedLabels from '@kubevirt-utils/hooks/useAutoAppliedLabels/useAutoAppliedLabels';
 import useKubevirtToast from '@kubevirt-utils/hooks/useKubevirtToast';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   Button,
   ButtonVariant,
@@ -21,7 +21,6 @@ import { PlusCircleIcon } from '@patternfly/react-icons';
 
 import AddKeyRow from './components/AddKeyRow';
 import AutoAppliedLabelRow from './components/AutoAppliedLabelRow';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
 
 const AutoAppliedLabelsTable: FC = () => {
   const { t } = useKubevirtTranslation();
@@ -97,7 +96,7 @@ const AutoAppliedLabelsTable: FC = () => {
       )}
 
       {labels.map((label, index) => (
-        <StackItem key={`${label.key}-${index}`}>
+        <StackItem key={label.key}>
           <AutoAppliedLabelRow
             existingKeys={existingKeys}
             isDisabled={isDisabled}
