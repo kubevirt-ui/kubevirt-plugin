@@ -24,7 +24,6 @@ test.describe('Tier1 Diagnostics Tab Redesign', { tag: [T1_TAG] }, () => {
       await apiClient.waitForVmRunning(vmName, ns, utils.TestTimeouts.VM_BOOTUP);
 
       await vmTreePage.navigateToNamespaceVirtualMachinesViaUI(testConfig.testNamespace);
-      await vmTreePage.toggleEmptyProjectsDisplay(true);
       await vmTreePage.searchTreeView(ns);
       await vmTreePage.clickTreeNodeAndEnsureExpanded(ns, vmName, ns);
       await vmTreePage.clickVmInTreeView(vmName, ns);

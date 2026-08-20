@@ -367,54 +367,34 @@ export default class VmTreePage extends TreeContextMenuMixin(PageCommons) {
     await this.goTo(`/k8s/ns/${namespace}/kubevirt.io~v1~VirtualMachine?labels=${label}`);
   }
 
-  async navigateToNamespaceVirtualMachines(namespace: string) {
+  async navigateToNamespaceVirtualMachines(namespace: string): Promise<void> {
     await this.goTo(`/k8s/ns/${namespace}/kubevirt.io~v1~VirtualMachine`);
   }
 
-  async navigateToNamespaceVirtualMachinesViaUI(namespace: string): Promise<void> {
+  async navigateToNamespaceVirtualMachinesViaUI(
+    namespace: string,
+    options?: { closeWelcomeModal?: boolean },
+  ): Promise<void> {
     await this.clickNavVirtualMachines();
     await this.page.waitForLoadState('domcontentloaded');
-    await this.switchProject(namespace);
-  }
-
-  async navigateToNamespaceVmListAndWait(namespace: string): Promise<void> {
-    await this.clickNavVirtualMachines();
-    await this.switchProject(namespace);
-
-    const vmListTab = this._vmListTab.or(this.page.getByRole('tab', { name: 'Virtual machines' }));
-    await vmListTab.first().waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
-    await this.robustClick(vmListTab.first());
-    await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
-  }
-
-  async navigateToProjectViaTreeView(namespace: string): Promise<void> {
-    await this.navigateToVirtualMachinesViaUI();
-    await this.tryCloseWelcomeModal();
+    if (options?.closeWelcomeModal) {
+      await this.tryCloseWelcomeModal();
+    }
     await this.toggleEmptyProjectsDisplay(true);
     await this.searchTreeView(namespace);
     await this.clickProjectNode(namespace);
   }
 
-  async navigateToProjectVirtualMachines(projectName: string) {
-    await this.goTo(`/k8s/ns/${projectName}/kubevirt.io~v1~VirtualMachine`);
+  async navigateToProjectViaTreeView(namespace: string): Promise<void> {
+    await this.navigateToNamespaceVirtualMachinesViaUI(namespace, { closeWelcomeModal: true });
   }
 
-  async navigateToProjectVmList(namespace: string): Promise<void> {
-    try {
-      await this.searchTreeView(namespace);
-      await this.clickProjectNode(namespace);
-      await this.clickVmListTab();
-    } catch {
-      await this.navigateToNamespaceVirtualMachines(namespace);
-      await this.clickVmListTab();
-    }
+  async navigateToProjectVirtualMachines(projectName: string): Promise<void> {
+    await this.goTo(`/k8s/ns/${projectName}/kubevirt.io~v1~VirtualMachine`);
   }
 
   async navigateToProjectVmListViaUI(namespace: string): Promise<void> {
     await this.navigateToNamespaceVirtualMachinesViaUI(namespace);
-    await this.toggleEmptyProjectsDisplay(true);
-    await this.searchTreeView(namespace);
-    await this.clickProjectNode(namespace);
     await this.clickVmListTab();
   }
 
@@ -422,13 +402,9 @@ export default class VmTreePage extends TreeContextMenuMixin(PageCommons) {
     await this.clickNavVirtualMachines();
   }
 
-  async navigateToVmsWithEmptyProjects(namespace: string): Promise<void> {
-    await this.navigateToNamespaceVirtualMachinesViaUI(namespace);
-    await this.toggleEmptyProjectsDisplay(true);
-  }
-
   async navigateToVmViaTreeView(namespace: string, vmName: string): Promise<void> {
-    await this.navigateToVirtualMachinesViaUI();
+    await this.clickNavVirtualMachines();
+    await this.page.waitForLoadState('domcontentloaded');
     await this.tryCloseWelcomeModal();
     await this.toggleEmptyProjectsDisplay(true);
     await this.searchTreeView(namespace);
@@ -464,13 +440,7 @@ export default class VmTreePage extends TreeContextMenuMixin(PageCommons) {
 
   async searchTreeView(searchText: string): Promise<void> {
     const searchInput = this._idVmsTreeViewSearchInput;
-    try {
-      await searchInput.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
-    } catch {
-      await this.navigateToAllNamespacesVirtualMachines();
-      await this.page.waitForLoadState('networkidle');
-      await searchInput.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
-    }
+    await searchInput.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
     await searchInput.clear();
     await searchInput.pressSequentially(searchText, { delay: 250 });
     await this.page.waitForTimeout(TestTimeouts.UI_DELAY_EXTRA);

@@ -465,10 +465,6 @@ export class VmListTreeComponent extends BaseComponent {
     return await this._treeView.isVisible().catch(() => false);
   }
 
-  async navigateToAllNamespacesVirtualMachines(): Promise<void> {
-    await this.goTo('/k8s/all-namespaces/kubevirt.io~v1~VirtualMachine');
-  }
-
   async navigateToAllProjects(): Promise<void> {
     const allProjectsNode = this.page.getByRole('treeitem', { name: /All projects/ });
     await allProjectsNode.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
@@ -477,13 +473,7 @@ export class VmListTreeComponent extends BaseComponent {
 
   async searchTreeView(searchText: string): Promise<void> {
     const searchInput = this._idVmsTreeViewSearchInput;
-    try {
-      await searchInput.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
-    } catch {
-      await this.navigateToAllNamespacesVirtualMachines();
-      await this.page.waitForLoadState('networkidle');
-      await searchInput.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
-    }
+    await searchInput.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
     await searchInput.clear();
     await searchInput.pressSequentially(searchText, { delay: 250 });
     await this.page.waitForTimeout(TestTimeouts.UI_DELAY_EXTRA);

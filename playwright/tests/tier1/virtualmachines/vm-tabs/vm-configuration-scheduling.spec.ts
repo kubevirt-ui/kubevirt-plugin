@@ -34,7 +34,6 @@ test.describe.serial(
         tags: [T1_TAG, VM_TABS_TAG],
       });
       await vmTreePage.navigateToNamespaceVirtualMachinesViaUI(testConfig.testNamespace);
-      await vmTreePage.toggleEmptyProjectsDisplay(true);
     });
 
     test('Configuration Scheduling: requirements and eviction strategy after patch', async ({
