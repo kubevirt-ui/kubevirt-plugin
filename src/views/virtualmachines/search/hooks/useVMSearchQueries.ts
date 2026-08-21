@@ -1,9 +1,10 @@
 import { useMemo } from 'react';
 import { useSearchParams } from 'react-router';
 
+import { isExcludedValue } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/utils';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getRowFilterQueryKey } from '@search/utils/query';
-import { AdvancedSearchFilter } from '@stolostron/multicluster-sdk';
+import { type AdvancedSearchFilter } from '@stolostron/multicluster-sdk';
 import { appendDateCreatedSearchQueries } from '@virtualmachines/search/utils';
 import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
@@ -25,14 +26,17 @@ const useVMSearchQueries = (): VMSearchQueries => {
     return value ? value.split(',') : [];
   };
 
-  const vmName = getParam(VirtualMachineRowFilterType.Name);
-  const ipAddress = getParam(VirtualMachineRowFilterType.IP);
+  const vmNames = getMultipleParams(VirtualMachineRowFilterType.Name);
+  const ipAddresses = getMultipleParams(VirtualMachineRowFilterType.IP);
+  const projects = getMultipleParams(VirtualMachineRowFilterType.Project);
+  const clusters = getMultipleParams(VirtualMachineRowFilterType.Cluster);
+
   const dateCreated = getParam(VirtualMachineRowFilterType.DateCreated);
   const createdFrom = getParam(VirtualMachineRowFilterType.DateCreatedFrom);
   const createdTo = getParam(VirtualMachineRowFilterType.DateCreatedTo);
 
-  const projects = getMultipleParams(VirtualMachineRowFilterType.Project);
-  const clusters = getMultipleParams(VirtualMachineRowFilterType.Cluster);
+  const vmName = vmNames.find((name) => !isExcludedValue(name));
+  const ipAddress = ipAddresses.find((ipAddr) => !isExcludedValue(ipAddr));
 
   return useMemo(() => {
     const queries: VMSearchQueries = {

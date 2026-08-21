@@ -1,22 +1,26 @@
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { K8sResourceCommon, WatchK8sResource } from '@openshift-console/dynamic-plugin-sdk';
+import {
+  type K8sResourceCommon,
+  type WatchK8sResource,
+} from '@openshift-console/dynamic-plugin-sdk';
 
 import { PROXY_KUBEVIRT_URL } from './constants';
 
-const rsMapper = {};
+const rsMapper: Record<string, number> = {};
 
-export const registerResourceVersion = (key: string, rs: string) => {
-  rsMapper[key] = Number(rs < rsMapper?.[key] ? rsMapper?.[key] : rs);
-  return;
+export const registerResourceVersion = (key: string, resourceVersion: string): void => {
+  const resourceVersionNumber = Number(resourceVersion);
+  rsMapper[key] = resourceVersionNumber < rsMapper[key] ? rsMapper[key] : resourceVersionNumber;
 };
-export const getResourceVersion = (key: string) => rsMapper?.[key];
 
-export const constructURL = (watchOptions: WatchK8sResource, query?: string) => {
+export const getResourceVersion = (key: string): number | undefined => rsMapper[key];
+
+export const constructURL = (watchOptions: WatchK8sResource, query?: string): string => {
   const { groupVersionKind, name, namespace } = watchOptions || {};
   const baseUrl = `${PROXY_KUBEVIRT_URL}apis/${groupVersionKind?.group}/${groupVersionKind?.version}/`;
-  const namespaceUrl = `${namespace ? `namespaces/${namespace}/` : ''}`;
-  const nameUrl = `${!name ? 's' : `/${name}`}`;
+  const namespaceUrl = namespace ? `namespaces/${namespace}/` : '';
+  const nameUrl = !name ? 's' : `/${name}`;
   const kindUrl = groupVersionKind?.kind.toLowerCase();
   const appendedQuery = !isEmpty(query) ? `?${query}` : '';
 

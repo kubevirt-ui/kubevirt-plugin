@@ -11,13 +11,14 @@ import {
 
 import useDeepCompareMemoize from '../useDeepCompareMemoize/useDeepCompareMemoize';
 
+import { type KubevirtDataPodFilters } from './types';
+import useKubevirtDataPodFilters from './useKubevirtDataPodFilters';
 import {
   compareNameAndNamespace,
   constructURL,
   getResourceVersion,
   registerResourceVersion,
 } from './utils/utils';
-import useKubevirtDataPodFilters, { KubevirtDataPodFilters } from './useKubevirtDataPodFilters';
 
 export type NullableWatchK8sResource = null | WatchK8sResource;
 
@@ -30,7 +31,7 @@ const useKubevirtDataPod = <T extends K8sResourceCommon | K8sResourceCommon[]>(
   const [data, setData] = useState<T>((<unknown>[]) as T);
   const [loaded, setLoaded] = useState<boolean>(false);
   const [error, setError] = useState<Error>(null);
-  const [resourceVersion, setResourceVersion] = useState<string>(null);
+  const [resourceVersion, setResourceVersion] = useState<number | null>(null);
   const query = useKubevirtDataPodFilters(filterOptions);
   const watchOptionsMemoized = useDeepCompareMemoize<NullableWatchK8sResource>(watchOptions, true);
   const url = useMemo(
@@ -46,7 +47,7 @@ const useKubevirtDataPod = <T extends K8sResourceCommon | K8sResourceCommon[]>(
       onOpen: () => kubevirtConsole.log('websocket open kubevirt: ', url),
       queryParams: {
         cluster: 'local-cluster',
-        resourceVersion,
+        ...(resourceVersion != null && { resourceVersion }),
         watch: 'true',
         // fieldSelector: 'metadata.name=?',
       },
@@ -66,7 +67,7 @@ const useKubevirtDataPod = <T extends K8sResourceCommon | K8sResourceCommon[]>(
           watchOptionsMemoized.groupVersionKind.kind,
           jsonData?.metadata?.resourceVersion,
         );
-        setResourceVersion(getResourceVersion(watchOptionsMemoized.groupVersionKind.kind));
+        setResourceVersion(getResourceVersion(watchOptionsMemoized.groupVersionKind.kind) ?? null);
         setData(jsonData?.items ? jsonData.items : jsonData);
         setShouldConnect(true);
         setLoaded(true);
