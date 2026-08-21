@@ -50,7 +50,7 @@ MigrationPolicies, cluster InstanceTypes, and bootable volumes.
 ### `001`: Create a VM via the creation wizard
 
 - **Objective:** Verify that completing the Create VM wizard redirects to the VM detail page and shows the created VM name
-- **Target version:** CNV 5.0
+- **Target version:** CNV 5.0.0
 - **Jira References:** —
 - **Pre-conditions:** Test namespace exists; at least one bootable volume is available for the wizard
 - **Tags:** `@gating`, `@resource-creation`, `e2e-create`
@@ -72,7 +72,7 @@ MigrationPolicies, cluster InstanceTypes, and bootable volumes.
 ### `002`: Create a VM via YAML import
 
 - **Objective:** Verify that importing a VM from YAML creates the VM and navigates to a URL that contains the VM name
-- **Target version:** CNV 5.0
+- **Target version:** CNV 5.0.0
 - **Jira References:** —
 - **Pre-conditions:** Test namespace exists
 - **Tags:** `@gating`, `@resource-creation`, `yaml-create`
@@ -88,7 +88,7 @@ MigrationPolicies, cluster InstanceTypes, and bootable volumes.
 ### `003`: Create a template via YAML editor
 
 - **Objective:** Verify that creating a template from the YAML editor persists the template and shows it in the Templates list
-- **Target version:** CNV 5.0
+- **Target version:** CNV 5.0.0
 - **Jira References:** CNV-87128
 - **Pre-conditions:** Test namespace exists
 - **Tags:** `@gating`, `@resource-creation`
@@ -105,7 +105,7 @@ MigrationPolicies, cluster InstanceTypes, and bootable volumes.
 ### `004`: Clone dialog opens from Create template
 
 - **Objective:** Verify that "Create template → From an existing template" opens the clone dialog with a source project selector
-- **Target version:** CNV 5.0
+- **Target version:** CNV 5.0.0
 - **Jira References:** CNV-87128
 - **Pre-conditions:** Templates page is reachable; All Projects view is available
 - **Tags:** `@gating`, `@resource-creation`
@@ -122,7 +122,7 @@ MigrationPolicies, cluster InstanceTypes, and bootable volumes.
 ### `005`: From a virtual machine navigates to the VM list
 
 - **Objective:** Verify that "Create template → From a virtual machine" navigates to the VirtualMachines list (`tab=vms`) and shows the save-as-template guidance toast
-- **Target version:** CNV 5.0
+- **Target version:** CNV 5.0.0
 - **Jira References:** CNV-87128
 - **Pre-conditions:** Templates page is reachable
 - **Tags:** `@gating`, `@resource-creation`
@@ -138,7 +138,7 @@ MigrationPolicies, cluster InstanceTypes, and bootable volumes.
 ### `006`: Save a VM as a template from VM details
 
 - **Objective:** Verify that saving a running/created VM as a template from the VM detail Actions menu creates a template visible in the Templates list
-- **Target version:** CNV 5.0
+- **Target version:** CNV 5.0.0
 - **Jira References:** —
 - **Pre-conditions:** Native VM templates preview flag is enabled (`vmTemplates=true`). Test is skipped otherwise.
 - **Tags:** `@gating`, `@resource-creation`
@@ -155,7 +155,7 @@ MigrationPolicies, cluster InstanceTypes, and bootable volumes.
 ### `007`: Create a migration policy via form
 
 - **Objective:** Verify that creating a MigrationPolicy from the form persists the resource via the API
-- **Target version:** CNV 5.0
+- **Target version:** CNV 5.0.0
 - **Jira References:** —
 - **Pre-conditions:** MigrationPolicies page is reachable
 - **Tags:** `@gating`, `@resource-creation`
@@ -172,7 +172,7 @@ MigrationPolicies, cluster InstanceTypes, and bootable volumes.
 ### `008`: Create a cluster instance type via YAML editor
 
 - **Objective:** Verify that creating a `VirtualMachineClusterInstancetype` from YAML shows the instance type in the UI list
-- **Target version:** CNV 5.0
+- **Target version:** CNV 5.0.0
 - **Jira References:** —
 - **Pre-conditions:** InstanceTypes page is reachable
 - **Tags:** `@gating`, `@resource-creation`
@@ -188,7 +188,7 @@ MigrationPolicies, cluster InstanceTypes, and bootable volumes.
 ### `009`: Create a bootable volume via YAML editor
 
 - **Objective:** Verify that creating a DataVolume bootable volume from YAML shows the volume in the bootable volumes list
-- **Target version:** CNV 5.0
+- **Target version:** CNV 5.0.0
 - **Jira References:** —
 - **Pre-conditions:** Test namespace exists; Fedora registry image URL is available to the test factory
 - **Tags:** `@gating`, `@resource-creation`

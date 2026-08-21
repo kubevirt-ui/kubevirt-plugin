@@ -49,7 +49,7 @@ Group selection in the Advanced Search modal, and applying/clearing the filter f
 ### `001`: Group key is visible in search suggestions
 
 - **Objective:** Verify that focusing the search input shows `group` in the Search by keys section.
-- **Target version:** CNV 5.00
+- **Target version:** CNV 5.0.0
 - **Jira References:** CNV-94097
 - **Pre-conditions:** Folder-labeled VMs exist in the test namespace
 - **Tags:** `@adminOnly`
@@ -65,7 +65,7 @@ Group selection in the Advanced Search modal, and applying/clearing the filter f
 ### `002`: group:folderName filters VMs by group
 
 - **Objective:** Verify that `group:group-alpha` applies a group chip and lists only VMs in that group.
-- **Target version:** CNV 5.00
+- **Target version:** CNV 5.0.0
 - **Jira References:** CNV-94097
 - **Pre-conditions:** Folder-labeled VMs exist in the test namespace
 - **Tags:** `@adminOnly`
@@ -81,7 +81,7 @@ Group selection in the Advanced Search modal, and applying/clearing the filter f
 ### `003`: Comma-separated groups apply OR logic
 
 - **Objective:** Verify that `group:group-alpha,group-beta` shows both group chips and matching VMs.
-- **Target version:** CNV 5.00
+- **Target version:** CNV 5.0.0
 - **Jira References:** CNV-94097
 - **Pre-conditions:** Folder-labeled VMs exist in the test namespace
 - **Tags:** `@adminOnly`
@@ -97,7 +97,7 @@ Group selection in the Advanced Search modal, and applying/clearing the filter f
 ### `004`: Clearing the group filter restores all VMs
 
 - **Objective:** Verify that clearing search after a group query shows all VMs again.
-- **Target version:** CNV 5.00
+- **Target version:** CNV 5.0.0
 - **Jira References:** CNV-94097
 - **Pre-conditions:** Folder-labeled VMs exist in the test namespace
 - **Tags:** `@adminOnly`
@@ -114,7 +114,7 @@ Group selection in the Advanced Search modal, and applying/clearing the filter f
 
 - **Objective:** Verify that choosing a group in the Advanced Search modal applies the group chip and
   filters the list.
-- **Target version:** CNV 5.00
+- **Target version:** CNV 5.0.0
 - **Jira References:** CNV-94097
 - **Pre-conditions:** Folder-labeled VMs exist in the test namespace
 - **Tags:** `@adminOnly`
@@ -132,7 +132,7 @@ Group selection in the Advanced Search modal, and applying/clearing the filter f
 ### `006`: Multi-group selection in Advanced Search shows all matching VMs
 
 - **Objective:** Verify that selecting two groups in Advanced Search lists VMs from both groups.
-- **Target version:** CNV 5.00
+- **Target version:** CNV 5.0.0
 - **Jira References:** CNV-94097
 - **Pre-conditions:** Folder-labeled VMs exist in the test namespace
 - **Tags:** `@adminOnly`
@@ -149,7 +149,7 @@ Group selection in the Advanced Search modal, and applying/clearing the filter f
 ### `007`: Clicking a folder node in the tree applies the group filter
 
 - **Objective:** Verify that clicking a folder in the tree sets `group=` in the URL and filters the list.
-- **Target version:** CNV 5.00
+- **Target version:** CNV 5.0.0
 - **Jira References:** CNV-94097
 - **Pre-conditions:** Folder-labeled VMs exist in the test namespace
 - **Tags:** `@adminOnly`
@@ -166,7 +166,7 @@ Group selection in the Advanced Search modal, and applying/clearing the filter f
 
 - **Objective:** Verify that clicking the project node after a folder selection clears `group=` from
   the URL and restores all VMs.
-- **Target version:** CNV 5.00
+- **Target version:** CNV 5.0.0
 - **Jira References:** CNV-94097
 - **Pre-conditions:** Folder-labeled VMs exist in the test namespace
 - **Tags:** `@adminOnly`

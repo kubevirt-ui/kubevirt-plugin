@@ -48,7 +48,7 @@ behavior, modal close-on-submit, and the resulting background export toast.
 
 - **Objective:** Verify the Upload to registry modal's Save button stays disabled until destination,
   username, and password are all provided.
-- **Target version:** CNV 5.00
+- **Target version:** CNV 5.0.0
 - **Jira References:** CNV-89946, CNV-87382, CNV-89815
 - **Pre-conditions:** A bootable volume (DataVolume + DataSource) already exists in the test namespace
 - **Tags:** `@nonpriv`
@@ -68,7 +68,7 @@ behavior, modal close-on-submit, and the resulting background export toast.
 - **Objective:** Verify that a completed and submitted Upload to registry form closes the modal
   automatically and surfaces a background progress toast (or an expected terminal state given dummy
   credentials).
-- **Target version:** CNV 5.00
+- **Target version:** CNV 5.0.0
 - **Jira References:** CNV-89946, CNV-87382, CNV-89815
 - **Pre-conditions:** A bootable volume (DataVolume + DataSource) already exists in the test namespace
 - **Tags:** `@nonpriv`
