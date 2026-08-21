@@ -275,10 +275,6 @@ export default class VmDetailComponent extends PageCommons {
     return (await moreLink.textContent())?.trim() || '';
   }
 
-  override getCurrentUrl(): string {
-    return this.page.url();
-  }
-
   async getStorageUtilizationText(): Promise<string | null> {
     try {
       const storageSummary = this._utilSummaryStorage;

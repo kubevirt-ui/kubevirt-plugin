@@ -108,15 +108,10 @@ export default class VmTreePage extends TreeContextMenuMixin(PageCommons) {
         .catch(() => false);
     }
 
-    const treeItem = this._treeView
-      .locator('[role="treeitem"]')
-      .filter({
-        has: this.page.locator('button', { hasText: 'Local cluster' }),
-      })
-      .first();
+    const treeItem = this._treeView.locator('[id="#ALL_NS#"]').first();
     await treeItem.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
 
-    const labelButton = treeItem.locator('button', { hasText: 'Local cluster' }).last();
+    const labelButton = treeItem.locator('button', { hasText: 'Local cluster' });
     await labelButton.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
     await this.robustClick(labelButton);
 
@@ -242,9 +237,11 @@ export default class VmTreePage extends TreeContextMenuMixin(PageCommons) {
   }
 
   async createProject(projectName: string): Promise<void> {
-    const allProjectsNode = this._treeNode.filter({ hasText: 'All projects' }).first();
-    await allProjectsNode.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
-    await allProjectsNode.click({ button: 'right' });
+    const localClusterNode = this.locator('[id="#ALL_NS#"]').locator('button', {
+      hasText: 'Local cluster',
+    });
+    await localClusterNode.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+    await localClusterNode.click({ button: 'right' });
     await this.page.waitForTimeout(TestTimeouts.UI_ANIMATION_DELAY);
 
     const createProjectOption = this.locator('button:has-text("Create project")');
@@ -345,9 +342,7 @@ export default class VmTreePage extends TreeContextMenuMixin(PageCommons) {
   }
 
   async navigateToAllProjects(): Promise<void> {
-    const allProjectsNode = this.page.getByRole('treeitem', { name: /All projects/ });
-    await allProjectsNode.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
-    await this.robustClick(allProjectsNode);
+    return this.clickLocalClusterInTree();
   }
 
   async navigateToFleetVirtualizationVmsForClusterNamespace(

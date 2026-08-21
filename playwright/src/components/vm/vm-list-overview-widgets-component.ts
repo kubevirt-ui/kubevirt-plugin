@@ -174,15 +174,10 @@ export default class VmListOverviewWidgetsComponent extends BaseComponent {
         .catch(() => false);
     }
 
-    const treeItem = this._treeView
-      .locator('[role="treeitem"]')
-      .filter({
-        has: this.page.locator('button', { hasText: 'Local cluster' }),
-      })
-      .first();
+    const treeItem = this._treeView.locator('[id="#ALL_NS#"]').first();
     await treeItem.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
 
-    const labelButton = treeItem.locator('button', { hasText: 'Local cluster' }).last();
+    const labelButton = treeItem.locator('button', { hasText: 'Local cluster' });
     await labelButton.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
     await this.robustClick(labelButton);
 

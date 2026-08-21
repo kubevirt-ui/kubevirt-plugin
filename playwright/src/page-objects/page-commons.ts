@@ -399,10 +399,6 @@ export default class PageCommons extends BasePage {
     return this.pageContent.getAllStatusTexts();
   }
 
-  getCurrentUrl(): string {
-    return this.pageContent.getCurrentUrl();
-  }
-
   async getMainHeadingH1Text(): Promise<string | null> {
     return this.pageContent.getMainHeadingH1Text();
   }

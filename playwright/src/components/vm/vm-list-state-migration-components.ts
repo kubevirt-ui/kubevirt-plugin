@@ -245,6 +245,9 @@ export class VmListEmptyStateComponent extends BaseComponent {
 /** VM list tree view: drawer, search, namespace/project nodes, and folder rows. */
 export class VmListTreeComponent extends BaseComponent {
   private readonly _idVmsTreeViewSearchInput = this.locator('[id="vms-tree-view-search-input"]');
+  private readonly _localClusterNodeButton = this.locator('[id="#ALL_NS#"]').locator('button', {
+    hasText: 'Local cluster',
+  });
   private readonly _projectName = this.locator('#project-name');
   private readonly _treeNode = this.locator('.pf-v6-c-tree-view__node');
   private readonly _treeView = this.locator('.pf-v6-c-tree-view');
@@ -266,6 +269,15 @@ export class VmListTreeComponent extends BaseComponent {
     const node = this.locator(`[id="${nodeId}"]`);
     await node.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
     await node.click();
+    await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
+  }
+
+  async clickLocalClusterInTree(): Promise<void> {
+    await this._localClusterNodeButton.waitFor({
+      state: 'visible',
+      timeout: TestTimeouts.ELEMENT_WAIT,
+    });
+    await this.robustClick(this._localClusterNodeButton);
     await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
   }
 
@@ -374,9 +386,11 @@ export class VmListTreeComponent extends BaseComponent {
   }
 
   async createProject(projectName: string): Promise<void> {
-    const allProjectsNode = this._treeNode.filter({ hasText: 'All projects' }).first();
-    await allProjectsNode.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
-    await allProjectsNode.click({ button: 'right' });
+    await this._localClusterNodeButton.waitFor({
+      state: 'visible',
+      timeout: TestTimeouts.ELEMENT_WAIT,
+    });
+    await this._localClusterNodeButton.click({ button: 'right' });
     await this.page.waitForTimeout(TestTimeouts.UI_ANIMATION_DELAY);
 
     const createProjectOption = this.locator('button:has-text("Create project")');
@@ -470,9 +484,7 @@ export class VmListTreeComponent extends BaseComponent {
   }
 
   async navigateToAllProjects(): Promise<void> {
-    const allProjectsNode = this.page.getByRole('treeitem', { name: /All projects/ });
-    await allProjectsNode.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
-    await this.robustClick(allProjectsNode);
+    return this.clickLocalClusterInTree();
   }
 
   async searchTreeView(searchText: string): Promise<void> {

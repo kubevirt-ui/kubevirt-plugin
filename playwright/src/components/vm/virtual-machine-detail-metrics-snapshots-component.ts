@@ -151,10 +151,6 @@ export default class VirtualMachineDetailMetricsSnapshotsComponent extends BaseC
     await this.robustClick(confirmButton);
   }
 
-  getCurrentUrl(): string {
-    return this.page.url();
-  }
-
   async getFirstSnapshotNameFromSnapshotsTable(
     timeoutMs: number = TestTimeouts.STATUS_VALIDATION,
   ): Promise<string> {

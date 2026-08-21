@@ -82,10 +82,6 @@ export default class QuotasPage extends BasePage {
     await input.fill(value);
   }
 
-  async getCurrentUrl(): Promise<string> {
-    return this.page.url();
-  }
-
   async getDocumentationLinkHref(): Promise<string | null> {
     try {
       const docLink = this._aHasTextLearnMoreAboutManagingVMQuotasWithAAQ;
