@@ -189,7 +189,7 @@ export default class VirtualMachinesPage extends TreeContextMenuMixin(PageCommon
   }
 
   async clickLocalClusterInTree(): Promise<void> {
-    return this.overviewWidgets.clickLocalClusterInTree();
+    return this.tree.clickLocalClusterInTree();
   }
 
   async clickMigrateConfirmationButton(): Promise<void> {
@@ -705,6 +705,10 @@ export default class VirtualMachinesPage extends TreeContextMenuMixin(PageCommon
 
   async isOverviewTabSelected(): Promise<boolean> {
     return this.overviewWidgets.isOverviewTabSelected();
+  }
+
+  async isProjectFilterEnabled(): Promise<boolean> {
+    return this.listFilters.isProjectFilterEnabled();
   }
 
   async isProjectHintVisible(timeout: number = TestTimeouts.ELEMENT_WAIT): Promise<boolean> {

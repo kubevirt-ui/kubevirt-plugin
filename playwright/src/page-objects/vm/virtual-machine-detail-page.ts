@@ -380,9 +380,6 @@ export default class VirtualMachineDetailPage extends PageCommons {
   async getCloudInitValues(): Promise<{ username: string; password: string } | null> {
     return this.diagnostics.getCloudInitValues();
   }
-  override getCurrentUrl(): string {
-    return this.metricsSnapshots.getCurrentUrl();
-  }
   async getDiagnosticsOverviewCardCounts(): Promise<{
     critical: number;
     warnings: number;

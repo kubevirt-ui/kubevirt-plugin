@@ -101,6 +101,14 @@ export class VmListFiltersComponent extends BaseComponent {
     await this.robustClick(statusFilter);
   }
 
+  async isProjectFilterEnabled(): Promise<boolean> {
+    await this._filterToolbarProjectButton.waitFor({
+      state: 'visible',
+      timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+    });
+    return this._filterToolbarProjectButton.isEnabled();
+  }
+
   async openProjectFilter(): Promise<void> {
     await this._filterToolbarProjectButton.waitFor({
       state: 'visible',
@@ -130,6 +138,7 @@ export class VmListFiltersComponent extends BaseComponent {
   async selectProjectInFilterMenu(projectName: string): Promise<void> {
     const menuitem = this._filterMenuitem.filter({ hasText: projectName }).first();
     await menuitem.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+    await menuitem.scrollIntoViewIfNeeded();
     await menuitem.click({ force: true });
   }
 

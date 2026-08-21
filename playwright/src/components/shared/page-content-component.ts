@@ -96,10 +96,6 @@ export default class PageContentComponent extends BaseComponent {
     return statusTexts;
   }
 
-  getCurrentUrl(): string {
-    return this.page.url();
-  }
-
   async getMainHeadingH1Text(): Promise<string | null> {
     const raw = await this.page.locator('h1').textContent();
     return raw?.trim() ?? null;

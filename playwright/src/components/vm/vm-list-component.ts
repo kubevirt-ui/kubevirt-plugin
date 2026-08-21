@@ -225,10 +225,6 @@ export default class VmListComponent extends BaseComponent {
     await this._templateVmNameInput.fill(vmName);
   }
 
-  getCurrentUrl(): string {
-    return this.page.url();
-  }
-
   async getTemplateVmName(): Promise<string> {
     return await this._templateVmNameInput.inputValue();
   }
