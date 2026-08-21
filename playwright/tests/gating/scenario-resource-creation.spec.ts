@@ -162,6 +162,19 @@ test.describe('Resource creation (gating)', { tag: [GATING_TAG, '@resource-creat
     await templatesPage.closeDialog();
   });
 
+  test('"From a virtual machine" navigates to the VM list', async ({ templatesPage, utils }) => {
+    await utils.withAllure({ suite: SUITE, feature: GATING, tags: [GATING_TAG] });
+
+    await templatesPage.navigateToTemplatesViaUI();
+    await templatesPage.clickCreateTemplateOption('From a virtual machine');
+
+    const result = await templatesPage.verifyNavigatedToVmsPage();
+    expect(result.onVmList, 'Should navigate to the VirtualMachines list with tab=vms').toBe(true);
+    expect
+      .soft(result.toastVisible, 'Should show guidance toast for saving a VM as a template')
+      .toBe(true);
+  });
+
   test('Create a template from a virtual machine', async ({
     apiClient,
     vmDetailPage,

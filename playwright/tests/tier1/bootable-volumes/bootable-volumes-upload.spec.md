@@ -45,7 +45,7 @@ in-progress upload from the toast.
 
 - **Objective:** Verify that uploading a local image through the Add volume form results in a
   successful DataVolume and a visible list row.
-- **Target version:** CNV 5.00
+- **Target version:** CNV 5.0.0
 - **Jira References:** CNV-89946, CNV-87382, CNV-89800
 - **Pre-conditions:** None
 - **Tags:** `@nonpriv`
@@ -64,7 +64,7 @@ in-progress upload from the toast.
 
 - **Objective:** Verify that closing the Add volume modal after submit does not cancel the upload, and
   the upload can still be aborted from the toast.
-- **Target version:** CNV 5.00
+- **Target version:** CNV 5.0.0
 - **Jira References:** CNV-89946, CNV-87382, CNV-89800
 - **Pre-conditions:** None
 - **Tags:** `@nonpriv`
@@ -83,7 +83,7 @@ in-progress upload from the toast.
 
 - **Objective:** Verify that the abort action in the uploading toast stops the upload and cleans up the
   DataVolume, and that the abort control disappears once aborted.
-- **Target version:** CNV 5.00
+- **Target version:** CNV 5.0.0
 - **Jira References:** CNV-89946, CNV-87382, CNV-89800
 - **Pre-conditions:** None
 - **Tags:** `@nonpriv`

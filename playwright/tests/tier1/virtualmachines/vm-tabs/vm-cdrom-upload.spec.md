@@ -47,7 +47,7 @@ including the resulting background upload toast and the ability to abort an in-p
 
 - **Objective:** Verify that adding a CD-ROM disk via "Upload new ISO" on an existing stopped VM starts
   a background upload and surfaces a progress toast.
-- **Target version:** CNV 5.00
+- **Target version:** CNV 5.0.0
 - **Jira References:** CNV-89946, CNV-87382, CNV-89800
 - **Pre-conditions:** VM must exist and be reachable via the VM tree view (created stopped from the
   RHEL9 template)
@@ -66,7 +66,7 @@ including the resulting background upload toast and the ability to abort an in-p
 
 - **Objective:** Verify that the abort action in the uploading toast stops an in-progress CD-ROM upload
   and removes the underlying DataVolume.
-- **Target version:** CNV 5.00
+- **Target version:** CNV 5.0.0
 - **Jira References:** CNV-89946, CNV-87382, CNV-89800
 - **Pre-conditions:** VM must exist and be reachable via the VM tree view (created stopped from the
   RHEL9 template)
