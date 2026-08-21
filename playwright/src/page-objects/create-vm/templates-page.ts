@@ -911,15 +911,28 @@ export default class TemplatesPage extends PageCommons {
     }
   }
 
-  async verifyNavigatedToVmsPage(): Promise<boolean> {
+  /**
+   * Outcome of Create template → "From a virtual machine": VM list URL and guidance toast.
+   */
+  async verifyNavigatedToVmsPage(): Promise<{ onVmList: boolean; toastVisible: boolean }> {
+    const toastVisiblePromise = this.page
+      .getByText('To create a template from a VM', { exact: false })
+      .waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY })
+      .then(() => true)
+      .catch(() => false);
+
+    let onVmList = false;
     try {
-      await this.page.waitForURL(/VirtualMachine/, {
-        timeout: TestTimeouts.UI_ACTION_COMPLETE,
-      });
-      return this.page.url().includes('tab=vms');
+      await this.page.waitForURL(
+        (url) => url.href.includes('tab=vms') && /VirtualMachine/i.test(url.pathname),
+        { timeout: TestTimeouts.UI_ACTION_COMPLETE },
+      );
+      onVmList = true;
     } catch {
-      return false;
+      onVmList = false;
     }
+
+    return { onVmList, toastVisible: await toastVisiblePromise };
   }
 
   override async verifyPageLoaded(
