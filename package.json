@@ -143,6 +143,10 @@
     },
     "@openshift-console/plugin-shared": {
       "sanitize-html": "2.17.4"
+    },
+    "sanitize-html": {
+      "htmlparser2": "8.0.2",
+      "entities": "4.5.0"
     }
   },
   "private": true,
