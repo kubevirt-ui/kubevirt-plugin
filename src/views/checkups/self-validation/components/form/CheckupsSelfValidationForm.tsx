@@ -83,7 +83,7 @@ const CheckupsSelfValidationForm = (): ReactElement => {
                 />
               </FormGroup>
 
-              {(checkupImageLoadError || checkupImageIsFallback) && (
+              {(checkupImageLoadError ?? checkupImageIsFallback) && (
                 <CheckupImageField
                   checkupImage={checkupImage}
                   checkupImageLoaded={checkupImageLoaded}
