@@ -24,7 +24,7 @@ export const formatTimestamp = (dateValue: Date | undefined): string => {
 export const getMetricSubtitle = (metricChartData: MetricChartData, metric: string): string => {
   if (!metricChartData.isReady) return NO_DATA_DASH;
   const currentValue = getCurrentValue(metricChartData.chartData);
-  const displayUnit = getLabelUnit(metric, metricChartData.unit) as string;
+  const displayUnit = getLabelUnit(metric, metricChartData.unit);
   const formattedValue =
     currentValue != null && !isNaN(currentValue) ? currentValue.toLocaleString() : '0';
   return `${formattedValue} ${displayUnit ?? ''}`.trim();

@@ -34,7 +34,7 @@ const DefaultVMLabelsTable: FC = () => {
 
   const onValueChange = useCallback(
     (key: string, value: string): void => {
-      void setUserValues({ ...((userValues as Record<string, string>) ?? {}), [key]: value });
+      void setUserValues({ ...(userValues ?? {}), [key]: value });
     },
     [setUserValues, userValues],
   );
@@ -75,7 +75,7 @@ const DefaultVMLabelsTable: FC = () => {
               <DefaultVMLabelRow
                 label={label}
                 onValueChange={onValueChange}
-                userValue={(userValues as Record<string, string>)?.[label.key]}
+                userValue={userValues?.[label.key]}
               />
             </StackItem>
           ))}

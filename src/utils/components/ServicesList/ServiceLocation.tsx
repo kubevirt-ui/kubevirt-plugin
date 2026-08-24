@@ -2,6 +2,7 @@ import React, { type FC } from 'react';
 
 import { type IoK8sApiCoreV1Service } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 
 type ServiceLocationProps = {
   service: IoK8sApiCoreV1Service;
@@ -40,7 +41,7 @@ const ServiceLocation: FC<ServiceLocationProps> = ({ service }) => {
         <>
           {service.status.loadBalancer.ingress.map((ingress) => (
             <div className="co-truncate co-select-to-copy" key={ingress.hostname ?? ingress.ip}>
-              {ingress.hostname ?? ingress.ip ?? '-'}
+              {ingress.hostname ?? ingress.ip ?? NO_DATA_DASH}
             </div>
           ))}
         </>
