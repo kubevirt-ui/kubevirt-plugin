@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { type V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { OPENSHIFT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import useListClusters from '@kubevirt-utils/hooks/useListClusters';
 import useListMulticlusterFilters from '@kubevirt-utils/hooks/useListMulticlusterFilters';
@@ -10,10 +10,11 @@ import {
   TEMPLATE_TYPE_VM,
 } from '@kubevirt-utils/resources/template';
 import { TemplateModelGroupVersionKind } from '@kubevirt-utils/resources/template/hooks/constants';
-import { Operator, Selector } from '@openshift-console/dynamic-plugin-sdk';
+import { Operator, type Selector } from '@openshift-console/dynamic-plugin-sdk';
 import { useAccessibleResources } from '@virtualmachines/search/hooks/useAccessibleResources';
 
 type UseOpenShiftTemplates = (props: {
+  clusterOverride?: string;
   fieldSelector?: string;
   namespace?: string;
   selector?: Selector;
@@ -24,12 +25,17 @@ type UseOpenShiftTemplates = (props: {
 };
 
 export const useOpenShiftTemplates: UseOpenShiftTemplates = ({
+  clusterOverride,
   fieldSelector,
   namespace,
   selector,
 }) => {
   const multiclusterFilters = useListMulticlusterFilters();
-  const clusters = useListClusters();
+  const clustersInParam = useListClusters();
+  const clusters = useMemo(
+    () => (clusterOverride ? [clusterOverride] : clustersInParam),
+    [clusterOverride, clustersInParam],
+  );
 
   const templateWatchNamespaces = useMemo(
     () => (namespace ? [OPENSHIFT_NAMESPACE, namespace] : [OPENSHIFT_NAMESPACE]),

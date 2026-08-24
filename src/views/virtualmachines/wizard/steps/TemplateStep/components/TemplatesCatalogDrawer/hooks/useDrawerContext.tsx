@@ -23,12 +23,10 @@ export type DrawerContext = {
 const useDrawer = (initialTemplate: Template) => {
   const [template, setTemplate] = useImmer(initialTemplate);
   const { control } = useVMWizard();
-  const project = useWatch({ control, name: CREATE_VM_FORM_FIELDS_VM_DATA.PROJECT });
-  const [templateWithGeneratedParams, loading, error] = useVMTemplateGeneratedParams(
-    initialTemplate,
-    project || undefined,
-  );
-  const { loaded: bootSourceLoaded } = useVMTemplateSource(initialTemplate);
+  const cluster = useWatch({ control, name: CREATE_VM_FORM_FIELDS_VM_DATA.CLUSTER });
+  const [templateWithGeneratedParams, loading, error] =
+    useVMTemplateGeneratedParams(initialTemplate);
+  const { loaded: bootSourceLoaded } = useVMTemplateSource(initialTemplate, cluster);
 
   // reset drawer template state when selected template changes
   useEffect(() => {

@@ -1,10 +1,11 @@
-import React, { FC, ReactNode, useEffect } from 'react';
+import React, { type FC, type ReactNode, useEffect } from 'react';
 import { FormProvider, useForm, useFormContext } from 'react-hook-form';
 
-import useClusterParam from '@multicluster/hooks/useClusterParam';
-import useInitialNamespace from '@virtualmachines/wizard/hooks/useInitialNamespace';
+import Loading from '@kubevirt-utils/components/Loading/Loading';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
+import useWizardInitialValues from '@virtualmachines/wizard/hooks/useWizardInitialValues';
 import { createInitialVMWizardFormValues } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
-import { VMWizardFormValues } from '@virtualmachines/wizard/state/vm-wizard-form/types';
+import { type VMWizardFormValues } from '@virtualmachines/wizard/state/vm-wizard-form/types';
 import { clearVMPendingUploadsAndSignal } from '@virtualmachines/wizard/utils/utils';
 
 type VMWizardProviderProps = {
@@ -12,13 +13,21 @@ type VMWizardProviderProps = {
 };
 
 export const VMWizardProvider: FC<VMWizardProviderProps> = ({ children }) => {
-  const clusterParam = useClusterParam();
-  const namespace = useInitialNamespace();
+  const { cluster, hubClusterError, isLoadingHubCluster, namespace } = useWizardInitialValues();
+
   const methods = useForm<VMWizardFormValues>({
-    defaultValues: createInitialVMWizardFormValues({ cluster: clusterParam ?? '', namespace }),
+    defaultValues: createInitialVMWizardFormValues({ cluster, namespace }),
   });
 
-  useEffect(() => () => clearVMPendingUploadsAndSignal(), []);
+  useEffect(() => (): void => clearVMPendingUploadsAndSignal(), []);
+
+  if (isLoadingHubCluster) {
+    return <Loading />;
+  }
+
+  if (!isEmpty(hubClusterError)) {
+    throw new Error(hubClusterError?.message ?? hubClusterError?.toString());
+  }
 
   return <FormProvider {...methods}>{children}</FormProvider>;
 };

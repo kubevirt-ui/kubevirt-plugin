@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router';
+import { useWatch } from 'react-hook-form';
 
 import { type V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
@@ -9,20 +9,24 @@ import {
   isVirtualMachineTemplate,
   processOpenShiftTemplate,
   replaceTemplateParameters,
-  Template,
+  type Template,
 } from '@kubevirt-utils/resources/template';
 import { generateParamsWithPrettyName } from '@kubevirt-utils/resources/template/utils/helpers';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import useClusterParam from '@multicluster/hooks/useClusterParam';
+import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
+import { CREATE_VM_FORM_FIELDS_VM_DATA } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
 
 const useVMTemplateGeneratedParams = (
   template: Template,
   namespaceOverride?: string,
 ): [template: Template, loading: boolean, error: Error] => {
-  const cluster = useClusterParam();
+  const { control } = useVMWizard();
+  const [cluster, project] = useWatch({
+    control,
+    name: [CREATE_VM_FORM_FIELDS_VM_DATA.CLUSTER, CREATE_VM_FORM_FIELDS_VM_DATA.PROJECT],
+  });
   const [error, setError] = useState<Error>();
-  const { ns: nsFromParams = DEFAULT_NAMESPACE } = useParams<{ ns: string }>();
-  const namespace = namespaceOverride || nsFromParams;
+  const namespace = namespaceOverride || project || DEFAULT_NAMESPACE;
   const [templateWithGeneratedValues, setTemplateWithGeneratedValues] = useState<Template>();
   const [loading, setLoading] = useState<boolean>(false);
 

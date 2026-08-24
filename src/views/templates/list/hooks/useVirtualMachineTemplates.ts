@@ -1,5 +1,7 @@
+import { useMemo } from 'react';
+
 import { VirtualMachineTemplateModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1beta1VirtualMachineTemplate } from '@kubevirt-ui-ext/kubevirt-api/virt-template';
+import { type V1beta1VirtualMachineTemplate } from '@kubevirt-ui-ext/kubevirt-api/virt-template';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
 import useListClusters from '@kubevirt-utils/hooks/useListClusters';
@@ -9,14 +11,23 @@ import { useK8sModel } from '@openshift-console/dynamic-plugin-sdk';
 type UseVirtualMachineTemplates = (
   namespace?: string,
   enabled?: boolean,
+  clusterOverride?: string,
 ) => {
   error: any;
   loaded: boolean;
   vmTemplates: V1beta1VirtualMachineTemplate[];
 };
 
-const useVirtualMachineTemplates: UseVirtualMachineTemplates = (namespace, enabled = true) => {
-  const clusters = useListClusters();
+const useVirtualMachineTemplates: UseVirtualMachineTemplates = (
+  namespace,
+  enabled = true,
+  clusterOverride,
+) => {
+  const clustersInParam = useListClusters();
+  const clusters = useMemo(
+    () => (clusterOverride ? [clusterOverride] : clustersInParam),
+    [clusterOverride, clustersInParam],
+  );
   const cluster = clusters?.length === 1 ? clusters[0] : undefined;
   const isAdmin = useIsAdmin();
   const [model, inFlight] = useK8sModel(VirtualMachineTemplateModelGroupVersionKind);

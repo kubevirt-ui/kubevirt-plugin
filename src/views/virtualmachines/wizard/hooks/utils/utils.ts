@@ -31,7 +31,10 @@ import { getErrorMessage, kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { getVMURL } from '@multicluster/urls';
 import { VMCreationMethod } from '@virtualmachines/wizard/utils/constants';
-import { HandleCloneRequestPhaseChangeParams } from '@virtualmachines/wizard/utils/types';
+import {
+  type GetClusterInitialValueParams,
+  type HandleCloneRequestPhaseChangeParams,
+} from '@virtualmachines/wizard/utils/types';
 
 export const prepareVMToCreate = (
   storeVM: V1VirtualMachine,
@@ -92,8 +95,8 @@ export const handleCloneRequestPhaseChange = ({
   navigate,
   setError,
   setIsSubmitting,
-  submittedCloneRequest,
   setSubmittedCloneRequest,
+  submittedCloneRequest,
   t,
 }: HandleCloneRequestPhaseChangeParams): void => {
   if (!submittedCloneRequest) {
@@ -117,4 +120,17 @@ export const handleCloneRequestPhaseChange = ({
     setSubmittedCloneRequest(undefined);
     logVMCreationFailed(TELEMETRY_VM_CREATION_METHOD.CLONE, cloneError);
   }
+};
+
+export const getClusterInitialValue = ({
+  clusterFromLocalStorage,
+  clusterFromNavigate,
+  hubClusterName,
+  isACM,
+}: GetClusterInitialValueParams): string => {
+  if (!isACM) {
+    return '';
+  }
+
+  return clusterFromNavigate ?? clusterFromLocalStorage ?? hubClusterName ?? '';
 };

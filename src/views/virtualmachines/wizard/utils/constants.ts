@@ -41,3 +41,7 @@ export const VM_GENERATION_STEPS = new Set<number | string>([
   VMWizardStep.TEMPLATE,
   VMWizardStep.COMPUTE_RESOURCES,
 ]);
+
+export const SELECTED_CLUSTER = {
+  LOCAL_STORAGE_KEY: 'kubevirt.fleet.lastUsedCluster',
+};

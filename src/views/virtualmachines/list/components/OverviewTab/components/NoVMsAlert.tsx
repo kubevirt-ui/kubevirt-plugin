@@ -1,10 +1,9 @@
-import React, { FC, useMemo, useState } from 'react';
+import React, { type FC, useMemo, useState } from 'react';
 import { Link } from 'react-router';
 
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import useCluster from '@multicluster/hooks/useCluster';
 import { getVMWizardURL } from '@multicluster/urls';
 import useIsACMPage from '@multicluster/useIsACMPage';
 import { useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
@@ -12,13 +11,12 @@ import { Alert, AlertActionCloseButton, AlertVariant, Skeleton } from '@patternf
 
 import { getAlertMessage } from './utils';
 
-type NoVMsAlertProps = { namespace?: string };
+type NoVMsAlertProps = { cluster?: string; namespace?: string };
 
-const NoVMsAlert: FC<NoVMsAlertProps> = ({ namespace }) => {
+const NoVMsAlert: FC<NoVMsAlertProps> = ({ cluster, namespace }) => {
   const { t } = useKubevirtTranslation();
   const [dismissed, setDismissed] = useState(false);
   const isACMPage = useIsACMPage();
-  const cluster = useCluster();
   const selectedNamespace = namespace || DEFAULT_NAMESPACE;
 
   const [canCreateVM, loading] = useAccessReview({
@@ -28,10 +26,7 @@ const NoVMsAlert: FC<NoVMsAlertProps> = ({ namespace }) => {
     verb: 'create',
   });
 
-  const vmWizardURL = useMemo(
-    () => getVMWizardURL(isACMPage ? cluster || '' : '', namespace),
-    [isACMPage, cluster, namespace],
-  );
+  const vmWizardURL = useMemo(() => getVMWizardURL(isACMPage), [isACMPage]);
 
   const alertMessage = getAlertMessage(canCreateVM, t);
 
@@ -53,7 +48,7 @@ const NoVMsAlert: FC<NoVMsAlertProps> = ({ namespace }) => {
           {alertMessage}
           {canCreateVM && (
             <div className="pf-v6-u-mt-sm">
-              <Link state={{ namespace }} to={vmWizardURL}>
+              <Link state={{ cluster, namespace }} to={vmWizardURL}>
                 {t('Create VM')}
               </Link>
             </div>

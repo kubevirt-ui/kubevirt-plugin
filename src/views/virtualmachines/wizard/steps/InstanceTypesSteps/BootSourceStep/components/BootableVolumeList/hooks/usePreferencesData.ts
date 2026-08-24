@@ -1,16 +1,19 @@
 import { useMemo } from 'react';
+import { useWatch } from 'react-hook-form';
 
 import {
-  V1beta1VirtualMachineClusterPreference,
-  V1beta1VirtualMachinePreference,
+  type V1beta1VirtualMachineClusterPreference,
+  type V1beta1VirtualMachinePreference,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { ALL_NAMESPACES_SESSION_KEY, ALL_PROJECTS } from '@kubevirt-utils/hooks/constants';
 import useUserPreferences from '@kubevirt-utils/hooks/useUserPreferences';
 import {
   convertResourceArrayToMap,
-  NamespacedResourceMap,
-  ResourceMap,
+  type NamespacedResourceMap,
+  type ResourceMap,
 } from '@kubevirt-utils/resources/shared';
+import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
+import { CREATE_VM_FORM_FIELDS_VM_DATA } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
 
 type UsePreferencesData = (
   volumeListNamespace: string,
@@ -23,8 +26,16 @@ type UsePreferencesData = (
 };
 
 const usePreferencesData: UsePreferencesData = (volumeListNamespace, preferencesData) => {
+  const { control } = useVMWizard();
+  const cluster = useWatch({ control, name: CREATE_VM_FORM_FIELDS_VM_DATA.CLUSTER });
+  const namespace =
+    volumeListNamespace === ALL_PROJECTS ? ALL_NAMESPACES_SESSION_KEY : volumeListNamespace;
+
   const [userPreferencesData, userPreferencesLoaded] = useUserPreferences(
-    volumeListNamespace === ALL_PROJECTS ? ALL_NAMESPACES_SESSION_KEY : volumeListNamespace,
+    namespace,
+    undefined,
+    undefined,
+    cluster,
   );
 
   const preferencesMap = useMemo(

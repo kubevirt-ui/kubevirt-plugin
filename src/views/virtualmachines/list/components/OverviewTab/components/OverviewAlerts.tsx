@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
 import useIsACMPage from '@multicluster/useIsACMPage';
 import { useHubClusterName } from '@stolostron/multicluster-sdk';
@@ -71,7 +71,7 @@ const OverviewAlerts: FC<OverviewAlertsProps> = ({
       {!showMCOWarning && showObservabilityWarning && (
         <ObservabilityDisabledAlert disabledClusters={alertClusters} />
       )}
-      {hasNoVMs && <NoVMsAlert namespace={namespace} />}
+      {hasNoVMs && <NoVMsAlert cluster={cluster} namespace={namespace} />}
     </>
   );
 };

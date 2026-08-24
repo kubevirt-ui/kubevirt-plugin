@@ -1,31 +1,34 @@
 import { useMemo } from 'react';
 
 import useIsVMTemplateFeatureEnabled from '@kubevirt-utils/hooks/useVMTemplateFeatureFlag/useIsVMTemplateFeatureEnabled';
-import { Template } from '@kubevirt-utils/resources/template';
+import { type Template } from '@kubevirt-utils/resources/template';
 import { useOpenShiftTemplates } from '@templates/list/hooks/useOpenShiftTemplates';
 import useVirtualMachineTemplates from '@templates/list/hooks/useVirtualMachineTemplates';
 
-type UseTemplates = (namespace?: string) => {
+type UseTemplates = (
+  namespace?: string,
+  clusterOverride?: string,
+) => {
   allTemplates: Template[];
   error: any;
   loaded: boolean;
 };
 
-const useTemplates: UseTemplates = (namespace) => {
+const useTemplates: UseTemplates = (namespace, clusterOverride) => {
   const { featureEnabled: vmTemplatesEnabled, loading: vmTemplatesFeatureLoading } =
-    useIsVMTemplateFeatureEnabled();
+    useIsVMTemplateFeatureEnabled(clusterOverride);
 
   const {
     error: templatesError,
     loaded: templatesLoaded,
     templates,
-  } = useOpenShiftTemplates({ namespace });
+  } = useOpenShiftTemplates({ clusterOverride, namespace });
 
   const {
     error: vmtError,
     loaded: vmtLoaded,
     vmTemplates,
-  } = useVirtualMachineTemplates(namespace, vmTemplatesEnabled);
+  } = useVirtualMachineTemplates(namespace, vmTemplatesEnabled, clusterOverride);
 
   const allTemplates = useMemo(
     () => (vmTemplatesEnabled ? [...vmTemplates, ...templates] : templates),
