@@ -6,7 +6,6 @@ import {
   humanizeDecimalBytes,
   type HumanizeResult,
   humanizeSeconds,
-  type HumanizeResult,
 } from '../../../../utils/utils/humanize';
 import { STORAGE_IOPS_UNIT } from './constants';
 import { TopConsumerMetric } from './topConsumerMetric';
