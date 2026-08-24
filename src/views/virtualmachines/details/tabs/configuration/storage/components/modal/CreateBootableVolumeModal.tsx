@@ -1,17 +1,16 @@
-/* eslint-disable */
-import React, { FC, useCallback, useEffect, useState } from 'react';
+import React, { type FC, useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 
 import { DataSourceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
-import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
+import { type IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import VolumeDestination from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeDestination/VolumeDestination';
 import VolumeMetadata from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/VolumeMetadata';
 import { initialBootableVolumeState } from '@kubevirt-utils/components/AddBootableVolumeModal/consts';
 import {
-  AddBootableVolumeState,
-  SetBootableVolumeFieldType,
+  type AddBootableVolumeState,
+  type SetBootableVolumeFieldType,
 } from '@kubevirt-utils/components/AddBootableVolumeModal/types';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
@@ -25,7 +24,7 @@ import { getPVCSize } from '@kubevirt-utils/resources/bootableresources/selector
 import { getName, getNamespace, getResourceUrl } from '@kubevirt-utils/resources/shared';
 import { getInstanceTypeMatcher, getPreferenceMatcher } from '@kubevirt-utils/resources/vm';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
-import { DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
+import { type DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 import { formatQuantityString } from '@kubevirt-utils/utils/units';
 import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverContentWithLightspeedButton/PopoverContentWithLightspeedButton';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
@@ -58,7 +57,7 @@ const CreateBootableVolumeModal: FC<CreateBootableVolumeModalProps> = ({
     namespace: diskObj?.namespace,
   });
 
-  const [bootableVolume, setBootableVolume] = useState<AddBootableVolumeState>({
+  const [bootableVolume, setBootableVolume] = useState<AddBootableVolumeState>(() => ({
     ...initialBootableVolumeState,
     bootableVolumeCluster: getCluster(vm),
     bootableVolumeName: `${getName(vm)}-${diskObj.name}`,
@@ -70,7 +69,7 @@ const CreateBootableVolumeModal: FC<CreateBootableVolumeModalProps> = ({
     pvcName: diskObj.source,
     pvcNamespace: diskObj?.namespace,
     storageClassName: diskObj?.storageClass === NO_DATA_DASH ? null : diskObj?.storageClass,
-  });
+  }));
 
   const setBootableVolumeField: SetBootableVolumeFieldType = useCallback(
     (key, fieldKey) => (value) =>
@@ -92,7 +91,7 @@ const CreateBootableVolumeModal: FC<CreateBootableVolumeModalProps> = ({
     });
   }, []);
 
-  const onSubmit = async () => {
+  const onSubmit = async (): Promise<void> => {
     const createdDS = await createBootableVolumeFromDisk(diskObj, vm, bootableVolume);
 
     navigate(getResourceUrl({ model: DataSourceModel, resource: createdDS }));

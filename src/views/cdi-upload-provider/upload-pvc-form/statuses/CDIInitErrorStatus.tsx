@@ -1,10 +1,10 @@
-import React, { FC, useState } from 'react';
+import React, { type FC, useState } from 'react';
 import { useNavigate } from 'react-router';
 
 import { modelToGroupVersionKind, PodModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { cancelUploadPVC } from '@kubevirt-utils/hooks/useCDIUpload/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { K8sResourceCommon, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import { type K8sResourceCommon, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Button,
   ButtonVariant,
@@ -19,7 +19,7 @@ import {
 } from '@patternfly/react-core';
 import { ErrorCircleOIcon } from '@patternfly/react-icons';
 
-import { resourcePath } from '../../utils/utils';
+import { resourcePath } from '../../utils/resourceUtils';
 
 type CDIInitErrorStatus = {
   namespace: string;
@@ -34,11 +34,11 @@ const CDIInitErrorStatus: FC<CDIInitErrorStatus> = ({ namespace, onErrorClick, p
     groupVersionKind: modelToGroupVersionKind(PodModel),
     name: `cdi-upload-${pvcName}`,
     namespace,
-  });
+  }) as [K8sResourceCommon, boolean, Error];
 
   const navigate = useNavigate();
 
-  const onClick = async () => {
+  const onClick = async (): Promise<void> => {
     shouldDeleteDv && (await cancelUploadPVC(pvcName, namespace));
     onErrorClick();
   };
@@ -79,10 +79,10 @@ const CDIInitErrorStatus: FC<CDIInitErrorStatus> = ({ namespace, onErrorClick, p
       {podLoaded && !podError && pod && (
         <EmptyStateActions>
           <Button
+            id="cdi-upload-check-logs"
             onClick={() =>
               navigate(`${resourcePath(PodModel, pod?.metadata?.name, namespace)}/logs`)
             }
-            id="cdi-upload-check-logs"
             variant={ButtonVariant.link}
           >
             {t('Check logs')}

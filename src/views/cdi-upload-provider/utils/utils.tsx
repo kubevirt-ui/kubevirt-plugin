@@ -1,27 +1,22 @@
-/* eslint-disable */
-import { Children, cloneElement } from 'react';
+import React, { type ReactNode } from 'react';
+
+export { resourcePath, resourcePathFromModel, updateDV } from './resourceUtils';
 
 import { DataVolumeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
-import { V1beta1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import {
-  getGroupVersionKindForModel,
-  k8sDelete,
-  K8sModel,
-} from '@openshift-console/dynamic-plugin-sdk';
+import { type V1beta1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { k8sDelete } from '@openshift-console/dynamic-plugin-sdk';
 import { ProgressVariant } from '@patternfly/react-core';
 
-import { LABEL_CDROM_SOURCE, UPLOAD_STATUS } from './consts';
-import { getKubevirtModelAvailableAPIVersion } from './selectors';
-import { OperatingSystemRecord } from './types';
+import { UPLOAD_STATUS } from './consts';
+import { type OperatingSystemRecord } from './types';
 
-export const killCDIBoundPVC = (pvc: V1beta1PersistentVolumeClaim) =>
+export const killCDIBoundPVC = (pvc: V1beta1PersistentVolumeClaim): ReturnType<typeof k8sDelete> =>
   k8sDelete({
     model: DataVolumeModel,
     resource: pvc,
   });
 
-export const getProgressVariant = (status: UPLOAD_STATUS) => {
+export const getProgressVariant = (status: UPLOAD_STATUS): null | ProgressVariant => {
   switch (status) {
     case UPLOAD_STATUS.ERROR:
       return ProgressVariant.danger;
@@ -32,75 +27,25 @@ export const getProgressVariant = (status: UPLOAD_STATUS) => {
   }
 };
 
-export const joinGrammaticallyListOfItems = (items: string[], separator = 'and') => {
+export const joinGrammaticallyListOfItems = (items: string[], separator = 'and'): string => {
   const result = items.join(', ');
   const lastCommaIdx = result.lastIndexOf(',');
 
   return items.length > 1 && lastCommaIdx >= 0
-    ? `${result.substr(0, lastCommaIdx)} ${separator}${result.substr(lastCommaIdx + 1)}`
+    ? `${result.substring(0, lastCommaIdx)} ${separator}${result.substring(lastCommaIdx + 1)}`
     : result;
 };
 
-export const injectDisabled = (children, disabled) => {
-  return Children.map(children, (c) => {
-    if (c?.type !== 'button') {
-      return c;
-    }
+export const injectDisabled = (children: ReactNode, disabled: boolean): ReactNode => (
+  <fieldset disabled={disabled} style={{ border: 0, margin: 0, padding: 0 }}>
+    {children}
+  </fieldset>
+);
 
-    return cloneElement(c, { disabled: c.props.disabled || disabled });
-  });
-};
-
-const unknownKinds = new Set();
-
-export const resourcePathFromModel = (model: K8sModel, name?: string, namespace?: string) => {
-  const { crd, namespaced, plural } = model;
-
-  let url = '/k8s/';
-
-  if (!namespaced) {
-    url += 'cluster/';
-  }
-
-  if (namespaced) {
-    url += namespace ? `ns/${namespace}/` : 'all-namespaces/';
-  }
-
-  if (crd) {
-    url += getGroupVersionKindForModel(model);
-  } else if (plural) {
-    url += plural;
-  }
-
-  if (name) {
-    // Some resources have a name that needs to be encoded. For instance,
-    // Users can have special characters in the name like `#`.
-    url += `/${encodeURIComponent(name)}`;
-  }
-
-  return url;
-};
-
-/**
- * NOTE: This will not work for runtime-defined resources. Use a `connect`-ed component like `ResourceLink` instead.
- */
-export const resourcePath = (modal: K8sModel, name?: string, namespace?: string) => {
-  if (!modal) {
-    if (!unknownKinds.has(modal?.kind)) {
-      unknownKinds.add(modal?.kind);
-       
-      console.error(`resourcePath: no model for "${modal?.kind}"`);
-    }
-    return;
-  }
-
-  return resourcePathFromModel(modal, name, namespace);
-};
-
-export const stringValueUnitSplit = (combinedVal) => {
+export const stringValueUnitSplit = (combinedVal: string): [string, string | undefined] => {
   const index = combinedVal.search(/([a-zA-Z]+)/g);
-  let value;
-  let unit;
+  let value: string;
+  let unit: string | undefined;
   if (index === -1) {
     value = combinedVal;
   } else {
@@ -113,47 +58,34 @@ export const stringValueUnitSplit = (combinedVal) => {
 const splitVersion = (osID: string): number[] =>
   (osID || '')
     .split(/\D/)
-    .filter((x) => x)
+    .filter((seg) => seg)
     .map((num) => parseInt(num));
 
 export const compareVersions = (version1: string, version2: string): number => {
-  if (!version1 && !version2) {
-    return 0;
-  }
+  if (!version1 && !version2) return 0;
+  if (version1 === 'devel') return 1;
+  if (version2 === 'devel') return -1;
 
-  // 'devel' version if exist is always the highest version.
-  if (version1 === 'devel') {
-    return 1;
-  }
-  if (version2 === 'devel') {
-    return -1;
-  }
-
-  const finalVersion1 = splitVersion(version1) || [];
-  const finalVersion2 = splitVersion(version2) || [];
+  const finalVersion1 = splitVersion(version1) ?? [];
+  const finalVersion2 = splitVersion(version2) ?? [];
 
   const selectedArray =
     finalVersion1?.length > finalVersion2?.length ? finalVersion1 : finalVersion2;
-  const zipped = selectedArray.map((_, index) => {
-    return [finalVersion1?.[index], finalVersion2?.[index]];
-  });
+  const zipped = selectedArray.map((_unused, index) => [
+    finalVersion1?.[index],
+    finalVersion2?.[index],
+  ]);
+
   let idx = 0;
   while (idx < zipped.length) {
-    /*
-      undefined values are equal to 0, eg:
-      14.0 == 14 -> zipped = [[14,14],[0,undefined]]
-      1.0.0 == 1 -> zipped = [[1,1],[0,undefined],[0,undefined]]
-    */
-    const ver1 = !zipped[idx][0] ? 0 : zipped[idx][0];
-    const ver2 = !zipped[idx][1] ? 0 : zipped[idx][1];
+    // undefined values are equal to 0, eg:
+    // 14.0 == 14 -> zipped = [[14,14],[0,undefined]]
+    // 1.0.0 == 1 -> zipped = [[1,1],[0,undefined],[0,undefined]]
+    const ver1 = zipped[idx][0] ?? 0;
+    const ver2 = zipped[idx][1] ?? 0;
 
-    if (ver1 > ver2) {
-      return 1;
-    }
-
-    if (ver2 > ver1) {
-      return -1;
-    }
+    if (ver1 > ver2) return 1;
+    if (ver2 > ver1) return -1;
 
     idx++;
   }
@@ -163,62 +95,19 @@ export const compareVersions = (version1: string, version2: string): number => {
 
 const descSortOSes = (os1: OperatingSystemRecord, os2: OperatingSystemRecord): number => {
   const nameCMP = (os1.name || '').localeCompare(os2.name || '');
-  if (nameCMP !== 0) {
-    return nameCMP * -1;
-  }
-
+  if (nameCMP !== 0) return nameCMP * -1;
   return compareVersions(os1.id, os2.id) * -1;
 };
 
 export const removeOSDups = (osArr: OperatingSystemRecord[]): OperatingSystemRecord[] => {
   const osNames = new Set<string>();
   return osArr
-    .reduce((acc, os) => {
-      if (os?.name && !osNames.has(os?.name)) {
-        osNames.add(os?.name);
-        acc.push(os);
+    .reduce<OperatingSystemRecord[]>((acc, osRecord) => {
+      if (osRecord?.name && !osNames.has(osRecord?.name)) {
+        osNames.add(osRecord?.name);
+        acc.push(osRecord);
       }
       return acc;
     }, [])
     .sort(descSortOSes);
-};
-
-export const updateDV = ({
-  accessMode,
-  mountAsCDROM,
-  namespace,
-  pvcName,
-  requestSizeUnit,
-  requestSizeValue,
-  storageClassName,
-  volumeMode,
-}): V1beta1DataVolume => {
-  const obj: V1beta1DataVolume = {
-    apiVersion: getKubevirtModelAvailableAPIVersion(DataVolumeModel),
-    kind: DataVolumeModel.kind,
-    metadata: {
-      labels: {
-        [LABEL_CDROM_SOURCE]: mountAsCDROM?.toString(),
-      },
-      name: pvcName,
-      namespace,
-    },
-    spec: {
-      source: {
-        upload: {},
-      },
-      storage: {
-        accessModes: [accessMode],
-        resources: {
-          requests: {
-            storage: `${requestSizeValue}${requestSizeUnit}`,
-          },
-        },
-        storageClassName,
-        volumeMode,
-      },
-    },
-  };
-
-  return obj;
 };

@@ -1,21 +1,20 @@
-import { TFunction } from 'i18next';
+import { type TFunction } from 'i18next';
 
 import { timestampFor } from '@kubevirt-utils/components/Timestamp/utils/datetime';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
-import { MetricChartData } from '@overview/OverviewTab/metric-charts-card/utils/hooks/useMetricChartData';
+import { type MetricChartData } from '@overview/OverviewTab/metric-charts-card/utils/hooks/useMetricChartData';
 import {
   getCurrentValue,
   getLabelUnit,
 } from '@overview/OverviewTab/metric-charts-card/utils/utils';
 
 import { getUnitLabel, UNIT_GIB } from '../hooks/useProjectResourceQuota';
-import { TopClustersMetricData } from '../hooks/useTopClustersChartData';
-
+import { type TopClustersMetricData } from '../hooks/useTopClustersChartData';
 import { CHART_DAYS_WINDOW, MIB_PER_GIB } from './constants';
 
-export const formatTimestamp = (x: Date | undefined): string => {
-  if (!(x instanceof Date)) return '';
-  return timestampFor(x, new Date(), false) as string;
+export const formatTimestamp = (dateValue: Date | undefined): string => {
+  if (!(dateValue instanceof Date)) return '';
+  return timestampFor(dateValue, new Date(), false) as string;
 };
 
 /**
@@ -55,10 +54,10 @@ export const EMPTY_METRIC_DATA: MetricChartData = {
   unit: '',
 };
 
-/** Build a MetricChartData-like object from TopClustersMetricData so useYAxisTicks works. */
+/** Build a MetricChartData-like object from TopClustersMetricData so getYAxisTicks works. */
 export const toMetricChartData = (clusterData: TopClustersMetricData): MetricChartData => {
-  const allPoints = clusterData.chartSeries.flatMap((s) => s.data);
-  const yValues = allPoints.map((p) => p.y);
+  const allPoints = clusterData.chartSeries.flatMap((series) => series.data);
+  const yValues = allPoints.map((point) => point.y);
   const largestValue = yValues.length > 0 ? Math.max(...yValues) : 0;
   return {
     chartData: allPoints,

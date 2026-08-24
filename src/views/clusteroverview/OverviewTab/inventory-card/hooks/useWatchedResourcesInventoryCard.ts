@@ -1,13 +1,9 @@
 import {
   modelToGroupVersionKind,
-  NodeModel,
-  TemplateModel,
-} from '@kubevirt-ui-ext/kubevirt-api/console';
-import {
   NetworkAttachmentDefinitionModel,
   NetworkAttachmentDefinitionModelGroupVersionKind,
-} from '@kubevirt-ui-ext/kubevirt-api/console';
-import {
+  NodeModel,
+  TemplateModel,
   VirtualMachineModel,
   VirtualMachineModelGroupVersionKind,
 } from '@kubevirt-ui-ext/kubevirt-api/console';

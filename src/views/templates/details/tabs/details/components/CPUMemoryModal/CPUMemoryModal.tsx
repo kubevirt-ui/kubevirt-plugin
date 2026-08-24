@@ -1,13 +1,12 @@
-/* eslint-disable */
-import React, { FC, useEffect, useMemo, useState } from 'react';
+import React, { type FC, useEffect, useMemo, useState } from 'react';
 import produce from 'immer';
 
-import { V1CPU } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1CPU } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import CPUInput from '@kubevirt-utils/components/CPUMemoryModal/components/CPUInput/CPUInput';
 import { getCPULimitsFromTemplate } from '@kubevirt-utils/components/CPUMemoryModal/components/CPUInput/utils/utils';
 import MemoryInput from '@kubevirt-utils/components/CPUMemoryModal/components/MemoryInput/MemoryInput';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getTemplateVirtualMachineObject, Template } from '@kubevirt-utils/resources/template';
+import { getTemplateVirtualMachineObject, type Template } from '@kubevirt-utils/resources/template';
 import { getCPU, getMemory } from '@kubevirt-utils/resources/vm';
 import { toQuantity } from '@kubevirt-utils/utils/units';
 import { ensurePath } from '@kubevirt-utils/utils/utils';
@@ -24,7 +23,6 @@ import {
 } from '@patternfly/react-core';
 
 import useEditTemplateAccessReview from '../../../../hooks/useIsTemplateEditable';
-
 import { getDefaultCPUMemoryValues } from './utils';
 
 import '@kubevirt-utils/components/CPUMemoryModal/cpu-memory-modal.scss';
@@ -42,14 +40,14 @@ const CPUMemoryModal: FC<CPUMemoryModalProps> = ({ isOpen, onClose, onSubmit, te
 
   const { isTemplateEditable } = useEditTemplateAccessReview(template);
 
-  const [cpu, setCPU] = useState<V1CPU>(getCPU(vm));
+  const [cpu, setCPU] = useState<V1CPU>(() => getCPU(vm));
   const [memory, setMemory] = useState<number>();
   const [memoryUnit, setMemoryUnit] = useState<string>();
 
   const [updateInProcess, setUpdateInProcess] = useState<boolean>(false);
   const [updateError, setUpdateError] = useState<string>();
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (): Promise<void> => {
     setUpdateInProcess(true);
     setUpdateError(null);
 
@@ -62,7 +60,7 @@ const CPUMemoryModal: FC<CPUMemoryModalProps> = ({ isOpen, onClose, onSubmit, te
       ]);
 
       draftVM.spec.template.spec.domain.cpu = cpu;
-      draftVM.spec.template.spec.domain.memory.guest = `${memory}${memoryUnit || ''}`;
+      draftVM.spec.template.spec.domain.memory.guest = `${memory}${memoryUnit ?? ''}`;
     });
 
     try {
@@ -132,14 +130,14 @@ const CPUMemoryModal: FC<CPUMemoryModalProps> = ({ isOpen, onClose, onSubmit, te
           {t('Save')}
         </Button>
         <Button
+          data-test="restore-button"
+          isDisabled={isTemplateEditable}
+          key="default"
           onClick={() => {
             setCPU(defaultCPU);
             setMemory(defaultMemorySize);
             setMemoryUnit(defaultMemoryUnit);
           }}
-          data-test="restore-button"
-          isDisabled={isTemplateEditable}
-          key="default"
           variant={ButtonVariant.secondary}
         >
           {t('Restore template settings')}

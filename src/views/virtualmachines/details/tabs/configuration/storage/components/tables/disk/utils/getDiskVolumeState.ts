@@ -11,6 +11,24 @@ import {
   hasPersistentVolumeClaim,
 } from '@kubevirt-utils/resources/vm/utils/disk/selectors';
 import { isEmptyContainerDiskImage } from '@kubevirt-utils/resources/vm/utils/disk/utils';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
+
+type DiskVolumeState = {
+  isCDROMMountedState: boolean;
+  volume: undefined | V1Volume;
+};
+
+const getVMVolumesWithRunningVMIVolumes = (
+  vmVolumes: V1Volume[],
+  vmi: undefined | V1VirtualMachineInstance,
+): V1Volume[] => {
+  if (isEmpty(vmi)) {
+    return vmVolumes;
+  }
+
+  const missingVolumes: V1Volume[] = getRunningVMMissingVolumesFromVMI(vmVolumes, vmi);
+  return [...vmVolumes, ...missingVolumes];
+};
 
 const isMountedVolume = (targetVolume: undefined | V1Volume): boolean => {
   if (!targetVolume) return false;
@@ -20,26 +38,16 @@ const isMountedVolume = (targetVolume: undefined | V1Volume): boolean => {
   return hasDataVolume(targetVolume) || hasPersistentVolumeClaim(targetVolume);
 };
 
-type DiskVolumeState = {
-  isCDROMMountedState: boolean;
-  volume: undefined | V1Volume;
-};
-
 export const getDiskVolumeState = (
   vm: V1VirtualMachine,
   vmi: undefined | V1VirtualMachineInstance,
   diskName: string,
-  isVMRunning: boolean,
   isCDROM: boolean,
 ): DiskVolumeState => {
-  const vmVolumes = getVolumes(vm);
+  const vmVolumes: V1Volume[] = getVolumes(vm) ?? [];
+  const volumes = isCDROM ? vmVolumes : getVMVolumesWithRunningVMIVolumes(vmVolumes, vmi);
 
-  const vols =
-    isVMRunning && !isCDROM
-      ? [...(vmVolumes ?? []), ...getRunningVMMissingVolumesFromVMI(vmVolumes ?? [], vmi)]
-      : vmVolumes;
-
-  const volume = vols?.find(({ name }) => name === diskName);
+  const volume = volumes.find((vol) => vol.name === diskName);
   const mounted = isMountedVolume(volume);
 
   return {

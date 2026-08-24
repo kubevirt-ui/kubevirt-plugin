@@ -23,6 +23,9 @@ export const useEditorHighlighter = (
   }, [pathsToHighlight, showEditor]);
 
   useEffect(() => {
+    if (!showEditor) return;
+
+    let cancelled = false;
     let timeoutId: ReturnType<typeof setTimeout>;
 
     const highlightPaths = async (): Promise<void> => {
@@ -36,18 +39,24 @@ export const useEditorHighlighter = (
         isHighlighedRef.current = true;
 
         await editor.getAction('editor.foldAll').run();
+        if (cancelled) return;
 
         const selections = ranges.map((range) => createSelection(range));
 
         editor.setSelections(selections);
         await editor.getAction('editor.unfoldRecursively').run();
+        if (cancelled) return;
+
         timeoutId = setTimeout(() => editor.revealLineInCenter(ranges.at(-1).start), 500);
       }
     };
 
     void highlightPaths();
 
-    return (): void => clearTimeout(timeoutId);
+    return (): void => {
+      cancelled = true;
+      clearTimeout(timeoutId);
+    };
   }, [editableYAML, editor, pathsToHighlight, showEditor]);
 
   return (ref: CodeEditorRef): void => setEditor(ref?.editor as EditorInstance);

@@ -3,18 +3,17 @@ import { Link } from 'react-router';
 
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
-  AdapterDataType,
+  type AdapterDataType,
   getGroupVersionKindForResource,
-  NetworkAdapterType,
-  PodsAdapterDataType,
+  type NetworkAdapterType,
+  type PodsAdapterDataType,
   ResourceIcon,
 } from '@openshift-console/dynamic-plugin-sdk';
-import { GraphElement } from '@patternfly/react-topology';
+import { type GraphElement } from '@patternfly/react-topology';
 import { isVMType } from '@topology/utils/utils';
 
-import { resourcePathFromModel } from '../../cdi-upload-provider/utils/utils';
+import { resourcePathFromModel } from '../../cdi-upload-provider/utils/resourceUtils';
 import usePodsAdapterForVM from '../hooks/usePodsAdapterForVM';
-
 import { getResource } from './topology-utils';
 
 export const getVMSidePanelPodsAdapter = (
@@ -31,7 +30,7 @@ export const getVMSidePanelNetworkAdapter = (element: GraphElement): NetworkAdap
   return { resource };
 };
 
-export const getVMSideBarResourceLink = (element: GraphElement) => {
+export const getVMSideBarResourceLink = (element: GraphElement): React.ReactNode => {
   if (!isVMType(element.getType())) return null;
   const name = element.getLabel();
   const resource = getResource(element);

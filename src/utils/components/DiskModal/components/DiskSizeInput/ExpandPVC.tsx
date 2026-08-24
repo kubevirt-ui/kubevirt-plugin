@@ -1,16 +1,17 @@
-import React, { FC } from 'react';
+import React, { type FC, useCallback } from 'react';
 import { useFormContext } from 'react-hook-form';
 
-import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import CapacityInput from '@kubevirt-utils/components/CapacityInput/CapacityInput';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getPVCSize } from '@kubevirt-utils/resources/bootableresources/selectors';
-import { formatQuantityString, quantityToString, toQuantity } from '@kubevirt-utils/utils/units';
+import { getNamespace } from '@kubevirt-utils/resources/shared';
+import { formatQuantityString } from '@kubevirt-utils/utils/units';
 
-import { V1DiskFormState } from '../../utils/types';
+import { type V1DiskFormState } from '../../utils/types';
 import { EXPAND_PVC_SIZE } from '../utils/constants';
-
-import { getMinSizes } from './utils';
+import useSourceMinSize from './useSourceMinSize';
+import { enforceMinDiskSize, formatMinSizeHelperText, isAtMinSize } from './utils';
 
 type ExpandPVCProps = { pvc: IoK8sApiCoreV1PersistentVolumeClaim };
 
@@ -19,44 +20,26 @@ const ExpandPVC: FC<ExpandPVCProps> = ({ pvc }) => {
   const { setValue, watch } = useFormContext<V1DiskFormState>();
   const diskState = watch();
 
-  const expandPVCSize = diskState.expandPVCSize;
-  const pvcStorage = formatQuantityString(getPVCSize(pvc));
+  const pvcSize = getPVCSize(pvc);
+  const pvcStorage = pvcSize ? (formatQuantityString(pvcSize) ?? undefined) : undefined;
+  const sourceMinSize = useSourceMinSize(diskState, getNamespace(pvc) ?? '');
+  const size = diskState.expandPVCSize ?? pvcStorage ?? '';
+
+  const handleSizeChange = useCallback(
+    (quantity: string) => setValue(EXPAND_PVC_SIZE, enforceMinDiskSize(quantity, sourceMinSize)),
+    [sourceMinSize, setValue],
+  );
+
   if (!pvcStorage) {
     return null;
   }
 
-  const size = expandPVCSize ?? pvcStorage;
-  const { unit, value } = toQuantity(size) ?? {};
-
-  const minSizes = getMinSizes(pvcStorage);
-
-  const onQuantityChange = (quantityString: string) => {
-    const { unit: newUnit, value: newValue } = toQuantity(quantityString) ?? {};
-
-    // unit has changed -> adjust size to be bigger than minimal size for that unit
-    if (newUnit && newUnit !== unit) {
-      const minSize = minSizes[newUnit];
-
-      if (minSize > newValue) {
-        const newPvcSize = quantityToString({ unit: newUnit, value: Math.ceil(minSize) });
-
-        setValue(EXPAND_PVC_SIZE, newPvcSize);
-        return;
-      }
-    }
-
-    setValue(EXPAND_PVC_SIZE, quantityString);
-  };
-
-  const minSize = minSizes[unit];
-  const isMinusDisabled = Math.ceil(minSize) >= value;
-
   return (
     <CapacityInput
-      isMinusDisabled={isMinusDisabled}
+      helperText={formatMinSizeHelperText(sourceMinSize, t)}
+      isMinusDisabled={isAtMinSize(size, sourceMinSize)}
       label={t('PersistentVolumeClaim size')}
-      minValue={minSize}
-      onChange={onQuantityChange}
+      onChange={handleSizeChange}
       size={size}
     />
   );

@@ -1,9 +1,8 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 import { Link } from 'react-router';
 
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { PrometheusResult } from '@openshift-console/dynamic-plugin-sdk';
+import { type PrometheusResult } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Chart,
   ChartAxis,
@@ -31,9 +30,22 @@ import {
   TICKS_COUNT,
 } from '../utils/utils';
 
+type NetworkChartDataPoint = {
+  name: string;
+  x: Date;
+  y: number;
+};
+
 type NetworkThresholdSingleSourceChartProps = {
   data: PrometheusResult[];
   link: string;
+};
+
+const CursorVoronoiContainer = createContainer('voronoi', 'cursor');
+
+const formatTooltipTitle = (datum: Record<string, unknown>): string => {
+  const date = datum?.x as Date | undefined;
+  return (date?.getHours() ?? '') + ':' + String(date?.getMinutes() ?? '')?.padStart(2, '0');
 };
 
 const NetworkThresholdSingleSourceChart: FC<NetworkThresholdSingleSourceChartProps> = ({
@@ -43,27 +55,28 @@ const NetworkThresholdSingleSourceChart: FC<NetworkThresholdSingleSourceChartPro
   const { currentTime, duration, timespan } = useDuration();
   const { height, ref, width } = useResponsiveCharts();
 
-  const chartData =
-    !isEmpty(data) &&
-    data?.map((obj) => {
-      return (obj?.values || [])?.map(([x, y]) => {
-        return {
-          name: obj?.metric?.interface,
-          x: new Date(x * MILLISECONDS_MULTIPLIER),
-          y: Number(y),
-        };
-      });
-    });
-  const isReady = !isEmpty(chartData);
-  const Ymax = useStableYMax(findNetworkMaxYValue(chartData), duration);
-  const yRange = getChartYRange(Ymax);
+  const chartData: NetworkChartDataPoint[][] = !isEmpty(data)
+    ? (data?.map((obj) =>
+        (obj?.values ?? [])?.map(
+          ([timestamp, val]: [number, string]): NetworkChartDataPoint => ({
+            name: obj?.metric?.interface,
+            x: new Date(timestamp * MILLISECONDS_MULTIPLIER),
+            y: Number(val),
+          }),
+        ),
+      ) ?? [])
+    : [];
 
-  const CursorVoronoiContainer = createContainer('voronoi', 'cursor');
-  const legendData =
-    !isEmpty(chartData) &&
-    chartData?.map((newChartdata, index) => {
-      return { childName: newChartdata?.[index]?.name, name: newChartdata?.[index]?.name };
-    });
+  const isReady = !isEmpty(chartData);
+  const yMaxValue = useStableYMax(findNetworkMaxYValue(chartData), duration);
+  const yRange = getChartYRange(yMaxValue);
+
+  const legendData: { childName: string; name: string }[] = !isEmpty(chartData)
+    ? (chartData?.map((series) => ({
+        childName: series?.[0]?.name,
+        name: series?.[0]?.name,
+      })) ?? [])
+    : [];
 
   return (
     <ComponentReady isReady={isReady} linkToMetrics={link}>
@@ -72,15 +85,10 @@ const NetworkThresholdSingleSourceChart: FC<NetworkThresholdSingleSourceChartPro
           <Chart
             containerComponent={
               <CursorVoronoiContainer
-                labelComponent={
-                  <ChartLegendTooltip
-                    title={(datum: any) =>
-                      datum?.x?.getHours() + ':' + String(datum?.x?.getMinutes())?.padStart(2, '0')
-                    }
-                    legendData={legendData}
-                  />
-                }
                 cursorDimension="x"
+                labelComponent={
+                  <ChartLegendTooltip legendData={legendData} title={formatTooltipTitle} />
+                }
                 labels={addTimestampToTooltip(formatNetworkThresholdSingleSourceTooltipData)}
                 mouseFollowTooltips
                 voronoiDimension="x"
@@ -97,32 +105,32 @@ const NetworkThresholdSingleSourceChart: FC<NetworkThresholdSingleSourceChartPro
             width={width}
           >
             <ChartAxis
+              dependentAxis
               style={{
                 grid: {
                   stroke: chart_color_black_200.value,
                 },
                 tickLabels,
               }}
-              dependentAxis
               tickFormat={formatNetworkYTick}
               {...(yRange && { tickValues: yRange })}
             />
             <ChartAxis
+              axisComponent={<></>}
               style={{
                 tickLabels: { padding: 2, ...tickLabels },
                 ticks: { stroke: 'transparent' },
               }}
-              axisComponent={<></>}
               tickCount={TICKS_COUNT}
               tickFormat={tickFormat(duration, currentTime)}
             />
             <ChartGroup>
               {isReady &&
-                chartData?.map((newChartdata) => (
+                chartData?.map((series) => (
                   <ChartLine
-                    data={newChartdata}
-                    key={newChartdata?.[0]?.name}
-                    name={newChartdata?.[0]?.name}
+                    data={series}
+                    key={series?.[0]?.name}
+                    name={series?.[0]?.name}
                     themeColor={ChartThemeColor.multiUnordered}
                   />
                 ))}

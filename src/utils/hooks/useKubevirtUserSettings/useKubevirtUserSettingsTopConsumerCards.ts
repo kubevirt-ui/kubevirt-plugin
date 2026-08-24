@@ -40,7 +40,9 @@ const useKubevirtUserSettingsTopConsumerCards: UseKubevirtUserSettingsTopConsume
     }
 
     if (!isEqualObject(topConsumerSettingsLocalStorage, cards?.[TOP_CONSUMERS_CARD])) {
-      void setCards?.({ [TOP_CONSUMERS_CARD]: topConsumerSettingsLocalStorage });
+      void setCards?.({
+        [TOP_CONSUMERS_CARD]: topConsumerSettingsLocalStorage,
+      } as unknown as typeof cards);
     }
   }, [
     cards,
