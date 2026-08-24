@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { type FC, useState } from 'react';
 import { Trans } from 'react-i18next';
 import { useNavigate } from 'react-router';

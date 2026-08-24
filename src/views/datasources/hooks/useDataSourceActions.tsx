@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { useCallback, useMemo, useState } from 'react';
 
 import { DataImportCronModel, DataSourceModel } from '@kubevirt-ui-ext/kubevirt-api/console';

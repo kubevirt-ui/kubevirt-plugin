@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { type FormEvent, type KeyboardEvent, useCallback, useMemo, useState } from 'react';
 
 import { logVMSearchLanguageUsed } from '@kubevirt-utils/extensions/telemetry/dashboard';

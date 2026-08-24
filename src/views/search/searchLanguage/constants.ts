@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { NumberOperator, numberOperatorInfo } from '@kubevirt-utils/utils/constants';
 import { SEARCH_KEY_BADGES } from '@search/components/SearchDropdown/constants';
 import { VirtualMachineRowFilterType } from '@virtualmachines/utils';

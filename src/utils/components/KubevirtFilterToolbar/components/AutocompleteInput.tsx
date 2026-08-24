@@ -1,5 +1,5 @@
-import React, { type Dispatch, type FC, type SetStateAction, useMemo, useState } from 'react';
 import classNames from 'classnames';
+import React, { type Dispatch, type FC, type SetStateAction, useMemo, useState } from 'react';
 
 import { type FilterableObject } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { labelParser } from '@kubevirt-utils/utils/labelUtils';

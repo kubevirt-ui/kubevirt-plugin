@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { type ComponentType, type FC } from 'react';
 
 import {

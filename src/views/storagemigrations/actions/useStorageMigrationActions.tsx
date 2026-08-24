@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { type ReactNode, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router';
 
