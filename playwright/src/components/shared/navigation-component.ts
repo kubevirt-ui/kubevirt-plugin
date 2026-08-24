@@ -189,6 +189,9 @@ export default class NavigationComponent extends BaseComponent {
 
   async expandVirtualizationNavSection(): Promise<void> {
     await this.switchToVirtualizationPerspective();
+    // Wait for the auto-hide requestAnimationFrame to fire and settle before checking sidebar state
+    await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
+
     await this.ensureSidebarExpanded();
 
     const childItem = this.testId('virtualmachines-nav-item')

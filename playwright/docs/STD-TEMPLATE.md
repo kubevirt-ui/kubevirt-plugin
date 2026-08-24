@@ -4,7 +4,7 @@
 
 - **Project Name:** KubeVirt UI — Playwright E2E Tests
 - **Feature Area:** [e.g., Gating — VM management, Tier1 — Bootable volumes]
-- **Latest version:** [Most recent CNV release this document was validated against, e.g., CNV 4.22]
+- **Latest version:** [Most recent CNV release this document was validated against, e.g., CNV 4.22.0]
 - **Latest update:** [YYYY-MM-DD of the most recent edit to this document]
 - **Document Status:** [Draft / In Review / Approved — if the tests described are included in the PR and have been verified locally, mark as Approved]
 
@@ -38,7 +38,7 @@
 ### `001`: [Functional title — describes what the system does; no Jira ticket IDs in title]
 
 - **Objective:** [What behavior is verified in one sentence]
-- **Target version:** [CNV release this scenario was written for / first covers, e.g., CNV 4.22]
+- **Target version:** [CNV release this scenario was written for / first covers, e.g., CNV 4.22.0]
 - **Jira References:** [CNV-XXXXX, CNV-YYYYY — tickets whose feature/bugfix this scenario covers; omit if none]
 - **Pre-conditions:** [Any test.skip() conditions or required cluster state]
 - **Tags:** [e.g., `@gating`, `@nonpriv`]
@@ -84,5 +84,5 @@ a planned coverage gap (status: Pending).
 ## 6. Approvals
 
 - **Prepared By:** Test automation / QE
-- **Reviewed By:** ********\_\_********
-- **Approval Signature:** ********\_\_********
+- **Reviewed By:** **\*\*\*\***\_\_**\*\*\*\***
+- **Approval Signature:** **\*\*\*\***\_\_**\*\*\*\***

@@ -1,7 +1,8 @@
 import type RequestContextClient from '@/clients/request-context-client';
 import type { TemplateConfig } from '@/data-factories/template-factory';
+import type { VmTemplateConfig } from '@/data-factories/vm-template-factory';
+import { VmTemplateFactory } from '@/data-factories/vm-template-factory';
 import type { TestUtilsType } from '@/fixtures/test-utils';
-import { TestTimeouts } from '@/utils/test-config';
 
 export async function setupTemplateFromResource(
   client: RequestContextClient,
@@ -41,6 +42,27 @@ export async function verifyTemplateDeletedFromCluster(
     deleted: false,
     error: `Template ${templateName} still exists after ${timeoutMs}ms`,
   };
+}
+
+export async function setupVmTemplateFromResource(
+  client: RequestContextClient,
+  prefix: string,
+  config: Omit<Partial<VmTemplateConfig>, 'namespace'> & { targetNamespace: string; name?: string },
+  utils: TestUtilsType,
+): Promise<{ templateName: string; templateDisplayName: string }> {
+  const { targetNamespace, name: explicitName, ...templateFields } = config;
+  const templateName = explicitName ?? utils.generateRandomTemplateName(prefix);
+  const templateDisplayName =
+    templateFields.displayName ?? `${prefix} ${utils.generateRandomString(8, 'alphanumeric')}`;
+  const resource = VmTemplateFactory.createResourceObject({
+    ...templateFields,
+    name: templateName,
+    namespace: targetNamespace,
+    displayName: templateDisplayName,
+  });
+  await client.createVmTemplate(targetNamespace, resource);
+  client.trackResource('VirtualMachineTemplate', templateName, targetNamespace);
+  return { templateName, templateDisplayName };
 }
 
 export function buildTemplateDetailResource(

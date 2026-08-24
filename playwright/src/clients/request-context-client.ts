@@ -19,6 +19,7 @@ import {
   SnapshotProxyHandler,
   TemplateProxyHandler,
   VirtualMachineProxyHandler,
+  VmTemplateProxyHandler,
 } from './proxy-handlers';
 
 function isPage(p: Page | APIRequestContext): p is Page {
@@ -46,6 +47,7 @@ function isPage(p: Page | APIRequestContext): p is Page {
  *   - `apiClient.vm.*`         — VirtualMachines, VMIs, Migrations
  *   - `apiClient.snapshot.*`   — Snapshots, Restores, VolumeSnapshots
  *   - `apiClient.template.*`   — OpenShift Templates
+ *   - `apiClient.vmTemplate.*` — KubeVirt VirtualMachineTemplates
  *   - `apiClient.instanceType.*` — InstanceTypes & Preferences
  *   - `apiClient.cdi.*`        — DataVolumes, DataSources, etc.
  *   - `apiClient.infra.*`      — HCO, KubeVirt CR, MigrationPolicies, NADs
@@ -70,6 +72,7 @@ export default class RequestContextClient extends BaseClient implements ProxyApi
   readonly snapshot: SnapshotProxyHandler;
   readonly template: TemplateProxyHandler;
   readonly vm: VirtualMachineProxyHandler;
+  readonly vmTemplate: VmTemplateProxyHandler;
 
   constructor(page: Page, config: ClusterAuthConfig);
   constructor(apiContext: APIRequestContext, config: ClusterAuthConfig);
@@ -81,6 +84,7 @@ export default class RequestContextClient extends BaseClient implements ProxyApi
     this.vm = new VirtualMachineProxyHandler(this);
     this.snapshot = new SnapshotProxyHandler(this);
     this.template = new TemplateProxyHandler(this);
+    this.vmTemplate = new VmTemplateProxyHandler(this);
     this.instanceType = new InstanceTypeProxyHandler(this);
     this.cdi = new CdiProxyHandler(this);
     this.infra = new InfraProxyHandler(this);
@@ -396,6 +400,9 @@ export default class RequestContextClient extends BaseClient implements ProxyApi
   createTemplate(namespace: string, spec: KubernetesResource) {
     return this.template.create(namespace, spec);
   }
+  createVmTemplate(namespace: string, spec: KubernetesResource) {
+    return this.vmTemplate.create(namespace, spec);
+  }
   createVirtualMachine(namespace: string, spec: KubernetesResource) {
     return this.vm.create(namespace, spec);
   }
@@ -658,6 +665,13 @@ export default class RequestContextClient extends BaseClient implements ProxyApi
   // -- Templates --
   getTemplates(namespace?: string, labelSelector?: string) {
     return this.template.list(namespace, labelSelector);
+  }
+  // -- VirtualMachineTemplates --
+  getVmTemplate(namespace: string, name: string) {
+    return this.vmTemplate.get(namespace, name);
+  }
+  getVmTemplates(namespace?: string, labelSelector?: string) {
+    return this.vmTemplate.list(namespace, labelSelector);
   }
   getVirtualMachine(namespace: string, name: string) {
     return this.vm.get(namespace, name);
