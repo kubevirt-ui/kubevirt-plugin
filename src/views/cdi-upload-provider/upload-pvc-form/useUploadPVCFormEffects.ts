@@ -2,9 +2,9 @@ import { type Dispatch, type SetStateAction, useEffect } from 'react';
 
 import { BinaryUnit } from '@kubevirt-utils/utils/unitConstants';
 
+import { updateDV } from '../utils/resourceUtils';
 import { type OperatingSystemRecord } from '../utils/types';
 import { getGiBUploadPVCSizeByImage } from '../utils/uploadSize';
-import { updateDV } from '../utils/utils';
 
 type EffectsParams = {
   accessMode: string;

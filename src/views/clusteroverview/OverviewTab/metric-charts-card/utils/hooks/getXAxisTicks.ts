@@ -1,9 +1,8 @@
-/* eslint-disable */
-import { UseXAxisTicks } from './types';
+import { type UseXAxisTicks } from './types';
 import { getDayMidpoints, isSingleDayData, xTickFormat } from './utils';
 
 // Ticks should be placed at the center point of each day's data
-const useXAxisTicks: UseXAxisTicks = (chartData) => {
+const getXAxisTicks: UseXAxisTicks = (chartData) => {
   if (!chartData) {
     return [null, null];
   }
@@ -15,4 +14,4 @@ const useXAxisTicks: UseXAxisTicks = (chartData) => {
   return [tickValues, xTickFormat];
 };
 
-export default useXAxisTicks;
+export default getXAxisTicks;

@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
 import { tickLabels } from '@kubevirt-utils/components/Charts/ChartLabels/styleOverrides';
 import useResponsiveCharts from '@kubevirt-utils/components/Charts/hooks/useResponsiveCharts';
@@ -12,9 +12,9 @@ import {
 import chart_color_black_200 from '@patternfly/react-tokens/dist/esm/chart_color_black_200';
 import chart_color_blue_100 from '@patternfly/react-tokens/dist/esm/chart_color_blue_100';
 
-import useXAxisTicks from '../utils/hooks/useXAxisTicks';
-import useYAxisTicks from '../utils/hooks/useYAxisTicks';
-import { MetricChartProps } from '../utils/types';
+import getXAxisTicks from '../utils/hooks/getXAxisTicks';
+import getYAxisTicks from '../utils/hooks/getYAxisTicks';
+import { type MetricChartProps } from '../utils/types';
 import { formatPopoverLabel, getLabelUnit } from '../utils/utils';
 
 import './MetricChart.scss';
@@ -23,8 +23,8 @@ const MetricChart: FC<MetricChartProps> = ({ metric, metricChartData }) => {
   const { chartData, domain, unit } = metricChartData;
   const { height, ref, width } = useResponsiveCharts();
   const displayUnit = getLabelUnit(metric, unit);
-  const [xAxisTicks, xAxisTickFormat] = useXAxisTicks(chartData);
-  const [yAxisTickValues, yAxisTickFormat] = useYAxisTicks(metricChartData);
+  const [xAxisTicks, xAxisTickFormat] = getXAxisTicks(chartData);
+  const [yAxisTickValues, yAxisTickFormat] = getYAxisTicks(metricChartData);
 
   return (
     <div className="overview-metric-chart" ref={ref}>
@@ -39,36 +39,36 @@ const MetricChart: FC<MetricChartProps> = ({ metric, metricChartData }) => {
         width={width}
       >
         <ChartAxis
+          axisComponent={<></>}
+          dependentAxis
           style={{
             grid: {
               stroke: chart_color_black_200.value,
             },
             tickLabels,
           }}
-          axisComponent={<></>}
-          dependentAxis
           tickFormat={yAxisTickFormat(metric, unit)}
           tickValues={yAxisTickValues}
         />
         <ChartAxis
+          fixLabelOverlap
           style={{
             axis: {
               stroke: chart_color_black_200.value,
             },
             tickLabels,
           }}
-          fixLabelOverlap
           tickFormat={xAxisTickFormat}
           tickValues={xAxisTicks}
         />
         <ChartGroup>
           <ChartArea
+            data={chartData}
             style={{
               data: {
                 stroke: chart_color_blue_100.value,
               },
             }}
-            data={chartData}
           />
         </ChartGroup>
       </Chart>
