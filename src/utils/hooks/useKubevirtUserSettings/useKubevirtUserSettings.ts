@@ -5,17 +5,31 @@ import {
   modelToGroupVersionKind,
   UserModel,
 } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { operatorNamespaceSignal } from '@kubevirt-utils/store/operatorNamespace';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 
 import { KUBEVIRT_USER_SETTINGS_CONFIG_MAP_NAME } from './utils/const';
-import { UseKubevirtUserSettings } from './utils/types';
-import { UserSettingsState } from './utils/userSettingsInitialState';
+import { type UserSettingsState } from './utils/userSettingsInitialState';
 import { parseNestedJSON, patchUserConfigMap } from './utils/utils';
 
-const useKubevirtUserSettings: UseKubevirtUserSettings = (key, cluster) => {
+export type KubevirtUserSettingResult<T> = [
+  value: T,
+  updater: (val: T) => Promise<T>,
+  loaded: boolean,
+  error: Error,
+];
+
+function useKubevirtUserSettings(): KubevirtUserSettingResult<UserSettingsState>;
+function useKubevirtUserSettings<K extends keyof UserSettingsState>(
+  key: K,
+  cluster?: string,
+): KubevirtUserSettingResult<UserSettingsState[K]>;
+function useKubevirtUserSettings(
+  key?: keyof UserSettingsState,
+  cluster?: string,
+): KubevirtUserSettingResult<UserSettingsState | UserSettingsState[keyof UserSettingsState]> {
   const [error, setError] = useState<Error>();
   const [userSettings, setUserSettings] = useState<UserSettingsState>();
   const [loading, setLoading] = useState<boolean>(false);
@@ -28,7 +42,7 @@ const useKubevirtUserSettings: UseKubevirtUserSettings = (key, cluster) => {
     name: '~',
   });
 
-  const userName = user?.metadata?.uid || user?.metadata?.name?.replace(/[^-._a-zA-Z0-9]+/g, '-');
+  const userName = user?.metadata?.uid ?? user?.metadata?.name?.replace(/[^-._a-zA-Z0-9]+/g, '-');
 
   const [userConfigMap, loadedConfigMap, configMapError] = useK8sWatchData<IoK8sApiCoreV1ConfigMap>(
     operatorNamespace &&
@@ -55,26 +69,32 @@ const useKubevirtUserSettings: UseKubevirtUserSettings = (key, cluster) => {
     setSettingsInitialized(true);
   }, [userConfigMap, userName, loadedCM, loadedUsr]);
 
-  const pushUserSettingsChanges = async (data, resolve, reject) => {
+  const pushUserSettingsChanges = async (
+    data: UserSettingsState,
+    resolve: (value: unknown) => void,
+    reject: (reason: unknown) => void,
+  ): Promise<void> => {
     setLoading(true);
 
     try {
       await patchUserConfigMap(userConfigMap, userName, data, cluster);
       resolve(key ? data[key] : data);
     } catch (apiError) {
-      setError(apiError);
+      setError(apiError as Error);
       reject(apiError);
     }
 
     setLoading(false);
   };
 
-  const updateUserSetting = (val: any) => {
+  const updateUserSetting = (
+    val: UserSettingsState | UserSettingsState[keyof UserSettingsState],
+  ): Promise<unknown> => {
     return new Promise((resolve, reject) => {
       setUserSettings((prevUserSettings) => {
-        const data = key ? { ...prevUserSettings, [key]: val } : val;
+        const data = (key ? { ...prevUserSettings, [key]: val } : val) as UserSettingsState;
 
-        pushUserSettingsChanges(data, resolve, reject);
+        void pushUserSettingsChanges(data, resolve, reject);
 
         return data;
       });
@@ -85,8 +105,8 @@ const useKubevirtUserSettings: UseKubevirtUserSettings = (key, cluster) => {
     key ? userSettings?.[key] : userSettings,
     userSettings && updateUserSetting,
     !loading && settingsInitialized,
-    error || errorUser || configMapError,
-  ];
-};
+    error ?? errorUser ?? configMapError,
+  ] as KubevirtUserSettingResult<UserSettingsState | UserSettingsState[keyof UserSettingsState]>;
+}
 
 export default useKubevirtUserSettings;

@@ -78,6 +78,9 @@ export const compareVersions = (version1: string, version2: string): number => {
 
   let idx = 0;
   while (idx < zipped.length) {
+    // undefined values are equal to 0, eg:
+    // 14.0 == 14 -> zipped = [[14,14],[0,undefined]]
+    // 1.0.0 == 1 -> zipped = [[1,1],[0,undefined],[0,undefined]]
     const ver1 = zipped[idx][0] ?? 0;
     const ver2 = zipped[idx][1] ?? 0;
 
